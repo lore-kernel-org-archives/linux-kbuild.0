@@ -1,65 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:42264 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728301AbfEMOo6 (ORCPT
+Received: from utopia.booyaka.com ([74.50.51.50]:50235 "EHLO
+        utopia.booyaka.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731694AbfEMR1O (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 May 2019 10:44:58 -0400
-Received: by mail-ed1-f66.google.com with SMTP id l25so17936391eda.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2019 07:44:57 -0700 (PDT)
-Date: Mon, 13 May 2019 16:44:51 +0200
-From: Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-Message-ID: <20190513144451.GQ17751@phenom.ffwll.local>
-References: <20190509015856.GB7031@mit.edu>
- <580e092f-fa4e-eedc-9e9a-a57dd085f0a6@gmail.com>
- <20190509032017.GA29703@mit.edu>
- <7fd35df81c06f6eb319223a22e7b93f29926edb9.camel@oracle.com>
- <20190509133551.GD29703@mit.edu>
- <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
- <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
- <20190509214233.GA20877@mit.edu>
- <80c72e64-2665-bd51-f78c-97f50f9a53ba@gmail.com>
- <20190511173344.GA8507@mit.edu>
+        Mon, 13 May 2019 13:27:14 -0400
+Date: Mon, 13 May 2019 17:20:33 +0000 (UTC)
+From: Paul Walmsley <paul@pwsan.com>
+Subject: Re: [PATCH] alpha: move arch/alpha/defconfig to
+ arch/alpha/configs/defconfig
+In-Reply-To: <20190513021405.12428-1-yamada.masahiro@socionext.com>
+Message-ID: <alpine.DEB.2.21.999.1905131720150.5613@utopia.booyaka.com>
+References: <20190513021405.12428-1-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190511173344.GA8507@mit.edu>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, Frank Rowand <frowand.list@gmail.com>, Tim.Bird@sony.com, knut.omang@oracle.com, gregkh@linuxfoundation.org, brendanhiggins@google.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, linux-kernel@vger.kernel.org, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Greentime Hu <green.hu@gmail.com>, linux-alpha@vger.kernel.org, Guo Ren <guoren@kernel.org>, Matt Turner <mattst88@gmail.com>, Vincent Chen <deanbo422@gmail.com>, linux-riscv@lists.infradead.org, Richard Henderson <rth@twiddle.net>
 
-On Sat, May 11, 2019 at 01:33:44PM -0400, Theodore Ts'o wrote:
-> On Fri, May 10, 2019 at 02:12:40PM -0700, Frank Rowand wrote:
-> > However, the reply is incorrect.  Kselftest in-kernel tests (which
-> > is the context here) can be configured as built in instead of as
-> > a module, and built in a UML kernel.  The UML kernel can boot,
-> > running the in-kernel tests before UML attempts to invoke the
-> > init process.
-> 
-> Um, Citation needed?
-> 
-> I don't see any evidence for this in the kselftest documentation, nor
-> do I see any evidence of this in the kselftest Makefiles.
-> 
-> There exists test modules in the kernel that run before the init
-> scripts run --- but that's not strictly speaking part of kselftests,
-> and do not have any kind of infrastructure.  As noted, the
-> kselftests_harness header file fundamentally assumes that you are
-> running test code in userspace.
+On Mon, 13 May 2019, Masahiro Yamada wrote:
 
-Yeah I really like the "no userspace required at all" design of kunit,
-while still collecting results in a well-defined way (unless the current
-self-test that just run when you load the module, with maybe some
-kselftest ad-hoc wrapper around to collect the results).
+> As of Linux 5.1, alpha and s390 are the last architectures that
+> have defconfig in arch/*/ instead of arch/*/configs/.
+> 
+>   $ find arch -name defconfig | sort
+>   arch/alpha/defconfig
+>   arch/arm64/configs/defconfig
+>   arch/csky/configs/defconfig
+>   arch/nds32/configs/defconfig
+>   arch/riscv/configs/defconfig
+>   arch/s390/defconfig
+> 
+> The arch/$(ARCH)/defconfig is the hard-coded default in Kconfig,
+> and I want to deprecate it after evacuating the remaining defconfig
+> into the standard location, arch/*/configs/.
+> 
+> Define KBUILD_DEFCONFIG like other architectures, and move defconfig
+> into the configs/ subdirectory.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-What I want to do long-term is to run these kernel unit tests as part of
-the build-testing, most likely in gitlab (sooner or later, for drm.git
-only ofc). So that people get their pull requests (and patch series, we
-have some ideas to tie this into patchwork) automatically tested for this
-super basic stuff.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Reviewed-by: Paul Walmsley <paul@pwsan.com>
+
+
+- Paul
