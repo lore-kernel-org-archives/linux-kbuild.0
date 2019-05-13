@@ -1,53 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:59012 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727311AbfEMC2X (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:38236 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbfEMCcC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 May 2019 22:28:23 -0400
+        Sun, 12 May 2019 22:32:02 -0400
 MIME-Version: 1.0
-References: <20190509073555.15545-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190509073555.15545-1-yamada.masahiro@socionext.com>
+References: <1557507408-7992-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1557507408-7992-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 13 May 2019 11:27:26 +0900
-Message-ID: <CAK7LNARotATDnShT-80Ect9XvSM98wYEbQRKHdUTuQBtvxG8aw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: terminate Kconfig when $(CC) or $(LD) is missing
+Date: Mon, 13 May 2019 11:31:06 +0900
+Message-ID: <CAK7LNARFntzRDbqK=-hnbW7LkCtqgFN7804d=PsRxkFS4tjdyA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: remove useless pointer check in conf_write_dep()
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Joel Stanley <joel@jms.id.au>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, May 9, 2019 at 4:36 PM Masahiro Yamada
+On Sat, May 11, 2019 at 1:56 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> If the compiler specified by $(CC) is not present, the Kconfig stage
-> sprinkles 'not found' messages, then succeeds.
+> conf_write_dep() has just one caller:
 >
->   $ make CROSS_COMPILE=foo defconfig
->   /bin/sh: 1: foogcc: not found
->   /bin/sh: 1: foogcc: not found
->   *** Default configuration is based on 'x86_64_defconfig'
->   ./scripts/gcc-version.sh: 17: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/gcc-version.sh: 18: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/gcc-version.sh: 19: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/gcc-version.sh: 17: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/gcc-version.sh: 18: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/gcc-version.sh: 19: ./scripts/gcc-version.sh: foogcc: not found
->   ./scripts/clang-version.sh: 11: ./scripts/clang-version.sh: foogcc: not found
->   ./scripts/gcc-plugin.sh: 11: ./scripts/gcc-plugin.sh: foogcc: not found
->   init/Kconfig:16:warning: 'GCC_VERSION': number is invalid
->   #
->   # configuration written to .config
->   #
+>     conf_write_dep("include/config/auto.conf.cmd");
 >
-> Terminate parsing files immediately if $(CC) or $(LD) is not found.
-> "make *config" will fail more nicely.
->
->   $ make CROSS_COMPILE=foo defconfig
->   *** Default configuration is based on 'x86_64_defconfig'
->   scripts/Kconfig.include:34: compiler 'foogcc' not found
->   make[1]: *** [scripts/kconfig/Makefile;82: defconfig] Error 1
->   make: *** [Makefile;557: defconfig] Error 2
+> "name" always points to a valid string.
 >
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
@@ -55,50 +32,24 @@ On Thu, May 9, 2019 at 4:36 PM Masahiro Yamada
 Applied to linux-kbuild.
 
 
->  Makefile                | 2 +-
->  scripts/Kconfig.include | 8 ++++++++
->  2 files changed, 9 insertions(+), 1 deletion(-)
+>  scripts/kconfig/confdata.c | 2 --
+>  1 file changed, 2 deletions(-)
 >
-> diff --git a/Makefile b/Makefile
-> index 28965187c528..bd7ae11947cb 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -537,7 +537,7 @@ endif
->  # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
->  # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
->  # and from include/config/auto.conf.cmd to detect the compiler upgrade.
-> -CC_VERSION_TEXT = $(shell $(CC) --version | head -n 1)
-> +CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 399973e..431b805 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -961,8 +961,6 @@ static int conf_write_dep(const char *name)
+>         struct file *file;
+>         FILE *out;
 >
->  ifeq ($(config-targets),1)
->  # ===========================================================================
-> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-> index 87ff1dcc6bd5..0b267fb27f07 100644
-> --- a/scripts/Kconfig.include
-> +++ b/scripts/Kconfig.include
-> @@ -18,6 +18,10 @@ if-success = $(shell,{ $(1); } >/dev/null 2>&1 && echo "$(2)" || echo "$(3)")
->  # Return y if <command> exits with 0, n otherwise
->  success = $(if-success,$(1),y,n)
->
-> +# $(failure,<command>)
-> +# Return n if <command> exits with 0, y otherwise
-> +failure = $(if-success,$(1),n,y)
-> +
->  # $(cc-option,<flag>)
->  # Return y if the compiler supports <flag>, n otherwise
->  cc-option = $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null)
-> @@ -26,5 +30,9 @@ cc-option = $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null)
->  # Return y if the linker supports <flag>, n otherwise
->  ld-option = $(success,$(LD) -v $(1))
->
-> +# check if $(CC) and $(LD) exist
-> +$(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
-> +$(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
-> +
->  # gcc version including patch level
->  gcc-version := $(shell,$(srctree)/scripts/gcc-version.sh $(CC))
+> -       if (!name)
+> -               name = ".kconfig.d";
+>         out = fopen("..config.tmp", "w");
+>         if (!out)
+>                 return 1;
 > --
-> 2.17.1
+> 2.7.4
 >
 
 
