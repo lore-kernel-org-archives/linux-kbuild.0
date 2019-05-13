@@ -1,57 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:27992 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727054AbfEMCYc (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:29424 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbfEMC07 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 May 2019 22:24:32 -0400
+        Sun, 12 May 2019 22:26:59 -0400
 MIME-Version: 1.0
-References: <20190509064635.1445-1-yamada.masahiro@socionext.com>
- <CA+icZUV03ZF_FWMMyY=36-zQZPWO0YUBuSs9bjQqpmXJzVYYRA@mail.gmail.com>
- <CAK7LNATgQaHU+6WiMvx0AAf=9AJ5nrL8f8=SJMOCJNQNb_=X1w@mail.gmail.com> <CAKwvOdn7bUOeiE8LobyENmPvYGO3j7rt1N+Ht7tcDWaOBuHhdg@mail.gmail.com>
-In-Reply-To: <CAKwvOdn7bUOeiE8LobyENmPvYGO3j7rt1N+Ht7tcDWaOBuHhdg@mail.gmail.com>
+References: <1557363481-27178-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1557363481-27178-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 13 May 2019 11:23:51 +0900
-Message-ID: <CAK7LNARJiQcBSSkdyr6HKQd_v4uWD-2D1S9nhrponaYzivOABg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add some extra warning flags unconditionally
+Date: Mon, 13 May 2019 11:26:12 +0900
+Message-ID: <CAK7LNARrrJD-7j-P8===Y4ZG5_--=35QQ4R1HALkvUZE_BO1Ow@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: re-enable int-in-bool-context warning
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, chromeos-toolchain <chromeos-toolchain@google.com>, Android-LLVM <android-llvm@google.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, May 10, 2019 at 1:47 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Thu, May 9, 2019 at 9:58 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> From: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > On Thu, May 9, 2019 at 4:11 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> > > BTW, is this a speedup when doing CC/LD FLAGS etc checks unconditionally?
-> >
-> > Yes.
-> > cc-option is somewhat costly because it invoked the compiler to
-> > check if the given flag is supported.
-> >
-> > So, I want to get rid of as many cc-option calls as possible.
-> >
-> >
-> > > Asking in general - do you have any numbers :-)?
-> >
-> > Removing a couple of cc-options does not make
-> > a measurable difference in general use-cases.
-> >
-> > But, this might be more beneficial for chrome OS
-> > because $(CC) is a wrapper and invoking it is much more expensive.
+> This warning was disabled by commit bd664f6b3e37 ("disable new
+> gcc-7.1.1 warnings for now") just because it was too noisy.
 >
-> Android does too, which we plan on removing as we recently measured
-> the performance cost of 5% for having a Python wrapper to aid in
-> bisection.
+> Thanks to Arnd Bergmann, all warnings have been fixed. Now, we are
+> ready to re-enable it.
 >
-> Anyways, I checked these options with clang 4 and gcc 4.6.4 in godbolt.
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-> --
-> Thanks,
-> ~Nick Desaulniers
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> ---
 
 Applied to linux-kbuild.
+
+
+
+> Changes in v2:
+>   - rebase
+>
+>  Makefile | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index a61a95b..2896518 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -692,7 +692,6 @@ KBUILD_CFLAGS       += $(call cc-option,-fno-delete-null-pointer-checks,)
+>  KBUILD_CFLAGS  += $(call cc-disable-warning,frame-address,)
+>  KBUILD_CFLAGS  += $(call cc-disable-warning, format-truncation)
+>  KBUILD_CFLAGS  += $(call cc-disable-warning, format-overflow)
+> -KBUILD_CFLAGS  += $(call cc-disable-warning, int-in-bool-context)
+>  KBUILD_CFLAGS  += $(call cc-disable-warning, address-of-packed-member)
+>
+>  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+> --
+> 2.7.4
+>
 
 
 -- 
