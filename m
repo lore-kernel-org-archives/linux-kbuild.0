@@ -1,96 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:38102 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727054AbfEMCWP (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:28939 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727054AbfEMCYC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 May 2019 22:22:15 -0400
+        Sun, 12 May 2019 22:24:02 -0400
 MIME-Version: 1.0
-References: <1557497409-18037-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1557497409-18037-1-git-send-email-yamada.masahiro@socionext.com>
+References: <CAK7LNASpsid7_sh4rdRNSTwZ1YtW_+uH2eoarJNNUttntQZ-kg@mail.gmail.com>
+ <20190509114824.25866-1-natechancellor@gmail.com>
+In-Reply-To: <20190509114824.25866-1-natechancellor@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 13 May 2019 11:21:19 +0900
-Message-ID: <CAK7LNASu5ef8TbhL5J4Mgw=ZH4fpGR34xPfbruOSW4frm0c6gQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add all Clang-specific flags unconditionally
+Date: Mon, 13 May 2019 11:23:10 +0900
+Message-ID: <CAK7LNASsm9wrL5JkpVpp0qm5jBd22sHukqYe_iJGJXe0RO8ECg@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: Don't try to add '-fcatch-undefined-behavior' flag
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Nick Desaulniers <ndesaulniers@google.com>, Arnd Bergmann <arnd@arndb.de>
 
-On Fri, May 10, 2019 at 11:11 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Thu, May 9, 2019 at 8:49 PM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
 >
-> We do not support old Clang versions. Upgrade your clang version
-> if any of these flags is unsupported.
+> This is no longer a valid option in clang, it was removed in 3.5, which
+> we don't support.
 >
-> Let's add all flags within ifdef CONFIG_CC_IS_CLANG unconditionally.
+> https://github.com/llvm/llvm-project/commit/cb3f812b6b9fab8f3b41414f24e90222170417b4
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 > ---
+>
+> Let me know if you want this incremental to your patch. I figured it
+> made more sense to remove this then do the cc-option/cc-disable-warning
+> removal because it will simplify the commit message.
 
 Applied to linux-kbuild.
+Thanks.
 
->
-> Changes in v2:
->   - Rebase on top of Nathan's patch
->      https://patchwork.kernel.org/patch/10937055/
->
->  Makefile                   | 10 +++++-----
->  scripts/Makefile.extrawarn | 12 ++++++------
->  2 files changed, 11 insertions(+), 11 deletions(-)
+
+>  Makefile | 1 -
+>  1 file changed, 1 deletion(-)
 >
 > diff --git a/Makefile b/Makefile
-> index 914a3ad..1152fc4 100644
+> index d24f5a8009ee..e4788eb2c9b9 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -731,15 +731,15 @@ stackp-flags-$(CONFIG_STACKPROTECTOR_STRONG)      := -fstack-protector-strong
->  KBUILD_CFLAGS += $(stackp-flags-y)
->
->  ifdef CONFIG_CC_IS_CLANG
-> -KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-> +KBUILD_CPPFLAGS += -Qunused-arguments
-> +KBUILD_CFLAGS += -Wno-format-invalid-specifier
-> +KBUILD_CFLAGS += -Wno-gnu
->  # Quiet clang warning: comparison of unsigned expression < 0 is always false
-> -KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-> +KBUILD_CFLAGS += -Wno-tautological-compare
->  # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+> @@ -740,7 +740,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
 >  # source of a reference will be _MergedGlobals and not on of the whitelisted names.
 >  # See modpost pattern 2
-> -KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> +KBUILD_CFLAGS += -mno-global-merge
+>  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+> -KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
 >  else
 >
 >  # These warnings generated too much noise in a regular build.
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 768306a..523c4ca 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -66,11 +66,11 @@ KBUILD_CFLAGS += $(warning)
->  else
->
->  ifdef CONFIG_CC_IS_CLANG
-> -KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
-> +KBUILD_CFLAGS += -Wno-initializer-overrides
-> +KBUILD_CFLAGS += -Wno-unused-value
-> +KBUILD_CFLAGS += -Wno-format
-> +KBUILD_CFLAGS += -Wno-sign-compare
-> +KBUILD_CFLAGS += -Wno-format-zero-length
-> +KBUILD_CFLAGS += -Wno-uninitialized
->  endif
->  endif
 > --
-> 2.7.4
+> 2.21.0
 >
 
 
