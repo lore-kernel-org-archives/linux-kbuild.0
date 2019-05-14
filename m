@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:33400 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726676AbfENFni (ORCPT
+Received: from mail-oi1-f201.google.com ([209.85.167.201]:46780 "EHLO
+        mail-oi1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726812AbfENFny (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 May 2019 01:43:38 -0400
-Received: by mail-pg1-f202.google.com with SMTP id s8so10824064pgk.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2019 22:43:37 -0700 (PDT)
-Date: Mon, 13 May 2019 22:42:33 -0700
-Message-Id: <20190514054251.186196-1-brendanhiggins@google.com>
+        Tue, 14 May 2019 01:43:54 -0400
+Received: by mail-oi1-f201.google.com with SMTP id f143so2039067oig.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2019 22:43:53 -0700 (PDT)
+Date: Mon, 13 May 2019 22:42:35 -0700
+In-Reply-To: <20190514054251.186196-1-brendanhiggins@google.com>
+Message-Id: <20190514054251.186196-3-brendanhiggins@google.com>
 Mime-Version: 1.0
-Subject: [PATCH v3 00/18] kunit: introduce KUnit, the Linux kernel unit
- testing framework
+References: <20190514054251.186196-1-brendanhiggins@google.com>
+Subject: [PATCH v3 02/18] kunit: test: add test resource management API
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,95 +19,281 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
 Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-## TLDR
+Create a common API for test managed resources like memory and test
+objects. A lot of times a test will want to set up infrastructure to be
+used in test cases; this could be anything from just wanting to allocate
+some memory to setting up a driver stack; this defines facilities for
+creating "test resources" which are managed by the test infrastructure
+and are automatically cleaned up at the conclusion of the test.
 
-I mostly wanted to incorporate feedback I got over the last week and a
-half.
+Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ include/kunit/test.h | 109 +++++++++++++++++++++++++++++++++++++++++++
+ kunit/test.c         |  95 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 204 insertions(+)
 
-Biggest things to look out for:
-
-- KUnit core now outputs results in TAP14.
-- Heavily reworked tools/testing/kunit/kunit.py
-  - Changed how parsing works.
-  - Added testing.
-  - Greg, Logan, you might want to re-review this.
-- Added documentation on how to use KUnit on non-UML kernels. You can
-  see the docs rendered here[1].
-
-There is still some discussion going on on the [PATCH v2 00/17] thread,
-but I wanted to get some of these updates out before they got too stale
-(and too difficult for me to keep track of). I hope no one minds.
-
-## Background
-
-This patch set proposes KUnit, a lightweight unit testing and mocking
-framework for the Linux kernel.
-
-Unlike Autotest and kselftest, KUnit is a true unit testing framework;
-it does not require installing the kernel on a test machine or in a VM
-(however, KUnit still allows you to run tests on test machines or in VMs
-if you want) and does not require tests to be written in userspace
-running on a host kernel. Additionally, KUnit is fast: From invocation
-to completion KUnit can run several dozen tests in under a second.
-Currently, the entire KUnit test suite for KUnit runs in under a second
-from the initial invocation (build time excluded).
-
-KUnit is heavily inspired by JUnit, Python's unittest.mock, and
-Googletest/Googlemock for C++. KUnit provides facilities for defining
-unit test cases, grouping related test cases into test suites, providing
-common infrastructure for running tests, mocking, spying, and much more.
-
-## What's so special about unit testing?
-
-A unit test is supposed to test a single unit of code in isolation,
-hence the name. There should be no dependencies outside the control of
-the test; this means no external dependencies, which makes tests orders
-of magnitudes faster. Likewise, since there are no external dependencies,
-there are no hoops to jump through to run the tests. Additionally, this
-makes unit tests deterministic: a failing unit test always indicates a
-problem. Finally, because unit tests necessarily have finer granularity,
-they are able to test all code paths easily solving the classic problem
-of difficulty in exercising error handling code.
-
-## Is KUnit trying to replace other testing frameworks for the kernel?
-
-No. Most existing tests for the Linux kernel are end-to-end tests, which
-have their place. A well tested system has lots of unit tests, a
-reasonable number of integration tests, and some end-to-end tests. KUnit
-is just trying to address the unit test space which is currently not
-being addressed.
-
-## More information on KUnit
-
-There is a bunch of documentation near the end of this patch set that
-describes how to use KUnit and best practices for writing unit tests.
-For convenience I am hosting the compiled docs here[2].
-
-Additionally for convenience, I have applied these patches to a
-branch[3].
-The repo may be cloned with:
-git clone https://kunit.googlesource.com/linux
-This patchset is on the kunit/rfc/v5.1/v3 branch.
-
-## Changes Since Last Version
-
-- Converted KUnit core to print test results in TAP14 format as
-  suggested by Greg and Frank.
-- Heavily reworked tools/testing/kunit/kunit.py
-  - Changed how parsing works.
-  - Added testing.
-- Added documentation on how to use KUnit on non-UML kernels. You can
-  see the docs rendered here[1].
-- Added a new set of EXPECTs and ASSERTs for pointer comparison.
-- Removed more function indirection as suggested by Logan.
-- Added a new patch that adds `kunit_try_catch_throw` to objtool's
-  noreturn list.
-- Fixed a number of minorish issues pointed out by Shuah, Masahiro, and
-  kbuild bot.
-
-[1] https://google.github.io/kunit-docs/third_party/kernel/docs/usage.html#kunit-on-non-uml-architectures
-[2] https://google.github.io/kunit-docs/third_party/kernel/docs/
-[3] https://kunit.googlesource.com/linux/+/kunit/rfc/v5.1/v3
-
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index e682ea0e1f9a5..5e86d88cd5305 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -12,6 +12,69 @@
+ #include <linux/types.h>
+ #include <linux/slab.h>
+ 
++struct kunit_resource;
++
++typedef int (*kunit_resource_init_t)(struct kunit_resource *, void *);
++typedef void (*kunit_resource_free_t)(struct kunit_resource *);
++
++/**
++ * struct kunit_resource - represents a *test managed resource*
++ * @allocation: for the user to store arbitrary data.
++ * @free: a user supplied function to free the resource. Populated by
++ * kunit_alloc_resource().
++ *
++ * Represents a *test managed resource*, a resource which will automatically be
++ * cleaned up at the end of a test case.
++ *
++ * Example:
++ *
++ * .. code-block:: c
++ *
++ *	struct kunit_kmalloc_params {
++ *		size_t size;
++ *		gfp_t gfp;
++ *	};
++ *
++ *	static int kunit_kmalloc_init(struct kunit_resource *res, void *context)
++ *	{
++ *		struct kunit_kmalloc_params *params = context;
++ *		res->allocation = kmalloc(params->size, params->gfp);
++ *
++ *		if (!res->allocation)
++ *			return -ENOMEM;
++ *
++ *		return 0;
++ *	}
++ *
++ *	static void kunit_kmalloc_free(struct kunit_resource *res)
++ *	{
++ *		kfree(res->allocation);
++ *	}
++ *
++ *	void *kunit_kmalloc(struct kunit *test, size_t size, gfp_t gfp)
++ *	{
++ *		struct kunit_kmalloc_params params;
++ *		struct kunit_resource *res;
++ *
++ *		params.size = size;
++ *		params.gfp = gfp;
++ *
++ *		res = kunit_alloc_resource(test, kunit_kmalloc_init,
++ *			kunit_kmalloc_free, &params);
++ *		if (res)
++ *			return res->allocation;
++ *		else
++ *			return NULL;
++ *	}
++ */
++struct kunit_resource {
++	void *allocation;
++	kunit_resource_free_t free;
++
++	/* private: internal use only. */
++	struct list_head node;
++};
++
+ struct kunit;
+ 
+ /**
+@@ -104,6 +167,7 @@ struct kunit {
+ 	const char *name; /* Read only after initialization! */
+ 	spinlock_t lock; /* Gaurds all mutable test state. */
+ 	bool success; /* Protected by lock. */
++	struct list_head resources; /* Protected by lock. */
+ };
+ 
+ void kunit_init_test(struct kunit *test, const char *name);
+@@ -124,6 +188,51 @@ int kunit_run_tests(struct kunit_module *module);
+ 		} \
+ 		late_initcall(module_kunit_init##module)
+ 
++/**
++ * kunit_alloc_resource() - Allocates a *test managed resource*.
++ * @test: The test context object.
++ * @init: a user supplied function to initialize the resource.
++ * @free: a user supplied function to free the resource.
++ * @context: for the user to pass in arbitrary data to the init function.
++ *
++ * Allocates a *test managed resource*, a resource which will automatically be
++ * cleaned up at the end of a test case. See &struct kunit_resource for an
++ * example.
++ */
++struct kunit_resource *kunit_alloc_resource(struct kunit *test,
++					    kunit_resource_init_t init,
++					    kunit_resource_free_t free,
++					    void *context);
++
++void kunit_free_resource(struct kunit *test, struct kunit_resource *res);
++
++/**
++ * kunit_kmalloc() - Like kmalloc() except the allocation is *test managed*.
++ * @test: The test context object.
++ * @size: The size in bytes of the desired memory.
++ * @gfp: flags passed to underlying kmalloc().
++ *
++ * Just like `kmalloc(...)`, except the allocation is managed by the test case
++ * and is automatically cleaned up after the test case concludes. See &struct
++ * kunit_resource for more information.
++ */
++void *kunit_kmalloc(struct kunit *test, size_t size, gfp_t gfp);
++
++/**
++ * kunit_kzalloc() - Just like kunit_kmalloc(), but zeroes the allocation.
++ * @test: The test context object.
++ * @size: The size in bytes of the desired memory.
++ * @gfp: flags passed to underlying kmalloc().
++ *
++ * See kzalloc() and kunit_kmalloc() for more information.
++ */
++static inline void *kunit_kzalloc(struct kunit *test, size_t size, gfp_t gfp)
++{
++	return kunit_kmalloc(test, size, gfp | __GFP_ZERO);
++}
++
++void kunit_cleanup(struct kunit *test);
++
+ void __printf(3, 4) kunit_printk(const char *level,
+ 				 const struct kunit *test,
+ 				 const char *fmt, ...);
+diff --git a/kunit/test.c b/kunit/test.c
+index 86f65ba2bcf92..a15e6f8c41582 100644
+--- a/kunit/test.c
++++ b/kunit/test.c
+@@ -141,6 +141,7 @@ static void kunit_print_test_case_ok_not_ok(struct kunit_case *test_case,
+ void kunit_init_test(struct kunit *test, const char *name)
+ {
+ 	spin_lock_init(&test->lock);
++	INIT_LIST_HEAD(&test->resources);
+ 	test->name = name;
+ }
+ 
+@@ -165,6 +166,11 @@ static void kunit_run_case_internal(struct kunit *test,
+ 	test_case->run_case(test);
+ }
+ 
++static void kunit_case_internal_cleanup(struct kunit *test)
++{
++	kunit_cleanup(test);
++}
++
+ /*
+  * Performs post validations and cleanup after a test case was run.
+  * XXX: Should ONLY BE CALLED AFTER kunit_run_case_internal!
+@@ -175,6 +181,8 @@ static void kunit_run_case_cleanup(struct kunit *test,
+ {
+ 	if (module->exit)
+ 		module->exit(test);
++
++	kunit_case_internal_cleanup(test);
+ }
+ 
+ /*
+@@ -211,6 +219,93 @@ int kunit_run_tests(struct kunit_module *module)
+ 	return 0;
+ }
+ 
++struct kunit_resource *kunit_alloc_resource(struct kunit *test,
++					    kunit_resource_init_t init,
++					    kunit_resource_free_t free,
++					    void *context)
++{
++	struct kunit_resource *res;
++	unsigned long flags;
++	int ret;
++
++	res = kzalloc(sizeof(*res), GFP_KERNEL);
++	if (!res)
++		return NULL;
++
++	ret = init(res, context);
++	if (ret)
++		return NULL;
++
++	res->free = free;
++	spin_lock_irqsave(&test->lock, flags);
++	list_add_tail(&res->node, &test->resources);
++	spin_unlock_irqrestore(&test->lock, flags);
++
++	return res;
++}
++
++void kunit_free_resource(struct kunit *test, struct kunit_resource *res)
++{
++	res->free(res);
++	list_del(&res->node);
++	kfree(res);
++}
++
++struct kunit_kmalloc_params {
++	size_t size;
++	gfp_t gfp;
++};
++
++static int kunit_kmalloc_init(struct kunit_resource *res, void *context)
++{
++	struct kunit_kmalloc_params *params = context;
++
++	res->allocation = kmalloc(params->size, params->gfp);
++	if (!res->allocation)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void kunit_kmalloc_free(struct kunit_resource *res)
++{
++	kfree(res->allocation);
++}
++
++void *kunit_kmalloc(struct kunit *test, size_t size, gfp_t gfp)
++{
++	struct kunit_kmalloc_params params;
++	struct kunit_resource *res;
++
++	params.size = size;
++	params.gfp = gfp;
++
++	res = kunit_alloc_resource(test,
++				   kunit_kmalloc_init,
++				   kunit_kmalloc_free,
++				   &params);
++
++	if (res)
++		return res->allocation;
++	else
++		return NULL;
++}
++
++void kunit_cleanup(struct kunit *test)
++{
++	struct kunit_resource *resource, *resource_safe;
++	unsigned long flags;
++
++	spin_lock_irqsave(&test->lock, flags);
++	list_for_each_entry_safe(resource,
++				 resource_safe,
++				 &test->resources,
++				 node) {
++		kunit_free_resource(test, resource);
++	}
++	spin_unlock_irqrestore(&test->lock, flags);
++}
++
+ void kunit_printk(const char *level,
+ 		  const struct kunit *test,
+ 		  const char *fmt, ...)
 -- 
 2.21.0.1020.gf2820cf01a-goog
