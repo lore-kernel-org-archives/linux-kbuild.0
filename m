@@ -1,464 +1,372 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ua1-f73.google.com ([209.85.222.73]:33049 "EHLO
-        mail-ua1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbfENFqQ (ORCPT
+Received: from mail-ot1-f74.google.com ([209.85.210.74]:39439 "EHLO
+        mail-ot1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727138AbfENFqg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 May 2019 01:46:16 -0400
-Received: by mail-ua1-f73.google.com with SMTP id h6so1990715uab.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2019 22:46:15 -0700 (PDT)
-Date: Mon, 13 May 2019 22:42:43 -0700
+        Tue, 14 May 2019 01:46:36 -0400
+Received: by mail-ot1-f74.google.com with SMTP id x27so3325855ote.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2019 22:46:35 -0700 (PDT)
+Date: Mon, 13 May 2019 22:42:51 -0700
 In-Reply-To: <20190514054251.186196-1-brendanhiggins@google.com>
-Message-Id: <20190514054251.186196-10-brendanhiggins@google.com>
+Message-Id: <20190514054251.186196-18-brendanhiggins@google.com>
 Mime-Version: 1.0
 References: <20190514054251.186196-1-brendanhiggins@google.com>
-Subject: [PATCH v3 09/18] kunit: test: add support for test abort
+Subject: [PATCH v3 17/18] kernel/sysctl-test: Add null pointer test for sysctl.c:proc_dointvec()
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Iurii Zaikin <yzaikin@google.com>, Brendan Higgins <brendanhiggins@google.com>
 
-Add support for aborting/bailing out of test cases, which is needed for
-implementing assertions.
+From: Iurii Zaikin <yzaikin@google.com>
 
-An assertion is like an expectation, but bails out of the test case
-early if the assertion is not met. The idea with assertions is that you
-use them to state all the preconditions for your test. Logically
-speaking, these are the premises of the test case, so if a premise isn't
-true, there is no point in continuing the test case because there are no
-conclusions that can be drawn without the premises. Whereas, the
-expectation is the thing you are trying to prove.
+KUnit tests for initialized data behavior of proc_dointvec that is
+explicitly checked in the code. Includes basic parsing tests including
+int min/max overflow.
 
+Signed-off-by: Iurii Zaikin <yzaikin@google.com>
 Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
 Changes Since Last Revision:
- - Removed unnecessary indirection as per Logan's comments.
+ - Fixed integer overflow discovered by kbuild bot.
 ---
- include/kunit/test.h      |  14 ++++
- include/kunit/try-catch.h |  69 +++++++++++++++++++
- kunit/Makefile            |   3 +-
- kunit/test.c              | 136 ++++++++++++++++++++++++++++++++++++--
- kunit/try-catch.c         |  95 ++++++++++++++++++++++++++
- 5 files changed, 309 insertions(+), 8 deletions(-)
- create mode 100644 include/kunit/try-catch.h
- create mode 100644 kunit/try-catch.c
+ kernel/Makefile      |   2 +
+ kernel/sysctl-test.c | 293 +++++++++++++++++++++++++++++++++++++++++++
+ lib/Kconfig.debug    |   6 +
+ 3 files changed, 301 insertions(+)
+ create mode 100644 kernel/sysctl-test.c
 
-diff --git a/include/kunit/test.h b/include/kunit/test.h
-index 86187ba069a5d..aff55b5610e7d 100644
---- a/include/kunit/test.h
-+++ b/include/kunit/test.h
-@@ -12,6 +12,7 @@
- #include <linux/types.h>
- #include <linux/slab.h>
- #include <kunit/kunit-stream.h>
-+#include <kunit/try-catch.h>
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 6c57e78817dad..c81a8976b6a4b 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -112,6 +112,8 @@ obj-$(CONFIG_HAS_IOMEM) += iomem.o
+ obj-$(CONFIG_ZONE_DEVICE) += memremap.o
+ obj-$(CONFIG_RSEQ) += rseq.o
  
- struct kunit_resource;
- 
-@@ -166,15 +167,28 @@ struct kunit {
- 
- 	/* private: internal use only. */
- 	const char *name; /* Read only after initialization! */
-+	struct kunit_try_catch try_catch;
- 	spinlock_t lock; /* Gaurds all mutable test state. */
- 	bool success; /* Protected by lock. */
-+	bool death_test; /* Protected by lock. */
- 	struct list_head resources; /* Protected by lock. */
- };
- 
-+static inline void kunit_set_death_test(struct kunit *test, bool death_test)
-+{
-+	unsigned long flags;
++obj-$(CONFIG_SYSCTL_KUNIT_TEST) += sysctl-test.o
 +
-+	spin_lock_irqsave(&test->lock, flags);
-+	test->death_test = death_test;
-+	spin_unlock_irqrestore(&test->lock, flags);
-+}
-+
- void kunit_init_test(struct kunit *test, const char *name);
- 
- void kunit_fail(struct kunit *test, struct kunit_stream *stream);
- 
-+void kunit_abort(struct kunit *test);
-+
- int kunit_run_tests(struct kunit_module *module);
- 
- /**
-diff --git a/include/kunit/try-catch.h b/include/kunit/try-catch.h
+ obj-$(CONFIG_GCC_PLUGIN_STACKLEAK) += stackleak.o
+ KASAN_SANITIZE_stackleak.o := n
+ KCOV_INSTRUMENT_stackleak.o := n
+diff --git a/kernel/sysctl-test.c b/kernel/sysctl-test.c
 new file mode 100644
-index 0000000000000..8a414a9af0b64
+index 0000000000000..fe0f2bae66085
 --- /dev/null
-+++ b/include/kunit/try-catch.h
-@@ -0,0 +1,69 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * An API to allow a function, that may fail, to be executed, and recover in a
-+ * controlled manner.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#ifndef _KUNIT_TRY_CATCH_H
-+#define _KUNIT_TRY_CATCH_H
-+
-+#include <linux/types.h>
-+
-+typedef void (*kunit_try_catch_func_t)(void *);
-+
-+struct kunit;
-+
-+/*
-+ * struct kunit_try_catch - provides a generic way to run code which might fail.
-+ * @context: used to pass user data to the try and catch functions.
-+ *
-+ * kunit_try_catch provides a generic, architecture independent way to execute
-+ * an arbitrary function of type kunit_try_catch_func_t which may bail out by
-+ * calling kunit_try_catch_throw(). If kunit_try_catch_throw() is called, @try
-+ * is stopped at the site of invocation and @catch is catch is called.
-+ *
-+ * struct kunit_try_catch provides a generic interface for the functionality
-+ * needed to implement kunit->abort() which in turn is needed for implementing
-+ * assertions. Assertions allow stating a precondition for a test simplifying
-+ * how test cases are written and presented.
-+ *
-+ * Assertions are like expectations, except they abort (call
-+ * kunit_try_catch_throw()) when the specified condition is not met. This is
-+ * useful when you look at a test case as a logical statement about some piece
-+ * of code, where assertions are the premises for the test case, and the
-+ * conclusion is a set of predicates, rather expectations, that must all be
-+ * true. If your premises are violated, it does not makes sense to continue.
-+ */
-+struct kunit_try_catch {
-+	/* private: internal use only. */
-+	struct kunit *test;
-+	struct completion *try_completion;
-+	int try_result;
-+	kunit_try_catch_func_t try;
-+	kunit_try_catch_func_t catch;
-+	void *context;
-+};
-+
-+void kunit_try_catch_init(struct kunit_try_catch *try_catch,
-+			  struct kunit *test,
-+			  kunit_try_catch_func_t try,
-+			  kunit_try_catch_func_t catch);
-+
-+void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context);
-+
-+void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch);
-+
-+static inline int kunit_try_catch_get_result(struct kunit_try_catch *try_catch)
-+{
-+	return try_catch->try_result;
-+}
-+
-+/*
-+ * Exposed for testing only.
-+ */
-+void kunit_generic_try_catch_init(struct kunit_try_catch *try_catch);
-+
-+#endif /* _KUNIT_TRY_CATCH_H */
-diff --git a/kunit/Makefile b/kunit/Makefile
-index 60a9ea6cb4697..1f7680cfa11ad 100644
---- a/kunit/Makefile
-+++ b/kunit/Makefile
-@@ -1,6 +1,7 @@
- obj-$(CONFIG_KUNIT) +=			test.o \
- 					string-stream.o \
--					kunit-stream.o
-+					kunit-stream.o \
-+					try-catch.o
- 
- obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
- 
-diff --git a/kunit/test.c b/kunit/test.c
-index e0727afb5d8a9..34cecc5c805e8 100644
---- a/kunit/test.c
-+++ b/kunit/test.c
-@@ -6,9 +6,9 @@
-  * Author: Brendan Higgins <brendanhiggins@google.com>
-  */
- 
--#include <linux/sched.h>
- #include <linux/sched/debug.h>
- #include <kunit/test.h>
-+#include <kunit/try-catch.h>
- 
- static bool kunit_get_success(struct kunit *test)
- {
-@@ -31,6 +31,18 @@ static void kunit_set_success(struct kunit *test, bool success)
- 	spin_unlock_irqrestore(&test->lock, flags);
- }
- 
-+static bool kunit_get_death_test(struct kunit *test)
-+{
-+	unsigned long flags;
-+	bool death_test;
-+
-+	spin_lock_irqsave(&test->lock, flags);
-+	death_test = test->death_test;
-+	spin_unlock_irqrestore(&test->lock, flags);
-+
-+	return death_test;
-+}
-+
- static int kunit_vprintk_emit(int level, const char *fmt, va_list args)
- {
- 	return vprintk_emit(0, level, NULL, 0, fmt, args);
-@@ -145,6 +157,21 @@ void kunit_fail(struct kunit *test, struct kunit_stream *stream)
- 	kunit_stream_commit(stream);
- }
- 
-+void __noreturn kunit_abort(struct kunit *test)
-+{
-+	kunit_set_death_test(test, true);
-+
-+	kunit_try_catch_throw(&test->try_catch);
-+
-+	/*
-+	 * Throw could not abort from test.
-+	 *
-+	 * XXX: we should never reach this line! As kunit_try_catch_throw is
-+	 * marked __noreturn.
-+	 */
-+	WARN_ONCE(true, "Throw could not abort from test!\n");
-+}
-+
- void kunit_init_test(struct kunit *test, const char *name)
- {
- 	spin_lock_init(&test->lock);
-@@ -193,18 +220,113 @@ static void kunit_run_case_cleanup(struct kunit *test,
- }
- 
- /*
-- * Performs all logic to run a test case.
-+ * Handles an unexpected crash in a test case.
-+ */
-+static void kunit_handle_test_crash(struct kunit *test,
-+				   struct kunit_module *module,
-+				   struct kunit_case *test_case)
-+{
-+	kunit_err(test, "kunit test case crashed!");
-+	/*
-+	 * TODO(brendanhiggins@google.com): This prints the stack trace up
-+	 * through this frame, not up to the frame that caused the crash.
-+	 */
-+	show_stack(NULL, NULL);
-+
-+	kunit_case_internal_cleanup(test);
-+}
-+
-+struct kunit_try_catch_context {
-+	struct kunit *test;
-+	struct kunit_module *module;
-+	struct kunit_case *test_case;
-+};
-+
-+static void kunit_try_run_case(void *data)
-+{
-+	struct kunit_try_catch_context *ctx = data;
-+	struct kunit *test = ctx->test;
-+	struct kunit_module *module = ctx->module;
-+	struct kunit_case *test_case = ctx->test_case;
-+
-+	/*
-+	 * kunit_run_case_internal may encounter a fatal error; if it does,
-+	 * abort will be called, this thread will exit, and finally the parent
-+	 * thread will resume control and handle any necessary clean up.
-+	 */
-+	kunit_run_case_internal(test, module, test_case);
-+	/* This line may never be reached. */
-+	kunit_run_case_cleanup(test, module, test_case);
-+}
-+
-+static void kunit_catch_run_case(void *data)
-+{
-+	struct kunit_try_catch_context *ctx = data;
-+	struct kunit *test = ctx->test;
-+	struct kunit_module *module = ctx->module;
-+	struct kunit_case *test_case = ctx->test_case;
-+	int try_exit_code = kunit_try_catch_get_result(&test->try_catch);
-+
-+	if (try_exit_code) {
-+		kunit_set_success(test, false);
-+		/*
-+		 * Test case could not finish, we have no idea what state it is
-+		 * in, so don't do clean up.
-+		 */
-+		if (try_exit_code == -ETIMEDOUT)
-+			kunit_err(test, "test case timed out\n");
-+		/*
-+		 * Unknown internal error occurred preventing test case from
-+		 * running, so there is nothing to clean up.
-+		 */
-+		else
-+			kunit_err(test, "internal error occurred preventing test case from running: %d\n",
-+				  try_exit_code);
-+		return;
-+	}
-+
-+	if (kunit_get_death_test(test)) {
-+		/*
-+		 * EXPECTED DEATH: kunit_run_case_internal encountered
-+		 * anticipated fatal error. Everything should be in a safe
-+		 * state.
-+		 */
-+		kunit_run_case_cleanup(test, module, test_case);
-+	} else {
-+		/*
-+		 * UNEXPECTED DEATH: kunit_run_case_internal encountered an
-+		 * unanticipated fatal error. We have no idea what the state of
-+		 * the test case is in.
-+		 */
-+		kunit_handle_test_crash(test, module, test_case);
-+		kunit_set_success(test, false);
-+	}
-+}
-+
-+/*
-+ * Performs all logic to run a test case. It also catches most errors that
-+ * occurs in a test case and reports them as failures.
-  */
--static void kunit_run_case(struct kunit_module *module,
--			   struct kunit_case *test_case)
-+static void kunit_run_case_catch_errors(struct kunit_module *module,
-+					struct kunit_case *test_case)
- {
-+	struct kunit_try_catch_context context;
-+	struct kunit_try_catch *try_catch;
- 	struct kunit test;
- 
- 	kunit_init_test(&test, test_case->name);
-+	try_catch = &test.try_catch;
- 	kunit_set_success(&test, true);
-+	kunit_set_death_test(&test, false);
- 
--	kunit_run_case_internal(&test, module, test_case);
--	kunit_run_case_cleanup(&test, module, test_case);
-+	kunit_try_catch_init(try_catch,
-+			     &test,
-+			     kunit_try_run_case,
-+			     kunit_catch_run_case);
-+	context.test = &test;
-+	context.module = module;
-+	context.test_case = test_case;
-+	kunit_try_catch_run(try_catch, &context);
- 
- 	test_case->success = kunit_get_success(&test);
- }
-@@ -217,7 +339,7 @@ int kunit_run_tests(struct kunit_module *module)
- 	kunit_print_subtest_start(module);
- 
- 	for (test_case = module->test_cases; test_case->run_case; test_case++) {
--		kunit_run_case(module, test_case);
-+		kunit_run_case_catch_errors(module, test_case);
- 		kunit_print_test_case_ok_not_ok(test_case, test_case_count++);
- 	}
- 
-diff --git a/kunit/try-catch.c b/kunit/try-catch.c
-new file mode 100644
-index 0000000000000..de580f074387b
---- /dev/null
-+++ b/kunit/try-catch.c
-@@ -0,0 +1,95 @@
++++ b/kernel/sysctl-test.c
+@@ -0,0 +1,293 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * An API to allow a function, that may fail, to be executed, and recover in a
-+ * controlled manner.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
++ * KUnit test of proc sysctl.
 + */
 +
-+#include <kunit/try-catch.h>
 +#include <kunit/test.h>
-+#include <linux/completion.h>
-+#include <linux/kthread.h>
++#include <linux/printk.h>
++#include <linux/sysctl.h>
++#include <linux/uaccess.h>
 +
-+void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch)
++static int i_zero;
++static int i_one_hundred = 100;
++
++struct test_sysctl_data {
++	int int_0001;
++	int int_0002;
++	int int_0003[4];
++
++	unsigned int uint_0001;
++
++	char string_0001[65];
++};
++
++static struct test_sysctl_data test_data = {
++	.int_0001 = 60,
++	.int_0002 = 1,
++
++	.int_0003[0] = 0,
++	.int_0003[1] = 1,
++	.int_0003[2] = 2,
++	.int_0003[3] = 3,
++
++	.uint_0001 = 314,
++
++	.string_0001 = "(none)",
++};
++
++static void sysctl_test_dointvec_null_tbl_data(struct kunit *test)
 +{
-+	try_catch->try_result = -EFAULT;
-+	complete_and_exit(try_catch->try_completion, -EFAULT);
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= NULL,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	void  *buffer = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	size_t len;
++	loff_t pos;
++
++	len = 1234;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 0, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
++	len = 1234;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
 +}
 +
-+static int kunit_generic_run_threadfn_adapter(void *data)
++static void sysctl_test_dointvec_table_maxlen_unset(struct kunit *test)
 +{
-+	struct kunit_try_catch *try_catch = data;
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= 0,
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	void  *buffer = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	size_t len;
++	loff_t pos;
 +
-+	try_catch->try(try_catch->context);
-+
-+	complete_and_exit(try_catch->try_completion, 0);
++	len = 1234;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 0, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
++	len = 1234;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
 +}
 +
-+void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
++static void sysctl_test_dointvec_table_len_is_zero(struct kunit *test)
 +{
-+	DECLARE_COMPLETION_ONSTACK(try_completion);
-+	struct kunit *test = try_catch->test;
-+	struct task_struct *task_struct;
-+	int exit_code, status;
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	void  *buffer = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	size_t len;
++	loff_t pos;
 +
-+	try_catch->context = context;
-+	try_catch->try_completion = &try_completion;
-+	try_catch->try_result = 0;
-+	task_struct = kthread_run(kunit_generic_run_threadfn_adapter,
-+				  try_catch,
-+				  "kunit_try_catch_thread");
-+	if (IS_ERR(task_struct)) {
-+		try_catch->catch(try_catch->context);
-+		return;
-+	}
++	len = 0;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 0, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
++}
 +
++static void sysctl_test_dointvec_table_read_but_position_set(struct kunit *test)
++{
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	void  *buffer = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	size_t len;
++	loff_t pos;
++
++	len = 1234;
++	pos = 1;
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 0, buffer, &len, &pos));
++	KUNIT_EXPECT_EQ(test, 0, len);
++}
++
++static void sysctl_test_dointvec_happy_single_positive(struct kunit *test)
++{
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	char input[] = "9";
++	size_t len = sizeof(input) - 1;
++	loff_t pos = 0;
++
++	table.data = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, input, &len, &pos));
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, len);
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, pos);
++	KUNIT_EXPECT_EQ(test, 9, *(int *)table.data);
++}
++
++static void sysctl_test_dointvec_happy_single_negative(struct kunit *test)
++{
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	char input[] = "-9";
++	size_t len = sizeof(input) - 1;
++	loff_t pos = 0;
++
++	table.data = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, input, &len, &pos));
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, len);
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, pos);
++	KUNIT_EXPECT_EQ(test, -9, *(int *)table.data);
++}
++
++static void sysctl_test_dointvec_single_less_int_min(struct kunit *test)
++{
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	char input[32];
++	size_t len = sizeof(input) - 1;
++	loff_t pos = 0;
++	unsigned long abs_of_less_than_min = (unsigned long)INT_MAX
++					     - (INT_MAX + INT_MIN) + 1;
++
++	KUNIT_EXPECT_LT(test,
++			snprintf(input, sizeof(input), "-%lu",
++				 abs_of_less_than_min),
++			sizeof(input));
++
++	table.data = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	KUNIT_EXPECT_EQ(test, -EINVAL,
++			proc_dointvec(&table, 1, input, &len, &pos));
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, len);
++	KUNIT_EXPECT_EQ(test, 0, *(int *)table.data);
++}
++
++static void sysctl_test_dointvec_single_greater_int_max(struct kunit *test)
++{
++	struct ctl_table table = {
++		.procname = "foo",
++		.data		= &test_data.int_0001,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec,
++		.extra1		= &i_zero,
++		.extra2         = &i_one_hundred,
++	};
++	char input[32];
++	size_t len = sizeof(input) - 1;
++	loff_t pos = 0;
++	unsigned long greater_than_max = (unsigned long)INT_MAX + 1;
++
++	KUNIT_EXPECT_GT(test, greater_than_max, INT_MAX);
++	KUNIT_EXPECT_LT(test, snprintf(input, sizeof(input), "%lu",
++				       greater_than_max),
++			sizeof(input));
++	table.data = kunit_kzalloc(test, sizeof(int), GFP_USER);
++	KUNIT_EXPECT_EQ(test, -EINVAL,
++			proc_dointvec(&table, 1, input, &len, &pos));
++	KUNIT_EXPECT_EQ(test, sizeof(input) - 1, len);
++	KUNIT_EXPECT_EQ(test, 0, *(int *)table.data);
++}
++
++static int sysctl_test_init(struct kunit *test)
++{
++	return 0;
++}
++
++/*
++ * This is run once after each test case, see the comment on example_test_module
++ * for more information.
++ */
++static void sysctl_test_exit(struct kunit *test)
++{
++}
++
++/*
++ * Here we make a list of all the test cases we want to add to the test module
++ * below.
++ */
++static struct kunit_case sysctl_test_cases[] = {
 +	/*
-+	 * TODO(brendanhiggins@google.com): We should probably have some type of
-+	 * variable timeout here. The only question is what that timeout value
-+	 * should be.
-+	 *
-+	 * The intention has always been, at some point, to be able to label
-+	 * tests with some type of size bucket (unit/small, integration/medium,
-+	 * large/system/end-to-end, etc), where each size bucket would get a
-+	 * default timeout value kind of like what Bazel does:
-+	 * https://docs.bazel.build/versions/master/be/common-definitions.html#test.size
-+	 * There is still some debate to be had on exactly how we do this. (For
-+	 * one, we probably want to have some sort of test runner level
-+	 * timeout.)
-+	 *
-+	 * For more background on this topic, see:
-+	 * https://mike-bland.com/2011/11/01/small-medium-large.html
++	 * This is a helper to create a test case object from a test case
++	 * function; its exact function is not important to understand how to
++	 * use KUnit, just know that this is how you associate test cases with a
++	 * test module.
 +	 */
-+	status = wait_for_completion_timeout(&try_completion,
-+					     300 * MSEC_PER_SEC); /* 5 min */
-+	if (status < 0) {
-+		kunit_err(test, "try timed out\n");
-+		try_catch->try_result = -ETIMEDOUT;
-+	}
++	KUNIT_CASE(sysctl_test_dointvec_null_tbl_data),
++	KUNIT_CASE(sysctl_test_dointvec_table_maxlen_unset),
++	KUNIT_CASE(sysctl_test_dointvec_table_len_is_zero),
++	KUNIT_CASE(sysctl_test_dointvec_table_read_but_position_set),
++	KUNIT_CASE(sysctl_test_dointvec_happy_single_positive),
++	KUNIT_CASE(sysctl_test_dointvec_happy_single_negative),
++	KUNIT_CASE(sysctl_test_dointvec_single_less_int_min),
++	KUNIT_CASE(sysctl_test_dointvec_single_greater_int_max),
++	{},
++};
 +
-+	exit_code = try_catch->try_result;
++/*
++ * This defines a suite or grouping of tests.
++ *
++ * Test cases are defined as belonging to the suite by adding them to
++ * `test_cases`.
++ *
++ * Often it is desirable to run some function which will set up things which
++ * will be used by every test; this is accomplished with an `init` function
++ * which runs before each test case is invoked. Similarly, an `exit` function
++ * may be specified which runs after every test case and can be used to for
++ * cleanup. For clarity, running tests in a test module would behave as follows:
++ *
++ * module.init(test);
++ * module.test_case[0](test);
++ * module.exit(test);
++ * module.init(test);
++ * module.test_case[1](test);
++ * module.exit(test);
++ * ...;
++ */
++static struct kunit_module sysctl_test_module = {
++	.name = "sysctl_test",
++	.init = sysctl_test_init,
++	.exit = sysctl_test_exit,
++	.test_cases = sysctl_test_cases,
++};
 +
-+	if (!exit_code)
-+		return;
++/*
++ * This registers the above test module telling KUnit that this is a suite of
++ * tests that need to be run.
++ */
++module_test(sysctl_test_module);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index d5a4a4036d2f8..772af4ec70111 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1908,6 +1908,12 @@ config TEST_SYSCTL
+ 
+ 	  If unsure, say N.
+ 
++config SYSCTL_KUNIT_TEST
++	bool "KUnit test for sysctl"
++	depends on KUNIT
++	help
++	  Enables KUnit sysctl test.
 +
-+	if (exit_code == -EFAULT)
-+		try_catch->try_result = 0;
-+	else if (exit_code == -EINTR)
-+		kunit_err(test, "wake_up_process() was never called\n");
-+	else if (exit_code)
-+		kunit_err(test, "Unknown error: %d\n", exit_code);
-+
-+	try_catch->catch(try_catch->context);
-+}
-+
-+void kunit_try_catch_init(struct kunit_try_catch *try_catch,
-+			  struct kunit *test,
-+			  kunit_try_catch_func_t try,
-+			  kunit_try_catch_func_t catch)
-+{
-+	try_catch->test = test;
-+	try_catch->try = try;
-+	try_catch->catch = catch;
-+}
+ config TEST_UDELAY
+ 	tristate "udelay test driver"
+ 	help
 -- 
 2.21.0.1020.gf2820cf01a-goog
