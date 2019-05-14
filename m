@@ -1,69 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:36879 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726174AbfENWqx (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:37244 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726454AbfENXTJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 May 2019 18:46:53 -0400
-Received: by mail-pg1-f196.google.com with SMTP id e6so289203pgc.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 14 May 2019 15:46:53 -0700 (PDT)
+        Tue, 14 May 2019 19:19:09 -0400
+Received: by mail-pl1-f194.google.com with SMTP id p15so345128pll.4
+        for <linux-kbuild@vger.kernel.org>; Tue, 14 May 2019 16:19:09 -0700 (PDT)
+Date: Tue, 14 May 2019 16:19:02 -0700
+From: Brendan Higgins <brendanhiggins@google.com>
+Subject: Re: [PATCH v3 15/18] Documentation: kunit: add documentation for
+ KUnit
+Message-ID: <20190514231902.GA12893@google.com>
+References: <20190514054251.186196-1-brendanhiggins@google.com>
+ <20190514054251.186196-16-brendanhiggins@google.com>
+ <20190514073422.4287267c@lwn.net>
+ <20190514180810.GA109557@google.com>
+ <20190514121623.0314bf07@lwn.net>
 MIME-Version: 1.0
-References: <20190514224047.28505-1-natechancellor@gmail.com>
-In-Reply-To: <20190514224047.28505-1-natechancellor@gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 14 May 2019 15:46:40 -0700
-Message-ID: <CAKwvOdk1Zr+YJc8Q5YNi+48K_ib9qJ1WPww8QWir=EWhqBaNvw@mail.gmail.com>
-Subject: Re: [PATCH] objtool: Allow AR to be overridden with HOSTAR
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190514121623.0314bf07@lwn.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Peter Zijlstra <peterz@infradead.org>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: frowand.list@gmail.com, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, dan.j.williams@intel.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Felix Guo <felixguoxiuping@gmail.com>
 
-.On Tue, May 14, 2019 at 3:41 PM Nathan Chancellor
-<natechancellor@gmail.com> wrote:
->
-> Currently, this Makefile hardcodes GNU ar, meaning that if it is not
-> available, there is no way to supply a different one and the build will
-> fail.
->
-> $ make AR=llvm-ar CC=clang LD=ld.lld HOSTAR=llvm-ar HOSTCC=clang \
->        HOSTLD=ld.lld HOSTLDFLAGS=-fuse-ld=lld defconfig modules_prepare
-> ...
->   AR       /out/tools/objtool/libsubcmd.a
-> /bin/sh: 1: ar: not found
-> ...
->
-> Follow the logic of HOST{CC,LD} and allow the user to specify a
-> different ar tool via HOSTAR (which is used elsewhere in other
-> tools/ Makefiles).
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/481
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
->  tools/objtool/Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-> index 53f8be0f4a1f..88158239622b 100644
-> --- a/tools/objtool/Makefile
-> +++ b/tools/objtool/Makefile
-> @@ -7,11 +7,12 @@ ARCH := x86
->  endif
->
->  # always use the host compiler
-> +HOSTAR ?= ar
->  HOSTCC ?= gcc
->  HOSTLD ?= ld
-> +AR      = $(HOSTAR)
->  CC      = $(HOSTCC)
->  LD      = $(HOSTLD)
-> -AR      = ar
+On Tue, May 14, 2019 at 12:16:23PM -0600, Jonathan Corbet wrote:
+> On Tue, 14 May 2019 11:08:10 -0700
+> Brendan Higgins <brendanhiggins@google.com> wrote:
+> 
+> > > Naturally, though, I have one request: I'd rather not see this at the top
+> > > level, which is more than crowded enough as it is.  Can this material
+> > > please go into the development tools book, alongside the kselftest
+> > > documentation?
 
-+ Kbuild
-Seems to match what's going on in tools/perf/Makefile.perf and
-tools/build/Makefile. Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Hmmm...probably premature to bring this up, but Documentation/dev-tools/
+is kind of thrown together.
 
--- 
-Thanks,
-~Nick Desaulniers
+It would be nice to provide a coherent overview, maybe provide some
+basic grouping as well.
+
+It would be nice if there was kind of a gentle introduction to the
+tools, which ones you should be looking at, when, why, etc.
+
+> > Oh yeah, that seems like the obvious home for this in hindsight. Sorry
+> > about that. Will fix in next revision!
+> 
+> No need to apologize - I have to say the same thing to everybody :)
