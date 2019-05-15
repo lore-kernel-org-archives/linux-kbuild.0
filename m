@@ -1,94 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47628 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725876AbfEOIOZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 May 2019 04:14:25 -0400
-Date: Wed, 15 May 2019 10:14:22 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [RFC PATCH] kbuild: check uniqueness of basename of modules
-Message-ID: <20190515081422.GA22750@kroah.com>
-References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
- <CAK8P3a1y7hxME0me_Zu-F8a8jU6n=T+c32mv83utOtsL-+gc0A@mail.gmail.com>
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:28366 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725871AbfEOI6y (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 15 May 2019 04:58:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a1y7hxME0me_Zu-F8a8jU6n=T+c32mv83utOtsL-+gc0A@mail.gmail.com>
+References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
+ <CAK8P3a1y7hxME0me_Zu-F8a8jU6n=T+c32mv83utOtsL-+gc0A@mail.gmail.com> <20190515081422.GA22750@kroah.com>
+In-Reply-To: <20190515081422.GA22750@kroah.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 15 May 2019 17:57:50 +0900
+Message-ID: <CAK7LNASpJFAgvuak=mz5kkM3oGh9-M8y_84KZv-xcUkQ0h=d_A@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: check uniqueness of basename of modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, May 15, 2019 at 10:08:12AM +0200, Arnd Bergmann wrote:
-> On Wed, May 15, 2019 at 9:39 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
+On Wed, May 15, 2019 at 5:14 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Wed, May 15, 2019 at 10:08:12AM +0200, Arnd Bergmann wrote:
+> > On Wed, May 15, 2019 at 9:39 AM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> > >
+> > > In the recent build test of linux-next, Stephen saw a build error
+> > > caused by a broken .tmp_versions/*.mod file:
+> > >
+> > >   https://lkml.org/lkml/2019/5/13/991
+> > >
+> > > drivers/net/phy/asix.ko and drivers/net/usb/asix.ko have the same
+> > > basename, and there is a race in generating .tmp_versions/asix.mod
+> > >
+> > > Kbuild has not checked this before, and it occasionally shows up with
+> > > obscure error message when this kind of race occurs.
+> > >
+> > > It is not trivial to catch this potential issue by eyes.
+> > >
+> > > Hence, this script.
+> > >
+> > > I compile-tested allmodconfig for the latest kernel as of writing,
+> > > it detected the following:
+> > >
+> > > warning: same basename '88pm800.ko' if the following are built as modules:
+> > >   drivers/regulator/88pm800.ko
+> > >   drivers/mfd/88pm800.ko
+> > > warning: same basename 'adv7511.ko' if the following are built as modules:
+> > >   drivers/gpu/drm/bridge/adv7511/adv7511.ko
+> > >   drivers/media/i2c/adv7511.ko
+> > > warning: same basename 'asix.ko' if the following are built as modules:
+> > >   drivers/net/phy/asix.ko
+> > >   drivers/net/usb/asix.ko
+> > > warning: same basename 'coda.ko' if the following are built as modules:
+> > >   fs/coda/coda.ko
+> > >   drivers/media/platform/coda/coda.ko
+> > > warning: same basename 'realtek.ko' if the following are built as modules:
+> > >   drivers/net/phy/realtek.ko
+> > >   drivers/net/dsa/realtek.ko
+> > >
+> > > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > >
-> > In the recent build test of linux-next, Stephen saw a build error
-> > caused by a broken .tmp_versions/*.mod file:
+> > That looks great!
 > >
-> >   https://lkml.org/lkml/2019/5/13/991
+> > > ---
+> > >
+> > >  [Alternative fix ? ]
+> > >
+> > > I do not know about the user experience of modprobe etc.
+> > > when two different modules have the same name.
+> > > It does not matter if this is correctly handled by modules.order?
+> > >
+> > > If this is just a problem of the build system, it is pretty easy to fix.
+> > > For example, if we prepend the directory path, parallel build will
+> > > never write to the same file simultanously.
+> > >
+> > >   asix.mod -> drivers/net/phy/asix.mod
+> > >   asix.mod -> drivers/net/usb/asix.mod
 > >
-> > drivers/net/phy/asix.ko and drivers/net/usb/asix.ko have the same
-> > basename, and there is a race in generating .tmp_versions/asix.mod
-> >
-> > Kbuild has not checked this before, and it occasionally shows up with
-> > obscure error message when this kind of race occurs.
-> >
-> > It is not trivial to catch this potential issue by eyes.
-> >
-> > Hence, this script.
-> >
-> > I compile-tested allmodconfig for the latest kernel as of writing,
-> > it detected the following:
-> >
-> > warning: same basename '88pm800.ko' if the following are built as modules:
-> >   drivers/regulator/88pm800.ko
-> >   drivers/mfd/88pm800.ko
-> > warning: same basename 'adv7511.ko' if the following are built as modules:
-> >   drivers/gpu/drm/bridge/adv7511/adv7511.ko
-> >   drivers/media/i2c/adv7511.ko
-> > warning: same basename 'asix.ko' if the following are built as modules:
-> >   drivers/net/phy/asix.ko
-> >   drivers/net/usb/asix.ko
-> > warning: same basename 'coda.ko' if the following are built as modules:
-> >   fs/coda/coda.ko
-> >   drivers/media/platform/coda/coda.ko
-> > warning: same basename 'realtek.ko' if the following are built as modules:
-> >   drivers/net/phy/realtek.ko
-> >   drivers/net/dsa/realtek.ko
-> >
-> > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> 
-> That looks great!
-> 
-> > ---
-> >
-> >  [Alternative fix ? ]
-> >
-> > I do not know about the user experience of modprobe etc.
-> > when two different modules have the same name.
-> > It does not matter if this is correctly handled by modules.order?
-> >
-> > If this is just a problem of the build system, it is pretty easy to fix.
-> > For example, if we prepend the directory path, parallel build will
-> > never write to the same file simultanously.
-> >
-> >   asix.mod -> drivers/net/phy/asix.mod
-> >   asix.mod -> drivers/net/usb/asix.mod
-> 
-> non-unique module names cause all kinds of problems, and
-> modprobe can certainly not handle them correctly, and there
-> are issues with symbols exported from a module when another
-> one has the same name.
+> > non-unique module names cause all kinds of problems, and
+> > modprobe can certainly not handle them correctly, and there
+> > are issues with symbols exported from a module when another
+> > one has the same name.
+>
+> /sys/modules/ will fall over when this happens as well.  I thought we
+> had the "rule" that module names had to be unique, I guess it was only a
+> matter of time before they started colliding :(
+>
+> So warning is good, but forbidding this is better, as things will break.
+>
+> Or we need to fix up the places where things will break.
 
-/sys/modules/ will fall over when this happens as well.  I thought we
-had the "rule" that module names had to be unique, I guess it was only a
-matter of time before they started colliding :(
 
-So warning is good, but forbidding this is better, as things will break.
+If we intentionally break the build,
+we need to send fix-up patches to subsystems first.
 
-Or we need to fix up the places where things will break.
 
-thanks,
 
-greg k-h
+-- 
+Best Regards
+Masahiro Yamada
