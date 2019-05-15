@@ -1,169 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39575 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726389AbfEOHlt (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:59053 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725902AbfEOHyA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 May 2019 03:41:49 -0400
-Received: by mail-ed1-f67.google.com with SMTP id e24so2761370edq.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 May 2019 00:41:46 -0700 (PDT)
-Date: Wed, 15 May 2019 09:41:41 +0200
-From: Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH v2 00/17] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-Message-ID: <20190515074141.GY17751@phenom.ffwll.local>
-References: <20190509133551.GD29703@mit.edu>
- <ECADFF3FD767C149AD96A924E7EA6EAF9770D591@USCULXMSG01.am.sony.com>
- <875c546d-9713-bb59-47e4-77a1d2c69a6d@gmail.com>
- <20190509214233.GA20877@mit.edu>
- <80c72e64-2665-bd51-f78c-97f50f9a53ba@gmail.com>
- <20190511173344.GA8507@mit.edu>
- <20190513144451.GQ17751@phenom.ffwll.local>
- <20190514060433.GA181462@google.com>
- <CAKMK7uHqtSF_sazJTbFL+xmQJRk4iwukCKZHoDHhsKkLXk=ECQ@mail.gmail.com>
- <20190514183618.GC109557@google.com>
+        Wed, 15 May 2019 03:54:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190514183618.GC109557@google.com>
+References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190515073818.22486-1-yamada.masahiro@socionext.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 15 May 2019 16:53:15 +0900
+Message-ID: <CAK7LNAQgBKq9JDGtQUD1kgKrfLZ4jOjuLJi7_tpSPLJZsWtmag@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: check uniqueness of basename of modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>
-Cc: Daniel Vetter <daniel@ffwll.ch>, Theodore Ts'o <tytso@mit.edu>, Frank Rowand <frowand.list@gmail.com>, Tim.Bird@sony.com, Knut Omang <knut.omang@oracle.com>, Greg KH <gregkh@linuxfoundation.org>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, sboyd@kernel.org, Shuah Khan <shuah@kernel.org>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Dan Williams <dan.j.williams@intel.com>, jdike@addtoit.com, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, May 14, 2019 at 11:36:18AM -0700, Brendan Higgins wrote:
-> On Tue, May 14, 2019 at 02:05:05PM +0200, Daniel Vetter wrote:
-> > On Tue, May 14, 2019 at 8:04 AM Brendan Higgins
-> > <brendanhiggins@google.com> wrote:
-> > >
-> > > On Mon, May 13, 2019 at 04:44:51PM +0200, Daniel Vetter wrote:
-> > > > On Sat, May 11, 2019 at 01:33:44PM -0400, Theodore Ts'o wrote:
-> > > > > On Fri, May 10, 2019 at 02:12:40PM -0700, Frank Rowand wrote:
-> > > > > > However, the reply is incorrect.  Kselftest in-kernel tests (which
-> > > > > > is the context here) can be configured as built in instead of as
-> > > > > > a module, and built in a UML kernel.  The UML kernel can boot,
-> > > > > > running the in-kernel tests before UML attempts to invoke the
-> > > > > > init process.
-> > > > >
-> > > > > Um, Citation needed?
-> > > > >
-> > > > > I don't see any evidence for this in the kselftest documentation, nor
-> > > > > do I see any evidence of this in the kselftest Makefiles.
-> > > > >
-> > > > > There exists test modules in the kernel that run before the init
-> > > > > scripts run --- but that's not strictly speaking part of kselftests,
-> > > > > and do not have any kind of infrastructure.  As noted, the
-> > > > > kselftests_harness header file fundamentally assumes that you are
-> > > > > running test code in userspace.
-> > > >
-> > > > Yeah I really like the "no userspace required at all" design of kunit,
-> > > > while still collecting results in a well-defined way (unless the current
-> > > > self-test that just run when you load the module, with maybe some
-> > > > kselftest ad-hoc wrapper around to collect the results).
-> > > >
-> > > > What I want to do long-term is to run these kernel unit tests as part of
-> > > > the build-testing, most likely in gitlab (sooner or later, for drm.git
-> > >
-> > > Totally! This is part of the reason I have been insisting on a minimum
-> > > of UML compatibility for all unit tests. If you can suffiently constrain
-> > > the environment that is required for tests to run in, it makes it much
-> > > easier not only for a human to run your tests, but it also makes it a
-> > > lot easier for an automated service to be able to run your tests.
-> > >
-> > > I actually have a prototype presubmit already working on my
-> > > "stable/non-upstream" branch. You can checkout what presubmit results
-> > > look like here[1][2].
-> > 
-> > ug gerrit :-)
-> 
-> Yeah, yeah, I know, but it is a lot easier for me to get a project set
-> up here using Gerrit, when we already use that for a lot of other
-> projects.
-> 
-> Also, Gerrit has gotten a lot better over the last two years or so. Two
-> years ago, I wouldn't touch it with a ten foot pole. It's not so bad
-> anymore, at least if you are used to using a web UI to review code.
+On Wed, May 15, 2019 at 4:40 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> In the recent build test of linux-next, Stephen saw a build error
+> caused by a broken .tmp_versions/*.mod file:
+>
+>   https://lkml.org/lkml/2019/5/13/991
+>
+> drivers/net/phy/asix.ko and drivers/net/usb/asix.ko have the same
+> basename, and there is a race in generating .tmp_versions/asix.mod
+>
+> Kbuild has not checked this before, and it occasionally shows up with
+> obscure error message when this kind of race occurs.
+>
+> It is not trivial to catch this potential issue by eyes.
+>
+> Hence, this script.
+>
+> I compile-tested allmodconfig for the latest kernel as of writing,
+> it detected the following:
+>
+> warning: same basename '88pm800.ko' if the following are built as modules:
+>   drivers/regulator/88pm800.ko
+>   drivers/mfd/88pm800.ko
+> warning: same basename 'adv7511.ko' if the following are built as modules:
+>   drivers/gpu/drm/bridge/adv7511/adv7511.ko
+>   drivers/media/i2c/adv7511.ko
+> warning: same basename 'asix.ko' if the following are built as modules:
+>   drivers/net/phy/asix.ko
+>   drivers/net/usb/asix.ko
+> warning: same basename 'coda.ko' if the following are built as modules:
+>   fs/coda/coda.ko
+>   drivers/media/platform/coda/coda.ko
+> warning: same basename 'realtek.ko' if the following are built as modules:
+>   drivers/net/phy/realtek.ko
+>   drivers/net/dsa/realtek.ko
+>
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
 
-I was somewhat joking, I'm just not used to gerrit ... And seems to indeed
-be a lot more polished than last time I looked at it seriously.
+> diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
+> new file mode 100755
+> index 000000000000..944e68bd22b0
+> --- /dev/null
+> +++ b/scripts/modules-check.sh
+> @@ -0,0 +1,18 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# Warn if two or more modules have the same basename
+> +check_same_name_modules()
+> +{
+> +       same_name_modules=$(cat modules.order modules.builtin | \
+> +                               xargs basename -a | sort | uniq -d)
+> +
+> +       for m in $same_name_modules
+> +       do
+> +               echo "warning: same basename '$m' if the following are built as modules:"
+> +               grep --no-filename -e /$m modules.order modules.builtin | \
+> +                                                       sed 's:^kernel/:  :'
 
-> > > > only ofc). So that people get their pull requests (and patch series, we
-> > > > have some ideas to tie this into patchwork) automatically tested for this
-> > >
-> > > Might that be Snowpatch[3]? I talked to Russell, the creator of Snowpatch,
-> > > and he seemed pretty open to collaboration.
-> > >
-> > > Before I heard about Snowpatch, I had an intern write a translation
-> > > layer that made Prow (the presubmit service that I used in the prototype
-> > > above) work with LKML[4].
-> > 
-> > There's about 3-4 forks/clones of patchwork. snowpatch is one, we have
-> > a different one on freedesktop.org. It's a bit a mess :-/
-> 
-> Oh, I didn't realize that. I found your patchwork instance here[5], but
-> do you have a place where I can see the changes you have added to
-> support presubmit?
 
-Ok here's a few links. Aside from the usual patch view we've also added a
-series view:
+Self nit-picking:
+It might be better to send these messages to stderr instead of stdout.
 
-https://patchwork.freedesktop.org/project/intel-gfx/series/?ordering=-last_updated
 
-This ties the patches + cover letter together, and it even (tries to at
-least) track revisions. Here's an example which is currently at revision
-9:
 
-https://patchwork.freedesktop.org/series/57232/
 
-Below the patch list for each revision we also have the test result list.
-If you click on the grey bar it'll expand with the summary from CI, the
-"See full logs" is link to the full results from our CI. This is driven
-with some REST api from our jenkins.
-
-Patchwork also sends out mails for these results.
-
-Source is on gitlab: https://gitlab.freedesktop.org/patchwork-fdo
- 
-> > > I am not married to either approach, but I think between the two of
-> > > them, most of the initial legwork has been done to make presubmit on
-> > > LKML a reality.
-> > 
-> > We do have presubmit CI working already with our freedesktop.org
-> > patchwork. The missing glue is just tying that into gitlab CI somehow
-> > (since we want to unify build testing more and make it easier for
-> > contributors to adjust things).
-> 
-> I checked out a couple of your projects on your patchwork instance: AMD
-> X.Org drivers, DRI devel, and Wayland. I saw the tab you added for
-> tests, but none of them actually had any test results. Can you point me
-> at one that does?
-
-Atm we use the CI stuff only on intel-gfx, with the our gpu CI farm, see
-links above.
-
-Cheers, Daniel
-
-> 
-> Cheers!
-> 
-> [5] https://patchwork.freedesktop.org/
-> 
-> > > > super basic stuff.
-> > >
-> > > I am really excited to hear back on what you think!
-> > >
-> > > Cheers!
-> > >
-> > > [1] https://kunit-review.googlesource.com/c/linux/+/1509/10#message-7bfa40efb132e15c8388755c273837559911425c
-> > > [2] https://kunit-review.googlesource.com/c/linux/+/1509/10#message-a6784496eafff442ac98fb068bf1a0f36ee73509
-> > > [3] https://developer.ibm.com/open/projects/snowpatch/
-> > > [4] https://kunit.googlesource.com/prow-lkml/
-> > > _______________________________________________
-> > > dri-devel mailing list
-> > > dri-devel@lists.freedesktop.org
-> > > https://lists.freedesktop.org/mailman/listinfo/dri-devel
-> 
-
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+--
+Best Regards
+Masahiro Yamada
