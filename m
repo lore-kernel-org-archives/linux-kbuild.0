@@ -1,23 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:59053 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725902AbfEOHyA (ORCPT
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:37806 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbfEOIIa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 May 2019 03:54:00 -0400
+        Wed, 15 May 2019 04:08:30 -0400
 MIME-Version: 1.0
 References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
 In-Reply-To: <20190515073818.22486-1-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 15 May 2019 16:53:15 +0900
-Message-ID: <CAK7LNAQgBKq9JDGtQUD1kgKrfLZ4jOjuLJi7_tpSPLJZsWtmag@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 15 May 2019 10:08:12 +0200
+Message-ID: <CAK8P3a1y7hxME0me_Zu-F8a8jU6n=T+c32mv83utOtsL-+gc0A@mail.gmail.com>
 Subject: Re: [RFC PATCH] kbuild: check uniqueness of basename of modules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, May 15, 2019 at 4:40 PM Masahiro Yamada
+On Wed, May 15, 2019 at 9:39 AM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
 > In the recent build test of linux-next, Stephen saw a build error
@@ -56,37 +56,27 @@ On Wed, May 15, 2019 at 4:40 PM Masahiro Yamada
 >
 > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+That looks great!
+
 > ---
 >
+>  [Alternative fix ? ]
+>
+> I do not know about the user experience of modprobe etc.
+> when two different modules have the same name.
+> It does not matter if this is correctly handled by modules.order?
+>
+> If this is just a problem of the build system, it is pretty easy to fix.
+> For example, if we prepend the directory path, parallel build will
+> never write to the same file simultanously.
+>
+>   asix.mod -> drivers/net/phy/asix.mod
+>   asix.mod -> drivers/net/usb/asix.mod
 
-> diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-> new file mode 100755
-> index 000000000000..944e68bd22b0
-> --- /dev/null
-> +++ b/scripts/modules-check.sh
-> @@ -0,0 +1,18 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +# Warn if two or more modules have the same basename
-> +check_same_name_modules()
-> +{
-> +       same_name_modules=$(cat modules.order modules.builtin | \
-> +                               xargs basename -a | sort | uniq -d)
-> +
-> +       for m in $same_name_modules
-> +       do
-> +               echo "warning: same basename '$m' if the following are built as modules:"
-> +               grep --no-filename -e /$m modules.order modules.builtin | \
-> +                                                       sed 's:^kernel/:  :'
+non-unique module names cause all kinds of problems, and
+modprobe can certainly not handle them correctly, and there
+are issues with symbols exported from a module when another
+one has the same name.
 
-
-Self nit-picking:
-It might be better to send these messages to stderr instead of stdout.
-
-
-
-
---
-Best Regards
-Masahiro Yamada
+     Arnd
