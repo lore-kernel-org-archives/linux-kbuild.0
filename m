@@ -1,37 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:34879 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbfEOSzJ (ORCPT
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:25423 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726900AbfEPJAz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 May 2019 14:55:09 -0400
-Received: by mail-qk1-f196.google.com with SMTP id c15so696149qkl.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 May 2019 11:55:09 -0700 (PDT)
+        Thu, 16 May 2019 05:00:55 -0400
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [RFC PATCH] kbuild: check uniqueness of basename of modules
+Date: Thu, 16 May 2019 09:00:50 +0000
+Message-ID: <5e6999f3d0b349bd86a32a612cff7b4b@AcuMS.aculab.com>
+References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
+ <CAK7LNAQgBKq9JDGtQUD1kgKrfLZ4jOjuLJi7_tpSPLJZsWtmag@mail.gmail.com>
+ <201905150913.C23BD99AD@keescook>
+ <CAK7LNARezpQgcK9O9K3ZFeebMVNroWStno_brvSLadsKXVfm-Q@mail.gmail.com>
+In-Reply-To: <CAK7LNARezpQgcK9O9K3ZFeebMVNroWStno_brvSLadsKXVfm-Q@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Wed, 15 May 2019 11:54:54 -0700
-Message-ID: <CABWYdi06NUOWRLingNuybgZZsTZPjhmsOx-9oCGK94qZGYbzcw@mail.gmail.com>
-Subject: Linux 4.19 and GCC 9
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: kernel-team <kernel-team@cloudflare.com>, miguel.ojeda.sandonis@gmail.com
+To: 'Masahiro Yamada' <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hey,
-
-It looks like it's not possible to build Linux 4.19.43 (latest LTS as
-of today) with GCC 9.1 (latest stable GCC). From what I see, some
-support for GCC 9 was added by Miguel (cc'd) in 4.20, but it was never
-backported into 4.19.
-
-Should this happen or is 4.19 stuck on GCC 8?
-
-I've tried doing this manually first, but it seems beyond a quick fix
-with a few backports for me:
-
-1. Disable perf (breaks on -Werror=stringop-truncation)
-2. Apply https://lore.kernel.org/patchwork/patch/1005478/
-3. Try applying https://lore.kernel.org/patchwork/cover/1040185/ and
-discover a missing file
-4. Discover that more things changed:
-https://github.com/torvalds/linux/commits/master/include/linux/compiler_attributes.h
+RnJvbTogTWFzYWhpcm8gWWFtYWRhDQo+IFNlbnQ6IDE1IE1heSAyMDE5IDE4OjU1DQouLi4NCj4g
+PiAgICAgeGFyZ3MgYmFzZW5hbWUgLWEgLS0gfCBzb3J0IHwgLi4uDQo+IA0KPiBTb3JyeSBmb3Ig
+bXkgaWdub3JhbmNlLCBidXQgY291bGQgeW91DQo+IHRlYWNoIG1lIHRoZSBlZmZlY3Qgb2YgIi0t
+IiA/DQo+IA0KPiBJIHNvbWV0aW1lcyB1c2UgIi0tIiBhcyBhIHNlcGFyYXRvcg0KPiB3aGVuIHRo
+ZXJlIGlzIGFtYmlndWl0eSBpbiBhcmd1bWVudHMNCj4gZm9yIGV4YW1wbGUsICJnaXQgbG9nIDxy
+ZXZpc2lvbj4gLS0gPHBhdGg+Ig0KPiANCj4gSW4gdGhpcyBjYXNlLCB3aGF0IGlzIGludGVuZGVk
+IGJ5ICItLSI/DQoNClRoZSAnLS0nIHN0b3BzIGdldG9wdCgpIGZyb20gcGFyc2luZyBhbnkgbW9y
+ZSBwYXJhbWV0ZXJzLg0KVXNlZnVsIHRoaW5ncyBsaWtlICdncmVwIC0tIC1xJyB3aGljaCB3aWxs
+IHNlYXJjaCBmb3IgdGhlDQpzdHJpbmcgJy1xJyByYXRoZXIgdGhhbiB0cmVhdGluZyBpdCBhcyBh
+IGNvbW1hbmQgbGluZSBvcHRpb24uDQoNClRoaXMgaXMgYWxsIG1hZGUgbW9yZSBob3JyaWQgYnkg
+YSBkZWNpc2lvbiBieSB0aGUgd3JpdGVycw0Kb2YgZ2xpYmMgZ2V0b3B0KCkgdG8gJ3Blcm11dGUn
+IGFyZ3ZbXSBzbyB0aGF0ICdvcHRpb25zJw0KY2FuIGZvbGxvdyAnbm9ub3B0aW9ucycgaWUgaXQg
+Y29udmVydHM6DQoJcHJvZyBmaWxlIC1hcmcNCnRvDQoJcHJvZyAtYXJnIGZpbGUNClRoZSBvbmx5
+IHByb2dyYW0gdGhlIGhpc3RvcmljYWxseSBhbGxvd2VkICdsYXRlJyBvcHRpb25zDQp3YXMgJ3Js
+b2dpbiBob3N0bmFtZSAtbCB1c2VybmFtZScuDQpUaGlzIGlzIGp1c3QgYnJva2VuLi4uLi4NCg0K
+CURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBN
+b3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAx
+Mzk3Mzg2IChXYWxlcykNCg==
