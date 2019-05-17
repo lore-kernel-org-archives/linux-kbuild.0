@@ -1,51 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:35243 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726447AbfEQDOh (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:22897 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726783AbfEQDip (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 May 2019 23:14:37 -0400
-Received: by mail-qt1-f193.google.com with SMTP id a39so6502634qtk.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 May 2019 20:14:37 -0700 (PDT)
+        Thu, 16 May 2019 23:38:45 -0400
 MIME-Version: 1.0
-References: <CABWYdi06NUOWRLingNuybgZZsTZPjhmsOx-9oCGK94qZGYbzcw@mail.gmail.com>
- <CANiq72kvpiC-i53AXM-YsCUvWroHQemmqxsXjnB330ZEeHahUg@mail.gmail.com>
- <CABWYdi1zhTTaN-GSgH0DnPfz7p=SRw0wts5QVYYVtfvoiS0qnQ@mail.gmail.com>
- <CANiq72=fsL5m2_e+bNovFCHy3=YVf53EKGtGE_sWvsAD=ONHuQ@mail.gmail.com> <20190516225013.nvhwqi5tfwtby6qb@treble>
-In-Reply-To: <20190516225013.nvhwqi5tfwtby6qb@treble>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Thu, 16 May 2019 20:14:25 -0700
-Message-ID: <CABWYdi29E++jBw8boFZAiDZA7iT5NiJhnNmiHb-Rvd9+97hSVA@mail.gmail.com>
-Subject: Re: Linux 4.19 and GCC 9
+References: <20190515073818.22486-1-yamada.masahiro@socionext.com>
+ <CAK7LNATUvPMqt93iwzNud0mxk99Si=CEBDyjA8BLEXM_tcTBfQ@mail.gmail.com> <201905151130.87CDB73C0@keescook>
+In-Reply-To: <201905151130.87CDB73C0@keescook>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 17 May 2019 12:37:46 +0900
+Message-ID: <CAK7LNASKnWkJhw3Hn1vKK=dB_vHOo0MtMd9duTpHoQSdgYoZLA@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: check uniqueness of basename of modules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, Greg KH <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-We are building the upstream kernel. There are a few patches, but
-nothing related to objtool.
+Hi Kees,
 
-Unless you mean mainline/stable by upstream, I haven't tried that. We
-stick to LTS.
-
-On Thu, May 16, 2019 at 7:04 PM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+On Thu, May 16, 2019 at 3:31 AM Kees Cook <keescook@chromium.org> wrote:
 >
-> On Thu, May 16, 2019 at 11:20:54PM +0200, Miguel Ojeda wrote:
-> > > mm/slub.o: warning: objtool: init_cache_random_seq()+0x36: sibling
-> > > call from callable instruction with modified stack frame
-> > > mm/slub.o: warning: objtool: slab_out_of_memory()+0x3b: sibling call
-> > > from callable instruction with modified stack frame
-> > > mm/slub.o: warning: objtool: slab_pad_check.part.0()+0x7c: sibling
-> > > call from callable instruction with modified stack frame
-> > > mm/slub.o: warning: objtool: check_slab()+0x1c: sibling call from
-> > > callable instruction with modified stack frame
+> On Thu, May 16, 2019 at 03:07:54AM +0900, Masahiro Yamada wrote:
+> > On Wed, May 15, 2019 at 4:40 PM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
 > >
-> > AFAIK those are non-critical, i.e. stack traces may be wrong (or not),
-> > but it does not mean the generated kernel itself is wrong. CC'ing the
-> > objtool maintainers too.
+> > >         $(Q)$(AWK) '!x[$$0]++' $^ > $(objtree)/modules.builtin
+> > > diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
+> > > new file mode 100755
+> > > index 000000000000..944e68bd22b0
+> > > --- /dev/null
+> > > +++ b/scripts/modules-check.sh
+> > > @@ -0,0 +1,18 @@
+> > > +#!/bin/sh
+> > > +# SPDX-License-Identifier: GPL-2.0
+> > > +
+> > > +# Warn if two or more modules have the same basename
+> > > +check_same_name_modules()
+> > > +{
+> > > +       same_name_modules=$(cat modules.order modules.builtin | \
+> > > +                               xargs basename -a | sort | uniq -d)
+> >
+> >
+> > I noticed a bug here.
+> >
+> >
+> > allnoconfig + CONFIG_MODULES=y
+> > will create empty modules.order and modules.builtin.
+> >
+> > Then, 'basename -a' will emit the error messages
+> > since it receives zero arguments.
 >
-> I don't think I recognize those warnings.  Do you also see them in the
-> upstream kernel?
+> You can skip running it by adding "-r" to xargs:
 >
-> --
-> Josh
+>        -r, --no-run-if-empty
+>               If the standard input does not contain any nonblanks, do not run
+>               the command.  Normally, the command is run once even if there is
+>               no input.  This option is a GNU extension.
+
+Good idea!
+
+I will use this in v2.
+
+Thanks.
+
+
+-- 
+Best Regards
+Masahiro Yamada
