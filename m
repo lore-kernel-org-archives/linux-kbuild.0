@@ -1,88 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:51269 "EHLO ozlabs.org"
+Received: from mail.kernel.org ([198.145.29.99]:48564 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726772AbfEQFeo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 May 2019 01:34:44 -0400
-Date: Fri, 17 May 2019 15:34:39 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
+        id S1726772AbfEQFhC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 May 2019 01:37:02 -0400
+Date: Fri, 17 May 2019 07:36:58 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
 Subject: Re: [PATCH v2] kbuild: check uniqueness of module names
-Message-ID: <20190517153439.3b479334@canb.auug.org.au>
-In-Reply-To: <20190517042753.25857-1-yamada.masahiro@socionext.com>
+Message-ID: <20190517053658.GA3464@kroah.com>
 References: <20190517042753.25857-1-yamada.masahiro@socionext.com>
+ <CAK7LNARvQUPPBzdq7ac67h-xhB6tHZ4WPzBHZy+c3iHE_bi_Fg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/IlsPisnNmYNysYS_bs/ddIU"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARvQUPPBzdq7ac67h-xhB6tHZ4WPzBHZy+c3iHE_bi_Fg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
---Sig_/IlsPisnNmYNysYS_bs/ddIU
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 17, 2019 at 01:45:11PM +0900, Masahiro Yamada wrote:
+> On Fri, May 17, 2019 at 1:29 PM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > In the recent build test of linux-next, Stephen saw a build error
+> > caused by a broken .tmp_versions/*.mod file:
+> >
+> >   https://lkml.org/lkml/2019/5/13/991
+> >
+> > drivers/net/phy/asix.ko and drivers/net/usb/asix.ko have the same
+> > basename, and there is a race in generating .tmp_versions/asix.mod
+> >
+> > Kbuild has not checked this before, and it suddenly shows up with
+> > obscure error message when this kind of race occurs.
+> >
+> > Non-unique module names cause various sort of problems, but it is
+> > not trivial to catch them by eyes.
+> >
+> > Hence, this script.
+> >
+> > It checks not only real modules, but also built-in modules (i.e.
+> > controlled by tristate CONFIG option, but currently compiled with =y).
+> > Non-unique names for built-in modules also cause problems because
+> > /sys/modules/ would fall over.
+> >
+> > I tested allmodconfig on the latest kernel, and it detected the
+> > following:
+> >
+> > warning: same basename if the following are built as modules:
+> >   drivers/regulator/88pm800.ko
+> >   drivers/mfd/88pm800.ko
+> > warning: same basename if the following are built as modules:
+> >   drivers/gpu/drm/bridge/adv7511/adv7511.ko
+> >   drivers/media/i2c/adv7511.ko
+> > warning: same basename if the following are built as modules:
+> >   drivers/net/phy/asix.ko
+> >   drivers/net/usb/asix.ko
+> > warning: same basename if the following are built as modules:
+> >   fs/coda/coda.ko
+> >   drivers/media/platform/coda/coda.ko
+> > warning: same basename if the following are built as modules:
+> >   drivers/net/phy/realtek.ko
+> >   drivers/net/dsa/realtek.ko
+> >
+> > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > ---
+> 
+> 
+> One more question popped up.
+> 
+> External modules are out of scope of the community,
+> but it is possible that people create an external module
+> that happens to have the same name as an upstream driver.
 
-Hi Masahiro,
+That is their bug, nothing we can do about that :)
 
-Thanks for this, looks good to me.  Just a nit below.
+thanks,
 
-On Fri, 17 May 2019 13:27:53 +0900 Masahiro Yamada <yamada.masahiro@socione=
-xt.com> wrote:
->
-
-> diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-> new file mode 100755
-> index 000000000000..c875f6eab01e
-> --- /dev/null
-> +++ b/scripts/modules-check.sh
-> @@ -0,0 +1,20 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +set -e
-> +
-> +# Check uniqueness of module names
-> +check_same_name_modules()
-> +{
-> +	same_name_modules=3D$(cat modules.order modules.builtin | \
-                                                                ^
-This trailing '\' is unnecessary after a pipe symbol.
-
-> +				xargs -r basename -a -- | sort | uniq -d)
-> +
-> +	for m in $same_name_modules
-> +	do
-> +		echo "warning: same basename if the following are built as modules:" >=
-&2
-> +		grep -h -e "/$m" modules.order modules.builtin | \
-
-Same here
-
-> +						sed 's:^kernel/:  :' >&2
-> +	done
-> +}
-> +
-> +check_same_name_modules
-
-Reviewed-by: Stephen ROthwell <sfr@canb.auug.org.au>
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/IlsPisnNmYNysYS_bs/ddIU
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlzeR+8ACgkQAVBC80lX
-0Gzmhwf7B10c15F0Cw1Alt+7cctlQvs4IV/Lpxcg/nFDLrKaGl9UEiAOS1NiUong
-cJuqTud0LO2PP41jUDbNoAwf6a90eLkJ28vhU4xz3l9x7lIHIwd8ziwkmbMHPCrY
-q6R63Qi6YKRo1ZbJAcKI671d+Dbkv3/VKArWxXHjha17/lYHOTLr15ASO+oaXyz3
-oK8IJ6+hX6wCPNV3RHgQ88GrazAaRlH+XefxCtxsV/lX2avmnk8y0rMwkN3v11nq
-CsOpLdpBCMgAFZ4Kpt3yr/XGDYBM9Gb3cFvkKbVbdKSKOuu6GZlAEd1JUwpdcSea
-YiAuCZu/OOoiNOhXrv3uDZzEJ48zFg==
-=Xu3a
------END PGP SIGNATURE-----
-
---Sig_/IlsPisnNmYNysYS_bs/ddIU--
+greg k-h
