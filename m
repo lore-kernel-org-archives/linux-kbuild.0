@@ -1,41 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.fireflyinternet.com ([109.228.58.192]:64206 "EHLO
-        fireflyinternet.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727065AbfEQIfl (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:40727 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728078AbfEQIfn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 May 2019 04:35:41 -0400
-Content-Type: text/plain; charset="utf-8"
+        Fri, 17 May 2019 04:35:43 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-From: Chris Wilson <chris@chris-wilson.co.uk>
-In-Reply-To: <20190516194818.29230-1-jani.nikula@intel.com>
-References: <20190516194818.29230-1-jani.nikula@intel.com>
-Message-ID: <155808211071.12244.10320883277188429270@skylake-alporthouse-com>
-Subject: Re: [RFC 1/3] kbuild: add support for ensuring headers are self-contained
-Date: Fri, 17 May 2019 09:35:10 +0100
+References: <CABWYdi06NUOWRLingNuybgZZsTZPjhmsOx-9oCGK94qZGYbzcw@mail.gmail.com>
+ <CANiq72kvpiC-i53AXM-YsCUvWroHQemmqxsXjnB330ZEeHahUg@mail.gmail.com>
+ <CABWYdi1zhTTaN-GSgH0DnPfz7p=SRw0wts5QVYYVtfvoiS0qnQ@mail.gmail.com>
+ <CANiq72=fsL5m2_e+bNovFCHy3=YVf53EKGtGE_sWvsAD=ONHuQ@mail.gmail.com>
+ <20190516225013.nvhwqi5tfwtby6qb@treble> <CABWYdi29E++jBw8boFZAiDZA7iT5NiJhnNmiHb-Rvd9+97hSVA@mail.gmail.com>
+ <20190517050931.GB32367@kroah.com> <20190517073813.GB2589@hirez.programming.kicks-ass.net>
+In-Reply-To: <20190517073813.GB2589@hirez.programming.kicks-ass.net>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 17 May 2019 10:35:29 +0200
+Message-ID: <CANiq72nUPoNHWM-dJuFc3=4D2=8XMuvO0PgGPjviOv+EhrAWUw@mail.gmail.com>
+Subject: Re: Linux 4.19 and GCC 9
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@intel.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Ivan Babrou <ivan@cloudflare.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>
 
-Quoting Jani Nikula (2019-05-16 20:48:16)
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 8a1f64f17740..c2839de06485 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -66,6 +66,9 @@ extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
->  extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
->  endif
->  
-> +# Test self-contained headers
-> +extra-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.o,$(header-test-y))
+On Fri, May 17, 2019 at 9:38 AM Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Fri, May 17, 2019 at 07:09:31AM +0200, Greg KH wrote:
+> > On Thu, May 16, 2019 at 08:14:25PM -0700, Ivan Babrou wrote:
+> > > We are building the upstream kernel. There are a few patches, but
+> > > nothing related to objtool.
+> > >
+> > > Unless you mean mainline/stable by upstream, I haven't tried that. We
+> > > stick to LTS.
+> >
+> > Please work and all of these issues fixed up in Linus's tree and then I
+> > will be glad to take the fixed into the stable releases.
+>
+> Right; if there is anything you can reproduce on linus.git I'll happily
+> have a look. If it doesn't reproduce all you have to do is find the
+> patches that make it work and ask Greg.
 
-This didn't get pulled into clean-files.
+Just to clarify: Linus' master is clean of these issues with GCC 9.1.1.
 
-clean-files-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.c,$(header-test-y))
-?
-
-Not enough. Nor is clean-files-y +=...
-
-And it should also be put into the global gitignore I think.
--Chris
+Cheers,
+Miguel
