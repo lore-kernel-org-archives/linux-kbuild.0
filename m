@@ -1,82 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:37007 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725933AbfEQQZA (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:24288 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727380AbfEQQzP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 May 2019 12:25:00 -0400
+        Fri, 17 May 2019 12:55:15 -0400
 MIME-Version: 1.0
-References: <20190517042753.25857-1-yamada.masahiro@socionext.com> <20190517153439.3b479334@canb.auug.org.au>
-In-Reply-To: <20190517153439.3b479334@canb.auug.org.au>
+References: <1558109235-23042-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1558109235-23042-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 May 2019 01:23:55 +0900
-Message-ID: <CAK7LNAQMCfEE2ncrGj3Cair8udQZea_ZsTGGSsFA_7T86-7vRA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: check uniqueness of module names
+Date: Sat, 18 May 2019 01:54:16 +0900
+Message-ID: <CAK7LNARDT7MaD1Kw8w0JgLYYXvLntb+tsNo+D9LJ2PmzNQNKdg@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: check uniqueness of module names
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Bernd Petrovitsch <bernd@petrovitsch.priv.at>, Alexander Kapshuk <alexander.kapshuk@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, May 17, 2019 at 2:34 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+On Sat, May 18, 2019 at 1:10 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> Hi Masahiro,
+> In the recent build test of linux-next, Stephen saw a build error
+> caused by a broken .tmp_versions/*.mod file:
 >
-> Thanks for this, looks good to me.  Just a nit below.
+>   https://lkml.org/lkml/2019/5/13/991
 >
-> On Fri, 17 May 2019 13:27:53 +0900 Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> >
+> drivers/net/phy/asix.ko and drivers/net/usb/asix.ko have the same
+> basename, and there is a race in generating .tmp_versions/asix.mod
 >
-> > diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-> > new file mode 100755
-> > index 000000000000..c875f6eab01e
-> > --- /dev/null
-> > +++ b/scripts/modules-check.sh
-> > @@ -0,0 +1,20 @@
-> > +#!/bin/sh
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +set -e
-> > +
-> > +# Check uniqueness of module names
-> > +check_same_name_modules()
-> > +{
-> > +     same_name_modules=$(cat modules.order modules.builtin | \
->                                                                 ^
-> This trailing '\' is unnecessary after a pipe symbol.
-
-
-With the suggestion from Alexander Kapshuk,
-the code in v3 became short enough to fit in 80-columns.
-
-Anyway, thanks for pointing it out.
-
-
-
-
-
-> > +                             xargs -r basename -a -- | sort | uniq -d)
-> > +
-> > +     for m in $same_name_modules
-> > +     do
-> > +             echo "warning: same basename if the following are built as modules:" >&2
-> > +             grep -h -e "/$m" modules.order modules.builtin | \
+> Kbuild has not checked this before, and it suddenly shows up with
+> obscure error message when this kind of race occurs.
 >
-> Same here
+> Non-unique module names cause various sort of problems, but it is
+> not trivial to catch them by eyes.
 >
-> > +                                             sed 's:^kernel/:  :' >&2
-> > +     done
-> > +}
-> > +
-> > +check_same_name_modules
+> Hence, this script.
 >
-> Reviewed-by: Stephen ROthwell <sfr@canb.auug.org.au>
+> It checks not only real modules, but also built-in modules (i.e.
+> controlled by tristate CONFIG option, but currently compiled with =y).
+> Non-unique names for built-in modules also cause problems because
+> /sys/modules/ would fall over.
 >
+> I tested allmodconfig on the latest kernel, and it detected the
+> following:
+
+
+FYI.
+
+"make -j8 allmodconfig all"
+takes long time to compile
+(my machine is cheap...)
+
+
+If you want to detect modules with non-unique name quickly,
+"make -j8 allyesconfig modules" is much faster.
+
+
+
+
+
+
+> warning: same basename if the following are built as modules:
+>   drivers/regulator/88pm800.ko
+>   drivers/mfd/88pm800.ko
+> warning: same basename if the following are built as modules:
+>   drivers/gpu/drm/bridge/adv7511/adv7511.ko
+>   drivers/media/i2c/adv7511.ko
+> warning: same basename if the following are built as modules:
+>   drivers/net/phy/asix.ko
+>   drivers/net/usb/asix.ko
+> warning: same basename if the following are built as modules:
+>   fs/coda/coda.ko
+>   drivers/media/platform/coda/coda.ko
+> warning: same basename if the following are built as modules:
+>   drivers/net/phy/realtek.ko
+>   drivers/net/dsa/realtek.ko
+>
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Reviewed-by: Lucas De Marchi <lucas.demarchi@intel.com>
+> ---
+>
+> Changes in v3:
+>  - Simplied sed code (Alexander Kapshuk)
+>
+> Changes in v2:
+>  - redirect messages to stderr
+>  - use '--' after 'basename -a'
+>  - use '-r' for xargs to cope with empty modules.order/modules.builtin
+>
+>  Makefile                 |  1 +
+>  scripts/modules-check.sh | 16 ++++++++++++++++
+>  2 files changed, 17 insertions(+)
+>  create mode 100755 scripts/modules-check.sh
+>
+> diff --git a/Makefile b/Makefile
+> index a61a95b..30792fe 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1290,6 +1290,7 @@ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
+>         $(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+>         @$(kecho) '  Building modules, stage 2.';
+>         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+> +       $(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh
+>
+>  modules.builtin: $(vmlinux-dirs:%=%/modules.builtin)
+>         $(Q)$(AWK) '!x[$$0]++' $^ > $(objtree)/modules.builtin
+> diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
+> new file mode 100755
+> index 0000000..2f65953
+> --- /dev/null
+> +++ b/scripts/modules-check.sh
+> @@ -0,0 +1,16 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +set -e
+> +
+> +# Check uniqueness of module names
+> +check_same_name_modules()
+> +{
+> +       for m in $(sed 's:.*/::' modules.order modules.builtin | sort | uniq -d)
+> +       do
+> +               echo "warning: same basename if the following are built as modules:" >&2
+> +               sed "/\/$m/!d;s:^kernel/:  :" modules.order modules.builtin >&2
+> +       done
+> +}
+> +
+> +check_same_name_modules
 > --
-> Cheers,
-> Stephen Rothwell
+> 2.7.4
+>
 
 
-
--- 
+--
 Best Regards
 Masahiro Yamada
