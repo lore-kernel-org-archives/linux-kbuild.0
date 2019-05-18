@@ -1,63 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:21184 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbfERFaS (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:60034 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbfERGbP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 May 2019 01:30:18 -0400
+        Sat, 18 May 2019 02:31:15 -0400
 MIME-Version: 1.0
-References: <20190516194818.29230-1-jani.nikula@intel.com> <155808211071.12244.10320883277188429270@skylake-alporthouse-com>
-In-Reply-To: <155808211071.12244.10320883277188429270@skylake-alporthouse-com>
+References: <1558122142-10683-1-git-send-email-alex.popov@linux.com>
+In-Reply-To: <1558122142-10683-1-git-send-email-alex.popov@linux.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 May 2019 14:29:30 +0900
-Message-ID: <CAK7LNARMb4Wza09Kq2it=NUkbd3asS9Me7uhUOSwPbu+j0OmeQ@mail.gmail.com>
-Subject: Re: [RFC 1/3] kbuild: add support for ensuring headers are self-contained
+Date: Sat, 18 May 2019 15:30:20 +0900
+Message-ID: <CAK7LNASGD3F-MOpQdwfoC3zqJowgdEP9bpABbg2g+a+d7jJPDg@mail.gmail.com>
+Subject: Re: [v3 1/1] kconfig: Terminate menu blocks with a comment in the
+ generated config
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Wilson <chris@chris-wilson.co.uk>
-Cc: Jani Nikula <jani.nikula@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-gfx@lists.freedesktop.org, Michal Marek <michal.lkml@markovi.net>
+To: Alexander Popov <alex.popov@linux.com>
+Cc: Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, May 17, 2019 at 5:35 PM Chris Wilson <chris@chris-wilson.co.uk> wrote:
+On Sat, May 18, 2019 at 4:42 AM Alexander Popov <alex.popov@linux.com> wrote:
 >
-> Quoting Jani Nikula (2019-05-16 20:48:16)
-> > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> > index 8a1f64f17740..c2839de06485 100644
-> > --- a/scripts/Makefile.lib
-> > +++ b/scripts/Makefile.lib
-> > @@ -66,6 +66,9 @@ extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
-> >  extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
-> >  endif
-> >
-> > +# Test self-contained headers
-> > +extra-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.o,$(header-test-y))
+> Currently menu blocks start with a pretty header but end with nothing in
+> the generated config. So next config options stick together with the
+> options from the menu block.
 >
-> This didn't get pulled into clean-files.
+> Let's terminate menu blocks in the generated config with a comment and
+> a newline if needed. Example:
 >
-> clean-files-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.c,$(header-test-y))
-> ?
+> ...
+> CONFIG_BPF_STREAM_PARSER=y
+> CONFIG_NET_FLOW_LIMIT=y
 >
-> Not enough. Nor is clean-files-y +=...
+> #
+> # Network testing
+> #
+> CONFIG_NET_PKTGEN=y
+> CONFIG_NET_DROP_MONITOR=y
+> # end of Network testing
+> # end of Networking options
+>
+> CONFIG_HAMRADIO=y
+> ...
+>
+> Signed-off-by: Alexander Popov <alex.popov@linux.com>
 
 
-The correct syntax is 'clean-files +='
-instead of 'clean-files-y +='
-
-
-If Kbuild supports this in the core Makefiles,
-we can add "-o -name '*.header_test.c'"
-to the top Makefile.
-
-
-
-> And it should also be put into the global gitignore I think.
-
-
-Documentation/dontdiff too.
+Applied to linux-kbuild. Thanks.
 
 
 
-> -Chris
-
+> ---
+>
+> v3 changes:
+>  - rebase onto the recent rc;
+>  - don't print the end comment for the rootmenu to avoid breaking
+>    'make testconfig' (thanks to Masahiro Yamada).
+>
+> ---
+>  scripts/kconfig/confdata.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 492ac34..6006154 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -867,6 +867,7 @@ int conf_write(const char *name)
+>         const char *str;
+>         char tmpname[PATH_MAX + 1], oldname[PATH_MAX + 1];
+>         char *env;
+> +       bool need_newline = false;
+>
+>         if (!name)
+>                 name = conf_get_configname();
+> @@ -912,12 +913,16 @@ int conf_write(const char *name)
+>                                      "#\n"
+>                                      "# %s\n"
+>                                      "#\n", str);
+> +                       need_newline = false;
+>                 } else if (!(sym->flags & SYMBOL_CHOICE)) {
+>                         sym_calc_value(sym);
+>                         if (!(sym->flags & SYMBOL_WRITE))
+>                                 goto next;
+> +                       if (need_newline) {
+> +                               fprintf(out, "\n");
+> +                               need_newline = false;
+> +                       }
+>                         sym->flags &= ~SYMBOL_WRITE;
+> -
+>                         conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+>                 }
+>
+> @@ -929,6 +934,12 @@ int conf_write(const char *name)
+>                 if (menu->next)
+>                         menu = menu->next;
+>                 else while ((menu = menu->parent)) {
+> +                       if (!menu->sym && menu_is_visible(menu) &&
+> +                           menu != &rootmenu) {
+> +                               str = menu_get_prompt(menu);
+> +                               fprintf(out, "# end of %s\n", str);
+> +                               need_newline = true;
+> +                       }
+>                         if (menu->next) {
+>                                 menu = menu->next;
+>                                 break;
+> --
+> 2.7.4
+>
 
 
 -- 
