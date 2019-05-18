@@ -1,93 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:42020 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726851AbfEQTmv (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:20260 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725268AbfERFRp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 May 2019 15:42:51 -0400
-From: Alexander Popov <alex.popov@linux.com>
-Subject: [v3 1/1] kconfig: Terminate menu blocks with a comment in the generated config
-Date: Fri, 17 May 2019 22:42:22 +0300
-Message-Id: <1558122142-10683-1-git-send-email-alex.popov@linux.com>
+        Sat, 18 May 2019 01:17:45 -0400
+MIME-Version: 1.0
+References: <20190516194818.29230-1-jani.nikula@intel.com>
+In-Reply-To: <20190516194818.29230-1-jani.nikula@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 18 May 2019 14:16:50 +0900
+Message-ID: <CAK7LNAQv-fm2iV6HW_FM0Fe6hNDeJ25c9CS2SbroSOneoepFMQ@mail.gmail.com>
+Subject: Re: [RFC 1/3] kbuild: add support for ensuring headers are self-contained
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Popov <alex.popov@linux.com>
+To: Jani Nikula <jani.nikula@intel.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-gfx@lists.freedesktop.org, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>
 
-Currently menu blocks start with a pretty header but end with nothing in
-the generated config. So next config options stick together with the
-options from the menu block.
+On Fri, May 17, 2019 at 4:48 AM Jani Nikula <jani.nikula@intel.com> wrote:
+>
+> Sometimes it's useful to be able to explicitly ensure certain headers
+> remain self-contained, i.e. that they are compilable as standalone
+> units, by including and/or forward declaring everything they depend on.
+>
+> Add special target header-test-y where individual Makefiles can add
+> headers to be tested if CONFIG_HEADER_TEST is enabled. This will
+> generate a dummy C file per header that gets built as part of extra-y.
+>
+> Cc: Chris Wilson <chris@chris-wilson.co.uk>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+> ---
+>  Documentation/kbuild/makefiles.txt |  7 +++++++
+>  init/Kconfig                       |  9 +++++++++
+>  scripts/Makefile.build             | 10 ++++++++++
+>  scripts/Makefile.lib               |  3 +++
+>  4 files changed, 29 insertions(+)
+>
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index 03c065855eaf..73df58e5ea0c 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -1036,6 +1036,13 @@ When kbuild executes, the following steps are followed (roughly):
+>         In this example, extra-y is used to list object files that
+>         shall be built, but shall not be linked as part of built-in.a.
+>
+> +    header-test-y
+> +
+> +       header-test-y specifies headers (*.h) in the current directory that
+> +       should be compile tested to ensure they are self-contained,
+> +       i.e. compilable as standalone units. If CONFIG_HEADER_TEST is enabled,
+> +       this autogenerates dummy sources to include the headers, and builds them
+> +       as part of extra-y.
+>
+>  --- 6.7 Commands useful for building a boot image
+>
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 4592bf7997c0..d91b157201b1 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -95,6 +95,15 @@ config COMPILE_TEST
+>           here. If you are a user/distributor, say N here to exclude useless
+>           drivers to be distributed.
+>
+> +config HEADER_TEST
+> +       bool "Compile test headers that should be standalone compilable"
+> +       help
+> +         Compile test headers listed in header-test-y target to ensure they are
+> +         self-contained, i.e. compilable as standalone units.
+> +
+> +         If you are a developer or tester and want to ensure the requested
+> +         headers are self-contained, say Y here. Otherwise, choose N.
+> +
+>  config LOCALVERSION
+>         string "Local version - append to kernel release"
+>         help
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 76ca30cc4791..4d4bf698467a 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -291,6 +291,16 @@ quiet_cmd_cc_lst_c = MKLST   $@
+>  $(obj)/%.lst: $(src)/%.c FORCE
+>         $(call if_changed_dep,cc_lst_c)
+>
+> +# Dummy C sources for header test (header-test-y target)
+> +# ---------------------------------------------------------------------------
+> +
+> +quiet_cmd_header_test = HDRTEST $@
+> +      cmd_header_test = echo "\#include \"$(<F)\"" > $@
+> +
+> +# FIXME: would be nice to be able to limit this implicit rule to header-test-y
+> +$(obj)/%.header_test.c: $(src)/%.h FORCE
+> +       $(call if_changed,header_test)
+> +
+>  # Compile assembler sources (.S)
+>  # ---------------------------------------------------------------------------
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 8a1f64f17740..c2839de06485 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -66,6 +66,9 @@ extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
+>  extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
+>  endif
+>
+> +# Test self-contained headers
+> +extra-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.o,$(header-test-y))
+> +
+>  # Add subdir path
+>
+>  extra-y                := $(addprefix $(obj)/,$(extra-y))
+> --
+> 2.20.1
+>
 
-Let's terminate menu blocks in the generated config with a comment and
-a newline if needed. Example:
 
-...
-CONFIG_BPF_STREAM_PARSER=y
-CONFIG_NET_FLOW_LIMIT=y
+Thanks, probably we should do this.
 
-#
-# Network testing
-#
-CONFIG_NET_PKTGEN=y
-CONFIG_NET_DROP_MONITOR=y
-# end of Network testing
-# end of Networking options
+At least, this check will be useful
+for uapi headers since the kernel does not
+test the self-containedness of
+exported headers, (then turned out be problematic
+later in user-space).
 
-CONFIG_HAMRADIO=y
-...
+I will take a little time to considier
+how far we can extend the idea about
+"headers should be self-contained".
 
-Signed-off-by: Alexander Popov <alex.popov@linux.com>
----
+Thank you.
 
-v3 changes:
- - rebase onto the recent rc;
- - don't print the end comment for the rootmenu to avoid breaking
-   'make testconfig' (thanks to Masahiro Yamada).
 
----
- scripts/kconfig/confdata.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 492ac34..6006154 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -867,6 +867,7 @@ int conf_write(const char *name)
- 	const char *str;
- 	char tmpname[PATH_MAX + 1], oldname[PATH_MAX + 1];
- 	char *env;
-+	bool need_newline = false;
- 
- 	if (!name)
- 		name = conf_get_configname();
-@@ -912,12 +913,16 @@ int conf_write(const char *name)
- 				     "#\n"
- 				     "# %s\n"
- 				     "#\n", str);
-+			need_newline = false;
- 		} else if (!(sym->flags & SYMBOL_CHOICE)) {
- 			sym_calc_value(sym);
- 			if (!(sym->flags & SYMBOL_WRITE))
- 				goto next;
-+			if (need_newline) {
-+				fprintf(out, "\n");
-+				need_newline = false;
-+			}
- 			sym->flags &= ~SYMBOL_WRITE;
--
- 			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
- 		}
- 
-@@ -929,6 +934,12 @@ int conf_write(const char *name)
- 		if (menu->next)
- 			menu = menu->next;
- 		else while ((menu = menu->parent)) {
-+			if (!menu->sym && menu_is_visible(menu) &&
-+			    menu != &rootmenu) {
-+				str = menu_get_prompt(menu);
-+				fprintf(out, "# end of %s\n", str);
-+				need_newline = true;
-+			}
- 			if (menu->next) {
- 				menu = menu->next;
- 				break;
 -- 
-2.7.4
+Best Regards
+Masahiro Yamada
