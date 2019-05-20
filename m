@@ -1,57 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46044 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726126AbfETJkX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 May 2019 05:40:23 -0400
-Date: Mon, 20 May 2019 11:40:20 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] kbuild: do not check name uniqueness of builtin modules
-Message-ID: <20190520094020.GC15326@kroah.com>
-References: <20190520025437.13825-1-yamada.masahiro@socionext.com>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:49774 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733027AbfETPJE (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 May 2019 11:09:04 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190520025437.13825-1-yamada.masahiro@socionext.com>
+References: <20190423212741.12219-1-ndesaulniers@google.com>
+In-Reply-To: <20190423212741.12219-1-ndesaulniers@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 21 May 2019 00:08:19 +0900
+Message-ID: <CAK7LNARdZa16J56AxhM5bcr9oHdAw+zpa4EDjPpF8YO77==Etw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: drop support for cc-ldoption
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>, Lucas De Marchi <lucas.demarchi@intel.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, May 20, 2019 at 11:54:37AM +0900, Masahiro Yamada wrote:
-> I just thought it was a good idea to scan builtin.modules in the name
-> uniqueness checking, but Stephen reported a false positive.
-> 
-> ppc64_defconfig produces:
-> 
->   warning: same basename if the following are built as modules:
->     arch/powerpc/platforms/powermac/nvram.ko
->     drivers/char/nvram.ko
-> 
-> ..., which is a false positive because the former is never built as
-> a module as you see in arch/powerpc/platforms/powermac/Makefile:
-> 
->   # CONFIG_NVRAM is an arch. independent tristate symbol, for pmac32 we really
->   # need this to be a bool.  Cheat here and pretend CONFIG_NVRAM=m is really
->   # CONFIG_NVRAM=y
->   obj-$(CONFIG_NVRAM:m=y)         += nvram.o
-> 
-> Since we cannot predict how tricky Makefiles are written in wild,
-> builtin.modules may potentially contain false positives. I do not
-> think it is a big deal as far as kmod is concerned, but false positive
-> warnings in the kernel build makes people upset. It is better to not
-> do it.
-> 
-> Even without checking builtin.modules, we have enough (and more solid)
-> test coverage with allmodconfig.
-> 
-> While I touched this part, I replaced the sed code with neater one
-> provided by Stephen.
-> 
-> Link: https://lkml.org/lkml/2019/5/19/120
-> Link: https://lkml.org/lkml/2019/5/19/123
-> Fixes: 3a48a91901c5 ("kbuild: check uniqueness of module names")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+On Wed, Apr 24, 2019 at 6:27 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> If you want to see if your linker supports a certain flag, then ask the
+> linker directly with ld-option (not the compiler with cc-ldoption).
+> Checking for linker flag support is an antipattern that complicates the
+> usage of various linkers other than bfd via -fuse-ld={bfd|gold|lld}.
+>
+> Cc: clang-built-linux@googlegroups.com
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 > ---
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Applied to linux-kbuild. Thanks.
+
+
+
+
+> This should probably wait until all of the call sites have been cleaned
+> up. Masahiro sent them for arm and arm64, while I sent cleanups for all
+> the rest.
+>
+>
+>  Documentation/kbuild/makefiles.txt | 14 --------------
+>  scripts/Kbuild.include             |  5 -----
+>  2 files changed, 19 deletions(-)
+>
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index 03c065855eaf..d65ad5746f94 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -437,20 +437,6 @@ more details, with real examples.
+>         The second argument is optional, and if supplied will be used
+>         if first argument is not supported.
+>
+> -    cc-ldoption
+> -       cc-ldoption is used to check if $(CC) when used to link object files
+> -       supports the given option.  An optional second option may be
+> -       specified if first option are not supported.
+> -
+> -       Example:
+> -               #arch/x86/kernel/Makefile
+> -               vsyscall-flags += $(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
+> -
+> -       In the above example, vsyscall-flags will be assigned the option
+> -       -Wl$(comma)--hash-style=sysv if it is supported by $(CC).
+> -       The second argument is optional, and if supplied will be used
+> -       if first argument is not supported.
+> -
+>      as-instr
+>         as-instr checks if the assembler reports a specific instruction
+>         and then outputs either option1 or option2
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 7484b9d8272f..fbfb37d1bcc8 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -138,11 +138,6 @@ cc-disable-warning = $(call try-run,\
+>  # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+>  cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
+>
+> -# cc-ldoption
+> -# Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+> -cc-ldoption = $(call try-run,\
+> -       $(CC) $(1) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+> -
+>  # ld-option
+>  # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
+>  ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
+> --
+> 2.21.0.593.g511ec345e18-goog
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
