@@ -1,140 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga17.intel.com ([192.55.52.151]:12516 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730302AbfETJQo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 May 2019 05:16:44 -0400
-From: Jani Nikula <jani.nikula@intel.com>
-Subject: Re: [Intel-gfx] [RFC 1/3] kbuild: add support for ensuring headers are self-contained
-In-Reply-To: <CAK7LNAQv-fm2iV6HW_FM0Fe6hNDeJ25c9CS2SbroSOneoepFMQ@mail.gmail.com>
-References: <20190516194818.29230-1-jani.nikula@intel.com> <CAK7LNAQv-fm2iV6HW_FM0Fe6hNDeJ25c9CS2SbroSOneoepFMQ@mail.gmail.com>
-Date: Mon, 20 May 2019 12:20:01 +0300
-Message-ID: <87zhnh8ou6.fsf@intel.com>
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:39751 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731432AbfETJ2j (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 May 2019 05:28:39 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20190520025437.13825-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190520025437.13825-1-yamada.masahiro@socionext.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 20 May 2019 11:28:20 +0200
+Message-ID: <CAK8P3a2nth2sNPT46_e8G=s=D-J8LtsrA4kO2esu804_pWVs-Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: do not check name uniqueness of builtin modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, intel-gfx@lists.freedesktop.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Greg KH <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Michael Schmitz <schmitzmic@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Rusty Russell <rusty@rustcorp.com.au>, Kees Cook <keescook@chromium.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Lucas De Marchi <lucas.demarchi@intel.com>
 
-On Sat, 18 May 2019, Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> On Fri, May 17, 2019 at 4:48 AM Jani Nikula <jani.nikula@intel.com> wrote:
->>
->> Sometimes it's useful to be able to explicitly ensure certain headers
->> remain self-contained, i.e. that they are compilable as standalone
->> units, by including and/or forward declaring everything they depend on.
->>
->> Add special target header-test-y where individual Makefiles can add
->> headers to be tested if CONFIG_HEADER_TEST is enabled. This will
->> generate a dummy C file per header that gets built as part of extra-y.
->>
->> Cc: Chris Wilson <chris@chris-wilson.co.uk>
->> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Cc: Michal Marek <michal.lkml@markovi.net>
->> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
->> ---
->>  Documentation/kbuild/makefiles.txt |  7 +++++++
->>  init/Kconfig                       |  9 +++++++++
->>  scripts/Makefile.build             | 10 ++++++++++
->>  scripts/Makefile.lib               |  3 +++
->>  4 files changed, 29 insertions(+)
->>
->> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
->> index 03c065855eaf..73df58e5ea0c 100644
->> --- a/Documentation/kbuild/makefiles.txt
->> +++ b/Documentation/kbuild/makefiles.txt
->> @@ -1036,6 +1036,13 @@ When kbuild executes, the following steps are followed (roughly):
->>         In this example, extra-y is used to list object files that
->>         shall be built, but shall not be linked as part of built-in.a.
->>
->> +    header-test-y
->> +
->> +       header-test-y specifies headers (*.h) in the current directory that
->> +       should be compile tested to ensure they are self-contained,
->> +       i.e. compilable as standalone units. If CONFIG_HEADER_TEST is enabled,
->> +       this autogenerates dummy sources to include the headers, and builds them
->> +       as part of extra-y.
->>
->>  --- 6.7 Commands useful for building a boot image
->>
->> diff --git a/init/Kconfig b/init/Kconfig
->> index 4592bf7997c0..d91b157201b1 100644
->> --- a/init/Kconfig
->> +++ b/init/Kconfig
->> @@ -95,6 +95,15 @@ config COMPILE_TEST
->>           here. If you are a user/distributor, say N here to exclude useless
->>           drivers to be distributed.
->>
->> +config HEADER_TEST
->> +       bool "Compile test headers that should be standalone compilable"
->> +       help
->> +         Compile test headers listed in header-test-y target to ensure they are
->> +         self-contained, i.e. compilable as standalone units.
->> +
->> +         If you are a developer or tester and want to ensure the requested
->> +         headers are self-contained, say Y here. Otherwise, choose N.
->> +
->>  config LOCALVERSION
->>         string "Local version - append to kernel release"
->>         help
->> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->> index 76ca30cc4791..4d4bf698467a 100644
->> --- a/scripts/Makefile.build
->> +++ b/scripts/Makefile.build
->> @@ -291,6 +291,16 @@ quiet_cmd_cc_lst_c = MKLST   $@
->>  $(obj)/%.lst: $(src)/%.c FORCE
->>         $(call if_changed_dep,cc_lst_c)
->>
->> +# Dummy C sources for header test (header-test-y target)
->> +# ---------------------------------------------------------------------------
->> +
->> +quiet_cmd_header_test = HDRTEST $@
->> +      cmd_header_test = echo "\#include \"$(<F)\"" > $@
->> +
->> +# FIXME: would be nice to be able to limit this implicit rule to header-test-y
->> +$(obj)/%.header_test.c: $(src)/%.h FORCE
->> +       $(call if_changed,header_test)
->> +
->>  # Compile assembler sources (.S)
->>  # ---------------------------------------------------------------------------
->>
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index 8a1f64f17740..c2839de06485 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -66,6 +66,9 @@ extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
->>  extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
->>  endif
->>
->> +# Test self-contained headers
->> +extra-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.header_test.o,$(header-test-y))
->> +
->>  # Add subdir path
->>
->>  extra-y                := $(addprefix $(obj)/,$(extra-y))
->> --
->> 2.20.1
->>
+On Mon, May 20, 2019 at 4:57 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
+> I just thought it was a good idea to scan builtin.modules in the name
+> uniqueness checking, but Stephen reported a false positive.
 >
-> Thanks, probably we should do this.
+> ppc64_defconfig produces:
 >
-> At least, this check will be useful
-> for uapi headers since the kernel does not
-> test the self-containedness of
-> exported headers, (then turned out be problematic
-> later in user-space).
+>   warning: same basename if the following are built as modules:
+>     arch/powerpc/platforms/powermac/nvram.ko
+>     drivers/char/nvram.ko
 >
-> I will take a little time to considier
-> how far we can extend the idea about
-> "headers should be self-contained".
+> ..., which is a false positive because the former is never built as
+> a module as you see in arch/powerpc/platforms/powermac/Makefile:
+>
+>   # CONFIG_NVRAM is an arch. independent tristate symbol, for pmac32 we really
+>   # need this to be a bool.  Cheat here and pretend CONFIG_NVRAM=m is really
+>   # CONFIG_NVRAM=y
+>   obj-$(CONFIG_NVRAM:m=y)         += nvram.o
+>
+> Since we cannot predict how tricky Makefiles are written in wild,
+> builtin.modules may potentially contain false positives. I do not
+> think it is a big deal as far as kmod is concerned, but false positive
+> warnings in the kernel build makes people upset. It is better to not
+> do it.
+>
+> Even without checking builtin.modules, we have enough (and more solid)
+> test coverage with allmodconfig.
+>
+> While I touched this part, I replaced the sed code with neater one
+> provided by Stephen.
+>
+> Link: https://lkml.org/lkml/2019/5/19/120
+> Link: https://lkml.org/lkml/2019/5/19/123
+> Fixes: 3a48a91901c5 ("kbuild: check uniqueness of module names")
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Thanks! Please let me know if/when you need further action from me, I
-won't post new versions until then.
+Looks good to me
 
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-BR,
-Jani.
-
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
+> ---
+>
+>  scripts/modules-check.sh | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
+> index 2f659530e1ec..39e8cb36ba19 100755
+> --- a/scripts/modules-check.sh
+> +++ b/scripts/modules-check.sh
+> @@ -6,10 +6,10 @@ set -e
+>  # Check uniqueness of module names
+>  check_same_name_modules()
+>  {
+> -       for m in $(sed 's:.*/::' modules.order modules.builtin | sort | uniq -d)
+> +       for m in $(sed 's:.*/::' modules.order | sort | uniq -d)
+>         do
+> -               echo "warning: same basename if the following are built as modules:" >&2
+> -               sed "/\/$m/!d;s:^kernel/:  :" modules.order modules.builtin >&2
+> +               echo "warning: same module names found:" >&2
+> +               sed -n "/\/$m/s:^kernel/:  :p" modules.order >&2
+>         done
+>  }
+>
+> --
+> 2.17.1
+>
