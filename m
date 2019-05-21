@@ -1,115 +1,194 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:51970 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725924AbfEUEtL (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:58503 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728142AbfEUNuA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 May 2019 00:49:11 -0400
-Subject: Re: [kbuild:kunit 14/17] htmldocs: include/kunit/kunit-stream.h:58:
- warning: Function parameter or member '2' not described in '__printf'
-References: <201905100945.V7PLp0za%lkp@intel.com>
- <CAFd5g46nZ0=Djo6d6iqdSQLaLP0Qq5bC+uzyjpqp5fXnty7YOg@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <94e6e17c-e360-f56d-674c-84cc0032ca4a@infradead.org>
-Date: Mon, 20 May 2019 21:49:07 -0700
+        Tue, 21 May 2019 09:50:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFd5g46nZ0=Djo6d6iqdSQLaLP0Qq5bC+uzyjpqp5fXnty7YOg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190509143859.9050-1-joe.lawrence@redhat.com> <20190509143859.9050-3-joe.lawrence@redhat.com>
+In-Reply-To: <20190509143859.9050-3-joe.lawrence@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 21 May 2019 22:48:57 +0900
+Message-ID: <CAK7LNAT_2Tgt+3C1RVYGn47uhQ0L94uY4CFRjjooJz2m0nZnXw@mail.gmail.com>
+Subject: Re: [PATCH v4 02/10] kbuild: Support for Symbols.list creation
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>, kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Felix Guo <felixguoxiuping@gmail.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 5/10/19 2:03 PM, Brendan Higgins wrote:
-> On Thu, May 9, 2019 at 6:23 PM kbuild test robot <lkp@intel.com> wrote:
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kunit
->> head:   c505c0b2e6237c729634327c178f5b0094f1c958
->> commit: c69e87665049970d1c2d6fe2fa1ae7a7c8655420 [14/17] Documentation: kunit: add documentation for KUnit
->> reproduce: make htmldocs
->>
->> If you fix the issue, kindly add following tag
->> Reported-by: kbuild test robot <lkp@intel.com>
->>
->> All warnings (new ones prefixed by >>):
-> < snip >
->>    drivers/gpu/drm/i915/i915_vma.h:50: warning: cannot understand function prototype: 'struct i915_vma '
->>    drivers/gpu/drm/i915/i915_vma.h:1: warning: no structured comments found
->>    drivers/gpu/drm/i915/intel_guc_fwif.h:536: warning: cannot understand function prototype: 'struct guc_log_buffer_state '
->>    drivers/gpu/drm/i915/i915_trace.h:1: warning: no structured comments found
->>    drivers/gpu/drm/i915/i915_reg.h:156: warning: bad line:
->>    include/linux/interconnect.h:1: warning: no structured comments found
->>>> include/kunit/kunit-stream.h:58: warning: Function parameter or member '2' not described in '__printf'
-> 
-> This looks like a bug in the kernel-doc parser: __printf in this context is:
-> 
->> 8dcda743 Brendan Higgins 2019-05-01  56  void __printf(2, 3) kunit_stream_add(struct kunit_stream *this,
->> 8dcda743 Brendan Higgins 2019-05-01  57                                      const char *fmt, ...);
-> 
-> which is an attribute to tell the compiler that this is a printf style
-> function with a printf style format string; it doesn't make sense to
-> describe it's parameters.
+On Thu, May 9, 2019 at 11:40 PM Joe Lawrence <joe.lawrence@redhat.com> wrote:
+>
+> From: Joao Moreira <jmoreira@suse.de>
+>
+> For automatic resolution of livepatch relocations, a file called
+> Symbols.list is used. This file maps symbols within every compiled
+> kernel object allowing the identification of symbols whose name is
+> unique, thus relocation can be automatically inferred, or providing
+> information that helps developers when code annotation is required for
+> solving the matter.
+>
+> Add support for creating Symbols.list in the main Makefile. First,
+> ensure that built-in is compiled when CONFIG_LIVEPATCH is enabled (as
+> required to achieve a complete Symbols.list file). Define the command to
+> build Symbols.list (cmd_klp_map) and hook it in the modules rule.
+>
+> As it is undesirable to have symbols from livepatch objects inside
+> Symbols.list, make livepatches discernible by modifying
+> scripts/Makefile.build to create a .livepatch file for each livepatch
+> in $(MODVERDIR). This file then used by cmd_klp_map to identify and
+> bypass livepatches.
+>
+> For identifying livepatches during the build process, a flag variable
+> LIVEPATCH_$(basetarget).o is considered in scripts/Makefile.build. This
+> way, set this flag for the livepatch sample Makefile in
+> samples/livepatch/Makefile.
+>
+> Finally, Add a clean rule to ensure that Symbols.list is removed during
+> clean.
+>
+> Notes:
+>
+> To achieve a correct Symbols.list file, all kernel objects must be
+> considered, thus, its construction require these objects to be priorly
+> built. On the other hand, invoking scripts/Makefile.modpost without
+> having a complete Symbols.list in place would occasionally lead to
+> in-tree livepatches being post-processed incorrectly. To prevent this
+> from becoming a circular dependency, the construction of Symbols.list
+> uses non-post-processed kernel objects and such does not cause harm as
+> the symbols normally referenced from within livepatches are visible at
+> this stage. Also due to these requirements, the spot in-between modules
+> compilation and the invocation of scripts/Makefile.modpost was picked
+> for hooking cmd_klp_map.
+>
+> The approach based on .livepatch files was proposed as an alternative
+> to using MODULE_INFO statements. This approach was originally
+> proposed by Miroslav Benes as a workaround for identifying livepathes
+> without depending on modinfo during the modpost stage. It was moved to
+> this patch as the approach also shown to be useful while building
+> Symbols.list.
+>
+> Signed-off-by: Joao Moreira <jmoreira@suse.de>
+> Signed-off-by: Joe Lawrence <joe.lawrence@redhat.com>
+> ---
+>  .gitignore                 |  1 +
+>  Makefile                   | 30 ++++++++++++++++++++++++++----
+>  lib/livepatch/Makefile     |  5 +++++
+>  samples/livepatch/Makefile |  4 ++++
+>  scripts/Makefile.build     |  7 +++++++
+>  5 files changed, 43 insertions(+), 4 deletions(-)
+>
+> diff --git a/.gitignore b/.gitignore
+> index a20ac26aa2f5..5cd5758f5ffe 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -45,6 +45,7 @@
+>  *.xz
+>  Module.symvers
+>  modules.builtin
+> +Symbols.list
 
-Yes.  I'm a little surprised that this has never come up before, but in my
-quick examination, it seems that most people put the __printf() attribute
-in a header file but not in the .c implementation file, then they document
-the function in the .c file, not in the header file, so it hasn't been needed.
 
-Ignoring __printf() could be added to scripts/kernel-doc.  I added
-kernel-doc notation to <linux/kernel.h> panic() and then tested it with
-the patch below.  ItWorksForMe.  :)
+Symbols.list is created only in the top directory.
 
+Please move this to
 
->>    include/kunit/kunit-stream.h:58: warning: Function parameter or member '3' not described in '__printf'
->>    include/kunit/kunit-stream.h:58: warning: Excess function parameter 'this' description in '__printf'
->>    include/kunit/kunit-stream.h:58: warning: Excess function parameter 'fmt' description in '__printf'
->>    include/linux/skbuff.h:897: warning: Function parameter or member 'dev_scratch' not described in 'sk_buff'
-> < snip >
->>    fs/debugfs/file.c:439: WARNING: Inline literal start-string without end-string.
->>
->> vim +58 include/kunit/kunit-stream.h
->>
->> 8dcda743 Brendan Higgins 2019-05-01  48
->> 8dcda743 Brendan Higgins 2019-05-01  49  /**
->> 8dcda743 Brendan Higgins 2019-05-01  50   * kunit_stream_add(): adds the formatted input to the internal buffer.
->> 8dcda743 Brendan Higgins 2019-05-01  51   * @this: the stream being operated on.
->> 8dcda743 Brendan Higgins 2019-05-01  52   * @fmt: printf style format string to append to stream.
->> 8dcda743 Brendan Higgins 2019-05-01  53   *
->> 8dcda743 Brendan Higgins 2019-05-01  54   * Appends the formatted string, @fmt, to the internal buffer.
->> 8dcda743 Brendan Higgins 2019-05-01  55   */
->> 8dcda743 Brendan Higgins 2019-05-01  56  void __printf(2, 3) kunit_stream_add(struct kunit_stream *this,
->> 8dcda743 Brendan Higgins 2019-05-01  57                                      const char *fmt, ...);
->> 8dcda743 Brendan Higgins 2019-05-01 @58
->>
->> :::::: The code at line 58 was first introduced by commit
->> :::::: 8dcda743c31c1ffc0ac13f3d23f3dd1b85b545f8 kunit: test: add kunit_stream a std::stream like logger
-> 
-> Thanks!
+# Top-level generic files
+
+section with a leading slash.
 
 
----
-From: Randy Dunlap <rdunlap@infradead.org>
 
-Ignore __printf() function attributes just as other __attribute__
-strings are ignored.
+Also, you need to add it to
+Documentation/dontdiff
 
-Fixes this kernel-doc warning message:
-include/kunit/kunit-stream.h:58: warning: Function parameter or member '2' not described in '__printf'
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Brendan Higgins <brendanhiggins@google.com>
----
- scripts/kernel-doc |    1 +
- 1 file changed, 1 insertion(+)
 
---- linux-next-20190520.orig/scripts/kernel-doc
-+++ linux-next-20190520/scripts/kernel-doc
-@@ -1580,6 +1580,7 @@ sub dump_function($$) {
-     $prototype =~ s/__must_check +//;
-     $prototype =~ s/__weak +//;
-     $prototype =~ s/__sched +//;
-+    $prototype =~ s/__printf\s*\(\s*\d*\s*,\s*\d*\s*\) +//;
-     my $define = $prototype =~ s/^#\s*define\s+//; #ak added
-     $prototype =~ s/__attribute__\s*\(\(
-             (?:
+
+>  #
+>  # Top-level generic files
+> diff --git a/Makefile b/Makefile
+> index abe13538a8c0..98089f9d44fe 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -574,10 +574,13 @@ KBUILD_BUILTIN := 1
+>  # If we have only "make modules", don't compile built-in objects.
+>  # When we're building modules with modversions, we need to consider
+>  # the built-in objects during the descend as well, in order to
+> -# make sure the checksums are up to date before we record them.
+> +# make sure the checksums are up to date before we record them. The
+> +# same applies for building livepatches, as built-in objects may hold
+> +# symbols which are referenced from livepatches and are required by
+> +# klp-convert post-processing tool for resolving these cases.
+>
+>  ifeq ($(MAKECMDGOALS),modules)
+> -  KBUILD_BUILTIN := $(if $(CONFIG_MODVERSIONS),1)
+> +  KBUILD_BUILTIN := $(if $(or $(CONFIG_MODVERSIONS), $(CONFIG_LIVEPATCH)),1)
+>  endif
+>
+>  # If we have "make <whatever> modules", compile modules
+> @@ -1261,9 +1264,25 @@ all: modules
+>  # duplicate lines in modules.order files.  Those are removed
+>  # using awk while concatenating to the final file.
+>
+> +quiet_cmd_klp_map = KLP     Symbols.list
+> +SLIST = $(objtree)/Symbols.list
+
+
+Please do not define SLIST.
+
+Use Symbols.list directly.
+
+
+
+
+> +
+> +define cmd_klp_map
+> +       $(shell echo "klp-convert-symbol-data.0.1" > $(SLIST))                          \
+> +       $(shell echo "*vmlinux" >> $(SLIST))                                            \
+> +       $(shell nm -f posix $(objtree)/vmlinux | cut -d\  -f1 >> $(SLIST))              \
+> +       $(foreach m, $(wildcard $(MODVERDIR)/*.mod),                                    \
+> +               $(eval mod = $(patsubst %.ko,%.o,$(shell head -n1 $(m))))               \
+> +               $(if $(wildcard $(MODVERDIR)/$(shell basename -s .o $(mod)).livepatch),,\
+> +                       $(eval fmod = $(subst $(quote),_,$(subst -,_,$(mod))))          \
+> +                       $(shell echo "*$(shell basename -s .o $(fmod))" >> $(SLIST))    \
+> +                       $(shell nm -f posix $(mod) | cut -d\  -f1 >> $(SLIST))))
+> +endef
+> +
+>  PHONY += modules
+>  modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
+>         $(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+> +       $(if $(CONFIG_LIVEPATCH), $(call cmd,klp_map))
+>         @$(kecho) '  Building modules, stage 2.';
+>         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+>
+> @@ -1350,7 +1369,7 @@ clean: rm-dirs  := $(CLEAN_DIRS)
+>  clean: rm-files := $(CLEAN_FILES)
+>  clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation samples)
+>
+> -PHONY += $(clean-dirs) clean archclean vmlinuxclean
+> +PHONY += $(clean-dirs) clean archclean vmlinuxclean klpclean
+>  $(clean-dirs):
+>         $(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+>
+> @@ -1358,7 +1377,10 @@ vmlinuxclean:
+>         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+>         $(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
+>
+> -clean: archclean vmlinuxclean
+> +klpclean:
+> +       $(Q) rm -f $(SLIST)
+
+
+klpclean is unneeded.
+
+Add it to CLEAN_FILES
+
+CLEAN_FILES += modules.builtin.modinfo Systems.list
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
