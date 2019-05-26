@@ -1,53 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19685 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726697AbfEYLtk (ORCPT
+Received: from sonic309-54.consmr.mail.ne1.yahoo.com ([66.163.184.180]:33915
+        "EHLO sonic309-54.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727906AbfEZQ0h (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 25 May 2019 07:49:40 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kconfig: tests: fix recursive inclusion unit test
-Date: Sat, 25 May 2019 20:49:19 +0900
-Message-Id: <20190525114919.26188-1-yamada.masahiro@socionext.com>
+        Sun, 26 May 2019 12:26:37 -0400
+Date: Sun, 26 May 2019 16:24:34 +0000 (UTC)
+From: Major Dennis Hornbeck <cd68@labourza.online>
+Reply-To: Major Dennis Hornbeck <hornbeckmajordennis637@gmail.com>
+Message-ID: <1055307886.7818108.1558887874541@mail.yahoo.com>
+Subject: 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <1055307886.7818108.1558887874541.ref@mail.yahoo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Adding SPDX license identifier is pretty safe; however, here is one
-exception.
+I am in the military unit here in Afghanistan, we have some amount of funds that we want to move out of the country. My partners and I need a good partner someone we can trust. It is risk free and legal. Reply to this email: hornbeckmajordennis637@gmail.com
 
-Since commit ec8f24b7faaf ("treewide: Add SPDX license identifier -
-Makefile/Kconfig"), "make testconfig" would not pass.
-
-When Kconfig detects a circular file inclusion, it displays error
-messages with a file name and a line number prefixed to each line.
-
-The unit test checks if Kconfig emits the error messages correctly
-(this also checks the line number correctness).
-
-Now that the test input has the SPDX license identifier at the very top,
-the line numbers in the expected stderr should be incremented by 1.
-
-Fixes: ec8f24b7faaf ("treewide: Add SPDX license identifier - Makefile/Kconfig")
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- scripts/kconfig/tests/err_recursive_inc/expected_stderr | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/kconfig/tests/err_recursive_inc/expected_stderr b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
-index 6b582eee2176..b070a31fdfeb 100644
---- a/scripts/kconfig/tests/err_recursive_inc/expected_stderr
-+++ b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
-@@ -1,6 +1,6 @@
- Recursive inclusion detected.
- Inclusion path:
-   current file : Kconfig.inc1
--  included from: Kconfig.inc3:1
--  included from: Kconfig.inc2:3
--  included from: Kconfig.inc1:4
-+  included from: Kconfig.inc3:2
-+  included from: Kconfig.inc2:4
-+  included from: Kconfig.inc1:5
--- 
-2.17.1
+Regards,
+Major Dennis Hornbeck.
