@@ -1,137 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:44487 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726274AbfE0OkT (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:60620 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726905AbfE0WMM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 May 2019 10:40:19 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/5] kconfig: make arch/*/configs/defconfig the default of KBUILD_DEFCONFIG
-Date: Mon, 27 May 2019 23:37:24 +0900
-Message-Id: <20190527143725.12542-4-yamada.masahiro@socionext.com>
-In-Reply-To: <20190527143725.12542-1-yamada.masahiro@socionext.com>
-References: <20190527143725.12542-1-yamada.masahiro@socionext.com>
+        Mon, 27 May 2019 18:12:12 -0400
+Subject: Re: uapi headers userspace build results
+References: <8b90457a-5b1d-818c-d2d6-ba3d16ad3eaf@infradead.org>
+ <1ef3a7b9-5172-9f7a-01fa-4866e765fbbe@google.com>
+ <b5a73c3f-b70d-110f-896d-82fd81982cf8@infradead.org>
+ <8a36d3ba-977b-49ca-c431-90ef53071f88@google.com>
+ <9b76d1b6-08a4-36cf-4fc8-661b216ca433@infradead.org>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <becd3d01-509b-d470-df48-e5ef0e21ae2a@infradead.org>
+Date: Mon, 27 May 2019 15:12:05 -0700
+MIME-Version: 1.0
+In-Reply-To: <9b76d1b6-08a4-36cf-4fc8-661b216ca433@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Paul Walmsley <paul@pwsan.com>, Firoz Khan <firoz.khan@linaro.org>, Richard Henderson <rth@twiddle.net>, Matt Turner <mattst88@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, Greentime Hu <green.hu@gmail.com>, Guo Ren <guoren@kernel.org>, Palmer Dabbelt <palmer@sifive.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Albert Ou <aou@eecs.berkeley.edu>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, linux-kernel@vger.kernel.org, Vincent Chen <deanbo422@gmail.com>, linux-alpha@vger.kernel.org, Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Jayant Chowdhary <jchowdhary@google.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, kernel-team@android.com
 
-Until recently, if KBUILD_DEFCONFIG was not set by the arch Makefile,
-the default path arch/*/defconfig was used.
+Hi Jayant,
 
-The last users of the default are gone by the following commits:
+What ever happened to this script and subsequent patches?
 
-- Commit f3e20ad67b4c ("s390: move arch/s390/defconfig to
-  arch/s390/configs/defconfig")
+thanks.
 
-- Commit 986a13769c4b ("alpha: move arch/alpha/defconfig to
-  arch/alpha/configs/defconfig")
+On 6/19/18 11:17 AM, Randy Dunlap wrote:
+> On 06/18/2018 06:47 PM, Jayant Chowdhary wrote:
+>> Hi Randy,
+>>
+>> On 06/12/2018 05:07 PM, Randy Dunlap wrote:
+>>> On 06/12/2018 01:39 PM, Jayant Chowdhary wrote:
+>>>> Hi Randy,
+>>>>
+>>>> On 06/11/2018 10:49 PM, Randy Dunlap wrote:
+>>>>> Hi,
+>>>>>
+>>>>> Here is what I have so far.  It begins with a makefile and some
+>>>>> template files that are added to.  There's a good bit of Perl also.
+>>>>>
+>>>>> I put all of these files in tools/uapi/ and run them from there.
+>>>>>
+>>>>> There is one .c file generated for each .h file in builddir/usr/include
+>>>>> (O=builddir).
+>>>>>
+>>>>
+>>>> Thanks for this! I wrote a small Makefile (uapi-compile.mk) which I'd put in
+>>>> tools/build (I can change this to tools/uapi, if that is more apt).
+>>>
+>>> Your makefile foo is much better than mine is.
+>>> Yes, I think that it deserves to be in its own sub-directory.
+>>>
+>>>> uapi-compile.mk straight-away compiles the uapi headers, without pulling them
+>>>> into any generated c source files. It may also be invoked with an environment
+>>>
+>>> Hm, I didn't even know that is possible.
+>>>
+>>>> variable 'UAPI_DIR' specifying the directory, for which the user would like to
+>>>> compile headers. This way we can test a directory at a time as well. In your
+>>>
+>>> Yes, good, I was planning to make a way to restrict the build to certain sub-dirs.
+>>>
+>>>> opinion, would this be simpler to have rather than having to auto-generate c
+>>>> source files including each uapi header and also autog-enerating the make
+>>>> targets? I feel like this approach would make maintaining these makefiles/
+>>>> scripts easier as well.
+>>>
+>>> Sure, this is much better than my scripts.
+>>>
+>>>>> Out of 889 header files, I see 45 errors.  That is better than I expected.
+>>>>>
+>>>>> The makefiles and scripts are attached (tar), as well as the output (I used
+>>>>> 'make -ik' so that make would keep going after errors and attempt to build
+>>>>> all target files).
+>>>>>
+>>>>> have fun!
+>>>>>
+>>>>
+>>>> I did a 'make ARCH=arm64 headers_install' from the kernel source's root, and
+>>>> then a 'make -kf uapi-compile.mk all > build.log 2>&1' to compile all the
+>>>> headers. Out of 864 headers, I see 20 compilation failures.
+>>>>
+>>>> I'm attaching uapi-compile.mk and the build.log file along.
+>>>
+>>> I have some usage comments.
+>>>
+>>> Since I ran 'make ARCH=x86_64 O=xx64 headers_install', I had to modify
+>>> uapi-compile.mk to use that SRC_DIR:
+>>>
+>>> SRC_DIR :=../../xx64
+>>>
+>>> Also, I first tried to make BDIR as a sub-directory of tools/uapi/ and
+>>> uapi-compile.mk did not work (when using BDIR=BDIR).
+>>> Then I did 'mkdir ../../xx64/BDIR' and specified BDIR=../../xx64/BDIR and
+>>> that worked.  But:  that sub-dir is not used:
+>>>
+>>> gcc -I../../xx64/usr/include/ --include=../../xx64/usr/include/linux/posix_types.h --include=../../xx64/usr/include/asm-generic/ipcbuf.h --include=stdarg.h --include=stdint.h --include=stddef.h -c ../../xx64/usr/include//linux/caif/caif_socket.h -o ../../xx64/BDIR/../../xx64/usr/include//linux/caif/caif_socket.o
+>>> [see the next comment]
+>>>
+>>> Oh, this makefile builds the .o files in the same sub-dirs as their
+>>> respective .h files.  I don't especially like that, but as long as
+>>> make clean works, it will do.  [and make clean does work]
+>>>
+>>
+>> Thanks for these comments. I'll take care of them in my patch-set. I've got a
+>> couple of questions for you. Since most of the errors were found in the
+>> include/uapi/linux directory, I tried investigating why.
+> 
+> Please also repost your latest patch-set.
+> 
+>> 1) I found that multiple headers depend on the definition of types such as
+>> pid_t, which have no definition in the set of uapi headers. There is a
+>> definition (of pid_t) in include/linux/types.h, and I thought we could try
+>> exposing that in the set of uapi headers. One problem I can see with that is
+>> that the header has some definitions which depend on kernel configs: eg:
+>> CONFIG_ARCH_DMA_ADDR_T_64BIT. Since user-land programs shouldn't really assume
+>> kernel configs, I was thinking we should re-factor this header so that
+>> appropriate parts can be exposed to user-land.
+> 
+> Sure, that's worth a try.  Mostly on a case-by-case basis.
+> 
+> I see that (at least in the distro that I am using)
+> /usr/include/asm-generic/posix_types.h has a typedef for __kernel_pid_t.
+> I wonder if that could be co-opted, but I expect that this would have
+> type/size issues.
+> 
+> OTOH, 'man getpid' uses pid_t and refers to <sys/types.h> and <unistd.h>,
+> so there should already be a pid_t for userspace.  Just #include more
+> headers files.  :)
+> 
+>> 2) Some headers try to expose information which should probably not be exposed
+>> to user-land. eg: wait_queue_head in linux/coda_psdev.h (this header should
+>> probably be removed altogether ?)
+> 
+> I suppose that header file describes a kernel-to-userspace ("Venus") interface,
+> so maybe not removed altogether.  But the wait_queue_head_t part of it should
+> just be some padding/reserved field (of what size/type?).
+> 
+> 
+>> Do you have better ideas ?
+> 
+> slow and steady.
+> 
 
-Let's set arch/*/configs/defconfig as a new default. This saves
-KBUILD_DEFCONFIG for some architectures.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- arch/alpha/Makefile      | 2 --
- arch/arm64/Makefile      | 2 --
- arch/csky/Makefile       | 1 -
- arch/nds32/Makefile      | 2 --
- arch/riscv/Makefile      | 2 --
- arch/s390/Makefile       | 2 --
- scripts/kconfig/Makefile | 4 ++++
- 7 files changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/arch/alpha/Makefile b/arch/alpha/Makefile
-index b3314e0dcb6f..12dee59b011c 100644
---- a/arch/alpha/Makefile
-+++ b/arch/alpha/Makefile
-@@ -8,8 +8,6 @@
- # Copyright (C) 1994 by Linus Torvalds
- #
- 
--KBUILD_DEFCONFIG := defconfig
--
- NM := $(NM) -B
- 
- LDFLAGS_vmlinux	:= -static -N #-relax
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index b025304bde46..970c41a30ed3 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -30,8 +30,6 @@ LDFLAGS_vmlinux	+= --fix-cortex-a53-843419
-   endif
- endif
- 
--KBUILD_DEFCONFIG := defconfig
--
- # Check for binutils support for specific extensions
- lseinstr := $(call as-instr,.arch_extension lse,-DCONFIG_AS_LSE=1)
- 
-diff --git a/arch/csky/Makefile b/arch/csky/Makefile
-index f9aab9157c4a..fb1bbbd91954 100644
---- a/arch/csky/Makefile
-+++ b/arch/csky/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- OBJCOPYFLAGS		:=-O binary
- GZFLAGS			:=-9
--KBUILD_DEFCONFIG	:= defconfig
- 
- ifdef CONFIG_CPU_HAS_FPU
- FPUEXT = f
-diff --git a/arch/nds32/Makefile b/arch/nds32/Makefile
-index 14dab5ad88ef..ccdca7142020 100644
---- a/arch/nds32/Makefile
-+++ b/arch/nds32/Makefile
-@@ -2,8 +2,6 @@
- LDFLAGS_vmlinux	:= --no-undefined -X
- OBJCOPYFLAGS	:= -O binary -R .note -R .note.gnu.build-id -R .comment -S
- 
--KBUILD_DEFCONFIG := defconfig
--
- ifdef CONFIG_FUNCTION_TRACER
- arch-y += -malways-save-lp -mno-relax
- endif
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 03e760267657..7a117be8297c 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -16,8 +16,6 @@ endif
- KBUILD_AFLAGS_MODULE += -fPIC
- KBUILD_CFLAGS_MODULE += -fPIC
- 
--KBUILD_DEFCONFIG = defconfig
--
- export BITS
- ifeq ($(CONFIG_ARCH_RV64I),y)
- 	BITS := 64
-diff --git a/arch/s390/Makefile b/arch/s390/Makefile
-index de8521fc9de5..df1d6a150f30 100644
---- a/arch/s390/Makefile
-+++ b/arch/s390/Makefile
-@@ -10,8 +10,6 @@
- # Copyright (C) 1994 by Linus Torvalds
- #
- 
--KBUILD_DEFCONFIG := defconfig
--
- LD_BFD		:= elf64-s390
- KBUILD_LDFLAGS	:= -m elf64_s390
- KBUILD_AFLAGS_MODULE += -fPIC
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 059642bd6584..ab30fe724c43 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -12,6 +12,10 @@ else
- Kconfig := Kconfig
- endif
- 
-+ifndef KBUILD_DEFCONFIG
-+KBUILD_DEFCONFIG := defconfig
-+endif
-+
- ifeq ($(quiet),silent_)
- silent := -s
- endif
 -- 
-2.17.1
+~Randy
