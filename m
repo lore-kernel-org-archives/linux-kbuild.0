@@ -1,59 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:50687 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726979AbfE1Ae0 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:46349 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726979AbfE1Afp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 May 2019 20:34:26 -0400
+        Mon, 27 May 2019 20:35:45 -0400
 MIME-Version: 1.0
-References: <20190527235423.153853-1-tgb.kernel@gmail.com>
-In-Reply-To: <20190527235423.153853-1-tgb.kernel@gmail.com>
+References: <20190525114919.26188-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190525114919.26188-1-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 28 May 2019 09:33:43 +0900
-Message-ID: <CAK7LNARj12T2vtBmVcDLoF2Z7G-TiDhXc0JZ7yRqAwMZCo47mQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: tar-pkg: enable communication with jobserver
+Date: Tue, 28 May 2019 09:34:46 +0900
+Message-ID: <CAK7LNATQCpNp4azKE4YJDpC-gSTRBYe6Lj7dTX+1N=7iqKsMXw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: tests: fix recursive inclusion unit test
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Trevor Bourget <tgb.kernel@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, May 28, 2019 at 8:55 AM Trevor Bourget <tgb.kernel@gmail.com> wrote:
+On Sat, May 25, 2019 at 8:49 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> The buildtar script might want to invoke a make, so tell the parent
-> make to pass the jobserver token pipe to the subcommand by prefixing
-> the command with a +.
+> Adding SPDX license identifier is pretty safe; however, here is one
+> exception.
 >
-> This addresses the issue seen here:
+> Since commit ec8f24b7faaf ("treewide: Add SPDX license identifier -
+> Makefile/Kconfig"), "make testconfig" would not pass.
 >
->         /bin/sh ../scripts/package/buildtar tar-pkg
->         make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+> When Kconfig detects a circular file inclusion, it displays error
+> messages with a file name and a line number prefixed to each line.
 >
-> See https://www.gnu.org/software/make/manual/html_node/Job-Slots.html
-> for more information.
+> The unit test checks if Kconfig emits the error messages correctly
+> (this also checks the line number correctness).
 >
-> Signed-off-by: Trevor Bourget <tgb.kernel@gmail.com>
+> Now that the test input has the SPDX license identifier at the very top,
+> the line numbers in the expected stderr should be incremented by 1.
+>
+> Fixes: ec8f24b7faaf ("treewide: Add SPDX license identifier - Makefile/Kconfig")
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 
-Applied to linux-kbuild/fixes. Thanks.
+Applied to linux-kbuild/fixes.
 
->  scripts/package/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+
 >
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 27b42d5b6c4f..ca7f46b562a4 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -104,7 +104,7 @@ clean-dirs += $(objtree)/snap/
->  # ---------------------------------------------------------------------------
->  tar%pkg: FORCE
->         $(MAKE) -f $(srctree)/Makefile
-> -       $(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
-> +       +$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
+>  scripts/kconfig/tests/err_recursive_inc/expected_stderr | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
->  clean-dirs += $(objtree)/tar-install/
->
+> diff --git a/scripts/kconfig/tests/err_recursive_inc/expected_stderr b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
+> index 6b582eee2176..b070a31fdfeb 100644
+> --- a/scripts/kconfig/tests/err_recursive_inc/expected_stderr
+> +++ b/scripts/kconfig/tests/err_recursive_inc/expected_stderr
+> @@ -1,6 +1,6 @@
+>  Recursive inclusion detected.
+>  Inclusion path:
+>    current file : Kconfig.inc1
+> -  included from: Kconfig.inc3:1
+> -  included from: Kconfig.inc2:3
+> -  included from: Kconfig.inc1:4
+> +  included from: Kconfig.inc3:2
+> +  included from: Kconfig.inc2:4
+> +  included from: Kconfig.inc1:5
 > --
-> 2.22.0.rc1.257.g3120a18244-goog
+> 2.17.1
 >
 
 
