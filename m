@@ -1,60 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:62786 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbfE2BNZ (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36774 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbfE2IQU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 May 2019 21:13:25 -0400
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id x4T1DEj4010106
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 May 2019 10:13:14 +0900
-Received: by mail-ua1-f51.google.com with SMTP id 7so230785uah.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 May 2019 18:13:14 -0700 (PDT)
+        Wed, 29 May 2019 04:16:20 -0400
+From: Mathieu Malaterre <malat@debian.org>
+Subject: [PATCH] kbuild: Remove -Waggregate-return from scripts/Makefile.extrawarn
+Date: Wed, 29 May 2019 10:04:34 +0200
+Message-Id: <20190529080434.1409-1-malat@debian.org>
 MIME-Version: 1.0
-References: <20190528121148.GA18162@lst.de>
-In-Reply-To: <20190528121148.GA18162@lst.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 29 May 2019 10:12:37 +0900
-Message-ID: <CAK7LNAQRW+phJrdR-5NfUE9L09O-nRiimfW5rB8Y8S9POtkxCA@mail.gmail.com>
-Subject: Re: building individual files in subdirectories
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Mathieu Malaterre <malat@debian.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 28, 2019 at 9:12 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> A few kernel modules have source files in multiple subdirectories.
-> Trying to build just a single object of a source file in such a
-> subdirectory currently doesn't work.
->
-> For example:
->
-> hch@brick:~/work/xfs$ make fs/xfs/libxfs/xfs_alloc.o
->   CALL    scripts/checksyscalls.sh
->   CALL    scripts/atomic/check-atomics.sh
->   DESCEND  objtool
-> scripts/Makefile.build:42: fs/xfs/libxfs/Makefile: No such file or directory
-> make[1]: *** No rule to make target 'fs/xfs/libxfs/Makefile'.  Stop.
-> make: *** [Makefile:1747: fs/xfs/libxfs/xfs_alloc.o] Error 2
->
-> Is there any reasonably easy way to get this to work?
+It makes little sense to pass -Waggregate-return these days since large
+part of the linux kernel rely on returning struct(s). For instance:
 
+  ../include/linux/timekeeping.h: In function 'show_uptime':
+  ../include/linux/ktime.h:91:34: error: function call has aggregate value [-Werror=aggregate-return]
+   #define ktime_to_timespec64(kt)  ns_to_timespec64((kt))
+                                    ^~~~~~~~~~~~~~~~~~~~~~
+  ../include/linux/timekeeping.h:166:8: note: in expansion of macro 'ktime_to_timespec64'
+    *ts = ktime_to_timespec64(ktime_get_coarse_boottime());
 
-While single targets are useful,
-they never work correctly.
-subdir-ccflags-y from upper Makefiles
-are not inherited.
+Remove this warning from W=2 completely.
 
-I want to implement single targets correctly, but
-I have never got around to it.
+Signed-off-by: Mathieu Malaterre <malat@debian.org>
+---
+ scripts/Makefile.extrawarn | 1 -
+ 1 file changed, 1 deletion(-)
 
-"make fs/xfs/" is an alternative solution
-although it will compile much more than you want.
-
-Another solution is to put a dummy
-fs/xfs/libxfs/Makefile
-
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 3ab8d1a303cd..98081ab300e5 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -34,7 +34,6 @@ warning-1 += $(call cc-option, -Wstringop-truncation)
+ warning-1 += -Wno-missing-field-initializers
+ warning-1 += -Wno-sign-compare
+ 
+-warning-2 := -Waggregate-return
+ warning-2 += -Wcast-align
+ warning-2 += -Wdisabled-optimization
+ warning-2 += -Wnested-externs
 -- 
-Best Regards
-Masahiro Yamada
+2.20.1
