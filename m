@@ -1,58 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:52815 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726717AbfFCRQz (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:44520 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726656AbfFCRdk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Jun 2019 13:16:55 -0400
+        Mon, 3 Jun 2019 13:33:40 -0400
+Date: Mon, 3 Jun 2019 19:33:28 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC 1/3] kbuild: add support for ensuring headers are
+ self-contained
+Message-ID: <20190603173328.GA11045@ravnborg.org>
+References: <20190516194818.29230-1-jani.nikula@intel.com>
+ <20190524174011.GA23737@ravnborg.org>
+ <CAK7LNARY_L3Oyi7hhCZXVwNRAsf6ceSarTNDrzdfXQGj1tDFJw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190516194818.29230-1-jani.nikula@intel.com> <CAK7LNAQv-fm2iV6HW_FM0Fe6hNDeJ25c9CS2SbroSOneoepFMQ@mail.gmail.com>
- <87zhnh8ou6.fsf@intel.com>
-In-Reply-To: <87zhnh8ou6.fsf@intel.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 4 Jun 2019 02:16:16 +0900
-Message-ID: <CAK7LNAT=nB0=at0X4OnHVKB=y7WwHGm4LXkrQnCw9HpjB5LooA@mail.gmail.com>
-Subject: Re: [Intel-gfx] [RFC 1/3] kbuild: add support for ensuring headers
- are self-contained
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARY_L3Oyi7hhCZXVwNRAsf6ceSarTNDrzdfXQGj1tDFJw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@intel.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, intel-gfx@lists.freedesktop.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Jani Nikula <jani.nikula@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-gfx@lists.freedesktop.org, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>
 
-Hi Jani,
+Hi Masahiro/Jani.
 
-On Mon, May 20, 2019 at 6:16 PM Jani Nikula <jani.nikula@intel.com> wrote:
->
-> >
-> > I will take a little time to considier
-> > how far we can extend the idea about
-> > "headers should be self-contained".
->
-> Thanks! Please let me know if/when you need further action from me, I
-> won't post new versions until then.
+> 
+> Following the obj-y pattern,
+> I want to make header-test-y relative to $(obj).
 
+I also considered this and agree this is better.
 
-Could you send v2 with the following changes ?
+Otherwise we end up with a spaghetti of dependencies across the tree.
 
+What I made just fit the purpose I had that day,
+which is no excuse for bad design.
 
-[1] Could you rename *.header_test.c to *.hdrtest.c ?
-    (I just thought .header_test.c was a bit too long.)
+> I prefer this:
+> 
+> quiet_cmd_header_test = HDRTEST $@
+>       cmd_header_test = echo "\#include \"$*.h\"" > $@
+> 
+> $(obj)/%.header_test.c:
+>         $(call cmd,header_test)
 
-[2] %.hdrtest.c should not depend on the header
+Even better - good.
 
-This will avoid unnecessary regeneration of *.hdrtest.c
+We call it HDRTEST - so why not just go for that name:
 
-quiet_cmd_header_test = HDRTEST $@
-      cmd_header_test = echo "\#include \"$*.h\"" > $@
+    hdrtest-y += headerfile.h
 
-$(obj)/%.hdrtest.c:
-        $(call cmd,header_test)
+??
 
-[3] Please add '*.hdrtest.c' to  .gitignore, Documentation/dontdiff
+The current proposal with "header-test-y" hurts the eye a little with
+two '-', and all other variables uses only one '-' as is today.
+(generic-y, obj-y etc).
 
-[4] Please add '*.hdrtest.c' to 'make clean' (around line 1640 of top Makefile)
+This is bikeshedding but is was itcing me a little.
 
-
--- 
-Best Regards
-Masahiro Yamada
+	Sam
