@@ -1,149 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:39514 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:39349 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727139AbfFDKPu (ORCPT
+        with ESMTP id S1727110AbfFDKPo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jun 2019 06:15:50 -0400
+        Tue, 4 Jun 2019 06:15:44 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 01/15] kbuild: remove headers_{install,check}_all
-Date: Tue,  4 Jun 2019 19:13:55 +0900
-Message-Id: <20190604101409.2078-2-yamada.masahiro@socionext.com>
+Subject: [PATCH 07/15] kbuild: build all prerequisite of headers_install simultaneously
+Date: Tue,  4 Jun 2019 19:14:01 +0900
+Message-Id: <20190604101409.2078-8-yamada.masahiro@socionext.com>
 In-Reply-To: <20190604101409.2078-1-yamada.masahiro@socionext.com>
 References: <20190604101409.2078-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-headers_install_all does not make much sense any more because different
-architectures export different set of uapi/linux/ headers. As you see
-in include/uapi/linux/Kbuild, the installation of a.out.h, kvm.h, and
-kvm_para.h is arch-dependent. So, headers_install_all repeats the
-installation/removal of them.
+Currently, scripts/unifdef is compiled after scripts_basic,
+uapi-asm-generic, archheaders, and archscripts.
 
-If somebody really thinks it is useful to do headers_install for all
-architectures, it would be possible by small shell-scripting, but the
-top Makefile do not have to provide entry targets just for that purpose.
+The proper dependency is just scripts_basic. There is no problem
+to compile scripts/unifdef and other headers at the same time.
+
+Split scripts_unifdef out in order to allow more parallel building.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Documentation/kbuild/headers_install.txt |  7 ------
- Documentation/kbuild/makefiles.txt       |  6 +----
- Makefile                                 | 15 ++----------
- scripts/headers.sh                       | 29 ------------------------
- 4 files changed, 3 insertions(+), 54 deletions(-)
- delete mode 100755 scripts/headers.sh
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
-index f0153adb95e2..f07e34eab70b 100644
---- a/Documentation/kbuild/headers_install.txt
-+++ b/Documentation/kbuild/headers_install.txt
-@@ -39,12 +39,5 @@ INSTALL_HDR_PATH indicates where to install the headers. It defaults to
- An 'include' directory is automatically created inside INSTALL_HDR_PATH and
- headers are installed in 'INSTALL_HDR_PATH/include'.
- 
--The command "make headers_install_all" exports headers for all architectures
--simultaneously.  (This is mostly of interest to distribution maintainers,
--who create an architecture-independent tarball from the resulting include
--directory.)  You also can use HDR_ARCH_LIST to specify list of architectures.
--Remember to provide the appropriate linux/asm directory via "mv" or "ln -s"
--before building a C library with headers exported this way.
--
- The kernel header export infrastructure is maintained by David Woodhouse
- <dwmw2@infradead.org>.
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index d65ad5746f94..bac301a73a86 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -897,11 +897,7 @@ When kbuild executes, the following steps are followed (roughly):
- --- 6.2 Add prerequisites to archheaders:
- 
- 	The archheaders: rule is used to generate header files that
--	may be installed into user space by "make header_install" or
--	"make headers_install_all".  In order to support
--	"make headers_install_all", this target has to be able to run
--	on an unconfigured tree, or a tree configured for another
--	architecture.
-+	may be installed into user space by "make header_install".
- 
- 	It is run before "make archprepare" when run on the
- 	architecture itself.
 diff --git a/Makefile b/Makefile
-index 004d67a4405f..7745bdd84861 100644
+index e998c40c94b4..f9c206eb3583 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1181,34 +1181,23 @@ headerdep:
- #Default location for installed headers
- export INSTALL_HDR_PATH = $(objtree)/usr
- 
--# If we do an all arch process set dst to include/arch-$(SRCARCH)
--hdr-dst = $(if $(KBUILD_HEADERS), dst=include/arch-$(SRCARCH), dst=include)
--
+@@ -1181,8 +1181,7 @@ export INSTALL_HDR_PATH = $(objtree)/usr
  PHONY += archheaders archscripts
  
  PHONY += __headers
- __headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
- 	$(Q)$(MAKE) $(build)=scripts build_unifdef
+-__headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
+-	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
++__headers: $(version_h) scripts_unifdef uapi-asm-generic archheaders archscripts
  
--PHONY += headers_install_all
--headers_install_all:
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/headers.sh install
--
  PHONY += headers_install
  headers_install: __headers
- 	$(if $(wildcard $(srctree)/arch/$(SRCARCH)/include/uapi/asm/Kbuild),, \
- 	  $(error Headers not exportable for the $(SRCARCH) architecture))
- 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include
--	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst)
--
--PHONY += headers_check_all
--headers_check_all: headers_install_all
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/headers.sh check
-+	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi dst=include
- 
- PHONY += headers_check
- headers_check: headers_install
- 	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
--	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi $(hdr-dst) HDRCHECK=1
-+	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi dst=include HDRCHECK=1
- 
- ifdef CONFIG_HEADERS_CHECK
+@@ -1204,6 +1203,10 @@ ifdef CONFIG_HEADERS_CHECK
  all: headers_check
-diff --git a/scripts/headers.sh b/scripts/headers.sh
-deleted file mode 100755
-index e0f883eb39a2..000000000000
---- a/scripts/headers.sh
-+++ /dev/null
-@@ -1,29 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0
--# Run headers_$1 command for all suitable architectures
--
--# Stop on error
--set -e
--
--do_command()
--{
--	if [ -f ${srctree}/arch/$2/include/asm/Kbuild ]; then
--		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
--	else
--		printf "Ignoring arch: %s\n" ${arch}
--	fi
--}
--
--archs=${HDR_ARCH_LIST:-$(ls ${srctree}/arch)}
--
--for arch in ${archs}; do
--	case ${arch} in
--	um)        # no userspace export
--		;;
--	*)
--		if [ -d ${srctree}/arch/${arch} ]; then
--			do_command $1 ${arch}
--		fi
--		;;
--	esac
--done
+ endif
+ 
++PHONY += scripts_unifdef
++scripts_unifdef: scripts_basic
++	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
++
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+ 
 -- 
 2.17.1
