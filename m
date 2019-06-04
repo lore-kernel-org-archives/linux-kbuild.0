@@ -1,40 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:34819 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725929AbfFDR0B (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:42678 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726092AbfFDRaz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jun 2019 13:26:01 -0400
-Date: Tue, 4 Jun 2019 19:25:53 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v2] kbuild: add support for ensuring headers are
- self-contained
-Message-ID: <20190604172553.GA2383@ravnborg.org>
-References: <20190604101409.2078-14-yamada.masahiro@socionext.com>
- <20190604124248.5564-1-jani.nikula@intel.com>
+        Tue, 4 Jun 2019 13:30:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190604124248.5564-1-jani.nikula@intel.com>
+References: <20190520151614.19188-1-dan.rue@linaro.org>
+In-Reply-To: <20190520151614.19188-1-dan.rue@linaro.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 5 Jun 2019 02:30:12 +0900
+Message-ID: <CAK7LNARonAGTShZTyiDL02qtP3PUg7jyYZRHG9C-MUY+zKY22g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: teach kselftest-merge to find nested config files
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@intel.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+To: Dan Rue <dan.rue@linaro.org>
+Cc: "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 04, 2019 at 03:42:48PM +0300, Jani Nikula wrote:
-> Sometimes it's useful to be able to explicitly ensure certain headers
-> remain self-contained, i.e. that they are compilable as standalone
-> units, by including and/or forward declaring everything they depend on.
-> 
-> Add special target header-test-y where individual Makefiles can add
-> headers to be tested if CONFIG_HEADER_TEST is enabled. This will
-> generate a dummy C file per header that gets built as part of extra-y.
-> 
-> Cc: Chris Wilson <chris@chris-wilson.co.uk>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+On Tue, May 21, 2019 at 12:19 AM Dan Rue <dan.rue@linaro.org> wrote:
+>
+> Current implementation of kselftest-merge only finds config files that
+> are one level deep using `$(srctree)/tools/testing/selftests/*/config`.
+>
+> Often, config files are added in nested directories, and do not get
+> picked up by kselftest-merge.
+>
+> Use `find` to catch all config files under
+> `$(srctree)/tools/testing/selftests` instead.
+>
+> Signed-off-by: Dan Rue <dan.rue@linaro.org>
+> ---
+>  Makefile | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index a45f84a7e811..e99e7f9484af 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1228,9 +1228,8 @@ kselftest-clean:
+>  PHONY += kselftest-merge
+>  kselftest-merge:
+>         $(if $(wildcard $(objtree)/.config),, $(error No .config exists, config your kernel first!))
+> -       $(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
+> -               -m $(objtree)/.config \
+> -               $(srctree)/tools/testing/selftests/*/config
+> +       $(Q)find $(srctree)/tools/testing/selftests -name config | \
+> +               xargs $(srctree)/scripts/kconfig/merge_config.sh -m $(objtree)/.config
+>         +$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+>
+>  # ---------------------------------------------------------------------------
+> --
+> 2.21.0
+>
 
-Looks good, thanks.
 
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+Applied to linux-kbuild/fixes. Thanks.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
