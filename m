@@ -1,51 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:39318 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:39195 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727107AbfFDKPn (ORCPT
+        with ESMTP id S1727110AbfFDKPk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jun 2019 06:15:43 -0400
+        Tue, 4 Jun 2019 06:15:40 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 04/15] kbuild: fix Kconfig prompt of CONFIG_HEADERS_CHECK
-Date: Tue,  4 Jun 2019 19:13:58 +0900
-Message-Id: <20190604101409.2078-5-yamada.masahiro@socionext.com>
+Subject: [PATCH 11/15] kbuild: simplify scripts/headers_install.sh
+Date: Tue,  4 Jun 2019 19:14:05 +0900
+Message-Id: <20190604101409.2078-12-yamada.masahiro@socionext.com>
 In-Reply-To: <20190604101409.2078-1-yamada.masahiro@socionext.com>
 References: <20190604101409.2078-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Prior to commit 257edce66d31 ("kbuild: exploit parallel building for
-CONFIG_HEADERS_CHECK"), the sanity check of exported headers was done
-as a side-effect of build rule of vmlinux.
-
-That commit is good, but I missed to update the prompt of the Kconfig
-entry. For the sake of preciseness, lets' say "when building 'all'".
+Now that headers_install.sh is invoked per file, remove the for-loop
+in the shell script.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- lib/Kconfig.debug | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/Makefile.headersinst |  2 +-
+ scripts/headers_install.sh   | 48 +++++++++++++++---------------------
+ 2 files changed, 21 insertions(+), 29 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index cbdfae379896..7cdcb962358c 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -306,11 +306,11 @@ config DEBUG_FS
- 	  If unsure, say N.
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index c96c4c26e240..d2b572a7a628 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -58,7 +58,7 @@ $(if $(new-dirs), $(shell mkdir -p $(new-dirs)))
+ ifndef HDRCHECK
  
- config HEADERS_CHECK
--	bool "Run 'make headers_check' when building vmlinux"
-+	bool "Run sanity checks on uapi headers when building 'all'"
- 	depends on !UML
- 	help
--	  This option will extract the user-visible kernel headers whenever
--	  building the kernel, and will run basic sanity checks on them to
-+	  This option will extract the user-visible kernel headers when
-+	  building the 'all' target, and will run basic sanity checks on them to
- 	  ensure that exported files do not attempt to include files which
- 	  were not exported, etc.
+ quiet_cmd_install = HDRINST $@
+-      cmd_install = $(CONFIG_SHELL) $(srctree)/scripts/headers_install.sh $(@D) $(<D) $(@F)
++      cmd_install = $(CONFIG_SHELL) $(srctree)/scripts/headers_install.sh $< $@
  
+ $(src-headers): $(dst)/%.h: $(src)/%.h $(srctree)/scripts/headers_install.sh FORCE
+ 	$(call if_changed,install)
+diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
+index 593f8879c641..47f6f3ea0771 100755
+--- a/scripts/headers_install.sh
++++ b/scripts/headers_install.sh
+@@ -1,47 +1,39 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-if [ $# -lt 2 ]
++if [ $# -ne 2 ]
+ then
+-	echo "Usage: headers_install.sh OUTDIR SRCDIR [FILES...]"
++	echo "Usage: headers_install.sh INFILE OUTFILE"
+ 	echo
+ 	echo "Prepares kernel header files for use by user space, by removing"
+ 	echo "all compiler.h definitions and #includes, removing any"
+ 	echo "#ifdef __KERNEL__ sections, and putting __underscores__ around"
+ 	echo "asm/inline/volatile keywords."
+ 	echo
+-	echo "OUTDIR: directory to write each userspace header FILE to."
+-	echo "SRCDIR: source directory where files are picked."
+-	echo "FILES:  list of header files to operate on."
++	echo "INFILE: header file to operate on"
++	echo "OUTFILE: output file which the processed header is writen to"
+ 
+ 	exit 1
+ fi
+ 
+ # Grab arguments
++INFILE=$1
++OUTFILE=$2
++TMPFILE=$OUTFILE.tmp
+ 
+-OUTDIR="$1"
+-shift
+-SRCDIR="$1"
+-shift
++trap 'rm -f $OUTFILE $TMPFILE' EXIT
+ 
+-# Iterate through files listed on command line
++sed -E -e '
++	s/([[:space:](])(__user|__force|__iomem)[[:space:]]/\1/g
++	s/__attribute_const__([[:space:]]|$)/\1/g
++	s@^#include <linux/compiler(|_types).h>@@
++	s/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g
++	s/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g
++	s@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @
++' $INFILE > $TMPFILE || exit 1
+ 
+-FILE=
+-trap 'rm -f "$OUTDIR/$FILE" "$OUTDIR/$FILE.sed"' EXIT
+-for i in "$@"
+-do
+-	FILE="$(basename "$i")"
+-	sed -E \
+-		-e 's/([[:space:](])(__user|__force|__iomem)[[:space:]]/\1/g' \
+-		-e 's/__attribute_const__([[:space:]]|$)/\1/g' \
+-		-e 's@^#include <linux/compiler(|_types).h>@@' \
+-		-e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
+-		-e 's/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g' \
+-		-e 's@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @' \
+-		"$SRCDIR/$i" > "$OUTDIR/$FILE.sed" || exit 1
+-	scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
+-		> "$OUTDIR/$FILE"
+-	[ $? -gt 1 ] && exit 1
+-	rm -f "$OUTDIR/$FILE.sed"
+-done
++scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ $TMPFILE > $OUTFILE
++[ $? -gt 1 ] && exit 1
++
++rm -f $TMPFILE
+ trap - EXIT
 -- 
 2.17.1
