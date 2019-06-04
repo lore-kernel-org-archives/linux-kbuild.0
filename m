@@ -1,127 +1,157 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:44024 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727139AbfFDKSj (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jun 2019 06:18:39 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 00/15] kbuild: refactor headers_install and support compile-test of UAPI headers
-Date: Tue,  4 Jun 2019 19:13:54 +0900
-Message-Id: <20190604101409.2078-1-yamada.masahiro@socionext.com>
+Received: from mga02.intel.com ([134.134.136.20]:34824 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727580AbfFDMjv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 4 Jun 2019 08:39:51 -0400
+From: Jani Nikula <jani.nikula@intel.com>
+Subject: [PATCH v2] kbuild: add support for ensuring headers are self-contained
+Date: Tue,  4 Jun 2019 15:42:48 +0300
+Message-Id: <20190604124248.5564-1-jani.nikula@intel.com>
+In-Reply-To: <20190604101409.2078-14-yamada.masahiro@socionext.com>
+References: <20190604101409.2078-14-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org, Daniel Borkmann <daniel@iogearbox.net>, linux-s390@vger.kernel.org, Greentime Hu <green.hu@gmail.com>, Helge Deller <deller@gmx.de>, Vineet Gupta <vgupta@synopsys.com>, Palmer Dabbelt <palmer@sifive.com>, Christian Borntraeger <borntraeger@de.ibm.com>, linux-snps-arc@lists.infradead.org, Song Liu <songliubraving@fb.com>, "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Yonghong Song <yhs@fb.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Martin KaFai Lau <kafai@fb.com>, Albert Ou <aou@eecs.berkeley.edu>, Vasily Gorbik <gor@linux.ibm.com>, linux-parisc@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-kernel@vger.kernel.org, Vincent Chen <deanbo422@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
 
+Sometimes it's useful to be able to explicitly ensure certain headers
+remain self-contained, i.e. that they are compilable as standalone
+units, by including and/or forward declaring everything they depend on.
 
-Multiple people have suggested to compile-test UAPI headers.
+Add special target header-test-y where individual Makefiles can add
+headers to be tested if CONFIG_HEADER_TEST is enabled. This will
+generate a dummy C file per header that gets built as part of extra-y.
 
-Currently, Kbuild provides simple sanity checks by headers_check
-but they are not enough to catch bugs.
+Cc: Chris Wilson <chris@chris-wilson.co.uk>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
 
-The most recent patch I know is David Howells' work:
-https://patchwork.kernel.org/patch/10590203/
+---
 
-I agree that we need better tests for UAPI headers,
-but I want to integrate it in a clean way.
+v2: changes suggested by Masahiro:
 
-The idea that has been in my mind is to compile each header
-to make sure the selfcontainedness.
+http://mid.mail-archive.com/CAK7LNAT=nB0=at0X4OnHVKB=y7WwHGm4LXkrQnCw9HpjB5LooA@mail.gmail.com
+---
+ .gitignore                         | 1 +
+ Documentation/dontdiff             | 1 +
+ Documentation/kbuild/makefiles.txt | 7 +++++++
+ Makefile                           | 1 +
+ init/Kconfig                       | 9 +++++++++
+ scripts/Makefile.build             | 9 +++++++++
+ scripts/Makefile.lib               | 3 +++
+ 7 files changed, 31 insertions(+)
 
-Recently, Jani Nikula proposed a new syntax 'header-test-y'.
-https://patchwork.kernel.org/patch/10947005/
-
-So, I implemented UAPI compile-testing on top of that.
-
-When adding a new feature, cleaning the code first is a
-good practice.
-
-[1] Remove headers_install_all
-
-This target installs UAPI headers of all architectures
-in a single tree.
-It does not make sense to compile test of headers from
-multiple arches at the same time. Hence, removed.
-
-[2] Split header installation into 'make headers' and 'make headers_install'
-
-To compile-test UAPI headers, we need a work-directory somewhere
-to save objects and .*.cmd files.
-
-usr/include/ will be the work-directory.
-
-Since we cannot pollute the final destination of headers_install,
-
-I split the header installation into two stages.
-
-'make headers' will build up
-the ready-to-install headers in usr/include,
-which will be also used as a work-directory for the compile-test.
-
-'make headers_install' will copy headers
-from usr/include to $(INSTALL_HDR_PATH)/include.
-
-[3] Support compile-test of UAPI headers
-
-This is implemented in usr/include/Makefile
-
-
-Jani Nikula (1):
-  kbuild: add support for ensuring headers are self-contained
-
-Masahiro Yamada (14):
-  kbuild: remove headers_{install,check}_all
-  kbuild: remove stale dependency between Documentation/ and
-    headers_install
-  kbuild: make gdb_script depend on prepare0 instead of prepare
-  kbuild: fix Kconfig prompt of CONFIG_HEADERS_CHECK
-  kbuild: add CONFIG_HEADERS_INSTALL and loosen the dependency of
-    samples
-  kbuild: remove build_unifdef target in scripts/Makefile
-  kbuild: build all prerequisite of headers_install simultaneously
-  kbuild: add 'headers' target to build up ready-to-install uapi headers
-  kbuild: re-implement Makefile.headersinst without directory descending
-  kbuild: move hdr-inst shorthand to top Makefile
-  kbuild: simplify scripts/headers_install.sh
-  kbuild: deb-pkg: do not run headers_check
-  fixup: kbuild: add support for ensuring headers are self-contained
-  kbuild: compile test UAPI headers to ensure they are self-contained
-
- Documentation/kbuild/headers_install.txt |   7 --
- Documentation/kbuild/makefiles.txt       |  13 ++-
- Makefile                                 |  56 +++++-----
- arch/arc/configs/tb10x_defconfig         |   1 +
- arch/nds32/configs/defconfig             |   1 +
- arch/parisc/configs/a500_defconfig       |   1 +
- arch/parisc/configs/b180_defconfig       |   1 +
- arch/parisc/configs/c3000_defconfig      |   1 +
- arch/parisc/configs/default_defconfig    |   1 +
- arch/powerpc/configs/ppc6xx_defconfig    |   1 +
- arch/s390/configs/debug_defconfig        |   1 +
- include/uapi/{linux => }/Kbuild          |   6 +-
- init/Kconfig                             |  20 ++++
- lib/Kconfig.debug                        |  25 +++--
- samples/Kconfig                          |  14 ++-
- samples/Makefile                         |   4 +-
- scripts/Kbuild.include                   |   6 --
- scripts/Makefile                         |   5 -
- scripts/Makefile.build                   |   9 ++
- scripts/Makefile.headersinst             | 132 ++++++++++-------------
- scripts/Makefile.lib                     |   3 +
- scripts/cc-system-headers.sh             |   8 ++
- scripts/headers.sh                       |  29 -----
- scripts/headers_install.sh               |  48 ++++-----
- scripts/package/builddeb                 |   2 +-
- usr/.gitignore                           |   1 -
- usr/Makefile                             |   2 +
- usr/include/.gitignore                   |   3 +
- usr/include/Makefile                     | 132 +++++++++++++++++++++++
- 29 files changed, 329 insertions(+), 204 deletions(-)
- rename include/uapi/{linux => }/Kbuild (77%)
- create mode 100755 scripts/cc-system-headers.sh
- delete mode 100755 scripts/headers.sh
- create mode 100644 usr/include/.gitignore
- create mode 100644 usr/include/Makefile
-
+diff --git a/.gitignore b/.gitignore
+index 7587ef56b92d..4bb60f0fa23b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,6 +22,7 @@
+ *.elf
+ *.gcno
+ *.gz
++*.hdrtest.c
+ *.i
+ *.ko
+ *.lex.c
+diff --git a/Documentation/dontdiff b/Documentation/dontdiff
+index 5eba889ea84d..554dfe4883d2 100644
+--- a/Documentation/dontdiff
++++ b/Documentation/dontdiff
+@@ -19,6 +19,7 @@
+ *.grep
+ *.grp
+ *.gz
++*.hdrtest.c
+ *.html
+ *.i
+ *.jpeg
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index d65ad5746f94..a31e54bd9ddd 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -1022,6 +1022,13 @@ When kbuild executes, the following steps are followed (roughly):
+ 	In this example, extra-y is used to list object files that
+ 	shall be built, but shall not be linked as part of built-in.a.
+ 
++    header-test-y
++
++	header-test-y specifies headers (*.h) in the current directory that
++	should be compile tested to ensure they are self-contained,
++	i.e. compilable as standalone units. If CONFIG_HEADER_TEST is enabled,
++	this autogenerates dummy sources to include the headers, and builds them
++	as part of extra-y.
+ 
+ --- 6.7 Commands useful for building a boot image
+ 
+diff --git a/Makefile b/Makefile
+index 11358153d8f2..b347be697fbb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1646,6 +1646,7 @@ clean: $(clean-dirs)
+ 		-o -name '*.dwo' -o -name '*.lst' \
+ 		-o -name '*.su'  \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
++		-o -name '*.hdrtest.c' \
+ 		-o -name '*.lex.c' -o -name '*.tab.[ch]' \
+ 		-o -name '*.asn1.[ch]' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+diff --git a/init/Kconfig b/init/Kconfig
+index 36894c9fb420..02d8897b91fb 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -96,6 +96,15 @@ config COMPILE_TEST
+ 	  here. If you are a user/distributor, say N here to exclude useless
+ 	  drivers to be distributed.
+ 
++config HEADER_TEST
++	bool "Compile test headers that should be standalone compilable"
++	help
++	  Compile test headers listed in header-test-y target to ensure they are
++	  self-contained, i.e. compilable as standalone units.
++
++	  If you are a developer or tester and want to ensure the requested
++	  headers are self-contained, say Y here. Otherwise, choose N.
++
+ config LOCALVERSION
+ 	string "Local version - append to kernel release"
+ 	help
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index ae9cf740633e..ee0319560513 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -294,6 +294,15 @@ quiet_cmd_cc_lst_c = MKLST   $@
+ $(obj)/%.lst: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cc_lst_c)
+ 
++# Dummy C sources for header test (header-test-y target)
++# ---------------------------------------------------------------------------
++
++quiet_cmd_header_test = HDRTEST $@
++      cmd_header_test = echo "\#include \"$*.h\"" > $@
++
++$(obj)/%.hdrtest.c:
++	$(call cmd,header_test)
++
+ # Compile assembler sources (.S)
+ # ---------------------------------------------------------------------------
+ 
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index f1f38c8cdc74..3e630fcaffd1 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -66,6 +66,9 @@ extra-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
+ extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
+ endif
+ 
++# Test self-contained headers
++extra-$(CONFIG_HEADER_TEST) += $(patsubst %.h,%.hdrtest.o,$(header-test-y))
++
+ # Add subdir path
+ 
+ extra-y		:= $(addprefix $(obj)/,$(extra-y))
 -- 
-2.17.1
+2.20.1
