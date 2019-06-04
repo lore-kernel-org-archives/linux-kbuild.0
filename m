@@ -1,70 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:36595 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726136AbfFDAVb (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:64297 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726173AbfFDAWZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Jun 2019 20:21:31 -0400
+        Mon, 3 Jun 2019 20:22:25 -0400
 MIME-Version: 1.0
-References: <20190516194818.29230-1-jani.nikula@intel.com> <20190524174011.GA23737@ravnborg.org>
- <CAK7LNARY_L3Oyi7hhCZXVwNRAsf6ceSarTNDrzdfXQGj1tDFJw@mail.gmail.com> <20190603173328.GA11045@ravnborg.org>
-In-Reply-To: <20190603173328.GA11045@ravnborg.org>
+References: <1559572240-18706-1-git-send-email-george_davis@mentor.com>
+In-Reply-To: <1559572240-18706-1-git-send-email-george_davis@mentor.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 4 Jun 2019 09:20:43 +0900
-Message-ID: <CAK7LNASWsd-MSUtD69O05EZsVhcJTj7dh92MASzUoYR_it66AQ@mail.gmail.com>
-Subject: Re: [RFC 1/3] kbuild: add support for ensuring headers are self-contained
+Date: Tue, 4 Jun 2019 09:21:25 +0900
+Message-ID: <CAK7LNAQ6Rfuohy8dQSnqXbFeERki-aaNTc0G0uFojCTE-4i=mg@mail.gmail.com>
+Subject: Re: [PATCH v2] scripts/checkstack.pl: Fix arm64 wrong or unknown architecture
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Jani Nikula <jani.nikula@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, intel-gfx@lists.freedesktop.org, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>
+To: "George G. Davis" <george_davis@mentor.com>
+Cc: Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Qian Cai <cai@lca.pw>, Andrew Morton <akpm@linux-foundation.org>, Breno Leitao <leitao@debian.org>, Michael Ellerman <mpe@ellerman.id.au>, open list <linux-kernel@vger.kernel.org>
 
-Hi Sam, Jani,
+On Mon, Jun 3, 2019 at 11:31 PM George G. Davis <george_davis@mentor.com> wrote:
+>
+> The following error occurs for the `make ARCH=arm64 checkstack` case:
+>
+> aarch64-linux-gnu-objdump -d vmlinux $(find . -name '*.ko') | \
+> perl ./scripts/checkstack.pl arm64
+> wrong or unknown architecture "arm64"
+>
+> As suggested by Masahiro Yamada, fix the above error using regular
+> expressions in the same way it was fixed for the `ARCH=x86` case via
+> commit fda9f9903be6 ("scripts/checkstack.pl: automatically handle
+> 32-bit and 64-bit mode for ARCH=x86").
+>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: George G. Davis <george_davis@mentor.com>
+> ---
 
-On Tue, Jun 4, 2019 at 2:33 AM Sam Ravnborg <sam@ravnborg.org> wrote:
->
-> Hi Masahiro/Jani.
->
-> >
-> > Following the obj-y pattern,
-> > I want to make header-test-y relative to $(obj).
->
-> I also considered this and agree this is better.
->
-> Otherwise we end up with a spaghetti of dependencies across the tree.
->
-> What I made just fit the purpose I had that day,
-> which is no excuse for bad design.
->
-> > I prefer this:
-> >
-> > quiet_cmd_header_test = HDRTEST $@
-> >       cmd_header_test = echo "\#include \"$*.h\"" > $@
-> >
-> > $(obj)/%.header_test.c:
-> >         $(call cmd,header_test)
->
-> Even better - good.
->
-> We call it HDRTEST - so why not just go for that name:
->
->     hdrtest-y += headerfile.h
->
-> ??
->
-> The current proposal with "header-test-y" hurts the eye a little with
-> two '-', and all other variables uses only one '-' as is today.
-> (generic-y, obj-y etc).
->
-> This is bikeshedding but is was itcing me a little.
+Applied to linux-kbuild/fixes. Thanks.
 
-I do not have a strong opinion.
-I leave it to Jani. Either is fine with me.
+> v1:
+> - https://patchwork.kernel.org/patch/10970393/
+> v2:
+> - Updates as Suggested-by: Masahiro Yamada
+> - Update commit subject due to moving the fix from Makefile to
+>   checkstack.pl
+> ---
+>  scripts/checkstack.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/checkstack.pl b/scripts/checkstack.pl
+> index 122aef5e4e14..371bd17a4983 100755
+> --- a/scripts/checkstack.pl
+> +++ b/scripts/checkstack.pl
+> @@ -46,7 +46,7 @@ my (@stack, $re, $dre, $x, $xs, $funcre);
+>         $x      = "[0-9a-f]";   # hex character
+>         $xs     = "[0-9a-f ]";  # hex character or space
+>         $funcre = qr/^$x* <(.*)>:$/;
+> -       if ($arch eq 'aarch64') {
+> +       if ($arch =~ '^(aarch|arm)64$') {
+>                 #ffffffc0006325cc:       a9bb7bfd        stp     x29, x30, [sp, #-80]!
+>                 #a110:       d11643ff        sub     sp, sp, #0x590
+>                 $re = qr/^.*stp.*sp, \#-([0-9]{1,8})\]\!/o;
+> --
+> 2.7.4
+>
 
 
-There are variables that contain two '-'.
-'no-clean-files', 'subdir-ccflags-y', etc.
-
-
---
+-- 
 Best Regards
 Masahiro Yamada
