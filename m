@@ -1,63 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:65097 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727741AbfFDRKp (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:34819 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725929AbfFDR0B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Jun 2019 13:10:45 -0400
+        Tue, 4 Jun 2019 13:26:01 -0400
+Date: Tue, 4 Jun 2019 19:25:53 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v2] kbuild: add support for ensuring headers are
+ self-contained
+Message-ID: <20190604172553.GA2383@ravnborg.org>
+References: <20190604101409.2078-14-yamada.masahiro@socionext.com>
+ <20190604124248.5564-1-jani.nikula@intel.com>
 MIME-Version: 1.0
-References: <20190529080434.1409-1-malat@debian.org>
-In-Reply-To: <20190529080434.1409-1-malat@debian.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 5 Jun 2019 02:09:58 +0900
-Message-ID: <CAK7LNAT7tdqVzbo0Un6mZfKoVGMpVtXAh=UakjOLOqY-pr8V0g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Remove -Waggregate-return from scripts/Makefile.extrawarn
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190604124248.5564-1-jani.nikula@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mathieu Malaterre <malat@debian.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jani Nikula <jani.nikula@intel.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>, Chris Wilson <chris@chris-wilson.co.uk>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
 
-On Wed, May 29, 2019 at 5:16 PM Mathieu Malaterre <malat@debian.org> wrote:
->
-> It makes little sense to pass -Waggregate-return these days since large
-> part of the linux kernel rely on returning struct(s). For instance:
->
->   ../include/linux/timekeeping.h: In function 'show_uptime':
->   ../include/linux/ktime.h:91:34: error: function call has aggregate value [-Werror=aggregate-return]
->    #define ktime_to_timespec64(kt)  ns_to_timespec64((kt))
->                                     ^~~~~~~~~~~~~~~~~~~~~~
->   ../include/linux/timekeeping.h:166:8: note: in expansion of macro 'ktime_to_timespec64'
->     *ts = ktime_to_timespec64(ktime_get_coarse_boottime());
->
-> Remove this warning from W=2 completely.
->
-> Signed-off-by: Mathieu Malaterre <malat@debian.org>
-> ---
+On Tue, Jun 04, 2019 at 03:42:48PM +0300, Jani Nikula wrote:
+> Sometimes it's useful to be able to explicitly ensure certain headers
+> remain self-contained, i.e. that they are compilable as standalone
+> units, by including and/or forward declaring everything they depend on.
+> 
+> Add special target header-test-y where individual Makefiles can add
+> headers to be tested if CONFIG_HEADER_TEST is enabled. This will
+> generate a dummy C file per header that gets built as part of extra-y.
+> 
+> Cc: Chris Wilson <chris@chris-wilson.co.uk>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
 
-Applied to linux-kbuild. Thanks.
+Looks good, thanks.
 
-
-
->  scripts/Makefile.extrawarn | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 3ab8d1a303cd..98081ab300e5 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -34,7 +34,6 @@ warning-1 += $(call cc-option, -Wstringop-truncation)
->  warning-1 += -Wno-missing-field-initializers
->  warning-1 += -Wno-sign-compare
->
-> -warning-2 := -Waggregate-return
->  warning-2 += -Wcast-align
->  warning-2 += -Wdisabled-optimization
->  warning-2 += -Wnested-externs
-> --
-> 2.20.1
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
