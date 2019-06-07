@@ -1,76 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:60736 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731635AbfFGPxo (ORCPT
+Received: from mail-qk1-f181.google.com ([209.85.222.181]:42840 "EHLO
+        mail-qk1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729241AbfFGQ6q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Jun 2019 11:53:44 -0400
+        Fri, 7 Jun 2019 12:58:46 -0400
+Received: by mail-qk1-f181.google.com with SMTP id b18so1670899qkc.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 07 Jun 2019 09:58:45 -0700 (PDT)
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 8 Jun 2019 00:52:56 +0900
-Message-ID: <CAK7LNAQZ2FAZcc367eCPqhwYRVvP+65hDa5hx6qfTwh2qVGL=w@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.2-rc4
+From: Derrick McKee <derrick.mckee@gmail.com>
+Date: Fri, 7 Jun 2019 12:58:33 -0400
+Message-ID: <CAJoBWHw2yPgT_25UVF_3tTx6_FfZMBbDqVW5TASb4aPu2JKHZg@mail.gmail.com>
+Subject: Adding new build target
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+Hi all,
 
-Please pull some Kbuild fixes.
-Thanks.
+Now that the kernel can be built with clang, I'd like to implement a
+new build target to generate LLVM bytecode for all C source files
+involved for a specific build configuration.  I am thinking that this
+should be very simple if I know the make variables that captures the
+needed information.  Specifically, I think I just need to perform the
+following command for all C files:
 
+clang -emit-llvm -c <appropriate CFLAGS and include paths> <source
+file> -o <corresponding object file location>.bc
 
+My problem is that I don't know how to get the info in the brackets,
+but I am thinking that I should make a new build target `bytecode`.
+Any help would be appreciated.  Thanks.
 
-The following changes since commit f2c7c76c5d0a443053e94adb9f0918fa2fb85c3a:
-
-  Linux 5.2-rc3 (2019-06-02 13:55:33 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.2-2
-
-for you to fetch changes up to 913ab9780fc021298949cc5514d6255a008e69f9:
-
-  kbuild: use more portable 'command -v' for cc-cross-prefix
-(2019-06-08 00:38:47 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.2 (2nd)
-
- - fix kselftest-merge to find config fragments in deeper directories
-
- - fix kconfig unit test, which was broken by SPDX tag addition
-
- - add + prefix to buildtar to suppress jobserver unavailable warning
-
- - fix checkstack.pl to recognize arch=arm64
-
- - suppress noisy warning from cc-cross-prefix
-
-----------------------------------------------------------------
-Dan Rue (1):
-      kbuild: teach kselftest-merge to find nested config files
-
-George G. Davis (1):
-      scripts/checkstack.pl: Fix arm64 wrong or unknown architecture
-
-Masahiro Yamada (2):
-      kconfig: tests: fix recursive inclusion unit test
-      kbuild: use more portable 'command -v' for cc-cross-prefix
-
-Trevor Bourget (1):
-      kbuild: tar-pkg: enable communication with jobserver
-
- Makefile                                                | 5 ++---
- scripts/Kbuild.include                                  | 7 ++++++-
- scripts/checkstack.pl                                   | 2 +-
- scripts/kconfig/tests/err_recursive_inc/expected_stderr | 6 +++---
- scripts/package/Makefile                                | 2 +-
- 5 files changed, 13 insertions(+), 9 deletions(-)
-
-
--- 
-Best Regards
-Masahiro Yamada
+Derrick McKee
