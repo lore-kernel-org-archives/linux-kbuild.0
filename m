@@ -1,180 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38486 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406712AbfFKR6h (ORCPT
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:40286 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391882AbfFKSnv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Jun 2019 13:58:37 -0400
-Received: by mail-pl1-f196.google.com with SMTP id f97so5442659plb.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 11 Jun 2019 10:58:37 -0700 (PDT)
-Date: Tue, 11 Jun 2019 10:58:30 -0700
-From: Brendan Higgins <brendanhiggins@google.com>
-Subject: Re: [PATCH v4 17/18] kernel/sysctl-test: Add null pointer test for
- sysctl.c:proc_dointvec()
-Message-ID: <20190611175830.GA236872@google.com>
-References: <20190514221711.248228-1-brendanhiggins@google.com>
- <20190514221711.248228-18-brendanhiggins@google.com>
- <20190517182254.548EA20815@mail.kernel.org>
- <CAAXuY3p4qhKVsSpQ44_kQeGDMfg7OuFLgFyxhcFWS3yf-5A_7g@mail.gmail.com>
- <20190607190047.C3E7A20868@mail.kernel.org>
+        Tue, 11 Jun 2019 14:43:51 -0400
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH] kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
+Date: Tue, 11 Jun 2019 11:43:31 -0700
+Message-Id: <20190611184331.44242-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190607190047.C3E7A20868@mail.kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Iurii Zaikin <yzaikin@google.com>, frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: clang-built-linux@googlegroups.com, Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Peter Smith <peter.smith@linaro.org>
 
-On Fri, Jun 07, 2019 at 12:00:47PM -0700, Stephen Boyd wrote:
-> Quoting Iurii Zaikin (2019-06-05 18:29:42)
-> > On Fri, May 17, 2019 at 11:22 AM Stephen Boyd <sboyd@kernel.org> wrote:
-> > >
-> > > Quoting Brendan Higgins (2019-05-14 15:17:10)
-> > > > diff --git a/kernel/sysctl-test.c b/kernel/sysctl-test.c
-> > > > new file mode 100644
-> > > > index 0000000000000..fe0f2bae66085
-> > > > --- /dev/null
-> > > > +++ b/kernel/sysctl-test.c
-> > > > +
-> > > > +
-> > > > +static void sysctl_test_dointvec_happy_single_negative(struct kunit *test)
-> > > > +{
-> > > > +       struct ctl_table table = {
-> > > > +               .procname = "foo",
-> > > > +               .data           = &test_data.int_0001,
-> > > > +               .maxlen         = sizeof(int),
-> > > > +               .mode           = 0644,
-> > > > +               .proc_handler   = proc_dointvec,
-> > > > +               .extra1         = &i_zero,
-> > > > +               .extra2         = &i_one_hundred,
-> > > > +       };
-> > > > +       char input[] = "-9";
-> > > > +       size_t len = sizeof(input) - 1;
-> > > > +       loff_t pos = 0;
-> > > > +
-> > > > +       table.data = kunit_kzalloc(test, sizeof(int), GFP_USER);
-> > > > +       KUNIT_EXPECT_EQ(test, 0, proc_dointvec(&table, 1, input, &len, &pos));
-> > > > +       KUNIT_EXPECT_EQ(test, sizeof(input) - 1, len);
-> > > > +       KUNIT_EXPECT_EQ(test, sizeof(input) - 1, pos);
-> > > > +       KUNIT_EXPECT_EQ(test, -9, *(int *)table.data);
-> > >
-> > > Is the casting necessary? Or can the macro do a type coercion of the
-> > > second parameter based on the first type?
-> >  Data field is defined as void* so I believe casting is necessary to
-> > dereference it as a pointer to an array of ints. I don't think the
-> > macro should do any type coercion that == operator wouldn't do.
-> >  I did change the cast to make it more clear that it's a pointer to an
-> > array of ints being dereferenced.
-> 
-> Ok, I still wonder if we should make KUNIT_EXPECT_EQ check the types on
-> both sides and cause a build warning/error if the types aren't the same.
-> This would be similar to our min/max macros that complain about
-> mismatched types in the comparisons. Then if a test developer needs to
-> convert one type or the other they could do so with a
-> KUNIT_EXPECT_EQ_T() macro that lists the types to coerce both sides to
-> explicitly.
+In commit ebcc5928c5d9 ("arm64: Silence gcc warnings about arch ABI
+drift"), the arm64 Makefile added -Wno-psabi to KBUILD_CFLAGS, which is
+a GCC only option so clang rightfully complains:
 
-Do you think it would be better to do a phony compare similar to how
-min/max used to work prior to 4.17, or to use the new __typecheck(...)
-macro? This might seem like a dumb question (and maybe it is), but Iurii
-and I thought the former created an error message that was a bit easier
-to understand, whereas __typecheck is obviously superior in terms of
-code reuse.
+warning: unknown warning option '-Wno-psabi' [-Wunknown-warning-option]
 
-This is what we are thinking right now; if you don't have any complaints
-I will squash it into the relevant commits on the next revision:
+https://clang.llvm.org/docs/DiagnosticsReference.html#wunknown-warning-option
+
+However, by default, this is merely a warning so the build happily goes
+on with a slew of these warnings in the process.
+
+Commit c3f0d0bc5b01 ("kbuild, LLVMLinux: Add -Werror to cc-option to
+support clang") worked around this behavior in cc-option by adding
+-Werror so that unknown flags cause an error. However, this all happens
+silently and when an unknown flag is added to the build unconditionally
+like -Wno-psabi, cc-option will always fail because there is always an
+unknown flag in the list of flags. This manifested as link time failures
+in the arm64 libstub because -fno-stack-protector didn't get added to
+KBUILD_CFLAGS.
+
+To avoid these weird cryptic failures in the future, make clang behave
+like gcc and immediately error when it encounters an unknown flag by
+adding -Werror=unknown-warning-option to CLANG_FLAGS. This can be added
+unconditionally for clang because it is supported by at least 3.0.0,
+according to godbolt [1] and 4.0.0, according to its documentation [2],
+which is far earlier than we typically support.
+
+[1]: https://godbolt.org/z/7F7rm3
+[2]: https://releases.llvm.org/4.0.0/tools/clang/docs/DiagnosticsReference.html#wunknown-warning-option
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/511
+Link: https://github.com/ClangBuiltLinux/linux/issues/517
+Suggested-by: Peter Smith <peter.smith@linaro.org>
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
-From: Iurii Zaikin <yzaikin@google.com>
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-Adds a warning message when comparing values of different types similar
-to what min() / max() macros do.
-
-Signed-off-by: Iurii Zaikin <yzaikin@google.com>
----
- include/kunit/test.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/include/kunit/test.h b/include/kunit/test.h
-index 511c9e85401a6..791e22fba5620 100644
---- a/include/kunit/test.h
-+++ b/include/kunit/test.h
-@@ -335,6 +335,13 @@ void __printf(3, 4) kunit_printk(const char *level,
- #define kunit_err(test, fmt, ...) \
- 		kunit_printk(KERN_ERR, test, fmt, ##__VA_ARGS__)
- 
-+/*
-+ * 'Unnecessary' cast serves to generate a compile-time warning in case
-+ * of comparing incompatible types. Inspired by include/linux/kernel.h
-+ */
-+#define __kunit_typecheck(lhs, rhs) \
-+	((void) (&(lhs) == &(rhs)))
-+
- static inline struct kunit_stream *kunit_expect_start(struct kunit *test,
- 						      const char *file,
- 						      const char *line)
-@@ -514,6 +521,7 @@ static inline void kunit_expect_ptr_binary(struct kunit *test,
- #define KUNIT_EXPECT_BINARY(test, left, condition, right) do {		       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_expect_binary(test,					       \
- 			    (long long) __left, #left,			       \
- 			    (long long) __right, #right,		       \
-@@ -524,6 +532,7 @@ static inline void kunit_expect_ptr_binary(struct kunit *test,
- #define KUNIT_EXPECT_BINARY_MSG(test, left, condition, right, fmt, ...) do {   \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_expect_binary_msg(test,					       \
- 				(long long) __left, #left,		       \
- 				(long long) __right, #right,		       \
-@@ -538,6 +547,7 @@ static inline void kunit_expect_ptr_binary(struct kunit *test,
- #define KUNIT_EXPECT_PTR_BINARY(test, left, condition, right) do {	       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_expect_ptr_binary(test,					       \
- 			    (void *) __left, #left,			       \
- 			    (void *) __right, #right,			       \
-@@ -553,6 +563,7 @@ static inline void kunit_expect_ptr_binary(struct kunit *test,
- 				    ...) do {				       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_expect_ptr_binary_msg(test,				       \
- 				    (void *) __left, #left,		       \
- 				    (void *) __right, #right,		       \
-@@ -1013,6 +1024,7 @@ static inline void kunit_assert_ptr_binary(struct kunit *test,
- #define KUNIT_ASSERT_BINARY(test, left, condition, right) do {		       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_assert_binary(test,					       \
- 			    (long long) __left, #left,			       \
- 			    (long long) __right, #right,		       \
-@@ -1023,6 +1035,7 @@ static inline void kunit_assert_ptr_binary(struct kunit *test,
- #define KUNIT_ASSERT_BINARY_MSG(test, left, condition, right, fmt, ...) do {   \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_assert_binary_msg(test,					       \
- 				(long long) __left, #left,		       \
- 				(long long) __right, #right,		       \
-@@ -1037,6 +1050,7 @@ static inline void kunit_assert_ptr_binary(struct kunit *test,
- #define KUNIT_ASSERT_PTR_BINARY(test, left, condition, right) do {	       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_assert_ptr_binary(test,					       \
- 				(void *) __left, #left,			       \
- 				(void *) __right, #right,		       \
-@@ -1051,6 +1065,7 @@ static inline void kunit_assert_ptr_binary(struct kunit *test,
- 				    fmt, ...) do {			       \
- 	typeof(left) __left = (left);					       \
- 	typeof(right) __right = (right);				       \
-+	__kunit_typecheck(__left, __right);				       \
- 	kunit_assert_ptr_binary_msg(test,				       \
- 				    (void *) __left, #left,		       \
- 				    (void *) __right, #right,		       \
+diff --git a/Makefile b/Makefile
+index b81e17261250..5f9d09bd2252 100644
+--- a/Makefile
++++ b/Makefile
+@@ -528,6 +528,7 @@ ifneq ($(GCC_TOOLCHAIN),)
+ CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ CLANG_FLAGS	+= -no-integrated-as
++CLANG_FLAGS	+= -Werror=unknown-warning-option
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
 -- 
-2.22.0.rc2.383.gf4fbbf30c2-goog
+2.22.0
