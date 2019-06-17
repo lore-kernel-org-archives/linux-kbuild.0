@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f201.google.com ([209.85.160.201]:51840 "EHLO
-        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727877AbfFQI1Y (ORCPT
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:48342 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727508AbfFQI02 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:27:24 -0400
-Received: by mail-qt1-f201.google.com with SMTP id a18so8554867qtj.18
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Jun 2019 01:27:23 -0700 (PDT)
-Date: Mon, 17 Jun 2019 01:26:05 -0700
-In-Reply-To: <20190617082613.109131-1-brendanhiggins@google.com>
-Message-Id: <20190617082613.109131-11-brendanhiggins@google.com>
+        Mon, 17 Jun 2019 04:26:28 -0400
+Received: by mail-vk1-f202.google.com with SMTP id f184so4481739vkd.15
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Jun 2019 01:26:27 -0700 (PDT)
+Date: Mon, 17 Jun 2019 01:25:55 -0700
+Message-Id: <20190617082613.109131-1-brendanhiggins@google.com>
 Mime-Version: 1.0
-References: <20190617082613.109131-1-brendanhiggins@google.com>
-Subject: [PATCH v5 10/18] kunit: test: add tests for kunit test abort
+Subject: [PATCH v5 00/18] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,138 +18,156 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
 Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-Add KUnit tests for the KUnit test abort mechanism (see preceding
-commit). Add tests both for general try catch mechanism as well as
-non-architecture specific mechanism.
+## TL;DR
 
-Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
----
- kunit/Makefile    |   3 +-
- kunit/test-test.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 103 insertions(+), 1 deletion(-)
- create mode 100644 kunit/test-test.c
+A not so quick follow-up to Stephen's suggestions on PATCH v4. Nothing
+that really changes any functionality or usage with the minor exception
+of a couple public functions that Stephen asked me to rename.
+Nevertheless, a good deal of clean up and fixes. See changes below.
 
-diff --git a/kunit/Makefile b/kunit/Makefile
-index 1f7680cfa11ad..533355867abd2 100644
---- a/kunit/Makefile
-+++ b/kunit/Makefile
-@@ -3,6 +3,7 @@ obj-$(CONFIG_KUNIT) +=			test.o \
- 					kunit-stream.o \
- 					try-catch.o
- 
--obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
-+obj-$(CONFIG_KUNIT_TEST) +=		test-test.o \
-+					string-stream-test.o
- 
- obj-$(CONFIG_KUNIT_EXAMPLE_TEST) +=	example-test.o
-diff --git a/kunit/test-test.c b/kunit/test-test.c
-new file mode 100644
-index 0000000000000..5d14e1ae35ed5
---- /dev/null
-+++ b/kunit/test-test.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KUnit test for core test infrastructure.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+#include <kunit/test.h>
-+
-+struct kunit_try_catch_test_context {
-+	struct kunit_try_catch *try_catch;
-+	bool function_called;
-+};
-+
-+void kunit_test_successful_try(void *data)
-+{
-+	struct kunit *test = data;
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+
-+	ctx->function_called = true;
-+}
-+
-+void kunit_test_no_catch(void *data)
-+{
-+	struct kunit *test = data;
-+
-+	KUNIT_FAIL(test, "Catch should not be called\n");
-+}
-+
-+static void kunit_test_try_catch_successful_try_no_catch(struct kunit *test)
-+{
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+	struct kunit_try_catch *try_catch = ctx->try_catch;
-+
-+	kunit_try_catch_init(try_catch,
-+			     test,
-+			     kunit_test_successful_try,
-+			     kunit_test_no_catch);
-+	kunit_try_catch_run(try_catch, test);
-+
-+	KUNIT_EXPECT_TRUE(test, ctx->function_called);
-+}
-+
-+void kunit_test_unsuccessful_try(void *data)
-+{
-+	struct kunit *test = data;
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+	struct kunit_try_catch *try_catch = ctx->try_catch;
-+
-+	kunit_try_catch_throw(try_catch);
-+	KUNIT_FAIL(test, "This line should never be reached\n");
-+}
-+
-+void kunit_test_catch(void *data)
-+{
-+	struct kunit *test = data;
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+
-+	ctx->function_called = true;
-+}
-+
-+static void kunit_test_try_catch_unsuccessful_try_does_catch(struct kunit *test)
-+{
-+	struct kunit_try_catch_test_context *ctx = test->priv;
-+	struct kunit_try_catch *try_catch = ctx->try_catch;
-+
-+	kunit_try_catch_init(try_catch,
-+			     test,
-+			     kunit_test_unsuccessful_try,
-+			     kunit_test_catch);
-+	kunit_try_catch_run(try_catch, test);
-+
-+	KUNIT_EXPECT_TRUE(test, ctx->function_called);
-+}
-+
-+static int kunit_try_catch_test_init(struct kunit *test)
-+{
-+	struct kunit_try_catch_test_context *ctx;
-+
-+	ctx = kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
-+	test->priv = ctx;
-+
-+	ctx->try_catch = kunit_kmalloc(test,
-+				       sizeof(*ctx->try_catch),
-+				       GFP_KERNEL);
-+
-+	return 0;
-+}
-+
-+static struct kunit_case kunit_try_catch_test_cases[] = {
-+	KUNIT_CASE(kunit_test_try_catch_successful_try_no_catch),
-+	KUNIT_CASE(kunit_test_try_catch_unsuccessful_try_does_catch),
-+	{}
-+};
-+
-+static struct kunit_module kunit_try_catch_test_module = {
-+	.name = "kunit-try-catch-test",
-+	.init = kunit_try_catch_test_init,
-+	.test_cases = kunit_try_catch_test_cases,
-+};
-+module_test(kunit_try_catch_test_module);
+As for our current status, right now we got Reviewed-bys on all patches
+except:
+
+- [PATCH v5 08/18] objtool: add kunit_try_catch_throw to the noreturn
+  list
+
+However, it would probably be good to get reviews/acks from the
+subsystem maintainers on:
+
+- [PATCH v5 06/18] kbuild: enable building KUnit
+- [PATCH v5 08/18] objtool: add kunit_try_catch_throw to the noreturn
+  list
+- [PATCH v5 15/18] Documentation: kunit: add documentation for KUnit
+- [PATCH v5 17/18] kernel/sysctl-test: Add null pointer test for
+  sysctl.c:proc_dointvec()
+- [PATCH v5 18/18] MAINTAINERS: add proc sysctl KUnit test to PROC
+  SYSCTL section
+
+Other than that, I think we should be good to go.
+
+One last thing, I updated the background to include my thoughts on KUnit
+vs. in kernel testing with kselftest in the background sections as
+suggested by Frank in the discussion on PATCH v2.
+
+## Background
+
+This patch set proposes KUnit, a lightweight unit testing and mocking
+framework for the Linux kernel.
+
+Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+it does not require installing the kernel on a test machine or in a VM
+(however, KUnit still allows you to run tests on test machines or in VMs
+if you want[1]) and does not require tests to be written in userspace
+running on a host kernel. Additionally, KUnit is fast: From invocation
+to completion KUnit can run several dozen tests in under a second.
+Currently, the entire KUnit test suite for KUnit runs in under a second
+from the initial invocation (build time excluded).
+
+KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+Googletest/Googlemock for C++. KUnit provides facilities for defining
+unit test cases, grouping related test cases into test suites, providing
+common infrastructure for running tests, mocking, spying, and much more.
+
+### But wait! Doesn't kselftest support in kernel testing?!
+
+In a previous version of this patchset Frank pointed out that kselftest
+already supports writing a test that resides in the kernel using the
+test module feature[2]. LWN did a really great summary on this
+discussion here[3].
+
+Kselftest has a feature that allows a test module to be loaded into a
+kernel using the kselftest framework; this does allow someone to write
+tests against kernel code not directly exposed to userland; however, it
+does not provide much of a framework around how to structure the tests.
+The kselftest test module feature just provides a header which has a
+standardized way of reporting test failures, and then provides
+infrastructure to load and run the tests using the kselftest test
+harness.
+
+The kselftest test module does not seem to be opinionated at all in
+regards to how tests are structured, how they check for failures, how
+tests are organized. Even in the method it provides for reporting
+failures is pretty simple; it doesn't have any more advanced failure
+reporting or logging features. Given what's there, I think it is fair to
+say that it is not actually a framework, but a feature that makes it
+possible for someone to do some checks in kernel space.
+
+Furthermore, kselftest test module has very few users. I checked for all
+the tests that use it using the following grep command:
+
+grep -Hrn -e 'kselftest_module\.h'
+
+and only got three results: lib/test_strscpy.c, lib/test_printf.c, and
+lib/test_bitmap.c.
+
+So despite kselftest test module's existence, there really is no feature
+overlap between kselftest and KUnit, save one: that you can use either
+to write an in-kernel test, but this is a very small feature in
+comparison to everything that KUnit allows you to do. KUnit is a full
+x-unit style unit testing framework, whereas kselftest looks a lot more
+like an end-to-end/functional testing framework, with a feature that
+makes it possible to write in-kernel tests.
+
+### What's so special about unit testing?
+
+A unit test is supposed to test a single unit of code in isolation,
+hence the name. There should be no dependencies outside the control of
+the test; this means no external dependencies, which makes tests orders
+of magnitudes faster. Likewise, since there are no external dependencies,
+there are no hoops to jump through to run the tests. Additionally, this
+makes unit tests deterministic: a failing unit test always indicates a
+problem. Finally, because unit tests necessarily have finer granularity,
+they are able to test all code paths easily solving the classic problem
+of difficulty in exercising error handling code.
+
+### Is KUnit trying to replace other testing frameworks for the kernel?
+
+No. Most existing tests for the Linux kernel are end-to-end tests, which
+have their place. A well tested system has lots of unit tests, a
+reasonable number of integration tests, and some end-to-end tests. KUnit
+is just trying to address the unit test space which is currently not
+being addressed.
+
+### More information on KUnit
+
+There is a bunch of documentation near the end of this patch set that
+describes how to use KUnit and best practices for writing unit tests.
+For convenience I am hosting the compiled docs here[4].
+
+Additionally for convenience, I have applied these patches to a
+branch[5]. The repo may be cloned with:
+git clone https://kunit.googlesource.com/linux
+This patchset is on the kunit/rfc/v5.2-rc4/v5 branch.
+
+## Changes Since Last Version
+
+Aside from a couple public function renames, there isn't really anything
+in here that changes any functionality.
+
+- Went through and fixed a couple of anti-patterns suggested by Stephen
+  Boyd. Things like:
+  - Dropping an else clause at the end of a function.
+  - Dropping the comma on the closing sentinel, `{}`, of a list.
+- Inlines a bunch of functions in the test case running logic in patch
+  01/18 to make it more readable as suggested by Stephen Boyd
+- Found and fixed bug in resource deallocation logic in patch 02/18. Bug
+  was discovered as a result of making a change suggested by Stephen
+  Boyd. This does not substantially change how any of the code works
+  conceptually.
+- Renamed new_string_stream() to alloc_string_stream() as suggested by
+  Stephen Boyd.
+- Made string-stream a KUnit managed object - based on a suggestion made
+  by Stephen Boyd.
+- Renamed kunit_new_stream() to alloc_kunit_stream() as suggested by
+  Stephen Boyd.
+- Removed the ability to set log level after allocating a kunit_stream,
+  as suggested by Stephen Boyd.
+
+[1] https://google.github.io/kunit-docs/third_party/kernel/docs/usage.html#kunit-on-non-uml-architectures
+[2] https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html#test-module
+[3] https://lwn.net/Articles/790235/
+[4] https://google.github.io/kunit-docs/third_party/kernel/docs/
+[5] https://kunit.googlesource.com/linux/+/kunit/rfc/v5.2-rc4/v5
+
 -- 
 2.22.0.410.gd8fdbe21b5-goog
