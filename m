@@ -1,46 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:34555 "EHLO
-        relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725280AbfFQGPs (ORCPT
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:44275 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727829AbfFQI1N (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Jun 2019 02:15:48 -0400
-From: Cedric Hombourger <Cedric_Hombourger@mentor.com>
-Subject: [PATCH] builddeb: generate multi-arch friendly linux-libc-dev package
-Date: Mon, 17 Jun 2019 08:14:56 +0200
-Message-ID: <1560752096-1323-1-git-send-email-Cedric_Hombourger@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Mon, 17 Jun 2019 04:27:13 -0400
+Received: by mail-qt1-f201.google.com with SMTP id x10so8593196qti.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Jun 2019 01:27:12 -0700 (PDT)
+Date: Mon, 17 Jun 2019 01:26:03 -0700
+In-Reply-To: <20190617082613.109131-1-brendanhiggins@google.com>
+Message-Id: <20190617082613.109131-9-brendanhiggins@google.com>
+Mime-Version: 1.0
+References: <20190617082613.109131-1-brendanhiggins@google.com>
+Subject: [PATCH v5 08/18] objtool: add kunit_try_catch_throw to the noreturn list
+From: Brendan Higgins <brendanhiggins@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: isar-users@googlegroups.com, Cedric Hombourger <Cedric_Hombourger@mentor.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>, kbuild test robot <lkp@intel.com>
 
-Debian-based distributions place libc header files in a machine
-specific directory (/usr/include/<libc-machine>) instead of
-/usr/include/asm to support installation of the linux-libc-dev
-package from multiple architectures. Move headers installed by
-"make headers_install" accordingly.
+Fix the following warning seen on GCC 7.3:
+  kunit/test-test.o: warning: objtool: kunit_test_unsuccessful_try() falls through to next function kunit_test_catch()
 
-Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
-Reviewed-by: Henning Schild <henning.schild@siemens.com>
+kunit_try_catch_throw is a function added in the following patch in this
+series; it allows KUnit, a unit testing framework for the kernel, to
+bail out of a broken test. As a consequence, it is a new __noreturn
+function that objtool thinks is broken (as seen above). So fix this
+warning by adding kunit_try_catch_throw to objtool's noreturn list.
+
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+Link: https://www.spinics.net/lists/linux-kbuild/msg21708.html
 ---
- scripts/package/builddeb | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/objtool/check.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index b03dd56a4782..8f7afb3a84e9 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -132,6 +132,11 @@ fi
- if [ "$ARCH" != "um" ]; then
- 	$MAKE -f $srctree/Makefile headers_check
- 	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
-+	# used by Debian-based distros (to support multi-arch)
-+	libc_mach=$($CC -dumpmachine)
-+	mkdir $libc_headers_dir/usr/include/$libc_mach
-+	mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$libc_mach/
- fi
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index 172f991957269..98db5fe85c797 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -134,6 +134,7 @@ static int __dead_end_function(struct objtool_file *file, struct symbol *func,
+ 		"usercopy_abort",
+ 		"machine_real_restart",
+ 		"rewind_stack_do_exit",
++		"kunit_try_catch_throw",
+ 	};
  
- # Install the maintainer scripts
+ 	if (func->bind == STB_WEAK)
 -- 
-2.11.0
+2.22.0.410.gd8fdbe21b5-goog
