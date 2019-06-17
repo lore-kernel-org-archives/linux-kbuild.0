@@ -1,254 +1,265 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw1-f73.google.com ([209.85.161.73]:33847 "EHLO
-        mail-yw1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727798AbfFQI1I (ORCPT
+Received: from mail-ot1-f73.google.com ([209.85.210.73]:50243 "EHLO
+        mail-ot1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727923AbfFQI1d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:27:08 -0400
-Received: by mail-yw1-f73.google.com with SMTP id q8so11573068ywc.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Jun 2019 01:27:07 -0700 (PDT)
-Date: Mon, 17 Jun 2019 01:26:02 -0700
+        Mon, 17 Jun 2019 04:27:33 -0400
+Received: by mail-ot1-f73.google.com with SMTP id a21so4575882otk.17
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Jun 2019 01:27:33 -0700 (PDT)
+Date: Mon, 17 Jun 2019 01:26:07 -0700
 In-Reply-To: <20190617082613.109131-1-brendanhiggins@google.com>
-Message-Id: <20190617082613.109131-8-brendanhiggins@google.com>
+Message-Id: <20190617082613.109131-13-brendanhiggins@google.com>
 Mime-Version: 1.0
 References: <20190617082613.109131-1-brendanhiggins@google.com>
-Subject: [PATCH v5 07/18] kunit: test: add initial tests
+Subject: [PATCH v5 12/18] kunit: test: add tests for KUnit managed resources
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Avinash Kondareddy <akndr41@gmail.com>, Brendan Higgins <brendanhiggins@google.com>
 
-Add a test for string stream along with a simpler example.
+From: Avinash Kondareddy <akndr41@gmail.com>
 
+Add unit tests for KUnit managed resources. KUnit managed resources
+(struct kunit_resource) are resources that are automatically cleaned up
+at the end of a KUnit test, similar to the concept of devm_* managed
+resources.
+
+Signed-off-by: Avinash Kondareddy <akndr41@gmail.com>
 Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- kunit/Kconfig              | 21 +++++++++
- kunit/Makefile             |  4 ++
- kunit/example-test.c       | 88 ++++++++++++++++++++++++++++++++++++++
- kunit/string-stream-test.c | 75 ++++++++++++++++++++++++++++++++
- 4 files changed, 188 insertions(+)
- create mode 100644 kunit/example-test.c
- create mode 100644 kunit/string-stream-test.c
+ kunit/test-test.c | 219 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 219 insertions(+)
 
-diff --git a/kunit/Kconfig b/kunit/Kconfig
-index 330ae83527c23..8541ef95b65ad 100644
---- a/kunit/Kconfig
-+++ b/kunit/Kconfig
-@@ -14,4 +14,25 @@ config KUNIT
- 	  architectures. For more information, please see
- 	  Documentation/dev-tools/kunit/.
- 
-+config KUNIT_TEST
-+	bool "KUnit test for KUnit"
-+	depends on KUNIT
-+	help
-+	  Enables the unit tests for the KUnit test framework. These tests test
-+	  the KUnit test framework itself; the tests are both written using
-+	  KUnit and test KUnit. This option should only be enabled for testing
-+	  purposes by developers interested in testing that KUnit works as
-+	  expected.
-+
-+config KUNIT_EXAMPLE_TEST
-+	bool "Example test for KUnit"
-+	depends on KUNIT
-+	help
-+	  Enables an example unit test that illustrates some of the basic
-+	  features of KUnit. This test only exists to help new users understand
-+	  what KUnit is and how it is used. Please refer to the example test
-+	  itself, kunit/example-test.c, for more information. This option is
-+	  intended for curious hackers who would like to understand how to use
-+	  KUnit for kernel development.
-+
- endmenu
-diff --git a/kunit/Makefile b/kunit/Makefile
-index 6ddc622ee6b1c..60a9ea6cb4697 100644
---- a/kunit/Makefile
-+++ b/kunit/Makefile
-@@ -1,3 +1,7 @@
- obj-$(CONFIG_KUNIT) +=			test.o \
- 					string-stream.o \
- 					kunit-stream.o
-+
-+obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
-+
-+obj-$(CONFIG_KUNIT_EXAMPLE_TEST) +=	example-test.o
-diff --git a/kunit/example-test.c b/kunit/example-test.c
-new file mode 100644
-index 0000000000000..f44b8ece488bb
---- /dev/null
-+++ b/kunit/example-test.c
-@@ -0,0 +1,88 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Example KUnit test to show how to use KUnit.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#include <kunit/test.h>
+diff --git a/kunit/test-test.c b/kunit/test-test.c
+index 43d1bedcf4592..60ef508cda1c6 100644
+--- a/kunit/test-test.c
++++ b/kunit/test-test.c
+@@ -101,3 +101,222 @@ static struct kunit_module kunit_try_catch_test_module = {
+ 	.test_cases = kunit_try_catch_test_cases,
+ };
+ module_test(kunit_try_catch_test_module);
 +
 +/*
-+ * This is the most fundamental element of KUnit, the test case. A test case
-+ * makes a set EXPECTATIONs and ASSERTIONs about the behavior of some code; if
-+ * any expectations or assertions are not met, the test fails; otherwise, the
-+ * test passes.
-+ *
-+ * In KUnit, a test case is just a function with the signature
-+ * `void (*)(struct kunit *)`. `struct kunit` is a context object that stores
-+ * information about the current test.
++ * Context for testing test managed resources
++ * is_resource_initialized is used to test arbitrary resources
 + */
-+static void example_simple_test(struct kunit *test)
++struct kunit_test_resource_context {
++	struct kunit test;
++	bool is_resource_initialized;
++	int allocate_order[2];
++	int free_order[2];
++};
++
++static int fake_resource_init(struct kunit_resource *res, void *context)
 +{
-+	/*
-+	 * This is an EXPECTATION; it is how KUnit tests things. When you want
-+	 * to test a piece of code, you set some expectations about what the
-+	 * code should do. KUnit then runs the test and verifies that the code's
-+	 * behavior matched what was expected.
-+	 */
-+	KUNIT_EXPECT_EQ(test, 1 + 1, 2);
++	struct kunit_test_resource_context *ctx = context;
++
++	res->allocation = &ctx->is_resource_initialized;
++	ctx->is_resource_initialized = true;
++	return 0;
 +}
 +
-+/*
-+ * This is run once before each test case, see the comment on
-+ * example_test_module for more information.
-+ */
-+static int example_test_init(struct kunit *test)
++static void fake_resource_free(struct kunit_resource *res)
 +{
-+	kunit_info(test, "initializing\n");
++	bool *is_resource_initialized = res->allocation;
++
++	*is_resource_initialized = false;
++}
++
++static void kunit_resource_test_init_resources(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx = test->priv;
++
++	kunit_init_test(&ctx->test, "testing_test_init_test");
++
++	KUNIT_EXPECT_TRUE(test, list_empty(&ctx->test.resources));
++}
++
++static void kunit_resource_test_alloc_resource(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx = test->priv;
++	struct kunit_resource *res;
++	kunit_resource_free_t free = fake_resource_free;
++
++	res = kunit_alloc_resource(&ctx->test,
++				   fake_resource_init,
++				   fake_resource_free,
++				   ctx);
++
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, res);
++	KUNIT_EXPECT_PTR_EQ(test,
++			    &ctx->is_resource_initialized,
++			    (bool *) res->allocation);
++	KUNIT_EXPECT_TRUE(test, list_is_last(&res->node, &ctx->test.resources));
++	KUNIT_EXPECT_PTR_EQ(test, free, res->free);
++}
++
++static void kunit_resource_test_free_resource(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx = test->priv;
++	struct kunit_resource *res = kunit_alloc_resource(&ctx->test,
++							  fake_resource_init,
++							  fake_resource_free,
++							  ctx);
++
++	kunit_free_resource(&ctx->test, res);
++
++	KUNIT_EXPECT_FALSE(test, ctx->is_resource_initialized);
++	KUNIT_EXPECT_TRUE(test, list_empty(&ctx->test.resources));
++}
++
++static void kunit_resource_test_cleanup_resources(struct kunit *test)
++{
++	int i;
++	struct kunit_test_resource_context *ctx = test->priv;
++	struct kunit_resource *resources[5];
++
++	for (i = 0; i < ARRAY_SIZE(resources); i++) {
++		resources[i] = kunit_alloc_resource(&ctx->test,
++						    fake_resource_init,
++						    fake_resource_free,
++						    ctx);
++	}
++
++	kunit_cleanup(&ctx->test);
++
++	KUNIT_EXPECT_TRUE(test, list_empty(&ctx->test.resources));
++}
++
++static void kunit_resource_test_mark_order(int order_array[],
++					   size_t order_size,
++					   int key)
++{
++	int i;
++
++	for (i = 0; i < order_size && order_array[i]; i++)
++		;
++
++	order_array[i] = key;
++}
++
++#define KUNIT_RESOURCE_TEST_MARK_ORDER(ctx, order_field, key)		       \
++		kunit_resource_test_mark_order(ctx->order_field,	       \
++					       ARRAY_SIZE(ctx->order_field),   \
++					       key)
++
++static int fake_resource_2_init(struct kunit_resource *res, void *context)
++{
++	struct kunit_test_resource_context *ctx = context;
++
++	KUNIT_RESOURCE_TEST_MARK_ORDER(ctx, allocate_order, 2);
++
++	res->allocation = ctx;
 +
 +	return 0;
 +}
 +
++static void fake_resource_2_free(struct kunit_resource *res)
++{
++	struct kunit_test_resource_context *ctx = res->allocation;
++
++	KUNIT_RESOURCE_TEST_MARK_ORDER(ctx, free_order, 2);
++}
++
++static int fake_resource_1_init(struct kunit_resource *res, void *context)
++{
++	struct kunit_test_resource_context *ctx = context;
++
++	kunit_alloc_resource(&ctx->test,
++			     fake_resource_2_init,
++			     fake_resource_2_free,
++			     ctx);
++
++	KUNIT_RESOURCE_TEST_MARK_ORDER(ctx, allocate_order, 1);
++
++	res->allocation = ctx;
++
++	return 0;
++}
++
++static void fake_resource_1_free(struct kunit_resource *res)
++{
++	struct kunit_test_resource_context *ctx = res->allocation;
++
++	KUNIT_RESOURCE_TEST_MARK_ORDER(ctx, free_order, 1);
++}
++
 +/*
-+ * Here we make a list of all the test cases we want to add to the test module
-+ * below.
++ * TODO(brendanhiggins@google.com): replace the arrays that keep track of the
++ * order of allocation and freeing with strict mocks using the IN_SEQUENCE macro
++ * to assert allocation and freeing order when the feature becomes available.
 + */
-+static struct kunit_case example_test_cases[] = {
++static void kunit_resource_test_proper_free_ordering(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx = test->priv;
++
++	/* fake_resource_1 allocates a fake_resource_2 in its init. */
++	kunit_alloc_resource(&ctx->test,
++			     fake_resource_1_init,
++			     fake_resource_1_free,
++			     ctx);
++
 +	/*
-+	 * This is a helper to create a test case object from a test case
-+	 * function; its exact function is not important to understand how to
-+	 * use KUnit, just know that this is how you associate test cases with a
-+	 * test module.
++	 * Since fake_resource_2_init calls KUNIT_RESOURCE_TEST_MARK_ORDER
++	 * before returning to fake_resource_1_init, it should be the first to
++	 * put its key in the allocate_order array.
 +	 */
-+	KUNIT_CASE(example_simple_test),
++	KUNIT_EXPECT_EQ(test, ctx->allocate_order[0], 2);
++	KUNIT_EXPECT_EQ(test, ctx->allocate_order[1], 1);
++
++	kunit_cleanup(&ctx->test);
++
++	/*
++	 * Because fake_resource_2 finishes allocation before fake_resource_1,
++	 * fake_resource_1 should be freed first since it could depend on
++	 * fake_resource_2.
++	 */
++	KUNIT_EXPECT_EQ(test, ctx->free_order[0], 1);
++	KUNIT_EXPECT_EQ(test, ctx->free_order[1], 2);
++}
++
++static int kunit_resource_test_init(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx =
++			kzalloc(sizeof(*ctx), GFP_KERNEL);
++
++	if (!ctx)
++		return -ENOMEM;
++
++	test->priv = ctx;
++
++	kunit_init_test(&ctx->test, "test_test_context");
++
++	return 0;
++}
++
++static void kunit_resource_test_exit(struct kunit *test)
++{
++	struct kunit_test_resource_context *ctx = test->priv;
++
++	kunit_cleanup(&ctx->test);
++	kfree(ctx);
++}
++
++static struct kunit_case kunit_resource_test_cases[] = {
++	KUNIT_CASE(kunit_resource_test_init_resources),
++	KUNIT_CASE(kunit_resource_test_alloc_resource),
++	KUNIT_CASE(kunit_resource_test_free_resource),
++	KUNIT_CASE(kunit_resource_test_cleanup_resources),
++	KUNIT_CASE(kunit_resource_test_proper_free_ordering),
 +	{}
 +};
 +
-+/*
-+ * This defines a suite or grouping of tests.
-+ *
-+ * Test cases are defined as belonging to the suite by adding them to
-+ * `kunit_cases`.
-+ *
-+ * Often it is desirable to run some function which will set up things which
-+ * will be used by every test; this is accomplished with an `init` function
-+ * which runs before each test case is invoked. Similarly, an `exit` function
-+ * may be specified which runs after every test case and can be used to for
-+ * cleanup. For clarity, running tests in a test module would behave as follows:
-+ *
-+ * module.init(test);
-+ * module.test_case[0](test);
-+ * module.exit(test);
-+ * module.init(test);
-+ * module.test_case[1](test);
-+ * module.exit(test);
-+ * ...;
-+ */
-+static struct kunit_module example_test_module = {
-+	.name = "example",
-+	.init = example_test_init,
-+	.test_cases = example_test_cases,
++static struct kunit_module kunit_resource_test_module = {
++	.name = "kunit-resource-test",
++	.init = kunit_resource_test_init,
++	.exit = kunit_resource_test_exit,
++	.test_cases = kunit_resource_test_cases,
 +};
-+
-+/*
-+ * This registers the above test module telling KUnit that this is a suite of
-+ * tests that need to be run.
-+ */
-+module_test(example_test_module);
-diff --git a/kunit/string-stream-test.c b/kunit/string-stream-test.c
-new file mode 100644
-index 0000000000000..36f0b5769a5a4
---- /dev/null
-+++ b/kunit/string-stream-test.c
-@@ -0,0 +1,75 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KUnit test for struct string_stream.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#include <linux/slab.h>
-+#include <kunit/test.h>
-+#include <kunit/string-stream.h>
-+
-+static void string_stream_test_empty_on_creation(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test);
-+
-+	KUNIT_EXPECT_TRUE(test, string_stream_is_empty(stream));
-+}
-+
-+static void string_stream_test_not_empty_after_add(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test);
-+
-+	string_stream_add(stream, "Foo");
-+
-+	KUNIT_EXPECT_FALSE(test, string_stream_is_empty(stream));
-+}
-+static void string_stream_test_get_string(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test);
-+	char *output;
-+
-+	string_stream_add(stream, "Foo");
-+	string_stream_add(stream, " %s", "bar");
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "Foo bar");
-+	kfree(output);
-+}
-+
-+static void string_stream_test_add_and_clear(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test);
-+	char *output;
-+	int i;
-+
-+	for (i = 0; i < 10; i++)
-+		string_stream_add(stream, "A");
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "AAAAAAAAAA");
-+	KUNIT_EXPECT_EQ(test, stream->length, (size_t)10);
-+	KUNIT_EXPECT_FALSE(test, string_stream_is_empty(stream));
-+	kfree(output);
-+
-+	string_stream_clear(stream);
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "");
-+	KUNIT_EXPECT_TRUE(test, string_stream_is_empty(stream));
-+}
-+
-+static struct kunit_case string_stream_test_cases[] = {
-+	KUNIT_CASE(string_stream_test_empty_on_creation),
-+	KUNIT_CASE(string_stream_test_not_empty_after_add),
-+	KUNIT_CASE(string_stream_test_get_string),
-+	KUNIT_CASE(string_stream_test_add_and_clear),
-+	{}
-+};
-+
-+static struct kunit_module string_stream_test_module = {
-+	.name = "string-stream-test",
-+	.test_cases = string_stream_test_cases
-+};
-+module_test(string_stream_test_module);
++module_test(kunit_resource_test_module);
 -- 
 2.22.0.410.gd8fdbe21b5-goog
