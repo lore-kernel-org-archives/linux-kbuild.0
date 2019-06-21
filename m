@@ -1,44 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:33758 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725947AbfFUTFl (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:35140 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726017AbfFURvj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Jun 2019 15:05:41 -0400
+        Fri, 21 Jun 2019 13:51:39 -0400
+Date: Fri, 21 Jun 2019 19:51:34 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild: compile-test global headers to ensure they are
+ self-contained
+Message-ID: <20190621175134.GB16409@ravnborg.org>
+References: <20190621163931.19397-1-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-References: <20190604101409.2078-1-yamada.masahiro@socionext.com> <20190604101409.2078-16-yamada.masahiro@socionext.com>
-In-Reply-To: <20190604101409.2078-16-yamada.masahiro@socionext.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 21 Jun 2019 21:05:22 +0200
-Message-ID: <CAK8P3a08f25WYP5r57JHPcZWieS2+07=_qTphLosS4M2w8F0Zw@mail.gmail.com>
-Subject: Re: [PATCH 15/15] kbuild: compile test UAPI headers to ensure they
- are self-contained
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190621163931.19397-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Song Liu <songliubraving@fb.com>, Alexei Starovoitov <ast@kernel.org>, Networking <netdev@vger.kernel.org>, Yonghong Song <yhs@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, Michal Marek <michal.lkml@markovi.net>, Martin KaFai Lau <kafai@fb.com>, Palmer Dabbelt <palmer@sifive.com>, bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, Albert Ou <aou@eecs.berkeley.edu>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-mediatek@lists.infradead.org, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel@lists.infradead.org
 
-On Tue, Jun 4, 2019 at 12:16 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+Hi Masahiro.
 
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1363,7 +1363,7 @@ CLEAN_DIRS  += $(MODVERDIR) include/ksym
->  CLEAN_FILES += modules.builtin.modinfo
->
->  # Directories & files removed with 'make mrproper'
-> -MRPROPER_DIRS  += include/config usr/include include/generated          \
-> +MRPROPER_DIRS  += include/config include/generated          \
->                   arch/$(SRCARCH)/include/generated .tmp_objdiff
->  MRPROPER_FILES += .config .config.old .version \
->                   Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+On Sat, Jun 22, 2019 at 01:39:31AM +0900, Masahiro Yamada wrote:
+> Make as many headers self-contained as possible so that they can be
+> included without relying on a specific include order.
+It is very nice finally to get some infrastructure to validate header
+files.
 
-This change seems to have caused a minor regression:
+But to avoid too many conflicts while including more and more headers
+that are selfcontained we really need something that is more
+distributed.
+So for example all header files in include/drm/* could be in one
+Makefile, incl. sub-directories, but the same Makefile would not include
+the files in include/soc/
 
-$ make clean ; make clean
-find: ‘*’: No such file or directory
+If you just show how ot do it, others can follow-up with the
+relevant directories.
 
-Any idea?
-
-      Arnd
+	Sam
