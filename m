@@ -1,79 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:60112 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725985AbfFUQkK (ORCPT
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:47269 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726032AbfFUSQU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Jun 2019 12:40:10 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: compile-test global headers to ensure they are self-contained
-Date: Sat, 22 Jun 2019 01:39:31 +0900
-Message-Id: <20190621163931.19397-1-yamada.masahiro@socionext.com>
+        Fri, 21 Jun 2019 14:16:20 -0400
+Date: Fri, 21 Jun 2019 14:13:42 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+Subject: Re: [PATCH v5 00/18] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+Message-ID: <20190621181342.GA17166@mit.edu>
+References: <20190617082613.109131-1-brendanhiggins@google.com>
+ <10feac3e-7621-65e5-fbf0-9c63fcbe09c9@gmail.com>
+ <69809117-dcda-160a-ee0a-d1d3b4c5cd8a@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69809117-dcda-160a-ee0a-d1d3b4c5cd8a@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-mediatek@lists.infradead.org, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel@lists.infradead.org
+To: shuah <shuah@kernel.org>
+Cc: Frank Rowand <frowand.list@gmail.com>, Brendan Higgins <brendanhiggins@google.com>, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-Make as many headers self-contained as possible so that they can be
-included without relying on a specific include order.
+On Fri, Jun 21, 2019 at 08:59:48AM -0600, shuah wrote:
+> > > ### But wait! Doesn't kselftest support in kernel testing?!
+> > >
+> > > ....
+> 
+> I think I commented on this before. I agree with the statement that
+> there is no overlap between Kselftest and KUnit. I would like see this
+> removed. Kselftest module support supports use-cases KUnit won't be able
+> to. I can build an kernel with Kselftest test modules and use it in the
+> filed to load and run tests if I need to debug a problem and get data
+> from a system. I can't do that with KUnit.
+> 
+> In my mind, I am not viewing this as which is better. Kselftest and
+> KUnit both have their place in the kernel development process. It isn't
+> productive and/or necessary to comparing Kselftest and KUnit without a
+> good understanding of the problem spaces for each of these.
+>
+> I would strongly recommend not making reference to Kselftest and talk
+> about what KUnit offers.
 
-This commit compiles only a few headers, but it is a good start point.
+Shuah,
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Just to recall the history, this section of the FAQ was added to rebut
+the ***very*** strong statements that Frank made that there was
+overlap between Kselftest and Kunit, and that having too many ways for
+kernel developers to do the identical thing was harmful (he said it
+was too much of a burden on a kernel developer) --- and this was an
+argument for not including Kunit in the upstream kernel.
 
- Makefile         |  1 +
- include/Makefile | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
- create mode 100644 include/Makefile
+If we're past that objection, then perhaps this section can be
+dropped, but there's a very good reason why it was there.  I wouldn't
+Brendan to be accused of ignoring feedback from those who reviewed his
+patches.   :-)
 
-diff --git a/Makefile b/Makefile
-index c23f5e8381ad..82c1722dd9e9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -610,6 +610,7 @@ drivers-y	:= drivers/ sound/
- drivers-$(CONFIG_SAMPLES) += samples/
- net-y		:= net/
- libs-y		:= lib/
-+libs-$(CONFIG_HEADER_TEST) += include/
- core-y		:= usr/
- virt-y		:= virt/
- endif # KBUILD_EXTMOD
-diff --git a/include/Makefile b/include/Makefile
-new file mode 100644
-index 000000000000..68a76ac732c3
---- /dev/null
-+++ b/include/Makefile
-@@ -0,0 +1,31 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+# extend the test coverage when existing errors are fixed
-+
-+header-test += linux/w*.h
-+header-test += linux/x*.h
-+header-test += linux/y*.h
-+header-test += ras/*.h
-+header-test += soc/at91/*.h
-+header-test += soc/bcm2835/*.h
-+header-test += soc/mediatek/*.h
-+header-test += soc/sa1100/*.h
-+
-+all-headers = $(patsubst $(srctree)/include/%,%,\
-+	    $(wildcard $(addprefix $(srctree)/include/, $(header-test))))
-+
-+# Do not include directly
-+no-header-test += linux/compiler-clang.h
-+no-header-test += linux/compiler-gcc.h
-+no-header-test += linux/patchkey.h
-+no-header-test += linux/rwlock_api_smp.h
-+no-header-test += linux/spinlock_types_up.h
-+no-header-test += linux/spinlock_up.h
-+no-header-test += linux/wimax/debug.h
-+no-header-test += rdma/uverbs_named_ioctl.h
-+
-+# Conditionally included
-+no-header-test += linux/byteorder/big_endian.h
-+no-header-test += linux/byteorder/little_endian.h
-+
-+header-test-y = $(filter-out $(no-header-test), $(all-headers))
--- 
-2.17.1
+						- Ted
