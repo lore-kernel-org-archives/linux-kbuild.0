@@ -1,58 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:47269 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726032AbfFUSQU (ORCPT
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:33758 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725947AbfFUTFl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Jun 2019 14:16:20 -0400
-Date: Fri, 21 Jun 2019 14:13:42 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-Subject: Re: [PATCH v5 00/18] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-Message-ID: <20190621181342.GA17166@mit.edu>
-References: <20190617082613.109131-1-brendanhiggins@google.com>
- <10feac3e-7621-65e5-fbf0-9c63fcbe09c9@gmail.com>
- <69809117-dcda-160a-ee0a-d1d3b4c5cd8a@kernel.org>
+        Fri, 21 Jun 2019 15:05:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69809117-dcda-160a-ee0a-d1d3b4c5cd8a@kernel.org>
+References: <20190604101409.2078-1-yamada.masahiro@socionext.com> <20190604101409.2078-16-yamada.masahiro@socionext.com>
+In-Reply-To: <20190604101409.2078-16-yamada.masahiro@socionext.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 21 Jun 2019 21:05:22 +0200
+Message-ID: <CAK8P3a08f25WYP5r57JHPcZWieS2+07=_qTphLosS4M2w8F0Zw@mail.gmail.com>
+Subject: Re: [PATCH 15/15] kbuild: compile test UAPI headers to ensure they
+ are self-contained
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shuah <shuah@kernel.org>
-Cc: Frank Rowand <frowand.list@gmail.com>, Brendan Higgins <brendanhiggins@google.com>, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Song Liu <songliubraving@fb.com>, Alexei Starovoitov <ast@kernel.org>, Networking <netdev@vger.kernel.org>, Yonghong Song <yhs@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-riscv@lists.infradead.org, Michal Marek <michal.lkml@markovi.net>, Martin KaFai Lau <kafai@fb.com>, Palmer Dabbelt <palmer@sifive.com>, bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, Albert Ou <aou@eecs.berkeley.edu>
 
-On Fri, Jun 21, 2019 at 08:59:48AM -0600, shuah wrote:
-> > > ### But wait! Doesn't kselftest support in kernel testing?!
-> > >
-> > > ....
-> 
-> I think I commented on this before. I agree with the statement that
-> there is no overlap between Kselftest and KUnit. I would like see this
-> removed. Kselftest module support supports use-cases KUnit won't be able
-> to. I can build an kernel with Kselftest test modules and use it in the
-> filed to load and run tests if I need to debug a problem and get data
-> from a system. I can't do that with KUnit.
-> 
-> In my mind, I am not viewing this as which is better. Kselftest and
-> KUnit both have their place in the kernel development process. It isn't
-> productive and/or necessary to comparing Kselftest and KUnit without a
-> good understanding of the problem spaces for each of these.
+On Tue, Jun 4, 2019 at 12:16 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1363,7 +1363,7 @@ CLEAN_DIRS  += $(MODVERDIR) include/ksym
+>  CLEAN_FILES += modules.builtin.modinfo
 >
-> I would strongly recommend not making reference to Kselftest and talk
-> about what KUnit offers.
+>  # Directories & files removed with 'make mrproper'
+> -MRPROPER_DIRS  += include/config usr/include include/generated          \
+> +MRPROPER_DIRS  += include/config include/generated          \
+>                   arch/$(SRCARCH)/include/generated .tmp_objdiff
+>  MRPROPER_FILES += .config .config.old .version \
+>                   Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
 
-Shuah,
+This change seems to have caused a minor regression:
 
-Just to recall the history, this section of the FAQ was added to rebut
-the ***very*** strong statements that Frank made that there was
-overlap between Kselftest and Kunit, and that having too many ways for
-kernel developers to do the identical thing was harmful (he said it
-was too much of a burden on a kernel developer) --- and this was an
-argument for not including Kunit in the upstream kernel.
+$ make clean ; make clean
+find: ‘*’: No such file or directory
 
-If we're past that objection, then perhaps this section can be
-dropped, but there's a very good reason why it was there.  I wouldn't
-Brendan to be accused of ignoring feedback from those who reviewed his
-patches.   :-)
+Any idea?
 
-						- Ted
+      Arnd
