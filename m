@@ -1,65 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:55073 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:55076 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbfFVQHM (ORCPT
+        with ESMTP id S1726290AbfFVQHN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jun 2019 12:07:12 -0400
+        Sat, 22 Jun 2019 12:07:13 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/3] kbuild: save $(strip ...) for calling any-prepreq
-Date: Sun, 23 Jun 2019 01:07:04 +0900
-Message-Id: <20190622160705.17071-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190622160705.17071-1-yamada.masahiro@socionext.com>
-References: <20190622160705.17071-1-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] kbuild: rename arg-check to cmd-check
+Date: Sun, 23 Jun 2019 01:07:03 +0900
+Message-Id: <20190622160705.17071-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The string returned by $(filter-out ...) does not contain any leading
-or trailing spaces.
+I prefer 'cmd-check' for consistency.
 
-So, only the space that matters is the one between
-
-  $(filter-out $(PHONY),$?)
-
-and
-
-  $(filter-out $(PHONY) $(wildcard $^),$^)
-
-By removing it from the code, we can save $(strip ...) evaluation.
-This refactoring is possible because $(any-prereq) is only passed to
-the first argument of $(if ...), so we are only interested in whether
-it is empty or not.
-
-This is also the prerequisite for the next commit.
+We have 'echo-cmd', 'cmd', 'cmd_and_fixdep', etc. in this file.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Kbuild.include | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/Kbuild.include | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 4bec04c89750..0fa93f6de0b0 100644
+index f641bb0aa63f..4bec04c89750 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -231,7 +231,7 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
+@@ -213,12 +213,12 @@ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+ # See Documentation/kbuild/makefiles.txt for more info
  
- # Find any prerequisites that is newer than target or that does not exist.
- # PHONY targets skipped in both cases.
--any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
-+any-prereq = $(filter-out $(PHONY),$?)$(filter-out $(PHONY) $(wildcard $^),$^)
+ ifneq ($(KBUILD_NOCMDDEP),1)
+-# Check if both arguments are the same including their order. Result is empty
++# Check if both commands are the same including their order. Result is empty
+ # string if equal. User may override this check using make KBUILD_NOCMDDEP=1
+-arg-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
++cmd-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
+                          $(subst $(space),$(space_escape),$(strip $(cmd_$1))))
+ else
+-arg-check = $(if $(strip $(cmd_$@)),,1)
++cmd-check = $(if $(strip $(cmd_$@)),,1)
+ endif
+ 
+ # Replace >$< with >$$< to preserve $ when reloading the .cmd file
+@@ -234,12 +234,12 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
+ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
  
  # Execute command if command has changed or prerequisite(s) are updated.
- if_changed = $(if $(strip $(any-prereq) $(cmd-check)),                       \
-@@ -274,7 +274,7 @@ ifeq ($(KBUILD_VERBOSE),2)
- why =                                                                        \
+-if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
++if_changed = $(if $(strip $(any-prereq) $(cmd-check)),                       \
+ 	$(cmd);                                                              \
+ 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+ 
+ # Execute the command and also postprocess generated .d dependencies file.
+-if_changed_dep = $(if $(strip $(any-prereq) $(arg-check)),$(cmd_and_fixdep),@:)
++if_changed_dep = $(if $(strip $(any-prereq) $(cmd-check)),$(cmd_and_fixdep),@:)
+ 
+ cmd_and_fixdep =                                                             \
+ 	$(cmd);                                                              \
+@@ -249,7 +249,7 @@ cmd_and_fixdep =                                                             \
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
+ # and if so will execute $(rule_foo).
+-if_changed_rule = $(if $(strip $(any-prereq) $(arg-check)),$(rule_$(1)),@:)
++if_changed_rule = $(if $(strip $(any-prereq) $(cmd-check)),$(rule_$(1)),@:)
+ 
+ ###
+ # why - tell why a target got built
+@@ -275,7 +275,7 @@ why =                                                                        \
      $(if $(filter $@, $(PHONY)),- due to target is PHONY,                    \
          $(if $(wildcard $@),                                                 \
--            $(if $(strip $(any-prereq)),- due to: $(any-prereq),             \
-+            $(if $(any-prereq),- due to: $(any-prereq),                      \
-                 $(if $(cmd-check),                                           \
+             $(if $(strip $(any-prereq)),- due to: $(any-prereq),             \
+-                $(if $(arg-check),                                           \
++                $(if $(cmd-check),                                           \
                      $(if $(cmd_$@),- due to command line change,             \
                          $(if $(filter $@, $(targets)),                       \
+                             - due to missing .cmd file,                      \
 -- 
 2.17.1
