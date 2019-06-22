@@ -1,76 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:44203 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbfFVNGk (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:55073 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726276AbfFVQHM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jun 2019 09:06:40 -0400
-Date: Sat, 22 Jun 2019 15:06:36 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: compile-test global headers to ensure they are
- self-contained
-Message-ID: <20190622130635.GA24262@ravnborg.org>
-References: <20190621163931.19397-1-yamada.masahiro@socionext.com>
- <20190621175134.GB16409@ravnborg.org>
- <CAK7LNATz1iuG0Moab60gMSbVU8PJAmrLn27K8HK_1zQ0qeh26w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATz1iuG0Moab60gMSbVU8PJAmrLn27K8HK_1zQ0qeh26w@mail.gmail.com>
+        Sat, 22 Jun 2019 12:07:12 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 2/3] kbuild: save $(strip ...) for calling any-prepreq
+Date: Sun, 23 Jun 2019 01:07:04 +0900
+Message-Id: <20190622160705.17071-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190622160705.17071-1-yamada.masahiro@socionext.com>
+References: <20190622160705.17071-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Hi Masahiro
+The string returned by $(filter-out ...) does not contain any leading
+or trailing spaces.
 
-> At first, I tried to split Makefile per directory,
-> and add header-test-y one by one.
-> 
-> I think you expect they look like this:
-> 
-> 
-> include/Makefile:
-> 
-> subdir-y += drm
-> subdir-y += linux
-> subdir-y += media
+So, only the space that matters is the one between
 
-So far we agree.
+  $(filter-out $(PHONY),$?)
 
-> include/drm/Makefile:
-> 
-> header-test-y += drm_cache.h
-> header-test-y += drm_file.h
-> header-test-y += drm_util.h
-> ...
-On this level it would be better to do:
-header-test-y += $(call find_all_header_files)
+and
 
-# drm files that are not self-contained
-header-test-n += drm_legacy.h
+  $(filter-out $(PHONY) $(wildcard $^),$^)
 
-Likewise for all subdirs below include/
-and include/linux should maybe be split up a little too.
-Maybe include/uapi/ would need to be slipt a little.
+By removing it from the code, we can save $(strip ...) evaluation.
+This refactoring is possible because $(any-prereq) is only passed to
+the first argument of $(if ...), so we are only interested in whether
+it is empty or not.
 
-Then we have a manageable number of Makefiles.
-New header files are automatically checked and
-we have a list of files to fix.
-If for example drm/ have too much failures to a start
-then we can add that directory to the higler level Makefile later.
+This is also the prerequisite for the next commit.
 
-The above is more or less what you already started,
-but the difference is that we have it pushed down one or two
-directories.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-The header-test-n logic could be moved to the generic part,
-and a helper could be made to find all header files.
-Then the Makefiles would be more or less trival, with all the
-Kbuild magic hidden away.
+ scripts/Kbuild.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> In my analysis, 70% of headers are already conf-contained.
-> After some fixups, 95% of headers can become self-contained.
-
-Sounds good. And we do not want 100%, but close...
-
-	Sam
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 4bec04c89750..0fa93f6de0b0 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -231,7 +231,7 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
+ 
+ # Find any prerequisites that is newer than target or that does not exist.
+ # PHONY targets skipped in both cases.
+-any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
++any-prereq = $(filter-out $(PHONY),$?)$(filter-out $(PHONY) $(wildcard $^),$^)
+ 
+ # Execute command if command has changed or prerequisite(s) are updated.
+ if_changed = $(if $(strip $(any-prereq) $(cmd-check)),                       \
+@@ -274,7 +274,7 @@ ifeq ($(KBUILD_VERBOSE),2)
+ why =                                                                        \
+     $(if $(filter $@, $(PHONY)),- due to target is PHONY,                    \
+         $(if $(wildcard $@),                                                 \
+-            $(if $(strip $(any-prereq)),- due to: $(any-prereq),             \
++            $(if $(any-prereq),- due to: $(any-prereq),                      \
+                 $(if $(cmd-check),                                           \
+                     $(if $(cmd_$@),- due to command line change,             \
+                         $(if $(filter $@, $(targets)),                       \
+-- 
+2.17.1
