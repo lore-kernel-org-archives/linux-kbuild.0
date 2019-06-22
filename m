@@ -1,69 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:55074 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726296AbfFVQHN (ORCPT
+Received: from sonic301-3.consmr.mail.bf2.yahoo.com ([74.6.129.42]:38272 "EHLO
+        sonic301-3.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726383AbfFVQ2u (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jun 2019 12:07:13 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 3/3] kbuild: save $(strip ...) for calling if_changed and friends
-Date: Sun, 23 Jun 2019 01:07:05 +0900
-Message-Id: <20190622160705.17071-3-yamada.masahiro@socionext.com>
-In-Reply-To: <20190622160705.17071-1-yamada.masahiro@socionext.com>
-References: <20190622160705.17071-1-yamada.masahiro@socionext.com>
+        Sat, 22 Jun 2019 12:28:50 -0400
+Date: Sat, 22 Jun 2019 16:28:46 +0000 (UTC)
+From: "Miss.Fatima Yusuf" <fatimayusuf5@outlook.fr>
+Reply-To: miss.fmayusuf11@gmail.com
+Message-ID: <270302503.296556.1561220926635@mail.yahoo.com>
+Subject: From:Miss: Fatima Yusuf.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The string returned by $(filter-out ...) does not contain any leading
-or trailing spaces.
 
-With the previous commit, 'any-prereq' no longer contains any
-excessive spaces.
 
-Nor does 'cmd-check' since it expands to a $(filter-out ...) call.
+From:Miss: Fatima Yusuf.
 
-So, only the space that matters is the one between 'any-prereq'
-and 'cmd-check'.
+For sure this mail would definitely come to you as a surprise, but do take your good time to go through it, My name is Ms. Fatima Yusuf,i am from Ivory Coast.
 
-By removing it from the code, we can save $(strip ...) evaluation.
-This refactoring is possible because $(any-prereq)$(cmd-check) is only
-passed to the first argument of $(if ...), so we are only interested
-in whether it is empty or not.
+I lost my parents a year and couple of months ago. My father was a serving director of the Agro-exporting board until his death. He was assassinated by his business partners.Before his death, he made a deposit of US$9.7 Million Dollars here in Cote d'ivoire which was for the purchase of cocoa processing machine and development of another factory before his untimely death.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Being that this part of the world experiences political and crises time without number, there is no guarantee of lives and properties. I cannot invest this money here any long, despite the fact it had been my late father's industrial plans.
 
- scripts/Kbuild.include | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I want you to do me a favor to receive this funds into your country or any safer place as the beneficiary, I have plans to invest this money in continuation with the investment vision of my late father, but not in this place again rather in your country. I have the vision of going into real estate and industrial production or any profitable business venture.
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 0fa93f6de0b0..0e57a9524003 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -234,12 +234,12 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
- any-prereq = $(filter-out $(PHONY),$?)$(filter-out $(PHONY) $(wildcard $^),$^)
- 
- # Execute command if command has changed or prerequisite(s) are updated.
--if_changed = $(if $(strip $(any-prereq) $(cmd-check)),                       \
-+if_changed = $(if $(any-prereq)$(cmd-check),                                 \
- 	$(cmd);                                                              \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
- # Execute the command and also postprocess generated .d dependencies file.
--if_changed_dep = $(if $(strip $(any-prereq) $(cmd-check)),$(cmd_and_fixdep),@:)
-+if_changed_dep = $(if $(any-prereq)$(cmd-check),$(cmd_and_fixdep),@:)
- 
- cmd_and_fixdep =                                                             \
- 	$(cmd);                                                              \
-@@ -249,7 +249,7 @@ cmd_and_fixdep =                                                             \
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
- # and if so will execute $(rule_foo).
--if_changed_rule = $(if $(strip $(any-prereq) $(cmd-check)),$(rule_$(1)),@:)
-+if_changed_rule = $(if $(any-prereq)$(cmd-check),$(rule_$(1)),@:)
- 
- ###
- # why - tell why a target got built
--- 
-2.17.1
+I will be ready to compensate you with 20% of the total Amount, now all my hope is banked on you and i really wants to invest this money in your country, where there is stability of Government, political and economic welfare.
+
+My greatest worry now is how to move out of this country because my uncle is threatening to kill me as he killed my father,Please do not let anybody hear about this, it is between me and you alone because of my security reason.
+
+I am waiting to hear from you.
+Yours Sincerely,
+Miss.Fatima Yusuf.
