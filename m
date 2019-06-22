@@ -1,88 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:25247 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726187AbfFVHv1 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:30710 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726112AbfFVMbR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jun 2019 03:51:27 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: fix a warning in double cleaning of separate build directory
-Date: Sat, 22 Jun 2019 16:51:00 +0900
-Message-Id: <20190622075100.17990-1-yamada.masahiro@socionext.com>
+        Sat, 22 Jun 2019 08:31:17 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190621163931.19397-1-yamada.masahiro@socionext.com> <20190621175134.GB16409@ravnborg.org>
+In-Reply-To: <20190621175134.GB16409@ravnborg.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 22 Jun 2019 21:30:24 +0900
+Message-ID: <CAK7LNATz1iuG0Moab60gMSbVU8PJAmrLn27K8HK_1zQ0qeh26w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: compile-test global headers to ensure they are self-contained
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-Since commit b91976b7c0e3 ("kbuild: compile-test UAPI headers to ensure
-they are self-contained"), 'make clean' in a row for the separate output
-directory emits a warning.
+Hi Sam,
 
-$ make -s O=foo allmodconfig; cd foo; make usr/; make clean; make clean
-  [ snip ]
-  CLEAN   .
-  CLEAN   usr/include/asm usr/include/asm-generic usr/include/drm usr/include/linux usr/include/misc usr/include/mtd usr/include/rdma usr/include/scsi usr/include/sound usr/include/video usr/include/xen
-  CLEAN   usr
-  CLEAN   arch/x86/tools
-  CLEAN   .tmp_versions
-find: ‘*’: No such file or directory
-find: ‘*’: No such file or directory
+On Sat, Jun 22, 2019 at 2:51 AM Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> Hi Masahiro.
+>
+> On Sat, Jun 22, 2019 at 01:39:31AM +0900, Masahiro Yamada wrote:
+> > Make as many headers self-contained as possible so that they can be
+> > included without relying on a specific include order.
+> It is very nice finally to get some infrastructure to validate header
+> files.
+>
+> But to avoid too many conflicts while including more and more headers
+> that are selfcontained we really need something that is more
+> distributed.
+> So for example all header files in include/drm/* could be in one
+> Makefile, incl. sub-directories, but the same Makefile would not include
+> the files in include/soc/
+>
+> If you just show how ot do it, others can follow-up with the
+> relevant directories.
 
-In the second 'make clean', $(objtree)/usr/include exists, but it
-contains nothing, then the 'find' command warns 'No such file or
-directory'.
 
-I replaced the nasty 'find' with $(wildcard ...).
+At first, I tried to split Makefile per directory,
+and add header-test-y one by one.
 
-[Note]
-I wish I could write the code more simply, like this:
+I think you expect they look like this:
 
-clean-dirs = $(patsubst $(obj)/%/,%,$(wildcard $(obj)/*/))
 
-I did not do that due to the bug of GNU Make <= 4.2.1
+include/Makefile:
 
-$(wildcard $(obj)/*/) should match to only directories since it has
-a trailing slash, but actually matches to regular files too.
+subdir-y += drm
+subdir-y += linux
+subdir-y += media
 
-This bug was fixed by:
 
-| commit b7acb10e86dc8f5fdf2a2bbd87e1059c315e31d6
-| Author: spagoveanu@gmail.com <spagoveanu@gmail.com>
-| Date:   Wed Jun 20 02:03:48 2018 +0300
-|
-|    * src/dir.c: Preserve glob d_type field
+include/drm/Makefile:
 
-For GNU Make <= 4.2.1, clean-dirs would end up with containing
-'usr/include/Makefile'. This would be harmless because Makefile.clean
-would search for the non-existing 'usr/include/usr/include/Makefile',
-then it would be filtered out by $(wildcard ...).
+header-test-y += drm_cache.h
+header-test-y += drm_file.h
+header-test-y += drm_util.h
+...
 
-However, I'd rather try my best to avoid buggy code.
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: b91976b7c0e3 ("kbuild: compile-test UAPI headers to ensure they are self-contained")
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+include/linux/Makefile:
 
- usr/include/Makefile | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+header-test-y += io.h
+header-test-y += list.h
+header-test-y += kernel.h
+header-test-y += types.h
+...
 
-diff --git a/usr/include/Makefile b/usr/include/Makefile
-index 7091e8b5a608..343abba96205 100644
---- a/usr/include/Makefile
-+++ b/usr/include/Makefile
-@@ -128,5 +128,8 @@ endif
- # Use '=' instead of ':=' to avoid $(shell ...) evaluation when cleaning
- header-test-y = $(filter-out $(no-header-test), $(all-uapi-headers))
- 
--# Use '=' instead of ':=' to avoid $(shell ...) evaluation when building
--clean-dirs = $(shell cd $(obj) 2>/dev/null && find * -maxdepth 0 -type d)
-+# Use '=' instead of ':=' to avoid $(wildcard ...) evaluation when building
-+#
-+# For GNU Make 4.2.1, $(wildcard $(obj)/*/) matches to not only directories
-+# but also regular files. Use $(filter %/, ...) just in case.
-+clean-dirs = $(patsubst $(obj)/%/,%,$(filter %/, $(wildcard $(obj)/*/)))
+
+
+This is a straightforward way,
+but I see some disadvantages.
+
+Currently, there are more than 4000 headers
+under include/.
+
+So, to cover (almost) all of them, we must
+list out 4000 entries.
+
+When somebody adds a new header,
+he will be very likely to forget to add
+header-test-y for it.
+So, newly added headers will always
+fall off the coverage.
+
+
+So, I am trying to take an opposite approach.
+
+Add all headers in include/ by wildcard, then
+filter-out one that cannot be self-contained.
+
+In my analysis, 70% of headers are already conf-contained.
+After some fixups, 95% of headers can become self-contained.
+
+At this moment, the wildcard only covers some directories
+or patterns, but my plan is to extend the wildcard gradually.
+
+
+Please feel free to suggest alternative ideas.
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
