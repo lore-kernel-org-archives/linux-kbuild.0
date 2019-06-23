@@ -1,36 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sonic301-3.consmr.mail.bf2.yahoo.com ([74.6.129.42]:38272 "EHLO
-        sonic301-3.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726383AbfFVQ2u (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:23057 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbfFWQNi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Jun 2019 12:28:50 -0400
-Date: Sat, 22 Jun 2019 16:28:46 +0000 (UTC)
-From: "Miss.Fatima Yusuf" <fatimayusuf5@outlook.fr>
-Reply-To: miss.fmayusuf11@gmail.com
-Message-ID: <270302503.296556.1561220926635@mail.yahoo.com>
-Subject: From:Miss: Fatima Yusuf.
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Sun, 23 Jun 2019 12:13:38 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kbuild: split modules.order build rule out of 'modules' target
+Date: Mon, 24 Jun 2019 01:13:28 +0900
+Message-Id: <20190623161328.22461-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190623161328.22461-1-yamada.masahiro@socionext.com>
+References: <20190623161328.22461-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+Merge the build rules of modules.order and modules.builtin
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-From:Miss: Fatima Yusuf.
+ Makefile | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-For sure this mail would definitely come to you as a surprise, but do take your good time to go through it, My name is Ms. Fatima Yusuf,i am from Ivory Coast.
-
-I lost my parents a year and couple of months ago. My father was a serving director of the Agro-exporting board until his death. He was assassinated by his business partners.Before his death, he made a deposit of US$9.7 Million Dollars here in Cote d'ivoire which was for the purchase of cocoa processing machine and development of another factory before his untimely death.
-
-Being that this part of the world experiences political and crises time without number, there is no guarantee of lives and properties. I cannot invest this money here any long, despite the fact it had been my late father's industrial plans.
-
-I want you to do me a favor to receive this funds into your country or any safer place as the beneficiary, I have plans to invest this money in continuation with the investment vision of my late father, but not in this place again rather in your country. I have the vision of going into real estate and industrial production or any profitable business venture.
-
-I will be ready to compensate you with 20% of the total Amount, now all my hope is banked on you and i really wants to invest this money in your country, where there is stability of Government, political and economic welfare.
-
-My greatest worry now is how to move out of this country because my uncle is threatening to kill me as he killed my father,Please do not let anybody hear about this, it is between me and you alone because of my security reason.
-
-I am waiting to hear from you.
-Yours Sincerely,
-Miss.Fatima Yusuf.
+diff --git a/Makefile b/Makefile
+index 19c33bc69bb1..6bfe22b852f2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1283,16 +1283,18 @@ all: modules
+ # using awk while concatenating to the final file.
+ 
+ PHONY += modules
+-modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
+-	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
++modules: $(if $(KBUILD_BUILTIN),vmlinux) modules.order modules.builtin
+ 	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh
+ 
+-modbuiltin-dirs := $(addprefix _modbuiltin_, $(vmlinux-dirs))
++modules.order modules.builtin:
++	$(Q)$(AWK) '!x[$$0]++' $(addsuffix /$@, $(vmlinux-dirs)) > $@
++
++modules.order: $(vmlinux-dirs)
+ 
++modbuiltin-dirs := $(addprefix _modbuiltin_, $(vmlinux-dirs))
+ modules.builtin: $(modbuiltin-dirs)
+-	$(Q)$(AWK) '!x[$$0]++' $(addsuffix /$@, $(vmlinux-dirs)) > $@
+ 
+ PHONY += $(modbuiltin-dirs)
+ # tristate.conf is not included from this Makefile. Add it as a prerequisite
+-- 
+2.17.1
