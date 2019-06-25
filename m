@@ -1,55 +1,188 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:59505 "EHLO
-        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726495AbfFYGL0 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:49502 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726495AbfFYGPe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Jun 2019 02:11:26 -0400
-Date: Tue, 25 Jun 2019 08:11:20 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: compile-test global headers to ensure they are
- self-contained
-Message-ID: <20190625061120.GA7561@ravnborg.org>
-References: <20190621163931.19397-1-yamada.masahiro@socionext.com>
- <20190621175134.GB16409@ravnborg.org>
- <CAK7LNATz1iuG0Moab60gMSbVU8PJAmrLn27K8HK_1zQ0qeh26w@mail.gmail.com>
- <20190622130635.GA24262@ravnborg.org>
- <20190624214027.GA14740@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190624214027.GA14740@ravnborg.org>
+        Tue, 25 Jun 2019 02:15:34 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] fixdep: check return code of printf() and putchar()
+Date: Tue, 25 Jun 2019 15:15:05 +0900
+Message-Id: <20190625061505.30107-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-> 
-> When all header files below include/drm are self-contained it will be a
-> single line:
-> 
->     header-test-y += $(all_headers_with_subdir)
-In reality it will likely be the above, and then a list of 
+When there is not enough space on your storage device, the build will
+fail with 'No space left on device' error message.
 
-header-test-n += foo.h
+The reason is obvious from the message, so you will free up some disk
+space, then you will resume the build.
 
-For the header files that we for one or the other reason do not want to
-make self-contained.
-It would be nice to have the list of ignored files close to their home
-and not a full list in one Makefile in include/
+However, sometimes you may still see a mysterious error message:
 
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 3e630fcaffd1..e2f765e9d1e1 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -67,6 +67,7 @@ extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
->  endif
->  
->  # Test self-contained headers
-> +header-test-y := $(filter-out $(header-test-n), $(header-test-y))
-This part should include the logic to filter out duplicates too.
-I think we may do something wrong if the same header is listed twice.
+  unterminated call to function 'wildcard': missing ')'.
 
-We could also extend this with a check that all files in header-test-n
-exits.
+If you run out of the disk space, fixdep may end up with generating
+incomplete .*.cmd files.
 
-	Sam
+For example, if the disk shortage occurs while fixdep is running
+print_dep(), the .*.cmd might be truncated like this:
+
+   $(wildcard include/config/
+
+When you run 'make' next time, this broken .*.cmd will be included,
+then GNU Make will terminate parsing since it is a wrong syntax.
+
+Once this happens, you need to run 'make clean' or delete the broken
+.*.cmd file manually.
+
+Even if you do not see any error message, the .*.cmd files after any
+error could be potentially incomplete, and unreliable. You may miss
+the re-compilation due to missing header dependency.
+
+If printf() cannot output the string for disk shortage or whatever
+reason, it returns a negative return code, but currently fixdep does
+not check it at all. Consequently, fixdep *successfully* generates a
+broken .*.cmd file. Make never notices that since fixdep exits with 0,
+which means success.
+
+Given the intended usage of fixdep, it must respect the return code of
+not only malloc(), but also printf() and putchar().
+
+This seems a long-standing issue since the introduction of fixdep.
+
+In old days, Kbuild tried to provide an extra safety by letting fixdep
+output to a temporary file and renaming it after everything is done:
+
+  scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+  rm -f $(depfile);                                                    \
+  mv -f $(dot-target).tmp $(dot-target).cmd)
+
+It did not avoid the current issue; fixdep created a truncated tmp file
+reporting success, so the broken tmp would be renamed to a .*.cmd file.
+
+By propagating the error code to the build system, this problem should
+be solved because:
+
+[1] Since commit 9c2af1c7377a ("kbuild: add .DELETE_ON_ERROR special
+    target"), Make will delete the target automatically on any failure
+    in the recipe.
+
+[2] Since commit 392885ee82d3 ("kbuild: let fixdep directly write to
+    .*.cmd files"), .*.cmd file is included only when the corresponding
+    target already exists.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/basic/fixdep.c | 47 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 10 deletions(-)
+
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index facbd603adf6..fea1d58bda68 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -99,6 +99,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <string.h>
++#include <stdarg.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <ctype.h>
+@@ -109,6 +110,32 @@ static void usage(void)
+ 	exit(1);
+ }
+ 
++/*
++ * In the intended usage of this program, the stdout is redirected to .*.cmd
++ * The return code of printf() and putchar() must be checked to catch any error
++ * like "No space left on device".
++ */
++static void xprintf(const char *format, ...)
++{
++	va_list ap;
++	int ret;
++
++	va_start(ap, format);
++	ret = vprintf(format, ap);
++	if (ret < 0)
++		exit(1);
++	va_end(ap);
++}
++
++static void xputchar(int c)
++{
++	int ret;
++
++	ret = putchar(c);
++	if (ret == EOF)
++		exit(1);
++}
++
+ /*
+  * Print out a dependency path from a symbol name
+  */
+@@ -116,7 +143,7 @@ static void print_dep(const char *m, int slen, const char *dir)
+ {
+ 	int c, prev_c = '/', i;
+ 
+-	printf("    $(wildcard %s/", dir);
++	xprintf("    $(wildcard %s/", dir);
+ 	for (i = 0; i < slen; i++) {
+ 		c = m[i];
+ 		if (c == '_')
+@@ -124,10 +151,10 @@ static void print_dep(const char *m, int slen, const char *dir)
+ 		else
+ 			c = tolower(c);
+ 		if (c != '/' || prev_c != '/')
+-			putchar(c);
++			xputchar(c);
+ 		prev_c = c;
+ 	}
+-	printf(".h) \\\n");
++	xprintf(".h) \\\n");
+ }
+ 
+ struct item {
+@@ -324,13 +351,13 @@ static void parse_dep_file(char *m, const char *target)
+ 				 */
+ 				if (!saw_any_target) {
+ 					saw_any_target = 1;
+-					printf("source_%s := %s\n\n",
+-					       target, m);
+-					printf("deps_%s := \\\n", target);
++					xprintf("source_%s := %s\n\n",
++						target, m);
++					xprintf("deps_%s := \\\n", target);
+ 				}
+ 				is_first_dep = 0;
+ 			} else {
+-				printf("  %s \\\n", m);
++				xprintf("  %s \\\n", m);
+ 			}
+ 
+ 			buf = read_file(m);
+@@ -353,8 +380,8 @@ static void parse_dep_file(char *m, const char *target)
+ 		exit(1);
+ 	}
+ 
+-	printf("\n%s: $(deps_%s)\n\n", target, target);
+-	printf("$(deps_%s):\n", target);
++	xprintf("\n%s: $(deps_%s)\n\n", target, target);
++	xprintf("$(deps_%s):\n", target);
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -369,7 +396,7 @@ int main(int argc, char *argv[])
+ 	target = argv[2];
+ 	cmdline = argv[3];
+ 
+-	printf("cmd_%s := %s\n\n", target, cmdline);
++	xprintf("cmd_%s := %s\n\n", target, cmdline);
+ 
+ 	buf = read_file(depfile);
+ 	parse_dep_file(buf, target);
+-- 
+2.17.1
