@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:49502 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726495AbfFYGPe (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:38726 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726551AbfFYGyz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Jun 2019 02:15:34 -0400
+        Tue, 25 Jun 2019 02:54:55 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] fixdep: check return code of printf() and putchar()
-Date: Tue, 25 Jun 2019 15:15:05 +0900
-Message-Id: <20190625061505.30107-1-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] fixdep: check return value of printf() and putchar()
+Date: Tue, 25 Jun 2019 15:54:19 +0900
+Message-Id: <20190625065419.26324-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -42,13 +42,13 @@ error could be potentially incomplete, and unreliable. You may miss
 the re-compilation due to missing header dependency.
 
 If printf() cannot output the string for disk shortage or whatever
-reason, it returns a negative return code, but currently fixdep does
-not check it at all. Consequently, fixdep *successfully* generates a
+reason, it returns a negative value, but currently fixdep does not
+check it at all. Consequently, fixdep *successfully* generates a
 broken .*.cmd file. Make never notices that since fixdep exits with 0,
 which means success.
 
-Given the intended usage of fixdep, it must respect the return code of
-not only malloc(), but also printf() and putchar().
+Given the intended usage of fixdep, it must respect the return value
+of not only malloc(), but also printf() and putchar().
 
 This seems a long-standing issue since the introduction of fixdep.
 
@@ -76,11 +76,14 @@ be solved because:
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/basic/fixdep.c | 47 +++++++++++++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+Changes in v2:
+ - Add prror()
+
+ scripts/basic/fixdep.c | 51 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 41 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index facbd603adf6..fea1d58bda68 100644
+index facbd603adf6..4ac973f2dc8c 100644
 --- a/scripts/basic/fixdep.c
 +++ b/scripts/basic/fixdep.c
 @@ -99,6 +99,7 @@
@@ -91,14 +94,14 @@ index facbd603adf6..fea1d58bda68 100644
  #include <stdlib.h>
  #include <stdio.h>
  #include <ctype.h>
-@@ -109,6 +110,32 @@ static void usage(void)
+@@ -109,6 +110,36 @@ static void usage(void)
  	exit(1);
  }
  
 +/*
 + * In the intended usage of this program, the stdout is redirected to .*.cmd
-+ * The return code of printf() and putchar() must be checked to catch any error
-+ * like "No space left on device".
++ * The return value of printf() and putchar() must be checked to catch any
++ * error like "No space left on device".
 + */
 +static void xprintf(const char *format, ...)
 +{
@@ -107,8 +110,10 @@ index facbd603adf6..fea1d58bda68 100644
 +
 +	va_start(ap, format);
 +	ret = vprintf(format, ap);
-+	if (ret < 0)
++	if (ret < 0) {
++		perror("fixdep");
 +		exit(1);
++	}
 +	va_end(ap);
 +}
 +
@@ -117,14 +122,16 @@ index facbd603adf6..fea1d58bda68 100644
 +	int ret;
 +
 +	ret = putchar(c);
-+	if (ret == EOF)
++	if (ret == EOF) {
++		perror("fixdep");
 +		exit(1);
++	}
 +}
 +
  /*
   * Print out a dependency path from a symbol name
   */
-@@ -116,7 +143,7 @@ static void print_dep(const char *m, int slen, const char *dir)
+@@ -116,7 +147,7 @@ static void print_dep(const char *m, int slen, const char *dir)
  {
  	int c, prev_c = '/', i;
  
@@ -133,7 +140,7 @@ index facbd603adf6..fea1d58bda68 100644
  	for (i = 0; i < slen; i++) {
  		c = m[i];
  		if (c == '_')
-@@ -124,10 +151,10 @@ static void print_dep(const char *m, int slen, const char *dir)
+@@ -124,10 +155,10 @@ static void print_dep(const char *m, int slen, const char *dir)
  		else
  			c = tolower(c);
  		if (c != '/' || prev_c != '/')
@@ -146,7 +153,7 @@ index facbd603adf6..fea1d58bda68 100644
  }
  
  struct item {
-@@ -324,13 +351,13 @@ static void parse_dep_file(char *m, const char *target)
+@@ -324,13 +355,13 @@ static void parse_dep_file(char *m, const char *target)
  				 */
  				if (!saw_any_target) {
  					saw_any_target = 1;
@@ -164,7 +171,7 @@ index facbd603adf6..fea1d58bda68 100644
  			}
  
  			buf = read_file(m);
-@@ -353,8 +380,8 @@ static void parse_dep_file(char *m, const char *target)
+@@ -353,8 +384,8 @@ static void parse_dep_file(char *m, const char *target)
  		exit(1);
  	}
  
@@ -175,7 +182,7 @@ index facbd603adf6..fea1d58bda68 100644
  }
  
  int main(int argc, char *argv[])
-@@ -369,7 +396,7 @@ int main(int argc, char *argv[])
+@@ -369,7 +400,7 @@ int main(int argc, char *argv[])
  	target = argv[2];
  	cmdline = argv[3];
  
