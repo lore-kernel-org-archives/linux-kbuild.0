@@ -1,52 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0038.hostedemail.com ([216.40.44.38]:36730 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728506AbfFYQ5o (ORCPT
+Received: from gateway24.websitewelcome.com ([192.185.50.45]:28223 "EHLO
+        gateway24.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726663AbfFYR2s (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Jun 2019 12:57:44 -0400
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave04.hostedemail.com (Postfix) with ESMTP id 185CE18020B0B
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2019 16:52:28 +0000 (UTC)
-Message-ID: <2bdbbd7909c5c4ad96d32c0c5be4690292132a34.camel@perches.com>
-Subject: Re: [PATCH] video: fbdev: s3c-fb: Mark expected switch fall-throughs
-From: Joe Perches <joe@perches.com>
-Date: Tue, 25 Jun 2019 09:52:23 -0700
-In-Reply-To: <20190625160103.GA13133@embeddedor>
+        Tue, 25 Jun 2019 13:28:48 -0400
+Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
+        by gateway24.websitewelcome.com (Postfix) with ESMTP id 872B51564C3
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2019 12:06:18 -0500 (CDT)
 References: <20190625160103.GA13133@embeddedor>
-Content-Type: text/plain; charset="ISO-8859-1"
+ <2bdbbd7909c5c4ad96d32c0c5be4690292132a34.camel@perches.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: Re: [PATCH] video: fbdev: s3c-fb: Mark expected switch fall-throughs
+Message-ID: <3e40f8c1-9699-2723-4e70-9e91ff256257@embeddedor.com>
+Date: Tue, 25 Jun 2019 12:06:17 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <2bdbbd7909c5c4ad96d32c0c5be4690292132a34.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Jingoo Han <jingoohan1@gmail.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Joe Perches <joe@perches.com>, Jingoo Han <jingoohan1@gmail.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 Cc: linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, 2019-06-25 at 11:01 -0500, Gustavo A. R. Silva wrote:
-> In preparation to enabling -Wimplicit-fallthrough, mark switch
-> cases where we are expecting to fall through.
-[]
-> This patch is part of the ongoing efforts to enable
-> -Wimplicit-fallthrough.
 
-Just enable the thing already.
 
-If you stopped trying to do it all yourself, others
-will help resolve any new build warnings.
+On 6/25/19 11:52 AM, Joe Perches wrote:
+> On Tue, 2019-06-25 at 11:01 -0500, Gustavo A. R. Silva wrote:
+>> In preparation to enabling -Wimplicit-fallthrough, mark switch
+>> cases where we are expecting to fall through.
+> []
+>> This patch is part of the ongoing efforts to enable
+>> -Wimplicit-fallthrough.
+> 
+> Just enable the thing already.
+> 
+> If you stopped trying to do it all yourself, others
 
-For instance: a build of -next x86/64 defconfig has 2.  nbd.
----
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+What are you talking about?
 
-diff --git a/Makefile b/Makefile
-index 5102b2bbd224..df909ffdfcdb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -690,6 +690,7 @@ endif # may-sync-config
- endif # $(dot-config)
- 
- KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
-+KBUILD_CFLAGS	+= $(call cc-option, -Wimplicit-fallthrough)
- KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
- KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
- KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
+Anyone can enable it, I'm adding this to every commit:
+
+Warning level 3 was used: -Wimplicit-fallthrough=3
+
+And I'll send a PR with a proper patch for the Makefile
+during the next merge window.
+
+If had the power I would have enabled this option since day 1,
+so every developer can take care of their own code.
+
+Lately, you are not being of much help, Joe.
+
+--
+Gustavo
