@@ -1,50 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32906 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726707AbfFYNYa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Jun 2019 09:24:30 -0400
-Subject: Re: [PATCH v4 00/10] klp-convert livepatch build tooling
-References: <20190509143859.9050-1-joe.lawrence@redhat.com>
- <alpine.LSU.2.21.1906131451560.22698@pobox.suse.cz>
- <b1a627a4-3702-9689-6c03-0c2123c06a2d@redhat.com>
- <c9021573-11c6-b576-0aa6-97754c98a06e@redhat.com>
- <20190614083435.uq3mk6mprbatysol@pathway.suse.cz>
- <alpine.LSU.2.21.1906251324450.12085@pobox.suse.cz>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <76da6ab0-5540-d9ff-c5ea-6dc31a39c744@redhat.com>
-Date: Tue, 25 Jun 2019 09:24:20 -0400
+Received: from smtprelay0038.hostedemail.com ([216.40.44.38]:36730 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728506AbfFYQ5o (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 25 Jun 2019 12:57:44 -0400
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave04.hostedemail.com (Postfix) with ESMTP id 185CE18020B0B
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2019 16:52:28 +0000 (UTC)
+Message-ID: <2bdbbd7909c5c4ad96d32c0c5be4690292132a34.camel@perches.com>
+Subject: Re: [PATCH] video: fbdev: s3c-fb: Mark expected switch fall-throughs
+From: Joe Perches <joe@perches.com>
+Date: Tue, 25 Jun 2019 09:52:23 -0700
+In-Reply-To: <20190625160103.GA13133@embeddedor>
+References: <20190625160103.GA13133@embeddedor>
+Content-Type: text/plain; charset="ISO-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.21.1906251324450.12085@pobox.suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>
-Cc: linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Jingoo Han <jingoohan1@gmail.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Cc: linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 6/25/19 7:36 AM, Miroslav Benes wrote:
-> 
- > [ ... snip ... ]
- >
-> So I made a couple of experiments and found that GCC is somehow involved.
-> If klp-convert (from scripts/livepatch/) is compiled with our GCC 4.8.5
-> from SLE12, the output is incorrect. If I compile it with GCC 7.4.0 from
-> openSUSE Leap 15.1, the output is correct.
-> 
-> If I revert commit d59cadc0a8f8 ("[squash] klp-convert: make
-> convert_rela() list-safe") (from Joe's expanded github tree), the problem
-> disappears.
-> 
-> I haven't spotted any problem in the code and I cannot explain a
-> dependency on GCC version. Any ideas?
-> 
+On Tue, 2019-06-25 at 11:01 -0500, Gustavo A. R. Silva wrote:
+> In preparation to enabling -Wimplicit-fallthrough, mark switch
+> cases where we are expecting to fall through.
+[]
+> This patch is part of the ongoing efforts to enable
+> -Wimplicit-fallthrough.
 
-Thanks for revisiting and debugging this.  Narrowing it down to my "fix" 
-to convert_rela() should be helpful.
+Just enable the thing already.
 
-In my case, I was probably testing with RHEL-8, which has gcc 8.2 vs 
-RHEL-7 which has gcc 4.8.  I'll have to make sure to try with a few 
-different versions for the next round.
+If you stopped trying to do it all yourself, others
+will help resolve any new build warnings.
 
--- Joe
+For instance: a build of -next x86/64 defconfig has 2.  nbd.
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 5102b2bbd224..df909ffdfcdb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -690,6 +690,7 @@ endif # may-sync-config
+ endif # $(dot-config)
+ 
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
++KBUILD_CFLAGS	+= $(call cc-option, -Wimplicit-fallthrough)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
