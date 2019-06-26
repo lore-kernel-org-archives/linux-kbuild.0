@@ -1,39 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46502 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726239AbfFZIDI (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Jun 2019 04:03:08 -0400
-Received: by mail-pf1-f193.google.com with SMTP id 81so904062pfy.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 26 Jun 2019 01:03:07 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:58260 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726131AbfFZK1O (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 26 Jun 2019 06:27:14 -0400
+Date: Wed, 26 Jun 2019 12:27:11 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v4 00/10] klp-convert livepatch build tooling
+In-Reply-To: <20190625190836.GL20356@redhat.com>
+Message-ID: <alpine.LSU.2.21.1906261222510.22069@pobox.suse.cz>
+References: <20190509143859.9050-1-joe.lawrence@redhat.com> <alpine.LSU.2.21.1906131451560.22698@pobox.suse.cz> <b1a627a4-3702-9689-6c03-0c2123c06a2d@redhat.com> <c9021573-11c6-b576-0aa6-97754c98a06e@redhat.com> <20190614083435.uq3mk6mprbatysol@pathway.suse.cz>
+ <alpine.LSU.2.21.1906251324450.12085@pobox.suse.cz> <20190625190836.GL20356@redhat.com>
 MIME-Version: 1.0
-References: <20190617082613.109131-1-brendanhiggins@google.com>
- <20190617082613.109131-14-brendanhiggins@google.com> <20190626000150.GT19023@42.do-not-panic.com>
-In-Reply-To: <20190626000150.GT19023@42.do-not-panic.com>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Wed, 26 Jun 2019 01:02:55 -0700
-Message-ID: <CAFd5g44kkepB2hZcpYL-NB5ZHYE5tP7W-0yducGCX7Khd9gd9w@mail.gmail.com>
-Subject: Re: [PATCH v5 13/18] kunit: tool: add Python wrappers for running
- KUnit tests
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, Felix Guo <felixguoxiuping@gmail.com>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Petr Mladek <pmladek@suse.com>, linux-kernel@vger.kernel.org, live-patching@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Jun 25, 2019 at 5:01 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> On Mon, Jun 17, 2019 at 01:26:08AM -0700, Brendan Higgins wrote:
-> >  create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-all_passed.log
-> >  create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-crash.log
-> >  create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-failure.log
-> >  create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-no_tests_run.log
-> >  create mode 100644 tools/testing/kunit/test_data/test_output_isolated_correctly.log
-> >  create mode 100644 tools/testing/kunit/test_data/test_read_from_file.kconfig
->
-> Why are these being added upstream? The commit log does not explain
-> this.
+On Tue, 25 Jun 2019, Joe Lawrence wrote:
 
-Oh sorry, those are for testing purposes. I thought that was clear
-from being in the test_data directory. I will reference it in the
-commit log in the next revision.
+> On Tue, Jun 25, 2019 at 01:36:37PM +0200, Miroslav Benes wrote:
+> >
+> > [ ... snip ... ]
+> >
+> > If I revert commit d59cadc0a8f8 ("[squash] klp-convert: make
+> > convert_rela() list-safe") (from Joe's expanded github tree), the problem
+> > disappears.
+> >
+> > I haven't spotted any problem in the code and I cannot explain a
+> > dependency on GCC version. Any ideas?
+> >
+> 
+> I can confirm that test_klp_convert1.ko crashes with RHEL-7 and its
+> older gcc.  I added some debugging printf's to klp-convert and see:
+> 
+>   % ./scripts/livepatch/klp-convert \
+>           ./Symbols.list \
+>           lib/livepatch/test_klp_convert1.klp.o \
+>           lib/livepatch/test_klp_convert1.ko | \
+>           grep saved_command_line
+> 
+>   convert_rela: oldsec: .rela.text rela @ 0x1279670 rela->sym @ 0x12791f0 (.klp.sym.vmlinux.saved_command_line,0) offset: 0x3
+>   convert_rela: oldsec: .rela.text rela @ 0x1279cd0 rela->sym @ 0x12791f0 (.klp.sym.vmlinux.saved_command_line,0) offset: 0x9a
+>   move_rela: rela @ 0x1279670 rela->sym @ 0x12791f0 (.klp.sym.vmlinux.saved_command_line,0) offset: 0x3
+>   main: skipping rela @ 0x1279cd0 rela->sym @ 0x12791f0 (.klp.sym.vmlinux.saved_command_line,0) (!must_convert)
+> 
+> I think the problem is:
+> 
+> - Relas at different offsets, but for the same symbol may share symbol
+>   storage.  Note the same rela->sym value above.
+> 
+> - Before d59cadc0a8f8 ("[squash] klp-convert: make convert_rela()
+>   list-safe"), convert_rela() iterated through the entire section's
+>   relas, moving any of the same name.  This was determined not to be
+>   list safe when moving consecutive relas in the linked list.
+> 
+> - After d59cadc0a8f8 ("[squash] klp-convert: make convert_rela()
+>   list-safe"), convert_rela() still iterates through the section relas,
+>   but only updates r1->sym->klp_rela_sec instead of moving them.
+>   move_rela() was added to be called by the for-each-rela loop in
+>   main().
+> 
+>   - Bug 1: klp_rela_sec probably belongs in struct rela and not struct
+>     symbol
+> 
+>   - Bug 2: the main loop skips over second, third, etc. matching relas
+>     anyway as the shared symbol name will have already been converted
+
+Yes, it explains the issue.
+ 
+> The following fix might not be elegant, but I can't think of a clever
+> way to handle the original issue d59cadc0a8f8 ("[squash] klp-convert:
+> make convert_rela() list-safe") as well as these resulting regressions.
+> So I broke out the moving of relas to a seperate loop.
+
+It works. Thanks Joe.
+
+> That is probably
+> worth a comment and at the same time we might be able to drop some of
+> these other "safe" loop traversals for ordinary list_for_each_entry.
+
+I think _safe from list_for_each_entry_safe(rela, tmprela, &sec->relas, 
+list) in the main loop could be dropped, because convert_rela() only marks 
+relas and does not move them anywhere. 
+Similarly, list_for_each_entry_safe(r1, r2, &oldsec->relas, list) in 
+convert_rela() itself.
+
+Miroslav
