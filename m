@@ -1,128 +1,285 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:23030 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:25506 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726727AbfF0BrZ (ORCPT
+        with ESMTP id S1726727AbfF0Bst (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Jun 2019 21:47:25 -0400
+        Wed, 26 Jun 2019 21:48:49 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 3/4] kbuild: support header-test-pattern-y
-Date: Thu, 27 Jun 2019 10:46:16 +0900
-Message-Id: <20190627014617.600-4-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/4] kbuild: compile-test UAPI headers to ensure they are self-contained
+Date: Thu, 27 Jun 2019 10:46:14 +0900
+Message-Id: <20190627014617.600-2-yamada.masahiro@socionext.com>
 In-Reply-To: <20190627014617.600-1-yamada.masahiro@socionext.com>
 References: <20190627014617.600-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Song Liu <songliubraving@fb.com>, Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, Yonghong Song <yhs@fb.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, Michal Marek <michal.lkml@markovi.net>, Martin KaFai Lau <kafai@fb.com>, Palmer Dabbelt <palmer@sifive.com>, bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, Albert Ou <aou@eecs.berkeley.edu>
 
-In my view, most of headers can be self-contained. So, it would be
-tedious to add every header to header-test-y explicitly. We usually
-end up with "all headers with some exceptions".
+Multiple people have suggested compile-testing UAPI headers to ensure
+they can be really included from user-space. "make headers_check" is
+obviously not enough to catch bugs, and we often leak references to
+kernel-space definition to user-space.
 
-There are two types in exceptions:
+Use the new header-test-y syntax to implement it. Please note exported
+headers are compile-tested with a completely different set of compiler
+flags. The header search path is set to $(objtree)/usr/include since
+exported headers should not include unexported ones.
 
-[1] headers that are never compiled as standalone units
+We use -std=gnu89 for the kernel space since the kernel code highly
+depends on GNU extensions. On the other hand, UAPI headers should be
+written in more standardized C, so they are compiled with -std=c90.
+This will emit errors if C++ style comments, the keyword 'inline', etc.
+are used. Please use C style comments (/* ... */), '__inline__', etc.
+in UAPI headers.
 
-  For examples, include/linux/compiler-gcc.h is not intended to be
-  included directly. We should always exclude such ones.
+There is additional compiler requirement to enable this test because
+many of UAPI headers include <stdlib.h>, <sys/ioctl.h>, <sys/time.h>,
+etc. directly or indirectly. You cannot use kernel.org pre-built
+toolchains [1] since they lack <stdlib.h>.
 
-[2] headers that are conditionally compiled as standalone units
+I added scripts/cc-system-headers.sh to check the system header
+availability, which CONFIG_UAPI_HEADER_TEST depends on.
 
-  Some headers can be compiled only for particular architectures.
-  For example, include/linux/arm-cci.h can be compiled only for
-  arm/arm64 because it requires <asm/arm-cci.h> to exist.
-  Clang can compile include/soc/nps/mtm.h only for arc because
-  it contains an arch-specific register in inline assembler.
+For now, a lot of headers need to be excluded because they cannot
+be compiled standalone, but this is a good start point.
 
-For [2], we can write Makefile like this:
-
-  header-test-$(CONFIG_ARM) += linux/arm-cci.h
-
-The new syntax header-test-pattern-y will be useful to specify
-"the rest".
-
-The typical usage is like this:
-
-  header-test-pattern-y += */*.h
-
-This adds all the headers in sub-directories to the test coverage,
-but headers added to header-test- are excluded. In this regards,
-header-test-pattern-y behaves like a weaker variant of header-test-y.
-
-Caveat:
-The patterns in header-test-pattern-y are prefixed with $(srctree)/$(src)/
-but not $(objtree)/$(obj)/. Stale generated patterns are often left over.
-For example, you will have ones when you traverse the git history for
-'git bisect' without cleaning. If a wildcard is used for generated
-headers, it may match to stale headers.
-
-If you really want to compile-test generated headers, I recommend to
-add them to header-test-y explicitly. One pitfall is $(srctree)/$(src)/
-and $(objtree)/$(obj)/ point to the same directory for in-tree building.
-So, header-test-pattern-y should be used with care. It can potentially
-match to generated headers, which may be stale and fail to compile.
-
-Caveat2:
-You could use wildcard for header-test-. For example,
-
-  header-test- += asm-generic/%
-
-... will exclude headers in asm-generic directory. Unfortunately, the
-wildcard character is '%' instead of '*' because this is evaluated by
-$(filter-out ...) whereas header-test-pattern-y is evaluated by
-$(wildcard ...). This is a kludge, but seems useful in some places...
+[1] https://mirrors.edge.kernel.org/pub/tools/crosstool/index.html
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2:
-  - New patch
+ - Add CONFIG_CPU_{BIG,LITTLE}_ENDIAN guard to avoid build error
+ - Use 'header-test-' instead of 'no-header-test'
+ - Avoid weird 'find' warning when cleaning
 
- Documentation/kbuild/makefiles.txt | 10 ++++++++++
- scripts/Makefile.lib               | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+ Makefile                     |   2 +-
+ init/Kconfig                 |  11 +++
+ scripts/cc-system-headers.sh |   8 +++
+ usr/.gitignore               |   1 -
+ usr/Makefile                 |   2 +
+ usr/include/.gitignore       |   3 +
+ usr/include/Makefile         | 133 +++++++++++++++++++++++++++++++++++
+ 7 files changed, 158 insertions(+), 2 deletions(-)
+ create mode 100755 scripts/cc-system-headers.sh
+ create mode 100644 usr/include/.gitignore
+ create mode 100644 usr/include/Makefile
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 5080fec34609..b817e6cefb77 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -1025,6 +1025,16 @@ When kbuild executes, the following steps are followed (roughly):
- 	i.e. compilable as standalone units. If CONFIG_HEADER_TEST is enabled,
- 	this builds them as part of extra-y.
+diff --git a/Makefile b/Makefile
+index 1f35aca4fe05..f23516980796 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1363,7 +1363,7 @@ CLEAN_DIRS  += $(MODVERDIR) include/ksym
+ CLEAN_FILES += modules.builtin.modinfo
  
-+    header-test-pattern-y
-+
-+	This works as a weaker version of header-test-y, and accepts wildcard
-+	patterns. The typical usage is:
-+
-+		  header-test-pattern-y += *.h
-+
-+	This specifies all the files that matches to '*.h' in the current
-+	directory, but the files in 'header-test-' are excluded.
-+
- --- 6.7 Commands useful for building a boot image
+ # Directories & files removed with 'make mrproper'
+-MRPROPER_DIRS  += include/config usr/include include/generated          \
++MRPROPER_DIRS  += include/config include/generated          \
+ 		  arch/$(SRCARCH)/include/generated .tmp_objdiff
+ MRPROPER_FILES += .config .config.old .version \
+ 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+diff --git a/init/Kconfig b/init/Kconfig
+index df5bba27e3fe..667d68e1cdf4 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -105,6 +105,17 @@ config HEADER_TEST
+ 	  If you are a developer or tester and want to ensure the requested
+ 	  headers are self-contained, say Y here. Otherwise, choose N.
  
- 	Kbuild provides a few macros that are useful when building a
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 55ae1ec65342..54444933bbab 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -67,6 +67,16 @@ extra-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
- endif
- 
- # Test self-contained headers
++config UAPI_HEADER_TEST
++	bool "Compile test UAPI headers"
++	depends on HEADER_TEST && HEADERS_INSTALL
++	depends on $(success,$(srctree)/scripts/cc-system-headers.sh $(CC))
++	help
++	  Compile test headers exported to user-space to ensure they are
++	  self-contained, i.e. compilable as standalone units.
 +
-+# Wildcard searches in $(srctree)/$(src)/, but not in $(objtree)/$(obj)/.
-+# Stale generated headers are often left over, so wildcard matching should
-+# be avoided. Please notice $(srctree)/$(src)/ and $(objtree)/$(obj) point
-+# to the same location for in-tree building.
-+header-test-y	+= $(filter-out $(header-test-), \
-+		$(patsubst $(srctree)/$(src)/%, %, \
-+		$(wildcard $(addprefix $(srctree)/$(src)/, \
-+		$(header-test-pattern-y)))))
++	  If you are a developer or tester and want to ensure the exported
++	  headers are self-contained, say Y here. Otherwise, choose N.
 +
- extra-$(CONFIG_HEADER_TEST) += $(addsuffix .s, $(header-test-y))
- 
- # Add subdir path
+ config LOCALVERSION
+ 	string "Local version - append to kernel release"
+ 	help
+diff --git a/scripts/cc-system-headers.sh b/scripts/cc-system-headers.sh
+new file mode 100755
+index 000000000000..1b3db369828c
+--- /dev/null
++++ b/scripts/cc-system-headers.sh
+@@ -0,0 +1,8 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0-only
++
++cat << "END" | $@ -E -x c - -o /dev/null >/dev/null 2>&1
++#include <stdlib.h>
++#include <sys/ioctl.h>
++#include <sys/time.h>
++END
+diff --git a/usr/.gitignore b/usr/.gitignore
+index 8e48117a3f3d..be5eae1df7eb 100644
+--- a/usr/.gitignore
++++ b/usr/.gitignore
+@@ -7,4 +7,3 @@ initramfs_data.cpio.gz
+ initramfs_data.cpio.bz2
+ initramfs_data.cpio.lzma
+ initramfs_list
+-include
+diff --git a/usr/Makefile b/usr/Makefile
+index 4a70ae43c9cb..6a89eb019275 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -56,3 +56,5 @@ $(deps_initramfs): klibcdirs
+ $(obj)/$(datafile_y): $(obj)/gen_init_cpio $(deps_initramfs) klibcdirs
+ 	$(Q)$(initramfs) -l $(ramfs-input) > $(obj)/$(datafile_d_y)
+ 	$(call if_changed,initfs)
++
++subdir-$(CONFIG_UAPI_HEADER_TEST) += include
+diff --git a/usr/include/.gitignore b/usr/include/.gitignore
+new file mode 100644
+index 000000000000..a0991ff4402b
+--- /dev/null
++++ b/usr/include/.gitignore
+@@ -0,0 +1,3 @@
++*
++!.gitignore
++!Makefile
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+new file mode 100644
+index 000000000000..c8c3eba28ccf
+--- /dev/null
++++ b/usr/include/Makefile
+@@ -0,0 +1,133 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++# Unlike the kernel space, uapi headers are written in standard C.
++#  - Forbid C++ style comments
++#  - Use '__inline__', '__asm__' instead of 'inline', 'asm'
++#
++# -std=c90 (equivalent to -ansi) catches the violation of those.
++# We cannot go as far as adding -Wpedantic since it emits too many warnings.
++#
++# REVISIT: re-consider the proper set of compiler flags for uapi compile-test.
++
++UAPI_CFLAGS := -std=c90 -Wall -Werror=implicit-function-declaration
++
++override c_flags = $(UAPI_CFLAGS) -Wp,-MD,$(depfile) -I$(objtree)/usr/include
++
++# The following are excluded for now just because they fail to build.
++# The cause of errors are mostly missing include directives.
++# Check one by one, and send a patch to each subsystem.
++#
++# Do not add a new header to the list without legitimate reason.
++# Please consider to fix the header first.
++header-test- += asm/ipcbuf.h
++header-test- += asm/msgbuf.h
++header-test- += asm/sembuf.h
++header-test- += asm/shmbuf.h
++header-test- += asm/signal.h
++header-test- += asm/ucontext.h
++header-test- += drm/vmwgfx_drm.h
++header-test- += linux/am437x-vpfe.h
++header-test- += linux/android/binderfs.h
++header-test- += linux/android/binder.h
++header-test-$(CONFIG_CPU_BIG_ENDIAN) += linux/byteorder/big_endian.h
++header-test-$(CONFIG_CPU_LITTLE_ENDIAN) += linux/byteorder/little_endian.h
++header-test- += linux/coda.h
++header-test- += linux/coda_psdev.h
++header-test- += linux/dvb/audio.h
++header-test- += linux/dvb/osd.h
++header-test- += linux/elfcore.h
++header-test- += linux/errqueue.h
++header-test- += linux/fsmap.h
++header-test- += linux/hdlc/ioctl.h
++header-test- += linux/jffs2.h
++header-test- += linux/kexec.h
++header-test- += linux/matroxfb.h
++header-test- += linux/netfilter_bridge/ebtables.h
++header-test- += linux/netfilter_ipv4/ipt_LOG.h
++header-test- += linux/netfilter_ipv6/ip6t_LOG.h
++header-test- += linux/nfc.h
++header-test- += linux/nilfs2_ondisk.h
++header-test- += linux/omap3isp.h
++header-test- += linux/omapfb.h
++header-test- += linux/patchkey.h
++header-test- += linux/phonet.h
++header-test- += linux/reiserfs_xattr.h
++header-test- += linux/scc.h
++header-test- += linux/sctp.h
++header-test- += linux/signal.h
++header-test- += linux/sysctl.h
++header-test- += linux/usb/audio.h
++header-test- += linux/ivtv.h
++header-test- += linux/v4l2-mediabus.h
++header-test- += linux/v4l2-subdev.h
++header-test- += linux/videodev2.h
++header-test- += linux/vm_sockets.h
++header-test- += misc/ocxl.h
++header-test- += mtd/mtd-abi.h
++header-test- += scsi/scsi_bsg_fc.h
++header-test- += scsi/scsi_netlink_fc.h
++header-test- += scsi/scsi_netlink.h
++header-test- += sound/asequencer.h
++header-test- += sound/asound.h
++header-test- += sound/asoc.h
++header-test- += sound/compress_offload.h
++header-test- += sound/emu10k1.h
++header-test- += sound/sfnt_info.h
++header-test- += sound/sof/eq.h
++header-test- += sound/sof/fw.h
++header-test- += sound/sof/header.h
++header-test- += sound/sof/manifest.h
++header-test- += sound/sof/trace.h
++header-test- += xen/evtchn.h
++header-test- += xen/gntdev.h
++header-test- += xen/privcmd.h
++
++# more headers are broken in some architectures
++
++ifeq ($(SRCARCH),arc)
++header-test- += linux/bpf_perf_event.h
++endif
++
++ifeq ($(SRCARCH),ia64)
++header-test- += asm/setup.h
++header-test- += asm/sigcontext.h
++header-test- += asm/perfmon.h
++header-test- += asm/perfmon_default_smpl.h
++header-test- += linux/if_bonding.h
++endif
++
++ifeq ($(SRCARCH),mips)
++header-test- += asm/stat.h
++endif
++
++ifeq ($(SRCARCH),powerpc)
++header-test- += asm/stat.h
++header-test- += linux/bpf_perf_event.h
++endif
++
++ifeq ($(SRCARCH),riscv)
++header-test- += linux/bpf_perf_event.h
++endif
++
++ifeq ($(SRCARCH),s390)
++header-test- += asm/runtime_instr.h
++header-test- += asm/zcrypt.h
++endif
++
++ifeq ($(SRCARCH),sparc)
++header-test- += asm/stat.h
++header-test- += asm/uctx.h
++header-test- += asm/fbio.h
++header-test- += asm/openpromio.h
++endif
++
++# asm-generic/*.h is used by asm/*.h, and should not be included directly
++header-test- += asm-generic/%
++
++header-test-y += $(filter-out $(header-test-), \
++			$(patsubst $(obj)/%,%, $(wildcard \
++			$(addprefix $(obj)/, *.h */*.h */*/*.h */*/*/*.h))))
++
++# For GNU Make <= 4.2.1, $(wildcard $(obj)/*/) matches to not only directories
++# but also regular files. Use $(filter %/, ...) just in case.
++clean-dirs += $(patsubst $(obj)/%/,%,$(filter %/, $(wildcard $(obj)/*/)))
 -- 
 2.17.1
