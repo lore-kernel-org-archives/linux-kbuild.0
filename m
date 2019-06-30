@@ -1,56 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:64763 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726056AbfF3BgH (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:19799 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725959AbfF3H6Z (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Jun 2019 21:36:07 -0400
+        Sun, 30 Jun 2019 03:58:25 -0400
 MIME-Version: 1.0
-References: <20190627163903.28398-1-yamada.masahiro@socionext.com> <20190627163903.28398-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190627163903.28398-2-yamada.masahiro@socionext.com>
+References: <20190627163903.28398-1-yamada.masahiro@socionext.com>
+ <20190627163903.28398-5-yamada.masahiro@socionext.com> <20190628180057.GA22758@ravnborg.org>
+In-Reply-To: <20190628180057.GA22758@ravnborg.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 30 Jun 2019 10:35:24 +0900
-Message-ID: <CAK7LNAQ4Z0BxqFrNdQDWJqbJBW9bSvnzVkvJTZZ-1mMKD7Y6SQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] kbuild: compile-test UAPI headers to ensure they
+Date: Sun, 30 Jun 2019 16:57:23 +0900
+Message-ID: <CAK7LNAQDqtm5F_JoPAjPOuf6s3d0F1=Ctyq6s0u2DWNpbFr5vg@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] kbuild: compile-test kernel headers to ensure they
  are self-contained
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Song Liu <songliubraving@fb.com>, Michal Marek <michal.lkml@markovi.net>, bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, Jani Nikula <jani.nikula@intel.com>, Networking <netdev@vger.kernel.org>, Palmer Dabbelt <palmer@sifive.com>, Alexei Starovoitov <ast@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Albert Ou <aou@eecs.berkeley.edu>, Yonghong Song <yhs@fb.com>, linux-riscv@lists.infradead.org, Sam Ravnborg <sam@ravnborg.org>, Martin KaFai Lau <kafai@fb.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jani Nikula <jani.nikula@intel.com>, Tony Luck <tony.luck@intel.com>, John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <jakub.kicinski@netronome.com>, Daniel Borkmann <daniel@iogearbox.net>, xdp-newbies@vger.kernel.org, Anton Vorontsov <anton@enomsg.org>, Matthias Brugger <matthias.bgg@gmail.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, Michal Marek <michal.lkml@markovi.net>, Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <kafai@fb.com>, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Colin Cross <ccross@android.com>, "David S. Miller" <davem@davemloft.net>, Kees Cook <keescook@chromium.org>, Alexei Starovoitov <ast@kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 1:40 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Multiple people have suggested compile-testing UAPI headers to ensure
-> they can be really included from user-space. "make headers_check" is
-> obviously not enough to catch bugs, and we often leak references to
-> kernel-space definition to user-space.
->
-> Use the new header-test-y syntax to implement it. Please note exported
-> headers are compile-tested with a completely different set of compiler
-> flags. The header search path is set to $(objtree)/usr/include since
-> exported headers should not include unexported ones.
->
-> We use -std=gnu89 for the kernel space since the kernel code highly
-> depends on GNU extensions. On the other hand, UAPI headers should be
-> written in more standardized C, so they are compiled with -std=c90.
-> This will emit errors if C++ style comments, the keyword 'inline', etc.
-> are used. Please use C style comments (/* ... */), '__inline__', etc.
-> in UAPI headers.
->
-> There is additional compiler requirement to enable this test because
-> many of UAPI headers include <stdlib.h>, <sys/ioctl.h>, <sys/time.h>,
-> etc. directly or indirectly. You cannot use kernel.org pre-built
-> toolchains [1] since they lack <stdlib.h>.
->
-> I added scripts/cc-system-headers.sh to check the system header
-> availability, which CONFIG_UAPI_HEADER_TEST depends on.
+Hi Sam,
 
 
-Perhaps, we could use scripts/cc-can-link.sh for this purpose.
+On Sat, Jun 29, 2019 at 3:01 AM Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> Hi Masahiro.
+>
+> On Fri, Jun 28, 2019 at 01:39:02AM +0900, Masahiro Yamada wrote:
+> > The headers in include/ are globally used in the kernel source tree
+> > to provide common APIs. They are included from external modules, too.
+> >
+> > It will be useful to make as many headers self-contained as possible
+> > so that we do not have to rely on a specific include order.
+> >
+> > There are more than 4000 headers in include/. In my rough analysis,
+> > 70% of them are already self-contained. With efforts, most of them
+> > can be self-contained.
+> >
+> > For now, we must exclude more than 1000 headers just because they
+> > cannot be compiled as standalone units. I added them to header-test-.
+> > The black list was mostly generated by a script, so should be checked
+> > later.
+> The list is smaller than I had expected.
+> And I see why you insisted on avoiding a maze ok Kbuild files.
+> It looks good, except there is a few issues..
+>
+>
+> The file kernel/kheaders_data.tar.xz includes all the .s files.
+> Something needs to be done to exclude the .s files...
 
-The intention is slightly different, but a compiler to link
-user-space programs must provide necessary standard headers.
+Good catch. I will change scripts/gen_kheaders.sh
+
+
+> When building a full kernel the build fails like this:
+>   LD      vmlinux.o
+> aarch64-linux-gnu-ld: cannot find include/lib.a: No such file or directory
+> make[1]: *** [/home/sam/kernel/linux-kbuild.git/Makefile:1054: vmlinux] Error 1
+> make[1]: Leaving directory '/home/sam/kernel/linux-kbuild.git/.build/arm64-allyesconfig'
+> make: *** [Makefile:179: sub-make] Error 2
+
+My bad - I built only include/,
+without testing full build.
+
+I will fix.
+
+
+>
+> include/uapi/linux/mman.h fails when building sparc64 allmodconfig.
+> There is likely more header files that will fail when we start to
+> throw this after diverse randconfigs.
+> I have no good idea how to catch this.
+> Unless your scripts could automate this across several architectures.
+
+Thanks. I excluded a little more headers.
+
+
+> I did not continue my testing futher.
+>
+> > +header-test-                 += uapi/drm/vmwgfx_drm.h
+> > +header-test-                 += uapi/linux/a.out.h
+> > +header-test-                 += uapi/linux/coda.h
+> ...
+> > +header-test-                 += uapi/xen/evtchn.h
+> > +header-test-                 += uapi/xen/gntdev.h
+> > +header-test-                 += uapi/xen/privcmd.h
+>
+> I though uapi files were covered by another Makefile?
+> If they are added because we pull them in using a pattern, maybe they
+> should be removed using a specific filer-out?
+
+I have not looked at this closely yet.
+
+usr/include/Makefile tests UAPI headers
+crafted by scripts/headers_install.sh
+
+Testing UAPI headers in their raw form
+makes sense, I think.
+
 
 
 -- 
