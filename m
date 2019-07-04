@@ -1,103 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:48295 "EHLO
-        relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727682AbfGDMjR (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:60892 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726791AbfGDNKM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:39:17 -0400
+        Thu, 4 Jul 2019 09:10:12 -0400
+Message-ID: <0ff3202ced2b501d6045157f1c7b50810c0571e5.camel@decadent.org.uk>
 Subject: Re: [PATCH] builddeb: generate multi-arch friendly linux-libc-dev
  package
-References: <1560752096-1323-1-git-send-email-Cedric_Hombourger@mentor.com>
- <CAK7LNASCmZyS11WkUWXLXVWgk-WU5JV=MMw=S6pXAzMhkVJ40Q@mail.gmail.com>
-From: Cedric Hombourger <cedric_hombourger@mentor.com>
-Message-ID: <df3c389f-25a7-b5b8-b8c2-1732638ef3ed@mentor.com>
-Date: Thu, 4 Jul 2019 14:39:03 +0200
-MIME-Version: 1.0
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 04 Jul 2019 14:10:02 +0100
 In-Reply-To: <CAK7LNASCmZyS11WkUWXLXVWgk-WU5JV=MMw=S6pXAzMhkVJ40Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <1560752096-1323-1-git-send-email-Cedric_Hombourger@mentor.com>
+         <CAK7LNASCmZyS11WkUWXLXVWgk-WU5JV=MMw=S6pXAzMhkVJ40Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-BZKpguClIp8ilfm1QdtD"
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: isar-users@googlegroups.com, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Cedric Hombourger <Cedric_Hombourger@mentor.com>
+Cc: isar-users@googlegroups.com, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>
 
-Hello Yamada-san
 
-Thanks for your review of this patch. Answers below
+--=-BZKpguClIp8ilfm1QdtD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/4/2019 2:43 AM, Masahiro Yamada wrote:
+On Thu, 2019-07-04 at 09:43 +0900, Masahiro Yamada wrote:
 > CCed a couple of people.
->
+>=20
 > On Mon, Jun 17, 2019 at 3:15 PM Cedric Hombourger
 > <Cedric_Hombourger@mentor.com> wrote:
->> Debian-based distributions place libc header files in a machine
->> specific directory (/usr/include/<libc-machine>) instead of
->> /usr/include/asm to support installation of the linux-libc-dev
->> package from multiple architectures. Move headers installed by
->> "make headers_install" accordingly.
->>
->> Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
->> Reviewed-by: Henning Schild <henning.schild@siemens.com>
->> ---
->>   scripts/package/builddeb | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->> index b03dd56a4782..8f7afb3a84e9 100755
->> --- a/scripts/package/builddeb
->> +++ b/scripts/package/builddeb
->> @@ -132,6 +132,11 @@ fi
->>   if [ "$ARCH" != "um" ]; then
->>          $MAKE -f $srctree/Makefile headers_check
->>          $MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
->> +       # move asm headers to /usr/include/<libc-machine>/asm to match the structure
->> +       # used by Debian-based distros (to support multi-arch)
->> +       libc_mach=$($CC -dumpmachine)
->> +       mkdir $libc_headers_dir/usr/include/$libc_mach
->> +       mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$libc_mach/
->>   fi
->>
->>   # Install the maintainer scripts
->
+> > Debian-based distributions place libc header files in a machine
+> > specific directory (/usr/include/<libc-machine>) instead of
+> > /usr/include/asm to support installation of the linux-libc-dev
+> > package from multiple architectures. Move headers installed by
+> > "make headers_install" accordingly.
+> >=20
+> > Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+> > Reviewed-by: Henning Schild <henning.schild@siemens.com>
+> > ---
+> >  scripts/package/builddeb | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >=20
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index b03dd56a4782..8f7afb3a84e9 100755
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -132,6 +132,11 @@ fi
+> >  if [ "$ARCH" !=3D "um" ]; then
+> >         $MAKE -f $srctree/Makefile headers_check
+> >         $MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH=3D"=
+$libc_headers_dir/usr"
+> > +       # move asm headers to /usr/include/<libc-machine>/asm to match =
+the structure
+> > +       # used by Debian-based distros (to support multi-arch)
+> > +       libc_mach=3D$($CC -dumpmachine)
+> > +       mkdir $libc_headers_dir/usr/include/$libc_mach
+> > +       mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/incl=
+ude/$libc_mach/
+
+This is wrong; the multiarch architecture tuple used in directory names
+does not necessarily match the compiler's architecture tuple.  Firstly,
+if you use a biarch compiler the compiler is only going to tell you the
+default architecture.  Secondly, on i386 the minimum processor is i586
+or i686 but the multiarch architecture tuple is still "i386-linux-gnu"
+(and there might be other cases like this).
+
+So, the correct command is:
+
+    dpkg-architecture -a$debarch -qDEB_HOST_MULTIARCH
+
+> >  fi
+> >=20
+> >  # Install the maintainer scripts
+>=20
 > I am not sure but,
 > I just worried about the backward compatibility...
-
-this patch is actually addressing a compatibility problem with 
-multi-arch capable distros (all the major Debian-based distros that I 
-know of are) where the currently generated libc headers packages is 
-placing arch specific headers where all arch compilers installed on the 
-system would find them
-
 > Was this previously broken?
 
-yes (as noted above) but would only be seen on systems with multi-arch 
-packages / development tools installed
+Debian has had multiarch support since Debian 7 "wheezy", and older
+versions are no longer supported.  So I think this change is fine to
+make unconditionally.
+
+The current linux-libc-dev packages build by "make deb-pkg" are
+"broken" in that multiple architectures can't be co-installed with each
+other, whereas this genrally can be done with the linux-libc-dev
+packages provided by Debian-based distributions.  However, co-
+installation is only allowed if the version strings and contents of
+common files in the packages are identical, and I don't know whether
+that's going to be true for those generated by "make deb-pkg".
 
 > I guess debian is using own control file
 > instead of the one in upstream kernel.
+
+We maintain multiple configurations, a meaningful changelog, tools
+packages, etc.  So "make deb-pkg" is not used for official kernel
+packages but we recommend it for custom kernels.
+
 > So, this is almost a matter for developers, I think.
-
-Correct. Debian and some others use their own.
-
-We (Mentor and Siemens) as well as other folks from the embedded 
-community build embedded platforms using Debian as a base and recent 
-kernels (so we can run Debian on e.g. recent Arm64 hardware designs). 
-This is achieved by using Isar (https://github.com/ilbers/isar). The 
-custom kernel recipe it provides uses builddeb since that feature is 
-mainline. It also allows us to use custom kernels regardless of the 
-Debian-based distro we use (Raspbian, Ubuntu, Debian, etc.)
-
+>=20
 > How did debian-base distros managed this before,
 > and will this introduce no breakage?
 
-We would expect desktop distros to continue using their own 
-debian/{control,rules} files but would recommend to have the .deb 
-produce by the kernel be better aligned with Debian so we can swap their 
-"old" kernels with recent LTS or recent HEAD kernels.
-
-Hope I was able to shed some light on our use-case / motivation.
+On the Debian side a similar change was made in Debian 7 "wheezy".  In
+Ubuntu I believe it was done earlier as they modified dpkg to support
+multiarch before us.
 
 > Ben,
 > Could you comment on this?
->
->
+
+Ben.
+
+--=20
+Ben Hutchings
+Quantity is no substitute for quality, but it's the only one we've got.
+
+--=-BZKpguClIp8ilfm1QdtD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl0d+qoACgkQ57/I7JWG
+EQlj5w/6A7Dpm2f0EbQF+Zdnfmf9gTCl8GGkRIuZ5I6YNr4t4SwUAptrZs8R34Zj
+RHemXnL7F/H1Baw3nAtbO9GE+76vatgwtdkhRC6B7fwNxPhUOgkGnbN8sZ+67qmu
+yuJ4Ap2IGagPh6D21APIF4s4XzEA7rD0B1kJUO0H7VKeztM58zuUnPiDmmXg4/YZ
+whgnLfJyUDDyny6HUdFJ2lvTeVOFYN0MWSKwqyR8mEDoAoCzcKX+OyFbs+Fu3Lys
+CgGjip3wpIshqibwUxVUzqq+qLTmfCuTsT7Vd/s/aBf3bD/8qNphL8zO2AsLrHdP
+RlwXzRZ9Sq+GajvHGcJqwdz+azF/oJfOCse138+HrK5lmt2RSxr9f1Zgqf9P/Pve
+eJy51IWmIKvEBiIx3bAATfwu8g61LlOepHZZooOT0zSQ5RZmoyj/WOPQRAyO6kyq
+tu/CVG0sbrOl0kEUEdfTFnCJKPGyK9KlTYdF6oXVXsaojIBsqM8IT6KrYQ7s08M2
+di8T9P/2+a1Q/d7it0ngt5itBJ3ZBos3yG7oYl+HKxPXP1ITj0h71jUyIC8nCFjb
+gDzEPHr+0Pp6GNsVG6lfBO9aLJ9QHHj8v28QNSWjuhq2GtF1rEfwefADbtJuZnag
+bA/So3i8ExEK4yxZ/PJqwKiMJoP0M/3Qs0jyd4uA7rLGuBv8HDM=
+=xBtL
+-----END PGP SIGNATURE-----
+
+--=-BZKpguClIp8ilfm1QdtD--
