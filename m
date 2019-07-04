@@ -1,15 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:63204 "EHLO
+Received: from relay1.mentorg.com ([192.94.38.131]:63211 "EHLO
         relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726871AbfGDUuv (ORCPT
+        with ESMTP id S1726903AbfGDUux (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jul 2019 16:50:51 -0400
+        Thu, 4 Jul 2019 16:50:53 -0400
 From: Cedric Hombourger <Cedric_Hombourger@mentor.com>
-Subject: [PATCH v3 0/1] builddeb: generate multi-arch friendly linux-libc-dev
-Date: Thu, 4 Jul 2019 22:50:26 +0200
-Message-ID: <1562273427-204-1-git-send-email-Cedric_Hombourger@mentor.com>
-In-Reply-To: <432e997617a0669886cd9ea5ceac7c1a2173044b.camel@decadent.org.uk>
+Subject: [PATCH v3 1/1] builddeb: generate multi-arch friendly linux-libc-dev package
+Date: Thu, 4 Jul 2019 22:50:27 +0200
+Message-ID: <1562273427-204-2-git-send-email-Cedric_Hombourger@mentor.com>
+In-Reply-To: <1562273427-204-1-git-send-email-Cedric_Hombourger@mentor.com>
 References: <432e997617a0669886cd9ea5ceac7c1a2173044b.camel@decadent.org.uk>
+ <1562273427-204-1-git-send-email-Cedric_Hombourger@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,21 +18,63 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: ben@decadent.org.uk
 Cc: yamada.masahiro@socionext.com, isar-users@googlegroups.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, riku.voipio@linaro.org, Cedric Hombourger <Cedric_Hombourger@mentor.com>
 
-Changes in v3:
+Debian-based distributions place libc header files in a machine
+specific directory (/usr/include/<libc-machine>) instead of
+/usr/include/asm to support installation of the linux-libc-dev
+package from multiple architectures. Move headers installed by
+"make headers_install" accordingly using Debian's tuple from
+dpkg-architecture.
 
- - add Multi-Arch: same to debian/control for linux-libc-dev
-
-Changes in v2:
-
- - forward $debarch from mkdebian to builddeb
- - use dpkg-architecture -qDEB_HOST_MULTIARCH instead of $CC -dumpmachine
-
-Cedric Hombourger (1):
-  builddeb: generate multi-arch friendly linux-libc-dev package
-
+Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+---
  scripts/package/builddeb | 8 ++++++++
  scripts/package/mkdebian | 5 +++--
  2 files changed, 11 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b03dd56a4782..15a034e18c37 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -132,6 +132,14 @@ fi
+ if [ "$ARCH" != "um" ]; then
+ 	$MAKE -f $srctree/Makefile headers_check
+ 	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
++	if [ -n "$debarch" ]; then
++		# move asm headers to /usr/include/<libc-machine>/asm to match the structure
++		# used by Debian-based distros (to support multi-arch) but only if ARCH was
++		# translated to Debian's (debarch) - this is done by mkdebian
++		host_arch=$(dpkg-architecture -a$debarch -qDEB_HOST_MULTIARCH)
++		mkdir $libc_headers_dir/usr/include/$host_arch
++		mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
++	fi
+ fi
+ 
+ # Install the maintainer scripts
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 8351584cb24e..2d670ae2cabc 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -197,6 +197,7 @@ Architecture: $debarch
+ Description: Linux support headers for userspace development
+  This package provides userspaces headers from the Linux kernel.  These headers
+  are used by the installed headers for GNU glibc and other system libraries.
++Multi-Arch: same
+ 
+ Package: $dbg_packagename
+ Section: debug
+@@ -212,11 +213,11 @@ cat <<EOF > debian/rules
+ srctree ?= .
+ 
+ build:
+-	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
++	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} debarch=${debarch} \
+ 	KBUILD_BUILD_VERSION=${revision} -f \$(srctree)/Makefile
+ 
+ binary-arch:
+-	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
++	\$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} debarch=${debarch} \
+ 	KBUILD_BUILD_VERSION=${revision} -f \$(srctree)/Makefile intdeb-pkg
+ 
+ clean:
 -- 
 2.11.0
