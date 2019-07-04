@@ -1,58 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:54715 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727605AbfGDAhr (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:30930 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbfGDAn5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Jul 2019 20:37:47 -0400
-Received: by mail-pg1-f201.google.com with SMTP id t2so2564922pgs.21
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2019 17:37:46 -0700 (PDT)
-Date: Wed,  3 Jul 2019 17:36:03 -0700
-In-Reply-To: <20190704003615.204860-1-brendanhiggins@google.com>
-Message-Id: <20190704003615.204860-7-brendanhiggins@google.com>
-Mime-Version: 1.0
-References: <20190704003615.204860-1-brendanhiggins@google.com>
-Subject: [PATCH v6 06/18] kbuild: enable building KUnit
-From: Brendan Higgins <brendanhiggins@google.com>
+        Wed, 3 Jul 2019 20:43:57 -0400
+MIME-Version: 1.0
+References: <1560752096-1323-1-git-send-email-Cedric_Hombourger@mentor.com>
+In-Reply-To: <1560752096-1323-1-git-send-email-Cedric_Hombourger@mentor.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 4 Jul 2019 09:43:04 +0900
+Message-ID: <CAK7LNASCmZyS11WkUWXLXVWgk-WU5JV=MMw=S6pXAzMhkVJ40Q@mail.gmail.com>
+Subject: Re: [PATCH] builddeb: generate multi-arch friendly linux-libc-dev package
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
+To: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+Cc: isar-users@googlegroups.com, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
 
-KUnit is a new unit testing framework for the kernel and when used is
-built into the kernel as a part of it. Add KUnit to the root Kconfig and
-Makefile to allow it to be actually built.
+CCed a couple of people.
 
-Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
----
- Kconfig  | 2 ++
- Makefile | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+On Mon, Jun 17, 2019 at 3:15 PM Cedric Hombourger
+<Cedric_Hombourger@mentor.com> wrote:
+>
+> Debian-based distributions place libc header files in a machine
+> specific directory (/usr/include/<libc-machine>) instead of
+> /usr/include/asm to support installation of the linux-libc-dev
+> package from multiple architectures. Move headers installed by
+> "make headers_install" accordingly.
+>
+> Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+> Reviewed-by: Henning Schild <henning.schild@siemens.com>
+> ---
+>  scripts/package/builddeb | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index b03dd56a4782..8f7afb3a84e9 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -132,6 +132,11 @@ fi
+>  if [ "$ARCH" != "um" ]; then
+>         $MAKE -f $srctree/Makefile headers_check
+>         $MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> +       # move asm headers to /usr/include/<libc-machine>/asm to match the structure
+> +       # used by Debian-based distros (to support multi-arch)
+> +       libc_mach=$($CC -dumpmachine)
+> +       mkdir $libc_headers_dir/usr/include/$libc_mach
+> +       mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$libc_mach/
+>  fi
+>
+>  # Install the maintainer scripts
 
-diff --git a/Kconfig b/Kconfig
-index 48a80beab6853..10428501edb78 100644
---- a/Kconfig
-+++ b/Kconfig
-@@ -30,3 +30,5 @@ source "crypto/Kconfig"
- source "lib/Kconfig"
- 
- source "lib/Kconfig.debug"
-+
-+source "kunit/Kconfig"
-diff --git a/Makefile b/Makefile
-index fabc127d127f9..44e0d730dd5b6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -991,7 +991,7 @@ endif
- PHONY += prepare0
- 
- ifeq ($(KBUILD_EXTMOD),)
--core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-+core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/ kunit/
- 
- vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
- 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
+
+I am not sure but,
+I just worried about the backward compatibility...
+Was this previously broken?
+
+I guess debian is using own control file
+instead of the one in upstream kernel.
+So, this is almost a matter for developers, I think.
+
+How did debian-base distros managed this before,
+and will this introduce no breakage?
+
+Ben,
+Could you comment on this?
+
+
 -- 
-2.22.0.410.gd8fdbe21b5-goog
+Best Regards
+Masahiro Yamada
