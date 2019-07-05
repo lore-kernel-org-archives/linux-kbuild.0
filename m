@@ -1,87 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:45678 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727090AbfGEPOu (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:41268 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725813AbfGEUPI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Jul 2019 11:14:50 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] scripts/tags.sh: drop SUBARCH support for ARM
-Date: Sat,  6 Jul 2019 00:14:30 +0900
-Message-Id: <20190705151431.29122-1-yamada.masahiro@socionext.com>
+        Fri, 5 Jul 2019 16:15:08 -0400
+Date: Fri, 5 Jul 2019 20:15:05 +0000
+From: Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH v6 01/18] kunit: test: add KUnit test runner core
+Message-ID: <20190705201505.GA19023@42.do-not-panic.com>
+References: <20190704003615.204860-1-brendanhiggins@google.com>
+ <20190704003615.204860-2-brendanhiggins@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190704003615.204860-2-brendanhiggins@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
 
-Our goal is to have more and more sub-architectures to join the
-ARM multi-platform, and support them in a single configuration.
+On Wed, Jul 03, 2019 at 05:35:58PM -0700, Brendan Higgins wrote:
+> Add core facilities for defining unit tests; this provides a common way
+> to define test cases, functions that execute code which is under test
+> and determine whether the code under test behaves as expected; this also
+> provides a way to group together related test cases in test suites (here
+> we call them test_modules).
+> 
+> Just define test cases and how to execute them for now; setting
+> expectations on code will be defined later.
+> 
+> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
-Remove the ARM SUBARCH support because it is ugly.
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+But a nitpick below, I think that can be fixed later with a follow up
+patch.
 
- scripts/tags.sh | 36 ++----------------------------------
- 1 file changed, 2 insertions(+), 34 deletions(-)
+> +/**
+> + * struct kunit - represents a running instance of a test.
+> + * @priv: for user to store arbitrary data. Commonly used to pass data created
+> + * in the init function (see &struct kunit_suite).
+> + *
+> + * Used to store information about the current context under which the test is
+> + * running. Most of this data is private and should only be accessed indirectly
+> + * via public functions; the one exception is @priv which can be used by the
+> + * test writer to store arbitrary data.
+> + *
+> + * A brief note on locking:
+> + *
+> + * First off, we need to lock because in certain cases a user may want to use an
+> + * expectation in a thread other than the thread that the test case is running
+> + * in.
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index cc991e18f4d1..f56edeb08739 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -41,15 +41,13 @@ find_arch_sources()
- 	for i in $archincludedir; do
- 		prune="$prune -wholename $i -prune -o"
- 	done
--	find ${tree}arch/$1 $ignore $subarchprune $prune -name "$2" \
--		-not -type l -print;
-+	find ${tree}arch/$1 $ignore $prune -name "$2" -not -type l -print;
- }
- 
- # find sources in arch/$1/include
- find_arch_include_sources()
- {
--	include=$(find ${tree}arch/$1/ $subarchprune \
--					-name include -type d -print);
-+	include=$(find ${tree}arch/$1/ -name include -type d -print);
- 	if [ -n "$include" ]; then
- 		archincludedir="$archincludedir $include"
- 		find $include $ignore -name "$2" -not -type l -print;
-@@ -305,36 +303,6 @@ if [ "${ARCH}" = "um" ]; then
- 	else
- 		archinclude=${SUBARCH}
- 	fi
--elif [ "${SRCARCH}" = "arm" -a "${SUBARCH}" != "" ]; then
--	subarchdir=$(find ${tree}arch/$SRCARCH/ -name "mach-*" -type d -o \
--							-name "plat-*" -type d);
--	mach_suffix=$SUBARCH
--	plat_suffix=$SUBARCH
--
--	# Special cases when $plat_suffix != $mach_suffix
--	case $mach_suffix in
--		"omap1" | "omap2")
--			plat_suffix="omap"
--			;;
--	esac
--
--	if [ ! -d ${tree}arch/$SRCARCH/mach-$mach_suffix ]; then
--		echo "Warning: arch/arm/mach-$mach_suffix/ not found." >&2
--		echo "         Fix your \$SUBARCH appropriately" >&2
--	fi
--
--	for i in $subarchdir; do
--		case "$i" in
--			*"mach-"${mach_suffix})
--				;;
--			*"plat-"${plat_suffix})
--				;;
--			*)
--				subarchprune="$subarchprune \
--						-wholename $i -prune -o"
--				;;
--		esac
--	done
- fi
- 
- remove_structs=
--- 
-2.17.1
+This as a prefix to the struct without a lock seems odd. It would be
+clearer I think if you'd explain here what locking mechanism we decided
+to use and why it suffices today.
+
+> +/**
+> + * suite_test() - used to register a &struct kunit_suite with KUnit.
+
+You mean kunit_test_suite()?
+
+> + * @suite: a statically allocated &struct kunit_suite.
+> + *
+> + * Registers @suite with the test framework. See &struct kunit_suite for more
+> + * information.
+> + *
+> + * NOTE: Currently KUnit tests are all run as late_initcalls; this means that
+> + * they cannot test anything where tests must run at a different init phase. One
+> + * significant restriction resulting from this is that KUnit cannot reliably
+> + * test anything that is initialize in the late_init phase.
+                            initialize prior to the late init phase.
+
+
+That is, this is useless to test things running early.
+
+> + *
+> + * TODO(brendanhiggins@google.com): Don't run all KUnit tests as late_initcalls.
+> + * I have some future work planned to dispatch all KUnit tests from the same
+> + * place, and at the very least to do so after everything else is definitely
+> + * initialized.
+
+TODOs are odd to be adding to documentation, this is just not common
+place practice. The NOTE should suffice for you.
+
+  Luis
