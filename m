@@ -1,51 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:57162 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726024AbfGEBTs (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jul 2019 21:19:48 -0400
-Subject: Re: mmotm 2019-07-04-15-01 uploaded (gpu/drm/i915/oa/)
-References: <20190704220152.1bF4q6uyw%akpm@linux-foundation.org>
- <80bf2204-558a-6d3f-c493-bf17b891fc8a@infradead.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <63db23ac-c642-3e0c-58a4-81df991ad637@infradead.org>
-Date: Thu, 4 Jul 2019 18:19:43 -0700
-MIME-Version: 1.0
-In-Reply-To: <80bf2204-558a-6d3f-c493-bf17b891fc8a@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from [134.209.16.40] ([134.209.16.40]:39637 "EHLO TEST.localdomain"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726404AbfGECSZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 4 Jul 2019 22:18:25 -0400
+Received: from localhost (TEST [127.0.0.1])
+        by TEST.localdomain (Postfix) with SMTP id 3FFBAC1861
+        for <linux-kbuild@vger.kernel.org>; Fri,  5 Jul 2019 02:04:26 +0000 (UTC)
+From: linux-kbuild@vger.kernel.org
+Reply-To: demexinruslan+AP2qL9@gmail.com
+Subject: Klientskie bazy. Email: prodawez@armyspy.com Uznajte podrobnee!
+Message-Id: <20190705020426.3FFBAC1861@TEST.localdomain>
+Date: Fri,  5 Jul 2019 02:04:26 +0000 (UTC)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: akpm@linux-foundation.org, broonie@kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-next@vger.kernel.org, mhocko@suse.cz, mm-commits@vger.kernel.org, sfr@canb.auug.org.au, dri-devel <dri-devel@lists.freedesktop.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: cMRYBilinux-kbuild@vger.kernel.org
 
-On 7/4/19 6:09 PM, Randy Dunlap wrote:
-> On 7/4/19 3:01 PM, akpm@linux-foundation.org wrote:
->> The mm-of-the-moment snapshot 2019-07-04-15-01 has been uploaded to
->>
->>    http://www.ozlabs.org/~akpm/mmotm/
->>
->> mmotm-readme.txt says
->>
->> README for mm-of-the-moment:
->>
->> http://www.ozlabs.org/~akpm/mmotm/
-> 
-> I get a lot of these but don't see/know what causes them:
-> 
-> ../scripts/Makefile.build:42: ../drivers/gpu/drm/i915/oa/Makefile: No such file or directory
-> make[6]: *** No rule to make target '../drivers/gpu/drm/i915/oa/Makefile'.  Stop.
-> ../scripts/Makefile.build:498: recipe for target 'drivers/gpu/drm/i915/oa' failed
-> make[5]: *** [drivers/gpu/drm/i915/oa] Error 2
-> ../scripts/Makefile.build:498: recipe for target 'drivers/gpu/drm/i915' failed
-> 
-
-[+ linux-kbuild]
-
-It seems to have something to do with "modules.order".
-
-But!!!
-# CONFIG_DRM_I915 it not set
-
--- 
-~Randy
+Klientskie bazy. Email: prodawez@armyspy.com Uznajte podrobnee!
