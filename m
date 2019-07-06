@@ -1,96 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:22881 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfGFOqi (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:38596 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726522AbfGFQ0P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 6 Jul 2019 10:46:38 -0400
-MIME-Version: 1.0
-References: <20190622160705.17071-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190622160705.17071-1-yamada.masahiro@socionext.com>
+        Sat, 6 Jul 2019 12:26:15 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 6 Jul 2019 23:45:53 +0900
-Message-ID: <CAK7LNAQsdbV5MD4nBiSwky9jQue8+tRGwAxkFwYwyV-b17cYMw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild: rename arg-check to cmd-check
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2] kbuild: get rid of misleading $(AS) from documents
+Date: Sun,  7 Jul 2019 01:25:08 +0900
+Message-Id: <20190706162508.8529-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>
 
-On Sun, Jun 23, 2019 at 1:07 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> I prefer 'cmd-check' for consistency.
->
-> We have 'echo-cmd', 'cmd', 'cmd_and_fixdep', etc. in this file.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+The assembler files in the kernel are *.S instead of *.s, so they must
+be preprocessed. Since 'as' of GNU binutils is not able to preprocess,
+we always use $(CC) as an assembler driver.
 
-Series, applied to linux-kbuild.
+$(AS) is almost unused in Kbuild. As of writing, there is just one place
+that directly invokes $(AS).
 
+  $ git grep -e '$(AS)' -e '${AS}' -e '$AS' -e '$(AS:' -e '${AS:' -- :^Documentation
+  drivers/net/wan/Makefile:  AS68K = $(AS)
 
->  scripts/Kbuild.include | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index f641bb0aa63f..4bec04c89750 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -213,12 +213,12 @@ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
->  # See Documentation/kbuild/makefiles.txt for more info
->
->  ifneq ($(KBUILD_NOCMDDEP),1)
-> -# Check if both arguments are the same including their order. Result is empty
-> +# Check if both commands are the same including their order. Result is empty
->  # string if equal. User may override this check using make KBUILD_NOCMDDEP=1
-> -arg-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
-> +cmd-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(cmd_$@))), \
->                           $(subst $(space),$(space_escape),$(strip $(cmd_$1))))
->  else
-> -arg-check = $(if $(strip $(cmd_$@)),,1)
-> +cmd-check = $(if $(strip $(cmd_$@)),,1)
->  endif
->
->  # Replace >$< with >$$< to preserve $ when reloading the .cmd file
-> @@ -234,12 +234,12 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
->  any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
->
->  # Execute command if command has changed or prerequisite(s) are updated.
-> -if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
-> +if_changed = $(if $(strip $(any-prereq) $(cmd-check)),                       \
->         $(cmd);                                                              \
->         printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
->
->  # Execute the command and also postprocess generated .d dependencies file.
-> -if_changed_dep = $(if $(strip $(any-prereq) $(arg-check)),$(cmd_and_fixdep),@:)
-> +if_changed_dep = $(if $(strip $(any-prereq) $(cmd-check)),$(cmd_and_fixdep),@:)
->
->  cmd_and_fixdep =                                                             \
->         $(cmd);                                                              \
-> @@ -249,7 +249,7 @@ cmd_and_fixdep =                                                             \
->  # Usage: $(call if_changed_rule,foo)
->  # Will check if $(cmd_foo) or any of the prerequisites changed,
->  # and if so will execute $(rule_foo).
-> -if_changed_rule = $(if $(strip $(any-prereq) $(arg-check)),$(rule_$(1)),@:)
-> +if_changed_rule = $(if $(strip $(any-prereq) $(cmd-check)),$(rule_$(1)),@:)
->
->  ###
->  # why - tell why a target got built
-> @@ -275,7 +275,7 @@ why =                                                                        \
->      $(if $(filter $@, $(PHONY)),- due to target is PHONY,                    \
->          $(if $(wildcard $@),                                                 \
->              $(if $(strip $(any-prereq)),- due to: $(any-prereq),             \
-> -                $(if $(arg-check),                                           \
-> +                $(if $(cmd-check),                                           \
->                      $(if $(cmd_$@),- due to command line change,             \
->                          $(if $(filter $@, $(targets)),                       \
->                              - due to missing .cmd file,                      \
-> --
-> 2.17.1
->
+The documentation about *_AFLAGS* sounds like the flags were passed
+to $(AS). This is somewhat misleading.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+---
 
+Changes in v2:
+  - Rephrase without using "assembling"
+
+ Documentation/kbuild/kbuild.txt    |  5 ++---
+ Documentation/kbuild/makefiles.txt | 12 ++++++------
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 9c230ea71963..2c6188abb213 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -31,12 +31,11 @@ Additional options to the assembler (for built-in and modules).
+ 
+ AFLAGS_MODULE
+ --------------------------------------------------
+-Additional module specific options to use for $(AS).
++Additional assembler options for modules.
+ 
+ AFLAGS_KERNEL
+ --------------------------------------------------
+-Additional options for $(AS) when used for assembler
+-code for code that is compiled as built-in.
++Additional assembler options for built-in.
+ 
+ KCFLAGS
+ --------------------------------------------------
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index d65ad5746f94..895bbbf38a0c 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -306,7 +306,7 @@ more details, with real examples.
+ 	variable $(KBUILD_CFLAGS) and uses it for compilation flags for the
+ 	entire tree.
+ 
+-	asflags-y specifies options for assembling with $(AS).
++	asflags-y specifies assembler options.
+ 
+ 	Example:
+ 		#arch/sparc/kernel/Makefile
+@@ -441,7 +441,7 @@ more details, with real examples.
+ 	as-instr checks if the assembler reports a specific instruction
+ 	and then outputs either option1 or option2
+ 	C escapes are supported in the test instruction
+-	Note: as-instr-option uses KBUILD_AFLAGS for $(AS) options
++	Note: as-instr-option uses KBUILD_AFLAGS for assembler options
+ 
+     cc-option
+ 	cc-option is used to check if $(CC) supports a given option, and if
+@@ -814,7 +814,7 @@ When kbuild executes, the following steps are followed (roughly):
+ 	In this example, the binary $(obj)/image is a binary version of
+ 	vmlinux. The usage of $(call if_changed,xxx) will be described later.
+ 
+-    KBUILD_AFLAGS		$(AS) assembler flags
++    KBUILD_AFLAGS		assembler flags
+ 
+ 	Default value - see top level Makefile
+ 	Append or modify as required per architecture.
+@@ -853,15 +853,15 @@ When kbuild executes, the following steps are followed (roughly):
+ 	The first example utilises the trick that a config option expands
+ 	to 'y' when selected.
+ 
+-    KBUILD_AFLAGS_KERNEL	$(AS) options specific for built-in
++    KBUILD_AFLAGS_KERNEL	Assembler options specific for built-in
+ 
+ 	$(KBUILD_AFLAGS_KERNEL) contains extra C compiler flags used to compile
+ 	resident kernel code.
+ 
+-    KBUILD_AFLAGS_MODULE   Options for $(AS) when building modules
++    KBUILD_AFLAGS_MODULE   Assembler options specific for modules
+ 
+ 	$(KBUILD_AFLAGS_MODULE) is used to add arch-specific options that
+-	are used for $(AS).
++	are used for assembler.
+ 	From commandline AFLAGS_MODULE shall be used (see kbuild.txt).
+ 
+     KBUILD_CFLAGS_KERNEL	$(CC) options specific for built-in
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
