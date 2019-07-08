@@ -1,48 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:33110 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729936AbfGHOcj (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:58865 "EHLO
+        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390899AbfGHPfK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jul 2019 10:32:39 -0400
-Received: by mail-lj1-f193.google.com with SMTP id h10so16155908ljg.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Jul 2019 07:32:38 -0700 (PDT)
+        Mon, 8 Jul 2019 11:35:10 -0400
+From: Harald Seiler <hws@denx.de>
+Subject: [PATCH] kbuild: fix compression errors getting ignored
+Date: Mon,  8 Jul 2019 17:34:36 +0200
+Message-Id: <20190708153436.19260-1-hws@denx.de>
 MIME-Version: 1.0
-References: <20190703205527.955320-1-arnd@arndb.de> <20190703205527.955320-2-arnd@arndb.de>
-In-Reply-To: <20190703205527.955320-2-arnd@arndb.de>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 8 Jul 2019 16:32:26 +0200
-Message-ID: <CACRpkdYnuSqiYBPMe_+u6dx_X1zSYKCnCtFznWtxkMf-BGBwjA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kasan: disable CONFIG_KASAN_STACK with clang on arm32
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Abbott Liu <liuwenliang@huawei.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kasan-dev@googlegroups.com, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Andrey Konovalov <andreyknvl@google.com>, Will Deacon <will@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, clang-built-linux@googlegroups.com
+To: linux-kbuild@vger.kernel.org
+Cc: Harald Seiler <hws@denx.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-On Wed, Jul 3, 2019 at 10:56 PM Arnd Bergmann <arnd@arndb.de> wrote:
+A missing compression utility or other errors were not picked up by make
+and an empty kernel image was produced.  With the added "|| exit $?",
+the error is propagated outwards and will make the build fail.
 
-> The CONFIG_KASAN_STACK symbol tells us whether we should be using the
-> asan-stack=1 parameter. On clang-8, this causes explosive kernel stack
-> frame growth, so it is currently disabled, hopefully to be turned back
-> on when a future clang version is fixed. Examples include
->
-> drivers/media/dvb-frontends/mb86a20s.c:1942:12: error: stack frame size of 4128 bytes in function
-> drivers/net/wireless/atmel/atmel.c:1307:5: error: stack frame size of 4928 bytes in function 'atmel_open'
-> drivers/gpu/drm/nouveau/nvkm/subdev/fb/ramgk104.c:1521:1: error: stack frame size of 5440 bytes in function
-> drivers/media/i2c/mt9t112.c:670:12: error: stack frame size of 9344 bytes in function 'mt9t112_init_camera'
-> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:185:12: error: stack frame size of 10048 bytes
->
-> For the 32-bit ARM build, the logic I introduced earlier does
-> not work because $(CFLAGS_KASAN_SHADOW) is empty, and we don't add
-> those flags.
->
-> Moving the asan-stack= parameter down fixes this. No idea of any
-> of the other parameters should also be moved though.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Signed-off-by: Harald Seiler <hws@denx.de>
+---
+ scripts/Makefile.lib | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-For some reason the RealView doesn't boot after this patch. Trying to figure
-out why.
-
-Yours,
-Linus Walleij
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index f1f38c8cdc74..4b374da065a3 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -331,19 +331,19 @@ printf "%08x\n" $$dec_size |						\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9 && $(size_append); } > $@
++      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9 || exit $$? && $(size_append); } > $@
+ 
+ # Lzma
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_lzma = LZMA    $@
+-      cmd_lzma = { cat $(real-prereqs) | lzma -9 && $(size_append); } > $@
++      cmd_lzma = { cat $(real-prereqs) | lzma -9 || exit $$? && $(size_append); } > $@
+ 
+ quiet_cmd_lzo = LZO     $@
+-      cmd_lzo = { cat $(real-prereqs) | lzop -9 && $(size_append); } > $@
++      cmd_lzo = { cat $(real-prereqs) | lzop -9 || exit $$? && $(size_append); } > $@
+ 
+ quiet_cmd_lz4 = LZ4     $@
+-      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout && \
++      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout || exit $$? && \
+                   $(size_append); } > $@
+ 
+ # U-Boot mkimage
+@@ -386,8 +386,8 @@ quiet_cmd_uimage = UIMAGE  $@
+ # big dictionary would increase the memory usage too much in the multi-call
+ # decompression mode. A BCJ filter isn't used either.
+ quiet_cmd_xzkern = XZKERN  $@
+-      cmd_xzkern = { cat $(real-prereqs) | sh $(srctree)/scripts/xz_wrap.sh && \
+-                     $(size_append); } > $@
++      cmd_xzkern = { cat $(real-prereqs) | sh $(srctree)/scripts/xz_wrap.sh || \
++                     exit $$? && $(size_append); } > $@
+ 
+ quiet_cmd_xzmisc = XZMISC  $@
+       cmd_xzmisc = cat $(real-prereqs) | xz --check=crc32 --lzma2=dict=1MiB > $@
+-- 
+2.20.1
