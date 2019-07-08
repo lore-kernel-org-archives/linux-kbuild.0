@@ -1,83 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:41819 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730471AbfGHL1F (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:33110 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729936AbfGHOcj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jul 2019 07:27:05 -0400
-Received: by mail-lf1-f68.google.com with SMTP id 62so10665712lfa.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Jul 2019 04:27:04 -0700 (PDT)
+        Mon, 8 Jul 2019 10:32:39 -0400
+Received: by mail-lj1-f193.google.com with SMTP id h10so16155908ljg.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 08 Jul 2019 07:32:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <5d215f83.1c69fb81.3739c.06f8SMTPIN_ADDED_BROKEN@mx.google.com>
-In-Reply-To: <5d215f83.1c69fb81.3739c.06f8SMTPIN_ADDED_BROKEN@mx.google.com>
-From: Sumit Garg <sumit.garg@linaro.org>
-Date: Mon, 8 Jul 2019 16:56:52 +0530
-Message-ID: <CAFA6WYPQWvVhjPjs9gueSvSn=EYcDBh7XGU+7te09-rmiWEvGw@mail.gmail.com>
-Subject: Re: uuid define issue build on macos
+References: <20190703205527.955320-1-arnd@arndb.de> <20190703205527.955320-2-arnd@arndb.de>
+In-Reply-To: <20190703205527.955320-2-arnd@arndb.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 8 Jul 2019 16:32:26 +0200
+Message-ID: <CACRpkdYnuSqiYBPMe_+u6dx_X1zSYKCnCtFznWtxkMf-BGBwjA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kasan: disable CONFIG_KASAN_STACK with clang on arm32
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: feng chen <puck.chen@foxmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Abbott Liu <liuwenliang@huawei.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kasan-dev@googlegroups.com, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Andrey Konovalov <andreyknvl@google.com>, Will Deacon <will@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, clang-built-linux@googlegroups.com
 
-On Sun, 7 Jul 2019 at 08:27, feng chen <puck.chen@foxmail.com> wrote:
->
-> *** Default configuration is based on 'defconfig'
-> #
-> # No change to .config
-> #
-> arch/arm64/Makefile:40: LSE atomics not supported by binutils
-> arch/arm64/Makefile:48: Detected assembler with broken .inst;
-> disassembly will be unreliable
->    UPD     include/config/kernel.release
->    UPD     include/generated/utsrelease.h
->    HOSTCC  scripts/mod/file2alias.o
-> scripts/mod/file2alias.c:42:3: error: typedef redefinition with
-> different types ('struct uuid_t' vs '__darwin_uuid_t' (aka 'unsigned
-> char [16]'))
-> } uuid_t;
->    ^
+On Wed, Jul 3, 2019 at 10:56 PM Arnd Bergmann <arnd@arndb.de> wrote:
 
-It looks like somehow Darwin OS specific header is included here for
-UUID definition. Please try to build with following change to include
-only standardized headers:
+> The CONFIG_KASAN_STACK symbol tells us whether we should be using the
+> asan-stack=1 parameter. On clang-8, this causes explosive kernel stack
+> frame growth, so it is currently disabled, hopefully to be turned back
+> on when a future clang version is fixed. Examples include
+>
+> drivers/media/dvb-frontends/mb86a20s.c:1942:12: error: stack frame size of 4128 bytes in function
+> drivers/net/wireless/atmel/atmel.c:1307:5: error: stack frame size of 4928 bytes in function 'atmel_open'
+> drivers/gpu/drm/nouveau/nvkm/subdev/fb/ramgk104.c:1521:1: error: stack frame size of 5440 bytes in function
+> drivers/media/i2c/mt9t112.c:670:12: error: stack frame size of 9344 bytes in function 'mt9t112_init_camera'
+> drivers/video/fbdev/omap2/omapfb/displays/panel-tpo-td028ttec1.c:185:12: error: stack frame size of 10048 bytes
+>
+> For the 32-bit ARM build, the logic I introduced earlier does
+> not work because $(CFLAGS_KASAN_SHADOW) is empty, and we don't add
+> those flags.
+>
+> Moving the asan-stack= parameter down fixes this. No idea of any
+> of the other parameters should also be moved though.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -10,6 +10,7 @@
-  * of the GNU General Public License, incorporated herein by reference.
-  */
+For some reason the RealView doesn't boot after this patch. Trying to figure
+out why.
 
-+#define _XOPEN_SOURCE
- #include "modpost.h"
- #include "devicetable-offsets.h"
-
--Sumit
-
->
-/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_uuid_t.h:31:25:
-> note: previous definition is here
-> typedef __darwin_uuid_t uuid_t;
->                          ^
-> scripts/mod/file2alias.c:1300:42: error: array initializer must be an
-> initializer list or string literal
->          DEF_FIELD(symval, tee_client_device_id, uuid);
->                                                  ^
-> 2 errors generated.
-> make[2]: *** [scripts/mod/file2alias.o] Error 1
-> make[1]: *** [prepare0] Error 2
-> make: *** [sub-make] Error 2
->
-> and:
->
-> _types.h:77:typedef unsigned char   __darwin_uuid_t[16];
->
->   28 #ifndef _UUID_T
->   29 #define _UUID_T
->   30 #include <sys/_types.h> /* __darwin_uuid_t */
->   31 typedef __darwin_uuid_t uuid_t;
->
->
->   32 #endif /* _UUID_T */
->
->
->
+Yours,
+Linus Walleij
