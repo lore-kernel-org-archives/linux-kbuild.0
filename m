@@ -1,64 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:43944 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbfGIOxl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jul 2019 10:53:41 -0400
-Subject: Re: [PATCH v7 16/18] MAINTAINERS: add entry for KUnit the unit
- testing framework
-References: <20190709063023.251446-1-brendanhiggins@google.com>
- <20190709063023.251446-17-brendanhiggins@google.com>
-From: shuah <shuah@kernel.org>
-Message-ID: <7cc417dd-036f-7dc1-6814-b1fdac810f03@kernel.org>
-Date: Tue, 9 Jul 2019 08:53:19 -0600
+Received: from bombadil.infradead.org ([198.137.202.133]:56538 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbfGIOyI (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Jul 2019 10:54:08 -0400
+Subject: Re: [PATCH 1/4] Makefile: rules for printing kernel architecture and
+ localversion
+References: <1562664759-16009-1-git-send-email-info@metux.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <3d4da301-618e-e348-2a6a-144b802d240f@infradead.org>
+Date: Tue, 9 Jul 2019 07:54:06 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190709063023.251446-17-brendanhiggins@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1562664759-16009-1-git-send-email-info@metux.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>, frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, shuah <shuah@kernel.org>
+To: "Enrico Weigelt, metux IT consult" <info@metux.net>, linux-kernel@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, apw@canonical.com, joe@perches.com, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org, clang-built-linux@googlegroups.com
 
-On 7/9/19 12:30 AM, Brendan Higgins wrote:
-> Add myself as maintainer of KUnit, the Linux kernel's unit testing
-> framework.
+On 7/9/19 2:32 AM, Enrico Weigelt, metux IT consult wrote:
+> trivial rule to print out the kernel arch and localversion, so
+> external tools, like distro packagers, can easily get it.
 > 
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+> Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+
+Hi,
+If accepted, these targets should be added to the top level Makefile's
+"make help" output also.
+
+Thanks.
+
 > ---
->   MAINTAINERS | 11 +++++++++++
->   1 file changed, 11 insertions(+)
+>  Makefile | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 677ef41cb012c..48d04d180a988 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8599,6 +8599,17 @@ S:	Maintained
->   F:	tools/testing/selftests/
->   F:	Documentation/dev-tools/kselftest*
->   
-> +KERNEL UNIT TESTING FRAMEWORK (KUnit)
-> +M:	Brendan Higgins <brendanhiggins@google.com>
-> +L:	linux-kselftest@vger.kernel.org
-> +L:	kunit-dev@googlegroups.com
-> +W:	https://google.github.io/kunit-docs/third_party/kernel/docs/
-> +S:	Maintained
-> +F:	Documentation/dev-tools/kunit/
-> +F:	include/kunit/
-> +F:	kunit/
-> +F:	tools/testing/kunit/
+> diff --git a/Makefile b/Makefile
+> index 3e4868a..5afc3de 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1706,6 +1706,12 @@ kernelrelease:
+>  kernelversion:
+>  	@echo $(KERNELVERSION)
+>  
+> +kernellocalversion:
+> +	@$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) | sed -e 's~^\-~~'
 > +
->   KERNEL USERMODE HELPER
->   M:	Luis Chamberlain <mcgrof@kernel.org>
->   L:	linux-kernel@vger.kernel.org
+> +kernelarch:
+> +	@echo $(ARCH)
+> +
+>  image_name:
+>  	@echo $(KBUILD_IMAGE)
+>  
 > 
 
-Thanks Brendan.
 
-I am good with this. I can take KUnit patches through kselftest
-with your Ack.
-
-thanks,
--- Shuah
+-- 
+~Randy
