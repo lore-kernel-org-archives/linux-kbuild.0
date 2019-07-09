@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:42169 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:42461 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727076AbfGIEZl (ORCPT
+        with ESMTP id S1727454AbfGIEZw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jul 2019 00:25:41 -0400
+        Tue, 9 Jul 2019 00:25:52 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 06/11] kbuild: modsign: read modules.order instead of $(MODVERDIR)/*.mod
-Date: Tue,  9 Jul 2019 13:24:10 +0900
-Message-Id: <20190709042416.27554-7-yamada.masahiro@socionext.com>
-In-Reply-To: <20190709042416.27554-1-yamada.masahiro@socionext.com>
-References: <20190709042416.27554-1-yamada.masahiro@socionext.com>
+Subject: [PATCH 00/11] kbuild: create *.mod with directory path and remove MODVERDIR
+Date: Tue,  9 Jul 2019 13:24:04 +0900
+Message-Id: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Nicolas Pitre <nico@fluxnic.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Nicolas Pitre <nico@fluxnic.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "Martin K. Petersen" <martin.petersen@oracle.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>
 
-Towards the goal of removing MODVERDIR, read out modules.order to get
-the list of modules to be signed. This is simpler than parsing *.mod
-files in $(MODVERDIR).
 
-The modules_sign target is only supported for in-kernel modules.
-So, this commit does not take care of external modules.
+This series kills the long standing MODVERDIR.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Since MODVERDIR has a flat structure, it cannot avoid a race
+condition when somebody introduces a module name conflict.
 
- scripts/Makefile.modsign | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Kbuild now reads modules.order to get the list of all modules.
 
-diff --git a/scripts/Makefile.modsign b/scripts/Makefile.modsign
-index da56aa78d245..d7325cefe709 100644
---- a/scripts/Makefile.modsign
-+++ b/scripts/Makefile.modsign
-@@ -8,8 +8,7 @@ __modsign:
- 
- include scripts/Kbuild.include
- 
--__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
--modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
-+modules := $(sort $(shell cat modules.order))
- 
- PHONY += $(modules)
- __modsign: $(modules)
+The post-processing/installation stages will be more robust
+and simpler.
+
+
+
+Masahiro Yamada (11):
+  kbuild: do not create empty modules.order in the prepare stage
+  kbuild: get rid of kernel/ prefix from in-tree modules.{order,builtin}
+  kbuild: remove duplication from modules.order in sub-directories
+  scsi: remove pointless $(MODVERDIR)/$(obj)/53c700.ver
+  kbuild: modinst: read modules.order instead of $(MODVERDIR)/*.mod
+  kbuild: modsign: read modules.order instead of $(MODVERDIR)/*.mod
+  kbuild: modpost: read modules.order instead of $(MODVERDIR)/*.mod
+  kbuild: create *.mod with full directory path and remove MODVERDIR
+  kbuild: remove the first line of *.mod files
+  kbuild: remove 'prepare1' target
+  kbuild: split out *.mod out of {single,multi}-used-m rules
+
+ .gitignore                  |  1 +
+ Documentation/dontdiff      |  1 +
+ Makefile                    | 33 +++++++++------------------------
+ drivers/scsi/Makefile       |  2 +-
+ scripts/Makefile.build      | 33 ++++++++++++++++-----------------
+ scripts/Makefile.modbuiltin |  2 +-
+ scripts/Makefile.modinst    |  5 +----
+ scripts/Makefile.modpost    | 17 +++++++++--------
+ scripts/Makefile.modsign    |  3 +--
+ scripts/adjust_autoksyms.sh | 11 ++++-------
+ scripts/mod/sumversion.c    | 23 ++++-------------------
+ scripts/modules-check.sh    |  2 +-
+ scripts/package/mkspec      |  2 +-
+ 13 files changed, 50 insertions(+), 85 deletions(-)
+
 -- 
 2.17.1
