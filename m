@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:42157 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:42175 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727065AbfGIEZm (ORCPT
+        with ESMTP id S1727127AbfGIEZm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 9 Jul 2019 00:25:42 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 11/11] kbuild: split out *.mod out of {single,multi}-used-m rules
-Date: Tue,  9 Jul 2019 13:24:15 +0900
-Message-Id: <20190709042416.27554-12-yamada.masahiro@socionext.com>
+Subject: [PATCH 01/11] kbuild: do not create empty modules.order in the prepare stage
+Date: Tue,  9 Jul 2019 13:24:05 +0900
+Message-Id: <20190709042416.27554-2-yamada.masahiro@socionext.com>
 In-Reply-To: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 References: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,74 +15,57 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Nicolas Pitre <nico@fluxnic.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Currently, *.mod is created as a side-effect of obj-m.
+Currently, $(objtree)/modules.order is touched in two places.
 
-Split out *.mod as a dedicated build rule, which allows to
-unify the %.c -> %.o rule, and remove the single-used-m rule.
+In the 'prepare0' rule, scripts/Makefile.build creates an empty
+modules.order while processing 'obj=.'
 
-This also makes the incremental build of allmodconfig faster because
-it saves $(NM) invocation when there is no change in the module.
+In the 'modules' rule, the top-level Makefile overwrites it with
+the correct list of modules.
+
+It might be a good side-effect that modules.order is made empty
+every time (probably this is not intended functionality), but I
+personally do not like this behavior.
+
+Kbuild descends into some directories in the preparation stage,
+where created modules.order files may be broken.
+
+Export 'preparing' while running the 'prepare' target, and when it
+is defined, do not touch modules.order at all.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/Makefile.build | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ Makefile               | 1 +
+ scripts/Makefile.build | 2 ++
+ 2 files changed, 3 insertions(+)
 
+diff --git a/Makefile b/Makefile
+index 5c75ea7177f6..a31b672d512b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1000,6 +1000,7 @@ ifdef CONFIG_STACK_VALIDATION
+ endif
+ 
+ PHONY += prepare0
++prepare: export preparing=1
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+ core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f34f941c3b9b..00bd3bc1d6ba 100644
+index 776842b7e6a3..93c20664bcbb 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -69,8 +69,10 @@ modorder-target := $(obj)/modules.order
+@@ -64,8 +64,10 @@ builtin-target := $(obj)/built-in.a
  endif
+ 
+ ifdef CONFIG_MODULES
++ifndef preparing
+ modorder-target := $(obj)/modules.order
  endif
++endif
  
-+mod-targets := $(patsubst %.o, %.mod, $(obj-m))
-+
- __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
--	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target)) \
-+	 $(if $(KBUILD_MODULES),$(obj-m) $(mod-targets) $(modorder-target)) \
- 	 $(subdir-ym) $(always)
- 	@:
+ # We keep a list of all modules in $(MODVERDIR)
  
-@@ -268,7 +270,7 @@ endef
- 
- # List module undefined symbols (or empty line if not enabled)
- ifdef CONFIG_TRIM_UNUSED_KSYMS
--cmd_undef_syms = $(NM) $@ | sed -n 's/^  *U //p' | xargs echo
-+cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | xargs echo
- else
- cmd_undef_syms = echo
- endif
-@@ -278,11 +280,15 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
- 
--$(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
--	$(call cmd,force_checksrc)
--	$(call if_changed_rule,cc_o_c)
--	@{ echo $@; \
--	   $(cmd_undef_syms); } > $(patsubst %.o,%.mod,$@)
-+cmd_mod = { \
-+	echo $(if $($*-objs)$($*-y)$($*-m), $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)), $(@:.mod=.o)); \
-+	$(cmd_undef_syms); \
-+	} > $@
-+
-+$(obj)/%.mod: $(obj)/%.o FORCE
-+	$(call if_changed,mod)
-+
-+targets += $(mod-targets)
- 
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-@@ -463,8 +469,6 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^) $(cmd_secanalysis
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(filter %.o,$^); \
--	   $(cmd_undef_syms); } > $(patsubst %.o,%.mod,$@)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
- targets += $(multi-used-m)
 -- 
 2.17.1
