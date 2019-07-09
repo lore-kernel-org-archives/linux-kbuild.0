@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:42175 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:42158 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727127AbfGIEZm (ORCPT
+        with ESMTP id S1725906AbfGIEZm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 9 Jul 2019 00:25:42 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 01/11] kbuild: do not create empty modules.order in the prepare stage
-Date: Tue,  9 Jul 2019 13:24:05 +0900
-Message-Id: <20190709042416.27554-2-yamada.masahiro@socionext.com>
+Subject: [PATCH 07/11] kbuild: modpost: read modules.order instead of $(MODVERDIR)/*.mod
+Date: Tue,  9 Jul 2019 13:24:11 +0900
+Message-Id: <20190709042416.27554-8-yamada.masahiro@socionext.com>
 In-Reply-To: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 References: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,57 +15,57 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Nicolas Pitre <nico@fluxnic.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Currently, $(objtree)/modules.order is touched in two places.
+Towards the goal of removing MODVERDIR, read out modules.order to get
+the list of modules to be processed. This is simpler than parsing *.mod
+files in $(MODVERDIR).
 
-In the 'prepare0' rule, scripts/Makefile.build creates an empty
-modules.order while processing 'obj=.'
-
-In the 'modules' rule, the top-level Makefile overwrites it with
-the correct list of modules.
-
-It might be a good side-effect that modules.order is made empty
-every time (probably this is not intended functionality), but I
-personally do not like this behavior.
-
-Kbuild descends into some directories in the preparation stage,
-where created modules.order files may be broken.
-
-Export 'preparing' while running the 'prepare' target, and when it
-is defined, do not touch modules.order at all.
+For external modules, $(KBUILD_EXTMOD)/modules.order should be read.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile               | 1 +
- scripts/Makefile.build | 2 ++
- 2 files changed, 3 insertions(+)
+ scripts/Makefile.modpost | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 5c75ea7177f6..a31b672d512b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1000,6 +1000,7 @@ ifdef CONFIG_STACK_VALIDATION
- endif
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index fec6ec2ffa47..2ab1694a7df3 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -8,9 +8,10 @@
+ # b) A <module>.o file which is the .o files above linked together
+ # c) A <module>.mod file in $(MODVERDIR)/, listing the name of the
+ #    the preliminary <module>.o file, plus all .o files
++# d) modules.order, which lists all the modules
  
- PHONY += prepare0
-+prepare: export preparing=1
+ # Stage 2 is handled by this file and does the following
+-# 1) Find all modules from the files listed in $(MODVERDIR)/
++# 1) Find all modules listed in modules.order
+ # 2) modpost is then used to
+ # 3)  create one <module>.mod.c file pr. module
+ # 4)  create one Module.symvers file with CRC for all exported symbols
+@@ -60,10 +61,10 @@ include scripts/Makefile.lib
+ kernelsymfile := $(objtree)/Module.symvers
+ modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
  
- ifeq ($(KBUILD_EXTMOD),)
- core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 776842b7e6a3..93c20664bcbb 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -64,8 +64,10 @@ builtin-target := $(obj)/built-in.a
- endif
+-# Step 1), find all modules listed in $(MODVERDIR)/
+-MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort -u
+-__modules := $(shell $(MODLISTCMD))
+-modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
++modorder := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)modules.order
++
++# Step 1), find all modules listed in modules.order
++modules := $(sort $(shell cat $(modorder)))
  
- ifdef CONFIG_MODULES
-+ifndef preparing
- modorder-target := $(obj)/modules.order
- endif
-+endif
+ # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
+ _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
+@@ -84,7 +85,7 @@ MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
  
- # We keep a list of all modules in $(MODVERDIR)
+ # We can go over command line length here, so be careful.
+ quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+-      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T -
++      cmd_modpost = sed 's/ko$$/o/' $(modorder) | $(modpost) $(MODPOST_OPT) -s -T -
  
+ PHONY += __modpost
+ __modpost: $(modules:.ko=.o) FORCE
 -- 
 2.17.1
