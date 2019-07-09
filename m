@@ -1,51 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp1.pobox.com ([64.147.108.70]:60058 "EHLO
-        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726133AbfGIRhy (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40828 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726492AbfGISBs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jul 2019 13:37:54 -0400
-Date: Tue, 9 Jul 2019 13:37:50 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH 08/11] kbuild: create *.mod with full directory path and
- remove MODVERDIR
-In-Reply-To: <20190709042416.27554-9-yamada.masahiro@socionext.com>
-Message-ID: <nycvar.YSQ.7.76.1907091332150.4190@knanqh.ubzr>
-References: <20190709042416.27554-1-yamada.masahiro@socionext.com> <20190709042416.27554-9-yamada.masahiro@socionext.com>
+        Tue, 9 Jul 2019 14:01:48 -0400
+Received: by mail-pf1-f196.google.com with SMTP id p184so9661541pfp.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 Jul 2019 11:01:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20190709063023.251446-1-brendanhiggins@google.com>
+ <20190709063023.251446-17-brendanhiggins@google.com> <7cc417dd-036f-7dc1-6814-b1fdac810f03@kernel.org>
+In-Reply-To: <7cc417dd-036f-7dc1-6814-b1fdac810f03@kernel.org>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Tue, 9 Jul 2019 11:01:35 -0700
+Message-ID: <CAFd5g4595X8cM919mohQVaShs4dKWzZ_-2RVB=6SH3RdVMwuQw@mail.gmail.com>
+Subject: Re: [PATCH v7 16/18] MAINTAINERS: add entry for KUnit the unit
+ testing framework
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: shuah <shuah@kernel.org>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Tue, 9 Jul 2019, Masahiro Yamada wrote:
+On Tue, Jul 9, 2019 at 7:53 AM shuah <shuah@kernel.org> wrote:
+>
+> On 7/9/19 12:30 AM, Brendan Higgins wrote:
+> > Add myself as maintainer of KUnit, the Linux kernel's unit testing
+> > framework.
+> >
+> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+> > ---
+> >   MAINTAINERS | 11 +++++++++++
+> >   1 file changed, 11 insertions(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 677ef41cb012c..48d04d180a988 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -8599,6 +8599,17 @@ S:     Maintained
+> >   F:  tools/testing/selftests/
+> >   F:  Documentation/dev-tools/kselftest*
+> >
+> > +KERNEL UNIT TESTING FRAMEWORK (KUnit)
+> > +M:   Brendan Higgins <brendanhiggins@google.com>
+> > +L:   linux-kselftest@vger.kernel.org
+> > +L:   kunit-dev@googlegroups.com
+> > +W:   https://google.github.io/kunit-docs/third_party/kernel/docs/
+> > +S:   Maintained
+> > +F:   Documentation/dev-tools/kunit/
+> > +F:   include/kunit/
+> > +F:   kunit/
+> > +F:   tools/testing/kunit/
+> > +
+> >   KERNEL USERMODE HELPER
+> >   M:  Luis Chamberlain <mcgrof@kernel.org>
+> >   L:  linux-kernel@vger.kernel.org
+> >
+>
+> Thanks Brendan.
+>
+> I am good with this. I can take KUnit patches through kselftest
+> with your Ack.
 
-> --- a/scripts/adjust_autoksyms.sh
-> +++ b/scripts/adjust_autoksyms.sh
-> @@ -47,13 +47,10 @@ cat > "$new_ksyms_file" << EOT
->   */
->  
->  EOT
-> -[ "$(ls -A "$MODVERDIR")" ] &&
-> -for mod in "$MODVERDIR"/*.mod; do
-> -	sed -n -e '3{s/ /\n/g;/^$/!p;}' "$mod"
-> -done | sort -u |
-> -while read sym; do
-> -	echo "#define __KSYM_${sym} 1"
-> -done >> "$new_ksyms_file"
-> +sed 's/ko$/mod/' modules.order |
-> +xargs -r -n1 sed -n -e '3{s/ /\n/g;/^$/!p;}' |
-> +sort -u |
-> +sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$new_ksyms_file"
+My acknowledgement? Sure! I thought we already agreed to that.
 
-Did you consider the case when CONFIG_MODULES=y but no modules are 
-selected? Also -r to xargs is a GNU extension and there were some 
-efforts to remove theur use in the past (no idea if this is still a 
-concern).
+Also, do we need an ack from Masahiro or Michal for the Kbuild patch
+[PATCH v7 06/18]? And an ack from Josh or Peter for the objtool patch
+[PATCH v7 08/18]?
 
-Other than that, looks good to me.
+Greg and Logan gave me a Reviewed-by for the Kbuild patch, so maybe
+that's fine, but I don't have any reviews or acks for the objtool
+patch.
 
-Acked-by: Nicolas Pitre <nico@fluxnic.net>
-
-
-Nicolas
+Thanks!
