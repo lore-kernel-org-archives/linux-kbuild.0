@@ -1,106 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:30792 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbfGIBK5 (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:42170 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727072AbfGIEZl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Jul 2019 21:10:57 -0400
-MIME-Version: 1.0
-References: <20190701005845.12475-1-yamada.masahiro@socionext.com> <20190701005845.12475-4-yamada.masahiro@socionext.com>
-In-Reply-To: <20190701005845.12475-4-yamada.masahiro@socionext.com>
+        Tue, 9 Jul 2019 00:25:41 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 9 Jul 2019 10:10:12 +0900
-Message-ID: <CAK7LNARjYtGGe2Jk9H6VPU5_G_X6xbMU=KS3oPgFrAbGyMNePQ@mail.gmail.com>
-Subject: Re: [PATCH 3/7] kbuild: do not create wrappers for header-test-y
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 10/11] kbuild: remove 'prepare1' target
+Date: Tue,  9 Jul 2019 13:24:14 +0900
+Message-Id: <20190709042416.27554-11-yamada.masahiro@socionext.com>
+In-Reply-To: <20190709042416.27554-1-yamada.masahiro@socionext.com>
+References: <20190709042416.27554-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Joel Fernandes <joel@joelfernandes.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicolas Pitre <nico@fluxnic.net>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Mon, Jul 1, 2019 at 10:00 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> header-test-y does not work with headers in sub-directories.
->
-> For example, you may want to write a Makefile, like this:
->
-> include/linux/Kbuild:
->
->   header-test-y += mtd/nand.h
->
-> This entry will create a wrapper include/linux/mtd/nand.hdrtest.c
-> with the following content:
->
->   #include "mtd/nand.h"
->
-> To make this work, we need to add $(srctree)/include/linux to the
-> header search path. It would be tedious to add ccflags-y.
->
-> Instead, we could change the *.hdrtest.c rule to wrap:
->
->   #include "nand.h"
->
-> This works for in-tree build since #include "..." searches in the
-> relative path from the header with this directive. For O=... build,
-> we need to add $(srctree)/include/linux/mtd to the header search path,
-> which will be even more tedious.
->
-> After all, I thought it would be handier to compile headers directly
-> without creating wrappers.
->
-> I added a new build rule to compile %.h into %.h.s
->
-> The target is %.h.s instead of %.h.o because it is slightly faster.
-> Also, as for GCC, an empty assembly is smaller than an empty object.
->
-> I wrote the build rule:
->
->   $(CC) $(c_flags) -S -o $@ -x c /dev/null -include $<
->
-> instead of:
->
->   $(CC) $(c_flags) -S -o $@ -x c $<
->
-> Both work fine with GCC, but the latter is bad for Clang.
->
-> This comes down to the difference in the -Wunused-function policy.
-> GCC does not warn about unused 'static inline' functions at all.
-> Clang does not warn about the ones in included headers, but does
-> about the ones in the source. So, we should handle headers as
-> headers, not as source files.
->
-> In fact, this has been hidden since commit abb2ea7dfd82 ("compiler,
-> clang: suppress warning for unused static inline functions"), but we
-> should not rely on that.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Acked-by: Jani Nikula <jani.nikula@intel.com>
-> Tested-by: Jani Nikula <jani.nikula@intel.com>
-> ---
+Now that there is no rule for 'prepare1', it can go away.
 
-To exclude *.h.s from kernel-devel rpm,
-I will squash the following change:
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index 009147d4718e..2d29df4a0a53 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -31,7 +31,7 @@ PROVIDES="$PROVIDES kernel-$KERNELRELEASE"
- __KERNELRELEASE=$(echo $KERNELRELEASE | sed -e "s/-/_/g")
- EXCLUDES="$RCS_TAR_IGNORE --exclude=.tmp_versions --exclude=*vmlinux* \
- --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation \
----exclude=.config.old --exclude=.missing-syscalls.d"
-+--exclude=.config.old --exclude=.missing-syscalls.d --exclude=*.s"
+ Makefile | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
- # We can label the here-doc lines for conditional output to the spec file
- #
-
-
-
-
-
-
-
+diff --git a/Makefile b/Makefile
+index 958fafa605b9..b284863e7ea0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1094,7 +1094,7 @@ scripts: scripts_basic scripts_dtc
+ # archprepare is used in arch Makefiles and when processed asm symlink,
+ # version.h and scripts_basic is processed / created.
+ 
+-PHONY += prepare archprepare prepare1 prepare3
++PHONY += prepare archprepare prepare3
+ 
+ # prepare3 is used to check if we are building in a separate output directory,
+ # and if so do:
+@@ -1111,10 +1111,8 @@ ifneq ($(srctree),.)
+ 	fi;
+ endif
+ 
+-prepare1: prepare3 outputmakefile asm-generic $(version_h) $(autoksyms_h) \
+-						include/generated/utsrelease.h
+-
+-archprepare: archheaders archscripts prepare1 scripts
++archprepare: archheaders archscripts scripts prepare3 outputmakefile \
++	asm-generic $(version_h) $(autoksyms_h) include/generated/utsrelease.h
+ 
+ prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=scripts/mod
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
