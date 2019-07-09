@@ -1,47 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:58287 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbfGIKUz (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:50152 "EHLO
+        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726591AbfGIKwP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jul 2019 06:20:55 -0400
-Subject: Re: [PATCH v4] builddeb: generate multi-arch friendly linux-libc-dev
- package
-References: <CAK7LNARgFmSm+kCngidevQ3HnNjqKDKfGzYXrFPzhgBRHmccXw@mail.gmail.com>
- <1562658215-186-1-git-send-email-Cedric_Hombourger@mentor.com>
- <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
-From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Message-ID: <37f96102-34bf-db52-720a-d8c83965f8dc@metux.net>
-Date: Tue, 9 Jul 2019 12:20:43 +0200
+        Tue, 9 Jul 2019 06:52:15 -0400
+From: Harald Seiler <hws@denx.de>
+Subject: [PATCH v2] kbuild: fix compression errors getting ignored
+Date: Tue,  9 Jul 2019 12:50:50 +0200
+Message-Id: <20190709105048.4608-1-hws@denx.de>
 MIME-Version: 1.0
-In-Reply-To: <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cedric Hombourger <Cedric_Hombourger@mentor.com>, yamada.masahiro@socionext.com
-Cc: ben@decadent.org.uk, isar-users@googlegroups.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, riku.voipio@linaro.org
+To: linux-kbuild@vger.kernel.org
+Cc: Harald Seiler <hws@denx.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
 
-On 09.07.19 09:43, Cedric Hombourger wrote:
-> Debian-based distributions place libc header files in a machine
-> specific directory (/usr/include/<libc-machine>) instead of
-> /usr/include/asm to support installation of the linux-libc-dev
-> package from multiple architectures. Move headers installed by
-> "make headers_install" accordingly using Debian's tuple from
-> dpkg-architecture (stored in debian/arch).
+A missing compression utility or other errors were not picked up by make
+and an empty kernel image was produced.  By removing the &&, errors will
+no longer be ignored.
 
-Is it correct the packages currently are not multiarch-compatible ?
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>
+Signed-off-by: Harald Seiler <hws@denx.de>
+---
 
-If so, your patch would be another step towards completely replacing
-the downstream's utterly complex build process :)
+Changes in v2:
+  - Use a much simpler fix for this problem
 
-I'll give it some test cycles.
+Thanks!  Somehow I totally missed doing it this way ...
 
-thx.
+ scripts/Makefile.lib | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
---mtx
-
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index f1f38c8cdc74..768e697df304 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -331,19 +331,19 @@ printf "%08x\n" $$dec_size |						\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9 && $(size_append); } > $@
++      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9; $(size_append); } > $@
+ 
+ # Lzma
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_lzma = LZMA    $@
+-      cmd_lzma = { cat $(real-prereqs) | lzma -9 && $(size_append); } > $@
++      cmd_lzma = { cat $(real-prereqs) | lzma -9; $(size_append); } > $@
+ 
+ quiet_cmd_lzo = LZO     $@
+-      cmd_lzo = { cat $(real-prereqs) | lzop -9 && $(size_append); } > $@
++      cmd_lzo = { cat $(real-prereqs) | lzop -9; $(size_append); } > $@
+ 
+ quiet_cmd_lz4 = LZ4     $@
+-      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout && \
++      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout; \
+                   $(size_append); } > $@
+ 
+ # U-Boot mkimage
+@@ -386,7 +386,7 @@ quiet_cmd_uimage = UIMAGE  $@
+ # big dictionary would increase the memory usage too much in the multi-call
+ # decompression mode. A BCJ filter isn't used either.
+ quiet_cmd_xzkern = XZKERN  $@
+-      cmd_xzkern = { cat $(real-prereqs) | sh $(srctree)/scripts/xz_wrap.sh && \
++      cmd_xzkern = { cat $(real-prereqs) | sh $(srctree)/scripts/xz_wrap.sh; \
+                      $(size_append); } > $@
+ 
+ quiet_cmd_xzmisc = XZMISC  $@
 -- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+2.20.1
