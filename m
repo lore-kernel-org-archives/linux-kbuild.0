@@ -1,81 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46196 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfGJU1y (ORCPT
+Received: from 50-244-196-250-static.hfc.comcastbusiness.net ([50.244.196.250]:56929
+        "EHLO hometime.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727767AbfGJWE2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jul 2019 16:27:54 -0400
-Received: by mail-pf1-f194.google.com with SMTP id c73so1600710pfb.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2019 13:27:54 -0700 (PDT)
+        Wed, 10 Jul 2019 18:04:28 -0400
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-References: <20190709063023.251446-1-brendanhiggins@google.com>
- <20190709063023.251446-17-brendanhiggins@google.com> <7cc417dd-036f-7dc1-6814-b1fdac810f03@kernel.org>
- <CAFd5g4595X8cM919mohQVaShs4dKWzZ_-2RVB=6SH3RdVMwuQw@mail.gmail.com>
-In-Reply-To: <CAFd5g4595X8cM919mohQVaShs4dKWzZ_-2RVB=6SH3RdVMwuQw@mail.gmail.com>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Wed, 10 Jul 2019 13:27:42 -0700
-Message-ID: <CAFd5g45zFhBN-yrJbRt6KnFkYKxVqjs9qeQULCSD6z89vvG-Tg@mail.gmail.com>
-Subject: Re: [PATCH v7 16/18] MAINTAINERS: add entry for KUnit the unit
- testing framework
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Greetings!
+From: fuqingzheng@asia.com
+Date: Wed, 10 Jul 2019 07:07:40 +0200
+Reply-To: zhengfuqing@yandex.com
+Message-ID: <SBSJZZJfwTXSRdZqou200008feb@hometime.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shuah <shuah@kernel.org>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: Recipients <fuqingzheng@asia.com>
 
-On Tue, Jul 9, 2019 at 11:01 AM Brendan Higgins
-<brendanhiggins@google.com> wrote:
->
-> On Tue, Jul 9, 2019 at 7:53 AM shuah <shuah@kernel.org> wrote:
-> >
-> > On 7/9/19 12:30 AM, Brendan Higgins wrote:
-> > > Add myself as maintainer of KUnit, the Linux kernel's unit testing
-> > > framework.
-> > >
-> > > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> > > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> > > ---
-> > >   MAINTAINERS | 11 +++++++++++
-> > >   1 file changed, 11 insertions(+)
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 677ef41cb012c..48d04d180a988 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -8599,6 +8599,17 @@ S:     Maintained
-> > >   F:  tools/testing/selftests/
-> > >   F:  Documentation/dev-tools/kselftest*
-> > >
-> > > +KERNEL UNIT TESTING FRAMEWORK (KUnit)
-> > > +M:   Brendan Higgins <brendanhiggins@google.com>
-> > > +L:   linux-kselftest@vger.kernel.org
-> > > +L:   kunit-dev@googlegroups.com
-> > > +W:   https://google.github.io/kunit-docs/third_party/kernel/docs/
-> > > +S:   Maintained
-> > > +F:   Documentation/dev-tools/kunit/
-> > > +F:   include/kunit/
-> > > +F:   kunit/
-> > > +F:   tools/testing/kunit/
-> > > +
-> > >   KERNEL USERMODE HELPER
-> > >   M:  Luis Chamberlain <mcgrof@kernel.org>
-> > >   L:  linux-kernel@vger.kernel.org
-> > >
-> >
-> > Thanks Brendan.
-> >
-> > I am good with this. I can take KUnit patches through kselftest
-> > with your Ack.
->
-> My acknowledgement? Sure! I thought we already agreed to that.
->
-> Also, do we need an ack from Masahiro or Michal for the Kbuild patch
-> [PATCH v7 06/18]? And an ack from Josh or Peter for the objtool patch
-> [PATCH v7 08/18]?
+Good day,
 
-By the way, I am guessing you have already seen it, but I uploaded a
-new version to incorporate a suggestion made by Masahiro on patch
-06/18. In addition, I have gotten acks on the two patches mentioned
-above. So I think we are good to go.
+  I have a mutual business proposal, which refers to the transfer of a large amount of money to an account abroad, with your help as a foreign partner as a beneficiary of the funds. Everything about this transaction will be legal without any bridge of financial authority both in my country and yours. If you are interested and I will give you more information about the project as soon as I receive your positive response.
 
-Thanks!
+Best regards,
+
+Executive Director.
+ 
+ICBC. China
+
+---
+Dit e-mailbericht is gecontroleerd op virussen met Avast antivirussoftware.
+https://www.avast.com/antivirus
