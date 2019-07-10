@@ -1,60 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55040 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725832AbfGJCbg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jul 2019 22:31:36 -0400
-Date: Tue, 9 Jul 2019 21:31:23 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v7 08/18] objtool: add kunit_try_catch_throw to the
- noreturn list
-Message-ID: <20190710023123.ifnt5osimvzoe5hf@treble>
-References: <20190709063023.251446-1-brendanhiggins@google.com>
- <20190709063023.251446-9-brendanhiggins@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190709063023.251446-9-brendanhiggins@google.com>
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47976 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725880AbfGJDKX (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Jul 2019 23:10:23 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] fixup! kbuild: remove obj and src from the top Makefile
+Date: Wed, 10 Jul 2019 12:09:01 +0900
+Message-Id: <20190710030901.1836-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>
-Cc: frowand.list@gmail.com, gregkh@linuxfoundation.org, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, kbuild test robot <lkp@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-parisc@vger.kernel.org, "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, Vineet Gupta <vgupta@synopsys.com>, linux-um@lists.infradead.org, Richard Weinberger <richard@nod.at>, linux-snps-arc@lists.infradead.org, Jeff Dike <jdike@addtoit.com>, Anton Ivanov <anton.ivanov@cambridgegreys.com>
 
-On Mon, Jul 08, 2019 at 11:30:13PM -0700, Brendan Higgins wrote:
-> Fix the following warning seen on GCC 7.3:
->   kunit/test-test.o: warning: objtool: kunit_test_unsuccessful_try() falls through to next function kunit_test_catch()
-> 
-> kunit_try_catch_throw is a function added in the following patch in this
-> series; it allows KUnit, a unit testing framework for the kernel, to
-> bail out of a broken test. As a consequence, it is a new __noreturn
-> function that objtool thinks is broken (as seen above). So fix this
-> warning by adding kunit_try_catch_throw to objtool's noreturn list.
-> 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Link: https://www.spinics.net/lists/linux-kbuild/msg21708.html
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> ---
->  tools/objtool/check.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-> index 172f991957269..98db5fe85c797 100644
-> --- a/tools/objtool/check.c
-> +++ b/tools/objtool/check.c
-> @@ -134,6 +134,7 @@ static int __dead_end_function(struct objtool_file *file, struct symbol *func,
->  		"usercopy_abort",
->  		"machine_real_restart",
->  		"rewind_stack_do_exit",
-> +		"kunit_try_catch_throw",
->  	};
->  
->  	if (func->bind == STB_WEAK)
-> -- 
-> 2.22.0.410.gd8fdbe21b5-goog
-> 
+Merging today's kbuild tree would break arc, um, parisc.
+I just noticed it now. I will fix it soon for tomorrow's linux-next.
 
-Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
+If needed, this might be useful for today's linux-next.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ arch/arc/Makefile    |  2 +-
+ arch/parisc/Makefile | 12 ++++++------
+ arch/um/Makefile     |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arc/Makefile b/arch/arc/Makefile
+index 03a0b19c92cd..ee6d1184c2b1 100644
+--- a/arch/arc/Makefile
++++ b/arch/arc/Makefile
+@@ -19,7 +19,7 @@ ifdef CONFIG_ARC_CURR_IN_REG
+ # any kernel headers, and missing the r25 global register
+ # Can't do unconditionally because of recursive include issues
+ # due to <linux/thread_info.h>
+-LINUXINCLUDE	+=  -include ${src}/arch/arc/include/asm/current.h
++LINUXINCLUDE	+=  -include $(srctree)/arch/arc/include/asm/current.h
+ endif
+ 
+ cflags-y				+= -fsection-anchors
+diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+index 58d46665cad9..8acb8fa1f8d6 100644
+--- a/arch/parisc/Makefile
++++ b/arch/parisc/Makefile
+@@ -120,8 +120,8 @@ PALO := $(shell if (which palo 2>&1); then : ; \
+ 	elif [ -x /sbin/palo ]; then echo /sbin/palo; \
+ 	fi)
+ 
+-PALOCONF := $(shell if [ -f $(src)/palo.conf ]; then echo $(src)/palo.conf; \
+-	else echo $(obj)/palo.conf; \
++PALOCONF := $(shell if [ -f $(srctree)/palo.conf ]; then echo $(srctree)/palo.conf; \
++	else echo $(objtree)/palo.conf; \
+ 	fi)
+ 
+ palo lifimage: vmlinuz
+@@ -131,8 +131,8 @@ palo lifimage: vmlinuz
+ 		false; \
+ 	fi
+ 	@if test ! -f "$(PALOCONF)"; then \
+-		cp $(src)/arch/parisc/defpalo.conf $(obj)/palo.conf; \
+-		echo 'A generic palo config file ($(obj)/palo.conf) has been created for you.'; \
++		cp $(srctree)/arch/parisc/defpalo.conf $(objtree)/palo.conf; \
++		echo 'A generic palo config file ($(objree)/palo.conf) has been created for you.'; \
+ 		echo 'You should check it and re-run "make palo".'; \
+ 		echo 'WARNING: the "lifimage" file is now placed in this directory by default!'; \
+ 		false; \
+@@ -162,10 +162,10 @@ vmlinuz: vmlinux
+ endif
+ 
+ install:
+-	$(CONFIG_SHELL) $(src)/arch/parisc/install.sh \
++	$(CONFIG_SHELL) $(srctree)/arch/parisc/install.sh \
+ 			$(KERNELRELEASE) vmlinux System.map "$(INSTALL_PATH)"
+ zinstall:
+-	$(CONFIG_SHELL) $(src)/arch/parisc/install.sh \
++	$(CONFIG_SHELL) $(srctree)/arch/parisc/install.sh \
+ 			$(KERNELRELEASE) vmlinuz System.map "$(INSTALL_PATH)"
+ 
+ CLEAN_FILES	+= lifimage
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index 273130cf91d1..d2daa206872d 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -73,7 +73,7 @@ KBUILD_AFLAGS += $(ARCH_INCLUDE)
+ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -I%,,$(KBUILD_CFLAGS))) \
+ 		$(ARCH_INCLUDE) $(MODE_INCLUDE) $(filter -I%,$(CFLAGS)) \
+ 		-D_FILE_OFFSET_BITS=64 -idirafter $(srctree)/include \
+-		-idirafter $(obj)/include -D__KERNEL__ -D__UM_HOST__
++		-idirafter $(objtree)/include -D__KERNEL__ -D__UM_HOST__
+ 
+ #This will adjust *FLAGS accordingly to the platform.
+ include $(ARCH_DIR)/Makefile-os-$(OS)
 -- 
-Josh
+2.17.1
