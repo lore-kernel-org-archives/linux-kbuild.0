@@ -1,92 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:63681 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725791AbfGJEAZ (ORCPT
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:46583 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726245AbfGJHPb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jul 2019 00:00:25 -0400
-MIME-Version: 1.0
-References: <20190709063023.251446-1-brendanhiggins@google.com> <20190709063023.251446-7-brendanhiggins@google.com>
-In-Reply-To: <20190709063023.251446-7-brendanhiggins@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 10 Jul 2019 12:59:30 +0900
-Message-ID: <CAK7LNATx30AhZ51xozde=nO06-8UzuC0M9nfZXrqkyfmEFdu5w@mail.gmail.com>
-Subject: Re: [PATCH v7 06/18] kbuild: enable building KUnit
+        Wed, 10 Jul 2019 03:15:31 -0400
+Received: by mail-pg1-f201.google.com with SMTP id u1so911997pgr.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2019 00:15:31 -0700 (PDT)
+Date: Wed, 10 Jul 2019 00:14:50 -0700
+Message-Id: <20190710071508.173491-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v8 00/18] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, "Cc: Shuah Khan" <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, DTML <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, Tim Bird <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, Michal Marek <michal.lkml@markovi.net>
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Iurii Zaikin <yzaikin@google.com>
 
-On Tue, Jul 9, 2019 at 3:34 PM Brendan Higgins
-<brendanhiggins@google.com> wrote:
->
-> KUnit is a new unit testing framework for the kernel and when used is
-> built into the kernel as a part of it. Add KUnit to the root Kconfig and
-> Makefile to allow it to be actually built.
->
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->  Kconfig  | 2 ++
->  Makefile | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/Kconfig b/Kconfig
-> index 48a80beab6853..10428501edb78 100644
-> --- a/Kconfig
-> +++ b/Kconfig
-> @@ -30,3 +30,5 @@ source "crypto/Kconfig"
->  source "lib/Kconfig"
->
->  source "lib/Kconfig.debug"
-> +
-> +source "kunit/Kconfig"
-> diff --git a/Makefile b/Makefile
-> index 3e4868a6498b2..60cf4f0813e0d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -991,7 +991,7 @@ endif
->  PHONY += prepare0
->
->  ifeq ($(KBUILD_EXTMOD),)
-> -core-y         += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-> +core-y         += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/ kunit/
->
->  vmlinux-dirs   := $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
->                      $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
-> --
-> 2.22.0.410.gd8fdbe21b5-goog
+## TL;DR
 
+This new patch set only contains a very minor change suggested by
+Masahiro to [PATCH v7 06/18] and is otherwise identical to PATCH v7.
 
-This is so trivial, and do not need to get ack from me.
+Also, with Josh's ack on the preceding patch set, I think we now have
+all necessary reviews and acks from all interested parties.
 
-Just a nit.
+## Background
 
+This patch set proposes KUnit, a lightweight unit testing and mocking
+framework for the Linux kernel.
 
-When CONFIG_KUNIT is disable, is there any point in descending into kunit/ ?
+Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+it does not require installing the kernel on a test machine or in a VM
+(however, KUnit still allows you to run tests on test machines or in VMs
+if you want[1]) and does not require tests to be written in userspace
+running on a host kernel. Additionally, KUnit is fast: From invocation
+to completion KUnit can run several dozen tests in about a second.
+Currently, the entire KUnit test suite for KUnit runs in under a second
+from the initial invocation (build time excluded).
 
-core-$(CONFIG_KUNIT) += kunit/
+KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+Googletest/Googlemock for C++. KUnit provides facilities for defining
+unit test cases, grouping related test cases into test suites, providing
+common infrastructure for running tests, mocking, spying, and much more.
 
-... might be useful to skip kunit/ entirely.
+### What's so special about unit testing?
 
-If you look at the top-level Makefile, some entries are doing this:
+A unit test is supposed to test a single unit of code in isolation,
+hence the name. There should be no dependencies outside the control of
+the test; this means no external dependencies, which makes tests orders
+of magnitudes faster. Likewise, since there are no external dependencies,
+there are no hoops to jump through to run the tests. Additionally, this
+makes unit tests deterministic: a failing unit test always indicates a
+problem. Finally, because unit tests necessarily have finer granularity,
+they are able to test all code paths easily solving the classic problem
+of difficulty in exercising error handling code.
 
+### Is KUnit trying to replace other testing frameworks for the kernel?
 
-init-y          := init/
-drivers-y       := drivers/ sound/
-drivers-$(CONFIG_SAMPLES) += samples/
-drivers-$(CONFIG_KERNEL_HEADER_TEST) += include/
-net-y           := net/
-libs-y          := lib/
-core-y          := usr/
+No. Most existing tests for the Linux kernel are end-to-end tests, which
+have their place. A well tested system has lots of unit tests, a
+reasonable number of integration tests, and some end-to-end tests. KUnit
+is just trying to address the unit test space which is currently not
+being addressed.
 
+### More information on KUnit
 
+There is a bunch of documentation near the end of this patch set that
+describes how to use KUnit and best practices for writing unit tests.
+For convenience I am hosting the compiled docs here[2].
 
+Additionally for convenience, I have applied these patches to a
+branch[3]. The repo may be cloned with:
+git clone https://kunit.googlesource.com/linux
+This patchset is on the kunit/rfc/v5.2/v8 branch.
 
+## Changes Since Last Version
 
---
-Best Regards
-Masahiro Yamada
+Like I said in the TL;DR, there is only one minor change since the
+previous revision. That change only affects patch 06/18; it makes it so
+that make doesn't attempt to scan the kunit/ directory when CONFIG_KUNIT
+is not set as suggested by Masahiro.
+
+[1] https://google.github.io/kunit-docs/third_party/kernel/docs/usage.html#kunit-on-non-uml-architectures
+[2] https://google.github.io/kunit-docs/third_party/kernel/docs/
+[3] https://kunit.googlesource.com/linux/+/kunit/rfc/v5.2/v8
+
+-- 
+2.22.0.410.gd8fdbe21b5-goog
