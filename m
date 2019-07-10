@@ -1,43 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:39969 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726043AbfGJHu2 (ORCPT
+Received: from perceval.ideasonboard.com ([213.167.242.64]:37942 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727330AbfGJTj3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jul 2019 03:50:28 -0400
+        Wed, 10 Jul 2019 15:39:29 -0400
+From: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+Subject: [PATCH RFC] modpost: Support I2C Aliases from OF tables
+Date: Wed, 10 Jul 2019 20:39:06 +0100
+Message-Id: <20190710193918.31135-1-kieran.bingham+renesas@ideasonboard.com>
 MIME-Version: 1.0
-References: <20190710071508.173491-1-brendanhiggins@google.com> <20190710071508.173491-7-brendanhiggins@google.com>
-In-Reply-To: <20190710071508.173491-7-brendanhiggins@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 10 Jul 2019 16:49:31 +0900
-Message-ID: <CAK7LNASywq+RhEisuPbqOjFoBh7WNvMEgy55iacizrgNB-uBfA@mail.gmail.com>
-Subject: Re: [PATCH v8 06/18] kbuild: enable building KUnit
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, "Luis R. Rodriguez" <mcgrof@kernel.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, "Cc: Shuah Khan" <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, DTML <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, Tim Bird <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, Michal Marek <michal.lkml@markovi.net>
+To: Wolfram Sang <wsa@the-dreams.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, open list <linux-kernel@vger.kernel.org>
+Cc: linux-renesas-soc@vger.kernel.org, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, Lee Jones <lee.jones@linaro.org>, Javier Martinez Canillas <javierm@redhat.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mark Brown <broonie@kernel.org>
 
-On Wed, Jul 10, 2019 at 4:16 PM Brendan Higgins
-<brendanhiggins@google.com> wrote:
->
-> KUnit is a new unit testing framework for the kernel and when used is
-> built into the kernel as a part of it. Add KUnit to the root Kconfig and
-> Makefile to allow it to be actually built.
->
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+I2C drivers match against an I2C ID table, an OF table, and an ACPI
+table. It is now also possible to match against an OF table entry
+without the vendor prefix to support backwards compatibility, and allow
+simplification of the i2c probe functions.
 
-Please feel free to replace this with:
+As part of this matching, the probe function is being converted to
+remove the need to specify the i2c_device_id table, but to support
+module aliasing, we still require to have the MODULE_DEVICE_TABLE entry.
 
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Facilitate generating the I2C aliases directly from the of_device_id
+tables, by stripping the vendor prefix prefix from the compatible string
+and using that as an alias just as the i2c-core supports.
 
+Drivers which remove the i2c_device_id table can then register against
+the of_device_id table by adding an extra MODULE_DEVICE_TABLE
+registration as shown by the following example:
 
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+ /* si4713_i2c_driver - i2c driver interface */
+-static const struct i2c_device_id si4713_id[] = {
+-       { "si4713" , 0 },
+-       { },
+-};
+-MODULE_DEVICE_TABLE(i2c, si4713_id);
 
+ static const struct of_device_id si4713_of_match[] = {
+        { .compatible = "silabs,si4713" },
+        { },
+ };
+ MODULE_DEVICE_TABLE(of, si4713_of_match);
++MODULE_DEVICE_TABLE(i2c_of, si4713_of_match);
 
+Several drivers have had their i2c_device_id tables removed entirely
+which will lead to their module aliases being limited, during the
+following patches:
 
+0f21700ac40c ("rtc: pcf85063: switch to probe_new")
+3a4f4f2963f4 ("ASoC: rt5677: Convert I2C driver to ->probe_new()")
+511cb17448d9 ("mfd: tps65217: Introduce dependency on CONFIG_OF")
+8597c0920d6f ("NFC: fdp: Convert I2C driver to ->probe_new()")
+b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new() call-back type")
+
+The following patches might require I2C aliases to be generated from
+their ACPI tables:
+
+e19c92059a70 ("media: staging: atomisp: Switch i2c drivers to use ->probe_new()")
+f758eb2363ec ("media: dw9714: Remove ACPI match tables, convert to use probe_new")
+
+Cc: Lee Jones <lee.jones@linaro.org>
+Cc: Wolfram Sang <wsa@the-dreams.de>
+Cc: Javier Martinez Canillas <javierm@redhat.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Mark Brown <broonie@kernel.org>
+
+Signed-off-by: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+---
+ scripts/mod/file2alias.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index e17a29ae2e97..16776f624d3a 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -379,6 +379,35 @@ static void do_of_table(void *symval, unsigned long size,
+ 		do_of_entry_multi(symval + i, mod);
+ }
+ 
++static int do_i2c_of_entry(void *symval, struct module *mod)
++{
++	const char *alias;
++	DEF_FIELD_ADDR(symval, of_device_id, compatible);
++
++	alias = strrchr(*compatible, ',');
++
++	buf_printf(&mod->dev_table_buf, "MODULE_ALIAS(\"%s%s\");\n",
++		   I2C_MODULE_PREFIX, alias ? alias + 1 : *compatible);
++
++	return 1;
++}
++
++/* Reuse OF tables to generate I2C aliases */
++static void do_i2c_of_table(void *symval, unsigned long size,
++			    struct module *mod)
++{
++	unsigned int i;
++	const unsigned long id_size = SIZE_of_device_id;
++
++	device_id_check(mod->name, "i2c_of", size, id_size, symval);
++
++	/* Leave last one: it's the terminator. */
++	size -= id_size;
++
++	for (i = 0; i < size; i += id_size)
++		do_i2c_of_entry(symval + i, mod);
++}
++
+ /* Looks like: hid:bNvNpN */
+ static int do_hid_entry(const char *filename,
+ 			     void *symval, char *alias)
+@@ -1452,6 +1481,8 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
+ 		do_usb_table(symval, sym->st_size, mod);
+ 	if (sym_is(name, namelen, "of"))
+ 		do_of_table(symval, sym->st_size, mod);
++	else if (sym_is(name, namelen, "i2c_of"))
++		do_i2c_of_table(symval, sym->st_size, mod);
+ 	else if (sym_is(name, namelen, "pnp"))
+ 		do_pnp_device_entry(symval, sym->st_size, mod);
+ 	else if (sym_is(name, namelen, "pnp_card"))
 -- 
-Best Regards
-Masahiro Yamada
+2.20.1
