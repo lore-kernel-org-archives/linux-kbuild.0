@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:59469 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:59467 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727785AbfGKFpx (ORCPT
+        with ESMTP id S1726088AbfGKFpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 11 Jul 2019 01:45:53 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 07/11] kbuild: modpost: read modules.order instead of $(MODVERDIR)/*.mod
-Date: Thu, 11 Jul 2019 14:44:30 +0900
-Message-Id: <20190711054434.1177-8-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 09/11] kbuild: remove the first line of *.mod files
+Date: Thu, 11 Jul 2019 14:44:32 +0900
+Message-Id: <20190711054434.1177-10-yamada.masahiro@socionext.com>
 In-Reply-To: <20190711054434.1177-1-yamada.masahiro@socionext.com>
 References: <20190711054434.1177-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,59 +15,90 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nico@fluxnic.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Towards the goal of removing MODVERDIR, read out modules.order to get
-the list of modules to be processed. This is simpler than parsing *.mod
-files in $(MODVERDIR).
+The current format of *.mod is like this:
 
-For external modules, $(KBUILD_EXTMOD)/modules.order should be read.
+  line 1: directory path to the .ko file
+  line 2: a list of objects linked into this module
+  line 3: unresolved symbols (only when CONFIG_TRIM_UNUSED_KSYMS=y)
+
+Now that *.mod and *.ko are created in the same directory, the line 1
+provides no valuable information. It can be derived by replacing the
+extension .mod with .ko.
+
+Cut the first line.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2: None
 
- scripts/Makefile.modpost | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ scripts/Makefile.build      | 4 ++--
+ scripts/adjust_autoksyms.sh | 2 +-
+ scripts/mod/sumversion.c    | 9 ++-------
+ 3 files changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index fec6ec2ffa47..2ab1694a7df3 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -8,9 +8,10 @@
- # b) A <module>.o file which is the .o files above linked together
- # c) A <module>.mod file in $(MODVERDIR)/, listing the name of the
- #    the preliminary <module>.o file, plus all .o files
-+# d) modules.order, which lists all the modules
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 9fb30633acd2..2709646b1a5d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -279,7 +279,7 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
+-	@{ echo $(@:.o=.ko); echo $@; \
++	@{ echo $@; \
+ 	   $(cmd_undef_syms); } > $(patsubst %.o,%.mod,$@)
  
- # Stage 2 is handled by this file and does the following
--# 1) Find all modules from the files listed in $(MODVERDIR)/
-+# 1) Find all modules listed in modules.order
- # 2) modpost is then used to
- # 3)  create one <module>.mod.c file pr. module
- # 4)  create one Module.symvers file with CRC for all exported symbols
-@@ -60,10 +61,10 @@ include scripts/Makefile.lib
- kernelsymfile := $(objtree)/Module.symvers
- modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
+ quiet_cmd_cc_lst_c = MKLST   $@
+@@ -461,7 +461,7 @@ cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^) $(cmd_secanalysis
  
--# Step 1), find all modules listed in $(MODVERDIR)/
--MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort -u
--__modules := $(shell $(MODLISTCMD))
--modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
-+modorder := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)modules.order
-+
-+# Step 1), find all modules listed in modules.order
-+modules := $(sort $(shell cat $(modorder)))
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
+-	@{ echo $(@:.o=.ko); echo $(filter %.o,$^); \
++	@{ echo $(filter %.o,$^); \
+ 	   $(cmd_undef_syms); } > $(patsubst %.o,%.mod,$@)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
  
- # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
- _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
-@@ -84,7 +85,7 @@ MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index 8b44bb80a451..89871cae3954 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -48,7 +48,7 @@ cat > "$new_ksyms_file" << EOT
  
- # We can go over command line length here, so be careful.
- quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
--      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T -
-+      cmd_modpost = sed 's/ko$$/o/' $(modorder) | $(modpost) $(MODPOST_OPT) -s -T -
+ EOT
+ sed 's/ko$/mod/' modules.order |
+-xargs -n1 sed -n -e '3{s/ /\n/g;/^$/!p;}' -- |
++xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
+ sort -u |
+ sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$new_ksyms_file"
  
- PHONY += __modpost
- __modpost: $(modules:.ko=.o) FORCE
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index 166f3fa247a9..63062024ce0e 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -398,7 +398,7 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ 	char *sources, *end, *fname;
+ 	char filelist[PATH_MAX + 1];
+ 
+-	/* objects for a module are listed in the second line of *.mod file. */
++	/* objects for a module are listed in the first line of *.mod file. */
+ 	snprintf(filelist, sizeof(filelist), "%.*smod",
+ 		 (int)strlen(modname) - 1, modname);
+ 
+@@ -407,13 +407,8 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ 		/* not a module or .mod file missing - ignore */
+ 		return;
+ 
+-	sources = strchr(file, '\n');
+-	if (!sources) {
+-		warn("malformed versions file for %s\n", modname);
+-		goto release;
+-	}
++	sources = file;
+ 
+-	sources++;
+ 	end = strchr(sources, '\n');
+ 	if (!end) {
+ 		warn("bad ending versions file for %s\n", modname);
 -- 
 2.17.1
