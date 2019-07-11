@@ -1,56 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19441 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726088AbfGKHdp (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:30926 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728102AbfGKOrf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jul 2019 03:33:45 -0400
+        Thu, 11 Jul 2019 10:47:35 -0400
+MIME-Version: 1.0
+References: <CAK7LNARgFmSm+kCngidevQ3HnNjqKDKfGzYXrFPzhgBRHmccXw@mail.gmail.com>
+ <1562658215-186-1-git-send-email-Cedric_Hombourger@mentor.com> <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
+In-Reply-To: <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kconfig: remove meaningless if-conditional in conf_read()
-Date: Thu, 11 Jul 2019 16:33:17 +0900
-Message-Id: <20190711073317.27248-1-yamada.masahiro@socionext.com>
+Date: Thu, 11 Jul 2019 23:46:53 +0900
+Message-ID: <CAK7LNAQDkPSzA3A6DDYvg3QLHWrkAs8-iWDp44opqtmW10QVvQ@mail.gmail.com>
+Subject: Re: [PATCH v4] builddeb: generate multi-arch friendly linux-libc-dev package
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>, isar-users@googlegroups.com, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>
 
-sym_is_choice(sym) has already been checked by previous if-block:
+On Tue, Jul 9, 2019 at 4:44 PM Cedric Hombourger
+<Cedric_Hombourger@mentor.com> wrote:
+>
+> Debian-based distributions place libc header files in a machine
+> specific directory (/usr/include/<libc-machine>) instead of
+> /usr/include/asm to support installation of the linux-libc-dev
+> package from multiple architectures. Move headers installed by
+> "make headers_install" accordingly using Debian's tuple from
+> dpkg-architecture (stored in debian/arch).
+>
+> Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
+> ---
+>  scripts/package/builddeb | 5 +++++
+>  scripts/package/mkdebian | 1 +
+>  2 files changed, 6 insertions(+)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index b03dd56a4782..d5d33bcba1fb 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -132,6 +132,11 @@ fi
+>  if [ "$ARCH" != "um" ]; then
+>         $MAKE -f $srctree/Makefile headers_check
+>         $MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> +       # move asm headers to /usr/include/<libc-machine>/asm to match the structure
+> +       # used by Debian-based distros (to support multi-arch)
+> +       host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
+> +       mkdir $libc_headers_dir/usr/include/$host_arch
+> +       mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
+>  fi
 
-    if (sym_is_choice(sym) || (sym->flags & SYMBOL_NO_WRITE))
-            continue;
 
-Hence, the following code is redundant, and the comment is misleading:
+I just wondered whether there is something better than $(cat debian/arch),
+but maybe not.
 
-    if (!sym_is_choice(sym))
-            continue;
-    /* fall through */
+OK, I am ready to pick it up for 5.3-rc1.
 
-It always takes 'continue', never falls though.
+With Ben's Ack, I would be able to proceed with more confident.
 
-Clean up the dead code.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
 
- scripts/kconfig/confdata.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 18e8051d89d7..cbb6efa4a5a6 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -534,11 +534,9 @@ int conf_read(const char *name)
- 			switch (sym->type) {
- 			case S_BOOLEAN:
- 			case S_TRISTATE:
--				if (sym->def[S_DEF_USER].tri != sym_get_tristate_value(sym))
--					break;
--				if (!sym_is_choice(sym))
-+				if (sym->def[S_DEF_USER].tri == sym_get_tristate_value(sym))
- 					continue;
--				/* fall through */
-+				break;
- 			default:
- 				if (!strcmp(sym->curr.val, sym->def[S_DEF_USER].val))
- 					continue;
+
+>  # Install the maintainer scripts
+> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+> index 8351584cb24e..e0750b70453f 100755
+> --- a/scripts/package/mkdebian
+> +++ b/scripts/package/mkdebian
+> @@ -197,6 +197,7 @@ Architecture: $debarch
+>  Description: Linux support headers for userspace development
+>   This package provides userspaces headers from the Linux kernel.  These headers
+>   are used by the installed headers for GNU glibc and other system libraries.
+> +Multi-Arch: same
+>
+>  Package: $dbg_packagename
+>  Section: debug
+> --
+> 2.11.0
+>
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
