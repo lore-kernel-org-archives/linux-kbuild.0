@@ -1,32 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 50-244-196-250-static.hfc.comcastbusiness.net ([50.244.196.250]:56929
-        "EHLO hometime.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727767AbfGJWE2 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:53452 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726088AbfGKEOx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Jul 2019 18:04:28 -0400
-Content-Type: text/plain; charset="iso-8859-1"
+        Thu, 11 Jul 2019 00:14:53 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Greetings!
-From: fuqingzheng@asia.com
-Date: Wed, 10 Jul 2019 07:07:40 +0200
-Reply-To: zhengfuqing@yandex.com
-Message-ID: <SBSJZZJfwTXSRdZqou200008feb@hometime.com>
+References: <20190709132639.26802-1-geert@linux-m68k.org> <20190709163042.GA28716@infradead.org>
+In-Reply-To: <20190709163042.GA28716@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 11 Jul 2019 13:14:03 +0900
+Message-ID: <CAK7LNARKaj9Tw+Am0hvQOOW8ZTh_LvY-tSPoZjvJWez4RaOPQA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Inform user to pass ARCH= for make mrproper
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <fuqingzheng@asia.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Good day,
+On Wed, Jul 10, 2019 at 1:30 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> Is there any chance we could save ARCH in .config?  That would make
+> cross compile builds so much easier..  Same for CROSS_COMPILE.
 
-  I have a mutual business proposal, which refers to the transfer of a large amount of money to an account abroad, with your help as a foreign partner as a beneficiary of the funds. Everything about this transaction will be legal without any bridge of financial authority both in my country and yours. If you are interested and I will give you more information about the project as soon as I receive your positive response.
 
-Best regards,
+Then, I have no idea how "make clean", "make help", etc. should work.
 
-Executive Director.
- 
-ICBC. China
+If a user has configured the kernel, do they work for CONFIG_ARCH
+stored in the .config file or still for the host-arch?
 
----
-Dit e-mailbericht is gecontroleerd op virussen met Avast antivirussoftware.
-https://www.avast.com/antivirus
+If not yet, do they fall-back to host-arch?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
