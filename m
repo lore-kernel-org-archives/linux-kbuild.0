@@ -1,93 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:59471 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727922AbfGKFpx (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:19441 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726088AbfGKHdp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jul 2019 01:45:53 -0400
+        Thu, 11 Jul 2019 03:33:45 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 01/11] kbuild: do not create empty modules.order in the prepare stage
-Date: Thu, 11 Jul 2019 14:44:24 +0900
-Message-Id: <20190711054434.1177-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190711054434.1177-1-yamada.masahiro@socionext.com>
-References: <20190711054434.1177-1-yamada.masahiro@socionext.com>
+Subject: [PATCH] kconfig: remove meaningless if-conditional in conf_read()
+Date: Thu, 11 Jul 2019 16:33:17 +0900
+Message-Id: <20190711073317.27248-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nico@fluxnic.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Currently, $(objtree)/modules.order is touched in two places.
+sym_is_choice(sym) has already been checked by previous if-block:
 
-In the 'prepare0' rule, scripts/Makefile.build creates an empty
-modules.order while processing 'obj=.'
+    if (sym_is_choice(sym) || (sym->flags & SYMBOL_NO_WRITE))
+            continue;
 
-In the 'modules' rule, the top-level Makefile overwrites it with
-the correct list of modules.
+Hence, the following code is redundant, and the comment is misleading:
 
-While this might be a good side-effect that modules.order is made
-empty every time (probably this is not intended functionality),
-I personally do not like this behavior.
+    if (!sym_is_choice(sym))
+            continue;
+    /* fall through */
 
-Create modules.order only when it is sensible to do so.
+It always takes 'continue', never falls though.
 
-This avoids creating the following pointless files:
-
-  scripts/basic/modules.order
-  scripts/dtc/modules.order
-  scripts/gcc-plugins/modules.order
-  scripts/genksyms/modules.order
-  scripts/mod/modules.order
-  scripts/modules.order
-  scripts/selinux/genheaders/modules.order
-  scripts/selinux/mdp/modules.order
-  scripts/selinux/modules.order
-
-Going forward, $(objtree)/modules.order lists the modules that
-was built in the last successful build.
+Clean up the dead code.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v2:
- - inverted the logic "preparing" -> need-modorder
+ scripts/kconfig/confdata.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
- Makefile               | 4 ++--
- scripts/Makefile.build | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 5c75ea7177f6..d8421d245f75 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1076,7 +1076,7 @@ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
- 
- PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare
--	$(Q)$(MAKE) $(build)=$@ need-builtin=1
-+	$(Q)$(MAKE) $(build)=$@ need-builtin=1 need-modorder=1
- 
- filechk_kernel.release = \
- 	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-@@ -1611,7 +1611,7 @@ $(objtree)/Module.symvers:
- module-dirs := $(addprefix _module_,$(KBUILD_EXTMOD))
- PHONY += $(module-dirs) modules
- $(module-dirs): prepare $(objtree)/Module.symvers
--	$(Q)$(MAKE) $(build)=$(patsubst _module_%,%,$@)
-+	$(Q)$(MAKE) $(build)=$(patsubst _module_%,%,$@) need-modorder=1
- 
- modules: $(module-dirs)
- 	@$(kecho) '  Building modules, stage 2.';
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 776842b7e6a3..e9b3d88257dd 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -63,7 +63,7 @@ ifneq ($(strip $(real-obj-y) $(need-builtin)),)
- builtin-target := $(obj)/built-in.a
- endif
- 
--ifdef CONFIG_MODULES
-+ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
- modorder-target := $(obj)/modules.order
- endif
- 
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 18e8051d89d7..cbb6efa4a5a6 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -534,11 +534,9 @@ int conf_read(const char *name)
+ 			switch (sym->type) {
+ 			case S_BOOLEAN:
+ 			case S_TRISTATE:
+-				if (sym->def[S_DEF_USER].tri != sym_get_tristate_value(sym))
+-					break;
+-				if (!sym_is_choice(sym))
++				if (sym->def[S_DEF_USER].tri == sym_get_tristate_value(sym))
+ 					continue;
+-				/* fall through */
++				break;
+ 			default:
+ 				if (!strcmp(sym->curr.val, sym->def[S_DEF_USER].val))
+ 					continue;
 -- 
 2.17.1
