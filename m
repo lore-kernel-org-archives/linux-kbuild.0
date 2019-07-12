@@ -1,258 +1,163 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:39275 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726254AbfGLIR7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jul 2019 04:17:59 -0400
-Received: by mail-pf1-f202.google.com with SMTP id 6so5122653pfi.6
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jul 2019 01:17:59 -0700 (PDT)
-Date: Fri, 12 Jul 2019 01:17:29 -0700
-In-Reply-To: <20190712081744.87097-1-brendanhiggins@google.com>
-Message-Id: <20190712081744.87097-4-brendanhiggins@google.com>
-Mime-Version: 1.0
-References: <20190712081744.87097-1-brendanhiggins@google.com>
-Subject: [PATCH v9 03/18] kunit: test: add string_stream a std::stream like
- string builder
-From: Brendan Higgins <brendanhiggins@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mx1.riseup.net ([198.252.153.129]:51856 "EHLO mx1.riseup.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726050AbfGLK7q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 12 Jul 2019 06:59:46 -0400
+Subject: Re: [PATCH] kconfig: fix missing choice values in auto.conf
+References: <20190712060709.20609-1-yamada.masahiro@socionext.com>
+From: =?UTF-8?Q?Joonas_Kylm=c3=a4l=c3=a4?= <joonas.kylmala@iki.fi>
+Message-ID: <0daa3b66-2dd0-079e-05ea-c65eb4fa6815@iki.fi>
+Date: Fri, 12 Jul 2019 13:59:39 +0300
+MIME-Version: 1.0
+In-Reply-To: <20190712060709.20609-1-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Ulf Magnusson <ulfalizer@gmail.com>, linux-stable <stable@vger.kernel.org>, linux-kernel@vger.kernel.org
 
-A number of test features need to do pretty complicated string printing
-where it may not be possible to rely on a single preallocated string
-with parameters.
+Hi,
 
-So provide a library for constructing the string as you go similar to
-C++'s std::string.
+thanks a lot for this patch! I tested this and it fixes what is says in
+the commit message:
 
-Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
----
- include/kunit/string-stream.h |  49 ++++++++++++
- kunit/Makefile                |   3 +-
- kunit/string-stream.c         | 147 ++++++++++++++++++++++++++++++++++
- 3 files changed, 198 insertions(+), 1 deletion(-)
- create mode 100644 include/kunit/string-stream.h
- create mode 100644 kunit/string-stream.c
+Tested-by: Joonas Kylmälä <joonas.kylmala@iki.fi>
 
-diff --git a/include/kunit/string-stream.h b/include/kunit/string-stream.h
-new file mode 100644
-index 0000000000000..0552a05781afe
---- /dev/null
-+++ b/include/kunit/string-stream.h
-@@ -0,0 +1,49 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * C++ stream style string builder used in KUnit for building messages.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#ifndef _KUNIT_STRING_STREAM_H
-+#define _KUNIT_STRING_STREAM_H
-+
-+#include <linux/types.h>
-+#include <linux/spinlock.h>
-+#include <linux/kref.h>
-+#include <stdarg.h>
-+
-+struct string_stream_fragment {
-+	struct list_head node;
-+	char *fragment;
-+};
-+
-+struct string_stream {
-+	size_t length;
-+	struct list_head fragments;
-+	/* length and fragments are protected by this lock */
-+	spinlock_t lock;
-+};
-+
-+struct kunit;
-+
-+struct string_stream *alloc_string_stream(struct kunit *test);
-+
-+void string_stream_get(struct string_stream *stream);
-+
-+int string_stream_put(struct string_stream *stream);
-+
-+int string_stream_add(struct string_stream *stream, const char *fmt, ...);
-+
-+int string_stream_vadd(struct string_stream *stream,
-+		       const char *fmt,
-+		       va_list args);
-+
-+char *string_stream_get_string(struct string_stream *stream);
-+
-+void string_stream_clear(struct string_stream *stream);
-+
-+bool string_stream_is_empty(struct string_stream *stream);
-+
-+#endif /* _KUNIT_STRING_STREAM_H */
-diff --git a/kunit/Makefile b/kunit/Makefile
-index 5efdc4dea2c08..275b565a0e81f 100644
---- a/kunit/Makefile
-+++ b/kunit/Makefile
-@@ -1 +1,2 @@
--obj-$(CONFIG_KUNIT) +=			test.o
-+obj-$(CONFIG_KUNIT) +=			test.o \
-+					string-stream.o
-diff --git a/kunit/string-stream.c b/kunit/string-stream.c
-new file mode 100644
-index 0000000000000..0463a92dad74b
---- /dev/null
-+++ b/kunit/string-stream.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * C++ stream style string builder used in KUnit for building messages.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#include <linux/list.h>
-+#include <linux/slab.h>
-+#include <kunit/string-stream.h>
-+#include <kunit/test.h>
-+
-+int string_stream_vadd(struct string_stream *stream,
-+		       const char *fmt,
-+		       va_list args)
-+{
-+	struct string_stream_fragment *frag_container;
-+	int len;
-+	va_list args_for_counting;
-+	unsigned long flags;
-+
-+	/* Make a copy because `vsnprintf` could change it */
-+	va_copy(args_for_counting, args);
-+
-+	/* Need space for null byte. */
-+	len = vsnprintf(NULL, 0, fmt, args_for_counting) + 1;
-+
-+	va_end(args_for_counting);
-+
-+	frag_container = kmalloc(sizeof(*frag_container), GFP_KERNEL);
-+	if (!frag_container)
-+		return -ENOMEM;
-+
-+	frag_container->fragment = kmalloc(len, GFP_KERNEL);
-+	if (!frag_container->fragment) {
-+		kfree(frag_container);
-+		return -ENOMEM;
-+	}
-+
-+	len = vsnprintf(frag_container->fragment, len, fmt, args);
-+	spin_lock_irqsave(&stream->lock, flags);
-+	stream->length += len;
-+	list_add_tail(&frag_container->node, &stream->fragments);
-+	spin_unlock_irqrestore(&stream->lock, flags);
-+
-+	return 0;
-+}
-+
-+int string_stream_add(struct string_stream *stream, const char *fmt, ...)
-+{
-+	va_list args;
-+	int result;
-+
-+	va_start(args, fmt);
-+	result = string_stream_vadd(stream, fmt, args);
-+	va_end(args);
-+
-+	return result;
-+}
-+
-+void string_stream_clear(struct string_stream *stream)
-+{
-+	struct string_stream_fragment *frag_container, *frag_container_safe;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&stream->lock, flags);
-+	list_for_each_entry_safe(frag_container,
-+				 frag_container_safe,
-+				 &stream->fragments,
-+				 node) {
-+		list_del(&frag_container->node);
-+		kfree(frag_container->fragment);
-+		kfree(frag_container);
-+	}
-+	stream->length = 0;
-+	spin_unlock_irqrestore(&stream->lock, flags);
-+}
-+
-+char *string_stream_get_string(struct string_stream *stream)
-+{
-+	struct string_stream_fragment *frag_container;
-+	size_t buf_len = stream->length + 1; /* +1 for null byte. */
-+	char *buf;
-+	unsigned long flags;
-+
-+	buf = kzalloc(buf_len, GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	spin_lock_irqsave(&stream->lock, flags);
-+	list_for_each_entry(frag_container, &stream->fragments, node)
-+		strlcat(buf, frag_container->fragment, buf_len);
-+	spin_unlock_irqrestore(&stream->lock, flags);
-+
-+	return buf;
-+}
-+
-+bool string_stream_is_empty(struct string_stream *stream)
-+{
-+	bool is_empty;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&stream->lock, flags);
-+	is_empty = list_empty(&stream->fragments);
-+	spin_unlock_irqrestore(&stream->lock, flags);
-+
-+	return is_empty;
-+}
-+
-+static int string_stream_init(struct kunit_resource *res, void *context)
-+{
-+	struct string_stream *stream;
-+
-+	stream = kzalloc(sizeof(*stream), GFP_KERNEL);
-+	if (!stream)
-+		return -ENOMEM;
-+
-+	res->allocation = stream;
-+	INIT_LIST_HEAD(&stream->fragments);
-+	spin_lock_init(&stream->lock);
-+
-+	return 0;
-+}
-+
-+static void string_stream_free(struct kunit_resource *res)
-+{
-+	struct string_stream *stream = res->allocation;
-+
-+	string_stream_clear(stream);
-+	kfree(stream);
-+}
-+
-+struct string_stream *alloc_string_stream(struct kunit *test)
-+{
-+	struct kunit_resource *res;
-+
-+	res = kunit_alloc_resource(test,
-+				   string_stream_init,
-+				   string_stream_free,
-+				   NULL);
-+
-+	if (!res)
-+		return NULL;
-+
-+	return res->allocation;
-+}
--- 
-2.22.0.410.gd8fdbe21b5-goog
+Masahiro Yamada:
+> Since commit 00c864f8903d ("kconfig: allow all config targets to write
+> auto.conf if missing"), Kconfig creates include/config/auto.conf in the
+> defconfig stage when it is missing.
+> 
+> Joonas Kylmälä reported incorrect auto.conf generation under some
+> circumstances.
+> 
+> Apply the following diff:
+> 
+> | --- a/arch/arm/configs/imx_v6_v7_defconfig
+> | +++ b/arch/arm/configs/imx_v6_v7_defconfig
+> | @@ -345,14 +345,7 @@ CONFIG_USB_CONFIGFS_F_MIDI=y
+> |  CONFIG_USB_CONFIGFS_F_HID=y
+> |  CONFIG_USB_CONFIGFS_F_UVC=y
+> |  CONFIG_USB_CONFIGFS_F_PRINTER=y
+> | -CONFIG_USB_ZERO=m
+> | -CONFIG_USB_AUDIO=m
+> | -CONFIG_USB_ETH=m
+> | -CONFIG_USB_G_NCM=m
+> | -CONFIG_USB_GADGETFS=m
+> | -CONFIG_USB_FUNCTIONFS=m
+> | -CONFIG_USB_MASS_STORAGE=m
+> | -CONFIG_USB_G_SERIAL=m
+> | +CONFIG_USB_FUNCTIONFS=y
+> |  CONFIG_MMC=y
+> |  CONFIG_MMC_SDHCI=y
+> |  CONFIG_MMC_SDHCI_PLTFM=y
+> 
+> And then, run:
+> 
+> $ make ARCH=arm mrproper imx_v6_v7_defconfig
+> 
+> CONFIG_USB_FUNCTIONFS=y is correctly contained in the .config, but not
+> in the auto.conf.
+> 
+> Please note drivers/usb/gadget/legacy/Kconfig is included from a choice
+> block in drivers/usb/gadget/Kconfig. So USB_FUNCTIONFS is a choice value.
+> 
+> This is probably a similar situation described in commit beaaddb62540
+> ("kconfig: tests: test defconfig when two choices interact").
+> 
+> When sym_calc_choice() is called, the choice symbol forgets the
+> SYMBOL_DEF_USER unless all of its choice values are explicitly set by
+> the user.
+> 
+> The choice symbol is given just one chance to recall it because
+> set_all_choice_values() is called if SYMBOL_NEED_SET_CHOICE_VALUES
+> is set.
+> 
+> When sym_calc_choice() is called again, the choice symbol forgets it
+> forever, since SYMBOL_NEED_SET_CHOICE_VALUES is a one-time aid.
+> Hence, we cannot call sym_clear_all_valid() again and again.
+> 
+> It is crazy to set and clear internal flags. However, we cannot simply
+> get rid of "sym->flags &= flags | ~SYMBOL_DEF_USER;" Doing so would
+> re-introduce the problem solved by commit 5d09598d488f ("kconfig: fix
+> new choices being skipped upon config update").
+> 
+> To work around the issue, conf_write_autoconf() stopped calling
+> sym_clear_all_valid().
+> 
+> conf_write() must be changed accordingly. Currently, it clears
+> SYMBOL_WRITE after the symbol is written into the .config file. This
+> is needed to prevent it from writing the same symbol multiple times in
+> case the symbol is declared in two or more locations. I added the new
+> flag SYMBOL_WRITTEN, to track the symbols that have been written.
+> 
+> Anyway, this is a cheesy workaround in order to suppress the issue
+> as far as defconfig is concerned.
+> 
+> Handling of choices is totally broken. sym_clear_all_valid() is called
+> every time a user touches a symbol from the GUI interface. To reproduce
+> it, just add a new symbol drivers/usb/gadget/legacy/Kconfig, then touch
+> around unrelated symbols from menuconfig. USB_FUNCTIONFS will disappear
+> from the .config file.
+> 
+> I added the Fixes tag since it is more fatal than before. But, this
+> has been broken since long long time before, and still it is.
+> We should take a closer look to fix this correctly somehow.
+> 
+> Fixes: 00c864f8903d ("kconfig: allow all config targets to write auto.conf if missing")
+> Cc: linux-stable <stable@vger.kernel.org> # 4.19+
+> Reported-by: Joonas Kylmälä <joonas.kylmala@iki.fi>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+> 
+>  scripts/kconfig/confdata.c | 7 +++----
+>  scripts/kconfig/expr.h     | 1 +
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index cbb6efa4a5a6..e0972b255aac 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -895,7 +895,8 @@ int conf_write(const char *name)
+>  				     "# %s\n"
+>  				     "#\n", str);
+>  			need_newline = false;
+> -		} else if (!(sym->flags & SYMBOL_CHOICE)) {
+> +		} else if (!(sym->flags & SYMBOL_CHOICE) &&
+> +			   !(sym->flags & SYMBOL_WRITTEN)) {
+>  			sym_calc_value(sym);
+>  			if (!(sym->flags & SYMBOL_WRITE))
+>  				goto next;
+> @@ -903,7 +904,7 @@ int conf_write(const char *name)
+>  				fprintf(out, "\n");
+>  				need_newline = false;
+>  			}
+> -			sym->flags &= ~SYMBOL_WRITE;
+> +			sym->flags |= SYMBOL_WRITTEN;
+>  			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+>  		}
+>  
+> @@ -1063,8 +1064,6 @@ int conf_write_autoconf(int overwrite)
+>  	if (!overwrite && is_present(autoconf_name))
+>  		return 0;
+>  
+> -	sym_clear_all_valid();
+> -
+>  	conf_write_dep("include/config/auto.conf.cmd");
+>  
+>  	if (conf_touch_deps())
+> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+> index 8dde65bc3165..017843c9a4f4 100644
+> --- a/scripts/kconfig/expr.h
+> +++ b/scripts/kconfig/expr.h
+> @@ -141,6 +141,7 @@ struct symbol {
+>  #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
+>  #define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
+>  #define SYMBOL_CHANGED    0x0400  /* ? */
+> +#define SYMBOL_WRITTEN    0x0800  /* track info to avoid double-write to .config */
+>  #define SYMBOL_NO_WRITE   0x1000  /* Symbol for internal use only; it will not be written */
+>  #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
+>  #define SYMBOL_WARNED     0x8000  /* warning has been issued */
+> 
