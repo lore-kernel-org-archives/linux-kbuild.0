@@ -1,163 +1,214 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.riseup.net ([198.252.153.129]:51856 "EHLO mx1.riseup.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726050AbfGLK7q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jul 2019 06:59:46 -0400
-Subject: Re: [PATCH] kconfig: fix missing choice values in auto.conf
-References: <20190712060709.20609-1-yamada.masahiro@socionext.com>
-From: =?UTF-8?Q?Joonas_Kylm=c3=a4l=c3=a4?= <joonas.kylmala@iki.fi>
-Message-ID: <0daa3b66-2dd0-079e-05ea-c65eb4fa6815@iki.fi>
-Date: Fri, 12 Jul 2019 13:59:39 +0300
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:38904 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726977AbfGLRuu (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 12 Jul 2019 13:50:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190712060709.20609-1-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 13 Jul 2019 02:50:05 +0900
+Message-ID: <CAK7LNATyxi5pjwi6zviW+kyZDWaYdt3tQNu+wFmyNeRDryGEKg@mail.gmail.com>
+Subject: [GIT PULL 1/2] Kbuild updates for v5.3-rc1
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, linux-stable <stable@vger.kernel.org>, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: masahiroy@kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi,
+Hi Linus,
 
-thanks a lot for this patch! I tested this and it fixes what is says in
-the commit message:
+Please pull Kbuild updates for v5.3
+Thanks!
 
-Tested-by: Joonas Kylmälä <joonas.kylmala@iki.fi>
 
-Masahiro Yamada:
-> Since commit 00c864f8903d ("kconfig: allow all config targets to write
-> auto.conf if missing"), Kconfig creates include/config/auto.conf in the
-> defconfig stage when it is missing.
-> 
-> Joonas Kylmälä reported incorrect auto.conf generation under some
-> circumstances.
-> 
-> Apply the following diff:
-> 
-> | --- a/arch/arm/configs/imx_v6_v7_defconfig
-> | +++ b/arch/arm/configs/imx_v6_v7_defconfig
-> | @@ -345,14 +345,7 @@ CONFIG_USB_CONFIGFS_F_MIDI=y
-> |  CONFIG_USB_CONFIGFS_F_HID=y
-> |  CONFIG_USB_CONFIGFS_F_UVC=y
-> |  CONFIG_USB_CONFIGFS_F_PRINTER=y
-> | -CONFIG_USB_ZERO=m
-> | -CONFIG_USB_AUDIO=m
-> | -CONFIG_USB_ETH=m
-> | -CONFIG_USB_G_NCM=m
-> | -CONFIG_USB_GADGETFS=m
-> | -CONFIG_USB_FUNCTIONFS=m
-> | -CONFIG_USB_MASS_STORAGE=m
-> | -CONFIG_USB_G_SERIAL=m
-> | +CONFIG_USB_FUNCTIONFS=y
-> |  CONFIG_MMC=y
-> |  CONFIG_MMC_SDHCI=y
-> |  CONFIG_MMC_SDHCI_PLTFM=y
-> 
-> And then, run:
-> 
-> $ make ARCH=arm mrproper imx_v6_v7_defconfig
-> 
-> CONFIG_USB_FUNCTIONFS=y is correctly contained in the .config, but not
-> in the auto.conf.
-> 
-> Please note drivers/usb/gadget/legacy/Kconfig is included from a choice
-> block in drivers/usb/gadget/Kconfig. So USB_FUNCTIONFS is a choice value.
-> 
-> This is probably a similar situation described in commit beaaddb62540
-> ("kconfig: tests: test defconfig when two choices interact").
-> 
-> When sym_calc_choice() is called, the choice symbol forgets the
-> SYMBOL_DEF_USER unless all of its choice values are explicitly set by
-> the user.
-> 
-> The choice symbol is given just one chance to recall it because
-> set_all_choice_values() is called if SYMBOL_NEED_SET_CHOICE_VALUES
-> is set.
-> 
-> When sym_calc_choice() is called again, the choice symbol forgets it
-> forever, since SYMBOL_NEED_SET_CHOICE_VALUES is a one-time aid.
-> Hence, we cannot call sym_clear_all_valid() again and again.
-> 
-> It is crazy to set and clear internal flags. However, we cannot simply
-> get rid of "sym->flags &= flags | ~SYMBOL_DEF_USER;" Doing so would
-> re-introduce the problem solved by commit 5d09598d488f ("kconfig: fix
-> new choices being skipped upon config update").
-> 
-> To work around the issue, conf_write_autoconf() stopped calling
-> sym_clear_all_valid().
-> 
-> conf_write() must be changed accordingly. Currently, it clears
-> SYMBOL_WRITE after the symbol is written into the .config file. This
-> is needed to prevent it from writing the same symbol multiple times in
-> case the symbol is declared in two or more locations. I added the new
-> flag SYMBOL_WRITTEN, to track the symbols that have been written.
-> 
-> Anyway, this is a cheesy workaround in order to suppress the issue
-> as far as defconfig is concerned.
-> 
-> Handling of choices is totally broken. sym_clear_all_valid() is called
-> every time a user touches a symbol from the GUI interface. To reproduce
-> it, just add a new symbol drivers/usb/gadget/legacy/Kconfig, then touch
-> around unrelated symbols from menuconfig. USB_FUNCTIONFS will disappear
-> from the .config file.
-> 
-> I added the Fixes tag since it is more fatal than before. But, this
-> has been broken since long long time before, and still it is.
-> We should take a closer look to fix this correctly somehow.
-> 
-> Fixes: 00c864f8903d ("kconfig: allow all config targets to write auto.conf if missing")
-> Cc: linux-stable <stable@vger.kernel.org> # 4.19+
-> Reported-by: Joonas Kylmälä <joonas.kylmala@iki.fi>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  scripts/kconfig/confdata.c | 7 +++----
->  scripts/kconfig/expr.h     | 1 +
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index cbb6efa4a5a6..e0972b255aac 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -895,7 +895,8 @@ int conf_write(const char *name)
->  				     "# %s\n"
->  				     "#\n", str);
->  			need_newline = false;
-> -		} else if (!(sym->flags & SYMBOL_CHOICE)) {
-> +		} else if (!(sym->flags & SYMBOL_CHOICE) &&
-> +			   !(sym->flags & SYMBOL_WRITTEN)) {
->  			sym_calc_value(sym);
->  			if (!(sym->flags & SYMBOL_WRITE))
->  				goto next;
-> @@ -903,7 +904,7 @@ int conf_write(const char *name)
->  				fprintf(out, "\n");
->  				need_newline = false;
->  			}
-> -			sym->flags &= ~SYMBOL_WRITE;
-> +			sym->flags |= SYMBOL_WRITTEN;
->  			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
->  		}
->  
-> @@ -1063,8 +1064,6 @@ int conf_write_autoconf(int overwrite)
->  	if (!overwrite && is_present(autoconf_name))
->  		return 0;
->  
-> -	sym_clear_all_valid();
-> -
->  	conf_write_dep("include/config/auto.conf.cmd");
->  
->  	if (conf_touch_deps())
-> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-> index 8dde65bc3165..017843c9a4f4 100644
-> --- a/scripts/kconfig/expr.h
-> +++ b/scripts/kconfig/expr.h
-> @@ -141,6 +141,7 @@ struct symbol {
->  #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
->  #define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
->  #define SYMBOL_CHANGED    0x0400  /* ? */
-> +#define SYMBOL_WRITTEN    0x0800  /* track info to avoid double-write to .config */
->  #define SYMBOL_NO_WRITE   0x1000  /* Symbol for internal use only; it will not be written */
->  #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
->  #define SYMBOL_WARNED     0x8000  /* warning has been issued */
-> 
+The following changes since commit d1fdb6d8f6a4109a4263176c84b899076a5f8008:
+
+  Linux 5.2-rc4 (2019-06-08 20:24:46 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v5.3
+
+for you to fetch changes up to d4a74bbfee03acf7bbddc77b9c9236462c744fc7:
+
+  kbuild: use -- separater intead of $(filter-out ...) for
+cc-cross-prefix (2019-07-11 23:34:52 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v5.3
+
+- remove headers_{install,check}_all targets
+
+- remove unreasonable 'depends on !UML' from CONFIG_SAMPLES
+
+- re-implement 'make headers_install' more cleanly
+
+- add new header-test-y syntax to compile-test headers
+
+- compile-test exported headers to ensure they are compilable in
+  user-space
+
+- compile-test headers under include/ to ensure they are self-contained
+
+- remove -Waggregate-return, -Wno-uninitialized, -Wno-unused-value flags
+
+- add -Werror=unknown-warning-option for Clang
+
+- add 128-bit built-in types support to genksyms
+
+- fix missed rebuild of modules.builtin
+
+- propagate 'No space left on device' error in fixdep to Make
+
+- allow Clang to use its integrated assembler
+
+- improve some coccinelle scripts
+
+- add a new flag KBUILD_ABS_SRCTREE to request Kbuild to use absolute
+  path for $(srctree).
+
+- do not ignore errors when compression utility is missing
+
+- misc cleanups
+
+----------------------------------------------------------------
+Geert Uytterhoeven (1):
+      kbuild: Inform user to pass ARCH= for make mrproper
+
+Harald Seiler (1):
+      kbuild: fix compression errors getting ignored
+
+Jani Nikula (1):
+      kbuild: add support for ensuring headers are self-contained
+
+Kirill Smelkov (1):
+      coccinelle: api/stream_open: treat all wait_.*() calls as blocking
+
+Markus Elfring (2):
+      coccinelle: put_device: Adjust a message construction
+      coccinelle: put_device: Add a cast to an expression for an assignment
+
+Masahiro Yamada (35):
+      kbuild: remove headers_{install,check}_all
+      kbuild: remove stale dependency between Documentation/ and headers_install
+      kbuild: make gdb_script depend on prepare0 instead of prepare
+      kbuild: fix Kconfig prompt of CONFIG_HEADERS_CHECK
+      kbuild: add CONFIG_HEADERS_INSTALL and loosen the dependency of samples
+      kbuild: remove build_unifdef target in scripts/Makefile
+      kbuild: build all prerequisites of headers_install simultaneously
+      kbuild: add 'headers' target to build up uapi headers in usr/include
+      kbuild: re-implement Makefile.headersinst without recursion
+      kbuild: move hdr-inst shorthand to top Makefile
+      kbuild: simplify scripts/headers_install.sh
+      kbuild: deb-pkg: do not run headers_check
+      lib/raid6: remove duplicated CFLAGS_REMOVE_altivec8.o
+      lib/raid6: refactor unroll rules with pattern rules
+      kbuild: fix 'No such file or directory' warning for headers_install
+      kbuild: rename arg-check to cmd-check
+      kbuild: save $(strip ...) for calling any-prepreq
+      kbuild: save $(strip ...) for calling if_changed and friends
+      kbuild: fix missed rebuild of modules.builtin
+      kbuild: split modules.order build rule out of 'modules' target
+      fixdep: check return value of printf() and putchar()
+      kbuild: add more hints about SUBDIRS replacement
+      init/Kconfig: add CONFIG_CC_CAN_LINK
+      kbuild: compile-test exported headers to ensure they are self-contained
+      kbuild: do not create wrappers for header-test-y
+      kbuild: support header-test-pattern-y
+      kheaders: remove meaningless -R option of 'ls'
+      kheaders: include only headers into kheaders_data.tar.xz
+      kbuild: compile-test kernel headers to ensure they are self-contained
+      scripts/tags.sh: drop SUBARCH support for ARM
+      scripts/tags.sh: remove unused environment variables from comments
+      kbuild: remove src and obj from the top Makefile
+      kbuild: replace KBUILD_SRCTREE with boolean building_out_of_srctree
+      kbuild: add a flag to force absolute path for srctree
+      kbuild: use -- separater intead of $(filter-out ...) for cc-cross-prefix
+
+Mathieu Malaterre (1):
+      kbuild: Remove -Waggregate-return from scripts/Makefile.extrawarn
+
+Nathan Chancellor (3):
+      kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
+      kbuild: Enable -Wuninitialized
+      kbuild: Add ability to test Clang's integrated assembler
+
+Nathan Huckleberry (1):
+      kbuild: Remove unnecessary -Wno-unused-value
+
+Rikard Falkeborn (1):
+      coccinelle: kstrdup: Fix typo in warning messages
+
+Vasily Gorbik (1):
+      kallsyms: exclude kasan local symbols on s390
+
+Will Deacon (1):
+      genksyms: Teach parser about 128-bit built-in types
+
+ Documentation/kbuild/headers_install.txt  |    7 -
+ Documentation/kbuild/kbuild.txt           |    9 +
+ Documentation/kbuild/makefiles.txt        |   22 +-
+ Makefile                                  |  117 ++--
+ arch/arc/Makefile                         |    2 +-
+ arch/arc/configs/tb10x_defconfig          |    1 +
+ arch/nds32/configs/defconfig              |    1 +
+ arch/parisc/Makefile                      |   12 +-
+ arch/parisc/configs/a500_defconfig        |    1 +
+ arch/parisc/configs/b180_defconfig        |    1 +
+ arch/parisc/configs/c3000_defconfig       |    1 +
+ arch/parisc/configs/default_defconfig     |    1 +
+ arch/powerpc/configs/ppc6xx_defconfig     |    1 +
+ arch/s390/configs/debug_defconfig         |    1 +
+ arch/um/Makefile                          |    2 +-
+ drivers/gpu/drm/i915/.gitignore           |    1 -
+ drivers/gpu/drm/i915/Makefile.header-test |   12 +-
+ include/Kbuild                            | 1270
++++++++++++++++++++++++++++++++++++
+ include/uapi/{linux => }/Kbuild           |    6 +-
+ init/Kconfig                              |   33 +
+ kernel/gen_kheaders.sh                    |   51 +-
+ lib/Kconfig.debug                         |   25 +-
+ lib/raid6/Makefile                        |   98 +--
+ net/bpfilter/Kconfig                      |    2 +-
+ samples/Kconfig                           |   14 +-
+ samples/Makefile                          |    4 +-
+ scripts/Kbuild.include                    |   28 +-
+ scripts/Makefile                          |    5 -
+ scripts/Makefile.build                    |   11 +-
+ scripts/Makefile.extrawarn                |    3 -
+ scripts/Makefile.headersinst              |  134 ++--
+ scripts/Makefile.host                     |    2 +-
+ scripts/Makefile.lib                      |   26 +-
+ scripts/Makefile.modbuiltin               |    2 +-
+ scripts/basic/fixdep.c                    |   51 +-
+ scripts/coccinelle/api/kstrdup.cocci      |    8 +-
+ scripts/coccinelle/api/stream_open.cocci  |    8 +-
+ scripts/coccinelle/free/put_device.cocci  |   11 +-
+ scripts/gdb/linux/Makefile                |    2 +-
+ scripts/genksyms/keywords.c               |    4 +
+ scripts/genksyms/parse.y                  |    2 +
+ scripts/headers.sh                        |   29 -
+ scripts/headers_install.sh                |   48 +-
+ scripts/kallsyms.c                        |    3 +
+ scripts/package/builddeb                  |    2 +-
+ scripts/package/mkspec                    |    2 +-
+ scripts/tags.sh                           |   43 +-
+ tools/testing/selftests/Makefile          |    2 +-
+ tools/testing/selftests/lib.mk            |    4 +-
+ usr/.gitignore                            |    1 -
+ usr/Makefile                              |    2 +
+ usr/include/.gitignore                    |    3 +
+ usr/include/Makefile                      |  132 ++++
+ 53 files changed, 1805 insertions(+), 458 deletions(-)
+ delete mode 100644 drivers/gpu/drm/i915/.gitignore
+ create mode 100644 include/Kbuild
+ rename include/uapi/{linux => }/Kbuild (77%)
+ delete mode 100755 scripts/headers.sh
+ create mode 100644 usr/include/.gitignore
+ create mode 100644 usr/include/Makefile
+
+
+-- 
+Best Regards
+Masahiro Yamada
