@@ -1,84 +1,180 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:30926 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728102AbfGKOrf (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41008 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728884AbfGLBGN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:47:35 -0400
+        Thu, 11 Jul 2019 21:06:13 -0400
+Received: by mail-pg1-f196.google.com with SMTP id q4so3732780pgj.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Jul 2019 18:06:13 -0700 (PDT)
+From: Brian Norris <briannorris@chromium.org>
+Subject: [RFC PATCH] bug: always show source-tree-relative paths in WARN()/BUG()
+Date: Thu, 11 Jul 2019 18:05:56 -0700
+Message-Id: <20190712010556.248319-1-briannorris@chromium.org>
 MIME-Version: 1.0
-References: <CAK7LNARgFmSm+kCngidevQ3HnNjqKDKfGzYXrFPzhgBRHmccXw@mail.gmail.com>
- <1562658215-186-1-git-send-email-Cedric_Hombourger@mentor.com> <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
-In-Reply-To: <1562658215-186-2-git-send-email-Cedric_Hombourger@mentor.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 11 Jul 2019 23:46:53 +0900
-Message-ID: <CAK7LNAQDkPSzA3A6DDYvg3QLHWrkAs8-iWDp44opqtmW10QVvQ@mail.gmail.com>
-Subject: Re: [PATCH v4] builddeb: generate multi-arch friendly linux-libc-dev package
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cedric Hombourger <Cedric_Hombourger@mentor.com>
-Cc: Ben Hutchings <ben@decadent.org.uk>, isar-users@googlegroups.com, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jason Baron <jbaron@akamai.com>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, Kees Cook <keescook@chromium.org>, Borislav Petkov <bp@suse.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Brian Norris <briannorris@chromium.org>
 
-On Tue, Jul 9, 2019 at 4:44 PM Cedric Hombourger
-<Cedric_Hombourger@mentor.com> wrote:
->
-> Debian-based distributions place libc header files in a machine
-> specific directory (/usr/include/<libc-machine>) instead of
-> /usr/include/asm to support installation of the linux-libc-dev
-> package from multiple architectures. Move headers installed by
-> "make headers_install" accordingly using Debian's tuple from
-> dpkg-architecture (stored in debian/arch).
->
-> Signed-off-by: Cedric Hombourger <Cedric_Hombourger@mentor.com>
-> ---
->  scripts/package/builddeb | 5 +++++
->  scripts/package/mkdebian | 1 +
->  2 files changed, 6 insertions(+)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index b03dd56a4782..d5d33bcba1fb 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -132,6 +132,11 @@ fi
->  if [ "$ARCH" != "um" ]; then
->         $MAKE -f $srctree/Makefile headers_check
->         $MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
-> +       # move asm headers to /usr/include/<libc-machine>/asm to match the structure
-> +       # used by Debian-based distros (to support multi-arch)
-> +       host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
-> +       mkdir $libc_headers_dir/usr/include/$host_arch
-> +       mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
->  fi
+When building out-of-tree (e.g., 'make O=...'), __FILE__ ends up being
+an absolute path, and so WARN() and BUG() end up putting path names from
+the build system into the log text. For example:
 
+  # echo BUG > /sys/kernel/debug/provoke-crash/DIRECT
+  ...
+  kernel BUG at /mnt/host/source/[...]/drivers/misc/lkdtm/bugs.c:71!
 
-I just wondered whether there is something better than $(cat debian/arch),
-but maybe not.
+Not only is this excessively verbose, it also adds extra noise into
+tools that might parse this output. (For example, if builder paths
+change across versions, we suddenly get a "new" crash signature.)
 
-OK, I am ready to pick it up for 5.3-rc1.
+All in all, this looks much better as:
 
-With Ben's Ack, I would be able to proceed with more confident.
+  kernel BUG at drivers/misc/lkdtm/bugs.c:71!
 
+It appears the Kbuild system is fairly entrenched in using
+$(KBUILD_OUTPUT) for the ${CWD}, which necessarily means that the
+preprocessor will get handed an absolute path. It seems the only
+solution then, is to do some sort of post-processing on __FILE__.
 
+It so happens that lib/dynamic_debug.c already solves this sort of
+problem, so I steal its solution for use in panic/warn/bug code as well.
 
+Signed-off-by: Brian Norris <briannorris@chromium.org>
+---
+I'd be happy to entertain better solutions to this problem, but so far,
+I haven't been creative enough to come up with one.
 
+I'm also unsure of who best to address this to. If anyone has better
+pointers, I'm all ears.
 
->  # Install the maintainer scripts
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index 8351584cb24e..e0750b70453f 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -197,6 +197,7 @@ Architecture: $debarch
->  Description: Linux support headers for userspace development
->   This package provides userspaces headers from the Linux kernel.  These headers
->   are used by the installed headers for GNU glibc and other system libraries.
-> +Multi-Arch: same
->
->  Package: $dbg_packagename
->  Section: debug
-> --
-> 2.11.0
->
+ include/linux/bug.h |  2 ++
+ kernel/panic.c      | 21 +++++++++++++++++++--
+ lib/bug.c           |  3 ++-
+ lib/dynamic_debug.c | 18 ++++--------------
+ 4 files changed, 27 insertions(+), 17 deletions(-)
 
-
+diff --git a/include/linux/bug.h b/include/linux/bug.h
+index fe5916550da8..6ab59e53801d 100644
+--- a/include/linux/bug.h
++++ b/include/linux/bug.h
+@@ -76,4 +76,6 @@ static inline __must_check bool check_data_corruption(bool v) { return v; }
+ 		corruption;						 \
+ 	}))
+ 
++const char *trim_filepath_prefix(const char *path);
++
+ #endif	/* _LINUX_BUG_H */
+diff --git a/kernel/panic.c b/kernel/panic.c
+index 4d9f55bf7d38..0bed3101f049 100644
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -546,6 +546,23 @@ struct warn_args {
+ 	va_list args;
+ };
+ 
++/**
++ * trim_filepath_prefix - retrieve source-root relative path from a __FILE__
++ * @path: a __FILE__-like path argument.
++ * Return: path relative to source root.
++ */
++const char *trim_filepath_prefix(const char *path)
++{
++	int skip = strlen(__FILE__) - strlen("kernel/panic.c");
++
++	BUILD_BUG_ON(strlen(__FILE__) < strlen("kernel/panic.c"));
++
++	if (strncmp(path, __FILE__, skip))
++		skip = 0; /* prefix mismatch, don't skip */
++
++	return path + skip;
++}
++
+ void __warn(const char *file, int line, void *caller, unsigned taint,
+ 	    struct pt_regs *regs, struct warn_args *args)
+ {
+@@ -556,8 +573,8 @@ void __warn(const char *file, int line, void *caller, unsigned taint,
+ 
+ 	if (file)
+ 		pr_warn("WARNING: CPU: %d PID: %d at %s:%d %pS\n",
+-			raw_smp_processor_id(), current->pid, file, line,
+-			caller);
++			raw_smp_processor_id(), current->pid,
++			trim_filepath_prefix(file), line, caller);
+ 	else
+ 		pr_warn("WARNING: CPU: %d PID: %d at %pS\n",
+ 			raw_smp_processor_id(), current->pid, caller);
+diff --git a/lib/bug.c b/lib/bug.c
+index 1077366f496b..2aa91d330451 100644
+--- a/lib/bug.c
++++ b/lib/bug.c
+@@ -191,7 +191,8 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
+ 	printk(KERN_DEFAULT CUT_HERE);
+ 
+ 	if (file)
+-		pr_crit("kernel BUG at %s:%u!\n", file, line);
++		pr_crit("kernel BUG at %s:%u!\n", trim_filepath_prefix(file),
++			line);
+ 	else
+ 		pr_crit("Kernel BUG at %pB [verbose debug info unavailable]\n",
+ 			(void *)bugaddr);
+diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
+index 8a16c2d498e9..0896f067ba17 100644
+--- a/lib/dynamic_debug.c
++++ b/lib/dynamic_debug.c
+@@ -13,6 +13,7 @@
+ 
+ #define pr_fmt(fmt) KBUILD_MODNAME ":%s: " fmt, __func__
+ 
++#include <linux/bug.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
+@@ -67,17 +68,6 @@ static LIST_HEAD(ddebug_tables);
+ static int verbose;
+ module_param(verbose, int, 0644);
+ 
+-/* Return the path relative to source root */
+-static inline const char *trim_prefix(const char *path)
+-{
+-	int skip = strlen(__FILE__) - strlen("lib/dynamic_debug.c");
+-
+-	if (strncmp(path, __FILE__, skip))
+-		skip = 0; /* prefix mismatch, don't skip */
+-
+-	return path + skip;
+-}
+-
+ static struct { unsigned flag:8; char opt_char; } opt_array[] = {
+ 	{ _DPRINTK_FLAGS_PRINT, 'p' },
+ 	{ _DPRINTK_FLAGS_INCL_MODNAME, 'm' },
+@@ -164,7 +154,7 @@ static int ddebug_change(const struct ddebug_query *query,
+ 			    !match_wildcard(query->filename,
+ 					   kbasename(dp->filename)) &&
+ 			    !match_wildcard(query->filename,
+-					   trim_prefix(dp->filename)))
++					   trim_filepath_prefix(dp->filename)))
+ 				continue;
+ 
+ 			/* match against the function */
+@@ -199,7 +189,7 @@ static int ddebug_change(const struct ddebug_query *query,
+ #endif
+ 			dp->flags = newflags;
+ 			vpr_info("changed %s:%d [%s]%s =%s\n",
+-				 trim_prefix(dp->filename), dp->lineno,
++				 trim_filepath_prefix(dp->filename), dp->lineno,
+ 				 dt->mod_name, dp->function,
+ 				 ddebug_describe_flags(dp, flagbuf,
+ 						       sizeof(flagbuf)));
+@@ -827,7 +817,7 @@ static int ddebug_proc_show(struct seq_file *m, void *p)
+ 	}
+ 
+ 	seq_printf(m, "%s:%u [%s]%s =%s \"",
+-		   trim_prefix(dp->filename), dp->lineno,
++		   trim_filepath_prefix(dp->filename), dp->lineno,
+ 		   iter->table->mod_name, dp->function,
+ 		   ddebug_describe_flags(dp, flagsbuf, sizeof(flagsbuf)));
+ 	seq_escape(m, dp->format, "\t\r\n\"");
 -- 
-Best Regards
-Masahiro Yamada
+2.22.0.410.gd8fdbe21b5-goog
