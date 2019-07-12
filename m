@@ -1,66 +1,154 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:64039 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbfGLBuC (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:42652 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbfGLGIm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Jul 2019 21:50:02 -0400
-MIME-Version: 1.0
-References: <20190712010556.248319-1-briannorris@chromium.org>
- <CAK7LNARGNVfxexE616cQDs1fK7SzToKwHxO_T69+RShL6QVTCQ@mail.gmail.com> <CA+ASDXNGqYkBjMsjcRKAit+0cd0n7dwxKhezyYCXSh_HjucvQw@mail.gmail.com>
-In-Reply-To: <CA+ASDXNGqYkBjMsjcRKAit+0cd0n7dwxKhezyYCXSh_HjucvQw@mail.gmail.com>
+        Fri, 12 Jul 2019 02:08:42 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 12 Jul 2019 10:49:18 +0900
-Message-ID: <CAK7LNARJ=aAf-iG7RVDp=bs7DTScJ1GBpEpkqtKDFDJYHEekUA@mail.gmail.com>
-Subject: Re: [RFC PATCH] bug: always show source-tree-relative paths in WARN()/BUG()
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kconfig: fix missing choice values in auto.conf
+Date: Fri, 12 Jul 2019 15:07:09 +0900
+Message-Id: <20190712060709.20609-1-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brian Norris <briannorris@chromium.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jason Baron <jbaron@akamai.com>, Andrew Morton <akpm@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, Kees Cook <keescook@chromium.org>, Borislav Petkov <bp@suse.de>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?Joonas=20Kylm=8F=AB=A3l=8F=AB=A3?= <joonas.kylmala@iki.fi>, Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-stable <stable@vger.kernel.org>, linux-kernel@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 10:23 AM Brian Norris <briannorris@chromium.org> wrote:
->
-> On Thu, Jul 11, 2019 at 6:14 PM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> > BTW, did you see this?
-> >
-> > commit a73619a845d5625079cc1b3b820f44c899618388
-> > Author: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Date:   Fri Mar 30 13:15:26 2018 +0900
-> >
-> >     kbuild: use -fmacro-prefix-map to make __FILE__ a relative path
->
-> Oh, wow, no I did not. If my reading is correct, that's GCC only? I've
-> been using various combinations of newer (5.2) and older (4.14.y --
-> didn't have that patch) kernels, older GCC (doesn't have that feature
-> AFAICT), and newer Clang (doesn't appear to have that feature). So I'm
-> not totally sure if I ever actually tried a combo that *could* make
-> use of that. But I may give it another shot.
->
-> In the event that this is GCC-specific...I don't suppose I could
-> convince anybody to expend any effort (e.g., taking a patch like mine)
-> to solve it for the non-GCC world?
->
-> Thanks for the tip,
-> Brian
+Since commit 00c864f8903d ("kconfig: allow all config targets to write
+auto.conf if missing"), Kconfig creates include/config/auto.conf in the
+defconfig stage when it is missing.
 
+Joonas Kylmälä reported incorrect auto.conf generation under some
+circumstances.
 
-GCC 8 added this flag.
-So, it will be eventually all solved in the GCC world.
+Apply the following diff:
 
-Clang has not supported it yet...
+| --- a/arch/arm/configs/imx_v6_v7_defconfig
+| +++ b/arch/arm/configs/imx_v6_v7_defconfig
+| @@ -345,14 +345,7 @@ CONFIG_USB_CONFIGFS_F_MIDI=y
+|  CONFIG_USB_CONFIGFS_F_HID=y
+|  CONFIG_USB_CONFIGFS_F_UVC=y
+|  CONFIG_USB_CONFIGFS_F_PRINTER=y
+| -CONFIG_USB_ZERO=m
+| -CONFIG_USB_AUDIO=m
+| -CONFIG_USB_ETH=m
+| -CONFIG_USB_G_NCM=m
+| -CONFIG_USB_GADGETFS=m
+| -CONFIG_USB_FUNCTIONFS=m
+| -CONFIG_USB_MASS_STORAGE=m
+| -CONFIG_USB_G_SERIAL=m
+| +CONFIG_USB_FUNCTIONFS=y
+|  CONFIG_MMC=y
+|  CONFIG_MMC_SDHCI=y
+|  CONFIG_MMC_SDHCI_PLTFM=y
 
+And then, run:
 
-Trimming absolute path at run-time
-is no help for reducing the kernel image.
+$ make ARCH=arm mrproper imx_v6_v7_defconfig
 
-Turning __FILE__ into a relative path at compile-time is better.
+CONFIG_USB_FUNCTIONFS=y is correctly contained in the .config, but not
+in the auto.conf.
 
+Please note drivers/usb/gadget/legacy/Kconfig is included from a choice
+block in drivers/usb/gadget/Kconfig. So USB_FUNCTIONFS is a choice value.
 
-I hope Clang people will consider to support it.
-I guess implementing this feature should not be so hard.
+This is probably a similar situation described in commit beaaddb62540
+("kconfig: tests: test defconfig when two choices interact").
 
+When sym_calc_choice() is called, the choice symbol forgets the
+SYMBOL_DEF_USER unless all of its choice values are explicitly set by
+the user.
 
+The choice symbol is given just one chance to recall it because
+set_all_choice_values() is called if SYMBOL_NEED_SET_CHOICE_VALUES
+is set.
+
+When sym_calc_choice() is called again, the choice symbol forgets it
+forever, since SYMBOL_NEED_SET_CHOICE_VALUES is a one-time aid.
+Hence, we cannot call sym_clear_all_valid() again and again.
+
+It is crazy to set and clear internal flags. However, we cannot simply
+get rid of "sym->flags &= flags | ~SYMBOL_DEF_USER;" Doing so would
+re-introduce the problem solved by commit 5d09598d488f ("kconfig: fix
+new choices being skipped upon config update").
+
+To work around the issue, conf_write_autoconf() stopped calling
+sym_clear_all_valid().
+
+conf_write() must be changed accordingly. Currently, it clears
+SYMBOL_WRITE after the symbol is written into the .config file. This
+is needed to prevent it from writing the same symbol multiple times in
+case the symbol is declared in two or more locations. I added the new
+flag SYMBOL_WRITTEN, to track the symbols that have been written.
+
+Anyway, this is a cheesy workaround in order to suppress the issue
+as far as defconfig is concerned.
+
+Handling of choices is totally broken. sym_clear_all_valid() is called
+every time a user touches a symbol from the GUI interface. To reproduce
+it, just add a new symbol drivers/usb/gadget/legacy/Kconfig, then touch
+around unrelated symbols from menuconfig. USB_FUNCTIONFS will disappear
+from the .config file.
+
+I added the Fixes tag since it is more fatal than before. But, this
+has been broken since long long time before, and still it is.
+We should take a closer look to fix this correctly somehow.
+
+Fixes: 00c864f8903d ("kconfig: allow all config targets to write auto.conf if missing")
+Cc: linux-stable <stable@vger.kernel.org> # 4.19+
+Reported-by: Joonas Kylmälä <joonas.kylmala@iki.fi>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/kconfig/confdata.c | 7 +++----
+ scripts/kconfig/expr.h     | 1 +
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index cbb6efa4a5a6..e0972b255aac 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -895,7 +895,8 @@ int conf_write(const char *name)
+ 				     "# %s\n"
+ 				     "#\n", str);
+ 			need_newline = false;
+-		} else if (!(sym->flags & SYMBOL_CHOICE)) {
++		} else if (!(sym->flags & SYMBOL_CHOICE) &&
++			   !(sym->flags & SYMBOL_WRITTEN)) {
+ 			sym_calc_value(sym);
+ 			if (!(sym->flags & SYMBOL_WRITE))
+ 				goto next;
+@@ -903,7 +904,7 @@ int conf_write(const char *name)
+ 				fprintf(out, "\n");
+ 				need_newline = false;
+ 			}
+-			sym->flags &= ~SYMBOL_WRITE;
++			sym->flags |= SYMBOL_WRITTEN;
+ 			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+ 		}
+ 
+@@ -1063,8 +1064,6 @@ int conf_write_autoconf(int overwrite)
+ 	if (!overwrite && is_present(autoconf_name))
+ 		return 0;
+ 
+-	sym_clear_all_valid();
+-
+ 	conf_write_dep("include/config/auto.conf.cmd");
+ 
+ 	if (conf_touch_deps())
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 8dde65bc3165..017843c9a4f4 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -141,6 +141,7 @@ struct symbol {
+ #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
+ #define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
+ #define SYMBOL_CHANGED    0x0400  /* ? */
++#define SYMBOL_WRITTEN    0x0800  /* track info to avoid double-write to .config */
+ #define SYMBOL_NO_WRITE   0x1000  /* Symbol for internal use only; it will not be written */
+ #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
+ #define SYMBOL_WARNED     0x8000  /* warning has been issued */
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
