@@ -1,62 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:17722 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387569AbfGOOCO (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:62962 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388773AbfGOOLX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:02:14 -0400
+        Mon, 15 Jul 2019 10:11:23 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: remove tag files by distclean instead of mrproper
-Date: Mon, 15 Jul 2019 23:01:49 +0900
-Message-Id: <20190715140149.21330-1-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: remove unused hostcc-option
+Date: Mon, 15 Jul 2019 23:11:03 +0900
+Message-Id: <20190715141103.22278-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-It takes somewhat long time to generate these tag files.
-Keep such precious files until we run 'make distclean'.
+We can re-add this whenever it is needed. At this moment, it is unused.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ scripts/Kbuild.include | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 2c5d00ba537e..2d8e45f2a8df 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1380,11 +1380,15 @@ CLEAN_FILES += modules.builtin.modinfo
- MRPROPER_DIRS  += include/config include/generated          \
- 		  arch/$(SRCARCH)/include/generated .tmp_objdiff
- MRPROPER_FILES += .config .config.old .version \
--		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
-+		  Module.symvers \
- 		  signing_key.pem signing_key.priv signing_key.x509	\
- 		  x509.genkey extra_certificates signing_key.x509.keyid	\
- 		  signing_key.x509.signer vmlinux-gdb.py
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 73e80b917f12..77c742fa4fb1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -125,11 +125,6 @@ CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+ cc-option = $(call __cc-option, $(CC),\
+ 	$(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS),$(1),$(2))
  
-+# Directories & files removed with 'make distclean'
-+DISTCLEAN_DIRS  +=
-+DISTCLEAN_FILES += tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS
-+
- # clean - Delete most, but leave enough to build external modules
- #
- clean: rm-dirs  := $(CLEAN_DIRS)
-@@ -1417,9 +1421,14 @@ mrproper: clean $(mrproper-dirs)
- 
- # distclean
- #
-+distclean: rm-dirs  := $(wildcard $(DISTCLEAN_DIRS))
-+distclean: rm-files := $(wildcard $(DISTCLEAN_FILES))
-+
- PHONY += distclean
- 
- distclean: mrproper
-+	$(call cmd,rmdirs)
-+	$(call cmd,rmfiles)
- 	@find $(srctree) $(RCS_FIND_IGNORE) \
- 		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
- 		-o -name '*.bak' -o -name '#*#' -o -name '*%' \
+-# hostcc-option
+-# Usage: cflags-y += $(call hostcc-option,-march=winchip-c6,-march=i586)
+-hostcc-option = $(call __cc-option, $(HOSTCC),\
+-	$(KBUILD_HOSTCFLAGS) $(HOST_EXTRACFLAGS),$(1),$(2))
+-
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+ cc-option-yn = $(call try-run,\
 -- 
 2.17.1
