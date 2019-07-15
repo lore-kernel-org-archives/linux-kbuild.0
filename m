@@ -1,114 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40517 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730984AbfGOVZ6 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Jul 2019 17:25:58 -0400
-Received: by mail-pf1-f194.google.com with SMTP id p184so8012782pfp.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Jul 2019 14:25:57 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:33906 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730647AbfGOWEI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 15 Jul 2019 18:04:08 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20190712081744.87097-1-brendanhiggins@google.com>
- <20190712081744.87097-2-brendanhiggins@google.com> <20190715201054.C69AA2086C@mail.kernel.org>
-In-Reply-To: <20190715201054.C69AA2086C@mail.kernel.org>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Mon, 15 Jul 2019 14:25:45 -0700
-Message-ID: <CAFd5g44kWHYceo85qxL98JKH2FYBwVLFuLzqNR+APpMC1aKWUQ@mail.gmail.com>
-Subject: Re: [PATCH v9 01/18] kunit: test: add KUnit test runner core
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFd5g47481sRaez=yEJN4_ghiXZbxayk1Y04tAZpuzPLsmnhKg@mail.gmail.com>
+References: <20190712081744.87097-1-brendanhiggins@google.com> <20190712081744.87097-4-brendanhiggins@google.com> <20190715204356.4E3F92145D@mail.kernel.org> <CAFd5g47481sRaez=yEJN4_ghiXZbxayk1Y04tAZpuzPLsmnhKg@mail.gmail.com>
+From: Stephen Boyd <sboyd@kernel.org>
+Subject: Re: [PATCH v9 03/18] kunit: test: add string_stream a std::stream like string builder
+Date: Mon, 15 Jul 2019 15:04:06 -0700
+Message-Id: <20190715220407.0030420665@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
+To: Brendan Higgins <brendanhiggins@google.com>
 Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Mon, Jul 15, 2019 at 1:10 PM Stephen Boyd <sboyd@kernel.org> wrote:
->
-> Quoting Brendan Higgins (2019-07-12 01:17:27)
-> > Add core facilities for defining unit tests; this provides a common way
-> > to define test cases, functions that execute code which is under test
-> > and determine whether the code under test behaves as expected; this also
-> > provides a way to group together related test cases in test suites (here
-> > we call them test_modules).
+Quoting Brendan Higgins (2019-07-15 14:11:50)
+> On Mon, Jul 15, 2019 at 1:43 PM Stephen Boyd <sboyd@kernel.org> wrote:
 > >
-> > Just define test cases and how to execute them for now; setting
-> > expectations on code will be defined later.
-> >
-> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> > Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
->
-> Reviewed-by: Stephen Boyd <sboyd@kernel.org>
->
-> Minor nits below.
->
-> > diff --git a/kunit/test.c b/kunit/test.c
-> > new file mode 100644
-> > index 0000000000000..571e4c65deb5c
-> > --- /dev/null
-> > +++ b/kunit/test.c
-> > @@ -0,0 +1,189 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Base unit test (KUnit) API.
-> > + *
-> > + * Copyright (C) 2019, Google LLC.
-> > + * Author: Brendan Higgins <brendanhiggins@google.com>
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <kunit/test.h>
-> > +
-> > +static void kunit_set_failure(struct kunit *test)
-> > +{
-> > +       WRITE_ONCE(test->success, false);
-> > +}
-> > +
-> [...]
-> > +
-> > +void kunit_init_test(struct kunit *test, const char *name)
-> > +{
-> > +       test->name = name;
-> > +       test->success = true;
-> > +}
-> > +
-> > +/*
-> > + * Performs all logic to run a test case.
-> > + */
-> > +static void kunit_run_case(struct kunit_suite *suite,
-> > +                          struct kunit_case *test_case)
-> > +{
-> > +       struct kunit test;
-> > +       int ret = 0;
-> > +
-> > +       kunit_init_test(&test, test_case->name);
-> > +
-> > +       if (suite->init) {
-> > +               ret = suite->init(&test);
->
-> Can you push the ret definition into this if scope? That way we can
-> avoid default initialize to 0 for it.
+> > I also wonder if it would be better to just have a big slop buffer of a
+> > 4K page or something so that we almost never have to allocate anything
+> > with a string_stream and we can just rely on a reader consuming data
+> > while writers are writing. That might work out better, but I don't quite
+> > understand the use case for the string stream.
+>=20
+> That makes sense, but might that also waste memory since we will
+> almost never need that much memory?
 
-Sure! I would actually prefer that from a cosmetic standpoint. I just
-thought that mixing declarations and code was against the style guide.
-
-> > +               if (ret) {
-> > +                       kunit_err(&test, "failed to initialize: %d\n", ret);
-> > +                       kunit_set_failure(&test);
->
-> Do we need to 'test_case->success = test.success' here too? Or is the
-> test failure extracted somewhere else?
-
-Er, yes. That's kind of embarrassing. Good catch.
-
-> > +                       return;
-> > +               }
-> > +       }
-> > +
-> > +       test_case->run_case(&test);
-> > +
-> > +       if (suite->exit)
-> > +               suite->exit(&test);
-> > +
-> > +       test_case->success = test.success;
-
-Thanks!
+Why do we care? These are unit tests. Having allocations in here makes
+things more complicated, whereas it would be simpler to have a pointer
+and a spinlock operating on a chunk of memory that gets flushed out
+periodically.
