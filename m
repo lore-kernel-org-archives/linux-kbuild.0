@@ -1,18 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:46284 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732382AbfGPJnT (ORCPT
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:34602 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732997AbfGPJnf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 05:43:19 -0400
-Received: by mail-pf1-f202.google.com with SMTP id g21so12038606pfb.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jul 2019 02:43:18 -0700 (PDT)
-Date: Tue, 16 Jul 2019 02:42:47 -0700
+        Tue, 16 Jul 2019 05:43:35 -0400
+Received: by mail-pl1-f202.google.com with SMTP id 71so9914163pld.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jul 2019 02:43:35 -0700 (PDT)
+Date: Tue, 16 Jul 2019 02:42:53 -0700
 In-Reply-To: <20190716094302.180360-1-brendanhiggins@google.com>
-Message-Id: <20190716094302.180360-4-brendanhiggins@google.com>
+Message-Id: <20190716094302.180360-10-brendanhiggins@google.com>
 Mime-Version: 1.0
 References: <20190716094302.180360-1-brendanhiggins@google.com>
-Subject: [PATCH v10 03/18] kunit: test: add string_stream a std::stream like
- string builder
+Subject: [PATCH v10 09/18] kunit: test: add support for test abort
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,238 +19,500 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
 Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-A number of test features need to do pretty complicated string printing
-where it may not be possible to rely on a single preallocated string
-with parameters.
+Add support for aborting/bailing out of test cases, which is needed for
+implementing assertions.
 
-So provide a library for constructing the string as you go similar to
-C++'s std::string.
+An assertion is like an expectation, but bails out of the test case
+early if the assertion is not met. The idea with assertions is that you
+use them to state all the preconditions for your test. Logically
+speaking, these are the premises of the test case, so if a premise isn't
+true, there is no point in continuing the test case because there are no
+conclusions that can be drawn without the premises. Whereas, the
+expectation is the thing you are trying to prove.
 
 Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- include/kunit/string-stream.h |  51 ++++++++++++
- kunit/Makefile                |   3 +-
- kunit/string-stream.c         | 144 ++++++++++++++++++++++++++++++++++
- 3 files changed, 197 insertions(+), 1 deletion(-)
- create mode 100644 include/kunit/string-stream.h
- create mode 100644 kunit/string-stream.c
+ include/kunit/test.h      |  16 ++++
+ include/kunit/try-catch.h |  69 +++++++++++++++
+ kunit/Makefile            |   3 +-
+ kunit/test.c              | 176 ++++++++++++++++++++++++++++++++++----
+ kunit/try-catch.c         |  95 ++++++++++++++++++++
+ 5 files changed, 343 insertions(+), 16 deletions(-)
+ create mode 100644 include/kunit/try-catch.h
+ create mode 100644 kunit/try-catch.c
 
-diff --git a/include/kunit/string-stream.h b/include/kunit/string-stream.h
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 4cc94f09389d7..1d35f542a30c9 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -13,6 +13,7 @@
+ #include <linux/types.h>
+ #include <linux/slab.h>
+ #include <kunit/kunit-stream.h>
++#include <kunit/try-catch.h>
+ 
+ struct kunit_resource;
+ 
+@@ -167,6 +168,7 @@ struct kunit {
+ 
+ 	/* private: internal use only. */
+ 	const char *name; /* Read only after initialization! */
++	struct kunit_try_catch try_catch;
+ 	/*
+ 	 * success starts as true, and may only be set to false during a test
+ 	 * case; thus, it is safe to update this across multiple threads using
+@@ -176,6 +178,11 @@ struct kunit {
+ 	 */
+ 	bool success; /* Read only after test_case finishes! */
+ 	spinlock_t lock; /* Gaurds all mutable test state. */
++	/*
++	 * death_test may be both set and unset from multiple threads in a test
++	 * case.
++	 */
++	bool death_test; /* Protected by lock. */
+ 	/*
+ 	 * Because resources is a list that may be updated multiple times (with
+ 	 * new resources) from any thread associated with a test case, we must
+@@ -184,10 +191,19 @@ struct kunit {
+ 	struct list_head resources; /* Protected by lock. */
+ };
+ 
++static inline void kunit_set_death_test(struct kunit *test, bool death_test)
++{
++	spin_lock(&test->lock);
++	test->death_test = death_test;
++	spin_unlock(&test->lock);
++}
++
+ void kunit_init_test(struct kunit *test, const char *name);
+ 
+ void kunit_fail(struct kunit *test, struct kunit_stream *stream);
+ 
++void kunit_abort(struct kunit *test);
++
+ int kunit_run_tests(struct kunit_suite *suite);
+ 
+ /**
+diff --git a/include/kunit/try-catch.h b/include/kunit/try-catch.h
 new file mode 100644
-index 0000000000000..390d118c41499
+index 0000000000000..8a414a9af0b64
 --- /dev/null
-+++ b/include/kunit/string-stream.h
-@@ -0,0 +1,51 @@
++++ b/include/kunit/try-catch.h
+@@ -0,0 +1,69 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * C++ stream style string builder used in KUnit for building messages.
++ * An API to allow a function, that may fail, to be executed, and recover in a
++ * controlled manner.
 + *
 + * Copyright (C) 2019, Google LLC.
 + * Author: Brendan Higgins <brendanhiggins@google.com>
 + */
 +
-+#ifndef _KUNIT_STRING_STREAM_H
-+#define _KUNIT_STRING_STREAM_H
++#ifndef _KUNIT_TRY_CATCH_H
++#define _KUNIT_TRY_CATCH_H
 +
 +#include <linux/types.h>
-+#include <linux/mutex.h>
-+#include <stdarg.h>
 +
-+struct string_stream_fragment {
-+	struct list_head node;
-+	char *fragment;
-+};
-+
-+struct string_stream {
-+	size_t length;
-+	struct list_head fragments;
-+	/* length and fragments are protected by this lock */
-+	struct mutex lock;
-+};
++typedef void (*kunit_try_catch_func_t)(void *);
 +
 +struct kunit;
 +
-+struct string_stream *alloc_string_stream(struct kunit *test);
++/*
++ * struct kunit_try_catch - provides a generic way to run code which might fail.
++ * @context: used to pass user data to the try and catch functions.
++ *
++ * kunit_try_catch provides a generic, architecture independent way to execute
++ * an arbitrary function of type kunit_try_catch_func_t which may bail out by
++ * calling kunit_try_catch_throw(). If kunit_try_catch_throw() is called, @try
++ * is stopped at the site of invocation and @catch is catch is called.
++ *
++ * struct kunit_try_catch provides a generic interface for the functionality
++ * needed to implement kunit->abort() which in turn is needed for implementing
++ * assertions. Assertions allow stating a precondition for a test simplifying
++ * how test cases are written and presented.
++ *
++ * Assertions are like expectations, except they abort (call
++ * kunit_try_catch_throw()) when the specified condition is not met. This is
++ * useful when you look at a test case as a logical statement about some piece
++ * of code, where assertions are the premises for the test case, and the
++ * conclusion is a set of predicates, rather expectations, that must all be
++ * true. If your premises are violated, it does not makes sense to continue.
++ */
++struct kunit_try_catch {
++	/* private: internal use only. */
++	struct kunit *test;
++	struct completion *try_completion;
++	int try_result;
++	kunit_try_catch_func_t try;
++	kunit_try_catch_func_t catch;
++	void *context;
++};
 +
-+void string_stream_get(struct string_stream *stream);
++void kunit_try_catch_init(struct kunit_try_catch *try_catch,
++			  struct kunit *test,
++			  kunit_try_catch_func_t try,
++			  kunit_try_catch_func_t catch);
 +
-+int string_stream_put(struct string_stream *stream);
++void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context);
 +
-+int string_stream_add(struct string_stream *stream, const char *fmt, ...);
++void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch);
 +
-+int string_stream_vadd(struct string_stream *stream,
-+		       const char *fmt,
-+		       va_list args);
++static inline int kunit_try_catch_get_result(struct kunit_try_catch *try_catch)
++{
++	return try_catch->try_result;
++}
 +
-+char *string_stream_get_string(struct string_stream *stream);
++/*
++ * Exposed for testing only.
++ */
++void kunit_generic_try_catch_init(struct kunit_try_catch *try_catch);
 +
-+int string_stream_append(struct string_stream *stream,
-+			 struct string_stream *other);
-+
-+void string_stream_clear(struct string_stream *stream);
-+
-+bool string_stream_is_empty(struct string_stream *stream);
-+
-+#endif /* _KUNIT_STRING_STREAM_H */
++#endif /* _KUNIT_TRY_CATCH_H */
 diff --git a/kunit/Makefile b/kunit/Makefile
-index 5efdc4dea2c08..275b565a0e81f 100644
+index 60a9ea6cb4697..1f7680cfa11ad 100644
 --- a/kunit/Makefile
 +++ b/kunit/Makefile
-@@ -1 +1,2 @@
--obj-$(CONFIG_KUNIT) +=			test.o
-+obj-$(CONFIG_KUNIT) +=			test.o \
-+					string-stream.o
-diff --git a/kunit/string-stream.c b/kunit/string-stream.c
+@@ -1,6 +1,7 @@
+ obj-$(CONFIG_KUNIT) +=			test.o \
+ 					string-stream.o \
+-					kunit-stream.o
++					kunit-stream.o \
++					try-catch.o
+ 
+ obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
+ 
+diff --git a/kunit/test.c b/kunit/test.c
+index 1f94a9224b03e..12db50b221781 100644
+--- a/kunit/test.c
++++ b/kunit/test.c
+@@ -7,13 +7,26 @@
+  */
+ 
+ #include <linux/kernel.h>
++#include <linux/sched/debug.h>
+ #include <kunit/test.h>
++#include <kunit/try-catch.h>
+ 
+ static void kunit_set_failure(struct kunit *test)
+ {
+ 	WRITE_ONCE(test->success, false);
+ }
+ 
++static bool kunit_get_death_test(struct kunit *test)
++{
++	bool death_test;
++
++	spin_lock(&test->lock);
++	death_test = test->death_test;
++	spin_unlock(&test->lock);
++
++	return death_test;
++}
++
+ static int kunit_vprintk_emit(int level, const char *fmt, va_list args)
+ {
+ 	return vprintk_emit(0, level, NULL, 0, fmt, args);
+@@ -126,42 +139,175 @@ void kunit_fail(struct kunit *test, struct kunit_stream *stream)
+ 	kunit_stream_commit(stream);
+ }
+ 
++void __noreturn kunit_abort(struct kunit *test)
++{
++	kunit_set_death_test(test, true);
++
++	kunit_try_catch_throw(&test->try_catch);
++
++	/*
++	 * Throw could not abort from test.
++	 *
++	 * XXX: we should never reach this line! As kunit_try_catch_throw is
++	 * marked __noreturn.
++	 */
++	WARN_ONCE(true, "Throw could not abort from test!\n");
++}
++
+ void kunit_init_test(struct kunit *test, const char *name)
+ {
+ 	spin_lock_init(&test->lock);
+ 	INIT_LIST_HEAD(&test->resources);
+ 	test->name = name;
+ 	test->success = true;
++	test->death_test = false;
+ }
+ 
+ /*
+- * Performs all logic to run a test case.
++ * Initializes and runs test case. Does not clean up or do post validations.
+  */
+-static void kunit_run_case(struct kunit_suite *suite,
+-			   struct kunit_case *test_case)
++static void kunit_run_case_internal(struct kunit *test,
++				    struct kunit_suite *suite,
++				    struct kunit_case *test_case)
+ {
+-	struct kunit test;
+-
+-	kunit_init_test(&test, test_case->name);
+-
+ 	if (suite->init) {
+ 		int ret;
+ 
+-		ret = suite->init(&test);
++		ret = suite->init(test);
+ 		if (ret) {
+-			kunit_err(&test, "failed to initialize: %d\n", ret);
+-			kunit_set_failure(&test);
+-			test_case->success = test.success;
++			kunit_err(test, "failed to initialize: %d\n", ret);
++			kunit_set_failure(test);
+ 			return;
+ 		}
+ 	}
+ 
+-	test_case->run_case(&test);
++	test_case->run_case(test);
++}
++
++static void kunit_case_internal_cleanup(struct kunit *test)
++{
++	kunit_cleanup(test);
++}
+ 
++/*
++ * Performs post validations and cleanup after a test case was run.
++ * XXX: Should ONLY BE CALLED AFTER kunit_run_case_internal!
++ */
++static void kunit_run_case_cleanup(struct kunit *test,
++				   struct kunit_suite *suite)
++{
+ 	if (suite->exit)
+-		suite->exit(&test);
++		suite->exit(test);
++
++	kunit_case_internal_cleanup(test);
++}
++
++/*
++ * Handles an unexpected crash in a test case.
++ */
++static void kunit_handle_test_crash(struct kunit *test,
++				   struct kunit_suite *suite,
++				   struct kunit_case *test_case)
++{
++	kunit_err(test, "kunit test case crashed!");
++	/*
++	 * TODO(brendanhiggins@google.com): This prints the stack trace up
++	 * through this frame, not up to the frame that caused the crash.
++	 */
++	show_stack(NULL, NULL);
++
++	kunit_case_internal_cleanup(test);
++}
++
++struct kunit_try_catch_context {
++	struct kunit *test;
++	struct kunit_suite *suite;
++	struct kunit_case *test_case;
++};
++
++static void kunit_try_run_case(void *data)
++{
++	struct kunit_try_catch_context *ctx = data;
++	struct kunit *test = ctx->test;
++	struct kunit_suite *suite = ctx->suite;
++	struct kunit_case *test_case = ctx->test_case;
++
++	/*
++	 * kunit_run_case_internal may encounter a fatal error; if it does,
++	 * abort will be called, this thread will exit, and finally the parent
++	 * thread will resume control and handle any necessary clean up.
++	 */
++	kunit_run_case_internal(test, suite, test_case);
++	/* This line may never be reached. */
++	kunit_run_case_cleanup(test, suite);
++}
++
++static void kunit_catch_run_case(void *data)
++{
++	struct kunit_try_catch_context *ctx = data;
++	struct kunit *test = ctx->test;
++	struct kunit_suite *suite = ctx->suite;
++	struct kunit_case *test_case = ctx->test_case;
++	int try_exit_code = kunit_try_catch_get_result(&test->try_catch);
++
++	if (try_exit_code) {
++		kunit_set_failure(test);
++		/*
++		 * Test case could not finish, we have no idea what state it is
++		 * in, so don't do clean up.
++		 */
++		if (try_exit_code == -ETIMEDOUT)
++			kunit_err(test, "test case timed out\n");
++		/*
++		 * Unknown internal error occurred preventing test case from
++		 * running, so there is nothing to clean up.
++		 */
++		else
++			kunit_err(test, "internal error occurred preventing test case from running: %d\n",
++				  try_exit_code);
++		return;
++	}
++
++	if (kunit_get_death_test(test)) {
++		/*
++		 * EXPECTED DEATH: kunit_run_case_internal encountered
++		 * anticipated fatal error. Everything should be in a safe
++		 * state.
++		 */
++		kunit_run_case_cleanup(test, suite);
++	} else {
++		/*
++		 * UNEXPECTED DEATH: kunit_run_case_internal encountered an
++		 * unanticipated fatal error. We have no idea what the state of
++		 * the test case is in.
++		 */
++		kunit_handle_test_crash(test, suite, test_case);
++		kunit_set_failure(test);
++	}
++}
++
++/*
++ * Performs all logic to run a test case. It also catches most errors that
++ * occurs in a test case and reports them as failures.
++ */
++static void kunit_run_case_catch_errors(struct kunit_suite *suite,
++					struct kunit_case *test_case)
++{
++	struct kunit_try_catch_context context;
++	struct kunit_try_catch *try_catch;
++	struct kunit test;
++
++	kunit_init_test(&test, test_case->name);
++	try_catch = &test.try_catch;
+ 
+-	kunit_cleanup(&test);
++	kunit_try_catch_init(try_catch,
++			     &test,
++			     kunit_try_run_case,
++			     kunit_catch_run_case);
++	context.test = &test;
++	context.suite = suite;
++	context.test_case = test_case;
++	kunit_try_catch_run(try_catch, &context);
+ 
+ 	test_case->success = test.success;
+ }
+@@ -174,7 +320,7 @@ int kunit_run_tests(struct kunit_suite *suite)
+ 	kunit_print_subtest_start(suite);
+ 
+ 	for (test_case = suite->test_cases; test_case->run_case; test_case++) {
+-		kunit_run_case(suite, test_case);
++		kunit_run_case_catch_errors(suite, test_case);
+ 		kunit_print_test_case_ok_not_ok(test_case, test_case_count++);
+ 	}
+ 
+diff --git a/kunit/try-catch.c b/kunit/try-catch.c
 new file mode 100644
-index 0000000000000..5e7906ffc7fa1
+index 0000000000000..de580f074387b
 --- /dev/null
-+++ b/kunit/string-stream.c
-@@ -0,0 +1,144 @@
++++ b/kunit/try-catch.c
+@@ -0,0 +1,95 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * C++ stream style string builder used in KUnit for building messages.
++ * An API to allow a function, that may fail, to be executed, and recover in a
++ * controlled manner.
 + *
 + * Copyright (C) 2019, Google LLC.
 + * Author: Brendan Higgins <brendanhiggins@google.com>
 + */
 +
-+#include <linux/list.h>
-+#include <linux/slab.h>
-+#include <kunit/string-stream.h>
++#include <kunit/try-catch.h>
 +#include <kunit/test.h>
++#include <linux/completion.h>
++#include <linux/kthread.h>
 +
-+int string_stream_vadd(struct string_stream *stream,
-+		       const char *fmt,
-+		       va_list args)
++void __noreturn kunit_try_catch_throw(struct kunit_try_catch *try_catch)
 +{
-+	struct string_stream_fragment *frag_container;
-+	int len;
-+	va_list args_for_counting;
++	try_catch->try_result = -EFAULT;
++	complete_and_exit(try_catch->try_completion, -EFAULT);
++}
 +
-+	/* Make a copy because `vsnprintf` could change it */
-+	va_copy(args_for_counting, args);
++static int kunit_generic_run_threadfn_adapter(void *data)
++{
++	struct kunit_try_catch *try_catch = data;
 +
-+	/* Need space for null byte. */
-+	len = vsnprintf(NULL, 0, fmt, args_for_counting) + 1;
++	try_catch->try(try_catch->context);
 +
-+	va_end(args_for_counting);
++	complete_and_exit(try_catch->try_completion, 0);
++}
 +
-+	frag_container = kmalloc(sizeof(*frag_container), GFP_KERNEL);
-+	if (!frag_container)
-+		return -ENOMEM;
++void kunit_try_catch_run(struct kunit_try_catch *try_catch, void *context)
++{
++	DECLARE_COMPLETION_ONSTACK(try_completion);
++	struct kunit *test = try_catch->test;
++	struct task_struct *task_struct;
++	int exit_code, status;
 +
-+	frag_container->fragment = kmalloc(len, GFP_KERNEL);
-+	if (!frag_container->fragment) {
-+		kfree(frag_container);
-+		return -ENOMEM;
++	try_catch->context = context;
++	try_catch->try_completion = &try_completion;
++	try_catch->try_result = 0;
++	task_struct = kthread_run(kunit_generic_run_threadfn_adapter,
++				  try_catch,
++				  "kunit_try_catch_thread");
++	if (IS_ERR(task_struct)) {
++		try_catch->catch(try_catch->context);
++		return;
 +	}
 +
-+	len = vsnprintf(frag_container->fragment, len, fmt, args);
-+	mutex_lock(&stream->lock);
-+	stream->length += len;
-+	list_add_tail(&frag_container->node, &stream->fragments);
-+	mutex_unlock(&stream->lock);
-+
-+	return 0;
-+}
-+
-+int string_stream_add(struct string_stream *stream, const char *fmt, ...)
-+{
-+	va_list args;
-+	int result;
-+
-+	va_start(args, fmt);
-+	result = string_stream_vadd(stream, fmt, args);
-+	va_end(args);
-+
-+	return result;
-+}
-+
-+void string_stream_clear(struct string_stream *stream)
-+{
-+	struct string_stream_fragment *frag_container, *frag_container_safe;
-+
-+	mutex_lock(&stream->lock);
-+	list_for_each_entry_safe(frag_container,
-+				 frag_container_safe,
-+				 &stream->fragments,
-+				 node) {
-+		list_del(&frag_container->node);
-+		kfree(frag_container->fragment);
-+		kfree(frag_container);
++	/*
++	 * TODO(brendanhiggins@google.com): We should probably have some type of
++	 * variable timeout here. The only question is what that timeout value
++	 * should be.
++	 *
++	 * The intention has always been, at some point, to be able to label
++	 * tests with some type of size bucket (unit/small, integration/medium,
++	 * large/system/end-to-end, etc), where each size bucket would get a
++	 * default timeout value kind of like what Bazel does:
++	 * https://docs.bazel.build/versions/master/be/common-definitions.html#test.size
++	 * There is still some debate to be had on exactly how we do this. (For
++	 * one, we probably want to have some sort of test runner level
++	 * timeout.)
++	 *
++	 * For more background on this topic, see:
++	 * https://mike-bland.com/2011/11/01/small-medium-large.html
++	 */
++	status = wait_for_completion_timeout(&try_completion,
++					     300 * MSEC_PER_SEC); /* 5 min */
++	if (status < 0) {
++		kunit_err(test, "try timed out\n");
++		try_catch->try_result = -ETIMEDOUT;
 +	}
-+	stream->length = 0;
-+	mutex_unlock(&stream->lock);
++
++	exit_code = try_catch->try_result;
++
++	if (!exit_code)
++		return;
++
++	if (exit_code == -EFAULT)
++		try_catch->try_result = 0;
++	else if (exit_code == -EINTR)
++		kunit_err(test, "wake_up_process() was never called\n");
++	else if (exit_code)
++		kunit_err(test, "Unknown error: %d\n", exit_code);
++
++	try_catch->catch(try_catch->context);
 +}
 +
-+char *string_stream_get_string(struct string_stream *stream)
++void kunit_try_catch_init(struct kunit_try_catch *try_catch,
++			  struct kunit *test,
++			  kunit_try_catch_func_t try,
++			  kunit_try_catch_func_t catch)
 +{
-+	struct string_stream_fragment *frag_container;
-+	size_t buf_len = stream->length + 1; /* +1 for null byte. */
-+	char *buf;
-+
-+	buf = kzalloc(buf_len, GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	mutex_lock(&stream->lock);
-+	list_for_each_entry(frag_container, &stream->fragments, node)
-+		strlcat(buf, frag_container->fragment, buf_len);
-+	mutex_unlock(&stream->lock);
-+
-+	return buf;
-+}
-+
-+int string_stream_append(struct string_stream *stream,
-+			 struct string_stream *other)
-+{
-+	const char *other_content;
-+
-+	other_content = string_stream_get_string(other);
-+
-+	if (!other_content)
-+		return -ENOMEM;
-+
-+	return string_stream_add(stream, other_content);
-+}
-+
-+bool string_stream_is_empty(struct string_stream *stream)
-+{
-+	return list_empty(&stream->fragments);
-+}
-+
-+static int string_stream_init(struct kunit_resource *res, void *context)
-+{
-+	struct string_stream *stream;
-+
-+	stream = kzalloc(sizeof(*stream), GFP_KERNEL);
-+	if (!stream)
-+		return -ENOMEM;
-+
-+	res->allocation = stream;
-+	INIT_LIST_HEAD(&stream->fragments);
-+	mutex_init(&stream->lock);
-+
-+	return 0;
-+}
-+
-+static void string_stream_free(struct kunit_resource *res)
-+{
-+	struct string_stream *stream = res->allocation;
-+
-+	string_stream_clear(stream);
-+	kfree(stream);
-+}
-+
-+struct string_stream *alloc_string_stream(struct kunit *test)
-+{
-+	return kunit_alloc_resource(test,
-+				    string_stream_init,
-+				    string_stream_free,
-+				    GFP_KERNEL,
-+				    NULL);
++	try_catch->test = test;
++	try_catch->try = try;
++	try_catch->catch = catch;
 +}
 -- 
 2.22.0.510.g264f2c817a-goog
