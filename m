@@ -1,67 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([193.142.43.55]:51032 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726213AbfGPTre (ORCPT
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54504 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728366AbfGPUAD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 15:47:34 -0400
-Date: Tue, 16 Jul 2019 21:47:27 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2] kbuild: Fail if gold linker is detected
-In-Reply-To: <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
-Message-ID: <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
-References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de> <20190716170606.GA38406@archlinux-threadripper> <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
+        Tue, 16 Jul 2019 16:00:03 -0400
+Date: Tue, 16 Jul 2019 12:59:57 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH v2] kbuild: Fail if gold linker is detected
+Message-ID: <20190716195957.GA38495@archlinux-threadripper>
+References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+ <20190716170606.GA38406@archlinux-threadripper>
+ <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
+ <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
+To: Thomas Gleixner <tglx@linutronix.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, "Theodore Y. Ts'o" <tytso@mit.edu>, Mike Lothian <mike@fireburn.co.uk>
 
-The gold linker has known issues of failing the build both in random and in
-predictible ways:
+On Tue, Jul 16, 2019 at 09:47:27PM +0200, Thomas Gleixner wrote:
+> The gold linker has known issues of failing the build both in random and in
+> predictible ways:
+> 
+>  - The x86/X32 VDSO build fails with:
+> 
+>    arch/x86/entry/vdso/vclock_gettime-x32.o:vclock_gettime.c:function do_hres:
+>    error: relocation overflow: reference to 'hvclock_page'
+> 
+>    That's a known issue for years and the usual workaround is to disable
+>    CONFIG_X86_32
+> 
+>  - A recent build failure is caused by turning a relocation into an
+>    absolute one for unknown reasons. See link below.
+> 
+>  - There are a couple of gold workarounds applied already, but reports
+>    about broken builds with ld.gold keep coming in on a regular base and in
+>    most cases the root cause is unclear.
+> 
+> In context of the most recent fail H.J. stated:
+> 
+>   "Since building a workable kernel for different kernel configurations
+>    isn't a requirement for gold, I don't recommend gold for kernel."
+> 
+> So instead of dealing with attempts to duct tape gold support without
+> understanding the root cause and without support from the gold folks, fail
+> the build when gold is detected.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> Link: https://lore.kernel.org/r/CAMe9rOqMqkQ0LNpm25yE_Yt0FKp05WmHOrwc0aRDb53miFKM+w@mail.gmail.com
 
- - The x86/X32 VDSO build fails with:
+Based on the crude little testing script I wrote below:
 
-   arch/x86/entry/vdso/vclock_gettime-x32.o:vclock_gettime.c:function do_hres:
-   error: relocation overflow: reference to 'hvclock_page'
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Tested-by: Nathan Chancellor <natechancellor@gmail.com>
 
-   That's a known issue for years and the usual workaround is to disable
-   CONFIG_X86_32
+$ cat test.sh
+#!/bin/bash
 
- - A recent build failure is caused by turning a relocation into an
-   absolute one for unknown reasons. See link below.
+# ld.bfd (expected to pass)
+make distclean defconfig || exit ${?}
 
- - There are a couple of gold workarounds applied already, but reports
-   about broken builds with ld.gold keep coming in on a regular base and in
-   most cases the root cause is unclear.
+# ld.gold explicitly (expected to fail)
+make LD=ld.gold distclean defconfig && exit ${?}
 
-In context of the most recent fail H.J. stated:
+# ld.gold as if it were the system linker (expected to fail)
+ln -fs /usr/bin/ld.gold ld
+PATH=${PWD}:${PATH} make distclean defconfig && exit ${?}
 
-  "Since building a workable kernel for different kernel configurations
-   isn't a requirement for gold, I don't recommend gold for kernel."
-
-So instead of dealing with attempts to duct tape gold support without
-understanding the root cause and without support from the gold folks, fail
-the build when gold is detected.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Link: https://lore.kernel.org/r/CAMe9rOqMqkQ0LNpm25yE_Yt0FKp05WmHOrwc0aRDb53miFKM+w@mail.gmail.com
----
-V2: Better changelog
-    Use the proper check as pointed out by Nathan
----
- scripts/Kconfig.include |    3 +++
- 1 file changed, 3 insertions(+)
-
---- a/scripts/Kconfig.include
-+++ b/scripts/Kconfig.include
-@@ -35,5 +35,8 @@ ld-option = $(success,$(LD) -v $(1))
- $(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
- $(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
- 
-+# Fail if the linker is gold as it's not capable of linking the kernel proper
-+$(error-if,$(success, $(LD) -v | grep -q gold), gold linker '$(LD)' not supported)
-+
- # gcc version including patch level
- gcc-version := $(shell,$(srctree)/scripts/gcc-version.sh $(CC))
+# ld.lld (expected to pass)
+make LD=ld.lld distclean defconfig || exit ${?}
