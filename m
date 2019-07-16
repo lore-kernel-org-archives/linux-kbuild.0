@@ -1,70 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55570 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727796AbfGPQUR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 12:20:17 -0400
-Date: Tue, 16 Jul 2019 11:20:14 -0500
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [kbuild:kbuild 5/19] drivers/atm/eni.o: warning: objtool:
- eni_init_one()+0xe42: indirect call found in RETPOLINE build
-Message-ID: <20190716162014.iu47g6o7ralxhcf5@treble>
-References: <201907160706.9xUSQ36X%lkp@intel.com>
- <CAK7LNATqxQnen2Tzcici8GnJuc-qNeCYcCYisKM2OkNow1FDnQ@mail.gmail.com>
- <20190716124249.GP5418@ubuntu-xps13>
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35335 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730384AbfGPRGL (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Jul 2019 13:06:11 -0400
+Date: Tue, 16 Jul 2019 10:06:06 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: kbuild: Fail if gold linker is detected
+Message-ID: <20190716170606.GA38406@archlinux-threadripper>
+References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190716124249.GP5418@ubuntu-xps13>
+In-Reply-To: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Seth Forshee <seth.forshee@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kbuild test robot <lkp@intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Tue, Jul 16, 2019 at 07:42:49AM -0500, Seth Forshee wrote:
-> On Tue, Jul 16, 2019 at 03:57:24PM +0900, Masahiro Yamada wrote:
-> > (+ Josh Poimboeuf)
-> > 
-> > On Tue, Jul 16, 2019 at 8:44 AM kbuild test robot <lkp@intel.com> wrote:
-> > >
-> > > tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
-> > > head:   0ff0c3753e06c0420c80dac1b0187a442b372acb
-> > > commit: 2eaf4e87ba258cc3f27e486cdf32d5ba76303c6f [5/19] kbuild: add -fcf-protection=none to retpoline flags
-> > > config: x86_64-randconfig-s2-07160214 (attached as .config)
-> > > compiler: gcc-4.9 (Debian 4.9.4-2) 4.9.4
-> > > reproduce:
-> > >         git checkout 2eaf4e87ba258cc3f27e486cdf32d5ba76303c6f
-> > >         # save the attached .config to linux build tree
-> > >         make ARCH=x86_64
-> > 
-> > 0-day bot reports objtool warnings with the following applied:
-> > https://patchwork.kernel.org/patch/11037379/
-> > 
-> > I have no idea about objtool.
-> > 
-> > Is it better to drop this patch for now?
+On Tue, Jul 16, 2019 at 02:47:56PM +0200, Thomas Gleixner wrote:
+> The gold linker has known issues of failing the build in random and
+> predictible ways. H.J. stated:
 > 
-> I'm surprised that the change would have any impact on a build with
-> gcc-4.9, since -fcf-protection seems to have been introduced in gcc-8. I
-> guess there's no full build log that would let us see the actual flags
-> passed to the compiler.
+>   "Since building a workable kernel for different kernel configurations
+>    isn't a requirement for gold, I don't recommend gold for kernel."
 > 
-> I'll try to reproduce this result. If you think the patch should be
-> dropped in the meantime, that's fine.
+> So instead of dealing with attempts to duct tape gold support without
+> understanding the root cause, fail the build when gold is detected.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Link: https://lore.kernel.org/r/CAMe9rOqMqkQ0LNpm25yE_Yt0FKp05WmHOrwc0aRDb53miFKM+w@mail.gmail.com
+> ---
+>  scripts/Kconfig.include |    3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -35,5 +35,8 @@ ld-option = $(success,$(LD) -v $(1))
+>  $(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
+>  $(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
+>  
+> +# Fail if the linker is gold as it's not capable of linking the kernel proper
+> +$(error-if,$(success, command -v $(LD) -v | grep -q gold), gold linker '$(LD)' not supported)
 
-The problem with this patch is that it's breaking the following check in
-arch/x86/Makefile.  GCC 4.9 doesn't support retpolines, so it's supposed
-to fail with the below error.
+Why are there two '-v' flags here? The second one is ignored since
+command -v just prints out the path of the binary that is being used,
+which would work in most cases but not if gold is the default system
+linker.
 
-ifdef CONFIG_RETPOLINE
-ifeq ($(RETPOLINE_CFLAGS),)
-	@echo "You are building kernel with non-retpoline compiler." >&2
-	@echo "Please update your compiler." >&2
-	@false
-endif
-endif
+$ command -v ld.gold -v
+/usr/bin/ld.gold
 
-Maybe the flags should be placed in another variable other than
-RETPOLINE_CFLAGS.
+$ command -v ld.gold
+/usr/bin/ld.gold
 
--- 
-Josh
+$ command ld.gold -v
+GNU gold (GNU Binutils 2.32) 1.16
+
+Thus, wouldn't it be better to just call $(LD) directly, like
+CC_IS_GCC and CC_IS_CLANG in init/Kconfig?
+
+$(success, $(LD) -v | grep -q gold)
+
+Cheers,
+Nathan
