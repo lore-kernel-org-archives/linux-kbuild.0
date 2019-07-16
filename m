@@ -1,91 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:39319 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726465AbfGPI7j (ORCPT
+Received: from mail-vs1-f74.google.com ([209.85.217.74]:35939 "EHLO
+        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728015AbfGPJnK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 04:59:39 -0400
-MIME-Version: 1.0
-References: <1562664759-16009-1-git-send-email-info@metux.net>
- <1562664759-16009-4-git-send-email-info@metux.net> <CAK7LNAR1N-bwVWm0LXky2-d2GfvRuRrEWeo5CGm3Z2Lp_s0WEw@mail.gmail.com>
- <5af9db32-2cf5-10ba-261c-e08852d0814f@metux.net> <20190715191245.GD3068@mit.edu>
-In-Reply-To: <20190715191245.GD3068@mit.edu>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 16 Jul 2019 17:58:49 +0900
-Message-ID: <CAK7LNASps6JBAvtJshjMbqMk8QaSrMaH8pm-wHsEySTRJzu0Kw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] debian: add generic rule file
+        Tue, 16 Jul 2019 05:43:10 -0400
+Received: by mail-vs1-f74.google.com with SMTP id j77so4214656vsd.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jul 2019 02:43:09 -0700 (PDT)
+Date: Tue, 16 Jul 2019 02:42:44 -0700
+Message-Id: <20190716094302.180360-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v10 00/18] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Theodore Y. Ts'o" <tytso@mit.edu>, "Enrico Weigelt, metux IT consult" <lkml@metux.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, "Enrico Weigelt, metux IT consult" <info@metux.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Robo Bot <apw@canonical.com>, Joe Perches <joe@perches.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-riscv@lists.infradead.org, clang-built-linux <clang-built-linux@googlegroups.com>
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Iurii Zaikin <yzaikin@google.com>
 
-On Tue, Jul 16, 2019 at 4:13 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
->
-> On Mon, Jul 15, 2019 at 08:56:25PM +0200, Enrico Weigelt, metux IT consult wrote:
-> > On 15.07.19 14:28, Masahiro Yamada wrote:
-> >
-> > >> The rule file contains a rule for creating debian/control and
-> > >> other metadata - this is done similar to the 'deb-pkg' make rule,
-> > >> scripts/packaging/mkdebian.
-> > >
-> > > I saw a similar patch submission before, and negative feedback about it.
-> >
-> > Do you recall what negative feedback exactly ?
+## TL;DR
 
-Sorry, my memory was broken.
+This patchset addresses comments from Stephen Boyd. Most changes are
+pretty minor, but this does fix a couple of bugs pointed out by Stephen.
 
-I did not like this patch set from the beginning,
-but missed to express my opinion strongly.
+I imagine that Stephen will probably have some more comments, but I
+wanted to get this out for him to look at as soon as possible.
 
-I want debian/ to be kept as a drop-in directory
-for packagers, without replacing the upstream debian/rules.
+## Background
 
-If a check-in source file is modified in anyway,
-scripts/setlocalversion would set -dirty flag,
-which I want to avoid.
+This patch set proposes KUnit, a lightweight unit testing and mocking
+framework for the Linux kernel.
 
+Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+it does not require installing the kernel on a test machine or in a VM
+(however, KUnit still allows you to run tests on test machines or in VMs
+if you want[1]) and does not require tests to be written in userspace
+running on a host kernel. Additionally, KUnit is fast: From invocation
+to completion KUnit can run several dozen tests in about a second.
+Currently, the entire KUnit test suite for KUnit runs in under a second
+from the initial invocation (build time excluded).
 
+KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+Googletest/Googlemock for C++. KUnit provides facilities for defining
+unit test cases, grouping related test cases into test suites, providing
+common infrastructure for running tests, mocking, spying, and much more.
 
-> It's possible I'm not remembering some of the feedback, but the only
-> thing I recall was the comment I made that I'd really like this use
-> case:
->
-> make O=/build/linux-build bindeb-pkg
->
-> to not break.  And as far as I can tell from the proposed patch series
-> (I haven't had a chance to experimentally verify it yet), I don't
-> think it should break anything --- I'm assuming that we will still
-> have a way of creating the debian/rules file in
-> /build/linux-build/debian/rules when doing a O= build, and that the
-> intdeb-pkg rule remains the same.  At least, it appears to be the case
-> from my doing a quick look at the patches.
->
-> > > Debian maintains its own debian/rules, and it is fine.
-> >
-> > Not for me, I don't use it - given up trying to make anything useful
-> > out of it. It's extremly complex, practically undebuggable and doesn't
-> > even work w/o lots of external preparations.
->
-> Yeah, the official Debian debian/rules is optimized for doing a
-> distribution release, and in addition to the issues Enrico has raised,
-> last time I tried it, it was S-L-O-W since it was building a fully
-> generic kernel.  It's not at all useable for general developer use.
+### What's so special about unit testing?
 
-It is OK if the package is targeting normal users instead of
-kernel developers.
+A unit test is supposed to test a single unit of code in isolation,
+hence the name. There should be no dependencies outside the control of
+the test; this means no external dependencies, which makes tests orders
+of magnitudes faster. Likewise, since there are no external dependencies,
+there are no hoops to jump through to run the tests. Additionally, this
+makes unit tests deterministic: a failing unit test always indicates a
+problem. Finally, because unit tests necessarily have finer granularity,
+they are able to test all code paths easily solving the classic problem
+of difficulty in exercising error handling code.
 
+### Is KUnit trying to replace other testing frameworks for the kernel?
 
-> It sounds like what Enrico is trying to do is to enable running
-> "dpkg-buildpackage -us -uc -b" from the the top-level kernel package
-> as being easier than running "make bindeb-pkg".  I suspect this might
-> be because his goal is to integrate individual kernel builds from
-> using Debian's hermetic build / chroot systems (e.g., sbuild, pbuilder)?
+No. Most existing tests for the Linux kernel are end-to-end tests, which
+have their place. A well tested system has lots of unit tests, a
+reasonable number of integration tests, and some end-to-end tests. KUnit
+is just trying to address the unit test space which is currently not
+being addressed.
 
-I am OK with generating debian/rules with 'make bindeb-pkg', a shell scripts
-or whatever, but I dislike to commit it in upstream git tree.
+### More information on KUnit
 
-debian/rules is a hook for packagers to do their jobs in downstream.
-"We kindly committed a generic one for you" sounds weird to me.
+There is a bunch of documentation near the end of this patch set that
+describes how to use KUnit and best practices for writing unit tests.
+For convenience I am hosting the compiled docs here[2].
+
+Additionally for convenience, I have applied these patches to a
+branch[3]. The repo may be cloned with:
+git clone https://kunit.googlesource.com/linux
+This patchset is on the kunit/rfc/v5.2/v10 branch.
+
+## Changes Since Last Version
+
+- Went back to using spinlock in `struct kunit`. Needed for resource
+  management API. Thanks to Stephen for this change.
+- Fixed bug where an init failure may not be recorded as a failure in
+  patch 01/18.
+- Added append method to string_stream as suggested by Stephen.
+- Mostly pretty minor changes after that, which mostly pertain to
+  string_stream and kunit_stream.
+
+[1] https://google.github.io/kunit-docs/third_party/kernel/docs/usage.html#kunit-on-non-uml-architectures
+[2] https://google.github.io/kunit-docs/third_party/kernel/docs/
+[3] https://kunit.googlesource.com/linux/+/kunit/rfc/v5.2/v10
 
 -- 
-Best Regards
-Masahiro Yamada
+2.22.0.510.g264f2c817a-goog
