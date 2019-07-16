@@ -1,33 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:34845 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728190AbfGPOkj (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 10:40:39 -0400
-Date: Tue, 16 Jul 2019 16:40:34 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: kbuild: Fail if gold linker is detected
-Message-ID: <20190716144034.GA36330@gmail.com>
-References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+Received: from mail.kernel.org ([198.145.29.99]:33784 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725926AbfGPPaD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Jul 2019 11:30:03 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFd5g44_axVHNMBzxSURQB_-R+Rif7cZcg7PyZ_SS+5hcy5jZA@mail.gmail.com>
+References: <20190712081744.87097-1-brendanhiggins@google.com> <20190712081744.87097-5-brendanhiggins@google.com> <20190715221554.8417320665@mail.kernel.org> <CAFd5g47ikJmA0uGoavAFsh+hQvDmgsOi26tyii0612R=rt7iiw@mail.gmail.com> <CAFd5g44_axVHNMBzxSURQB_-R+Rif7cZcg7PyZ_SS+5hcy5jZA@mail.gmail.com>
+From: Stephen Boyd <sboyd@kernel.org>
+Subject: Re: [PATCH v9 04/18] kunit: test: add kunit_stream a std::stream like logger
+Date: Tue, 16 Jul 2019 08:30:01 -0700
+Message-Id: <20190716153002.49E292054F@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
+Quoting Brendan Higgins (2019-07-16 01:37:34)
+> On Tue, Jul 16, 2019 at 12:57 AM Brendan Higgins
+> <brendanhiggins@google.com> wrote:
+> >
+> > On Mon, Jul 15, 2019 at 3:15 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> > >
+> > > Quoting Brendan Higgins (2019-07-12 01:17:30)
+> > > > diff --git a/include/kunit/kunit-stream.h b/include/kunit/kunit-str=
+eam.h
+> > > > new file mode 100644
+> > > > index 0000000000000..a7b53eabf6be4
+> > > > --- /dev/null
+> > > > +++ b/include/kunit/kunit-stream.h
+> > > > +/**
+> > > > + * struct kunit_stream - a std::stream style string builder.
+> > > > + *
+> > > > + * A std::stream style string builder. Allows messages to be built=
+ up and
+> > > > + * printed all at once.
+> > > > + */
+> > > > +struct kunit_stream {
+> > > > +       /* private: internal use only. */
+> > > > +       struct kunit *test;
+> > > > +       const char *level;
+> > >
+> > > Is the level changed? See my comment below, but I wonder if this whole
+> > > struct can go away and the wrappers can just operate on 'struct
+> > > string_stream' instead.
+> >
+> > I was inclined to agree with you when I first read your comment, but
+> > then I thought about the case that someone wants to add in a debug
+> > message (of which I currently have none). I think under most
+> > circumstances a user of kunit_stream would likely want to pick a
+> > default verbosity that maybe I should provide, but may still want
+> > different verbosity levels.
+> >
+> > The main reason I want to keep the types separate, string_stream vs.
+> > kunit_stream, is that they are intended to be used differently.
+> > string_stream is just a generic string builder. If you are using that,
+> > you are expecting to see someone building the string at some point and
+> > then doing something interesting with it. kunit_stream really tells
+> > you specifically that KUnit is putting together a message to
+> > communicate something to a user of KUnit. It is really used in a very
+> > specific way, and I wouldn't want to generalize its usage beyond how
+> > it is currently used. I think in order to preserve the author's
+> > intention it adds clarity to keep the types separate regardless of how
+> > similar they might be in reality.
 
-* Thomas Gleixner <tglx@linutronix.de> wrote:
+You may want to add some of these reasons to the commit text.
 
-> The gold linker has known issues of failing the build in random and
-> predictible ways. H.J. stated:
+> > > > +
+> > > > +       if (!string_stream_is_empty(stream->internal_stream)) {
+> > > > +               kunit_err(stream->test,
+> > > > +                         "End of test case reached with uncommitte=
+d stream entries\n");
+> > > > +               kunit_stream_commit(stream);
+> > > > +       }
+> > > > +}
+> > > > +
+> > >
+> > > Nitpick: Drop this extra newline.
+> >
+> > Oops, nice catch.
+>=20
+> Not super important, but I don't want you to think that I am ignoring
+> you. I think you must have unintentionally deleted the last function
+> in this file, or maybe you are referring to something that I am just
+> not seeing, but I don't see the extra newline here.
 
-s/predictable/unpredictable?
+No worries. Sorry for the noise.
 
-Acked-by: Ingo Molnar <mingo@kernel.org>
+> > property of the input, it may or may not be enough information on its
+> > own for the expectation to fail, but we want to share the result of
+> > the property check with the user regardless, BUT only if the
+> > expectation as a whole fails.
+> >
+> > Hence, we can have multiple `struct kunit_stream`s associated with a
+> > `struct kunit` active at any given time.
 
-Thanks,
-
-	Ingo
+Makes sense. I wasn't sure if there were more than one stream associated
+with a test. Sounds like there are many to one so it can't just be a
+member of the test. This could be documented somewhere so this question
+doesn't come up again.
