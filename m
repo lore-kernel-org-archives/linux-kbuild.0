@@ -1,66 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35335 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730384AbfGPRGL (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 13:06:11 -0400
-Date: Tue, 16 Jul 2019 10:06:06 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: kbuild: Fail if gold linker is detected
-Message-ID: <20190716170606.GA38406@archlinux-threadripper>
-References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+Received: from mail.kernel.org ([198.145.29.99]:58928 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728137AbfGPRuX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 16 Jul 2019 13:50:23 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFd5g44_axVHNMBzxSURQB_-R+Rif7cZcg7PyZ_SS+5hcy5jZA@mail.gmail.com>
+References: <20190712081744.87097-1-brendanhiggins@google.com> <20190712081744.87097-5-brendanhiggins@google.com> <20190715221554.8417320665@mail.kernel.org> <CAFd5g47ikJmA0uGoavAFsh+hQvDmgsOi26tyii0612R=rt7iiw@mail.gmail.com> <CAFd5g44_axVHNMBzxSURQB_-R+Rif7cZcg7PyZ_SS+5hcy5jZA@mail.gmail.com>
+From: Stephen Boyd <sboyd@kernel.org>
+Subject: Re: [PATCH v9 04/18] kunit: test: add kunit_stream a std::stream like logger
+Date: Tue, 16 Jul 2019 10:50:20 -0700
+Message-Id: <20190716175021.9CA412173C@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Tue, Jul 16, 2019 at 02:47:56PM +0200, Thomas Gleixner wrote:
-> The gold linker has known issues of failing the build in random and
-> predictible ways. H.J. stated:
-> 
->   "Since building a workable kernel for different kernel configurations
->    isn't a requirement for gold, I don't recommend gold for kernel."
-> 
-> So instead of dealing with attempts to duct tape gold support without
-> understanding the root cause, fail the build when gold is detected.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Link: https://lore.kernel.org/r/CAMe9rOqMqkQ0LNpm25yE_Yt0FKp05WmHOrwc0aRDb53miFKM+w@mail.gmail.com
-> ---
->  scripts/Kconfig.include |    3 +++
->  1 file changed, 3 insertions(+)
-> 
-> --- a/scripts/Kconfig.include
-> +++ b/scripts/Kconfig.include
-> @@ -35,5 +35,8 @@ ld-option = $(success,$(LD) -v $(1))
->  $(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
->  $(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
->  
-> +# Fail if the linker is gold as it's not capable of linking the kernel proper
-> +$(error-if,$(success, command -v $(LD) -v | grep -q gold), gold linker '$(LD)' not supported)
+Quoting Brendan Higgins (2019-07-16 01:37:34)
+> On Tue, Jul 16, 2019 at 12:57 AM Brendan Higgins
+> <brendanhiggins@google.com> wrote:
+> >
+> > A `struct kunit_stream` is usually associated with a message that is
+> > being built up over time like maybe an expectation; it is meant to
+> > capture the idea that we might want to send some information out to
+> > the user pertaining to some thing 'X', but we aren't sure that we
+> > actually want to send it until 'X' is complete, but do to the nature
+> > of 'X' it is easier to start constructing the message before 'X' is
+> > complete.
+> >
+> > Consider a complicated expectation, there might be multiple conditions
+> > that satisfy it and multiple conditions which could make it fail. As
+> > we start exploring the input to the expectation we gain information
+> > that we might want to share back with the user if the expectation were
+> > to fail and we might get that information before we are actually sure
+> > that the expectation does indeed fail.
+> >
+> > When we first step into the expectation we immediately know the
+> > function name, file name, and line number where we are called and
+> > would want to put that information into any message we would send to
+> > the user about this expectation. Next, we might want to check a
+> > property of the input, it may or may not be enough information on its
+> > own for the expectation to fail, but we want to share the result of
+> > the property check with the user regardless, BUT only if the
+> > expectation as a whole fails.
+> >
+> > Hence, we can have multiple `struct kunit_stream`s associated with a
+> > `struct kunit` active at any given time.
 
-Why are there two '-v' flags here? The second one is ignored since
-command -v just prints out the path of the binary that is being used,
-which would work in most cases but not if gold is the default system
-linker.
+I'm coming back to this now after reading the rest of the patches that
+deal with assertions and expectations. It looks like the string stream
+is there to hold a few different pieces of information:
 
-$ command -v ld.gold -v
-/usr/bin/ld.gold
+ - Line Number
+ - File Name
+ - Function Name
 
-$ command -v ld.gold
-/usr/bin/ld.gold
+The above items could be stored in a structure on the stack that then
+gets printed and formatted when the expectation or assertion fails. That
+would make the whole string stream structure and code unnecessary.
 
-$ command ld.gold -v
-GNU gold (GNU Binutils 2.32) 1.16
+The only hypothetical case where this can't be done is a complicated
+assertion or expectation that does more than one check and can't be
+written as a function that dumps out what went wrong. Is this a real
+problem? Maybe such an assertion should just open code that logic so we
+don't have to build up a string for all the other simple cases.
 
-Thus, wouldn't it be better to just call $(LD) directly, like
-CC_IS_GCC and CC_IS_CLANG in init/Kconfig?
+It seems far simpler to get rid of the string stream API and just have a
+struct for this.
 
-$(success, $(LD) -v | grep -q gold)
+	struct kunit_fail_msg {
+		const char *line;
+		const char *file;
+		const char *func;
+		const char *msg;
+	};
 
-Cheers,
-Nathan
+Then you can have the assertion macros create this on the stack (with
+another macro?).
+
+	#define DEFINE_KUNIT_FAIL_MSG(name, _msg) \
+		struct kunit_fail_msg name =3D { \
+			.line =3D  __LINE__, \
+			.file =3D __FILE__, \
+			.func =3D __func__, \
+			.msg =3D _msg, \
+		}
+
+Note: I don't know if the __LINE__ above will use the macro location, so
+this probably needs another wrapper to put the right line number there.
+
+I don't want to derail this whole series on this topic, but it seems
+like a bunch of code is there to construct this same set of information
+over and over again into a buffer a little bit at a time and then throw
+it away when nothing fails just because we may want to support the case
+where we have some unstructured data to inform the user about.
+
+Why not build in the structured part into the framework (i.e. the struct
+above) so that it's always there and then add the string building part
+later when we have to?
