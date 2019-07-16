@@ -1,51 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([193.142.43.55]:51238 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728434AbfGPWZY (ORCPT
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39465 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2387623AbfGPXha (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jul 2019 18:25:24 -0400
-Date: Wed, 17 Jul 2019 00:25:14 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
+        Tue, 16 Jul 2019 19:37:30 -0400
+Date: Tue, 16 Jul 2019 19:37:08 -0400
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
 Subject: Re: [PATCH v2] kbuild: Fail if gold linker is detected
-In-Reply-To: <CAHbf0-GjYKZtV2786d5n2EEnVM9TW6cZbxjG3mtqm_bw=1CThA@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.1907170015530.1767@nanos.tec.linutronix.de>
-References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de> <20190716170606.GA38406@archlinux-threadripper> <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de> <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
- <20190716195957.GA38495@archlinux-threadripper> <CAHbf0-GjYKZtV2786d5n2EEnVM9TW6cZbxjG3mtqm_bw=1CThA@mail.gmail.com>
+Message-ID: <20190716233708.GA11824@mit.edu>
+References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+ <20190716170606.GA38406@archlinux-threadripper>
+ <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
+ <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
+ <20190716195957.GA38495@archlinux-threadripper>
+ <CAHbf0-GjYKZtV2786d5n2EEnVM9TW6cZbxjG3mtqm_bw=1CThA@mail.gmail.com>
+ <alpine.DEB.2.21.1907170015530.1767@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1907170015530.1767@nanos.tec.linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Lothian <mike@fireburn.co.uk>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, "Theodore Y. Ts'o" <tytso@mit.edu>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Mike Lothian <mike@fireburn.co.uk>, Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-Mike,
-
-On Tue, 16 Jul 2019, Mike Lothian wrote:
-> On Tue, 16 Jul 2019 at 21:00, Nathan Chancellor wrote
+On Wed, Jul 17, 2019 at 12:25:14AM +0200, Thomas Gleixner wrote:
+> > It's been my default system linker for years and I've had very few issues
+> > with it and it's a big improvement when linking with LTO
 > 
-> Would it be possible to force ld.bfd with -fuse-ld=bfd when gold is detected?
+> I understand, but the fact that you need to turn off config options in
+> order to build a kernel and the clear statement that it's not recommended
+> makes it truly unsuitable and unmaintainable for us.
 
-It's probably possible but way beyond my kbuild foo.
+Or if you work for a cloud company who is willing to make the gold
+linker work for your specific use case and configuration (and ideally,
+have gold toolchain experts on staff who will work with you), then it
+might be OK, but just for that particular use case.  (Just as Android
+kernels worked with Clang when Clang was still miscompiling kernel on
+different architectures and configurations.)  In those cases, you can
+just carry a patch to force the gold linker to work.
 
-Adding LD=ld.bfd to the make invocation is the trivial workaround.
+The point though is the teams that were using alternative,
+not-always-reliable toolchains, were big boys and girls, and they
+weren't asking the upstream kernel devs for support.  And they only
+cared about a few specific configurations, and not something that
+would work for all or even most configurations and hardware platforms.
 
-> Are there gold bug reports for any of the issues that have been seen
-> with gold?
-
-Yes. Some got resolved, some not.
-
-> It's been my default system linker for years and I've had very few issues
-> with it and it's a big improvement when linking with LTO
-
-I understand, but the fact that you need to turn off config options in
-order to build a kernel and the clear statement that it's not recommended
-makes it truly unsuitable and unmaintainable for us.
-
-If the gold people are interested to link a kernel and resolve all issues,
-this surely can be revisited. We work with tooling folks and we try to
-accomodate different tools, see the ongoing efforts for clang, but that
-requires commitment from the tooling side.
-
-Thanks,
-
-	tglx
+	      	       	      	   	- Ted
