@@ -1,54 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:55714 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725948AbfGQPYC (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45958 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725993AbfGQPbB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jul 2019 11:24:02 -0400
-Date: Wed, 17 Jul 2019 11:23:26 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-Subject: Re: [PATCH 4/4] debian: add generic rule file
-Message-ID: <20190717152326.GC31412@mit.edu>
-References: <1562664759-16009-1-git-send-email-info@metux.net>
- <1562664759-16009-4-git-send-email-info@metux.net>
- <CAK7LNAR1N-bwVWm0LXky2-d2GfvRuRrEWeo5CGm3Z2Lp_s0WEw@mail.gmail.com>
- <5af9db32-2cf5-10ba-261c-e08852d0814f@metux.net>
- <20190715191245.GD3068@mit.edu>
- <CAK7LNASps6JBAvtJshjMbqMk8QaSrMaH8pm-wHsEySTRJzu0Kw@mail.gmail.com>
- <20190716123431.GB2999@mit.edu>
- <77f82ca2-f89b-e8e2-507a-c37bce1343a5@metux.net>
+        Wed, 17 Jul 2019 11:31:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77f82ca2-f89b-e8e2-507a-c37bce1343a5@metux.net>
+References: <20190717142922.214d54ec@canb.auug.org.au>
+In-Reply-To: <20190717142922.214d54ec@canb.auug.org.au>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Wed, 17 Jul 2019 17:30:47 +0200
+Message-ID: <CA+icZUUhnSGkLQcCZBzYXCRxExiZ1F=KnzdeiNSbojHRfxRjOA@mail.gmail.com>
+Subject: Re: linux-next: Tree for Jul 17
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, "Enrico Weigelt, metux IT consult" <info@metux.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Robo Bot <apw@canonical.com>, Joe Perches <joe@perches.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-riscv@lists.infradead.org, clang-built-linux <clang-built-linux@googlegroups.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>, "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 04:16:39PM +0200, Enrico Weigelt, metux IT consult wrote:
-> 
-> > In practice, that's not going to be a problem for most distributions.
-> > The traditional way Debian-derived systems have done builds is
-> > completely outside of git.  So there will be a linux_5.2.orig.tar.gz
-> > and a linux_5.2-1.debian.tar.xz.  dpkg_source -x will first unpackage
-> > the orig.tar.gz, and then the debian.tar.xz, and if the second
-> > overwrites the first, it's no big deal.
-> 
-> ACK. IIRC they already filter out debian/ directories when generating
-> upstream tarballs - other upstreams already provide their debian/
-> stuff, too.
+Hi Steven, Hi Darrick,
 
-Well, no, actually they don't.  That's because as much as possible
-they want the upstream tarball to be bit-for-bit identical to the one
-published on the official upstream distribution site.  That allows
-them to include the detached PGP signature from the upstream
-maintainer, if one is provided.
+Unfortunately, my build-script is not working anymore.
 
-If there are files in the upstream debian/ directory that they don't
-need, they can delete in the distro's debian/rules file.  Ideally, so
-we shouldn't include files in the Linux kernel's debian/ directory
-willy-nilly.  But the debian/rules file will *always* be present, and
-so it will be overwritten by the <package>_<ver>.debian.tar.xz file,
-and so it's no big deal.
+I am using builddeb/mkdebian scripts.
 
-					- Ted
+[ BUILD-LOG ]
+...
+set -e; mkdir -p include/config/; { echo "5.2.0$(/bin/bash
+./scripts/setlocalversion .)"; } > include/config/kernel.release.tmp;
+if [ -r include/config/kernel.release ] && cmp -s
+include/config/kernel.release include/config/kernel.release.tmp; then
+rm -f include/config/kernel.release.tmp; else : '  UPD
+include/config/kernel.release'; mv -f
+include/config/kernel.release.tmp include/config/kernel.release; fi
+make -f ./scripts/Makefile.build obj=3Dscripts/package bindeb-pkg
+/bin/bash ./scripts/package/mkdebian
+./scripts/package/mkdebian: line 149: cd: source/: No such file or director=
+y
+make[1]: *** [scripts/package/Makefile:79: bindeb-pkg] Error 1
+make: *** [Makefile:1442: bindeb-pkg] Error 2
+
+Investigations revealed hardcoded stuff from the ...
+
+Merge remote-tracking branch 'iomap/iomap-for-next'
+
+$ git blame scripts/package/mkdebian | grep 'cd source'
+87bdff62e470c (Darrick J. Wong    2019-06-27 17:30:15 -0700 149) (cd
+source/ ; stg ser | sed -e '/^-/d' -e 's/^. /  * /g') >>
+debian/changelog
+
+$ git log --oneline --author=3D"Darrick J. Wong" scripts/package/mkdebian
+87bdff62e470 mtr: Build script adjustments
+
+I do not think this was intended?
+
+Reverting seems to be easy and fix it for me.
+
+$ git revert --no-edit 87bdff62e470
+F=C3=BChre Erkennung f=C3=BCr ungenaue Umbenennung aus: 100% (2251440/22514=
+40), Fertig.
+[5.2.0-3-amd64-cbl-asmgoto db8ec1968620] Revert "mtr: Build script adjustme=
+nts"
+ Date: Wed Jul 17 17:27:26 2019 +0200
+ 3 files changed, 10 insertions(+), 17 deletions(-)
+
+Please make it work again for $WORLD.
+
+Thanks.
+
+Regards,
+- Sedat -
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/log=
+/scripts/package/mkdebian?h=3Dnext-20190717
