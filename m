@@ -1,39 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55227 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726934AbfGQPod (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:33635 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726081AbfGQQH1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jul 2019 11:44:33 -0400
+        Wed, 17 Jul 2019 12:07:27 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <seth.forshee@canonical.com>)
+        id 1hnmRp-0001kQ-Ax
+        for linux-kbuild@vger.kernel.org; Wed, 17 Jul 2019 16:06:29 +0000
+Received: by mail-io1-f69.google.com with SMTP id f22so27555385ioh.22
+        for <linux-kbuild@vger.kernel.org>; Wed, 17 Jul 2019 09:06:29 -0700 (PDT)
+From: Seth Forshee <seth.forshee@canonical.com>
+Subject: [PATCH v2] kbuild: add -fcf-protection=none when using retpoline flags
+Date: Wed, 17 Jul 2019 11:06:26 -0500
+Message-Id: <20190717160626.26293-1-seth.forshee@canonical.com>
 MIME-Version: 1.0
-References: <20190717142922.214d54ec@canb.auug.org.au> <CA+icZUUhnSGkLQcCZBzYXCRxExiZ1F=KnzdeiNSbojHRfxRjOA@mail.gmail.com>
- <20190717153329.GC7116@magnolia>
-In-Reply-To: <20190717153329.GC7116@magnolia>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Wed, 17 Jul 2019 17:44:18 +0200
-Message-ID: <CA+icZUUKk0DfhyA881bSc=huHCo5VaMy2oXYV7hE+HAjV09+tQ@mail.gmail.com>
-Subject: Re: linux-next: Tree for Jul 17
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 5:33 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
->
-> On Wed, Jul 17, 2019 at 05:30:47PM +0200, Sedat Dilek wrote:
-> > Hi Steven, Hi Darrick,
-> >
-> > Unfortunately, my build-script is not working anymore.
-> >
-> > I am using builddeb/mkdebian scripts.
->
-> Yeah, I accidentally uploaded an internal build patch yesterday which
-> got sucked into for-next.  It's been fixed in the iomap-for-next tree
-> and should disappear in Thursday's for-next tree.  Sorry about that. :(
->
-> --D
+The gcc -fcf-protection=branch option is not compatible with
+-mindirect-branch=thunk-extern. The latter is used when
+CONFIG_RETPOLINE is selected, and this will fail to build with
+a gcc which has -fcf-protection=branch enabled by default. Adding
+-fcf-protection=none when building with retpoline enabled
+prevents such build failures.
 
-Shit happens.
+Signed-off-by: Seth Forshee <seth.forshee@canonical.com>
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-- sed@ -
+diff --git a/Makefile b/Makefile
+index 3e4868a6498b..73a94d1db2b6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -878,6 +878,12 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
+ # change __FILE__ to the relative path from the srctree
+ KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
+ 
++# ensure -fcf-protection is disabled when using retpoline as it is
++# incompatible with -mindirect-branch=thunk-extern
++ifdef CONFIG_RETPOLINE
++KBUILD_CFLAGS += $(call cc-option,-fcf-protection=none,)
++endif
++
+ # use the deterministic mode of AR if available
+ KBUILD_ARFLAGS := $(call ar-option,D)
+ 
+-- 
+2.20.1
