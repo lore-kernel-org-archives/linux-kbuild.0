@@ -1,58 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:62962 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:32864 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfGQGS0 (ORCPT
+        with ESMTP id S1725892AbfGQG3n (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jul 2019 02:18:26 -0400
+        Wed, 17 Jul 2019 02:29:43 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v3 03/12] kbuild: remove duplication from modules.order in sub-directories
-Date: Wed, 17 Jul 2019 15:17:51 +0900
-Message-Id: <20190717061800.10018-4-yamada.masahiro@socionext.com>
-In-Reply-To: <20190717061800.10018-1-yamada.masahiro@socionext.com>
-References: <20190717061800.10018-1-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: update compile-test headers for v5.3-rc1
+Date: Wed, 17 Jul 2019 15:29:13 +0900
+Message-Id: <20190717062913.11437-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Joe Lawrence <joe.lawrence@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Currently, only the top-level modules.order drops duplicated entries.
+- Some headers graduated from the blacklist
 
-The modules.order files in sub-directories potentially contain
-duplication. To list out the paths of all modules, I want to use
-modules.order instead of parsing *.mod files in $(MODVERDIR).
+- hyperv_timer.h joined the header-test when CONFIG_X86=y
 
-To achieve this, I want to rip off duplication from modules.order
-of external modules too.
+- nf_tables*.h joined the header-test when CONFIG_NF_TABLES is
+  enabled.
+
+- The entry for nf_tables_offload.h was added to fix build error for
+  the combination of CONFIG_NF_TABLES=n and CONFIG_KERNEL_HEADER_TEST=y.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
-Changes in v3: None
-Changes in v2: None
+Changes in v2:
+  - Remove rdma_counter.h from the exclude list
 
- scripts/Makefile.build | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ include/Kbuild       | 13 +++++--------
+ usr/include/Makefile |  8 --------
+ 2 files changed, 5 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 10e92a27ec20..be32a3752de4 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -423,13 +423,10 @@ endif # builtin-target
- #
- # Create commands to either record .ko file or cat modules.order from
- # a subdirectory
--modorder-cmds =						\
--	$(foreach m, $(modorder),			\
--		$(if $(filter %/modules.order, $m),	\
--			cat $m;, echo $m;))
--
- $(modorder-target): $(subdir-ym) FORCE
--	$(Q)(cat /dev/null; $(modorder-cmds)) > $@
-+	$(Q){ $(foreach m, $(modorder), \
-+	$(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
-+	| $(AWK) '!x[$$0]++' - > $@
+diff --git a/include/Kbuild b/include/Kbuild
+index 7e9f1acb9dd5..8c71f906d322 100644
+--- a/include/Kbuild
++++ b/include/Kbuild
+@@ -31,7 +31,7 @@ header-test-			+= acpi/platform/acintel.h
+ header-test-			+= acpi/platform/aclinux.h
+ header-test-			+= acpi/platform/aclinuxex.h
+ header-test-			+= acpi/processor.h
+-header-test-			+= clocksource/hyperv_timer.h
++header-test-$(CONFIG_X86)	+= clocksource/hyperv_timer.h
+ header-test-			+= clocksource/timer-sp804.h
+ header-test-			+= crypto/cast_common.h
+ header-test-			+= crypto/internal/cryptouser.h
+@@ -454,9 +454,6 @@ header-test-			+= linux/phy/omap_control_phy.h
+ header-test-			+= linux/phy/tegra/xusb.h
+ header-test-			+= linux/phy/ulpi_phy.h
+ header-test-			+= linux/phy_fixed.h
+-header-test-			+= linux/pinctrl/pinconf-generic.h
+-header-test-			+= linux/pinctrl/pinconf.h
+-header-test-			+= linux/pinctrl/pinctrl.h
+ header-test-			+= linux/pipe_fs_i.h
+ header-test-			+= linux/pktcdvd.h
+ header-test-			+= linux/pl320-ipc.h
+@@ -905,10 +902,11 @@ header-test-			+= net/netfilter/nf_nat_redirect.h
+ header-test-			+= net/netfilter/nf_queue.h
+ header-test-			+= net/netfilter/nf_reject.h
+ header-test-			+= net/netfilter/nf_synproxy.h
+-header-test-			+= net/netfilter/nf_tables.h
+-header-test-			+= net/netfilter/nf_tables_core.h
+-header-test-			+= net/netfilter/nf_tables_ipv4.h
++header-test-$(CONFIG_NF_TABLES)	+= net/netfilter/nf_tables.h
++header-test-$(CONFIG_NF_TABLES)	+= net/netfilter/nf_tables_core.h
++header-test-$(CONFIG_NF_TABLES)	+= net/netfilter/nf_tables_ipv4.h
+ header-test-			+= net/netfilter/nf_tables_ipv6.h
++header-test-$(CONFIG_NF_TABLES)	+= net/netfilter/nf_tables_offload.h
+ header-test-			+= net/netfilter/nft_fib.h
+ header-test-			+= net/netfilter/nft_meta.h
+ header-test-			+= net/netfilter/nft_reject.h
+@@ -949,7 +947,6 @@ header-test-			+= pcmcia/ds.h
+ header-test-			+= rdma/ib.h
+ header-test-			+= rdma/iw_portmap.h
+ header-test-			+= rdma/opa_port_info.h
+-header-test-			+= rdma/rdma_counter.h
+ header-test-			+= rdma/rdmavt_cq.h
+ header-test-			+= rdma/restrack.h
+ header-test-			+= rdma/signature.h
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index cd8daa20d487..aa316d99e035 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -30,8 +30,6 @@ header-test-$(CONFIG_CPU_BIG_ENDIAN) += linux/byteorder/big_endian.h
+ header-test-$(CONFIG_CPU_LITTLE_ENDIAN) += linux/byteorder/little_endian.h
+ header-test- += linux/coda.h
+ header-test- += linux/coda_psdev.h
+-header-test- += linux/dvb/audio.h
+-header-test- += linux/dvb/osd.h
+ header-test- += linux/elfcore.h
+ header-test- += linux/errqueue.h
+ header-test- += linux/fsmap.h
+@@ -44,7 +42,6 @@ header-test- += linux/netfilter_bridge/ebtables.h
+ header-test- += linux/netfilter_ipv4/ipt_LOG.h
+ header-test- += linux/netfilter_ipv6/ip6t_LOG.h
+ header-test- += linux/nfc.h
+-header-test- += linux/nilfs2_ondisk.h
+ header-test- += linux/omap3isp.h
+ header-test- += linux/omapfb.h
+ header-test- += linux/patchkey.h
+@@ -59,9 +56,6 @@ header-test- += linux/v4l2-mediabus.h
+ header-test- += linux/v4l2-subdev.h
+ header-test- += linux/videodev2.h
+ header-test- += linux/vm_sockets.h
+-header-test- += misc/ocxl.h
+-header-test- += mtd/mtd-abi.h
+-header-test- += mtd/mtd-user.h
+ header-test- += scsi/scsi_bsg_fc.h
+ header-test- += scsi/scsi_netlink.h
+ header-test- += scsi/scsi_netlink_fc.h
+@@ -108,7 +102,6 @@ header-test- += linux/bpf_perf_event.h
+ endif
  
- #
- # Rule to compile a set of .o files into one .a file (with symbol table)
+ ifeq ($(SRCARCH),s390)
+-header-test- += asm/runtime_instr.h
+ header-test- += asm/zcrypt.h
+ endif
+ 
+@@ -116,7 +109,6 @@ ifeq ($(SRCARCH),sparc)
+ header-test- += asm/stat.h
+ header-test- += asm/uctx.h
+ header-test- += asm/fbio.h
+-header-test- += asm/openpromio.h
+ endif
+ 
+ # asm-generic/*.h is used by asm/*.h, and should not be included directly
 -- 
 2.17.1
