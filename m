@@ -1,106 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:31373 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfGQFWg (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:62956 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725890AbfGQGSZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jul 2019 01:22:36 -0400
-MIME-Version: 1.0
-References: <20190711054434.1177-1-yamada.masahiro@socionext.com>
- <20190711054434.1177-9-yamada.masahiro@socionext.com> <20190716214023.GA15159@redhat.com>
-In-Reply-To: <20190716214023.GA15159@redhat.com>
+        Wed, 17 Jul 2019 02:18:25 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 17 Jul 2019 14:21:45 +0900
-Message-ID: <CAK7LNAQ41NhPPO6xoVObgFctTO6WewSXPfZkE7_bZXsdAtKSpA@mail.gmail.com>
-Subject: Re: [PATCH v2 08/11] kbuild: create *.mod with full directory path
- and remove MODVERDIR
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v3 08/12] kbuild: export_report: read modules.order instead of .tmp_versions/*.mod
+Date: Wed, 17 Jul 2019 15:17:56 +0900
+Message-Id: <20190717061800.10018-9-yamada.masahiro@socionext.com>
+In-Reply-To: <20190717061800.10018-1-yamada.masahiro@socionext.com>
+References: <20190717061800.10018-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nico@fluxnic.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Joe Lawrence <joe.lawrence@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Hi Joe
+Towards the goal of removing MODVERDIR aka .tmp_versions, read out
+modules.order to get the list of modules to be processed. This is
+simpler than parsing *.mod files in .tmp_versions.
 
-On Wed, Jul 17, 2019 at 6:40 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
->
-> On Thu, Jul 11, 2019 at 02:44:31PM +0900, Masahiro Yamada wrote:
-> > While descending directories, Kbuild produces objects for modules,
-> > but do not link final *.ko files; it is done in the modpost.
-> >
-> > To keep track of modules, Kbuild creates a *.mod file in $(MODVERDIR)
-> > for every module it is building. Some post-processing steps read the
-> > necessary information from *.mod files. This avoids descending into
-> > directories again. This mechanism was introduced in 2003 or so.
-> >
-> > Later, commit 551559e13af1 ("kbuild: implement modules.order") added
-> > modules.order. So, we can simply read it out to know all the modules
-> > with directory paths. This is easier than parsing the first line of
-> > *.mod files.
-> >
-> > $(MODVERDIR) has a flat directory structure, that is, *.mod files
-> > are named only with base names. This is based on the assumption that
-> > the module name is unique across the tree. This assumption is really
-> > fragile.
-> >
-> > Stephen Rothwell reported a race condition caused by a module name
-> > conflict:
-> >
-> >   https://lkml.org/lkml/2019/5/13/991
-> >
-> > In parallel building, two different threads could write to the same
-> > $(MODVERDIR)/*.mod simultaneously.
-> >
-> > Non-unique module names are the source of all kind of troubles, hence
-> > commit 3a48a91901c5 ("kbuild: check uniqueness of module names")
-> > introduced a new checker script.
-> >
-> > However, it is still fragile in the build system point of view because
-> > this race happens before scripts/modules-check.sh is invoked. If it
-> > happens again, the modpost will emit unclear error messages.
-> >
-> > To fix this issue completely, create *.mod in the same directory as
-> > *.ko so that two threads never attempt to write to the same file.
-> > $(MODVERDIR) is no longer needed.
-> >
-> > Since modules with directory paths are listed in modules.order, Kbuild
-> > is still able to find *.mod files without additional descending.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Acked-by: Nicolas Pitre <nico@fluxnic.net>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-> >
->
-> Hi Masahiro,
->
-> I'm following this patchset changes as they will affect the klp-convert
-> series [1] that the livepatching folks have been working on...
+Changes in v3:
+  - New patch
 
-Empty files .tmp_versions/*.livepatch are touched
-to keep track of 'LIVEPATCH_* := y', right?
+Changes in v2: None
 
-Perhaps, adding a new field
-to *.mod files might be cleaner.
+ scripts/export_report.pl | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-
-
-> Just wondering if these other files should be checked for more MODVERDIR
-> fallout:
->
->   % grep -R 'tmp_versions'
->   tools/power/cpupower/debug/kernel/Makefile:     - rm -rf .tmp_versions* Module.symvers modules.order
->   scripts/export_report.pl:    while (<.tmp_versions/*.mod>) {
->   scripts/adjust_autoksyms.sh:# .tmp_versions/*.mod files.
->
-> export_report.pl is probably the only interesting one on this list.
-
-Good catch. I will fix it.
-
-> Also, can you cc me on subsequent patchset versions?
-
-Yes, will do.
-
-
-
---
-Best Regards
-Masahiro Yamada
+diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+index 0f604f62f067..7d3030d03a25 100755
+--- a/scripts/export_report.pl
++++ b/scripts/export_report.pl
+@@ -52,13 +52,12 @@ sub usage {
+ 
+ sub collectcfiles {
+     my @file;
+-    while (<.tmp_versions/*.mod>) {
+-	open my $fh, '<', $_ or die "cannot open $_: $!\n";
+-	push (@file,
+-	      grep s/\.ko/.mod.c/,	# change the suffix
+-	      grep m/.+\.ko/,		# find the .ko path
+-	      <$fh>);			# lines in opened file
++    open my $fh, '< modules.order' or die "cannot open modules.order: $!\n";
++    while (<$fh>) {
++	s/\.ko$/.mod.c/;
++	push (@file, $_)
+     }
++    close($fh);
+     chomp @file;
+     return @file;
+ }
+-- 
+2.17.1
