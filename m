@@ -1,35 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:53606 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727260AbfGQRXG (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:44908 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726040AbfGRRAZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jul 2019 13:23:06 -0400
+        Thu, 18 Jul 2019 13:00:25 -0400
+Subject: Re: linux-next: Tree for Jul 18 (header build error)
+References: <20190718133751.3cf036be@canb.auug.org.au>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <127d228c-322d-6349-382b-d304974df148@infradead.org>
+Date: Thu, 18 Jul 2019 10:00:22 -0700
 MIME-Version: 1.0
-References: <20190717160626.26293-1-seth.forshee@canonical.com>
-In-Reply-To: <20190717160626.26293-1-seth.forshee@canonical.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 18 Jul 2019 02:22:02 +0900
-Message-ID: <CAK7LNASPqp6eK_3bx2PPQ6nUyh=7RBhABNxNY0Yw7vqdn=Ej1g@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add -fcf-protection=none when using retpoline flags
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190718133751.3cf036be@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Seth Forshee <seth.forshee@canonical.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Jul 18, 2019 at 1:07 AM Seth Forshee <seth.forshee@canonical.com> wrote:
->
-> The gcc -fcf-protection=branch option is not compatible with
-> -mindirect-branch=thunk-extern. The latter is used when
-> CONFIG_RETPOLINE is selected, and this will fail to build with
-> a gcc which has -fcf-protection=branch enabled by default. Adding
-> -fcf-protection=none when building with retpoline enabled
-> prevents such build failures.
->
-> Signed-off-by: Seth Forshee <seth.forshee@canonical.com>
+On 7/17/19 8:37 PM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Please do not add v5.4 material to your linux-next included branches
+> until after v5.3-rc1 has been released.
+> 
+> Changes since 20190717:
+> 
 
-Applied to linux-kbuild. Thanks.
+on x86_64, when CONFIG_BLOCK is not set:
+
+  CC      include/linux/iomap.h.s
+In file included from <command-line>:0:0:
+./../include/linux/iomap.h: In function ‘iomap_sector’:
+./../include/linux/iomap.h:76:48: error: ‘SECTOR_SHIFT’ undeclared (first use in this function); did you mean ‘SECTIONS_SHIFT’?
+  return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
+                                                ^~~~~~~~~~~~
+
 
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
