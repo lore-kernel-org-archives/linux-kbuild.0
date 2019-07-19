@@ -1,50 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:34076 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725794AbfGSKOG (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:46716 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727559AbfGSMkg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Jul 2019 06:14:06 -0400
-MIME-Version: 1.0
-References: <20190719100859.11227-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190719100859.11227-1-yamada.masahiro@socionext.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 19 Jul 2019 12:13:48 +0200
-Message-ID: <CAK8P3a13WKoDCTRk-PpF5Efi2JUu-e-hMt2vmgrnvuybO-sROw@mail.gmail.com>
+        Fri, 19 Jul 2019 08:40:36 -0400
+Date: Fri, 19 Jul 2019 14:40:30 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] kbuild: disable compile-test of kernel headers for now
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190719124030.GA5858@ravnborg.org>
+References: <20190719100859.11227-1-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190719100859.11227-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@intel.com>, linux-kernel@vger.kernel.org
 
-On Fri, Jul 19, 2019 at 12:09 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
+Hi Masahiro.
+
+On Fri, Jul 19, 2019 at 07:08:59PM +0900, Masahiro Yamada wrote:
 > This compile-test started from the strong belief that (almost) all
 > headers should be able to be compiled as a standalone unit, but this
 > requirement seems to be just annoying.
->
+> 
 > I believe compile-test of exported headers is good. On the other hand,
 > in-kernel headers are not necessarily supposed to be always compilable.
 > Actually, some headers are only included under a certain combination
 > of CONFIG options, and that is definitely fine.
->
+> 
 > This test is still causing false positive errors in randconfig.
 > Moreover, newly added headers are compile-tested by default, sometimes
 > they catch (not fatal) bugs, but often raise false positive errors to
 > end up with making people upset.
->
+> 
 > The merge window is closing shortly, so there is not much I can do.
 > Disable it for now, and take a pause to re-think whether we should
 > continue this or change the course.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+The present status is that iomap.h fails - and Arnd promptly
+made a fix for it:
+https://lore.kernel.org/lkml/20190719113139.4005262-1-arnd@arndb.de/T/#u
 
-FWIW, I only saw occasional failures for one file (linux/iomap.h)
-when doing many randconfig builds across x86, arm32 and arm64.
-I think those are fixable, but disabling it for the 5.3 is clearly the safer
-option.
+You already fixed another issue.
+So the fall-out so far is miniaml and already fixed (pending Arnd's
+patch).
 
-       Arnd
+If headers are not self-contained then one needs to include them in a
+specific order which can be quite hard to get right.
+Especially if the requirements differ across different architectures.
+So the whole concept seems sane.
+
+I have thrown it after may array of cross builds:
+=> alpha arm arm64 sparc64 i386 x86 powerpc s390 riscv sh
+
+For each arch I try:
+=> allmodconfig allyesconfig allnoconfig defconfig
+
+No errros.
+But that obviously only coveres a very minial set of configurations.
+Arnd's result from his randconfig are also very promising.
+
+I advise to keep it enabled and if there is a steady stream of
+new errors after -rc1 and -rc2 then to disable the testing.
+We will not get the coverage unless this is upstreamed.
+And the testing is relevant.
+
+	Sam
