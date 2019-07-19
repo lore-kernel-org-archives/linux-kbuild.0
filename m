@@ -1,55 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57394 "EHLO mx1.redhat.com"
+Received: from ozlabs.org ([203.11.71.1]:40671 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728022AbfGRUSg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:18:36 -0400
-Subject: Re: [PATCH v2 08/11] kbuild: create *.mod with full directory path
- and remove MODVERDIR
-References: <20190711054434.1177-1-yamada.masahiro@socionext.com>
- <20190711054434.1177-9-yamada.masahiro@socionext.com>
- <20190716214023.GA15159@redhat.com>
- <CAK7LNAQ41NhPPO6xoVObgFctTO6WewSXPfZkE7_bZXsdAtKSpA@mail.gmail.com>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <f1222c8a-9301-1e76-981d-a36e8687a29f@redhat.com>
-Date: Thu, 18 Jul 2019 16:18:33 -0400
+        id S1725992AbfGSAGA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 Jul 2019 20:06:00 -0400
+Date: Fri, 19 Jul 2019 10:05:57 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-next: Tree for Jul 18 (header build error)
+Message-ID: <20190719100557.3ead3285@canb.auug.org.au>
+In-Reply-To: <127d228c-322d-6349-382b-d304974df148@infradead.org>
+References: <20190718133751.3cf036be@canb.auug.org.au>
+        <127d228c-322d-6349-382b-d304974df148@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQ41NhPPO6xoVObgFctTO6WewSXPfZkE7_bZXsdAtKSpA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/z1=xYY.a9cTfhHO35FJ79pe";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nico@fluxnic.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, "Darrick J. Wong" <darrick.wong@oracle.com>
 
-On 7/17/19 1:21 AM, Masahiro Yamada wrote:
->> Hi Masahiro,
->>
->> I'm following this patchset changes as they will affect the klp-convert
->> series [1] that the livepatching folks have been working on...
-> 
-> Empty files .tmp_versions/*.livepatch are touched
-> to keep track of 'LIVEPATCH_* := y', right?
-> 
+--Sig_/z1=xYY.a9cTfhHO35FJ79pe
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Pretty much.  From that patchset I think the rework would need to  modify..
+Hi all,
 
-- [PATCH v4 02/10] kbuild: Support for Symbols.list creation: creates a 
-Symbols.list file of kernel and module symbols, but *not* including any 
-from LIVEPATCH_* modules.
+On Thu, 18 Jul 2019 10:00:22 -0700 Randy Dunlap <rdunlap@infradead.org> wro=
+te:
+>
+> on x86_64, when CONFIG_BLOCK is not set:
+>=20
+>   CC      include/linux/iomap.h.s
+> In file included from <command-line>:0:0:
+> ./../include/linux/iomap.h: In function =E2=80=98iomap_sector=E2=80=99:
+> ./../include/linux/iomap.h:76:48: error: =E2=80=98SECTOR_SHIFT=E2=80=99 u=
+ndeclared (first use in this function); did you mean =E2=80=98SECTIONS_SHIF=
+T=E2=80=99?
+>   return (iomap->addr + pos - iomap->offset) >> SECTOR_SHIFT;
+>                                                 ^~~~~~~~~~~~
 
-- [PATCH v4 05/10] modpost: Integrate klp-convert: if a LIVEPATCH_* 
-module has changed, call a newly introduced klp-convert script on it.
+include/linux/iomap.h should only be used when CONFIG_BLOCK is set (if
+you follow the Kconfig trail).  So maybe this header should only be
+compile tested if CONFIG_BLOCK is set.
 
-- [PATCH v4 06/10] modpost: Add modinfo flag to livepatch modules: find 
-any LIVEPATCH_* mod, add it to a livepatchmods file, then pass that file 
-to modpost
+--=20
+Cheers,
+Stephen Rothwell
 
-> Perhaps, adding a new field
-> to *.mod files might be cleaner.
+--Sig_/z1=xYY.a9cTfhHO35FJ79pe
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-I can look into that.  By "field" you mean a new row in the file?
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl0xCWUACgkQAVBC80lX
+0GwSMAf/XraSYDqoBJY5K/r9UdR05YjdlfrPEbwsEwGFHCpL0u2m6jiwq9ciOo1R
+E9MgT5vqxAOBTcm8hc4XK0msKMDUWwYso0O6/1BGjRARdUz3c8QHYjIYZ4oHV1nG
+6R4vWHLBKs9YIusRCl7ZFYy364DGmvVAb9dwTc1L3ZF3Tu9vPlIn2ntsrc+Je/zA
+A3OoztV9DKmXWmzL+XZHScEx391GX3pGo3zSL26w4rDpSwSjfFctL5EWo2p9mH2Z
+KFkH0pYUxh2O50GS1XGWfVfmpo7mck6rfHRTuMyKkB2Oq67xFZg+Uh81axMR2hlZ
+M2SCpbYCyCvX+2ZB9uTWpdB31FaytA==
+=Zdp9
+-----END PGP SIGNATURE-----
 
--- Joe
+--Sig_/z1=xYY.a9cTfhHO35FJ79pe--
