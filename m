@@ -1,62 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59316 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:47176 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728815AbfGSD7j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Jul 2019 23:59:39 -0400
+        id S1731159AbfGSEMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Jul 2019 00:12:01 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.2 085/171] net/ipv4: fib_trie: Avoid cryptic ternary expressions
-Date: Thu, 18 Jul 2019 23:55:16 -0400
-Message-Id: <20190719035643.14300-85-sashal@kernel.org>
-In-Reply-To: <20190719035643.14300-1-sashal@kernel.org>
-References: <20190719035643.14300-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 28/60] kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
+Date: Fri, 19 Jul 2019 00:10:37 -0400
+Message-Id: <20190719041109.18262-28-sashal@kernel.org>
+In-Reply-To: <20190719041109.18262-1-sashal@kernel.org>
+References: <20190719041109.18262-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Nathan Huckleberry <nhuck@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Alexander Duyck <alexander.h.duyck@linux.intel.com>, "David S . Miller" <davem@davemloft.net>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Peter Smith <peter.smith@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
 
-From: Nathan Huckleberry <nhuck@google.com>
+From: Nathan Chancellor <natechancellor@gmail.com>
 
-[ Upstream commit 25cec756891e8733433efea63b2254ddc93aa5cc ]
+[ Upstream commit 589834b3a0097a4908f4112eac0ca2feb486fa32 ]
 
-empty_child_inc/dec() use the ternary operator for conditional
-operations. The conditions involve the post/pre in/decrement
-operator and the operation is only performed when the condition
-is *not* true. This is hard to parse for humans, use a regular
-'if' construct instead and perform the in/decrement separately.
+In commit ebcc5928c5d9 ("arm64: Silence gcc warnings about arch ABI
+drift"), the arm64 Makefile added -Wno-psabi to KBUILD_CFLAGS, which is
+a GCC only option so clang rightfully complains:
 
-This also fixes two warnings that are emitted about the value
-of the ternary expression being unused, when building the kernel
-with clang + "kbuild: Remove unnecessary -Wno-unused-value"
-(https://lore.kernel.org/patchwork/patch/1089869/):
+warning: unknown warning option '-Wno-psabi' [-Wunknown-warning-option]
 
-CC      net/ipv4/fib_trie.o
-net/ipv4/fib_trie.c:351:2: error: expression result unused [-Werror,-Wunused-value]
-        ++tn_info(n)->empty_children ? : ++tn_info(n)->full_children;
+https://clang.llvm.org/docs/DiagnosticsReference.html#wunknown-warning-option
 
-Fixes: 95f60ea3e99a ("fib_trie: Add collapse() and should_collapse() to resize")
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-Reviewed-by: Douglas Anderson <dianders@chromium.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Acked-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+However, by default, this is merely a warning so the build happily goes
+on with a slew of these warnings in the process.
+
+Commit c3f0d0bc5b01 ("kbuild, LLVMLinux: Add -Werror to cc-option to
+support clang") worked around this behavior in cc-option by adding
+-Werror so that unknown flags cause an error. However, this all happens
+silently and when an unknown flag is added to the build unconditionally
+like -Wno-psabi, cc-option will always fail because there is always an
+unknown flag in the list of flags. This manifested as link time failures
+in the arm64 libstub because -fno-stack-protector didn't get added to
+KBUILD_CFLAGS.
+
+To avoid these weird cryptic failures in the future, make clang behave
+like gcc and immediately error when it encounters an unknown flag by
+adding -Werror=unknown-warning-option to CLANG_FLAGS. This can be added
+unconditionally for clang because it is supported by at least 3.0.0,
+according to godbolt [1] and 4.0.0, according to its documentation [2],
+which is far earlier than we typically support.
+
+[1]: https://godbolt.org/z/7F7rm3
+[2]: https://releases.llvm.org/4.0.0/tools/clang/docs/DiagnosticsReference.html#wunknown-warning-option
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/511
+Link: https://github.com/ClangBuiltLinux/linux/issues/517
+Suggested-by: Peter Smith <peter.smith@linaro.org>
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/Makefile.extrawarn | 1 -
- 1 file changed, 1 deletion(-)
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 3ab8d1a303cd..b293246e48fe 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -68,7 +68,6 @@ else
- 
- ifdef CONFIG_CC_IS_CLANG
- KBUILD_CFLAGS += -Wno-initializer-overrides
--KBUILD_CFLAGS += -Wno-unused-value
- KBUILD_CFLAGS += -Wno-format
- KBUILD_CFLAGS += -Wno-sign-compare
- KBUILD_CFLAGS += -Wno-format-zero-length
+diff --git a/Makefile b/Makefile
+index c36e64bd9ae7..3d43f922953f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -488,6 +488,7 @@ ifneq ($(GCC_TOOLCHAIN),)
+ CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
+ endif
+ CLANG_FLAGS	+= -no-integrated-as
++CLANG_FLAGS	+= -Werror=unknown-warning-option
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
 -- 
 2.20.1
