@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47176 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49730 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731159AbfGSEMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Jul 2019 00:12:01 -0400
+        id S2389233AbfGSENk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Jul 2019 00:13:40 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 28/60] kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
-Date: Fri, 19 Jul 2019 00:10:37 -0400
-Message-Id: <20190719041109.18262-28-sashal@kernel.org>
-In-Reply-To: <20190719041109.18262-1-sashal@kernel.org>
-References: <20190719041109.18262-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 21/45] kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
+Date: Fri, 19 Jul 2019 00:12:40 -0400
+Message-Id: <20190719041304.18849-21-sashal@kernel.org>
+In-Reply-To: <20190719041304.18849-1-sashal@kernel.org>
+References: <20190719041304.18849-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -62,16 +62,16 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index c36e64bd9ae7..3d43f922953f 100644
+index c80dad45334e..60b562dbd97f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -488,6 +488,7 @@ ifneq ($(GCC_TOOLCHAIN),)
+@@ -515,6 +515,7 @@ ifneq ($(GCC_TOOLCHAIN),)
  CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
  endif
  CLANG_FLAGS	+= -no-integrated-as
 +CLANG_FLAGS	+= -Werror=unknown-warning-option
  KBUILD_CFLAGS	+= $(CLANG_FLAGS)
  KBUILD_AFLAGS	+= $(CLANG_FLAGS)
- export CLANG_FLAGS
+ endif
 -- 
 2.20.1
