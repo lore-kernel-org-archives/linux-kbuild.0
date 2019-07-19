@@ -1,59 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35307 "EHLO ozlabs.org"
+Received: from mail.kernel.org ([198.145.29.99]:59316 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726015AbfGSAkm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Jul 2019 20:40:42 -0400
-Date: Fri, 19 Jul 2019 10:40:38 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: linux-next: Tree for Jul 18 (header build error)
-Message-ID: <20190719104038.1d1f9a15@canb.auug.org.au>
-In-Reply-To: <20190719003045.GF692234@magnolia>
-References: <20190718133751.3cf036be@canb.auug.org.au>
-        <127d228c-322d-6349-382b-d304974df148@infradead.org>
-        <20190719100557.3ead3285@canb.auug.org.au>
-        <20190719003045.GF692234@magnolia>
+        id S1728815AbfGSD7j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 Jul 2019 23:59:39 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 085/171] net/ipv4: fib_trie: Avoid cryptic ternary expressions
+Date: Thu, 18 Jul 2019 23:55:16 -0400
+Message-Id: <20190719035643.14300-85-sashal@kernel.org>
+In-Reply-To: <20190719035643.14300-1-sashal@kernel.org>
+References: <20190719035643.14300-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/nX4Jeu6sxuCZYl9N82CPIAF";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Nathan Huckleberry <nhuck@google.com>, Matthias Kaehlcke <mka@chromium.org>, Douglas Anderson <dianders@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Alexander Duyck <alexander.h.duyck@linux.intel.com>, "David S . Miller" <davem@davemloft.net>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
 
---Sig_/nX4Jeu6sxuCZYl9N82CPIAF
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Nathan Huckleberry <nhuck@google.com>
 
-Hi Darrick,
+[ Upstream commit 25cec756891e8733433efea63b2254ddc93aa5cc ]
 
-On Thu, 18 Jul 2019 17:30:45 -0700 "Darrick J. Wong" <darrick.wong@oracle.c=
-om> wrote:
->
-> ... oh, this is some weird "mash all the kernel headers together and see
-> if they compile" thing, isn't it?  Um, yes, iomap.h should only be
-> tested if CONFIG_IOMAP=3Dy (which in turn requires CONFIG_BLOCK=3Dy)
+empty_child_inc/dec() use the ternary operator for conditional
+operations. The conditions involve the post/pre in/decrement
+operator and the operation is only performed when the condition
+is *not* true. This is hard to parse for humans, use a regular
+'if' construct instead and perform the in/decrement separately.
 
-Actually it tries to build each header file on its own to see if it
-include all its dependencies.
+This also fixes two warnings that are emitted about the value
+of the ternary expression being unused, when building the kernel
+with clang + "kbuild: Remove unnecessary -Wno-unused-value"
+(https://lore.kernel.org/patchwork/patch/1089869/):
 
---=20
-Cheers,
-Stephen Rothwell
+CC      net/ipv4/fib_trie.o
+net/ipv4/fib_trie.c:351:2: error: expression result unused [-Werror,-Wunused-value]
+        ++tn_info(n)->empty_children ? : ++tn_info(n)->full_children;
 
---Sig_/nX4Jeu6sxuCZYl9N82CPIAF
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Fixes: 95f60ea3e99a ("fib_trie: Add collapse() and should_collapse() to resize")
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/Makefile.extrawarn | 1 -
+ 1 file changed, 1 deletion(-)
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl0xEYYACgkQAVBC80lX
-0Gwjnwf/cpxl9GjFax+XTHpFksObgF3XDfOvv7FrK++PfETXXai/cL9CmG4r0KSY
-m/s7MXlV83ONX4PmSB3LdMjMcPjYZFtuv5ZQ5LsAyupecwuJNDH7MEfH6F5pmx05
-h4DEWwQTSauxRA9GXqUGApYNrzbXcauaUMy1kWyKO95owuNdQWFS5mGq0n3jL2dN
-ClrPQuZZwPjvBRfrlJfJVe4/P8YluO5xJSGDCcFGmjiMc/zB71DoOHjWpP4ttS9J
-/9J7EiaibV7dKQz6fl0uF5HnAyi2i0aD3/HCx4drT+kbMUWiohHlmxXJLyr5BW7j
-tQAdbePufT0htEO3/XVLcm3+3PDyLg==
-=GzlS
------END PGP SIGNATURE-----
-
---Sig_/nX4Jeu6sxuCZYl9N82CPIAF--
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 3ab8d1a303cd..b293246e48fe 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -68,7 +68,6 @@ else
+ 
+ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CFLAGS += -Wno-initializer-overrides
+-KBUILD_CFLAGS += -Wno-unused-value
+ KBUILD_CFLAGS += -Wno-format
+ KBUILD_CFLAGS += -Wno-sign-compare
+ KBUILD_CFLAGS += -Wno-format-zero-length
+-- 
+2.20.1
