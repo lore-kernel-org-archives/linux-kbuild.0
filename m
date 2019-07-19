@@ -1,77 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59362 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728825AbfGSD7k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 Jul 2019 23:59:40 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.2 086/171] kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS
-Date: Thu, 18 Jul 2019 23:55:17 -0400
-Message-Id: <20190719035643.14300-86-sashal@kernel.org>
-In-Reply-To: <20190719035643.14300-1-sashal@kernel.org>
-References: <20190719035643.14300-1-sashal@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from conuserg-10.nifty.com ([210.131.2.77]:29227 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbfGSKKR (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Jul 2019 06:10:17 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: disable compile-test of kernel headers for now
+Date: Fri, 19 Jul 2019 19:08:59 +0900
+Message-Id: <20190719100859.11227-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Peter Smith <peter.smith@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+To: linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-From: Nathan Chancellor <natechancellor@gmail.com>
+This compile-test started from the strong belief that (almost) all
+headers should be able to be compiled as a standalone unit, but this
+requirement seems to be just annoying.
 
-[ Upstream commit 589834b3a0097a4908f4112eac0ca2feb486fa32 ]
+I believe compile-test of exported headers is good. On the other hand,
+in-kernel headers are not necessarily supposed to be always compilable.
+Actually, some headers are only included under a certain combination
+of CONFIG options, and that is definitely fine.
 
-In commit ebcc5928c5d9 ("arm64: Silence gcc warnings about arch ABI
-drift"), the arm64 Makefile added -Wno-psabi to KBUILD_CFLAGS, which is
-a GCC only option so clang rightfully complains:
+This test is still causing false positive errors in randconfig.
+Moreover, newly added headers are compile-tested by default, sometimes
+they catch (not fatal) bugs, but often raise false positive errors to
+end up with making people upset.
 
-warning: unknown warning option '-Wno-psabi' [-Wunknown-warning-option]
+The merge window is closing shortly, so there is not much I can do.
+Disable it for now, and take a pause to re-think whether we should
+continue this or change the course.
 
-https://clang.llvm.org/docs/DiagnosticsReference.html#wunknown-warning-option
-
-However, by default, this is merely a warning so the build happily goes
-on with a slew of these warnings in the process.
-
-Commit c3f0d0bc5b01 ("kbuild, LLVMLinux: Add -Werror to cc-option to
-support clang") worked around this behavior in cc-option by adding
--Werror so that unknown flags cause an error. However, this all happens
-silently and when an unknown flag is added to the build unconditionally
-like -Wno-psabi, cc-option will always fail because there is always an
-unknown flag in the list of flags. This manifested as link time failures
-in the arm64 libstub because -fno-stack-protector didn't get added to
-KBUILD_CFLAGS.
-
-To avoid these weird cryptic failures in the future, make clang behave
-like gcc and immediately error when it encounters an unknown flag by
-adding -Werror=unknown-warning-option to CLANG_FLAGS. This can be added
-unconditionally for clang because it is supported by at least 3.0.0,
-according to godbolt [1] and 4.0.0, according to its documentation [2],
-which is far earlier than we typically support.
-
-[1]: https://godbolt.org/z/7F7rm3
-[2]: https://releases.llvm.org/4.0.0/tools/clang/docs/DiagnosticsReference.html#wunknown-warning-option
-
-Link: https://github.com/ClangBuiltLinux/linux/issues/511
-Link: https://github.com/ClangBuiltLinux/linux/issues/517
-Suggested-by: Peter Smith <peter.smith@linaro.org>
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 1 +
+
+ init/Kconfig | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Makefile b/Makefile
-index d8f5dbfd6b76..f02079b98e7e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -528,6 +528,7 @@ ifneq ($(GCC_TOOLCHAIN),)
- CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
- endif
- CLANG_FLAGS	+= -no-integrated-as
-+CLANG_FLAGS	+= -Werror=unknown-warning-option
- KBUILD_CFLAGS	+= $(CLANG_FLAGS)
- KBUILD_AFLAGS	+= $(CLANG_FLAGS)
- export CLANG_FLAGS
+diff --git a/init/Kconfig b/init/Kconfig
+index 9697c6b5303c..778551a1a13c 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -111,6 +111,7 @@ config HEADER_TEST
+ config KERNEL_HEADER_TEST
+ 	bool "Compile test kernel headers"
+ 	depends on HEADER_TEST
++	depends on BROKEN	# disabled for now
+ 	help
+ 	  Headers in include/ are used to build external moduls.
+ 	  Compile test them to ensure they are self-contained, i.e.
 -- 
-2.20.1
+2.17.1
