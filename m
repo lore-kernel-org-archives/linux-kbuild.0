@@ -1,53 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:29227 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725794AbfGSKKR (ORCPT
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:34076 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbfGSKOG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Jul 2019 06:10:17 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: disable compile-test of kernel headers for now
-Date: Fri, 19 Jul 2019 19:08:59 +0900
-Message-Id: <20190719100859.11227-1-yamada.masahiro@socionext.com>
+        Fri, 19 Jul 2019 06:14:06 -0400
+MIME-Version: 1.0
+References: <20190719100859.11227-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190719100859.11227-1-yamada.masahiro@socionext.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 19 Jul 2019 12:13:48 +0200
+Message-ID: <CAK8P3a13WKoDCTRk-PpF5Efi2JUu-e-hMt2vmgrnvuybO-sROw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: disable compile-test of kernel headers for now
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Jani Nikula <jani.nikula@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-This compile-test started from the strong belief that (almost) all
-headers should be able to be compiled as a standalone unit, but this
-requirement seems to be just annoying.
+On Fri, Jul 19, 2019 at 12:09 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> This compile-test started from the strong belief that (almost) all
+> headers should be able to be compiled as a standalone unit, but this
+> requirement seems to be just annoying.
+>
+> I believe compile-test of exported headers is good. On the other hand,
+> in-kernel headers are not necessarily supposed to be always compilable.
+> Actually, some headers are only included under a certain combination
+> of CONFIG options, and that is definitely fine.
+>
+> This test is still causing false positive errors in randconfig.
+> Moreover, newly added headers are compile-tested by default, sometimes
+> they catch (not fatal) bugs, but often raise false positive errors to
+> end up with making people upset.
+>
+> The merge window is closing shortly, so there is not much I can do.
+> Disable it for now, and take a pause to re-think whether we should
+> continue this or change the course.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-I believe compile-test of exported headers is good. On the other hand,
-in-kernel headers are not necessarily supposed to be always compilable.
-Actually, some headers are only included under a certain combination
-of CONFIG options, and that is definitely fine.
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-This test is still causing false positive errors in randconfig.
-Moreover, newly added headers are compile-tested by default, sometimes
-they catch (not fatal) bugs, but often raise false positive errors to
-end up with making people upset.
+FWIW, I only saw occasional failures for one file (linux/iomap.h)
+when doing many randconfig builds across x86, arm32 and arm64.
+I think those are fixable, but disabling it for the 5.3 is clearly the safer
+option.
 
-The merge window is closing shortly, so there is not much I can do.
-Disable it for now, and take a pause to re-think whether we should
-continue this or change the course.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- init/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/init/Kconfig b/init/Kconfig
-index 9697c6b5303c..778551a1a13c 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -111,6 +111,7 @@ config HEADER_TEST
- config KERNEL_HEADER_TEST
- 	bool "Compile test kernel headers"
- 	depends on HEADER_TEST
-+	depends on BROKEN	# disabled for now
- 	help
- 	  Headers in include/ are used to build external moduls.
- 	  Compile test them to ensure they are self-contained, i.e.
--- 
-2.17.1
+       Arnd
