@@ -1,37 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:33438 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725765AbfGTFJs (ORCPT
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:44951 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727228AbfGTJMX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Jul 2019 01:09:48 -0400
+        Sat, 20 Jul 2019 05:12:23 -0400
+Received: by mail-qt1-f195.google.com with SMTP id 44so2559957qtg.11
+        for <linux-kbuild@vger.kernel.org>; Sat, 20 Jul 2019 02:12:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190711054434.1177-1-yamada.masahiro@socionext.com>
- <20190711054434.1177-9-yamada.masahiro@socionext.com> <20190716214023.GA15159@redhat.com>
- <CAK7LNAQ41NhPPO6xoVObgFctTO6WewSXPfZkE7_bZXsdAtKSpA@mail.gmail.com> <f1222c8a-9301-1e76-981d-a36e8687a29f@redhat.com>
-In-Reply-To: <f1222c8a-9301-1e76-981d-a36e8687a29f@redhat.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 20 Jul 2019 14:09:01 +0900
-Message-ID: <CAK7LNATrS_ENkz3-dT70mXi=L89w0a-x6tSsDT-r7qxNa+kaOQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/11] kbuild: create *.mod with full directory path
- and remove MODVERDIR
+References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+ <20190716170606.GA38406@archlinux-threadripper> <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
+ <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
+ <CAK7LNASBiaMX8ihnmhLGmYfHX=ZHZmVN91nxmFZe-OCaw6Px2w@mail.gmail.com> <alpine.DEB.2.21.1907170955250.1767@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1907170955250.1767@nanos.tec.linutronix.de>
+From: Mike Lothian <mike@fireburn.co.uk>
+Date: Sat, 20 Jul 2019 10:12:10 +0100
+Message-ID: <CAHbf0-GyQzWcRg_BP2B5pVzEJoxSE_hX5xFypS--7Q5LSHxzWw@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Fail if gold linker is detected
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Nicolas Pitre <nico@fluxnic.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, "H.J. Lu" <hjl.tools@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, linux-arch@vger.kernel.org
 
-Hi Joe,
-
-On Fri, Jul 19, 2019 at 5:18 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
-
-> > Perhaps, adding a new field
-> > to *.mod files might be cleaner.
+On Wed, 17 Jul 2019 at 08:57, Thomas Gleixner <tglx@linutronix.de> wrote:
 >
-> I can look into that.  By "field" you mean a new row in the file?
+> On Wed, 17 Jul 2019, Masahiro Yamada wrote:
+> > On Wed, Jul 17, 2019 at 4:47 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+> > > So instead of dealing with attempts to duct tape gold support without
+> > > understanding the root cause and without support from the gold folks, fail
+> > > the build when gold is detected.
+> > >
+> >
+> > The code looks OK in the build system point of view.
+> >
+> > Please let me confirm this, just in case:
+> > For now, we give up all architectures, not only x86, right?
+>
+> Well, that's the logical consequence of a statement which says: don't use
+> gold for the kernel.
+>
+> > I have not not heard much from other arch maintainers.
+>
+> Cc'ed linux-arch for that matter.
+>
+> Thanks,
+>
+>         tglx
 
-Yes.
+Hi
 
+I've done a bit more digging, I had a second machine that was building
+Linus's tree just fine with ld.gold
 
--- 
-Best Regards
-Masahiro Yamada
+I tried forcing ld.bfd on the problem machine and got this:
+
+ld.bfd: arch/x86/boot/compressed/head_64.o: warning: relocation in
+read-only section `.head.text'
+ld.bfd: warning: creating a DT_TEXTREL in object
+
+I had a look at the differences in the kernel configs and noticed this:
+
+CONFIG_RANDOMIZE_BASE=y
+CONFIG_X86_NEED_RELOCS=y
+CONFIG_PHYSICAL_ALIGN=0x1000000
+CONFIG_DYNAMIC_MEMORY_LAYOUT=y
+CONFIG_RANDOMIZE_MEMORY=y
+CONFIG_RANDOMIZE_MEMORY_PHYSICAL_PADDING=0x0
+
+Unsetting CONFIG_RANDOMIZE_BASE=y gets things working for me with ld.gold again
+
+In light of this - can we drop this patch?
+
+Cheers
+
+Mike
