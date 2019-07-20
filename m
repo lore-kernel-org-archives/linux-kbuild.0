@@ -1,71 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay-out1.synopsys.com ([198.182.47.102]:42406 "EHLO
-        smtprelay-out1.synopsys.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726020AbfGTPiP (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:52417 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725940AbfGTQ1t (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Jul 2019 11:38:15 -0400
-From: Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>
-Subject: Re: [TRIVIAL PATCH] of: per-file dtc preprocessor flags
-Date: Sat, 20 Jul 2019 15:37:40 +0000
-Message-ID: <b2f24f32fead8bc9f282d2beb77d58ed3b98850c.camel@synopsys.com>
-References: <20190719192824.24639-1-Eugeniy.Paltsev@synopsys.com>
-         <CAK7LNARJjb3fgdo_dxPSv-vs5x573OHKf-UAUJGMc89Jfmk+QA@mail.gmail.com>
-In-Reply-To: <CAK7LNARJjb3fgdo_dxPSv-vs5x573OHKf-UAUJGMc89Jfmk+QA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FF127F5F7C65E642B19BDE983CF152BA@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Sat, 20 Jul 2019 12:27:49 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/3] kbuild: use $(basename ...) for cmd_asn1_compiler
+Date: Sun, 21 Jul 2019 01:27:38 +0900
+Message-Id: <20190720162740.4292-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Eugeniy.Paltsev@synopsys.com" <Eugeniy.Paltsev@synopsys.com>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>
-Cc: Alexey Brodkin <Alexey.Brodkin@synopsys.com>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "Vineet.Gupta1@synopsys.com" <Vineet.Gupta1@synopsys.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-SGkgTWFzYWhpcm8sDQoNCk9uIFNhdCwgMjAxOS0wNy0yMCBhdCAxMTo0MCArMDkwMCwgTWFzYWhp
-cm8gWWFtYWRhIHdyb3RlOg0KPiBPbiBTYXQsIEp1bCAyMCwgMjAxOSBhdCA0OjI4IEFNIEV1Z2Vu
-aXkgUGFsdHNldg0KPiA8RXVnZW5peS5QYWx0c2V2QHN5bm9wc3lzLmNvbT4gd3JvdGU6DQo+ID4g
-QXMgb2YgdG9kYXkgd2UgYXJlIGFibGUgdG8gcGFzcyBjdXN0b20gZmxhZ3MgdG8gZHRjIGNvbXBp
-bGVyIGJ1dCBub3QNCj4gPiB0byBkdGMgcHJlcHJvY2Vzc29yLg0KPiA+IFRoaXMgYWJpbGl0eSBp
-cyByZXF1aXJlZCBmb3IgaW5jbHVkaW5nIHNvbWUgYm9hcmQtc3BlY2lmaWMgaGVhZGVyIGZpbGVz
-Lg0KPiA+IEl0IGFsbG93cyB1cyB0byBwYXNzIGRlZmluZWQgY29uc3RhbnRzIHRvIGR0cyB3aXRo
-b3V0IHRoZWlyIGR1cGxpY2F0aW9uDQo+ID4gaW4gc2V2ZXJhbCBwbGFjZXMuDQo+IA0KPiBIb3cg
-dG8gdXNlIHRoaXMgb3B0aW9uIGluIGEgdXNlZnVsIHdheT8NCj4gDQo+IEkgc2VlIGEgYnVuY2gg
-b2YgZGVmaW5lZCBjb25zdGFudHMgdW5kZXIgaW5jbHVkZS9kdC1iaW5kaW5ncy8uDQo+IA0KPiBJ
-ZiB5b3UgYXJlIHRhbGtpbmcgYWJvdXQgY29kZSBkdXBsaWNhdGlvbiBhY3Jvc3MgYXJjaGl0ZWN0
-dXJlcywNCj4geW91IGNhbiBpbmNsdWRlIGFybSBkdHNpIGZyb20gYXJtNjQgZHRzLCBvciB2aWNl
-IHZlcnNhLg0KPiBUaGlzIHdhcyBtYWRlIHBvc3NpYmxlIGJ5IHRoZSBzeW1ib2xpYyBsaW5rcw0K
-PiBpbiBzY3JpcHRzL2R0Yy9pbmNsdWRlLXByZWZpeGVzLy4NCj4gDQo+IENvdWxkIHlvdSBwbGVh
-c2UgZWxhYm9yYXRlIHlvdXIgaXNzdWVzIGlmIHlvdSBjYW5ub3Qgc29sdmUgdGhlbQ0KPiBieSB0
-aGUgY3VycmVudCBzdHJhdGVneT8NCj4gDQoNCkhlcmUgaXMgdGhlIGV4YW1wbGU6DQoNCldlIGhh
-dmUgc2V2ZXJhbCBGUEdBLWJhc2VkIGJvYXJkcyAoaGFwc19ocywgaGFwc19oc19pZHUsLi4uKSB3
-aGljaCBhcmUgaW52b2x2ZWQNCmluIFNXIGFuZCBIVyBhdXRvbWF0ZWQgdmVyaWZpY2F0aW9uLiBG
-b3Igc29tZSB0ZXN0cyB3ZSByYW5kb21pemUgcGh5c2ljYWwgbWVtb3J5DQpsb2NhdGlvbiBzbyB3
-ZSBwYXRjaCAnQ09ORklHX0xJTlVYX1JBTV9CQVNFJyBrY29uZmlnIHZhcmlhYmxlIGFuZCAnbWVt
-b3J5JyBub2RlIGluDQpkZXZpY2UgdHJlZS4gV2Ugd2FudCB0byBrZWVwIG51bWJlciBvZiBwYXRj
-aGVzIGFzIGxlc3MgYXMgcG9zc2libGUgKHRvIGF2b2lkDQpjb25mbGljdHMgb24gdGhlaXIgYXBw
-bHlpbmcpIHNvIHdlIHdhbnQgdG8gYXZvaWQgZHVwbGljYXRpb24gYW5kIHBhc3MNCidDT05GSUdf
-TElOVVhfUkFNX0JBU0UnIGRpcmVjdGx5IHRvIGR0cyBieSBpbmNsdWRpbmcgaXQgZnJvbQ0KJ2lu
-Y2x1ZGUvZ2VuZXJhdGVkL2F1dG9jb25mLmgnOg0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLT44LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQptZW1vcnkgew0KCWRl
-dmljZV90eXBlID0gIm1lbW9yeSI7DQotCQkvKiBDT05GSUdfTElOVVhfUkFNX0JBU0UgbmVlZHMg
-dG8gbWF0Y2ggbG93IG1lbSBzdGFydCAqLw0KLSAgICAgICAgICAgICAgIHJlZyA9IDwweDgwMDAw
-MDAwIDB4MjAwMDAwMDA+OyAgLyogNTEyICovDQorICAgICAgICAgICAgICAgcmVnID0gPENPTkZJ
-R19MSU5VWF9SQU1fQkFTRSAweDIwMDAwMDAwPjsgICAgICAvKiA1MTIgKi8NCn07DQotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLT44LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQoNClRoaXMgcGF0Y2ggYWxsb3dzIHVzIHRvIGV4dGVuZCB0aGUgc2VhcmNoIHBhdGggb2Yg
-aW5jbHVkZSBmaWxlcyB0bw0KaW5jbHVkZSAnaW5jbHVkZS9nZW5lcmF0ZWQvYXV0b2NvbmYuaCcu
-DQoNCj4gDQo+ID4gU2lnbmVkLW9mZi1ieTogRXVnZW5peSBQYWx0c2V2IDxFdWdlbml5LlBhbHRz
-ZXZAc3lub3BzeXMuY29tPg0KPiA+IC0tLQ0KPiA+ICBzY3JpcHRzL01ha2VmaWxlLmxpYiB8IDIg
-KysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KPiA+IA0KPiA+IGRpZmYg
-LS1naXQgYS9zY3JpcHRzL01ha2VmaWxlLmxpYiBiL3NjcmlwdHMvTWFrZWZpbGUubGliDQo+ID4g
-aW5kZXggZjFmMzhjOGNkYzc0Li5mMjU5NWE2MDhkY2UgMTAwNjQ0DQo+ID4gLS0tIGEvc2NyaXB0
-cy9NYWtlZmlsZS5saWINCj4gPiArKysgYi9zY3JpcHRzL01ha2VmaWxlLmxpYg0KPiA+IEBAIC0x
-NjYsNiArMTY2LDggQEAgZHRjX2NwcF9mbGFncyAgPSAtV3AsLU1ELCQoZGVwZmlsZSkucHJlLnRt
-cCAtbm9zdGRpbmMgICAgICAgICAgICAgICAgICAgIFwNCj4gPiAgICAgICAgICAgICAgICAgICQo
-YWRkcHJlZml4IC1JLCQoRFRDX0lOQ0xVREUpKSAgICAgICAgICAgICAgICAgICAgICAgICAgXA0K
-PiA+ICAgICAgICAgICAgICAgICAgLXVuZGVmIC1EX19EVFNfXw0KPiA+IA0KPiA+ICtkdGNfY3Bw
-X2ZsYWdzICArPSAkKERUQ19DUFBfRkxBR1NfJChiYXNldGFyZ2V0KSkNCj4gPiArDQo+ID4gICMg
-VXNlZnVsIGZvciBkZXNjcmliaW5nIHRoZSBkZXBlbmRlbmN5IG9mIGNvbXBvc2l0ZSBvYmplY3Rz
-DQo+ID4gICMgVXNhZ2U6DQo+ID4gICMgICAkKGNhbGwgbXVsdGlfZGVwZW5kLCBtdWx0aV91c2Vk
-X3RhcmdldHMsIHN1ZmZpeF90b19yZW1vdmUsIHN1ZmZpeF90b19hZGQpDQo+ID4gLS0NCj4gPiAy
-LjIxLjANCj4gPiANCj4gDQo+IA0KLS0gDQogRXVnZW5peSBQYWx0c2V2DQo=
+$(basename ...) trims the last suffix. Using it is more intuitive in
+my opinion.
+
+This pattern rule makes %.asn1.c and %.asn1.h at the same time.
+Previously, the short log showed only either of them, depending on
+the target file in question.
+
+To clarify that two files are being generated by the single recipe,
+I changed the log as follows:
+
+Before:
+
+  ASN.1   crypto/asymmetric_keys/x509.asn1.c
+
+After:
+
+  ASN.1   crypto/asymmetric_keys/x509.asn1.[ch]
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/Makefile.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 644431140434..7f71dbd180cb 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -388,9 +388,9 @@ $(obj)/%.lds: $(src)/%.lds.S FORCE
+ 
+ # ASN.1 grammar
+ # ---------------------------------------------------------------------------
+-quiet_cmd_asn1_compiler = ASN.1   $@
++quiet_cmd_asn1_compiler = ASN.1   $(basename $@).[ch]
+       cmd_asn1_compiler = $(objtree)/scripts/asn1_compiler $< \
+-				$(subst .h,.c,$@) $(subst .c,.h,$@)
++				$(basename $@).c $(basename $@).h
+ 
+ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
+ 	$(call cmd,asn1_compiler)
+-- 
+2.17.1
