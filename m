@@ -1,28 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51094 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729039AbfGTSkZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Jul 2019 14:40:25 -0400
-Subject: Re: [GIT PULL] More Kbuild updates for v5.3-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNAQD7m+PCS6KtoVmZ_7kggLeWD6LE6NkfZ7TeaSO26sQGA@mail.gmail.com>
-References: <CAK7LNAQD7m+PCS6KtoVmZ_7kggLeWD6LE6NkfZ7TeaSO26sQGA@mail.gmail.com>
-Message-Id: <156364802496.20023.10550559026864840074.pr-tracker-bot@kernel.org>
-Date: Sat, 20 Jul 2019 18:40:24 +0000
+Received: from mail.ampi.com.tw ([211.22.54.232]:36654 "EHLO
+        HQIMSVA.ampi.com.tw" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725830AbfGUGrv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 21 Jul 2019 02:47:51 -0400
+From: "=?UTF-8?Q?PMB_=EF=BF=BD?=\=?UTF-8?Q?=EF=BF=BD?=}=?UTF-8?Q?=EF=BF=BDa?="
+        <re_shu@ampi.com.tw>
+Reply-To: yrc.co.ltd.jp@hotmail.com
+Subject: RE
+Date: Sun, 21 Jul 2019 14:30:36 +0800
+Message-Id: <20190721063031.M11027@ampi.com.tw>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, masahiroy@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-The pull request you sent on Sat, 20 Jul 2019 11:31:01 +0900:
+Dear:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-v5.3-2
+Yokohama Rubber Manufacturing Company requires a reputable individual and 
+company representation for our delinquent accounts customers in America 
+and North America. We are seeking for representation for our business 
+interest in America and North America.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/168c79971b4a7be7011e73bf488b740a8e1135c8
+We are currently having a high volume of delinquent customers in this 
+region. Haven't fully respected and completed our own side of the supply 
+obligations,  we need an Agent representative who can assist in handling 
+our delinquent account collections in your region.
 
-Thank you!
+Upon your prompt acceptance of the above proposal, we shall be requiring 
+your details  as  listed bellow.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Full Names:
+Full Contact Address:
+Occupation:
+Company Name: (If Any)
+Tel:
+Cell Phone Number:
+Fax Numbers:
+Age:
+
+Please accept our warmest appreciation of your decision in offering your 
+services as we look forward to your prompt response.
+
+
+Note: You shall be entitle to 10% of every collection from our clients.
+
+Regards,
+Head of Tire
+Takaharu Fushimi
+Yokohama Rubber Manufacturing Company
