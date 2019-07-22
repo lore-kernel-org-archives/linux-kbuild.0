@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36706 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730386AbfGVU1n (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43578 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730367AbfGVU1l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Jul 2019 16:27:43 -0400
+        Mon, 22 Jul 2019 16:27:41 -0400
 From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: [PATCH 4/5] x86_64, -march=native: REP STOSB support
-Date: Mon, 22 Jul 2019 23:27:22 +0300
-Message-Id: <20190722202723.13408-4-adobriyan@gmail.com>
+Subject: [PATCH 3/5] x86_64, -march=native: REP MOVSB support
+Date: Mon, 22 Jul 2019 23:27:21 +0300
+Message-Id: <20190722202723.13408-3-adobriyan@gmail.com>
 In-Reply-To: <20190722202723.13408-1-adobriyan@gmail.com>
 References: <20190722202723.13408-1-adobriyan@gmail.com>
 MIME-Version: 1.0
@@ -17,244 +17,232 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
 Cc: linux-kernel@vger.kernel.org, x86@kernel.org, adobriyan@gmail.com, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-Use REP STOSB everywhere if CPU advertises fast REP STOSB.
+Detect fast REP MOVSB support and use it for page copying.
 
-Gcc LOVES to unroll memset(), using -mmemset-strategy saves terabytes of
-.text.
+Inline copy_page(), this saves alternative entry and a function call
+overhead which should hopefully improve code generation.
 
 Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
 ---
- Makefile                           |  3 +++
- arch/x86/boot/compressed/head_64.S |  4 ++++
- arch/x86/crypto/sha1_ssse3_asm.S   |  7 ++++++-
- arch/x86/include/asm/page_64.h     | 13 +++++++++++++
- arch/x86/kernel/verify_cpu.S       |  2 +-
- arch/x86/lib/Makefile              |  2 ++
- arch/x86/lib/memset_64.S           | 15 +++++++++++++++
- arch/x86/lib/usercopy_64.c         | 16 +++++++++++++++-
- scripts/kconfig/cpuid.c            |  6 +++++-
- scripts/march-native.sh            |  1 +
- 10 files changed, 65 insertions(+), 4 deletions(-)
+ Makefile                             |  3 +++
+ arch/x86/include/asm/page_64.h       | 13 +++++++++++++
+ arch/x86/kernel/relocate_kernel_64.S | 15 +++++++++++++++
+ arch/x86/kernel/verify_cpu.S         | 12 ++++++++++++
+ arch/x86/lib/Makefile                |  5 ++++-
+ arch/x86/lib/memcpy_64.S             | 13 +++++++++++++
+ arch/x86/platform/pvh/head.S         |  4 ++++
+ scripts/kconfig/cpuid.c              |  9 +++++++++
+ scripts/march-native.sh              |  1 +
+ 9 files changed, 74 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index aa194c96d27c..31a6375d0e31 100644
+index 690f70afa74e..aa194c96d27c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -612,6 +612,9 @@ endif
- ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
- KBUILD_CFLAGS += -mmemcpy-strategy=rep_byte:-1:align,rep_byte:-1:noalign
+@@ -609,6 +609,9 @@ endif
+ ifdef CONFIG_MARCH_NATIVE
+ KBUILD_CFLAGS += -march=native
  endif
-+ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+KBUILD_CFLAGS += -mmemset-strategy=rep_byte:-1:align,rep_byte:-1:noalign
++ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++KBUILD_CFLAGS += -mmemcpy-strategy=rep_byte:-1:align,rep_byte:-1:noalign
 +endif
  
  ifeq ($(KBUILD_EXTMOD),)
  # Objects we will link into vmlinux / subdirs we need to visit
-diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
-index 6233ae35d0d9..a350d265e8af 100644
---- a/arch/x86/boot/compressed/head_64.S
-+++ b/arch/x86/boot/compressed/head_64.S
-@@ -520,8 +520,12 @@ relocated:
- 	leaq    _bss(%rip), %rdi
- 	leaq    _ebss(%rip), %rcx
- 	subq	%rdi, %rcx
-+#ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+	rep stosb
-+#else
- 	shrq	$3, %rcx
- 	rep	stosq
-+#endif
- 
- /*
-  * Do the extraction, and jump to the new kernel..
-diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
-index 99c5b8c4dc38..c98f8f2aead6 100644
---- a/arch/x86/crypto/sha1_ssse3_asm.S
-+++ b/arch/x86/crypto/sha1_ssse3_asm.S
-@@ -90,10 +90,15 @@
- 	SHA1_PIPELINED_MAIN_BODY
- 
- 	# cleanup workspace
--	mov	$8, %ecx
- 	mov	%rsp, %rdi
- 	xor	%eax, %eax
-+#ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+	mov	$64, %ecx
-+	rep stosb
-+#else
-+	mov	$8, %ecx
- 	rep stosq
-+#endif
- 
- 	mov	%rbp, %rsp		# deallocate workspace
- 	pop	%rbp
 diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
-index 051da768273d..7654d5544e0b 100644
+index 939b1cff4a7b..051da768273d 100644
 --- a/arch/x86/include/asm/page_64.h
 +++ b/arch/x86/include/asm/page_64.h
-@@ -40,6 +40,18 @@ extern unsigned long __phys_addr_symbol(unsigned long);
- #define pfn_valid(pfn)          ((pfn) < max_pfn)
- #endif
+@@ -54,7 +54,20 @@ static inline void clear_page(void *page)
+ 			   : "cc", "memory", "rax", "rcx");
+ }
  
-+#ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+static __always_inline void clear_page(void *page)
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++static __always_inline void copy_page(void *to, void *from)
 +{
 +	uint32_t len = PAGE_SIZE;
 +	asm volatile (
-+		"rep stosb"
-+		: "+D" (page), "+c" (len)
-+		: "a" (0)
++		"rep movsb"
++		: "+D" (to), "+S" (from), "+c" (len)
++		:
 +		: "memory"
 +	);
 +}
 +#else
- void clear_page_orig(void *page);
- void clear_page_rep(void *page);
- void clear_page_erms(void *page);
-@@ -53,6 +65,7 @@ static inline void clear_page(void *page)
- 			   "0" (page)
- 			   : "cc", "memory", "rax", "rcx");
- }
+ void copy_page(void *to, void *from);
 +#endif
  
- #ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
- static __always_inline void copy_page(void *to, void *from)
+ #endif	/* !__ASSEMBLY__ */
+ 
+diff --git a/arch/x86/kernel/relocate_kernel_64.S b/arch/x86/kernel/relocate_kernel_64.S
+index c51ccff5cd01..822f7a3d035a 100644
+--- a/arch/x86/kernel/relocate_kernel_64.S
++++ b/arch/x86/kernel/relocate_kernel_64.S
+@@ -266,18 +266,33 @@ swap_pages:
+ 	movq	%rsi, %rax
+ 
+ 	movq	%r10, %rdi
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++	mov	$4096, %ecx
++	rep movsb
++#else
+ 	movl	$512, %ecx
+ 	rep ; movsq
++#endif
+ 
+ 	movq	%rax, %rdi
+ 	movq	%rdx, %rsi
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++	mov	$4096, %ecx
++	rep movsb
++#else
+ 	movl	$512, %ecx
+ 	rep ; movsq
++#endif
+ 
+ 	movq	%rdx, %rdi
+ 	movq	%r10, %rsi
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++	mov	$4096, %ecx
++	rep movsb
++#else
+ 	movl	$512, %ecx
+ 	rep ; movsq
++#endif
+ 
+ 	lea	PAGE_SIZE(%rax), %rsi
+ 	jmp	0b
 diff --git a/arch/x86/kernel/verify_cpu.S b/arch/x86/kernel/verify_cpu.S
-index 57b41dafc592..d3f3370e7dab 100644
+index a9be8904faa3..57b41dafc592 100644
 --- a/arch/x86/kernel/verify_cpu.S
 +++ b/arch/x86/kernel/verify_cpu.S
-@@ -142,7 +142,7 @@ ENTRY(verify_cpu)
+@@ -142,6 +142,18 @@ ENTRY(verify_cpu)
  	jnc	.Lverify_cpu_no_longmode
  #endif
  
--#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
-+#if defined(CONFIG_MARCH_NATIVE_REP_MOVSB) || defined(CONFIG_MARCH_NATIVE_REP_STOSB)
- 	xor	%eax, %eax
- 	cpuid
- 	cmp	$7, %eax
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++	xor	%eax, %eax
++	cpuid
++	cmp	$7, %eax
++	jb	.Lverify_cpu_no_longmode
++	mov	$7, %eax
++	xor	%ecx, %ecx
++	cpuid
++	bt	$9, %ebx
++	jnc	.Lverify_cpu_no_longmode
++#endif
++
+ 	popf				# Restore caller passed flags
+ 	xorl %eax, %eax
+ 	ret
 diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-index fa24cc717fb1..ed71e88cb859 100644
+index 7dc0e71b0ef3..fa24cc717fb1 100644
 --- a/arch/x86/lib/Makefile
 +++ b/arch/x86/lib/Makefile
-@@ -59,7 +59,9 @@ endif
+@@ -59,7 +59,10 @@ endif
  else
          obj-y += iomap_copy_64.o
          lib-y += csum-partial_64.o csum-copy_64.o csum-wrappers_64.o
-+ifneq ($(CONFIG_MARCH_NATIVE_REP_STOSB),y)
-         lib-y += clear_page_64.o
+-        lib-y += clear_page_64.o copy_page_64.o
++        lib-y += clear_page_64.o
++ifneq ($(CONFIG_MARCH_NATIVE_REP_MOVSB),y)
++	lib-y += copy_page_64.o
 +endif
- ifneq ($(CONFIG_MARCH_NATIVE_REP_MOVSB),y)
- 	lib-y += copy_page_64.o
- endif
-diff --git a/arch/x86/lib/memset_64.S b/arch/x86/lib/memset_64.S
-index 9bc861c71e75..7786d1a65423 100644
---- a/arch/x86/lib/memset_64.S
-+++ b/arch/x86/lib/memset_64.S
-@@ -8,6 +8,20 @@
+         lib-y += memmove_64.o memset_64.o
+         lib-y += copy_user_64.o
+ 	lib-y += cmpxchg16b_emu.o
+diff --git a/arch/x86/lib/memcpy_64.S b/arch/x86/lib/memcpy_64.S
+index 92748660ba51..ab5b9662b348 100644
+--- a/arch/x86/lib/memcpy_64.S
++++ b/arch/x86/lib/memcpy_64.S
+@@ -17,6 +17,18 @@
  
- .weak memset
+ .weak memcpy
  
-+#ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+ENTRY(memset)
-+ENTRY(__memset)
-+	mov	%esi, %eax
-+	mov	%rdi, %rsi
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++ENTRY(__memcpy)
++ENTRY(memcpy)
++	mov	%rdi, %rax
 +	mov	%rdx, %rcx
-+	rep stosb
-+	mov	%rsi, %rax
++	rep movsb
 +	ret
-+ENDPROC(memset)
-+ENDPROC(__memset)
-+EXPORT_SYMBOL(memset)
-+EXPORT_SYMBOL(__memset)
++ENDPROC(memcpy)
++ENDPROC(__memcpy)
++EXPORT_SYMBOL(memcpy)
++EXPORT_SYMBOL(__memcpy)
 +#else
  /*
-  * ISO C memset - set a memory block to a byte value. This function uses fast
-  * string to get better performance than the original function. The code is
-@@ -140,3 +154,4 @@ ENTRY(memset_orig)
- 	jmp .Lafter_bad_alignment
- .Lfinal:
- ENDPROC(memset_orig)
+  * memcpy - Copy a memory block.
+  *
+@@ -183,6 +195,7 @@ ENTRY(memcpy_orig)
+ .Lend:
+ 	retq
+ ENDPROC(memcpy_orig)
 +#endif
-diff --git a/arch/x86/lib/usercopy_64.c b/arch/x86/lib/usercopy_64.c
-index fff28c6f73a2..a90779b12d89 100644
---- a/arch/x86/lib/usercopy_64.c
-+++ b/arch/x86/lib/usercopy_64.c
-@@ -16,11 +16,23 @@
  
- unsigned long __clear_user(void __user *addr, unsigned long size)
- {
--	long __d0;
- 	might_fault();
- 	/* no memory constraint because it doesn't change any memory gcc knows
- 	   about */
- 	stac();
-+
-+#ifdef CONFIG_MARCH_NATIVE_REP_STOSB
-+	asm volatile (
-+		"0:     rep stosb\n"
-+		"1:\n"
-+		_ASM_EXTABLE(0b,1b)
-+		: "+D" (addr), "+c" (size)
-+		: "a" (0)
-+		: "memory"
-+	);
+ #ifndef CONFIG_UML
+ 
+diff --git a/arch/x86/platform/pvh/head.S b/arch/x86/platform/pvh/head.S
+index 1f8825bbaffb..2737f3e8c021 100644
+--- a/arch/x86/platform/pvh/head.S
++++ b/arch/x86/platform/pvh/head.S
+@@ -64,9 +64,13 @@ ENTRY(pvh_start_xen)
+ 	mov $_pa(pvh_start_info), %edi
+ 	mov %ebx, %esi
+ 	mov _pa(pvh_start_info_sz), %ecx
++#ifdef CONFIG_MARCH_NATIVE_REP_MOVSB
++	rep movsb
 +#else
-+	{
-+	long __d0;
- 	asm volatile(
- 		"	testq  %[size8],%[size8]\n"
- 		"	jz     4f\n"
-@@ -42,6 +54,8 @@ unsigned long __clear_user(void __user *addr, unsigned long size)
- 		_ASM_EXTABLE_UA(1b, 2b)
- 		: [size8] "=&c"(size), [dst] "=&D" (__d0)
- 		: [size1] "r"(size & 7), "[size8]" (size / 8), "[dst]"(addr));
-+	}
+ 	shr $2,%ecx
+ 	rep
+ 	movsl
 +#endif
- 	clac();
- 	return size;
- }
+ 
+ 	mov $_pa(early_stack_end), %esp
+ 
 diff --git a/scripts/kconfig/cpuid.c b/scripts/kconfig/cpuid.c
-index 2d78fba1dcc7..58d09bda61e5 100644
+index 9efc0d9464d8..2d78fba1dcc7 100644
 --- a/scripts/kconfig/cpuid.c
 +++ b/scripts/kconfig/cpuid.c
-@@ -45,6 +45,7 @@ static inline void cpuid2(uint32_t eax0, uint32_t ecx0, uint32_t *eax, uint32_t
+@@ -44,6 +44,7 @@ static inline void cpuid2(uint32_t eax0, uint32_t ecx0, uint32_t *eax, uint32_t
+ }
  
  static bool popcnt	= false;
- static bool rep_movsb	= false;
-+static bool rep_stosb	= false;
++static bool rep_movsb	= false;
  
  static uint32_t eax0_max;
  
-@@ -64,8 +65,10 @@ static void intel(void)
- 		cpuid2(7, 0, &eax, &ecx, &edx, &ebx);
- //		printf("%08x %08x %08x %08x\n", eax, ecx, edx, ebx);
- 
--		if (ebx & (1 << 9))
-+		if (ebx & (1 << 9)) {
- 			rep_movsb = true;
-+			rep_stosb = true;
-+		}
+@@ -59,6 +60,13 @@ static void intel(void)
+ 			popcnt = true;
+ 		}
  	}
++	if (eax0_max >= 7) {
++		cpuid2(7, 0, &eax, &ecx, &edx, &ebx);
++//		printf("%08x %08x %08x %08x\n", eax, ecx, edx, ebx);
++
++		if (ebx & (1 << 9))
++			rep_movsb = true;
++	}
  }
  
-@@ -88,6 +91,7 @@ int main(int argc, char *argv[])
+ int main(int argc, char *argv[])
+@@ -79,6 +87,7 @@ int main(int argc, char *argv[])
+ 
  #define _(x)	if (streq(opt, #x)) return x ? EXIT_SUCCESS : EXIT_FAILURE
  	_(popcnt);
- 	_(rep_movsb);
-+	_(rep_stosb);
++	_(rep_movsb);
  #undef _
  
  	return EXIT_FAILURE;
 diff --git a/scripts/march-native.sh b/scripts/march-native.sh
-index 87f00cdb8e10..a41a15a64df4 100755
+index c3059f93ed2b..87f00cdb8e10 100755
 --- a/scripts/march-native.sh
 +++ b/scripts/march-native.sh
-@@ -43,6 +43,7 @@ echo "-march=native: $COLLECT_GCC_OPTIONS"
+@@ -42,6 +42,7 @@ COLLECT_GCC_OPTIONS=$(
+ echo "-march=native: $COLLECT_GCC_OPTIONS"
  
  "$CPUID" popcnt		&& option "CONFIG_MARCH_NATIVE_POPCNT"
- "$CPUID" rep_movsb	&& option "CONFIG_MARCH_NATIVE_REP_MOVSB"
-+"$CPUID" rep_stosb	&& option "CONFIG_MARCH_NATIVE_REP_STOSB"
++"$CPUID" rep_movsb	&& option "CONFIG_MARCH_NATIVE_REP_MOVSB"
  
  for i in $COLLECT_GCC_OPTIONS; do
  	case $i in
