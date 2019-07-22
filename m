@@ -1,51 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.ampi.com.tw ([211.22.54.232]:36654 "EHLO
-        HQIMSVA.ampi.com.tw" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725830AbfGUGrv (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:23415 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726314AbfGVBoQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 Jul 2019 02:47:51 -0400
-From: "=?UTF-8?Q?PMB_=EF=BF=BD?=\=?UTF-8?Q?=EF=BF=BD?=}=?UTF-8?Q?=EF=BF=BDa?="
-        <re_shu@ampi.com.tw>
-Reply-To: yrc.co.ltd.jp@hotmail.com
-Subject: RE
-Date: Sun, 21 Jul 2019 14:30:36 +0800
-Message-Id: <20190721063031.M11027@ampi.com.tw>
+        Sun, 21 Jul 2019 21:44:16 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20190719192824.24639-1-Eugeniy.Paltsev@synopsys.com>
+ <CAK7LNARJjb3fgdo_dxPSv-vs5x573OHKf-UAUJGMc89Jfmk+QA@mail.gmail.com> <b2f24f32fead8bc9f282d2beb77d58ed3b98850c.camel@synopsys.com>
+In-Reply-To: <b2f24f32fead8bc9f282d2beb77d58ed3b98850c.camel@synopsys.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 22 Jul 2019 10:43:18 +0900
+Message-ID: <CAK7LNAT2p8LjMJMAM9WMZymUXPVyDXDtXL094WHFhHamhShzEg@mail.gmail.com>
+Subject: Re: [TRIVIAL PATCH] of: per-file dtc preprocessor flags
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>
+Cc: Alexey Brodkin <Alexey.Brodkin@synopsys.com>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>, "michal.lkml@markovi.net" <michal.lkml@markovi.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "Vineet.Gupta1@synopsys.com" <Vineet.Gupta1@synopsys.com>
 
-Dear:
+On Sun, Jul 21, 2019 at 12:38 AM Eugeniy Paltsev
+<Eugeniy.Paltsev@synopsys.com> wrote:
+>
+> Hi Masahiro,
+>
+> On Sat, 2019-07-20 at 11:40 +0900, Masahiro Yamada wrote:
+> > On Sat, Jul 20, 2019 at 4:28 AM Eugeniy Paltsev
+> > <Eugeniy.Paltsev@synopsys.com> wrote:
+> > > As of today we are able to pass custom flags to dtc compiler but not
+> > > to dtc preprocessor.
+> > > This ability is required for including some board-specific header files.
+> > > It allows us to pass defined constants to dts without their duplication
+> > > in several places.
+> >
+> > How to use this option in a useful way?
+> >
+> > I see a bunch of defined constants under include/dt-bindings/.
+> >
+> > If you are talking about code duplication across architectures,
+> > you can include arm dtsi from arm64 dts, or vice versa.
+> > This was made possible by the symbolic links
+> > in scripts/dtc/include-prefixes/.
+> >
+> > Could you please elaborate your issues if you cannot solve them
+> > by the current strategy?
+> >
+>
+> Here is the example:
+>
+> We have several FPGA-based boards (haps_hs, haps_hs_idu,...) which are involved
+> in SW and HW automated verification. For some tests we randomize physical memory
+> location so we patch 'CONFIG_LINUX_RAM_BASE' kconfig variable and 'memory' node in
+> device tree. We want to keep number of patches as less as possible (to avoid
+> conflicts on their applying) so we want to avoid duplication and pass
+> 'CONFIG_LINUX_RAM_BASE' directly to dts by including it from
+> 'include/generated/autoconf.h':
+>
+> ----------------------------->8------------------------------------
+> memory {
+>         device_type = "memory";
+> -               /* CONFIG_LINUX_RAM_BASE needs to match low mem start */
+> -               reg = <0x80000000 0x20000000>;  /* 512 */
+> +               reg = <CONFIG_LINUX_RAM_BASE 0x20000000>;      /* 512 */
 
-Yokohama Rubber Manufacturing Company requires a reputable individual and 
-company representation for our delinquent accounts customers in America 
-and North America. We are seeking for representation for our business 
-interest in America and North America.
-
-We are currently having a high volume of delinquent customers in this 
-region. Haven't fully respected and completed our own side of the supply 
-obligations,  we need an Agent representative who can assist in handling 
-our delinquent account collections in your region.
-
-Upon your prompt acceptance of the above proposal, we shall be requiring 
-your details  as  listed bellow.
-
-Full Names:
-Full Contact Address:
-Occupation:
-Company Name: (If Any)
-Tel:
-Cell Phone Number:
-Fax Numbers:
-Age:
-
-Please accept our warmest appreciation of your decision in offering your 
-services as we look forward to your prompt response.
 
 
-Note: You shall be entitle to 10% of every collection from our clients.
+So, we need the kernel configuration to build DT?
 
-Regards,
-Head of Tire
-Takaharu Fushimi
-Yokohama Rubber Manufacturing Company
+I am scared with this idea.
+
+I believe DT files should be able to be compiled
+irrespective of the .config because they are
+re-used for other projects.
+
+devicetree-rebasing is a subset of the kernel tree
+that collects DT.
+
+If you upstream that patch, this will be broken, at least.
+
+git://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
