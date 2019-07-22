@@ -1,108 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:45663 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725766AbfGVEuJ (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36856 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728924AbfGVNDb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Jul 2019 00:50:09 -0400
+        Mon, 22 Jul 2019 09:03:31 -0400
+Received: by mail-wm1-f66.google.com with SMTP id g67so31145721wme.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Jul 2019 06:03:29 -0700 (PDT)
+Subject: Re: [PATCH RFC] modpost: Support I2C Aliases from OF tables
+References: <20190710193918.31135-1-kieran.bingham+renesas@ideasonboard.com>
+From: Javier Martinez Canillas <javierm@redhat.com>
+Message-ID: <0e1b6e0b-1c94-4b00-7fda-c2a303ee3816@redhat.com>
+Date: Mon, 22 Jul 2019 15:03:26 +0200
 MIME-Version: 1.0
-References: <20190719100859.11227-1-yamada.masahiro@socionext.com> <20190719124030.GA5858@ravnborg.org>
-In-Reply-To: <20190719124030.GA5858@ravnborg.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 22 Jul 2019 13:49:12 +0900
-Message-ID: <CAK7LNASc5Fjic-zMKO6EKGUb2zWbTr=BmWUASFW6+n90FfRhxg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: disable compile-test of kernel headers for now
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190710193918.31135-1-kieran.bingham+renesas@ideasonboard.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>, "Darrick J . Wong" <darrick.wong@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, Wolfram Sang <wsa@the-dreams.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, open list <linux-kernel@vger.kernel.org>
+Cc: linux-renesas-soc@vger.kernel.org, Lee Jones <lee.jones@linaro.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mark Brown <broonie@kernel.org>
 
-Hi Sam,
+Hello Kieran,
 
-
-
-On Fri, Jul 19, 2019 at 9:40 PM Sam Ravnborg <sam@ravnborg.org> wrote:
+On 7/10/19 9:39 PM, Kieran Bingham wrote:
+> I2C drivers match against an I2C ID table, an OF table, and an ACPI
+> table. It is now also possible to match against an OF table entry
+> without the vendor prefix to support backwards compatibility, and allow
+> simplification of the i2c probe functions.
+> 
+> As part of this matching, the probe function is being converted to
+> remove the need to specify the i2c_device_id table, but to support
+> module aliasing, we still require to have the MODULE_DEVICE_TABLE entry.
 >
-> Hi Masahiro.
->
-> On Fri, Jul 19, 2019 at 07:08:59PM +0900, Masahiro Yamada wrote:
-> > This compile-test started from the strong belief that (almost) all
-> > headers should be able to be compiled as a standalone unit, but this
-> > requirement seems to be just annoying.
-> >
-> > I believe compile-test of exported headers is good. On the other hand,
-> > in-kernel headers are not necessarily supposed to be always compilable.
-> > Actually, some headers are only included under a certain combination
-> > of CONFIG options, and that is definitely fine.
-> >
-> > This test is still causing false positive errors in randconfig.
-> > Moreover, newly added headers are compile-tested by default, sometimes
-> > they catch (not fatal) bugs, but often raise false positive errors to
-> > end up with making people upset.
-> >
-> > The merge window is closing shortly, so there is not much I can do.
-> > Disable it for now, and take a pause to re-think whether we should
-> > continue this or change the course.
->
-> The present status is that iomap.h fails - and Arnd promptly
-> made a fix for it:
-> https://lore.kernel.org/lkml/20190719113139.4005262-1-arnd@arndb.de/T/#u
->
-> You already fixed another issue.
-> So the fall-out so far is miniaml and already fixed (pending Arnd's
-> patch).
->
-> If headers are not self-contained then one needs to include them in a
-> specific order which can be quite hard to get right.
-> Especially if the requirements differ across different architectures.
-> So the whole concept seems sane.
->
-> I have thrown it after may array of cross builds:
-> => alpha arm arm64 sparc64 i386 x86 powerpc s390 riscv sh
->
-> For each arch I try:
-> => allmodconfig allyesconfig allnoconfig defconfig
->
-> No errros.
-> But that obviously only coveres a very minial set of configurations.
-> Arnd's result from his randconfig are also very promising.
->
-> I advise to keep it enabled and if there is a steady stream of
-> new errors after -rc1 and -rc2 then to disable the testing.
-> We will not get the coverage unless this is upstreamed.
-> And the testing is relevant.
->
->         Sam
 
+My opinion on this is that I2C drivers should register the tables of the
+firmware interfaces that support. That is, if a driver is only used in a
+platform that supports OF then it should only require an OF device table.
 
+But if the driver supports devices that can also be present in platforms
+that use ACPI, then should also require to have an ACPI device ID table.
 
-I am still wondering what to do about this.
+So there should be consistency about what table is used for both matching
+a device with a driver and reporting a modalias to user-space for module
+auto-loading. If a I2C device was instantiated by OF, then the OF table
+should be used for both reporting a modalias uevent and matching a driver.
 
-After some consideration, I thought it would be too
-annoying to put new headers to the test coverage
-unconditionally.
+Now, the i2c_of_match_device() function attempts to match by first calling
+of_match_device() and if fails fallbacks to i2c_of_match_device_sysfs().
 
-Kernel code are compiled only under some circumstances.
-It is not feasible to know correct CONFIG options
-that headers are compiled with.
+The latter attempts to match the I2C device by striping the vendor prefix
+of the compatible strings on the OF device ID table. That means that you
+could instantiate an I2C device ID through the sysfs interface and the OF
+table would be used to match the driver.
 
-So, I am thinking of making this testing service on demand.
-Headers need to be manually added to header-test-y
-by somebody who is interested in doing so.
+But i2c_device_uevent() would had reported an I2C modalias and not an OF
+modalias (since the registered device won't have an associated of_node) so
+there's inconsistency in that case since a table is used to match but no
+to report modaliases.
 
-Divide Makefiles into sub-directory basis as you suggested first.
-The area of test-coverage is up to each subsystem.
-If drm people are really passionate about this,
-they can make effort to make headers self-contained
-and add everything to include/drm/Kbuild.
-If nobody is interested, that's it.
+> Facilitate generating the I2C aliases directly from the of_device_id
+> tables, by stripping the vendor prefix prefix from the compatible string
+> and using that as an alias just as the i2c-core supports.
+> 
 
-Probably, many new headers will fall off the coverage,
-but this is a trade-off to avoiding false-positives.
+I see two ways to solve this issue. One is with $SUBJECT since we can argue
+that if a OF-only driver is able to match devices that were instantiated
+through the sysfs interface that only have a device name, then a modalias
+of the form i2c:<foo> is needed. Since the compatible strings without the
+vendor prefix is used to match, then I think that makes sense to also use
+them without the vendor prefix to populate I2C modaliases as $SUBJECT does.
 
+The other option is to remove i2c_of_match_device() and don't make OF match
+to fallback to i2c_of_match_device_sysfs(). This is what happens in the ACPI
+case, since i2c_device_match() just calls acpi_driver_match_device() directly
+and doesn't have a wrapper function that fallbacks to sysfs matching.
 
---
-Best Regards
+In this case an I2C device ID table would be required if the devices have to
+be instantiated through sysfs. That way the I2C table would be used both for
+auto-loading and also to match the device when it doesn't have an of_node.
 
+If the former is the correct way to solve this then the patch looks good to me.
 
-Masahiro Yamada
+Reviewed-by: Javier Martinez Canillas <javierm@redhat.com>
+
+Best regards,
+-- 
+Javier Martinez Canillas
+Software Engineer - Desktop Hardware Enablement
+Red Hat
