@@ -1,118 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52770 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725851AbfGXHbb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jul 2019 03:31:31 -0400
-Date: Wed, 24 Jul 2019 09:31:25 +0200
-From: Petr Mladek <pmladek@suse.com>
-Subject: Re: [PATCH v9 04/18] kunit: test: add kunit_stream a std::stream
- like logger
-Message-ID: <20190724073125.xyzfywctrcvg6fmh@pathway.suse.cz>
-References: <CAFd5g47ikJmA0uGoavAFsh+hQvDmgsOi26tyii0612R=rt7iiw@mail.gmail.com>
- <CAFd5g44_axVHNMBzxSURQB_-R+Rif7cZcg7PyZ_SS+5hcy5jZA@mail.gmail.com>
- <20190716175021.9CA412173C@mail.kernel.org>
- <CAFd5g453vXeSUCZenCk_CzJ-8a1ym9RaPo0NVF=FujF9ac-5Ag@mail.gmail.com>
- <20190718175024.C3EC421019@mail.kernel.org>
- <CAFd5g46a7C1+R6ZcE_SkqaYqgrH5Rx3M=X7orFyaMgFLDbeYYA@mail.gmail.com>
- <20190719000834.GA3228@google.com>
- <20190722200347.261D3218C9@mail.kernel.org>
- <CAFd5g45hdCxEavSxirr0un_uLzo5Z-J4gHRA06qjzcQrTzmjVg@mail.gmail.com>
- <20190722235411.06C1320840@mail.kernel.org>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:38239 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388413AbfGXXud (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Jul 2019 19:50:33 -0400
+Received: by mail-pg1-f194.google.com with SMTP id f5so13173787pgu.5
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jul 2019 16:50:33 -0700 (PDT)
+From: Stephen Boyd <swboyd@chromium.org>
+Subject: [PATCH] kbuild: Check for unknown options with cc-option and clang in Kbuild
+Date: Wed, 24 Jul 2019 16:50:30 -0700
+Message-Id: <20190724235030.131144-1-swboyd@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190722235411.06C1320840@mail.kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Brendan Higgins <brendanhiggins@google.com>, Jeff Dike <jdike@addtoit.com>, Kevin Hilman <khilman@baylibre.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Daniel Vetter <daniel@ffwll.ch>, Amir Goldstein <amir73il@gmail.com>, Frank Rowand <frowand.list@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, Kees Cook <keescook@google.com>, David Rientjes <rientjes@google.com>, kunit-dev@googlegroups.com, Kieran Bingham <kieran.bingham@ideasonboard.com>, Peter Zijlstra <peterz@infradead.org>, Randy Dunlap <rdunlap@infradead.org>, Joel Stanley <joel@jms.id.au>, Luis Chamberlain <mcgrof@kernel.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, wfg@linux.intel.com, Greg KH <gregkh@linuxfoundation.org>, Julia Lawall <julia.lawall@lip6.fr>, linux-nvdimm <linux-nvdimm@lists.01.org>, dri-devel <dri-devel@lists.freedesktop.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, Theodore Ts'o <tytso@mit.edu>, Richard Weinberger <richard@nod.at>, Dan Carpenter <dan.carpenter@oracle.com>, Knut Omang <knut.omang@oracle.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Timothy Bird <Tim.Bird@sony.com>, devicetree <devicetree@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, Peter Smith <peter.smith@linaro.org>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Douglas Anderson <dianders@chromium.org>
 
-On Mon 2019-07-22 16:54:10, Stephen Boyd wrote:
-> Quoting Brendan Higgins (2019-07-22 15:30:49)
-> > On Mon, Jul 22, 2019 at 1:03 PM Stephen Boyd <sboyd@kernel.org> wrote:
-> > >
-> > >
-> > > What's the calling context of the assertions and expectations? I still
-> > > don't like the fact that string stream needs to allocate buffers and
-> > > throw them into a list somewhere because the calling context matters
-> > > there.
-> > 
-> > The calling context is the same as before, which is anywhere.
-> 
-> Ok. That's concerning then.
-> 
-> > 
-> > > I'd prefer we just wrote directly to the console/log via printk
-> > > instead. That way things are simple because we use the existing
-> > > buffering path of printk, but maybe there's some benefit to the string
-> > > stream that I don't see? Right now it looks like it builds a string and
-> > > then dumps it to printk so I'm sort of lost what the benefit is over
-> > > just writing directly with printk.
-> > 
-> > It's just buffering it so the whole string gets printed uninterrupted.
-> > If we were to print out piecemeal to printk, couldn't we have another
-> > call to printk come in causing it to garble the KUnit message we are
-> > in the middle of printing?
-> 
-> Yes, printing piecemeal by calling printk many times could lead to
-> interleaving of messages if something else comes in such as an interrupt
-> printing something. Printk has some support to hold "records" but I'm
-> not sure how that would work here because KERN_CONT talks about only
-> being used early on in boot code. I haven't looked at printk in detail
-> though so maybe I'm all wrong and KERN_CONT just works?
+If the particular version of clang a user has doesn't enable
+-Werror=unknown-warning-option by default, even though it is the
+default[1], then make sure to pass the option to the Kconfig cc-option
+command so that testing options from Kconfig files works properly.
+Otherwise, depending on the default values setup in the clang toolchain
+we will silently assume options such as -Wmaybe-uninitialized are
+supported by clang, when they really aren't.
 
-KERN_CONT does not guarantee that the message will get printed
-together. The pieces get interleaved with messages printed in
-parallel.
+This issue only started happening for me once commit 589834b3a009
+("kbuild: Add -Werror=unknown-warning-option to CLANG_FLAGS") was
+applied on top of commit b303c6df80c9 ("kbuild: compute false-positive
+-Wmaybe-uninitialized cases in Kconfig"). This leads kbuild to try and
+test for the existence of the -Wmaybe-uninitialized flag with the
+cc-option command in scripts/Kconfig.include, and it doesn't see an
+error returned from the option test so it sets the config value to Y.
+Then the makefile tries to pass the unknown option on the command line
+and -Werror=unknown-warning-option catches the invalid option and breaks
+the build.
 
-Note that KERN_CONT was originally really meant to be used only during
-boot. It was later used more widely and ended in the best effort category.
+Note: this doesn't change the cc-option tests in Makefiles, because
+those use a different rule that includes KBUILD_CFLAGS by default, and
+the KBUILD_CFLAGS already has -Werror=unknown-warning-option. Thanks to
+Doug for pointing out the different rule.
 
-There were several attempts to make it more reliable. But it was
-always either too complicated or error prone or both.
+[1] https://clang.llvm.org/docs/DiagnosticsReference.html#wunknown-warning-option
+Cc: Peter Smith <peter.smith@linaro.org>
+Cc: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Stephen Boyd <swboyd@chromium.org>
 
-You need to use your own buffering if you rely want perfect output.
-The question is if it is really worth the complexity. Also note that
-any buffering reduces the chance that the messages will reach
-the console.
+Change-Id: I3bb69d45bb062d1306acbf19bc0adfb60f706442
+---
+ Makefile                | 5 +++++
+ scripts/Kconfig.include | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-BTW: There is a work in progress on a lockless printk ring buffer.
-It will make printk() more secure regarding deadlocks. But it might
-make transparent handling of continuous lines even more tricky.
-
-I guess that local buffering, before calling printk(), will be
-even more important then. Well, it might really force us to create
-an API for it.
-
-
-> Can printk be called once with whatever is in the struct? Otherwise if
-> this is about making printk into a structured log then maybe printk
-> isn't the proper solution anyway. Maybe a dev interface should be used
-> instead that can handle starting and stopping tests (via ioctl) in
-> addition to reading test results, records, etc. with read() and a
-> clearing of the records. Then the seqfile API works naturally. All of
-> this is a bit premature, but it looks like you're going down the path of
-> making something akin to ftrace that stores binary formatted
-> assertion/expectation records in a lockless ring buffer that then
-> formats those records when the user asks for them.
-
-IMHO, ftrace postpones the text formatting primary because it does not
-not want to slow down the traced code more than necessary. It is yet
-another layer and there should be some strong reason for it.
-
-> I can imagine someone wanting to write unit tests that check conditions
-> from a simulated hardirq context via irq works (a driver mock
-> framework?), so this doesn't seem far off.
-
-Note that stroring the messages into the printk log is basically safe in any
-context. It uses temporary per-CPU buffers for recursive messages and
-in NMI. The only problem is panic() when some CPU gets stuck with the
-lock taken. This will get solved by the lockless ringbuffer. Also
-the temporary buffers will not be necessary any longer.
-
-Much bigger problems are with consoles. There are many of them. It
-means a lot of code and more locks involved, including scheduler
-locks. Note that console lock is a semaphore.
-
-Best Regards,
-Petr
+diff --git a/Makefile b/Makefile
+index 9be5834073f8..28177674178a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -517,6 +517,8 @@ ifdef building_out_of_srctree
+ 	{ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+ endif
+ 
++KCONFIG_CC_OPTION_FLAGS := -Werror
++
+ ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+ ifneq ($(CROSS_COMPILE),)
+ CLANG_FLAGS	:= --target=$(notdir $(CROSS_COMPILE:%-=%))
+@@ -531,11 +533,14 @@ ifeq ($(shell $(AS) --version 2>&1 | head -n 1 | grep clang),)
+ CLANG_FLAGS	+= -no-integrated-as
+ endif
+ CLANG_FLAGS	+= -Werror=unknown-warning-option
++KCONFIG_CC_OPTION_FLAGS += -Werror=unknown-warning-option
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
+ endif
+ 
++export KCONFIG_CC_OPTION_FLAGS
++
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+index 8a5c4d645eb1..144e83e7cb81 100644
+--- a/scripts/Kconfig.include
++++ b/scripts/Kconfig.include
+@@ -25,7 +25,7 @@ failure = $(if-success,$(1),n,y)
+ 
+ # $(cc-option,<flag>)
+ # Return y if the compiler supports <flag>, n otherwise
+-cc-option = $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null)
++cc-option = $(success,$(CC) $(KCONFIG_CC_OPTION_FLAGS) $(1) -E -x c /dev/null -o /dev/null)
+ 
+ # $(ld-option,<flag>)
+ # Return y if the linker supports <flag>, n otherwise
+-- 
+Sent by a computer through tubes
