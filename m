@@ -1,56 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:27299 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403940AbfGYLSX (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:29566 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388500AbfGYPHk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jul 2019 07:18:23 -0400
-MIME-Version: 1.0
-References: <20190725080513.4071-1-yamada.masahiro@socionext.com> <20190725111256.GA30958@kroah.com>
-In-Reply-To: <20190725111256.GA30958@kroah.com>
+        Thu, 25 Jul 2019 11:07:40 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 25 Jul 2019 20:17:21 +0900
-Message-ID: <CAK7LNATcRXT8ptGpPhc4kods65AQsRbz2wmnq5=df35S2aWn7w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: detect missing "WITH Linux-syscall-note" for uapi headers
-Content-Type: text/plain; charset="UTF-8"
+Subject: [FWIW PATCH] kbuild: create modules.order in sub-directories visited by subdir-y,m
+Date: Fri, 26 Jul 2019 00:06:00 +0900
+Message-Id: <20190725150600.27007-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 8:13 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Thu, Jul 25, 2019 at 05:05:13PM +0900, Masahiro Yamada wrote:
-> > UAPI headers licensed under GPL are supposed to have exception
-> > "WITH Linux-syscall-note" so that they can be included into non-GPL
-> > user space application code.
-> >
-> > Unfortunately, people often miss to add it. Break 'make headers'
-> > when any of exported headers lacks the exception note so that the
-> > 0-day bot can easily catch it.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > ---
-> >
-> > This patch depends on the following:
-> >
-> > https://lore.kernel.org/patchwork/patch/1105289/
-> >
-> > I will turn on the error after all headers are fixed.
->
-> I've taken the dependancy here in the spdx tree and will send it to
-> Linus for 5.3-rc2.
+Jan Kiszka reported a module build regression; since commit ff9b45c55b26
+("kbuild: modpost: read modules.order instead of $(MODVERDIR)/*.mod"),
+a module is no longer built in the following pattern:
 
-Thanks!
+  [Makefile]
+  subdir-y := some-module
 
->  I can also take this now through that tree, or you
-> can add it to yours afterward, which ever is easier for you.
+  [some-module/Makefile]
+  obj-m := some-module.o
 
-I will create a branch on top 5.3-rc2
-and queue this patch by myself.
+You can make it work by writing like this:
 
-Thank you.
+  [Makefile]
+  obj-m := some-module/
+
+  [some-module/Makefile]
+  obj-m := some-module.o
+
+None of upstream Makefiles is written like the former. In fact, the
+former is a bug in upstream since modules.order is not correctly
+generated.
+
+For external modules, it was at least known to work, and being used
+by some people.
+
+This commit gets it back working, but I do not to want to encourage it
+for the upstream code, so I surrounded it by ifeq ($(KBUILD_EXTMOD),).
+
+Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+I just wrote a fix-up patch, but I am still wondering if it is correct
+to build modules under subdir-y.
 
 
+ scripts/Makefile.lib | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 5241d0751eb0..9568888c97ca 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -25,6 +25,11 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ # and -m subdirs.  Just put -y's first.
+ modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
+ 
++ifeq ($(KBUILD_EXTMOD),)
++# External modules may generate modules under subdir-y or subdir-m.
++modorder += $(addsuffix /modules.order, $(subdir-y) $(subdir-m))
++endif
++
+ # Handle objects in subdirs
+ # ---------------------------------------------------------------------------
+ # o if we encounter foo/ in $(obj-y), replace it by foo/built-in.a
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
