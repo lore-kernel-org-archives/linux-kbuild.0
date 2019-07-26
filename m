@@ -1,43 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:37064 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725819AbfGYVes (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:25839 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726099AbfGZCRo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jul 2019 17:34:48 -0400
-Date: Thu, 25 Jul 2019 23:34:44 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: .h.s files spam
-Message-ID: <20190725213444.GA19265@ravnborg.org>
-References: <20190725195633.GA15202@avx2>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190725195633.GA15202@avx2>
+        Thu, 25 Jul 2019 22:17:44 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: remove unused single-used-m
+Date: Fri, 26 Jul 2019 11:17:38 +0900
+Message-Id: <20190726021738.4935-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Hi Alexey
+This is unused since commit 9f69a496f100 ("kbuild: split out *.mod out
+of {single,multi}-used-m rules").
 
-On Thu, Jul 25, 2019 at 10:56:33PM +0300, Alexey Dobriyan wrote:
-> What are these files for?
-> 
-> 	$ cat ../obj/include/linux/kernel.h.s
->         .file   "null"
->         .text
->         .ident  "GCC: (Gentoo 9.1.0-r1 p1.1) 9.1.0"
->         .section        .note.GNU-stack,"",@progbits
-> 
-> 	$ find ../obj/ -type f -name '*.s' | wc -l
-> 	4047
-> 
-> It is "allyesconfig" in case someone is going to reproduce it.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-The files are created by the new headers-test-y stuff.
-We now verify that a big part of the header files in include/*
-are self-contained. (They include all their dependencies).
-The header-test-y support is also enabled for the rest of the kernel,
-but used only in very few places outside include/* as of today.
+ scripts/Makefile.lib | 2 --
+ 1 file changed, 2 deletions(-)
 
-	Sam
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 5241d0751eb0..41c50f9461e5 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -45,7 +45,6 @@ subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+ multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+ multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
+ multi-used   := $(multi-used-y) $(multi-used-m)
+-single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+ 
+ # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+ # tell kbuild to descend
+@@ -91,7 +90,6 @@ lib-y		:= $(addprefix $(obj)/,$(lib-y))
+ subdir-obj-y	:= $(addprefix $(obj)/,$(subdir-obj-y))
+ real-obj-y	:= $(addprefix $(obj)/,$(real-obj-y))
+ real-obj-m	:= $(addprefix $(obj)/,$(real-obj-m))
+-single-used-m	:= $(addprefix $(obj)/,$(single-used-m))
+ multi-used-m	:= $(addprefix $(obj)/,$(multi-used-m))
+ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+ 
+-- 
+2.17.1
