@@ -1,72 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:34809 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725872AbfG1CAu (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:65068 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725875AbfG1EMw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jul 2019 22:00:50 -0400
+        Sun, 28 Jul 2019 00:12:52 -0400
 MIME-Version: 1.0
-References: <20190714152817.24693-1-efremov@linux.com> <CAK7LNATg1m_pzsZqGDUOUZHzv6jn2K0My8vFWbOVdUSTMQ05Ug@mail.gmail.com>
- <5232680b-5303-3d63-db51-de65eea76e3a@linux.com>
-In-Reply-To: <5232680b-5303-3d63-db51-de65eea76e3a@linux.com>
+References: <alpine.DEB.2.21.1907262245320.1791@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1907262245320.1791@nanos.tec.linutronix.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 28 Jul 2019 11:00:06 +0900
-Message-ID: <CAK7LNAR5AM_fU36_9vc9wVJhxbzD5Xc72-mqBw6M3k_-9KZjjQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] modpost: check for static EXPORT_SYMBOL* functions
+Date: Sun, 28 Jul 2019 13:12:02 +0900
+Message-ID: <CAK7LNAS1=+OccAd3asj9P9JMWnhimRWR+dPQREOyK3y=Dx2odg@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: Handle PREEMPT_RT for version string and magic
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denis Efremov <efremov@linux.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Sebastian Sewior <bigeasy@linutronix.de>
 
-Hi.
+Hi Thomas,
 
-On Sun, Jul 28, 2019 at 4:14 AM Denis Efremov <efremov@linux.com> wrote:
+On Sat, Jul 27, 2019 at 5:49 AM Thomas Gleixner <tglx@linutronix.de> wrote:
 >
-> Hi.
+> Update the build scripts and the version magic to reflect when
+> CONFIG_PREEMPT_RT is enabled in the same way as CONFIG_PREEMPT is treated.
 >
-> > Could you drop the solved ones from the list?
+> The resulting version strings:
 >
-> Yes, of course. Do you want me to remove all symbols fixed with patches
-> or only those are in-tree now?
+>   Linux m 5.3.0-rc1+ #100 SMP Fri Jul 26 ...
+>   Linux m 5.3.0-rc1+ #101 SMP PREEMPT Fri Jul 26 ...
+>   Linux m 5.3.0-rc1+ #102 SMP PREEMPT_RT Fri Jul 26 ...
 >
-> Should it be like this:
->   1. "torture_onoff_cleanup" [kernel/torture]
->      "torture_shuffle_cleanup" [kernel/torture]
->      Patch: https://lkml.org/lkml/2019/7/4/411 (accepted)
->   2. "LZ4HC_setExternalDict" [lib/lz4/lz4hc_compress]
->      Patch: https://lkml.org/lkml/2019/7/8/842
->   3. "drm_client_close" [drivers/gpu/drm/drm]
->      Patch: https://lkml.org/lkml/2019/7/3/758 (accepted)
->   4. "ahci_em_messages" [drivers/ata/libahci]
->      Patch: https://lkml.org/lkml/2019/7/10/550 (reviewed)
->   5. "ftrace_set_clr_event" [vmlinux]
->      Patch: https://lkml.org/lkml/2019/7/4/609 (reviewed)
->   6. "rmi_2d_sensor_set_input_params" [drivers/input/rmi4/rmi_core]
->      Patch: https://lkml.org/lkml/2019/7/8/999 (accepted)
->   10. "empty_zero_page" [vmlinux]
->   11. "phys_base" [vmlinux]
->   12. "hypercall_page" [vmlinux]
+> The module vermagic:
 >
-> Or like this:
->   1. "empty_zero_page" [vmlinux]
->   2. "phys_base" [vmlinux]
->   3. "hypercall_page" [vmlinux]
+>   5.3.0-rc1+ SMP mod_unload modversions
+>   5.3.0-rc1+ SMP preempt mod_unload modversions
+>   5.3.0-rc1+ SMP preempt_rt mod_unload modversions
 >
-> Well, I could remove this list at all. It seems like the following list
-> with existing commits is enough to show the problem of static exported
-> functions.
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: linux-kbuild@vger.kernel.org
 
-Yeah, I agree.
-Showing some existing commits is enough.
+Since CONFIG_PREEMPTION was introduced after -rc1,
+I think this should be queued on top of -rc2.
+
+Just a nit below.
 
 
-
-> I will resend the patch shortly after.
+> ---
+>  include/linux/vermagic.h |   10 +++++++---
+>  init/Makefile            |    5 +++--
+>  scripts/Makefile.modpost |    2 +-
+>  scripts/mkcompile_h      |    4 +++-
+>  4 files changed, 14 insertions(+), 7 deletions(-)
 >
-> Regards,
-> Denis
+> --- a/include/linux/vermagic.h
+> +++ b/include/linux/vermagic.h
+> @@ -7,10 +7,14 @@
+>  #else
+>  #define MODULE_VERMAGIC_SMP ""
+>  #endif
+> -#ifdef CONFIG_PREEMPT
+> -#define MODULE_VERMAGIC_PREEMPT "preempt "
+> +#ifdef CONFIG_PREEMPTION
+> +# ifdef CONFIG_PREEMPT
+> +#  define MODULE_VERMAGIC_PREEMPT "preempt "
+> +# else
+> +#  define MODULE_VERMAGIC_PREEMPT "preempt_rt "
+> +# endif
+>  #else
+> -#define MODULE_VERMAGIC_PREEMPT ""
+> +# define MODULE_VERMAGIC_PREEMPT ""
+
+Maybe, is the following more readable?
+
+#if defined(CONFIG_PREEMPT_RT)
+#define MODULE_VERMAGIC_PREEMPT "preempt_rt "
+#elif defined(CONFIG_PREEMPT)
+#define MODULE_VERMAGIC_PREEMPT "preempt "
+#else
+#define MODULE_VERMAGIC_PREEMPT ""
+#endif
 
 
+Thanks.
 
 -- 
 Best Regards
