@@ -1,131 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50612 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387596AbfG2OTW (ORCPT
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33942 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726717AbfG2OXl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 10:19:22 -0400
-From: Denis Efremov <efremov@linux.com>
-Subject: [PATCH v3] modpost: check for static EXPORT_SYMBOL* functions
-Date: Mon, 29 Jul 2019 17:18:01 +0300
-Message-Id: <20190729141801.31333-1-efremov@linux.com>
-In-Reply-To: <20190714152817.24693-1-efremov@linux.com>
-References: <20190714152817.24693-1-efremov@linux.com>
+        Mon, 29 Jul 2019 10:23:41 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n9so22129769pgc.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jul 2019 07:23:41 -0700 (PDT)
+Message-ID: <5d3f016c.1c69fb81.b4775.c7d0@mx.google.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAK7LNAQZJgkx-yEwgHcTapKFayExgUCb3=zLBpJmVMJMeEA_WA@mail.gmail.com>
+References: <20190725154730.80169-1-swboyd@chromium.org> <CAK7LNAQZJgkx-yEwgHcTapKFayExgUCb3=zLBpJmVMJMeEA_WA@mail.gmail.com>
+From: Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v2] kbuild: Check for unknown options with cc-option usage in Kconfig and clang
+Date: Mon, 29 Jul 2019 07:23:39 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Denis Efremov <efremov@linux.com>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Peter Smith <peter.smith@linaro.org>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Douglas Anderson <dianders@chromium.org>
 
-This patch adds a check to warn about static EXPORT_SYMBOL* functions
-during the modpost. In most of the cases, a static symbol marked for
-exporting is an odd combination that should be fixed either by deleting
-the exporting mark or by removing the static attribute and adding the
-appropriate declaration to headers.
+Quoting Masahiro Yamada (2019-07-29 03:02:40)
+>=20
+> Thanks for catching this.
+>=20
+> I wonder if we could fix this issue
+> by one-liner, like this:
+>=20
+>=20
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> index 8a5c4d645eb1..4bbf4fc163a2 100644
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -25,7 +25,7 @@ failure =3D $(if-success,$(1),n,y)
+>=20
+>  # $(cc-option,<flag>)
+>  # Return y if the compiler supports <flag>, n otherwise
+> -cc-option =3D $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/nul=
+l)
+> +cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c
+> /dev/null -o /dev/null)
+>=20
+>  # $(ld-option,<flag>)
+>  # Return y if the linker supports <flag>, n otherwise
+>=20
+>=20
+>=20
+> This propagates not only -Werror=3Dunknown-warning-option
+> but also other clang flags to Kconfig.
+>=20
+>=20
+> Currently, we do not pass the target triplet to Kconfig.
+> This means, cc-option in Kconfig evaluates the given flags
+> against host-arch instead of target-arch.
+> The compiler flags are mostly independent of the architecture,
+> and this is not a big deal, I think.
+> But, maybe, would it make more sense to pass the other
+> basic clang flags as well?
+>=20
 
-This check could help to detect the following problems:
-1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
-2. 54638c6eaf44 ("net: phy: make exported variables non-static")
-3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
-4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
-5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
-6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
-7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
-8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
-9. ...
-
-Build time impact, allmodconfig, Dell XPS 15 9570 (measurements 3x):
-$ make mrproper; make allmodconfig; time make -j12; \
-  git checkout HEAD~1; \
-  make mrproper; make allmodconfig; time make -j12
-1.
-   (with patch) 17635,94s user 1895,54s system 1085% cpu 29:59,22 total
-   (w/o  patch) 17275,42s user 1803,87s system 1112% cpu 28:35,66 total
-2.
-   (with patch) 17369,51s user 1763,28s system 1111% cpu 28:41,47 total
-   (w/o  patch) 16880,50s user 1670,93s system 1113% cpu 27:46,56 total
-3.
-   (with patch) 17937,88s user 1842,53s system 1109% cpu 29:42,26 total
-   (w/o  patch) 17267,55s user 1725,09s system 1111% cpu 28:28,17 total
-
-The check adds less than a minute to a usual build.
-
-Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- scripts/mod/modpost.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index f277e116e0eb..332898d34e47 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -169,6 +169,7 @@ struct symbol {
- 	unsigned int kernel:1;     /* 1 if symbol is from kernel
- 				    *  (only for external modules) **/
- 	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers, or crc */
-+	unsigned int is_static:1;  /* 1 if symbol is not global */
- 	enum export  export;       /* Type of export */
- 	char name[0];
- };
-@@ -201,6 +202,7 @@ static struct symbol *alloc_symbol(const char *name, unsigned int weak,
- 	strcpy(s->name, name);
- 	s->weak = weak;
- 	s->next = next;
-+	s->is_static = 1;
- 	return s;
- }
- 
-@@ -1980,6 +1982,22 @@ static void read_symbols(const char *modname)
- 		handle_modversions(mod, &info, sym, symname);
- 		handle_moddevtable(mod, &info, sym, symname);
- 	}
-+
-+	// check for static EXPORT_SYMBOL_* functions && global vars
-+	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
-+		unsigned char bind = ELF_ST_BIND(sym->st_info);
-+		unsigned char type = ELF_ST_TYPE(sym->st_info);
-+
-+		if (type == STT_OBJECT || type == STT_FUNC) {
-+			struct symbol *s =
-+				find_symbol(remove_dot(info.strtab +
-+						       sym->st_name));
-+
-+			if (s && (bind == STB_GLOBAL || bind == STB_WEAK))
-+				s->is_static = 0;
-+		}
-+	}
-+
- 	if (!is_vmlinux(modname) || vmlinux_section_warnings)
- 		check_sec_ref(mod, modname, &info);
- 
-@@ -2425,6 +2443,7 @@ int main(int argc, char **argv)
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
- 	int err;
-+	int n;
- 	struct ext_sym_list *extsym_iter;
- 	struct ext_sym_list *extsym_start = NULL;
- 
-@@ -2520,6 +2539,19 @@ int main(int argc, char **argv)
- 	if (sec_mismatch_count && sec_mismatch_fatal)
- 		fatal("modpost: Section mismatches detected.\n"
- 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
-+	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
-+		struct symbol *s = symbolhash[n];
-+
-+		while (s) {
-+			if (s->is_static)
-+				warn("\"%s\" [%s] is a static %s\n",
-+				     s->name, s->module->name,
-+				     export_str(s->export));
-+
-+			s = s->next;
-+		}
-+	}
-+
- 	free(buf.p);
- 
- 	return err;
--- 
-2.21.0
+Yes that also works and I had that earlier. I wanted to mirror what was
+done in scripts/Kbuild.include where there's a CC_OPTION_CFLAGS
+variable. I'm happy either way, so it's up to you.
