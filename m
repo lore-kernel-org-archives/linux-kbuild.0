@@ -1,65 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:39495 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726940AbfG2RRt (ORCPT
+Received: from esgaroth.petrovitsch.at ([78.47.184.11]:2450 "EHLO
+        esgaroth.tuxoid.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbfG2RSF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 13:17:49 -0400
-Received: by mail-pl1-f195.google.com with SMTP id b7so27806050pls.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jul 2019 10:17:49 -0700 (PDT)
+        Mon, 29 Jul 2019 13:18:05 -0400
+Subject: Re: kbuild: Fail if gold linker is detected
+References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
+ <20190716144034.GA36330@gmail.com>
+ <alpine.DEB.2.21.1907161757490.1767@nanos.tec.linutronix.de>
+From: Bernd Petrovitsch <bernd@petrovitsch.priv.at>
+Message-ID: <77140de3-84de-dc5a-c82d-60432145fec2@petrovitsch.priv.at>
+Date: Mon, 29 Jul 2019 19:06:21 +0200
 MIME-Version: 1.0
-References: <20190727030110.17208-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190727030110.17208-1-yamada.masahiro@socionext.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 29 Jul 2019 10:17:36 -0700
-Message-ID: <CAKwvOdmUUuFvdqD3X4SO7xPOpUevvc0iDpyUGC98KQH_AvvD=A@mail.gmail.com>
-Subject: Re: [PATCH] gen_compile_commands: lower the entry count threshold
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <alpine.DEB.2.21.1907161757490.1767@nanos.tec.linutronix.de>
+Content-Type: multipart/mixed;
+ boundary="------------46ACFD3E755ACF77140A0DD2"
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tom Roeder <tmroeder@google.com>, LKML <linux-kernel@vger.kernel.org>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, x86@kernel.org, "H.J. Lu" <hjl.tools@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Jul 26, 2019 at 8:01 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Running gen_compile_commands.py after building with allnoconfig
-> gave this:
->
-> $ ./scripts/gen_compile_commands.py
-> WARNING: Found 449 entries. Have you compiled the kernel?
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+This is a multi-part message in MIME format.
+--------------46ACFD3E755ACF77140A0DD2
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This potentially may need to go lower for other arch's allnoconfig.
-I'm guessing you tested x86_64?
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+Hi all!
 
-> ---
->
->  scripts/gen_compile_commands.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
-> index 7915823b92a5..c458696ef3a7 100755
-> --- a/scripts/gen_compile_commands.py
-> +++ b/scripts/gen_compile_commands.py
-> @@ -21,9 +21,9 @@ _LINE_PATTERN = r'^cmd_[^ ]*\.o := (.* )([^ ]*\.c)$'
->  _VALID_LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
->
->  # A kernel build generally has over 2000 entries in its compile_commands.json
-> -# database. If this code finds 500 or fewer, then warn the user that they might
-> +# database. If this code finds 300 or fewer, then warn the user that they might
->  # not have all the .cmd files, and they might need to compile the kernel.
-> -_LOW_COUNT_THRESHOLD = 500
-> +_LOW_COUNT_THRESHOLD = 300
->
->
->  def parse_arguments():
-> --
-> 2.17.1
->
+On 16/07/2019 17:59, Thomas Gleixner wrote:
+[...]
+> No. It fails randomly, but also predictable. Enable X32 support on 64bi=
+t
+> and it fails the VDSO build. That's been the case for years.
 
+FWIW "GNU gold (GNU Binutils for Ubuntu 2.30) 1.15" segfaults for
+userspace x32 binaries now and then (in unpredictable ways) too.
 
--- 
-Thanks,
-~Nick Desaulniers
+MfG,
+	Bernd--
+"I dislike type abstraction if it has no real reason. And saving
+on typing is not a good reason - if your typing speed is the main
+issue when you're coding, you're doing something seriously wrong."
+    - Linus Torvalds
+
+--------------46ACFD3E755ACF77140A0DD2
+Content-Type: application/pgp-keys;
+ name="pEpkey.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="pEpkey.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D=3D
+=3DGX6K
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------46ACFD3E755ACF77140A0DD2--
