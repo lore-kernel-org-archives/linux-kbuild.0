@@ -1,55 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:34985 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726713AbfG2Uap (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 16:30:45 -0400
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH v2] Makefile: rules for printing kernel architecture and localversion
-Date: Mon, 29 Jul 2019 22:30:35 +0200
-Message-Id: <1564432235-31100-1-git-send-email-info@metux.net>
+Received: from ozlabs.org ([203.11.71.1]:57563 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727215AbfG2W0Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 29 Jul 2019 18:26:25 -0400
+Date: Tue, 30 Jul 2019 08:26:18 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH v3] modpost: check for static EXPORT_SYMBOL* functions
+Message-ID: <20190730082618.5bb5edf3@canb.auug.org.au>
+In-Reply-To: <20190729141801.31333-1-efremov@linux.com>
+References: <20190714152817.24693-1-efremov@linux.com>
+        <20190729141801.31333-1-efremov@linux.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/W1FvA._R0XXtjhBVU9lsVnR";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+To: Denis Efremov <efremov@linux.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-trivial rule to print out the kernel arch and localversion, so
-external tools, like distro packagers, can easily get it.
+--Sig_/W1FvA._R0XXtjhBVU9lsVnR
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-v2: add help text
+Hi Denis,
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- Makefile | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+On Mon, 29 Jul 2019 17:18:01 +0300 Denis Efremov <efremov@linux.com> wrote:
+>
+> This patch adds a check to warn about static EXPORT_SYMBOL* functions
+> during the modpost. In most of the cases, a static symbol marked for
+> exporting is an odd combination that should be fixed either by deleting
+> the exporting mark or by removing the static attribute and adding the
+> appropriate declaration to headers.
 
-diff --git a/Makefile b/Makefile
-index fa0fbe7..32c8f2a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1517,6 +1517,10 @@ help:
- 	@echo  'Kernel packaging:'
- 	@$(MAKE) $(build)=$(package-dir) help
- 	@echo  ''
-+	@echo  'Build configuration retrieval:'
-+	@echo  '  kernellocalversion  - Print kernel local version (CONFIG_LOCALVERSION)'
-+	@echo  '  kernelarch          - Print kernel architecture'
-+	@echo  ''
- 	@echo  'Documentation targets:'
- 	@$(MAKE) -f $(srctree)/Documentation/Makefile dochelp
- 	@echo  ''
-@@ -1728,6 +1732,12 @@ kernelrelease:
- kernelversion:
- 	@echo $(KERNELVERSION)
- 
-+kernellocalversion:
-+	@$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) | sed -e 's~^\-~~'
-+
-+kernelarch:
-+	@echo $(ARCH)
-+
- image_name:
- 	@echo $(KBUILD_IMAGE)
- 
--- 
-1.9.1
+OK, this is now in linux-next and I am getting what look like false
+positives :-(
+
+My powerpc builds produce these:
+
+WARNING: "ahci_em_messages" [vmlinux] is the static EXPORT_SYMBOL_GPL
+WARNING: "ftrace_set_clr_event" [vmlinux] is the static EXPORT_SYMBOL_GPL
+WARNING: "empty_zero_page" [vmlinux] is the static EXPORT_SYMBOL
+WARNING: "jiffies" [vmlinux] is the static EXPORT_SYMBOL
+
+empty_zero_page (at least) is not static.  It is defined in assembler ...
+
+jiffies is defined in arch/powerpc/kernel/vmlinux.lds.S as an alias for
+(part of) jiffies_64 which is not static (defined in kernel/time/timer.c).
+
+The other 2 were OK.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/W1FvA._R0XXtjhBVU9lsVnR
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl0/cosACgkQAVBC80lX
+0GzaKwf/eMecLr6q+Z8Lqr2neg+RXHvOu+Ph+Q3hgYr0RbcLyGZYcBtE33vMZgGR
+Ue3bKhTvx+0YJBg7z8uO3tP+n5BVvw/wo9Kn4s/ckWZA8eK2c3FJ2SMuT4dKir9X
+bdHg+T3OVJeHT/NkHGO6TrRb/7lL/xcEwifhbG6LNc0Fdc7UQ2LIZZFeVURIWSkv
+P/Q+OhS4pT1r8T7jfhVM2REMDKcl3j0/gmNjyXe4mTjaoh2rGSmfuKKnWCV0YlmT
+vwBYB7zI71zH7ndRoXYoBCRWiIi0Nphgjk0idKBI/5A3UU9YZOIr5/VKfWBM7zec
+SgcnFWXp+ixj6ZO2DJoWOaCq2E4b1g==
+=JP8H
+-----END PGP SIGNATURE-----
+
+--Sig_/W1FvA._R0XXtjhBVU9lsVnR--
