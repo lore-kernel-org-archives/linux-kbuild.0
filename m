@@ -1,131 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38957 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfG2JXT (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:46481 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726496AbfG2Jdj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 05:23:19 -0400
-From: Denis Efremov <efremov@linux.com>
-Subject: [PATCH v2] modpost: check for static EXPORT_SYMBOL* functions
-Date: Mon, 29 Jul 2019 12:22:50 +0300
-Message-Id: <20190729092250.32670-1-efremov@linux.com>
-In-Reply-To: <20190714152817.24693-1-efremov@linux.com>
-References: <20190714152817.24693-1-efremov@linux.com>
+        Mon, 29 Jul 2019 05:33:39 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190714152817.24693-1-efremov@linux.com> <20190728100906.18847-1-efremov@linux.com>
+ <20190729151351.24f9eeb9@canb.auug.org.au> <e2b5607f-0f74-41c6-a83d-5a22d6828778@linux.com>
+In-Reply-To: <e2b5607f-0f74-41c6-a83d-5a22d6828778@linux.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 29 Jul 2019 18:32:55 +0900
+Message-ID: <CAK7LNATFKv=gm=Q8_0Xqjq4NAb-FL59xY6C3VQ3RXq3NaP2=jQ@mail.gmail.com>
+Subject: Re: [PATCH] modpost: check for static EXPORT_SYMBOL* functions
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Denis Efremov <efremov@linux.com>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Denis Efremov <efremov@linux.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-This patch adds a check to warn about static EXPORT_SYMBOL* functions
-during the modpost. In most of the cases, a static symbol marked for
-exporting is an odd combination that should be fixed either by deleting
-the exporting mark or by removing the static attribute and adding the
-appropriate declaration to headers.
+On Mon, Jul 29, 2019 at 6:16 PM Denis Efremov <efremov@linux.com> wrote:
+>
+> > Just a reminder that some of us (just me?) do well over 100+ builds per
+> > day ...  if this can be optimised some what that would be good.
+>
+> These measurements for the worst case (allmodconfig). Is it possible to
+> measure the slowdown in your case? How it will perform on your typical
+> workflow?
+>
+> Looks like it is possible to optimize it, but I need some hints from
+> Masahiro on how to do it properly. Because I don't know how to match
+> __ksymtab_<symbol> with the <symbol> without an additional loop.
 
-This check could help to detect the following problems:
-1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
-2. 54638c6eaf44 ("net: phy: make exported variables non-static")
-3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
-4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
-5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
-6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
-7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
-8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
-9. ...
+Right.
+This is not feasible without an additional loop
+since we put only exported symbols into the hash table.
 
-Build time impact, allmodconfig, Dell XPS 15 9570 (measurements 3x):
-$ make mrproper; make allmodconfig; time make -j12; \
-  git checkout HEAD~1; \
-  make mrproper; make allmodconfig; time make -j12
-1.
-   (with patch) 17635,94s user 1895,54s system 1085% cpu 29:59,22 total
-   (w/o  patch) 17275,42s user 1803,87s system 1112% cpu 28:35,66 total
-2.
-   (with patch) 17369,51s user 1763,28s system 1111% cpu 28:41,47 total
-   (w/o  patch) 16880,50s user 1670,93s system 1113% cpu 27:46,56 total
-3.
-   (with patch) 17937,88s user 1842,53s system 1109% cpu 29:42,26 total
-   (w/o  patch) 17267,55s user 1725,09s system 1111% cpu 28:28,17 total
 
-Thus, the current implementation adds approx. 1 min for allmodconfig.
+Perhaps, we could put every symbol into the hash table
+so that we can quickly look-up <symbol> from __ksymtab_<symbol>,
+but it would consume lots of memory.
 
-Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- scripts/mod/modpost.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+So, I think the implementation is this patch is good enough.
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index f277e116e0eb..e138d763bcf2 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -169,6 +169,7 @@ struct symbol {
- 	unsigned int kernel:1;     /* 1 if symbol is from kernel
- 				    *  (only for external modules) **/
- 	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers, or crc */
-+	unsigned int is_static:1;  /* 1 if symbol is not global */
- 	enum export  export;       /* Type of export */
- 	char name[0];
- };
-@@ -201,6 +202,7 @@ static struct symbol *alloc_symbol(const char *name, unsigned int weak,
- 	strcpy(s->name, name);
- 	s->weak = weak;
- 	s->next = next;
-+	s->is_static = 1;
- 	return s;
- }
- 
-@@ -1980,6 +1982,22 @@ static void read_symbols(const char *modname)
- 		handle_modversions(mod, &info, sym, symname);
- 		handle_moddevtable(mod, &info, sym, symname);
- 	}
-+
-+	// check for static EXPORT_SYMBOL_* functions && global vars
-+	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
-+		unsigned char bind = ELF_ST_BIND(sym->st_info);
-+		unsigned char type = ELF_ST_TYPE(sym->st_info);
-+
-+		if (type == STT_OBJECT || type == STT_FUNC) {
-+			struct symbol *s =
-+				find_symbol(remove_dot(info.strtab +
-+						       sym->st_name));
-+
-+			if (s && (bind == STB_GLOBAL || bind == STB_WEAK))
-+				s->is_static = 0;
-+		}
-+	}
-+
- 	if (!is_vmlinux(modname) || vmlinux_section_warnings)
- 		check_sec_ref(mod, modname, &info);
- 
-@@ -2425,6 +2443,7 @@ int main(int argc, char **argv)
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
- 	int err;
-+	int n;
- 	struct ext_sym_list *extsym_iter;
- 	struct ext_sym_list *extsym_start = NULL;
- 
-@@ -2520,6 +2539,19 @@ int main(int argc, char **argv)
- 	if (sec_mismatch_count && sec_mismatch_fatal)
- 		fatal("modpost: Section mismatches detected.\n"
- 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
-+	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
-+		struct symbol *s = symbolhash[n];
-+
-+		while (s) {
-+			if (s->is_static)
-+				warn("\"%s\" [%s] is the static %s\n",
-+				     s->name, s->module->name,
-+				     export_str(s->export));
-+
-+			s = s->next;
-+		}
-+	}
-+
- 	free(buf.p);
- 
- 	return err;
+
+> Introduce another hash table?
+>
+> The first loop from this patch could traverse only the exported symbols
+> instead of all symbols. But in this case, I don't know how to break
+> early from the loop because there can be many symbols with the same name
+> but with the different scope (static/non-static).
+>
+> For example, ring_buffer_size:
+> kernel/trace/ring_buffer.c
+> 4334:unsigned long ring_buffer_size(struct ring_buffer *buffer, int cpu)
+> 4347:EXPORT_SYMBOL_GPL(ring_buffer_size);
+> And
+> drivers/usb/misc/ldusb.c
+> 125:static int ring_buffer_size = 128;
+>
+> Or for, nfs4_disable_idmapping:
+> fs/nfs/super.c
+> 2920:bool nfs4_disable_idmapping = true;
+> 2930:EXPORT_SYMBOL_GPL(nfs4_disable_idmapping);
+> fs/nfsd/nfs4idmap.c
+> 48:static bool nfs4_disable_idmapping = true;
+
+
+
+
+
 -- 
-2.21.0
+Best Regards
+Masahiro Yamada
