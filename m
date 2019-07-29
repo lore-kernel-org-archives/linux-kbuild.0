@@ -1,64 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33942 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726717AbfG2OXl (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55524 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726795AbfG2QER (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 10:23:41 -0400
-Received: by mail-pg1-f194.google.com with SMTP id n9so22129769pgc.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jul 2019 07:23:41 -0700 (PDT)
-Message-ID: <5d3f016c.1c69fb81.b4775.c7d0@mx.google.com>
-Content-Type: text/plain; charset="utf-8"
+        Mon, 29 Jul 2019 12:04:17 -0400
+Date: Mon, 29 Jul 2019 09:04:12 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH] kbuild: initialize CLANG_FLAGS correctly in the top
+ Makefile
+Message-ID: <20190729160412.GA100132@archlinux-threadripper>
+References: <20190729091517.5334-1-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAK7LNAQZJgkx-yEwgHcTapKFayExgUCb3=zLBpJmVMJMeEA_WA@mail.gmail.com>
-References: <20190725154730.80169-1-swboyd@chromium.org> <CAK7LNAQZJgkx-yEwgHcTapKFayExgUCb3=zLBpJmVMJMeEA_WA@mail.gmail.com>
-From: Stephen Boyd <swboyd@chromium.org>
-Subject: Re: [PATCH v2] kbuild: Check for unknown options with cc-option usage in Kconfig and clang
-Date: Mon, 29 Jul 2019 07:23:39 -0700
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190729091517.5334-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Peter Smith <peter.smith@linaro.org>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Douglas Anderson <dianders@chromium.org>
+Cc: linux-kbuild@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, stable@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
 
-Quoting Masahiro Yamada (2019-07-29 03:02:40)
->=20
-> Thanks for catching this.
->=20
-> I wonder if we could fix this issue
-> by one-liner, like this:
->=20
->=20
-> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-> index 8a5c4d645eb1..4bbf4fc163a2 100644
-> --- a/scripts/Kconfig.include
-> +++ b/scripts/Kconfig.include
-> @@ -25,7 +25,7 @@ failure =3D $(if-success,$(1),n,y)
->=20
->  # $(cc-option,<flag>)
->  # Return y if the compiler supports <flag>, n otherwise
-> -cc-option =3D $(success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/nul=
-l)
-> +cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c
-> /dev/null -o /dev/null)
->=20
->  # $(ld-option,<flag>)
->  # Return y if the linker supports <flag>, n otherwise
->=20
->=20
->=20
-> This propagates not only -Werror=3Dunknown-warning-option
-> but also other clang flags to Kconfig.
->=20
->=20
-> Currently, we do not pass the target triplet to Kconfig.
-> This means, cc-option in Kconfig evaluates the given flags
-> against host-arch instead of target-arch.
-> The compiler flags are mostly independent of the architecture,
-> and this is not a big deal, I think.
-> But, maybe, would it make more sense to pass the other
-> basic clang flags as well?
->=20
+On Mon, Jul 29, 2019 at 06:15:17PM +0900, Masahiro Yamada wrote:
+> CLANG_FLAGS is initialized by the following line:
+> 
+>   CLANG_FLAGS     := --target=$(notdir $(CROSS_COMPILE:%-=%))
+> 
+> ..., which is run only when CROSS_COMPILE is set.
+> 
+> Some build targets (bindeb-pkg etc.) recurse to the top Makefile.
+> 
+> When you build the kernel with Clang but without CROSS_COMPILE,
+> the same compiler flags such as -no-integrated-as are accumulated
+> into CLANG_FLAGS.
+> 
+> If you run 'make CC=clang' and then 'make CC=clang bindeb-pkg',
+> Kbuild will recompile everything needlessly due to the build command
+> change.
+> 
+> Fix this by correctly initializing CLANG_FLAGS.
+> 
+> Fixes: 238bcbc4e07f ("kbuild: consolidate Clang compiler flags")
+> Cc: <stable@vger.kernel.org> # v4.20+
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Yes that also works and I had that earlier. I wanted to mirror what was
-done in scripts/Kbuild.include where there's a CC_OPTION_CFLAGS
-variable. I'm happy either way, so it's up to you.
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
