@@ -1,64 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:46479 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfG2C2K (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:51983 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbfG2D3w (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jul 2019 22:28:10 -0400
+        Sun, 28 Jul 2019 23:29:52 -0400
 MIME-Version: 1.0
-References: <alpine.DEB.2.21.1907161434260.1767@nanos.tec.linutronix.de>
- <20190716170606.GA38406@archlinux-threadripper> <alpine.DEB.2.21.1907162059200.1767@nanos.tec.linutronix.de>
- <alpine.DEB.2.21.1907162135590.1767@nanos.tec.linutronix.de>
- <CAK7LNASBiaMX8ihnmhLGmYfHX=ZHZmVN91nxmFZe-OCaw6Px2w@mail.gmail.com>
- <alpine.DEB.2.21.1907170955250.1767@nanos.tec.linutronix.de>
- <CAHbf0-GyQzWcRg_BP2B5pVzEJoxSE_hX5xFypS--7Q5LSHxzWw@mail.gmail.com>
- <CAK7LNATJGbSYyuxV7npC_bQiXQShb=7J7dcQcOaupnL5-GhADg@mail.gmail.com>
- <alpine.DEB.2.21.1907230837400.1659@nanos.tec.linutronix.de> <alpine.DEB.2.21.1907231013340.1659@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1907231013340.1659@nanos.tec.linutronix.de>
+References: <20190714152817.24693-1-efremov@linux.com> <20190728100906.18847-1-efremov@linux.com>
+In-Reply-To: <20190728100906.18847-1-efremov@linux.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Jul 2019 11:27:20 +0900
-Message-ID: <CAK7LNATg38uFeY8JKnNPXudv8y4O1g=TPtvEbcBjrqFXSaKgdQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: Fail if gold linker is detected
+Date: Mon, 29 Jul 2019 12:29:11 +0900
+Message-ID: <CAK7LNAR9Gzeh6s2QGRF55ORCt1MMSit_cagx-+Ooor_sRC1U8w@mail.gmail.com>
+Subject: Re: [PATCH] modpost: check for static EXPORT_SYMBOL* functions
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Mike Lothian <mike@fireburn.co.uk>, Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, X86 ML <x86@kernel.org>, "H.J. Lu" <hjl.tools@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, linux-arch <linux-arch@vger.kernel.org>
+To: Denis Efremov <efremov@linux.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Jul 23, 2019 at 5:17 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+On Sun, Jul 28, 2019 at 7:09 PM Denis Efremov <efremov@linux.com> wrote:
 >
-> On Tue, 23 Jul 2019, Thomas Gleixner wrote:
-> > On Tue, 23 Jul 2019, Masahiro Yamada wrote:
-> > > Right.
-> > > I was able to build with ld.gold
-> > >
-> > > So, we can use gold, depending on the kernel configuration.
-> >
-> > That's exactly the problem. It breaks with random kernel configurations
-> > which is not acceptable except for people who know what they are doing.
-> >
-> > I'm tired of dealing with half baken fixes and 'regression' reports. Either
-> > there is an effort to fix the issues with gold like the clang people fix
-> > their issues or it needs to be disabled. We have a clear statement that
-> > gold developers have other priorities.
+> This patch adds a check to warn about static EXPORT_SYMBOL* functions
+> during the modpost. In most of the cases, a static symbol marked for
+> exporting is an odd combination that should be fixed either by deleting
+> the exporting mark or by removing the static attribute and adding the
+> appropriate declaration to headers.
 >
-> That said, I'm perfectly happy to move this to x86 and leave it alone for
-> other architectures, but it does not make sense to me.
+> This check could help to detect the following problems:
+> 1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
+> 2. 54638c6eaf44 ("net: phy: make exported variables non-static")
+> 3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
+> 4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
+> 5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
+> 6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
+> 7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
+> 8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
+> 9. ...
+>
+> Build time impact, allmodconfig, Dell XPS 15 9570 (measurements 3x):
+> $ make mrproper; make allmodconfig; time make -j12; \
+>   git checkout HEAD~1; \
+>   make mrproper; make allmodconfig; time make -j12
+> 1.
+>    (with patch) 17635,94s user 1895,54s system 1085% cpu 29:59,22 total
+>    (w/o  patch) 17275,42s user 1803,87s system 1112% cpu 28:35,66 total
+> 2.
+>    (with patch) 17369,51s user 1763,28s system 1111% cpu 28:41,47 total
+>    (w/o  patch) 16880,50s user 1670,93s system 1113% cpu 27:46,56 total
+> 3.
+>    (with patch) 17937,88s user 1842,53s system 1109% cpu 29:42,26 total
+>    (w/o  patch) 17267,55s user 1725,09s system 1111% cpu 28:28,17 total
+>
+> Thus, the current implementation adds approx. 1 min for allmodconfig.
+>
+> Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
+> Signed-off-by: Denis Efremov <efremov@linux.com>
+> ---
+>  scripts/mod/modpost.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>
 
+>
+> @@ -2425,6 +2443,7 @@ int main(int argc, char **argv)
+>         char *dump_write = NULL, *files_source = NULL;
+>         int opt;
+>         int err;
+> +       size_t n;
 
-I did not see opposition from other arch maintainers.
+Sorry, I missed to ask this in the previous version.
 
+If there is not a particular reason,
+may I ask you to use 'int' instead of 'size_t' here?
 
-> If the gold fans care enough, then we can add something like
-> CONFIG_I_WANT_TO_USE_GOLD_AND_DEAL_WITH_THE_FALLOUT_MYSELF.
+SYMBOL_HASH_SIZE (= 1024) is small enough, and
+it will keep consistency with
+the write_dump() function in this file.
 
-Let's apply this and see.
+If it is tedious to send a new version,
+may I fix-up 'size_t' -> 'int' ?
 
-If somebody really wants to use gold by his risk,
-I will consider such a config option.
-
-
-Applied to linux-kbuild.
 Thanks.
+
+
+>         struct ext_sym_list *extsym_iter;
+>         struct ext_sym_list *extsym_start = NULL;
+>
+> @@ -2520,6 +2539,19 @@ int main(int argc, char **argv)
+>         if (sec_mismatch_count && sec_mismatch_fatal)
+>                 fatal("modpost: Section mismatches detected.\n"
+>                       "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
+> +       for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
+> +               struct symbol *s = symbolhash[n];
+> +
+> +               while (s) {
+> +                       if (s->is_static)
+> +                               warn("\"%s\" [%s] is the static %s\n",
+> +                                    s->name, s->module->name,
+> +                                    export_str(s->export));
+> +
+> +                       s = s->next;
+> +               }
+> +       }
+> +
+>         free(buf.p);
+>
+>         return err;
+> --
+> 2.21.0
+>
 
 
 -- 
