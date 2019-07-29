@@ -1,72 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:46481 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbfG2Jdj (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:20905 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725818AbfG2Jjl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jul 2019 05:33:39 -0400
+        Mon, 29 Jul 2019 05:39:41 -0400
 MIME-Version: 1.0
-References: <20190714152817.24693-1-efremov@linux.com> <20190728100906.18847-1-efremov@linux.com>
- <20190729151351.24f9eeb9@canb.auug.org.au> <e2b5607f-0f74-41c6-a83d-5a22d6828778@linux.com>
-In-Reply-To: <e2b5607f-0f74-41c6-a83d-5a22d6828778@linux.com>
+References: <20190729091517.5334-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190729091517.5334-1-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 29 Jul 2019 18:32:55 +0900
-Message-ID: <CAK7LNATFKv=gm=Q8_0Xqjq4NAb-FL59xY6C3VQ3RXq3NaP2=jQ@mail.gmail.com>
-Subject: Re: [PATCH] modpost: check for static EXPORT_SYMBOL* functions
+Date: Mon, 29 Jul 2019 18:38:59 +0900
+Message-ID: <CAK7LNASjXdMJG5OVz4qhyGHHLGd0uZO9ifH_iqkUqYxKD+Xn2g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: initialize CLANG_FLAGS correctly in the top Makefile
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denis Efremov <efremov@linux.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Stephen Boyd <swboyd@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, stable <stable@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jul 29, 2019 at 6:16 PM Denis Efremov <efremov@linux.com> wrote:
+On Mon, Jul 29, 2019 at 6:16 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> > Just a reminder that some of us (just me?) do well over 100+ builds per
-> > day ...  if this can be optimised some what that would be good.
+> CLANG_FLAGS is initialized by the following line:
 >
-> These measurements for the worst case (allmodconfig). Is it possible to
-> measure the slowdown in your case? How it will perform on your typical
-> workflow?
+>   CLANG_FLAGS     := --target=$(notdir $(CROSS_COMPILE:%-=%))
 >
-> Looks like it is possible to optimize it, but I need some hints from
-> Masahiro on how to do it properly. Because I don't know how to match
-> __ksymtab_<symbol> with the <symbol> without an additional loop.
-
-Right.
-This is not feasible without an additional loop
-since we put only exported symbols into the hash table.
-
-
-Perhaps, we could put every symbol into the hash table
-so that we can quickly look-up <symbol> from __ksymtab_<symbol>,
-but it would consume lots of memory.
-
-So, I think the implementation is this patch is good enough.
-
-
-> Introduce another hash table?
+> ..., which is run only when CROSS_COMPILE is set.
 >
-> The first loop from this patch could traverse only the exported symbols
-> instead of all symbols. But in this case, I don't know how to break
-> early from the loop because there can be many symbols with the same name
-> but with the different scope (static/non-static).
+> Some build targets (bindeb-pkg etc.) recurse to the top Makefile.
 >
-> For example, ring_buffer_size:
-> kernel/trace/ring_buffer.c
-> 4334:unsigned long ring_buffer_size(struct ring_buffer *buffer, int cpu)
-> 4347:EXPORT_SYMBOL_GPL(ring_buffer_size);
-> And
-> drivers/usb/misc/ldusb.c
-> 125:static int ring_buffer_size = 128;
+> When you build the kernel with Clang but without CROSS_COMPILE,
+> the same compiler flags such as -no-integrated-as are accumulated
+> into CLANG_FLAGS.
 >
-> Or for, nfs4_disable_idmapping:
-> fs/nfs/super.c
-> 2920:bool nfs4_disable_idmapping = true;
-> 2930:EXPORT_SYMBOL_GPL(nfs4_disable_idmapping);
-> fs/nfsd/nfs4idmap.c
-> 48:static bool nfs4_disable_idmapping = true;
+> If you run 'make CC=clang' and then 'make CC=clang bindeb-pkg',
+> Kbuild will recompile everything needlessly due to the build command
+> change.
+>
+> Fix this by correctly initializing CLANG_FLAGS.
+>
+> Fixes: 238bcbc4e07f ("kbuild: consolidate Clang compiler flags")
+> Cc: <stable@vger.kernel.org> # v4.20+
 
+This should be v5.0+
 
-
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 
 
 -- 
