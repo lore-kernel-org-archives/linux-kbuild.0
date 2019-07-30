@@ -1,46 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:46189 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726510AbfG3Qkr (ORCPT
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39067 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728271AbfG3Qo6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jul 2019 12:40:47 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] lib/raid6: fix unnecessary rebuild of vpermxor*.c
-Date: Wed, 31 Jul 2019 01:40:42 +0900
-Message-Id: <20190730164042.2631-1-yamada.masahiro@socionext.com>
+        Tue, 30 Jul 2019 12:44:58 -0400
+Subject: Re: [PATCH v3] modpost: check for static EXPORT_SYMBOL* functions
+References: <20190714152817.24693-1-efremov@linux.com>
+ <20190729141801.31333-1-efremov@linux.com>
+ <20190730082618.5bb5edf3@canb.auug.org.au>
+ <1b6f749c-2a25-219a-3eb3-0f2c7a542426@linux.com>
+ <CAK7LNATnC6eVmahn=44F-j3Uf-x+cUWuP0q7QuP800biL9QJiA@mail.gmail.com>
+From: Denis Efremov <efremov@linux.com>
+Message-ID: <d26ff0d1-fc45-d5b5-fe84-26fa9df09c3e@linux.com>
+Date: Tue, 30 Jul 2019 19:44:49 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNATnC6eVmahn=44F-j3Uf-x+cUWuP0q7QuP800biL9QJiA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-The following four files are every time rebuilt:
+On 30.07.2019 19:29, Masahiro Yamada wrote:
+> I prefer this, but why do you need to check type?
+> 
+> Doesn't this work?
+> 
+> for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+>          unsigned char bind = ELF_ST_BIND(sym->st_info);
+> 
+>          struct symbol *s = find_symbol(remove_dot(info.strtab +
+>                                                    sym->st_name));
+> 
+>          if (s && (bind == STB_GLOBAL || bind == STB_WEAK))
+>                  s->is_static = 0;
+> }
 
-  UNROLL  lib/raid6/vpermxor1.c
-  UNROLL  lib/raid6/vpermxor2.c
-  UNROLL  lib/raid6/vpermxor4.c
-  UNROLL  lib/raid6/vpermxor8.c
+This works. However, I thought it will be too costly to call find_symbol 
+on each symbol. Hence, 'type == STT_OBJECT || type == STT_FUNC || type 
+== STT_NOTYPE' is a small performance optimization because we need to 
+check only variables and functions. Is it worth to remove it in v4?
 
-I made a mistake in the Makefile refactoring.
-
-Fixes: 72ad21075df8 ("lib/raid6: refactor unroll rules with pattern rules")
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- lib/raid6/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/raid6/Makefile b/lib/raid6/Makefile
-index 42695bc8d451..0083b5cc646c 100644
---- a/lib/raid6/Makefile
-+++ b/lib/raid6/Makefile
-@@ -66,7 +66,7 @@ CFLAGS_vpermxor1.o += $(altivec_flags)
- CFLAGS_vpermxor2.o += $(altivec_flags)
- CFLAGS_vpermxor4.o += $(altivec_flags)
- CFLAGS_vpermxor8.o += $(altivec_flags)
--targets += vpermxor1.o vpermxor2.o vpermxor4.o vpermxor8.o
-+targets += vpermxor1.c vpermxor2.c vpermxor4.c vpermxor8.c
- $(obj)/vpermxor%.c: $(src)/vpermxor.uc $(src)/unroll.awk FORCE
- 	$(call if_changed,unroll)
- 
--- 
-2.17.1
+Denis
