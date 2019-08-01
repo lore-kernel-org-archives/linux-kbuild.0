@@ -1,94 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25321 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726626AbfHAC5k (ORCPT
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:35714 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725790AbfHAGHM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Jul 2019 22:57:40 -0400
+        Thu, 1 Aug 2019 02:07:12 -0400
+From: Denis Efremov <efremov@linux.com>
+Subject: [PATCH v5] modpost: check for static EXPORT_SYMBOL* functions
+Date: Thu,  1 Aug 2019 09:06:57 +0300
+Message-Id: <20190801060657.5932-1-efremov@linux.com>
+In-Reply-To: <20190714152817.24693-1-efremov@linux.com>
+References: <20190714152817.24693-1-efremov@linux.com>
 MIME-Version: 1.0
-References: <20190730164803.45080-1-swboyd@chromium.org> <20190730164959.GA129059@archlinux-threadripper>
- <CAK7LNARvyxzJa9CG-4uSoE7asdHp=Cbeh71_13dmuP8zMJtqSA@mail.gmail.com>
-In-Reply-To: <CAK7LNARvyxzJa9CG-4uSoE7asdHp=Cbeh71_13dmuP8zMJtqSA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 1 Aug 2019 11:56:44 +0900
-Message-ID: <CAK7LNASNxKzhO3cKXBTxcLWNoEX2pMdO6MFScyu3wprdtH2rzw@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: Check for unknown options with cc-option usage
- in Kconfig and clang
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Stephen Boyd <swboyd@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Peter Smith <peter.smith@linaro.org>, Nick Desaulniers <ndesaulniers@google.com>, Douglas Anderson <dianders@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Denis Efremov <efremov@linux.com>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Jul 31, 2019 at 1:51 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Wed, Jul 31, 2019 at 1:50 AM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > On Tue, Jul 30, 2019 at 09:48:03AM -0700, Stephen Boyd wrote:
-> > > If the particular version of clang a user has doesn't enable
-> > > -Werror=unknown-warning-option by default, even though it is the
-> > > default[1], then make sure to pass the option to the Kconfig cc-option
-> > > command so that testing options from Kconfig files works properly.
-> > > Otherwise, depending on the default values setup in the clang toolchain
-> > > we will silently assume options such as -Wmaybe-uninitialized are
-> > > supported by clang, when they really aren't.
-> > >
-> > > A compilation issue only started happening for me once commit
-> > > 589834b3a009 ("kbuild: Add -Werror=unknown-warning-option to
-> > > CLANG_FLAGS") was applied on top of commit b303c6df80c9 ("kbuild:
-> > > compute false-positive -Wmaybe-uninitialized cases in Kconfig"). This
-> > > leads kbuild to try and test for the existence of the
-> > > -Wmaybe-uninitialized flag with the cc-option command in
-> > > scripts/Kconfig.include, and it doesn't see an error returned from the
-> > > option test so it sets the config value to Y. Then the Makefile tries to
-> > > pass the unknown option on the command line and
-> > > -Werror=unknown-warning-option catches the invalid option and breaks the
-> > > build. Before commit 589834b3a009 ("kbuild: Add
-> > > -Werror=unknown-warning-option to CLANG_FLAGS") the build works fine,
-> > > but any cc-option test of a warning option in Kconfig files silently
-> > > evaluates to true, even if the warning option flag isn't supported on
-> > > clang.
-> > >
-> > > Note: This doesn't change cc-option usages in Makefiles because those
-> > > use a different rule that includes KBUILD_CFLAGS by default (see the
-> > > __cc-option command in scripts/Kbuild.incluide). The KBUILD_CFLAGS
-> > > variable already has the -Werror=unknown-warning-option flag set. Thanks
-> > > to Doug for pointing out the different rule.
-> > >
-> > > [1] https://clang.llvm.org/docs/DiagnosticsReference.html#wunknown-warning-option
-> > > Cc: Peter Smith <peter.smith@linaro.org>
-> > > Cc: Nathan Chancellor <natechancellor@gmail.com>
-> > > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> > > Cc: Douglas Anderson <dianders@chromium.org>
-> > > Signed-off-by: Stephen Boyd <swboyd@chromium.org>
-> >
-> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> >
-> > > ---
-> > >  Makefile                | 1 +
-> > >  scripts/Kconfig.include | 2 +-
-> > >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index 9be5834073f8..517d0a3f6539 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -536,6 +536,7 @@ KBUILD_AFLAGS     += $(CLANG_FLAGS)
-> > >  export CLANG_FLAGS
-> > >  endif
-> > >
-> > > +
-> >
-> > Not sure it's worth sending a v4 for but I don't think this should be
-> > there.
->
->
-> I will remove it when I apply this.
->
+This patch adds a check to warn about static EXPORT_SYMBOL* functions
+during the modpost. In most of the cases, a static symbol marked for
+exporting is an odd combination that should be fixed either by deleting
+the exporting mark or by removing the static attribute and adding the
+appropriate declaration to headers.
 
-Applied to linux-kbuild/fixes. Thanks.
+This check could help to detect the following problems:
+1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
+2. 54638c6eaf44 ("net: phy: make exported variables non-static")
+3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
+4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
+5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
+6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
+7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
+8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
+9. ...
 
+The build time impact is very limited and is almost at the unnoticeable
+level (< 1 sec).
+
+Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+ scripts/mod/modpost.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index f277e116e0eb..3e6d36ddfcdf 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -169,6 +169,7 @@ struct symbol {
+ 	unsigned int kernel:1;     /* 1 if symbol is from kernel
+ 				    *  (only for external modules) **/
+ 	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers, or crc */
++	unsigned int is_static:1;  /* 1 if symbol is not global */
+ 	enum export  export;       /* Type of export */
+ 	char name[0];
+ };
+@@ -201,6 +202,7 @@ static struct symbol *alloc_symbol(const char *name, unsigned int weak,
+ 	strcpy(s->name, name);
+ 	s->weak = weak;
+ 	s->next = next;
++	s->is_static = 1;
+ 	return s;
+ }
+ 
+@@ -1980,6 +1982,21 @@ static void read_symbols(const char *modname)
+ 		handle_modversions(mod, &info, sym, symname);
+ 		handle_moddevtable(mod, &info, sym, symname);
+ 	}
++
++	// check for static EXPORT_SYMBOL_* functions && global vars
++	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
++		unsigned char bind = ELF_ST_BIND(sym->st_info);
++
++		if (bind == STB_GLOBAL || bind == STB_WEAK) {
++			struct symbol *s =
++				find_symbol(remove_dot(info.strtab +
++						       sym->st_name));
++
++			if (s)
++				s->is_static = 0;
++		}
++	}
++
+ 	if (!is_vmlinux(modname) || vmlinux_section_warnings)
+ 		check_sec_ref(mod, modname, &info);
+ 
+@@ -2425,6 +2442,7 @@ int main(int argc, char **argv)
+ 	char *dump_write = NULL, *files_source = NULL;
+ 	int opt;
+ 	int err;
++	int n;
+ 	struct ext_sym_list *extsym_iter;
+ 	struct ext_sym_list *extsym_start = NULL;
+ 
+@@ -2520,6 +2538,19 @@ int main(int argc, char **argv)
+ 	if (sec_mismatch_count && sec_mismatch_fatal)
+ 		fatal("modpost: Section mismatches detected.\n"
+ 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
++	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
++		struct symbol *s = symbolhash[n];
++
++		while (s) {
++			if (s->is_static)
++				warn("\"%s\" [%s] is a static %s\n",
++				     s->name, s->module->name,
++				     export_str(s->export));
++
++			s = s->next;
++		}
++	}
++
+ 	free(buf.p);
+ 
+ 	return err;
 -- 
-Best Regards
-Masahiro Yamada
+2.21.0
