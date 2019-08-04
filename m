@@ -1,45 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:22281 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725283AbfHDDu7 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:31490 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726054AbfHDD6l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 3 Aug 2019 23:50:59 -0400
+        Sat, 3 Aug 2019 23:58:41 -0400
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id x743wOoY028580
+        for <linux-kbuild@vger.kernel.org>; Sun, 4 Aug 2019 12:58:25 +0900
+Received: by mail-ua1-f41.google.com with SMTP id j8so31078801uan.6
+        for <linux-kbuild@vger.kernel.org>; Sat, 03 Aug 2019 20:58:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAK7LNASPib2GUgjUEwmNYcO9_NgvjyjKSpqwJVZSNhFOJ7Lkfw@mail.gmail.com>
- <20190803100212.8227-1-m.v.b@runbox.com>
-In-Reply-To: <20190803100212.8227-1-m.v.b@runbox.com>
+References: <CALYGOBV9FERiui6mJDmQyAjaNASAOQ5z1k-6nCHQVB+c4XxmSw@mail.gmail.com>
+In-Reply-To: <CALYGOBV9FERiui6mJDmQyAjaNASAOQ5z1k-6nCHQVB+c4XxmSw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 4 Aug 2019 12:50:10 +0900
-Message-ID: <CAK7LNAS3heQA-0FzANyqXGSOR+kZ6zLgoSWYEW_ngrEdH46QsQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: Clear "written" flag to avoid data loss
+Date: Sun, 4 Aug 2019 12:57:48 +0900
+Message-ID: <CAK7LNAQSFdSZ5OctMkhXRmmXrq4S0cJ4Xy3MOd9iLF-Cs_VQMw@mail.gmail.com>
+Subject: Re: make_kernelconfig fails in OpenWRT buildroot
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "M. Vefa Bicakci" <m.v.b@runbox.com>
-Cc: =?UTF-8?B?Sm9vbmFzIEt5bG3DpGzDpA==?= <joonas.kylmala@iki.fi>, Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-stable <stable@vger.kernel.org>
+To: Thomas Albers <thomas.gameiro@googlemail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sat, Aug 3, 2019 at 7:02 PM M. Vefa Bicakci <m.v.b@runbox.com> wrote:
+On Sun, Aug 4, 2019 at 1:44 AM Thomas Albers
+<thomas.gameiro@googlemail.com> wrote:
 >
-> Prior to this commit, starting nconfig, xconfig or gconfig, and saving
-> the .config file more than once caused data loss, where a .config file
-> that contained only comments would be written to disk starting from the
-> second save operation.
+> Hello!
 >
-> This bug manifests itself because the SYMBOL_WRITTEN flag is never
-> cleared after the first call to conf_write, and subsequent calls to
-> conf_write then skip all of the configuration symbols due to the
-> SYMBOL_WRITTEN flag being set.
+> When you say "make kernel_menuconfig" in OpenWRT buildroot kernel
+> configuration fails, like so:
+> $ make kernel_menuconfig
+> make[3]: Entering directory
+> '/home/ta/openwrt/build_dir/target-arm_cortex-a15+neon-vfpv4_musl_eabi/linux-ipq806x/linux-4.14.134'
+>   HOSTCC  scripts/kconfig/mconf.o
+>   HOSTCC  scripts/kconfig/lxdialog/checklist.o
+>   HOSTCC  scripts/kconfig/lxdialog/util.o
+>   HOSTCC  scripts/kconfig/lxdialog/inputbox.o
+>   HOSTCC  scripts/kconfig/lxdialog/textbox.o
+>   HOSTCC  scripts/kconfig/lxdialog/yesno.o
+>   HOSTCC  scripts/kconfig/lxdialog/menubox.o
+>   HOSTLD  scripts/kconfig/mconf
+> /usr/lib/gcc/x86_64-pc-linux-gnu/8.3.0/../../../../x86_64-pc-linux-gnu/bin/ld:
+> scripts/kconfig/lxdialog/checklist.o: undefined reference to symbol
+> 'keypad'
+> /usr/lib/gcc/x86_64-pc-linux-gnu/8.3.0/../../../../x86_64-pc-linux-gnu/bin/ld:
+> /lib64/libtinfow.so.6: error adding symbols: DSO missing from command
+> line
+> collect2: error: ld returned 1 exit status
 >
-> This commit resolves this issue by clearing the SYMBOL_WRITTEN flag
-> from all symbols before conf_write returns.
+> Steps to reproduce (see
+> https://openwrt.org/docs/guide-developer/build-system/use-buildsystem)
+> $ git clone https://github.com/openwrt/openwrt.git
+> $ make menuconfig
+> $ make defconfig
+> $ make kernel_menuconfig
 >
-> Fixes: 8e2442a5f86e ("kconfig: fix missing choice values in auto.conf")
-> Cc: linux-stable <stable@vger.kernel.org> # 4.19+
-> Signed-off-by: M. Vefa Bicakci <m.v.b@runbox.com>
+> It seems that the bug was introduced here:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fd65465b7016dc6d9fa5c2f39cc706c231c9a089
+> when menuconfig no longer used pkg-config to find the ncurses libraries.
+> Also see a related bug report from Gentoo: https://bugs.gentoo.org/457530
+> and the OpenWRT bug report:
+> https://bugs.openwrt.org/index.php?do=details&task_id=2423
+>
 
+See line 7-20 of scripts/kconfig/mconf-cfg.sh,
+it tries pkg-config first. If pkg-config cannot find ncurses,
+it falls back to some hard-coded install paths.
 
-Applied to linux-kbuild/fixes.
-Thanks.
+Am I misunderstanding the code?
 
 
 
