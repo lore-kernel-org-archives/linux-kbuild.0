@@ -1,72 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:50060 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731594AbfHFGem (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:39569 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731560AbfHFGkW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:34:42 -0400
-MIME-Version: 1.0
-References: <20190806062316.30784-1-ice_yangxiao@163.com>
-In-Reply-To: <20190806062316.30784-1-ice_yangxiao@163.com>
+        Tue, 6 Aug 2019 02:40:22 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Aug 2019 15:33:42 +0900
-Message-ID: <CAK7LNARVrBf2imEOdYv0zZxDZaQ2z83qKr=xSbrHHGEYHgRLuA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Remove unused variable TMPO of ld-option
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 1/5] kbuild: treat an object as multi-used when $(foo-) is set
+Date: Tue,  6 Aug 2019 15:39:19 +0900
+Message-Id: <20190806063923.1266-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190806063923.1266-1-yamada.masahiro@socionext.com>
+References: <20190806063923.1266-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Xiao Yang <ice_yangxiao@163.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, yangx.jy@cn.fujitsu.com
+To: linux-kbuild@vger.kernel.org
+Cc: Jani Nikula <jani.nikula@intel.com>, intel-gfx@lists.freedesktop.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Tue, Aug 6, 2019 at 3:23 PM Xiao Yang <ice_yangxiao@163.com> wrote:
->
-> ld-option implementation has been simplified so variable TMPO
-> is no longer needed.
->
-> Fixes: Commit 0294e6f4a000 ("kbuild: simplify ld-option implementation")
-> Signed-off-by: Xiao Yang <ice_yangxiao@163.com>
-> ---
->  scripts/Kbuild.include | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 4b0432e095ae..13a6f627351d 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -91,12 +91,11 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
->  # automatically cleaned up.
->  try-run = $(shell set -e;              \
->         TMP="$(TMPOUT).$$$$.tmp";       \
-> -       TMPO="$(TMPOUT).$$$$.o";        \
->         if ($(1)) >/dev/null 2>&1;      \
->         then echo "$(2)";               \
->         else echo "$(3)";               \
->         fi;                             \
-> -       rm -f "$$TMP" "$$TMPO")
-> +       rm -f "$$TMP")
->
->  # as-option
->  # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
-> --
-> 2.21.0
->
->
+Currently, Kbuild treats an object as multi-used when any of
+$(foo-objs), $(foo-y), $(foo-m) is set. It makes more sense to
+check $(foo-) as well.
 
-Unfortunately, there is a user in arch/x86/Makefile.
+In the context of foo-$(CONFIG_FOO_FEATURE1), CONFIG_FOO_FEATURE1
+could be unset.
 
-masahiro@pug:~/ref/linux$ git grep TMPO
-arch/x86/Makefile:                      $(OBJCOPY) -O elf32-x86-64
-"$$TMP" "$$TMPO" && \
-arch/x86/Makefile:                      $(LD) -m elf32_x86_64 "$$TMPO"
--o "$$TMP",y,n)
-scripts/Kbuild.include:TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword
-$(KBUILD_EXTMOD))/)
-scripts/Kbuild.include: TMP="$(TMPOUT).$$$$.tmp";       \
-scripts/Kbuild.include: TMPO="$(TMPOUT).$$$$.o";        \
-scripts/Kbuild.include: rm -f "$$TMP" "$$TMPO")
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/Makefile.lib | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-
-
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 41c50f9461e5..0a540599823e 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -41,9 +41,9 @@ obj-m		:= $(filter-out %/, $(obj-m))
+ # Subdirectories we need to descend into
+ subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+ 
+-# if $(foo-objs), $(foo-y), or $(foo-m) exists, foo.o is a composite object
+-multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+-multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
++# If $(foo-objs), $(foo-y), $(foo-m), or $(foo-) exists, foo.o is a composite object
++multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))), $(m))))
++multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))), $(m))))
+ multi-used   := $(multi-used-y) $(multi-used-m)
+ 
+ # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+@@ -52,8 +52,8 @@ subdir-obj-y := $(filter %/built-in.a, $(obj-y))
+ 
+ # Replace multi-part objects by their individual parts,
+ # including built-in.a from subdirectories
+-real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+-real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
++real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
++real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+ 
+ # DTB
+ # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
