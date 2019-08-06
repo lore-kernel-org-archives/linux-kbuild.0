@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55806 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55356 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729636AbfHFViI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Aug 2019 17:38:08 -0400
+        id S1727373AbfHFVhe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 6 Aug 2019 17:37:34 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 10/14] kbuild: modpost: handle KBUILD_EXTRA_SYMBOLS only for external modules
-Date: Tue,  6 Aug 2019 17:37:44 -0400
-Message-Id: <20190806213749.20689-10-sashal@kernel.org>
-In-Reply-To: <20190806213749.20689-1-sashal@kernel.org>
-References: <20190806213749.20689-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 10/17] kbuild: modpost: handle KBUILD_EXTRA_SYMBOLS only for external modules
+Date: Tue,  6 Aug 2019 17:37:07 -0400
+Message-Id: <20190806213715.20487-10-sashal@kernel.org>
+In-Reply-To: <20190806213715.20487-1-sashal@kernel.org>
+References: <20190806213715.20487-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -33,7 +33,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 1366a94b6c395..7718a64b1cd15 100644
+index 16923ba4b5b10..8cb7971b3f25c 100644
 --- a/scripts/Makefile.modpost
 +++ b/scripts/Makefile.modpost
 @@ -74,7 +74,7 @@ modpost = scripts/mod/modpost                    \
