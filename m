@@ -1,45 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:35533 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732584AbfHFKD6 (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2186 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730381AbfHFK5P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Aug 2019 06:03:58 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/3] kbuild: generate modules.order only in directories visited by obj-y/m
-Date: Tue,  6 Aug 2019 19:03:22 +0900
-Message-Id: <20190806100323.22919-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190806100323.22919-1-yamada.masahiro@socionext.com>
-References: <20190806100323.22919-1-yamada.masahiro@socionext.com>
+        Tue, 6 Aug 2019 06:57:15 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x76AvBS5049297
+        for <linux-kbuild@vger.kernel.org>; Tue, 6 Aug 2019 06:57:14 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u7689vvn4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Aug 2019 06:57:13 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <gor@linux.ibm.com>;
+        Tue, 6 Aug 2019 11:56:50 +0100
+Date: Tue, 6 Aug 2019 12:56:45 +0200
+From: Vasily Gorbik <gor@linux.ibm.com>
+Subject: [PATCH 1/2] kbuild: add OBJSIZE variable for the size tool
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Message-Id: <patch-1.thread-2257a1.git-188f5a3d81d5.your-ad-here.call-01565088755-ext-5120@work.hours>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The modules.order files in directories visited by the chain of obj-y
-or obj-m are merged to the upper-level ones, and become parts of the
-top-level modules.order. On the other hand, there is no need to
-generate modules.order in directories visited by subdir-y or subdir-m.
-They would become orphan anyway.
+Define and export OBJSIZE variable for "size" tool from binutils to be
+used in architecture specific Makefiles (naming the variable just "SIZE"
+would be too risky). In particular this tool is useful to perform checks
+that early boot code is not using bss section (which might have not been
+zeroed yet or intersects with initrd or other files boot loader might
+have put right after the linux kernel).
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 ---
+ Makefile | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
- scripts/Makefile.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 3fe0c73e002c..37a1d2cd49d4 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -488,7 +488,8 @@ targets += $(call intermediate_targets, .asn1.o, .asn1.c .asn1.h) \
- PHONY += $(subdir-ym)
- $(subdir-ym):
- 	$(Q)$(MAKE) $(build)=$@ \
--	need-builtin=$(if $(filter $@/built-in.a, $(subdir-obj-y)),1)
-+	need-builtin=$(if $(filter $@/built-in.a, $(subdir-obj-y)),1) \
-+	need-modorder=$(if $(need-modorder),$(if $(filter $@/modules.order, $(modorder)),1))
+diff --git a/Makefile b/Makefile
+index fa0fbe7851ea..ff4cff29fe46 100644
+--- a/Makefile
++++ b/Makefile
+@@ -419,6 +419,7 @@ NM		= $(CROSS_COMPILE)nm
+ STRIP		= $(CROSS_COMPILE)strip
+ OBJCOPY		= $(CROSS_COMPILE)objcopy
+ OBJDUMP		= $(CROSS_COMPILE)objdump
++OBJSIZE		= $(CROSS_COMPILE)size
+ PAHOLE		= pahole
+ LEX		= flex
+ YACC		= bison
+@@ -474,9 +475,9 @@ KBUILD_LDFLAGS :=
+ GCC_PLUGINS_CFLAGS :=
  
- # Add FORCE to the prequisites of a target to force it to be always rebuilt.
- # ---------------------------------------------------------------------------
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP PAHOLE KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
+-export MAKE LEX YACC AWK INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+-export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
++export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE PAHOLE LEX YACC AWK INSTALLKERNEL
++export PERL PYTHON PYTHON2 PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
++export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
 -- 
-2.17.1
+2.21.0
