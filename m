@@ -1,68 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:40065 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:39558 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731731AbfHFGkk (ORCPT
+        with ESMTP id S1731576AbfHFGkX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:40:40 -0400
+        Tue, 6 Aug 2019 02:40:23 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/5] kbuild: allow big modules to sub-divide Makefiles
-Date: Tue,  6 Aug 2019 15:39:18 +0900
-Message-Id: <20190806063923.1266-1-yamada.masahiro@socionext.com>
+Subject: [PATCH 3/5] kbuild: rename cmd_ar_builtin to cmd_ar_no_sym
+Date: Tue,  6 Aug 2019 15:39:21 +0900
+Message-Id: <20190806063923.1266-4-yamada.masahiro@socionext.com>
+In-Reply-To: <20190806063923.1266-1-yamada.masahiro@socionext.com>
+References: <20190806063923.1266-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Jani Nikula <jani.nikula@intel.com>, intel-gfx@lists.freedesktop.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Michal Marek <michal.lkml@markovi.net>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, Zhi Wang <zhi.a.wang@intel.com>, dri-devel@lists.freedesktop.org, intel-gvt-dev@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Cc: Jani Nikula <jani.nikula@intel.com>, intel-gfx@lists.freedesktop.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
+In the next commit, I will re-use this for thin-archives of objects
+liked into modules.
 
-Recently, Jani Nikula requests a better build system support
-for drivers spanning multiple directories.
-(better kbuild support for drivers spanning multiple directories?)
+Rename cmd_ar_builtin to a more generic cmd_ar_no_sym.
+(cmd_ar is already defined in scripts/Makefile.lib)
 
-I implemented it, so please take a look at it.
+I removed unneeded ifdef builtin-target.
 
-Note:
-The single targets do not work correctly.
+No functional change intended.
 
-The single targets have never worked correctly:
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-[1] For instance, "make drivers/foo/bar/baz.o" will descend into
-    drivers/foo/bar/Makefile, which may not necessarily specify
-    the build rule of baz.o
+ scripts/Makefile.build | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-    It is possible for drivers/foo/Makefile having
-        obj-$(CONFIG_BAZ) += bar/baz.o
-
-[2] subdir-ccflags-y does not work.
-
-    The single targets directly descend into the directory of
-    that file resides.
-
-    It missed subdir-ccflags-y if it is specifies in parent
-    Makefiles.
-
-Perhaps, I will have to manage correct implementation of single targets.
-
-
-
-Masahiro Yamada (5):
-  kbuild: treat an object as multi-used when $(foo-) is set
-  kbuild: clean up modname calculation
-  kbuild: rename cmd_ar_builtin to cmd_ar_no_sym
-  kbuild: support composite objects spanning across multiple Makefiles
-  drm: i915: hierachize Makefiles
-
- drivers/gpu/drm/i915/Makefile               | 126 ++------------------
- drivers/gpu/drm/i915/display/Makefile       |  64 ++++++++++
- drivers/gpu/drm/i915/gem/Makefile           |  27 +++++
- drivers/gpu/drm/i915/gem/selftests/Makefile |   3 +
- drivers/gpu/drm/i915/gt/Makefile            |  16 +++
- drivers/gpu/drm/i915/gvt/Makefile           |  32 ++++-
- drivers/gpu/drm/i915/selftests/Makefile     |   9 ++
- scripts/Makefile.build                      |  39 +++---
- scripts/Makefile.lib                        |  66 ++++++----
- 9 files changed, 218 insertions(+), 164 deletions(-)
- create mode 100644 drivers/gpu/drm/i915/gem/selftests/Makefile
- create mode 100644 drivers/gpu/drm/i915/selftests/Makefile
-
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index b0ff60ac0c42..68622cbdfda5 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -404,16 +404,14 @@ $(sort $(subdir-obj-y)): $(subdir-ym) ;
+ #
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+ #
+-ifdef builtin-target
+ 
+-quiet_cmd_ar_builtin = AR      $@
+-      cmd_ar_builtin = rm -f $@; $(AR) rcSTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
++quiet_cmd_ar_no_sym = AR      $@
++      cmd_ar_no_sym = rm -f $@; $(AR) rcSTP$(KBUILD_ARFLAGS) $@ $(real-prereqs)
+ 
+ $(builtin-target): $(real-obj-y) FORCE
+-	$(call if_changed,ar_builtin)
++	$(call if_changed,ar_no_sym)
+ 
+ targets += $(builtin-target)
+-endif # builtin-target
+ 
+ #
+ # Rule to create modules.order file
 -- 
 2.17.1
