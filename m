@@ -1,53 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:64822 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:17775 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727213AbfHGPLF (ORCPT
+        with ESMTP id S1726773AbfHGPNF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Aug 2019 11:11:05 -0400
+        Wed, 7 Aug 2019 11:13:05 -0400
 MIME-Version: 1.0
-References: <20190731061358.30117-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190731061358.30117-1-yamada.masahiro@socionext.com>
+References: <20190714152817.24693-1-efremov@linux.com> <20190801060657.5932-1-efremov@linux.com>
+In-Reply-To: <20190801060657.5932-1-efremov@linux.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 8 Aug 2019 00:10:19 +0900
-Message-ID: <CAK7LNAQPezQovn6Lnw1Zgz7Y2xz7_XXaccyZ-79zSYXAVSE6jQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add [M] marker for build log of *.mod.o
+Date: Thu, 8 Aug 2019 00:12:12 +0900
+Message-ID: <CAK7LNASdhyhhqyf1wcga7UDYoo=2t-0ZaqTmQdcsFOfAR580sw@mail.gmail.com>
+Subject: Re: [PATCH v5] modpost: check for static EXPORT_SYMBOL* functions
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Denis Efremov <efremov@linux.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Jul 31, 2019 at 3:14 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Thu, Aug 1, 2019 at 3:07 PM Denis Efremov <efremov@linux.com> wrote:
 >
-> This builds module objects, so [M] makes sense.
+> This patch adds a check to warn about static EXPORT_SYMBOL* functions
+> during the modpost. In most of the cases, a static symbol marked for
+> exporting is an odd combination that should be fixed either by deleting
+> the exporting mark or by removing the static attribute and adding the
+> appropriate declaration to headers.
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-Applied to linux-kbuild.
-
-
+> This check could help to detect the following problems:
+> 1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
+> 2. 54638c6eaf44 ("net: phy: make exported variables non-static")
+> 3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
+> 4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
+> 5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
+> 6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
+> 7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
+> 8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
+> 9. ...
+>
+> The build time impact is very limited and is almost at the unnoticeable
+> level (< 1 sec).
+>
+> Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 > ---
->
->  scripts/Makefile.modpost | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index 6e328190d609..6c237af41417 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -112,7 +112,7 @@ $(modules:.ko=.mod.c): modules-modpost ;
->  # modname is set to make c_flags define KBUILD_MODNAME
->  modname = $(notdir $(@:.mod.o=))
->
-> -quiet_cmd_cc_o_c = CC      $@
-> +quiet_cmd_cc_o_c = CC [M]  $@
->        cmd_cc_o_c = $(CC) $(c_flags) $(KBUILD_CFLAGS_MODULE) $(CFLAGS_MODULE) \
->                    -c -o $@ $<
->
-> --
-> 2.17.1
->
+
+Applied to linux-kbuild. Thanks.
+
+
 
 
 -- 
