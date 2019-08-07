@@ -1,70 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:16449 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726773AbfHGPQG (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:59102 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387815AbfHGPXs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Aug 2019 11:16:06 -0400
+        Wed, 7 Aug 2019 11:23:48 -0400
 MIME-Version: 1.0
-References: <20190802102358.28408-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190802102358.28408-1-yamada.masahiro@socionext.com>
+References: <20190806100323.22919-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190806100323.22919-1-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 8 Aug 2019 00:15:13 +0900
-Message-ID: <CAK7LNASfBWBqmBtA9kpbFDJD21HZfoHYexwA25jaJgn5CpPw=A@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: revive single target %.ko
+Date: Thu, 8 Aug 2019 00:22:57 +0900
+Message-ID: <CAK7LNASUNw8pdg3WYmoZzpz=9tu0c=O+Fyzu228kSLYOhUq81g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] kbuild: fix false-positive need-builtin
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Don Brace <don.brace@microsemi.com>, Arend Van Spriel <arend.vanspriel@broadcom.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Fri, Aug 2, 2019 at 7:24 PM Masahiro Yamada
+On Tue, Aug 6, 2019 at 7:03 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
-> I removed the single target %.ko in commit ff9b45c55b26 ("kbuild:
-> modpost: read modules.order instead of $(MODVERDIR)/*.mod") because
-> the modpost stage does not work reliably. For instance, the module
-> dependency, modversion, etc. do not work if we lack symbol information
-> from the other modules.
+> The current implementation of need-builtin is false-positive,
+> for example, in the following Makefile:
 >
-> Yet, some people still want to build only one module in their interest,
-> and it may be still useful if it is used within those limitations.
+>   obj-m := foo/
+>   obj-y := foo/bar/
 >
-> Fixes: ff9b45c55b26 ("kbuild: modpost: read modules.order instead of $(MODVERDIR)/*.mod")
-> Reported-by: Don Brace <don.brace@microsemi.com>
-> Reported-by: Arend Van Spriel <arend.vanspriel@broadcom.com>
+> ..., where foo/built-in.a is not required.
+>
+> Fixes: f7adc3124da0 ("kbuild: create built-in.o automatically if parent directory wants it")
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 
-Applied to linux-kbuild/fixes.
+Series, applied to linux-kbuild.
+
 
 >
->  Makefile | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  scripts/Makefile.build | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/Makefile b/Makefile
-> index 571cf862d7a4..e4c7211f5a3b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -997,6 +997,8 @@ endif
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 0d434d0afc0b..3fe0c73e002c 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -487,7 +487,8 @@ targets += $(call intermediate_targets, .asn1.o, .asn1.c .asn1.h) \
 >
->  PHONY += prepare0
+>  PHONY += $(subdir-ym)
+>  $(subdir-ym):
+> -       $(Q)$(MAKE) $(build)=$@ need-builtin=$(if $(findstring $@,$(subdir-obj-y)),1)
+> +       $(Q)$(MAKE) $(build)=$@ \
+> +       need-builtin=$(if $(filter $@/built-in.a, $(subdir-obj-y)),1)
 >
-> +export MODORDER := $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)modules.order
-> +
->  ifeq ($(KBUILD_EXTMOD),)
->  core-y         += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
->
-> @@ -1766,6 +1768,10 @@ build-dir = $(patsubst %/,%,$(dir $(build-target)))
->         $(Q)$(MAKE) $(build)=$(build-dir) $(build-target)
->  %.symtypes: prepare FORCE
->         $(Q)$(MAKE) $(build)=$(build-dir) $(build-target)
-> +%.ko: prepare FORCE
-> +       $(Q)$(MAKE) $(build)=$(build-dir) $(build-target:.ko=.mod)
-> +       $(Q)echo $(build-target) > $(MODORDER)
-> +       $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost || { rm -f $(MODORDER); false; }
->
->  # Modules
->  PHONY += /
+>  # Add FORCE to the prequisites of a target to force it to be always rebuilt.
+>  # ---------------------------------------------------------------------------
 > --
 > 2.17.1
 >
