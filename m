@@ -1,49 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:52240 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727635AbfHFVe0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Aug 2019 17:34:26 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.2 34/59] kbuild: modpost: handle KBUILD_EXTRA_SYMBOLS only for external modules
-Date: Tue,  6 Aug 2019 17:32:54 -0400
-Message-Id: <20190806213319.19203-34-sashal@kernel.org>
-In-Reply-To: <20190806213319.19203-1-sashal@kernel.org>
-References: <20190806213319.19203-1-sashal@kernel.org>
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:37472 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727653AbfHGCdH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 6 Aug 2019 22:33:07 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <patch-1.thread-2257a1.git-188f5a3d81d5.your-ad-here.call-01565088755-ext-5120@work.hours>
+In-Reply-To: <patch-1.thread-2257a1.git-188f5a3d81d5.your-ad-here.call-01565088755-ext-5120@work.hours>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 7 Aug 2019 11:32:04 +0900
+Message-ID: <CAK7LNATL8aGReDm+BYk74tH1EdK1NKVgaWF6sJ7m1NtBL1kqkw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: add OBJSIZE variable for the size tool
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Hi.
 
-[ Upstream commit cb4819934a7f9b87876f11ed05b8624c0114551b ]
+On Tue, Aug 6, 2019 at 7:56 PM Vasily Gorbik <gor@linux.ibm.com> wrote:
+>
+> Define and export OBJSIZE variable for "size" tool from binutils to be
+> used in architecture specific Makefiles (naming the variable just "SIZE"
+> would be too risky). In particular this tool is useful to perform checks
+> that early boot code is not using bss section (which might have not been
+> zeroed yet or intersects with initrd or other files boot loader might
+> have put right after the linux kernel).
+>
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 
-KBUILD_EXTRA_SYMBOLS makes sense only when building external modules.
-Moreover, the modpost sets 'external_module' if the -e option is given.
+I think you want to apply both to the s390 tree. If so,
 
-I replaced $(patsubst %, -e %,...) with simpler $(addprefix -e,...)
-while I was here.
+Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- scripts/Makefile.modpost | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index fec6ec2ffa47d..b7e71545733b8 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -75,7 +75,7 @@ modpost = scripts/mod/modpost                    \
-  $(if $(CONFIG_MODULE_SRCVERSION_ALL),-a,)       \
-  $(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)   \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-- $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
-+ $(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS))) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-  $(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)  \
-  $(if $(KBUILD_MODPOST_WARN),-w)
+> ---
+>  Makefile | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index fa0fbe7851ea..ff4cff29fe46 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -419,6 +419,7 @@ NM          = $(CROSS_COMPILE)nm
+>  STRIP          = $(CROSS_COMPILE)strip
+>  OBJCOPY                = $(CROSS_COMPILE)objcopy
+>  OBJDUMP                = $(CROSS_COMPILE)objdump
+> +OBJSIZE                = $(CROSS_COMPILE)size
+>  PAHOLE         = pahole
+>  LEX            = flex
+>  YACC           = bison
+> @@ -474,9 +475,9 @@ KBUILD_LDFLAGS :=
+>  GCC_PLUGINS_CFLAGS :=
+>
+>  export ARCH SRCARCH CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+> -export CPP AR NM STRIP OBJCOPY OBJDUMP PAHOLE KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
+> -export MAKE LEX YACC AWK INSTALLKERNEL PERL PYTHON PYTHON2 PYTHON3 UTS_MACHINE
+> -export HOSTCXX KBUILD_HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+> +export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE PAHOLE LEX YACC AWK INSTALLKERNEL
+> +export PERL PYTHON PYTHON2 PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+> +export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
+>
+>  export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+>  export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
+> --
+> 2.21.0
+>
+
+
 -- 
-2.20.1
+Best Regards
+Masahiro Yamada
