@@ -1,94 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:37726 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730747AbfHHLVv (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.130]:59231 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732375AbfHHNNN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Aug 2019 07:21:51 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2] kbuild: show hint if subdir-y/m is used to visit module Makefile
-Date: Thu,  8 Aug 2019 20:21:11 +0900
-Message-Id: <20190808112111.16159-1-yamada.masahiro@socionext.com>
+        Thu, 8 Aug 2019 09:13:13 -0400
+Subject: Re: [PATCH RFC] modpost: Support I2C Aliases from OF tables
+References: <20190710193918.31135-1-kieran.bingham+renesas@ideasonboard.com>
+ <0e1b6e0b-1c94-4b00-7fda-c2a303ee3816@redhat.com>
+ <20190731194419.GB4084@kunai>
+ <f4a78e93-6aaa-bc72-cf94-06fc2574451c@redhat.com>
+ <CAMuHMdUA-hjVqSP_c0cB=76cfrucF6xxRi3ymVoEsJ2hbkfT=A@mail.gmail.com>
+ <51451f89-9193-2be6-e724-e9ca44a25f52@redhat.com>
+From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <620e0aec-e3d8-7289-6525-b720013e8dfa@metux.net>
+Date: Thu, 8 Aug 2019 15:12:47 +0200
+MIME-Version: 1.0
+In-Reply-To: <51451f89-9193-2be6-e724-e9ca44a25f52@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+To: Javier Martinez Canillas <javierm@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Wolfram Sang <wsa@the-dreams.de>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>, Lee Jones <lee.jones@linaro.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mark Brown <broonie@kernel.org>
 
-Since commit ff9b45c55b26 ("kbuild: modpost: read modules.order instead
-of $(MODVERDIR)/*.mod"), a module is no longer built in the following
-pattern:
+On 06.08.19 19:12, Javier Martinez Canillas wrote:
 
-  [Makefile]
-  subdir-y := some-module
+> Right, we could add a macro for that. Although it should probably be called
+> I2C_OF_MODULE_DEVICE_TABLE() or something like that since is specific to OF.
 
-  [some-module/Makefile]
-  obj-m := some-module.o
+At that point it should be completely noop when OF is disabled, so we
+also can get rid of many ifdef's.
 
-You cannot write Makefile this way in upstream because modules.order is
-not correctly generated. subdir-y is used to descend to a sub-directory
-that builds tools, device trees, etc.
+I've got some patch somewhere for introducing a MODULE_OF_TABLE() macro
+as replacement for many MODULE_DEVICE_TABLE(of, ...) cases, which noops
+when CONFIG_OF is disabled. (and similar ones for other table types).
 
-For external modules, the modules order does not matter. So, the
-Makefile above was known to work.
+by the way: haven't followed whole discussion, just picked up some
+proposed table changes ... does that require userland upgrades ?
 
-I believe the Makefile should be re-written as follows:
 
-  [Makefile]
-  obj-m := some-module/
+--mtx
 
-  [some-module/Makefile]
-  obj-m := some-module.o
-
-However, people will have no idea if their Makefile suddenly stops
-working. In fact, I received questions from multiple people.
-
-Show a warning if obj-m is specified in a Makefile visited by subdir-y
-or subdir-m.
-
-I touched the %/ rule to avoid false-positive warnings for the single
-target.
-
-Cc: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-Changes in v2:
- - fix false-positive warnings for single targets
-
- Makefile               | 2 +-
- scripts/Makefile.build | 7 +++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 0e37ad2f77bf..fac25e279da6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1783,7 +1783,7 @@ PHONY += /
- /: ./
- 
- %/: prepare FORCE
--	$(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir)
-+	$(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir) need-modorder=1
- 
- # FIXME Should go into a make.lib or something
- # ===========================================================================
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 37a1d2cd49d4..2f66ed388d1c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -52,6 +52,13 @@ ifndef obj
- $(warning kbuild: Makefile.build is included improperly)
- endif
- 
-+ifeq ($(MAKECMDGOALS)$(need-modorder),)
-+ifneq ($(obj-m),)
-+$(warning $(patsubst %.o,'%.ko',$(obj-m)) will not be built even though obj-m is specified.)
-+$(warning You cannot use subdir-y/m to visit a module Makefile. Use obj-y/m instead.)
-+endif
-+endif
-+
- # ===========================================================================
- 
- ifneq ($(strip $(lib-y) $(lib-m) $(lib-)),)
 -- 
-2.17.1
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
