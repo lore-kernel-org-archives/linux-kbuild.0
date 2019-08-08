@@ -1,53 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:36764 "EHLO
+Received: from heliosphere.sirena.org.uk ([172.104.155.198]:52328 "EHLO
         heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390340AbfHHWSQ (ORCPT
+        with ESMTP id S2404609AbfHHW1a (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Aug 2019 18:18:16 -0400
-Date: Thu, 8 Aug 2019 23:17:54 +0100
+        Thu, 8 Aug 2019 18:27:30 -0400
 From: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH RFC 0/1] kbuild: enable overriding the compiler using the
- environment
-Message-ID: <20190808221754.GP3795@sirena.co.uk>
-References: <cover.1565297255.git.guillaume.tucker@collabora.com>
+Subject: [PATCH] merge_config.sh: Check error codes from make
+Date: Thu,  8 Aug 2019 23:27:05 +0100
+Message-Id: <20190808222705.35973-1-broonie@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="iq/fWD14IMVFWBCD"
-Content-Disposition: inline
-In-Reply-To: <cover.1565297255.git.guillaume.tucker@collabora.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Guillaume Tucker <guillaume.tucker@collabora.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Guenter Roeck <linux@roeck-us.net>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, kernel@collabora.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Mark Brown <broonie@kernel.org>, Guillaume Tucker <guillaume.tucker@collabora.com>
 
+When we execute make after merging the configurations we ignore any
+errors it produces causing whatever is running merge_config.sh to be
+unaware of any failures.  This issue was noticed by Guillaume Tucker
+while looking at problems with testing of clang only builds in KernelCI
+which caused Kbuild to be unable to find a working host compiler.
 
---iq/fWD14IMVFWBCD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reported-by: Guillaume Tucker <guillaume.tucker@collabora.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ scripts/kconfig/merge_config.sh | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-On Thu, Aug 08, 2019 at 11:06:51PM +0200, Guillaume Tucker wrote:
-
-> While this fix seems like a very obvious thing to do, it's equally
-> surprising that it hasn't been done before.  This is why I'm sending this
-> as an RFC; there may be a very good reason why the compiler variables
-> still need to be hard-coded with gcc in the top-level Makefile.
-
-Probably the few people building kernels who didn't have GCC installed
-and ran into this just went and installed it when they saw the error.
-
---iq/fWD14IMVFWBCD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl1Mn5IACgkQJNaLcl1U
-h9DY1Af+NqU3cOOFQVhT9tHvETuiNHGUGmHdw+yNH2FL0oD+g/TnIDUwt/LzUXv5
-f1ZbtgZjdjQWsKzmhZCrPC5im8DngacGB1SUF3gZP09voM6xJ6GcaD/kpGk3+jDW
-Xqlfc7Z2s1t73CAAJ1E8+vh20kRVnzZD326f2XBIP7i72gVjB2NbwMJidkvLEANO
-1G7YgkXtxG8C7jfyif+3HIbq65G9sgcHj0WBhCoEn/Vh1kPgYIiGf7E7ebdwlYIW
-aoWBYxAiMDLoPq2QxC2Kw6P2tQMdUgOimmrkPbRCX+JhCfKeJw4EySGbcCedt0vL
-uVbmpSx17MVaxjRzQEsWapcMATznGA==
-=1asF
------END PGP SIGNATURE-----
-
---iq/fWD14IMVFWBCD--
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index d924c51d28b7..96e960dce968 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -14,9 +14,10 @@
+ #  Copyright 2011 Linaro
+ 
+ clean_up() {
++	RET=$1
+ 	rm -f $TMP_FILE
+ 	rm -f $MERGE_FILE
+-	exit
++	exit ${RET}
+ }
+ trap clean_up HUP INT TERM
+ 
+@@ -171,6 +172,10 @@ fi
+ # alldefconfig: Fills in any missing symbols with Kconfig default
+ # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
++RET=$?
++if [ "$RET" != "0" ]; then
++	clean_up $RET
++fi
+ 
+ 
+ # Check all specified config values took (might have missed-dependency issues)
+-- 
+2.20.1
