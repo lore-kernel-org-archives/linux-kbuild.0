@@ -1,109 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:54085 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725817AbfHHGan (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:37744 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726721AbfHHHpJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Aug 2019 02:30:43 -0400
+        Thu, 8 Aug 2019 03:45:09 -0400
+Date: Thu, 8 Aug 2019 00:45:07 -0700
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC PATCH] kbuild: re-implement detection of CONFIG options
+ leaked to user-space
+Message-ID: <20190808074507.GA22720@infradead.org>
+References: <20190806043729.5562-1-yamada.masahiro@socionext.com>
+ <CAK8P3a2POcb+AReLKib513i_RTN9kLM_Tun7+G5LOacDuy7gjQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190806100323.22919-1-yamada.masahiro@socionext.com> <20190806100323.22919-3-yamada.masahiro@socionext.com>
-In-Reply-To: <20190806100323.22919-3-yamada.masahiro@socionext.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 8 Aug 2019 15:29:52 +0900
-Message-ID: <CAK7LNARrC2h_qtFaY6=2+YVz2kJcMK_+QZ+WJEba8T1AH_Nvjg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] kbuild: show hint if subdir-y/m is used to visit
- module Makefile
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a2POcb+AReLKib513i_RTN9kLM_Tun7+G5LOacDuy7gjQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, bpf@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Amit Pundir <amit.pundir@linaro.org>, David Howells <dhowells@redhat.com>
 
-On Tue, Aug 6, 2019 at 7:03 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Since commit ff9b45c55b26 ("kbuild: modpost: read modules.order instead
-> of $(MODVERDIR)/*.mod"), a module is no longer built in the following
-> pattern:
->
->   [Makefile]
->   subdir-y := some-module
->
->   [some-module/Makefile]
->   obj-m := some-module.o
->
-> You cannot write Makefile this way in upstream because modules.order is
-> not correctly generated. subdir-y is used to descend to a sub-directory
-> that builds tools, device trees, etc.
->
-> For external modules, the modules order does not matter. So, the
-> Makefile above was known to work.
->
-> I believe the Makefile should be re-written as follows:
->
->   [Makefile]
->   obj-m := some-module/
->
->   [some-module/Makefile]
->   obj-m := some-module.o
->
-> However, people will have no idea if their Makefile suddenly stops
-> working. In fact, I received questions from multiple people.
->
-> Show a warning if obj-m is specified in a Makefile visited by subdir-y
-> or subdir-m.
->
-> Cc: Jan Kiszka <jan.kiszka@siemens.com>
-> Cc: Tom Stonecypher <thomas.edwardx.stonecypher@intel.com>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+On Tue, Aug 06, 2019 at 11:00:19AM +0200, Arnd Bergmann wrote:
+> > I was playing with sed yesterday, but the resulted code might be unreadable.
+> >
+> > Sed scripts tend to be somewhat unreadable.
+> > I just wondered which language is appropriate for this?
+> > Maybe perl, or what else? I am not good at perl, though.
+> 
+> I like the sed version, in particular as it seems to do the job and
+> I'm not volunteering to write it in anything else.
 
-This produces false-positive warnings for single-targets.
-I will fix up as follows:
+Did anyone not like sed?  I have to say I do like scripts using sed and
+awk because they are fairly readable and avoid dependencies on "big"
+scripting language and their optional modules that sooner or later get
+pulled in.
 
+> This one is nontrivial, since it defines two incompatible layouts for
+> this structure,
+> and the fdpic version is currently not usable at all from user space. Also,
+> the definition breaks configurations that have both CONFIG_BINFMT_ELF
+> and CONFIG_BINFMT_ELF_FDPIC enabled, which has become possible
+> with commit 382e67aec6a7 ("ARM: enable elf_fdpic on systems with an MMU").
+> 
+> The best way forward I see is to duplicate the structure definition, adding
+> a new 'struct elf_fdpic_prstatus', and using that in fs/binfmt_elf_fdpic.c.
+> The same change is required in include/linux/elfcore-compat.h.
 
-diff --git a/Makefile b/Makefile
-index 0e37ad2f77bf..fac25e279da6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1783,7 +1783,7 @@ PHONY += /
- /: ./
-
- %/: prepare FORCE
--       $(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir)
-+       $(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir) need-modorder=1
-
- # FIXME Should go into a make.lib or something
- # ===========================================================================
-
-
-
->
->  scripts/Makefile.build | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 37a1d2cd49d4..4a26c7ed9198 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -52,6 +52,13 @@ ifndef obj
->  $(warning kbuild: Makefile.build is included improperly)
->  endif
->
-> +ifeq ($(need-modorder),)
-> +ifneq ($(obj-m),)
-> +$(warning $(patsubst %.o,'%.ko',$(obj-m)) will not be built even though obj-m is specified.)
-> +$(warning You cannot use subdir-y/m to visit a module Makefile. Use obj-y/m instead.)
-> +endif
-> +endif
-> +
->  # ===========================================================================
->
->  ifneq ($(strip $(lib-y) $(lib-m) $(lib-)),)
-> --
-> 2.17.1
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+Yeah, this is a mess.  David Howells suggested something similar when
+I brought the issue to his attention last time.
