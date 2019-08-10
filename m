@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:34505 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:34527 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726395AbfHJPyo (ORCPT
+        with ESMTP id S1726410AbfHJPyo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 10 Aug 2019 11:54:44 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 07/11] kbuild: unset variables in top Makefile instead of setting 0
-Date: Sun, 11 Aug 2019 00:53:03 +0900
-Message-Id: <20190810155307.29322-8-yamada.masahiro@socionext.com>
+Subject: [PATCH 04/11] kbuild: remove 'make /' support
+Date: Sun, 11 Aug 2019 00:53:00 +0900
+Message-Id: <20190810155307.29322-5-yamada.masahiro@socionext.com>
 In-Reply-To: <20190810155307.29322-1-yamada.masahiro@socionext.com>
 References: <20190810155307.29322-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,170 +15,48 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-There is no need to set 0 to variables such as config-targets,
-mixed-targets, etc.
+'make /' is just an alias for 'make ./'; this builds all objects of an
+external module, but skips the modpost stage.
 
-Unset instead of setting 0 in order to use 'ifdef' to test them.
+I am not a big fan of 'make /' since it looks as if it were touching
+the root directory of the system. I like 'make ./' better.
 
-I also renamed:
-
-  config-targets  ->  config-build
-  mixed-targets   ->  mixed-build
-  dot-config      ->  need-config
-
-to clarify what we are doing.
+I do not know how many people are using it, but let's show a hint if
+it is used. Also, move it close to the external module rules since
+this only makes sense for external modules.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ Makefile | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 3c186f59f152..706ca0d633df 100644
+index 24c9ed272b5f..86afce391582 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -272,32 +272,32 @@ no-dot-config-targets := $(clean-targets) \
- no-sync-config-targets := $(no-dot-config-targets) install %install \
- 			   kernelrelease
+@@ -1648,6 +1648,10 @@ $(clean-dirs):
  
--config-targets  := 0
--mixed-targets   := 0
--dot-config      := 1
--may-sync-config := 1
-+config-build	:=
-+mixed-build	:=
-+need-config	:= 1
-+may-sync-config	:= 1
+ clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers
  
- ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
--		dot-config := 0
-+		need-config :=
- 	endif
- endif
++PHONY += /
++/:
++	@echo >&2 '"$(MAKE) /" is no longer supported. Please use "$(MAKE) ./" instead.'
++
+ PHONY += help
+ help:
+ 	@echo  '  Building external modules.'
+@@ -1783,11 +1787,6 @@ endif
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(build-target:.ko=.mod)
+ 	$(Q)echo $(build-target) > $(MODORDER)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-
+-# Modules
+-PHONY += /
+-/: ./
+-
+ %/: prepare FORCE
+ 	$(Q)$(MAKE) KBUILD_MODULES=1 $(build)=$(build-dir) need-modorder=1
  
- ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
- 	ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
--		may-sync-config := 0
-+		may-sync-config :=
- 	endif
- endif
- 
- ifneq ($(KBUILD_EXTMOD),)
--	may-sync-config := 0
-+	may-sync-config :=
- endif
- 
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
--                config-targets := 1
-+		config-build := 1
-                 ifneq ($(words $(MAKECMDGOALS)),1)
--                        mixed-targets := 1
-+			mixed-build := 1
-                 endif
-         endif
- endif
-@@ -305,18 +305,18 @@ endif
- # For "make -j clean all", "make -j mrproper defconfig all", etc.
- ifneq ($(filter $(clean-targets),$(MAKECMDGOALS)),)
-         ifneq ($(filter-out $(clean-targets),$(MAKECMDGOALS)),)
--                mixed-targets := 1
-+		mixed-build := 1
-         endif
- endif
- 
- # install and modules_install need also be processed one by one
- ifneq ($(filter install,$(MAKECMDGOALS)),)
-         ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
--	        mixed-targets := 1
-+		mixed-build := 1
-         endif
- endif
- 
--ifeq ($(mixed-targets),1)
-+ifdef mixed-build
- # ===========================================================================
- # We're called with mixed targets (*config and build targets).
- # Handle them one by one.
-@@ -332,7 +332,7 @@ __build_one_by_one:
- 		$(MAKE) -f $(srctree)/Makefile $$i; \
- 	done
- 
--else
-+else # !mixed-build
- 
- include scripts/Kbuild.include
- 
-@@ -544,7 +544,7 @@ endif
- # and from include/config/auto.conf.cmd to detect the compiler upgrade.
- CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
- 
--ifeq ($(config-targets),1)
-+ifdef config-build
- # ===========================================================================
- # *config targets only - make sure prerequisites are updated, and descend
- # in scripts/kconfig to make the *config target
-@@ -561,7 +561,7 @@ config: scripts_basic outputmakefile FORCE
- %config: scripts_basic outputmakefile FORCE
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
--else
-+else #!config-build
- # ===========================================================================
- # Build targets only - this includes vmlinux, arch specific targets, clean
- # targets and others. In general all targets except *config targets.
-@@ -604,7 +604,7 @@ endif
- 
- export KBUILD_MODULES KBUILD_BUILTIN
- 
--ifeq ($(dot-config),1)
-+ifdef need-config
- include include/config/auto.conf
- endif
- 
-@@ -652,8 +652,8 @@ ARCH_AFLAGS :=
- ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
--ifeq ($(dot-config),1)
--ifeq ($(may-sync-config),1)
-+ifdef need-config
-+ifdef may-sync-config
- # Read in dependencies to all Kconfig* files, make sure to run syncconfig if
- # changes are detected. This should be included after arch/$(SRCARCH)/Makefile
- # because some architectures define CROSS_COMPILE there.
-@@ -676,7 +676,7 @@ $(KCONFIG_CONFIG):
- # The syncconfig should be executed only once to make all the targets.
- %/auto.conf %/auto.conf.cmd %/tristate.conf: $(KCONFIG_CONFIG)
- 	$(Q)$(MAKE) -f $(srctree)/Makefile syncconfig
--else
-+else # !may-sync-config
- # External modules and some install targets need include/generated/autoconf.h
- # and include/config/auto.conf but do not care if they are up-to-date.
- # Use auto.conf to trigger the test
-@@ -692,7 +692,7 @@ include/config/auto.conf:
- 	/bin/false)
- 
- endif # may-sync-config
--endif # $(dot-config)
-+endif # need-config
- 
- KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
- KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
-@@ -1809,9 +1809,9 @@ existing-targets := $(wildcard $(sort $(targets)))
- 
- -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
- 
--endif   # ifeq ($(config-targets),1)
--endif   # ifeq ($(mixed-targets),1)
--endif   # need-sub-make
-+endif # config-targets
-+endif # mixed-build
-+endif # need-sub-make
- 
- PHONY += FORCE
- FORCE:
 -- 
 2.17.1
