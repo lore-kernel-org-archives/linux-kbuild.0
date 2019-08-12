@@ -1,109 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:45155 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726200AbfHLVtO (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 17:49:14 -0400
-Received: by mail-pg1-f195.google.com with SMTP id o13so50130054pgp.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 14:49:13 -0700 (PDT)
-Date: Mon, 12 Aug 2019 14:49:11 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: Parameterize kallsyms generation and correct
- reporting
-Message-ID: <201908121448.4D023D7@keescook>
+Received: from mail.kernel.org ([198.145.29.99]:49114 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726185AbfHLWKc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Aug 2019 18:10:32 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190812182421.141150-3-brendanhiggins@google.com>
+References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812182421.141150-3-brendanhiggins@google.com>
+Subject: Re: [PATCH v12 02/18] kunit: test: add test resource management API
+From: Stephen Boyd <sboyd@kernel.org>
+Date: Mon, 12 Aug 2019 15:10:29 -0700
+Message-Id: <20190812221030.99B31206C2@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-When kallsyms generation happens, temporary vmlinux outputs are linked
-but the quiet make output doesn't report it, giving the impression that
-the prior command is taking longer than expected.
+Quoting Brendan Higgins (2019-08-12 11:24:05)
+> Create a common API for test managed resources like memory and test
+> objects. A lot of times a test will want to set up infrastructure to be
+> used in test cases; this could be anything from just wanting to allocate
+> some memory to setting up a driver stack; this defines facilities for
+> creating "test resources" which are managed by the test infrastructure
+> and are automatically cleaned up at the conclusion of the test.
+>=20
+> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+> ---
 
-Instead, report the KSYM step before the temporary linking. While at it,
-this consolidates the repeated "kallsyms generation step" into a single
-function and removes the existing copy/pasting.
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- scripts/link-vmlinux.sh | 39 ++++++++++++++++++++-------------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
-
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 96b6c0233a61..ed52be015523 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -170,7 +170,6 @@ gen_btf()
- # Create ${2} .o file with all symbols from the ${1} object file
- kallsyms()
- {
--	info KSYM ${2}
- 	local kallsymopt;
- 
- 	if [ -n "${CONFIG_KALLSYMS_ALL}" ]; then
-@@ -277,7 +276,22 @@ info MODINFO modules.builtin.modinfo
- ${OBJCOPY} -j .modinfo -O binary vmlinux.o modules.builtin.modinfo
- 
- kallsymso=""
-+kallsymso_previous=""
- kallsyms_vmlinux=""
-+
-+# Perform one step in kallsyms generation, including temporary linking of
-+# vmlinux.
-+kallsyms_step()
-+{
-+	kallsymso_previous=${kallsymso}
-+	kallsymso=.tmp_kallsyms${1}.o
-+	kallsyms_vmlinux=.tmp_vmlinux${1}
-+
-+	info KSYM ${kallsymso}
-+	vmlinux_link "${kallsymso_previous}" ${kallsyms_vmlinux}
-+	kallsyms ${kallsyms_vmlinux} ${kallsymso}
-+}
-+
- if [ -n "${CONFIG_KALLSYMS}" ]; then
- 
- 	# kallsyms support
-@@ -303,28 +317,15 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
- 	# a)  Verify that the System.map from vmlinux matches the map from
- 	#     ${kallsymso}.
- 
--	kallsymso=.tmp_kallsyms2.o
--	kallsyms_vmlinux=.tmp_vmlinux2
--
--	# step 1
--	vmlinux_link "" .tmp_vmlinux1
--	kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
--
--	# step 2
--	vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
--	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
-+	kallsyms_step 1
-+	kallsyms_step 2
- 
- 	# step 3
--	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" .tmp_kallsyms1.o)
--	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" .tmp_kallsyms2.o)
-+	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso_previous})
-+	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
- 
- 	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
--		kallsymso=.tmp_kallsyms3.o
--		kallsyms_vmlinux=.tmp_vmlinux3
--
--		vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
--
--		kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
-+		kallsyms_step 3
- 	fi
- fi
- 
--- 
-2.17.1
-
-
--- 
-Kees Cook
+Reviewed-by: Stephen Boyd <sboyd@kernel.org>
