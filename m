@@ -1,112 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:57258 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728826AbfHLNdU (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:28767 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727037AbfHLPYk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 09:33:20 -0400
-Subject: Re: [PATCH RFC 1/1] kbuild: enable overriding the compiler using the
- environment
-References: <cover.1565297255.git.guillaume.tucker@collabora.com>
- <3885ccdcbdbe83eb367e8344584df944adc76e34.1565297255.git.guillaume.tucker@collabora.com>
- <CAKwvOdmOdJspcO8jqUhqR63-MOWkV3ZrVcCO6u=HG6peov8Htw@mail.gmail.com>
- <20190809051552.GA44466@archlinux-threadripper>
-From: Guillaume Tucker <guillaume.tucker@collabora.com>
-Message-ID: <b2ac60fb-94f7-1273-e1a3-825172c3cc00@collabora.com>
-Date: Mon, 12 Aug 2019 15:33:08 +0200
+        Mon, 12 Aug 2019 11:24:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190809051552.GA44466@archlinux-threadripper>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
+In-Reply-To: <20190809002104.18599-2-stancheff@cray.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 13 Aug 2019 00:23:38 +0900
+Message-ID: <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Mark Brown <broonie@kernel.org>, Guenter Roeck <linux@roeck-us.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel@collabora.com
+To: Shaun Tancheff <shaun@tancheff.com>
+Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
 
-On 09/08/2019 07:15, Nathan Chancellor wrote:
-> On Thu, Aug 08, 2019 at 03:42:32PM -0700, 'Nick Desaulniers' via Clang Built Linux wrote:
->> On Thu, Aug 8, 2019 at 2:07 PM Guillaume Tucker
->> <guillaume.tucker@collabora.com> wrote:
->>>
->>> Only use gcc/g++ for HOSTCC, HOSTCXX and CC by default if they are not
->>> already defined in the environment.  This fixes cases such as building
->>> host tools with clang without having gcc installed.
->>>
->>> The issue was initially hit when running merge_config.sh with clang
->>> only as it failed to build "HOSTCC scripts/basic/fixdep".
->>
->> Thanks for the patch.  I don't quite follow the exact error.
->>
->> When building with Clang, I usually do:
->>
->> $ make CC=clang HOSTCC=clang ...
->>
->> are you trying to fix the case where you do:
->>
->> $ make CC=clang ...
->> <no HOSTCC set>
->> when GCC is not installed?  Because if so, I think it would be easier
->> to just specify HOSTCC=clang, but maybe I'm misunderstanding the
->> issue?
-> 
-> As I understand it,
-> 
-> $ make CC=clang HOSTCC=clang
-> 
-> works fine. What doesn't currently work is:
-> 
-> $ export CC=clang
-> $ export HOSTCC=clang
-> $ make
-> 
-> This is problematic because there is no way for CC, HOSTCC, and HOSTCXX
-> to be passed to make within scripts/kconfig/merge_config.sh.
-> 
-> A quick test before and after the patch:
-> 
-> $ ( export HOSTCC=clang; make -j$(nproc) O=out defconfig V=1 )
-> ...
->   gcc -Wp,-MD,scripts/kconfig/.conf.o.d -Wall -Wmissing-prototypes...
->   gcc -Wp,-MD,scripts/kconfig/.confdata.o.d -Wall -Wmissing-prototypes...
-> ...
-> $ ( export HOSTCC=clang; make -j$(nproc) O=out defconfig V=1 )
-> ...
->   clang -Wp,-MD,scripts/kconfig/.conf.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes...
->   clang -Wp,-MD,scripts/kconfig/.confdata.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes...
-> ...
-> 
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
+>
+> When building a tree of external modules stage 2 fails
+> silently as the root modules.order is empty.
+>
+> Modify the modules.order location to be fixed to the
+> root when KBUILD_EXTMOD is specified and write all
+> module paths to the single modules.order file.
 
-Thanks for the review.
+Could you try v5.3-rc4 please?
 
-> I wonder if all variable should be converted to that scheme or just the
-> ones that are needed in this instance. I also wonder if this will cause
 
-This is what Mark also asked.  If we want to use ?= then I can
-send another patch to cover all the other variables.  It also
-makes sense to be able to choose an alternative linker, in
-particular LLVM's ld.lld was brought up recently in some KernelCI
-discussions.
 
-> any issues with people who define these variables in their environment
-> already; if so, maybe merge_config.sh should be updated to support
-> passing CC, HOSTCC, and HOSTCXX to make.
 
-I think the reason for the RFC essentially boils down to this.
-On the other hand, if someone exports HOSTCC or CC to use some
-specific compiler, they would expect it to be used.  It would
-seem like a bit strange to export one value for a variable and
-then pass another one to make (i.e. "export CC=gcc; make
-CC=clang").  Also, passing all the variables to make in
-merge_config.sh as well as any other place where this may happen
-is likely to be rather error-prone and hard to maintain, say if
-new variables get introduced in the Makefile or if some new
-scripts start calling make.
+> Signed-off-by: Shaun Tancheff <stancheff@cray.com>
+> ---
+>  Makefile               | 1 +
+>  scripts/Makefile.build | 8 +++++++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 23cdf1f41364..a9964492f47e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1622,6 +1622,7 @@ $(module-dirs): prepare $(objtree)/Module.symvers
+>
+>  modules: $(module-dirs)
+>         @$(kecho) '  Building modules, stage 2.';
+> +       $(Q)$rm -f $(KBUILD_EXTMOD)/modules.order
+>         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+>
+>  PHONY += modules_install
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 0d434d0afc0b..f9908b3d59e0 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -64,7 +64,13 @@ builtin-target := $(obj)/built-in.a
+>  endif
+>
+>  ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
+> +ifneq ($(KBUILD_EXTMOD),)
+> +modorder-target := $(KBUILD_EXTMOD)/modules.order
+> +modorder-add := >>
+> +else
+>  modorder-target := $(obj)/modules.order
+> +modorder-add := >
+> +endif
+>  endif
+>
+>  mod-targets := $(patsubst %.o, %.mod, $(obj-m))
+> @@ -423,7 +429,7 @@ endif # builtin-target
+>  $(modorder-target): $(subdir-ym) FORCE
+>         $(Q){ $(foreach m, $(modorder), \
+>         $(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
+> -       | $(AWK) '!x[$$0]++' - > $@
+> +       | $(AWK) '!x[$$0]++' - $(modorder-add) $@
+>
+>  #
+>  # Rule to compile a set of .o files into one .a file (with symbol table)
+> --
+> 2.20.1
+>
 
-So I'll prepare a new patch using the ?= approach.  Meanwhile
-we'll see if someone can find a good reason why this can actually
-be problematic.
 
-Best wishes,
-Guillaume
+-- 
+Best Regards
+Masahiro Yamada
