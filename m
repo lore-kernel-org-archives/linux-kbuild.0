@@ -1,72 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:47776 "EHLO
-        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727846AbfHLKnh (ORCPT
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:56984 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728750AbfHLNN2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 06:43:37 -0400
-Date: Mon, 12 Aug 2019 11:43:33 +0100
-From: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH] merge_config.sh: Check error codes from make
-Message-ID: <20190812104333.GC4592@sirena.co.uk>
-References: <20190808222705.35973-1-broonie@kernel.org>
- <CAK7LNARkfLY94D=B_h_s7Cz_DAmMUYvoYq4-xB1bt-RRJZP77Q@mail.gmail.com>
+        Mon, 12 Aug 2019 09:13:28 -0400
+Subject: Re: [PATCH RFC 1/1] kbuild: enable overriding the compiler using the
+ environment
+References: <cover.1565297255.git.guillaume.tucker@collabora.com>
+ <3885ccdcbdbe83eb367e8344584df944adc76e34.1565297255.git.guillaume.tucker@collabora.com>
+ <20190808223512.GT3795@sirena.co.uk>
+From: Guillaume Tucker <guillaume.tucker@collabora.com>
+Message-ID: <0d0a5126-73fb-8815-f4d6-d60506dea0ab@collabora.com>
+Date: Mon, 12 Aug 2019 15:13:20 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="eRtJSFbw+EEWtPj3"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARkfLY94D=B_h_s7Cz_DAmMUYvoYq4-xB1bt-RRJZP77Q@mail.gmail.com>
+In-Reply-To: <20190808223512.GT3795@sirena.co.uk>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Guillaume Tucker <guillaume.tucker@collabora.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Guenter Roeck <linux@roeck-us.net>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, kernel@collabora.com
 
+On 09/08/2019 00:35, Mark Brown wrote:
+> On Thu, Aug 08, 2019 at 11:06:52PM +0200, Guillaume Tucker wrote:
+> 
+>> @@ -412,7 +412,7 @@ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
+>>  # Make variables (CC, etc...)
+>>  AS		= $(CROSS_COMPILE)as
+>>  LD		= $(CROSS_COMPILE)ld
+>> -CC		= $(CROSS_COMPILE)gcc
+>> +CC	       ?= $(CROSS_COMPILE)gcc
+>>  CPP		= $(CC) -E
+>>  AR		= $(CROSS_COMPILE)ar
+>>  NM		= $(CROSS_COMPILE)nm
+> 
+> Why only for CC and not for anything else here?
 
---eRtJSFbw+EEWtPj3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This was the smallest possible change to fix the issue and what I
+tested for this RFC.  Of course, if using ?= is a valid way to
+fix it then it would seem logical to apply it to the other
+variables defined there.
 
-On Sat, Aug 10, 2019 at 06:11:10PM +0900, Masahiro Yamada wrote:
-> On Fri, Aug 9, 2019 at 7:27 AM Mark Brown <broonie@kernel.org> wrote:
-
-> > When we execute make after merging the configurations we ignore any
-> > errors it produces causing whatever is running merge_config.sh to be
-> > unaware of any failures.  This issue was noticed by Guillaume Tucker
-
-> I am not a big fan of this way of fixing.
-
-> [1] 'set -e' is useful to catch any error in this script.
-
-Right, that was actually my first thought but since there was a handler
-and it was already being called directly this must be a deliberate style
-so I did things this way in order to fit in with the existing style :/
-
-> [2] I think trapping only EXIT is smarter.
->     The clean() help will be invoked when this script exits
->     for whatever reason; the temporary files will be cleaned up
->     when the script is interrupted, errors-out, or finishes
->     successfully.
-
-> I would change like follows:
-
-That works for me,=20
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Tested-by: Mark Brown <broonie@kernel.org>
-
---eRtJSFbw+EEWtPj3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl1RQtQACgkQJNaLcl1U
-h9CP1gf/XX+eXOYHMI9aH70hZlG2FXdfrke5+ZDdtFbM7OI+pEBwVxe6gpnkeBYY
-0OVXegZeeeM+aLnb3zIXXkX88i0VFlwuEFGDEhyds5eHQOwXljK9JddMwaUKf2Qk
-47jRgLYyKmIukt9WV45V5fhcz4FxujzEH+gHTYFqKaDEk+WvvUKe0NvuicGCqEzA
-oqV9R4A9aYunhJdSkY9mIYSorP67Z9jBNeLYCYEbZx2Uj01kxCAh2rekAPUZOd4w
-yf1jXsuIO2Osz0f3ZmEpGpxyLQvBlpZeo92/K2dHovxz2LitGlnugQcDMth/8fS+
-hoHqfgbVF4iONB4gM4cNweJdpu7KZg==
-=kLUK
------END PGP SIGNATURE-----
-
---eRtJSFbw+EEWtPj3--
+Guillaume
