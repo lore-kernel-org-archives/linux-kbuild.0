@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:44910 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726949AbfHLSY7 (ORCPT
+Received: from mail-ua1-f74.google.com ([209.85.222.74]:55768 "EHLO
+        mail-ua1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726871AbfHLSYv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 14:24:59 -0400
-Received: by mail-pg1-f202.google.com with SMTP id i134so27879727pgd.11
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 11:24:58 -0700 (PDT)
-Date: Mon, 12 Aug 2019 11:24:10 -0700
+        Mon, 12 Aug 2019 14:24:51 -0400
+Received: by mail-ua1-f74.google.com with SMTP id r20so501504uak.22
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 11:24:51 -0700 (PDT)
+Date: Mon, 12 Aug 2019 11:24:07 -0700
 In-Reply-To: <20190812182421.141150-1-brendanhiggins@google.com>
-Message-Id: <20190812182421.141150-8-brendanhiggins@google.com>
+Message-Id: <20190812182421.141150-5-brendanhiggins@google.com>
 Mime-Version: 1.0
 References: <20190812182421.141150-1-brendanhiggins@google.com>
-Subject: [PATCH v12 07/18] kunit: test: add initial tests
+Subject: [PATCH v12 04/18] kunit: test: add assertion printing library
 From: Brendan Higgins <brendanhiggins@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,235 +19,363 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
 Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-Add a test for string stream along with a simpler example.
+Add `struct kunit_assert` and friends which provide a structured way to
+capture data from an expectation or an assertion (introduced later in
+the series) so that it may be printed out in the event of a failure.
 
 Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- kunit/Kconfig              | 21 +++++++++
- kunit/Makefile             |  4 ++
- kunit/example-test.c       | 88 ++++++++++++++++++++++++++++++++++++++
- kunit/string-stream-test.c | 74 ++++++++++++++++++++++++++++++++
- 4 files changed, 187 insertions(+)
- create mode 100644 kunit/example-test.c
- create mode 100644 kunit/string-stream-test.c
+ include/kunit/assert.h | 183 +++++++++++++++++++++++++++++++++++++++++
+ kunit/Makefile         |   3 +-
+ kunit/assert.c         | 141 +++++++++++++++++++++++++++++++
+ 3 files changed, 326 insertions(+), 1 deletion(-)
+ create mode 100644 include/kunit/assert.h
+ create mode 100644 kunit/assert.c
 
-diff --git a/kunit/Kconfig b/kunit/Kconfig
-index 330ae83527c23..8541ef95b65ad 100644
---- a/kunit/Kconfig
-+++ b/kunit/Kconfig
-@@ -14,4 +14,25 @@ config KUNIT
- 	  architectures. For more information, please see
- 	  Documentation/dev-tools/kunit/.
- 
-+config KUNIT_TEST
-+	bool "KUnit test for KUnit"
-+	depends on KUNIT
-+	help
-+	  Enables the unit tests for the KUnit test framework. These tests test
-+	  the KUnit test framework itself; the tests are both written using
-+	  KUnit and test KUnit. This option should only be enabled for testing
-+	  purposes by developers interested in testing that KUnit works as
-+	  expected.
-+
-+config KUNIT_EXAMPLE_TEST
-+	bool "Example test for KUnit"
-+	depends on KUNIT
-+	help
-+	  Enables an example unit test that illustrates some of the basic
-+	  features of KUnit. This test only exists to help new users understand
-+	  what KUnit is and how it is used. Please refer to the example test
-+	  itself, kunit/example-test.c, for more information. This option is
-+	  intended for curious hackers who would like to understand how to use
-+	  KUnit for kernel development.
-+
- endmenu
-diff --git a/kunit/Makefile b/kunit/Makefile
-index 6dcbe309036b8..4e46450bcb3a8 100644
---- a/kunit/Makefile
-+++ b/kunit/Makefile
-@@ -1,3 +1,7 @@
- obj-$(CONFIG_KUNIT) +=			test.o \
- 					string-stream.o \
- 					assert.o
-+
-+obj-$(CONFIG_KUNIT_TEST) +=		string-stream-test.o
-+
-+obj-$(CONFIG_KUNIT_EXAMPLE_TEST) +=	example-test.o
-diff --git a/kunit/example-test.c b/kunit/example-test.c
+diff --git a/include/kunit/assert.h b/include/kunit/assert.h
 new file mode 100644
-index 0000000000000..f64a829aa441f
+index 0000000000000..55f1b88b0cb4d
 --- /dev/null
-+++ b/kunit/example-test.c
-@@ -0,0 +1,88 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/include/kunit/assert.h
+@@ -0,0 +1,183 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * Example KUnit test to show how to use KUnit.
++ * Assertion and expectation serialization API.
 + *
 + * Copyright (C) 2019, Google LLC.
 + * Author: Brendan Higgins <brendanhiggins@google.com>
 + */
 +
-+#include <kunit/test.h>
++#ifndef _KUNIT_ASSERT_H
++#define _KUNIT_ASSERT_H
 +
-+/*
-+ * This is the most fundamental element of KUnit, the test case. A test case
-+ * makes a set EXPECTATIONs and ASSERTIONs about the behavior of some code; if
-+ * any expectations or assertions are not met, the test fails; otherwise, the
-+ * test passes.
-+ *
-+ * In KUnit, a test case is just a function with the signature
-+ * `void (*)(struct kunit *)`. `struct kunit` is a context object that stores
-+ * information about the current test.
-+ */
-+static void example_simple_test(struct kunit *test)
-+{
-+	/*
-+	 * This is an EXPECTATION; it is how KUnit tests things. When you want
-+	 * to test a piece of code, you set some expectations about what the
-+	 * code should do. KUnit then runs the test and verifies that the code's
-+	 * behavior matched what was expected.
-+	 */
-+	KUNIT_EXPECT_EQ(test, 1 + 1, 2);
-+}
-+
-+/*
-+ * This is run once before each test case, see the comment on
-+ * example_test_suite for more information.
-+ */
-+static int example_test_init(struct kunit *test)
-+{
-+	kunit_info(test, "initializing\n");
-+
-+	return 0;
-+}
-+
-+/*
-+ * Here we make a list of all the test cases we want to add to the test suite
-+ * below.
-+ */
-+static struct kunit_case example_test_cases[] = {
-+	/*
-+	 * This is a helper to create a test case object from a test case
-+	 * function; its exact function is not important to understand how to
-+	 * use KUnit, just know that this is how you associate test cases with a
-+	 * test suite.
-+	 */
-+	KUNIT_CASE(example_simple_test),
-+	{}
-+};
-+
-+/*
-+ * This defines a suite or grouping of tests.
-+ *
-+ * Test cases are defined as belonging to the suite by adding them to
-+ * `kunit_cases`.
-+ *
-+ * Often it is desirable to run some function which will set up things which
-+ * will be used by every test; this is accomplished with an `init` function
-+ * which runs before each test case is invoked. Similarly, an `exit` function
-+ * may be specified which runs after every test case and can be used to for
-+ * cleanup. For clarity, running tests in a test suite would behave as follows:
-+ *
-+ * suite.init(test);
-+ * suite.test_case[0](test);
-+ * suite.exit(test);
-+ * suite.init(test);
-+ * suite.test_case[1](test);
-+ * suite.exit(test);
-+ * ...;
-+ */
-+static struct kunit_suite example_test_suite = {
-+	.name = "example",
-+	.init = example_test_init,
-+	.test_cases = example_test_cases,
-+};
-+
-+/*
-+ * This registers the above test suite telling KUnit that this is a suite of
-+ * tests that need to be run.
-+ */
-+kunit_test_suite(example_test_suite);
-diff --git a/kunit/string-stream-test.c b/kunit/string-stream-test.c
-new file mode 100644
-index 0000000000000..9cf08f9dadf36
---- /dev/null
-+++ b/kunit/string-stream-test.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KUnit test for struct string_stream.
-+ *
-+ * Copyright (C) 2019, Google LLC.
-+ * Author: Brendan Higgins <brendanhiggins@google.com>
-+ */
-+
-+#include <linux/slab.h>
-+#include <kunit/test.h>
++#include <linux/err.h>
 +#include <kunit/string-stream.h>
 +
-+static void string_stream_test_empty_on_creation(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test, GFP_KERNEL);
++struct kunit;
 +
-+	KUNIT_EXPECT_TRUE(test, string_stream_is_empty(stream));
-+}
-+
-+static void string_stream_test_not_empty_after_add(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test, GFP_KERNEL);
-+
-+	string_stream_add(stream, "Foo");
-+
-+	KUNIT_EXPECT_FALSE(test, string_stream_is_empty(stream));
-+}
-+
-+static void string_stream_test_get_string(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test, GFP_KERNEL);
-+	char *output;
-+
-+	string_stream_add(stream, "Foo");
-+	string_stream_add(stream, " %s", "bar");
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "Foo bar");
-+}
-+
-+static void string_stream_test_add_and_clear(struct kunit *test)
-+{
-+	struct string_stream *stream = alloc_string_stream(test, GFP_KERNEL);
-+	char *output;
-+	int i;
-+
-+	for (i = 0; i < 10; i++)
-+		string_stream_add(stream, "A");
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "AAAAAAAAAA");
-+	KUNIT_EXPECT_EQ(test, stream->length, (size_t)10);
-+	KUNIT_EXPECT_FALSE(test, string_stream_is_empty(stream));
-+
-+	string_stream_clear(stream);
-+
-+	output = string_stream_get_string(stream);
-+	KUNIT_EXPECT_STREQ(test, output, "");
-+	KUNIT_EXPECT_TRUE(test, string_stream_is_empty(stream));
-+}
-+
-+static struct kunit_case string_stream_test_cases[] = {
-+	KUNIT_CASE(string_stream_test_empty_on_creation),
-+	KUNIT_CASE(string_stream_test_not_empty_after_add),
-+	KUNIT_CASE(string_stream_test_get_string),
-+	KUNIT_CASE(string_stream_test_add_and_clear),
-+	{}
++enum kunit_assert_type {
++	KUNIT_ASSERTION,
++	KUNIT_EXPECTATION,
 +};
 +
-+static struct kunit_suite string_stream_test_suite = {
-+	.name = "string-stream-test",
-+	.test_cases = string_stream_test_cases
++struct kunit_assert {
++	struct kunit *test;
++	enum kunit_assert_type type;
++	int line;
++	const char *file;
++	struct va_format message;
++	void (*format)(const struct kunit_assert *assert,
++		       struct string_stream *stream);
 +};
-+kunit_test_suite(string_stream_test_suite);
++
++#define KUNIT_INIT_VA_FMT_NULL { .fmt = NULL, .va = NULL }
++
++#define KUNIT_INIT_ASSERT_STRUCT(kunit, assert_type, fmt) {		       \
++	.test = kunit,							       \
++	.type = assert_type,						       \
++	.file = __FILE__,						       \
++	.line = __LINE__,						       \
++	.message = KUNIT_INIT_VA_FMT_NULL,				       \
++	.format = fmt							       \
++}
++
++void kunit_base_assert_format(const struct kunit_assert *assert,
++			      struct string_stream *stream);
++
++void kunit_assert_print_msg(const struct kunit_assert *assert,
++			    struct string_stream *stream);
++
++struct kunit_fail_assert {
++	struct kunit_assert assert;
++};
++
++void kunit_fail_assert_format(const struct kunit_assert *assert,
++			      struct string_stream *stream);
++
++#define KUNIT_INIT_FAIL_ASSERT_STRUCT(test, type) {			       \
++		.assert = KUNIT_INIT_ASSERT_STRUCT(test,		       \
++						   type,		       \
++						   kunit_fail_assert_format)   \
++}
++
++struct kunit_unary_assert {
++	struct kunit_assert assert;
++	const char *condition;
++	bool expected_true;
++};
++
++void kunit_unary_assert_format(const struct kunit_assert *assert,
++			       struct string_stream *stream);
++
++#define KUNIT_INIT_UNARY_ASSERT_STRUCT(test, type, cond, expect_true) {	       \
++	.assert = KUNIT_INIT_ASSERT_STRUCT(test,			       \
++					   type,			       \
++					   kunit_unary_assert_format),	       \
++	.condition = cond,						       \
++	.expected_true = expect_true					       \
++}
++
++struct kunit_ptr_not_err_assert {
++	struct kunit_assert assert;
++	const char *text;
++	const void *value;
++};
++
++void kunit_ptr_not_err_assert_format(const struct kunit_assert *assert,
++				     struct string_stream *stream);
++
++#define KUNIT_INIT_PTR_NOT_ERR_STRUCT(test, type, txt, val) {		       \
++	.assert = KUNIT_INIT_ASSERT_STRUCT(test,			       \
++					   type,			       \
++					   kunit_ptr_not_err_assert_format),   \
++	.text = txt,							       \
++	.value = val							       \
++}
++
++struct kunit_binary_assert {
++	struct kunit_assert assert;
++	const char *operation;
++	const char *left_text;
++	long long left_value;
++	const char *right_text;
++	long long right_value;
++};
++
++void kunit_binary_assert_format(const struct kunit_assert *assert,
++				struct string_stream *stream);
++
++#define KUNIT_INIT_BINARY_ASSERT_STRUCT(test,				       \
++					type,				       \
++					op_str,				       \
++					left_str,			       \
++					left_val,			       \
++					right_str,			       \
++					right_val) {			       \
++	.assert = KUNIT_INIT_ASSERT_STRUCT(test,			       \
++					   type,			       \
++					   kunit_binary_assert_format),	       \
++	.operation = op_str,						       \
++	.left_text = left_str,						       \
++	.left_value = left_val,						       \
++	.right_text = right_str,					       \
++	.right_value = right_val					       \
++}
++
++struct kunit_binary_ptr_assert {
++	struct kunit_assert assert;
++	const char *operation;
++	const char *left_text;
++	const void *left_value;
++	const char *right_text;
++	const void *right_value;
++};
++
++void kunit_binary_ptr_assert_format(const struct kunit_assert *assert,
++				    struct string_stream *stream);
++
++#define KUNIT_INIT_BINARY_PTR_ASSERT_STRUCT(test,			       \
++					    type,			       \
++					    op_str,			       \
++					    left_str,			       \
++					    left_val,			       \
++					    right_str,			       \
++					    right_val) {		       \
++	.assert = KUNIT_INIT_ASSERT_STRUCT(test,			       \
++					   type,			       \
++					   kunit_binary_ptr_assert_format),    \
++	.operation = op_str,						       \
++	.left_text = left_str,						       \
++	.left_value = left_val,						       \
++	.right_text = right_str,					       \
++	.right_value = right_val					       \
++}
++
++struct kunit_binary_str_assert {
++	struct kunit_assert assert;
++	const char *operation;
++	const char *left_text;
++	const char *left_value;
++	const char *right_text;
++	const char *right_value;
++};
++
++void kunit_binary_str_assert_format(const struct kunit_assert *assert,
++				    struct string_stream *stream);
++
++#define KUNIT_INIT_BINARY_STR_ASSERT_STRUCT(test,			       \
++					    type,			       \
++					    op_str,			       \
++					    left_str,			       \
++					    left_val,			       \
++					    right_str,			       \
++					    right_val) {		       \
++	.assert = KUNIT_INIT_ASSERT_STRUCT(test,			       \
++					   type,			       \
++					   kunit_binary_str_assert_format),    \
++	.operation = op_str,						       \
++	.left_text = left_str,						       \
++	.left_value = left_val,						       \
++	.right_text = right_str,					       \
++	.right_value = right_val					       \
++}
++
++#endif /*  _KUNIT_ASSERT_H */
+diff --git a/kunit/Makefile b/kunit/Makefile
+index 275b565a0e81f..6dcbe309036b8 100644
+--- a/kunit/Makefile
++++ b/kunit/Makefile
+@@ -1,2 +1,3 @@
+ obj-$(CONFIG_KUNIT) +=			test.o \
+-					string-stream.o
++					string-stream.o \
++					assert.o
+diff --git a/kunit/assert.c b/kunit/assert.c
+new file mode 100644
+index 0000000000000..86013d4cf891c
+--- /dev/null
++++ b/kunit/assert.c
+@@ -0,0 +1,141 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Assertion and expectation serialization API.
++ *
++ * Copyright (C) 2019, Google LLC.
++ * Author: Brendan Higgins <brendanhiggins@google.com>
++ */
++#include <kunit/assert.h>
++
++void kunit_base_assert_format(const struct kunit_assert *assert,
++			      struct string_stream *stream)
++{
++	const char *expect_or_assert = NULL;
++
++	switch (assert->type) {
++	case KUNIT_EXPECTATION:
++		expect_or_assert = "EXPECTATION";
++		break;
++	case KUNIT_ASSERTION:
++		expect_or_assert = "ASSERTION";
++		break;
++	}
++
++	string_stream_add(stream, "%s FAILED at %s:%d\n",
++			 expect_or_assert, assert->file, assert->line);
++}
++
++void kunit_assert_print_msg(const struct kunit_assert *assert,
++			    struct string_stream *stream)
++{
++	if (assert->message.fmt)
++		string_stream_add(stream, "\n%pV", &assert->message);
++}
++
++void kunit_fail_assert_format(const struct kunit_assert *assert,
++			      struct string_stream *stream)
++{
++	kunit_base_assert_format(assert, stream);
++	string_stream_add(stream, "%pV", &assert->message);
++}
++
++void kunit_unary_assert_format(const struct kunit_assert *assert,
++			       struct string_stream *stream)
++{
++	struct kunit_unary_assert *unary_assert = container_of(
++			assert, struct kunit_unary_assert, assert);
++
++	kunit_base_assert_format(assert, stream);
++	if (unary_assert->expected_true)
++		string_stream_add(stream,
++				 "\tExpected %s to be true, but is false\n",
++				 unary_assert->condition);
++	else
++		string_stream_add(stream,
++				 "\tExpected %s to be false, but is true\n",
++				 unary_assert->condition);
++	kunit_assert_print_msg(assert, stream);
++}
++
++void kunit_ptr_not_err_assert_format(const struct kunit_assert *assert,
++				     struct string_stream *stream)
++{
++	struct kunit_ptr_not_err_assert *ptr_assert = container_of(
++			assert, struct kunit_ptr_not_err_assert, assert);
++
++	kunit_base_assert_format(assert, stream);
++	if (!ptr_assert->value) {
++		string_stream_add(stream,
++				 "\tExpected %s is not null, but is\n",
++				 ptr_assert->text);
++	} else if (IS_ERR(ptr_assert->value)) {
++		string_stream_add(stream,
++				 "\tExpected %s is not error, but is: %ld\n",
++				 ptr_assert->text,
++				 PTR_ERR(ptr_assert->value));
++	}
++	kunit_assert_print_msg(assert, stream);
++}
++
++void kunit_binary_assert_format(const struct kunit_assert *assert,
++				struct string_stream *stream)
++{
++	struct kunit_binary_assert *binary_assert = container_of(
++			assert, struct kunit_binary_assert, assert);
++
++	kunit_base_assert_format(assert, stream);
++	string_stream_add(stream,
++			 "\tExpected %s %s %s, but\n",
++			 binary_assert->left_text,
++			 binary_assert->operation,
++			 binary_assert->right_text);
++	string_stream_add(stream, "\t\t%s == %lld\n",
++			 binary_assert->left_text,
++			 binary_assert->left_value);
++	string_stream_add(stream, "\t\t%s == %lld",
++			 binary_assert->right_text,
++			 binary_assert->right_value);
++	kunit_assert_print_msg(assert, stream);
++}
++
++void kunit_binary_ptr_assert_format(const struct kunit_assert *assert,
++				    struct string_stream *stream)
++{
++	struct kunit_binary_ptr_assert *binary_assert = container_of(
++			assert, struct kunit_binary_ptr_assert, assert);
++
++	kunit_base_assert_format(assert, stream);
++	string_stream_add(stream,
++			 "\tExpected %s %s %s, but\n",
++			 binary_assert->left_text,
++			 binary_assert->operation,
++			 binary_assert->right_text);
++	string_stream_add(stream, "\t\t%s == %pK\n",
++			 binary_assert->left_text,
++			 binary_assert->left_value);
++	string_stream_add(stream, "\t\t%s == %pK",
++			 binary_assert->right_text,
++			 binary_assert->right_value);
++	kunit_assert_print_msg(assert, stream);
++}
++
++void kunit_binary_str_assert_format(const struct kunit_assert *assert,
++				    struct string_stream *stream)
++{
++	struct kunit_binary_str_assert *binary_assert = container_of(
++			assert, struct kunit_binary_str_assert, assert);
++
++	kunit_base_assert_format(assert, stream);
++	string_stream_add(stream,
++			 "\tExpected %s %s %s, but\n",
++			 binary_assert->left_text,
++			 binary_assert->operation,
++			 binary_assert->right_text);
++	string_stream_add(stream, "\t\t%s == %s\n",
++			 binary_assert->left_text,
++			 binary_assert->left_value);
++	string_stream_add(stream, "\t\t%s == %s",
++			 binary_assert->right_text,
++			 binary_assert->right_value);
++	kunit_assert_print_msg(assert, stream);
++}
 -- 
 2.23.0.rc1.153.gdeed80330f-goog
