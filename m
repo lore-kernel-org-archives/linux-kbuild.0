@@ -1,93 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk1-f194.google.com ([209.85.221.194]:41928 "EHLO
-        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfHLReo (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 13:34:44 -0400
+Received: from verein.lst.de ([213.95.11.211]:50207 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726090AbfHLSAb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Aug 2019 14:00:31 -0400
+Date: Mon, 12 Aug 2019 20:00:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+Subject: Re: can we use mandatory-y for non-uapi headers?
+Message-ID: <20190812180026.GA15574@lst.de>
+References: <20190810075226.GA24085@lst.de> <CAK7LNAQfQWNMMLS1-3mE41Ffy3MV9i3VpbWtmKQdUqZjyk8Yqg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
- <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
-In-Reply-To: <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-Date: Mon, 12 Aug 2019 12:34:30 -0500
-Message-ID: <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQfQWNMMLS1-3mE41Ffy3MV9i3VpbWtmKQdUqZjyk8Yqg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Aug 12, 2019 at 10:24 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
-> >
-> > When building a tree of external modules stage 2 fails
-> > silently as the root modules.order is empty.
-> >
-> > Modify the modules.order location to be fixed to the
-> > root when KBUILD_EXTMOD is specified and write all
-> > module paths to the single modules.order file.
->
-> Could you try v5.3-rc4 please?
+On Tue, Aug 13, 2019 at 12:41:20AM +0900, Masahiro Yamada wrote:
+> > what is the reason that the documentation says mandatory-y should only
+> > be used for uapi headers?
+> 
+> Where is it documented?
+> 
+> Documentation/kbuild/makefiles.rst section 7.4 describes
+> mandatory-y is essentially used by include/(uapi/)asm-generic/Kbuild
+> 
+> include/(uapi/)asm-generic/Kbuild means:
+> 
+> include/uapi/asm-generic/Kbuild
+> include/asm-generic/Kbuild
 
-So it seems we are using 'subdir-m' but that is now gone?
-
-Is there a recommend pattern for backward compatibility?
-
-Thanks!
->
-> > Signed-off-by: Shaun Tancheff <stancheff@cray.com>
-> > ---
-> >  Makefile               | 1 +
-> >  scripts/Makefile.build | 8 +++++++-
-> >  2 files changed, 8 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 23cdf1f41364..a9964492f47e 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1622,6 +1622,7 @@ $(module-dirs): prepare $(objtree)/Module.symvers
-> >
-> >  modules: $(module-dirs)
-> >         @$(kecho) '  Building modules, stage 2.';
-> > +       $(Q)$rm -f $(KBUILD_EXTMOD)/modules.order
-> >         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
-> >
-> >  PHONY += modules_install
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index 0d434d0afc0b..f9908b3d59e0 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -64,7 +64,13 @@ builtin-target := $(obj)/built-in.a
-> >  endif
-> >
-> >  ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
-> > +ifneq ($(KBUILD_EXTMOD),)
-> > +modorder-target := $(KBUILD_EXTMOD)/modules.order
-> > +modorder-add := >>
-> > +else
-> >  modorder-target := $(obj)/modules.order
-> > +modorder-add := >
-> > +endif
-> >  endif
-> >
-> >  mod-targets := $(patsubst %.o, %.mod, $(obj-m))
-> > @@ -423,7 +429,7 @@ endif # builtin-target
-> >  $(modorder-target): $(subdir-ym) FORCE
-> >         $(Q){ $(foreach m, $(modorder), \
-> >         $(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
-> > -       | $(AWK) '!x[$$0]++' - > $@
-> > +       | $(AWK) '!x[$$0]++' - $(modorder-add) $@
-> >
-> >  #
-> >  # Rule to compile a set of .o files into one .a file (with symbol table)
-> > --
-> > 2.20.1
-> >
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Ok, maybe it was just me misreading the documentation.  In that
+case I'll start submitting patches to use it more.
