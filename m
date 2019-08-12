@@ -1,54 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:43448 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfHLRdj (ORCPT
+Received: from mail-vk1-f194.google.com ([209.85.221.194]:41928 "EHLO
+        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726267AbfHLReo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 13:33:39 -0400
-Received: by mail-pg1-f193.google.com with SMTP id r26so13887184pgl.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 10:33:38 -0700 (PDT)
+        Mon, 12 Aug 2019 13:34:44 -0400
 MIME-Version: 1.0
-References: <cover.1565297255.git.guillaume.tucker@collabora.com>
- <3885ccdcbdbe83eb367e8344584df944adc76e34.1565297255.git.guillaume.tucker@collabora.com>
- <CAKwvOdmOdJspcO8jqUhqR63-MOWkV3ZrVcCO6u=HG6peov8Htw@mail.gmail.com>
- <20190809051552.GA44466@archlinux-threadripper> <CAK7LNAT6Yp3oemUxSst+htnmM-St8WmSv+UZ2x2XF23cw-kU-Q@mail.gmail.com>
- <20190812171444.GL4592@sirena.co.uk>
-In-Reply-To: <20190812171444.GL4592@sirena.co.uk>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 12 Aug 2019 10:33:27 -0700
-Message-ID: <CAKwvOdmEe7gE7LUFRtqrUiHr3_Q2Ky4a-obUQWagbgdWZ33_ag@mail.gmail.com>
-Subject: Re: [PATCH RFC 1/1] kbuild: enable overriding the compiler using the environment
+References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
+ <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
+In-Reply-To: <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+Date: Mon, 12 Aug 2019 12:34:30 -0500
+Message-ID: <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nathan Chancellor <natechancellor@gmail.com>, Guillaume Tucker <guillaume.tucker@collabora.com>, Michal Marek <michal.lkml@markovi.net>, Guenter Roeck <linux@roeck-us.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel@collabora.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
 
-On Mon, Aug 12, 2019 at 10:14 AM Mark Brown <broonie@kernel.org> wrote:
+On Mon, Aug 12, 2019 at 10:24 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Tue, Aug 13, 2019 at 01:37:14AM +0900, Masahiro Yamada wrote:
-> > Only the problem I see is the situation where
-> > a user directly runs scripts/kconfig/merge_config.sh
-> > without using make as a start-point.
-
-Further, if it's possible to detect if merge_config.sh was invoked
-from Make or not, it might be useful to warn or error when not invoked
-via Make.
-
+> On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
+> >
+> > When building a tree of external modules stage 2 fails
+> > silently as the root modules.order is empty.
+> >
+> > Modify the modules.order location to be fixed to the
+> > root when KBUILD_EXTMOD is specified and write all
+> > module paths to the single modules.order file.
 >
-> This is really a very common thing for testing infrastructure to do,
-> it'll combine a base defconfig with a fragment enabling extra stuff
-> either to directly cover that extra stuff or to ensure that
-> configuration options needed for testsuites get turned on.
+> Could you try v5.3-rc4 please?
+
+So it seems we are using 'subdir-m' but that is now gone?
+
+Is there a recommend pattern for backward compatibility?
+
+Thanks!
 >
-> > A user can wrap merge_config.sh with a simple Makefile
-> > if they want to override CC, HOSTCC, etc.
+> > Signed-off-by: Shaun Tancheff <stancheff@cray.com>
+> > ---
+> >  Makefile               | 1 +
+> >  scripts/Makefile.build | 8 +++++++-
+> >  2 files changed, 8 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 23cdf1f41364..a9964492f47e 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1622,6 +1622,7 @@ $(module-dirs): prepare $(objtree)/Module.symvers
+> >
+> >  modules: $(module-dirs)
+> >         @$(kecho) '  Building modules, stage 2.';
+> > +       $(Q)$rm -f $(KBUILD_EXTMOD)/modules.order
+> >         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+> >
+> >  PHONY += modules_install
+> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > index 0d434d0afc0b..f9908b3d59e0 100644
+> > --- a/scripts/Makefile.build
+> > +++ b/scripts/Makefile.build
+> > @@ -64,7 +64,13 @@ builtin-target := $(obj)/built-in.a
+> >  endif
+> >
+> >  ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
+> > +ifneq ($(KBUILD_EXTMOD),)
+> > +modorder-target := $(KBUILD_EXTMOD)/modules.order
+> > +modorder-add := >>
+> > +else
+> >  modorder-target := $(obj)/modules.order
+> > +modorder-add := >
+> > +endif
+> >  endif
+> >
+> >  mod-targets := $(patsubst %.o, %.mod, $(obj-m))
+> > @@ -423,7 +429,7 @@ endif # builtin-target
+> >  $(modorder-target): $(subdir-ym) FORCE
+> >         $(Q){ $(foreach m, $(modorder), \
+> >         $(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
+> > -       | $(AWK) '!x[$$0]++' - > $@
+> > +       | $(AWK) '!x[$$0]++' - $(modorder-add) $@
+> >
+> >  #
+> >  # Rule to compile a set of .o files into one .a file (with symbol table)
+> > --
+> > 2.20.1
+> >
 >
-> If we want to do that it seems sensible to provide that Makefile
-> upstream so there's a standard thing, it might also help people notice
-> that they need to do this and avoid getting surprised.
-
-
-
--- 
-Thanks,
-~Nick Desaulniers
+>
+> --
+> Best Regards
+> Masahiro Yamada
