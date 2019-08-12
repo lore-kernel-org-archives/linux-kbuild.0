@@ -1,79 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0235.hostedemail.com ([216.40.44.235]:42420 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726568AbfHLWku (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 18:40:50 -0400
-Message-ID: <814c1b19141022946d3e0f7e24d69658d7a512e4.camel@perches.com>
-Subject: Re: [PATCH v2] kbuild: Change fallthrough comments to attributes
-From: Joe Perches <joe@perches.com>
-Date: Mon, 12 Aug 2019 15:40:45 -0700
-In-Reply-To: <20190812221416.139678-1-nhuck@google.com>
-References: <20190812214711.83710-1-nhuck@google.com>
-         <20190812221416.139678-1-nhuck@google.com>
-Content-Type: text/plain; charset="ISO-8859-1"
+Received: from mail.kernel.org ([198.145.29.99]:57056 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726681AbfHLWzV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Aug 2019 18:55:21 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190812182421.141150-4-brendanhiggins@google.com>
+References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812182421.141150-4-brendanhiggins@google.com>
+Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream like string builder
+From: Stephen Boyd <sboyd@kernel.org>
+Date: Mon, 12 Aug 2019 15:55:19 -0700
+Message-Id: <20190812225520.5A67C206A2@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Huckleberry <nhuck@google.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, Nathan Chancellor <natechancellor@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, clang-built-linux@googlegroups.com
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
 
-On Mon, 2019-08-12 at 15:14 -0700, Nathan Huckleberry wrote:
-> Clang does not support the use of comments to label
-> intentional fallthrough. This patch replaces some uses
-> of comments to attributesto cut down a significant number
-> of warnings on clang (from ~50000 to ~200). Only comments
-> in commonly used header files have been replaced.
-> 
-> Since there is still quite a bit of noise, this
-> patch moves -Wimplicit-fallthrough to
-> Makefile.extrawarn if you are compiling with
-> clang.
+Quoting Brendan Higgins (2019-08-12 11:24:06)
+> +void string_stream_clear(struct string_stream *stream)
+> +{
+> +       struct string_stream_fragment *frag_container, *frag_container_sa=
+fe;
+> +
+> +       spin_lock(&stream->lock);
+> +       list_for_each_entry_safe(frag_container,
+> +                                frag_container_safe,
+> +                                &stream->fragments,
+> +                                node) {
+> +               list_del(&frag_container->node);
 
-Unmodified clang does not emit this warning without a patch.
+Shouldn't we free the allocation here? Otherwise, if some test is going
+to add, add, clear, add, it's going to leak until the test is over?
 
-> diff --git a/Makefile b/Makefile
-[]
-> @@ -846,7 +846,11 @@ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
->  KBUILD_CFLAGS += -Wdeclaration-after-statement
->  
->  # Warn about unmarked fall-throughs in switch statement.
-> +# If the compiler is clang, this warning is only enabled if W=1 in
-> +# Makefile.extrawarn
-> +ifndef CONFIG_CC_IS_CLANG
->  KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,)
-> +endif
-
-It'd be better to remove CONFIG_CC_IS_CLANG everywhere
-eventually as it adds complexity and makes .config files
-not portable to multiple systems.
-
-> diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
-[]
-> @@ -253,4 +253,8 @@
->   */
->  #define __weak                          __attribute__((__weak__))
->  
-> +#if __has_attribute(fallthrough)
-> +#define __fallthrough                   __attribute__((fallthrough))
-
-This should be __attribute__((__fallthrough__))
-
-And there is still no agreement about whether this should
-be #define fallthrough or #define __fallthrough
-
-https://lore.kernel.org/patchwork/patch/1108577/
-
-> diff --git a/include/linux/jhash.h b/include/linux/jhash.h
-[]
-> @@ -86,19 +86,43 @@ static inline u32 jhash(const void *key, u32 length, u32 initval)
-[]
-> +	case 12:
-> +		c += (u32)k[11]<<24;
-> +		__fallthrough;
-
-You might consider trying out the scripted conversion tool
-attached to this email:
-
-https://lore.kernel.org/lkml/61ddbb86d5e68a15e24ccb06d9b399bbf5ce2da7.camel@perches.com/
+> +       }
+> +       stream->length =3D 0;
+> +       spin_unlock(&stream->lock);
+> +}
+> +
