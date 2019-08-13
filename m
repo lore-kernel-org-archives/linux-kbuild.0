@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:60092 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727633AbfHMGLf (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:59252 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727633AbfHMGLm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 02:11:35 -0400
+        Tue, 13 Aug 2019 02:11:42 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Subject: [RFC 06/19] ktf: A simple debugfs interface to test results
-Date: Tue, 13 Aug 2019 08:09:21 +0200
-Message-Id: <ae6c38384e2338aa3cfb8a4e4dd1002833789253.1565676440.git-series.knut.omang@oracle.com>
+Subject: [RFC 08/19] ktf: Configurable context support for network info setup
+Date: Tue, 13 Aug 2019 08:09:23 +0200
+Message-Id: <ddf9f91c347d1c731b4cceea318783bb293676c3.1565676440.git-series.knut.omang@oracle.com>
 In-Reply-To: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
 References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
@@ -17,423 +17,226 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>, Knut Omang <knut.omang@oracle.com>
 
-From: Alan Maguire <alan.maguire@oracle.com>
+An implementation of configurable contexts for exchanging network
+information, to make it easier to run network tests potentially
+involving more than one kernel.
 
-While test results is available via netlink from user space, sometimes
-it may be useful to be able to access the results from the kernel as well,
-for instance due to a crash. Make that possible via debugfs.
+ktf_netctx.h:    Configurable context setup for multinode network tests
 
-ktf_debugfs.h:   Support for creating a debugfs representation of test
-
-Signed-off-by: Alan Maguire <alan.maguire@oracle.com>
 Signed-off-by: Knut Omang <knut.omang@oracle.com>
 ---
- tools/testing/selftests/ktf/kernel/ktf_debugfs.c | 356 ++++++++++++++++-
- tools/testing/selftests/ktf/kernel/ktf_debugfs.h |  34 ++-
- 2 files changed, 390 insertions(+)
- create mode 100644 tools/testing/selftests/ktf/kernel/ktf_debugfs.c
- create mode 100644 tools/testing/selftests/ktf/kernel/ktf_debugfs.h
+ tools/testing/selftests/ktf/kernel/ktf_netctx.c | 132 +++++++++++++++++-
+ tools/testing/selftests/ktf/kernel/ktf_netctx.h |  64 ++++++++-
+ 2 files changed, 196 insertions(+)
+ create mode 100644 tools/testing/selftests/ktf/kernel/ktf_netctx.c
+ create mode 100644 tools/testing/selftests/ktf/kernel/ktf_netctx.h
 
-diff --git a/tools/testing/selftests/ktf/kernel/ktf_debugfs.c b/tools/testing/selftests/ktf/kernel/ktf_debugfs.c
+diff --git a/tools/testing/selftests/ktf/kernel/ktf_netctx.c b/tools/testing/selftests/ktf/kernel/ktf_netctx.c
 new file mode 100644
-index 0000000..a20fbd2
+index 0000000..84ef6ac
 --- /dev/null
-+++ b/tools/testing/selftests/ktf/kernel/ktf_debugfs.c
-@@ -0,0 +1,356 @@
++++ b/tools/testing/selftests/ktf/kernel/ktf_netctx.c
+@@ -0,0 +1,132 @@
 +/*
-+ * Copyright (c) 2009, 2017, Oracle and/or its affiliates. All rights reserved.
-+ *    Author: Alan Maguire <alan.maguire@oracle.com>
++ * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
++ *    Author: Knut Omang <knut.omang@oracle.com>
 + *
 + * SPDX-License-Identifier: GPL-2.0
 + *
++ * ktf_netcfg.h: Configurable context setup for multinode network tests
++ *
 + */
-+#include <asm/unistd.h>
-+#include <linux/module.h>
-+#include <linux/time.h>
-+#include "ktf_debugfs.h"
++
 +#include "ktf.h"
-+#include "ktf_test.h"
-+#include "ktf_cov.h"
++#include "ktf_netctx.h"
++#include <linux/in.h>
 +
-+/* Create a debugfs representation of test sets/tests.  Hierarchy looks like
-+ * this:
-+ *
-+ * Path					Semantics
-+ * /sys/kernel/debug/ktf/run/<testset>		Run all tests in testset
-+ * /sys/kernel/debug/ktf/run/<testset>/<test>	Run specific test in testset
-+ * /sys/kernel/debug/ktf/results/<testset>	Show results of last run for
-+ *						testset
-+ *
-+ * /sys/kernel/debug/ktf/results/<testset>/<test>
-+ *						Show results of last run for
-+ *						test
-+ *
++/* Configuration callback to configure a network context */
++
++int ktf_netctx_cb(struct ktf_context *ctx, const void *data, size_t data_sz)
++{
++	struct ktf_netctx *nc = container_of(ctx, struct ktf_netctx, k);
++	struct ktf_addrinfo *kai = (struct ktf_addrinfo *)data;
++	short n = kai->n;
++	size_t param_sz;
++
++	if (n < 2) {
++		terr("Unsupported number of nodes (%d) - must be at least 2", n);
++		return -EINVAL;
++	}
++
++	param_sz = sizeof(*kai) + sizeof(kai->a) * (n - 2);
++
++	if (n > nc->max_nodes || n < nc->min_nodes) {
++		terr("Unsupported number of nodes (%d) - must be between %d and %d!",
++		     n, nc->min_nodes, nc->max_nodes);
++		return -EINVAL;
++	}
++
++	if (param_sz != data_sz) {
++		terr("Expected %lu bytes of parameter data, received %lu!",
++		     param_sz, data_sz);
++		return -EINVAL;
++	}
++
++	if (nc->a && nc->a_sz != data_sz) {
++		kfree(nc->a);
++		nc->a = NULL;
++	}
++
++	if (!nc->a) {
++		nc->a = kzalloc(data_sz, GFP_KERNEL);
++		if (!nc->a)
++			return -ENOMEM;
++	}
++
++	memcpy(nc->a, kai, data_sz);
++	return 0;
++}
++EXPORT_SYMBOL(ktf_netctx_cb);
++
++void ktf_netctx_cleanup(struct ktf_context *ctx)
++{
++	struct ktf_netctx *nc = container_of(ctx, struct ktf_netctx, k);
++
++	kfree(nc->a);
++}
++EXPORT_SYMBOL(ktf_netctx_cleanup);
++
++/* Make network contexts dynamically allocatable from user mode
++ * Caller must supply desired values for callback functions in @nct.
 + */
-+
-+static struct dentry *ktf_debugfs_rootdir;
-+static struct dentry *ktf_debugfs_rundir;
-+static struct dentry *ktf_debugfs_resultsdir;
-+static struct dentry *ktf_debugfs_cov_file;
-+
-+static void ktf_debugfs_print_result(struct seq_file *seq, struct ktf_test *t)
++int ktf_netctx_enable(struct ktf_handle *handle, struct ktf_netctx_type *nct,
++		      short min_nodes, short max_nodes)
 +{
-+	struct timespec now;
++	struct ktf_context *lo_ctx;
++	struct ktf_addrinfo ai = {
++		.n = 2,
++		.rank = 0
++	};
++	int ret;
++	int i;
 +
-+	if (t && strlen(t->log) > 0) {
-+		getnstimeofday(&now);
-+		seq_printf(seq, "[%s/%s, %ld seconds ago] %s\n",
-+			   t->tclass, t->name,
-+			   now.tv_sec - t->lastrun.tv_sec, t->log);
-+	}
-+}
++	ret = ktf_handle_add_ctx_type(handle, &nct->t);
++	if (ret)
++		return ret;
 +
-+/* /sys/kernel/debug/ktf/results/<testset>-tests/<test> shows specific result */
-+static int ktf_debugfs_result(struct seq_file *seq, void *v)
-+{
-+	struct ktf_test *t = (struct ktf_test *)seq->private;
++	nct->min_nodes = min_nodes;
++	nct->max_nodes = max_nodes;
++	strcpy(nct->t.name, "netctx");
 +
-+	ktf_debugfs_print_result(seq, t);
++	for (i = 0; i < 2; i++) {
++		struct sockaddr_in *ai_in = (struct sockaddr_in *)&ai.a[i].addr;
 +
-+	return 0;
-+}
-+
-+/* /sys/kernel/debug/ktf/results/<testset> shows all results for testset. */
-+static int ktf_debugfs_results_all(struct seq_file *seq, void *v)
-+{
-+	struct ktf_case *testset = (struct ktf_case *)seq->private;
-+	struct ktf_test *t;
-+
-+	if (!testset)
-+		return 0;
-+
-+	seq_printf(seq, "%s results:\n", ktf_case_name(testset));
-+	ktf_testcase_for_each_test(t, testset)
-+		ktf_debugfs_print_result(seq, t);
-+
-+	return 0;
-+}
-+
-+/* /sys/kernel/debug/ktf/run/<testset>-tests/<test> runs specific test. */
-+static int ktf_debugfs_run(struct seq_file *seq, void *v)
-+{
-+	struct ktf_test *t = (struct ktf_test *)seq->private;
-+
-+	if (!t)
-+		return 0;
-+
-+	ktf_run_hook(NULL, NULL, t, 0, NULL, 0);
-+	ktf_debugfs_print_result(seq, t);
-+
-+	return 0;
-+}
-+
-+/* /sys/kernel/debug/ktf/run/<testset> runs all tests in testset. */
-+static int ktf_debugfs_run_all(struct seq_file *seq, void *v)
-+{
-+	struct ktf_case *testset = (struct ktf_case *)seq->private;
-+	struct ktf_test *t;
-+
-+	if (!testset)
-+		return 0;
-+
-+	seq_printf(seq, "Running %s\n", ktf_case_name(testset));
-+	ktf_testcase_for_each_test(t, testset) {
-+		ktf_run_hook(NULL, NULL, t, 0, NULL, 0);
-+		ktf_debugfs_print_result(seq, t);
++		ai.a[i].addr.ss_family = AF_INET;
++		strcpy(ai.a[i].ifname, "lo");
++		ai_in->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 +	}
 +
-+	return 0;
-+}
++	/* create and configure the loopback network context */
++	lo_ctx = ktf_context_add_from(handle, "lo", &nct->t);
++	if (!lo_ctx)
++		return -ENOMEM;
 +
-+static int ktf_run_test_open(struct inode *inode, struct file *file)
-+{
-+	struct ktf_test *t;
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
-+	t = (struct ktf_test *)inode->i_private;
-+
-+	return single_open(file, ktf_debugfs_run, t);
-+}
-+
-+static int ktf_debugfs_release(struct inode *inode, struct file *file)
-+{
-+	module_put(THIS_MODULE);
-+	return single_release(inode, file);
-+}
-+
-+static const struct file_operations ktf_run_test_fops = {
-+	.open = ktf_run_test_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = ktf_debugfs_release,
-+};
-+
-+static int ktf_results_test_open(struct inode *inode, struct file *file)
-+{
-+	struct ktf_test *t;
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
-+	t = (struct ktf_test *)inode->i_private;
-+
-+	return single_open(file, ktf_debugfs_result, t);
-+}
-+
-+static const struct file_operations ktf_results_test_fops = {
-+	.open = ktf_results_test_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = ktf_debugfs_release,
-+};
-+
-+static void _ktf_debugfs_destroy_test(struct ktf_test *t)
-+{
-+	if (!t)
-+		return;
-+
-+	tlog(T_DEBUG, "Destroying debugfs test %s", t->name);
-+	debugfs_remove(t->debugfs.debugfs_results_test);
-+	debugfs_remove(t->debugfs.debugfs_run_test);
-+	memset(&t->debugfs, 0, sizeof(t->debugfs));
-+}
-+
-+void ktf_debugfs_create_test(struct ktf_test *t)
-+{
-+	struct ktf_case *testset = ktf_case_find(t->tclass);
-+
-+	if (!testset)
-+		return;
-+
-+	memset(&t->debugfs, 0, sizeof(t->debugfs));
-+
-+	t->debugfs.debugfs_results_test =
-+		debugfs_create_file(t->name, S_IFREG | 0444,
-+				    testset->debugfs.debugfs_results_test,
-+				 t, &ktf_results_test_fops);
-+
-+	if (t->debugfs.debugfs_results_test) {
-+		t->debugfs.debugfs_run_test =
-+			debugfs_create_file(t->name, S_IFREG | 0444,
-+					    testset->debugfs.debugfs_run_test,
-+				 t, &ktf_run_test_fops);
-+		if (!t->debugfs.debugfs_run_test) {
-+			_ktf_debugfs_destroy_test(t);
-+		} else {
-+			/* Take reference for test for debugfs */
-+			ktf_test_get(t);
-+		}
-+	}
-+	/* Drop reference to testset from ktf_case_find(). */
-+	ktf_case_put(testset);
-+}
-+
-+void ktf_debugfs_destroy_test(struct ktf_test *t)
-+{
-+	_ktf_debugfs_destroy_test(t);
-+	/* Release reference now debugfs files are gone. */
-+	ktf_test_put(t);
-+}
-+
-+static int ktf_results_testset_open(struct inode *inode, struct file *file)
-+{
-+	struct ktf_case *testset;
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
-+	testset = (struct ktf_case *)inode->i_private;
-+
-+	return single_open(file, ktf_debugfs_results_all, testset);
-+}
-+
-+static const struct file_operations ktf_results_testset_fops = {
-+	.open = ktf_results_testset_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = ktf_debugfs_release,
-+};
-+
-+static int ktf_run_testset_open(struct inode *inode, struct file *file)
-+{
-+	struct ktf_case *testset;
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
-+	testset = (struct ktf_case *)inode->i_private;
-+
-+	return single_open(file, ktf_debugfs_run_all, testset);
-+}
-+
-+static const struct file_operations ktf_run_testset_fops = {
-+	.open = ktf_run_testset_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = ktf_debugfs_release,
-+};
-+
-+static void _ktf_debugfs_destroy_testset(struct ktf_case *testset)
-+{
-+	debugfs_remove(testset->debugfs.debugfs_run_testset);
-+	debugfs_remove(testset->debugfs.debugfs_run_test);
-+	debugfs_remove(testset->debugfs.debugfs_results_testset);
-+	debugfs_remove(testset->debugfs.debugfs_results_test);
-+}
-+
-+void ktf_debugfs_create_testset(struct ktf_case *testset)
-+{
-+	char tests_subdir[KTF_DEBUGFS_NAMESZ];
-+	const char *name = ktf_case_name(testset);
-+
-+	memset(&testset->debugfs, 0, sizeof(testset->debugfs));
-+
-+	/* First add /sys/kernel/debug/ktf/[results|run]/<testset> */
-+	testset->debugfs.debugfs_results_testset =
-+		debugfs_create_file(name, S_IFREG | 0444,
-+				    ktf_debugfs_resultsdir,
-+				 testset, &ktf_results_testset_fops);
-+	if (!testset->debugfs.debugfs_results_testset)
-+		goto err;
-+
-+	testset->debugfs.debugfs_run_testset =
-+		debugfs_create_file(name, S_IFREG | 0444,
-+				    ktf_debugfs_rundir,
-+				    testset, &ktf_run_testset_fops);
-+	if (!testset->debugfs.debugfs_run_testset)
-+		goto err;
-+
-+	/* Now add parent directories for individual test result/run tests
-+	 * which live in
-+	 * /sys/kernel/debug/ktf/[results|run]/<testset>-tests/<testname>
-+	 */
-+	(void)snprintf(tests_subdir, sizeof(tests_subdir), "%s%s",
-+			name, KTF_DEBUGFS_TESTS_SUFFIX);
-+
-+	testset->debugfs.debugfs_results_test =
-+		debugfs_create_dir(tests_subdir, ktf_debugfs_resultsdir);
-+	if (!testset->debugfs.debugfs_results_test)
-+		goto err;
-+
-+	testset->debugfs.debugfs_run_test =
-+		debugfs_create_dir(tests_subdir, ktf_debugfs_rundir);
-+	if (!testset->debugfs.debugfs_run_test)
-+		goto err;
-+
-+	/* Take reference count for testset.  One will do as we will always
-+	 * free testset debugfs resources together.
-+	 */
-+	ktf_case_get(testset);
-+	return;
-+err:
-+	_ktf_debugfs_destroy_testset(testset);
-+}
-+
-+void ktf_debugfs_destroy_testset(struct ktf_case *testset)
-+{
-+	tlog(T_DEBUG, "Destroying debugfs testset %s", ktf_case_name(testset));
-+	_ktf_debugfs_destroy_testset(testset);
-+	/* Remove our debugfs reference cout to testset */
-+	ktf_case_put(testset);
-+}
-+
-+/* /sys/kernel/debug/ktf/coverage shows coverage statistics. */
-+static int ktf_debugfs_cov(struct seq_file *seq, void *v)
-+{
-+	ktf_cov_seq_print(seq);
++	ret = ktf_context_set_config(lo_ctx, &ai, sizeof(ai));
++	if (ret)
++		return ret;
 +
 +	return 0;
 +}
++EXPORT_SYMBOL(ktf_netctx_enable);
 +
-+static int ktf_cov_open(struct inode *inode, struct file *file)
++struct sockaddr_storage *ktf_netctx_addr(struct ktf_netctx *ctx, short rank)
 +{
-+	if (!try_module_get(THIS_MODULE))
-+		return -EIO;
-+
-+	return single_open(file, ktf_debugfs_cov, NULL);
++	return &ctx->a->a[rank].addr;
 +}
++EXPORT_SYMBOL(ktf_netctx_addr);
 +
-+static const struct file_operations ktf_cov_fops = {
-+	.open = ktf_cov_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = ktf_debugfs_release,
-+};
-+
-+void ktf_debugfs_cleanup(void)
++const char *ktf_netctx_ifname(struct ktf_netctx *ctx, short rank)
 +{
-+	tlog(T_DEBUG, "Removing ktf debugfs dirs...");
-+	debugfs_remove(ktf_debugfs_cov_file);
-+	debugfs_remove(ktf_debugfs_rundir);
-+	debugfs_remove(ktf_debugfs_resultsdir);
-+	debugfs_remove(ktf_debugfs_rootdir);
++	return ctx->a->a[rank].ifname;
 +}
++EXPORT_SYMBOL(ktf_netctx_ifname);
 +
-+void ktf_debugfs_init(void)
++short ktf_netctx_rank(struct ktf_netctx *ctx)
 +{
-+	ktf_debugfs_rootdir = debugfs_create_dir(KTF_DEBUGFS_ROOT, NULL);
-+	if (!ktf_debugfs_rootdir)
-+		goto err;
-+	ktf_debugfs_rundir = debugfs_create_dir(KTF_DEBUGFS_RUN,
-+						ktf_debugfs_rootdir);
-+	if (!ktf_debugfs_rundir)
-+		goto err;
-+	ktf_debugfs_resultsdir = debugfs_create_dir(KTF_DEBUGFS_RESULTS,
-+						    ktf_debugfs_rootdir);
-+	if (!ktf_debugfs_resultsdir)
-+		goto err;
-+
-+	ktf_debugfs_cov_file = debugfs_create_file(KTF_DEBUGFS_COV,
-+						   S_IFREG | 0444,
-+						   ktf_debugfs_rootdir,
-+						   NULL,
-+						   &ktf_cov_fops);
-+	if (ktf_debugfs_cov_file)
-+		return;
-+err:
-+	terr("Could not init %s\n", KTF_DEBUGFS_ROOT);
-+	ktf_debugfs_cleanup();
++	return ctx->a->rank;
 +}
-diff --git a/tools/testing/selftests/ktf/kernel/ktf_debugfs.h b/tools/testing/selftests/ktf/kernel/ktf_debugfs.h
++EXPORT_SYMBOL(ktf_netctx_rank);
++
++short ktf_netctx_n(struct ktf_netctx *ctx)
++{
++	return ctx->a->n;
++}
++EXPORT_SYMBOL(ktf_netctx_n);
+diff --git a/tools/testing/selftests/ktf/kernel/ktf_netctx.h b/tools/testing/selftests/ktf/kernel/ktf_netctx.h
 new file mode 100644
-index 0000000..4dab1ea
+index 0000000..414c744
 --- /dev/null
-+++ b/tools/testing/selftests/ktf/kernel/ktf_debugfs.h
-@@ -0,0 +1,34 @@
++++ b/tools/testing/selftests/ktf/kernel/ktf_netctx.h
+@@ -0,0 +1,64 @@
 +/*
-+ * Copyright (c) 2009, 2017, Oracle and/or its affiliates. All rights reserved.
-+ *    Author: Alan Maguire <alan.maguire@oracle.com>
++ * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
++ *    Author: Knut Omang <knut.omang@oracle.com>
 + *
 + * SPDX-License-Identifier: GPL-2.0
 + *
-+ * ktf_debugfs.h: Support for creating a debugfs representation of test
-+ * sets/tests.
++ * ktf_netctx.h: Configurable context setup for multinode network tests
++ *
++ * KTF implements handling on the kernel side for this but leaves
++ * user space implementation to construct the corresponding
++ * stuct ktf_addrinfo parameter block
 + */
 +
-+#ifndef KTF_DEBUGFS_H
-+#define KTF_DEBUGFS_H
-+#include <linux/debugfs.h>
++#ifndef _KTF_NETCTX_H
++#define _KTF_NETCTX_H
 +
-+#define KTF_DEBUGFS_ROOT                        "ktf"
-+#define KTF_DEBUGFS_RUN                         "run"
-+#define KTF_DEBUGFS_RESULTS                     "results"
-+#define KTF_DEBUGFS_COV				"coverage"
-+#define KTF_DEBUGFS_TESTS_SUFFIX                "-tests"
++/* KTF matches against this type id as a possible discriminator: */
++#define KTF_NETCTX_TYPE_ID 0x2222
 +
-+#define KTF_DEBUGFS_NAMESZ                      256
++#define IFNAMSZ 16
 +
-+struct ktf_test;
-+struct ktf_case;
++struct ktf_peer_address
++{
++	struct sockaddr_storage addr; /* Address to use for this peer */
++	char ifname[IFNAMSZ];	    /* Local name of the interface with this address at peer */
++};
 +
-+void ktf_debugfs_create_test(struct ktf_test *);
-+void ktf_debugfs_destroy_test(struct ktf_test *);
-+void ktf_debugfs_create_testset(struct ktf_case *);
-+void ktf_debugfs_destroy_testset(struct ktf_case *);
-+void ktf_debugfs_init(void);
-+void ktf_debugfs_cleanup(void);
++struct ktf_addrinfo
++{
++	short n;		    /* Number of nodes involved, including the local */
++	short rank;		    /* Index into ktf_peer_address that corresponds to local host */
++	struct ktf_peer_address a[2]; /* KTF expects size n instead of 2 here */
++};
 +
++#ifdef __KERNEL__
++
++struct ktf_netctx {
++	struct ktf_context k;
++	struct ktf_addrinfo *a; /* Addr.info dyn.allocated based on incoming data */
++	size_t a_sz;		/* Size of the allocation in a, if any */
++	short min_nodes;	/* Minimum number of nodes for this context */
++	short max_nodes;	/* Maximum number of nodes this context supports */
++};
++
++struct ktf_netctx_type {
++	struct ktf_context_type t;
++	short min_nodes;	/* Minimum number of nodes for the context type */
++	short max_nodes;	/* Maximum number of nodes for the context type */
++};
++
++int ktf_netctx_enable(struct ktf_handle *handle, struct ktf_netctx_type *nct,
++		      short min_nodes, short max_nodes);
++
++int ktf_netctx_cb(struct ktf_context *ctx, const void *data, size_t data_sz);
++void ktf_netctx_cleanup(struct ktf_context *ctx);
++
++struct sockaddr_storage *ktf_netctx_addr(struct ktf_netctx *ctx, short rank);
++const char *ktf_netctx_ifname(struct ktf_netctx *ctx, short rank);
++short ktf_netctx_rank(struct ktf_netctx *ctx);
++short ktf_netctx_n(struct ktf_netctx *ctx);
++
++#endif
 +
 +#endif
 -- 
