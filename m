@@ -1,52 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35070 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726769AbfHMQsT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:48:19 -0400
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:44200 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726903AbfHMRCb (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 13:02:31 -0400
+Received: by mail-pf1-f194.google.com with SMTP id c81so2938654pfc.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 Aug 2019 10:02:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAFd5g452+-6m1eiVK0ccTDkJ2wH8GBwxRDw5owwC8h3NscE1ag@mail.gmail.com>
-References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org> <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org> <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com> <20190813045623.F3D9520842@mail.kernel.org> <CAFd5g46PJNTOUAA4GOOrW==74Zy7u1sRESTanL_BXBn6QykscA@mail.gmail.com> <20190813053023.CC86120651@mail.kernel.org> <CAFd5g47v7410QRAizPV8zaHrKrc95-Sk-GNzRRVngN741OKnvg@mail.gmail.com> <CAFd5g452+-6m1eiVK0ccTDkJ2wH8GBwxRDw5owwC8h3NscE1ag@mail.gmail.com>
-Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream like string builder
-From: Stephen Boyd <sboyd@kernel.org>
-Date: Tue, 13 Aug 2019 09:48:17 -0700
-Message-Id: <20190813164818.06A2D20842@mail.kernel.org>
+References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+ <20190813082336.GB17627@kroah.com> <f0e1a6efa8f21ab93935c4c19e13b904d4a71f98.camel@oracle.com>
+In-Reply-To: <f0e1a6efa8f21ab93935c4c19e13b904d4a71f98.camel@oracle.com>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Tue, 13 Aug 2019 10:02:18 -0700
+Message-ID: <CAFd5g45eK8LRgXj0vnY4ONB70+EeR2gjk+Dv9+b6Lgf+ykJu-Q@mail.gmail.com>
+Subject: Re: [RFC 00/19] Integration of Kernel Test Framework (KTF) into the
+ kernel tree
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: Knut Omang <knut.omang@oracle.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
 
-Quoting Brendan Higgins (2019-08-13 02:12:54)
-> On Tue, Aug 13, 2019 at 2:04 AM Brendan Higgins
-> <brendanhiggins@google.com> wrote:
-> >
-> > On Mon, Aug 12, 2019 at 10:30 PM Stephen Boyd <sboyd@kernel.org> wrote:
+On Tue, Aug 13, 2019 at 2:51 AM Knut Omang <knut.omang@oracle.com> wrote:
+>
+> On Tue, 2019-08-13 at 10:23 +0200, Greg Kroah-Hartman wrote:
+> > On Tue, Aug 13, 2019 at 08:09:15AM +0200, Knut Omang wrote:
+> > > and in the making::
 > > >
-> > > Quoting Brendan Higgins (2019-08-12 22:02:59)
-> > > > However, now that I added the kunit_resource_destroy, I thought it
-> > > > might be good to free the string_stream after I use it in each call=
- to
-> > > > kunit_assert->format(...) in which case I will be using this logic.
-> > > >
-> > > > So I think the right thing to do is to expose string_stream_destroy=
- so
-> > > > kunit_do_assert can clean up when it's done, and then demote
-> > > > string_stream_clear to static. Sound good?
-> > >
-> > > Ok, sure. I don't really see how clearing it explicitly when the
-> > > assertion prints vs. never allocating it to begin with is really any
-> > > different. Maybe I've missed something though.
+> > > kunit/                        (kernel only (UML))
 > >
-> > It's for the case that we *do* print something out. Once we are doing
-> > printing, we don't want the fragments anymore.
->=20
-> Oops, sorry fat fingered: s/doing/done
+> > You are going to have to integrate this with kunit, to come up with a
+> > superset of both in the end.
+>
+> Yes, I agree - getting to a unified approach has been my intention since I first brought this
+> up at LPC'17.
+>
+> > And I do not think that kunit is only UML, it's just that seems to be
+> > what Brendan tests with, but should work with other arches as well.
+>
+> If I get Brendan right, it is UML only now but can be extended to also support
+> kernels running on real hardware. Still it is kernel only, while KTF also has the
+> hybrid mode, where a test can have code and assertions both in user mode and kernel mode.
+> This is made easier and more streamlined by letting all reporting happen from user mode.
 
-Yes, but when we print something out we've run into some sort of problem
-and then the test is over. So freeing the memory when it fails vs. when
-the test is over seems like a minor difference. Or is it also used to
-print other informational messages while the test is running?
+Nope, the KUnit patchset currently under review *does* support any
+architecture; we have tested it on x86, ARM, and UML, but it should
+work on any architecture.
 
-I'm not particularly worried here, just trying to see if less code is
-possible.
+I added support for that a while ago due to popular demand.
