@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2120.oracle.com ([156.151.31.85]:38666 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727485AbfHMGMS (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:60114 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727485AbfHMGMM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 02:12:18 -0400
+        Tue, 13 Aug 2019 02:12:12 -0400
 From: Knut Omang <knut.omang@oracle.com>
-Subject: [RFC 17/19] ktf: Toplevel ktf Makefile/makefile includes and scripts to run from kselftest
-Date: Tue, 13 Aug 2019 08:09:32 +0200
-Message-Id: <79b7a9ac73c098d3d6ed7a4dde6952b655232b1c.1565676440.git-series.knut.omang@oracle.com>
+Subject: [RFC 15/19] ktf: Some simple examples
+Date: Tue, 13 Aug 2019 08:09:30 +0200
+Message-Id: <930ceefe7f08e47c66cc43404d6e67b310cbec60.1565676440.git-series.knut.omang@oracle.com>
 In-Reply-To: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
 References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
@@ -17,203 +17,367 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>, Knut Omang <knut.omang@oracle.com>
 
+A few simple examples, and example of other test modules
+to make it easier to get started with ktf.
+
 Signed-off-by: Knut Omang <knut.omang@oracle.com>
 ---
- tools/testing/selftests/ktf/Makefile            |  21 ++++-
- tools/testing/selftests/ktf/scripts/ktf_syms.mk |  16 +++-
- tools/testing/selftests/ktf/scripts/runtests.mk |   3 +-
- tools/testing/selftests/ktf/scripts/runtests.sh | 100 +++++++++++++++++-
- tools/testing/selftests/ktf/scripts/top_make.mk |  14 ++-
- 5 files changed, 154 insertions(+)
- create mode 100644 tools/testing/selftests/ktf/Makefile
- create mode 100644 tools/testing/selftests/ktf/scripts/ktf_syms.mk
- create mode 100644 tools/testing/selftests/ktf/scripts/runtests.mk
- create mode 100755 tools/testing/selftests/ktf/scripts/runtests.sh
- create mode 100644 tools/testing/selftests/ktf/scripts/top_make.mk
+ tools/testing/selftests/ktf/examples/Makefile | 17 ++++-
+ tools/testing/selftests/ktf/examples/h2.c     | 45 +++++++++++-
+ tools/testing/selftests/ktf/examples/h3.c     | 84 ++++++++++++++++++++-
+ tools/testing/selftests/ktf/examples/h4.c     | 62 +++++++++++++++-
+ tools/testing/selftests/ktf/examples/hello.c  | 38 +++++++++-
+ tools/testing/selftests/ktf/examples/kgdemo.c | 61 +++++++++++++++-
+ 6 files changed, 307 insertions(+)
+ create mode 100644 tools/testing/selftests/ktf/examples/Makefile
+ create mode 100644 tools/testing/selftests/ktf/examples/h2.c
+ create mode 100644 tools/testing/selftests/ktf/examples/h3.c
+ create mode 100644 tools/testing/selftests/ktf/examples/h4.c
+ create mode 100644 tools/testing/selftests/ktf/examples/hello.c
+ create mode 100644 tools/testing/selftests/ktf/examples/kgdemo.c
 
-diff --git a/tools/testing/selftests/ktf/Makefile b/tools/testing/selftests/ktf/Makefile
+diff --git a/tools/testing/selftests/ktf/examples/Makefile b/tools/testing/selftests/ktf/examples/Makefile
 new file mode 100644
-index 0000000..0fef39c
+index 0000000..f3cfcc9
 --- /dev/null
-+++ b/tools/testing/selftests/ktf/Makefile
-@@ -0,0 +1,21 @@
-+
-+ifneq ($(TARGETS),)
-+# We end up here if called from selftests/Makefile
-+# Invoke our "module target" to get everything built
-+all:
-+	$(Q)$(MAKE) -C $(abs_objtree) M=tools/testing/selftests/ktf
-+
-+clean:
-+	$(Q)$(MAKE) -C $(abs_objtree) M=tools/testing/selftests/ktf clean
-+
-+run_tests:
-+	@echo "running tests"
-+	$(MAKE) BUILD=$(abs_objtree)/tools/testing/selftests -f scripts/runtests.mk $@
-+
-+endif
-+obj-m += kernel/
-+obj-m += selftest/
-+obj-m += examples/
-+obj-m += lib/
-+obj-m += user/
-+
-diff --git a/tools/testing/selftests/ktf/scripts/ktf_syms.mk b/tools/testing/selftests/ktf/scripts/ktf_syms.mk
-new file mode 100644
-index 0000000..a332223
---- /dev/null
-+++ b/tools/testing/selftests/ktf/scripts/ktf_syms.mk
-@@ -0,0 +1,16 @@
-+ktf_symfile=$(shell (cd $(srctree)/$(src) && ls ktf_syms.txt 2> /dev/null || true))
-+ktf_syms = $(ktf_symfile:%.txt=%.h)
-+
-+ifneq ($(ktf_symfile),)
-+
-+$(obj)/self.o: $(obj)/$(ktf_syms)
-+
-+ktf_scripts = $(srctree)/$(src)/../scripts
-+
-+$(obj)/$(ktf_syms): $(srctree)/$(src)/ktf_syms.txt $(ktf_scripts)/resolve
-+	@echo "  KTFSYMS $@"
-+	$(Q)$(ktf_scripts)/resolve $(ccflags-y) $< $@
-+
-+clean-files += $(ktf_syms)
-+
-+endif
-diff --git a/tools/testing/selftests/ktf/scripts/runtests.mk b/tools/testing/selftests/ktf/scripts/runtests.mk
-new file mode 100644
-index 0000000..7fd3651
---- /dev/null
-+++ b/tools/testing/selftests/ktf/scripts/runtests.mk
-@@ -0,0 +1,3 @@
-+TEST_PROGS := scripts/runtests.sh
-+
-+include ../lib.mk
-diff --git a/tools/testing/selftests/ktf/scripts/runtests.sh b/tools/testing/selftests/ktf/scripts/runtests.sh
-new file mode 100755
-index 0000000..3396aec
---- /dev/null
-+++ b/tools/testing/selftests/ktf/scripts/runtests.sh
-@@ -0,0 +1,100 @@
-+#!/bin/bash -e
-+
-+verbose=1
-+
-+# Convenience function to return a string that
-+# is a reverse list of the incoming arguments:
++++ b/tools/testing/selftests/ktf/examples/Makefile
+@@ -0,0 +1,17 @@
++# Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved.
 +#
-+reverse()
-+{
-+    args=($*)
-+    for (( i=((${#args[*]} - 1)); i >= 0; i-- )); do
-+	echo ${args[$i]}
-+    done
-+}
-+
-+# Set paths to a particular module - if no path is set to a module, use modprobe:
++# SPDX-License-Identifier: GPL-2.0
 +#
-+declare -A a_mpath
-+mpath()
-+{
-+    local module="$1"
-+    local mpath="$2"
-+    [[ $mpath != "" ]] || fail "Usage: mpath module path"
-+
-+    a_mpath[$module]="$BUILD/$mpath"
-+}
-+
-+# Set parameters to load a given module with for test purposes:
-+declare -A a_params
-+params()
-+{
-+    local module="$1"
-+    shift
-+    a_params[$module]="$*"
-+}
-+
-+log()
-+{
-+    (( $verbose )) && echo $*
-+}
-+
-+mod_probe()
-+{
-+    local fm=""
-+    local name="$1"
-+    shift
-+
-+    mp=${a_mpath[$name]}
-+    if [[ $mp != "" ]]; then
-+	fm="$mp"
-+    fi
-+
-+    is_loaded=$(lsmod | egrep "^$name" || true)
-+    if [[ $is_loaded != "" ]]; then
-+	echo "Module \"$name\" is already loaded!" 1>&2
-+	return 0
-+    fi
-+
-+    if [[ $fm == "" ]]; then
-+	log "Modprobing $name"
-+	$sudo modprobe $name ${a_params[$name]}
-+    else
-+	fm=${a_mpath[$name]}
-+        log "Insmod'ing module \"$name\"" 1>&2
-+	$sudo insmod $fm ${a_params[$name]}
-+    fi
-+}
-+
-+# If/when more modules are to be loaded, this could go in a config file
-+# but for the purpose of this example, just do it inline:
++# Kernel module implementing a few simple examples of KTF tests
 +#
-+mpath ktf 	ktf/kernel/ktf.ko
-+mpath selftest	ktf/selftest/selftest.ko
 +
-+load_modules="ktf selftest"
++include $(srctree)/$(src)/../scripts/ktf_syms.mk
 +
-+unload_modules=$(reverse $load_modules)
++ccflags-y += -I$(srctree)/$(src)/../kernel -I$(src)
 +
-+sudo=""
-+if [[ $USER != "root" ]]; then
-+    sudo="sudo"
-+fi
++obj-m := hello.o h2.o h3.o h4.o
 +
-+for m in $load_modules; do
-+    mod_probe $m
-+done
-+
-+if [[ $GTEST_PATH == "" ]];then
-+    echo "Set environment variable GTEST_PATH to point to your googletest build!"
-+    exit 1
-+fi
-+
-+export LD_LIBRARY_PATH="$BUILD/ktf/lib:$GTEST_PATH/lib64:$GTEST_PATH/lib"
-+$BUILD/ktf/user/ktftest || stat=$?
-+
-+for m in $unload_modules; do
-+    $sudo rmmod $m
-+done
-+
-+exit $stat
-diff --git a/tools/testing/selftests/ktf/scripts/top_make.mk b/tools/testing/selftests/ktf/scripts/top_make.mk
-new file mode 100644
-index 0000000..978068e
---- /dev/null
-+++ b/tools/testing/selftests/ktf/scripts/top_make.mk
-@@ -0,0 +1,14 @@
-+ifneq ($(TARGETS),)
-+# We end up here if called from selftests/Makefile
-+# Invoke our "module target" to get everything built
-+all:
-+	$(Q)$(MAKE) -C $(abs_objtree) M=tools/testing/selftests/ktf
-+
-+clean:
-+	$(Q)$(MAKE) -C $(abs_objtree) M=tools/testing/selftests/ktf clean
-+
-+run_tests:
-+	@echo "running tests"
-+	$(MAKE) BUILD=$(abs_objtree)/tools/testing/selftests -f scripts/runtests.mk $@
-+
++ifdef CONFIG_KGDB
++obj-m += kgdemo.o
 +endif
++
+diff --git a/tools/testing/selftests/ktf/examples/h2.c b/tools/testing/selftests/ktf/examples/h2.c
+new file mode 100644
+index 0000000..37a6fbb
+--- /dev/null
++++ b/tools/testing/selftests/ktf/examples/h2.c
+@@ -0,0 +1,45 @@
++#include <linux/module.h>
++#include "ktf.h"
++
++MODULE_LICENSE("GPL");
++
++KTF_INIT();
++
++#define MAX_CNT 3
++
++struct hello_ctx {
++	struct ktf_context k;
++	int value[MAX_CNT];
++};
++
++static struct hello_ctx myctx = { .value = { 0, 1, 4 } };
++
++TEST(examples, cmp)
++{
++	struct hello_ctx *hctx = KTF_CONTEXT_GET("value", struct hello_ctx);
++
++	EXPECT_INT_EQ(_i, hctx->value[_i]);
++}
++
++static void add_tests(void)
++{
++	ADD_LOOP_TEST(cmp, 0, MAX_CNT);
++}
++
++static int __init hello_init(void)
++{
++	KTF_CONTEXT_ADD(&myctx.k, "value");
++	add_tests();
++	return 0;
++}
++
++static void __exit hello_exit(void)
++{
++	struct ktf_context *kctx = KTF_CONTEXT_FIND("value");
++
++	KTF_CONTEXT_REMOVE(kctx);
++	KTF_CLEANUP();
++}
++
++module_init(hello_init);
++module_exit(hello_exit);
+diff --git a/tools/testing/selftests/ktf/examples/h3.c b/tools/testing/selftests/ktf/examples/h3.c
+new file mode 100644
+index 0000000..a6aca98
+--- /dev/null
++++ b/tools/testing/selftests/ktf/examples/h3.c
+@@ -0,0 +1,84 @@
++#include <linux/module.h>
++#include "ktf.h"
++
++MODULE_LICENSE("GPL");
++
++KTF_INIT();
++
++DECLARE_F(hello_fixture)
++	struct list_head head;
++};
++
++struct my_element {
++	struct list_head list;
++	int value;
++};
++
++SETUP_F(hello_fixture, hello_setup)
++{
++	int i;
++
++	INIT_LIST_HEAD(&hello_fixture->head);
++	for (i = 0; i < 10; i++) {
++		struct my_element *e = kzalloc(sizeof(*e), GFP_KERNEL);
++
++		e->value = i;
++		list_add_tail(&e->list, &hello_fixture->head);
++	}
++	hello_fixture->ok = true;
++}
++
++TEARDOWN_F(hello_fixture, hello_teardown)
++{
++	struct list_head *p, *next_p;
++
++	/* Just cleanup whatever is left after the test */
++	list_for_each_safe(p, next_p, &hello_fixture->head) {
++		struct my_element *e = list_entry(p, struct my_element, list);
++
++		list_del(&e->list);
++		kfree(e);
++	}
++	EXPECT_TRUE(list_empty(&hello_fixture->head));
++}
++
++INIT_F(hello_fixture, hello_setup, hello_teardown);
++
++TEST_F(hello_fixture, examples, hello_del)
++{
++	int cnt = 0;
++	int cnt_ones = 0;
++	struct my_element *e = kzalloc(sizeof(*e), GFP_KERNEL);
++
++	e->value = 1;
++	list_add(&e->list, &ctx->head);
++
++	list_for_each_entry(e, &ctx->head, list) {
++		if (e->value == 1)
++			cnt_ones++;
++		cnt++;
++	}
++	EXPECT_INT_EQ(11, cnt);
++	EXPECT_INT_EQ(2, cnt_ones);
++}
++
++static void add_tests(void)
++{
++	ADD_TEST(hello_del);
++}
++
++static int __init hello_init(void)
++{
++	add_tests();
++	tlog(T_INFO, "hello: loaded");
++	return 0;
++}
++
++static void __exit hello_exit(void)
++{
++	KTF_CLEANUP();
++	tlog(T_INFO, "hello: unloaded");
++}
++
++module_init(hello_init);
++module_exit(hello_exit);
+diff --git a/tools/testing/selftests/ktf/examples/h4.c b/tools/testing/selftests/ktf/examples/h4.c
+new file mode 100644
+index 0000000..3e85fef
+--- /dev/null
++++ b/tools/testing/selftests/ktf/examples/h4.c
+@@ -0,0 +1,62 @@
++#include <linux/module.h>
++#include "ktf.h"
++
++MODULE_LICENSE("GPL");
++
++KTF_INIT();
++
++static int count;
++static int ret;
++
++KTF_ENTRY_PROBE(printk, printkhandler)
++{
++	count++;
++
++	KTF_ENTRY_PROBE_RETURN(0);
++}
++
++TEST(examples, entrycheck)
++{
++	count = 0;
++	ASSERT_INT_EQ_GOTO(KTF_REGISTER_ENTRY_PROBE(printk, printkhandler),
++			   0, done);
++	printk(KERN_INFO "Testing kprobe entry...");
++	ASSERT_INT_GT_GOTO(count, 0, done);
++done:
++	KTF_UNREGISTER_ENTRY_PROBE(printk, printkhandler);
++}
++
++KTF_RETURN_PROBE(printk, printkrethandler)
++{
++	ret = KTF_RETURN_VALUE();
++
++	return 0;
++}
++
++TEST(examples, returncheck)
++{
++	char *teststr = "Testing kprobe return...";
++
++	ret = -1;
++	ASSERT_INT_EQ_GOTO(KTF_REGISTER_RETURN_PROBE(printk, printkrethandler),
++			   0, done);
++	printk(KERN_INFO "%s", teststr);
++	ASSERT_INT_EQ_GOTO(ret, strlen(teststr), done);
++done:
++	KTF_UNREGISTER_RETURN_PROBE(printk, printkrethandler);
++}
++
++static int __init hello_init(void)
++{
++	ADD_TEST(entrycheck);
++	ADD_TEST(returncheck);
++	return 0;
++}
++
++static void __exit hello_exit(void)
++{
++	KTF_CLEANUP();
++}
++
++module_init(hello_init);
++module_exit(hello_exit);
+diff --git a/tools/testing/selftests/ktf/examples/hello.c b/tools/testing/selftests/ktf/examples/hello.c
+new file mode 100644
+index 0000000..9c4713f
+--- /dev/null
++++ b/tools/testing/selftests/ktf/examples/hello.c
+@@ -0,0 +1,38 @@
++#include <linux/module.h>
++#include "ktf.h"
++
++MODULE_LICENSE("GPL");
++
++KTF_INIT();
++
++TEST(examples, hello_ok)
++{
++	EXPECT_TRUE(true);
++}
++
++TEST(examples, hello_fail)
++{
++	EXPECT_TRUE(false);
++}
++
++static void add_tests(void)
++{
++	ADD_TEST(hello_ok);
++	ADD_TEST(hello_fail);
++}
++
++static int __init hello_init(void)
++{
++	add_tests();
++	tlog(T_INFO, "hello: loaded");
++	return 0;
++}
++
++static void __exit hello_exit(void)
++{
++	KTF_CLEANUP();
++	tlog(T_INFO, "hello: unloaded");
++}
++
++module_init(hello_init);
++module_exit(hello_exit);
+diff --git a/tools/testing/selftests/ktf/examples/kgdemo.c b/tools/testing/selftests/ktf/examples/kgdemo.c
+new file mode 100644
+index 0000000..9ce19ff
+--- /dev/null
++++ b/tools/testing/selftests/ktf/examples/kgdemo.c
+@@ -0,0 +1,61 @@
++#include <linux/module.h>
++#include "ktf.h"
++
++/*
++ * A trivial and somewhat rough example used by the author
++ * for pedagogical purposes, to demonstrate
++ * interactive debugging with kgdb.
++ *
++ * Requires a kernel built with CONFIG_KGDB
++ *
++ * Note: these test breaks into kgdb and/or creates a NULL
++ *       pointer exception and corresponding stack dump, so
++ *       try out in a test environment only!
++ */
++
++MODULE_LICENSE("GPL");
++
++KTF_INIT();
++
++#define MAX_CNT 3
++#include <linux/kgdb.h>
++
++static int kgdemo_cnt;
++static int *bogus_ref;
++
++TEST(kgdb, breakpoint)
++{
++	kgdemo_cnt = 0;
++	printk(KERN_INFO "** Please set kgdemo_cnt = 1 **\n");
++	kgdb_breakpoint();
++	EXPECT_INT_EQ(1, kgdemo_cnt);
++}
++
++TEST(kgdb, nullpointer)
++{
++	int pre = kgdemo_cnt;
++
++	int b = *bogus_ref++;
++
++	EXPECT_INT_EQ(pre + 1, b);
++}
++
++static void add_tests(void)
++{
++	ADD_TEST(breakpoint);
++	ADD_TEST(nullpointer);
++}
++
++static int __init kgdemo_init(void)
++{
++	add_tests();
++	return 0;
++}
++
++static void __exit kgdemo_exit(void)
++{
++	KTF_CLEANUP();
++}
++
++module_init(kgdemo_init);
++module_exit(kgdemo_exit);
 -- 
 git-series 0.9.1
