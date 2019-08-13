@@ -1,89 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36271 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726735AbfHMFEn (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:44654 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfHMFGQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 01:04:43 -0400
-Received: by mail-pf1-f195.google.com with SMTP id w2so65347pfi.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 22:04:42 -0700 (PDT)
+        Tue, 13 Aug 2019 01:06:16 -0400
+Received: by mail-pg1-f196.google.com with SMTP id i18so50617000pgl.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 22:06:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190812182421.141150-1-brendanhiggins@google.com>
- <20190812182421.141150-6-brendanhiggins@google.com> <20190812235701.533E82063F@mail.kernel.org>
- <20190813003352.GA235915@google.com> <20190813050206.2A49C206C2@mail.kernel.org>
-In-Reply-To: <20190813050206.2A49C206C2@mail.kernel.org>
+ <20190812182421.141150-11-brendanhiggins@google.com> <20190813042455.4A04320644@mail.kernel.org>
+In-Reply-To: <20190813042455.4A04320644@mail.kernel.org>
 From: Brendan Higgins <brendanhiggins@google.com>
-Date: Mon, 12 Aug 2019 22:04:30 -0700
-Message-ID: <CAFd5g44VBzDSjxHGUZ=8A9hempQ0_3Ym_8qzj0ETEJ8AzM6poA@mail.gmail.com>
-Subject: Re: [PATCH v12 05/18] kunit: test: add the concept of expectations
+Date: Mon, 12 Aug 2019 22:06:04 -0700
+Message-ID: <CAFd5g46LHq1sQaio2Vj5jt54YN-Y2HuCT8FbALQhJoekkYJ-uQ@mail.gmail.com>
+Subject: Re: [PATCH v12 10/18] kunit: test: add tests for kunit test abort
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Boyd <sboyd@kernel.org>
 Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Mon, Aug 12, 2019 at 10:02 PM Stephen Boyd <sboyd@kernel.org> wrote:
+On Mon, Aug 12, 2019 at 9:24 PM Stephen Boyd <sboyd@kernel.org> wrote:
 >
-> Quoting Brendan Higgins (2019-08-12 17:33:52)
-> > On Mon, Aug 12, 2019 at 04:57:00PM -0700, Stephen Boyd wrote:
-> > > Quoting Brendan Higgins (2019-08-12 11:24:08)
-> > > > + */
-> > > > +#define KUNIT_EXPECT_TRUE(test, condition) \
-> > > > +               KUNIT_TRUE_ASSERTION(test, KUNIT_EXPECTATION, condition)
-> > >
-> > > A lot of these macros seem double indented.
-> >
-> > In a case you pointed out in the preceding patch, I was just keeping the
-> > arguments column aligned.
-> >
-> > In this case I am just indenting two tabs for a line continuation. I
-> > thought I found other instances in the kernel that did this early on
-> > (and that's also what the Linux kernel vim plugin wanted me to do).
-> > After a couple of spot checks, it seems like one tab for this kind of
-> > line continuation seems more common. I personally don't feel strongly
-> > about any particular version. I just want to know now what the correct
-> > indentation is for macros before I go through and change them all.
-> >
-> > I think there are three cases:
-> >
-> > #define macro0(param0, param1) \
-> >                 a_really_long_macro(...)
-> >
-> > In this first case, I use two tabs for the first indent, I think you are
-> > telling me this should be one tab.
+> Quoting Brendan Higgins (2019-08-12 11:24:13)
+> > +
+> > +static int kunit_try_catch_test_init(struct kunit *test)
+> > +{
+> > +       struct kunit_try_catch_test_context *ctx;
+> > +
+> > +       ctx = kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
 >
-> Yes. Should be one.
->
-> >
-> > #define macro1(param0, param1) {                                               \
-> >         statement_in_a_block0;                                                 \
-> >         statement_in_a_block1;                                                 \
-> >         ...                                                                    \
-> > }
-> >
-> > In this case, every line is in a block and is indented as it would be in
-> > a function body. I think you are okay with this, and now that I am
-> > thinking about it, what I think you are proposing for macro0 will make
-> > these two cases more consistent.
-> >
-> > #define macro2(param0,                                                         \
-> >                param1,                                                         \
-> >                param2,                                                         \
-> >                param3,                                                         \
-> >                ...,                                                            \
-> >                paramn) ...                                                     \
-> >
-> > In this last case, the body would be indented as in macro0, or macro1,
-> > but the parameters passed into the macro are column aligned, consistent
-> > with one of the acceptable ways of formatting function parameters that
-> > don't fit on a single line.
-> >
-> > In all cases, I put 1 space in between the closing parameter paren and
-> > the line continuation `\`, if only one `\` is needed. Otherwise, I align
-> > all the `\s` to the 80th column. Is this okay, or would you prefer that
-> > I align them all to the 80th column, or something else?
-> >
->
-> This all sounds fine and I'm not nitpicking this style. Just the double
-> tabs making lines longer than required.
+> Can this fail? Should return -ENOMEM in that case?
 
-Sounds good. Will do.
+Yes, I should do that.
+
+> > +       test->priv = ctx;
+> > +
+> > +       ctx->try_catch = kunit_kmalloc(test,
+> > +                                      sizeof(*ctx->try_catch),
+> > +                                      GFP_KERNEL);
