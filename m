@@ -1,67 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:45840 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726066AbfHMWKY (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 18:10:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45852 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727193AbfHMWdC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 18:33:02 -0400
 MIME-Version: 1.0
-References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
- <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com>
- <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com> <CAK7LNAT5OVcw9tJtaR8VE_JEemAzkqV6FeSHPEy38wotxjhkZg@mail.gmail.com>
-In-Reply-To: <CAK7LNAT5OVcw9tJtaR8VE_JEemAzkqV6FeSHPEy38wotxjhkZg@mail.gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-Date: Tue, 13 Aug 2019 17:10:12 -0500
-Message-ID: <CAJ48U8UKzGPj7JM2z2vnTDC4fT_7+X2NXVLf1T116-ym50i=xQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
+References: <20190813183825.9605-1-sboyd@kernel.org>
+In-Reply-To: <20190813183825.9605-1-sboyd@kernel.org>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 13 Aug 2019 16:32:48 -0600
+Message-ID: <CAL_JsqLivZNf9A2bVXKf8eqdmsywQV+KEh5dYVLywNQPfn0P=w@mail.gmail.com>
+Subject: Re: [PATCH] devicetree: Expose dtbs_check and dt_binding_check some more
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
+To: Stephen Boyd <sboyd@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, devicetree@vger.kernel.org, Linux Doc Mailing List <linux-doc@vger.kernel.org>
 
-On Mon, Aug 12, 2019 at 8:07 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Tue, Aug 13, 2019 at 12:38 PM Stephen Boyd <sboyd@kernel.org> wrote:
 >
-> On Tue, Aug 13, 2019 at 2:34 AM Shaun Tancheff <shaun@tancheff.com> wrote:
-> >
-> > On Mon, Aug 12, 2019 at 10:24 AM Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
-> > >
-> > > On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
-> > > >
-> > > > When building a tree of external modules stage 2 fails
-> > > > silently as the root modules.order is empty.
-> > > >
-> > > > Modify the modules.order location to be fixed to the
-> > > > root when KBUILD_EXTMOD is specified and write all
-> > > > module paths to the single modules.order file.
-> > >
-> > > Could you try v5.3-rc4 please?
-> >
-> > So it seems we are using 'subdir-m' but that is now gone?
-> >
-> > Is there a recommend pattern for backward compatibility?
-> >
-> > Thanks!
+> It wasn't obvious that this was a command to run based on 'make help',
+> so add it to the top-level help for devicetree builds. Also, add an
+> example to the documentation to show that db_binding_check can be run
+> with DT_SCHEMA_FILES= to only check one schema file instead of all of
+> them.
 >
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: <linux-kbuild@vger.kernel.org>
+> Cc: <devicetree@vger.kernel.org>
+> Cc: <linux-doc@vger.kernel.org>
+> Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+> ---
 >
-> Please convert
->
-> subdir-m += dir1
-> subdir-m += dir2
->
-> into
->
-> obj-m += dir1/
-> obj-m += dir2/
+> I didn't find this sent, so sending again!
 
-After working through some local quirks everything is working now.
-Thanks!
+You had. :)
 
 >
->
-> Thanks.
->
-> --
-> Best Regards
-> Masahiro Yamada
+>  Documentation/devicetree/writing-schema.md | 1 +
+>  Makefile                                   | 6 ++++--
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+
+writing-schema.md got converted to rst, so I fixed up and applied.
+
+Rob
