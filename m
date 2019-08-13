@@ -1,92 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:32862 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33382 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725820AbfHMEzM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 00:55:12 -0400
+        id S1725867AbfHME4Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 00:56:25 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190812182421.141150-12-brendanhiggins@google.com>
-References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812182421.141150-12-brendanhiggins@google.com>
-Subject: Re: [PATCH v12 11/18] kunit: test: add the concept of assertions
+In-Reply-To: <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
+References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org> <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org> <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
+Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream like string builder
 From: Stephen Boyd <sboyd@kernel.org>
-Date: Mon, 12 Aug 2019 21:55:09 -0700
-Message-Id: <20190813045510.C1D6E206C2@mail.kernel.org>
+Date: Mon, 12 Aug 2019 21:56:23 -0700
+Message-Id: <20190813045623.F3D9520842@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, Brendan Higgins <brendanhiggins@google.com>
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-Quoting Brendan Higgins (2019-08-12 11:24:14)
-> Add support for assertions which are like expectations except the test
-> terminates if the assertion is not satisfied.
+Quoting Brendan Higgins (2019-08-12 17:41:05)
+> On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> >
+> > > kunit_resource_destroy (respective equivalents to devm_kfree, and
+> > > devres_destroy) and use kunit_kfree here?
+> > >
+> >
+> > Yes, or drop the API entirely? Does anything need this functionality?
 >=20
-> The idea with assertions is that you use them to state all the
-> preconditions for your test. Logically speaking, these are the premises
-> of the test case, so if a premise isn't true, there is no point in
-> continuing the test case because there are no conclusions that can be
-> drawn without the premises. Whereas, the expectation is the thing you
-> are trying to prove. It is not used universally in x-unit style test
-> frameworks, but I really like it as a convention.  You could still
-> express the idea of a premise using the above idiom, but I think
-> KUNIT_ASSERT_* states the intended idea perfectly.
->=20
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+> Drop the kunit_resource API? I would strongly prefer not to.
 
-Reviewed-by: Stephen Boyd <sboyd@kernel.org>
-
-> + * Sets an expectation that the values that @left and @right evaluate to=
- are
-> + * not equal. This is semantically equivalent to
-> + * KUNIT_ASSERT_TRUE(@test, strcmp((@left), (@right))). See KUNIT_ASSERT=
-_TRUE()
-> + * for more information.
-> + */
-> +#define KUNIT_ASSERT_STRNEQ(test, left, right)                          =
-      \
-> +               KUNIT_BINARY_STR_NE_ASSERTION(test,                      =
-      \
-> +                                             KUNIT_ASSERTION,           =
-      \
-> +                                             left,                      =
-      \
-> +                                             right)
-> +
-> +#define KUNIT_ASSERT_STRNEQ_MSG(test, left, right, fmt, ...)            =
-      \
-> +               KUNIT_BINARY_STR_NE_MSG_ASSERTION(test,                  =
-      \
-> +                                                 KUNIT_ASSERTION,       =
-      \
-> +                                                 left,                  =
-      \
-> +                                                 right,                 =
-      \
-> +                                                 fmt,                   =
-      \
-
-Same question about tabbing too.
-
-> diff --git a/kunit/test-test.c b/kunit/test-test.c
-> index 88f4cdf03db2a..058f3fb37458a 100644
-> --- a/kunit/test-test.c
-> +++ b/kunit/test-test.c
-> @@ -78,11 +78,13 @@ static int kunit_try_catch_test_init(struct kunit *te=
-st)
->         struct kunit_try_catch_test_context *ctx;
-> =20
->         ctx =3D kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
-> +       KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctx);
-
-Ah ok. Question still stands if kunit_kzalloc() should just have the
-assertion on failure.
-
->         test->priv =3D ctx;
-> =20
->         ctx->try_catch =3D kunit_kmalloc(test,
->                                        sizeof(*ctx->try_catch),
->                                        GFP_KERNEL);
-> +       KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctx->try_catch);
-> =20
+No. I mean this API, string_stream_clear(). Does anything use it?
