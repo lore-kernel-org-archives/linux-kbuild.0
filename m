@@ -1,68 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:40463 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726703AbfHMUQV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 16:16:21 -0400
-Received: by mail-ot1-f67.google.com with SMTP id c34so37045881otb.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Aug 2019 13:16:21 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:54704 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726878AbfHMWol (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 18:44:41 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20180716122125.175792-1-maco@android.com> <20190813121733.52480-1-maennich@google.com>
- <20190813121733.52480-6-maennich@google.com>
-In-Reply-To: <20190813121733.52480-6-maennich@google.com>
-From: Saravana Kannan <saravanak@google.com>
-Date: Tue, 13 Aug 2019 13:15:44 -0700
-Message-ID: <CAGETcx_LQDdnaU+3JVGw+6=DJ8tRoQ00+3rD2gOiHHkWomt8jg@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] module: add config option MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAL_JsqLivZNf9A2bVXKf8eqdmsywQV+KEh5dYVLywNQPfn0P=w@mail.gmail.com>
+References: <20190813183825.9605-1-sboyd@kernel.org> <CAL_JsqLivZNf9A2bVXKf8eqdmsywQV+KEh5dYVLywNQPfn0P=w@mail.gmail.com>
+Subject: Re: [PATCH] devicetree: Expose dtbs_check and dt_binding_check some more
+From: Stephen Boyd <sboyd@kernel.org>
+Date: Tue, 13 Aug 2019 15:44:39 -0700
+Message-Id: <20190813224440.0468920644@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, maco@android.com, Android Kernel Team <kernel-team@android.com>, arnd@arndb.de, geert@linux-m68k.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, hpa@zytor.com, jeyu@kernel.org, "Joel Fernandes (Google)" <joel@joelfernandes.org>, kstewart@linuxfoundation.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, lucas.de.marchi@gmail.com, maco@google.com, michal.lkml@markovi.net, mingo@redhat.com, oneukum@suse.com, pombredanne@nexb.com, sam@ravnborg.org, sboyd@codeaurora.org, Sandeep Patil <sspatil@google.com>, stern@rowland.harvard.edu, tglx@linutronix.de, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, yamada.masahiro@socionext.com, Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, David Howells <dhowells@redhat.com>, Patrick Bellasi <patrick.bellasi@arm.com>, Dan Williams <dan.j.williams@intel.com>, Adrian Reber <adrian@lisas.de>, Richard Guy Briggs <rgb@redhat.com>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, devicetree@vger.kernel.org, Linux Doc Mailing List <linux-doc@vger.kernel.org>
 
-On Tue, Aug 13, 2019 at 5:19 AM 'Matthias Maennich' via kernel-team
-<kernel-team@android.com> wrote:
->
-> If MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS is enabled (default=n), the
-> requirement for modules to import all namespaces that are used by
-> the module is relaxed.
->
-> Enabling this option effectively allows (invalid) modules to be loaded
-> while only a warning is emitted.
->
-> Disabling this option keeps the enforcement at module loading time and
-> loading is denied if the module's imports are not satisfactory.
->
-> Reviewed-by: Martijn Coenen <maco@android.com>
-> Signed-off-by: Matthias Maennich <maennich@google.com>
-> ---
->  init/Kconfig    | 14 ++++++++++++++
->  kernel/module.c | 11 +++++++++--
->  2 files changed, 23 insertions(+), 2 deletions(-)
->
-> diff --git a/init/Kconfig b/init/Kconfig
-> index bd7d650d4a99..b3373334cdf1 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -2119,6 +2119,20 @@ config MODULE_COMPRESS_XZ
->
->  endchoice
->
-> +config MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-> +       bool "Allow loading of modules with missing namespace imports"
-> +       default n
-> +       help
-> +         Symbols exported with EXPORT_SYMBOL_NS*() are considered exported in
-> +         a namespace. A module that makes use of a symbol exported with such a
-> +         namespace is required to import the namespace via MODULE_IMPORT_NS().
-> +         This option relaxes this requirement when loading a module.
+Quoting Rob Herring (2019-08-13 15:32:48)
+> On Tue, Aug 13, 2019 at 12:38 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> >
+> > It wasn't obvious that this was a command to run based on 'make help',
+> > so add it to the top-level help for devicetree builds. Also, add an
+> > example to the documentation to show that db_binding_check can be run
+> > with DT_SCHEMA_FILES=3D to only check one schema file instead of all of
+> > them.
+> >
+> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Cc: <linux-kbuild@vger.kernel.org>
+> > Cc: <devicetree@vger.kernel.org>
+> > Cc: <linux-doc@vger.kernel.org>
+> > Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+> > ---
+> >
+> > I didn't find this sent, so sending again!
+>=20
+> You had. :)
 
-> While
-> +         technically there is no reason to enforce correct namespace imports,
-> +         it creates consistency between symbols defining namespaces and users
-> +         importing namespaces they make use of.
+Oh no, sorry! :(
 
-I'm confused by this sentence. It sounds like it's the opposite of
-what the config is doing? Can you please reword it for clarify?
+>=20
+> >
+> >  Documentation/devicetree/writing-schema.md | 1 +
+> >  Makefile                                   | 6 ++++--
+> >  2 files changed, 5 insertions(+), 2 deletions(-)
+>=20
+> writing-schema.md got converted to rst, so I fixed up and applied.
 
--Saravana
+Thanks!
