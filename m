@@ -1,44 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38458 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727038AbfHMP1R (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 11:27:17 -0400
-Date: Tue, 13 Aug 2019 17:27:14 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 04/10] modpost: add support for symbol namespaces
-Message-ID: <20190813152714.GC26138@kroah.com>
-References: <20180716122125.175792-1-maco@android.com>
- <20190813121733.52480-1-maennich@google.com>
- <20190813121733.52480-5-maennich@google.com>
+Received: from aserp2120.oracle.com ([141.146.126.78]:33022 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727211AbfHMQTf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 12:19:35 -0400
+Message-ID: <14b99d26a4cff1c813c92818dc1234007fa06fc9.camel@oracle.com>
+Subject: Re: [RFC 01/19] kbuild: Fixes to rules for host-cshlib and
+ host-cxxshlib
+From: Knut Omang <knut.omang@oracle.com>
+Date: Tue, 13 Aug 2019 18:19:01 +0200
+In-Reply-To: <CAK7LNASX4jPRxRxD+JafAfKqjck=x27HuHZgPV1VFfW8MzcwZA@mail.gmail.com>
+References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+         <be2c361eac49ded2848b2a555b75e30cc3c24e71.1565676440.git-series.knut.omang@oracle.com>
+         <CAK7LNASX4jPRxRxD+JafAfKqjck=x27HuHZgPV1VFfW8MzcwZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190813121733.52480-5-maennich@google.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: linux-kernel@vger.kernel.org, maco@android.com, kernel-team@android.com, arnd@arndb.de, geert@linux-m68k.org, hpa@zytor.com, jeyu@kernel.org, joel@joelfernandes.org, kstewart@linuxfoundation.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, lucas.de.marchi@gmail.com, maco@google.com, michal.lkml@markovi.net, mingo@redhat.com, oneukum@suse.com, pombredanne@nexb.com, sam@ravnborg.org, sboyd@codeaurora.org, sspatil@google.com, stern@rowland.harvard.edu, tglx@linutronix.de, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, yamada.masahiro@socionext.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
 
-On Tue, Aug 13, 2019 at 01:17:01PM +0100, Matthias Maennich wrote:
-> Add support for symbols that are exported into namespaces. For that,
-> extract any namespace suffix from the symbol name. In addition, emit a
-> warning whenever a module refers to an exported symbol without
-> explicitly importing the namespace that it is defined in. This patch
-> consistently adds the namespace suffix to symbol names exported into
-> Module.symvers.
+On Tue, 2019-08-13 at 23:01 +0900, Masahiro Yamada wrote:
+> On Tue, Aug 13, 2019 at 3:13 PM Knut Omang <knut.omang@oracle.com> wrote:
+> >
+> > C++ libraries interfacing to C APIs might sometimes need some glue
+> > logic more easily written in C.
+> > Allow a C++ library to also contain 0 or more C objects.
+> >
+> > Also fix rules for both C and C++ shared libraries:
+> > - C++ shared libraries depended on .c instead of .cc files
+> > - Rules were referenced as -objs instead of the intended
+> >   -cobjs and -cxxobjs following the pattern from hostprogs*.
+> >
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
 > 
-> Example warning emitted by modpost in case of the above violation:
 > 
->  WARNING: module ums-usbat uses symbol usb_stor_resume from namespace
->  USB_STORAGE, but does not import it.
-> 
-> Co-developed-by: Martijn Coenen <maco@android.com>
-> Signed-off-by: Martijn Coenen <maco@android.com>
-> Reviewed-by: Joel Fernandes (Google) <joel@joelfernandes.org>
-> Signed-off-by: Matthias Maennich <maennich@google.com>
-> ---
->  scripts/mod/modpost.c | 91 +++++++++++++++++++++++++++++++++++++------
->  scripts/mod/modpost.h |  7 ++++
->  2 files changed, 87 insertions(+), 11 deletions(-)
+> How is this patch related to the rest of this series?
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+This is just my (likely naive) way I to get what I had working 
+using autotools in the Github version of KTF) translated into something 
+comparable using kbuild only. We need to build a shared library consisting 
+of a few C++ files and a very simple C file, and a couple of simple binaries, 
+and the rule in there does seem to take .c files and subject them to the 
+C++ compiler, which makes this difficult to achieve?
+
+> This patch breaks GCC-plugins.
+> Did you really compile-test this patch before the submission?
+
+Sorry for my ignorance here:
+I ran through the kernel build and installed the resulting kernel 
+on a VM that I used to test this, if that's what you are asking 
+about?
+
+Do I need some unusual .config options or run a special make target 
+to trigger the problem you see?
+
+I used a recent Fedora config with default values for new options,
+and ran the normal default make target (also with O=) and make selftests 
+to test the patch itself.
+
+Thanks,
+Knut
+
+> --
+> Best Regards
+> 
+> Masahiro Yamada
