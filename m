@@ -1,148 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40425 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726549AbfHMAd7 (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35205 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726647AbfHMAlS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 20:33:59 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w10so50315591pgj.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 17:33:58 -0700 (PDT)
-Date: Mon, 12 Aug 2019 17:33:52 -0700
-From: Brendan Higgins <brendanhiggins@google.com>
-Subject: Re: [PATCH v12 05/18] kunit: test: add the concept of expectations
-Message-ID: <20190813003352.GA235915@google.com>
-References: <20190812182421.141150-1-brendanhiggins@google.com>
- <20190812182421.141150-6-brendanhiggins@google.com>
- <20190812235701.533E82063F@mail.kernel.org>
+        Mon, 12 Aug 2019 20:41:18 -0400
+Received: by mail-pl1-f194.google.com with SMTP id w24so48527685plp.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 17:41:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190812235701.533E82063F@mail.kernel.org>
+References: <20190812182421.141150-1-brendanhiggins@google.com>
+ <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org>
+ <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org>
+In-Reply-To: <20190812235940.100842063F@mail.kernel.org>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Mon, 12 Aug 2019 17:41:05 -0700
+Message-ID: <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
+Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream
+ like string builder
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Boyd <sboyd@kernel.org>
-Cc: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Mon, Aug 12, 2019 at 04:57:00PM -0700, Stephen Boyd wrote:
-> Quoting Brendan Higgins (2019-08-12 11:24:08)
-> > Add support for expectations, which allow properties to be specified and
-> > then verified in tests.
-> > 
-> > Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> 
-> Reviewed-by: Stephen Boyd <sboyd@kernel.org>
-> 
-> Just some minor nits again.
-> 
-> > diff --git a/include/kunit/test.h b/include/kunit/test.h
-> > index d0bf112910caf..2625bcfeb19ac 100644
-> > --- a/include/kunit/test.h
-> > +++ b/include/kunit/test.h
-> > @@ -9,8 +9,10 @@
-> >  #ifndef _KUNIT_TEST_H
-> >  #define _KUNIT_TEST_H
-> >  
-> > +#include <linux/kernel.h>
-> >  #include <linux/types.h>
-> >  #include <linux/slab.h>
-> > +#include <kunit/assert.h>
-> 
-> Can you alphabet sort these?
+On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
+>
+> Quoting Brendan Higgins (2019-08-12 16:33:36)
+> > On Mon, Aug 12, 2019 at 03:55:19PM -0700, Stephen Boyd wrote:
+> > > Quoting Brendan Higgins (2019-08-12 11:24:06)
+> > > > +void string_stream_clear(struct string_stream *stream)
+> > > > +{
+> > > > +       struct string_stream_fragment *frag_container, *frag_container_safe;
+> > > > +
+> > > > +       spin_lock(&stream->lock);
+> > > > +       list_for_each_entry_safe(frag_container,
+> > > > +                                frag_container_safe,
+> > > > +                                &stream->fragments,
+> > > > +                                node) {
+> > > > +               list_del(&frag_container->node);
+> > >
+> > > Shouldn't we free the allocation here? Otherwise, if some test is going
+> > > to add, add, clear, add, it's going to leak until the test is over?
+> >
+> > So basically this means I should add a kunit_kfree and
+> > kunit_resource_destroy (respective equivalents to devm_kfree, and
+> > devres_destroy) and use kunit_kfree here?
+> >
+>
+> Yes, or drop the API entirely? Does anything need this functionality?
 
-Sure. Will fix.
+Drop the kunit_resource API? I would strongly prefer not to.
+string_stream uses it; the expectation stuff uses it via string
+stream; some of the tests in this patchset allocate memory as part of
+the test setup that uses it. The intention is that we would provide a
+kunit_res_* version of many (hopefully eventually most) common
+resources required by tests and it would be used in the same way that
+the devm_* stuff is.
 
-> >  
-> >  struct kunit_resource;
-> >  
-> > @@ -319,4 +321,845 @@ void __printf(3, 4) kunit_printk(const char *level,
-> >  #define kunit_err(test, fmt, ...) \
-> >                 kunit_printk(KERN_ERR, test, fmt, ##__VA_ARGS__)
-> >  
-> > +/*
-> > + * Generates a compile-time warning in case of comparing incompatible types.
-> > + */
-> > +#define __kunit_typecheck(lhs, rhs) \
-> > +       ((void) __typecheck(lhs, rhs))
-> 
-> Is there a reason why this can't be inlined and the __kunit_typecheck()
-> macro can't be removed?
-
-No real reason anymore. I used it in multiple places before and we
-weren't sure if we wanted to stick with the warnings that __typecheck
-produces long term, but now that it is only used in one place, I guess
-that doesn't make sense anymore. Will fix.
-
-> > +
-> > +/**
-> > + * KUNIT_SUCCEED() - A no-op expectation. Only exists for code clarity.
-> > + * @test: The test context object.
-> [...]
-> > + * @condition: an arbitrary boolean expression. The test fails when this does
-> > + * not evaluate to true.
-> > + *
-> > + * This and expectations of the form `KUNIT_EXPECT_*` will cause the test case
-> > + * to fail when the specified condition is not met; however, it will not prevent
-> > + * the test case from continuing to run; this is otherwise known as an
-> > + * *expectation failure*.
-> > + */
-> > +#define KUNIT_EXPECT_TRUE(test, condition) \
-> > +               KUNIT_TRUE_ASSERTION(test, KUNIT_EXPECTATION, condition)
-> 
-> A lot of these macros seem double indented.
-
-In a case you pointed out in the preceding patch, I was just keeping the
-arguments column aligned.
-
-In this case I am just indenting two tabs for a line continuation. I
-thought I found other instances in the kernel that did this early on
-(and that's also what the Linux kernel vim plugin wanted me to do).
-After a couple of spot checks, it seems like one tab for this kind of
-line continuation seems more common. I personally don't feel strongly
-about any particular version. I just want to know now what the correct
-indentation is for macros before I go through and change them all.
-
-I think there are three cases:
-
-#define macro0(param0, param1) \
-		a_really_long_macro(...)
-
-In this first case, I use two tabs for the first indent, I think you are
-telling me this should be one tab.
-
-#define macro1(param0, param1) {					       \
-	statement_in_a_block0;						       \
-	statement_in_a_block1;						       \
-	...								       \
-}
-
-In this case, every line is in a block and is indented as it would be in
-a function body. I think you are okay with this, and now that I am
-thinking about it, what I think you are proposing for macro0 will make
-these two cases more consistent.
-
-#define macro2(param0,							       \
-	       param1,							       \
-	       param2,							       \
-	       param3,							       \
-	       ...,							       \
-	       paramn) ...						       \
-
-In this last case, the body would be indented as in macro0, or macro1,
-but the parameters passed into the macro are column aligned, consistent
-with one of the acceptable ways of formatting function parameters that
-don't fit on a single line.
-
-In all cases, I put 1 space in between the closing parameter paren and
-the line continuation `\`, if only one `\` is needed. Otherwise, I align
-all the `\s` to the 80th column. Is this okay, or would you prefer that
-I align them all to the 80th column, or something else?
-
-> > +
-> > +#define KUNIT_EXPECT_TRUE_MSG(test, condition, fmt, ...)                      \
-> > +               KUNIT_TRUE_MSG_ASSERTION(test,                                 \
-> > +                                        KUNIT_EXPECTATION,                    \
-> > +                                        condition,                            \
-> > +                                        fmt,                                  \
-> > +                                        ##__VA_ARGS__)
-> > +
+Nevertheless, I am fine adding the kunit_resource_destroy, etc. I just
+wanted to make sure I understood what you were asking.
