@@ -1,60 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35205 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726647AbfHMAlS (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:52583 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726200AbfHMBHN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 20:41:18 -0400
-Received: by mail-pl1-f194.google.com with SMTP id w24so48527685plp.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 17:41:18 -0700 (PDT)
+        Mon, 12 Aug 2019 21:07:13 -0400
 MIME-Version: 1.0
-References: <20190812182421.141150-1-brendanhiggins@google.com>
- <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org>
- <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org>
-In-Reply-To: <20190812235940.100842063F@mail.kernel.org>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Mon, 12 Aug 2019 17:41:05 -0700
-Message-ID: <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
-Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream
- like string builder
+References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
+ <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com> <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
+In-Reply-To: <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 13 Aug 2019 10:06:29 +0900
+Message-ID: <CAK7LNAT5OVcw9tJtaR8VE_JEemAzkqV6FeSHPEy38wotxjhkZg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: Shaun Tancheff <shaun@tancheff.com>
+Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
 
-On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
+On Tue, Aug 13, 2019 at 2:34 AM Shaun Tancheff <shaun@tancheff.com> wrote:
 >
-> Quoting Brendan Higgins (2019-08-12 16:33:36)
-> > On Mon, Aug 12, 2019 at 03:55:19PM -0700, Stephen Boyd wrote:
-> > > Quoting Brendan Higgins (2019-08-12 11:24:06)
-> > > > +void string_stream_clear(struct string_stream *stream)
-> > > > +{
-> > > > +       struct string_stream_fragment *frag_container, *frag_container_safe;
-> > > > +
-> > > > +       spin_lock(&stream->lock);
-> > > > +       list_for_each_entry_safe(frag_container,
-> > > > +                                frag_container_safe,
-> > > > +                                &stream->fragments,
-> > > > +                                node) {
-> > > > +               list_del(&frag_container->node);
+> On Mon, Aug 12, 2019 at 10:24 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
 > > >
-> > > Shouldn't we free the allocation here? Otherwise, if some test is going
-> > > to add, add, clear, add, it's going to leak until the test is over?
+> > > When building a tree of external modules stage 2 fails
+> > > silently as the root modules.order is empty.
+> > >
+> > > Modify the modules.order location to be fixed to the
+> > > root when KBUILD_EXTMOD is specified and write all
+> > > module paths to the single modules.order file.
 > >
-> > So basically this means I should add a kunit_kfree and
-> > kunit_resource_destroy (respective equivalents to devm_kfree, and
-> > devres_destroy) and use kunit_kfree here?
-> >
+> > Could you try v5.3-rc4 please?
 >
-> Yes, or drop the API entirely? Does anything need this functionality?
+> So it seems we are using 'subdir-m' but that is now gone?
+>
+> Is there a recommend pattern for backward compatibility?
+>
+> Thanks!
 
-Drop the kunit_resource API? I would strongly prefer not to.
-string_stream uses it; the expectation stuff uses it via string
-stream; some of the tests in this patchset allocate memory as part of
-the test setup that uses it. The intention is that we would provide a
-kunit_res_* version of many (hopefully eventually most) common
-resources required by tests and it would be used in the same way that
-the devm_* stuff is.
 
-Nevertheless, I am fine adding the kunit_resource_destroy, etc. I just
-wanted to make sure I understood what you were asking.
+Please convert
+
+subdir-m += dir1
+subdir-m += dir2
+
+into
+
+obj-m += dir1/
+obj-m += dir2/
+
+
+Thanks.
+
+-- 
+Best Regards
+Masahiro Yamada
