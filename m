@@ -1,66 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:43751 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727599AbfHMJNJ (ORCPT
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:51515 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726650AbfHMJsH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 05:13:09 -0400
-Received: by mail-lf1-f68.google.com with SMTP id c19so76273618lfm.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Aug 2019 02:13:08 -0700 (PDT)
+        Tue, 13 Aug 2019 05:48:07 -0400
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH v2] kbuild: Change fallthrough comments to attributes
+Date: Tue, 13 Aug 2019 09:48:01 +0000
+Message-ID: <85e25647ae404bf38bc008ea914e08b3@AcuMS.aculab.com>
+References: <20190812214711.83710-1-nhuck@google.com>
+         <20190812221416.139678-1-nhuck@google.com>
+         <814c1b19141022946d3e0f7e24d69658d7a512e4.camel@perches.com>
+         <CAKwvOdnpXqoQDmHVRCh0qX=Yh-8UpEWJ0C3S=syn1KN8rB3OGQ@mail.gmail.com>
+         <20190813063327.GA46858@archlinux-threadripper>
+ <3078e553a777976655f72718d088791363544caa.camel@perches.com>
+In-Reply-To: <3078e553a777976655f72718d088791363544caa.camel@perches.com>
+Content-Language: en-US
 MIME-Version: 1.0
-References: <20190812182421.141150-1-brendanhiggins@google.com>
- <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org>
- <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org>
- <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
- <20190813045623.F3D9520842@mail.kernel.org> <CAFd5g46PJNTOUAA4GOOrW==74Zy7u1sRESTanL_BXBn6QykscA@mail.gmail.com>
- <20190813053023.CC86120651@mail.kernel.org> <CAFd5g47v7410QRAizPV8zaHrKrc95-Sk-GNzRRVngN741OKnvg@mail.gmail.com>
-In-Reply-To: <CAFd5g47v7410QRAizPV8zaHrKrc95-Sk-GNzRRVngN741OKnvg@mail.gmail.com>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Tue, 13 Aug 2019 02:12:54 -0700
-Message-ID: <CAFd5g452+-6m1eiVK0ccTDkJ2wH8GBwxRDw5owwC8h3NscE1ag@mail.gmail.com>
-Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream
- like string builder
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: 'Joe Perches' <joe@perches.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Huckleberry <nhuck@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, clang-built-linux <clang-built-linux@googlegroups.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 
-On Tue, Aug 13, 2019 at 2:04 AM Brendan Higgins
-<brendanhiggins@google.com> wrote:
->
-> On Mon, Aug 12, 2019 at 10:30 PM Stephen Boyd <sboyd@kernel.org> wrote:
-> >
-> > Quoting Brendan Higgins (2019-08-12 22:02:59)
-> > > On Mon, Aug 12, 2019 at 9:56 PM Stephen Boyd <sboyd@kernel.org> wrote:
-> > > >
-> > > > Quoting Brendan Higgins (2019-08-12 17:41:05)
-> > > > > On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
-> > > > > >
-> > > > > > > kunit_resource_destroy (respective equivalents to devm_kfree, and
-> > > > > > > devres_destroy) and use kunit_kfree here?
-> > > > > > >
-> > > > > >
-> > > > > > Yes, or drop the API entirely? Does anything need this functionality?
-> > > > >
-> > > > > Drop the kunit_resource API? I would strongly prefer not to.
-> > > >
-> > > > No. I mean this API, string_stream_clear(). Does anything use it?
-> > >
-> > > Oh, right. No.
-> > >
-> > > However, now that I added the kunit_resource_destroy, I thought it
-> > > might be good to free the string_stream after I use it in each call to
-> > > kunit_assert->format(...) in which case I will be using this logic.
-> > >
-> > > So I think the right thing to do is to expose string_stream_destroy so
-> > > kunit_do_assert can clean up when it's done, and then demote
-> > > string_stream_clear to static. Sound good?
-> >
-> > Ok, sure. I don't really see how clearing it explicitly when the
-> > assertion prints vs. never allocating it to begin with is really any
-> > different. Maybe I've missed something though.
->
-> It's for the case that we *do* print something out. Once we are doing
-> printing, we don't want the fragments anymore.
+From: Joe Perches
+> Sent: 13 August 2019 08:05
+...
+> The afs ones seem to be because the last comment in the block
+> is not the fallthrough, but a description of the next case;
+> 
+> e.g.: from fs/afs/fsclient.c:
+> 
+> 		/* extract the volume name */
+> 	case 3:
+> 		_debug("extract volname");
 
-Oops, sorry fat fingered: s/doing/done
+I'd change those to:
+	case 3:  /* extract the volume name */
+
+Then the /* fall through */ would be fine.
+
+The /* FALLTHROUGH */ comment has been valid C syntax (for lint)
+for over 40 years.
+IMHO since C compilers are now doing all the checks that lint used
+to do, it should be using the same syntax.
+Both the [[]] and attribute forms look horrid.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
