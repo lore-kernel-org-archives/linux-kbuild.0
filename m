@@ -1,102 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:37661 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727305AbfHMQIN (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:08:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38008 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726705AbfHMP01 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 11:26:27 -0400
+Date: Tue, 13 Aug 2019 17:26:24 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 03/10] module: add support for symbol namespaces.
+Message-ID: <20190813152624.GB26138@kroah.com>
+References: <20180716122125.175792-1-maco@android.com>
+ <20190813121733.52480-1-maennich@google.com>
+ <20190813121733.52480-4-maennich@google.com>
 MIME-Version: 1.0
-References: <20190714152817.24693-1-efremov@linux.com> <20190801060657.5932-1-efremov@linux.com>
- <CAK7LNASdhyhhqyf1wcga7UDYoo=2t-0ZaqTmQdcsFOfAR580sw@mail.gmail.com>
-In-Reply-To: <CAK7LNASdhyhhqyf1wcga7UDYoo=2t-0ZaqTmQdcsFOfAR580sw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 14 Aug 2019 01:07:28 +0900
-Message-ID: <CAK7LNAQG7DM_2+JJ+bJdre12HcbZY7zGfHk3AU66S0ESjxMbnA@mail.gmail.com>
-Subject: Re: [PATCH v5] modpost: check for static EXPORT_SYMBOL* functions
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190813121733.52480-4-maennich@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denis Efremov <efremov@linux.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Matthias Maennich <maennich@google.com>
+Cc: linux-kernel@vger.kernel.org, maco@android.com, kernel-team@android.com, arnd@arndb.de, geert@linux-m68k.org, hpa@zytor.com, jeyu@kernel.org, joel@joelfernandes.org, kstewart@linuxfoundation.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, lucas.de.marchi@gmail.com, maco@google.com, michal.lkml@markovi.net, mingo@redhat.com, oneukum@suse.com, pombredanne@nexb.com, sam@ravnborg.org, sboyd@codeaurora.org, sspatil@google.com, stern@rowland.harvard.edu, tglx@linutronix.de, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, yamada.masahiro@socionext.com, Andrew Morton <akpm@linux-foundation.org>, Michael Ellerman <mpe@ellerman.id.au>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Hi Denis,
+On Tue, Aug 13, 2019 at 01:17:00PM +0100, Matthias Maennich wrote:
+> The EXPORT_SYMBOL_NS() and EXPORT_SYMBOL_NS_GPL() macros can be used to
+> export a symbol to a specific namespace.  There are no _GPL_FUTURE and
+> _UNUSED variants because these are currently unused, and I'm not sure
+> they are necessary.
+> 
+> I didn't add EXPORT_SYMBOL_NS() for ASM exports; this patch sets the
+> namespace of ASM exports to NULL by default. In case of relative
+> references, it will be relocatable to NULL. If there's a need, this
+> should be pretty easy to add.
+> 
+> A module that wants to use a symbol exported to a namespace must add a
+> MODULE_IMPORT_NS() statement to their module code; otherwise, modpost
+> will complain when building the module, and the kernel module loader
+> will emit an error and fail when loading the module.
+> 
+> MODULE_IMPORT_NS() adds a modinfo tag 'import_ns' to the module. That
+> tag can be observed by the modinfo command, modpost and kernel/module.c
+> at the time of loading the module.
+> 
+> The ELF symbols are renamed to include the namespace with an asm label;
+> for example, symbol 'usb_stor_suspend' in namespace USB_STORAGE becomes
+> 'usb_stor_suspend.USB_STORAGE'.  This allows modpost to do namespace
+> checking, without having to go through all the effort of parsing ELF and
+> relocation records just to get to the struct kernel_symbols.
+> 
+> On x86_64 I saw no difference in binary size (compression), but at
+> runtime this will require a word of memory per export to hold the
+> namespace. An alternative could be to store namespaced symbols in their
+> own section and use a separate 'struct namespaced_kernel_symbol' for
+> that section, at the cost of making the module loader more complex.
+> 
+> Co-developed-by: Martijn Coenen <maco@android.com>
+> Signed-off-by: Martijn Coenen <maco@android.com>
+> Signed-off-by: Matthias Maennich <maennich@google.com>
 
-
-On Thu, Aug 8, 2019 at 12:12 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Thu, Aug 1, 2019 at 3:07 PM Denis Efremov <efremov@linux.com> wrote:
-> >
-> > This patch adds a check to warn about static EXPORT_SYMBOL* functions
-> > during the modpost. In most of the cases, a static symbol marked for
-> > exporting is an odd combination that should be fixed either by deleting
-> > the exporting mark or by removing the static attribute and adding the
-> > appropriate declaration to headers.
-> >
-> > This check could help to detect the following problems:
-> > 1. 550113d4e9f5 ("i2c: add newly exported functions to the header, too")
-> > 2. 54638c6eaf44 ("net: phy: make exported variables non-static")
-> > 3. 98ef2046f28b ("mm: remove the exporting of totalram_pages")
-> > 4. 73df167c819e ("s390/zcrypt: remove the exporting of ap_query_configuration")
-> > 5. a57caf8c527f ("sunrpc/cache: remove the exporting of cache_seq_next")
-> > 6. e4e4730698c9 ("crypto: skcipher - remove the exporting of skcipher_walk_next")
-> > 7. 14b4c48bb1ce ("gve: Remove the exporting of gve_probe")
-> > 8. 9b79ee9773a8 ("scsi: libsas: remove the exporting of sas_wait_eh")
-> > 9. ...
-> >
-> > The build time impact is very limited and is almost at the unnoticeable
-> > level (< 1 sec).
-> >
-> > Acked-by: Emil Velikov <emil.l.velikov@gmail.com>
-> > Signed-off-by: Denis Efremov <efremov@linux.com>
-> > ---
->
-> Applied to linux-kbuild. Thanks.
-
-
-I noticed this patch produces false-positive warnings
-for external module build.
-
-
-When I built my external module, it showed the following,
-the last five are false positives.
-
-make[1]: Entering directory '/home/masahiro/workspace/linux-kbuild'
-  Building modules, stage 2.
-  MODPOST 2 modules
-WARNING: "drm_client_close" [vmlinux] is a static EXPORT_SYMBOL
-WARNING: "ahci_em_messages" [vmlinux] is a static EXPORT_SYMBOL_GPL
-WARNING: "ftrace_set_clr_event" [vmlinux] is a static EXPORT_SYMBOL_GPL
-WARNING: "nf_log_dump_packet_common" [net/netfilter/nf_log_common] is
-a static EXPORT_SYMBOL_GPL
-WARNING: "nf_log_l2packet" [net/netfilter/nf_log_common] is a static
-EXPORT_SYMBOL_GPL
-WARNING: "nf_log_dump_sk_uid_gid" [net/netfilter/nf_log_common] is a
-static EXPORT_SYMBOL_GPL
-WARNING: "nf_log_dump_udp_header" [net/netfilter/nf_log_common] is a
-static EXPORT_SYMBOL_GPL
-WARNING: "nf_log_dump_tcp_header" [net/netfilter/nf_log_common] is a
-static EXPORT_SYMBOL_GPL
-make[1]: Leaving directory '/home/masahiro/workspace/linux-kbuild'
-
-
-I squashed the following fix-up.
-
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 3e6d36ddfcdf..2773f9f9bae2 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2386,6 +2386,7 @@ static void read_dump(const char *fname,
-unsigned int kernel)
-                s = sym_add_exported(symname, mod, export_no(export));
-                s->kernel    = kernel;
-                s->preloaded = 1;
-+               s->is_static = 0;
-                sym_update_crc(symname, mod, crc, export_no(export));
-        }
-        release_file(file, size);
-
-
--- 
-Best Regards
-Masahiro Yamada
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
