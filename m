@@ -1,47 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33146 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:35768 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728284AbfHMSVz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 14:21:55 -0400
-Date: Tue, 13 Aug 2019 20:21:51 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 07/10] modpost: add support for generating namespace
- dependencies
-Message-ID: <20190813182151.GF2378@kroah.com>
-References: <20180716122125.175792-1-maco@android.com>
- <20190813121733.52480-1-maennich@google.com>
- <20190813121733.52480-8-maennich@google.com>
+        id S1726295AbfHMSi0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 14:38:26 -0400
+From: Stephen Boyd <sboyd@kernel.org>
+Subject: [PATCH] devicetree: Expose dtbs_check and dt_binding_check some more
+Date: Tue, 13 Aug 2019 11:38:25 -0700
+Message-Id: <20190813183825.9605-1-sboyd@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190813121733.52480-8-maennich@google.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: linux-kernel@vger.kernel.org, maco@android.com, kernel-team@android.com, arnd@arndb.de, geert@linux-m68k.org, hpa@zytor.com, jeyu@kernel.org, joel@joelfernandes.org, kstewart@linuxfoundation.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, lucas.de.marchi@gmail.com, maco@google.com, michal.lkml@markovi.net, mingo@redhat.com, oneukum@suse.com, pombredanne@nexb.com, sam@ravnborg.org, sboyd@codeaurora.org, sspatil@google.com, stern@rowland.harvard.edu, tglx@linutronix.de, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, yamada.masahiro@socionext.com
+To: Rob Herring <robh+dt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 01:17:04PM +0100, Matthias Maennich wrote:
-> This patch adds an option to modpost to generate a <module>.ns_deps file
-> per module, containing the namespace dependencies for that module.
-> 
-> E.g. if the linked module my-module.ko would depend on the symbol
-> myfunc.MY_NS in the namespace MY_NS, the my-module.ns_deps file created
-> by modpost would contain the entry MY_NS to express the namespace
-> dependency of my-module imposed by using the symbol myfunc.
-> 
-> These files can subsequently be used by static analysis tools (like
-> coccinelle scripts) to address issues with missing namespace imports. A
-> later patch of this series will introduce such a script 'nsdeps' and a
-> corresponding make target to automatically add missing
-> MODULE_IMPORT_NS() definitions to the module's sources. For that it uses
-> the information provided in the generated .ns_deps files.
-> 
-> Co-developed-by: Martijn Coenen <maco@android.com>
-> Signed-off-by: Martijn Coenen <maco@android.com>
-> Signed-off-by: Matthias Maennich <maennich@google.com>
-> ---
->  scripts/mod/modpost.c | 61 +++++++++++++++++++++++++++++++++++++++----
->  scripts/mod/modpost.h |  2 ++
->  2 files changed, 58 insertions(+), 5 deletions(-)
+It wasn't obvious that this was a command to run based on 'make help',
+so add it to the top-level help for devicetree builds. Also, add an
+example to the documentation to show that db_binding_check can be run
+with DT_SCHEMA_FILES= to only check one schema file instead of all of
+them.
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: <linux-kbuild@vger.kernel.org>
+Cc: <devicetree@vger.kernel.org>
+Cc: <linux-doc@vger.kernel.org>
+Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+---
+
+I didn't find this sent, so sending again!
+
+ Documentation/devicetree/writing-schema.md | 1 +
+ Makefile                                   | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/writing-schema.md b/Documentation/devicetree/writing-schema.md
+index dc032db36262..17ad67887fde 100644
+--- a/Documentation/devicetree/writing-schema.md
++++ b/Documentation/devicetree/writing-schema.md
+@@ -120,6 +120,7 @@ This will first run the `dt_binding_check` which generates the processed schema.
+ It is also possible to run checks with a single schema file by setting the
+ 'DT_SCHEMA_FILES' variable to a specific schema file.
+ 
++`make dt_binding_check DT_SCHEMA_FILES=Documentation/devicetree/bindings/trivial-devices.yaml`
+ `make dtbs_check DT_SCHEMA_FILES=Documentation/devicetree/bindings/trivial-devices.yaml`
+ 
+ 
+diff --git a/Makefile b/Makefile
+index 9be5834073f8..96bb28aa1c46 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1503,8 +1503,10 @@ help:
+ 	@echo  ''
+ 	@$(if $(dtstree), \
+ 		echo 'Devicetree:'; \
+-		echo '* dtbs            - Build device tree blobs for enabled boards'; \
+-		echo '  dtbs_install    - Install dtbs to $(INSTALL_DTBS_PATH)'; \
++		echo '* dtbs             - Build device tree blobs for enabled boards'; \
++		echo '  dtbs_install     - Install dtbs to $(INSTALL_DTBS_PATH)'; \
++		echo '  dt_binding_check - Validate device tree binding documents'; \
++		echo '  dtbs_check       - Validate device tree source files';\
+ 		echo '')
+ 
+ 	@echo 'Userspace tools targets:'
+-- 
+Sent by a computer through tubes
