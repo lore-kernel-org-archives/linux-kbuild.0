@@ -1,34 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45340 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727099AbfHMIXj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 04:23:39 -0400
-Date: Tue, 13 Aug 2019 10:23:36 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [RFC 00/19] Integration of Kernel Test Framework (KTF) into the
- kernel tree
-Message-ID: <20190813082336.GB17627@kroah.com>
-References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33472 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727038AbfHMJE5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 05:04:57 -0400
+Received: by mail-pl1-f193.google.com with SMTP id c14so48927251plo.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 Aug 2019 02:04:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+References: <20190812182421.141150-1-brendanhiggins@google.com>
+ <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org>
+ <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org>
+ <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com>
+ <20190813045623.F3D9520842@mail.kernel.org> <CAFd5g46PJNTOUAA4GOOrW==74Zy7u1sRESTanL_BXBn6QykscA@mail.gmail.com>
+ <20190813053023.CC86120651@mail.kernel.org>
+In-Reply-To: <20190813053023.CC86120651@mail.kernel.org>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Tue, 13 Aug 2019 02:04:44 -0700
+Message-ID: <CAFd5g47v7410QRAizPV8zaHrKrc95-Sk-GNzRRVngN741OKnvg@mail.gmail.com>
+Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream
+ like string builder
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
+To: Stephen Boyd <sboyd@kernel.org>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Tue, Aug 13, 2019 at 08:09:15AM +0200, Knut Omang wrote:
-> and in the making::
-> 
-> kunit/			  (kernel only (UML))
+On Mon, Aug 12, 2019 at 10:30 PM Stephen Boyd <sboyd@kernel.org> wrote:
+>
+> Quoting Brendan Higgins (2019-08-12 22:02:59)
+> > On Mon, Aug 12, 2019 at 9:56 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> > >
+> > > Quoting Brendan Higgins (2019-08-12 17:41:05)
+> > > > On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> > > > >
+> > > > > > kunit_resource_destroy (respective equivalents to devm_kfree, and
+> > > > > > devres_destroy) and use kunit_kfree here?
+> > > > > >
+> > > > >
+> > > > > Yes, or drop the API entirely? Does anything need this functionality?
+> > > >
+> > > > Drop the kunit_resource API? I would strongly prefer not to.
+> > >
+> > > No. I mean this API, string_stream_clear(). Does anything use it?
+> >
+> > Oh, right. No.
+> >
+> > However, now that I added the kunit_resource_destroy, I thought it
+> > might be good to free the string_stream after I use it in each call to
+> > kunit_assert->format(...) in which case I will be using this logic.
+> >
+> > So I think the right thing to do is to expose string_stream_destroy so
+> > kunit_do_assert can clean up when it's done, and then demote
+> > string_stream_clear to static. Sound good?
+>
+> Ok, sure. I don't really see how clearing it explicitly when the
+> assertion prints vs. never allocating it to begin with is really any
+> different. Maybe I've missed something though.
 
-You are going to have to integrate this with kunit, to come up with a
-superset of both in the end.
-
-And I do not think that kunit is only UML, it's just that seems to be
-what Brendan tests with, but should work with other arches as well.
-
-thanks,
-
-greg k-h
+It's for the case that we *do* print something out. Once we are doing
+printing, we don't want the fragments anymore.
