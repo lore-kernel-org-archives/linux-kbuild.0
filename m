@@ -1,69 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:33022 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727211AbfHMQTf (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:19:35 -0400
-Message-ID: <14b99d26a4cff1c813c92818dc1234007fa06fc9.camel@oracle.com>
-Subject: Re: [RFC 01/19] kbuild: Fixes to rules for host-cshlib and
- host-cxxshlib
-From: Knut Omang <knut.omang@oracle.com>
-Date: Tue, 13 Aug 2019 18:19:01 +0200
-In-Reply-To: <CAK7LNASX4jPRxRxD+JafAfKqjck=x27HuHZgPV1VFfW8MzcwZA@mail.gmail.com>
-References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
-         <be2c361eac49ded2848b2a555b75e30cc3c24e71.1565676440.git-series.knut.omang@oracle.com>
-         <CAK7LNASX4jPRxRxD+JafAfKqjck=x27HuHZgPV1VFfW8MzcwZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.kernel.org ([198.145.29.99]:35070 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726769AbfHMQsT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Aug 2019 12:48:19 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFd5g452+-6m1eiVK0ccTDkJ2wH8GBwxRDw5owwC8h3NscE1ag@mail.gmail.com>
+References: <20190812182421.141150-1-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org> <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org> <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com> <20190813045623.F3D9520842@mail.kernel.org> <CAFd5g46PJNTOUAA4GOOrW==74Zy7u1sRESTanL_BXBn6QykscA@mail.gmail.com> <20190813053023.CC86120651@mail.kernel.org> <CAFd5g47v7410QRAizPV8zaHrKrc95-Sk-GNzRRVngN741OKnvg@mail.gmail.com> <CAFd5g452+-6m1eiVK0ccTDkJ2wH8GBwxRDw5owwC8h3NscE1ag@mail.gmail.com>
+Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream like string builder
+From: Stephen Boyd <sboyd@kernel.org>
+Date: Tue, 13 Aug 2019 09:48:17 -0700
+Message-Id: <20190813164818.06A2D20842@mail.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
+To: Brendan Higgins <brendanhiggins@google.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Tue, 2019-08-13 at 23:01 +0900, Masahiro Yamada wrote:
-> On Tue, Aug 13, 2019 at 3:13 PM Knut Omang <knut.omang@oracle.com> wrote:
+Quoting Brendan Higgins (2019-08-13 02:12:54)
+> On Tue, Aug 13, 2019 at 2:04 AM Brendan Higgins
+> <brendanhiggins@google.com> wrote:
 > >
-> > C++ libraries interfacing to C APIs might sometimes need some glue
-> > logic more easily written in C.
-> > Allow a C++ library to also contain 0 or more C objects.
+> > On Mon, Aug 12, 2019 at 10:30 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> > >
+> > > Quoting Brendan Higgins (2019-08-12 22:02:59)
+> > > > However, now that I added the kunit_resource_destroy, I thought it
+> > > > might be good to free the string_stream after I use it in each call=
+ to
+> > > > kunit_assert->format(...) in which case I will be using this logic.
+> > > >
+> > > > So I think the right thing to do is to expose string_stream_destroy=
+ so
+> > > > kunit_do_assert can clean up when it's done, and then demote
+> > > > string_stream_clear to static. Sound good?
+> > >
+> > > Ok, sure. I don't really see how clearing it explicitly when the
+> > > assertion prints vs. never allocating it to begin with is really any
+> > > different. Maybe I've missed something though.
 > >
-> > Also fix rules for both C and C++ shared libraries:
-> > - C++ shared libraries depended on .c instead of .cc files
-> > - Rules were referenced as -objs instead of the intended
-> >   -cobjs and -cxxobjs following the pattern from hostprogs*.
-> >
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> 
-> 
-> How is this patch related to the rest of this series?
+> > It's for the case that we *do* print something out. Once we are doing
+> > printing, we don't want the fragments anymore.
+>=20
+> Oops, sorry fat fingered: s/doing/done
 
-This is just my (likely naive) way I to get what I had working 
-using autotools in the Github version of KTF) translated into something 
-comparable using kbuild only. We need to build a shared library consisting 
-of a few C++ files and a very simple C file, and a couple of simple binaries, 
-and the rule in there does seem to take .c files and subject them to the 
-C++ compiler, which makes this difficult to achieve?
+Yes, but when we print something out we've run into some sort of problem
+and then the test is over. So freeing the memory when it fails vs. when
+the test is over seems like a minor difference. Or is it also used to
+print other informational messages while the test is running?
 
-> This patch breaks GCC-plugins.
-> Did you really compile-test this patch before the submission?
-
-Sorry for my ignorance here:
-I ran through the kernel build and installed the resulting kernel 
-on a VM that I used to test this, if that's what you are asking 
-about?
-
-Do I need some unusual .config options or run a special make target 
-to trigger the problem you see?
-
-I used a recent Fedora config with default values for new options,
-and ran the normal default make target (also with O=) and make selftests 
-to test the patch itself.
-
-Thanks,
-Knut
-
-> --
-> Best Regards
-> 
-> Masahiro Yamada
+I'm not particularly worried here, just trying to see if less code is
+possible.
