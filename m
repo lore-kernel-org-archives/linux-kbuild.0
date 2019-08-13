@@ -1,49 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43368 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725836AbfHMFDL (ORCPT
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42643 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726143AbfHMFDz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Aug 2019 01:03:11 -0400
-Received: by mail-pf1-f193.google.com with SMTP id v12so3094171pfn.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 22:03:11 -0700 (PDT)
+        Tue, 13 Aug 2019 01:03:55 -0400
+Received: by mail-pl1-f196.google.com with SMTP id ay6so48828930plb.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2019 22:03:55 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190812182421.141150-1-brendanhiggins@google.com>
- <20190812182421.141150-4-brendanhiggins@google.com> <20190812225520.5A67C206A2@mail.kernel.org>
- <20190812233336.GA224410@google.com> <20190812235940.100842063F@mail.kernel.org>
- <CAFd5g44xciLPBhH_J3zUcY3TedWTijdnWgF055qffF+dAguhPQ@mail.gmail.com> <20190813045623.F3D9520842@mail.kernel.org>
-In-Reply-To: <20190813045623.F3D9520842@mail.kernel.org>
+ <20190812182421.141150-5-brendanhiggins@google.com> <20190812234644.E054D20679@mail.kernel.org>
+ <CAFd5g44huOiR9B0H1C2TtiPy63BDuwi_Qpb_exF3zmT3ttV8eg@mail.gmail.com>
+ <CAFd5g44GxE-p+Jk_46GYA-WWVHLW7w=yE+K_tbbdiniDfrk-2w@mail.gmail.com> <20190813045747.3AF0A206C2@mail.kernel.org>
+In-Reply-To: <20190813045747.3AF0A206C2@mail.kernel.org>
 From: Brendan Higgins <brendanhiggins@google.com>
-Date: Mon, 12 Aug 2019 22:02:59 -0700
-Message-ID: <CAFd5g46PJNTOUAA4GOOrW==74Zy7u1sRESTanL_BXBn6QykscA@mail.gmail.com>
-Subject: Re: [PATCH v12 03/18] kunit: test: add string_stream a std::stream
- like string builder
+Date: Mon, 12 Aug 2019 22:03:42 -0700
+Message-ID: <CAFd5g47OUymztYcWngDUd10WswVOrO-PTmX+KNF_T=cg_OcJNg@mail.gmail.com>
+Subject: Re: [PATCH v12 04/18] kunit: test: add assertion printing library
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Boyd <sboyd@kernel.org>
 Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, shuah <shuah@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-On Mon, Aug 12, 2019 at 9:56 PM Stephen Boyd <sboyd@kernel.org> wrote:
+On Mon, Aug 12, 2019 at 9:57 PM Stephen Boyd <sboyd@kernel.org> wrote:
 >
-> Quoting Brendan Higgins (2019-08-12 17:41:05)
-> > On Mon, Aug 12, 2019 at 4:59 PM Stephen Boyd <sboyd@kernel.org> wrote:
+> Quoting Brendan Higgins (2019-08-12 21:27:05)
+> > On Mon, Aug 12, 2019 at 4:56 PM Brendan Higgins
+> > <brendanhiggins@google.com> wrote:
 > > >
-> > > > kunit_resource_destroy (respective equivalents to devm_kfree, and
-> > > > devres_destroy) and use kunit_kfree here?
+> > > On Mon, Aug 12, 2019 at 4:46 PM Stephen Boyd <sboyd@kernel.org> wrote:
 > > > >
+> > > > Quoting Brendan Higgins (2019-08-12 11:24:07)
+> > > > > +#define KUNIT_INIT_FAIL_ASSERT_STRUCT(test, type) {                           \
+> > > > > +               .assert = KUNIT_INIT_ASSERT_STRUCT(test,                       \
+> > > > > +                                                  type,                       \
+> > > > > +                                                  kunit_fail_assert_format)   \
+> > > >
+> > > > This one got indented one too many times?
 > > >
-> > > Yes, or drop the API entirely? Does anything need this functionality?
+> > > Not unless I have been using the wrong formatting for multiline
+> > > macros. You can see this commit applied here:
+> > > https://kunit.googlesource.com/linux/+/870964da2990920030990dd1ffb647ef408e52df/include/kunit/assert.h#59
+> > >
+> > > I have test, type, and kunit_fail_assert_format all column aligned (it
+> > > just doesn't render nicely in the patch format).
 > >
-> > Drop the kunit_resource API? I would strongly prefer not to.
+> > Disregard that last comment. I just looked at the line immediately
+> > above your comment and thought it looked correct. Sorry about that
+> > (you were pointing out that the .assert line looked wrong, correct?).
 >
-> No. I mean this API, string_stream_clear(). Does anything use it?
+> Yes. .assert is double tabbed?
 
-Oh, right. No.
-
-However, now that I added the kunit_resource_destroy, I thought it
-might be good to free the string_stream after I use it in each call to
-kunit_assert->format(...) in which case I will be using this logic.
-
-So I think the right thing to do is to expose string_stream_destroy so
-kunit_do_assert can clean up when it's done, and then demote
-string_stream_clear to static. Sound good?
+Yes it is. Sorry about the confusion. Will fix.
