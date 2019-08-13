@@ -1,58 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:52583 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726200AbfHMBHN (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:33910 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfHMBQh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Aug 2019 21:07:13 -0400
+        Mon, 12 Aug 2019 21:16:37 -0400
 MIME-Version: 1.0
-References: <20190809002104.18599-1-stancheff@cray.com> <20190809002104.18599-2-stancheff@cray.com>
- <CAK7LNAScm9P+QMZiqqSQnOoPsN54OTcTGpaDgxTbjJ_knoeGhA@mail.gmail.com> <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
-In-Reply-To: <CAJ48U8Xp40is+R1dMW8sXq77ZS5D_h+hHte5Mq5eOrtpb41Qxw@mail.gmail.com>
+References: <20190509143859.9050-1-joe.lawrence@redhat.com>
+ <20190509143859.9050-4-joe.lawrence@redhat.com> <CAK7LNAT3qZ8EESs0eEtaezjgjzRa1XqoAAxpKh_sLi_JPJie2A@mail.gmail.com>
+ <CAK7LNAToLyKSk9C0hwuMRxDK8yjJtghi_y6fH1p0+wK7N1wKow@mail.gmail.com> <20190809184253.GA31811@redhat.com>
+In-Reply-To: <20190809184253.GA31811@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 13 Aug 2019 10:06:29 +0900
-Message-ID: <CAK7LNAT5OVcw9tJtaR8VE_JEemAzkqV6FeSHPEy38wotxjhkZg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] kbuild: recursive build of external kernel modules
+Date: Tue, 13 Aug 2019 10:15:47 +0900
+Message-ID: <CAK7LNARHQY_7E2ar47EZJmh=SD_Mf3p51AcKAecVLQip27+3Ug@mail.gmail.com>
+Subject: Re: [PATCH v4 03/10] livepatch: Add klp-convert tool
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shaun Tancheff <shaun@tancheff.com>
-Cc: Shaun Tancheff <stancheff@cray.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, "James E . J . Bottomley" <jejb@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>, "Martin K . Petersen" <martin.petersen@oracle.com>, Michal Marek <michal.lkml@markovi.net>, Shuah Khan <shuah@kernel.org>, Thomas Renninger <trenn@suse.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux PM mailing list <linux-pm@vger.kernel.org>, linux-scsi <linux-scsi@vger.kernel.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Aug 13, 2019 at 2:34 AM Shaun Tancheff <shaun@tancheff.com> wrote:
->
-> On Mon, Aug 12, 2019 at 10:24 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > On Fri, Aug 9, 2019 at 9:21 AM Shaun Tancheff <shaun@tancheff.com> wrote:
+On Sat, Aug 10, 2019 at 3:42 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
+
+> > > > diff --git a/scripts/livepatch/Makefile b/scripts/livepatch/Makefile
+> > > > new file mode 100644
+> > > > index 000000000000..2842ecdba3fd
+> > > > --- /dev/null
+> > > > +++ b/scripts/livepatch/Makefile
+> > > > @@ -0,0 +1,7 @@
+> > > > +hostprogs-y                    := klp-convert
+> > > > +always                         := $(hostprogs-y)
+> > > > +
+> > > > +klp-convert-objs               := klp-convert.o elf.o
+> > > > +
+> > > > +HOST_EXTRACFLAGS               := -g -I$(INSTALL_HDR_PATH)/include -Wall
 > > >
-> > > When building a tree of external modules stage 2 fails
-> > > silently as the root modules.order is empty.
+> > > This looks strange.
 > > >
-> > > Modify the modules.order location to be fixed to the
-> > > root when KBUILD_EXTMOD is specified and write all
-> > > module paths to the single modules.order file.
+> > > Theoretically, you cannot include headers in $(INSTALL_HDR_PATH)/include
+> > > from host programs.
+> > >
+> > > headers_install works for the target architecture, not host architecture.
+> > > This may cause a strange result when you are cross-compiling the kernel.
+> > >
+> > > BTW, which header in $(INSTALL_HDR_PATH)/include do you need to include ?
+> > >
+> > >
+> > > Also, -Wall is redundant because it is set by the top-level Makefile.
 > >
-> > Could you try v5.3-rc4 please?
+> >
+> > I deleted HOST_EXTRACFLAGS entirely,
+> > and I was still able to build klp-convert.
+> >
+> >
+> > What is the purpose of '-g' ?
+> > If it is only needed for local debugging,
+> > it should be removed from the upstream code, in my opinion.
+> >
 >
-> So it seems we are using 'subdir-m' but that is now gone?
+> HOST_EXTRACFLAGS looks like it was present in the patchset from the
+> early RFC days and inherited through each revision.
 >
-> Is there a recommend pattern for backward compatibility?
+> These are the files that the klp-convert code includes, mostly typical C
+> usercode headers like stdio.h and a few local headers like elf.h:
 >
-> Thanks!
+>   % grep -h '^#include' scripts/livepatch/*.{c,h} | sort -u
+>   #include "elf.h"
+>   #include <fcntl.h>
+>   #include <gelf.h>
+>   #include "klp-convert.h"
+>   #include "list.h"
+>   #include <stdbool.h>
+>   #include <stdio.h>
+>   #include <stdlib.h>
+>   #include <string.h>
+>   #include <sys/stat.h>
+>   #include <sys/types.h>
+>   #include <unistd.h>
+>
+> If HOST_EXTRACFLAGS is really unneeded, we can easily drop it in the
+> next patchset version.
 
-
-Please convert
-
-subdir-m += dir1
-subdir-m += dir2
-
-into
-
-obj-m += dir1/
-obj-m += dir2/
-
+Yes, please do so.
 
 Thanks.
+
+
 
 -- 
 Best Regards
