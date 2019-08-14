@@ -1,59 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:52502 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727110AbfHNKyf (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Aug 2019 06:54:35 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] docs: kbuild: remove cc-ldoption from document again
-Date: Wed, 14 Aug 2019 19:54:00 +0900
-Message-Id: <20190814105400.1339-3-yamada.masahiro@socionext.com>
-In-Reply-To: <20190814105400.1339-1-yamada.masahiro@socionext.com>
-References: <20190814105400.1339-1-yamada.masahiro@socionext.com>
+Received: from mout.web.de ([212.227.15.14]:51161 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725800AbfHNMCZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Aug 2019 08:02:25 -0400
+References: <20190813121733.52480-9-maennich@google.com>
+Subject: Re: [v2 08/10] scripts: Coccinelle script for namespace dependencies
+From: Markus Elfring <Markus.Elfring@web.de>
+Message-ID: <d3c852b2-0e41-1a7e-2f98-d8fd23cb8c1a@web.de>
+Date: Wed, 14 Aug 2019 14:00:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20190813121733.52480-9-maennich@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Julia Lawall <Julia.Lawall@lip6.fr>, Martijn Coenen <maco@android.com>, Himanshu Jha <himanshujha199640@gmail.com>, cocci@systeme.lip6.fr, kernel-janitors@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, ",linux-kernel"@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, kernel-team@android.com, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Gilles Muller <Gilles.Muller@lip6.fr>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jessica Yu <jeyu@kernel.org>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Kate Stewart <kstewart@linuxfoundation.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Martijn Coenen <maco@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, Nicolas Palix <nicolas.palix@imag.fr>, Oliver Neukum <oneukum@suse.com>, Philippe Ombredanne <pombredanne@nexb.com>, Sam Ravnborg <sam@ravnborg.org>, Sandeep Patil <sspatil@google.com>, Stephen Boyd <sboyd@codeaurora.org>, Thomas Gleixner <tglx@linutronix.de>
 
-Commit 055efab3120b ("kbuild: drop support for cc-ldoption") correctly
-removed the cc-ldoption from Documentation/kbuild/makefiles.txt, but
-commit cd238effefa2 ("docs: kbuild: convert docs to ReST and rename
-to *.rst") revived it. I guess it was a rebase mistake.
++# This script requires at least spatch
++# version 1.0.4.
 
-Remove it again.
+How do you think about to avoid the duplicate specification of this identification?
 
-Fixes: cd238effefa2 ("docs: kbuild: convert docs to ReST and rename to *.rst")
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- Documentation/kbuild/makefiles.rst | 15 ---------------
- 1 file changed, 15 deletions(-)
-
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index b4c28c543d72..7971729d1fd4 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -471,21 +471,6 @@ more details, with real examples.
- 	The second argument is optional, and if supplied will be used
- 	if first argument is not supported.
- 
--    cc-ldoption
--	cc-ldoption is used to check if $(CC) when used to link object files
--	supports the given option.  An optional second option may be
--	specified if first option are not supported.
--
--	Example::
--
--		#arch/x86/kernel/Makefile
--		vsyscall-flags += $(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
--
--	In the above example, vsyscall-flags will be assigned the option
--	-Wl$(comma)--hash-style=sysv if it is supported by $(CC).
--	The second argument is optional, and if supplied will be used
--	if first argument is not supported.
--
-     as-instr
- 	as-instr checks if the assembler reports a specific instruction
- 	and then outputs either option1 or option2
--- 
-2.17.1
+Regards,
+Markus
