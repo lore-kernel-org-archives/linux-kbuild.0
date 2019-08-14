@@ -1,29 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:52503 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:52498 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725996AbfHNKye (ORCPT
+        with ESMTP id S1726383AbfHNKyf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Aug 2019 06:54:34 -0400
+        Wed, 14 Aug 2019 06:54:35 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/2] docs: two fixes for Kbuild document after the ReST conversion
-Date: Wed, 14 Aug 2019 19:53:58 +0900
-Message-Id: <20190814105400.1339-1-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] docs: kbuild: fix invalid ReST syntax
+Date: Wed, 14 Aug 2019 19:53:59 +0900
+Message-Id: <20190814105400.1339-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190814105400.1339-1-yamada.masahiro@socionext.com>
+References: <20190814105400.1339-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The ReST conversion was merged in the previous merge window.
-Iron out some issues.
+I see the following warnings when I open this document with a ReST
+viewer, retext:
 
+/home/masahiro/ref/linux/Documentation/kbuild/makefiles.rst:1142: (WARNING/2) Inline emphasis start-string without end-string.
+/home/masahiro/ref/linux/Documentation/kbuild/makefiles.rst:1152: (WARNING/2) Inline emphasis start-string without end-string.
+/home/masahiro/ref/linux/Documentation/kbuild/makefiles.rst:1154: (WARNING/2) Inline emphasis start-string without end-string.
 
+These hunks were added by commit e846f0dc57f4 ("kbuild: add support
+for ensuring headers are self-contained") and commit 1e21cbfada87
+("kbuild: support header-test-pattern-y"), respectively. They were
+written not for ReST but for the plain text, and merged via the
+kbuild tree.
 
-Masahiro Yamada (2):
-  docs: kbuild: fix invalid ReST syntax
-  docs: kbuild: remove cc-ldoption from document again
+In the same development cycle, this document was converted to ReST
+by commit cd238effefa2 ("docs: kbuild: convert docs to ReST and rename
+to *.rst"), and merged via the doc sub-system.
 
- Documentation/kbuild/makefiles.rst | 23 ++++-------------------
- 1 file changed, 4 insertions(+), 19 deletions(-)
+Merging them together into Linus' tree resulted in the current situation.
 
+To fix the syntax, surround the asterisks with back-quotes, and
+use :: for the code sample.
+
+Fixes: 39ceda5ce1b0 ("Merge tag 'kbuild-v5.3' of git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild")
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Documentation/kbuild/makefiles.rst | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index f4f0f7ffde2b..b4c28c543d72 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -1139,7 +1139,7 @@ When kbuild executes, the following steps are followed (roughly):
+ 
+     header-test-y
+ 
+-	header-test-y specifies headers (*.h) in the current directory that
++	header-test-y specifies headers (`*.h`) in the current directory that
+ 	should be compile tested to ensure they are self-contained,
+ 	i.e. compilable as standalone units. If CONFIG_HEADER_TEST is enabled,
+ 	this builds them as part of extra-y.
+@@ -1147,11 +1147,11 @@ When kbuild executes, the following steps are followed (roughly):
+     header-test-pattern-y
+ 
+ 	This works as a weaker version of header-test-y, and accepts wildcard
+-	patterns. The typical usage is:
++	patterns. The typical usage is::
+ 
+-		  header-test-pattern-y += *.h
++		header-test-pattern-y += *.h
+ 
+-	This specifies all the files that matches to '*.h' in the current
++	This specifies all the files that matches to `*.h` in the current
+ 	directory, but the files in 'header-test-' are excluded.
+ 
+ 6.7 Commands useful for building a boot image
 -- 
 2.17.1
