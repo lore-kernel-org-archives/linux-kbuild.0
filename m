@@ -1,176 +1,323 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:34179 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726126AbfHNQJv (ORCPT
+Received: from userp2120.oracle.com ([156.151.31.85]:52006 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730902AbfHNRRr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Aug 2019 12:09:51 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/3] kbuild: rebuild modules when module linker scripts are updated
-Date: Thu, 15 Aug 2019 01:06:22 +0900
-Message-Id: <20190814160623.24802-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190814160623.24802-1-yamada.masahiro@socionext.com>
-References: <20190814160623.24802-1-yamada.masahiro@socionext.com>
+        Wed, 14 Aug 2019 13:17:47 -0400
+Message-ID: <a63bea757e02656a38463cc794da7da15273dd16.camel@oracle.com>
+Subject: Re: [RFC 06/19] ktf: A simple debugfs interface to test results
+From: Knut Omang <knut.omang@oracle.com>
+Date: Wed, 14 Aug 2019 19:17:07 +0200
+In-Reply-To: <20190813082152.GA17627@kroah.com>
+References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+         <ae6c38384e2338aa3cfb8a4e4dd1002833789253.1565676440.git-series.knut.omang@oracle.com>
+         <20190813082152.GA17627@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Albert Ou <aou@eecs.berkeley.edu>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Catalin Marinas <catalin.marinas@arm.com>, Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Helge Deller <deller@gmx.de>, "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Jonathan Corbet <corbet@lwn.net>, Michael Ellerman <mpe@ellerman.id.au>, Michal Marek <michal.lkml@markovi.net>, Palmer Dabbelt <palmer@sifive.com>, Paul Mackerras <paulus@samba.org>, Paul Walmsley <paul.walmsley@sifive.com>, Russell King <linux@armlinux.org.uk>, Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
 
-Currently, the timestamp of module linker scripts are not checked.
-Add them to the dependency of modules so they are correctly rebuilt.
+On Tue, 2019-08-13 at 10:21 +0200, Greg Kroah-Hartman wrote:
+> On Tue, Aug 13, 2019 at 08:09:21AM +0200, Knut Omang wrote:
+> > From: Alan Maguire <alan.maguire@oracle.com>
+> > 
+> > While test results is available via netlink from user space, sometimes
+> > it may be useful to be able to access the results from the kernel as well,
+> > for instance due to a crash. Make that possible via debugfs.
+> > 
+> > ktf_debugfs.h:   Support for creating a debugfs representation of test
+> > 
+> > Signed-off-by: Alan Maguire <alan.maguire@oracle.com>
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > ---
+> >  tools/testing/selftests/ktf/kernel/ktf_debugfs.c | 356 ++++++++++++++++-
+> >  tools/testing/selftests/ktf/kernel/ktf_debugfs.h |  34 ++-
+> >  2 files changed, 390 insertions(+)
+> >  create mode 100644 tools/testing/selftests/ktf/kernel/ktf_debugfs.c
+> >  create mode 100644 tools/testing/selftests/ktf/kernel/ktf_debugfs.h
+> > 
+> > diff --git a/tools/testing/selftests/ktf/kernel/ktf_debugfs.c b/tools/testing/selftests/ktf/kernel/ktf_debugfs.c
+> > new file mode 100644
+> > index 0000000..a20fbd2
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/ktf/kernel/ktf_debugfs.c
+> > @@ -0,0 +1,356 @@
+> > +/*
+> > + * Copyright (c) 2009, 2017, Oracle and/or its affiliates. All rights reserved.
+> > + *    Author: Alan Maguire <alan.maguire@oracle.com>
+> > + *
+> > + * SPDX-License-Identifier: GPL-2.0
+> 
+> Has to be the first line of the file, did you run this through
+> checkpatch?
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Yes, the code has been subject to continuous integration which uses 
+a version of my runchecks tool (https://lkml.org/lkml/2018/1/19/157)
+to ensure that it is not possible to "forget" to run checkpatch 
+(or sparse, smatch doc.check for that sake)
 
- Documentation/kbuild/makefiles.rst | 5 +++++
- Makefile                           | 3 ++-
- arch/arm/Makefile                  | 2 +-
- arch/arm64/Makefile                | 2 +-
- arch/ia64/Makefile                 | 2 +-
- arch/m68k/Makefile                 | 2 +-
- arch/parisc/Makefile               | 2 +-
- arch/powerpc/Makefile              | 2 +-
- arch/riscv/Makefile                | 2 +-
- scripts/Makefile.modpost           | 5 +++--
- 10 files changed, 17 insertions(+), 10 deletions(-)
+Ironically though I fell victim to my own tooling here,
+as I postponed fixing the SPDX_LICENSE_TAG class of issues 
+once that test appeared, while working on something else, 
+and just forgot to re-enable it again..
 
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index d3448d2c8017..36ba92e199d2 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -999,6 +999,11 @@ When kbuild executes, the following steps are followed (roughly):
- 
- 	The linker script with full path. Assigned by the top-level Makefile.
- 
-+    KBUILD_LDS_MODULE
-+
-+	The module linker script with full path. Assigned by the top-level
-+	Makefile and additionally by the arch Makefile.
-+
-     KBUILD_VMLINUX_OBJS
- 
- 	All object files for vmlinux. They are linked to vmlinux in the same
-diff --git a/Makefile b/Makefile
-index 164ca615e2f6..af808837a1f2 100644
---- a/Makefile
-+++ b/Makefile
-@@ -485,7 +485,8 @@ KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
--KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
-+KBUILD_LDFLAGS_MODULE :=
-+export KBUILD_LDS_MODULE := $(srctree)/scripts/module-common.lds
- KBUILD_LDFLAGS :=
- GCC_PLUGINS_CFLAGS :=
- CLANG_FLAGS :=
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index c3624ca6c0bc..fbe50eec8f34 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -17,7 +17,7 @@ KBUILD_LDFLAGS_MODULE	+= --be8
- endif
- 
- ifeq ($(CONFIG_ARM_MODULE_PLTS),y)
--KBUILD_LDFLAGS_MODULE	+= -T $(srctree)/arch/arm/kernel/module.lds
-+KBUILD_LDS_MODULE	+= $(srctree)/arch/arm/kernel/module.lds
- endif
- 
- GZFLAGS		:=-9
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 61de992bbea3..d4ed1869e536 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -101,7 +101,7 @@ endif
- CHECKFLAGS	+= -D__aarch64__
- 
- ifeq ($(CONFIG_ARM64_MODULE_PLTS),y)
--KBUILD_LDFLAGS_MODULE	+= -T $(srctree)/arch/arm64/kernel/module.lds
-+KBUILD_LDS_MODULE	+= $(srctree)/arch/arm64/kernel/module.lds
- endif
- 
- # Default value
-diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
-index 171290f9f1de..5c3bcaee5980 100644
---- a/arch/ia64/Makefile
-+++ b/arch/ia64/Makefile
-@@ -20,7 +20,7 @@ CHECKFLAGS	+= -D__ia64=1 -D__ia64__=1 -D_LP64 -D__LP64__
- 
- OBJCOPYFLAGS	:= --strip-all
- LDFLAGS_vmlinux	:= -static
--KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/ia64/module.lds
-+KBUILD_LDS_MODULE += $(srctree)/arch/ia64/module.lds
- KBUILD_AFLAGS_KERNEL := -mconstant-gp
- EXTRA		:=
- 
-diff --git a/arch/m68k/Makefile b/arch/m68k/Makefile
-index 482513b9af2c..5d9288384096 100644
---- a/arch/m68k/Makefile
-+++ b/arch/m68k/Makefile
-@@ -73,7 +73,7 @@ KBUILD_AFLAGS += -D__uClinux__
- endif
- 
- KBUILD_LDFLAGS := -m m68kelf
--KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/m68k/kernel/module.lds
-+KBUILD_LDS_MODULE += $(srctree)/arch/m68k/kernel/module.lds
- 
- ifdef CONFIG_SUN3
- LDFLAGS_vmlinux = -N
-diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
-index 3b77d729057f..36b834f1c933 100644
---- a/arch/parisc/Makefile
-+++ b/arch/parisc/Makefile
-@@ -60,7 +60,7 @@ KBUILD_CFLAGS += -DCC_USING_PATCHABLE_FUNCTION_ENTRY=1 \
- 		 -DFTRACE_PATCHABLE_FUNCTION_SIZE=$(NOP_COUNT)
- 
- CC_FLAGS_FTRACE := -fpatchable-function-entry=$(NOP_COUNT),$(shell echo $$(($(NOP_COUNT)-1)))
--KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/parisc/kernel/module.lds
-+KBUILD_LDS_MODULE += $(srctree)/arch/parisc/kernel/module.lds
- endif
- 
- OBJCOPY_FLAGS =-O binary -R .note -R .comment -S
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index c345b79414a9..b2227855de20 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -67,7 +67,7 @@ UTS_MACHINE := $(subst $(space),,$(machine-y))
- ifdef CONFIG_PPC32
- KBUILD_LDFLAGS_MODULE += arch/powerpc/lib/crtsavres.o
- else
--KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/powerpc/kernel/module.lds
-+KBUILD_LDS_MODULE += $(srctree)/arch/powerpc/kernel/module.lds
- ifeq ($(call ld-ifversion, -ge, 225000000, y),y)
- # Have the linker provide sfpr if possible.
- # There is a corresponding test in arch/powerpc/lib/Makefile
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 7a117be8297c..426d989125a8 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -52,7 +52,7 @@ ifeq ($(CONFIG_CMODEL_MEDANY),y)
- 	KBUILD_CFLAGS += -mcmodel=medany
- endif
- ifeq ($(CONFIG_MODULE_SECTIONS),y)
--	KBUILD_LDFLAGS_MODULE += -T $(srctree)/arch/riscv/kernel/module.lds
-+	KBUILD_LDS_MODULE += $(srctree)/arch/riscv/kernel/module.lds
- endif
- 
- KBUILD_CFLAGS_MODULE += $(call cc-option,-mno-relax)
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index bf15818f6947..905db30d6622 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -126,10 +126,11 @@ quiet_cmd_ld_ko_o = LD [M]  $@
-       cmd_ld_ko_o =                                                     \
- 	$(LD) -r $(KBUILD_LDFLAGS)                                      \
-                  $(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)             \
--                 -o $@ $(real-prereqs) ;                                \
-+                 $(addprefix -T , $(KBUILD_LDS_MODULE))                 \
-+                 -o $@ $(filter %.o, $^);                               \
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
--$(modules): %.ko :%.o %.mod.o FORCE
-+$(modules): %.ko :%.o %.mod.o $(KBUILD_LDS_MODULE) FORCE
- 	+$(call if_changed,ld_ko_o)
- 
- targets += $(modules)
--- 
-2.17.1
+> > +static int ktf_run_test_open(struct inode *inode, struct file *file)
+> > +{
+> > +	struct ktf_test *t;
+> > +
+> > +	if (!try_module_get(THIS_MODULE))
+> > +		return -EIO;
+> 
+> This is an anti-pattern, and one guaranteed to not work properly.  NEVER
+> do this.
+
+Sorry, I didn't know this, and the origin is probably my responsibility.
+
+I know the feeling of never being able to get rid of bad examples 
+because they keep getting copied..
+
+The pattern seemed to be widely used the first time I saw it, and although 
+somewhat awkward, it seemed to be the standard way then, but as you know, 
+my Infiniband driver (
+https://github.com/oracle/linux-uek/blob/uek4/qu7/drivers/infiniband/hw/sif/sif_debug.c)
+unfortunately never made it to the scrutiny of LKML, since the hardware project 
+got cancelled.
+The -EIO return value was also copied from merged kernel code back then.
+
+I notice the discussion and your response here: 
+http://linux-kernel.2935.n7.nabble.com/debugfs-and-module-unloading-td865175.html
+I assume that means that protection against module unload while a debugfs file
+is open is now safe.
+
+On older kernels, having this code in place is far better than an unprotected 
+debugfs entry/exit - I have tested it extensively in the past :-)
+
+Back when I first used it, I had this cool set of polymorphic 
+debugfs file code to list the set of active MRs, CQs, QPs, AHs etc 
+that the whole infiniband driver, database and hardware teams loved 
+so much that multiple users ended up using it in multiple windows 
+from within watch for live observations of state changes, 
+and often also running driver load/unloads for testing purposes.
+
+I perfectly agree with you that reducing the hole for a race condition 
+is generally a bad idea, but from the above mail thread 
+it seems that's the only available choice for older kernels?
+
+(I am asking because I still want to be able to support rather 
+old kernels with the github version of KTF)
+
+Anyway, great to know that a better solution now exists!
+
+We'll fix the rest of the issues below as well for the next version..
+
+Thanks!
+Knut
+
+> > +
+> > +	t = (struct ktf_test *)inode->i_private;
+> > +
+> > +	return single_open(file, ktf_debugfs_run, t);
+> > +}
+> > +
+> > +static int ktf_debugfs_release(struct inode *inode, struct file *file)
+> > +{
+> > +	module_put(THIS_MODULE);
+> 
+> Same here, not ok.
+> 
+> 
+> > +	return single_release(inode, file);
+> > +}
+> > +
+> > +static const struct file_operations ktf_run_test_fops = {
+> > +	.open = ktf_run_test_open,
+> > +	.read = seq_read,
+> > +	.llseek = seq_lseek,
+> > +	.release = ktf_debugfs_release,
+> > +};
+> > +
+> > +static int ktf_results_test_open(struct inode *inode, struct file *file)
+> > +{
+> > +	struct ktf_test *t;
+> > +
+> > +	if (!try_module_get(THIS_MODULE))
+> > +		return -EIO;
+> 
+> Nope!
+> 
+> And why -EIO?  That is not an io issue.
+
+Agreed
+> 
+> > +void ktf_debugfs_create_test(struct ktf_test *t)
+> > +{
+> > +	struct ktf_case *testset = ktf_case_find(t->tclass);
+> > +
+> > +	if (!testset)
+> > +		return;
+> > +
+> > +	memset(&t->debugfs, 0, sizeof(t->debugfs));
+> > +
+> > +	t->debugfs.debugfs_results_test =
+> > +		debugfs_create_file(t->name, S_IFREG | 0444,
+> > +				    testset->debugfs.debugfs_results_test,
+> > +				 t, &ktf_results_test_fops);
+> > +
+> > +	if (t->debugfs.debugfs_results_test) {
+> 
+> How can that variable ever be NULL (hint, it can not.)
+> 
+> > +		t->debugfs.debugfs_run_test =
+> > +			debugfs_create_file(t->name, S_IFREG | 0444,
+> > +					    testset->debugfs.debugfs_run_test,
+> > +				 t, &ktf_run_test_fops);
+> > +		if (!t->debugfs.debugfs_run_test) {
+> > +			_ktf_debugfs_destroy_test(t);
+> > +		} else {
+> > +			/* Take reference for test for debugfs */
+> > +			ktf_test_get(t);
+> > +		}
+> > +	}
+> 
+> Never test the result of any debugfs call, you do not need to.  Just
+> call it and move on, your code flow should NEVER be different with, or
+> without, a successful debugfs call.
+> 
+> 
+> > +static int ktf_run_testset_open(struct inode *inode, struct file *file)
+> > +{
+> > +	struct ktf_case *testset;
+> > +
+> > +	if (!try_module_get(THIS_MODULE))
+> > +		return -EIO;
+> 
+> Again no.  I hate to know what code you copied this all from, as that
+> code is very wrong.  Do you have a pointer to that code anywhere so we
+> can fix that up?
+> 
+> > +
+> > +	testset = (struct ktf_case *)inode->i_private;
+> > +
+> > +	return single_open(file, ktf_debugfs_run_all, testset);
+> > +}
+> > +
+> > +static const struct file_operations ktf_run_testset_fops = {
+> > +	.open = ktf_run_testset_open,
+> > +	.read = seq_read,
+> > +	.llseek = seq_lseek,
+> > +	.release = ktf_debugfs_release,
+> 
+> If you really care about module references you should be setting the
+> owner of the module here.
+> 
+> > +};
+> > +
+> > +static void _ktf_debugfs_destroy_testset(struct ktf_case *testset)
+> > +{
+> > +	debugfs_remove(testset->debugfs.debugfs_run_testset);
+> > +	debugfs_remove(testset->debugfs.debugfs_run_test);
+> > +	debugfs_remove(testset->debugfs.debugfs_results_testset);
+> > +	debugfs_remove(testset->debugfs.debugfs_results_test);
+> 
+> Why not just recursivly remove the directory?  That way you do not have
+> to keep track of any individual files.
+> 
+> 
+> > +}
+> > +
+> > +void ktf_debugfs_create_testset(struct ktf_case *testset)
+> > +{
+> > +	char tests_subdir[KTF_DEBUGFS_NAMESZ];
+> > +	const char *name = ktf_case_name(testset);
+> > +
+> > +	memset(&testset->debugfs, 0, sizeof(testset->debugfs));
+> > +
+> > +	/* First add /sys/kernel/debug/ktf/[results|run]/<testset> */
+> > +	testset->debugfs.debugfs_results_testset =
+> > +		debugfs_create_file(name, S_IFREG | 0444,
+> > +				    ktf_debugfs_resultsdir,
+> > +				 testset, &ktf_results_testset_fops);
+> > +	if (!testset->debugfs.debugfs_results_testset)
+> > +		goto err;
+> 
+> Again, can never happen, and again, do not do different things depending
+> on the result of a debugfs call.
+> 
+> > +
+> > +	testset->debugfs.debugfs_run_testset =
+> > +		debugfs_create_file(name, S_IFREG | 0444,
+> > +				    ktf_debugfs_rundir,
+> > +				    testset, &ktf_run_testset_fops);
+> > +	if (!testset->debugfs.debugfs_run_testset)
+> > +		goto err;
+> 
+> Again, nope.
+> 
+> > +
+> > +	/* Now add parent directories for individual test result/run tests
+> > +	 * which live in
+> > +	 * /sys/kernel/debug/ktf/[results|run]/<testset>-tests/<testname>
+> > +	 */
+> > +	(void)snprintf(tests_subdir, sizeof(tests_subdir), "%s%s",
+> > +			name, KTF_DEBUGFS_TESTS_SUFFIX);
+> 
+> why (void)?
+> 
+> 
+> > +
+> > +	testset->debugfs.debugfs_results_test =
+> > +		debugfs_create_dir(tests_subdir, ktf_debugfs_resultsdir);
+> > +	if (!testset->debugfs.debugfs_results_test)
+> > +		goto err;
+> 
+> nope :)
+> 
+> > +
+> > +	testset->debugfs.debugfs_run_test =
+> > +		debugfs_create_dir(tests_subdir, ktf_debugfs_rundir);
+> > +	if (!testset->debugfs.debugfs_run_test)
+> > +		goto err;
+> 
+> Nope :)
+> 
+> > +
+> > +	/* Take reference count for testset.  One will do as we will always
+> > +	 * free testset debugfs resources together.
+> > +	 */
+> > +	ktf_case_get(testset);
+> > +	return;
+> > +err:
+> > +	_ktf_debugfs_destroy_testset(testset);
+> > +}
+> > +
+> > +void ktf_debugfs_destroy_testset(struct ktf_case *testset)
+> > +{
+> > +	tlog(T_DEBUG, "Destroying debugfs testset %s", ktf_case_name(testset));
+> > +	_ktf_debugfs_destroy_testset(testset);
+> > +	/* Remove our debugfs reference cout to testset */
+> > +	ktf_case_put(testset);
+> > +}
+> > +
+> > +/* /sys/kernel/debug/ktf/coverage shows coverage statistics. */
+> > +static int ktf_debugfs_cov(struct seq_file *seq, void *v)
+> > +{
+> > +	ktf_cov_seq_print(seq);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int ktf_cov_open(struct inode *inode, struct file *file)
+> > +{
+> > +	if (!try_module_get(THIS_MODULE))
+> > +		return -EIO;
+> 
+> {sigh}  I'll stop reviewing now :)
+
+
+> 
+> thanks,
+> 
+> greg k-h
