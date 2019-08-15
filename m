@@ -1,52 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:36718 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732034AbfHOW7K (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:40964 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732541AbfHOW7s (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Aug 2019 18:59:10 -0400
-Received: by mail-pl1-f201.google.com with SMTP id a5so2163637pla.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Aug 2019 15:59:10 -0700 (PDT)
-Date: Thu, 15 Aug 2019 15:58:44 -0700
-In-Reply-To: <CAKwvOdk+NQCKZ4EXAukaKYK4R9CDaNWVY_aDxXaeQrLfo_Z=nw@mail.gmail.com>
-Message-Id: <20190815225844.145726-1-nhuck@google.com>
-Mime-Version: 1.0
-References: <CAKwvOdk+NQCKZ4EXAukaKYK4R9CDaNWVY_aDxXaeQrLfo_Z=nw@mail.gmail.com>
-Subject: [PATCH v2] kbuild: Require W=1 for -Wimplicit-fallthrough with clang
-From: Nathan Huckleberry <nhuck@google.com>
+        Thu, 15 Aug 2019 18:59:48 -0400
+MIME-Version: 1.0
+References: <20190815182029.197604-1-nhuck@google.com> <20190815204529.GA69414@archlinux-threadripper>
+In-Reply-To: <20190815204529.GA69414@archlinux-threadripper>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 16 Aug 2019 00:59:34 +0200
+Message-ID: <CANiq72nM4d-rc_qUMUEisXyEU9A0mbW=O_w5X0zoqWNPLacuNw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Require W=1 for -Wimplicit-fallthrough with clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, joe@perches.com, miguel.ojeda.sandonis@gmail.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nathan Huckleberry <nhuck@google.com>, Nathan Chancellor <natechancellor@gmail.com>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Nathan Huckleberry <nhuck@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Joe Perches <joe@perches.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-Clang is updating to support -Wimplicit-fallthrough on C
-https://reviews.llvm.org/D64838. Since clang does not
-support the comment version of fallthrough annotations
-this update causes an additional 50k warnings. Most
-of these warnings (>49k) are duplicates from header files.
+On Thu, Aug 15, 2019 at 10:45 PM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
+>
+> I am still not a huge fan of the CONFIG_CC_IS_CLANG ifdefs but I don't
+> really see a much cleaner way to get around this. Some that come to
+> mind:
 
-This patch is intended to be reverted after the warnings
-have been cleaned up.
+Yeah...
 
-Signed-off-by: Nathan Huckleberry <nhuck@google.com>
-Suggested-by: Nathan Chancellor <natechancellor@gmail.com>
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
----
-Changes v1->v2
-* Move code to preexisting ifdef
- scripts/Makefile.extrawarn | 1 +
- 1 file changed, 1 insertion(+)
+> * Revert commit bfd77145f35c ("Makefile: Convert -Wimplicit-fallthrough=3
+> to just -Wimplicit-fallthrough for clang") for the time being and just
+> rely on adding -Wimplicit-fallthrough to KCFLAGS for testing.
 
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index a74ce2e3c33e..95973a1ee999 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -70,5 +70,6 @@ KBUILD_CFLAGS += -Wno-initializer-overrides
- KBUILD_CFLAGS += -Wno-format
- KBUILD_CFLAGS += -Wno-sign-compare
- KBUILD_CFLAGS += -Wno-format-zero-length
-+KBUILD_CFLAGS += $(call cc-option,-Wno-implicit-fallthrough)
- endif
- endif
--- 
-2.23.0.rc1.153.gdeed80330f-goog
+I would avoid applying commits that will have to be reverted just for
+Clang, particularly since it is not fully supported yet.
+
+Cheers,
+Miguel
