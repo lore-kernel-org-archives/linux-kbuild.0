@@ -1,86 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:46056 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728169AbfHNRfV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Aug 2019 13:35:21 -0400
-Received: by mail-ot1-f68.google.com with SMTP id m24so31309320otp.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Aug 2019 10:35:21 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:35646 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726027AbfHOItZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Aug 2019 04:49:25 -0400
+Date: Thu, 15 Aug 2019 10:49:21 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [RFC 06/19] ktf: A simple debugfs interface to test results
+Message-ID: <20190815084921.GE3512@kroah.com>
+References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
+ <ae6c38384e2338aa3cfb8a4e4dd1002833789253.1565676440.git-series.knut.omang@oracle.com>
+ <20190813082152.GA17627@kroah.com>
+ <a63bea757e02656a38463cc794da7da15273dd16.camel@oracle.com>
 MIME-Version: 1.0
-References: <20180716122125.175792-1-maco@android.com> <20190813121733.52480-1-maennich@google.com>
- <20190813121733.52480-6-maennich@google.com> <CAGETcx_LQDdnaU+3JVGw+6=DJ8tRoQ00+3rD2gOiHHkWomt8jg@mail.gmail.com>
- <20190814125427.GA72826@google.com>
-In-Reply-To: <20190814125427.GA72826@google.com>
-From: Saravana Kannan <saravanak@google.com>
-Date: Wed, 14 Aug 2019 10:34:43 -0700
-Message-ID: <CAGETcx99Xx7aRPS-2Pw8h7O5D_+3T+1hbqja=p-gLN2wXApaEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 05/10] module: add config option MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a63bea757e02656a38463cc794da7da15273dd16.camel@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, maco@android.com, Android Kernel Team <kernel-team@android.com>, arnd@arndb.de, geert@linux-m68k.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, hpa@zytor.com, jeyu@kernel.org, "Joel Fernandes (Google)" <joel@joelfernandes.org>, Kate Stewart <kstewart@linuxfoundation.org>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, lucas.de.marchi@gmail.com, Martijn Coenen <maco@google.com>, michal.lkml@markovi.net, mingo@redhat.com, oneukum@suse.com, Philippe Ombredanne <pombredanne@nexb.com>, sam@ravnborg.org, Sandeep Patil <sspatil@google.com>, stern@rowland.harvard.edu, tglx@linutronix.de, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, yamada.masahiro@socionext.com, Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, David Howells <dhowells@redhat.com>, Patrick Bellasi <patrick.bellasi@arm.com>, Dan Williams <dan.j.williams@intel.com>, Adrian Reber <adrian@lisas.de>, Richard Guy Briggs <rgb@redhat.com>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
 
-On Wed, Aug 14, 2019 at 5:54 AM 'Matthias Maennich' via kernel-team
-<kernel-team@android.com> wrote:
->
-> On Tue, Aug 13, 2019 at 01:15:44PM -0700, Saravana Kannan wrote:
-> >On Tue, Aug 13, 2019 at 5:19 AM 'Matthias Maennich' via kernel-team
-> ><kernel-team@android.com> wrote:
-> >>
-> >> If MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS is enabled (default=n), the
-> >> requirement for modules to import all namespaces that are used by
-> >> the module is relaxed.
-> >>
-> >> Enabling this option effectively allows (invalid) modules to be loaded
-> >> while only a warning is emitted.
-> >>
-> >> Disabling this option keeps the enforcement at module loading time and
-> >> loading is denied if the module's imports are not satisfactory.
-> >>
-> >> Reviewed-by: Martijn Coenen <maco@android.com>
-> >> Signed-off-by: Matthias Maennich <maennich@google.com>
-> >> ---
-> >>  init/Kconfig    | 14 ++++++++++++++
-> >>  kernel/module.c | 11 +++++++++--
-> >>  2 files changed, 23 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/init/Kconfig b/init/Kconfig
-> >> index bd7d650d4a99..b3373334cdf1 100644
-> >> --- a/init/Kconfig
-> >> +++ b/init/Kconfig
-> >> @@ -2119,6 +2119,20 @@ config MODULE_COMPRESS_XZ
-> >>
-> >>  endchoice
-> >>
-> >> +config MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-> >> +       bool "Allow loading of modules with missing namespace imports"
-> >> +       default n
-> >> +       help
-> >> +         Symbols exported with EXPORT_SYMBOL_NS*() are considered exported in
-> >> +         a namespace. A module that makes use of a symbol exported with such a
-> >> +         namespace is required to import the namespace via MODULE_IMPORT_NS().
-> >> +         This option relaxes this requirement when loading a module.
-> >
-> >> While
-> >> +         technically there is no reason to enforce correct namespace imports,
-> >> +         it creates consistency between symbols defining namespaces and users
-> >> +         importing namespaces they make use of.
-> >
-> >I'm confused by this sentence. It sounds like it's the opposite of
-> >what the config is doing? Can you please reword it for clarify?
->
-> How about:
->
->   Symbols exported with EXPORT_SYMBOL_NS*() are considered exported in
->   a namespace. A module that makes use of a symbol exported with such a
->   namespace is required to import the namespace via MODULE_IMPORT_NS().
->   There is no technical reason to enforce correct namespace imports,
->   but it creates consistency between symbols defining namespaces and
->   users importing namespaces they make use of. This option relaxes this
->   requirement and lifts the enforcement when loading a module.
+On Wed, Aug 14, 2019 at 07:17:07PM +0200, Knut Omang wrote:
+> I notice the discussion and your response here: 
+> http://linux-kernel.2935.n7.nabble.com/debugfs-and-module-unloading-td865175.html
+> I assume that means that protection against module unload while a debugfs file
+> is open is now safe.
 
-That's a lot better. Especially moving the "This option relaxes..." to
-the bottom. Thanks.
+It should be, if you set the *owner field of your file_operations
+properly.  Try it and see!
 
--Saravana
+> On older kernels, having this code in place is far better than an unprotected 
+> debugfs entry/exit - I have tested it extensively in the past :-)
+
+Yes, it seems to work, but again, it really is racy and will fail.
+Please don't use it.
+
+> I perfectly agree with you that reducing the hole for a race condition 
+> is generally a bad idea, but from the above mail thread 
+> it seems that's the only available choice for older kernels?
+
+I have no idea, but please, do not use that pattern of code as it is
+racy in all kernels, from all of time.
+
+thanks,
+
+greg k-h
