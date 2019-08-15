@@ -1,45 +1,228 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:58553 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732426AbfHONwL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Aug 2019 09:52:11 -0400
-References: <20190813121733.52480-9-maennich@google.com>
-Subject: Re: [v2 08/10] scripts: Coccinelle script for namespace dependencies
-From: Markus Elfring <Markus.Elfring@web.de>
-Message-ID: <1c4420f4-361c-7358-49d9-87d8a51f7920@web.de>
-Date: Thu, 15 Aug 2019 15:50:38 +0200
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:60595 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732079AbfHOPFv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Aug 2019 11:05:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <20190813121733.52480-9-maennich@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
+References: <20190509143859.9050-1-joe.lawrence@redhat.com>
+ <20190509143859.9050-7-joe.lawrence@redhat.com> <CAK7LNAQuS-YcXecfJ21BGzc0CimzWxQcYST5-1xRgnCQGtcL4A@mail.gmail.com>
+ <20190812155626.GA19845@redhat.com>
+In-Reply-To: <20190812155626.GA19845@redhat.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 16 Aug 2019 00:05:06 +0900
+Message-ID: <CAK7LNATRLTBqA9c=b+Y38T-zWc9o5JMq18r9auA=enPC=p10pA@mail.gmail.com>
+Subject: Re: [PATCH v4 06/10] modpost: Add modinfo flag to livepatch modules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Julia Lawall <Julia.Lawall@lip6.fr>, Martijn Coenen <maco@android.com>, cocci@systeme.lip6.fr, kernel-janitors@vger.kernel.org
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, kernel-team@android.com, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Gilles Muller <Gilles.Muller@lip6.fr>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jessica Yu <jeyu@kernel.org>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Kate Stewart <kstewart@linuxfoundation.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Martijn Coenen <maco@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, Nicolas Palix <nicolas.palix@imag.fr>, Oliver Neukum <oneukum@suse.com>, Philippe Ombredanne <pombredanne@nexb.com>, Sam Ravnborg <sam@ravnborg.org>, Sandeep Patil <sspatil@google.com>, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-> +generate_deps_for_ns() {
-> +    $SPATCH --very-quiet --in-place --sp-file \
-> +	    $srctree/scripts/coccinelle/misc/add_namespace.cocci -D ns=3D$1 $2
-> +}
+Hi Joe,
 
-* Where will the variable =E2=80=9Csrctree=E2=80=9D be set for the file =
-=E2=80=9Cscripts/nsdeps=E2=80=9D?
+On Tue, Aug 13, 2019 at 12:56 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
+>
+> On Wed, Jul 31, 2019 at 02:58:27PM +0900, Masahiro Yamada wrote:
+> > Hi Joe,
+> >
+> >
+> > On Thu, May 9, 2019 at 11:39 PM Joe Lawrence <joe.lawrence@redhat.com> wrote:
+> > >
+> > > From: Miroslav Benes <mbenes@suse.cz>
+> > >
+> > > Currently, livepatch infrastructure in the kernel relies on
+> > > MODULE_INFO(livepatch, "Y") statement in a livepatch module. Then the
+> > > kernel module loader knows a module is indeed livepatch module and can
+> > > behave accordingly.
+> > >
+> > > klp-convert, on the other hand relies on LIVEPATCH_* statement in the
+> > > module's Makefile for exactly the same reason.
+> > >
+> > > Remove dependency on modinfo and generate MODULE_INFO flag
+> > > automatically in modpost when LIVEPATCH_* is defined in the module's
+> > > Makefile. Generate a list of all built livepatch modules based on
+> > > the .livepatch file and store it in (MODVERDIR)/livepatchmods. Give
+> > > this list as an argument for modpost which will use it to identify
+> > > livepatch modules.
+> > >
+> > > As MODULE_INFO is no longer needed, remove it.
+> >
+> >
+> > I do not understand this patch.
+> > This makes the implementation so complicated.
+> >
+> > I think MODULE_INFO(livepatch, "Y") is cleaner than
+> > LIVEPATCH_* in Makefile.
+> >
+> >
+> > How about this approach?
+> >
+> >
+> > [1] Make modpost generate the list of livepatch modules.
+> >     (livepatch-modules)
+> >
+> > [2] Generate Symbols.list in scripts/Makefile.modpost
+> >     (vmlinux + modules excluding livepatch-modules)
+> >
+> > [3] Run klp-convert for modules in livepatch-modules.
+> >
+> >
+> > If you do this, you can remove most of the build system hacks
+> > can't you?
+> >
+> >
+> > I attached an example implementation for [1].
+> >
+> > Please check whether this works.
+> >
+>
+> Hi Masahiro,
+>
+> I tested and step [1] that you attached did create the livepatch-modules
+> as expected.  Thanks for that example, it does look cleaner that what
+> we had in the patchset.
+>
+> I'm admittedly out of my element with kbuild changes, but here are my
+> naive attempts at steps [2] and [3]...
+>
+>
+> [step 2] generate Symbols.list - I tacked this on as a dependency of the
+> $(modules:.ko=.mod.o), but there is probably a better more logical place
+> to put it.  Also used grep -Fxv to exclude the livepatch-modules list
+> from the modules.order list of modules to process.
+>
+> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+>
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 3eca7fccadd4..5409bbc212bb 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -111,7 +111,23 @@ quiet_cmd_cc_o_c = CC      $@
+>        cmd_cc_o_c = $(CC) $(c_flags) $(KBUILD_CFLAGS_MODULE) $(CFLAGS_MODULE) \
+>                    -c -o $@ $<
+>
+> -$(modules:.ko=.mod.o): %.mod.o: %.mod.c FORCE
+> +quiet_cmd_klp_map = KLP     Symbols.list
+> +SLIST = $(objtree)/Symbols.list
+> +
+> +define cmd_symbols_list
+> +       $(shell echo "klp-convert-symbol-data.0.1" > $(objtree)/Symbols.list)                   \
+> +       $(shell echo "*vmlinux" >> $(objtree)/Symbols.list)                                     \
+> +       $(shell nm -f posix $(objtree)/vmlinux | cut -d\  -f1 >> $(objtree)/Symbols.list)       \
+> +       $(foreach ko, $(sort $(shell grep -Fxv -f livepatch-modules modules.order)),            \
+> +               $(shell echo "*$(shell basename -s .ko $(ko))" >> $(objtree)/Symbols.list)      \
+> +               $(shell nm -f posix $(patsubst %.ko,%.o,$(ko)) | cut -d\  -f1 >> $(objtree)/Symbols.list))
+> +endef
 
-* Would you like to support a separate build directory for desired adjustm=
-ents?
 
-* How do you think about to check error handling around such commands?
+All the $(shell ...) calls are pointless.
 
 
-> +generate_deps() {
-=E2=80=A6
-> +        for source_file in $mod_source_files; do
-> +            sed '/MODULE_IMPORT_NS/Q' $source_file > ${source_file}.tmp
-=E2=80=A6
+     $(shell echo "hello" > Symbols.list)
 
-I suggest to assign the name for the temporary file to a variable
-which should be used by subsequent commands.
+is equivalent to
 
-Regards,
-Markus
+     echo "hello" > Symbols.list
+
+
+> +
+> +Symbols.list: __modpost
+> +       $(if $(CONFIG_LIVEPATCH), $(call cmd,symbols_list))
+> +
+> +
+> +$(modules:.ko=.mod.o): %.mod.o: %.mod.c Symbols.list FORCE
+>         $(call if_changed_dep,cc_o_c)
+>
+>  targets += $(modules:.ko=.mod.o)
+> --
+> 2.18.1
+>
+> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+>
+>
+>
+> [step 3] klp-convert the livepatch-modules - more or less what existed
+> in the patchset already, however used the grep -Fx trick to process only
+> modules found in livepatch-modules file:
+>
+> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+>
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 73e80b917f12..f085644c2b97 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -223,6 +223,8 @@ endif
+>  # (needed for the shell)
+>  make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
+>
+> +save-cmd = printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+> +
+>  # Find any prerequisites that is newer than target or that does not exist.
+>  # PHONY targets skipped in both cases.
+>  any-prereq = $(filter-out $(PHONY),$?)$(filter-out $(PHONY) $(wildcard $^),$^)
+> @@ -230,7 +232,7 @@ any-prereq = $(filter-out $(PHONY),$?)$(filter-out $(PHONY) $(wildcard $^),$^)
+>  # Execute command if command has changed or prerequisite(s) are updated.
+>  if_changed = $(if $(any-prereq)$(cmd-check),                                 \
+>         $(cmd);                                                              \
+> -       printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+> +       $(save-cmd), @:)
+>
+>  # Execute the command and also postprocess generated .d dependencies file.
+>  if_changed_dep = $(if $(any-prereq)$(cmd-check),$(cmd_and_fixdep),@:)
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 5409bbc212bb..bc3b7b9dd8fa 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -142,8 +142,22 @@ quiet_cmd_ld_ko_o = LD [M]  $@
+>                   -o $@ $(real-prereqs) ;                                \
+>         $(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+>
+> +SLIST = $(objtree)/Symbols.list
+> +KLP_CONVERT = scripts/livepatch/klp-convert
+> +quiet_cmd_klp_convert = KLP     $@
+> +      cmd_klp_convert = mv $@ $(@:.ko=.klp.o);                         \
+> +                       $(KLP_CONVERT) $(SLIST) $(@:.ko=.klp.o) $@
+> +
+> +define rule_ld_ko_o
+> +       $(Q)$(call echo-cmd,ld_ko_o) $(cmd_ld_ko_o) ;                           \
+> +       $(call save-cmd,ld_ko_o) ;                                              \
+> +       $(if $(CONFIG_LIVEPATCH),                                               \
+> +               $(if $(shell grep -Fx "$@" livepatch-modules),                  \
+> +                       $(call echo-cmd,klp_convert) $(cmd_klp_convert)))
+> +endef
+
+This does not correctly detect the command change of cmd_klp_convert.
+
+
+I cleaned up the build system, and pushed it based on my
+kbuild tree.
+
+Please see:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+klp-cleanup
+
+
+Thanks.
+
+
+> +
+>  $(modules): %.ko :%.o %.mod.o FORCE
+> -       +$(call if_changed,ld_ko_o)
+> +       +$(call if_changed_rule,ld_ko_o)
+>
+>  targets += $(modules)
+>
+> --
+> 2.18.1
+>
+> -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8-- -->8--
+>
+>
+> Thanks,
+>
+> -- Joe
+--
+Best Regards
+Masahiro Yamada
