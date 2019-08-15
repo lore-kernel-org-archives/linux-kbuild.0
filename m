@@ -1,53 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56256 "EHLO mail.kernel.org"
+Received: from mout.web.de ([212.227.17.11]:58553 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731246AbfHOKw2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Aug 2019 06:52:28 -0400
-Date: Thu, 15 Aug 2019 12:52:25 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [RFC 06/19] ktf: A simple debugfs interface to test results
-Message-ID: <20190815105225.GA16395@kroah.com>
-References: <cover.92d76bb4f6dcedc971d0b72a49e8e459a98bca54.1565676440.git-series.knut.omang@oracle.com>
- <ae6c38384e2338aa3cfb8a4e4dd1002833789253.1565676440.git-series.knut.omang@oracle.com>
- <20190813082152.GA17627@kroah.com>
- <a63bea757e02656a38463cc794da7da15273dd16.camel@oracle.com>
- <20190815084921.GE3512@kroah.com>
- <9629068a41a160de0145a18dd22924bce70f37fe.camel@oracle.com>
+        id S1732426AbfHONwL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Aug 2019 09:52:11 -0400
+References: <20190813121733.52480-9-maennich@google.com>
+Subject: Re: [v2 08/10] scripts: Coccinelle script for namespace dependencies
+From: Markus Elfring <Markus.Elfring@web.de>
+Message-ID: <1c4420f4-361c-7358-49d9-87d8a51f7920@web.de>
+Date: Thu, 15 Aug 2019 15:50:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9629068a41a160de0145a18dd22924bce70f37fe.camel@oracle.com>
+In-Reply-To: <20190813121733.52480-9-maennich@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Shreyans Devendra Doshi <0xinfosect0r@gmail.com>, Alan Maguire <alan.maguire@oracle.com>, Brendan Higgins <brendanhiggins@google.com>, Kevin Hilman <khilman@baylibre.com>, Hidenori Yamaji <hidenori.yamaji@sony.com>, Frank Rowand <frowand.list@gmail.com>, Timothy Bird <Tim.Bird@sony.com>, Luis Chamberlain <mcgrof@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Vetter <daniel@ffwll.ch>, Stephen Boyd <sboyd@kernel.org>
+To: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Julia Lawall <Julia.Lawall@lip6.fr>, Martijn Coenen <maco@android.com>, cocci@systeme.lip6.fr, kernel-janitors@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, kernel-team@android.com, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Gilles Muller <Gilles.Muller@lip6.fr>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jessica Yu <jeyu@kernel.org>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Kate Stewart <kstewart@linuxfoundation.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Martijn Coenen <maco@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, Nicolas Palix <nicolas.palix@imag.fr>, Oliver Neukum <oneukum@suse.com>, Philippe Ombredanne <pombredanne@nexb.com>, Sam Ravnborg <sam@ravnborg.org>, Sandeep Patil <sspatil@google.com>, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
 
-On Thu, Aug 15, 2019 at 12:35:26PM +0200, Knut Omang wrote:
-> On Thu, 2019-08-15 at 10:49 +0200, Greg Kroah-Hartman wrote:
-> > > I perfectly agree with you that reducing the hole for a race condition 
-> > > is generally a bad idea, but from the above mail thread 
-> > > it seems that's the only available choice for older kernels?
-> > 
-> > I have no idea, but please, do not use that pattern of code as it is
-> > racy in all kernels, from all of time.
-> 
-> Ok, will remove it :-)
-> 
-> I tried in vain to find the commit from Al Viro that made the code safe,
-> to identify which kernels that are safe from this issue,
-> but he has a **lot** of commits, do you have a clue for what/where to look?
-> 
-> It will be good to have a mention/comment on this for future reference, 
-> like the earliest kernel version where this is safe.
+> +generate_deps_for_ns() {
+> +    $SPATCH --very-quiet --in-place --sp-file \
+> +	    $srctree/scripts/coccinelle/misc/add_namespace.cocci -D ns=3D$1 $2
+> +}
 
-Always use a "newer" kernel to be "safe" and you will be fine :)
+* Where will the variable =E2=80=9Csrctree=E2=80=9D be set for the file =
+=E2=80=9Cscripts/nsdeps=E2=80=9D?
 
-> Maybe we can even get rid of some more of the remaining of these too..
-> (I notice there's 65 cases of 'if (!try_module_get(THIS_MODULE))'
-> right now)
+* Would you like to support a separate build directory for desired adjustm=
+ents?
 
-Something to put on a TODO list somewhere...
+* How do you think about to check error handling around such commands?
 
-thanks,
 
-greg k-h
+> +generate_deps() {
+=E2=80=A6
+> +        for source_file in $mod_source_files; do
+> +            sed '/MODULE_IMPORT_NS/Q' $source_file > ${source_file}.tmp
+=E2=80=A6
+
+I suggest to assign the name for the temporary file to a variable
+which should be used by subsequent commands.
+
+Regards,
+Markus
