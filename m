@@ -1,61 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47532 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726390AbfHSQC0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Aug 2019 12:02:26 -0400
-Subject: Re: [PATCH v4 06/10] modpost: Add modinfo flag to livepatch modules
-References: <20190509143859.9050-1-joe.lawrence@redhat.com>
- <20190509143859.9050-7-joe.lawrence@redhat.com>
- <CAK7LNAQuS-YcXecfJ21BGzc0CimzWxQcYST5-1xRgnCQGtcL4A@mail.gmail.com>
- <20190812155626.GA19845@redhat.com>
- <CAK7LNATRLTBqA9c=b+Y38T-zWc9o5JMq18r9auA=enPC=p10pA@mail.gmail.com>
- <alpine.LSU.2.21.1908161016430.2020@pobox.suse.cz>
- <6c7e4d19-b993-1c14-d6cf-6aa1ee891361@redhat.com>
- <CAK7LNAS0Z95VT2n1o3V09bKf-rkPBMNdRryF67gpLKtnjAVAiA@mail.gmail.com>
- <alpine.LSU.2.21.1908190928520.31051@pobox.suse.cz>
-From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <42254ffc-6422-19e1-62a2-6abc23fd089a@redhat.com>
-Date: Mon, 19 Aug 2019 12:02:25 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35324 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726654AbfHSQJZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Aug 2019 12:09:25 -0400
+Date: Mon, 19 Aug 2019 09:09:20 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH] kbuild: enable unused-function warnings for W= build
+ with Clang
+Message-ID: <20190819160920.GA108942@archlinux-threadripper>
+References: <20190819105138.5053-1-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.21.1908190928520.31051@pobox.suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190819105138.5053-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miroslav Benes <mbenes@suse.cz>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Borislav Petkov <bp@suse.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
 
-On 8/19/19 3:31 AM, Miroslav Benes wrote:
-> On Mon, 19 Aug 2019, Masahiro Yamada wrote:
+On Mon, Aug 19, 2019 at 07:51:38PM +0900, Masahiro Yamada wrote:
+> GCC and Clang have different policy for -Wunused-function; GCC does
+> not report unused-function warnings at all for the functions marked
+> as 'static inline'. Clang does report unused-function warnings if they
+> are defined in source files instead of headers.
 > 
->>
->> I can review this series from the build system point of view,
->> but I am not familiar enough with live-patching itself.
->>
->> Some possibilities:
->>
->> [1] Merge this series thru the live-patch tree after the
->>      kbuild base patches land.
->>      This requires one extra development cycle (targeting for 5.5-rc1)
->>      but I think this is the official way if you do not rush into it.
+> We could use Clang for detecting unused functions, but it has been
+> suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
+> warning for unused static inline functions").
 > 
-> I'd prefer this option. There is no real rush and I think we can wait one
-> extra development cycle.
+> So, we never notice left-over code if functions in .c files are
+> marked as inline.
+> 
+> Let's remove __maybe_unused from the inline macro. As always, it is
+> not a good idea to sprinkle warnings for the normal build. So, these
+> warnings will be shown for the W= build.
+> 
+> If you contribute to code clean-up, please run "make CC=clang W=1"
+> and check -Wunused-function warnings. You will find lots of unused
+> functions.
+> 
+> Some of them are false-positives because the call-sites are disabled
+> by #ifdef. I do not like to abuse the inline keyword for suppressing
+> unused-function warnings because it might affect the compiler's
+> optimization. When I need to fix unused-functions warnings, I prefer
+> adding #ifdef or __maybe_unused to function definitions.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Agreed.  I'm in no hurry and was only curious about the kbuild changes 
-that this patchset is now dependent on -- how to note them for other 
-reviewers or anyone wishing to test.
+So if I understand everything correctly, this change allows us to start
+finding unused static inline functions with clang at W=1 but disables
+-Wunused-function by default... I am not sure that is a good tradeoff
+as I am pretty sure that W=1 is fairly noisy for clang although I
+haven't checked lately. I'd argue most regular developers do not build
+with W=1 meaning -Wunused-function generally will not be run with clang
+at all, missing stuff like this:
 
-> Joe, could you submit one more revision with all the recent changes (once
-> kbuild improvements settle down), please? We should take a look at the
-> whole thing one more time? What do you think?
->   
+https://lore.kernel.org/lkml/20190523010235.GA105588@archlinux-epyc/
 
-Definitely, yes.  I occasionally force a push to:
-https://github.com/joe-lawrence/linux/tree/klp-convert-v5-expanded
+https://lore.kernel.org/lkml/1558574945-19275-1-git-send-email-skomatineni@nvidia.com/
 
-as I've been updating and collecting feedback from v4.  Once updates 
-settle, I'll send out a new v5 set.
+Furthermore, per the documemtation [1], -Wno-unused-function will also
+disable -Wunneeded-internal-declaration, which can help find bugs like
+commit 8289c4b6f2e5 ("platform/x86: mlx-platform: Properly use
+mlxplat_mlxcpld_msn201x_items").
 
--- Joe
+[1]: https://clang.llvm.org/docs/DiagnosticsReference.html#wunused-function
+
+Is there a way to conditionally remove __maybe_unused from the inline
+defintion so that we keep the current behavior but we can still
+selectively find potentially unused functions?
+
+Cheers,
+Nathan
