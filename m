@@ -1,53 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:19519 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726808AbfHSOx0 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:24315 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbfHSOyG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Aug 2019 10:53:26 -0400
+        Mon, 19 Aug 2019 10:54:06 -0400
 MIME-Version: 1.0
-References: <20190810155307.29322-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190810155307.29322-1-yamada.masahiro@socionext.com>
+References: <20190806063923.1266-1-yamada.masahiro@socionext.com> <20190806063923.1266-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20190806063923.1266-2-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 19 Aug 2019 23:52:44 +0900
-Message-ID: <CAK7LNATkeM=w2rymdvaqBuVYfRb9=US+FzVqGS6Hr81h5RAbWA@mail.gmail.com>
-Subject: Re: [PATCH 00/11] kbuild: clean-ups and improvement of single targets
+Date: Mon, 19 Aug 2019 23:53:24 +0900
+Message-ID: <CAK7LNATaj9zY1E=7-HU_v_PwiQYs+GP1Y5r19evqUdYaZ7+Hpg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: treat an object as multi-used when $(foo-) is set
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Sam Ravnborg <sam@ravnborg.org>, Alexei Starovoitov <ast@kernel.org>, Boris Pismenny <borisp@mellanox.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Igor Russkikh <igor.russkikh@aquantia.com>, Jakub Kicinski <jakub.kicinski@netronome.com>, Leon Romanovsky <leon@kernel.org>, Martin KaFai Lau <kafai@fb.com>, Michal Marek <michal.lkml@markovi.net>, Saeed Mahameed <saeedm@mellanox.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, bpf@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org, Networking <netdev@vger.kernel.org>, oss-drivers@netronome.com
+Cc: Jani Nikula <jani.nikula@intel.com>, intel-gfx@lists.freedesktop.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sun, Aug 11, 2019 at 12:55 AM Masahiro Yamada
+On Tue, Aug 6, 2019 at 3:40 PM Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
 >
+> Currently, Kbuild treats an object as multi-used when any of
+> $(foo-objs), $(foo-y), $(foo-m) is set. It makes more sense to
+> check $(foo-) as well.
 >
-> 01/11-09/11 are trivial clean-ups.
+> In the context of foo-$(CONFIG_FOO_FEATURE1), CONFIG_FOO_FEATURE1
+> could be unset.
 >
-> 10/11 makes the single targets work more correctly.
->
-> 11/11 cleans up Makefiles that have been added
-> to work aroud the single target issues.
->
->
->
-> Masahiro Yamada (11):
->   kbuild: move the Module.symvers check for external module build
->   kbuild: refactor part-of-module more
->   kbuild: fix modkern_aflags implementation
->   kbuild: remove 'make /' support
->   kbuild: remove meaningless 'targets' in ./Kbuild
->   kbuild: do not descend to ./Kbuild when cleaning
->   kbuild: unset variables in top Makefile instead of setting 0
->   kbuild: unify vmlinux-dirs and module-dirs rules
->   kbuild: unify clean-dirs rule for in-kernel and external module
->   kbuild: make single targets work more correctly
->   treewide: remove dummy Makefiles for single targets
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+Only this patch applied for now.
 
 
-Patch 01-09 applied.
-
-10-11 have been superseded.
-
+> ---
+>
+>  scripts/Makefile.lib | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 41c50f9461e5..0a540599823e 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -41,9 +41,9 @@ obj-m         := $(filter-out %/, $(obj-m))
+>  # Subdirectories we need to descend into
+>  subdir-ym      := $(sort $(subdir-y) $(subdir-m))
+>
+> -# if $(foo-objs), $(foo-y), or $(foo-m) exists, foo.o is a composite object
+> -multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+> -multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))), $(m))))
+> +# If $(foo-objs), $(foo-y), $(foo-m), or $(foo-) exists, foo.o is a composite object
+> +multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))), $(m))))
+> +multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))), $(m))))
+>  multi-used   := $(multi-used-y) $(multi-used-m)
+>
+>  # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
+> @@ -52,8 +52,8 @@ subdir-obj-y := $(filter %/built-in.a, $(obj-y))
+>
+>  # Replace multi-part objects by their individual parts,
+>  # including built-in.a from subdirectories
+> -real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+> -real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+> +real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+> +real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+>
+>  # DTB
+>  # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
+> --
+> 2.17.1
+>
 
 
 -- 
