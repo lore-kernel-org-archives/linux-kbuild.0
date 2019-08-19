@@ -1,90 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:19333 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726477AbfHSKw5 (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:19519 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726808AbfHSOx0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Aug 2019 06:52:57 -0400
+        Mon, 19 Aug 2019 10:53:26 -0400
+MIME-Version: 1.0
+References: <20190810155307.29322-1-yamada.masahiro@socionext.com>
+In-Reply-To: <20190810155307.29322-1-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: enable unused-function warnings for W= build with Clang
-Date: Mon, 19 Aug 2019 19:51:38 +0900
-Message-Id: <20190819105138.5053-1-yamada.masahiro@socionext.com>
+Date: Mon, 19 Aug 2019 23:52:44 +0900
+Message-ID: <CAK7LNATkeM=w2rymdvaqBuVYfRb9=US+FzVqGS6Hr81h5RAbWA@mail.gmail.com>
+Subject: Re: [PATCH 00/11] kbuild: clean-ups and improvement of single targets
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Sam Ravnborg <sam@ravnborg.org>, Alexei Starovoitov <ast@kernel.org>, Boris Pismenny <borisp@mellanox.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Igor Russkikh <igor.russkikh@aquantia.com>, Jakub Kicinski <jakub.kicinski@netronome.com>, Leon Romanovsky <leon@kernel.org>, Martin KaFai Lau <kafai@fb.com>, Michal Marek <michal.lkml@markovi.net>, Saeed Mahameed <saeedm@mellanox.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, bpf@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org, Networking <netdev@vger.kernel.org>, oss-drivers@netronome.com
 
-GCC and Clang have different policy for -Wunused-function; GCC does
-not report unused-function warnings at all for the functions marked
-as 'static inline'. Clang does report unused-function warnings if they
-are defined in source files instead of headers.
+On Sun, Aug 11, 2019 at 12:55 AM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+>
+> 01/11-09/11 are trivial clean-ups.
+>
+> 10/11 makes the single targets work more correctly.
+>
+> 11/11 cleans up Makefiles that have been added
+> to work aroud the single target issues.
+>
+>
+>
+> Masahiro Yamada (11):
+>   kbuild: move the Module.symvers check for external module build
+>   kbuild: refactor part-of-module more
+>   kbuild: fix modkern_aflags implementation
+>   kbuild: remove 'make /' support
+>   kbuild: remove meaningless 'targets' in ./Kbuild
+>   kbuild: do not descend to ./Kbuild when cleaning
+>   kbuild: unset variables in top Makefile instead of setting 0
+>   kbuild: unify vmlinux-dirs and module-dirs rules
+>   kbuild: unify clean-dirs rule for in-kernel and external module
+>   kbuild: make single targets work more correctly
+>   treewide: remove dummy Makefiles for single targets
 
-We could use Clang for detecting unused functions, but it has been
-suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
-warning for unused static inline functions").
 
-So, we never notice left-over code if functions in .c files are
-marked as inline.
+Patch 01-09 applied.
 
-Let's remove __maybe_unused from the inline macro. As always, it is
-not a good idea to sprinkle warnings for the normal build. So, these
-warnings will be shown for the W= build.
+10-11 have been superseded.
 
-If you contribute to code clean-up, please run "make CC=clang W=1"
-and check -Wunused-function warnings. You will find lots of unused
-functions.
 
-Some of them are false-positives because the call-sites are disabled
-by #ifdef. I do not like to abuse the inline keyword for suppressing
-unused-function warnings because it might affect the compiler's
-optimization. When I need to fix unused-functions warnings, I prefer
-adding #ifdef or __maybe_unused to function definitions.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- include/linux/compiler_types.h | 10 ++--------
- scripts/Makefile.extrawarn     |  1 +
- 2 files changed, 3 insertions(+), 8 deletions(-)
-
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 599c27b56c29..14de8d0162fb 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -130,10 +130,6 @@ struct ftrace_likely_data {
- 
- /*
-  * Force always-inline if the user requests it so via the .config.
-- * GCC does not warn about unused static inline functions for
-- * -Wunused-function.  This turns out to avoid the need for complex #ifdef
-- * directives.  Suppress the warning in clang as well by using "unused"
-- * function attribute, which is redundant but not harmful for gcc.
-  * Prefer gnu_inline, so that extern inline functions do not emit an
-  * externally visible function. This makes extern inline behave as per gnu89
-  * semantics rather than c99. This prevents multiple symbol definition errors
-@@ -143,11 +139,9 @@ struct ftrace_likely_data {
-  * (which would break users of __always_inline).
-  */
- #if !defined(CONFIG_OPTIMIZE_INLINING)
--#define inline inline __attribute__((__always_inline__)) __gnu_inline \
--	__maybe_unused notrace
-+#define inline inline __attribute__((__always_inline__)) __gnu_inline notrace
- #else
--#define inline inline                                    __gnu_inline \
--	__maybe_unused notrace
-+#define inline inline                                    __gnu_inline notrace
- #endif
- 
- #define __inline__ inline
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index a74ce2e3c33e..92f542797e03 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -70,5 +70,6 @@ KBUILD_CFLAGS += -Wno-initializer-overrides
- KBUILD_CFLAGS += -Wno-format
- KBUILD_CFLAGS += -Wno-sign-compare
- KBUILD_CFLAGS += -Wno-format-zero-length
-+KBUILD_CFLAGS += -Wno-unused-function
- endif
- endif
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
