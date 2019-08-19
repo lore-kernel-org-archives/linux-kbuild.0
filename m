@@ -1,8 +1,8 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45192 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:47532 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726373AbfHSPzV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:55:21 -0400
+        id S1726390AbfHSQC0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Aug 2019 12:02:26 -0400
 Subject: Re: [PATCH v4 06/10] modpost: Add modinfo flag to livepatch modules
 References: <20190509143859.9050-1-joe.lawrence@redhat.com>
  <20190509143859.9050-7-joe.lawrence@redhat.com>
@@ -11,85 +11,51 @@ References: <20190509143859.9050-1-joe.lawrence@redhat.com>
  <CAK7LNATRLTBqA9c=b+Y38T-zWc9o5JMq18r9auA=enPC=p10pA@mail.gmail.com>
  <alpine.LSU.2.21.1908161016430.2020@pobox.suse.cz>
  <6c7e4d19-b993-1c14-d6cf-6aa1ee891361@redhat.com>
- <163ad1fb-ccbf-0a3e-d795-2bb748a0e88f@redhat.com>
- <CAK7LNAR-1qXUhZ=cKUK2WEg5WeinXgFf1B2rq-=Oke4CUucp_g@mail.gmail.com>
+ <CAK7LNAS0Z95VT2n1o3V09bKf-rkPBMNdRryF67gpLKtnjAVAiA@mail.gmail.com>
+ <alpine.LSU.2.21.1908190928520.31051@pobox.suse.cz>
 From: Joe Lawrence <joe.lawrence@redhat.com>
-Message-ID: <9127bdf6-1daf-0387-88fb-6f1118dd6804@redhat.com>
-Date: Mon, 19 Aug 2019 11:55:19 -0400
+Message-ID: <42254ffc-6422-19e1-62a2-6abc23fd089a@redhat.com>
+Date: Mon, 19 Aug 2019 12:02:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAR-1qXUhZ=cKUK2WEg5WeinXgFf1B2rq-=Oke4CUucp_g@mail.gmail.com>
+In-Reply-To: <alpine.LSU.2.21.1908190928520.31051@pobox.suse.cz>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Miroslav Benes <mbenes@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Miroslav Benes <mbenes@suse.cz>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 8/18/19 11:50 PM, Masahiro Yamada wrote:
-> Hi Joe,
+On 8/19/19 3:31 AM, Miroslav Benes wrote:
+> On Mon, 19 Aug 2019, Masahiro Yamada wrote:
 > 
-> On Sat, Aug 17, 2019 at 4:01 AM Joe Lawrence <joe.lawrence@redhat.com> wrote:
 >>
+>> I can review this series from the build system point of view,
+>> but I am not familiar enough with live-patching itself.
 >>
->> I didn't realize that we're supposed to be able to still build external
->> modules after "make clean".  If that's the case, then one might want to
->> build an external klp-module after doing that.
-> 
-> Yes. 'make clean' must keep all the build artifacts
-> needed for building external modules.
-> 
-> 
->> With that in mind, shouldn't Symbols.list to persist until mrproper?
->> And I think modules-livepatch could go away during clean, what do you think?
+>> Some possibilities:
 >>
->> -- Joe
+>> [1] Merge this series thru the live-patch tree after the
+>>      kbuild base patches land.
+>>      This requires one extra development cycle (targeting for 5.5-rc1)
+>>      but I think this is the official way if you do not rush into it.
 > 
-> 
-> Symbols.list should be kept by the time mrproper is run.
-> So, please add it to MRROPER_FILES instead of CLEAN_FILES.
-> 
-> modules.livepatch is a temporary file, so you can add it to
-> CLEAN_FILES.
-> 
+> I'd prefer this option. There is no real rush and I think we can wait one
+> extra development cycle.
 
-OK, I'll add those to their respective lists.
+Agreed.  I'm in no hurry and was only curious about the kbuild changes 
+that this patchset is now dependent on -- how to note them for other 
+reviewers or anyone wishing to test.
 
-> How is this feature supposed to work for external modules?
-> 
-> klp-convert receives:
-> "symbols from vmlinux" + "symbols from no-klp in-tree modules"
-> + "symbols from no-klp external modules" ??
-> 
+> Joe, could you submit one more revision with all the recent changes (once
+> kbuild improvements settle down), please? We should take a look at the
+> whole thing one more time? What do you think?
+>   
 
-I don't think that this use-case has been previously thought out 
-(Miroslav, correct me if I'm wrong here.)
+Definitely, yes.  I occasionally force a push to:
+https://github.com/joe-lawrence/linux/tree/klp-convert-v5-expanded
 
-I did just run an external build of a copy of 
-samples/livepatch/livepatch-annotated-sample.c:
-
-  - modules.livepatch is generated in external dir
-  - klp-convert is invoked for the livepatch module
-  - the external livepatch module successfully loads
-
-But that was only testing external livepatch modules.
-
-I don't know if we need/want to support general external modules 
-supplementing Symbols.list, at least for the initial klp-convert commit. 
-  I suppose external livepatch modules would then need to specify 
-additional Symbols.list(s) files somehow as well.
-
-> 
-> BTW, 'Symbols.list' sounds like a file to list out symbols
-> for generic purposes, but in fact, the
-> file format is very specific for the klp-convert tool.
-> Perhaps, is it better to rename it so it infers
-> this is for livepatching? What do you think?
-> 
-
-I don't know if the "Symbols.list" name and leading uppercase was based 
-on any convention, but something like symbols.klp would be fine with me.
-
-Thanks,
+as I've been updating and collecting feedback from v4.  Once updates 
+settle, I'll send out a new v5 set.
 
 -- Joe
