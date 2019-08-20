@@ -1,114 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34456 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728647AbfHTCZT (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Aug 2019 22:25:19 -0400
-Date: Mon, 19 Aug 2019 19:25:14 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH] kbuild: enable unused-function warnings for W= build
- with Clang
-Message-ID: <20190820022514.GB30221@archlinux-threadripper>
-References: <20190819105138.5053-1-yamada.masahiro@socionext.com>
- <20190819160920.GA108942@archlinux-threadripper>
- <CAK7LNARDQPixBfWp8od1=13w+hcycYbyTX9+G-gqEHHwXxDCvA@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:44672 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726049AbfHTHyP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 20 Aug 2019 03:54:15 -0400
+Date: Tue, 20 Aug 2019 09:54:05 +0200 (CEST)
+From: Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH v4 06/10] modpost: Add modinfo flag to livepatch
+ modules
+In-Reply-To: <9127bdf6-1daf-0387-88fb-6f1118dd6804@redhat.com>
+Message-ID: <alpine.LSU.2.21.1908200948260.9536@pobox.suse.cz>
+References: <20190509143859.9050-1-joe.lawrence@redhat.com> <20190509143859.9050-7-joe.lawrence@redhat.com> <CAK7LNAQuS-YcXecfJ21BGzc0CimzWxQcYST5-1xRgnCQGtcL4A@mail.gmail.com> <20190812155626.GA19845@redhat.com> <CAK7LNATRLTBqA9c=b+Y38T-zWc9o5JMq18r9auA=enPC=p10pA@mail.gmail.com>
+ <alpine.LSU.2.21.1908161016430.2020@pobox.suse.cz> <6c7e4d19-b993-1c14-d6cf-6aa1ee891361@redhat.com> <163ad1fb-ccbf-0a3e-d795-2bb748a0e88f@redhat.com> <CAK7LNAR-1qXUhZ=cKUK2WEg5WeinXgFf1B2rq-=Oke4CUucp_g@mail.gmail.com>
+ <9127bdf6-1daf-0387-88fb-6f1118dd6804@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARDQPixBfWp8od1=13w+hcycYbyTX9+G-gqEHHwXxDCvA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Borislav Petkov <bp@suse.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Paul Burton <paul.burton@mips.com>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Aug 20, 2019 at 01:58:26AM +0900, Masahiro Yamada wrote:
-> Hi Nathan,
+> > How is this feature supposed to work for external modules?
+> > 
+> > klp-convert receives:
+> > "symbols from vmlinux" + "symbols from no-klp in-tree modules"
+> > + "symbols from no-klp external modules" ??
+> > 
 > 
-> On Tue, Aug 20, 2019 at 1:09 AM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > On Mon, Aug 19, 2019 at 07:51:38PM +0900, Masahiro Yamada wrote:
-> > > GCC and Clang have different policy for -Wunused-function; GCC does
-> > > not report unused-function warnings at all for the functions marked
-> > > as 'static inline'. Clang does report unused-function warnings if they
-> > > are defined in source files instead of headers.
-> > >
-> > > We could use Clang for detecting unused functions, but it has been
-> > > suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
-> > > warning for unused static inline functions").
-> > >
-> > > So, we never notice left-over code if functions in .c files are
-> > > marked as inline.
-> > >
-> > > Let's remove __maybe_unused from the inline macro. As always, it is
-> > > not a good idea to sprinkle warnings for the normal build. So, these
-> > > warnings will be shown for the W= build.
-> > >
-> > > If you contribute to code clean-up, please run "make CC=clang W=1"
-> > > and check -Wunused-function warnings. You will find lots of unused
-> > > functions.
-> > >
-> > > Some of them are false-positives because the call-sites are disabled
-> > > by #ifdef. I do not like to abuse the inline keyword for suppressing
-> > > unused-function warnings because it might affect the compiler's
-> > > optimization. When I need to fix unused-functions warnings, I prefer
-> > > adding #ifdef or __maybe_unused to function definitions.
-> > >
-> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >
-> > So if I understand everything correctly, this change allows us to start
-> > finding unused static inline functions with clang at W=1 but disables
-> > -Wunused-function by default... I am not sure that is a good tradeoff
-> > as I am pretty sure that W=1 is fairly noisy for clang although I
-> > haven't checked lately. I'd argue most regular developers do not build
-> > with W=1 meaning -Wunused-function generally will not be run with clang
-> > at all, missing stuff like this:
+> I don't think that this use-case has been previously thought out (Miroslav,
+> correct me if I'm wrong here.)
 > 
+> I did just run an external build of a copy of
+> samples/livepatch/livepatch-annotated-sample.c:
 > 
-> Try "git log --grep=W=1"
+>  - modules.livepatch is generated in external dir
+>  - klp-convert is invoked for the livepatch module
+>  - the external livepatch module successfully loads
 > 
-> Some people are making efforts to fix W=1 warnings.
-> I believe somebody will start to remove unused static inline functions.
+> But that was only testing external livepatch modules.
+> 
+> I don't know if we need/want to support general external modules supplementing
+> Symbols.list, at least for the initial klp-convert commit.  I suppose external
+> livepatch modules would then need to specify additional Symbols.list(s) files
+> somehow as well.
 
-Yes, it could be a good way to get people involved with working with
-clang.
+I think we discussed it briefly and decided to postpone it for later 
+improvements. External modules are not so important in my opinion.
+ 
+> > 
+> > BTW, 'Symbols.list' sounds like a file to list out symbols
+> > for generic purposes, but in fact, the
+> > file format is very specific for the klp-convert tool.
+> > Perhaps, is it better to rename it so it infers
+> > this is for livepatching? What do you think?
+> > 
+> 
+> I don't know if the "Symbols.list" name and leading uppercase was based on any
+> convention, but something like symbols.klp would be fine with me.
 
-> 
-> 
-> 
-> >
-> > https://lore.kernel.org/lkml/20190523010235.GA105588@archlinux-epyc/
-> >
-> > https://lore.kernel.org/lkml/1558574945-19275-1-git-send-email-skomatineni@nvidia.com/
-> >
-> > Furthermore, per the documemtation [1], -Wno-unused-function will also
-> > disable -Wunneeded-internal-declaration, which can help find bugs like
-> > commit 8289c4b6f2e5 ("platform/x86: mlx-platform: Properly use
-> > mlxplat_mlxcpld_msn201x_items").
-> >
-> > [1]: https://clang.llvm.org/docs/DiagnosticsReference.html#wunused-function
-> 
-> 
-> How about this?
-> 
-> KBUILD_CFLAGS += -Wno-unused-function
-> KBUILD_CFLAGS += -Wunneeded-internal-declaration
+symbols.klp looks ok
 
-Yes, that would work.
-
-> 
-> 
-> 
-> > Is there a way to conditionally remove __maybe_unused from the inline
-> > defintion so that we keep the current behavior but we can still
-> > selectively find potentially unused functions?
-> 
-> It would be possible by tweaking include/linux/compiler_types.h
-> but I am not a big fan of uglifying the 'inline' replacement any more.
-
-I agree that ugly is not ideal but I think it is even less ideal to
-weaken the default set of warnings for clang... Merely food for thought
-though.
-
-Cheers,
-Nathan
+Miroslav
