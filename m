@@ -1,62 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44672 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726049AbfHTHyP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Aug 2019 03:54:15 -0400
-Date: Tue, 20 Aug 2019 09:54:05 +0200 (CEST)
-From: Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH v4 06/10] modpost: Add modinfo flag to livepatch
- modules
-In-Reply-To: <9127bdf6-1daf-0387-88fb-6f1118dd6804@redhat.com>
-Message-ID: <alpine.LSU.2.21.1908200948260.9536@pobox.suse.cz>
-References: <20190509143859.9050-1-joe.lawrence@redhat.com> <20190509143859.9050-7-joe.lawrence@redhat.com> <CAK7LNAQuS-YcXecfJ21BGzc0CimzWxQcYST5-1xRgnCQGtcL4A@mail.gmail.com> <20190812155626.GA19845@redhat.com> <CAK7LNATRLTBqA9c=b+Y38T-zWc9o5JMq18r9auA=enPC=p10pA@mail.gmail.com>
- <alpine.LSU.2.21.1908161016430.2020@pobox.suse.cz> <6c7e4d19-b993-1c14-d6cf-6aa1ee891361@redhat.com> <163ad1fb-ccbf-0a3e-d795-2bb748a0e88f@redhat.com> <CAK7LNAR-1qXUhZ=cKUK2WEg5WeinXgFf1B2rq-=Oke4CUucp_g@mail.gmail.com>
- <9127bdf6-1daf-0387-88fb-6f1118dd6804@redhat.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:25580 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726663AbfHTPIG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 20 Aug 2019 11:08:06 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20190819200650.18156-1-broonie@kernel.org>
+In-Reply-To: <20190819200650.18156-1-broonie@kernel.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 21 Aug 2019 00:07:06 +0900
+Message-ID: <CAK7LNARaVoxWVi679JkR1w+m-RRH1PLdvfJc1ba4n2N2bZR_5g@mail.gmail.com>
+Subject: Re: [PATCH v2] merge_config.sh: Check error codes from make
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Lawrence <joe.lawrence@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, live-patching@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Guillaume Tucker <guillaume.tucker@collabora.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-> > How is this feature supposed to work for external modules?
-> > 
-> > klp-convert receives:
-> > "symbols from vmlinux" + "symbols from no-klp in-tree modules"
-> > + "symbols from no-klp external modules" ??
-> > 
-> 
-> I don't think that this use-case has been previously thought out (Miroslav,
-> correct me if I'm wrong here.)
-> 
-> I did just run an external build of a copy of
-> samples/livepatch/livepatch-annotated-sample.c:
-> 
->  - modules.livepatch is generated in external dir
->  - klp-convert is invoked for the livepatch module
->  - the external livepatch module successfully loads
-> 
-> But that was only testing external livepatch modules.
-> 
-> I don't know if we need/want to support general external modules supplementing
-> Symbols.list, at least for the initial klp-convert commit.  I suppose external
-> livepatch modules would then need to specify additional Symbols.list(s) files
-> somehow as well.
+On Tue, Aug 20, 2019 at 5:07 AM Mark Brown <broonie@kernel.org> wrote:
+>
+> When we execute make after merging the configurations we ignore any
+> errors it produces causing whatever is running merge_config.sh to be
+> unaware of any failures.  This issue was noticed by Guillaume Tucker
+> while looking at problems with testing of clang only builds in KernelCI
+> which caused Kbuild to be unable to find a working host compiler.
+>
+> This implementation was suggested by Yamada-san.
+>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Reported-by: Guillaume Tucker <guillaume.tucker@collabora.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
 
-I think we discussed it briefly and decided to postpone it for later 
-improvements. External modules are not so important in my opinion.
- 
-> > 
-> > BTW, 'Symbols.list' sounds like a file to list out symbols
-> > for generic purposes, but in fact, the
-> > file format is very specific for the klp-convert tool.
-> > Perhaps, is it better to rename it so it infers
-> > this is for livepatching? What do you think?
-> > 
-> 
-> I don't know if the "Symbols.list" name and leading uppercase was based on any
-> convention, but something like symbols.klp would be fine with me.
+Applied to linux-kbuild.
+Thanks.
 
-symbols.klp looks ok
+>  scripts/kconfig/merge_config.sh | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> index d924c51d28b7..bec246719aea 100755
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -13,12 +13,12 @@
+>  #  Copyright (c) 2009-2010 Wind River Systems, Inc.
+>  #  Copyright 2011 Linaro
+>
+> +set -e
+> +
+>  clean_up() {
+>         rm -f $TMP_FILE
+>         rm -f $MERGE_FILE
+> -       exit
+>  }
+> -trap clean_up HUP INT TERM
+>
+>  usage() {
+>         echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
+> @@ -110,6 +110,9 @@ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+>  MERGE_FILE=$(mktemp ./.merge_tmp.config.XXXXXXXXXX)
+>
+>  echo "Using $INITFILE as base"
+> +
+> +trap clean_up EXIT
+> +
+>  cat $INITFILE > $TMP_FILE
+>
+>  # Merge files, printing warnings on overridden values
+> @@ -155,7 +158,6 @@ if [ "$RUNMAKE" = "false" ]; then
+>         echo "#"
+>         echo "# merged configuration written to $KCONFIG_CONFIG (needs make)"
+>         echo "#"
+> -       clean_up
+>         exit
+>  fi
+>
+> @@ -185,5 +187,3 @@ for CFG in $(sed -n -e "$SED_CONFIG_EXP1" -e "$SED_CONFIG_EXP2" $TMP_FILE); do
+>                 echo ""
+>         fi
+>  done
+> -
+> -clean_up
+> --
+> 2.20.1
+>
 
-Miroslav
+
+-- 
+Best Regards
+Masahiro Yamada
