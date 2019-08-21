@@ -1,111 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:35875 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727283AbfHUHCU (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:46625 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726693AbfHUHDy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Aug 2019 03:02:20 -0400
+        Wed, 21 Aug 2019 03:03:54 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/4] kbuild: pkg: add package targets to PHONY instead of FORCE
-Date: Wed, 21 Aug 2019 16:02:03 +0900
-Message-Id: <20190821070205.8297-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190821070205.8297-1-yamada.masahiro@socionext.com>
-References: <20190821070205.8297-1-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: remove unneeded '+' marker from kselftest-merge
+Date: Wed, 21 Aug 2019 16:03:48 +0900
+Message-Id: <20190821070348.8596-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-These are not real targets. Adding them to PHONY is preferred.
+This line contains $(MAKE), so Make knows that it will invoke sub-make
+without help of the '+' marker.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/package/Makefile | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index a2d8830f54be..407189d9942a 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -50,7 +50,8 @@ rm -f $(objtree)/.scmversion
+diff --git a/Makefile b/Makefile
+index ec2a6b85a0fa..c0be1a4dbfdd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1253,7 +1253,7 @@ kselftest-merge:
+ 	$(if $(wildcard $(objtree)/.config),, $(error No .config exists, config your kernel first!))
+ 	$(Q)find $(srctree)/tools/testing/selftests -name config | \
+ 		xargs $(srctree)/scripts/kconfig/merge_config.sh -m $(objtree)/.config
+-	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
++	$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
  
- # rpm-pkg
  # ---------------------------------------------------------------------------
--rpm-pkg: FORCE
-+PHONY += rpm-pkg
-+rpm-pkg:
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
- 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
-@@ -59,13 +60,15 @@ rpm-pkg: FORCE
- 
- # binrpm-pkg
- # ---------------------------------------------------------------------------
--binrpm-pkg: FORCE
-+PHONY += binrpm-pkg
-+binrpm-pkg:
- 	$(MAKE) -f $(srctree)/Makefile
- 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
- 	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
- 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
- 
--deb-pkg: FORCE
-+PHONY += deb-pkg
-+deb-pkg:
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
- 	$(call cmd,src_tar,$(KDEB_SOURCENAME))
-@@ -73,16 +76,19 @@ deb-pkg: FORCE
- 		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
- 	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -i.git -us -uc
- 
--bindeb-pkg: FORCE
-+PHONY += bindeb-pkg
-+bindeb-pkg:
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
- 	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -b -nc -uc
- 
--intdeb-pkg: FORCE
-+PHONY += intdeb-pkg
-+intdeb-pkg:
- 	+$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
- 
- # snap-pkg
- # ---------------------------------------------------------------------------
--snap-pkg: FORCE
-+PHONY += snap-pkg
-+snap-pkg:
- 	rm -rf $(objtree)/snap
- 	mkdir $(objtree)/snap
- 	$(MAKE) clean
-@@ -96,7 +102,9 @@ snap-pkg: FORCE
- 
- # tarball targets
- # ---------------------------------------------------------------------------
--tar%pkg: FORCE
-+tar-pkgs := tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
-+PHONY += $(tar-pkgs)
-+$(tar-pkgs):
- 	$(MAKE) -f $(srctree)/Makefile
- 	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
- 
-@@ -124,12 +132,15 @@ $(if $(findstring xz,$@),xz,                                        \
- $(error unknown target $@))))                                       \
- 	-f -9 $(perf-tar).tar)
- 
--perf-%pkg: FORCE
-+perf-tar-pkgs := perf-tar-src-pkg perf-targz-src-pkg perf-tarbz2-src-pkg perf-tarxz-src-pkg
-+PHONY += $(perf-tar-pkgs)
-+$(perf-tar-pkgs):
- 	$(call cmd,perf_tar)
- 
- # Help text displayed when executing 'make help'
- # ---------------------------------------------------------------------------
--help: FORCE
-+PHONY += help
-+help:
- 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
- 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
+ # Devicetree files
 -- 
 2.17.1
