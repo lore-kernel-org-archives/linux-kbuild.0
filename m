@@ -1,101 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:35706 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:35857 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727266AbfHUHCQ (ORCPT
+        with ESMTP id S1727266AbfHUHCT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Aug 2019 03:02:16 -0400
+        Wed, 21 Aug 2019 03:02:19 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/4] kbuild: pkg: clean up package files/dirs from the top Makefile
-Date: Wed, 21 Aug 2019 16:02:02 +0900
-Message-Id: <20190821070205.8297-1-yamada.masahiro@socionext.com>
+Subject: [PATCH 4/4] kbuild: remove unneeded '+' marker from cmd_clean
+Date: Wed, 21 Aug 2019 16:02:05 +0900
+Message-Id: <20190821070205.8297-4-yamada.masahiro@socionext.com>
+In-Reply-To: <20190821070205.8297-1-yamada.masahiro@socionext.com>
+References: <20190821070205.8297-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-I am not a big fan of the $(objtree)/ hack for clean-files/clean-dirs.
+This '+' was added a long time ago:
 
-These are created in the top of $(objtree), so let's clean them up
-from the top Makefile.
+|commit c23e6bf05f7802e92fd3da69a1ed35e56f9c85bb (HEAD)
+|Author: Kai Germaschewski <kai@tp1.ruhr-uni-bochum.de>
+|Date:   Mon Oct 28 01:16:34 2002 -0600
+|
+|    kbuild: Fix a "make -j<N>" warning
+|
+|diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+|index 2c843e0380bc..e7c392fd5788 100644
+|--- a/scripts/Makefile.clean
+|+++ b/scripts/Makefile.clean
+|@@ -42,7 +42,7 @@ quiet_cmd_clean = CLEAN   $(obj)
+|
+| __clean: $(subdir-ymn)
+| ifneq ($(strip $(__clean-files) $(clean-rule)),)
+|-       $(call cmd,clean)
+|+       +$(call cmd,clean)
+| else
+|        @:
+| endif
+
+At that time, cmd_clean contained '$(clean-rule)', which was able to
+invoke sub-make. That was why "make -j<N> clean" showed:
+warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+
+It is not the case any more. cmd_clean now just runs the 'rm' command.
+The '+' marker is pointless.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile                 | 6 ++++--
- scripts/Makefile         | 2 +-
- scripts/package/Makefile | 9 ---------
- 3 files changed, 5 insertions(+), 12 deletions(-)
+ scripts/Makefile.clean | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 5d202ad1481a..e88d4fcd5e87 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1389,12 +1389,14 @@ CLEAN_FILES += modules.builtin.modinfo
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index 798e8717c1d9..29281a20cf8e 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -59,7 +59,7 @@ quiet_cmd_clean    = CLEAN   $(obj)
  
- # Directories & files removed with 'make mrproper'
- MRPROPER_DIRS  += include/config include/generated          \
--		  arch/$(SRCARCH)/include/generated .tmp_objdiff
-+		  arch/$(SRCARCH)/include/generated .tmp_objdiff \
-+		  debian/ snap/ tar-install/
- MRPROPER_FILES += .config .config.old .version \
- 		  Module.symvers \
- 		  signing_key.pem signing_key.priv signing_key.x509	\
- 		  x509.genkey extra_certificates signing_key.x509.keyid	\
--		  signing_key.x509.signer vmlinux-gdb.py
-+		  signing_key.x509.signer vmlinux-gdb.py \
-+		  *.spec
- 
- # Directories & files removed with 'make distclean'
- DISTCLEAN_DIRS  +=
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 16bcb8087899..c42891e10ba3 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,4 +36,4 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- 
- # Let clean descend into subdirs
--subdir-	+= basic dtc gdb kconfig mod package
-+subdir-	+= basic dtc gdb kconfig mod
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index ca7f46b562a4..a2d8830f54be 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -65,8 +65,6 @@ binrpm-pkg: FORCE
- 	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
- 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
- 
--clean-files += $(objtree)/*.spec
--
- deb-pkg: FORCE
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
-@@ -82,8 +80,6 @@ bindeb-pkg: FORCE
- intdeb-pkg: FORCE
- 	+$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
- 
--clean-dirs += $(objtree)/debian/
--
- # snap-pkg
- # ---------------------------------------------------------------------------
- snap-pkg: FORCE
-@@ -98,17 +94,12 @@ snap-pkg: FORCE
- 	cd $(objtree)/snap && \
- 	snapcraft --target-arch=$(UTS_MACHINE)
- 
--clean-dirs += $(objtree)/snap/
--
- # tarball targets
- # ---------------------------------------------------------------------------
- tar%pkg: FORCE
- 	$(MAKE) -f $(srctree)/Makefile
- 	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
- 
--clean-dirs += $(objtree)/tar-install/
--
--
- # perf-pkg - generate a source tarball with perf source
- # ---------------------------------------------------------------------------
+ __clean: $(subdir-ymn)
+ ifneq ($(strip $(__clean-files)),)
+-	+$(call cmd,clean)
++	$(call cmd,clean)
+ endif
+ 	@:
  
 -- 
 2.17.1
