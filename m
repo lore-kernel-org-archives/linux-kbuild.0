@@ -1,54 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:51915 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730824AbfHVLCi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Aug 2019 07:02:38 -0400
-Subject: Re: [v2 08/10] scripts: Coccinelle script for namespace dependencies
-References: <20190813121733.52480-9-maennich@google.com>
- <1c4420f4-361c-7358-49d9-87d8a51f7920@web.de>
- <20190822091858.GA60652@google.com>
-From: Markus Elfring <Markus.Elfring@web.de>
-Message-ID: <796bc082-7708-172e-df1e-13447ef6b577@web.de>
-Date: Thu, 22 Aug 2019 13:00:52 +0200
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:39693 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732812AbfHVMaL (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 22 Aug 2019 08:30:11 -0400
+Received: by mail-lf1-f67.google.com with SMTP id x3so4400490lfn.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Aug 2019 05:30:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190822091858.GA60652@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Reply-To: eku.lawfirm@gmail.com
+From: "Law firm(Eku and Associates)" <elenabaltach66@gmail.com>
+Date: Thu, 22 Aug 2019 12:30:08 +0000
+Message-ID: <CAOGpsp5-jtxg0EF9UNKiS2JiLByUAiDoKpw7HM0DuZo7wP=xMw@mail.gmail.com>
+Subject: MY $25,000,000.00 INVESTMENT PROPOSAL WITH YOU AND IN YOUR COUNTRY.
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>, cocci@systeme.lip6.fr, kernel-janitors@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Julia Lawall <Julia.Lawall@lip6.fr>, Martijn Coenen <maco@android.com>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org, kernel-team@android.com, usb-storage@lists.one-eyed-alien.net, x86@kernel.org, Alan Stern <stern@rowland.harvard.edu>, Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Gilles Muller <Gilles.Muller@lip6.fr>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jessica Yu <jeyu@kernel.org>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Kate Stewart <kstewart@linuxfoundation.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Martijn Coenen <maco@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, Nicolas Palix <nicolas.palix@imag.fr>, Oliver Neukum <oneukum@suse.com>, Philippe Ombredanne <pombredanne@nexb.com>, Sam Ravnborg <sam@ravnborg.org>, Sandeep Patil <sspatil@google.com>, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
 
-> $srctree is defined by kbuild in the toplevel Makefile.
+--=20
+Dear,
+With due respect this is not spam or Scam mail, because I have
+contacted you before and there was no response from you,I apologise if
+the contents of this mail are contrary to your moral ethics, which I
+feel may be of great disturbance to your person, but please treat this
+with absolute confidentiality, believing that this email reaches you
+in good faith. My contacting you is not a mistake or a coincidence
+because God can use any person known or unknown to accomplish great
+things.
+I am a lawyer and I have an investment business proposal to offer you.
+It is not official but should be considered as legal and confidential
+business. I have a customer's deposit of $US25 million dollars ready
+to be moved for investment if you can partner with us. We are ready to
+offer you 10% of this total amount as your compensation for supporting
+the transaction to completion. If you are interested to help me please
+reply me with your full details as stated below:
+(1) Your full names:
+(2) Your address:
+(3) Your occupation:
+(4) Your mobile telephone number:
+(5) Your nationality:
+(6) Your present location:
+(7) Your age:
+So that I will provide you more details on what to do and what is
+required for successful completion.
+Note: DO NOT REPLY ME IF YOU ARE NOT INTERESTED AND WITHOUT THE ABOVE
+MENTIONED DETAILS
 
-How is this variable passed to the file =E2=80=9Cscripts/nsdeps=E2=80=9D?
-
-
->> * Would you like to support a separate build directory for desired adju=
-stments?
->
-> No, as the purpose of this script is to directly patch the kernel
-> sources where applicable.
-
-Will there occasionally be a need to provide a generated patch
-(without in-place file modification)?
-
-
->> I suggest to assign the name for the temporary file to a variable
->> which should be used by subsequent commands.
->
-> I somehow don't agree that this is an improvement to the code as the
-> variable would likely be something like ${source_file_tmp}.
-
-Would you dare to choose a shorter variable name?
-
-
-> ${source_file}.tmp does express the intent of a temporary file next to
-> the original source file and the reader of the code does not need to
-> reason about the value of ${source_file_tmp}.
-
-I would find a code variant with less suffix repetition nicer.
-
-Regards,
-Markus
+Sinc=C3=A8rement v=C3=B4tre,
+Avocat Etienne Eku Esq.(Lawfirm)
+Procureur principal. De Cabinet d=E2=80=99avocats de l=E2=80=99Afrique de l=
+=E2=80=99ouest.
+Skype:westafricalawfirm
