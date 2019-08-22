@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:29727 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:29724 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730905AbfHVEq3 (ORCPT
+        with ESMTP id S1730896AbfHVEq3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 22 Aug 2019 00:46:29 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 6/6] kbuild: check clean srctree even earlier
-Date: Thu, 22 Aug 2019 13:46:13 +0900
-Message-Id: <20190822044613.5349-6-yamada.masahiro@socionext.com>
+Subject: [PATCH 3/6] kbuild: clarify where to run make mrproper when out-of-tree fails
+Date: Thu, 22 Aug 2019 13:46:10 +0900
+Message-Id: <20190822044613.5349-3-yamada.masahiro@socionext.com>
 In-Reply-To: <20190822044613.5349-1-yamada.masahiro@socionext.com>
 References: <20190822044613.5349-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,45 +15,46 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Move the outputmakefile target to the leftmost in the prerequisite list
-so that this is checked first. There is no guarantee that Make runs the
-prerequisites from left to right, but at least the released versions of
-GNU Make work like that when the parallel build option is not given.
+If you try out-of-tree build with an unclean source tree, Kbuild
+suggests to run make mrproper. The path to the source tree may be
+shown with a relative path, for example, "make O=foo" emits the
+following:
 
-Of course, when the parallel option -j given, other targets will be run
-simultaneously but it is nice to show the error as early as possible.
+  .. is not clean, please run 'make mrproper'
+  in the '..' directory.
+
+This is somewhat confusing if you ran "make O=foo" in the source tree.
+Using the absolute path will be clearer.
+
+This commit changes the error message like follows:
+
+***
+*** The source tree is not clean, please run 'make mrproper'
+*** in /absolute/path/to/linux
+***
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 960df4d35b15..089983a8a028 100644
+index d9cbbc27d4ba..901fcb8fffbe 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -581,10 +581,10 @@ ifdef config-build
- include arch/$(SRCARCH)/Makefile
- export KBUILD_DEFCONFIG KBUILD_KCONFIG CC_VERSION_TEXT
- 
--config: scripts_basic outputmakefile FORCE
-+config: outputmakefile scripts_basic FORCE
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
--%config: scripts_basic outputmakefile FORCE
-+%config: outputmakefile scripts_basic FORCE
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
- else #!config-build
-@@ -1123,7 +1123,7 @@ scripts: scripts_basic scripts_dtc
- 
- PHONY += prepare archprepare
- 
--archprepare: archheaders archscripts scripts include/config/kernel.release outputmakefile \
-+archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
- 	asm-generic $(version_h) $(autoksyms_h) include/generated/utsrelease.h
- 
- prepare0: archprepare
+@@ -1121,8 +1121,10 @@ ifdef building_out_of_srctree
+ 	$(Q)if [ -f $(srctree)/.config -o \
+ 		 -d $(srctree)/include/config -o \
+ 		 -d $(srctree)/arch/$(SRCARCH)/include/generated ]; then \
+-		echo >&2 "  $(srctree) is not clean, please run 'make$(if $(findstring command line, $(origin ARCH)), ARCH=$(ARCH)) mrproper'"; \
+-		echo >&2 "  in the '$(srctree)' directory.";\
++		echo >&2 "***"; \
++		echo >&2 "*** The source tree is not clean, please run 'make$(if $(findstring command line, $(origin ARCH)), ARCH=$(ARCH)) mrproper'"; \
++		echo >&2 "*** in $(abs_srctree)";\
++		echo >&2 "***"; \
+ 		/bin/false; \
+ 	fi;
+ endif
 -- 
 2.17.1
