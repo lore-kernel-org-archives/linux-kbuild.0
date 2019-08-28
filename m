@@ -1,52 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gateway24.websitewelcome.com ([192.185.50.45]:18659 "EHLO
-        gateway24.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726315AbfH1SXw (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:35897 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726400AbfH1S0U (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 14:23:52 -0400
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway24.websitewelcome.com (Postfix) with ESMTP id ECA6F9467
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Aug 2019 13:02:41 -0500 (CDT)
-References: <20190815225844.145726-1-nhuck@google.com>
- <20190827004155.11366-1-natechancellor@gmail.com>
- <CAK7LNATHj5KrnFa0fvHjuC-=5mV8VBT14vrpPMfuNKWw7wabag@mail.gmail.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: [PATCH] kbuild: Do not enable -Wimplicit-fallthrough for clang
- for now
-Message-ID: <d42b1f1c-f0fe-39ca-0573-04147c58b9e5@embeddedor.com>
-Date: Wed, 28 Aug 2019 13:02:38 -0500
+        Wed, 28 Aug 2019 14:26:20 -0400
+Received: by mail-pf1-f194.google.com with SMTP id w2so337362pfi.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Aug 2019 11:26:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATHj5KrnFa0fvHjuC-=5mV8VBT14vrpPMfuNKWw7wabag@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190828055425.24765-1-yamada.masahiro@socionext.com> <CA+icZUWigJkh-VtJc4=xE06oMgE=ci2Mfdo2JaDv0fth8PKH+A@mail.gmail.com>
+In-Reply-To: <CA+icZUWigJkh-VtJc4=xE06oMgE=ci2Mfdo2JaDv0fth8PKH+A@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Wed, 28 Aug 2019 11:26:08 -0700
+Message-ID: <CAKwvOd=Zwkm33_8MTFKoVfs8XEEUKgzQFqJN3nar_ryKnbJTPw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: refactor scripts/Makefile.extrawarn
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Nathan Chancellor <natechancellor@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Nathan Huckleberry <nhuck@google.com>, Joe Perches <joe@perches.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <michal.lkml@markovi.net>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
 
+On Wed, Aug 28, 2019 at 12:20 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>
+> On Wed, Aug 28, 2019 at 7:55 AM Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> >
+> > Instead of the warning-[123] magic, let's accumulate compiler options
+> > to KBUILD_CFLAGS directly as the top Makefile does. I think this makes
+> > easier to understand what is going on in this file.
+> >
+> > This commit slightly changes the behavior, I think all of which are OK.
+> >
+> > [1] Currently, cc-option calls are needlessly evaluated. For example,
+> >       warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
+> >     needs evaluating only when W=3, but it is actually evaluated for
+> >     W=1, W=2 as well. With this commit, only relevant cc-option calls
+> >     will be evaluated. This is a slight optimization.
+> >
+> > [2] Currently, unsupported level like W=4 is checked by:
+> >       $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
+> >     This will no longer be checked, but I do not think it is a big
+> >     deal.
+> >
+>
+> Hi Masahiro Yamada,
+>
+> thanks for your patch series.
+>
+> If KBUILD_ENABLE_EXTRA_GCC_CHECKS does extra(-warning)-checks for GCC and Clang,
+> please rename the Kconfig into...
+>
+> KBUILD_ENABLE_EXTRA_CC_CHECKS
+>
+> ...or something similiar (and maybe with some notes in its Kconfig help-text?).
 
+I too would like to see that changed.
 
-On 8/28/19 11:20 AM, Masahiro Yamada wrote:
-
->>
->> Given these two problems need discussion and coordination, do not enable
->> -Wimplicit-fallthrough with clang right now. Add a comment to explain
->> what is going on as well. This commit should be reverted once these two
->> issues are fully flushed out and resolved.
->>
->> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
->> ---
-> 
-> Applied to linux-kbuild. Thanks.
-> 
-> (If other clang folks give tags, I will add them later.)
-> 
-
-Acked-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-
-
-Thanks
---
-Gustavo
+-- 
+Thanks,
+~Nick Desaulniers
