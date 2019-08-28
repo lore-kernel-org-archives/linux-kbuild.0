@@ -1,56 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:29386 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726428AbfH1Qod (ORCPT
+Received: from mail-lj1-f169.google.com ([209.85.208.169]:32943 "EHLO
+        mail-lj1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbfH1QpJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 12:44:33 -0400
+        Wed, 28 Aug 2019 12:45:09 -0400
 MIME-Version: 1.0
-References: <20190819055421.13482-1-yamada.masahiro@socionext.com> <CAMuHMdVpn01Tcjm1Z3Jp--kiNYf4R5=AyH-huc26RwP19w9OZQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdVpn01Tcjm1Z3Jp--kiNYf4R5=AyH-huc26RwP19w9OZQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 29 Aug 2019 01:43:52 +0900
-Message-ID: <CAK7LNARB_LO=DWKQ-vcKSNkTih_3XhjqD-f8-VmSKmGZD=iHRQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: add CONFIG_ASM_MODVERSIONS
+References: <20190815225844.145726-1-nhuck@google.com> <20190827004155.11366-1-natechancellor@gmail.com>
+ <CAK7LNATHj5KrnFa0fvHjuC-=5mV8VBT14vrpPMfuNKWw7wabag@mail.gmail.com>
+In-Reply-To: <CAK7LNATHj5KrnFa0fvHjuC-=5mV8VBT14vrpPMfuNKWw7wabag@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 28 Aug 2019 18:44:56 +0200
+Message-ID: <CANiq72ndWZWD-KBT1s-mUxQNa1jaD7oDaCB2+NPiT1chf14Z_g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Do not enable -Wimplicit-fallthrough for clang
+ for now
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Nathan Huckleberry <nhuck@google.com>, Joe Perches <joe@perches.com>, Nick Desaulniers <ndesaulniers@google.com>
 
-On Mon, Aug 19, 2019 at 6:13 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+On Wed, Aug 28, 2019 at 6:21 PM Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
-> On Mon, Aug 19, 2019 at 7:55 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> > Add CONFIG_ASM_MODVERSIONS to remove one if-conditional nesting
-> > from Makefile.build
-> >
-> > This also avoid $(wildcard ...) evaluation for every descending,
-> > but I did not see measurable performance improvement.
-> >
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Applied to linux-kbuild. Thanks.
 >
->
-> >  arch/m68k/Kconfig      | 1 +
->
-> Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
+> (If other clang folks give tags, I will add them later.)
 
-Applied to linux-kbuild.
+Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 
-
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Miguel
