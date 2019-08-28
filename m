@@ -1,57 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:18234 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726400AbfH1P5B (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:26895 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726400AbfH1P5H (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 11:57:01 -0400
+        Wed, 28 Aug 2019 11:57:07 -0400
 MIME-Version: 1.0
-References: <20190827111437.22000-1-heikki.krogerus@linux.intel.com>
-In-Reply-To: <20190827111437.22000-1-heikki.krogerus@linux.intel.com>
+References: <20190827122023.15086-1-efremov@linux.com>
+In-Reply-To: <20190827122023.15086-1-efremov@linux.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 29 Aug 2019 00:56:18 +0900
-Message-ID: <CAK7LNARoy_Q40zdr7YSkJSV_N8WcMpL8Zunwnf16QTCYUbessg@mail.gmail.com>
-Subject: Re: [PATCH] modpost: add guid_t type definition
+Date: Thu, 29 Aug 2019 00:56:08 +0900
+Message-ID: <CAK7LNASMc058_R4ewCQQ9KZJcZDckDw9EjJo-YyVne6hYGm-Zw@mail.gmail.com>
+Subject: Re: [PATCH] modpost: add NOFAIL to strndup
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Denis Efremov <efremov@linux.com>
 Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Aug 27, 2019 at 8:14 PM Heikki Krogerus
-<heikki.krogerus@linux.intel.com> wrote:
+On Tue, Aug 27, 2019 at 9:20 PM Denis Efremov <efremov@linux.com> wrote:
 >
-> Since guid_t is the recommended data type for UUIDs in
-> kernel (and I guess uuid_le is meant to be ultimately
-> replaced with it), it should be made available here as
-> well.
+> Add NOFAIL check for the strndup call, because the function
+> allocates memory and can return NULL. All calls to strdup in
+> modpost are checked with NOFAIL.
 >
-> Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 > ---
 
 Applied to linux-kbuild. Thanks.
 
 
->  scripts/mod/file2alias.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  scripts/mod/modpost.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index e17a29ae2e97..c91eba751804 100644
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -34,6 +34,11 @@ typedef Elf64_Addr   kernel_ulong_t;
->  typedef uint32_t       __u32;
->  typedef uint16_t       __u16;
->  typedef unsigned char  __u8;
-> +typedef struct {
-> +       __u8 b[16];
-> +} guid_t;
-> +
-> +/* backwards compatibility, don't use in new code */
->  typedef struct {
->         __u8 b[16];
->  } uuid_le;
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index f277e116e0eb..0255538528fe 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -795,9 +795,9 @@ static int match(const char *sym, const char * const pat[])
+>
+>                 /* "*foo*" */
+>                 if (*p == '*' && *endp == '*') {
+> -                       char *here, *bare = strndup(p + 1, strlen(p) - 2);
+> +                       char *bare = NOFAIL(strndup(p + 1, strlen(p) - 2));
+> +                       char *here = strstr(sym, bare);
+>
+> -                       here = strstr(sym, bare);
+>                         free(bare);
+>                         if (here != NULL)
+>                                 return 1;
 > --
-> 2.23.0.rc1
+> 2.21.0
 >
 
 
