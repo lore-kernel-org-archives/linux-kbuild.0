@@ -1,60 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:35897 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726400AbfH1S0U (ORCPT
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:53132 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726400AbfH1UT6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 14:26:20 -0400
-Received: by mail-pf1-f194.google.com with SMTP id w2so337362pfi.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Aug 2019 11:26:20 -0700 (PDT)
+        Wed, 28 Aug 2019 16:19:58 -0400
+From: Guillaume Tucker <guillaume.tucker@collabora.com>
+Subject: [PATCH 1/1] merge_config.sh: ignore unwanted grep errors
+Date: Wed, 28 Aug 2019 21:19:18 +0100
+Message-Id: <4f92e9b3a88e60c8b5962504d77bc596442b0a40.1567023309.git.guillaume.tucker@collabora.com>
 MIME-Version: 1.0
-References: <20190828055425.24765-1-yamada.masahiro@socionext.com> <CA+icZUWigJkh-VtJc4=xE06oMgE=ci2Mfdo2JaDv0fth8PKH+A@mail.gmail.com>
-In-Reply-To: <CA+icZUWigJkh-VtJc4=xE06oMgE=ci2Mfdo2JaDv0fth8PKH+A@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 28 Aug 2019 11:26:08 -0700
-Message-ID: <CAKwvOd=Zwkm33_8MTFKoVfs8XEEUKgzQFqJN3nar_ryKnbJTPw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: refactor scripts/Makefile.extrawarn
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <michal.lkml@markovi.net>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Mark Brown <broonie@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@collabora.com, Guillaume Tucker <guillaume.tucker@collabora.com>
 
-On Wed, Aug 28, 2019 at 12:20 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> On Wed, Aug 28, 2019 at 7:55 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > Instead of the warning-[123] magic, let's accumulate compiler options
-> > to KBUILD_CFLAGS directly as the top Makefile does. I think this makes
-> > easier to understand what is going on in this file.
-> >
-> > This commit slightly changes the behavior, I think all of which are OK.
-> >
-> > [1] Currently, cc-option calls are needlessly evaluated. For example,
-> >       warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-> >     needs evaluating only when W=3, but it is actually evaluated for
-> >     W=1, W=2 as well. With this commit, only relevant cc-option calls
-> >     will be evaluated. This is a slight optimization.
-> >
-> > [2] Currently, unsupported level like W=4 is checked by:
-> >       $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-> >     This will no longer be checked, but I do not think it is a big
-> >     deal.
-> >
->
-> Hi Masahiro Yamada,
->
-> thanks for your patch series.
->
-> If KBUILD_ENABLE_EXTRA_GCC_CHECKS does extra(-warning)-checks for GCC and Clang,
-> please rename the Kconfig into...
->
-> KBUILD_ENABLE_EXTRA_CC_CHECKS
->
-> ...or something similiar (and maybe with some notes in its Kconfig help-text?).
+The merge_config.sh script verifies that all the config options have
+their expected value in the resulting file and prints any issues as
+warnings.  These checks aren't intended to be treated as errors given
+the current implementation.  However, since "set -e" was added, if the
+grep command to look for a config option does not find it the script
+will then abort prematurely.
 
-I too would like to see that changed.
+Handle the case where the grep exit status is non-zero by setting
+ACTUAL_VAL to an empty string to restore previous functionality.
 
+Fixes: cdfca821571d ("merge_config.sh: Check error codes from make")
+Signed-off-by: Guillaume Tucker <guillaume.tucker@collabora.com>
+---
+ scripts/kconfig/merge_config.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index d924c51d28b7..d673268d414b 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -177,7 +177,7 @@ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ for CFG in $(sed -n -e "$SED_CONFIG_EXP1" -e "$SED_CONFIG_EXP2" $TMP_FILE); do
+ 
+ 	REQUESTED_VAL=$(grep -w -e "$CFG" $TMP_FILE)
+-	ACTUAL_VAL=$(grep -w -e "$CFG" "$KCONFIG_CONFIG")
++	ACTUAL_VAL=$(grep -w -e "$CFG" "$KCONFIG_CONFIG" || echo)
+ 	if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
+ 		echo "Value requested for $CFG not in final .config"
+ 		echo "Requested value:  $REQUESTED_VAL"
 -- 
-Thanks,
-~Nick Desaulniers
+2.20.1
