@@ -1,49 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42085 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726937AbfH1XK1 (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35615 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726935AbfH1X2n (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 19:10:27 -0400
-Received: by mail-pf1-f193.google.com with SMTP id i30so722786pfk.9
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Aug 2019 16:10:27 -0700 (PDT)
+        Wed, 28 Aug 2019 19:28:43 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n4so539178pgv.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Aug 2019 16:28:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190827103621.1073-1-yamada.masahiro@socionext.com>
- <20190827192811.GA24626@archlinux-threadripper> <CAKwvOd=7Jf13PDC9Q1FMhZUJQsq7Ggn=wRz5xpRY0YrU6tP9Kw@mail.gmail.com>
- <20190827213447.GA26954@archlinux-threadripper> <CAKwvOd=pQm7ytZSJeRzXoWwzouDADOYkO8S_+zSPtXOAO3Jc5g@mail.gmail.com>
- <CAK7LNARduZNvwQ2AJbP3NNDojM+1AACx=wRqdRz+DRSCuVMK2w@mail.gmail.com>
-In-Reply-To: <CAK7LNARduZNvwQ2AJbP3NNDojM+1AACx=wRqdRz+DRSCuVMK2w@mail.gmail.com>
+References: <20190828055425.24765-1-yamada.masahiro@socionext.com>
+ <20190828055425.24765-2-yamada.masahiro@socionext.com> <20190828182017.GB127646@archlinux-threadripper>
+In-Reply-To: <20190828182017.GB127646@archlinux-threadripper>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 28 Aug 2019 16:10:15 -0700
-Message-ID: <CAKwvOdkOo-6aS=Tu_QkArHK=rhK34Qe+SKJtY4sM-7YupAsCNA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: enable unused-function warnings for W= build
- with Clang
+Date: Wed, 28 Aug 2019 16:28:30 -0700
+Message-ID: <CAKwvOd=r5Y8hQQBeKZ6zAokPdyeT2AVKFsdviTvwV5AyDQQHrw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: allow Clang to find unused static inline
+ functions for W=1 build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Sven Schnelle <svens@stackframe.org>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, Aug 27, 2019 at 7:58 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> On Wed, Aug 28, 2019 at 6:56 AM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
-> > Masahiro, does your patch correctly make -Wunused-function work for
-> > clang at W=1?  It looks like -Wunused gets added to warning-1, but
-> > then -Wno-unused-function gets added to KBUILD_CFLAGS after `warning`
-> > does.  Will that work correctly?  I'd imagine that at W=1,
-> > KBUILD_CFLAGS for clang will look like:
-> > ... -Wunused -Wno-unused-function ...
-> > which is probably not what we want?
+On Wed, Aug 28, 2019 at 11:20 AM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
 >
-> Hmm?
->
-> -Wunused is added only when W=1.
->
-> -Wno-unused-function is added only when W= was not passed.
->
-> They do not happen at the same time.
+> On Wed, Aug 28, 2019 at 02:54:25PM +0900, Masahiro Yamada wrote:
+> > GCC and Clang have different policy for -Wunused-function; GCC does not
+> > warn unused static inline functions at all whereas Clang does if they
+> > are defined in source files instead of included headers although it has
+> > been suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
+> > warning for unused static inline functions").
+> >
+> > We often miss to delete unused functions where 'static inline' is used
+> > in *.c files since there is no tool to detect them. Unused code remains
+> > until somebody notices. For example, commit 075ddd75680f ("regulator:
+> > core: remove unused rdev_get_supply()").
+> >
+> > Let's remove __maybe_unused from the inline macro to allow Clang to
+> > start finding unused static inline functions. For now, we do this only
+> > for W=1 build since it is not a good idea to sprinkle warnings for the
+> > normal build.
+> >
+> > My initial attempt was to add -Wno-unused-function for no W=1 build
+> > (https://lore.kernel.org/patchwork/patch/1120594/)
+> >
+> > Nathan Chancellor pointed out that would weaken Clang's checks since
+> > we would no longer get -Wunused-function without W=1. It is true GCC
+> > would detect unused static non-inline functions, but it would weaken
+> > Clang as a standalone compiler at least.
 
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+Got it. No problem.
+
+> >
+> > Here is a counter implementation. The current problem is, W=... only
+> > controls compiler flags, which are globally effective. There is no way
+> > to narrow the scope to only 'static inline' functions.
+> >
+> > This commit defines KBUILD_EXTRA_WARN[123] corresponding to W=[123].
+> > When KBUILD_EXTRA_WARN1 is defined, __maybe_unused is omitted from
+> > the 'inline' macro.
+> >
+> > This makes the code a bit uglier, so personally I do not want to carry
+> > this forever. If we can manage to fix most of the warnings, we can
+> > drop this entirely, then enable -Wunused-function all the time.
+
+How many warnings?
+
+> >
+> > If you contribute to code clean-up, please run "make CC=clang W=1"
+> > and check -Wunused-function warnings. You will find lots of unused
+> > functions.
+> >
+> > Some of them are false-positives because the call-sites are disabled
+> > by #ifdef. I do not like to abuse the inline keyword for suppressing
+> > unused-function warnings because it is intended to be a hint for the
+> > compiler optimization. I prefer #ifdef around the definition, or
+> > __maybe_unused if #ifdef would make the code too ugly.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> I can still see warnings from static unused functions and with W=1, I
+> see plenty more. I agree that this is uglier because of the
+> __inline_maybe_unused but I think this is better for regular developers.
+> I will try to work on these unused-function warnings!
+
+How many are we talking here?
+
+>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+
+This is getting kind of messy.  I was more ok when the goal seemed to
+be simplifying the definition of `inline`, but this is worse IMO.
 
 -- 
 Thanks,
