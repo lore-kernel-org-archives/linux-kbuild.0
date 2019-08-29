@@ -1,99 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:55684 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726973AbfH2Q00 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:57736 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726973AbfH2RTK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Aug 2019 12:26:26 -0400
+        Thu, 29 Aug 2019 13:19:10 -0400
 MIME-Version: 1.0
-References: <20190822044613.5349-1-yamada.masahiro@socionext.com> <20190822044613.5349-6-yamada.masahiro@socionext.com>
-In-Reply-To: <20190822044613.5349-6-yamada.masahiro@socionext.com>
+References: <20190815225844.145726-1-nhuck@google.com> <20190827004155.11366-1-natechancellor@gmail.com>
+ <CAK7LNATHj5KrnFa0fvHjuC-=5mV8VBT14vrpPMfuNKWw7wabag@mail.gmail.com>
+ <CANiq72ndWZWD-KBT1s-mUxQNa1jaD7oDaCB2+NPiT1chf14Z_g@mail.gmail.com>
+ <CAKwvOdkuDPfOusJRneeTzg7tZ4VKxaRCNg2SgmjVas58cDwe8w@mail.gmail.com> <CAKwvOdnOo3RXm3cx5YDtPyM=9Ry7kss-i4HzjxQkK4pjE-n9Lw@mail.gmail.com>
+In-Reply-To: <CAKwvOdnOo3RXm3cx5YDtPyM=9Ry7kss-i4HzjxQkK4pjE-n9Lw@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 30 Aug 2019 01:25:43 +0900
-Message-ID: <CAK7LNAQLnOa6f5jDLochYyFdctzUuMvk4ETGga-f2v-EP6hqnw@mail.gmail.com>
-Subject: Re: [PATCH 6/6] kbuild: check clean srctree even earlier
+Date: Fri, 30 Aug 2019 02:18:14 +0900
+Message-ID: <CAK7LNATZSLYMW3NaEgm=r7EiHwLnxjtaogm_CRHZYgcBLVRb-w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Do not enable -Wimplicit-fallthrough for clang
+ for now
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Nathan Huckleberry <nhuck@google.com>, Joe Perches <joe@perches.com>
 
-On Thu, Aug 22, 2019 at 1:46 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On Thu, Aug 29, 2019 at 2:44 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> Move the outputmakefile target to the leftmost in the prerequisite list
-> so that this is checked first. There is no guarantee that Make runs the
-> prerequisites from left to right,
-
-Looks like this is guaranteed.
-
-I did not know POSIX defined this.
-
-
-I will reword the commit log as follows:
-
-
-"
-kbuild: check clean srctree even earlier
-
-Move the outputmakefile target to the leftmost in the prerequisite list
-so that this is checked first. GNU Make processes the prerequisites
-left to right.
-
-GNU Make will keep to stick to this behavior, and it seems even
-POSIX standard, according to this:
-https://lists.gnu.org/archive/html/bug-make/2019-08/msg00030.html
-
-The POSIX standard of make is available here:
-https://pubs.opengroup.org/onlinepubs/9699919799/utilities/make.html
-
-Of course, when the parallel option -j given, other targets will be run
-simultaneously but it is nice to show the error as early as possible.
-"
-
-
-
-
-> but at least the released versions of
-> GNU Make work like that when the parallel build option is not given.
+> On Wed, Aug 28, 2019 at 10:39 AM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > On Wed, Aug 28, 2019 at 9:45 AM Miguel Ojeda
+> > <miguel.ojeda.sandonis@gmail.com> wrote:
+> > >
+> > > On Wed, Aug 28, 2019 at 6:21 PM Masahiro Yamada
+> > > <yamada.masahiro@socionext.com> wrote:
+> > > >
+> > > > Applied to linux-kbuild. Thanks.
+> > > >
+> > > > (If other clang folks give tags, I will add them later.)
+> > >
+> > > Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+> >
+> > I verified that GCC didn't get support for -Wimplicit-fallthrough
+> > until GCC ~7.1 release, so the cc-option guard is still required.
+> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Thanks for the patch Nathan.
 >
-> Of course, when the parallel option -j given, other targets will be run
-> simultaneously but it is nice to show the error as early as possible.
+> Also, there's an inconsistency between Makefile vs
+> scripts/Makefile.extrawarn that's been bugging me: it seems we enable
+> GCC only flags in Makefile, then disable certain Clang flags in
+> scripts/Makefile.extrawarn.
+
+
+All the flags listed in scripts/Makefile.extrawarn depend on W= option.
+The options in Makefile are passed irrespective of W=.
+
+There is no inconsistency.
+
+
+> Not necessary to fix here and now, but I
+> hope one day to have one file that has all of the compiler specific
+> flags in one place (maybe its own file), so I only have to look in one
+> place.  I know, I know, "patches welcome." ;)
 >
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
->
->  Makefile | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 960df4d35b15..089983a8a028 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -581,10 +581,10 @@ ifdef config-build
->  include arch/$(SRCARCH)/Makefile
->  export KBUILD_DEFCONFIG KBUILD_KCONFIG CC_VERSION_TEXT
->
-> -config: scripts_basic outputmakefile FORCE
-> +config: outputmakefile scripts_basic FORCE
->         $(Q)$(MAKE) $(build)=scripts/kconfig $@
->
-> -%config: scripts_basic outputmakefile FORCE
-> +%config: outputmakefile scripts_basic FORCE
->         $(Q)$(MAKE) $(build)=scripts/kconfig $@
->
->  else #!config-build
-> @@ -1123,7 +1123,7 @@ scripts: scripts_basic scripts_dtc
->
->  PHONY += prepare archprepare
->
-> -archprepare: archheaders archscripts scripts include/config/kernel.release outputmakefile \
-> +archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
->         asm-generic $(version_h) $(autoksyms_h) include/generated/utsrelease.h
->
->  prepare0: archprepare
 > --
-> 2.17.1
->
+> Thanks,
+> ~Nick Desaulniers
+
 
 
 -- 
