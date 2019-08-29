@@ -1,59 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33867 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727097AbfH1Xlu (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36677 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726828AbfH2AF5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Aug 2019 19:41:50 -0400
-Date: Wed, 28 Aug 2019 23:41:34 +0000
-From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH 01/11] ftrace: move recordmcount tools to scripts/ftrace
-Message-ID: <20190828234133.quir3ptl4kidnxud@mail.google.com>
-References: <20190825132330.5015-1-changbin.du@gmail.com>
- <20190825132330.5015-2-changbin.du@gmail.com>
- <20190826184444.09334ae9@gandalf.local.home>
+        Wed, 28 Aug 2019 20:05:57 -0400
+Date: Wed, 28 Aug 2019 17:05:51 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: allow Clang to find unused static inline
+ functions for W=1 build
+Message-ID: <20190829000551.GA62731@archlinux-threadripper>
+References: <20190828055425.24765-1-yamada.masahiro@socionext.com>
+ <20190828055425.24765-2-yamada.masahiro@socionext.com>
+ <20190828182017.GB127646@archlinux-threadripper>
+ <CAKwvOd=r5Y8hQQBeKZ6zAokPdyeT2AVKFsdviTvwV5AyDQQHrw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190826184444.09334ae9@gandalf.local.home>
+In-Reply-To: <CAKwvOd=r5Y8hQQBeKZ6zAokPdyeT2AVKFsdviTvwV5AyDQQHrw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Changbin Du <changbin.du@gmail.com>, Ingo Molnar <mingo@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, "John F . Reiser" <jreiser@BitWagon.com>, Matt Helsley <mhelsley@vmware.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Sven Schnelle <svens@stackframe.org>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
 
-On Mon, Aug 26, 2019 at 06:44:44PM -0400, Steven Rostedt wrote:
-> On Sun, 25 Aug 2019 21:23:20 +0800
-> Changbin Du <changbin.du@gmail.com> wrote:
+On Wed, Aug 28, 2019 at 04:28:30PM -0700, Nick Desaulniers wrote:
+> On Wed, Aug 28, 2019 at 11:20 AM Nathan Chancellor
+> <natechancellor@gmail.com> wrote:
+> >
+> > On Wed, Aug 28, 2019 at 02:54:25PM +0900, Masahiro Yamada wrote:
+> > > GCC and Clang have different policy for -Wunused-function; GCC does not
+> > > warn unused static inline functions at all whereas Clang does if they
+> > > are defined in source files instead of included headers although it has
+> > > been suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
+> > > warning for unused static inline functions").
+> > >
+> > > We often miss to delete unused functions where 'static inline' is used
+> > > in *.c files since there is no tool to detect them. Unused code remains
+> > > until somebody notices. For example, commit 075ddd75680f ("regulator:
+> > > core: remove unused rdev_get_supply()").
+> > >
+> > > Let's remove __maybe_unused from the inline macro to allow Clang to
+> > > start finding unused static inline functions. For now, we do this only
+> > > for W=1 build since it is not a good idea to sprinkle warnings for the
+> > > normal build.
+> > >
+> > > My initial attempt was to add -Wno-unused-function for no W=1 build
+> > > (https://lore.kernel.org/patchwork/patch/1120594/)
+> > >
+> > > Nathan Chancellor pointed out that would weaken Clang's checks since
+> > > we would no longer get -Wunused-function without W=1. It is true GCC
+> > > would detect unused static non-inline functions, but it would weaken
+> > > Clang as a standalone compiler at least.
 > 
-> > Move ftrace tools to its own directory. We will add another tool later.
-> > 
-> > Cc: John F. Reiser <jreiser@BitWagon.com>
-> > Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> > ---
-> >  scripts/.gitignore                   |  1 -
-> >  scripts/Makefile                     |  2 +-
-> >  scripts/Makefile.build               | 10 +++++-----
-> >  scripts/ftrace/.gitignore            |  4 ++++
-> >  scripts/ftrace/Makefile              |  4 ++++
-> >  scripts/{ => ftrace}/recordmcount.c  |  0
-> >  scripts/{ => ftrace}/recordmcount.h  |  0
-> >  scripts/{ => ftrace}/recordmcount.pl |  0
-> >  8 files changed, 14 insertions(+), 7 deletions(-)
-> >  create mode 100644 scripts/ftrace/.gitignore
-> >  create mode 100644 scripts/ftrace/Makefile
-> >  rename scripts/{ => ftrace}/recordmcount.c (100%)
-> >  rename scripts/{ => ftrace}/recordmcount.h (100%)
-> >  rename scripts/{ => ftrace}/recordmcount.pl (100%)
-> >  mode change 100755 => 100644
+> Got it. No problem.
 > 
-> Note, we are in the process of merging recordmcount with objtool. It
-> would be better to continue from that work.
+> > >
+> > > Here is a counter implementation. The current problem is, W=... only
+> > > controls compiler flags, which are globally effective. There is no way
+> > > to narrow the scope to only 'static inline' functions.
+> > >
+> > > This commit defines KBUILD_EXTRA_WARN[123] corresponding to W=[123].
+> > > When KBUILD_EXTRA_WARN1 is defined, __maybe_unused is omitted from
+> > > the 'inline' macro.
+> > >
+> > > This makes the code a bit uglier, so personally I do not want to carry
+> > > this forever. If we can manage to fix most of the warnings, we can
+> > > drop this entirely, then enable -Wunused-function all the time.
 > 
->  http://lkml.kernel.org/r/2767f55f4a5fbf30ba0635aed7a9c5ee92ac07dd.1563992889.git.mhelsley@vmware.com
-> 
-> -- Steve
-Thanks for reminding. Let me check if prototype tool can merge into
-objtool easily after above work.
+> How many warnings?
 
--- 
+In an x86 defconfig build (one of the smallest builds we do), I see an
+additional 35 warnings that crop up:
+
+https://gist.github.com/003ba86ba60b4ac7e8109089d6cb1a5a
+
+> > >
+> > > If you contribute to code clean-up, please run "make CC=clang W=1"
+> > > and check -Wunused-function warnings. You will find lots of unused
+> > > functions.
+> > >
+> > > Some of them are false-positives because the call-sites are disabled
+> > > by #ifdef. I do not like to abuse the inline keyword for suppressing
+> > > unused-function warnings because it is intended to be a hint for the
+> > > compiler optimization. I prefer #ifdef around the definition, or
+> > > __maybe_unused if #ifdef would make the code too ugly.
+> > >
+> > > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >
+> > I can still see warnings from static unused functions and with W=1, I
+> > see plenty more. I agree that this is uglier because of the
+> > __inline_maybe_unused but I think this is better for regular developers.
+> > I will try to work on these unused-function warnings!
+> 
+> How many are we talking here?
+> 
+> >
+> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> > Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> 
+> This is getting kind of messy.  I was more ok when the goal seemed to
+> be simplifying the definition of `inline`, but this is worse IMO.
+
+I guess if you want, we can just go back to v1 and have all unused
+function warnings hidden by default with clang. Fixing these warnings
+will take a significant amount of time given there will probably be a
+few hundred so I don't think having this warning hidden behind W=1 for
+that long is a good thing.
+
 Cheers,
-Changbin Du
+Nathan
