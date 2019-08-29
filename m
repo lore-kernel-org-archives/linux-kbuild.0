@@ -1,60 +1,284 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:18257 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728983AbfH2TEK (ORCPT
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38292 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728512AbfH2TSC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Aug 2019 15:04:10 -0400
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id x7TJ3pH3029664
-        for <linux-kbuild@vger.kernel.org>; Fri, 30 Aug 2019 04:03:52 +0900
-Received: by mail-ua1-f47.google.com with SMTP id g11so1536648uak.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Aug 2019 12:03:52 -0700 (PDT)
+        Thu, 29 Aug 2019 15:18:02 -0400
+Received: by mail-pl1-f194.google.com with SMTP id w11so2047863plp.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Aug 2019 12:18:01 -0700 (PDT)
+Date: Thu, 29 Aug 2019 12:17:59 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [RFC PATCH 1/2] Add clang-tidy and static analyzer support to
+ makefile
+Message-ID: <201908291207.3AE0872B88@keescook>
+References: <20190806211047.232709-1-nhuck@google.com>
 MIME-Version: 1.0
-References: <201908300201.6bXAplRQ%lkp@intel.com>
-In-Reply-To: <201908300201.6bXAplRQ%lkp@intel.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 30 Aug 2019 04:03:14 +0900
-Message-ID: <CAK7LNAQTXaMbjLxfNjikRDWUCa4DRotnCizUNm7gZ8k1P1E1tA@mail.gmail.com>
-Subject: Re: [kbuild:kbuild 48/54] arch/powerpc/kernel/prom_init_check.sh: 36:
- arch/powerpc/kernel/prom_init_check.sh: Syntax error: "(" unexpected
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190806211047.232709-1-nhuck@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nathan Huckleberry <nhuck@google.com>
+Cc: mark.rutland@arm.com, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 3:47 AM kbuild test robot <lkp@intel.com> wrote:
->
-> tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
-> head:   d24121b576497d25a5b53fa78e6789ce8ca413cc
-> commit: 51af17b8434f10a5881fc6fde4fa2c41df59c287 [48/54] kbuild: add $(BASH) to run scripts with bash-extension
-> config: powerpc-defconfig (attached as .config)
-> compiler: powerpc64-linux-gcc (GCC) 7.4.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 51af17b8434f10a5881fc6fde4fa2c41df59c287
->         # save the attached .config to linux build tree
->         GCC_VERSION=7.4.0 make.cross ARCH=powerpc
->
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
-> >> arch/powerpc/kernel/prom_init_check.sh: 36: arch/powerpc/kernel/prom_init_check.sh: Syntax error: "(" unexpected
+[ Added kbuild and Masahiro to CC ... ]
 
-I will remove 'function' to fix this.
-
-Thanks.
-
-
+On Tue, Aug 06, 2019 at 02:10:46PM -0700, Nathan Huckleberry wrote:
+> Signed-off-by: Nathan Huckleberry <nhuck@google.com>
 > ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
+These two lines should be at the end of your commit log. :)
 
+> These patches add clang-tidy and the clang static-analyzer as make
+> targets. The goal of these patches is to make static analysis tools
+> usable and extendable by any developer or researcher who is familiar
+> with basic c++.
+> 
+> The current static analysis tools require intimate knowledge of the internal
+> workings of the static analysis.  Clang-tidy and the clang static analyzers
+> expose an easy to use api and allow users unfamiliar with clang to
+> write new checks with relative ease.
+> 
+> ===Clang-tidy===
+> 
+> Clang-tidy is an easily extendable 'linter' that runs on the AST.
+> Clang-tidy checks are easy to write and understand. A check consists of
+> two parts, a matcher and a checker. The matcher is created using a
+> domain specific language that acts on the AST
+> (https://clang.llvm.org/docs/LibASTMatchersReference.html).  When AST
+> nodes are found by the matcher a callback is made to the checker. The
+> checker can then execute additional checks and issue warnings.
+> 
+> Here is an example clang-tidy check to report functions that have calls
+> to local_irq_disable without calls to local_irq_enable and vice-versa.
+> Functions flagged with __attribute((annotation("ignore_irq_balancing")))
+> are ignored for analysis.
+> 
+> The full patch can be found here (https://reviews.llvm.org/D65828)
+> 
+> ```
+> void IrqUnbalancedCheck::registerMatchers(MatchFinder *Finder) {
+>   // finds calls to "arch_local_irq_disable" in a function body
+>   auto disable =
+>               forEachDescendant(
+>                   callExpr(
+>                       hasDeclaration(
+>                           namedDecl(
+>                               hasName("arch_local_irq_disable")))).bind("disable"));
+> 
+>   // finds calls to "arch_local_irq_enable" in a function body
+>   auto enable =
+>               forEachDescendant(
+>                   callExpr(
+>                       hasDeclaration(
+>                           namedDecl(
+>                               hasName("arch_local_irq_enable")))).bind("enable"));
+> 
+>   // Looks for function body that has the following property:
+>   // ((disable && !enable) || (enable && !disable))
+>   auto matcher = functionDecl(
+>       anyOf(allOf(disable, unless(enable)), allOf(enable, unless(disable))));
+> 
+>   Finder->addMatcher(matcher.bind("func"), this);
+> }
+> 
+> std::string annotation = "ignore_irq_balancing";
+> void IrqUnbalancedCheck::check(const MatchFinder::MatchResult &Result) {
+>   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("func");
+>   const auto *DisableCall = Result.Nodes.getNodeAs<CallExpr>("disable");
+>   const auto *EnableCall = Result.Nodes.getNodeAs<CallExpr>("enable");
+> 
+>   // If the function has __attribute((annotate("ignore_irq_balancing"))
+>   for (const auto *Attr : MatchedDecl->attrs()) {
+>     if (Attr->getKind() == clang::attr::Annotate) {
+>       if(dyn_cast<AnnotateAttr>(Attr)->getAnnotation().str() == annotation) {
+>         return;
+>       }
+>     }
+>   }
+> 
+>   if(EnableCall) {
+>     diag(MatchedDecl->getLocation(), "call to 'enable_local_irq' without 'disable_local_irq' in %0 ")
+>         << MatchedDecl;
+>     diag(EnableCall->getBeginLoc(), "call to 'enable_local_irq'", DiagnosticIDs::Note)
+>         << MatchedDecl;
+>   }
+> 
+>   if(DisableCall) {
+>     diag(MatchedDecl->getLocation(), "call to 'disable_local_irq' without 'enable_local_irq' in %0 ")
+>         << MatchedDecl;
+>     diag(DisableCall->getBeginLoc(), "call to 'disable_local_irq'", DiagnosticIDs::Note)
+>         << MatchedDecl;
+>   }
+> }
+> ```
+> 
+> ===Clang static analyzer===
+> 
+> The clang static analyzer is a more powerful static analysis tool that
+> uses symbolic execution to find bugs. Currently there is a check that
+> looks for potential security bugs from invalid uses of kmalloc and
+> kfree. There are several more general purpose checks that are useful for
+> the kernel.
+> 
+> The clang static analyzer is well documented and designed to be
+> extensible.
+> (https://clang-analyzer.llvm.org/checker_dev_manual.html)
+> (https://github.com/haoNoQ/clang-analyzer-guide/releases/download/v0.1/clang-analyzer-guide-v0.1.pdf)
+> 
+> 
+> Why add clang-tidy and the clang static analyzer when other static
+> analyzers are already in the kernel?
+> 
+> The main draw of the clang tools is how accessible they are. The clang
+> documentation is very nice and these tools are built specifically to be
+> easily extendable by any developer. They provide an accessible method of
+> bug-finding and research to people who are not overly familiar with the
+> kernel codebase.
+> 
+
+^ i.e. they should be right here...
+
+>  Makefile                                      |  3 ++
+>  scripts/clang-tools/Makefile.clang-tools      | 35 ++++++++++++++
+>  .../{ => clang-tools}/gen_compile_commands.py |  0
+>  scripts/clang-tools/parse_compile_commands.py | 47 +++++++++++++++++++
+>  4 files changed, 85 insertions(+)
+>  create mode 100644 scripts/clang-tools/Makefile.clang-tools
+>  rename scripts/{ => clang-tools}/gen_compile_commands.py (100%)
+>  create mode 100755 scripts/clang-tools/parse_compile_commands.py
+> 
+> diff --git a/Makefile b/Makefile
+> index fabc127d127f..49f1d3fa48a8 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -709,6 +709,7 @@ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+>  
+>  include scripts/Makefile.kcov
+>  include scripts/Makefile.gcc-plugins
+> +include scripts/clang-tools/Makefile.clang-tools
+>  
+>  ifdef CONFIG_READABLE_ASM
+>  # Disable optimizations that make assembler listings hard to read.
+> @@ -1470,6 +1471,8 @@ help:
+>  	@echo  '  headers_check   - Sanity check on exported headers'
+>  	@echo  '  headerdep       - Detect inclusion cycles in headers'
+>  	@echo  '  coccicheck      - Check with Coccinelle'
+> +	@echo  '  clang-analyzer  - Check with clang static analyzer'
+> +	@echo  '  clang-tidy      - Check with clang-tidy'
+
+I think this is great; more people will be able to run these tests.
+
+>  	@echo  ''
+>  	@echo  'Kernel selftest:'
+>  	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
+> diff --git a/scripts/clang-tools/Makefile.clang-tools b/scripts/clang-tools/Makefile.clang-tools
+> new file mode 100644
+> index 000000000000..0adb6df20777
+> --- /dev/null
+> +++ b/scripts/clang-tools/Makefile.clang-tools
+> @@ -0,0 +1,35 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +PHONY += clang-tidy
+> +HAS_PARALLEL := $(shell (parallel --version 2> /dev/null) | grep 'GNU parallel' 2> /dev/null)
+> +clang-tidy:
+> +ifdef CONFIG_CC_IS_CLANG
+> +	$(PYTHON3) scripts/clang-tools/gen_compile_commands.py
+> +ifdef HAS_PARALLEL
+
+Is it worth falling back to xargs? Are there builders where clang-tidy
+or clang-analyzer are installed but parallel isn't? (i.e. it might just
+be better to simply require parallel.) Note that there's no test for
+python3 -- we just try to run it. :)
+
+> +	#Xargs interleaves multiprocessed output. GNU Parallel does not.
+> +	scripts/clang-tools/parse_compile_commands.py compile_commands.json \
+> +		| parallel -k -j $(shell nproc) 'echo {} && clang-tidy -p . "-checks=-*,linuxkernel-*" {}'
+> +else
+> +	@echo "GNU parallel is not installed. Defaulting to non-parallelized runs"
+> +	scripts/clang-tools/parse_compile_commands.py compile_commands.json \
+> +		| xargs -L 1 -I@ sh -c "echo '@' && clang-tidy -p . '-checks=-*,linuxkernel-*' @"
+> +endif
+> +else
+> +	$(error Clang-tidy requires CC=clang)
+> +endif
+> +
+> +PHONY += clang-analyzer
+> +clang-analyzer:
+> +ifdef CONFIG_CC_IS_CLANG
+> +	$(PYTHON3) scripts/clang-tools/gen_compile_commands.py
+> +ifdef HAS_PARALLEL
+> +	#Xargs interleaves multiprocessed output. GNU Parallel does not.
+> +	scripts/clang-tools/parse_compile_commands.py compile_commands.json \
+> +		| parallel -k -j $(shell nproc) 'echo {} && clang-tidy -p . "-checks=-*,clang-analyzer-*" {}'
+> +else
+> +	@echo "GNU parallel is not installed. Defaulting to non-parallelized runs"
+> +	scripts/clang-tools/parse_compile_commands.py compile_commands.json \
+> +		| xargs -L 1 -I@ sh -c "echo '@' && clang-tidy -p . '-checks=-*,clang-analyzer-*' @"
+> +endif
+> +else
+> +	$(error Clang-analyzer requires CC=clang)
+> +endif
+> diff --git a/scripts/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
+> similarity index 100%
+> rename from scripts/gen_compile_commands.py
+> rename to scripts/clang-tools/gen_compile_commands.py
+> diff --git a/scripts/clang-tools/parse_compile_commands.py b/scripts/clang-tools/parse_compile_commands.py
+> new file mode 100755
+> index 000000000000..d6bc1bf9951e
+> --- /dev/null
+> +++ b/scripts/clang-tools/parse_compile_commands.py
+> @@ -0,0 +1,47 @@
+> +#!/usr/bin/env python
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Copyright (C) Google LLC, 2019
+> +#
+> +# Author: Nathan Huckleberry <nhuck@google.com>
+> +#
+> +"""A helper routine for make clang-tidy to parse compile_commands.json."""
+> +
+> +import argparse
+> +import json
+> +import logging
+> +import os
+> +import re
+> +
+> +def parse_arguments():
+> +  """Set up and parses command-line arguments.
+> +  Returns:
+> +    file_path: Path to compile_commands.json file
+> +  """
+> +  usage = """Parse a compilation database and return a list of files
+> +  included in the database"""
+> +  parser = argparse.ArgumentParser(description=usage)
+> +
+> +  file_path_help = ('Path to the compilation database to parse')
+> +  parser.add_argument('file',  type=str, help=file_path_help)
+> +
+> +  args = parser.parse_args()
+> +
+> +  return args.file
+> +
+> +
+> +def main():
+> +  filename = parse_arguments()
+> +
+> +  #Read JSON data into the datastore variable
+> +  if filename:
+> +    with open(filename, 'r') as f:
+> +      datastore = json.load(f)
+> +
+> +      #Use the new datastore datastructure
+> +      for entry in datastore:
+> +        print(entry['file'])
+> +
+> +
+> +if __name__ == '__main__':
+> +    main()
+
+And this is nice to have because now there is a real consumer of
+gen_compile_commands.py.
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
