@@ -1,42 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53348 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727754AbfH3Jwi (ORCPT
+Received: from smtprelay0043.hostedemail.com ([216.40.44.43]:43654 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726660AbfH3LJT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Aug 2019 05:52:38 -0400
+        Fri, 30 Aug 2019 07:09:19 -0400
+Message-ID: <ccc65bd29747f8ad4d0ba1b3eda6c9d230f03c70.camel@perches.com>
+Subject: Re: [PATCH] Makefile: Convert -Wimplicit-fallthrough to
+ -Wimplicit-fallthrough=2
+From: Joe Perches <joe@perches.com>
+Date: Fri, 30 Aug 2019 04:09:15 -0700
+In-Reply-To: <20190829120215.1977-1-msuchanek@suse.de>
+References: <20190829120215.1977-1-msuchanek@suse.de>
+Content-Type: text/plain; charset="ISO-8859-1"
 MIME-Version: 1.0
-References: <20190828055425.24765-1-yamada.masahiro@socionext.com>
- <20190828055425.24765-2-yamada.masahiro@socionext.com> <20190828182017.GB127646@archlinux-threadripper>
- <CAKwvOd=r5Y8hQQBeKZ6zAokPdyeT2AVKFsdviTvwV5AyDQQHrw@mail.gmail.com> <CA+icZUWmmC7CruvXx6U0cdXMLaMWJadU=T61E0om1rOuW3==pw@mail.gmail.com>
-In-Reply-To: <CA+icZUWmmC7CruvXx6U0cdXMLaMWJadU=T61E0om1rOuW3==pw@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 30 Aug 2019 11:52:24 +0200
-Message-ID: <CA+icZUXX6YG7=4n60A3_HiTYE0SkNXd8yr4-pqfOsqg66QvXzw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: allow Clang to find unused static inline
- functions for W=1 build
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Sven Schnelle <svens@stackframe.org>, Xiaozhou Liu <liuxiaozhou@bytedance.com>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
+To: Michal Suchanek <msuchanek@suse.de>, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Just as a sidenote:
+On Thu, 2019-08-29 at 14:02 +0200, Michal Suchanek wrote:
+> In particular the default value of 3 does not match the comments like
+> /* falls through to do foobar */
 
-From [PATCH v2] kbuild: enable unused-function warnings for W= build with Clang:
+How many comments are there like this in the kernel?
 
-"Per the documentation [1], -Wno-unused-function will also disable
--Wunneeded-internal-declaration, which can help find bugs like
-commit 8289c4b6f2e5 ("platform/x86: mlx-platform: Properly use
-mlxplat_mlxcpld_msn201x_items"). (pointed out by Nathan Chancellor)
-I added -Wunneeded-internal-declaration to address it.
-
-If you contribute to code clean-up, please run "make CC=clang W=1"
-and check -Wunused-function warnings. You will find lots of unused
-functions."
-
-Isn't that missing in your double?
-
-- Sedat -
-
-[1] https://lkml.org/lkml/2019/8/27/729
+Also you have to deal with gcc/clang differences.
+As far as I know, clang doesn't take a value for this.
