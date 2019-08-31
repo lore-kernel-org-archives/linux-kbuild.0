@@ -1,224 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:37484 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728159AbfH3VCw (ORCPT
+Received: from gateway30.websitewelcome.com ([50.116.125.1]:33776 "EHLO
+        gateway30.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725298AbfHaFeL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Aug 2019 17:02:52 -0400
-Received: by mail-pg1-f195.google.com with SMTP id d1so4127492pgp.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 30 Aug 2019 14:02:51 -0700 (PDT)
+        Sat, 31 Aug 2019 01:34:11 -0400
+Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
+        by gateway30.websitewelcome.com (Postfix) with ESMTP id C02D331EF
+        for <linux-kbuild@vger.kernel.org>; Sat, 31 Aug 2019 00:12:12 -0500 (CDT)
+References: <20190829120215.1977-1-msuchanek@suse.de>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: Re: [PATCH] Makefile: Convert -Wimplicit-fallthrough to
+ -Wimplicit-fallthrough=2
+Message-ID: <975cea02-a2db-c0b9-ba84-83a0ddadab0f@embeddedor.com>
+Date: Sat, 31 Aug 2019 00:12:10 -0500
 MIME-Version: 1.0
-References: <20190829181231.5920-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190829181231.5920-1-yamada.masahiro@socionext.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 30 Aug 2019 14:02:39 -0700
-Message-ID: <CAKwvOdn4abmHse=EUf1mMNUbXO3ZprZQYDmxbRFyeLVhhs8Rew@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: refactor scripts/Makefile.extrawarn
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190829120215.1977-1-msuchanek@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
-
-On Thu, Aug 29, 2019 at 11:12 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> Instead of the warning-[123] magic, let's accumulate compiler options
-> to KBUILD_CFLAGS directly as the top Makefile does. I think this makes
-> easier to understand what is going on in this file.
->
-> This commit slightly changes the behavior, I think all of which are OK.
->
-> [1] Currently, cc-option calls are needlessly evaluated. For example,
->       warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
->     needs evaluating only when W=3, but it is actually evaluated for
->     W=1, W=2 as well. With this commit, only relevant cc-option calls
->     will be evaluated. This is a slight optimization.
->
-> [2] Currently, unsupported level like W=4 is checked by:
->       $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
->     This will no longer be checked, but I do not think it is a big
->     deal.
->
-> [3] Currently, 4 Clang warnings (Winitializer-overrides, Wformat,
->     Wsign-compare, Wformat-zero-length) are shown by any of W=1, W=2,
->     and W=3. With this commit, they will be warned only by W=1. I
->     think this is a more correct behavior since each warning belongs
->     to only one group.
->
-> For understanding this commit correctly:
->
-> We have 3 warning groups, W=1, W=2, and W=3. You may think W=3 has a
-> higher level than W=1, but they are actually independent. If you like,
-
-What?! Ok now things make much more sense.  (This is a great addition
-to this patch).  Maybe this should additionally be a comment in the
-source code?
-
-> you can combine them like W=13. To enable all the warnings, you can
-> pass W=123. This is shown by 'make help', but it is often missed
-> unfortunately. Since we support W= combination, there should not exist
-> intersection among the three groups. If we enable Winitializer-overrides
-> for W=1, we do not need to for W=2 or W=3. This is why I believe the
-> change [3] makes sense.
->
-> The documentation says -Winitializer-overrides is enabled by default.
-> (https://clang.llvm.org/docs/DiagnosticsReference.html#winitializer-overrides)
-> We negate it by passing -Wno-initializer-overrides for the normal
-> build, but we do not do that for W=1. This means, W=1 effectively
-> enables -Winitializer-overrides by the clang's default. The same for
-> the other three. I wonder if this logic needs detailed commenting,
-> but I do not want to be bothered any more. I added comments.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-
-> ---
->
-> Changes in v2:
->   - Added comments and more commit log
->
->  scripts/Makefile.extrawarn | 105 +++++++++++++++++++------------------
->  1 file changed, 54 insertions(+), 51 deletions(-)
->
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index a74ce2e3c33e..3680445823b7 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -1,14 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # ==========================================================================
-> -#
->  # make W=... settings
-> -#
-> -# W=1 - warnings that may be relevant and does not occur too often
-> -# W=2 - warnings that occur quite often but may still be relevant
-> -# W=3 - the more obscure warnings, can most likely be ignored
-> -#
-> -# $(call cc-option, -W...) handles gcc -W.. options which
-> -# are not supported by all versions of the compiler
->  # ==========================================================================
->
->  KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
-> @@ -17,58 +9,69 @@ ifeq ("$(origin W)", "command line")
->    export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
->  endif
->
-> -ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-> -warning-  := $(empty)
-> +#
-> +# W=1 - warnings that may be relevant and does not occur too often
-> +#
-> +ifneq ($(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
->
-> -warning-1 := -Wextra -Wunused -Wno-unused-parameter
-> -warning-1 += -Wmissing-declarations
-> -warning-1 += -Wmissing-format-attribute
-> -warning-1 += -Wmissing-prototypes
-> -warning-1 += -Wold-style-definition
-> -warning-1 += -Wmissing-include-dirs
-> -warning-1 += $(call cc-option, -Wunused-but-set-variable)
-> -warning-1 += $(call cc-option, -Wunused-const-variable)
-> -warning-1 += $(call cc-option, -Wpacked-not-aligned)
-> -warning-1 += $(call cc-option, -Wstringop-truncation)
-> +KBUILD_CFLAGS += -Wextra -Wunused -Wno-unused-parameter
-> +KBUILD_CFLAGS += -Wmissing-declarations
-> +KBUILD_CFLAGS += -Wmissing-format-attribute
-> +KBUILD_CFLAGS += -Wmissing-prototypes
-> +KBUILD_CFLAGS += -Wold-style-definition
-> +KBUILD_CFLAGS += -Wmissing-include-dirs
-> +KBUILD_CFLAGS += $(call cc-option, -Wunused-but-set-variable)
-> +KBUILD_CFLAGS += $(call cc-option, -Wunused-const-variable)
-> +KBUILD_CFLAGS += $(call cc-option, -Wpacked-not-aligned)
-> +KBUILD_CFLAGS += $(call cc-option, -Wstringop-truncation)
->  # The following turn off the warnings enabled by -Wextra
-> -warning-1 += -Wno-missing-field-initializers
-> -warning-1 += -Wno-sign-compare
-> -
-> -warning-2 += -Wcast-align
-> -warning-2 += -Wdisabled-optimization
-> -warning-2 += -Wnested-externs
-> -warning-2 += -Wshadow
-> -warning-2 += $(call cc-option, -Wlogical-op)
-> -warning-2 += -Wmissing-field-initializers
-> -warning-2 += -Wsign-compare
-> -warning-2 += $(call cc-option, -Wmaybe-uninitialized)
-> -warning-2 += $(call cc-option, -Wunused-macros)
-> -
-> -warning-3 := -Wbad-function-cast
-> -warning-3 += -Wcast-qual
-> -warning-3 += -Wconversion
-> -warning-3 += -Wpacked
-> -warning-3 += -Wpadded
-> -warning-3 += -Wpointer-arith
-> -warning-3 += -Wredundant-decls
-> -warning-3 += -Wswitch-default
-> -warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-> -
-> -warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-> -warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-> -warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-> -
-> -ifeq ("$(strip $(warning))","")
-> -        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-> -endif
-> +KBUILD_CFLAGS += -Wno-missing-field-initializers
-> +KBUILD_CFLAGS += -Wno-sign-compare
->
-> -KBUILD_CFLAGS += $(warning)
->  else
->
-> +# Some diagnostics such as -Winitializer-overrides are enabled by default.
-> +# We suppress them by using -Wno... except for W=1.
-> +
->  ifdef CONFIG_CC_IS_CLANG
->  KBUILD_CFLAGS += -Wno-initializer-overrides
->  KBUILD_CFLAGS += -Wno-format
->  KBUILD_CFLAGS += -Wno-sign-compare
->  KBUILD_CFLAGS += -Wno-format-zero-length
->  endif
-> +
-> +endif
-> +
-> +#
-> +# W=2 - warnings that occur quite often but may still be relevant
-> +#
-> +ifneq ($(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
-> +
-> +KBUILD_CFLAGS += -Wcast-align
-> +KBUILD_CFLAGS += -Wdisabled-optimization
-> +KBUILD_CFLAGS += -Wnested-externs
-> +KBUILD_CFLAGS += -Wshadow
-> +KBUILD_CFLAGS += $(call cc-option, -Wlogical-op)
-> +KBUILD_CFLAGS += -Wmissing-field-initializers
-> +KBUILD_CFLAGS += -Wsign-compare
-> +KBUILD_CFLAGS += $(call cc-option, -Wmaybe-uninitialized)
-> +KBUILD_CFLAGS += $(call cc-option, -Wunused-macros)
-> +
-> +endif
-> +
-> +#
-> +# W=3 - the more obscure warnings, can most likely be ignored
-> +#
-> +ifneq ($(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
-> +
-> +KBUILD_CFLAGS += -Wbad-function-cast
-> +KBUILD_CFLAGS += -Wcast-qual
-> +KBUILD_CFLAGS += -Wconversion
-> +KBUILD_CFLAGS += -Wpacked
-> +KBUILD_CFLAGS += -Wpadded
-> +KBUILD_CFLAGS += -Wpointer-arith
-> +KBUILD_CFLAGS += -Wredundant-decls
-> +KBUILD_CFLAGS += -Wswitch-default
-> +KBUILD_CFLAGS += $(call cc-option, -Wpacked-bitfield-compat)
-> +
->  endif
-> --
-> 2.17.1
->
+To: Michal Suchanek <msuchanek@suse.de>, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
 
 
--- 
-Thanks,
-~Nick Desaulniers
+
+On 8/29/19 7:02 AM, Michal Suchanek wrote:
+> From gcc documentation:
+> 
+> -Wimplicit-fallthrough=0
+>   disables the warning altogether.
+> -Wimplicit-fallthrough=1
+>   matches .* regular expression, any comment is used as fallthrough comment.
+> -Wimplicit-fallthrough=2
+>   case insensitively matches .*falls?[ \t-]*thr(ough|u).* regular expression.
+> -Wimplicit-fallthrough=3
+>   case sensitively matches one of the following regular expressions:
+>    -fallthrough
+>    @fallthrough@
+>    lint -fallthrough[ \t]*
+>    [ \t.!]*(ELSE,? |INTENTIONAL(LY)? )?
+>    FALL(S | |-)?THR(OUGH|U)[ \t.!]*(-[^\n\r]*)?
+>    [ \t.!]*(Else,? |Intentional(ly)? )?
+>    Fall((s | |-)[Tt]|t)hr(ough|u)[ \t.!]*(-[^\n\r]*)?
+>    [ \t.!]*([Ee]lse,? |[Ii]ntentional(ly)? )?
+>    fall(s | |-)?thr(ough|u)[ \t.!]*(-[^\n\r]*)?
+> -Wimplicit-fallthrough=4
+>   case sensitively matches one of the following regular expressions:
+>    -fallthrough
+>    @fallthrough@
+>    lint -fallthrough[ \t]*
+>    [ \t]*FALLTHR(OUGH|U)[ \t]*
+> -Wimplicit-fallthrough=5
+>   doesn’t recognize any comments as fallthrough comments, only attributes disable the warning.
+> 
+> In particular the default value of 3 does not match the comments like
+> /* falls through to do foobar */
+> generating suprious warnings on properly annotated code.
+> 
+
+NACK
+
+How many of those case do you see? if any...
+
+In any case, those comments can be easily transformed to:
+
+/* falls through - to do foobar */
+
+like in this case:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d2d833e0bf2bad221a955626b942b38312630894
+
+Also, notice that code in linux-next is already ahead... :
+
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=e2079e93f562c7f7a030eb7642017ee5eabaaa10
+
+--
+Gustavo
