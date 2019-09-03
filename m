@@ -1,51 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:44558 "EHLO
-        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbfIBP7o (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38524 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbfICFhk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Sep 2019 11:59:44 -0400
-Date: Mon, 2 Sep 2019 16:59:37 +0100
-From: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2] merge_config.sh: Check error codes from make
-Message-ID: <20190902155937.GD5819@sirena.co.uk>
-References: <20190819200650.18156-1-broonie@kernel.org>
- <b744485d-3e57-469f-5573-6d8a32ba0aef@nvidia.com>
+        Tue, 3 Sep 2019 01:37:40 -0400
+Date: Mon, 2 Sep 2019 22:37:35 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH v3 2/2] kbuild: rename KBUILD_ENABLE_EXTRA_GCC_CHECKS to
+ KBUILD_EXTRA_WARN
+Message-ID: <20190903053735.GA56603@archlinux-threadripper>
+References: <20190831162555.31887-1-yamada.masahiro@socionext.com>
+ <20190831162555.31887-2-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="gE7i1rD7pdK0Ng3j"
-Content-Disposition: inline
-In-Reply-To: <b744485d-3e57-469f-5573-6d8a32ba0aef@nvidia.com>
-Sender: linux-kbuild-owner@vger.kernel.org
-List-ID: <linux-kbuild.vger.kernel.org>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Guillaume Tucker <guillaume.tucker@collabora.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-tegra <linux-tegra@vger.kernel.org>
-
-
---gE7i1rD7pdK0Ng3j
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20190831162555.31887-2-yamada.masahiro@socionext.com>
+Sender: linux-kbuild-owner@vger.kernel.org
+List-ID: <linux-kbuild.vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Sedat Dilek <sedat.dilek@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux@googlegroups.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 03:06:28PM +0100, Jon Hunter wrote:
+On Sun, Sep 01, 2019 at 01:25:55AM +0900, Masahiro Yamada wrote:
+> KBUILD_ENABLE_EXTRA_GCC_CHECKS started as a switch to add extra warning
+> options for GCC, but now it is a historical misnomer since we use it
+> also for Clang, DTC, and even kernel-doc.
+> 
+> Rename it to more sensible, and shorter KBUILD_EXTRA_WARN.
+> 
+> For the backward compatibility, KBUILD_ENABLE_EXTRA_GCC_CHECKS is still
+> supported (but not advertised in the documentation).
+> 
+> I also fixed up 'make help', and updated the documentation.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-> If the intent is to catch errors returned by make, then one simple fix would be ...
-
-I proposed a simpler version originally that only caught errors from
-make, this version was suggested by Yamada-san.  Like Guillaume says he
-posted a proposed fix for this last week.
-
---gE7i1rD7pdK0Ng3j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl1tPGgACgkQJNaLcl1U
-h9Ay0QgAg/xxPeqP2NZDIjMq3QJRYuPGW0WzVxE5ZNhSp4XYeNPplJo8koUkwApf
-FmvBUl0DJSJHwkh/jZNFm+Z6G5T0DrKoM+lgxyzYvDLH7Up6hVUx3Iw5i0v1fuys
-kjtgallTF9Jd75gYIYeX1mJWc5HChvKQyx8Q9Vy3UYePbUQ/S/LNZJdquESGSPiq
-Nb1Aql0BCqhUVMVKwXf9rk9/fEkvvD/rttciTOfHZiCCqj+eyu5hPrcLXvZgh2VF
-ntZSNe61u49S3kwhEN0R8JX0ViZvVpuKE4YqbTccEmVo+A2D7y5NI1na3ODEm/At
-jcGbsUlnWjeSpLkD7go+jsqV3ny9Rg==
-=jOvy
------END PGP SIGNATURE-----
-
---gE7i1rD7pdK0Ng3j--
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
