@@ -1,17 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk1-f202.google.com ([209.85.221.202]:52032 "EHLO
-        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729832AbfICPHj (ORCPT
+Received: from mail-yw1-f73.google.com ([209.85.161.73]:52362 "EHLO
+        mail-yw1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729835AbfICPHm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Sep 2019 11:07:39 -0400
-Received: by mail-vk1-f202.google.com with SMTP id y73so7243786vky.18
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Sep 2019 08:07:38 -0700 (PDT)
-Date: Tue,  3 Sep 2019 16:06:31 +0100
+        Tue, 3 Sep 2019 11:07:42 -0400
+Received: by mail-yw1-f73.google.com with SMTP id d18so13594794ywb.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Sep 2019 08:07:41 -0700 (PDT)
+Date: Tue,  3 Sep 2019 16:06:32 +0100
 In-Reply-To: <20190903150638.242049-1-maennich@google.com>
-Message-Id: <20190903150638.242049-6-maennich@google.com>
+Message-Id: <20190903150638.242049-7-maennich@google.com>
 Mime-Version: 1.0
 References: <20180716122125.175792-1-maco@android.com> <20190903150638.242049-1-maennich@google.com>
-Subject: [PATCH v4 05/12] module: add config option MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
+Subject: [PATCH v4 06/12] export: allow definition default namespaces in
+ Makefiles or sources
 From: Matthias Maennich <maennich@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,70 +20,57 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: kernel-team@android.com, maennich@google.com, arnd@arndb.de, gregkh@linuxfoundation.org, jeyu@kernel.org, joel@joelfernandes.org, lucas.de.marchi@gmail.com, maco@android.com, sspatil@google.com, will@kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-watchdog@vger.kernel.org
 
-If MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS is enabled (default=n), the
-requirement for modules to import all namespaces that are used by
-the module is relaxed.
+To avoid excessive usage of EXPORT_SYMBOL_NS(sym, MY_NAMESPACE), where
+MY_NAMESPACE will always be the namespace we are exporting to, allow
+exporting all definitions of EXPORT_SYMBOL() and friends by defining
+DEFAULT_SYMBOL_NAMESPACE.
 
-Enabling this option effectively allows (invalid) modules to be loaded
-while only a warning is emitted.
+For example, to export all symbols defined in usb-common into the
+namespace USB_COMMON, add a line like this to drivers/usb/common/Makefile:
 
-Disabling this option keeps the enforcement at module loading time and
-loading is denied if the module's imports are not satisfactory.
+  ccflags-y += -DDEFAULT_SYMBOL_NAMESPACE=USB_COMMON
 
+That is equivalent to changing all EXPORT_SYMBOL(sym) definitions to
+EXPORT_SYMBOL_NS(sym, USB_COMMON). Subsequently all symbol namespaces
+functionality will apply.
+
+Another way of making use of this feature is to define the namespace
+within source or header files similar to how TRACE_SYSTEM defines are
+used:
+  #undef DEFAULT_SYMBOL_NAMESPACE
+  #define DEFAULT_SYMBOL_NAMESPACE USB_COMMON
+
+Please note that, as opposed to TRACE_SYSTEM, DEFAULT_SYMBOL_NAMESPACE
+has to be defined before including include/linux/export.h.
+
+If DEFAULT_SYMBOL_NAMESPACE is defined, a symbol can still be exported
+to another namespace by using EXPORT_SYMBOL_NS() and friends with
+explicitly specifying the namespace.
+
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
 Reviewed-by: Martijn Coenen <maco@android.com>
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Matthias Maennich <maennich@google.com>
 ---
- init/Kconfig    | 13 +++++++++++++
- kernel/module.c | 11 +++++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ include/linux/export.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index bd7d650d4a99..cc28561288a7 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -2119,6 +2119,19 @@ config MODULE_COMPRESS_XZ
+diff --git a/include/linux/export.h b/include/linux/export.h
+index d59461e71478..2c5468d8ea9a 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -166,6 +166,12 @@ struct kernel_symbol {
+ #define __EXPORT_SYMBOL ___EXPORT_SYMBOL
+ #endif
  
- endchoice
- 
-+config MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-+	bool "Allow loading of modules with missing namespace imports"
-+	help
-+	  Symbols exported with EXPORT_SYMBOL_NS*() are considered exported in
-+	  a namespace. A module that makes use of a symbol exported with such a
-+	  namespace is required to import the namespace via MODULE_IMPORT_NS().
-+	  There is no technical reason to enforce correct namespace imports,
-+	  but it creates consistency between symbols defining namespaces and
-+	  users importing namespaces they make use of. This option relaxes this
-+	  requirement and lifts the enforcement when loading a module.
-+
-+	  If unsure, say N.
-+
- config TRIM_UNUSED_KSYMS
- 	bool "Trim unused exported kernel symbols"
- 	depends on MODULES && !UNUSED_SYMBOLS
-diff --git a/kernel/module.c b/kernel/module.c
-index 6bb9b938f9c7..f76efcf2043e 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -1408,9 +1408,16 @@ static int verify_namespace_is_imported(const struct load_info *info,
- 			imported_namespace = get_next_modinfo(
- 				info, "import_ns", imported_namespace);
- 		}
--		pr_err("%s: module uses symbol (%s) from namespace %s, but does not import it.\n",
--		       mod->name, kernel_symbol_name(sym), namespace);
-+#ifdef CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
-+		pr_warn(
-+#else
-+		pr_err(
++#ifdef DEFAULT_SYMBOL_NAMESPACE
++#undef __EXPORT_SYMBOL
++#define __EXPORT_SYMBOL(sym, sec)				\
++	__EXPORT_SYMBOL_NS(sym, sec, DEFAULT_SYMBOL_NAMESPACE)
 +#endif
-+			"%s: module uses symbol (%s) from namespace %s, but does not import it.\n",
-+			mod->name, kernel_symbol_name(sym), namespace);
-+#ifndef CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS
- 		return -EINVAL;
-+#endif
- 	}
- 	return 0;
- }
++
+ #define EXPORT_SYMBOL(sym) __EXPORT_SYMBOL(sym, "")
+ #define EXPORT_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_gpl")
+ #define EXPORT_SYMBOL_GPL_FUTURE(sym) __EXPORT_SYMBOL(sym, "_gpl_future")
 -- 
 2.23.0.187.g17f5b7556c-goog
