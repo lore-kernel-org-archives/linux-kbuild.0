@@ -1,66 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:24473 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729640AbfIDNuf (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:60220 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730462AbfIDOGS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Sep 2019 09:50:35 -0400
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id x84DoVE1017006
-        for <linux-kbuild@vger.kernel.org>; Wed, 4 Sep 2019 22:50:32 +0900
-Received: by mail-vs1-f47.google.com with SMTP id z14so8203969vsz.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Sep 2019 06:50:32 -0700 (PDT)
+        Wed, 4 Sep 2019 10:06:18 -0400
 MIME-Version: 1.0
-References: <201909041423.tfn4I8cY%lkp@intel.com>
-In-Reply-To: <201909041423.tfn4I8cY%lkp@intel.com>
+References: <20190831162555.31887-1-yamada.masahiro@socionext.com>
+ <20190831162555.31887-2-yamada.masahiro@socionext.com> <CAKwvOdm0zcyaBLdSVc7PmjUa-wyVuCaN=6qZoPLvnoJC1ammog@mail.gmail.com>
+ <CA+icZUWzSsFXLmrO2G7ochE62e=kByEV6UKregcJqZrJN1WJxQ@mail.gmail.com>
+ <CA+icZUXboR-0TzpSHf7a8MSjxPWxdC13Oudu8D+b+umtvWCCkg@mail.gmail.com> <CA+icZUVN1zRi5P8PPWMjXoXwtSCkbzTFNreYXi+0HtTjPnfkTQ@mail.gmail.com>
+In-Reply-To: <CA+icZUVN1zRi5P8PPWMjXoXwtSCkbzTFNreYXi+0HtTjPnfkTQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 4 Sep 2019 22:49:55 +0900
-Message-ID: <CAK7LNATG_rtO-QUPTWoEJr0pU+d0MW4TFUk9roFu6hfa0DerHw@mail.gmail.com>
-Subject: Re: [kbuild:kbuild 51/57] scripts/mkuboot.sh: 20: scripts/mkuboot.sh:
- -path:: not found
+Date: Wed, 4 Sep 2019 23:05:28 +0900
+Message-ID: <CAK7LNAQ28VedOdiHX-tKatT1ebzDNXM8b5CxcxKek3b271PgzA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] kbuild: rename KBUILD_ENABLE_EXTRA_GCC_CHECKS to KBUILD_EXTRA_WARN
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Sep 4, 2019 at 3:01 PM kbuild test robot <lkp@intel.com> wrote:
+On Wed, Sep 4, 2019 at 6:58 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
 >
-> tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild
-> head:   10dd50d6bdbada801cc8da64558e77b683fa17e2
-> commit: 1d99a66e29e339196aecd3acd6d8b6acd38bb8a6 [51/57] kbuild: add $(BASH) to run scripts with bash-extension
-> config: mips-allmodconfig (attached as .config)
-> compiler: mips-linux-gcc (GCC) 7.4.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 1d99a66e29e339196aecd3acd6d8b6acd38bb8a6
->         # save the attached .config to linux build tree
->         GCC_VERSION=7.4.0 make.cross ARCH=mips
+> On Wed, Sep 4, 2019 at 10:07 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> >
+> > On Wed, Sep 4, 2019 at 8:58 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> > >
+> > > On Tue, Sep 3, 2019 at 11:50 PM Nick Desaulniers
+> > > <ndesaulniers@google.com> wrote:
+> > > >
+> > > > On Sat, Aug 31, 2019 at 9:26 AM Masahiro Yamada
+> > > > <yamada.masahiro@socionext.com> wrote:
+> > > > >
+> > > > > KBUILD_ENABLE_EXTRA_GCC_CHECKS started as a switch to add extra warning
+> > > > > options for GCC, but now it is a historical misnomer since we use it
+> > > > > also for Clang, DTC, and even kernel-doc.
+> > > >
+> > > > Thanks for the patch!
+> > > > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> > > >
+> > >
+> > > Thanks for the patch.
+> > > I like the backward compatibility and am OK with pointing to 'make
+> > > --help' for the documentation part (KISS - Keep It Simple and
+> > > Short/Stupid).
+> > >
+> > > Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+> >
+> > If you will do a next version...
+> >
+> > - @echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
+> > + @echo  '  make W=n   [targets] Enable extra checks, n=1,2,3 where'
+> >
+> > ...clarify on extra checks for compiler...
+> >
+> > + @echo  '  make W=n   [targets] Enable extra *compiler* checks, n=1,2,3 where'
+> >
 >
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
+> +KBUILD_EXTRA_WARN
+> +-----------------
+> +Specify the extra build checks. The same value can be assigned by passing
+> +W=... from the command line.
 >
-> All errors (new ones prefixed by >>):
+> For consistency reasons might be better:
 >
-> >> scripts/mkuboot.sh: 20: scripts/mkuboot.sh: -path:: not found
+> - @echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
+> + @echo  '  make W=n   [targets] Enable extra build checks, n=1,2,3 where'
+>
 
-Thanks.
-
-I squashed this.
-
-
-index 3ce4dd578370..528bd73d530a 100644
---- a/arch/mips/boot/Makefile
-+++ b/arch/mips/boot/Makefile
-@@ -160,7 +160,7 @@ targets += vmlinux.lzo.itb
- quiet_cmd_itb-image = ITB     $@
-       cmd_itb-image = \
-                env PATH="$(objtree)/scripts/dtc:$(PATH)" \
--               $(CONFIG_SHELL) $(MKIMAGE) \
-+               $(BASH) $(MKIMAGE) \
-                -D "-I dts -O dtb -p 500 \
-                        --include $(objtree)/arch/mips \
-                        --warning no-unit_address_vs_reg" \
+OK, I will squash this. Thanks.
 
 
 -- 
