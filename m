@@ -1,30 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35202 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727787AbfIDHQo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Sep 2019 03:16:44 -0400
-Date: Wed, 4 Sep 2019 09:16:41 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v4 09/12] docs: Add documentation for Symbol Namespaces
-Message-ID: <20190904071641.GD18791@kroah.com>
-References: <20180716122125.175792-1-maco@android.com>
- <20190903150638.242049-1-maennich@google.com>
- <20190903150638.242049-10-maennich@google.com>
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44439 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727787AbfIDIIH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 4 Sep 2019 04:08:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903150638.242049-10-maennich@google.com>
+References: <20190831162555.31887-1-yamada.masahiro@socionext.com>
+ <20190831162555.31887-2-yamada.masahiro@socionext.com> <CAKwvOdm0zcyaBLdSVc7PmjUa-wyVuCaN=6qZoPLvnoJC1ammog@mail.gmail.com>
+ <CA+icZUWzSsFXLmrO2G7ochE62e=kByEV6UKregcJqZrJN1WJxQ@mail.gmail.com>
+In-Reply-To: <CA+icZUWzSsFXLmrO2G7ochE62e=kByEV6UKregcJqZrJN1WJxQ@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Wed, 4 Sep 2019 10:07:51 +0200
+Message-ID: <CA+icZUXboR-0TzpSHf7a8MSjxPWxdC13Oudu8D+b+umtvWCCkg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] kbuild: rename KBUILD_ENABLE_EXTRA_GCC_CHECKS to KBUILD_EXTRA_WARN
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: linux-kernel@vger.kernel.org, kernel-team@android.com, arnd@arndb.de, jeyu@kernel.org, joel@joelfernandes.org, lucas.de.marchi@gmail.com, maco@android.com, sspatil@google.com, will@kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org, linux-usb@vger.kernel.org, usb-storage@lists.one-eyed-alien.net, linux-watchdog@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, Sep 03, 2019 at 04:06:35PM +0100, Matthias Maennich wrote:
-> Describe using Symbol Namespaces from a perspective of a user. I.e.
-> module authors or subsystem maintainers.
-> 
-> Signed-off-by: Matthias Maennich <maennich@google.com>
+On Wed, Sep 4, 2019 at 8:58 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>
+> On Tue, Sep 3, 2019 at 11:50 PM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > On Sat, Aug 31, 2019 at 9:26 AM Masahiro Yamada
+> > <yamada.masahiro@socionext.com> wrote:
+> > >
+> > > KBUILD_ENABLE_EXTRA_GCC_CHECKS started as a switch to add extra warning
+> > > options for GCC, but now it is a historical misnomer since we use it
+> > > also for Clang, DTC, and even kernel-doc.
+> >
+> > Thanks for the patch!
+> > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> >
+>
+> Thanks for the patch.
+> I like the backward compatibility and am OK with pointing to 'make
+> --help' for the documentation part (KISS - Keep It Simple and
+> Short/Stupid).
+>
+> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
 
-Nice, it's good to have stuff to point people at.
+If you will do a next version...
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+- @echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
++ @echo  '  make W=n   [targets] Enable extra checks, n=1,2,3 where'
+
+...clarify on extra checks for compiler...
+
++ @echo  '  make W=n   [targets] Enable extra *compiler* checks, n=1,2,3 where'
+
+Thanks in advance.
+
+- Sedat -
