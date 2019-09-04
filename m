@@ -1,57 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44439 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727787AbfIDIIH (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:23311 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726358AbfIDIq2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Sep 2019 04:08:07 -0400
+        Wed, 4 Sep 2019 04:46:28 -0400
 MIME-Version: 1.0
-References: <20190831162555.31887-1-yamada.masahiro@socionext.com>
- <20190831162555.31887-2-yamada.masahiro@socionext.com> <CAKwvOdm0zcyaBLdSVc7PmjUa-wyVuCaN=6qZoPLvnoJC1ammog@mail.gmail.com>
- <CA+icZUWzSsFXLmrO2G7ochE62e=kByEV6UKregcJqZrJN1WJxQ@mail.gmail.com>
-In-Reply-To: <CA+icZUWzSsFXLmrO2G7ochE62e=kByEV6UKregcJqZrJN1WJxQ@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Wed, 4 Sep 2019 10:07:51 +0200
-Message-ID: <CA+icZUXboR-0TzpSHf7a8MSjxPWxdC13Oudu8D+b+umtvWCCkg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] kbuild: rename KBUILD_ENABLE_EXTRA_GCC_CHECKS to KBUILD_EXTRA_WARN
+References: <20180716122125.175792-1-maco@android.com> <20190903150638.242049-1-maennich@google.com>
+ <20190903150638.242049-13-maennich@google.com> <20190903161045.GA22754@roeck-us.net>
+In-Reply-To: <20190903161045.GA22754@roeck-us.net>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 4 Sep 2019 17:45:45 +0900
+Message-ID: <CAK7LNARYqqCSCc0G4FL7_bj80iMoLLJrUJ7B3+huD25EUkrttA@mail.gmail.com>
+Subject: Re: [PATCH v4 12/12] RFC: watchdog: export core symbols in
+ WATCHDOG_CORE namespace
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Matthias Maennich <maennich@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Cc: Android Kernel" <kernel-team@android.com>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jessica Yu <jeyu@kernel.org>, "Joel Fernandes (Google)" <joel@joelfernandes.org>, Lucas De Marchi <lucas.de.marchi@gmail.com>, maco@android.com, sspatil@google.com, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-modules@vger.kernel.org, linux-usb <linux-usb@vger.kernel.org>, usb-storage@lists.one-eyed-alien.net, linux-watchdog@vger.kernel.org
 
-On Wed, Sep 4, 2019 at 8:58 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+On Wed, Sep 4, 2019 at 1:10 AM Guenter Roeck <linux@roeck-us.net> wrote:
 >
-> On Tue, Sep 3, 2019 at 11:50 PM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
+> On Tue, Sep 03, 2019 at 04:06:38PM +0100, Matthias Maennich wrote:
+> > Modules using symbols from the WATCHDOG_CORE namespace are required to
+> > explicitly import the namespace. This patch was generated with the
+> > following steps and serves as a reference to use the symbol namespace
+> > feature:
 > >
-> > On Sat, Aug 31, 2019 at 9:26 AM Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
-> > >
-> > > KBUILD_ENABLE_EXTRA_GCC_CHECKS started as a switch to add extra warning
-> > > options for GCC, but now it is a historical misnomer since we use it
-> > > also for Clang, DTC, and even kernel-doc.
+> >  1) Use EXPORT_SYMBOL_NS* macros instead of EXPORT_SYMBOL* for symbols
+> >     in watchdog_core.c
+> >  2) make  (see warnings during modpost about missing imports)
+> >  3) make nsdeps
 > >
-> > Thanks for the patch!
-> > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> > I used 'allmodconfig' for the above steps to ensure all occurrences are
+> > patched.
 > >
+> > Defining DEFAULT_SYMBOL_NAMESPACE in the Makefile is not trivial in this
+> > case as not only watchdog_core is defined in drivers/watchdog/Makefile.
+> > Hence this patch uses the variant of using the EXPORT_SYMBOL_NS* macros
+> > to export into a different namespace.
+> >
+> > An alternative to this patch would be a single definition line before
+> > any use of EXPORT_SYMBOL*:
+> >  #define DEFAULT_SYMBOL_NAMESPACE WATCHDOG_CORE
+> >
+> > This patch serves as a reference on how to use the symbol namespaces.
+> >
+> > Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Signed-off-by: Matthias Maennich <maennich@google.com>
 >
-> Thanks for the patch.
-> I like the backward compatibility and am OK with pointing to 'make
-> --help' for the documentation part (KISS - Keep It Simple and
-> Short/Stupid).
+> As mentioned before, I am opposed to this set of changes. I don't see
+> the point of restricting the use of exported symbols in WATCHDOG_CORE.
 >
-> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Guenter
 
-If you will do a next version...
 
-- @echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
-+ @echo  '  make W=n   [targets] Enable extra checks, n=1,2,3 where'
+I agree.
 
-...clarify on extra checks for compiler...
+I do not like this patch set either.
 
-+ @echo  '  make W=n   [targets] Enable extra *compiler* checks, n=1,2,3 where'
+Anyway, the last two patches (usb-stroage, watchdog)
+are useful to demonstrate
+that this has a bad taste.
 
-Thanks in advance.
 
-- Sedat -
+--
+Best Regards
+Masahiro Yamada
