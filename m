@@ -1,123 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:45287 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405979AbfIGNHJ (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:36148 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727467AbfIGVIW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Sep 2019 09:07:09 -0400
-MIME-Version: 1.0
-References: <20190906151059.1077708-1-arnd@arndb.de> <7fc19dd4-93fb-fa15-3d36-3079cd42cf7c@linux.com>
- <17ee4877-d24a-12ad-5836-411e3e525933@linux.com>
-In-Reply-To: <17ee4877-d24a-12ad-5836-411e3e525933@linux.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Sat, 7 Sep 2019 15:06:51 +0200
-Message-ID: <CAK8P3a1kpLgTBqd_VC8_V7UL_gvf7kZmyaSjbbHpqsaFQ00KyQ@mail.gmail.com>
+        Sat, 7 Sep 2019 17:08:22 -0400
 Subject: Re: [PATCH] mostpost: don't warn about symbols from another file
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+References: <20190906151059.1077708-1-arnd@arndb.de>
+From: Denis Efremov <efremov@linux.com>
+Message-ID: <aa79df36-8698-3490-ef7f-f9c6a90c34c6@linux.com>
+Date: Sun, 8 Sep 2019 00:08:14 +0300
+MIME-Version: 1.0
+In-Reply-To: <20190906151059.1077708-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denis Efremov <efremov@linux.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, Sam Ravnborg <sam@ravnborg.org>, WANG Chao <chao.wang@ucloud.cn>, Sami Tolvanen <samitolvanen@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: Emil Velikov <emil.l.velikov@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, Sam Ravnborg <sam@ravnborg.org>, WANG Chao <chao.wang@ucloud.cn>, Sami Tolvanen <samitolvanen@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Sep 7, 2019 at 7:28 AM Denis Efremov <efremov@linux.com> wrote:
-> On 07.09.2019 01:39, Denis Efremov wrote:
-> >> This is not helpful, as these are clearly not static symbols
-> >> at all. Suppress the warning in a case like this.
-> >>
-> >
-> > It looks very similar to this discussion https://lkml.org/lkml/2019/7/30/112
-> >
-> > Could you please write the steps to reproduce the warnings?
->
-> > Now, I'm trying to build linux-next (host Ubuntu 19.04 x86_64) with:
-> > $ make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi-
-> > But I can't get these warnings.
->
-> Tried defconfig, allyesconfig.
 
-I only have one randconfig build that caused these, see
-http://paste.ubuntu.com/p/D6w8RNS7MG/ for the .config
 
-I was building linux-next with the clang-9 toolchain from http://apt.llvm.org,
-but that should not matter here.
+On 06.09.2019 18:10, Arnd Bergmann wrote:
+> On architectures such as ARM that have a list of symbols exported
+> from assembler in a separate C file, we get a lot of new warnings:
+> 
+> WARNING: "__ashrdi3" [vmlinux] is a static (unknown) WARNING:
+> "__lshrdi3" [vmlinux] is a static (unknown) WARNING: "__aeabi_llsr"
+> [vmlinux] is a static (unknown) WARNING: "__aeabi_lasr" [vmlinux] is
+> a static (unknown) WARNING: "__aeabi_uidivmod" [vmlinux] is a static
+> (unknown) WARNING: "__udivsi3" [vmlinux] is a static (unknown) 
+> WARNING: "_change_bit" [vmlinux] is a static (unknown) WARNING:
+> "__aeabi_idiv" [vmlinux] is a static (unknown) WARNING: "__umodsi3"
+> [vmlinux] is a static (unknown) WARNING: "__aeabi_uidiv" [vmlinux] is
+> a static (unknown) WARNING: "__aeabi_idivmod" [vmlinux] is a static
+> (unknown) WARNING: "__muldi3" [vmlinux] is a static (unknown) 
+> WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown) WARNING:
+> "__raw_writesb" [vmlinux] is a static (unknown) WARNING:
+> "__raw_readsb" [vmlinux] is a static (unknown) ...
+> 
+> This is not helpful, as these are clearly not static symbols at all.
+> Suppress the warning in a case like this.
+> 
+> Fixes: 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL*
+> functions") Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-> > I would like to check the type of this asm symbols. It seems like they
-> > are STT_NOTYPE. In this case the fix could also involve ELF_ST_TYPE check.
-> >
->
-> Ah, I forgot that we don't check the type at all, so this is not the case.
-> But still, I would like to test what if the remove binding check at all?
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 76c221dd9b2b..97dbcebf2338 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -1987,14 +1987,12 @@ static void read_symbols(const char *modname)
->         for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
->                 unsigned char bind = ELF_ST_BIND(sym->st_info);
->
-> -               if (bind == STB_GLOBAL || bind == STB_WEAK) {
->                         struct symbol *s =
->                                 find_symbol(remove_dot(info.strtab +
->                                                        sym->st_name));
->
->                         if (s)
->                                 s->is_static = 0;
-> -               }
->         }
->
->         if (!is_vmlinux(modname) || vmlinux_section_warnings)
+Tested-by: Denis Efremov <efremov@linux.com>
 
-Unfortunately, I still get the same warnings, plus one about modpost.c:
+What I could add here is that all these symbols are:
+$ nm vmlinux | grep '__ashrdi3\|__lshrdi3\|__aeabi_llsr\|...'
+cd63c845 A __crc___aeabi_lasr
+76cf47f6 A __crc___aeabi_llsl
+8a4fa83b A __crc___aeabi_llsr
+44643b93 A __crc___aeabi_lmul
+f564412a A __crc___aeabi_ulcmp
+40f07981 A __crc___ashldi3
+edd9106d A __crc___ashrdi3
+389ecf9e A __crc___bswapdi2
+f1ea6f1c A __crc___bswapsi2
+14d4a9c5 A __crc__change_bit
+ff67b37f A __crc___lshrdi3
+800e4ffa A __crc___muldi3
+f7163ec9 A __crc___raw_readsb
+f0ed2ef4 A __crc___raw_writesb
+ffb94ef0 A __crc__test_and_change_bit
+7cc035a7 A __crc___ucmpdi2
 
-scripts/mod/modpost.c:1988:17: warning: unused variable ‘bind’
-[-Wunused-variable]
-WARNING: "__ashrdi3" [vmlinux] is a static (unknown)
-WARNING: "__lshrdi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsr" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lasr" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_uidivmod" [vmlinux] is a static (unknown)
-WARNING: "__udivsi3" [vmlinux] is a static (unknown)
-WARNING: "_change_bit" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_idiv" [vmlinux] is a static (unknown)
-WARNING: "__umodsi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_uidiv" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_idivmod" [vmlinux] is a static (unknown)
-WARNING: "__muldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown)
-WARNING: "__raw_writesb" [vmlinux] is a static (unknown)
-WARNING: "__raw_readsb" [vmlinux] is a static (unknown)
-WARNING: "__ucmpdi2" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lmul" [vmlinux] is a static (unknown)
-WARNING: "__divsi3" [vmlinux] is a static (unknown)
-WARNING: "__modsi3" [vmlinux] is a static (unknown)
-WARNING: "_test_and_change_bit" [vmlinux] is a static (unknown)
-WARNING: "__bswapdi2" [vmlinux] is a static (unknown)
-WARNING: "__bswapsi2" [vmlinux] is a static (unknown)
-WARNING: "__ashldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsl" [vmlinux] is a static (unknown)
-WARNING: "__ashrdi3" [vmlinux] is a static (unknown)
-WARNING: "__lshrdi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsr" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lasr" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_uidivmod" [vmlinux] is a static (unknown)
-WARNING: "__udivsi3" [vmlinux] is a static (unknown)
-WARNING: "_change_bit" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_idiv" [vmlinux] is a static (unknown)
-WARNING: "__umodsi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_uidiv" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_idivmod" [vmlinux] is a static (unknown)
-WARNING: "__muldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown)
-WARNING: "__raw_writesb" [vmlinux] is a static (unknown)
-WARNING: "__raw_readsb" [vmlinux] is a static (unknown)
-WARNING: "__ucmpdi2" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lmul" [vmlinux] is a static (unknown)
-WARNING: "__divsi3" [vmlinux] is a static (unknown)
-WARNING: "__modsi3" [vmlinux] is a static (unknown)
-WARNING: "_test_and_change_bit" [vmlinux] is a static (unknown)
-WARNING: "__bswapdi2" [vmlinux] is a static (unknown)
-WARNING: "__bswapsi2" [vmlinux] is a static (unknown)
-WARNING: "__ashldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsl" [vmlinux] is a static (unknown)
+There is no ksymtab, kstrtab for them and there is
+no the exact symbols, only crc.
 
-     Arnd
+Thus they get to the symbolhash table from
+handle_modversions() -> sym_update_crc().
+
+Since there is no the exact symbols, e.g. like
+nm vmlinux | grep __kmalloc
+2d6fcc06 A __crc___kmalloc
+c01c922d T __kmalloc           <---
+c0749192 r __kstrtab___kmalloc
+c073c7c4 r __ksymtab___kmalloc
+
+we can't check them in this cycle:
+// check for static EXPORT_SYMBOL_* functions && global vars
+for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+
+and they are automatically marked as static.
+
+That's all so far, I don't know is it correct to have only
+__crc* or not for a symbol.
+
+Just a sidenote:
+arch/arm/kernel/armksyms.c states that these are
+/*
+ * libgcc functions - functions that are used internally by the
+ * compiler...
+
+
+Thanks,
+Denis
+
+> --- scripts/mod/modpost.c | 2 +- 1 file changed, 1 insertion(+), 1
+> deletion(-)
+> 
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c index
+> 76c221dd9b2b..4265dd924933 100644 --- a/scripts/mod/modpost.c +++
+> b/scripts/mod/modpost.c @@ -2543,7 +2543,7 @@ int main(int argc, char
+> **argv) struct symbol *s = symbolhash[n];
+> 
+> while (s) { -			if (s->is_static) +			if (s->is_static && s->export
+> != export_unknown) warn("\"%s\" [%s] is a static %s\n", s->name,
+> s->module->name, export_str(s->export));
+> 
