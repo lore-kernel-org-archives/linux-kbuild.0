@@ -1,81 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:46956 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392542AbfIFWjQ (ORCPT
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:38974 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406427AbfIGBfx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Sep 2019 18:39:16 -0400
-Subject: Re: [PATCH] mostpost: don't warn about symbols from another file
-References: <20190906151059.1077708-1-arnd@arndb.de>
-From: Denis Efremov <efremov@linux.com>
-Message-ID: <7fc19dd4-93fb-fa15-3d36-3079cd42cf7c@linux.com>
-Date: Sat, 7 Sep 2019 01:39:11 +0300
+        Fri, 6 Sep 2019 21:35:53 -0400
+Received: by mail-vs1-f65.google.com with SMTP id y62so5280438vsb.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Sep 2019 18:35:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906151059.1077708-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Reply-To: waltonalice41@gmail.com
+From: Alice Walton <saraharmony501@gmail.com>
+Date: Sat, 7 Sep 2019 02:35:52 +0100
+Message-ID: <CAHoQAbVi2eUJHHAx8-i6uv=tXXkdZbDQj+bGXrd4foXr+8goAQ@mail.gmail.com>
+Subject: Please forgive me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
-Cc: Emil Velikov <emil.l.velikov@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, Sam Ravnborg <sam@ravnborg.org>, WANG Chao <chao.wang@ucloud.cn>, Sami Tolvanen <samitolvanen@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+My Dearest,
 
-On 06.09.2019 18:10, Arnd Bergmann wrote:
-> On architectures such as ARM that have a list of symbols exported from
-> assembler in a separate C file, we get a lot of new warnings:
-> 
-> WARNING: "__ashrdi3" [vmlinux] is a static (unknown)
-> WARNING: "__lshrdi3" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_llsr" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_lasr" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_uidivmod" [vmlinux] is a static (unknown)
-> WARNING: "__udivsi3" [vmlinux] is a static (unknown)
-> WARNING: "_change_bit" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_idiv" [vmlinux] is a static (unknown)
-> WARNING: "__umodsi3" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_uidiv" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_idivmod" [vmlinux] is a static (unknown)
-> WARNING: "__muldi3" [vmlinux] is a static (unknown)
-> WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown)
-> WARNING: "__raw_writesb" [vmlinux] is a static (unknown)
-> WARNING: "__raw_readsb" [vmlinux] is a static (unknown)
-> ...
-> 
-> This is not helpful, as these are clearly not static symbols
-> at all. Suppress the warning in a case like this.
-> 
+Please forgive me for stressing you with my predicaments as I know
+that this letter may come to you as a big surprise.
 
-It looks very similar to this discussion https://lkml.org/lkml/2019/7/30/112
+Actually, I came across your E-mail from my personal search afterward
+I decided to email you directly believing that you will be honest to
+fulfil my final wish before anything happens to me. Meanwhile, I am
+Madam Alice Walton, 71 years old childless widow from France but i
+reside and doing Gold mining business in Africa before i fall sick.
 
-Could you please write the steps to reproduce the warnings?
-Now, I'm trying to build linux-next (host Ubuntu 19.04 x86_64) with:
-$ make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi-
-But I can't get these warnings.
+I am suffering from Adenocarcinoma Cancer of the lungs for the past 8
+years and from all indication my condition is really deteriorating as
+my doctors have confirmed and courageously advised me that I may not
+live beyond 3 weeks from now for the reason that my tumor has reached
+a critical stage which has defiled all forms of medical treatment.
 
-I would like to check the type of this asm symbols. It seems like they
-are STT_NOTYPE. In this case the fix could also involve ELF_ST_TYPE check.
+Since my days are numbered, I=E2=80=99ve decided willingly to fulfil my
+long-time vow to donate to the less privileges the sum of($18.5
+million dollars) I deposited in my offshore account over 7 years now
+because I have tried to handle this project by myself but I have seen
+that my health could not allow me to do so anymore.
 
-Thanks,
-Denis
+My promise to God includes building of well-equipped charity
+foundation/hospital and a technical school for the orphans and less
+privileges.
 
-> Fixes: 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL* functions")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  scripts/mod/modpost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 76c221dd9b2b..4265dd924933 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -2543,7 +2543,7 @@ int main(int argc, char **argv)
->  		struct symbol *s = symbolhash[n];
->  
->  		while (s) {
-> -			if (s->is_static)
-> +			if (s->is_static && s->export != export_unknown)
->  				warn("\"%s\" [%s] is a static %s\n",
->  				     s->name, s->module->name,
->  				     export_str(s->export));
-> 
+Since i am not capable to handle this again myself due to my critical
+health condition,please i need your consent to help me receive my
+money from the bank and use it to do this divine works of God in your
+country in my name so that my soul can be at rest if anything happens
+to me.
+
+If you will be honest, kind and willing to assist me handle this
+charity project as I=E2=80=99ve mentioned here, I will like you to provide =
+me
+your personal data like,
+
+(1) Your full name:
+(2) country:
+(3) Occupation:
+(4) phone number:
+(5) Age:
+
+Let me have this data so that i can link you up with my bank as my
+representative and receiver of the funds now that i am still alive.
+
+Warmest Regards!
+Mrs. Alice Walton
