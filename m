@@ -1,174 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:54371 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729342AbfIIKxm (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:20659 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732685AbfIIK7B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Sep 2019 06:53:42 -0400
+        Mon, 9 Sep 2019 06:59:01 -0400
+MIME-Version: 1.0
+References: <20190906151059.1077708-1-arnd@arndb.de>
+In-Reply-To: <20190906151059.1077708-1-arnd@arndb.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] export.h, genksyms: do not make genksyms calculate CRC of trimmed symbols
-Date: Mon,  9 Sep 2019 19:53:17 +0900
-Message-Id: <20190909105317.20473-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20190909105317.20473-1-yamada.masahiro@socionext.com>
-References: <20190909105317.20473-1-yamada.masahiro@socionext.com>
+Date: Mon, 9 Sep 2019 19:58:12 +0900
+Message-ID: <CAK7LNAR_6cQs33nOsJyVCmztw62dx=0W59KWo4WH+SoUnzOJoQ@mail.gmail.com>
+Subject: Re: [PATCH] mostpost: don't warn about symbols from another file
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Denis Efremov <efremov@linux.com>, Nicolas Pitre <nico@fluxnic.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <michal.lkml@markovi.net>, Emil Velikov <emil.l.velikov@gmail.com>, Denis Efremov <efremov@linux.com>, Paul Walmsley <paul.walmsley@sifive.com>, Sam Ravnborg <sam@ravnborg.org>, WANG Chao <chao.wang@ucloud.cn>, Sami Tolvanen <samitolvanen@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Arnd Bergmann reported false-positive modpost warnings detected by
-his randconfig testing of linux-next:
+On Sat, Sep 7, 2019 at 12:11 AM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On architectures such as ARM that have a list of symbols exported from
+> assembler in a separate C file, we get a lot of new warnings:
+>
+> WARNING: "__ashrdi3" [vmlinux] is a static (unknown)
+> WARNING: "__lshrdi3" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_llsr" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_lasr" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_uidivmod" [vmlinux] is a static (unknown)
+> WARNING: "__udivsi3" [vmlinux] is a static (unknown)
+> WARNING: "_change_bit" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_idiv" [vmlinux] is a static (unknown)
+> WARNING: "__umodsi3" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_uidiv" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_idivmod" [vmlinux] is a static (unknown)
+> WARNING: "__muldi3" [vmlinux] is a static (unknown)
+> WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown)
+> WARNING: "__raw_writesb" [vmlinux] is a static (unknown)
+> WARNING: "__raw_readsb" [vmlinux] is a static (unknown)
+> ...
+>
+> This is not helpful, as these are clearly not static symbols
+> at all. Suppress the warning in a case like this.
+>
+> Fixes: 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL* functions")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-  https://lkml.org/lkml/2019/9/6/619
 
-Actually, this happens under the combination of CONFIG_MODVERSIONS=y
-and CONFIG_TRIM_UNUSED_KSYMS=y since commit 15bfc2348d54 ("modpost:
-check for static EXPORT_SYMBOL* functions").
+This patch is not root-causing the problem,
+rather it is hiding it.
 
-For example, arch/arm/config/multi_v7_defconfig + CONFIG_MODVERSIONS=y
-+ CONFIG_TRIM_UNUSED_KSYMS=y produces the following false-positives:
+I posted a real fix:
+https://patchwork.kernel.org/patch/11137689/
 
-WARNING: "__lshrdi3" [vmlinux] is a static (unknown)
-WARNING: "__ashrdi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lasr" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsr" [vmlinux] is a static (unknown)
-WARNING: "ftrace_set_clr_event" [vmlinux] is a static (unknown)
-WARNING: "__muldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_ulcmp" [vmlinux] is a static (unknown)
-WARNING: "__ucmpdi2" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_lmul" [vmlinux] is a static (unknown)
-WARNING: "__bswapsi2" [vmlinux] is a static (unknown)
-WARNING: "__bswapdi2" [vmlinux] is a static (unknown)
-WARNING: "__ashldi3" [vmlinux] is a static (unknown)
-WARNING: "__aeabi_llsl" [vmlinux] is a static (unknown)
 
-The root cause of the problem is not in the modpost, but in the
-implementation of CONFIG_TRIM_UNUSED_KSYMS.
 
-If there is at least one untrimmed symbol in the file, genksyms is
-invoked to calculate CRC of *all* the symbols in that file even if
-some of them have been trimmed due to no caller existing.
+> ---
+>  scripts/mod/modpost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 76c221dd9b2b..4265dd924933 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -2543,7 +2543,7 @@ int main(int argc, char **argv)
+>                 struct symbol *s = symbolhash[n];
+>
+>                 while (s) {
+> -                       if (s->is_static)
+> +                       if (s->is_static && s->export != export_unknown)
+>                                 warn("\"%s\" [%s] is a static %s\n",
+>                                      s->name, s->module->name,
+>                                      export_str(s->export));
+> --
+> 2.20.0
+>
 
-As a result, .tmp_*.ver files contain CRC of trimmed symbols, thus
-unneeded __crc* symbols are added to objects. It has been harmless
-until recently.
 
-Since commit 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL*
-functions"), it is harmful because the bogus __crc* symbols make
-modpost call sym_update_crc(), and then new_symbol(), but there is
-no one that clears the ->is_static member.
-
-I gave Fixes to the first commit that uncovered the issue, but the
-potential problem has long existed since commit f235541699bc
-("export.h: allow for per-symbol configurable EXPORT_SYMBOL()").
-
-Fixes: 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL* functions")
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- include/linux/export.h      | 42 ++++++++++++++-----------------------
- scripts/genksyms/keywords.c |  6 +-----
- 2 files changed, 17 insertions(+), 31 deletions(-)
-
-diff --git a/include/linux/export.h b/include/linux/export.h
-index cdd98a0d918c..7d8c112a8b61 100644
---- a/include/linux/export.h
-+++ b/include/linux/export.h
-@@ -18,9 +18,6 @@ extern struct module __this_module;
- #define THIS_MODULE ((struct module *)0)
- #endif
- 
--#ifdef CONFIG_MODULES
--
--#if !defined(__GENKSYMS__)
- #ifdef CONFIG_MODVERSIONS
- /* Mark the CRC weak since genksyms apparently decides not to
-  * generate a checksums for some symbols */
-@@ -74,6 +71,12 @@ struct kernel_symbol {
- };
- #endif
- 
-+#ifdef __GENKSYMS__
-+
-+#define ___EXPORT_SYMBOL(sym, sec)	__GENKSYMS_EXPORT_SYMBOL(sym)
-+
-+#else
-+
- /* For every exported symbol, place a struct in the __ksymtab section */
- #define ___EXPORT_SYMBOL(sym, sec)					\
- 	extern typeof(sym) sym;						\
-@@ -83,7 +86,9 @@ struct kernel_symbol {
- 	= #sym;								\
- 	__KSYMTAB_ENTRY(sym, sec)
- 
--#if defined(__DISABLE_EXPORTS)
-+#endif
-+
-+#if !defined(CONFIG_MODULES) || defined(__DISABLE_EXPORTS)
- 
- /*
-  * Allow symbol exports to be disabled completely so that C code may
-@@ -117,37 +122,22 @@ struct kernel_symbol {
- #define __cond_export_sym_0(sym, sec) /* nothing */
- 
- #else
--#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
--#endif
- 
--#define EXPORT_SYMBOL(sym)					\
--	__EXPORT_SYMBOL(sym, "")
-+#define __EXPORT_SYMBOL(sym, sec)	___EXPORT_SYMBOL(sym, sec)
- 
--#define EXPORT_SYMBOL_GPL(sym)					\
--	__EXPORT_SYMBOL(sym, "_gpl")
--
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
--	__EXPORT_SYMBOL(sym, "_gpl_future")
-+#endif /* CONFIG_MODULES */
- 
-+#define EXPORT_SYMBOL(sym)		__EXPORT_SYMBOL(sym, "")
-+#define EXPORT_SYMBOL_GPL(sym)		__EXPORT_SYMBOL(sym, "_gpl")
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)	__EXPORT_SYMBOL(sym, "_gpl_future")
- #ifdef CONFIG_UNUSED_SYMBOLS
--#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
--#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
-+#define EXPORT_UNUSED_SYMBOL(sym)	__EXPORT_SYMBOL(sym, "_unused")
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)	__EXPORT_SYMBOL(sym, "_unused_gpl")
- #else
- #define EXPORT_UNUSED_SYMBOL(sym)
- #define EXPORT_UNUSED_SYMBOL_GPL(sym)
- #endif
- 
--#endif	/* __GENKSYMS__ */
--
--#else /* !CONFIG_MODULES... */
--
--#define EXPORT_SYMBOL(sym)
--#define EXPORT_SYMBOL_GPL(sym)
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)
--#define EXPORT_UNUSED_SYMBOL(sym)
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)
--
--#endif /* CONFIG_MODULES */
- #endif /* !__ASSEMBLY__ */
- 
- #endif /* _LINUX_EXPORT_H */
-diff --git a/scripts/genksyms/keywords.c b/scripts/genksyms/keywords.c
-index c586d32dd2c3..7a85c4e21175 100644
---- a/scripts/genksyms/keywords.c
-+++ b/scripts/genksyms/keywords.c
-@@ -3,11 +3,7 @@ static struct resword {
- 	const char *name;
- 	int token;
- } keywords[] = {
--	{ "EXPORT_SYMBOL", EXPORT_SYMBOL_KEYW },
--	{ "EXPORT_SYMBOL_GPL", EXPORT_SYMBOL_KEYW },
--	{ "EXPORT_SYMBOL_GPL_FUTURE", EXPORT_SYMBOL_KEYW },
--	{ "EXPORT_UNUSED_SYMBOL", EXPORT_SYMBOL_KEYW },
--	{ "EXPORT_UNUSED_SYMBOL_GPL", EXPORT_SYMBOL_KEYW },
-+	{ "__GENKSYMS_EXPORT_SYMBOL", EXPORT_SYMBOL_KEYW },
- 	{ "__asm", ASM_KEYW },
- 	{ "__asm__", ASM_KEYW },
- 	{ "__attribute", ATTRIBUTE_KEYW },
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
