@@ -1,165 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:51694 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730923AbfILLul (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:42382 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730119AbfILQXJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Sep 2019 07:50:41 -0400
-MIME-Version: 1.0
-References: <20190907025236.31393-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20190907025236.31393-1-yamada.masahiro@socionext.com>
+        Thu, 12 Sep 2019 12:23:09 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 12 Sep 2019 20:49:50 +0900
-Message-ID: <CAK7LNAQukxuyshqVausLr5bBgUHQD4TZo6zGa79oYPhpX85xcg@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: allow Clang to find unused static inline
- functions for W=1 build
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2 3/4] kbuild: clear KBUILD_MODULES in top Makefile if CONFIG_MODULES=n
+Date: Fri, 13 Sep 2019 01:22:53 +0900
+Message-Id: <20190912162254.9603-3-yamada.masahiro@socionext.com>
+In-Reply-To: <20190912162254.9603-1-yamada.masahiro@socionext.com>
+References: <20190912162254.9603-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Sat, Sep 7, 2019 at 11:53 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> GCC and Clang have different policy for -Wunused-function; GCC does not
-> warn unused static inline functions at all whereas Clang does if they
-> are defined in source files instead of included headers although it has
-> been suppressed since commit abb2ea7dfd82 ("compiler, clang: suppress
-> warning for unused static inline functions").
->
-> We often miss to delete unused functions where 'static inline' is used
-> in *.c files since there is no tool to detect them. Unused code remains
-> until somebody notices. For example, commit 075ddd75680f ("regulator:
-> core: remove unused rdev_get_supply()").
->
-> Let's remove __maybe_unused from the inline macro to allow Clang to
-> start finding unused static inline functions. For now, we do this only
-> for W=1 build since it is not a good idea to sprinkle warnings for the
-> normal build (e.g. 35 warnings for arch/x86/configs/x86_64_defconfig).
->
-> My initial attempt was to add -Wno-unused-function for no W= build
-> (https://lore.kernel.org/patchwork/patch/1120594/)
->
-> Nathan Chancellor pointed out that would weaken Clang's checks since
-> we would no longer get -Wunused-function without W=1. It is true GCC
-> would catch unused static non-inline functions, but it would weaken
-> Clang as a standalone compiler, at least.
->
-> Hence, here is a counter implementation. The current problem is, W=...
-> only controls compiler flags, which are globally effective. There is
-> no way to address only 'static inline' functions.
->
-> This commit defines KBUILD_EXTRA_WARN[123] corresponding to W=[123].
-> When KBUILD_EXTRA_WARN1 is defined, __maybe_unused is omitted from
-> the 'inline' macro.
->
-> The new macro __inline_maybe_unused makes the code a bit uglier, so I
-> hope we can remove it entirely after fixing most of the warnings.
->
-> If you contribute to code clean-up, please run "make CC=clang W=1"
-> and check -Wunused-function warnings. You will find lots of unused
-> functions.
->
-> Some of them are false-positives because the call-sites are disabled
-> by #ifdef. I do not like to abuse the inline keyword for suppressing
-> unused-function warnings because it is intended to be a hint for the
-> compiler optimization. I prefer #ifdef around the definition, or
-> __maybe_unused if #ifdef would make the code too ugly.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
+Do not try to build any module-related artifacts when CONFIG_MODULES
+is disabled.
 
-Applied to linux-kbuild.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
->
-> Changes in v2:
->  - Rebase on top of https://patchwork.kernel.org/patch/11124933/
->
->  include/linux/compiler_types.h | 20 ++++++++++++++------
->  scripts/Makefile.extrawarn     |  6 ++++++
->  2 files changed, 20 insertions(+), 6 deletions(-)
->
-> diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-> index 599c27b56c29..b056a40116da 100644
-> --- a/include/linux/compiler_types.h
-> +++ b/include/linux/compiler_types.h
-> @@ -130,10 +130,6 @@ struct ftrace_likely_data {
->
->  /*
->   * Force always-inline if the user requests it so via the .config.
-> - * GCC does not warn about unused static inline functions for
-> - * -Wunused-function.  This turns out to avoid the need for complex #ifdef
-> - * directives.  Suppress the warning in clang as well by using "unused"
-> - * function attribute, which is redundant but not harmful for gcc.
->   * Prefer gnu_inline, so that extern inline functions do not emit an
->   * externally visible function. This makes extern inline behave as per gnu89
->   * semantics rather than c99. This prevents multiple symbol definition errors
-> @@ -144,15 +140,27 @@ struct ftrace_likely_data {
->   */
->  #if !defined(CONFIG_OPTIMIZE_INLINING)
->  #define inline inline __attribute__((__always_inline__)) __gnu_inline \
-> -       __maybe_unused notrace
-> +       __inline_maybe_unused notrace
->  #else
->  #define inline inline                                    __gnu_inline \
-> -       __maybe_unused notrace
-> +       __inline_maybe_unused notrace
->  #endif
->
->  #define __inline__ inline
->  #define __inline   inline
->
-> +/*
-> + * GCC does not warn about unused static inline functions for -Wunused-function.
-> + * Suppress the warning in clang as well by using __maybe_unused, but enable it
-> + * for W=1 build. This will allow clang to find unused functions. Remove the
-> + * __inline_maybe_unused entirely after fixing most of -Wunused-function warnings.
-> + */
-> +#ifdef KBUILD_EXTRA_WARN1
-> +#define __inline_maybe_unused
-> +#else
-> +#define __inline_maybe_unused __maybe_unused
-> +#endif
-> +
->  /*
->   * Rather then using noinline to prevent stack consumption, use
->   * noinline_for_stack instead.  For documentation reasons.
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 53eb7e0c6a5a..ecddf83ac142 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -36,6 +36,8 @@ KBUILD_CFLAGS += $(call cc-option, -Wstringop-truncation)
->  KBUILD_CFLAGS += -Wno-missing-field-initializers
->  KBUILD_CFLAGS += -Wno-sign-compare
->
-> +KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN1
-> +
->  else
->
->  # Some diagnostics enabled by default are noisy.
-> @@ -65,6 +67,8 @@ KBUILD_CFLAGS += -Wsign-compare
->  KBUILD_CFLAGS += $(call cc-option, -Wmaybe-uninitialized)
->  KBUILD_CFLAGS += $(call cc-option, -Wunused-macros)
->
-> +KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN2
-> +
->  endif
->
->  #
-> @@ -82,4 +86,6 @@ KBUILD_CFLAGS += -Wredundant-decls
->  KBUILD_CFLAGS += -Wswitch-default
->  KBUILD_CFLAGS += $(call cc-option, -Wpacked-bitfield-compat)
->
-> +KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN3
-> +
->  endif
-> --
-> 2.17.1
->
+Changes in v2:
+  - New patch
 
+ Makefile               | 4 ++++
+ scripts/Makefile.build | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index adc0cabe2382..0ecc62dbe234 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1797,6 +1797,10 @@ single-build = $(if $(filter-out $@/, $(single-no-ko)),1)
+ 
+ endif
+ 
++ifndef CONFIG_MODULES
++KBUILD_MODULES :=
++endif
++
+ # FIXME Should go into a make.lib or something
+ # ===========================================================================
+ 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index fb29c898604a..aab9a14fa78d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -76,7 +76,7 @@ else ifneq ($(real-obj-y),)
+ builtin-target := __warn-orphan-obj-y
+ endif
+ 
+-ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
++ifdef need-modorder
+ modorder-target := $(obj)/modules.order
+ endif
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
