@@ -1,76 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34526 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727570AbfINT1q (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:53290 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725795AbfINXno (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Sep 2019 15:27:46 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n9so17057329pgc.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Sep 2019 12:27:45 -0700 (PDT)
-Date: Sat, 14 Sep 2019 12:27:44 -0700 (PDT)
-Subject: RE: [RFC] buildtar: add case for riscv architecture
-In-Reply-To: <MN2PR04MB60613FADCF3482C14F29F4558DB20@MN2PR04MB6061.namprd04.prod.outlook.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-4e30fb12-057c-425c-a867-ecf93e080ed9@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Sat, 14 Sep 2019 19:43:44 -0400
+Message-ID: <c90c07552347ce3ae26ad6115d7bee7a6fbcaaa3.camel@decadent.org.uk>
+Subject: Re: [PATCH] Documentation: kbuild: Add document about reproducible
+ builds
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 14 Sep 2019 12:15:50 +0100
+In-Reply-To: <20190913062811.GG8267@fjasle.eu>
+References: <20190911115353.yngbk6hf6gwctock@decadent.org.uk>
+         <20190913062811.GG8267@fjasle.eu>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-T61ovYkJ++u0q7lrH+Xr"
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anup Patel <Anup.Patel@wdc.com>
-Cc: mail@aurabindo.in, Troy Benjegerdes <troy.benjegerdes@sifive.com>, Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, ab@php.net
 
-On Sat, 14 Sep 2019 06:05:59 PDT (-0700), Anup Patel wrote:
-> 
-> 
->> -----Original Message-----
->> From: linux-kernel-owner@vger.kernel.org <linux-kernel-
->> owner@vger.kernel.org> On Behalf Of Palmer Dabbelt
->> Sent: Saturday, September 14, 2019 6:30 PM
->> To: mail@aurabindo.in
->> Cc: Troy Benjegerdes <troy.benjegerdes@sifive.com>; Paul Walmsley
->> <paul.walmsley@sifive.com>; aou@eecs.berkeley.edu; linux-
->> riscv@lists.infradead.org; linux-kernel@vger.kernel.org; linux-
->> kbuild@vger.kernel.org
->> Subject: Re: [RFC] buildtar: add case for riscv architecture
->> 
->> On Wed, 11 Sep 2019 05:54:07 PDT (-0700), mail@aurabindo.in wrote:
->> >
->> >
->> >> None of the available RiscV platforms that I’m aware of use compressed
->> images, unless there are some new bootloaders I haven’t seen yet.
->> >>
->> >
->> > I noticed that default build image is Image.gz, which is why I thought its a
->> good idea to copy it into the tarball. Does such a copy not make sense at this
->> point ?
->> 
->> Image.gz can't be booted directly: it's just Image that's been compressed
->> with the standard gzip command.  A bootloader would have to decompress
->> that image before loading it into memory, which requires extra bootloader
->> support.
->> Contrast that with the zImage style images (which are vmlinuz on x86), which
->> are self-extracting and therefor require no bootloader support.  The
->> examples for u-boot all use the "booti" command, which expects
->> uncompressed images.
->> Poking around I couldn't figure out a way to have u-boot decompress the
->> images, but that applies to arm64 as well so I'm not sure if I'm missing
->> something.
->> 
->> If I was doing this, I'd copy over arch/riscv/boot/Image and call it
->> "/boot/image-${KERNELRELEASE}", as calling it vmlinuz is a bit confusing to
->> me because I'd expect vmlinuz to be a self-extracting compressed
->> executable and not a raw gzip file.
-> 
-> On the contrary, it is indeed possible to boot Image.gz directly using
-> U-Boot booti command so this patch would be useful.
-> 
-> Atish had got it working on U-Boot but he has deferred booti Image.gz
-> support due to few more dependent changes. May be he can share
-> more info.
 
-Oh, great.  I guess it makes sense to just put both in the tarball, then, as 
-users will still need to use the Image format for now.
+--=-T61ovYkJ++u0q7lrH+Xr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Regards,
-> Anup
+On Fri, 2019-09-13 at 08:28 +0200, Nicolas Schier wrote:
+> Hi Ben,
+>=20
+> thanks for that document, I really enjoyed reading it!
+>=20
+> On Wed, Sep 11, 2019 at 12:53:53PM +0100, Ben Hutchings wrote:
+> [...]
+> > diff --git a/Documentation/kbuild/reproducible-builds.rst b/Documentati=
+on/kbuild/reproducible-builds.rst
+> > new file mode 100644
+> > index 000000000000..4d988faf93b8
+> > --- /dev/null
+> > +++ b/Documentation/kbuild/reproducible-builds.rst
+> > @@ -0,0 +1,115 @@
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +Reproducible builds
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +It is generally desirable that the building the same source code with
+>=20
+> In this sentence, I think there is either one word to much (the first
+> 'the') or some word is missing (e.h. 'of').
+
+Yes, thanks.
+
+Ben.
+
+--=20
+Ben Hutchings
+If you seem to know what you are doing, you'll be given more to do.
+
+
+
+--=-T61ovYkJ++u0q7lrH+Xr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl18y+cACgkQ57/I7JWG
+EQmkbQ/7BiRT3bkLrMimHZUVFAqdRFSAN/J3ot1yPHJpDURjrA2XLM3/5nuTxiMm
++QQ0BuPDSMTxdUGLiTs4xhFZgnShkG5uDObnkKtLUfsTEDgcLuQojAARD210nCAh
+Xr5S3li3kpJ7JziA1/48i9DA+yls0IlGzHe8BBL996YRMHbSlyorMwzhKTv4e5zX
+AnoCKb6o2LpTmdcrd1nzYItyrwCjwROSpUe3RizorU9zWo1EEucxPdS9Su9T1QW4
+icojZ0gQPc6hBBHEl4ZpOnLuvvqtcYMbs0pvQqUCHcpXcik8wBbPHFoXtuJLsEzF
+Nqp3xt0ZLqBdefKUowlGYR8usX7M2QWRNw7o7fBSfcywxXGnskxUjmIUOmF3DZj2
+baOoCRjdk7G7m3YaTt6/nVol2MgDcdPYtjbP2GyyiW6d4QZMuhp8MssPIWWpXWYl
+ufedb1hptWldBRHG7e+uTn40ToPY9gKKoDxF/hU83uWJ6eJHjvZSV2yPHTaXWMLp
+Wu2lWwC20mnnz2p0NUdvcT/r5fw0mSN0ze8NtD/SaUlv/+IXEnyL8OGkwF6rivwS
+O3mYfUpE8MCIxKyP7neBX+//uH8QON1cE2rU3pfcPTA0ZSNyezyY1H2dJjKDRWRh
+/qF22JZaT4LiXDxDEPpm8ZV4RhvlXB9kwaY1pRpTvrLFJSUGVag=
+=VLJx
+-----END PGP SIGNATURE-----
+
+--=-T61ovYkJ++u0q7lrH+Xr--
