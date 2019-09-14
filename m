@@ -1,42 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36669 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387462AbfINM75 (ORCPT
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:25249 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388575AbfINNGD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 14 Sep 2019 08:59:57 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y22so19799014pfr.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Sep 2019 05:59:57 -0700 (PDT)
-Date: Sat, 14 Sep 2019 05:59:55 -0700 (PDT)
-Subject: Re: [RFC] buildtar: add case for riscv architecture
-In-Reply-To: <X9f9LozkDQUeBwasTsPlPseP6ZT5yJHNY2GcIgoAgNQJPuFAyYimnDXTJUqxfrZ64GOIl5-uPh07NZnD1pi4uWhCpZvbu9khOW6rEq5P4jU=@aurabindo.in>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-ed262582-dc00-41fe-9be5-2487297f2432@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Sat, 14 Sep 2019 09:06:03 -0400
+From: Anup Patel <Anup.Patel@wdc.com>
+Subject: RE: [RFC] buildtar: add case for riscv architecture
+Date: Sat, 14 Sep 2019 13:05:59 +0000
+Message-ID: <MN2PR04MB60613FADCF3482C14F29F4558DB20@MN2PR04MB6061.namprd04.prod.outlook.com>
+References: <X9f9LozkDQUeBwasTsPlPseP6ZT5yJHNY2GcIgoAgNQJPuFAyYimnDXTJUqxfrZ64GOIl5-uPh07NZnD1pi4uWhCpZvbu9khOW6rEq5P4jU=@aurabindo.in>
+ <mhng-ed262582-dc00-41fe-9be5-2487297f2432@palmer-si-x1e>
+In-Reply-To: <mhng-ed262582-dc00-41fe-9be5-2487297f2432@palmer-si-x1e>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mail@aurabindo.in
-Cc: Troy Benjegerdes <troy.benjegerdes@sifive.com>, Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Palmer Dabbelt <palmer@sifive.com>, "mail@aurabindo.in" <mail@aurabindo.in>
+Cc: Troy Benjegerdes <troy.benjegerdes@sifive.com>, Paul Walmsley <paul.walmsley@sifive.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Wed, 11 Sep 2019 05:54:07 PDT (-0700), mail@aurabindo.in wrote:
->
->
->> None of the available RiscV platforms that I’m aware of use compressed images, unless there are some new bootloaders I haven’t seen yet.
->>
->
-> I noticed that default build image is Image.gz, which is why I thought its a good idea to copy it into the tarball. Does such a copy not make sense at this point ?
-
-Image.gz can't be booted directly: it's just Image that's been compressed with 
-the standard gzip command.  A bootloader would have to decompress that image 
-before loading it into memory, which requires extra bootloader support.  
-Contrast that with the zImage style images (which are vmlinuz on x86), which 
-are self-extracting and therefor require no bootloader support.  The examples 
-for u-boot all use the "booti" command, which expects uncompressed images.  
-Poking around I couldn't figure out a way to have u-boot decompress the images, 
-but that applies to arm64 as well so I'm not sure if I'm missing something.
-
-If I was doing this, I'd copy over arch/riscv/boot/Image and call it 
-"/boot/image-${KERNELRELEASE}", as calling it vmlinuz is a bit confusing to me 
-because I'd expect vmlinuz to be a self-extracting compressed executable and 
-not a raw gzip file.
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgta2VybmVsLW93
+bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgta2VybmVsLQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5v
+cmc+IE9uIEJlaGFsZiBPZiBQYWxtZXIgRGFiYmVsdA0KPiBTZW50OiBTYXR1cmRheSwgU2VwdGVt
+YmVyIDE0LCAyMDE5IDY6MzAgUE0NCj4gVG86IG1haWxAYXVyYWJpbmRvLmluDQo+IENjOiBUcm95
+IEJlbmplZ2VyZGVzIDx0cm95LmJlbmplZ2VyZGVzQHNpZml2ZS5jb20+OyBQYXVsIFdhbG1zbGV5
+DQo+IDxwYXVsLndhbG1zbGV5QHNpZml2ZS5jb20+OyBhb3VAZWVjcy5iZXJrZWxleS5lZHU7IGxp
+bnV4LQ0KPiByaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJu
+ZWwub3JnOyBsaW51eC0NCj4ga2J1aWxkQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTog
+W1JGQ10gYnVpbGR0YXI6IGFkZCBjYXNlIGZvciByaXNjdiBhcmNoaXRlY3R1cmUNCj4gDQo+IE9u
+IFdlZCwgMTEgU2VwIDIwMTkgMDU6NTQ6MDcgUERUICgtMDcwMCksIG1haWxAYXVyYWJpbmRvLmlu
+IHdyb3RlOg0KPiA+DQo+ID4NCj4gPj4gTm9uZSBvZiB0aGUgYXZhaWxhYmxlIFJpc2NWIHBsYXRm
+b3JtcyB0aGF0IEnigJltIGF3YXJlIG9mIHVzZSBjb21wcmVzc2VkDQo+IGltYWdlcywgdW5sZXNz
+IHRoZXJlIGFyZSBzb21lIG5ldyBib290bG9hZGVycyBJIGhhdmVu4oCZdCBzZWVuIHlldC4NCj4g
+Pj4NCj4gPg0KPiA+IEkgbm90aWNlZCB0aGF0IGRlZmF1bHQgYnVpbGQgaW1hZ2UgaXMgSW1hZ2Uu
+Z3osIHdoaWNoIGlzIHdoeSBJIHRob3VnaHQgaXRzIGENCj4gZ29vZCBpZGVhIHRvIGNvcHkgaXQg
+aW50byB0aGUgdGFyYmFsbC4gRG9lcyBzdWNoIGEgY29weSBub3QgbWFrZSBzZW5zZSBhdCB0aGlz
+DQo+IHBvaW50ID8NCj4gDQo+IEltYWdlLmd6IGNhbid0IGJlIGJvb3RlZCBkaXJlY3RseTogaXQn
+cyBqdXN0IEltYWdlIHRoYXQncyBiZWVuIGNvbXByZXNzZWQNCj4gd2l0aCB0aGUgc3RhbmRhcmQg
+Z3ppcCBjb21tYW5kLiAgQSBib290bG9hZGVyIHdvdWxkIGhhdmUgdG8gZGVjb21wcmVzcw0KPiB0
+aGF0IGltYWdlIGJlZm9yZSBsb2FkaW5nIGl0IGludG8gbWVtb3J5LCB3aGljaCByZXF1aXJlcyBl
+eHRyYSBib290bG9hZGVyDQo+IHN1cHBvcnQuDQo+IENvbnRyYXN0IHRoYXQgd2l0aCB0aGUgeklt
+YWdlIHN0eWxlIGltYWdlcyAod2hpY2ggYXJlIHZtbGludXogb24geDg2KSwgd2hpY2gNCj4gYXJl
+IHNlbGYtZXh0cmFjdGluZyBhbmQgdGhlcmVmb3IgcmVxdWlyZSBubyBib290bG9hZGVyIHN1cHBv
+cnQuICBUaGUNCj4gZXhhbXBsZXMgZm9yIHUtYm9vdCBhbGwgdXNlIHRoZSAiYm9vdGkiIGNvbW1h
+bmQsIHdoaWNoIGV4cGVjdHMNCj4gdW5jb21wcmVzc2VkIGltYWdlcy4NCj4gUG9raW5nIGFyb3Vu
+ZCBJIGNvdWxkbid0IGZpZ3VyZSBvdXQgYSB3YXkgdG8gaGF2ZSB1LWJvb3QgZGVjb21wcmVzcyB0
+aGUNCj4gaW1hZ2VzLCBidXQgdGhhdCBhcHBsaWVzIHRvIGFybTY0IGFzIHdlbGwgc28gSSdtIG5v
+dCBzdXJlIGlmIEknbSBtaXNzaW5nDQo+IHNvbWV0aGluZy4NCj4gDQo+IElmIEkgd2FzIGRvaW5n
+IHRoaXMsIEknZCBjb3B5IG92ZXIgYXJjaC9yaXNjdi9ib290L0ltYWdlIGFuZCBjYWxsIGl0DQo+
+ICIvYm9vdC9pbWFnZS0ke0tFUk5FTFJFTEVBU0V9IiwgYXMgY2FsbGluZyBpdCB2bWxpbnV6IGlz
+IGEgYml0IGNvbmZ1c2luZyB0bw0KPiBtZSBiZWNhdXNlIEknZCBleHBlY3Qgdm1saW51eiB0byBi
+ZSBhIHNlbGYtZXh0cmFjdGluZyBjb21wcmVzc2VkDQo+IGV4ZWN1dGFibGUgYW5kIG5vdCBhIHJh
+dyBnemlwIGZpbGUuDQoNCk9uIHRoZSBjb250cmFyeSwgaXQgaXMgaW5kZWVkIHBvc3NpYmxlIHRv
+IGJvb3QgSW1hZ2UuZ3ogZGlyZWN0bHkgdXNpbmcNClUtQm9vdCBib290aSBjb21tYW5kIHNvIHRo
+aXMgcGF0Y2ggd291bGQgYmUgdXNlZnVsLg0KDQpBdGlzaCBoYWQgZ290IGl0IHdvcmtpbmcgb24g
+VS1Cb290IGJ1dCBoZSBoYXMgZGVmZXJyZWQgYm9vdGkgSW1hZ2UuZ3oNCnN1cHBvcnQgZHVlIHRv
+IGZldyBtb3JlIGRlcGVuZGVudCBjaGFuZ2VzLiBNYXkgYmUgaGUgY2FuIHNoYXJlDQptb3JlIGlu
+Zm8uDQoNClJlZ2FyZHMsDQpBbnVwDQo=
