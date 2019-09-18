@@ -1,60 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35516 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfIQSsw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Sep 2019 14:48:52 -0400
-Date: Tue, 17 Sep 2019 20:48:44 +0200
-From: Jessica Yu <jeyu@kernel.org>
-Subject: Re: [GIT PULL] Kbuild updates for v5.4-rc1
-Message-ID: <20190917184844.GA15149@linux-8ccs>
-References: <CAK7LNARsoed86dY75b_HNXXkCXRAKdMUGaEWUUca4BuGaZCwcg@mail.gmail.com>
- <20190917150902.GA4116@linux-8ccs>
- <CAK7LNAR_8atC3M9gGQ=DBwzFG52PVuNaFVAzAr32TKxTwDCLug@mail.gmail.com>
- <20190917180136.GA10376@linux-8ccs>
- <20190917181636.7sngz5lrldx34rth@willie-the-truck>
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42522 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726591AbfIRJoi (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 18 Sep 2019 05:44:38 -0400
+From: Erwan Velu <erwanaliasr1@gmail.com>
+Subject: [PATCH 1/3] firmware/dmi_scan: Add dmi_save_release to save releases fields
+Date: Wed, 18 Sep 2019 11:43:19 +0200
+Message-Id: <20190918094323.17515-1-e.velu@criteo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190917181636.7sngz5lrldx34rth@willie-the-truck>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>, Matthias Maennich <maennich@google.com>, gregkh@linuxfoundation.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Erwan Velu <e.velu@criteo.com>, Jean Delvare <jdelvare@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Mattias Jacobsson <2pi@mok.nu>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Jens Wiklander <jens.wiklander@linaro.org>, Sumit Garg <sumit.garg@linaro.org>, Changbin Du <changbin.du@intel.com>, Boris Brezillon <bbrezillon@kernel.org>, "Robert P. J. Day" <rpjday@crashcourse.ca>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-+++ Will Deacon [17/09/19 19:16 +0100]:
->Hi Jessica,
->
->On Tue, Sep 17, 2019 at 08:01:36PM +0200, Jessica Yu wrote:
->> Yikes, I did not catch Stephen Rothwell's email about pausing the
->> linux-next releases from Sept 5 until Sept 30
->> (https://lore.kernel.org/linux-next/20190904233443.3f73c46b@canb.auug.org.au/).
->>
->> The modules-next namespace patches have been in since last Tuesday,
->> and my original plan was for them to catch at least a week of
->> linux-next time before sending the pull request. :-/ But that did not
->> happen due to the above.
->>
->> So Linus, in light of the above realization, I'd say at this time - I
->> will still formally send a pull request with the merge conflicts
->> resolved with either solution #2 or #3, but merge at your own
->> discretion, it's fine to delay to the following release if you're
->> uncomfortable.
->
->FWIW, when I've run into unexpected merge conflicts with other trees in the
->past, I've found that it's usually sufficient just to include the resolution
->as an inline diff in the pull request, rather than try to munge the tree
->with merges or rebases.  Linus is pretty good at figuring it out, and with a
->resolution to compare with, the damage is limited. The downside of the merge
->is that it's fiddly to extract the changes and see what's actually being
->pulled.
->
->Also, it's not like the kbuild stuff has been in -next for ages, so this
->would've been a late and messy conflict regardless.
+In DMI type 0, there is several fields that encodes a release.
+The dmi_save_release() function have the logic to check if the field is valid.
+If so, it reports the actual value.
 
-Hi Will!
+Signed-off-by: Erwan Velu <e.velu@criteo.com>
+---
+ drivers/firmware/dmi_scan.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Thanks a lot for the advice :-) The inline diff sounds like a good
-idea. This is I believe only the second tree conflict I've encountered
-so far so the tips are much appreciated.
-
-Jessica
+diff --git a/drivers/firmware/dmi_scan.c b/drivers/firmware/dmi_scan.c
+index 35ed56b9c34f..202bd2c69d0f 100644
+--- a/drivers/firmware/dmi_scan.c
++++ b/drivers/firmware/dmi_scan.c
+@@ -181,6 +181,32 @@ static void __init dmi_save_ident(const struct dmi_header *dm, int slot,
+ 	dmi_ident[slot] = p;
+ }
+ 
++static void __init dmi_save_release(const struct dmi_header *dm, int slot,
++		int index)
++{
++	const u8 *d;
++	char *s;
++
++	// If the table doesn't have the field, let's return
++	if (dmi_ident[slot] || dm->length < index)
++		return;
++
++	d = (u8 *) dm + index;
++
++	// As per the specification,
++	// if the system doesn't have the field, the value is FF
++	if (d[0] == 0xFF)
++		return;
++
++	s = dmi_alloc(4);
++	if (!s)
++		return;
++
++	sprintf(s, "%u", d[0]);
++
++	dmi_ident[slot] = s;
++}
++
+ static void __init dmi_save_uuid(const struct dmi_header *dm, int slot,
+ 		int index)
+ {
+-- 
+2.21.0
