@@ -1,81 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34309 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387984AbfITWkb (ORCPT
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:52278 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2437483AbfIUAT4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Sep 2019 18:40:31 -0400
-Received: by mail-pg1-f195.google.com with SMTP id n9so4648030pgc.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Sep 2019 15:40:31 -0700 (PDT)
-Date: Fri, 20 Sep 2019 15:40:29 -0700 (PDT)
-Subject: RE: [RFC] buildtar: add case for riscv architecture
-In-Reply-To: <lMUhcsewB9GAKeZH2cH-zl3vFME8u2z5IzCqDBFhtT2IbG71vhHnjrlHKbhyxFee5XFe1X1gRllNJBR9e9dQlC0vbIpSffL_y0pLb46VddQ=@aurabindo.in>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-79e5204f-e7b6-43d0-94cb-815d3be314ae@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Fri, 20 Sep 2019 20:19:56 -0400
+Received: by mail-pl1-f202.google.com with SMTP id y2so5457835plk.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Sep 2019 17:19:55 -0700 (PDT)
+Date: Fri, 20 Sep 2019 17:18:54 -0700
+In-Reply-To: <20190921001855.200947-1-brendanhiggins@google.com>
+Message-Id: <20190921001855.200947-19-brendanhiggins@google.com>
+Mime-Version: 1.0
+References: <20190921001855.200947-1-brendanhiggins@google.com>
+Subject: [PATCH v17 18/19] MAINTAINERS: add proc sysctl KUnit test to PROC
+ SYSCTL section
+From: Brendan Higgins <brendanhiggins@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mail@aurabindo.in
-Cc: Anup Patel <Anup.Patel@wdc.com>, Troy Benjegerdes <troy.benjegerdes@sifive.com>, Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, torvalds@linux-foundation.org, Brendan Higgins <brendanhiggins@google.com>, Iurii Zaikin <yzaikin@google.com>
 
-On Tue, 17 Sep 2019 02:35:10 PDT (-0700), mail@aurabindo.in wrote:
-> ‐‐‐‐‐‐‐ Original Message ‐‐‐‐‐‐‐
-> On Sunday, September 15, 2019 12:57 AM, Palmer Dabbelt <palmer@sifive.com> wrote:
->
->> On Sat, 14 Sep 2019 06:05:59 PDT (-0700), Anup Patel wrote:
->>
->> > > -----Original Message-----
->> > > From: linux-kernel-owner@vger.kernel.org <linux-kernel-
->> > > owner@vger.kernel.org> On Behalf Of Palmer Dabbelt
->> > > Sent: Saturday, September 14, 2019 6:30 PM
->> > > To: mail@aurabindo.in
->> > > Cc: Troy Benjegerdes troy.benjegerdes@sifive.com; Paul Walmsley
->> > > paul.walmsley@sifive.com; aou@eecs.berkeley.edu; linux-
->> > > riscv@lists.infradead.org; linux-kernel@vger.kernel.org; linux-
->> > > kbuild@vger.kernel.org
->> > > Subject: Re: [RFC] buildtar: add case for riscv architecture
->> > > On Wed, 11 Sep 2019 05:54:07 PDT (-0700), mail@aurabindo.in wrote:
->> > >
->> > > > > None of the available RiscV platforms that I’m aware of use compressed
->> > > > > images, unless there are some new bootloaders I haven’t seen yet.
->> > > >
->> > > > >
->> > > >
->> > > > I noticed that default build image is Image.gz, which is why I thought its a
->> > > > good idea to copy it into the tarball. Does such a copy not make sense at this
->> > > > point ?
->> > >
->> > > Image.gz can't be booted directly: it's just Image that's been compressed
->> > > with the standard gzip command. A bootloader would have to decompress
->> > > that image before loading it into memory, which requires extra bootloader
->> > > support.
->> > > Contrast that with the zImage style images (which are vmlinuz on x86), which
->> > > are self-extracting and therefor require no bootloader support. The
->> > > examples for u-boot all use the "booti" command, which expects
->> > > uncompressed images.
->> > > Poking around I couldn't figure out a way to have u-boot decompress the
->> > > images, but that applies to arm64 as well so I'm not sure if I'm missing
->> > > something.
->> > > If I was doing this, I'd copy over arch/riscv/boot/Image and call it
->> > > "/boot/image-${KERNELRELEASE}", as calling it vmlinuz is a bit confusing to
->> > > me because I'd expect vmlinuz to be a self-extracting compressed
->> > > executable and not a raw gzip file.
->> >
->> > On the contrary, it is indeed possible to boot Image.gz directly using
->> > U-Boot booti command so this patch would be useful.
->> > Atish had got it working on U-Boot but he has deferred booti Image.gz
->> > support due to few more dependent changes. May be he can share
->> > more info.
->>
->> Oh, great. I guess it makes sense to just put both in the tarball, then, as
->> users will still need to use the Image format for now.
->>
->
-> Uncompressed vmlinux is already copied by default. This patch just adds the
-> Image.gz into the archive as vmlinuz. But as you said, since the name vmlinuz is
-> reserved for self extracting archives, should I keep the original name Image.gz ?
+Add entry for the new proc sysctl KUnit test to the PROC SYSCTL section,
+and add Iurii as a maintainer.
 
-vmlinux is not the same as Image: vmlinux is an ELF file that can't be loaded 
-directly by most bootloaders, Image is a mostly-flat binary with a small header 
-that we're expecting can be booted by most bootloaders.
+Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+Cc: Iurii Zaikin <yzaikin@google.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e3d0d184ae4e..6663d4accd36 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12983,12 +12983,14 @@ F:	Documentation/filesystems/proc.txt
+ PROC SYSCTL
+ M:	Luis Chamberlain <mcgrof@kernel.org>
+ M:	Kees Cook <keescook@chromium.org>
++M:	Iurii Zaikin <yzaikin@google.com>
+ L:	linux-kernel@vger.kernel.org
+ L:	linux-fsdevel@vger.kernel.org
+ S:	Maintained
+ F:	fs/proc/proc_sysctl.c
+ F:	include/linux/sysctl.h
+ F:	kernel/sysctl.c
++F:	kernel/sysctl-test.c
+ F:	tools/testing/selftests/sysctl/
+ 
+ PS3 NETWORK SUPPORT
+-- 
+2.23.0.351.gc4317032e6-goog
