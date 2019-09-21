@@ -1,56 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:47051 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437304AbfIUHGJ (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:24022 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389497AbfIUNTA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 21 Sep 2019 03:06:09 -0400
+        Sat, 21 Sep 2019 09:19:00 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: remove SUBDIRS support
-Date: Sat, 21 Sep 2019 16:05:41 +0900
-Message-Id: <20190921070542.12868-1-yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: update comment about KBUILD_ALLDIRS
+Date: Sat, 21 Sep 2019 22:18:46 +0900
+Message-Id: <20190921131846.18981-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Linux 5.3 was released. Remove the SUBDIRS support.
+Commit 000ec95fbe75 ("kbuild: pkg: rename scripts/package/Makefile to
+scripts/Makefile.package") missed to update this comment.
 
+Fixes: 000ec95fbe75 ("kbuild: pkg: rename scripts/package/Makefile to scripts/Makefile.package")
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 20 ++------------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 88b180b2cb64..6206cd358411 100644
+index 6206cd358411..4808377f2db8 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -206,24 +206,8 @@ ifndef KBUILD_CHECKSRC
-   KBUILD_CHECKSRC = 0
- endif
+@@ -1037,7 +1037,7 @@ export KBUILD_VMLINUX_OBJS := $(head-y) $(init-y) $(core-y) $(libs-y2) \
+ export KBUILD_VMLINUX_LIBS := $(libs-y1)
+ export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
+ export LDFLAGS_vmlinux
+-# used by scripts/package/Makefile
++# used by scripts/Makefile.package
+ export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) LICENSES arch include scripts tools)
  
--# Use make M=dir to specify directory of external module to build
--# Old syntax make ... SUBDIRS=$PWD is still supported
--# Setting the environment variable KBUILD_EXTMOD take precedence
--ifdef SUBDIRS
--  $(warning ================= WARNING ================)
--  $(warning 'SUBDIRS' will be removed after Linux 5.3)
--  $(warning )
--  $(warning If you are building an individual subdirectory)
--  $(warning in the kernel tree, you can do like this:)
--  $(warning $$ make path/to/dir/you/want/to/build/)
--  $(warning (Do not forget the trailing slash))
--  $(warning )
--  $(warning If you are building an external module,)
--  $(warning Please use 'M=' or 'KBUILD_EXTMOD' instead)
--  $(warning ==========================================)
--  KBUILD_EXTMOD ?= $(SUBDIRS)
--endif
--
-+# Use make M=dir or set the environment variable KBUILD_EXTMOD to specify the
-+# directory of external module to build. Setting M= takes precedence.
- ifeq ("$(origin M)", "command line")
-   KBUILD_EXTMOD := $(M)
- endif
+ vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)
 -- 
 2.17.1
