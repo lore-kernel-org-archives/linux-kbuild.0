@@ -1,182 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:50155 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437160AbfITXUe (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:63707 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729346AbfIUGbZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Sep 2019 19:20:34 -0400
-Received: by mail-pf1-f202.google.com with SMTP id i28so5741420pfq.16
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Sep 2019 16:20:32 -0700 (PDT)
-Date: Fri, 20 Sep 2019 16:19:23 -0700
-In-Reply-To: <20190920231923.141900-1-brendanhiggins@google.com>
-Message-Id: <20190920231923.141900-20-brendanhiggins@google.com>
-Mime-Version: 1.0
-References: <20190920231923.141900-1-brendanhiggins@google.com>
-Subject: [PATCH v16 19/19] kunit: fix failure to build without printk
-From: Brendan Higgins <brendanhiggins@google.com>
+        Sat, 21 Sep 2019 02:31:25 -0400
+MIME-Version: 1.0
+References: <1569006062-17862-1-git-send-email-jhugo@codeaurora.org>
+In-Reply-To: <1569006062-17862-1-git-send-email-jhugo@codeaurora.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 21 Sep 2019 15:30:25 +0900
+Message-ID: <CAK7LNATHu6M8zKQi4O30Dvijg0zi8Lvxv6EBbWOE+H_s=E6m+Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: binrpm-pkg: Propagate O= to rpmbuild
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, torvalds@linux-foundation.org, Brendan Higgins <brendanhiggins@google.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, Joe Perches <joe@perches.com>
+To: Jeffrey Hugo <jhugo@codeaurora.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Previously KUnit assumed that printk would always be present, which is
-not a valid assumption to make. Fix that by removing call to
-vprintk_emit, and calling printk directly.
+Hi Jeffrey,
 
-This fixes a build error[1] reported by Randy.
+On Sat, Sep 21, 2019 at 4:01 AM Jeffrey Hugo <jhugo@codeaurora.org> wrote:
+>
+> If the user specifies O= to indicate a specific output directory for the
+> build, rpmbuild does not honor this, and will use its default, which could
+> be the user's home directory.  In cases where the user has limited home
+> directory space, this could cause the build to outright fail.
+>
+> In the case of the binrpm-pkg target, redefine the top directory for output
+> to be what the user specified in O=, thus the user will find a "rpmbuild"
+> subdirectory in that location with all of the RPM artifacts.
+>
+> This does not apply to rpm-pkg, since we already cannot handle creating
+> the source tarball out of tree.
+>
+> Signed-off-by: Jeffrey Hugo <jhugo@codeaurora.org>
 
-For context this change comes after much discussion. My first stab[2] at
-this was just to make the KUnit logging code compile out; however, it
-was agreed that if we were going to use vprintk_emit, then vprintk_emit
-should provide a no-op stub, which lead to my second attempt[3]. In
-response to me trying to stub out vprintk_emit, Sergey Senozhatsky
-suggested a way for me to remove our usage of vprintk_emit, which led to
-my third attempt at solving this[4].
 
-In my third version of this patch[4], I completely removed vprintk_emit,
-as suggested by Sergey; however, there was a bit of debate over whether
-Sergey's solution was the best. The debate arose due to Sergey's version
-resulting in a checkpatch warning, which resulted in a debate over
-correct printk usage. Joe Perches offered an alternative fix which was
-somewhat less far reaching than what Sergey had suggested and
-importantly relied on continuing to use %pV. Much of the debated
-centered around whether %pV should be widely used, and whether Sergey's
-version would result in object size bloat. Ultimately, we decided to go
-with Sergey's version.
+binrpm-pkg creates intermediate build artifacts in $(objtree)/,
+but puts only the final .rpm into ${HOME}/rpmbuild/RPMS/${ARCH}/.
 
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Link[1]: https://lore.kernel.org/linux-kselftest/c7229254-0d90-d90e-f3df-5b6d6fc0b51f@infradead.org/
-Link[2]: https://lore.kernel.org/linux-kselftest/20190827174932.44177-1-brendanhiggins@google.com/
-Link[3]: https://lore.kernel.org/linux-kselftest/20190827234835.234473-1-brendanhiggins@google.com/
-Link[4]: https://lore.kernel.org/linux-kselftest/20190828093143.163302-1-brendanhiggins@google.com/
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Cc: Joe Perches <joe@perches.com>
-Cc: Tim.Bird@sony.com
-Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-Reviewed-by: Petr Mladek <pmladek@suse.com>
----
- include/kunit/test.h |  5 ++--
- lib/kunit/test.c     | 57 +++++---------------------------------------
- 2 files changed, 8 insertions(+), 54 deletions(-)
+It has worked like that since a long time before
+probably in order to respect the default of rpmbuild.
 
-diff --git a/include/kunit/test.h b/include/kunit/test.h
-index 8b7eb03d4971..dba48304b3bd 100644
---- a/include/kunit/test.h
-+++ b/include/kunit/test.h
-@@ -339,9 +339,8 @@ static inline void *kunit_kzalloc(struct kunit *test, size_t size, gfp_t gfp)
- 
- void kunit_cleanup(struct kunit *test);
- 
--void __printf(3, 4) kunit_printk(const char *level,
--				 const struct kunit *test,
--				 const char *fmt, ...);
-+#define kunit_printk(lvl, test, fmt, ...) \
-+	printk(lvl "\t# %s: " fmt, (test)->name, ##__VA_ARGS__)
- 
- /**
-  * kunit_info() - Prints an INFO level message associated with @test.
-diff --git a/lib/kunit/test.c b/lib/kunit/test.c
-index b2ca9b94c353..c83c0fa59cbd 100644
---- a/lib/kunit/test.c
-+++ b/lib/kunit/test.c
-@@ -16,36 +16,12 @@ static void kunit_set_failure(struct kunit *test)
- 	WRITE_ONCE(test->success, false);
- }
- 
--static int kunit_vprintk_emit(int level, const char *fmt, va_list args)
--{
--	return vprintk_emit(0, level, NULL, 0, fmt, args);
--}
--
--static int kunit_printk_emit(int level, const char *fmt, ...)
--{
--	va_list args;
--	int ret;
--
--	va_start(args, fmt);
--	ret = kunit_vprintk_emit(level, fmt, args);
--	va_end(args);
--
--	return ret;
--}
--
--static void kunit_vprintk(const struct kunit *test,
--			  const char *level,
--			  struct va_format *vaf)
--{
--	kunit_printk_emit(level[1] - '0', "\t# %s: %pV", test->name, vaf);
--}
--
- static void kunit_print_tap_version(void)
- {
- 	static bool kunit_has_printed_tap_version;
- 
- 	if (!kunit_has_printed_tap_version) {
--		kunit_printk_emit(LOGLEVEL_INFO, "TAP version 14\n");
-+		pr_info("TAP version 14\n");
- 		kunit_has_printed_tap_version = true;
- 	}
- }
-@@ -64,10 +40,8 @@ static size_t kunit_test_cases_len(struct kunit_case *test_cases)
- static void kunit_print_subtest_start(struct kunit_suite *suite)
- {
- 	kunit_print_tap_version();
--	kunit_printk_emit(LOGLEVEL_INFO, "\t# Subtest: %s\n", suite->name);
--	kunit_printk_emit(LOGLEVEL_INFO,
--			  "\t1..%zd\n",
--			  kunit_test_cases_len(suite->test_cases));
-+	pr_info("\t# Subtest: %s\n", suite->name);
-+	pr_info("\t1..%zd\n", kunit_test_cases_len(suite->test_cases));
- }
- 
- static void kunit_print_ok_not_ok(bool should_indent,
-@@ -87,9 +61,7 @@ static void kunit_print_ok_not_ok(bool should_indent,
- 	else
- 		ok_not_ok = "not ok";
- 
--	kunit_printk_emit(LOGLEVEL_INFO,
--			  "%s%s %zd - %s\n",
--			  indent, ok_not_ok, test_number, description);
-+	pr_info("%s%s %zd - %s\n", indent, ok_not_ok, test_number, description);
- }
- 
- static bool kunit_suite_has_succeeded(struct kunit_suite *suite)
-@@ -133,11 +105,11 @@ static void kunit_print_string_stream(struct kunit *test,
- 		kunit_err(test,
- 			  "Could not allocate buffer, dumping stream:\n");
- 		list_for_each_entry(fragment, &stream->fragments, node) {
--			kunit_err(test, fragment->fragment);
-+			kunit_err(test, "%s", fragment->fragment);
- 		}
- 		kunit_err(test, "\n");
- 	} else {
--		kunit_err(test, buf);
-+		kunit_err(test, "%s", buf);
- 		kunit_kfree(test, buf);
- 	}
- }
-@@ -504,20 +476,3 @@ void kunit_cleanup(struct kunit *test)
- 		kunit_resource_free(test, resource);
- 	}
- }
--
--void kunit_printk(const char *level,
--		  const struct kunit *test,
--		  const char *fmt, ...)
--{
--	struct va_format vaf;
--	va_list args;
--
--	va_start(args, fmt);
--
--	vaf.fmt = fmt;
--	vaf.va = &args;
--
--	kunit_vprintk(test, level, &vaf);
--
--	va_end(args);
--}
--- 
-2.23.0.351.gc4317032e6-goog
+
+If you change this behavior, it should be consistent.
+The 'rpmbuild' should be always located in the kernel tree
+instead of the user's home directory.
+
+But, doing so might give impact to other users who
+rely on having 'rpmbuild' in the home directory.
+I have to hear opinions from others
+if this change is desired.
+
+Meanwhile, if you are unhappy with that, one solution is to use RPMOPTS.
+RPMOPTS exists to tweak the default behavior.
+
+
+Thanks.
+
+
+> ---
+>  scripts/Makefile.package | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index 56eadcc..aab0711 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -21,7 +21,7 @@ include $(srctree)/scripts/Kbuild.include
+>  # - Use /. to avoid tar packing just the symlink
+>
+>  # Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
+> -# but the binrpm-pkg target can; for some reason O= gets ignored.
+> +# but the binrpm-pkg target can
+>
+>  # Remove hyphens since they have special meaning in RPM filenames
+>  KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+> @@ -33,6 +33,12 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
+>                 Kbuild Kconfig COPYING $(wildcard localversion*)
+>  MKSPEC     := $(srctree)/scripts/package/mkspec
+>
+> +RPM_OUTDIR :=
+> +ifneq ($(objtree),$(srctree))
+> +# Using absolute path as relative path will cause parts of rpmbuild to fail
+> +        RPM_OUTDIR := --define "_topdir $(abs_objtree)/rpmbuild"
+> +endif
+> +
+>  quiet_cmd_src_tar = TAR     $(2).tar.gz
+>        cmd_src_tar = \
+>  if test "$(objtree)" != "$(srctree)"; then \
+> @@ -65,8 +71,8 @@ PHONY += binrpm-pkg
+>  binrpm-pkg:
+>         $(MAKE) -f $(srctree)/Makefile
+>         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+> -       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+> -               $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+> +       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" $(RPM_OUTDIR) \
+> +               --target $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+>
+>  PHONY += deb-pkg
+>  deb-pkg:
+> --
+> Qualcomm Technologies, Inc. is a member of the
+> Code Aurora Forum, a Linux Foundation Collaborative Project.
+>
+
+
+--
+Best Regards
+Masahiro Yamada
