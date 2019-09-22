@@ -1,80 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:42724 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387604AbfIVQ3U (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Sep 2019 12:29:20 -0400
-Subject: Re: [PATCH v17 07/19] kunit: test: add initial tests
-References: <20190921001855.200947-1-brendanhiggins@google.com>
- <20190921001855.200947-8-brendanhiggins@google.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <944ac47d-1411-9ebd-d0d4-a616c88c9c20@infradead.org>
-Date: Sun, 22 Sep 2019 09:28:28 -0700
+Received: from mail.kernel.org ([198.145.29.99]:49938 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2406260AbfIVSvr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:51:47 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 077/185] kasan/arm64: fix CONFIG_KASAN_SW_TAGS && KASAN_INLINE
+Date: Sun, 22 Sep 2019 14:47:35 -0400
+Message-Id: <20190922184924.32534-77-sashal@kernel.org>
+In-Reply-To: <20190922184924.32534-1-sashal@kernel.org>
+References: <20190922184924.32534-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190921001855.200947-8-brendanhiggins@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>, frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
-Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, torvalds@linux-foundation.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Will Deacon <will@kernel.org>, Sasha Levin <sashal@kernel.org>, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org
 
-On 9/20/19 5:18 PM, Brendan Higgins wrote:
-> Add a test for string stream along with a simpler example.
-> 
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Stephen Boyd <sboyd@kernel.org>
-> ---
->  lib/kunit/Kconfig              | 25 ++++++++++
->  lib/kunit/Makefile             |  4 ++
->  lib/kunit/example-test.c       | 88 ++++++++++++++++++++++++++++++++++
->  lib/kunit/string-stream-test.c | 52 ++++++++++++++++++++
->  4 files changed, 169 insertions(+)
->  create mode 100644 lib/kunit/example-test.c
->  create mode 100644 lib/kunit/string-stream-test.c
-> 
-> diff --git a/lib/kunit/Kconfig b/lib/kunit/Kconfig
-> index 666b9cb67a74..3868c226cf31 100644
-> --- a/lib/kunit/Kconfig
-> +++ b/lib/kunit/Kconfig
-> @@ -11,3 +11,28 @@ menuconfig KUNIT
->  	  special hardware when using UML. Can also be used on most other
->  	  architectures. For more information, please see
->  	  Documentation/dev-tools/kunit/.
-> +
-> +if KUNIT
+From: Mark Rutland <mark.rutland@arm.com>
 
-The 'if' above provides the dependency clause, so the 2 'depends on KUNIT'
-below are not needed.  They are redundant.
+[ Upstream commit 34b5560db40d2941cfbe82eca1641353d5aed1a9 ]
 
-> +
-> +config KUNIT_TEST
-> +	bool "KUnit test for KUnit"
-> +	depends on KUNIT
-> +	help
-> +	  Enables the unit tests for the KUnit test framework. These tests test
-> +	  the KUnit test framework itself; the tests are both written using
-> +	  KUnit and test KUnit. This option should only be enabled for testing
-> +	  purposes by developers interested in testing that KUnit works as
-> +	  expected.
-> +
-> +config KUNIT_EXAMPLE_TEST
-> +	bool "Example test for KUnit"
-> +	depends on KUNIT
-> +	help
-> +	  Enables an example unit test that illustrates some of the basic
-> +	  features of KUnit. This test only exists to help new users understand
-> +	  what KUnit is and how it is used. Please refer to the example test
-> +	  itself, lib/kunit/example-test.c, for more information. This option
-> +	  is intended for curious hackers who would like to understand how to
-> +	  use KUnit for kernel development.
-> +
-> +endif # KUNIT
+The generic Makefile.kasan propagates CONFIG_KASAN_SHADOW_OFFSET into
+KASAN_SHADOW_OFFSET, but only does so for CONFIG_KASAN_GENERIC.
 
+Since commit:
 
+  6bd1d0be0e97936d ("arm64: kasan: Switch to using KASAN_SHADOW_OFFSET")
 
+... arm64 defines CONFIG_KASAN_SHADOW_OFFSET in Kconfig rather than
+defining KASAN_SHADOW_OFFSET in a Makefile. Thus, if
+CONFIG_KASAN_SW_TAGS && KASAN_INLINE are selected, we get build time
+splats due to KASAN_SHADOW_OFFSET not being set:
+
+| [mark@lakrids:~/src/linux]% usellvm 8.0.1 usekorg 8.1.0  make ARCH=arm64 CROSS_COMPILE=aarch64-linux- CC=clang
+| scripts/kconfig/conf  --syncconfig Kconfig
+|   CC      scripts/mod/empty.o
+| clang (LLVM option parsing): for the -hwasan-mapping-offset option: '' value invalid for uint argument!
+| scripts/Makefile.build:273: recipe for target 'scripts/mod/empty.o' failed
+| make[1]: *** [scripts/mod/empty.o] Error 1
+| Makefile:1123: recipe for target 'prepare0' failed
+| make: *** [prepare0] Error 2
+
+Let's fix this by always propagating CONFIG_KASAN_SHADOW_OFFSET into
+KASAN_SHADOW_OFFSET if CONFIG_KASAN is selected, moving the existing
+common definition of +CFLAGS_KASAN_NOSANITIZE to the top of
+Makefile.kasan.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Tested-by Steve Capper <steve.capper@arm.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/Makefile.kasan | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 6410bd22fe387..03757cc60e06c 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -1,4 +1,9 @@
+ # SPDX-License-Identifier: GPL-2.0
++ifdef CONFIG_KASAN
++CFLAGS_KASAN_NOSANITIZE := -fno-builtin
++KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
++endif
++
+ ifdef CONFIG_KASAN_GENERIC
+ 
+ ifdef CONFIG_KASAN_INLINE
+@@ -7,8 +12,6 @@ else
+ 	call_threshold := 0
+ endif
+ 
+-KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
+-
+ CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
+ 
+ cc-param = $(call cc-option, -mllvm -$(1), $(call cc-option, --param $(1)))
+@@ -45,7 +48,3 @@ CFLAGS_KASAN := -fsanitize=kernel-hwaddress \
+ 		$(instrumentation_flags)
+ 
+ endif # CONFIG_KASAN_SW_TAGS
+-
+-ifdef CONFIG_KASAN
+-CFLAGS_KASAN_NOSANITIZE := -fno-builtin
+-endif
 -- 
-~Randy
+2.20.1
