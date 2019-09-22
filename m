@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49938 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:42822 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406260AbfIVSvr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:51:47 -0400
+        id S2389931AbfIVSqg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:46:36 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.2 077/185] kasan/arm64: fix CONFIG_KASAN_SW_TAGS && KASAN_INLINE
-Date: Sun, 22 Sep 2019 14:47:35 -0400
-Message-Id: <20190922184924.32534-77-sashal@kernel.org>
-In-Reply-To: <20190922184924.32534-1-sashal@kernel.org>
-References: <20190922184924.32534-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.3 086/203] kasan/arm64: fix CONFIG_KASAN_SW_TAGS && KASAN_INLINE
+Date: Sun, 22 Sep 2019 14:41:52 -0400
+Message-Id: <20190922184350.30563-86-sashal@kernel.org>
+In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
+References: <20190922184350.30563-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Will Deacon <will@kernel.org>, Sasha Levin <sashal@kernel.org>, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Will Deacon <will@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com
 
 From: Mark Rutland <mark.rutland@arm.com>
 
