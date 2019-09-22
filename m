@@ -1,91 +1,159 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:42822 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389931AbfIVSqg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:46:36 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.3 086/203] kasan/arm64: fix CONFIG_KASAN_SW_TAGS && KASAN_INLINE
-Date: Sun, 22 Sep 2019 14:41:52 -0400
-Message-Id: <20190922184350.30563-86-sashal@kernel.org>
-In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
-References: <20190922184350.30563-1-sashal@kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:50154 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726785AbfIVVI4 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Sep 2019 17:08:56 -0400
+Subject: Re: [PATCH] kbuild: binrpm-pkg: Propagate O= to rpmbuild
+References: <1569006062-17862-1-git-send-email-jhugo@codeaurora.org>
+ <CAK7LNATHu6M8zKQi4O30Dvijg0zi8Lvxv6EBbWOE+H_s=E6m+Q@mail.gmail.com>
+From: Jeffrey Hugo <jhugo@codeaurora.org>
+Message-ID: <e4f88d2a-2551-7a63-629c-21d053d73b84@codeaurora.org>
+Date: Sun, 22 Sep 2019 15:08:52 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK7LNATHu6M8zKQi4O30Dvijg0zi8Lvxv6EBbWOE+H_s=E6m+Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Will Deacon <will@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Mark Rutland <mark.rutland@arm.com>
+On 9/20/2019 11:30 PM, Masahiro Yamada wrote:
+> Hi Jeffrey,
+> 
+> On Sat, Sep 21, 2019 at 4:01 AM Jeffrey Hugo <jhugo@codeaurora.org> wrote:
+>>
+>> If the user specifies O= to indicate a specific output directory for the
+>> build, rpmbuild does not honor this, and will use its default, which could
+>> be the user's home directory.  In cases where the user has limited home
+>> directory space, this could cause the build to outright fail.
+>>
+>> In the case of the binrpm-pkg target, redefine the top directory for output
+>> to be what the user specified in O=, thus the user will find a "rpmbuild"
+>> subdirectory in that location with all of the RPM artifacts.
+>>
+>> This does not apply to rpm-pkg, since we already cannot handle creating
+>> the source tarball out of tree.
+>>
+>> Signed-off-by: Jeffrey Hugo <jhugo@codeaurora.org>
+> 
+> 
+> binrpm-pkg creates intermediate build artifacts in $(objtree)/,
+> but puts only the final .rpm into ${HOME}/rpmbuild/RPMS/${ARCH}/.
 
-[ Upstream commit 34b5560db40d2941cfbe82eca1641353d5aed1a9 ]
+I disagree with this.  Ubuntu 16.04 with the 4.12 version of the rpm 
+packaging utilities will create several directories under rpmbuild in 
+the user's home directory -
+BUILDROOT  RPMS  SOURCES  SPECS  SRPMS
 
-The generic Makefile.kasan propagates CONFIG_KASAN_SHADOW_OFFSET into
-KASAN_SHADOW_OFFSET, but only does so for CONFIG_KASAN_GENERIC.
+SOURCES/SPECS/SRPMS are empty for binrpm-pkg.
+RPMs contains the final RPMs as you've indicated
+BUILDROOT appears to contain more intermediate files which are used to 
+then generate the final rpms.
 
-Since commit:
+It seems like more than just the final rpms are dumped into the home 
+directory.
 
-  6bd1d0be0e97936d ("arm64: kasan: Switch to using KASAN_SHADOW_OFFSET")
+> 
+> It has worked like that since a long time before
+> probably in order to respect the default of rpmbuild.
 
-... arm64 defines CONFIG_KASAN_SHADOW_OFFSET in Kconfig rather than
-defining KASAN_SHADOW_OFFSET in a Makefile. Thus, if
-CONFIG_KASAN_SW_TAGS && KASAN_INLINE are selected, we get build time
-splats due to KASAN_SHADOW_OFFSET not being set:
+It still seems inconsistent to me that there is an option defined 
+(KBUILD_OUTPUT and O=) which is described to allow the user to specify 
+the location of the build output, yet there are parts of the build 
+system which do not respect this.
 
-| [mark@lakrids:~/src/linux]% usellvm 8.0.1 usekorg 8.1.0  make ARCH=arm64 CROSS_COMPILE=aarch64-linux- CC=clang
-| scripts/kconfig/conf  --syncconfig Kconfig
-|   CC      scripts/mod/empty.o
-| clang (LLVM option parsing): for the -hwasan-mapping-offset option: '' value invalid for uint argument!
-| scripts/Makefile.build:273: recipe for target 'scripts/mod/empty.o' failed
-| make[1]: *** [scripts/mod/empty.o] Error 1
-| Makefile:1123: recipe for target 'prepare0' failed
-| make: *** [prepare0] Error 2
+I also find it curious that there is a comment in the makefile this 
+patch modifies that seems to suggest that it is intended for O= to 
+impact the binrpm-pkg target, however that is currently not the case.
 
-Let's fix this by always propagating CONFIG_KASAN_SHADOW_OFFSET into
-KASAN_SHADOW_OFFSET if CONFIG_KASAN is selected, moving the existing
-common definition of +CFLAGS_KASAN_NOSANITIZE to the top of
-Makefile.kasan.
+> 
+> 
+> If you change this behavior, it should be consistent.
+> The 'rpmbuild' should be always located in the kernel tree
+> instead of the user's home directory.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Tested-by Steve Capper <steve.capper@arm.com>
-Signed-off-by: Will Deacon <will@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- scripts/Makefile.kasan | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+I'm ok with this.  The current patch attempts to preserve current 
+behavior in the default case of not specifying an output directory, but 
+dumping everything in the kernel tree seems sane to me.
 
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 6410bd22fe387..03757cc60e06c 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -1,4 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
-+ifdef CONFIG_KASAN
-+CFLAGS_KASAN_NOSANITIZE := -fno-builtin
-+KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
-+endif
-+
- ifdef CONFIG_KASAN_GENERIC
- 
- ifdef CONFIG_KASAN_INLINE
-@@ -7,8 +12,6 @@ else
- 	call_threshold := 0
- endif
- 
--KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
--
- CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
- 
- cc-param = $(call cc-option, -mllvm -$(1), $(call cc-option, --param $(1)))
-@@ -45,7 +48,3 @@ CFLAGS_KASAN := -fsanitize=kernel-hwaddress \
- 		$(instrumentation_flags)
- 
- endif # CONFIG_KASAN_SW_TAGS
--
--ifdef CONFIG_KASAN
--CFLAGS_KASAN_NOSANITIZE := -fno-builtin
--endif
+> 
+> But, doing so might give impact to other users who
+> rely on having 'rpmbuild' in the home directory.
+> I have to hear opinions from others
+> if this change is desired.
+
+Fair enough.
+
+> 
+> Meanwhile, if you are unhappy with that, one solution is to use RPMOPTS.
+> RPMOPTS exists to tweak the default behavior.
+
+I don't see this documented anywhere.  I'm assuming that is supposed to 
+be an environment variable.  I'll have to see how well that works with 
+our automated build systems.  Command line options are generally preferred.
+
+> 
+> 
+> Thanks.
+> 
+> 
+>> ---
+>>   scripts/Makefile.package | 12 +++++++++---
+>>   1 file changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+>> index 56eadcc..aab0711 100644
+>> --- a/scripts/Makefile.package
+>> +++ b/scripts/Makefile.package
+>> @@ -21,7 +21,7 @@ include $(srctree)/scripts/Kbuild.include
+>>   # - Use /. to avoid tar packing just the symlink
+>>
+>>   # Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
+>> -# but the binrpm-pkg target can; for some reason O= gets ignored.
+>> +# but the binrpm-pkg target can
+>>
+>>   # Remove hyphens since they have special meaning in RPM filenames
+>>   KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+>> @@ -33,6 +33,12 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
+>>                  Kbuild Kconfig COPYING $(wildcard localversion*)
+>>   MKSPEC     := $(srctree)/scripts/package/mkspec
+>>
+>> +RPM_OUTDIR :=
+>> +ifneq ($(objtree),$(srctree))
+>> +# Using absolute path as relative path will cause parts of rpmbuild to fail
+>> +        RPM_OUTDIR := --define "_topdir $(abs_objtree)/rpmbuild"
+>> +endif
+>> +
+>>   quiet_cmd_src_tar = TAR     $(2).tar.gz
+>>         cmd_src_tar = \
+>>   if test "$(objtree)" != "$(srctree)"; then \
+>> @@ -65,8 +71,8 @@ PHONY += binrpm-pkg
+>>   binrpm-pkg:
+>>          $(MAKE) -f $(srctree)/Makefile
+>>          $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+>> -       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+>> -               $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+>> +       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" $(RPM_OUTDIR) \
+>> +               --target $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+>>
+>>   PHONY += deb-pkg
+>>   deb-pkg:
+>> --
+>> Qualcomm Technologies, Inc. is a member of the
+>> Code Aurora Forum, a Linux Foundation Collaborative Project.
+>>
+> 
+> 
+> --
+> Best Regards
+> Masahiro Yamada
+> 
+
+
 -- 
-2.20.1
+Jeffrey Hugo
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
