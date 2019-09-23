@@ -1,159 +1,214 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:50154 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726785AbfIVVI4 (ORCPT
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:53970 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729483AbfIWJC4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Sep 2019 17:08:56 -0400
-Subject: Re: [PATCH] kbuild: binrpm-pkg: Propagate O= to rpmbuild
-References: <1569006062-17862-1-git-send-email-jhugo@codeaurora.org>
- <CAK7LNATHu6M8zKQi4O30Dvijg0zi8Lvxv6EBbWOE+H_s=E6m+Q@mail.gmail.com>
-From: Jeffrey Hugo <jhugo@codeaurora.org>
-Message-ID: <e4f88d2a-2551-7a63-629c-21d053d73b84@codeaurora.org>
-Date: Sun, 22 Sep 2019 15:08:52 -0600
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNATHu6M8zKQi4O30Dvijg0zi8Lvxv6EBbWOE+H_s=E6m+Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 23 Sep 2019 05:02:56 -0400
+Received: by mail-pg1-f202.google.com with SMTP id a31so1393995pgm.20
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 Sep 2019 02:02:56 -0700 (PDT)
+Date: Mon, 23 Sep 2019 02:02:30 -0700
+Message-Id: <20190923090249.127984-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v18 00/19] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+From: Brendan Higgins <brendanhiggins@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, rdunlap@infradead.org, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, torvalds@linux-foundation.org, Brendan Higgins <brendanhiggins@google.com>
 
-On 9/20/2019 11:30 PM, Masahiro Yamada wrote:
-> Hi Jeffrey,
-> 
-> On Sat, Sep 21, 2019 at 4:01 AM Jeffrey Hugo <jhugo@codeaurora.org> wrote:
->>
->> If the user specifies O= to indicate a specific output directory for the
->> build, rpmbuild does not honor this, and will use its default, which could
->> be the user's home directory.  In cases where the user has limited home
->> directory space, this could cause the build to outright fail.
->>
->> In the case of the binrpm-pkg target, redefine the top directory for output
->> to be what the user specified in O=, thus the user will find a "rpmbuild"
->> subdirectory in that location with all of the RPM artifacts.
->>
->> This does not apply to rpm-pkg, since we already cannot handle creating
->> the source tarball out of tree.
->>
->> Signed-off-by: Jeffrey Hugo <jhugo@codeaurora.org>
-> 
-> 
-> binrpm-pkg creates intermediate build artifacts in $(objtree)/,
-> but puts only the final .rpm into ${HOME}/rpmbuild/RPMS/${ARCH}/.
+## TL;DR
 
-I disagree with this.  Ubuntu 16.04 with the 4.12 version of the rpm 
-packaging utilities will create several directories under rpmbuild in 
-the user's home directory -
-BUILDROOT  RPMS  SOURCES  SPECS  SRPMS
+This revision addresses comments from Linus[1] and Randy[2], by moving
+top level `kunit/` directory to `lib/kunit/` and likewise moves top
+level Kconfig entry under lib/Kconfig.debug, so the KUnit submenu now
+shows up under the "Kernel Hacking" menu.
 
-SOURCES/SPECS/SRPMS are empty for binrpm-pkg.
-RPMs contains the final RPMs as you've indicated
-BUILDROOT appears to contain more intermediate files which are used to 
-then generate the final rpms.
+As a consequence of this, I rewrote patch 06/18 (kbuild: enable building
+KUnit) - now 06/19 (lib: enable building KUnit in lib/), and now needs
+to be re-acked/reviewed.
 
-It seems like more than just the final rpms are dumped into the home 
-directory.
+## Background
 
-> 
-> It has worked like that since a long time before
-> probably in order to respect the default of rpmbuild.
+This patch set proposes KUnit, a lightweight unit testing and mocking
+framework for the Linux kernel.
 
-It still seems inconsistent to me that there is an option defined 
-(KBUILD_OUTPUT and O=) which is described to allow the user to specify 
-the location of the build output, yet there are parts of the build 
-system which do not respect this.
+Unlike Autotest and kselftest, KUnit is a true unit testing framework;
+it does not require installing the kernel on a test machine or in a VM
+(however, KUnit still allows you to run tests on test machines or in VMs
+if you want[3]) and does not require tests to be written in userspace
+running on a host kernel. Additionally, KUnit is fast: From invocation
+to completion KUnit can run several dozen tests in about a second.
+Currently, the entire KUnit test suite for KUnit runs in under a second
+from the initial invocation (build time excluded).
 
-I also find it curious that there is a comment in the makefile this 
-patch modifies that seems to suggest that it is intended for O= to 
-impact the binrpm-pkg target, however that is currently not the case.
+KUnit is heavily inspired by JUnit, Python's unittest.mock, and
+Googletest/Googlemock for C++. KUnit provides facilities for defining
+unit test cases, grouping related test cases into test suites, providing
+common infrastructure for running tests, mocking, spying, and much more.
 
-> 
-> 
-> If you change this behavior, it should be consistent.
-> The 'rpmbuild' should be always located in the kernel tree
-> instead of the user's home directory.
+### What's so special about unit testing?
 
-I'm ok with this.  The current patch attempts to preserve current 
-behavior in the default case of not specifying an output directory, but 
-dumping everything in the kernel tree seems sane to me.
+A unit test is supposed to test a single unit of code in isolation,
+hence the name. There should be no dependencies outside the control of
+the test; this means no external dependencies, which makes tests orders
+of magnitudes faster. Likewise, since there are no external dependencies,
+there are no hoops to jump through to run the tests. Additionally, this
+makes unit tests deterministic: a failing unit test always indicates a
+problem. Finally, because unit tests necessarily have finer granularity,
+they are able to test all code paths easily solving the classic problem
+of difficulty in exercising error handling code.
 
-> 
-> But, doing so might give impact to other users who
-> rely on having 'rpmbuild' in the home directory.
-> I have to hear opinions from others
-> if this change is desired.
+### Is KUnit trying to replace other testing frameworks for the kernel?
 
-Fair enough.
+No. Most existing tests for the Linux kernel are end-to-end tests, which
+have their place. A well tested system has lots of unit tests, a
+reasonable number of integration tests, and some end-to-end tests. KUnit
+is just trying to address the unit test space which is currently not
+being addressed.
 
-> 
-> Meanwhile, if you are unhappy with that, one solution is to use RPMOPTS.
-> RPMOPTS exists to tweak the default behavior.
+### More information on KUnit
 
-I don't see this documented anywhere.  I'm assuming that is supposed to 
-be an environment variable.  I'll have to see how well that works with 
-our automated build systems.  Command line options are generally preferred.
+There is a bunch of documentation near the end of this patch set that
+describes how to use KUnit and best practices for writing unit tests.
+For convenience I am hosting the compiled docs here[4].
 
-> 
-> 
-> Thanks.
-> 
-> 
->> ---
->>   scripts/Makefile.package | 12 +++++++++---
->>   1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
->> index 56eadcc..aab0711 100644
->> --- a/scripts/Makefile.package
->> +++ b/scripts/Makefile.package
->> @@ -21,7 +21,7 @@ include $(srctree)/scripts/Kbuild.include
->>   # - Use /. to avoid tar packing just the symlink
->>
->>   # Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
->> -# but the binrpm-pkg target can; for some reason O= gets ignored.
->> +# but the binrpm-pkg target can
->>
->>   # Remove hyphens since they have special meaning in RPM filenames
->>   KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
->> @@ -33,6 +33,12 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
->>                  Kbuild Kconfig COPYING $(wildcard localversion*)
->>   MKSPEC     := $(srctree)/scripts/package/mkspec
->>
->> +RPM_OUTDIR :=
->> +ifneq ($(objtree),$(srctree))
->> +# Using absolute path as relative path will cause parts of rpmbuild to fail
->> +        RPM_OUTDIR := --define "_topdir $(abs_objtree)/rpmbuild"
->> +endif
->> +
->>   quiet_cmd_src_tar = TAR     $(2).tar.gz
->>         cmd_src_tar = \
->>   if test "$(objtree)" != "$(srctree)"; then \
->> @@ -65,8 +71,8 @@ PHONY += binrpm-pkg
->>   binrpm-pkg:
->>          $(MAKE) -f $(srctree)/Makefile
->>          $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
->> -       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
->> -               $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
->> +       +rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" $(RPM_OUTDIR) \
->> +               --target $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
->>
->>   PHONY += deb-pkg
->>   deb-pkg:
->> --
->> Qualcomm Technologies, Inc. is a member of the
->> Code Aurora Forum, a Linux Foundation Collaborative Project.
->>
-> 
-> 
-> --
-> Best Regards
-> Masahiro Yamada
-> 
+Additionally for convenience, I have applied these patches to a
+branch[5]. The repo may be cloned with:
+git clone https://kunit.googlesource.com/linux
+This patchset is on the kunit/initial/v5.3/v18 branch.
 
+## History since v15
+
+### v18
+
+ - Addrssed comments on 07/19 (kunit: test: add initial tests) from
+   Randy Dunlap by removing redundant dependencies from Kconfig entries.
+
+### v17
+
+ - Addressed comments on 06/19 (lib: enable building KUnit in lib/) from
+   Stephen Boyd by moving KUnit submenu ahead of Runtime Testing
+   submenu.
+
+### v16
+
+ - Addressed comments from Linus Torvalds by moving all kunit/ paths to
+   lib/kunit/.
+ - Addressed comments by Randy Dunlap by moving KUnit Kconfig under
+   lib/Kconfig.debug so the KUnit submenu shows up under the "Kernel
+   Hacking" menu.
+
+[1] https://www.lkml.org/lkml/2019/9/20/696
+[2] https://www.lkml.org/lkml/2019/9/20/738
+[3] https://google.github.io/kunit-docs/third_party/kernel/docs/usage.html#kunit-on-non-uml-architectures
+[4] https://google.github.io/kunit-docs/third_party/kernel/docs/
+[5] https://kunit.googlesource.com/linux/+/kunit/initial/v5.3/v18
+
+---
+Avinash Kondareddy (1):
+  kunit: test: add tests for KUnit managed resources
+
+Brendan Higgins (16):
+  kunit: test: add KUnit test runner core
+  kunit: test: add test resource management API
+  kunit: test: add string_stream a std::stream like string builder
+  kunit: test: add assertion printing library
+  kunit: test: add the concept of expectations
+  lib: enable building KUnit in lib/
+  kunit: test: add initial tests
+  objtool: add kunit_try_catch_throw to the noreturn list
+  kunit: test: add support for test abort
+  kunit: test: add tests for kunit test abort
+  kunit: test: add the concept of assertions
+  kunit: defconfig: add defconfigs for building KUnit tests
+  Documentation: kunit: add documentation for KUnit
+  MAINTAINERS: add entry for KUnit the unit testing framework
+  MAINTAINERS: add proc sysctl KUnit test to PROC SYSCTL section
+  kunit: fix failure to build without printk
+
+Felix Guo (1):
+  kunit: tool: add Python wrappers for running KUnit tests
+
+Iurii Zaikin (1):
+  kernel/sysctl-test: Add null pointer test for sysctl.c:proc_dointvec()
+
+ Documentation/dev-tools/index.rst             |    1 +
+ Documentation/dev-tools/kunit/api/index.rst   |   16 +
+ Documentation/dev-tools/kunit/api/test.rst    |   11 +
+ Documentation/dev-tools/kunit/faq.rst         |   62 +
+ Documentation/dev-tools/kunit/index.rst       |   79 +
+ Documentation/dev-tools/kunit/start.rst       |  180 ++
+ Documentation/dev-tools/kunit/usage.rst       |  576 +++++++
+ MAINTAINERS                                   |   13 +
+ arch/um/configs/kunit_defconfig               |    3 +
+ include/kunit/assert.h                        |  356 ++++
+ include/kunit/string-stream.h                 |   51 +
+ include/kunit/test.h                          | 1490 +++++++++++++++++
+ include/kunit/try-catch.h                     |   75 +
+ kernel/Makefile                               |    2 +
+ kernel/sysctl-test.c                          |  392 +++++
+ lib/Kconfig.debug                             |   13 +
+ lib/Makefile                                  |    2 +
+ lib/kunit/Kconfig                             |   36 +
+ lib/kunit/Makefile                            |    9 +
+ lib/kunit/assert.c                            |  141 ++
+ lib/kunit/example-test.c                      |   88 +
+ lib/kunit/string-stream-test.c                |   52 +
+ lib/kunit/string-stream.c                     |  217 +++
+ lib/kunit/test-test.c                         |  331 ++++
+ lib/kunit/test.c                              |  478 ++++++
+ lib/kunit/try-catch.c                         |  118 ++
+ tools/objtool/check.c                         |    1 +
+ tools/testing/kunit/.gitignore                |    3 +
+ tools/testing/kunit/configs/all_tests.config  |    3 +
+ tools/testing/kunit/kunit.py                  |  136 ++
+ tools/testing/kunit/kunit_config.py           |   66 +
+ tools/testing/kunit/kunit_kernel.py           |  149 ++
+ tools/testing/kunit/kunit_parser.py           |  310 ++++
+ tools/testing/kunit/kunit_tool_test.py        |  206 +++
+ .../test_is_test_passed-all_passed.log        |   32 +
+ .../test_data/test_is_test_passed-crash.log   |   69 +
+ .../test_data/test_is_test_passed-failure.log |   36 +
+ .../test_is_test_passed-no_tests_run.log      |   75 +
+ .../test_output_isolated_correctly.log        |  106 ++
+ .../test_data/test_read_from_file.kconfig     |   17 +
+ 40 files changed, 6001 insertions(+)
+ create mode 100644 Documentation/dev-tools/kunit/api/index.rst
+ create mode 100644 Documentation/dev-tools/kunit/api/test.rst
+ create mode 100644 Documentation/dev-tools/kunit/faq.rst
+ create mode 100644 Documentation/dev-tools/kunit/index.rst
+ create mode 100644 Documentation/dev-tools/kunit/start.rst
+ create mode 100644 Documentation/dev-tools/kunit/usage.rst
+ create mode 100644 arch/um/configs/kunit_defconfig
+ create mode 100644 include/kunit/assert.h
+ create mode 100644 include/kunit/string-stream.h
+ create mode 100644 include/kunit/test.h
+ create mode 100644 include/kunit/try-catch.h
+ create mode 100644 kernel/sysctl-test.c
+ create mode 100644 lib/kunit/Kconfig
+ create mode 100644 lib/kunit/Makefile
+ create mode 100644 lib/kunit/assert.c
+ create mode 100644 lib/kunit/example-test.c
+ create mode 100644 lib/kunit/string-stream-test.c
+ create mode 100644 lib/kunit/string-stream.c
+ create mode 100644 lib/kunit/test-test.c
+ create mode 100644 lib/kunit/test.c
+ create mode 100644 lib/kunit/try-catch.c
+ create mode 100644 tools/testing/kunit/.gitignore
+ create mode 100644 tools/testing/kunit/configs/all_tests.config
+ create mode 100755 tools/testing/kunit/kunit.py
+ create mode 100644 tools/testing/kunit/kunit_config.py
+ create mode 100644 tools/testing/kunit/kunit_kernel.py
+ create mode 100644 tools/testing/kunit/kunit_parser.py
+ create mode 100755 tools/testing/kunit/kunit_tool_test.py
+ create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-all_passed.log
+ create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-crash.log
+ create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-failure.log
+ create mode 100644 tools/testing/kunit/test_data/test_is_test_passed-no_tests_run.log
+ create mode 100644 tools/testing/kunit/test_data/test_output_isolated_correctly.log
+ create mode 100644 tools/testing/kunit/test_data/test_read_from_file.kconfig
 
 -- 
-Jeffrey Hugo
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+2.23.0.351.gc4317032e6-goog
