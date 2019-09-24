@@ -1,44 +1,190 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:58418 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:49670 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729120AbfIWVbK (ORCPT
+        with ESMTP id S2392180AbfIXAwm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Sep 2019 17:31:10 -0400
+        Mon, 23 Sep 2019 20:52:42 -0400
 Subject: Re: [PATCH v18 15/19] Documentation: kunit: add documentation for
  KUnit
 References: <20190923090249.127984-1-brendanhiggins@google.com>
  <20190923090249.127984-16-brendanhiggins@google.com>
- <d87eba35-ae09-0c53-bbbe-51ee9dc9531f@infradead.org>
- <CAFd5g45y-NWzbn8E8hUg=n4U5E+N6_4D8eCXhQ74Y0N4zqVW=w@mail.gmail.com>
- <d7a61045-8fe6-a104-ece9-67b69c379425@infradead.org>
- <d5dc04ab-9be5-b258-c302-29f8045d6aaa@kernel.org>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <437bc2d1-f26b-0f04-324f-cbdca989e42c@infradead.org>
-Date: Mon, 23 Sep 2019 14:30:21 -0700
+Message-ID: <9cd80aa2-fc8d-1fed-838b-cf4951692b6d@infradead.org>
+Date: Mon, 23 Sep 2019 17:51:41 -0700
 MIME-Version: 1.0
-In-Reply-To: <d5dc04ab-9be5-b258-c302-29f8045d6aaa@kernel.org>
+In-Reply-To: <20190923090249.127984-16-brendanhiggins@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shuah <shuah@kernel.org>, Brendan Higgins <brendanhiggins@google.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Greg KH <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Theodore Ts'o <tytso@mit.edu>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, Linus Torvalds <torvalds@linux-foundation.org>, Felix Guo <felixguoxiuping@gmail.com>, Jonathan Corbet <corbet@lwn.net>
+To: Brendan Higgins <brendanhiggins@google.com>, frowand.list@gmail.com, gregkh@linuxfoundation.org, jpoimboe@redhat.com, keescook@google.com, kieran.bingham@ideasonboard.com, mcgrof@kernel.org, peterz@infradead.org, robh@kernel.org, sboyd@kernel.org, shuah@kernel.org, tytso@mit.edu, yamada.masahiro@socionext.com
+Cc: devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-nvdimm@lists.01.org, linux-um@lists.infradead.org, Alexander.Levin@microsoft.com, Tim.Bird@sony.com, amir73il@gmail.com, dan.carpenter@oracle.com, daniel@ffwll.ch, jdike@addtoit.com, joel@jms.id.au, julia.lawall@lip6.fr, khilman@baylibre.com, knut.omang@oracle.com, logang@deltatee.com, mpe@ellerman.id.au, pmladek@suse.com, richard@nod.at, rientjes@google.com, rostedt@goodmis.org, wfg@linux.intel.com, torvalds@linux-foundation.org, Felix Guo <felixguoxiuping@gmail.com>, Jonathan Corbet <corbet@lwn.net>
 
-On 9/23/19 2:18 PM, shuah wrote:
+On 9/23/19 2:02 AM, Brendan Higgins wrote:
 
-> I would like to apply the series very soon so it gets some soak time
-> after this move in linux-next and it can still make the rc1.
-> 
-> Since there changes can be addressed after rc1, I would like to not
-> require Brendan to do another version before I apply.
-> 
-> Hope you are okay with that Randy!
-> 
-> thanks,
-> -- Shuah
+> diff --git a/Documentation/dev-tools/kunit/usage.rst b/Documentation/dev-tools/kunit/usage.rst
+> new file mode 100644
+> index 000000000000..c6e69634e274
+> --- /dev/null
+> +++ b/Documentation/dev-tools/kunit/usage.rst
+> @@ -0,0 +1,576 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +===========
+> +Using KUnit
+> +===========
+> +
+> +The purpose of this document is to describe what KUnit is, how it works, how it
+> +is intended to be used, and all the concepts and terminology that are needed to
+> +understand it. This guide assumes a working knowledge of the Linux kernel and
+> +some basic knowledge of testing.
+> +
+> +For a high level introduction to KUnit, including setting up KUnit for your
+> +project, see :doc:`start`.
+> +
+> +Organization of this document
+> +=============================
+> +
+> +This document is organized into two main sections: Testing and Isolating
+> +Behavior. The first covers what a unit test is and how to use KUnit to write
 
-Sure, no problem, go for it .
+                              what unit tests are
+would agree with the following "them."
+
+> +them. The second covers how to use KUnit to isolate code and make it possible
+> +to unit test code that was otherwise un-unit-testable.
+> +
+> +Testing
+> +=======
+> +
+
+[snip]
+
+
+> +
+> +Test Suites
+> +~~~~~~~~~~~
+> +
+> +Now obviously one unit test isn't very helpful; the power comes from having
+> +many test cases covering all of your behaviors. Consequently it is common to
+
+                   covering all of a unit's behaviors.
+
+> +have many *similar* tests; in order to reduce duplication in these closely
+> +related tests most unit testing frameworks provide the concept of a *test
+> +suite*, in KUnit we call it a *test suite*; all it is is just a collection of
+
+                                             . This is just a collection of
+
+> +test cases for a unit of code with a set up function that gets invoked before
+> +every test cases and then a tear down function that gets invoked after every
+
+   every test case
+
+> +test case completes.
+> +
+> +Example:
+> +
+> +.. code-block:: c
+> +
+> +	static struct kunit_case example_test_cases[] = {
+> +		KUNIT_CASE(example_test_foo),
+> +		KUNIT_CASE(example_test_bar),
+> +		KUNIT_CASE(example_test_baz),
+> +		{}
+> +	};
+> +
+> +	static struct kunit_suite example_test_suite = {
+> +		.name = "example",
+> +		.init = example_test_init,
+> +		.exit = example_test_exit,
+> +		.test_cases = example_test_cases,
+> +	};
+> +	kunit_test_suite(example_test_suite);
+> +
+> +In the above example the test suite, ``example_test_suite``, would run the test
+> +cases ``example_test_foo``, ``example_test_bar``, and ``example_test_baz``,
+> +each would have ``example_test_init`` called immediately before it and would
+> +have ``example_test_exit`` called immediately after it.
+> +``kunit_test_suite(example_test_suite)`` registers the test suite with the
+> +KUnit test framework.
+> +
+> +.. note::
+> +   A test case will only be run if it is associated with a test suite.
+> +
+> +For a more information on these types of things see the :doc:`api/test`.
+
+   For more
+
+> +
+> +Isolating Behavior
+> +==================
+> +
+
+[snip]
+
+> +
+> +.. _kunit-on-non-uml:
+> +
+> +KUnit on non-UML architectures
+> +==============================
+> +
+> +By default KUnit uses UML as a way to provide dependencies for code under test.
+> +Under most circumstances KUnit's usage of UML should be treated as an
+> +implementation detail of how KUnit works under the hood. Nevertheless, there
+> +are instances where being able to run architecture specific code, or test
+
+                           I would drop the comma above.
+
+> +against real hardware is desirable. For these reasons KUnit supports running on
+> +other architectures.
+> +
+> +Running existing KUnit tests on non-UML architectures
+> +-----------------------------------------------------
+> +
+
+[snip]
+
+> +Writing new tests for other architectures
+> +-----------------------------------------
+> +
+> +The first thing you must do is ask yourself whether it is necessary to write a
+> +KUnit test for a specific architecture, and then whether it is necessary to
+> +write that test for a particular piece of hardware. In general, writing a test
+> +that depends on having access to a particular piece of hardware or software (not
+> +included in the Linux source repo) should be avoided at all costs.
+> +
+> +Even if you only ever plan on running your KUnit test on your hardware
+> +configuration, other people may want to run your tests and may not have access
+> +to your hardware. If you write your test to run on UML, then anyone can run your
+> +tests without knowing anything about your particular setup, and you can still
+> +run your tests on your hardware setup just by compiling for your architecture.
+> +
+> +.. important::
+> +   Always prefer tests that run on UML to tests that only run under a particular
+> +   architecture, and always prefer tests that run under QEMU or another easy
+> +   (and monitarily free) to obtain software environment to a specific piece of
+
+           monetarily
+
+> +   hardware.
+> +
+> +Nevertheless, there are still valid reasons to write an architecture or hardware
+> +specific test: for example, you might want to test some code that really belongs
+> +in ``arch/some-arch/*``. Even so, try your best to write the test so that it
+> +does not depend on physical hardware: if some of your test cases don't need the
+> +hardware, only require the hardware for tests that actually need it.
+> +
+> +Now that you have narrowed down exactly what bits are hardware specific, the
+> +actual procedure for writing and running the tests is pretty much the same as
+> +writing normal KUnit tests. One special caveat is that you have to reset
+> +hardware state in between test cases; if this is not possible, you may only be
+> +able to run one test case per invocation.
+> +
+> +.. TODO(brendanhiggins@google.com): Add an actual example of an architecture
+> +   dependent KUnit test.
+
 
 -- 
 ~Randy
