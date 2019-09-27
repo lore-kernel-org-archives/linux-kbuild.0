@@ -1,114 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f47.google.com ([209.85.166.47]:44905 "EHLO
-        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726968AbfIZWkS (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:33063 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726365AbfI0JhC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Sep 2019 18:40:18 -0400
-Received: by mail-io1-f47.google.com with SMTP id j4so10806094iog.11
-        for <linux-kbuild@vger.kernel.org>; Thu, 26 Sep 2019 15:40:17 -0700 (PDT)
-From: Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v2] selftests: Add kselftest-all and kselftest-install targets
-Date: Thu, 26 Sep 2019 16:40:14 -0600
-Message-Id: <20190926224014.28910-1-skhan@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Fri, 27 Sep 2019 05:37:02 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 0/7] module: various bug-fixes and clean-ups for module namespace
+Date: Fri, 27 Sep 2019 18:35:56 +0900
+Message-Id: <20190927093603.9140-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org
-Cc: Shuah Khan <skhan@linuxfoundation.org>, linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jessica Yu <jeyu@kernel.org>
+Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Joel Fernandes <joel@joelfernandes.org>, Martijn Coenen <maco@android.com>, Will Deacon <will.deacon@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Add kselftest-all target to build tests from the top level
-Makefile. This is to simplify kselftest use-cases for CI and
-distributions where build and test systems are different.
 
-Current kselftest target builds and runs tests on a development
-system which is a developer use-case.
+I was hit by some problems caused by the module namespace feature
+that was merged recently. At least, the breakage of
+external module builds is a fatal one. I just took a look at the code
+closer, and I noticed some more issues and improvements.
 
-Add kselftest-install target to install tests from the top level
-Makefile. This is to simplify kselftest use-cases for CI and
-distributions where build and test systems are different.
+I hope these patches are mostly OK.
+The 4th patch might have room for argument since it is a trade-off
+of "cleaner implermentation" vs "code size".
 
-This change addresses requests from developers and testers to add
-support for installing kselftest from the main Makefile.
 
-In addition, make the install directory the same when install is
-run using "make kselftest-install" or by running kselftest_install.sh.
-Also fix the INSTALL_PATH variable conflict between main Makefile and
-selftests Makefile.
 
-Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
----
-Changes since v1:
-- Collpased two patches that added separate targets to
-  build and install into one patch using pattern rule to
-  invoke all, install, and clean targets from main Makefile.
+Masahiro Yamada (7):
+  modpost: fix broken sym->namespace for external module builds
+  module: swap the order of symbol.namespace
+  module: rename __kstrtab_ns_* to __kstrtabns_* to avoid symbol
+    conflict
+  module: avoid code duplication in include/linux/export.h
+  kbuild: fix build error of 'make nsdeps' in clean tree
+  nsdeps: fix hashbang of scripts/nsdeps
+  nsdeps: make generated patches independent of locale
 
- Makefile                                     | 5 ++---
- tools/testing/selftests/Makefile             | 8 ++++++--
- tools/testing/selftests/kselftest_install.sh | 4 ++--
- 3 files changed, 10 insertions(+), 7 deletions(-)
+ Makefile               |   2 +-
+ include/linux/export.h | 104 ++++++++++++++---------------------------
+ kernel/module.c        |   2 +-
+ scripts/mod/modpost.c  |  20 ++++----
+ scripts/nsdeps         |   4 +-
+ 5 files changed, 47 insertions(+), 85 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index d456746da347..ec296c60c1af 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1237,9 +1237,8 @@ PHONY += kselftest
- kselftest:
- 	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests run_tests
- 
--PHONY += kselftest-clean
--kselftest-clean:
--	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests clean
-+kselftest-%: FORCE
-+	$(Q)$(MAKE) -C $(srctree)/tools/testing/selftests $*
- 
- PHONY += kselftest-merge
- kselftest-merge:
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index c3feccb99ff5..bad18145ed1a 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -171,9 +171,12 @@ run_pstore_crash:
- # 1. output_dir=kernel_src
- # 2. a separate output directory is specified using O= KBUILD_OUTPUT
- # 3. a separate output directory is specified using KBUILD_OUTPUT
-+# Avoid conflict with INSTALL_PATH set by the main Makefile
- #
--INSTALL_PATH ?= $(BUILD)/install
--INSTALL_PATH := $(abspath $(INSTALL_PATH))
-+KSFT_INSTALL_PATH ?= $(BUILD)/kselftest_install
-+KSFT_INSTALL_PATH := $(abspath $(KSFT_INSTALL_PATH))
-+# Avoid changing the rest of the logic here and lib.mk.
-+INSTALL_PATH := $(KSFT_INSTALL_PATH)
- ALL_SCRIPT := $(INSTALL_PATH)/run_kselftest.sh
- 
- install: all
-@@ -203,6 +206,7 @@ ifdef INSTALL_PATH
- 		echo "[ -w /dev/kmsg ] && echo \"kselftest: Running tests in $$TARGET\" >> /dev/kmsg" >> $(ALL_SCRIPT); \
- 		echo "cd $$TARGET" >> $(ALL_SCRIPT); \
- 		echo -n "run_many" >> $(ALL_SCRIPT); \
-+		echo -n "Emit Tests for $$TARGET\n"; \
- 		$(MAKE) -s --no-print-directory OUTPUT=$$BUILD_TARGET -C $$TARGET emit_tests >> $(ALL_SCRIPT); \
- 		echo "" >> $(ALL_SCRIPT);	    \
- 		echo "cd \$$ROOT" >> $(ALL_SCRIPT); \
-diff --git a/tools/testing/selftests/kselftest_install.sh b/tools/testing/selftests/kselftest_install.sh
-index ec304463883c..e2e1911d62d5 100755
---- a/tools/testing/selftests/kselftest_install.sh
-+++ b/tools/testing/selftests/kselftest_install.sh
-@@ -24,12 +24,12 @@ main()
- 		echo "$0: Installing in specified location - $install_loc ..."
- 	fi
- 
--	install_dir=$install_loc/kselftest
-+	install_dir=$install_loc/kselftest_install
- 
- # Create install directory
- 	mkdir -p $install_dir
- # Build tests
--	INSTALL_PATH=$install_dir make install
-+	KSFT_INSTALL_PATH=$install_dir make install
- }
- 
- main "$@"
 -- 
-2.20.1
+2.17.1
