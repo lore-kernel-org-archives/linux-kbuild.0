@@ -1,58 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:46655 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727289AbfI0Qfh (ORCPT
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:36695 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726294AbfI0Rmq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:35:37 -0400
-Received: by mail-vs1-f65.google.com with SMTP id z14so2247422vsz.13
-        for <linux-kbuild@vger.kernel.org>; Fri, 27 Sep 2019 09:35:36 -0700 (PDT)
+        Fri, 27 Sep 2019 13:42:46 -0400
+Date: Fri, 27 Sep 2019 19:42:32 +0200
+From: Ulf Magnusson <ulfalizer@gmail.com>
+Subject: [PATCH] drm/tiny: Kconfig: Remove always-y THERMAL dep. from
+ TINYDRM_REPAPER
+Message-ID: <20190927174218.GA32085@huvuddator>
 MIME-Version: 1.0
-References: <CAKYFi-4i-rspPYsYPznjcU+_v02sKEewxFLQuHyx6i11v85UWQ@mail.gmail.com>
- <CAK7LNAQ8xu=6PD_Pz8wPrshsTtHprwjQEj7qFoFsq80rc5bDZg@mail.gmail.com>
-In-Reply-To: <CAK7LNAQ8xu=6PD_Pz8wPrshsTtHprwjQEj7qFoFsq80rc5bDZg@mail.gmail.com>
-From: constant override <constantoverride@gmail.com>
-Date: Fri, 27 Sep 2019 18:34:52 +0200
-Message-ID: <CAKYFi-7FbdHqobEYBCpYprABOEhPN0wrgEsujFv6V3D71Vz4cQ@mail.gmail.com>
-Subject: Re: scripts/kconfig/nconf.c stuck in infinite loop in search
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com
+Cc: airlied@linux.ie, daniel@ffwll.ch, noralf@tronnes.org, sam@ravnborg.org, david@lechnology.com, hdegoede@redhat.com, eric@anholt.net, tglx@linutronix.de, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 5:54 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Fri, Sep 27, 2019 at 2:41 AM constant override
-> <constantoverride@gmail.com> wrote:
-> >
-> > please have a look at the patch/solution here:
-the only reason I even mentioned it here(ML) is because someone in the
-comments asked me to.
-> > https://bugzilla.kernel.org/show_bug.cgi?id=203437#c0
-> >
-> > thanks!
->
-> Could you send it in a patch form to this ML?
-"using your real name (sorry, no pseudonyms or anonymous contributions.)"
+Commit 554b3529fe01 ("thermal/drivers/core: Remove the module Kconfig's
+option") changed the type of THERMAL from tristate to bool, so
+THERMAL || !THERMAL is now always y. Remove the redundant dependency.
 
-no can do, sorry :)
->
->
-> Please add the subject in the form:
->
-> kconfig: <one-line description in imperative mood>
->
->
-> Also, one important thing is
-> to add your Signed-off-by:
->
-> For the patch submission rule, you can refer to:
->
-> https://github.com/torvalds/linux/blob/master/Documentation/process/submitting-patches.rst
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Discovered through Kconfiglib detecting a dependency loop. The C tools
+simplify the expression to y before running dependency loop detection,
+and so don't see it. Changing the type of THERMAL back to tristate makes
+the C tools detect the same loop.
+
+Not sure if running dep. loop detection after simplification can be
+called a bug. Fixing this nit unbreaks Kconfiglib on the kernel at
+least.
+
+Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+---
+ drivers/gpu/drm/tiny/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/tiny/Kconfig b/drivers/gpu/drm/tiny/Kconfig
+index 504763423d46..a46ac284dd5e 100644
+--- a/drivers/gpu/drm/tiny/Kconfig
++++ b/drivers/gpu/drm/tiny/Kconfig
+@@ -63,7 +63,6 @@ config TINYDRM_REPAPER
+ 	depends on DRM && SPI
+ 	select DRM_KMS_HELPER
+ 	select DRM_KMS_CMA_HELPER
+-	depends on THERMAL || !THERMAL
+ 	help
+ 	  DRM driver for the following Pervasive Displays panels:
+ 	  1.44" TFT EPD Panel (E1144CS021)
+-- 
+2.20.1
