@@ -1,82 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:62160 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725379AbfI2EAG (ORCPT
+Received: from padbanking.net ([31.220.0.186]:56499 "EHLO
+        slot0.jntechglass.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1726198AbfI2Pvy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 29 Sep 2019 00:00:06 -0400
+        Sun, 29 Sep 2019 11:51:54 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <CAK7LNAT-D68xMFrE-D_F-2y+iZt45+8iLF9dmTyO8YwUX-bTqA@mail.gmail.com>
- <CAHk-=wjdc7Ovi-iVGBGzuP6prTXVRT8rgbnabBd0AiHRqECMCg@mail.gmail.com>
-In-Reply-To: <CAHk-=wjdc7Ovi-iVGBGzuP6prTXVRT8rgbnabBd0AiHRqECMCg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 29 Sep 2019 12:59:24 +0900
-Message-ID: <CAK7LNAQuY50tB790n85LGpX3m6yuxHTyB++0BwVFnSnz1B0gWA@mail.gmail.com>
-Subject: Re: [GIT PULL] More Kbuild updates for v5.4-rc1
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: =?utf-8?b?UmU6IOKCrCAyLDAwMCwwMDAtMDAgRVVS?=
+From: "Herr Richard Wahl" <admin@jntechglass.com>
+Date: Sun, 29 Sep 2019 08:36:02 -0700
+Reply-To: unitednationscouncilrefunds@gmail.com
+Message-ID: <0.0.1B.53D.1D576DB995906B0.0@slot0.jntechglass.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: Recipients <admin@jntechglass.com>
 
-Hi Linus,
+Lieber Freund,
 
-On Sun, Sep 29, 2019 at 11:57 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sat, Sep 28, 2019 at 11:41 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
-> >
-> > Please pull some more updates for v5.4-rc1
->
-> I pulled this, but I'm not sure if I'm going to keep it.
->
-> There's thousands of lines of changes because of the header-test-y
-> thing, and I'm honestly considering just getting rid of that thing
-> entirely.
->
-> It has no actual upside that I can tell, and it's extremely annoying.
-> It pollutes the tree with hundreds of *.h.s files, which messes up
-> filename completion, and just generally is ugly and annoying.
->
-> So I've unpulled for now, and I'm not sure I want to pull more noise
-> for this mis-feature.
->
->                 Linus
+Ich bin Herr Richard Wahl der Mega-Gewinner von $ 533M In Mega Millions Jac=
+kpot spende ich an 5 zuf=C3=A4llige Personen, wenn Sie diese E-Mail erhalte=
+n, dann wurde Ihre E-Mail nach einem Spinball ausgew=C3=A4hlt. Ich habe den=
+ gr=C3=B6=C3=9Ften Teil meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=
+=A4tigkeitsorganisationen und Organisationen verteilt. Ich habe mich freiwi=
+llig dazu entschieden, Ihnen den Betrag von =E2=82=AC 2.000.000,00 zu spend=
+en eine der ausgew=C3=A4hlten 5, um meine Gewinne zu =C3=BCberpr=C3=BCfen, =
+finden Sie auf meiner You Tube Seite unten.
 
+UHR MICH HIER: https://www.youtube.com/watch?v=3Dtne02ExNDrw
 
+Das ist dein Spendencode: [DF00430342018]
 
+Antworten Sie mit dem Spendencode auf diese E-Mail: andrebotha@yahoo.com
 
-The concept of header test is to make sure every header
-is self-contained, so that headers can be included in
-  either
-#include <linux/foo.h>
-#include <linux/bar.h>
-  or
-#include <linux/bar.h>
-#include <linux/foo.h>
+Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
 
+Gr=C3=BC=C3=9Fe
 
-Of course, you can argue that it is addressing hypothetical issues
-"what if the include directives are arranged in this order?",
-that nobody has been hit before.
-
-If this test is just annoying, shall we remove
-the 'header-test-y' syntax and include/Kbuild entirely?
-
-But, at least, I want to continue compile-testing
-uapi headers that are exported to user-space.
-
-This is useful to detect a broken uapi header
-that is never be able to be compiled in user-space.
-
-For example,
-https://lkml.org/lkml/2019/6/19/104
-
-
-So, I'd like to keep usr/include/Makefile
-at least.
-
-
--- 
-Best Regards
-Masahiro Yamada
+Herr Richard Wahl
