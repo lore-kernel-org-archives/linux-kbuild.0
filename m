@@ -1,189 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:24430 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726581AbfI1SlS (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:51339 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728569AbfI2AVU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Sep 2019 14:41:18 -0400
+        Sat, 28 Sep 2019 20:21:20 -0400
 MIME-Version: 1.0
+References: <20190129204319.15238-1-jacob.e.keller@intel.com>
+ <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org> <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
+In-Reply-To: <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 29 Sep 2019 03:40:28 +0900
-Message-ID: <CAK7LNAT-D68xMFrE-D_F-2y+iZt45+8iLF9dmTyO8YwUX-bTqA@mail.gmail.com>
-Subject: [GIT PULL] More Kbuild updates for v5.4-rc1
+Date: Sun, 29 Sep 2019 09:20:31 +0900
+Message-ID: <CAK7LNARyUEakeG_N9TWcO2cjFSzbgY__k_QJm6C+oOz+fW0aeg@mail.gmail.com>
+Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative paths
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Linus,
+On Sat, Sep 28, 2019 at 8:30 AM Keller, Jacob E
+<jacob.e.keller@intel.com> wrote:
+>
+> > -----Original Message-----
+> > From: Randy Dunlap [mailto:rdunlap@infradead.org]
+> > Sent: Friday, September 27, 2019 4:12 PM
+> > To: Keller, Jacob E <jacob.e.keller@intel.com>
+> > Cc: intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; linux-kbuild <linux-
+> > kbuild@vger.kernel.org>; Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative paths
+> >
+> >
+> > re: https://lore.kernel.org/lkml/20190129204319.15238-1-jacob.e.keller@intel.com/
+> >
+> > Did anything happen with this patch?
+> >
+> > Please send it to linux-kbuild@vger.kernel.org and
+> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >
+> > You can also add:
+> > Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> > Tested-by: Randy Dunlap <rdunlap@infradead.org>
+> >
+> >
+> > I was just about to fix this script but I decided to first see if anyone else
+> > had already done so.  Thanks.
+> >
+> > --
+> > ~Randy
+>
+> Done, thanks.
+>
+> Regards,
+> Jake
 
-Please pull some more updates for v5.4-rc1
 
-Thanks.
-
-
-
-The following changes since commit 351c8a09b00b5c51c8f58b016fffe51f87e2d820:
-
-  Merge branch 'i2c/for-5.4' of
-git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux (2019-09-24
-16:48:02 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v5.4-2
-
-for you to fetch changes up to 69305e9506cc5513862421ae31111f27de1f28a5:
-
-  namespace: fix namespace.pl script to support relative paths
-(2019-09-29 03:07:44 +0900)
-
-----------------------------------------------------------------
-Kbuild updates for v5.4 (2nd)
-
- - remove unneeded asm headers for hexagon and ia64
-
- - remove unneeded ar-option and KBUILD_ARFLAGS
-
- - remove long-deprecated SUBDIRS
-
- - fix false-positive "static EXPORT_SYMBOL" modpost warnings for UML
-
- - detect missing include guard by header compile-test
-
- - stop using wildcard patterns for in-kernel header test
-
- - fix scripts/namespace.pl to handle relative ${objtree}, ${srctree}
-
- - misc Makefile fixes and cleanups
-
-----------------------------------------------------------------
-Alex Gaynor (1):
-      Corrected formatting of header in kbuild module docs
-
-Jacob Keller (1):
-      namespace: fix namespace.pl script to support relative paths
-
-Masahiro Yamada (15):
-      hexagon: remove asm/bitsperlong.h
-      ia64: remove unneeded uapi asm-generic wrappers
-      integrity: remove unneeded, broken attempt to add -fshort-wchar
-      integrity: remove pointless subdir-$(CONFIG_...)
-      video/logo: remove unneeded *.o pattern from clean-files
-      video/logo: do not generate unneeded logo C files
-      video/logo: simplify cmd_logo
-      video/logo: move pnmtologo tool to drivers/video/logo/ from scripts/
-      kconfig: split util.c out of parser.y
-      kbuild: remove ar-option and KBUILD_ARFLAGS
-      kbuild: remove SUBDIRS support
-      modpost: fix static EXPORT_SYMBOL warnings for UML build
-      kbuild: update compile-test header list for v5.4-rc1
-      kbuild: detect missing header include guard
-      kbuild: stop using wildcard patterns for in-kernel header test
-
- Documentation/kbuild/makefiles.rst          |    5 -
- Documentation/kbuild/modules.rst            |    3 +-
- Makefile                                    |   24 +-
- arch/hexagon/include/uapi/asm/bitsperlong.h |   27 -
- arch/ia64/include/uapi/asm/errno.h          |    2 -
- arch/ia64/include/uapi/asm/ioctl.h          |    2 -
- arch/ia64/include/uapi/asm/ioctls.h         |    7 -
- arch/powerpc/boot/Makefile                  |    2 +-
- drivers/video/logo/.gitignore               |    1 +
- drivers/video/logo/Makefile                 |   36 +-
- {scripts => drivers/video/logo}/pnmtologo.c |    0
- include/Kbuild                              | 1205 +---------------------
- include/acpi/Kbuild                         |   18 +
- include/clocksource/Kbuild                  |    8 +
- include/crypto/Kbuild                       |   63 ++
- include/drm/Kbuild                          |   89 ++
- include/keys/Kbuild                         |   10 +
- include/kvm/Kbuild                          |    5 +
- include/linux/Kbuild                        | 1175 +++++++++++++++++++++
- include/linux/byteorder/Kbuild              |    4 +
- include/linux/ceph/Kbuild                   |   19 +
- include/linux/i3c/Kbuild                    |    5 +
- include/linux/iio/Kbuild                    |   22 +
- include/linux/mfd/Kbuild                    |  154 +++
- include/linux/mmc/Kbuild                    |   14 +
- include/linux/mtd/Kbuild                    |   31 +
- include/linux/pinctrl/Kbuild                |   10 +
- include/linux/platform_data/Kbuild          |  148 +++
- include/linux/regulator/Kbuild              |   26 +
- include/linux/sched/Kbuild                  |   28 +
- include/linux/spi/Kbuild                    |   18 +
- include/linux/sunrpc/Kbuild                 |   28 +
- include/linux/usb/Kbuild                    |   41 +
- include/math-emu/Kbuild                     |    6 +
- include/media/Kbuild                        |  100 ++
- include/misc/Kbuild                         |    5 +
- include/net/Kbuild                          |  239 +++++
- include/pcmcia/Kbuild                       |    6 +
- include/ras/Kbuild                          |    3 +
- include/rdma/Kbuild                         |   38 +
- include/scsi/Kbuild                         |   19 +
- include/soc/Kbuild                          |   26 +
- include/sound/Kbuild                        |   93 ++
- include/target/Kbuild                       |    6 +
- include/trace/Kbuild                        |   85 ++
- include/vdso/Kbuild                         |    4 +
- include/video/Kbuild                        |   32 +
- include/xen/Kbuild                          |    9 +
- scripts/.gitignore                          |    1 -
- scripts/Kbuild.include                      |    5 -
- scripts/Makefile                            |    2 -
- scripts/Makefile.build                      |    5 +-
- scripts/Makefile.lib                        |    2 +-
- scripts/kconfig/Makefile                    |    2 +-
- scripts/kconfig/parser.y                    |    1 -
- scripts/mod/modpost.c                       |   13 +-
- scripts/namespace.pl                        |   13 +-
- security/integrity/Makefile                 |    3 -
- usr/include/Makefile                        |   12 +-
- 59 files changed, 2646 insertions(+), 1314 deletions(-)
- delete mode 100644 arch/hexagon/include/uapi/asm/bitsperlong.h
- delete mode 100644 arch/ia64/include/uapi/asm/errno.h
- delete mode 100644 arch/ia64/include/uapi/asm/ioctl.h
- delete mode 100644 arch/ia64/include/uapi/asm/ioctls.h
- rename {scripts => drivers/video/logo}/pnmtologo.c (100%)
- create mode 100644 include/acpi/Kbuild
- create mode 100644 include/clocksource/Kbuild
- create mode 100644 include/crypto/Kbuild
- create mode 100644 include/drm/Kbuild
- create mode 100644 include/keys/Kbuild
- create mode 100644 include/kvm/Kbuild
- create mode 100644 include/linux/Kbuild
- create mode 100644 include/linux/byteorder/Kbuild
- create mode 100644 include/linux/ceph/Kbuild
- create mode 100644 include/linux/i3c/Kbuild
- create mode 100644 include/linux/iio/Kbuild
- create mode 100644 include/linux/mfd/Kbuild
- create mode 100644 include/linux/mmc/Kbuild
- create mode 100644 include/linux/mtd/Kbuild
- create mode 100644 include/linux/pinctrl/Kbuild
- create mode 100644 include/linux/platform_data/Kbuild
- create mode 100644 include/linux/regulator/Kbuild
- create mode 100644 include/linux/sched/Kbuild
- create mode 100644 include/linux/spi/Kbuild
- create mode 100644 include/linux/sunrpc/Kbuild
- create mode 100644 include/linux/usb/Kbuild
- create mode 100644 include/math-emu/Kbuild
- create mode 100644 include/media/Kbuild
- create mode 100644 include/misc/Kbuild
- create mode 100644 include/net/Kbuild
- create mode 100644 include/pcmcia/Kbuild
- create mode 100644 include/ras/Kbuild
- create mode 100644 include/rdma/Kbuild
- create mode 100644 include/scsi/Kbuild
- create mode 100644 include/soc/Kbuild
- create mode 100644 include/sound/Kbuild
- create mode 100644 include/target/Kbuild
- create mode 100644 include/trace/Kbuild
- create mode 100644 include/vdso/Kbuild
- create mode 100644 include/video/Kbuild
- create mode 100644 include/xen/Kbuild
-
+Applied to linux/kbuild. Thanks.
 
 -- 
 Best Regards
