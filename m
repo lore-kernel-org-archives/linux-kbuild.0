@@ -1,49 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:33210 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728457AbfJCDSe (ORCPT
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:35154 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728432AbfJCDSq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Oct 2019 23:18:34 -0400
-Received: by mail-pl1-f193.google.com with SMTP id d22so814913pls.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2019 20:18:33 -0700 (PDT)
-Message-Id: <20191003031312.252507322@gmail.com>
-Date: Wed, 02 Oct 2019 20:13:13 -0700
+        Wed, 2 Oct 2019 23:18:46 -0400
+Received: by mail-pf1-f170.google.com with SMTP id 205so796815pfw.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2019 20:18:46 -0700 (PDT)
+Message-Id: <20191003031312.313485229@gmail.com>
+Date: Wed, 02 Oct 2019 20:13:14 -0700
 From: rd.dunlab@gmail.com
-Subject: [PATCH 1/4] scripts: namespace.pl: handle lib-ksyms.o as lib.a
+Subject: [PATCH 2/4] scripts: namespace.pl: add some x86 object files to nmexception
 References: <20191003031312.157994411@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=scr-namespace-check-fix002.patch
+Content-Disposition: inline; filename=scr-namespace-x86-excepts.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Randy Dunlap <rd.dunlab@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, rdunlap@infradead.org
 
-Fix these warnings:
-  No source file found for drivers/firmware/efi/libstub/lib-ksyms.o
-  No source file found for arch/x86/lib/lib-ksyms.o
-  No source file found for lib/lib-ksyms.o
-
-In scripts/Makefile.build, any resulting lib-ksyms.o file is renamed to
-lib.a, so handle that rename here also.
+These x86 object files do not have any exports or public symbols
+so they can be excluded from the namespace checking.
 
 Signed-off-by: Randy Dunlap <rd.dunlab@gmail.com>
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Randy Dunlap <rdunlap@infradead.org>
 ---
-patch 1/4:
- scripts/namespace.pl |    3 +++
- 1 file changed, 3 insertions(+)
+patch 2/4:
+ scripts/namespace.pl |    2 ++
+ 1 file changed, 2 insertions(+)
 
 --- linux-next-20191002.orig/scripts/namespace.pl
 +++ linux-next-20191002/scripts/namespace.pl
-@@ -231,6 +231,9 @@ sub do_nm
- 		return;
- 	}
- 	($source = $basename) =~ s/\.o$//;
-+	if ($basename eq "lib-ksyms.o") { # modified in scripts/Makefile.build
-+		$basename = "lib.a";	# from lib.a to lib-ksyms.o
-+	}
- 	if (-e "$source.c" || -e "$source.S") {
- 		$source = File::Spec->catfile($objtree, $File::Find::dir, $source)
- 	} else {
+@@ -91,6 +91,8 @@ my %nmexception = (
+     'arch/x86/lib/thunk_32'		=> 1,
+     'arch/x86/lib/cmpxchg'		=> 1,
+     'arch/x86/vdso/vdso32/note'		=> 1,
++    'arch/x86/entry/vdso/vdso-note.o'	=> 1,
++    'arch/x86/entry/vdso/vdso32/note.o'	=> 1,
+     'lib/irq_regs'			=> 1,
+     'usr/initramfs_data'		=> 1,
+     'drivers/scsi/aic94xx/aic94xx_dump'	=> 1,
