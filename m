@@ -1,53 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:59224 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727452AbfJCH7Q (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:63836 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727953AbfJCID7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Oct 2019 03:59:16 -0400
+        Thu, 3 Oct 2019 04:03:59 -0400
+MIME-Version: 1.0
+References: <20190927093603.9140-1-yamada.masahiro@socionext.com>
+ <20190927134108.GC187147@google.com> <20191002185701.GA29041@linux-8ccs>
+In-Reply-To: <20191002185701.GA29041@linux-8ccs>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 4/6] kbuild: fix build error of 'make nsdeps' in clean tree
-Date: Thu,  3 Oct 2019 16:58:24 +0900
-Message-Id: <20191003075826.7478-5-yamada.masahiro@socionext.com>
-In-Reply-To: <20191003075826.7478-1-yamada.masahiro@socionext.com>
-References: <20191003075826.7478-1-yamada.masahiro@socionext.com>
+Date: Thu, 3 Oct 2019 17:03:18 +0900
+Message-ID: <CAK7LNAQy7FjBeXTA=R=-0Tm+6m0ENVin7SPFQWcvF8zJ2etvvg@mail.gmail.com>
+Subject: Re: [PATCH 0/7] module: various bug-fixes and clean-ups for module namespace
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jessica Yu <jeyu@kernel.org>
-Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shaun Ruffell <sruffell@sruffell.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Joel Fernandes <joel@joelfernandes.org>, Martijn Coenen <maco@android.com>, Will Deacon <will.deacon@arm.com>, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Running 'make nsdeps' in a clean source tree fails as follows:
+Hi Jessica,
 
-$ make -s clean; make -s defconfig; make nsdeps
-   [ snip ]
-awk: fatal: cannot open file `init/modules.order' for reading (No such file or directory)
-make: *** [Makefile;1307: modules.order] Error 2
-make: *** Deleting file 'modules.order'
-make: *** Waiting for unfinished jobs....
+On Thu, Oct 3, 2019 at 3:57 AM Jessica Yu <jeyu@kernel.org> wrote:
+>
+> +++ Matthias Maennich [27/09/19 14:41 +0100]:
+> >On Fri, Sep 27, 2019 at 06:35:56PM +0900, Masahiro Yamada wrote:
+> >>
+> >>I was hit by some problems caused by the module namespace feature
+> >>that was merged recently. At least, the breakage of
+> >>external module builds is a fatal one. I just took a look at the code
+> >>closer, and I noticed some more issues and improvements.
+> >>
+> >>I hope these patches are mostly OK.
+> >>The 4th patch might have room for argument since it is a trade-off
+> >>of "cleaner implermentation" vs "code size".
+> >>
+> >Thanks Masahiro for taking the time to improve the implementation of the
+> >symbol namespaces. These are all good points that you addressed!
+>
+> Agreed, thanks Masahiro for fixing up all the rough edges! Your series
+> of fixes look good to me, I will queue this up on modules-next this
+> week with the exception of patch 4 - Matthias, you are planning to
+> submit a patch that would supercede patch 04/07, right?
+>
+> Thanks!
 
-The cause of the error is 'make nsdeps' does not build modules at all.
-Set KBUILD_MODULES to fix it.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Reviewed-by: Matthias Maennich <maennich@google.com>
----
+I missed to fix one issue in v1.
+sym_add_exported() misses to set s->namespace
+if the struct symbol is already created by
+read_dump() or sym_update_crc().
 
-Changes in v2: None
 
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So, I just sent v2.
 
-diff --git a/Makefile b/Makefile
-index 6f54f2f95743..d97f38ad5d9f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -616,7 +616,7 @@ endif
- # in addition to whatever we do anyway.
- # Just "make" or "make all" shall build modules as well
- 
--ifneq ($(filter all _all modules,$(MAKECMDGOALS)),)
-+ifneq ($(filter all _all modules nsdeps,$(MAKECMDGOALS)),)
-   KBUILD_MODULES := 1
- endif
- 
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
