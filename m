@@ -1,135 +1,147 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:49391 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728919AbfJCKaN (ORCPT
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:46858 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730370AbfJCN33 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Oct 2019 06:30:13 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 3/4] kbuild: do not read $(KBUILD_EXTMOD)/Module.symvers
-Date: Thu,  3 Oct 2019 19:29:14 +0900
-Message-Id: <20191003102915.28301-3-yamada.masahiro@socionext.com>
-In-Reply-To: <20191003102915.28301-1-yamada.masahiro@socionext.com>
-References: <20191003102915.28301-1-yamada.masahiro@socionext.com>
+        Thu, 3 Oct 2019 09:29:29 -0400
+Received: by mail-yw1-f67.google.com with SMTP id 201so985317ywn.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 03 Oct 2019 06:29:28 -0700 (PDT)
+Date: Thu, 3 Oct 2019 01:29:27 -0500
+From: Shaun Ruffell <sruffell@sruffell.net>
+Subject: Re: [PATCH v2 2/6] modpost: fix broken sym->namespace for external
+ module builds
+Message-ID: <20191003062927.4pusu3sfjyfayigy@sruffell.net>
+References: <20191003075826.7478-1-yamada.masahiro@socionext.com>
+ <20191003075826.7478-3-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191003075826.7478-3-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Jessica Yu <jeyu@kernel.org>, Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Since commit 040fcc819a2e ("kbuild: improved modversioning support for
-external modules"), the external module build reads Module.symvers in
-the directory of the module itself, then dumps symbols back into it.
-It accumulates stale symbols in the file when you build an external
-module incrementally.
+On Thu, Oct 03, 2019 at 04:58:22PM +0900, Masahiro Yamada wrote:
+> Currently, external module builds produce tons of false-positives:
+> 
+>   WARNING: module <mod> uses symbol <sym> from namespace <ns>, but does not import it.
+> 
+> Here, the <ns> part shows a random string.
+> 
+> When you build external modules, the symbol info of vmlinux and
+> in-kernel modules are read from $(objtree)/Module.symvers, but
+> read_dump() is buggy in multiple ways:
+> 
+> [1] When the modpost is run for vmlinux and in-kernel modules,
+> sym_extract_namespace() allocates memory for the namespace. On the
+> other hand, read_dump() does not, then sym->namespace will point to
+> somewhere in the line buffer of get_next_line(). The data in the
+> buffer will be replaced soon, and sym->namespace will end up with
+> pointing to unrelated data. As a result, check_exports() will show
+> random strings in the warning messages.
+> 
+> [2] When there is no namespace, sym_extract_namespace() returns NULL.
+> On the other hand, read_dump() sets namespace to an empty string "".
+> (but, it will be later replaced with unrelated data due to bug [1].)
+> The check_exports() shows a warning unless exp->namespace is NULL,
+> so every symbol read from read_dump() emits the warning, which is
+> mostly false positive.
+> 
+> To address [1], sym_add_exported() calls strdup() for s->namespace.
+> The namespace from sym_extract_namespace() must be freed to avoid
+> memory leak.
+> 
+> For [2], I changed the if-conditional in check_exports().
+> 
+> This commit also fixes sym_add_exported() to set s->namespace correctly
+> when the symbol is preloaded.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Reviewed-by: Matthias Maennich <maennich@google.com>
+> ---
+> 
+> Changes in v2:
+>   - Change the approach to deal with ->preloaded
+> 
+>  scripts/mod/modpost.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 2c644086c412..936d3ad23c83 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -166,7 +166,7 @@ struct symbol {
+>  	struct module *module;
+>  	unsigned int crc;
+>  	int crc_valid;
+> -	const char *namespace;
+> +	char *namespace;
+>  	unsigned int weak:1;
+>  	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
+>  	unsigned int kernel:1;     /* 1 if symbol is from kernel
+> @@ -348,7 +348,7 @@ static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
+>  		return export_unknown;
+>  }
+>  
+> -static const char *sym_extract_namespace(const char **symname)
+> +static char *sym_extract_namespace(const char **symname)
+>  {
+>  	char *namespace = NULL;
+>  	char *ns_separator;
+> @@ -373,7 +373,6 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
+>  
+>  	if (!s) {
+>  		s = new_symbol(name, mod, export);
+> -		s->namespace = namespace;
+>  	} else {
+>  		if (!s->preloaded) {
+>  			warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+> @@ -384,6 +383,8 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
+>  			s->module = mod;
+>  		}
+>  	}
+> +	free(s->namespace);
+> +	s->namespace = namespace ? strdup(namespace) : NULL;
+>  	s->preloaded = 0;
+>  	s->vmlinux   = is_vmlinux(mod->name);
+>  	s->kernel    = 0;
+> @@ -670,7 +671,8 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+>  	unsigned int crc;
+>  	enum export export;
+>  	bool is_crc = false;
+> -	const char *name, *namespace;
+> +	const char *name;
+> +	char *namespace;
+>  
+>  	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
+>  	    strstarts(symname, "__ksymtab"))
+> @@ -745,6 +747,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+>  			name = symname + strlen("__ksymtab_");
+>  			namespace = sym_extract_namespace(&name);
+>  			sym_add_exported(name, namespace, mod, export);
+> +			free(namespace);
+>  		}
+>  		if (strcmp(symname, "init_module") == 0)
+>  			mod->has_init = 1;
+> @@ -2193,7 +2196,7 @@ static int check_exports(struct module *mod)
+>  		else
+>  			basename = mod->name;
+>  
+> -		if (exp->namespace) {
+> +		if (exp->namespace && exp->namespace[0]) {
+>  			add_namespace(&mod->required_namespaces,
+>  				      exp->namespace);
+>  
 
-The idea behind it was, as the commit log explained, you can copy
-Modules.symvers from one module to another when you need to pass symbol
-information between two modules. However, the manual copy of the file
-sounds questionable to me, and containing stale symbols is a downside.
+This looks good to me and is better than what I had originally proposed.
+I confirmed that I can still build an external module without any
+warnings. (But I did have to convince myself that it was OK to store
+empty namespace strings in the symbol structure and that check_exports()
+would cover it sufficiently)
 
-Some time later, commit 0d96fb20b7ed ("kbuild: Add new Kbuild variable
-KBUILD_EXTRA_SYMBOLS") introduced a saner approach.
+If you would like, feel free to add my
 
-So, this commit removes the former one. Going forward, the external
-module build dumps symbols into Module.symvers to be carried via
-KBUILD_EXTRA_SYMBOLS, but never reads it automatically.
-
-With the -I option removed, there is no one to set the external_module
-flag unless KBUILD_EXTRA_SYMBOLS is passed. Now the -i option does it
-instead.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- Documentation/kbuild/modules.rst | 13 +++++--------
- scripts/Makefile.modpost         |  1 -
- scripts/mod/modpost.c            |  9 ++-------
- 3 files changed, 7 insertions(+), 16 deletions(-)
-
-diff --git a/Documentation/kbuild/modules.rst b/Documentation/kbuild/modules.rst
-index dd1d2a0688e8..4c74f683bb2b 100644
---- a/Documentation/kbuild/modules.rst
-+++ b/Documentation/kbuild/modules.rst
-@@ -492,18 +492,15 @@ build.
- 	to the symbols from the kernel to check if all external symbols
- 	are defined. This is done in the MODPOST step. modpost obtains
- 	the symbols by reading Module.symvers from the kernel source
--	tree. If a Module.symvers file is present in the directory
--	where the external module is being built, this file will be
--	read too. During the MODPOST step, a new Module.symvers file
--	will be written containing all exported symbols that were not
--	defined in the kernel.
-+	tree. During the MODPOST step, a new Module.symvers file will be
-+	written containing all exported symbols from that external module.
- 
- --- 6.3 Symbols From Another External Module
- 
- 	Sometimes, an external module uses exported symbols from
- 	another external module. Kbuild needs to have full knowledge of
- 	all symbols to avoid spitting out warnings about undefined
--	symbols. Three solutions exist for this situation.
-+	symbols. Two solutions exist for this situation.
- 
- 	NOTE: The method with a top-level kbuild file is recommended
- 	but may be impractical in certain situations.
-@@ -543,8 +540,8 @@ build.
- 		all symbols defined and not part of the kernel.
- 
- 	Use "make" variable KBUILD_EXTRA_SYMBOLS
--		If it is impractical to copy Module.symvers from
--		another module, you can assign a space separated list
-+		If it is impractical to add a top-level kbuild file,
-+		you can assign a space separated list
- 		of files to KBUILD_EXTRA_SYMBOLS in your build file.
- 		These files will be loaded by modpost during the
- 		initialization of its symbol tables.
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 72109d201196..01c0a992d293 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -50,7 +50,6 @@ MODPOST = scripts/mod/modpost						\
- 	$(if $(CONFIG_MODVERSIONS),-m)					\
- 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)			\
- 	$(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)			\
--	$(if $(KBUILD_EXTMOD),-I $(modulesymfile))			\
- 	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))	\
- 	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))			\
- 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)			\
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 936d3ad23c83..5234555cf550 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2540,7 +2540,7 @@ int main(int argc, char **argv)
- {
- 	struct module *mod;
- 	struct buffer buf = { };
--	char *kernel_read = NULL, *module_read = NULL;
-+	char *kernel_read = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
- 	int err;
-@@ -2548,13 +2548,10 @@ int main(int argc, char **argv)
- 	struct ext_sym_list *extsym_iter;
- 	struct ext_sym_list *extsym_start = NULL;
- 
--	while ((opt = getopt(argc, argv, "i:I:e:mnsT:o:awEd")) != -1) {
-+	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awEd")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			kernel_read = optarg;
--			break;
--		case 'I':
--			module_read = optarg;
- 			external_module = 1;
- 			break;
- 		case 'e':
-@@ -2599,8 +2596,6 @@ int main(int argc, char **argv)
- 
- 	if (kernel_read)
- 		read_dump(kernel_read, 1);
--	if (module_read)
--		read_dump(module_read, 0);
- 	while (extsym_start) {
- 		read_dump(extsym_start->file, 0);
- 		extsym_iter = extsym_start->next;
--- 
-2.17.1
+Reviewed-by: Shaun Ruffell <sruffell@sruffell.net>
+  or
+Tested-by: Shaun Ruffell <sruffell@sruffell.net>
