@@ -1,44 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37165 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728432AbfJCDS5 (ORCPT
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:36421 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725827AbfJCG21 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Oct 2019 23:18:57 -0400
-Received: by mail-pg1-f193.google.com with SMTP id c17so848653pgg.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2019 20:18:57 -0700 (PDT)
-Message-Id: <20191003031312.433635881@gmail.com>
-Date: Wed, 02 Oct 2019 20:13:16 -0700
-From: rd.dunlab@gmail.com
-Subject: [PATCH 4/4] scripts: namespace.pl: add blank section separator line
-References: <20191003031312.157994411@gmail.com>
+        Thu, 3 Oct 2019 02:28:27 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=scr-namespace-blank-sep-line.patch
+References: <20191001101429.24965-1-bjorn.topel@gmail.com> <CAK7LNATNw4Qysj1Q2dXd4PALfbtgMXPwgvmW=g0dRcrczGW-Fg@mail.gmail.com>
+ <CAJ+HfNgvxornSfqnbAthNy6u6=-enGCdA8K1e6rLXhCzGgmONQ@mail.gmail.com>
+ <CAK7LNATD4vCQnNsHXP8A2cyWDkCNX=LGh0ej-dkDajm-+Lfw8Q@mail.gmail.com>
+ <CAJ+HfNgem7ijzQkz7BU-Z_A-CqWXY_uMF6_p0tGZ6eUMx_N3QQ@mail.gmail.com> <20191002231448.GA10649@khorivan>
+In-Reply-To: <20191002231448.GA10649@khorivan>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@gmail.com>
+Date: Thu, 3 Oct 2019 08:28:14 +0200
+Message-ID: <CAJ+HfNiCrcVDwQw4nxsntnTSy2pUgV2n6pW206==hUmq1=ZUTA@mail.gmail.com>
+Subject: Re: [PATCH bpf] samples/bpf: kbuild: add CONFIG_SAMPLE_BPF Kconfig
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rd.dunlab@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, rdunlap@infradead.org
+To: Ivan Khoronzhuk <ivan.khoronzhuk@linaro.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Networking <netdev@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, bpf <bpf@vger.kernel.org>
 
-Most namespace report sections are separated by blank lines, but a
-blank line is needed before the "multiply defined" output as a
-separator, to make it easier to find the beginning of this section
-of output.
+On Thu, 3 Oct 2019 at 01:14, Ivan Khoronzhuk <ivan.khoronzhuk@linaro.org> w=
+rote:
+>
+> On Wed, Oct 02, 2019 at 09:41:15AM +0200, Bj=C3=B6rn T=C3=B6pel wrote:
+> >On Wed, 2 Oct 2019 at 03:49, Masahiro Yamada
+> ><yamada.masahiro@socionext.com> wrote:
+> >>
+> >[...]
+> >> > Yes, the BPF samples require clang/LLVM with BPF support to build. A=
+ny
+> >> > suggestion on a good way to address this (missing tools), better tha=
+n
+> >> > the warning above? After the commit 394053f4a4b3 ("kbuild: make sing=
+le
+> >> > targets work more correctly"), it's no longer possible to build
+> >> > samples/bpf without support in the samples/Makefile.
+> >>
+> >>
+> >> You can with
+> >>
+> >> "make M=3Dsamples/bpf"
+> >>
+> >
+> >Oh, I didn't know that. Does M=3D support "output" builds (O=3D)?
+> >
+> >I usually just build samples/bpf/ with:
+> >
+> >  $ make V=3D1 O=3D/home/foo/build/bleh samples/bpf/
+> >
+> >
+> >Bj=C3=B6rn
+>
+> Shouldn't README be updated?
+>
 
-Signed-off-by: Randy Dunlap <rd.dunlab@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>
----
-patch 4/4:
- scripts/namespace.pl |    1 +
- 1 file changed, 1 insertion(+)
+Hmm, the M=3D variant doesn't work at all for me. The build is still
+broken for me. Maybe I'm missing anything obvious...
 
---- linux-next-20191002.orig/scripts/namespace.pl
-+++ linux-next-20191002/scripts/namespace.pl
-@@ -368,6 +368,7 @@ sub drop_def
- 
- sub list_multiply_defined
- {
-+	printf "\n";
- 	foreach my $name (keys(%def)) {
- 		if ($#{$def{$name}} > 0) {
- 			# Special case for cond_syscall
+
+> --
+> Regards,
+> Ivan Khoronzhuk
