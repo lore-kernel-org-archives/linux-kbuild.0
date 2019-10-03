@@ -1,40 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:59223 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:59227 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728061AbfJCH7R (ORCPT
+        with ESMTP id S1726523AbfJCH7R (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 3 Oct 2019 03:59:17 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 3/6] module: rename __kstrtab_ns_* to __kstrtabns_* to avoid symbol conflict
-Date: Thu,  3 Oct 2019 16:58:23 +0900
-Message-Id: <20191003075826.7478-4-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 1/6] module: swap the order of symbol.namespace
+Date: Thu,  3 Oct 2019 16:58:21 +0900
+Message-Id: <20191003075826.7478-2-yamada.masahiro@socionext.com>
 In-Reply-To: <20191003075826.7478-1-yamada.masahiro@socionext.com>
 References: <20191003075826.7478-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jessica Yu <jeyu@kernel.org>
-Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shaun Ruffell <sruffell@sruffell.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shaun Ruffell <sruffell@sruffell.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org
 
-The module namespace produces __strtab_ns_<sym> symbols to store
-namespace strings, but it does not guarantee the name uniqueness.
-This is a potential problem because we have exported symbols starting
-with "ns_".
+Currently, EXPORT_SYMBOL_NS(_GPL) constructs the kernel symbol as
+follows:
 
-For example, kernel/capability.c exports the following symbols:
+  __ksymtab_SYMBOL.NAMESPACE
 
-  EXPORT_SYMBOL(ns_capable);
-  EXPORT_SYMBOL(capable);
+The sym_extract_namespace() in modpost allocates memory for the part
+SYMBOL.NAMESPACE when '.' is contained. One problem is that the pointer
+returned by strdup() is lost because the symbol name will be copied to
+malloc'ed memory by alloc_symbol(). No one will keep track of the
+pointer of strdup'ed memory.
 
-Assume a situation where those are converted as follows:
+sym->namespace still points to the NAMESPACE part. So, you can free it
+with complicated code like this:
 
-  EXPORT_SYMBOL_NS(ns_capable, some_namespace);
-  EXPORT_SYMBOL_NS(capable, some_namespace);
+   free(sym->namespace - strlen(sym->name) - 1);
 
-The former expands to "__kstrtab_ns_capable" and "__kstrtab_ns_ns_capable",
-and the latter to "__kstrtab_capable" and "__kstrtab_ns_capable".
-Then, we have the duplicated "__kstrtab_ns_capable".
+It complicates memory free.
 
-To ensure the uniqueness, rename "__kstrtab_ns_*" to "__kstrtabns_*".
+To fix it elegantly, I swapped the order of the symbol and the
+namespace as follows:
+
+  __ksymtab_NAMESPACE.SYMBOL
+
+then, simplified sym_extract_namespace() so that it allocates memory
+only for the NAMESPACE part.
+
+I prefer this order because it is intuitive and also matches to major
+languages. For example, NAMESPACE::NAME in C++, MODULE.NAME in Python.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Reviewed-by: Matthias Maennich <maennich@google.com>
@@ -42,39 +50,61 @@ Reviewed-by: Matthias Maennich <maennich@google.com>
 
 Changes in v2: None
 
- include/linux/export.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/export.h |  4 ++--
+ scripts/mod/modpost.c  | 16 +++++++---------
+ 2 files changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/include/linux/export.h b/include/linux/export.h
-index 0695d4e847d9..621158ecd2e2 100644
+index 95f55b7f83a0..0695d4e847d9 100644
 --- a/include/linux/export.h
 +++ b/include/linux/export.h
-@@ -55,7 +55,7 @@ extern struct module __this_module;
- 	    "__ksymtab_" #ns NS_SEPARATOR #sym ":		\n"	\
+@@ -52,7 +52,7 @@ extern struct module __this_module;
+ 	__ADDRESSABLE(sym)						\
+ 	asm("	.section \"___ksymtab" sec "+" #sym "\", \"a\"	\n"	\
+ 	    "	.balign	4					\n"	\
+-	    "__ksymtab_" #sym NS_SEPARATOR #ns ":		\n"	\
++	    "__ksymtab_" #ns NS_SEPARATOR #sym ":		\n"	\
  	    "	.long	" #sym "- .				\n"	\
  	    "	.long	__kstrtab_" #sym "- .			\n"	\
--	    "	.long	__kstrtab_ns_" #sym "- .		\n"	\
-+	    "	.long	__kstrtabns_" #sym "- .			\n"	\
- 	    "	.previous					\n")
- 
- #define __KSYMTAB_ENTRY(sym, sec)					\
-@@ -79,7 +79,7 @@ struct kernel_symbol {
- 	asm("__ksymtab_" #ns NS_SEPARATOR #sym)				\
+ 	    "	.long	__kstrtab_ns_" #sym "- .		\n"	\
+@@ -76,7 +76,7 @@ struct kernel_symbol {
+ #else
+ #define __KSYMTAB_ENTRY_NS(sym, sec, ns)				\
+ 	static const struct kernel_symbol __ksymtab_##sym##__##ns	\
+-	asm("__ksymtab_" #sym NS_SEPARATOR #ns)				\
++	asm("__ksymtab_" #ns NS_SEPARATOR #sym)				\
  	__attribute__((section("___ksymtab" sec "+" #sym), used))	\
  	__aligned(sizeof(void *))					\
--	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtab_ns_##sym }
-+	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtabns_##sym }
+ 	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtab_ns_##sym }
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 442d5e2ad688..2c644086c412 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -350,18 +350,16 @@ static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
  
- #define __KSYMTAB_ENTRY(sym, sec)					\
- 	static const struct kernel_symbol __ksymtab_##sym		\
-@@ -112,7 +112,7 @@ struct kernel_symbol {
- /* For every exported symbol, place a struct in the __ksymtab section */
- #define ___EXPORT_SYMBOL_NS(sym, sec, ns)				\
- 	___export_symbol_common(sym, sec);				\
--	static const char __kstrtab_ns_##sym[]				\
-+	static const char __kstrtabns_##sym[]				\
- 	__attribute__((section("__ksymtab_strings"), used, aligned(1)))	\
- 	= #ns;								\
- 	__KSYMTAB_ENTRY_NS(sym, sec, ns)
+ static const char *sym_extract_namespace(const char **symname)
+ {
+-	size_t n;
+-	char *dupsymname;
++	char *namespace = NULL;
++	char *ns_separator;
+ 
+-	n = strcspn(*symname, ".");
+-	if (n < strlen(*symname) - 1) {
+-		dupsymname = NOFAIL(strdup(*symname));
+-		dupsymname[n] = '\0';
+-		*symname = dupsymname;
+-		return dupsymname + n + 1;
++	ns_separator = strchr(*symname, '.');
++	if (ns_separator) {
++		namespace = NOFAIL(strndup(*symname, ns_separator - *symname));
++		*symname = ns_separator + 1;
+ 	}
+ 
+-	return NULL;
++	return namespace;
+ }
+ 
+ /**
 -- 
 2.17.1
