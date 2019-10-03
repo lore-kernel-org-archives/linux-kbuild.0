@@ -1,65 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:36421 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725827AbfJCG21 (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:59228 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728119AbfJCH7R (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Oct 2019 02:28:27 -0400
-MIME-Version: 1.0
-References: <20191001101429.24965-1-bjorn.topel@gmail.com> <CAK7LNATNw4Qysj1Q2dXd4PALfbtgMXPwgvmW=g0dRcrczGW-Fg@mail.gmail.com>
- <CAJ+HfNgvxornSfqnbAthNy6u6=-enGCdA8K1e6rLXhCzGgmONQ@mail.gmail.com>
- <CAK7LNATD4vCQnNsHXP8A2cyWDkCNX=LGh0ej-dkDajm-+Lfw8Q@mail.gmail.com>
- <CAJ+HfNgem7ijzQkz7BU-Z_A-CqWXY_uMF6_p0tGZ6eUMx_N3QQ@mail.gmail.com> <20191002231448.GA10649@khorivan>
-In-Reply-To: <20191002231448.GA10649@khorivan>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@gmail.com>
-Date: Thu, 3 Oct 2019 08:28:14 +0200
-Message-ID: <CAJ+HfNiCrcVDwQw4nxsntnTSy2pUgV2n6pW206==hUmq1=ZUTA@mail.gmail.com>
-Subject: Re: [PATCH bpf] samples/bpf: kbuild: add CONFIG_SAMPLE_BPF Kconfig
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 3 Oct 2019 03:59:17 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2 2/6] modpost: fix broken sym->namespace for external module builds
+Date: Thu,  3 Oct 2019 16:58:22 +0900
+Message-Id: <20191003075826.7478-3-yamada.masahiro@socionext.com>
+In-Reply-To: <20191003075826.7478-1-yamada.masahiro@socionext.com>
+References: <20191003075826.7478-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ivan Khoronzhuk <ivan.khoronzhuk@linaro.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Networking <netdev@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+To: Jessica Yu <jeyu@kernel.org>
+Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Shaun Ruffell <sruffell@sruffell.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Thu, 3 Oct 2019 at 01:14, Ivan Khoronzhuk <ivan.khoronzhuk@linaro.org> w=
-rote:
->
-> On Wed, Oct 02, 2019 at 09:41:15AM +0200, Bj=C3=B6rn T=C3=B6pel wrote:
-> >On Wed, 2 Oct 2019 at 03:49, Masahiro Yamada
-> ><yamada.masahiro@socionext.com> wrote:
-> >>
-> >[...]
-> >> > Yes, the BPF samples require clang/LLVM with BPF support to build. A=
-ny
-> >> > suggestion on a good way to address this (missing tools), better tha=
-n
-> >> > the warning above? After the commit 394053f4a4b3 ("kbuild: make sing=
-le
-> >> > targets work more correctly"), it's no longer possible to build
-> >> > samples/bpf without support in the samples/Makefile.
-> >>
-> >>
-> >> You can with
-> >>
-> >> "make M=3Dsamples/bpf"
-> >>
-> >
-> >Oh, I didn't know that. Does M=3D support "output" builds (O=3D)?
-> >
-> >I usually just build samples/bpf/ with:
-> >
-> >  $ make V=3D1 O=3D/home/foo/build/bleh samples/bpf/
-> >
-> >
-> >Bj=C3=B6rn
->
-> Shouldn't README be updated?
->
+Currently, external module builds produce tons of false-positives:
 
-Hmm, the M=3D variant doesn't work at all for me. The build is still
-broken for me. Maybe I'm missing anything obvious...
+  WARNING: module <mod> uses symbol <sym> from namespace <ns>, but does not import it.
 
+Here, the <ns> part shows a random string.
 
-> --
-> Regards,
-> Ivan Khoronzhuk
+When you build external modules, the symbol info of vmlinux and
+in-kernel modules are read from $(objtree)/Module.symvers, but
+read_dump() is buggy in multiple ways:
+
+[1] When the modpost is run for vmlinux and in-kernel modules,
+sym_extract_namespace() allocates memory for the namespace. On the
+other hand, read_dump() does not, then sym->namespace will point to
+somewhere in the line buffer of get_next_line(). The data in the
+buffer will be replaced soon, and sym->namespace will end up with
+pointing to unrelated data. As a result, check_exports() will show
+random strings in the warning messages.
+
+[2] When there is no namespace, sym_extract_namespace() returns NULL.
+On the other hand, read_dump() sets namespace to an empty string "".
+(but, it will be later replaced with unrelated data due to bug [1].)
+The check_exports() shows a warning unless exp->namespace is NULL,
+so every symbol read from read_dump() emits the warning, which is
+mostly false positive.
+
+To address [1], sym_add_exported() calls strdup() for s->namespace.
+The namespace from sym_extract_namespace() must be freed to avoid
+memory leak.
+
+For [2], I changed the if-conditional in check_exports().
+
+This commit also fixes sym_add_exported() to set s->namespace correctly
+when the symbol is preloaded.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Reviewed-by: Matthias Maennich <maennich@google.com>
+---
+
+Changes in v2:
+  - Change the approach to deal with ->preloaded
+
+ scripts/mod/modpost.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 2c644086c412..936d3ad23c83 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -166,7 +166,7 @@ struct symbol {
+ 	struct module *module;
+ 	unsigned int crc;
+ 	int crc_valid;
+-	const char *namespace;
++	char *namespace;
+ 	unsigned int weak:1;
+ 	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
+ 	unsigned int kernel:1;     /* 1 if symbol is from kernel
+@@ -348,7 +348,7 @@ static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
+ 		return export_unknown;
+ }
+ 
+-static const char *sym_extract_namespace(const char **symname)
++static char *sym_extract_namespace(const char **symname)
+ {
+ 	char *namespace = NULL;
+ 	char *ns_separator;
+@@ -373,7 +373,6 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
+ 
+ 	if (!s) {
+ 		s = new_symbol(name, mod, export);
+-		s->namespace = namespace;
+ 	} else {
+ 		if (!s->preloaded) {
+ 			warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+@@ -384,6 +383,8 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
+ 			s->module = mod;
+ 		}
+ 	}
++	free(s->namespace);
++	s->namespace = namespace ? strdup(namespace) : NULL;
+ 	s->preloaded = 0;
+ 	s->vmlinux   = is_vmlinux(mod->name);
+ 	s->kernel    = 0;
+@@ -670,7 +671,8 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 	unsigned int crc;
+ 	enum export export;
+ 	bool is_crc = false;
+-	const char *name, *namespace;
++	const char *name;
++	char *namespace;
+ 
+ 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
+ 	    strstarts(symname, "__ksymtab"))
+@@ -745,6 +747,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 			name = symname + strlen("__ksymtab_");
+ 			namespace = sym_extract_namespace(&name);
+ 			sym_add_exported(name, namespace, mod, export);
++			free(namespace);
+ 		}
+ 		if (strcmp(symname, "init_module") == 0)
+ 			mod->has_init = 1;
+@@ -2193,7 +2196,7 @@ static int check_exports(struct module *mod)
+ 		else
+ 			basename = mod->name;
+ 
+-		if (exp->namespace) {
++		if (exp->namespace && exp->namespace[0]) {
+ 			add_namespace(&mod->required_namespaces,
+ 				      exp->namespace);
+ 
+-- 
+2.17.1
