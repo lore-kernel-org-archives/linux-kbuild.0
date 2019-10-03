@@ -1,32 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:42676 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727724AbfJBXQI (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:49234 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726948AbfJCB1K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Oct 2019 19:16:08 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: 'make help' br0ken for @echo ' valid values for SPHINXDIRS are:
- $(_SPHINXDIRS)'
-Message-ID: <416a61e8-e40a-6266-3f6a-bdbadf9a10c3@infradead.org>
-Date: Wed, 2 Oct 2019 16:16:07 -0700
+        Wed, 2 Oct 2019 21:27:10 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190927093603.9140-1-yamada.masahiro@socionext.com>
+ <20190927134108.GC187147@google.com> <20191002185701.GA29041@linux-8ccs>
+In-Reply-To: <20191002185701.GA29041@linux-8ccs>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 3 Oct 2019 10:26:09 +0900
+Message-ID: <CAK7LNATbKVEf8Q82k5374UOQVxFJX1U7eU4ywW-LdGvHOq+tPw@mail.gmail.com>
+Subject: Re: [PATCH 0/7] module: various bug-fixes and clean-ups for module namespace
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>
+To: Jessica Yu <jeyu@kernel.org>
+Cc: Matthias Maennich <maennich@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Joel Fernandes <joel@joelfernandes.org>, Martijn Coenen <maco@android.com>, Will Deacon <will.deacon@arm.com>, Michal Marek <michal.lkml@markovi.net>, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-It seems that _SPHINXDIRS is empty.  I'm getting (short extract):
+H Jessica,
 
-  make SPHINXDIRS="s1 s2" [target] Generate only docs of folder s1, s2
-  valid values for SPHINXDIRS are: 
+On Thu, Oct 3, 2019 at 3:57 AM Jessica Yu <jeyu@kernel.org> wrote:
+>
+> +++ Matthias Maennich [27/09/19 14:41 +0100]:
+> >On Fri, Sep 27, 2019 at 06:35:56PM +0900, Masahiro Yamada wrote:
+> >>
+> >>I was hit by some problems caused by the module namespace feature
+> >>that was merged recently. At least, the breakage of
+> >>external module builds is a fatal one. I just took a look at the code
+> >>closer, and I noticed some more issues and improvements.
+> >>
+> >>I hope these patches are mostly OK.
+> >>The 4th patch might have room for argument since it is a trade-off
+> >>of "cleaner implermentation" vs "code size".
+> >>
+> >Thanks Masahiro for taking the time to improve the implementation of the
+> >symbol namespaces. These are all good points that you addressed!
+>
+> Agreed, thanks Masahiro for fixing up all the rough edges! Your series
+> of fixes look good to me, I will queue this up on modules-next this
+> week
 
-  make SPHINX_CONF={conf-file} [target] use *additional* sphinx-build
-  configuration. This is e.g. useful to build with nit-picking config.
+Since these are bug fixes,
+please send them before v5.4.
 
-  Default location for the generated documents is Documentation/output
+Thanks.
+
+
+
+> with the exception of patch 4 - Matthias, you are planning to
+> submit a patch that would supercede patch 04/07, right?
+>
+> Thanks!
+>
+> Jessica
+
 
 
 -- 
-~Randy
+Best Regards
+Masahiro Yamada
