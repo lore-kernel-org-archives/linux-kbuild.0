@@ -1,71 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42837 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726969AbfJGIlG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Oct 2019 04:41:06 -0400
-Received: by mail-pg1-f194.google.com with SMTP id z12so7749521pgp.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Oct 2019 01:41:06 -0700 (PDT)
+Received: from ms.lwn.net ([45.79.88.28]:57442 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727801AbfJGN3c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Oct 2019 09:29:32 -0400
+Date: Mon, 7 Oct 2019 07:29:30 -0600
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] doc: move namespaces.rst out of kbuild directory
+Message-ID: <20191007072930.07b1e90a@lwn.net>
+In-Reply-To: <20191007081241.GA8279@linux-8ccs>
+References: <20191007043611.31036-1-yamada.masahiro@socionext.com>
+        <20191007060614.GA142813@google.com>
+        <20191007081241.GA8279@linux-8ccs>
 MIME-Version: 1.0
-References: <CAHk-=whX-JbpM2Sc85epng_GAgGGzxRAJ2SSKkMf9N1Lsqe+OA@mail.gmail.com>
- <56e2e1a7-f8fe-765b-8452-1710b41895bf@kernel.org> <20191004222714.GA107737@google.com>
- <ad800337-1ae2-49d2-e715-aa1974e28a10@kernel.org> <20191004232955.GC12012@mit.edu>
- <CAFd5g456rBSp177EkYAwsF+KZ0rxJa90mzUpW2M3R7tWbMAh9Q@mail.gmail.com>
- <63e59b0b-b51e-01f4-6359-a134a1f903fd@kernel.org> <CAFd5g47wji3T9RFmqBwt+jPY0tb83y46oj_ttOq=rTX_N1Ggyg@mail.gmail.com>
- <544bdfcb-fb35-5008-ec94-8d404a08fd14@kernel.org> <CAFd5g467PkfELixpU0JbaepEAAD_ugAA340-uORngC-eXsQQ-g@mail.gmail.com>
- <20191006165436.GA29585@mit.edu> <CAHk-=wjcJxypxUOSF-jc=SQKT1CrOoTMyT7soYzbvK3965JmCA@mail.gmail.com>
-In-Reply-To: <CAHk-=wjcJxypxUOSF-jc=SQKT1CrOoTMyT7soYzbvK3965JmCA@mail.gmail.com>
-From: Brendan Higgins <brendanhiggins@google.com>
-Date: Mon, 7 Oct 2019 01:40:53 -0700
-Message-ID: <CAFd5g45djTX+FaXwn2abve1+6GbtNrv+8EJgDe_TXn1d+pzukA@mail.gmail.com>
-Subject: Re: [PATCH v18 00/19] kunit: introduce KUnit, the Linux kernel unit
- testing framework
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "Theodore Y. Ts'o" <tytso@mit.edu>, shuah <shuah@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
+To: Jessica Yu <jeyu@kernel.org>
+Cc: Matthias Maennich <maennich@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-doc@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Adam Zerella <adam.zerella@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Oct 6, 2019 at 10:18 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sun, Oct 6, 2019 at 9:55 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
-> >
-> > Well, one thing we *can* do is if (a) if we can create a kselftest
-> > branch which we know is stable and won't change, and (b) we can get
-> > assurances that Linus *will* accept that branch during the next merge
-> > window, those subsystems which want to use kself test can simply pull
-> > it into their tree.
->
-> Yes.
->
-> At the same time, I don't think it needs to be even that fancy. Even
-> if it's not a stable branch that gets shared between different
-> developers, it would be good to just have people do a "let's try this"
-> throw-away branch to use the kunit functionality and verify that
-> "yeah, this is fairly convenient for ext4".
->
-> It doesn't have to be merged in that form, but just confirmation that
-> the infrastructure is helpful before it gets merged would be good.
+On Mon, 7 Oct 2019 10:12:42 +0200
+Jessica Yu <jeyu@kernel.org> wrote:
 
-I thought we already had done this satisfactorily.
+> This was my line of thought as well, since the audience of
+> admin-guide/ is sysadmins and users. Namespaces are mostly relevant to
+> module authors and kernel developers. Currently, I don't think there
+> is an existing good place in Documentation/ for this topic :-/
+> I suppose kernel-hacking/ might be the closest fit, as Adam suggested.
 
-We have one proof-of-concept test in the branch in the kselftest repo
-(proc sysctl test) that went out in the pull request, and we also had
-some other tests that were not in the pull request (there is the ext4
-timestamp stuff mentioned above, and we also had one against the list
-data structure), which we were planning on sending out for review once
-Shuah's pull request was accepted. I know the apparmor people also
-wrote some tests that they said were useful; however, I have not
-coordinated with them on upstreaming their tests. I know of some other
-people who are using it, but I don't think the tests are as far along
-for upstreaming.
+I didn't see this thread before responding in the first, naturally...  
 
-The point is: I thought we had plenty of signal that KUnit would be
-useful to have merged into the mainline kernel. I thought the only
-reason it was rejected for 5.4 was due to the directory name issue
-combined with bad timing.
+I think the core-api manual is probably as good a place as any for this.
+Changing the name to something like symbol-namespaces.rst is probably a
+good idea, since most people think of other things when they see
+"namespaces".  Or perhaps that mythical Somebody could expand it into a
+proper description of symbol exports in general...:)
 
-Please correct me if I missed anything.
+Thanks,
 
-Thanks!
+jon
