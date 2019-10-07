@@ -1,47 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:38470 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726889AbfJGIMs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Oct 2019 04:12:48 -0400
-Date: Mon, 7 Oct 2019 10:12:42 +0200
-From: Jessica Yu <jeyu@kernel.org>
-Subject: Re: [PATCH] doc: move namespaces.rst out of kbuild directory
-Message-ID: <20191007081241.GA8279@linux-8ccs>
-References: <20191007043611.31036-1-yamada.masahiro@socionext.com>
- <20191007060614.GA142813@google.com>
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:39794 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727324AbfJGIUr (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Oct 2019 04:20:47 -0400
+Received: by mail-pl1-f195.google.com with SMTP id s17so6496502plp.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Oct 2019 01:20:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191007060614.GA142813@google.com>
+References: <CAHk-=whX-JbpM2Sc85epng_GAgGGzxRAJ2SSKkMf9N1Lsqe+OA@mail.gmail.com>
+ <56e2e1a7-f8fe-765b-8452-1710b41895bf@kernel.org> <20191004222714.GA107737@google.com>
+ <ad800337-1ae2-49d2-e715-aa1974e28a10@kernel.org> <20191004232955.GC12012@mit.edu>
+ <CAFd5g456rBSp177EkYAwsF+KZ0rxJa90mzUpW2M3R7tWbMAh9Q@mail.gmail.com>
+ <63e59b0b-b51e-01f4-6359-a134a1f903fd@kernel.org> <CAFd5g47wji3T9RFmqBwt+jPY0tb83y46oj_ttOq=rTX_N1Ggyg@mail.gmail.com>
+ <544bdfcb-fb35-5008-ec94-8d404a08fd14@kernel.org> <CAFd5g467PkfELixpU0JbaepEAAD_ugAA340-uORngC-eXsQQ-g@mail.gmail.com>
+ <20191006165436.GA29585@mit.edu>
+In-Reply-To: <20191006165436.GA29585@mit.edu>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Mon, 7 Oct 2019 01:20:34 -0700
+Message-ID: <CAFd5g47XogYaO24fHnRR9wyki_r4oQg0qSWo9kOgnXpyTuJAWw@mail.gmail.com>
+Subject: Re: [PATCH v18 00/19] kunit: introduce KUnit, the Linux kernel unit
+ testing framework
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>, Adam Zerella <adam.zerella@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc: shuah <shuah@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com
 
-+++ Matthias Maennich [07/10/19 07:06 +0100]:
->Hi!
+On Sun, Oct 6, 2019 at 9:55 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
 >
->On Mon, Oct 07, 2019 at 01:36:11PM +0900, Masahiro Yamada wrote:
->>I did not notice this document was added to Documentation/kbuild/,
->>and I do not understand how it is related to the build system.
->>
->>Kick it out of the kbuild directory.
->>
->>I am not sure if this is the perfect place, but I added its index
->>close to the module-signing.
+> On Fri, Oct 04, 2019 at 06:18:04PM -0700, Brendan Higgins wrote:
+> > > Let's talk about current state. Right now kunit is in linux-next and
+> > > we want to add a few more tests. We will have to coordinate the effort.
+> > > Once kunit get into mainline, then the need for this coordination goes
+> > > down.
+> >
+> > Sure, I was just thinking that getting other people to write the tests
+> > would be better. Since not only is it then useful to someone else, it
+> > provides the best possible exercise of KUnit.
 >
->When searching for a place for this documentation, kbuild/ was the
->closest I could find. admin-guide/ seems to target system administrators
->while the symbol namespace feature documentation is relevant for kernel
->developers. I am ok to take maintainership for the file, but the new
->location suggested seems not to be a good fit either.
+> Well, one thing we *can* do is if (a) if we can create a kselftest
+> branch which we know is stable and won't change, and (b) we can get
+> assurances that Linus *will* accept that branch during the next merge
+> window, those subsystems which want to use kself test can simply pull
+> it into their tree.
 
-This was my line of thought as well, since the audience of
-admin-guide/ is sysadmins and users. Namespaces are mostly relevant to
-module authors and kernel developers. Currently, I don't think there
-is an existing good place in Documentation/ for this topic :-/
-I suppose kernel-hacking/ might be the closest fit, as Adam suggested.
+Yeah, I can't think of any reason that you haven't outlined already
+why that might not work, but that seems kind of like circumventing
+Linus.
 
-Thanks,
+> We've done this before in the file system world, when there has been
+> some common set of changes needed to improve, say, Direct I/O, where
+> the changes are put into a standalone branch, say, in the xfs tree,
+> and those file systems which need it as a building block can pull it
+> into their tree, and then add the changes needed to use those changes
+> into their file system git tree.  These changes are generally not
+> terribly controversial, and we've not had to worry about people want
+> to bikeshed the changes.
+>
+> There is a risk with doing this of course, which is that if the branch
+> *is* controversial, or gets bike-shedded for some reason, then Linus
+> gets upset and any branches which depended on said branch will get
+> rejected at the next merge window.  Which is the requirement for (a)
+> and (b) above.  Presumably, the fact that people were unwilling to let
+> Kunit land during this merge window might will *because* we think more
+> changes might be pending?
 
-Jessica
+My understanding, based on what I have been told, is that we were
+simply unlucky with the timing when Linus pulled the branch in the
+first week of the 5.4 merge window (Friday), such that once I fixed
+the directory naming issue, the updated changes didn't spend enough
+time in linux-next. And now with this issue fixed and KUnit back in
+linux-next, if nothing interesting happens between now and 5.5, it
+will be accepted in the 5.5 merge window. I do not think that anyone
+is expecting anymore changes before merging.
+
+Shuah, Linus, is my understanding correct?
+
+> The other thing I suppose I can do is to let the ext4 kunit tests land
+> in ext4 tree, but with the necessary #ifdef's around things like
+> "#include <kunit/test.h>" so that the build won't blow up w/o kunit
+> changes being in the tree that I'm building.  It means I won't be able
+> to run the tests without creating a test integration branch and
+> merging in kunit by hand, which will super-annoying, of course.  And
+> if some of the bike-shedding is in Kunit's interfaces, then that
+> becomes problematic as well, since any tests that are in ext4.git tree
+> might change if people want to rename Kunit's publically exported
+> functions (for example).
+
+Yeah, that seems even worse. I'm sorry to have caused this frustration.
+
+> > Hey Ted, do you know if that ext4 timestamp test can go in through
+> > linux-kselftest? It seemed fairly self-contained. Or is that what you
+> > were saying wouldn't work for you?
+>
+> Well, I was hoping that we might start creating more tests beyond just
+> the ext4 timestamp tests....
+
+Okay, that's what I thought (and what I hoped) you were saying :-)
+
+I hope we can figure out something that will work for you. Or
+otherwise that you won't mind waiting until 5.5.
+
+Sorry
