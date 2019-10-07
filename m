@@ -1,8 +1,8 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54918 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:59560 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727745AbfJGOmz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Oct 2019 10:42:55 -0400
+        id S1727490AbfJGO5l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Oct 2019 10:57:41 -0400
 Subject: Re: [PATCH v18 00/19] kunit: introduce KUnit, the Linux kernel unit
  testing framework
 References: <CAHk-=whX-JbpM2Sc85epng_GAgGGzxRAJ2SSKkMf9N1Lsqe+OA@mail.gmail.com>
@@ -17,24 +17,24 @@ References: <CAHk-=whX-JbpM2Sc85epng_GAgGGzxRAJ2SSKkMf9N1Lsqe+OA@mail.gmail.com>
  <CAFd5g467PkfELixpU0JbaepEAAD_ugAA340-uORngC-eXsQQ-g@mail.gmail.com>
  <20191006165436.GA29585@mit.edu>
  <CAHk-=wjcJxypxUOSF-jc=SQKT1CrOoTMyT7soYzbvK3965JmCA@mail.gmail.com>
- <CAFd5g45djTX+FaXwn2abve1+6GbtNrv+8EJgDe_TXn1d+pzukA@mail.gmail.com>
+ <20191007104048.66ae7e59@gandalf.local.home>
 From: shuah <shuah@kernel.org>
-Message-ID: <ed26ac47-7f27-c3ec-56ae-8b3b9aa87654@kernel.org>
-Date: Mon, 7 Oct 2019 08:42:36 -0600
+Message-ID: <176fa69d-1767-ea9b-476d-c685c2a68d46@kernel.org>
+Date: Mon, 7 Oct 2019 08:57:36 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFd5g45djTX+FaXwn2abve1+6GbtNrv+8EJgDe_TXn1d+pzukA@mail.gmail.com>
+In-Reply-To: <20191007104048.66ae7e59@gandalf.local.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brendan Higgins <brendanhiggins@google.com>, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "Theodore Y. Ts'o" <tytso@mit.edu>, Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, Steven Rostedt <rostedt@goodmis.org>, wfg@linux.intel.com, shuah <shuah@kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Theodore Y. Ts'o" <tytso@mit.edu>, Brendan Higgins <brendanhiggins@google.com>, Frank Rowand <frowand.list@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Kees Cook <keescook@google.com>, Kieran Bingham <kieran.bingham@ideasonboard.com>, Luis Chamberlain <mcgrof@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, devicetree <devicetree@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, kunit-dev@googlegroups.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>, linux-um@lists.infradead.org, Sasha Levin <Alexander.Levin@microsoft.com>, "Bird, Timothy" <Tim.Bird@sony.com>, Amir Goldstein <amir73il@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, Daniel Vetter <daniel@ffwll.ch>, Jeff Dike <jdike@addtoit.com>, Joel Stanley <joel@jms.id.au>, Julia Lawall <julia.lawall@lip6.fr>, Kevin Hilman <khilman@baylibre.com>, Knut Omang <knut.omang@oracle.com>, Logan Gunthorpe <logang@deltatee.com>, Michael Ellerman <mpe@ellerman.id.au>, Petr Mladek <pmladek@suse.com>, Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard@nod.at>, David Rientjes <rientjes@google.com>, wfg@linux.intel.com, shuah <shuah@kernel.org>
 
-On 10/7/19 2:40 AM, Brendan Higgins wrote:
-> On Sun, Oct 6, 2019 at 10:18 AM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
+On 10/7/19 8:40 AM, Steven Rostedt wrote:
+> On Sun, 6 Oct 2019 10:18:11 -0700
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
+> 
 >> On Sun, Oct 6, 2019 at 9:55 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
 >>>
 >>> Well, one thing we *can* do is if (a) if we can create a kselftest
@@ -54,38 +54,21 @@ On 10/7/19 2:40 AM, Brendan Higgins wrote:
 >> It doesn't have to be merged in that form, but just confirmation that
 >> the infrastructure is helpful before it gets merged would be good.
 > 
-> I thought we already had done this satisfactorily.
+> Can't you just create an ext4 branch that has the kselftest-next branch
+> in it, that you build upon. And push that after the kunit test is
+> merged?
 > 
-Adding a couple more tests will only help in the long run. The idea is
-to see can this help
-
-> We have one proof-of-concept test in the branch in the kselftest repo
-> (proc sysctl test) that went out in the pull request, and we also had
-> some other tests that were not in the pull request (there is the ext4
-> timestamp stuff mentioned above, and we also had one against the list
-> data structure), which we were planning on sending out for review once
-> Shuah's pull request was accepted. I know the apparmor people also
-> wrote some tests that they said were useful; however, I have not
-> coordinated with them on upstreaming their tests. I know of some other
-> people who are using it, but I don't think the tests are as far along
-> for upstreaming.
+> In the past I've had to rely on other branches in next, and would just
+> hold two branches myself. One with everything not dependent on the other
+> developer's branch, and one with the work that was. At the merge
+> window, I would either merge the two or just send two pull requests
+> with the two branches.
 > 
 
-Maybe that is a good start. To get the tests that are already in use
-and get them in shape for upstream.
+I do something similar when I am working on top of a branch that isn't
+already in the mainline. In any case, repeating myself
 
-> The point is: I thought we had plenty of signal that KUnit would be
-> useful to have merged into the mainline kernel. I thought the only
-> reason it was rejected for 5.4 was due to the directory name issue
-> combined with bad timing.
-> 
-
-That is probably the initial thought. However, it makes perfect sense
-to add a couple of tests in. We have a few weeks anyway and it gives
-us more confidence on kunit.
-
-I already have a branch that is in linux-next and it just has kunit in
-it and I will rebase it to 5.4-rc1.
+Let's work on top of - it is rebased to 5.4-rc1 and ready for use.
 
 https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=test
 
