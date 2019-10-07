@@ -1,73 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ms.lwn.net ([45.79.88.28]:58024 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727791AbfJGPlo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Oct 2019 11:41:44 -0400
-Date: Mon, 7 Oct 2019 09:41:43 -0600
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: 'make help' br0ken for @echo ' valid values for SPHINXDIRS are:
- $(_SPHINXDIRS)'
-Message-ID: <20191007094143.3a4d8a09@lwn.net>
-In-Reply-To: <416a61e8-e40a-6266-3f6a-bdbadf9a10c3@infradead.org>
-References: <416a61e8-e40a-6266-3f6a-bdbadf9a10c3@infradead.org>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:65271 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727711AbfJGQMf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Oct 2019 12:12:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+References: <f5cb4272-4cb8-4253-77fd-56aaf73a0dbc@infradead.org>
+In-Reply-To: <f5cb4272-4cb8-4253-77fd-56aaf73a0dbc@infradead.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 8 Oct 2019 01:11:39 +0900
+Message-ID: <CAK7LNARCzEQNAJa1-ub6Ga1VcC6pQHtqc8P1dutscyfQZFzTmQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: setlocalversion: fix a bashism
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-doc@vger.kernel.org, Mauro Carvalho Chehab <mchehab@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Mike Crowe <mcrowe@zipitwireless.com>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, 2 Oct 2019 16:16:07 -0700
-Randy Dunlap <rdunlap@infradead.org> wrote:
+On Sun, Oct 6, 2019 at 12:02 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> Fix bashism reported by checkbashisms by using only one '=':
+>
+> possible bashism in scripts/setlocalversion line 96 (should be 'b = a'):
+>         if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
+>
+> Fixes: 38b3439d84f4 ("setlocalversion: update mercurial tag parsing")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Mike Crowe <mcrowe@zipitwireless.com>
 
-> It seems that _SPHINXDIRS is empty.  I'm getting (short extract):
-> 
->   make SPHINXDIRS="s1 s2" [target] Generate only docs of folder s1, s2
->   valid values for SPHINXDIRS are: 
-> 
->   make SPHINX_CONF={conf-file} [target] use *additional* sphinx-build
->   configuration. This is e.g. useful to build with nit-picking config.
-> 
->   Default location for the generated documents is Documentation/output
+Applied to linux-kbuild. Thanks.
 
-Hmm...it looks like that broke with 9fc3a18a942f, which got rid of the
-various conf.py files.  Something like the following seems to do the right
-thing?  (It also shows that we have way too many top-level directories, but
-that's a separate issue...)
+> ---
+> Does anyone still use hg for kernel development?
 
-Thanks,
+I have also been wondering in which situation
+this code is used...
 
-jon
 
-From d402c2de65bb9353e6222a05095f32929ae62373 Mon Sep 17 00:00:00 2001
-From: Jonathan Corbet <corbet@lwn.net>
-Date: Mon, 7 Oct 2019 09:38:58 -0600
-Subject: [PATCH] docs: Fix "make help" suggestion for SPHINXDIR
+>
+>  scripts/setlocalversion |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> --- lnx-54-rc1.orig/scripts/setlocalversion
+> +++ lnx-54-rc1/scripts/setlocalversion
+> @@ -93,7 +93,7 @@ scm_version()
+>         # Check for mercurial and a mercurial repo.
+>         if test -d .hg && hgid=`hg id 2>/dev/null`; then
+>                 # Do we have an tagged version?  If so, latesttagdistance == 1
+> -               if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
+> +               if [ "`hg log -r . --template '{latesttagdistance}'`" = "1" ]; then
+>                         id=`hg log -r . --template '{latesttag}'`
+>                         printf '%s%s' -hg "$id"
+>                 else
+>
 
-Commit 9fc3a18a942f ("docs: remove extra conf.py files") broke the setting
-of _SPHINXDIRS in Documentation/Makefile.  Let's just have it look for an
-index.rst file instead.
 
-Fixes: 9fc3a18a942f ("docs: remove extra conf.py files")
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
----
- Documentation/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/Makefile b/Documentation/Makefile
-index c6e564656a5b..ce8eb63b523a 100644
---- a/Documentation/Makefile
-+++ b/Documentation/Makefile
-@@ -13,7 +13,7 @@ endif
- SPHINXBUILD   = sphinx-build
- SPHINXOPTS    =
- SPHINXDIRS    = .
--_SPHINXDIRS   = $(patsubst $(srctree)/Documentation/%/conf.py,%,$(wildcard $(srctree)/Documentation/*/conf.py))
-+_SPHINXDIRS   = $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst))
- SPHINX_CONF   = conf.py
- PAPER         =
- BUILDDIR      = $(obj)/output
 -- 
-2.21.0
+Best Regards
+Masahiro Yamada
