@@ -1,58 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:28280 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730727AbfJHMGn (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37211 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730371AbfJHNPZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Oct 2019 08:06:43 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/5] kheaders: remove unneeded 'cat' command piped to 'head' / 'tail'
-Date: Tue,  8 Oct 2019 21:05:52 +0900
-Message-Id: <20191008120556.4263-1-yamada.masahiro@socionext.com>
+        Tue, 8 Oct 2019 09:15:25 -0400
+From: Wei Liu <wei.liu@kernel.org>
+Subject: [PATCH RFC] kconfig: add hvconfig for Linux on Hyper-V
+Date: Tue,  8 Oct 2019 14:15:08 +0100
+Message-Id: <20191008131508.21189-1-liuw@liuw.name>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Greg KH <gregkh@linuxfoundation.org>, Joel Fernandes <joel@joelfernandes.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
+To: Linux on Hyper-V List <linux-hyperv@vger.kernel.org>
+Cc: Linux Kernel List <linux-kernel@vger.kernel.org>, Linux Kconfig List <linux-kbuild@vger.kernel.org>, Wei Liu <liuwe@microsoft.com>
 
-The 'head' and 'tail' commands can take a file path directly.
-So, you do not need to run 'cat'.
+From: Wei Liu <liuwe@microsoft.com>
 
-  cat kernel/kheaders.md5 | head -1
+Add an config file snippet which enalbes additional options useful for
+running the kernel in a Hyper-V guest.
 
-... is equivalent to:
+The expected use case is a user provides an existing config file then
+executes `make hvconfig`. It will merge those options with the
+provided config file.
 
-  head -1 kernel/kheaders.md5
+Based on similar concept for Xen and KVM.
 
-and the latter saves forking one process.
-
-While I was here, I replaced 'head -1' with 'head -n 1'.
-
-I also replaced '==' with '=' since we do not have a good reason to
-use the bashism.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Wei Liu <liuwe@microsoft.com>
 ---
+RFC: I only tested this on x86.  Although the config options included in
+hv_guest.config don't seem to be arch-specific, we should probably
+move the ones not yet implemented on Arm to an x86 specific config
+file.
+---
+ Documentation/admin-guide/README.rst |  3 +++
+ kernel/configs/hv_guest.config       | 33 ++++++++++++++++++++++++++++
+ scripts/kconfig/Makefile             |  5 +++++
+ 3 files changed, 41 insertions(+)
+ create mode 100644 kernel/configs/hv_guest.config
 
- kernel/gen_kheaders.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
-index aff79e461fc9..8aa6d3c37ba7 100755
---- a/kernel/gen_kheaders.sh
-+++ b/kernel/gen_kheaders.sh
-@@ -41,10 +41,10 @@ obj_files_md5="$(find $dir_list -name "*.h"			   |
- this_file_md5="$(ls -l $sfile | md5sum | cut -d ' ' -f1)"
- if [ -f $tarfile ]; then tarfile_md5="$(md5sum $tarfile | cut -d ' ' -f1)"; fi
- if [ -f kernel/kheaders.md5 ] &&
--	[ "$(cat kernel/kheaders.md5|head -1)" == "$src_files_md5" ] &&
--	[ "$(cat kernel/kheaders.md5|head -2|tail -1)" == "$obj_files_md5" ] &&
--	[ "$(cat kernel/kheaders.md5|head -3|tail -1)" == "$this_file_md5" ] &&
--	[ "$(cat kernel/kheaders.md5|tail -1)" == "$tarfile_md5" ]; then
-+	[ "$(head -n 1 kernel/kheaders.md5)" = "$src_files_md5" ] &&
-+	[ "$(head -n 2 kernel/kheaders.md5 | tail -n 1)" = "$obj_files_md5" ] &&
-+	[ "$(head -n 3 kernel/kheaders.md5 | tail -n 1)" = "$this_file_md5" ] &&
-+	[ "$(tail -n 1 kernel/kheaders.md5)" = "$tarfile_md5" ]; then
- 		exit
- fi
+diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+index cc6151fc0845..d5f4389a7a2f 100644
+--- a/Documentation/admin-guide/README.rst
++++ b/Documentation/admin-guide/README.rst
+@@ -224,6 +224,9 @@ Configuring the kernel
+      "make xenconfig"   Enable additional options for xen dom0 guest kernel
+                         support.
+ 
++     "make hvconfig"    Enable additional options for Hyper-V guest kernel
++                        support.
++
+      "make tinyconfig"  Configure the tiniest possible kernel.
+ 
+    You can find more information on using the Linux kernel config tools
+diff --git a/kernel/configs/hv_guest.config b/kernel/configs/hv_guest.config
+new file mode 100644
+index 000000000000..0e71e34a2d4d
+--- /dev/null
++++ b/kernel/configs/hv_guest.config
+@@ -0,0 +1,33 @@
++CONFIG_NET=y
++CONFIG_NET_CORE=y
++CONFIG_NETDEVICES=y
++CONFIG_BLOCK=y
++CONFIG_BLK_DEV=y
++CONFIG_NETWORK_FILESYSTEMS=y
++CONFIG_INET=y
++CONFIG_TTY=y
++CONFIG_SERIAL_8250=y
++CONFIG_SERIAL_8250_CONSOLE=y
++CONFIG_IP_PNP=y
++CONFIG_IP_PNP_DHCP=y
++CONFIG_BINFMT_ELF=y
++CONFIG_PCI=y
++CONFIG_PCI_MSI=y
++CONFIG_DEBUG_KERNEL=y
++CONFIG_VIRTUALIZATION=y
++CONFIG_HYPERVISOR_GUEST=y
++CONFIG_PARAVIRT=y
++CONFIG_HYPERV=y
++CONFIG_HYPERV_VSOCKETS=y
++CONFIG_PCI_HYPERV=y
++CONFIG_PCI_HYPERV_INTERFACE=y
++CONFIG_HYPERV_STORAGE=y
++CONFIG_HYPERV_NET=y
++CONFIG_HYPERV_KEYBOARD=y
++CONFIG_FB_HYPERV=y
++CONFIG_HID_HYPERV_MOUSE=y
++CONFIG_HYPERV=y
++CONFIG_HYPERV_TIMER=y
++CONFIG_HYPERV_UTILS=y
++CONFIG_HYPERV_BALLOON=y
++CONFIG_HYPERV_IOMMU=y
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ef2f2336c469..2ee46301b22e 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -104,6 +104,10 @@ PHONY += xenconfig
+ xenconfig: xen.config
+ 	@:
+ 
++PHONY += hvconfig
++hvconfig: hv_guest.config
++	@:
++
+ PHONY += tinyconfig
+ tinyconfig:
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
+@@ -138,6 +142,7 @@ help:
+ 	@echo  '                    default value without prompting'
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+ 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
++	@echo  '  hvconfig        - Enable additional options for Hyper-V guest kernel support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+ 	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
  
 -- 
-2.17.1
+2.20.1
