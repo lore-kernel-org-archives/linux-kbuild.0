@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f73.google.com ([209.85.128.73]:57635 "EHLO
-        mail-wm1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726546AbfJJPQP (ORCPT
+Received: from mail-wr1-f73.google.com ([209.85.221.73]:50413 "EHLO
+        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726083AbfJJPQE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Oct 2019 11:16:15 -0400
-Received: by mail-wm1-f73.google.com with SMTP id f63so1904471wma.7
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:12 -0700 (PDT)
-Date: Thu, 10 Oct 2019 16:14:43 +0100
-In-Reply-To: <20191010151443.7399-1-maennich@google.com>
-Message-Id: <20191010151443.7399-5-maennich@google.com>
+        Thu, 10 Oct 2019 11:16:04 -0400
+Received: by mail-wr1-f73.google.com with SMTP id m14so2889081wru.17
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:01 -0700 (PDT)
+Date: Thu, 10 Oct 2019 16:14:39 +0100
+Message-Id: <20191010151443.7399-1-maennich@google.com>
 Mime-Version: 1.0
-References: <20191010151443.7399-1-maennich@google.com>
-Subject: [PATCH 4/4] export: avoid code duplication in include/linux/export.h
+Subject: [PATCH 0/4] export/modpost: avoid renaming __ksymtab entries for
+ symbol namespaces
 From: Matthias Maennich <maennich@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,200 +18,54 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
 
-Now that the namespace value is not part of the __ksymtab entry name
-anymore, we can simplify the implementation of EXPORT_SYMBOL*. By
-allowing the empty string "" to represent 'no namespace', we can unify
-the implementation and drop a lot redundant code.  That increases
-readability and maintainability.
+The introduction of the symbol namespace patches changed the way symbols are
+named in the ksymtab entries. That caused userland tools to fail (such as
+kmod's depmod). As depmod is used as part of the kernel build it was worth
+having another look whether this name change can be avoided.
 
-As Masahiro pointed out earlier,
-"The drawback of this change is, it grows the code size. When the symbol
-has no namespace, sym->namespace was previously NULL, but it is now am
-empty string "". So, it increases 1 byte for every no namespace
-EXPORT_SYMBOL. A typical kernel configuration has 10K exported symbols,
-so it increases 10KB in rough estimation."
+The main purpose of this series is to restore the original ksymtab entry names.
+For that to happen and to remove some rough edges around that, the relevant
+parts in modpost got a small refactoring as to when and how namespaces are
+evaluated and set in the symbol struct.
 
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Matthias Maennich <maennich@google.com>
----
- include/linux/export.h | 92 +++++++++++++-----------------------------
+Eventually, the namespace values can be read from __kstrtabns_ entries and
+their corresponding __ksymtab_strings values. That removes the need to carry
+the namespace names within the (anyway unique) symbol name entries.
+
+The last patch of this series is adopted from Masahiro [1]. By allowing 'no
+namespace' to be represented as empty string, large chunks of
+include/linux/export.h could be consolidated. Technically, this last patch is
+not absolutely necessary to fix functionality. It addresses concerns about
+maintainability and readability. While I strongly suggest sending all of the
+patches for 5.4, the last one could possible deferred to the next merge window.
+
+This patch applies to the modules-linus [2] branch.
+
+[1] https://lore.kernel.org/lkml/20190927093603.9140-5-yamada.masahiro@socionext.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/jeyu/linux.git/log/?h=modules-linus
+
+Cc: Jessica Yu <jeyu@kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Martijn Coenen <maco@android.com>
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Cc: Shaun Ruffell <sruffell@sruffell.net>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-modules@vger.kernel.org
+
+
+Matthias Maennich (4):
+  modpost: delegate updating namespaces to separate function
+  modpost: make updating the symbol namespace explict
+  symbol namespaces: revert to previous __ksymtab name scheme
+  export: avoid code duplication in include/linux/export.h
+
+ include/linux/export.h | 97 +++++++++++++-----------------------------
  kernel/module.c        |  2 +-
- 2 files changed, 29 insertions(+), 65 deletions(-)
+ scripts/mod/modpost.c  | 58 ++++++++++++++++---------
+ scripts/mod/modpost.h  |  1 +
+ 4 files changed, 69 insertions(+), 89 deletions(-)
 
-diff --git a/include/linux/export.h b/include/linux/export.h
-index f24b86d7dd4d..201262793369 100644
---- a/include/linux/export.h
-+++ b/include/linux/export.h
-@@ -46,7 +46,7 @@ extern struct module __this_module;
-  * absolute relocations that require runtime processing on relocatable
-  * kernels.
-  */
--#define __KSYMTAB_ENTRY_NS(sym, sec)					\
-+#define __KSYMTAB_ENTRY(sym, sec)					\
- 	__ADDRESSABLE(sym)						\
- 	asm("	.section \"___ksymtab" sec "+" #sym "\", \"a\"	\n"	\
- 	    "	.balign	4					\n"	\
-@@ -56,34 +56,17 @@ extern struct module __this_module;
- 	    "	.long	__kstrtabns_" #sym "- .			\n"	\
- 	    "	.previous					\n")
- 
--#define __KSYMTAB_ENTRY(sym, sec)					\
--	__ADDRESSABLE(sym)						\
--	asm("	.section \"___ksymtab" sec "+" #sym "\", \"a\"	\n"	\
--	    "	.balign 4					\n"	\
--	    "__ksymtab_" #sym ":				\n"	\
--	    "	.long	" #sym "- .				\n"	\
--	    "	.long	__kstrtab_" #sym "- .			\n"	\
--	    "	.long	0					\n"	\
--	    "	.previous					\n")
--
- struct kernel_symbol {
- 	int value_offset;
- 	int name_offset;
- 	int namespace_offset;
- };
- #else
--#define __KSYMTAB_ENTRY_NS(sym, sec)					\
--	static const struct kernel_symbol __ksymtab_##sym		\
--	__attribute__((section("___ksymtab" sec "+" #sym), used))	\
--	__aligned(sizeof(void *))					\
--	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtabns_##sym }
--
- #define __KSYMTAB_ENTRY(sym, sec)					\
- 	static const struct kernel_symbol __ksymtab_##sym		\
--	asm("__ksymtab_" #sym)						\
- 	__attribute__((section("___ksymtab" sec "+" #sym), used))	\
- 	__aligned(sizeof(void *))					\
--	= { (unsigned long)&sym, __kstrtab_##sym, NULL }
-+	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtabns_##sym }
- 
- struct kernel_symbol {
- 	unsigned long value;
-@@ -94,28 +77,20 @@ struct kernel_symbol {
- 
- #ifdef __GENKSYMS__
- 
--#define ___EXPORT_SYMBOL(sym,sec)	__GENKSYMS_EXPORT_SYMBOL(sym)
--#define ___EXPORT_SYMBOL_NS(sym,sec,ns)	__GENKSYMS_EXPORT_SYMBOL(sym)
-+#define ___EXPORT_SYMBOL(sym, sec, ns)	__GENKSYMS_EXPORT_SYMBOL(sym)
- 
- #else
- 
--#define ___export_symbol_common(sym, sec)				\
-+/* For every exported symbol, place a struct in the __ksymtab section */
-+#define ___EXPORT_SYMBOL(sym, sec, ns)					\
- 	extern typeof(sym) sym;						\
- 	__CRC_SYMBOL(sym, sec);						\
- 	static const char __kstrtab_##sym[]				\
- 	__attribute__((section("__ksymtab_strings"), used, aligned(1)))	\
--	= #sym								\
--
--/* For every exported symbol, place a struct in the __ksymtab section */
--#define ___EXPORT_SYMBOL_NS(sym, sec, ns)				\
--	___export_symbol_common(sym, sec);				\
-+	= #sym;								\
- 	static const char __kstrtabns_##sym[]				\
- 	__attribute__((section("__ksymtab_strings"), used, aligned(1)))	\
--	= #ns;								\
--	__KSYMTAB_ENTRY_NS(sym, sec)
--
--#define ___EXPORT_SYMBOL(sym, sec)					\
--	___export_symbol_common(sym, sec);				\
-+	= ns;								\
- 	__KSYMTAB_ENTRY(sym, sec)
- 
- #endif
-@@ -127,8 +102,7 @@ struct kernel_symbol {
-  * be reused in other execution contexts such as the UEFI stub or the
-  * decompressor.
-  */
--#define __EXPORT_SYMBOL_NS(sym, sec, ns)
--#define __EXPORT_SYMBOL(sym, sec)
-+#define __EXPORT_SYMBOL(sym, sec, ns)
- 
- #elif defined(CONFIG_TRIM_UNUSED_KSYMS)
- 
-@@ -144,48 +118,38 @@ struct kernel_symbol {
- #define __ksym_marker(sym)	\
- 	static int __ksym_marker_##sym[0] __section(".discard.ksym") __used
- 
--#define __EXPORT_SYMBOL(sym, sec)				\
--	__ksym_marker(sym);					\
--	__cond_export_sym(sym, sec, __is_defined(__KSYM_##sym))
--#define __cond_export_sym(sym, sec, conf)			\
--	___cond_export_sym(sym, sec, conf)
--#define ___cond_export_sym(sym, sec, enabled)			\
--	__cond_export_sym_##enabled(sym, sec)
--#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
--#define __cond_export_sym_0(sym, sec) /* nothing */
--
--#define __EXPORT_SYMBOL_NS(sym, sec, ns)				\
-+#define __EXPORT_SYMBOL(sym, sec, ns)					\
- 	__ksym_marker(sym);						\
--	__cond_export_ns_sym(sym, sec, ns, __is_defined(__KSYM_##sym))
--#define __cond_export_ns_sym(sym, sec, ns, conf)			\
--	___cond_export_ns_sym(sym, sec, ns, conf)
--#define ___cond_export_ns_sym(sym, sec, ns, enabled)			\
--	__cond_export_ns_sym_##enabled(sym, sec, ns)
--#define __cond_export_ns_sym_1(sym, sec, ns) ___EXPORT_SYMBOL_NS(sym, sec, ns)
--#define __cond_export_ns_sym_0(sym, sec, ns) /* nothing */
-+	__cond_export_sym(sym, sec, ns, __is_defined(__KSYM_##sym))
-+#define __cond_export_sym(sym, sec, ns, conf)				\
-+	___cond_export_sym(sym, sec, ns, conf)
-+#define ___cond_export_sym(sym, sec, ns, enabled)			\
-+	__cond_export_sym_##enabled(sym, sec, ns)
-+#define __cond_export_sym_1(sym, sec, ns) ___EXPORT_SYMBOL(sym, sec, ns)
-+#define __cond_export_sym_0(sym, sec, ns) /* nothing */
- 
- #else
- 
--#define __EXPORT_SYMBOL_NS(sym,sec,ns)	___EXPORT_SYMBOL_NS(sym,sec,ns)
--#define __EXPORT_SYMBOL(sym,sec)	___EXPORT_SYMBOL(sym,sec)
-+#define __EXPORT_SYMBOL(sym, sec, ns)	___EXPORT_SYMBOL(sym, sec, ns)
- 
- #endif /* CONFIG_MODULES */
- 
- #ifdef DEFAULT_SYMBOL_NAMESPACE
--#undef __EXPORT_SYMBOL
--#define __EXPORT_SYMBOL(sym, sec)				\
--	__EXPORT_SYMBOL_NS(sym, sec, DEFAULT_SYMBOL_NAMESPACE)
-+#include <linux/stringify.h>
-+#define _EXPORT_SYMBOL(sym, sec)	__EXPORT_SYMBOL(sym, sec, __stringify(DEFAULT_SYMBOL_NAMESPACE))
-+#else
-+#define _EXPORT_SYMBOL(sym, sec)	__EXPORT_SYMBOL(sym, sec, "")
- #endif
- 
--#define EXPORT_SYMBOL(sym)		__EXPORT_SYMBOL(sym, "")
--#define EXPORT_SYMBOL_GPL(sym)		__EXPORT_SYMBOL(sym, "_gpl")
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)	__EXPORT_SYMBOL(sym, "_gpl_future")
--#define EXPORT_SYMBOL_NS(sym, ns)	__EXPORT_SYMBOL_NS(sym, "", ns)
--#define EXPORT_SYMBOL_NS_GPL(sym, ns)	__EXPORT_SYMBOL_NS(sym, "_gpl", ns)
-+#define EXPORT_SYMBOL(sym)		_EXPORT_SYMBOL(sym, "")
-+#define EXPORT_SYMBOL_GPL(sym)		_EXPORT_SYMBOL(sym, "_gpl")
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)	_EXPORT_SYMBOL(sym, "_gpl_future")
-+#define EXPORT_SYMBOL_NS(sym, ns)	__EXPORT_SYMBOL(sym, "", #ns)
-+#define EXPORT_SYMBOL_NS_GPL(sym, ns)	__EXPORT_SYMBOL(sym, "_gpl", #ns)
- 
- #ifdef CONFIG_UNUSED_SYMBOLS
--#define EXPORT_UNUSED_SYMBOL(sym)	__EXPORT_SYMBOL(sym, "_unused")
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)	__EXPORT_SYMBOL(sym, "_unused_gpl")
-+#define EXPORT_UNUSED_SYMBOL(sym)	_EXPORT_SYMBOL(sym, "_unused")
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)	_EXPORT_SYMBOL(sym, "_unused_gpl")
- #else
- #define EXPORT_UNUSED_SYMBOL(sym)
- #define EXPORT_UNUSED_SYMBOL_GPL(sym)
-diff --git a/kernel/module.c b/kernel/module.c
-index ff2d7359a418..26c13173da3d 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -1400,7 +1400,7 @@ static int verify_namespace_is_imported(const struct load_info *info,
- 	char *imported_namespace;
- 
- 	namespace = kernel_symbol_namespace(sym);
--	if (namespace) {
-+	if (namespace && namespace[0]) {
- 		imported_namespace = get_modinfo(info, "import_ns");
- 		while (imported_namespace) {
- 			if (strcmp(namespace, imported_namespace) == 0)
 -- 
 2.23.0.581.g78d2f28ef7-goog
