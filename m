@@ -1,40 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:42718 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388126AbfJJNRn (ORCPT
+Received: from smtp.domeneshop.no ([194.63.252.55]:60773 "EHLO
+        smtp.domeneshop.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725880AbfJJNvP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Oct 2019 09:17:43 -0400
-Received: by mail-ot1-f65.google.com with SMTP id c10so4804844otd.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 06:17:43 -0700 (PDT)
+        Thu, 10 Oct 2019 09:51:15 -0400
+Subject: Re: [PATCH] drm/tiny: Kconfig: Remove always-y THERMAL dep. from
+ TINYDRM_REPAPER
+From: =?UTF-8?Q?Noralf_Tr=c3=b8nnes?= <noralf@tronnes.org>
+References: <20190927174218.GA32085@huvuddator>
+ <c3b41a7b-ef3b-7960-13a1-d4b8dd6f15b6@tronnes.org>
+Message-ID: <10f6225f-89c0-268e-8ef9-7a6b7c22e911@tronnes.org>
+Date: Thu, 10 Oct 2019 15:51:06 +0200
 MIME-Version: 1.0
-Reply-To: sunrisefundingltd50@gmail.com
-From: Valentina Yurina <v_yurina@ub.ac.id>
-Date: Thu, 10 Oct 2019 14:17:41 +0100
-Message-ID: <CAKoEkvu4vc5Yn9-hzxQ5dYmUL=oO69=GSP0FC7O+CGz9Jni8+Q@mail.gmail.com>
-Subject: Apply For Financial investment at a lower rate 2%
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <c3b41a7b-ef3b-7960-13a1-d4b8dd6f15b6@tronnes.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com
+Cc: david@lechnology.com, airlied@linux.ie, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, hdegoede@redhat.com, tglx@linutronix.de, sam@ravnborg.org, Jason Gunthorpe <jgg@ziepe.ca>
 
--- 
-Hello,
 
-We are private lenders based in UK.
 
-Do you need a loan (credit) as soon as possible. Are you in search of
-money to solve your personal needs or finance your business venture,
-then get Your desired loan today! Consult us at Sunrise Funding Ltd.
+Den 01.10.2019 12.58, skrev Noralf Trønnes:
+> 
+> 
+> Den 27.09.2019 19.42, skrev Ulf Magnusson:
+>> Commit 554b3529fe01 ("thermal/drivers/core: Remove the module Kconfig's
+>> option") changed the type of THERMAL from tristate to bool, so
+>> THERMAL || !THERMAL is now always y. Remove the redundant dependency.
+>>
+>> Discovered through Kconfiglib detecting a dependency loop. The C tools
+>> simplify the expression to y before running dependency loop detection,
+>> and so don't see it. Changing the type of THERMAL back to tristate makes
+>> the C tools detect the same loop.
+>>
+>> Not sure if running dep. loop detection after simplification can be
+>> called a bug. Fixing this nit unbreaks Kconfiglib on the kernel at
+>> least.
+>>
+>> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
+>> ---
+> 
+> Thanks, applied to drm-misc-next.
+> 
 
-* We offer personal loan & huge capital loan at 2% interest rate to
-the general public both locally and internationally.
-* Credit amount range from $5,000.00 -- $500,000.00 and above.
-* Special $10,000,000.00 Loan offer for huge project also available.
-* Loan period of 6 months -- 10 years.
-* Loan is granted 24 hours after approval and accredited, directly in
-hand or bank account.
+This has now been queued for the next -rc pull.
 
-Please note that you are advised to contact us for more details via
-the following e-mail address below;
+Discussion: https://patchwork.freedesktop.org/patch/319826/
 
-EMAIL : sunrisefundingltd50@gmail.com
-FIRM : Sunrise Funding Ltd UK.
+Noralf.
