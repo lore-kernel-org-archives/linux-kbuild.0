@@ -1,52 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.domeneshop.no ([194.63.252.55]:60773 "EHLO
-        smtp.domeneshop.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725880AbfJJNvP (ORCPT
+Received: from mail-wm1-f74.google.com ([209.85.128.74]:40408 "EHLO
+        mail-wm1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726457AbfJJPQF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Oct 2019 09:51:15 -0400
-Subject: Re: [PATCH] drm/tiny: Kconfig: Remove always-y THERMAL dep. from
- TINYDRM_REPAPER
-From: =?UTF-8?Q?Noralf_Tr=c3=b8nnes?= <noralf@tronnes.org>
-References: <20190927174218.GA32085@huvuddator>
- <c3b41a7b-ef3b-7960-13a1-d4b8dd6f15b6@tronnes.org>
-Message-ID: <10f6225f-89c0-268e-8ef9-7a6b7c22e911@tronnes.org>
-Date: Thu, 10 Oct 2019 15:51:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <c3b41a7b-ef3b-7960-13a1-d4b8dd6f15b6@tronnes.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Thu, 10 Oct 2019 11:16:05 -0400
+Received: by mail-wm1-f74.google.com with SMTP id o188so2758783wmo.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:04 -0700 (PDT)
+Date: Thu, 10 Oct 2019 16:14:40 +0100
+In-Reply-To: <20191010151443.7399-1-maennich@google.com>
+Message-Id: <20191010151443.7399-2-maennich@google.com>
+Mime-Version: 1.0
+References: <20191010151443.7399-1-maennich@google.com>
+Subject: [PATCH 1/4] modpost: delegate updating namespaces to separate function
+From: Matthias Maennich <maennich@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer@gmail.com>, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com
-Cc: david@lechnology.com, airlied@linux.ie, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, hdegoede@redhat.com, tglx@linutronix.de, sam@ravnborg.org, Jason Gunthorpe <jgg@ziepe.ca>
+To: linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
 
+Let the function 'sym_update_namespace' take care of updating the
+namespace for a symbol. While this currently only replaces one single
+location where namespaces are updated, in a following patch, this
+function will get more call sites.
 
+The function signature is intentionally close to sym_update_crc and
+taking the name by char* seems like unnecessary work as the symbol has
+to be looked up again. In a later patch of this series, this concern
+will be addressed.
 
-Den 01.10.2019 12.58, skrev Noralf Trønnes:
-> 
-> 
-> Den 27.09.2019 19.42, skrev Ulf Magnusson:
->> Commit 554b3529fe01 ("thermal/drivers/core: Remove the module Kconfig's
->> option") changed the type of THERMAL from tristate to bool, so
->> THERMAL || !THERMAL is now always y. Remove the redundant dependency.
->>
->> Discovered through Kconfiglib detecting a dependency loop. The C tools
->> simplify the expression to y before running dependency loop detection,
->> and so don't see it. Changing the type of THERMAL back to tristate makes
->> the C tools detect the same loop.
->>
->> Not sure if running dep. loop detection after simplification can be
->> called a bug. Fixing this nit unbreaks Kconfiglib on the kernel at
->> least.
->>
->> Signed-off-by: Ulf Magnusson <ulfalizer@gmail.com>
->> ---
-> 
-> Thanks, applied to drm-misc-next.
-> 
+This function ensures that symbol::namespace is either NULL or has a
+valid non-empty value. Previously, the empty string was considered 'no
+namespace' as well and this lead to confusion.
 
-This has now been queued for the next -rc pull.
+Signed-off-by: Matthias Maennich <maennich@google.com>
+---
+ scripts/mod/modpost.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-Discussion: https://patchwork.freedesktop.org/patch/319826/
-
-Noralf.
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4d2cdb4d71e3..9f5dcdff4d2f 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -362,6 +362,22 @@ static char *sym_extract_namespace(const char **symname)
+ 	return namespace;
+ }
+ 
++static void sym_update_namespace(const char *symname, const char *namespace)
++{
++       struct symbol *s = find_symbol(symname);
++       /* That symbol should have been created earlier and thus this is
++        * actually an assertion. */
++       if (!s) {
++               merror("Could not update namespace(%s) for symbol %s\n",
++                      namespace, symname);
++               return;
++       }
++
++       free(s->namespace);
++       s->namespace =
++	       namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
++}
++
+ /**
+  * Add an exported symbol - it may have already been added without a
+  * CRC, in this case just update the CRC
+@@ -383,8 +399,7 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
+ 			s->module = mod;
+ 		}
+ 	}
+-	free(s->namespace);
+-	s->namespace = namespace ? strdup(namespace) : NULL;
++	sym_update_namespace(name, namespace);
+ 	s->preloaded = 0;
+ 	s->vmlinux   = is_vmlinux(mod->name);
+ 	s->kernel    = 0;
+@@ -2196,7 +2211,7 @@ static int check_exports(struct module *mod)
+ 		else
+ 			basename = mod->name;
+ 
+-		if (exp->namespace && exp->namespace[0]) {
++		if (exp->namespace) {
+ 			add_namespace(&mod->required_namespaces,
+ 				      exp->namespace);
+ 
+-- 
+2.23.0.581.g78d2f28ef7-goog
