@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f74.google.com ([209.85.128.74]:40408 "EHLO
-        mail-wm1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbfJJPQF (ORCPT
+Received: from mail-wr1-f74.google.com ([209.85.221.74]:34524 "EHLO
+        mail-wr1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfJJPQM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Oct 2019 11:16:05 -0400
-Received: by mail-wm1-f74.google.com with SMTP id o188so2758783wmo.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:04 -0700 (PDT)
-Date: Thu, 10 Oct 2019 16:14:40 +0100
+        Thu, 10 Oct 2019 11:16:12 -0400
+Received: by mail-wr1-f74.google.com with SMTP id k4so2907862wru.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:09 -0700 (PDT)
+Date: Thu, 10 Oct 2019 16:14:42 +0100
 In-Reply-To: <20191010151443.7399-1-maennich@google.com>
-Message-Id: <20191010151443.7399-2-maennich@google.com>
+Message-Id: <20191010151443.7399-4-maennich@google.com>
 Mime-Version: 1.0
 References: <20191010151443.7399-1-maennich@google.com>
-Subject: [PATCH 1/4] modpost: delegate updating namespaces to separate function
+Subject: [PATCH 3/4] symbol namespaces: revert to previous __ksymtab name scheme
 From: Matthias Maennich <maennich@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,70 +19,166 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
 
-Let the function 'sym_update_namespace' take care of updating the
-namespace for a symbol. While this currently only replaces one single
-location where namespaces are updated, in a following patch, this
-function will get more call sites.
+The introduction Symbol Namespaces changed the naming schema of the
+__ksymtab entries from __kysmtab__symbol to __ksymtab_NAMESPACE.symbol.
 
-The function signature is intentionally close to sym_update_crc and
-taking the name by char* seems like unnecessary work as the symbol has
-to be looked up again. In a later patch of this series, this concern
-will be addressed.
+That caused some breakages in tools that depend on the name layout in
+either the binaries(vmlinux,*.ko) or in System.map. E.g. kmod's depmod
+would not be able to read System.map without a patch to support symbol
+namespaces. A warning reported by depmod for namespaced symbols would
+look like
 
-This function ensures that symbol::namespace is either NULL or has a
-valid non-empty value. Previously, the empty string was considered 'no
-namespace' as well and this lead to confusion.
+  depmod: WARNING: [...]/uas.ko needs unknown symbol usb_stor_adjust_quirks
 
+In order to address this issue, revert to the original naming scheme and
+rather read the __kstrtabns_<symbol> entries and their corresponding
+values from __ksymtab_strings to update the namespace values for
+symbols. After having read all symbols and handled them in
+handle_modversions(), the symbols are created. In a second pass, read
+the __kstrtabns_ entries and update the namespaces accordingly.
+
+Suggested-by: Jessica Yu <jeyu@kernel.org>
+Fixes: 8651ec01daed ("module: add support for symbol namespaces.")
 Signed-off-by: Matthias Maennich <maennich@google.com>
 ---
- scripts/mod/modpost.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ include/linux/export.h | 13 +++++--------
+ scripts/mod/modpost.c  | 33 ++++++++++++++++++---------------
+ scripts/mod/modpost.h  |  1 +
+ 3 files changed, 24 insertions(+), 23 deletions(-)
 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 621158ecd2e2..f24b86d7dd4d 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -18,8 +18,6 @@ extern struct module __this_module;
+ #define THIS_MODULE ((struct module *)0)
+ #endif
+ 
+-#define NS_SEPARATOR "."
+-
+ #ifdef CONFIG_MODVERSIONS
+ /* Mark the CRC weak since genksyms apparently decides not to
+  * generate a checksums for some symbols */
+@@ -48,11 +46,11 @@ extern struct module __this_module;
+  * absolute relocations that require runtime processing on relocatable
+  * kernels.
+  */
+-#define __KSYMTAB_ENTRY_NS(sym, sec, ns)				\
++#define __KSYMTAB_ENTRY_NS(sym, sec)					\
+ 	__ADDRESSABLE(sym)						\
+ 	asm("	.section \"___ksymtab" sec "+" #sym "\", \"a\"	\n"	\
+ 	    "	.balign	4					\n"	\
+-	    "__ksymtab_" #ns NS_SEPARATOR #sym ":		\n"	\
++	    "__ksymtab_" #sym ":				\n"	\
+ 	    "	.long	" #sym "- .				\n"	\
+ 	    "	.long	__kstrtab_" #sym "- .			\n"	\
+ 	    "	.long	__kstrtabns_" #sym "- .			\n"	\
+@@ -74,9 +72,8 @@ struct kernel_symbol {
+ 	int namespace_offset;
+ };
+ #else
+-#define __KSYMTAB_ENTRY_NS(sym, sec, ns)				\
+-	static const struct kernel_symbol __ksymtab_##sym##__##ns	\
+-	asm("__ksymtab_" #ns NS_SEPARATOR #sym)				\
++#define __KSYMTAB_ENTRY_NS(sym, sec)					\
++	static const struct kernel_symbol __ksymtab_##sym		\
+ 	__attribute__((section("___ksymtab" sec "+" #sym), used))	\
+ 	__aligned(sizeof(void *))					\
+ 	= { (unsigned long)&sym, __kstrtab_##sym, __kstrtabns_##sym }
+@@ -115,7 +112,7 @@ struct kernel_symbol {
+ 	static const char __kstrtabns_##sym[]				\
+ 	__attribute__((section("__ksymtab_strings"), used, aligned(1)))	\
+ 	= #ns;								\
+-	__KSYMTAB_ENTRY_NS(sym, sec, ns)
++	__KSYMTAB_ENTRY_NS(sym, sec)
+ 
+ #define ___EXPORT_SYMBOL(sym, sec)					\
+ 	___export_symbol_common(sym, sec);				\
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4d2cdb4d71e3..9f5dcdff4d2f 100644
+index 46137b730447..7cf0065ac95f 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -362,6 +362,22 @@ static char *sym_extract_namespace(const char **symname)
- 	return namespace;
+@@ -348,18 +348,11 @@ static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
+ 		return export_unknown;
  }
  
-+static void sym_update_namespace(const char *symname, const char *namespace)
-+{
-+       struct symbol *s = find_symbol(symname);
-+       /* That symbol should have been created earlier and thus this is
-+        * actually an assertion. */
-+       if (!s) {
-+               merror("Could not update namespace(%s) for symbol %s\n",
-+                      namespace, symname);
-+               return;
-+       }
-+
-+       free(s->namespace);
-+       s->namespace =
-+	       namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-+}
-+
- /**
-  * Add an exported symbol - it may have already been added without a
-  * CRC, in this case just update the CRC
-@@ -383,8 +399,7 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
- 			s->module = mod;
+-static char *sym_extract_namespace(const char **symname)
++static const char *namespace_from_kstrtabns(struct elf_info *info,
++					    Elf_Sym *kstrtabns)
+ {
+-	char *namespace = NULL;
+-	char *ns_separator;
+-
+-	ns_separator = strchr(*symname, '.');
+-	if (ns_separator) {
+-		namespace = NOFAIL(strndup(*symname, ns_separator - *symname));
+-		*symname = ns_separator + 1;
+-	}
+-
+-	return namespace;
++	char *value = info->ksymtab_strings + kstrtabns->st_value;
++	return value[0] ? value : NULL;
+ }
+ 
+ static void sym_update_namespace(const char *symname, const char *namespace)
+@@ -597,6 +590,10 @@ static int parse_elf(struct elf_info *info, const char *filename)
+ 			info->export_unused_gpl_sec = i;
+ 		else if (strcmp(secname, "__ksymtab_gpl_future") == 0)
+ 			info->export_gpl_future_sec = i;
++		else if (strcmp(secname, "__ksymtab_strings") == 0)
++			info->ksymtab_strings = (void *)hdr +
++						sechdrs[i].sh_offset -
++						sechdrs[i].sh_addr;
+ 
+ 		if (sechdrs[i].sh_type == SHT_SYMTAB) {
+ 			unsigned int sh_link_idx;
+@@ -686,7 +683,6 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 	enum export export;
+ 	bool is_crc = false;
+ 	const char *name;
+-	char *namespace;
+ 
+ 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
+ 	    strstarts(symname, "__ksymtab"))
+@@ -759,10 +755,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		/* All exported symbols */
+ 		if (strstarts(symname, "__ksymtab_")) {
+ 			name = symname + strlen("__ksymtab_");
+-			namespace = sym_extract_namespace(&name);
+ 			sym_add_exported(name, mod, export);
+-			sym_update_namespace(name, namespace);
+-			free(namespace);
  		}
+ 		if (strcmp(symname, "init_module") == 0)
+ 			mod->has_init = 1;
+@@ -2058,6 +2051,16 @@ static void read_symbols(const char *modname)
+ 		handle_moddevtable(mod, &info, sym, symname);
  	}
--	free(s->namespace);
--	s->namespace = namespace ? strdup(namespace) : NULL;
-+	sym_update_namespace(name, namespace);
- 	s->preloaded = 0;
- 	s->vmlinux   = is_vmlinux(mod->name);
- 	s->kernel    = 0;
-@@ -2196,7 +2211,7 @@ static int check_exports(struct module *mod)
- 		else
- 			basename = mod->name;
  
--		if (exp->namespace && exp->namespace[0]) {
-+		if (exp->namespace) {
- 			add_namespace(&mod->required_namespaces,
- 				      exp->namespace);
- 
++	/* Apply symbol namespaces from __kstrtabns_<symbol> entries. */
++	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
++		symname = remove_dot(info.strtab + sym->st_name);
++
++		if (strstarts(symname, "__kstrtabns_"))
++			sym_update_namespace(symname + strlen("__kstrtabns_"),
++					     namespace_from_kstrtabns(&info,
++								      sym));
++	}
++
+ 	// check for static EXPORT_SYMBOL_* functions && global vars
+ 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+ 		unsigned char bind = ELF_ST_BIND(sym->st_info);
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 92a926d375d2..ad271bc6c313 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -143,6 +143,7 @@ struct elf_info {
+ 	Elf_Section  export_gpl_sec;
+ 	Elf_Section  export_unused_gpl_sec;
+ 	Elf_Section  export_gpl_future_sec;
++	char	     *ksymtab_strings;
+ 	char         *strtab;
+ 	char	     *modinfo;
+ 	unsigned int modinfo_len;
 -- 
 2.23.0.581.g78d2f28ef7-goog
