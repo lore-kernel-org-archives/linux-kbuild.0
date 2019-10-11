@@ -1,61 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36156 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727399AbfJKPnP (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:60240 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726642AbfJKWiQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Oct 2019 11:43:15 -0400
-Received: by mail-wm1-f65.google.com with SMTP id m18so10688631wmc.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Oct 2019 08:43:14 -0700 (PDT)
-Date: Fri, 11 Oct 2019 16:43:11 +0100
-From: Matthias Maennich <maennich@google.com>
-Subject: Re: [PATCH 4/4] export: avoid code duplication in
- include/linux/export.h
-Message-ID: <20191011154311.GA192647@google.com>
-References: <20191010151443.7399-1-maennich@google.com>
- <20191010151443.7399-5-maennich@google.com>
- <20191011153127.GA1283883@kroah.com>
+        Fri, 11 Oct 2019 18:38:16 -0400
+Subject: Re: [PATCH] fix shell syntax
+References: <linux-kbuild@vger.kernel.org , yamada.masahiro@socionext.com ,
+ michal.lkml@markovi.net> <20191011070539.25908-1-unixbhaskar@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <e9a4a63c-954d-6437-0a79-323e88ef637c@infradead.org>
+Date: Fri, 11 Oct 2019 15:38:13 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191011153127.GA1283883@kroah.com>
+In-Reply-To: <20191011070539.25908-1-unixbhaskar@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, kernel-team@android.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
 
-On Fri, Oct 11, 2019 at 05:31:27PM +0200, Greg Kroah-Hartman wrote:
->On Thu, Oct 10, 2019 at 04:14:43PM +0100, Matthias Maennich wrote:
->> Now that the namespace value is not part of the __ksymtab entry name
->> anymore, we can simplify the implementation of EXPORT_SYMBOL*. By
->> allowing the empty string "" to represent 'no namespace', we can unify
->> the implementation and drop a lot redundant code.  That increases
->> readability and maintainability.
->>
->> As Masahiro pointed out earlier,
->> "The drawback of this change is, it grows the code size. When the symbol
->> has no namespace, sym->namespace was previously NULL, but it is now am
->> empty string "". So, it increases 1 byte for every no namespace
->> EXPORT_SYMBOL. A typical kernel configuration has 10K exported symbols,
->> so it increases 10KB in rough estimation."
->
->10Kb of non-swapable memory isn't good.  But if you care about that, you
->can get it back with the option to compile away any non-used symbols,
->and that shouldn't be affected by this change, right?
+Hi Bhaskar,
 
-Rasmus suggested to put the 'aMS' flags on the __ksymtab_strings section
-to mitigate this:
-https://lore.kernel.org/lkml/f2e28d6b-77c5-5fe2-0bc4-b24955de9954@rasmusvillemoes.dk/
+1- the Subject line is incomplete, missing some info: e.g.
+    [PATCH] scripts: setlocalversion: fix shell syntax
 
-I was not yet able to properly test this, so I did not include it in
-this series. As I said in the cover letter, this 4th patch might be
-optional for 5.4. So, we could defer it to a later time when we have
-addressed that properly.
 
-Cheers,
-Matthias
 
->
->That being said, the code is a lot cleaner, so I have no objection to
->it.
->
->Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On 10/11/19 12:05 AM, Bhaskar Chowdhury wrote:
+
+2- at this place, there should be a description of how the patch
+"fixes" the shell syntax.  and why.
+
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+> ---
+>  scripts/setlocalversion | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+> index 220dae0db3f1..b82a29bfc78a 100755
+> --- a/scripts/setlocalversion
+> +++ b/scripts/setlocalversion
+> @@ -45,11 +45,11 @@ scm_version()
+>  
+>  	# Check for git and a git repo.
+>  	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
+> -	   head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+> +		head=$(git rev-parse --verify --short HEAD 2>/dev/null); then
+
+3- That indentation change is not good IMO.
+
+4- The patch does seem to work, in my limited testing.
+
+5- Near the beginning of the script, it seems to say that the author
+would like to be Cc:ed on patches.
+
+>  
+>  		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+>  		# it, because this version is defined in the top level Makefile.
+> -		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
+> +		if [ -z "$(git describe --exact-match 2>/dev/null)" ]; then
+>  
+>  			# If only the short version is requested, don't bother
+>  			# running further git commands
+> @@ -59,7 +59,7 @@ scm_version()
+>  			fi
+>  			# If we are past a tagged commit (like
+>  			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+> -			if atag="`git describe 2>/dev/null`"; then
+> +			if atag="$(git describe 2>/dev/null)"; then
+>  				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
+>  
+>  			# If we don't have a tag at all we print -g{commitish}.
+> @@ -70,7 +70,7 @@ scm_version()
+>  
+>  		# Is this git on svn?
+>  		if git config --get svn-remote.svn.url >/dev/null; then
+> -			printf -- '-svn%s' "`git svn find-rev $head`"
+> +			printf -- '-svn%s' "$(git svn find-rev $head)"
+>  		fi
+>  
+>  		# Check for uncommitted changes.
+> @@ -91,15 +91,15 @@ scm_version()
+>  	fi
+>  
+>  	# Check for mercurial and a mercurial repo.
+> -	if test -d .hg && hgid=`hg id 2>/dev/null`; then
+> +	if test -d .hg && hgid=$(hg id 2>/dev/null); then
+>  		# Do we have an tagged version?  If so, latesttagdistance == 1
+> -		if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
+> -			id=`hg log -r . --template '{latesttag}'`
+> +		if [ "$(hg log -r . --template '{latesttagdistance}')" == "1" ]; then
+> +			id=$(hg log -r . --template '{latesttag}')
+>  			printf '%s%s' -hg "$id"
+>  		else
+> -			tag=`printf '%s' "$hgid" | cut -d' ' -f2`
+> +			tag=$(printf '%s' "$hgid" | cut -d' ' -f2)
+>  			if [ -z "$tag" -o "$tag" = tip ]; then
+> -				id=`printf '%s' "$hgid" | sed 's/[+ ].*//'`
+> +				id=$(printf '%s' "$hgid" | sed 's/[+ ].*//')
+>  				printf '%s%s' -hg "$id"
+>  			fi
+>  		fi
+> @@ -115,8 +115,8 @@ scm_version()
+>  	fi
+>  
+>  	# Check for svn and a svn repo.
+> -	if rev=`LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'`; then
+> -		rev=`echo $rev | awk '{print $NF}'`
+> +	if rev=$(LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'); then
+> +		rev=$(echo $rev | awk '{print $NF}')
+>  		printf -- '-svn%s' "$rev"
+>  
+>  		# All done with svn
+> 
+
+Thanks.
+-- 
+~Randy
