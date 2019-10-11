@@ -1,71 +1,218 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f73.google.com ([209.85.221.73]:50413 "EHLO
-        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfJJPQE (ORCPT
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:44797 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727518AbfJKCUl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Oct 2019 11:16:04 -0400
-Received: by mail-wr1-f73.google.com with SMTP id m14so2889081wru.17
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 08:16:01 -0700 (PDT)
-Date: Thu, 10 Oct 2019 16:14:39 +0100
-Message-Id: <20191010151443.7399-1-maennich@google.com>
-Mime-Version: 1.0
-Subject: [PATCH 0/4] export/modpost: avoid renaming __ksymtab entries for
- symbol namespaces
-From: Matthias Maennich <maennich@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 10 Oct 2019 22:20:41 -0400
+Received: by mail-pl1-f193.google.com with SMTP id q15so3709475pll.11
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Oct 2019 19:20:40 -0700 (PDT)
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] Modern Bash syntax, replace backquote to dollar parenthesis
+Date: Fri, 11 Oct 2019 07:47:59 +0530
+Message-Id: <20191011021759.28960-1-unixbhaskar@gmail.com>
+In-Reply-To: <yamada.masahiro@socionext.com,michal.lkml@markovi.net,linux-kbuild@vger.kernel.org>
+References: <yamada.masahiro@socionext.com,michal.lkml@markovi.net,linux-kbuild@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-The introduction of the symbol namespace patches changed the way symbols are
-named in the ksymtab entries. That caused userland tools to fail (such as
-kmod's depmod). As depmod is used as part of the kernel build it was worth
-having another look whether this name change can be avoided.
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ setlocalversion | 183 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 183 insertions(+)
+ create mode 100755 setlocalversion
 
-The main purpose of this series is to restore the original ksymtab entry names.
-For that to happen and to remove some rough edges around that, the relevant
-parts in modpost got a small refactoring as to when and how namespaces are
-evaluated and set in the symbol struct.
-
-Eventually, the namespace values can be read from __kstrtabns_ entries and
-their corresponding __ksymtab_strings values. That removes the need to carry
-the namespace names within the (anyway unique) symbol name entries.
-
-The last patch of this series is adopted from Masahiro [1]. By allowing 'no
-namespace' to be represented as empty string, large chunks of
-include/linux/export.h could be consolidated. Technically, this last patch is
-not absolutely necessary to fix functionality. It addresses concerns about
-maintainability and readability. While I strongly suggest sending all of the
-patches for 5.4, the last one could possible deferred to the next merge window.
-
-This patch applies to the modules-linus [2] branch.
-
-[1] https://lore.kernel.org/lkml/20190927093603.9140-5-yamada.masahiro@socionext.com/
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/jeyu/linux.git/log/?h=modules-linus
-
-Cc: Jessica Yu <jeyu@kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Martijn Coenen <maco@android.com>
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc: Shaun Ruffell <sruffell@sruffell.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-modules@vger.kernel.org
-
-
-Matthias Maennich (4):
-  modpost: delegate updating namespaces to separate function
-  modpost: make updating the symbol namespace explict
-  symbol namespaces: revert to previous __ksymtab name scheme
-  export: avoid code duplication in include/linux/export.h
-
- include/linux/export.h | 97 +++++++++++++-----------------------------
- kernel/module.c        |  2 +-
- scripts/mod/modpost.c  | 58 ++++++++++++++++---------
- scripts/mod/modpost.h  |  1 +
- 4 files changed, 69 insertions(+), 89 deletions(-)
-
+diff --git a/setlocalversion b/setlocalversion
+new file mode 100755
+index 000000000000..220dae0db3f1
+--- /dev/null
++++ b/setlocalversion
+@@ -0,0 +1,183 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++#
++# This scripts adds local version information from the version
++# control systems git, mercurial (hg) and subversion (svn).
++#
++# If something goes wrong, send a mail the kernel build mailinglist
++# (see MAINTAINERS) and CC Nico Schottelius
++# <nico-linuxsetlocalversion -at- schottelius.org>.
++#
++#
++
++usage() {
++	echo "Usage: $0 [--save-scmversion] [srctree]" >&2
++	exit 1
++}
++
++scm_only=false
++srctree=.
++if test "$1" = "--save-scmversion"; then
++	scm_only=true
++	shift
++fi
++if test $# -gt 0; then
++	srctree=$1
++	shift
++fi
++if test $# -gt 0 -o ! -d "$srctree"; then
++	usage
++fi
++
++scm_version()
++{
++	local short
++	short=false
++
++	cd "$srctree"
++	if test -e .scmversion; then
++		cat .scmversion
++		return
++	fi
++	if test "$1" = "--short"; then
++		short=true
++	fi
++
++	# Check for git and a git repo.
++	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
++	   head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
++
++		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
++		# it, because this version is defined in the top level Makefile.
++		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
++
++			# If only the short version is requested, don't bother
++			# running further git commands
++			if $short; then
++				echo "+"
++				return
++			fi
++			# If we are past a tagged commit (like
++			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
++			if atag="`git describe 2>/dev/null`"; then
++				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
++
++			# If we don't have a tag at all we print -g{commitish}.
++			else
++				printf '%s%s' -g $head
++			fi
++		fi
++
++		# Is this git on svn?
++		if git config --get svn-remote.svn.url >/dev/null; then
++			printf -- '-svn%s' "`git svn find-rev $head`"
++		fi
++
++		# Check for uncommitted changes.
++		# First, with git-status, but --no-optional-locks is only
++		# supported in git >= 2.14, so fall back to git-diff-index if
++		# it fails. Note that git-diff-index does not refresh the
++		# index, so it may give misleading results. See
++		# git-update-index(1), git-diff-index(1), and git-status(1).
++		if {
++			git --no-optional-locks status -uno --porcelain 2>/dev/null ||
++			git diff-index --name-only HEAD
++		} | grep -qvE '^(.. )?scripts/package'; then
++			printf '%s' -dirty
++		fi
++
++		# All done with git
++		return
++	fi
++
++	# Check for mercurial and a mercurial repo.
++	if test -d .hg && hgid=`hg id 2>/dev/null`; then
++		# Do we have an tagged version?  If so, latesttagdistance == 1
++		if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
++			id=`hg log -r . --template '{latesttag}'`
++			printf '%s%s' -hg "$id"
++		else
++			tag=`printf '%s' "$hgid" | cut -d' ' -f2`
++			if [ -z "$tag" -o "$tag" = tip ]; then
++				id=`printf '%s' "$hgid" | sed 's/[+ ].*//'`
++				printf '%s%s' -hg "$id"
++			fi
++		fi
++
++		# Are there uncommitted changes?
++		# These are represented by + after the changeset id.
++		case "$hgid" in
++			*+|*+\ *) printf '%s' -dirty ;;
++		esac
++
++		# All done with mercurial
++		return
++	fi
++
++	# Check for svn and a svn repo.
++	if rev=`LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'`; then
++		rev=`echo $rev | awk '{print $NF}'`
++		printf -- '-svn%s' "$rev"
++
++		# All done with svn
++		return
++	fi
++}
++
++collect_files()
++{
++	local file res=
++
++	for file; do
++		case "$file" in
++		*\~*)
++			continue
++			;;
++		esac
++		if test -e "$file"; then
++			res="$res$(cat "$file")"
++		fi
++	done
++	echo "$res"
++}
++
++if $scm_only; then
++	if test ! -e .scmversion; then
++		res=$(scm_version)
++		echo "$res" >.scmversion
++	fi
++	exit
++fi
++
++if test -e include/config/auto.conf; then
++	. include/config/auto.conf
++else
++	echo "Error: kernelrelease not valid - run 'make prepare' to update it" >&2
++	exit 1
++fi
++
++# localversion* files in the build and source directory
++res="$(collect_files localversion*)"
++if test ! "$srctree" -ef .; then
++	res="$res$(collect_files "$srctree"/localversion*)"
++fi
++
++# CONFIG_LOCALVERSION and LOCALVERSION (if set)
++res="${res}${CONFIG_LOCALVERSION}${LOCALVERSION}"
++
++# scm version string if not at a tagged commit
++if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
++	# full scm version string
++	res="$res$(scm_version)"
++else
++	# append a plus sign if the repository is not in a clean
++	# annotated or signed tagged state (as git describe only
++	# looks at signed or annotated tags - git tag -a/-s) and
++	# LOCALVERSION= is not specified
++	if test "${LOCALVERSION+set}" != "set"; then
++		scm=$(scm_version --short)
++		res="$res${scm:++}"
++	fi
++fi
++
++echo "$res"
 -- 
-2.23.0.581.g78d2f28ef7-goog
+2.21.0
