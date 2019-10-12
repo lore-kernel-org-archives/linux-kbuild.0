@@ -1,74 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:25066 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:49627 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726839AbfJLDgv (ORCPT
+        with ESMTP id S1725308AbfJLE0V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Oct 2019 23:36:51 -0400
+        Sat, 12 Oct 2019 00:26:21 -0400
 MIME-Version: 1.0
-References: <20191010151443.7399-1-maennich@google.com> <20191010151443.7399-4-maennich@google.com>
-In-Reply-To: <20191010151443.7399-4-maennich@google.com>
+References: <20191010151443.7399-1-maennich@google.com> <20191010151443.7399-5-maennich@google.com>
+ <20191011153127.GA1283883@kroah.com> <20191011154311.GA192647@google.com>
+In-Reply-To: <20191011154311.GA192647@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 12 Oct 2019 12:35:47 +0900
-Message-ID: <CAK7LNASMn9GY2dzVvouDW5MfqR3M1pEkWM73quh1HKb_XW1L4g@mail.gmail.com>
-Subject: Re: [PATCH 3/4] symbol namespaces: revert to previous __ksymtab name scheme
+Date: Sat, 12 Oct 2019 13:25:32 +0900
+Message-ID: <CAK7LNASvQd8C4UE3Zm9tsSH48w3QKwskyTKn2P8tegBMrV0_ww@mail.gmail.com>
+Subject: Re: [PATCH 4/4] export: avoid code duplication in include/linux/export.h
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Matthias Maennich <maennich@google.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-modules <linux-modules@vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-modules <linux-modules@vger.kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
 
-On Fri, Oct 11, 2019 at 12:16 AM Matthias Maennich <maennich@google.com> wrote:
+On Sat, Oct 12, 2019 at 12:43 AM Matthias Maennich <maennich@google.com> wrote:
 >
-> The introduction Symbol Namespaces changed the naming schema of the
-> __ksymtab entries from __kysmtab__symbol to __ksymtab_NAMESPACE.symbol.
+> On Fri, Oct 11, 2019 at 05:31:27PM +0200, Greg Kroah-Hartman wrote:
+> >On Thu, Oct 10, 2019 at 04:14:43PM +0100, Matthias Maennich wrote:
+> >> Now that the namespace value is not part of the __ksymtab entry name
+> >> anymore, we can simplify the implementation of EXPORT_SYMBOL*. By
+> >> allowing the empty string "" to represent 'no namespace', we can unify
+> >> the implementation and drop a lot redundant code.  That increases
+> >> readability and maintainability.
+> >>
+> >> As Masahiro pointed out earlier,
+> >> "The drawback of this change is, it grows the code size. When the symbol
+> >> has no namespace, sym->namespace was previously NULL, but it is now am
+> >> empty string "". So, it increases 1 byte for every no namespace
+> >> EXPORT_SYMBOL. A typical kernel configuration has 10K exported symbols,
+> >> so it increases 10KB in rough estimation."
+> >
+> >10Kb of non-swapable memory isn't good.  But if you care about that, you
+> >can get it back with the option to compile away any non-used symbols,
+> >and that shouldn't be affected by this change, right?
 >
-> That caused some breakages in tools that depend on the name layout in
-> either the binaries(vmlinux,*.ko) or in System.map. E.g. kmod's depmod
-> would not be able to read System.map without a patch to support symbol
-> namespaces. A warning reported by depmod for namespaced symbols would
-> look like
+> Rasmus suggested to put the 'aMS' flags on the __ksymtab_strings section
+> to mitigate this:
+> https://lore.kernel.org/lkml/f2e28d6b-77c5-5fe2-0bc4-b24955de9954@rasmusvillemoes.dk/
 >
->   depmod: WARNING: [...]/uas.ko needs unknown symbol usb_stor_adjust_quirks
->
-> In order to address this issue, revert to the original naming scheme and
-> rather read the __kstrtabns_<symbol> entries and their corresponding
-> values from __ksymtab_strings to update the namespace values for
-> symbols. After having read all symbols and handled them in
-> handle_modversions(), the symbols are created. In a second pass, read
-> the __kstrtabns_ entries and update the namespaces accordingly.
->
-> Suggested-by: Jessica Yu <jeyu@kernel.org>
-> Fixes: 8651ec01daed ("module: add support for symbol namespaces.")
-> Signed-off-by: Matthias Maennich <maennich@google.com>
+> I was not yet able to properly test this, so I did not include it in
+> this series. As I said in the cover letter, this 4th patch might be
+> optional for 5.4. So, we could defer it to a later time when we have
+> addressed that properly.
 
 
-According to https://lore.kernel.org/patchwork/patch/1135222/
-was this problem reported by Stefan?
-Reported-by: Stefan Wahren <stefan.wahren@i2se.com>
-
-
-BTW, I initially suggested this way of fixing.
-Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-
-
-> @@ -74,9 +72,8 @@ struct kernel_symbol {
->         int namespace_offset;
->  };
->  #else
-> -#define __KSYMTAB_ENTRY_NS(sym, sec, ns)                               \
-> -       static const struct kernel_symbol __ksymtab_##sym##__##ns       \
-> -       asm("__ksymtab_" #ns NS_SEPARATOR #sym)                         \
-
-
-For consistency, you could also delete   asm("__ksymtab_" #sym)
-by this patch instead of by 4/4.
-
-Not a big deal, though.
-
+This looks the same as my patch, though.
 
 Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
 
 
 -- 
