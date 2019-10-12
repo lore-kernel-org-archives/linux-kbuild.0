@@ -1,167 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36101 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbfJKW5s (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:31646 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726391AbfJLDUu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Oct 2019 18:57:48 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y22so6918548pfr.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Oct 2019 15:57:47 -0700 (PDT)
-Date: Sat, 12 Oct 2019 04:27:33 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] fix shell syntax
-Message-ID: <20191011225730.GA25079@Gentoo>
-References: <20191011070539.25908-1-unixbhaskar@gmail.com>
- <e9a4a63c-954d-6437-0a79-323e88ef637c@infradead.org>
+        Fri, 11 Oct 2019 23:20:50 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
-Content-Disposition: inline
-In-Reply-To: <e9a4a63c-954d-6437-0a79-323e88ef637c@infradead.org>
+References: <20191010151443.7399-1-maennich@google.com> <20191010151443.7399-2-maennich@google.com>
+ <20191011153253.GB1283883@kroah.com>
+In-Reply-To: <20191011153253.GB1283883@kroah.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 12 Oct 2019 12:19:58 +0900
+Message-ID: <CAK7LNAQbgtnP_P6aZEO7bHNL+w641ED+19TXCXKkU=dE+gyBGQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] modpost: delegate updating namespaces to separate function
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Matthias Maennich <maennich@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Will Deacon <will@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-modules <linux-modules@vger.kernel.org>
 
-
---+QahgC5+KEYLbs62
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 15:38 Fri 11 Oct 2019, Randy Dunlap wrote:
->Hi Bhaskar,
+On Sat, Oct 12, 2019 at 12:33 AM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
 >
->1- the Subject line is incomplete, missing some info: e.g.
->    [PATCH] scripts: setlocalversion: fix shell syntax
+> On Thu, Oct 10, 2019 at 04:14:40PM +0100, Matthias Maennich wrote:
+> > Let the function 'sym_update_namespace' take care of updating the
+> > namespace for a symbol. While this currently only replaces one single
+> > location where namespaces are updated, in a following patch, this
+> > function will get more call sites.
+> >
+> > The function signature is intentionally close to sym_update_crc and
+> > taking the name by char* seems like unnecessary work as the symbol has
+> > to be looked up again. In a later patch of this series, this concern
+> > will be addressed.
+> >
+> > This function ensures that symbol::namespace is either NULL or has a
+> > valid non-empty value. Previously, the empty string was considered 'no
+> > namespace' as well and this lead to confusion.
+> >
+> > Signed-off-by: Matthias Maennich <maennich@google.com>
+> > ---
+> >  scripts/mod/modpost.c | 21 ++++++++++++++++++---
+> >  1 file changed, 18 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> > index 4d2cdb4d71e3..9f5dcdff4d2f 100644
+> > --- a/scripts/mod/modpost.c
+> > +++ b/scripts/mod/modpost.c
+> > @@ -362,6 +362,22 @@ static char *sym_extract_namespace(const char **symname)
+> >       return namespace;
+> >  }
+> >
+> > +static void sym_update_namespace(const char *symname, const char *namespace)
+> > +{
+> > +       struct symbol *s = find_symbol(symname);
+> > +       /* That symbol should have been created earlier and thus this is
+> > +        * actually an assertion. */
 >
-Oops! let me redo it, I was going by your earlier suggestion :)
+> Do we care about checkpatch issues in tools?
+
+Personally, I do.
+
+
 >
->On 10/11/19 12:05 AM, Bhaskar Chowdhury wrote:
+> If so, you need a blank line before the comment :)
+
+One more minor issue, the block comment style is not correct.
+Please do like this:
+
+/*
+ * Blah Blah ...
+ * Blah Blha ...
+ */
+
+With those addressed,
+
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+
 >
->2- at this place, there should be a description of how the patch
->"fixes" the shell syntax.  and why.
+> Anyway, not a big deal
 >
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-My bad, was kinda confused,thought it might break the patch..lack of
-awareness. Will fix that next one.
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->> ---
->>  scripts/setlocalversion | 22 +++++++++++-----------
->>  1 file changed, 11 insertions(+), 11 deletions(-)
->>
->> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
->> index 220dae0db3f1..b82a29bfc78a 100755
->> --- a/scripts/setlocalversion
->> +++ b/scripts/setlocalversion
->> @@ -45,11 +45,11 @@ scm_version()
->>
->>  	# Check for git and a git repo.
->>  	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
->> -	   head=3D`git rev-parse --verify --short HEAD 2>/dev/null`; then
->> +		head=3D$(git rev-parse --verify --short HEAD 2>/dev/null); then
->
->3- That indentation change is not good IMO.
->
-Heck...another fix ...I am gobbling up your and others precious time
-with this trivialities. Will be careful .
 
->4- The patch does seem to work, in my limited testing.
->
-I made sure before sending anything , that thing should work in my local
-environment. Thank you for the double check ...at least I am inline :)
 
->5- Near the beginning of the script, it seems to say that the author
->would like to be Cc:ed on patches.
->
-Curse me for ignoring that...not fun ..why the fuck I missed that I
-don't know...
->>
->>  		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
->>  		# it, because this version is defined in the top level Makefile.
->> -		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
->> +		if [ -z "$(git describe --exact-match 2>/dev/null)" ]; then
->>
->>  			# If only the short version is requested, don't bother
->>  			# running further git commands
->> @@ -59,7 +59,7 @@ scm_version()
->>  			fi
->>  			# If we are past a tagged commit (like
->>  			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
->> -			if atag=3D"`git describe 2>/dev/null`"; then
->> +			if atag=3D"$(git describe 2>/dev/null)"; then
->>  				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
->>
->>  			# If we don't have a tag at all we print -g{commitish}.
->> @@ -70,7 +70,7 @@ scm_version()
->>
->>  		# Is this git on svn?
->>  		if git config --get svn-remote.svn.url >/dev/null; then
->> -			printf -- '-svn%s' "`git svn find-rev $head`"
->> +			printf -- '-svn%s' "$(git svn find-rev $head)"
->>  		fi
->>
->>  		# Check for uncommitted changes.
->> @@ -91,15 +91,15 @@ scm_version()
->>  	fi
->>
->>  	# Check for mercurial and a mercurial repo.
->> -	if test -d .hg && hgid=3D`hg id 2>/dev/null`; then
->> +	if test -d .hg && hgid=3D$(hg id 2>/dev/null); then
->>  		# Do we have an tagged version?  If so, latesttagdistance =3D=3D 1
->> -		if [ "`hg log -r . --template '{latesttagdistance}'`" =3D=3D "1" ]; t=
-hen
->> -			id=3D`hg log -r . --template '{latesttag}'`
->> +		if [ "$(hg log -r . --template '{latesttagdistance}')" =3D=3D "1" ]; =
-then
->> +			id=3D$(hg log -r . --template '{latesttag}')
->>  			printf '%s%s' -hg "$id"
->>  		else
->> -			tag=3D`printf '%s' "$hgid" | cut -d' ' -f2`
->> +			tag=3D$(printf '%s' "$hgid" | cut -d' ' -f2)
->>  			if [ -z "$tag" -o "$tag" =3D tip ]; then
->> -				id=3D`printf '%s' "$hgid" | sed 's/[+ ].*//'`
->> +				id=3D$(printf '%s' "$hgid" | sed 's/[+ ].*//')
->>  				printf '%s%s' -hg "$id"
->>  			fi
->>  		fi
->> @@ -115,8 +115,8 @@ scm_version()
->>  	fi
->>
->>  	# Check for svn and a svn repo.
->> -	if rev=3D`LANG=3D LC_ALL=3D LC_MESSAGES=3DC svn info 2>/dev/null | gre=
-p '^Last Changed Rev'`; then
->> -		rev=3D`echo $rev | awk '{print $NF}'`
->> +	if rev=3D$(LANG=3D LC_ALL=3D LC_MESSAGES=3DC svn info 2>/dev/null | gr=
-ep '^Last Changed Rev'); then
->> +		rev=3D$(echo $rev | awk '{print $NF}')
->>  		printf -- '-svn%s' "$rev"
->>
->>  		# All done with svn
->>
->
 
-Thank you so much for your invaluable time Randy...will be sending
-another one with the correction.
 
-Thanks,
-Bhaskar
->Thanks.
->--=20
->~Randy
-
---+QahgC5+KEYLbs62
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl2hCNcACgkQsjqdtxFL
-KRV6pwgAmYkb2rRsXeLToD4sdpE/LieGahcAXdFWey4vMmTOsg8QUz4jAE9xWrH2
-QIzzX+cCLn0erAnbA2rjB+Ev0PhndJ2JK31M2mcRFqyKyyP4AiDB4QMW6G3eoa0R
-BcBYjtxAFiRkoI95ao4DP8TsT++BI4aY0kWtn4yWdMkAP0nbeuaTzmQT2pSxqWgd
-hRYlChrej2+2b3JB1jjYU2/s7uCgrRCz/PiAi7tBxN98my4qfwrq/cswKEKyYCDV
-kHr7/j5MtGGyiEwDUnzIJG3qtO6uHvmDtnjGODTaONPEc5UI8lWOZa3CYM/xy51J
-tTAxemWPwWQasJIgCwmVzsDyUhUv5A==
-=FEeY
------END PGP SIGNATURE-----
-
---+QahgC5+KEYLbs62--
+-- 
+Best Regards
+Masahiro Yamada
