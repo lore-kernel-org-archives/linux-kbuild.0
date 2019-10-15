@@ -1,56 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr720078.outbound.protection.outlook.com ([40.107.72.78]:11232
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726430AbfJOIrE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Oct 2019 04:47:04 -0400
-Subject: Re: [PATCH] microblaze: Include generic support for MSI irqdomains
-References: <aa6dd855474451ff4f2e82691d1f590f3a85ba68.1570530881.git.michal.simek@xilinx.com>
- <20191008154604.GA7903@infradead.org>
- <c558db03-1199-275d-3e42-612c71cbf736@xilinx.com>
- <20191015074717.GB8715@infradead.org>
-From: Michal Simek <michal.simek@xilinx.com>
-Message-ID: <7cedfc62-b9ba-d1f2-e14f-93a64ad07fbc@xilinx.com>
-Date: Tue, 15 Oct 2019 10:46:45 +0200
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:41840 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbfJOPAf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Oct 2019 11:00:35 -0400
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] :scripts: prune-kernel : prunning kernel generalize way
+Date: Tue, 15 Oct 2019 20:25:49 +0530
+Message-Id: <20191015145548.24165-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191015074717.GB8715@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>, Michal Simek <michal.simek@xilinx.com>, Bjorn Helgaas <bhelgaas@google.com>
-Cc: linux-kernel@vger.kernel.org, monstr@monstr.eu, git@xilinx.com, Kate Stewart <kstewart@linuxfoundation.org>, Kuldeep Dave <kuldeep.dave@xilinx.com>, Albert Ou <aou@eecs.berkeley.edu>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Palmer Dabbelt <palmer@sifive.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Firoz Khan <firoz.khan@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will@kernel.org>, linux-riscv@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-On 15. 10. 19 9:47, Christoph Hellwig wrote:
-> On Thu, Oct 10, 2019 at 12:47:31PM +0200, Michal Simek wrote:
->> On 08. 10. 19 17:46, Christoph Hellwig wrote:
->>> On Tue, Oct 08, 2019 at 12:34:47PM +0200, Michal Simek wrote:
->>>> index e5c9170a07fc..83417105c00a 100644
->>>> --- a/arch/microblaze/include/asm/Kbuild
->>>> +++ b/arch/microblaze/include/asm/Kbuild
->>>> @@ -25,6 +25,7 @@ generic-y += local64.h
->>>>  generic-y += mcs_spinlock.h
->>>>  generic-y += mm-arch-hooks.h
->>>>  generic-y += mmiowb.h
->>>> +generic-y += msi.h
->>>
->>> Please just mark it as mandatory-y in the asm-generic makefile
->>> instead of requiring a sniplet for every architecture.
->>>
->>
->> But is it really mandatory for all architectures?
-> 
-> What the mandatory-y keyword means is that every architecture that
-> doesn't provide its own header gets the default one, which seems
-> applicable here.  Maybe the keyword is a bit misnamed and should be
-> default-y or something like that..
-> 
-> But in this case I think we have a clear case of x86 vs the rest, which
-> is unlikely to change in a major way.
-> 
+This patch will remove old kernels from system selective way.
 
-Bjorn: If you are ok with this I will make the patch.
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ scripts/prune-kernel | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Thanks,
-Michal
+diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+index 74143f229f84..28fae6c91218 100755
+--- a/scripts/prune-kernel
++++ b/scripts/prune-kernel
+@@ -33,7 +33,7 @@ printf "\t\n Enlist the installed kernels \n\n\n"
+ cd $boot_dir && pwd
+
+ #Bash experts not recomend to run ls inside script,but you can by running that too
+-# ls -1 vmlinuz-*
++# ls -1 vmlinuz-*
+
+ #This is the recommended way , little complex but that's what people want to see!
+
+@@ -42,10 +42,10 @@ find $boot_dir -name "vmlinuz-*" -type f -print0 -exec ls -1 {} \;
+ printf "\n\n\n Well, we need to purge some kernel to gain some space.\n\n\n"
+
+
+-printf "Please give the kernel version to remove: %s"
++printf "Please give the kernel version to remove: %s"
+ read kernel_version
+
+-remove_old_kernel
++remove_old_kernel
+
+ printf "\n\n Remove associated modules too ... \n\n"
+
+@@ -54,7 +54,7 @@ cd $modules_dir && pwd
+ printf "\n\n\n Enlist the installed modules \n\n\n"
+
+ #This is (-1) minus one not l(el)
+-# ls -1
++# ls -1
+
+ find $modules_dir -name "$kernel_version-*" -type f -print0 -exec ls -1 {} \;
+
+@@ -66,14 +66,14 @@ rm -rf $modules_version
+ printf "\n\n Done \n\n"
+
+ printf "\n\n Want to remove another?[Yn] : %s"
+-read response
++read response
+
+
+ if [[ $response == "Y" ]]; then
+- printf "Please give another version to remove : %s"
++ printf "Please give another version to remove : %s"
+  read kernel_version
+
+-remove_old_kernel
++remove_old_kernel
+
+ elif [[ $response == "n" ]]; then
+
+@@ -81,4 +81,4 @@ elif [[ $response == "n" ]]; then
+
+ fi
+
+-exit 0
++exit 0
+--
+2.21.0
