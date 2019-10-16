@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f73.google.com ([209.85.221.73]:56175 "EHLO
-        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391742AbfJPIlT (ORCPT
+Received: from mail-vk1-f201.google.com ([209.85.221.201]:47076 "EHLO
+        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391758AbfJPIlX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Oct 2019 04:41:19 -0400
-Received: by mail-wr1-f73.google.com with SMTP id o10so11366595wrm.22
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Oct 2019 01:41:15 -0700 (PDT)
-Date: Wed, 16 Oct 2019 10:39:53 +0200
+        Wed, 16 Oct 2019 04:41:23 -0400
+Received: by mail-vk1-f201.google.com with SMTP id n124so9386651vkg.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Oct 2019 01:41:22 -0700 (PDT)
+Date: Wed, 16 Oct 2019 10:39:55 +0200
 In-Reply-To: <20191016083959.186860-1-elver@google.com>
-Message-Id: <20191016083959.186860-3-elver@google.com>
+Message-Id: <20191016083959.186860-5-elver@google.com>
 Mime-Version: 1.0
 References: <20191016083959.186860-1-elver@google.com>
-Subject: [PATCH 2/8] objtool, kcsan: Add KCSAN runtime functions to whitelist
+Subject: [PATCH 4/8] seqlock, kcsan: Add annotations for KCSAN
 From: Marco Elver <elver@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,40 +19,156 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: elver@google.com
 Cc: akiyks@gmail.com, stern@rowland.harvard.edu, glider@google.com, parri.andrea@gmail.com, andreyknvl@google.com, luto@kernel.org, ard.biesheuvel@linaro.org, arnd@arndb.de, boqun.feng@gmail.com, bp@alien8.de, dja@axtens.net, dlustig@nvidia.com, dave.hansen@linux.intel.com, dhowells@redhat.com, dvyukov@google.com, hpa@zytor.com, mingo@redhat.com, j.alglave@ucl.ac.uk, joel@joelfernandes.org, corbet@lwn.net, jpoimboe@redhat.com, luc.maranget@inria.fr, mark.rutland@arm.com, npiggin@gmail.com, paulmck@linux.ibm.com, peterz@infradead.org, tglx@linutronix.de, will@kernel.org, kasan-dev@googlegroups.com, linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org
 
-This patch adds KCSAN runtime functions to the objtool whitelist.
+Since seqlocks in the Linux kernel do not require the use of marked
+atomic accesses in critical sections, we teach KCSAN to assume such
+accesses are atomic. KCSAN currently also pretends that writes to
+`sequence` are atomic, although currently plain writes are used (their
+corresponding reads are READ_ONCE).
+
+Further, to avoid false positives in the absence of clear ending of a
+seqlock reader critical section (only when using the raw interface),
+KCSAN assumes a fixed number of accesses after start of a seqlock
+critical section are atomic.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
- tools/objtool/check.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/linux/seqlock.h | 44 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 044c9a3cb247..d1acc867b43c 100644
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -466,6 +466,23 @@ static const char *uaccess_safe_builtin[] = {
- 	"__asan_report_store4_noabort",
- 	"__asan_report_store8_noabort",
- 	"__asan_report_store16_noabort",
-+	/* KCSAN */
-+	"__kcsan_check_watchpoint",
-+	"__kcsan_setup_watchpoint",
-+	/* KCSAN/TSAN out-of-line */
-+	"__tsan_func_entry",
-+	"__tsan_func_exit",
-+	"__tsan_read_range",
-+	"__tsan_read1",
-+	"__tsan_read2",
-+	"__tsan_read4",
-+	"__tsan_read8",
-+	"__tsan_read16",
-+	"__tsan_write1",
-+	"__tsan_write2",
-+	"__tsan_write4",
-+	"__tsan_write8",
-+	"__tsan_write16",
- 	/* KCOV */
- 	"write_comp_data",
- 	"__sanitizer_cov_trace_pc",
+diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
+index bcf4cf26b8c8..1e425831a7ed 100644
+--- a/include/linux/seqlock.h
++++ b/include/linux/seqlock.h
+@@ -37,8 +37,24 @@
+ #include <linux/preempt.h>
+ #include <linux/lockdep.h>
+ #include <linux/compiler.h>
++#include <linux/kcsan.h>
+ #include <asm/processor.h>
+ 
++/*
++ * The seqlock interface does not prescribe a precise sequence of read
++ * begin/retry/end. For readers, typically there is a call to
++ * read_seqcount_begin() and read_seqcount_retry(), however, there are more
++ * esoteric cases which do not follow this pattern.
++ *
++ * As a consequence, we take the following best-effort approach for *raw* usage
++ * of seqlocks under KCSAN: upon beginning a seq-reader critical section,
++ * pessimistically mark then next KCSAN_SEQLOCK_REGION_MAX memory accesses as
++ * atomics; if there is a matching read_seqcount_retry() call, no following
++ * memory operations are considered atomic. Non-raw usage of seqlocks is not
++ * affected.
++ */
++#define KCSAN_SEQLOCK_REGION_MAX 1000
++
+ /*
+  * Version using sequence counter only.
+  * This can be used when code has its own mutex protecting the
+@@ -115,6 +131,7 @@ static inline unsigned __read_seqcount_begin(const seqcount_t *s)
+ 		cpu_relax();
+ 		goto repeat;
+ 	}
++	kcsan_atomic_next(KCSAN_SEQLOCK_REGION_MAX);
+ 	return ret;
+ }
+ 
+@@ -131,6 +148,7 @@ static inline unsigned raw_read_seqcount(const seqcount_t *s)
+ {
+ 	unsigned ret = READ_ONCE(s->sequence);
+ 	smp_rmb();
++	kcsan_atomic_next(KCSAN_SEQLOCK_REGION_MAX);
+ 	return ret;
+ }
+ 
+@@ -183,6 +201,7 @@ static inline unsigned raw_seqcount_begin(const seqcount_t *s)
+ {
+ 	unsigned ret = READ_ONCE(s->sequence);
+ 	smp_rmb();
++	kcsan_atomic_next(KCSAN_SEQLOCK_REGION_MAX);
+ 	return ret & ~1;
+ }
+ 
+@@ -202,7 +221,8 @@ static inline unsigned raw_seqcount_begin(const seqcount_t *s)
+  */
+ static inline int __read_seqcount_retry(const seqcount_t *s, unsigned start)
+ {
+-	return unlikely(s->sequence != start);
++	kcsan_atomic_next(0);
++	return unlikely(READ_ONCE(s->sequence) != start);
+ }
+ 
+ /**
+@@ -225,6 +245,7 @@ static inline int read_seqcount_retry(const seqcount_t *s, unsigned start)
+ 
+ static inline void raw_write_seqcount_begin(seqcount_t *s)
+ {
++	kcsan_begin_atomic(true);
+ 	s->sequence++;
+ 	smp_wmb();
+ }
+@@ -233,6 +254,7 @@ static inline void raw_write_seqcount_end(seqcount_t *s)
+ {
+ 	smp_wmb();
+ 	s->sequence++;
++	kcsan_end_atomic(true);
+ }
+ 
+ /**
+@@ -262,18 +284,20 @@ static inline void raw_write_seqcount_end(seqcount_t *s)
+  *
+  *      void write(void)
+  *      {
+- *              Y = true;
++ *              WRITE_ONCE(Y, true);
+  *
+  *              raw_write_seqcount_barrier(seq);
+  *
+- *              X = false;
++ *              WRITE_ONCE(X, false);
+  *      }
+  */
+ static inline void raw_write_seqcount_barrier(seqcount_t *s)
+ {
++	kcsan_begin_atomic(true);
+ 	s->sequence++;
+ 	smp_wmb();
+ 	s->sequence++;
++	kcsan_end_atomic(true);
+ }
+ 
+ static inline int raw_read_seqcount_latch(seqcount_t *s)
+@@ -398,7 +422,9 @@ static inline void write_seqcount_end(seqcount_t *s)
+ static inline void write_seqcount_invalidate(seqcount_t *s)
+ {
+ 	smp_wmb();
++	kcsan_begin_atomic(true);
+ 	s->sequence+=2;
++	kcsan_end_atomic(true);
+ }
+ 
+ typedef struct {
+@@ -430,11 +456,21 @@ typedef struct {
+  */
+ static inline unsigned read_seqbegin(const seqlock_t *sl)
+ {
+-	return read_seqcount_begin(&sl->seqcount);
++	unsigned ret = read_seqcount_begin(&sl->seqcount);
++
++	kcsan_atomic_next(0);  /* non-raw usage, assume closing read_seqretry */
++	kcsan_begin_atomic(false);
++	return ret;
+ }
+ 
+ static inline unsigned read_seqretry(const seqlock_t *sl, unsigned start)
+ {
++	/*
++	 * Assume not nested: read_seqretry may be called multiple times when
++	 * completing read critical section.
++	 */
++	kcsan_end_atomic(false);
++
+ 	return read_seqcount_retry(&sl->seqcount, start);
+ }
+ 
 -- 
 2.23.0.700.g56cf767bdb-goog
