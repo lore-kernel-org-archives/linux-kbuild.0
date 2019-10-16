@@ -1,46 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:16530 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726648AbfJPFRI (ORCPT
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:36806 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727729AbfJPGOC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Oct 2019 01:17:08 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 2/2] kbuild: make target builds much faster
-Date: Wed, 16 Oct 2019 14:15:47 +0900
-Message-Id: <20191016051547.11399-2-yamada.masahiro@socionext.com>
-In-Reply-To: <20191016051547.11399-1-yamada.masahiro@socionext.com>
-References: <20191016051547.11399-1-yamada.masahiro@socionext.com>
+        Wed, 16 Oct 2019 02:14:02 -0400
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] scripts : prune-kernel : prune kernels generalized way
+Date: Wed, 16 Oct 2019 11:43:12 +0530
+Message-Id: <20191016061312.10626-1-unixbhaskar@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@infradead.org, bfields@fieldses.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-Since commit 394053f4a4b3 ("kbuild: make single targets work more
-correctly"), building single targets is really slow.
+This patch will remove old kernel from the system in a selective way.
 
-Speed it up by not descending into unrelated directories.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
+Thanks, a bunch to Randy for the hand holding . :)
 
- scripts/Makefile.build | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ scripts/prune-kernel | 71 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 59 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index dcbb0124dac4..7eabbb66a65c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -479,7 +479,10 @@ curdir-single := $(sort $(foreach x, $(KBUILD_SINGLE_TARGETS), \
- unknown-single := $(filter-out $(addsuffix /%, $(subdir-ym)), \
- 			$(filter-out $(curdir-single), $(KBUILD_SINGLE_TARGETS)))
- 
--__build: $(curdir-single) $(subdir-ym)
-+single-subdirs := $(foreach d, $(subdir-ym), \
-+			$(if $(filter $(d)/%, $(KBUILD_SINGLE_TARGETS)), $(d)))
+diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+index e8aa940bc0a9..78dd4c854b2b 100755
+--- a/scripts/prune-kernel
++++ b/scripts/prune-kernel
+@@ -5,17 +5,64 @@
+ # again, /boot and /lib/modules/ eventually fill up.
+ # Dumb script to purge that stuff:
+
++#for f in "$@"
++#do
++#        if rpm -qf "/lib/modules/$f" >/dev/null; then
++#                echo "keeping $f (installed from rpm)"
++#        elif [ $(uname -r) = "$f" ]; then
++#                echo "keeping $f (running kernel) "
++#        else
++#                echo "removing $f"
++#                rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
++#                rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
++#                rm -rf "/lib/modules/$f"
++#                new-kernel-pkg --remove $f
++#        fi
++#done
++boot_dir=/boot
++modules_dir=/lib/modules
 +
-+__build: $(curdir-single) $(single-subdirs)
- ifneq ($(unknown-single),)
- 	$(Q)$(MAKE) -f /dev/null $(unknown-single)
- endif
--- 
-2.17.1
++function remove_old_kernel(){
++	cd $boot_dir
++	rm -If vmlinuz-$kenrel_version System.map-$kernel_version config-$kernel_verison
++}
++function remove_old_kernel_modules_dir(){
++	cd $modules_dir
++	rm -rf $modules_version
++}
++printf "\n\n Enlist the installed kernels \n\n"
++
++find $boot_dir -name "vmlinuz-*" -type f  -exec ls -1 {} \;
++
++printf "\n\n\n Please give the kernel version to remove: %s"
++read kernel_version
++
++remove_old_kernel
++
++printf "\n\n Enlist the installed modules directory \n\n"
++
++find $modules_dir  -maxdepth 0 -type d -exec ls -1 {} \;
++
++printf "\n\n Please give the full modules directory name to remove: %s"
++read modules_version
++
++remove_old_kernel_modules_dir
++
++printf "\n\n Removed kernel version: $kernel_version and associcated modules: $modules_version ...Done \n"
++while :
+ do
++printf "\n\n Do you want to remove another?[YN] : %s"
++read response
++
++if [[ $response == "Y" ]];then
++	printf "Please give another version to remove : %s"
++	read kernel_version
++	remove_old_kernel
++	printf "\n\n Please give the full modules directory name to remove: %s"
++	read modules_version
++	remove_old_kernel_modules_dir
++elif [[ $response == "N" ]];then
++	printf "\n\n Alright,no more. \n\n"
++	exit 1
++fi
+ done
+--
+2.21.0
