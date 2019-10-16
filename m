@@ -1,99 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f73.google.com ([209.85.128.73]:40770 "EHLO
-        mail-wm1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391756AbfJPIlW (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40586 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388426AbfJPJdl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Oct 2019 04:41:22 -0400
-Received: by mail-wm1-f73.google.com with SMTP id o188so858268wmo.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Oct 2019 01:41:19 -0700 (PDT)
-Date: Wed, 16 Oct 2019 10:39:54 +0200
-In-Reply-To: <20191016083959.186860-1-elver@google.com>
-Message-Id: <20191016083959.186860-4-elver@google.com>
-Mime-Version: 1.0
-References: <20191016083959.186860-1-elver@google.com>
-Subject: [PATCH 3/8] build, kcsan: Add KCSAN build exceptions
-From: Marco Elver <elver@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 16 Oct 2019 05:33:41 -0400
+Received: by mail-pf1-f194.google.com with SMTP id x127so14347471pfb.7
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Oct 2019 02:33:41 -0700 (PDT)
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] scripts: setlocalversion: replace backquote to dollar parenthesis 
+Date: Wed, 16 Oct 2019 15:02:46 +0530
+Message-Id: <20191016093246.20000-1-unixbhaskar@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: elver@google.com
-Cc: akiyks@gmail.com, stern@rowland.harvard.edu, glider@google.com, parri.andrea@gmail.com, andreyknvl@google.com, luto@kernel.org, ard.biesheuvel@linaro.org, arnd@arndb.de, boqun.feng@gmail.com, bp@alien8.de, dja@axtens.net, dlustig@nvidia.com, dave.hansen@linux.intel.com, dhowells@redhat.com, dvyukov@google.com, hpa@zytor.com, mingo@redhat.com, j.alglave@ucl.ac.uk, joel@joelfernandes.org, corbet@lwn.net, jpoimboe@redhat.com, luc.maranget@inria.fr, mark.rutland@arm.com, npiggin@gmail.com, paulmck@linux.ibm.com, peterz@infradead.org, tglx@linutronix.de, will@kernel.org, kasan-dev@googlegroups.com, linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-This blacklists several compilation units from KCSAN. See the respective
-inline comments for the reasoning.
+This patch replace backquote to dollar parenthesis syntax for better
+readability.
 
-Signed-off-by: Marco Elver <elver@google.com>
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
- kernel/Makefile       | 5 +++++
- kernel/sched/Makefile | 6 ++++++
- mm/Makefile           | 8 ++++++++
- 3 files changed, 19 insertions(+)
+ scripts/setlocalversion | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 74ab46e2ebd1..4a597a68b8bc 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -23,6 +23,9 @@ endif
- # Prevents flicker of uninteresting __do_softirq()/__local_bh_disable_ip()
- # in coverage traces.
- KCOV_INSTRUMENT_softirq.o := n
-+# Avoid KCSAN instrumentation in softirq ("No shared variables, all the data
-+# are CPU local" => assume no data-races), to reduce overhead in interrupts.
-+KCSAN_SANITIZE_softirq.o = n
- # These are called from save_stack_trace() on slub debug path,
- # and produce insane amounts of uninteresting coverage.
- KCOV_INSTRUMENT_module.o := n
-@@ -30,6 +33,7 @@ KCOV_INSTRUMENT_extable.o := n
- # Don't self-instrument.
- KCOV_INSTRUMENT_kcov.o := n
- KASAN_SANITIZE_kcov.o := n
-+KCSAN_SANITIZE_kcov.o := n
- CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 220dae0db3f1..b82a29bfc78a 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -45,11 +45,11 @@ scm_version()
  
- # cond_syscall is currently not LTO compatible
-@@ -118,6 +122,7 @@ obj-$(CONFIG_RSEQ) += rseq.o
+ 	# Check for git and a git repo.
+ 	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
+-	   head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
++		head=$(git rev-parse --verify --short HEAD 2>/dev/null); then
  
- obj-$(CONFIG_GCC_PLUGIN_STACKLEAK) += stackleak.o
- KASAN_SANITIZE_stackleak.o := n
-+KCSAN_SANITIZE_stackleak.o := n
- KCOV_INSTRUMENT_stackleak.o := n
+ 		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+ 		# it, because this version is defined in the top level Makefile.
+-		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
++		if [ -z "$(git describe --exact-match 2>/dev/null)" ]; then
  
- $(obj)/configs.o: $(obj)/config_data.gz
-diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
-index 21fb5a5662b5..e9307a9c54e7 100644
---- a/kernel/sched/Makefile
-+++ b/kernel/sched/Makefile
-@@ -7,6 +7,12 @@ endif
- # that is not a function of syscall inputs. E.g. involuntary context switches.
- KCOV_INSTRUMENT := n
+ 			# If only the short version is requested, don't bother
+ 			# running further git commands
+@@ -59,7 +59,7 @@ scm_version()
+ 			fi
+ 			# If we are past a tagged commit (like
+ 			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+-			if atag="`git describe 2>/dev/null`"; then
++			if atag="$(git describe 2>/dev/null)"; then
+ 				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
  
-+# There are numerous races here, however, most of them due to plain accesses.
-+# This would make it even harder for syzbot to find reproducers, because these
-+# bugs trigger without specific input. Disable by default, but should re-enable
-+# eventually.
-+KCSAN_SANITIZE := n
-+
- ifneq ($(CONFIG_SCHED_OMIT_FRAME_POINTER),y)
- # According to Alan Modra <alan@linuxcare.com.au>, the -fno-omit-frame-pointer is
- # needed for x86 only.  Why this used to be enabled for all architectures is beyond
-diff --git a/mm/Makefile b/mm/Makefile
-index d996846697ef..33ea0154dd2d 100644
---- a/mm/Makefile
-+++ b/mm/Makefile
-@@ -7,6 +7,14 @@ KASAN_SANITIZE_slab_common.o := n
- KASAN_SANITIZE_slab.o := n
- KASAN_SANITIZE_slub.o := n
+ 			# If we don't have a tag at all we print -g{commitish}.
+@@ -70,7 +70,7 @@ scm_version()
  
-+# These produce frequent data-race reports: most of them are due to races on
-+# the same word but accesses to different bits of that word. Re-enable KCSAN
-+# for these when we have more consensus on what to do about them.
-+KCSAN_SANITIZE_slab_common.o := n
-+KCSAN_SANITIZE_slab.o := n
-+KCSAN_SANITIZE_slub.o := n
-+KCSAN_SANITIZE_page_alloc.o := n
-+
- # These files are disabled because they produce non-interesting and/or
- # flaky coverage that is not a function of syscall inputs. E.g. slab is out of
- # free pages, or a task is migrated between nodes.
+ 		# Is this git on svn?
+ 		if git config --get svn-remote.svn.url >/dev/null; then
+-			printf -- '-svn%s' "`git svn find-rev $head`"
++			printf -- '-svn%s' "$(git svn find-rev $head)"
+ 		fi
+ 
+ 		# Check for uncommitted changes.
+@@ -91,15 +91,15 @@ scm_version()
+ 	fi
+ 
+ 	# Check for mercurial and a mercurial repo.
+-	if test -d .hg && hgid=`hg id 2>/dev/null`; then
++	if test -d .hg && hgid=$(hg id 2>/dev/null); then
+ 		# Do we have an tagged version?  If so, latesttagdistance == 1
+-		if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
+-			id=`hg log -r . --template '{latesttag}'`
++		if [ "$(hg log -r . --template '{latesttagdistance}')" == "1" ]; then
++			id=$(hg log -r . --template '{latesttag}')
+ 			printf '%s%s' -hg "$id"
+ 		else
+-			tag=`printf '%s' "$hgid" | cut -d' ' -f2`
++			tag=$(printf '%s' "$hgid" | cut -d' ' -f2)
+ 			if [ -z "$tag" -o "$tag" = tip ]; then
+-				id=`printf '%s' "$hgid" | sed 's/[+ ].*//'`
++				id=$(printf '%s' "$hgid" | sed 's/[+ ].*//')
+ 				printf '%s%s' -hg "$id"
+ 			fi
+ 		fi
+@@ -115,8 +115,8 @@ scm_version()
+ 	fi
+ 
+ 	# Check for svn and a svn repo.
+-	if rev=`LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'`; then
+-		rev=`echo $rev | awk '{print $NF}'`
++	if rev=$(LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'); then
++		rev=$(echo $rev | awk '{print $NF}')
+ 		printf -- '-svn%s' "$rev"
+ 
+ 		# All done with svn
 -- 
-2.23.0.700.g56cf767bdb-goog
+2.21.0
