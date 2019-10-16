@@ -1,162 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33571 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfJPBgT (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Oct 2019 21:36:19 -0400
-Date: Wed, 16 Oct 2019 07:06:04 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] :scripts: prune-kernel : prunning kernel generalize way
-Message-ID: <20191016013601.GA13621@Gentoo>
-References: <20191015145548.24165-1-unixbhaskar@gmail.com>
- <c075bcce-0d6d-abee-7fb5-80821f2ae3a2@infradead.org>
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34283 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727488AbfJPCAa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Oct 2019 22:00:30 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v2] selftests: Add kselftest-all and kselftest-install targets
+In-Reply-To: <20190926224014.28910-1-skhan@linuxfoundation.org>
+References: <20190926224014.28910-1-skhan@linuxfoundation.org>
+Date: Wed, 16 Oct 2019 13:00:21 +1100
+Message-ID: <87sgnttpoq.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
-Content-Disposition: inline
-In-Reply-To: <c075bcce-0d6d-abee-7fb5-80821f2ae3a2@infradead.org>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, bfields@fieldses.org
+To: Shuah Khan <skhan@linuxfoundation.org>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, shuah@kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hi Shuah,
 
---0F1p//8PRICkK4MW
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I know this has been merged already, so this is just FYI and in case it
+helps anyone else who's tracking down build failures.
 
-On 16:03 Tue 15 Oct 2019, Randy Dunlap wrote:
->Subject: s/prunning/pruning/
->Subject:  s/:scripts:/scripts:/
+Sorry I didn't reply before you merged it, I was on leave.
+
+Shuah Khan <skhan@linuxfoundation.org> writes:
+> Add kselftest-all target to build tests from the top level
+> Makefile. This is to simplify kselftest use-cases for CI and
+> distributions where build and test systems are different.
 >
->On 10/15/19 7:55 AM, Bhaskar Chowdhury wrote:
->> This patch will remove old kernels from system selective way.
+> Current kselftest target builds and runs tests on a development
+> system which is a developer use-case.
 >
->                                                 in a selective way.
+> Add kselftest-install target to install tests from the top level
+> Makefile. This is to simplify kselftest use-cases for CI and
+> distributions where build and test systems are different.
 >
->>
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->> ---
->>  scripts/prune-kernel | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
->> index 74143f229f84..28fae6c91218 100755
->> --- a/scripts/prune-kernel
->> +++ b/scripts/prune-kernel
->> @@ -33,7 +33,7 @@ printf "\t\n Enlist the installed kernels \n\n\n"
->>  cd $boot_dir && pwd
->>
->>  #Bash experts not recomend to run ls inside script,but you can by runni=
-ng that too
->> -# ls -1 vmlinuz-*
->> +# ls -1 vmlinuz-*
->>
->>  #This is the recommended way , little complex but that's what people wa=
-nt to see!
->>
->> @@ -42,10 +42,10 @@ find $boot_dir -name "vmlinuz-*" -type f -print0 -ex=
-ec ls -1 {} \;
->>  printf "\n\n\n Well, we need to purge some kernel to gain some space.\n=
-\n\n"
->>
->>
->> -printf "Please give the kernel version to remove: %s"
->> +printf "Please give the kernel version to remove: %s"
->>  read kernel_version
->>
->> -remove_old_kernel
->> +remove_old_kernel
->>
->>  printf "\n\n Remove associated modules too ... \n\n"
->>
->> @@ -54,7 +54,7 @@ cd $modules_dir && pwd
->>  printf "\n\n\n Enlist the installed modules \n\n\n"
->>
->>  #This is (-1) minus one not l(el)
->> -# ls -1
->> +# ls -1
->>
->>  find $modules_dir -name "$kernel_version-*" -type f -print0 -exec ls -1=
- {} \;
->>
->> @@ -66,14 +66,14 @@ rm -rf $modules_version
->>  printf "\n\n Done \n\n"
->>
->>  printf "\n\n Want to remove another?[Yn] : %s"
->> -read response
->> +read response
->>
->>
->>  if [[ $response =3D=3D "Y" ]]; then
->> - printf "Please give another version to remove : %s"
->> + printf "Please give another version to remove : %s"
->>   read kernel_version
->>
->> -remove_old_kernel
->> +remove_old_kernel
->>
->>  elif [[ $response =3D=3D "n" ]]; then
->>
->> @@ -81,4 +81,4 @@ elif [[ $response =3D=3D "n" ]]; then
->>
->>  fi
->>
->> -exit 0
->> +exit 0
->> --
->> 2.21.0
->>
+> This change addresses requests from developers and testers to add
+> support for installing kselftest from the main Makefile.
 >
->Trying to apply this patch with 'patch --verbose' says:
->
->checking file scripts/prune-kernel
->Using Plan A...
->Hunk #1 FAILED at 33.
->Hunk #2 FAILED at 42.
->Hunk #3 FAILED at 54.
->Hunk #4 FAILED at 66.
->Hunk #5 FAILED at 81.
->5 out of 5 hunks FAILED
->Hmm...  Ignoring the trailing garbage.
->done
->
->
->Those + and - lines with the same content don't make any sense.
->
->And probably Cc: the author of the script:
->J. Bruce Fields <bfields@fieldses.org>
->
->--=20
->~Randy
+> In addition, make the install directory the same when install is
+> run using "make kselftest-install" or by running kselftest_install.sh.
+> Also fix the INSTALL_PATH variable conflict between main Makefile and
+> selftests Makefile.
+...
+> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+> index c3feccb99ff5..bad18145ed1a 100644
+> --- a/tools/testing/selftests/Makefile
+> +++ b/tools/testing/selftests/Makefile
+> @@ -171,9 +171,12 @@ run_pstore_crash:
+>  # 1. output_dir=kernel_src
+>  # 2. a separate output directory is specified using O= KBUILD_OUTPUT
+>  # 3. a separate output directory is specified using KBUILD_OUTPUT
+> +# Avoid conflict with INSTALL_PATH set by the main Makefile
+>  #
+> -INSTALL_PATH ?= $(BUILD)/install
+> -INSTALL_PATH := $(abspath $(INSTALL_PATH))
+> +KSFT_INSTALL_PATH ?= $(BUILD)/kselftest_install
 
-Thank you Randy, silly mistakes creeps in...my bad ...will correct that
-and resend.
-BTW I haven't found Bruce's name anywhere...where did you get it? Or did I
-miss the obvious??
+This change broke all my CI, because the tests no longer install in the
+place it's expecting them :/
 
-Ran against get_maintainers and it only throw a open list , no other
-names.So kinda, stump by that.=20
+I can fix it by explicitly specifying the install path in my CI scripts.
 
-Time to redo it again...huh
+> +KSFT_INSTALL_PATH := $(abspath $(KSFT_INSTALL_PATH))
+> +# Avoid changing the rest of the logic here and lib.mk.
+> +INSTALL_PATH := $(KSFT_INSTALL_PATH)
 
-Thanks,
-Bhaskar
+But because the over-rideable variable changed from INSTALL_PATH to
+KSFT_INSTALL_PATH I will need to export both of them in order for my CI
+to work with old and new kernels.
 
---0F1p//8PRICkK4MW
-Content-Type: application/pgp-signature; name="signature.asc"
+So to emulate the old behaviour for old & new kernels you need to do:
 
------BEGIN PGP SIGNATURE-----
+# export KSFT_INSTALL_PATH=install
+# export INSTALL_PATH=install
+# make -C tools/testing/selftests install
 
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl2mc/0ACgkQsjqdtxFL
-KRXh7wgAk8luWf86C5OdriZJqIDDBRmCzV8cjpPvV9ddO6LB/t4Am/ceveiKoBdZ
-nfgTUMJTwd+1k2DmovCftBghDSkiKHvhrit2YGaKmhARH8XXkgYn6j6bY+cb5gH7
-6OGkIMmpnHfmXhZnlj6EZFNkgiZdoLl5YOKitNhSIk6WK32mjn71Qw/oDELkiLad
-5Qfbt2EIlbytdX7i9mKpt/ifdzm25fUufyC0dz9//Fy4G83Oiuj3R+IuAQrV0IMz
-6sNiMeKKmHgiadLe7QngSb1G+aYX0Lw4ZR75PZGHaZudfs66d5pLsgEqeKyq8tYp
-i1aei3nl2Xvl5slBbCUEqOwYYe5kTw==
-=mMoA
------END PGP SIGNATURE-----
 
---0F1p//8PRICkK4MW--
+cheers
