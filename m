@@ -1,99 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f73.google.com ([209.85.221.73]:36684 "EHLO
-        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2439911AbfJQONj (ORCPT
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:36266 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394836AbfJQOPf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Oct 2019 10:13:39 -0400
-Received: by mail-wr1-f73.google.com with SMTP id c6so1034889wrp.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Oct 2019 07:13:36 -0700 (PDT)
-Date: Thu, 17 Oct 2019 16:13:00 +0200
-In-Reply-To: <20191017141305.146193-1-elver@google.com>
-Message-Id: <20191017141305.146193-4-elver@google.com>
-Mime-Version: 1.0
-References: <20191017141305.146193-1-elver@google.com>
-Subject: [PATCH v2 3/8] build, kcsan: Add KCSAN build exceptions
+        Thu, 17 Oct 2019 10:15:35 -0400
+Received: by mail-oi1-f195.google.com with SMTP id k20so2286327oih.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Oct 2019 07:15:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191016083959.186860-1-elver@google.com>
+In-Reply-To: <20191016083959.186860-1-elver@google.com>
 From: Marco Elver <elver@google.com>
+Date: Thu, 17 Oct 2019 16:15:20 +0200
+Message-ID: <CANpmjNPB8mFso7=WpUQ8Nbxon3kKTEGRUFMCVhjLNkfzey+TJg@mail.gmail.com>
+Subject: Re: [PATCH 0/8] Add Kernel Concurrency Sanitizer (KCSAN)
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: elver@google.com
-Cc: akiyks@gmail.com, stern@rowland.harvard.edu, glider@google.com, parri.andrea@gmail.com, andreyknvl@google.com, luto@kernel.org, ard.biesheuvel@linaro.org, arnd@arndb.de, boqun.feng@gmail.com, bp@alien8.de, dja@axtens.net, dlustig@nvidia.com, dave.hansen@linux.intel.com, dhowells@redhat.com, dvyukov@google.com, hpa@zytor.com, mingo@redhat.com, j.alglave@ucl.ac.uk, joel@joelfernandes.org, corbet@lwn.net, jpoimboe@redhat.com, luc.maranget@inria.fr, mark.rutland@arm.com, npiggin@gmail.com, paulmck@linux.ibm.com, peterz@infradead.org, tglx@linutronix.de, will@kernel.org, kasan-dev@googlegroups.com, linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org
+To: Marco Elver <elver@google.com>
+Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, dave.hansen@linux.intel.com, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, "Paul E. McKenney" <paulmck@linux.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
 
-This blacklists several compilation units from KCSAN. See the respective
-inline comments for the reasoning.
+On Wed, 16 Oct 2019 at 10:41, Marco Elver <elver@google.com> wrote:
+>
+> This is the patch-series for the Kernel Concurrency Sanitizer (KCSAN).
+> KCSAN is a sampling watchpoint-based data-race detector. More details
+> are included in Documentation/dev-tools/kcsan.rst. This patch-series
+> only enables KCSAN for x86, but we expect adding support for other
+> architectures is relatively straightforward (we are aware of
+> experimental ARM64 and POWER support).
+>
+> To gather early feedback, we announced KCSAN back in September, and
+> have integrated the feedback where possible:
+> http://lkml.kernel.org/r/CANpmjNPJ_bHjfLZCAPV23AXFfiPiyXXqqu72n6TgWzb2Gnu1eA@mail.gmail.com
+>
+> We want to point out and acknowledge the work surrounding the LKMM,
+> including several articles that motivate why data-races are dangerous
+> [1, 2], justifying a data-race detector such as KCSAN.
+> [1] https://lwn.net/Articles/793253/
+> [2] https://lwn.net/Articles/799218/
+>
+> The current list of known upstream fixes for data-races found by KCSAN
+> can be found here:
+> https://github.com/google/ktsan/wiki/KCSAN#upstream-fixes-of-data-races-found-by-kcsan
 
-Signed-off-by: Marco Elver <elver@google.com>
----
- kernel/Makefile       | 5 +++++
- kernel/sched/Makefile | 6 ++++++
- mm/Makefile           | 8 ++++++++
- 3 files changed, 19 insertions(+)
+Sent v2: http://lkml.kernel.org/r/20191017141305.146193-1-elver@google.com
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 74ab46e2ebd1..4a597a68b8bc 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -23,6 +23,9 @@ endif
- # Prevents flicker of uninteresting __do_softirq()/__local_bh_disable_ip()
- # in coverage traces.
- KCOV_INSTRUMENT_softirq.o := n
-+# Avoid KCSAN instrumentation in softirq ("No shared variables, all the data
-+# are CPU local" => assume no data-races), to reduce overhead in interrupts.
-+KCSAN_SANITIZE_softirq.o = n
- # These are called from save_stack_trace() on slub debug path,
- # and produce insane amounts of uninteresting coverage.
- KCOV_INSTRUMENT_module.o := n
-@@ -30,6 +33,7 @@ KCOV_INSTRUMENT_extable.o := n
- # Don't self-instrument.
- KCOV_INSTRUMENT_kcov.o := n
- KASAN_SANITIZE_kcov.o := n
-+KCSAN_SANITIZE_kcov.o := n
- CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack -fno-stack-protector)
- 
- # cond_syscall is currently not LTO compatible
-@@ -118,6 +122,7 @@ obj-$(CONFIG_RSEQ) += rseq.o
- 
- obj-$(CONFIG_GCC_PLUGIN_STACKLEAK) += stackleak.o
- KASAN_SANITIZE_stackleak.o := n
-+KCSAN_SANITIZE_stackleak.o := n
- KCOV_INSTRUMENT_stackleak.o := n
- 
- $(obj)/configs.o: $(obj)/config_data.gz
-diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
-index 21fb5a5662b5..e9307a9c54e7 100644
---- a/kernel/sched/Makefile
-+++ b/kernel/sched/Makefile
-@@ -7,6 +7,12 @@ endif
- # that is not a function of syscall inputs. E.g. involuntary context switches.
- KCOV_INSTRUMENT := n
- 
-+# There are numerous races here, however, most of them due to plain accesses.
-+# This would make it even harder for syzbot to find reproducers, because these
-+# bugs trigger without specific input. Disable by default, but should re-enable
-+# eventually.
-+KCSAN_SANITIZE := n
-+
- ifneq ($(CONFIG_SCHED_OMIT_FRAME_POINTER),y)
- # According to Alan Modra <alan@linuxcare.com.au>, the -fno-omit-frame-pointer is
- # needed for x86 only.  Why this used to be enabled for all architectures is beyond
-diff --git a/mm/Makefile b/mm/Makefile
-index d996846697ef..33ea0154dd2d 100644
---- a/mm/Makefile
-+++ b/mm/Makefile
-@@ -7,6 +7,14 @@ KASAN_SANITIZE_slab_common.o := n
- KASAN_SANITIZE_slab.o := n
- KASAN_SANITIZE_slub.o := n
- 
-+# These produce frequent data-race reports: most of them are due to races on
-+# the same word but accesses to different bits of that word. Re-enable KCSAN
-+# for these when we have more consensus on what to do about them.
-+KCSAN_SANITIZE_slab_common.o := n
-+KCSAN_SANITIZE_slab.o := n
-+KCSAN_SANITIZE_slub.o := n
-+KCSAN_SANITIZE_page_alloc.o := n
-+
- # These files are disabled because they produce non-interesting and/or
- # flaky coverage that is not a function of syscall inputs. E.g. slab is out of
- # free pages, or a task is migrated between nodes.
--- 
-2.23.0.866.gb869b98d4c-goog
+Many thanks,
+-- Marco
+
+> Marco Elver (8):
+>   kcsan: Add Kernel Concurrency Sanitizer infrastructure
+>   objtool, kcsan: Add KCSAN runtime functions to whitelist
+>   build, kcsan: Add KCSAN build exceptions
+>   seqlock, kcsan: Add annotations for KCSAN
+>   seqlock: Require WRITE_ONCE surrounding raw_seqcount_barrier
+>   asm-generic, kcsan: Add KCSAN instrumentation for bitops
+>   locking/atomics, kcsan: Add KCSAN instrumentation
+>   x86, kcsan: Enable KCSAN for x86
+>
+>  Documentation/dev-tools/kcsan.rst         | 202 ++++++++++
+>  MAINTAINERS                               |  11 +
+>  Makefile                                  |   3 +-
+>  arch/x86/Kconfig                          |   1 +
+>  arch/x86/boot/Makefile                    |   1 +
+>  arch/x86/boot/compressed/Makefile         |   1 +
+>  arch/x86/entry/vdso/Makefile              |   1 +
+>  arch/x86/include/asm/bitops.h             |   2 +-
+>  arch/x86/kernel/Makefile                  |   6 +
+>  arch/x86/kernel/cpu/Makefile              |   3 +
+>  arch/x86/lib/Makefile                     |   2 +
+>  arch/x86/mm/Makefile                      |   3 +
+>  arch/x86/purgatory/Makefile               |   1 +
+>  arch/x86/realmode/Makefile                |   1 +
+>  arch/x86/realmode/rm/Makefile             |   1 +
+>  drivers/firmware/efi/libstub/Makefile     |   1 +
+>  include/asm-generic/atomic-instrumented.h | 192 ++++++++-
+>  include/asm-generic/bitops-instrumented.h |  18 +
+>  include/linux/compiler-clang.h            |   9 +
+>  include/linux/compiler-gcc.h              |   7 +
+>  include/linux/compiler.h                  |  35 +-
+>  include/linux/kcsan-checks.h              | 116 ++++++
+>  include/linux/kcsan.h                     |  85 ++++
+>  include/linux/sched.h                     |   7 +
+>  include/linux/seqlock.h                   |  51 ++-
+>  init/init_task.c                          |   6 +
+>  init/main.c                               |   2 +
+>  kernel/Makefile                           |   6 +
+>  kernel/kcsan/Makefile                     |  14 +
+>  kernel/kcsan/atomic.c                     |  21 +
+>  kernel/kcsan/core.c                       | 458 ++++++++++++++++++++++
+>  kernel/kcsan/debugfs.c                    | 225 +++++++++++
+>  kernel/kcsan/encoding.h                   |  94 +++++
+>  kernel/kcsan/kcsan.c                      |  81 ++++
+>  kernel/kcsan/kcsan.h                      | 140 +++++++
+>  kernel/kcsan/report.c                     | 307 +++++++++++++++
+>  kernel/kcsan/test.c                       | 117 ++++++
+>  kernel/sched/Makefile                     |   6 +
+>  lib/Kconfig.debug                         |   2 +
+>  lib/Kconfig.kcsan                         |  88 +++++
+>  lib/Makefile                              |   3 +
+>  mm/Makefile                               |   8 +
+>  scripts/Makefile.kcsan                    |   6 +
+>  scripts/Makefile.lib                      |  10 +
+>  scripts/atomic/gen-atomic-instrumented.sh |   9 +-
+>  tools/objtool/check.c                     |  17 +
+>  46 files changed, 2364 insertions(+), 16 deletions(-)
+>  create mode 100644 Documentation/dev-tools/kcsan.rst
+>  create mode 100644 include/linux/kcsan-checks.h
+>  create mode 100644 include/linux/kcsan.h
+>  create mode 100644 kernel/kcsan/Makefile
+>  create mode 100644 kernel/kcsan/atomic.c
+>  create mode 100644 kernel/kcsan/core.c
+>  create mode 100644 kernel/kcsan/debugfs.c
+>  create mode 100644 kernel/kcsan/encoding.h
+>  create mode 100644 kernel/kcsan/kcsan.c
+>  create mode 100644 kernel/kcsan/kcsan.h
+>  create mode 100644 kernel/kcsan/report.c
+>  create mode 100644 kernel/kcsan/test.c
+>  create mode 100644 lib/Kconfig.kcsan
+>  create mode 100644 scripts/Makefile.kcsan
+>
+> --
+> 2.23.0.700.g56cf767bdb-goog
+>
