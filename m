@@ -1,51 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:35605 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727470AbfJQHtk (ORCPT
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44398 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438938AbfJQI0e (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Oct 2019 03:49:40 -0400
-Received: by mail-oi1-f195.google.com with SMTP id x3so1365723oig.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Oct 2019 00:49:40 -0700 (PDT)
+        Thu, 17 Oct 2019 04:26:34 -0400
+Date: Thu, 17 Oct 2019 13:56:22 +0530
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [RFC] scripts : mkmakefile : change name to create_makefile
+Message-ID: <20191017082619.GA22508@Gentoo>
 MIME-Version: 1.0
-References: <20191016083959.186860-1-elver@google.com> <20191016083959.186860-2-elver@google.com>
- <20191016184346.GT2328@hirez.programming.kicks-ass.net> <CANpmjNP4b9Eo3ZKE6maBs4ANS7K7sLiVB2CbebQnCH09TB+hZQ@mail.gmail.com>
- <20191017074730.GW2328@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191017074730.GW2328@hirez.programming.kicks-ass.net>
-From: Marco Elver <elver@google.com>
-Date: Thu, 17 Oct 2019 09:49:27 +0200
-Message-ID: <CANpmjNPKbCrL+XzmMrnjqw+EYOa2H94cgE5sPJeuVONbCSqBHg@mail.gmail.com>
-Subject: Re: [PATCH 1/8] kcsan: Add Kernel Concurrency Sanitizer infrastructure
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, dave.hansen@linux.intel.com, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, "Paul E. McKenney" <paulmck@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
+To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@infradead.org
 
-On Thu, 17 Oct 2019 at 09:47, Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Wed, Oct 16, 2019 at 09:34:05PM +0200, Marco Elver wrote:
-> > On Wed, 16 Oct 2019 at 20:44, Peter Zijlstra <peterz@infradead.org> wrote:
-> > > > +     /*
-> > > > +      * Disable interrupts & preemptions, to ignore races due to accesses in
-> > > > +      * threads running on the same CPU.
-> > > > +      */
-> > > > +     local_irq_save(irq_flags);
-> > > > +     preempt_disable();
-> > >
-> > > Is there a point to that preempt_disable() here?
-> >
-> > We want to avoid being preempted while the watchpoint is set up;
-> > otherwise, we would report data-races for CPU-local data, which is
-> > incorrect.
->
-> Disabling IRQs already very much disables preemption. There is
-> absolutely no point in doing preempt_disable() when the whole section
-> already runs with IRQs disabled.
 
-Ah thanks for the clarification, in that case I assume it's safe to
-remove preempt_disable() for v2.
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> --
-> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/20191017074730.GW2328%40hirez.programming.kicks-ass.net.
+Hi,
+
+It would be good, if we can change the name of the script to more
+explicit name ,which also tell us the purpose of the script by just
+looking at it.=20
+
+The present name "mkmakefile" is perfectly alright for the people ,who
+are technically inclined not so with other, who wants to understand.
+
+This my understanding.
+
+Present Script Name :  mkmakefile
+
+Change Script name  : create_makefile
+
+Please shed some light.
+
+Thanks,
+Bhaskar
+
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl2oJagACgkQsjqdtxFL
+KRVvaAgAhf9g5o+HCmnaDBDG2b0Z5drT1VO2BHh1DyVl9KwI2PpbMG9ToezruMF8
+rHKhg249Xz9xTiCvXr337T5BsU39YJ8Wss33aZ0Ptk3BjbDK/kTabQjf1Giv3Akw
+TorrQUMLQ/lLvLx43T4ASIAQaPJ/Bi9ZZQ27fWqVqIS+7OTODHWMko5YKMuRwRt1
+tSiy59ontancJwdnEcy9+KK+W1yaSqZrgTPJLwjmM++ZJ55iWb6i/JHQVDCBaAEj
+rVRhiRj2gicK/z3dm1eG034B4MS36a2dyVjb5bnZZcBYYM82fMN5/1n0LMYHV2Cf
+F76YHImeUWu5RnA1GJ15rSv0fJNgxg==
+=NzPR
+-----END PGP SIGNATURE-----
+
+--AhhlLboLdkugWU4S--
