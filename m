@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44170 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726248AbfJQKW0 (ORCPT
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34406 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404947AbfJQKZf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Oct 2019 06:22:26 -0400
+        Thu, 17 Oct 2019 06:25:35 -0400
 From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH] NM variable missed the value,so fixed
-Date: Thu, 17 Oct 2019 15:51:59 +0530
-Message-Id: <20191017102159.20387-1-unixbhaskar@gmail.com>
+Subject: [PATCH] scripts : mksysmap : NM variable missed the value,so fixed
+Date: Thu, 17 Oct 2019 15:55:06 +0530
+Message-Id: <20191017102506.22192-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,6 +19,9 @@ This patch will provide the missing value for NM variable.
 
 Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
+TO all,
+Adjusted the subject line, missed in previous one,sorry
+
  scripts/mksysmap | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
