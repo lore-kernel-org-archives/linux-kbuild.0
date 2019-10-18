@@ -1,66 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:41379 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728064AbfJRH4V (ORCPT
+Received: from mail-wr1-f74.google.com ([209.85.221.74]:56913 "EHLO
+        mail-wr1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2395294AbfJRJb6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Oct 2019 03:56:21 -0400
-MIME-Version: 1.0
-References: <CAK8P3a3uiTSaruN7x5iMaDowYziqMFxKWjDyS1c8pYFJgPJ5Dg@mail.gmail.com>
- <20191017125637.1041949-1-arnd@arndb.de> <CAHk-=wiH7Ej9x3RqJkUEW4hDCisgWdi6wai6E0tvo4omF_FbeQ@mail.gmail.com>
- <20191017153755.jh6iherf2ywmwbss@box> <CAK8P3a1TrOippPUh6Fc_McHcp2LOerdD6ifmcieuy0bAFPvs8g@mail.gmail.com>
- <CAHk-=wh8MsquobFL5TC0yUkG-9yFUZZnikMPA8QHLc7fcyND6w@mail.gmail.com> <20191017161617.zj7u6p642mytpzts@box>
-In-Reply-To: <20191017161617.zj7u6p642mytpzts@box>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 18 Oct 2019 09:56:01 +0200
-Message-ID: <CAK8P3a0YLeqm71TNzTwJ0FwQKW4Ji0etA+6U=08Exk7fibyBQw@mail.gmail.com>
-Subject: Re: [PATCH] [RFC, EXPERIMENTAL] allow building with --std=gnu99
+        Fri, 18 Oct 2019 05:31:58 -0400
+Received: by mail-wr1-f74.google.com with SMTP id s9so2310573wrw.23
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Oct 2019 02:31:57 -0700 (PDT)
+Date: Fri, 18 Oct 2019 10:31:39 +0100
+In-Reply-To: <20191010151443.7399-1-maennich@google.com>
+Message-Id: <20191018093143.15997-1-maennich@google.com>
+Mime-Version: 1.0
+References: <20191010151443.7399-1-maennich@google.com>
+Subject: [PATCH v2 0/4] export/modpost: avoid renaming __ksymtab entries for
+ symbol namespaces
+From: Matthias Maennich <maennich@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Andrew Pinski <apinski@cavium.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, mm-commits@vger.kernel.org, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, Kostya Serebryany <kcc@google.com>, Ingo Molnar <mingo@elte.hu>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 6:16 PM Kirill A. Shutemov <kirill@shutemov.name> wrote:
-> On Thu, Oct 17, 2019 at 08:56:50AM -0700, Linus Torvalds wrote:
-> > Yeah, that's certainly less than wonderful.
-> >
-> > That said, there's no way in hell we'll support gcc-4 for another 7
-> > years (eg Suse 12-sp4), so at _some_ point the EOL dates aren't even
-> > relevant any more.
-> >
-> > But it does look like we can't just say "gcc-5.1 is ok". Darn.
->
-> I don't read the picture the same way. All distributions have at least one
-> major release with GCC >= 5.
->
-> The first release with gcc >= 5:
->
-> - Debian 9 stretch has 6.3.0, released 2017-06-18;
->
-> - Ubuntu 15.10 wily has 5.2.1, released 2015-10-22;
->
-> - Fedora 24 has 6.1.1, released 2016-06-21;
->
-> - OpenSUSE 15 has 7.4.1, released 2018-05-25;
->
-> - RHEL 8.0 has 8.2.1, released 2019-05-06;
->
-> - SUSE 15 has 7.3.1, released 2018-06-25;
->
-> - Oracle 7.6.4 has 7.6.4, release 2019-07-18;
-               ^^^ Oracle 8
->
-> - Slackware 14.2 has 5.3.0, released 2016-07-01;
+The introduction of the symbol namespace patches changed the way symbols are
+named in the ksymtab entries. That caused userland tools to fail (such as
+kmod's depmod). As depmod is used as part of the kernel build it was worth
+having another look whether this name change can be avoided.
 
-For /most/ of these I see no problem, but RHEL 7 / Centos 7 /
-Oracle 7 and (to a lesser degree) SUSE 12 must have users
-that want to build new kernels for some reason without a trivial
-way to install new compilers.
+The main purpose of this series is to restore the original ksymtab entry names.
+For that to happen and to remove some rough edges around that, the relevant
+parts in modpost got a small refactoring as to when and how namespaces are
+evaluated and set in the symbol struct.
 
-OTOH, I agree that requiring a much more recent compiler has
-some advantages that may outweigh these troubles. glibc has
-moved to requiring a 3 (!) year old compiler or newer, which gives
-them a reasonable time frame to make changes to gcc and then
-build on requiring these changes.
+Eventually, the namespace values can be read from __kstrtabns_ entries and
+their corresponding __ksymtab_strings values. That removes the need to carry
+the namespace names within the (anyway unique) symbol name entries.
 
-      Arnd
+The last patch of this series is adopted from Masahiro [1]. By allowing 'no
+namespace' to be represented as empty string, large chunks of
+include/linux/export.h could be consolidated. Technically, this last patch is
+not absolutely necessary to fix functionality. It addresses concerns about
+maintainability and readability. While I strongly suggest sending all of the
+patches for 5.4, the last one could possible deferred to the next merge window.
+
+This patch applies to the modules-linus [2] branch.
+
+Changes since v2:
+ - restored correct authorship for [4/4]
+ - add missing contributor tags
+ - fixed typos and code style (spaces/tabs)
+
+[1] https://lore.kernel.org/lkml/20190927093603.9140-5-yamada.masahiro@socionext.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/jeyu/linux.git/log/?h=modules-linus
+
+Cc: Jessica Yu <jeyu@kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Martijn Coenen <maco@android.com>
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Cc: Shaun Ruffell <sruffell@sruffell.net>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-modules@vger.kernel.org
+
+
+Masahiro Yamada (1):
+  export: avoid code duplication in include/linux/export.h
+
+Matthias Maennich (3):
+  modpost: delegate updating namespaces to separate function
+  modpost: make updating the symbol namespace explicit
+  symbol namespaces: revert to previous __ksymtab name scheme
+
+ include/linux/export.h | 97 +++++++++++++-----------------------------
+ kernel/module.c        |  2 +-
+ scripts/mod/modpost.c  | 59 ++++++++++++++++---------
+ scripts/mod/modpost.h  |  1 +
+ 4 files changed, 71 insertions(+), 88 deletions(-)
+
+Interdiff against v1:
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 7cf0065ac95f..0bf7eab80d9f 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -357,18 +357,21 @@ static const char *namespace_from_kstrtabns(struct elf_info *info,
+ 
+ static void sym_update_namespace(const char *symname, const char *namespace)
+ {
+-       struct symbol *s = find_symbol(symname);
+-       /* That symbol should have been created earlier and thus this is
+-        * actually an assertion. */
+-       if (!s) {
+-               merror("Could not update namespace(%s) for symbol %s\n",
+-                      namespace, symname);
+-               return;
+-       }
+-
+-       free(s->namespace);
+-       s->namespace =
+-	       namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
++	struct symbol *s = find_symbol(symname);
++
++	/*
++	 * That symbol should have been created earlier and thus this is
++	 * actually an assertion.
++	 */
++	if (!s) {
++		merror("Could not update namespace(%s) for symbol %s\n",
++		       namespace, symname);
++		return;
++	}
++
++	free(s->namespace);
++	s->namespace =
++		namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+ }
+ 
+ /**
+-- 
+2.23.0.866.gb869b98d4c-goog
