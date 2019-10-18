@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41556 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:39498 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388321AbfJRWI4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Oct 2019 18:08:56 -0400
+        id S1732709AbfJRWHT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 18 Oct 2019 18:07:19 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 39/56] kbuild: fix build error of 'make nsdeps' in clean tree
-Date: Fri, 18 Oct 2019 18:07:36 -0400
-Message-Id: <20191018220753.10002-39-sashal@kernel.org>
-In-Reply-To: <20191018220753.10002-1-sashal@kernel.org>
-References: <20191018220753.10002-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 077/100] kbuild: fix build error of 'make nsdeps' in clean tree
+Date: Fri, 18 Oct 2019 18:05:02 -0400
+Message-Id: <20191018220525.9042-77-sashal@kernel.org>
+In-Reply-To: <20191018220525.9042-1-sashal@kernel.org>
+References: <20191018220525.9042-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -41,10 +41,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 93c3467eeb8c9..731a2ce8a749a 100644
+index 4d29c7370b464..80f169534c4a7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -554,7 +554,7 @@ endif
+@@ -566,7 +566,7 @@ endif
  # in addition to whatever we do anyway.
  # Just "make" or "make all" shall build modules as well
  
