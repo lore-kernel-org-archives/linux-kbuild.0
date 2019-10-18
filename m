@@ -1,94 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f74.google.com ([209.85.221.74]:54706 "EHLO
-        mail-wr1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2409753AbfJRJcD (ORCPT
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:38186 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2633268AbfJRKKO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Oct 2019 05:32:03 -0400
-Received: by mail-wr1-f74.google.com with SMTP id e14so2312516wrm.21
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Oct 2019 02:32:00 -0700 (PDT)
-Date: Fri, 18 Oct 2019 10:31:40 +0100
-In-Reply-To: <20191018093143.15997-1-maennich@google.com>
-Message-Id: <20191018093143.15997-2-maennich@google.com>
-Mime-Version: 1.0
-References: <20191010151443.7399-1-maennich@google.com> <20191018093143.15997-1-maennich@google.com>
-Subject: [PATCH v2 1/4] modpost: delegate updating namespaces to separate function
-From: Matthias Maennich <maennich@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 18 Oct 2019 06:10:14 -0400
+Received: by mail-lf1-f65.google.com with SMTP id q28so996772lfa.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Oct 2019 03:10:12 -0700 (PDT)
+Date: Fri, 18 Oct 2019 13:10:09 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+Subject: Re: [PATCH] [RFC, EXPERIMENTAL] allow building with --std=gnu99
+Message-ID: <20191018101009.s6yonyxlcevtifiq@box.shutemov.name>
+References: <CAK8P3a3uiTSaruN7x5iMaDowYziqMFxKWjDyS1c8pYFJgPJ5Dg@mail.gmail.com>
+ <20191017125637.1041949-1-arnd@arndb.de>
+ <CAHk-=wiH7Ej9x3RqJkUEW4hDCisgWdi6wai6E0tvo4omF_FbeQ@mail.gmail.com>
+ <20191017153755.jh6iherf2ywmwbss@box>
+ <CAK8P3a1TrOippPUh6Fc_McHcp2LOerdD6ifmcieuy0bAFPvs8g@mail.gmail.com>
+ <CAHk-=wh8MsquobFL5TC0yUkG-9yFUZZnikMPA8QHLc7fcyND6w@mail.gmail.com>
+ <20191017161617.zj7u6p642mytpzts@box>
+ <CAK8P3a0YLeqm71TNzTwJ0FwQKW4Ji0etA+6U=08Exk7fibyBQw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a0YLeqm71TNzTwJ0FwQKW4Ji0etA+6U=08Exk7fibyBQw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: kernel-team@android.com, maennich@google.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Andrew Pinski <apinski@cavium.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, mm-commits@vger.kernel.org, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, Kostya Serebryany <kcc@google.com>, Ingo Molnar <mingo@elte.hu>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Let the function 'sym_update_namespace' take care of updating the
-namespace for a symbol. While this currently only replaces one single
-location where namespaces are updated, in a following patch, this
-function will get more call sites.
+On Fri, Oct 18, 2019 at 09:56:01AM +0200, Arnd Bergmann wrote:
+> On Thu, Oct 17, 2019 at 6:16 PM Kirill A. Shutemov <kirill@shutemov.name> wrote:
+> > On Thu, Oct 17, 2019 at 08:56:50AM -0700, Linus Torvalds wrote:
+> > > Yeah, that's certainly less than wonderful.
+> > >
+> > > That said, there's no way in hell we'll support gcc-4 for another 7
+> > > years (eg Suse 12-sp4), so at _some_ point the EOL dates aren't even
+> > > relevant any more.
+> > >
+> > > But it does look like we can't just say "gcc-5.1 is ok". Darn.
+> >
+> > I don't read the picture the same way. All distributions have at least one
+> > major release with GCC >= 5.
+> >
+> > The first release with gcc >= 5:
+> >
+> > - Debian 9 stretch has 6.3.0, released 2017-06-18;
+> >
+> > - Ubuntu 15.10 wily has 5.2.1, released 2015-10-22;
+> >
+> > - Fedora 24 has 6.1.1, released 2016-06-21;
+> >
+> > - OpenSUSE 15 has 7.4.1, released 2018-05-25;
+> >
+> > - RHEL 8.0 has 8.2.1, released 2019-05-06;
+> >
+> > - SUSE 15 has 7.3.1, released 2018-06-25;
+> >
+> > - Oracle 7.6.4 has 7.6.4, release 2019-07-18;
+>                ^^^ Oracle 8
+> >
+> > - Slackware 14.2 has 5.3.0, released 2016-07-01;
+> 
+> For /most/ of these I see no problem, but RHEL 7 / Centos 7 /
+> Oracle 7 and (to a lesser degree) SUSE 12 must have users
+> that want to build new kernels for some reason without a trivial
+> way to install new compilers.
 
-The function signature is intentionally close to sym_update_crc and
-taking the name by char* seems like unnecessary work as the symbol has
-to be looked up again. In a later patch of this series, this concern
-will be addressed.
+Isn't crosstool the trivial enough? We can directly suggest using it if
+compiler is too old.
 
-This function ensures that symbol::namespace is either NULL or has a
-valid non-empty value. Previously, the empty string was considered 'no
-namespace' as well and this lead to confusion.
+BTW, we already require much newer compiler for some features. See
+retpoline.
 
-Acked-by: Will Deacon <will@kernel.org>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Matthias Maennich <maennich@google.com>
----
- scripts/mod/modpost.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4d2cdb4d71e3..dbfa3997136b 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -362,6 +362,25 @@ static char *sym_extract_namespace(const char **symname)
- 	return namespace;
- }
- 
-+static void sym_update_namespace(const char *symname, const char *namespace)
-+{
-+	struct symbol *s = find_symbol(symname);
-+
-+	/*
-+	 * That symbol should have been created earlier and thus this is
-+	 * actually an assertion.
-+	 */
-+	if (!s) {
-+		merror("Could not update namespace(%s) for symbol %s\n",
-+		       namespace, symname);
-+		return;
-+	}
-+
-+	free(s->namespace);
-+	s->namespace =
-+		namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-+}
-+
- /**
-  * Add an exported symbol - it may have already been added without a
-  * CRC, in this case just update the CRC
-@@ -383,8 +402,7 @@ static struct symbol *sym_add_exported(const char *name, const char *namespace,
- 			s->module = mod;
- 		}
- 	}
--	free(s->namespace);
--	s->namespace = namespace ? strdup(namespace) : NULL;
-+	sym_update_namespace(name, namespace);
- 	s->preloaded = 0;
- 	s->vmlinux   = is_vmlinux(mod->name);
- 	s->kernel    = 0;
-@@ -2196,7 +2214,7 @@ static int check_exports(struct module *mod)
- 		else
- 			basename = mod->name;
- 
--		if (exp->namespace && exp->namespace[0]) {
-+		if (exp->namespace) {
- 			add_namespace(&mod->required_namespaces,
- 				      exp->namespace);
- 
 -- 
-2.23.0.866.gb869b98d4c-goog
+ Kirill A. Shutemov
