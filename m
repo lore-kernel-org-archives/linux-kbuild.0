@@ -1,201 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37346 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726146AbfJSWQv (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:40851 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726383AbfJTQSj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Oct 2019 18:16:51 -0400
-Date: Sun, 20 Oct 2019 03:46:35 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] scripts: prune-kernel : prune kernels generalized way
-Message-ID: <20191019221632.GA17010@Gentoo>
-References: <20191019130722.8067-1-unixbhaskar@gmail.com>
- <20191019160142.GA31839@fieldses.org>
+        Sun, 20 Oct 2019 12:18:39 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
-Content-Disposition: inline
-In-Reply-To: <20191019160142.GA31839@fieldses.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 21 Oct 2019 01:17:57 +0900
+Message-ID: <CAK7LNAScdn6BuvdrVhW=We50f8_618+hh72d2q6rZbSP1u5Abg@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.4-rc4
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, rdunlap@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: masahiroy@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+
+Hi Linus,
+
+Please pull some Kbuild fixes. Thanks.
 
 
---AhhlLboLdkugWU4S
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 12:01 Sat 19 Oct 2019, J. Bruce Fields wrote:
->On Sat, Oct 19, 2019 at 06:37:22PM +0530, Bhaskar Chowdhury wrote:
->> This patch will remove old kernel from the system in a selective way.
->
->Please don't comment out code, just delete it, git's there to keep the
->old code.
->
-I thought it would be more appropriate to know user why it's written in
-first place.So ,deleting is not a good idea!
+The following changes since commit 4f5cafb5cb8471e54afdc9054d973535614f7675:
 
->There's some redundant code that should be inside a loop.
-I don't want to make thing unnecessary complicated. Two more line
-,scripts like this, doesn't harm at all. Easy for readability.
->
->A little more detail in the changelog might be useful to those of us who
->are lazy about reading bash script....
->
-More "unnecessary" words doesn't make the actual purpose of the scripts
-more helpful. I believe the single line I put is good enough for the
-people to capture the essence.
->Looks like this just prompts for each individual delete?  Actually it
->looks like it requires the user to enter the module path and kernel
->version for each one which makes it not much more convenient use than a
->bare "ls" and "rm".
->
-No , it is not. You missed out the point. The user should be reminded
-what they are upto and precisely what is needed. I don't care who the
-user are. This is operation just can not be done airy-fairy way.
->I personally use this in unattended scripts.  I mean, I don't really
->care what we do with this, as I use my own copy of the script, so
->whatever's useful to more people is fine.
->
-Yes, you wrote it for your convenience, and that's great. I am thinking
-of putting broader user base, so the verbosity and explicitness.
->But if somebody does actually use it as-is, it'd be nicer to keep the
->current behavior and add an option ("-i" or something) for the
->interactive behavior.
-Subtle thing is not my cup of tea, honestly lack of bent of mind always
-prevent me to doing that kind of thing.What you mention a flag would be
-great and pretty trivial . But the whole point of having this script to
-be "usable" lies somewhere else.
->
->--b.
->
-Bruce, I am no way trying to demean or over riding your thought and
-work. Just trying to make things work for everyone else. I just took it
-your good work to extend it , certainly others could have done much
-better if they stab on it,including you. No, doubt about it.
+  Linux 5.4-rc3 (2019-10-13 16:37:36 -0700)
 
-Thanks,
-Bhaskar
->>=20
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->> ---
->>  scripts/prune-kernel | 86 ++++++++++++++++++++++++++++++++++++--------
->>  1 file changed, 72 insertions(+), 14 deletions(-)
->>=20
->> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
->> index e8aa940bc0a9..9d839a4e4539 100755
->> --- a/scripts/prune-kernel
->> +++ b/scripts/prune-kernel
->> @@ -5,17 +5,75 @@
->>  # again, /boot and /lib/modules/ eventually fill up.
->>  # Dumb script to purge that stuff:
->>=20
->> -for f in "$@"
->> -do
->> -        if rpm -qf "/lib/modules/$f" >/dev/null; then
->> -                echo "keeping $f (installed from rpm)"
->> -        elif [ $(uname -r) =3D "$f" ]; then
->> -                echo "keeping $f (running kernel) "
->> -        else
->> -                echo "removing $f"
->> -                rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
->> -                rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
->> -                rm -rf "/lib/modules/$f"
->> -                new-kernel-pkg --remove $f
->> -        fi
->> -done
->> +#for f in "$@"
->> +#do
->> +#       if rpm -qf "/lib/modules/$f" >/dev/null; then
->> +#                echo "keeping $f (installed from rpm)"
->> +#        elif [ $(uname -r) =3D "$f" ]; then
->> +#                echo "keeping $f (running kernel) "
->> +#        else
->> +#                echo "removing $f"
->> +#                rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
->> +#                rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
->> +#                rm -rf "/lib/modules/$f"
->> +#                new-kernel-pkg --remove $f
->> +#       fi
->> +#done
->> +boot_dir=3D/boot
->> +modules_dir=3D/lib/modules
->> +
->> +function remove_old_kernel(){
->> +	cd $boot_dir
->> +	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kern=
-el_version
->> +}
->> +
->> +function remove_old_modules_dir(){
->> +	cd $modules_dir
->> +	rm -rf $modules_version
->> +}
->> +
->> +printf "\n\n Enlist the installed kernels \n\n"
->> +
->> +
->> +find $boot_dir -name "vmlinuz-*" -type f -exec ls -1 {} \;
->> +
->> +printf "\n\n\n Please give the kernel version to remove: %s"
->> +read kernel_version
->> +
->> +if [[ $kernel_version =3D=3D "" ]];then
->> +	exit 1
->> +else
->> +	remove_old_kernel
->> +fi
->> +
->> +printf "\n\n Enlist the installed modules directory \n\n"
->> +
->> +find $modules_dir -maxdepth 0 -type d -exec ls -1 {} \;
->> +
->> +printf "\n\n Please give the full modules directory name to remove: %s"
->> +read modules_version
->> +
->> +if [[ $modules_version =3D=3D "" ]];then
->> +	printf "You have forgotten to give the modules dir to remove"
->> +else
->> +	remove_old_modules_dir
->> +fi
->> +
->> +printf "\n\n\n Removed kernel version:$kernel_version and associated mo=
-dules:$modules_version ...Done \n"
->> +
->> +while :
->> + do
->> +    printf "\n\n Do you want to remove another?[YN]: %s"
->> +    read response
->> +       if [[ $response =3D=3D "Y" ]];then
->> +	 printf "Please give another version to remove: %s"
->> +	 read kernel_version
->> +	 remove_old_kernel
->> +	 printf "Please give the full modules directory name to remove: %s"
->> +	 read modules_version
->> +	 remove_old_modules_dir
->> +	 printf "\n\n\n Removed kernel version:$kernel_version and associated =
-modules:$modules_version ..Done \n\n"
->> +      elif [[ $response =3D=3D "N" ]];then
->> +	 exit 1
->> +    fi
->> + done
->> --
->> 2.21.0
+are available in the Git repository at:
 
---AhhlLboLdkugWU4S
-Content-Type: application/pgp-signature; name="signature.asc"
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.4-2
 
------BEGIN PGP SIGNATURE-----
+for you to fetch changes up to 700dea5a0bea9f64eba89fae7cb2540326fdfdc1:
 
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl2rizwACgkQsjqdtxFL
-KRU5dQgAsFrij05JHiZC8W3Y4tZhQfUG+waVCGU4/0Ryc1nFqvbLTnTRW6Yc9hI+
-PAMpXDzlZR3Fgig09I46RoRdJVqiuqD3WD+WMCKi+GigxQHaQqzA/LjG4nf4LMyI
-iPJEsghN0RGWodRQqXSKH35ToVxvrQgAEhu2NvEGaRMLIsys9G+Kci8L2NZoxDMz
-isw5oRHOUb2QDL1/rZAF/L0I9zo1lGuqsqb/Pk7KMHynyIGJC9x68FpC9HRRmLcs
-30treoZ/ozFBFtyx5ZL48GObw5298a1OEqxyaKduyQen3hRlsgol/UsStIOxrKMW
-7eWAShdqmKYHarSB2wYA9OjfnPPoew==
-=arbh
------END PGP SIGNATURE-----
+  kheaders: substituting --sort in archive creation (2019-10-17 09:08:19 +0900)
 
---AhhlLboLdkugWU4S--
+----------------------------------------------------------------
+Kbuild fixes for v5.4 (2nd)
+
+ - fix a bashism of setlocalversion
+
+ - do not use the too new --sort option of tar
+
+----------------------------------------------------------------
+Dmitry Goldin (1):
+      kheaders: substituting --sort in archive creation
+
+Masahiro Yamada (1):
+      kbuild: update comment about KBUILD_ALLDIRS
+
+Randy Dunlap (1):
+      scripts: setlocalversion: fix a bashism
+
+ Makefile                |  2 +-
+ kernel/gen_kheaders.sh  | 11 +++++++----
+ scripts/setlocalversion |  2 +-
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+
+-- 
+Best Regards
+Masahiro Yamada
