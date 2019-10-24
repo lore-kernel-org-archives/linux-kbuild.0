@@ -1,57 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:8888 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405467AbfJWVeH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Oct 2019 17:34:07 -0400
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Subject: RE: [PATCH] namespace: fix namespace.pl script to support relative
- paths
-Date: Wed, 23 Oct 2019 21:34:06 +0000
-Message-ID: <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:30540 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726925AbfJXBWj (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 23 Oct 2019 21:22:39 -0400
+MIME-Version: 1.0
 References: <20190129204319.15238-1-jacob.e.keller@intel.com>
- <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org>
- <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
+ <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org> <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
  <CAK7LNARyUEakeG_N9TWcO2cjFSzbgY__k_QJm6C+oOz+fW0aeg@mail.gmail.com>
  <02874ECE860811409154E81DA85FBB58968E1402@ORSMSX121.amr.corp.intel.com>
- <CAK7LNARAhZtzdnS9+mgtamj=pLdV81dudnYVDa8NRxcQPpF0bw@mail.gmail.com>
-In-Reply-To: <CAK7LNARAhZtzdnS9+mgtamj=pLdV81dudnYVDa8NRxcQPpF0bw@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <CAK7LNARAhZtzdnS9+mgtamj=pLdV81dudnYVDa8NRxcQPpF0bw@mail.gmail.com> <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
+In-Reply-To: <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 24 Oct 2019 10:21:57 +0900
+Message-ID: <CAK7LNAQow8N9a5e_=pu7qDiuvETy1x1P5fxp20zYOZgQhXPJhg@mail.gmail.com>
+Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative paths
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXNhaGlybyBZYW1hZGEgPHlh
-bWFkYS5tYXNhaGlyb0Bzb2Npb25leHQuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBPY3RvYmVyIDIy
-LCAyMDE5IDEwOjIyIFBNDQo+IFRvOiBLZWxsZXIsIEphY29iIEUgPGphY29iLmUua2VsbGVyQGlu
-dGVsLmNvbT47IFJhbmR5IER1bmxhcA0KPiA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPg0KPiBDYzog
-aW50ZWwtd2lyZWQtbGFuQGxpc3RzLm9zdW9zbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5l
-bC5vcmc7IGxpbnV4LWtidWlsZA0KPiA8bGludXgta2J1aWxkQHZnZXIua2VybmVsLm9yZz4NCj4g
-U3ViamVjdDogUmU6IFtQQVRDSF0gbmFtZXNwYWNlOiBmaXggbmFtZXNwYWNlLnBsIHNjcmlwdCB0
-byBzdXBwb3J0IHJlbGF0aXZlDQo+IHBhdGhzDQo+IA0KPiBUaGlzIHNjcmlwdHMgaGFzIGJlZW4g
-NS15ZWFyIGJyb2tlbiwNCj4gYW5kIEkgZGlkIG5vdCBzZWUgYW55IGNvbXBsYWludCBleGNlcHQg
-ZnJvbSB5b3UuDQo+IFNvLCBJIHdvbmRlciBob3cgbWFueSBwZW9wbGUgYXJlIHVzaW5nIHRoaXMu
-DQo+IA0KPiBOb3IsIGRvIEkgdW5kZXJzdGFuZCBob3cgdG8gdXNlIGl0Lg0KPiANCj4gQ291bGQg
-eW91IHRlYWNoIG1lIGEgYml0IG1vcmUgYWJvdXQgdGhpcyBzY3JpcHQ/DQo+IA0KPiANCj4gDQo+
-IFNvbWV0aGluZyBtaWdodCBiZSBtaXNzaW5nIGluIG15IG1pbmQsIGJ1dA0KPiBJIGRvIG5vdCBr
-bm93IGhvdyB0byB1c2UgdGhpcyBzY3JpcHQgaW4gYSB1c2VmdWwgd2F5Lg0KPiANCj4gDQo+IA0K
-PiBJdCBwcm92aWRlcyB0aHJlZSBjaGVja3MuDQo+IA0KPiBbMV0gbGlzdF9tdWx0aXBseV9kZWZp
-bmVkKCkNCj4gDQo+IFRoaXMgd2FybnMgbXVsdGlwbGUgZGVmaW5pdGlvbiBvZiBmdW5jdGlvbnMu
-DQo+IA0KPiBUaGUgY29tcGlsZXIgd291bGQgZmFpbCBpZiBpdCBzYXcgYW55IG11bHRpcGxlIGRl
-ZmluaXRpb24sDQo+IHNvIHRoZSByZXBvcnRzIGZyb20gdGhpcyBjaGVjayBhcmUgYWxsIGZhbHNl
-LXBvc2l0aXZlLg0KPiANCj4gDQo+IFsyXSByZXNvbHZlX2V4dGVybmFsX3JlZmVyZW5jZXMoKQ0K
-PiANCj4gVGhpcyB3YXJucyB1bnJlc29sdmVkIHN5bWJvbHMuDQo+IA0KPiBUaGUgY29tcGlsZXIg
-d291bGQgZmFpbCBpZiBpdCBzYXcgYW55IHVucmVzb2x2ZWQgc3ltYm9sLA0KPiBzbyB0aGUgcmVw
-b3J0cyBmcm9tIHRoaXMgY2hlY2sgYXJlIGFsbCBmYWxzZS1wb3NpdGl2ZSwgdG9vLg0KPiANCj4g
-DQoNClRoZSBjb21waWxlciB3b24ndCBuZWNlc3NhcmlseSBmYWlsIHdoZW4gYnVpbGRpbmcgbW9k
-dWxlcywgYmVjYXVzZSB0aGUgc3ltYm9sIG1pZ2h0IGJlIGluIGFub3RoZXIgbG9hZGFibGUgbW9k
-dWxlLg0KDQo+IA0KPiANCj4gWzNdIGxpc3RfZXh0cmFfZXh0ZXJuYWxzDQo+IA0KPiBUaGlzIHdh
-cm5zIHN5bWJvbHMgd2l0aCBubyByZWZlcmVuY2UuDQo+IA0KPiBUaGlzIHBvdGVudGlhbGx5IGNv
-bnRhaW5zIGxvdHMgb2YgZmFsc2UtcG9zaXRpdmVzLg0KPiBGb3IgZXhhbXBsZSwgdGhlIGNvcmUg
-ZnJhbWV3b3JrIHByb3ZpZGVzIEFQSXMsIGJ1dCBpZiBhbGwgZHJpdmVycw0KPiBhcmUgZGlzYWJs
-ZWQsIHRoZXJlIGlzIG5vIHVzZXIgb2YgdGhvc2UgQVBJcy4NCj4gDQoNCldlIHVzZSB0aGlzIHRv
-IGhlbHAgdmVyaWZ5IHRoYXQgZHJpdmVyIG1vZHVsZXMgZG8gbm90IGV4cG9zZSBzeW1ib2xzLg0K
-DQpUaGFua3MsDQpKYWtlDQo=
+On Thu, Oct 24, 2019 at 6:34 AM Keller, Jacob E
+<jacob.e.keller@intel.com> wrote:
+>
+> > -----Original Message-----
+> > From: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Sent: Tuesday, October 22, 2019 10:22 PM
+> > To: Keller, Jacob E <jacob.e.keller@intel.com>; Randy Dunlap
+> > <rdunlap@infradead.org>
+> > Cc: intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; linux-kbuild
+> > <linux-kbuild@vger.kernel.org>
+> > Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative
+> > paths
+> >
+> > This scripts has been 5-year broken,
+> > and I did not see any complaint except from you.
+> > So, I wonder how many people are using this.
+> >
+> > Nor, do I understand how to use it.
+> >
+> > Could you teach me a bit more about this script?
+> >
+> >
+> >
+> > Something might be missing in my mind, but
+> > I do not know how to use this script in a useful way.
+> >
+> >
+> >
+> > It provides three checks.
+> >
+> > [1] list_multiply_defined()
+> >
+> > This warns multiple definition of functions.
+> >
+> > The compiler would fail if it saw any multiple definition,
+> > so the reports from this check are all false-positive.
+> >
+> >
+> > [2] resolve_external_references()
+> >
+> > This warns unresolved symbols.
+> >
+> > The compiler would fail if it saw any unresolved symbol,
+> > so the reports from this check are all false-positive, too.
+> >
+> >
+>
+> The compiler won't necessarily fail when building modules, because the symbol might be in another loadable module.
+
+Right, but this is already checked by modpost, isn't it?
+
+
+
+> >
+> >
+> > [3] list_extra_externals
+> >
+> > This warns symbols with no reference.
+> >
+> > This potentially contains lots of false-positives.
+> > For example, the core framework provides APIs, but if all drivers
+> > are disabled, there is no user of those APIs.
+> >
+>
+> We use this to help verify that driver modules do not expose symbols.
+
+Ah, the output is quite large, so
+you search for only modules in your interest. Right?
+
+
+If you want to detect missing 'static',
+have you tried 'sparse'?
+
+
+
+> Thanks,
+> Jake
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
