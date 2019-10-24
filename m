@@ -1,72 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:35476 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407344AbfJXKY1 (ORCPT
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:43312 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392237AbfJXLCR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Oct 2019 06:24:27 -0400
-Date: Thu, 24 Oct 2019 10:24:24 +0000
-From: Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH v2 0/4] export/modpost: avoid renaming __ksymtab entries
- for symbol namespaces
-Message-ID: <20191024102424.GL11244@42.do-not-panic.com>
-References: <20191010151443.7399-1-maennich@google.com>
- <20191018093143.15997-1-maennich@google.com>
- <20191023122222.GA27861@42.do-not-panic.com>
- <20191024093546.GB199239@google.com>
+        Thu, 24 Oct 2019 07:02:17 -0400
+Received: by mail-ot1-f67.google.com with SMTP id z20so1610969otk.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 24 Oct 2019 04:02:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191024093546.GB199239@google.com>
+References: <20191017141305.146193-1-elver@google.com> <20191017141305.146193-2-elver@google.com>
+ <20191022154858.GA13700@redhat.com> <CANpmjNPUT2B3rWaa=5Ee2Xs3HHDaUiBGpG09Q4h9Gemhsp9KFw@mail.gmail.com>
+ <20191023162432.GC14327@redhat.com>
+In-Reply-To: <20191023162432.GC14327@redhat.com>
+From: Marco Elver <elver@google.com>
+Date: Thu, 24 Oct 2019 13:02:03 +0200
+Message-ID: <CANpmjNOOT+KR7m8KpETk1czyJLr3TeHsvvejwyuY3JXKr=eajg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/8] kcsan: Add Kernel Concurrency Sanitizer infrastructure
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: linux-kernel@vger.kernel.org, kernel-team@android.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
+To: Oleg Nesterov <oleg@redhat.com>
+Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, "Paul E. McKenney" <paulmck@linux.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
 
-On Thu, Oct 24, 2019 at 10:35:46AM +0100, Matthias Maennich wrote:
-> On Wed, Oct 23, 2019 at 12:22:22PM +0000, Luis Chamberlain wrote:
-> > On Fri, Oct 18, 2019 at 10:31:39AM +0100, Matthias Maennich wrote:
-> > > The introduction of the symbol namespace patches changed the way symbols are
-> > > named in the ksymtab entries. That caused userland tools to fail (such as
-> > > kmod's depmod). As depmod is used as part of the kernel build it was worth
-> > > having another look whether this name change can be avoided.
-> > 
-> > Why have this as a default feature? What about having an option to
-> > disable this feature? The benefit being that without a full swing of
-> > tests to avoid regressions its not clear what other issues may creep
-> > up. With this as optional, those wanting the mechanism can enable it
-> > and happilly find the issues for those more conservative.
-> 
-> The strongest argument against that is, that the 'conservative' people
-> would constantly break things for the more 'adventurous' ones. They
-> would introduce namespace requirements by just using symbols without
-> correctly adjusting the imports.
-> 
-> Second, vmlinux and modules would have to be compiled in the same
-> configuration. Otherwise they are incompatible and we would likely have
-> to maintain code in the module loader to catch issues caused by that.
-> In general, I think for the adoption of this feature and one of its
-> purposes - making unexpected use of symbols across the tree visible
-> already at review time - we should not make this an optional one.
-> Enforcing the imports at module load time is optional (there is an
-> option).
-> 
-> And finally, having that code configurable for both options introduces
-> quite some complexity in kernel/module.c, modpost and
-> include/linux/export.h that would make the code hard to maintain and
-> complex to test. Hence that would likely introduce more issues.
-> 
-> I know the feature came with some rough edges. Sorry about that. I
-> think, we got most of them worked out pretty well (big thanks to
-> Masahiro and Jessica and others helping with that). Now the actual
-> change to the surface exposed to userland tools is much smaller and the
-> feature itself less intrusive.
+On Wed, 23 Oct 2019 at 18:24, Oleg Nesterov <oleg@redhat.com> wrote:
+>
+> On 10/22, Marco Elver wrote:
+> >
+> > On Tue, 22 Oct 2019 at 17:49, Oleg Nesterov <oleg@redhat.com> wrote:
+> > >
+> > > Just for example. Suppose that task->state = TASK_UNINTERRUPTIBLE, this task
+> > > does __set_current_state(TASK_RUNNING), another CPU does wake_up_process(task)
+> > > which does the same UNINTERRUPTIBLE -> RUNNING transition.
+> > >
+> > > Looks like, this is the "data race" according to kcsan?
+> >
+> > Yes, they are "data races". They are probably not "race conditions" though.
+> >
+> > This is a fair distinction to make, and we never claimed to find "race
+> > conditions" only
+>
+> I see, thanks, just wanted to be sure...
+>
+> > KCSAN's goal is to find *data races* according to the LKMM.  Some data
+> > races are race conditions (usually the more interesting bugs) -- but
+> > not *all* data races are race conditions. Those are what are usually
+> > referred to as "benign", but they can still become bugs on the wrong
+> > arch/compiler combination. Hence, the need to annotate these accesses
+> > with READ_ONCE, WRITE_ONCE or use atomic_t:
+>
+> Well, if I see READ_ONCE() in the code I want to understand why it was
+> used. Is it really needed for correctness or we want to shut up kcsan?
+> Say, why should wait_event(wq, *ptr) use READ_ONCE()? Nevermind, please
+> forget.
+>
+> Btw, why __kcsan_check_watchpoint() does user_access_save() before
+> try_consume_watchpoint() ?
 
-This logic makes sense, the complexity over module loading is already
-high and supporting yet another division would be a burden for review
-and maintenace.
+Instrumentation is added in UACCESS regions. Since we do not access
+user-memory, we do user_access_save to ensure everything is safe
+(otherwise objtool complains that we do calls to non-whitelisted
+functions). I will try to optimize this a bit, but we can't avoid it.
 
-However I'd feel much more inclined to support such decisions when and if
-we had a series of test cases to prevent possible regressions. Since
-effort with testing will move forward, I'm happy with the status quo.
-
-  Luis
+> Oleg.
+>
