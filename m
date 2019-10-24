@@ -1,106 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:30540 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726925AbfJXBWj (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46658 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2408871AbfJXJfu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Oct 2019 21:22:39 -0400
+        Thu, 24 Oct 2019 05:35:50 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n15so14467481wrw.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 24 Oct 2019 02:35:49 -0700 (PDT)
+Date: Thu, 24 Oct 2019 10:35:46 +0100
+From: Matthias Maennich <maennich@google.com>
+Subject: Re: [PATCH v2 0/4] export/modpost: avoid renaming __ksymtab entries
+ for symbol namespaces
+Message-ID: <20191024093546.GB199239@google.com>
+References: <20191010151443.7399-1-maennich@google.com>
+ <20191018093143.15997-1-maennich@google.com>
+ <20191023122222.GA27861@42.do-not-panic.com>
 MIME-Version: 1.0
-References: <20190129204319.15238-1-jacob.e.keller@intel.com>
- <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org> <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
- <CAK7LNARyUEakeG_N9TWcO2cjFSzbgY__k_QJm6C+oOz+fW0aeg@mail.gmail.com>
- <02874ECE860811409154E81DA85FBB58968E1402@ORSMSX121.amr.corp.intel.com>
- <CAK7LNARAhZtzdnS9+mgtamj=pLdV81dudnYVDa8NRxcQPpF0bw@mail.gmail.com> <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
-In-Reply-To: <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 24 Oct 2019 10:21:57 +0900
-Message-ID: <CAK7LNAQow8N9a5e_=pu7qDiuvETy1x1P5fxp20zYOZgQhXPJhg@mail.gmail.com>
-Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative paths
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191023122222.GA27861@42.do-not-panic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kernel-team@android.com, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Martijn Coenen <maco@android.com>, Lucas De Marchi <lucas.de.marchi@gmail.com>, Shaun Ruffell <sruffell@sruffell.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 6:34 AM Keller, Jacob E
-<jacob.e.keller@intel.com> wrote:
+On Wed, Oct 23, 2019 at 12:22:22PM +0000, Luis Chamberlain wrote:
+>On Fri, Oct 18, 2019 at 10:31:39AM +0100, Matthias Maennich wrote:
+>> The introduction of the symbol namespace patches changed the way symbols are
+>> named in the ksymtab entries. That caused userland tools to fail (such as
+>> kmod's depmod). As depmod is used as part of the kernel build it was worth
+>> having another look whether this name change can be avoided.
 >
-> > -----Original Message-----
-> > From: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > Sent: Tuesday, October 22, 2019 10:22 PM
-> > To: Keller, Jacob E <jacob.e.keller@intel.com>; Randy Dunlap
-> > <rdunlap@infradead.org>
-> > Cc: intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; linux-kbuild
-> > <linux-kbuild@vger.kernel.org>
-> > Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative
-> > paths
-> >
-> > This scripts has been 5-year broken,
-> > and I did not see any complaint except from you.
-> > So, I wonder how many people are using this.
-> >
-> > Nor, do I understand how to use it.
-> >
-> > Could you teach me a bit more about this script?
-> >
-> >
-> >
-> > Something might be missing in my mind, but
-> > I do not know how to use this script in a useful way.
-> >
-> >
-> >
-> > It provides three checks.
-> >
-> > [1] list_multiply_defined()
-> >
-> > This warns multiple definition of functions.
-> >
-> > The compiler would fail if it saw any multiple definition,
-> > so the reports from this check are all false-positive.
-> >
-> >
-> > [2] resolve_external_references()
-> >
-> > This warns unresolved symbols.
-> >
-> > The compiler would fail if it saw any unresolved symbol,
-> > so the reports from this check are all false-positive, too.
-> >
-> >
+>Why have this as a default feature? What about having an option to
+>disable this feature? The benefit being that without a full swing of
+>tests to avoid regressions its not clear what other issues may creep
+>up. With this as optional, those wanting the mechanism can enable it
+>and happilly find the issues for those more conservative.
+
+The strongest argument against that is, that the 'conservative' people
+would constantly break things for the more 'adventurous' ones. They
+would introduce namespace requirements by just using symbols without
+correctly adjusting the imports.
+
+Second, vmlinux and modules would have to be compiled in the same
+configuration. Otherwise they are incompatible and we would likely have
+to maintain code in the module loader to catch issues caused by that.
+In general, I think for the adoption of this feature and one of its
+purposes - making unexpected use of symbols across the tree visible
+already at review time - we should not make this an optional one.
+Enforcing the imports at module load time is optional (there is an
+option).
+
+And finally, having that code configurable for both options introduces
+quite some complexity in kernel/module.c, modpost and
+include/linux/export.h that would make the code hard to maintain and
+complex to test. Hence that would likely introduce more issues.
+
+I know the feature came with some rough edges. Sorry about that. I
+think, we got most of them worked out pretty well (big thanks to
+Masahiro and Jessica and others helping with that). Now the actual
+change to the surface exposed to userland tools is much smaller and the
+feature itself less intrusive.
+
+Cheers,
+Matthias
+
 >
-> The compiler won't necessarily fail when building modules, because the symbol might be in another loadable module.
-
-Right, but this is already checked by modpost, isn't it?
-
-
-
-> >
-> >
-> > [3] list_extra_externals
-> >
-> > This warns symbols with no reference.
-> >
-> > This potentially contains lots of false-positives.
-> > For example, the core framework provides APIs, but if all drivers
-> > are disabled, there is no user of those APIs.
-> >
->
-> We use this to help verify that driver modules do not expose symbols.
-
-Ah, the output is quite large, so
-you search for only modules in your interest. Right?
-
-
-If you want to detect missing 'static',
-have you tried 'sparse'?
-
-
-
-> Thanks,
-> Jake
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+>  Luis
