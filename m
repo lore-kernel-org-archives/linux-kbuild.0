@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39189 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403890AbfJYHbg (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46032 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389796AbfJYIGJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Oct 2019 03:31:36 -0400
+        Fri, 25 Oct 2019 04:06:09 -0400
 From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH] scripts:patch-kernel:bash syntax replace
-Date: Fri, 25 Oct 2019 12:58:53 +0530
-Message-Id: <20191025072852.356-1-unixbhaskar@gmail.com>
+Subject: [PATCH] scripts:patch-kernel:bash syntax replace,correct one
+Date: Fri, 25 Oct 2019 13:35:44 +0530
+Message-Id: <20191025080544.7209-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,8 +15,8 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
 Cc: torvalds@linux-foundation.org, rdunlap@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-This patch will replace backquote with dollar parenthesis
-for better realdibility.
+This patch will replace backquote to dollar parenthesis syntax
+for better readability.Corrected one.
 
 Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
@@ -24,7 +24,7 @@ Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/patch-kernel b/scripts/patch-kernel
-index 033d5916797d..d864bbd67940 100755
+index 033d5916797d..6f9443336f9a 100755
 --- a/scripts/patch-kernel
 +++ b/scripts/patch-kernel
 @@ -153,7 +153,7 @@ applyPatch () {
@@ -50,7 +50,7 @@ index 033d5916797d..d864bbd67940 100755
  # force $TMPFILEs below to be in local directory: a slash character prevents
  # the dot command from using the search path.
 -TMPFILE=`mktemp ./.tmpver.XXXXXX` || { echo "cannot make temp file" ; exit 1; }
-+TMPFILE=$(mktemp ./.tmpver.XXXXXX$( || { echo "cannot make temp file" ; exit 1; }
++TMPFILE=$(mktemp ./.tmpver.XXXXXX) || { echo "cannot make temp file" ; exit 1; }
  grep -E "^(VERSION|PATCHLEVEL|SUBLEVEL|EXTRAVERSION)" $sourcedir/Makefile > $TMPFILE
  tr -d [:blank:] < $TMPFILE > $TMPFILE.1
  . $TMPFILE.1
@@ -59,7 +59,7 @@ index 033d5916797d..d864bbd67940 100755
  fi
 
 -NAME=`grep ^NAME $sourcedir/Makefile`
-+NAME=$(grep ^NAME $sourcedir/Makefile)
++NAME=$(grep ^NAME $sourcedir/Makefil)
  NAME=${NAME##*=}
 
  echo "Current kernel version is $VERSION.$PATCHLEVEL.$SUBLEVEL${EXTRAVERSION} ($NAME)"
