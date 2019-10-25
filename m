@@ -1,151 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38602 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390519AbfJYFrV (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39189 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403890AbfJYHbg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Oct 2019 01:47:21 -0400
+        Fri, 25 Oct 2019 03:31:36 -0400
 From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH] scripts:prune-kernel:prune old kernels and modules dir 
-Date: Fri, 25 Oct 2019 11:17:03 +0530
-Message-Id: <20191025054703.16400-1-unixbhaskar@gmail.com>
+Subject: [PATCH] scripts:patch-kernel:bash syntax replace
+Date: Fri, 25 Oct 2019 12:58:53 +0530
+Message-Id: <20191025072852.356-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com, michal.lkml@markovi.net
-Cc: bfields@fieldses.org, rdunlap@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: torvalds@linux-foundation.org, rdunlap@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-This patch will remmove old kernel and associated modules directory from
-the system.
-
-Few interaction with the script ,below 
-
-1) ✔ ~/git-linux/linux-kbuild [master ↑·18|✔]
-10:40 $ ./scripts/prune-kernel
-
-
-2)10:41 $ ./scripts/prune-kernel -h
-You need to use this script like this :
-
-  ./scripts/prune-kernel -r kernel_version  modules_directory_name
- ./scripts/prune-kernel -i  option for interactive way to  use it.
-
-
-3) 10:41 $ ./scripts/prune-kernel -r 5.2.2 5.2.2-gentoo
-Removed  kernel version:5.2.2 and modules directory:5.2.2-gentoo from
-the system.
-
-
-4)10:41 $ ./scripts/prune-kernel -i
-
-
- Want to removing old kernels and modules dir [YN]: Y
- Please give another version to remove: 5.2.2
- /boot/vmlinuz-5.3.7-050307-generic
- /boot/vmlinuz-5.3.6-050306-generic
- find: ‘/boot/efi’: Permission denied
- Please give the full modules directory name to remove: 5.2.2-gentoo
- 5.3.6-050306-generic
- 5.3.7-050307-generic
-
-
-
-  Removed kernel version:5.2.2 and associated modules:5.2.2-gentoo
-  ..Done.
-
-
-
+This patch will replace backquote with dollar parenthesis
+for better realdibility.
 
 Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
-To Bruce,
-I have incorporated all the changes you asked for ,kindly review.
+ scripts/patch-kernel | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
- scripts/prune-kernel | 75 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 56 insertions(+), 19 deletions(-)
+diff --git a/scripts/patch-kernel b/scripts/patch-kernel
+index 033d5916797d..d864bbd67940 100755
+--- a/scripts/patch-kernel
++++ b/scripts/patch-kernel
+@@ -153,7 +153,7 @@ applyPatch () {
+     echo "failed.  Clean up yourself."
+     return 1;
+   fi
+-  if [ "`find $sourcedir/ '(' -name '*.rej' -o -name '.*.rej' ')' -print`" ]
++  if [ "$(find $sourcedir/ '(' -name '*.rej' -o -name '.*.rej' ')' -print)" ]
+   then
+     echo "Aborting.  Reject files found."
+     return 1;
+@@ -175,7 +175,7 @@ reversePatch () {
+ 		echo "failed.  Clean it up."
+ 		exit 1
+ 	fi
+-	if [ "`find $sourcedir/ '(' -name '*.rej' -o -name '.*.rej' ')' -print`" ]
++	if [ "$(find $sourcedir/ '(' -name '*.rej' -o -name '.*.rej' ')' -print)" ]
+ 	then
+ 		echo "Aborting.  Reject files found."
+ 		return 1
+@@ -189,7 +189,7 @@ reversePatch () {
+ # set current VERSION, PATCHLEVEL, SUBLEVEL, EXTRAVERSION
+ # force $TMPFILEs below to be in local directory: a slash character prevents
+ # the dot command from using the search path.
+-TMPFILE=`mktemp ./.tmpver.XXXXXX` || { echo "cannot make temp file" ; exit 1; }
++TMPFILE=$(mktemp ./.tmpver.XXXXXX$( || { echo "cannot make temp file" ; exit 1; }
+ grep -E "^(VERSION|PATCHLEVEL|SUBLEVEL|EXTRAVERSION)" $sourcedir/Makefile > $TMPFILE
+ tr -d [:blank:] < $TMPFILE > $TMPFILE.1
+ . $TMPFILE.1
+@@ -200,7 +200,7 @@ then
+     exit 1
+ fi
 
-diff --git a/scripts/prune-kernel b/scripts/prune-kernel
-index e8aa940bc0a9..292ba70d7770 100755
---- a/scripts/prune-kernel
-+++ b/scripts/prune-kernel
-@@ -1,21 +1,58 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
--
--# because I use CONFIG_LOCALVERSION_AUTO, not the same version again and
--# again, /boot and /lib/modules/ eventually fill up.
--# Dumb script to purge that stuff:
--
--for f in "$@"
--do
--        if rpm -qf "/lib/modules/$f" >/dev/null; then
--                echo "keeping $f (installed from rpm)"
--        elif [ $(uname -r) = "$f" ]; then
--                echo "keeping $f (running kernel) "
--        else
--                echo "removing $f"
--                rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
--                rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
--                rm -rf "/lib/modules/$f"
--                new-kernel-pkg --remove $f
--        fi
--done
-+#This script will delete old kernels and modules directory related to it interactively.
-+#if you choose "-i" as interactive otherwise it will just go ahead and do the stuff once
-+#you mentione the kernel_version and modules_directory_name as parameter.
-+flag=$1
-+kernel_ver=$2
-+modules_dir_name=$3
-+boot_dir=/boot
-+modules_dir=/lib/modules
-+remove_old_kernel() {
-+	cd $boot_dir
-+	find $boot_dir -name "vmlinuz-*" -type f -exec ls -1 {} \;
-+	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kernel_version
-+	return 0
-+}
-+remove_old_modules_dir() {
-+	cd $modules_dir
-+	find $modules_dir -maxdepth 0 -type d -exec ls -1 {} \;
-+	rm -rf $modules_version
-+	return 0
-+}
-+while getopts :hir opt;
-+do 
-+		 case "$1" in
-+			 -i | --interactive)
-+		 printf "\n\n Want to removing old kernels and modules dir [YN]: %s"
-+		 read response
-+		 if [[ $response == "Y" ]];then
-+			 printf "Please give another version to remove: %s"
-+			 read kernel_version
-+			 remove_old_kernel
-+			 printf "Please give the full modules directory name to remove: %s"
-+			 read modules_version
-+			 remove_old_modules_dir
-+			 printf "\n\n\n Removed kernel version:$kernel_version and associated modules:$modules_version ..Done. \n\n"
-+		 elif [[ $response == "N" ]];then
-+			 exit 1
-+		 fi
-+		 ;;
-+	                  -h | --help)
-+                    
-+                     printf "You need to use this script like this :\n
-+	             $0 -r kernel_version modules_directory_name\n
-+                     $0 -i option for interactive way to use it.\n\n"
-+	      
-+	         exit 1
-+		     ;;
-+	                 -r | --remove)
-+			 shift $(( OPTIND - 1 ))
-+			 rm -f kernel_ver
-+                         cd $modules_dir
-+	                 rm -rf $modules_dir_name
-+	                 printf "Removed  kernel version:$kernel_ver and modules directory:$modules_dir_name from the system.\n\n"
-+			 exit 0
-+                         ;;
-+ esac
-+     done
--- 
+-NAME=`grep ^NAME $sourcedir/Makefile`
++NAME=$(grep ^NAME $sourcedir/Makefile)
+ NAME=${NAME##*=}
+
+ echo "Current kernel version is $VERSION.$PATCHLEVEL.$SUBLEVEL${EXTRAVERSION} ($NAME)"
+@@ -216,8 +216,8 @@ fi
+
+ #echo "stopvers=$stopvers"
+ if [ $stopvers != "default" ]; then
+-	STOPSUBLEVEL=`echo $stopvers | cut -d. -f3`
+-	STOPEXTRA=`echo $stopvers | cut -d. -f4`
++	STOPSUBLEVEL=$(echo $stopvers | cut -d. -f3)
++	STOPEXTRA=$(echo $stopvers | cut -d. -f4)
+ 	STOPFULLVERSION=${stopvers%%.$STOPEXTRA}
+ 	#echo "#___STOPSUBLEVEL=/$STOPSUBLEVEL/, STOPEXTRA=/$STOPEXTRA/"
+ else
+@@ -306,7 +306,7 @@ if [ x$gotac != x ]; then
+ 		HIGHESTPATCH=0
+ 		for PATCHNAMES in $patchdir/patch-${CURRENTFULLVERSION}-ac*\.*
+ 		do
+-			ACVALUE=`echo $PATCHNAMES | sed -e 's/^.*patch-[0-9.]*-ac\([0-9]*\).*/\1/'`
++			ACVALUE=$(echo $PATCHNAMES | sed -e 's/^.*patch-[0-9.]*-ac\([0-9]*\).*/\1/')
+ 			# Check it is actually a recognised patch type
+ 			findFile $patchdir/patch-${CURRENTFULLVERSION}-ac${ACVALUE} || break
+
+--
 2.20.1
