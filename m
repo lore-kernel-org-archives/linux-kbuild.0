@@ -1,11 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:35134 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725775AbfJYTaD (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Oct 2019 15:30:03 -0400
-Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative
+Received: from mga07.intel.com ([134.134.136.100]:18009 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726589AbfJYUUy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 25 Oct 2019 16:20:54 -0400
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Subject: RE: [PATCH] namespace: fix namespace.pl script to support relative
  paths
+Date: Fri, 25 Oct 2019 20:20:51 +0000
+Message-ID: <02874ECE860811409154E81DA85FBB589693DABC@ORSMSX121.amr.corp.intel.com>
 References: <20190129204319.15238-1-jacob.e.keller@intel.com>
  <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org>
  <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
@@ -15,117 +17,49 @@ References: <20190129204319.15238-1-jacob.e.keller@intel.com>
  <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
  <CAK7LNAQow8N9a5e_=pu7qDiuvETy1x1P5fxp20zYOZgQhXPJhg@mail.gmail.com>
  <02874ECE860811409154E81DA85FBB589693D053@ORSMSX121.amr.corp.intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <6127ec91-ad81-f0d7-576e-22e06e677442@infradead.org>
-Date: Fri, 25 Oct 2019 12:30:01 -0700
-MIME-Version: 1.0
-In-Reply-To: <02874ECE860811409154E81DA85FBB589693D053@ORSMSX121.amr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
+ <6127ec91-ad81-f0d7-576e-22e06e677442@infradead.org>
+In-Reply-To: <6127ec91-ad81-f0d7-576e-22e06e677442@infradead.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 10/25/19 10:45 AM, Keller, Jacob E wrote:
-> 
->> -----Original Message-----
->> From: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Sent: Wednesday, October 23, 2019 6:22 PM
->> To: Keller, Jacob E <jacob.e.keller@intel.com>
->> Cc: Randy Dunlap <rdunlap@infradead.org>; intel-wired-lan@lists.osuosl.org;
->> linux-kernel@vger.kernel.org; linux-kbuild <linux-kbuild@vger.kernel.org>
->> Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative
->> paths
->>
->> On Thu, Oct 24, 2019 at 6:34 AM Keller, Jacob E
->> <jacob.e.keller@intel.com> wrote:
->>>
->>>> -----Original Message-----
->>>> From: Masahiro Yamada <yamada.masahiro@socionext.com>
->>>> Sent: Tuesday, October 22, 2019 10:22 PM
->>>> To: Keller, Jacob E <jacob.e.keller@intel.com>; Randy Dunlap
->>>> <rdunlap@infradead.org>
->>>> Cc: intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; linux-
->> kbuild
->>>> <linux-kbuild@vger.kernel.org>
->>>> Subject: Re: [PATCH] namespace: fix namespace.pl script to support relative
->>>> paths
->>>>
->>>> This scripts has been 5-year broken,
->>>> and I did not see any complaint except from you.
->>>> So, I wonder how many people are using this.
->>>>
->>>> Nor, do I understand how to use it.
->>>>
->>>> Could you teach me a bit more about this script?
->>>>
->>>>
->>>>
->>>> Something might be missing in my mind, but
->>>> I do not know how to use this script in a useful way.
->>>>
->>>>
->>>>
->>>> It provides three checks.
->>>>
->>>> [1] list_multiply_defined()
->>>>
->>>> This warns multiple definition of functions.
->>>>
->>>> The compiler would fail if it saw any multiple definition,
->>>> so the reports from this check are all false-positive.
->>>>
->>>>
->>>> [2] resolve_external_references()
->>>>
->>>> This warns unresolved symbols.
->>>>
->>>> The compiler would fail if it saw any unresolved symbol,
->>>> so the reports from this check are all false-positive, too.
->>>>
->>>>
->>>
->>> The compiler won't necessarily fail when building modules, because the symbol
->> might be in another loadable module.
->>
->> Right, but this is already checked by modpost, isn't it?
->>
->>
->>
->>>>
->>>>
->>>> [3] list_extra_externals
->>>>
->>>> This warns symbols with no reference.
->>>>
->>>> This potentially contains lots of false-positives.
->>>> For example, the core framework provides APIs, but if all drivers
->>>> are disabled, there is no user of those APIs.
->>>>
->>>
->>> We use this to help verify that driver modules do not expose symbols.
->>
->> Ah, the output is quite large, so
->> you search for only modules in your interest. Right?
->>
-> 
-> We run it on only one module at a time, yes.
-> 
->>
->> If you want to detect missing 'static',
->> have you tried 'sparse'?
->>
-> 
-> We've used that as well. 
-> 
-> To be fair, I agree that it covers similar functionality as other tools. I haven't looked directly at namespace.pl output in a while, and the fix here is multiple years old that took a long time to get picked up.
-> 
-> If it's agreed that the tool has no value, and especially if it results in false indications of a problem, then maybe removing it to prevent someone from mis-reading its output makes sense?
-
-If there is a satisfactory alternative, I expect that namespace.pl is old,
-unmaintained, and unneeded, and should go away.
-
--- 
-~Randy
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSYW5keSBEdW5sYXAgPHJkdW5s
+YXBAaW5mcmFkZWFkLm9yZz4NCj4gU2VudDogRnJpZGF5LCBPY3RvYmVyIDI1LCAyMDE5IDEyOjMw
+IFBNDQo+IFRvOiBLZWxsZXIsIEphY29iIEUgPGphY29iLmUua2VsbGVyQGludGVsLmNvbT47IE1h
+c2FoaXJvIFlhbWFkYQ0KPiA8eWFtYWRhLm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+DQo+IENjOiBp
+bnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVs
+Lm9yZzsgbGludXgta2J1aWxkDQo+IDxsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnPg0KPiBT
+dWJqZWN0OiBSZTogW1BBVENIXSBuYW1lc3BhY2U6IGZpeCBuYW1lc3BhY2UucGwgc2NyaXB0IHRv
+IHN1cHBvcnQgcmVsYXRpdmUNCj4gcGF0aHMNCj4gDQo+IE9uIDEwLzI1LzE5IDEwOjQ1IEFNLCBL
+ZWxsZXIsIEphY29iIEUgd3JvdGU6DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
+LS0NCj4gPj4gRnJvbTogTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0
+LmNvbT4NCj4gPj4gU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDIzLCAyMDE5IDY6MjIgUE0NCj4g
+Pj4gVG86IEtlbGxlciwgSmFjb2IgRSA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPg0KPiA+PiBD
+YzogUmFuZHkgRHVubGFwIDxyZHVubGFwQGluZnJhZGVhZC5vcmc+OyBpbnRlbC13aXJlZC1sYW5A
+bGlzdHMub3N1b3NsLm9yZzsNCj4gPj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGlu
+dXgta2J1aWxkIDxsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnPg0KPiA+PiBTdWJqZWN0OiBS
+ZTogW1BBVENIXSBuYW1lc3BhY2U6IGZpeCBuYW1lc3BhY2UucGwgc2NyaXB0IHRvIHN1cHBvcnQg
+cmVsYXRpdmUNCj4gPj4gcGF0aHMNCj4gPj4NCj4gPj4gSWYgeW91IHdhbnQgdG8gZGV0ZWN0IG1p
+c3NpbmcgJ3N0YXRpYycsDQo+ID4+IGhhdmUgeW91IHRyaWVkICdzcGFyc2UnPw0KPiA+Pg0KPiA+
+DQo+ID4gV2UndmUgdXNlZCB0aGF0IGFzIHdlbGwuDQo+ID4NCj4gPiBUbyBiZSBmYWlyLCBJIGFn
+cmVlIHRoYXQgaXQgY292ZXJzIHNpbWlsYXIgZnVuY3Rpb25hbGl0eSBhcyBvdGhlciB0b29scy4g
+SSBoYXZlbid0DQo+IGxvb2tlZCBkaXJlY3RseSBhdCBuYW1lc3BhY2UucGwgb3V0cHV0IGluIGEg
+d2hpbGUsIGFuZCB0aGUgZml4IGhlcmUgaXMgbXVsdGlwbGUNCj4geWVhcnMgb2xkIHRoYXQgdG9v
+ayBhIGxvbmcgdGltZSB0byBnZXQgcGlja2VkIHVwLg0KPiA+DQo+ID4gSWYgaXQncyBhZ3JlZWQg
+dGhhdCB0aGUgdG9vbCBoYXMgbm8gdmFsdWUsIGFuZCBlc3BlY2lhbGx5IGlmIGl0IHJlc3VsdHMg
+aW4gZmFsc2UNCj4gaW5kaWNhdGlvbnMgb2YgYSBwcm9ibGVtLCB0aGVuIG1heWJlIHJlbW92aW5n
+IGl0IHRvIHByZXZlbnQgc29tZW9uZSBmcm9tIG1pcy0NCj4gcmVhZGluZyBpdHMgb3V0cHV0IG1h
+a2VzIHNlbnNlPw0KPiANCj4gSWYgdGhlcmUgaXMgYSBzYXRpc2ZhY3RvcnkgYWx0ZXJuYXRpdmUs
+IEkgZXhwZWN0IHRoYXQgbmFtZXNwYWNlLnBsIGlzIG9sZCwNCj4gdW5tYWludGFpbmVkLCBhbmQg
+dW5uZWVkZWQsIGFuZCBzaG91bGQgZ28gYXdheS4NCj4gDQo+IC0tDQo+IH5SYW5keQ0KDQpHaXZl
+biBZYW1hZGEncyBjb21tZW50cyBhbmQgbXkgZXhwZXJpZW5jZSwgbW9kcG9zdCBhbmQgc3BhcnNl
+IGFyZSBib3RoIGdvb2QgYXQgZGV0ZWN0aW5nIHRoZSBpc3N1ZXMgdGhhdCBuYW1lc3BhY2UucGwg
+aGFuZGxlcy4NCg0KSSBhbSBub3Qgc3VyZSBpZiB0aGVyZSdzIGFueSBvdGhlciBvdXRwdXQgdGhh
+dCB3b3VsZCBiZSB2YWx1YWJsZSBmcm9tIG5hbWVzcGFjZS5wbCwgYnV0IGlmIG5vdC4uIEkgZG9u
+J3Qgc2VlIGEgcmVhc29uIHRvIGtlZXAgaXQgY29tcGFyZWQgdG8gdGhlIG90aGVyIHRvb2xzLg0K
+DQpUaGFua3MsDQpKYWtlDQo=
