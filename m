@@ -1,65 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:18009 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726589AbfJYUUy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Oct 2019 16:20:54 -0400
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Subject: RE: [PATCH] namespace: fix namespace.pl script to support relative
- paths
-Date: Fri, 25 Oct 2019 20:20:51 +0000
-Message-ID: <02874ECE860811409154E81DA85FBB589693DABC@ORSMSX121.amr.corp.intel.com>
-References: <20190129204319.15238-1-jacob.e.keller@intel.com>
- <7b26e6cc-10ce-5df2-6375-1f95bc4da04e@infradead.org>
- <02874ECE860811409154E81DA85FBB58968DBE54@ORSMSX121.amr.corp.intel.com>
- <CAK7LNARyUEakeG_N9TWcO2cjFSzbgY__k_QJm6C+oOz+fW0aeg@mail.gmail.com>
- <02874ECE860811409154E81DA85FBB58968E1402@ORSMSX121.amr.corp.intel.com>
- <CAK7LNARAhZtzdnS9+mgtamj=pLdV81dudnYVDa8NRxcQPpF0bw@mail.gmail.com>
- <02874ECE860811409154E81DA85FBB589693A38A@ORSMSX121.amr.corp.intel.com>
- <CAK7LNAQow8N9a5e_=pu7qDiuvETy1x1P5fxp20zYOZgQhXPJhg@mail.gmail.com>
- <02874ECE860811409154E81DA85FBB589693D053@ORSMSX121.amr.corp.intel.com>
- <6127ec91-ad81-f0d7-576e-22e06e677442@infradead.org>
-In-Reply-To: <6127ec91-ad81-f0d7-576e-22e06e677442@infradead.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:30686 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbfJZCpN (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 25 Oct 2019 22:45:13 -0400
 MIME-Version: 1.0
+References: <20191025115232.9592-1-geert+renesas@glider.be>
+In-Reply-To: <20191025115232.9592-1-geert+renesas@glider.be>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 26 Oct 2019 11:44:31 +0900
+Message-ID: <CAK7LNAQOdvXOCJ6nu96=m6r_HkQAdz7pK6wKyn2r=fYy=gyntg@mail.gmail.com>
+Subject: Re: [PATCH v2] kconfig: Wrap long "make help" text lines
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSYW5keSBEdW5sYXAgPHJkdW5s
-YXBAaW5mcmFkZWFkLm9yZz4NCj4gU2VudDogRnJpZGF5LCBPY3RvYmVyIDI1LCAyMDE5IDEyOjMw
-IFBNDQo+IFRvOiBLZWxsZXIsIEphY29iIEUgPGphY29iLmUua2VsbGVyQGludGVsLmNvbT47IE1h
-c2FoaXJvIFlhbWFkYQ0KPiA8eWFtYWRhLm1hc2FoaXJvQHNvY2lvbmV4dC5jb20+DQo+IENjOiBp
-bnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVs
-Lm9yZzsgbGludXgta2J1aWxkDQo+IDxsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnPg0KPiBT
-dWJqZWN0OiBSZTogW1BBVENIXSBuYW1lc3BhY2U6IGZpeCBuYW1lc3BhY2UucGwgc2NyaXB0IHRv
-IHN1cHBvcnQgcmVsYXRpdmUNCj4gcGF0aHMNCj4gDQo+IE9uIDEwLzI1LzE5IDEwOjQ1IEFNLCBL
-ZWxsZXIsIEphY29iIEUgd3JvdGU6DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0t
-LS0NCj4gPj4gRnJvbTogTWFzYWhpcm8gWWFtYWRhIDx5YW1hZGEubWFzYWhpcm9Ac29jaW9uZXh0
-LmNvbT4NCj4gPj4gU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDIzLCAyMDE5IDY6MjIgUE0NCj4g
-Pj4gVG86IEtlbGxlciwgSmFjb2IgRSA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPg0KPiA+PiBD
-YzogUmFuZHkgRHVubGFwIDxyZHVubGFwQGluZnJhZGVhZC5vcmc+OyBpbnRlbC13aXJlZC1sYW5A
-bGlzdHMub3N1b3NsLm9yZzsNCj4gPj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGlu
-dXgta2J1aWxkIDxsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnPg0KPiA+PiBTdWJqZWN0OiBS
-ZTogW1BBVENIXSBuYW1lc3BhY2U6IGZpeCBuYW1lc3BhY2UucGwgc2NyaXB0IHRvIHN1cHBvcnQg
-cmVsYXRpdmUNCj4gPj4gcGF0aHMNCj4gPj4NCj4gPj4gSWYgeW91IHdhbnQgdG8gZGV0ZWN0IG1p
-c3NpbmcgJ3N0YXRpYycsDQo+ID4+IGhhdmUgeW91IHRyaWVkICdzcGFyc2UnPw0KPiA+Pg0KPiA+
-DQo+ID4gV2UndmUgdXNlZCB0aGF0IGFzIHdlbGwuDQo+ID4NCj4gPiBUbyBiZSBmYWlyLCBJIGFn
-cmVlIHRoYXQgaXQgY292ZXJzIHNpbWlsYXIgZnVuY3Rpb25hbGl0eSBhcyBvdGhlciB0b29scy4g
-SSBoYXZlbid0DQo+IGxvb2tlZCBkaXJlY3RseSBhdCBuYW1lc3BhY2UucGwgb3V0cHV0IGluIGEg
-d2hpbGUsIGFuZCB0aGUgZml4IGhlcmUgaXMgbXVsdGlwbGUNCj4geWVhcnMgb2xkIHRoYXQgdG9v
-ayBhIGxvbmcgdGltZSB0byBnZXQgcGlja2VkIHVwLg0KPiA+DQo+ID4gSWYgaXQncyBhZ3JlZWQg
-dGhhdCB0aGUgdG9vbCBoYXMgbm8gdmFsdWUsIGFuZCBlc3BlY2lhbGx5IGlmIGl0IHJlc3VsdHMg
-aW4gZmFsc2UNCj4gaW5kaWNhdGlvbnMgb2YgYSBwcm9ibGVtLCB0aGVuIG1heWJlIHJlbW92aW5n
-IGl0IHRvIHByZXZlbnQgc29tZW9uZSBmcm9tIG1pcy0NCj4gcmVhZGluZyBpdHMgb3V0cHV0IG1h
-a2VzIHNlbnNlPw0KPiANCj4gSWYgdGhlcmUgaXMgYSBzYXRpc2ZhY3RvcnkgYWx0ZXJuYXRpdmUs
-IEkgZXhwZWN0IHRoYXQgbmFtZXNwYWNlLnBsIGlzIG9sZCwNCj4gdW5tYWludGFpbmVkLCBhbmQg
-dW5uZWVkZWQsIGFuZCBzaG91bGQgZ28gYXdheS4NCj4gDQo+IC0tDQo+IH5SYW5keQ0KDQpHaXZl
-biBZYW1hZGEncyBjb21tZW50cyBhbmQgbXkgZXhwZXJpZW5jZSwgbW9kcG9zdCBhbmQgc3BhcnNl
-IGFyZSBib3RoIGdvb2QgYXQgZGV0ZWN0aW5nIHRoZSBpc3N1ZXMgdGhhdCBuYW1lc3BhY2UucGwg
-aGFuZGxlcy4NCg0KSSBhbSBub3Qgc3VyZSBpZiB0aGVyZSdzIGFueSBvdGhlciBvdXRwdXQgdGhh
-dCB3b3VsZCBiZSB2YWx1YWJsZSBmcm9tIG5hbWVzcGFjZS5wbCwgYnV0IGlmIG5vdC4uIEkgZG9u
-J3Qgc2VlIGEgcmVhc29uIHRvIGtlZXAgaXQgY29tcGFyZWQgdG8gdGhlIG90aGVyIHRvb2xzLg0K
-DQpUaGFua3MsDQpKYWtlDQo=
+On Fri, Oct 25, 2019 at 8:52 PM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+>
+> Some "make help" text lines extend beyond 80 characters.
+> Wrap them before an opening parenthesis, or before 80 characters.
+>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+
+I applied both to linux-kbuild.
+
+I changed the subject prefix
+"kconfig:" to "kbuild:".
+
+
+
+> This is v2 of "[PATCH] kconfig: Wrap long "make help" text line for
+> xenconfig ".
+>
+> v2:
+>   - Fix more recent offenders.
+> ---
+>  Documentation/Makefile   | 6 ++++--
+>  Makefile                 | 3 ++-
+>  scripts/Makefile.package | 3 ++-
+>  scripts/kconfig/Makefile | 3 ++-
+>  4 files changed, 10 insertions(+), 5 deletions(-)
+>
+> diff --git a/Documentation/Makefile b/Documentation/Makefile
+> index e145e4db508bc6a4..0c5185187dad0b68 100644
+> --- a/Documentation/Makefile
+> +++ b/Documentation/Makefile
+> @@ -128,8 +128,10 @@ dochelp:
+>         @echo  '  pdfdocs         - PDF'
+>         @echo  '  epubdocs        - EPUB'
+>         @echo  '  xmldocs         - XML'
+> -       @echo  '  linkcheckdocs   - check for broken external links (will connect to external hosts)'
+> -       @echo  '  refcheckdocs    - check for references to non-existing files under Documentation'
+> +       @echo  '  linkcheckdocs   - check for broken external links'
+> +       @echo  '                    (will connect to external hosts)'
+> +       @echo  '  refcheckdocs    - check for references to non-existing files under'
+> +       @echo  '                    Documentation'
+>         @echo  '  cleandocs       - clean all generated files'
+>         @echo
+>         @echo  '  make SPHINXDIRS="s1 s2" [target] Generate only docs of folder s1, s2'
+> diff --git a/Makefile b/Makefile
+> index 5475cdb6d57d4117..5a1ef8db2cec69f6 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1523,7 +1523,8 @@ help:
+>         @echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
+>         @echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
+>         @echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
+> -       @echo  '  make C=1   [targets] Check re-compiled c source with $$CHECK (sparse by default)'
+> +       @echo  '  make C=1   [targets] Check re-compiled c source with $$CHECK'
+> +       @echo  '                       (sparse by default)'
+>         @echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+>         @echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+>         @echo  '  make W=n   [targets] Enable extra build checks, n=1,2,3 where'
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index 56eadcc48d46de54..ee9b368dfcf37736 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -146,7 +146,8 @@ help:
+>         @echo '  binrpm-pkg          - Build only the binary kernel RPM package'
+>         @echo '  deb-pkg             - Build both source and binary deb kernel packages'
+>         @echo '  bindeb-pkg          - Build only the binary kernel deb package'
+> -       @echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
+> +       @echo '  snap-pkg            - Build only the binary kernel snap package'
+> +       @echo '                        (will connect to external hosts)'
+>         @echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+>         @echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+>         @echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index ef2f2336c46960df..a7d130b9306e8876 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -137,7 +137,8 @@ help:
+>         @echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
+>         @echo  '                    default value without prompting'
+>         @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
+> -       @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
+> +       @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
+> +       @echo  '                    support'
+>         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
+>         @echo  '  testconfig      - Run Kconfig unit tests (requires python3 and pytest)'
+>
+> --
+> 2.17.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
