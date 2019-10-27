@@ -1,114 +1,238 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:30686 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbfJZCpN (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:42428 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726838AbfJ0SYM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Oct 2019 22:45:13 -0400
+        Sun, 27 Oct 2019 14:24:12 -0400
+Subject: Re: [PATCH] scripts:prune-kernel:prune old kernels and modules dir
+References: <20191025054703.16400-1-unixbhaskar@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <4adba61c-9c1b-dee3-0a9b-9159dcce5a82@infradead.org>
+Date: Sun, 27 Oct 2019 11:24:09 -0700
 MIME-Version: 1.0
-References: <20191025115232.9592-1-geert+renesas@glider.be>
-In-Reply-To: <20191025115232.9592-1-geert+renesas@glider.be>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 26 Oct 2019 11:44:31 +0900
-Message-ID: <CAK7LNAQOdvXOCJ6nu96=m6r_HkQAdz7pK6wKyn2r=fYy=gyntg@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: Wrap long "make help" text lines
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191025054703.16400-1-unixbhaskar@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: bfields@fieldses.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 8:52 PM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
->
-> Some "make help" text lines extend beyond 80 characters.
-> Wrap them before an opening parenthesis, or before 80 characters.
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On 10/24/19 10:47 PM, Bhaskar Chowdhury wrote:
+> This patch will remmove old kernel and associated modules directory from
+> the system.
+> 
+> Few interaction with the script ,below 
+> 
+> 1) ✔ ~/git-linux/linux-kbuild [master ↑·18|✔]
+> 10:40 $ ./scripts/prune-kernel
+> 
+> 
+> 2)10:41 $ ./scripts/prune-kernel -h
+> You need to use this script like this :
+> 
+>   ./scripts/prune-kernel -r kernel_version  modules_directory_name
+>  ./scripts/prune-kernel -i  option for interactive way to  use it.
+> 
+> 
+> 3) 10:41 $ ./scripts/prune-kernel -r 5.2.2 5.2.2-gentoo
+> Removed  kernel version:5.2.2 and modules directory:5.2.2-gentoo from
+> the system.
+> 
+> 
+> 4)10:41 $ ./scripts/prune-kernel -i
+> 
+> 
+>  Want to removing old kernels and modules dir [YN]: Y
+>  Please give another version to remove: 5.2.2
+
+These 2 lines above could (should) be combined into one line. E.g.:
+
+Enter kernel version to remove or blank/emtpy to exit:
+
+>  /boot/vmlinuz-5.3.7-050307-generic
+>  /boot/vmlinuz-5.3.6-050306-generic
+>  find: ‘/boot/efi’: Permission denied
+
+too noisy.
+
+>  Please give the full modules directory name to remove: 5.2.2-gentoo
+>  5.3.6-050306-generic
+>  5.3.7-050307-generic
+
+too noisy.
+
+> 
+> 
+>   Removed kernel version:5.2.2 and associated modules:5.2.2-gentoo
+>   ..Done.
+> 
+> 
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 > ---
+> To Bruce,
+> I have incorporated all the changes you asked for ,kindly review.
+> 
+>  scripts/prune-kernel | 75 +++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 56 insertions(+), 19 deletions(-)
+> 
+> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+> index e8aa940bc0a9..292ba70d7770 100755
+> --- a/scripts/prune-kernel
+> +++ b/scripts/prune-kernel
+> @@ -1,21 +1,58 @@
+>  #!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+> -
+> -# because I use CONFIG_LOCALVERSION_AUTO, not the same version again and
+> -# again, /boot and /lib/modules/ eventually fill up.
+> -# Dumb script to purge that stuff:
+> -
+> -for f in "$@"
+> -do
+> -        if rpm -qf "/lib/modules/$f" >/dev/null; then
+> -                echo "keeping $f (installed from rpm)"
+> -        elif [ $(uname -r) = "$f" ]; then
+> -                echo "keeping $f (running kernel) "
+> -        else
+> -                echo "removing $f"
+> -                rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
+> -                rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
+> -                rm -rf "/lib/modules/$f"
+> -                new-kernel-pkg --remove $f
+> -        fi
+> -done
+> +#This script will delete old kernels and modules directory related to it interactively.
+> +#if you choose "-i" as interactive otherwise it will just go ahead and do the stuff once
+> +#you mentione the kernel_version and modules_directory_name as parameter.
 
-I applied both to linux-kbuild.
+        mention
+or better:
+        enter
 
-I changed the subject prefix
-"kconfig:" to "kbuild:".
+> +flag=$1
+
+$flag is not used anywhere.
+
+> +kernel_ver=$2
+
+remove_old_kernel() uses $kernel_version, not $kernel_ver.
+
+> +modules_dir_name=$3
+
+remove_old_modules_dir() uses $modules_version, not $modules_dir_name.
+
+> +boot_dir=/boot
+> +modules_dir=/lib/modules
+
+need a blank line here.
+
+> +remove_old_kernel() {
+> +	cd $boot_dir
+> +	find $boot_dir -name "vmlinuz-*" -type f -exec ls -1 {} \;
+
+why the 'ls'?  too noisy IMO.
+
+> +	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kernel_version
+> +	return 0
+> +}
+
+need a blank line here.
+
+> +remove_old_modules_dir() {
+> +	cd $modules_dir
+> +	find $modules_dir -maxdepth 0 -type d -exec ls -1 {} \;
+
+'ls' is too noisy.
+
+> +	rm -rf $modules_version
+> +	return 0
+> +}
+> +while getopts :hir opt;
+
+$opt is not used anywhere.
+
+Does 'getopt's support long option strings?  E.g.,
+--interactive, --help, --remove.
+
+> +do 
+
+'do' has a trailing space after it.  drop it.
+
+> +		 case "$1" in
+
+Is $1 the same as $flag here?
+
+> +			 -i | --interactive)
+
+bad indentation above.
+
+> +		 printf "\n\n Want to removing old kernels and modules dir [YN]: %s"
+> +		 read response
+> +		 if [[ $response == "Y" ]];then
+> +			 printf "Please give another version to remove: %s"
+> +			 read kernel_version
+> +			 remove_old_kernel
+> +			 printf "Please give the full modules directory name to remove: %s"
+> +			 read modules_version
+> +			 remove_old_modules_dir
+> +			 printf "\n\n\n Removed kernel version:$kernel_version and associated modules:$modules_version ..Done. \n\n"
+> +		 elif [[ $response == "N" ]];then
+> +			 exit 1
+> +		 fi
+> +		 ;;
+> +	                  -h | --help)
+
+bad indentation.
+
+> +                    
+
+line above is just a bunch of spaces.  bad.
+
+> +                     printf "You need to use this script like this :\n
+
+use tabs to indent, not spaces.
+
+> +	             $0 -r kernel_version modules_directory_name\n
+> +                     $0 -i option for interactive way to use it.\n\n"
+
+inconsistent indentation.
+
+> +	      
+
+line above is just spaces.  Empty lines are OK, even good for
+readablility, but they should not end with spaces or tabs.
+
+> +	         exit 1
+> +		     ;;
+> +	                 -r | --remove)
+> +			 shift $(( OPTIND - 1 ))
+
+What is the purpose of the shift, when this case ends with exit?
+
+> +			 rm -f kernel_ver
+
+			       $kernel_ver
+
+Probably need to cd $boot_dir for above 'rm'.
+or just rm -f $boot_dir/$kernel_ver
+
+> +                         cd $modules_dir
+> +	                 rm -rf $modules_dir_name
+> +	                 printf "Removed  kernel version:$kernel_ver and modules directory:$modules_dir_name from the system.\n\n"
+> +			 exit 0
+> +                         ;;
+> + esac
+
+esac indentation does not match case.
+
+> +     done
+
+done indentation does not match do.
 
 
-
-> This is v2 of "[PATCH] kconfig: Wrap long "make help" text line for
-> xenconfig ".
->
-> v2:
->   - Fix more recent offenders.
-> ---
->  Documentation/Makefile   | 6 ++++--
->  Makefile                 | 3 ++-
->  scripts/Makefile.package | 3 ++-
->  scripts/kconfig/Makefile | 3 ++-
->  4 files changed, 10 insertions(+), 5 deletions(-)
->
-> diff --git a/Documentation/Makefile b/Documentation/Makefile
-> index e145e4db508bc6a4..0c5185187dad0b68 100644
-> --- a/Documentation/Makefile
-> +++ b/Documentation/Makefile
-> @@ -128,8 +128,10 @@ dochelp:
->         @echo  '  pdfdocs         - PDF'
->         @echo  '  epubdocs        - EPUB'
->         @echo  '  xmldocs         - XML'
-> -       @echo  '  linkcheckdocs   - check for broken external links (will connect to external hosts)'
-> -       @echo  '  refcheckdocs    - check for references to non-existing files under Documentation'
-> +       @echo  '  linkcheckdocs   - check for broken external links'
-> +       @echo  '                    (will connect to external hosts)'
-> +       @echo  '  refcheckdocs    - check for references to non-existing files under'
-> +       @echo  '                    Documentation'
->         @echo  '  cleandocs       - clean all generated files'
->         @echo
->         @echo  '  make SPHINXDIRS="s1 s2" [target] Generate only docs of folder s1, s2'
-> diff --git a/Makefile b/Makefile
-> index 5475cdb6d57d4117..5a1ef8db2cec69f6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1523,7 +1523,8 @@ help:
->         @echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
->         @echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
->         @echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
-> -       @echo  '  make C=1   [targets] Check re-compiled c source with $$CHECK (sparse by default)'
-> +       @echo  '  make C=1   [targets] Check re-compiled c source with $$CHECK'
-> +       @echo  '                       (sparse by default)'
->         @echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
->         @echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
->         @echo  '  make W=n   [targets] Enable extra build checks, n=1,2,3 where'
-> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-> index 56eadcc48d46de54..ee9b368dfcf37736 100644
-> --- a/scripts/Makefile.package
-> +++ b/scripts/Makefile.package
-> @@ -146,7 +146,8 @@ help:
->         @echo '  binrpm-pkg          - Build only the binary kernel RPM package'
->         @echo '  deb-pkg             - Build both source and binary deb kernel packages'
->         @echo '  bindeb-pkg          - Build only the binary kernel deb package'
-> -       @echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
-> +       @echo '  snap-pkg            - Build only the binary kernel snap package'
-> +       @echo '                        (will connect to external hosts)'
->         @echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
->         @echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
->         @echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index ef2f2336c46960df..a7d130b9306e8876 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -137,7 +137,8 @@ help:
->         @echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
->         @echo  '                    default value without prompting'
->         @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
-> -       @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
-> +       @echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
-> +       @echo  '                    support'
->         @echo  '  tinyconfig      - Configure the tiniest possible kernel'
->         @echo  '  testconfig      - Run Kconfig unit tests (requires python3 and pytest)'
->
-> --
-> 2.17.1
->
-
+Nack.
 
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
