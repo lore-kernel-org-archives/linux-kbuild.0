@@ -1,101 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f67.google.com ([209.85.166.67]:35179 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfJ2PCF (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36955 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390192AbfJ2P6x (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Oct 2019 11:02:05 -0400
-From: Ethan Sommer <e5ten.arch@gmail.com>
-Subject: [PATCH v2] kbuild: support byacc as alternative YACC to bison
-Date: Tue, 29 Oct 2019 11:01:16 -0400
-Message-Id: <20191029150119.19823-1-e5ten.arch@gmail.com>
-In-Reply-To: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
+        Tue, 29 Oct 2019 11:58:53 -0400
+Subject: Re: [PATCH v2] kbuild: support byacc as alternative YACC to bison
 References: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
+ <20191029150119.19823-1-e5ten.arch@gmail.com>
+From: Frank Rowand <frowand.list@gmail.com>
+Message-ID: <760b5b4f-caa6-67e1-aa7f-ddd694a84b4a@gmail.com>
+Date: Tue, 29 Oct 2019 10:58:48 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191029150119.19823-1-e5ten.arch@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Ethan Sommer <e5ten.arch@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+To: Ethan Sommer <e5ten.arch@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Rob Herring <robh+dt@kernel.org>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
 
-Switches to a more portable set of flags for generating the same file
-names instead of the bison-specific --defines, uses the more portable -V
-instead of --version, and explicitly defines YYSTYPE in lex.l, which
-bison implicitly defines if not present but byacc does not.
+Hi Ethan,
 
-Add %locations to dtc-parser.y to explicitly enable location tracking
-for byacc, and define YYERROR_CALL explicitly to prevent the locations
-directive from causing it to be defined to a 2-parameter call to
-yyerror, which dtc-parser.y defines to accept one parameter.
+On 10/29/19 10:01 AM, Ethan Sommer wrote:
+> Switches to a more portable set of flags for generating the same file
+> names instead of the bison-specific --defines, uses the more portable -V
+> instead of --version, and explicitly defines YYSTYPE in lex.l, which
+> bison implicitly defines if not present but byacc does not.
+> 
+> Add %locations to dtc-parser.y to explicitly enable location tracking
+> for byacc, and define YYERROR_CALL explicitly to prevent the locations
+> directive from causing it to be defined to a 2-parameter call to
+> yyerror, which dtc-parser.y defines to accept one parameter.
+> 
+> Requires byacc to be built with --enable-btyacc.
+> 
+> Signed-off-by: Ethan Sommer <e5ten.arch@gmail.com>
+> ---
+>  scripts/Makefile.host     | 2 +-
+>  scripts/dtc/dtc-parser.y  | 4 ++++
+>  scripts/genksyms/Makefile | 2 +-
+>  scripts/genksyms/lex.l    | 2 ++
+>  4 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+> index 4c51c95d40f4..64e98e1d4825 100644
+> --- a/scripts/Makefile.host
+> +++ b/scripts/Makefile.host
+> @@ -11,7 +11,7 @@ $(obj)/%.lex.c: $(src)/%.l FORCE
+>  # YACC
+>  # ---------------------------------------------------------------------------
+>  quiet_cmd_bison = YACC    $(basename $@).[ch]
+> -      cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -t -l $<
+> +      cmd_bison = $(YACC) -b $(basename $(basename $@)) -d -t -l $<
+>  
+>  $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
+>  	$(call if_changed,bison)
+> diff --git a/scripts/dtc/dtc-parser.y b/scripts/dtc/dtc-parser.y
+> index 2ed4dc1f07fd..40dcf4f149da 100644
+> --- a/scripts/dtc/dtc-parser.y
+> +++ b/scripts/dtc/dtc-parser.y
 
-Requires byacc to be built with --enable-btyacc.
+For file scripts/dtc/dtc-parser.y:
 
-Signed-off-by: Ethan Sommer <e5ten.arch@gmail.com>
----
- scripts/Makefile.host     | 2 +-
- scripts/dtc/dtc-parser.y  | 4 ++++
- scripts/genksyms/Makefile | 2 +-
- scripts/genksyms/lex.l    | 2 ++
- 4 files changed, 8 insertions(+), 2 deletions(-)
+This file is maintained in the upstream dtc project.  We pull changes
+from that project into the Linux kernel source tree.
 
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 4c51c95d40f4..64e98e1d4825 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -11,7 +11,7 @@ $(obj)/%.lex.c: $(src)/%.l FORCE
- # YACC
- # ---------------------------------------------------------------------------
- quiet_cmd_bison = YACC    $(basename $@).[ch]
--      cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -t -l $<
-+      cmd_bison = $(YACC) -b $(basename $(basename $@)) -d -t -l $<
- 
- $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
- 	$(call if_changed,bison)
-diff --git a/scripts/dtc/dtc-parser.y b/scripts/dtc/dtc-parser.y
-index 2ed4dc1f07fd..40dcf4f149da 100644
---- a/scripts/dtc/dtc-parser.y
-+++ b/scripts/dtc/dtc-parser.y
-@@ -2,6 +2,8 @@
- /*
-  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
-  */
-+%locations
-+
- %{
- #include <stdio.h>
- #include <inttypes.h>
-@@ -17,6 +19,8 @@ extern void yyerror(char const *s);
- 		treesource_error = true; \
- 	} while (0)
- 
-+#define YYERROR_CALL(msg) yyerror(msg)
-+
- extern struct dt_info *parser_output;
- extern bool treesource_error;
- %}
-diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-index 78629f515e78..397c2dc8182b 100644
---- a/scripts/genksyms/Makefile
-+++ b/scripts/genksyms/Makefile
-@@ -15,7 +15,7 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
- ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
- 
- quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
--      cmd_bison_no_warn = $(YACC) --version >/dev/null; \
-+      cmd_bison_no_warn = $(YACC) -V >/dev/null; \
- 			  $(cmd_bison) 2>/dev/null
- 
- $(obj)/pars%.tab.c $(obj)/pars%.tab.h: $(src)/pars%.y FORCE
-diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
-index e265c5d96861..0580c088527f 100644
---- a/scripts/genksyms/lex.l
-+++ b/scripts/genksyms/lex.l
-@@ -19,6 +19,8 @@
- #include "genksyms.h"
- #include "parse.tab.h"
- 
-+extern YYSTYPE yylval;
-+
- /* We've got a two-level lexer here.  We let flex do basic tokenization
-    and then we categorize those basic tokens in the second stage.  */
- #define YY_DECL		static int yylex1(void)
--- 
-2.23.0
+The file is located at the root level of the upstream project.
+
+Info on submitting patches is in the upstream file "Documentation/manual.txt":
+
+   1) Sources
+
+   Source code for the Device Tree Compiler can be found at git.kernel.org.
+
+   The upstream repository is here:
+
+       git://git.kernel.org/pub/scm/utils/dtc/dtc.git
+       https://git.kernel.org/pub/scm/utils/dtc/dtc.git
+
+   The gitweb interface for the upstream respository is:
+
+       https://git.kernel.org/cgit/utils/dtc/dtc.git/
+
+   1.1) Submitting Patches
+
+   Patches should be sent to the maintainers:
+           David Gibson <david@gibson.dropbear.id.au>
+           Jon Loeliger <jdl@jdl.com>
+   and CCed to <devicetree-compiler@vger.kernel.org>.
+
+-Frank
+
+
+> @@ -2,6 +2,8 @@
+>  /*
+>   * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
+>   */
+> +%locations
+> +
+>  %{
+>  #include <stdio.h>
+>  #include <inttypes.h>
+> @@ -17,6 +19,8 @@ extern void yyerror(char const *s);
+>  		treesource_error = true; \
+>  	} while (0)
+>  
+> +#define YYERROR_CALL(msg) yyerror(msg)
+> +
+>  extern struct dt_info *parser_output;
+>  extern bool treesource_error;
+>  %}
+> diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+> index 78629f515e78..397c2dc8182b 100644
+> --- a/scripts/genksyms/Makefile
+> +++ b/scripts/genksyms/Makefile
+> @@ -15,7 +15,7 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
+>  ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
+>  
+>  quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
+> -      cmd_bison_no_warn = $(YACC) --version >/dev/null; \
+> +      cmd_bison_no_warn = $(YACC) -V >/dev/null; \
+>  			  $(cmd_bison) 2>/dev/null
+>  
+>  $(obj)/pars%.tab.c $(obj)/pars%.tab.h: $(src)/pars%.y FORCE
+> diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
+> index e265c5d96861..0580c088527f 100644
+> --- a/scripts/genksyms/lex.l
+> +++ b/scripts/genksyms/lex.l
+> @@ -19,6 +19,8 @@
+>  #include "genksyms.h"
+>  #include "parse.tab.h"
+>  
+> +extern YYSTYPE yylval;
+> +
+>  /* We've got a two-level lexer here.  We let flex do basic tokenization
+>     and then we categorize those basic tokens in the second stage.  */
+>  #define YY_DECL		static int yylex1(void)
+> 
