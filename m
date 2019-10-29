@@ -1,49 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:34505 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729134AbfJ2MjH (ORCPT
+Received: from mail-io1-f67.google.com ([209.85.166.67]:35179 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725776AbfJ2PCF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Oct 2019 08:39:07 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/4] More nsdeps improvements
-Date: Tue, 29 Oct 2019 21:38:05 +0900
-Message-Id: <20191029123809.29301-1-yamada.masahiro@socionext.com>
+        Tue, 29 Oct 2019 11:02:05 -0400
+From: Ethan Sommer <e5ten.arch@gmail.com>
+Subject: [PATCH v2] kbuild: support byacc as alternative YACC to bison
+Date: Tue, 29 Oct 2019 11:01:16 -0400
+Message-Id: <20191029150119.19823-1-e5ten.arch@gmail.com>
+In-Reply-To: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
+References: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jessica Yu <jeyu@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Jonathan Corbet <corbet@lwn.net>, Matthias Maennich <maennich@google.com>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Ethan Sommer <e5ten.arch@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
 
-This series improves nsdeps more by addressing the root problem.
+Switches to a more portable set of flags for generating the same file
+names instead of the bison-specific --defines, uses the more portable -V
+instead of --version, and explicitly defines YYSTYPE in lex.l, which
+bison implicitly defines if not present but byacc does not.
 
-Based on linux-next.
+Add %locations to dtc-parser.y to explicitly enable location tracking
+for byacc, and define YYERROR_CALL explicitly to prevent the locations
+directive from causing it to be defined to a 2-parameter call to
+yyerror, which dtc-parser.y defines to accept one parameter.
 
-This series does NOT apply to the Linus tree because
-I updates modpost from my Kbuild tree.
+Requires byacc to be built with --enable-btyacc.
 
-I can pick up this series to kbuild tree if there is no objection.
-If it goes to the module tree, we need to discuss how to deal with
-the conflicts.
+Signed-off-by: Ethan Sommer <e5ten.arch@gmail.com>
+---
+ scripts/Makefile.host     | 2 +-
+ scripts/dtc/dtc-parser.y  | 4 ++++
+ scripts/genksyms/Makefile | 2 +-
+ scripts/genksyms/lex.l    | 2 ++
+ 4 files changed, 8 insertions(+), 2 deletions(-)
 
-The modpost is actively touched these days
-from both kbuild and module trees.
-
-
-
-Masahiro Yamada (4):
-  modpost: do not invoke extra modpost for nsdeps
-  modpost: dump missing namespaces into a single modules.nsdeps file
-  scripts/nsdeps: support nsdeps for external module builds
-  mospost: remove unneeded local variable in contains_namespace()
-
- .gitignore                                   |  2 +-
- Documentation/core-api/symbol-namespaces.rst |  3 ++
- Documentation/dontdiff                       |  1 +
- Makefile                                     | 10 ++--
- scripts/Makefile.modpost                     |  8 ++-
- scripts/mod/modpost.c                        | 55 ++++++++------------
- scripts/mod/modpost.h                        |  4 +-
- scripts/nsdeps                               | 29 ++++++-----
- 8 files changed, 53 insertions(+), 59 deletions(-)
-
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 4c51c95d40f4..64e98e1d4825 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -11,7 +11,7 @@ $(obj)/%.lex.c: $(src)/%.l FORCE
+ # YACC
+ # ---------------------------------------------------------------------------
+ quiet_cmd_bison = YACC    $(basename $@).[ch]
+-      cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -t -l $<
++      cmd_bison = $(YACC) -b $(basename $(basename $@)) -d -t -l $<
+ 
+ $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
+ 	$(call if_changed,bison)
+diff --git a/scripts/dtc/dtc-parser.y b/scripts/dtc/dtc-parser.y
+index 2ed4dc1f07fd..40dcf4f149da 100644
+--- a/scripts/dtc/dtc-parser.y
++++ b/scripts/dtc/dtc-parser.y
+@@ -2,6 +2,8 @@
+ /*
+  * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
+  */
++%locations
++
+ %{
+ #include <stdio.h>
+ #include <inttypes.h>
+@@ -17,6 +19,8 @@ extern void yyerror(char const *s);
+ 		treesource_error = true; \
+ 	} while (0)
+ 
++#define YYERROR_CALL(msg) yyerror(msg)
++
+ extern struct dt_info *parser_output;
+ extern bool treesource_error;
+ %}
+diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+index 78629f515e78..397c2dc8182b 100644
+--- a/scripts/genksyms/Makefile
++++ b/scripts/genksyms/Makefile
+@@ -15,7 +15,7 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
+ ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
+ 
+ quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
+-      cmd_bison_no_warn = $(YACC) --version >/dev/null; \
++      cmd_bison_no_warn = $(YACC) -V >/dev/null; \
+ 			  $(cmd_bison) 2>/dev/null
+ 
+ $(obj)/pars%.tab.c $(obj)/pars%.tab.h: $(src)/pars%.y FORCE
+diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
+index e265c5d96861..0580c088527f 100644
+--- a/scripts/genksyms/lex.l
++++ b/scripts/genksyms/lex.l
+@@ -19,6 +19,8 @@
+ #include "genksyms.h"
+ #include "parse.tab.h"
+ 
++extern YYSTYPE yylval;
++
+ /* We've got a two-level lexer here.  We let flex do basic tokenization
+    and then we categorize those basic tokens in the second stage.  */
+ #define YY_DECL		static int yylex1(void)
 -- 
-2.17.1
+2.23.0
