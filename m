@@ -1,140 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36955 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390192AbfJ2P6x (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Oct 2019 11:58:53 -0400
-Subject: Re: [PATCH v2] kbuild: support byacc as alternative YACC to bison
-References: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
- <20191029150119.19823-1-e5ten.arch@gmail.com>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <760b5b4f-caa6-67e1-aa7f-ddd694a84b4a@gmail.com>
-Date: Tue, 29 Oct 2019 10:58:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34194 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730754AbfJ2SRS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 Oct 2019 14:17:18 -0400
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com [209.85.219.199])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B3B88796E6
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Oct 2019 18:17:17 +0000 (UTC)
+Received: by mail-yb1-f199.google.com with SMTP id w69so11162226ybe.18
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Oct 2019 11:17:17 -0700 (PDT)
+From: Laura Abbott <labbott@redhat.com>
+Subject: [RFC PATCH] kconfig: Add option to get the full help text with listnewconfig
+Date: Tue, 29 Oct 2019 14:17:02 -0400
+Message-Id: <20191029181702.21460-1-labbott@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191029150119.19823-1-e5ten.arch@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ethan Sommer <e5ten.arch@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Rob Herring <robh+dt@kernel.org>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Laura Abbott <labbott@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jcline@redhat.com, dzickus@redhat.com
 
-Hi Ethan,
+make listnewconfig will list the individual options that need to be set.
+This is useful but there's no easy way to get the help text associated
+with the options at the same time. Introduce a new targe
+'make extendedlistnewconfig' which lists the full help text of all the
+new options as well. This makes it easier to automatically generate
+changes that are easy for humans to review. This command also adds
+markers between each option for easier parsing.
 
-On 10/29/19 10:01 AM, Ethan Sommer wrote:
-> Switches to a more portable set of flags for generating the same file
-> names instead of the bison-specific --defines, uses the more portable -V
-> instead of --version, and explicitly defines YYSTYPE in lex.l, which
-> bison implicitly defines if not present but byacc does not.
-> 
-> Add %locations to dtc-parser.y to explicitly enable location tracking
-> for byacc, and define YYERROR_CALL explicitly to prevent the locations
-> directive from causing it to be defined to a 2-parameter call to
-> yyerror, which dtc-parser.y defines to accept one parameter.
-> 
-> Requires byacc to be built with --enable-btyacc.
-> 
-> Signed-off-by: Ethan Sommer <e5ten.arch@gmail.com>
-> ---
->  scripts/Makefile.host     | 2 +-
->  scripts/dtc/dtc-parser.y  | 4 ++++
->  scripts/genksyms/Makefile | 2 +-
->  scripts/genksyms/lex.l    | 2 ++
->  4 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index 4c51c95d40f4..64e98e1d4825 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -11,7 +11,7 @@ $(obj)/%.lex.c: $(src)/%.l FORCE
->  # YACC
->  # ---------------------------------------------------------------------------
->  quiet_cmd_bison = YACC    $(basename $@).[ch]
-> -      cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -t -l $<
-> +      cmd_bison = $(YACC) -b $(basename $(basename $@)) -d -t -l $<
->  
->  $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
->  	$(call if_changed,bison)
-> diff --git a/scripts/dtc/dtc-parser.y b/scripts/dtc/dtc-parser.y
-> index 2ed4dc1f07fd..40dcf4f149da 100644
-> --- a/scripts/dtc/dtc-parser.y
-> +++ b/scripts/dtc/dtc-parser.y
+Signed-off-by: Laura Abbott <labbott@redhat.com>
+---
+Red Hat has been relying on some external libraries that have a tendency
+to break to get the help text for all new config options. I'd really
+like an in tree way to get the help text so we can automatically
+generate patches for people to reveiw new config options. I'm open to
+other approaches that let us script getting the help text as well.
+---
+ scripts/kconfig/Makefile |  5 ++++-
+ scripts/kconfig/conf.c   | 13 ++++++++++++-
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-For file scripts/dtc/dtc-parser.y:
-
-This file is maintained in the upstream dtc project.  We pull changes
-from that project into the Linux kernel source tree.
-
-The file is located at the root level of the upstream project.
-
-Info on submitting patches is in the upstream file "Documentation/manual.txt":
-
-   1) Sources
-
-   Source code for the Device Tree Compiler can be found at git.kernel.org.
-
-   The upstream repository is here:
-
-       git://git.kernel.org/pub/scm/utils/dtc/dtc.git
-       https://git.kernel.org/pub/scm/utils/dtc/dtc.git
-
-   The gitweb interface for the upstream respository is:
-
-       https://git.kernel.org/cgit/utils/dtc/dtc.git/
-
-   1.1) Submitting Patches
-
-   Patches should be sent to the maintainers:
-           David Gibson <david@gibson.dropbear.id.au>
-           Jon Loeliger <jdl@jdl.com>
-   and CCed to <devicetree-compiler@vger.kernel.org>.
-
--Frank
-
-
-> @@ -2,6 +2,8 @@
->  /*
->   * (C) Copyright David Gibson <dwg@au1.ibm.com>, IBM Corporation.  2005.
->   */
-> +%locations
-> +
->  %{
->  #include <stdio.h>
->  #include <inttypes.h>
-> @@ -17,6 +19,8 @@ extern void yyerror(char const *s);
->  		treesource_error = true; \
->  	} while (0)
->  
-> +#define YYERROR_CALL(msg) yyerror(msg)
-> +
->  extern struct dt_info *parser_output;
->  extern bool treesource_error;
->  %}
-> diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-> index 78629f515e78..397c2dc8182b 100644
-> --- a/scripts/genksyms/Makefile
-> +++ b/scripts/genksyms/Makefile
-> @@ -15,7 +15,7 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
->  ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
->  
->  quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
-> -      cmd_bison_no_warn = $(YACC) --version >/dev/null; \
-> +      cmd_bison_no_warn = $(YACC) -V >/dev/null; \
->  			  $(cmd_bison) 2>/dev/null
->  
->  $(obj)/pars%.tab.c $(obj)/pars%.tab.h: $(src)/pars%.y FORCE
-> diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
-> index e265c5d96861..0580c088527f 100644
-> --- a/scripts/genksyms/lex.l
-> +++ b/scripts/genksyms/lex.l
-> @@ -19,6 +19,8 @@
->  #include "genksyms.h"
->  #include "parse.tab.h"
->  
-> +extern YYSTYPE yylval;
-> +
->  /* We've got a two-level lexer here.  We let flex do basic tokenization
->     and then we categorize those basic tokens in the second stage.  */
->  #define YY_DECL		static int yylex1(void)
-> 
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ef2f2336c469..aaaf1f62300c 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -66,7 +66,9 @@ localyesconfig localmodconfig: $(obj)/conf
+ #  syncconfig has become an internal implementation detail and is now
+ #  deprecated for external use
+ simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
+-	alldefconfig randconfig listnewconfig olddefconfig syncconfig
++	alldefconfig randconfig listnewconfig olddefconfig syncconfig \
++	extendedlistnewconfig
++
+ PHONY += $(simple-targets)
+ 
+ $(simple-targets): $(obj)/conf
+@@ -134,6 +136,7 @@ help:
+ 	@echo  '  alldefconfig    - New config with all symbols set to default'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  listnewconfig   - List new options'
++	@echo  '  extendedlistnewconfig   - List new options'
+ 	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
+ 	@echo  '                    default value without prompting'
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 40e16e871ae2..7aeb77374d9a 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -32,6 +32,7 @@ enum input_mode {
+ 	defconfig,
+ 	savedefconfig,
+ 	listnewconfig,
++	extendedlistnewconfig,
+ 	olddefconfig,
+ };
+ static enum input_mode input_mode = oldaskconfig;
+@@ -434,6 +435,11 @@ static void check_conf(struct menu *menu)
+ 						printf("%s%s=%s\n", CONFIG_, sym->name, str);
+ 					}
+ 				}
++			} else if (input_mode == extendedlistnewconfig) {
++				printf("-----\n");
++				print_help(menu);
++				printf("-----\n");
++
+ 			} else {
+ 				if (!conf_cnt++)
+ 					printf("*\n* Restart config...\n*\n");
+@@ -459,6 +465,7 @@ static struct option long_opts[] = {
+ 	{"alldefconfig",    no_argument,       NULL, alldefconfig},
+ 	{"randconfig",      no_argument,       NULL, randconfig},
+ 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
++	{"extendedlistnewconfig",   no_argument,       NULL, extendedlistnewconfig},
+ 	{"olddefconfig",    no_argument,       NULL, olddefconfig},
+ 	{NULL, 0, NULL, 0}
+ };
+@@ -469,6 +476,7 @@ static void conf_usage(const char *progname)
+ 	printf("Usage: %s [-s] [option] <kconfig-file>\n", progname);
+ 	printf("[option] is _one_ of the following:\n");
+ 	printf("  --listnewconfig         List new options\n");
++	printf("  --extendedlistnewconfig List new options and help text\n");
+ 	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
+ 	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
+ 	printf("  --syncconfig            Similar to oldconfig but generates configuration in\n"
+@@ -543,6 +551,7 @@ int main(int ac, char **av)
+ 		case allmodconfig:
+ 		case alldefconfig:
+ 		case listnewconfig:
++		case extendedlistnewconfig:
+ 		case olddefconfig:
+ 			break;
+ 		case '?':
+@@ -576,6 +585,7 @@ int main(int ac, char **av)
+ 	case oldaskconfig:
+ 	case oldconfig:
+ 	case listnewconfig:
++	case extendedlistnewconfig:
+ 	case olddefconfig:
+ 		conf_read(NULL);
+ 		break;
+@@ -657,6 +667,7 @@ int main(int ac, char **av)
+ 		/* fall through */
+ 	case oldconfig:
+ 	case listnewconfig:
++	case extendedlistnewconfig:
+ 	case syncconfig:
+ 		/* Update until a loop caused no more changes */
+ 		do {
+@@ -675,7 +686,7 @@ int main(int ac, char **av)
+ 				defconfig_file);
+ 			return 1;
+ 		}
+-	} else if (input_mode != listnewconfig) {
++	} else if (input_mode != listnewconfig && input_mode != extendedlistnewconfig) {
+ 		if (!no_conf_write && conf_write(NULL)) {
+ 			fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
+ 			exit(1);
+-- 
+2.21.0
