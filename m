@@ -1,76 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:41073 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727263AbfJ2B47 (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:44557 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727350AbfJ2DBC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Oct 2019 21:56:59 -0400
+        Mon, 28 Oct 2019 23:01:02 -0400
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] scripts:prune-kernel:prune kernel and modules dir from the system
+Date: Tue, 29 Oct 2019 08:30:30 +0530
+Message-Id: <20191029030030.31659-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
-References: <20191028155639.30330-1-e5ten.arch@gmail.com> <CAK7LNAS41TxKMLBj3_N=WE57CT7ttHes+7GdLWNW-mAgPkvW7w@mail.gmail.com>
- <CAMEGPiq+Z7kbjJSNA0m=1TAymamQExud_7v5yzakSPdciPbq1Q@mail.gmail.com>
-In-Reply-To: <CAMEGPiq+Z7kbjJSNA0m=1TAymamQExud_7v5yzakSPdciPbq1Q@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 29 Oct 2019 10:56:05 +0900
-Message-ID: <CAK7LNASG4GzaU6SR=ThfJpjrqmC53xmcSMAWqppciWbx3jMgdw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: support byacc as alternative YACC to bison
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ethan Sommer <e5ten.arch@gmail.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: rdunlap@infradead.org, bfields@fieldses.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-Hi Ethan,
+This patch will remove old kernel and modules directory from 
+the system interactive way and also at once ,provied the parameter
+given to the invoking script.
 
-On Tue, Oct 29, 2019 at 10:41 AM Ethan Sommer <e5ten.arch@gmail.com> wrote:
->
-> > I applied this patch, and tried the latest byacc,
-> > but I still cannot build kconfig probably because
-> > %destructor is not supported.
-> > byacc does not seem to work anyway.
->
-> Hi Masahiro, because I hadn't built it in a while I completely forgot
-> that to support %destructor byacc needs to be built with
-> --enable-btyacc, should I update the commit message to include that
-> detail?
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ scripts/prune-kernel | 58 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-OK, I was able to build kconfig with --enable-btyacc.
-
-byacc still cannot build scripts/dtc/dtc-parser.y
-Thought?
-
-dtc is not compiled for x86.
-Please try ARCH=arm.
-
-
-masahiro@pug:~/ref/linux$ make ARCH=arm
-CROSS_COMPILE=arm-linux-gnueabihf- YACC=/home/masahiro/bin/yacc
-scripts/kconfig/conf  --syncconfig Kconfig
-  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-common.h
-  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-oabi.h
-  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-eabi.h
-  HOSTCC  scripts/dtc/dtc.o
-  HOSTCC  scripts/dtc/flattree.o
-  HOSTCC  scripts/dtc/fstree.o
-  HOSTCC  scripts/dtc/data.o
-  HOSTCC  scripts/dtc/livetree.o
-  HOSTCC  scripts/dtc/treesource.o
-  HOSTCC  scripts/dtc/srcpos.o
-  HOSTCC  scripts/dtc/checks.o
-  HOSTCC  scripts/dtc/util.o
-  LEX     scripts/dtc/dtc-lexer.lex.c
-  YACC    scripts/dtc/dtc-parser.tab.[ch]
-/home/masahiro/bin/yacc: e - line 120 of "scripts/dtc/dtc-parser.y",
-syntax error
-ERROR(&@2, "Header flags don't match earlier ones");
-       ^
-make[1]: *** [scripts/Makefile.host;17: scripts/dtc/dtc-parser.tab.h] Error 1
-make[1]: *** Deleting file 'scripts/dtc/dtc-parser.tab.h'
-make[1]: *** [scripts/dtc/dtc-parser.tab.h] Deleting file
-'scripts/dtc/dtc-parser.tab.c'
-make: *** [Makefile;1260: scripts_dtc] Error 2
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+index 58a7650ce592..a6c990450ddc 100755
+--- a/scripts/prune-kernel
++++ b/scripts/prune-kernel
+@@ -1,2 +1,60 @@
+ #!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
++#This script will delete old kernels and modules directory related to it,both
++#automated and interactive way, if you choose -i or --interactive as parameter.
++#For normal operation you have to invoke this script like below
++#prune-kernel -r kernel_ver modules_dir_name
++flag=$1
++kernel_ver=$2
++modules_dir_name=$3
++boot_dir=/boot
++modules_dir=/lib/modules
++
++remove_old_kernel() {
++	cd $boot_dir
++	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kernel_version
++	return 0
++}
++
++remove_old_modules_dir() {
++	cd $modules_dir
++	rm -rf $modules_version
++	return 0
++}
++
++usage() {
++	printf "Usage: $(basename $0) [-ri] \n"
++	printf "\n -r | --remove kernel_ver modules_dir_name \n"
++	printf "\n -i | --interactive use as interactive way \n"
++}
++
++while getopts :hir opt;do
++	case "$flag" in
++		-i | --interactive)
++			printf "\nEnter kernel version to remove or blank/empty to exit:%s"
++			read kernel_version
++			if [[ $kernel_version != "" ]]; then
++				remove_old_kernel
++				printf "Please give the full modules directory name to remove:%s"
++				read modules_version
++				remove_old_modules_dir
++				printf "\n\n\n Removed kernel version:$kernel_version and associated modules directory:$modules_version ..Done.\n"
++			else
++				exit 1
++			fi
++			;;
++		-h | --help)
++			usage
++			exit 1
++			;;
++		-r | --remove)
++			shift $(( OPTIND -1 ))
++			cd $boot_dir
++			rm -f $kernel_ver
++			cd $modules_dir
++			rm -rf $modules_dir_name
++			printf "Removed kernel version:$kernel_ver and modules directory:$modules_dir_name from the system. \n\n"
++			exit 0
++			;;
++	esac
++done
+--
+2.23.0
