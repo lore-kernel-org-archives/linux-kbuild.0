@@ -1,57 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:41612 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:42954 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725909AbfJ2WBN (ORCPT
+        with ESMTP id S1725974AbfJ3AF0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Oct 2019 18:01:13 -0400
-Subject: Re: [RFC PATCH] kconfig: Add option to get the full help text with
- listnewconfig
-References: <20191029181702.21460-1-labbott@redhat.com>
+        Tue, 29 Oct 2019 20:05:26 -0400
+Subject: Re: [PATCH] scripts:prune-kernel:prune kernel and modules dir from
+ the system
+References: <20191029030030.31659-1-unixbhaskar@gmail.com>
 From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <53da077f-b4d6-c123-bcbc-ae531fdcc410@infradead.org>
-Date: Tue, 29 Oct 2019 15:01:12 -0700
+Message-ID: <de2a4604-e3ba-dab1-c72c-a0ff451541cf@infradead.org>
+Date: Tue, 29 Oct 2019 17:05:23 -0700
 MIME-Version: 1.0
-In-Reply-To: <20191029181702.21460-1-labbott@redhat.com>
+In-Reply-To: <20191029030030.31659-1-unixbhaskar@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laura Abbott <labbott@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jcline@redhat.com, dzickus@redhat.com
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, bfields@fieldses.org
+Cc: yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Laura,
+Hi,
 
-On 10/29/19 11:17 AM, Laura Abbott wrote:
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index ef2f2336c469..aaaf1f62300c 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -66,7 +66,9 @@ localyesconfig localmodconfig: $(obj)/conf
->  #  syncconfig has become an internal implementation detail and is now
->  #  deprecated for external use
->  simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
-> -	alldefconfig randconfig listnewconfig olddefconfig syncconfig
-> +	alldefconfig randconfig listnewconfig olddefconfig syncconfig \
-> +	extendedlistnewconfig
+On 10/28/19 8:00 PM, Bhaskar Chowdhury wrote:
+> This patch will remove old kernel and modules directory from 
+> the system interactive way and also at once ,provied the parameter
+> given to the invoking script.
+> 
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+> ---
+>  scripts/prune-kernel | 58 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+> 
+> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+> index 58a7650ce592..a6c990450ddc 100755
+> --- a/scripts/prune-kernel
+> +++ b/scripts/prune-kernel
+> @@ -1,2 +1,60 @@
+>  #!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+> +#This script will delete old kernels and modules directory related to it,both
+> +#automated and interactive way, if you choose -i or --interactive as parameter.
+> +#For normal operation you have to invoke this script like below
+> +#prune-kernel -r kernel_ver modules_dir_name
+> +flag=$1
+> +kernel_ver=$2
+> +modules_dir_name=$3
+> +boot_dir=/boot
+> +modules_dir=/lib/modules
 > +
->  PHONY += $(simple-targets)
->  
->  $(simple-targets): $(obj)/conf
-> @@ -134,6 +136,7 @@ help:
->  	@echo  '  alldefconfig    - New config with all symbols set to default'
->  	@echo  '  randconfig	  - New config with random answer to all options'
->  	@echo  '  listnewconfig   - List new options'
-> +	@echo  '  extendedlistnewconfig   - List new options'
+> +remove_old_kernel() {
+> +	cd $boot_dir
+> +	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kernel_version
+> +	return 0
+> +}
+> +
+> +remove_old_modules_dir() {
+> +	cd $modules_dir
+> +	rm -rf $modules_version
+> +	return 0
+> +}
+> +
+> +usage() {
+> +	printf "Usage: $(basename $0) [-ri] \n"
+> +	printf "\n -r | --remove kernel_ver modules_dir_name \n"
+> +	printf "\n -i | --interactive use as interactive way \n"
+> +}
+> +
+> +while getopts :hir opt;do
 
-This text should also say " and help text" similar to what conf.c does.
+what is the purpose of "opt" above?
+It is not used AFAICT.
 
->  	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
->  	@echo  '                    default value without prompting'
->  	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+My internet searching says that 'getopts' does not support "--options" (long options).
+But then $flag is used below, not $opt, so the long options are just supported
+by "flag=$1" at the beginning of the script.
 
-I can't say that I like the name, but I won't try to paint it a
-different color.
+
+> +	case "$flag" in
+> +		-i | --interactive)
+> +			printf "\nEnter kernel version to remove or blank/empty to exit:%s"
+> +			read kernel_version
+> +			if [[ $kernel_version != "" ]]; then
+> +				remove_old_kernel
+> +				printf "Please give the full modules directory name to remove:%s"
+> +				read modules_version
+
+Need to handle modules_version = "" here.
+
+> +				remove_old_modules_dir
+> +				printf "\n\n\n Removed kernel version:$kernel_version and associated modules directory:$modules_version ..Done.\n"
+> +			else
+> +				exit 1
+> +			fi
+> +			;;
+> +		-h | --help)
+> +			usage
+> +			exit 1
+> +			;;
+> +		-r | --remove)
+
+What happens if a user enters:
+
+./scripts/prune-kernel -r
+and no kernel_ver or modules_dir_name after -r?
+
+
+> +			shift $(( OPTIND -1 ))
+
+What is the purpose of the 'shift' since there is no loop to process more options?
+
+> +			cd $boot_dir
+> +			rm -f $kernel_ver
+> +			cd $modules_dir
+> +			rm -rf $modules_dir_name
+> +			printf "Removed kernel version:$kernel_ver and modules directory:$modules_dir_name from the system. \n\n"
+> +			exit 0
+> +			;;
+> +	esac
+> +done
+
+This patch does not delete the original script loop, so that still follows
+after the 'done' above.  Was that intentional?
 
 -- 
 ~Randy
