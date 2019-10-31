@@ -1,188 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:49976 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726506AbfJaLyJ (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:46148 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727511AbfJaPG5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Oct 2019 07:54:09 -0400
+        Thu, 31 Oct 2019 11:06:57 -0400
+Subject: Re: [PATCH] scripts: prune-kernel:remove old kernels and modules dir
+ from system
+References: <20191030095445.912435-1-unixbhaskar@gmail.com>
+ <b8a12c03-1e17-61de-2cd9-a09650dc22b1@infradead.org>
+ <20191031033722.GA7687@Gentoo>
+ <41693d0e-8ff2-bf06-f1a6-e7fb52779f95@infradead.org>
+ <20191031045242.GA3130@Gentoo>
+ <809aa850-7a22-a7c5-af21-0e88d1c63dd7@infradead.org>
+ <20191031071839.GB3130@Gentoo>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <875a75ec-bbf1-9d80-a3e1-9c759c9c05e1@infradead.org>
+Date: Thu, 31 Oct 2019 08:06:55 -0700
 MIME-Version: 1.0
-References: <20191029123809.29301-1-yamada.masahiro@socionext.com>
- <20191029123809.29301-3-yamada.masahiro@socionext.com> <20191031112044.GC2177@linux-8ccs>
-In-Reply-To: <20191031112044.GC2177@linux-8ccs>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 31 Oct 2019 20:53:25 +0900
-Message-ID: <CAK7LNASCmSUuqLyJhZW+3yrGk1KTPxA-_0x86N=Y7A5psCVUSg@mail.gmail.com>
-Subject: Re: [PATCH 2/4] modpost: dump missing namespaces into a single
- modules.nsdeps file
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191031071839.GB3130@Gentoo>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jessica Yu <jeyu@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Jonathan Corbet <corbet@lwn.net>, Matthias Maennich <maennich@google.com>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: bfields@fieldses.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Oct 31, 2019 at 8:20 PM Jessica Yu <jeyu@kernel.org> wrote:
->
-> +++ Masahiro Yamada [29/10/19 21:38 +0900]:
-> >The modpost, with the -d option given, generates per-module .ns_deps
-> >files.
-> >
-> >Kbuild generates per-module .mod files to carry module information.
-> >This is convenient because Make handles multiple jobs when the -j
-> >option is given.
-> >
-> >On the other hand, the modpost always runs as a single thread.
-> >I do not see a strong reason to produce separate .ns_deps files.
-> >
-> >This commit changes the modpost to generate just one file,
-> >modules.nsdeps, each line of which has the following format:
-> >
-> >  <module_name>: <list of missing namespaces>
-> >
-> >Please note it contains *missing* namespaces instead of required ones.
-> >So, modules.nsdeps is empty if the namespace dependency is all good.
-> >
-> >This will work more efficiently because spatch will no longer process
-> >already imported namespaces. I removed the '(if needed)' from the
-> >nsdeps log since spatch is invoked only when needed.
-> >
-> >This also solved the stale .ns_deps files problem reported by
-> >Jessica Yu:
-> >
-> >  https://lkml.org/lkml/2019/10/28/467
-> >
-> >While I was here, I improved the modpost code a little more;
-> >I freed ns_deps_bus.p because buf_write() allocates memory.
-> >
-> >Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >---
-> >
-> > .gitignore               |  2 +-
-> > Documentation/dontdiff   |  1 +
-> > Makefile                 |  4 ++--
-> > scripts/Makefile.modpost |  2 +-
-> > scripts/mod/modpost.c    | 44 +++++++++++++++++-----------------------
-> > scripts/mod/modpost.h    |  4 ++--
-> > scripts/nsdeps           | 21 +++++++++----------
-> > 7 files changed, 36 insertions(+), 42 deletions(-)
-> >
-> >diff --git a/.gitignore b/.gitignore
-> >index 70580bdd352c..72ef86a5570d 100644
-> >--- a/.gitignore
-> >+++ b/.gitignore
-> >@@ -32,7 +32,6 @@
-> > *.lzo
-> > *.mod
-> > *.mod.c
-> >-*.ns_deps
-> > *.o
-> > *.o.*
-> > *.patch
-> >@@ -61,6 +60,7 @@ modules.order
-> > /System.map
-> > /Module.markers
-> > /modules.builtin.modinfo
-> >+/modules.nsdeps
-> >
-> > #
-> > # RPM spec file (make rpm-pkg)
-> >diff --git a/Documentation/dontdiff b/Documentation/dontdiff
-> >index 9f4392876099..72fc2e9e2b63 100644
-> >--- a/Documentation/dontdiff
-> >+++ b/Documentation/dontdiff
-> >@@ -179,6 +179,7 @@ mkutf8data
-> > modpost
-> > modules.builtin
-> > modules.builtin.modinfo
-> >+modules.nsdeps
-> > modules.order
-> > modversions.h*
-> > nconf
-> >diff --git a/Makefile b/Makefile
-> >index 0ef897fd9cfd..1e3f307bd49b 100644
-> >--- a/Makefile
-> >+++ b/Makefile
-> >@@ -1356,7 +1356,7 @@ endif # CONFIG_MODULES
-> >
-> > # Directories & files removed with 'make clean'
-> > CLEAN_DIRS  += include/ksym
-> >-CLEAN_FILES += modules.builtin.modinfo
-> >+CLEAN_FILES += modules.builtin.modinfo modules.nsdeps
->
-> Hmm, I tried to run `make -C path/to/kernel/src M=$(PWD) clean` for a test
-> external module, but it didn't remove modules.nsdeps for me. I declared a
-> MODULE namespace for testing purposes.
->
-> $ make
-> make -C /dev/shm/linux M=/tmp/ppyu/test-module
-> make[1]: Entering directory '/dev/shm/linux'
->   AR      /tmp/ppyu/test-module/built-in.a
->   CC [M]  /tmp/ppyu/test-module/test1.o
->   CC [M]  /tmp/ppyu/test-module/test2.o
->   LD [M]  /tmp/ppyu/test-module/test.o
->   Building modules, stage 2.
->   MODPOST 1 modules
-> WARNING: module test uses symbol try_module_get from namespace MODULE, but does not import it.
->   CC [M]  /tmp/ppyu/test-module/test.mod.o
->   LD [M]  /tmp/ppyu/test-module/test.ko
-> make[1]: Leaving directory '/dev/shm/linux'
->
-> Then I make nsdeps:
->
-> make -C /dev/shm/linux M=/tmp/ppyu/test-module nsdeps
-> make[1]: Entering directory '/dev/shm/linux'
->   Building modules, stage 2.
->   MODPOST 1 modules
-> WARNING: module test uses symbol try_module_get from namespace MODULE, but does not import it.
-> Adding namespace MODULE to module /tmp/ppyu/test-module/test.ko.
-> --- /tmp/ppyu/test-module/test1.c
-> +++ /tmp/cocci-output-3696-c1f8b3-test1.c
-> @@ -38,3 +38,4 @@ static void __exit hello_cleanup(void)
->  module_init(hello_init);
->  module_exit(hello_cleanup);
->  MODULE_LICENSE("GPL");
-> +MODULE_IMPORT_NS(MODULE);
-> make[1]: Leaving directory '/dev/shm/linux'
-> $ cat modules.nsdeps
-> /tmp/ppyu/test-module/test.ko: MODULE
->
-> Looks good so far, then I try make clean:
->
-> $ make clean
-> make -C /dev/shm/linux M=/tmp/ppyu/test-module clean
-> make[1]: Entering directory '/dev/shm/linux'
->   CLEAN   /tmp/ppyu/test-module/Module.symvers
-> make[1]: Leaving directory '/dev/shm/linux'
-> $ ls
-> Makefile  modules.nsdeps  test1.c  test2.c
->
-> But modules.nsdeps is still there.
->
+On 10/31/19 12:18 AM, Bhaskar Chowdhury wrote:
+> On 22:27 Wed 30 Oct 2019, Randy Dunlap wrote:
+>> On 10/30/19 9:52 PM, Bhaskar Chowdhury wrote:
+>>>>>> That 'rm' doesn't remove any files.  Compare what remove_old_kernel() does.
+>>>>> No,it is not using that function rather take the parameter from the
+>>>>> commandline and get into boot dir match with it and remove it.
+>>>>
+>>>> But it doesn't do that.  I tested it.  It should be more like what
+>>>> rmeove_old_kernel() does:
+>>>>
+>>>>         rm -If vmlinuz-$kernel_ver System.map-$kernel_ver config-$kernel_ver
+>>>>
+>>>> and if not, please explain why not.
+>>> Okay, again some uniformity missing in the code, I would like to your
+>>> suggested method,i.e call remove_old_kernel to do the job instead of depending on individual kernel.
+>>
+>> The simplest thing to do is set kernel_version=$kernel_ver
+>> and then call remove_old_kernel().
+>> And set modules_version=$modules_dir_name and call remove_old_modules_dir().
+>>
+>> But it would be cleaner to pass a parameter (kernel_version) to the
+>> remove_old_kernel() function and to pass a parameter (modules_dir) to the
+>> remove_old_modules_dir() function.
+> 
+>>
+> 
+> Thank you...I have just modified the code and call both the function
+> under remove option. BTW I didn't set the extra variable $kernel_ver name it $kernel_version and instead of $modules_dir_name name it $mo
+> dules_version.
+> 
+> Capturing command line parameter in $kernel_version and $modules_version
+> 
+> Is that fine? Here is a code snippet:
 
-Good catch!
+Yes, that should be OK.
 
-I forgot to take care of it for external module builds.
+> -r | --remove)
+>   if [[ $# -ne 3 ]]; then
+>    printf "You need to provide kernel version and modules directory
+>    name \n"
+>    exit 1
+>    else
+>    remove_old_kernel
+>    remove_old_modules_dir
+>    fi
+> 
+> 
+> I have just test it and it works.
+> 
+> 
+> And about solitary r option without hypen is ignoring and doing nothing.
+> 
+> Means, if I pass ./scripts/prune-kernel r 5.3.3
+> it simply ignore and does nothing.Only with the hypen it can work.
 
-The following should work. I will fold it in 3/4.
-
-
-
-
-diff --git a/Makefile b/Makefile
-index 79be70bf2899..6035702803eb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1619,7 +1619,7 @@ _emodinst_post: _emodinst_
-        $(call cmd,depmod)
-
- clean-dirs := $(KBUILD_EXTMOD)
--clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers
-+clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers
-$(KBUILD_EXTMOD)/modules.nsdeps
-
- PHONY += /
- /:
-
-
+Is that how it should be?
+or what would you expect that to do?
 
 -- 
-Best Regards
-Masahiro Yamada
+~Randy
