@@ -1,51 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:40904 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726479AbfJaF1V (ORCPT
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42405 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726479AbfJaHS5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Oct 2019 01:27:21 -0400
+        Thu, 31 Oct 2019 03:18:57 -0400
+Date: Thu, 31 Oct 2019 12:48:42 +0530
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 Subject: Re: [PATCH] scripts: prune-kernel:remove old kernels and modules dir
  from system
+Message-ID: <20191031071839.GB3130@Gentoo>
 References: <20191030095445.912435-1-unixbhaskar@gmail.com>
  <b8a12c03-1e17-61de-2cd9-a09650dc22b1@infradead.org>
  <20191031033722.GA7687@Gentoo>
  <41693d0e-8ff2-bf06-f1a6-e7fb52779f95@infradead.org>
  <20191031045242.GA3130@Gentoo>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <809aa850-7a22-a7c5-af21-0e88d1c63dd7@infradead.org>
-Date: Wed, 30 Oct 2019 22:27:19 -0700
+ <809aa850-7a22-a7c5-af21-0e88d1c63dd7@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20191031045242.GA3130@Gentoo>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
+Content-Disposition: inline
+In-Reply-To: <809aa850-7a22-a7c5-af21-0e88d1c63dd7@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To: Randy Dunlap <rdunlap@infradead.org>
 Cc: bfields@fieldses.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 10/30/19 9:52 PM, Bhaskar Chowdhury wrote:
->>>> That 'rm' doesn't remove any files.  Compare what remove_old_kernel() does.
->>> No,it is not using that function rather take the parameter from the
->>> commandline and get into boot dir match with it and remove it.
->>
->> But it doesn't do that.  I tested it.  It should be more like what
->> rmeove_old_kernel() does:
->>
->>         rm -If vmlinuz-$kernel_ver System.map-$kernel_ver config-$kernel_ver
->>
->> and if not, please explain why not.
-> Okay, again some uniformity missing in the code, I would like to your
-> suggested method,i.e call remove_old_kernel to do the job instead of depending on individual kernel.
 
-The simplest thing to do is set kernel_version=$kernel_ver
-and then call remove_old_kernel().
-And set modules_version=$modules_dir_name and call remove_old_modules_dir().
+--61jdw2sOBCFtR2d/
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-But it would be cleaner to pass a parameter (kernel_version) to the
-remove_old_kernel() function and to pass a parameter (modules_dir) to the
-remove_old_modules_dir() function.
+On 22:27 Wed 30 Oct 2019, Randy Dunlap wrote:
+>On 10/30/19 9:52 PM, Bhaskar Chowdhury wrote:
+>>>>> That=C2=A0'rm'=C2=A0doesn't=C2=A0remove=C2=A0any=C2=A0files.=C2=A0=C2=
+=A0Compare=C2=A0what=C2=A0remove_old_kernel()=C2=A0does.
+>>>> No,it=C2=A0is=C2=A0not=C2=A0using=C2=A0that=C2=A0function=C2=A0rather=
+=C2=A0take=C2=A0the=C2=A0parameter=C2=A0from=C2=A0the
+>>>> commandline=C2=A0and=C2=A0get=C2=A0into=C2=A0boot=C2=A0dir=C2=A0match=
+=C2=A0with=C2=A0it=C2=A0and=C2=A0remove=C2=A0it.
+>>>
+>>> But=C2=A0it=C2=A0doesn't=C2=A0do=C2=A0that.=C2=A0=C2=A0I=C2=A0tested=C2=
+=A0it.=C2=A0=C2=A0It=C2=A0should=C2=A0be=C2=A0more=C2=A0like=C2=A0what
+>>> rmeove_old_kernel()=C2=A0does:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rm=C2=A0-If=C2=A0vmlinu=
+z-$kernel_ver=C2=A0System.map-$kernel_ver=C2=A0config-$kernel_ver
+>>>
+>>> and=C2=A0if=C2=A0not,=C2=A0please=C2=A0explain=C2=A0why=C2=A0not.
+>> Okay,=C2=A0again=C2=A0some=C2=A0uniformity=C2=A0missing=C2=A0in=C2=A0the=
+=C2=A0code,=C2=A0I=C2=A0would=C2=A0like=C2=A0to=C2=A0your
+>> suggested method,i.e call remove_old_kernel to do the job instead of dep=
+ending=C2=A0on=C2=A0individual=C2=A0kernel.
+>
+>The simplest thing to do is set kernel_version=3D$kernel_ver
+>and then call remove_old_kernel().
+>And set modules_version=3D$modules_dir_name and call remove_old_modules_di=
+r().
+>
+>But it would be cleaner to pass a parameter (kernel_version) to the
+>remove_old_kernel() function and to pass a parameter (modules_dir) to the
+>remove_old_modules_dir() function.
+
+>
+
+Thank you...I have just modified the code and call both the function
+under remove option. BTW I didn't set the extra variable $kernel_ver=20
+name it $kernel_version and instead of $modules_dir_name name it $mo
+dules_version.
+
+Capturing command line parameter in $kernel_version and $modules_version
+
+Is that fine? Here is a code snippet:
+
+ -r | --remove)
+   if [[ $# -ne 3 ]]; then
+    printf "You need to provide kernel version and modules directory
+    name \n"
+    exit 1
+    else
+    remove_old_kernel
+    remove_old_modules_dir
+    fi
 
 
--- 
-~Randy
+I have just test it and it works.
+
+
+And about solitary r option without hypen is ignoring and doing nothing.
+
+Means, if I pass ./scripts/prune-kernel r 5.3.3=20
+
+it simply ignore and does nothing.Only with the hypen it can work.
+
+>--=20
+>~Randy
+>
+Bhaskar
+
+--61jdw2sOBCFtR2d/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl26isgACgkQsjqdtxFL
+KRVyXAf/ebHDm+R5TuyyrwcURHxUYZQ+vAAH5KziMSdZy7E6XMrQoRX3bmOrUsfd
+FQ7ew7Ol3rC6kmHRAVIi60Eqkanyo7ocjwQnrKMAJR7Uxx52HJz+/UBDLpy2xvKL
+rrkzvGAmRUrh/J/Fa2sglYZgdFzRP847eXRjFJEpfLdNldSIbTuBIMrtgIPdh2nP
+xT/ZCJgmn+kVvLd1Z57pWm5tiyJPnNpdjA6ckiWn2xC2uW2NAvA+/COqOb+I/bgu
+DSWu3kLkQncA/SE17PxrlOJyb6RUF3JurM1lnUcF4SaK6IJFhtUgEiqqTo+P9JzH
+If6K9voH/VypHZnbIV9hw9OCd2PHmg==
+=gnFn
+-----END PGP SIGNATURE-----
+
+--61jdw2sOBCFtR2d/--
