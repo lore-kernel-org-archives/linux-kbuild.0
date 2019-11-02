@@ -1,72 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47041 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727372AbfKASwf (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:43154 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726229AbfKBCEo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Nov 2019 14:52:35 -0400
-From: Jeff Moyer <jmoyer@redhat.com>
-Subject: Re: [PATCH 4/4] modpost: do not set ->preloaded for symbols from Module.symvers
-References: <20191003102915.28301-1-yamada.masahiro@socionext.com>
-        <20191003102915.28301-4-yamada.masahiro@socionext.com>
-        <x497e4kluxq.fsf@segfault.boston.devel.redhat.com>
-        <CAK7LNASmpO6Dn2M1DtoCDs=RM+jwW7_tRhq7nqDU1YZWdRafuw@mail.gmail.com>
-Date: Fri, 01 Nov 2019 14:52:27 -0400
-In-Reply-To: <CAK7LNASmpO6Dn2M1DtoCDs=RM+jwW7_tRhq7nqDU1YZWdRafuw@mail.gmail.com>
-        (Masahiro Yamada's message of "Fri, 1 Nov 2019 10:13:10 +0900")
-Message-ID: <x494kznctuc.fsf@segfault.boston.devel.redhat.com>
+        Fri, 1 Nov 2019 22:04:44 -0400
+Subject: Re: [PATCH] scripts:prune-kernel:Removed old kernels and modules dir
+ from system
+References: <20191101080510.26247-1-unixbhaskar@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <180b82ba-f90d-e3de-9ce1-c77a79d014d2@infradead.org>
+Date: Fri, 1 Nov 2019 19:04:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191101080510.26247-1-unixbhaskar@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dan Williams <dan.j.williams@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: bfields@fieldses.org, yamada.masahiro@socionext.com, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+On 11/1/19 1:05 AM, Bhaskar Chowdhury wrote:
+> This patch allow you to remove old kernels and associated modules
+> directory from the system.You can do it at once with the -r flag
+> and interactively with the -i flag.
+> 
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-> On Fri, Nov 1, 2019 at 1:51 AM Jeff Moyer <jmoyer@redhat.com> wrote:
->>
->> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->>
->> > Now that there is no overwrap between symbols from ELF files and
->> > ones from Module.symvers.
->> >
->> > So, the 'exported twice' warning should be reported irrespective
->> > of where the symbol in question came from. Only the exceptional case
->> > is when __crc_<sym> symbol appears before __ksymtab_<sym>. This
->> > typically occurs for EXPORT_SYMBOL in .S files.
->>
->> Hi, Masahiro,
->>
->> After apply this patch, I get the following modpost warnings when doing:
->>
->> $ make M=3Dtools/tesing/nvdimm
->> ...
->>   Building modules, stage 2.
->>   MODPOST 12 modules
->> WARNING: tools/testing/nvdimm/libnvdimm: 'nvdimm_bus_lock' exported
->> twice. Previous export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'nvdimm_bus_unlock'
->> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'is_nvdimm_bus_locked'
->> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'devm_nvdimm_memremap'
->> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'nd_fletcher64' exported twice.=
- Previous export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'to_nd_desc' exported twice. Pr=
-evious export was in drivers/nvdimm/libnvdimm.ko
->> WARNING: tools/testing/nvdimm/libnvdimm: 'to_nvdimm_bus_dev'
->> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
->> ...
->>
->> There are a lot of these warnings.  :)
->
-> These warnings are correct since
-> drivers/nvdimm/Makefile and
-> tools/testing/nvdimm/Kbuild
-> compile the same files.
+Hi Bhaskar,
 
-Yeah, but that's by design.  Is there a way to silence these warnings?
+I think that you are getting a lot closer with this patch, but
+there are still a few issues.  And of course, it's not up to me
+whether the patch is applied.
 
--Jeff
+See below.
+
+> ---
+>  scripts/prune-kernel | 63 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 63 insertions(+)
+> 
+> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
+> index a25aa2160d47..373a845792e6 100755
+> --- a/scripts/prune-kernel
+> +++ b/scripts/prune-kernel
+> @@ -1,3 +1,66 @@
+>  #!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+> +#This script will remove old kernels and modules directory related to it.
+> +# "-h" or "--help" show how to use this script or show without parameter.
+> +#"-r" or "--remove" show how to silently remove old kernel and modules dir.
+> +#"-i" or "--interactive" show how to remove interactively.
+> 
+> +flag=$1
+> +kernel_version=$2
+> +modules_version=$3
+> +boot_dir=/boot
+> +modules_dir=/lib/modules
+> +
+> +remove_old_kernel() {
+> +	cd $boot_dir
+> +	rm -If vmlinuz-$kernel_version System.map-$kernel_version config-$kernel_version
+> +	return 0
+> +}
+> +
+> +remove_old_modules_dir() {
+> +	cd $modules_dir
+> +	rm -rf $modules_version
+> +	return 0
+> +}
+> +
+> +usage() {
+> +	printf "Usage: $(basename $0) [-ri] \n"
+> +	printf "\n -r or --remove  kernel_version modules_version \n"
+> +	printf "\n -i or --interactive do as interactive way \n"
+
+In those 3 printf's, drop the ending space before the \n.
+
+> +	return 0
+> +}
+> +
+> +	case "$flag" in
+> +		-i | --interactive)
+> +			printf "\nEnter kernel version to remove or blank/empty to exit:%s"
+
+Drop the %s - it's not needed.
+
+> +			read kernel_version
+> +			if [[ $kernel_version != "" ]]; then
+> +				remove_old_kernel
+> +				printf "Please give the full modules directory name to remove:%s"
+
+Drop the %s here also.
+
+> +				read modules_version
+> +				if [[ $modules_version != "" ]]; then
+> +					remove_old_modules_dir
+> +					printf "\n\nRemoved kernel version:$kernel_version and associated modules directory:$modules_version ...Done \n"
+> +				else
+> +					exit 1
+> +				fi
+> +			fi
+
+There is still a small problem here: if I enter a kernel_version and then
+remove_old_kernel() is called, and then I enter "" for modules_version,
+the script exits without that printf line.  I guess that it is possible
+that someone only wants to remove the kernel_version files and not the modules.
+
+Perhaps the thing to do is just make the prompts and calls and printf totally
+separate and repeated for kernel_version and modules_version.  Do you see
+what I mean?  or do you have other ideas about this?
+
+> +			;;
+> +		-h | --help)
+> +			usage
+> +			exit 1
+> +			;;
+> +		-r | --remove)
+> +			if [[ $# -ne 3 ]]; then
+> +				printf "You need to provide kernel version and modules directory name \n"
+
+Drop the space before the \n.
+
+> +				exit 1
+> +			else
+> +				remove_old_kernel
+> +				remove_old_modules_dir
+> +			fi
+> +			;;
+> +		*)
+> +			usage
+> +			exit 1
+> +			;;
+> +	esac
+> --
+
+Same comment as before: after applying this patch, the "new" scripts/prune-kernel file
+still contains the previous script's for-loop at the end of the "new" script.
+
+
+-- 
+~Randy
