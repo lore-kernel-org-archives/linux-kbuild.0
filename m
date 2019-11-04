@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f73.google.com ([209.85.221.73]:48707 "EHLO
-        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729061AbfKDO3X (ORCPT
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:49868 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728705AbfKDO25 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Nov 2019 09:29:23 -0500
-Received: by mail-wr1-f73.google.com with SMTP id h4so10497476wrx.15
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Nov 2019 06:29:19 -0800 (PST)
-Date: Mon,  4 Nov 2019 15:27:45 +0100
+        Mon, 4 Nov 2019 09:28:57 -0500
+Received: by mail-vk1-f202.google.com with SMTP id v71so7948809vkd.16
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Nov 2019 06:28:56 -0800 (PST)
+Date: Mon,  4 Nov 2019 15:27:38 +0100
 In-Reply-To: <20191104142745.14722-1-elver@google.com>
-Message-Id: <20191104142745.14722-10-elver@google.com>
+Message-Id: <20191104142745.14722-3-elver@google.com>
 Mime-Version: 1.0
 References: <20191104142745.14722-1-elver@google.com>
-Subject: [PATCH v3 9/9] x86, kcsan: Enable KCSAN for x86
+Subject: [PATCH v3 2/9] kcsan: Add Documentation entry in dev-tools
 From: Marco Elver <elver@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,215 +19,254 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: elver@google.com
 Cc: akiyks@gmail.com, stern@rowland.harvard.edu, glider@google.com, parri.andrea@gmail.com, andreyknvl@google.com, luto@kernel.org, ard.biesheuvel@linaro.org, arnd@arndb.de, boqun.feng@gmail.com, bp@alien8.de, dja@axtens.net, dlustig@nvidia.com, dave.hansen@linux.intel.com, dhowells@redhat.com, dvyukov@google.com, hpa@zytor.com, mingo@redhat.com, j.alglave@ucl.ac.uk, joel@joelfernandes.org, corbet@lwn.net, jpoimboe@redhat.com, luc.maranget@inria.fr, mark.rutland@arm.com, npiggin@gmail.com, paulmck@kernel.org, peterz@infradead.org, tglx@linutronix.de, will@kernel.org, kasan-dev@googlegroups.com, linux-arch@vger.kernel.org, linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org
 
-This patch enables KCSAN for x86, with updates to build rules to not use
-KCSAN for several incompatible compilation units.
-
 Signed-off-by: Marco Elver <elver@google.com>
 ---
 v3:
-* Moved EFI stub build exception hunk to generic build exception patch,
-  since it's not x86-specific.
-
-v2:
-* Document build exceptions where no previous above comment explained
-  why we cannot instrument.
+* Split Documentation into separate patch.
+* Fix typos.
+* Accuracy: refer to unsoundness/completeness.
+* Update with new slow-down after optimizations.
+* Add Alternatives Considered section and move KTSAN mentions there.
 ---
- arch/x86/Kconfig                  | 1 +
- arch/x86/boot/Makefile            | 2 ++
- arch/x86/boot/compressed/Makefile | 2 ++
- arch/x86/entry/vdso/Makefile      | 3 +++
- arch/x86/include/asm/bitops.h     | 6 +++++-
- arch/x86/kernel/Makefile          | 7 +++++++
- arch/x86/kernel/cpu/Makefile      | 3 +++
- arch/x86/lib/Makefile             | 4 ++++
- arch/x86/mm/Makefile              | 3 +++
- arch/x86/purgatory/Makefile       | 2 ++
- arch/x86/realmode/Makefile        | 3 +++
- arch/x86/realmode/rm/Makefile     | 3 +++
- 12 files changed, 38 insertions(+), 1 deletion(-)
+ Documentation/dev-tools/index.rst |   1 +
+ Documentation/dev-tools/kcsan.rst | 217 ++++++++++++++++++++++++++++++
+ 2 files changed, 218 insertions(+)
+ create mode 100644 Documentation/dev-tools/kcsan.rst
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index d6e1faa28c58..81859be4a005 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -226,6 +226,7 @@ config X86
- 	select VIRT_TO_BUS
- 	select X86_FEATURE_NAMES		if PROC_FS
- 	select PROC_PID_ARCH_STATUS		if PROC_FS
-+	select HAVE_ARCH_KCSAN if X86_64
- 
- config INSTRUCTION_DECODER
- 	def_bool y
-diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-index e2839b5c246c..9c7942794164 100644
---- a/arch/x86/boot/Makefile
-+++ b/arch/x86/boot/Makefile
-@@ -9,7 +9,9 @@
- # Changed by many, many contributors over the years.
- #
- 
-+# Sanitizer runtimes are unavailable and cannot be linked for early boot code.
- KASAN_SANITIZE			:= n
-+KCSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Kernel does not boot with kcov instrumentation here.
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 6b84afdd7538..a1c248b8439f 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -17,7 +17,9 @@
- #	(see scripts/Makefile.lib size_append)
- #	compressed vmlinux.bin.all + u32 size of vmlinux.bin.all
- 
-+# Sanitizer runtimes are unavailable and cannot be linked for early boot code.
- KASAN_SANITIZE			:= n
-+KCSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
-diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-index 0f2154106d01..a23debaad5b9 100644
---- a/arch/x86/entry/vdso/Makefile
-+++ b/arch/x86/entry/vdso/Makefile
-@@ -10,8 +10,11 @@ ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
- include $(srctree)/lib/vdso/Makefile
- 
- KBUILD_CFLAGS += $(DISABLE_LTO)
+diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tools/index.rst
+index b0522a4dd107..1b756a7014e0 100644
+--- a/Documentation/dev-tools/index.rst
++++ b/Documentation/dev-tools/index.rst
+@@ -21,6 +21,7 @@ whole; patches welcome!
+    kasan
+    ubsan
+    kmemleak
++   kcsan
+    gdb-kernel-debugging
+    kgdb
+    kselftest
+diff --git a/Documentation/dev-tools/kcsan.rst b/Documentation/dev-tools/kcsan.rst
+new file mode 100644
+index 000000000000..bf1093b0c64f
+--- /dev/null
++++ b/Documentation/dev-tools/kcsan.rst
+@@ -0,0 +1,217 @@
++The Kernel Concurrency Sanitizer (KCSAN)
++========================================
 +
-+# Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
-+KCSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
-diff --git a/arch/x86/include/asm/bitops.h b/arch/x86/include/asm/bitops.h
-index 7d1f6a49bfae..ee08917d3d92 100644
---- a/arch/x86/include/asm/bitops.h
-+++ b/arch/x86/include/asm/bitops.h
-@@ -201,8 +201,12 @@ arch_test_and_change_bit(long nr, volatile unsigned long *addr)
- 	return GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(btc), *addr, c, "Ir", nr);
- }
- 
--static __always_inline bool constant_test_bit(long nr, const volatile unsigned long *addr)
-+static __no_kcsan_or_inline bool constant_test_bit(long nr, const volatile unsigned long *addr)
- {
-+	/*
-+	 * Because this is a plain access, we need to disable KCSAN here to
-+	 * avoid double instrumentation via bitops-instrumented.h.
-+	 */
- 	return ((1UL << (nr & (BITS_PER_LONG-1))) &
- 		(addr[nr >> _BITOPS_LONG_SHIFT])) != 0;
- }
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 3578ad248bc9..2aa122d94956 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -28,6 +28,13 @@ KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
- KASAN_SANITIZE_stacktrace.o				:= n
- KASAN_SANITIZE_paravirt.o				:= n
- 
-+# Do not instrument early boot code.
-+KCSAN_SANITIZE_head$(BITS).o				:= n
-+# Do not instrument debug code to avoid corrupting bug reporting.
-+KCSAN_SANITIZE_dumpstack.o				:= n
-+KCSAN_SANITIZE_dumpstack_$(BITS).o			:= n
-+KCSAN_SANITIZE_stacktrace.o				:= n
++Overview
++--------
 +
- OBJECT_FILES_NON_STANDARD_relocate_kernel_$(BITS).o	:= y
- OBJECT_FILES_NON_STANDARD_test_nx.o			:= y
- OBJECT_FILES_NON_STANDARD_paravirt_patch.o		:= y
-diff --git a/arch/x86/kernel/cpu/Makefile b/arch/x86/kernel/cpu/Makefile
-index d7a1e5a9331c..1f1b0edc0187 100644
---- a/arch/x86/kernel/cpu/Makefile
-+++ b/arch/x86/kernel/cpu/Makefile
-@@ -13,6 +13,9 @@ endif
- KCOV_INSTRUMENT_common.o := n
- KCOV_INSTRUMENT_perf_event.o := n
- 
-+# As above, instrumenting secondary CPU boot code causes boot hangs.
-+KCSAN_SANITIZE_common.o := n
++*Kernel Concurrency Sanitizer (KCSAN)* is a dynamic data race detector for
++kernel space. KCSAN is a sampling watchpoint-based data race detector. Key
++priorities in KCSAN's design are lack of false positives, scalability, and
++simplicity. More details can be found in `Implementation Details`_.
 +
- # Make sure load_percpu_segment has no stackprotector
- nostackp := $(call cc-option, -fno-stack-protector)
- CFLAGS_common.o		:= $(nostackp)
-diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-index 5246db42de45..432a07705677 100644
---- a/arch/x86/lib/Makefile
-+++ b/arch/x86/lib/Makefile
-@@ -6,10 +6,14 @@
- # Produces uninteresting flaky coverage.
- KCOV_INSTRUMENT_delay.o	:= n
- 
-+# KCSAN uses udelay for introducing watchpoint delay; avoid recursion.
-+KCSAN_SANITIZE_delay.o := n
++KCSAN uses compile-time instrumentation to instrument memory accesses. KCSAN is
++supported in both GCC and Clang. With GCC it requires version 7.3.0 or later.
++With Clang it requires version 7.0.0 or later.
 +
- # Early boot use of cmdline; don't instrument it
- ifdef CONFIG_AMD_MEM_ENCRYPT
- KCOV_INSTRUMENT_cmdline.o := n
- KASAN_SANITIZE_cmdline.o  := n
-+KCSAN_SANITIZE_cmdline.o  := n
- 
- ifdef CONFIG_FUNCTION_TRACER
- CFLAGS_REMOVE_cmdline.o = -pg
-diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
-index 84373dc9b341..ee871602f96a 100644
---- a/arch/x86/mm/Makefile
-+++ b/arch/x86/mm/Makefile
-@@ -7,6 +7,9 @@ KCOV_INSTRUMENT_mem_encrypt_identity.o	:= n
- KASAN_SANITIZE_mem_encrypt.o		:= n
- KASAN_SANITIZE_mem_encrypt_identity.o	:= n
- 
-+KCSAN_SANITIZE_mem_encrypt.o		:= n
-+KCSAN_SANITIZE_mem_encrypt_identity.o	:= n
++Usage
++-----
 +
- ifdef CONFIG_FUNCTION_TRACER
- CFLAGS_REMOVE_mem_encrypt.o		= -pg
- CFLAGS_REMOVE_mem_encrypt_identity.o	= -pg
-diff --git a/arch/x86/purgatory/Makefile b/arch/x86/purgatory/Makefile
-index fb4ee5444379..69379bce9574 100644
---- a/arch/x86/purgatory/Makefile
-+++ b/arch/x86/purgatory/Makefile
-@@ -17,7 +17,9 @@ CFLAGS_sha256.o := -D__DISABLE_EXPORTS
- LDFLAGS_purgatory.ro := -e purgatory_start -r --no-undefined -nostdlib -z nodefaultlib
- targets += purgatory.ro
- 
-+# Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE	:= n
-+KCSAN_SANITIZE	:= n
- KCOV_INSTRUMENT := n
- 
- # These are adjustments to the compiler flags used for objects that
-diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
-index 682c895753d9..6b1f3a4eeb44 100644
---- a/arch/x86/realmode/Makefile
-+++ b/arch/x86/realmode/Makefile
-@@ -6,7 +6,10 @@
- # for more details.
- #
- #
++To enable KCSAN configure kernel with::
 +
-+# Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE			:= n
-+KCSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- subdir- := rm
-diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
-index f60501a384f9..fdbbb945c216 100644
---- a/arch/x86/realmode/rm/Makefile
-+++ b/arch/x86/realmode/rm/Makefile
-@@ -6,7 +6,10 @@
- # for more details.
- #
- #
++    CONFIG_KCSAN = y
 +
-+# Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE			:= n
-+KCSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
++KCSAN provides several other configuration options to customize behaviour (see
++their respective help text for more info).
++
++debugfs
++~~~~~~~
++
++* The file ``/sys/kernel/debug/kcsan`` can be read to get stats.
++
++* KCSAN can be turned on or off by writing ``on`` or ``off`` to
++  ``/sys/kernel/debug/kcsan``.
++
++* Writing ``!some_func_name`` to ``/sys/kernel/debug/kcsan`` adds
++  ``some_func_name`` to the report filter list, which (by default) blacklists
++  reporting data races where either one of the top stackframes are a function
++  in the list.
++
++* Writing either ``blacklist`` or ``whitelist`` to ``/sys/kernel/debug/kcsan``
++  changes the report filtering behaviour. For example, the blacklist feature
++  can be used to silence frequently occurring data races; the whitelist feature
++  can help with reproduction and testing of fixes.
++
++Error reports
++~~~~~~~~~~~~~
++
++A typical data race report looks like this::
++
++    ==================================================================
++    BUG: KCSAN: data-race in generic_permission / kernfs_refresh_inode
++
++    write to 0xffff8fee4c40700c of 4 bytes by task 175 on cpu 4:
++     kernfs_refresh_inode+0x70/0x170
++     kernfs_iop_permission+0x4f/0x90
++     inode_permission+0x190/0x200
++     link_path_walk.part.0+0x503/0x8e0
++     path_lookupat.isra.0+0x69/0x4d0
++     filename_lookup+0x136/0x280
++     user_path_at_empty+0x47/0x60
++     vfs_statx+0x9b/0x130
++     __do_sys_newlstat+0x50/0xb0
++     __x64_sys_newlstat+0x37/0x50
++     do_syscall_64+0x85/0x260
++     entry_SYSCALL_64_after_hwframe+0x44/0xa9
++
++    read to 0xffff8fee4c40700c of 4 bytes by task 166 on cpu 6:
++     generic_permission+0x5b/0x2a0
++     kernfs_iop_permission+0x66/0x90
++     inode_permission+0x190/0x200
++     link_path_walk.part.0+0x503/0x8e0
++     path_lookupat.isra.0+0x69/0x4d0
++     filename_lookup+0x136/0x280
++     user_path_at_empty+0x47/0x60
++     do_faccessat+0x11a/0x390
++     __x64_sys_access+0x3c/0x50
++     do_syscall_64+0x85/0x260
++     entry_SYSCALL_64_after_hwframe+0x44/0xa9
++
++    Reported by Kernel Concurrency Sanitizer on:
++    CPU: 6 PID: 166 Comm: systemd-journal Not tainted 5.3.0-rc7+ #1
++    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
++    ==================================================================
++
++The header of the report provides a short summary of the functions involved in
++the race. It is followed by the access types and stack traces of the 2 threads
++involved in the data race.
++
++The other less common type of data race report looks like this::
++
++    ==================================================================
++    BUG: KCSAN: data-race in e1000_clean_rx_irq+0x551/0xb10
++
++    race at unknown origin, with read to 0xffff933db8a2ae6c of 1 bytes by interrupt on cpu 0:
++     e1000_clean_rx_irq+0x551/0xb10
++     e1000_clean+0x533/0xda0
++     net_rx_action+0x329/0x900
++     __do_softirq+0xdb/0x2db
++     irq_exit+0x9b/0xa0
++     do_IRQ+0x9c/0xf0
++     ret_from_intr+0x0/0x18
++     default_idle+0x3f/0x220
++     arch_cpu_idle+0x21/0x30
++     do_idle+0x1df/0x230
++     cpu_startup_entry+0x14/0x20
++     rest_init+0xc5/0xcb
++     arch_call_rest_init+0x13/0x2b
++     start_kernel+0x6db/0x700
++
++    Reported by Kernel Concurrency Sanitizer on:
++    CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.3.0-rc7+ #2
++    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
++    ==================================================================
++
++This report is generated where it was not possible to determine the other
++racing thread, but a race was inferred due to the data-value of the watched
++memory location having changed. These can occur either due to missing
++instrumentation or e.g. DMA accesses.
++
++Data Races
++----------
++
++Informally, two operations *conflict* if they access the same memory location,
++and at least one of them is a write operation. In an execution, two memory
++operations from different threads form a **data race** if they *conflict*, at
++least one of them is a *plain access* (non-atomic), and they are *unordered* in
++the "happens-before" order according to the `LKMM
++<../../tools/memory-model/Documentation/explanation.txt>`_.
++
++Relationship with the Linux Kernel Memory Model (LKMM)
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++The LKMM defines the propagation and ordering rules of various memory
++operations, which gives developers the ability to reason about concurrent code.
++Ultimately this allows to determine the possible executions of concurrent code,
++and if that code is free from data races.
++
++KCSAN is aware of *atomic* accesses (``READ_ONCE``, ``WRITE_ONCE``,
++``atomic_*``, etc.), but is oblivious of any ordering guarantees. In other
++words, KCSAN assumes that as long as a plain access is not observed to race
++with another conflicting access, memory operations are correctly ordered.
++
++This means that KCSAN will not report *potential* data races due to missing
++memory ordering. If, however, missing memory ordering (that is observable with
++a particular compiler and architecture) leads to an observable data race (e.g.
++entering a critical section erroneously), KCSAN would report the resulting
++data race.
++
++Implementation Details
++----------------------
++
++The general approach is inspired by `DataCollider
++<http://usenix.org/legacy/events/osdi10/tech/full_papers/Erickson.pdf>`_.
++Unlike DataCollider, KCSAN does not use hardware watchpoints, but instead
++relies on compiler instrumentation. Watchpoints are implemented using an
++efficient encoding that stores access type, size, and address in a long; the
++benefits of using "soft watchpoints" are portability and greater flexibility in
++limiting which accesses trigger a watchpoint.
++
++More specifically, KCSAN requires instrumenting plain (unmarked, non-atomic)
++memory operations; for each instrumented plain access:
++
++1. Check if a matching watchpoint exists; if yes, and at least one access is a
++   write, then we encountered a racing access.
++
++2. Periodically, if no matching watchpoint exists, set up a watchpoint and
++   stall for a small delay.
++
++3. Also check the data value before the delay, and re-check the data value
++   after delay; if the values mismatch, we infer a race of unknown origin.
++
++To detect data races between plain and atomic memory operations, KCSAN also
++annotates atomic accesses, but only to check if a watchpoint exists
++(``kcsan_check_atomic_*``); i.e.  KCSAN never sets up a watchpoint on atomic
++accesses.
++
++Key Properties
++~~~~~~~~~~~~~~
++
++1. **Memory Overhead:**  The current implementation uses a small array of longs
++   to encode watchpoint information, which is negligible.
++
++2. **Performance Overhead:** KCSAN's runtime aims to be minimal, using an
++   efficient watchpoint encoding that does not require acquiring any shared
++   locks in the fast-path. For kernel boot on a system with 8 CPUs:
++
++   - 5x slow-down with the default KCSAN config;
++   - 3x slow-down from runtime fast-path overhead only (set very large
++     ``KCSAN_SKIP_WATCH`` and unset ``KCSAN_SKIP_WATCH_RANDOMIZE``).
++
++3. **Annotation Overheads:** Minimal annotations are required outside the KCSAN
++   runtime. As a result, maintenance overheads are minimal as the kernel
++   evolves.
++
++4. **Detects Racy Writes from Devices:** Due to checking data values upon
++   setting up watchpoints, racy writes from devices can also be detected.
++
++5. **Memory Ordering:** KCSAN is *not* explicitly aware of the LKMM's ordering
++   rules; this may result in missed data races (false negatives).
++
++6. **Analysis Accuracy:** For observed executions, due to using a sampling
++   strategy, the analysis is *unsound* (false negatives possible), but aims to
++   be complete (no false positives).
++
++Alternatives Considered
++-----------------------
++
++An alternative data race detection approach for the kernel can be found in
++`Kernel Thread Sanitizer (KTSAN) <https://github.com/google/ktsan/wiki>`_.
++KTSAN is a happens-before data race detector, which explicitly establishes the
++happens-before order between memory operations, which can then be used to
++determine data races as defined in `Data Races`_. To build a correct
++happens-before relation, KTSAN must be aware of all ordering rules of the LKMM
++and synchronization primitives. Unfortunately, any omission leads to false
++positives, which is especially important in the context of the kernel which
++includes numerous custom synchronization mechanisms. Furthermore, KTSAN's
++implementation requires metadata for each memory location (shadow memory);
++currently, for each page, KTSAN requires 4 pages of shadow memory.
 -- 
 2.24.0.rc1.363.gb1bccd3e3d-goog
