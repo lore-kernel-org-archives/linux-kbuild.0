@@ -1,86 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:37776 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727788AbfKDGnn (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41126 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729025AbfKDNMD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Nov 2019 01:43:43 -0500
-Received: by mail-oi1-f195.google.com with SMTP id y194so13179349oie.4
-        for <linux-kbuild@vger.kernel.org>; Sun, 03 Nov 2019 22:43:42 -0800 (PST)
+        Mon, 4 Nov 2019 08:12:03 -0500
+Received: by mail-wr1-f69.google.com with SMTP id u2so4288959wrm.7
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Nov 2019 05:12:00 -0800 (PST)
+From: Matteo Croce <mcroce@redhat.com>
+Subject: [PATCH v2] kbuild: Add make dir-pkg build option
+Date: Mon,  4 Nov 2019 14:11:44 +0100
+Message-Id: <20191104131144.14333-1-mcroce@redhat.com>
 MIME-Version: 1.0
-References: <20191003102915.28301-1-yamada.masahiro@socionext.com>
- <20191003102915.28301-4-yamada.masahiro@socionext.com> <x497e4kluxq.fsf@segfault.boston.devel.redhat.com>
- <CAK7LNASmpO6Dn2M1DtoCDs=RM+jwW7_tRhq7nqDU1YZWdRafuw@mail.gmail.com>
- <x494kznctuc.fsf@segfault.boston.devel.redhat.com> <CAK7LNAQnaBCkRCsRPjK9m6wLaDvTsgkiFgMEiObnfuncxOHZOg@mail.gmail.com>
-In-Reply-To: <CAK7LNAQnaBCkRCsRPjK9m6wLaDvTsgkiFgMEiObnfuncxOHZOg@mail.gmail.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Sun, 3 Nov 2019 22:43:31 -0800
-Message-ID: <CAPcyv4gFO=4EmObucuYyPNCS91y1H7d-M=0LebBK72YuD=ekNQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] modpost: do not set ->preloaded for symbols from Module.symvers
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Jeff Moyer <jmoyer@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Sun, Nov 3, 2019 at 7:12 PM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> On Sat, Nov 2, 2019 at 3:52 AM Jeff Moyer <jmoyer@redhat.com> wrote:
-> >
-> > Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> >
-> > > On Fri, Nov 1, 2019 at 1:51 AM Jeff Moyer <jmoyer@redhat.com> wrote:
-> > >>
-> > >> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-> > >>
-> > >> > Now that there is no overwrap between symbols from ELF files and
-> > >> > ones from Module.symvers.
-> > >> >
-> > >> > So, the 'exported twice' warning should be reported irrespective
-> > >> > of where the symbol in question came from. Only the exceptional case
-> > >> > is when __crc_<sym> symbol appears before __ksymtab_<sym>. This
-> > >> > typically occurs for EXPORT_SYMBOL in .S files.
-> > >>
-> > >> Hi, Masahiro,
-> > >>
-> > >> After apply this patch, I get the following modpost warnings when doing:
-> > >>
-> > >> $ make M=tools/tesing/nvdimm
-> > >> ...
-> > >>   Building modules, stage 2.
-> > >>   MODPOST 12 modules
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'nvdimm_bus_lock' exported
-> > >> twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'nvdimm_bus_unlock'
-> > >> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'is_nvdimm_bus_locked'
-> > >> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'devm_nvdimm_memremap'
-> > >> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'nd_fletcher64' exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'to_nd_desc' exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> WARNING: tools/testing/nvdimm/libnvdimm: 'to_nvdimm_bus_dev'
-> > >> exported twice. Previous export was in drivers/nvdimm/libnvdimm.ko
-> > >> ...
-> > >>
-> > >> There are a lot of these warnings.  :)
-> > >
-> > > These warnings are correct since
-> > > drivers/nvdimm/Makefile and
-> > > tools/testing/nvdimm/Kbuild
-> > > compile the same files.
-> >
-> > Yeah, but that's by design.  Is there a way to silence these warnings?
-> >
-> > -Jeff
-> >
->
-> "rm -f Module.symvers; make M=tools/testing/nvdimm" ?
->
-> I'd like the _design_ fixed though.
+Add a 'dir-pkg' target which just creates the same directory structures
+as in tar-pkg, but doesn't package anything.
+Useful when the user wants to copy the kernel tree on a machine using
+ssh, rsync or whatever.
 
-This design is deliberate. The goal is to re-build the typical nvdimm
-modules, but link them against mocked version of core kernel symbols.
-This enables the nvdimm unit tests which have been there for years and
-pre-date Kunit. That said, deleting Module.symvers seems a simple
-enough workaround.
+Signed-off-by: Matteo Croce <mcroce@redhat.com>
+---
+ scripts/Makefile.package | 3 ++-
+ scripts/package/buildtar | 8 ++++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+index 56eadcc48d46..36600ad1d5e6 100644
+--- a/scripts/Makefile.package
++++ b/scripts/Makefile.package
+@@ -103,7 +103,7 @@ snap-pkg:
+=20
+ # tarball targets
+ # ------------------------------------------------------------------------=
+---
+-tar-pkgs :=3D tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
++tar-pkgs :=3D dir-pkg tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
+ PHONY +=3D $(tar-pkgs)
+ $(tar-pkgs):
+ =09$(MAKE) -f $(srctree)/Makefile
+@@ -147,6 +147,7 @@ help:
+ =09@echo '  deb-pkg             - Build both source and binary deb kernel =
+packages'
+ =09@echo '  bindeb-pkg          - Build only the binary kernel deb package=
+'
+ =09@echo '  snap-pkg            - Build only the binary kernel snap packag=
+e (will connect to external hosts)'
++=09@echo '  dir-pkg             - Build the kernel as a plain directory st=
+ructure'
+ =09@echo '  tar-pkg             - Build the kernel as an uncompressed tarb=
+all'
+ =09@echo '  targz-pkg           - Build the kernel as a gzip compressed ta=
+rball'
+ =09@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed t=
+arball'
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index 2f66c81e4021..77c7caefede1 100755
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -2,7 +2,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+=20
+ #
+-# buildtar 0.0.4
++# buildtar 0.0.5
+ #
+ # (C) 2004-2006 by Jan-Benedict Glaw <jbglaw@lug-owl.de>
+ #
+@@ -24,7 +24,7 @@ tarball=3D"${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+ # Figure out how to compress, if requested at all
+ #
+ case "${1}" in
+-=09tar-pkg)
++=09dir-pkg|tar-pkg)
+ =09=09opts=3D
+ =09=09;;
+ =09targz-pkg)
+@@ -125,6 +125,10 @@ case "${ARCH}" in
+ =09=09;;
+ esac
+=20
++if [ "${1}" =3D dir-pkg ]; then
++=09echo "Kernel tree successfully created in $tmpdir"
++=09exit 0
++fi
+=20
+ #
+ # Create the tarball
+--=20
+2.23.0
