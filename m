@@ -1,136 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39669 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390159AbfKEQhS (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54539 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390885AbfKETZE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Nov 2019 11:37:18 -0500
-Received: by mail-wm1-f68.google.com with SMTP id t26so16797250wmi.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Nov 2019 08:37:16 -0800 (PST)
-Date: Tue, 5 Nov 2019 16:37:14 +0000
-From: Matthias Maennich <maennich@google.com>
-Subject: Re: [PATCH 1/4] modpost: do not invoke extra modpost for nsdeps
-Message-ID: <20191105163714.GC73159@google.com>
-References: <20191029123809.29301-1-yamada.masahiro@socionext.com>
- <20191029123809.29301-2-yamada.masahiro@socionext.com>
+        Tue, 5 Nov 2019 14:25:04 -0500
+Received: by mail-lj1-f198.google.com with SMTP id d5so4541023ljj.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Nov 2019 11:25:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191029123809.29301-2-yamada.masahiro@socionext.com>
+References: <20191104131144.14333-1-mcroce@redhat.com>
+In-Reply-To: <20191104131144.14333-1-mcroce@redhat.com>
+From: Matteo Croce <mcroce@redhat.com>
+Date: Tue, 5 Nov 2019 20:24:23 +0100
+Message-ID: <CAGnkfhzdHWS8-FLPpAsma8ZeszkAujKAtfDcqLvNY7n__fz=4Q@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Add make dir-pkg build option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Jessica Yu <jeyu@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, Oct 29, 2019 at 09:38:06PM +0900, Masahiro Yamada wrote:
->'make nsdeps' invokes the modpost three times at most; before linking
->vmlinux, before building modules, and finally for generating .ns_deps
->files. Running the modpost again and again is annoying.
+On Mon, Nov 4, 2019 at 2:11 PM Matteo Croce <mcroce@redhat.com> wrote:
 >
->The last two can be unified. When the -d option is given, the modpost
->still does the usual job, and in addition, generates .ns_deps files.
+> Add a 'dir-pkg' target which just creates the same directory structures
+> as in tar-pkg, but doesn't package anything.
+> Useful when the user wants to copy the kernel tree on a machine using
+> ssh, rsync or whatever.
 >
->Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->---
+> Signed-off-by: Matteo Croce <mcroce@redhat.com>
 
-That is a very nice simplification of `make nsdeps`. Thanks!
+Hi Masahiro,
 
-Tested-by: Matthias Maennich <maennich@google.com>
-Reviewed-by: Matthias Maennich <maennich@google.com>
+here there is the v2 with that nit addressed :)
 
-Cheers,
-Matthias
-
->
-> Makefile                 | 5 ++---
-> scripts/Makefile.modpost | 8 +++-----
-> scripts/mod/modpost.c    | 9 ++-------
-> 3 files changed, 7 insertions(+), 15 deletions(-)
->
->diff --git a/Makefile b/Makefile
->index 4f4d8979bfce..0ef897fd9cfd 100644
->--- a/Makefile
->+++ b/Makefile
->@@ -1682,10 +1682,9 @@ tags TAGS cscope gtags: FORCE
-> # ---------------------------------------------------------------------------
->
-> PHONY += nsdeps
->-
->+nsdeps: export KBUILD_NSDEPS=1
-> nsdeps: modules
->-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost nsdeps
->-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/$@
->+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/nsdeps
->
-> # Scripts to check various things for consistency
-> # ---------------------------------------------------------------------------
->diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
->index 01c0a992d293..c9757b20b048 100644
->--- a/scripts/Makefile.modpost
->+++ b/scripts/Makefile.modpost
->@@ -53,8 +53,7 @@ MODPOST = scripts/mod/modpost						\
-> 	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))	\
-> 	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))			\
-> 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)			\
->-	$(if $(KBUILD_MODPOST_WARN),-w)					\
->-	$(if $(filter nsdeps,$(MAKECMDGOALS)),-d)
->+	$(if $(KBUILD_MODPOST_WARN),-w)
->
-> ifdef MODPOST_VMLINUX
->
->@@ -66,7 +65,8 @@ __modpost:
->
-> else
->
->-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T -
->+MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T - \
->+	$(if $(KBUILD_NSDEPS),-d)
->
-> ifeq ($(KBUILD_EXTMOD),)
-> MODPOST += $(wildcard vmlinux)
->@@ -97,8 +97,6 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
-> 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modfinal
-> endif
->
->-nsdeps: __modpost
->-
-> endif
->
-> .PHONY: $(PHONY)
->diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
->index 26ba97245576..dcd90d563ce8 100644
->--- a/scripts/mod/modpost.c
->+++ b/scripts/mod/modpost.c
->@@ -2221,8 +2221,7 @@ static int check_exports(struct module *mod)
-> 			add_namespace(&mod->required_namespaces,
-> 				      exp->namespace);
->
->-			if (!write_namespace_deps &&
->-			    !module_imports_namespace(mod, exp->namespace)) {
->+			if (!module_imports_namespace(mod, exp->namespace)) {
-> 				warn("module %s uses symbol %s from namespace %s, but does not import it.\n",
-> 				     basename, exp->name, exp->namespace);
-> 			}
->@@ -2641,8 +2640,6 @@ int main(int argc, char **argv)
->
-> 		err |= check_modname_len(mod);
-> 		err |= check_exports(mod);
->-		if (write_namespace_deps)
->-			continue;
->
-> 		add_header(&buf, mod);
-> 		add_intree_flag(&buf, !external_module);
->@@ -2657,10 +2654,8 @@ int main(int argc, char **argv)
-> 		write_if_changed(&buf, fname);
-> 	}
->
->-	if (write_namespace_deps) {
->+	if (write_namespace_deps)
-> 		write_namespace_deps_files();
->-		return 0;
->-	}
->
-> 	if (dump_write)
-> 		write_dump(dump_write);
->-- 
->2.17.1
->
+Regards,
+--=20
+Matteo Croce
+per aspera ad upstream
