@@ -1,96 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:29798 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730274AbfKFCOJ (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:63832 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730649AbfKFCPh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Nov 2019 21:14:09 -0500
+        Tue, 5 Nov 2019 21:15:37 -0500
 MIME-Version: 1.0
-References: <20191104131144.14333-1-mcroce@redhat.com>
-In-Reply-To: <20191104131144.14333-1-mcroce@redhat.com>
+References: <20191104221008.30078-1-labbott@redhat.com>
+In-Reply-To: <20191104221008.30078-1-labbott@redhat.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 6 Nov 2019 11:13:18 +0900
-Message-ID: <CAK7LNATmSxVkmoepVugds0x0fU+N=xE20Pfb28FG_eUb7XwoMA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: Add make dir-pkg build option
+Date: Wed, 6 Nov 2019 11:14:42 +0900
+Message-ID: <CAK7LNAR9+S6+7RYCgTXHt+au6KuiULutk=ohNdjzWsmLZ2fiFg@mail.gmail.com>
+Subject: Re: [PATCHv2] kconfig: Add option to get the full help text with listnewconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matteo Croce <mcroce@redhat.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Laura Abbott <labbott@redhat.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jeremy Cline <jcline@redhat.com>, Don Zickus <dzickus@redhat.com>, Randy Dunlap <rdunlap@infradead.org>
 
-On Mon, Nov 4, 2019 at 10:12 PM Matteo Croce <mcroce@redhat.com> wrote:
+On Tue, Nov 5, 2019 at 7:13 AM Laura Abbott <labbott@redhat.com> wrote:
 >
-> Add a 'dir-pkg' target which just creates the same directory structures
-> as in tar-pkg, but doesn't package anything.
-> Useful when the user wants to copy the kernel tree on a machine using
-> ssh, rsync or whatever.
+> make listnewconfig will list the individual options that need to be set.
+> This is useful but there's no easy way to get the help text associated
+> with the options at the same time. Introduce a new targe
+> 'make helpnewconfig' which lists the full help text of all the
+> new options as well. This makes it easier to automatically generate
+> changes that are easy for humans to review. This command also adds
+> markers between each option for easier parsing.
 >
-> Signed-off-by: Matteo Croce <mcroce@redhat.com>
+> Signed-off-by: Laura Abbott <labbott@redhat.com>
 > ---
+> v2: Dropped rfc tag, renamed extendedlistnewconfig -> helpnewconfig.
+> Added another missing help text.
 
 Applied to linux-kbuild.
 Thanks.
 
 
->  scripts/Makefile.package | 3 ++-
->  scripts/package/buildtar | 8 ++++++--
->  2 files changed, 8 insertions(+), 3 deletions(-)
+
+> ---
+>  scripts/kconfig/Makefile |  5 ++++-
+>  scripts/kconfig/conf.c   | 13 ++++++++++++-
+>  2 files changed, 16 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-> index 56eadcc48d46..36600ad1d5e6 100644
-> --- a/scripts/Makefile.package
-> +++ b/scripts/Makefile.package
-> @@ -103,7 +103,7 @@ snap-pkg:
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index ef2f2336c469..71a956cec64a 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -66,7 +66,9 @@ localyesconfig localmodconfig: $(obj)/conf
+>  #  syncconfig has become an internal implementation detail and is now
+>  #  deprecated for external use
+>  simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
+> -       alldefconfig randconfig listnewconfig olddefconfig syncconfig
+> +       alldefconfig randconfig listnewconfig olddefconfig syncconfig \
+> +       helpnewconfig
+> +
+>  PHONY += $(simple-targets)
 >
->  # tarball targets
->  # ---------------------------------------------------------------------------
-> -tar-pkgs := tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
-> +tar-pkgs := dir-pkg tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
->  PHONY += $(tar-pkgs)
->  $(tar-pkgs):
->         $(MAKE) -f $(srctree)/Makefile
-> @@ -147,6 +147,7 @@ help:
->         @echo '  deb-pkg             - Build both source and binary deb kernel packages'
->         @echo '  bindeb-pkg          - Build only the binary kernel deb package'
->         @echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
-> +       @echo '  dir-pkg             - Build the kernel as a plain directory structure'
->         @echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
->         @echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
->         @echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-> index 2f66c81e4021..77c7caefede1 100755
-> --- a/scripts/package/buildtar
-> +++ b/scripts/package/buildtar
-> @@ -2,7 +2,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->
->  #
-> -# buildtar 0.0.4
-> +# buildtar 0.0.5
->  #
->  # (C) 2004-2006 by Jan-Benedict Glaw <jbglaw@lug-owl.de>
->  #
-> @@ -24,7 +24,7 @@ tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
->  # Figure out how to compress, if requested at all
->  #
->  case "${1}" in
-> -       tar-pkg)
-> +       dir-pkg|tar-pkg)
->                 opts=
->                 ;;
->         targz-pkg)
-> @@ -125,6 +125,10 @@ case "${ARCH}" in
->                 ;;
->  esac
->
-> +if [ "${1}" = dir-pkg ]; then
-> +       echo "Kernel tree successfully created in $tmpdir"
-> +       exit 0
-> +fi
->
->  #
->  # Create the tarball
+>  $(simple-targets): $(obj)/conf
+> @@ -134,6 +136,7 @@ help:
+>         @echo  '  alldefconfig    - New config with all symbols set to default'
+>         @echo  '  randconfig      - New config with random answer to all options'
+>         @echo  '  listnewconfig   - List new options'
+> +       @echo  '  helpnewconfig   - List new options and help text'
+>         @echo  '  olddefconfig    - Same as oldconfig but sets new symbols to their'
+>         @echo  '                    default value without prompting'
+>         @echo  '  kvmconfig       - Enable additional options for kvm guest kernel support'
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 40e16e871ae2..1f89bf1558ce 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -32,6 +32,7 @@ enum input_mode {
+>         defconfig,
+>         savedefconfig,
+>         listnewconfig,
+> +       helpnewconfig,
+>         olddefconfig,
+>  };
+>  static enum input_mode input_mode = oldaskconfig;
+> @@ -434,6 +435,11 @@ static void check_conf(struct menu *menu)
+>                                                 printf("%s%s=%s\n", CONFIG_, sym->name, str);
+>                                         }
+>                                 }
+> +                       } else if (input_mode == helpnewconfig) {
+> +                               printf("-----\n");
+> +                               print_help(menu);
+> +                               printf("-----\n");
+> +
+>                         } else {
+>                                 if (!conf_cnt++)
+>                                         printf("*\n* Restart config...\n*\n");
+> @@ -459,6 +465,7 @@ static struct option long_opts[] = {
+>         {"alldefconfig",    no_argument,       NULL, alldefconfig},
+>         {"randconfig",      no_argument,       NULL, randconfig},
+>         {"listnewconfig",   no_argument,       NULL, listnewconfig},
+> +       {"helpnewconfig",   no_argument,       NULL, helpnewconfig},
+>         {"olddefconfig",    no_argument,       NULL, olddefconfig},
+>         {NULL, 0, NULL, 0}
+>  };
+> @@ -469,6 +476,7 @@ static void conf_usage(const char *progname)
+>         printf("Usage: %s [-s] [option] <kconfig-file>\n", progname);
+>         printf("[option] is _one_ of the following:\n");
+>         printf("  --listnewconfig         List new options\n");
+> +       printf("  --helpnewconfig         List new options and help text\n");
+>         printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
+>         printf("  --oldconfig             Update a configuration using a provided .config as base\n");
+>         printf("  --syncconfig            Similar to oldconfig but generates configuration in\n"
+> @@ -543,6 +551,7 @@ int main(int ac, char **av)
+>                 case allmodconfig:
+>                 case alldefconfig:
+>                 case listnewconfig:
+> +               case helpnewconfig:
+>                 case olddefconfig:
+>                         break;
+>                 case '?':
+> @@ -576,6 +585,7 @@ int main(int ac, char **av)
+>         case oldaskconfig:
+>         case oldconfig:
+>         case listnewconfig:
+> +       case helpnewconfig:
+>         case olddefconfig:
+>                 conf_read(NULL);
+>                 break;
+> @@ -657,6 +667,7 @@ int main(int ac, char **av)
+>                 /* fall through */
+>         case oldconfig:
+>         case listnewconfig:
+> +       case helpnewconfig:
+>         case syncconfig:
+>                 /* Update until a loop caused no more changes */
+>                 do {
+> @@ -675,7 +686,7 @@ int main(int ac, char **av)
+>                                 defconfig_file);
+>                         return 1;
+>                 }
+> -       } else if (input_mode != listnewconfig) {
+> +       } else if (input_mode != listnewconfig && input_mode != helpnewconfig) {
+>                 if (!no_conf_write && conf_write(NULL)) {
+>                         fprintf(stderr, "\n*** Error during writing of the configuration.\n\n");
+>                         exit(1);
 > --
-> 2.23.0
+> 2.21.0
 >
 
 
