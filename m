@@ -1,87 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:34306 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729784AbfKFEml (ORCPT
+Received: from mail-io1-f67.google.com ([209.85.166.67]:39267 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725616AbfKFFam (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Nov 2019 23:42:41 -0500
-Date: Wed, 6 Nov 2019 10:12:26 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] scripts:prune-kernel:remove old kernels and modules dir
- from system
-Message-ID: <20191106044223.GA18076@Gentoo>
-References: <20191102063036.28601-1-unixbhaskar@gmail.com>
- <50680c37-9e85-0050-c1e1-700260a0471c@infradead.org>
- <20191105023243.GA16635@fieldses.org>
- <CAK7LNARAgOEnMRYAyzbvJ-xZzFfwOMckxb=bW0-E+P1HYu5nhA@mail.gmail.com>
- <20191106043120.GB6355@fieldses.org>
+        Wed, 6 Nov 2019 00:30:42 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="1yeeQ81UyVL57Vl7"
-Content-Disposition: inline
-In-Reply-To: <20191106043120.GB6355@fieldses.org>
+References: <20191106033610.29841-1-unixbhaskar@gmail.com>
+In-Reply-To: <20191106033610.29841-1-unixbhaskar@gmail.com>
+From: Alexander Kapshuk <alexander.kapshuk@gmail.com>
+Date: Wed, 6 Nov 2019 07:30:03 +0200
+Message-ID: <CAJ1xhMXXT9HaZFB2QjB0NCQgc9q6BCnN64Ock1n0Row=jh6aww@mail.gmail.com>
+Subject: [PATCH]scripts:ver_linux:Added Bison and Flex to the checklist
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-
---1yeeQ81UyVL57Vl7
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 23:31 Tue 05 Nov 2019, J. Bruce Fields wrote:
->On Wed, Nov 06, 2019 at 11:53:28AM +0900, Masahiro Yamada wrote:
->> BTW.
->> Bruce,
->> Does the current script expect RHEL or something?
->> I do not see 'new-kernel-pkg' on my Ubuntu machine.
+On Wed, Nov 6, 2019 at 5:36 AM Bhaskar Chowdhury <unixbhaskar@gmail.com> wrote:
 >
->I test on Fedora.  Looks like on recent Fedora that's only provided by
->an rpm "grubby-deprecated", which is an inauspicious name....
+> As Masahiro pointed out ,only add Bison and Flex to the checklist.
 >
->I think maybe you're supposed to use "grubby" itself now.  Do you have
->that?
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+> ---
+>  scripts/ver_linux | 2 ++
+>  1 file changed, 2 insertions(+)
 >
->> It would still work with 'new-kernel-pkg: command not found'
->> warning.
->>=20
->> We could bypass it if we like.
->>=20
->> command -v new-kernel-pkg && new-kernel-pkg --remove $f
+> diff --git a/scripts/ver_linux b/scripts/ver_linux
+> index 810e608baa24..85005d6b7f10 100755
+> --- a/scripts/ver_linux
+> +++ b/scripts/ver_linux
+> @@ -32,6 +32,8 @@ BEGIN {
+>         printversion("PPP", version("pppd --version"))
+>         printversion("Isdn4k-utils", version("isdnctrl"))
+>         printversion("Nfs-utils", version("showmount --version"))
+> +       printversion("Bison", version("bison --version"))
+> +       printversion("Flex", version("flex --version"))
 >
->Looks like it's what updates the grub configuration, which is probably a
->nice thing to do if you can.
+>         while (getline <"/proc/self/maps" > 0) {
+>                 if (/libc.*\.so$/) {
+> --
+> 2.23.0
 >
->--b.
 
-Bruce,
-
-Two things,
-
-If the system doesn't run grub , how the fallback policy???
-
-This binary "new-kernel-pkg" also missing in other systems too...I can
-confirm that... i.e gentoo,slackware,
-
-So , you are only targeting the rpm based system????=20
-
-~
-Bhaskar
-
---1yeeQ81UyVL57Vl7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3CTykACgkQsjqdtxFL
-KRWY0Qf+OSbac++mWERchiwDUMOUyNUaoVi0cAGXnvWNdGZfWhHQVcEDkCZzWzrz
-vdWhgESith3kZHDQ4Mp++SqWl7Ps8vj1qZob+d9DFnma9LL/4OP5SobjAVsOlfkt
-j33vf8kcAzfbVmmB9qojTQ1jxRcdSGVCyBpjQtmxJZd5juYR6SRsgZblVLAZkIrh
-QxdaQEVqokbsrwi02XXeL8cBo1JWLm8g0ININYHGT4Vw/H0MdJgB0wFMobl0E1Pj
-5gwn+LJGtBNh9RJOnnO4slxA1oxBR+8t92KrEnAMJnYvBe0gu2ggscoJiLJ4hndU
-FGqNjXncYGU2l3hhpqxdtxq2m6N7OQ==
-=hHCq
------END PGP SIGNATURE-----
-
---1yeeQ81UyVL57Vl7--
+Acked-by: Alexander Kapshuk <alexander.kapshuk@gmail.com>
