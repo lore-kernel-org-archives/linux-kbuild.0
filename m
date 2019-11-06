@@ -1,26 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54539 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390885AbfKETZE (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:29798 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730274AbfKFCOJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Nov 2019 14:25:04 -0500
-Received: by mail-lj1-f198.google.com with SMTP id d5so4541023ljj.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Nov 2019 11:25:01 -0800 (PST)
+        Tue, 5 Nov 2019 21:14:09 -0500
 MIME-Version: 1.0
 References: <20191104131144.14333-1-mcroce@redhat.com>
 In-Reply-To: <20191104131144.14333-1-mcroce@redhat.com>
-From: Matteo Croce <mcroce@redhat.com>
-Date: Tue, 5 Nov 2019 20:24:23 +0100
-Message-ID: <CAGnkfhzdHWS8-FLPpAsma8ZeszkAujKAtfDcqLvNY7n__fz=4Q@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 6 Nov 2019 11:13:18 +0900
+Message-ID: <CAK7LNATmSxVkmoepVugds0x0fU+N=xE20Pfb28FG_eUb7XwoMA@mail.gmail.com>
 Subject: Re: [PATCH v2] kbuild: Add make dir-pkg build option
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, LKML <linux-kernel@vger.kernel.org>
+To: Matteo Croce <mcroce@redhat.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Nov 4, 2019 at 2:11 PM Matteo Croce <mcroce@redhat.com> wrote:
+On Mon, Nov 4, 2019 at 10:12 PM Matteo Croce <mcroce@redhat.com> wrote:
 >
 > Add a 'dir-pkg' target which just creates the same directory structures
 > as in tar-pkg, but doesn't package anything.
@@ -28,12 +25,75 @@ On Mon, Nov 4, 2019 at 2:11 PM Matteo Croce <mcroce@redhat.com> wrote:
 > ssh, rsync or whatever.
 >
 > Signed-off-by: Matteo Croce <mcroce@redhat.com>
+> ---
 
-Hi Masahiro,
+Applied to linux-kbuild.
+Thanks.
 
-here there is the v2 with that nit addressed :)
 
-Regards,
---=20
-Matteo Croce
-per aspera ad upstream
+>  scripts/Makefile.package | 3 ++-
+>  scripts/package/buildtar | 8 ++++++--
+>  2 files changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+> index 56eadcc48d46..36600ad1d5e6 100644
+> --- a/scripts/Makefile.package
+> +++ b/scripts/Makefile.package
+> @@ -103,7 +103,7 @@ snap-pkg:
+>
+>  # tarball targets
+>  # ---------------------------------------------------------------------------
+> -tar-pkgs := tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
+> +tar-pkgs := dir-pkg tar-pkg targz-pkg tarbz2-pkg tarxz-pkg
+>  PHONY += $(tar-pkgs)
+>  $(tar-pkgs):
+>         $(MAKE) -f $(srctree)/Makefile
+> @@ -147,6 +147,7 @@ help:
+>         @echo '  deb-pkg             - Build both source and binary deb kernel packages'
+>         @echo '  bindeb-pkg          - Build only the binary kernel deb package'
+>         @echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
+> +       @echo '  dir-pkg             - Build the kernel as a plain directory structure'
+>         @echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+>         @echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+>         @echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+> index 2f66c81e4021..77c7caefede1 100755
+> --- a/scripts/package/buildtar
+> +++ b/scripts/package/buildtar
+> @@ -2,7 +2,7 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>
+>  #
+> -# buildtar 0.0.4
+> +# buildtar 0.0.5
+>  #
+>  # (C) 2004-2006 by Jan-Benedict Glaw <jbglaw@lug-owl.de>
+>  #
+> @@ -24,7 +24,7 @@ tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+>  # Figure out how to compress, if requested at all
+>  #
+>  case "${1}" in
+> -       tar-pkg)
+> +       dir-pkg|tar-pkg)
+>                 opts=
+>                 ;;
+>         targz-pkg)
+> @@ -125,6 +125,10 @@ case "${ARCH}" in
+>                 ;;
+>  esac
+>
+> +if [ "${1}" = dir-pkg ]; then
+> +       echo "Kernel tree successfully created in $tmpdir"
+> +       exit 0
+> +fi
+>
+>  #
+>  # Create the tarball
+> --
+> 2.23.0
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
