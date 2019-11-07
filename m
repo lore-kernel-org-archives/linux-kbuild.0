@@ -1,162 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:36711 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727196AbfKFWjf (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:31178 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726571AbfKGHPO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Nov 2019 17:39:35 -0500
-Date: Thu, 7 Nov 2019 04:09:18 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] scripts:prune-kernel:remove old kernels and modules dir
- from system
-Message-ID: <20191106223918.GB1852@Slackware>
-References: <20191102063036.28601-1-unixbhaskar@gmail.com>
- <50680c37-9e85-0050-c1e1-700260a0471c@infradead.org>
- <20191105023243.GA16635@fieldses.org>
- <CAK7LNARAgOEnMRYAyzbvJ-xZzFfwOMckxb=bW0-E+P1HYu5nhA@mail.gmail.com>
- <20191106043120.GB6355@fieldses.org>
- <20191106044223.GA18076@Gentoo>
- <20191106193010.GG17669@fieldses.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
-Content-Disposition: inline
-In-Reply-To: <20191106193010.GG17669@fieldses.org>
+        Thu, 7 Nov 2019 02:15:14 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 2/2] kbuild: move headers_check rule to usr/include/Makefile
+Date: Thu,  7 Nov 2019 16:14:41 +0900
+Message-Id: <20191107071441.1067-2-yamada.masahiro@socionext.com>
+In-Reply-To: <20191107071441.1067-1-yamada.masahiro@socionext.com>
+References: <20191107071441.1067-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, Jani Nikula <jani.nikula@intel.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
+Currently, some sanity checks for uapi headers are done by
+scripts/headers_check.pl, which is wired up to the 'headers_check'
+target in the top Makefile.
 
---uZ3hkaAS1mZxFaxD
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It is true compiling headers has better test coverage, but there
+are still several headers excluded from the compile test. I like
+to keep headers_check.pl for a while, but we can delete a lot of
+code by moving the build rule to usr/include/Makefile.
 
-On 14:30 Wed 06 Nov 2019, J. Bruce Fields wrote:
->On Wed, Nov 06, 2019 at 10:12:26AM +0530, Bhaskar Chowdhury wrote:
->> On 23:31 Tue 05 Nov 2019, J. Bruce Fields wrote:
->> >On Wed, Nov 06, 2019 at 11:53:28AM +0900, Masahiro Yamada wrote:
->> >>BTW.
->> >>Bruce,
->> >>Does the current script expect RHEL or something?
->> >>I do not see 'new-kernel-pkg' on my Ubuntu machine.
->> >
->> >I test on Fedora.  Looks like on recent Fedora that's only provided by
->> >an rpm "grubby-deprecated", which is an inauspicious name....
->> >
->> >I think maybe you're supposed to use "grubby" itself now.  Do you have
->> >that?
->> >
->> >>It would still work with 'new-kernel-pkg: command not found'
->> >>warning.
->> >>
->> >>We could bypass it if we like.
->> >>
->> >>command -v new-kernel-pkg && new-kernel-pkg --remove $f
->> >
->> >Looks like it's what updates the grub configuration, which is probably a
->> >nice thing to do if you can.
->> >
->> >--b.
->>=20
->> Bruce,
->>=20
->> Two things,
->>=20
->> If the system doesn't run grub , how the fallback policy???
->>=20
->> This binary "new-kernel-pkg" also missing in other systems too...I can
->> confirm that... i.e gentoo,slackware,
->>=20
->> So , you are only targeting the rpm based system????
->
->It's just what I happen to use.  If someone wants to make it work
->elsewhere that'd be great, as long as we don't break what already works.
->
->I think Debian uses grub2-mkconfig?  Might be OK for Fedora too, I
->dunno.
->
->--b.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Okay , thanks for the input. I was trying to write something in
-generalize way , that is why my code spins off.And if you see the
-subject line of my very first attempt to patch written was "removing
-old kernels and modules dir in selective way"... that was it.
+ Makefile                     | 11 +++--------
+ lib/Kconfig.debug            | 11 -----------
+ scripts/Makefile.headersinst | 18 ------------------
+ usr/include/Makefile         |  9 ++++++---
+ 4 files changed, 9 insertions(+), 40 deletions(-)
 
-Now, there are plenty of distros around, not only rpm based one(yes I do
-agree that ,you wrote it while using and testing on it, but that is
-limited in nature),the broader user base might be using something else.
-
-we simply can not restrict it to certain packaging version or several
-packaging versions of selected distros. We are making and building this
-(worth an effort) to make it as generalized as possible.=20
-
-Importantly I was only thinking of people who put the stuff in standard
-places in the FSH and use it. I might be wrong.
-
-As I have said it before, I was no way trying to bypass your work ,but
-it seems very limited in nature to adopted. So trying to widen the
-spectrum.
-
-I am trying to incorporating both the pole, different kind user base in
-mind, like you , who don't like to be prompted for this operation and
-assuming things should go well, and you are right.
-
-On the other hand , I am kinda guy , sometime I need to know what is
-going on, so the prompting.=20
-
-Well, I have never taken into account about modifying the bootloader
-config by looking at your work. Had I been, I would have done it already
-and it would be extremely trivial in nature.
-
-Now, Grub, no doubt it's fantastic piece of software, but complexity
-is paramount with it. Don't you think so???  I HAVE NOTHING AGAINST
-GRUB!
-
-I have personally stops using it for years and using something very
-rudimentary and simple and useful. That is because I know what I am
-doing and my system well.=20
-
-Caveat emptor: that was me, not every one else in the wild. Grub is used
-by the most distro by default,everybody knows it,but certainly not the
-norm.
-
-I would love to give it a stab again and if you better people feel it is
-necessary, but I need some concrete understanding from you,Masahiro and
-Randy(who is helping me actively).
-
-Say, You people might come up ,
-
-We need these :
-
-a)
-b)
-c)=20
-
-and we don't need these:
-
-a)
-b)
-c)
-
-
-My two cents! kindly, flame me with your thoughts.
-
-~Bhaskar
-
---uZ3hkaAS1mZxFaxD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3DS5IACgkQsjqdtxFL
-KRV7Rgf+OMwhspUynXOGPUZfJm3a7pgGlvYmk7wseYUHUHD1binTyLxb77HXYIFZ
-AUpLuLOJYvWkJlfYzUWdrEYfU08+xxt38lp+M7wQgNEY8dBSk9paB++dk7TAnGAS
-FfbDvW+4vOoaw6pooIvdzWCSVe+MrfvX5Fhr59/VzW9iJ/d6NTirTo0MjoKlsgJi
-/6NWndrkD7yl0ARLXJqPT74OsYeTHPxvcPC0Z9EoUZTl+wRGWCDnb0fG065Phoc4
-IU7ndS1AU149FyPQxON/SfrA39CtlzSs76kcaoyJwFmF1faAmFZWboZa5R0NxjXB
-/3FGNxq/s6LJGTwOTRlj87zaryftuQ==
-=amex
------END PGP SIGNATURE-----
-
---uZ3hkaAS1mZxFaxD--
+diff --git a/Makefile b/Makefile
+index 225884bd0d86..778f92e58020 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1192,19 +1192,15 @@ headers: $(version_h) scripts_unifdef uapi-asm-generic archheaders archscripts
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi
+ 
++# Deprecated. It is no-op now.
+ PHONY += headers_check
+-headers_check: headers
+-	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
+-	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi HDRCHECK=1
++headers_check:
++	@:
+ 
+ ifdef CONFIG_HEADERS_INSTALL
+ prepare: headers
+ endif
+ 
+-ifdef CONFIG_HEADERS_CHECK
+-all: headers_check
+-endif
+-
+ PHONY += scripts_unifdef
+ scripts_unifdef: scripts_basic
+ 	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
+@@ -1472,7 +1468,6 @@ help:
+ 	@echo  '  versioncheck    - Sanity check on version.h usage'
+ 	@echo  '  includecheck    - Check for duplicate included header files'
+ 	@echo  '  export_report   - List the usages of all exported symbols'
+-	@echo  '  headers_check   - Sanity check on exported headers'
+ 	@echo  '  headerdep       - Detect inclusion cycles in headers'
+ 	@echo  '  coccicheck      - Check with Coccinelle'
+ 	@echo  ''
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 93d97f9b0157..f61d834e02fe 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -299,17 +299,6 @@ config HEADERS_INSTALL
+ 	  user-space program samples. It is also needed by some features such
+ 	  as uapi header sanity checks.
+ 
+-config HEADERS_CHECK
+-	bool "Run sanity checks on uapi headers when building 'all'"
+-	depends on HEADERS_INSTALL
+-	help
+-	  This option will run basic sanity checks on uapi headers when
+-	  building the 'all' target, for example, ensure that they do not
+-	  attempt to include files which were not exported, etc.
+-
+-	  If you're making modifications to header files which are
+-	  relevant for userspace, say 'Y'.
+-
+ config OPTIMIZE_INLINING
+ 	def_bool y
+ 	help
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 1b405a7ed14f..708fbd08a2c5 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -56,9 +56,6 @@ new-dirs      := $(filter-out $(existing-dirs), $(wanted-dirs))
+ $(if $(new-dirs), $(shell mkdir -p $(new-dirs)))
+ 
+ # Rules
+-
+-ifndef HDRCHECK
+-
+ quiet_cmd_install = HDRINST $@
+       cmd_install = $(CONFIG_SHELL) $(srctree)/scripts/headers_install.sh $< $@
+ 
+@@ -81,21 +78,6 @@ existing-headers := $(filter $(old-headers), $(all-headers))
+ 
+ -include $(foreach f,$(existing-headers),$(dir $(f)).$(notdir $(f)).cmd)
+ 
+-else
+-
+-quiet_cmd_check = HDRCHK  $<
+-      cmd_check = $(PERL) $(srctree)/scripts/headers_check.pl $(dst) $(SRCARCH) $<; touch $@
+-
+-check-files := $(addsuffix .chk, $(all-headers))
+-
+-$(check-files): $(dst)/%.chk : $(dst)/% $(srctree)/scripts/headers_check.pl
+-	$(call cmd,check)
+-
+-__headers: $(check-files)
+-	@:
+-
+-endif
+-
+ PHONY += FORCE
+ FORCE:
+ 
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index a7c3e2f81680..604dfdcd6d3c 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -92,11 +92,14 @@ endif
+ # asm-generic/*.h is used by asm/*.h, and should not be included directly
+ header-test- += asm-generic/%
+ 
+-extra-y := $(patsubst %.h,%.hdrtest, $(filter-out $(header-test-), \
+-		$(patsubst $(obj)/%,%, $(shell find $(obj) -name '*.h'))))
++extra-y := $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name '*.h'))
+ 
+ quiet_cmd_hdrtest = HDRTEST $<
+-      cmd_hdrtest = $(CC) $(c_flags) -S -o /dev/null -x c /dev/null -include $<; touch $@
++      cmd_hdrtest = \
++		$(CC) $(c_flags) -S -o /dev/null -x c /dev/null \
++			$(if $(filter-out $(header-test-), $*.h), -include $<); \
++		$(PERL) $(srctree)/scripts/headers_check.pl $(obj) $(SRCARCH) $<; \
++		touch $@
+ 
+ $(obj)/%.hdrtest: $(obj)/%.h FORCE
+ 	$(call if_changed_dep,hdrtest)
+-- 
+2.17.1
