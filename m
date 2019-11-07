@@ -1,61 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:45369 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729047AbfKGOeA (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:62497 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726640AbfKGPFM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Nov 2019 09:34:00 -0500
-From: shile.zhang@linux.alibaba.com
-Subject: [RFC PATCH 0/4] Speed booting by sorting ORC unwind tables at build time
-Date: Thu,  7 Nov 2019 22:32:01 +0800
-Message-Id: <20191107143205.206606-1-shile.zhang@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 7 Nov 2019 10:05:12 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: update compile-test header list for v5.5-rc1
+Date: Fri,  8 Nov 2019 00:04:52 +0900
+Message-Id: <20191107150452.2682-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Josh Poimboeuf <jpoimboe@redhat.com>, x86@kernel.org
-Cc: "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Shile Zhang <shile.zhang@linux.alibaba.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Since commit 707816c8b050 ("netfilter: remove deprecation warnings from
+uapi headers."), you can compile linux/netfilter_ipv4/ipt_LOG.h and
+linux/netfilter_ipv6/ip6t_LOG.h without warnings.
 
-Hi,
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-I found the unwind_init taken long time (more than 90ms) in kernel
-booting, mainly spent on sorting the two ORC unwind tables, orc_unwind
-and orc_unwind_ip.
+ usr/include/Makefile | 4 ----
+ 1 file changed, 4 deletions(-)
 
-I also noticed that this issued has reported and discussed last year:
-https://lkml.org/lkml/2018/10/8/342
-But seems no final solution until now, I tried to sort the ORC tables at
-build time, followed the helpful hints from Josh and Ingo in that thread.
-And mainly referred the implementation of 'sortextable' tool:
-https://lore.kernel.org/linux-mips/1334872799-14589-1-git-send-email-ddaney.cavm@gmail.com/
-
-What I did:
-
-- Add a Kconfig to control build-time sorting or runtime sorting;
-- Referred 'sortextable', create a similar helper tool 'sortorctable',
-  help to sort the ORC unwind tables at vmlinux link process.
-
-One potential improvement is to sort the module ORC tables in future.
-
-Thanks!
-
-Shile Zhang (4):
-  scripts: Add sortorctable to sort ORC unwind tables
-  kbuild: Sort ORC unwind tables in vmlinux link process
-  x86/unwind/orc: Skip sorting if BUILDTIME_ORCTABLE_SORT is configured
-  x86/Kconfig: Add a Kconfig option to sort ORC tables at build time
-
- arch/x86/Kconfig.debug       |   9 ++
- arch/x86/kernel/unwind_orc.c |   2 +
- scripts/.gitignore           |   1 +
- scripts/Makefile             |   2 +
- scripts/link-vmlinux.sh      |  10 ++
- scripts/sortorctable.c       | 246 +++++++++++++++++++++++++++++++++++
- scripts/sortorctable.h       |  25 ++++
- 7 files changed, 295 insertions(+)
- create mode 100644 scripts/sortorctable.c
- create mode 100644 scripts/sortorctable.h
-
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index 57b20f7b6729..3e1adab089a4 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -26,8 +26,6 @@ header-test- += drm/vmwgfx_drm.h
+ header-test- += linux/am437x-vpfe.h
+ header-test- += linux/android/binder.h
+ header-test- += linux/android/binderfs.h
+-header-test-$(CONFIG_CPU_BIG_ENDIAN) += linux/byteorder/big_endian.h
+-header-test-$(CONFIG_CPU_LITTLE_ENDIAN) += linux/byteorder/little_endian.h
+ header-test- += linux/coda.h
+ header-test- += linux/elfcore.h
+ header-test- += linux/errqueue.h
+@@ -36,8 +34,6 @@ header-test- += linux/hdlc/ioctl.h
+ header-test- += linux/ivtv.h
+ header-test- += linux/kexec.h
+ header-test- += linux/matroxfb.h
+-header-test- += linux/netfilter_ipv4/ipt_LOG.h
+-header-test- += linux/netfilter_ipv6/ip6t_LOG.h
+ header-test- += linux/nfc.h
+ header-test- += linux/omap3isp.h
+ header-test- += linux/omapfb.h
 -- 
-2.24.0.rc2
+2.17.1
