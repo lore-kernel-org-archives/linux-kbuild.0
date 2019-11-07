@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:60222 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389190AbfKGOdB (ORCPT
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:40285 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731082AbfKGOdC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Nov 2019 09:33:01 -0500
+        Thu, 7 Nov 2019 09:33:02 -0500
 From: shile.zhang@linux.alibaba.com
-Subject: [RFC PATCH 4/4] x86/Kconfig: Add a Kconfig option to sort ORC tables at build time
-Date: Thu,  7 Nov 2019 22:32:05 +0800
-Message-Id: <20191107143205.206606-5-shile.zhang@linux.alibaba.com>
+Subject: [RFC PATCH 2/4] kbuild: Sort ORC unwind tables in vmlinux link process
+Date: Thu,  7 Nov 2019 22:32:03 +0800
+Message-Id: <20191107143205.206606-3-shile.zhang@linux.alibaba.com>
 In-Reply-To: <20191107143205.206606-1-shile.zhang@linux.alibaba.com>
 References: <20191107143205.206606-1-shile.zhang@linux.alibaba.com>
 MIME-Version: 1.0
@@ -19,33 +19,41 @@ Cc: "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuil
 
 From: Shile Zhang <shile.zhang@linux.alibaba.com>
 
-Add a new Kconfig BUILDTIME_ORCTABLE_SORT to control the ORC unwind
-tables at build time. Select for ORC unwinder on x86_64 by default.
+To sort the ORC unwind tables in vmlinux link process, controlled
+by configure BUILDTIME_ORCTABLE_SORT.
 
 Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
 ---
- arch/x86/Kconfig.debug | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ scripts/link-vmlinux.sh | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/Kconfig.debug b/arch/x86/Kconfig.debug
-index bf9cd83de777..320ff2af4837 100644
---- a/arch/x86/Kconfig.debug
-+++ b/arch/x86/Kconfig.debug
-@@ -335,6 +335,15 @@ config UNWINDER_GUESS
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 06495379fcd8..43fe8c151c8d 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -183,6 +183,11 @@ sortextable()
+ 	${objtree}/scripts/sortextable ${1}
+ }
  
- endchoice
- 
-+config BUILDTIME_ORCTABLE_SORT
-+	bool "Sort ORC unwind tables at build time"
-+	depends on X86_64
-+	depends on UNWINDER_ORC
-+	default y
-+	help
-+	This option enables the build-time sorting for ORC unwind tables. It
-+	can help to speed up kernel boot by skip the runtime sorting.
++sortorctable()
++{
++	${objtree}/scripts/sortorctable ${1}
++}
 +
- config FRAME_POINTER
- 	depends on !UNWINDER_ORC && !UNWINDER_GUESS
- 	bool
+ # Delete output files in case of error
+ cleanup()
+ {
+@@ -303,6 +308,11 @@ if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
+ 	sortextable vmlinux
+ fi
+ 
++if [ -n "${CONFIG_BUILDTIME_ORCTABLE_SORT}" ]; then
++	info SORTORC vmlinux
++	sortorctable vmlinux
++fi
++
+ info SYSMAP System.map
+ mksysmap vmlinux System.map
+ 
 -- 
 2.24.0.rc2
