@@ -1,198 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:45295 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbfKILN7 (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54876 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726281AbfKIMMZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 9 Nov 2019 06:13:59 -0500
-Date: Sat, 9 Nov 2019 16:43:40 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH] scripts:prune-kernel:remove old kernels and modules dir
- from system
-Message-ID: <20191109111335.GA1198@Gentoo>
-References: <20191102063036.28601-1-unixbhaskar@gmail.com>
- <50680c37-9e85-0050-c1e1-700260a0471c@infradead.org>
- <20191105023243.GA16635@fieldses.org>
- <CAK7LNARAgOEnMRYAyzbvJ-xZzFfwOMckxb=bW0-E+P1HYu5nhA@mail.gmail.com>
- <20191106043120.GB6355@fieldses.org>
- <20191106044223.GA18076@Gentoo>
- <20191106193010.GG17669@fieldses.org>
- <20191106223918.GB1852@Slackware>
- <CAK7LNASvoh1k=vw6DOyTXa5xYDYNT5uH-5YWS=_95t9XwfAgTQ@mail.gmail.com>
+        Sat, 9 Nov 2019 07:12:25 -0500
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: [PATCH] kbuild: tell sparse about the $ARCH
+Date: Sat,  9 Nov 2019 13:12:16 +0100
+Message-Id: <20191109121216.61381-1-luc.vanoostenryck@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASvoh1k=vw6DOyTXa5xYDYNT5uH-5YWS=_95t9XwfAgTQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "J. Bruce Fields" <bfields@fieldses.org>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ben Dooks <ben.dooks@codethink.co.uk>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
+Sparse uses the same executable for all archs and uses flags
+like -m64, -mbig-endian or -D__arm__ for arch-specific parameters.
+But Sparse also uses value from the host machine used to build
+Sparse as default value for the target machine.
 
---EeQfGwPcQSOJBaQU
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This works, of course, well for native build but can create
+problems when cross-compiling, like defining both '__i386__'
+and '__arm__' when cross-compiling for arm on a x86-64 machine.
 
-On 16:25 Sat 09 Nov 2019, Masahiro Yamada wrote:
->On Thu, Nov 7, 2019 at 7:39 AM Bhaskar Chowdhury <unixbhaskar@gmail.com> w=
-rote:
->>
->> On 14:30 Wed 06 Nov 2019, J. Bruce Fields wrote:
->> >On Wed, Nov 06, 2019 at 10:12:26AM +0530, Bhaskar Chowdhury wrote:
->> >> On 23:31 Tue 05 Nov 2019, J. Bruce Fields wrote:
->> >> >On Wed, Nov 06, 2019 at 11:53:28AM +0900, Masahiro Yamada wrote:
->> >> >>BTW.
->> >> >>Bruce,
->> >> >>Does the current script expect RHEL or something?
->> >> >>I do not see 'new-kernel-pkg' on my Ubuntu machine.
->> >> >
->> >> >I test on Fedora.  Looks like on recent Fedora that's only provided =
-by
->> >> >an rpm "grubby-deprecated", which is an inauspicious name....
->> >> >
->> >> >I think maybe you're supposed to use "grubby" itself now.  Do you ha=
-ve
->> >> >that?
->> >> >
->> >> >>It would still work with 'new-kernel-pkg: command not found'
->> >> >>warning.
->> >> >>
->> >> >>We could bypass it if we like.
->> >> >>
->> >> >>command -v new-kernel-pkg && new-kernel-pkg --remove $f
->> >> >
->> >> >Looks like it's what updates the grub configuration, which is probab=
-ly a
->> >> >nice thing to do if you can.
->> >> >
->> >> >--b.
->> >>
->> >> Bruce,
->> >>
->> >> Two things,
->> >>
->> >> If the system doesn't run grub , how the fallback policy???
->> >>
->> >> This binary "new-kernel-pkg" also missing in other systems too...I can
->> >> confirm that... i.e gentoo,slackware,
->> >>
->> >> So , you are only targeting the rpm based system????
->> >
->> >It's just what I happen to use.  If someone wants to make it work
->> >elsewhere that'd be great, as long as we don't break what already works.
->> >
->> >I think Debian uses grub2-mkconfig?  Might be OK for Fedora too, I
->> >dunno.
->> >
->> >--b.
->>
->> Okay , thanks for the input. I was trying to write something in
->> generalize way , that is why my code spins off.And if you see the
->> subject line of my very first attempt to patch written was "removing
->> old kernels and modules dir in selective way"... that was it.
->>
->> Now, there are plenty of distros around, not only rpm based one(yes I do
->> agree that ,you wrote it while using and testing on it, but that is
->> limited in nature),the broader user base might be using something else.
->>
->> we simply can not restrict it to certain packaging version or several
->> packaging versions of selected distros. We are making and building this
->> (worth an effort) to make it as generalized as possible.
->>
->> Importantly I was only thinking of people who put the stuff in standard
->> places in the FSH and use it. I might be wrong.
->>
->> As I have said it before, I was no way trying to bypass your work ,but
->> it seems very limited in nature to adopted. So trying to widen the
->> spectrum.
->>
->> I am trying to incorporating both the pole, different kind user base in
->> mind, like you , who don't like to be prompted for this operation and
->> assuming things should go well, and you are right.
->>
->> On the other hand , I am kinda guy , sometime I need to know what is
->> going on, so the prompting.
->>
->> Well, I have never taken into account about modifying the bootloader
->> config by looking at your work. Had I been, I would have done it already
->> and it would be extremely trivial in nature.
->>
->> Now, Grub, no doubt it's fantastic piece of software, but complexity
->> is paramount with it. Don't you think so???  I HAVE NOTHING AGAINST
->> GRUB!
->>
->> I have personally stops using it for years and using something very
->> rudimentary and simple and useful. That is because I know what I am
->> doing and my system well.
->>
->> Caveat emptor: that was me, not every one else in the wild. Grub is used
->> by the most distro by default,everybody knows it,but certainly not the
->> norm.
->>
->> I would love to give it a stab again and if you better people feel it is
->> necessary, but I need some concrete understanding from you,Masahiro and
->> Randy(who is helping me actively).
->>
->> Say, You people might come up ,
->>
->> We need these :
->>
->> a)
->> b)
->> c)
->>
->> and we don't need these:
->>
->> a)
->> b)
->> c)
->>
->>
->> My two cents! kindly, flame me with your thoughts.
->
->
->Honestly, I did not even know this script
->before you submitted the patch.
->
-:)
+Fix this by explicitely telling sparse the target architecture.
 
->I prune stale kernel/modules with my own script,
->and I guess people do similar to meet their demand.
->
-I do the same.
+Reported-by: Ben Dooks <ben.dooks@codethink.co.uk>
+Signed-off-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
->I am not sure how many people are using this.
-Only people who look up in the kernel source scripts directory , nobody
-else for sure.
->If somebody is passionate to improve this script
->in a simple way, that is fine, but
->I do not want to see messy code for covering various use-cases.
-Agreed. That is why need guideline from you people(You, Randy and Bruce
-needs to tell me clearly), like what I mentioned, we can do
-these and we can not do these. I am asking because you people have had more
-exposure ,so might come up with some valid points to build up.
->
->--=20
->Best Regards
->Masahiro Yamada
-
-Thanks,
-Bhaskar
-
---EeQfGwPcQSOJBaQU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3Gn1sACgkQsjqdtxFL
-KRUHLgf9GSEK31oq15304EzgLzR9bG2AUbz4kSTaGdGkX5asV3xbxgzb6J5H8dFw
-TYlG9vyTnYGyN9rl7/w5bOAeTosZpjJjZupBynfhkEoXGS0zf8t3YA2HLG8GLkWE
-u9VkMg35jxH4iMpuFZzihi3ubLfSrjWogK0h3UqckDoxbxtyetTGWigpV8y/mtl0
-j3SpsOHxuz9QLz8oOwYTOWQ8Z/i4aJJvLUHOba0anLWfJ+rgtvGeUufAWFXjaaVi
-mLTnmHtLlwRrx/D6TGRSMJkc/HkmOg8Y7SK370fGlUamD0PeVTV2kWSDmd/PEqyx
-iGh8C875TCgWxvxsAW3Lkb32i9GSJg==
-=agn5
------END PGP SIGNATURE-----
-
---EeQfGwPcQSOJBaQU--
+diff --git a/Makefile b/Makefile
+index 6f54f2f95743..05a8906dde63 100644
+--- a/Makefile
++++ b/Makefile
+@@ -937,6 +937,9 @@ ifeq ($(CONFIG_RELR),y)
+ LDFLAGS_vmlinux	+= --pack-dyn-relocs=relr
+ endif
+ 
++# make the checker run with the right architecture
++CHECKFLAGS += --arch=$(ARCH)
++
+ # insure the checker run with the right endianness
+ CHECKFLAGS += $(if $(CONFIG_CPU_BIG_ENDIAN),-mbig-endian,-mlittle-endian)
+ 
+-- 
+2.24.0
