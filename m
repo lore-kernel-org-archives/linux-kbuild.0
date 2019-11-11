@@ -1,74 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37298 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726811AbfKKOfW (ORCPT
+Received: from forward106p.mail.yandex.net ([77.88.28.109]:55623 "EHLO
+        forward106p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728301AbfKKSnV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Nov 2019 09:35:22 -0500
-Subject: Re: [PATCH] sparc: vdso: Fix build failure seen due to kbuild changes
-References: <20191111011106.18427-1-linux@roeck-us.net>
- <20191110.173203.1243596361382467520.davem@davemloft.net>
- <CAK7LNAQTCyEVKkJQfoTpd5USk5tibmcro6EeoonjXKm-OAFJ_g@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <591a9e5e-1347-8883-c080-38940fffd535@roeck-us.net>
-Date: Mon, 11 Nov 2019 06:35:19 -0800
+        Mon, 11 Nov 2019 13:43:21 -0500
+From: Dmitry Golovin <dima@golovin.in>
+Subject: Re: [PATCH v2] kbuild: support byacc as alternative YACC to bison
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQTCyEVKkJQfoTpd5USk5tibmcro6EeoonjXKm-OAFJ_g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Date: Mon, 11 Nov 2019 20:37:25 +0200
+Message-Id: <17102241573497445@vla1-b2d94eaf2344.qloud-c.yandex.net>
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, David Miller <davem@davemloft.net>
-Cc: sparclinux <sparclinux@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <maz@kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Ethan Sommer <e5ten.arch@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, DTML <devicetree@vger.kernel.org>
 
-On 11/10/19 5:47 PM, Masahiro Yamada wrote:
-> On Mon, Nov 11, 2019 at 10:32 AM David Miller <davem@davemloft.net> wrote:
->>
->> From: Guenter Roeck <linux@roeck-us.net>
->> Date: Sun, 10 Nov 2019 17:11:06 -0800
->>
->>> sparc64:allmodconfig fails to build with the following error.
->>>
->>> unrecognized e_machine 18 arch/sparc/vdso/vdso32/vclock_gettime.o
->>> arch/sparc/vdso/vdso32/vclock_gettime.o: failed
->>> make[2]: *** [arch/sparc/vdso/vdso32/vclock_gettime.o] Error 1
->>> make[2]: *** Deleting file 'arch/sparc/vdso/vdso32/vclock_gettime.o'
->>> make[2]: *** Waiting for unfinished jobs....
->>>
->>> The problem bisects to commit a3de7a72c517 ("kbuild: change
->>> *FLAGS_<basetarget>.o to take the path relative to $(obj)").
->>> Duplicate the x86 specific defines from this commit to the sparc
->>> vdso Makefile to fix the problem.
->>>
->>> Fixes: a3de7a72c517 ("kbuild: change *FLAGS_<basetarget>.o to take the path relative to $(obj)")
->>> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
->>> Cc: Marc Zyngier <maz@kernel.org>
->>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->>
->> Acked-by: David S. Miller <davem@davemloft.net>
+> Hmm, this is unfortunate since there is no common way to
+> specify the header path directly.
 > 
+> I am not sure how much effort we should invent
+> to support non-GNU implementation
+> since we already rely on various GNU tools.
 > 
-> Yeah, I had submitted a fix a long time before.
-> 
-> https://lore.kernel.org/patchwork/patch/1130469/
-> 
-> I do not know why it was not picked up.
-> 
+> If we decide to support byacc,
+> we must carry the restriction
+> that bans GNU-extension.
 
-Why don't you just push it upstream yourself ?
+In fact Linux now can be built without using GNU
+binutils and using LLVM tools instead. It's just
+one architecture and a specific config now, but
+eventually the others will be built too. You can
+follow the progress here:
+https://github.com/ClangBuiltLinux/continuous-integration/issues/73
 
-> 
-> It is OK whether any patch is picked up
-> as long as the build error is fixed.
-> 
-Same here.
+I believe that compatibility with different
+alternative tools is a good thing as long as it
+doesn't add unwanted complexity. And as this patch
+is just changing command-line flags to their
+portable variants and explicitly adds a couple of
+definitions that are presumed by GNU bison, I
+can't see a problem with it.
 
-> 
-> (I think  CFLAGS_REMOVE_vdso32/vdso-note.o
-> should be added too, though)
-> 
-Hard to decide for someone not involved in vdso development.
-It wasn't added for x86, and it compiles without, so I rather
-left it alone.
-
-Guenter
+Regards,
+Dmitry
