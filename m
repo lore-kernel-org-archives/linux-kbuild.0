@@ -1,71 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38928 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726254AbfKNN4n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Nov 2019 08:56:43 -0500
-Date: Thu, 14 Nov 2019 14:56:41 +0100
-From: Michal Hocko <mhocko@kernel.org>
-Subject: Re: [PATCH] mm/vmalloc: Fix regression caused by needless
- vmalloc_sync_all()
-Message-ID: <20191114135641.GA1356@dhcp22.suse.cz>
-References: <20191113095530.228959-1-shile.zhang@linux.alibaba.com>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:62876 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726482AbfKNPUI (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 Nov 2019 10:20:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191113095530.228959-1-shile.zhang@linux.alibaba.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 15 Nov 2019 00:19:27 +0900
+Message-ID: <CAK7LNATqoF-NVhkP9J7SyDmK-x8vQ5pDJ7U_aEngdJb_vvDixg@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.4(-rc8)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shile Zhang <shile.zhang@linux.alibaba.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Joerg Roedel <jroedel@suse.de>, linux-mm@kvack.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org
 
-On Wed 13-11-19 17:55:30, Shile Zhang wrote:
-> vmalloc_sync_all() was put in the common path in
-> __purge_vmap_area_lazy(), for one sync issue only happened on X86_32
-> with PTI enabled. It is needless for X86_64, which caused a big regression
-> in UnixBench Shell8 testing on X86_64.
-> Similar regression also reported by 0-day kernel test robot in reaim
-> benchmarking:
-> https://lists.01.org/hyperkitty/list/lkp@lists.01.org/thread/4D3JPPHBNOSPFK2KEPC6KGKS6J25AIDB/
-> 
-> Fix it by adding more conditions.
+Hi Linus,
 
-This doesn't really explain a lot. Could you explain why the syncing
-should be limited only to PAE and !SHARED_KERNEL_PMD? 
+Please pull Kbuild fixes.
+Thanks.
 
-> Fixes: 3f8fd02b1bf1 ("mm/vmalloc: Sync unmappings in __purge_vmap_area_lazy()")
-> 
-> Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
-> ---
->  mm/vmalloc.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> index a3c70e275f4e..7b9fc7966da6 100644
-> --- a/mm/vmalloc.c
-> +++ b/mm/vmalloc.c
-> @@ -1255,11 +1255,17 @@ static bool __purge_vmap_area_lazy(unsigned long start, unsigned long end)
->  	if (unlikely(valist == NULL))
->  		return false;
->  
-> +#if defined(CONFIG_X86_32) && defined(CONFIG_X86_PAE)
->  	/*
->  	 * First make sure the mappings are removed from all page-tables
->  	 * before they are freed.
-> +	 *
-> +	 * This is only needed on x86-32 with !SHARED_KERNEL_PMD, which is
-> +	 * the case on a PAE kernel with PTI enabled.
->  	 */
-> -	vmalloc_sync_all();
-> +	if (!SHARED_KERNEL_PMD && boot_cpu_has(X86_FEATURE_PTI))
-> +		vmalloc_sync_all();
-> +#endif
->  
->  	/*
->  	 * TODO: to calculate a flush range without looping.
-> -- 
-> 2.24.0.rc2
-> 
+
+The following changes since commit 31f4f5b495a62c9a8b15b1c3581acd5efeb9af8c:
+
+  Linux 5.4-rc7 (2019-11-10 16:17:15 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+kbuild-fixes-v5.4-3
+
+for you to fetch changes up to 80591e61a0f7e88deaada69844e4a31280c4a38f:
+
+  kbuild: tell sparse about the $ARCH (2019-11-15 00:13:23 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v5.4 (3rc)
+
+ - fix build error when compiling SPARC VDSO with CONFIG_COMPAT=y
+
+ - pass correct --arch option to Sparse
+
+----------------------------------------------------------------
+Luc Van Oostenryck (1):
+      kbuild: tell sparse about the $ARCH
+
+Masahiro Yamada (1):
+      sparc: vdso: fix build error of vdso32
+
+ Makefile                 | 3 +++
+ arch/sparc/vdso/Makefile | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
 
 -- 
-Michal Hocko
-SUSE Labs
+Best Regards
+Masahiro Yamada
