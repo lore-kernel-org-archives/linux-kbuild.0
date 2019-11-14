@@ -1,88 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:42174 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727314AbfKOMCW (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Nov 2019 07:02:22 -0500
-Received: by mail-oi1-f193.google.com with SMTP id x4so437796oie.9
-        for <linux-kbuild@vger.kernel.org>; Fri, 15 Nov 2019 04:02:21 -0800 (PST)
+Received: from mail.hgs.gob.ec ([190.214.19.83]:52452 "HELO mail.hgs.gob.ec"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+        id S1727249AbfKONor (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 15 Nov 2019 08:44:47 -0500
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-References: <20191114180303.66955-1-elver@google.com> <20191114195046.GP2865@paulmck-ThinkPad-P72>
- <20191114213303.GA237245@google.com> <20191114221559.GS2865@paulmck-ThinkPad-P72>
-In-Reply-To: <20191114221559.GS2865@paulmck-ThinkPad-P72>
-From: Marco Elver <elver@google.com>
-Date: Fri, 15 Nov 2019 13:02:08 +0100
-Message-ID: <CANpmjNPxAOUAxXHd9tka5gCjR_rNKmBk+k5UzRsXT0a0CtNorw@mail.gmail.com>
-Subject: Re: [PATCH v4 00/10] Add Kernel Concurrency Sanitizer (KCSAN)
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: =?utf-8?q?Wohlt=C3=A4tigkeitsspende_von_2=2E000=2E000=2E000_Euro?=
+From: ''Charles jackson'' <dietetica@hgs.gob.ec>
+Date: Thu, 14 Nov 2019 23:57:02 +0200
+Reply-To: charlesjacksonjr001@gmail.com
+Message-Id: <20191114215713.8263AA0FD38@mail.hgs.gob.ec>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, Eric Dumazet <edumazet@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
+To: Recipients <dietetica@hgs.gob.ec>
 
-On Thu, 14 Nov 2019 at 23:16, Paul E. McKenney <paulmck@kernel.org> wrote:
->
-> On Thu, Nov 14, 2019 at 10:33:03PM +0100, Marco Elver wrote:
-> > On Thu, 14 Nov 2019, Paul E. McKenney wrote:
-> >
-> > > On Thu, Nov 14, 2019 at 07:02:53PM +0100, Marco Elver wrote:
-> > > > This is the patch-series for the Kernel Concurrency Sanitizer (KCSAN).
-> > > > KCSAN is a sampling watchpoint-based *data race detector*. More details
-> > > > are included in **Documentation/dev-tools/kcsan.rst**. This patch-series
-> > > > only enables KCSAN for x86, but we expect adding support for other
-> > > > architectures is relatively straightforward (we are aware of
-> > > > experimental ARM64 and POWER support).
-> > > >
-> > > > To gather early feedback, we announced KCSAN back in September, and have
-> > > > integrated the feedback where possible:
-> > > > http://lkml.kernel.org/r/CANpmjNPJ_bHjfLZCAPV23AXFfiPiyXXqqu72n6TgWzb2Gnu1eA@mail.gmail.com
-> > > >
-> > > > The current list of known upstream fixes for data races found by KCSAN
-> > > > can be found here:
-> > > > https://github.com/google/ktsan/wiki/KCSAN#upstream-fixes-of-data-races-found-by-kcsan
-> > > >
-> > > > We want to point out and acknowledge the work surrounding the LKMM,
-> > > > including several articles that motivate why data races are dangerous
-> > > > [1, 2], justifying a data race detector such as KCSAN.
-> > > >
-> > > > [1] https://lwn.net/Articles/793253/
-> > > > [2] https://lwn.net/Articles/799218/
-> > >
-> > > I queued this and ran a quick rcutorture on it, which completed
-> > > successfully with quite a few reports.
-> >
-> > Great. Many thanks for queuing this in -rcu. And regarding merge window
-> > you mentioned, we're fine with your assumption to targeting the next
-> > (v5.6) merge window.
-> >
-> > I've just had a look at linux-next to check what a future rebase
-> > requires:
-> >
-> > - There is a change in lib/Kconfig.debug and moving KCSAN to the
-> >   "Generic Kernel Debugging Instruments" section seems appropriate.
-> > - bitops-instrumented.h was removed and split into 3 files, and needs
-> >   re-inserting the instrumentation into the right places.
-> >
-> > Otherwise there are no issues. Let me know what you recommend.
->
-> Sounds good!
->
-> I will be rebasing onto v5.5-rc1 shortly after it comes out.  My usual
-> approach is to fix any conflicts during that rebasing operation.
-> Does that make sense, or would you prefer to send me a rebased stack at
-> that point?  Either way is fine for me.
+Lieber Freund,
 
-That's fine with me, thanks!  To avoid too much additional churn on
-your end, I just replied to the bitops patch with a version that will
-apply with the change to bitops-instrumented infrastructure.
+Ich bin Herr Charles W Jackson, North Carolina, Vereinigte Staaten von Amer=
+ika, der Mega-Gewinner von 344 Millionen US-Dollar. Beim Mega-Millions-Jack=
+pot spende ich an 5 zuf&auml;llige Personen. Wenn Sie diese E-Mail erhalten=
+, wurde Ihre E-Mail zu einem Spinball, den ich am h&auml;ufigsten verteilt =
+habe von meinem Verm&ouml;gen an eine Reihe von Wohlt&auml;tigkeitsorganisa=
+tionen. Ich habe mich freiwillig entschlossen, Ihnen als einer der ausgew&a=
+uml;hlten 5 einen Betrag von &euro; 2.000.000,00 zu spenden, um meine Gewin=
+ne zu &uuml;berpr&uuml;fen.
+Dies ist Ihr Spendencode: [CJ530342019]
 
-Also considering the merge window, we had a discussion and there are
-some arguments for targeting the v5.5 merge window:
-- we'd unblock ARM and POWER ports;
-- we'd unblock people wanting to use the data_race macro;
-- we'd unblock syzbot just tracking upstream;
-Unless there are strong reasons to not target v5.5, I leave it to you
-if you think it's appropriate.
+www.youtube.com/watch?v=3DBSr8myiLPMQ
 
-Thanks,
--- Marco
+Antworten Sie auf diese E-Mail mit dem SPENDER-CODE: =
+
+
+charlesjacksonjr001@gmail.com
+
+Ich hoffe, Sie und Ihre Familie gl&uuml;cklich zu machen
+
+Sch&ouml;ne Gr&uuml;&szlig;e
+Mr. Charles Jackson
