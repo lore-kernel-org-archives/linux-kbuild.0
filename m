@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:64705 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:64767 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726263AbfKNRme (ORCPT
+        with ESMTP id S1726957AbfKNRmh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Nov 2019 12:42:34 -0500
+        Thu, 14 Nov 2019 12:42:37 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/6] modpost: stop symbol preloading for modversion CRC
-Date: Fri, 15 Nov 2019 02:42:24 +0900
-Message-Id: <20191114174226.7201-4-yamada.masahiro@socionext.com>
+Subject: [PATCH 6/6] modpost: respect the previous export when 'exported twice' is warned
+Date: Fri, 15 Nov 2019 02:42:26 +0900
+Message-Id: <20191114174226.7201-6-yamada.masahiro@socionext.com>
 In-Reply-To: <20191114174226.7201-1-yamada.masahiro@socionext.com>
 References: <20191114174226.7201-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,140 +15,64 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-It is complicated to add mocked-up symbols to pre-handle CRC.
-Handle CRC after all the export symbols in the relevant module
-are registered.
+When 'exported twice' is warned, let sym_add_exported() return without
+updating the symbol info. This respects the previous export, which is
+ordered first in modules.order
+
+This simplifies the code too.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/mod/modpost.c | 64 +++++++++++++++++++++++--------------------
- 1 file changed, 35 insertions(+), 29 deletions(-)
+ scripts/mod/modpost.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6735ae3da4c2..73bdf27c41fe 100644
+index 06086105011f..d9a92fbe1146 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -169,7 +169,7 @@ struct symbol {
- 	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
- 	unsigned int kernel:1;     /* 1 if symbol is from kernel
- 				    *  (only for external modules) **/
--	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers, or crc */
-+	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers */
- 	unsigned int is_static:1;  /* 1 if symbol is not global */
- 	enum export  export;       /* Type of export */
- 	char name[0];
-@@ -410,15 +410,15 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	return s;
+@@ -211,13 +211,11 @@ static struct symbol *new_symbol(const char *name, struct module *module,
+ 				 enum export export)
+ {
+ 	unsigned int hash;
+-	struct symbol *new;
+ 
+ 	hash = tdb_hash(name) % SYMBOL_HASH_SIZE;
+-	new = symbolhash[hash] = alloc_symbol(name, 0, symbolhash[hash]);
+-	new->module = module;
+-	new->export = export;
+-	return new;
++	symbolhash[hash] = alloc_symbol(name, 0, symbolhash[hash]);
++
++	return symbolhash[hash];
  }
  
--static void sym_update_crc(const char *name, struct module *mod,
--			   unsigned int crc, enum export export)
-+static void sym_set_crc(const char *name, const struct module *mod,
-+			unsigned int crc)
- {
- 	struct symbol *s = find_symbol(name);
+ static struct symbol *find_symbol(const char *name)
+@@ -392,17 +390,15 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
  
  	if (!s) {
--		s = new_symbol(name, mod, export);
--		/* Don't complain when we find it later. */
--		s->preloaded = 1;
-+		warn("%s: '__crc_%s' is invalid use. __crc_* is reserved for modversion\n",
-+		     mod->name, name);
-+		return;
- 	}
- 	s->crc = crc;
- 	s->crc_valid = 1;
-@@ -683,12 +683,34 @@ static int ignore_undef_symbol(struct elf_info *info, const char *symname)
- 	return 0;
- }
- 
-+static void handle_modversion(const struct module *mod,
-+			      const struct elf_info *info,
-+			      const Elf_Sym *sym, const char *symname)
-+{
-+	unsigned int crc;
-+
-+	if (sym->st_shndx == SHN_UNDEF) {
-+		warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
-+		     symname, mod->name, is_vmlinux(mod->name) ? "":".ko");
-+		return;
-+	}
-+
-+	if (sym->st_shndx == SHN_ABS) {
-+		crc = sym->st_value;
-+	} else {
-+		unsigned int *crcp;
-+
-+		/* symbol points to the CRC in the ELF object */
-+		crcp = sym_get_data(info, sym);
-+		crc = TO_NATIVE(*crcp);
-+	}
-+	sym_set_crc(symname, mod, crc);
-+}
-+
- static void handle_symbol(struct module *mod, struct elf_info *info,
- 			  const Elf_Sym *sym, const char *symname)
- {
--	unsigned int crc;
- 	enum export export;
--	bool is_crc = false;
- 	const char *name;
- 
- 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
-@@ -697,21 +719,6 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 	else
- 		export = export_from_sec(info, get_secindex(info, sym));
- 
--	/* CRC'd symbol */
--	if (strstarts(symname, "__crc_")) {
--		is_crc = true;
--		crc = (unsigned int) sym->st_value;
--		if (sym->st_shndx != SHN_UNDEF && sym->st_shndx != SHN_ABS) {
--			unsigned int *crcp;
--
--			/* symbol points to the CRC in the ELF object */
--			crcp = sym_get_data(info, sym);
--			crc = TO_NATIVE(*crcp);
+ 		s = new_symbol(name, mod, export);
+-	} else {
+-		if (!external_module || is_vmlinux(s->module->name) ||
+-		    s->module == mod) {
+-			warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+-			     mod->name, name, s->module->name,
+-			     is_vmlinux(s->module->name) ? "" : ".ko");
+-		} else {
+-			/* In case Module.symvers was out of date */
+-			s->module = mod;
 -		}
--		sym_update_crc(symname + strlen("__crc_"), mod, crc,
--				export);
--	}
--
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
- 		if (strstarts(symname, "__gnu_lto_")) {
-@@ -746,11 +753,6 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 		}
- #endif
- 
--		if (is_crc) {
--			const char *e = is_vmlinux(mod->name) ?"":".ko";
--			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
--			     symname + strlen("__crc_"), mod->name, e);
--		}
- 		mod->unres = alloc_symbol(symname,
- 					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
- 					  mod->unres);
-@@ -2063,6 +2065,10 @@ static void read_symbols(const char *modname)
- 			sym_update_namespace(symname + strlen("__kstrtabns_"),
- 					     namespace_from_kstrtabns(&info,
- 								      sym));
++	} else if (!external_module || is_vmlinux(s->module->name) ||
++		   s->module == mod) {
++		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
++		     mod->name, name, s->module->name,
++		     is_vmlinux(s->module->name) ? "" : ".ko");
++		return s;
+ 	}
 +
-+		if (strstarts(symname, "__crc_"))
-+			handle_modversion(mod, &info, sym,
-+					  symname + strlen("__crc_"));
- 	}
- 
- 	// check for static EXPORT_SYMBOL_* functions && global vars
-@@ -2476,7 +2482,7 @@ static void read_dump(const char *fname, unsigned int kernel)
- 		s->kernel    = kernel;
- 		s->preloaded = 1;
- 		s->is_static = 0;
--		sym_update_crc(symname, mod, crc, export_no(export));
-+		sym_set_crc(symname, mod, crc);
- 		sym_update_namespace(symname, namespace);
- 	}
- 	release_file(file, size);
++	s->module = mod;
+ 	s->vmlinux   = is_vmlinux(mod->name);
+ 	s->kernel    = 0;
+ 	s->export    = export;
 -- 
 2.17.1
