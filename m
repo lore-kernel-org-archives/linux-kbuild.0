@@ -1,55 +1,136 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:59274 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727559AbfKOQva (ORCPT
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:46546 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727626AbfKORPB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Nov 2019 11:51:30 -0500
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [RFC PATCH v3 7/7] x86/unwind/orc: remove run-time ORC unwind
- tables sort
-Date: Fri, 15 Nov 2019 16:51:24 +0000
-Message-ID: <893d3caf85cd4ed0921fab84cfe28cad@AcuMS.aculab.com>
-References: <20191115064750.47888-1-shile.zhang@linux.alibaba.com>
- <20191115064750.47888-8-shile.zhang@linux.alibaba.com>
-In-Reply-To: <20191115064750.47888-8-shile.zhang@linux.alibaba.com>
-Content-Language: en-US
+        Fri, 15 Nov 2019 12:15:01 -0500
+Received: by mail-oi1-f194.google.com with SMTP id n14so9205743oie.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 15 Nov 2019 09:15:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <20191114180303.66955-1-elver@google.com> <20191114195046.GP2865@paulmck-ThinkPad-P72>
+ <20191114213303.GA237245@google.com> <20191114221559.GS2865@paulmck-ThinkPad-P72>
+ <CANpmjNPxAOUAxXHd9tka5gCjR_rNKmBk+k5UzRsXT0a0CtNorw@mail.gmail.com> <20191115164159.GU2865@paulmck-ThinkPad-P72>
+In-Reply-To: <20191115164159.GU2865@paulmck-ThinkPad-P72>
+From: Marco Elver <elver@google.com>
+Date: Fri, 15 Nov 2019 18:14:46 +0100
+Message-ID: <CANpmjNPy2RDBUhV-j-APzwYr-_x2V9QwgPTYZph36rCpEVqZSQ@mail.gmail.com>
+Subject: Re: [PATCH v4 00/10] Add Kernel Concurrency Sanitizer (KCSAN)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Shile Zhang' <shile.zhang@linux.alibaba.com>, Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>
-Cc: "H . Peter Anvin" <hpa@zytor.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, Eric Dumazet <edumazet@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
 
-From: Shile Zhang
-> Sent: 15 November 2019 06:48
-...
->  arch/x86/kernel/unwind_orc.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/unwind_orc.c b/arch/x86/kernel/unwind_orc.c
-> index 332ae6530fa8..280da6fa9922 100644
-> --- a/arch/x86/kernel/unwind_orc.c
-> +++ b/arch/x86/kernel/unwind_orc.c
-> @@ -273,9 +273,11 @@ void __init unwind_init(void)
->  		return;
->  	}
-> 
-> -	/* Sort the .orc_unwind and .orc_unwind_ip tables: */
-> -	sort(__start_orc_unwind_ip, num_entries, sizeof(int), orc_sort_cmp,
-> -	     orc_sort_swap);
-> +	/*
-> +	 * Note, orc_unwind and orc_unwind_ip tables has been sorted in
-> +	 * vmlinux link phase by sorttable tool at build time.
-> +	 * Its ready for binary search now.
-> +	 */
+On Fri, 15 Nov 2019 at 17:42, Paul E. McKenney <paulmck@kernel.org> wrote:
+>
+> On Fri, Nov 15, 2019 at 01:02:08PM +0100, Marco Elver wrote:
+> > On Thu, 14 Nov 2019 at 23:16, Paul E. McKenney <paulmck@kernel.org> wrote:
+> > >
+> > > On Thu, Nov 14, 2019 at 10:33:03PM +0100, Marco Elver wrote:
+> > > > On Thu, 14 Nov 2019, Paul E. McKenney wrote:
+> > > >
+> > > > > On Thu, Nov 14, 2019 at 07:02:53PM +0100, Marco Elver wrote:
+> > > > > > This is the patch-series for the Kernel Concurrency Sanitizer (KCSAN).
+> > > > > > KCSAN is a sampling watchpoint-based *data race detector*. More details
+> > > > > > are included in **Documentation/dev-tools/kcsan.rst**. This patch-series
+> > > > > > only enables KCSAN for x86, but we expect adding support for other
+> > > > > > architectures is relatively straightforward (we are aware of
+> > > > > > experimental ARM64 and POWER support).
+> > > > > >
+> > > > > > To gather early feedback, we announced KCSAN back in September, and have
+> > > > > > integrated the feedback where possible:
+> > > > > > http://lkml.kernel.org/r/CANpmjNPJ_bHjfLZCAPV23AXFfiPiyXXqqu72n6TgWzb2Gnu1eA@mail.gmail.com
+> > > > > >
+> > > > > > The current list of known upstream fixes for data races found by KCSAN
+> > > > > > can be found here:
+> > > > > > https://github.com/google/ktsan/wiki/KCSAN#upstream-fixes-of-data-races-found-by-kcsan
+> > > > > >
+> > > > > > We want to point out and acknowledge the work surrounding the LKMM,
+> > > > > > including several articles that motivate why data races are dangerous
+> > > > > > [1, 2], justifying a data race detector such as KCSAN.
+> > > > > >
+> > > > > > [1] https://lwn.net/Articles/793253/
+> > > > > > [2] https://lwn.net/Articles/799218/
+> > > > >
+> > > > > I queued this and ran a quick rcutorture on it, which completed
+> > > > > successfully with quite a few reports.
+> > > >
+> > > > Great. Many thanks for queuing this in -rcu. And regarding merge window
+> > > > you mentioned, we're fine with your assumption to targeting the next
+> > > > (v5.6) merge window.
+> > > >
+> > > > I've just had a look at linux-next to check what a future rebase
+> > > > requires:
+> > > >
+> > > > - There is a change in lib/Kconfig.debug and moving KCSAN to the
+> > > >   "Generic Kernel Debugging Instruments" section seems appropriate.
+> > > > - bitops-instrumented.h was removed and split into 3 files, and needs
+> > > >   re-inserting the instrumentation into the right places.
+> > > >
+> > > > Otherwise there are no issues. Let me know what you recommend.
+> > >
+> > > Sounds good!
+> > >
+> > > I will be rebasing onto v5.5-rc1 shortly after it comes out.  My usual
+> > > approach is to fix any conflicts during that rebasing operation.
+> > > Does that make sense, or would you prefer to send me a rebased stack at
+> > > that point?  Either way is fine for me.
+> >
+> > That's fine with me, thanks!  To avoid too much additional churn on
+> > your end, I just replied to the bitops patch with a version that will
+> > apply with the change to bitops-instrumented infrastructure.
+>
+> My first thought was to replace 8/10 of the previous version of your
+> patch in -rcu (047ca266cfab "asm-generic, kcsan: Add KCSAN instrumentation
+> for bitops"), but this does not apply.  So I am guessing that I instead
+> do this substitution when a rebase onto -rc1..
+>
+> Except...
+>
+> > Also considering the merge window, we had a discussion and there are
+> > some arguments for targeting the v5.5 merge window:
+> > - we'd unblock ARM and POWER ports;
+> > - we'd unblock people wanting to use the data_race macro;
+> > - we'd unblock syzbot just tracking upstream;
+> > Unless there are strong reasons to not target v5.5, I leave it to you
+> > if you think it's appropriate.
+>
+> My normal process is to send the pull request shortly after -rc5 comes
+> out, but you do call out some benefits of getting it in sooner, so...
+>
+> What I will do is to rebase your series onto (say) -rc7, test it, and
+> see about an RFC pull request.
+>
+> One possible complication is the new 8/10 patch.  But maybe it will
+> apply against -rc7?
+>
+> Another possible complication is this:
+>
+> scripts/kconfig/conf  --syncconfig Kconfig
+> *
+> * Restart config...
+> *
+> *
+> * KCSAN: watchpoint-based dynamic data race detector
+> *
+> KCSAN: watchpoint-based dynamic data race detector (KCSAN) [N/y/?] (NEW)
+>
+> Might be OK in this case because it is quite obvious what it is doing.
+> (Avoiding pain from this is the reason that CONFIG_RCU_EXPERT exists.)
+>
+> But I will just mention this in the pull request.
+>
+> If there is a -rc8, there is of course a higher probability of making it
+> into the next merge window.
+>
+> Fair enough?
 
-How fast is sort() if the table is sorted?
-Relying on the kernel sources and build scripts always being in sync seems dangerous.
-Probably better to leave the sort in for a release of two.
+Totally fine with that, sounds like a good plan, thanks!
 
-	David
+If it helps, in theory we can also drop and delay the bitops
+instrumentation patch until the new bitops instrumentation
+infrastructure is in 5.5-rc1. There won't be any false positives if
+this is missing, we might just miss a few data races until we have it.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+Thanks,
+-- Marco
