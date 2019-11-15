@@ -1,50 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:45902 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725829AbfKOIY4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Nov 2019 03:24:56 -0500
-Subject: Re: [RFC PATCH v3 0/7] Speed booting by sorting ORC unwind tables at
- build time
-References: <20191115064750.47888-1-shile.zhang@linux.alibaba.com>
- <20191115072511.GA114447@gmail.com>
-From: Shile Zhang <shile.zhang@linux.alibaba.com>
-Message-ID: <ea339e91-0718-4b8c-dda4-5e4f70d68f24@linux.alibaba.com>
-Date: Fri, 15 Nov 2019 16:24:52 +0800
+Received: from mail.skyhub.de ([5.9.137.197]:50830 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbfKOIix (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 15 Nov 2019 03:38:53 -0500
+Date: Fri, 15 Nov 2019 09:38:47 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] mm/vmalloc: Fix regression caused by needless
+ vmalloc_sync_all()
+Message-ID: <20191115083847.GB18929@zn.tnic>
+References: <20191113095530.228959-1-shile.zhang@linux.alibaba.com>
+ <20191114171231.GA21753@suse.de>
+ <20191114160108.57a72907f7b1aa9860471a06@linux-foundation.org>
 MIME-Version: 1.0
-In-Reply-To: <20191115072511.GA114447@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191114160108.57a72907f7b1aa9860471a06@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Joerg Roedel <jroedel@suse.de>, Shile Zhang <shile.zhang@linux.alibaba.com>, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, hpa@zytor.com
 
+On Thu, Nov 14, 2019 at 04:01:08PM -0800, Andrew Morton wrote:
+> It's fairly urgent - I consider this to be -stable material.
+> 
+> Thomas & co, was that a deliberate skip?
 
+More like lost in the mail flood. I'm assuming you're taking it?
 
-On 2019/11/15 15:25, Ingo Molnar wrote:
-> * Shile Zhang <shile.zhang@linux.alibaba.com> wrote:
->
->> Hi,
->>
->> I refactored the sortextable code and add ORC unwind tables sort
->> support, for kernel boot speedup by sorting kernel tables at build time
->> as much as possible.
->>
->> Followed Peter's suggestion, I put ORC tables sort into a separated
->> thread makes these tables sort concurrently. That helps to avoid
->> kernel's link time as possible.
-> Could you please also measure how much boot time this saves,
-> approximately, and how long it takes to do it at build time?
+In any case, patch looks ok to me - the "unmappings" naming sounds like
+coming from someone with a very wild phantasy... :-)
 
-Thanks for your review!
+Thx.
 
-I've tested on 2vcpu16GB VM (with 2.5GHz Xeon CPU), it can saves near 90ms.
-And the new sorttable tool costs about 0.074s to do extable and orc 
-tables sort,
-on host with same CPU.
->
-> Thanks,
->
-> 	Ingo
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
