@@ -1,123 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:58364 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725829AbfKOJT4 (ORCPT
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:34080 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727355AbfKOJny (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Nov 2019 04:19:56 -0500
-Date: Fri, 15 Nov 2019 10:19:45 +0100
-From: Peter Zijlstra <peterz@infradead.org>
+        Fri, 15 Nov 2019 04:43:54 -0500
 Subject: Re: [RFC PATCH v3 6/7] scripts/sorttable: Add ORC unwind tables sort
  concurrently
-Message-ID: <20191115091945.GT4114@hirez.programming.kicks-ass.net>
 References: <20191115064750.47888-1-shile.zhang@linux.alibaba.com>
  <20191115064750.47888-7-shile.zhang@linux.alibaba.com>
+ <20191115090723.GS4114@hirez.programming.kicks-ass.net>
+From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Message-ID: <9594afbc-52bc-5ae7-4a19-8fc4b36a1abd@linux.alibaba.com>
+Date: Fri, 15 Nov 2019 17:43:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115064750.47888-7-shile.zhang@linux.alibaba.com>
+In-Reply-To: <20191115090723.GS4114@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shile Zhang <shile.zhang@linux.alibaba.com>
+To: Peter Zijlstra <peterz@infradead.org>
 Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 02:47:49PM +0800, Shile Zhang wrote:
 
-> @@ -141,21 +306,44 @@ static int do_sort(Elf_Ehdr *ehdr,
->  		if (r(&s->sh_type) == SHT_SYMTAB_SHNDX)
->  			symtab_shndx = (Elf32_Word *)((const char *)ehdr +
->  						      _r(&s->sh_offset));
-> -	}
->  
-> +#if defined(SORTTABLE_64) && defined(UNWINDER_ORC_ENABLED)
-> +		/* locate the ORC unwind tables */
-> +		if (!strcmp(secstrings + idx, ".orc_unwind_ip")) {
-> +			orctable.orc_ip_size = s->sh_size;
-> +			g_orc_ip_table = (int *)((void *)ehdr +
-> +						   s->sh_offset);
-> +		}
-> +		if (!strcmp(secstrings + idx, ".orc_unwind")) {
-> +			orctable.orc_size = s->sh_size;
-> +			g_orc_table = (struct orc_entry *)((void *)ehdr +
-> +							     s->sh_offset);
-> +		}
-> +#endif
-> +	} /* for loop */
-> +
-> +#if defined(SORTTABLE_64) && defined(UNWINDER_ORC_ENABLED)
 
-Maybe something like:
+On 2019/11/15 17:07, Peter Zijlstra wrote:
+> On Fri, Nov 15, 2019 at 02:47:49PM +0800, Shile Zhang wrote:
+>
+>> +#if defined(SORTTABLE_64) && defined(UNWINDER_ORC_ENABLED)
+>> +/* ORC unwinder only support X86_64 */
+>> +#include <errno.h>
+>> +#include <pthread.h>
+>> +#include <linux/types.h>
+>> +
+>> +#define ORC_REG_UNDEFINED	0
+>> +#define ERRSTRING_MAXSZ		256
+>> +
+>> +struct orc_entry {
+>> +	s16		sp_offset;
+>> +	s16		bp_offset;
+>> +	unsigned	sp_reg:4;
+>> +	unsigned	bp_reg:4;
+>> +	unsigned	type:2;
+>> +	unsigned	end:1;
+>> +} __attribute__((packed));
+>> +
+>> +struct orctable_info {
+>> +	size_t	orc_size;
+>> +	size_t	orc_ip_size;
+>> +} orctable;
+> There's ./arch/x86/include/asm/orc_types.h for this. Please don't
+> duplicate. objtool uses that same header.
+Good catch! Thanks for your kindly reminder! I'll remove it.
+>> +/**
+>> + * sort - sort an array of elements
+>> + * @base: pointer to data to sort
+>> + * @num: number of elements
+>> + * @size: size of each element
+>> + * @cmp_func: pointer to comparison function
+>> + * @swap_func: pointer to swap function
+>> + *
+>> + * This function does a heapsort on the given array. You may provide a
+>> + * swap_func function optimized to your element type.
+>> + *
+>> + * Sorting time is O(n log n) both on average and worst-case. While
+>> + * qsort is about 20% faster on average, it suffers from exploitable
+>> + * O(n*n) worst-case behavior and extra memory requirements that make
+>> + * it less suitable for kernel use.
+>> + *
+>> + * This code token out of /lib/sort.c.
+>> + */
+>> +static void sort(void *base, size_t num, size_t size,
+>> +	  int (*cmp_func)(const void *, const void *),
+>> +	  void (*swap_func)(void *, void *, int size))
+>> +{
+>> +	/* pre-scale counters for performance */
+>> +	int i = (num/2 - 1) * size, n = num * size, c, r;
+>> +
+>> +	/* heapify */
+>> +	for ( ; i >= 0; i -= size) {
+>> +		for (r = i; r * 2 + size < n; r  = c) {
+>> +			c = r * 2 + size;
+>> +			if (c < n - size &&
+>> +					cmp_func(base + c, base + c + size) < 0)
+>> +				c += size;
+>> +			if (cmp_func(base + r, base + c) >= 0)
+>> +				break;
+>> +			swap_func(base + r, base + c, size);
+>> +		}
+>> +	}
+>> +
+>> +	/* sort */
+>> +	for (i = n - size; i > 0; i -= size) {
+>> +		swap_func(base, base + i, size);
+>> +		for (r = 0; r * 2 + size < i; r = c) {
+>> +			c = r * 2 + size;
+>> +			if (c < i - size &&
+>> +					cmp_func(base + c, base + c + size) < 0)
+>> +				c += size;
+>> +			if (cmp_func(base + r, base + c) >= 0)
+>> +				break;
+>> +			swap_func(base + r, base + c, size);
+>> +		}
+>> +	}
+>> +}
+> Do we really need to copy the heapsort implementation? That is, why not
+> use libc's qsort() ? This is userspace after all.
 
-	if (g_orc_table && g_orc_ip_table) {
-		 if (pthread_create(...))
-		...
-	} else if (g_orc_table || g_orc_up_table) {
-		fprintf(stderr, "incomplete ORC tables...\n");
-	}
-
-> +	/* create thread to sort ORC unwind tables concurrently */
-> +	if (pthread_create(&orc_sort_thread, NULL, sort_orctable, &orctable)) {
-> +		fprintf(stderr,
-> +			"pthread_create orc_sort_thread failed '%s': %s\n",
-> +			strerror(errno), fname);
-> +		goto out;
-> +	}
-> +#endif
->  	if (!extab_sec) {
->  		fprintf(stderr,	"no __ex_table in file: %s\n", fname);
-> -		return -1;
-> +		goto out;
->  	}
->  
->  	if (!symtab_sec) {
->  		fprintf(stderr,	"no .symtab in file: %s\n", fname);
-> -		return -1;
-> +		goto out;
->  	}
->  
->  	if (!strtab_sec) {
->  		fprintf(stderr,	"no .strtab in file: %s\n", fname);
-> -		return -1;
-> +		goto out;
->  	}
->  
->  	extab_image = (void *)ehdr + _r(&extab_sec->sh_offset);
-> @@ -192,7 +380,7 @@ static int do_sort(Elf_Ehdr *ehdr,
->  		fprintf(stderr,
->  			"no main_extable_sort_needed symbol in file: %s\n",
->  			fname);
-> -		return -1;
-> +		goto out;
->  	}
->  
->  	sort_needed_sec = &shdr[get_secindex(r2(&sym->st_shndx),
-> @@ -205,6 +393,20 @@ static int do_sort(Elf_Ehdr *ehdr,
->  
->  	/* extable has been sorted, clear the flag */
->  	w(0, sort_needed_loc);
-> +	rc = 0;
->  
-> -	return 0;
-> +out:
-> +#if defined(SORTTABLE_64) && defined(UNWINDER_ORC_ENABLED)
-> +	{ /* to avoid gcc warning about declaration */
-> +	void *retval = NULL;
-
-and then here:
-
-	if (orc_sort_thread) {
-		void *retval = NULL;
-		pthread_join(...);
-		...
-	}
-
-> +
-> +	/* wait for ORC tables sort done */
-> +	pthread_join(orc_sort_thread, &retval);
-> +	if (retval) {
-> +		fprintf(stderr, "%s in file: %s\n", (char *)retval, fname);
-> +		rc = -1;
-> +	}
-> +	}
-> +#endif
-> +	return rc;
->  }
+Yes, I think qsort is better choice than copy-paste here. But qsort does 
+not support customized swap func, which is needed for ORC unwind swap 
+two tables together.
+I think it's hard to do with qsort, so I used sort same with original 
+orc unwind table sort.
