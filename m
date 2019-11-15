@@ -1,136 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:46546 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727626AbfKORPB (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40522 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727555AbfKORYo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 15 Nov 2019 12:15:01 -0500
-Received: by mail-oi1-f194.google.com with SMTP id n14so9205743oie.13
-        for <linux-kbuild@vger.kernel.org>; Fri, 15 Nov 2019 09:15:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20191114180303.66955-1-elver@google.com> <20191114195046.GP2865@paulmck-ThinkPad-P72>
- <20191114213303.GA237245@google.com> <20191114221559.GS2865@paulmck-ThinkPad-P72>
- <CANpmjNPxAOUAxXHd9tka5gCjR_rNKmBk+k5UzRsXT0a0CtNorw@mail.gmail.com> <20191115164159.GU2865@paulmck-ThinkPad-P72>
-In-Reply-To: <20191115164159.GU2865@paulmck-ThinkPad-P72>
-From: Marco Elver <elver@google.com>
-Date: Fri, 15 Nov 2019 18:14:46 +0100
-Message-ID: <CANpmjNPy2RDBUhV-j-APzwYr-_x2V9QwgPTYZph36rCpEVqZSQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/10] Add Kernel Concurrency Sanitizer (KCSAN)
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 15 Nov 2019 12:24:44 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 15so6305069pgt.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 15 Nov 2019 09:24:43 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC PATCH v3 6/7] scripts/sorttable: Add ORC unwind tables sort concurrently
+Date: Fri, 15 Nov 2019 09:24:07 -0800
+Message-Id: <A4F85A0C-C8A8-4226-A334-276F9D0C2679@amacapital.net>
+References: <9594afbc-52bc-5ae7-4a19-8fc4b36a1abd@linux.alibaba.com>
+In-Reply-To: <9594afbc-52bc-5ae7-4a19-8fc4b36a1abd@linux.alibaba.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <mark.rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, Eric Dumazet <edumazet@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
+To: Shile Zhang <shile.zhang@linux.alibaba.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, 15 Nov 2019 at 17:42, Paul E. McKenney <paulmck@kernel.org> wrote:
->
-> On Fri, Nov 15, 2019 at 01:02:08PM +0100, Marco Elver wrote:
-> > On Thu, 14 Nov 2019 at 23:16, Paul E. McKenney <paulmck@kernel.org> wrote:
-> > >
-> > > On Thu, Nov 14, 2019 at 10:33:03PM +0100, Marco Elver wrote:
-> > > > On Thu, 14 Nov 2019, Paul E. McKenney wrote:
-> > > >
-> > > > > On Thu, Nov 14, 2019 at 07:02:53PM +0100, Marco Elver wrote:
-> > > > > > This is the patch-series for the Kernel Concurrency Sanitizer (KCSAN).
-> > > > > > KCSAN is a sampling watchpoint-based *data race detector*. More details
-> > > > > > are included in **Documentation/dev-tools/kcsan.rst**. This patch-series
-> > > > > > only enables KCSAN for x86, but we expect adding support for other
-> > > > > > architectures is relatively straightforward (we are aware of
-> > > > > > experimental ARM64 and POWER support).
-> > > > > >
-> > > > > > To gather early feedback, we announced KCSAN back in September, and have
-> > > > > > integrated the feedback where possible:
-> > > > > > http://lkml.kernel.org/r/CANpmjNPJ_bHjfLZCAPV23AXFfiPiyXXqqu72n6TgWzb2Gnu1eA@mail.gmail.com
-> > > > > >
-> > > > > > The current list of known upstream fixes for data races found by KCSAN
-> > > > > > can be found here:
-> > > > > > https://github.com/google/ktsan/wiki/KCSAN#upstream-fixes-of-data-races-found-by-kcsan
-> > > > > >
-> > > > > > We want to point out and acknowledge the work surrounding the LKMM,
-> > > > > > including several articles that motivate why data races are dangerous
-> > > > > > [1, 2], justifying a data race detector such as KCSAN.
-> > > > > >
-> > > > > > [1] https://lwn.net/Articles/793253/
-> > > > > > [2] https://lwn.net/Articles/799218/
-> > > > >
-> > > > > I queued this and ran a quick rcutorture on it, which completed
-> > > > > successfully with quite a few reports.
-> > > >
-> > > > Great. Many thanks for queuing this in -rcu. And regarding merge window
-> > > > you mentioned, we're fine with your assumption to targeting the next
-> > > > (v5.6) merge window.
-> > > >
-> > > > I've just had a look at linux-next to check what a future rebase
-> > > > requires:
-> > > >
-> > > > - There is a change in lib/Kconfig.debug and moving KCSAN to the
-> > > >   "Generic Kernel Debugging Instruments" section seems appropriate.
-> > > > - bitops-instrumented.h was removed and split into 3 files, and needs
-> > > >   re-inserting the instrumentation into the right places.
-> > > >
-> > > > Otherwise there are no issues. Let me know what you recommend.
-> > >
-> > > Sounds good!
-> > >
-> > > I will be rebasing onto v5.5-rc1 shortly after it comes out.  My usual
-> > > approach is to fix any conflicts during that rebasing operation.
-> > > Does that make sense, or would you prefer to send me a rebased stack at
-> > > that point?  Either way is fine for me.
-> >
-> > That's fine with me, thanks!  To avoid too much additional churn on
-> > your end, I just replied to the bitops patch with a version that will
-> > apply with the change to bitops-instrumented infrastructure.
->
-> My first thought was to replace 8/10 of the previous version of your
-> patch in -rcu (047ca266cfab "asm-generic, kcsan: Add KCSAN instrumentation
-> for bitops"), but this does not apply.  So I am guessing that I instead
-> do this substitution when a rebase onto -rc1..
->
-> Except...
->
-> > Also considering the merge window, we had a discussion and there are
-> > some arguments for targeting the v5.5 merge window:
-> > - we'd unblock ARM and POWER ports;
-> > - we'd unblock people wanting to use the data_race macro;
-> > - we'd unblock syzbot just tracking upstream;
-> > Unless there are strong reasons to not target v5.5, I leave it to you
-> > if you think it's appropriate.
->
-> My normal process is to send the pull request shortly after -rc5 comes
-> out, but you do call out some benefits of getting it in sooner, so...
->
-> What I will do is to rebase your series onto (say) -rc7, test it, and
-> see about an RFC pull request.
->
-> One possible complication is the new 8/10 patch.  But maybe it will
-> apply against -rc7?
->
-> Another possible complication is this:
->
-> scripts/kconfig/conf  --syncconfig Kconfig
-> *
-> * Restart config...
-> *
-> *
-> * KCSAN: watchpoint-based dynamic data race detector
-> *
-> KCSAN: watchpoint-based dynamic data race detector (KCSAN) [N/y/?] (NEW)
->
-> Might be OK in this case because it is quite obvious what it is doing.
-> (Avoiding pain from this is the reason that CONFIG_RCU_EXPERT exists.)
->
-> But I will just mention this in the pull request.
->
-> If there is a -rc8, there is of course a higher probability of making it
-> into the next merge window.
->
-> Fair enough?
 
-Totally fine with that, sounds like a good plan, thanks!
+> On Nov 15, 2019, at 1:43 AM, Shile Zhang <shile.zhang@linux.alibaba.com> w=
+rote:
+>=20
+> =EF=BB=BF
+>=20
+>> On 2019/11/15 17:07, Peter Zijlstra wrote:
+>>> On Fri, Nov 15, 2019 at 02:47:49PM +0800, Shile Zhang wrote:
+>>>=20
+>>> +#if defined(SORTTABLE_64) && defined(UNWINDER_ORC_ENABLED)
+>>> +/* ORC unwinder only support X86_64 */
+>>> +#include <errno.h>
+>>> +#include <pthread.h>
+>>> +#include <linux/types.h>
+>>> +
+>>> +#define ORC_REG_UNDEFINED    0
+>>> +#define ERRSTRING_MAXSZ        256
+>>> +
+>>> +struct orc_entry {
+>>> +    s16        sp_offset;
+>>> +    s16        bp_offset;
+>>> +    unsigned    sp_reg:4;
+>>> +    unsigned    bp_reg:4;
+>>> +    unsigned    type:2;
+>>> +    unsigned    end:1;
+>>> +} __attribute__((packed));
+>>> +
+>>> +struct orctable_info {
+>>> +    size_t    orc_size;
+>>> +    size_t    orc_ip_size;
+>>> +} orctable;
+>> There's ./arch/x86/include/asm/orc_types.h for this. Please don't
+>> duplicate. objtool uses that same header.
+> Good catch! Thanks for your kindly reminder! I'll remove it.
+>>> +/**
+>>> + * sort - sort an array of elements
+>>> + * @base: pointer to data to sort
+>>> + * @num: number of elements
+>>> + * @size: size of each element
+>>> + * @cmp_func: pointer to comparison function
+>>> + * @swap_func: pointer to swap function
+>>> + *
+>>> + * This function does a heapsort on the given array. You may provide a
+>>> + * swap_func function optimized to your element type.
+>>> + *
+>>> + * Sorting time is O(n log n) both on average and worst-case. While
+>>> + * qsort is about 20% faster on average, it suffers from exploitable
+>>> + * O(n*n) worst-case behavior and extra memory requirements that make
+>>> + * it less suitable for kernel use.
+>>> + *
+>>> + * This code token out of /lib/sort.c.
+>>> + */
+>>> +static void sort(void *base, size_t num, size_t size,
+>>> +      int (*cmp_func)(const void *, const void *),
+>>> +      void (*swap_func)(void *, void *, int size))
+>>> +{
+>>> +    /* pre-scale counters for performance */
+>>> +    int i =3D (num/2 - 1) * size, n =3D num * size, c, r;
+>>> +
+>>> +    /* heapify */
+>>> +    for ( ; i >=3D 0; i -=3D size) {
+>>> +        for (r =3D i; r * 2 + size < n; r  =3D c) {
+>>> +            c =3D r * 2 + size;
+>>> +            if (c < n - size &&
+>>> +                    cmp_func(base + c, base + c + size) < 0)
+>>> +                c +=3D size;
+>>> +            if (cmp_func(base + r, base + c) >=3D 0)
+>>> +                break;
+>>> +            swap_func(base + r, base + c, size);
+>>> +        }
+>>> +    }
+>>> +
+>>> +    /* sort */
+>>> +    for (i =3D n - size; i > 0; i -=3D size) {
+>>> +        swap_func(base, base + i, size);
+>>> +        for (r =3D 0; r * 2 + size < i; r =3D c) {
+>>> +            c =3D r * 2 + size;
+>>> +            if (c < i - size &&
+>>> +                    cmp_func(base + c, base + c + size) < 0)
+>>> +                c +=3D size;
+>>> +            if (cmp_func(base + r, base + c) >=3D 0)
+>>> +                break;
+>>> +            swap_func(base + r, base + c, size);
+>>> +        }
+>>> +    }
+>>> +}
+>> Do we really need to copy the heapsort implementation? That is, why not
+>> use libc's qsort() ? This is userspace after all.
+>=20
+> Yes, I think qsort is better choice than copy-paste here. But qsort does n=
+ot support customized swap func, which is needed for ORC unwind swap two tab=
+les together.
+> I think it's hard to do with qsort, so I used sort same with original orc u=
+nwind table sort.
 
-If it helps, in theory we can also drop and delay the bitops
-instrumentation patch until the new bitops instrumentation
-infrastructure is in 5.5-rc1. There won't be any false positives if
-this is missing, we might just miss a few data races until we have it.
+One solution is to make an array of indices 0, 1, 2, etc, and sort that usin=
+g a comparison function that compares i,j by actually comparing source[i], s=
+ource[j]. (Or use pointers, but indices are probably faster on a 64-bit mach=
+ine if you can use 32-bit indices.) Then, after sorting, permute the origina=
+l array using the now-sorted indices. In the case where swapping is expensiv=
+e, this is actually faster, since it does exactly n moves instead of O(n log=
+ n).
 
-Thanks,
--- Marco
+>=20
