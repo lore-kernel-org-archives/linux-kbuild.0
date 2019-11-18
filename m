@@ -1,79 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:47071 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726284AbfKRAP6 (ORCPT
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:36157 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726168AbfKRB5O (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Nov 2019 19:15:58 -0500
+        Sun, 17 Nov 2019 20:57:14 -0500
+Subject: Re: [RFC PATCH v4 0/7] Speed booting by sorting ORC unwind tables at
+ build time
+References: <20191115164539.57930-1-shile.zhang@linux.alibaba.com>
+ <20191115175224.ozuiei2vlfvynok5@treble>
+From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Message-ID: <39ff8865-8fef-6220-e024-293ee4fadf65@linux.alibaba.com>
+Date: Mon, 18 Nov 2019 09:57:10 +0800
 MIME-Version: 1.0
-References: <20190528121148.GA18162@lst.de> <CAK7LNAQRW+phJrdR-5NfUE9L09O-nRiimfW5rB8Y8S9POtkxCA@mail.gmail.com>
-In-Reply-To: <CAK7LNAQRW+phJrdR-5NfUE9L09O-nRiimfW5rB8Y8S9POtkxCA@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 18 Nov 2019 09:15:13 +0900
-Message-ID: <CAK7LNAQFy=AfJtk4GT+FL=Kzcf6Ev=keKoUz_7Le7iZOQEc90g@mail.gmail.com>
-Subject: Re: building individual files in subdirectories
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191115175224.ozuiei2vlfvynok5@treble>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-Hi Jens,
-
-
-(related to  https://lkml.org/lkml/2019/11/15/1152)
-
-
-I received questions about single builds not working properly
-some times in the past.
-
-For example, the following is a post from Christoph to kbuild ML,
-and my reply to it.
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 
 
-
-On Wed, May 29, 2019 at 10:12 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
+On 2019/11/16 01:52, Josh Poimboeuf wrote:
+> On Sat, Nov 16, 2019 at 12:45:32AM +0800, Shile Zhang wrote:
+>> Hi,
+>>
+>> I refactored the code, followed by Peter's suggestions in v3, thank you!
+>> Any suggestions and comments are welcome!
+>>
+>> Thanks!
+>>
+>> Changelog:
+>> ==========
+>> v3->v4:
+>> - Code refactored for Peter's review findings and suggestions.
+> Hi Shile,
 >
-> On Tue, May 28, 2019 at 9:12 PM Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > A few kernel modules have source files in multiple subdirectories.
-> > Trying to build just a single object of a source file in such a
-> > subdirectory currently doesn't work.
-> >
-> > For example:
-> >
-> > hch@brick:~/work/xfs$ make fs/xfs/libxfs/xfs_alloc.o
-> >   CALL    scripts/checksyscalls.sh
-> >   CALL    scripts/atomic/check-atomics.sh
-> >   DESCEND  objtool
-> > scripts/Makefile.build:42: fs/xfs/libxfs/Makefile: No such file or directory
-> > make[1]: *** No rule to make target 'fs/xfs/libxfs/Makefile'.  Stop.
-> > make: *** [Makefile:1747: fs/xfs/libxfs/xfs_alloc.o] Error 2
-> >
-> > Is there any reasonably easy way to get this to work?
+> I haven't given it a proper review yet, but one minor suggestion.  In
+> general it's good practice to wait at least a few business days before
+> posting a new version of a patch set.  That way it gives people time to
+> review, and it also helps to avoid flooding people's inboxes.
 >
->
-> While single targets are useful,
-> they never work correctly.
-> subdir-ccflags-y from upper Makefiles
-> are not inherited.
->
-> I want to implement single targets correctly, but
-> I have never got around to it.
->
-> "make fs/xfs/" is an alternative solution
-> although it will compile much more than you want.
->
-> Another solution is to put a dummy
-> fs/xfs/libxfs/Makefile
->
-> --
-> Best Regards
-> Masahiro Yamada
 
+Hi, Josh,
 
+Thank you very much for your kindly reminder!
+I got it and very sorry for that flooding.
 
--- 
-Best Regards
-Masahiro Yamada
+Best regards!
+
+--- Shile
