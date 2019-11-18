@@ -1,146 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:53165 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbfKRExQ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 Nov 2019 23:53:16 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: make single target builds even faster
-Date: Mon, 18 Nov 2019 13:52:47 +0900
-Message-Id: <20191118045247.14082-1-yamada.masahiro@socionext.com>
+Received: from mail-eopbgr720103.outbound.protection.outlook.com ([40.107.72.103]:54432
+        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725816AbfKRFqU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 18 Nov 2019 00:46:20 -0500
+From: Paul <paul@pgazz.com>
+Subject: announcing kmax, a symbolic build config evaluator; requesting useful
+ application ideas
+Date: Mon, 18 Nov 2019 05:46:16 +0000
+Message-ID: <20191118054613.ar6vnl4vkfum5kr3@dev.opentheblackbox.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D36AB1877AB4B8438B0BD160632C30ED@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Commit 2dffd23f81a3 ("kbuild: make single target builds much faster")
-made the situation much better.
+Hi all,
 
-To improve it even more, apply the similar idea to the top Makefile.
-Trim unrelated directories from build-dirs.
+I'd like to announce a tool called Kmax and see if it can be of benefit to =
+the developer community: https://github.com/paulgazz/kmax/
 
-The single build code must be moved above the 'descend' target.
+Kmax extracts symbolic constraints for compilation units from Kbuild Makefi=
+les. For example, this snippet
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+    obj-y :=3D fork.o
+    ifeq ($(CONFIG_A),y)
+      BITS :=3D 32
+    else
+      BITS :=3D 64
+    endif
+    obj-$(CONFIG_B) +=3D probe_$(BITS).o
 
- Makefile | 90 +++++++++++++++++++++++++++++---------------------------
- 1 file changed, 47 insertions(+), 43 deletions(-)
+would yield this output
 
-diff --git a/Makefile b/Makefile
-index 99470c19c158..345b8f2e2a9e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1633,6 +1633,50 @@ help:
- PHONY += prepare
- endif # KBUILD_EXTMOD
- 
-+# Single targets
-+# ---------------------------------------------------------------------------
-+# To build individual files in subdirectories, you can do like this:
-+#
-+#   make foo/bar/baz.s
-+#
-+# The supported suffixes for single-target are listed in 'single-targets'
-+#
-+# To build only under specific subdirectories, you can do like this:
-+#
-+#   make foo/bar/baz/
-+
-+ifdef single-build
-+
-+# .ko is special because modpost is needed
-+single-ko := $(sort $(filter %.ko, $(MAKECMDGOALS)))
-+single-no-ko := $(sort $(patsubst %.ko,%.mod, $(MAKECMDGOALS)))
-+
-+$(single-ko): single_modpost
-+	@:
-+$(single-no-ko): descend
-+	@:
-+
-+ifeq ($(KBUILD_EXTMOD),)
-+# For the single build of in-tree modules, use a temporary file to avoid
-+# the situation of modules_install installing an invalid modules.order.
-+MODORDER := .modules.tmp
-+endif
-+
-+PHONY += single_modpost
-+single_modpost: $(single-no-ko)
-+	$(Q){ $(foreach m, $(single-ko), echo $(extmod-prefix)$m;) } > $(MODORDER)
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
-+
-+KBUILD_MODULES := 1
-+
-+export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod-prefix), $(single-no-ko))
-+
-+# trim unrelated directories
-+build-dirs := $(foreach d, $(build-dirs), \
-+			$(if $(filter $(d)/%, $(KBUILD_SINGLE_TARGETS)), $(d)))
-+
-+endif
-+
- # Handle descending into subdirectories listed in $(build-dirs)
- # Preset locale variables to speed up the build process. Limit locale
- # tweaks to this spot to avoid wrong language settings when running
-@@ -1641,7 +1685,9 @@ endif # KBUILD_EXTMOD
- PHONY += descend $(build-dirs)
- descend: $(build-dirs)
- $(build-dirs): prepare
--	$(Q)$(MAKE) $(build)=$@ single-build=$(single-build) need-builtin=1 need-modorder=1
-+	$(Q)$(MAKE) $(build)=$@ \
-+	single-build=$(if $(filter-out $@/, $(single-no-ko)),1) \
-+	need-builtin=1 need-modorder=1
- 
- clean-dirs := $(addprefix _clean_, $(clean-dirs))
- PHONY += $(clean-dirs) clean
-@@ -1744,48 +1790,6 @@ tools/%: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
- 	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(srctree)/tools/ $*
- 
--# Single targets
--# ---------------------------------------------------------------------------
--# To build individual files in subdirectories, you can do like this:
--#
--#   make foo/bar/baz.s
--#
--# The supported suffixes for single-target are listed in 'single-targets'
--#
--# To build only under specific subdirectories, you can do like this:
--#
--#   make foo/bar/baz/
--
--ifdef single-build
--
--# .ko is special because modpost is needed
--single-ko := $(sort $(filter %.ko, $(MAKECMDGOALS)))
--single-no-ko := $(sort $(patsubst %.ko,%.mod, $(MAKECMDGOALS)))
--
--$(single-ko): single_modpost
--	@:
--$(single-no-ko): descend
--	@:
--
--ifeq ($(KBUILD_EXTMOD),)
--# For the single build of in-tree modules, use a temporary file to avoid
--# the situation of modules_install installing an invalid modules.order.
--MODORDER := .modules.tmp
--endif
--
--PHONY += single_modpost
--single_modpost: $(single-no-ko)
--	$(Q){ $(foreach m, $(single-ko), echo $(extmod-prefix)$m;) } > $(MODORDER)
--	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
--
--KBUILD_MODULES := 1
--
--export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod-prefix), $(single-no-ko))
--
--single-build = $(if $(filter-out $@/, $(single-no-ko)),1)
--
--endif
--
- # FIXME Should go into a make.lib or something
- # ===========================================================================
- 
--- 
-2.17.1
+    probe_64.o ((! CONFIG_A) && CONFIG_B)
+    probe_32.o (CONFIG_A && CONFIG_B)
+    fork.o 1
+
+I've used Kmax to collect the symbolic constraints for compilation units fr=
+om the 5.3.11 (x86) kernel: https://drive.google.com/file/d/1q7dDzOvEKWUi7F=
+lZ2YixValV6xlkq1yY/view?usp=3Dsharing
+
+Since this was proposed as a GSoC project last year (https://wiki.linuxfoun=
+dation.org/gsoc/2019-gsoc-safety-critical-linux#student_project_proposals_2=
+018), I thought this might be useful for kernel developers.
+
+What (if any) would be useful applications that developers would most benef=
+it from?  Automatically generating configurations that include a particular=
+ C file?  Looking for dead (unconfigurable) compilation units?  Something m=
+ore pressing?  Looking forward to any suggestions.
+
+Best,
+Paul Gazzillo
