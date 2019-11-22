@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17390 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfKVIAs (ORCPT
+Received: from condef-05.nifty.com ([202.248.20.70]:59410 "EHLO
+        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727184AbfKVI1V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 Nov 2019 03:00:48 -0500
+        Fri, 22 Nov 2019 03:27:21 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: check MODULE_* macros in non-modular code
-Date: Fri, 22 Nov 2019 16:59:39 +0900
-Message-Id: <20191122075939.14481-1-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: check MODULE_* macros in non-modular code
+Date: Fri, 22 Nov 2019 17:11:00 +0900
+Message-Id: <20191122081100.27695-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Paul Gortmaker <paul.gortmaker@windriver.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Lucas De Marchi <lucas.demarchi@intel.com>, linux-kernel@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Paul Gortmaker <paul.gortmaker@windriver.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, Lucas De Marchi <lucas.demarchi@intel.com>, linux-kernel@vger.kernel.org
 
 Paul Gortmaker sent a lot of patches to remove orphan modular code.
 You can see his contributions by:
@@ -109,11 +109,14 @@ Please see Paul's commits.
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
+Changes in v2:
+  - Remove redundant back-slashes after the pipe operator '|'
+
  scripts/modules-check.sh | 54 ++++++++++++++++++++++++++++++++++++++++
  1 file changed, 54 insertions(+)
 
 diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-index f51f446707b8..5f1d98d4ee30 100755
+index f51f446707b8..7975aa61ddb8 100755
 --- a/scripts/modules-check.sh
 +++ b/scripts/modules-check.sh
 @@ -13,4 +13,58 @@ check_same_name_modules()
@@ -145,9 +148,9 @@ index f51f446707b8..5f1d98d4ee30 100755
 +
 +	# Exclude '.paramtype=' and '.param=' to skip checking module_param()
 +	# and MODULE_PARM_DESC().
-+	module_macro_users=$(tr '\0' '\n' < modules.builtin.modinfo | \
-+		sed -e '/\.parmtype=/d' -e '/\.parm=/d' | \
-+		sed -n 's/\..*//p' | sort | uniq)
++	module_macro_users=$(tr '\0' '\n' < modules.builtin.modinfo |
++			     sed -e '/\.parmtype=/d' -e '/\.parm=/d' |
++			     sed -n 's/\..*//p' | sort | uniq)
 +
 +	for m in $module_macro_users
 +	do
