@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:49458 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:49447 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726833AbfKWQFC (ORCPT
+        with ESMTP id S1726767AbfKWQFC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 23 Nov 2019 11:05:02 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 07/16] scripts/kallsyms: add sym_name() to mitigate cast ugliness
-Date: Sun, 24 Nov 2019 01:04:35 +0900
-Message-Id: <20191123160444.11251-8-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 11/16] scripts/kallsyms: skip ignored symbols very early
+Date: Sun, 24 Nov 2019 01:04:39 +0900
+Message-Id: <20191123160444.11251-12-yamada.masahiro@socionext.com>
 In-Reply-To: <20191123160444.11251-1-yamada.masahiro@socionext.com>
 References: <20191123160444.11251-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,115 +15,168 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-sym_entry::sym is (unsigned char *) instead of (char *) because
-kallsyms exploits the MSB for compression, and the characters are
-used as the index of token_profit array.
-
-However, it requires casting (unsigned char *) to (char *) in some
-places since standard library functions such as strcmp(), strlen()
-expect (char *).
-
-Introduce a new helper, sym_name(), which advances the given pointer
-by 1 and casts it to (char *).
+Unless the address range matters, symbols can be ignored earlier,
+which avoids unneeded memory allocation.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2: None
 
- scripts/kallsyms.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+ scripts/kallsyms.c | 113 +++++++++++++++++++++++++--------------------
+ 1 file changed, 62 insertions(+), 51 deletions(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index a57636c6f84f..baa2fa5692b0 100644
+index 056bde436540..843615c1d384 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
-@@ -74,6 +74,11 @@ static void usage(void)
- 	exit(1);
+@@ -18,6 +18,7 @@
+  *
+  */
+ 
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -79,6 +80,64 @@ static char *sym_name(const struct sym_entry *s)
+ 	return (char *)s->sym + 1;
  }
  
-+static char *sym_name(const struct sym_entry *s)
++static bool is_ignored_symbol(const char *name, char type)
 +{
-+	return (char *)s->sym + 1;
++	static const char * const ignored_symbols[] = {
++		/*
++		 * Symbols which vary between passes. Passes 1 and 2 must have
++		 * identical symbol lists. The kallsyms_* symbols below are
++		 * only added after pass 1, they would be included in pass 2
++		 * when --all-symbols is specified so exclude them to get a
++		 * stable symbol list.
++		 */
++		"kallsyms_addresses",
++		"kallsyms_offsets",
++		"kallsyms_relative_base",
++		"kallsyms_num_syms",
++		"kallsyms_names",
++		"kallsyms_markers",
++		"kallsyms_token_table",
++		"kallsyms_token_index",
++		/* Exclude linker generated symbols which vary between passes */
++		"_SDA_BASE_",		/* ppc */
++		"_SDA2_BASE_",		/* ppc */
++		NULL
++	};
++
++	static const char * const ignored_prefixes[] = {
++		"__crc_",		/* modversions */
++		"__efistub_",		/* arm64 EFI stub namespace */
++		NULL
++	};
++
++	static const char * const ignored_suffixes[] = {
++		"_from_arm",		/* arm */
++		"_from_thumb",		/* arm */
++		"_veneer",		/* arm */
++		NULL
++	};
++
++	const char * const *p;
++
++	/* Exclude symbols which vary between passes. */
++	for (p = ignored_symbols; *p; p++)
++		if (!strcmp(name, *p))
++			return true;
++
++	for (p = ignored_prefixes; *p; p++)
++		if (!strncmp(name, *p, strlen(*p)))
++			return true;
++
++	for (p = ignored_suffixes; *p; p++) {
++		int l = strlen(name) - strlen(*p);
++
++		if (l >= 0 && !strcmp(name + l, *p))
++			return true;
++	}
++
++	return false;
 +}
 +
  static int check_symbol_range(const char *sym, unsigned long long addr,
  			      struct addr_range *ranges, int entries)
  {
-@@ -154,7 +159,7 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 			"unable to allocate required amount of memory\n");
- 		exit(EXIT_FAILURE);
+@@ -118,6 +177,9 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+ 		return -1;
  	}
--	strcpy((char *)s->sym + 1, sym);
-+	strcpy(sym_name(s), sym);
- 	s->sym[0] = stype;
  
- 	s->percpu_absolute = 0;
-@@ -215,7 +220,7 @@ static int symbol_valid(struct sym_entry *s)
- 		NULL };
++	if (is_ignored_symbol(sym, stype))
++		return -1;
++
+ 	/* Ignore most absolute/undefined (?) symbols. */
+ 	if (strcmp(sym, "_text") == 0)
+ 		_text = s->addr;
+@@ -188,38 +250,6 @@ static int symbol_in_range(const struct sym_entry *s,
  
- 	int i;
--	char *sym_name = (char *)s->sym + 1;
-+	const char *name = sym_name(s);
+ static int symbol_valid(const struct sym_entry *s)
+ {
+-	/* Symbols which vary between passes.  Passes 1 and 2 must have
+-	 * identical symbol lists.  The kallsyms_* symbols below are only added
+-	 * after pass 1, they would be included in pass 2 when --all-symbols is
+-	 * specified so exclude them to get a stable symbol list.
+-	 */
+-	static const char * const special_symbols[] = {
+-		"kallsyms_addresses",
+-		"kallsyms_offsets",
+-		"kallsyms_relative_base",
+-		"kallsyms_num_syms",
+-		"kallsyms_names",
+-		"kallsyms_markers",
+-		"kallsyms_token_table",
+-		"kallsyms_token_index",
+-
+-	/* Exclude linker generated symbols which vary between passes */
+-		"_SDA_BASE_",		/* ppc */
+-		"_SDA2_BASE_",		/* ppc */
+-		NULL };
+-
+-	static const char * const special_prefixes[] = {
+-		"__crc_",		/* modversions */
+-		"__efistub_",		/* arm64 EFI stub namespace */
+-		NULL };
+-
+-	static const char * const special_suffixes[] = {
+-		"_veneer",		/* arm */
+-		"_from_arm",		/* arm */
+-		"_from_thumb",		/* arm */
+-		NULL };
+-
+-	int i;
+ 	const char *name = sym_name(s);
  
  	/* if --all-symbols is not specified, then symbols outside the text
- 	 * and inittext sections are discarded */
-@@ -230,30 +235,28 @@ static int symbol_valid(struct sym_entry *s)
- 		 * rules.
- 		 */
- 		if ((s->addr == text_range_text->end &&
--				strcmp(sym_name,
--				       text_range_text->end_sym)) ||
-+		     strcmp(name, text_range_text->end_sym)) ||
- 		    (s->addr == text_range_inittext->end &&
--				strcmp(sym_name,
--				       text_range_inittext->end_sym)))
-+		     strcmp(name, text_range_inittext->end_sym)))
+@@ -241,25 +271,6 @@ static int symbol_valid(const struct sym_entry *s)
  			return 0;
  	}
  
- 	/* Exclude symbols which vary between passes. */
- 	for (i = 0; special_symbols[i]; i++)
--		if (strcmp(sym_name, special_symbols[i]) == 0)
-+		if (strcmp(name, special_symbols[i]) == 0)
- 			return 0;
- 
- 	for (i = 0; special_prefixes[i]; i++) {
- 		int l = strlen(special_prefixes[i]);
- 
--		if (strncmp(sym_name, special_prefixes[i], l) == 0)
-+		if (strncmp(name, special_prefixes[i], l) == 0)
- 			return 0;
- 	}
- 
- 	for (i = 0; special_suffixes[i]; i++) {
--		int l = strlen(sym_name) - strlen(special_suffixes[i]);
-+		int l = strlen(name) - strlen(special_suffixes[i]);
- 
--		if (l >= 0 && strcmp(sym_name + l, special_suffixes[i]) == 0)
-+		if (l >= 0 && strcmp(name + l, special_suffixes[i]) == 0)
- 			return 0;
- 	}
- 
-@@ -626,7 +629,7 @@ static void optimize_token_table(void)
- /* guess for "linker script provide" symbol */
- static int may_be_linker_script_provide_symbol(const struct sym_entry *se)
- {
--	const char *symbol = (char *)se->sym + 1;
-+	const char *symbol = sym_name(se);
- 	int len = se->len - 1;
- 
- 	if (len < 8)
-@@ -696,8 +699,8 @@ static int compare_symbols(const void *a, const void *b)
- 		return wa - wb;
- 
- 	/* sort by the number of prefix underscores */
--	wa = prefix_underscores_count((const char *)sa->sym + 1);
--	wb = prefix_underscores_count((const char *)sb->sym + 1);
-+	wa = prefix_underscores_count(sym_name(sa));
-+	wb = prefix_underscores_count(sym_name(sb));
- 	if (wa != wb)
- 		return wa - wb;
+-	/* Exclude symbols which vary between passes. */
+-	for (i = 0; special_symbols[i]; i++)
+-		if (strcmp(name, special_symbols[i]) == 0)
+-			return 0;
+-
+-	for (i = 0; special_prefixes[i]; i++) {
+-		int l = strlen(special_prefixes[i]);
+-
+-		if (strncmp(name, special_prefixes[i], l) == 0)
+-			return 0;
+-	}
+-
+-	for (i = 0; special_suffixes[i]; i++) {
+-		int l = strlen(name) - strlen(special_suffixes[i]);
+-
+-		if (l >= 0 && strcmp(name + l, special_suffixes[i]) == 0)
+-			return 0;
+-	}
+-
+ 	return 1;
+ }
  
 -- 
 2.17.1
