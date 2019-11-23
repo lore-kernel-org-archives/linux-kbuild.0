@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:49457 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:49446 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726820AbfKWQFC (ORCPT
+        with ESMTP id S1726784AbfKWQFB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Nov 2019 11:05:02 -0500
+        Sat, 23 Nov 2019 11:05:01 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 14/16] scripts/kallsyms: make check_symbol_range() void function
-Date: Sun, 24 Nov 2019 01:04:42 +0900
-Message-Id: <20191123160444.11251-15-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 09/16] scripts/kallsyms: make find_token() return (unsigned char *)
+Date: Sun, 24 Nov 2019 01:04:37 +0900
+Message-Id: <20191123160444.11251-10-yamada.masahiro@socionext.com>
 In-Reply-To: <20191123160444.11251-1-yamada.masahiro@socionext.com>
 References: <20191123160444.11251-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,60 +15,30 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-There is no more reason to check the return value of
-check_symbol_range().
+The callers of this function expect (unsigned char *). I do not see
+a good reason to make this function return (void *).
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
 Changes in v2: None
 
- scripts/kallsyms.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ scripts/kallsyms.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index d90a6133d7b8..f4d5f131556d 100644
+index 89cc7c098c51..274a77bfbd63 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
-@@ -155,8 +155,8 @@ static bool is_ignored_symbol(const char *name, char type)
- 	return false;
+@@ -503,7 +503,8 @@ static void build_initial_tok_table(void)
+ 		learn_symbol(table[i].sym, table[i].len);
  }
  
--static int check_symbol_range(const char *sym, unsigned long long addr,
--			      struct addr_range *ranges, int entries)
-+static void check_symbol_range(const char *sym, unsigned long long addr,
-+			       struct addr_range *ranges, int entries)
+-static void *find_token(unsigned char *str, int len, unsigned char *token)
++static unsigned char *find_token(unsigned char *str, int len,
++				 unsigned char *token)
  {
- 	size_t i;
- 	struct addr_range *ar;
-@@ -166,14 +166,12 @@ static int check_symbol_range(const char *sym, unsigned long long addr,
+ 	int i;
  
- 		if (strcmp(sym, ar->start_sym) == 0) {
- 			ar->start = addr;
--			return 0;
-+			return;
- 		} else if (strcmp(sym, ar->end_sym) == 0) {
- 			ar->end = addr;
--			return 0;
-+			return;
- 		}
- 	}
--
--	return 1;
- }
- 
- static int read_symbol(FILE *in, struct sym_entry *s)
-@@ -200,9 +198,8 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 	/* Ignore most absolute/undefined (?) symbols. */
- 	if (strcmp(sym, "_text") == 0)
- 		_text = s->addr;
--	else if (check_symbol_range(sym, s->addr, text_ranges,
--				    ARRAY_SIZE(text_ranges)) == 0)
--		/* nothing to do */;
-+
-+	check_symbol_range(sym, s->addr, text_ranges, ARRAY_SIZE(text_ranges));
- 
- 	/* include the type field in the symbol name, so that it gets
- 	 * compressed together */
 -- 
 2.17.1
