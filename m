@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:39588 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:39540 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726830AbfKWN2C (ORCPT
+        with ESMTP id S1726784AbfKWN2B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Nov 2019 08:28:02 -0500
+        Sat, 23 Nov 2019 08:28:01 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 06/16] scripts/kallsyms: add sym_name() to mitigate cast ugliness
-Date: Sat, 23 Nov 2019 22:27:17 +0900
-Message-Id: <20191123132727.30151-7-yamada.masahiro@socionext.com>
+Subject: [PATCH 09/16] scripts/kallsyms: add const qualifiers where possible
+Date: Sat, 23 Nov 2019 22:27:20 +0900
+Message-Id: <20191123132727.30151-10-yamada.masahiro@socionext.com>
 In-Reply-To: <20191123132727.30151-1-yamada.masahiro@socionext.com>
 References: <20191123132727.30151-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,113 +15,127 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-sym_entry::sym is (unsigned char *) instead of (char *) because
-kallsyms exploits the MSB for compression, and the characters are
-used as the index of token_profit array.
-
-However, it requires casting (unsigned char *) to (char *) in some
-places since standard library functions such as strcmp(), strlen()
-expect (char *).
-
-Introduce a new helper, sym_name(), which advances the given pointer
-by 1 and casts it to (char *).
+Add 'const' where a function does not write to the pointer dereferenes.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- scripts/kallsyms.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+ scripts/kallsyms.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index d06f373b3a96..7b00b4030be4 100644
+index c4f7f20ecfb7..d745fd2c7247 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
-@@ -74,6 +74,11 @@ static void usage(void)
- 	exit(1);
+@@ -170,11 +170,11 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+ 	return 0;
  }
  
-+static char *sym_name(const struct sym_entry *s)
-+{
-+	return (char *)s->sym + 1;
-+}
-+
- static int check_symbol_range(const char *sym, unsigned long long addr,
- 			      struct addr_range *ranges, int entries)
+-static int symbol_in_range(struct sym_entry *s, struct addr_range *ranges,
+-			   int entries)
++static int symbol_in_range(const struct sym_entry *s,
++			   const struct addr_range *ranges, int entries)
  {
-@@ -154,7 +159,7 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 			"unable to allocate required amount of memory\n");
- 		exit(EXIT_FAILURE);
- 	}
--	strcpy((char *)s->sym + 1, sym);
-+	strcpy(sym_name(s), sym);
- 	s->sym[0] = stype;
+ 	size_t i;
+-	struct addr_range *ar;
++	const struct addr_range *ar;
  
- 	s->percpu_absolute = 0;
-@@ -215,7 +220,7 @@ static int symbol_valid(struct sym_entry *s)
+ 	for (i = 0; i < entries; ++i) {
+ 		ar = &ranges[i];
+@@ -186,14 +186,14 @@ static int symbol_in_range(struct sym_entry *s, struct addr_range *ranges,
+ 	return 0;
+ }
+ 
+-static int symbol_valid(struct sym_entry *s)
++static int symbol_valid(const struct sym_entry *s)
+ {
+ 	/* Symbols which vary between passes.  Passes 1 and 2 must have
+ 	 * identical symbol lists.  The kallsyms_* symbols below are only added
+ 	 * after pass 1, they would be included in pass 2 when --all-symbols is
+ 	 * specified so exclude them to get a stable symbol list.
+ 	 */
+-	static char *special_symbols[] = {
++	static const char * const special_symbols[] = {
+ 		"kallsyms_addresses",
+ 		"kallsyms_offsets",
+ 		"kallsyms_relative_base",
+@@ -208,12 +208,12 @@ static int symbol_valid(struct sym_entry *s)
+ 		"_SDA2_BASE_",		/* ppc */
  		NULL };
  
- 	int i;
--	char *sym_name = (char *)s->sym + 1;
-+	const char *name = sym_name(s);
+-	static char *special_prefixes[] = {
++	static const char * const special_prefixes[] = {
+ 		"__crc_",		/* modversions */
+ 		"__efistub_",		/* arm64 EFI stub namespace */
+ 		NULL };
  
- 	/* if --all-symbols is not specified, then symbols outside the text
- 	 * and inittext sections are discarded */
-@@ -230,30 +235,28 @@ static int symbol_valid(struct sym_entry *s)
- 		 * rules.
- 		 */
- 		if ((s->addr == text_range_text->end &&
--				strcmp(sym_name,
--				       text_range_text->end_sym)) ||
-+		     strcmp(name, text_range_text->end_sym)) ||
- 		    (s->addr == text_range_inittext->end &&
--				strcmp(sym_name,
--				       text_range_inittext->end_sym)))
-+		     strcmp(name, text_range_inittext->end_sym)))
- 			return 0;
+-	static char *special_suffixes[] = {
++	static const char * const special_suffixes[] = {
+ 		"_veneer",		/* arm */
+ 		"_from_arm",		/* arm */
+ 		"_from_thumb",		/* arm */
+@@ -281,7 +281,7 @@ static void read_map(FILE *in)
  	}
+ }
  
- 	/* Exclude symbols which vary between passes. */
- 	for (i = 0; special_symbols[i]; i++)
--		if (strcmp(sym_name, special_symbols[i]) == 0)
-+		if (strcmp(name, special_symbols[i]) == 0)
- 			return 0;
- 
- 	for (i = 0; special_prefixes[i]; i++) {
- 		int l = strlen(special_prefixes[i]);
- 
--		if (strncmp(sym_name, special_prefixes[i], l) == 0)
-+		if (strncmp(name, special_prefixes[i], l) == 0)
- 			return 0;
- 	}
- 
- 	for (i = 0; special_suffixes[i]; i++) {
--		int l = strlen(sym_name) - strlen(special_suffixes[i]);
-+		int l = strlen(name) - strlen(special_suffixes[i]);
- 
--		if (l >= 0 && strcmp(sym_name + l, special_suffixes[i]) == 0)
-+		if (l >= 0 && strcmp(name + l, special_suffixes[i]) == 0)
- 			return 0;
- 	}
- 
-@@ -618,7 +621,7 @@ static void optimize_token_table(void)
- /* guess for "linker script provide" symbol */
- static int may_be_linker_script_provide_symbol(const struct sym_entry *se)
+-static void output_label(char *label)
++static void output_label(const char *label)
  {
--	const char *symbol = (char *)se->sym + 1;
-+	const char *symbol = sym_name(se);
- 	int len = se->len - 1;
+ 	printf(".globl %s\n", label);
+ 	printf("\tALGN\n");
+@@ -290,7 +290,7 @@ static void output_label(char *label)
  
- 	if (len < 8)
-@@ -688,8 +691,8 @@ static int compare_symbols(const void *a, const void *b)
- 		return wa - wb;
+ /* uncompress a compressed symbol. When this function is called, the best table
+  * might still be compressed itself, so the function needs to be recursive */
+-static int expand_symbol(unsigned char *data, int len, char *result)
++static int expand_symbol(const unsigned char *data, int len, char *result)
+ {
+ 	int c, rlen, total=0;
  
- 	/* sort by the number of prefix underscores */
--	wa = prefix_underscores_count((const char *)sa->sym + 1);
--	wb = prefix_underscores_count((const char *)sb->sym + 1);
-+	wa = prefix_underscores_count(sym_name(sa));
-+	wb = prefix_underscores_count(sym_name(sb));
- 	if (wa != wb)
- 		return wa - wb;
+@@ -315,7 +315,7 @@ static int expand_symbol(unsigned char *data, int len, char *result)
+ 	return total;
+ }
  
+-static int symbol_absolute(struct sym_entry *s)
++static int symbol_absolute(const struct sym_entry *s)
+ {
+ 	return s->percpu_absolute;
+ }
+@@ -453,7 +453,7 @@ static void write_src(void)
+ /* table lookup compression functions */
+ 
+ /* count all the possible tokens in a symbol */
+-static void learn_symbol(unsigned char *symbol, int len)
++static void learn_symbol(const unsigned char *symbol, int len)
+ {
+ 	int i;
+ 
+@@ -462,7 +462,7 @@ static void learn_symbol(unsigned char *symbol, int len)
+ }
+ 
+ /* decrease the count for all the possible tokens in a symbol */
+-static void forget_symbol(unsigned char *symbol, int len)
++static void forget_symbol(const unsigned char *symbol, int len)
+ {
+ 	int i;
+ 
+@@ -490,7 +490,7 @@ static void build_initial_tok_table(void)
+ }
+ 
+ static unsigned char *find_token(unsigned char *str, int len,
+-				 unsigned char *token)
++				 const unsigned char *token)
+ {
+ 	int i;
+ 
+@@ -503,7 +503,7 @@ static unsigned char *find_token(unsigned char *str, int len,
+ 
+ /* replace a given token in all the valid symbols. Use the sampled symbols
+  * to update the counts */
+-static void compress_symbols(unsigned char *str, int idx)
++static void compress_symbols(const unsigned char *str, int idx)
+ {
+ 	unsigned int i, len, size;
+ 	unsigned char *p1, *p2;
 -- 
 2.17.1
