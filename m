@@ -1,85 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:31571 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725800AbfKWHXC (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:39541 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726451AbfKWN17 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Nov 2019 02:23:02 -0500
-MIME-Version: 1.0
-References: <20191114174226.7201-1-yamada.masahiro@socionext.com>
-In-Reply-To: <20191114174226.7201-1-yamada.masahiro@socionext.com>
+        Sat, 23 Nov 2019 08:27:59 -0500
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 23 Nov 2019 16:22:20 +0900
-Message-ID: <CAK7LNATk-D2g0FJ_TVVxXQZ-m2uzdHYVaDxzuZKVX9WA+VWOKA@mail.gmail.com>
-Subject: Re: [PATCH 1/6] modpost: add a helper to get data pointed by a symbol
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 16/16] scripts/kallsyms: remove redundant initializers
+Date: Sat, 23 Nov 2019 22:27:27 +0900
+Message-Id: <20191123132727.30151-17-yamada.masahiro@socionext.com>
+In-Reply-To: <20191123132727.30151-1-yamada.masahiro@socionext.com>
+References: <20191123132727.30151-1-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 2:42 AM Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
->
-> When CONFIG_MODULE_REL_CRCS is enabled, the value of __crc_* is not
-> an absolute value, but the address to the CRC data embedded in the
-> .rodata section.
->
-> Getting the data pointed by the symbol value is somewhat complex.
-> Split it out into a new helper, sym_get_data().
->
-> I will reuse it to refactor namespace_from_kstrtabns() in the next
-> commit.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
+These are set to zero without the explicit initializers.
 
-Series, applied to linux-kbuild.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ scripts/kallsyms.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
->
->  scripts/mod/modpost.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 46d7f695fe7f..cd885573daaf 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -308,6 +308,18 @@ static const char *sec_name(struct elf_info *elf, int secindex)
->         return sech_name(elf, &elf->sechdrs[secindex]);
->  }
->
-> +static void *sym_get_data(const struct elf_info *info, const Elf_Sym *sym)
-> +{
-> +       Elf_Shdr *sechdr = &info->sechdrs[sym->st_shndx];
-> +       unsigned long offset;
-> +
-> +       offset = sym->st_value;
-> +       if (info->hdr->e_type != ET_REL)
-> +               offset -= sechdr->sh_addr;
-> +
-> +       return (void *)info->hdr + sechdr->sh_offset + offset;
-> +}
-> +
->  #define strstarts(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
->
->  static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
-> @@ -697,10 +709,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
->                         unsigned int *crcp;
->
->                         /* symbol points to the CRC in the ELF object */
-> -                       crcp = (void *)info->hdr + sym->st_value +
-> -                              info->sechdrs[sym->st_shndx].sh_offset -
-> -                              (info->hdr->e_type != ET_REL ?
-> -                               info->sechdrs[sym->st_shndx].sh_addr : 0);
-> +                       crcp = sym_get_data(info, sym);
->                         crc = TO_NATIVE(*crcp);
->                 }
->                 sym_update_crc(symname + strlen("__crc_"), mod, crc,
-> --
-> 2.17.1
->
-
-
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 22ff206e2533..803df71e5069 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -57,9 +57,9 @@ static struct addr_range percpu_range = {
+ 
+ static struct sym_entry *table;
+ static unsigned int table_size, table_cnt;
+-static int all_symbols = 0;
+-static int absolute_percpu = 0;
+-static int base_relative = 0;
++static int all_symbols;
++static int absolute_percpu;
++static int base_relative;
+ 
+ static int token_profit[0x10000];
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
