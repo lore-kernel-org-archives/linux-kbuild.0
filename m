@@ -1,51 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:49449 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726740AbfKWQFB (ORCPT
+Received: from mail-io1-f65.google.com ([209.85.166.65]:36805 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726992AbfKXN2F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 Nov 2019 11:05:01 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 15/16] scripts/kallsyms: put check_symbol_range() calls close together
-Date: Sun, 24 Nov 2019 01:04:43 +0900
-Message-Id: <20191123160444.11251-16-yamada.masahiro@socionext.com>
-In-Reply-To: <20191123160444.11251-1-yamada.masahiro@socionext.com>
-References: <20191123160444.11251-1-yamada.masahiro@socionext.com>
+        Sun, 24 Nov 2019 08:28:05 -0500
+Received: by mail-io1-f65.google.com with SMTP id s3so13196518ioe.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 24 Nov 2019 05:28:03 -0800 (PST)
+MIME-Version: 1.0
+Reply-To: afginvestmentbrokers@al-faisaliah.org
+From: "Mr. Joon-Kyu Lin" <johnpfox60@gmail.com>
+Date: Sun, 24 Nov 2019 05:28:02 -0800
+Message-ID: <CAHLmmYMfUhtA9ktHbRfePyRD2j0yBArOW=ZhsrS_vTfqhPovgw@mail.gmail.com>
+Subject: Venture Capital & Private Investors
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Put the relevant code close together.
+Attention:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+I am an investor that can provide funding for any viable business idea or
+venture.
 
-Changes in v2: None
+Please do let me know if you have fund management abilities, credible
+projects in need of funding or advanced stage projects requiring Bank
+Guarantees, Loans or Partnership, Joint Venture, Equity, we would be
+delighted to work with you.
 
- scripts/kallsyms.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index f4d5f131556d..b9b1a4cf1c65 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -200,6 +200,7 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 		_text = s->addr;
- 
- 	check_symbol_range(sym, s->addr, text_ranges, ARRAY_SIZE(text_ranges));
-+	check_symbol_range(sym, s->addr, &percpu_range, 1);
- 
- 	/* include the type field in the symbol name, so that it gets
- 	 * compressed together */
-@@ -215,9 +216,6 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 
- 	s->percpu_absolute = 0;
- 
--	/* Record if we've found __per_cpu_start/end. */
--	check_symbol_range(sym, s->addr, &percpu_range, 1);
--
- 	return 0;
- }
- 
--- 
-2.17.1
+Best Regards,
+Mr. Joon-Kyu Lim
+Al Faisaliah Group (AFG)
+Venture Capital & Private Investors
+
+--
+*This email and any attachments are intended for the named recipients only
+and contain confidential materials. Any unauthorized copying, reviewing,
+dissemination or other use by anyone other than the named recipients of
+this communication is strictly prohibited. If you received this email in
+error and/or are not a named recipient, please notify the sender (Al
+Faisaliah Group) and delete all copies of this email. Thank you.
