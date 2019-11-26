@@ -1,41 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36805 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726992AbfKXN2F (ORCPT
+Received: from mail-io1-f70.google.com ([209.85.166.70]:50845 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728617AbfKZPrC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Nov 2019 08:28:05 -0500
-Received: by mail-io1-f65.google.com with SMTP id s3so13196518ioe.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 24 Nov 2019 05:28:03 -0800 (PST)
+        Tue, 26 Nov 2019 10:47:02 -0500
+Received: by mail-io1-f70.google.com with SMTP id t193so13578339iof.17
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Nov 2019 07:47:01 -0800 (PST)
 MIME-Version: 1.0
-Reply-To: afginvestmentbrokers@al-faisaliah.org
-From: "Mr. Joon-Kyu Lin" <johnpfox60@gmail.com>
-Date: Sun, 24 Nov 2019 05:28:02 -0800
-Message-ID: <CAHLmmYMfUhtA9ktHbRfePyRD2j0yBArOW=ZhsrS_vTfqhPovgw@mail.gmail.com>
-Subject: Venture Capital & Private Investors
-Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 26 Nov 2019 07:47:00 -0800
+In-Reply-To: <94eb2c059ce0bca273056940d77d@google.com>
+Message-ID: <0000000000007a85c4059841ca66@google.com>
+Subject: Re: INFO: task hung in do_ip_vs_set_ctl (2)
+From: syzbot <syzbot+7810ed2e0cb359580c17@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kadlec@blackhole.kfki.hu, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, mmarek@suse.com, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pablo@netfilter.org, syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org, wensong@linux-vs.org, yamada.masahiro@socionext.com
 
-Attention:
+syzbot has bisected this bug to:
 
-I am an investor that can provide funding for any viable business idea or
-venture.
+commit 6f7da290413ba713f0cdd9ff1a2a9bb129ef4f6c
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Jul 2 23:07:02 2017 +0000
 
-Please do let me know if you have fund management abilities, credible
-projects in need of funding or advanced stage projects requiring Bank
-Guarantees, Loans or Partnership, Joint Venture, Equity, we would be
-delighted to work with you.
+     Linux 4.12
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a2b78ce00000
+start commit:   17dec0a9 Merge branch 'userns-linus' of git://git.kernel.o..
+git tree:       net-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=da08d02b86752ade
+dashboard link: https://syzkaller.appspot.com/bug?extid=7810ed2e0cb359580c17
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=130abb47800000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=150a15bb800000
 
-Best Regards,
-Mr. Joon-Kyu Lim
-Al Faisaliah Group (AFG)
-Venture Capital & Private Investors
+Reported-by: syzbot+7810ed2e0cb359580c17@syzkaller.appspotmail.com
+Fixes: 6f7da290413b ("Linux 4.12")
 
---
-*This email and any attachments are intended for the named recipients only
-and contain confidential materials. Any unauthorized copying, reviewing,
-dissemination or other use by anyone other than the named recipients of
-this communication is strictly prohibited. If you received this email in
-error and/or are not a named recipient, please notify the sender (Al
-Faisaliah Group) and delete all copies of this email. Thank you.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
