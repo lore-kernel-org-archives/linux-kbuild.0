@@ -1,52 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34938 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726061AbfK0GTh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Nov 2019 01:19:37 -0500
-Date: Tue, 26 Nov 2019 22:19:34 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-Subject: Re: INFO: task hung in do_ip_vs_set_ctl (2)
-Message-ID: <20191127061934.GC227319@sol.localdomain>
-References: <94eb2c059ce0bca273056940d77d@google.com>
- <0000000000007a85c4059841ca66@google.com>
+Received: from mail-eopbgr40113.outbound.protection.outlook.com ([40.107.4.113]:12257
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726558AbfK0PEk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Nov 2019 10:04:40 -0500
+From: Erwan Velu <e.velu@criteo.com>
+Subject: Re: [PATCH 1/3] firmware/dmi_scan: Add dmi_save_release to save
+ releases fields
+Date: Wed, 27 Nov 2019 15:04:34 +0000
+Message-ID: <c1dce47f-f772-b6a9-745f-49a39788b276@criteo.com>
+References: <20190918094323.17515-1-e.velu@criteo.com>
+ <20191021163208.5cd03d59@endymion>
+In-Reply-To: <20191021163208.5cd03d59@endymion>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6A98BB875B3AC24EA7B7A6693A7C01DC@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000007a85c4059841ca66@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: syzbot <syzbot+7810ed2e0cb359580c17@syzkaller.appspotmail.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kadlec@blackhole.kfki.hu, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, mmarek@suse.com, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pablo@netfilter.org, syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org, wensong@linux-vs.org, yamada.masahiro@socionext.com
+To: Jean Delvare <jdelvare@suse.de>, Erwan Velu <erwanaliasr1@gmail.com>
+Cc: "Robert P. J. Day" <rpjday@crashcourse.ca>, Changbin Du <changbin.du@intel.com>, Boris Brezillon <bbrezillon@kernel.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Jens Wiklander <jens.wiklander@linaro.org>, Sumit Garg <sumit.garg@linaro.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Michal Marek <michal.lkml@markovi.net>, Mattias Jacobsson <2pi@mok.nu>, Masahiro Yamada <yamada.masahiro@socionext.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Tue, Nov 26, 2019 at 07:47:00AM -0800, syzbot wrote:
-> syzbot has bisected this bug to:
-> 
-> commit 6f7da290413ba713f0cdd9ff1a2a9bb129ef4f6c
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Sun Jul 2 23:07:02 2017 +0000
-> 
->     Linux 4.12
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a2b78ce00000
-> start commit:   17dec0a9 Merge branch 'userns-linus' of git://git.kernel.o..
-> git tree:       net-next
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=da08d02b86752ade
-> dashboard link: https://syzkaller.appspot.com/bug?extid=7810ed2e0cb359580c17
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=130abb47800000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=150a15bb800000
-> 
-> Reported-by: syzbot+7810ed2e0cb359580c17@syzkaller.appspotmail.com
-> Fixes: 6f7da290413b ("Linux 4.12")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-This bisection is obviously bogus, though oddly enough the bisection log shows
-that v4.12 crashed 10/10 times, while v4.12~1 crashed 0/10 times...
-
-Anyway, this bug looks extremely stale, as it only occurred for a 2-week period
-in 2018.  Commit 5c64576a77 ("ipvs: fix rtnl_lock lockups caused by
-start_sync_thread") might have been the fix, but I'm just invalidating this:
-
-#syz invalid
-
-- Eric
+R290IGFsbCB5b3VyIHBvaW50cywgc2VuZGluZyBhIFYyIHdpdGggdGhlIGZpeGVzIHlvdSBhc2tl
+ZC4NCg0KT24gMjEvMTAvMjAxOSAxNjozMiwgSmVhbiBEZWx2YXJlIHdyb3RlOg0KPiBIaSBFcndh
+biwNCj4NCj4gU29ycnkgZm9yIHRoZSBsYXRlIGFuc3dlci4NCj4NCj4gT24gV2VkLCAxOCBTZXAg
+MjAxOSAxMTo0MzoxOSArMDIwMCwgRXJ3YW4gVmVsdSB3cm90ZToNCj4+IEluIERNSSB0eXBlIDAs
+IHRoZXJlIGlzIHNldmVyYWwgZmllbGRzIHRoYXQgZW5jb2RlcyBhIHJlbGVhc2UuDQo+IGlzIC0+
+IGFyZQ0KPiBlbmNvZGVzIC0+IGVuY29kZQ0KPg0KPj4gVGhlIGRtaV9zYXZlX3JlbGVhc2UoKSBm
+dW5jdGlvbiBoYXZlIHRoZSBsb2dpYyB0byBjaGVjayBpZiB0aGUgZmllbGQgaXMgdmFsaWQuDQo+
+PiBJZiBzbywgaXQgcmVwb3J0cyB0aGUgYWN0dWFsIHZhbHVlLg0KPj4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IEVyd2FuIFZlbHUgPGUudmVsdUBjcml0ZW8uY29tPg0KPj4gLS0tDQo+PiAgIGRyaXZlcnMv
+ZmlybXdhcmUvZG1pX3NjYW4uYyB8IDI2ICsrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiAg
+IDEgZmlsZSBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspDQo+IFRoaXMgcGF0Y2ggaW50cm9kdWNl
+cyBhIHdhcm5pbmc6DQo+DQo+IGRyaXZlcnMvZmlybXdhcmUvZG1pX3NjYW4uYzoxODU6MjA6IHdh
+cm5pbmc6IOKAmGRtaV9zYXZlX3JlbGVhc2XigJkgZGVmaW5lZCBidXQgbm90IHVzZWQgWy1XdW51
+c2VkLWZ1bmN0aW9uXQ0KPiAgIHN0YXRpYyB2b2lkIF9faW5pdCBkbWlfc2F2ZV9yZWxlYXNlKGNv
+bnN0IHN0cnVjdCBkbWlfaGVhZGVyICpkbSwgaW50IHNsb3QsDQo+ICAgICAgICAgICAgICAgICAg
+ICAgIF5+fn5+fn5+fn5+fn5+fn4NCj4NCj4gYmVjYXVzZSB5b3UgYWRkIGEgc3RhdGljIGZ1bmN0
+aW9uIHdpdGggbm8gdXNlci4gSSB1bmRlcnN0YW5kIHRoYXQgeW91DQo+IGFkZCBhIHVzZSBsYXRl
+ciBpbiB0aGUgc2VyaWVzLCBidXQgaXQncyBub3QgT0sgdG8gaW50cm9kdWNlIGEgd2FybmluZw0K
+PiBldmVuIGlmIHRlbXBvcmFyeS4gSXQgYWxzbyBtYWtlcyBsaXR0bGUgc2Vuc2UgdG8gc3BsaXQg
+dGhlIGNoYW5nZXMgdGhhdA0KPiB3YXkgYXMgdGhlcmUgaXMgbm8gd2F5IHRvIGNoZXJyeS1waWNr
+IG9uZSBvZiB0aGUgcGF0Y2hlcyB3aXRob3V0IHRoZQ0KPiByZXN0LiBBbmQgaXQgbWFrZXMgdGhp
+bmdzIG1vcmUgZGlmZmljdWx0IHRvIHJldmlldyB0b28sIGFzIEkgY2FuJ3QNCj4gcG9zc2libHkg
+anVkZ2UgaWYgdGhpcyBmdW5jdGlvbiBpZiByaWdodCB3aXRob3V0IGFsc28gc2VlaW5nIHdoZXJl
+IGlzDQo+IHdpbGwgYmUgY2FsbGVkIGFuZCBob3cuDQo+DQo+IFNvLCBwbGVhc2UgbWVyZ2UgYWxs
+IHRoZSBjaGFuZ2VzIGludG8gYSBzaW5nbGUgcGF0Y2guDQo+DQo+PiBkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9maXJtd2FyZS9kbWlfc2Nhbi5jIGIvZHJpdmVycy9maXJtd2FyZS9kbWlfc2Nhbi5jDQo+
+PiBpbmRleCAzNWVkNTZiOWMzNGYuLjIwMmJkMmM2OWQwZiAxMDA2NDQNCj4+IC0tLSBhL2RyaXZl
+cnMvZmlybXdhcmUvZG1pX3NjYW4uYw0KPj4gKysrIGIvZHJpdmVycy9maXJtd2FyZS9kbWlfc2Nh
+bi5jDQo+PiBAQCAtMTgxLDYgKzE4MSwzMiBAQCBzdGF0aWMgdm9pZCBfX2luaXQgZG1pX3NhdmVf
+aWRlbnQoY29uc3Qgc3RydWN0IGRtaV9oZWFkZXIgKmRtLCBpbnQgc2xvdCwNCj4+ICAgCWRtaV9p
+ZGVudFtzbG90XSA9IHA7DQo+PiAgIH0NCj4+ICAgDQo+PiArc3RhdGljIHZvaWQgX19pbml0IGRt
+aV9zYXZlX3JlbGVhc2UoY29uc3Qgc3RydWN0IGRtaV9oZWFkZXIgKmRtLCBpbnQgc2xvdCwNCj4+
+ICsJCWludCBpbmRleCkNCj4+ICt7DQo+PiArCWNvbnN0IHU4ICpkOw0KPj4gKwljaGFyICpzOw0K
+Pj4gKw0KPj4gKwkvLyBJZiB0aGUgdGFibGUgZG9lc24ndCBoYXZlIHRoZSBmaWVsZCwgbGV0J3Mg
+cmV0dXJuDQo+IFBsZWFzZSBzdGljayB0byBDODktc3R5bGUgY29tbWVudHMgKC8qICovKSBhcyB1
+c2VkIGV2ZXJ5d2hlcmUgZWxzZSBpbg0KPiB0aGlzIGZpbGUuDQo+DQo+PiArCWlmIChkbWlfaWRl
+bnRbc2xvdF0gfHwgZG0tPmxlbmd0aCA8IGluZGV4KQ0KPj4gKwkJcmV0dXJuOw0KPj4gKw0KPj4g
+KwlkID0gKHU4ICopIGRtICsgaW5kZXg7DQo+PiArDQo+PiArCS8vIEFzIHBlciB0aGUgc3BlY2lm
+aWNhdGlvbiwNCj4+ICsJLy8gaWYgdGhlIHN5c3RlbSBkb2Vzbid0IGhhdmUgdGhlIGZpZWxkLCB0
+aGUgdmFsdWUgaXMgRkYNCj4+ICsJaWYgKGRbMF0gPT0gMHhGRikNCj4+ICsJCXJldHVybjsNCj4g
+VGhhdCdzIG5vdCBleGFjdGx5IHdoYXQgdGhlIHNwZWNpZmljYXRpb24gc2F5cy4gSXQgc2F5czoN
+Cj4NCj4gIklmIHRoZSBzeXN0ZW0gZG9lcyBub3Qgc3VwcG9ydCB0aGUgdXNlIG9mIFt0aGUgU3lz
+dGVtIEJJT1MgTWFqb3INCj4gUmVsZWFzZV0gZmllbGQsIHRoZSB2YWx1ZSBpcyAwRkZoIGZvciBi
+b3RoIHRoaXMgZmllbGQgYW5kIHRoZSBTeXN0ZW0NCj4gQklPUyBNaW5vciBSZWxlYXNlIGZpZWxk
+LiIgU28gdW51c2VkIGlzIHdoZW4gYm90aCBmaWVsZHMgYXJlIDB4RkYuIFlvdQ0KPiBjYW4ndCB0
+ZXN0IHRoZW0gaW5kZXBlbmRlbnRseS4NCj4NCj4gU2FtZSBnb2VzIGZvciB0aGUgRW1iZWRkZWQg
+Q29udHJvbGxlciBGaXJtd2FyZSBSZWxlYXNlIGZpZWxkcywgZXZlbiBpZg0KPiBpdCBpcyB3b3Jk
+ZWQgZGlmZmVyZW50bHksIHRoZSBsb2dpYyBpcyB0aGUgc2FtZS4NCj4NCj4+ICsNCj4+ICsJcyA9
+IGRtaV9hbGxvYyg0KTsNCj4+ICsJaWYgKCFzKQ0KPj4gKwkJcmV0dXJuOw0KPj4gKw0KPj4gKwlz
+cHJpbnRmKHMsICIldSIsIGRbMF0pOw0KPj4gKw0KPj4gKwlkbWlfaWRlbnRbc2xvdF0gPSBzOw0K
+Pj4gK30NCj4+ICsNCj4+ICAgc3RhdGljIHZvaWQgX19pbml0IGRtaV9zYXZlX3V1aWQoY29uc3Qg
+c3RydWN0IGRtaV9oZWFkZXIgKmRtLCBpbnQgc2xvdCwNCj4+ICAgCQlpbnQgaW5kZXgpDQo+PiAg
+IHsNCj4NCg==
