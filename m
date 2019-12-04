@@ -1,74 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:32821 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727855AbfLDMnA (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.24]:52545 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727530AbfLDNiw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Dec 2019 07:43:00 -0500
-Received: by mail-qt1-f195.google.com with SMTP id d5so7610342qto.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Dec 2019 04:42:59 -0800 (PST)
+        Wed, 4 Dec 2019 08:38:52 -0500
+Subject: Re: [RFC scripts] Modules info in one liner script
+References: <20191203072802.GA224932@ArchLinux>
+From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <f38056b7-9633-7ff9-c0f5-19c4ba71bee4@metux.net>
+Date: Wed, 4 Dec 2019 14:38:15 +0100
 MIME-Version: 1.0
-Reply-To: moneygram.1820@outlook.fr
-From: "Rev.Dr Emmanuel Okoye CEO Ecobank-benin"
-        <westernunion.benin982@gmail.com>
-Date: Wed, 4 Dec 2019 13:42:57 +0100
-Message-ID: <CAP=nHBJXiPmPL21x=_0BHWRk_3N3Yax+tTxcFi=t=AhN7g==1Q@mail.gmail.com>
-Subject: God has remembered your prayers I have already sent you Money Gram
- payment of $5000.00 today, MG 1029-8096
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191203072802.GA224932@ArchLinux>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: tl
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net, rdunlap@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Attn, dear Beneficiary.
+On 03.12.19 08:28, Bhaskar Chowdhury wrote:
 
-God has remembered your prayers
-I have already sent you Money Gram payment of $5000.00 today, MG 1029-8096
-This is because we have finally concluded to effect your transfer
-funds of $4.8,000.000usd
-through MONEY GRAM International Fund transfer Service
-Each payment will be sending to you by $5000.00 daily until the
-($4.8,000.000usd) is completely transferred
-we have this morning sent  MONEY GRAM payment of $5,000.00 in your name today
-So contact the MONEY GRAM Agent to pick up this first payment of $5000 now
+> Can we put in a script called "kernel_modules_info.sh"
+> under scripts dir??
 
-Contact person Mrs. Alan Ude
-Dir. MONEY GRAM Service,Benin
-Phone number: +229 98856728
-E-mail: moneygram.1820@outlook.fr
+I'd like to welcome that.
 
-Ask him to give you the complete mtcn, sender name, question and
-answer to enable you
-pick up the $5000.00 sent today,
-Also you are instructed to re-confirm your information's
-to Mrs.Alan Ude as listed below to avoid wrong transactions.
 
-(1Your Full name:............................................
-(2 Phone number.....................................................
-(3 Contact address:.....................................
-(4 Age:..................................................................
-(5 Country..............................................
-(6) Sex .................................................................
-(7) your occupation...........................................
+--mtx
 
-(8)Passport/By Attach or Drivers License Number:
-Contact Mrs. Alan Ude for your MONEY GRAM payment of $4.8,000.000usd
-Note please: I have paid service fees for you but the only money you
-are required
-to send to Mrs. Alan Ude is $90.00 only Transfer fee before you can
-pick up your transfer today.
-
-Send it to via Money Gram
-Receiver's Name-----Alan Ude
-Country----------Benin
-Address-----------Cotonou
-Quest--------Honest
-Ans-----------Trust
-
-I done all my best for you to receive your transfer now ok.
-We need your urgent reply
-Best Regards
-Rev.Dr Emmanuel Okoye
-CEO Ecobank-benin
-
-If we did not receive it urgent from you today,
-I will go ahead and release you funds to Mrs. Lyndia Ppaulson as your
-representative.
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
