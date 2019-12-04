@@ -1,39 +1,305 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39240 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbfLCJyE (ORCPT
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:46861 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726079AbfLDAqq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Dec 2019 04:54:04 -0500
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH 2/2] fix the SPDX syntax and bash interprester pointer
-Date: Tue,  3 Dec 2019 15:23:39 +0530
-Message-Id: <20191203095339.615774-1-unixbhaskar@gmail.com>
+        Tue, 3 Dec 2019 19:46:46 -0500
+From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Subject: [RFC PATCH v6 1/7] scripts/sortextable: Rewrite error/success handling
+Date: Wed,  4 Dec 2019 08:46:27 +0800
+Message-Id: <20191204004633.88660-2-shile.zhang@linux.alibaba.com>
+In-Reply-To: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
+References: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, michal.lkml@markovi.net, rdunlap@infradead.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@amacapital.net>, x86@kernel.org
+Cc: "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Shile Zhang <shile.zhang@linux.alibaba.com>
 
-SPDX syntax was complining by checkpatch fixed it,added space before it.
-And add bash interpreter to find by the env .
+The sortextable token some code from recordmount, which uses
+the same setjmp/longjmp to manage control flow.
+Now, recordmcount has been rewritten the error handling by
+commit 3f1df12019f3 ("recordmcount: Rewrite error/success handling").
 
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+So rewrite this part as well with more refactors, make it more readable
+and easy for further extend, no functional changes.
+
+Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- scripts/kernel_modules_info.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/sortextable.c | 119 +++++++++++++++---------------------------
+ scripts/sortextable.h |  11 ++--
+ 2 files changed, 48 insertions(+), 82 deletions(-)
 
-diff --git a/scripts/kernel_modules_info.sh b/scripts/kernel_modules_info.sh
-index f005c47a3aa6..3a9b00988ed3 100755
---- a/scripts/kernel_modules_info.sh
-+++ b/scripts/kernel_modules_info.sh
-@@ -1,5 +1,5 @@
--#!/bin/bash - 
--#SPDX-License-Identifier: GPL-2.0
-+#!/usr/bin/env bash 
-+# SPDX-License-Identifier: GPL-2.0
- #===============================================================================
- #
- #          FILE: kernel_modules_info.sh
+diff --git a/scripts/sortextable.c b/scripts/sortextable.c
+index 55768654e3c6..cd9762ba4467 100644
+--- a/scripts/sortextable.c
++++ b/scripts/sortextable.c
+@@ -22,7 +22,6 @@
+ #include <getopt.h>
+ #include <elf.h>
+ #include <fcntl.h>
+-#include <setjmp.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -51,61 +50,41 @@
+ #define EM_ARCV2	195
+ #endif
+ 
+-static int fd_map;	/* File descriptor for file being modified. */
+-static int mmap_failed; /* Boolean flag. */
+-static void *ehdr_curr; /* current ElfXX_Ehdr *  for resource cleanup */
+-static struct stat sb;	/* Remember .st_size, etc. */
+-static jmp_buf jmpenv;	/* setjmp/longjmp per-file error escape */
+-
+-/* setjmp() return values */
+-enum {
+-	SJ_SETJMP = 0,  /* hardwired first return */
+-	SJ_FAIL,
+-	SJ_SUCCEED
+-};
+-
+-/* Per-file resource cleanup when multiple files. */
+-static void
+-cleanup(void)
+-{
+-	if (!mmap_failed)
+-		munmap(ehdr_curr, sb.st_size);
+-	close(fd_map);
+-}
+-
+-static void __attribute__((noreturn))
+-fail_file(void)
+-{
+-	cleanup();
+-	longjmp(jmpenv, SJ_FAIL);
+-}
+-
+ /*
+  * Get the whole file as a programming convenience in order to avoid
+  * malloc+lseek+read+free of many pieces.  If successful, then mmap
+  * avoids copying unused pieces; else just read the whole file.
+  * Open for both read and write.
+  */
+-static void *mmap_file(char const *fname)
++static void *mmap_file(char const *fname, size_t *size)
+ {
+-	void *addr;
++	int fd;
++	struct stat sb;
++	void *addr = NULL;
+ 
+-	fd_map = open(fname, O_RDWR);
+-	if (fd_map < 0 || fstat(fd_map, &sb) < 0) {
++	fd = open(fname, O_RDWR);
++	if (fd < 0) {
+ 		perror(fname);
+-		fail_file();
++		return NULL;
++	}
++	if (fstat(fd, &sb) < 0) {
++		perror(fname);
++		goto out;
+ 	}
+ 	if (!S_ISREG(sb.st_mode)) {
+ 		fprintf(stderr, "not a regular file: %s\n", fname);
+-		fail_file();
++		goto out;
+ 	}
+-	addr = mmap(0, sb.st_size, PROT_READ|PROT_WRITE, MAP_SHARED,
+-		    fd_map, 0);
++	addr = mmap(0, sb.st_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+ 	if (addr == MAP_FAILED) {
+-		mmap_failed = 1;
+ 		fprintf(stderr, "Could not mmap file: %s\n", fname);
+-		fail_file();
++		goto out;
+ 	}
++
++	*size = sb.st_size;
++
++out:
++	close(fd);
+ 	return addr;
+ }
+ 
+@@ -264,19 +243,18 @@ static void sort_relative_table(char *extab_image, int image_size)
+ 	}
+ }
+ 
+-static void
+-do_file(char const *const fname)
++static int
++do_file(char const *const fname, void *addr)
+ {
+-	table_sort_t custom_sort;
+-	Elf32_Ehdr *ehdr = mmap_file(fname);
++	table_sort_t custom_sort = NULL;
++	Elf32_Ehdr *ehdr = addr;
++	int rc = -1;
+ 
+-	ehdr_curr = ehdr;
+ 	switch (ehdr->e_ident[EI_DATA]) {
+ 	default:
+ 		fprintf(stderr, "unrecognized ELF data encoding %d: %s\n",
+ 			ehdr->e_ident[EI_DATA], fname);
+-		fail_file();
+-		break;
++		return -1;
+ 	case ELFDATA2LSB:
+ 		r = rle;
+ 		r2 = r2le;
+@@ -298,7 +276,7 @@ do_file(char const *const fname)
+ 	||  (r2(&ehdr->e_type) != ET_EXEC && r2(&ehdr->e_type) != ET_DYN)
+ 	||  ehdr->e_ident[EI_VERSION] != EV_CURRENT) {
+ 		fprintf(stderr, "unrecognized ET_EXEC/ET_DYN file %s\n", fname);
+-		fail_file();
++		return -1;
+ 	}
+ 
+ 	custom_sort = NULL;
+@@ -306,7 +284,6 @@ do_file(char const *const fname)
+ 	default:
+ 		fprintf(stderr, "unrecognized e_machine %d %s\n",
+ 			r2(&ehdr->e_machine), fname);
+-		fail_file();
+ 		break;
+ 	case EM_386:
+ 	case EM_X86_64:
+@@ -333,16 +310,15 @@ do_file(char const *const fname)
+ 	default:
+ 		fprintf(stderr, "unrecognized ELF class %d %s\n",
+ 			ehdr->e_ident[EI_CLASS], fname);
+-		fail_file();
+ 		break;
+ 	case ELFCLASS32:
+ 		if (r2(&ehdr->e_ehsize) != sizeof(Elf32_Ehdr)
+ 		||  r2(&ehdr->e_shentsize) != sizeof(Elf32_Shdr)) {
+ 			fprintf(stderr,
+ 				"unrecognized ET_EXEC/ET_DYN file: %s\n", fname);
+-			fail_file();
++			break;
+ 		}
+-		do32(ehdr, fname, custom_sort);
++		rc = do32(ehdr, fname, custom_sort);
+ 		break;
+ 	case ELFCLASS64: {
+ 		Elf64_Ehdr *const ghdr = (Elf64_Ehdr *)ehdr;
+@@ -350,21 +326,22 @@ do_file(char const *const fname)
+ 		||  r2(&ghdr->e_shentsize) != sizeof(Elf64_Shdr)) {
+ 			fprintf(stderr,
+ 				"unrecognized ET_EXEC/ET_DYN file: %s\n", fname);
+-			fail_file();
++			break;
+ 		}
+-		do64(ghdr, fname, custom_sort);
++		rc = do64(ghdr, fname, custom_sort);
+ 		break;
+ 	}
+ 	}  /* end switch */
+ 
+-	cleanup();
++	return rc;
+ }
+ 
+ int
+ main(int argc, char *argv[])
+ {
+-	int n_error = 0;  /* gcc-4.3.0 false positive complaint */
+-	int i;
++	int i, n_error = 0;  /* gcc-4.3.0 false positive complaint */
++	size_t size = 0;
++	void *addr = NULL;
+ 
+ 	if (argc < 2) {
+ 		fprintf(stderr, "usage: sortextable vmlinux...\n");
+@@ -373,28 +350,16 @@ main(int argc, char *argv[])
+ 
+ 	/* Process each file in turn, allowing deep failure. */
+ 	for (i = 1; i < argc; i++) {
+-		char *file = argv[i];
+-		int const sjval = setjmp(jmpenv);
++		addr = mmap_file(argv[i], &size);
++		if (!addr) {
++			++n_error;
++			continue;
++		}
+ 
+-		switch (sjval) {
+-		default:
+-			fprintf(stderr, "internal error: %s\n", file);
+-			exit(1);
+-			break;
+-		case SJ_SETJMP:    /* normal sequence */
+-			/* Avoid problems if early cleanup() */
+-			fd_map = -1;
+-			ehdr_curr = NULL;
+-			mmap_failed = 1;
+-			do_file(file);
+-			break;
+-		case SJ_FAIL:    /* error in do_file or below */
++		if (do_file(argv[i], addr))
+ 			++n_error;
+-			break;
+-		case SJ_SUCCEED:    /* premature success */
+-			/* do nothing */
+-			break;
+-		}  /* end switch */
++
++		munmap(addr, size);
+ 	}
+ 	return !!n_error;
+ }
+diff --git a/scripts/sortextable.h b/scripts/sortextable.h
+index d4b3f6c40f02..5a62e94df678 100644
+--- a/scripts/sortextable.h
++++ b/scripts/sortextable.h
+@@ -87,7 +87,7 @@ static int compare_extable(const void *a, const void *b)
+ 	return 0;
+ }
+ 
+-static void
++static int
+ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
+ {
+ 	Elf_Shdr *shdr;
+@@ -146,17 +146,17 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
+ 	}
+ 	if (strtab_sec == NULL) {
+ 		fprintf(stderr,	"no .strtab in  file: %s\n", fname);
+-		fail_file();
++		return -1;
+ 	}
+ 	if (symtab_sec == NULL) {
+ 		fprintf(stderr,	"no .symtab in  file: %s\n", fname);
+-		fail_file();
++		return -1;
+ 	}
+ 	symtab = (const Elf_Sym *)((const char *)ehdr +
+ 				   _r(&symtab_sec->sh_offset));
+ 	if (extab_sec == NULL) {
+ 		fprintf(stderr,	"no __ex_table in  file: %s\n", fname);
+-		fail_file();
++		return -1;
+ 	}
+ 	strtab = (const char *)ehdr + _r(&strtab_sec->sh_offset);
+ 
+@@ -190,7 +190,7 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
+ 		fprintf(stderr,
+ 			"no main_extable_sort_needed symbol in  file: %s\n",
+ 			fname);
+-		fail_file();
++		return -1;
+ 	}
+ 	sort_needed_sec = &shdr[get_secindex(r2(&sym->st_shndx),
+ 					     sort_needed_sym - symtab,
+@@ -206,4 +206,5 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
+ #endif
+ 	/* We sorted it, clear the flag. */
+ 	w(0, sort_done_location);
++	return 0;
+ }
 -- 
-2.24.0
+2.24.0.rc2
