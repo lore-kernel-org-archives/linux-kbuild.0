@@ -1,44 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:36382 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726086AbfLDArg (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:52231 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726521AbfLDCwR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Dec 2019 19:47:36 -0500
-From: Shile Zhang <shile.zhang@linux.alibaba.com>
-Subject: [RFC PATCH v6 3/7] scripts/sortextable: Remove dead code
-Date: Wed,  4 Dec 2019 08:46:29 +0800
-Message-Id: <20191204004633.88660-4-shile.zhang@linux.alibaba.com>
-In-Reply-To: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
-References: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
+        Tue, 3 Dec 2019 21:52:17 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: fix 'No such file or directory' warning when cleaning
+Date: Wed,  4 Dec 2019 11:51:48 +0900
+Message-Id: <20191204025148.32101-1-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@amacapital.net>, x86@kernel.org
-Cc: "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Shile Zhang <shile.zhang@linux.alibaba.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-Remove the comment out dead code, no functional changes.
+Since commit fcbb8461fd23 ("kbuild: remove header compile test"),
+'make clean' with O= option in the pristine source tree emits
+'No such file or directory' warning.
 
-Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+$ git clean -d -f -x
+$ make O=foo clean
+make[1]: Entering directory '/home/masahiro/linux/foo'
+find: ‘usr/include’: No such file or directory
+make[1]: Leaving directory '/home/masahiro/linux/foo'
+
+Fixes: fcbb8461fd23 ("kbuild: remove header compile test")
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- scripts/sortextable.h | 4 ----
- 1 file changed, 4 deletions(-)
 
-diff --git a/scripts/sortextable.h b/scripts/sortextable.h
-index b7e407e09f59..a2e3af7bf211 100644
---- a/scripts/sortextable.h
-+++ b/scripts/sortextable.h
-@@ -201,10 +201,6 @@ static int do_func(Elf_Ehdr *ehdr,
- 		_r(&sort_needed_sym->st_value) -
- 		_r(&sort_needed_sec->sh_addr);
+ usr/include/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index 24543a30b9f0..e5895a79c45f 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -95,7 +95,7 @@ endif
+ # asm-generic/*.h is used by asm/*.h, and should not be included directly
+ header-test- += asm-generic/%
  
--#if 0
--	printf("sort done marker at %lx\n",
--	       (unsigned long)((char *)sort_done_location - (char *)ehdr));
--#endif
- 	/* We sorted it, clear the flag. */
- 	w(0, sort_done_location);
- 	return 0;
+-extra-y := $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name '*.h'))
++extra-y := $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name '*.h' 2>/dev/null))
+ 
+ quiet_cmd_hdrtest = HDRTEST $<
+       cmd_hdrtest = \
 -- 
-2.24.0.rc2
+2.17.1
