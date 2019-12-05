@@ -1,104 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35160 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728011AbfLDXSS (ORCPT
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:39576 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728321AbfLEDZU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Dec 2019 18:18:18 -0500
-Received: by mail-pl1-f194.google.com with SMTP id s10so385525plp.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Dec 2019 15:18:18 -0800 (PST)
+        Wed, 4 Dec 2019 22:25:20 -0500
+Date: Thu, 5 Dec 2019 08:55:07 +0530
+From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: Re: [PATCH 1/2] Enlist running kernel modules information
+Message-ID: <20191205032503.GA3981@debian>
+References: <20191203094845.610692-1-unixbhaskar@gmail.com>
+ <CAK7LNASyrYv+pufwe4CfiNvd7NtriLw=FRdLOtu7CrbmZDSVHg@mail.gmail.com>
+ <20191204150728.GD2734@twin.jikos.cz>
 MIME-Version: 1.0
-References: <20191204225446.202981-1-dima@golovin.in>
-In-Reply-To: <20191204225446.202981-1-dima@golovin.in>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 4 Dec 2019 15:18:05 -0800
-Message-ID: <CAKwvOdm-bhuJMRRN3tyNdb88+_TFd4m3b-7gX0-91VG4djzp+Q@mail.gmail.com>
-Subject: Re: [PATCH] x86/boot: kbuild: allow readelf executable to be specified
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
+Content-Disposition: inline
+In-Reply-To: <20191204150728.GD2734@twin.jikos.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Golovin <dima@golovin.in>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Bruce Ashfield <bruce.ashfield@gmail.com>, Ross Philipson <ross.philipson@oracle.com>, Ross Burton <ross.burton@intel.com>, Chao Fan <fanc.fnst@cn.fujitsu.com>, Daniel Kiper <daniel.kiper@oracle.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, tony.luck@intel.com, fenghua.yu@intel.com, linux-ia64@vger.kernel.org
+To: dsterba@suse.cz, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Dec 4, 2019 at 2:55 PM Dmitry Golovin <dima@golovin.in> wrote:
+
+--Qxx1br4bt0+wmkIi
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 16:07 Wed 04 Dec 2019, David Sterba wrote:
+>On Wed, Dec 04, 2019 at 12:10:25PM +0900, Masahiro Yamada wrote:
+>> On Tue, Dec 3, 2019 at 6:49 PM Bhaskar Chowdhury <unixbhaskar@gmail.com>=
+ wrote:
+>> > +awk '{print $1}' "/proc/modules" | xargs modinfo | awk '/^(filename|d=
+esc|depends)/'
+>>=20
+>> I want to see a good reason (e.g. useful for other developers) for upstr=
+eaming.
+>> This script looks like your custom script, which you can maintain locall=
+y.
 >
-> Introduce a new READELF variable to top-level Makefile, so the name of
-> readelf binary can be specified.
+>I think the verbosity should be added to either lsmod or modinfo, not
+>some script in kernel git.
 
-Thanks for the patch!
+lsmod and modinfo already are pretty verbose and the one liner is using
+one of them to cut thing out of it....can you give it another look???
 
-This is a general cleanup that should improve cross compilation
-(readelf should be treated as ever binary in the list like
-objcopy/objdump/etc), and allow us to use binutils substitutes for
-readelf that aren't called `readelf` (ie. `llvm-readelf`).
+Moreover,this is sort and precise and can be parsed by other scripts.
 
->
-> Before this change the name of the binary was hardcoded to
-> "$(CROSS_COMPILE)readelf" which might not be present for every
-> toolchain.
->
-> This allows to build with LLVM Object Reader by using make parameter
-> READELF=llvm-readelf.
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/771
-> Signed-off-by: Dmitry Golovin <dima@golovin.in>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
+The whole point behind this is to give the developers a convenient point
+without going through all the rigorous details.
 
-No need to explicitly CC me; I monitor our list like a hawk.
+--Qxx1br4bt0+wmkIi
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> ---
->  Makefile                          | 3 ++-
->  arch/x86/boot/compressed/Makefile | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 999a197d67d2..612a55d25442 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -414,6 +414,7 @@ STRIP               = $(CROSS_COMPILE)strip
->  OBJCOPY                = $(CROSS_COMPILE)objcopy
->  OBJDUMP                = $(CROSS_COMPILE)objdump
->  OBJSIZE                = $(CROSS_COMPILE)size
-> +READELF                = $(CROSS_COMPILE)readelf
->  PAHOLE         = pahole
->  LEX            = flex
->  YACC           = bison
-> @@ -472,7 +473,7 @@ GCC_PLUGINS_CFLAGS :=
->  CLANG_FLAGS :=
->
->  export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
-> -export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE PAHOLE LEX YACC AWK INSTALLKERNEL
-> +export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
->  export PERL PYTHON PYTHON2 PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
->  export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
->
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index aa976adb7094..1dac210f7d44 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -103,7 +103,7 @@ vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_thunk_$(BITS).o
->  quiet_cmd_check_data_rel = DATAREL $@
->  define cmd_check_data_rel
->         for obj in $(filter %.o,$^); do \
-> -               ${CROSS_COMPILE}readelf -S $$obj | grep -qF .rel.local && { \
-> +               $(READELF) -S $$obj | grep -qF .rel.local && { \
+-----BEGIN PGP SIGNATURE-----
 
-Grepping the kernel sources for `READELF`, it looks like
-arch/ia64/Makefile makes the same mistake. Would you mind fixing both
-cases in the same patch (v2)?  I'm also curious about it's use in
-arch/ia64/scripts/unwcheck.py, and scripts/faddr2line. +ia64
-maintainers and list.
+iQEzBAABCgAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3oeIsACgkQsjqdtxFL
+KRX3RQf9Ebo/O6Fv1Psf3ytEbvXQWfRvqqK6lVruZnNzgdDAW4mkeGWevG+9viHd
+4Vdx94bKDHNGDRPSJs1lsm1aZH7k+Jwr6tHMUWDAFzcXHOQz3bnwM57r2gmsd0nb
+YAlNscQGYEO5g6Q2TWgm+7gZVcCSupoyNrx8z8GWERhF+gsR9aUrqNyV26qGeI2T
+PpkBqMhuXigTF0qkS7V5IPWNX7B2TT/caB3jrEIYHwTAVk2ozuENsQxqD27QvUPu
+pdGyf+0XYAnhkJy0nvxPmurQrTcpyd5dMUW9gUymJdogQGxImZ0Hyg83f6nv8yqU
+Wkwkpahx3O/d7p68WismcO9e+ssO2A==
+=QvmI
+-----END PGP SIGNATURE-----
 
-I think if you simply remove the assignment on line 17 of
-arch/ia64/Makefile you should be fine.
-
->                         echo "error: $$obj has data relocations!" >&2; \
->                         exit 1; \
->                 } || true; \
-> --
-> 2.23.0
->
-
-
--- 
-Thanks,
-~Nick Desaulniers
+--Qxx1br4bt0+wmkIi--
