@@ -1,71 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38360 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730090AbfLERGB (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:43226 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729931AbfLERSd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Dec 2019 12:06:01 -0500
-Received: by mail-pl1-f196.google.com with SMTP id o8so1495514pls.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Dec 2019 09:06:01 -0800 (PST)
+        Thu, 5 Dec 2019 12:18:33 -0500
 MIME-Version: 1.0
-References: <20191204225446.202981-1-dima@golovin.in> <CAKwvOdm-bhuJMRRN3tyNdb88+_TFd4m3b-7gX0-91VG4djzp+Q@mail.gmail.com>
- <23883331575506134@vla1-3991b5027d7d.qloud-c.yandex.net> <CAK7LNASQ_QGgm1Ec7R4yy6_qPj440V6Dg=DuuduEvqaqvBHBXg@mail.gmail.com>
-In-Reply-To: <CAK7LNASQ_QGgm1Ec7R4yy6_qPj440V6Dg=DuuduEvqaqvBHBXg@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 5 Dec 2019 09:05:49 -0800
-Message-ID: <CAKwvOdkAvz41OMZ_JDTVdSGby8PGis0edzbztta8-8d_Z0QVhA@mail.gmail.com>
-Subject: Re: [PATCH] x86/boot: kbuild: allow readelf executable to be specified
+References: <20191204025148.32101-1-masahiroy@kernel.org>
+In-Reply-To: <20191204025148.32101-1-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 6 Dec 2019 02:17:49 +0900
+Message-ID: <CAK7LNAS3wSV6a48zMg=o2RXBz8qaijo6SqBcSyzwf0sW=dF71A@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix 'No such file or directory' warning when cleaning
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Dmitry Golovin <dima@golovin.in>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Bruce Ashfield <bruce.ashfield@gmail.com>, Ross Philipson <ross.philipson@oracle.com>, Ross Burton <ross.burton@intel.com>, Chao Fan <fanc.fnst@cn.fujitsu.com>, Daniel Kiper <daniel.kiper@oracle.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, "tony.luck@intel.com" <tony.luck@intel.com>, "fenghua.yu@intel.com" <fenghua.yu@intel.com>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Dec 5, 2019 at 8:25 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Wed, Dec 4, 2019 at 11:52 AM Masahiro Yamada <masahiroy@kernel.org> wrot=
+e:
 >
+> Since commit fcbb8461fd23 ("kbuild: remove header compile test"),
+> 'make clean' with O=3D option in the pristine source tree emits
+> 'No such file or directory' warning.
 >
+> $ git clean -d -f -x
+> $ make O=3Dfoo clean
+> make[1]: Entering directory '/home/masahiro/linux/foo'
+> find: =E2=80=98usr/include=E2=80=99: No such file or directory
+> make[1]: Leaving directory '/home/masahiro/linux/foo'
 >
-> On Thu, Dec 5, 2019 at 9:41 AM Dmitry Golovin <dima@golovin.in> wrote:
->>
->> 05.12.2019, 01:18, "'Nick Desaulniers' via Clang Built Linux" <clang-built-linux@googlegroups.com>:
->> >
->> > Grepping the kernel sources for `READELF`, it looks like
->> > arch/ia64/Makefile makes the same mistake. Would you mind fixing both
->> > cases in the same patch (v2)? I'm also curious about it's use in
->> > arch/ia64/scripts/unwcheck.py, and scripts/faddr2line. +ia64
->> > maintainers and list.
->> >
->> > I think if you simply remove the assignment on line 17 of
->> > arch/ia64/Makefile you should be fine.
->>
->> Perhaps something should be done to NM on line 16 of this file as well. Also
->> found similar invocation of `objcopy` in arch/riscv/kernel/vdso/Makefile.
->> I think IA64 and RISC-V changes should be made as separate commits.
->>
->> -- Dmitry
->
->
->
-> I am fine with either way.
-> I can take this patch, and also a one for IA64.
+> Fixes: fcbb8461fd23 ("kbuild: remove header compile test")
+> Reported-by: kbuild test robot <lkp@intel.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Whichever, as long as we don't have to wait for the base patch to land
-via kbuild tree, then submit arch specific ones to their respective
-trees months later.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Applied to linux-kbuild.
 
+
+>  usr/include/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
+> diff --git a/usr/include/Makefile b/usr/include/Makefile
+> index 24543a30b9f0..e5895a79c45f 100644
+> --- a/usr/include/Makefile
+> +++ b/usr/include/Makefile
+> @@ -95,7 +95,7 @@ endif
+>  # asm-generic/*.h is used by asm/*.h, and should not be included directl=
+y
+>  header-test- +=3D asm-generic/%
 >
+> -extra-y :=3D $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name =
+'*.h'))
+> +extra-y :=3D $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name =
+'*.h' 2>/dev/null))
 >
-> You can send a patch for arch/riscv/kernel/vdso/Makefile
-> to the riscv maintainer since it has no patch dependency.
->
->
+>  quiet_cmd_hdrtest =3D HDRTEST $<
+>        cmd_hdrtest =3D \
 > --
-> Best Regards
-> Masahiro Yamada
+> 2.17.1
+>
 
 
-
--- 
-Thanks,
-~Nick Desaulniers
+--=20
+Best Regards
+Masahiro Yamada
