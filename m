@@ -1,91 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:33281 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728132AbfLEDaw (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:41096 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728490AbfLEDgf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Dec 2019 22:30:52 -0500
-Date: Thu, 5 Dec 2019 09:00:38 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH 1/2] Enlist running kernel modules information
-Message-ID: <20191205033035.GB3981@debian>
-References: <20191203094845.610692-1-unixbhaskar@gmail.com>
- <CAK7LNASyrYv+pufwe4CfiNvd7NtriLw=FRdLOtu7CrbmZDSVHg@mail.gmail.com>
- <20191204041543.GA1086470@ArchLinux>
- <6ff74f67-11d3-d16f-8aeb-828c01455961@metux.net>
+        Wed, 4 Dec 2019 22:36:35 -0500
+Subject: Re: [PATCH 2/2] fix the SPDX syntax and bash interprester pointer
+References: <20191203095339.615774-1-unixbhaskar@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <56303cd3-fcf8-49cd-f66a-4db7e382774c@infradead.org>
+Date: Wed, 4 Dec 2019 19:36:32 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="GRPZ8SYKNexpdSJ7"
-Content-Disposition: inline
-In-Reply-To: <6ff74f67-11d3-d16f-8aeb-828c01455961@metux.net>
+In-Reply-To: <20191203095339.615774-1-unixbhaskar@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, yamada.masahiro@socionext.com, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+
+On 12/3/19 1:53 AM, Bhaskar Chowdhury wrote:
+> SPDX syntax was complining by checkpatch fixed it,added space before it.
+> And add bash interpreter to find by the env .
+> 
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+> ---
+>  scripts/kernel_modules_info.sh | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kernel_modules_info.sh b/scripts/kernel_modules_info.sh
+> index f005c47a3aa6..3a9b00988ed3 100755
+> --- a/scripts/kernel_modules_info.sh
+> +++ b/scripts/kernel_modules_info.sh
+> @@ -1,5 +1,5 @@
+> -#!/bin/bash - 
+> -#SPDX-License-Identifier: GPL-2.0
+> +#!/usr/bin/env bash 
+> +# SPDX-License-Identifier: GPL-2.0
+>  #===============================================================================
+>  #
+>  #          FILE: kernel_modules_info.sh
+> 
+
+a.  There is no good reason for patch 2/2.  Just merge the 2 patches.
+
+b.  The big header comment in patch 1/2 is not needed and is unwanted.
+Just put some or all of that in the patch description/comment message.
 
 
---GRPZ8SYKNexpdSJ7
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 14:48 Wed 04 Dec 2019, Enrico Weigelt, metux IT consult wrote:
->On 04.12.19 05:22, Bhaskar Chowdhury wrote:
->
->Hi,
->
->> I think the usefulness comes from developers wants to see what are the
->> modules are using by the running kernel in formatted way.
->> This is very simple way to enlist all the modules with descriptions of
->> it.So , they can easily parse it with other scripts.
->
->IMHO, this is a good thing to have. I can even imagine it shipped by
->distros, for better bug reports.
->
->OTOH, if it's about the currently running kernel and loaded modules, why
->not putting this into /proc or /sys ?
-
-The reason being not putting in the /proc or /sys is, it is not
-dynamically generated stuff. This is small script which do a specific
-task ,out of the information available  in /proc or /sys.
-
-And essentially resides in the scripts directory for easy finding and
-using. =20
-
-:)
-
-~Bhaskar
->
->
->--mtx
->
->--=20
->Dringender Hinweis: aufgrund existenzieller Bedrohung durch "Emotet"
->sollten Sie *niemals* MS-Office-Dokumente via E-Mail annehmen/=F6ffenen,
->selbst wenn diese von vermeintlich vertrauensw=FCrdigen Absendern zu
->stammen scheinen. Andernfalls droht Totalschaden.
->---
->Hinweis: unverschl=FCsselte E-Mails k=F6nnen leicht abgeh=F6rt und manipul=
-iert
->werden ! F=FCr eine vertrauliche Kommunikation senden Sie bitte ihren
->GPG/PGP-Schl=FCssel zu.
->---
->Enrico Weigelt, metux IT consult
->Free software and Linux embedded engineering
->info@metux.net -- +49-151-27565287
-
---GRPZ8SYKNexpdSJ7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3oedgACgkQsjqdtxFL
-KRX1EQf/bM+T/selwfgcqWcb3hw5h1W4xeF8v3MgFwzyiBKWHIbSHd8+ly1G4iO+
-YMzDeOSceRGjE3p/GnsR9D2Z2Oz/2Bb9U7LH6QO72TQMsP9yfZCXu2jOgxFWdkns
-KKybGCo4udo/Ui8RiLZm+0agD3mJClJoRxPAXEgMZ0euRh/oja4r2FF4qfclfKnW
-dCuDmLV8eiFElFez+qR1KK4JzmJLcI+RX+0KgATUBNIwbwv+inu/xLKt+nPg2pPu
-L0ui74Slc/RKz0CzEs5HA8jsKF1ErqlKNzweK6GoeHGGGx14vRDwyRmjyU08OIcy
-Yx69fTPorBKBHJxyJbWdzPRhhL+UMw==
-=Tgd4
------END PGP SIGNATURE-----
-
---GRPZ8SYKNexpdSJ7--
+-- 
+~Randy
