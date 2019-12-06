@@ -1,66 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:45252 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726371AbfLFQJF (ORCPT
+Received: from mail-ot1-f50.google.com ([209.85.210.50]:44840 "EHLO
+        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbfLFUMH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Dec 2019 11:09:05 -0500
-Subject: Re: [PATCH] kconfig: Add yes2modconfig and mod2yesconfig targets.
-References: <1575625847-6384-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <5a473c6c-cc1f-6648-31ec-3b40e415a836@infradead.org>
-Date: Fri, 6 Dec 2019 08:09:03 -0800
+        Fri, 6 Dec 2019 15:12:07 -0500
+Received: by mail-ot1-f50.google.com with SMTP id x3so6840890oto.11
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Dec 2019 12:12:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1575625847-6384-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From: Martin Galvan <omgalvan.86@gmail.com>
+Date: Fri, 6 Dec 2019 17:11:55 -0300
+Message-ID: <CAN19L9G-mFN-MTmw0FS3ZX4d1MjeoL2U+s-Fk7Qw9UYWn5Q1YA@mail.gmail.com>
+Subject: Some header files being ignored when calculating srcversion
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>
+To: linux-kbuild@vger.kernel.org, michal.lkml@markovi.net, yamada.masahiro@socionext.com
 
-On 12/6/19 1:50 AM, Tetsuo Handa wrote:
-> Since kernel configs provided by syzbot are close to "make allyesconfig",
-> it takes long time to rebuild. This is especially waste of time when we
-> need to rebuild for many times (e.g. doing manual printk() inspection,
-> bisect operations).
-> 
-> We can save time if we can exclude modules which are irrelevant to each
-> problem. But "make localmodconfig" cannot exclude modules which are built
-> into vmlinux because /sbin/lsmod output is used as the source of modules.
-> 
-> Therefore, this patch adds "make yes2modconfig" which converts from =y
-> to =m if possible. After confirming that the interested problem is still
-> reproducible, we can try "make localmodconfig" (and/or manually tune
-> based on "Modules linked in:" line) in order to exclude modules which are
-> irrelevant to the interested problem. While we are at it, this patch also
-> adds "make mod2yesconfig" target which converts from =m to =y in case
-> someone wants to convert from =m to =y after "make localmodconfig".
-> 
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Cc: Dmitry Vyukov <dvyukov@google.com>
-> ---
->  scripts/kconfig/Makefile   |  2 +-
->  scripts/kconfig/conf.c     | 17 +++++++++++++++++
->  scripts/kconfig/confdata.c | 26 ++++++++++++++++++++++++++
->  scripts/kconfig/lkc.h      |  3 +++
->  4 files changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 2f1a59fa5169..3516809255be 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -67,7 +67,7 @@ localyesconfig localmodconfig: $(obj)/conf
->  #  deprecated for external use
->  simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
->  	alldefconfig randconfig listnewconfig olddefconfig syncconfig \
-> -	helpnewconfig
-> +	helpnewconfig yes2modconfig mod2yesconfig
->  
->  PHONY += $(simple-targets)
+Hi all,
 
+I'm working on a kernel module and noticed that sometimes my changes
+to certain header files don't affect the module's srcversion hash.
+This matters because tools like dkms will refuse to upgrade a module
+if the new hash is the same as the one currently installed.
 
-In this Makefile (above), please also update the available 'help' targets.
+The files being ignored are those that are not (however indirectly)
+included by a .c placed in the same directory. In my case, I have a
+header which is included by several .c files placed in other
+directories; changes to this header won't affect the final srcversion
+hash.
 
--- 
-~Randy
+The cause of this seems to be this check in sumversion.c:
+
+/* Check if this file is in same dir as objfile */
+if ((strstr(line, dir)+strlen(dir)-1) == strrchr(line, '/')) {
+    if (!parse_file(line, md)) {
+        warn("could not open %s: %s\n",
+             line, strerror(errno));
+        goto out_file;
+    }
+
+}
+
+I'm not sure what's the rationale behind this check, not whether this
+behavior is documented anywhere.
