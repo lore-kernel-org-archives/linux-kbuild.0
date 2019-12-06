@@ -1,65 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:45593 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726245AbfLFNDd (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.134]:42037 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726258AbfLFPtY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Dec 2019 08:03:33 -0500
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/2] mkcompile_h: use printf for LINUX_COMPILE_BY
-Date: Fri,  6 Dec 2019 22:03:02 +0900
-Message-Id: <20191206130302.11473-2-masahiroy@kernel.org>
-In-Reply-To: <20191206130302.11473-1-masahiroy@kernel.org>
-References: <20191206130302.11473-1-masahiroy@kernel.org>
+        Fri, 6 Dec 2019 10:49:24 -0500
+Subject: Re: [PATCH 1/2] Enlist running kernel modules information
+References: <20191203094845.610692-1-unixbhaskar@gmail.com>
+ <CAK7LNASyrYv+pufwe4CfiNvd7NtriLw=FRdLOtu7CrbmZDSVHg@mail.gmail.com>
+ <20191204150728.GD2734@twin.jikos.cz> <20191205032503.GA3981@debian>
+From: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <06491eb2-b43c-badc-ce3c-7709abe06a3f@metux.net>
+Date: Fri, 6 Dec 2019 16:48:43 +0100
+MIME-Version: 1.0
+In-Reply-To: <20191205032503.GA3981@debian>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: tl
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, dsterba@suse.cz, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Commit 858805b336be ("kbuild: add $(BASH) to run scripts with
-bash-extension") shed light on portability issues. Here is another one.
+On 05.12.19 04:25, Bhaskar Chowdhury wrote:
 
-Since commit f07726048d59 ("Fix handling of backlash character in
-LINUX_COMPILE_BY name"), we must escape a backslash contained in
-LINUX_COMPILE_BY. This is not working on distros like Ubuntu.
+Hi,
 
-As the POSIX spec [1] says, if any of the operands contain a backslash
-( '\' ) character, the results are implementation-defined.
+> The whole point behind this is to give the developers a convenient point
+> without going through all the rigorous details.
 
-The actual shell of /bin/sh could be bash, dash depending on distros,
-and the behavior of builtin echo command is different among them.
+I see your point, but I wonder whether it maybe better should go
+into kmod.
 
-The bash builtin echo, unless -e is given, copies the arguments to
-output without expanding escape sequences (BSD-like behavior).
+--mtx
 
-The dash builtin echo, in contrast, adopts System V behavior, which
-does expand escape sequences without any option.
-
-Even non-builtin /bin/echo behaves differently depending on the system.
-Due to these variations, echo is considered as a non-portable command.
-Using printf is the common solution to avoid the portability issue.
-
-[1] https://pubs.opengroup.org/onlinepubs/009695399/utilities/echo.html
-
-Fixes: 858805b336be ("kbuild: add $(BASH) to run scripts with bash-extension")
-Reported-by: XXing Wei <xxing.wei@unisoc.com>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
-
- scripts/mkcompile_h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index 3097fec1756a..3a5a4b210c86 100755
---- a/scripts/mkcompile_h
-+++ b/scripts/mkcompile_h
-@@ -69,7 +69,7 @@ UTS_VERSION="$(echo $UTS_VERSION $CONFIG_FLAGS $TIMESTAMP | cut -b -$UTS_LEN)"
- 
-   echo \#define UTS_VERSION \"$UTS_VERSION\"
- 
--  echo \#define LINUX_COMPILE_BY \"$LINUX_COMPILE_BY\"
-+  printf '#define LINUX_COMPILE_BY "%s"\n' "$LINUX_COMPILE_BY"
-   echo \#define LINUX_COMPILE_HOST \"$LINUX_COMPILE_HOST\"
- 
-   echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//'`\"
--- 
-2.17.1
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
