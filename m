@@ -1,117 +1,181 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:45805 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726203AbfLFIKn (ORCPT
+Received: from www262.sakura.ne.jp ([202.181.97.72]:64283 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726127AbfLFJv0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Dec 2019 03:10:43 -0500
-Date: Fri, 6 Dec 2019 13:40:27 +0530
-From: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: Re: [PATCH 1/2] Enlist running kernel modules information
-Message-ID: <20191206081027.GA1165@ArchLinux>
-References: <20191203094845.610692-1-unixbhaskar@gmail.com>
- <CAK7LNASyrYv+pufwe4CfiNvd7NtriLw=FRdLOtu7CrbmZDSVHg@mail.gmail.com>
- <20191204150728.GD2734@twin.jikos.cz>
- <20191205032503.GA3981@debian>
- <CAK7LNARdOGfvc_8TMX+KbJQ1DRGy8_xZsdDye1ZrvimSS1VoFQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARdOGfvc_8TMX+KbJQ1DRGy8_xZsdDye1ZrvimSS1VoFQ@mail.gmail.com>
+        Fri, 6 Dec 2019 04:51:26 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] kconfig: Add yes2modconfig and mod2yesconfig targets.
+Date: Fri,  6 Dec 2019 18:50:47 +0900
+Message-Id: <1575625847-6384-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: dsterba@suse.cz, Michal Marek <michal.lkml@markovi.net>, Randy Dunlap <rdunlap@infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Dmitry Vyukov <dvyukov@google.com>
 
+Since kernel configs provided by syzbot are close to "make allyesconfig",
+it takes long time to rebuild. This is especially waste of time when we
+need to rebuild for many times (e.g. doing manual printk() inspection,
+bisect operations).
 
---huq684BweRXVnRxX
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We can save time if we can exclude modules which are irrelevant to each
+problem. But "make localmodconfig" cannot exclude modules which are built
+into vmlinux because /sbin/lsmod output is used as the source of modules.
 
-On 01:08 Fri 06 Dec 2019, Masahiro Yamada wrote:
->   On Thu, Dec 5, 2019 at 12:25 PM Bhaskar Chowdhury
->   <[1]unixbhaskar@gmail.com> wrote:
->
->     On 16:07 Wed 04 Dec 2019, David Sterba wrote:
->     >On Wed, Dec 04, 2019 at 12:10:25PM +0900, Masahiro Yamada wrote:
->     >> On Tue, Dec 3, 2019 at 6:49 PM Bhaskar Chowdhury
->     <[2]unixbhaskar@gmail.com> wrote:
->     >> > +awk '{print $1}' "/proc/modules" | xargs modinfo | awk
->     '/^(filename|desc|depends)/'
->     >>
->     >> I want to see a good reason (e.g. useful for other developers)
->     for upstreaming.
->     >> This script looks like your custom script, which you can maintain
->     locally.
->     >
->     >I think the verbosity should be added to either lsmod or modinfo,
->     not
->     >some script in kernel git.
->     lsmod and modinfo already are pretty verbose and the one liner is
->     using
->     one of them to cut thing out of it....can you give it another
->     look???
->     Moreover,this is sort and precise and can be parsed by other
->     scripts.
->     The whole point behind this is to give the developers a convenient
->     point
->     without going through all the rigorous details.
->
->   lsmod and modinfo are good.
->   If you are not satisfied with the current format,
->   talk to the kmod maintainer.
->   As a maintainer, I need to avoid the situation
->   where upstream tree is flooded with weird scripts like this.
->   One more thing:
->   Despite advice from Randy over again,
->   you are still not able to submit a patch correctly.
->   (see what you sent as v2).
->   Do not get me wrong. I am not saying you to send v3.
->   I do not like this patch. Please stop.
->   --
-I completely get you. I should stop sending this. Thanks for the heads
-up.=20
+Therefore, this patch adds "make yes2modconfig" which converts from =y
+to =m if possible. After confirming that the interested problem is still
+reproducible, we can try "make localmodconfig" (and/or manually tune
+based on "Modules linked in:" line) in order to exclude modules which are
+irrelevant to the interested problem. While we are at it, this patch also
+adds "make mod2yesconfig" target which converts from =m to =y in case
+someone wants to convert from =m to =y after "make localmodconfig".
 
-And I was not denying the verbosity of lsmod and modinfo , as I was
-pointing out to someone else.
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+---
+ scripts/kconfig/Makefile   |  2 +-
+ scripts/kconfig/conf.c     | 17 +++++++++++++++++
+ scripts/kconfig/confdata.c | 26 ++++++++++++++++++++++++++
+ scripts/kconfig/lkc.h      |  3 +++
+ 4 files changed, 47 insertions(+), 1 deletion(-)
 
-About the V2, this was a mistake , I know once I saw it alas! after
-sending it you. So, my apology.=20
-
-One thing get it straight , I am NOT trying to flooding with some airy
-fairy script , I know what it takes to maintain that bloody thing.
-
-Your time is precious like mine, never try to gobbles it by sending
-garbage.
-
-I was thinking make it easy for others, not sure why you think it's
-wired.
-
-Again , thanks for the heads up...above statements are STRICTLY NOT in my
-defence not to cover the mistake.
-
->   Best Regards
->   Masahiro Yamada
->
->References
->
->   1. mailto:unixbhaskar@gmail.com
->   2. mailto:unixbhaskar@gmail.com
-
---huq684BweRXVnRxX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAl3qDO8ACgkQsjqdtxFL
-KRX92QgAjHkoScuG/jGzDUGWVxlstQ/vqjht3c4mVgIpuTQlEnd9GtpLRS6SWsn3
-mPlrmdVxYpOWUhdRekIfwPQ3I0bcY/teccY04VkoYqvzCq/UGy0xr72fpUrCkN+m
-8nVXztrMDgo5MEiLEmFrpnGIsSPJcOGOekWCotFVu+m14dPPOGzWSTVYm1rCppSn
-PZYrHyiJds0dEM93SH1ruLbqQZvbvMt0jXVa3SBARoknRSBQKs2LdEpZCvi+7gJz
-dior+esWl0a4ajcWXk0MKyjaDPH/LGTI0m12AwA6Ortkr+h73yccxqt2OvcbOHj/
-k4t+Bd44GVymXe/JBKeiPT5vI1Ozlw==
-=4dLL
------END PGP SIGNATURE-----
-
---huq684BweRXVnRxX--
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 2f1a59fa5169..3516809255be 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -67,7 +67,7 @@ localyesconfig localmodconfig: $(obj)/conf
+ #  deprecated for external use
+ simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
+ 	alldefconfig randconfig listnewconfig olddefconfig syncconfig \
+-	helpnewconfig
++	helpnewconfig yes2modconfig mod2yesconfig
+ 
+ PHONY += $(simple-targets)
+ 
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 1f89bf1558ce..ae9ddf88c64d 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -34,6 +34,8 @@ enum input_mode {
+ 	listnewconfig,
+ 	helpnewconfig,
+ 	olddefconfig,
++	yes2modconfig,
++	mod2yesconfig,
+ };
+ static enum input_mode input_mode = oldaskconfig;
+ 
+@@ -467,6 +469,8 @@ static struct option long_opts[] = {
+ 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
+ 	{"helpnewconfig",   no_argument,       NULL, helpnewconfig},
+ 	{"olddefconfig",    no_argument,       NULL, olddefconfig},
++	{"yes2modconfig",   no_argument,       NULL, yes2modconfig},
++	{"mod2yesconfig",   no_argument,       NULL, mod2yesconfig},
+ 	{NULL, 0, NULL, 0}
+ };
+ 
+@@ -489,6 +493,8 @@ static void conf_usage(const char *progname)
+ 	printf("  --allmodconfig          New config where all options are answered with mod\n");
+ 	printf("  --alldefconfig          New config with all symbols set to default\n");
+ 	printf("  --randconfig            New config with random answer to all options\n");
++	printf("  --yes2modconfig         Change answers from yes to mod if possible\n");
++	printf("  --mod2yesconfig         Change answers from mod to yes\n");
+ }
+ 
+ int main(int ac, char **av)
+@@ -553,6 +559,8 @@ int main(int ac, char **av)
+ 		case listnewconfig:
+ 		case helpnewconfig:
+ 		case olddefconfig:
++		case yes2modconfig:
++		case mod2yesconfig:
+ 			break;
+ 		case '?':
+ 			conf_usage(progname);
+@@ -587,6 +595,8 @@ int main(int ac, char **av)
+ 	case listnewconfig:
+ 	case helpnewconfig:
+ 	case olddefconfig:
++	case yes2modconfig:
++	case mod2yesconfig:
+ 		conf_read(NULL);
+ 		break;
+ 	case allnoconfig:
+@@ -638,6 +648,11 @@ int main(int ac, char **av)
+ 		}
+ 	}
+ 
++	if (input_mode == yes2modconfig)
++		conf_rewrite_mod_or_yes(def_y2m);
++	else if (input_mode == mod2yesconfig)
++		conf_rewrite_mod_or_yes(def_m2y);
++
+ 	switch (input_mode) {
+ 	case allnoconfig:
+ 		conf_set_all_new_symbols(def_no);
+@@ -669,6 +684,8 @@ int main(int ac, char **av)
+ 	case listnewconfig:
+ 	case helpnewconfig:
+ 	case syncconfig:
++	case yes2modconfig:
++	case mod2yesconfig:
+ 		/* Update until a loop caused no more changes */
+ 		do {
+ 			conf_cnt = 0;
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 3569d2dec37c..6832a04a1aa4 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1362,3 +1362,29 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
+ 
+ 	return has_changed;
+ }
++
++bool conf_rewrite_mod_or_yes(enum conf_def_mode mode)
++{
++	struct symbol *sym;
++	int i;
++	bool has_changed = false;
++
++	if (mode == def_y2m) {
++		for_all_symbols(i, sym) {
++			if (sym_get_type(sym) == S_TRISTATE &&
++			    sym->def[S_DEF_USER].tri == yes) {
++				sym->def[S_DEF_USER].tri = mod;
++				has_changed = true;
++			}
++		}
++	} else if (mode == def_m2y) {
++		for_all_symbols(i, sym) {
++			if (sym_get_type(sym) == S_TRISTATE &&
++			    sym->def[S_DEF_USER].tri == mod) {
++				sym->def[S_DEF_USER].tri = yes;
++				has_changed = true;
++			}
++		}
++	}
++	return has_changed;
++}
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 4fb16f316626..e8f3238dcc70 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -34,6 +34,8 @@ enum conf_def_mode {
+ 	def_default,
+ 	def_yes,
+ 	def_mod,
++	def_y2m,
++	def_m2y,
+ 	def_no,
+ 	def_random
+ };
+@@ -52,6 +54,7 @@ const char *conf_get_configname(void);
+ void sym_set_change_count(int count);
+ void sym_add_change_count(int count);
+ bool conf_set_all_new_symbols(enum conf_def_mode mode);
++bool conf_rewrite_mod_or_yes(enum conf_def_mode mode);
+ void set_all_choice_values(struct symbol *csym);
+ 
+ /* confdata.c and expr.c */
+-- 
+2.16.5
