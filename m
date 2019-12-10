@@ -1,35 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f169.google.com ([209.85.167.169]:39903 "EHLO
-        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727436AbfLINxu (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Dec 2019 08:53:50 -0500
-Received: by mail-oi1-f169.google.com with SMTP id a67so6338826oib.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Dec 2019 05:53:49 -0800 (PST)
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7207 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727224AbfLJMMr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Dec 2019 07:12:47 -0500
+From: John Garry <john.garry@huawei.com>
+Subject: [PATCH] merge_config.sh: Add option for allmodconfig
+Date: Tue, 10 Dec 2019 20:09:14 +0800
+Message-ID: <1575979754-184896-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-References: <CAN19L9G-mFN-MTmw0FS3ZX4d1MjeoL2U+s-Fk7Qw9UYWn5Q1YA@mail.gmail.com>
- <CAK7LNAR2bJW8BMq3xbt2FuuC_=uGqFrDsL9jEw6H1B78wHG_yg@mail.gmail.com>
-In-Reply-To: <CAK7LNAR2bJW8BMq3xbt2FuuC_=uGqFrDsL9jEw6H1B78wHG_yg@mail.gmail.com>
-From: Martin Galvan <omgalvan.86@gmail.com>
-Date: Mon, 9 Dec 2019 10:53:38 -0300
-Message-ID: <CAN19L9Hbo_uthS3OYfu4oOjGrOoiZpq9MpKMrbM=f-t=LMec1Q@mail.gmail.com>
-Subject: Re: Some header files being ignored when calculating srcversion
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Rusty Russell <rusty@rustcorp.com.au>, Andrew Morton <akpm@linux-foundation.org>
+To: masahiroy@kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, anders.roxell@linaro.org, John Garry <john.garry@huawei.com>
 
-El lun., 9 dic. 2019 a las 3:05, Masahiro Yamada
-(<masahiroy@kernel.org>) escribi=C3=B3:
-> I also wondered about this design
-> when I looked into this code for the first time.
->
-> In my understanding, this is based on the assumption that
-> headers file from the same or sub- directories are highly
-> relevant to the module in question, while the header
-> files from other locations are less related.
+Recently there has been some work in reporting and fixing bugs in booting
+an allmodconfig kernel - here are a few examples:
 
-If we all agree that this behavior is not correct, I'll send a patch
-to remove that check.
+https://lore.kernel.org/linux-edac/304df85b-8b56-b77e-1a11-aa23769f2e7c@huawei.com/T/#t
+https://lore.kernel.org/linux-ide/bdf02e03-86a1-3d35-2908-28187f504495@huawei.com/T/#t
+https://lore.kernel.org/netdev/CADYN=9LCPfbpwdTWKw03B22-y3Text=RWXW7XP7wJBHYsMOgrA@mail.gmail.com/
+https://sourceforge.net/p/openipmi/mailman/message/36871567/
+
+If we want to boot an allmodconfig kernel we may still want to force some
+loadable modules built-in, like UART drivers. Or just still turn off some
+configs.
+
+So add an option to add add fragments to an allmodconfig kernel.
+
+Signed-off-by: John Garry <john.garry@huawei.com>
+
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 63c8565206a4..01697fb6dfbe 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -23,6 +23,7 @@ clean_up() {
+ usage() {
+ 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
+ 	echo "  -h    display this help text"
++	echo "  -a    use allmodconfig instead of alldefconfig"
+ 	echo "  -m    only merge the fragments, do not execute the make command"
+ 	echo "  -n    use allnoconfig instead of alldefconfig"
+ 	echo "  -r    list redundant entries when merging fragments"
+@@ -41,6 +42,11 @@ CONFIG_PREFIX=${CONFIG_-CONFIG_}
+ 
+ while true; do
+ 	case $1 in
++	"-a")
++		ALLTARGET=allmodconfig
++		shift
++		continue
++		;;
+ 	"-n")
+ 		ALLTARGET=allnoconfig
+ 		shift
+@@ -171,6 +177,7 @@ fi
+ 
+ # Use the merged file as the starting point for:
+ # alldefconfig: Fills in any missing symbols with Kconfig default
++# allmodconfig: Fills in any missing symbols with =m when loadable
+ # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ 
+-- 
+2.17.1
