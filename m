@@ -1,66 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7207 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727224AbfLJMMr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Dec 2019 07:12:47 -0500
-From: John Garry <john.garry@huawei.com>
-Subject: [PATCH] merge_config.sh: Add option for allmodconfig
-Date: Tue, 10 Dec 2019 20:09:14 +0800
-Message-ID: <1575979754-184896-1-git-send-email-john.garry@huawei.com>
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:37705 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727345AbfLJOlJ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Dec 2019 09:41:09 -0500
+From: Alyssa Ross <hi@alyssa.is>
+Subject: Bogus dependency for HW_RANDOM_VIRTIO with oldconfig
+Date: Tue, 10 Dec 2019 14:41:04 +0000
+Message-ID: <87wob4tf9b.fsf@alyssa.is>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, anders.roxell@linaro.org, John Garry <john.garry@huawei.com>
+To: linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
 
-Recently there has been some work in reporting and fixing bugs in booting
-an allmodconfig kernel - here are a few examples:
+I'm new here and not sure if I'm contacting the correct people/groups --
+please point me in the right direction if not.  I don't know if the
+culprit here is Kconfig, the virtio Kconfig file, the hw_random Kconfig
+file, or some combination of those.
 
-https://lore.kernel.org/linux-edac/304df85b-8b56-b77e-1a11-aa23769f2e7c@huawei.com/T/#t
-https://lore.kernel.org/linux-ide/bdf02e03-86a1-3d35-2908-28187f504495@huawei.com/T/#t
-https://lore.kernel.org/netdev/CADYN=9LCPfbpwdTWKw03B22-y3Text=RWXW7XP7wJBHYsMOgrA@mail.gmail.com/
-https://sourceforge.net/p/openipmi/mailman/message/36871567/
+I believe I have discovered an issue with the order in which make
+oldconfig asks for virtio-related options, and would appreciate some
+advice on how to solve it:
 
-If we want to boot an allmodconfig kernel we may still want to force some
-loadable modules built-in, like UART drivers. Or just still turn off some
-configs.
+HW_RANDOM_VIRTIO=y depends on VIRTIO=y.  In my kernel, VIRTIO=y is
+selected by VIRITO_PCI=y, but when make oldconfig prompts for
+HW_RANDOM_VIRTIO, VIRTIO_PCI has not been prompted for yet, and so
+VIRTIO is still set to m.
 
-So add an option to add add fragments to an allmodconfig kernel.
+This means that it's not possible for me to set HW_RANDOM_VIRTIO=y using
+oldconfig without setting an VIRTIO-selecting option I don't need, but
+that is prompted for _before_ HW_RANDOM_VIRTIO.  One such option that I
+have identified so far is VOP.  It is prompted for before
+HW_RANDOM_VIRTIO, and so if I set VOP=y it is now possible to set
+HW_RANDOM_VIRTIO.
 
-Signed-off-by: John Garry <john.garry@huawei.com>
+When using menuconfig on a config file generated with oldconfig, that
+does not have HW_RANDOM_VIRTIO enabled, I am able to set HW_RANDOM=y and
+HW_RANDOM_VIRTIO=y, and after saving I can confirm that no other changes
+have been made to the configuration file.  This tells me that there's no
+need for a dependency on e.g. VOP, except when using oldconfig.
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 63c8565206a4..01697fb6dfbe 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -23,6 +23,7 @@ clean_up() {
- usage() {
- 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
- 	echo "  -h    display this help text"
-+	echo "  -a    use allmodconfig instead of alldefconfig"
- 	echo "  -m    only merge the fragments, do not execute the make command"
- 	echo "  -n    use allnoconfig instead of alldefconfig"
- 	echo "  -r    list redundant entries when merging fragments"
-@@ -41,6 +42,11 @@ CONFIG_PREFIX=${CONFIG_-CONFIG_}
- 
- while true; do
- 	case $1 in
-+	"-a")
-+		ALLTARGET=allmodconfig
-+		shift
-+		continue
-+		;;
- 	"-n")
- 		ALLTARGET=allnoconfig
- 		shift
-@@ -171,6 +177,7 @@ fi
- 
- # Use the merged file as the starting point for:
- # alldefconfig: Fills in any missing symbols with Kconfig default
-+# allmodconfig: Fills in any missing symbols with =m when loadable
- # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
- make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
- 
--- 
-2.17.1
+So, I think there is an ordering issue here, and that oldconfig
+should not prompt for HW_RANDOM_VIRTIO until after any option that might
+select VIRTIO=y.
+
+I would be happy to try to submit or test a patch to fix this, but I
+don't know where to go from here.
