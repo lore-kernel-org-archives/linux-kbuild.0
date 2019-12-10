@@ -1,50 +1,166 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:37705 "EHLO
-        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727345AbfLJOlJ (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:39654 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727543AbfLJRq3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Dec 2019 09:41:09 -0500
-From: Alyssa Ross <hi@alyssa.is>
-Subject: Bogus dependency for HW_RANDOM_VIRTIO with oldconfig
-Date: Tue, 10 Dec 2019 14:41:04 +0000
-Message-ID: <87wob4tf9b.fsf@alyssa.is>
+        Tue, 10 Dec 2019 12:46:29 -0500
+Subject: Re: [PATCH v3] kallsyms: add names of built-in modules
+References: <20191119224225.2438-1-eugene.loh@oracle.com>
+ <20191120045938.2155-1-eugene.loh@oracle.com>
+ <CAK7LNASv4BkjHYaUXWEjeizHF6UckSef72y=X1VV2zEAOn1XdA@mail.gmail.com>
+From: Eugene Loh <eugene.loh@oracle.com>
+Message-ID: <7e0f4a74-63c5-ad62-c619-c6277c4bc791@oracle.com>
+Date: Tue, 10 Dec 2019 09:45:36 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAK7LNASv4BkjHYaUXWEjeizHF6UckSef72y=X1VV2zEAOn1XdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <maz@kernel.org>, Song Liu <songliubraving@fb.com>, Thomas Gleixner <tglx@linutronix.de>, "Keller, Jacob E" <jacob.e.keller@intel.com>, Kris Van Hees <kris.van.hees@oracle.com>, Nick Alcock <nick.alcock@oracle.com>
 
-I'm new here and not sure if I'm contacting the correct people/groups --
-please point me in the right direction if not.  I don't know if the
-culprit here is Kconfig, the virtio Kconfig file, the hw_random Kconfig
-file, or some combination of those.
+Thank you for the careful review.  Sorry for the delayed response.  I 
+will post a v4 momentarily.  Further comments below.
 
-I believe I have discovered an issue with the order in which make
-oldconfig asks for virtio-related options, and would appreciate some
-advice on how to solve it:
+On 11/22/2019 02:00 AM, Masahiro Yamada wrote:
 
-HW_RANDOM_VIRTIO=y depends on VIRTIO=y.  In my kernel, VIRTIO=y is
-selected by VIRITO_PCI=y, but when make oldconfig prompts for
-HW_RANDOM_VIRTIO, VIRTIO_PCI has not been prompted for yet, and so
-VIRTIO is still set to m.
+> On Wed, Nov 20, 2019 at 2:02 PM <eugene.loh@oracle.com> wrote:
+>> From: Eugene Loh <eugene.loh@oracle.com>
+>>
+>> /proc/kallsyms is very useful for tracers and other tools that need
+>> to map kernel symbols to addresses.
+>>
+>> It would be useful if there were a mapping between kernel symbol and
+>> module name that only changed when the kernel source code is changed.
+> Unfortunately, this is not necessarily true.
+> Some objects could be linked into multiple modules.
 
-This means that it's not possible for me to set HW_RANDOM_VIRTIO=y using
-oldconfig without setting an VIRTIO-selecting option I don't need, but
-that is prompted for _before_ HW_RANDOM_VIRTIO.  One such option that I
-have identified so far is VOP.  It is prompted for before
-HW_RANDOM_VIRTIO, and so if I set VOP=y it is now possible to set
-HW_RANDOM_VIRTIO.
+Good point but, as Nick pointed out, at least we can solve the common 
+case.  I have added a remark to that effect to the commit message.
 
-When using menuconfig on a config file generated with oldconfig, that
-does not have HW_RANDOM_VIRTIO enabled, I am able to set HW_RANDOM=y and
-HW_RANDOM_VIRTIO=y, and after saving I can confirm that no other changes
-have been made to the configuration file.  This tells me that there's no
-need for a dependency on e.g. VOP, except when using oldconfig.
+>>   .gitignore                  |   1 +
+>>   Documentation/dontdiff      |   1 +
+>>   Makefile                    |  41 ++-
+>>   kernel/kallsyms.c           |  12 +-
+>>   scripts/Makefile.modbuiltin |  20 +-
+>>   scripts/kallsyms.c          | 515 +++++++++++++++++++++++++++++++++++-
+>>   scripts/link-vmlinux.sh     |  17 ++
+>>   scripts/namespace.pl        |   5 +
+>>   8 files changed, 589 insertions(+), 23 deletions(-)
+> This diff-stat is unfortunate.
+> scripts/kallsyms.c increased 65% for parsing
+> .tmp_vmlinux.ranges and modules_think.builtin
+>
+> I tend to suspect the design mistake...
 
-So, I think there is an ordering issue here, and that oldconfig
-should not prompt for HW_RANDOM_VIRTIO until after any option that might
-select VIRTIO=y.
+I have cleaned the changes up some and moved one portion, that can be 
+used for other purposes, into a separate file.  So the delta on 
+scripts/kallsyms.c has been decreased some.
 
-I would be happy to try to submit or test a patch to fix this, but I
-don't know where to go from here.
+>> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+>> @@ -69,10 +76,116 @@ static unsigned char best_table[256][2];
+>> +static struct obj2mod_elem *obj2mod[OBJ2MOD_N];
+>> +
+>> +static void obj2mod_init(void)
+>> +{
+>> +       memset(obj2mod, 0, sizeof(obj2mod));
+>> +}
+> Unneeded.
+>
+> The .bss section is automatically zero-cleared by
+> operating system.  obj2mod is already zero-filled.
+
+Thanks.  Change made.
+
+>> +static void obj2mod_put(char *obj, int mod)
+> you can add 'const' to the 'char *'.
+> Same for obj2mod_get().
+
+Thanks.  Change made.
+
+>> +static int addrmap_compare(const void *keyp, const void *rangep)
+>> +{
+>> +       unsigned long long addr = *((const unsigned long long *)keyp);
+>> +       const struct addrmap_entry *range = (const struct addrmap_entry *)rangep;
+> Cast is uneeded since rangep is an opaque pointer.
+
+Thanks.  Change made.
+
+>> @@ -125,6 +252,16 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+>> +       /* skip the .init.scratch section */
+>> +       if (strcmp(sym, "__init_scratch_end") == 0) {
+>> +               init_scratch = 0;
+>> +               goto read_another;
+>> +       }
+>> +       if (strcmp(sym, "__init_scratch_begin") == 0)
+>> +               init_scratch = 1;
+>> +       if (init_scratch)
+>> +               goto read_another;
+> How is this hunk related?
+> I do not understand it from the commit log.
+
+I removed this section.
+
+>> @@ -154,6 +291,14 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+>>          else if (!strncmp(sym, ".LASANPC", 8))
+>>                  return -1;
+>>
+>> +       /* look up the builtin module this is part of (if any) */
+>> +       range = (struct addrmap_entry *) bsearch(&s->addr,
+> Unneeded cast because bsearch() returns an opaque pointer.
+
+Thanks.  Change made.
+
+>> @@ -454,6 +601,19 @@ static void write_src(void)
+>>          for (i = 0; i < 256; i++)
+>>                  printf("\t.short\t%d\n", best_idx[i]);
+>>          printf("\n");
+>> +
+>> +       output_label("kallsyms_modules");
+>> +       for (i = 0; i < builtin_module_len; i++)
+>> +               printf("\t.asciz\t\"%s\"\n", builtin_modules[i]);
+>> +       printf("\n");
+> Output strings in plain text?
+> Did you consider the possibility for compression?
+
+As Nick pointed out, these names (one per module) only add a little 
+extra to the size.
+
+
+>>   int main(int argc, char **argv)
+>>   {
+>> +       const char *modules_builtin = "modules_thick.builtin";
+>> +
+>>          if (argc >= 2) {
+>>                  int i;
+>>                  for (i = 1; i < argc; i++) {
+>> -                       if(strcmp(argv[i], "--all-symbols") == 0)
+>> +                       if (strcmp(argv[i], "--all-symbols") == 0)
+>>                                  all_symbols = 1;
+>>                          else if (strcmp(argv[i], "--absolute-percpu") == 0)
+>>                                  absolute_percpu = 1;
+>>                          else if (strcmp(argv[i], "--base-relative") == 0)
+>>                                  base_relative = 1;
+>> +                       else if (strncmp(argv[i], "--builtin=", 10) == 0)
+>> +                               modules_builtin = &argv[i][10];
+>
+> ".tmp_vmlinux.ranges" is hard-coded, but
+> "modules_think.builtin" can be changed via option. Heh.
+
+Good point.  I removed the unneeded option.
+
+>> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+>> @@ -138,6 +140,19 @@ kallsyms()
+>> +       # read the linker map to identify ranges of addresses:
+>> +       #   - for each *.o file, report address, size, pathname
+>> +       #       - most such lines will have four fields
+>> +       #       - but sometimes there is a line break after the first field
+>> +       #   - start reading at "Linker script and memory map"
+> Searching for "Linker script and memory map" will probably bring
+> portability issue.
+>
+> llvm folks will be unhappy with it.
+
+Actually, LLVM emits the same string.
