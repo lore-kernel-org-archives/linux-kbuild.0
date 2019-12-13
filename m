@@ -1,39 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38302 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725906AbfLMKCt (ORCPT
+Received: from Galois.linutronix.de ([193.142.43.55]:47770 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbfLMKDx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Dec 2019 05:02:49 -0500
-Date: Fri, 13 Dec 2019 11:02:44 +0100
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [RFC PATCH v6 0/7] Speed booting by sorting ORC unwind tables at
- build time
-Message-ID: <20191213100244.GB113121@gmail.com>
-References: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
+        Fri, 13 Dec 2019 05:03:53 -0500
+Date: Fri, 13 Dec 2019 10:03:37 -0000
+From: "tip-bot2 for Shile Zhang" <tip-bot2@linutronix.de>
+Reply-to: linux-kernel@vger.kernel.org
+Subject: [tip: core/objtool] x86/unwind/orc: Remove boot-time ORC unwind
+ tables sorting
+In-Reply-To: <20191204004633.88660-8-shile.zhang@linux.alibaba.com>
+References: <20191204004633.88660-8-shile.zhang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
+Message-ID: <157623141704.30329.9522840249744393883.tip-bot2@tip-bot2>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shile Zhang <shile.zhang@linux.alibaba.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@amacapital.net>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-tip-commits@vger.kernel.org
+Cc: Shile Zhang <shile.zhang@linux.alibaba.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
+The following commit has been merged into the core/objtool branch of tip:
 
-* Shile Zhang <shile.zhang@linux.alibaba.com> wrote:
+Commit-ID:     f14bf6a350dfd6613dbf91be5b423bc7eab690da
+Gitweb:        https://git.kernel.org/tip/f14bf6a350dfd6613dbf91be5b423bc7eab690da
+Author:        Shile Zhang <shile.zhang@linux.alibaba.com>
+AuthorDate:    Wed, 04 Dec 2019 08:46:33 +08:00
+Committer:     Ingo Molnar <mingo@kernel.org>
+CommitterDate: Fri, 13 Dec 2019 10:47:58 +01:00
 
-> Hi,
-> 
-> Sorry, update for compile error fix, reported by Intel's kbuild test robot.
-> Any comments or suggestions are welcome!
+x86/unwind/orc: Remove boot-time ORC unwind tables sorting
 
-Could you please send a delta patch to fix these new build warnings on 
-64-bit allnoconfig kernels:
+Now that the orc_unwind and orc_unwind_ip tables are sorted at build time,
+remove the boot time sorting pass.
 
-  arch/x86/kernel/unwind_orc.c:210:12: warning: ‘orc_sort_cmp’ defined but not used [-Wunused-function]
-  arch/x86/kernel/unwind_orc.c:190:13: warning: ‘orc_sort_swap’ defined but not used [-Wunused-function]
+No change in functionality.
 
-Thanks,
+[ mingo: Rewrote the changelog and code comments. ]
 
-	Ingo
+Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kbuild@vger.kernel.org
+Link: https://lkml.kernel.org/r/20191204004633.88660-8-shile.zhang@linux.alibaba.com
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+---
+ arch/x86/kernel/unwind_orc.c | 8 +++++---
+ scripts/link-vmlinux.sh      | 5 ++++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kernel/unwind_orc.c b/arch/x86/kernel/unwind_orc.c
+index 332ae65..abdf891 100644
+--- a/arch/x86/kernel/unwind_orc.c
++++ b/arch/x86/kernel/unwind_orc.c
+@@ -273,9 +273,11 @@ void __init unwind_init(void)
+ 		return;
+ 	}
+ 
+-	/* Sort the .orc_unwind and .orc_unwind_ip tables: */
+-	sort(__start_orc_unwind_ip, num_entries, sizeof(int), orc_sort_cmp,
+-	     orc_sort_swap);
++	/*
++	 * Note, the orc_unwind and orc_unwind_ip tables were already
++	 * sorted at build time via the 'sorttable' tool.
++	 * It's ready for binary search straight away, no need to sort it.
++	 */
+ 
+ 	/* Initialize the fast lookup table: */
+ 	lookup_num_blocks = orc_lookup_end - orc_lookup;
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index a81aa76..c287ad9 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -306,7 +306,10 @@ vmlinux_link vmlinux "${kallsymso}" ${btf_vmlinux_bin_o}
+ 
+ if [ -n "${CONFIG_BUILDTIME_TABLE_SORT}" ]; then
+ 	info SORTTAB vmlinux
+-	sorttable vmlinux
++	if ! sorttable vmlinux; then
++		echo >&2 Failed to sort kernel tables
++		exit 1
++	fi
+ fi
+ 
+ info SYSMAP System.map
