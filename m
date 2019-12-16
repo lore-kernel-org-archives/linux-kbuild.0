@@ -1,59 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([193.142.43.55]:47781 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbfLMKDy (ORCPT
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:46682 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726528AbfLPDHM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Dec 2019 05:03:54 -0500
-Date: Fri, 13 Dec 2019 10:03:37 -0000
-From: "tip-bot2 for Shile Zhang" <tip-bot2@linutronix.de>
-Reply-to: linux-kernel@vger.kernel.org
-Subject: [tip: core/objtool] scripts/sortextable: Remove dead code
-In-Reply-To: <20191204004633.88660-4-shile.zhang@linux.alibaba.com>
-References: <20191204004633.88660-4-shile.zhang@linux.alibaba.com>
+        Sun, 15 Dec 2019 22:07:12 -0500
+Subject: Re: [RFC PATCH v6 0/7] Speed booting by sorting ORC unwind tables at
+ build time
+References: <20191204004633.88660-1-shile.zhang@linux.alibaba.com>
+ <20191213100244.GB113121@gmail.com>
+From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Message-ID: <c9c81536-2afc-c8aa-c5f8-c7618ecd4f54@linux.alibaba.com>
+Date: Mon, 16 Dec 2019 11:07:29 +0800
 MIME-Version: 1.0
-Message-ID: <157623141795.30329.4389292245949858856.tip-bot2@tip-bot2>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191213100244.GB113121@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-tip-commits@vger.kernel.org
-Cc: Shile Zhang <shile.zhang@linux.alibaba.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@amacapital.net>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-The following commit has been merged into the core/objtool branch of tip:
 
-Commit-ID:     abe4f92ca8948a3e04c56788354933c326909acb
-Gitweb:        https://git.kernel.org/tip/abe4f92ca8948a3e04c56788354933c326909acb
-Author:        Shile Zhang <shile.zhang@linux.alibaba.com>
-AuthorDate:    Wed, 04 Dec 2019 08:46:29 +08:00
-Committer:     Ingo Molnar <mingo@kernel.org>
-CommitterDate: Fri, 13 Dec 2019 10:47:58 +01:00
+On 2019/12/13 18:02, Ingo Molnar wrote:
+>    arch/x86/kernel/unwind_orc.c:210:12: warning: ‘orc_sort_cmp’ defined but not used [-Wunused-function]
+>    arch/x86/kernel/unwind_orc.c:190:13: warning: ‘orc_sort_swap’ defined but not used [-Wunused-function]
+Hi Ingo,
 
-scripts/sortextable: Remove dead code
+Sorry for trouble! please help to check the warning-fix patch.
+Thanks!
+
+---
+ From b3d34213b4fe5a9cf2efcc1c758a5fb6c5f7676b Mon Sep 17 00:00:00 2001
+From: Shile Zhang <shile.zhang@linux.alibaba.com>
+Date: Mon, 16 Dec 2019 10:56:03 +0800
+Subject: [PATCH] x86/unwind/orc: fix build warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+To fix follwowing warning due to ORC sort moved to build time:
+
+arch/x86/kernel/unwind_orc.c:210:12: warning: ‘orc_sort_cmp’ defined but 
+not used [-Wunused-function]
+arch/x86/kernel/unwind_orc.c:190:13: warning: ‘orc_sort_swap’ defined 
+but not used [-Wunused-function]
 
 Signed-off-by: Shile Zhang <shile.zhang@linux.alibaba.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
-Link: https://lkml.kernel.org/r/20191204004633.88660-4-shile.zhang@linux.alibaba.com
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
 ---
- scripts/sortextable.h | 4 ----
- 1 file changed, 4 deletions(-)
+  arch/x86/kernel/unwind_orc.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/sortextable.h b/scripts/sortextable.h
-index b7e407e..a2e3af7 100644
---- a/scripts/sortextable.h
-+++ b/scripts/sortextable.h
-@@ -201,10 +201,6 @@ static int do_func(Elf_Ehdr *ehdr,
- 		_r(&sort_needed_sym->st_value) -
- 		_r(&sort_needed_sec->sh_addr);
- 
--#if 0
--	printf("sort done marker at %lx\n",
--	       (unsigned long)((char *)sort_done_location - (char *)ehdr));
--#endif
- 	/* We sorted it, clear the flag. */
- 	w(0, sort_done_location);
- 	return 0;
+diff --git a/arch/x86/kernel/unwind_orc.c b/arch/x86/kernel/unwind_orc.c
+index 280da6fa9922..2391874b724a 100644
+--- a/arch/x86/kernel/unwind_orc.c
++++ b/arch/x86/kernel/unwind_orc.c
+@@ -187,6 +187,7 @@ static struct orc_entry *orc_find(unsigned long ip)
+         return orc_ftrace_find(ip);
+  }
+
++#ifdef CONFIG_MODULES
+  static void orc_sort_swap(void *_a, void *_b, int size)
+  {
+         struct orc_entry *orc_a, *orc_b;
+@@ -229,7 +230,6 @@ static int orc_sort_cmp(const void *_a, const void *_b)
+         return orc_a->sp_reg == ORC_REG_UNDEFINED && !orc_a->end ? -1 : 1;
+  }
+
+-#ifdef CONFIG_MODULES
+  void unwind_module_init(struct module *mod, void *_orc_ip, size_t 
+orc_ip_size,
+                         void *_orc, size_t orc_size)
+  {
+--
+2.24.0.rc2
