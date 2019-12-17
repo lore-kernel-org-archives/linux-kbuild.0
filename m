@@ -1,71 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:36589 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727039AbfLQEDK (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:49221 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727197AbfLQEOn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Dec 2019 23:03:10 -0500
+        Mon, 16 Dec 2019 23:14:43 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kconfig: warn nested choice
-Date: Tue, 17 Dec 2019 13:02:45 +0900
-Message-Id: <20191217040245.24441-1-masahiroy@kernel.org>
+Subject: [PATCH 2/8] kconfig: use parent->dep as the parentdep of 'menu'
+Date: Tue, 17 Dec 2019 13:14:17 +0900
+Message-Id: <20191217041424.29285-3-masahiroy@kernel.org>
+In-Reply-To: <20191217041424.29285-1-masahiroy@kernel.org>
+References: <20191217041424.29285-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-If you create a 'choice' inside another 'choice', I do not know how
-it should work.
+In menu_finalize(), the dependency of a menu entry is propagated
+downwards.
 
-I applied this patch onto v5.5-rc1, and I see one warning:
-
-  drivers/usb/gadget/legacy/Kconfig:458: warning: nested choice. previous choice entry is drivers/usb/gadget/Kconfig:486
-
-This is because entire drivers/usb/gadget/legacy/Kconfig is in the
-choice context.
+For the 'menu', ->dep and ->prompt->visible.expr are the same.
+Both accumulate the 'depends on' of itself and upper menu entries.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/parser.y | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ scripts/kconfig/menu.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-index b3eff9613cf8..86e75ea74731 100644
---- a/scripts/kconfig/parser.y
-+++ b/scripts/kconfig/parser.y
-@@ -30,6 +30,9 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b1b1ee8cf987..bbabf0a59ac4 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -326,12 +326,10 @@ void menu_finalize(struct menu *parent)
+ 			 * choice value symbols.
+ 			 */
+ 			parentdep = expr_alloc_symbol(sym);
+-		} else if (parent->prompt)
+-			/* Menu node for 'menu' */
+-			parentdep = parent->prompt->visible.expr;
+-		else
+-			/* Menu node for 'if' */
++		} else {
++			/* Menu node for 'menu', 'if' */
+ 			parentdep = parent->dep;
++		}
  
- static struct menu *current_menu, *current_entry;
- 
-+/* while in the choice block, this points to the location of the choice entry */
-+static struct menu *current_choice_menu;
-+
- %}
- 
- %union
-@@ -239,6 +242,14 @@ choice: T_CHOICE word_opt T_EOL
- 	menu_add_entry(sym);
- 	menu_add_expr(P_CHOICE, NULL, NULL);
- 	free($2);
-+
-+	if (current_choice_menu)
-+		zconfprint("warning: nested choice. previous choice entry is %s:%d",
-+			   current_choice_menu->file->name,
-+			   current_choice_menu->lineno);
-+
-+	current_choice_menu = current_entry;
-+
- 	printd(DEBUG_PARSE, "%s:%d:choice\n", zconf_curname(), zconf_lineno());
- };
- 
-@@ -439,7 +450,7 @@ prompt:	  T_WORD
- ;
- 
- end:	  T_ENDMENU T_EOL	{ $$ = "menu"; }
--	| T_ENDCHOICE T_EOL	{ $$ = "choice"; }
-+	| T_ENDCHOICE T_EOL	{ $$ = "choice"; current_choice_menu = NULL; }
- 	| T_ENDIF T_EOL		{ $$ = "if"; }
- ;
- 
+ 		/* For each child menu node... */
+ 		for (menu = parent->list; menu; menu = menu->next) {
 -- 
 2.17.1
