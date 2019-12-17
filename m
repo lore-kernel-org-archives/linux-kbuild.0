@@ -1,39 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:43689 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726164AbfLQN4V (ORCPT
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:48123 "EHLO
+        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726164AbfLQOGy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Dec 2019 08:56:21 -0500
-From: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Subject: [PATCH v2] scripts: package: mkdebian: add missing rsync dependency
-Date: Tue, 17 Dec 2019 14:55:39 +0100
-Message-Id: <20191217135539.17157-1-info@metux.net>
+        Tue, 17 Dec 2019 09:06:54 -0500
+Date: Tue, 17 Dec 2019 15:06:46 +0100
+From: Greg KH <greg@kroah.com>
+Subject: Re: [PATCH] RFC: platform driver registering via initcall tables
+Message-ID: <20191217140646.GC3489463@kroah.com>
+References: <20191217102219.29223-1-info@metux.net>
+ <20191217103152.GB2914497@kroah.com>
+ <6422bc88-6d0a-7b51-aaa7-640c6961b177@metux.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6422bc88-6d0a-7b51-aaa7-640c6961b177@metux.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: masahiroy@kernel.org, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, linux-riscv@lists.infradead.org
+To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Cc: "Enrico Weigelt, metux IT consult" <info@metux.net>, linux-kernel@vger.kernel.org, linus.walleij@linaro.org, bgolaszewski@baylibre.com, dmitry.torokhov@gmail.com, jacek.anaszewski@gmail.com, pavel@ucw.cz, dmurphy@ti.com, arnd@arndb.de, masahiroy@kernel.org, michal.lkml@markovi.net, kafai@fb.com, songliubraving@fb.com, yhs@fb.com, andriin@fb.com, linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, linux-leds@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 
-We've missed the dependency to rsync, so build fails on
-minimal containers.
+On Tue, Dec 17, 2019 at 02:44:39PM +0100, Enrico Weigelt, metux IT consult wrote:
+> On 17.12.19 11:31, Greg KH wrote:
+> 
+> Hi,
+> 
+> > No, what is so "special" about platform drivers that they require this?
+> 
+> Nothing, of course ;-)
+> 
+> It's the the starting point for this PoC. The idea actually is doing
+> this for all other driver types, too (eg. spi, pci, usb, ...). But
+> they'll need their own tables, as different *_register() functions have
+> to be called - just haven't implemented that yet.
 
-Fixes: 59b2bd05f5f4 ("kbuild: add 'headers' target to build up uapi headers in usr/include")
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- scripts/package/mkdebian | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That's not needed, and you are going to break the implicit ordering we
+already have with link order.  You are going to have to figure out what
+bus type the driver is, to determine what segment it was in, to figure
+out what was loaded before what.
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index e0750b70453f..7c230016b08d 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -174,7 +174,7 @@ Source: $sourcename
- Section: kernel
- Priority: optional
- Maintainer: $maintainer
--Build-Depends: bc, kmod, cpio, bison, flex | flex:native $extra_build_depends
-+Build-Depends: bc, rsync, kmod, cpio, bison, flex | flex:native $extra_build_depends
- Homepage: http://www.kernel.org/
- 
- Package: $packagename
--- 
-2.11.0
+Not good.
+
+> > If anything, we should be moving _AWAY_ from platform drivers and use
+> > real bus drivers instead.
+> 
+> That would be nice, but, unfortunately, we have lots of devices which
+> aren't attached to any (probing-capable) bus. That's why we have things
+> like oftree, etc.
+> 
+> > Please no, I don't see why this is even needed.
+> 
+> The idea is getting rid of all the init code, which all just does the
+> same, just calls some *_register() function.
+
+There's no need to get rid of it, what are you trying to save here?  How
+can you be sure init order is still the same?
+
+thanks,
+
+greg k-h
