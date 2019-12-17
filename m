@@ -1,56 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:38269 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725940AbfLQKb5 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30524 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726487AbfLQLHU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Dec 2019 05:31:57 -0500
-Date: Tue, 17 Dec 2019 11:31:52 +0100
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] RFC: platform driver registering via initcall tables
-Message-ID: <20191217103152.GB2914497@kroah.com>
-References: <20191217102219.29223-1-info@metux.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191217102219.29223-1-info@metux.net>
+        Tue, 17 Dec 2019 06:07:20 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] tty: vt: move conmakehash to drivers/tty/vt/ from scripts/
+Date: Tue, 17 Dec 2019 20:06:33 +0900
+Message-Id: <20191217110633.8796-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Cc: linux-kernel@vger.kernel.org, linus.walleij@linaro.org, bgolaszewski@baylibre.com, dmitry.torokhov@gmail.com, jacek.anaszewski@gmail.com, pavel@ucw.cz, dmurphy@ti.com, arnd@arndb.de, masahiroy@kernel.org, michal.lkml@markovi.net, kafai@fb.com, songliubraving@fb.com, yhs@fb.com, andriin@fb.com, linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, linux-leds@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 11:22:19AM +0100, Enrico Weigelt, metux IT consult wrote:
-> A large portion of platform drivers doesn't need their own init/exit
-> functions. At source level, the boilerplate is already replaced by
-> module_platform_driver() macro call, which creates this code under
-> the hood. But in the binary, the code is still there.
-> 
-> This patch is an attempt to remove them it, by the same approach
-> already used for the init functions: collect pointers to the driver
-> structs in special sections, which are then processed by the init
-> code which already calls the init function vectors. For each level,
-> the structs are processed right after the init funcs, so we guarantee
-> the existing order, and explicit inits always come before the automatic
-> registering.
+scripts/conmakehash is only used for generating
+drivers/tty/vt/consolemap_deftbl.c
 
-No, what is so "special" about platform drivers that they require this?
+Move it to the related directory.
 
-If anything, we should be moving _AWAY_ from platform drivers and use
-real bus drivers instead.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> Downside of apprach: cluttering init code w/ a little bit knowledge
-> about driver related stuff (calls to platform_driver_register(), etc).
+ drivers/tty/vt/.gitignore                 | 1 +
+ drivers/tty/vt/Makefile                   | 6 ++++--
+ {scripts => drivers/tty/vt}/conmakehash.c | 0
+ scripts/.gitignore                        | 1 -
+ scripts/Makefile                          | 3 ---
+ 5 files changed, 5 insertions(+), 6 deletions(-)
+ rename {scripts => drivers/tty/vt}/conmakehash.c (100%)
 
-Exactly, don't.
-
-> For now, only implemented for the built-in case (modules still go the
-> old route). The module case is a little bit trickier: either we have to
-> extend the module header (and modpost tool) or do some dynamic symbol
-> lookup.
-> 
-> This patch is just a PoC for further discussions, not ready for mainline.
-> It also changes a few drivers, just for illustration. In case the general
-> approach is accepted, it will be cleaned up and splitted.
-
-Please no, I don't see why this is even needed.
-
-greg k-h
+diff --git a/drivers/tty/vt/.gitignore b/drivers/tty/vt/.gitignore
+index 9b38b85f9d9a..3ecf42234d89 100644
+--- a/drivers/tty/vt/.gitignore
++++ b/drivers/tty/vt/.gitignore
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
++conmakehash
+ consolemap_deftbl.c
+ defkeymap.c
+diff --git a/drivers/tty/vt/Makefile b/drivers/tty/vt/Makefile
+index edbbe0ccdb83..329ca336b8ee 100644
+--- a/drivers/tty/vt/Makefile
++++ b/drivers/tty/vt/Makefile
+@@ -12,10 +12,12 @@ obj-$(CONFIG_HW_CONSOLE)		+= vt.o defkeymap.o
+ # Files generated that shall be removed upon make clean
+ clean-files := consolemap_deftbl.c defkeymap.c
+ 
++hostprogs-y += conmakehash
++
+ quiet_cmd_conmk = CONMK   $@
+-      cmd_conmk = scripts/conmakehash $< > $@
++      cmd_conmk = $(obj)/conmakehash $< > $@
+ 
+-$(obj)/consolemap_deftbl.c: $(src)/$(FONTMAPFILE)
++$(obj)/consolemap_deftbl.c: $(src)/$(FONTMAPFILE) $(obj)/conmakehash
+ 	$(call cmd,conmk)
+ 
+ $(obj)/defkeymap.o:  $(obj)/defkeymap.c
+diff --git a/scripts/conmakehash.c b/drivers/tty/vt/conmakehash.c
+similarity index 100%
+rename from scripts/conmakehash.c
+rename to drivers/tty/vt/conmakehash.c
+diff --git a/scripts/.gitignore b/scripts/.gitignore
+index 4aa1806c59c2..fcbc81f7c3d4 100644
+--- a/scripts/.gitignore
++++ b/scripts/.gitignore
+@@ -2,7 +2,6 @@
+ # Generated files
+ #
+ bin2c
+-conmakehash
+ kallsyms
+ unifdef
+ recordmcount
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 00c47901cb06..96f155b582dd 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -4,14 +4,11 @@
+ # the kernel for the build process.
+ # ---------------------------------------------------------------------------
+ # kallsyms:      Find all symbols in vmlinux
+-# conmakehash:   Create chartable
+-# conmakehash:	 Create arrays for initializing the kernel console tables
+ 
+ HOST_EXTRACFLAGS += -I$(srctree)/tools/include
+ 
+ hostprogs-$(CONFIG_BUILD_BIN2C)  += bin2c
+ hostprogs-$(CONFIG_KALLSYMS)     += kallsyms
+-hostprogs-$(CONFIG_VT)           += conmakehash
+ hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
+ hostprogs-$(CONFIG_BUILDTIME_EXTABLE_SORT) += sortextable
+ hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
+-- 
+2.17.1
