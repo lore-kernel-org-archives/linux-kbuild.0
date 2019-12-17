@@ -1,63 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:57920 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbfLQBKf (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:58155 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725836AbfLQDGc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Dec 2019 20:10:35 -0500
+        Mon, 16 Dec 2019 22:06:32 -0500
 MIME-Version: 1.0
-References: <20191216200719.30479-1-info@metux.net>
-In-Reply-To: <20191216200719.30479-1-info@metux.net>
+References: <20191204225446.202981-1-dima@golovin.in> <CAKwvOdm-bhuJMRRN3tyNdb88+_TFd4m3b-7gX0-91VG4djzp+Q@mail.gmail.com>
+ <23883331575506134@vla1-3991b5027d7d.qloud-c.yandex.net>
+In-Reply-To: <23883331575506134@vla1-3991b5027d7d.qloud-c.yandex.net>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 17 Dec 2019 10:09:44 +0900
-Message-ID: <CAK7LNASxcne9kryTsW2+7TQxuH+tp4Z4OT+1BjUHSE2Cfp_qxA@mail.gmail.com>
-Subject: Re: [PATCH] scripts: package: mkdebian: add missing rsync dependency
+Date: Tue, 17 Dec 2019 12:05:36 +0900
+Message-ID: <CAK7LNATRWgfnP_C68aiOLacR_Bhz2oL6DgyUE76gENWfOvvGbQ@mail.gmail.com>
+Subject: Re: [PATCH] x86/boot: kbuild: allow readelf executable to be specified
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <info@metux.net>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-riscv@lists.infradead.org
+To: Dmitry Golovin <dima@golovin.in>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Bruce Ashfield <bruce.ashfield@gmail.com>, Ross Philipson <ross.philipson@oracle.com>, Ross Burton <ross.burton@intel.com>, Chao Fan <fanc.fnst@cn.fujitsu.com>, Daniel Kiper <daniel.kiper@oracle.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, "tony.luck@intel.com" <tony.luck@intel.com>, "fenghua.yu@intel.com" <fenghua.yu@intel.com>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>
 
-On Tue, Dec 17, 2019 at 5:08 AM Enrico Weigelt, metux IT consult
-<info@metux.net> wrote:
+On Thu, Dec 5, 2019 at 9:41 AM Dmitry Golovin <dima@golovin.in> wrote:
 >
-> We've missed the dependency to rsync, so build fails on
-> minimal containers.
-
-Ah, right.
-
-Did it fail in headers_install?
-
-If so, I will add this tag.
-
-Fixes: 59b2bd05f5f4 ("kbuild: add 'headers' target to build up uapi
-headers in usr/include")
-
-
-
-
-
-> Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
-> ---
->  scripts/package/mkdebian | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 05.12.2019, 01:18, "'Nick Desaulniers' via Clang Built Linux" <clang-built-linux@googlegroups.com>:
+> >
+> > Grepping the kernel sources for `READELF`, it looks like
+> > arch/ia64/Makefile makes the same mistake. Would you mind fixing both
+> > cases in the same patch (v2)? I'm also curious about it's use in
+> > arch/ia64/scripts/unwcheck.py, and scripts/faddr2line. +ia64
+> > maintainers and list.
+> >
+> > I think if you simply remove the assignment on line 17 of
+> > arch/ia64/Makefile you should be fine.
 >
-> diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index e0750b70453f..7c230016b08d 100755
-> --- a/scripts/package/mkdebian
-> +++ b/scripts/package/mkdebian
-> @@ -174,7 +174,7 @@ Source: $sourcename
->  Section: kernel
->  Priority: optional
->  Maintainer: $maintainer
-> -Build-Depends: bc, kmod, cpio, bison, flex | flex:native $extra_build_depends
-> +Build-Depends: bc, rsync, kmod, cpio, bison, flex | flex:native $extra_build_depends
->  Homepage: http://www.kernel.org/
+> Perhaps something should be done to NM on line 16 of this file as well. Also
+> found similar invocation of `objcopy` in arch/riscv/kernel/vdso/Makefile.
+> I think IA64 and RISC-V changes should be made as separate commits.
 >
->  Package: $packagename
-> --
-> 2.11.0
->
+> -- Dmitry
 
+Applied to linux-kbuid. Thanks.
 
 -- 
 Best Regards
