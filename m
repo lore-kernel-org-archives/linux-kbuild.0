@@ -1,46 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:42573 "EHLO
-        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727127AbfLQOuI (ORCPT
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:45574 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729042AbfLQQPz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Dec 2019 09:50:08 -0500
-Date: Tue, 17 Dec 2019 15:50:03 +0100
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] RFC: platform driver registering via initcall tables
-Message-ID: <20191217145003.GB3639802@kroah.com>
-References: <20191217102219.29223-1-info@metux.net>
- <20191217103152.GB2914497@kroah.com>
- <6422bc88-6d0a-7b51-aaa7-640c6961b177@metux.net>
- <20191217140646.GC3489463@kroah.com>
- <d938b8e1-d9ce-9ad6-4178-86219e99d4df@metux.net>
+        Tue, 17 Dec 2019 11:15:55 -0500
+From: Thomas Hebb <tommyhebb@gmail.com>
+Subject: [PATCH v2 3/3] kconfig: fix nesting of symbol help text
+Date: Tue, 17 Dec 2019 08:15:45 -0800
+Message-Id: <51c902d29bf8748c411f78405f9638109a5cf4c6.1576599202.git.tommyhebb@gmail.com>
+In-Reply-To: <cover.1576599202.git.tommyhebb@gmail.com>
+References: <cover.1576599202.git.tommyhebb@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d938b8e1-d9ce-9ad6-4178-86219e99d4df@metux.net>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Cc: "Enrico Weigelt, metux IT consult" <info@metux.net>, linux-kernel@vger.kernel.org, linus.walleij@linaro.org, bgolaszewski@baylibre.com, dmitry.torokhov@gmail.com, jacek.anaszewski@gmail.com, pavel@ucw.cz, dmurphy@ti.com, arnd@arndb.de, masahiroy@kernel.org, michal.lkml@markovi.net, kafai@fb.com, songliubraving@fb.com, yhs@fb.com, andriin@fb.com, linux-gpio@vger.kernel.org, linux-input@vger.kernel.org, linux-leds@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Thomas Hebb <tommyhebb@gmail.com>
 
-On Tue, Dec 17, 2019 at 03:43:56PM +0100, Enrico Weigelt, metux IT consult wrote:
-> On 17.12.19 15:06, Greg KH wrote:
-> 
-> > That's not needed, and you are going to break the implicit ordering we
-> > already have with link order.  
-> 
-> Ups, 10 points for you - I didn't consider that.
-> 
-> > You are going to have to figure out what
-> > bus type the driver is, to determine what segment it was in, to figure
-> > out what was loaded before what.
-> 
-> hmm, if it's just the ordering by bus type (but not within one bus
-> type), then it shouldn't be the big deal to fix, as I'll need one table
-> and register-loop per bus-type anyways.
-> 
-> By the way: how is there init order ensured with dynamically loaded
-> modules ? (for cases where there aren't explicit symbol dependencies)
+When we generate the help text of a symbol (e.g. when a user presses '?'
+in menuconfig), we do two things:
 
-See the recent work in the driver core for DT fixes for that very issue.
+ 1. We iterate through every prompt that belongs to that symbol,
+    printing its text and its location in the menu tree.
+ 2. We print symbol-wide information that's not linked to a particular
+    prompt, such as what it selects/is selected by and what it
+    implies/is implied by.
 
-greg k-h
+Each prompt we print for 1 starts with a line that's not indented
+indicating where the prompt is defined, then continues with indented
+lines that describe properties of that particular definition.
+
+Once we get to 2, however, we print all the global data indented as
+well! Visually, this makes it look like the symbol-wide data is
+associated with the last prompt we happened to print rather than
+the symbol as a whole.
+
+Fix this by removing the indentation for symbol-wide information.
+
+Before:
+
+  Symbol: CPU_FREQ [=n]
+  Type  : bool
+  Defined at drivers/cpufreq/Kconfig:4
+    Prompt: CPU Frequency scaling
+    Location:
+      -> CPU Power Management
+        -> CPU Frequency scaling
+    Selects: SRCU [=n]
+    Selected by [n]:
+    - ARCH_SA1100 [=n] && <choice>
+
+After:
+
+  Symbol: CPU_FREQ [=n]
+  Type  : bool
+  Defined at drivers/cpufreq/Kconfig:4
+    Prompt: CPU Frequency scaling
+    Location:
+      -> CPU Power Management
+        -> CPU Frequency scaling
+  Selects: SRCU [=n]
+  Selected by [n]:
+    - ARCH_SA1100 [=n] && <choice>
+
+Signed-off-by: Thomas Hebb <tommyhebb@gmail.com>
+---
+
+Changes in v2: None
+
+ scripts/kconfig/menu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index dcf7f32f0bba..ef36d1cf2a76 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -838,18 +838,18 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 		}
+ 	}
+ 
+-	get_symbol_props_str(r, sym, P_SELECT, "  Selects: ");
++	get_symbol_props_str(r, sym, P_SELECT, "Selects: ");
+ 	if (sym->rev_dep.expr) {
+-		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "  Selected by [y]:\n");
+-		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "  Selected by [m]:\n");
+-		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "  Selected by [n]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, yes, "Selected by [y]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, mod, "Selected by [m]:\n");
++		expr_gstr_print_revdep(sym->rev_dep.expr, r, no, "Selected by [n]:\n");
+ 	}
+ 
+-	get_symbol_props_str(r, sym, P_IMPLY, "  Implies: ");
++	get_symbol_props_str(r, sym, P_IMPLY, "Implies: ");
+ 	if (sym->implied.expr) {
+-		expr_gstr_print_revdep(sym->implied.expr, r, yes, "  Implied by [y]:\n");
+-		expr_gstr_print_revdep(sym->implied.expr, r, mod, "  Implied by [m]:\n");
+-		expr_gstr_print_revdep(sym->implied.expr, r, no, "  Implied by [n]:\n");
++		expr_gstr_print_revdep(sym->implied.expr, r, yes, "Implied by [y]:\n");
++		expr_gstr_print_revdep(sym->implied.expr, r, mod, "Implied by [m]:\n");
++		expr_gstr_print_revdep(sym->implied.expr, r, no, "Implied by [n]:\n");
+ 	}
+ 
+ 	str_append(r, "\n\n");
+-- 
+2.24.1
