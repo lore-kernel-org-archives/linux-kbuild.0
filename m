@@ -1,55 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-il1-f196.google.com ([209.85.166.196]:39185 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727323AbfLRPNz (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:50784 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726921AbfLRPfZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Dec 2019 10:13:55 -0500
-Received: by mail-il1-f196.google.com with SMTP id x5so1983701ila.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2019 07:13:54 -0800 (PST)
-MIME-Version: 1.0
-Reply-To: dhl.expresscourier102156@outlook.fr
-From: "MS. MARYANNA B. THOMASON" <info.zennitbankplcnigerian@gmail.com>
-Date: Wed, 18 Dec 2019 16:13:52 +0100
-Message-ID: <CABHzvrnY8Lhdw4Y2q97jvAVrRpM9CVLFkw=Ved7y1GhGqHiAdw@mail.gmail.com>
-Subject: I WANT TO YOU TO TREAT THIS EMAIL VERY URGENT
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 18 Dec 2019 10:35:25 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 1/2] kbuild: detect missing include guard for exported headers
+Date: Thu, 19 Dec 2019 00:34:21 +0900
+Message-Id: <20191218153422.14557-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, Pablo Neira Ayuso <pablo@netfilter.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-Attn Dear.
+Adding an include guard to every header file is good practice in case
+it is included multiple times.
 
-Urgent delivery Notification of your ATM MASTER CARD, Dhl-Benin is
-ready for delivery of your ATM Master card worth $15.800=E2=80=99000=E2=80=
-=9900, as
-approved this morning, Date, 18/12/2019. Through the Intruction from
-INTERNATIONAL MONETARY FUNDS, I.M.F official Directors.
+Exported headers are compile-tested for the comprehensive sanity checks.
+Let's include the same header twice. If an include guard is missing,
+the header will fail to build due to redefinition of something.
 
-REGISTRATION NO :EG58945
-PARCEL NUMBER: 140479
-Delivery Schuleded now,
-Finally all we required from you is your ATM Card Proccessing Delivery
-fees $19.00 only which you must send to this DHL service to enable us
-dispatch the parcel to your destination today.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+---
 
-Here is our receiving payment details.
-You are advised to send it Via Money Gram Service.
+ usr/include/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Receiver's Name--------Alan Ude
-Country-------Benin Republic.
-City/ Address--------Cotonou
-Test Question--------In God
-Answer-------We Trust
-Amount------------$US19.00 only
-Mtcn-------------
-Sender's Name-------
-
-Your delivery  ATM card worth $15.800=E2=80=99000=E2=80=9900,
-Is Due for delivery to your address today upon confirmation of
-required fee from you asap.
-
-Call us on this phone number for any inquiry. +229 62819378
-Awaiting your urgent response.
-
-MS. MARYANNA B. THOMASON, Shipment director, DHL Express
-Courier Company-Benin
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index 84598469e6ff..e90f5f7903bb 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -93,10 +93,11 @@ header-test- += asm-generic/%
+ 
+ extra-y := $(patsubst $(obj)/%.h,%.hdrtest, $(shell find $(obj) -name '*.h' 2>/dev/null))
+ 
++# Include the header to detect missing include guard.
+ quiet_cmd_hdrtest = HDRTEST $<
+       cmd_hdrtest = \
+ 		$(CC) $(c_flags) -S -o /dev/null -x c /dev/null \
+-			$(if $(filter-out $(header-test-), $*.h), -include $<); \
++			$(if $(filter-out $(header-test-), $*.h), -include $< -include $<); \
+ 		$(PERL) $(srctree)/scripts/headers_check.pl $(obj) $(SRCARCH) $<; \
+ 		touch $@
+ 
+-- 
+2.17.1
