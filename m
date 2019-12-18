@@ -1,40 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:58511 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727031AbfLRQFZ (ORCPT
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:33838 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727193AbfLRRX7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Dec 2019 11:05:25 -0500
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kbuild: use pattern rule for building built-in.a in sub-directories
-Date: Thu, 19 Dec 2019 01:05:14 +0900
-Message-Id: <20191218160514.28124-1-masahiroy@kernel.org>
+        Wed, 18 Dec 2019 12:23:59 -0500
+Date: Wed, 18 Dec 2019 18:23:53 +0100
+From: Johan Hovold <johan@kernel.org>
+Subject: kbuild obj-m directory descend (was: Re: [PATCH] serdev: fix builds
+ with CONFIG_SERIAL_DEV_BUS=m)
+Message-ID: <20191218172353.GO22665@localhost>
+References: <201912181000.82Z7czbN%lkp@intel.com>
+ <20191218083842.14882-1-u.kleine-koenig@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191218083842.14882-1-u.kleine-koenig@pengutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>, Rob Herring <robh@kernel.org>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, kbuild test robot <lkp@intel.com>, linux-kbuild@vger.kernel.org
 
-The built-in.a in a sub-directory is created by descending into that
-directory. It does not depend on the other sub-directories. Loosen
-the dependency.
+On Wed, Dec 18, 2019 at 09:38:42AM +0100, Uwe Kleine-König wrote:
+> Commit 54edb425346a ("serdev: simplify Makefile") broke builds with
+> serdev configured as module. I don't understand it completely yet, but
+> it seems that
+> 
+> 	obj-$(CONFIG_SERIAL_DEV_BUS) += serdev/
+> 
+> in drivers/tty/Makefile with CONFIG_SERIAL_DEV_BUS=m doesn't result in
+> code that is added using obj-y in drivers/tty/serdev/Makefile being
+> compiled. So instead of dropping $(CONFIG_SERIAL_DEV_BUS) in serdev's
+> Makefile, drop it in drivers/tty/Makefile.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+I was just looking into this when you commented on this off-list.
 
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The offending patch is broken since it effectively makes
+CONFIG_SERIAL_DEV_BUS bool (built-in or disabled), but for some reason
+those symbols do not end up in vmlinux (despite being compiled) when you
+add a built-in object goal under a directory that was entered using
+obj-m.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index e46b4ee9a120..a562d695f0fa 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -372,7 +372,7 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
- # ---------------------------------------------------------------------------
- 
- # To build objects in subdirs, we need to descend into the directories
--$(sort $(subdir-obj-y)): $(subdir-ym) ;
-+$(obj)/%/built-in.a: $(obj)/% ;
- 
- #
- # Rule to compile a set of .o files into one .a file (without symbol table)
--- 
-2.17.1
+That seems like a bug to me and contradicts the kbuild documentation
+(3.6):
+
+	Example:
+
+	#fs/Makefile
+	obj-$(CONFIG_EXT2_FS) += ext2/
+
+	If CONFIG_EXT2_FS is set to either ‘y’ (built-in) or ‘m’
+	(modular) the corresponding obj- variable will be set, and
+	kbuild will descend down in the ext2 directory. Kbuild only uses
+	this information to decide that it needs to visit the directory,
+	it is the Makefile in the subdirectory that specifies what is
+	modular and what is built-in.
+
+I tried adding other targets to obj-y directly and they are also are not
+included, seemingly since the directory was entered using obj-m.
+
+Masahiro or Michal, can you shed some light?
+
+Johan
