@@ -1,57 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:36831 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726463AbfLSIeg (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:52780 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726591AbfLSI4g (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 19 Dec 2019 03:34:36 -0500
+        Thu, 19 Dec 2019 03:56:36 -0500
+MIME-Version: 1.0
+References: <201912181000.82Z7czbN%lkp@intel.com> <20191218083842.14882-1-u.kleine-koenig@pengutronix.de>
+ <20191218172353.GO22665@localhost> <CAK7LNATztV-a3maL+vqQhbVsLBD_dsy+wbOZQ5ofQfbZQGGuLA@mail.gmail.com>
+ <20191219081814.GP22665@localhost>
+In-Reply-To: <20191219081814.GP22665@localhost>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 0/3] kbuild: generate modules.builtin without Makefile.modbuiltin or tristate.conf
-Date: Thu, 19 Dec 2019 17:33:26 +0900
-Message-Id: <20191219083329.5926-1-masahiroy@kernel.org>
+Date: Thu, 19 Dec 2019 17:55:54 +0900
+Message-ID: <CAK7LNASHZ9HsYj+sncDqOBWRV+YoFNTciKOxfeYrA7MtBJ9T7A@mail.gmail.com>
+Subject: Re: kbuild obj-m directory descend (was: Re: [PATCH] serdev: fix
+ builds with CONFIG_SERIAL_DEV_BUS=m)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Johan Hovold <johan@kernel.org>
+Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>, Rob Herring <robh@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sascha Hauer <kernel@pengutronix.de>, kbuild test robot <lkp@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+
+On Thu, Dec 19, 2019 at 5:18 PM Johan Hovold <johan@kernel.org> wrote:
+>
+> On Thu, Dec 19, 2019 at 11:00:15AM +0900, Masahiro Yamada wrote:
+> > Hi.
+> >
+> > On Thu, Dec 19, 2019 at 2:23 AM Johan Hovold <johan@kernel.org> wrote:
+>
+> > > The offending patch is broken since it effectively makes
+> > > CONFIG_SERIAL_DEV_BUS bool (built-in or disabled), but for some reaso=
+n
+> > > those symbols do not end up in vmlinux (despite being compiled) when =
+you
+> > > add a built-in object goal under a directory that was entered using
+> > > obj-m.
+> > >
+> > > That seems like a bug to me and contradicts the kbuild documentation
+> > > (3.6):
+> > >
+> > >         Example:
+> > >
+> > >         #fs/Makefile
+> > >         obj-$(CONFIG_EXT2_FS) +=3D ext2/
+> > >
+> > >         If CONFIG_EXT2_FS is set to either =E2=80=98y=E2=80=99 (built=
+-in) or =E2=80=98m=E2=80=99
+> > >         (modular) the corresponding obj- variable will be set, and
+> > >         kbuild will descend down in the ext2 directory. Kbuild only u=
+ses
+> > >         this information to decide that it needs to visit the directo=
+ry,
+> > >         it is the Makefile in the subdirectory that specifies what is
+> > >         modular and what is built-in.
+> > >
+> > > I tried adding other targets to obj-y directly and they are also are =
+not
+> > > included, seemingly since the directory was entered using obj-m.
+> > >
+> > > Masahiro or Michal, can you shed some light?
+>
+> > I saw similar questions in ML in the past.
+> > Yes, this is how Kbuild works;
+> > Kbuild only links objects in Makefiles visited by obj-y.
+> >
+> > If you use
+> >     obj-m +=3D serdev/
+> > all objects in serdev/ are considered as modular.
+>
+> Well, any objects in serdev/ specified in obj-y would currently be built
+> but never included in either built-in.a or any module.
+
+Right.
+
+>
+> > I think it is better to make the document
+> > clarify this.
+>
+> Yeah, I don't have a use case for this, but the documentation would need
+> to be updated to not have more people look into this.
+>
+> And at least this behaviour allowed us to catch this bug, but only
+> because we had dependent modules that failed to build. I see now that
+> you posted a patch adding a general warning about obj-y under obj-m last
+> fall, but that was apparently never merged.
+
+This one?
+
+https://lore.kernel.org/patchwork/patch/1126959/
+
+This patch detected several Makefile/Kconfig bugs,
+and it is good.
+
+But, it also turned out to cause false positive warnings
+on some architectures.
+I thought it was not so easy to fix it.
+So, I decided to postpone it.
 
 
-This series re-implements the way of generating modules.builtin
+> But when was this behaviour changed? And was that done on purpose?
 
-Current approach:
-   Collect all CONFIG options with 'tristate' type into tristate.conf,
-   and parse Makefiles to get the list of builtin modules.
+No. Not changed at all.
 
-New approach:
-   Use MODULE_LICENSE() tags that compiled into vmlinux.
-   This information appears in modules.builtin.info,
-   but trimmed from vmlinux itself. So the image size does
-   not change.
-
-This slightly speeds up builds because Kbuild no longer needs
-to traverse the source tree twice.
-
-Also, the code diff is appealing:
- 8 files changed, 35 insertions(+), 135 deletions(-)
-
-I think this is OK, but I hope module people can check it.
+In my understanding, the current behavior has been kept
+from the beginning.
 
 
 
-Masahiro Yamada (3):
-  kbuild: add stringify helper to quote a string passed to C files
-  kbuild: pass KBUILD_MODFILE when compiling builtin objects
-  kbuild: create modules.builtin without Makefile.modbuiltin or
-    tristate.conf
+> Johan
 
- Documentation/kbuild/kconfig.rst |  5 ---
- Makefile                         | 21 +++---------
- include/linux/module.h           | 12 ++++++-
- scripts/Kbuild.include           | 10 +++---
- scripts/Makefile.lib             | 17 ++++++----
- scripts/Makefile.modbuiltin      | 57 --------------------------------
- scripts/kconfig/confdata.c       | 45 ++-----------------------
- scripts/link-vmlinux.sh          |  4 +++
- 8 files changed, 36 insertions(+), 135 deletions(-)
- delete mode 100644 scripts/Makefile.modbuiltin
 
--- 
-2.17.1
+
+--=20
+Best Regards
+Masahiro Yamada
