@@ -1,94 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:27492 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726777AbfLSE3Q (ORCPT
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35503 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726439AbfLSISU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Dec 2019 23:29:16 -0500
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id xBJ4T8VN026696
-        for <linux-kbuild@vger.kernel.org>; Thu, 19 Dec 2019 13:29:09 +0900
-Received: by mail-vk1-f176.google.com with SMTP id s142so1279866vkd.9
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2019 20:29:08 -0800 (PST)
+        Thu, 19 Dec 2019 03:18:20 -0500
+Date: Thu, 19 Dec 2019 09:18:14 +0100
+From: Johan Hovold <johan@kernel.org>
+Subject: Re: kbuild obj-m directory descend (was: Re: [PATCH] serdev: fix
+ builds with CONFIG_SERIAL_DEV_BUS=m)
+Message-ID: <20191219081814.GP22665@localhost>
+References: <201912181000.82Z7czbN%lkp@intel.com>
+ <20191218083842.14882-1-u.kleine-koenig@pengutronix.de>
+ <20191218172353.GO22665@localhost>
+ <CAK7LNATztV-a3maL+vqQhbVsLBD_dsy+wbOZQ5ofQfbZQGGuLA@mail.gmail.com>
 MIME-Version: 1.0
-References: <7e0f4a74-63c5-ad62-c619-c6277c4bc791@oracle.com>
- <20191210174826.5433-1-eugene.loh@oracle.com> <2a535000-e71e-fab9-cf6a-e7e5fb8053d8@oracle.com>
- <20191218222931.76131c6a@rorschach.local.home>
-In-Reply-To: <20191218222931.76131c6a@rorschach.local.home>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 19 Dec 2019 13:28:31 +0900
-Message-ID: <CAK7LNATJZCekCoj0ruPUGRv7sH_hcJP-dFPd-3_EOR5hFNW-Xg@mail.gmail.com>
-Subject: Re: [PATCH v4] kallsyms: add names of built-in modules
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK7LNATztV-a3maL+vqQhbVsLBD_dsy+wbOZQ5ofQfbZQGGuLA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Eugene Loh <eugene.loh@oracle.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <maz@kernel.org>, Song Liu <songliubraving@fb.com>, Thomas Gleixner <tglx@linutronix.de>, "Keller, Jacob E" <jacob.e.keller@intel.com>, Kris Van Hees <kris.van.hees@oracle.com>, Nick Alcock <nick.alcock@oracle.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Johan Hovold <johan@kernel.org>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Michal Marek <michal.lkml@markovi.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>, Rob Herring <robh@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sascha Hauer <kernel@pengutronix.de>, kbuild test robot <lkp@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, Dec 19, 2019 at 12:29 PM Steven Rostedt <rostedt@goodmis.org> wrote:
->
-> On Wed, 18 Dec 2019 15:55:18 -0800
-> Eugene Loh <eugene.loh@oracle.com> wrote:
->
-> > Ping.
->
-> Couple of notes:
->
-> 1) this affects code that doesn't really have a maintainer. I could
-> take it in my tree, but I would like to have acks from other
-> maintainers. Perhaps Jessica Yu (Module maintainer), and probably one
-> from Linus himself.
->
-> 2) Do not send new versions of a patch as a reply to the old version. I
-> and many other maintainers sort our inbox by threads, and I look at the
-> top of the thread for patches. That is, if there's another version of a
-> patch that is a reply to a previous version, it is basically off my
-> radar, unless I happen to notice it by chance (which I did with this
-> email).
->
-> You can send your v4 patch again, but please send it as its own thread,
-> that way it will be on the radar of other maintainers. Hopefully we can
-> get some acks on this as well.
->
-> -- Steve
+On Thu, Dec 19, 2019 at 11:00:15AM +0900, Masahiro Yamada wrote:
+> Hi.
+> 
+> On Thu, Dec 19, 2019 at 2:23 AM Johan Hovold <johan@kernel.org> wrote:
 
-
-I do not like this patch.
-
-scripts/Makefile.modbuiltin is really ugly.
-It traverses all the directories once again.
-
-This patch makes it even worse,
-Kbuild would traverse the
-whole directories three times.
-
-I was thinking to remove scripts/Makefile.modbuiltin
-and Kconfig's tristate.conf entirely
-because it is possible to generate modules.builtin more simply.
-
-
-As I said, the name of builtin module is not fixed info.
-And, this makes kallsyms fat just for less important info.
-
-
-Masahiro Yamada
-
+> > The offending patch is broken since it effectively makes
+> > CONFIG_SERIAL_DEV_BUS bool (built-in or disabled), but for some reason
+> > those symbols do not end up in vmlinux (despite being compiled) when you
+> > add a built-in object goal under a directory that was entered using
+> > obj-m.
 > >
-
+> > That seems like a bug to me and contradicts the kbuild documentation
+> > (3.6):
 > >
-> > On 12/10/2019 09:48 AM, eugene.loh@oracle.com wrote:
-> > > From: Eugene Loh <eugene.loh@oracle.com>
-> > >
-> > > /proc/kallsyms is very useful for tracers and other tools that need
-> > > to map kernel symbols to addresses.
-> > >
-> > > It would be useful if there were a mapping between kernel symbol and
-> > > module name that only changed when the kernel source code is changed.
-> > > This mapping should not vanish simply because a module becomes built
-> > > into the kernel.
-> > >
+> >         Example:
+> >
+> >         #fs/Makefile
+> >         obj-$(CONFIG_EXT2_FS) += ext2/
+> >
+> >         If CONFIG_EXT2_FS is set to either ‘y’ (built-in) or ‘m’
+> >         (modular) the corresponding obj- variable will be set, and
+> >         kbuild will descend down in the ext2 directory. Kbuild only uses
+> >         this information to decide that it needs to visit the directory,
+> >         it is the Makefile in the subdirectory that specifies what is
+> >         modular and what is built-in.
+> >
+> > I tried adding other targets to obj-y directly and they are also are not
+> > included, seemingly since the directory was entered using obj-m.
+> >
+> > Masahiro or Michal, can you shed some light?
 
+> I saw similar questions in ML in the past.
+> Yes, this is how Kbuild works;
+> Kbuild only links objects in Makefiles visited by obj-y.
+> 
+> If you use
+>     obj-m += serdev/
+> all objects in serdev/ are considered as modular.
 
+Well, any objects in serdev/ specified in obj-y would currently be built
+but never included in either built-in.a or any module.
 
--- 
-Best Regards
-Masahiro Yamada
+> I think it is better to make the document
+> clarify this.
+
+Yeah, I don't have a use case for this, but the documentation would need
+to be updated to not have more people look into this.
+
+And at least this behaviour allowed us to catch this bug, but only
+because we had dependent modules that failed to build. I see now that
+you posted a patch adding a general warning about obj-y under obj-m last
+fall, but that was apparently never merged.
+
+But when was this behaviour changed? And was that done on purpose?
+
+Johan
