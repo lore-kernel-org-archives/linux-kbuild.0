@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:52435 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727400AbfLTQBR (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:32604 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbfLUPd3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Dec 2019 11:01:17 -0500
+        Sat, 21 Dec 2019 10:33:29 -0500
 MIME-Version: 1.0
-References: <20191219115100.958-1-masahiroy@kernel.org> <20191219195302.GG32169@bombadil.infradead.org>
-In-Reply-To: <20191219195302.GG32169@bombadil.infradead.org>
+References: <20191219115100.958-1-masahiroy@kernel.org> <20191219164915.GS22665@localhost>
+In-Reply-To: <20191219164915.GS22665@localhost>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 21 Dec 2019 01:00:22 +0900
-Message-ID: <CAK7LNAQsD5KMA-DrDS-9krNdQLfHJEnJ2NB6mq2aLemY2xs+-w@mail.gmail.com>
+Date: Sun, 22 Dec 2019 00:32:40 +0900
+Message-ID: <CAK7LNAS-G6GQC=HTDdbgAAWx-YaL65LPhm1SfGsarZq-HtGJ8Q@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: clarify the difference between obj-y and obj-m
  w.r.t. descending
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Johan Hovold <johan@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Johan Hovold <johan@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Dec 20, 2019 at 4:53 AM Matthew Wilcox <willy@infradead.org> wrote:
+On Fri, Dec 20, 2019 at 1:49 AM Johan Hovold <johan@kernel.org> wrote:
 >
 > On Thu, Dec 19, 2019 at 08:51:00PM +0900, Masahiro Yamada wrote:
 > > Kbuild descends into a directory by either 'y' or 'm', but there is an
@@ -39,7 +39,33 @@ On Fri, Dec 20, 2019 at 4:53 AM Matthew Wilcox <willy@infradead.org> wrote:
 > >
 > > The current statement "Kbuild only uses this information to decide that
 > > it needs to visit the directory" is misleading. Clarify the difference.
+> >
+> > Reported-by: Johan Hovold <johan@kernel.org>
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 >
+> Looks good! Thanks for fixing this.
+>
+> Reviewed-by: Johan Hovold <johan@kernel.org>
+
+Applied to linux-kbuild.
+
+> > ---
+> >
+> >  Documentation/kbuild/makefiles.rst | 16 +++++++++++++---
+> >  1 file changed, 13 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+> > index b9b50553bfc5..d7e6534a8505 100644
+> > --- a/Documentation/kbuild/makefiles.rst
+> > +++ b/Documentation/kbuild/makefiles.rst
+> > @@ -297,9 +297,19 @@ more details, with real examples.
+> >       If CONFIG_EXT2_FS is set to either 'y' (built-in) or 'm' (modular)
+> >       the corresponding obj- variable will be set, and kbuild will descend
+> >       down in the ext2 directory.
+> > -     Kbuild only uses this information to decide that it needs to visit
+> > -     the directory, it is the Makefile in the subdirectory that
+> > -     specifies what is modular and what is built-in.
+> > +
 > > +     Kbuild uses this information not only to decide that it needs to visit
 > > +     the directory, but also to decide whether or not to link objects from
 > > +     the directory into vmlinux.
@@ -52,13 +78,11 @@ On Fri, Dec 20, 2019 at 4:53 AM Matthew Wilcox <willy@infradead.org> wrote:
 > > +     from that directory will be linked into vmlinux. If the Makefile in
 > > +     that directory specifies obj-y, those objects will be left orphan.
 > > +     It is very likely a bug of the Makefile or of dependencies in Kconfig.
->
-> Perhaps the implementation should be changed to match the documentation?
-> This seems like a very subtle point for people to know.
+> >
+> >       It is good practice to use a `CONFIG_` variable when assigning directory
+> >       names. This allows kbuild to totally skip the directory if the
 
-I also considered this, but
-I do not think the current behavior is too odd.
-So, I am not changing it.
+
 
 -- 
 Best Regards
