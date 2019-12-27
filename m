@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41150 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:43622 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727681AbfL0Rnd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Dec 2019 12:43:33 -0500
+        id S1727875AbfL0RpI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 27 Dec 2019 12:45:08 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.4 132/187] kconfig: don't crash on NULL expressions in expr_eq()
-Date: Fri, 27 Dec 2019 12:40:00 -0500
-Message-Id: <20191227174055.4923-132-sashal@kernel.org>
-In-Reply-To: <20191227174055.4923-1-sashal@kernel.org>
-References: <20191227174055.4923-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 63/84] kconfig: don't crash on NULL expressions in expr_eq()
+Date: Fri, 27 Dec 2019 12:43:31 -0500
+Message-Id: <20191227174352.6264-63-sashal@kernel.org>
+In-Reply-To: <20191227174352.6264-1-sashal@kernel.org>
+References: <20191227174352.6264-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -33,10 +33,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index 77ffff3a053c..9f1de58e9f0c 100644
+index e1a39e90841d..7e38070ee523 100644
 --- a/scripts/kconfig/expr.c
 +++ b/scripts/kconfig/expr.c
-@@ -254,6 +254,13 @@ static int expr_eq(struct expr *e1, struct expr *e2)
+@@ -252,6 +252,13 @@ static int expr_eq(struct expr *e1, struct expr *e2)
  {
  	int res, old_count;
  
