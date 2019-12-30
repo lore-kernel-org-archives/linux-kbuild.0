@@ -1,54 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39856 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727823AbfL0SPK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Dec 2019 13:15:10 -0500
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 28/38] kconfig: don't crash on NULL expressions in expr_eq()
-Date: Fri, 27 Dec 2019 13:14:25 -0500
-Message-Id: <20191227181435.7644-28-sashal@kernel.org>
-In-Reply-To: <20191227181435.7644-1-sashal@kernel.org>
-References: <20191227181435.7644-1-sashal@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from conuserg-07.nifty.com ([210.131.2.74]:64258 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727397AbfL3NUo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 30 Dec 2019 08:20:44 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] initramfs: fix 'bad variable name' error in gen_initramfs_list.sh
+Date: Mon, 30 Dec 2019 22:20:06 +0900
+Message-Id: <20191230132006.7401-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Thomas Hebb <tommyhebb@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: "Jory A . Pratt" <anarchy@gentoo.org>, Masahiro Yamada <masahiroy@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-From: Thomas Hebb <tommyhebb@gmail.com>
+Prior to commit 858805b336be ("kbuild: add $(BASH) to run scripts with
+bash-extension"), this shell script was almost always run by bash since
+bash is usually installed on the system by default.
 
-[ Upstream commit 272a72103012862e3a24ea06635253ead0b6e808 ]
+Now, this script is run by sh, which might be a symlink to dash. On such
+distros, the following code emits an error:
 
-NULL expressions are taken to always be true, as implemented by the
-expr_is_yes() macro and by several other functions in expr.c. As such,
-they ought to be valid inputs to expr_eq(), which compares two
-expressions.
+  local dev=`LC_ALL=C ls -l "${location}"`
 
-Signed-off-by: Thomas Hebb <tommyhebb@gmail.com>
+You can reproduce the build error, for example by setting
+CONFIG_INITRAMFS_SOURCE="/dev".
+
+    GEN     usr/initramfs_data.cpio.gz
+  ./usr/gen_initramfs_list.sh: 131: local: 1: bad variable name
+  make[1]: *** [usr/Makefile:61: usr/initramfs_data.cpio.gz] Error 2
+
+This is because `LC_ALL=C ls -l "${location}"` contains spaces.
+Surrounding it with double-quotes fixes the error.
+
+Fixes: 858805b336be ("kbuild: add $(BASH) to run scripts with bash-extension")
+Reported-by: Jory A. Pratt <anarchy@gentoo.org>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/kconfig/expr.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index ed29bad1f03a..96420b620963 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -201,6 +201,13 @@ static int expr_eq(struct expr *e1, struct expr *e2)
- {
- 	int res, old_count;
- 
-+	/*
-+	 * A NULL expr is taken to be yes, but there's also a different way to
-+	 * represent yes. expr_is_yes() checks for either representation.
-+	 */
-+	if (!e1 || !e2)
-+		return expr_is_yes(e1) && expr_is_yes(e2);
-+
- 	if (e1->type != e2->type)
- 		return 0;
- 	switch (e1->type) {
+ usr/gen_initramfs_list.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/gen_initramfs_list.sh b/usr/gen_initramfs_list.sh
+index 0aad760fcd8c..2bbac73e6477 100755
+--- a/usr/gen_initramfs_list.sh
++++ b/usr/gen_initramfs_list.sh
+@@ -128,7 +128,7 @@ parse() {
+ 			str="${ftype} ${name} ${location} ${str}"
+ 			;;
+ 		"nod")
+-			local dev=`LC_ALL=C ls -l "${location}"`
++			local dev="`LC_ALL=C ls -l "${location}"`"
+ 			local maj=`field 5 ${dev}`
+ 			local min=`field 6 ${dev}`
+ 			maj=${maj%,}
 -- 
-2.20.1
+2.17.1
