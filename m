@@ -1,42 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:16482 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:16481 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728238AbgACSAh (ORCPT
+        with ESMTP id S1728268AbgACSAi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Jan 2020 13:00:37 -0500
+        Fri, 3 Jan 2020 13:00:38 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 00/12] initramfs: a lot of cleanups
-Date: Sat,  4 Jan 2020 02:59:03 +0900
-Message-Id: <20200103175915.26663-1-masahiroy@kernel.org>
+Subject: [PATCH 09/12] initramfs: add default_cpio_list, and delete -d option support
+Date: Sat,  4 Jan 2020 02:59:12 +0900
+Message-Id: <20200103175915.26663-10-masahiroy@kernel.org>
+In-Reply-To: <20200103175915.26663-1-masahiroy@kernel.org>
+References: <20200103175915.26663-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-Masahiro Yamada (12):
-  gen_initramfs_list.sh: remove unused variable 'default_list'
-  gen_initramfs_list.sh: fix the tool name in the comment
-  initramfs: rename gen_initramfs_list.sh to gen_initramfs.sh
-  initramfs: remove redundant dependency on BLK_DEV_INITRD
-  initramfs: make compression options not depend on INITRAMFS_SOURCE
-  initramfs: make initramfs compression choice non-optional
-  initramfs: specify $(src)/gen_initramfs.sh as a prerequisite in
-    Makefile
-  initramfs: generate dependency list and cpio at the same time
-  initramfs: add default_cpio_list, and delete -d option support
-  gen_initramfs.sh: always output cpio even without -o option
-  initramfs: refactor the initramfs build rules
-  gen_initramfs.sh: remove intermediate cpio_list on errors
+When CONFIG_INITRAMFS_SOURCE is empty, the Makefile passes the -d
+option to gen_initramfs.sh to create the default initramfs, which
+contains /dev, /dev/console, and /root.
 
- usr/.gitignore                                |   8 +-
- usr/Kconfig                                   |  26 ---
- usr/Makefile                                  |  92 ++++++----
- usr/default_cpio_list                         |   6 +
- ...gen_initramfs_list.sh => gen_initramfs.sh} | 167 +++++-------------
- usr/initramfs_data.S                          |   5 +-
- 6 files changed, 111 insertions(+), 193 deletions(-)
+This simplify the default behavior; remove the -d option, and
+add the default cpio list.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ usr/Makefile          |  2 +-
+ usr/default_cpio_list |  6 ++++++
+ usr/gen_initramfs.sh  | 16 ----------------
+ 3 files changed, 7 insertions(+), 17 deletions(-)
  create mode 100644 usr/default_cpio_list
- rename usr/{gen_initramfs_list.sh => gen_initramfs.sh} (53%)
 
+diff --git a/usr/Makefile b/usr/Makefile
+index 3ae8b45bfc61..9256a5b189ee 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -25,7 +25,7 @@ $(obj)/initramfs_data.o: $(obj)/$(datafile_y) FORCE
+ 
+ hostprogs-y := gen_init_cpio
+ ramfs-input := $(if $(filter-out "",$(CONFIG_INITRAMFS_SOURCE)), \
+-			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),-d)
++			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),$(srctree)/$(src)/default_cpio_list)
+ ramfs-args  := \
+         $(if $(CONFIG_INITRAMFS_ROOT_UID), -u $(CONFIG_INITRAMFS_ROOT_UID)) \
+         $(if $(CONFIG_INITRAMFS_ROOT_GID), -g $(CONFIG_INITRAMFS_ROOT_GID))
+diff --git a/usr/default_cpio_list b/usr/default_cpio_list
+new file mode 100644
+index 000000000000..37b3864066e8
+--- /dev/null
++++ b/usr/default_cpio_list
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0-only
++# This is a very simple, default initramfs
++
++dir /dev 0755 0 0
++nod /dev/console 0600 0 0 c 5 1
++dir /root 0700 0 0
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 49a4e22147b5..e6808a8c3b2b 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -28,7 +28,6 @@ $0 [-o <file>] [-l <dep_list>] [-u <uid>] [-g <gid>] {-d | <cpio_source>} ...
+ 	<cpio_source>  File list or directory for cpio archive.
+ 		       If <cpio_source> is a .cpio file it will be used
+ 		       as direct input to initramfs.
+-	-d             Output the default cpio list.
+ 
+ All options except -o and -l may be repeated and are interpreted
+ sequentially and immediately.  -u and -g states are preserved across
+@@ -43,18 +42,6 @@ field() {
+ 	shift $1 ; echo $1
+ }
+ 
+-default_initramfs() {
+-	cat <<-EOF >> ${output}
+-		# This is a very simple, default initramfs
+-
+-		dir /dev 0755 0 0
+-		nod /dev/console 0600 0 0 c 5 1
+-		dir /root 0700 0 0
+-		# file /kinit usr/kinit/kinit 0755 0 0
+-		# slink /init kinit 0755 0 0
+-	EOF
+-}
+-
+ filetype() {
+ 	local argv1="$1"
+ 
+@@ -263,9 +250,6 @@ while [ $# -gt 0 ]; do
+ 			[ "$root_gid" = "-1" ] && root_gid=$(id -g || echo 0)
+ 			shift
+ 			;;
+-		"-d")	# display default initramfs list
+-			default_initramfs
+-			;;
+ 		"-h")
+ 			usage
+ 			exit 0
 -- 
 2.17.1
