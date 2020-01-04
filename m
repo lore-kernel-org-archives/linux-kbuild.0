@@ -1,65 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44557 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728611AbgACUTr (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:32061 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727274AbgADDg0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Jan 2020 15:19:47 -0500
-Received: by mail-pf1-f193.google.com with SMTP id 195so23122250pfw.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 03 Jan 2020 12:19:47 -0800 (PST)
+        Fri, 3 Jan 2020 22:36:26 -0500
 MIME-Version: 1.0
-From: "Rev.Dr Emmanuel Okoye CEO Ecobank-benin"
-        <westernunion.benin982@gmail.com>
-Date: Fri, 3 Jan 2020 21:19:45 +0100
-Message-ID: <CAP=nHBKxfmbdRg7q4-1jdSUL6+zok9agasMSrXV5CsEJEmZz3A@mail.gmail.com>
-Subject: I promise you must be happy today, God has uplifted you and your
- family ok
+References: <20200103175915.26663-1-masahiroy@kernel.org> <20200103175915.26663-12-masahiroy@kernel.org>
+ <20200103195205.GC21515@ravnborg.org>
+In-Reply-To: <20200103195205.GC21515@ravnborg.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 4 Jan 2020 12:35:37 +0900
+Message-ID: <CAK7LNAQXx0RGutdOe4JFLTbjm7=cx9aEKQ-823-irED4SyCmMA@mail.gmail.com>
+Subject: Re: [PATCH 11/12] initramfs: refactor the initramfs build rules
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Dear Friend
+Hi Sam,
 
-i hope all is well with you,if so, glory be to God almighty. I'm very
-happy to inform you, about my success in getting payment funds under
-the cooperation of a new partner from United States of
-America.Presently I am in uk for investment projects with my own share
-of the total sum. I didn't forget your past efforts. IMF finally
-approved your compensation payment funds this morning by prepaid (ATM)
-Debit card of US$12,500.000.00Million Dollars, Since you not received
-this payment yet, I was not certified
-but it is not your fault and not my fault, I hold nothing against
-you.than bank official whom has been detaining the transfer in the
-bank, trying to claim your funds by themselves.
+On Sat, Jan 4, 2020 at 4:52 AM Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> Hi Mashahiro.
+>
+> I just browsed this fine patchset and noticed...
+> >
+> > -#####
+> > -# Generate the initramfs cpio archive
+> > +ramfs-input := $(shell echo $(CONFIG_INITRAMFS_SOURCE))
+> > +cpio-data :=
+> > +
+> > +ifeq ($(words $(ramfs-input)),0)
+> > +
+> > +# If CONFIG_INITRAMFS_SOURCE is empty, generate a small initramfs with the
+> > +# default contents.
+> > +ramfs-input := $(srctree)/$(src)/default_cpio_list
+> > +
+> > +else ifeq ($(words $(ramfs-input)),1)
+> > +# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
+> > +# .cpio or .cpio.*, use it directly as an initramfs.
+> > +ifneq ($(filter %.cpio,$(ramfs-input)),)
+> > +cpio-data := $(ramfs-input)
+> > +endif
+>
+> This part will now work if the file is named foo.cpio.bar.
+> $(findstring .cpio, should be used and not $(filter %.cpio
+> At least if the comment describes the intended behaviour.
 
-Therefore, in appreciation of your effort I have raised an
-International prepaid (ATM) Debit card of US$12,500.000.00 in your
-favor as compensation to you.
 
-Now, i want you to contact my Diplomatic Agent, His name is Mike Benz
-on His  e-mail Address (mikebenz550@aol.com
+The 'foo.cpio.bar' is taken care of
+by ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
 
-ask Him to send the Prepaid (ATM) Debit card to you. Bear in mind that
-the money is in Prepaid (ATM) Debit card, not cash, so you need to
-send to him,
-your full name
-address  where the prepaid (ATM) Debit card will be delivered to you,
-including your cell phone number. Finally, I left explicit
-instructions with him, on how to send the (ATM CARD) to you.
+I admit the comment was confusing.
 
-The Prepaid (ATM) Debit card, will be send to you through my
-Diplomatic Agent Mr. Mike Benz immediately you contact him. So contact
-my Diplomatic Agent Mr. Mike Benz immediately you receive this letter.
-Below is his contact information:
 
-NAME : MIKE BENZ
-EMAIL ADDRESS: mikebenz550@aol.com
-Text Him, (256) 284-4886
+I will clarify the comments as follows:
 
-Request for Delivery of the Prepaid (ATM) Debit card  to you today.
-Note, please I have paid for the whole service fees for you, so the
-only money you will send to my Diplomatic Agent Mr. Mike Benz is
-$50.00 for your prepaid (ATM) Debit card DELIVERY FEE to your address
-ok.
-Let me know once you receive this Card at your address.
-Best regards,
-Rev.Dr, George Adadar
+
+
+# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
+# .cpio, use it directly as an initramfs.
+ifneq ($(filter %.cpio,$(ramfs-input)),)
+cpio-data := $(ramfs-input)
+endif
+
+# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
+# .cpio.*, use it directly as an initramfs, and avoid double compression.
+ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
+cpio-data := $(ramfs-input)
+compress-y := shipped
+endif
+
+
+
+
+
+
+> > +
+> > +ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
+> > +cpio-data := $(ramfs-input)
+> > +# If the specified archive is suffixed with .cpio.* (i.e. already compressed),
+> > +# we do not double-compress it.
+> > +compress-y := shipped
+> > +endif
+> > +
+> > +endif
+>
+>
+>         Sam
+
+
+
+
+
+
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
