@@ -1,45 +1,257 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:54710 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:54708 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726292AbgADPDy (ORCPT
+        with ESMTP id S1726080AbgADPDy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 4 Jan 2020 10:03:54 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 00/13] initramfs: a lot of cleanups
-Date: Sun,  5 Jan 2020 00:02:25 +0900
-Message-Id: <20200104150238.19834-1-masahiroy@kernel.org>
+Subject: [PATCH v2 09/13] initramfs: generate dependency list and cpio at the same time
+Date: Sun,  5 Jan 2020 00:02:34 +0900
+Message-Id: <20200104150238.19834-10-masahiroy@kernel.org>
+In-Reply-To: <20200104150238.19834-1-masahiroy@kernel.org>
+References: <20200104150238.19834-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
+Currently, this script is run twice, for the dependency list, and then
+for the cpio archive.
 
+The first one is re-run every time although its build log is suppressed
+so nobody notices it.
 
-Masahiro Yamada (13):
-  initramfs: replace klibcdirs in Makefile with FORCE
-  gen_initramfs_list.sh: remove unused variable 'default_list'
-  gen_initramfs_list.sh: fix the tool name in the comment
-  initramfs: rename gen_initramfs_list.sh to gen_initramfs.sh
-  initramfs: remove redundant dependency on BLK_DEV_INITRD
-  initramfs: make compression options not depend on INITRAMFS_SOURCE
-  initramfs: make initramfs compression choice non-optional
-  initramfs: specify $(src)/gen_initramfs.sh as a prerequisite in
-    Makefile
-  initramfs: generate dependency list and cpio at the same time
-  initramfs: add default_cpio_list, and delete -d option support
-  gen_initramfs.sh: always output cpio even without -o option
-  initramfs: refactor the initramfs build rules
-  gen_initramfs.sh: remove intermediate cpio_list on errors
+Make it work more efficiently by generating the cpio and the dependency
+list at the same time.
 
- usr/.gitignore                                |   8 +-
- usr/Kconfig                                   |  26 ---
- usr/Makefile                                  |  97 ++++++----
- usr/default_cpio_list                         |   6 +
- ...gen_initramfs_list.sh => gen_initramfs.sh} | 167 +++++-------------
- usr/initramfs_data.S                          |   5 +-
- 6 files changed, 112 insertions(+), 197 deletions(-)
- create mode 100644 usr/default_cpio_list
- rename usr/{gen_initramfs_list.sh => gen_initramfs.sh} (53%)
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+Changes in v2: None
+
+ usr/Makefile         |   3 +-
+ usr/gen_initramfs.sh | 108 ++++++++++++++++++-------------------------
+ 2 files changed, 47 insertions(+), 64 deletions(-)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index 7df6559f0f30..3ae8b45bfc61 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -39,7 +39,7 @@ ifneq ($(wildcard $(obj)/$(datafile_d_y)),)
+ endif
+ 
+ quiet_cmd_initfs = GEN     $@
+-      cmd_initfs = $< -o $@ $(ramfs-args) $(ramfs-input)
++      cmd_initfs = $< -o $@ -l $(obj)/$(datafile_d_y) $(ramfs-args) $(ramfs-input)
+ 
+ targets := $(datafile_y)
+ 
+@@ -52,7 +52,6 @@ $(deps_initramfs): ;
+ # 3) If gen_init_cpio are newer than initramfs_data.cpio
+ # 4) Arguments to gen_initramfs.sh changes
+ $(obj)/$(datafile_y): $(src)/gen_initramfs.sh $(obj)/gen_init_cpio $(deps_initramfs) FORCE
+-	$(Q)$< -l $(ramfs-input) > $(obj)/$(datafile_d_y)
+ 	$(call if_changed,initfs)
+ 
+ subdir-$(CONFIG_UAPI_HEADER_TEST) += include
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 68b6ddfd5f96..49a4e22147b5 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -15,9 +15,10 @@ set -e
+ usage() {
+ cat << EOF
+ Usage:
+-$0 [-o <file>] [-u <uid>] [-g <gid>] {-d | <cpio_source>} ...
++$0 [-o <file>] [-l <dep_list>] [-u <uid>] [-g <gid>] {-d | <cpio_source>} ...
+ 	-o <file>      Create compressed initramfs file named <file> using
+ 		       gen_init_cpio and compressor depending on the extension
++	-l <dep_list>  Create dependency list named <dep_list>
+ 	-u <uid>       User ID to map to user ID 0 (root).
+ 		       <uid> is only meaningful if <cpio_source> is a
+ 		       directory.  "squash" forces all files to uid 0.
+@@ -42,11 +43,6 @@ field() {
+ 	shift $1 ; echo $1
+ }
+ 
+-list_default_initramfs() {
+-	# echo usr/kinit/kinit
+-	:
+-}
+-
+ default_initramfs() {
+ 	cat <<-EOF >> ${output}
+ 		# This is a very simple, default initramfs
+@@ -81,10 +77,6 @@ filetype() {
+ 	return 0
+ }
+ 
+-list_print_mtime() {
+-	:
+-}
+-
+ print_mtime() {
+ 	local my_mtime="0"
+ 
+@@ -97,10 +89,10 @@ print_mtime() {
+ }
+ 
+ list_parse() {
+-	if [ -L "$1" ]; then
++	if [ -z "$dep_list" -o -L "$1" ]; then
+ 		return
+ 	fi
+-	echo "$1" | sed 's/:/\\:/g; s/$/ \\/'
++	echo "$1" | sed 's/:/\\:/g; s/$/ \\/' >> $dep_list
+ }
+ 
+ # for each file print a line in following format
+@@ -161,28 +153,25 @@ unknown_option() {
+ 	exit 1
+ }
+ 
+-list_header() {
+-	:
+-}
+-
+ header() {
+ 	printf "\n#####################\n# $1\n" >> ${output}
+ }
+ 
+ # process one directory (incl sub-directories)
+ dir_filelist() {
+-	${dep_list}header "$1"
++	header "$1"
+ 
+ 	srcdir=$(echo "$1" | sed -e 's://*:/:g')
+ 	dirlist=$(find "${srcdir}" -printf "%p %m %U %G\n" | LANG=C sort)
+ 
+ 	# If $dirlist is only one line, then the directory is empty
+ 	if [  "$(echo "${dirlist}" | wc -l)" -gt 1 ]; then
+-		${dep_list}print_mtime "$1"
++		print_mtime "$1"
+ 
+ 		echo "${dirlist}" | \
+ 		while read x; do
+-			${dep_list}parse ${x}
++			list_parse $x
++			parse $x
+ 		done
+ 	fi
+ }
+@@ -193,22 +182,21 @@ dir_filelist() {
+ input_file() {
+ 	source="$1"
+ 	if [ -f "$1" ]; then
+-		${dep_list}header "$1"
++		header "$1"
+ 		is_cpio="$(echo "$1" | sed 's/^.*\.cpio\(\..*\)\{0,1\}/cpio/')"
+ 		if [ $2 -eq 0 -a ${is_cpio} = "cpio" ]; then
+ 			cpio_file=$1
+ 			echo "$1" | grep -q '^.*\.cpio\..*' && is_cpio_compressed="compressed"
+-			[ ! -z ${dep_list} ] && echo "$1"
++			[ -n "$dep_list" ] && echo "$1" >> $dep_list
+ 			return 0
+ 		fi
+-		if [ -z ${dep_list} ]; then
+-			print_mtime "$1" >> ${output}
+-			cat "$1"         >> ${output}
+-		else
+-		        echo "$1 \\"
++		print_mtime "$1" >> ${output}
++		cat "$1"         >> ${output}
++		if [ -n "$dep_list" ]; then
++		        echo "$1 \\"  >> $dep_list
+ 			cat "$1" | while read type dir file perm ; do
+ 				if [ "$type" = "file" ]; then
+-					echo "$file \\";
++					echo "$file \\" >> $dep_list
+ 				fi
+ 			done
+ 		fi
+@@ -231,44 +219,40 @@ output_file=""
+ is_cpio_compressed=
+ compr="gzip -n -9 -f"
+ 
+-arg="$1"
+-case "$arg" in
+-	"-l")	# files included in initramfs - used by kbuild
+-		dep_list="list_"
+-		echo "deps_initramfs := \\"
+-		shift
+-		;;
+-	"-o")	# generate compressed cpio image named $1
+-		shift
+-		output_file="$1"
+-		cpio_list="$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)"
+-		output=${cpio_list}
+-		echo "$output_file" | grep -q "\.gz$" \
+-                && [ -x "`which gzip 2> /dev/null`" ] \
+-                && compr="gzip -n -9 -f"
+-		echo "$output_file" | grep -q "\.bz2$" \
+-                && [ -x "`which bzip2 2> /dev/null`" ] \
+-                && compr="bzip2 -9 -f"
+-		echo "$output_file" | grep -q "\.lzma$" \
+-                && [ -x "`which lzma 2> /dev/null`" ] \
+-                && compr="lzma -9 -f"
+-		echo "$output_file" | grep -q "\.xz$" \
+-                && [ -x "`which xz 2> /dev/null`" ] \
+-                && compr="xz --check=crc32 --lzma2=dict=1MiB"
+-		echo "$output_file" | grep -q "\.lzo$" \
+-                && [ -x "`which lzop 2> /dev/null`" ] \
+-                && compr="lzop -9 -f"
+-		echo "$output_file" | grep -q "\.lz4$" \
+-                && [ -x "`which lz4 2> /dev/null`" ] \
+-                && compr="lz4 -l -9 -f"
+-		echo "$output_file" | grep -q "\.cpio$" && compr="cat"
+-		shift
+-		;;
+-esac
+ while [ $# -gt 0 ]; do
+ 	arg="$1"
+ 	shift
+ 	case "$arg" in
++		"-l")	# files included in initramfs - used by kbuild
++			dep_list="$1"
++			echo "deps_initramfs := \\" > $dep_list
++			shift
++			;;
++		"-o")	# generate compressed cpio image named $1
++			output_file="$1"
++			cpio_list="$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)"
++			output=${cpio_list}
++			echo "$output_file" | grep -q "\.gz$" \
++			&& [ -x "`which gzip 2> /dev/null`" ] \
++			&& compr="gzip -n -9 -f"
++			echo "$output_file" | grep -q "\.bz2$" \
++			&& [ -x "`which bzip2 2> /dev/null`" ] \
++			&& compr="bzip2 -9 -f"
++			echo "$output_file" | grep -q "\.lzma$" \
++			&& [ -x "`which lzma 2> /dev/null`" ] \
++			&& compr="lzma -9 -f"
++			echo "$output_file" | grep -q "\.xz$" \
++			&& [ -x "`which xz 2> /dev/null`" ] \
++			&& compr="xz --check=crc32 --lzma2=dict=1MiB"
++			echo "$output_file" | grep -q "\.lzo$" \
++			&& [ -x "`which lzop 2> /dev/null`" ] \
++			&& compr="lzop -9 -f"
++			echo "$output_file" | grep -q "\.lz4$" \
++			&& [ -x "`which lz4 2> /dev/null`" ] \
++			&& compr="lz4 -l -9 -f"
++			echo "$output_file" | grep -q "\.cpio$" && compr="cat"
++			shift
++			;;
+ 		"-u")	# map $1 to uid=0 (root)
+ 			root_uid="$1"
+ 			[ "$root_uid" = "-1" ] && root_uid=$(id -u || echo 0)
+@@ -280,7 +264,7 @@ while [ $# -gt 0 ]; do
+ 			shift
+ 			;;
+ 		"-d")	# display default initramfs list
+-			${dep_list}default_initramfs
++			default_initramfs
+ 			;;
+ 		"-h")
+ 			usage
 -- 
 2.17.1
