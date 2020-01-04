@@ -1,43 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:53555 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:54704 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725924AbgADPDB (ORCPT
+        with ESMTP id S1725924AbgADPDx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 4 Jan 2020 10:03:01 -0500
+        Sat, 4 Jan 2020 10:03:53 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 03/13] gen_initramfs_list.sh: fix the tool name in the comment
-Date: Sun,  5 Jan 2020 00:02:28 +0900
-Message-Id: <20200104150238.19834-4-masahiroy@kernel.org>
+Subject: [PATCH v2 08/13] initramfs: specify $(src)/gen_initramfs.sh as a prerequisite in Makefile
+Date: Sun,  5 Jan 2020 00:02:33 +0900
+Message-Id: <20200104150238.19834-9-masahiroy@kernel.org>
 In-Reply-To: <20200104150238.19834-1-masahiroy@kernel.org>
 References: <20200104150238.19834-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-There is no tool named "gen_initramfs". The correct name is
-"gen_init_cpio".
+Specify the dependency directly in the Makefile.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- usr/gen_initramfs_list.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ usr/Makefile         | 7 +++----
+ usr/gen_initramfs.sh | 2 +-
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/usr/gen_initramfs_list.sh b/usr/gen_initramfs_list.sh
-index 909a7b865aa7..1fd93414fb37 100755
---- a/usr/gen_initramfs_list.sh
-+++ b/usr/gen_initramfs_list.sh
-@@ -189,7 +189,7 @@ dir_filelist() {
+diff --git a/usr/Makefile b/usr/Makefile
+index e44a66b8c051..7df6559f0f30 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -24,7 +24,6 @@ $(obj)/initramfs_data.o: $(obj)/$(datafile_y) FORCE
+ # Generate the initramfs cpio archive
  
- # if only one file is specified and it is .cpio file then use it direct as fs
- # if a directory is specified then add all files in given direcotry to fs
--# if a regular file is specified assume it is in gen_initramfs format
-+# if a regular file is specified assume it is in gen_init_cpio format
- input_file() {
- 	source="$1"
- 	if [ -f "$1" ]; then
+ hostprogs-y := gen_init_cpio
+-initramfs   := $(CONFIG_SHELL) $(srctree)/$(src)/gen_initramfs.sh
+ ramfs-input := $(if $(filter-out "",$(CONFIG_INITRAMFS_SOURCE)), \
+ 			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),-d)
+ ramfs-args  := \
+@@ -40,7 +39,7 @@ ifneq ($(wildcard $(obj)/$(datafile_d_y)),)
+ endif
+ 
+ quiet_cmd_initfs = GEN     $@
+-      cmd_initfs = $(initramfs) -o $@ $(ramfs-args) $(ramfs-input)
++      cmd_initfs = $< -o $@ $(ramfs-args) $(ramfs-input)
+ 
+ targets := $(datafile_y)
+ 
+@@ -52,8 +51,8 @@ $(deps_initramfs): ;
+ # 2) There are changes in which files are included (added or deleted)
+ # 3) If gen_init_cpio are newer than initramfs_data.cpio
+ # 4) Arguments to gen_initramfs.sh changes
+-$(obj)/$(datafile_y): $(obj)/gen_init_cpio $(deps_initramfs) FORCE
+-	$(Q)$(initramfs) -l $(ramfs-input) > $(obj)/$(datafile_d_y)
++$(obj)/$(datafile_y): $(src)/gen_initramfs.sh $(obj)/gen_init_cpio $(deps_initramfs) FORCE
++	$(Q)$< -l $(ramfs-input) > $(obj)/$(datafile_d_y)
+ 	$(call if_changed,initfs)
+ 
+ subdir-$(CONFIG_UAPI_HEADER_TEST) += include
+diff --git a/usr/gen_initramfs.sh b/usr/gen_initramfs.sh
+index 1fd93414fb37..68b6ddfd5f96 100755
+--- a/usr/gen_initramfs.sh
++++ b/usr/gen_initramfs.sh
+@@ -235,7 +235,7 @@ arg="$1"
+ case "$arg" in
+ 	"-l")	# files included in initramfs - used by kbuild
+ 		dep_list="list_"
+-		echo "deps_initramfs := $0 \\"
++		echo "deps_initramfs := \\"
+ 		shift
+ 		;;
+ 	"-o")	# generate compressed cpio image named $1
 -- 
 2.17.1
