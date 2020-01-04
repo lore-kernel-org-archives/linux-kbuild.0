@@ -1,104 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:32061 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727274AbgADDg0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Jan 2020 22:36:26 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:52047 "EHLO rere.qmqm.pl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726191AbgADJz6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 4 Jan 2020 04:55:58 -0500
+Date: Sat, 04 Jan 2020 10:55:52 +0100
+Message-Id: <09f5b36d9c64b4e6d1d235f84a7333b7802b2866.1578131485.git.mirq-linux@rere.qmqm.pl>
+From: =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>
+Subject: [PATCH 1/2] builddeb: allow selection of .deb compressor
 MIME-Version: 1.0
-References: <20200103175915.26663-1-masahiroy@kernel.org> <20200103175915.26663-12-masahiroy@kernel.org>
- <20200103195205.GC21515@ravnborg.org>
-In-Reply-To: <20200103195205.GC21515@ravnborg.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 4 Jan 2020 12:35:37 +0900
-Message-ID: <CAK7LNAQXx0RGutdOe4JFLTbjm7=cx9aEKQ-823-irED4SyCmMA@mail.gmail.com>
-Subject: Re: [PATCH 11/12] initramfs: refactor the initramfs build rules
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Sam,
+Select deb compression using KPKG_COMPRESS make variable. This allows to
+use gzip compression for local or test builds, and that's way faster
+than now-default xz compression.
 
-On Sat, Jan 4, 2020 at 4:52 AM Sam Ravnborg <sam@ravnborg.org> wrote:
->
-> Hi Mashahiro.
->
-> I just browsed this fine patchset and noticed...
-> >
-> > -#####
-> > -# Generate the initramfs cpio archive
-> > +ramfs-input := $(shell echo $(CONFIG_INITRAMFS_SOURCE))
-> > +cpio-data :=
-> > +
-> > +ifeq ($(words $(ramfs-input)),0)
-> > +
-> > +# If CONFIG_INITRAMFS_SOURCE is empty, generate a small initramfs with the
-> > +# default contents.
-> > +ramfs-input := $(srctree)/$(src)/default_cpio_list
-> > +
-> > +else ifeq ($(words $(ramfs-input)),1)
-> > +# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
-> > +# .cpio or .cpio.*, use it directly as an initramfs.
-> > +ifneq ($(filter %.cpio,$(ramfs-input)),)
-> > +cpio-data := $(ramfs-input)
-> > +endif
->
-> This part will now work if the file is named foo.cpio.bar.
-> $(findstring .cpio, should be used and not $(filter %.cpio
-> At least if the comment describes the intended behaviour.
+Signed-off-by: Michał Mirosław <mirq-linux@rere.qmqm.pl>
+---
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-The 'foo.cpio.bar' is taken care of
-by ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
-
-I admit the comment was confusing.
-
-
-I will clarify the comments as follows:
-
-
-
-# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
-# .cpio, use it directly as an initramfs.
-ifneq ($(filter %.cpio,$(ramfs-input)),)
-cpio-data := $(ramfs-input)
-endif
-
-# If CONFIG_INITRAMFS_SOURCE specifies a single file, and it is suffixed with
-# .cpio.*, use it directly as an initramfs, and avoid double compression.
-ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
-cpio-data := $(ramfs-input)
-compress-y := shipped
-endif
-
-
-
-
-
-
-> > +
-> > +ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
-> > +cpio-data := $(ramfs-input)
-> > +# If the specified archive is suffixed with .cpio.* (i.e. already compressed),
-> > +# we do not double-compress it.
-> > +compress-y := shipped
-> > +endif
-> > +
-> > +endif
->
->
->         Sam
-
-
-
-
-
-
-
-
-
-
---
-Best Regards
-Masahiro Yamada
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index c4c580f547ef..d289c4ebc891 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -43,7 +43,7 @@ create_package() {
+ 
+ 	# Create the package
+ 	dpkg-gencontrol -p$pname -P"$pdir"
+-	dpkg --build "$pdir" ..
++	dpkg-deb ${KPKG_COMPRESS:+-Z$KPKG_COMPRESS} --build "$pdir" ..
+ }
+ 
+ version=$KERNELRELEASE
+-- 
+2.20.1
