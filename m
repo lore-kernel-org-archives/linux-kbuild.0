@@ -1,56 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:53560 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:53555 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbgADPDB (ORCPT
+        with ESMTP id S1725924AbgADPDB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 4 Jan 2020 10:03:01 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 07/13] initramfs: make initramfs compression choice non-optional
-Date: Sun,  5 Jan 2020 00:02:32 +0900
-Message-Id: <20200104150238.19834-8-masahiroy@kernel.org>
+Subject: [PATCH v2 03/13] gen_initramfs_list.sh: fix the tool name in the comment
+Date: Sun,  5 Jan 2020 00:02:28 +0900
+Message-Id: <20200104150238.19834-4-masahiroy@kernel.org>
 In-Reply-To: <20200104150238.19834-1-masahiroy@kernel.org>
 References: <20200104150238.19834-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-Currently, the choice of the initramfs compression mode is too complex
-because users are allowed to not specify the compression mode at all.
-
-I think it makes more sense to require users to choose the compression
-explicitly, and delete the fallback defaults of INITRAMFS_COMPRESSION.
+There is no tool named "gen_initramfs". The correct name is
+"gen_init_cpio".
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- usr/Kconfig | 8 --------
- 1 file changed, 8 deletions(-)
+ usr/gen_initramfs_list.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/usr/Kconfig b/usr/Kconfig
-index 43934c128010..ab61e81165e0 100644
---- a/usr/Kconfig
-+++ b/usr/Kconfig
-@@ -102,7 +102,6 @@ config RD_LZ4
+diff --git a/usr/gen_initramfs_list.sh b/usr/gen_initramfs_list.sh
+index 909a7b865aa7..1fd93414fb37 100755
+--- a/usr/gen_initramfs_list.sh
++++ b/usr/gen_initramfs_list.sh
+@@ -189,7 +189,7 @@ dir_filelist() {
  
- choice
- 	prompt "Built-in initramfs compression mode"
--	optional
- 	help
- 	  This option allows you to decide by which algorithm the builtin
- 	  initramfs will be compressed.  Several compression algorithms are
-@@ -218,10 +217,3 @@ config INITRAMFS_COMPRESSION
- 	default ".xz"   if INITRAMFS_COMPRESSION_XZ
- 	default ".lzo"  if INITRAMFS_COMPRESSION_LZO
- 	default ".lz4"  if INITRAMFS_COMPRESSION_LZ4
--	default ".gz"   if RD_GZIP
--	default ".lz4"  if RD_LZ4
--	default ".lzo"  if RD_LZO
--	default ".xz"   if RD_XZ
--	default ".lzma" if RD_LZMA
--	default ".bz2"  if RD_BZIP2
--	default ""
+ # if only one file is specified and it is .cpio file then use it direct as fs
+ # if a directory is specified then add all files in given direcotry to fs
+-# if a regular file is specified assume it is in gen_initramfs format
++# if a regular file is specified assume it is in gen_init_cpio format
+ input_file() {
+ 	source="$1"
+ 	if [ -f "$1" ]; then
 -- 
 2.17.1
