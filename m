@@ -1,56 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:61774 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbgAFSFX (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33091 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727139AbgAFVdq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Jan 2020 13:05:23 -0500
-MIME-Version: 1.0
-References: <1575979754-184896-1-git-send-email-john.garry@huawei.com> <7e769634-eb22-5827-e2d8-df68134056c0@huawei.com>
-In-Reply-To: <7e769634-eb22-5827-e2d8-df68134056c0@huawei.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 7 Jan 2020 03:04:28 +0900
-Message-ID: <CAK7LNAS+XHGete9u2SV7fTj3HpROQmzfuJhV8tXW_xXkoPOYvg@mail.gmail.com>
-Subject: Re: [PATCH] merge_config.sh: Add option for allmodconfig
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 6 Jan 2020 16:33:46 -0500
+Date: Mon, 06 Jan 2020 13:33:36 -0800 (PST)
+Message-Id: <20200106.133336.719905028750983361.davem@redhat.com>
+Subject: Re: [PATCH] modpost: assume STT_SPARC_REGISTER is defined
+From: David Miller <davem@redhat.com>
+In-Reply-To: <20200104153651.2258-1-masahiroy@kernel.org>
+References: <20200104153651.2258-1-masahiroy@kernel.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: John Garry <john.garry@huawei.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>
+To: masahiroy@kernel.org
+Cc: linux-kbuild@vger.kernel.org, sparclinux@vger.kernel.org, arnd@arndb.de, bcollins@debian.org, michal.lkml@markovi.net, linux-kernel@vger.kernel.org
 
-On Mon, Jan 6, 2020 at 6:18 PM John Garry <john.garry@huawei.com> wrote:
->
-> On 10/12/2019 12:09, John Garry wrote:
->
-> Hi Masahiro,
->
-> Could you please consider this patch?
->
-> Thanks,
-> John
->
-> > Recently there has been some work in reporting and fixing bugs in booting
-> > an allmodconfig kernel - here are a few examples:
-> >
-> > https://lore.kernel.org/linux-edac/304df85b-8b56-b77e-1a11-aa23769f2e7c@huawei.com/T/#t
-> > https://lore.kernel.org/linux-ide/bdf02e03-86a1-3d35-2908-28187f504495@huawei.com/T/#t
-> > https://lore.kernel.org/netdev/CADYN=9LCPfbpwdTWKw03B22-y3Text=RWXW7XP7wJBHYsMOgrA@mail.gmail.com/
-> > https://sourceforge.net/p/openipmi/mailman/message/36871567/
-> >
-> > If we want to boot an allmodconfig kernel we may still want to force some
-> > loadable modules built-in, like UART drivers. Or just still turn off some
-> > configs.
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sun,  5 Jan 2020 00:36:51 +0900
 
+> Commit 8d5290149ee1 ("[SPARC]: Deal with glibc changing macro names in
+> modpost.c") was more than 14 years ago. STT_SPARC_REGISTER is hopefully
+> defined in elf.h of recent C libraries.
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-I do not understand why you need to use merge_config.sh
-for this purpose.
-
-KCONFIG_ALLCONFIG=<path-to-your-config-fragment> make allmodconfig
-
-should work.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Acked-by: David S. Miller <davem@davemloft.net>
