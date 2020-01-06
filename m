@@ -1,29 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:51221 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725843AbgAFHvw (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:62462 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbgAFIgz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Jan 2020 02:51:52 -0500
-Received: by mail-pg1-f201.google.com with SMTP id g20so21571242pgb.18
-        for <linux-kbuild@vger.kernel.org>; Sun, 05 Jan 2020 23:51:51 -0800 (PST)
-Date: Sun, 05 Jan 2020 23:51:48 -0800
-In-Reply-To: <20200104150238.19834-9-masahiroy@kernel.org>
-Message-Id: <xr93a7716mzv.fsf@gthelen.svl.corp.google.com>
-Mime-Version: 1.0
-References: <20200104150238.19834-1-masahiroy@kernel.org> <20200104150238.19834-9-masahiroy@kernel.org>
-Subject: Re: [PATCH v2 08/13] initramfs: specify $(src)/gen_initramfs.sh as a
- prerequisite in Makefile
-From: Greg Thelen <gthelen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 6 Jan 2020 03:36:55 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: remove PYTHON2 variable
+Date: Mon,  6 Jan 2020 17:36:28 +0900
+Message-Id: <20200106083628.29729-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Masahiro Yamada <masahiroy@kernel.org> wrote:
+Python 2 has retired. There is no user of this variable.
 
-> Specify the dependency directly in the Makefile.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Reviewed-by: Greg Thelen <gthelen@google.com>
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 4f01de6cd43c..4a0796b05324 100644
+--- a/Makefile
++++ b/Makefile
+@@ -423,7 +423,6 @@ INSTALLKERNEL  := installkernel
+ DEPMOD		= /sbin/depmod
+ PERL		= perl
+ PYTHON		= python
+-PYTHON2		= python2
+ PYTHON3		= python3
+ CHECK		= sparse
+ BASH		= bash
+@@ -474,7 +473,7 @@ CLANG_FLAGS :=
+ 
+ export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
+-export PERL PYTHON PYTHON2 PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
++export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+ export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+-- 
+2.17.1
