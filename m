@@ -1,98 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.136]:58861 "EHLO
-        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728211AbgAGRNe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jan 2020 12:13:34 -0500
-Date: Tue, 07 Jan 2020 09:13:03 -0800
-In-Reply-To: <CAK7LNAS+SfvRRu=WHzh6eghBNusMiEaxuqj0L+5jnA0W=HOy+Q@mail.gmail.com>
-References: <20200104150238.19834-1-masahiroy@kernel.org> <20200104150238.19834-2-masahiroy@kernel.org> <CAK7LNAS+SfvRRu=WHzh6eghBNusMiEaxuqj0L+5jnA0W=HOy+Q@mail.gmail.com>
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:44885 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728721AbgAGT4j (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 Jan 2020 14:56:39 -0500
+Received: by mail-ed1-f66.google.com with SMTP id bx28so591745edb.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jan 2020 11:56:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 01/13] initramfs: replace klibcdirs in Makefile with FORCE
-From: hpa@zytor.com
-Message-ID: <6D307942-FAB0-48A7-8441-01AECB94D69E@zytor.com>
+Reply-To: dhlexpresscouriercompany.nyusa@gmail.com
+From: "Dr. William Johnson" <currency1000000@gmail.com>
+Date: Tue, 7 Jan 2020 20:56:34 +0100
+Message-ID: <CAPqfnSEyU1pBR_7HT2g1KK7i8caLMBQ8yPA8KRDVm+MN-K_Z4w@mail.gmail.com>
+Subject: contact Dhl office New York to receive your Prepaid ATM Master Card
+ worth $15.8Million US DOLLARS now.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>
 
-On January 7, 2020 2:46:29 AM PST, Masahiro Yamada <masahiroy@kernel=2Eorg>=
- wrote:
->(+CC: Ben Hutchings, H=2E Peter Anvin)
->
->On Sun, Jan 5, 2020 at 12:03 AM Masahiro Yamada <masahiroy@kernel=2Eorg>
->wrote:
->>
->> 'klibcdirs' was added by commit d39a206bc35d ("kbuild: rebuild
->initramfs
->> if content of initramfs changes")=2E If this is just a matter of
->forcing
->> execution of the recipe line, we can replace it with FORCE=2E
->>
->> I do not understand the purpose of
->>
->>    $(deps_initramfs): klibcdirs
->
->
->Perhaps, the 'klibcdirs' target might be intended
->to control the directory descending
->in case klibc is dropped in the kernel tree=2E
->
->Anyway, klibc is built independently
->of Linux kernel, and this 'klibcdirs' target
->is just a no-op stub as far as the kernel tree is concerned=2E
->
->Clean it up=2E
->
->
->> Remove it=2E
->>
->> Signed-off-by: Masahiro Yamada <masahiroy@kernel=2Eorg>
->> ---
->>
->> Changes in v2:
->>   - New patch (I forgot to submit this in v1 series)
->>
->>  usr/Makefile | 6 +-----
->>  1 file changed, 1 insertion(+), 5 deletions(-)
->>
->> diff --git a/usr/Makefile b/usr/Makefile
->> index e6f7cb2f81db=2E=2E55c942da01cd 100644
->> --- a/usr/Makefile
->> +++ b/usr/Makefile
->> @@ -3,9 +3,6 @@
->>  # kbuild file for usr/ - including initramfs image
->>  #
->>
->> -klibcdirs:;
->> -PHONY +=3D klibcdirs
->> -
->>  suffix_y =3D $(subst $\",,$(CONFIG_INITRAMFS_COMPRESSION))
->>  datafile_y =3D initramfs_data=2Ecpio$(suffix_y)
->>  datafile_d_y =3D =2E$(datafile_y)=2Ed
->> @@ -50,13 +47,12 @@ targets :=3D $(datafile_y)
->>  # do not try to update files included in initramfs
->>  $(deps_initramfs): ;
->>
->> -$(deps_initramfs): klibcdirs
->>  # We rebuild initramfs_data=2Ecpio if:
->>  # 1) Any included file is newer than initramfs_data=2Ecpio
->>  # 2) There are changes in which files are included (added or
->deleted)
->>  # 3) If gen_init_cpio are newer than initramfs_data=2Ecpio
->>  # 4) Arguments to gen_initramfs=2Esh changes
->> -$(obj)/$(datafile_y): $(obj)/gen_init_cpio $(deps_initramfs)
->klibcdirs
->> +$(obj)/$(datafile_y): $(obj)/gen_init_cpio $(deps_initramfs) FORCE
->>         $(Q)$(initramfs) -l $(ramfs-input) > $(obj)/$(datafile_d_y)
->>         $(call if_changed,initfs)
->>
->> --
->> 2=2E17=2E1
->>
-
-Yes, it is/was a hook for the klibc integration tree=2E
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+ATTN Dear Beneficiary.
+Goodnews
+I have Registered your Prepaid ATM Master Card
+worth $15.800,000.00 US DOLLARS with Courier company
+asigned to deliver it to you today.
+So contact Dhl office New York to receive your Prepaid ATM Master Card
+worth $15.8Million US DOLLARS now.
+Contact Person: Mrs. Mary Michael, Director, DHL Courier Company-NY USA. 10218
+Email. dhlexpresscouriercompany.nyusa@gmail.com
+Call the office +(202) 890-8752
+Rec-Confirmed your mailing address to the office as I listed below.
+Your Full Name--------------
+House Address-----------
+Your working Phone Number----------------
+ID copy-------------------------
+Sex-----------------------------
+Note,delivery fee to your address is only $25.00. send it to this
+company urgent on itunes card today so that DHL will deliver this
+Prepaid ATM Master Card to you today according to our finally
+agreement.
+Thanks for coperations,
+Dr. William Johnson
