@@ -1,41 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:44885 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728721AbgAGT4j (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.134]:52919 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726389AbgAGVcE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jan 2020 14:56:39 -0500
-Received: by mail-ed1-f66.google.com with SMTP id bx28so591745edb.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jan 2020 11:56:38 -0800 (PST)
+        Tue, 7 Jan 2020 16:32:04 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] x86: orc: fix unused-function warning
+Date: Tue,  7 Jan 2020 22:31:20 +0100
+Message-Id: <20200107213127.209139-1-arnd@arndb.de>
 MIME-Version: 1.0
-Reply-To: dhlexpresscouriercompany.nyusa@gmail.com
-From: "Dr. William Johnson" <currency1000000@gmail.com>
-Date: Tue, 7 Jan 2020 20:56:34 +0100
-Message-ID: <CAPqfnSEyU1pBR_7HT2g1KK7i8caLMBQ8yPA8KRDVm+MN-K_Z4w@mail.gmail.com>
-Subject: contact Dhl office New York to receive your Prepaid ATM Master Card
- worth $15.8Million US DOLLARS now.
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, Shile Zhang <shile.zhang@linux.alibaba.com>, "Peter Zijlstra (Intel)" <peterz@infradead.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Josh Poimboeuf <jpoimboe@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Masami Hiramatsu <mhiramat@kernel.org>, Jann Horn <jannh@google.com>, linux-kernel@vger.kernel.org
 
-ATTN Dear Beneficiary.
-Goodnews
-I have Registered your Prepaid ATM Master Card
-worth $15.800,000.00 US DOLLARS with Courier company
-asigned to deliver it to you today.
-So contact Dhl office New York to receive your Prepaid ATM Master Card
-worth $15.8Million US DOLLARS now.
-Contact Person: Mrs. Mary Michael, Director, DHL Courier Company-NY USA. 10218
-Email. dhlexpresscouriercompany.nyusa@gmail.com
-Call the office +(202) 890-8752
-Rec-Confirmed your mailing address to the office as I listed below.
-Your Full Name--------------
-House Address-----------
-Your working Phone Number----------------
-ID copy-------------------------
-Sex-----------------------------
-Note,delivery fee to your address is only $25.00. send it to this
-company urgent on itunes card today so that DHL will deliver this
-Prepaid ATM Master Card to you today according to our finally
-agreement.
-Thanks for coperations,
-Dr. William Johnson
+The orc unwinder contains a new warning:
+
+arch/x86/kernel/unwind_orc.c:210:12: error: 'orc_sort_cmp' defined but not used [-Werror=unused-function]
+ static int orc_sort_cmp(const void *_a, const void *_b)
+            ^~~~~~~~~~~~
+arch/x86/kernel/unwind_orc.c:190:13: error: 'orc_sort_swap' defined but not used [-Werror=unused-function]
+ static void orc_sort_swap(void *_a, void *_b, int size)
+             ^~~~~~~~~~~~~
+
+Move the #ifdef to hide the now unused functions.
+
+Fixes: f14bf6a350df ("x86/unwind/orc: Remove boot-time ORC unwind tables sorting")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/x86/kernel/unwind_orc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/unwind_orc.c b/arch/x86/kernel/unwind_orc.c
+index abdf8911a1fb..538152cca46b 100644
+--- a/arch/x86/kernel/unwind_orc.c
++++ b/arch/x86/kernel/unwind_orc.c
+@@ -187,6 +187,7 @@ static struct orc_entry *orc_find(unsigned long ip)
+ 	return orc_ftrace_find(ip);
+ }
+ 
++#ifdef CONFIG_MODULES
+ static void orc_sort_swap(void *_a, void *_b, int size)
+ {
+ 	struct orc_entry *orc_a, *orc_b;
+@@ -229,7 +230,6 @@ static int orc_sort_cmp(const void *_a, const void *_b)
+ 	return orc_a->sp_reg == ORC_REG_UNDEFINED && !orc_a->end ? -1 : 1;
+ }
+ 
+-#ifdef CONFIG_MODULES
+ void unwind_module_init(struct module *mod, void *_orc_ip, size_t orc_ip_size,
+ 			void *_orc, size_t orc_size)
+ {
+-- 
+2.20.0
