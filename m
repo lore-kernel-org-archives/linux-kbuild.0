@@ -1,93 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp2130.oracle.com ([156.151.31.86]:50660 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725825AbgAHSdH (ORCPT
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42784 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728120AbgAIM4b (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:33:07 -0500
-Subject: Re: [PATCH v4] kallsyms: add names of built-in modules
-References: <7e0f4a74-63c5-ad62-c619-c6277c4bc791@oracle.com>
- <20191210174826.5433-1-eugene.loh@oracle.com>
- <2a535000-e71e-fab9-cf6a-e7e5fb8053d8@oracle.com>
- <20191218222931.76131c6a@rorschach.local.home>
- <CAK7LNATJZCekCoj0ruPUGRv7sH_hcJP-dFPd-3_EOR5hFNW-Xg@mail.gmail.com>
-From: Eugene Loh <eugene.loh@oracle.com>
-Message-ID: <aa165beb-a92c-c3b9-d57a-4046ba91f677@oracle.com>
-Date: Wed, 8 Jan 2020 10:32:09 -0800
+        Thu, 9 Jan 2020 07:56:31 -0500
+Received: by mail-wr1-f66.google.com with SMTP id q6so7255356wro.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jan 2020 04:56:30 -0800 (PST)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH] kconfig: fix an "implicit declaration of function" warning
+Date: Thu,  9 Jan 2020 13:56:27 +0100
+Message-Id: <20200109125627.24654-1-brgl@bgdev.pl>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATJZCekCoj0ruPUGRv7sH_hcJP-dFPd-3_EOR5hFNW-Xg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Steven Rostedt <rostedt@goodmis.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <maz@kernel.org>, Song Liu <songliubraving@fb.com>, Thomas Gleixner <tglx@linutronix.de>, "Keller, Jacob E" <jacob.e.keller@intel.com>, Kris Van Hees <kris.van.hees@oracle.com>, Nick Alcock <nick.alcock@oracle.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-On 12/18/2019 08:28 PM, Masahiro Yamada wrote:
+From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-> On Thu, Dec 19, 2019 at 12:29 PM Steven Rostedt <rostedt@goodmis.org> wrote:
->> Couple of notes:
->> 1) this affects code that doesn't really have a maintainer. I could
->> take it in my tree, but I would like to have acks from other
->> maintainers. Perhaps Jessica Yu (Module maintainer), and probably one
->> from Linus himself.
->>
->> 2) Do not send new versions of a patch as a reply to the old version. I
->> and many other maintainers sort our inbox by threads, and I look at the
->> top of the thread for patches. That is, if there's another version of a
->> patch that is a reply to a previous version, it is basically off my
->> radar, unless I happen to notice it by chance (which I did with this
->> email).
->>
->> You can send your v4 patch again, but please send it as its own thread,
->> that way it will be on the radar of other maintainers. Hopefully we can
->> get some acks on this as well.
+strncasecmp() & strcasecmp() functions are declared in strings.h, not
+string.h. On most environments the former is implicitly included by
+the latter but on some setups, building menuconfig results in the
+following warning:
 
-Sorry.  I misunderstood some process doc.  But before I resend...
+  HOSTCC  scripts/kconfig/mconf.o
+scripts/kconfig/mconf.c: In function ‘search_conf’:
+scripts/kconfig/mconf.c:423:6: warning: implicit declaration of function ‘strncasecmp’ [-Wimplicit-function-declaration]
+  if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) == 0)
+      ^~~~~~~~~~~
+scripts/kconfig/mconf.c: In function ‘main’:
+scripts/kconfig/mconf.c:1021:8: warning: implicit declaration of function ‘strcasecmp’ [-Wimplicit-function-declaration]
+   if (!strcasecmp(mode, "single_menu"))
+        ^~~~~~~~~~
 
-> I do not like this patch.
->
-> scripts/Makefile.modbuiltin is really ugly.
-> It traverses all the directories once again.
->
-> This patch makes it even worse,
-> Kbuild would traverse the
-> whole directories three times.
->
-> I was thinking to remove scripts/Makefile.modbuiltin
-> and Kconfig's tristate.conf entirely
-> because it is possible to generate modules.builtin more simply.
+Fix it by explicitly including strings.h.
 
-Sorry about the delayed response, due in part to holidays.  Thank you 
-for your on-going review and the pointer to 
-https://lore.kernel.org/patchwork/project/lkml/list/?series=423205
+Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+---
+ scripts/kconfig/mconf.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I agree your proposed patch simplifies some build code, but this is 
-long-standing code.  Also, the build time -- either that would be saved 
-by your patch or that would be incurred by a third traversal -- is 
-miniscule.
-
-Further, I do not see how to add object-to-module information to your 
-proposed scheme.  Can you suggest something?  If not, then it seems the 
-proposed code simplification is limiting functionality.
-
-> As I said, the name of builtin module is not fixed info.
-> And, this makes kallsyms fat just for less important info.
-
-The name of the builtin module can be ambiguous in some cases, but in 
-most cases it is not.  Indeed, the extra information is typically 
-useful, and comments from, e.g., Linus and Steve were positive about 
-adding that information to kallsyms.  Further, we have even heard 
-favorable feedback for adding such built-in-module information to 
-available_filter_functions as well.
-
->>> On 12/10/2019 09:48 AM, eugene.loh@oracle.com wrote:
->>>> From: Eugene Loh <eugene.loh@oracle.com>
->>>>
->>>> /proc/kallsyms is very useful for tracers and other tools that need
->>>> to map kernel symbols to addresses.
->>>>
->>>> It would be useful if there were a mapping between kernel symbol and
->>>> module name that only changed when the kernel source code is changed.
->>>> This mapping should not vanish simply because a module becomes built
->>>> into the kernel.
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 49c26ea9dd98..4063dbc1b927 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -15,6 +15,7 @@
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <strings.h>
+ #include <signal.h>
+ #include <unistd.h>
+ 
+-- 
+2.23.0
