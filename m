@@ -1,89 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:45449 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728501AbgAKHTI (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:48559 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728501AbgAKHVp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Jan 2020 02:19:08 -0500
+        Sat, 11 Jan 2020 02:21:45 -0500
 MIME-Version: 1.0
-References: <20200109161724.9546-1-brgl@bgdev.pl> <CAK7LNAQQcGLq46QOhqHArQvQG8DP2uQDtpn8XoUthNhwu8Aiyg@mail.gmail.com>
- <CAMpxmJUp_sEzf7sO1m=A+16eAhMJtu2Z_O2cZk7XCQeSjNj9+A@mail.gmail.com>
-In-Reply-To: <CAMpxmJUp_sEzf7sO1m=A+16eAhMJtu2Z_O2cZk7XCQeSjNj9+A@mail.gmail.com>
+References: <20200106083628.29729-1-masahiroy@kernel.org>
+In-Reply-To: <20200106083628.29729-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 11 Jan 2020 16:18:01 +0900
-Message-ID: <CAK7LNAT8ZgeMRgm1jjnj6P+UPWF-uuJtJj8hmgCsx6JRD2h5rg@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: ignore temporary generated files
+Date: Sat, 11 Jan 2020 16:21:04 +0900
+Message-ID: <CAK7LNAST-9NUg0zeUny7YU+ihjNMihYAxAUfJy7MU2v11OMFhQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove PYTHON2 variable
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Jan 10, 2020 at 1:38 AM Bartosz Golaszewski
-<bgolaszewski@baylibre.com> wrote:
+On Mon, Jan 6, 2020 at 5:36 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> czw., 9 sty 2020 o 17:36 Masahiro Yamada <masahiroy@kernel.org> napisa=C5=
-=82(a):
-> >
-> > On Fri, Jan 10, 2020 at 1:17 AM Bartosz Golaszewski <brgl@bgdev.pl> wro=
-te:
-> > >
-> > > From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> > >
-> > > If building gconfig fails, a temporary gtk config file is left in the
-> > > kconfig directory and is not ignored by git. Add an appropriate patte=
-rn
-> > > to .gitignore.
-> > >
-> > > Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
-> > > ---
-> > >  scripts/kconfig/.gitignore | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
-> > > index b5bf92f66d11..d22e6753397d 100644
-> > > --- a/scripts/kconfig/.gitignore
-> > > +++ b/scripts/kconfig/.gitignore
-> > > @@ -3,6 +3,7 @@
-> > >  #
-> > >  *.moc
-> > >  *conf-cfg
-> > > +*conf-cfg.tmp
-> >
-> > I have no idea in which situation this pattern is left.
-> >
-> > Could you tell me the way to reproduce it?
+> Python 2 has retired. There is no user of this variable.
 >
-> Sure:
->
-> 1. Don't have gtk+ development files installed.
-> 2. Run `make gconfig`.
-> 3. Watch it fail with the following error message:
->
-> ---
-> $ make gconfig
-> *
-> * Unable to find the GTK+ installation. Please make sure that
-> * the GTK+ 2.0 development package is correctly installed.
-> * You need gtk+-2.0 gmodule-2.0 libglade-2.0
-> *
-> make[1]: *** [scripts/kconfig/Makefile:212: scripts/kconfig/gconf-cfg] Er=
-ror 1
-> make: *** [Makefile:568: gconfig] Error 2
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+
+Applied to linux-kbuild.
+
+
 > ---
 >
-> 4. See the file `gconf-cfg.tmp` under scripts/kconfig.
+>  Makefile | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> Bart
+> diff --git a/Makefile b/Makefile
+> index 4f01de6cd43c..4a0796b05324 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -423,7 +423,6 @@ INSTALLKERNEL  := installkernel
+>  DEPMOD         = /sbin/depmod
+>  PERL           = perl
+>  PYTHON         = python
+> -PYTHON2                = python2
+>  PYTHON3                = python3
+>  CHECK          = sparse
+>  BASH           = bash
+> @@ -474,7 +473,7 @@ CLANG_FLAGS :=
+>
+>  export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
+>  export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
+> -export PERL PYTHON PYTHON2 PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+> +export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+>  export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
+>
+>  export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+> --
+> 2.17.1
+>
 
-Thanks for this info.
 
-This seems a kbuild bug, so I fixed the root cause
-instead of hiding the garbage files.
-
-https://patchwork.kernel.org/patch/11326631/
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
