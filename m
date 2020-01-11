@@ -1,87 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:44272 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728432AbgAKGwD (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:54266 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728441AbgAKHQx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Jan 2020 01:52:03 -0500
+        Sat, 11 Jan 2020 02:16:53 -0500
 MIME-Version: 1.0
-References: <09f5b36d9c64b4e6d1d235f84a7333b7802b2866.1578131485.git.mirq-linux@rere.qmqm.pl>
-In-Reply-To: <09f5b36d9c64b4e6d1d235f84a7333b7802b2866.1578131485.git.mirq-linux@rere.qmqm.pl>
+References: <20200109161636.9362-1-brgl@bgdev.pl>
+In-Reply-To: <20200109161636.9362-1-brgl@bgdev.pl>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 11 Jan 2020 15:51:20 +0900
-Message-ID: <CAK7LNAQNYQY=Z6TqacifFi-ycnHgSdWtD+YBQAGWPZA52RQm0w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] builddeb: allow selection of .deb compressor
+Date: Sat, 11 Jan 2020 16:15:51 +0900
+Message-ID: <CAK7LNAT34K7OcpXYhsAemd5Jd7px8P1+DyS=7s76pW2h6d663A@mail.gmail.com>
+Subject: Re: [PATCH v2] kconfig: fix an "implicit declaration of function" warning
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-(+CC: Ben Hutchings, Riku Voipio)
-
-On Sat, Jan 4, 2020 at 6:56 PM Micha=C5=82 Miros=C5=82aw <mirq-linux@rere.q=
-mqm.pl> wrote:
+On Fri, Jan 10, 2020 at 1:16 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 >
-> Select deb compression using KPKG_COMPRESS make variable. This allows to
-> use gzip compression for local or test builds, and that's way faster
-> than now-default xz compression.
+> From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 >
-> Signed-off-by: Micha=C5=82 Miros=C5=82aw <mirq-linux@rere.qmqm.pl>
-> ---
->  scripts/package/builddeb | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> strncasecmp() & strcasecmp() functions are declared in strings.h, not
+> string.h. On most environments the former is implicitly included by
+> the latter but on some setups, building menuconfig results in the
+> following warning:
 >
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index c4c580f547ef..d289c4ebc891 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -43,7 +43,7 @@ create_package() {
+>   HOSTCC  scripts/kconfig/mconf.o
+> scripts/kconfig/mconf.c: In function =E2=80=98search_conf=E2=80=99:
+> scripts/kconfig/mconf.c:423:6: warning: implicit declaration of function =
+=E2=80=98strncasecmp=E2=80=99 [-Wimplicit-function-declaration]
+>   if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) =3D=3D 0=
+)
+>       ^~~~~~~~~~~
+> scripts/kconfig/mconf.c: In function =E2=80=98main=E2=80=99:
+> scripts/kconfig/mconf.c:1021:8: warning: implicit declaration of function=
+ =E2=80=98strcasecmp=E2=80=99 [-Wimplicit-function-declaration]
+>    if (!strcasecmp(mode, "single_menu"))
+>         ^~~~~~~~~~
 >
->         # Create the package
->         dpkg-gencontrol -p$pname -P"$pdir"
-> -       dpkg --build "$pdir" ..
-> +       dpkg-deb ${KPKG_COMPRESS:+-Z$KPKG_COMPRESS} --build "$pdir" ..
->  }
+> Fix it by explicitly including strings.h.
 >
->  version=3D$KERNELRELEASE
-> --
-> 2.20.1
->
+> Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
-I have not seen any comment on this,
-but using gzip is indeed way faster.
-
-
-Some minor comments:
-
-I see some variables staring "KDEB_",
-but nothing starting "KPKG_".
-
-
-
-masahiro@grover:~/workspace/linux-kbuild$ git grep KDEB_
-scripts/Makefile.package:KDEB_SOURCENAME ?=3D linux-$(KERNELRELEASE)
-scripts/Makefile.package:export KDEB_SOURCENAME
-scripts/Makefile.package:       $(call cmd,src_tar,$(KDEB_SOURCENAME))
-scripts/Makefile.package:               mv $(KDEB_SOURCENAME).tar.gz
-../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
-scripts/package/builddeb:# specified in KDEB_HOOKDIR) that will be
-called on package install and
-scripts/package/builddeb:debhookdir=3D${KDEB_HOOKDIR:-/etc/kernel}
-scripts/package/mkdebian:if [ -n "$KDEB_PKGVERSION" ]; then
-scripts/package/mkdebian:       packageversion=3D$KDEB_PKGVERSION
-scripts/package/mkdebian:sourcename=3D$KDEB_SOURCENAME
-scripts/package/mkdebian:if [ -n "$KDEB_CHANGELOG_DIST" ]; then
-scripts/package/mkdebian:        distribution=3D$KDEB_CHANGELOG_DIST
-scripts/package/mkdebian:        echo >&2 "Install lsb-release or set
-\$KDEB_CHANGELOG_DIST explicitly"
-masahiro@grover:~/workspace/linux-kbuild$ git grep KPKG_
-
-
-Maybe starting KDEB_ seems to be better for consistency?
-
-
+Applied to linux-kbuild.
+Thanks.
 
 
 --=20
