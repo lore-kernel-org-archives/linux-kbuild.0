@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:50773 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:50761 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726399AbgAMGtl (ORCPT
+        with ESMTP id S1725954AbgAMGtk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 01:49:41 -0500
+        Mon, 13 Jan 2020 01:49:40 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 4/7] builddeb: avoid invoking sub-shells where possible
-Date: Mon, 13 Jan 2020 15:48:38 +0900
-Message-Id: <20200113064841.3946-4-masahiroy@kernel.org>
+Subject: [PATCH 5/7] builddeb: remove redundant make for ARCH=um
+Date: Mon, 13 Jan 2020 15:48:39 +0900
+Message-Id: <20200113064841.3946-5-masahiroy@kernel.org>
 In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
 References: <20200113064841.3946-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,70 +15,29 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The commands surrounded by ( ... ) is run in a sub-shell, but you do
-not have to invoke it for every single line.
-
-Use just one ( ... ) for creating debian/hdrsrcfiles.
-
-For tar, use -C option instead.
+The kernel build has already been done before builddeb is invoked.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/package/builddeb | 39 ++++++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 13 deletions(-)
+ scripts/package/builddeb | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 9b92745bf13a..7c561ffe1de0 100755
+index 7c561ffe1de0..5efb6155ac0a 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -165,21 +165,34 @@ EOF
- done
+@@ -82,10 +82,9 @@ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
  
- # Build kernel header package
--(cd $srctree; find . arch/$SRCARCH -maxdepth 1 -name Makefile\*) > debian/hdrsrcfiles
--(cd $srctree; find include scripts -type f -o -type l) >> debian/hdrsrcfiles
--(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> debian/hdrsrcfiles
--(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> debian/hdrsrcfiles
--if is_enabled CONFIG_STACK_VALIDATION; then
--	echo tools/objtool/objtool >> debian/hdrobjfiles
--fi
--find arch/$SRCARCH/include Module.symvers include scripts -type f >> debian/hdrobjfiles
--if is_enabled CONFIG_GCC_PLUGINS; then
--	find scripts/gcc-plugins -name \*.so >> debian/hdrobjfiles
--fi
-+(
-+	cd $srctree
-+	find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
-+	find include scripts -type f -o -type l
-+	find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
-+	find arch/$SRCARCH -name include -type f
-+
-+	if [ -d arch/$SRCARCH/scripts ]; then
-+		find arch/$SRCARCH/scripts -type f
-+	fi
-+) > debian/hdrsrcfiles
-+
-+{
-+	if is_enabled CONFIG_STACK_VALIDATION; then
-+		find tools/objtool -type f -executable
-+	fi
-+
-+	find arch/$SRCARCH/include Module.symvers include scripts -type f
-+
-+	if is_enabled CONFIG_GCC_PLUGINS; then
-+		find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
-+	fi
-+} > debian/hdrobjfiles
-+
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
--(cd $srctree; tar -c -f - -T -) < debian/hdrsrcfiles | (cd $destdir; tar -xf -)
--tar -c -f - -T - < debian/hdrobjfiles | (cd $destdir; tar -xf -)
-+tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
-+tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
- cp $KCONFIG_CONFIG $destdir/.config # copy .config manually to be where it's expected to be
- ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
- rm -f debian/hdrsrcfiles debian/hdrobjfiles
+-# Build and install the kernel
++# Install the kernel
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin" "$tmpdir/usr/share/doc/$packagename"
+-	$MAKE linux
+ 	cp System.map "$tmpdir/usr/lib/uml/modules/$version/System.map"
+ 	cp $KCONFIG_CONFIG "$tmpdir/usr/share/doc/$packagename/config"
+ 	gzip "$tmpdir/usr/share/doc/$packagename/config"
 -- 
 2.17.1
