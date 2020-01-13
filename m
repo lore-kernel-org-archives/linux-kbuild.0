@@ -1,35 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:46152 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732888AbgAMFw0 (ORCPT
+Received: from conuserg-11.nifty.com ([210.131.2.78]:50779 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbgAMGtm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 00:52:26 -0500
-Received: by mail-oi1-f196.google.com with SMTP id 13so7164431oij.13
-        for <linux-kbuild@vger.kernel.org>; Sun, 12 Jan 2020 21:52:26 -0800 (PST)
-MIME-Version: 1.0
-Reply-To: rickschaech@gmail.com
-From: Rick Schaech <cathben72@gmail.com>
-Date: Mon, 13 Jan 2020 01:52:24 -0400
-Message-ID: <CAEcBxO=TAnFn5LzizHa22hUC0Db5FuiZJF28m=yX3_9m--jRqg@mail.gmail.com>
-Subject: I wait for your swift response,
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 13 Jan 2020 01:49:42 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 6/7] builddeb: split kernel headers deployment out into a function
+Date: Mon, 13 Jan 2020 15:48:40 +0900
+Message-Id: <20200113064841.3946-6-masahiroy@kernel.org>
+In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
+References: <20200113064841.3946-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Dear, I'm Mr Rick Schaech, I am the General Account Auditor, Though i
-know we have not meet each other before but sometimes in life God have
-a reason of bringing two people from two different countries together
-as business partners or life partners.
+Deploy kernel headers (linux-headers package) in a separate function
+for readability.
 
-My dear friend, I have the sum of 15.7 Million USD i wish to put in
-your name due to the death of my late client who died several years
-ago as his next of kin column still remain blank. Though the internet
-medium is highly abuse these days but am assuring you that this
-transaction is legitimate and I am contacting you that we may have a
-deal, note for your cooperation and collaboration 40% of the sum will
-be for you while the other 60% will be for me as well. I wait for your
-swift response for more details. please forward your response to my
-personal E-mail: rickschaech@gmail.com
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Yours sincerely,
-Rick Schaech.
+ scripts/package/builddeb | 84 ++++++++++++++++++++++------------------
+ 1 file changed, 46 insertions(+), 38 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5efb6155ac0a..50dc24fa3a65 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -46,13 +46,53 @@ create_package() {
+ 	dpkg --build "$pdir" ..
+ }
+ 
++deploy_kernel_headers () {
++	pdir=$1
++
++	rm -rf $pdir
++
++	(
++		cd $srctree
++		find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
++		find include scripts -type f -o -type l
++		find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
++		find arch/$SRCARCH -name include -type f
++
++		if [ -d arch/$SRCARCH/scripts ]; then
++			find arch/$SRCARCH/scripts -type f
++		fi
++	) > debian/hdrsrcfiles
++
++	{
++		if is_enabled CONFIG_STACK_VALIDATION; then
++			find tools/objtool -type f -executable
++		fi
++
++		find arch/$SRCARCH/include Module.symvers include scripts -type f
++
++		if is_enabled CONFIG_GCC_PLUGINS; then
++			find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
++		fi
++	} > debian/hdrobjfiles
++
++	destdir=$pdir/usr/src/linux-headers-$version
++	mkdir -p $destdir
++	tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
++	tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
++	rm -f debian/hdrsrcfiles debian/hdrobjfiles
++
++	# copy .config manually to be where it's expected to be
++	cp $KCONFIG_CONFIG $destdir/.config
++
++	mkdir -p $pdir/lib/modules/$version/
++	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
++}
++
+ version=$KERNELRELEASE
+ tmpdir=debian/linux-image
+-kernel_headers_dir=debian/linux-headers
+ libc_headers_dir=debian/linux-libc-dev
+ dbg_dir=debian/linux-image-dbg
+ packagename=linux-image-$version
+-kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ 
+@@ -77,10 +117,9 @@ esac
+ BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" debian/files
++rm -rf "$tmpdir" "$libc_headers_dir" "$dbg_dir" debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+-mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ 
+ # Install the kernel
+ if [ "$ARCH" = "um" ] ; then
+@@ -163,41 +202,10 @@ EOF
+ 	chmod 755 "$tmpdir/DEBIAN/$script"
+ done
+ 
+-# Build kernel header package
+-(
+-	cd $srctree
+-	find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
+-	find include scripts -type f -o -type l
+-	find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
+-	find arch/$SRCARCH -name include -type f
+-
+-	if [ -d arch/$SRCARCH/scripts ]; then
+-		find arch/$SRCARCH/scripts -type f
+-	fi
+-) > debian/hdrsrcfiles
+-
+-{
+-	if is_enabled CONFIG_STACK_VALIDATION; then
+-		find tools/objtool -type f -executable
+-	fi
+-
+-	find arch/$SRCARCH/include Module.symvers include scripts -type f
+-
+-	if is_enabled CONFIG_GCC_PLUGINS; then
+-		find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
+-	fi
+-} > debian/hdrobjfiles
+-
+-destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+-mkdir -p "$destdir"
+-tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
+-tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
+-cp $KCONFIG_CONFIG $destdir/.config # copy .config manually to be where it's expected to be
+-ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+-rm -f debian/hdrsrcfiles debian/hdrobjfiles
+-
+ if [ "$ARCH" != "um" ]; then
+-	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
++	deploy_kernel_headers debian/linux-headers
++	create_package linux-headers-$version debian/linux-headers
++
+ 	create_package "$libc_headers_packagename" "$libc_headers_dir"
+ fi
+ 
+-- 
+2.17.1
