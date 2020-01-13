@@ -1,48 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:50763 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:50773 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726023AbgAMGtl (ORCPT
+        with ESMTP id S1726399AbgAMGtl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 13 Jan 2020 01:49:41 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/7] builddeb: remove unneeded files in hdrobjfiles for headers package
-Date: Mon, 13 Jan 2020 15:48:35 +0900
-Message-Id: <20200113064841.3946-1-masahiroy@kernel.org>
+Subject: [PATCH 4/7] builddeb: avoid invoking sub-shells where possible
+Date: Mon, 13 Jan 2020 15:48:38 +0900
+Message-Id: <20200113064841.3946-4-masahiroy@kernel.org>
+In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
+References: <20200113064841.3946-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
- - We do not need tools/objtool/fixdep or tools/objtool/sync-check.sh
-   for building external modules. Including tools/objtool/objtool is
-   enough.
+The commands surrounded by ( ... ) is run in a sub-shell, but you do
+not have to invoke it for every single line.
 
- - gcc-common.h is a check-in file. I do not see any point to search
-   for it in objtree.
+Use just one ( ... ) for creating debian/hdrsrcfiles.
+
+For tar, use -C option instead.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/package/builddeb | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/package/builddeb | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index b60388051c7f..eb067d6f1370 100755
+index 9b92745bf13a..7c561ffe1de0 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -170,11 +170,11 @@ done
- (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
- if is_enabled CONFIG_STACK_VALIDATION; then
--	(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
-+	echo tools/objtool/objtool >> "$objtree/debian/hdrobjfiles"
- fi
- (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
- if is_enabled CONFIG_GCC_PLUGINS; then
--	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
-+	(cd $objtree; find scripts/gcc-plugins -name \*.so) >> "$objtree/debian/hdrobjfiles"
- fi
+@@ -165,21 +165,34 @@ EOF
+ done
+ 
+ # Build kernel header package
+-(cd $srctree; find . arch/$SRCARCH -maxdepth 1 -name Makefile\*) > debian/hdrsrcfiles
+-(cd $srctree; find include scripts -type f -o -type l) >> debian/hdrsrcfiles
+-(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> debian/hdrsrcfiles
+-(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> debian/hdrsrcfiles
+-if is_enabled CONFIG_STACK_VALIDATION; then
+-	echo tools/objtool/objtool >> debian/hdrobjfiles
+-fi
+-find arch/$SRCARCH/include Module.symvers include scripts -type f >> debian/hdrobjfiles
+-if is_enabled CONFIG_GCC_PLUGINS; then
+-	find scripts/gcc-plugins -name \*.so >> debian/hdrobjfiles
+-fi
++(
++	cd $srctree
++	find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
++	find include scripts -type f -o -type l
++	find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
++	find arch/$SRCARCH -name include -type f
++
++	if [ -d arch/$SRCARCH/scripts ]; then
++		find arch/$SRCARCH/scripts -type f
++	fi
++) > debian/hdrsrcfiles
++
++{
++	if is_enabled CONFIG_STACK_VALIDATION; then
++		find tools/objtool -type f -executable
++	fi
++
++	find arch/$SRCARCH/include Module.symvers include scripts -type f
++
++	if is_enabled CONFIG_GCC_PLUGINS; then
++		find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
++	fi
++} > debian/hdrobjfiles
++
  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
  mkdir -p "$destdir"
+-(cd $srctree; tar -c -f - -T -) < debian/hdrsrcfiles | (cd $destdir; tar -xf -)
+-tar -c -f - -T - < debian/hdrobjfiles | (cd $destdir; tar -xf -)
++tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
++tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
+ cp $KCONFIG_CONFIG $destdir/.config # copy .config manually to be where it's expected to be
+ ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+ rm -f debian/hdrsrcfiles debian/hdrobjfiles
 -- 
 2.17.1
