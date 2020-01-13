@@ -1,43 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:50761 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725954AbgAMGtk (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:36298 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728646AbgAMHaY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 01:49:40 -0500
+        Mon, 13 Jan 2020 02:30:24 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 5/7] builddeb: remove redundant make for ARCH=um
-Date: Mon, 13 Jan 2020 15:48:39 +0900
-Message-Id: <20200113064841.3946-5-masahiroy@kernel.org>
-In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
-References: <20200113064841.3946-1-masahiroy@kernel.org>
+Subject: [PATCH] kbuild: remove 'Building modules, stage 2.' log
+Date: Mon, 13 Jan 2020 16:30:17 +0900
+Message-Id: <20200113073017.6910-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The kernel build has already been done before builddeb is invoked.
+This log is displayed every time modules are built, but it is not
+so important.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/package/builddeb | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ scripts/Makefile.modpost | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 7c561ffe1de0..5efb6155ac0a 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -82,10 +82,9 @@ mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p "$tmpdir/lib" "$tmpdir/boot"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 69897d5d3a70..b4d3f2d122ac 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -90,7 +90,6 @@ quiet_cmd_modpost = MODPOST $(words $(modules)) modules
+       cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST)
  
--# Build and install the kernel
-+# Install the kernel
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin" "$tmpdir/usr/share/doc/$packagename"
--	$MAKE linux
- 	cp System.map "$tmpdir/usr/lib/uml/modules/$version/System.map"
- 	cp $KCONFIG_CONFIG "$tmpdir/usr/share/doc/$packagename/config"
- 	gzip "$tmpdir/usr/share/doc/$packagename/config"
+ __modpost:
+-	@$(kecho) '  Building modules, stage 2.'
+ 	$(call cmd,modpost)
+ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modfinal
 -- 
 2.17.1
