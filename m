@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:50779 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:50772 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726523AbgAMGtm (ORCPT
+        with ESMTP id S1726202AbgAMGtl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 01:49:42 -0500
+        Mon, 13 Jan 2020 01:49:41 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 6/7] builddeb: split kernel headers deployment out into a function
-Date: Mon, 13 Jan 2020 15:48:40 +0900
-Message-Id: <20200113064841.3946-6-masahiroy@kernel.org>
+Subject: [PATCH 2/7] builddeb: match temporary directory name to the package name
+Date: Mon, 13 Jan 2020 15:48:36 +0900
+Message-Id: <20200113064841.3946-2-masahiroy@kernel.org>
 In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
 References: <20200113064841.3946-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,131 +15,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Deploy kernel headers (linux-headers package) in a separate function
-for readability.
+The temporary directory names, debian/hdrtmp (linux-headers package)
+and debian/headertmp (linux-libc-dev package) are confusing.
+
+Matching the directory name to the package name is clearer, IMHO.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/package/builddeb | 84 ++++++++++++++++++++++------------------
- 1 file changed, 46 insertions(+), 38 deletions(-)
+ scripts/package/builddeb | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 5efb6155ac0a..50dc24fa3a65 100755
+index eb067d6f1370..0a0a7c1447f4 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -46,13 +46,53 @@ create_package() {
- 	dpkg --build "$pdir" ..
+@@ -47,10 +47,10 @@ create_package() {
  }
  
-+deploy_kernel_headers () {
-+	pdir=$1
-+
-+	rm -rf $pdir
-+
-+	(
-+		cd $srctree
-+		find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
-+		find include scripts -type f -o -type l
-+		find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
-+		find arch/$SRCARCH -name include -type f
-+
-+		if [ -d arch/$SRCARCH/scripts ]; then
-+			find arch/$SRCARCH/scripts -type f
-+		fi
-+	) > debian/hdrsrcfiles
-+
-+	{
-+		if is_enabled CONFIG_STACK_VALIDATION; then
-+			find tools/objtool -type f -executable
-+		fi
-+
-+		find arch/$SRCARCH/include Module.symvers include scripts -type f
-+
-+		if is_enabled CONFIG_GCC_PLUGINS; then
-+			find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
-+		fi
-+	} > debian/hdrobjfiles
-+
-+	destdir=$pdir/usr/src/linux-headers-$version
-+	mkdir -p $destdir
-+	tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
-+	tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
-+	rm -f debian/hdrsrcfiles debian/hdrobjfiles
-+
-+	# copy .config manually to be where it's expected to be
-+	cp $KCONFIG_CONFIG $destdir/.config
-+
-+	mkdir -p $pdir/lib/modules/$version/
-+	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
-+}
-+
  version=$KERNELRELEASE
- tmpdir=debian/linux-image
--kernel_headers_dir=debian/linux-headers
- libc_headers_dir=debian/linux-libc-dev
- dbg_dir=debian/linux-image-dbg
+-tmpdir="$objtree/debian/tmp"
+-kernel_headers_dir="$objtree/debian/hdrtmp"
+-libc_headers_dir="$objtree/debian/headertmp"
+-dbg_dir="$objtree/debian/dbgtmp"
++tmpdir="$objtree/debian/linux-image"
++kernel_headers_dir="$objtree/debian/linux-headers"
++libc_headers_dir="$objtree/debian/linux-libc-dev"
++dbg_dir="$objtree/debian/linux-image-dbg"
  packagename=linux-image-$version
--kernel_headers_packagename=linux-headers-$version
+ kernel_headers_packagename=linux-headers-$version
  libc_headers_packagename=linux-libc-dev
- dbg_packagename=$packagename-dbg
- 
-@@ -77,10 +117,9 @@ esac
- BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
- 
- # Setup the directory structure
--rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" debian/files
-+rm -rf "$tmpdir" "$libc_headers_dir" "$dbg_dir" debian/files
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p "$tmpdir/lib" "$tmpdir/boot"
--mkdir -p "$kernel_headers_dir/lib/modules/$version/"
- 
- # Install the kernel
- if [ "$ARCH" = "um" ] ; then
-@@ -163,41 +202,10 @@ EOF
- 	chmod 755 "$tmpdir/DEBIAN/$script"
- done
- 
--# Build kernel header package
--(
--	cd $srctree
--	find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
--	find include scripts -type f -o -type l
--	find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
--	find arch/$SRCARCH -name include -type f
--
--	if [ -d arch/$SRCARCH/scripts ]; then
--		find arch/$SRCARCH/scripts -type f
--	fi
--) > debian/hdrsrcfiles
--
--{
--	if is_enabled CONFIG_STACK_VALIDATION; then
--		find tools/objtool -type f -executable
--	fi
--
--	find arch/$SRCARCH/include Module.symvers include scripts -type f
--
--	if is_enabled CONFIG_GCC_PLUGINS; then
--		find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
--	fi
--} > debian/hdrobjfiles
--
--destdir=$kernel_headers_dir/usr/src/linux-headers-$version
--mkdir -p "$destdir"
--tar -c -f - -C $srctree -T debian/hdrsrcfiles | tar -xf - -C $destdir
--tar -c -f - -T debian/hdrobjfiles | tar -xf - -C $destdir
--cp $KCONFIG_CONFIG $destdir/.config # copy .config manually to be where it's expected to be
--ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
--rm -f debian/hdrsrcfiles debian/hdrobjfiles
--
- if [ "$ARCH" != "um" ]; then
--	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
-+	deploy_kernel_headers debian/linux-headers
-+	create_package linux-headers-$version debian/linux-headers
-+
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
- fi
- 
 -- 
 2.17.1
