@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:50772 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:50762 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbgAMGtl (ORCPT
+        with ESMTP id S1726115AbgAMGtm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 01:49:41 -0500
+        Mon, 13 Jan 2020 01:49:42 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/7] builddeb: match temporary directory name to the package name
-Date: Mon, 13 Jan 2020 15:48:36 +0900
-Message-Id: <20200113064841.3946-2-masahiroy@kernel.org>
+Subject: [PATCH 7/7] builddeb: split libc headers deployment out into a function
+Date: Mon, 13 Jan 2020 15:48:41 +0900
+Message-Id: <20200113064841.3946-7-masahiroy@kernel.org>
 In-Reply-To: <20200113064841.3946-1-masahiroy@kernel.org>
 References: <20200113064841.3946-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,35 +15,82 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The temporary directory names, debian/hdrtmp (linux-headers package)
-and debian/headertmp (linux-libc-dev package) are confusing.
-
-Matching the directory name to the package name is clearer, IMHO.
+Deploy user-space headers (linux-libc-dev package) in a separate
+function for readability.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/package/builddeb | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/package/builddeb | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index eb067d6f1370..0a0a7c1447f4 100755
+index 50dc24fa3a65..9448a05a2bce 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -47,10 +47,10 @@ create_package() {
+@@ -88,12 +88,25 @@ deploy_kernel_headers () {
+ 	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
  }
  
++deploy_libc_headers () {
++	pdir=$1
++
++	rm -rf $pdir
++
++	$MAKE -f $srctree/Makefile headers
++	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH=$pdir/usr
++
++	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
++	# used by Debian-based distros (to support multi-arch)
++	host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
++	mkdir $pdir/usr/include/$host_arch
++	mv $pdir/usr/include/asm $pdir/usr/include/$host_arch/
++}
++
  version=$KERNELRELEASE
--tmpdir="$objtree/debian/tmp"
--kernel_headers_dir="$objtree/debian/hdrtmp"
--libc_headers_dir="$objtree/debian/headertmp"
--dbg_dir="$objtree/debian/dbgtmp"
-+tmpdir="$objtree/debian/linux-image"
-+kernel_headers_dir="$objtree/debian/linux-headers"
-+libc_headers_dir="$objtree/debian/linux-libc-dev"
-+dbg_dir="$objtree/debian/linux-image-dbg"
+ tmpdir=debian/linux-image
+-libc_headers_dir=debian/linux-libc-dev
+ dbg_dir=debian/linux-image-dbg
  packagename=linux-image-$version
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
+-libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ 
+ if [ "$ARCH" = "um" ] ; then
+@@ -117,7 +130,7 @@ esac
+ BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$libc_headers_dir" "$dbg_dir" debian/files
++rm -rf "$tmpdir" "$dbg_dir" debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+ 
+@@ -167,16 +180,6 @@ if is_enabled CONFIG_MODULES; then
+ 	fi
+ fi
+ 
+-if [ "$ARCH" != "um" ]; then
+-	$MAKE -f $srctree/Makefile headers
+-	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
+-	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
+-	# used by Debian-based distros (to support multi-arch)
+-	host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
+-	mkdir $libc_headers_dir/usr/include/$host_arch
+-	mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
+-fi
+-
+ # Install the maintainer scripts
+ # Note: hook scripts under /etc/kernel are also executed by official Debian
+ # kernel packages, as well as kernel packages built using make-kpkg.
+@@ -206,7 +209,8 @@ if [ "$ARCH" != "um" ]; then
+ 	deploy_kernel_headers debian/linux-headers
+ 	create_package linux-headers-$version debian/linux-headers
+ 
+-	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	deploy_libc_headers debian/linux-libc-dev
++	create_package linux-libc-dev debian/linux-libc-dev
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
 -- 
 2.17.1
