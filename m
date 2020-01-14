@@ -1,58 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59698 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727382AbgAMXWY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jan 2020 18:22:24 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-Subject: [PATCH] kconfig: fix documentation typos
-Date: Mon, 13 Jan 2020 17:22:11 -0600
-Message-Id: <20200113232212.138327-1-helgaas@kernel.org>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:61739 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728682AbgANIFL (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Jan 2020 03:05:11 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200113064841.3946-1-masahiroy@kernel.org> <20200113064841.3946-4-masahiroy@kernel.org>
+ <7da5750c40489dcb6cd8eef0307ee8d8df2e134e.camel@decadent.org.uk>
+In-Reply-To: <7da5750c40489dcb6cd8eef0307ee8d8df2e134e.camel@decadent.org.uk>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 14 Jan 2020 17:04:09 +0900
+Message-ID: <CAK7LNAR3fL-RQM412LJmJD6v81JTJ+s0A5vcS4O=Y_=kNO4DUA@mail.gmail.com>
+Subject: Re: [PATCH 4/7] builddeb: avoid invoking sub-shells where possible
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Bjorn Helgaas <bhelgaas@google.com>
+Hi Ben,
 
-Fix a couple typos in kconfig-language documentation.
+On Tue, Jan 14, 2020 at 2:21 AM Ben Hutchings <ben@decadent.org.uk> wrote:
+> > +(
+> > +     cd $srctree
+> > +     find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
+> > +     find include scripts -type f -o -type l
+> > +     find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
+> > +     find arch/$SRCARCH -name include -type f
+>
+> This command is wrong.  We currently find all files under all
+> directories named "include" under arch/$SRCARCH.  (arc, arm and xtensa
+> have some per-platform include directories in additional to the per-
+> architecture include directory.)
+>
+> > +
+> > +     if [ -d arch/$SRCARCH/scripts ]; then
+> > +             find arch/$SRCARCH/scripts -type f
+> > +     fi
+> > +) > debian/hdrsrcfiles
+> > +
+> > +{
+> > +     if is_enabled CONFIG_STACK_VALIDATION; then
+> > +             find tools/objtool -type f -executable
+> > +     fi
+> > +
+> > +     find arch/$SRCARCH/include Module.symvers include scripts -type f
+> > +
+> > +     if is_enabled CONFIG_GCC_PLUGINS; then
+> > +             find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
+> > +     fi
+>
+> This is reverting patch 1.
+>
+> Ben.
 
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
----
- Documentation/kbuild/kconfig-language.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Thank you for catching these.
 
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index 74bef19f69f0..f547720bd82d 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -594,7 +594,7 @@ The two different resolutions for b) can be tested in the sample Kconfig file
- Documentation/kbuild/Kconfig.recursion-issue-02.
- 
- Below is a list of examples of prior fixes for these types of recursive issues;
--all errors appear to involve one or more select's and one or more "depends on".
-+all errors appear to involve one or more "selects" and one or more "depends on".
- 
- ============    ===================================
- commit          fix
-@@ -656,7 +656,7 @@ the use of the xconfig configurator [1]_. Work should be done to confirm if
- the deduced semantics matches our intended Kconfig design goals.
- 
- Having well defined semantics can be useful for tools for practical
--evaluation of depenencies, for instance one such use known case was work to
-+evaluation of dependencies, for instance one such case was work to
- express in boolean abstraction of the inferred semantics of Kconfig to
- translate Kconfig logic into boolean formulas and run a SAT solver on this to
- find dead code / features (always inactive), 114 dead features were found in
-@@ -683,7 +683,7 @@ abstraction the inferred semantics of Kconfig to translate Kconfig logic into
- boolean formulas and run a SAT solver on it [5]_. Another known related project
- is CADOS [6]_ (former VAMOS [7]_) and the tools, mainly undertaker [8]_, which
- has been introduced first with [9]_.  The basic concept of undertaker is to
--exract variability models from Kconfig, and put them together with a
-+extract variability models from Kconfig and put them together with a
- propositional formula extracted from CPP #ifdefs and build-rules into a SAT
- solver in order to find dead code, dead files, and dead symbols. If using a SAT
- solver is desirable on Kconfig one approach would be to evaluate repurposing
+I made a mistake somehow
+when I inserted the patch 1, and then
+rebased the others on top of it.
+
+I will fix it in v2.
+
+
 -- 
-2.25.0.rc1.283.g88dfdc4193-goog
+Best Regards
+Masahiro Yamada
