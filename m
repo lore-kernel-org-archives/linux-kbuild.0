@@ -1,68 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:61739 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728682AbgANIFL (ORCPT
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44120 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725956AbgANLIc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Jan 2020 03:05:11 -0500
-MIME-Version: 1.0
-References: <20200113064841.3946-1-masahiroy@kernel.org> <20200113064841.3946-4-masahiroy@kernel.org>
- <7da5750c40489dcb6cd8eef0307ee8d8df2e134e.camel@decadent.org.uk>
-In-Reply-To: <7da5750c40489dcb6cd8eef0307ee8d8df2e134e.camel@decadent.org.uk>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 14 Jan 2020 17:04:09 +0900
-Message-ID: <CAK7LNAR3fL-RQM412LJmJD6v81JTJ+s0A5vcS4O=Y_=kNO4DUA@mail.gmail.com>
-Subject: Re: [PATCH 4/7] builddeb: avoid invoking sub-shells where possible
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 14 Jan 2020 06:08:32 -0500
+Received: by mail-qk1-f193.google.com with SMTP id w127so11642402qkb.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 14 Jan 2020 03:08:31 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+From: Qian Cai <cai@lca.pw>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v4 01/10] kcsan: Add Kernel Concurrency Sanitizer infrastructure
+Date: Tue, 14 Jan 2020 06:08:29 -0500
+Message-Id: <53F6B915-AC53-41BB-BF32-33732515B3A0@lca.pw>
+References: <CANpmjNOC2PYFsE_TK2SYmKcHxyG+2arWc8x_fmeWPOMi0+ot8g@mail.gmail.com>
+In-Reply-To: <CANpmjNOC2PYFsE_TK2SYmKcHxyG+2arWc8x_fmeWPOMi0+ot8g@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-
-Hi Ben,
-
-On Tue, Jan 14, 2020 at 2:21 AM Ben Hutchings <ben@decadent.org.uk> wrote:
-> > +(
-> > +     cd $srctree
-> > +     find . arch/$SRCARCH -maxdepth 1 -name Makefile\*
-> > +     find include scripts -type f -o -type l
-> > +     find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
-> > +     find arch/$SRCARCH -name include -type f
->
-> This command is wrong.  We currently find all files under all
-> directories named "include" under arch/$SRCARCH.  (arc, arm and xtensa
-> have some per-platform include directories in additional to the per-
-> architecture include directory.)
->
-> > +
-> > +     if [ -d arch/$SRCARCH/scripts ]; then
-> > +             find arch/$SRCARCH/scripts -type f
-> > +     fi
-> > +) > debian/hdrsrcfiles
-> > +
-> > +{
-> > +     if is_enabled CONFIG_STACK_VALIDATION; then
-> > +             find tools/objtool -type f -executable
-> > +     fi
-> > +
-> > +     find arch/$SRCARCH/include Module.symvers include scripts -type f
-> > +
-> > +     if is_enabled CONFIG_GCC_PLUGINS; then
-> > +             find scripts/gcc-plugins -name \*.so -o -name gcc-common.h
-> > +     fi
->
-> This is reverting patch 1.
->
-> Ben.
-
-Thank you for catching these.
-
-I made a mistake somehow
-when I inserted the patch 1, and then
-rebased the others on top of it.
-
-I will fix it in v2.
+To: Marco Elver <elver@google.com>
+Cc: LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <Mark.Rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, Eric Dumazet <edumazet@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
 
 
--- 
-Best Regards
-Masahiro Yamada
+
+> On Jan 6, 2020, at 7:47 AM, Marco Elver <elver@google.com> wrote:
+>=20
+> Thanks, I'll look into KCSAN + lockdep compatibility. It's probably
+> missing some KCSAN_SANITIZE :=3D n in some Makefile.
+
+Can I have a update on fixing this? It looks like more of a problem that kcs=
+an_setup_watchpoint() will disable IRQs and then dive into the page allocato=
+r where it would complain because it might sleep.
+
+BTW, I saw Paul sent a pull request for 5.6 but it is ugly to have everybody=
+ could trigger a deadlock (sleep function called in atomic context) like thi=
+s during boot once this hits the mainline not to mention about only recently=
+ it is possible to test this feature (thanks to warning ratelimit) with the e=
+xisting debugging options because it was unable to boot due to the brokennes=
+s with debug_pagealloc as mentioned in this thread, so this does sounds like=
+ it needs more soak time for the mainline to me.
+
+0000000000000400
+[   13.416814][    T1] Call Trace:
+[   13.416814][    T1]  lock_is_held_type+0x66/0x160
+[   13.416814][    T1]  ___might_sleep+0xc1/0x1d0
+[   13.416814][    T1]  __might_sleep+0x5b/0xa0
+[   13.416814][    T1]  slab_pre_alloc_hook+0x7b/0xa0
+[   13.416814][    T1]  __kmalloc_node+0x60/0x300
+[   13.416814   T1]  ? alloc_cpumask_var_node+0x44/0x70
+[   13.416814][    T1]  ? topology_phys_to_logical_die+0x7e/0x180
+[   13.416814][    T1]  alloc_cpumask_var_node+0x44/0x70
+[   13.416814][    T1]  zalloc_cpumask_var+0x2a/0x40
+[   13.416814][    T1]  native_smp_prepare_cpus+0x246/0x425
+[   13.416814][    T1]  kernel_init_freeable+0x1b8/0x496
+[   13.416814][    T1]  ? rest_init+0x381/0x381
+[   13.416814][    T1]  kernel_init+0x18/0x17f
+[   13.416814][    T1]  ? rest_init+0x381/0x381
+[   13.416814][    T1]  ret_from_fork+0x3a/0x50
+[   13.416814][    T1] irq event stamp: 910
+[   13.416814][    T1] hardirqs last  enabled at (909): [<ffffffff8d1240f3>]=
+ _raw_write_unlock_irqrestore+0x53/0x57
+[   13.416814][    T1] hardirqs last disabled at (910): [<ffffffff8c8bba76>]=
+ kcsan_setup_watchpoint+0x96/0x460
+[   13.416814][    T1] softirqs last  enabled at (0): [<ffffffff8c6b697a>] c=
+opy_process+0x11fa/0x34f0
+[   13.416814][    T1] softirqs last disabled at (0): [<0000000000000000>] 0=
+x0
+[   13.416814][    T1] ---[ end trace 7d1df66da055aa92 ]---
+[   13.416814][    T1] possible reason: unannotated irqs-on.
+[   13.416814][ent stamp: 910
+[   13.416814][    T1] hardirqs last  enabled at (909): [<ffffffff8d1240f3>]=
+ _raw_write_unlock_irqrestore+0x53/0x57
+[   13.416814][    T1] hardirqs last disabled at (910): [<ffffffff8c8bba76>]=
+ kcsan_setup_watchpoint+0x96/0x460
+[   13.416814][    T1] softirqs last  enabled at (0): [<ffffffff8c6b697a>] c=
+opy_process+0x11fa/0x34f0
+[   13.416814][    T1] softirqs last disabled at (0): [<0000000000000000>] 0=
+x0=
