@@ -1,44 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48710 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726491AbgANWJH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Jan 2020 17:09:07 -0500
-Date: Tue, 14 Jan 2020 14:09:06 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-Subject: Re: [PATCH v4 01/10] kcsan: Add Kernel Concurrency Sanitizer
- infrastructure
-Message-ID: <20200114220906.GZ2935@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200114213405.GX2935@paulmck-ThinkPad-P72>
- <9970E373-DF70-4FE4-A839-AAE641612EC5@lca.pw>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9970E373-DF70-4FE4-A839-AAE641612EC5@lca.pw>
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33105 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730090AbgAOLxD (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 15 Jan 2020 06:53:03 -0500
+Received: by mail-wm1-f65.google.com with SMTP id d139so4587288wmd.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 15 Jan 2020 03:53:02 -0800 (PST)
+From: Ilie Halip <ilie.halip@gmail.com>
+Subject: [RFC PATCH] lib: move memcat_p.o to obj-y
+Date: Wed, 15 Jan 2020 13:52:49 +0200
+Message-Id: <20200115115249.27774-1-ilie.halip@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Qian Cai <cai@lca.pw>
-Cc: Marco Elver <elver@google.com>, LKMM Maintainers -- Akira Yokosawa <akiyks@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Alexander Potapenko <glider@google.com>, Andrea Parri <parri.andrea@gmail.com>, Andrey Konovalov <andreyknvl@google.com>, Andy Lutomirski <luto@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Daniel Axtens <dja@axtens.net>, Daniel Lustig <dlustig@nvidia.com>, Dave Hansen <dave.hansen@linux.intel.com>, David Howells <dhowells@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Jade Alglave <j.alglave@ucl.ac.uk>, Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Luc Maranget <luc.maranget@inria.fr>, Mark Rutland <Mark.Rutland@arm.com>, Nicholas Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, Eric Dumazet <edumazet@google.com>, kasan-dev <kasan-dev@googlegroups.com>, linux-arch <linux-arch@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, linux-efi@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, the arch/x86 maintainers <x86@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, clang-built-linux@googlegroups.com, Ilie Halip <ilie.halip@gmail.com>
 
-On Tue, Jan 14, 2020 at 04:48:22PM -0500, Qian Cai wrote:
-> 
-> 
-> > On Jan 14, 2020, at 4:34 PM, Paul E. McKenney <paulmck@kernel.org> wrote:
-> > 
-> > As an alternative, once the patches needed for your tests to pass
-> > reach mainline, you could announce that KCSAN was ready to be enabled
-> > in distros.
-> > 
-> > Though I confess that I don't know how that works.  Is there a separate
-> > testing kernel binary provided by the distros in question?
-> 
-> I don’t think I have powers to announce that. Once the feature hit the mainline, distro people could start to use in the debug kernel variant, and it is a shame to only find out it is broken. Anyway, I’ll try to edge out those corner cases. Stay tuned.
+The semantics of `--undefined` differ between ld.bfd and ld.lld:
+    $ echo | gcc -x c -c - -o a.o
+    $ echo "EXTERN(test)" > a.lds
+    $ ld.bfd a.o -t a.lds -o - 2>/dev/null && objdump -t | grep test
+    0000000000000000         *UND*      0000000000000000 test
+    $ ld.lld a.o -t a.lds -o - 2>/dev/null && objdump -t | grep test
+    $
 
-Very good, thank you!
+When building with CONFIG_STM=m, there are no in-kernel users of memcat_p()
+and ld.lld discards this symbol because it's linked in via --no-whole-archive.
+It's marked as undefined by a linker script but ld.lld discards it anyway (as
+seen in the above snippet).
 
-And you do have the power to announce.  But just like most of the rest
-of use, myself included, you won't always have the power to make people
-actually pay attention to what you say.  ;-)
+Work around the ld.lld behavior by moving the object file to obj-y.
 
-							Thanx, Paul
+Signed-off-by: Ilie Halip <ilie.halip@gmail.com>
+Link: https://github.com/ClangBuiltLinux/linux/issues/515
+---
+ lib/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 93217d44237f..eac343b81f77 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -30,7 +30,7 @@ lib-y := ctype.o string.o vsprintf.o cmdline.o \
+ 	 flex_proportions.o ratelimit.o show_mem.o \
+ 	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
+ 	 earlycpio.o seq_buf.o siphash.o dec_and_lock.o \
+-	 nmi_backtrace.o nodemask.o win_minmax.o memcat_p.o
++	 nmi_backtrace.o nodemask.o win_minmax.o
+ 
+ lib-$(CONFIG_PRINTK) += dump_stack.o
+ lib-$(CONFIG_MMU) += ioremap.o
+@@ -45,7 +45,7 @@ obj-y += bcd.o sort.o parser.o debug_locks.o random32.o \
+ 	 bsearch.o find_bit.o llist.o memweight.o kfifo.o \
+ 	 percpu-refcount.o rhashtable.o \
+ 	 once.o refcount.o usercopy.o errseq.o bucket_locks.o \
+-	 generic-radix-tree.o
++	 generic-radix-tree.o memcat_p.o
+ obj-$(CONFIG_STRING_SELFTEST) += test_string.o
+ obj-y += string_helpers.o
+ obj-$(CONFIG_TEST_STRING_HELPERS) += test-string_helpers.o
+
+base-commit: ee02f9544ebd8d38900dfe955710897b99483686
+-- 
+2.17.1
