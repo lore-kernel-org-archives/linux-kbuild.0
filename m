@@ -1,58 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from jack.einval.com ([84.45.184.145]:37052 "EHLO mail.einval.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726483AbgAOQZy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Jan 2020 11:25:54 -0500
-From: Steve McIntyre <steve.mcintyre@linaro.org>
-Subject: Re: [RFC PATCH 0/3] Add device tree build information
-In-Reply-To: <20200113181625.3130-1-alexandre.torgue@st.com>
-Message-Id: <E1irl1W-00082F-CF@mail.einval.com>
-Date: Wed, 15 Jan 2020 15:56:02 +0000
+Received: from conuserg-07.nifty.com ([210.131.2.74]:58428 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726483AbgAOQ0L (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 15 Jan 2020 11:26:11 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH v2 2/7] builddeb: match temporary directory name to the package name
+Date: Thu, 16 Jan 2020 01:25:24 +0900
+Message-Id: <20200115162529.11089-2-masahiroy@kernel.org>
+In-Reply-To: <20200115162529.11089-1-masahiroy@kernel.org>
+References: <20200115162529.11089-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: alexandre.torgue@st.com
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Hi Alexandre!
+The temporary directory names, debian/hdrtmp (linux-headers package)
+vs debian/headertmp (linux-libc-dev package), are confusing.
 
-alexandre.torgue@st.com wrote:
->
->The goal of this series is to add device tree build information in dtb.
->This information can be dtb build date, where devicetree files come from,
->who built the dtb ... Actually, same kind of information that you can find
->in the Linux banner which is printout during kernel boot. Having the same
->kind of information for device tree is useful for debugging and maintenance.
->
->To achieve that a new option "-B" (using an argument) is added to dtc. 
->The argument is a file containing a string with build information
->(e.g., From Linux 5.5.0-rc1 by alex the Mon Jan 13 18:25:38 CET 2020).
->DTC use it to append dts file with a new string property "Build-info".
->
->of/fdt.c is modified to printout "Build-info" property during Kernel boot and 
->scripts/Makefile.lib is modified to use dtc -B option during kernel make (this
->last part could be improved for sure).
->
->Regards
->Alex
->
->Alexandre Torgue (3):
->  dtc: Add dtb build information option
->  of: fdt: print dtb build information
->  scripts: Use -B dtc option to generate dtb build information.
->
-> drivers/of/fdt.c           |  9 +++++++
-> scripts/Makefile.lib       | 11 +++++---
-> scripts/dtc/dtc.c          | 55 +++++++++++++++++++++++++++++++++-----
-> scripts/gen_dtb_build_info | 11 ++++++++
-> 4 files changed, 76 insertions(+), 10 deletions(-)
-> create mode 100755 scripts/gen_dtb_build_info
+Matching the directory name to the package name is clearer, IMHO.
 
-Looks good to me in testing here:
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-[    0.000000] OF: fdt: From Linux 5.5.0-rc6-00031-g95e20af9fb9c-dirty by stemci01 the Wed 15 Jan 14:33:25 GMT 2020.
+Changes in v2: None
 
-Tested-By: Steve McIntyre <steve.mcintyre@linaro.org>
+ scripts/package/builddeb | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index eb067d6f1370..0a0a7c1447f4 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -47,10 +47,10 @@ create_package() {
+ }
+ 
+ version=$KERNELRELEASE
+-tmpdir="$objtree/debian/tmp"
+-kernel_headers_dir="$objtree/debian/hdrtmp"
+-libc_headers_dir="$objtree/debian/headertmp"
+-dbg_dir="$objtree/debian/dbgtmp"
++tmpdir="$objtree/debian/linux-image"
++kernel_headers_dir="$objtree/debian/linux-headers"
++libc_headers_dir="$objtree/debian/linux-libc-dev"
++dbg_dir="$objtree/debian/linux-image-dbg"
+ packagename=linux-image-$version
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
 -- 
-Steve McIntyre                                steve.mcintyre@linaro.org
-<http://www.linaro.org/> Linaro.org | Open source software for ARM SoCs
+2.17.1
