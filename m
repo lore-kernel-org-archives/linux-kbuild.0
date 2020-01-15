@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:58519 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:58809 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbgAOQ0Q (ORCPT
+        with ESMTP id S1726165AbgAOQ0c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Jan 2020 11:26:16 -0500
+        Wed, 15 Jan 2020 11:26:32 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 3/7] builddeb: remove redundant $objtree/
-Date: Thu, 16 Jan 2020 01:25:25 +0900
-Message-Id: <20200115162529.11089-3-masahiroy@kernel.org>
+Subject: [PATCH v2 7/7] builddeb: split libc headers deployment out into a function
+Date: Thu, 16 Jan 2020 01:25:29 +0900
+Message-Id: <20200115162529.11089-7-masahiroy@kernel.org>
 In-Reply-To: <20200115162529.11089-1-masahiroy@kernel.org>
 References: <20200115162529.11089-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,80 +15,84 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-This script works only when it is invoked in the $objtree, that is,
-it is already relying on $objtree is '.'
+Deploy user-space headers (linux-libc-dev package) in a separate
+function for readability.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/package/builddeb | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ scripts/package/builddeb | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 0a0a7c1447f4..9b92745bf13a 100755
+index d149452692da..f49f41fd4c95 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -47,10 +47,10 @@ create_package() {
+@@ -88,12 +88,25 @@ deploy_kernel_headers () {
+ 	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
  }
  
++deploy_libc_headers () {
++	pdir=$1
++
++	rm -rf $pdir
++
++	$MAKE -f $srctree/Makefile headers
++	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH=$pdir/usr
++
++	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
++	# used by Debian-based distros (to support multi-arch)
++	host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
++	mkdir $pdir/usr/include/$host_arch
++	mv $pdir/usr/include/asm $pdir/usr/include/$host_arch/
++}
++
  version=$KERNELRELEASE
--tmpdir="$objtree/debian/linux-image"
--kernel_headers_dir="$objtree/debian/linux-headers"
--libc_headers_dir="$objtree/debian/linux-libc-dev"
--dbg_dir="$objtree/debian/linux-image-dbg"
-+tmpdir=debian/linux-image
-+kernel_headers_dir=debian/linux-headers
-+libc_headers_dir=debian/linux-libc-dev
-+dbg_dir=debian/linux-image-dbg
+ tmpdir=debian/linux-image
+-libc_headers_dir=debian/linux-libc-dev
+ dbg_dir=debian/linux-image-dbg
  packagename=linux-image-$version
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-@@ -77,7 +77,7 @@ esac
+-libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ 
+ if [ "$ARCH" = "um" ] ; then
+@@ -117,7 +130,7 @@ esac
  BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
  
  # Setup the directory structure
--rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
-+rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" debian/files
+-rm -rf "$tmpdir" "$libc_headers_dir" "$dbg_dir" debian/files
++rm -rf "$tmpdir" "$dbg_dir" debian/files
  mkdir -m 755 -p "$tmpdir/DEBIAN"
  mkdir -p "$tmpdir/lib" "$tmpdir/boot"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
-@@ -165,24 +165,24 @@ EOF
- done
  
- # Build kernel header package
--(cd $srctree; find . arch/$SRCARCH -maxdepth 1 -name Makefile\*) > "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find include scripts -type f -o -type l) >> "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
-+(cd $srctree; find . arch/$SRCARCH -maxdepth 1 -name Makefile\*) > debian/hdrsrcfiles
-+(cd $srctree; find include scripts -type f -o -type l) >> debian/hdrsrcfiles
-+(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> debian/hdrsrcfiles
-+(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> debian/hdrsrcfiles
- if is_enabled CONFIG_STACK_VALIDATION; then
--	echo tools/objtool/objtool >> "$objtree/debian/hdrobjfiles"
-+	echo tools/objtool/objtool >> debian/hdrobjfiles
+@@ -167,16 +180,6 @@ if is_enabled CONFIG_MODULES; then
+ 	fi
  fi
--(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
-+find arch/$SRCARCH/include Module.symvers include scripts -type f >> debian/hdrobjfiles
- if is_enabled CONFIG_GCC_PLUGINS; then
--	(cd $objtree; find scripts/gcc-plugins -name \*.so) >> "$objtree/debian/hdrobjfiles"
-+	find scripts/gcc-plugins -name \*.so >> debian/hdrobjfiles
- fi
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
--(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
--(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
--(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
-+(cd $srctree; tar -c -f - -T -) < debian/hdrsrcfiles | (cd $destdir; tar -xf -)
-+tar -c -f - -T - < debian/hdrobjfiles | (cd $destdir; tar -xf -)
-+cp $KCONFIG_CONFIG $destdir/.config # copy .config manually to be where it's expected to be
- ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
--rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
-+rm -f debian/hdrsrcfiles debian/hdrobjfiles
  
- if [ "$ARCH" != "um" ]; then
- 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+-if [ "$ARCH" != "um" ]; then
+-	$MAKE -f $srctree/Makefile headers
+-	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
+-	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
+-	# used by Debian-based distros (to support multi-arch)
+-	host_arch=$(dpkg-architecture -a$(cat debian/arch) -qDEB_HOST_MULTIARCH)
+-	mkdir $libc_headers_dir/usr/include/$host_arch
+-	mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
+-fi
+-
+ # Install the maintainer scripts
+ # Note: hook scripts under /etc/kernel are also executed by official Debian
+ # kernel packages, as well as kernel packages built using make-kpkg.
+@@ -206,7 +209,8 @@ if [ "$ARCH" != "um" ]; then
+ 	deploy_kernel_headers debian/linux-headers
+ 	create_package linux-headers-$version debian/linux-headers
+ 
+-	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	deploy_libc_headers debian/linux-libc-dev
++	create_package linux-libc-dev debian/linux-libc-dev
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
 -- 
 2.17.1
