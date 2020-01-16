@@ -1,84 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58100 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:38776 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390778AbgAPRYH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:24:07 -0500
+        id S1731675AbgAPQyT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:54:19 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 059/371] kbuild: mark prepare0 as PHONY to fix external module build
-Date: Thu, 16 Jan 2020 12:18:51 -0500
-Message-Id: <20200116172403.18149-2-sashal@kernel.org>
-In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
-References: <20200116172403.18149-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 186/205] bpf: Force .BTF section start to zero when dumping from vmlinux
+Date: Thu, 16 Jan 2020 11:42:41 -0500
+Message-Id: <20200116164300.6705-186-sashal@kernel.org>
+In-Reply-To: <20200116164300.6705-1-sashal@kernel.org>
+References: <20200116164300.6705-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Samuel Holland <samuel@sholland.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Stanislav Fomichev <sdf@google.com>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andriin@fb.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+From: Stanislav Fomichev <sdf@google.com>
 
-[ Upstream commit e00d8880481497474792d28c14479a9fb6752046 ]
+[ Upstream commit df786c9b947639aedbc7bb44b5dae2a7824af360 ]
 
-Commit c3ff2a5193fa ("powerpc/32: add stack protector support")
-caused kernel panic on PowerPC when an external module is used with
-CONFIG_STACKPROTECTOR because the 'prepare' target was not executed
-for the external module build.
+While trying to figure out why fentry_fexit selftest doesn't pass for me
+(old pahole, broken BTF), I found out that my latest patch can break vmlinux
+.BTF generation. objcopy preserves section start when doing --only-section,
+so there is a chance (depending on where pahole inserts .BTF section) to
+have leading empty zeroes. Let's explicitly force section offset to zero.
 
-Commit e07db28eea38 ("kbuild: fix single target build for external
-module") turned it into a build error because the 'prepare' target is
-now executed but the 'prepare0' target is missing for the external
-module build.
+Before:
 
-External module on arm/arm64 with CONFIG_STACKPROTECTOR_PER_TASK is
-also broken in the same way.
+$ objcopy --set-section-flags .BTF=alloc -O binary \
+	--only-section=.BTF vmlinux .btf.vmlinux.bin
+$ xxd .btf.vmlinux.bin | head -n1
+00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 
-Move 'PHONY += prepare0' to the common place. GNU Make is fine with
-missing rule for phony targets. I also removed the comment which is
-wrong irrespective of this commit.
+After:
 
-I minimize the change so it can be easily backported to 4.20.x
+$ objcopy --change-section-address .BTF=0 \
+	--set-section-flags .BTF=alloc -O binary \
+	--only-section=.BTF vmlinux .btf.vmlinux.bin
+$ xxd .btf.vmlinux.bin | head -n1
+00000000: 9feb 0100 1800 0000 0000 0000 80e1 1c00  ................
+          ^BTF magic
 
-To fix v4.20, please backport e07db28eea38 ("kbuild: fix single target
-build for external module"), and then this commit.
+As part of this change, I'm also dropping '2>/dev/null' from objcopy
+invocation to be able to catch possible other issues (objcopy doesn't
+produce any warnings for me anymore, it did before with --dump-section).
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=201891
-Fixes: e07db28eea38 ("kbuild: fix single target build for external module")
-Fixes: c3ff2a5193fa ("powerpc/32: add stack protector support")
-Fixes: 189af4657186 ("ARM: smp: add support for per-task stack canaries")
-Fixes: 0a1213fa7432 ("arm64: enable per-task stack canaries")
-Cc: linux-stable <stable@vger.kernel.org> # v4.20
-Reported-by: Samuel Holland <samuel@sholland.org>
-Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Fixes: da5fb18225b4 ("bpf: Support pre-2.25-binutils objcopy for vmlinux BTF")
+Signed-off-by: Stanislav Fomichev <sdf@google.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Acked-by: John Fastabend <john.fastabend@gmail.com>
+Cc: Andrii Nakryiko <andriin@fb.com>
+Link: https://lore.kernel.org/bpf/20191127225759.39923-1-sdf@google.com
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/link-vmlinux.sh | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 166e18aa9ca9..4560f763ad11 100644
---- a/Makefile
-+++ b/Makefile
-@@ -971,6 +971,7 @@ ifdef CONFIG_STACK_VALIDATION
-   endif
- endif
- 
-+PHONY += prepare0
- 
- ifeq ($(KBUILD_EXTMOD),)
- core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-@@ -1065,8 +1066,7 @@ include/config/kernel.release: include/config/auto.conf FORCE
- # archprepare is used in arch Makefiles and when processed asm symlink,
- # version.h and scripts_basic is processed / created.
- 
--# Listed in dependency order
--PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
-+PHONY += prepare archprepare prepare1 prepare2 prepare3
- 
- # prepare3 is used to check if we are building in a separate output directory,
- # and if so do:
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 2998ddb323e3..436379940356 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -127,8 +127,9 @@ gen_btf()
+ 		cut -d, -f1 | cut -d' ' -f2)
+ 	bin_format=$(LANG=C ${OBJDUMP} -f ${1} | grep 'file format' | \
+ 		awk '{print $4}')
+-	${OBJCOPY} --set-section-flags .BTF=alloc -O binary \
+-		--only-section=.BTF ${1} .btf.vmlinux.bin 2>/dev/null
++	${OBJCOPY} --change-section-address .BTF=0 \
++		--set-section-flags .BTF=alloc -O binary \
++		--only-section=.BTF ${1} .btf.vmlinux.bin
+ 	${OBJCOPY} -I binary -O ${bin_format} -B ${bin_arch} \
+ 		--rename-section .data=.BTF .btf.vmlinux.bin ${2}
+ }
 -- 
 2.20.1
