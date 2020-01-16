@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48880 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:58100 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387562AbgAPQ7s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:59:48 -0500
+        id S2390778AbgAPRYH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:24:07 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 119/671] kbuild: mark prepare0 as PHONY to fix external module build
-Date: Thu, 16 Jan 2020 11:50:28 -0500
-Message-Id: <20200116165940.10720-2-sashal@kernel.org>
-In-Reply-To: <20200116165940.10720-1-sashal@kernel.org>
-References: <20200116165940.10720-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 059/371] kbuild: mark prepare0 as PHONY to fix external module build
+Date: Thu, 16 Jan 2020 12:18:51 -0500
+Message-Id: <20200116172403.18149-2-sashal@kernel.org>
+In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
+References: <20200116172403.18149-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -59,10 +59,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 3b836cc8b22d..bf77bc0b92d9 100644
+index 166e18aa9ca9..4560f763ad11 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -964,6 +964,7 @@ ifdef CONFIG_STACK_VALIDATION
+@@ -971,6 +971,7 @@ ifdef CONFIG_STACK_VALIDATION
    endif
  endif
  
@@ -70,7 +70,7 @@ index 3b836cc8b22d..bf77bc0b92d9 100644
  
  ifeq ($(KBUILD_EXTMOD),)
  core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-@@ -1072,8 +1073,7 @@ scripts: scripts_basic asm-generic gcc-plugins $(autoksyms_h)
+@@ -1065,8 +1066,7 @@ include/config/kernel.release: include/config/auto.conf FORCE
  # archprepare is used in arch Makefiles and when processed asm symlink,
  # version.h and scripts_basic is processed / created.
  
