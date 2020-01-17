@@ -1,59 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58102 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727043AbgAQQSa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Jan 2020 11:18:30 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-Subject: [PATCH v2] kconfig: fix documentation typos
-Date: Fri, 17 Jan 2020 10:18:22 -0600
-Message-Id: <20200117161822.106635-1-helgaas@kernel.org>
+Received: from conuserg-08.nifty.com ([210.131.2.75]:20894 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbgAQRQG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Jan 2020 12:16:06 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: use -S instead of -E for precise cc-option test in Kconfig
+Date: Sat, 18 Jan 2020 02:14:35 +0900
+Message-Id: <20200117171435.11591-1-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-From: Bjorn Helgaas <bhelgaas@google.com>
+Currently, -E (stop after the preprocessing stage) is used to check
+whether the given compiler flag is supported.
 
-Fix a couple typos in kconfig-language documentation.
+While it is faster than -S (or -c), it can be false-positive. You need
+to run the compilation proper to check the flag more precisely.
 
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+For example, when testing "--param asan-instrument-allocas=1", my gcc
+gives a different result for -E vs -S.
+
+$ gcc -Werror --param asan-instrument-allocas=1 -E -x c /dev/null -o /dev/null
+$ echo $?
+0
+
+$ gcc -Werror --param asan-instrument-allocas=1 -S -x c /dev/null -o /dev/null
+cc1: error: invalid --param name ‘asan-instrument-allocas’; did you mean ‘asan-instrument-writes’?
+$ echo $?
+1
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- Documentation/kbuild/kconfig-language.rst | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index 74bef19f69f0..0148ae82446e 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -594,7 +594,8 @@ The two different resolutions for b) can be tested in the sample Kconfig file
- Documentation/kbuild/Kconfig.recursion-issue-02.
+ scripts/Kconfig.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+index d4adfbe42690..bfb44b265a94 100644
+--- a/scripts/Kconfig.include
++++ b/scripts/Kconfig.include
+@@ -25,7 +25,7 @@ failure = $(if-success,$(1),n,y)
  
- Below is a list of examples of prior fixes for these types of recursive issues;
--all errors appear to involve one or more select's and one or more "depends on".
-+all errors appear to involve one or more "select" statements and one or more
-+"depends on".
+ # $(cc-option,<flag>)
+ # Return y if the compiler supports <flag>, n otherwise
+-cc-option = $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c /dev/null -o /dev/null)
++cc-option = $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -S -x c /dev/null -o /dev/null)
  
- ============    ===================================
- commit          fix
-@@ -656,7 +657,7 @@ the use of the xconfig configurator [1]_. Work should be done to confirm if
- the deduced semantics matches our intended Kconfig design goals.
- 
- Having well defined semantics can be useful for tools for practical
--evaluation of depenencies, for instance one such use known case was work to
-+evaluation of dependencies, for instance one such case was work to
- express in boolean abstraction of the inferred semantics of Kconfig to
- translate Kconfig logic into boolean formulas and run a SAT solver on this to
- find dead code / features (always inactive), 114 dead features were found in
-@@ -683,7 +684,7 @@ abstraction the inferred semantics of Kconfig to translate Kconfig logic into
- boolean formulas and run a SAT solver on it [5]_. Another known related project
- is CADOS [6]_ (former VAMOS [7]_) and the tools, mainly undertaker [8]_, which
- has been introduced first with [9]_.  The basic concept of undertaker is to
--exract variability models from Kconfig, and put them together with a
-+extract variability models from Kconfig and put them together with a
- propositional formula extracted from CPP #ifdefs and build-rules into a SAT
- solver in order to find dead code, dead files, and dead symbols. If using a SAT
- solver is desirable on Kconfig one approach would be to evaluate repurposing
+ # $(ld-option,<flag>)
+ # Return y if the linker supports <flag>, n otherwise
 -- 
-2.25.0.341.g760bfbb309-goog
+2.17.1
