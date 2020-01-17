@@ -1,91 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33083 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727023AbgAQEHg (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Jan 2020 23:07:36 -0500
+Received: from foss.arm.com ([217.140.110.172]:39904 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726885AbgAQLd4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Jan 2020 06:33:56 -0500
+Date: Fri, 17 Jan 2020 11:33:51 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 14/16] kconfig: Add support for 'as-option'
+Message-ID: <20200117113351.GF26090@arrakis.emea.arm.com>
+References: <1576486038-9899-1-git-send-email-amit.kachhap@arm.com>
+ <1576486038-9899-15-git-send-email-amit.kachhap@arm.com>
 MIME-Version: 1.0
-References: <20200113232212.138327-1-helgaas@kernel.org> <CAK7LNASYynBVaaGROEjy1PC7+9xatO7gf2LTRGG1UOpiXtzENw@mail.gmail.com>
-In-Reply-To: <CAK7LNASYynBVaaGROEjy1PC7+9xatO7gf2LTRGG1UOpiXtzENw@mail.gmail.com>
-Reply-To: bjorn@helgaas.com
-From: Bjorn Helgaas <bjorn.helgaas@gmail.com>
-Date: Thu, 16 Jan 2020 22:07:24 -0600
-Message-ID: <CABhMZUVjx-z51FkCNPTKzP3=8m4CBM3cp57ZvMBcMXTfA6ARKw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix documentation typos
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1576486038-9899-15-git-send-email-amit.kachhap@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Randy Dunlap <rdunlap@infradead.org>
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>, Vincenzo Frascino <Vincenzo.Frascino@arm.com>, Mark Brown <Mark.Brown@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 8:18 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> On Tue, Jan 14, 2020 at 8:22 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> >
-> > From: Bjorn Helgaas <bhelgaas@google.com>
-> >
-> > Fix a couple typos in kconfig-language documentation.
-> >
-> > Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
-> > ---
-> >  Documentation/kbuild/kconfig-language.rst | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-> > index 74bef19f69f0..f547720bd82d 100644
-> > --- a/Documentation/kbuild/kconfig-language.rst
-> > +++ b/Documentation/kbuild/kconfig-language.rst
-> > @@ -594,7 +594,7 @@ The two different resolutions for b) can be tested in the sample Kconfig file
-> >  Documentation/kbuild/Kconfig.recursion-issue-02.
-> >
-> >  Below is a list of examples of prior fixes for these types of recursive issues;
-> > -all errors appear to involve one or more select's and one or more "depends on".
-> > +all errors appear to involve one or more "selects" and one or more "depends on".
->
->
-> I think "selects" is strange here.
->
-> "select" is a Kconfig keyword.
-> select's is intentional, I guess.
->
->
-> Keep it as-is, or perhaps change it into "select" (singular) ?
+On Mon, Dec 16, 2019 at 02:17:16PM +0530, Amit Daniel Kachhap wrote:
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> index d4adfbe..cc465dd 100644
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -31,6 +31,10 @@ cc-option = $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c /dev/null -o /de
+>  # Return y if the linker supports <flag>, n otherwise
+>  ld-option = $(success,$(LD) -v $(1))
+>  
+> +# $(as-option,<flag>)
+> +# Return y if the assembler supports <flag>, n otherwise
+> +as-option = $(success, $(CC) $(CLANG_FLAGS) $(1) -E -x assembler /dev/null -o /dev/null)
 
-With rare exceptions, apostrophes are not used to form a plural noun.
+I had different experiments with this for MTE and noticed that clang
+does not honour the -Wa, option (which you use in a subsequent patch).
+So not sure how useful as-option is.
 
-Maybe it could be recast as "... at least one 'select' attribute and
-at least one 'depends on' attribute"?
-
-I'm not quite sure what the intended meaning is, because the table it
-refers to has lines that contain only "depends on" (without "select")
-and also lines that contain only "select" (no "depends on").
-
-
-> >  ============    ===================================
-> >  commit          fix
-> > @@ -656,7 +656,7 @@ the use of the xconfig configurator [1]_. Work should be done to confirm if
-> >  the deduced semantics matches our intended Kconfig design goals.
-> >
-> >  Having well defined semantics can be useful for tools for practical
-> > -evaluation of depenencies, for instance one such use known case was work to
-> > +evaluation of dependencies, for instance one such case was work to
-> >  express in boolean abstraction of the inferred semantics of Kconfig to
-> >  translate Kconfig logic into boolean formulas and run a SAT solver on this to
-> >  find dead code / features (always inactive), 114 dead features were found in
-> > @@ -683,7 +683,7 @@ abstraction the inferred semantics of Kconfig to translate Kconfig logic into
-> >  boolean formulas and run a SAT solver on it [5]_. Another known related project
-> >  is CADOS [6]_ (former VAMOS [7]_) and the tools, mainly undertaker [8]_, which
-> >  has been introduced first with [9]_.  The basic concept of undertaker is to
-> > -exract variability models from Kconfig, and put them together with a
-> > +extract variability models from Kconfig and put them together with a
-> >  propositional formula extracted from CPP #ifdefs and build-rules into a SAT
-> >  solver in order to find dead code, dead files, and dead symbols. If using a SAT
-> >  solver is desirable on Kconfig one approach would be to evaluate repurposing
-> > --
-> > 2.25.0.rc1.283.g88dfdc4193-goog
-> >
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+-- 
+Catalin
