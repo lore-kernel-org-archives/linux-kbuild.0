@@ -1,125 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:26656 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728512AbgAQPLu (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Jan 2020 10:11:50 -0500
-Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
-References: <20200113181625.3130-1-alexandre.torgue@st.com>
- <20200113181625.3130-2-alexandre.torgue@st.com>
- <20200116005741.GB54439@umbus> <d2594b79-a45d-dcac-3642-90016a1408b8@st.com>
- <20200117090937.GU54439@umbus>
- <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
-From: Alexandre Torgue <alexandre.torgue@st.com>
-Message-ID: <c78545d9-cd91-9b18-2b85-07ce5f87ca04@st.com>
-Date: Fri, 17 Jan 2020 16:11:19 +0100
+Received: from mail.kernel.org ([198.145.29.99]:58102 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727043AbgAQQSa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Jan 2020 11:18:30 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+Subject: [PATCH v2] kconfig: fix documentation typos
+Date: Fri, 17 Jan 2020 10:18:22 -0600
+Message-Id: <20200117161822.106635-1-helgaas@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Simon Glass <sjg@chromium.org>, devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Devicetree Compiler <devicetree-compiler@vger.kernel.org>, Steve McIntyre <steve.mcintyre@linaro.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
 
-David, Rob,
+From: Bjorn Helgaas <bhelgaas@google.com>
 
-On 1/17/20 3:43 PM, Rob Herring wrote:
-> On Fri, Jan 17, 2020 at 6:26 AM David Gibson
-> <david@gibson.dropbear.id.au> wrote:
->>
->> On Thu, Jan 16, 2020 at 09:58:23AM +0100, Alexandre Torgue wrote:
->>> Hi David
->>>
->>> On 1/16/20 1:57 AM, David Gibson wrote:
->>>> On Mon, Jan 13, 2020 at 07:16:23PM +0100, Alexandre Torgue wrote:
->>>>> This commit adds the possibility to add build information for a DTB.
->>>>> Build information can be: build date, DTS version, "who built the DTB"
->>>>> (same kind of information that we get in Linux with the Linux banner).
->>>>>
->>>>> To do this, an extra option "-B" using an information file as argument
->>>>> has been added. If this option is used, input device tree is appended with
->>>>> a new string property "Build-info". This property is built with information
->>>>> found in information file given as argument. This file has to be generated
->>>>> by user and shouldn't exceed 256 bytes.
->>>>>
->>>>> Signed-off-by: Alexandre Torgue <alexandre.torgue@st.com>
->>>>
->>>> At the very least, this patch of the series will need to be sent to
->>>> upstream dtc first.
->>>
->>> Ok sorry. I thought that sending all the series would give more
->>> information.
->>
->> That's fair enough, but in order to merge, you'll need to post against
->> upstream dtc.
+Fix a couple typos in kconfig-language documentation.
 
-ok
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+ Documentation/kbuild/kconfig-language.rst | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
->>
->>>> I'm also not terribly clear on what you're trying to accomplish here,
->>>> and why it's useful.
->>>
->>> Let's take Kernel boot at example (but could be extend to other DTB "users"
->>> like U-Boot). When Linux kernel booting we get a log that gives useful
->>> information about kernel image: source version, build date, people who built
->>> the kernel image, compiler version. This information is useful for debug and
->>> support. The aim is to get same kind of information but for the DTB.
->>>
->>>> Since you're doing this specifically for use with dtbs built in the
->>>> kernel build, could you just use a:
->>>>      Build-info = /incbin/ "build-info.txt";
->>>> in each of the in-kernel .dts files?
->>>
->>> My first idea was to not modify all existing .dts files. Adding an extra
->>> option in dtc is (for me) the softer way to do it. I mean, compile
->>> information should come through compiler without modify .dts files outside
->>> from dtc. In this way it will be easy to everybody using dtc (inside our
->>> outside Linux tree) to add dtb build info (even if they don't how to write a
->>> dts file).
->>
->> But you're not really having this information coming from the
->> compiler.  Instead you're adding a compiler option that just force
->> includes another file into the generated tree, and it's up to your
->> build scripts to put something useful into that file.
->>
->> I don't really see that as preferable to modifying the .dts files.
-
-I agree. I took example on kernel version info. It doesn't come from gcc 
-but from auto-generated file. I thought it was the easier way to 
-process. But I understand your concerns. As it is not generated by dtc 
-itself, dtc should not be modified.
-
->>
->> I also dislike the fact that the option as proposed is much more
->> general than the name suggests, but also very similar too, but much
->> more specific than the existing /incbin/ option.
->>
->> What might be better would be to have a dtc option which force appends
->> an extra .dts to the mail .dts compiled.  You can then put an overlay
->> template in that file, something like:
->>
->> &{/} {
->>          linux,build-info = /incbin/ "build-info.txt;
->> }
-> 
-> I like this suggestion either as an include another dts file or an
-> overlay. The latter could be useful as a way to maintain current dtb
-> files while splitting the source files into base and overlay dts
-> files.
-
-First suggestion will imply to modify an huge part of dts file (not a 
-big modification but a lot :)).
-Second one (dtbo) sounds good. In this case this dtso will be created 
-from build-info.txt and applied when dtb is built. So no impacts on 
-current dts file. I'm right ?
-
-Alex
-
-> 
-> But no, let's not prepend this with 'linux'. It's not a property
-> specific for Linux to consume.
-> 
-> Rob
-> 
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index 74bef19f69f0..0148ae82446e 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -594,7 +594,8 @@ The two different resolutions for b) can be tested in the sample Kconfig file
+ Documentation/kbuild/Kconfig.recursion-issue-02.
+ 
+ Below is a list of examples of prior fixes for these types of recursive issues;
+-all errors appear to involve one or more select's and one or more "depends on".
++all errors appear to involve one or more "select" statements and one or more
++"depends on".
+ 
+ ============    ===================================
+ commit          fix
+@@ -656,7 +657,7 @@ the use of the xconfig configurator [1]_. Work should be done to confirm if
+ the deduced semantics matches our intended Kconfig design goals.
+ 
+ Having well defined semantics can be useful for tools for practical
+-evaluation of depenencies, for instance one such use known case was work to
++evaluation of dependencies, for instance one such case was work to
+ express in boolean abstraction of the inferred semantics of Kconfig to
+ translate Kconfig logic into boolean formulas and run a SAT solver on this to
+ find dead code / features (always inactive), 114 dead features were found in
+@@ -683,7 +684,7 @@ abstraction the inferred semantics of Kconfig to translate Kconfig logic into
+ boolean formulas and run a SAT solver on it [5]_. Another known related project
+ is CADOS [6]_ (former VAMOS [7]_) and the tools, mainly undertaker [8]_, which
+ has been introduced first with [9]_.  The basic concept of undertaker is to
+-exract variability models from Kconfig, and put them together with a
++extract variability models from Kconfig and put them together with a
+ propositional formula extracted from CPP #ifdefs and build-rules into a SAT
+ solver in order to find dead code, dead files, and dead symbols. If using a SAT
+ solver is desirable on Kconfig one approach would be to evaluate repurposing
+-- 
+2.25.0.341.g760bfbb309-goog
