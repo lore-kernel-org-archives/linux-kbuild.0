@@ -1,56 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55221 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726982AbgATSSG (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44418 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbgATS3F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Jan 2020 13:18:06 -0500
-Received: by mail-wm1-f65.google.com with SMTP id b19so278900wmj.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Jan 2020 10:18:04 -0800 (PST)
-Date: Mon, 20 Jan 2020 18:17:14 +0000
+        Mon, 20 Jan 2020 13:29:05 -0500
+Received: by mail-wr1-f65.google.com with SMTP id q10so460722wrm.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Jan 2020 10:29:04 -0800 (PST)
+Date: Mon, 20 Jan 2020 18:28:46 +0000
 From: Steve McIntyre <steve.mcintyre@linaro.org>
-Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
-Message-ID: <20200120181708.GN3697@linaro.org>
+Subject: Re: [RFC PATCH 0/3] Add device tree build information
+Message-ID: <20200120182837.GO3697@linaro.org>
 References: <20200113181625.3130-1-alexandre.torgue@st.com>
- <20200113181625.3130-2-alexandre.torgue@st.com>
- <20200116005741.GB54439@umbus>
- <d2594b79-a45d-dcac-3642-90016a1408b8@st.com>
- <20200117090937.GU54439@umbus>
- <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
+ <f21ad44d-f119-2035-b4ee-16b3619879af@gmail.com>
+ <233e0a5f-d38f-908c-5ca7-66ee87d0fcae@st.com>
+ <7cfd0bc0-13fd-98ea-9bfd-6cfbbfd77b6d@gmail.com>
+ <220e3aea-b273-417a-69c9-059236c888af@st.com>
+ <a1233cd8-e73a-82d7-74bf-69109d1a0a07@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
+In-Reply-To: <a1233cd8-e73a-82d7-74bf-69109d1a0a07@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexandre Torgue <alexandre.torgue@st.com>, Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Simon Glass <sjg@chromium.org>, devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Devicetree Compiler <devicetree-compiler@vger.kernel.org>
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@st.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 08:43:23AM -0600, Rob Herring wrote:
->On Fri, Jan 17, 2020 at 6:26 AM David Gibson
-><david@gibson.dropbear.id.au> wrote:
+Hi Frank!
+
+Thanks for the link back to the previous discussion, it's very
+helpful.
+
+On Mon, Jan 20, 2020 at 10:14:22AM -0600, Frank Rowand wrote:
+>On 1/20/20 4:56 AM, Alexandre Torgue wrote:
 
 ...
 
->> What might be better would be to have a dtc option which force appends
->> an extra .dts to the mail .dts compiled.  You can then put an overlay
->> template in that file, something like:
->>
->> &{/} {
->>         linux,build-info = /incbin/ "build-info.txt;
->> }
+>> and the date). There are no "dtb versions", and "absolute/relative"
+>> path which created concerns. One remaining concern is "reproducible
 >
->I like this suggestion either as an include another dts file or an
->overlay. The latter could be useful as a way to maintain current dtb
->files while splitting the source files into base and overlay dts
->files.
+>Here is an example of the info from one of my builds:
+>
+>   From Linux 5.5.0-rc2-dirty by frowand the Mon Jan 20 09:50:58 CST 2020.
+>
+>The information 'Linux 5.5.0-rc2-dirty' is precisely what was most objected
+>to in my proposal.
 
-ACK, that sounds like it could be helpful.
+ACK. :-( I'm surprised to see so much push-back on what looks like a
+simple piece of information here.
 
->But no, let's not prepend this with 'linux'. It's not a property
->specific for Linux to consume.
-
-Right. We might be seeing the data coming through from U-Boot (or any
-other random bootloader) too.
+I've had users *specifically* asking for this kind of identification
+so that they can verify the version of the DTB they're using at
+runtime. Right now it can be a guessing game, which does not help
+people trying to debug problems.
 
 Cheers,
 -- 
