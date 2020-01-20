@@ -1,85 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:33416 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726876AbgATQQH (ORCPT
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55221 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726982AbgATSSG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Jan 2020 11:16:07 -0500
-Subject: Re: [RFC PATCH 3/3] scripts: Use -B dtc option to generate dtb build
- information.
+        Mon, 20 Jan 2020 13:18:06 -0500
+Received: by mail-wm1-f65.google.com with SMTP id b19so278900wmj.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Jan 2020 10:18:04 -0800 (PST)
+Date: Mon, 20 Jan 2020 18:17:14 +0000
+From: Steve McIntyre <steve.mcintyre@linaro.org>
+Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
+Message-ID: <20200120181708.GN3697@linaro.org>
 References: <20200113181625.3130-1-alexandre.torgue@st.com>
- <20200113181625.3130-4-alexandre.torgue@st.com>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <5b5a40b5-6954-05aa-5c7f-5ae8100aa1ee@gmail.com>
-Date: Mon, 20 Jan 2020 10:16:05 -0600
+ <20200113181625.3130-2-alexandre.torgue@st.com>
+ <20200116005741.GB54439@umbus>
+ <d2594b79-a45d-dcac-3642-90016a1408b8@st.com>
+ <20200117090937.GU54439@umbus>
+ <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200113181625.3130-4-alexandre.torgue@st.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexandre Torgue <alexandre.torgue@st.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org
+To: Rob Herring <robh+dt@kernel.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexandre Torgue <alexandre.torgue@st.com>, Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Simon Glass <sjg@chromium.org>, devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Devicetree Compiler <devicetree-compiler@vger.kernel.org>
 
-On 1/13/20 12:16 PM, Alexandre Torgue wrote:
-> This commit adds a new script to create a string in tmp file with
-> some information (date, linux version, user). This file is then used by
-> dtc with -B option to append dts file with a new property.
-> During kernel boot it will then be possible to printout DTB build
-> information (date, linux version used, user).
-> 
-> Signed-off-by: Alexandre Torgue <alexandre.torgue@st.com>
-> 
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 3fa32f83b2d7..6a98eac1e56d 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -235,6 +235,7 @@ quiet_cmd_gzip = GZIP    $@
->  # DTC
->  # ---------------------------------------------------------------------------
->  DTC ?= $(objtree)/scripts/dtc/dtc
-> +DTB_GEN_INFO ?= $(objtree)/scripts/gen_dtb_build_info
->  
->  # Disable noisy checks by default
->  ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
-> @@ -275,11 +276,13 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
->  
->  quiet_cmd_dtc = DTC     $@
->  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
-> -	$(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-> -	$(DTC) -O $(2) -o $@ -b 0 \
-> +       $(DTB_GEN_INFO) $(@).info ;\
-> +       $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-> +       $(DTC) -O $(2) -o $@ -b 0 -B $(@).info\
->  		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
-> -		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
-> -	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
-> +               -d $(depfile).dtc.tmp $(dtc-tmp) ; \
-> +       rm $(@).info ; \
-> +       cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
+On Fri, Jan 17, 2020 at 08:43:23AM -0600, Rob Herring wrote:
+>On Fri, Jan 17, 2020 at 6:26 AM David Gibson
+><david@gibson.dropbear.id.au> wrote:
 
-The indentation should be tabs instead of spaces.
+...
 
--Frank
+>> What might be better would be to have a dtc option which force appends
+>> an extra .dts to the mail .dts compiled.  You can then put an overlay
+>> template in that file, something like:
+>>
+>> &{/} {
+>>         linux,build-info = /incbin/ "build-info.txt;
+>> }
+>
+>I like this suggestion either as an include another dts file or an
+>overlay. The latter could be useful as a way to maintain current dtb
+>files while splitting the source files into base and overlay dts
+>files.
 
->  
->  $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
->  	$(call if_changed_dep,dtc,dtb)
-> diff --git a/scripts/gen_dtb_build_info b/scripts/gen_dtb_build_info
-> new file mode 100755
-> index 000000000000..30cf7506b9d5
-> --- /dev/null
-> +++ b/scripts/gen_dtb_build_info
-> @@ -0,0 +1,11 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +DTB_TARGET=$@
-> +COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
-> +
-> +touch $DTB_TARGET
-> +
-> +{
-> +  echo From Linux $KERNELRELEASE by $COMPILE_BY the $(date).
-> +} > $DTB_TARGET
-> 
+ACK, that sounds like it could be helpful.
+
+>But no, let's not prepend this with 'linux'. It's not a property
+>specific for Linux to consume.
+
+Right. We might be seeing the data coming through from U-Boot (or any
+other random bootloader) too.
+
+Cheers,
+-- 
+Steve McIntyre                                steve.mcintyre@linaro.org
+<http://www.linaro.org/> Linaro.org | Open source software for ARM SoCs
