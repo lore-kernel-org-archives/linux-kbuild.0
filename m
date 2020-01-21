@@ -1,32 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57432 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727220AbgAUKO1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Jan 2020 05:14:27 -0500
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:31965 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726714AbgAUPsq (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Jan 2020 10:48:46 -0500
+MIME-Version: 1.0
+References: <20200117171435.11591-1-masahiroy@kernel.org>
+In-Reply-To: <20200117171435.11591-1-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 22 Jan 2020 00:47:54 +0900
+Message-ID: <CAK7LNAQ-jkwUT3qcuqZeKUhiDjTP_XuEK1qgjTwEoL00v+c07g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use -S instead of -E for precise cc-option test
+ in Kconfig
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-In-Reply-To: <20200121100150.31660-1-geert+renesas@glider.be>
-Date: Tue, 21 Jan 2020 11:13:56 +0100
-Subject: Re: [PATCH] arm64: bcm2835: Drop select of nonexistent
- HAVE_ARM_ARCH_TIMER
-From: "Nicolas Saenz Julienne" <nsaenzjulienne@suse.de>
-Message-Id: <C01E1Q2TFG55.35B3FH1ISNZQO@linux-9qgx>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Masahiro Yamada <masahiroy@kernel.org>, Eric Anholt <eric@anholt.net>, bcm-kernel-feedback-list@broadcom.com, Gerd Hoffmann <kraxel@redhat.com>, Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue Jan 21, 2020 at 11:01 AM, Geert Uytterhoeven wrote:
-> Unlike on arm32, the HAVE_ARM_ARCH_TIMER config symbol does not exist on
-> arm64.
+On Sat, Jan 18, 2020 at 2:16 AM Masahiro Yamada <masahiroy@kernel.org> wrot=
+e:
 >
-> Note that the toplevel ARM64 symbol always selects ARM_ARCH_TIMER, so
-> support for it is always included.
+> Currently, -E (stop after the preprocessing stage) is used to check
+> whether the given compiler flag is supported.
 >
-> Fixes: 628d30d1ccb897fe ("arm64: Add platform selection for BCM2835.")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> While it is faster than -S (or -c), it can be false-positive. You need
+> to run the compilation proper to check the flag more precisely.
+>
+> For example, when testing "--param asan-instrument-allocas=3D1", my gcc
+> gives a different result for -E vs -S.
+>
+> $ gcc -Werror --param asan-instrument-allocas=3D1 -E -x c /dev/null -o /d=
+ev/null
+> $ echo $?
+> 0
+>
+> $ gcc -Werror --param asan-instrument-allocas=3D1 -S -x c /dev/null -o /d=
+ev/null
+> cc1: error: invalid --param name =E2=80=98asan-instrument-allocas=E2=80=
+=99; did you mean =E2=80=98asan-instrument-writes=E2=80=99?
+> $ echo $?
+> 1
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
 
-Reviewed-by: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+Applied to linux-kbuild.
 
-Thanks,
-Nicolas
+
+>  scripts/Kconfig.include | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> index d4adfbe42690..bfb44b265a94 100644
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -25,7 +25,7 @@ failure =3D $(if-success,$(1),n,y)
+>
+>  # $(cc-option,<flag>)
+>  # Return y if the compiler supports <flag>, n otherwise
+> -cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c /dev/n=
+ull -o /dev/null)
+> +cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -S -x c /dev/n=
+ull -o /dev/null)
+>
+>  # $(ld-option,<flag>)
+>  # Return y if the linker supports <flag>, n otherwise
+> --
+> 2.17.1
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
