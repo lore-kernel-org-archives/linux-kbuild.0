@@ -1,77 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:31965 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726714AbgAUPsq (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51283 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726714AbgAUPt0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Jan 2020 10:48:46 -0500
+        Tue, 21 Jan 2020 10:49:26 -0500
 MIME-Version: 1.0
-References: <20200117171435.11591-1-masahiroy@kernel.org>
-In-Reply-To: <20200117171435.11591-1-masahiroy@kernel.org>
+References: <20200115162529.11089-1-masahiroy@kernel.org>
+In-Reply-To: <20200115162529.11089-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 22 Jan 2020 00:47:54 +0900
-Message-ID: <CAK7LNAQ-jkwUT3qcuqZeKUhiDjTP_XuEK1qgjTwEoL00v+c07g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use -S instead of -E for precise cc-option test
- in Kconfig
+Date: Wed, 22 Jan 2020 00:48:22 +0900
+Message-ID: <CAK7LNATj0X-F+9p_M40BXVH3XdpoRcy_Rwk7NGL5au2EKS4gjQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] builddeb: remove unneeded files in hdrobjfiles for
+ headers package
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Ben Hutchings <ben@decadent.org.uk>, Riku Voipio <riku.voipio@linaro.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sat, Jan 18, 2020 at 2:16 AM Masahiro Yamada <masahiroy@kernel.org> wrot=
-e:
+On Thu, Jan 16, 2020 at 1:26 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Currently, -E (stop after the preprocessing stage) is used to check
-> whether the given compiler flag is supported.
+>  - We do not need tools/objtool/fixdep or tools/objtool/sync-check.sh
+>    for building external modules. Including tools/objtool/objtool is
+>    enough.
 >
-> While it is faster than -S (or -c), it can be false-positive. You need
-> to run the compilation proper to check the flag more precisely.
->
-> For example, when testing "--param asan-instrument-allocas=3D1", my gcc
-> gives a different result for -E vs -S.
->
-> $ gcc -Werror --param asan-instrument-allocas=3D1 -E -x c /dev/null -o /d=
-ev/null
-> $ echo $?
-> 0
->
-> $ gcc -Werror --param asan-instrument-allocas=3D1 -S -x c /dev/null -o /d=
-ev/null
-> cc1: error: invalid --param name =E2=80=98asan-instrument-allocas=E2=80=
-=99; did you mean =E2=80=98asan-instrument-writes=E2=80=99?
-> $ echo $?
-> 1
+>  - gcc-common.h is a check-in file. I do not see any point to search
+>    for it in objtree.
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
-
-Applied to linux-kbuild.
-
-
->  scripts/Kconfig.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-> index d4adfbe42690..bfb44b265a94 100644
-> --- a/scripts/Kconfig.include
-> +++ b/scripts/Kconfig.include
-> @@ -25,7 +25,7 @@ failure =3D $(if-success,$(1),n,y)
+> Changes in v2: None
+
+
+Series, applied to linux-kbuild.
+
+
 >
->  # $(cc-option,<flag>)
->  # Return y if the compiler supports <flag>, n otherwise
-> -cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -E -x c /dev/n=
-ull -o /dev/null)
-> +cc-option =3D $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -S -x c /dev/n=
-ull -o /dev/null)
+>  scripts/package/builddeb | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->  # $(ld-option,<flag>)
->  # Return y if the linker supports <flag>, n otherwise
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index b60388051c7f..eb067d6f1370 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -170,11 +170,11 @@ done
+>  (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+>  (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+>  if is_enabled CONFIG_STACK_VALIDATION; then
+> -       (cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
+> +       echo tools/objtool/objtool >> "$objtree/debian/hdrobjfiles"
+>  fi
+>  (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+>  if is_enabled CONFIG_GCC_PLUGINS; then
+> -       (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> +       (cd $objtree; find scripts/gcc-plugins -name \*.so) >> "$objtree/debian/hdrobjfiles"
+>  fi
+>  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+>  mkdir -p "$destdir"
 > --
 > 2.17.1
 >
 
 
---=20
+-- 
 Best Regards
 Masahiro Yamada
