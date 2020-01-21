@@ -1,60 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:65434 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727817AbgAUQAz (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45315 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728852AbgAURLO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Jan 2020 11:00:55 -0500
+        Tue, 21 Jan 2020 12:11:14 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j42so4075569wrj.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 21 Jan 2020 09:11:12 -0800 (PST)
+Date: Tue, 21 Jan 2020 17:10:56 +0000
+From: Steve McIntyre <steve.mcintyre@linaro.org>
+Subject: Re: [RFC PATCH 0/3] Add device tree build information
+Message-ID: <20200121171048.GF6796@tack.einval.com>
+References: <20200113181625.3130-1-alexandre.torgue@st.com>
+ <f21ad44d-f119-2035-b4ee-16b3619879af@gmail.com>
+ <233e0a5f-d38f-908c-5ca7-66ee87d0fcae@st.com>
+ <7cfd0bc0-13fd-98ea-9bfd-6cfbbfd77b6d@gmail.com>
+ <220e3aea-b273-417a-69c9-059236c888af@st.com>
+ <a1233cd8-e73a-82d7-74bf-69109d1a0a07@gmail.com>
+ <20200120182837.GO3697@linaro.org>
+ <f09ce50c-6721-c9d3-4f27-3f98a2d0b183@gmail.com>
 MIME-Version: 1.0
-References: <20200104150238.19834-1-masahiroy@kernel.org>
-In-Reply-To: <20200104150238.19834-1-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 22 Jan 2020 00:59:54 +0900
-Message-ID: <CAK7LNATS33-TfoGajRCT3nAAZ+AcfVmO4GorxRTNPk9z8mBcHA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] initramfs: a lot of cleanups
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f09ce50c-6721-c9d3-4f27-3f98a2d0b183@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@st.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Sun, Jan 5, 2020 at 12:03 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+[ Adding lakml to the CC list ]
+
+On Mon, Jan 20, 2020 at 09:20:55PM -0600, Frank Rowand wrote:
+>On 1/20/20 12:28 PM, Steve McIntyre wrote:
+>> On Mon, Jan 20, 2020 at 10:14:22AM -0600, Frank Rowand wrote:
+>>> On 1/20/20 4:56 AM, Alexandre Torgue wrote:
+>>>
+>>> Here is an example of the info from one of my builds:
+>>>
+>>>   From Linux 5.5.0-rc2-dirty by frowand the Mon Jan 20 09:50:58 CST 2020.
+>>>
+>>> The information 'Linux 5.5.0-rc2-dirty' is precisely what was most objected
+>>> to in my proposal.
+>> 
+>> ACK. :-( I'm surprised to see so much push-back on what looks like a
+>> simple piece of information here.
 >
+>Me too.
+
+So, looking at the comments back on the old thread...
+
+Alexandre is proposing somthing slightly different here: a patch to
+add a simple string to allow for a description of where the DTB came
+from. The particular example he uses here fills in build details from
+the Linux repo, but it could just as easily be filled in as part of a
+U-Boot build, or the build of a DTB included with EDK2, or whatever
+other firmware might include it. It might be useful to also add
+similar debug output into U-Boot, or for that matter any other
+DT-using project.
+
+As Rob says later, it's simply information for humans to help identify
+where a DTB came from. Nothing more.
+
+>> I've had users *specifically* asking for this kind of identification
+>> so that they can verify the version of the DTB they're using at
+>> runtime. Right now it can be a guessing game, which does not help
+>> people trying to debug problems.
 >
->
-> Masahiro Yamada (13):
->   initramfs: replace klibcdirs in Makefile with FORCE
->   gen_initramfs_list.sh: remove unused variable 'default_list'
->   gen_initramfs_list.sh: fix the tool name in the comment
->   initramfs: rename gen_initramfs_list.sh to gen_initramfs.sh
->   initramfs: remove redundant dependency on BLK_DEV_INITRD
->   initramfs: make compression options not depend on INITRAMFS_SOURCE
->   initramfs: make initramfs compression choice non-optional
->   initramfs: specify $(src)/gen_initramfs.sh as a prerequisite in
->     Makefile
->   initramfs: generate dependency list and cpio at the same time
->   initramfs: add default_cpio_list, and delete -d option support
->   gen_initramfs.sh: always output cpio even without -o option
->   initramfs: refactor the initramfs build rules
->   gen_initramfs.sh: remove intermediate cpio_list on errors
+>If the information was reported as debug information via pr_debug(),
+>would that work for your use case?  Or would the users' kernels
+>not have debug enabled in the configuration?
 
-All, applied to linux-kbuild.
+Quite possibly not - I'm not 100% sure to be honest. :-/
 
-
->  usr/.gitignore                                |   8 +-
->  usr/Kconfig                                   |  26 ---
->  usr/Makefile                                  |  97 ++++++----
->  usr/default_cpio_list                         |   6 +
->  ...gen_initramfs_list.sh => gen_initramfs.sh} | 167 +++++-------------
->  usr/initramfs_data.S                          |   5 +-
->  6 files changed, 112 insertions(+), 197 deletions(-)
->  create mode 100644 usr/default_cpio_list
->  rename usr/{gen_initramfs_list.sh => gen_initramfs.sh} (53%)
->
-> --
-> 2.17.1
->
-
-
---
-Best Regards
-Masahiro Yamada
+-- 
+Steve McIntyre                                steve.mcintyre@linaro.org
+<http://www.linaro.org/> Linaro.org | Open source software for ARM SoCs
