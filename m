@@ -1,55 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.110.172]:54282 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729047AbgAVKD4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Jan 2020 05:03:56 -0500
-From: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Subject: [PATCH] kconfig: Sanitize make randconfig generated .config
-Date: Wed, 22 Jan 2020 10:03:44 +0000
-Message-Id: <20200122100344.50751-1-vincenzo.frascino@arm.com>
+Received: from mail-lj1-f176.google.com ([209.85.208.176]:46175 "EHLO
+        mail-lj1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725802AbgAVRwY (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 22 Jan 2020 12:52:24 -0500
+Received: by mail-lj1-f176.google.com with SMTP id m26so7786307ljc.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Jan 2020 09:52:23 -0800 (PST)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: vmlinux ELF header sometimes corrupt
+Message-ID: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
+Date: Wed, 22 Jan 2020 18:52:21 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, vincenzo.frascino@arm.com
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
 
-"make randconfig" calculates the probability of a tristate option (yes,
-mod, no) based on srand()/rand() and can be fed with a seed.
-At the last step of randconfig some option are chosen randomly and their
-tristate set based on similar mechanism.
-After this passage the resulting .config is not sanitized, hence it
-might result in an inconsistent set of options being selected.
+I'm building for a ppc32 (mpc8309) target using Yocto, and I'm hitting a
+very hard to debug problem that maybe someone else has encountered. This
+doesn't happen always, perhaps 1 in 8 times or something like that.
 
-This was noticed on arm64 using KCONFIG_SEED=0x40C5E904. During
-randomize_choice_values() CONFIG_BIG_ENDIAN is enabled. Since CONFIG_EFI
-was enabled at a previous step, and depends on !CONFIG_BIG_ENDIAN the
-resulting .config is inconsistent.
+The issue is that when the build gets to do "${CROSS}objcopy -O binary
+... vmlinux", vmlinux is not (no longer) a proper ELF file, so naturally
+that fails with
 
-Fix the issue making sure that randconfig sanitizes the generated
-.config as a last step.
+  powerpc-oe-linux-objcopy:vmlinux: file format not recognized
 
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
----
- scripts/kconfig/conf.c | 5 +++++
- 1 file changed, 5 insertions(+)
+So I hacked link-vmlinux.sh to stash copies of vmlinux before and after
+sortextable vmlinux. Both of those are proper ELF files, and comparing
+the corrupted vmlinux to vmlinux.after_sort they are identical after the
+first 52 bytes; in vmlinux, those first 52 bytes are all 0.
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 1f89bf1558ce..c0fcaa4e9762 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -654,6 +654,11 @@ int main(int ac, char **av)
- 	case randconfig:
- 		/* Really nothing to do in this loop */
- 		while (conf_set_all_new_symbols(def_random)) ;
-+		/*
-+		 * .config at this point might contain
-+		 * incompatible options. Sanitize it.
-+		 */
-+		sym_clear_all_valid();
- 		break;
- 	case defconfig:
- 		conf_set_all_new_symbols(def_default);
--- 
-2.25.0
+I also saved stat(1) info to see if vmlinux is being replaced or
+modified in-place.
+
+$ cat vmlinux.stat.after_sort
+  File: 'vmlinux'
+  Size: 8608456     Blocks: 16696      IO Block: 4096   regular file
+Device: 811h/2065d  Inode: 21919132    Links: 1
+Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
+Access: 2020-01-22 10:52:38.946703081 +0000
+Modify: 2020-01-22 10:52:38.954703105 +0000
+Change: 2020-01-22 10:52:38.954703105 +0000
+
+$ stat vmlinux
+  File: 'vmlinux'
+  Size: 8608456         Blocks: 16688      IO Block: 4096   regular file
+Device: 811h/2065d      Inode: 21919132    Links: 1
+Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
+Access: 2020-01-22 17:20:00.650379057 +0000
+Modify: 2020-01-22 10:52:38.954703105 +0000
+Change: 2020-01-22 10:52:38.954703105 +0000
+
+So the inode number and mtime/ctime are exactly the same, but for some
+reason Blocks: has changed? This is on an ext4 filesystem, but I don't
+suspect the filesystem to be broken, because it's always just vmlinux
+that ends up corrupt, and always in exactly this way with the first 52
+bytes having been wiped.
+
+Any ideas?
+
+Rasmus
