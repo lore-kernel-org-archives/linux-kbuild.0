@@ -1,66 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f176.google.com ([209.85.208.176]:46175 "EHLO
-        mail-lj1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725802AbgAVRwY (ORCPT
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:16218 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725802AbgAVSAz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Jan 2020 12:52:24 -0500
-Received: by mail-lj1-f176.google.com with SMTP id m26so7786307ljc.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 22 Jan 2020 09:52:23 -0800 (PST)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: vmlinux ELF header sometimes corrupt
-Message-ID: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
-Date: Wed, 22 Jan 2020 18:52:21 +0100
+        Wed, 22 Jan 2020 13:00:55 -0500
+Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
+References: <20200113181625.3130-1-alexandre.torgue@st.com>
+ <20200113181625.3130-2-alexandre.torgue@st.com>
+ <20200116005741.GB54439@umbus> <d2594b79-a45d-dcac-3642-90016a1408b8@st.com>
+ <20200117090937.GU54439@umbus>
+ <CAL_JsqKTsX9efYDMjGahFDxj0cEfzozeNrY1Nq1bECzgOZGqdQ@mail.gmail.com>
+ <20200120181708.GN3697@linaro.org>
+From: Alexandre Torgue <alexandre.torgue@st.com>
+Message-ID: <9d83a36c-78c5-3452-bb48-209d68c46038@st.com>
+Date: Wed, 22 Jan 2020 19:00:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200120181708.GN3697@linaro.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Steve McIntyre <steve.mcintyre@linaro.org>, Rob Herring <robh+dt@kernel.org>, David Gibson <david@gibson.dropbear.id.au>, Frank Rowand <frowand.list@gmail.com>, ian@freebsd.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Simon Glass <sjg@chromium.org>, devicetree@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Devicetree Compiler <devicetree-compiler@vger.kernel.org>
 
-I'm building for a ppc32 (mpc8309) target using Yocto, and I'm hitting a
-very hard to debug problem that maybe someone else has encountered. This
-doesn't happen always, perhaps 1 in 8 times or something like that.
+Hi
 
-The issue is that when the build gets to do "${CROSS}objcopy -O binary
-... vmlinux", vmlinux is not (no longer) a proper ELF file, so naturally
-that fails with
+On 1/20/20 7:17 PM, Steve McIntyre wrote:
+> On Fri, Jan 17, 2020 at 08:43:23AM -0600, Rob Herring wrote:
+>> On Fri, Jan 17, 2020 at 6:26 AM David Gibson
+>> <david@gibson.dropbear.id.au> wrote:
+> 
+> ...
+> 
+>>> What might be better would be to have a dtc option which force appends
+>>> an extra .dts to the mail .dts compiled.  You can then put an overlay
+>>> template in that file, something like:
+>>>
+>>> &{/} {
+>>>          linux,build-info = /incbin/ "build-info.txt;
+>>> }
+>>
+>> I like this suggestion either as an include another dts file or an
+>> overlay. The latter could be useful as a way to maintain current dtb
+>> files while splitting the source files into base and overlay dts
+>> files.
+> 
+> ACK, that sounds like it could be helpful.
+> 
+>> But no, let's not prepend this with 'linux'. It's not a property
+>> specific for Linux to consume.
+> 
+> Right. We might be seeing the data coming through from U-Boot (or any
+> other random bootloader) too.
+> 
+> Cheers,
+> 
 
-  powerpc-oe-linux-objcopy:vmlinux: file format not recognized
+Thanks for reviews. I gonna prepare a V2 with David proposition (to use 
+overlay format) by keeping in mind not to modify existing dts(i) files.
 
-So I hacked link-vmlinux.sh to stash copies of vmlinux before and after
-sortextable vmlinux. Both of those are proper ELF files, and comparing
-the corrupted vmlinux to vmlinux.after_sort they are identical after the
-first 52 bytes; in vmlinux, those first 52 bytes are all 0.
+Remaining questions are:
 
-I also saved stat(1) info to see if vmlinux is being replaced or
-modified in-place.
+1- "build-info" or "linux,build-info"? IMO, If information is "generic" 
+then first one should be used.
 
-$ cat vmlinux.stat.after_sort
-  File: 'vmlinux'
-  Size: 8608456     Blocks: 16696      IO Block: 4096   regular file
-Device: 811h/2065d  Inode: 21919132    Links: 1
-Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
-Access: 2020-01-22 10:52:38.946703081 +0000
-Modify: 2020-01-22 10:52:38.954703105 +0000
-Change: 2020-01-22 10:52:38.954703105 +0000
+2- Looking at Franck proposition[1] some years ago and objections on it, 
+do you think that this one could accepted ?
 
-$ stat vmlinux
-  File: 'vmlinux'
-  Size: 8608456         Blocks: 16688      IO Block: 4096   regular file
-Device: 811h/2065d      Inode: 21919132    Links: 1
-Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
-Access: 2020-01-22 17:20:00.650379057 +0000
-Modify: 2020-01-22 10:52:38.954703105 +0000
-Change: 2020-01-22 10:52:38.954703105 +0000
+regards
+Alex
 
-So the inode number and mtime/ctime are exactly the same, but for some
-reason Blocks: has changed? This is on an ext4 filesystem, but I don't
-suspect the filesystem to be broken, because it's always just vmlinux
-that ends up corrupt, and always in exactly this way with the first 52
-bytes having been wiped.
-
-Any ideas?
-
-Rasmus
+[1] https://lore.kernel.org/linux-arm-kernel/550A42AC.8060104@gmail.com/
