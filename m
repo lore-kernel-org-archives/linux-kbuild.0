@@ -1,36 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:60422 "EHLO
-        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387445AbgAXNOJ (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:52992 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388558AbgAXSJv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Jan 2020 08:14:09 -0500
-From: Andreas Schwab <schwab@linux-m68k.org>
-Subject: Re: vmlinux ELF header sometimes corrupt
-References: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
-Date: Fri, 24 Jan 2020 14:14:05 +0100
-In-Reply-To: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk> (Rasmus
-        Villemoes's message of "Wed, 22 Jan 2020 18:52:21 +0100")
-Message-ID: <87sgk5m1ya.fsf@igel.home>
+        Fri, 24 Jan 2020 13:09:51 -0500
+Subject: Re: [PATCH v4] kallsyms: add names of built-in modules
+References: <7e0f4a74-63c5-ad62-c619-c6277c4bc791@oracle.com>
+ <20191210174826.5433-1-eugene.loh@oracle.com>
+ <2a535000-e71e-fab9-cf6a-e7e5fb8053d8@oracle.com>
+ <20191218222931.76131c6a@rorschach.local.home>
+ <CAK7LNATJZCekCoj0ruPUGRv7sH_hcJP-dFPd-3_EOR5hFNW-Xg@mail.gmail.com>
+ <aa165beb-a92c-c3b9-d57a-4046ba91f677@oracle.com>
+ <CAK7LNATnYNpNXYF+Ttv9y6AcE85f1uN2USrR0+FnUffp40MKkw@mail.gmail.com>
+From: Eugene Loh <eugene.loh@oracle.com>
+Message-ID: <ec2e9f63-f54b-f156-e1a8-f5367e7ee0fa@oracle.com>
+Date: Fri, 24 Jan 2020 10:08:33 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAK7LNATnYNpNXYF+Ttv9y6AcE85f1uN2USrR0+FnUffp40MKkw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Steven Rostedt <rostedt@goodmis.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Jessica Yu <jeyu@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Marc Zyngier <maz@kernel.org>, Song Liu <songliubraving@fb.com>, Thomas Gleixner <tglx@linutronix.de>, "Keller, Jacob E" <jacob.e.keller@intel.com>, Kris Van Hees <kris.van.hees@oracle.com>, Nick Alcock <nick.alcock@oracle.com>
 
-On Jan 22 2020, Rasmus Villemoes wrote:
+On 01/19/2020 10:37 PM, Masahiro Yamada wrote:
 
-> So the inode number and mtime/ctime are exactly the same, but for some
-> reason Blocks: has changed? This is on an ext4 filesystem, but I don't
-> suspect the filesystem to be broken, because it's always just vmlinux
-> that ends up corrupt, and always in exactly this way with the first 52
-> bytes having been wiped.
+> Hi Eugene,
+>
+> On Thu, Jan 9, 2020 at 3:32 AM Eugene Loh <eugene.loh@oracle.com> wrote:
+>> On 12/18/2019 08:28 PM, Masahiro Yamada wrote:
+>>
+>>> On Thu, Dec 19, 2019 at 12:29 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+>>>> Couple of notes:
+>>>> 1) this affects code that doesn't really have a maintainer. I could
+>>>> take it in my tree, but I would like to have acks from other
+>>>> maintainers. Perhaps Jessica Yu (Module maintainer), and probably one
+>>>> from Linus himself.
+>>>>
+>>>> 2) Do not send new versions of a patch as a reply to the old version. I
+>>>> and many other maintainers sort our inbox by threads, and I look at the
+>>>> top of the thread for patches. That is, if there's another version of a
+>>>> patch that is a reply to a previous version, it is basically off my
+>>>> radar, unless I happen to notice it by chance (which I did with this
+>>>> email).
+>>>>
+>>>> You can send your v4 patch again, but please send it as its own thread,
+>>>> that way it will be on the radar of other maintainers. Hopefully we can
+>>>> get some acks on this as well.
+>> Sorry.  I misunderstood some process doc.  But before I resend...
+>>
+>>> I do not like this patch.
+>>>
+>>> scripts/Makefile.modbuiltin is really ugly.
+>>> It traverses all the directories once again.
+>>>
+>>> This patch makes it even worse,
+>>> Kbuild would traverse the
+>>> whole directories three times.
+>>>
+>>> I was thinking to remove scripts/Makefile.modbuiltin
+>>> and Kconfig's tristate.conf entirely
+>>> because it is possible to generate modules.builtin more simply.
+>> Sorry about the delayed response, due in part to holidays.  Thank you
+>> for your on-going review and the pointer to
+>> https://lore.kernel.org/patchwork/project/lkml/list/?series=423205
+>>
+>> I agree your proposed patch simplifies some build code, but this is
+>> long-standing code.  Also, the build time -- either that would be saved
+>> by your patch or that would be incurred by a third traversal -- is
+>> miniscule.
+>>
+>> Further, I do not see how to add object-to-module information to your
+>> proposed scheme.  Can you suggest something?  If not, then it seems the
+>> proposed code simplification is limiting functionality.
+>
+> The object-to-module information can be retrieved by a similar
+> way as I did in
+> https://lore.kernel.org/patchwork/project/lkml/list/?series=423205
 
-Note that the size of the ELF header (Elf32_Ehdr) is 52 bytes.
+Thanks again for that pointer.  I'm looking at how that approach can be 
+generalized to the functionality we need for the object-to-module mapping.
 
-Andreas.
+> But, even if modules_think.builtin is produced in a new way,
+> there would make no difference in the fact that
+> the build system needs to generate modules_think.builtin and
+> .tmp_vmlinux.range, and kallsyms must integrate a big
+> parser of them.
+>
+> So, I think this patch lacks the taste as overall.
 
--- 
-Andreas Schwab, schwab@linux-m68k.org
-GPG Key fingerprint = 7578 EB47 D4E5 4D69 2510  2552 DF73 E780 A9DA AEC1
-"And now for something completely different."
+Unfortunately we need to get the information from somewhere.  I'll work 
+on streamlining the implementation more, and prepare an updated patch.
+
+>>> As I said, the name of builtin module is not fixed info.
+>>> And, this makes kallsyms fat just for less important info.
+>> The name of the builtin module can be ambiguous in some cases, but in
+>> most cases it is not.  Indeed, the extra information is typically
+>> useful, and comments from, e.g., Linus and Steve were positive about
+>> adding that information to kallsyms.  Further, we have even heard
+>> favorable feedback for adding such built-in-module information to
+>> available_filter_functions as well.
+> In my opinion, this should be determined by the balance
+> between the added value and the ugliness of the code.
+>
+> (Real) module names are obvious, but as I stated,
+> built-in module names are somewhat subtle, so I do not
+> like to extend it too much.
+>
+> Perhaps, I was the only person who reviewed the code in detail.
+> After looking at how this feature is integrated,
+> I do not believe this should go in. Sorry.
+
+Thanks for the review.  In light of the value of the functionality and the
+expressed interest in this feature, I'll work towards an updated patch for
+further review.
+
+>>>>> On 12/10/2019 09:48 AM, eugene.loh@oracle.com wrote:
+>>>>>> From: Eugene Loh <eugene.loh@oracle.com>
+>>>>>>
+>>>>>> /proc/kallsyms is very useful for tracers and other tools that need
+>>>>>> to map kernel symbols to addresses.
+>>>>>>
+>>>>>> It would be useful if there were a mapping between kernel symbol and
+>>>>>> module name that only changed when the kernel source code is changed.
+>>>>>> This mapping should not vanish simply because a module becomes built
+>>>>>> into the kernel.
