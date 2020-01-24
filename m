@@ -1,71 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33189 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730054AbgAXKuY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Jan 2020 05:50:24 -0500
-From: Michael Ellerman <mpe@ellerman.id.au>
+Received: from mail-lj1-f174.google.com ([209.85.208.174]:36104 "EHLO
+        mail-lj1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390342AbgAXLQW (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 24 Jan 2020 06:16:22 -0500
+Received: by mail-lj1-f174.google.com with SMTP id r19so2081582ljg.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 24 Jan 2020 03:16:21 -0800 (PST)
 Subject: Re: vmlinux ELF header sometimes corrupt
-In-Reply-To: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
 References: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
-Date: Fri, 24 Jan 2020 21:50:20 +1100
-Message-ID: <875zh1i0wj.fsf@mpe.ellerman.id.au>
+ <875zh1i0wj.fsf@mpe.ellerman.id.au>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Message-ID: <b5f6ab1c-337e-c5e4-6449-0cf73413e1be@rasmusvillemoes.dk>
+Date: Fri, 24 Jan 2020 12:16:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <875zh1i0wj.fsf@mpe.ellerman.id.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>, LKML <linux-kernel@vger.kernel.org>
+To: Michael Ellerman <mpe@ellerman.id.au>, LKML <linux-kernel@vger.kernel.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
 
-Rasmus Villemoes <linux@rasmusvillemoes.dk> writes:
-> I'm building for a ppc32 (mpc8309) target using Yocto, and I'm hitting a
-> very hard to debug problem that maybe someone else has encountered. This
-> doesn't happen always, perhaps 1 in 8 times or something like that.
->
-> The issue is that when the build gets to do "${CROSS}objcopy -O binary
-> ... vmlinux", vmlinux is not (no longer) a proper ELF file, so naturally
-> that fails with
->
->   powerpc-oe-linux-objcopy:vmlinux: file format not recognized
->
-> So I hacked link-vmlinux.sh to stash copies of vmlinux before and after
-> sortextable vmlinux. Both of those are proper ELF files, and comparing
-> the corrupted vmlinux to vmlinux.after_sort they are identical after the
-> first 52 bytes; in vmlinux, those first 52 bytes are all 0.
->
-> I also saved stat(1) info to see if vmlinux is being replaced or
-> modified in-place.
->
-> $ cat vmlinux.stat.after_sort
->   File: 'vmlinux'
->   Size: 8608456     Blocks: 16696      IO Block: 4096   regular file
-> Device: 811h/2065d  Inode: 21919132    Links: 1
-> Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
-> Access: 2020-01-22 10:52:38.946703081 +0000
-> Modify: 2020-01-22 10:52:38.954703105 +0000
-> Change: 2020-01-22 10:52:38.954703105 +0000
->
-> $ stat vmlinux
->   File: 'vmlinux'
->   Size: 8608456         Blocks: 16688      IO Block: 4096   regular file
-> Device: 811h/2065d      Inode: 21919132    Links: 1
-> Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
-> Access: 2020-01-22 17:20:00.650379057 +0000
-> Modify: 2020-01-22 10:52:38.954703105 +0000
-> Change: 2020-01-22 10:52:38.954703105 +0000
->
-> So the inode number and mtime/ctime are exactly the same, but for some
-> reason Blocks: has changed? This is on an ext4 filesystem, but I don't
-> suspect the filesystem to be broken, because it's always just vmlinux
-> that ends up corrupt, and always in exactly this way with the first 52
-> bytes having been wiped.
->
-> Any ideas?
+On 24/01/2020 11.50, Michael Ellerman wrote:
+> Rasmus Villemoes <linux@rasmusvillemoes.dk> writes:
+>> I'm building for a ppc32 (mpc8309) target using Yocto, and I'm hitting a
+>> very hard to debug problem that maybe someone else has encountered. This
+>> doesn't happen always, perhaps 1 in 8 times or something like that.
+>>
+>> The issue is that when the build gets to do "${CROSS}objcopy -O binary
+>> ... vmlinux", vmlinux is not (no longer) a proper ELF file, so naturally
+>> that fails with
+>>
+>>   powerpc-oe-linux-objcopy:vmlinux: file format not recognized
+>>
+>>
+>> Any ideas?
+> 
+> Not really sorry. Haven't seen or heard of that before.
+> 
+> Are you doing a parallel make? If so does -j 1 fix it?
 
-Not really sorry. Haven't seen or heard of that before.
+Hard to say, I'll have to try that a number of times to see if it can be
+reproduced with that setting.
 
-Are you doing a parallel make? If so does -j 1 fix it?
+> If it seems like sortextable is at fault then strace'ing it would be my
+> next step.
 
-If it seems like sortextable is at fault then strace'ing it would be my
-next step.
+I don't think sortextable is at fault, that was just my first "I know
+that at least pokes around in the ELF file". I do "cp vmlinux
+vmlinux.before_sort" and "cp vmlinux vmlinux.after_sort", and both of
+those copies are proper ELF files - and the .after_sort is identical to
+the corrupt vmlinux apart from vmlinux ending up with its ELF header wiped.
 
-cheers
+So it's something that happens during some later build step (Yocto has a
+lot of steps), perhaps "make modules" or "make modules_install" or
+something ends up somehow deciding "hey, vmlinux isn't quite uptodate,
+let's nuke it". I'm not even sure it's a Kbuild problem, but I've seen
+the same thing happen using another meta-build system called oe-lite,
+which is why I'm not primarily suspecting the Yocto logic.
+
+Rasmus
