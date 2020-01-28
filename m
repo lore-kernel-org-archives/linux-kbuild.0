@@ -1,52 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga12.intel.com ([192.55.52.136]:6723 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726210AbgA0KFp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Jan 2020 05:05:45 -0500
-Date: Mon, 27 Jan 2020 12:05:42 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH v1] kbuild: Fix off-by-one error when generate a new
- version
-Message-ID: <20200127100542.GV32742@smile.fi.intel.com>
-References: <20200124195859.86991-1-andriy.shevchenko@linux.intel.com>
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:40585 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725844AbgA1IMK (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 28 Jan 2020 03:12:10 -0500
+Received: by mail-lf1-f68.google.com with SMTP id c23so8400679lfi.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jan 2020 00:12:08 -0800 (PST)
+Subject: Re: vmlinux ELF header sometimes corrupt
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+References: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
+Message-ID: <5997e9b6-95fd-405b-05f8-16f9e34d9d87@rasmusvillemoes.dk>
+Date: Tue, 28 Jan 2020 09:12:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200124195859.86991-1-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <71aa76d0-a3b8-b4f3-a7c3-766cfb75412f@rasmusvillemoes.dk>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Simek <monstr@monstr.eu>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, linux-ext4@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 09:58:59PM +0200, Andy Shevchenko wrote:
-> When build on, for example, x86 using `make O=... -j64` the version
-> in the built kernel comes from include/generated/compile.h, which is:
+On 22/01/2020 18.52, Rasmus Villemoes wrote:
+> I'm building for a ppc32 (mpc8309) target using Yocto, and I'm hitting a
+> very hard to debug problem that maybe someone else has encountered. This
+> doesn't happen always, perhaps 1 in 8 times or something like that.
 > 
-> 	#define UTS_VERSION "#351 SMP Fri Jan 24 18:46:34 EET 2020"
+> The issue is that when the build gets to do "${CROSS}objcopy -O binary
+> ... vmlinux", vmlinux is not (no longer) a proper ELF file, so naturally
+> that fails with
 > 
-> While at the end the x86 specific Makefile prints the contents of
-> the .version file:
+>   powerpc-oe-linux-objcopy:vmlinux: file format not recognized
 > 
-> 	Kernel: arch/x86/boot/bzImage is ready  (#352)
+> So I hacked link-vmlinux.sh to stash copies of vmlinux before and after
+> sortextable vmlinux. Both of those are proper ELF files, and comparing
+> the corrupted vmlinux to vmlinux.after_sort they are identical after the
+> first 52 bytes; in vmlinux, those first 52 bytes are all 0.
 > 
-> Obviously the latter is not true. This happens because we first
-> check compile.h and update it and then generate new version, which is
-> incorrect flow:
+> I also saved stat(1) info to see if vmlinux is being replaced or
+> modified in-place.
 > 
->   CHK     include/generated/compile.h
->   UPD     include/generated/compile.h
->   ...
->   GEN     .version
+> $ cat vmlinux.stat.after_sort
+>   File: 'vmlinux'
+>   Size: 8608456     Blocks: 16696      IO Block: 4096   regular file
+> Device: 811h/2065d  Inode: 21919132    Links: 1
+> Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
+> Access: 2020-01-22 10:52:38.946703081 +0000
+> Modify: 2020-01-22 10:52:38.954703105 +0000
+> Change: 2020-01-22 10:52:38.954703105 +0000
 > 
-> In order to fix this, move the version generation from link-vmlinux.sh
-> to scripts/version.sh and re-use it in init/Makefile.
+> $ stat vmlinux
+>   File: 'vmlinux'
+>   Size: 8608456         Blocks: 16688      IO Block: 4096   regular file
+> Device: 811h/2065d      Inode: 21919132    Links: 1
+> Access: (0755/-rwxr-xr-x)  Uid: ( 1000/    user)   Gid: ( 1001/    user)
+> Access: 2020-01-22 17:20:00.650379057 +0000
+> Modify: 2020-01-22 10:52:38.954703105 +0000
+> Change: 2020-01-22 10:52:38.954703105 +0000
 > 
-> Additionally provide a unified way to get the current version of the build
-> and use this in few callers. This will respect the KBUILD_BUILD_VERSION
-> in case it's provided.
+> So the inode number and mtime/ctime are exactly the same, but for some
+> reason Blocks: has changed? This is on an ext4 filesystem, but I don't
+> suspect the filesystem to be broken, because it's always just vmlinux
+> that ends up corrupt, and always in exactly this way with the first 52
+> bytes having been wiped.
 
-Hmm... It looks like a mess in my build tree.
-I have to setup more experiments here.
+So, I think I take that last part back. I just hit a case where I built
+the kernel manually, made a copy of vmlinux to vmlinux.copy, and file(1)
+said both were fine (and cmp(1) agreed they were identical). Then I went
+off and did work elsewhere with a lot of I/O. When I came back to the
+linux build dir, vmlinux was broken, exactly as before. So I now suspect
+it to be some kind of "while the file is in the pagecache, everything is
+fine, but when it's read back from disk it's broken".
 
--- 
-With Best Regards,
-Andy Shevchenko
+My ext4 fs does have inline_data enabled, which could explain why the
+corruption happens in the beginning. It's just very odd that it only
+ever seems to trigger for vmlinux and not other files, but perhaps the
+I/O patterns that ld and/or sortextable does are exactly what are needed
+to trigger the bug.
+
+I've done a long overdue kernel update, and there are quite a few
+fs/ext4/ -stable patches in there, so now I'll see if it still happens.
+And if anything more comes of this, I'll remove the kbuild and ppc lists
+from cc, sorry for the noise.
+
+Rasmus
