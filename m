@@ -1,33 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:33259 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726211AbgA1WE0 (ORCPT
+Received: from mail-wm1-f73.google.com ([209.85.128.73]:56115 "EHLO
+        mail-wm1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726271AbgA2PGR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Jan 2020 17:04:26 -0500
-Received: by mail-pg1-f195.google.com with SMTP id 6so7748394pgk.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jan 2020 14:04:26 -0800 (PST)
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH] arm64: bcm2835: Drop select of nonexistent HAVE_ARM_ARCH_TIMER
-Date: Tue, 28 Jan 2020 14:04:23 -0800
-Message-Id: <20200128220423.13270-1-f.fainelli@gmail.com>
-In-Reply-To: <20200121100150.31660-1-geert+renesas@glider.be>
-References: <20200121100150.31660-1-geert+renesas@glider.be>
+        Wed, 29 Jan 2020 10:06:17 -0500
+Received: by mail-wm1-f73.google.com with SMTP id p26so2794081wmg.5
+        for <linux-kbuild@vger.kernel.org>; Wed, 29 Jan 2020 07:06:16 -0800 (PST)
+Date: Wed, 29 Jan 2020 15:06:12 +0000
+Message-Id: <20200129150612.19200-1-qperret@google.com>
+Mime-Version: 1.0
+Subject: [PATCH] kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYMS
+From: Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: bcm-kernel-feedback-list@broadcom.com, Geert Uytterhoeven <geert+renesas@glider.be>, Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Masahiro Yamada <masahiroy@kernel.org>, Eric Anholt <eric@anholt.net>, Gerd Hoffmann <kraxel@redhat.com>, Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+To: masahiroy@kernel.org, nico@fluxnic.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, qperret@google.com
 
-On Tue, 21 Jan 2020 11:01:50 +0100, Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-> Unlike on arm32, the HAVE_ARM_ARCH_TIMER config symbol does not exist on
-> arm64.
-> 
-> Note that the toplevel ARM64 symbol always selects ARM_ARCH_TIMER, so
-> support for it is always included.
-> 
-> Fixes: 628d30d1ccb897fe ("arm64: Add platform selection for BCM2835.")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
+CONFIG_TRIM_UNUSED_KSYMS currently removes all unused exported symbols
+from ksymtab. This works really well when using in-tree drivers, but
+cannot be used in its current form if some of them are out-of-tree.
 
-Applied to soc-arm64/next, thanks!
---
-Florian
+Indeed, even if the list of symbols required by out-of-tree drivers is
+known at compile time, the only solution today to guarantee these don't
+get trimmed is to set CONFIG_TRIM_UNUSED_KSYMS=n. This not only wastes
+space, but also makes it difficult to control the ABI usable by vendor
+modules in distribution kernels such as Android. Being able to control
+the kernel ABI surface is particularly useful to ship a unique Generic
+Kernel Image (GKI) for all vendors.
+
+As such, attempt to improve the situation by enabling users to specify a
+symbol 'whitelist' at compile time. Any symbol specified in this
+whitelist will be kept exported when CONFIG_TRIM_UNUSED_KSYMS is set,
+even if it has no in-tree user. The whitelist is defined as a simple
+text file, listing symbols, one per line.
+
+Signed-off-by: Quentin Perret <qperret@google.com>
+
+---
+
+Not sure if this was relevant for the commit message so I'll put it
+here: more context about the GKI effort in Android can found in these
+talk at LPC2018 [1] and LPC2019 [2].
+
+[1] https://linuxplumbersconf.org/event/2/contributions/61/
+[2] https://linuxplumbersconf.org/event/4/contributions/401/
+---
+ init/Kconfig                | 12 ++++++++++++
+ scripts/adjust_autoksyms.sh |  1 +
+ 2 files changed, 13 insertions(+)
+
+diff --git a/init/Kconfig b/init/Kconfig
+index a34064a031a5..d9c977ef7de5 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2180,6 +2180,18 @@ config TRIM_UNUSED_KSYMS
+ 
+ 	  If unsure, or if you need to build out-of-tree modules, say N.
+ 
++config UNUSED_KSYMS_WHITELIST
++	string "Whitelist of symbols to keep in ksymtab"
++	depends on TRIM_UNUSED_KSYMS
++	help
++	  By default, all unused exported symbols will be trimmed from the
++	  build when TRIM_UNUSED_KSYMS is selected.
++
++	  UNUSED_KSYMS_WHITELIST allows to whitelist symbols that must be kept
++	  exported at all times, even in absence of in-tree users. The value to
++	  set here is the path to a text file containing the list of symbols,
++	  one per line.
++
+ endif # MODULES
+ 
+ config MODULES_TREE_LOOKUP
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+index a904bf1f5e67..1a6f7f377230 100755
+--- a/scripts/adjust_autoksyms.sh
++++ b/scripts/adjust_autoksyms.sh
+@@ -48,6 +48,7 @@ cat > "$new_ksyms_file" << EOT
+ EOT
+ sed 's/ko$/mod/' modules.order |
+ xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
++cat - $CONFIG_UNUSED_KSYMS_WHITELIST |
+ sort -u |
+ sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$new_ksyms_file"
+ 
+-- 
+2.25.0.341.g760bfbb309-goog
