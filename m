@@ -1,121 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40963 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727158AbgA3QXq (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40406 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727224AbgA3RBt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Jan 2020 11:23:46 -0500
-From: Ethan Sommer <e5ten.arch@gmail.com>
-Subject: [PATCH] make yacc usage POSIX-compliant
-Date: Thu, 30 Jan 2020 11:23:11 -0500
-Message-Id: <20200130162314.31449-1-e5ten.arch@gmail.com>
+        Thu, 30 Jan 2020 12:01:49 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j104so4984717wrj.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Jan 2020 09:01:47 -0800 (PST)
+Date: Thu, 30 Jan 2020 17:01:41 +0000
+From: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH] kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYMS
+Message-ID: <20200130170141.GA136787@google.com>
+References: <20200129150612.19200-1-qperret@google.com>
+ <20200130154530.GA7452@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200130154530.GA7452@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Ethan Sommer <e5ten.arch@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Sedat Dilek <sedat.dilek@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+Cc: masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com
 
-use -b and -d to generate correctly named source and header files,
-instead of bison-specific --defines and non-POSIX -o
-check that YACC command is found in path or is an executable file,
-instead of using bison-specific --version flag to display an error when
-it is missing
-explicitly define yyltype in scripts/genksyms/lex.l, instead of relying
-on bison automatically defining it
-replace bison-specific %destructor use in scripts/kconfig/parser.y
-dtc's yacc usage is not covered here, as its use of bison-specific
-features is much greater, and it is only built on certain architectures,
-unlike kconfig and genksyms
+On Thursday 30 Jan 2020 at 07:45:30 (-0800), Christoph Hellwig wrote:
+> On Wed, Jan 29, 2020 at 03:06:12PM +0000, Quentin Perret wrote:
+> > CONFIG_TRIM_UNUSED_KSYMS currently removes all unused exported symbols
+> > from ksymtab. This works really well when using in-tree drivers, but
+> > cannot be used in its current form if some of them are out-of-tree.
+> 
+> NAK.  The state policy is that we don't care for out of tree modules,
+> and this is useful for nothing but.
 
-Signed-off-by: Ethan Sommer <e5ten.arch@gmail.com>
----
- scripts/Makefile.host     |  2 +-
- scripts/genksyms/Makefile |  6 ++++--
- scripts/genksyms/lex.l    |  2 ++
- scripts/kconfig/parser.y  | 14 +++++++-------
- 4 files changed, 14 insertions(+), 10 deletions(-)
+That is correct. Now, I clearly failed to explain this patch properly,
+but the long term goal here _is_ to get vendors to contribute more code
+upstream, and have a lot less code downstream / out-of-tree. And I hope
+we can agree this would be a good thing. So let me try again, and sorry
+if I missed the mark the first time.
 
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 4c51c95d40f4..64e98e1d4825 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -11,7 +11,7 @@ $(obj)/%.lex.c: $(src)/%.l FORCE
- # YACC
- # ---------------------------------------------------------------------------
- quiet_cmd_bison = YACC    $(basename $@).[ch]
--      cmd_bison = $(YACC) -o $(basename $@).c --defines=$(basename $@).h -t -l $<
-+      cmd_bison = $(YACC) -b $(basename $(basename $@)) -d -t -l $<
- 
- $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
- 	$(call if_changed,bison)
-diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-index 78629f515e78..1e120328fa88 100644
---- a/scripts/genksyms/Makefile
-+++ b/scripts/genksyms/Makefile
-@@ -14,9 +14,11 @@ genksyms-objs	:= genksyms.o parse.tab.o lex.lex.o
- # so that 'bison: not found' will be displayed if it is missing.
- ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
- 
-+ifeq ($(shell command -v $(YACC) || [ -x $(YACC) ] && echo y),)
-+  $(error command not found: $(YACC))
-+endif
- quiet_cmd_bison_no_warn = $(quiet_cmd_bison)
--      cmd_bison_no_warn = $(YACC) --version >/dev/null; \
--			  $(cmd_bison) 2>/dev/null
-+      cmd_bison_no_warn = $(cmd_bison) 2>/dev/null
- 
- $(obj)/pars%.tab.c $(obj)/pars%.tab.h: $(src)/pars%.y FORCE
- 	$(call if_changed,bison_no_warn)
-diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
-index e265c5d96861..0580c088527f 100644
---- a/scripts/genksyms/lex.l
-+++ b/scripts/genksyms/lex.l
-@@ -19,6 +19,8 @@
- #include "genksyms.h"
- #include "parse.tab.h"
- 
-+extern YYSTYPE yylval;
-+
- /* We've got a two-level lexer here.  We let flex do basic tokenization
-    and then we categorize those basic tokens in the second stage.  */
- #define YY_DECL		static int yylex1(void)
-diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-index b3eff9613cf8..9eb9a94a68e0 100644
---- a/scripts/kconfig/parser.y
-+++ b/scripts/kconfig/parser.y
-@@ -20,6 +20,8 @@
- 
- int cdebug = PRINTD;
- 
-+int yynerrs = 0;
-+
- static void yyerror(const char *err);
- static void zconfprint(const char *err, ...);
- static void zconf_error(const char *err, ...);
-@@ -101,13 +103,6 @@ static struct menu *current_menu, *current_entry;
- %type <string> word_opt assign_val
- %type <flavor> assign_op
- 
--%destructor {
--	fprintf(stderr, "%s:%d: missing end statement for this entry\n",
--		$$->file->name, $$->lineno);
--	if (current_menu == $$)
--		menu_end_menu();
--} if_entry menu_entry choice_entry
--
- %%
- input: mainmenu_stmt stmt_list | stmt_list;
- 
-@@ -529,6 +524,11 @@ static bool zconf_endtoken(const char *tokenname,
- 	if (strcmp(tokenname, expected_tokenname)) {
- 		zconf_error("unexpected '%s' within %s block",
- 			    tokenname, expected_tokenname);
-+		if (!strcmp(tokenname, "if") || !strcmp(tokenname, "menu") ||
-+			!strcmp(tokenname, "choice"))
-+			fprintf(stderr, "%s:%d: missing end statement for this entry\n",
-+				current_menu->file->name, current_menu->lineno);
-+		menu_end_menu();
- 		yynerrs++;
- 		return false;
- 	}
--- 
-2.25.0
+As you probably know, the current norm on Android and many other systems
+is for vendors to introduce significant changes to their downstream
+kernels, and to contribute very little (if any) code back upstream.
+
+One of the goals of the Generic Kernel Image (GKI) project together with
+updatability and such is to close the gap between vendor-specific
+downstream kernels and upstream. Having one unique kernel for all android
+devices of the same architecture regardless of the vendor will
+mechanically force all interested parties to agree on a common solution.
+And we _are_ pushing for all this to reach upstream and be available to
+use by the wider community.
+
+The kernel-to-drivers ABI on Android devices varies significantly from
+one vendor kernel to another today (because of changes to exported
+symbols, dependencies on vendor symbols, and surely other things). The
+first step for GKI is to try and put some order into this by agreeing on
+one version of the ABI that works for everybody.
+
+For practical reasons, we need to reduce the ABI surface to a subset of
+the exported symbols, simply to make the problem realistically solvable.
+Hence this patch.
+
+I understand your point of view, and quite frankly agree with the
+message. But I think this patch pushes in the right direction. As I see
+it, things like GKI really are significant improvements, so preventing
+them from happening by refusing trivial patches such as this one will,
+in the long term, do more harm than good to the cause.
+
+Thank you for your time,
+Quentin
