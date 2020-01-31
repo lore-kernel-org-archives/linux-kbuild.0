@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53656 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:54290 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727749AbgAaCiC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Jan 2020 21:38:02 -0500
-Date: Thu, 30 Jan 2020 21:37:59 -0500
+        id S1727749AbgAaClC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 30 Jan 2020 21:41:02 -0500
+Date: Thu, 30 Jan 2020 21:41:00 -0500
 From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: [GIT PULL] kconfig: localmodconfig: Minor clean ups to
  streamline_config.pl
-Message-ID: <20200130213759.27aeeab9@rorschach.local.home>
+Message-ID: <20200130214100.57b8239b@rorschach.local.home>
 In-Reply-To: <CAK7LNATryPUSTm8wPTFHO=E5f=sVPM4T0UxT=BF2qeyVehsH6Q@mail.gmail.com>
 References: <20200130122221.30029e32@gandalf.local.home>
         <CAK7LNAR1AJFDahD6cB_MryBd-79N_T5O9WV3CMEA+HOCDXZEig@mail.gmail.com>
@@ -24,16 +24,14 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kern
 On Fri, 31 Jan 2020 11:08:59 +0900
 Masahiro Yamada <masahiroy@kernel.org> wrote:
 
-> Linus,
-> 
-> If you have not pulled this one yet,
-> could you ignore it?
+> OK, I see.  I will also try my best to send a notice email.
+> I want to avoid a situation where two people
+> are picking up the same patches without noticing each other.
 
-Ack, please ignore this pull request, Thanks!
+BTW, I'm fine with changes to the localmodconfig code going through
+your tree. Just let me give them acks. And if I end up having changes,
+I'll send them to you.
+
+Thanks!
 
 -- Steve
-
-> 
-> 
-> I will soon send pull requests for Kbuild + Kconfig,
-> which includes the same patches.
