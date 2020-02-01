@@ -1,38 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:42040 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726354AbgBAS2X (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Feb 2020 13:28:23 -0500
-Received: by mail-lj1-f196.google.com with SMTP id d10so10462225ljl.9
-        for <linux-kbuild@vger.kernel.org>; Sat, 01 Feb 2020 10:28:21 -0800 (PST)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com. [209.85.167.41])
-        by smtp.gmail.com with ESMTPSA id w29sm8298824ljd.99.2020.02.01.10.28.19
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2020 10:28:19 -0800 (PST)
-Received: by mail-lf1-f41.google.com with SMTP id t23so7021609lfk.6
-        for <linux-kbuild@vger.kernel.org>; Sat, 01 Feb 2020 10:28:19 -0800 (PST)
-MIME-Version: 1.0
-References: <CAK7LNAT2Z=_ig0CnCcCS-=MVN409XrPay5-62LhVRRtvOPshTA@mail.gmail.com>
-In-Reply-To: <CAK7LNAT2Z=_ig0CnCcCS-=MVN409XrPay5-62LhVRRtvOPshTA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 1 Feb 2020 10:28:03 -0800
-Message-ID: <CAHk-=wj1K6DR65Vg0-KreeRdK7AKhJ3XwbJ7Gqk5L0=QkKfvDg@mail.gmail.com>
-Subject: Re: [GIT PULL 2/2] Kconfig updates for v5.6-rc1
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.kernel.org ([198.145.29.99]:60750 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726270AbgBASaQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 1 Feb 2020 13:30:16 -0500
+Subject: Re: [GIT PULL 1/2] Kbuild updates for v5.6-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNAS625YwKpv4wfKO78+Rexe2fP5pLDbMD4r71wwiQfN0Ng@mail.gmail.com>
+References: <CAK7LNAS625YwKpv4wfKO78+Rexe2fP5pLDbMD4r71wwiQfN0Ng@mail.gmail.com>
+Message-Id: <158058181620.4504.1255517678258543821.pr-tracker-bot@kernel.org>
+Date: Sat, 01 Feb 2020 18:30:16 +0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Jan 31, 2020 at 8:06 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
->  - add 'yes2modconfig' and 'mod2yesconfig' targets
+The pull request you sent on Sat, 1 Feb 2020 13:05:32 +0900:
 
-It would have been appreciated if you'd explain what the point of those are.
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-v5.6
 
-Yes, I looked into the individual commits to check, but it wasn't
-exactly obvious why anybody would ever use this.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/368d060bb497775e42e323b9f676c45e2011da27
 
-                    Linus
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
