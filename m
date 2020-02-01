@@ -1,83 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45211 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726712AbgAaRlB (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:55760 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbgBADN1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Jan 2020 12:41:01 -0500
-Received: by mail-wr1-f65.google.com with SMTP id a6so9585006wrx.12
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Jan 2020 09:41:00 -0800 (PST)
-Date: Fri, 31 Jan 2020 17:40:55 +0000
-From: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v2] kbuild: allow symbol whitelisting with
- TRIM_UNUSED_KSYMS
-Message-ID: <20200131174055.GA8425@google.com>
-References: <20200129181541.105335-1-qperret@google.com>
- <20200131131508.GH102066@google.com>
+        Fri, 31 Jan 2020 22:13:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200131131508.GH102066@google.com>
+References: <20200122100344.50751-1-vincenzo.frascino@arm.com>
+In-Reply-To: <20200122100344.50751-1-vincenzo.frascino@arm.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 1 Feb 2020 12:12:44 +0900
+Message-ID: <CAK7LNATxbGWGW19N9H-HAiSY0AL0iFs8D_H0DEKmEfTGTT88iA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Sanitize make randconfig generated .config
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Maennich <maennich@google.com>
-Cc: masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kernel-team@android.com, jeyu@kernel.org
+To: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Friday 31 Jan 2020 at 13:15:08 (+0000), 'Matthias Maennich' via kernel-team wrote:
-> On Wed, Jan 29, 2020 at 06:15:41PM +0000, Quentin Perret wrote:
-> > diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> > index a904bf1f5e67..8e1b7f70e800 100755
-> > --- a/scripts/adjust_autoksyms.sh
-> > +++ b/scripts/adjust_autoksyms.sh
-> > @@ -48,6 +48,7 @@ cat > "$new_ksyms_file" << EOT
-> > EOT
-> > sed 's/ko$/mod/' modules.order |
-> > xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
-> > +cat - "${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}" |
-> 
-> This handles absolute paths very well. I wonder whether we can make this
-> more useful for folks that want to maintain such a whitelist in their
-> copy of the tree. Lets say, I have in my sources
-> arch/x86/configs/x86_64_symbol_whitelist and in my config I have
-> CONFIG_UNUSED_KSYMS_WHITELIST="arch/x86/configs/x86_64_symbol_whitelist".
-> 
-> If I see it correctly, UNUSED_KSYMS_WHITELIST is currently either an
-> absolute path or a relative path to the current build directory. I would
-> prefer if relative paths would be relative to the source directory to
-> support the above use case. (Note, that scenario above works if I build
-> directly in the sources, but fails if I build O=/somewhere/else.)
+Hi.
 
-Right, that is an interesting use case. I suppose something like the
-below should work (with appropriate documentation of the config option).
 
----8<---
-diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-index 8e1b7f70e800..d37803fd75ce 100755
---- a/scripts/adjust_autoksyms.sh
-+++ b/scripts/adjust_autoksyms.sh
-@@ -38,6 +38,12 @@ esac
- # We need access to CONFIG_ symbols
- . include/config/auto.conf
- 
-+ksym_wl="${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}"
-+# If the path is relative, it must be relative to the source tree
-+if [ "$ksym_wl" == "${ksym_wl#/}" ]; then
-+       ksym_wl="$abs_srctree/$ksym_wl"
-+fi
-+
- # Generate a new ksym list file with symbols needed by the current
- # set of modules.
- cat > "$new_ksyms_file" << EOT
-@@ -48,7 +54,7 @@ cat > "$new_ksyms_file" << EOT
- EOT
- sed 's/ko$/mod/' modules.order |
- xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
--cat - "${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}" |
-+cat - "$ksym_wl" |
- sort -u |
- sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$new_ksyms_file"
---->8---
+On Wed, Jan 22, 2020 at 7:03 PM Vincenzo Frascino
+<vincenzo.frascino@arm.com> wrote:
+>
+> "make randconfig" calculates the probability of a tristate option (yes,
+> mod, no) based on srand()/rand() and can be fed with a seed.
+> At the last step of randconfig some option are chosen randomly and their
+> tristate set based on similar mechanism.
+> After this passage the resulting .config is not sanitized, hence it
+> might result in an inconsistent set of options being selected.
+>
+> This was noticed on arm64 using KCONFIG_SEED=0x40C5E904. During
+> randomize_choice_values() CONFIG_BIG_ENDIAN is enabled. Since CONFIG_EFI
+> was enabled at a previous step, and depends on !CONFIG_BIG_ENDIAN the
+> resulting .config is inconsistent.
+>
+> Fix the issue making sure that randconfig sanitizes the generated
+> .config as a last step.
+>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+> ---
+>  scripts/kconfig/conf.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 1f89bf1558ce..c0fcaa4e9762 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -654,6 +654,11 @@ int main(int ac, char **av)
+>         case randconfig:
+>                 /* Really nothing to do in this loop */
+>                 while (conf_set_all_new_symbols(def_random)) ;
+> +               /*
+> +                * .config at this point might contain
+> +                * incompatible options. Sanitize it.
+> +                */
+> +               sym_clear_all_valid();
 
-Thoughts ?
+Thanks for the report, but clearing
+all the valid flags is a big hammer.
+I do not think it is a proper fix.
 
-Thanks,
-Quentin
+
+I checked the code, and I noticed the root cause of
+this bug.
+
+I will send a different patch later.
+
+
+
+
+>                 break;
+>         case defconfig:
+>                 conf_set_all_new_symbols(def_default);
+> --
+> 2.25.0
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
