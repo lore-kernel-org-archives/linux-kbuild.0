@@ -1,69 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:33998 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgBAFMD (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:26548 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgBAFQs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Feb 2020 00:12:03 -0500
+        Sat, 1 Feb 2020 00:16:48 -0500
 MIME-Version: 1.0
-References: <20200201050311.3458-1-masahiroy@kernel.org>
-In-Reply-To: <20200201050311.3458-1-masahiroy@kernel.org>
+References: <20200122100344.50751-1-vincenzo.frascino@arm.com> <CAK7LNATxbGWGW19N9H-HAiSY0AL0iFs8D_H0DEKmEfTGTT88iA@mail.gmail.com>
+In-Reply-To: <CAK7LNATxbGWGW19N9H-HAiSY0AL0iFs8D_H0DEKmEfTGTT88iA@mail.gmail.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 1 Feb 2020 14:11:15 +0900
-Message-ID: <CAK7LNATTZGrJmh0CsR8eJUo3b13T9sjZPV4dh+2fCSZ9F4U0YA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix broken dependency in randconfig-generated .config
+Date: Sat, 1 Feb 2020 14:15:52 +0900
+Message-ID: <CAK7LNATmVaxdMrJqeNEZ0cNHYXrL06Va7v2hFzEY=j1i=gGCdw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Sanitize make randconfig generated .config
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Vincenzo Frascino <vincenzo.frascino@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sat, Feb 1, 2020 at 2:03 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Sat, Feb 1, 2020 at 12:12 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Running randconfig on arm64 using KCONFIG_SEED=0x40C5E904 (e.g. on v5.5)
-> produces the .config with CONFIG_EFI=y and CONFIG_CPU_BIG_ENDIAN=y,
-> which does not meet the !CONFIG_CPU_BIG_ENDIAN dependency.
+> Hi.
 >
-> This is because the user choice for CONFIG_CPU_LITTLE_ENDIAN vs
-> CONFIG_CPU_BIG_ENDIAN is set by randomize_choice_values() after the
-> value of CONFIG_EFI is calculated.
 >
-> When this happens, the has_changed flag should be set.
+> On Wed, Jan 22, 2020 at 7:03 PM Vincenzo Frascino
+> <vincenzo.frascino@arm.com> wrote:
+> >
+> > "make randconfig" calculates the probability of a tristate option (yes,
+> > mod, no) based on srand()/rand() and can be fed with a seed.
+> > At the last step of randconfig some option are chosen randomly and their
+> > tristate set based on similar mechanism.
+> > After this passage the resulting .config is not sanitized, hence it
+> > might result in an inconsistent set of options being selected.
+> >
+> > This was noticed on arm64 using KCONFIG_SEED=0x40C5E904. During
+> > randomize_choice_values() CONFIG_BIG_ENDIAN is enabled. Since CONFIG_EFI
+> > was enabled at a previous step, and depends on !CONFIG_BIG_ENDIAN the
+> > resulting .config is inconsistent.
+> >
+> > Fix the issue making sure that randconfig sanitizes the generated
+> > .config as a last step.
+> >
+> > Cc: Masahiro Yamada <masahiroy@kernel.org>
+> > Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+> > ---
+> >  scripts/kconfig/conf.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> > index 1f89bf1558ce..c0fcaa4e9762 100644
+> > --- a/scripts/kconfig/conf.c
+> > +++ b/scripts/kconfig/conf.c
+> > @@ -654,6 +654,11 @@ int main(int ac, char **av)
+> >         case randconfig:
+> >                 /* Really nothing to do in this loop */
+> >                 while (conf_set_all_new_symbols(def_random)) ;
+> > +               /*
+> > +                * .config at this point might contain
+> > +                * incompatible options. Sanitize it.
+> > +                */
+> > +               sym_clear_all_valid();
 >
-> Currently, it takes the result from the last iteration. It should
-> accumulate all the results of the loop.
+> Thanks for the report, but clearing
+> all the valid flags is a big hammer.
+> I do not think it is a proper fix.
 >
-> Reported-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+>
+> I checked the code, and I noticed the root cause of
+> this bug.
+>
+> I will send a different patch later.
 
-Maybe, this could be tagged:
 
-Fixes: 3b9a19e08960 ("kconfig: loop as long as we changed some symbols
-in randconfig")
-
-
-
-
-
->  scripts/kconfig/confdata.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 99f2418baa6c..eb1efa3abdee 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -1353,7 +1353,7 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
->
->                 sym_calc_value(csym);
->                 if (mode == def_random)
-> -                       has_changed = randomize_choice_values(csym);
-> +                       has_changed |= randomize_choice_values(csym);
->                 else {
->                         set_all_choice_values(csym);
->                         has_changed = true;
-> --
-> 2.17.1
->
+I think this is a more correct fix-up:
+https://patchwork.kernel.org/patch/11360945/
 
 
 -- 
