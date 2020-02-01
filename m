@@ -1,80 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:26548 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgBAFQs (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44694 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbgBAGZL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Feb 2020 00:16:48 -0500
+        Sat, 1 Feb 2020 01:25:11 -0500
+From: Changbin Du <changbin.du@gmail.com>
+Subject: [PATCH 0/2] Add SANITIZE_xx.o & SANITIZE and apply them to x86
+Date: Sat,  1 Feb 2020 14:24:57 +0800
+Message-Id: <20200201062459.7150-1-changbin.du@gmail.com>
 MIME-Version: 1.0
-References: <20200122100344.50751-1-vincenzo.frascino@arm.com> <CAK7LNATxbGWGW19N9H-HAiSY0AL0iFs8D_H0DEKmEfTGTT88iA@mail.gmail.com>
-In-Reply-To: <CAK7LNATxbGWGW19N9H-HAiSY0AL0iFs8D_H0DEKmEfTGTT88iA@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 1 Feb 2020 14:15:52 +0900
-Message-ID: <CAK7LNATmVaxdMrJqeNEZ0cNHYXrL06Va7v2hFzEY=j1i=gGCdw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Sanitize make randconfig generated .config
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Alexander Potapenko <glider@google.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, hpa@zytor.com, x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Changbin Du <changbin.du@gmail.com>
 
-On Sat, Feb 1, 2020 at 12:12 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Hi.
->
->
-> On Wed, Jan 22, 2020 at 7:03 PM Vincenzo Frascino
-> <vincenzo.frascino@arm.com> wrote:
-> >
-> > "make randconfig" calculates the probability of a tristate option (yes,
-> > mod, no) based on srand()/rand() and can be fed with a seed.
-> > At the last step of randconfig some option are chosen randomly and their
-> > tristate set based on similar mechanism.
-> > After this passage the resulting .config is not sanitized, hence it
-> > might result in an inconsistent set of options being selected.
-> >
-> > This was noticed on arm64 using KCONFIG_SEED=0x40C5E904. During
-> > randomize_choice_values() CONFIG_BIG_ENDIAN is enabled. Since CONFIG_EFI
-> > was enabled at a previous step, and depends on !CONFIG_BIG_ENDIAN the
-> > resulting .config is inconsistent.
-> >
-> > Fix the issue making sure that randconfig sanitizes the generated
-> > .config as a last step.
-> >
-> > Cc: Masahiro Yamada <masahiroy@kernel.org>
-> > Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> > ---
-> >  scripts/kconfig/conf.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> > index 1f89bf1558ce..c0fcaa4e9762 100644
-> > --- a/scripts/kconfig/conf.c
-> > +++ b/scripts/kconfig/conf.c
-> > @@ -654,6 +654,11 @@ int main(int ac, char **av)
-> >         case randconfig:
-> >                 /* Really nothing to do in this loop */
-> >                 while (conf_set_all_new_symbols(def_random)) ;
-> > +               /*
-> > +                * .config at this point might contain
-> > +                * incompatible options. Sanitize it.
-> > +                */
-> > +               sym_clear_all_valid();
->
-> Thanks for the report, but clearing
-> all the valid flags is a big hammer.
-> I do not think it is a proper fix.
->
->
-> I checked the code, and I noticed the root cause of
-> this bug.
->
-> I will send a different patch later.
+These two patches add SANITIZE_xx.o and SANITIZE to disable all sanitizers for
+specific files, and apply them to x86 booting code.
 
+We need to disable UBSAN for some of ealy stage code:
+ o For code which could operate in one-one mapping mode. In this case,
+   kernel would crash at accessing data parameter when invoking UBSAN
+   handlers.
+ o Since UBSAN handlers are instrumented by KASAN, so invoking UBSAN
+   handlers before KASAN is initiated also is not allowed.
 
-I think this is a more correct fix-up:
-https://patchwork.kernel.org/patch/11360945/
+Changbin Du (2):
+  sanitize: Add SANITIZE_xx.o and SANITIZE to disable all sanitizers for
+    specific files
+  x86: Disable both KASAN and UBSAN for some booting code
 
+ Documentation/dev-tools/kasan.rst | 12 ++++++++++++
+ arch/x86/boot/Makefile            |  2 +-
+ arch/x86/boot/compressed/Makefile |  2 +-
+ arch/x86/entry/vdso/Makefile      |  3 +--
+ arch/x86/kernel/Makefile          | 10 +++++-----
+ arch/x86/lib/Makefile             |  2 +-
+ arch/x86/mm/Makefile              |  4 ++--
+ arch/x86/realmode/Makefile        |  2 +-
+ arch/x86/realmode/rm/Makefile     |  2 +-
+ scripts/Makefile.lib              |  4 ++--
+ 10 files changed, 27 insertions(+), 16 deletions(-)
 
 -- 
-Best Regards
-Masahiro Yamada
+2.24.0
