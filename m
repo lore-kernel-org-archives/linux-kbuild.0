@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44699 "EHLO
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:37003 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbgBAGZR (ORCPT
+        with ESMTP id S1726669AbgBAGZX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Feb 2020 01:25:17 -0500
+        Sat, 1 Feb 2020 01:25:23 -0500
 From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH 1/2] sanitize: Add SANITIZE_xx.o and SANITIZE to disable all sanitizers for specific files
-Date: Sat,  1 Feb 2020 14:24:58 +0800
-Message-Id: <20200201062459.7150-2-changbin.du@gmail.com>
+Subject: [PATCH 2/2] x86: Disable both KASAN and UBSAN for some booting code
+Date: Sat,  1 Feb 2020 14:24:59 +0800
+Message-Id: <20200201062459.7150-3-changbin.du@gmail.com>
 In-Reply-To: <20200201062459.7150-1-changbin.du@gmail.com>
 References: <20200201062459.7150-1-changbin.du@gmail.com>
 MIME-Version: 1.0
@@ -17,58 +17,144 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>
 Cc: Alexander Potapenko <glider@google.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, hpa@zytor.com, x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Changbin Du <changbin.du@gmail.com>
 
-This patch add two new flags to disable all sanitizers (UBSAN and KASAN):
-  o SANITIZE_xx.o - disable all sanitizers for a single file.
-  o SANITIZE - disable all sanitizers for current directory.
+Now we have disabled KASAN for some special files properly which might
+prevent kernel to boot. We also need to disable UBSAN for some of these
+files:
+  o For code which could operate in one-one mapping mode. In this case,
+    kernel would crash at accessing data parameter when invoking UBSAN
+    handlers.
+  o Since UBSAN handlers are instrumented by KASAN, so invoking UBSAN
+    handlers before KASAN is initiated also is not allowed.
+
+It is easy to prove such behavior by adding a line of code that triggers
+UBSAN report before kasan_early_init().
 
 Signed-off-by: Changbin Du <changbin.du@gmail.com>
 ---
- Documentation/dev-tools/kasan.rst | 12 ++++++++++++
- scripts/Makefile.lib              |  4 ++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ arch/x86/boot/Makefile            |  2 +-
+ arch/x86/boot/compressed/Makefile |  2 +-
+ arch/x86/entry/vdso/Makefile      |  3 +--
+ arch/x86/kernel/Makefile          | 10 +++++-----
+ arch/x86/lib/Makefile             |  2 +-
+ arch/x86/mm/Makefile              |  4 ++--
+ arch/x86/realmode/Makefile        |  2 +-
+ arch/x86/realmode/rm/Makefile     |  2 +-
+ 8 files changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
-index e4d66e7c50de..f59fc5fb2cd8 100644
---- a/Documentation/dev-tools/kasan.rst
-+++ b/Documentation/dev-tools/kasan.rst
-@@ -55,6 +55,18 @@ similar to the following to the respective kernel Makefile:
- 
-     KASAN_SANITIZE := n
- 
-+Similarly, to disable all sanitizers (KASAN, UBSAN) for specific files or
-+directories, add a line similar to the following to the respective kernel
-+Makefile:
-+
-+- For a single file (e.g. main.o)::
-+
-+    SANITIZE_main.o := n
-+
-+- For all files in one directory::
-+
-+    SANITIZE := n
-+
- Error reports
- ~~~~~~~~~~~~~
- 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3fa32f83b2d7..9b7d784e3252 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -122,13 +122,13 @@ endif
+diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
+index 748b6d28a91d..cd1f1ddbd319 100644
+--- a/arch/x86/boot/Makefile
++++ b/arch/x86/boot/Makefile
+@@ -9,7 +9,7 @@
+ # Changed by many, many contributors over the years.
  #
- ifeq ($(CONFIG_KASAN),y)
- _c_flags += $(if $(patsubst n%,, \
--		$(KASAN_SANITIZE_$(basetarget).o)$(KASAN_SANITIZE)y), \
-+		$(SANITIZE_$(basetarget).o)$(SANITIZE)$(KASAN_SANITIZE_$(basetarget).o)$(KASAN_SANITIZE)y), \
- 		$(CFLAGS_KASAN), $(CFLAGS_KASAN_NOSANITIZE))
+ 
+-KASAN_SANITIZE			:= n
++SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+ 
+ # Kernel does not boot with kcov instrumentation here.
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 56aa5fa0a66b..82304ccc1e12 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -17,7 +17,7 @@
+ #	(see scripts/Makefile.lib size_append)
+ #	compressed vmlinux.bin.all + u32 size of vmlinux.bin.all
+ 
+-KASAN_SANITIZE			:= n
++SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+ 
+ # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
+diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
+index 2b75e80f6b41..53728b92374b 100644
+--- a/arch/x86/entry/vdso/Makefile
++++ b/arch/x86/entry/vdso/Makefile
+@@ -10,8 +10,7 @@ ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
+ include $(srctree)/lib/vdso/Makefile
+ 
+ KBUILD_CFLAGS += $(DISABLE_LTO)
+-KASAN_SANITIZE			:= n
+-UBSAN_SANITIZE			:= n
++SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+ 
+ # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 6175e370ee4a..c038ef0fc77c 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -22,11 +22,11 @@ CFLAGS_REMOVE_early_printk.o = -pg
+ CFLAGS_REMOVE_head64.o = -pg
  endif
  
- ifeq ($(CONFIG_UBSAN),y)
- _c_flags += $(if $(patsubst n%,, \
--		$(UBSAN_SANITIZE_$(basetarget).o)$(UBSAN_SANITIZE)$(CONFIG_UBSAN_SANITIZE_ALL)), \
-+		$(SANITIZE_$(basetarget).o)$(SANITIZE)$(UBSAN_SANITIZE_$(basetarget).o)$(UBSAN_SANITIZE)$(CONFIG_UBSAN_SANITIZE_ALL)), \
- 		$(CFLAGS_UBSAN))
- endif
+-KASAN_SANITIZE_head$(BITS).o				:= n
+-KASAN_SANITIZE_dumpstack.o				:= n
+-KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
+-KASAN_SANITIZE_stacktrace.o				:= n
+-KASAN_SANITIZE_paravirt.o				:= n
++SANITIZE_head$(BITS).o					:= n
++SANITIZE_dumpstack.o					:= n
++SANITIZE_dumpstack_$(BITS).o				:= n
++SANITIZE_stacktrace.o					:= n
++SANITIZE_paravirt.o					:= n
  
+ OBJECT_FILES_NON_STANDARD_relocate_kernel_$(BITS).o	:= y
+ OBJECT_FILES_NON_STANDARD_test_nx.o			:= y
+diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
+index 5246db42de45..f0da5b35e745 100644
+--- a/arch/x86/lib/Makefile
++++ b/arch/x86/lib/Makefile
+@@ -9,7 +9,7 @@ KCOV_INSTRUMENT_delay.o	:= n
+ # Early boot use of cmdline; don't instrument it
+ ifdef CONFIG_AMD_MEM_ENCRYPT
+ KCOV_INSTRUMENT_cmdline.o := n
+-KASAN_SANITIZE_cmdline.o  := n
++SANITIZE_cmdline.o	  := n
+ 
+ ifdef CONFIG_FUNCTION_TRACER
+ CFLAGS_REMOVE_cmdline.o = -pg
+diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
+index 98aecb14fbcc..58d58d9208e9 100644
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
+@@ -4,8 +4,8 @@ KCOV_INSTRUMENT_tlb.o			:= n
+ KCOV_INSTRUMENT_mem_encrypt.o		:= n
+ KCOV_INSTRUMENT_mem_encrypt_identity.o	:= n
+ 
+-KASAN_SANITIZE_mem_encrypt.o		:= n
+-KASAN_SANITIZE_mem_encrypt_identity.o	:= n
++SANITIZE_mem_encrypt.o			:= n
++SANITIZE_mem_encrypt_identity.o		:= n
+ 
+ ifdef CONFIG_FUNCTION_TRACER
+ CFLAGS_REMOVE_mem_encrypt.o		= -pg
+diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
+index 682c895753d9..db86f4283808 100644
+--- a/arch/x86/realmode/Makefile
++++ b/arch/x86/realmode/Makefile
+@@ -6,7 +6,7 @@
+ # for more details.
+ #
+ #
+-KASAN_SANITIZE			:= n
++SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+ 
+ subdir- := rm
+diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
+index f60501a384f9..61017575dab1 100644
+--- a/arch/x86/realmode/rm/Makefile
++++ b/arch/x86/realmode/rm/Makefile
+@@ -6,7 +6,7 @@
+ # for more details.
+ #
+ #
+-KASAN_SANITIZE			:= n
++SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+ 
+ # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
 -- 
 2.24.0
