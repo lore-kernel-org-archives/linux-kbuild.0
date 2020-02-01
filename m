@@ -1,95 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:17270 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726567AbgBAEGs (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:36221 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725306AbgBAFD0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Jan 2020 23:06:48 -0500
-MIME-Version: 1.0
+        Sat, 1 Feb 2020 00:03:26 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 1 Feb 2020 13:05:48 +0900
-Message-ID: <CAK7LNAT2Z=_ig0CnCcCS-=MVN409XrPay5-62LhVRRtvOPshTA@mail.gmail.com>
-Subject: [GIT PULL 2/2] Kconfig updates for v5.6-rc1
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kconfig: fix broken dependency in randconfig-generated .config
+Date: Sat,  1 Feb 2020 14:03:11 +0900
+Message-Id: <20200201050311.3458-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Vincenzo Frascino <vincenzo.frascino@arm.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-Hi Linus,
+Running randconfig on arm64 using KCONFIG_SEED=0x40C5E904 (e.g. on v5.5)
+produces the .config with CONFIG_EFI=y and CONFIG_CPU_BIG_ENDIAN=y,
+which does not meet the !CONFIG_CPU_BIG_ENDIAN dependency.
 
-Please pull Kconfig updates for v5.6-rc1.
+This is because the user choice for CONFIG_CPU_LITTLE_ENDIAN vs
+CONFIG_CPU_BIG_ENDIAN is set by randomize_choice_values() after the
+value of CONFIG_EFI is calculated.
 
-Thanks!
+When this happens, the has_changed flag should be set.
 
+Currently, it takes the result from the last iteration. It should
+accumulate all the results of the loop.
 
-The following changes since commit c79f46a282390e0f5b306007bf7b11a46d529538:
+Reported-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-  Linux 5.5-rc5 (2020-01-05 14:23:27 -0800)
+ scripts/kconfig/confdata.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kconfig-v5.6
-
-for you to fetch changes up to 2b5072b9dfab1bc9e4f605bba19b4470e429c60c:
-
-  kconfig: fix documentation typos (2020-01-22 00:54:35 +0900)
-
-----------------------------------------------------------------
-Kconfig updates for v5.6
-
- - add 'yes2modconfig' and 'mod2yesconfig' targets
-
- - sanitize help text
-
- - various code cleanups
-
-----------------------------------------------------------------
-Bartosz Golaszewski (1):
-      kconfig: fix an "implicit declaration of function" warning
-
-Bjorn Helgaas (1):
-      kconfig: fix documentation typos
-
-Masahiro Yamada (12):
-      kconfig: remove the rootmenu check in menu_add_prop()
-      kconfig: use parent->dep as the parentdep of 'menu'
-      kconfig: drop T_WORD from the RHS of 'prompt' symbol
-      kconfig: remove 'prompt' symbol
-      kconfig: move prompt handling to menu_add_prompt() from menu_add_prop()
-      kconfig: remove 'prompt' argument from menu_add_prop()
-      kconfig: remove sym from struct property
-      kconfig: squash prop_alloc() into menu_add_prop()
-      kconfig: localmodconfig: remove unused $config
-      kconfig: localmodconfig: fix indentation for closing brace
-      kconfig: fix too deep indentation in Makefile
-      kconfig: use $(PERL) in Makefile
-
-Tetsuo Handa (1):
-      kconfig: Add yes2modconfig and mod2yesconfig targets.
-
-Thomas Hebb (3):
-      kconfig: list all definitions of a symbol in help text
-      kconfig: distinguish between dependencies and visibility in help text
-      kconfig: fix nesting of symbol help text
-
- Documentation/kbuild/kconfig-language.rst |   7 +-
- scripts/kconfig/Makefile                  |  24 ++--
- scripts/kconfig/conf.c                    |  16 +++
- scripts/kconfig/confdata.c                |  16 +++
- scripts/kconfig/expr.c                    |   3 +-
- scripts/kconfig/expr.h                    |   2 +-
- scripts/kconfig/gconf.c                   |   1 +
- scripts/kconfig/lkc.h                     |   4 +-
- scripts/kconfig/mconf.c                   |   1 +
- scripts/kconfig/menu.c                    | 185 ++++++++++++++++------------
- scripts/kconfig/nconf.c                   |   1 +
- scripts/kconfig/parser.y                  |  21 ++--
- scripts/kconfig/streamline_config.pl      |   4 +-
- scripts/kconfig/symbol.c                  |  22 ----
- 14 files changed, 174 insertions(+), 133 deletions(-)
-
-
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 99f2418baa6c..eb1efa3abdee 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1353,7 +1353,7 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
+ 
+ 		sym_calc_value(csym);
+ 		if (mode == def_random)
+-			has_changed = randomize_choice_values(csym);
++			has_changed |= randomize_choice_values(csym);
+ 		else {
+ 			set_all_choice_values(csym);
+ 			has_changed = true;
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
