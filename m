@@ -1,160 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:37003 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726669AbgBAGZX (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:63393 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726669AbgBAQuU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Feb 2020 01:25:23 -0500
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH 2/2] x86: Disable both KASAN and UBSAN for some booting code
-Date: Sat,  1 Feb 2020 14:24:59 +0800
-Message-Id: <20200201062459.7150-3-changbin.du@gmail.com>
-In-Reply-To: <20200201062459.7150-1-changbin.du@gmail.com>
-References: <20200201062459.7150-1-changbin.du@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sat, 1 Feb 2020 11:50:20 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 1/2] kbuild: fix the document to use extra-y for vmlinux.lds
+Date: Sun,  2 Feb 2020 01:49:23 +0900
+Message-Id: <20200201164924.5487-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: Alexander Potapenko <glider@google.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, hpa@zytor.com, x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Changbin Du <changbin.du@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>
 
-Now we have disabled KASAN for some special files properly which might
-prevent kernel to boot. We also need to disable UBSAN for some of these
-files:
-  o For code which could operate in one-one mapping mode. In this case,
-    kernel would crash at accessing data parameter when invoking UBSAN
-    handlers.
-  o Since UBSAN handlers are instrumented by KASAN, so invoking UBSAN
-    handlers before KASAN is initiated also is not allowed.
+The difference between "always" and "extra-y" is that the targets
+listed in $(always) are always built, whereas the ones in $(extra-y)
+are built only when KBUILD_BUILTIN is set.
 
-It is easy to prove such behavior by adding a line of code that triggers
-UBSAN report before kasan_early_init().
+So, "make modules" does not build the targets in $(extra-y).
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
+vmlinux.lds is only needed for linking vmlinux. So, adding it to extra-y
+is more correct. In fact, arch/x86/kernel/Makefile does this.
+
+Fix the example code.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- arch/x86/boot/Makefile            |  2 +-
- arch/x86/boot/compressed/Makefile |  2 +-
- arch/x86/entry/vdso/Makefile      |  3 +--
- arch/x86/kernel/Makefile          | 10 +++++-----
- arch/x86/lib/Makefile             |  2 +-
- arch/x86/mm/Makefile              |  4 ++--
- arch/x86/realmode/Makefile        |  2 +-
- arch/x86/realmode/rm/Makefile     |  2 +-
- 8 files changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-index 748b6d28a91d..cd1f1ddbd319 100644
---- a/arch/x86/boot/Makefile
-+++ b/arch/x86/boot/Makefile
-@@ -9,7 +9,7 @@
- # Changed by many, many contributors over the years.
- #
+ Documentation/kbuild/makefiles.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index d7e6534a8505..b1733b877025 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -1269,12 +1269,12 @@ When kbuild executes, the following steps are followed (roughly):
+ 	Example::
  
--KASAN_SANITIZE			:= n
-+SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
+ 		#arch/x86/kernel/Makefile
+-		always := vmlinux.lds
++		extra-y := vmlinux.lds
  
- # Kernel does not boot with kcov instrumentation here.
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 56aa5fa0a66b..82304ccc1e12 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -17,7 +17,7 @@
- #	(see scripts/Makefile.lib size_append)
- #	compressed vmlinux.bin.all + u32 size of vmlinux.bin.all
+ 		#Makefile
+ 		export CPPFLAGS_vmlinux.lds += -P -C -U$(ARCH)
  
--KASAN_SANITIZE			:= n
-+SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
-diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-index 2b75e80f6b41..53728b92374b 100644
---- a/arch/x86/entry/vdso/Makefile
-+++ b/arch/x86/entry/vdso/Makefile
-@@ -10,8 +10,7 @@ ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
- include $(srctree)/lib/vdso/Makefile
- 
- KBUILD_CFLAGS += $(DISABLE_LTO)
--KASAN_SANITIZE			:= n
--UBSAN_SANITIZE			:= n
-+SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 6175e370ee4a..c038ef0fc77c 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -22,11 +22,11 @@ CFLAGS_REMOVE_early_printk.o = -pg
- CFLAGS_REMOVE_head64.o = -pg
- endif
- 
--KASAN_SANITIZE_head$(BITS).o				:= n
--KASAN_SANITIZE_dumpstack.o				:= n
--KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
--KASAN_SANITIZE_stacktrace.o				:= n
--KASAN_SANITIZE_paravirt.o				:= n
-+SANITIZE_head$(BITS).o					:= n
-+SANITIZE_dumpstack.o					:= n
-+SANITIZE_dumpstack_$(BITS).o				:= n
-+SANITIZE_stacktrace.o					:= n
-+SANITIZE_paravirt.o					:= n
- 
- OBJECT_FILES_NON_STANDARD_relocate_kernel_$(BITS).o	:= y
- OBJECT_FILES_NON_STANDARD_test_nx.o			:= y
-diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-index 5246db42de45..f0da5b35e745 100644
---- a/arch/x86/lib/Makefile
-+++ b/arch/x86/lib/Makefile
-@@ -9,7 +9,7 @@ KCOV_INSTRUMENT_delay.o	:= n
- # Early boot use of cmdline; don't instrument it
- ifdef CONFIG_AMD_MEM_ENCRYPT
- KCOV_INSTRUMENT_cmdline.o := n
--KASAN_SANITIZE_cmdline.o  := n
-+SANITIZE_cmdline.o	  := n
- 
- ifdef CONFIG_FUNCTION_TRACER
- CFLAGS_REMOVE_cmdline.o = -pg
-diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
-index 98aecb14fbcc..58d58d9208e9 100644
---- a/arch/x86/mm/Makefile
-+++ b/arch/x86/mm/Makefile
-@@ -4,8 +4,8 @@ KCOV_INSTRUMENT_tlb.o			:= n
- KCOV_INSTRUMENT_mem_encrypt.o		:= n
- KCOV_INSTRUMENT_mem_encrypt_identity.o	:= n
- 
--KASAN_SANITIZE_mem_encrypt.o		:= n
--KASAN_SANITIZE_mem_encrypt_identity.o	:= n
-+SANITIZE_mem_encrypt.o			:= n
-+SANITIZE_mem_encrypt_identity.o		:= n
- 
- ifdef CONFIG_FUNCTION_TRACER
- CFLAGS_REMOVE_mem_encrypt.o		= -pg
-diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
-index 682c895753d9..db86f4283808 100644
---- a/arch/x86/realmode/Makefile
-+++ b/arch/x86/realmode/Makefile
-@@ -6,7 +6,7 @@
- # for more details.
- #
- #
--KASAN_SANITIZE			:= n
-+SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- subdir- := rm
-diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
-index f60501a384f9..61017575dab1 100644
---- a/arch/x86/realmode/rm/Makefile
-+++ b/arch/x86/realmode/rm/Makefile
-@@ -6,7 +6,7 @@
- # for more details.
- #
- #
--KASAN_SANITIZE			:= n
-+SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- 
- # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
+-	The assignment to $(always) is used to tell kbuild to build the
++	The assignment to extra-y is used to tell kbuild to build the
+ 	target vmlinux.lds.
+ 	The assignment to $(CPPFLAGS_vmlinux.lds) tells kbuild to use the
+ 	specified options when building the target vmlinux.lds.
 -- 
-2.24.0
+2.17.1
