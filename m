@@ -1,65 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39932 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729159AbgBCSsl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Feb 2020 13:48:41 -0500
-From: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-Subject: [PATCH 2/2] ARM: add multi_v7_lpae_defconfig
-Date: Mon,  3 Feb 2020 19:48:19 +0100
-Message-Id: <20200203184820.4433-3-nsaenzjulienne@suse.de>
-In-Reply-To: <20200203184820.4433-1-nsaenzjulienne@suse.de>
-References: <20200203184820.4433-1-nsaenzjulienne@suse.de>
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:37577 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726187AbgBCUHB (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 3 Feb 2020 15:07:01 -0500
+From: Arvind Sankar <nivedita@alum.mit.edu>
+Date: Mon, 3 Feb 2020 15:06:58 -0500
+Subject: Re: [PATCH] initramfs: do not show compression mode choice if
+ INITRAMFS_SOURCE is empty
+Message-ID: <20200203200656.GA455151@rani.riverdale.lan>
+References: <20200203164708.17478-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200203164708.17478-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com, linux-rpi-kernel@lists.infradead.org, f.fainelli@gmail.com, yamada.masahiro@socionext.com, Nicolas Saenz Julienne <nsaenzjulienne@suse.de>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-The only missing configuration option preventing us from using
-multi_v7_defconfig with the Raspberry Pi 4 is ARM_LPAE. It's needed as
-the PCIe controller found on the SoC depends on 64bit addressing, yet
-can't be included as not all v7 boards support LPAE.
+On Tue, Feb 04, 2020 at 01:47:08AM +0900, Masahiro Yamada wrote:
+> Since commit ddd09bcc899f ("initramfs: make compression options not
+> depend on INITRAMFS_SOURCE"), Kconfig asks the compression mode for
+> the built-in initramfs regardless of INITRAMFS_SOURCE.
+> 
+> It is technically simpler, but pointless from a UI perspective,
+> Linus says [1].
+> 
+> When INITRAMFS_SOURCE is empty, usr/Makefile creates a tiny default
+> cpio, which is so small that nobody cares about the compression.
+> 
+> This commit hides the Kconfig choice in that case. The default cpio
+> is embedded without compression, which was the original behavior.
+> 
+> [1]: https://lkml.org/lkml/2020/2/1/160
+> 
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Introduce multi_v7_lpae_defconfig, built off multi_v7_defconfig, which will
-avoid us having to duplicate and maintain multiple similar configurations.
+Would it be feasible to check if the kernel is going to be compressed,
+i.e. one of the KERNEL_{GZIP,BZIP2,...} options other than
+KERNEL_UNCOMPRESSED is set, and default built-in initramfs to
+uncompressed in that case as well?
 
-Needless to say the Raspberry Pi 4 is not the only platform that can
-benefit from this new configuration.
-
-Signed-off-by: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-
----
-
-Changes since RFC:
- - Move config merge function into scripts folder
----
- arch/arm/Makefile            | 4 ++++
- arch/arm/configs/lpae.config | 1 +
- 2 files changed, 5 insertions(+)
- create mode 100644 arch/arm/configs/lpae.config
-
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index 16d41efea7f2..1f4f9a90561d 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -359,6 +359,10 @@ archclean:
- # My testing targets (bypasses dependencies)
- bp:;	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/bootpImage
- 
-+include $(srctree)/scripts/Makefile.defconf
-+PHONY += multi_v7_lpae_defconfig
-+multi_v7_lpae_defconfig:
-+	$(call merge_into_defconfig,multi_v7_defconfig,lpae)
- 
- define archhelp
-   echo  '* zImage        - Compressed kernel image (arch/$(ARCH)/boot/zImage)'
-diff --git a/arch/arm/configs/lpae.config b/arch/arm/configs/lpae.config
-new file mode 100644
-index 000000000000..19bab134e014
---- /dev/null
-+++ b/arch/arm/configs/lpae.config
-@@ -0,0 +1 @@
-+CONFIG_ARM_LPAE=y
--- 
-2.25.0
+Thanks.
