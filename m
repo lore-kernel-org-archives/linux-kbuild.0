@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:39188 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727148AbgBCRd2 (ORCPT
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39419 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbgBCRfa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Feb 2020 12:33:28 -0500
-Received: by mail-lj1-f195.google.com with SMTP id o15so9990040ljg.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 03 Feb 2020 09:33:25 -0800 (PST)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
-        by smtp.gmail.com with ESMTPSA id m8sm9376342lfp.4.2020.02.03.09.33.23
+        Mon, 3 Feb 2020 12:35:30 -0500
+Received: by mail-lj1-f196.google.com with SMTP id o15so9996833ljg.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 03 Feb 2020 09:35:28 -0800 (PST)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
+        by smtp.gmail.com with ESMTPSA id 11sm10264042lju.103.2020.02.03.09.35.26
         for <linux-kbuild@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2020 09:33:23 -0800 (PST)
-Received: by mail-lf1-f53.google.com with SMTP id 9so10266582lfq.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 03 Feb 2020 09:33:23 -0800 (PST)
+        Mon, 03 Feb 2020 09:35:26 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id v201so10268255lfa.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 03 Feb 2020 09:35:26 -0800 (PST)
 MIME-Version: 1.0
 References: <20200203164708.17478-1-masahiroy@kernel.org>
 In-Reply-To: <20200203164708.17478-1-masahiroy@kernel.org>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 3 Feb 2020 17:33:06 +0000
-Message-ID: <CAHk-=whHRjzeTRsPta3VY3pnT_NRPXgCqPgmm=midXevHjGZEg@mail.gmail.com>
+Date: Mon, 3 Feb 2020 17:35:09 +0000
+Message-ID: <CAHk-=wiERN+VgxBEOUKMhZFG-yAvVjmDSZXGR22vQBZETQ75yg@mail.gmail.com>
 Subject: Re: [PATCH] initramfs: do not show compression mode choice if
  INITRAMFS_SOURCE is empty
 Content-Type: text/plain; charset="UTF-8"
@@ -29,8 +29,16 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven
 
 On Mon, Feb 3, 2020 at 4:47 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Will you directly pick up this if you are OK with it?
+> This commit hides the Kconfig choice in that case. The default cpio
+> is embedded without compression, which was the original behavior.
 
-Done. Thanks,
+Btw, is there any way to figure out automatically what the initrd
+compression is (for the external case)?
 
-              Linus
+Because I think it would be lovely to be able to have sane defaults
+for the CONFIG_RD_xyz things.
+
+I'm assuming the answer is "no", simply because it comes from distro
+installs, but I thought I'd check.
+
+                 Linus
