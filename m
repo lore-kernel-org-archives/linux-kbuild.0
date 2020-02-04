@@ -1,125 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:30282 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726561AbgBDCXV (ORCPT
+Received: from www262.sakura.ne.jp ([202.181.97.72]:51114 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726924AbgBDEJH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Feb 2020 21:23:21 -0500
+        Mon, 3 Feb 2020 23:09:07 -0500
+Message-Id: <202002040408.01448ioc013868@www262.sakura.ne.jp>
+Subject: [PATCH] kconfig: Invalidate all symbols after changing to y or m.
+From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-References: <20200203200656.GA455151@rani.riverdale.lan> <20200203211644.39847-1-nivedita@alum.mit.edu>
-In-Reply-To: <20200203211644.39847-1-nivedita@alum.mit.edu>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 4 Feb 2020 11:22:19 +0900
-Message-ID: <CAK7LNAQq7ah1yLOr-fgH-Oo7_NHzvYiy6huY1=4DxJoCGi+cmw@mail.gmail.com>
-Subject: Re: [PATCH] initramfs: don't double-compress built-in initramfs if
- the kernel is compressed
-Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 04 Feb 2020 13:08:44 +0900
+References: <ced8ab1c-9c35-c7b0-6b9e-bcee7ffdf469@i-love.sakura.ne.jp> <CAK7LNATNY1oP5XgFH3+fuUU=Z7pEz7Sqz0vKCzvhM4Kem7RkOg@mail.gmail.com>
+In-Reply-To: <CAK7LNATNY1oP5XgFH3+fuUU=Z7pEz7Sqz0vKCzvhM4Kem7RkOg@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arvind Sankar <nivedita@alum.mit.edu>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dmitry Vyukov <dvyukov@google.com>
 
-Hi.
+Since commit 89b9060987d98833 ("kconfig: Add yes2modconfig and
+mod2yesconfig targets.") forgot to clear SYMBOL_VALID bit after
+changing to y or m, these targets did not save the changes.
+Call sym_clear_all_valid() so that all symbols are revalidated.
 
-On Tue, Feb 4, 2020 at 6:16 AM Arvind Sankar <nivedita@alum.mit.edu> wrote:
->
-> If the kernel is going to be compressed anyway, there is no point in
-> double-compressing the built-in initramfs. Hide the built-in initramfs
-> compression choice in this case.
->
-> Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ scripts/kconfig/confdata.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-
-Double-compression slightly reduces the data size.
-And, keeping the bare vmlinux small is beneficial, IMHO.
-
-
-
-
-> ---
->  init/Kconfig | 9 +++++++++
->  usr/Kconfig  | 2 +-
->  2 files changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 24b23d843df1..88da0976bbfa 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -176,6 +176,9 @@ config HAVE_KERNEL_LZ4
->  config HAVE_KERNEL_UNCOMPRESSED
->         bool
->
-> +config KERNEL_COMPRESSED
-> +       bool
-> +
->  choice
->         prompt "Kernel compression mode"
->         default KERNEL_GZIP
-> @@ -201,6 +204,7 @@ choice
->  config KERNEL_GZIP
->         bool "Gzip"
->         depends on HAVE_KERNEL_GZIP
-> +       select KERNEL_COMPRESSED
->         help
->           The old and tried gzip compression. It provides a good balance
->           between compression ratio and decompression speed.
-> @@ -208,6 +212,7 @@ config KERNEL_GZIP
->  config KERNEL_BZIP2
->         bool "Bzip2"
->         depends on HAVE_KERNEL_BZIP2
-> +       select KERNEL_COMPRESSED
->         help
->           Its compression ratio and speed is intermediate.
->           Decompression speed is slowest among the choices.  The kernel
-> @@ -218,6 +223,7 @@ config KERNEL_BZIP2
->  config KERNEL_LZMA
->         bool "LZMA"
->         depends on HAVE_KERNEL_LZMA
-> +       select KERNEL_COMPRESSED
->         help
->           This compression algorithm's ratio is best.  Decompression speed
->           is between gzip and bzip2.  Compression is slowest.
-> @@ -226,6 +232,7 @@ config KERNEL_LZMA
->  config KERNEL_XZ
->         bool "XZ"
->         depends on HAVE_KERNEL_XZ
-> +       select KERNEL_COMPRESSED
->         help
->           XZ uses the LZMA2 algorithm and instruction set specific
->           BCJ filters which can improve compression ratio of executable
-> @@ -241,6 +248,7 @@ config KERNEL_XZ
->  config KERNEL_LZO
->         bool "LZO"
->         depends on HAVE_KERNEL_LZO
-> +       select KERNEL_COMPRESSED
->         help
->           Its compression ratio is the poorest among the choices. The kernel
->           size is about 10% bigger than gzip; however its speed
-> @@ -249,6 +257,7 @@ config KERNEL_LZO
->  config KERNEL_LZ4
->         bool "LZ4"
->         depends on HAVE_KERNEL_LZ4
-> +       select KERNEL_COMPRESSED
->         help
->           LZ4 is an LZ77-type compressor with a fixed, byte-oriented encoding.
->           A preliminary version of LZ4 de/compression tool is available at
-> diff --git a/usr/Kconfig b/usr/Kconfig
-> index bdf5bbd40727..f39eeb9ea2e3 100644
-> --- a/usr/Kconfig
-> +++ b/usr/Kconfig
-> @@ -102,7 +102,7 @@ config RD_LZ4
->
->  choice
->         prompt "Built-in initramfs compression mode"
-> -       depends on INITRAMFS_SOURCE != ""
-> +       depends on INITRAMFS_SOURCE != "" && !KERNEL_COMPRESSED
->         help
->           This option allows you to decide by which algorithm the builtin
->           initramfs will be compressed.  Several compression algorithms are
-> --
-> 2.24.1
->
-
-
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 11f6c72c2eee..aa70360f27c1 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1331,9 +1331,8 @@ void conf_rewrite_mod_or_yes(enum conf_def_mode mode)
+ 
+ 	for_all_symbols(i, sym) {
+ 		if (sym_get_type(sym) == S_TRISTATE &&
+-		    sym->def[S_DEF_USER].tri == old_val) {
++		    sym->def[S_DEF_USER].tri == old_val)
+ 			sym->def[S_DEF_USER].tri = new_val;
+-			sym_add_change_count(1);
+-		}
+ 	}
++	sym_clear_all_valid();
+ }
 -- 
-Best Regards
-Masahiro Yamada
+2.11.0
