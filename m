@@ -1,92 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:33204 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727257AbgBDOoT (ORCPT
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:38078 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727307AbgBDQ3U (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Feb 2020 09:44:19 -0500
-Received: by mail-wm1-f68.google.com with SMTP id m10so2368105wmc.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Feb 2020 06:44:17 -0800 (PST)
-Date: Tue, 4 Feb 2020 14:44:15 +0000
-From: Matthias Maennich <maennich@google.com>
-Subject: Re: [PATCH v2] kbuild: allow symbol whitelisting with
- TRIM_UNUSED_KSYMS
-Message-ID: <20200204144415.GC42496@google.com>
-References: <20200129181541.105335-1-qperret@google.com>
- <20200131131508.GH102066@google.com>
- <20200131174055.GA8425@google.com>
+        Tue, 4 Feb 2020 11:29:20 -0500
+From: Arvind Sankar <nivedita@alum.mit.edu>
+Date: Tue, 4 Feb 2020 11:29:17 -0500
+Subject: Re: [PATCH] initramfs: don't double-compress built-in initramfs if
+ the kernel is compressed
+Message-ID: <20200204162917.GA1772390@rani.riverdale.lan>
+References: <20200203200656.GA455151@rani.riverdale.lan>
+ <20200203211644.39847-1-nivedita@alum.mit.edu>
+ <CAK7LNAQq7ah1yLOr-fgH-Oo7_NHzvYiy6huY1=4DxJoCGi+cmw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200131174055.GA8425@google.com>
+In-Reply-To: <CAK7LNAQq7ah1yLOr-fgH-Oo7_NHzvYiy6huY1=4DxJoCGi+cmw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kernel-team@android.com, jeyu@kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Arvind Sankar <nivedita@alum.mit.edu>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Fri, Jan 31, 2020 at 05:40:55PM +0000, Quentin Perret wrote:
->On Friday 31 Jan 2020 at 13:15:08 (+0000), 'Matthias Maennich' via kernel-team wrote:
->> On Wed, Jan 29, 2020 at 06:15:41PM +0000, Quentin Perret wrote:
->> > diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
->> > index a904bf1f5e67..8e1b7f70e800 100755
->> > --- a/scripts/adjust_autoksyms.sh
->> > +++ b/scripts/adjust_autoksyms.sh
->> > @@ -48,6 +48,7 @@ cat > "$new_ksyms_file" << EOT
->> > EOT
->> > sed 's/ko$/mod/' modules.order |
->> > xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
->> > +cat - "${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}" |
->>
->> This handles absolute paths very well. I wonder whether we can make this
->> more useful for folks that want to maintain such a whitelist in their
->> copy of the tree. Lets say, I have in my sources
->> arch/x86/configs/x86_64_symbol_whitelist and in my config I have
->> CONFIG_UNUSED_KSYMS_WHITELIST="arch/x86/configs/x86_64_symbol_whitelist".
->>
->> If I see it correctly, UNUSED_KSYMS_WHITELIST is currently either an
->> absolute path or a relative path to the current build directory. I would
->> prefer if relative paths would be relative to the source directory to
->> support the above use case. (Note, that scenario above works if I build
->> directly in the sources, but fails if I build O=/somewhere/else.)
->
->Right, that is an interesting use case. I suppose something like the
->below should work (with appropriate documentation of the config option).
->
->---8<---
->diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
->index 8e1b7f70e800..d37803fd75ce 100755
->--- a/scripts/adjust_autoksyms.sh
->+++ b/scripts/adjust_autoksyms.sh
->@@ -38,6 +38,12 @@ esac
-> # We need access to CONFIG_ symbols
-> . include/config/auto.conf
->
->+ksym_wl="${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}"
->+# If the path is relative, it must be relative to the source tree
->+if [ "$ksym_wl" == "${ksym_wl#/}" ]; then
->+       ksym_wl="$abs_srctree/$ksym_wl"
->+fi
->+
-> # Generate a new ksym list file with symbols needed by the current
-> # set of modules.
-> cat > "$new_ksyms_file" << EOT
->@@ -48,7 +54,7 @@ cat > "$new_ksyms_file" << EOT
-> EOT
-> sed 's/ko$/mod/' modules.order |
-> xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
->-cat - "${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}" |
->+cat - "$ksym_wl" |
-> sort -u |
-> sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$new_ksyms_file"
->--->8---
->
->Thoughts ?
+On Tue, Feb 04, 2020 at 11:22:19AM +0900, Masahiro Yamada wrote:
+> Hi.
+> 
+> On Tue, Feb 4, 2020 at 6:16 AM Arvind Sankar <nivedita@alum.mit.edu> wrote:
+> >
+> > If the kernel is going to be compressed anyway, there is no point in
+> > double-compressing the built-in initramfs. Hide the built-in initramfs
+> > compression choice in this case.
+> >
+> > Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+> 
+> 
+> Double-compression slightly reduces the data size.
+> And, keeping the bare vmlinux small is beneficial, IMHO.
+> 
 
-That definitely looks like I would expect that config option to work.
-Thanks for looking into that!
+Ok. In my setup (kernel is compressed by xz), none for the builtin
+initramfs is optimal by a measurable amount, but I that will depend on
+config/initramfs contents/compression methods, so might well not be true
+in general. Maybe add a note to the help text?
 
-Cheers,
-Matthias
+none    7030816 arch/x86/boot/bzImage
+gz      7382144 arch/x86/boot/bzImage
+bz2     7353696 arch/x86/boot/bzImage
+lzma    7118176 arch/x86/boot/bzImage
+xz      7126400 arch/x86/boot/bzImage
+lzo     7379360 arch/x86/boot/bzImage
+lz4     7335712 arch/x86/boot/bzImage
 
->
->Thanks,
->Quentin
+
+diff --git a/usr/Kconfig b/usr/Kconfig
+index a6b68503d177..b68910b225fc 100644
+--- a/usr/Kconfig
++++ b/usr/Kconfig
+@@ -125,6 +125,12 @@ choice
+ 	  low on RAM, since it reduces the memory consumption during
+ 	  boot.
+ 
++	  Note that if the kernel itself is compressed, the builtin initramfs
++	  will be compressed twice, first by the algorithm selected here, and
++	  then by the kernel compression method chosen. This may increase the
++	  final image size, so you should test whether compressing the builtin
++	  initramfs provides any savings.
++
+ 	  Keep in mind that your build system needs to provide the appropriate
+ 	  compression tool to compress the generated initram cpio file for
+ 	  embedding.
