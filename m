@@ -1,70 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:38078 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727307AbgBDQ3U (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:51574 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727884AbgBEEms (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Feb 2020 11:29:20 -0500
-From: Arvind Sankar <nivedita@alum.mit.edu>
-Date: Tue, 4 Feb 2020 11:29:17 -0500
-Subject: Re: [PATCH] initramfs: don't double-compress built-in initramfs if
- the kernel is compressed
-Message-ID: <20200204162917.GA1772390@rani.riverdale.lan>
-References: <20200203200656.GA455151@rani.riverdale.lan>
- <20200203211644.39847-1-nivedita@alum.mit.edu>
- <CAK7LNAQq7ah1yLOr-fgH-Oo7_NHzvYiy6huY1=4DxJoCGi+cmw@mail.gmail.com>
+        Tue, 4 Feb 2020 23:42:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQq7ah1yLOr-fgH-Oo7_NHzvYiy6huY1=4DxJoCGi+cmw@mail.gmail.com>
+References: <ced8ab1c-9c35-c7b0-6b9e-bcee7ffdf469@i-love.sakura.ne.jp>
+ <CAK7LNATNY1oP5XgFH3+fuUU=Z7pEz7Sqz0vKCzvhM4Kem7RkOg@mail.gmail.com> <202002040408.01448ioc013868@www262.sakura.ne.jp>
+In-Reply-To: <202002040408.01448ioc013868@www262.sakura.ne.jp>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 5 Feb 2020 13:42:07 +0900
+Message-ID: <CAK7LNATD1p6KDYNLYmb+UZpVNOaLdFEp-QRm1waDX_v-sSZ1=w@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Invalidate all symbols after changing to y or m.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Arvind Sankar <nivedita@alum.mit.edu>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dmitry Vyukov <dvyukov@google.com>
 
-On Tue, Feb 04, 2020 at 11:22:19AM +0900, Masahiro Yamada wrote:
-> Hi.
-> 
-> On Tue, Feb 4, 2020 at 6:16 AM Arvind Sankar <nivedita@alum.mit.edu> wrote:
-> >
-> > If the kernel is going to be compressed anyway, there is no point in
-> > double-compressing the built-in initramfs. Hide the built-in initramfs
-> > compression choice in this case.
-> >
-> > Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
-> 
-> 
-> Double-compression slightly reduces the data size.
-> And, keeping the bare vmlinux small is beneficial, IMHO.
-> 
+Hi.
 
-Ok. In my setup (kernel is compressed by xz), none for the builtin
-initramfs is optimal by a measurable amount, but I that will depend on
-config/initramfs contents/compression methods, so might well not be true
-in general. Maybe add a note to the help text?
-
-none    7030816 arch/x86/boot/bzImage
-gz      7382144 arch/x86/boot/bzImage
-bz2     7353696 arch/x86/boot/bzImage
-lzma    7118176 arch/x86/boot/bzImage
-xz      7126400 arch/x86/boot/bzImage
-lzo     7379360 arch/x86/boot/bzImage
-lz4     7335712 arch/x86/boot/bzImage
+On Tue, Feb 4, 2020 at 1:09 PM Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+>
+> Since commit 89b9060987d98833 ("kconfig: Add yes2modconfig and
+> mod2yesconfig targets.") forgot to clear SYMBOL_VALID bit after
+> changing to y or m, these targets did not save the changes.
+> Call sym_clear_all_valid() so that all symbols are revalidated.
+>
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
 
-diff --git a/usr/Kconfig b/usr/Kconfig
-index a6b68503d177..b68910b225fc 100644
---- a/usr/Kconfig
-+++ b/usr/Kconfig
-@@ -125,6 +125,12 @@ choice
- 	  low on RAM, since it reduces the memory consumption during
- 	  boot.
- 
-+	  Note that if the kernel itself is compressed, the builtin initramfs
-+	  will be compressed twice, first by the algorithm selected here, and
-+	  then by the kernel compression method chosen. This may increase the
-+	  final image size, so you should test whether compressing the builtin
-+	  initramfs provides any savings.
-+
- 	  Keep in mind that your build system needs to provide the appropriate
- 	  compression tool to compress the generated initram cpio file for
- 	  embedding.
+My previous comment:
+"sym_add_change_count(1); seems the convention way
+to inform kconfig of some options being updated."
+was misleading. Sorry.
+
+
+conf_write() skips symbol invalidation
+when conf_get_change() returns non-zero value.
+
+        if (!conf_get_changed())
+                sym_clear_all_valid();
+
+I do not know why this if-conditional exists here...
+
+Anyway, this patch fixes the issue.
+
+Applied. Thanks.
+
+
+
+> ---
+>  scripts/kconfig/confdata.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 11f6c72c2eee..aa70360f27c1 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -1331,9 +1331,8 @@ void conf_rewrite_mod_or_yes(enum conf_def_mode mode)
+>
+>         for_all_symbols(i, sym) {
+>                 if (sym_get_type(sym) == S_TRISTATE &&
+> -                   sym->def[S_DEF_USER].tri == old_val) {
+> +                   sym->def[S_DEF_USER].tri == old_val)
+>                         sym->def[S_DEF_USER].tri = new_val;
+> -                       sym_add_change_count(1);
+> -               }
+>         }
+> +       sym_clear_all_valid();
+>  }
+> --
+> 2.11.0
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
