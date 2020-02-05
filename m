@@ -1,44 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:46455 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726277AbgBEG4M (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55024 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726277AbgBELxh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Feb 2020 01:56:12 -0500
-Received: by mail-lj1-f196.google.com with SMTP id x14so1107785ljd.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Feb 2020 22:56:10 -0800 (PST)
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com. [209.85.208.175])
-        by smtp.gmail.com with ESMTPSA id r20sm11628685lfi.91.2020.02.04.22.56.08
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2020 22:56:08 -0800 (PST)
-Received: by mail-lj1-f175.google.com with SMTP id n18so1147963ljo.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Feb 2020 22:56:08 -0800 (PST)
+        Wed, 5 Feb 2020 06:53:37 -0500
+Received: by mail-wm1-f68.google.com with SMTP id g1so2150831wmh.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Feb 2020 03:53:36 -0800 (PST)
+Date: Wed, 5 Feb 2020 11:53:31 +0000
+From: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v2] kbuild: allow symbol whitelisting with
+ TRIM_UNUSED_KSYMS
+Message-ID: <20200205115331.GA74296@google.com>
+References: <20200129181541.105335-1-qperret@google.com>
+ <20200131131508.GH102066@google.com>
+ <20200131174055.GA8425@google.com>
+ <20200204144415.GC42496@google.com>
 MIME-Version: 1.0
-References: <20200205065152.873-1-masahiroy@kernel.org>
-In-Reply-To: <20200205065152.873-1-masahiroy@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 5 Feb 2020 06:55:52 +0000
-Message-ID: <CAHk-=wgF6+PqsfQZyTNM9bXK+moUy6kSzbb3ZxxRVo93-_Cc=w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: make multiple directory targets work properly
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200204144415.GC42496@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Matthias Maennich <maennich@google.com>
+Cc: masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kernel-team@android.com, jeyu@kernel.org
 
-On Wed, Feb 5, 2020 at 6:52 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> If you want to use this patch soon (seems useful since
-> you are travelling), please feel free to apply it directly.
->
-> If you wait for my next pull request, I will apply it to
-> my tree.
+On Tuesday 04 Feb 2020 at 14:44:15 (+0000), 'Matthias Maennich' via kernel-team wrote:
+> That definitely looks like I would expect that config option to work.
 
-I'll wait for the proper channels, I'm heading back home tomorrow
-anyway, and it's not been a big problem for me.
+Good, thank you, I'll send an update.
 
-Just an oddity I happened to hit because of doing slightly different
-things while on the road.
+And while at it, I realized we could actually pre-populate autoksyms.h
+very early on with the content of the whitelist instead of having it
+empty. That way, there's a whole lot of things that will be compiled
+'correctly' from the start (that is, adjust_autoksyms.sh won't need to
+re-compile them later on). And in fact, if all symbols used by in-tree
+modules happen to already be on the whitelist, you'll build a trimmed
+kernel in a single pass, which should improve build time a bit I hope.
+
+I'll add something to v3 in addition to your suggestion.
 
 Thanks,
-                Linus
+Quentin
