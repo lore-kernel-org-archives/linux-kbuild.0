@@ -1,68 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qv1-f66.google.com ([209.85.219.66]:41702 "EHLO
-        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727116AbgBEVx1 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:43219 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727306AbgBFBye (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Feb 2020 16:53:27 -0500
-Received: by mail-qv1-f66.google.com with SMTP id s7so1878670qvn.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Feb 2020 13:53:26 -0800 (PST)
+        Wed, 5 Feb 2020 20:54:34 -0500
 MIME-Version: 1.0
-References: <20200205154629.GA1257054@kroah.com> <20200205160250.GG142103@google.com>
- <CAOesGMj7Z9JoEYrnQaiHrHsjG7cv9ebEbyZM-QFWN2HJDa=UGA@mail.gmail.com>
- <20200205171353.GI142103@google.com> <20200205213354.GB1465126@kroah.com>
- <CAEXW_YSU_Zm24R2TYFQd42CfXyotowv42BbvbvKfSFbZGUqOHQ@mail.gmail.com> <20200205214841.GB1468203@kroah.com>
-In-Reply-To: <20200205214841.GB1468203@kroah.com>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Wed, 5 Feb 2020 13:53:15 -0800
-Message-ID: <CAEXW_YST9qj91=TbJ9j4boQgV=k=8E6fSQZB-iojRBLwGXSOag@mail.gmail.com>
-Subject: Re: [PATCH] Revert kheaders feature
+References: <20200203164708.17478-1-masahiroy@kernel.org> <CAHk-=wiERN+VgxBEOUKMhZFG-yAvVjmDSZXGR22vQBZETQ75yg@mail.gmail.com>
+In-Reply-To: <CAHk-=wiERN+VgxBEOUKMhZFG-yAvVjmDSZXGR22vQBZETQ75yg@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Thu, 6 Feb 2020 10:53:44 +0900
+Message-ID: <CAK7LNAREEkuZeXXzGbtemZ=A-YX6Jn6WOtD0azBxaiDiOxLp2w@mail.gmail.com>
+Subject: Re: [PATCH] initramfs: do not show compression mode choice if
+ INITRAMFS_SOURCE is empty
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Olof Johansson <olof@lixom.net>, Alexei Starovoitov <ast@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Tejun Heo <tj@kernel.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, David Howells <dhowells@redhat.com>, Patrick Bellasi <patrick.bellasi@arm.com>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kbuild@vger.kernel.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Thelen <gthelen@google.com>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Feb 5, 2020 at 1:48 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
+Hi Linus,
+
+On Tue, Feb 4, 2020 at 2:35 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> On Wed, Feb 05, 2020 at 01:35:56PM -0800, Joel Fernandes wrote:
-> > On Wed, Feb 5, 2020 at 1:33 PM Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> > [snip]
-> > > > > like the BTF approach is significantly better and said users are
-> > > > > hopefully moving forward to it quickly, and if they can't move
-> > > > > forward, then they're likely also not going to move forward to newer
-> > > > > kernels either?
-> > > >
-> > > > I think BCC runs on a lot of upstream machines. I think the migration
-> > > > strategy is a matter of opinion, one way is to take it out and cause some
-> > > > pain in the hope that users/tools will migrate soon (while probably carrying
-> > > > the reverted patches out of tree). Another is to migrate the tools first and
-> > > > then take it out (which has its own disadvantages such as introducing even
-> > > > more users of it while it is still upstream).
-> > >
-> > > Do we "know" what tools today require this, and what needs to be done to
-> > > "fix" them?  If we don't know that, then there's no way to drop this,
-> > > pretty much ever :(
+> On Mon, Feb 3, 2020 at 4:47 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 > >
-> > Is there a real reason to drop it or a problem dropping this solves though?
+> > This commit hides the Kconfig choice in that case. The default cpio
+> > is embedded without compression, which was the original behavior.
 >
-> Olof had some reasons, but as we were drinking at the time when it came
-> up last night, I can't really remember them specifically.  Hopefully he
-> does :)
-> But that didn't answer my question of "who is still using this"?  I was
-> hoping we actually knew this given it was created for specific users.
+> Btw, is there any way to figure out automatically what the initrd
+> compression is (for the external case)?
+>
+> Because I think it would be lovely to be able to have sane defaults
+> for the CONFIG_RD_xyz things.
+>
+> I'm assuming the answer is "no", simply because it comes from distro
+> installs, but I thought I'd check.
 
-I think I mentioned this in a previous thread of this email. Several
-BCC tools are using it - see for example the criticalstat BCC tool
-which includes linux/sched.h :
-https://github.com/iovisor/bcc/blob/master/tools/criticalstat.py#L73
-, or filetop BCC tool which uses struct dentry :
-https://github.com/iovisor/bcc/blob/master/tools/filetop.py#L101
+I think the answer is no.
 
-These would break without kernel headers either on the host or via
-CONFIG_IKHEADERS.
+For external initrd, it is up to distros,
+and we have no way to know the compression type beforehand.
 
-thanks,
+We know it after booting.
 
- - Joel
+init/initramfs.c has the following line:
+pr_debug("Detected %s compressed data\n", compress_name);
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
