@@ -1,95 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:37415 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725789AbgBHFJz (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:49457 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725836AbgBIFqD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 8 Feb 2020 00:09:55 -0500
+        Sun, 9 Feb 2020 00:46:03 -0500
 MIME-Version: 1.0
-References: <20200207180755.100561-1-qperret@google.com> <20200207180755.100561-4-qperret@google.com>
-In-Reply-To: <20200207180755.100561-4-qperret@google.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 8 Feb 2020 06:09:06 +0100
-Message-ID: <CAK7LNAT+Xw8ntYcrcMtLrekkgziaHU+7nvzdh5tqD0cbe8pJhw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] kbuild: generate autoksyms.h early
+Date: Sun, 9 Feb 2020 06:45:18 +0100
+Message-ID: <CAK7LNAQs-KVCM7xXqJchQrMG+nnajPFRMB2Z+RJ9VTsg7XGRAQ@mail.gmail.com>
+Subject: [GIT PULL] more Kbuild updates for v5.6-rc1
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Nicolas Pitre <nico@fluxnic.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthias Maennich <maennich@google.com>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Christoph Hellwig <hch@infradead.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Feb 7, 2020 at 7:08 PM Quentin Perret <qperret@google.com> wrote:
->
-> When doing a cold build, autoksyms.h starts empty, and is updated late
-> in the build process to have visibility over the symbols used by in-tree
-> drivers. But since the symbol whitelist is known upfront, it can be used
-> to pre-populate autoksyms.h and maximize the amount of code that can be
-> compiled to its final state in a single pass, hence reducing build time.
->
-> Do this by using gen_autoksyms.sh to initialize autoksyms.h instead of
-> creating an empty file.
->
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  Makefile                 | 2 +-
->  scripts/gen_autoksyms.sh | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 6a01b073915e..e5c389d189f7 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1065,7 +1065,7 @@ autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
->
->  $(autoksyms_h):
->         $(Q)mkdir -p $(dir $@)
-> -       $(Q)touch $@
-> +       $(Q)$(CONFIG_SHELL) $(srctree)/scripts/gen_autoksyms.sh $@
+Hi Linus,
 
+Please pull more Kbuild updates.
+(I touched Makefiles around due to some syntax renaming,
+but it is trivial.)
 
-Now that this line is doing a non-trivial task,
-it might be a good idea to show a short log, like this:
-
-  GEN     include/generated/autoksyms.h
-
-
-
-You can do it like this:
-
-
-quiet_cmd_autoksyms_h = GEN     $@
-      cmd_autoksyms_h = mkdir -p $(dir $@); $(BASH)
-$(srctree)/scripts/gen_autoksyms.sh $@
-
-$(autoksyms_h):
-        $(call cmd,autoksyms_h)
+Thanks.
 
 
 
 
+The following changes since commit 754beeec1d9024eef0db8dc4be2636331dd413c6:
 
->
->  ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
->
-> diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
-> index ce0919c3791a..ae033ab03a4a 100755
-> --- a/scripts/gen_autoksyms.sh
-> +++ b/scripts/gen_autoksyms.sh
-> @@ -32,7 +32,8 @@ cat > "$output_file" << EOT
->
->  EOT
->
-> -sed 's/ko$/mod/' modules.order |
-> +[[ -f modules.order ]] && modlist=modules.order || modlist=/dev/null
-> +sed 's/ko$/mod/' $modlist |
->  xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
->  cat - "$ksym_wl" |
->  sort -u |
-> --
-> 2.25.0.341.g760bfbb309-goog
->
+  Merge tag 'char-misc-5.6-rc1-2' of
+git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc
+(2020-02-03 14:57:33 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v5.6-2
+
+for you to fetch changes up to f566e1fbadb686e28f1c307e356114b2865ef588:
+
+  kbuild: make multiple directory targets work (2020-02-06 06:31:51 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v5.6 (2nd)
+
+ - fix randconfig to generate a sane .config
+
+ - rename hostprogs-y / always to hostprogs / always-y, which are
+   more natual syntax.
+
+ - optimize scripts/kallsyms
+
+ - fix yes2modconfig and mod2yesconfig
+
+ - make multiple directory targets ('make foo/ bar/') work
+
+----------------------------------------------------------------
+Masahiro Yamada (7):
+      kconfig: fix broken dependency in randconfig-generated .config
+      kbuild: fix the document to use extra-y for vmlinux.lds
+      kbuild: rename hostprogs-y/always to hostprogs/always-y
+      scripts/kallsyms: rename local variables in read_symbol()
+      scripts/kallsyms: change table to store (strcut sym_entry *)
+      kallsyms: fix type of kallsyms_token_table[]
+      kbuild: make multiple directory targets work
+
+Tetsuo Handa (1):
+      kconfig: Invalidate all symbols after changing to y or m.
+
+ Documentation/kbuild/makefiles.rst  |  53 ++++------
+ Kbuild                              |   8 +-
+ Makefile                            |   2 +-
+ arch/alpha/boot/Makefile            |   2 +-
+ arch/arm/vdso/Makefile              |   2 +-
+ arch/arm64/kernel/vdso32/Makefile   |   4 +-
+ arch/mips/boot/Makefile             |   2 +-
+ arch/mips/boot/compressed/Makefile  |   4 +-
+ arch/mips/boot/tools/Makefile       |   2 +-
+ arch/mips/tools/Makefile            |   4 +-
+ arch/mips/vdso/Makefile             |   2 +-
+ arch/powerpc/boot/Makefile          |   4 +-
+ arch/s390/tools/Makefile            |   4 +-
+ arch/sparc/boot/Makefile            |   2 +-
+ arch/sparc/vdso/Makefile            |   2 +-
+ arch/x86/boot/Makefile              |   4 +-
+ arch/x86/boot/compressed/Makefile   |   2 +-
+ arch/x86/entry/vdso/Makefile        |   2 +-
+ arch/x86/realmode/rm/Makefile       |   2 +-
+ arch/x86/tools/Makefile             |   4 +-
+ drivers/gpu/drm/radeon/Makefile     |   2 +-
+ drivers/tty/vt/Makefile             |   2 +-
+ drivers/video/logo/Makefile         |   2 +-
+ drivers/zorro/Makefile              |   2 +-
+ fs/unicode/Makefile                 |   2 +-
+ kernel/kallsyms.c                   |   5 +-
+ lib/Makefile                        |   4 +-
+ lib/raid6/Makefile                  |   2 +-
+ net/bpfilter/Makefile               |   2 +-
+ samples/bpf/Makefile                | 118 +++++++++++-----------
+ samples/connector/Makefile          |   8 +-
+ samples/hidraw/Makefile             |   6 +-
+ samples/mei/Makefile                |   4 +-
+ samples/pidfd/Makefile              |   4 +-
+ samples/seccomp/Makefile            |   4 +-
+ samples/uhid/Makefile               |   4 +-
+ samples/vfs/Makefile                |   5 +-
+ scripts/Makefile                    |  22 ++--
+ scripts/Makefile.build              |   8 +-
+ scripts/Makefile.clean              |   4 +-
+ scripts/Makefile.host               |   8 +-
+ scripts/Makefile.lib                |   6 +-
+ scripts/basic/Makefile              |   4 +-
+ scripts/dtc/Makefile                |   4 +-
+ scripts/gcc-plugins/Makefile        |   2 +-
+ scripts/genksyms/Makefile           |   4 +-
+ scripts/kallsyms.c                  | 133 +++++++++++++------------
+ scripts/kconfig/Makefile            |  10 +-
+ scripts/kconfig/confdata.c          |   7 +-
+ scripts/mod/Makefile                |   4 +-
+ scripts/selinux/genheaders/Makefile |   4 +-
+ scripts/selinux/mdp/Makefile        |   4 +-
+ usr/Makefile                        |   2 +-
+ 53 files changed, 252 insertions(+), 261 deletions(-)
 
 
 --
 Best Regards
-
 Masahiro Yamada
