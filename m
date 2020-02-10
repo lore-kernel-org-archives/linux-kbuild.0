@@ -1,49 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:39126 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731021AbgBJNTc (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Feb 2020 08:19:32 -0500
-Received: by mail-pg1-f201.google.com with SMTP id r192so5423282pgr.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Feb 2020 05:19:30 -0800 (PST)
-Date: Mon, 10 Feb 2020 05:19:25 -0800
-Message-Id: <20200210131925.145463-1-samitolvanen@google.com>
-Mime-Version: 1.0
-Subject: [PATCH] kbuild: remove duplicate dependencies from .mod files
-From: Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from foss.arm.com ([217.140.110.172]:34272 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726846AbgBJODL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Feb 2020 09:03:11 -0500
+Date: Mon, 10 Feb 2020 14:03:08 +0000
+From: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH] [RFC] ASoC: Use imply for SND_SOC_ALL_CODECS
+Message-ID: <20200210140308.GN7685@sirena.org.uk>
+References: <20200207091351.18133-1-geert@linux-m68k.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="TXIPBuAs4GDcsx9K"
+Content-Disposition: inline
+In-Reply-To: <20200207091351.18133-1-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, alsa-devel@alsa-project.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-With CONFIG_TRIM_UNUSED_SYMS, if a module has enough dependencies to
-exceed the default xargs command line size limit, the output is split
-into multiple lines, which can result in used symbols getting trimmed.
 
-This change removes duplicate dependencies, which will reduce the
-probability of this happening and makes .mod files smaller and easier
-to read.
+--TXIPBuAs4GDcsx9K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
----
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Feb 07, 2020 at 10:13:51AM +0100, Geert Uytterhoeven wrote:
+> Currently SND_SOC_ALL_CODECS selects the config symbols for all codec
+> drivers.  As "select" bypasses dependencies, lots of "select" statements
+> need explicit dependencies, which are hard to get right, and hard to
+> maintain[*].
+>=20
+> Fix this by using "imply" instead, which is a weak version of "select",
+> and which obeys dependencies of target symbols.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a1730d42e5f3..a083bcec19d3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -257,7 +257,7 @@ endef
- 
- # List module undefined symbols (or empty line if not enabled)
- ifdef CONFIG_TRIM_UNUSED_KSYMS
--cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | xargs echo
-+cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | sort -u | xargs echo
- else
- cmd_undef_syms = echo
- endif
+This is a *really* badly named feature :/
 
-base-commit: bb6d3fb354c5ee8d6bde2d576eb7220ea09862b9
--- 
-2.25.0.341.g760bfbb309-goog
+--TXIPBuAs4GDcsx9K
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl5BYpwACgkQJNaLcl1U
+h9AJ6wf+JoGh6XxETeSB4TWntPU4POgBDY7UzyJaSzC/k9dxItOpbvF8sZbh3YVO
+RqfpWryUL/Icpn8pUC785qgCczDrAzW3YB3tkwvAma8tNK/HA6TC4b5/pl2h0F1e
+R5gValaXJ4qG0+Q9ZDNlDNmVX06fSlutz4K+UUBAP8DUgrXcQXqo4PhjIptTRix/
+GKtNAePn3171ofUgEhfSpVE6I7zZHkcD0IC3CQ5Ss9ui/7YBzRls6qq5HOqEbvDD
+4KvKMTM4lDu7u7f+R9ov/N0NEDS2ZtKNfoALHeQTBCplEhIbXSHZ5r0hF4LBAE9r
+CI47bCrYKahz5DDreklkq0WdmyUZQw==
+=MBOV
+-----END PGP SIGNATURE-----
+
+--TXIPBuAs4GDcsx9K--
