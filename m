@@ -1,68 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:51212 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727054AbgBLQBT (ORCPT
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:42323 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727054AbgBLRNx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Feb 2020 11:01:19 -0500
+        Wed, 12 Feb 2020 12:13:53 -0500
+Received: by mail-vs1-f68.google.com with SMTP id b79so1638400vsd.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Feb 2020 09:13:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20200210200634.950-1-masahiroy@kernel.org>
-In-Reply-To: <20200210200634.950-1-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 13 Feb 2020 01:00:30 +0900
-Message-ID: <CAK7LNASYsNcdL8L_do7McOKf1sJJRvBbMS_wQeU-HefYJnfU3Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix mismatch between .version and include/generated/compile.h
+References: <20200210131925.145463-1-samitolvanen@google.com> <CAK7LNAS7UchtP_+2m4AB-hJ=nMwsM-qpkJ+VHU1JGJrn8K1KPg@mail.gmail.com>
+In-Reply-To: <CAK7LNAS7UchtP_+2m4AB-hJ=nMwsM-qpkJ+VHU1JGJrn8K1KPg@mail.gmail.com>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Wed, 12 Feb 2020 09:13:40 -0800
+Message-ID: <CABCJKuemBAeySJQY6yxhzbxK=XGBtVSt+6J6WXpO=RoiVXH7GQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove duplicate dependencies from .mod files
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Feb 11, 2020 at 5:06 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Since commit 56d589361572 ("kbuild: do not create orphan built-in.a or
-> obj-y objects"), scripts/link-vmlinux.sh does nothing when descending
-> into init/.
->
-> Once the version number becomes out of sync between .version and
-> include/generated/compile.h, it is not self-healing.
->
-> [How to reproduce]
->
->  $ echo 100 > .version
->  $ make
->
-> You will see the number in the .version is always bigger than that in
-> compile.h by one. After this, every time you run 'make', the vmlinux is
-> re-linked even when none of source files is updated.
->
-> Fixes: 56d589361572 ("kbuild: do not create orphan built-in.a or obj-y objects")
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+On Wed, Feb 12, 2020 at 5:23 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> In which case are undefined symbols duplicated?
 
-Applied.
+When a module consists of multiple compilation units, which depend on
+the same external symbols. In Android, we ran into this when adding
+hardening features that all depend on an external error handler
+function with a rather long name. When CONFIG_TRIM_UNUSED_SYMS was
+later enabled, we ran into this:
 
+$ llvm-nm drivers/gpu/drm/nouveau/nouveau.o | sed -n 's/^  *U //p' |
+xargs echo | wc
+      2    9136  168660
 
->  scripts/link-vmlinux.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> index 1919c311c149..dd484e92752e 100755
-> --- a/scripts/link-vmlinux.sh
-> +++ b/scripts/link-vmlinux.sh
-> @@ -239,7 +239,7 @@ else
->  fi;
->
->  # final build of init/
-> -${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init
-> +${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init need-builtin=1
->
->  #link vmlinux.o
->  info LD vmlinux.o
-> --
-> 2.17.1
->
+xargs defaults to 128kiB limit for command line size, so the output
+was split into two lines, which means some of the dependencies were
+dropped and we ran into modpost errors. One method of fixing this is
+to increase the limit:
 
+$ llvm-nm drivers/gpu/drm/nouveau/nouveau.o | sed -n 's/^  *U //p' |
+xargs -s 262144 echo | wc
+      1    9136  168660
 
--- 
-Best Regards
-Masahiro Yamada
+But it seems removing duplicates is a better solution as the length of
+the dependency list is reduced significantly:
+
+$ llvm-nm drivers/gpu/drm/nouveau/nouveau.o | sed -n 's/^  *U //p' |
+sort -u | xargs echo | wc
+      1    2716   50461
+
+> Do you have a .config to reproduce it?
+
+I can currently reproduce this on an Android kernel that has
+Control-Flow Integrity (CFI) enabled. While this feature is not
+upstreamed yet, there's nothing that would prevent us from hitting the
+command line limit with sufficiently large modules otherwise as well.
+
+Sami
