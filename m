@@ -1,65 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.110.172]:49630 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728202AbgBKQp1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Feb 2020 11:45:27 -0500
-Date: Tue, 11 Feb 2020 16:45:24 +0000
-From: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH] [RFC] ASoC: Use imply for SND_SOC_ALL_CODECS
-Message-ID: <20200211164524.GN4543@sirena.org.uk>
-References: <20200207091351.18133-1-geert@linux-m68k.org>
- <CAK7LNAQGcw1jbb=fWd_CbWv5hQrkqG_QFCw3uY4LXroONGM6BA@mail.gmail.com>
- <20200211161905.GM4543@sirena.org.uk>
- <CAK7LNARCr8afvs=h5-ZWVs=Bkk7PSMNvX+M_SeBSF-L99UencA@mail.gmail.com>
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:59506 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728530AbgBLJVb (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 12 Feb 2020 04:21:31 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="YuJye9aIuN0w6xGV"
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARCr8afvs=h5-ZWVs=Bkk7PSMNvX+M_SeBSF-L99UencA@mail.gmail.com>
+References: <20200210161852.842-1-masahiroy@kernel.org>
+In-Reply-To: <20200210161852.842-1-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 12 Feb 2020 18:20:42 +0900
+Message-ID: <CAK7LNATLCAnrtqR8vv=jWiDcODGchMekOGMbSNvEQtnb3JqTDQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts/kallsyms: fix memory corruption caused by write over-run
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, ALSA Development Mailing List <alsa-devel@alsa-project.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: youling257 <youling257@gmail.com>, Pavel Machek <pavel@ucw.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+
+On Tue, Feb 11, 2020 at 1:19 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> scripts/kallsyms crashes because memcpy() writes one more byte than
+> allocated.
+>
+> Fixes: 8d60526999aa ("scripts/kallsyms: change table to store (strcut sym_entry *)")
+> Reported-by: youling257 <youling257@gmail.com>
+> Reported-by: Pavel Machek <pavel@ucw.cz>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+
+Applied.
+I will send a pull request shortly
+because many people are tripping over this bug.
 
 
---YuJye9aIuN0w6xGV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Wed, Feb 12, 2020 at 01:38:16AM +0900, Masahiro Yamada wrote:
-> On Wed, Feb 12, 2020 at 1:19 AM Mark Brown <broonie@kernel.org> wrote:
 
-> > No it doesn't.  Those only enable user selectable options, many CODEC
-> > drivers don't have user selectable options as they are selected by
-> > machine drivers some of which either have more platform specific
-> > dependencies that the CODEC drivers or aren't upstream.
+>  scripts/kallsyms.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index a566d8201b56..0133dfaaf352 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -210,7 +210,7 @@ static struct sym_entry *read_symbol(FILE *in)
+>
+>         len = strlen(name) + 1;
+>
+> -       sym = malloc(sizeof(*sym) + len);
+> +       sym = malloc(sizeof(*sym) + len + 1);
+>         if (!sym) {
+>                 fprintf(stderr, "kallsyms failure: "
+>                         "unable to allocate required amount of memory\n");
+> @@ -219,7 +219,7 @@ static struct sym_entry *read_symbol(FILE *in)
+>         sym->addr = addr;
+>         sym->len = len;
+>         sym->sym[0] = type;
+> -       memcpy(sym_name(sym), name, len);
+> +       strcpy(sym_name(sym), name);
+>         sym->percpu_absolute = 0;
+>
+>         return sym;
+> --
+> 2.17.1
+>
 
-> Maybe, can you add a prompt which is only displayed
-> if COMPILE_TEST is enabled?
 
-> For example,
-
-> config SND_SOC_L3
->         tristate "some prompt" if COMPILE_TEST
-
-That's effectively what this is doing, it's just making it a single
-option that enables everything en masse rather than lots of per driver
-options and isn't as esoteric so is easier to understand (almost all the
-existing examples are Renesas specific).
-
---YuJye9aIuN0w6xGV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl5C2iMACgkQJNaLcl1U
-h9C39wf+LExhl27QS0xwjrmLu461Qr4UrkCcrNBX4/WGttFKbi2xbL1A7I8Tc9sh
-eNIYtW64RUY96X6wT3BeuNRoBDHbJhm4p8j4gRhsbxtXp2nKazBcVURs/p+3ShKd
-huwUYOohkLVxJOxlJ2EBV7iode/CfXYs7rfhK0SjjSqZ8edmGZvpXjZTaeWyYHwH
-wYUdfWVMMAcQ5vJPGRVYrPBF7oHrjB3fyVtwNgFe7QfoEe0A5LXImI18wMztBifs
-1s0gXzUdZGUpcoUXiHyd/qiq18lHGqcrEzOMqSVUyprOK4NE42dvX73LptIIZnEc
-Gw9JHwmbgxgHt85hG64pBAnPJ/I7aA==
-=ABsK
------END PGP SIGNATURE-----
-
---YuJye9aIuN0w6xGV--
+-- 
+Best Regards
+Masahiro Yamada
