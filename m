@@ -1,57 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:38362 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726775AbgBLM2y (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:53801 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725887AbgBLNXI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Feb 2020 07:28:54 -0500
-Date: Wed, 12 Feb 2020 20:28:42 +0800
-From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH 0/2] Add SANITIZE_xx.o & SANITIZE and apply them to x86
-Message-ID: <20200212122840.5p3kvijii3qboltt@mail.google.com>
-References: <20200201062459.7150-1-changbin.du@gmail.com>
+        Wed, 12 Feb 2020 08:23:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200201062459.7150-1-changbin.du@gmail.com>
+References: <20200210131925.145463-1-samitolvanen@google.com>
+In-Reply-To: <20200210131925.145463-1-samitolvanen@google.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 12 Feb 2020 22:22:27 +0900
+Message-ID: <CAK7LNAS7UchtP_+2m4AB-hJ=nMwsM-qpkJ+VHU1JGJrn8K1KPg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove duplicate dependencies from .mod files
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Changbin Du <changbin.du@gmail.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, hpa@zytor.com, x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hello, Any comments? Thanks.
+Hi Sami,
 
-On Sat, Feb 01, 2020 at 02:24:57PM +0800, Changbin Du wrote:
-> These two patches add SANITIZE_xx.o and SANITIZE to disable all sanitizers for
-> specific files, and apply them to x86 booting code.
-> 
-> We need to disable UBSAN for some of ealy stage code:
->  o For code which could operate in one-one mapping mode. In this case,
->    kernel would crash at accessing data parameter when invoking UBSAN
->    handlers.
->  o Since UBSAN handlers are instrumented by KASAN, so invoking UBSAN
->    handlers before KASAN is initiated also is not allowed.
-> 
-> Changbin Du (2):
->   sanitize: Add SANITIZE_xx.o and SANITIZE to disable all sanitizers for
->     specific files
->   x86: Disable both KASAN and UBSAN for some booting code
-> 
->  Documentation/dev-tools/kasan.rst | 12 ++++++++++++
->  arch/x86/boot/Makefile            |  2 +-
->  arch/x86/boot/compressed/Makefile |  2 +-
->  arch/x86/entry/vdso/Makefile      |  3 +--
->  arch/x86/kernel/Makefile          | 10 +++++-----
->  arch/x86/lib/Makefile             |  2 +-
->  arch/x86/mm/Makefile              |  4 ++--
->  arch/x86/realmode/Makefile        |  2 +-
->  arch/x86/realmode/rm/Makefile     |  2 +-
->  scripts/Makefile.lib              |  4 ++--
->  10 files changed, 27 insertions(+), 16 deletions(-)
-> 
-> -- 
-> 2.24.0
-> 
+On Mon, Feb 10, 2020 at 10:19 PM Sami Tolvanen <samitolvanen@google.com> wrote:
+>
+> With CONFIG_TRIM_UNUSED_SYMS, if a module has enough dependencies to
+> exceed the default xargs command line size limit, the output is split
+> into multiple lines, which can result in used symbols getting trimmed.
+>
+> This change removes duplicate dependencies, which will reduce the
+> probability of this happening and makes .mod files smaller and easier
+> to read.
+>
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> ---
+>  scripts/Makefile.build | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index a1730d42e5f3..a083bcec19d3 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -257,7 +257,7 @@ endef
+>
+>  # List module undefined symbols (or empty line if not enabled)
+>  ifdef CONFIG_TRIM_UNUSED_KSYMS
+> -cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | xargs echo
+> +cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | sort -u | xargs echo
+
+
+
+In which case are undefined symbols duplicated?
+
+Do you have a .config to reproduce it?
+
+
+
+>  else
+>  cmd_undef_syms = echo
+>  endif
+>
+> base-commit: bb6d3fb354c5ee8d6bde2d576eb7220ea09862b9
+> --
+> 2.25.0.341.g760bfbb309-goog
+>
+
 
 -- 
-Cheers,
-Changbin Du
+Best Regards
+Masahiro Yamada
