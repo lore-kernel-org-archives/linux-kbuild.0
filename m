@@ -1,71 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f73.google.com ([209.85.128.73]:37359 "EHLO
-        mail-wm1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729114AbgBLUVz (ORCPT
+Received: from pb-smtp1.pobox.com ([64.147.108.70]:55868 "EHLO
+        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727111AbgBLUsy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Feb 2020 15:21:55 -0500
-Received: by mail-wm1-f73.google.com with SMTP id b133so1427861wmb.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 12 Feb 2020 12:21:52 -0800 (PST)
-Date: Wed, 12 Feb 2020 20:21:40 +0000
+        Wed, 12 Feb 2020 15:48:54 -0500
+Date: Wed, 12 Feb 2020 15:48:50 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [PATCH v4 0/3] kbuild: allow symbol whitelisting with
+ TRIM_UNUSED_KSYM
 In-Reply-To: <20200212202140.138092-1-qperret@google.com>
-Message-Id: <20200212202140.138092-4-qperret@google.com>
-Mime-Version: 1.0
+Message-ID: <nycvar.YSQ.7.76.2002121545120.1559@knanqh.ubzr>
 References: <20200212202140.138092-1-qperret@google.com>
-Subject: [PATCH v4 3/3] kbuild: generate autoksyms.h early
-From: Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org, nico@fluxnic.net
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org, qperret@google.com
+To: Quentin Perret <qperret@google.com>
+Cc: masahiroy@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org
 
-When doing a cold build, autoksyms.h starts empty, and is updated late
-in the build process to have visibility over the symbols used by in-tree
-drivers. But since the symbol whitelist is known upfront, it can be used
-to pre-populate autoksyms.h and maximize the amount of code that can be
-compiled to its final state in a single pass, hence reducing build time.
+On Wed, 12 Feb 2020, Quentin Perret wrote:
 
-Do this by using gen_autoksyms.sh to initialize autoksyms.h instead of
-creating an empty file.
+> The current norm on Android and many other systems is for vendors to
+> introduce significant changes to their downstream kernels, and to
+> contribute very little (if any) code back upstream. The Generic Kernel
+> Image (GKI) project in Android attempts to improve the status-quo by
+> having a unique kernel for all android devices of the same architecture,
+> regardless of the SoC vendor. The key idea is to make all interested
+> parties agree on a common solution, and contribute their code upstream
+> to make it available to use by the wider community.
+> 
+> The kernel-to-drivers ABI on Android devices varies significantly from
+> one vendor kernel to another today because of changes to exported
+> symbols, dependencies on vendor symbols, and surely other things. The
+> first step for GKI is to try and put some order into this by agreeing on
+> one version of the ABI that works for everybody.
+> 
+> For practical reasons, we need to reduce the ABI surface to a subset of
+> the exported symbols, simply to make the problem realistically solvable,
+> but there is currently no upstream support for this use-case.
+> 
+> As such, this series attempts to improve the situation by enabling users
+> to specify a symbol 'whitelist' at compile time. Any symbol specified in
+> this whitelist will be kept exported when CONFIG_TRIM_UNUSED_KSYMS is
+> set, even if it has no in-tree user. The whitelist is defined as a
+> simple text file, listing symbols, one per line.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- Makefile                 | 7 +++++--
- scripts/gen_autoksyms.sh | 3 ++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+For the whole series:
 
-diff --git a/Makefile b/Makefile
-index 84b71845c43f..17b7e7f441bd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1062,9 +1062,12 @@ endif
- 
- autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
- 
-+quiet_cmd_autoksyms_h = GEN     $@
-+      cmd_autoksyms_h = mkdir -p $(dir $@); $(CONFIG_SHELL) \
-+			$(srctree)/scripts/gen_autoksyms.sh $@
-+
- $(autoksyms_h):
--	$(Q)mkdir -p $(dir $@)
--	$(Q)touch $@
-+	$(call cmd,autoksyms_h)
- 
- ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
- 
-diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
-index 2cea433616a8..f52b93ad122c 100755
---- a/scripts/gen_autoksyms.sh
-+++ b/scripts/gen_autoksyms.sh
-@@ -32,7 +32,8 @@ cat > "$output_file" << EOT
- 
- EOT
- 
--sed 's/ko$/mod/' modules.order |
-+[ -f modules.order ] && modlist=modules.order || modlist=/dev/null
-+sed 's/ko$/mod/' $modlist |
- xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
- cat - "$ksym_wl" |
- sort -u |
--- 
-2.25.0.225.g125e21ebc7-goog
+Acked-by: Nicolas Pitre <nico@fluxnic.net>
+
+
+Nicolas
