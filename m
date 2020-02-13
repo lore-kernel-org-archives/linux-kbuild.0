@@ -1,85 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:38207 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727868AbgBMQdF (ORCPT
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43071 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727803AbgBMSHn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Feb 2020 11:33:05 -0500
+        Thu, 13 Feb 2020 13:07:43 -0500
+Received: by mail-wr1-f66.google.com with SMTP id r11so7818202wrq.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Feb 2020 10:07:42 -0800 (PST)
+Date: Thu, 13 Feb 2020 18:07:36 +0000
+From: Quentin Perret <qperret@google.com>
+Subject: Re: [kbuild-all] Re: [PATCH v3 3/3] kbuild: generate autoksyms.h
+ early
+Message-ID: <20200213180736.GA157895@google.com>
+References: <20200207180755.100561-4-qperret@google.com>
+ <202002111002.wXBhAK5H%lkp@intel.com>
+ <20200212195628.GA120870@google.com>
+ <20200213084251.GU12867@shao2-debian>
 MIME-Version: 1.0
-References: <874kvz10rx.fsf@mpe.ellerman.id.au>
-In-Reply-To: <874kvz10rx.fsf@mpe.ellerman.id.au>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 14 Feb 2020 01:32:13 +0900
-Message-ID: <CAK7LNASePHZ78O6fnScU_fVHkDOKJEgT+B+OC7NPxkW+tb7q1Q@mail.gmail.com>
-Subject: Re: install is no longer PHONY?
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200213084251.GU12867@shao2-debian>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: kernel test robot <rong.a.chen@intel.com>
+Cc: kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org, masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org
 
-Hi Michael,
+On Thursday 13 Feb 2020 at 16:42:51 (+0800), kernel test robot wrote:
+> I attached the build log for your reference.
 
-On Mon, Feb 10, 2020 at 2:15 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
->
-> Hi Masahiro,
->
-> I noticed that "install" seems to be no longer PHONY, or at least if I
-> have a file/directory called install then the build doesn't run.
->
-> eg:
->   $ touch install
->   $ make install
->   make: 'install' is up to date.
->   $ rm install
->   $ make install
->     LDS     arch/powerpc/boot/zImage.lds
->     WRAP    arch/powerpc/boot/zImage.pseries
->     WRAP    arch/powerpc/boot/zImage.epapr
+Thanks!
 
+<snip>
+> scripts/kconfig/conf  --syncconfig Kconfig
+>   SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
+>   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
+>   UPD     include/config/kernel.release
+>   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
+>   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
+>   UPD     include/generated/utsrelease.h
+>   HOSTCC  scripts/dtc/dtc.o
+>   HOSTCC  scripts/dtc/flattree.o
+> ./scripts/gen_autoksyms.sh: 24: ./scripts/gen_autoksyms.sh: [[: not found
+> ./scripts/gen_autoksyms.sh: 35: ./scripts/gen_autoksyms.sh: [[: not found
+> cat: /home/nfs/linux//dev/null: No such file or directory
 
-I think the reason is
-'install' is not specified as a phony target.
+OK, so that's the issue, which Nicolas pointed out earlier. That should
+be fixed in v4.
 
-
-You can add 'PHONY += install' to fix it.
-
-
-
-PHONY += install    # please add this!
-install:
-        $(Q)$(MAKE) $(build)=$(boot) install
-
-
-Please do so in both arch/powerpc/Makefile and
-arch/powerpc/boot/Makefile.
-
-
-
-
-> In the past the presence of an install file/directory didn't have any
-> affect.
->
-> It seems this changed in:
->   d79424137a73 ("kbuild: do not update config when running install targets")
->
-> Was that expected?
->
-> cheers
-
-
-I do not think commit is related.
-
-Prior to this commit, I still see the same issue.
-
-
-$ git checkout d7942413^
-$ touch install
-$ make -s ARCH=powerpc allnoconfig
-$ make  ARCH=powerpc install
-make: 'install' is up to date.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+Quentin
