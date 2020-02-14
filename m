@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34760 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:60704 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391355AbgBNQJt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:09:49 -0500
+        id S2390632AbgBNQIj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:08:39 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.4 376/459] bpf, btf: Always output invariant hit in pahole DWARF to BTF transform
-Date: Fri, 14 Feb 2020 11:00:26 -0500
-Message-Id: <20200214160149.11681-376-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 319/459] kbuild: remove *.tmp file when filechk fails
+Date: Fri, 14 Feb 2020 10:59:29 -0500
+Message-Id: <20200214160149.11681-319-sashal@kernel.org>
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -14,59 +14,82 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Chris Down <chris@chrisdown.name>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andriin@fb.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Bartosz Golaszewski <bgolaszewski@baylibre.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-From: Chris Down <chris@chrisdown.name>
+From: Masahiro Yamada <masahiroy@kernel.org>
 
-[ Upstream commit 2a67a6ccb01f21b854715d86ff6432a18b97adb3 ]
+[ Upstream commit 88fe89a47153facd8cb2d06d5c8727f7224c43c2 ]
 
-When trying to compile with CONFIG_DEBUG_INFO_BTF enabled, I got this
-error:
+Bartosz Golaszewski reports that when "make {menu,n,g,x}config" fails
+due to missing packages, a temporary file is left over, which is not
+ignored by git.
 
-    % make -s
-    Failed to generate BTF for vmlinux
-    Try to disable CONFIG_DEBUG_INFO_BTF
-    make[3]: *** [vmlinux] Error 1
+For example, if GTK+ is not installed:
 
-Compiling again without -s shows the true error (that pahole is
-missing), but since this is fatal, we should show the error
-unconditionally on stderr as well, not silence it using the `info`
-function. With this patch:
+  $ make gconfig
+  *
+  * Unable to find the GTK+ installation. Please make sure that
+  * the GTK+ 2.0 development package is correctly installed.
+  * You need gtk+-2.0 gmodule-2.0 libglade-2.0
+  *
+  scripts/kconfig/Makefile:208: recipe for target 'scripts/kconfig/gconf-cfg' failed
+  make[1]: *** [scripts/kconfig/gconf-cfg] Error 1
+  Makefile:567: recipe for target 'gconfig' failed
+  make: *** [gconfig] Error 2
+  $ git status
+  HEAD detached at v5.4
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
 
-    % make -s
-    BTF: .tmp_vmlinux.btf: pahole (pahole) is not available
-    Failed to generate BTF for vmlinux
-    Try to disable CONFIG_DEBUG_INFO_BTF
-    make[3]: *** [vmlinux] Error 1
+          scripts/kconfig/gconf-cfg.tmp
 
-Signed-off-by: Chris Down <chris@chrisdown.name>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Acked-by: Andrii Nakryiko <andriin@fb.com>
-Link: https://lore.kernel.org/bpf/20200122000110.GA310073@chrisdown.name
+  nothing added to commit but untracked files present (use "git add" to track)
+
+This is because the check scripts are run with filechk, which misses
+to clean up the temporary file on failure.
+
+When the line
+
+  { $(filechk_$(1)); } > $@.tmp;
+
+... fails, it exits immediately due to the 'set -e'. Use trap to make
+sure to delete the temporary file on exit.
+
+For extra safety, I replaced $@.tmp with $(dot-target).tmp to make it
+a hidden file.
+
+Reported-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/link-vmlinux.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/Kbuild.include | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 4363799403561..408b5c0b99b1b 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -108,13 +108,13 @@ gen_btf()
- 	local bin_arch
- 
- 	if ! [ -x "$(command -v ${PAHOLE})" ]; then
--		info "BTF" "${1}: pahole (${PAHOLE}) is not available"
-+		echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
- 		return 1
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 10ba926ae2924..d1dd4a6b6adb6 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -55,14 +55,13 @@ kecho := $($(quiet)kecho)
+ # - stdin is piped in from the first prerequisite ($<) so one has
+ #   to specify a valid file as first prerequisite (often the kbuild file)
+ define filechk
+-	$(Q)set -e;				\
+-	mkdir -p $(dir $@);			\
+-	{ $(filechk_$(1)); } > $@.tmp;		\
+-	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
+-		rm -f $@.tmp;			\
+-	else					\
+-		$(kecho) '  UPD     $@';	\
+-		mv -f $@.tmp $@;		\
++	$(Q)set -e;						\
++	mkdir -p $(dir $@);					\
++	trap "rm -f $(dot-target).tmp" EXIT;			\
++	{ $(filechk_$(1)); } > $(dot-target).tmp;		\
++	if [ ! -r $@ ] || ! cmp -s $@ $(dot-target).tmp; then	\
++		$(kecho) '  UPD     $@';			\
++		mv -f $(dot-target).tmp $@;			\
  	fi
- 
- 	pahole_ver=$(${PAHOLE} --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/')
- 	if [ "${pahole_ver}" -lt "113" ]; then
--		info "BTF" "${1}: pahole version $(${PAHOLE} --version) is too old, need at least v1.13"
-+		echo >&2 "BTF: ${1}: pahole version $(${PAHOLE} --version) is too old, need at least v1.13"
- 		return 1
- 	fi
+ endef
  
 -- 
 2.20.1
