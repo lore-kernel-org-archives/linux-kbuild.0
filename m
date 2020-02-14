@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57024 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:50074 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393166AbgBNQWB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:22:01 -0500
+        id S2404657AbgBNQSN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:18:13 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 030/141] kconfig: fix broken dependency in randconfig-generated .config
-Date: Fri, 14 Feb 2020 11:19:30 -0500
-Message-Id: <20200214162122.19794-30-sashal@kernel.org>
-In-Reply-To: <20200214162122.19794-1-sashal@kernel.org>
-References: <20200214162122.19794-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 044/186] kconfig: fix broken dependency in randconfig-generated .config
+Date: Fri, 14 Feb 2020 11:14:53 -0500
+Message-Id: <20200214161715.18113-44-sashal@kernel.org>
+In-Reply-To: <20200214161715.18113-1-sashal@kernel.org>
+References: <20200214161715.18113-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
