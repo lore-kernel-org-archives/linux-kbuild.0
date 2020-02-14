@@ -1,50 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43071 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727803AbgBMSHn (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Feb 2020 13:07:43 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r11so7818202wrq.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Feb 2020 10:07:42 -0800 (PST)
-Date: Thu, 13 Feb 2020 18:07:36 +0000
-From: Quentin Perret <qperret@google.com>
-Subject: Re: [kbuild-all] Re: [PATCH v3 3/3] kbuild: generate autoksyms.h
- early
-Message-ID: <20200213180736.GA157895@google.com>
-References: <20200207180755.100561-4-qperret@google.com>
- <202002111002.wXBhAK5H%lkp@intel.com>
- <20200212195628.GA120870@google.com>
- <20200213084251.GU12867@shao2-debian>
+Received: from mail.kernel.org ([198.145.29.99]:42020 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387905AbgBNP6Q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:58:16 -0500
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 438/542] bpf, btf: Always output invariant hit in pahole DWARF to BTF transform
+Date: Fri, 14 Feb 2020 10:47:10 -0500
+Message-Id: <20200214154854.6746-438-sashal@kernel.org>
+In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
+References: <20200214154854.6746-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200213084251.GU12867@shao2-debian>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel test robot <rong.a.chen@intel.com>
-Cc: kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org, masahiroy@kernel.org, nico@fluxnic.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Chris Down <chris@chrisdown.name>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andriin@fb.com>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Thursday 13 Feb 2020 at 16:42:51 (+0800), kernel test robot wrote:
-> I attached the build log for your reference.
+From: Chris Down <chris@chrisdown.name>
 
-Thanks!
+[ Upstream commit 2a67a6ccb01f21b854715d86ff6432a18b97adb3 ]
 
-<snip>
-> scripts/kconfig/conf  --syncconfig Kconfig
->   SYSTBL  arch/x86/include/generated/asm/syscalls_32.h
->   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_32.h
->   UPD     include/config/kernel.release
->   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_64.h
->   SYSHDR  arch/x86/include/generated/uapi/asm/unistd_x32.h
->   UPD     include/generated/utsrelease.h
->   HOSTCC  scripts/dtc/dtc.o
->   HOSTCC  scripts/dtc/flattree.o
-> ./scripts/gen_autoksyms.sh: 24: ./scripts/gen_autoksyms.sh: [[: not found
-> ./scripts/gen_autoksyms.sh: 35: ./scripts/gen_autoksyms.sh: [[: not found
-> cat: /home/nfs/linux//dev/null: No such file or directory
+When trying to compile with CONFIG_DEBUG_INFO_BTF enabled, I got this
+error:
 
-OK, so that's the issue, which Nicolas pointed out earlier. That should
-be fixed in v4.
+    % make -s
+    Failed to generate BTF for vmlinux
+    Try to disable CONFIG_DEBUG_INFO_BTF
+    make[3]: *** [vmlinux] Error 1
 
-Thanks,
-Quentin
+Compiling again without -s shows the true error (that pahole is
+missing), but since this is fatal, we should show the error
+unconditionally on stderr as well, not silence it using the `info`
+function. With this patch:
+
+    % make -s
+    BTF: .tmp_vmlinux.btf: pahole (pahole) is not available
+    Failed to generate BTF for vmlinux
+    Try to disable CONFIG_DEBUG_INFO_BTF
+    make[3]: *** [vmlinux] Error 1
+
+Signed-off-by: Chris Down <chris@chrisdown.name>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Acked-by: Andrii Nakryiko <andriin@fb.com>
+Link: https://lore.kernel.org/bpf/20200122000110.GA310073@chrisdown.name
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/link-vmlinux.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 4363799403561..408b5c0b99b1b 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -108,13 +108,13 @@ gen_btf()
+ 	local bin_arch
+ 
+ 	if ! [ -x "$(command -v ${PAHOLE})" ]; then
+-		info "BTF" "${1}: pahole (${PAHOLE}) is not available"
++		echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
+ 		return 1
+ 	fi
+ 
+ 	pahole_ver=$(${PAHOLE} --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/')
+ 	if [ "${pahole_ver}" -lt "113" ]; then
+-		info "BTF" "${1}: pahole version $(${PAHOLE} --version) is too old, need at least v1.13"
++		echo >&2 "BTF: ${1}: pahole version $(${PAHOLE} --version) is too old, need at least v1.13"
+ 		return 1
+ 	fi
+ 
+-- 
+2.20.1
