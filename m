@@ -1,91 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.11.71.1]:35505 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728698AbgBQK3B (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Feb 2020 05:29:01 -0500
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: install is no longer PHONY?
-In-Reply-To: <CAK7LNASePHZ78O6fnScU_fVHkDOKJEgT+B+OC7NPxkW+tb7q1Q@mail.gmail.com>
-References: <874kvz10rx.fsf@mpe.ellerman.id.au> <CAK7LNASePHZ78O6fnScU_fVHkDOKJEgT+B+OC7NPxkW+tb7q1Q@mail.gmail.com>
-Date: Mon, 17 Feb 2020 21:28:55 +1100
-Message-ID: <87d0adfqxk.fsf@mpe.ellerman.id.au>
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34536 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726414AbgBQOX2 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 17 Feb 2020 09:23:28 -0500
+Received: by mail-wm1-f66.google.com with SMTP id s144so21180wme.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Feb 2020 06:23:27 -0800 (PST)
+Date: Mon, 17 Feb 2020 14:23:22 +0000
+From: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v4 1/3] kbuild: allow symbol whitelisting with
+ TRIM_UNUSED_KSYMS
+Message-ID: <20200217142322.GA183353@google.com>
+References: <20200212202140.138092-1-qperret@google.com>
+ <20200212202140.138092-2-qperret@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200212202140.138092-2-qperret@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: masahiroy@kernel.org, nico@fluxnic.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org
 
-Masahiro Yamada <masahiroy@kernel.org> writes:
-> Hi Michael,
->
-> On Mon, Feb 10, 2020 at 2:15 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
->>
->> Hi Masahiro,
->>
->> I noticed that "install" seems to be no longer PHONY, or at least if I
->> have a file/directory called install then the build doesn't run.
->>
->> eg:
->>   $ touch install
->>   $ make install
->>   make: 'install' is up to date.
->>   $ rm install
->>   $ make install
->>     LDS     arch/powerpc/boot/zImage.lds
->>     WRAP    arch/powerpc/boot/zImage.pseries
->>     WRAP    arch/powerpc/boot/zImage.epapr
->
->
-> I think the reason is
-> 'install' is not specified as a phony target.
->
-> You can add 'PHONY += install' to fix it.
->
->
-> PHONY += install    # please add this!
-> install:
->         $(Q)$(MAKE) $(build)=$(boot) install
->
->
-> Please do so in both arch/powerpc/Makefile and
-> arch/powerpc/boot/Makefile.
+On Wednesday 12 Feb 2020 at 20:21:38 (+0000), Quentin Perret wrote:
+> diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+> index a904bf1f5e67..93f4d10e66e6 100755
+> --- a/scripts/adjust_autoksyms.sh
+> +++ b/scripts/adjust_autoksyms.sh
+> @@ -38,6 +38,10 @@ esac
+>  # We need access to CONFIG_ symbols
+>  . include/config/auto.conf
+>  
+> +# Use 'eval' to expand the whitelist path and check if it is relative
+> +eval ksym_wl="${CONFIG_UNUSED_KSYMS_WHITELIST:-/dev/null}"
+> +[ "${ksym_wl:0:1}" = "/" ] || ksym_wl="$abs_srctree/$ksym_wl"
 
-Oh lol, sorry I didn't realise install was in the arch Makefile.
+Our internal CI just informed me that this is *still* not quite POSIX
+compliant ... I believe that the following should (finally) solve this
+issue:
 
+  [ "${ksym_wl}" != "${ksym_wl#/}" ] || ksym_wl="$abs_srctree/$ksym_wl"
 
->> In the past the presence of an install file/directory didn't have any
->> affect.
->>
->> It seems this changed in:
->>   d79424137a73 ("kbuild: do not update config when running install targets")
->>
->> Was that expected?
->>
->> cheers
->
->
-> I do not think commit is related.
->
-> Prior to this commit, I still see the same issue.
->
->
-> $ git checkout d7942413^
-> $ touch install
-> $ make -s ARCH=powerpc allnoconfig
-> $ make  ARCH=powerpc install
-> make: 'install' is up to date.
+The above seems to work with bash, zsh, dash, posh and, IIUC, complies
+with https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html.
+I'll try other shells and stare at the doc some more, but if there is a
+preferred pattern in the kernel I'm happy to change it.
 
-Hmm weird. I did bisect it:
-
-  # bad: [d79424137a7312d381d131d707a462440c0e8df9] kbuild: do not update config when running install targets
-  git bisect bad d79424137a7312d381d131d707a462440c0e8df9
-  # good: [9c2af1c7377a8a6ef86e5cabf80978f3dbbb25c0] kbuild: add .DELETE_ON_ERROR special target
-  git bisect good 9c2af1c7377a8a6ef86e5cabf80978f3dbbb25c0
-  # first bad commit: [d79424137a7312d381d131d707a462440c0e8df9] kbuild: do not update config when running install targets
-
-But you're right. I must have messed something up while bisecting.
-
-Sorry for the noise.
-
-cheers
+Thanks,
+Quentin
