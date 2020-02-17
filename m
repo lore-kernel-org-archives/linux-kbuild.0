@@ -1,48 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:24959 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbgBQB2H (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 16 Feb 2020 20:28:07 -0500
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/2] kconfig: remove unused variable in qconf.cc
-Date: Mon, 17 Feb 2020 10:27:40 +0900
-Message-Id: <20200217012741.22100-1-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from foss.arm.com ([217.140.110.172]:60650 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728773AbgBQJ3K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 17 Feb 2020 04:29:10 -0500
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: [PATCH v5 15/17] kconfig: Add support for 'as-option'
+Date: Mon, 17 Feb 2020 14:57:46 +0530
+Message-Id: <1581931668-11559-16-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1581931668-11559-1-git-send-email-amit.kachhap@arm.com>
+References: <1581931668-11559-1-git-send-email-amit.kachhap@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, James Morse <james.morse@arm.com>, Vincenzo Frascino <Vincenzo.Frascino@arm.com>, Mark Brown <broonie@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-If this file were compiled with -Wall, the following warning would be
-reported:
+From: Vincenzo Frascino <vincenzo.frascino@arm.com>
 
-scripts/kconfig/qconf.cc:312:6: warning: unused variable ‘i’ [-Wunused-variable]
-  int i;
-      ^
+Currently kconfig does not have a feature that allows to detect if the
+used assembler supports a specific compilation option.
 
-The commit prepares to turn on -Wall for host programs written in C++.
+Introduce 'as-option' to serve this purpose in the context of Kconfig:
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+        config X
+                def_bool $(as-option,...)
+
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org
+Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
 ---
+ scripts/Kconfig.include | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- scripts/kconfig/qconf.cc | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 82773cc35d35..50a5245d87bb 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -309,8 +309,6 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 	  showName(false), showRange(false), showData(false), mode(singleMode), optMode(normalOpt),
- 	  rootEntry(0), headerPopup(0)
- {
--	int i;
--
- 	setObjectName(name);
- 	setSortingEnabled(false);
- 	setRootIsDecorated(true);
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+index 85334dc..374e251 100644
+--- a/scripts/Kconfig.include
++++ b/scripts/Kconfig.include
+@@ -35,6 +35,10 @@ ld-option = $(success,$(LD) -v $(1))
+ # Return y if the assembler supports <instr>, n otherwise
+ as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
+ 
++# $(as-option,<flag>)
++# Return y if the assembler supports <flag>, n otherwise
++as-option = $(success, $(CC) $(CLANG_FLAGS) $(1) -c -x assembler /dev/null -o /dev/zero)
++
+ # check if $(CC) and $(LD) exist
+ $(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
+ $(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
 -- 
-2.17.1
+2.7.4
