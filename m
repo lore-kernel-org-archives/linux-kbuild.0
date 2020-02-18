@@ -1,139 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:21053 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726091AbgBRAid (ORCPT
+Received: from mail-wr1-f74.google.com ([209.85.221.74]:53231 "EHLO
+        mail-wr1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726347AbgBRJlo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Feb 2020 19:38:33 -0500
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 01I0c88x022532
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Feb 2020 09:38:08 +0900
-Received: by mail-ua1-f50.google.com with SMTP id o42so6816116uad.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Feb 2020 16:38:08 -0800 (PST)
-MIME-Version: 1.0
-References: <1581931668-11559-1-git-send-email-amit.kachhap@arm.com>
- <1581931668-11559-16-git-send-email-amit.kachhap@arm.com> <CAK7LNARTD88U1ZBxMU3fCDb1KxF=PavhgoUzqTt6ar9-+7eMQA@mail.gmail.com>
- <7b2b8e5a-c276-4dfe-3fac-afc03cda4e3d@arm.com>
-In-Reply-To: <7b2b8e5a-c276-4dfe-3fac-afc03cda4e3d@arm.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 18 Feb 2020 09:37:31 +0900
-Message-ID: <CAK7LNASELe0+MhpU-huL-jCmxsCofs-OKz_1xYYLgJtuM5bomg@mail.gmail.com>
-Subject: Re: [PATCH v5 15/17] kconfig: Add support for 'as-option'
+        Tue, 18 Feb 2020 04:41:44 -0500
+Received: by mail-wr1-f74.google.com with SMTP id a12so10513903wrn.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Feb 2020 01:41:43 -0800 (PST)
+Date: Tue, 18 Feb 2020 09:41:36 +0000
+Message-Id: <20200218094139.78835-1-qperret@google.com>
+Mime-Version: 1.0
+Subject: [PATCH v5 0/3] kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYM
+From: Quentin Perret <qperret@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Cc: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>, Mark Brown <broonie@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: masahiroy@kernel.org, nico@fluxnic.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, maennich@google.com, kernel-team@android.com, jeyu@kernel.org, hch@infradead.org, qperret@google.com
 
-Hi,
+The current norm on Android and many other systems is for vendors to
+introduce significant changes to their downstream kernels, and to
+contribute very little (if any) code back upstream. The Generic Kernel
+Image (GKI) project in Android attempts to improve the status-quo by
+having a unique kernel for all android devices of the same architecture,
+regardless of the SoC vendor. The key idea is to make all interested
+parties agree on a common solution, and contribute their code upstream
+to make it available to use by the wider community.
 
-On Mon, Feb 17, 2020 at 7:16 PM Vincenzo Frascino
-<vincenzo.frascino@arm.com> wrote:
->
-> Hi,
->
-> On 17/02/2020 09:39, Masahiro Yamada wrote:
-> > Hi.
-> >
-> > On Mon, Feb 17, 2020 at 6:29 PM Amit Daniel Kachhap
-> > <amit.kachhap@arm.com> wrote:
-> >>
-> >> From: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> >>
-> >> Currently kconfig does not have a feature that allows to detect if the
-> >> used assembler supports a specific compilation option.
-> >>
-> >> Introduce 'as-option' to serve this purpose in the context of Kconfig:
-> >>
-> >>         config X
-> >>                 def_bool $(as-option,...)
-> >>
-> >> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >> Cc: linux-kbuild@vger.kernel.org
-> >> Acked-by: Masahiro Yamada <masahiroy@kernel.org>
-> >> Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> >> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> >> ---
-> >>  scripts/Kconfig.include | 4 ++++
-> >>  1 file changed, 4 insertions(+)
-> >>
-> >> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-> >> index 85334dc..374e251 100644
-> >> --- a/scripts/Kconfig.include
-> >> +++ b/scripts/Kconfig.include
-> >> @@ -35,6 +35,10 @@ ld-option = $(success,$(LD) -v $(1))
-> >>  # Return y if the assembler supports <instr>, n otherwise
-> >>  as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
-> >>
-> >> +# $(as-option,<flag>)
-> >> +# Return y if the assembler supports <flag>, n otherwise
-> >> +as-option =$(success, $(CC) $(CLANG_FLAGS) $(1) -c -x assembler /dev/null -o /dev/zero)
-> >> +
-> >
-> >
-> > I am still not convinced with using /dev/zero here.
-> >
->
-> Could you please elaborate a bit more?
+The kernel-to-drivers ABI on Android devices varies significantly from
+one vendor kernel to another today because of changes to exported
+symbols, dependencies on vendor symbols, and surely other things. The
+first step for GKI is to try and put some order into this by agreeing on
+one version of the ABI that works for everybody.
 
+For practical reasons, we need to reduce the ABI surface to a subset of
+the exported symbols, simply to make the problem realistically solvable,
+but there is currently no upstream support for this use-case.
 
-I am just not familiar with this usage of /dev/zero.
+As such, this series attempts to improve the situation by enabling users
+to specify a symbol 'whitelist' at compile time. Any symbol specified in
+this whitelist will be kept exported when CONFIG_TRIM_UNUSED_KSYMS is
+set, even if it has no in-tree user. The whitelist is defined as a
+simple text file, listing symbols, one per line.
 
+v5:
+ - made sure to be POSIX-compliant (+ tested with dash and posh)
+ - added failure path if the whitelist path is incorrect (Matthias,
+   Nicolas)
+ - collected Acked-By (and other) tags from Nicolas and Matthias
 
-The behavior of /dev/null is clear.
-The read/write to /dev/null is described in the standard:
-https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap10.html
+v4:
+ - removed [[]] bash-specific pattern from the scripts (Nicolas)
+ - use $CONFIG_SHELL consistently in all patches (Masahiro)
+ - added shortlog for initial generation of autoksyms.h (Masahiro)
+ - added comment on how 'eval' expands the whitelist path (Masahiro)
 
-I just do not know whether the write to /dev/zero is
-the defined-behavior or not.
+v3:
+ - added a cover letter to explain why this is in fact an attempt to
+   help upstream in the long term (Christoph)
+ - made path relative to the kernel source tree (Matthias)
+ - made the Kconfig help text less confusing (Jessica)
+ - added patch 02 and 03 to optimize build time when a whitelist is
+   provided
 
+v2:
+ - make sure to quote the whitelist path properly (Nicolas)
 
-Masahiro Yamada
+Quentin Perret (3):
+  kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYMS
+  kbuild: split adjust_autoksyms.sh in two parts
+  kbuild: generate autoksyms.h early
 
+ Makefile                    |  7 +++--
+ init/Kconfig                | 13 ++++++++++
+ scripts/adjust_autoksyms.sh | 24 +++--------------
+ scripts/gen_autoksyms.sh    | 52 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 74 insertions(+), 22 deletions(-)
+ create mode 100755 scripts/gen_autoksyms.sh
 
->
-> >
-> > Does this work?
-> >
-> > as-option = $(success, cat /dev/null | $(CC) $(CLANG_FLAGS) $(1) -c -x
-> > assembler -o /dev/null -)
-> >
->
-> I will try and get back to you.
-
-
-
-Masahiro Yamada
-
-
->
-> >
-> > [1] Could you insert as-option between ld-option and as-instr ?
-> >
->
-> Sure, I will do it in the next version.
->
-> > [2] Could you add some comments to explain why
-> >      /dev/null -o /dev/null does not work?
-> >
-> >
->
-> Comments are always a good think :) I will do in the next version.
->
-> >
-> >
-> >
-> >>  # check if $(CC) and $(LD) exist
-> >>  $(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
-> >>  $(error-if,$(failure,command -v $(LD)),linker '$(LD)' not found)
-> >> --
-> >> 2.7.4
-> >>
-> >
-> >
->
-> --
-> Regards,
-> Vincenzo
---
-Best Regards
-Masahiro Yamada
+-- 
+2.25.0.265.gbab2e86ba0-goog
