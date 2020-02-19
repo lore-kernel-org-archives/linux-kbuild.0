@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:39571 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726551AbgBSEyc (ORCPT
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:34149 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726750AbgBSEyh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Feb 2020 23:54:32 -0500
+        Tue, 18 Feb 2020 23:54:37 -0500
 From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH 0/6] Silence some instances of -Wtautological-compare and enable globally
-Date: Tue, 18 Feb 2020 21:54:17 -0700
-Message-Id: <20200219045423.54190-1-natechancellor@gmail.com>
+Subject: [PATCH 6/6] kbuild: Enable -Wtautological-compare
+Date: Tue, 18 Feb 2020 21:54:23 -0700
+Message-Id: <20200219045423.54190-7-natechancellor@gmail.com>
+In-Reply-To: <20200219045423.54190-1-natechancellor@gmail.com>
+References: <20200219045423.54190-1-natechancellor@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,60 +17,38 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>, Jason Baron <jbaron@akamai.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>
 
-Hi everyone,
+Currently, we disable -Wtautological-compare, which in turn disables a
+bunch of more specific tautological comparison warnings that are useful
+for the kernel (see clang's documentation below). Now that all of the
+major/noisy warnings have been fixed, enable -Wtautological-compare so
+that more issues can be caught at build time.
 
-This patch series aims to silence some instances of clang's
--Wtautological-compare that are not problematic and enable it globally
-for the kernel because it has a bunch of subwarnings that can find real
-bugs in the kernel such as
-https://lore.kernel.org/lkml/20200116222658.5285-1-natechancellor@gmail.com/
-and https://bugs.llvm.org/show_bug.cgi?id=42666, which was specifically
-requested by Dmitry.
+-Wtautological-constant-out-of-range-compare is kept disabled because
+there are places in the kernel where a constant or variable size can
+change based on the kernel configuration; these are not fixed in a
+clean/concise way and they are almost always harmless so this one
+subwarning is kept disabled.
 
-The first patch adds a macro that casts the section variables to
-unsigned long (uintptr_t), which silences the warning and adds
-documentation.
+Link: https://github.com/ClangBuiltLinux/linux/issues/488
+Link: http://releases.llvm.org/9.0.0/tools/clang/docs/DiagnosticsReference.html#wtautological-compare
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Patches two through four silence the warning in the places I have
-noticed it across all of my builds with -Werror, including arm, arm64,
-and x86_64 defconfig/allmodconfig/allyesconfig. There might still be
-more lurking but those will have to be teased out over time.
-
-Patch six finally enables the warning, while leaving one of the
-subwarnings disabled because it is rather noisy and somewhat pointless
-for the kernel, where core kernel code is expected to build and run with
-many different configurations where variable types can be different
-sizes.
-
-A slight meta comment: This is the first treewide patchset that I have
-sent. I pray I did everything right but please let me know if I did not.
-I assume someone like Andrew will pick this up with acks from everyone
-but let me know if there is someone better.
-
-Cheers,
-Nathan
-
-Nathan Chancellor (6):
-  asm/sections: Add COMPARE_SECTIONS macro
-  kernel/extable: Wrap section comparison in sort_main_extable with
-    COMPARE_SECTIONS
-  tracing: Wrap section comparison in tracer_alloc_buffers with
-    COMPARE_SECTIONS
-  dynamic_debug: Wrap section comparison in dynamic_debug_init with
-    COMPARE_SECTIONS
-  mm: kmemleak: Wrap section comparison in kmemleak_init with
-    COMPARE_SECTIONS
-  kbuild: Enable -Wtautological-compare
-
- Makefile                       | 3 +--
- include/asm-generic/sections.h | 7 +++++++
- kernel/extable.c               | 3 ++-
- kernel/trace/trace.c           | 2 +-
- lib/dynamic_debug.c            | 2 +-
- mm/kmemleak.c                  | 3 ++-
- 6 files changed, 14 insertions(+), 6 deletions(-)
-
-
-base-commit: 02815e777db630e3c183718cab73752b48a5053e
+diff --git a/Makefile b/Makefile
+index b954c304c479..99080c57a1cb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -742,8 +742,7 @@ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+ KBUILD_CFLAGS += -Wno-format-invalid-specifier
+ KBUILD_CFLAGS += -Wno-gnu
+-# Quiet clang warning: comparison of unsigned expression < 0 is always false
+-KBUILD_CFLAGS += -Wno-tautological-compare
++KBUILD_CFLAGS += -Wno-tautological-constant-out-of-range-compare
+ # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+ # See modpost pattern 2
 -- 
 2.25.1
