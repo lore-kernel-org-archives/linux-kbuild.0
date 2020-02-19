@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:40622 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726623AbgBSEyf (ORCPT
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:40216 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726739AbgBSEyh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Feb 2020 23:54:35 -0500
+        Tue, 18 Feb 2020 23:54:37 -0500
 From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH 3/6] tracing: Wrap section comparison in tracer_alloc_buffers with COMPARE_SECTIONS
-Date: Tue, 18 Feb 2020 21:54:20 -0700
-Message-Id: <20200219045423.54190-4-natechancellor@gmail.com>
+Subject: [PATCH 5/6] mm: kmemleak: Wrap section comparison in kmemleak_init with COMPARE_SECTIONS
+Date: Tue, 18 Feb 2020 21:54:22 -0700
+Message-Id: <20200219045423.54190-6-natechancellor@gmail.com>
 In-Reply-To: <20200219045423.54190-1-natechancellor@gmail.com>
 References: <20200219045423.54190-1-natechancellor@gmail.com>
 MIME-Version: 1.0
@@ -19,11 +19,15 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.
 
 Clang warns:
 
-../kernel/trace/trace.c:9335:33: warning: array comparison always
-evaluates to true [-Wtautological-compare]
-        if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
-                                       ^
-1 warning generated.
+../mm/kmemleak.c:1950:28: warning: array comparison always evaluates to
+a constant [-Wtautological-compare]
+        if (__start_ro_after_init < _sdata || __end_ro_after_init > _edata)
+                                  ^
+../mm/kmemleak.c:1950:60: warning: array comparison always evaluates to
+a constant [-Wtautological-compare]
+        if (__start_ro_after_init < _sdata || __end_ro_after_init > _edata)
+                                                                  ^
+2 warnings generated.
 
 These are not true arrays, they are linker defined symbols, which are
 just addresses so there is not a real issue here. Use the
@@ -33,21 +37,22 @@ defined symbols to unsigned long, which keeps the logic the same.
 Link: https://github.com/ClangBuiltLinux/linux/issues/765
 Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
- kernel/trace/trace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/kmemleak.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index c797a15a1fc7..e1f3b16e457b 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -9332,7 +9332,7 @@ __init static int tracer_alloc_buffers(void)
- 		goto out_free_buffer_mask;
- 
- 	/* Only allocate trace_printk buffers if a trace_printk exists */
--	if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
-+	if (COMPARE_SECTIONS(__stop___trace_bprintk_fmt, !=, __start___trace_bprintk_fmt))
- 		/* Must be called before global_trace.buffer is allocated */
- 		trace_printk_init_buffers();
- 
+diff --git a/mm/kmemleak.c b/mm/kmemleak.c
+index aa6832432d6a..e27655526ba7 100644
+--- a/mm/kmemleak.c
++++ b/mm/kmemleak.c
+@@ -1952,7 +1952,8 @@ void __init kmemleak_init(void)
+ 	create_object((unsigned long)__bss_start, __bss_stop - __bss_start,
+ 		      KMEMLEAK_GREY, GFP_ATOMIC);
+ 	/* only register .data..ro_after_init if not within .data */
+-	if (__start_ro_after_init < _sdata || __end_ro_after_init > _edata)
++	if (COMPARE_SECTIONS(__start_ro_after_init, <, _sdata) ||
++	    COMPARE_SECTIONS(__end_ro_after_init, >, _edata))
+ 		create_object((unsigned long)__start_ro_after_init,
+ 			      __end_ro_after_init - __start_ro_after_init,
+ 			      KMEMLEAK_GREY, GFP_ATOMIC);
 -- 
 2.25.1
