@@ -1,64 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53776 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727720AbgBSOet (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Feb 2020 09:34:49 -0500
-Date: Wed, 19 Feb 2020 09:34:45 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 3/6] tracing: Wrap section comparison in
- tracer_alloc_buffers with COMPARE_SECTIONS
-Message-ID: <20200219093445.386f1c09@gandalf.local.home>
-In-Reply-To: <20200219045423.54190-4-natechancellor@gmail.com>
-References: <20200219045423.54190-1-natechancellor@gmail.com>
-        <20200219045423.54190-4-natechancellor@gmail.com>
+Received: from pb-smtp21.pobox.com ([173.228.157.53]:56037 "EHLO
+        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726652AbgBSQQF (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Feb 2020 11:16:05 -0500
+Date: Wed, 19 Feb 2020 11:15:57 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [PATCH] kconfig: make 'imply' obey the direct dependency
+In-Reply-To: <20200219074950.23344-1-masahiroy@kernel.org>
+Message-ID: <nycvar.YSQ.7.76.2002191046520.1559@knanqh.ubzr>
+References: <20200219074950.23344-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, Jason Baron <jbaron@akamai.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, clang-built-linux@googlegroups.com
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Richard Cochran <richardcochran@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, John Stultz <john.stultz@linaro.org>, Josh Triplett <josh@joshtriplett.org>, Mark Brown <broonie@kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 18 Feb 2020 21:54:20 -0700
-Nathan Chancellor <natechancellor@gmail.com> wrote:
+On Wed, 19 Feb 2020, Masahiro Yamada wrote:
 
-> Clang warns:
+> The 'imply' statement may create unmet direct dependency when the
+> implied symbol depends on m.
 > 
-> ../kernel/trace/trace.c:9335:33: warning: array comparison always
-> evaluates to true [-Wtautological-compare]
->         if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
->                                        ^
-> 1 warning generated.
+> [Test Code]
 > 
-> These are not true arrays, they are linker defined symbols, which are
-> just addresses so there is not a real issue here. Use the
-> COMPARE_SECTIONS macro to silence this warning by casting the linker
-> defined symbols to unsigned long, which keeps the logic the same.
+>   config FOO
+>           tristate "foo"
+>           imply BAZ
 > 
-> Link: https://github.com/ClangBuiltLinux/linux/issues/765
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
->  kernel/trace/trace.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   config BAZ
+>           tristate "baz"
+>           depends on BAR
 > 
-> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-> index c797a15a1fc7..e1f3b16e457b 100644
-> --- a/kernel/trace/trace.c
-> +++ b/kernel/trace/trace.c
-> @@ -9332,7 +9332,7 @@ __init static int tracer_alloc_buffers(void)
->  		goto out_free_buffer_mask;
->  
->  	/* Only allocate trace_printk buffers if a trace_printk exists */
-> -	if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
-> +	if (COMPARE_SECTIONS(__stop___trace_bprintk_fmt, !=, __start___trace_bprintk_fmt))
+>   config BAR
+>           def_tristate m
+> 
+>   config MODULES
+>           def_bool y
+>           option modules
+> 
+> If you set FOO=y, BAZ is also promoted to y, which results in the
+> following .config file:
+> 
+>   CONFIG_FOO=y
+>   CONFIG_BAZ=y
+>   CONFIG_BAR=m
+>   CONFIG_MODULES=y
+> 
+> This ignores the dependency "BAZ depends on BAR".
+> 
+> Unlike 'select', what is worse, Kconfig never shows the
+> "WARNING: unmet direct dependencies detected for ..." for this case.
+> 
+> Because 'imply' should be weaker than 'depends on', Kconfig should
+> take the direct dependency into account.
+> 
+> Describe this case in Documentation/kbuild/kconfig-language.rst for
+> clarification.
+> 
+> Commit 237e3ad0f195 ("Kconfig: Introduce the "imply" keyword") says that
+> a symbol implied by y is restricted to y or n, excluding m.
+> 
+> As for the combination of FOO=y and BAR=m, the case of BAZ=m is excluded
+> by the 'imply', and BAZ=y is also excluded by 'depends on'. So, only the
+> possible value is BAZ=n.
 
-Sorry, but this is really ugly and unreadable. Please find some other
-solution to fix this.
+I don't think this is right. The imply keyword provide influence over 
+another symbol but it should not impose any restrictions. If BAR=m then 
+BAZ should still be allowed to be m or n.
 
-NAK-by: Steven Rostedt
+> @@ -174,6 +174,9 @@ applicable everywhere (see syntax).
+>  	n		y		n		N/m/y
+>  	m		y		m		M/y/n
+>  	y		y		y		Y/n
+> +	n		m		n		N/m
+> +	m		m		m		M/n
+> +	y		m		n		N
 
--- Steve
+Here the last line shoule be y m n N/m.
 
->  		/* Must be called before global_trace.buffer is allocated */
->  		trace_printk_init_buffers();
->  
+Generally speaking, the code enabled by FOO may rely on functionalities 
+provided by BAZ only when BAZ >= FOO. This is accomplished with 
+IS_REACHABLE():
+
+	foo_init()
+	{
+		if (IS_REACHABLE(CONFIG_BAZ))
+			baz_register(&foo);
+		...
+	}
+
+So if FOO=y and BAZ=m then IS_REACHABLE(CONFIG_BAZ) will be false. Maybe 
+adding a note to that effect linked to the "y m n N/m" line in the table 
+would be a good idea.
+
+
+Nicolas
