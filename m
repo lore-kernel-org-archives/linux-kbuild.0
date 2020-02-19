@@ -1,98 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp21.pobox.com ([173.228.157.53]:56037 "EHLO
-        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726652AbgBSQQF (ORCPT
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42536 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726638AbgBSRon (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:16:05 -0500
-Date: Wed, 19 Feb 2020 11:15:57 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH] kconfig: make 'imply' obey the direct dependency
-In-Reply-To: <20200219074950.23344-1-masahiroy@kernel.org>
-Message-ID: <nycvar.YSQ.7.76.2002191046520.1559@knanqh.ubzr>
-References: <20200219074950.23344-1-masahiroy@kernel.org>
+        Wed, 19 Feb 2020 12:44:43 -0500
+Received: by mail-pl1-f196.google.com with SMTP id e8so353197plt.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Feb 2020 09:44:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20200219045423.54190-1-natechancellor@gmail.com>
+ <20200219045423.54190-4-natechancellor@gmail.com> <20200219093445.386f1c09@gandalf.local.home>
+In-Reply-To: <20200219093445.386f1c09@gandalf.local.home>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Wed, 19 Feb 2020 09:44:31 -0800
+Message-ID: <CAKwvOdm-N1iX0SMxGDV5Vf=qS5uHPdH3S-TRs-065BuSOdKt1w@mail.gmail.com>
+Subject: Re: [PATCH 3/6] tracing: Wrap section comparison in
+ tracer_alloc_buffers with COMPARE_SECTIONS
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Richard Cochran <richardcochran@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, John Stultz <john.stultz@linaro.org>, Josh Triplett <josh@joshtriplett.org>, Mark Brown <broonie@kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>, Nathan Chancellor <natechancellor@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, Jason Baron <jbaron@akamai.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Memory Management List <linux-mm@kvack.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Wed, 19 Feb 2020, Masahiro Yamada wrote:
+On Wed, Feb 19, 2020 at 6:34 AM Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> On Tue, 18 Feb 2020 21:54:20 -0700
+> Nathan Chancellor <natechancellor@gmail.com> wrote:
+>
+> > Clang warns:
+> >
+> > ../kernel/trace/trace.c:9335:33: warning: array comparison always
+> > evaluates to true [-Wtautological-compare]
+> >         if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+> >                                        ^
+> > 1 warning generated.
+> >
+> > These are not true arrays, they are linker defined symbols, which are
+> > just addresses so there is not a real issue here. Use the
+> > COMPARE_SECTIONS macro to silence this warning by casting the linker
+> > defined symbols to unsigned long, which keeps the logic the same.
+> >
+> > Link: https://github.com/ClangBuiltLinux/linux/issues/765
+> > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> > ---
+> >  kernel/trace/trace.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> > index c797a15a1fc7..e1f3b16e457b 100644
+> > --- a/kernel/trace/trace.c
+> > +++ b/kernel/trace/trace.c
+> > @@ -9332,7 +9332,7 @@ __init static int tracer_alloc_buffers(void)
+> >               goto out_free_buffer_mask;
+> >
+> >       /* Only allocate trace_printk buffers if a trace_printk exists */
+> > -     if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+> > +     if (COMPARE_SECTIONS(__stop___trace_bprintk_fmt, !=, __start___trace_bprintk_fmt))
+>
+> Sorry, but this is really ugly and unreadable. Please find some other
+> solution to fix this.
+>
+> NAK-by: Steven Rostedt
+>
 
-> The 'imply' statement may create unmet direct dependency when the
-> implied symbol depends on m.
-> 
-> [Test Code]
-> 
->   config FOO
->           tristate "foo"
->           imply BAZ
-> 
->   config BAZ
->           tristate "baz"
->           depends on BAR
-> 
->   config BAR
->           def_tristate m
-> 
->   config MODULES
->           def_bool y
->           option modules
-> 
-> If you set FOO=y, BAZ is also promoted to y, which results in the
-> following .config file:
-> 
->   CONFIG_FOO=y
->   CONFIG_BAZ=y
->   CONFIG_BAR=m
->   CONFIG_MODULES=y
-> 
-> This ignores the dependency "BAZ depends on BAR".
-> 
-> Unlike 'select', what is worse, Kconfig never shows the
-> "WARNING: unmet direct dependencies detected for ..." for this case.
-> 
-> Because 'imply' should be weaker than 'depends on', Kconfig should
-> take the direct dependency into account.
-> 
-> Describe this case in Documentation/kbuild/kconfig-language.rst for
-> clarification.
-> 
-> Commit 237e3ad0f195 ("Kconfig: Introduce the "imply" keyword") says that
-> a symbol implied by y is restricted to y or n, excluding m.
-> 
-> As for the combination of FOO=y and BAR=m, the case of BAZ=m is excluded
-> by the 'imply', and BAZ=y is also excluded by 'depends on'. So, only the
-> possible value is BAZ=n.
+Hey Nathan,
+Thanks for the series; enabling the warning will help us find more
+bugs.  Revisiting what the warning is about, I checked on this
+"referring to symbols defined in linker scripts from C" pattern.  This
+document [0] (by no means definitive, but I think it has a good idea)
+says:
 
-I don't think this is right. The imply keyword provide influence over 
-another symbol but it should not impose any restrictions. If BAR=m then 
-BAZ should still be allowed to be m or n.
+Linker symbols that represent a data address: In C code, declare the
+variable as an extern variable. Then, refer to the value of the linker
+symbol using the & operator. Because the variable is at a valid data
+address, we know that a data pointer can represent the value.
+Linker symbols for an arbitrary address: In C code, declare this as an
+extern symbol. The type does not matter. If you are using GCC
+extensions, declare it as "extern void".
 
-> @@ -174,6 +174,9 @@ applicable everywhere (see syntax).
->  	n		y		n		N/m/y
->  	m		y		m		M/y/n
->  	y		y		y		Y/n
-> +	n		m		n		N/m
-> +	m		m		m		M/n
-> +	y		m		n		N
+Indeed, it seems that Clang is happier with that pattern:
+https://godbolt.org/z/sW3t5W
 
-Here the last line shoule be y m n N/m.
+Looking at __stop___trace_bprintk_fmt in particular:
 
-Generally speaking, the code enabled by FOO may rely on functionalities 
-provided by BAZ only when BAZ >= FOO. This is accomplished with 
-IS_REACHABLE():
+kernel/trace/trace.h
+1923:extern const char *__stop___trace_bprintk_fmt[];
 
-	foo_init()
-	{
-		if (IS_REACHABLE(CONFIG_BAZ))
-			baz_register(&foo);
-		...
-	}
+(Should be `extern const void __stop___trace_bprintk_fmt;` void since
+we don't access any data or function from that symbol, just compare
+its address)
 
-So if FOO=y and BAZ=m then IS_REACHABLE(CONFIG_BAZ) will be false. Maybe 
-adding a note to that effect linked to the "y m n N/m" line in the table 
-would be a good idea.
+kernel/trace/trace_printk.c
+260: start_index = __stop___trace_bprintk_fmt - __start___trace_bprintk_fmt;
 
+(Should be `start_index = (uintptr_t)__stop___trace_bprintk_fmt -
+(uintptr_t)__start___trace_bprintk_fmt;`) (storing the result in an
+int worries me a little, but maybe that refactoring can be saved for
+another day)
 
-Nicolas
+kernel/trace/trace.c
+9335: if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+
+(Should be `if (&__stop___trace_bprintk_fmt -
+&__start___trace_bprintk_fmt)`.  That's not a significant change to
+the existing code, and is quite legible IMO)
+
+Steven, thoughts?
+
+[0] http://downloads.ti.com/docs/esd/SPRUI03/using-linker-symbols-in-c-c-applications-slau1318080.html
+-- 
+Thanks,
+~Nick Desaulniers
