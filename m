@@ -1,49 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:49770 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726757AbgBSBPy (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:49554 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726882AbgBSCTY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Feb 2020 20:15:54 -0500
+        Tue, 18 Feb 2020 21:19:24 -0500
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 01J2J3Za001115
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Feb 2020 11:19:04 +0900
+Received: by mail-ua1-f49.google.com with SMTP id f7so8282949uaa.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 18 Feb 2020 18:19:04 -0800 (PST)
+MIME-Version: 1.0
+References: <20200219000434.15872-1-mpe@ellerman.id.au>
+In-Reply-To: <20200219000434.15872-1-mpe@ellerman.id.au>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kbuild: remove wrong documentation about mandatory-y
-Date: Wed, 19 Feb 2020 10:15:19 +0900
-Message-Id: <20200219011519.22148-1-masahiroy@kernel.org>
+Date: Wed, 19 Feb 2020 11:18:27 +0900
+Message-ID: <CAK7LNARm+iePH7F-W3ur5=TfhQSAdbOzX-uLm_9Qak-hFZ2EdQ@mail.gmail.com>
+Subject: Re: [PATCH v2] powerpc/Makefile: Mark phony targets as PHONY
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: linuxppc-dev@ozlabs.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-This sentence does not make sense in the section about mandatory-y.
+On Wed, Feb 19, 2020 at 9:04 AM Michael Ellerman <mpe@ellerman.id.au> wrote:
+>
+> Some of our phony targets are not marked as such. This can lead to
+> confusing errors, eg:
+>
+>   $ make clean
+>   $ touch install
+>   $ make install
+>   make: 'install' is up to date.
+>   $
+>
+> Fix it by adding them to the PHONY variable which is marked phony in
+> the top-level Makefile, or in scripts/Makefile.build for the boot
+> Makefile.
+>
+> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> ---
 
-This seems to be a copy-paste mistake of commit fcc8487d477a ("uapi:
-export all headers under uapi directories").
+Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
 
-The correct description would be "The convention is to list one
-mandatory-y per line ...".
 
-I just removed it instead of fixing it. If such information is needed,
-it could be commented in include/asm-generic/Kbuild and
-include/uapi/asm-generic/Kbuild.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- Documentation/kbuild/makefiles.rst | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index 0e0eb2c8da7d..4018ad7c7a11 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -1379,9 +1379,6 @@ See subsequent chapter for the syntax of the Kbuild file.
- 	in arch/$(ARCH)/include/(uapi/)/asm, Kbuild will automatically generate
- 	a wrapper of the asm-generic one.
- 
--	The convention is to list one subdir per line and
--	preferably in alphabetic order.
--
- 8 Kbuild Variables
- ==================
- 
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
