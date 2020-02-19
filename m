@@ -1,26 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from scm.imp.edu.mx ([132.247.16.103]:53040 "EHLO scm.imp.edu.mx"
+Received: from mail.kernel.org ([198.145.29.99]:53776 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727873AbgBSNZl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Feb 2020 08:25:41 -0500
-Content-Type: text/plain; charset="iso-8859-1"
+        id S1727720AbgBSOet (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Feb 2020 09:34:49 -0500
+Date: Wed, 19 Feb 2020 09:34:45 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH 3/6] tracing: Wrap section comparison in
+ tracer_alloc_buffers with COMPARE_SECTIONS
+Message-ID: <20200219093445.386f1c09@gandalf.local.home>
+In-Reply-To: <20200219045423.54190-4-natechancellor@gmail.com>
+References: <20200219045423.54190-1-natechancellor@gmail.com>
+        <20200219045423.54190-4-natechancellor@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: 19-02-2020
-From: "urs portmann" <mucios@imp.edu.mx>
-Date: Wed, 19 Feb 2020 21:51:40 +1100
-Reply-To: onube@qq.com
-Message-Id: <20200219105143.0F277180635F48@imp.edu.mx>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <mucios@imp.edu.mx>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, Jason Baron <jbaron@akamai.com>, Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, clang-built-linux@googlegroups.com
 
-Guten Morgen,
-                                          19-02-2020
-Wir haben versucht, Sie zu erreichen und haben noch nichts von Ihnen gehört. Haben Sie unsere letzte E-Mail über Ihre S.p.e.n.d.e erhalten? Wenn nicht, melden Sie sich bitte bei uns, um weitere Informationen zu erhalten.
+On Tue, 18 Feb 2020 21:54:20 -0700
+Nathan Chancellor <natechancellor@gmail.com> wrote:
 
-Wir warten darauf, von Ihnen zu hören, sobald Sie diese Nachricht erhalten, die Sie bei der weiteren Vorgehensweise unterstützt.
+> Clang warns:
+> 
+> ../kernel/trace/trace.c:9335:33: warning: array comparison always
+> evaluates to true [-Wtautological-compare]
+>         if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+>                                        ^
+> 1 warning generated.
+> 
+> These are not true arrays, they are linker defined symbols, which are
+> just addresses so there is not a real issue here. Use the
+> COMPARE_SECTIONS macro to silence this warning by casting the linker
+> defined symbols to unsigned long, which keeps the logic the same.
+> 
+> Link: https://github.com/ClangBuiltLinux/linux/issues/765
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> ---
+>  kernel/trace/trace.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> index c797a15a1fc7..e1f3b16e457b 100644
+> --- a/kernel/trace/trace.c
+> +++ b/kernel/trace/trace.c
+> @@ -9332,7 +9332,7 @@ __init static int tracer_alloc_buffers(void)
+>  		goto out_free_buffer_mask;
+>  
+>  	/* Only allocate trace_printk buffers if a trace_printk exists */
+> -	if (__stop___trace_bprintk_fmt != __start___trace_bprintk_fmt)
+> +	if (COMPARE_SECTIONS(__stop___trace_bprintk_fmt, !=, __start___trace_bprintk_fmt))
 
-Mfg
-urs portmann
+Sorry, but this is really ugly and unreadable. Please find some other
+solution to fix this.
+
+NAK-by: Steven Rostedt
+
+-- Steve
+
+>  		/* Must be called before global_trace.buffer is allocated */
+>  		trace_printk_init_buffers();
+>  
