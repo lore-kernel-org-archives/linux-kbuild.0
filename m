@@ -1,134 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:17334 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727668AbgBTCkd (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:48072 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726248AbgBTHqH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Feb 2020 21:40:33 -0500
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 01K2eI2F000430
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Feb 2020 11:40:19 +0900
-Received: by mail-vk1-f172.google.com with SMTP id t129so775259vkg.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Feb 2020 18:40:18 -0800 (PST)
+        Thu, 20 Feb 2020 02:46:07 -0500
 MIME-Version: 1.0
-References: <20200217012741.22100-2-masahiroy@kernel.org> <202002200725.lfEcxTej%lkp@intel.com>
-In-Reply-To: <202002200725.lfEcxTej%lkp@intel.com>
+References: <20200219074950.23344-1-masahiroy@kernel.org> <nycvar.YSQ.7.76.2002191046520.1559@knanqh.ubzr>
+In-Reply-To: <nycvar.YSQ.7.76.2002191046520.1559@knanqh.ubzr>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 20 Feb 2020 11:39:40 +0900
-Message-ID: <CAK7LNARMfv-JzbX1PMy4J6H1XGVPO7s-6Gy6QF2KevKvKjGcoA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: add -Wall to KBUILD_HOSTCXXFLAGS
+Date: Thu, 20 Feb 2020 16:45:13 +0900
+Message-ID: <CAK7LNASubs2oJ8-a-amsEhWjYrfpAx8QxeTzH4PnKsELKyLaUw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: make 'imply' obey the direct dependency
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Richard Cochran <richardcochran@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, John Stultz <john.stultz@linaro.org>, Josh Triplett <josh@joshtriplett.org>, Mark Brown <broonie@kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Feb 20, 2020 at 8:37 AM kbuild test robot <lkp@intel.com> wrote:
+Hi Nicolas,
+
+On Thu, Feb 20, 2020 at 1:16 AM Nicolas Pitre <nico@fluxnic.net> wrote:
 >
-> Hi Masahiro,
+> On Wed, 19 Feb 2020, Masahiro Yamada wrote:
 >
-> I love your patch! Perhaps something to improve:
+> > The 'imply' statement may create unmet direct dependency when the
+> > implied symbol depends on m.
+> >
+> > [Test Code]
+> >
+> >   config FOO
+> >           tristate "foo"
+> >           imply BAZ
+> >
+> >   config BAZ
+> >           tristate "baz"
+> >           depends on BAR
+> >
+> >   config BAR
+> >           def_tristate m
+> >
+> >   config MODULES
+> >           def_bool y
+> >           option modules
+> >
+> > If you set FOO=y, BAZ is also promoted to y, which results in the
+> > following .config file:
+> >
+> >   CONFIG_FOO=y
+> >   CONFIG_BAZ=y
+> >   CONFIG_BAR=m
+> >   CONFIG_MODULES=y
+> >
+> > This ignores the dependency "BAZ depends on BAR".
+> >
+> > Unlike 'select', what is worse, Kconfig never shows the
+> > "WARNING: unmet direct dependencies detected for ..." for this case.
+> >
+> > Because 'imply' should be weaker than 'depends on', Kconfig should
+> > take the direct dependency into account.
+> >
+> > Describe this case in Documentation/kbuild/kconfig-language.rst for
+> > clarification.
+> >
+> > Commit 237e3ad0f195 ("Kconfig: Introduce the "imply" keyword") says that
+> > a symbol implied by y is restricted to y or n, excluding m.
+> >
+> > As for the combination of FOO=y and BAR=m, the case of BAZ=m is excluded
+> > by the 'imply', and BAZ=y is also excluded by 'depends on'. So, only the
+> > possible value is BAZ=n.
 >
-> [auto build test WARNING on kbuild/for-next]
-> [also build test WARNING on kbuild/kconfig linux/master linus/master v5.6-rc2 next-20200219]
-> [if your patch is applied to the wrong git tree, please drop us a note to help
-> improve the system. BTW, we also suggest to use '--base' option to specify the
-> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> I don't think this is right. The imply keyword provide influence over
+> another symbol but it should not impose any restrictions. If BAR=m then
+> BAZ should still be allowed to be m or n.
 >
-> url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kconfig-remove-unused-variable-in-qconf-cc/20200219-035229
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
-> config: i386-randconfig-a003-20200219 (attached as .config)
-> compiler: gcc-5 (Ubuntu 5.5.0-12ubuntu1) 5.5.0 20171010
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386
+> > @@ -174,6 +174,9 @@ applicable everywhere (see syntax).
+> >       n               y               n               N/m/y
+> >       m               y               m               M/y/n
+> >       y               y               y               Y/n
+> > +     n               m               n               N/m
+> > +     m               m               m               M/n
+> > +     y               m               n               N
 >
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
+> Here the last line shoule be y m n N/m.
 >
-> All warnings (new ones prefixed by >>):
+> Generally speaking, the code enabled by FOO may rely on functionalities
+> provided by BAZ only when BAZ >= FOO. This is accomplished with
+> IS_REACHABLE():
 >
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:27,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts//gcc-plugins/gcc-common.h:9,
->                     from scripts//gcc-plugins/cyc_complexity_plugin.c:21:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:102:21: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      102 |    fprintf ((FILE), "%s"HOST_WIDE_INT_PRINT_UNSIGNED"\n",\
-
-
-
-Thanks for the report.
-This is a warning from the toolchain headers.
-I cannot fix it.
-
-I do not see this warning on newer GCC.
-
-
-
-
-
-
-
->          |                     ^
->    /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:170:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      170 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:48,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts//gcc-plugins/gcc-common.h:9,
->                     from scripts//gcc-plugins/cyc_complexity_plugin.c:21:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/defaults.h:126:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      126 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
-> --
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:27,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts/gcc-plugins/gcc-common.h:9,
->                     from scripts/gcc-plugins/randomize_layout_plugin.c:19:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:102:21: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      102 |    fprintf ((FILE), "%s"HOST_WIDE_INT_PRINT_UNSIGNED"\n",\
->          |                     ^
->    /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:170:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      170 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:27,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts/gcc-plugins/gcc-common.h:9,
->                     from scripts/gcc-plugins/cyc_complexity_plugin.c:21:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:102:21: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      102 |    fprintf ((FILE), "%s"HOST_WIDE_INT_PRINT_UNSIGNED"\n",\
->          |                     ^
->    /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/config/elfos.h:170:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      170 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:48,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts/gcc-plugins/gcc-common.h:9,
->                     from scripts/gcc-plugins/randomize_layout_plugin.c:19:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/defaults.h:126:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      126 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
->    In file included from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/tm.h:48,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/gcc-plugin.h:31,
->                     from /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/plugin.h:23,
->                     from scripts/gcc-plugins/gcc-common.h:9,
->                     from scripts/gcc-plugins/cyc_complexity_plugin.c:21:
-> >> /usr/lib/gcc/x86_64-linux-gnu/5/plugin/include/defaults.h:126:24: warning: C++11 requires a space between string literal and macro [-Wc++11-compat]
->      126 |       fprintf ((FILE), ","HOST_WIDE_INT_PRINT_UNSIGNED",%u\n",  \
->          |                        ^
->    Cyclomatic Complexity 1 scripts/mod/devicetable-offsets.c:main
->    Cyclomatic Complexity 1 kernel/bounds.c:main
->    Cyclomatic Complexity 1 arch/x86/kernel/asm-offsets_32.c:foo
->    Cyclomatic Complexity 1 arch/x86/kernel/asm-offsets.c:common
->    51 real  8 user  9 sys  33.65% cpu   make prepare
+>         foo_init()
+>         {
+>                 if (IS_REACHABLE(CONFIG_BAZ))
+>                         baz_register(&foo);
+>                 ...
+>         }
 >
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+> So if FOO=y and BAZ=m then IS_REACHABLE(CONFIG_BAZ) will be false. Maybe
+> adding a note to that effect linked to the "y m n N/m" line in the table
+> would be a good idea.
+>
+
+I also thought so.
+
+I agree IS_REACHABLE() is much saner approach.
+
+So, do you agree to change the current behavior
+as follows?
+
+
+index d0111dd26410..47dbfd1ee003 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -173,7 +173,7 @@ applicable everywhere (see syntax).
+        ===             ===             =============   ==============
+        n               y               n               N/m/y
+        m               y               m               M/y/n
+-       y               y               y               Y/n
++       y               y               y               Y/m/n
+        y               n               *               N
+        ===             ===             =============   ==============
+
+
+
 
 
 
