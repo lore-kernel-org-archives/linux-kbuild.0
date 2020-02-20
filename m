@@ -1,86 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp1.pobox.com ([64.147.108.70]:63092 "EHLO
-        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728090AbgBTQVm (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:16587 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728130AbgBTQ3T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Feb 2020 11:21:42 -0500
-Date: Thu, 20 Feb 2020 11:21:37 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH] kconfig: make 'imply' obey the direct dependency
-In-Reply-To: <CAK7LNASubs2oJ8-a-amsEhWjYrfpAx8QxeTzH4PnKsELKyLaUw@mail.gmail.com>
-Message-ID: <nycvar.YSQ.7.76.2002201117050.1559@knanqh.ubzr>
-References: <20200219074950.23344-1-masahiroy@kernel.org> <nycvar.YSQ.7.76.2002191046520.1559@knanqh.ubzr> <CAK7LNASubs2oJ8-a-amsEhWjYrfpAx8QxeTzH4PnKsELKyLaUw@mail.gmail.com>
+        Thu, 20 Feb 2020 11:29:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20200219011519.22148-1-masahiroy@kernel.org>
+In-Reply-To: <20200219011519.22148-1-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 21 Feb 2020 01:28:16 +0900
+Message-ID: <CAK7LNARuqSDxc1=pMQXUF942TSBeDeB0NosS-n0_hhiWhQZhQw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove wrong documentation about mandatory-y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Richard Cochran <richardcochran@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, John Stultz <john.stultz@linaro.org>, Josh Triplett <josh@joshtriplett.org>, Mark Brown <broonie@kernel.org>, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, 20 Feb 2020, Masahiro Yamada wrote:
-
-> Hi Nicolas,
-> 
-> On Thu, Feb 20, 2020 at 1:16 AM Nicolas Pitre <nico@fluxnic.net> wrote:
-> >
-> > On Wed, 19 Feb 2020, Masahiro Yamada wrote:
-> >
-> > > As for the combination of FOO=y and BAR=m, the case of BAZ=m is excluded
-> > > by the 'imply', and BAZ=y is also excluded by 'depends on'. So, only the
-> > > possible value is BAZ=n.
-> >
-> > I don't think this is right. The imply keyword provide influence over
-> > another symbol but it should not impose any restrictions. If BAR=m then
-> > BAZ should still be allowed to be m or n.
-> >
-> > > @@ -174,6 +174,9 @@ applicable everywhere (see syntax).
-> > >       n               y               n               N/m/y
-> > >       m               y               m               M/y/n
-> > >       y               y               y               Y/n
-> > > +     n               m               n               N/m
-> > > +     m               m               m               M/n
-> > > +     y               m               n               N
-> >
-> > Here the last line shoule be y m n N/m.
-> >
-> > Generally speaking, the code enabled by FOO may rely on functionalities
-> > provided by BAZ only when BAZ >= FOO. This is accomplished with
-> > IS_REACHABLE():
-> >
-> >         foo_init()
-> >         {
-> >                 if (IS_REACHABLE(CONFIG_BAZ))
-> >                         baz_register(&foo);
-> >                 ...
-> >         }
-> >
-> > So if FOO=y and BAZ=m then IS_REACHABLE(CONFIG_BAZ) will be false. Maybe
-> > adding a note to that effect linked to the "y m n N/m" line in the table
-> > would be a good idea.
-> >
-> 
-> I also thought so.
-> 
-> I agree IS_REACHABLE() is much saner approach.
-> 
-> So, do you agree to change the current behavior
-> as follows?
-> 
-> 
-> index d0111dd26410..47dbfd1ee003 100644
-> --- a/Documentation/kbuild/kconfig-language.rst
-> +++ b/Documentation/kbuild/kconfig-language.rst
-> @@ -173,7 +173,7 @@ applicable everywhere (see syntax).
->         ===             ===             =============   ==============
->         n               y               n               N/m/y
->         m               y               m               M/y/n
-> -       y               y               y               Y/n
-> +       y               y               y               Y/m/n
->         y               n               *               N
->         ===             ===             =============   ==============
-> 
-
-Yes. That should have been the case all along.
+On Wed, Feb 19, 2020 at 10:15 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> This sentence does not make sense in the section about mandatory-y.
+>
+> This seems to be a copy-paste mistake of commit fcc8487d477a ("uapi:
+> export all headers under uapi directories").
+>
+> The correct description would be "The convention is to list one
+> mandatory-y per line ...".
+>
+> I just removed it instead of fixing it. If such information is needed,
+> it could be commented in include/asm-generic/Kbuild and
+> include/uapi/asm-generic/Kbuild.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
 
-Nicolas
+Applied to linux-kbuild.
+
+> ---
+>
+>  Documentation/kbuild/makefiles.rst | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+> index 0e0eb2c8da7d..4018ad7c7a11 100644
+> --- a/Documentation/kbuild/makefiles.rst
+> +++ b/Documentation/kbuild/makefiles.rst
+> @@ -1379,9 +1379,6 @@ See subsequent chapter for the syntax of the Kbuild file.
+>         in arch/$(ARCH)/include/(uapi/)/asm, Kbuild will automatically generate
+>         a wrapper of the asm-generic one.
+>
+> -       The convention is to list one subdir per line and
+> -       preferably in alphabetic order.
+> -
+>  8 Kbuild Variables
+>  ==================
+>
+> --
+> 2.17.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
