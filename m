@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:54919 "EHLO
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:9660 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727095AbgBUQOn (ORCPT
+        by vger.kernel.org with ESMTP id S1728690AbgBUQOl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Feb 2020 11:14:43 -0500
+        Fri, 21 Feb 2020 11:14:41 -0500
 From: Alexandre Torgue <alexandre.torgue@st.com>
-Subject: [RFC PATCH v2 2/4] of: fdt: print dtb build information
-Date: Fri, 21 Feb 2020 17:14:16 +0100
-Message-ID: <20200221161418.20225-3-alexandre.torgue@st.com>
+Subject: [RFC PATCH v2 3/4] ARM: dts: stm32: Add dtb build information entry for stm32mp157c-dk2
+Date: Fri, 21 Feb 2020 17:14:17 +0100
+Message-ID: <20200221161418.20225-4-alexandre.torgue@st.com>
 In-Reply-To: <20200221161418.20225-1-alexandre.torgue@st.com>
 References: <20200221161418.20225-1-alexandre.torgue@st.com>
 MIME-Version: 1.0
@@ -17,33 +17,23 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: robh+dt@kernel.org, Frank Rowand <frowand.list@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org
 Cc: devicetree@vger.kernel.org, Alexandre Torgue <alexandre.torgue@st.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, Ian Lepore <ian@freebsd.org>
 
-This commit prints out DTB build information (build time, dts source
-version used, ...) if "Build-info" property exists in DTB root node.
+dtb-build.txt is a file containing device tree build information (date,
+source version ...). This file is used to fill "build-info" entry which
+will be displayed during kernel boot.
 
 Signed-off-by: Alexandre Torgue <alexandre.torgue@st.com>
 
-diff --git a/drivers/of/fdt.c b/drivers/of/fdt.c
-index 2cdf64d2456f..aa5989039746 100644
---- a/drivers/of/fdt.c
-+++ b/drivers/of/fdt.c
-@@ -1224,9 +1224,18 @@ bool __init early_init_dt_scan(void *params)
-  */
- void __init unflatten_device_tree(void)
- {
-+	const char *build_info;
-+	unsigned long dt_root;
-+
- 	__unflatten_device_tree(initial_boot_params, NULL, &of_root,
- 				early_init_dt_alloc_memory_arch, false);
+diff --git a/arch/arm/boot/dts/stm32mp157c-dk2.dts b/arch/arm/boot/dts/stm32mp157c-dk2.dts
+index 7985b80967ca..387d3bcf5fa3 100644
+--- a/arch/arm/boot/dts/stm32mp157c-dk2.dts
++++ b/arch/arm/boot/dts/stm32mp157c-dk2.dts
+@@ -15,6 +15,7 @@
+ / {
+ 	model = "STMicroelectronics STM32MP157C-DK2 Discovery Board";
+ 	compatible = "st,stm32mp157c-dk2", "st,stm32mp157";
++	build-info = /incbin/("dtb-build.txt");
  
-+	/* If available, provide dtb build information */
-+	dt_root = of_get_flat_dt_root();
-+	build_info = of_get_flat_dt_prop(dt_root, "build-info", NULL);
-+	if (build_info)
-+		pr_info("%s\n", build_info);
-+
- 	/* Get pointer to "/chosen" and "/aliases" nodes for use everywhere */
- 	of_alias_scan(early_init_dt_alloc_memory_arch);
- 
+ 	aliases {
+ 		ethernet0 = &ethernet0;
 -- 
 2.17.1
