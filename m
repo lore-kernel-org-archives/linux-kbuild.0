@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:63236 "EHLO
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:54919 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727720AbgBUQMt (ORCPT
+        by vger.kernel.org with ESMTP id S1727095AbgBUQOn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Feb 2020 11:12:49 -0500
+        Fri, 21 Feb 2020 11:14:43 -0500
 From: Alexandre Torgue <alexandre.torgue@st.com>
 Subject: [RFC PATCH v2 2/4] of: fdt: print dtb build information
-Date: Fri, 21 Feb 2020 17:12:15 +0100
-Message-ID: <20200221161217.20069-3-alexandre.torgue@st.com>
-In-Reply-To: <20200221161217.20069-1-alexandre.torgue@st.com>
-References: <20200221161217.20069-1-alexandre.torgue@st.com>
+Date: Fri, 21 Feb 2020 17:14:16 +0100
+Message-ID: <20200221161418.20225-3-alexandre.torgue@st.com>
+In-Reply-To: <20200221161418.20225-1-alexandre.torgue@st.com>
+References: <20200221161418.20225-1-alexandre.torgue@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
