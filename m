@@ -1,68 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:44448 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726310AbgBVSMv (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:23008 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726758AbgBVTEy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Feb 2020 13:12:51 -0500
-Date: Sat, 22 Feb 2020 11:12:49 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH] kbuild: move -pipe to global KBUILD_CFLAGS
-Message-ID: <20200222181249.GA23843@ubuntu-m2-xlarge-x86>
-References: <20200222003820.220854-1-alex_y_xu.ref@yahoo.ca>
- <20200222003820.220854-1-alex_y_xu@yahoo.ca>
- <20200222021619.GA51223@ubuntu-m2-xlarge-x86>
- <1582341758.yo66djba3t.none@localhost>
- <20200222080140.GA40311@ubuntu-m2-xlarge-x86>
- <1582381271.1karmgahx0.none@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1582381271.1karmgahx0.none@localhost>
+        Sat, 22 Feb 2020 14:04:54 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 4/5] kbuild: add dt_binding_check to PHONY in a correct place
+Date: Sun, 23 Feb 2020 04:04:34 +0900
+Message-Id: <20200222190435.11767-4-masahiroy@kernel.org>
+In-Reply-To: <20200222190435.11767-1-masahiroy@kernel.org>
+References: <20200222190435.11767-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Cc: Russell King <linux@armlinux.org.uk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, masahiroy@kernel.org, michal.lkml@markovi.net
+To: linux-kbuild@vger.kernel.org
+Cc: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Sat, Feb 22, 2020 at 09:24:14AM -0500, Alex Xu (Hello71) wrote:
-> Excerpts from Nathan Chancellor's message of February 22, 2020 3:01 am:
-> > I used hyperfine [1] to run a quick benchmark with a freshly built
-> > GCC 9.2.0 for x86 and aarch64 and here are the results:
-> > 
-> > In both cases it seems like performance regresses (by 1% but still) but
-> > maybe it is my machine, even though this benchmark was done on a
-> > different machine than the one from my commit back in 2018.
-> > 
-> > I am not sure I would write off these results, since I did the benchmark
-> > 25 times on each one back to back, eliminating most of the variance that
-> > you described.
-> > 
-> > [1]: https://github.com/sharkdp/hyperfine
-> > 
-> > Cheers,
-> > Nathan
-> > 
-> 
-> What kernel version are you running? Do you have the 5.6 pipe reworks?
+The dt_binding_check is added to PHONY, but it is visible only
+when $(dtstree) is not empty. So, it is not specified as phony
+for ARCH=x86 etc.
 
-No, it is a stock Ubuntu 18.04 kernel, which is running 4.15.0.
+Add it to PHONY outside the ifneq ... endif block.
 
-$ uname -a
-Linux c2-medium-x86 4.15.0-50-generic #54-Ubuntu SMP Mon May 6 18:46:08 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-If you are curious about the specs:
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-$ neofetch --stdout
-nathan@c2-medium-x86 
--------------------- 
-OS: Ubuntu 18.04.3 LTS x86_64 
-Host: PowerEdge R6415 
-Kernel: 4.15.0-50-generic 
-Uptime: 126 days, 12 hours, 39 mins 
-Packages: 686 
-Shell: zsh 5.4.2 
-Terminal: /dev/pts/0 
-CPU: AMD EPYC 7401P 24- (48) @ 2.794GHz 
-Memory: 2974MiB / 64018MiB 
-
-Cheers,
-Nathan
+diff --git a/Makefile b/Makefile
+index 102710a9228c..83f9b8f6fbaf 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1238,7 +1238,7 @@ ifneq ($(dtstree),)
+ %.dtb: include/config/kernel.release scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+ 
+-PHONY += dtbs dtbs_install dtbs_check dt_binding_check
++PHONY += dtbs dtbs_install dtbs_check
+ dtbs dtbs_check: include/config/kernel.release scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(dtstree)
+ 
+@@ -1258,6 +1258,7 @@ PHONY += scripts_dtc
+ scripts_dtc: scripts_basic
+ 	$(Q)$(MAKE) $(build)=scripts/dtc
+ 
++PHONY += dt_binding_check
+ dt_binding_check: scripts_dtc
+ 	$(Q)$(MAKE) $(build)=Documentation/devicetree/bindings
+ 
+-- 
+2.17.1
