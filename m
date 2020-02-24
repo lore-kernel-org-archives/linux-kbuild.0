@@ -1,83 +1,191 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:57134 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726722AbgBXVUe (ORCPT
+Received: from mail-ed1-f48.google.com ([209.85.208.48]:41539 "EHLO
+        mail-ed1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728211AbgBXWCk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Feb 2020 16:20:34 -0500
-Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/
- Clang/LLVM
-References: <20200224174129.2664-1-ndesaulniers@google.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ab366833-3f9f-0311-3c06-d48b7dc9655f@infradead.org>
-Date: Mon, 24 Feb 2020 13:20:30 -0800
+        Mon, 24 Feb 2020 17:02:40 -0500
+Received: by mail-ed1-f48.google.com with SMTP id c26so13783814eds.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 14:02:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200224174129.2664-1-ndesaulniers@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From: "David F." <df7729@gmail.com>
+Date: Mon, 24 Feb 2020 14:02:26 -0800
+Message-ID: <CAGRSmLshZwKYEj=Mv3WfDh4=ihJf4r0naG_iKBtgR7CEqBCeEw@mail.gmail.com>
+Subject: Moving from 4.x to 5.4.22 breaks custom module build.
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, corbet@lwn.net, masahiroy@kernel.org
-Cc: Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+To: linux-kbuild@vger.kernel.org
 
-On 2/24/20 9:41 AM, Nick Desaulniers wrote:
-> Added to kbuild documentation. Provides more official info on building
-> kernels with Clang and LLVM than our wiki.
-> 
-> Suggested-by: Kees Cook <keescook@chromium.org>
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
->  Documentation/kbuild/index.rst |  1 +
->  Documentation/kbuild/llvm.rst  | 80 ++++++++++++++++++++++++++++++++++
->  2 files changed, 81 insertions(+)
->  create mode 100644 Documentation/kbuild/llvm.rst
-> 
-> diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
-> index 0f144fad99a6..3882bd5f7728 100644
-> --- a/Documentation/kbuild/index.rst
-> +++ b/Documentation/kbuild/index.rst
-> @@ -19,6 +19,7 @@ Kernel Build System
->  
->      issues
->      reproducible-builds
-> +    llvm
->  
->  .. only::  subproject and html
->  
-> diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
-> new file mode 100644
-> index 000000000000..68ae022aebc0
-> --- /dev/null
-> +++ b/Documentation/kbuild/llvm.rst
-> @@ -0,0 +1,80 @@
-> +==============================
-> +Building Linux with Clang/LLVM
-> +==============================
-> +
-> +This document covers how to build the Linux kernel with Clang and LLVM
-> +utilities.
-> +
-> +About
-> +-----
-> +
-> +The Linux kernel has always traditionally been compiled with GNU toolchains
-> +such as GCC and binutils. On going work has allowed for `Clang
+Hi,
 
-                             Ongoing
+I have a private custom module I build via various scripts since I
+setup since I knew I'd have no clue how to do it in the future.  It's
+been working great for years, but now it's broken with the move from
+4.19.xx to 5.4.22 so the future is here and don't remember much about
+how I set it all up.  But it does look to me that the failure has to
+do with a support library I have it build.  Can the kbuild experts
+tell me what changed with V5 from V4.19 that breaks building my custom
+module.
 
-> +<https://clang.llvm.org/>`_ and `LLVM <https://llvm.org/>`_ utilities to be
-> +used as viable substitutes. Distributions such as `Android
-> +<https://www.android.com/>`_, `ChromeOS
-> +<https://www.chromium.org/chromium-os>`_, and `OpenMandriva
-> +<https://www.openmandriva.org/>`_ use Clang built kernels.  `LLVM is a
-> +collection of toolchain components implemented in terms of C++ objects
-> +<https://www.aosabook.org/en/llvm.html>`_. Clang is a front-end to LLVM that
-> +supports C and the GNU C extensions required by the kernel, and is pronounced
-> +"klang," not "see-lang."
+Thanks!!
+
+Here's the information (I'm writing this in Windows so my dir output
+will be from windows):
+
+The input/source files:
+
+01/25/2016  06:52 PM             1,501 linuxdriverc.c
+01/24/2016  06:59 PM               284 linuxdrivercpp.cpp
+01/22/2016  07:20 PM             1,124 linuxdriverdumpbuf.c
+09/22/2019  12:17 AM             4,985 linuxdriverfile.c
+01/22/2016  07:20 PM             2,142 linuxdriverprintk.c
+
+When the 4.x version (this was 4.19.97) finishes the dir contains:
+
+01/22/2020  12:43 AM               338 .junk.ko.cmd
+01/22/2020  12:43 AM            29,743 .junk.mod.o.cmd
+01/22/2020  12:43 AM               220 .junk.o.cmd
+01/22/2020  12:43 AM               581 .lib.a.cmd
+01/22/2020  12:43 AM            29,795 .linuxdriverc.o.cmd
+01/22/2020  12:43 AM            30,248 .linuxdriverdumpbuf.o.cmd
+01/22/2020  12:43 AM            36,098 .linuxdriverfile.o.cmd
+01/22/2020  12:43 AM            30,235 .linuxdriverprintk.o.cmd
+01/22/2020  12:43 AM             1,908 junk.ko
+01/22/2020  12:43 AM               650 junk.mod.c
+01/22/2020  12:43 AM             1,792 junk.mod.o
+01/22/2020  12:43 AM               260 junk.o
+01/22/2020  12:43 AM             1,084 lib.a
+01/22/2020  12:43 AM                29 linuxdriverc.c
+01/22/2020  12:43 AM             1,040 linuxdriverc.o
+01/22/2020  12:43 AM                33 linuxdrivercpp.cpp
+01/22/2020  12:43 AM               976 linuxdrivercpp.o
+01/22/2020  12:43 AM                35 linuxdriverdumpbuf.c
+01/22/2020  12:43 AM             1,320 linuxdriverdumpbuf.o
+01/22/2020  12:43 AM                32 linuxdriverfile.c
+01/22/2020  12:43 AM             1,448 linuxdriverfile.o
+01/22/2020  12:43 AM                34 linuxdriverprintk.c
+01/22/2020  12:43 AM             1,564 linuxdriverprintk.o
+01/22/2020  12:43 AM             1,084 linuxdriversup.a
+01/26/2016  05:16 PM             2,188 Makefile
+01/22/2020  12:43 AM                 0 Module.symvers
+01/22/2020  12:43 AM                71 modules.order
+
+For the 5.4.22 the files are:
+
+02/24/2020  12:04 PM               573 .lib.a.cmd
+02/24/2020  12:04 PM            30,740 .linuxdriverc.o.cmd
+02/24/2020  12:04 PM            31,278 .linuxdriverdumpbuf.o.cmd
+02/24/2020  12:04 PM            37,708 .linuxdriverfile.o.cmd
+02/24/2020  12:04 PM            31,265 .linuxdriverprintk.o.cmd
+02/24/2020  12:04 PM             1,080 lib.a
+01/25/2016  06:52 PM                29 linuxdriverc.c
+02/24/2020  12:04 PM             1,040 linuxdriverc.o
+01/24/2016  06:59 PM                33 linuxdrivercpp.cpp
+02/24/2020  12:04 PM               976 linuxdrivercpp.o
+01/22/2016  07:20 PM                35 linuxdriverdumpbuf.c
+02/24/2020  12:04 PM             1,320 linuxdriverdumpbuf.o
+09/22/2019  12:17 AM                32 linuxdriverfile.c
+02/24/2020  12:04 PM             1,448 linuxdriverfile.o
+01/22/2016  07:20 PM                34 linuxdriverprintk.c
+02/24/2020  12:04 PM             1,564 linuxdriverprintk.o
+01/26/2016  05:16 PM             2,188 Makefile
+
+There are no error messages other than it can't find junk.o for LD:
+
+Starting KBuild make...
+make[3]: Entering directory '/usr/src/linux-headers-5.4.22-686-iflnet'
+  LD [M]  /media/sf_SRC_DRIVE/libs/linux_drivers/5.4.22-686-iflnet/junk.o
+ld: no input files
+scripts/Makefile.build:446: recipe for target
+'/media/sf_SRC_DRIVE/libs/linux_drivers/5.4.22-686-iflnet/junk.o'
+failed
+make[4]: *** [/media/sf_SRC_DRIVE/libs/linux_drivers/5.4.22-686-iflnet/junk.o]
+Error 1
+Makefile:1652: recipe for target
+'/media/sf_SRC_DRIVE/libs/linux_drivers/5.4.22-686-iflnet' failed
+make[3]: *** [/media/sf_SRC_DRIVE/libs/linux_drivers/5.4.22-686-iflnet] Error 2
+make[3]: Leaving directory '/usr/src/linux-headers-5.4.22-686-iflnet'
 
 
-Thanks for the info.
+The makefile used is:
 
--- 
-~Randy
+# You should only need to change the items marked ** fill in **
+# everything else should be automatic.
+
+# the version of the kernel the module is being compiled for
+KVER?=$(shell uname -r)
+# the directory of the kernel build system
+KDIR:=/lib/modules/$(KVER)/build
+# fill in the verbose level you want
+V:=0
+
+#################################
+# fill in the name of the module    ** fill in **
+#################################
+mymodlib_name:=linuxdriversup
+
+#################################
+# unique cpp build flags            ** fill in **
+#################################
+# CC_FLAGS+=-I.
+
+# flags file for building CPP versions
+FLAGS:=/media/sf_SRC_DRIVE/libs/linux_drivers/buildopts/$(KVER)/buildopts.cfg
+
+#################################
+# extra C flags to use                ** fill in **
+#################################
+EXTRA_CFLAGS+=-I.
+#EXTRA_CFLAGS+=-Werror
+#EXTRA_CFLAGS += -std=gnu99
+#EXTRA_CFLAGS += -Wno-declaration-after-statement
+
+##############
+# code start #
+##############
+ifeq ($(V),1)
+Q=
+else
+Q=@
+endif
+
+# this was the only way I figured out how to get the
+# kbuild envrionment to build the library for me.  the
+# cpp item doesn't really need to be built in this
+# envrionment but we do it since it works.
+
+# Setup module name for kbuild
+obj-m:=junk.o
+junk-objs:=lib.a
+
+# build sources in the target directory
+SOURCES_ALL:=$(filter-out %.mod.c,$(shell find $(M) -maxdepth 1 -name
+"*.cpp" -or -name "*.c"))
+
+# add the sources and to the kbuild
+lib-y+=$(addsuffix .o,$(notdir $(basename $(SOURCES_ALL))))
+
+
+# pattern for compiling the c++ parts
+%.o: %.cpp $(FLAGS)
+    $(info doing [$@])
+    $(Q)g++ `cat $(FLAGS)` $(CC_FLAGS) -fno-exceptions -fno-rtti -Wall
+-c -o $@ $<
+
+.PHONY: all
+all:
+    $(Q)echo Run make from main directory
+
+.PHONY: renamelib
+renamelib:
+#    the -p is not working to preserve timestamps but touch works
+    @cp -p lib.a $(mymodlib_name).a ; \
+    touch -r lib.a $(mymodlib_name).a; \
+    rm -fr .tmp_versions
+#    rm -f junk.* .*.cmd ; removing either of these trigger full build
+
+
+.PHONY: clean
+clean:
+    # note this deletes .a .o etc files in subdirs too!
+    $(Q)$(MAKE) -C $(KDIR) M=$(CURDIR) V=$(V) clean
