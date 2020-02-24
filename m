@@ -1,108 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:41657 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727151AbgBXA52 (ORCPT
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:51710 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728043AbgBXRln (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 23 Feb 2020 19:57:28 -0500
-Subject: Re: [RFC PATCH v2 1/4] scripts: Add script to generate dtb build
- information
-References: <20200221161418.20225-1-alexandre.torgue@st.com>
- <20200221161418.20225-2-alexandre.torgue@st.com>
- <592e41a4-6115-474e-b6ce-eeb82f858a78@gmail.com>
- <20200223215936.GB1751@umbus.fritz.box>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <9e77ace1-6821-1094-85e0-a68228b2609d@gmail.com>
-Date: Sun, 23 Feb 2020 18:57:25 -0600
-MIME-Version: 1.0
-In-Reply-To: <20200223215936.GB1751@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 24 Feb 2020 12:41:43 -0500
+Received: by mail-pg1-f201.google.com with SMTP id m18so7083777pgn.18
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 09:41:41 -0800 (PST)
+Date: Mon, 24 Feb 2020 09:41:28 -0800
+Message-Id: <20200224174129.2664-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+Subject: [PATCH] Documentation/llvm: add documentation on building w/ Clang/LLVM
+From: Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexandre Torgue <alexandre.torgue@st.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, Ian Lepore <ian@freebsd.org>
+To: corbet@lwn.net, masahiroy@kernel.org
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
 
-On 2/23/20 3:59 PM, David Gibson wrote:
-> On Fri, Feb 21, 2020 at 11:52:34AM -0600, Frank Rowand wrote:
->> On 2/21/20 10:14 AM, Alexandre Torgue wrote:
->>> This commit adds a new script to create a file (in dts file directory) with
->>> some information (date, Linux version, user). This file could then be used
->>> to populate "build-info" property in every dts file that would use this
->>> build information:
->>>
->>> Example:
->>>
->>> / {
->>> 	...
->>> 	build-info = /incbin/("dtb-build.txt");
->>
->> s/.txt/.dtsi/
-> 
-> I don't think that makes sense.  This is an /incbin/ not an /include/
-> so the text file is *not* dts information.
+Added to kbuild documentation. Provides more official info on building
+kernels with Clang and LLVM than our wiki.
 
-You are right, thanks for catching that.
+Suggested-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ Documentation/kbuild/index.rst |  1 +
+ Documentation/kbuild/llvm.rst  | 80 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+)
+ create mode 100644 Documentation/kbuild/llvm.rst
 
--Frank
-
-> 
->> and same wherever the file name is used.
->>
->>
->>> 	...
->>> };
->>>
->>> Signed-off-by: Alexandre Torgue <alexandre.torgue@st.com>
->>>
->>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->>> index bae62549e3d2..a5af84ef4ffc 100644
->>> --- a/scripts/Makefile.lib
->>> +++ b/scripts/Makefile.lib
->>> @@ -246,6 +246,7 @@ quiet_cmd_gzip = GZIP    $@
->>>  # DTC
->>>  # ---------------------------------------------------------------------------
->>>  DTC ?= $(objtree)/scripts/dtc/dtc
->>> +DTB_GEN_INFO ?= $(objtree)/scripts/gen_dtb_build_info.sh
->>>  
->>>  # Disable noisy checks by default
->>>  ifeq ($(findstring 1,$(KBUILD_EXTRA_WARN)),)
->>> @@ -286,6 +287,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
->>>  
->>>  quiet_cmd_dtc = DTC     $@
->>>  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
->>> +	$(DTB_GEN_INFO) $(src) ; \
->>>  	$(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
->>>  	$(DTC) -O $(2) -o $@ -b 0 \
->>>  		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
->>> diff --git a/scripts/gen_dtb_build_info.sh b/scripts/gen_dtb_build_info.sh
->>> new file mode 100755
->>> index 000000000000..0cd8bd98e410
->>> --- /dev/null
->>> +++ b/scripts/gen_dtb_build_info.sh
->>> @@ -0,0 +1,10 @@
->>> +#!/bin/bash
->>> +# SPDX-License-Identifier: GPL-2.0
->>> +
->>> +set -o nounset
->>> +
->>> +DTB_DIR=$1
->>> +DTB_COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
->>> +DTB_INFO="From Linux $KERNELRELEASE by $DTB_COMPILE_BY the $(date).\0"
->>
->> I would remove the filler words "From", "by", "the", and the trailing
->> period ('.').
->>
->> <bikeshed>
->> You might consider using a format more like the Linux
->> kernel version line, which puts parenthesis around the
->> compiled by info.
->> </bikeshed>
->>
->> -Frank
->>
->>> +
->>> +printf "$DTB_INFO" > "$DTB_DIR/dtb-build.txt"
->>>
->>
-> 
+diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
+index 0f144fad99a6..3882bd5f7728 100644
+--- a/Documentation/kbuild/index.rst
++++ b/Documentation/kbuild/index.rst
+@@ -19,6 +19,7 @@ Kernel Build System
+ 
+     issues
+     reproducible-builds
++    llvm
+ 
+ .. only::  subproject and html
+ 
+diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+new file mode 100644
+index 000000000000..68ae022aebc0
+--- /dev/null
++++ b/Documentation/kbuild/llvm.rst
+@@ -0,0 +1,80 @@
++==============================
++Building Linux with Clang/LLVM
++==============================
++
++This document covers how to build the Linux kernel with Clang and LLVM
++utilities.
++
++About
++-----
++
++The Linux kernel has always traditionally been compiled with GNU toolchains
++such as GCC and binutils. On going work has allowed for `Clang
++<https://clang.llvm.org/>`_ and `LLVM <https://llvm.org/>`_ utilities to be
++used as viable substitutes. Distributions such as `Android
++<https://www.android.com/>`_, `ChromeOS
++<https://www.chromium.org/chromium-os>`_, and `OpenMandriva
++<https://www.openmandriva.org/>`_ use Clang built kernels.  `LLVM is a
++collection of toolchain components implemented in terms of C++ objects
++<https://www.aosabook.org/en/llvm.html>`_. Clang is a front-end to LLVM that
++supports C and the GNU C extensions required by the kernel, and is pronounced
++"klang," not "see-lang."
++
++Clang
++-----
++
++The compiler used can be swapped out via `CC=` command line argument to `make`.
++`CC=` should be set when selecting a config and during a build.
++
++	make CC=clang defconfig
++
++	make CC=clang
++
++Cross Compiling
++---------------
++
++A single Clang compiler binary will typically contain all supported backends,
++which can help simplify cross compiling.
++
++	ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make CC=clang
++
++`CROSS_COMPILE` is not used to suffix the Clang compiler binary, instead
++`CROSS_COMPILE` is used to set a command line flag: `--target <triple>`. For
++example:
++
++	clang --target aarch64-linux-gnu foo.c
++
++LLVM Utilities
++--------------
++
++LLVM has substitutes for GNU binutils utilities. These can be invoked as
++additional parameters to `make`.
++
++	make CC=clang AS=clang LD=ld.lld AR=llvm-ar NM=llvm-nm STRIP=llvm-strip \\
++	  OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump OBJSIZE=llvm-objsize \\
++	  READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
++	  HOSTLD=ld.lld
++
++Getting Help
++------------
++
++- `Website <https://clangbuiltlinux.github.io/>`_
++- `Mailing List <https://groups.google.com/forum/#!forum/clang-built-linux>`_: <clang-built-linux@googlegroups.com>
++- `Issue Tracker <https://github.com/ClangBuiltLinux/linux/issues>`_
++- IRC: #clangbuiltlinux on chat.freenode.net
++- `Telegram <https://t.me/ClangBuiltLinux>`_: @ClangBuiltLinux
++- `Wiki <https://github.com/ClangBuiltLinux/linux/wiki>`_
++- `Beginner Bugs <https://github.com/ClangBuiltLinux/linux/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22>`_
++
++Getting LLVM
++-------------
++
++- http://releases.llvm.org/download.html
++- https://github.com/llvm/llvm-project
++- https://llvm.org/docs/GettingStarted.html
++- https://llvm.org/docs/CMake.html
++- https://apt.llvm.org/
++- https://www.archlinux.org/packages/extra/x86_64/llvm/
++- https://github.com/ClangBuiltLinux/tc-build
++- https://github.com/ClangBuiltLinux/linux/wiki/Building-Clang-from-source
++- https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/
+-- 
+2.25.0.265.gbab2e86ba0-goog
