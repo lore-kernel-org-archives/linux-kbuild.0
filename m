@@ -1,74 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33645 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728051AbgBYS6a (ORCPT
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:40379 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728162AbgBYUw2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Feb 2020 13:58:30 -0500
-Received: by mail-pg1-f196.google.com with SMTP id 6so11034pgk.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2020 10:58:30 -0800 (PST)
-Date: Tue, 25 Feb 2020 10:58:28 -0800
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] gcc-plugins: fix gcc-plugins directory path in
- documentation
-Message-ID: <202002251057.C4E397A@keescook>
-References: <20200213122410.1605-1-masahiroy@kernel.org>
+        Tue, 25 Feb 2020 15:52:28 -0500
+Received: by mail-pj1-f66.google.com with SMTP id 12so245843pjb.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2020 12:52:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200213122410.1605-1-masahiroy@kernel.org>
+References: <20200224174129.2664-1-ndesaulniers@google.com> <CAK7LNASNsOmyqFWYtJHB4UcHAed5C_isWvMJ4MKHu0O=yUy=8w@mail.gmail.com>
+In-Reply-To: <CAK7LNASNsOmyqFWYtJHB4UcHAed5C_isWvMJ4MKHu0O=yUy=8w@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 25 Feb 2020 12:52:16 -0800
+Message-ID: <CAKwvOd=mPg79CrYnDm8=z0iJpKL0FHm9J5qZF0_A6BFXBv8Dow@mail.gmail.com>
+Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/ Clang/LLVM
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Emese Revfy <re.emese@gmail.com>, Michal Marek <michal.lkml@markovi.net>, kernel-hardening@lists.openwall.com, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Thu, Feb 13, 2020 at 09:24:10PM +0900, Masahiro Yamada wrote:
-> Fix typos "plgins" -> "plugins".
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Mon, Feb 24, 2020 at 4:34 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> On Tue, Feb 25, 2020 at 2:41 AM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > Added to kbuild documentation. Provides more official info on building
+> > kernels with Clang and LLVM than our wiki.
+> >
+> > Suggested-by: Kees Cook <keescook@chromium.org>
+> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> > ---
+>
+>
+> Perhaps, is it better to explicitly add it to MAINTAINERS?
+>
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4118,6 +4118,7 @@ W:        https://clangbuiltlinux.github.io/
+>  B:     https://github.com/ClangBuiltLinux/linux/issues
+>  C:     irc://chat.freenode.net/clangbuiltlinux
+>  S:     Supported
+> +F:     Documentation/kbuild/llvm.rst
+>  K:     \b(?i:clang|llvm)\b
 
-Thanks!
-
-Acked-by: Kees Cook <keescook@chromium.org>
-
-Jon, can you take this?
-
--Kees
-
-> ---
-> 
->  Documentation/kbuild/reproducible-builds.rst | 2 +-
->  scripts/gcc-plugins/Kconfig                  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/reproducible-builds.rst b/Documentation/kbuild/reproducible-builds.rst
-> index 503393854e2e..3b25655e441b 100644
-> --- a/Documentation/kbuild/reproducible-builds.rst
-> +++ b/Documentation/kbuild/reproducible-builds.rst
-> @@ -101,7 +101,7 @@ Structure randomisation
->  
->  If you enable ``CONFIG_GCC_PLUGIN_RANDSTRUCT``, you will need to
->  pre-generate the random seed in
-> -``scripts/gcc-plgins/randomize_layout_seed.h`` so the same value
-> +``scripts/gcc-plugins/randomize_layout_seed.h`` so the same value
->  is used in rebuilds.
->  
->  Debug info conflicts
-> diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
-> index e3569543bdac..7b63c819610c 100644
-> --- a/scripts/gcc-plugins/Kconfig
-> +++ b/scripts/gcc-plugins/Kconfig
-> @@ -86,7 +86,7 @@ config GCC_PLUGIN_RANDSTRUCT
->  	  source tree isn't cleaned after kernel installation).
->  
->  	  The seed used for compilation is located at
-> -	  scripts/gcc-plgins/randomize_layout_seed.h.  It remains after
-> +	  scripts/gcc-plugins/randomize_layout_seed.h.  It remains after
->  	  a make clean to allow for external modules to be compiled with
->  	  the existing seed and will be removed by a make mrproper or
->  	  make distclean.
-> -- 
-> 2.17.1
-> 
+I'm happy to leave it to the maintainers of Documentation/.  Otherwise
+we have a file for which there is no MAINTAINER, which seems
+ambiguous.
 
 -- 
-Kees Cook
+Thanks,
+~Nick Desaulniers
