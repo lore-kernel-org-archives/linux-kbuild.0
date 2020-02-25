@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41288 "EHLO
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:43628 "EHLO
         mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725788AbgBYHRr (ORCPT
+        with ESMTP id S1729493AbgBYIlY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:17:47 -0500
-Received: by mail-ed1-f66.google.com with SMTP id c26so15056346eds.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 23:17:45 -0800 (PST)
+        Tue, 25 Feb 2020 03:41:24 -0500
+Received: by mail-ed1-f66.google.com with SMTP id dc19so15276267edb.10
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2020 00:41:22 -0800 (PST)
 MIME-Version: 1.0
 References: <CAGRSmLshZwKYEj=Mv3WfDh4=ihJf4r0naG_iKBtgR7CEqBCeEw@mail.gmail.com>
  <CAK7LNATyfWCso7XGjYpdc+h6rqoAZ399csr2ftK8-1+kQfJMkg@mail.gmail.com>
 In-Reply-To: <CAK7LNATyfWCso7XGjYpdc+h6rqoAZ399csr2ftK8-1+kQfJMkg@mail.gmail.com>
 From: "David F." <df7729@gmail.com>
-Date: Mon, 24 Feb 2020 23:17:33 -0800
-Message-ID: <CAGRSmLvEuUD0p9o3kCHfimFkEoaN3druk4HGy6Wr7LVXwtjFNA@mail.gmail.com>
+Date: Tue, 25 Feb 2020 00:41:10 -0800
+Message-ID: <CAGRSmLv+7T8D1dSKO0r7vjzXrwwa+rnb3MZTSsysayKMHuGtgg@mail.gmail.com>
 Subject: Re: Moving from 4.x to 5.4.22 breaks custom module build.
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,23 +20,8 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Unreal, you mean someone broke it?  On that particular build, if I
-take out the obj-m reference it seems to work, but I was back here
-because now my driver itself has link failures.  The driver has about
-12 libraries amounting to 100's modules and 10's if not 100's of
-thousands of lines of code.  Some are specific to driver support (that
-build in the start of this thread), others are just built for several
-environments, from Windows Drivers, Linux Drivers, BIOS, UEFI, etc..
-From encryption, compression, complex data handling, etc.. The driver
-requires all that, no way I could just try to include the source
-somehow.  I'll look at the patch and if I want to move to this broken
-V5 version or just stick with 4.x forever (I already tried moving a
-block driver over to blk-mq, one I'm trying to build now to test, that
-was a surprise too, broken because old method taken out, not sure if I
-should still queue requests to my worker thread or now that is done
-for me?).
-
-Thanks for feedback.
+I applied your patch and everything worked.  Completed my project in
+30 seconds after I already wasted hours earlier today.  Thanks!!!!
 
 On Mon, Feb 24, 2020 at 6:57 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
