@@ -1,57 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:47025 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728725AbgBYEdu (ORCPT
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41697 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbgBYFQU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Feb 2020 23:33:50 -0500
+        Tue, 25 Feb 2020 00:16:20 -0500
+Received: by mail-pf1-f195.google.com with SMTP id j9so6544373pfa.8
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 21:16:19 -0800 (PST)
+Date: Mon, 24 Feb 2020 21:16:17 -0800
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] kbuild: Remove debug info from kallsyms linking
+Message-ID: <202002242114.CBED7F1@keescook>
 MIME-Version: 1.0
-References: <20200222190435.11767-1-masahiroy@kernel.org> <20200224225253.GA27948@bogus>
-In-Reply-To: <20200224225253.GA27948@bogus>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 25 Feb 2020 13:32:58 +0900
-Message-ID: <CAK7LNAS+iOAonhxN2BK4D8TSb8F-BqPxDGFU0AOv9fZ2So4iqA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kbuild: fix DT binding schema rule to detect command
- line changes
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Rob,
+When CONFIG_DEBUG_INFO is enabled, the two kallsyms linking steps spend
+time collecting and writing the dwarf sections to the temporary output
+files. kallsyms does not need this information, and leaving it off
+halves their linking time. This is especially noticeable without
+CONFIG_DEBUG_INFO_REDUCED. The BTF linking stage, however, does still
+need those details.
 
-On Tue, Feb 25, 2020 at 7:52 AM Rob Herring <robh@kernel.org> wrote:
->
-> On Sun, Feb 23, 2020 at 04:04:31AM +0900, Masahiro Yamada wrote:
-> > This if_change_rule is not working; it cannot detect any command line
-> > changes.
-> >
-> > The reason is because cmd-check in scripts/Kbuild.include compares
-> > $(cmd_$@) and $(cmd_$1), but cmd_dtc_dt_yaml does not exist here.
-> >
-> > For if_change_rule to work properly, the stem part of cmd_* and rule_*
-> > must match. Because this cmd_and_fixdep invokes cmd_dtc, this rule must
-> > be named rule_dtc.
-> >
-> > Fixes: 4f0e3a57d6eb ("kbuild: Add support for DT binding schema checks")
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  scripts/Makefile.lib | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> For the series,
->
-> Acked-by: Rob Herring <robh@kernel.org>
->
-> I'm assuming you will take these? If not, I can in the DT tree.
+Refactor the BTF and kallsyms generation stages slightly for more
+regularized temporary names. Skip debug during kallsyms links.
 
-Yes, I will queue these to kbuild tree.
+For a full debug info build with BTF, my link time goes from 1m06s to
+0m54s, saving about 12 seconds, or 18%.
 
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ scripts/link-vmlinux.sh | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index dd484e92752e..ac569e197bfa 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -63,12 +63,18 @@ vmlinux_link()
+ 	local lds="${objtree}/${KBUILD_LDS}"
+ 	local output=${1}
+ 	local objects
++	local strip_debug
+ 
+ 	info LD ${output}
+ 
+ 	# skip output file argument
+ 	shift
+ 
++	# The kallsyms linking does not need debug symbols included.
++	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
++		strip_debug=-Wl,--strip-debug
++	fi
++
+ 	if [ "${SRCARCH}" != "um" ]; then
+ 		objects="--whole-archive			\
+ 			${KBUILD_VMLINUX_OBJS}			\
+@@ -79,6 +85,7 @@ vmlinux_link()
+ 			${@}"
+ 
+ 		${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}	\
++			${strip_debug#-Wl,}			\
+ 			-o ${output}				\
+ 			-T ${lds} ${objects}
+ 	else
+@@ -91,6 +98,7 @@ vmlinux_link()
+ 			${@}"
+ 
+ 		${CC} ${CFLAGS_vmlinux}				\
++			${strip_debug}				\
+ 			-o ${output}				\
+ 			-Wl,-T,${lds}				\
+ 			${objects}				\
+@@ -106,6 +114,8 @@ gen_btf()
+ {
+ 	local pahole_ver
+ 	local bin_arch
++	local bin_format
++	local bin_file
+ 
+ 	if ! [ -x "$(command -v ${PAHOLE})" ]; then
+ 		echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
+@@ -118,8 +128,9 @@ gen_btf()
+ 		return 1
+ 	fi
+ 
+-	info "BTF" ${2}
+ 	vmlinux_link ${1}
++
++	info "BTF" ${2}
+ 	LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
+ 
+ 	# dump .BTF section into raw binary file to link with final vmlinux
+@@ -127,11 +138,12 @@ gen_btf()
+ 		cut -d, -f1 | cut -d' ' -f2)
+ 	bin_format=$(LANG=C ${OBJDUMP} -f ${1} | grep 'file format' | \
+ 		awk '{print $4}')
++	bin_file=.btf.vmlinux.bin
+ 	${OBJCOPY} --change-section-address .BTF=0 \
+ 		--set-section-flags .BTF=alloc -O binary \
+-		--only-section=.BTF ${1} .btf.vmlinux.bin
++		--only-section=.BTF ${1} $bin_file
+ 	${OBJCOPY} -I binary -O ${bin_format} -B ${bin_arch} \
+-		--rename-section .data=.BTF .btf.vmlinux.bin ${2}
++		--rename-section .data=.BTF $bin_file ${2}
+ }
+ 
+ # Create ${2} .o file with all symbols from the ${1} object file
+@@ -166,8 +178,8 @@ kallsyms()
+ kallsyms_step()
+ {
+ 	kallsymso_prev=${kallsymso}
+-	kallsymso=.tmp_kallsyms${1}.o
+-	kallsyms_vmlinux=.tmp_vmlinux${1}
++	kallsyms_vmlinux=.tmp_vmlinux.kallsyms${1}
++	kallsymso=${kallsyms_vmlinux}.o
+ 
+ 	vmlinux_link ${kallsyms_vmlinux} "${kallsymso_prev}" ${btf_vmlinux_bin_o}
+ 	kallsyms ${kallsyms_vmlinux} ${kallsymso}
+@@ -190,7 +202,6 @@ cleanup()
+ {
+ 	rm -f .btf.*
+ 	rm -f .tmp_System.map
+-	rm -f .tmp_kallsyms*
+ 	rm -f .tmp_vmlinux*
+ 	rm -f System.map
+ 	rm -f vmlinux
+@@ -257,9 +268,8 @@ tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
+ 
+ btf_vmlinux_bin_o=""
+ if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
+-	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
+-		btf_vmlinux_bin_o=.btf.vmlinux.bin.o
+-	else
++	btf_vmlinux_bin_o=.btf.vmlinux.bin.o
++	if ! gen_btf .tmp_vmlinux.btf $btf_vmlinux_bin_o ; then
+ 		echo >&2 "Failed to generate BTF for vmlinux"
+ 		echo >&2 "Try to disable CONFIG_DEBUG_INFO_BTF"
+ 		exit 1
+-- 
+2.20.1
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
