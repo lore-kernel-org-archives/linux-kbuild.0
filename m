@@ -1,46 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43955 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbgBXWw4 (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:33654 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727081AbgBYAef (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Feb 2020 17:52:56 -0500
-Date: Mon, 24 Feb 2020 16:52:53 -0600
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 1/5] kbuild: fix DT binding schema rule to detect command
- line changes
-Message-ID: <20200224225253.GA27948@bogus>
-References: <20200222190435.11767-1-masahiroy@kernel.org>
+        Mon, 24 Feb 2020 19:34:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200222190435.11767-1-masahiroy@kernel.org>
+References: <20200224174129.2664-1-ndesaulniers@google.com>
+In-Reply-To: <20200224174129.2664-1-ndesaulniers@google.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 25 Feb 2020 09:33:54 +0900
+Message-ID: <CAK7LNASNsOmyqFWYtJHB4UcHAed5C_isWvMJ4MKHu0O=yUy=8w@mail.gmail.com>
+Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/ Clang/LLVM
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Sun, Feb 23, 2020 at 04:04:31AM +0900, Masahiro Yamada wrote:
-> This if_change_rule is not working; it cannot detect any command line
-> changes.
-> 
-> The reason is because cmd-check in scripts/Kbuild.include compares
-> $(cmd_$@) and $(cmd_$1), but cmd_dtc_dt_yaml does not exist here.
-> 
-> For if_change_rule to work properly, the stem part of cmd_* and rule_*
-> must match. Because this cmd_and_fixdep invokes cmd_dtc, this rule must
-> be named rule_dtc.
-> 
-> Fixes: 4f0e3a57d6eb ("kbuild: Add support for DT binding schema checks")
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Tue, Feb 25, 2020 at 2:41 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> Added to kbuild documentation. Provides more official info on building
+> kernels with Clang and LLVM than our wiki.
+>
+> Suggested-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 > ---
-> 
->  scripts/Makefile.lib | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 
-For the series,
 
-Acked-by: Rob Herring <robh@kernel.org>
+Perhaps, is it better to explicitly add it to MAINTAINERS?
 
-I'm assuming you will take these? If not, I can in the DT tree.
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4118,6 +4118,7 @@ W:        https://clangbuiltlinux.github.io/
+ B:     https://github.com/ClangBuiltLinux/linux/issues
+ C:     irc://chat.freenode.net/clangbuiltlinux
+ S:     Supported
++F:     Documentation/kbuild/llvm.rst
+ K:     \b(?i:clang|llvm)\b
 
-Rob
+ CLEANCACHE API
+
+
+
+Thanks.
+
+-- 
+Best Regards
+Masahiro Yamada
