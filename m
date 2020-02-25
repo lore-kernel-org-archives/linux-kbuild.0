@@ -1,51 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:45896 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728866AbgBYEZU (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:47025 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728725AbgBYEdu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Feb 2020 23:25:20 -0500
-Received: by mail-pf1-f196.google.com with SMTP id 2so6474024pfg.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 20:25:20 -0800 (PST)
-Date: Mon, 24 Feb 2020 20:25:17 -0800
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/
- Clang/LLVM
-Message-ID: <202002242019.A9F519A33A@keescook>
-References: <20200224174129.2664-1-ndesaulniers@google.com>
- <202002242003.870E5F80@keescook>
- <20200225041643.GA17425@ubuntu-m2-xlarge-x86>
+        Mon, 24 Feb 2020 23:33:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200225041643.GA17425@ubuntu-m2-xlarge-x86>
+References: <20200222190435.11767-1-masahiroy@kernel.org> <20200224225253.GA27948@bogus>
+In-Reply-To: <20200224225253.GA27948@bogus>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 25 Feb 2020 13:32:58 +0900
+Message-ID: <CAK7LNAS+iOAonhxN2BK4D8TSb8F-BqPxDGFU0AOv9fZ2So4iqA@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: fix DT binding schema rule to detect command
+ line changes
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, corbet@lwn.net, masahiroy@kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+To: Rob Herring <robh@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Feb 24, 2020 at 09:16:43PM -0700, Nathan Chancellor wrote:
-> I think the clang one should be added in a separate patch that
-> solidifies that in include/linux/compiler-clang.h with a CLANG_VERSION
-> macro and version check, like in include/linux/compiler-gcc.h.
+Hi Rob,
 
-Sounds good.
+On Tue, Feb 25, 2020 at 7:52 AM Rob Herring <robh@kernel.org> wrote:
+>
+> On Sun, Feb 23, 2020 at 04:04:31AM +0900, Masahiro Yamada wrote:
+> > This if_change_rule is not working; it cannot detect any command line
+> > changes.
+> >
+> > The reason is because cmd-check in scripts/Kbuild.include compares
+> > $(cmd_$@) and $(cmd_$1), but cmd_dtc_dt_yaml does not exist here.
+> >
+> > For if_change_rule to work properly, the stem part of cmd_* and rule_*
+> > must match. Because this cmd_and_fixdep invokes cmd_dtc, this rule must
+> > be named rule_dtc.
+> >
+> > Fixes: 4f0e3a57d6eb ("kbuild: Add support for DT binding schema checks")
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  scripts/Makefile.lib | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> For the series,
+>
+> Acked-by: Rob Herring <robh@kernel.org>
+>
+> I'm assuming you will take these? If not, I can in the DT tree.
 
-> ld.lld's minimum version should also be 9, what is the blocking issue
-> that makes it 11?
+Yes, I will queue these to kbuild tree.
 
-I think I've mostly got future patches on my mind. lld before 11 will
-blow up on this:
-https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=build/link-time
-(but I haven't sent this patch yet since I didn't want to break lld
-until it was fixed, which it is now, but I got distracted by other
-stuff).
 
-Additionally there will be LTO, but LTO will be version-checked. Then I
-was thinking about the orphan section handling, and there is very
-clearly more work to be done there too... (i.e. the synthesized sections
-get reported by the orphan warning before they're actually processed by
-DISCARD is some cases -- I still need to isolate the behavior and open a
-bug.)
+
+
 
 -- 
-Kees Cook
+Best Regards
+Masahiro Yamada
