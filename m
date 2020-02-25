@@ -1,149 +1,177 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41697 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725788AbgBYFQU (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45116 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbgBYGbE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Feb 2020 00:16:20 -0500
-Received: by mail-pf1-f195.google.com with SMTP id j9so6544373pfa.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Feb 2020 21:16:19 -0800 (PST)
-Date: Mon, 24 Feb 2020 21:16:17 -0800
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: Remove debug info from kallsyms linking
-Message-ID: <202002242114.CBED7F1@keescook>
+        Tue, 25 Feb 2020 01:31:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20200224174129.2664-1-ndesaulniers@google.com> <202002242003.870E5F80@keescook>
+In-Reply-To: <202002242003.870E5F80@keescook>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Tue, 25 Feb 2020 07:33:27 +0100
+Message-ID: <CA+icZUWVybtEW3bxw5p8UFvoRr5OU=sgcpL=EbQTW7sTWYsRqg@mail.gmail.com>
+Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/ Clang/LLVM
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, corbet@lwn.net, masahiroy@kernel.org, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
 
-When CONFIG_DEBUG_INFO is enabled, the two kallsyms linking steps spend
-time collecting and writing the dwarf sections to the temporary output
-files. kallsyms does not need this information, and leaving it off
-halves their linking time. This is especially noticeable without
-CONFIG_DEBUG_INFO_REDUCED. The BTF linking stage, however, does still
-need those details.
+On Tue, Feb 25, 2020 at 5:08 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Mon, Feb 24, 2020 at 09:41:28AM -0800, Nick Desaulniers wrote:
+> > Added to kbuild documentation. Provides more official info on building
+> > kernels with Clang and LLVM than our wiki.
+> >
+> > Suggested-by: Kees Cook <keescook@chromium.org>
+> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> > ---
+> >  Documentation/kbuild/index.rst |  1 +
+> >  Documentation/kbuild/llvm.rst  | 80 ++++++++++++++++++++++++++++++++++
+> >  2 files changed, 81 insertions(+)
+> >  create mode 100644 Documentation/kbuild/llvm.rst
+> >
+> > diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
+> > index 0f144fad99a6..3882bd5f7728 100644
+> > --- a/Documentation/kbuild/index.rst
+> > +++ b/Documentation/kbuild/index.rst
+> > @@ -19,6 +19,7 @@ Kernel Build System
+> >
+> >      issues
+> >      reproducible-builds
+> > +    llvm
+> >
+> >  .. only::  subproject and html
+> >
+> > diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+> > new file mode 100644
+> > index 000000000000..68ae022aebc0
+> > --- /dev/null
+> > +++ b/Documentation/kbuild/llvm.rst
+> > @@ -0,0 +1,80 @@
+> > +==============================
+> > +Building Linux with Clang/LLVM
+> > +==============================
+> > +
+> > +This document covers how to build the Linux kernel with Clang and LLVM
+> > +utilities.
+> > +
+> > +About
+> > +-----
+> > +
+> > +The Linux kernel has always traditionally been compiled with GNU toolchains
+> > +such as GCC and binutils. On going work has allowed for `Clang
+> > +<https://clang.llvm.org/>`_ and `LLVM <https://llvm.org/>`_ utilities to be
+> > +used as viable substitutes. Distributions such as `Android
+> > +<https://www.android.com/>`_, `ChromeOS
+> > +<https://www.chromium.org/chromium-os>`_, and `OpenMandriva
+> > +<https://www.openmandriva.org/>`_ use Clang built kernels.  `LLVM is a
+> > +collection of toolchain components implemented in terms of C++ objects
+> > +<https://www.aosabook.org/en/llvm.html>`_. Clang is a front-end to LLVM that
+> > +supports C and the GNU C extensions required by the kernel, and is pronounced
+> > +"klang," not "see-lang."
+> > +
+> > +Clang
+> > +-----
+> > +
+> > +The compiler used can be swapped out via `CC=` command line argument to `make`.
+> > +`CC=` should be set when selecting a config and during a build.
+> > +
+> > +     make CC=clang defconfig
+> > +
+> > +     make CC=clang
+> > +
+> > +Cross Compiling
+> > +---------------
+> > +
+> > +A single Clang compiler binary will typically contain all supported backends,
+> > +which can help simplify cross compiling.
+> > +
+> > +     ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make CC=clang
+> > +
+> > +`CROSS_COMPILE` is not used to suffix the Clang compiler binary, instead
+>
+> s/suffix/prefix/
+>
+> > +`CROSS_COMPILE` is used to set a command line flag: `--target <triple>`. For
+> > +example:
+> > +
+> > +     clang --target aarch64-linux-gnu foo.c
+> > +
+> > +LLVM Utilities
+> > +--------------
+> > +
+> > +LLVM has substitutes for GNU binutils utilities. These can be invoked as
+> > +additional parameters to `make`.
+> > +
+> > +     make CC=clang AS=clang LD=ld.lld AR=llvm-ar NM=llvm-nm STRIP=llvm-strip \\
+> > +       OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump OBJSIZE=llvm-objsize \\
+> > +       READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
+> > +       HOSTLD=ld.lld
+> > +
+> > +Getting Help
+> > +------------
+> > +
+> > +- `Website <https://clangbuiltlinux.github.io/>`_
+> > +- `Mailing List <https://groups.google.com/forum/#!forum/clang-built-linux>`_: <clang-built-linux@googlegroups.com>
+> > +- `Issue Tracker <https://github.com/ClangBuiltLinux/linux/issues>`_
+> > +- IRC: #clangbuiltlinux on chat.freenode.net
+> > +- `Telegram <https://t.me/ClangBuiltLinux>`_: @ClangBuiltLinux
+> > +- `Wiki <https://github.com/ClangBuiltLinux/linux/wiki>`_
+> > +- `Beginner Bugs <https://github.com/ClangBuiltLinux/linux/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22>`_
+> > +
+> > +Getting LLVM
+> > +-------------
+> > +
+> > +- http://releases.llvm.org/download.html
+> > +- https://github.com/llvm/llvm-project
+> > +- https://llvm.org/docs/GettingStarted.html
+> > +- https://llvm.org/docs/CMake.html
+> > +- https://apt.llvm.org/
+> > +- https://www.archlinux.org/packages/extra/x86_64/llvm/
+> > +- https://github.com/ClangBuiltLinux/tc-build
+> > +- https://github.com/ClangBuiltLinux/linux/wiki/Building-Clang-from-source
+> > +- https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/
+>
+> Should this also include an update to Documentation/process/changes.rst
+> with the minimum version required? (I would expect this to be "9" for Clang,
+> and "11" for ld.lld.)
+>
+> Otherwise, yes, with Randy and Masahiro's suggestions, please consider it:
+>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+>
 
-Refactor the BTF and kallsyms generation stages slightly for more
-regularized temporary names. Skip debug during kallsyms links.
+Hi,
 
-For a full debug info build with BTF, my link time goes from 1m06s to
-0m54s, saving about 12 seconds, or 18%.
+that update for documentation purposes was overdue.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- scripts/link-vmlinux.sh | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+My last experiments were with Linux v5.3 and llvm-toolchain 9.0 means
+Clang compiler v9.0 and LLD linker v9.0 on x86-64.
+With Debian's kernel-config I was able to build OOTB (out-of-the-box)
+with no extra patches.
+I cannot speak for higher Linux and/or llvm-toolchain versions/combinations.
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index dd484e92752e..ac569e197bfa 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -63,12 +63,18 @@ vmlinux_link()
- 	local lds="${objtree}/${KBUILD_LDS}"
- 	local output=${1}
- 	local objects
-+	local strip_debug
- 
- 	info LD ${output}
- 
- 	# skip output file argument
- 	shift
- 
-+	# The kallsyms linking does not need debug symbols included.
-+	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
-+		strip_debug=-Wl,--strip-debug
-+	fi
-+
- 	if [ "${SRCARCH}" != "um" ]; then
- 		objects="--whole-archive			\
- 			${KBUILD_VMLINUX_OBJS}			\
-@@ -79,6 +85,7 @@ vmlinux_link()
- 			${@}"
- 
- 		${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}	\
-+			${strip_debug#-Wl,}			\
- 			-o ${output}				\
- 			-T ${lds} ${objects}
- 	else
-@@ -91,6 +98,7 @@ vmlinux_link()
- 			${@}"
- 
- 		${CC} ${CFLAGS_vmlinux}				\
-+			${strip_debug}				\
- 			-o ${output}				\
- 			-Wl,-T,${lds}				\
- 			${objects}				\
-@@ -106,6 +114,8 @@ gen_btf()
- {
- 	local pahole_ver
- 	local bin_arch
-+	local bin_format
-+	local bin_file
- 
- 	if ! [ -x "$(command -v ${PAHOLE})" ]; then
- 		echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
-@@ -118,8 +128,9 @@ gen_btf()
- 		return 1
- 	fi
- 
--	info "BTF" ${2}
- 	vmlinux_link ${1}
-+
-+	info "BTF" ${2}
- 	LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
- 
- 	# dump .BTF section into raw binary file to link with final vmlinux
-@@ -127,11 +138,12 @@ gen_btf()
- 		cut -d, -f1 | cut -d' ' -f2)
- 	bin_format=$(LANG=C ${OBJDUMP} -f ${1} | grep 'file format' | \
- 		awk '{print $4}')
-+	bin_file=.btf.vmlinux.bin
- 	${OBJCOPY} --change-section-address .BTF=0 \
- 		--set-section-flags .BTF=alloc -O binary \
--		--only-section=.BTF ${1} .btf.vmlinux.bin
-+		--only-section=.BTF ${1} $bin_file
- 	${OBJCOPY} -I binary -O ${bin_format} -B ${bin_arch} \
--		--rename-section .data=.BTF .btf.vmlinux.bin ${2}
-+		--rename-section .data=.BTF $bin_file ${2}
- }
- 
- # Create ${2} .o file with all symbols from the ${1} object file
-@@ -166,8 +178,8 @@ kallsyms()
- kallsyms_step()
- {
- 	kallsymso_prev=${kallsymso}
--	kallsymso=.tmp_kallsyms${1}.o
--	kallsyms_vmlinux=.tmp_vmlinux${1}
-+	kallsyms_vmlinux=.tmp_vmlinux.kallsyms${1}
-+	kallsymso=${kallsyms_vmlinux}.o
- 
- 	vmlinux_link ${kallsyms_vmlinux} "${kallsymso_prev}" ${btf_vmlinux_bin_o}
- 	kallsyms ${kallsyms_vmlinux} ${kallsymso}
-@@ -190,7 +202,6 @@ cleanup()
- {
- 	rm -f .btf.*
- 	rm -f .tmp_System.map
--	rm -f .tmp_kallsyms*
- 	rm -f .tmp_vmlinux*
- 	rm -f System.map
- 	rm -f vmlinux
-@@ -257,9 +268,8 @@ tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
- 
- btf_vmlinux_bin_o=""
- if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
--	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
--		btf_vmlinux_bin_o=.btf.vmlinux.bin.o
--	else
-+	btf_vmlinux_bin_o=.btf.vmlinux.bin.o
-+	if ! gen_btf .tmp_vmlinux.btf $btf_vmlinux_bin_o ; then
- 		echo >&2 "Failed to generate BTF for vmlinux"
- 		echo >&2 "Try to disable CONFIG_DEBUG_INFO_BTF"
- 		exit 1
--- 
-2.20.1
+I would prefer such an information also for the *supported* Linux
+versions, so people have a good orientation.
+
+So for the above scenario, you can add:
+
+Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>.(Clang and LLD v9.0,
+Linux v5.3, x86-64)
+
+Regards,
+- Sedat -
 
 
--- 
-Kees Cook
+
+
+> --
+> Kees Cook
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/202002242003.870E5F80%40keescook.
