@@ -1,71 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:30600 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726272AbgBZMBf (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37979 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726187AbgBZM0k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Feb 2020 07:01:35 -0500
+        Wed, 26 Feb 2020 07:26:40 -0500
 MIME-Version: 1.0
 References: <20200224174129.2664-1-ndesaulniers@google.com>
- <CAK7LNASNsOmyqFWYtJHB4UcHAed5C_isWvMJ4MKHu0O=yUy=8w@mail.gmail.com> <CAKwvOd=mPg79CrYnDm8=z0iJpKL0FHm9J5qZF0_A6BFXBv8Dow@mail.gmail.com>
-In-Reply-To: <CAKwvOd=mPg79CrYnDm8=z0iJpKL0FHm9J5qZF0_A6BFXBv8Dow@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 26 Feb 2020 21:00:34 +0900
-Message-ID: <CAK7LNAQ83rLAm1GcvrgJbinyAVPpM_SoxfO7RdOAfmXyg2tBdQ@mail.gmail.com>
-Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/ Clang/LLVM
+ <20200225210250.64366-1-ndesaulniers@google.com> <CAK7LNAQJuF__26R+fEsdfYH1SAJuo3-8grGQAE4htjxzEG-nqw@mail.gmail.com>
+In-Reply-To: <CAK7LNAQJuF__26R+fEsdfYH1SAJuo3-8grGQAE4htjxzEG-nqw@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Wed, 26 Feb 2020 13:29:07 +0100
+Message-ID: <CA+icZUWcW3+9QdZcACCXP6Yun__Sm_s4+qM4rALdFf=hGBt3FQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Documentation/llvm: add documentation on building w/ Clang/LLVM
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Wed, Feb 26, 2020 at 5:52 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Wed, Feb 26, 2020 at 12:31 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> On Mon, Feb 24, 2020 at 4:34 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > On Tue, Feb 25, 2020 at 2:41 AM Nick Desaulniers
-> > <ndesaulniers@google.com> wrote:
-> > >
-> > > Added to kbuild documentation. Provides more official info on building
-> > > kernels with Clang and LLVM than our wiki.
-> > >
-> > > Suggested-by: Kees Cook <keescook@chromium.org>
-> > > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> > > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> > > ---
-> >
-> >
-> > Perhaps, is it better to explicitly add it to MAINTAINERS?
-> >
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -4118,6 +4118,7 @@ W:        https://clangbuiltlinux.github.io/
-> >  B:     https://github.com/ClangBuiltLinux/linux/issues
-> >  C:     irc://chat.freenode.net/clangbuiltlinux
-> >  S:     Supported
-> > +F:     Documentation/kbuild/llvm.rst
-> >  K:     \b(?i:clang|llvm)\b
+> Hi.
 >
-> I'm happy to leave it to the maintainers of Documentation/.  Otherwise
-> we have a file for which there is no MAINTAINER, which seems
-> ambiguous.
+>
+> On Wed, Feb 26, 2020 at 6:02 AM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > Added to kbuild documentation. Provides more official info on building
+> > kernels with Clang and LLVM than our wiki.
+> >
+> > Suggested-by: Randy Dunlap <rdunlap@infradead.org>
+> > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> > Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> > ---
+> > Changes V1 -> V2:
+> > * s/On going/ongoing/
+> > * add Randy's Suggested-by
+>
+>
+> I do not understand this tag update.
+>
+> As far as I saw the review process,
+> I do not think Randy deserves to have Suggested-by
+> because he just pointed out a typo (on going -> ongoing) :
+> https://patchwork.kernel.org/patch/11401189/#23179575
+>
+> (or, was there off-line activity I had missed?)
+>
 
-It is common that MAINTAINERS lists per-file (per-driver) maintainers.
-It does not necessarily mean a person who picks up patches.
+Hi Masahiro,
 
-scripts/get_maintainer.pl lists maintainers that
-match any F:, N:, K: patterns.
-So, both Doc and Kbuild maintainers/ML will still be listed.
+I got some credits from Nick for a review by seeing a typo - not on a
+review of the code - and H. Peter Anvin asked why.
 
-Having said that, it is up to you. Either is fine with me.
-Another pattern 'K: \b(?i:clang|llvm)\b'  covers this file anyway.
+I am not sure what is here the correct credit to give.
+Depends a "Reviewed-by" and/or "Suggested-by" on a technical review?
 
+My POV: When people take time to look over patches they should get
+credits - sort of esteem.
 
-(BTW, I am also happy to see your name as the maintainer of this entry.)
+Regards,
+- Sedat -
 
+P.S.: Tipp: Use codespell to find typos :-).
 
-Thanks.
-
---
-Best Regards
-Masahiro Yamada
+[1] https://git.kernel.org/linus/0e2e160033283e20f688d8bad5b89460cc5bfcc4
+"x86/asm: Add _ASM_ARG* constants for argument registers to <asm/asm.h>"
