@@ -1,66 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:61090 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726765AbgBZRtF (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:24983 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726951AbgBZRyD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Feb 2020 12:49:05 -0500
-MIME-Version: 1.0
-References: <20200222190435.11767-1-masahiroy@kernel.org> <20200222190435.11767-4-masahiroy@kernel.org>
-In-Reply-To: <20200222190435.11767-4-masahiroy@kernel.org>
+        Wed, 26 Feb 2020 12:54:03 -0500
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 27 Feb 2020 02:48:14 +0900
-Message-ID: <CAK7LNATBj30rmh8XCO_QGY6JbMcyBWx2e=1CxoWNJ_t4mPecJA@mail.gmail.com>
-Subject: Re: [PATCH 4/5] kbuild: add dt_binding_check to PHONY in a correct place
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: remove trailing slash from devicetree/binding/ for descending
+Date: Thu, 27 Feb 2020 02:53:25 +0900
+Message-Id: <20200226175325.8787-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Rob Herring <robh+dt@kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
 
-On Sun, Feb 23, 2020 at 4:04 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> The dt_binding_check is added to PHONY, but it is visible only
-> when $(dtstree) is not empty. So, it is not specified as phony
-> for ARCH=x86 etc.
->
-> Add it to PHONY outside the ifneq ... endif block.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+obj-* needs a trailing slash for a directory, but subdir-* does not
+because it already implies a directory.
 
-Applied with Rob's Ack.
+Also, change subdir-y to subdir- to ensure this is effective only
+for cleaning targets.
 
+This makes the cleaning log consistent. (no trailing slash)
 
+Before:
 
->  Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 102710a9228c..83f9b8f6fbaf 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1238,7 +1238,7 @@ ifneq ($(dtstree),)
->  %.dtb: include/config/kernel.release scripts_dtc
->         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->
-> -PHONY += dtbs dtbs_install dtbs_check dt_binding_check
-> +PHONY += dtbs dtbs_install dtbs_check
->  dtbs dtbs_check: include/config/kernel.release scripts_dtc
->         $(Q)$(MAKE) $(build)=$(dtstree)
->
-> @@ -1258,6 +1258,7 @@ PHONY += scripts_dtc
->  scripts_dtc: scripts_basic
->         $(Q)$(MAKE) $(build)=scripts/dtc
->
-> +PHONY += dt_binding_check
->  dt_binding_check: scripts_dtc
->         $(Q)$(MAKE) $(build)=Documentation/devicetree/bindings
->
-> --
-> 2.17.1
->
+  $ make clean
+  CLEAN   Documentation/devicetree/bindings/
 
+After:
 
+  $ make clean
+  CLEAN   Documentation/devicetree/bindings
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Documentation/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index d77bb607aea4..39569a2e1953 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -2,7 +2,8 @@
+ # Makefile for Sphinx documentation
+ #
+ 
+-subdir-y := devicetree/bindings/
++# for cleaning
++subdir- := devicetree/bindings
+ 
+ # Check for broken documentation file references
+ ifeq ($(CONFIG_WARN_MISSING_DOCUMENTS),y)
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
