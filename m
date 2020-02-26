@@ -1,36 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0025.hostedemail.com ([216.40.44.25]:44193 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727227AbgBYW1u (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:58785 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726229AbgBZGrD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Feb 2020 17:27:50 -0500
-Message-ID: <3b7b2b366220c9ba39ebc241ba22c0304f0d61b0.camel@perches.com>
-Subject: Re: [PATCH] Documentation/llvm: add documentation on building w/
- Clang/LLVM
-From: Joe Perches <joe@perches.com>
-Date: Tue, 25 Feb 2020 14:20:19 -0800
-In-Reply-To: <202002251353.25A016CD@keescook>
-References: <20200224174129.2664-1-ndesaulniers@google.com>
-         <202002242003.870E5F80@keescook>
-         <20200225041643.GA17425@ubuntu-m2-xlarge-x86>
-         <CAKwvOdn0_EETGtBVhbRKMPqv2K04Z1N4PuOZDZ6++Ejbi9-B-w@mail.gmail.com>
-         <202002251353.25A016CD@keescook>
-Content-Type: text/plain; charset="ISO-8859-1"
+        Wed, 26 Feb 2020 01:47:03 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20200222190435.11767-1-masahiroy@kernel.org> <20200222190435.11767-5-masahiroy@kernel.org>
+In-Reply-To: <20200222190435.11767-5-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 26 Feb 2020 15:46:15 +0900
+Message-ID: <CAK7LNAT14XvMLp+CFJk4QdgvYCTanXz8KPQ=5C90N+VCOYPu1g@mail.gmail.com>
+Subject: Re: [PATCH 5/5] kbuild: allow to run dt_binding_check and dtbs_check
+ in a single command
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Rob Herring <robh+dt@kernel.org>, DTML <devicetree@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Maxime Ripard <mripard@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, 2020-02-25 at 13:56 -0800, Kees Cook wrote:
-> I think we should take a specific version stand as the
-> "minimum" version. Being able to build x86 defconfig is a good minimum
-> IMO.
+On Sun, Feb 23, 2020 at 4:04 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Since commit 93512dad334d ("dt-bindings: Improve validation build error
+> handling"), 'make dtbs_check' does not validate the schema fully.
+>
+> If you want to check everything, you need to run two commands.
+>
+>   $ make ARCH=arm dt_binding_check
+>   $ make ARCH=arm dtbs_check
+>
+> You cannot do:
+>
+>   $ make ARCH=arm dt_binding_check dtbs_check
+>
+> Because CHECK_DTBS is set, dt-doc-validate and dt-extract-example
+> are skipped.
+>
+> Making it work will be useful for schema writers.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Agree.
 
-It's odd to say that clang 4 is fine for arm when it's
-not fine for x86.  It's also reasonable to expect arm
-users to upgrade their compiler to a more recent version
-when the only cost is a very small bit of time.
+
+Sorry, I take back this patch.
+
+'make dtbs_check dt_binding_chec' does not work.
+
+
+
+>
+>  Documentation/devicetree/bindings/Makefile  | 6 ++----
+>  Documentation/devicetree/writing-schema.rst | 4 ++++
+>  Makefile                                    | 8 +++++---
+>  3 files changed, 11 insertions(+), 7 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
+> index 646cb3525373..6efa2094b95e 100644
+> --- a/Documentation/devicetree/bindings/Makefile
+> +++ b/Documentation/devicetree/bindings/Makefile
+> @@ -25,10 +25,8 @@ DT_DOCS = $(shell \
+>
+>  DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
+>
+> -ifeq ($(CHECK_DTBS),)
+> -extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+> -extra-y += $(patsubst $(src)/%.yaml,%.example.dt.yaml, $(DT_SCHEMA_FILES))
+> -endif
+> +extra-$(CHECK_DT_BINDING) += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+> +extra-$(CHECK_DT_BINDING) += $(patsubst $(src)/%.yaml,%.example.dt.yaml, $(DT_SCHEMA_FILES))
+>
+>  $(obj)/$(DT_TMP_SCHEMA): $(DT_SCHEMA_FILES) FORCE
+>         $(call if_changed,mk_schema)
+> diff --git a/Documentation/devicetree/writing-schema.rst b/Documentation/devicetree/writing-schema.rst
+> index 7635ab230456..220cf464ed77 100644
+> --- a/Documentation/devicetree/writing-schema.rst
+> +++ b/Documentation/devicetree/writing-schema.rst
+> @@ -147,6 +147,10 @@ Note that ``dtbs_check`` will skip any binding schema files with errors. It is
+>  necessary to use ``dt_binding_check`` to get all the validation errors in the
+>  binding schema files.
+>
+> +It is possible to run both in a single command::
+> +
+> +    make dt_binding_check dtbs_check
+> +
+>  It is also possible to run checks with a single schema file by setting the
+>  ``DT_SCHEMA_FILES`` variable to a specific schema file.
+>
+> diff --git a/Makefile b/Makefile
+> index 83f9b8f6fbaf..59dd768a1c1e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1243,7 +1243,7 @@ dtbs dtbs_check: include/config/kernel.release scripts_dtc
+>         $(Q)$(MAKE) $(build)=$(dtstree)
+>
+>  dtbs_check: export CHECK_DTBS=1
+> -dtbs_check: dt_binding_check
+> +dtbs_check: __dt_binding_check
+>
+>  dtbs_install:
+>         $(Q)$(MAKE) $(dtbinst)=$(dtstree)
+> @@ -1258,8 +1258,10 @@ PHONY += scripts_dtc
+>  scripts_dtc: scripts_basic
+>         $(Q)$(MAKE) $(build)=scripts/dtc
+>
+> -PHONY += dt_binding_check
+> -dt_binding_check: scripts_dtc
+> +PHONY += dt_binding_check __dt_binding_check
+> +dt_binding_check: export CHECK_DT_BINDING=y
+> +dt_binding_check: __dt_binding_check
+> +__dt_binding_check: scripts_dtc
+>         $(Q)$(MAKE) $(build)=Documentation/devicetree/bindings
+>
+>  # ---------------------------------------------------------------------------
+> --
+> 2.17.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
