@@ -1,62 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:59514 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:60357 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726920AbgBZRsF (ORCPT
+        with ESMTP id S1726151AbgBZRsf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Feb 2020 12:48:05 -0500
+        Wed, 26 Feb 2020 12:48:35 -0500
 MIME-Version: 1.0
-References: <20200222190435.11767-1-masahiroy@kernel.org> <20200224225253.GA27948@bogus>
- <CAK7LNAS+iOAonhxN2BK4D8TSb8F-BqPxDGFU0AOv9fZ2So4iqA@mail.gmail.com>
-In-Reply-To: <CAK7LNAS+iOAonhxN2BK4D8TSb8F-BqPxDGFU0AOv9fZ2So4iqA@mail.gmail.com>
+References: <20200222190435.11767-1-masahiroy@kernel.org> <20200222190435.11767-3-masahiroy@kernel.org>
+In-Reply-To: <20200222190435.11767-3-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 27 Feb 2020 02:47:16 +0900
-Message-ID: <CAK7LNAS-Ozq8kwa4HixNQ=r8d3ToehFnsbh0F0TgAcnemXantA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kbuild: fix DT binding schema rule to detect command
- line changes
+Date: Thu, 27 Feb 2020 02:47:51 +0900
+Message-ID: <CAK7LNAQoBXfSpQQee1wjx6wXJ2Zeuit6K+qfZwKZBhOG1M1p1g@mail.gmail.com>
+Subject: Re: [PATCH 3/5] kbuild: add dtbs_check to PHONY
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Rob Herring <robh+dt@kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Feb 25, 2020 at 1:32 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Sun, Feb 23, 2020 at 4:04 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Hi Rob,
+> The dtbs_check should be a phony target, but currently it is not
+> specified so.
 >
-> On Tue, Feb 25, 2020 at 7:52 AM Rob Herring <robh@kernel.org> wrote:
-> >
-> > On Sun, Feb 23, 2020 at 04:04:31AM +0900, Masahiro Yamada wrote:
-> > > This if_change_rule is not working; it cannot detect any command line
-> > > changes.
-> > >
-> > > The reason is because cmd-check in scripts/Kbuild.include compares
-> > > $(cmd_$@) and $(cmd_$1), but cmd_dtc_dt_yaml does not exist here.
-> > >
-> > > For if_change_rule to work properly, the stem part of cmd_* and rule_*
-> > > must match. Because this cmd_and_fixdep invokes cmd_dtc, this rule must
-> > > be named rule_dtc.
-> > >
-> > > Fixes: 4f0e3a57d6eb ("kbuild: Add support for DT binding schema checks")
-> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > > ---
-> > >
-> > >  scripts/Makefile.lib | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > For the series,
-> >
-> > Acked-by: Rob Herring <robh@kernel.org>
-> >
-> > I'm assuming you will take these? If not, I can in the DT tree.
+> 'make dtbs_check' works even if a file named 'dtbs_check' exists
+> because it depends on another phony target, scripts_dtc, but we
+> should not rely on it.
 >
-> Yes, I will queue these to kbuild tree.
+> Add dtbs_check to PHONY.
 >
->
-
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
 Applied with Rob's Ack.
 
 
+>
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index aab38cb02b24..102710a9228c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1238,7 +1238,7 @@ ifneq ($(dtstree),)
+>  %.dtb: include/config/kernel.release scripts_dtc
+>         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+>
+> -PHONY += dtbs dtbs_install dt_binding_check
+> +PHONY += dtbs dtbs_install dtbs_check dt_binding_check
+>  dtbs dtbs_check: include/config/kernel.release scripts_dtc
+>         $(Q)$(MAKE) $(build)=$(dtstree)
+>
+> --
+> 2.17.1
+>
 
 
 -- 
