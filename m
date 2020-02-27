@@ -1,53 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:39879 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:27297 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730245AbgB0Qpe (ORCPT
+        with ESMTP id S1729430AbgB0RRu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Feb 2020 11:45:34 -0500
+        Thu, 27 Feb 2020 12:17:50 -0500
 MIME-Version: 1.0
-References: <20200218100031.10018-1-masahiroy@kernel.org>
-In-Reply-To: <20200218100031.10018-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 28 Feb 2020 01:44:41 +0900
-Message-ID: <CAK7LNASvgJ2tBhM7s-cnpwuy1GZy0kZ96tLETBVuEZSCTCKmcA@mail.gmail.com>
-Subject: Re: [PATCH] fixdep: remove redundant null character check
+Date: Fri, 28 Feb 2020 02:16:57 +0900
+Message-ID: <CAK7LNASDV1hBV_4U6wHHMFfxsxctFhVpk4gUQ+pYMay1i4Memw@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.6-rc4
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, Feb 18, 2020 at 7:00 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> If *q is '\0', the condition (isalnum(*q) || *q == '_') is false anyway.
->
-> Ensuring non-zero *q is redundant.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+Hi Linus,
+
+Please pull some more Kbuild fixes.
+Thanks!
 
 
-Applied to linux-kbuild.
+The following changes since commit f8788d86ab28f61f7b46eb6be375f8a726783636:
 
->  scripts/basic/fixdep.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-> index ad2041817985..877ca2c88246 100644
-> --- a/scripts/basic/fixdep.c
-> +++ b/scripts/basic/fixdep.c
-> @@ -246,7 +246,7 @@ static void parse_config_file(const char *p)
->                 }
->                 p += 7;
->                 q = p;
-> -               while (*q && (isalnum(*q) || *q == '_'))
-> +               while (isalnum(*q) || *q == '_')
->                         q++;
->                 if (str_ends_with(p, q - p, "_MODULE"))
->                         r = q - 7;
-> --
-> 2.17.1
->
+  Linux 5.6-rc3 (2020-02-23 16:17:42 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.6-2
+
+for you to fetch changes up to eabc8bcb292fb9a5757b0c8ab7751f41b0a104f8:
+
+  kbuild: get rid of trailing slash from subdir- example (2020-02-27
+10:03:27 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v5.6 (2nd)
+
+ - fix missed rebuild of DT schema check
+
+ - add some phony targets to PHONY
+
+ - fix comments and documents
+
+----------------------------------------------------------------
+Masahiro Yamada (6):
+      kbuild: remove wrong documentation about mandatory-y
+      kbuild: fix DT binding schema rule to detect command line changes
+      kbuild: remove unneeded semicolon at the end of cmd_dtb_check
+      kbuild: add dtbs_check to PHONY
+      kbuild: add dt_binding_check to PHONY in a correct place
+      kbuild: get rid of trailing slash from subdir- example
+
+Randy Dunlap (1):
+      kbuild: add comment for V=2 mode
+
+ Documentation/kbuild/makefiles.rst | 5 +----
+ Makefile                           | 4 +++-
+ scripts/Makefile.lib               | 6 +++---
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
 
 -- 
