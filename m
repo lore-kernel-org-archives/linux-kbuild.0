@@ -1,50 +1,170 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:59758 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729134AbgB0QIG (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:27262 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729703AbgB0QMP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Feb 2020 11:08:06 -0500
+        Thu, 27 Feb 2020 11:12:15 -0500
 MIME-Version: 1.0
-References: <20200226174458.8115-1-masahiroy@kernel.org>
-In-Reply-To: <20200226174458.8115-1-masahiroy@kernel.org>
+References: <20200225210250.64366-1-ndesaulniers@google.com> <20200226232336.252872-1-ndesaulniers@google.com>
+In-Reply-To: <20200226232336.252872-1-ndesaulniers@google.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 28 Feb 2020 01:07:25 +0900
-Message-ID: <CAK7LNAQxD6FkYRoz+Cn=SVFr8So-m0=Qf0rASFxM_-01FC1_-A@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: get rid of trailing slash from subdir- example
+Date: Fri, 28 Feb 2020 01:11:32 +0900
+Message-ID: <CAK7LNAT=O9+VMEy1j9Un9rznnb_qaxtC-C_xO1DLwiZAhCxZ0g@mail.gmail.com>
+Subject: Re: [PATCH v3] Documentation/llvm: add documentation on building w/ Clang/LLVM
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kees Cook <keescook@chromium.org>, Nathan Chancellor <natechancellor@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Thu, Feb 27, 2020 at 2:45 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Thu, Feb 27, 2020 at 8:23 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> obj-* needs a trailing slash for a directory, but subdir-* does not.
+> Added to kbuild documentation. Provides more official info on building
+> kernels with Clang and LLVM than our wiki.
 >
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Suggested-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 > ---
 
 Applied to linux-kbuild.
 
+Thanks.
 
->  Documentation/kbuild/makefiles.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+
+> Changes V2 -> V3:
+> * Drop Randy's Suggested-by tag. Sorry Randy, I do appreciate the review
+>   though.
+> * Add F: line to MAINTAINERS.
 >
-> diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-> index 0e0eb2c8da7d..c9adfa1f9e21 100644
-> --- a/Documentation/kbuild/makefiles.rst
-> +++ b/Documentation/kbuild/makefiles.rst
-> @@ -765,7 +765,7 @@ is not sufficient this sometimes needs to be explicit.
->         Example::
+> Changes V1 -> V2:
+> * s/On going/ongoing/
+> * add Randy's Suggested-by
+> * add Nathan and Sedat's Reviewed-by
+> * Upgrade Kees' Sugguested-by to Reviewed-by
+> * s/suffix/prefix/
 >
->                 #arch/x86/boot/Makefile
-> -               subdir- := compressed/
-> +               subdir- := compressed
+>  Documentation/kbuild/index.rst |  1 +
+>  Documentation/kbuild/llvm.rst  | 80 ++++++++++++++++++++++++++++++++++
+>  MAINTAINERS                    |  1 +
+>  3 files changed, 82 insertions(+)
+>  create mode 100644 Documentation/kbuild/llvm.rst
 >
->  The above assignment instructs kbuild to descend down in the
->  directory compressed/ when "make clean" is executed.
+> diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
+> index 0f144fad99a6..3882bd5f7728 100644
+> --- a/Documentation/kbuild/index.rst
+> +++ b/Documentation/kbuild/index.rst
+> @@ -19,6 +19,7 @@ Kernel Build System
+>
+>      issues
+>      reproducible-builds
+> +    llvm
+>
+>  .. only::  subproject and html
+>
+> diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+> new file mode 100644
+> index 000000000000..d6c79eb4e23e
+> --- /dev/null
+> +++ b/Documentation/kbuild/llvm.rst
+> @@ -0,0 +1,80 @@
+> +==============================
+> +Building Linux with Clang/LLVM
+> +==============================
+> +
+> +This document covers how to build the Linux kernel with Clang and LLVM
+> +utilities.
+> +
+> +About
+> +-----
+> +
+> +The Linux kernel has always traditionally been compiled with GNU toolchains
+> +such as GCC and binutils. Ongoing work has allowed for `Clang
+> +<https://clang.llvm.org/>`_ and `LLVM <https://llvm.org/>`_ utilities to be
+> +used as viable substitutes. Distributions such as `Android
+> +<https://www.android.com/>`_, `ChromeOS
+> +<https://www.chromium.org/chromium-os>`_, and `OpenMandriva
+> +<https://www.openmandriva.org/>`_ use Clang built kernels.  `LLVM is a
+> +collection of toolchain components implemented in terms of C++ objects
+> +<https://www.aosabook.org/en/llvm.html>`_. Clang is a front-end to LLVM that
+> +supports C and the GNU C extensions required by the kernel, and is pronounced
+> +"klang," not "see-lang."
+> +
+> +Clang
+> +-----
+> +
+> +The compiler used can be swapped out via `CC=` command line argument to `make`.
+> +`CC=` should be set when selecting a config and during a build.
+> +
+> +       make CC=clang defconfig
+> +
+> +       make CC=clang
+> +
+> +Cross Compiling
+> +---------------
+> +
+> +A single Clang compiler binary will typically contain all supported backends,
+> +which can help simplify cross compiling.
+> +
+> +       ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make CC=clang
+> +
+> +`CROSS_COMPILE` is not used to prefix the Clang compiler binary, instead
+> +`CROSS_COMPILE` is used to set a command line flag: `--target <triple>`. For
+> +example:
+> +
+> +       clang --target aarch64-linux-gnu foo.c
+> +
+> +LLVM Utilities
+> +--------------
+> +
+> +LLVM has substitutes for GNU binutils utilities. These can be invoked as
+> +additional parameters to `make`.
+> +
+> +       make CC=clang AS=clang LD=ld.lld AR=llvm-ar NM=llvm-nm STRIP=llvm-strip \\
+> +         OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump OBJSIZE=llvm-objsize \\
+> +         READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
+> +         HOSTLD=ld.lld
+> +
+> +Getting Help
+> +------------
+> +
+> +- `Website <https://clangbuiltlinux.github.io/>`_
+> +- `Mailing List <https://groups.google.com/forum/#!forum/clang-built-linux>`_: <clang-built-linux@googlegroups.com>
+> +- `Issue Tracker <https://github.com/ClangBuiltLinux/linux/issues>`_
+> +- IRC: #clangbuiltlinux on chat.freenode.net
+> +- `Telegram <https://t.me/ClangBuiltLinux>`_: @ClangBuiltLinux
+> +- `Wiki <https://github.com/ClangBuiltLinux/linux/wiki>`_
+> +- `Beginner Bugs <https://github.com/ClangBuiltLinux/linux/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22>`_
+> +
+> +Getting LLVM
+> +-------------
+> +
+> +- http://releases.llvm.org/download.html
+> +- https://github.com/llvm/llvm-project
+> +- https://llvm.org/docs/GettingStarted.html
+> +- https://llvm.org/docs/CMake.html
+> +- https://apt.llvm.org/
+> +- https://www.archlinux.org/packages/extra/x86_64/llvm/
+> +- https://github.com/ClangBuiltLinux/tc-build
+> +- https://github.com/ClangBuiltLinux/linux/wiki/Building-Clang-from-source
+> +- https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8b85f22b9b69..79e1f9bfb2b6 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4124,6 +4124,7 @@ B:        https://github.com/ClangBuiltLinux/linux/issues
+>  C:     irc://chat.freenode.net/clangbuiltlinux
+>  S:     Supported
+>  K:     \b(?i:clang|llvm)\b
+> +F:     Documentation/kbuild/llvm.rst
+>
+>  CLEANCACHE API
+>  M:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 > --
-> 2.17.1
+> 2.25.0.265.gbab2e86ba0-goog
 >
 
 
