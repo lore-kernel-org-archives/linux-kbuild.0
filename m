@@ -1,202 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:43740 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730586AbgB1Dtg (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46491 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbgB1Gvg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Feb 2020 22:49:36 -0500
+        Fri, 28 Feb 2020 01:51:36 -0500
 MIME-Version: 1.0
-References: <20200228034640.25247-1-masahiroy@kernel.org>
-In-Reply-To: <20200228034640.25247-1-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 28 Feb 2020 12:48:54 +0900
-Message-ID: <CAK7LNAS9uWyvFeVkxtbkuBrnqumYzzLfcsUrVByHHyons4m8hA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use KBUILD_DEFCONFIG as the fallback for DEFCONFIG_LIST
+References: <20200228002244.15240-1-keescook@chromium.org>
+In-Reply-To: <20200228002244.15240-1-keescook@chromium.org>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Fri, 28 Feb 2020 07:51:21 +0100
+Message-ID: <CA+icZUVRnjOWKZynAGDniXD_H9KRccONmeKHs25DPPU1c8ZcGg@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Enable orphan section warning
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, linux-um@lists.infradead.org, sparclinux <sparclinux@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Borislav Petkov <bp@suse.de>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, linux-kernel@vger.kernel.org
 
-On Fri, Feb 28, 2020 at 12:47 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Fri, Feb 28, 2020 at 1:22 AM Kees Cook <keescook@chromium.org> wrote:
 >
-> Most of the Kconfig commands (except defconfig and all*config) read
-> the .config file as a base set of CONFIG options.
+> Hi!
 >
-> When it does not exist, the files in DEFCONFIG_LIST are searched in
-> this order and loaded if found.
+> A recent bug was solved for builds linked with ld.lld, and tracking
+> it down took way longer than it needed to (a year). Ultimately, it
+> boiled down to differences between ld.bfd and ld.lld's handling of
+> orphan sections. Similarly, the recent FGKASLR series brough up orphan
+> section handling too[2]. In both cases, it would have been nice if the
+> linker was running with --orphan-handling=warn so that surprise sections
+> wouldn't silently get mapped into the kernel image at locations up to
+> the whim of the linker's orphan handling logic. Instead, all desired
+> sections should be explicitly identified in the linker script (to be
+> either kept or discarded) with any orphans throwing a warning. The
+> powerpc architecture actually already does this, so this series seeks
+> to extend this coverage to x86, arm64, and arm.
 >
-> I do not see much sense in the last two lines in DEFCONFIG_LIST.
+> This series depends on tip/x86/boot (where recent .eh_frame fixes[3]
+> landed), and has a minor conflict[4] with the ARM tree (related to
+> the earlier mentioned bug). As it uses refactorings in the asm-generic
+> linker script, and makes changes to kbuild, I think the cleanest place
+> for this series to land would also be through -tip. Once again (like
+> my READ_IMPLIES_EXEC series), I'm looking to get maintainer Acks so
+> this can go all together with the least disruption. Splitting it up by
+> architecture seems needlessly difficult.
 >
-> [1] ARCH_DEFCONFIG
+> Thanks!
 >
-> The entry for DEFCONFIG_LIST is guarded by 'depends on !UML'. So, the
-> ARCH_DEFCONFIG definition in arch/x86/um/Kconfig is meaningless.
+> -Kees
 >
-> arch/{sh,sparc,x86}/Kconfig define ARCH_DEFCONFIG depending on 32 or
-> 64 bit variant symbols. This is a little bit strange; ARCH_DEFCONFIG
-> should be a fixed string because the base config file is loaded before
-> the symbol evaluation stage.
+> [1] https://github.com/ClangBuiltLinux/linux/issues/282
+> [2] https://lore.kernel.org/lkml/202002242122.AA4D1B8@keescook/
+> [3] https://lore.kernel.org/lkml/158264960194.28353.10560165361470246192.tip-bot2@tip-bot2/
+> [4] https://www.arm.linux.org.uk/developer/patches/viewpatch.php?id=8959/1
 >
-> Using KBUILD_DEFCONFIG makes more sense because it is fixed before
-> Kconfig is invoked. Fortunately, arch/{sh,sparc,x86}/Makefile define it
-> in the same way, and it works as expected. Hence, replace ARCH_DEFCONFIG
-> with "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)".
->
-> [2] arch/$(ARCH)/defconfig
->
-> This file path is no longer valid. The defconfig files are always located
-> in the arch configs/ directories.
->
->   $ find arch -name defconfig | sort
->   arch/alpha/configs/defconfig
->   arch/arm64/configs/defconfig
->   arch/csky/configs/defconfig
->   arch/nds32/configs/defconfig
->   arch/riscv/configs/defconfig
->   arch/s390/configs/defconfig
->   arch/unicore32/configs/defconfig
->
-> The path arch/*/configs/defconfig is already covered by
-> "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)". So, this file path is
-> not necessary.
->
-> I moved the default KBUILD_DEFCONFIG to the top Makefile. Otherwise,
-> the 7 architectures listed above would end up with endless loop of
-> syncconfig.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Hi Kees,
+
+is this an updated version of what you have in your
+kees/linux.git#linker/orphans/x86-arm Git branch?
+
+Especially, I saw a difference in [2] and "[PATCH 4/9] x86/boot: Warn
+on orphan section placement"
+
+[ arch/x86/boot/compressed/Makefile ]
+
++KBUILD_LDFLAGS += --no-ld-generated-unwind-info
+
+Can you comment on why this KBUILD_LDFLAGS was added/needed?
+
+I like when people offer their work in a Git branch.
+Do you plan to do that?
+
+Thanks.
+
+Regards,
+- Sedat -
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=linker/orphans/x86-arm
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/commit/?h=linker/orphans/x86-arm&id=e43aa77956c40b9b6db0b37b3780423aa2e661ad
 
 
-I forgot to say this.
-This is v2.
 
-Changes in v2:
-  - Move KBUILD_DEFCONFIG to fix endless loop of syncconfig
-
-
-> ---
+> H.J. Lu (1):
+>   Add RUNTIME_DISCARD_EXIT to generic DISCARDS
 >
->  Makefile                 | 3 +++
->  arch/sh/Kconfig          | 5 -----
->  arch/sparc/Kconfig       | 5 -----
->  arch/x86/Kconfig         | 5 -----
->  arch/x86/um/Kconfig      | 5 -----
->  init/Kconfig             | 3 +--
->  scripts/kconfig/Makefile | 4 ----
->  7 files changed, 4 insertions(+), 26 deletions(-)
+> Kees Cook (8):
+>   scripts/link-vmlinux.sh: Delay orphan handling warnings until final
+>     link
+>   vmlinux.lds.h: Add .gnu.version* to DISCARDS
+>   x86/build: Warn on orphan section placement
+>   x86/boot: Warn on orphan section placement
+>   arm64/build: Use common DISCARDS in linker script
+>   arm64/build: Warn on orphan section placement
+>   arm/build: Warn on orphan section placement
+>   arm/boot: Warn on orphan section placement
 >
-> diff --git a/Makefile b/Makefile
-> index 81d130ad9534..17cc09304561 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -388,6 +388,9 @@ endif
->  KCONFIG_CONFIG ?= .config
->  export KCONFIG_CONFIG
+>  arch/arm/Makefile                             |  4 ++++
+>  arch/arm/boot/compressed/Makefile             |  2 ++
+>  arch/arm/boot/compressed/vmlinux.lds.S        | 17 ++++++--------
+>  .../arm/{kernel => include/asm}/vmlinux.lds.h | 22 ++++++++++++++-----
+>  arch/arm/kernel/vmlinux-xip.lds.S             |  5 ++---
+>  arch/arm/kernel/vmlinux.lds.S                 |  5 ++---
+>  arch/arm64/Makefile                           |  4 ++++
+>  arch/arm64/kernel/vmlinux.lds.S               | 13 +++++------
+>  arch/x86/Makefile                             |  4 ++++
+>  arch/x86/boot/compressed/Makefile             |  3 ++-
+>  arch/x86/boot/compressed/vmlinux.lds.S        | 13 +++++++++++
+>  arch/x86/kernel/vmlinux.lds.S                 |  7 ++++++
+>  include/asm-generic/vmlinux.lds.h             | 11 ++++++++--
+>  scripts/link-vmlinux.sh                       |  6 +++++
+>  14 files changed, 85 insertions(+), 31 deletions(-)
+>  rename arch/arm/{kernel => include/asm}/vmlinux.lds.h (92%)
 >
-> +# Default file for 'make defconfig'. This may be overridden by arch-Makefile.
-> +export KBUILD_DEFCONFIG := defconfig
-> +
->  # SHELL used by kbuild
->  CONFIG_SHELL := sh
->
-> diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
-> index 9ece111b0254..b4f0e37b83eb 100644
-> --- a/arch/sh/Kconfig
-> +++ b/arch/sh/Kconfig
-> @@ -87,11 +87,6 @@ config SUPERH64
->         select HAVE_EXIT_THREAD
->         select KALLSYMS
->
-> -config ARCH_DEFCONFIG
-> -       string
-> -       default "arch/sh/configs/shx3_defconfig" if SUPERH32
-> -       default "arch/sh/configs/cayman_defconfig" if SUPERH64
-> -
->  config GENERIC_BUG
->         def_bool y
->         depends on BUG && SUPERH32
-> diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
-> index c1dd6dd642f4..0de15380d1fc 100644
-> --- a/arch/sparc/Kconfig
-> +++ b/arch/sparc/Kconfig
-> @@ -95,11 +95,6 @@ config SPARC64
->         select PCI_DOMAINS if PCI
->         select ARCH_HAS_GIGANTIC_PAGE
->
-> -config ARCH_DEFCONFIG
-> -       string
-> -       default "arch/sparc/configs/sparc32_defconfig" if SPARC32
-> -       default "arch/sparc/configs/sparc64_defconfig" if SPARC64
-> -
->  config ARCH_PROC_KCORE_TEXT
->         def_bool y
->
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index beea77046f9b..98935f4387f9 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -240,11 +240,6 @@ config OUTPUT_FORMAT
->         default "elf32-i386" if X86_32
->         default "elf64-x86-64" if X86_64
->
-> -config ARCH_DEFCONFIG
-> -       string
-> -       default "arch/x86/configs/i386_defconfig" if X86_32
-> -       default "arch/x86/configs/x86_64_defconfig" if X86_64
-> -
->  config LOCKDEP_SUPPORT
->         def_bool y
->
-> diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
-> index a8985e1f7432..95d26a69088b 100644
-> --- a/arch/x86/um/Kconfig
-> +++ b/arch/x86/um/Kconfig
-> @@ -27,11 +27,6 @@ config X86_64
->         def_bool 64BIT
->         select MODULES_USE_ELF_RELA
->
-> -config ARCH_DEFCONFIG
-> -       string
-> -       default "arch/um/configs/i386_defconfig" if X86_32
-> -       default "arch/um/configs/x86_64_defconfig" if X86_64
-> -
->  config 3_LEVEL_PGTABLES
->         bool "Three-level pagetables" if !64BIT
->         default 64BIT
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 20a6ac33761c..240c1ed15c69 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -6,8 +6,7 @@ config DEFCONFIG_LIST
->         default "/lib/modules/$(shell,uname -r)/.config"
->         default "/etc/kernel-config"
->         default "/boot/config-$(shell,uname -r)"
-> -       default ARCH_DEFCONFIG
-> -       default "arch/$(ARCH)/defconfig"
-> +       default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
->
->  config CC_IS_GCC
->         def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 5887ceb6229e..c9d0a4a8efb3 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -12,10 +12,6 @@ else
->  Kconfig := Kconfig
->  endif
->
-> -ifndef KBUILD_DEFCONFIG
-> -KBUILD_DEFCONFIG := defconfig
-> -endif
-> -
->  ifeq ($(quiet),silent_)
->  silent := -s
->  endif
 > --
-> 2.17.1
+> 2.20.1
 >
-
-
--- 
-Best Regards
-Masahiro Yamada
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200228002244.15240-1-keescook%40chromium.org.
