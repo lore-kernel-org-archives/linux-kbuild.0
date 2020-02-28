@@ -1,61 +1,181 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:40169 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730140AbgB1AWv (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:58005 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730586AbgB1DrP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Feb 2020 19:22:51 -0500
-Received: by mail-pj1-f67.google.com with SMTP id 12so498431pjb.5
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Feb 2020 16:22:50 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 1/9] scripts/link-vmlinux.sh: Delay orphan handling warnings until final link
-Date: Thu, 27 Feb 2020 16:22:36 -0800
-Message-Id: <20200228002244.15240-2-keescook@chromium.org>
-In-Reply-To: <20200228002244.15240-1-keescook@chromium.org>
-References: <20200228002244.15240-1-keescook@chromium.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 27 Feb 2020 22:47:15 -0500
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: use KBUILD_DEFCONFIG as the fallback for DEFCONFIG_LIST
+Date: Fri, 28 Feb 2020 12:46:40 +0900
+Message-Id: <20200228034640.25247-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@suse.de>
-Cc: Kees Cook <keescook@chromium.org>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, linux-um@lists.infradead.org, sparclinux@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-Right now, powerpc adds "--orphan-handling=warn" to LD_FLAGS_vmlinux
-to detect when there are unexpected sections getting added to the kernel
-image. There is no need to report these warnings more than once, so it
-can be removed until the final link stage.
+Most of the Kconfig commands (except defconfig and all*config) read
+the .config file as a base set of CONFIG options.
 
-This helps pave the way for other architectures to enable this, with the
-end goal of enabling this warning by default for vmlinux for all
-architectures.
+When it does not exist, the files in DEFCONFIG_LIST are searched in
+this order and loaded if found.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
+I do not see much sense in the last two lines in DEFCONFIG_LIST.
+
+[1] ARCH_DEFCONFIG
+
+The entry for DEFCONFIG_LIST is guarded by 'depends on !UML'. So, the
+ARCH_DEFCONFIG definition in arch/x86/um/Kconfig is meaningless.
+
+arch/{sh,sparc,x86}/Kconfig define ARCH_DEFCONFIG depending on 32 or
+64 bit variant symbols. This is a little bit strange; ARCH_DEFCONFIG
+should be a fixed string because the base config file is loaded before
+the symbol evaluation stage.
+
+Using KBUILD_DEFCONFIG makes more sense because it is fixed before
+Kconfig is invoked. Fortunately, arch/{sh,sparc,x86}/Makefile define it
+in the same way, and it works as expected. Hence, replace ARCH_DEFCONFIG
+with "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)".
+
+[2] arch/$(ARCH)/defconfig
+
+This file path is no longer valid. The defconfig files are always located
+in the arch configs/ directories.
+
+  $ find arch -name defconfig | sort
+  arch/alpha/configs/defconfig
+  arch/arm64/configs/defconfig
+  arch/csky/configs/defconfig
+  arch/nds32/configs/defconfig
+  arch/riscv/configs/defconfig
+  arch/s390/configs/defconfig
+  arch/unicore32/configs/defconfig
+
+The path arch/*/configs/defconfig is already covered by
+"arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)". So, this file path is
+not necessary.
+
+I moved the default KBUILD_DEFCONFIG to the top Makefile. Otherwise,
+the 7 architectures listed above would end up with endless loop of
+syncconfig.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- scripts/link-vmlinux.sh | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 1919c311c149..416968fea685 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -255,6 +255,11 @@ info GEN modules.builtin
- tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
- 	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$/.ko/' > modules.builtin
+ Makefile                 | 3 +++
+ arch/sh/Kconfig          | 5 -----
+ arch/sparc/Kconfig       | 5 -----
+ arch/x86/Kconfig         | 5 -----
+ arch/x86/um/Kconfig      | 5 -----
+ init/Kconfig             | 3 +--
+ scripts/kconfig/Makefile | 4 ----
+ 7 files changed, 4 insertions(+), 26 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 81d130ad9534..17cc09304561 100644
+--- a/Makefile
++++ b/Makefile
+@@ -388,6 +388,9 @@ endif
+ KCONFIG_CONFIG	?= .config
+ export KCONFIG_CONFIG
  
++# Default file for 'make defconfig'. This may be overridden by arch-Makefile.
++export KBUILD_DEFCONFIG := defconfig
 +
-+# Do not warn about orphan sections until the final link stage.
-+saved_LDFLAGS_vmlinux="${LDFLAGS_vmlinux}"
-+LDFLAGS_vmlinux="$(echo "${LDFLAGS_vmlinux}" | sed -E 's/ --orphan-handling=warn( |$)/ /g')"
-+
- btf_vmlinux_bin_o=""
- if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
- 	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
-@@ -306,6 +311,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
- 	fi
- fi
+ # SHELL used by kbuild
+ CONFIG_SHELL := sh
  
-+LDFLAGS_vmlinux="${saved_LDFLAGS_vmlinux}"
- vmlinux_link vmlinux "${kallsymso}" ${btf_vmlinux_bin_o}
+diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
+index 9ece111b0254..b4f0e37b83eb 100644
+--- a/arch/sh/Kconfig
++++ b/arch/sh/Kconfig
+@@ -87,11 +87,6 @@ config SUPERH64
+ 	select HAVE_EXIT_THREAD
+ 	select KALLSYMS
  
- if [ -n "${CONFIG_BUILDTIME_TABLE_SORT}" ]; then
+-config ARCH_DEFCONFIG
+-	string
+-	default "arch/sh/configs/shx3_defconfig" if SUPERH32
+-	default "arch/sh/configs/cayman_defconfig" if SUPERH64
+-
+ config GENERIC_BUG
+ 	def_bool y
+ 	depends on BUG && SUPERH32
+diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
+index c1dd6dd642f4..0de15380d1fc 100644
+--- a/arch/sparc/Kconfig
++++ b/arch/sparc/Kconfig
+@@ -95,11 +95,6 @@ config SPARC64
+ 	select PCI_DOMAINS if PCI
+ 	select ARCH_HAS_GIGANTIC_PAGE
+ 
+-config ARCH_DEFCONFIG
+-	string
+-	default "arch/sparc/configs/sparc32_defconfig" if SPARC32
+-	default "arch/sparc/configs/sparc64_defconfig" if SPARC64
+-
+ config ARCH_PROC_KCORE_TEXT
+ 	def_bool y
+ 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index beea77046f9b..98935f4387f9 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -240,11 +240,6 @@ config OUTPUT_FORMAT
+ 	default "elf32-i386" if X86_32
+ 	default "elf64-x86-64" if X86_64
+ 
+-config ARCH_DEFCONFIG
+-	string
+-	default "arch/x86/configs/i386_defconfig" if X86_32
+-	default "arch/x86/configs/x86_64_defconfig" if X86_64
+-
+ config LOCKDEP_SUPPORT
+ 	def_bool y
+ 
+diff --git a/arch/x86/um/Kconfig b/arch/x86/um/Kconfig
+index a8985e1f7432..95d26a69088b 100644
+--- a/arch/x86/um/Kconfig
++++ b/arch/x86/um/Kconfig
+@@ -27,11 +27,6 @@ config X86_64
+ 	def_bool 64BIT
+ 	select MODULES_USE_ELF_RELA
+ 
+-config ARCH_DEFCONFIG
+-	string
+-	default "arch/um/configs/i386_defconfig" if X86_32
+-	default "arch/um/configs/x86_64_defconfig" if X86_64
+-
+ config 3_LEVEL_PGTABLES
+ 	bool "Three-level pagetables" if !64BIT
+ 	default 64BIT
+diff --git a/init/Kconfig b/init/Kconfig
+index 20a6ac33761c..240c1ed15c69 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -6,8 +6,7 @@ config DEFCONFIG_LIST
+ 	default "/lib/modules/$(shell,uname -r)/.config"
+ 	default "/etc/kernel-config"
+ 	default "/boot/config-$(shell,uname -r)"
+-	default ARCH_DEFCONFIG
+-	default "arch/$(ARCH)/defconfig"
++	default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
+ 
+ config CC_IS_GCC
+ 	def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 5887ceb6229e..c9d0a4a8efb3 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -12,10 +12,6 @@ else
+ Kconfig := Kconfig
+ endif
+ 
+-ifndef KBUILD_DEFCONFIG
+-KBUILD_DEFCONFIG := defconfig
+-endif
+-
+ ifeq ($(quiet),silent_)
+ silent := -s
+ endif
 -- 
-2.20.1
+2.17.1
