@@ -1,109 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:32779 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726440AbgB1KDI (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:28884 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbgB1Knh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Feb 2020 05:03:08 -0500
-Received: by mail-wr1-f66.google.com with SMTP id x7so2303878wrr.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Feb 2020 02:03:07 -0800 (PST)
-Date: Fri, 28 Feb 2020 10:03:02 +0000
-From: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v5 2/3] kbuild: split adjust_autoksyms.sh in two parts
-Message-ID: <20200228100302.GA228304@google.com>
-References: <20200218094139.78835-1-qperret@google.com>
- <20200218094139.78835-3-qperret@google.com>
- <CAK7LNAS0D_1k8FUJ+Bre1jrtGvHu28psU_xCa=K24iD7BkcJeA@mail.gmail.com>
+        Fri, 28 Feb 2020 05:43:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAS0D_1k8FUJ+Bre1jrtGvHu28psU_xCa=K24iD7BkcJeA@mail.gmail.com>
+References: <20200218094139.78835-1-qperret@google.com> <20200218094139.78835-4-qperret@google.com>
+In-Reply-To: <20200218094139.78835-4-qperret@google.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 28 Feb 2020 19:42:41 +0900
+Message-ID: <CAK7LNASCrTj4_RgtxvZm0ei_HExYaPPMJodngKXBOL+=GODv5w@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] kbuild: generate autoksyms.h early
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
+To: Quentin Perret <qperret@google.com>
 Cc: Nicolas Pitre <nico@fluxnic.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthias Maennich <maennich@google.com>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Christoph Hellwig <hch@infradead.org>
 
-On Friday 28 Feb 2020 at 01:41:50 (+0900), Masahiro Yamada wrote:
-> Hi.
-> 
-> On Tue, Feb 18, 2020 at 6:41 PM Quentin Perret <qperret@google.com> wrote:
-> >
-> > In order to prepare the ground for a build-time optimization, split
-> > adjust_autoksyms.sh into two scripts: one that generates autoksyms.h
-> > based on all currently available information (whitelist, and .mod
-> > files), and the other to inspect the diff between two versions of
-> > autoksyms.h and trigger appropriate rebuilds.
-> >
-> > Acked-by: Nicolas Pitre <nico@fluxnic.net>
-> > Tested-by: Matthias Maennich <maennich@google.com>
-> > Reviewed-by: Matthias Maennich <maennich@google.com>
-> > Signed-off-by: Quentin Perret <qperret@google.com>
-> > ---
-> >  scripts/adjust_autoksyms.sh | 36 +++-----------------------
-> >  scripts/gen_autoksyms.sh    | 51 +++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 55 insertions(+), 32 deletions(-)
-> >  create mode 100755 scripts/gen_autoksyms.sh
-> >
-> > diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-> > index ff46996525d3..2b366d945ccb 100755
-> > --- a/scripts/adjust_autoksyms.sh
-> > +++ b/scripts/adjust_autoksyms.sh
-> > @@ -1,14 +1,13 @@
-> >  #!/bin/sh
-> >  # SPDX-License-Identifier: GPL-2.0-only
-> >
-> > -# Script to create/update include/generated/autoksyms.h and dependency files
-> > +# Script to update include/generated/autoksyms.h and dependency files
-> >  #
-> >  # Copyright:   (C) 2016  Linaro Limited
-> >  # Created by:  Nicolas Pitre, January 2016
-> >  #
-> >
-> > -# Create/update the include/generated/autoksyms.h file from the list
-> > -# of all module's needed symbols as recorded on the second line of *.mod files.
-> > +# Update the include/generated/autoksyms.h file.
-> >  #
-> >  # For each symbol being added or removed, the corresponding dependency
-> >  # file's timestamp is updated to force a rebuild of the affected source
-> > @@ -38,35 +37,8 @@ esac
-> >  # We need access to CONFIG_ symbols
-> >  . include/config/auto.conf
-> >
-> > -ksym_wl=/dev/null
-> > -if [ -n "$CONFIG_UNUSED_KSYMS_WHITELIST" ]; then
-> > -       # Use 'eval' to expand the whitelist path and check if it is relative
-> > -       eval ksym_wl="$CONFIG_UNUSED_KSYMS_WHITELIST"
-> > -       [ "${ksym_wl}" != "${ksym_wl#/}" ] || ksym_wl="$abs_srctree/$ksym_wl"
-> > -       if [ ! -f "$ksym_wl" ]; then
-> 
-> 
-> Just a Nit.
-> 
-> Maybe, is testing  -r better ?
-> 
-> 'cat - "$ksym_wl"' is piped, so its error code is not checked.
-> 
-> So, checking the read permission here is robust, I think.
+On Tue, Feb 18, 2020 at 6:41 PM Quentin Perret <qperret@google.com> wrote:
+>
+> When doing a cold build, autoksyms.h starts empty, and is updated late
+> in the build process to have visibility over the symbols used by in-tree
+> drivers. But since the symbol whitelist is known upfront, it can be used
+> to pre-populate autoksyms.h and maximize the amount of code that can be
+> compiled to its final state in a single pass, hence reducing build time.
+>
+> Do this by using gen_autoksyms.sh to initialize autoksyms.h instead of
+> creating an empty file.
+>
+> Acked-by: Nicolas Pitre <nico@fluxnic.net>
+> Tested-by: Matthias Maennich <maennich@google.com>
+> Reviewed-by: Matthias Maennich <maennich@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  Makefile                 | 7 +++++--
+>  scripts/gen_autoksyms.sh | 3 ++-
+>  2 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 84b71845c43f..17b7e7f441bd 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1062,9 +1062,12 @@ endif
+>
+>  autoksyms_h := $(if $(CONFIG_TRIM_UNUSED_KSYMS), include/generated/autoksyms.h)
+>
+> +quiet_cmd_autoksyms_h = GEN     $@
+> +      cmd_autoksyms_h = mkdir -p $(dir $@); $(CONFIG_SHELL) \
+> +                       $(srctree)/scripts/gen_autoksyms.sh $@
 
-Right, that's a good point. And actually, I think we want both -f and
--r. -r alone would consider a path to a folder as correct.
 
-This should do the trick:
+When you send v6,
+could you wrap the line as follows (CONFIG_SHELL in the next line)  ?
 
-diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
-index 679c9f05e4b4..16c0b2ddaa4c 100755
---- a/scripts/gen_autoksyms.sh
-+++ b/scripts/gen_autoksyms.sh
-@@ -24,7 +24,7 @@ if [ -n "$CONFIG_UNUSED_KSYMS_WHITELIST" ]; then
-        # Use 'eval' to expand the whitelist path and check if it is relative
-        eval ksym_wl="$CONFIG_UNUSED_KSYMS_WHITELIST"
-        [ "${ksym_wl}" != "${ksym_wl#/}" ] || ksym_wl="$abs_srctree/$ksym_wl"
--       if [ ! -f "$ksym_wl" ]; then
-+       if [ ! -f "$ksym_wl" ] || [ ! -r "$ksym_wl" ]; then
-                echo "ERROR: '$ksym_wl' whitelist file not found" >&2
-                exit 1
-        fi
+         cmd_autoksyms_h = mkdir -p $(dir $@); \
+                          $(CONFIG_SHELL) $(srctree)/scripts/gen_autoksyms.sh $@
 
-I'll send a v6 shortly.
 
-Thanks!
-Quentin
+This still fits in 80-cols.
+
+Thanks.
+
+
+
+
+> +
+>  $(autoksyms_h):
+> -       $(Q)mkdir -p $(dir $@)
+> -       $(Q)touch $@
+> +       $(call cmd,autoksyms_h)
+>
+>  ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+>
+> diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
+> index 6c625f52118f..679c9f05e4b4 100755
+> --- a/scripts/gen_autoksyms.sh
+> +++ b/scripts/gen_autoksyms.sh
+> @@ -39,7 +39,8 @@ cat > "$output_file" << EOT
+>
+>  EOT
+>
+> -sed 's/ko$/mod/' modules.order |
+> +[ -f modules.order ] && modlist=modules.order || modlist=/dev/null
+> +sed 's/ko$/mod/' $modlist |
+>  xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
+>  cat - "$ksym_wl" |
+>  sort -u |
+> --
+> 2.25.0.265.gbab2e86ba0-goog
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
