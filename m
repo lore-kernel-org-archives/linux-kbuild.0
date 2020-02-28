@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34139 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730432AbgB1AWy (ORCPT
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:40441 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730028AbgB1AWx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Feb 2020 19:22:54 -0500
-Received: by mail-pl1-f193.google.com with SMTP id j7so499165plt.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Feb 2020 16:22:53 -0800 (PST)
+        Thu, 27 Feb 2020 19:22:53 -0500
+Received: by mail-pf1-f193.google.com with SMTP id b185so726850pfb.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 27 Feb 2020 16:22:52 -0800 (PST)
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 7/9] arm64/build: Warn on orphan section placement
-Date: Thu, 27 Feb 2020 16:22:42 -0800
-Message-Id: <20200228002244.15240-8-keescook@chromium.org>
+Subject: [PATCH 2/9] vmlinux.lds.h: Add .gnu.version* to DISCARDS
+Date: Thu, 27 Feb 2020 16:22:37 -0800
+Message-Id: <20200228002244.15240-3-keescook@chromium.org>
 In-Reply-To: <20200228002244.15240-1-keescook@chromium.org>
 References: <20200228002244.15240-1-keescook@chromium.org>
 MIME-Version: 1.0
@@ -19,68 +19,26 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Borislav Petkov <bp@suse.de>
 Cc: Kees Cook <keescook@chromium.org>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
 
-We don't want to depend on the linker's orphan section placement
-heuristics as these can vary between linkers, and may change between
-versions. All sections need to be explicitly named in the linker
-script.
-
-Explicitly include debug sections when they're present. Add .eh_frame*
-to discard as it seems that these are still generated even though
--fno-asynchronous-unwind-tables is being specified. Add .plt and
-.data.rel.ro to discards as they are not actually used. Add .got.plt
-to the image as it does appear to be mapped near .data. Finally enable
-orphan section warnings.
+For vmlinux linking, no architecture uses the .gnu.version* section,
+so remove it via the common DISCARDS macro in preparation for adding
+--orphan-handling=warn more widely.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/Makefile             | 4 ++++
- arch/arm64/kernel/vmlinux.lds.S | 5 ++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ include/asm-generic/vmlinux.lds.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index dca1a97751ab..c682a65b3ab8 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -30,6 +30,10 @@ LDFLAGS_vmlinux	+= --fix-cortex-a53-843419
-   endif
- endif
- 
-+# We never want expected sections to be placed heuristically by the
-+# linker. All sections should be explicitly named in the linker script.
-+LDFLAGS_vmlinux += --orphan-handling=warn
-+
- ifeq ($(CONFIG_ARM64_USE_LSE_ATOMICS), y)
-   ifneq ($(CONFIG_ARM64_LSE_ATOMICS), y)
- $(warning LSE atomics not supported by binutils)
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index c61d9ab3211c..6141d5b72f8f 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -98,7 +98,8 @@ SECTIONS
- 	/DISCARD/ : {
- 		*(.interp .dynamic)
- 		*(.dynsym .dynstr .hash .gnu.hash)
--		*(.eh_frame)
-+		*(.plt) *(.data.rel.ro)
-+		*(.eh_frame) *(.init.eh_frame)
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index e00f41aa8ec4..303597e51396 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -902,6 +902,7 @@
+ 	*(.discard)							\
+ 	*(.discard.*)							\
+ 	*(.modinfo)							\
++	*(.gnu.version*)						\
  	}
  
- 	. = KIMAGE_VADDR + TEXT_OFFSET;
-@@ -212,6 +213,7 @@ SECTIONS
- 	_data = .;
- 	_sdata = .;
- 	RW_DATA(L1_CACHE_BYTES, PAGE_SIZE, THREAD_ALIGN)
-+	.got.plt : ALIGN(8) { *(.got.plt) }
- 
- 	/*
- 	 * Data written with the MMU off but read with the MMU on requires
-@@ -246,6 +248,7 @@ SECTIONS
- 	_end = .;
- 
- 	STABS_DEBUG
-+	DWARF_DEBUG
- 
- 	HEAD_SYMBOLS
- }
+ /**
 -- 
 2.20.1
