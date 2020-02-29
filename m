@@ -1,145 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:31730 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726046AbgB2E0D (ORCPT
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41128 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727119AbgB2QK2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Feb 2020 23:26:03 -0500
+        Sat, 29 Feb 2020 11:10:28 -0500
+From: =?UTF-8?q?SZ=20Lin=20=28=E6=9E=97=E4=B8=8A=E6=99=BA=29?=
+        <sz.lin@moxa.com>
+Subject: [PATCH] kbuild: Fix inconsistent comment
+Date: Sun,  1 Mar 2020 00:09:58 +0800
+Message-Id: <20200229160959.871801-1-sz.lin@moxa.com>
 MIME-Version: 1.0
-References: <20200229003731.2728-1-robh@kernel.org>
-In-Reply-To: <20200229003731.2728-1-robh@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 29 Feb 2020 13:25:15 +0900
-Message-ID: <CAK7LNAQUbfVvYYSuMNnB2OyNbuYZkzY0gsKRybe-0P9GuYZN2w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: =?UTF-8?q?SZ=20Lin=20=28=E6=9E=97=E4=B8=8A=E6=99=BA=29?= <sz.lin@moxa.com>, Kaiden PK Yu <KaidenPK.Yu@moxa.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Rob,
+The commit 2042b5486bd3 ("kbuild: unset variables in top Makefile
+instead of setting 0") renamed the variable from "config-targets"
+to "config-build", the comment should be consistent accordingly.
 
-On Sat, Feb 29, 2020 at 9:37 AM Rob Herring <robh@kernel.org> wrote:
->
-> Most folks only run dt_binding_check on the single schema they care about
-> by setting DT_SCHEMA_FILES. That means example is only checked against
-> that one schema which is not always sufficient.
->
-> Let's address this by splitting processed-schema.yaml into 2 files: one
-> that's always all schemas for the examples and one that's just the schema
-> in DT_SCHEMA_FILES for dtbs.
->
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: linux-kbuild@vger.kernel.org
-> Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> Masahiro, given you pretty much re-wrote this, I added you as
-> Co-developed-by.
+Signed-off-by: Kaiden PK Yu (余泊鎧) <KaidenPK.Yu@moxa.com>
+Signed-off-by: SZ Lin (林上智) <sz.lin@moxa.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
-I can apply both to my kbuild tree.
-
-Or, if you want to apply them to your tree,
-please add my
-Acked-by: Masahiro Yamada <masahiroy@kernel.org>
-
-
-Either way is fine.
-
-Thanks.
-
-
-
->
-> Based on next/master
->
->  Documentation/devicetree/bindings/.gitignore |  2 +-
->  Documentation/devicetree/bindings/Makefile   | 22 +++++++++++++-------
->  scripts/Makefile.lib                         |  3 ++-
->  3 files changed, 17 insertions(+), 10 deletions(-)
->
-> diff --git a/Documentation/devicetree/bindings/.gitignore b/Documentation/devicetree/bindings/.gitignore
-> index ef82fcfcccab..57afa1533a5f 100644
-> --- a/Documentation/devicetree/bindings/.gitignore
-> +++ b/Documentation/devicetree/bindings/.gitignore
-> @@ -1,2 +1,2 @@
->  *.example.dts
-> -processed-schema.yaml
-> +processed-schema*.yaml
-> diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
-> index 646cb3525373..7c40d5ba1b51 100644
-> --- a/Documentation/devicetree/bindings/Makefile
-> +++ b/Documentation/devicetree/bindings/Makefile
-> @@ -2,7 +2,6 @@
->  DT_DOC_CHECKER ?= dt-doc-validate
->  DT_EXTRACT_EX ?= dt-extract-example
->  DT_MK_SCHEMA ?= dt-mk-schema
-> -DT_MK_SCHEMA_FLAGS := $(if $(DT_SCHEMA_FILES), -u)
->
->  quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
->        cmd_chk_binding = $(DT_DOC_CHECKER) -u $(srctree)/$(src) $< ; \
-> @@ -11,26 +10,33 @@ quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
->  $(obj)/%.example.dts: $(src)/%.yaml FORCE
->         $(call if_changed,chk_binding)
->
-> -DT_TMP_SCHEMA := processed-schema.yaml
-> +# Use full schemas when checking %.example.dts
-> +DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
->
->  quiet_cmd_mk_schema = SCHEMA  $@
->        cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $(real-prereqs)
->
-> -DT_DOCS = $(shell \
-> +DT_DOCS = $(addprefix $(src)/, \
-> +       $(shell \
->         cd $(srctree)/$(src) && \
->         find * \( -name '*.yaml' ! \
-> -               -name $(DT_TMP_SCHEMA) ! \
-> +               -name 'processed-schema*' ! \
->                 -name '*.example.dt.yaml' \) \
-> -       )
-> +       ))
->
-> -DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
-> +DT_SCHEMA_FILES ?= $(DT_DOCS)
->
->  ifeq ($(CHECK_DTBS),)
->  extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
->  extra-y += $(patsubst $(src)/%.yaml,%.example.dt.yaml, $(DT_SCHEMA_FILES))
-> +extra-y += processed-schema-examples.yaml
-> +
-> +$(obj)/processed-schema-examples.yaml: $(DT_DOCS) FORCE
-> +       $(call if_changed,mk_schema)
->  endif
->
-> -$(obj)/$(DT_TMP_SCHEMA): $(DT_SCHEMA_FILES) FORCE
-> +$(obj)/processed-schema.yaml: DT_MK_SCHEMA_FLAGS := -u
-> +$(obj)/processed-schema.yaml: $(DT_SCHEMA_FILES) FORCE
->         $(call if_changed,mk_schema)
->
-> -extra-y += $(DT_TMP_SCHEMA)
-> +extra-y += processed-schema.yaml
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index f5ff506e4a24..b12dd5ba4896 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -307,7 +307,8 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
->
->  DT_CHECKER ?= dt-validate
->  DT_BINDING_DIR := Documentation/devicetree/bindings
-> -DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
-> +# DT_TMP_SCHEMA may be overridden from Documentation/devicetree/bindings/Makefile
-> +DT_TMP_SCHEMA ?= $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
->
->  quiet_cmd_dtb_check =  CHECK   $@
->        cmd_dtb_check =  $(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
-> --
-> 2.20.1
->
-
-
+diff --git a/Makefile b/Makefile
+index 90ee2a22e88b..01ac935f28bd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1805,7 +1805,7 @@ existing-targets := $(wildcard $(sort $(targets)))
+ 
+ -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+ 
+-endif # config-targets
++endif # config-build
+ endif # mixed-build
+ endif # need-sub-make
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
