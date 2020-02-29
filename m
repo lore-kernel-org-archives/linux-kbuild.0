@@ -1,117 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:40804 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726359AbgB2Ahf (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:37137 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbgB2ERV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Feb 2020 19:37:35 -0500
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH v2 1/2] kbuild: Always validate DT binding examples 
-Date: Fri, 28 Feb 2020 18:37:30 -0600
-Message-Id: <20200229003731.2728-1-robh@kernel.org>
+        Fri, 28 Feb 2020 23:17:21 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200228172015.44369-1-qperret@google.com>
+In-Reply-To: <20200228172015.44369-1-qperret@google.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 29 Feb 2020 13:16:29 +0900
+Message-ID: <CAK7LNAQniztgAbF8N_OK+BJmaVUTVzhYmnY0-u1R_VsfEdOkTA@mail.gmail.com>
+Subject: Re: [PATCH v6 0/3] kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYM
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+To: Quentin Perret <qperret@google.com>
+Cc: Nicolas Pitre <nico@fluxnic.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Matthias Maennich <maennich@google.com>, "Cc: Android Kernel" <kernel-team@android.com>, Jessica Yu <jeyu@kernel.org>, Christoph Hellwig <hch@infradead.org>
 
-Most folks only run dt_binding_check on the single schema they care about
-by setting DT_SCHEMA_FILES. That means example is only checked against
-that one schema which is not always sufficient.
+On Sat, Feb 29, 2020 at 2:20 AM Quentin Perret <qperret@google.com> wrote:
+>
+> The current norm on Android and many other systems is for vendors to
+> introduce significant changes to their downstream kernels, and to
+> contribute very little (if any) code back upstream. The Generic Kernel
+> Image (GKI) project in Android attempts to improve the status-quo by
+> having a unique kernel for all android devices of the same architecture,
+> regardless of the SoC vendor. The key idea is to make all interested
+> parties agree on a common solution, and contribute their code upstream
+> to make it available to use by the wider community.
+>
+> The kernel-to-drivers ABI on Android devices varies significantly from
+> one vendor kernel to another today because of changes to exported
+> symbols, dependencies on vendor symbols, and surely other things. The
+> first step for GKI is to try and put some order into this by agreeing on
+> one version of the ABI that works for everybody.
+>
+> For practical reasons, we need to reduce the ABI surface to a subset of
+> the exported symbols, simply to make the problem realistically solvable,
+> but there is currently no upstream support for this use-case.
+>
+> As such, this series attempts to improve the situation by enabling users
+> to specify a symbol 'whitelist' at compile time. Any symbol specified in
+> this whitelist will be kept exported when CONFIG_TRIM_UNUSED_KSYMS is
+> set, even if it has no in-tree user. The whitelist is defined as a
+> simple text file, listing symbols, one per line.
 
-Let's address this by splitting processed-schema.yaml into 2 files: one
-that's always all schemas for the examples and one that's just the schema
-in DT_SCHEMA_FILES for dtbs.
 
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
-Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Rob Herring <robh@kernel.org>
----
-Masahiro, given you pretty much re-wrote this, I added you as 
-Co-developed-by.
+Series, applied to linux-kbuild.
 
-Based on next/master
+Thanks.
 
- Documentation/devicetree/bindings/.gitignore |  2 +-
- Documentation/devicetree/bindings/Makefile   | 22 +++++++++++++-------
- scripts/Makefile.lib                         |  3 ++-
- 3 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/.gitignore b/Documentation/devicetree/bindings/.gitignore
-index ef82fcfcccab..57afa1533a5f 100644
---- a/Documentation/devicetree/bindings/.gitignore
-+++ b/Documentation/devicetree/bindings/.gitignore
-@@ -1,2 +1,2 @@
- *.example.dts
--processed-schema.yaml
-+processed-schema*.yaml
-diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
-index 646cb3525373..7c40d5ba1b51 100644
---- a/Documentation/devicetree/bindings/Makefile
-+++ b/Documentation/devicetree/bindings/Makefile
-@@ -2,7 +2,6 @@
- DT_DOC_CHECKER ?= dt-doc-validate
- DT_EXTRACT_EX ?= dt-extract-example
- DT_MK_SCHEMA ?= dt-mk-schema
--DT_MK_SCHEMA_FLAGS := $(if $(DT_SCHEMA_FILES), -u)
- 
- quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
-       cmd_chk_binding = $(DT_DOC_CHECKER) -u $(srctree)/$(src) $< ; \
-@@ -11,26 +10,33 @@ quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
- $(obj)/%.example.dts: $(src)/%.yaml FORCE
- 	$(call if_changed,chk_binding)
- 
--DT_TMP_SCHEMA := processed-schema.yaml
-+# Use full schemas when checking %.example.dts
-+DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
- 
- quiet_cmd_mk_schema = SCHEMA  $@
-       cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $(real-prereqs)
- 
--DT_DOCS = $(shell \
-+DT_DOCS = $(addprefix $(src)/, \
-+	$(shell \
- 	cd $(srctree)/$(src) && \
- 	find * \( -name '*.yaml' ! \
--		-name $(DT_TMP_SCHEMA) ! \
-+		-name 'processed-schema*' ! \
- 		-name '*.example.dt.yaml' \) \
--	)
-+	))
- 
--DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
-+DT_SCHEMA_FILES ?= $(DT_DOCS)
- 
- ifeq ($(CHECK_DTBS),)
- extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
- extra-y += $(patsubst $(src)/%.yaml,%.example.dt.yaml, $(DT_SCHEMA_FILES))
-+extra-y += processed-schema-examples.yaml
-+
-+$(obj)/processed-schema-examples.yaml: $(DT_DOCS) FORCE
-+	$(call if_changed,mk_schema)
- endif
- 
--$(obj)/$(DT_TMP_SCHEMA): $(DT_SCHEMA_FILES) FORCE
-+$(obj)/processed-schema.yaml: DT_MK_SCHEMA_FLAGS := -u
-+$(obj)/processed-schema.yaml: $(DT_SCHEMA_FILES) FORCE
- 	$(call if_changed,mk_schema)
- 
--extra-y += $(DT_TMP_SCHEMA)
-+extra-y += processed-schema.yaml
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index f5ff506e4a24..b12dd5ba4896 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -307,7 +307,8 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
- 
- DT_CHECKER ?= dt-validate
- DT_BINDING_DIR := Documentation/devicetree/bindings
--DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
-+# DT_TMP_SCHEMA may be overridden from Documentation/devicetree/bindings/Makefile
-+DT_TMP_SCHEMA ?= $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
- 
- quiet_cmd_dtb_check =	CHECK   $@
-       cmd_dtb_check =	$(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
+> v6:
+>  - made permission checks on the whitelist file more robust (Masahiro)
+>  - better style/identation in Makefile (Masahiro)
+>
+> v5:
+>  - made sure to be POSIX-compliant (+ tested with dash and posh)
+>  - added failure path if the whitelist path is incorrect (Matthias,
+>    Nicolas)
+>  - collected Acked-By (and other) tags from Nicolas and Matthias
+>
+> v4:
+>  - removed [[]] bash-specific pattern from the scripts (Nicolas)
+>  - use $CONFIG_SHELL consistently in all patches (Masahiro)
+>  - added shortlog for initial generation of autoksyms.h (Masahiro)
+>  - added comment on how 'eval' expands the whitelist path (Masahiro)
+>
+> v3:
+>  - added a cover letter to explain why this is in fact an attempt to
+>    help upstream in the long term (Christoph)
+>  - made path relative to the kernel source tree (Matthias)
+>  - made the Kconfig help text less confusing (Jessica)
+>  - added patch 02 and 03 to optimize build time when a whitelist is
+>    provided
+>
+> v2:
+>  - make sure to quote the whitelist path properly (Nicolas)
+>
+> Quentin Perret (3):
+>   kbuild: allow symbol whitelisting with TRIM_UNUSED_KSYMS
+>   kbuild: split adjust_autoksyms.sh in two parts
+>   kbuild: generate autoksyms.h early
+>
+>  Makefile                    |  7 +++--
+>  init/Kconfig                | 13 ++++++++++
+>  scripts/adjust_autoksyms.sh | 24 +++--------------
+>  scripts/gen_autoksyms.sh    | 52 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 74 insertions(+), 22 deletions(-)
+>  create mode 100755 scripts/gen_autoksyms.sh
+>
+> --
+> 2.25.1.481.gfbce0eb801-goog
+>
+
+
 -- 
-2.20.1
+Best Regards
+Masahiro Yamada
