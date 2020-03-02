@@ -1,123 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp1.pobox.com ([64.147.108.70]:58160 "EHLO
-        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727032AbgCBPdZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Mar 2020 10:33:25 -0500
-Date: Mon, 2 Mar 2020 10:33:19 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH 2/2] kconfig: make 'imply' obey the direct dependency
-In-Reply-To: <20200302062340.21453-2-masahiroy@kernel.org>
-Message-ID: <nycvar.YSQ.7.76.2003021032000.1559@knanqh.ubzr>
-References: <20200302062340.21453-1-masahiroy@kernel.org> <20200302062340.21453-2-masahiroy@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:39240 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726390AbgCBQG5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 2 Mar 2020 11:06:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20200229003731.2728-1-robh@kernel.org> <CAK7LNAQUbfVvYYSuMNnB2OyNbuYZkzY0gsKRybe-0P9GuYZN2w@mail.gmail.com>
+In-Reply-To: <CAK7LNAQUbfVvYYSuMNnB2OyNbuYZkzY0gsKRybe-0P9GuYZN2w@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 2 Mar 2020 10:06:40 -0600
+Message-ID: <CAL_JsqLqZYZXGg8-FnoV8EFKSK8moQjEWe93+FazEbh9GTxQpw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ulf Magnusson <ulfalizer@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org
+Cc: DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, 2 Mar 2020, Masahiro Yamada wrote:
+On Fri, Feb 28, 2020 at 10:25 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Hi Rob,
+>
+> On Sat, Feb 29, 2020 at 9:37 AM Rob Herring <robh@kernel.org> wrote:
+> >
+> > Most folks only run dt_binding_check on the single schema they care about
+> > by setting DT_SCHEMA_FILES. That means example is only checked against
+> > that one schema which is not always sufficient.
+> >
+> > Let's address this by splitting processed-schema.yaml into 2 files: one
+> > that's always all schemas for the examples and one that's just the schema
+> > in DT_SCHEMA_FILES for dtbs.
+> >
+> > Cc: Michal Marek <michal.lkml@markovi.net>
+> > Cc: linux-kbuild@vger.kernel.org
+> > Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+> > ---
+> > Masahiro, given you pretty much re-wrote this, I added you as
+> > Co-developed-by.
+>
+>
+>
+> I can apply both to my kbuild tree.
 
-> The 'imply' statement may create unmet direct dependency when the
-> implied symbol depends on m.
-> 
-> [Test Code]
-> 
->   config FOO
->           tristate "foo"
->           imply BAZ
-> 
->   config BAZ
->           tristate "baz"
->           depends on BAR
-> 
->   config BAR
->           def_tristate m
-> 
->   config MODULES
->           def_bool y
->           option modules
-> 
-> If you set FOO=y, BAZ is also promoted to y, which results in the
-> following .config file:
-> 
->   CONFIG_FOO=y
->   CONFIG_BAZ=y
->   CONFIG_BAR=m
->   CONFIG_MODULES=y
-> 
-> This does not meet the dependency 'BAZ depends on BAR'.
-> 
-> Unlike 'select', what is worse, Kconfig never shows the
-> 'WARNING: unmet direct dependencies detected for ...' for this case.
-> 
-> Because 'imply' is considered to be weaker than 'depends on', Kconfig
-> should take the direct dependency into account.
-> 
-> For clarification, describe this case in kconfig-language.rst too.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Please apply to your tree.
 
-Acked-by: Nicolas Pitre <nico@fluxnic.net>
+Rob
 
-> ---
-> 
->  Documentation/kbuild/kconfig-language.rst | 7 +++++--
->  scripts/kconfig/symbol.c                  | 4 +++-
->  2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-> index d4d988aea679..68719e78ff85 100644
-> --- a/Documentation/kbuild/kconfig-language.rst
-> +++ b/Documentation/kbuild/kconfig-language.rst
-> @@ -159,11 +159,11 @@ applicable everywhere (see syntax).
->    Given the following example::
->  
->      config FOO
-> -	tristate
-> +	tristate "foo"
->  	imply BAZ
->  
->      config BAZ
-> -	tristate
-> +	tristate "baz"
->  	depends on BAR
->  
->    The following values are possible:
-> @@ -174,6 +174,9 @@ applicable everywhere (see syntax).
->  	n		y		n		N/m/y
->  	m		y		m		M/y/n
->  	y		y		y		Y/m/n
-> +	n		m		n		N/m
-> +	m		m		m		M/n
-> +	y		m		n		M/n
->  	y		n		*		N
->  	===		===		=============	==============
->  
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index b101ef3c377a..3dc81397d003 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -221,7 +221,7 @@ static void sym_calc_visibility(struct symbol *sym)
->  		sym_set_changed(sym);
->  	}
->  	tri = no;
-> -	if (sym->implied.expr && sym->dir_dep.tri != no)
-> +	if (sym->implied.expr)
->  		tri = expr_calc_value(sym->implied.expr);
->  	if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
->  		tri = yes;
-> @@ -394,6 +394,8 @@ void sym_calc_value(struct symbol *sym)
->  				if (sym->implied.tri != no) {
->  					sym->flags |= SYMBOL_WRITE;
->  					newval.tri = EXPR_OR(newval.tri, sym->implied.tri);
-> +					newval.tri = EXPR_AND(newval.tri,
-> +							      sym->dir_dep.tri);
->  				}
->  			}
->  		calc_newval:
-> -- 
-> 2.17.1
-> 
-> 
+>
+> Or, if you want to apply them to your tree,
+> please add my
+> Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+>
+>
+> Either way is fine.
+>
+> Thanks.
+>
+>
+>
+> >
+> > Based on next/master
+> >
+> >  Documentation/devicetree/bindings/.gitignore |  2 +-
+> >  Documentation/devicetree/bindings/Makefile   | 22 +++++++++++++-------
+> >  scripts/Makefile.lib                         |  3 ++-
+> >  3 files changed, 17 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/.gitignore b/Documentation/devicetree/bindings/.gitignore
+> > index ef82fcfcccab..57afa1533a5f 100644
+> > --- a/Documentation/devicetree/bindings/.gitignore
+> > +++ b/Documentation/devicetree/bindings/.gitignore
+> > @@ -1,2 +1,2 @@
+> >  *.example.dts
+> > -processed-schema.yaml
+> > +processed-schema*.yaml
+> > diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
+> > index 646cb3525373..7c40d5ba1b51 100644
+> > --- a/Documentation/devicetree/bindings/Makefile
+> > +++ b/Documentation/devicetree/bindings/Makefile
+> > @@ -2,7 +2,6 @@
+> >  DT_DOC_CHECKER ?= dt-doc-validate
+> >  DT_EXTRACT_EX ?= dt-extract-example
+> >  DT_MK_SCHEMA ?= dt-mk-schema
+> > -DT_MK_SCHEMA_FLAGS := $(if $(DT_SCHEMA_FILES), -u)
+> >
+> >  quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
+> >        cmd_chk_binding = $(DT_DOC_CHECKER) -u $(srctree)/$(src) $< ; \
+> > @@ -11,26 +10,33 @@ quiet_cmd_chk_binding = CHKDT   $(patsubst $(srctree)/%,%,$<)
+> >  $(obj)/%.example.dts: $(src)/%.yaml FORCE
+> >         $(call if_changed,chk_binding)
+> >
+> > -DT_TMP_SCHEMA := processed-schema.yaml
+> > +# Use full schemas when checking %.example.dts
+> > +DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
+> >
+> >  quiet_cmd_mk_schema = SCHEMA  $@
+> >        cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@ $(real-prereqs)
+> >
+> > -DT_DOCS = $(shell \
+> > +DT_DOCS = $(addprefix $(src)/, \
+> > +       $(shell \
+> >         cd $(srctree)/$(src) && \
+> >         find * \( -name '*.yaml' ! \
+> > -               -name $(DT_TMP_SCHEMA) ! \
+> > +               -name 'processed-schema*' ! \
+> >                 -name '*.example.dt.yaml' \) \
+> > -       )
+> > +       ))
+> >
+> > -DT_SCHEMA_FILES ?= $(addprefix $(src)/,$(DT_DOCS))
+> > +DT_SCHEMA_FILES ?= $(DT_DOCS)
+> >
+> >  ifeq ($(CHECK_DTBS),)
+> >  extra-y += $(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
+> >  extra-y += $(patsubst $(src)/%.yaml,%.example.dt.yaml, $(DT_SCHEMA_FILES))
+> > +extra-y += processed-schema-examples.yaml
+> > +
+> > +$(obj)/processed-schema-examples.yaml: $(DT_DOCS) FORCE
+> > +       $(call if_changed,mk_schema)
+> >  endif
+> >
+> > -$(obj)/$(DT_TMP_SCHEMA): $(DT_SCHEMA_FILES) FORCE
+> > +$(obj)/processed-schema.yaml: DT_MK_SCHEMA_FLAGS := -u
+> > +$(obj)/processed-schema.yaml: $(DT_SCHEMA_FILES) FORCE
+> >         $(call if_changed,mk_schema)
+> >
+> > -extra-y += $(DT_TMP_SCHEMA)
+> > +extra-y += processed-schema.yaml
+> > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> > index f5ff506e4a24..b12dd5ba4896 100644
+> > --- a/scripts/Makefile.lib
+> > +++ b/scripts/Makefile.lib
+> > @@ -307,7 +307,8 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
+> >
+> >  DT_CHECKER ?= dt-validate
+> >  DT_BINDING_DIR := Documentation/devicetree/bindings
+> > -DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
+> > +# DT_TMP_SCHEMA may be overridden from Documentation/devicetree/bindings/Makefile
+> > +DT_TMP_SCHEMA ?= $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
+> >
+> >  quiet_cmd_dtb_check =  CHECK   $@
+> >        cmd_dtb_check =  $(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
+> > --
+> > 2.20.1
+> >
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
