@@ -1,58 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16465 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727261AbgCBRR3 (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42120 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727000AbgCBRcw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Mar 2020 12:17:29 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 022GwefA001325
-        for <linux-kbuild@vger.kernel.org>; Mon, 2 Mar 2020 12:17:28 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yfkn9qgra-1
+        Mon, 2 Mar 2020 12:32:52 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 022HLmA0111489
+        for <linux-kbuild@vger.kernel.org>; Mon, 2 Mar 2020 12:32:51 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yfhqpwgk2-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Mar 2020 12:17:27 -0500
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Mar 2020 12:32:51 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-kbuild@vger.kernel.org> from <naveen.n.rao@linux.ibm.com>;
-        Mon, 2 Mar 2020 17:17:25 -0000
-Date: Mon, 02 Mar 2020 22:47:18 +0530
+        Mon, 2 Mar 2020 17:32:49 -0000
+Date: Mon, 02 Mar 2020 23:02:42 +0530
 From: "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>
-Subject: Re: eh_frame confusion
+Subject: eh_frame confusion
 References: <3b00b45f-74b5-13e3-9a98-c3d6b3bb7286@rasmusvillemoes.dk>
-        <20200302124442.GI22482@gate.crashing.org>
-In-Reply-To: <20200302124442.GI22482@gate.crashing.org>
+        <1583168442.ovqnxu16tp.naveen@linux.ibm.com>
+In-Reply-To: <1583168442.ovqnxu16tp.naveen@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1583169014.zvau4om8mi.naveen@linux.ibm.com>
+Message-Id: <1583169883.zo43kx69lm.naveen@linux.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>, Segher Boessenkool <segher@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Michael Ellerman <mpe@ellerman.id.au>
 
-Segher Boessenkool wrote:
-> On Mon, Mar 02, 2020 at 11:56:05AM +0100, Rasmus Villemoes wrote:
+Naveen N. Rao wrote:
+> Rasmus Villemoes wrote:
 >> I'm building a ppc32 kernel, and noticed that after upgrading from gcc-7
->> to gcc-8 all object files now end up having .eh_frame section.
-> 
-> Since GCC 8, we enable -fasynchronous-unwind-tables by default for
-> PowerPC.  See https://gcc.gnu.org/r259298 .
-> 
->> For
+>> to gcc-8 all object files now end up having .eh_frame section. For
 >> vmlinux, that's not a problem, because they all get discarded in
 >> arch/powerpc/kernel/vmlinux.lds.S . However, they stick around in
 >> modules, which doesn't seem to be useful - given that everything worked
 >> just fine with gcc-7, and I don't see anything in the module loader that
 >> handles .eh_frame.
+>> 
+>> The reason I care is that my target has a rather tight rootfs budget,
+>> and the .eh_frame section seem to occupy 10-30% of the file size
+>> (obviously very depending on the particular module).
+>> 
+>> Comparing the .foo.o.cmd files, I don't see change in options that might
+>> explain this (there's a bunch of new -Wno-*, and the -mspe=no spelling
+>> is apparently no longer supported in gcc-8). Both before and after, there's
+>> 
+>> -fno-dwarf2-cfi-asm
+>> 
+>> about which gcc's documentation says
+>> 
+>> '-fno-dwarf2-cfi-asm'
+>>      Emit DWARF unwind info as compiler generated '.eh_frame' section
+>>      instead of using GAS '.cfi_*' directives.
+>> 
+>> Looking into where that comes from got me even more confused, because
+>> both arm and unicore32 say
+>> 
+>> # Never generate .eh_frame
+>> KBUILD_CFLAGS           += $(call cc-option,-fno-dwarf2-cfi-asm)
+>> 
+>> while the ppc32 case at hand says
+>> 
+>> # FIXME: the module load should be taught about the additional relocs
+>> # generated by this.
+>> # revert to pre-gcc-4.4 behaviour of .eh_frame
 > 
-> It is useful for debugging.  Not many people debug the kernel like this,
-> of course.
+> Michael opened a task to look into this recently and I had spent some 
+> time last week on this. The original commit/discussion adding 
+> -fno-dwarf2-cfi-asm refers to R_PPC64_REL32 relocations not being 
+> handled by our module loader:
+> http://lkml.kernel.org/r/20090224065112.GA6690@bombadil.infradead.org
+> 
+> However, that is now handled thanks to commit 9f751b82b491d:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9f751b82b491d
+> 
+> I did a test build and a simple module loaded fine, so I think 
+> -fno-dwarf2-cfi-asm is not required anymore, unless Michael has seen 
+> some breakages with it. Michael?
+> 
+>> 
+>> but prior to gcc-8, .eh_frame didn't seem to get generated anyway.
+>> 
+>> Can .eh_frame sections be discarded for modules (on ppc32 at least), or
+>> is there some magic that makes them necessary when building with gcc-8?
+> 
+> As Segher points out, it looks like we need to add 
+> -fno-asynchronous-unwind-tables. Most other architectures seem to use 
+> that too.
 
-I'm trying to understand if we need that. Other architectures seems to 
-pass -fasynchronous-unwind-tables only for the vdso, but disable it for 
-the kernel build. I suppose we can do the same.
-
-If using -fno-asynchronous-unwind-tables, would crash/perf have 
-problems?
+Can you check if the below patch works? I am yet to test this in more 
+detail, but would be good to know the implications for ppc32.
 
 - Naveen
+
+
+---
+diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+index f35730548e42..5b5bf98b8217 100644
+--- a/arch/powerpc/Makefile
++++ b/arch/powerpc/Makefile
+@@ -239,10 +239,7 @@ KBUILD_CFLAGS += $(call cc-option,-mno-vsx)
+ KBUILD_CFLAGS += $(call cc-option,-mno-spe)
+ KBUILD_CFLAGS += $(call cc-option,-mspe=no)
+ 
+-# FIXME: the module load should be taught about the additional relocs
+-# generated by this.
+-# revert to pre-gcc-4.4 behaviour of .eh_frame
+-KBUILD_CFLAGS  += $(call cc-option,-fno-dwarf2-cfi-asm)
++KBUILD_CFLAGS  += $(call cc-option,-fno-asynchronous-unwind-tables)
+ 
+ # Never use string load/store instructions as they are
+ # often slow when they are implemented at all
+diff --git a/arch/powerpc/kernel/vdso32/Makefile b/arch/powerpc/kernel/vdso32/Makefile
+index e147bbdc12cd..d43b0b18137c 100644
+--- a/arch/powerpc/kernel/vdso32/Makefile
++++ b/arch/powerpc/kernel/vdso32/Makefile
+@@ -25,6 +25,7 @@ KCOV_INSTRUMENT := n
+ UBSAN_SANITIZE := n
+ 
+ ccflags-y := -shared -fno-common -fno-builtin -nostdlib \
++       -fasynchronous-unwind-tables \
+        -Wl,-soname=linux-vdso32.so.1 -Wl,--hash-style=both
+ asflags-y := -D__VDSO32__ -s
+ 
+diff --git a/arch/powerpc/kernel/vdso64/Makefile b/arch/powerpc/kernel/vdso64/Makefile
+index 32ebb3522ea1..b2cbb5c49bad 100644
+--- a/arch/powerpc/kernel/vdso64/Makefile
++++ b/arch/powerpc/kernel/vdso64/Makefile
+@@ -13,6 +13,7 @@ KCOV_INSTRUMENT := n
+ UBSAN_SANITIZE := n
+ 
+ ccflags-y := -shared -fno-common -fno-builtin -nostdlib \
++       -fasynchronous-unwind-tables \
+        -Wl,-soname=linux-vdso64.so.1 -Wl,--hash-style=both
+ asflags-y := -D__VDSO64__ -s
+ 
+ 
