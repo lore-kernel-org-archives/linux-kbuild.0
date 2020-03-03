@@ -1,84 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:53762 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728420AbgCCNri (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:17398 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726890AbgCCNsU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Mar 2020 08:47:38 -0500
+        Tue, 3 Mar 2020 08:48:20 -0500
 MIME-Version: 1.0
-References: <20200228034640.25247-1-masahiroy@kernel.org> <CAK7LNAS9uWyvFeVkxtbkuBrnqumYzzLfcsUrVByHHyons4m8hA@mail.gmail.com>
-In-Reply-To: <CAK7LNAS9uWyvFeVkxtbkuBrnqumYzzLfcsUrVByHHyons4m8hA@mail.gmail.com>
+References: <20200226175325.8787-1-masahiroy@kernel.org>
+In-Reply-To: <20200226175325.8787-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 3 Mar 2020 22:46:47 +0900
-Message-ID: <CAK7LNATyuyU46qXngDr80d51cs0-J=00jkgL1rdASUMfgmfKOw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use KBUILD_DEFCONFIG as the fallback for DEFCONFIG_LIST
+Date: Tue, 3 Mar 2020 22:47:39 +0900
+Message-ID: <CAK7LNARVX6bJPO0yPo7k_ateDNmk_bXGfoR8nmkEUbkCVtJTLw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove trailing slash from devicetree/binding/
+ for descending
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>, linux-um@lists.infradead.org, sparclinux <sparclinux@vger.kernel.org>
+Cc: Rob Herring <robh+dt@kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
 
-On Fri, Feb 28, 2020 at 12:48 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Thu, Feb 27, 2020 at 2:53 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> On Fri, Feb 28, 2020 at 12:47 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > Most of the Kconfig commands (except defconfig and all*config) read
-> > the .config file as a base set of CONFIG options.
-> >
-> > When it does not exist, the files in DEFCONFIG_LIST are searched in
-> > this order and loaded if found.
-> >
-> > I do not see much sense in the last two lines in DEFCONFIG_LIST.
-> >
-> > [1] ARCH_DEFCONFIG
-> >
-> > The entry for DEFCONFIG_LIST is guarded by 'depends on !UML'. So, the
-> > ARCH_DEFCONFIG definition in arch/x86/um/Kconfig is meaningless.
-> >
-> > arch/{sh,sparc,x86}/Kconfig define ARCH_DEFCONFIG depending on 32 or
-> > 64 bit variant symbols. This is a little bit strange; ARCH_DEFCONFIG
-> > should be a fixed string because the base config file is loaded before
-> > the symbol evaluation stage.
-> >
-> > Using KBUILD_DEFCONFIG makes more sense because it is fixed before
-> > Kconfig is invoked. Fortunately, arch/{sh,sparc,x86}/Makefile define it
-> > in the same way, and it works as expected. Hence, replace ARCH_DEFCONFIG
-> > with "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)".
-> >
-> > [2] arch/$(ARCH)/defconfig
-> >
-> > This file path is no longer valid. The defconfig files are always located
-> > in the arch configs/ directories.
-> >
-> >   $ find arch -name defconfig | sort
-> >   arch/alpha/configs/defconfig
-> >   arch/arm64/configs/defconfig
-> >   arch/csky/configs/defconfig
-> >   arch/nds32/configs/defconfig
-> >   arch/riscv/configs/defconfig
-> >   arch/s390/configs/defconfig
-> >   arch/unicore32/configs/defconfig
-> >
-> > The path arch/*/configs/defconfig is already covered by
-> > "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)". So, this file path is
-> > not necessary.
-> >
-> > I moved the default KBUILD_DEFCONFIG to the top Makefile. Otherwise,
-> > the 7 architectures listed above would end up with endless loop of
-> > syncconfig.
-> >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> obj-* needs a trailing slash for a directory, but subdir-* does not
+> because it already implies a directory.
 >
+> Also, change subdir-y to subdir- to ensure this is effective only
+> for cleaning targets.
 >
-> I forgot to say this.
-> This is v2.
+> This makes the cleaning log consistent. (no trailing slash)
 >
-> Changes in v2:
->   - Move KBUILD_DEFCONFIG to fix endless loop of syncconfig
+> Before:
 >
+>   $ make clean
+>   CLEAN   Documentation/devicetree/bindings/
 >
+> After:
+>
+>   $ make clean
+>   CLEAN   Documentation/devicetree/bindings
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+
 
 Applied to linux-kbuild.
 
 
+
+>
+>  Documentation/Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/Makefile b/Documentation/Makefile
+> index d77bb607aea4..39569a2e1953 100644
+> --- a/Documentation/Makefile
+> +++ b/Documentation/Makefile
+> @@ -2,7 +2,8 @@
+>  # Makefile for Sphinx documentation
+>  #
+>
+> -subdir-y := devicetree/bindings/
+> +# for cleaning
+> +subdir- := devicetree/bindings
+>
+>  # Check for broken documentation file references
+>  ifeq ($(CONFIG_WARN_MISSING_DOCUMENTS),y)
+> --
+> 2.17.1
+>
+
+
+-- 
 Best Regards
 Masahiro Yamada
