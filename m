@@ -1,75 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qv1-f68.google.com ([209.85.219.68]:44948 "EHLO
-        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725440AbgCCGzQ (ORCPT
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:33176 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728257AbgCCJuL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Mar 2020 01:55:16 -0500
+        Tue, 3 Mar 2020 04:50:11 -0500
+Received: by mail-lj1-f194.google.com with SMTP id f13so2820716ljp.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Mar 2020 01:50:09 -0800 (PST)
+Subject: Re: eh_frame confusion
+References: <3b00b45f-74b5-13e3-9a98-c3d6b3bb7286@rasmusvillemoes.dk>
+ <1583168442.ovqnxu16tp.naveen@linux.ibm.com>
+ <1583169883.zo43kx69lm.naveen@linux.ibm.com>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Message-ID: <9c9f79e3-d355-1c8a-fb5b-169aab2945da@rasmusvillemoes.dk>
+Date: Tue, 3 Mar 2020 10:50:06 +0100
 MIME-Version: 1.0
-References: <202002242114.CBED7F1@keescook>
-In-Reply-To: <202002242114.CBED7F1@keescook>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 2 Mar 2020 22:55:04 -0800
-Message-ID: <CAEf4BzYrBoQJ1tPMRMQ_-G6e76=zj4zyC=HrY-mxH_9QK65oqg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Remove debug info from kallsyms linking
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1583169883.zo43kx69lm.naveen@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+To: "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Segher Boessenkool <segher@kernel.crashing.org>
 
-On Mon, Feb 24, 2020 at 9:17 PM Kees Cook <keescook@chromium.org> wrote:
->
-> When CONFIG_DEBUG_INFO is enabled, the two kallsyms linking steps spend
-> time collecting and writing the dwarf sections to the temporary output
-> files. kallsyms does not need this information, and leaving it off
-> halves their linking time. This is especially noticeable without
-> CONFIG_DEBUG_INFO_REDUCED. The BTF linking stage, however, does still
-> need those details.
->
-> Refactor the BTF and kallsyms generation stages slightly for more
-> regularized temporary names. Skip debug during kallsyms links.
->
-> For a full debug info build with BTF, my link time goes from 1m06s to
-> 0m54s, saving about 12 seconds, or 18%.
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
+On 02/03/2020 18.32, Naveen N. Rao wrote:
+> Naveen N. Rao wrote:
+>> Michael opened a task to look into this recently and I had spent some
+>> time last week on this. The original commit/discussion adding
+>> -fno-dwarf2-cfi-asm refers to R_PPC64_REL32 relocations not being
+>> handled by our module loader:
+>> http://lkml.kernel.org/r/20090224065112.GA6690@bombadil.infradead.org
+>>
+>> However, that is now handled thanks to commit 9f751b82b491d:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9f751b82b491d
+>>
+>>
+>> I did a test build and a simple module loaded fine, so I think
+>> -fno-dwarf2-cfi-asm is not required anymore, unless Michael has seen
+>> some breakages with it. Michael?
+>>
+>>>
+>>> but prior to gcc-8, .eh_frame didn't seem to get generated anyway.
+>>>
+>>> Can .eh_frame sections be discarded for modules (on ppc32 at least), or
+>>> is there some magic that makes them necessary when building with gcc-8?
+>>
+>> As Segher points out, it looks like we need to add
+>> -fno-asynchronous-unwind-tables. Most other architectures seem to use
+>> that too.
 
-I've tested locally, seems to be generating BTF properly (I haven't
-timed anything, though). See nit below, but otherwise:
+Yes. Thanks, Segher, that explains that part.
 
-Acked-by: Andrii Nakryiko <andriin@fb.com>
+> Can you check if the below patch works? I am yet to test this in more
+> detail, but would be good to know the implications for ppc32.
 
->  scripts/link-vmlinux.sh | 28 +++++++++++++++++++---------
->  1 file changed, 19 insertions(+), 9 deletions(-)
->
+I'll see if that produces a bootable kernel, but I think I'd prefer a
+more piecemeal approach.
 
-[...]
+One patch to add -fno-asynchronous-unwind-tables (given that other
+arches do it unconditionally I don't think cc-option is needed), with a
+commit log saying something like "no-op for gcc < 8, prevents .eh_frame
+sections that are discarded anyway for vmlinux and waste disk space for
+modules". Then another patch can get rid of -fno-dwarf2-cfi-asm if
+that's no longer required.
 
-> @@ -106,6 +114,8 @@ gen_btf()
->  {
->         local pahole_ver
->         local bin_arch
-> +       local bin_format
-> +       local bin_file
->
->         if ! [ -x "$(command -v ${PAHOLE})" ]; then
->                 echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
-> @@ -118,8 +128,9 @@ gen_btf()
->                 return 1
->         fi
->
-> -       info "BTF" ${2}
->         vmlinux_link ${1}
-> +
-> +       info "BTF" ${2}
-
-Any reason to exclude linking from "BTF" step? It's still a part of
-BTF generation, so seems fair to have BTF encompass both vmlinux
-linking and BTF generation/deduplication?
-
->         LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
->
->         # dump .BTF section into raw binary file to link with final vmlinux
-
-[...]
+Rasmus
