@@ -1,82 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60774 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:36738 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbgCDPZT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 4 Mar 2020 10:25:19 -0500
+        id S1726752AbgCDPfC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 4 Mar 2020 10:35:02 -0500
 MIME-Version: 1.0
-References: <20200304032038.14424-1-masahiroy@kernel.org> <20200304032038.14424-4-masahiroy@kernel.org>
-In-Reply-To: <20200304032038.14424-4-masahiroy@kernel.org>
+References: <20200304032038.14424-1-masahiroy@kernel.org> <20200304032038.14424-2-masahiroy@kernel.org>
+In-Reply-To: <20200304032038.14424-2-masahiroy@kernel.org>
 From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 4 Mar 2020 09:25:06 -0600
-Message-ID: <CAL_JsqKt1K6nOED2TeUfyxkbWHi_KrbZFDW-ZxwgHZX-Og7-DA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] kbuild: allow to run dt_binding_check without kernel configuration
+Date: Wed, 4 Mar 2020 09:34:49 -0600
+Message-ID: <CAL_JsqJ3q4txoV6wE-Vk5X9oo0roVbBYpwMuPEngDiEv1XXinQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] kbuild: avoid concurrency issue in parallel building
+ dtbs and dtbs_check
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: devicetree@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: devicetree@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Tue, Mar 3, 2020 at 9:21 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Tue, Mar 3, 2020 at 9:20 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> The dt_binding_check target is located outside of the
-> 'ifneq ($(dtstree),) ... endif' block.
->
-> Hence, you can run 'make dt_binding_check' on any architecture.
-> This makes a perfect sense because the dt-schema is arch-agnostic.
->
-> The only one problem I see is that scripts/dtc/dtc is not always built.
-> For example, ARCH=x86 defconfig does not define CONFIG_DTC. Kbuild
-> descends into scripts/dtc/, but does nothing. Then, it fails to build
-> *.example.dt.yaml files.
+> 'make dtbs_check' checks the shecma in addition to building *.dtb files,
 
-Yeah, I've just worked around this by doing 'make CONFIG_DTC=y
-dt_binding_check'.
+typo
 
-The only thing I'd come up with was just always building dtc, but I
-didn't want to do that.
-
-> Let's build scripts/dtc/dtc forcibly when running dt_binding_check.
+> in other words, 'make dtbs_check' is a super-set of 'make dtbs'.
+> So, you do not have to do 'make dtbs dtbs_check', but I want to keep
+> the build system robust in any use.
 >
-> The dt-schema does not depend on any CONFIG option either, so you
-> should be able to run dt_binding_check without the .config file.
+> Currently, 'dtbs' and 'dtbs_check' are independent of each other.
+> In parallel building, two threads descend into arch/*/boot/dts/,
+> one for dtbs and the other for dtbs_check, then end up with building
+> the same DTB simultaneously.
 >
-> Going forward, you can directly run 'make dt_binding_check' in a
-> pristine source tree.
+> This commit fixes the concurrency issue. Otherwise, I see build errors
+> like follows:
+>
+> $ make ARCH=arm64 defconfig
+> $ make -j16 ARCH=arm64 DT_SCHEMA_FILES=Documentation/devicetree/bindings/arm/psci.yaml dtbs dtbs_check
+>   <snip>
+>   DTC     arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dtb
+>   DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtb
+>   DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb
+>   DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb
+>   DTC     arch/arm64/boot/dts/freescale/imx8mn-evk.dtb
+>   DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb
+>   DTC     arch/arm64/boot/dts/zte/zx296718-pcbox.dtb
+>   DTC     arch/arm64/boot/dts/altera/socfpga_stratix10_socdk.dt.yaml
+>   DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dtb
+>   DTC     arch/arm64/boot/dts/xilinx/zynqmp-zc1254-revA.dtb
+>   DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dtb
+>   DTC     arch/arm64/boot/dts/rockchip/rk3399-gru-scarlet-inx.dtb
+>   DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb
+>   CHECK   arch/arm64/boot/dts/altera/socfpga_stratix10_socdk.dt.yaml
+> fixdep: error opening file: arch/arm64/boot/dts/allwinner/.sun50i-h6-orangepi-lite2.dtb.d: No such file or directory
+> make[2]: *** [scripts/Makefile.lib:296: arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb] Error 2
+> make[2]: *** Deleting file 'arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb'
+> make[2]: *** Waiting for unfinished jobs....
+>   DTC     arch/arm64/boot/dts/rockchip/rk3399-gru-scarlet-kd.dtb
+>   DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p231.dtb
+>   DTC     arch/arm64/boot/dts/xilinx/zynqmp-zc1275-revA.dtb
+>   DTC     arch/arm64/boot/dts/freescale/imx8mn-ddr4-evk.dtb
+> fixdep: parse error; no targets found
+> make[2]: *** [scripts/Makefile.lib:296: arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb] Error 1
+> make[2]: *** Deleting file 'arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb'
+> make[1]: *** [scripts/Makefile.build:505: arch/arm64/boot/dts/allwinner] Error 2
+> make[1]: *** Waiting for unfinished jobs....
+>   DTC     arch/arm64/boot/dts/renesas/r8a77951-salvator-xs.dtb
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
 >
->  Makefile             | 2 +-
->  scripts/dtc/Makefile | 5 +++--
->  2 files changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 7dec7b343842..190f595c7bfc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -255,7 +255,7 @@ clean-targets := %clean mrproper cleandocs
->  no-dot-config-targets := $(clean-targets) \
->                          cscope gtags TAGS tags help% %docs check% coccicheck \
->                          $(version_h) headers headers_% archheaders archscripts \
-> -                        %asm-generic kernelversion %src-pkg
-> +                        %asm-generic kernelversion %src-pkg dt_binding_check
->  no-sync-config-targets := $(no-dot-config-targets) install %install \
->                            kernelrelease
->  single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
-> diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
-> index 3acbb410904c..2f3c3a7e1620 100644
-> --- a/scripts/dtc/Makefile
-> +++ b/scripts/dtc/Makefile
-> @@ -1,8 +1,9 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # scripts/dtc makefile
->
-> -hostprogs              := dtc
-> -always-$(CONFIG_DTC)   := $(hostprogs)
-> +hostprogs                      := dtc
-> +always-$(CONFIG_DTC)           += $(hostprogs)
-> +always-$(CHECK_DT_BINDING)     += $(hostprogs)
-
-This looks like a good solution.
+>  Makefile | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
 Reviewed-by: Rob Herring <robh@kernel.org>
