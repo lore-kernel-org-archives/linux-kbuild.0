@@ -1,90 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:42293 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727903AbgCDCLT (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:41322 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387460AbgCDCSi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Mar 2020 21:11:19 -0500
-Received: by mail-pg1-f193.google.com with SMTP id h8so214328pgs.9
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Mar 2020 18:11:18 -0800 (PST)
-Date: Tue, 3 Mar 2020 18:11:16 -0800
+        Tue, 3 Mar 2020 21:18:38 -0500
+Received: by mail-pf1-f194.google.com with SMTP id j9so141605pfa.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Mar 2020 18:18:37 -0800 (PST)
+Date: Tue, 3 Mar 2020 18:18:34 -0800
 From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] kbuild: Remove debug info from kallsyms linking
-Message-ID: <202003031758.AE8FEB7@keescook>
-References: <202002242114.CBED7F1@keescook>
- <CAEf4BzYrBoQJ1tPMRMQ_-G6e76=zj4zyC=HrY-mxH_9QK65oqg@mail.gmail.com>
- <202003031301.083CF048C2@keescook>
- <CAEf4BzbX-Eo3+DCG4zBMhJtLSZrtp48Z-8SvA8qy-WXA5kjR6A@mail.gmail.com>
+Subject: [PATCH bpf-next v2] kbuild: Remove debug info from kallsyms linking
+Message-ID: <202003031814.4AEA3351@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEf4BzbX-Eo3+DCG4zBMhJtLSZrtp48Z-8SvA8qy-WXA5kjR6A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+To: bpf@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Tue, Mar 03, 2020 at 01:50:52PM -0800, Andrii Nakryiko wrote:
-> On Tue, Mar 3, 2020 at 1:06 PM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > On Mon, Mar 02, 2020 at 10:55:04PM -0800, Andrii Nakryiko wrote:
-> > > On Mon, Feb 24, 2020 at 9:17 PM Kees Cook <keescook@chromium.org> wrote:
-> > > > [...]
-> > > > @@ -118,8 +128,9 @@ gen_btf()
-> > > >                 return 1
-> > > >         fi
-> > > >
-> > > > -       info "BTF" ${2}
-> > > >         vmlinux_link ${1}
-> > > > +
-> > > > +       info "BTF" ${2}
-> > >
-> > > Any reason to exclude linking from "BTF" step? It's still a part of
-> > > BTF generation, so seems fair to have BTF encompass both vmlinux
-> > > linking and BTF generation/deduplication?
-> >
-> > I'm not sure I'm following what you're saying here. If you're asking why
-> > BTF linking is separate from the final vmlinux link, it's because of how
-> > kallsyms is generated. Currently it's using a rather brute-force
-> 
-> No, I meant that you moved `info "BTF"` to after `vmlinux_link` call,
-> which will make it appear (from make output) as if BTF generation
-> phase is shorter than it is. No big deal, was just wondering if it was
-> done on purpose.
+When CONFIG_DEBUG_INFO is enabled, the two kallsyms linking steps spend
+time collecting and writing the dwarf sections to the temporary output
+files. kallsyms does not need this information, and leaving it off
+halves their linking time. This is especially noticeable without
+CONFIG_DEBUG_INFO_REDUCED. The BTF linking stage, however, does still
+need those details.
 
-Oh! Yes. I changed the reporting in commit 8959e39272d6 ("kbuild:
-Parameterize kallsyms generation and correct reporting") so that
-vmlinux_link reports the "info LD ..." line instead of each of the callers.
+Refactor the BTF and kallsyms generation stages slightly for more
+regularized temporary names. Skip debug during kallsyms links.
+Additionally move "info BTF" to the correct place since commit
+8959e39272d6 ("kbuild: Parameterize kallsyms generation and correct
+reporting"), which added "info LD ..." to vmlinux_link calls.
 
-This current patch adjusts it so "info BTF ..." is reported for the BTF
-generation stage (right now there's no delay between "info BTF ..." and
-"info LD ...", and it looks like the "info LD" stages takes way too
-long. ;)
+For a full debug info build with BTF, my link time goes from 1m06s to
+0m54s, saving about 12 seconds, or 18%.
 
-> > approach to figure out exactly where everything is going to be in the
-> > final link, and for that it need to have both the BTF symbols present
-> > and the kallysms symbols present. So, unfortunately, each needs to be a
-> > separate step. I spent some time trying to merge BTF and kallsyms phase
-> > 1, but I didn't find a viable solution. I'm *sure* there is a better way
-> > to handle kallsyms, but I haven't had the time to really investigate it.
-> > I think it would require some close coordination with linker behavior
-> > changes...
-> >
-> > >
-> > > >         LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
-> > > >
-> > > >         # dump .BTF section into raw binary file to link with final vmlinux
-> >
-> > BTW, in looking at BTF generation, why is this cut up into three steps:
-> > pahole, objcopy, objcopy... shouldn't pahole just gross an output method
-> > to dump the final .o file? That would be MUCH nicer. Especially since
-> > the first step ends up rewriting (?!) the original ELF. This is a lot of
-> > needless IO...
-> 
-> Just mostly historical reasons, that was the interface pahole already
-> supported. I agree that it's a good idea to teach pahole to just emit
-> a binary BTF section dump.
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Andrii Nakryiko <andriin@fb.com>
+---
+v2: add Ack, clarify "info BTF" relocation
+---
+ scripts/link-vmlinux.sh | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-/me adds it to giant TODO list ;)
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index dd484e92752e..ac569e197bfa 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -63,12 +63,18 @@ vmlinux_link()
+ 	local lds="${objtree}/${KBUILD_LDS}"
+ 	local output=${1}
+ 	local objects
++	local strip_debug
+ 
+ 	info LD ${output}
+ 
+ 	# skip output file argument
+ 	shift
+ 
++	# The kallsyms linking does not need debug symbols included.
++	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
++		strip_debug=-Wl,--strip-debug
++	fi
++
+ 	if [ "${SRCARCH}" != "um" ]; then
+ 		objects="--whole-archive			\
+ 			${KBUILD_VMLINUX_OBJS}			\
+@@ -79,6 +85,7 @@ vmlinux_link()
+ 			${@}"
+ 
+ 		${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}	\
++			${strip_debug#-Wl,}			\
+ 			-o ${output}				\
+ 			-T ${lds} ${objects}
+ 	else
+@@ -91,6 +98,7 @@ vmlinux_link()
+ 			${@}"
+ 
+ 		${CC} ${CFLAGS_vmlinux}				\
++			${strip_debug}				\
+ 			-o ${output}				\
+ 			-Wl,-T,${lds}				\
+ 			${objects}				\
+@@ -106,6 +114,8 @@ gen_btf()
+ {
+ 	local pahole_ver
+ 	local bin_arch
++	local bin_format
++	local bin_file
+ 
+ 	if ! [ -x "$(command -v ${PAHOLE})" ]; then
+ 		echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
+@@ -118,8 +128,9 @@ gen_btf()
+ 		return 1
+ 	fi
+ 
+-	info "BTF" ${2}
+ 	vmlinux_link ${1}
++
++	info "BTF" ${2}
+ 	LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
+ 
+ 	# dump .BTF section into raw binary file to link with final vmlinux
+@@ -127,11 +138,12 @@ gen_btf()
+ 		cut -d, -f1 | cut -d' ' -f2)
+ 	bin_format=$(LANG=C ${OBJDUMP} -f ${1} | grep 'file format' | \
+ 		awk '{print $4}')
++	bin_file=.btf.vmlinux.bin
+ 	${OBJCOPY} --change-section-address .BTF=0 \
+ 		--set-section-flags .BTF=alloc -O binary \
+-		--only-section=.BTF ${1} .btf.vmlinux.bin
++		--only-section=.BTF ${1} $bin_file
+ 	${OBJCOPY} -I binary -O ${bin_format} -B ${bin_arch} \
+-		--rename-section .data=.BTF .btf.vmlinux.bin ${2}
++		--rename-section .data=.BTF $bin_file ${2}
+ }
+ 
+ # Create ${2} .o file with all symbols from the ${1} object file
+@@ -166,8 +178,8 @@ kallsyms()
+ kallsyms_step()
+ {
+ 	kallsymso_prev=${kallsymso}
+-	kallsymso=.tmp_kallsyms${1}.o
+-	kallsyms_vmlinux=.tmp_vmlinux${1}
++	kallsyms_vmlinux=.tmp_vmlinux.kallsyms${1}
++	kallsymso=${kallsyms_vmlinux}.o
+ 
+ 	vmlinux_link ${kallsyms_vmlinux} "${kallsymso_prev}" ${btf_vmlinux_bin_o}
+ 	kallsyms ${kallsyms_vmlinux} ${kallsymso}
+@@ -190,7 +202,6 @@ cleanup()
+ {
+ 	rm -f .btf.*
+ 	rm -f .tmp_System.map
+-	rm -f .tmp_kallsyms*
+ 	rm -f .tmp_vmlinux*
+ 	rm -f System.map
+ 	rm -f vmlinux
+@@ -257,9 +268,8 @@ tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
+ 
+ btf_vmlinux_bin_o=""
+ if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
+-	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
+-		btf_vmlinux_bin_o=.btf.vmlinux.bin.o
+-	else
++	btf_vmlinux_bin_o=.btf.vmlinux.bin.o
++	if ! gen_btf .tmp_vmlinux.btf $btf_vmlinux_bin_o ; then
+ 		echo >&2 "Failed to generate BTF for vmlinux"
+ 		echo >&2 "Try to disable CONFIG_DEBUG_INFO_BTF"
+ 		exit 1
+-- 
+2.20.1
+
 
 -- 
 Kees Cook
