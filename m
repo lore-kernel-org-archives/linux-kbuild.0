@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:40044 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:41738 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726378AbgCEROI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Mar 2020 12:14:08 -0500
+        id S1727103AbgCERPI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 5 Mar 2020 12:15:08 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.5 43/67] kbuild: fix DT binding schema rule to detect command line changes
-Date: Thu,  5 Mar 2020 12:12:44 -0500
-Message-Id: <20200305171309.29118-43-sashal@kernel.org>
-In-Reply-To: <20200305171309.29118-1-sashal@kernel.org>
-References: <20200305171309.29118-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 38/58] kbuild: add dtbs_check to PHONY
+Date: Thu,  5 Mar 2020 12:13:59 -0500
+Message-Id: <20200305171420.29595-38-sashal@kernel.org>
+In-Reply-To: <20200305171420.29595-1-sashal@kernel.org>
+References: <20200305171420.29595-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,45 +18,36 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>, Rob Herring <robh@kernel.org>, Sasha
 
 From: Masahiro Yamada <masahiroy@kernel.org>
 
-[ Upstream commit 7a04960560640ac5b0b89461f7757322b57d0c7a ]
+[ Upstream commit 964a596db8db8c77c9903dd05655696696e6b3ad ]
 
-This if_change_rule is not working properly; it cannot detect any
-command line change.
+The dtbs_check should be a phony target, but currently it is not
+specified so.
 
-The reason is because cmd-check in scripts/Kbuild.include compares
-$(cmd_$@) and $(cmd_$1), but cmd_dtc_dt_yaml does not exist here.
+'make dtbs_check' works even if a file named 'dtbs_check' exists
+because it depends on another phony target, scripts_dtc, but we
+should not rely on it.
 
-For if_change_rule to work properly, the stem part of cmd_* and rule_*
-must match. Because this cmd_and_fixdep invokes cmd_dtc, this rule must
-be named rule_dtc.
+Add dtbs_check to PHONY.
 
-Fixes: 4f0e3a57d6eb ("kbuild: Add support for DT binding schema checks")
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Acked-by: Rob Herring <robh@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/Makefile.lib | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3fa32f83b2d74..a66fc0acad1e4 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -291,13 +291,13 @@ DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
- quiet_cmd_dtb_check =	CHECK   $@
-       cmd_dtb_check =	$(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@ ;
+diff --git a/Makefile b/Makefile
+index af5e90075514a..63094ce5e5744 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1242,7 +1242,7 @@ ifneq ($(dtstree),)
+ %.dtb: include/config/kernel.release scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
  
--define rule_dtc_dt_yaml
-+define rule_dtc
- 	$(call cmd_and_fixdep,dtc,yaml)
- 	$(call cmd,dtb_check)
- endef
- 
- $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
--	$(call if_changed_rule,dtc_dt_yaml)
-+	$(call if_changed_rule,dtc)
- 
- dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+-PHONY += dtbs dtbs_install dt_binding_check
++PHONY += dtbs dtbs_install dtbs_check dt_binding_check
+ dtbs dtbs_check: include/config/kernel.release scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(dtstree)
  
 -- 
 2.20.1
