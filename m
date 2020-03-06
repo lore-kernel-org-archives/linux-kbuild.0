@@ -1,56 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:47985 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726413AbgCFEGv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Mar 2020 23:06:51 -0500
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 02646ecs001794
-        for <linux-kbuild@vger.kernel.org>; Fri, 6 Mar 2020 13:06:40 +0900
-Received: by mail-vs1-f54.google.com with SMTP id 7so680243vsr.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Mar 2020 20:06:40 -0800 (PST)
-MIME-Version: 1.0
-References: <20200219000434.15872-1-mpe@ellerman.id.au> <48YT3Y2QBsz9sSs@ozlabs.org>
-In-Reply-To: <48YT3Y2QBsz9sSs@ozlabs.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 6 Mar 2020 13:06:02 +0900
-Message-ID: <CAK7LNAQfREwzk4NwE5PzxOXGLcsk2BtjYNKvKx8g4_vxHmNHdw@mail.gmail.com>
-Subject: Re: [PATCH v2] powerpc/Makefile: Mark phony targets as PHONY
-Content-Type: text/plain; charset="UTF-8"
+Received: from foss.arm.com ([217.140.110.172]:57288 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbgCFGgq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 6 Mar 2020 01:36:46 -0500
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: [PATCH v6 16/18] kconfig: Add support for 'as-option'
+Date: Fri,  6 Mar 2020 12:05:23 +0530
+Message-Id: <1583476525-13505-17-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1583476525-13505-1-git-send-email-amit.kachhap@arm.com>
+References: <1583476525-13505-1-git-send-email-amit.kachhap@arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@ozlabs.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, James Morse <james.morse@arm.com>, Vincenzo Frascino <Vincenzo.Frascino@arm.com>, Mark Brown <broonie@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Mar 6, 2020 at 9:27 AM Michael Ellerman
-<patch-notifications@ellerman.id.au> wrote:
->
-> On Wed, 2020-02-19 at 00:04:34 UTC, Michael Ellerman wrote:
-> > Some of our phony targets are not marked as such. This can lead to
-> > confusing errors, eg:
-> >
-> >   $ make clean
-> >   $ touch install
-> >   $ make install
-> >   make: 'install' is up to date.
-> >   $
-> >
-> > Fix it by adding them to the PHONY variable which is marked phony in
-> > the top-level Makefile, or in scripts/Makefile.build for the boot
-> > Makefile.
-> >
-> > Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-> > Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
->
-> Applied to powerpc next.
->
-> https://git.kernel.org/powerpc/c/d42c6d0f8d004c3661dde3c376ed637e9f292c22
->
+From: Vincenzo Frascino <vincenzo.frascino@arm.com>
 
-You do not have to double your Signed-off-by.
+Currently kconfig does not have a feature that allows to detect if the
+used assembler supports a specific compilation option.
 
+Introduce 'as-option' to serve this purpose in the context of Kconfig:
 
+        config X
+                def_bool $(as-option,...)
 
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org
+Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+---
+Changes since v5:
+ * More descriptions for using /dev/zero.
+
+ scripts/Kconfig.include | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+index 85334dc..a1c1925 100644
+--- a/scripts/Kconfig.include
++++ b/scripts/Kconfig.include
+@@ -31,6 +31,12 @@ cc-option = $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -S -x c /dev/null -o /de
+ # Return y if the linker supports <flag>, n otherwise
+ ld-option = $(success,$(LD) -v $(1))
+ 
++# $(as-option,<flag>)
++# /dev/zero is used as output instead of /dev/null as some assembler cribs when
++# both input and output are same. Also both of them have same write behaviour so
++# can be easily substituted.
++as-option = $(success, $(CC) $(CLANG_FLAGS) $(1) -c -x assembler /dev/null -o /dev/zero)
++
+ # $(as-instr,<instr>)
+ # Return y if the assembler supports <instr>, n otherwise
+ as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
