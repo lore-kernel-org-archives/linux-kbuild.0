@@ -1,55 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37394 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgCHHeh (ORCPT
+Received: from www752.sakura.ne.jp ([59.106.19.202]:59273 "EHLO
+        www752.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726279AbgCHSUP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Mar 2020 03:34:37 -0400
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH] kbuild: Disable -Wpointer-to-enum-cast
-Date: Sun,  8 Mar 2020 00:34:00 -0700
-Message-Id: <20200308073400.23398-1-natechancellor@gmail.com>
+        Sun, 8 Mar 2020 14:20:15 -0400
+Message-Id: <202003081555.028Ft2lu062216@www752.sakura.ne.jp>
+Subject: BUSINESS PROPOSAL
+From: postmaster@hokusetubad.sakura.ne.jp
+Reply-To: abulkareem461@gmail.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Mon, 09 Mar 2020 00:55:02 +0900
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, stable@vger.kernel.org
+To: mitch.a.williams@intel.com
 
-Clang's -Wpointer-to-int-cast deviates from GCC in that it warns when
-casting to enums. The kernel does this in certain places, such as device
-tree matches to set the version of the device being used, which allows
-the kernel to avoid using a gigantic union.
+Dearest Friend
 
-https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L428
-https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L402
-https://elixir.bootlin.com/linux/v5.5.8/source/include/linux/mod_devicetable.h#L264
-
-To avoid a ton of false positive warnings, disable this particular part
-of the warning, which has been split off into a separate diagnostic so
-that the entire warning does not need to be turned off for clang.
-
-Cc: stable@vger.kernel.org
-Link: https://github.com/ClangBuiltLinux/linux/issues/887
-Link: https://github.com/llvm/llvm-project/commit/2a41b31fcdfcb67ab7038fc2ffb606fd50b83a84
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 86035d866f2c..90e56d5657c9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -748,6 +748,10 @@ KBUILD_CFLAGS += -Wno-tautological-compare
- # source of a reference will be _MergedGlobals and not on of the whitelisted names.
- # See modpost pattern 2
- KBUILD_CFLAGS += -mno-global-merge
-+# clang's -Wpointer-to-int-cast warns when casting to enums, which does not match GCC.
-+# Disable that part of the warning because it is very noisy across the kernel and does
-+# not point out any real bugs.
-+KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
- else
- 
- # These warnings generated too much noise in a regular build.
--- 
-2.25.1
+I am Mr Abdul Kareem working with Emirate NBD Bank Dubai,United Arab Emirate as Finance Manager.
+I have a very profitable Business that concerns you and will benefit both of us after completion.
+Kindly get back to me for more details.
+Awaiting your response.
+Regards
+Abdul Kareem
