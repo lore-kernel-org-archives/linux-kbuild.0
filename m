@@ -1,79 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:33242 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726116AbgCHCTd (ORCPT
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:37394 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgCHHeh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 Mar 2020 21:19:33 -0500
+        Sun, 8 Mar 2020 03:34:37 -0400
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH] kbuild: Disable -Wpointer-to-enum-cast
+Date: Sun,  8 Mar 2020 00:34:00 -0700
+Message-Id: <20200308073400.23398-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-References: <20200304032038.14424-1-masahiroy@kernel.org> <20200304032038.14424-3-masahiroy@kernel.org>
- <20200304055520.GA28911@ravnborg.org> <CAL_JsqLA7yq8rnVhM210sLt788yeu2xxFd94Fe0K_CGZw-mqSA@mail.gmail.com>
-In-Reply-To: <CAL_JsqLA7yq8rnVhM210sLt788yeu2xxFd94Fe0K_CGZw-mqSA@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 8 Mar 2020 11:18:41 +0900
-Message-ID: <CAK7LNATmnfjo2A0x6ytLNeo_rjv1_e9RFyxCnB-K1E1O=fw9jQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kbuild: allow to run dt_binding_check and dtbs_check
- in a single command
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, DTML <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mark Rutland <mark.rutland@arm.com>, Maxime Ripard <mripard@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, stable@vger.kernel.org
 
-Hi Sam, Rob,
+Clang's -Wpointer-to-int-cast deviates from GCC in that it warns when
+casting to enums. The kernel does this in certain places, such as device
+tree matches to set the version of the device being used, which allows
+the kernel to avoid using a gigantic union.
 
-On Thu, Mar 5, 2020 at 12:19 AM Rob Herring <robh+dt@kernel.org> wrote:
->
-> On Tue, Mar 3, 2020 at 11:55 PM Sam Ravnborg <sam@ravnborg.org> wrote:
-> >
-> > Hi Masahiro
-> >
-> > Thanks for the nice improvements to the dt infrastructure.
-> >
-> > Stealing a thread here..
-> >
-> > >  It is also possible to run checks with a single schema file by setting the
-> > >  ``DT_SCHEMA_FILES`` variable to a specific schema file.
-> > Would it be simple to enable the use of dirs for DT_SCHEMA_FILES?
->
-> I did name that with the intent of supporting more than one file.
->
-> > So I for example could do:
-> >
-> > make dt_bindings_check DT_SCHEMA_FILES=Documentation/devicetree/bindings/display/panel/
->
-> Does this work?:
->
-> make dt_bindings_check DT_SCHEMA_FILES="$(find
-> Documentation/devicetree/bindings/display/panel/ -name '*.yaml' |
-> xargs)"
->
-> Rob
+https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L428
+https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L402
+https://elixir.bootlin.com/linux/v5.5.8/source/include/linux/mod_devicetable.h#L264
 
+To avoid a ton of false positive warnings, disable this particular part
+of the warning, which has been split off into a separate diagnostic so
+that the entire warning does not need to be turned off for clang.
 
-Rob proposed a solution, so
-I do not think we should extend this too much.
+Cc: stable@vger.kernel.org
+Link: https://github.com/ClangBuiltLinux/linux/issues/887
+Link: https://github.com/llvm/llvm-project/commit/2a41b31fcdfcb67ab7038fc2ffb606fd50b83a84
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-BTW, there is a limitation that
-DT_SCHEMA_FILES must point to file(s)
-in Documentation/devicetree/bindings/.
-
-
-$ cp  Documentation/devicetree/bindings/arm/psci.yaml   ./
-$ make  dt_binding_check  DT_SCHEMA_FILES=psci.yaml
-  SCHEMA  Documentation/devicetree/bindings/processed-schema.yaml
-make[1]: *** No rule to make target
-'Documentation/devicetree/bindings/psci.yaml', needed by '__build'.
-Stop.
-make: *** [Makefile:1278: dt_binding_check] Error 2
-
-
-
-$(patsubst $(src)/%.yaml,%.example.dts, $(DT_SCHEMA_FILES))
-does not work if DT_SCHEMA_FILES is outside of
-Documentation/devicetree/bindings/, but I have no
-solution for this.
-
---
-Best Regards
-Masahiro Yamada
+diff --git a/Makefile b/Makefile
+index 86035d866f2c..90e56d5657c9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -748,6 +748,10 @@ KBUILD_CFLAGS += -Wno-tautological-compare
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+ # See modpost pattern 2
+ KBUILD_CFLAGS += -mno-global-merge
++# clang's -Wpointer-to-int-cast warns when casting to enums, which does not match GCC.
++# Disable that part of the warning because it is very noisy across the kernel and does
++# not point out any real bugs.
++KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.25.1
