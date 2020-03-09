@@ -1,45 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx.sdf.org ([205.166.94.20]:50302 "EHLO mx.sdf.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726921AbgCIPei (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Mar 2020 11:34:38 -0400
-Date: Mon, 9 Mar 2020 15:27:20 +0000
-From: George Spelvin <lkml@SDF.ORG>
-Subject: Bug in CONFIG_CC_HAS_INT128 (5.5 regression)
-Message-ID: <20200309152720.GA24424@SDF.ORG>
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:40889 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbgCIT7v (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Mar 2020 15:59:51 -0400
+Received: by mail-pj1-f67.google.com with SMTP id gv19so361164pjb.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Mar 2020 12:59:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20200309023910.25370-1-masahiroy@kernel.org> <202003091801.6KQQKZ1Y%lkp@intel.com>
+In-Reply-To: <202003091801.6KQQKZ1Y%lkp@intel.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 9 Mar 2020 12:59:37 -0700
+Message-ID: <CAKwvOdksxVa=NGtyT3hsuHg6SJG4CbNWAepf+dxwVDC1+36zyw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: link lib-y objects to vmlinux forcibly when CONFIG_MODULES=y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: ardb@kernel.org
-Cc: linux-kbuild@vger.kernel.org, masahiroy@kernel.org, George Spelvin <lkml@SDF.ORG>
+To: "David S. Miller" <davem@davemloft.net>, Masahiro Yamada <masahiroy@kernel.org>
+Cc: kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, clang-built-linux <clang-built-linux@googlegroups.com>, =?UTF-8?B?Ru+/ve+/ve+/vW5nLXJ177+977+977+9IFPvv73vv73vv71uZw==?= <maskray@google.com>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, kbuild test robot <lkp@intel.com>
 
-Here's an interesting bug I just ran into, a bug in commit
-c12d3362a74b ("int128: move __uint128_t compiler test to Kconfig")
+On Mon, Mar 9, 2020 at 3:55 AM kbuild test robot <lkp@intel.com> wrote:
+>
+> Hi Masahiro,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on kbuild/for-next]
+> [also build test ERROR on linux/master linus/master v5.6-rc5 next-20200306]
+> [if your patch is applied to the wrong git tree, please drop us a note to help
+> improve the system. BTW, we also suggest to use '--base' option to specify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+>
+> url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-link-lib-y-objects-to-vmlinux-forcibly-when-CONFIG_MODULES-y/20200309-115312
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+> config: sparc-defconfig (attached as .config)
+> compiler: sparc-linux-gcc (GCC) 7.5.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.5.0 make.cross ARCH=sparc
+>
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>    arch/sparc/lib/strlen.o: In function `strlen':
+> >> (.text+0x0): multiple definition of `strlen'
+>    lib/string.o:string.c:(.text+0x2b0): first defined here
 
-My x86-64 kernel build is lacking CC_HAS_INT128 and therefore
- CONFIG_ARCH_SUPPORTS_INT128, even through it supports
-__int128 just fine.
+So this looks like a bug in 32b Sparc, that we should fix first.
 
-The reason is that the actuall call which tests for compiler support is 
-execve("/usr/bin/gcc", ["gcc", "-Werror", "-D__SIZEOF_INT128__=0", "-S", "-x", "c", "/dev/null", "-o", "/dev/null"], 0x5818d390 /* 122 vars */) = 0
+arch/sparc/lib/strlen.S provides a definition of strlen, but it does
+not define the preprocessor token __HAVE_ARCH_STRLEN to avoid multiple
+definitions from producing a link error.
 
-and it doesn't detect the redefined symbol.
+Or rather, __HAVE_ARCH_STRLEN is provided in include/asm/string_64.h,
+but not for 32b sparc.  arch/sparc/strlen.o is unconditionally
+required in lib-y in arch/sparc/lib/Makefile.
 
-$ gcc -Werror -D__SIZEOF_INT128__=0 -S -x c /dev/null -o /dev/null
-$ echo $?
-0
+Either:
+1. arch/sparc/lib/strlen.S supports 32b sparc, then __HAVE_ARCH_STRLEN
+and a forward declaration of strlen should be provided in
+arch/sparc/include/asm/string.h rather than
+arch/sparc/include/asm/string_64.h, or...
+2. arch/sparc/lib/strlen.S does not support 32b sparc, then the
+inclusion of strlen.o in arch/sparc/lib/Makefile should be predicated
+on CONFIG_SPARC64.
 
-But on my machine, gcc defaults to the 32-bit compiler.  The kernel
-is compiled with -m64, and with that on the command line, things
-fail as expected:
-
-$ gcc -m64 -Werror -D__SIZEOF_INT128__=0 -S -x c /dev/null -o /dev/null
-<command-line>: error: "__SIZEOF_INT128__" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-$
-
-I haven't figured out how to fix this, but hopefully someone more familiar
-with the innards of Kconfig can.
++ Dave who maybe can provide guidance on how to proceed?  The use of
+the BRANCH32 macro in arch/sparc/lib/strlen.S seems to have different
+definitions based on CONFIG_SPARC64 vs CONFIG_SPARC32, which makes me
+thing it's case 1 above, but I'm not familiar with Sparc assembly to
+be confident.
+-- 
+Thanks,
+~Nick Desaulniers
