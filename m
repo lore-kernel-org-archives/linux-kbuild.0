@@ -1,59 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:28070 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726258AbgCJKPN (ORCPT
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:50186 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726316AbgCJLbG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Mar 2020 06:15:13 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/2] int128: fix __uint128_t compiler test in Kconfig
-Date: Tue, 10 Mar 2020 19:12:50 +0900
-Message-Id: <20200310101250.22374-2-masahiroy@kernel.org>
-In-Reply-To: <20200310101250.22374-1-masahiroy@kernel.org>
-References: <20200310101250.22374-1-masahiroy@kernel.org>
+        Tue, 10 Mar 2020 07:31:06 -0400
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH] kbuild: Disable -Wpointer-to-enum-cast
+Date: Tue, 10 Mar 2020 11:31:01 +0000
+Message-ID: <c2a687d065c1463d8eea9947687b3b05@AcuMS.aculab.com>
+References: <20200308073400.23398-1-natechancellor@gmail.com>
+ <CAK7LNARcTHpd8fzrAhFVB_AR7NoBgenX64de0eS2uN8g0by9PQ@mail.gmail.com>
+ <20200310012545.GA16822@ubuntu-m2-xlarge-x86>
+In-Reply-To: <20200310012545.GA16822@ubuntu-m2-xlarge-x86>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>, George Spelvin <lkml@sdf.org>, Masahiro Yamada <masahiroy@kernel.org>, Dan Williams <dan.j.williams@intel.com>, David Howells <dhowells@redhat.com>, "Eric W. Biederman" <ebiederm@xmission.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Herbert Xu <herbert@gondor.apana.org.au>, "Joel Fernandes (Google)" <joel@joelfernandes.org>, Krzysztof Kozlowski <krzk@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, Patrick Bellasi <patrick.bellasi@arm.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, linux-kernel@vger.kernel.org
+To: 'Nathan Chancellor' <natechancellor@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, stable <stable@vger.kernel.org>
 
-The support for __uint128_t is dependent on the target bit size.
+From: Nathan Chancellor
+> Sent: 10 March 2020 01:26
+...
+> Sure, I can send v2 to do that but I think that sending 97 patches just
+> casting the small values (usually less than twenty) to unsigned long
+> then to the enum is rather frivolous. I audited at least ten to fifteen
+> of these call sites when creating the clang patch and they are all
+> basically false positives.
 
-GCC that defaults to the 32-bit can still build the 64-bit kernel
-with -m64 flag passed.
+Such casts just make the code hard to read.
+If misused casts can hide horrid bugs.
+IMHO sprinkling the code with casts just to remove
+compiler warnings will bite back one day.
 
-However, $(cc-option,-D__SIZEOF_INT128__=0) is evaluated against the
-default machine bit, which may not match to the kernel it is building.
+	David
 
-Theoretically, this could be evaluated separately for 64BIT/32BIT.
-
-  config CC_HAS_INT128
-          bool
-          default !$(cc-option,$(m64-flag) -D__SIZEOF_INT128__=0) if 64BIT
-          default !$(cc-option,$(m32-flag) -D__SIZEOF_INT128__=0)
-
-I simplified it more because the 32-bit compiler is unlikely to support
-__uint128_t.
-
-Fixes: c12d3362a74b ("int128: move __uint128_t compiler test to Kconfig")
-Reported-by: George Spelvin <lkml@sdf.org>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- init/Kconfig | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/init/Kconfig b/init/Kconfig
-index 20a6ac33761c..4f717bfdbfe2 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -767,8 +767,7 @@ config ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
- 	bool
- 
- config CC_HAS_INT128
--	def_bool y
--	depends on !$(cc-option,-D__SIZEOF_INT128__=0)
-+	def_bool !$(cc-option,$(m64-flag) -D__SIZEOF_INT128__=0) && 64BIT
- 
- #
- # For architectures that know their GCC __int128 support is sound
--- 
-2.17.1
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
