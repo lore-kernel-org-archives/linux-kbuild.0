@@ -1,128 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:45185 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgCJSVh (ORCPT
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:41403 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726315AbgCJSwx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Mar 2020 14:21:37 -0400
-Received: by mail-ot1-f66.google.com with SMTP id f21so14094860otp.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Mar 2020 11:21:36 -0700 (PDT)
+        Tue, 10 Mar 2020 14:52:53 -0400
+From: Arnaldo Carvalho de Melo <arnaldo.melo@gmail.com>
+Date: Tue, 10 Mar 2020 15:52:48 -0300
+Subject: Re: [PATCH] kbuild: Remove debug info from kallsyms linking
+Message-ID: <20200310185248.GM15931@kernel.org>
+References: <202002242114.CBED7F1@keescook>
+ <CAEf4BzYrBoQJ1tPMRMQ_-G6e76=zj4zyC=HrY-mxH_9QK65oqg@mail.gmail.com>
+ <202003031301.083CF048C2@keescook>
+ <CAEf4BzbX-Eo3+DCG4zBMhJtLSZrtp48Z-8SvA8qy-WXA5kjR6A@mail.gmail.com>
+ <202003031758.AE8FEB7@keescook>
+ <CAEf4Bza31J_3Puwf7gnq0jDYRH2_JkRM9L+PO8dFrCzp+==8Lg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200308073400.23398-1-natechancellor@gmail.com>
- <CAK7LNARcTHpd8fzrAhFVB_AR7NoBgenX64de0eS2uN8g0by9PQ@mail.gmail.com>
- <20200310012545.GA16822@ubuntu-m2-xlarge-x86> <c2a687d065c1463d8eea9947687b3b05@AcuMS.aculab.com>
- <CAK7LNARMsO0AeO8-kH4czMuW0Y_=dN+ZhtXNdRE7CWGvU2PNvA@mail.gmail.com> <CAKwvOdmf0V61O5gsuby_50fijrxe=LNh4pTtRGy_8=5637P7qw@mail.gmail.com>
-In-Reply-To: <CAKwvOdmf0V61O5gsuby_50fijrxe=LNh4pTtRGy_8=5637P7qw@mail.gmail.com>
-From: Saravana Kannan <saravanak@google.com>
-Date: Tue, 10 Mar 2020 11:20:59 -0700
-Message-ID: <CAGETcx930eOFOLjf2zjY5RLvSNnyyESLRv+8M7s=cP8EnMDBLg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Disable -Wpointer-to-enum-cast
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEf4Bza31J_3Puwf7gnq0jDYRH2_JkRM9L+PO8dFrCzp+==8Lg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, David Laight <David.Laight@aculab.com>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, stable <stable@vger.kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Kees Cook <keescook@chromium.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 
-On Tue, Mar 10, 2020 at 9:16 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> + Saravana, who I spoke to briefly about this.
->
->
-> On Tue, Mar 10, 2020 at 8:32 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > On Tue, Mar 10, 2020 at 8:31 PM David Laight <David.Laight@aculab.com> wrote:
-> > >
-> > > From: Nathan Chancellor
-> > > > Sent: 10 March 2020 01:26
-> > > ...
-> > > > Sure, I can send v2 to do that but I think that sending 97 patches just
-> > > > casting the small values (usually less than twenty) to unsigned long
-> > > > then to the enum is rather frivolous. I audited at least ten to fifteen
-> > > > of these call sites when creating the clang patch and they are all
-> > > > basically false positives.
-> > >
-> > > Such casts just make the code hard to read.
-> > > If misused casts can hide horrid bugs.
-> > > IMHO sprinkling the code with casts just to remove
-> > > compiler warnings will bite back one day.
-> > >
-> >
-> > I agree that too much casts make the code hard to read,
-> > but irrespective of this patch, there is no difference
-> > in the fact that we need a cast to convert
-> > (const void *) to a non-pointer value.
-> >
-> > The difference is whether we use
-> > (uintptr_t) or (enum foo).
-> >
-> >
-> >
-> >
-> > If we want to avoid casts completely,
-> > we could use union in struct of_device_id
-> > although this might be rejected.
+Em Tue, Mar 03, 2020 at 08:29:39PM -0800, Andrii Nakryiko escreveu:
+> On Tue, Mar 3, 2020 at 6:11 PM Kees Cook <keescook@chromium.org> wrote:
+> > On Tue, Mar 03, 2020 at 01:50:52PM -0800, Andrii Nakryiko wrote:
+> > > On Tue, Mar 3, 2020 at 1:06 PM Kees Cook <keescook@chromium.org> wrote:
+> > > > On Mon, Mar 02, 2020 at 10:55:04PM -0800, Andrii Nakryiko wrote:
+> > > > > On Mon, Feb 24, 2020 at 9:17 PM Kees Cook <keescook@chromium.org> wrote:
+> > > > > >         LLVM_OBJCOPY=${OBJCOPY} ${PAHOLE} -J ${1}
+> > > > > >
+> > > > > >         # dump .BTF section into raw binary file to link with final vmlinux
 
-The union like you suggested might fly. Maybe the new field data_ulong
-or data_u32 might work and even help non-enum non-pointer values to be
-stored in this directly too without needing the casting that's needed
-today.
+> > > > BTW, in looking at BTF generation, why is this cut up into three steps:
+> > > > pahole, objcopy, objcopy... shouldn't pahole just gross an output method
+> > > > to dump the final .o file? That would be MUCH nicer. Especially since
+> > > > the first step ends up rewriting (?!) the original ELF. This is a lot of
+> > > > needless IO...
 
-I still don't get why the compiler can't be smarter about this. If the
-enum would fit inside the pointer, why not leave that alone and throw
-a warning only when the enum really can overflow the pointer field?
+> > > Just mostly historical reasons, that was the interface pahole already
+> > > supported. I agree that it's a good idea to teach pahole to just emit
+> > > a binary BTF section dump.
 
-> >
-> >
-> > FWIW:
-> >
-> > diff --git a/drivers/ata/ahci_brcm.c b/drivers/ata/ahci_brcm.c
-> > index 6853dbb4131d..534170bea134 100644
-> > --- a/drivers/ata/ahci_brcm.c
-> > +++ b/drivers/ata/ahci_brcm.c
-> > @@ -415,11 +415,11 @@ static struct scsi_host_template ahci_platform_sht = {
-> >  };
-> >
-> >  static const struct of_device_id ahci_of_match[] = {
-> > -       {.compatible = "brcm,bcm7425-ahci", .data = (void *)BRCM_SATA_BCM7425},
-> > -       {.compatible = "brcm,bcm7445-ahci", .data = (void *)BRCM_SATA_BCM7445},
-> > -       {.compatible = "brcm,bcm63138-ahci", .data = (void *)BRCM_SATA_BCM7445},
-> > -       {.compatible = "brcm,bcm-nsp-ahci", .data = (void *)BRCM_SATA_NSP},
-> > -       {.compatible = "brcm,bcm7216-ahci", .data = (void *)BRCM_SATA_BCM7216},
-> > +       {.compatible = "brcm,bcm7425-ahci", .data2 = BRCM_SATA_BCM7425},
-> > +       {.compatible = "brcm,bcm7445-ahci", .data2 = BRCM_SATA_BCM7445},
-> > +       {.compatible = "brcm,bcm63138-ahci", .data2 = BRCM_SATA_BCM7445},
-> > +       {.compatible = "brcm,bcm-nsp-ahci", .data2 = BRCM_SATA_NSP},
-> > +       {.compatible = "brcm,bcm7216-ahci", .data2 = BRCM_SATA_BCM7216},
-> >         {},
-> >  };
-> >  MODULE_DEVICE_TABLE(of, ahci_of_match);
-> > @@ -442,7 +442,7 @@ static int brcm_ahci_probe(struct platform_device *pdev)
-> >         if (!of_id)
-> >                 return -ENODEV;
-> >
-> > -       priv->version = (enum brcm_ahci_version)of_id->data;
-> > +       priv->version = of_id->data2;
-> >         priv->dev = dev;
-> >
-> >         res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "top-ctrl");
-> > diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-> > index e3596db077dc..98d44ebf146a 100644
-> > --- a/include/linux/mod_devicetable.h
-> > +++ b/include/linux/mod_devicetable.h
-> > @@ -261,7 +261,10 @@ struct of_device_id {
-> >         char    name[32];
-> >         char    type[32];
-> >         char    compatible[128];
-> > -       const void *data;
-> > +       union {
-> > +               const void *data;
-> > +               unsigned long data2;
-> > +       };
-> >  };
-> >
+> > /me adds it to giant TODO list ;)
 
-I've never (or long since forgotten) consciously declared a union
-without a name and directly accessed it's fields. If this compiles,
-this seems reasonable.
+Mine is giant as well, but adding it anyway...
 
--Saravana
+:-)
+
+- Arnaldo
