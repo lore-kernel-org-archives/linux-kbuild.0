@@ -1,112 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:46155 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbgCJBO1 (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:57081 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbgCJBPD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Mar 2020 21:14:27 -0400
-Date: Mon, 9 Mar 2020 18:14:23 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH] kbuild: Disable -Wpointer-to-enum-cast
-Message-ID: <20200310011423.GA1578@ubuntu-m2-xlarge-x86>
-References: <20200308073400.23398-1-natechancellor@gmail.com>
- <20200309122505.5043620866@mail.kernel.org>
+        Mon, 9 Mar 2020 21:15:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200309122505.5043620866@mail.kernel.org>
+References: <20200309023910.25370-1-masahiroy@kernel.org> <202003091801.6KQQKZ1Y%lkp@intel.com>
+ <CAKwvOdksxVa=NGtyT3hsuHg6SJG4CbNWAepf+dxwVDC1+36zyw@mail.gmail.com>
+In-Reply-To: <CAKwvOdksxVa=NGtyT3hsuHg6SJG4CbNWAepf+dxwVDC1+36zyw@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 10 Mar 2020 10:14:11 +0900
+Message-ID: <CAK7LNATy3Eb9MNFua1N0vjo1Nn7FH5v6do5aU=cufTXvcEq6jw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: link lib-y objects to vmlinux forcibly when CONFIG_MODULES=y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sasha Levin <sashal@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, clang-built-linux <clang-built-linux@googlegroups.com>, =?UTF-8?B?Ru+/ve+/ve+/vW5nLXJ177+977+977+9IFPvv73vv73vv71uZw==?= <maskray@google.com>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Michal Marek <michal.lkml@markovi.net>, kbuild test robot <lkp@intel.com>
 
-On Mon, Mar 09, 2020 at 12:25:04PM +0000, Sasha Levin wrote:
-> Hi
-> 
-> [This is an automated email]
-> 
-> This commit has been processed because it contains a -stable tag.
-> The stable tag indicates that it's relevant for the following trees: all
-> 
-> The bot has tested the following trees: v5.5.8, v5.4.24, v4.19.108, v4.14.172, v4.9.215, v4.4.215.
-> 
-> v5.5.8: Build OK!
-> v5.4.24: Build OK!
-> v4.19.108: Failed to apply! Possible dependencies:
->     076f421da5d4 ("kbuild: replace cc-name test with CONFIG_CC_IS_CLANG")
->     a1494304346a ("kbuild: add all Clang-specific flags unconditionally")
-> 
-> v4.14.172: Failed to apply! Possible dependencies:
->     076f421da5d4 ("kbuild: replace cc-name test with CONFIG_CC_IS_CLANG")
->     a1494304346a ("kbuild: add all Clang-specific flags unconditionally")
->     c6d6f4c55f5c ("MIPS: Always specify -EB or -EL when using clang")
->     ee67855ecd9d ("MIPS: vdso: Allow clang's --target flag in VDSO cflags")
-> 
-> v4.9.215: Failed to apply! Possible dependencies:
->     076f421da5d4 ("kbuild: replace cc-name test with CONFIG_CC_IS_CLANG")
->     0e5e7f5e9700 ("powerpc/64: Reclaim CPU_FTR_SUBCORE")
->     1421dc6d4829 ("powerpc/kbuild: Use flags variables rather than overriding LD/CC/AS")
->     250122baed29 ("powerpc64/module: Tighten detection of mcount call sites with -mprofile-kernel")
->     2a056f58fd33 ("powerpc: consolidate -mno-sched-epilog into FTRACE flags")
->     3a849815a136 ("powerpc/book3s64: Always build for power4 or later")
->     43c9127d94d6 ("powerpc: Add option to use thin archives")
->     471d7ff8b51b ("powerpc/64s: Remove POWER4 support")
->     5a61ef74f269 ("powerpc/64s: Support new device tree binding for discovering CPU features")
->     6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer")
->     73aca179d78e ("powerpc/modules: Fix crashes by adding CONFIG_RELOCATABLE to vermagic")
->     951eedebcdea ("powerpc/64: Handle linker stubs in low .text code")
->     a1494304346a ("kbuild: add all Clang-specific flags unconditionally")
->     a73657ea19ae ("powerpc/64: Add GENERIC_CPU support for little endian")
->     abba759796f9 ("powerpc/kbuild: move -mprofile-kernel check to Kconfig")
->     b40b2386bce9 ("powerpc/Makefile: Fix ld version check with 64-bit LE-only toolchain")
->     b71c9ffb1405 ("powerpc: Add arch/powerpc/tools directory")
->     baa25b571a16 ("powerpc/64: Do not link crtsavres.o in vmlinux")
->     badf436f6fa5 ("powerpc/Makefiles: Convert ifeq to ifdef where possible")
->     c0d64cf9fefd ("powerpc: Use feature bit for RTC presence rather than timebase presence")
->     c1807e3f8466 ("powerpc/64: Free up CPU_FTR_ICSWX")
->     c6d6f4c55f5c ("MIPS: Always specify -EB or -EL when using clang")
->     cf43d3b26452 ("powerpc: Enable pkey subsystem")
->     ee67855ecd9d ("MIPS: vdso: Allow clang's --target flag in VDSO cflags")
->     efe0160cfd40 ("powerpc/64: Linker on-demand sfpr functions for modules")
->     f188d0524d7e ("powerpc: Use the new post-link pass to check relocations")
-> 
-> v4.4.215: Failed to apply! Possible dependencies:
->     076f421da5d4 ("kbuild: replace cc-name test with CONFIG_CC_IS_CLANG")
->     07e45c120c9c ("powerpc: Don't disable kernel FP/VMX/VSX MSR bits on context switch")
->     152d523e6307 ("powerpc: Create context switch helpers save_sprs() and restore_sprs()")
->     20dbe6706206 ("powerpc: Call restore_sprs() before _switch()")
->     2a056f58fd33 ("powerpc: consolidate -mno-sched-epilog into FTRACE flags")
->     3f3b5dc14c25 ("powerpc/pseries: PACA save area fix for general exception vs MCE")
->     579e633e764e ("powerpc: create flush_all_to_thread()")
->     57f266497d81 ("powerpc: Use gas sections for arranging exception vectors")
->     6977f95e63b9 ("powerpc: avoid -mno-sched-epilog on GCC 4.9 and newer")
->     70fe3d980f5f ("powerpc: Restore FPU/VEC/VSX if previously used")
->     8c50b72a3b4f ("powerpc/ftrace: Add Kconfig & Make glue for mprofile-kernel")
->     951eedebcdea ("powerpc/64: Handle linker stubs in low .text code")
->     a1494304346a ("kbuild: add all Clang-specific flags unconditionally")
->     a74599a50419 ("powerpc/pseries: PACA save area fix for MCE vs MCE")
->     abba759796f9 ("powerpc/kbuild: move -mprofile-kernel check to Kconfig")
->     c208505900b2 ("powerpc: create giveup_all()")
->     c6d6f4c55f5c ("MIPS: Always specify -EB or -EL when using clang")
->     caca285e5ab4 ("powerpc/mm/radix: Use STD_MMU_64 to properly isolate hash related code")
->     d1e1cf2e38de ("powerpc: clean up asm/switch_to.h")
->     d8d42b0511fe ("powerpc/64: Do load of PACAKBASE in LOAD_HANDLER")
->     ee67855ecd9d ("MIPS: vdso: Allow clang's --target flag in VDSO cflags")
->     f0f558b131db ("powerpc/mm: Preserve CFAR value on SLB miss caused by access to bogus address")
->     f3d885ccba85 ("powerpc: Rearrange __switch_to()")
-> 
-> 
-> NOTE: The patch will not be queued to stable trees until it is upstream.
-> 
-> How should we proceed with this patch?
-> 
-> -- 
-> Thanks
-> Sasha
+Hi Nick, David,
 
-Hi Sasha,
+On Tue, Mar 10, 2020 at 4:59 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> On Mon, Mar 9, 2020 at 3:55 AM kbuild test robot <lkp@intel.com> wrote:
+> >
+> > Hi Masahiro,
+> >
+> > I love your patch! Yet something to improve:
+> >
+> > [auto build test ERROR on kbuild/for-next]
+> > [also build test ERROR on linux/master linus/master v5.6-rc5 next-20200306]
+> > [if your patch is applied to the wrong git tree, please drop us a note to help
+> > improve the system. BTW, we also suggest to use '--base' option to specify the
+> > base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> >
+> > url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/kbuild-link-lib-y-objects-to-vmlinux-forcibly-when-CONFIG_MODULES-y/20200309-115312
+> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+> > config: sparc-defconfig (attached as .config)
+> > compiler: sparc-linux-gcc (GCC) 7.5.0
+> > reproduce:
+> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # save the attached .config to linux build tree
+> >         GCC_VERSION=7.5.0 make.cross ARCH=sparc
+> >
+> > If you fix the issue, kindly add following tag
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    arch/sparc/lib/strlen.o: In function `strlen':
+> > >> (.text+0x0): multiple definition of `strlen'
+> >    lib/string.o:string.c:(.text+0x2b0): first defined here
+>
+> So this looks like a bug in 32b Sparc, that we should fix first.
+>
+> arch/sparc/lib/strlen.S provides a definition of strlen, but it does
+> not define the preprocessor token __HAVE_ARCH_STRLEN to avoid multiple
+> definitions from producing a link error.
+>
+> Or rather, __HAVE_ARCH_STRLEN is provided in include/asm/string_64.h,
+> but not for 32b sparc.  arch/sparc/strlen.o is unconditionally
+> required in lib-y in arch/sparc/lib/Makefile.
+>
+> Either:
+> 1. arch/sparc/lib/strlen.S supports 32b sparc, then __HAVE_ARCH_STRLEN
+> and a forward declaration of strlen should be provided in
+> arch/sparc/include/asm/string.h rather than
+> arch/sparc/include/asm/string_64.h, or...
+> 2. arch/sparc/lib/strlen.S does not support 32b sparc, then the
+> inclusion of strlen.o in arch/sparc/lib/Makefile should be predicated
+> on CONFIG_SPARC64.
+>
+> + Dave who maybe can provide guidance on how to proceed?  The use of
+> the BRANCH32 macro in arch/sparc/lib/strlen.S seems to have different
+> definitions based on CONFIG_SPARC64 vs CONFIG_SPARC32, which makes me
+> thing it's case 1 above, but I'm not familiar with Sparc assembly to
+> be confident.
 
-If/when this patch hits mainline and I get the rejected emails from
-Greg, I will send a manual backport.
 
-Cheers,
-Nathan
+
+I agree.
+The former is probably the intention
+according to this commit:
+
+commit ae984d72e0632782dd98c3fcf469b9045ad0d449
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Dec 9 01:07:09 2008 -0800
+
+    sparc: Unify strlen assembler.
+
+    Use the new asm/asm.h header to help commonize the
+    strlen assembler between 32-bit and 64-bit
+
+    While we're here, use proper linux/linkage.h macros
+    instead of by-hand stuff.
+
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
