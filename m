@@ -1,126 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-db8eur05on2053.outbound.protection.outlook.com ([40.107.20.53]:6068
-        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730677AbgCKSSt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 Mar 2020 14:18:49 -0400
-Subject: Re: [PATCH] scripts/kallsyms: fix wrong kallsyms_relative_base with
- CONFIG_KALLSYMS_BASE_RELATIVE
-References: <da22e0ac-8da8-8a16-e8dd-b7065752cb4d@mir.dev>
- <CAK7LNASput9F2XhAi4NUT7jx1z+-mSJXUDnqCfKGtXq_SNbohQ@mail.gmail.com>
-From: Mikhail Petrov <Mikhail.Petrov@mir.dev>
-Message-ID: <bd6dc9fb-3171-c12d-6d80-31a52eb9eb0a@mir.dev>
-Date: Wed, 11 Mar 2020 21:18:40 +0300
-In-Reply-To: <CAK7LNASput9F2XhAi4NUT7jx1z+-mSJXUDnqCfKGtXq_SNbohQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:36867 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730705AbgCKTl0 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 11 Mar 2020 15:41:26 -0400
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH v2] kbuild: Disable -Wpointer-to-enum-cast
+Date: Wed, 11 Mar 2020 12:41:21 -0700
+Message-Id: <20200311194121.38047-1-natechancellor@gmail.com>
+In-Reply-To: <20200308073400.23398-1-natechancellor@gmail.com>
+References: <20200308073400.23398-1-natechancellor@gmail.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, stable@vger.kernel.org
 
-Hi Masahiro,
+Clang's -Wpointer-to-int-cast deviates from GCC in that it warns when
+casting to enums. The kernel does this in certain places, such as device
+tree matches to set the version of the device being used, which allows
+the kernel to avoid using a gigantic union.
 
-On 11.03.2020 9:06, Masahiro Yamada wrote:
-> Hi Mikhail,
-> 
-> On Wed, Mar 11, 2020 at 5:34 AM Mikhail Petrov <Mikhail.Petrov@mir.dev> wrote:
->>
->> There is the code in the read_symbol function in 'scripts/kallsyms.c':
->>
->>         if (is_ignored_symbol(name, type))
->>                 return NULL;
->>
->>         /* Ignore most absolute/undefined (?) symbols. */
->>         if (strcmp(name, "_text") == 0)
->>                 _text = addr;
->>
->> But the is_ignored_symbol function returns true for name="_text" and type='a'. So the next condition is not executed and the _text variable is always zero.
->>
->> It makes the wrong kallsyms_relative_base symbol as a result of the code:
->>
->>         if (base_relative) {
->>                 output_label("kallsyms_relative_base");
->>                 output_address(relative_base);
->>                 printf("\n");
->>         }
->>
->> Because the output_address function uses the _text variable.
->>
->> So the kallsyms_lookup function and all related functions in the kernel do not work properly. For example, the stack trace in oops:
->>
->>         Call Trace:
->>         [aa095e58] [809feab8] kobj_ns_ops_tbl+0x7ff09ac8/0x7ff1c1c4 (unreliable)
->>         [aa095e98] [80002b64] kobj_ns_ops_tbl+0x7f50db74/0x80000010
->>         [aa095ef8] [809c3d24] kobj_ns_ops_tbl+0x7feced34/0x7ff1c1c4
->>         [aa095f28] [80002ed0] kobj_ns_ops_tbl+0x7f50dee0/0x80000010
->>         [aa095f38] [8000f238] kobj_ns_ops_tbl+0x7f51a248/0x80000010
->>
->> The right stack trace:
->>
->>         Call Trace:
->>         [aa095e58] [809feab8] module_vdu_video_init+0x2fc/0x3bc (unreliable)
->>         [aa095e98] [80002b64] do_one_initcall+0x40/0x1f0
->>         [aa095ef8] [809c3d24] kernel_init_freeable+0x164/0x1d8
->>         [aa095f28] [80002ed0] kernel_init+0x14/0x124
->>         [aa095f38] [8000f238] ret_from_kernel_thread+0x14/0x1c
->>
->> Signed-off-by: Mikhail Petrov <Mikhail.Petrov@mir.dev>
->>
->> ---
-> 
-> 
-> Thanks for the patch.
-> 
-> Just for curiosity, on which architecrure
-> did you see  name="_text" and type='a' case ?
+https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L428
+https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L402
+https://elixir.bootlin.com/linux/v5.5.8/source/include/linux/mod_devicetable.h#L264
 
-Actually 'a' is 'A' (my mistake). The architecture is PowerPC - core PPC476FS.
+To avoid a ton of false positive warnings, disable this particular part
+of the warning, which has been split off into a separate diagnostic so
+that the entire warning does not need to be turned off for clang. It
+will be visible under W=1 in case people want to go about fixing these
+easily and enabling the warning treewide.
 
-nm -n .tmp_vmlinux1 looks like:
+Cc: stable@vger.kernel.org
+Link: https://github.com/ClangBuiltLinux/linux/issues/887
+Link: https://github.com/llvm/llvm-project/commit/2a41b31fcdfcb67ab7038fc2ffb606fd50b83a84
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
 
-...
-         w kallsyms_token_table
-         w mach_powermac
-00000007 a LG_CACHELINE_BYTES
-00000007 a LG_CACHELINE_BYTES
-00000007 a LG_CACHELINE_BYTES
-00000020 a reg
-0000007f a CACHELINE_MASK
-0000007f a CACHELINE_MASK
-0000007f a CACHELINE_MASK
-00000080 a CACHELINE_BYTES
-00000080 a CACHELINE_BYTES
-00000080 a CACHELINE_BYTES
-00000400 a dcr
-80000000 T _start
-80000000 A _stext
-80000000 A _text
-80000088 t interrupt_base
-800000a0 t CriticalInput
-80000180 t MachineCheck
-80000260 t MachineCheckA
-80000360 t DataStorage
-80000420 t InstructionStorage
-80000500 t ExternalInput
-800005c0 t Alignment
-80000680 t Program
-80000740 t FloatingPointUnavailable
-80000820 t SystemCall
-80000900 t AuxillaryProcessorUnavailable
-...
+v1 -> v2:
 
+* Move under scripts/Makefile.extrawarn, as requested by Masahiro
+
+ scripts/Makefile.extrawarn | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index ecddf83ac142..ca08f2fe7c34 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -48,6 +48,7 @@ KBUILD_CFLAGS += -Wno-initializer-overrides
+ KBUILD_CFLAGS += -Wno-format
+ KBUILD_CFLAGS += -Wno-sign-compare
+ KBUILD_CFLAGS += -Wno-format-zero-length
++KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
+ endif
  
-> Could you wrap the commit log to avoid
-> this checkpatch warning?
-> WARNING: Possible unwrapped commit description (prefer a maximum 75
-> chars per line)
-> 
-> Also, could you shorten the patch subject
-> to make it fit in this limit?
-
-Sorry for that. Now I know about scripts/checkpatch.pl. I will improve and resubmit the patch soon.
-
-Thanks.
+ endif
+-- 
+2.26.0.rc1
