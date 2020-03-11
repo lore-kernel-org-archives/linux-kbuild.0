@@ -1,61 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:36867 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730705AbgCKTl0 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 Mar 2020 15:41:26 -0400
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH v2] kbuild: Disable -Wpointer-to-enum-cast
-Date: Wed, 11 Mar 2020 12:41:21 -0700
-Message-Id: <20200311194121.38047-1-natechancellor@gmail.com>
-In-Reply-To: <20200308073400.23398-1-natechancellor@gmail.com>
-References: <20200308073400.23398-1-natechancellor@gmail.com>
+Received: from mail-eopbgr50070.outbound.protection.outlook.com ([40.107.5.70]:26787
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726684AbgCKUhS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 11 Mar 2020 16:37:18 -0400
+From: Mikhail Petrov <Mikhail.Petrov@mir.dev>
+Subject: [PATCH v2] scripts/kallsyms: fix wrong kallsyms_relative_base
+Message-ID: <306f76fc-c445-6578-d4fe-5e462861920c@mir.dev>
+Date: Wed, 11 Mar 2020 23:37:09 +0300
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nathan Chancellor <natechancellor@gmail.com>, stable@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Clang's -Wpointer-to-int-cast deviates from GCC in that it warns when
-casting to enums. The kernel does this in certain places, such as device
-tree matches to set the version of the device being used, which allows
-the kernel to avoid using a gigantic union.
+There is the code in the read_symbol function in 'scripts/kallsyms.c':
 
-https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L428
-https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L402
-https://elixir.bootlin.com/linux/v5.5.8/source/include/linux/mod_devicetable.h#L264
+	if (is_ignored_symbol(name, type))
+		return NULL;
 
-To avoid a ton of false positive warnings, disable this particular part
-of the warning, which has been split off into a separate diagnostic so
-that the entire warning does not need to be turned off for clang. It
-will be visible under W=1 in case people want to go about fixing these
-easily and enabling the warning treewide.
+	/* Ignore most absolute/undefined (?) symbols. */
+	if (strcmp(name, "_text") == 0)
+		_text = addr;
 
-Cc: stable@vger.kernel.org
-Link: https://github.com/ClangBuiltLinux/linux/issues/887
-Link: https://github.com/llvm/llvm-project/commit/2a41b31fcdfcb67ab7038fc2ffb606fd50b83a84
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+But the is_ignored_symbol function returns true for name="_text" and
+type='A'. So the next condition is not executed and the _text variable
+is always zero.
+
+It makes the wrong kallsyms_relative_base symbol as a result of the code
+(CONFIG_KALLSYMS_BASE_RELATIVE is defined):
+
+	if (base_relative) {
+		output_label("kallsyms_relative_base");
+		output_address(relative_base);
+		printf("\n");
+	}
+
+Because the output_address function uses the _text variable.
+
+So the kallsyms_lookup function and all related functions in the kernel
+do not work properly. For example, the stack trace in oops:
+
+ Call Trace:
+ [aa095e58] [809feab8] kobj_ns_ops_tbl+0x7ff09ac8/0x7ff1c1c4 (unreliable)
+ [aa095e98] [80002b64] kobj_ns_ops_tbl+0x7f50db74/0x80000010
+ [aa095ef8] [809c3d24] kobj_ns_ops_tbl+0x7feced34/0x7ff1c1c4
+ [aa095f28] [80002ed0] kobj_ns_ops_tbl+0x7f50dee0/0x80000010
+ [aa095f38] [8000f238] kobj_ns_ops_tbl+0x7f51a248/0x80000010
+
+The right stack trace:
+
+ Call Trace:
+ [aa095e58] [809feab8] module_vdu_video_init+0x2fc/0x3bc (unreliable)
+ [aa095e98] [80002b64] do_one_initcall+0x40/0x1f0
+ [aa095ef8] [809c3d24] kernel_init_freeable+0x164/0x1d8
+ [aa095f28] [80002ed0] kernel_init+0x14/0x124
+ [aa095f38] [8000f238] ret_from_kernel_thread+0x14/0x1c
+
+Signed-off-by: Mikhail Petrov <Mikhail.Petrov@mir.dev>
+
 ---
 
-v1 -> v2:
-
-* Move under scripts/Makefile.extrawarn, as requested by Masahiro
-
- scripts/Makefile.extrawarn | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index ecddf83ac142..ca08f2fe7c34 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -48,6 +48,7 @@ KBUILD_CFLAGS += -Wno-initializer-overrides
- KBUILD_CFLAGS += -Wno-format
- KBUILD_CFLAGS += -Wno-sign-compare
- KBUILD_CFLAGS += -Wno-format-zero-length
-+KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
- endif
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 0133dfaaf352..3e8dea6e0a95 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -195,13 +195,13 @@ static struct sym_entry *read_symbol(FILE *in)
+ 		return NULL;
+ 	}
  
- endif
--- 
-2.26.0.rc1
+-	if (is_ignored_symbol(name, type))
+-		return NULL;
+-
+-	/* Ignore most absolute/undefined (?) symbols. */
+ 	if (strcmp(name, "_text") == 0)
+ 		_text = addr;
+ 
++	/* Ignore most absolute/undefined (?) symbols. */
++	if (is_ignored_symbol(name, type))
++		return NULL;
++
+ 	check_symbol_range(name, addr, text_ranges, ARRAY_SIZE(text_ranges));
+ 	check_symbol_range(name, addr, &percpu_range, 1);
+ 
