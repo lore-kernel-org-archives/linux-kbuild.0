@@ -1,84 +1,194 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr60074.outbound.protection.outlook.com ([40.107.6.74]:41383
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726480AbgCJUeM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Mar 2020 16:34:12 -0400
-From: Mikhail Petrov <Mikhail.Petrov@mir.dev>
-Subject: [PATCH] scripts/kallsyms: fix wrong kallsyms_relative_base with
- CONFIG_KALLSYMS_BASE_RELATIVE
-Message-ID: <da22e0ac-8da8-8a16-e8dd-b7065752cb4d@mir.dev>
-Date: Tue, 10 Mar 2020 23:34:03 +0300
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-MIME-Version: 1.0
+Received: from conuserg-08.nifty.com ([210.131.2.75]:43733 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725813AbgCKFvw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 11 Mar 2020 01:51:52 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] net: drop_monitor: make drop_monitor built-in
+Date: Wed, 11 Mar 2020 14:49:53 +0900
+Message-Id: <20200311054953.11956-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+To: Neil Horman <nhorman@tuxdriver.com>, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+Cc: Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@mellanox.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
 
-There is the code in the read_symbol function in 'scripts/kallsyms.c':
+In net/Kconfig, NET_DEVLINK implies NET_DROP_MONITOR.
 
-	if (is_ignored_symbol(name, type))
-		return NULL;
+The original behavior of the 'imply' keyword prevents NET_DROP_MONITOR
+from being 'm' when NET_DEVLINK=y.
 
-	/* Ignore most absolute/undefined (?) symbols. */
-	if (strcmp(name, "_text") == 0)
-		_text = addr;
+With the planned Kconfig change that relaxes the 'imply', the
+combination of NET_DEVLINK=y and NET_DROP_MONITOR=m would be allowed,
+causing a link error of vmlinux.
 
-But the is_ignored_symbol function returns true for name="_text" and type='a'. So the next condition is not executed and the _text variable is always zero.
+As far as I see the mainline code, NET_DROP_MONITOR=m does not provide
+any useful case.
 
-It makes the wrong kallsyms_relative_base symbol as a result of the code:
+The call-site of net_dm_hw_report() only exists in net/core/devlink.c,
+which is always built-in since NET_DEVLINK is a bool type option.
 
-	if (base_relative) {
-		output_label("kallsyms_relative_base");
-		output_address(relative_base);
-		printf("\n");
-	}
+So, NET_DROP_MONITOR=m causes a build error, or creates an unused
+module at best.
 
-Because the output_address function uses the _text variable.
+Make NET_DROP_MONITOR a bool option, and remove the module exit code.
+I also unexported net_dm_hw_report because I see no other call-site
+in upstream.
 
-So the kallsyms_lookup function and all related functions in the kernel do not work properly. For example, the stack trace in oops:
-
-	Call Trace:
-	[aa095e58] [809feab8] kobj_ns_ops_tbl+0x7ff09ac8/0x7ff1c1c4 (unreliable)
-	[aa095e98] [80002b64] kobj_ns_ops_tbl+0x7f50db74/0x80000010
-	[aa095ef8] [809c3d24] kobj_ns_ops_tbl+0x7feced34/0x7ff1c1c4
-	[aa095f28] [80002ed0] kobj_ns_ops_tbl+0x7f50dee0/0x80000010
-	[aa095f38] [8000f238] kobj_ns_ops_tbl+0x7f51a248/0x80000010
-
-The right stack trace:
-
-	Call Trace:
-	[aa095e58] [809feab8] module_vdu_video_init+0x2fc/0x3bc (unreliable)
-	[aa095e98] [80002b64] do_one_initcall+0x40/0x1f0
-	[aa095ef8] [809c3d24] kernel_init_freeable+0x164/0x1d8
-	[aa095f28] [80002ed0] kernel_init+0x14/0x124
-	[aa095f38] [8000f238] ret_from_kernel_thread+0x14/0x1c
-
-Signed-off-by: Mikhail Petrov <Mikhail.Petrov@mir.dev>
-
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 0133dfaaf352..3e8dea6e0a95 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -195,13 +195,13 @@ static struct sym_entry *read_symbol(FILE *in)
- 		return NULL;
- 	}
+This build error was reported in linux-next.
+https://lkml.org/lkml/2020/3/10/1936
+
+A less invasive change would be to change
+IS_ENABLED(CONFIG_NET_DROP_MONITOR) in include/net/drop_monitor.h
+to IS_REACHABLE(CONFIG_NET_DROP_MONITOR).
+
+If you want to keep this modular, it is fine too.
+
+If this patch is acceptable,
+I'd like to get Ack from the maintainers,
+and insert this patch before my Kconfig change.
+
+
+ include/net/drop_monitor.h |  2 +-
+ net/Kconfig                |  2 +-
+ net/core/drop_monitor.c    | 56 ++------------------------------------
+ 3 files changed, 4 insertions(+), 56 deletions(-)
+
+diff --git a/include/net/drop_monitor.h b/include/net/drop_monitor.h
+index 2ab668461463..aa775f243b61 100644
+--- a/include/net/drop_monitor.h
++++ b/include/net/drop_monitor.h
+@@ -19,7 +19,7 @@ struct net_dm_hw_metadata {
+ 	struct net_device *input_dev;
+ };
  
--	if (is_ignored_symbol(name, type))
--		return NULL;
+-#if IS_ENABLED(CONFIG_NET_DROP_MONITOR)
++#ifdef CONFIG_NET_DROP_MONITOR
+ void net_dm_hw_report(struct sk_buff *skb,
+ 		      const struct net_dm_hw_metadata *hw_metadata);
+ #else
+diff --git a/net/Kconfig b/net/Kconfig
+index 2eeb0e55f7c9..6ad5d3e95be6 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -347,7 +347,7 @@ config NET_PKTGEN
+ 	  module will be called pktgen.
+ 
+ config NET_DROP_MONITOR
+-	tristate "Network packet drop alerting service"
++	bool "Network packet drop alerting service"
+ 	depends on INET && TRACEPOINTS
+ 	---help---
+ 	  This feature provides an alerting service to userspace in the
+diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
+index 31700e0c3928..25466b7a0176 100644
+--- a/net/core/drop_monitor.c
++++ b/net/core/drop_monitor.c
+@@ -13,6 +13,7 @@
+ #include <linux/if_arp.h>
+ #include <linux/inetdevice.h>
+ #include <linux/inet.h>
++#include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/netpoll.h>
+ #include <linux/sched.h>
+@@ -25,7 +26,6 @@
+ #include <linux/timer.h>
+ #include <linux/bitops.h>
+ #include <linux/slab.h>
+-#include <linux/module.h>
+ #include <net/drop_monitor.h>
+ #include <net/genetlink.h>
+ #include <net/netevent.h>
+@@ -962,7 +962,6 @@ void net_dm_hw_report(struct sk_buff *skb,
+ out:
+ 	rcu_read_unlock();
+ }
+-EXPORT_SYMBOL_GPL(net_dm_hw_report);
+ 
+ static int net_dm_hw_monitor_start(struct netlink_ext_ack *extack)
+ {
+@@ -1581,11 +1580,6 @@ static void __net_dm_cpu_data_init(struct per_cpu_dm_data *data)
+ 	u64_stats_init(&data->stats.syncp);
+ }
+ 
+-static void __net_dm_cpu_data_fini(struct per_cpu_dm_data *data)
+-{
+-	WARN_ON(!skb_queue_empty(&data->drop_queue));
+-}
 -
--	/* Ignore most absolute/undefined (?) symbols. */
- 	if (strcmp(name, "_text") == 0)
- 		_text = addr;
+ static void net_dm_cpu_data_init(int cpu)
+ {
+ 	struct per_cpu_dm_data *data;
+@@ -1594,18 +1588,6 @@ static void net_dm_cpu_data_init(int cpu)
+ 	__net_dm_cpu_data_init(data);
+ }
  
-+	/* Ignore most absolute/undefined (?) symbols. */
-+	if (is_ignored_symbol(name, type))
-+		return NULL;
-+
- 	check_symbol_range(name, addr, text_ranges, ARRAY_SIZE(text_ranges));
- 	check_symbol_range(name, addr, &percpu_range, 1);
+-static void net_dm_cpu_data_fini(int cpu)
+-{
+-	struct per_cpu_dm_data *data;
+-
+-	data = &per_cpu(dm_cpu_data, cpu);
+-	/* At this point, we should have exclusive access
+-	 * to this struct and can free the skb inside it.
+-	 */
+-	consume_skb(data->skb);
+-	__net_dm_cpu_data_fini(data);
+-}
+-
+ static void net_dm_hw_cpu_data_init(int cpu)
+ {
+ 	struct per_cpu_dm_data *hw_data;
+@@ -1614,15 +1596,6 @@ static void net_dm_hw_cpu_data_init(int cpu)
+ 	__net_dm_cpu_data_init(hw_data);
+ }
  
+-static void net_dm_hw_cpu_data_fini(int cpu)
+-{
+-	struct per_cpu_dm_data *hw_data;
+-
+-	hw_data = &per_cpu(dm_hw_cpu_data, cpu);
+-	kfree(hw_data->hw_entries);
+-	__net_dm_cpu_data_fini(hw_data);
+-}
+-
+ static int __init init_net_drop_monitor(void)
+ {
+ 	int cpu, rc;
+@@ -1661,29 +1634,4 @@ static int __init init_net_drop_monitor(void)
+ out:
+ 	return rc;
+ }
+-
+-static void exit_net_drop_monitor(void)
+-{
+-	int cpu;
+-
+-	BUG_ON(unregister_netdevice_notifier(&dropmon_net_notifier));
+-
+-	/*
+-	 * Because of the module_get/put we do in the trace state change path
+-	 * we are guarnateed not to have any current users when we get here
+-	 */
+-
+-	for_each_possible_cpu(cpu) {
+-		net_dm_hw_cpu_data_fini(cpu);
+-		net_dm_cpu_data_fini(cpu);
+-	}
+-
+-	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
+-}
+-
+-module_init(init_net_drop_monitor);
+-module_exit(exit_net_drop_monitor);
+-
+-MODULE_LICENSE("GPL v2");
+-MODULE_AUTHOR("Neil Horman <nhorman@tuxdriver.com>");
+-MODULE_ALIAS_GENL_FAMILY("NET_DM");
++device_initcall(init_net_drop_monitor);
+-- 
+2.17.1
