@@ -1,45 +1,227 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from elvis.franken.de ([193.175.24.41]:35914 "EHLO elvis.franken.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725980AbgCLIkG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 12 Mar 2020 04:40:06 -0400
-Date: Thu, 12 Mar 2020 09:39:43 +0100
-From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: Re: [PATCH v2 2/2] kbuild: link lib-y objects to vmlinux forcibly
- when CONFIG_MODULES=y
-Message-ID: <20200312083943.GA7278@alpha.franken.de>
-References: <20200311223725.27662-2-masahiroy@kernel.org>
- <202003121230.lys3M8E8%lkp@intel.com>
- <CAK7LNARwR5X2C_VzK_3RZo+30Cu3uPuiw-rFUut1j8azLhbxAA@mail.gmail.com>
+Received: from mail-vi1eur05on2060.outbound.protection.outlook.com ([40.107.21.60]:13499
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726523AbgCLTgy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 12 Mar 2020 15:36:54 -0400
+Subject: Re: [PATCH] scripts/kallsyms: fix wrong kallsyms_relative_base with
+ CONFIG_KALLSYMS_BASE_RELATIVE
+References: <da22e0ac-8da8-8a16-e8dd-b7065752cb4d@mir.dev>
+ <CAK7LNASput9F2XhAi4NUT7jx1z+-mSJXUDnqCfKGtXq_SNbohQ@mail.gmail.com>
+ <bd6dc9fb-3171-c12d-6d80-31a52eb9eb0a@mir.dev>
+ <CAK7LNASOHOkBPFTKQH2jPc522E=bBJ2wtK8q1PVrqMVhMChghQ@mail.gmail.com>
+From: Mikhail Petrov <Mikhail.Petrov@mir.dev>
+Message-ID: <a4e69e0c-284c-8599-71ed-e20e6a25fcf7@mir.dev>
+Date: Thu, 12 Mar 2020 22:36:41 +0300
+In-Reply-To: <CAK7LNASOHOkBPFTKQH2jPc522E=bBJ2wtK8q1PVrqMVhMChghQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARwR5X2C_VzK_3RZo+30Cu3uPuiw-rFUut1j8azLhbxAA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-mips@vger.kernel.org, Paul Burton <paulburton@kernel.org>, kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "sparclinux@vger.kernel.org, David S . Miller" <davem@davemloft.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Al Viro <viro@zeniv.linux.org.uk>, Nick Desaulniers <ndesaulniers@google.com>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, kbuild test robot <lkp@intel.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Thu, Mar 12, 2020 at 03:12:28PM +0900, Masahiro Yamada wrote:
-> I got the following report from 0-day bot.
-> Please advise me how to fix it.
+
+
+On 11.03.2020 23:56, Masahiro Yamada wrote:
+> On Thu, Mar 12, 2020 at 3:18 AM Mikhail Petrov <Mikhail.Petrov@mir.dev> wrote:
+>>
+>> Hi Masahiro,
+>>
+>> On 11.03.2020 9:06, Masahiro Yamada wrote:
+>>> Hi Mikhail,
+>>>
+>>> On Wed, Mar 11, 2020 at 5:34 AM Mikhail Petrov <Mikhail.Petrov@mir.dev> wrote:
+>>>>
+>>>> There is the code in the read_symbol function in 'scripts/kallsyms.c':
+>>>>
+>>>>         if (is_ignored_symbol(name, type))
+>>>>                 return NULL;
+>>>>
+>>>>         /* Ignore most absolute/undefined (?) symbols. */
+>>>>         if (strcmp(name, "_text") == 0)
+>>>>                 _text = addr;
+>>>>
+>>>> But the is_ignored_symbol function returns true for name="_text" and type='a'. So the next condition is not executed and the _text variable is always zero.
+>>>>
+>>>> It makes the wrong kallsyms_relative_base symbol as a result of the code:
+>>>>
+>>>>         if (base_relative) {
+>>>>                 output_label("kallsyms_relative_base");
+>>>>                 output_address(relative_base);
+>>>>                 printf("\n");
+>>>>         }
+>>>>
+>>>> Because the output_address function uses the _text variable.
+>>>>
+>>>> So the kallsyms_lookup function and all related functions in the kernel do not work properly. For example, the stack trace in oops:
+>>>>
+>>>>         Call Trace:
+>>>>         [aa095e58] [809feab8] kobj_ns_ops_tbl+0x7ff09ac8/0x7ff1c1c4 (unreliable)
+>>>>         [aa095e98] [80002b64] kobj_ns_ops_tbl+0x7f50db74/0x80000010
+>>>>         [aa095ef8] [809c3d24] kobj_ns_ops_tbl+0x7feced34/0x7ff1c1c4
+>>>>         [aa095f28] [80002ed0] kobj_ns_ops_tbl+0x7f50dee0/0x80000010
+>>>>         [aa095f38] [8000f238] kobj_ns_ops_tbl+0x7f51a248/0x80000010
+>>>>
+>>>> The right stack trace:
+>>>>
+>>>>         Call Trace:
+>>>>         [aa095e58] [809feab8] module_vdu_video_init+0x2fc/0x3bc (unreliable)
+>>>>         [aa095e98] [80002b64] do_one_initcall+0x40/0x1f0
+>>>>         [aa095ef8] [809c3d24] kernel_init_freeable+0x164/0x1d8
+>>>>         [aa095f28] [80002ed0] kernel_init+0x14/0x124
+>>>>         [aa095f38] [8000f238] ret_from_kernel_thread+0x14/0x1c
+>>>>
+>>>> Signed-off-by: Mikhail Petrov <Mikhail.Petrov@mir.dev>
+>>>>
+>>>> ---
+>>>
+>>>
+>>> Thanks for the patch.
+>>>
+>>> Just for curiosity, on which architecrure
+>>> did you see  name="_text" and type='a' case ?
+>>
+>> Actually 'a' is 'A' (my mistake). The architecture is PowerPC - core PPC476FS.
+>>
+>> nm -n .tmp_vmlinux1 looks like:
+>>
+>> ...
+>>          w kallsyms_token_table
+>>          w mach_powermac
+>> 00000007 a LG_CACHELINE_BYTES
+>> 00000007 a LG_CACHELINE_BYTES
+>> 00000007 a LG_CACHELINE_BYTES
+>> 00000020 a reg
+>> 0000007f a CACHELINE_MASK
+>> 0000007f a CACHELINE_MASK
+>> 0000007f a CACHELINE_MASK
+>> 00000080 a CACHELINE_BYTES
+>> 00000080 a CACHELINE_BYTES
+>> 00000080 a CACHELINE_BYTES
+>> 00000400 a dcr
+>> 80000000 T _start
+>> 80000000 A _stext
+>> 80000000 A _text
 > 
 > 
-> I am not sure how multi-platform works in MIPS.
+> Hmm, I am still not able to reproduce this.
 > 
-> The cavium-octeon platform has its own implementation
-> of various functions.
+> I compiled ARCH=powerpc, but
+> 'powerpc-linux-nm -n .tmp_vmlinux1' got this.
 > 
-> So, vmlinux links different library routines
-> depending on whether CONFIG_CAVIUM_OCTEON_SOC, correct?
+> 
+> 0000007f a CACHELINE_MASK
+> 0000007f a CACHELINE_MASK
+> 0000007f a CACHELINE_MASK
+> 00000080 a CACHELINE_BYTES
+> 00000080 a CACHELINE_BYTES
+> 00000080 a CACHELINE_BYTES
+> 00000400 a dcr
+> c0000000 T _start
+> c0000000 T _stext
+> c0000000 T _text
+> c00000b8 t interrupt_base
+> c00000c0 t CriticalInput
+> c00001a0 t MachineCheck
+> c0000280 t MachineCheckA
+> 
+> 
+> 
+> 
+> Which defconfig did you use?
 
-for cavium memcpy is directly linked in via octeon-memcpy.o, while for
-every other platform it's coming from lib/lib.a(memcpy.o).
+I use a custom config file for a custom SoC with two PPC476FS cores. The config is not in the upstream repository. The same effect can be reached with '44x/akebono_defconfig'.
 
-What have you changed, that this doesn't work anymore ?
+I did some investigation with the GCC version.
 
-Thomas.
+GCC version  4.8.1 (akebono_defconfig):
 
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+00000007 a LG_CACHELINE_BYTES
+00000020 a reg
+0000007f a CACHELINE_MASK
+0000007f a CACHELINE_MASK
+0000007f a CACHELINE_MASK
+00000080 a CACHELINE_BYTES
+00000080 a CACHELINE_BYTES
+00000080 a CACHELINE_BYTES
+00000400 a dcr
+00000400 a spr
+c0000000 T _start
+c0000000 A _stext
+c0000000 A _text
+c0000088 t interrupt_base
+c00000a0 t CriticalInput
+c0000180 t MachineCheck
+
+GCC version 7.5.0 (akebono_defconfig):
+
+00000007 a LG_CACHELINE_BYTES
+00000020 a reg
+0000007f a CACHELINE_MASK
+0000007f a CACHELINE_MASK
+0000007f a CACHELINE_MASK
+00000080 a CACHELINE_BYTES
+00000080 a CACHELINE_BYTES
+00000080 a CACHELINE_BYTES
+00000400 a dcr
+00000400 a spr
+c0000000 T _start
+c0000000 T _stext
+c0000000 T _text
+c0000088 t interrupt_base
+c00000a0 t CriticalInput
+c0000180 t MachineCheck
+
+So, I used an old version of GCC. Changing the GCC version solved the problem. Maybe the patch is not necessary.
+
+
+> 
+> 
+> (I also CCed the ppc maintainer,
+> I am just curious what makes _text absolute.)
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+>> 80000088 t interrupt_base
+>> 800000a0 t CriticalInput
+>> 80000180 t MachineCheck
+>> 80000260 t MachineCheckA
+>> 80000360 t DataStorage
+>> 80000420 t InstructionStorage
+>> 80000500 t ExternalInput
+>> 800005c0 t Alignment
+>> 80000680 t Program
+>> 80000740 t FloatingPointUnavailable
+>> 80000820 t SystemCall
+>> 80000900 t AuxillaryProcessorUnavailable
+>> ...
+>>
+>>
+>>> Could you wrap the commit log to avoid
+>>> this checkpatch warning?
+>>> WARNING: Possible unwrapped commit description (prefer a maximum 75
+>>> chars per line)
+>>>
+>>> Also, could you shorten the patch subject
+>>> to make it fit in this limit?
+>>
+>> Sorry for that. Now I know about scripts/checkpatch.pl. I will improve and resubmit the patch soon.
+>>
+>> Thanks.
+> 
+> 
+> --
+> Best Regards
+> Masahiro Yamada
+> 
+
+--
+Best Regards,
+Mikhail Petrov
