@@ -1,98 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:40396 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726853AbgCNBaE (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:59928 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726853AbgCNBdJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Mar 2020 21:30:04 -0400
+        Fri, 13 Mar 2020 21:33:09 -0400
 MIME-Version: 1.0
-References: <20200311225044.29502-1-masahiroy@kernel.org>
-In-Reply-To: <20200311225044.29502-1-masahiroy@kernel.org>
+References: <20200308073400.23398-1-natechancellor@gmail.com> <20200311194121.38047-1-natechancellor@gmail.com>
+In-Reply-To: <20200311194121.38047-1-natechancellor@gmail.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 14 Mar 2020 10:29:21 +0900
-Message-ID: <CAK7LNAQ=AVRwXxErOvs=2iK2vKYU3GrF_am7JUUFBiVGPchWXw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix references to other documents
+Date: Sat, 14 Mar 2020 10:32:17 +0900
+Message-ID: <CAK7LNASdzfR6iewpZY8z4Ln8tN8GxNxgnzk2tPsOBn2v4ZJvwg@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: Disable -Wpointer-to-enum-cast
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, stable <stable@vger.kernel.org>
 
-On Thu, Mar 12, 2020 at 7:50 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Thu, Mar 12, 2020 at 4:41 AM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
 >
-> All the files in Documentation/kbuild/ were converted to reST.
+> Clang's -Wpointer-to-int-cast deviates from GCC in that it warns when
+> casting to enums. The kernel does this in certain places, such as device
+> tree matches to set the version of the device being used, which allows
+> the kernel to avoid using a gigantic union.
 >
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L428
+> https://elixir.bootlin.com/linux/v5.5.8/source/drivers/ata/ahci_brcm.c#L402
+> https://elixir.bootlin.com/linux/v5.5.8/source/include/linux/mod_devicetable.h#L264
+>
+> To avoid a ton of false positive warnings, disable this particular part
+> of the warning, which has been split off into a separate diagnostic so
+> that the entire warning does not need to be turned off for clang. It
+> will be visible under W=1 in case people want to go about fixing these
+> easily and enabling the warning treewide.
+>
+> Cc: stable@vger.kernel.org
+> Link: https://github.com/ClangBuiltLinux/linux/issues/887
+> Link: https://github.com/llvm/llvm-project/commit/2a41b31fcdfcb67ab7038fc2ffb606fd50b83a84
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 > ---
 
+
 Applied to linux-kbuild.
+Thanks.
 
 
 >
->  Documentation/kbuild/kbuild.rst                 | 2 +-
->  Documentation/kbuild/kconfig-macro-language.rst | 2 +-
->  Documentation/kbuild/makefiles.rst              | 6 +++---
->  3 files changed, 5 insertions(+), 5 deletions(-)
+> v1 -> v2:
 >
-> diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
-> index f1e5dce86af7..510f38d7e78a 100644
-> --- a/Documentation/kbuild/kbuild.rst
-> +++ b/Documentation/kbuild/kbuild.rst
-> @@ -237,7 +237,7 @@ This is solely useful to speed up test compiles.
->  KBUILD_EXTRA_SYMBOLS
->  --------------------
->  For modules that use symbols from other modules.
-> -See more details in modules.txt.
-> +See more details in modules.rst.
+> * Move under scripts/Makefile.extrawarn, as requested by Masahiro
 >
->  ALLSOURCE_ARCHS
->  ---------------
-> diff --git a/Documentation/kbuild/kconfig-macro-language.rst b/Documentation/kbuild/kconfig-macro-language.rst
-> index 35b3263b7e40..8b413ef9603d 100644
-> --- a/Documentation/kbuild/kconfig-macro-language.rst
-> +++ b/Documentation/kbuild/kconfig-macro-language.rst
-> @@ -44,7 +44,7 @@ intermediate::
->              def_bool y
+>  scripts/Makefile.extrawarn | 1 +
+>  1 file changed, 1 insertion(+)
 >
->  Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
-> -dependency as explained in kconfig-language.txt.
-> +dependency as explained in kconfig-language.rst.
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index ecddf83ac142..ca08f2fe7c34 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -48,6 +48,7 @@ KBUILD_CFLAGS += -Wno-initializer-overrides
+>  KBUILD_CFLAGS += -Wno-format
+>  KBUILD_CFLAGS += -Wno-sign-compare
+>  KBUILD_CFLAGS += -Wno-format-zero-length
+> +KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
+>  endif
 >
->
->  Variables
-> diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-> index 6bc126a14b3d..04d5c01a2e99 100644
-> --- a/Documentation/kbuild/makefiles.rst
-> +++ b/Documentation/kbuild/makefiles.rst
-> @@ -924,7 +924,7 @@ When kbuild executes, the following steps are followed (roughly):
->         $(KBUILD_AFLAGS_MODULE) is used to add arch-specific options that
->         are used for assembler.
->
-> -       From commandline AFLAGS_MODULE shall be used (see kbuild.txt).
-> +       From commandline AFLAGS_MODULE shall be used (see kbuild.rst).
->
->      KBUILD_CFLAGS_KERNEL
->         $(CC) options specific for built-in
-> @@ -937,7 +937,7 @@ When kbuild executes, the following steps are followed (roughly):
->
->         $(KBUILD_CFLAGS_MODULE) is used to add arch-specific options that
->         are used for $(CC).
-> -       From commandline CFLAGS_MODULE shall be used (see kbuild.txt).
-> +       From commandline CFLAGS_MODULE shall be used (see kbuild.rst).
->
->      KBUILD_LDFLAGS_MODULE
->         Options for $(LD) when linking modules
-> @@ -945,7 +945,7 @@ When kbuild executes, the following steps are followed (roughly):
->         $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
->         used when linking modules. This is often a linker script.
->
-> -       From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
-> +       From commandline LDFLAGS_MODULE shall be used (see kbuild.rst).
->
->      KBUILD_LDS
+>  endif
+> --
+> 2.26.0.rc1
 >
 > --
-> 2.17.1
->
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200311194121.38047-1-natechancellor%40gmail.com.
+
 
 
 -- 
