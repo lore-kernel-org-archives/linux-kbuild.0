@@ -1,89 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.110.172]:50408 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726230AbgCMJOX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Mar 2020 05:14:23 -0400
-Subject: Re: [PATCH v7 15/17] kconfig: Add support for 'as-option'
-References: <1584090304-18043-1-git-send-email-amit.kachhap@arm.com>
- <1584090304-18043-16-git-send-email-amit.kachhap@arm.com>
- <CAK7LNATKkdd5RqB-E0_F3WidxmdBZxhjc2g6bkgCxaUu2vO2eA@mail.gmail.com>
-From: Amit Kachhap <amit.kachhap@arm.com>
-Message-ID: <ec853788-03f8-6c28-90f2-3daf0a113c6f@arm.com>
-Date: Fri, 13 Mar 2020 14:44:17 +0530
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:40396 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726853AbgCNBaE (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 13 Mar 2020 21:30:04 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATKkdd5RqB-E0_F3WidxmdBZxhjc2g6bkgCxaUu2vO2eA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200311225044.29502-1-masahiroy@kernel.org>
+In-Reply-To: <20200311225044.29502-1-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 14 Mar 2020 10:29:21 +0900
+Message-ID: <CAK7LNAQ=AVRwXxErOvs=2iK2vKYU3GrF_am7JUUFBiVGPchWXw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix references to other documents
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>, Vincenzo Frascino <Vincenzo.Frascino@arm.com>, Mark Brown <broonie@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
 
-Hi,
+On Thu, Mar 12, 2020 at 7:50 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> All the files in Documentation/kbuild/ were converted to reST.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-On 3/13/20 2:40 PM, Masahiro Yamada wrote:
-> Hi Amit,
-> 
-> On Fri, Mar 13, 2020 at 6:06 PM Amit Daniel Kachhap
-> <amit.kachhap@arm.com> wrote:
->>
->> From: Vincenzo Frascino <vincenzo.frascino@arm.com>
->>
->> Currently kconfig does not have a feature that allows to detect if the
->> used assembler supports a specific compilation option.
->>
->> Introduce 'as-option' to serve this purpose in the context of Kconfig:
->>
->>          config X
->>                  def_bool $(as-option,...)
->>
->> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
->> Cc: linux-kbuild@vger.kernel.org
-> 
-> 
-> If you have a chance for v8,
-> could you please drop these Cc lines?
+Applied to linux-kbuild.
 
-Ok sure I will remember.
 
-Cheers,
-Amit
+>
+>  Documentation/kbuild/kbuild.rst                 | 2 +-
+>  Documentation/kbuild/kconfig-macro-language.rst | 2 +-
+>  Documentation/kbuild/makefiles.rst              | 6 +++---
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
+> index f1e5dce86af7..510f38d7e78a 100644
+> --- a/Documentation/kbuild/kbuild.rst
+> +++ b/Documentation/kbuild/kbuild.rst
+> @@ -237,7 +237,7 @@ This is solely useful to speed up test compiles.
+>  KBUILD_EXTRA_SYMBOLS
+>  --------------------
+>  For modules that use symbols from other modules.
+> -See more details in modules.txt.
+> +See more details in modules.rst.
+>
+>  ALLSOURCE_ARCHS
+>  ---------------
+> diff --git a/Documentation/kbuild/kconfig-macro-language.rst b/Documentation/kbuild/kconfig-macro-language.rst
+> index 35b3263b7e40..8b413ef9603d 100644
+> --- a/Documentation/kbuild/kconfig-macro-language.rst
+> +++ b/Documentation/kbuild/kconfig-macro-language.rst
+> @@ -44,7 +44,7 @@ intermediate::
+>              def_bool y
+>
+>  Then, Kconfig moves onto the evaluation stage to resolve inter-symbol
+> -dependency as explained in kconfig-language.txt.
+> +dependency as explained in kconfig-language.rst.
+>
+>
+>  Variables
+> diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+> index 6bc126a14b3d..04d5c01a2e99 100644
+> --- a/Documentation/kbuild/makefiles.rst
+> +++ b/Documentation/kbuild/makefiles.rst
+> @@ -924,7 +924,7 @@ When kbuild executes, the following steps are followed (roughly):
+>         $(KBUILD_AFLAGS_MODULE) is used to add arch-specific options that
+>         are used for assembler.
+>
+> -       From commandline AFLAGS_MODULE shall be used (see kbuild.txt).
+> +       From commandline AFLAGS_MODULE shall be used (see kbuild.rst).
+>
+>      KBUILD_CFLAGS_KERNEL
+>         $(CC) options specific for built-in
+> @@ -937,7 +937,7 @@ When kbuild executes, the following steps are followed (roughly):
+>
+>         $(KBUILD_CFLAGS_MODULE) is used to add arch-specific options that
+>         are used for $(CC).
+> -       From commandline CFLAGS_MODULE shall be used (see kbuild.txt).
+> +       From commandline CFLAGS_MODULE shall be used (see kbuild.rst).
+>
+>      KBUILD_LDFLAGS_MODULE
+>         Options for $(LD) when linking modules
+> @@ -945,7 +945,7 @@ When kbuild executes, the following steps are followed (roughly):
+>         $(KBUILD_LDFLAGS_MODULE) is used to add arch-specific options
+>         used when linking modules. This is often a linker script.
+>
+> -       From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
+> +       From commandline LDFLAGS_MODULE shall be used (see kbuild.rst).
+>
+>      KBUILD_LDS
+>
+> --
+> 2.17.1
+>
 
-> 
-> I had already given Ack, and am satisfied.
-> I have no more comment.
-> 
-> Thanks.
-> 
-> 
-> 
->> Acked-by: Masahiro Yamada <masahiroy@kernel.org>
->> Signed-off-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> ---
->>   scripts/Kconfig.include | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
->> index 85334dc..a1c1925 100644
->> --- a/scripts/Kconfig.include
->> +++ b/scripts/Kconfig.include
->> @@ -31,6 +31,12 @@ cc-option = $(success,$(CC) -Werror $(CLANG_FLAGS) $(1) -S -x c /dev/null -o /de
->>   # Return y if the linker supports <flag>, n otherwise
->>   ld-option = $(success,$(LD) -v $(1))
->>
->> +# $(as-option,<flag>)
->> +# /dev/zero is used as output instead of /dev/null as some assembler cribs when
->> +# both input and output are same. Also both of them have same write behaviour so
->> +# can be easily substituted.
->> +as-option = $(success, $(CC) $(CLANG_FLAGS) $(1) -c -x assembler /dev/null -o /dev/zero)
->> +
->>   # $(as-instr,<instr>)
->>   # Return y if the assembler supports <instr>, n otherwise
->>   as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
->> --
->> 2.7.4
->>
-> 
-> 
+
+-- 
+Best Regards
+Masahiro Yamada
