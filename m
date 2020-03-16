@@ -1,39 +1,171 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53852 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731535AbgCPOfZ (ORCPT
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44668 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732859AbgCPXOI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Mar 2020 10:35:25 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 25so17928969wmk.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2020 07:35:23 -0700 (PDT)
-Date: Mon, 16 Mar 2020 15:35:05 +0100
-From: Petr Malat <oss@malat.biz>
-Subject: Re: [PATCH 1/2] lib: add support for ZSTD-compressed kernel
-Message-ID: <20200316143505.GA1449@ntb.petris.klfree.czf>
-References: <20200316135025.7579-1-oss@malat.biz>
- <20200316140726.GA4041840@kroah.com>
+        Mon, 16 Mar 2020 19:14:08 -0400
+Received: by mail-pg1-f195.google.com with SMTP id 37so10596222pgm.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2020 16:14:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200316140726.GA4041840@kroah.com>
+References: <20200311223725.27662-2-masahiroy@kernel.org> <202003121230.lys3M8E8%lkp@intel.com>
+ <CAK7LNARwR5X2C_VzK_3RZo+30Cu3uPuiw-rFUut1j8azLhbxAA@mail.gmail.com>
+In-Reply-To: <CAK7LNARwR5X2C_VzK_3RZo+30Cu3uPuiw-rFUut1j8azLhbxAA@mail.gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 16 Mar 2020 16:13:55 -0700
+Message-ID: <CAKwvOdmGh+NkVvf=e1W_ThZ8hW2KFe0R+AJ=-0jJ5FUg4sGoaA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: link lib-y objects to vmlinux forcibly
+ when CONFIG_MODULES=y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, terrelln@fb.com, clm@fb.com, keescook@chromium.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: inux-mips@vger.kernel.org, Paul Burton <paulburton@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "sparclinux@vger.kernel.org, David S . Miller" <davem@davemloft.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Al Viro <viro@zeniv.linux.org.uk>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, kbuild test robot <lkp@intel.com>
 
-I have extended the description, thx.
-  Petr
+On Wed, Mar 11, 2020 at 11:13 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Hi MIPS forks,
+>
+>
+> I got the following report from 0-day bot.
+> Please advise me how to fix it.
+>
+>
+> I am not sure how multi-platform works in MIPS.
+>
+> The cavium-octeon platform has its own implementation
+> of various functions.
+>
+> So, vmlinux links different library routines
+> depending on whether CONFIG_CAVIUM_OCTEON_SOC, correct?
+>
+>
+>
+> fw_init_cmdline():
+> arch/mips/cavium-octeon/setup.c
+> arch/mips/fw/lib/cmdline.c
+>
+>
+> __delay(), __udelay(), __ndelay():
+> arch/mips/cavium-octeon/csrc-octeon.c
+> arch/mips/lib/delay.S
+>
+>
+> memcpy(), memmove():
+> arch/mips/cavium-octeon/octeon-memcpy.S
+> arch/mips/lib/memcpy.S
+>
+>
+>
+> FWIW, the following fixes the multiple definition errors.
+>
+>
+>
+> diff --git a/arch/mips/fw/lib/cmdline.c b/arch/mips/fw/lib/cmdline.c
+> index 6ecda64ad184..6ac6e0493e1f 100644
+> --- a/arch/mips/fw/lib/cmdline.c
+> +++ b/arch/mips/fw/lib/cmdline.c
+> @@ -16,6 +16,7 @@ int fw_argc;
+>  int *_fw_argv;
+>  int *_fw_envp;
+>
+> +#ifndef CONFIG_CAVIUM_OCTEON_SOC
+>  void __init fw_init_cmdline(void)
 
-On Mon, Mar 16, 2020 at 03:07:26PM +0100, Greg KH wrote:
-> On Mon, Mar 16, 2020 at 02:50:24PM +0100, Petr Malat wrote:
-> > Add support for extracting ZSTD-compressed kernel images, as well as
-> > ZSTD-compressed initramfs.
-> > 
-> > Signed-off-by: Petr Malat <oss@malat.biz>
-> 
-> That says _what_ you did here, but not _why_ you did this, or why anyone
-> would even want this.
-> 
-> thanks,
-> 
-> greg k-h
+Alternatively, you could define this fw_init_cmdline as __weak, then
+let the strong definition in arch/mips/cavium-octeon/setup.c override
+it. But both should work, so:
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Eitherway, octeon has some multiple definition errors that should get fixed.
+
+>  {
+>         int i;
+> @@ -41,6 +42,7 @@ void __init fw_init_cmdline(void)
+>                         strlcat(arcs_cmdline, " ", COMMAND_LINE_SIZE);
+>         }
+>  }
+> +#endif
+>
+>  char * __init fw_getcmdline(void)
+>  {
+> diff --git a/arch/mips/lib/Makefile b/arch/mips/lib/Makefile
+> index 479f50559c83..4cc98af4161a 100644
+> --- a/arch/mips/lib/Makefile
+> +++ b/arch/mips/lib/Makefile
+> @@ -3,10 +3,14 @@
+>  # Makefile for MIPS-specific library files..
+>  #
+>
+> -lib-y  += bitops.o csum_partial.o delay.o memcpy.o memset.o \
+> +lib-y  += bitops.o csum_partial.o memset.o \
+>            mips-atomic.o strncpy_user.o \
+>            strnlen_user.o uncached.o
+>
+> +ifneq ($(CONFIG_CAVIUM_OCTEON_SOC),y)
+> +lib-y  += delay.o memcpy.o
+> +endif
+> +
+>  obj-y                  += iomap_copy.o
+>  obj-$(CONFIG_PCI)      += iomap-pci.o
+>  lib-$(CONFIG_GENERIC_CSUM)     := $(filter-out csum_partial.o, $(lib-y))
+>
+>
+>
+> On Thu, Mar 12, 2020 at 1:31 PM kbuild test robot <lkp@intel.com> wrote:
+> >
+> > Hi Masahiro,
+> >
+> > I love your patch! Yet something to improve:
+> >
+> > [auto build test ERROR on kbuild/for-next]
+> > [also build test ERROR on v5.6-rc5 next-20200311]
+> > [if your patch is applied to the wrong git tree, please drop us a note to help
+> > improve the system. BTW, we also suggest to use '--base' option to specify the
+> > base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> >
+> > url:    https://github.com/0day-ci/linux/commits/Masahiro-Yamada/sparc-revive-__HAVE_ARCH_STRLEN-for-32bit-sparc/20200312-073459
+> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+> > config: mips-cavium_octeon_defconfig (attached as .config)
+> > compiler: mips64-linux-gcc (GCC) 9.2.0
+> > reproduce:
+> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # save the attached .config to linux build tree
+> >         GCC_VERSION=9.2.0 make.cross ARCH=mips
+> >
+> > If you fix the issue, kindly add following tag
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    mips64-linux-ld: arch/mips/fw/lib/cmdline.o: in function `fw_init_cmdline':
+> > >> cmdline.c:(.init.text+0x0): multiple definition of `fw_init_cmdline'; arch/mips/cavium-octeon/setup.o:setup.c:(.init.text+0xad8): first defined here
+> >    mips64-linux-ld: arch/mips/lib/delay.o: in function `__delay':
+> > >> delay.c:(.text+0x0): multiple definition of `__delay'; arch/mips/cavium-octeon/csrc-octeon.o:csrc-octeon.c:(.text+0x80): first defined here
+> >    mips64-linux-ld: arch/mips/lib/delay.o: in function `__udelay':
+> > >> delay.c:(.text+0x10): multiple definition of `__udelay'; arch/mips/cavium-octeon/csrc-octeon.o:csrc-octeon.c:(.text+0x8): first defined here
+> >    mips64-linux-ld: arch/mips/lib/delay.o: in function `__ndelay':
+> > >> delay.c:(.text+0x50): multiple definition of `__ndelay'; arch/mips/cavium-octeon/csrc-octeon.o:csrc-octeon.c:(.text+0x40): first defined here
+> >    mips64-linux-ld: arch/mips/lib/memcpy.o: in function `memmove':
+> > >> (.text+0x0): multiple definition of `memmove'; arch/mips/cavium-octeon/octeon-memcpy.o:(.text+0x3a0): first defined here
+> >    mips64-linux-ld: arch/mips/lib/memcpy.o: in function `__rmemcpy':
+> > >> (.text+0x20): multiple definition of `__rmemcpy'; arch/mips/cavium-octeon/octeon-memcpy.o:(.text+0x3c0): first defined here
+> >    mips64-linux-ld: arch/mips/lib/memcpy.o: in function `memcpy':
+> > >> (.text+0x80): multiple definition of `memcpy'; arch/mips/cavium-octeon/octeon-memcpy.o:(.text+0x0): first defined here
+> >    mips64-linux-ld: arch/mips/lib/memcpy.o: in function `memcpy':
+> > >> (.text+0x84): multiple definition of `__copy_user'; arch/mips/cavium-octeon/octeon-memcpy.o:(.text+0x4): first defined here
+> >
+> > ---
+> > 0-DAY CI Kernel Test Service, Intel Corporation
+> > https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
+
+
+
+-- 
+Thanks,
+~Nick Desaulniers
