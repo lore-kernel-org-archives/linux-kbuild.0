@@ -1,50 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:35524 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726637AbgCQEcv (ORCPT
+Received: from sonic307-2.consmr.mail.ne1.yahoo.com ([66.163.190.121]:35259
+        "EHLO sonic307-2.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726250AbgCQMJP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Mar 2020 00:32:51 -0400
-Date: Tue, 17 Mar 2020 05:32:46 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: linux-kbuild missing from lore?
-Message-ID: <20200317043246.GA27518@ravnborg.org>
-References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
- <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
- <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
+        Tue, 17 Mar 2020 08:09:15 -0400
+Date: Tue, 17 Mar 2020 12:07:13 +0000 (UTC)
+From: Stephen Li <stenn7@gabg.net>
+Reply-To: stephli947701@gmail.com
+Message-ID: <2078071840.1852905.1584446833663@mail.yahoo.com>
+Subject: REF
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <2078071840.1852905.1584446833663.ref@mail.yahoo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Mar 16, 2020 at 06:06:20PM -0700, Randy Dunlap wrote:
-> On 3/16/20 5:47 PM, Masahiro Yamada wrote:
-> > Hi Nick,
-> > 
-> > On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
-> > <ndesaulniers@google.com> wrote:
-> >>
-> >> Hi Masahiro,
-> >> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
-> >> https://lore.kernel.org/lists.html.  Is that intentional or
-> >> accidental?
-> >> --
-> >> Thanks,
-> >> ~Nick Desaulniers
-> > 
-> > 
-> > Thanks for letting me know this.
-> > I guess it is accidental.
-> > 
-> > In fact, I do not know what to do
-> > to take good care of the kbuild ML.
-> 
-> Maybe ask Sam Ravnborg or Michal Marek if they have kbuild ML archives.
 
-I do the zero-inbox thing, and delete mails when processed.
-So sorry, I have no local archieve.
 
-	Sam
+Greetings,
+I was searching through a local business directory when I found your
+profile. I am Soliciting On-Behalf of my private client who is
+interested in having a serious business investment in your country. If
+you have a valid business, investment or project he can invest
+back to me for more details. Your swift response is highly needed.
+Sincerely
+Stephen Li
+Please response back to me with is my private email below for more details
+stephli947701@gmail.com
