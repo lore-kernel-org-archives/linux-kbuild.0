@@ -1,37 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58620 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726530AbgCQV4V (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Mar 2020 17:56:21 -0400
-Date: Tue, 17 Mar 2020 21:56:14 +0000
-From: Will Deacon <will@kernel.org>
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:42857 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726549AbgCQXBU (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 17 Mar 2020 19:01:20 -0400
+Received: by mail-pf1-f195.google.com with SMTP id x2so12416796pfn.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2020 16:01:19 -0700 (PDT)
+Date: Tue, 17 Mar 2020 16:01:16 -0700
+From: Kees Cook <keescook@chromium.org>
 Subject: Re: [PATCH 7/9] arm64/build: Warn on orphan section placement
-Message-ID: <20200317215614.GB20788@willie-the-truck>
+Message-ID: <202003171558.7E1D46AED6@keescook>
 References: <20200228002244.15240-1-keescook@chromium.org>
  <20200228002244.15240-8-keescook@chromium.org>
+ <20200317215614.GB20788@willie-the-truck>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200228002244.15240-8-keescook@chromium.org>
+In-Reply-To: <20200317215614.GB20788@willie-the-truck>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+To: Will Deacon <will@kernel.org>
 Cc: Borislav Petkov <bp@suse.de>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 04:22:42PM -0800, Kees Cook wrote:
-> We don't want to depend on the linker's orphan section placement
-> heuristics as these can vary between linkers, and may change between
-> versions. All sections need to be explicitly named in the linker
-> script.
+On Tue, Mar 17, 2020 at 09:56:14PM +0000, Will Deacon wrote:
+> On Thu, Feb 27, 2020 at 04:22:42PM -0800, Kees Cook wrote:
+> > We don't want to depend on the linker's orphan section placement
+> > heuristics as these can vary between linkers, and may change between
+> > versions. All sections need to be explicitly named in the linker
+> > script.
+> > 
+> > Explicitly include debug sections when they're present. Add .eh_frame*
+> > to discard as it seems that these are still generated even though
+> > -fno-asynchronous-unwind-tables is being specified. Add .plt and
+> > .data.rel.ro to discards as they are not actually used. Add .got.plt
+> > to the image as it does appear to be mapped near .data. Finally enable
+> > orphan section warnings.
 > 
-> Explicitly include debug sections when they're present. Add .eh_frame*
-> to discard as it seems that these are still generated even though
-> -fno-asynchronous-unwind-tables is being specified. Add .plt and
-> .data.rel.ro to discards as they are not actually used. Add .got.plt
-> to the image as it does appear to be mapped near .data. Finally enable
-> orphan section warnings.
+> Hmm, I don't understand what .got.plt is doing here. Please can you
+> elaborate?
 
-Hmm, I don't understand what .got.plt is doing here. Please can you
-elaborate?
+I didn't track it down, but it seems to have been present (and merged
+into the kernel .data) for a while now. I can try to track this down if
+you want?
 
-Will
+-- 
+Kees Cook
