@@ -1,54 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45922 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726478AbgCQBlY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Mar 2020 21:41:24 -0400
-Date: Tue, 17 Mar 2020 02:41:21 +0100 (CET)
-From: Jiri Kosina <jikos@kernel.org>
-Subject: Re: [PATCH] Makefile: disallow data races on gcc-10 as well
-In-Reply-To: <nycvar.YFH.7.76.2003170154580.19500@cbobk.fhfr.pm>
-Message-ID: <nycvar.YFH.7.76.2003170240410.19500@cbobk.fhfr.pm>
-References: <20200317000718.177637-1-slyfox@gentoo.org> <nycvar.YFH.7.76.2003170154580.19500@cbobk.fhfr.pm>
+Received: from asavdk4.altibox.net ([109.247.116.15]:35524 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726637AbgCQEcv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 17 Mar 2020 00:32:51 -0400
+Date: Tue, 17 Mar 2020 05:32:46 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: linux-kbuild missing from lore?
+Message-ID: <20200317043246.GA27518@ravnborg.org>
+References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+ <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
+ <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sergei Trofimovich <slyfox@gentoo.org>
-Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, 17 Mar 2020, Jiri Kosina wrote:
-
-> > The flag change happened at https://gcc.gnu.org/PR92046.
+On Mon, Mar 16, 2020 at 06:06:20PM -0700, Randy Dunlap wrote:
+> On 3/16/20 5:47 PM, Masahiro Yamada wrote:
+> > Hi Nick,
 > > 
-> > CC: Jiri Kosina <jkosina@suse.cz>
-> > CC: Masahiro Yamada <masahiroy@kernel.org>
-> > CC: Michal Marek <michal.lkml@markovi.net>
-> > CC: linux-kbuild@vger.kernel.org
-> > Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
-> > ---
-> >  Makefile | 1 +
-> >  1 file changed, 1 insertion(+)
+> > On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
+> > <ndesaulniers@google.com> wrote:
+> >>
+> >> Hi Masahiro,
+> >> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
+> >> https://lore.kernel.org/lists.html.  Is that intentional or
+> >> accidental?
+> >> --
+> >> Thanks,
+> >> ~Nick Desaulniers
 > > 
-> > diff --git a/Makefile b/Makefile
-> > index 171f2b004c8a..9696eb2cd5a1 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -714,6 +714,7 @@ endif
-> >  
-> >  # Tell gcc to never replace conditional load with a non-conditional one
-> >  KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
-> > +KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
+> > 
+> > Thanks for letting me know this.
+> > I guess it is accidental.
+> > 
+> > In fact, I do not know what to do
+> > to take good care of the kbuild ML.
 > 
-> I have to say I can't really read gcc sources without major cerebral pain, 
-> so let me me dense here: what happens to gcc<10 if you pass 
-> -fno-allow-store-data-races to it?
+> Maybe ask Sam Ravnborg or Michal Marek if they have kbuild ML archives.
 
-Sorry, brainfart on my side, your patch is good :)
+I do the zero-inbox thing, and delete mails when processed.
+So sorry, I have no local archieve.
 
-	Acked-by: Jiri Kosina <jkosina@suse.cz>
-
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs
+	Sam
