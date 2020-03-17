@@ -1,33 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.uic.edu.hk ([61.143.62.86]:48979 "EHLO umgp.uic.edu.hk"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733047AbgCQALn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Mar 2020 20:11:43 -0400
-Date: Tue, 17 Mar 2020 08:11:26 +0800 (CST)
-From: David Ibe <ylawrence@uic.edu.hk>
-Reply-To: David Ibe <davidibe718@gmail.com>
-Message-ID: <2065446646.63699156.1584403886963.JavaMail.zimbra@uic.edu.hk>
-Subject: 
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Received: from shards.monkeyblade.net ([23.128.96.9]:50358 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733005AbgCQAsh (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 16 Mar 2020 20:48:37 -0400
+Date: Mon, 16 Mar 2020 17:48:36 -0700 (PDT)
+Message-Id: <20200316.174836.1008034012256551916.davem@davemloft.net>
+Subject: Re: [PATCH v2 1/2] sparc: revive __HAVE_ARCH_STRLEN for 32bit sparc
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20200311223725.27662-1-masahiroy@kernel.org>
+References: <20200311223725.27662-1-masahiroy@kernel.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: masahiroy@kernel.org
+Cc: linux-kbuild@vger.kernel.org, sparclinux@vger.kernel.org, clang-built-linux@googlegroups.com, viro@zeniv.linux.org.uk, ndesaulniers@google.com, ilie.halip@gmail.com, natechancellor@gmail.com, linux-kernel@vger.kernel.org
 
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Thu, 12 Mar 2020 07:37:24 +0900
 
+> Prior to commit 70a6fcf3283a ("[sparc] unify 32bit and 64bit string.h"),
+> __HAVE_ARCH_STRLEN was defined in both of string_32.h and string_64.h
+> 
+> It did not unify __HAVE_ARCH_STRLEN, but deleted it from string_32.h
+> 
+> This issue was reported by the kbuild test robot in the trial of
+> forcible linking of $(lib-y) to vmlinux.
+> 
+> Fixes: 70a6fcf3283a ("[sparc] unify 32bit and 64bit string.h")
+> Reported-by: kbuild test robot <lkp@intel.com>
+> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Good Day,                
-
-I am Mr. David Ibe, I work with the International Standards on Auditing, I have seen on records, that several times people has divert your funds into their own personal accounts.
-
-Now I am writing to you in respect of the amount which I have been able to send to you through our International United Nations accredited and approved Diplomat, who has arrived Africa, I want you to know that the diplomat would deliver the funds which I have packaged as a diplomatic compensation to you and the amount in the consignment is  $10,000,000.00 United State Dollars.
-
-I did not disclose the contents to the diplomat, but I told him that it is your compensation from the Auditing Corporate Governance and Stewardship, Auditing and Assurance Standards Board. I want you to know that these funds would help with your financial status as I have seen in records that you have spent a lot trying to receive these funds and I am not demanding so much from you but only 30% for my stress and logistics.
-
-I would like you to get back to me with your personal contact details, so that I can give you the contact information's of the diplomat who has arrived Africa and has been waiting to get your details so that he can proceed with the delivery to you.
-
-Yours Sincerely,
-Kindly forward your details to: mrdavidibe966@gmail.com
-Mr. David Ibe
-International Auditor,
-Corporate Governance and Stewardship
+Acked-by: David S. Miller <davem@davemloft.net>
