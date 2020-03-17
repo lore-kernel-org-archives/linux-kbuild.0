@@ -1,48 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:48091 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733152AbgCQAsi (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Mar 2020 20:48:38 -0400
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 02H0mQWT012973
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2020 09:48:27 +0900
-Received: by mail-ua1-f49.google.com with SMTP id 9so6846212uav.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2020 17:48:27 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:57398 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733274AbgCQA5u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 16 Mar 2020 20:57:50 -0400
+Date: Tue, 17 Mar 2020 01:57:46 +0100 (CET)
+From: Jiri Kosina <jikos@kernel.org>
+Subject: Re: [PATCH] Makefile: disallow data races on gcc-10 as well
+In-Reply-To: <20200317000718.177637-1-slyfox@gentoo.org>
+Message-ID: <nycvar.YFH.7.76.2003170154580.19500@cbobk.fhfr.pm>
+References: <20200317000718.177637-1-slyfox@gentoo.org>
 MIME-Version: 1.0
-References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
-In-Reply-To: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 17 Mar 2020 09:47:49 +0900
-Message-ID: <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
-Subject: Re: linux-kbuild missing from lore?
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Sergei Trofimovich <slyfox@gentoo.org>
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
 
-Hi Nick,
+On Tue, 17 Mar 2020, Sergei Trofimovich wrote:
 
-On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> Hi Masahiro,
-> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
-> https://lore.kernel.org/lists.html.  Is that intentional or
-> accidental?
-> --
-> Thanks,
-> ~Nick Desaulniers
+> gcc-10 will rename --param=allow-store-data-races=0
+> to -fno-allow-store-data-races.
+> 
+> The flag change happened at https://gcc.gnu.org/PR92046.
+> 
+> CC: Jiri Kosina <jkosina@suse.cz>
+> CC: Masahiro Yamada <masahiroy@kernel.org>
+> CC: Michal Marek <michal.lkml@markovi.net>
+> CC: linux-kbuild@vger.kernel.org
+> Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+> ---
+>  Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 171f2b004c8a..9696eb2cd5a1 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -714,6 +714,7 @@ endif
+>  
+>  # Tell gcc to never replace conditional load with a non-conditional one
+>  KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+> +KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
 
+I have to say I can't really read gcc sources without major cerebral pain, 
+so let me me dense here: what happens to gcc<10 if you pass 
+-fno-allow-store-data-races to it?
 
-Thanks for letting me know this.
-I guess it is accidental.
+My expectation would be that it would just blow up in fatal error, meaning 
+that after we apply your patch, kernel couldn't be successfully compiled 
+by any compiler that doesn't understand '-fno-allow-store-data-races' 
+(which is just about any compiler on this planet).
 
-In fact, I do not know what to do
-to take good care of the kbuild ML.
+Thanks,
 
-
---
-Best Regards
-Masahiro Yamada
+-- 
+Jiri Kosina
+SUSE Labs
