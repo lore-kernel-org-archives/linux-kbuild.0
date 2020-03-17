@@ -1,37 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:50358 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733005AbgCQAsh (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:48091 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733152AbgCQAsi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 16 Mar 2020 20:48:37 -0400
-Date: Mon, 16 Mar 2020 17:48:36 -0700 (PDT)
-Message-Id: <20200316.174836.1008034012256551916.davem@davemloft.net>
-Subject: Re: [PATCH v2 1/2] sparc: revive __HAVE_ARCH_STRLEN for 32bit sparc
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20200311223725.27662-1-masahiroy@kernel.org>
-References: <20200311223725.27662-1-masahiroy@kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Mon, 16 Mar 2020 20:48:38 -0400
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 02H0mQWT012973
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2020 09:48:27 +0900
+Received: by mail-ua1-f49.google.com with SMTP id 9so6846212uav.12
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Mar 2020 17:48:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+In-Reply-To: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 17 Mar 2020 09:47:49 +0900
+Message-ID: <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
+Subject: Re: linux-kbuild missing from lore?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org, sparclinux@vger.kernel.org, clang-built-linux@googlegroups.com, viro@zeniv.linux.org.uk, ndesaulniers@google.com, ilie.halip@gmail.com, natechancellor@gmail.com, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 12 Mar 2020 07:37:24 +0900
+Hi Nick,
 
-> Prior to commit 70a6fcf3283a ("[sparc] unify 32bit and 64bit string.h"),
-> __HAVE_ARCH_STRLEN was defined in both of string_32.h and string_64.h
-> 
-> It did not unify __HAVE_ARCH_STRLEN, but deleted it from string_32.h
-> 
-> This issue was reported by the kbuild test robot in the trial of
-> forcible linking of $(lib-y) to vmlinux.
-> 
-> Fixes: 70a6fcf3283a ("[sparc] unify 32bit and 64bit string.h")
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> Hi Masahiro,
+> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
+> https://lore.kernel.org/lists.html.  Is that intentional or
+> accidental?
+> --
+> Thanks,
+> ~Nick Desaulniers
 
-Acked-by: David S. Miller <davem@davemloft.net>
+
+Thanks for letting me know this.
+I guess it is accidental.
+
+In fact, I do not know what to do
+to take good care of the kbuild ML.
+
+
+--
+Best Regards
+Masahiro Yamada
