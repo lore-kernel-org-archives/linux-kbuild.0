@@ -1,66 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:21122 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727023AbgCSPfJ (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:42387 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727189AbgCSPtO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 19 Mar 2020 11:35:09 -0400
+        Thu, 19 Mar 2020 11:49:14 -0400
 MIME-Version: 1.0
-References: <20200317000718.177637-1-slyfox@gentoo.org> <nycvar.YFH.7.76.2003170154580.19500@cbobk.fhfr.pm>
- <nycvar.YFH.7.76.2003170240410.19500@cbobk.fhfr.pm>
-In-Reply-To: <nycvar.YFH.7.76.2003170240410.19500@cbobk.fhfr.pm>
+References: <20200311223725.27662-2-masahiroy@kernel.org> <202003121230.lys3M8E8%lkp@intel.com>
+ <CAK7LNARwR5X2C_VzK_3RZo+30Cu3uPuiw-rFUut1j8azLhbxAA@mail.gmail.com> <20200312083943.GA7278@alpha.franken.de>
+In-Reply-To: <20200312083943.GA7278@alpha.franken.de>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 20 Mar 2020 00:34:05 +0900
-Message-ID: <CAK7LNARKBjfYsqvaksDhSwhDHxLv0o6c8cLx=eWuVYGHCGZ_Sw@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: disallow data races on gcc-10 as well
+Date: Fri, 20 Mar 2020 00:48:20 +0900
+Message-ID: <CAK7LNAT8AVh8PawDsUoStjYMsOq-DLJbW30SpX7hDDJHZNCd9g@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: link lib-y objects to vmlinux forcibly
+ when CONFIG_MODULES=y
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Kosina <jikos@kernel.org>, Sergei Trofimovich <slyfox@gentoo.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: linux-mips@vger.kernel.org, Paul Burton <paulburton@kernel.org>, kbuild-all@lists.01.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "sparclinux@vger.kernel.org, David S . Miller" <davem@davemloft.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Al Viro <viro@zeniv.linux.org.uk>, Nick Desaulniers <ndesaulniers@google.com>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, kbuild test robot <lkp@intel.com>
 
-On Tue, Mar 17, 2020 at 10:41 AM Jiri Kosina <jikos@kernel.org> wrote:
+Hi Thomas,
+
+On Thu, Mar 12, 2020 at 5:40 PM Thomas Bogendoerfer
+<tsbogend@alpha.franken.de> wrote:
 >
-> On Tue, 17 Mar 2020, Jiri Kosina wrote:
->
-> > > The flag change happened at https://gcc.gnu.org/PR92046.
-> > >
-> > > CC: Jiri Kosina <jkosina@suse.cz>
-> > > CC: Masahiro Yamada <masahiroy@kernel.org>
-> > > CC: Michal Marek <michal.lkml@markovi.net>
-> > > CC: linux-kbuild@vger.kernel.org
-> > > Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
-> > > ---
-> > >  Makefile | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/Makefile b/Makefile
-> > > index 171f2b004c8a..9696eb2cd5a1 100644
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -714,6 +714,7 @@ endif
-> > >
-> > >  # Tell gcc to never replace conditional load with a non-conditional one
-> > >  KBUILD_CFLAGS      += $(call cc-option,--param=allow-store-data-races=0)
-> > > +KBUILD_CFLAGS      += $(call cc-option,-fno-allow-store-data-races)
+> On Thu, Mar 12, 2020 at 03:12:28PM +0900, Masahiro Yamada wrote:
+> > I got the following report from 0-day bot.
+> > Please advise me how to fix it.
 > >
-> > I have to say I can't really read gcc sources without major cerebral pain,
-> > so let me me dense here: what happens to gcc<10 if you pass
-> > -fno-allow-store-data-races to it?
+> >
+> > I am not sure how multi-platform works in MIPS.
+> >
+> > The cavium-octeon platform has its own implementation
+> > of various functions.
+> >
+> > So, vmlinux links different library routines
+> > depending on whether CONFIG_CAVIUM_OCTEON_SOC, correct?
 >
-> Sorry, brainfart on my side, your patch is good :)
+> for cavium memcpy is directly linked in via octeon-memcpy.o, while for
+> every other platform it's coming from lib/lib.a(memcpy.o).
 >
->         Acked-by: Jiri Kosina <jkosina@suse.cz>
+> What have you changed, that this doesn't work anymore ?
 >
-> Thanks,
->
-> --
-> Jiri Kosina
-> SUSE Labs
->
+> Thomas.
 
-Applied to linux-kbuild with Jiri's Ack.
 
-Thanks.
+I want to change all objects from lib-y
+to be linked to vmlinux (exactly like obj-y )
+if CONFIG_MODULES is enabled.
+
+https://patchwork.kernel.org/patch/11432969/
+
+
+EXPORT_SYMBOL in libraries
+must be linked to vmlinux all the time,
+even if there is no call-site in vmlinux.
+I believe this is a good simplification because
+EXPORT_SYMBOL is interface to loadable modules.
+
+As it turned out, lib-y is (ab)used to avoid
+multiple definition errors.
+
+The 0-day detected a bug of 32-bit sparc:
+https://patchwork.kernel.org/patch/11432969/
+
+And, another is this one.
+
+MIPS relies on that
+arch/mips/lib/lib.a is weaker than octeon ones.
+
+So, annotating __weak is a good solution
+(thanks Nick!).
+
+If I send a patch, is it acceptable?
+
 
 -- 
 Best Regards
