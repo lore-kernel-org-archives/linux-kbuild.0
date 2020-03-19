@@ -1,103 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:62303 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727356AbgCSPXG (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:21122 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727023AbgCSPfJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 19 Mar 2020 11:23:06 -0400
+        Thu, 19 Mar 2020 11:35:09 -0400
 MIME-Version: 1.0
+References: <20200317000718.177637-1-slyfox@gentoo.org> <nycvar.YFH.7.76.2003170154580.19500@cbobk.fhfr.pm>
+ <nycvar.YFH.7.76.2003170240410.19500@cbobk.fhfr.pm>
+In-Reply-To: <nycvar.YFH.7.76.2003170240410.19500@cbobk.fhfr.pm>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 20 Mar 2020 00:22:09 +0900
-Message-ID: <CAK7LNASTxvF9AbddpkgABM2fAmvCP_bwCCrS9gmeDN0w-ZjfwA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.6-rc7
+Date: Fri, 20 Mar 2020 00:34:05 +0900
+Message-ID: <CAK7LNARKBjfYsqvaksDhSwhDHxLv0o6c8cLx=eWuVYGHCGZ_Sw@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: disallow data races on gcc-10 as well
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Jiri Kosina <jikos@kernel.org>, Sergei Trofimovich <slyfox@gentoo.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Linus,
+On Tue, Mar 17, 2020 at 10:41 AM Jiri Kosina <jikos@kernel.org> wrote:
+>
+> On Tue, 17 Mar 2020, Jiri Kosina wrote:
+>
+> > > The flag change happened at https://gcc.gnu.org/PR92046.
+> > >
+> > > CC: Jiri Kosina <jkosina@suse.cz>
+> > > CC: Masahiro Yamada <masahiroy@kernel.org>
+> > > CC: Michal Marek <michal.lkml@markovi.net>
+> > > CC: linux-kbuild@vger.kernel.org
+> > > Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+> > > ---
+> > >  Makefile | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/Makefile b/Makefile
+> > > index 171f2b004c8a..9696eb2cd5a1 100644
+> > > --- a/Makefile
+> > > +++ b/Makefile
+> > > @@ -714,6 +714,7 @@ endif
+> > >
+> > >  # Tell gcc to never replace conditional load with a non-conditional one
+> > >  KBUILD_CFLAGS      += $(call cc-option,--param=allow-store-data-races=0)
+> > > +KBUILD_CFLAGS      += $(call cc-option,-fno-allow-store-data-races)
+> >
+> > I have to say I can't really read gcc sources without major cerebral pain,
+> > so let me me dense here: what happens to gcc<10 if you pass
+> > -fno-allow-store-data-races to it?
+>
+> Sorry, brainfart on my side, your patch is good :)
+>
+>         Acked-by: Jiri Kosina <jkosina@suse.cz>
+>
+> Thanks,
+>
+> --
+> Jiri Kosina
+> SUSE Labs
+>
 
-Please pull more Kbuild fixes.
+Applied to linux-kbuild with Jiri's Ack.
+
 Thanks.
 
-
-
-The following changes since commit 98d54f81e36ba3bf92172791eba5ca5bd813989b=
-:
-
-  Linux 5.6-rc4 (2020-03-01 16:38:46 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.6-3
-
-for you to fetch changes up to 7883a14339299773b2ce08dcfd97c63c199a9289:
-
-  scripts/kallsyms: fix wrong kallsyms_relative_base (2020-03-19 23:40:20 +=
-0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.6 (3rd)
-
- - fix __uint128_t capability test in Kconfig when GCC that defaults
-   to 32-bit is used to build the 64-bit kernel
-
- - suppress new noisy Clang warnings -Wpointer-to-enum-cast
-
- - move the namespace field in Module.symvers for the backward
-   compatibility reason for the depmod tool
-
- - use available compression for initramdisk when INTRAMFS_SOURCE
-   is defined, which was the original behavior
-
- - fix modpost to handle correct large section numbers when it refers
-   to modversion CRCs and module namespaces
-
- - fix comments and documents
-
-----------------------------------------------------------------
-Eugeniy Paltsev (1):
-      initramfs: restore default compression behavior
-
-Jessica Yu (1):
-      modpost: move the namespace field in Module.symvers last
-
-Masahiro Yamada (3):
-      kconfig: introduce m32-flag and m64-flag
-      int128: fix __uint128_t compiler test in Kconfig
-      kbuild: doc: fix references to other documents
-
-Mikhail Petrov (1):
-      scripts/kallsyms: fix wrong kallsyms_relative_base
-
-Nathan Chancellor (1):
-      kbuild: Disable -Wpointer-to-enum-cast
-
-SZ Lin (=E6=9E=97=E4=B8=8A=E6=99=BA) (1):
-      kbuild: Fix inconsistent comment
-
-Xiao Yang (1):
-      modpost: Get proper section index by get_secindex() instead of st_shn=
-dx
-
- Documentation/kbuild/kbuild.rst                 |  2 +-
- Documentation/kbuild/kconfig-macro-language.rst |  2 +-
- Documentation/kbuild/makefiles.rst              |  6 +++---
- Documentation/kbuild/modules.rst                |  4 ++--
- Makefile                                        |  2 +-
- init/Kconfig                                    |  3 +--
- scripts/Kconfig.include                         |  7 ++++++
- scripts/Makefile.extrawarn                      |  1 +
- scripts/export_report.pl                        |  2 +-
- scripts/kallsyms.c                              |  8 +++----
- scripts/mod/modpost.c                           | 27 ++++++++++++---------=
----
- usr/Kconfig                                     | 22 +++++++++----------
- 12 files changed, 47 insertions(+), 39 deletions(-)
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
