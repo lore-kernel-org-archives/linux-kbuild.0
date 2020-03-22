@@ -1,156 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:35097 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726851AbgCUAuH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Mar 2020 20:50:07 -0400
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC 1/3] x86: probe assembler instead of kconfig instead of makefile
-Date: Fri, 20 Mar 2020 18:49:43 -0600
-Message-Id: <20200321004945.451497-2-Jason@zx2c4.com>
-In-Reply-To: <20200321004945.451497-1-Jason@zx2c4.com>
-References: <CAHk-=wjbTF2iw3EbKgfiRRq_keb4fHwLO8xJyRXbfK3Q7cscuQ@mail.gmail.com>
- <20200321004945.451497-1-Jason@zx2c4.com>
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:40183 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726797AbgCVJTh (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Mar 2020 05:19:37 -0400
+Date: Sun, 22 Mar 2020 19:16:29 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/9] scripts/link-vmlinux.sh: Delay orphan handling
+ warnings until final link
+References: <20200228002244.15240-1-keescook@chromium.org>
+        <20200228002244.15240-2-keescook@chromium.org>
+        <1584672297.mudnpz3ir9.astroid@bobo.none> <202003201121.8CBD96451B@keescook>
+In-Reply-To: <202003201121.8CBD96451B@keescook>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <1584868418.o62lxee8k1.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, x86@kernel.org, linux-crypto@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@suse.de>, Catalin Marinas <catalin.marinas@arm.com>, clang-built-linux@googlegroups.com, "H.J. Lu" <hjl.tools@gmail.com>, James Morse <james.morse@arm.com>, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <masahiroy@kernel.org>, Peter Collingbourne <pcc@google.com>, Will Deacon <will@kernel.org>, x86@kernel.org
 
-Doing this probing inside of the Makefiles means we have a maze of
-ifdefs inside the source code and child Makefiles that need to make
-proper decisions on this too. Instead, we do it at Kconfig time, like
-many other compiler and assembler options, which allows us to set up the
-dependencies normally for full compilation units.
+Kees Cook's on March 21, 2020 4:24 am:
+> On Fri, Mar 20, 2020 at 12:47:54PM +1000, Nicholas Piggin wrote:
+>> Kees Cook's on February 28, 2020 10:22 am:
+>> > Right now, powerpc adds "--orphan-handling=3Dwarn" to LD_FLAGS_vmlinux
+>> > to detect when there are unexpected sections getting added to the kern=
+el
+>> > image. There is no need to report these warnings more than once, so it
+>> > can be removed until the final link stage.
+>> >=20
+>> > This helps pave the way for other architectures to enable this, with t=
+he
+>> > end goal of enabling this warning by default for vmlinux for all
+>> > architectures.
+>> >=20
+>> > Signed-off-by: Kees Cook <keescook@chromium.org>
+>> > ---
+>> >  scripts/link-vmlinux.sh | 6 ++++++
+>> >  1 file changed, 6 insertions(+)
+>> >=20
+>> > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+>> > index 1919c311c149..416968fea685 100755
+>> > --- a/scripts/link-vmlinux.sh
+>> > +++ b/scripts/link-vmlinux.sh
+>> > @@ -255,6 +255,11 @@ info GEN modules.builtin
+>> >  tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.f=
+ile=3D//p' |
+>> >  	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$/.ko/' > modules.b=
+uiltin
+>> > =20
+>> > +
+>> > +# Do not warn about orphan sections until the final link stage.
+>> > +saved_LDFLAGS_vmlinux=3D"${LDFLAGS_vmlinux}"
+>> > +LDFLAGS_vmlinux=3D"$(echo "${LDFLAGS_vmlinux}" | sed -E 's/ --orphan-=
+handling=3Dwarn( |$)/ /g')"
+>> > +
+>> >  btf_vmlinux_bin_o=3D""
+>> >  if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
+>> >  	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
+>> > @@ -306,6 +311,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+>> >  	fi
+>> >  fi
+>> > =20
+>> > +LDFLAGS_vmlinux=3D"${saved_LDFLAGS_vmlinux}"
+>> >  vmlinux_link vmlinux "${kallsymso}" ${btf_vmlinux_bin_o}
+>> > =20
+>> >  if [ -n "${CONFIG_BUILDTIME_TABLE_SORT}" ]; then
+>>=20
+>> That's ugly. Why not just enable it for all archs?
+>=20
+> It is ugly; I agree.
+>=20
+> I can try to do this for all architectures, but I worry there are a
+> bunch I can't test. But I guess it would stand out. ;)
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/x86/Kconfig              |  2 ++
- arch/x86/Kconfig.assembler    | 36 +++++++++++++++++++++++++++++++++++
- arch/x86/Makefile             | 22 ---------------------
- drivers/gpu/drm/i915/Makefile |  3 ---
- lib/raid6/test/Makefile       |  9 ---------
- 5 files changed, 38 insertions(+), 34 deletions(-)
- create mode 100644 arch/x86/Kconfig.assembler
+It's only warn, so it doesn't break their builds (unless there's a=20
+linker error on warn option I don't know about?). We had a powerpc bug=20
+that would have been caught with it as well, so it's not a bad idea to
+get everyone using it.
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index beea77046f9b..707673227837 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2935,3 +2935,5 @@ config HAVE_ATOMIC_IOMAP
- source "drivers/firmware/Kconfig"
- 
- source "arch/x86/kvm/Kconfig"
-+
-+source "arch/x86/Kconfig.assembler"
-diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
-new file mode 100644
-index 000000000000..d90ed2d7adae
---- /dev/null
-+++ b/arch/x86/Kconfig.assembler
-@@ -0,0 +1,36 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2020 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+
-+config AS_CFI
-+	def_bool $(as-instr,.cfi_startproc\n.cfi_rel_offset rsp$(comma)0\n.cfi_endproc) if 64BIT
-+	def_bool $(as-instr,.cfi_startproc\n.cfi_rel_offset esp$(comma)0\n.cfi_endproc) if !64BIT
-+
-+config AS_CFI_SIGNAL_FRAME
-+	def_bool $(as-instr,.cfi_startproc\n.cfi_signal_frame\n.cfi_endproc)
-+
-+config AS_CFI_SECTIONS
-+	def_bool $(as-instr,.cfi_sections .debug_frame)
-+
-+config AS_SSSE3
-+	def_bool $(as-instr,pshufb %xmm0$(comma)%xmm0)
-+
-+config AS_AVX
-+	def_bool $(as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2)
-+
-+config AS_AVX2
-+	def_bool $(as-instr,vpbroadcastb %xmm0$(comma)%ymm1)
-+
-+config AS_AVX512
-+	def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)
-+
-+config AS_SHA1_NI
-+	def_bool $(as-instr,sha1msg1 %xmm0$(comma)%xmm1)
-+
-+config AS_SHA256_NI
-+	def_bool $(as-instr,sha256msg1 %xmm0$(comma)%xmm1)
-+
-+config AS_ADX
-+	def_bool $(as-instr,adox %r10$(comma)%r10)
-+
-+config AS_MOVNTDQA
-+	def_bool $(as-instr,movntdqa (%eax)$(comma)%xmm0)
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 513a55562d75..b65ec63c7db7 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -177,28 +177,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
- endif
- 
--# Stackpointer is addressed different for 32 bit and 64 bit x86
--sp-$(CONFIG_X86_32) := esp
--sp-$(CONFIG_X86_64) := rsp
--
--# do binutils support CFI?
--cfi := $(call as-instr,.cfi_startproc\n.cfi_rel_offset $(sp-y)$(comma)0\n.cfi_endproc,-DCONFIG_AS_CFI=1)
--# is .cfi_signal_frame supported too?
--cfi-sigframe := $(call as-instr,.cfi_startproc\n.cfi_signal_frame\n.cfi_endproc,-DCONFIG_AS_CFI_SIGNAL_FRAME=1)
--cfi-sections := $(call as-instr,.cfi_sections .debug_frame,-DCONFIG_AS_CFI_SECTIONS=1)
--
--# does binutils support specific instructions?
--asinstr += $(call as-instr,pshufb %xmm0$(comma)%xmm0,-DCONFIG_AS_SSSE3=1)
--avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
--avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
--avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
--sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=1)
--sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
--adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
--
--KBUILD_AFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
- #
-diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index a1f2411aa21b..e559e53fc634 100644
---- a/drivers/gpu/drm/i915/Makefile
-+++ b/drivers/gpu/drm/i915/Makefile
-@@ -28,9 +28,6 @@ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
- CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
- CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
- 
--subdir-ccflags-y += \
--	$(call as-instr,movntdqa (%eax)$(comma)%xmm0,-DCONFIG_AS_MOVNTDQA)
--
- subdir-ccflags-y += -I$(srctree)/$(src)
- 
- # Please keep these build lists sorted!
-diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
-index 3ab8720aa2f8..f8d4a44bc03d 100644
---- a/lib/raid6/test/Makefile
-+++ b/lib/raid6/test/Makefile
-@@ -34,15 +34,6 @@ endif
- 
- ifeq ($(IS_X86),yes)
-         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
--        CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
--                    gcc -c -x assembler - >&/dev/null &&	\
--                    rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
--        CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
--                    gcc -c -x assembler - >&/dev/null &&	\
--                    rm ./-.o && echo -DCONFIG_AS_AVX2=1)
--	CFLAGS += $(shell echo "vpmovm2b %k1, %zmm5" |          \
--		    gcc -c -x assembler - >&/dev/null &&        \
--		    rm ./-.o && echo -DCONFIG_AS_AVX512=1)
- else ifeq ($(HAS_NEON),yes)
-         OBJS   += neon.o neon1.o neon2.o neon4.o neon8.o recov_neon.o recov_neon_inner.o
-         CFLAGS += -DCONFIG_KERNEL_MODE_NEON=1
--- 
-2.25.1
+I would just do it. Doesn't take much to fix.
+
+Thanks,
+Nick
+=
