@@ -1,91 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:45941 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725785AbgCVQAZ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 22 Mar 2020 12:00:25 -0400
-Received: by mail-pf1-f195.google.com with SMTP id j10so6183247pfi.12
-        for <linux-kbuild@vger.kernel.org>; Sun, 22 Mar 2020 09:00:24 -0700 (PDT)
-Date: Sun, 22 Mar 2020 09:00:22 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 1/9] scripts/link-vmlinux.sh: Delay orphan handling
- warnings until final link
-Message-ID: <202003220859.E54327D98C@keescook>
-References: <20200228002244.15240-1-keescook@chromium.org>
- <20200228002244.15240-2-keescook@chromium.org>
- <1584672297.mudnpz3ir9.astroid@bobo.none>
- <202003201121.8CBD96451B@keescook>
- <1584868418.o62lxee8k1.astroid@bobo.none>
+Received: from frisell.zx2c4.com ([192.95.5.64]:59113 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726847AbgCVSu2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Mar 2020 14:50:28 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1584868418.o62lxee8k1.astroid@bobo.none>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Sun, 22 Mar 2020 12:50:13 -0600
+Message-ID: <CAHmME9ptzBzzn+jOo=azZagB=TTFbc2vzdcYurfsE0_1nvKF+g@mail.gmail.com>
+Subject: using libbpf in external projects
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@suse.de>, Catalin Marinas <catalin.marinas@arm.com>, clang-built-linux@googlegroups.com, "H.J. Lu" <hjl.tools@gmail.com>, James Morse <james.morse@arm.com>, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Masahiro Yamada <masahiroy@kernel.org>, Peter Collingbourne <pcc@google.com>, Will Deacon <will@kernel.org>, x86@kernel.org
+To: bpf@vger.kernel.org
+Cc: nicolas@serveur.io, linux-kbuild@vger.kernel.org
 
-On Sun, Mar 22, 2020 at 07:16:29PM +1000, Nicholas Piggin wrote:
-> Kees Cook's on March 21, 2020 4:24 am:
-> > On Fri, Mar 20, 2020 at 12:47:54PM +1000, Nicholas Piggin wrote:
-> >> Kees Cook's on February 28, 2020 10:22 am:
-> >> > Right now, powerpc adds "--orphan-handling=warn" to LD_FLAGS_vmlinux
-> >> > to detect when there are unexpected sections getting added to the kernel
-> >> > image. There is no need to report these warnings more than once, so it
-> >> > can be removed until the final link stage.
-> >> > 
-> >> > This helps pave the way for other architectures to enable this, with the
-> >> > end goal of enabling this warning by default for vmlinux for all
-> >> > architectures.
-> >> > 
-> >> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> >> > ---
-> >> >  scripts/link-vmlinux.sh | 6 ++++++
-> >> >  1 file changed, 6 insertions(+)
-> >> > 
-> >> > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> >> > index 1919c311c149..416968fea685 100755
-> >> > --- a/scripts/link-vmlinux.sh
-> >> > +++ b/scripts/link-vmlinux.sh
-> >> > @@ -255,6 +255,11 @@ info GEN modules.builtin
-> >> >  tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
-> >> >  	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$/.ko/' > modules.builtin
-> >> >  
-> >> > +
-> >> > +# Do not warn about orphan sections until the final link stage.
-> >> > +saved_LDFLAGS_vmlinux="${LDFLAGS_vmlinux}"
-> >> > +LDFLAGS_vmlinux="$(echo "${LDFLAGS_vmlinux}" | sed -E 's/ --orphan-handling=warn( |$)/ /g')"
-> >> > +
-> >> >  btf_vmlinux_bin_o=""
-> >> >  if [ -n "${CONFIG_DEBUG_INFO_BTF}" ]; then
-> >> >  	if gen_btf .tmp_vmlinux.btf .btf.vmlinux.bin.o ; then
-> >> > @@ -306,6 +311,7 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
-> >> >  	fi
-> >> >  fi
-> >> >  
-> >> > +LDFLAGS_vmlinux="${saved_LDFLAGS_vmlinux}"
-> >> >  vmlinux_link vmlinux "${kallsymso}" ${btf_vmlinux_bin_o}
-> >> >  
-> >> >  if [ -n "${CONFIG_BUILDTIME_TABLE_SORT}" ]; then
-> >> 
-> >> That's ugly. Why not just enable it for all archs?
-> > 
-> > It is ugly; I agree.
-> > 
-> > I can try to do this for all architectures, but I worry there are a
-> > bunch I can't test. But I guess it would stand out. ;)
-> 
-> It's only warn, so it doesn't break their builds (unless there's a 
-> linker error on warn option I don't know about?). We had a powerpc bug 
-> that would have been caught with it as well, so it's not a bad idea to
-> get everyone using it.
+Hi,
 
-Well, it's bad form to add warnings to a build. I am expected to fix any
-warnings before I enable a warning flag.
+Nicolas (CC'd) and I are working on a small utility that does some bpf
+things. What it actually does isn't important. But I did just clean up
+its use of libbpf by way of a Makefile:
 
-> I would just do it. Doesn't take much to fix.
+> KERNEL_VERSION := 5.5.11
+> PKG_CONFIG ?= pkg-config
+>
+> all: linux-$(KERNEL_VERSION)/.prepared
+>     @$(MAKE) --no-print-directory netifexec
+>
+> linux-$(KERNEL_VERSION)/.prepared:
+>     curl https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$(KERNEL_VERSION).tar.xz | tar xJf -
+>     touch $@
+>
+> CFLAGS ?= -O3
+> CFLAGS += -Ilinux-$(KERNEL_VERSION)/tools/lib/bpf -Ilinux-$(KERNEL_VERSION)/tools/include -Ilinux-$(KERNEL_VERSION)/tools/include/uapi
+> CFLAGS += -DHAVE_LIBELF_MMAP_SUPPORT
+> CFLAGS += -MMD -MP
+> CFLAGS += -std=gnu99 -D_GNU_SOURCE
+> CFLAGS += -Wall
+> CFLAGS += $(shell $(PKG_CONFIG) --cflags libelf zlib)
+> LDLIBS += $(shell $(PKG_CONFIG) --libs libelf zlib)
+>
+> netifexec: $(sort $(patsubst %.c,%.o,$(wildcard *.c linux-$(KERNEL_VERSION)/tools/lib/bpf/*.c)))
+>
+> clean:
+>     $(RM) netifexec *.o *.d linux-$(KERNEL_VERSION)/tools/lib/bpf/*.o linux-$(KERNEL_VERSION)/tools/lib/bpf/*.d
+>
+> mrproper: clean
+>     $(RM) -r linux-$(KERNEL_VERSION)
+>
+> .PHONY: all clean mrproper
 
-I will do my best on the archs I can't test. :)
+Ignoring that piping curl to tar with no hash checking is unsafe, is
+this kind of embedding something you intended people would do to use
+this code externally? Or is there another distribution of this library
+from elsewhere that you'd recommend?
 
--- 
-Kees Cook
+Jason
