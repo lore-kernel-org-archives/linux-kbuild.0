@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:16890 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17232 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727119AbgCXIvC (ORCPT
+        with ESMTP id S1727261AbgCXIvL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:02 -0400
+        Tue, 24 Mar 2020 04:51:11 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 04/16] x86: remove unneeded (CONFIG_AS_)CFI_SIGNAL_FRAME
-Date: Tue, 24 Mar 2020 17:48:09 +0900
-Message-Id: <20200324084821.29944-5-masahiroy@kernel.org>
+Subject: [PATCH 09/16] x86: replace arch macros from compiler with CONFIG_X86_{32,64}
+Date: Tue, 24 Mar 2020 17:48:14 +0900
+Message-Id: <20200324084821.29944-10-masahiroy@kernel.org>
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,60 +15,58 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux@googlegroups.com, Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-Commit 131484c8da97 ("x86/debug: Remove perpetually broken,
-unmaintainable dwarf annotations") removes all the users of
-CFI_SIGNAL_FRAME.
+If the intention is to check i386/x86_64 excluding UML, testing
+CONFIG_X86_{32,64} is simpler.
 
-Remove the CFI_SIGNAL_FRAME and CONFIG_AS_CFI_SIGNAL_FRAME.
+The reason for checking __i386__ / __x86_64__ was perhaps because
+lib/raid6/algos.c is built not only for the kernel but also for
+testing the library code from userspace.
+
+However, lib/raid6/test/Makefile passes -DCONFIG_X86_{32,64} for
+this case. So, I do not see a reason to not use CONFIG option here.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 ---
 
- arch/x86/Makefile             | 6 ++----
- arch/x86/include/asm/dwarf2.h | 6 ------
- 2 files changed, 2 insertions(+), 10 deletions(-)
+ kernel/signal.c   | 2 +-
+ lib/raid6/algos.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 72f8f744ebd7..dd275008fc59 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -177,8 +177,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
- endif
+diff --git a/kernel/signal.c b/kernel/signal.c
+index 5b2396350dd1..db557e1629e5 100644
+--- a/kernel/signal.c
++++ b/kernel/signal.c
+@@ -1246,7 +1246,7 @@ static void print_fatal_signal(int signr)
+ 	struct pt_regs *regs = signal_pt_regs();
+ 	pr_info("potentially unexpected fatal signal %d.\n", signr);
  
--# is .cfi_signal_frame supported too?
--cfi-sigframe := $(call as-instr,.cfi_startproc\n.cfi_signal_frame\n.cfi_endproc,-DCONFIG_AS_CFI_SIGNAL_FRAME=1)
- cfi-sections := $(call as-instr,.cfi_sections .debug_frame,-DCONFIG_AS_CFI_SECTIONS=1)
+-#if defined(__i386__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_32
+ 	pr_info("code at %08lx: ", regs->ip);
+ 	{
+ 		int i;
+diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
+index df08664d3432..b5a02326cfb7 100644
+--- a/lib/raid6/algos.c
++++ b/lib/raid6/algos.c
+@@ -29,7 +29,7 @@ struct raid6_calls raid6_call;
+ EXPORT_SYMBOL_GPL(raid6_call);
  
- # does binutils support specific instructions?
-@@ -190,8 +188,8 @@ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=
- sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
- adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
- 
--KBUILD_AFLAGS += $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_AFLAGS += $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_CFLAGS += $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
- 
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
-diff --git a/arch/x86/include/asm/dwarf2.h b/arch/x86/include/asm/dwarf2.h
-index 90807583cad7..f440790f09f9 100644
---- a/arch/x86/include/asm/dwarf2.h
-+++ b/arch/x86/include/asm/dwarf2.h
-@@ -21,12 +21,6 @@
- #define CFI_UNDEFINED		.cfi_undefined
- #define CFI_ESCAPE		.cfi_escape
- 
--#ifdef CONFIG_AS_CFI_SIGNAL_FRAME
--#define CFI_SIGNAL_FRAME	.cfi_signal_frame
--#else
--#define CFI_SIGNAL_FRAME
--#endif
--
- #if defined(CONFIG_AS_CFI_SECTIONS)
- #ifndef BUILD_VDSO
- 	/*
+ const struct raid6_calls * const raid6_algos[] = {
+-#if defined(__i386__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_32
+ #ifdef CONFIG_AS_AVX512
+ 	&raid6_avx512x2,
+ 	&raid6_avx512x1,
+@@ -45,7 +45,7 @@ const struct raid6_calls * const raid6_algos[] = {
+ 	&raid6_mmxx2,
+ 	&raid6_mmxx1,
+ #endif
+-#if defined(__x86_64__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_64
+ #ifdef CONFIG_AS_AVX512
+ 	&raid6_avx512x4,
+ 	&raid6_avx512x2,
 -- 
 2.17.1
