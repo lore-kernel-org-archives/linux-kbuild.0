@@ -1,60 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.18]:48389 "EHLO mout.gmx.net"
+Received: from helcar.hmeau.com ([216.24.177.18]:37394 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726524AbgCXKYz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Mar 2020 06:24:55 -0400
-From: Reinhard Karcher <reinhard.karcher@gmx.net>
-Subject: Patch: Suppress irrelevant warning when generating a debian package
-Date: Tue, 24 Mar 2020 11:24:47 +0100
-Message-ID: <1966103.4dT7el1ifK@apollon>
+        id S1727365AbgCXLz5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 24 Mar 2020 07:55:57 -0400
+Date: Tue, 24 Mar 2020 22:54:44 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 12/16] crypto: x86 - rework configuration based on Kconfig
+Message-ID: <20200324115444.GA31003@gondor.apana.org.au>
+References: <20200324084821.29944-1-masahiroy@kernel.org>
+ <20200324084821.29944-13-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200324084821.29944-13-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: 954778@bugs.debian.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux@googlegroups.com, linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-Creating a Debian package by compiling the kernel using make bindeb-pkg
-without creating debug information creates a warning that no
-debug package was created.
-This patch excludes the debug package from the control file,
-if no debug package is created by this configuration.
+On Tue, Mar 24, 2020 at 05:48:17PM +0900, Masahiro Yamada wrote:
+> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> 
+> Now that assembler capabilities are probed inside of Kconfig, we can set
+> up proper Kconfig-based dependencies. We also take this opportunity to
+> reorder the Makefile, so that items are grouped logically by primitive.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>  arch/x86/crypto/Makefile | 152 +++++++++++++++++----------------------
+>  crypto/Kconfig           |   8 +--
+>  2 files changed, 69 insertions(+), 91 deletions(-)
 
-By making a contribution to this project, I certify that:
-The contribution was created in whole or in part by me and I have the righ=
-t to
-submit it under the open source license indicated in the file.
-Signed-off-by: Reinhard Karcher <reinhard.karcher@gmx.net>
-=2D--
-The condition to include the debug package is copied from the file
-builddeb in the same directory.
-
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 357dc56bcf30..1673b9f84804 100755
-=2D-- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -198,7 +198,10 @@ Description: Linux support headers for userspace
-development
-  This package provides userspaces headers from the Linux kernel.  These
-headers
-  are used by the installed headers for GNU glibc and other system librari=
-es.
- Multi-Arch: same
-+EOF
-
-+if [ -n "$BUILD_DEBUG" ] ; then
-+cat <<EOF >> debian/control
- Package: $dbg_packagename
- Section: debug
- Architecture: $debarch
-@@ -206,6 +209,7 @@ Description: Linux kernel debugging symbols for $versi=
-on
-  This package will come in handy if you need to debug the kernel. It prov=
-ides
-  all the necessary debug symbols for the kernel and its modules.
- EOF
-+fi
-
- cat <<EOF > debian/rules
- #!$(command -v $MAKE) -f
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
