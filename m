@@ -1,87 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35553 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbgCXTjC (ORCPT
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:36755 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725835AbgCXTnj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Mar 2020 15:39:02 -0400
-Received: by mail-pg1-f195.google.com with SMTP id 7so9571106pgr.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 24 Mar 2020 12:39:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324161539.7538-1-masahiroy@kernel.org> <20200324161539.7538-3-masahiroy@kernel.org>
-In-Reply-To: <20200324161539.7538-3-masahiroy@kernel.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 24 Mar 2020 12:38:50 -0700
-Message-ID: <CAKwvOdkjiyyt8Ju2j2O4cm1sB34rb_FTgjCRzEiXM6KL4muO_w@mail.gmail.com>
+        Tue, 24 Mar 2020 15:43:39 -0400
+Date: Tue, 24 Mar 2020 12:43:36 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
 Subject: Re: [PATCH 3/3] kbuild: remove AS variable
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20200324194336.GA15310@ubuntu-m2-xlarge-x86>
+References: <20200324161539.7538-1-masahiroy@kernel.org>
+ <20200324161539.7538-3-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200324161539.7538-3-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux <clang-built-linux@googlegroups.com>
+Cc: linux-kbuild@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>, clang-built-linux@googlegroups.com
 
-On Tue, Mar 24, 2020 at 9:16 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
+On Wed, Mar 25, 2020 at 01:15:39AM +0900, Masahiro Yamada wrote:
 > As commit 5ef872636ca7 ("kbuild: get rid of misleading $(AS) from
 > documents") noted, we rarely use $(AS) in the kernel build.
->
+> 
 > Now that the only/last user of $(AS) in drivers/net/wan/Makefile was
 > converted to $(CC), $(AS) is no longer used in the build process.
-
-TIL that we don't actually invoke the assembler at all for out of line
-assembly files, but rather use the compiler as the "driver".
-scripts/Makefile.build:
-329 quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
-330       cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
-
-Though I am personally conflicted, as
-commit 055efab3120b ("kbuild: drop support for cc-ldoption")
-since we do the opposite for the linker (we do not use the compiler as
-the driver for the linker using -Wl,-foo flags).  I wish we were
-consistent in this regard (and not using the compiler as the driver),
-but that is a yak-shave+bikeshed (I typed out yakshed without
-thinking; maybe a new entry for Linux kernel urban dictionary or The
-Jargon File) for another day.
-
-$ grep -nR --include="Makefile" '(AS)' .
-Turned up only this change and the above referenced wan driver.
-
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-
-
->
+> 
 > You can still pass in AS=clang, which is just a switch to turn on
 > the LLVM integrated assembler.
->
+> 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  Makefile | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 16d8271192d1..339e8c51a10b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -405,7 +405,6 @@ KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
->  KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
->
->  # Make variables (CC, etc...)
-> -AS             = $(CROSS_COMPILE)as
->  LD             = $(CROSS_COMPILE)ld
->  CC             = $(CROSS_COMPILE)gcc
->  CPP            = $(CC) -E
-> @@ -472,7 +471,7 @@ KBUILD_LDFLAGS :=
->  GCC_PLUGINS_CFLAGS :=
->  CLANG_FLAGS :=
->
-> -export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
-> +export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
->  export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
->  export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
->  export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
-> --
 
--- 
-Thanks,
-~Nick Desaulniers
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
