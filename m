@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17233 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17988 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727262AbgCXIvL (ORCPT
+        with ESMTP id S1727467AbgCXIve (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:11 -0400
+        Tue, 24 Mar 2020 04:51:34 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 13/16] crypto: curve25519 - do not pollute dispatcher based on assembler
-Date: Tue, 24 Mar 2020 17:48:18 +0900
-Message-Id: <20200324084821.29944-14-masahiroy@kernel.org>
+Subject: [PATCH 11/16] x86: probe assembler capabilities via kconfig instead of makefile
+Date: Tue, 24 Mar 2020 17:48:16 +0900
+Message-Id: <20200324084821.29944-12-masahiroy@kernel.org>
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,44 +17,87 @@ Cc: "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-fou
 
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-Since we're doing a static inline dispatch here, we normally branch
-based on whether or not there's an arch implementation. That would have
-been fine in general, except the crypto Makefile prior used to turn
-things off -- despite the Kconfig -- resulting in us needing to also
-hard code various assembler things into the dispatcher too. The horror!
-Now that the assembler config options are done by Kconfig, we can get
-rid of the inconsistency.
+Doing this probing inside of the Makefiles means we have a maze of
+ifdefs inside the source code and child Makefiles that need to make
+proper decisions on this too. Instead, we do it at Kconfig time, like
+many other compiler and assembler options, which allows us to set up the
+dependencies normally for full compilation units. In the process, the
+ADX test changes to use %eax instead of %r10 so that it's valid in both
+32-bit and 64-bit mode.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- include/crypto/curve25519.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/Kconfig           |  2 ++
+ arch/x86/Kconfig.assembler | 22 ++++++++++++++++++++++
+ arch/x86/Makefile          | 15 ---------------
+ 3 files changed, 24 insertions(+), 15 deletions(-)
+ create mode 100644 arch/x86/Kconfig.assembler
 
-diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
-index 9ecb3c1f0f15..4e6dc840b159 100644
---- a/include/crypto/curve25519.h
-+++ b/include/crypto/curve25519.h
-@@ -33,8 +33,7 @@ bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
- 			     const u8 secret[CURVE25519_KEY_SIZE],
- 			     const u8 basepoint[CURVE25519_KEY_SIZE])
- {
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_arch(mypublic, secret, basepoint);
- 	else
- 		curve25519_generic(mypublic, secret, basepoint);
-@@ -50,8 +49,7 @@ __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
- 				    CURVE25519_KEY_SIZE)))
- 		return false;
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index beea77046f9b..707673227837 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2935,3 +2935,5 @@ config HAVE_ATOMIC_IOMAP
+ source "drivers/firmware/Kconfig"
  
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_base_arch(pub, secret);
- 	else
- 		curve25519_generic(pub, secret, curve25519_base_point);
+ source "arch/x86/kvm/Kconfig"
++
++source "arch/x86/Kconfig.assembler"
+diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
+new file mode 100644
+index 000000000000..46868ec7b723
+--- /dev/null
++++ b/arch/x86/Kconfig.assembler
+@@ -0,0 +1,22 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2020 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++
++# binutils >= 2.22
++config AS_AVX2
++	def_bool $(as-instr,vpbroadcastb %xmm0$(comma)%ymm1)
++
++# binutils >= 2.25
++config AS_AVX512
++	def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)
++
++# binutils >= 2.24
++config AS_SHA1_NI
++	def_bool $(as-instr,sha1msg1 %xmm0$(comma)%xmm1)
++
++# binutils >= 2.24
++config AS_SHA256_NI
++	def_bool $(as-instr,sha256msg1 %xmm0$(comma)%xmm1)
++
++# binutils >= 2.23
++config AS_ADX
++	def_bool $(as-instr,adox %eax$(comma)%eax)
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 4c57cb3018fb..b65ec63c7db7 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -177,21 +177,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
+ endif
+ 
+-# does binutils support specific instructions?
+-# binutils >= 2.22
+-avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
+-# binutils >= 2.25
+-avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
+-# binutils >= 2.24
+-sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=1)
+-# binutils >= 2.24
+-sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
+-# binutils >= 2.23
+-adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
+-
+-KBUILD_AFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+-KBUILD_CFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+-
+ KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ 
+ #
 -- 
 2.17.1
