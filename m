@@ -1,42 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from helcar.hmeau.com ([216.24.177.18]:37414 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727238AbgCXL4J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 24 Mar 2020 07:56:09 -0400
-Date: Tue, 24 Mar 2020 22:55:27 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 16/16] crypto: x86 - clean up
- poly1305-x86_64-cryptogams.S by 'make clean'
-Message-ID: <20200324115527.GC31003@gondor.apana.org.au>
-References: <20200324084821.29944-1-masahiroy@kernel.org>
- <20200324084821.29944-17-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200324084821.29944-17-masahiroy@kernel.org>
+Received: from conuserg-12.nifty.com ([210.131.2.79]:42697 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727164AbgCXQPy (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 24 Mar 2020 12:15:54 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: remove AS variable
+Date: Wed, 25 Mar 2020 01:15:07 +0900
+Message-Id: <20200324161507.7414-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux@googlegroups.com, linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, clang-built-linux@googlegroups.com
 
-On Tue, Mar 24, 2020 at 05:48:21PM +0900, Masahiro Yamada wrote:
-> poly1305-x86_64-cryptogams.S is a generated file, so it should be
-> cleaned up by 'make clean'.
-> 
-> Assigning it to the variable 'targets' teaches Kbuild that it is a
-> generated file. However, this line is not evaluated while cleaning
-> because scripts/Makefile.clean does not include include/config/auto.conf.
-> 
-> Removing the ifneq-conditional, so this file is correctly cleaned up.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  arch/x86/crypto/Makefile | 2 --
->  1 file changed, 2 deletions(-)
+As commit 5ef872636ca7 ("kbuild: get rid of misleading $(AS) from
+documents") noted, we rarely use $(AS) in the kernel build.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Now that the only/last user of $(AS) in drivers/net/wan/Makefile was
+converted to $(CC), $(AS) is no longer used in the build process.
+
+You can still pass in AS=clang, which is just a switch to turn on
+the LLVM integrated assembler.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 16d8271192d1..339e8c51a10b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -405,7 +405,6 @@ KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
+ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
+ 
+ # Make variables (CC, etc...)
+-AS		= $(CROSS_COMPILE)as
+ LD		= $(CROSS_COMPILE)ld
+ CC		= $(CROSS_COMPILE)gcc
+ CPP		= $(CC) -E
+@@ -472,7 +471,7 @@ KBUILD_LDFLAGS :=
+ GCC_PLUGINS_CFLAGS :=
+ CLANG_FLAGS :=
+ 
+-export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
++export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
+ export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+ export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.17.1
