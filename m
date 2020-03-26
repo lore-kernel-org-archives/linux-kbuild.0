@@ -1,89 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:57886 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727682AbgCZIYO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:24:14 -0400
-From: Jani Nikula <jani.nikula@linux.intel.com>
-Subject: Re: [PATCH v2 09/16] drm/i915: remove always-defined CONFIG_AS_MOVNTDQA
-In-Reply-To: <20200326080104.27286-10-masahiroy@kernel.org>
-References: <20200326080104.27286-1-masahiroy@kernel.org> <20200326080104.27286-10-masahiroy@kernel.org>
-Date: Thu, 26 Mar 2020 10:24:04 +0200
-Message-ID: <87ftdvikwr.fsf@intel.com>
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50987 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbgCZJU0 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 26 Mar 2020 05:20:26 -0400
+Date: Thu, 26 Mar 2020 10:20:19 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 00/16] x86, crypto: remove always-defined CONFIG_AS_* and
+ cosolidate Kconfig/Makefiles
+Message-ID: <20200326092019.GA100058@gmail.com>
+References: <20200324084821.29944-1-masahiroy@kernel.org>
+ <20200325045940.GA24974@gmail.com>
+ <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-
-On Thu, 26 Mar 2020, Masahiro Yamada <masahiroy@kernel.org> wrote:
-> CONFIG_AS_MOVNTDQA was introduced by commit 0b1de5d58e19 ("drm/i915:
-> Use SSE4.1 movntdqa to accelerate reads from WC memory").
->
-> We raise the minimal supported binutils version from time to time.
-> The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-> required binutils version to 2.21").
->
-> I confirmed the code in $(call as-instr,...) can be assembled by the
-> binutils 2.21 assembler and also by LLVM integrated assembler.
->
-> Remove CONFIG_AS_MOVNTDQA, which is always defined.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-
-Ack for merging this via whichever tree you see fit; please let me know
-if you want me to pick this up via drm-intel.
-
-BR,
-Jani.
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>
 
 
-> ---
->
-> Changes in v2: None
->
->  drivers/gpu/drm/i915/Makefile      | 3 ---
->  drivers/gpu/drm/i915/i915_memcpy.c | 5 -----
->  2 files changed, 8 deletions(-)
->
-> diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-> index a1f2411aa21b..e559e53fc634 100644
-> --- a/drivers/gpu/drm/i915/Makefile
-> +++ b/drivers/gpu/drm/i915/Makefile
-> @@ -28,9 +28,6 @@ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
->  CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
->  CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
->  
-> -subdir-ccflags-y += \
-> -	$(call as-instr,movntdqa (%eax)$(comma)%xmm0,-DCONFIG_AS_MOVNTDQA)
-> -
->  subdir-ccflags-y += -I$(srctree)/$(src)
->  
->  # Please keep these build lists sorted!
-> diff --git a/drivers/gpu/drm/i915/i915_memcpy.c b/drivers/gpu/drm/i915/i915_memcpy.c
-> index fdd550405fd3..7b3b83bd5ab8 100644
-> --- a/drivers/gpu/drm/i915/i915_memcpy.c
-> +++ b/drivers/gpu/drm/i915/i915_memcpy.c
-> @@ -35,7 +35,6 @@
->  
->  static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
->  
-> -#ifdef CONFIG_AS_MOVNTDQA
->  static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
->  {
->  	kernel_fpu_begin();
-> @@ -93,10 +92,6 @@ static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len)
->  
->  	kernel_fpu_end();
->  }
-> -#else
-> -static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len) {}
-> -static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len) {}
-> -#endif
->  
->  /**
->   * i915_memcpy_from_wc: perform an accelerated *aligned* read from WC
+* Masahiro Yamada <masahiroy@kernel.org> wrote:
 
--- 
-Jani Nikula, Intel Open Source Graphics Center
+> > LGTM. I've got these four from Jason A. Donenfeld queued up in
+> > tip:WIP.x86/asm:
+> >
+> >  bd5b1283e41c: ("crypto: Curve25519 - do not pollute dispatcher based on assembler")
+> >  829f32d78588: ("crypto: X86 - rework configuration, based on Kconfig")
+> >  95ef9f80ed63: ("x86/build: Probe assembler from Kconfig instead of Kbuild")
+> >  1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+> >
+> > I suppose these might interact (maybe even conflict), and are topically
+> > related.
+> >
+> > Would you like to pull these into the kbuild tree? You can find them in:
+> >
+> >    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.x86/asm
+> >
+> > Thanks,
+> >
+> >         Ingo
+> 
+> 
+> I did not know that these had already landed in tip tree.
+> 
+> They are immature version.
+> (In fact CONFIG_AS_CFI and AS_ADX are false-negative
+> if GCC that defaults to 32-bit is used.)
+> 
+> Can you simply discard the WIP.x86/asm branch,
+> and only reapply
+> 1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+> 
+> ?
+
+Sure, done!
+
+In case you need any x86 maintainer acks for your series:
+
+  Acked-by: Ingo Molnar <mingo@kernel.org>
+
+Thanks,
+
+	Ingo
