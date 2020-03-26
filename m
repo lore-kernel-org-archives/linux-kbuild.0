@@ -1,28 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:35275 "EHLO frisell.zx2c4.com"
+Received: from mga11.intel.com ([192.55.52.93]:57886 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727821AbgCZISJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:18:09 -0400
+        id S1727682AbgCZIYO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 26 Mar 2020 04:24:14 -0400
+From: Jani Nikula <jani.nikula@linux.intel.com>
+Subject: Re: [PATCH v2 09/16] drm/i915: remove always-defined CONFIG_AS_MOVNTDQA
+In-Reply-To: <20200326080104.27286-10-masahiroy@kernel.org>
+References: <20200326080104.27286-1-masahiroy@kernel.org> <20200326080104.27286-10-masahiroy@kernel.org>
+Date: Thu, 26 Mar 2020 10:24:04 +0200
+Message-ID: <87ftdvikwr.fsf@intel.com>
 MIME-Version: 1.0
-References: <20200326080104.27286-1-masahiroy@kernel.org>
-In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 26 Mar 2020 02:12:54 -0600
-Message-ID: <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_*
- and cosolidate Kconfig/Makefiles
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
 
-Very little has changed from last time, and this whole series still
-looks good to me. I think I already ack'd most packages, but in case
-it helps:
+On Thu, 26 Mar 2020, Masahiro Yamada <masahiroy@kernel.org> wrote:
+> CONFIG_AS_MOVNTDQA was introduced by commit 0b1de5d58e19 ("drm/i915:
+> Use SSE4.1 movntdqa to accelerate reads from WC memory").
+>
+> We raise the minimal supported binutils version from time to time.
+> The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
+> required binutils version to 2.21").
+>
+> I confirmed the code in $(call as-instr,...) can be assembled by the
+> binutils 2.21 assembler and also by LLVM integrated assembler.
+>
+> Remove CONFIG_AS_MOVNTDQA, which is always defined.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Ack for merging this via whichever tree you see fit; please let me know
+if you want me to pick this up via drm-intel.
 
-Since this touches a lot of stuff, it might be best to get it in as
-early as possible during the merge window, as I imagine new code being
-added is going to want to be touching those makefiles too.
+BR,
+Jani.
+
+
+> ---
+>
+> Changes in v2: None
+>
+>  drivers/gpu/drm/i915/Makefile      | 3 ---
+>  drivers/gpu/drm/i915/i915_memcpy.c | 5 -----
+>  2 files changed, 8 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+> index a1f2411aa21b..e559e53fc634 100644
+> --- a/drivers/gpu/drm/i915/Makefile
+> +++ b/drivers/gpu/drm/i915/Makefile
+> @@ -28,9 +28,6 @@ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
+>  CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
+>  CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+>  
+> -subdir-ccflags-y += \
+> -	$(call as-instr,movntdqa (%eax)$(comma)%xmm0,-DCONFIG_AS_MOVNTDQA)
+> -
+>  subdir-ccflags-y += -I$(srctree)/$(src)
+>  
+>  # Please keep these build lists sorted!
+> diff --git a/drivers/gpu/drm/i915/i915_memcpy.c b/drivers/gpu/drm/i915/i915_memcpy.c
+> index fdd550405fd3..7b3b83bd5ab8 100644
+> --- a/drivers/gpu/drm/i915/i915_memcpy.c
+> +++ b/drivers/gpu/drm/i915/i915_memcpy.c
+> @@ -35,7 +35,6 @@
+>  
+>  static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
+>  
+> -#ifdef CONFIG_AS_MOVNTDQA
+>  static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
+>  {
+>  	kernel_fpu_begin();
+> @@ -93,10 +92,6 @@ static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len)
+>  
+>  	kernel_fpu_end();
+>  }
+> -#else
+> -static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len) {}
+> -static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len) {}
+> -#endif
+>  
+>  /**
+>   * i915_memcpy_from_wc: perform an accelerated *aligned* read from WC
+
+-- 
+Jani Nikula, Intel Open Source Graphics Center
