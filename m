@@ -1,150 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19339 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:19151 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727773AbgCZIEM (ORCPT
+        with ESMTP id S1727867AbgCZIEG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:04:12 -0400
+        Thu, 26 Mar 2020 04:04:06 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 06/16] x86: remove always-defined CONFIG_AS_SSSE3
-Date: Thu, 26 Mar 2020 17:00:54 +0900
-Message-Id: <20200326080104.27286-7-masahiroy@kernel.org>
+Subject: [PATCH v2 13/16] crypto: curve25519 - do not pollute dispatcher based on assembler
+Date: Thu, 26 Mar 2020 17:01:01 +0900
+Message-Id: <20200326080104.27286-14-masahiroy@kernel.org>
 In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
 References: <20200326080104.27286-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Masahiro Yamada <masahiroy@kernel.org>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Masahiro Yamada <masahiroy@kernel.org>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 
-CONFIG_AS_SSSE3 was introduced by commit 75aaf4c3e6a4 ("x86/raid6:
-correctly check for assembler capabilities").
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-We raise the minimal supported binutils version from time to time.
-The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-required binutils version to 2.21").
+Since we're doing a static inline dispatch here, we normally branch
+based on whether or not there's an arch implementation. That would have
+been fine in general, except the crypto Makefile prior used to turn
+things off -- despite the Kconfig -- resulting in us needing to also
+hard code various assembler things into the dispatcher too. The horror!
+Now that the assembler config options are done by Kconfig, we can get
+rid of the inconsistency.
 
-I confirmed the code in $(call as-instr,...) can be assembled by the
-binutils 2.21 assembler and also by LLVM integrated assembler.
-
-Remove CONFIG_AS_SSSE3, which is always defined.
-
-I added ifdef CONFIG_X86 to lib/raid6/algos.c to avoid link errors
-on non-x86 architectures.
-
-lib/raid6/algos.c is built not only for the kernel but also for
-testing the library code from userspace. I added -DCONFIG_X86 to
-lib/raid6/test/Makefile to cator to this usecase.
-
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
 Changes in v2: None
 
- arch/x86/Makefile              | 5 ++---
- arch/x86/crypto/blake2s-core.S | 2 --
- lib/raid6/algos.c              | 2 +-
- lib/raid6/recov_ssse3.c        | 6 ------
- lib/raid6/test/Makefile        | 4 +---
- 5 files changed, 4 insertions(+), 15 deletions(-)
+ include/crypto/curve25519.h | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index e4a062313bb0..94f89612e024 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -178,7 +178,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- endif
+diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
+index 9ecb3c1f0f15..4e6dc840b159 100644
+--- a/include/crypto/curve25519.h
++++ b/include/crypto/curve25519.h
+@@ -33,8 +33,7 @@ bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
+ 			     const u8 secret[CURVE25519_KEY_SIZE],
+ 			     const u8 basepoint[CURVE25519_KEY_SIZE])
+ {
+-	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
+-	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
++	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
+ 		curve25519_arch(mypublic, secret, basepoint);
+ 	else
+ 		curve25519_generic(mypublic, secret, basepoint);
+@@ -50,8 +49,7 @@ __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
+ 				    CURVE25519_KEY_SIZE)))
+ 		return false;
  
- # does binutils support specific instructions?
--asinstr += $(call as-instr,pshufb %xmm0$(comma)%xmm0,-DCONFIG_AS_SSSE3=1)
- avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
- avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
- avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
-@@ -186,8 +185,8 @@ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=
- sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
- adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
- 
--KBUILD_AFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
- 
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
-diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
-index 24910b766bdd..2ca79974f819 100644
---- a/arch/x86/crypto/blake2s-core.S
-+++ b/arch/x86/crypto/blake2s-core.S
-@@ -46,7 +46,6 @@ SIGMA2:
- #endif /* CONFIG_AS_AVX512 */
- 
- .text
--#ifdef CONFIG_AS_SSSE3
- SYM_FUNC_START(blake2s_compress_ssse3)
- 	testq		%rdx,%rdx
- 	je		.Lendofloop
-@@ -174,7 +173,6 @@ SYM_FUNC_START(blake2s_compress_ssse3)
- .Lendofloop:
- 	ret
- SYM_FUNC_END(blake2s_compress_ssse3)
--#endif /* CONFIG_AS_SSSE3 */
- 
- #ifdef CONFIG_AS_AVX512
- SYM_FUNC_START(blake2s_compress_avx512)
-diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index bf1b4765c8f6..df08664d3432 100644
---- a/lib/raid6/algos.c
-+++ b/lib/raid6/algos.c
-@@ -97,13 +97,13 @@ void (*raid6_datap_recov)(int, size_t, int, void **);
- EXPORT_SYMBOL_GPL(raid6_datap_recov);
- 
- const struct raid6_recov_calls *const raid6_recov_algos[] = {
-+#ifdef CONFIG_X86
- #ifdef CONFIG_AS_AVX512
- 	&raid6_recov_avx512,
- #endif
- #ifdef CONFIG_AS_AVX2
- 	&raid6_recov_avx2,
- #endif
--#ifdef CONFIG_AS_SSSE3
- 	&raid6_recov_ssse3,
- #endif
- #ifdef CONFIG_S390
-diff --git a/lib/raid6/recov_ssse3.c b/lib/raid6/recov_ssse3.c
-index 1de97d2405d0..4bfa3c6b60de 100644
---- a/lib/raid6/recov_ssse3.c
-+++ b/lib/raid6/recov_ssse3.c
-@@ -3,8 +3,6 @@
-  * Copyright (C) 2012 Intel Corporation
-  */
- 
--#ifdef CONFIG_AS_SSSE3
--
- #include <linux/raid/pq.h>
- #include "x86.h"
- 
-@@ -328,7 +326,3 @@ const struct raid6_recov_calls raid6_recov_ssse3 = {
- #endif
- 	.priority = 1,
- };
--
--#else
--#warning "your version of binutils lacks SSSE3 support"
--#endif
-diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
-index b9e6c3648be1..60021319ac78 100644
---- a/lib/raid6/test/Makefile
-+++ b/lib/raid6/test/Makefile
-@@ -34,9 +34,7 @@ endif
- 
- ifeq ($(IS_X86),yes)
-         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
--        CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
--                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
--                    rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
-+        CFLAGS += -DCONFIG_X86
-         CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
-                     gcc -c -x assembler - >/dev/null 2>&1 &&	\
-                     rm ./-.o && echo -DCONFIG_AS_AVX2=1)
+-	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
+-	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
++	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
+ 		curve25519_base_arch(pub, secret);
+ 	else
+ 		curve25519_generic(pub, secret, curve25519_base_point);
 -- 
 2.17.1
