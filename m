@@ -1,63 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19151 "EHLO
+Received: from conuserg-11.nifty.com ([210.131.2.78]:19078 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727867AbgCZIEG (ORCPT
+        with ESMTP id S1727773AbgCZIEE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:04:06 -0400
+        Thu, 26 Mar 2020 04:04:04 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 13/16] crypto: curve25519 - do not pollute dispatcher based on assembler
-Date: Thu, 26 Mar 2020 17:01:01 +0900
-Message-Id: <20200326080104.27286-14-masahiroy@kernel.org>
+Subject: [PATCH v2 14/16] Documentation/changes: Raise minimum supported binutils version to 2.23
+Date: Thu, 26 Mar 2020 17:01:02 +0900
+Message-Id: <20200326080104.27286-15-masahiroy@kernel.org>
 In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
 References: <20200326080104.27286-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Masahiro Yamada <masahiroy@kernel.org>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux@googlegroups.com, Borislav Petkov <bp@suse.de>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+From: Borislav Petkov <bp@suse.de>
 
-Since we're doing a static inline dispatch here, we normally branch
-based on whether or not there's an arch implementation. That would have
-been fine in general, except the crypto Makefile prior used to turn
-things off -- despite the Kconfig -- resulting in us needing to also
-hard code various assembler things into the dispatcher too. The horror!
-Now that the assembler config options are done by Kconfig, we can get
-rid of the inconsistency.
+The currently minimum-supported binutils version 2.21 has the problem of
+promoting symbols which are defined outside of a section into absolute.
+According to Arvind:
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+  binutils-2.21 and -2.22. An x86-64 defconfig will fail with
+          Invalid absolute R_X86_64_32S relocation: _etext
+  and after fixing that one, with
+          Invalid absolute R_X86_64_32S relocation: __end_of_kernel_reserve
+
+Those two versions of binutils have a bug when it comes to handling
+symbols defined outside of a section and binutils 2.23 has the proper
+fix, see: https://sourceware.org/legacy-ml/binutils/2012-06/msg00155.html
+
+Therefore, up to the fixed version directly, skipping the broken ones.
+
+Currently shipping distros already have the fixed binutils version so
+there should be no breakage resulting from this.
+
+For more details about the whole thing, see the thread in Link.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Link: https://lkml.kernel.org/r/20200110202349.1881840-1-nivedita@alum.mit.edu
+Acked-by: Kees Cook <keescook@chromium.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- include/crypto/curve25519.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ Documentation/process/changes.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
-index 9ecb3c1f0f15..4e6dc840b159 100644
---- a/include/crypto/curve25519.h
-+++ b/include/crypto/curve25519.h
-@@ -33,8 +33,7 @@ bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
- 			     const u8 secret[CURVE25519_KEY_SIZE],
- 			     const u8 basepoint[CURVE25519_KEY_SIZE])
- {
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_arch(mypublic, secret, basepoint);
- 	else
- 		curve25519_generic(mypublic, secret, basepoint);
-@@ -50,8 +49,7 @@ __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
- 				    CURVE25519_KEY_SIZE)))
- 		return false;
+diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
+index e47863575917..91c5ff8e161e 100644
+--- a/Documentation/process/changes.rst
++++ b/Documentation/process/changes.rst
+@@ -31,7 +31,7 @@ you probably needn't concern yourself with pcmciautils.
+ ====================== ===============  ========================================
+ GNU C                  4.6              gcc --version
+ GNU make               3.81             make --version
+-binutils               2.21             ld -v
++binutils               2.23             ld -v
+ flex                   2.5.35           flex --version
+ bison                  2.0              bison --version
+ util-linux             2.10o            fdformat --version
+@@ -76,7 +76,7 @@ You will need GNU make 3.81 or later to build the kernel.
+ Binutils
+ --------
  
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_base_arch(pub, secret);
- 	else
- 		curve25519_generic(pub, secret, curve25519_base_point);
+-Binutils 2.21 or newer is needed to build the kernel.
++Binutils 2.23 or newer is needed to build the kernel.
+ 
+ pkg-config
+ ----------
 -- 
 2.17.1
