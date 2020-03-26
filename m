@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:10644 "EHLO
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35408 "EHLO
         mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726340AbgCZSv0 (ORCPT
+        by vger.kernel.org with ESMTP id S1726340AbgCZTEK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 14:51:26 -0400
+        Thu, 26 Mar 2020 15:04:10 -0400
 From: Nick Terrell <terrelln@fb.com>
-Subject: Re: [PATCH v3 1/8] lib: prepare zstd for preboot environment
-Date: Thu, 26 Mar 2020 18:50:43 +0000
-Message-ID: <40FFD6B5-8353-4126-9F89-B8F21A400EB3@fb.com>
+Subject: Re: [PATCH v3 3/8] lib: add zstd support to decompress
+Date: Thu, 26 Mar 2020 19:03:54 +0000
+Message-ID: <611A224B-1CB3-4283-9783-87C184C8983A@fb.com>
 References: <20200325195849.407900-1-nickrterrell@gmail.com>
- <20200325195849.407900-2-nickrterrell@gmail.com>
- <20200326154038.GA21231@ntb.petris.klfree.czf>
-In-Reply-To: <20200326154038.GA21231@ntb.petris.klfree.czf>
+ <20200325195849.407900-4-nickrterrell@gmail.com>
+ <20200326164732.GA17157@ntb.petris.klfree.czf>
+In-Reply-To: <20200326164732.GA17157@ntb.petris.klfree.czf>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <D7C6279926EAF149A94698AD0AFBD329@namprd15.prod.outlook.com>
+Content-ID: <A5CFD1D6E92BBA48B087E0108739BEE5@namprd15.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,26 +22,41 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Petr Malat <oss@malat.biz>
 Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
 
-DQoNCj4gT24gTWFyIDI2LCAyMDIwLCBhdCA4OjQwIEFNLCBQZXRyIE1hbGF0IDxvc3NAbWFsYXQu
-Yml6PiB3cm90ZToNCj4gDQo+IEhpIE5pY2ssDQo+IEkgZmluYWxseSBnb3Qgc29tZSB0aW1lIHRv
-IHJldmlldyB5b3VyIHBhdGNoLCBoZXJlIGFyZSBteSBjb21tZW50czoNCj4gDQo+IE9uIFdlZCwg
-TWFyIDI1LCAyMDIwIGF0IDEyOjU4OjQyUE0gLTA3MDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+
-ICogRG9uJ3QgZXhwb3J0IHN5bWJvbHMgaWYgWlNURF9QUkVCT09UIGlzIGRlZmluZWQuDQo+IEkn
-bSBub3Qgc3VyZSBpZiB0aGlzIGlzIG5lZWRlZC4gV2hlbiBJIHdvcmtlZCBvbiBteSBwYXRjaCwg
-SSBoYXZlIGZvdW5kIHRoYXQNCj4gYWxsIGV4cG9ydGluZyBhbmQgbW9kaW5mbyBtYWNyb3MgZ2Vu
-ZXJhdGUgc3ltYm9scyBpbiBtb2RpbmZvIGFuZCBkaXNjYXJkLmtzeW0NCj4gc2VjdGlvbnMsIHdo
-aWNoIGFyZSB0aGVuIGRyb3BwZWQgYnkgdGhlIHZtbGludXggbGlua2VyIHNjcmlwdCwgdGh1cyBv
-bmUNCj4gd2lsbCBnZXQgdGhlIHNhbWUgYmluYXJ5IGluZGVwZW5kZW50bHkgaWYgaGUgcHV0cyB0
-aGlzIGNoYW5nZSBpbiBvciBub3QuDQo+IA0KPiBJJ20gbm90IHN1cmUgaWYgdGhpcyBpcyBpbnRl
-bnRpb25hbCBhcyB0aGVyZSBpcyBhbHNvIF9fRElTQUJMRV9FWFBPUlRTIGRlZmluZSwNCj4gd2hp
-Y2ggc2hvdWxkIGJlIHVzZWQgYnkgYSBkZWNvbXByZXNzb3IgKGFjY29yZGluZyB0byBjb21tZW50
-cyBpbiBleHBvcnQuaCkuDQoNClRoaXMgaXMgbm90IG15IGFyZWEgb2YgZXhwZXJ0aXNlLCBJ4oCZ
-bSBhIHpzdGQgZGV2ZWxvcGVyIG5vdCBhIGtlcm5lbCBkZXZlbG9wZXIuDQpGb3IgdGhhdCByZWFz
-b24gSSB3YW50ZWQgdG8gcGljayB0aGUgc2FmZSByb3V0ZSBvZiBkaXNhYmxpbmcgdGhlIGV4cG9y
-dHMgZXhwbGljaXRseSwNCnNpbmNlIHRoYXQgaXMgd2hhdCB0aGUgb3RoZXIgZGVjb21wcmVzc29y
-cyBkbywgc28gSSBrbm93IGl0IHdvcmtzLg0KDQpJZiB5b3XigJlyZSBjb25maWRlbnQgdGhhdCBp
-dCBpc27igJl0IG5lY2Vzc2FyeSwgSSBjYW4gZHJvcCB0aGUgbW9kaWZpY2F0aW9uLiBCdXQsIEkg
-ZG8NCnByZWZlciB0aGlzIGFwcHJvYWNoLCBiZWNhdXNlIHRoZXJlIGlzIG5vIG1hZ2ljIGludm9s
-dmVkLiBJIGNhbiBzZWUgd2hhdCBpcw0KaGFwcGVuaW5nIGNsZWFybHkganVzdCBieSBsb29raW5n
-IGF0IHRoZSBkZWNvbXByZXNzX3VuenN0ZC5jIGNvZGUuDQoNClRoYW5rcyBmb3IgdGhlIHJldmll
-dywNCk5pY2sNCg0K
+PiBPbiBNYXIgMjYsIDIwMjAsIGF0IDk6NDcgQU0sIFBldHIgTWFsYXQgPG9zc0BtYWxhdC5iaXo+
+IHdyb3RlOg0KPiANCj4gSGkhDQo+IE9uIFdlZCwgTWFyIDI1LCAyMDIwIGF0IDEyOjU4OjQ0UE0g
+LTA3MDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IEZyb206IE5pY2sgVGVycmVsbCA8dGVycmVs
+bG5AZmIuY29tPg0KPj4gKiBBZGQgdW56c3RkKCkgYW5kIHRoZSB6c3RkIGRlY29tcHJlc3MgaW50
+ZXJmYWNlLg0KPiBIZXJlIEkgZG8gbm90IHVuZGVyc3RhbmQgd2h5IHlvdSBsaW1pdCB0aGUgd2lu
+ZG93IHNpemUgdG8gOE1CIGV2ZW4gd2hlbg0KPiB5b3UgcmVhZCBhIGxhcmdlciB2YWx1ZSBmcm9t
+IHRoZSBoZWFkZXIuIEkgZG8gbm90IHNlZSBhIHJlYXNvbiB3aHkgdGhlcmUNCj4gc2hvdWxkIGJl
+IHN1Y2ggYSBsaW1pdGF0aW9uIGF0IHRoZSBmaXJzdCBwbGFjZSBhbmQgaWYgdGhlcmUgc2hvdWxk
+IGJlLA0KPiB3aHkgaXQgZGlmZmVycyBmcm9tIFpTVERfV0lORE9XTE9HX01BWC4NCg0KV2hlbiB3
+ZSBhcmUgZG9pbmcgc3RyZWFtaW5nIGRlY29tcHJlc3Npb24gKGVpdGhlciBmbHVzaCBvciBmaWxs
+IGlzIHByb3ZpZGVkKQ0Kd2UgaGF2ZSB0byBhbGxvY2F0ZSBtZW1vcnkgcHJvcG9ydGlvbmFsIHRv
+IHRoZSB3aW5kb3cgc2l6ZS4gV2Ugd2FudCB0bw0KYm91bmQgdGhhdCBtZW1vcnkgc28gd2UgZG9u
+4oCZdCBhY2NpZGVudGFsbHkgYWxsb2NhdGUgdG9vIG11Y2ggbWVtb3J5Lg0KV2hlbiB3ZSBhcmUg
+ZG9pbmcgYSBzaW5nbGUtcGFzcyBkZWNvbXByZXNzaW9uIChuZWl0aGVyIGZsdXNoIG5vciBmaWxs
+DQphcmUgcHJvdmlkZWQpIHRoZSB3aW5kb3cgc2l6ZSBkb2VzbuKAmXQgbWF0dGVyLCBhbmQgd2Ug
+b25seSBoYXZlIHRvIGFsbG9jYXRlDQphIGZpeGVkIGFtb3VudCBvZiBtZW1vcnkgfjE5MiBLQi4N
+Cg0KVGhlIHpzdGQgc3BlYyBbMF0gc3BlY2lmaWVzIHRoYXQgYWxsIGRlY29kZXJzIHNob3VsZCBh
+bGxvdyB3aW5kb3cgc2l6ZXMNCnVwIHRvIDggTUIuIEFkZGl0aW9uYWxseSwgdGhlIHpzdGQgQ0xJ
+IHdvbuKAmXQgcHJvZHVjZSB3aW5kb3cgc2l6ZXMgZ3JlYXRlcg0KdGhhbiA4IE1CIGJ5IGRlZmF1
+bHQuIFRoZSB3aW5kb3cgc2l6ZSBpcyBjb250cm9sbGVkIGJ5IHRoZSBjb21wcmVzc2lvbg0KbGV2
+ZWwsIGFuZCBjYW4gYmUgZXhwbGljaXRseSBzZXQuDQoNCkkgd291bGQgZXhwZWN0IGxhcmdlciB3
+aW5kb3cgc2l6ZXMgdG8gYmUgYmVuZWZpY2lhbCBmb3IgY29tcHJlc3Npb24gcmF0aW8sDQp0aG91
+Z2ggdGhlcmUgaXMgZGVtaXNpbmcgcmV0dXJucy4gSSB3b3VsZCBleHBlY3QgdGhhdCBmb3Iga2Vy
+bmVsIGltYWdlDQpjb21wcmVzc2lvbiBsYXJnZXIgd2luZG93IHNpemVzIGFyZSBiZW5lZmljaWFs
+LCBzaW5jZSBpdCBpcyBkZWNvbXByZXNzZWQNCndpdGggYSBzaW5nbGUgcGFzcy4gRm9yIGluaXRy
+YW1mcyBkZWNvbXByZXNzaW9uLCBJIHdvdWxkIGV4cGVjdCB0aGF0IGxpbWl0aW5nDQp0aGUgd2lu
+ZG93IHNpemUgY291bGQgaGVscCBkZWNvbXByZXNzaW9uIHNwZWVkLCBzaW5jZSBpdCB1c2VzIHN0
+cmVhbWluZw0KY29tcHJlc3Npb24sIHNvIHVuenN0ZCgpIGhhcyB0byBhbGxvY2F0ZSBhIGJ1ZmZl
+ciBvZiB3aW5kb3cgc2l6ZSBieXRlcy4NCg0KPiBJIHJlbW92ZWQgdGhhdCBsaW1pdGF0aW9uIHRv
+IGJlIGFibGUgdG8gdGVzdCBpdCBpbiBteSBlbnZpcm9ubWVudCBhbmQgSQ0KPiBmb3VuZCB0aGUg
+cGVyZm9ybWFuY2UgaXMgd29yc3QgdGhhbiB3aXRoIG15IHBhdGNoIGJ5IHJvdWdobHkgMjAlIChv
+bg0KPiBpNy0zNTIwTSksIHdoaWNoIGlzIGEgbWFqb3IgZHJhd2JhY2sgY29uc2lkZXJpbmcgdGhl
+IG1haW4gbW90aXZhdGlvbg0KPiB0byB1c2UgenN0ZCBpcyB0aGUgZGVjb21wcmVzc2lvbiBzcGVl
+ZC4gSSB3aWxsIHRlc3Qgb24gYXJtIGFzIHdlbGwgYW5kDQo+IHNoYXJlIHRoZSByZXN1bHQgdG9t
+b3Jyb3cuDQo+ICBQZXRyDQoNCldoYXQgZG8geW91IG1lYW4gYnkgdGhhdD8gQ2FuIHlvdSBzaGFy
+ZSB3aXRoIG1lIHRoZSB0ZXN0IHlvdSByYW4/DQpJcyB0aGlzIGZvciBrZXJuZWwgZGVjb21wcmVz
+c2lvbiBvciBpbml0cmFtZnMgZGVjb21wcmVzc2lvbj8NCg0KQmVzdCwNCk5pY2sNCg0KWzBdIGh0
+dHBzOi8vdG9vbHMuaWV0Zi5vcmcvaHRtbC9yZmM4NDc4I3NlY3Rpb24tMy4xLjEuMS4y
