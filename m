@@ -1,101 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:36700 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727606AbgCZVOv (ORCPT
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40638 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727593AbgCZVoa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 17:14:51 -0400
-From: Nick Terrell <terrelln@fb.com>
+        Thu, 26 Mar 2020 17:44:30 -0400
+Received: by mail-wm1-f65.google.com with SMTP id a81so9652587wmf.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 26 Mar 2020 14:44:29 -0700 (PDT)
+Date: Thu, 26 Mar 2020 22:44:19 +0100
+From: Petr Malat <oss@malat.biz>
 Subject: Re: [PATCH v3 3/8] lib: add zstd support to decompress
-Date: Thu, 26 Mar 2020 21:13:54 +0000
-Message-ID: <ED5FFEDC-A3B7-470E-95AE-B60EB1E6AE64@fb.com>
+Message-ID: <20200326214419.GA13249@ntb.petris.klfree.czf>
 References: <20200325195849.407900-1-nickrterrell@gmail.com>
  <20200325195849.407900-4-nickrterrell@gmail.com>
  <20200326164732.GA17157@ntb.petris.klfree.czf>
  <611A224B-1CB3-4283-9783-87C184C8983A@fb.com>
  <20200326201634.GA9948@ntb.petris.klfree.czf>
-In-Reply-To: <20200326201634.GA9948@ntb.petris.klfree.czf>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <20D121B17023F949B1351E412714FE51@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <ED5FFEDC-A3B7-470E-95AE-B60EB1E6AE64@fb.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ED5FFEDC-A3B7-470E-95AE-B60EB1E6AE64@fb.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Petr Malat <oss@malat.biz>
+To: Nick Terrell <terrelln@fb.com>
 Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
 
-DQoNCj4gT24gTWFyIDI2LCAyMDIwLCBhdCAxOjE2IFBNLCBQZXRyIE1hbGF0IDxvc3NAbWFsYXQu
-Yml6PiB3cm90ZToNCj4gDQo+IEhpIQ0KPiBPbiBUaHUsIE1hciAyNiwgMjAyMCBhdCAwNzowMzo1
-NFBNICswMDAwLCBOaWNrIFRlcnJlbGwgd3JvdGU6DQo+Pj4+ICogQWRkIHVuenN0ZCgpIGFuZCB0
-aGUgenN0ZCBkZWNvbXByZXNzIGludGVyZmFjZS4NCj4+PiBIZXJlIEkgZG8gbm90IHVuZGVyc3Rh
-bmQgd2h5IHlvdSBsaW1pdCB0aGUgd2luZG93IHNpemUgdG8gOE1CIGV2ZW4gd2hlbg0KPj4+IHlv
-dSByZWFkIGEgbGFyZ2VyIHZhbHVlIGZyb20gdGhlIGhlYWRlci4gSSBkbyBub3Qgc2VlIGEgcmVh
-c29uIHdoeSB0aGVyZQ0KPj4+IHNob3VsZCBiZSBzdWNoIGEgbGltaXRhdGlvbiBhdCB0aGUgZmly
-c3QgcGxhY2UgYW5kIGlmIHRoZXJlIHNob3VsZCBiZSwNCj4+PiB3aHkgaXQgZGlmZmVycyBmcm9t
-IFpTVERfV0lORE9XTE9HX01BWC4NCj4+IA0KPj4gV2hlbiB3ZSBhcmUgZG9pbmcgc3RyZWFtaW5n
-IGRlY29tcHJlc3Npb24gKGVpdGhlciBmbHVzaCBvciBmaWxsIGlzIHByb3ZpZGVkKQ0KPj4gd2Ug
-aGF2ZSB0byBhbGxvY2F0ZSBtZW1vcnkgcHJvcG9ydGlvbmFsIHRvIHRoZSB3aW5kb3cgc2l6ZS4g
-V2Ugd2FudCB0bw0KPj4gYm91bmQgdGhhdCBtZW1vcnkgc28gd2UgZG9uJ3QgYWNjaWRlbnRhbGx5
-IGFsbG9jYXRlIHRvbyBtdWNoIG1lbW9yeS4NCj4+IFdoZW4gd2UgYXJlIGRvaW5nIGEgc2luZ2xl
-LXBhc3MgZGVjb21wcmVzc2lvbiAobmVpdGhlciBmbHVzaCBub3IgZmlsbA0KPj4gYXJlIHByb3Zp
-ZGVkKSB0aGUgd2luZG93IHNpemUgZG9lc24ndCBtYXR0ZXIsIGFuZCB3ZSBvbmx5IGhhdmUgdG8g
-YWxsb2NhdGUNCj4+IGEgZml4ZWQgYW1vdW50IG9mIG1lbW9yeSB+MTkyIEtCLg0KPj4gDQo+PiBU
-aGUgenN0ZCBzcGVjIFswXSBzcGVjaWZpZXMgdGhhdCBhbGwgZGVjb2RlcnMgc2hvdWxkIGFsbG93
-IHdpbmRvdyBzaXplcw0KPj4gdXAgdG8gOCBNQi4gQWRkaXRpb25hbGx5LCB0aGUgenN0ZCBDTEkg
-d29uJ3QgcHJvZHVjZSB3aW5kb3cgc2l6ZXMgZ3JlYXRlcg0KPj4gdGhhbiA4IE1CIGJ5IGRlZmF1
-bHQuIFRoZSB3aW5kb3cgc2l6ZSBpcyBjb250cm9sbGVkIGJ5IHRoZSBjb21wcmVzc2lvbg0KPj4g
-bGV2ZWwsIGFuZCBjYW4gYmUgZXhwbGljaXRseSBzZXQuDQo+IFllcywgb25lIG5lZWRzIHRvIHBh
-c3MgLS11bHRyYSBvcHRpb24gdG8genN0ZCB0byBwcm9kdWNlIGFuIGluY29tcGF0aWJsZQ0KPiBh
-cmNoaXZlLCBidXQgdGhhdCBkb2Vzbid0IGp1c3RpZnkgdGhlIHJlYXNvbiB0byBsaW1pdCB0aGlz
-IGluIHRoZSBrZXJuZWwsDQo+IGVzcGVjaWFsbHkgaWYgb25lIGlzIGFibGUgdG8gcmVhZCB0aGUg
-bmVlZGVkIHdpbmRvdyBzaXplIGZyb20gdGhlIGhlYWRlcg0KPiB3aGVuIGFsbG9jYXRpbmcgdGhl
-IG1lbW9yeS4gQXQgdGhlIHRpbWUgd2hlbiBpbml0cmFtZnMgaXMgZXh0cmFjdGVkLA0KPiB0aGVy
-ZSB1c3VhbGx5IGlzIG1lbW9yeSBhdmFpbGFibGUgYXMgaXQncyBiZWZvcmUgYW55IHByb2Nlc3Nl
-cyBhcmUNCj4gc3RhcnRlZCBhbmQgdGhpcyBtZW1vcnkgaXMgcmVjbGFpbWVkIGFmdGVyIHRoZSBk
-ZWNvbXByZXNzaW9uLg0KDQpJ4oCZbSBoYXBweSB0byBpbmNyZWFzZSB0aGlzIGxpbWl0LiBJIHNl
-dCBpdCB0byA4IE1CIHRvIGJlIGNvbnNlcnZhdGl2ZSwgYnV0IEkgYW0NCmhhcHB5IHRvIGluY3Jl
-YXNlIGl0IHRvIDEyOCBNQiA9PSAxIDw8IFpTVERfV0lORE9XTE9HX01BWC4gSSB3aWxsDQpzdWJt
-aXQgYSBuZXcgdmVyc2lvbiB3aXRoIHRoYXQgY2hhbmdlLg0KDQo+IElmLCBvbiB0aGUgb3RoZXIg
-aGFuZCwgYW4gdXNlciBtYWtlcyBhbiBpbml0cmFtZnMgZm9yIGEgbWVtb3J5IGNvbnN0cmFpbmVk
-DQo+IHN5c3RlbSwgaGUgbGltaXRzIHRoZSB3aW5kb3cgc2l6ZSB3aGlsZSBjb21wcmVzc2luZyB0
-aGUgYXJjaGl2ZSBhbmQNCj4gdGhlIHNtYWxsIHdpbmRvdyBzaXplIHdpbGwgYmUgYW5ub3VuY2Vk
-IGluIHRoZSBoZWFkZXIuDQo+IA0KPiBUaGUgb25seSBzY2VuYXJpbyB3aGVyZSB1c2luZyB0aGUg
-aGFyZC1jb2RlZCBsaW1pdCBtYWtlcyBzZW5zZSBpcyBpbiBhDQo+IGNhc2UgdGhlIHdpbmRvdyBz
-aXplIGlzIG5vdCBhdmFpbGFibGUgKEknbSBub3Qgc3VyZSBpZiBpdCdzIG1hbmRhdG9yeQ0KPiB0
-byBwcm92aWRlIGl0KS4gVGhhdCdzIGhvdyBteSBjb2RlIHdvcmtzIC0gaWYgdGhlIHNpemUgaXMg
-YXZhaWxhYmxlLA0KPiBpdCB1c2VzIHRoZSBwcm92aWRlZCB2YWx1ZSwgaWYgbm90IGl0IHVzZXMg
-MSA8PCBaU1REX1dJTkRPV0xPR19NQVguDQo+IA0KPiBJIHdvdWxkIGFsc28gYWdyZWUgYSBmaXhl
-ZCBsaW1pdCB3b3VsZCBtYWtlIGEgc2Vuc2UgaWYgYSB1c2VyIChvciBuZXR3b3JrKQ0KPiBwcm92
-aWRlZCBkYXRhIHdvdWxkIGJlIHVzZWQsIGJ1dCBpbiB0aGlzIGNhc2Ugb25seSB0aGUgc3lzdGVt
-IG93bmVyIGlzIGFibGUNCj4gdG8gcHJvdmlkZSBhbiBpbml0cmFtZnMuIElmIG9uZSBpcyBhYmxl
-IHRvIGNoYW5nZSBpbml0cmFtZnMsIGhlIGNhbiByZW5kZXINCj4gdGhlIHN5c3RlbSB1bnVzYWJs
-ZSBzaW1wbHkgYnkgcHJvdmlkaW5nIGEgY29ycnVwdGVkIGZpbGUuIEhlIGRvZXNuJ3QgaGF2ZQ0K
-PiB0byBib3RoZXIgbWFraW5nIHRoZSB3aW5kb3cgYmlnZ2VyIHRoYW4gdGhlIGF2YWlsYWJsZSBt
-ZW1vcnkuDQoNClRoYXQgbWFrZXMgc2Vuc2UgdG8gbWUuDQoNCj4+IEkgd291bGQgZXhwZWN0IGxh
-cmdlciB3aW5kb3cgc2l6ZXMgdG8gYmUgYmVuZWZpY2lhbCBmb3IgY29tcHJlc3Npb24gcmF0aW8s
-DQo+PiB0aG91Z2ggdGhlcmUgaXMgZGVtaXNpbmcgcmV0dXJucy4gSSB3b3VsZCBleHBlY3QgdGhh
-dCBmb3Iga2VybmVsIGltYWdlDQo+PiBjb21wcmVzc2lvbiBsYXJnZXIgd2luZG93IHNpemVzIGFy
-ZSBiZW5lZmljaWFsLCBzaW5jZSBpdCBpcyBkZWNvbXByZXNzZWQNCj4+IHdpdGggYSBzaW5nbGUg
-cGFzcy4gRm9yIGluaXRyYW1mcyBkZWNvbXByZXNzaW9uLCBJIHdvdWxkIGV4cGVjdCB0aGF0IGxp
-bWl0aW5nDQo+PiB0aGUgd2luZG93IHNpemUgY291bGQgaGVscCBkZWNvbXByZXNzaW9uIHNwZWVk
-LCBzaW5jZSBpdCB1c2VzIHN0cmVhbWluZw0KPj4gY29tcHJlc3Npb24sIHNvIHVuenN0ZCgpIGhh
-cyB0byBhbGxvY2F0ZSBhIGJ1ZmZlciBvZiB3aW5kb3cgc2l6ZSBieXRlcy4NCj4gWWVzLCBsYXJn
-ZXIgd2luZG93IGltcHJvdmVzIHRoZSBjb21wcmVzc2lvbiByYXRpbywgc2VlIGhlcmUgYSBjb21w
-YXJpc29uDQo+IGJldHdlZW4gbGV2ZWwgMTkgYW5kIDIyIG9uIG15IHRlc3RpbmcgeDg2LTY0IGlu
-aXRyYW1mczoNCj4gIDMwNzc1MDIyIHJvb3Rmcy5jcGlvLnpzdC0xOQ0KPiAgMjg3NTU0Mjkgcm9v
-dGZzLmNwaW8uenN0LTIyDQo+IFRoZXNlIDclIGNhbiBiZSBub3RpY2VhYmxlIHdoZW4gb25lIGhh
-cyBhIHNsb3cgc3RvcmFnZSwgZS5nLiBhIGZsYXNoIG1lbW9yeQ0KPiBvbiBTUEkgYnVzLiANCj4g
-DQo+Pj4gSSByZW1vdmVkIHRoYXQgbGltaXRhdGlvbiB0byBiZSBhYmxlIHRvIHRlc3QgaXQgaW4g
-bXkgZW52aXJvbm1lbnQgYW5kIEkNCj4+PiBmb3VuZCB0aGUgcGVyZm9ybWFuY2UgaXMgd29yc3Qg
-dGhhbiB3aXRoIG15IHBhdGNoIGJ5IHJvdWdobHkgMjAlIChvbg0KPj4+IGk3LTM1MjBNKSwgd2hp
-Y2ggaXMgYSBtYWpvciBkcmF3YmFjayBjb25zaWRlcmluZyB0aGUgbWFpbiBtb3RpdmF0aW9uDQo+
-Pj4gdG8gdXNlIHpzdGQgaXMgdGhlIGRlY29tcHJlc3Npb24gc3BlZWQuIEkgd2lsbCB0ZXN0IG9u
-IGFybSBhcyB3ZWxsIGFuZA0KPj4+IHNoYXJlIHRoZSByZXN1bHQgdG9tb3Jyb3cuDQo+Pj4gUGV0
-cg0KPj4gDQo+PiBXaGF0IGRvIHlvdSBtZWFuIGJ5IHRoYXQ/IENhbiB5b3Ugc2hhcmUgd2l0aCBt
-ZSB0aGUgdGVzdCB5b3UgcmFuPw0KPj4gSXMgdGhpcyBmb3Iga2VybmVsIGRlY29tcHJlc3Npb24g
-b3IgaW5pdHJhbWZzIGRlY29tcHJlc3Npb24/DQo+IEluaXRyYW1mcyAtIHlvdSBjYW4gYXBwbHkg
-bXkgdjIgcGF0Y2ggb24gdjUuNSBhbmQgdHJ5IHdpdGggeW91ciB0ZXN0IGRhdGEuDQo+IA0KPiBJ
-IGhhdmUgdGVzdGVkIHlvdXIgcGF0Y2ggYWxzbyBvbiBBUk12NyBwbGF0Zm9ybSBhbmQgdGhlcmUg
-dGhlIGRlZ3JhZGF0aW9uDQo+IHdhcyA4JS4NCg0KQXJlIHlvdSBjb21wYXJpbmcgdGhlIHBlcmZv
-cm1hbmNlIG9mIGFuIDggTUIgd2luZG93IHNpemUgdnMgYSAxMjggTUINCndpbmRvdyBzaXplPw0K
-DQo+ICBQZXRyDQoNCg==
+On Thu, Mar 26, 2020 at 09:13:54PM +0000, Nick Terrell wrote:
+> >> What do you mean by that? Can you share with me the test you ran?
+> >> Is this for kernel decompression or initramfs decompression?
+> > Initramfs - you can apply my v2 patch on v5.5 and try with your test data.
+> > 
+> > I have tested your patch also on ARMv7 platform and there the degradation
+> > was 8%.
+> 
+> Are you comparing the performance of an 8 MB window size vs a 128 MB
+> window size?
+No, I use the same initramfs file with 2 different kernels for the test. I have
+removed
+  if (params.windowSize > ZSTD_WINDOWSIZE_MAX) goto out;
+from your code.
+  Petr
