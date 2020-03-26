@@ -1,48 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52544 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726298AbgCZJWS (ORCPT
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36391 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727670AbgCZPku (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 05:22:18 -0400
-Date: Thu, 26 Mar 2020 10:22:13 +0100
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_*
- and cosolidate Kconfig/Makefiles
-Message-ID: <20200326092213.GA100918@gmail.com>
-References: <20200326080104.27286-1-masahiroy@kernel.org>
- <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
+        Thu, 26 Mar 2020 11:40:50 -0400
+Received: by mail-wr1-f67.google.com with SMTP id 31so8378829wrs.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 26 Mar 2020 08:40:49 -0700 (PDT)
+Date: Thu, 26 Mar 2020 16:40:38 +0100
+From: Petr Malat <oss@malat.biz>
+Subject: Re: [PATCH v3 1/8] lib: prepare zstd for preboot environment
+Message-ID: <20200326154038.GA21231@ntb.petris.klfree.czf>
+References: <20200325195849.407900-1-nickrterrell@gmail.com>
+ <20200325195849.407900-2-nickrterrell@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
+In-Reply-To: <20200325195849.407900-2-nickrterrell@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Nick Terrell <nickrterrell@gmail.com>
+Cc: Nick Terrell <terrelln@fb.com>, linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>
 
+Hi Nick,
+I finally got some time to review your patch, here are my comments:
 
-* Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Wed, Mar 25, 2020 at 12:58:42PM -0700, Nick Terrell wrote:
+> * Don't export symbols if ZSTD_PREBOOT is defined.
+I'm not sure if this is needed. When I worked on my patch, I have found that
+all exporting and modinfo macros generate symbols in modinfo and discard.ksym
+sections, which are then dropped by the vmlinux linker script, thus one
+will get the same binary independently if he puts this change in or not.
 
-> Very little has changed from last time, and this whole series still
-> looks good to me. I think I already ack'd most packages, but in case
-> it helps:
-> 
-> Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+I'm not sure if this is intentional as there is also __DISABLE_EXPORTS define,
+which should be used by a decompressor (according to comments in export.h).
 
-Acked-by: Ingo Molnar <mingo@kernel.org>
-
-> Since this touches a lot of stuff, it might be best to get it in as 
-> early as possible during the merge window, as I imagine new code being 
-> added is going to want to be touching those makefiles too.
-
-I'd argue the opposite: please merge this later in the merge window, to 
-not disrupt the vast body of other stuff that has already been lined up 
-and has been tested, and to give time for these new bits to get tested 
-some more.
-
-Also, please get it into -next ASAP, today would be ideal for test 
-coverage ...
-
-Thanks,
-
-	Ingo
+> * Remove a double definition of the CHECK_F macro when the zstd
+>   library is amalgamated.
+> * Switch ZSTD_copy8() to __builtin_memcpy(), because in the preboot
+>   environment on x86 gcc can't inline `memcpy()` otherwise.
+> * Limit the gcc hack in ZSTD_wildcopy() to the broken gcc version. See
+>   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81388.
+No comments to the rest.
+  Petr
