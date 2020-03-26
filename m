@@ -1,83 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:36742 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727354AbgCZTmV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 15:42:21 -0400
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH v2] kbuild: Enable -Wtautological-compare
-Date: Thu, 26 Mar 2020 12:41:55 -0700
-Message-Id: <20200326194155.29107-1-natechancellor@gmail.com>
+Received: from frisell.zx2c4.com ([192.95.5.64]:40083 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726067AbgCZTsm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 26 Mar 2020 15:48:42 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200326080104.27286-1-masahiroy@kernel.org> <20200326080104.27286-16-masahiroy@kernel.org>
+ <CAKwvOdnG4F6+Ndfj+=BoV6OidJjWS_dYtjvyCEJ6nyxkSQc3rg@mail.gmail.com>
+In-Reply-To: <CAKwvOdnG4F6+Ndfj+=BoV6OidJjWS_dYtjvyCEJ6nyxkSQc3rg@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 26 Mar 2020 13:48:27 -0600
+Message-ID: <CAHmME9p_N2cpMt20Gf1kWTRnj36nwrceFxEui2MU0kFu3WOdww@mail.gmail.com>
+Subject: Re: [PATCH v2 15/16] x86: update AS_* macros to binutils >=2.23,
+ supporting ADX and AVX2
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Nick Desaulniers <ndesaulniers@google.com>, Dmitry Vyukov <dvyukov@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Nathan Chancellor <natechancellor@gmail.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Currently, we disable -Wtautological-compare, which in turn disables a
-bunch of more specific tautological comparison warnings that are useful
-for the kernel such as -Wtautological-bitwise-compare. See clang's
-documentation below for the other warnings that are suppressed by
--Wtautological-compare. Now that all of the major/noisy warnings have
-been fixed, enable -Wtautological-compare so that more issues can be
-caught at build time by various continuous integration setups.
+On Thu, Mar 26, 2020 at 11:55 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+> I see four checks for CONFIG_AS_AVX2 in:
+> net/netfilter/nft_set_pipapo.c
+> net/netfilter/nf_tables_api.c
+> net/netfilter/Makefile
+> net/netfilter/nft_set_pipapo_avx2.h
 
--Wtautological-constant-out-of-range-compare is kept disabled under a
-normal build but visible at W=1 because there are places in the kernel
-where a constant or variable size can change based on the kernel
-configuration. These are not fixed in a clean/concise way and the ones
-I have audited so far appear to be harmless. It is not a subgroup but
-rather just one warning so we do not lose out on much coverage by
-default.
-
-Link: https://github.com/ClangBuiltLinux/linux/issues/488
-Link: http://releases.llvm.org/10.0.0/tools/clang/docs/DiagnosticsReference.html#wtautological-compare
-Link: https://bugs.llvm.org/show_bug.cgi?id=42666
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
-
-v1 -> v2: https://lore.kernel.org/lkml/20200219045423.54190-7-natechancellor@gmail.com/
-
-* Expand commit message a bit by adding more reasoning behind change.
-* Disable -Wtautological-constant-out-of-range-compare under a normal
-  build but allow it to show up at W=1 for easy auditing.
-
-I hope this can be accepted for 5.7. There are two warnings that I see
-still across a bunch of allyesconfig/allmodconfig builds that have
-patches sent but not accepted. I will ping them today.
-
-* https://lore.kernel.org/lkml/20191023002014.22571-1-natechancellor@gmail.com/
-* https://lore.kernel.org/lkml/20200220051011.26113-1-natechancellor@gmail.com/
-
- Makefile                   | 2 --
- scripts/Makefile.extrawarn | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index db442a9ee6b2..05f9f50dda3e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -746,8 +746,6 @@ ifdef CONFIG_CC_IS_CLANG
- KBUILD_CPPFLAGS += -Qunused-arguments
- KBUILD_CFLAGS += -Wno-format-invalid-specifier
- KBUILD_CFLAGS += -Wno-gnu
--# Quiet clang warning: comparison of unsigned expression < 0 is always false
--KBUILD_CFLAGS += -Wno-tautological-compare
- # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
- # source of a reference will be _MergedGlobals and not on of the whitelisted names.
- # See modpost pattern 2
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index ca08f2fe7c34..4aea7cf71d11 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -49,6 +49,7 @@ KBUILD_CFLAGS += -Wno-format
- KBUILD_CFLAGS += -Wno-sign-compare
- KBUILD_CFLAGS += -Wno-format-zero-length
- KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
-+KBUILD_CFLAGS += -Wno-tautological-constant-out-of-range-compare
- endif
- 
- endif
--- 
-2.26.0
+That code isn't in Linus' tree right now is it? Does it make sense for
+us to see which subsystem trees (crypto, netfilter, raid, etc) are
+submitted to 5.7? Or would you rather this patchset be rebased now on
+next?
