@@ -1,62 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35408 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726340AbgCZTEK (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 15:04:10 -0400
-From: Nick Terrell <terrelln@fb.com>
-Subject: Re: [PATCH v3 3/8] lib: add zstd support to decompress
-Date: Thu, 26 Mar 2020 19:03:54 +0000
-Message-ID: <611A224B-1CB3-4283-9783-87C184C8983A@fb.com>
-References: <20200325195849.407900-1-nickrterrell@gmail.com>
- <20200325195849.407900-4-nickrterrell@gmail.com>
- <20200326164732.GA17157@ntb.petris.klfree.czf>
-In-Reply-To: <20200326164732.GA17157@ntb.petris.klfree.czf>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A5CFD1D6E92BBA48B087E0108739BEE5@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Received: from mail.sysgo.com ([176.9.12.79]:47370 "EHLO mail.sysgo.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726067AbgCZThy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 26 Mar 2020 15:37:54 -0400
+From: David Engraf <david.engraf@sysgo.com>
+Subject: [PATCH] kbuild: add outputmakefile to no-dot-config-targets
+Date: Thu, 26 Mar 2020 20:29:33 +0100
+Message-Id: <20200326192933.14091-1-david.engraf@sysgo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Petr Malat <oss@malat.biz>
-Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
+To: masahiroy@kernel.org, michal.lkml@markovi.net
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Engraf <david.engraf@sysgo.com>
 
-PiBPbiBNYXIgMjYsIDIwMjAsIGF0IDk6NDcgQU0sIFBldHIgTWFsYXQgPG9zc0BtYWxhdC5iaXo+
-IHdyb3RlOg0KPiANCj4gSGkhDQo+IE9uIFdlZCwgTWFyIDI1LCAyMDIwIGF0IDEyOjU4OjQ0UE0g
-LTA3MDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IEZyb206IE5pY2sgVGVycmVsbCA8dGVycmVs
-bG5AZmIuY29tPg0KPj4gKiBBZGQgdW56c3RkKCkgYW5kIHRoZSB6c3RkIGRlY29tcHJlc3MgaW50
-ZXJmYWNlLg0KPiBIZXJlIEkgZG8gbm90IHVuZGVyc3RhbmQgd2h5IHlvdSBsaW1pdCB0aGUgd2lu
-ZG93IHNpemUgdG8gOE1CIGV2ZW4gd2hlbg0KPiB5b3UgcmVhZCBhIGxhcmdlciB2YWx1ZSBmcm9t
-IHRoZSBoZWFkZXIuIEkgZG8gbm90IHNlZSBhIHJlYXNvbiB3aHkgdGhlcmUNCj4gc2hvdWxkIGJl
-IHN1Y2ggYSBsaW1pdGF0aW9uIGF0IHRoZSBmaXJzdCBwbGFjZSBhbmQgaWYgdGhlcmUgc2hvdWxk
-IGJlLA0KPiB3aHkgaXQgZGlmZmVycyBmcm9tIFpTVERfV0lORE9XTE9HX01BWC4NCg0KV2hlbiB3
-ZSBhcmUgZG9pbmcgc3RyZWFtaW5nIGRlY29tcHJlc3Npb24gKGVpdGhlciBmbHVzaCBvciBmaWxs
-IGlzIHByb3ZpZGVkKQ0Kd2UgaGF2ZSB0byBhbGxvY2F0ZSBtZW1vcnkgcHJvcG9ydGlvbmFsIHRv
-IHRoZSB3aW5kb3cgc2l6ZS4gV2Ugd2FudCB0bw0KYm91bmQgdGhhdCBtZW1vcnkgc28gd2UgZG9u
-4oCZdCBhY2NpZGVudGFsbHkgYWxsb2NhdGUgdG9vIG11Y2ggbWVtb3J5Lg0KV2hlbiB3ZSBhcmUg
-ZG9pbmcgYSBzaW5nbGUtcGFzcyBkZWNvbXByZXNzaW9uIChuZWl0aGVyIGZsdXNoIG5vciBmaWxs
-DQphcmUgcHJvdmlkZWQpIHRoZSB3aW5kb3cgc2l6ZSBkb2VzbuKAmXQgbWF0dGVyLCBhbmQgd2Ug
-b25seSBoYXZlIHRvIGFsbG9jYXRlDQphIGZpeGVkIGFtb3VudCBvZiBtZW1vcnkgfjE5MiBLQi4N
-Cg0KVGhlIHpzdGQgc3BlYyBbMF0gc3BlY2lmaWVzIHRoYXQgYWxsIGRlY29kZXJzIHNob3VsZCBh
-bGxvdyB3aW5kb3cgc2l6ZXMNCnVwIHRvIDggTUIuIEFkZGl0aW9uYWxseSwgdGhlIHpzdGQgQ0xJ
-IHdvbuKAmXQgcHJvZHVjZSB3aW5kb3cgc2l6ZXMgZ3JlYXRlcg0KdGhhbiA4IE1CIGJ5IGRlZmF1
-bHQuIFRoZSB3aW5kb3cgc2l6ZSBpcyBjb250cm9sbGVkIGJ5IHRoZSBjb21wcmVzc2lvbg0KbGV2
-ZWwsIGFuZCBjYW4gYmUgZXhwbGljaXRseSBzZXQuDQoNCkkgd291bGQgZXhwZWN0IGxhcmdlciB3
-aW5kb3cgc2l6ZXMgdG8gYmUgYmVuZWZpY2lhbCBmb3IgY29tcHJlc3Npb24gcmF0aW8sDQp0aG91
-Z2ggdGhlcmUgaXMgZGVtaXNpbmcgcmV0dXJucy4gSSB3b3VsZCBleHBlY3QgdGhhdCBmb3Iga2Vy
-bmVsIGltYWdlDQpjb21wcmVzc2lvbiBsYXJnZXIgd2luZG93IHNpemVzIGFyZSBiZW5lZmljaWFs
-LCBzaW5jZSBpdCBpcyBkZWNvbXByZXNzZWQNCndpdGggYSBzaW5nbGUgcGFzcy4gRm9yIGluaXRy
-YW1mcyBkZWNvbXByZXNzaW9uLCBJIHdvdWxkIGV4cGVjdCB0aGF0IGxpbWl0aW5nDQp0aGUgd2lu
-ZG93IHNpemUgY291bGQgaGVscCBkZWNvbXByZXNzaW9uIHNwZWVkLCBzaW5jZSBpdCB1c2VzIHN0
-cmVhbWluZw0KY29tcHJlc3Npb24sIHNvIHVuenN0ZCgpIGhhcyB0byBhbGxvY2F0ZSBhIGJ1ZmZl
-ciBvZiB3aW5kb3cgc2l6ZSBieXRlcy4NCg0KPiBJIHJlbW92ZWQgdGhhdCBsaW1pdGF0aW9uIHRv
-IGJlIGFibGUgdG8gdGVzdCBpdCBpbiBteSBlbnZpcm9ubWVudCBhbmQgSQ0KPiBmb3VuZCB0aGUg
-cGVyZm9ybWFuY2UgaXMgd29yc3QgdGhhbiB3aXRoIG15IHBhdGNoIGJ5IHJvdWdobHkgMjAlIChv
-bg0KPiBpNy0zNTIwTSksIHdoaWNoIGlzIGEgbWFqb3IgZHJhd2JhY2sgY29uc2lkZXJpbmcgdGhl
-IG1haW4gbW90aXZhdGlvbg0KPiB0byB1c2UgenN0ZCBpcyB0aGUgZGVjb21wcmVzc2lvbiBzcGVl
-ZC4gSSB3aWxsIHRlc3Qgb24gYXJtIGFzIHdlbGwgYW5kDQo+IHNoYXJlIHRoZSByZXN1bHQgdG9t
-b3Jyb3cuDQo+ICBQZXRyDQoNCldoYXQgZG8geW91IG1lYW4gYnkgdGhhdD8gQ2FuIHlvdSBzaGFy
-ZSB3aXRoIG1lIHRoZSB0ZXN0IHlvdSByYW4/DQpJcyB0aGlzIGZvciBrZXJuZWwgZGVjb21wcmVz
-c2lvbiBvciBpbml0cmFtZnMgZGVjb21wcmVzc2lvbj8NCg0KQmVzdCwNCk5pY2sNCg0KWzBdIGh0
-dHBzOi8vdG9vbHMuaWV0Zi5vcmcvaHRtbC9yZmM4NDc4I3NlY3Rpb24tMy4xLjEuMS4y
+The target outputmakefile is used to generate a Makefile
+for out-of-tree builds and does not depend on the kernel
+configuration.
+
+Signed-off-by: David Engraf <david.engraf@sysgo.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index e56bf7ef182d..45be0e5b0cef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -255,7 +255,7 @@ clean-targets := %clean mrproper cleandocs
+ no-dot-config-targets := $(clean-targets) \
+ 			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+-			 %asm-generic kernelversion %src-pkg
++			 %asm-generic kernelversion %src-pkg outputmakefile
+ no-sync-config-targets := $(no-dot-config-targets) install %install \
+ 			   kernelrelease
+ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+-- 
+2.17.1
