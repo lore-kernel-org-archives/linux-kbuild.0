@@ -1,66 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:50987 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726298AbgCZJU0 (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52544 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbgCZJWS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 05:20:26 -0400
-Date: Thu, 26 Mar 2020 10:20:19 +0100
+        Thu, 26 Mar 2020 05:22:18 -0400
+Date: Thu, 26 Mar 2020 10:22:13 +0100
 From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 00/16] x86, crypto: remove always-defined CONFIG_AS_* and
- cosolidate Kconfig/Makefiles
-Message-ID: <20200326092019.GA100058@gmail.com>
-References: <20200324084821.29944-1-masahiroy@kernel.org>
- <20200325045940.GA24974@gmail.com>
- <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_*
+ and cosolidate Kconfig/Makefiles
+Message-ID: <20200326092213.GA100918@gmail.com>
+References: <20200326080104.27286-1-masahiroy@kernel.org>
+ <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
+In-Reply-To: <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
 
-* Masahiro Yamada <masahiroy@kernel.org> wrote:
+* Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-> > LGTM. I've got these four from Jason A. Donenfeld queued up in
-> > tip:WIP.x86/asm:
-> >
-> >  bd5b1283e41c: ("crypto: Curve25519 - do not pollute dispatcher based on assembler")
-> >  829f32d78588: ("crypto: X86 - rework configuration, based on Kconfig")
-> >  95ef9f80ed63: ("x86/build: Probe assembler from Kconfig instead of Kbuild")
-> >  1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
-> >
-> > I suppose these might interact (maybe even conflict), and are topically
-> > related.
-> >
-> > Would you like to pull these into the kbuild tree? You can find them in:
-> >
-> >    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.x86/asm
-> >
-> > Thanks,
-> >
-> >         Ingo
+> Very little has changed from last time, and this whole series still
+> looks good to me. I think I already ack'd most packages, but in case
+> it helps:
 > 
-> 
-> I did not know that these had already landed in tip tree.
-> 
-> They are immature version.
-> (In fact CONFIG_AS_CFI and AS_ADX are false-negative
-> if GCC that defaults to 32-bit is used.)
-> 
-> Can you simply discard the WIP.x86/asm branch,
-> and only reapply
-> 1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
-> 
-> ?
+> Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Sure, done!
+Acked-by: Ingo Molnar <mingo@kernel.org>
 
-In case you need any x86 maintainer acks for your series:
+> Since this touches a lot of stuff, it might be best to get it in as 
+> early as possible during the merge window, as I imagine new code being 
+> added is going to want to be touching those makefiles too.
 
-  Acked-by: Ingo Molnar <mingo@kernel.org>
+I'd argue the opposite: please merge this later in the merge window, to 
+not disrupt the vast body of other stuff that has already been lined up 
+and has been tested, and to give time for these new bits to get tested 
+some more.
+
+Also, please get it into -next ASAP, today would be ideal for test 
+coverage ...
 
 Thanks,
 
