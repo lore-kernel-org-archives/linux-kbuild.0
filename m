@@ -1,39 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:20175 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727884AbgCZVNB (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:36700 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727606AbgCZVOv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Mar 2020 17:13:01 -0400
+        Thu, 26 Mar 2020 17:14:51 -0400
+From: Nick Terrell <terrelln@fb.com>
+Subject: Re: [PATCH v3 3/8] lib: add zstd support to decompress
+Date: Thu, 26 Mar 2020 21:13:54 +0000
+Message-ID: <ED5FFEDC-A3B7-470E-95AE-B60EB1E6AE64@fb.com>
+References: <20200325195849.407900-1-nickrterrell@gmail.com>
+ <20200325195849.407900-4-nickrterrell@gmail.com>
+ <20200326164732.GA17157@ntb.petris.klfree.czf>
+ <611A224B-1CB3-4283-9783-87C184C8983A@fb.com>
+ <20200326201634.GA9948@ntb.petris.klfree.czf>
+In-Reply-To: <20200326201634.GA9948@ntb.petris.klfree.czf>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <20D121B17023F949B1351E412714FE51@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200326080104.27286-1-masahiroy@kernel.org> <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
- <20200326092213.GA100918@gmail.com> <CAK7LNAQ7-wpm+g=cXeJ01vGrO1nVjfP-ornKm=SXoDEn4x+DjQ@mail.gmail.com>
- <CAHmME9qnWWYV+eWVmx2yoADB9oecZKj=UgLkdSHe_=MnxedtSQ@mail.gmail.com>
-In-Reply-To: <CAHmME9qnWWYV+eWVmx2yoADB9oecZKj=UgLkdSHe_=MnxedtSQ@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 27 Mar 2020 06:12:19 +0900
-Message-ID: <CAK7LNAQNx0TxWGCzNM-2JqfEJuyDKnLMcqJv8Be_9_Ty5wv5Lg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_*
- and cosolidate Kconfig/Makefiles
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Ingo Molnar <mingo@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jani Nikula <jani.nikula@linux.intel.com>, Jim Kukunas <james.t.kukunas@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Yuanhan Liu <yuanhan.liu@linux.intel.com>, dri-devel <dri-devel@lists.freedesktop.org>, intel-gfx@lists.freedesktop.org, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Petr Malat <oss@malat.biz>
+Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
 
-On Fri, Mar 27, 2020 at 5:46 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Mar 26, 2020 at 2:44 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> > I collected more Reviewed-by and Acked-by,
-> > then pushed this series to
-> >
-> > git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-> > kbuild-asinstr
->
-> But not the version of the penultimate patch that Nick ack'd....
-
-Dropped Nick's Reviewed-by.
-
-
--- 
-Best Regards
-Masahiro Yamada
+DQoNCj4gT24gTWFyIDI2LCAyMDIwLCBhdCAxOjE2IFBNLCBQZXRyIE1hbGF0IDxvc3NAbWFsYXQu
+Yml6PiB3cm90ZToNCj4gDQo+IEhpIQ0KPiBPbiBUaHUsIE1hciAyNiwgMjAyMCBhdCAwNzowMzo1
+NFBNICswMDAwLCBOaWNrIFRlcnJlbGwgd3JvdGU6DQo+Pj4+ICogQWRkIHVuenN0ZCgpIGFuZCB0
+aGUgenN0ZCBkZWNvbXByZXNzIGludGVyZmFjZS4NCj4+PiBIZXJlIEkgZG8gbm90IHVuZGVyc3Rh
+bmQgd2h5IHlvdSBsaW1pdCB0aGUgd2luZG93IHNpemUgdG8gOE1CIGV2ZW4gd2hlbg0KPj4+IHlv
+dSByZWFkIGEgbGFyZ2VyIHZhbHVlIGZyb20gdGhlIGhlYWRlci4gSSBkbyBub3Qgc2VlIGEgcmVh
+c29uIHdoeSB0aGVyZQ0KPj4+IHNob3VsZCBiZSBzdWNoIGEgbGltaXRhdGlvbiBhdCB0aGUgZmly
+c3QgcGxhY2UgYW5kIGlmIHRoZXJlIHNob3VsZCBiZSwNCj4+PiB3aHkgaXQgZGlmZmVycyBmcm9t
+IFpTVERfV0lORE9XTE9HX01BWC4NCj4+IA0KPj4gV2hlbiB3ZSBhcmUgZG9pbmcgc3RyZWFtaW5n
+IGRlY29tcHJlc3Npb24gKGVpdGhlciBmbHVzaCBvciBmaWxsIGlzIHByb3ZpZGVkKQ0KPj4gd2Ug
+aGF2ZSB0byBhbGxvY2F0ZSBtZW1vcnkgcHJvcG9ydGlvbmFsIHRvIHRoZSB3aW5kb3cgc2l6ZS4g
+V2Ugd2FudCB0bw0KPj4gYm91bmQgdGhhdCBtZW1vcnkgc28gd2UgZG9uJ3QgYWNjaWRlbnRhbGx5
+IGFsbG9jYXRlIHRvbyBtdWNoIG1lbW9yeS4NCj4+IFdoZW4gd2UgYXJlIGRvaW5nIGEgc2luZ2xl
+LXBhc3MgZGVjb21wcmVzc2lvbiAobmVpdGhlciBmbHVzaCBub3IgZmlsbA0KPj4gYXJlIHByb3Zp
+ZGVkKSB0aGUgd2luZG93IHNpemUgZG9lc24ndCBtYXR0ZXIsIGFuZCB3ZSBvbmx5IGhhdmUgdG8g
+YWxsb2NhdGUNCj4+IGEgZml4ZWQgYW1vdW50IG9mIG1lbW9yeSB+MTkyIEtCLg0KPj4gDQo+PiBU
+aGUgenN0ZCBzcGVjIFswXSBzcGVjaWZpZXMgdGhhdCBhbGwgZGVjb2RlcnMgc2hvdWxkIGFsbG93
+IHdpbmRvdyBzaXplcw0KPj4gdXAgdG8gOCBNQi4gQWRkaXRpb25hbGx5LCB0aGUgenN0ZCBDTEkg
+d29uJ3QgcHJvZHVjZSB3aW5kb3cgc2l6ZXMgZ3JlYXRlcg0KPj4gdGhhbiA4IE1CIGJ5IGRlZmF1
+bHQuIFRoZSB3aW5kb3cgc2l6ZSBpcyBjb250cm9sbGVkIGJ5IHRoZSBjb21wcmVzc2lvbg0KPj4g
+bGV2ZWwsIGFuZCBjYW4gYmUgZXhwbGljaXRseSBzZXQuDQo+IFllcywgb25lIG5lZWRzIHRvIHBh
+c3MgLS11bHRyYSBvcHRpb24gdG8genN0ZCB0byBwcm9kdWNlIGFuIGluY29tcGF0aWJsZQ0KPiBh
+cmNoaXZlLCBidXQgdGhhdCBkb2Vzbid0IGp1c3RpZnkgdGhlIHJlYXNvbiB0byBsaW1pdCB0aGlz
+IGluIHRoZSBrZXJuZWwsDQo+IGVzcGVjaWFsbHkgaWYgb25lIGlzIGFibGUgdG8gcmVhZCB0aGUg
+bmVlZGVkIHdpbmRvdyBzaXplIGZyb20gdGhlIGhlYWRlcg0KPiB3aGVuIGFsbG9jYXRpbmcgdGhl
+IG1lbW9yeS4gQXQgdGhlIHRpbWUgd2hlbiBpbml0cmFtZnMgaXMgZXh0cmFjdGVkLA0KPiB0aGVy
+ZSB1c3VhbGx5IGlzIG1lbW9yeSBhdmFpbGFibGUgYXMgaXQncyBiZWZvcmUgYW55IHByb2Nlc3Nl
+cyBhcmUNCj4gc3RhcnRlZCBhbmQgdGhpcyBtZW1vcnkgaXMgcmVjbGFpbWVkIGFmdGVyIHRoZSBk
+ZWNvbXByZXNzaW9uLg0KDQpJ4oCZbSBoYXBweSB0byBpbmNyZWFzZSB0aGlzIGxpbWl0LiBJIHNl
+dCBpdCB0byA4IE1CIHRvIGJlIGNvbnNlcnZhdGl2ZSwgYnV0IEkgYW0NCmhhcHB5IHRvIGluY3Jl
+YXNlIGl0IHRvIDEyOCBNQiA9PSAxIDw8IFpTVERfV0lORE9XTE9HX01BWC4gSSB3aWxsDQpzdWJt
+aXQgYSBuZXcgdmVyc2lvbiB3aXRoIHRoYXQgY2hhbmdlLg0KDQo+IElmLCBvbiB0aGUgb3RoZXIg
+aGFuZCwgYW4gdXNlciBtYWtlcyBhbiBpbml0cmFtZnMgZm9yIGEgbWVtb3J5IGNvbnN0cmFpbmVk
+DQo+IHN5c3RlbSwgaGUgbGltaXRzIHRoZSB3aW5kb3cgc2l6ZSB3aGlsZSBjb21wcmVzc2luZyB0
+aGUgYXJjaGl2ZSBhbmQNCj4gdGhlIHNtYWxsIHdpbmRvdyBzaXplIHdpbGwgYmUgYW5ub3VuY2Vk
+IGluIHRoZSBoZWFkZXIuDQo+IA0KPiBUaGUgb25seSBzY2VuYXJpbyB3aGVyZSB1c2luZyB0aGUg
+aGFyZC1jb2RlZCBsaW1pdCBtYWtlcyBzZW5zZSBpcyBpbiBhDQo+IGNhc2UgdGhlIHdpbmRvdyBz
+aXplIGlzIG5vdCBhdmFpbGFibGUgKEknbSBub3Qgc3VyZSBpZiBpdCdzIG1hbmRhdG9yeQ0KPiB0
+byBwcm92aWRlIGl0KS4gVGhhdCdzIGhvdyBteSBjb2RlIHdvcmtzIC0gaWYgdGhlIHNpemUgaXMg
+YXZhaWxhYmxlLA0KPiBpdCB1c2VzIHRoZSBwcm92aWRlZCB2YWx1ZSwgaWYgbm90IGl0IHVzZXMg
+MSA8PCBaU1REX1dJTkRPV0xPR19NQVguDQo+IA0KPiBJIHdvdWxkIGFsc28gYWdyZWUgYSBmaXhl
+ZCBsaW1pdCB3b3VsZCBtYWtlIGEgc2Vuc2UgaWYgYSB1c2VyIChvciBuZXR3b3JrKQ0KPiBwcm92
+aWRlZCBkYXRhIHdvdWxkIGJlIHVzZWQsIGJ1dCBpbiB0aGlzIGNhc2Ugb25seSB0aGUgc3lzdGVt
+IG93bmVyIGlzIGFibGUNCj4gdG8gcHJvdmlkZSBhbiBpbml0cmFtZnMuIElmIG9uZSBpcyBhYmxl
+IHRvIGNoYW5nZSBpbml0cmFtZnMsIGhlIGNhbiByZW5kZXINCj4gdGhlIHN5c3RlbSB1bnVzYWJs
+ZSBzaW1wbHkgYnkgcHJvdmlkaW5nIGEgY29ycnVwdGVkIGZpbGUuIEhlIGRvZXNuJ3QgaGF2ZQ0K
+PiB0byBib3RoZXIgbWFraW5nIHRoZSB3aW5kb3cgYmlnZ2VyIHRoYW4gdGhlIGF2YWlsYWJsZSBt
+ZW1vcnkuDQoNClRoYXQgbWFrZXMgc2Vuc2UgdG8gbWUuDQoNCj4+IEkgd291bGQgZXhwZWN0IGxh
+cmdlciB3aW5kb3cgc2l6ZXMgdG8gYmUgYmVuZWZpY2lhbCBmb3IgY29tcHJlc3Npb24gcmF0aW8s
+DQo+PiB0aG91Z2ggdGhlcmUgaXMgZGVtaXNpbmcgcmV0dXJucy4gSSB3b3VsZCBleHBlY3QgdGhh
+dCBmb3Iga2VybmVsIGltYWdlDQo+PiBjb21wcmVzc2lvbiBsYXJnZXIgd2luZG93IHNpemVzIGFy
+ZSBiZW5lZmljaWFsLCBzaW5jZSBpdCBpcyBkZWNvbXByZXNzZWQNCj4+IHdpdGggYSBzaW5nbGUg
+cGFzcy4gRm9yIGluaXRyYW1mcyBkZWNvbXByZXNzaW9uLCBJIHdvdWxkIGV4cGVjdCB0aGF0IGxp
+bWl0aW5nDQo+PiB0aGUgd2luZG93IHNpemUgY291bGQgaGVscCBkZWNvbXByZXNzaW9uIHNwZWVk
+LCBzaW5jZSBpdCB1c2VzIHN0cmVhbWluZw0KPj4gY29tcHJlc3Npb24sIHNvIHVuenN0ZCgpIGhh
+cyB0byBhbGxvY2F0ZSBhIGJ1ZmZlciBvZiB3aW5kb3cgc2l6ZSBieXRlcy4NCj4gWWVzLCBsYXJn
+ZXIgd2luZG93IGltcHJvdmVzIHRoZSBjb21wcmVzc2lvbiByYXRpbywgc2VlIGhlcmUgYSBjb21w
+YXJpc29uDQo+IGJldHdlZW4gbGV2ZWwgMTkgYW5kIDIyIG9uIG15IHRlc3RpbmcgeDg2LTY0IGlu
+aXRyYW1mczoNCj4gIDMwNzc1MDIyIHJvb3Rmcy5jcGlvLnpzdC0xOQ0KPiAgMjg3NTU0Mjkgcm9v
+dGZzLmNwaW8uenN0LTIyDQo+IFRoZXNlIDclIGNhbiBiZSBub3RpY2VhYmxlIHdoZW4gb25lIGhh
+cyBhIHNsb3cgc3RvcmFnZSwgZS5nLiBhIGZsYXNoIG1lbW9yeQ0KPiBvbiBTUEkgYnVzLiANCj4g
+DQo+Pj4gSSByZW1vdmVkIHRoYXQgbGltaXRhdGlvbiB0byBiZSBhYmxlIHRvIHRlc3QgaXQgaW4g
+bXkgZW52aXJvbm1lbnQgYW5kIEkNCj4+PiBmb3VuZCB0aGUgcGVyZm9ybWFuY2UgaXMgd29yc3Qg
+dGhhbiB3aXRoIG15IHBhdGNoIGJ5IHJvdWdobHkgMjAlIChvbg0KPj4+IGk3LTM1MjBNKSwgd2hp
+Y2ggaXMgYSBtYWpvciBkcmF3YmFjayBjb25zaWRlcmluZyB0aGUgbWFpbiBtb3RpdmF0aW9uDQo+
+Pj4gdG8gdXNlIHpzdGQgaXMgdGhlIGRlY29tcHJlc3Npb24gc3BlZWQuIEkgd2lsbCB0ZXN0IG9u
+IGFybSBhcyB3ZWxsIGFuZA0KPj4+IHNoYXJlIHRoZSByZXN1bHQgdG9tb3Jyb3cuDQo+Pj4gUGV0
+cg0KPj4gDQo+PiBXaGF0IGRvIHlvdSBtZWFuIGJ5IHRoYXQ/IENhbiB5b3Ugc2hhcmUgd2l0aCBt
+ZSB0aGUgdGVzdCB5b3UgcmFuPw0KPj4gSXMgdGhpcyBmb3Iga2VybmVsIGRlY29tcHJlc3Npb24g
+b3IgaW5pdHJhbWZzIGRlY29tcHJlc3Npb24/DQo+IEluaXRyYW1mcyAtIHlvdSBjYW4gYXBwbHkg
+bXkgdjIgcGF0Y2ggb24gdjUuNSBhbmQgdHJ5IHdpdGggeW91ciB0ZXN0IGRhdGEuDQo+IA0KPiBJ
+IGhhdmUgdGVzdGVkIHlvdXIgcGF0Y2ggYWxzbyBvbiBBUk12NyBwbGF0Zm9ybSBhbmQgdGhlcmUg
+dGhlIGRlZ3JhZGF0aW9uDQo+IHdhcyA4JS4NCg0KQXJlIHlvdSBjb21wYXJpbmcgdGhlIHBlcmZv
+cm1hbmNlIG9mIGFuIDggTUIgd2luZG93IHNpemUgdnMgYSAxMjggTUINCndpbmRvdyBzaXplPw0K
+DQo+ICBQZXRyDQoNCg==
