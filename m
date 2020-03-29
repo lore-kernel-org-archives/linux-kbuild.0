@@ -1,80 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:44360 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727903AbgC2Na6 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 29 Mar 2020 09:30:58 -0400
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 02TDUcuc019732
-        for <linux-kbuild@vger.kernel.org>; Sun, 29 Mar 2020 22:30:38 +0900
-Received: by mail-ua1-f44.google.com with SMTP id v24so5307926uak.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 29 Mar 2020 06:30:38 -0700 (PDT)
+Received: from mout.gmx.net ([212.227.17.22]:52601 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727488AbgC2O2u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 29 Mar 2020 10:28:50 -0400
+From: Reinhard Karcher <reinhard.karcher@gmx.net>
+Subject: Re: Bug#954778: Patch: Suppress irrelevant warning when generating a debian package
+Date: Sun, 29 Mar 2020 16:28:44 +0200
+Message-ID: <3046032.1AMzvzNrTs@apollon>
+In-Reply-To: <CAK7LNAQBypq0QxUafH6f4k4d7wObjycK6eys2NKDZi8_Qdxb4A@mail.gmail.com>
+References: <1966103.4dT7el1ifK@apollon> <2516578.0xqDLvIEN0@apollon> <CAK7LNAQBypq0QxUafH6f4k4d7wObjycK6eys2NKDZi8_Qdxb4A@mail.gmail.com>
 MIME-Version: 1.0
-References: <1966103.4dT7el1ifK@apollon> <158496310058.14061.15052560096291438066.reportbug@debian>
- <CAK7LNAQcMM_H41zXA++FOF=LJT+YKNfmwHMYqdF3r1uQT307Hw@mail.gmail.com> <2516578.0xqDLvIEN0@apollon>
-In-Reply-To: <2516578.0xqDLvIEN0@apollon>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 29 Mar 2020 22:30:01 +0900
-Message-ID: <CAK7LNAQBypq0QxUafH6f4k4d7wObjycK6eys2NKDZi8_Qdxb4A@mail.gmail.com>
-Subject: Re: Bug#954778: Patch: Suppress irrelevant warning when generating a
- debian package
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="nextPart53114204.YFjIEDjTXD"
+Content-Transfer-Encoding: 7Bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Reinhard Karcher <reinhard.karcher@gmx.net>, 954778@bugs.debian.org
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: 954778@bugs.debian.org
 
-On Sun, Mar 29, 2020 at 9:57 PM Reinhard Karcher
-<reinhard.karcher@gmx.net> wrote:
->
-> Am Sonntag, 29. M=C3=A4rz 2020, 14:01 schrieb Masahiro Yamada:
-> >
-> > > By making a contribution to this project, I certify that:
-> > > The contribution was created in whole or in part by me and I have the
-> > > right to submit it under the open source license indicated in the fil=
-e.
-> >
-> > Please drop this.
-> >
-> > Signed-off-by implies this.
-> > No need to explain this in an individual patch.
->
-> Droped in attached new version.
->
-> > > +if [ -n "$BUILD_DEBUG" ] ; then
-> >
-> > This file does not define BUILD_DEBUG.
-> > So, this conditional is always false, isn't it?
-> >
-> > It should be:
-> >
-> > if is_enabled CONFIG_DEBUG_INFO; then
-> >
->
-> The definition of BUILD_DEBUG is copied from builddeb too.
-> See attached patch.
+This is a multi-part message in MIME format.
 
+--nextPart53114204.YFjIEDjTXD
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 
-No.
+Am Sonntag, 29. M=C3=A4rz 2020, 15:30 schrieb Masahiro Yamada:
+>=20
+> I want you to directly use
+>=20
+> if is_enabled CONFIG_DEBUG_INFO; then
+> ...
+> fi
+>=20
 
-I want you to directly use
+Corrected patch attached
 
-if is_enabled CONFIG_DEBUG_INFO; then
-...
-fi
+=2D-
+Best regards
+Reinhard Karcher
 
+--nextPart53114204.YFjIEDjTXD
+Content-Disposition: attachment; filename="remove_debug_warning.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-patch; charset="UTF-8"; name="remove_debug_warning.patch"
 
+from Reinhard.Karcher reinhard.karcher@gmx.net
 
+Creating a Debian package by compiling the kernel
+make bindeb-pkg
+without creating debug information creates a warning that no
+debug package was created
+This patch excludes the debug package from the control file,
+if no debug package is created by this configuration
 
+Signed-off-by:Reinhard Karcher <reinhard.karcher@gmx.net>
 
-I guess builddeb used BUILD_DEBUG
-to avoid running grep twice.
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 357dc56bcf30..327ea3c2a785 100755
+=2D-- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -198,7 +198,10 @@ Description: Linux support headers for userspace deve=
+lopment
+  This package provides userspaces headers from the Linux kernel.  These h=
+eaders
+  are used by the installed headers for GNU glibc and other system librari=
+es.
+ Multi-Arch: same
++EOF
 
-It does not apply to mkdebian.
++if is_enabled CONFIG_DEBUG_INFO; then
++cat <<EOF >> debian/control
+ Package: $dbg_packagename
+ Section: debug
+ Architecture: $debarch
+@@ -206,6 +209,7 @@ Description: Linux kernel debugging symbols for $versi=
+on
+  This package will come in handy if you need to debug the kernel. It prov=
+ides
+  all the necessary debug symbols for the kernel and its modules.
+ EOF
++fi
 
+ cat <<EOF > debian/rules
+ #!$(command -v $MAKE) -f
 
-
---=20
-Best Regards
-Masahiro Yamada
+--nextPart53114204.YFjIEDjTXD--
