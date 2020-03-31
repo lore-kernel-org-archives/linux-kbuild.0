@@ -1,78 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:41277 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729997AbgCaKLZ (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:55724 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730380AbgCaLCK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Mar 2020 06:11:25 -0400
-Date: Tue, 31 Mar 2020 03:11:22 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH v2] kbuild: Enable -Wtautological-compare
-Message-ID: <20200331101122.GA6292@ubuntu-m2-xlarge-x86>
-References: <20200326194155.29107-1-natechancellor@gmail.com>
- <CAK7LNAQ8uHtuhd7DiGGOLbkEX524rPjfUuWAHjU-_92Ow3_1Pg@mail.gmail.com>
+        Tue, 31 Mar 2020 07:02:10 -0400
+Subject: Re: single target builds are broken
+References: <a5ce79eb-be9d-df97-0b58-5aee5a48f4d3@oracle.com>
+ <CAK7LNAQ8LZMPxrjVkuLizHjVZyBtSmLFZ=EvDCCAPb-XGfJLHA@mail.gmail.com>
+From: Vegard Nossum <vegard.nossum@oracle.com>
+Message-ID: <8c491e3b-a622-14c1-15c3-8cff061017ba@oracle.com>
+Date: Tue, 31 Mar 2020 13:01:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ8uHtuhd7DiGGOLbkEX524rPjfUuWAHjU-_92Ow3_1Pg@mail.gmail.com>
+In-Reply-To: <CAK7LNAQ8LZMPxrjVkuLizHjVZyBtSmLFZ=EvDCCAPb-XGfJLHA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Nick Desaulniers <ndesaulniers@google.com>, Dmitry Vyukov <dvyukov@google.com>, "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: Jens Axboe <axboe@kernel.dk>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sun, Mar 29, 2020 at 08:31:26PM +0900, Masahiro Yamada wrote:
-> On Fri, Mar 27, 2020 at 4:42 AM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > Currently, we disable -Wtautological-compare, which in turn disables a
-> > bunch of more specific tautological comparison warnings that are useful
-> > for the kernel such as -Wtautological-bitwise-compare. See clang's
-> > documentation below for the other warnings that are suppressed by
-> > -Wtautological-compare. Now that all of the major/noisy warnings have
-> > been fixed, enable -Wtautological-compare so that more issues can be
-> > caught at build time by various continuous integration setups.
-> >
-> > -Wtautological-constant-out-of-range-compare is kept disabled under a
-> > normal build but visible at W=1 because there are places in the kernel
-> > where a constant or variable size can change based on the kernel
-> > configuration. These are not fixed in a clean/concise way and the ones
-> > I have audited so far appear to be harmless. It is not a subgroup but
-> > rather just one warning so we do not lose out on much coverage by
-> > default.
-> >
-> > Link: https://github.com/ClangBuiltLinux/linux/issues/488
-> > Link: http://releases.llvm.org/10.0.0/tools/clang/docs/DiagnosticsReference.html#wtautological-compare
-> > Link: https://bugs.llvm.org/show_bug.cgi?id=42666
-> > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> > ---
-> >
-> > v1 -> v2: https://lore.kernel.org/lkml/20200219045423.54190-7-natechancellor@gmail.com/
-> >
-> > * Expand commit message a bit by adding more reasoning behind change.
-> > * Disable -Wtautological-constant-out-of-range-compare under a normal
-> >   build but allow it to show up at W=1 for easy auditing.
-> >
-> > I hope this can be accepted for 5.7. There are two warnings that I see
-> > still across a bunch of allyesconfig/allmodconfig builds that have
-> > patches sent but not accepted. I will ping them today.
-> >
-> > * https://lore.kernel.org/lkml/20191023002014.22571-1-natechancellor@gmail.com/
-> > * https://lore.kernel.org/lkml/20200220051011.26113-1-natechancellor@gmail.com/
+
+On 3/31/20 11:49 AM, Masahiro Yamada wrote:
+> On Tue, Mar 31, 2020 at 6:16 PM Vegard Nossum <vegard.nossum@oracle.com> wrote:
+>>
+>>
+>> Hi,
+>>
+>> I often run 'make foo/bar.o' as part of my workflow, even when bar.o is
+>> not specified in any kernel makefile, and this has worked just fine for
+>> years.
+>>
+>> This is broken after commit 394053f4a4b3e3eeeaa67b67fc886a9a75bd9e4d
+>> (kbuild: make single targets work more correctly) and just gives an error:
+>>
+>> $ make kernel/test.o
+>>     CALL    scripts/checksyscalls.sh
+>>     CALL    scripts/atomic/check-atomics.sh
+>>     DESCEND  objtool
+>> make[2]: *** No rule to make target 'kernel/test.o'.  Stop.
+>> scripts/Makefile.build:502: recipe for target '__build' failed
+>> make[1]: *** [__build] Error 2
+>> Makefile:1670: recipe for target 'kernel' failed
+>> make: *** [kernel] Error 2
 > 
 > 
-> OK, I will queue this up and send it to Linus
-> in the second week of MW.
+> This is intentional to make the single target builds
+> work in the same manner as the normal builds.
 > 
-> I hope all warnings will be fixed by that time.
+> 
+> The necessary CONFIG dependency must be met.
+> 
+> obj-$(CONFIG_FOO) += foo.o
+> 
+> foo.o can be built only when CONFIG_FOO is y/m.
+> 
+> 
+> 
+>> For top-level objects (e.g. 'make bar.o') the situation is even worse,
+>> since make exits with status 0 without building anything :-/
+> 
+> 
+> There is no .c or .S file at the top-level of the kernel source tree.
+> 
+> 'make bar.o' never happens.
 
-Just a follow up, those two patches have been picked up and should be in
-this coming release:
+It doesn't happen in mainline, but I often use that to small test things
+in an isolated source file. As just one example you can do
 
-https://git.kernel.org/balbi/usb/c/58582220d2d34228e5a1e1585e41b735713988bb
-https://git.kernel.org/rostedt/linux-trace/c/bf2cbe044da275021b2de5917240411a19e5c50d
+#include <linux/sched.h>
+unsigned int task_struct_size = sizeof(struct task_struct);
 
-As of next-20200331, with the former applied (because it is not there
-yet) along with this patch, I see no warnings on arm, arm64, x86_64
-all{mod,yes}config.
+and then you can look in the object file to find the size. Or any other
+of a million useful things that you might want to do without rebuilding
+an actual source file or modifying makefiles.
 
-Cheers,
-Nathan
+>> Is there any chance we can get this back? It was super useful for me.
+> 
+> 
+> What you want is "Let's build whatever", right?
+
+It's really useful to be able to build object files separately, but as
+if it was part of the kernel (so e.g. with all the gcc flags, include
+paths, etc.).
+
+> No, please add 'obj-y += test.o' if you want to
+> test your local file.
+
+This is a clear workflow regression for me. Why is it so absolutely
+necessary to break the way it used to work?
+
+At the very least, can we find a way to reduce the typing overhead for
+testing one-offs like that? 'make STANDALONE=1 test.o' or something?
+
+
+Vegard
