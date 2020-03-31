@@ -1,66 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40242 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729299AbgCaBEG (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:55571 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727614AbgCaCl4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Mar 2020 21:04:06 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a81so784814wmf.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 30 Mar 2020 18:04:03 -0700 (PDT)
-Date: Tue, 31 Mar 2020 02:03:56 +0100
-From: Steve McIntyre <steve.mcintyre@linaro.org>
-Subject: Re: [RFC PATCH v2 0/4] Add device tree build information
-Message-ID: <20200331010347.GF4037@linaro.org>
-References: <20200221161418.20225-1-alexandre.torgue@st.com>
- <1b946fcf-47a9-012d-1b04-f4bbd2682607@gmail.com>
- <67d75f0c-7478-23b0-8619-746cf83cedb5@gmail.com>
- <dba17be2-067f-8221-f313-7a3edcf61511@st.com>
+        Mon, 30 Mar 2020 22:41:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dba17be2-067f-8221-f313-7a3edcf61511@st.com>
+References: <20200326080104.27286-1-masahiroy@kernel.org> <20200326080104.27286-9-masahiroy@kernel.org>
+In-Reply-To: <20200326080104.27286-9-masahiroy@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 31 Mar 2020 11:40:57 +0900
+Message-ID: <CAK7LNARueG4wM-_z+xDjwHci=wwAad8CqP1UF5mFJpPf8Zg71Q@mail.gmail.com>
+Subject: Re: [PATCH v2 08/16] x86: replace arch macros from compiler with CONFIG_X86_{32,64}
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexandre Torgue <alexandre.torgue@st.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, Ian Lepore <ian@freebsd.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Nick Desaulniers <ndesaulniers@google.com>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Randy Dunlap <rdunlap@infradead.org>
 
-Hi Alexandre,
-
-On Mon, Mar 02, 2020 at 01:55:55PM +0100, Alexandre Torgue wrote:
->On 2/28/20 6:47 PM, Frank Rowand wrote:
->> > This would require modifying every single main .dts file to get the build info
->> > I would prefer the method that Ian and David came up with (sorry, no lore link,
->> > it did not go to lkml).  Extract from David's email:
->> > 
->> >     Date:   Tue, 21 Jan 2020 13:05:25 +1100
->> >     From:   David Gibson <david@gibson.dropbear.id.au>
->> >     Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
->> > 
->> >     > Given that dts files are run through the C preprocessor before being
->> >     > fed to dtc, the build script could use the '-include' flag to force-
->> >     > include a fragment containing generated build info without any need to
->> >     > modify existing dts files.
->> > 
->> >     Uh... maybe.  -include will essentially prepend the forced file, which
->> >     is a bit awkward for our purposes.  It means that the prepended file
->> >     would need the /dts-v1/ tag, and we couldn't have it in the main files
->> >     which would be a bit confusing.  I think it would also cause problems
->> >     with any /memreserve/ tags and means that the main tree could in
->> >     theory overwrite the build information which we don't necessarily
->> >     want.
->> > 
->> >     I guess we could build things the other way around: have the main .dts
->> >     file specified with -include and have the dts on the dtc commandline
->> >     be a fixed one with the build information.  It'd be a little weird,
->> >     though.
->> > 
->> > -Frank
+On Thu, Mar 26, 2020 at 5:03 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
->Yes. I try briefly this idea but I got issues with dts-v1 tag. I agree, it is
->cleaner to not modify input dts file. I can rework int this way.
+> If the intention is to check i386/x86_64 excluding UML, testing
+> CONFIG_X86_{32,64} is simpler.
+>
+> The reason for checking __i386__ / __x86_64__ was perhaps because
+> lib/raid6/algos.c is built not only for the kernel but also for
+> testing the library code from userspace.
+>
+> However, lib/raid6/test/Makefile passes -DCONFIG_X86_{32,64} for
+> this case. So, I do not see a reason to not use CONFIG option here.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Acked-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+> ---
 
-Have you made any progress on this please?
 
-Cheers,
+Sorry, this patch broke UML builds.
+
+https://lkml.org/lkml/2020/3/27/618
+
+
+
+I will drop this patch for tomorrow's linux-next.
+
+
+
+CONFIG_X86 is not defined for ARCH=um.
+So, I still think it is OK to replace one complicated line
+in lib/raid6/x86.h
+
+   #if (defined(__i386__) || defined(__x86_64__)) && !defined(__arch_um__)
+
+with:
+
+   #ifdef CONFIG_X86
+
+
+
+
+Also, I slightly prefer
+
+   #if defined(CONFIG_X86_32) && !defined(CONFIG_UML)
+
+to
+
+   #if defined(__i386__) && !defined(__arch_um__)
+
+
+
+But, we do not need to rush this now.
+
+
+This patch does not affect the rest of this series.
+
+Thanks.
+
+
+
+
+
+> Changes in v2: None
+>
+>  kernel/signal.c   | 2 +-
+>  lib/raid6/algos.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/kernel/signal.c b/kernel/signal.c
+> index 5b2396350dd1..db557e1629e5 100644
+> --- a/kernel/signal.c
+> +++ b/kernel/signal.c
+> @@ -1246,7 +1246,7 @@ static void print_fatal_signal(int signr)
+>         struct pt_regs *regs = signal_pt_regs();
+>         pr_info("potentially unexpected fatal signal %d.\n", signr);
+>
+> -#if defined(__i386__) && !defined(__arch_um__)
+> +#ifdef CONFIG_X86_32
+>         pr_info("code at %08lx: ", regs->ip);
+>         {
+>                 int i;
+> diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
+> index df08664d3432..b5a02326cfb7 100644
+> --- a/lib/raid6/algos.c
+> +++ b/lib/raid6/algos.c
+> @@ -29,7 +29,7 @@ struct raid6_calls raid6_call;
+>  EXPORT_SYMBOL_GPL(raid6_call);
+>
+>  const struct raid6_calls * const raid6_algos[] = {
+> -#if defined(__i386__) && !defined(__arch_um__)
+> +#ifdef CONFIG_X86_32
+>  #ifdef CONFIG_AS_AVX512
+>         &raid6_avx512x2,
+>         &raid6_avx512x1,
+> @@ -45,7 +45,7 @@ const struct raid6_calls * const raid6_algos[] = {
+>         &raid6_mmxx2,
+>         &raid6_mmxx1,
+>  #endif
+> -#if defined(__x86_64__) && !defined(__arch_um__)
+> +#ifdef CONFIG_X86_64
+>  #ifdef CONFIG_AS_AVX512
+>         &raid6_avx512x4,
+>         &raid6_avx512x2,
+> --
+> 2.17.1
+>
+
+
 -- 
-Steve McIntyre                                steve.mcintyre@linaro.org
-<http://www.linaro.org/> Linaro.org | Open source software for ARM SoCs
+Best Regards
+Masahiro Yamada
