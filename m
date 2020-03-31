@@ -1,90 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:39436 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbgC3TDP (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40242 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729299AbgCaBEG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 30 Mar 2020 15:03:15 -0400
-Date: Mon, 30 Mar 2020 12:03:12 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH v2] Makefile.llvm: simplify LLVM build
-Message-ID: <20200330190312.GA32257@ubuntu-m2-xlarge-x86>
-References: <20200317202404.GA20746@ubuntu-m2-xlarge-x86>
- <20200317215515.226917-1-ndesaulniers@google.com>
- <20200327224246.GA12350@ubuntu-m2-xlarge-x86>
- <CAK7LNAShb1gWuZyycLAGWm19EWn17zeNcmdPyqu1o=K9XrfJbg@mail.gmail.com>
- <CAK7LNAQ3=jUu4aa=JQB8wErUGDd-Vr=cX_yZSdP_uAP6kWZ=pw@mail.gmail.com>
- <CAKwvOd=5AG1ARw6JUXmkuiftuShuYHKLk0ZnueuLhvOdMr5dOA@mail.gmail.com>
+        Mon, 30 Mar 2020 21:04:06 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a81so784814wmf.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Mar 2020 18:04:03 -0700 (PDT)
+Date: Tue, 31 Mar 2020 02:03:56 +0100
+From: Steve McIntyre <steve.mcintyre@linaro.org>
+Subject: Re: [RFC PATCH v2 0/4] Add device tree build information
+Message-ID: <20200331010347.GF4037@linaro.org>
+References: <20200221161418.20225-1-alexandre.torgue@st.com>
+ <1b946fcf-47a9-012d-1b04-f4bbd2682607@gmail.com>
+ <67d75f0c-7478-23b0-8619-746cf83cedb5@gmail.com>
+ <dba17be2-067f-8221-f313-7a3edcf61511@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKwvOd=5AG1ARw6JUXmkuiftuShuYHKLk0ZnueuLhvOdMr5dOA@mail.gmail.com>
+In-Reply-To: <dba17be2-067f-8221-f313-7a3edcf61511@st.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sandeep Patil <sspatil@google.com>
+To: Alexandre Torgue <alexandre.torgue@st.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, Ian Lepore <ian@freebsd.org>
 
-On Mon, Mar 30, 2020 at 11:58:19AM -0700, Nick Desaulniers wrote:
-> On Sat, Mar 28, 2020 at 6:57 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > I also had planned to provide a single switch to change
-> > all the tool defaults to LLVM.
-> >
-> > So, supporting 'LLVM' is fine, but I'd rather want this
-> > look symmetrical, and easy to understand.
-> >
-> > CPP        = $(CC) -E
-> > ifneq ($(LLVM),)
-> 
-> Yes, a simple if statement is much simpler than the overly complex patch I had.
-> 
-> > CC         = $(LLVM_DIR)clang
-> 
-> Do we need $LLVM_DIR? Shouldn't users just have that in their $PATH?
-> 
-> Also, I think we need to support suffixed binaries, as debian
-> distributes these with version suffixes, as Nathan points out.  Or do
-> the debian packages install suffixed binaries AND path versioned
-> non-suffixed binaries?
+Hi Alexandre,
 
-I think the idea here is that ultimately, the suffixed versions of clang
-that Debian has in /usr/bin are symlinks to binaries in
-/usr/lib/llvm-#/bin; as a result, a user could say
-LLVM_DIR=/usr/lib/llvm-#/bin/ and all of those tools would be picked up
-automatically. I am not really sure what is better.
+On Mon, Mar 02, 2020 at 01:55:55PM +0100, Alexandre Torgue wrote:
+>On 2/28/20 6:47 PM, Frank Rowand wrote:
+>> > This would require modifying every single main .dts file to get the build info
+>> > I would prefer the method that Ian and David came up with (sorry, no lore link,
+>> > it did not go to lkml).  Extract from David's email:
+>> > 
+>> >     Date:   Tue, 21 Jan 2020 13:05:25 +1100
+>> >     From:   David Gibson <david@gibson.dropbear.id.au>
+>> >     Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
+>> > 
+>> >     > Given that dts files are run through the C preprocessor before being
+>> >     > fed to dtc, the build script could use the '-include' flag to force-
+>> >     > include a fragment containing generated build info without any need to
+>> >     > modify existing dts files.
+>> > 
+>> >     Uh... maybe.  -include will essentially prepend the forced file, which
+>> >     is a bit awkward for our purposes.  It means that the prepended file
+>> >     would need the /dts-v1/ tag, and we couldn't have it in the main files
+>> >     which would be a bit confusing.  I think it would also cause problems
+>> >     with any /memreserve/ tags and means that the main tree could in
+>> >     theory overwrite the build information which we don't necessarily
+>> >     want.
+>> > 
+>> >     I guess we could build things the other way around: have the main .dts
+>> >     file specified with -include and have the dts on the dtc commandline
+>> >     be a fixed one with the build information.  It'd be a little weird,
+>> >     though.
+>> > 
+>> > -Frank
+>
+>Yes. I try briefly this idea but I got issues with dts-v1 tag. I agree, it is
+>cleaner to not modify input dts file. I can rework int this way.
 
-I'll try to have some other comments by later today/tonight.
-
-> > LD         = $(LLVM_DIR)ld.lld
-> > AR         = $(LLVM_DIR)llvm-ar
-> > NM         = $(LLVM_DIR)llvm-nm
-> > OBJCOPY    = $(LLVM_DIR)llvm-objcopy
-> > OBJDUMP    = $(LLVM_DIR)llvm-objdump
-> > READELF    = $(LLVM_DIR)llvm-readelf
-> > OBJSIZE    = $(LLVM_DIR)llvm-size
-> > STRIP      = $(LLVM_DIR)llvm-strip
-> > else
-> > CC         = $(CROSS_COMPILE)gcc
-> > LD         = $(CROSS_COMPILE)ld
-> > AR         = $(CROSS_COMPILE)ar
-> > NM         = $(CROSS_COMPILE)nm
-> > OBJCOPY    = $(CROSS_COMPILE)objcopy
-> > OBJDUMP    = $(CROSS_COMPILE)objdump
-> > READELF    = $(CROSS_COMPILE)readelf
-> > OBJSIZE    = $(CROSS_COMPILE)size
-> > STRIP      = $(CROSS_COMPILE)strip
-> > endif
-> >
-> >
-> >
-> > I attached two patches.
-> > Comments appreciated.
-> 
-> I'm not sure the second one that recommends changing cc/c++ is the way
-> to go; I think it might harm hermeticity.
-
-Agreed. I do not modify my host system at all for this project, just
-relying on PATH modification. In theory, we can still override HOSTCC
-and HOSTCXX but that would defeat the purpose of that patch.
+Have you made any progress on this please?
 
 Cheers,
-Nathan
+-- 
+Steve McIntyre                                steve.mcintyre@linaro.org
+<http://www.linaro.org/> Linaro.org | Open source software for ARM SoCs
