@@ -1,97 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp2120.oracle.com ([141.146.126.78]:55724 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730380AbgCaLCK (ORCPT
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:57662 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730153AbgCaPBo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Mar 2020 07:02:10 -0400
-Subject: Re: single target builds are broken
-References: <a5ce79eb-be9d-df97-0b58-5aee5a48f4d3@oracle.com>
- <CAK7LNAQ8LZMPxrjVkuLizHjVZyBtSmLFZ=EvDCCAPb-XGfJLHA@mail.gmail.com>
-From: Vegard Nossum <vegard.nossum@oracle.com>
-Message-ID: <8c491e3b-a622-14c1-15c3-8cff061017ba@oracle.com>
-Date: Tue, 31 Mar 2020 13:01:59 +0200
+        Tue, 31 Mar 2020 11:01:44 -0400
+Subject: Re: [RFC PATCH v2 0/4] Add device tree build information
+References: <20200221161418.20225-1-alexandre.torgue@st.com>
+ <1b946fcf-47a9-012d-1b04-f4bbd2682607@gmail.com>
+ <67d75f0c-7478-23b0-8619-746cf83cedb5@gmail.com>
+ <dba17be2-067f-8221-f313-7a3edcf61511@st.com>
+ <20200331010347.GF4037@linaro.org>
+From: Alexandre Torgue <alexandre.torgue@st.com>
+Message-ID: <afa534b0-c671-600f-f344-de7026dc2c79@st.com>
+Date: Tue, 31 Mar 2020 17:00:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQ8LZMPxrjVkuLizHjVZyBtSmLFZ=EvDCCAPb-XGfJLHA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200331010347.GF4037@linaro.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Steve McIntyre <steve.mcintyre@linaro.org>
+Cc: Frank Rowand <frowand.list@gmail.com>, robh+dt@kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, david@gibson.dropbear.id.au, sjg@chromium.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree-compiler@vger.kernel.org, Ian Lepore <ian@freebsd.org>
 
+Hi Steeve
 
-On 3/31/20 11:49 AM, Masahiro Yamada wrote:
-> On Tue, Mar 31, 2020 at 6:16 PM Vegard Nossum <vegard.nossum@oracle.com> wrote:
+On 3/31/20 3:03 AM, Steve McIntyre wrote:
+> Hi Alexandre,
+> 
+> On Mon, Mar 02, 2020 at 01:55:55PM +0100, Alexandre Torgue wrote:
+>> On 2/28/20 6:47 PM, Frank Rowand wrote:
+>>>> This would require modifying every single main .dts file to get the build info
+>>>> I would prefer the method that Ian and David came up with (sorry, no lore link,
+>>>> it did not go to lkml).  Extract from David's email:
+>>>>
+>>>>      Date:   Tue, 21 Jan 2020 13:05:25 +1100
+>>>>      From:   David Gibson <david@gibson.dropbear.id.au>
+>>>>      Subject: Re: [RFC PATCH 1/3] dtc: Add dtb build information option
+>>>>
+>>>>      > Given that dts files are run through the C preprocessor before being
+>>>>      > fed to dtc, the build script could use the '-include' flag to force-
+>>>>      > include a fragment containing generated build info without any need to
+>>>>      > modify existing dts files.
+>>>>
+>>>>      Uh... maybe.  -include will essentially prepend the forced file, which
+>>>>      is a bit awkward for our purposes.  It means that the prepended file
+>>>>      would need the /dts-v1/ tag, and we couldn't have it in the main files
+>>>>      which would be a bit confusing.  I think it would also cause problems
+>>>>      with any /memreserve/ tags and means that the main tree could in
+>>>>      theory overwrite the build information which we don't necessarily
+>>>>      want.
+>>>>
+>>>>      I guess we could build things the other way around: have the main .dts
+>>>>      file specified with -include and have the dts on the dtc commandline
+>>>>      be a fixed one with the build information.  It'd be a little weird,
+>>>>      though.
+>>>>
+>>>> -Frank
 >>
->>
->> Hi,
->>
->> I often run 'make foo/bar.o' as part of my workflow, even when bar.o is
->> not specified in any kernel makefile, and this has worked just fine for
->> years.
->>
->> This is broken after commit 394053f4a4b3e3eeeaa67b67fc886a9a75bd9e4d
->> (kbuild: make single targets work more correctly) and just gives an error:
->>
->> $ make kernel/test.o
->>     CALL    scripts/checksyscalls.sh
->>     CALL    scripts/atomic/check-atomics.sh
->>     DESCEND  objtool
->> make[2]: *** No rule to make target 'kernel/test.o'.  Stop.
->> scripts/Makefile.build:502: recipe for target '__build' failed
->> make[1]: *** [__build] Error 2
->> Makefile:1670: recipe for target 'kernel' failed
->> make: *** [kernel] Error 2
+>> Yes. I try briefly this idea but I got issues with dts-v1 tag. I agree, it is
+>> cleaner to not modify input dts file. I can rework int this way.
 > 
-> 
-> This is intentional to make the single target builds
-> work in the same manner as the normal builds.
-> 
-> 
-> The necessary CONFIG dependency must be met.
-> 
-> obj-$(CONFIG_FOO) += foo.o
-> 
-> foo.o can be built only when CONFIG_FOO is y/m.
-> 
-> 
-> 
->> For top-level objects (e.g. 'make bar.o') the situation is even worse,
->> since make exits with status 0 without building anything :-/
-> 
-> 
-> There is no .c or .S file at the top-level of the kernel source tree.
-> 
-> 'make bar.o' never happens.
+> Have you made any progress on this please?
 
-It doesn't happen in mainline, but I often use that to small test things
-in an isolated source file. As just one example you can do
+Unfortunately no. I cook something locally but not yet upstream-able.
+Due to project issue I didn't find time to work on it. I think (I hope) 
+to be less busy next week and so I'll restart it.
 
-#include <linux/sched.h>
-unsigned int task_struct_size = sizeof(struct task_struct);
+regards
+alex
 
-and then you can look in the object file to find the size. Or any other
-of a million useful things that you might want to do without rebuilding
-an actual source file or modifying makefiles.
-
->> Is there any chance we can get this back? It was super useful for me.
 > 
+> Cheers,
 > 
-> What you want is "Let's build whatever", right?
-
-It's really useful to be able to build object files separately, but as
-if it was part of the kernel (so e.g. with all the gcc flags, include
-paths, etc.).
-
-> No, please add 'obj-y += test.o' if you want to
-> test your local file.
-
-This is a clear workflow regression for me. Why is it so absolutely
-necessary to break the way it used to work?
-
-At the very least, can we find a way to reduce the typing overhead for
-testing one-offs like that? 'make STANDALONE=1 test.o' or something?
-
-
-Vegard
