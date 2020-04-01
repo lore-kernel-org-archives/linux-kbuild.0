@@ -1,70 +1,150 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:23440 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732279AbgDARdp (ORCPT
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35172 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732137AbgDARgS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Apr 2020 13:33:45 -0400
-From: Nick Terrell <terrelln@fb.com>
-Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
-Date: Wed, 1 Apr 2020 17:33:03 +0000
-Message-ID: <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com>
-References: <20200401053913.216783-1-nickrterrell@gmail.com>
- <20200401053913.216783-7-nickrterrell@gmail.com>
- <20200401093310.GA13748@zn.tnic>
-In-Reply-To: <20200401093310.GA13748@zn.tnic>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EC898B513727BF4F9F52406FBEF90360@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 1 Apr 2020 13:36:18 -0400
 MIME-Version: 1.0
+References: <20200401053913.216783-1-nickrterrell@gmail.com>
+In-Reply-To: <20200401053913.216783-1-nickrterrell@gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Wed, 1 Apr 2020 19:36:20 +0200
+Message-ID: <CA+icZUVBqpaeL3KYoasA9nViFEUofA6DUZ5=ZeV48Q19i1QNMQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/8] Add support for ZSTD-compressed kernel and initramfs
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
+To: Nick Terrell <nickrterrell@gmail.com>
+Cc: Nick Terrell <terrelln@fb.com>, linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>
 
-DQoNCj4gT24gQXByIDEsIDIwMjAsIGF0IDI6MzMgQU0sIEJvcmlzbGF2IFBldGtvdiA8YnBAYWxp
-ZW44LmRlPiB3cm90ZToNCj4gDQo+IE9uIFR1ZSwgTWFyIDMxLCAyMDIwIGF0IDEwOjM5OjExUE0g
-LTA3MDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IEZyb206IE5pY2sgVGVycmVsbCA8dGVycmVs
-bG5AZmIuY29tPg0KPj4gDQo+PiBCdW1wIHRoZSBaT196X2V4dHJhX2J5dGVzIG1hcmdpbiBmb3Ig
-enN0ZC4NCj4+IA0KPj4gWnN0ZCBuZWVkcyAzIGJ5dGVzIHBlciAxMjggS0IsIGFuZCBoYXMgYSAy
-MiBieXRlIGZpeGVkIG92ZXJoZWFkLg0KPj4gWnN0ZCBuZWVkcyB0byBtYWludGFpbiAxMjggS0Ig
-b2Ygc3BhY2UgYXQgYWxsIHRpbWVzLCBzaW5jZSB0aGF0IGlzDQo+PiB0aGUgbWF4aW11bSBibG9j
-ayBzaXplLiBTZWUgdGhlIGNvbW1lbnRzIHJlZ2FyZGluZyBpbi1wbGFjZQ0KPj4gZGVjb21wcmVz
-c2lvbiBhZGRlZCBpbiBsaWIvZGVjb21wcmVzc191bnpzdGQuYyBmb3IgZGV0YWlscy4NCj4+IA0K
-Pj4gUmV2aWV3ZWQtYnk6IEtlZXMgQ29vayA8a2Vlc2Nvb2tAY2hyb21pdW0ub3JnPg0KPj4gVGVz
-dGVkLWJ5OiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29tPg0KPj4gU2lnbmVkLW9m
-Zi1ieTogTmljayBUZXJyZWxsIDx0ZXJyZWxsbkBmYi5jb20+DQo+PiAtLS0NCj4+IGFyY2gveDg2
-L2Jvb3QvaGVhZGVyLlMgfCA4ICsrKysrKystDQo+PiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRp
-b25zKCspLCAxIGRlbGV0aW9uKC0pDQo+PiANCj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9ib290
-L2hlYWRlci5TIGIvYXJjaC94ODYvYm9vdC9oZWFkZXIuUw0KPj4gaW5kZXggOTdkOWI2ZDZjMWFm
-Li5iODIwODc1YzVjOTUgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9ib290L2hlYWRlci5TDQo+
-PiArKysgYi9hcmNoL3g4Ni9ib290L2hlYWRlci5TDQo+PiBAQCAtNTM2LDggKzUzNiwxNCBAQCBw
-cmVmX2FkZHJlc3M6CQkucXVhZCBMT0FEX1BIWVNJQ0FMX0FERFIJIyBwcmVmZXJyZWQgbG9hZCBh
-ZGRyDQo+PiAjIHRoZSBzaXplLWRlcGVuZGVudCBwYXJ0IG5vdyBncm93cyBzbyBmYXN0Lg0KPj4g
-Iw0KPj4gIyBleHRyYV9ieXRlcyA9ICh1bmNvbXByZXNzZWRfc2l6ZSA+PiA4KSArIDY1NTM2DQo+
-PiArIw0KPj4gKyMgWlNURCBjb21wcmVzc2VkIGRhdGEgZ3Jvd3MgYnkgYXQgbW9zdCAzIGJ5dGVz
-IHBlciAxMjhLLCBhbmQgb25seSBoYXMgYSAyMg0KPj4gKyMgYnl0ZSBmaXhlZCBvdmVyaGVhZCBi
-dXQgaGFzIGEgbWF4aW11bSBibG9jayBzaXplIG9mIDEyOEssIHNvIGl0IG5lZWRzIGENCj4+ICsj
-IGxhcmdlciBtYXJnaW4uDQo+PiArIw0KPj4gKyMgZXh0cmFfYnl0ZXMgPSAodW5jb21wcmVzc2Vk
-X3NpemUgPj4gOCkgKyAxMzEwNzINCj4+IA0KPj4gLSNkZWZpbmUgWk9fel9leHRyYV9ieXRlcwko
-KFpPX3pfb3V0cHV0X2xlbiA+PiA4KSArIDY1NTM2KQ0KPj4gKyNkZWZpbmUgWk9fel9leHRyYV9i
-eXRlcwkoKFpPX3pfb3V0cHV0X2xlbiA+PiA4KSArIDEzMTA3MikNCj4+ICNpZiBaT196X291dHB1
-dF9sZW4gPiBaT196X2lucHV0X2xlbg0KPj4gIyBkZWZpbmUgWk9fel9leHRyYWN0X29mZnNldAko
-Wk9fel9vdXRwdXRfbGVuICsgWk9fel9leHRyYV9ieXRlcyAtIFwNCj4+IAkJCQkgWk9fel9pbnB1
-dF9sZW4pDQo+PiAtLSANCj4gDQo+IFNvIHdoeSBpcyB0aGlzIGNoYW5nZSB1bmNvbmRpdGlvbmFs
-IGlmIG9ubHkgdGhpcyBjb21wcmVzc2lvbiBhbGcuIG5lZWRzDQo+IGl0Pw0KDQpUaGUgY29kZSBp
-cyBjdXJyZW50bHkgd3JpdHRlbiBzbyB0aGF0IGFsbCB0aGUgY29tcHJlc3Npb24gYWxnb3JpdGht
-cyB1c2UgdGhlDQpzYW1lIFpPX3pfZXh0cmFfYnl0ZXMuIEl0IGlzIHRha2VuIHRvIGJlIHRoZSBt
-YXhpbXVtIG9mIHRoZSBncm93dGggcmF0ZQ0KcGx1cyB0aGUgbWF4aW11bSBmaXhlZCBvdmVyaGVh
-ZC4gSnVzdCBhIGZldyBsaW5lcyBhYm92ZSBpcyB0aGUgY29tbWVudDoNCg0KIyDigKYgSGVuY2Ug
-c2FmZXR5DQojIG1hcmdpbiBzaG91bGQgYmUgdXBkYXRlZCB0byBjb3ZlciBhbGwgZGVjb21wcmVz
-c29ycyBzbyB0aGF0IHdlIGRvbid0DQojIG5lZWQgdG8gZGVhbCB3aXRoIGVhY2ggb2YgdGhlbSBz
-ZXBhcmF0ZWx5LiBQbGVhc2UgY2hlY2sNCiMgdGhlIGRlc2NyaXB0aW9uIGluIGxpYi9kZWNvbXBy
-ZXNzb3JfeHh4LmMgZm9yIHNwZWNpZmljIGluZm9ybWF0aW9uLg0KDQpTbyBJIHdhcyBiZWVuIGZv
-bGxvd2luZyB0aGUgZ3VpZGFuY2UgaW4gdGhlIGNvbW1lbnRzLiBJZiB3ZSB3YW50IHRvIHJlZmFj
-dG9yDQppdCB0byBoYW5kbGUgZWFjaCBjb21wcmVzc29yIGluZGl2aWR1YWxseSB3ZSBjb3VsZCBt
-YWtlIFpPX3pfZXh0cmFfYnl0ZXMNCnNtYWxsZXIgZm9yIG1vc3QgYWxnb3JpdGhtcy4NCg0KRG9l
-cyBpdCBtYXR0ZXI/IEnigJltIG5vdCBhbiBleHBlcnQgaGVyZSwgYnV0IGl0IHNlZW1zIHRvIG1l
-IHRoYXQgcmVxdWlyaW5nIGFuDQpleHRyYSA2NCBLQiBvZiBSQU0gZm9yIGtlcm5lbCBkZWNvbXBy
-ZXNzaW9uIGlzbuKAmXQgc3VjaCBhbiBvbmVyb3VzIGFkZGl0aW9uLg0KDQpCZXN0LA0KTmljaw0K
-DQo=
+On Wed, Apr 1, 2020 at 7:38 AM Nick Terrell <nickrterrell@gmail.com> wrote:
+>
+> From: Nick Terrell <terrelln@fb.com>
+>
+> Hi all,
+>
+> This patch set adds support for a ZSTD-compressed kernel, ramdisk, and
+> initramfs in the kernel boot process. ZSTD-compressed ramdisk and initramfs
+> are supported on all architectures. The ZSTD-compressed kernel is only
+> hooked up to x86 in this patch set.
+>
+> Zstandard requires slightly more memory during the kernel decompression
+> on x86 (192 KB vs 64 KB), and the memory usage is independent of the
+> window size.
+>
+> Zstandard requires memory proprortional to the window size used during
+> compression for decompressing the ramdisk image, since streaming mode is
+> used. Newer versions of zstd (1.3.2+) list the window size of a file
+> with `zstd -lv <file>'. The absolute maximum amount of memory required
+> is just over 8 MB, but it can be controlled at compression time.
+>
+> This patch set has been boot tested with buildroot and QEMU based off
+> of linux-5.6-rc6.
+>
+> On i386 and x86_64 I have tested the following configurations:
+> * zstd compressed kernel and a separate zstd compressed initramfs
+> * zstd compressed kernel and a built-in zstd compressed initramfs
+> * gzip compressed kernel and a separate gzip compressed initramfs
+> * gzip compressed kernel and a built-in gzip compressed initramfs
+>
+> On arm and aarch64 I tested the same configurations, except that the kernel is
+> always gzip compressed.
+>
+> Facebook has been using v1 of these patches on x86_64 devices for more than 6
+> months. When we switched from a xz compressed initramfs to a zstd compressed
+> initramfs decompression time shrunk from 12 seconds to 3 seconds. When we
+> switched from a xz compressed kernel to a zstd compressed kernel we saved 2
+> seconds of boot time.
+>
+> Facebook has been using v2 of these patches on aarch64 devices for a few weeks.
+> When we switched from an lzma compressed initramfs to a zstd compressed initramfs
+> decompression time shrunk from 27 seconds to 8 seconds.
+>
+> The zstd compressed kernel is smaller than the gzip compressed kernel but larger
+> than the xz or lzma compressed kernels, and it decompresses faster than
+> everything except lz4. See the table below for the measurement of an x86_64
+> kernel ordered by compressed size:
+>
+> algo    size
+> xz       6,509,792
+> lzma     6,856,576
+> zstd     7,399,157
+> gzip     8,522,527
+> bzip     8,629,603
+> lzo      9,808,035
+> lz4     10,705,570
+> none    32,565,672
+>
+> v1 -> v2:
+> - Rebase
+>   - usr/Makefile and init/Kconfig were changed so the patches were updated
+> - No functional changes except to rebase
+> - Split the patches up into smaller chunks
+>
+> v2 -> v3:
+> - Add *.zst to the .gitignore in patch 8
+> - Style nits in patch 3
+> - Rename the PREBOOT macro to ZSTD_PREBOOT and XXH_PREBOOT in patches
+>   1 through 3
+>
+> v3 -> v4:
+> - Increase the ZSTD_IOBUF_SIZE from 4KB to 128KB to improve performance.
+>   With this change I switch from malloc() to large_malloc() for the
+>   buffers.
+> - Increase the maximum allowed window size from 8 MB to 128 MB, which is
+>   the max that zstd in the kernel supports.
+>
+
+Hi Nick,
+
+thanks for version 4.
+
+I have re-tested against Linux v5.6 final and it boots fine with a
+ZSTD-compressed initramfs on Debian/testing AMD64.
+
+Regards,
+- Sedat -
+
+> Best,
+> Nick Terrell
+>
+> Adam Borowski (1):
+>   .gitignore: add ZSTD-compressed files
+>
+> Nick Terrell (7):
+>   lib: prepare zstd for preboot environment
+>   lib: prepare xxhash for preboot environment
+>   lib: add zstd support to decompress
+>   init: add support for zstd compressed kernel
+>   usr: add support for zstd compressed initramfs
+>   x86: bump ZO_z_extra_bytes margin for zstd
+>   x86: Add support for ZSTD compressed kernel
+>
+>  .gitignore                        |   1 +
+>  Documentation/x86/boot.rst        |   6 +-
+>  arch/x86/Kconfig                  |   1 +
+>  arch/x86/boot/compressed/Makefile |   5 +-
+>  arch/x86/boot/compressed/misc.c   |   4 +
+>  arch/x86/boot/header.S            |   8 +-
+>  arch/x86/include/asm/boot.h       |   6 +-
+>  include/linux/decompress/unzstd.h |  11 +
+>  init/Kconfig                      |  15 +-
+>  lib/Kconfig                       |   4 +
+>  lib/Makefile                      |   1 +
+>  lib/decompress.c                  |   5 +
+>  lib/decompress_unzstd.c           | 342 ++++++++++++++++++++++++++++++
+>  lib/xxhash.c                      |  21 +-
+>  lib/zstd/decompress.c             |   2 +
+>  lib/zstd/fse_decompress.c         |   9 +-
+>  lib/zstd/zstd_internal.h          |  14 +-
+>  scripts/Makefile.lib              |  15 ++
+>  usr/Kconfig                       |  20 ++
+>  usr/Makefile                      |   1 +
+>  20 files changed, 464 insertions(+), 27 deletions(-)
+>  create mode 100644 include/linux/decompress/unzstd.h
+>  create mode 100644 lib/decompress_unzstd.c
+>
+> --
+> 2.26.0
+>
