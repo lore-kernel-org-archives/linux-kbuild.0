@@ -1,28 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-003e4a01.pphosted.com ([205.220.161.136]:17124 "EHLO
-        mx0a-003e4a01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732856AbgDAOaN (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:23440 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732279AbgDARdp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Apr 2020 10:30:13 -0400
-Reply-To: <abukareem461@gmail.com>
-From: "Abdul Kareem" <admin@abdulkareem.org>
-Subject: BUSINESS PROPOSAL !!!
-Date: Wed, 1 Apr 2020 02:39:35 -0700
+        Wed, 1 Apr 2020 13:33:45 -0400
+From: Nick Terrell <terrelln@fb.com>
+Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
+Date: Wed, 1 Apr 2020 17:33:03 +0000
+Message-ID: <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com>
+References: <20200401053913.216783-1-nickrterrell@gmail.com>
+ <20200401053913.216783-7-nickrterrell@gmail.com>
+ <20200401093310.GA13748@zn.tnic>
+In-Reply-To: <20200401093310.GA13748@zn.tnic>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EC898B513727BF4F9F52406FBEF90360@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-Message-ID: <SUSILCESMTP5cEPt0nl0000b69c@SUSILCESMTP5.FCStone.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-Dearest Friend
-
-I am Abdul Kareem Working with Emirate NBD Bank Dubai,United Arab Emirate as Finance Manager,I am pleased to get across to you for a very urgent and profitable business proposal which I believe will profit the both of us after completion,I have been in search of someone with this last name as yours,when I saw your name I was pushed to contact you and see how best we can assist each other believing that you will not betray me, My late client citizen of your country who is the founder of (ALF Emirate Gold Refinery DMCC) made a fixed deposit with my bank in January 2009 for 36 calendar months, valued at (US$37,500,000)Thirty Seven Million,Five Hundred Thousand United State Dollars Only,The due date for this deposit contract was the 2nd of April 2012,He met his untimely death in the Japan earthquake and tsunami Friday 11 March 2011 on a business trip.
-
-My bank management is yet to know about his death, I knew about it because he was my friend and I was his Account Officer and he did not mention any Next of Kin/ Heir when the account was opened,he was a widowed and no children,I am seeking your co-operation to present you as the Next of Kin/ Heir to the account, since you are a foreigner and my bank  will release the funds to you,There is no risk involved, the transaction will be executed under a legitimate arrangement that will protect us from any breach of law,I am not a greedy person, so I am suggesting we share the funds in this ratio, 50/50% ,Let me know your mind on this and please do treat this information highly confidential, We shall go over the details once I receive your urgent response.
-
-Anticipating your response
-
-Sincerely Yours
-Abdul Kareem
+DQoNCj4gT24gQXByIDEsIDIwMjAsIGF0IDI6MzMgQU0sIEJvcmlzbGF2IFBldGtvdiA8YnBAYWxp
+ZW44LmRlPiB3cm90ZToNCj4gDQo+IE9uIFR1ZSwgTWFyIDMxLCAyMDIwIGF0IDEwOjM5OjExUE0g
+LTA3MDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IEZyb206IE5pY2sgVGVycmVsbCA8dGVycmVs
+bG5AZmIuY29tPg0KPj4gDQo+PiBCdW1wIHRoZSBaT196X2V4dHJhX2J5dGVzIG1hcmdpbiBmb3Ig
+enN0ZC4NCj4+IA0KPj4gWnN0ZCBuZWVkcyAzIGJ5dGVzIHBlciAxMjggS0IsIGFuZCBoYXMgYSAy
+MiBieXRlIGZpeGVkIG92ZXJoZWFkLg0KPj4gWnN0ZCBuZWVkcyB0byBtYWludGFpbiAxMjggS0Ig
+b2Ygc3BhY2UgYXQgYWxsIHRpbWVzLCBzaW5jZSB0aGF0IGlzDQo+PiB0aGUgbWF4aW11bSBibG9j
+ayBzaXplLiBTZWUgdGhlIGNvbW1lbnRzIHJlZ2FyZGluZyBpbi1wbGFjZQ0KPj4gZGVjb21wcmVz
+c2lvbiBhZGRlZCBpbiBsaWIvZGVjb21wcmVzc191bnpzdGQuYyBmb3IgZGV0YWlscy4NCj4+IA0K
+Pj4gUmV2aWV3ZWQtYnk6IEtlZXMgQ29vayA8a2Vlc2Nvb2tAY2hyb21pdW0ub3JnPg0KPj4gVGVz
+dGVkLWJ5OiBTZWRhdCBEaWxlayA8c2VkYXQuZGlsZWtAZ21haWwuY29tPg0KPj4gU2lnbmVkLW9m
+Zi1ieTogTmljayBUZXJyZWxsIDx0ZXJyZWxsbkBmYi5jb20+DQo+PiAtLS0NCj4+IGFyY2gveDg2
+L2Jvb3QvaGVhZGVyLlMgfCA4ICsrKysrKystDQo+PiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRp
+b25zKCspLCAxIGRlbGV0aW9uKC0pDQo+PiANCj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9ib290
+L2hlYWRlci5TIGIvYXJjaC94ODYvYm9vdC9oZWFkZXIuUw0KPj4gaW5kZXggOTdkOWI2ZDZjMWFm
+Li5iODIwODc1YzVjOTUgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9ib290L2hlYWRlci5TDQo+
+PiArKysgYi9hcmNoL3g4Ni9ib290L2hlYWRlci5TDQo+PiBAQCAtNTM2LDggKzUzNiwxNCBAQCBw
+cmVmX2FkZHJlc3M6CQkucXVhZCBMT0FEX1BIWVNJQ0FMX0FERFIJIyBwcmVmZXJyZWQgbG9hZCBh
+ZGRyDQo+PiAjIHRoZSBzaXplLWRlcGVuZGVudCBwYXJ0IG5vdyBncm93cyBzbyBmYXN0Lg0KPj4g
+Iw0KPj4gIyBleHRyYV9ieXRlcyA9ICh1bmNvbXByZXNzZWRfc2l6ZSA+PiA4KSArIDY1NTM2DQo+
+PiArIw0KPj4gKyMgWlNURCBjb21wcmVzc2VkIGRhdGEgZ3Jvd3MgYnkgYXQgbW9zdCAzIGJ5dGVz
+IHBlciAxMjhLLCBhbmQgb25seSBoYXMgYSAyMg0KPj4gKyMgYnl0ZSBmaXhlZCBvdmVyaGVhZCBi
+dXQgaGFzIGEgbWF4aW11bSBibG9jayBzaXplIG9mIDEyOEssIHNvIGl0IG5lZWRzIGENCj4+ICsj
+IGxhcmdlciBtYXJnaW4uDQo+PiArIw0KPj4gKyMgZXh0cmFfYnl0ZXMgPSAodW5jb21wcmVzc2Vk
+X3NpemUgPj4gOCkgKyAxMzEwNzINCj4+IA0KPj4gLSNkZWZpbmUgWk9fel9leHRyYV9ieXRlcwko
+KFpPX3pfb3V0cHV0X2xlbiA+PiA4KSArIDY1NTM2KQ0KPj4gKyNkZWZpbmUgWk9fel9leHRyYV9i
+eXRlcwkoKFpPX3pfb3V0cHV0X2xlbiA+PiA4KSArIDEzMTA3MikNCj4+ICNpZiBaT196X291dHB1
+dF9sZW4gPiBaT196X2lucHV0X2xlbg0KPj4gIyBkZWZpbmUgWk9fel9leHRyYWN0X29mZnNldAko
+Wk9fel9vdXRwdXRfbGVuICsgWk9fel9leHRyYV9ieXRlcyAtIFwNCj4+IAkJCQkgWk9fel9pbnB1
+dF9sZW4pDQo+PiAtLSANCj4gDQo+IFNvIHdoeSBpcyB0aGlzIGNoYW5nZSB1bmNvbmRpdGlvbmFs
+IGlmIG9ubHkgdGhpcyBjb21wcmVzc2lvbiBhbGcuIG5lZWRzDQo+IGl0Pw0KDQpUaGUgY29kZSBp
+cyBjdXJyZW50bHkgd3JpdHRlbiBzbyB0aGF0IGFsbCB0aGUgY29tcHJlc3Npb24gYWxnb3JpdGht
+cyB1c2UgdGhlDQpzYW1lIFpPX3pfZXh0cmFfYnl0ZXMuIEl0IGlzIHRha2VuIHRvIGJlIHRoZSBt
+YXhpbXVtIG9mIHRoZSBncm93dGggcmF0ZQ0KcGx1cyB0aGUgbWF4aW11bSBmaXhlZCBvdmVyaGVh
+ZC4gSnVzdCBhIGZldyBsaW5lcyBhYm92ZSBpcyB0aGUgY29tbWVudDoNCg0KIyDigKYgSGVuY2Ug
+c2FmZXR5DQojIG1hcmdpbiBzaG91bGQgYmUgdXBkYXRlZCB0byBjb3ZlciBhbGwgZGVjb21wcmVz
+c29ycyBzbyB0aGF0IHdlIGRvbid0DQojIG5lZWQgdG8gZGVhbCB3aXRoIGVhY2ggb2YgdGhlbSBz
+ZXBhcmF0ZWx5LiBQbGVhc2UgY2hlY2sNCiMgdGhlIGRlc2NyaXB0aW9uIGluIGxpYi9kZWNvbXBy
+ZXNzb3JfeHh4LmMgZm9yIHNwZWNpZmljIGluZm9ybWF0aW9uLg0KDQpTbyBJIHdhcyBiZWVuIGZv
+bGxvd2luZyB0aGUgZ3VpZGFuY2UgaW4gdGhlIGNvbW1lbnRzLiBJZiB3ZSB3YW50IHRvIHJlZmFj
+dG9yDQppdCB0byBoYW5kbGUgZWFjaCBjb21wcmVzc29yIGluZGl2aWR1YWxseSB3ZSBjb3VsZCBt
+YWtlIFpPX3pfZXh0cmFfYnl0ZXMNCnNtYWxsZXIgZm9yIG1vc3QgYWxnb3JpdGhtcy4NCg0KRG9l
+cyBpdCBtYXR0ZXI/IEnigJltIG5vdCBhbiBleHBlcnQgaGVyZSwgYnV0IGl0IHNlZW1zIHRvIG1l
+IHRoYXQgcmVxdWlyaW5nIGFuDQpleHRyYSA2NCBLQiBvZiBSQU0gZm9yIGtlcm5lbCBkZWNvbXBy
+ZXNzaW9uIGlzbuKAmXQgc3VjaCBhbiBvbmVyb3VzIGFkZGl0aW9uLg0KDQpCZXN0LA0KTmljaw0K
+DQo=
