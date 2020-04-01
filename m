@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38636 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731589AbgDAFis (ORCPT
+Received: from mail-pg1-f173.google.com ([209.85.215.173]:44731 "EHLO
+        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731589AbgDAFiy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Apr 2020 01:38:48 -0400
+        Wed, 1 Apr 2020 01:38:54 -0400
 From: Nick Terrell <nickrterrell@gmail.com>
-Subject: [PATCH v4 4/8] init: add support for zstd compressed kernel
-Date: Tue, 31 Mar 2020 22:39:09 -0700
-Message-Id: <20200401053913.216783-5-nickrterrell@gmail.com>
+Subject: [PATCH v4 5/8] usr: add support for zstd compressed initramfs
+Date: Tue, 31 Mar 2020 22:39:10 -0700
+Message-Id: <20200401053913.216783-6-nickrterrell@gmail.com>
 In-Reply-To: <20200401053913.216783-1-nickrterrell@gmail.com>
 References: <20200401053913.216783-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
@@ -19,83 +19,78 @@ Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.ke
 
 From: Nick Terrell <terrelln@fb.com>
 
-* Adds the zstd cmd to scripts/Makefile.lib
-* Adds the HAVE_KERNEL_ZSTD and KERNEL_ZSTD options
+* Add support for a zstd compressed initramfs.
+* Add compression for compressing built-in initramfs with zstd.
 
-Architecture specific support is still needed for decompression.
+I have tested this patch by boot testing with buildroot and QEMU.
+Specifically, I booted the kernel with both a zstd and gzip compressed
+initramfs, both built into the kernel and separate. I ensured that the
+correct compression algorithm was used. I tested on arm, aarch64, i386,
+and x86_64.
+
+This patch has been tested in production on aarch64 and x86_64 devices.
+
+Additionally, I have performance measurements from internal use in
+production. On an aarch64 device we saw 19 second boot time improvement
+from switching from lzma to zstd (27 seconds to 8 seconds). On an x86_64
+device we saw a 9 second boot time reduction from switching from xz to
+zstd.
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
 Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
- init/Kconfig         | 15 ++++++++++++++-
- scripts/Makefile.lib | 15 +++++++++++++++
- 2 files changed, 29 insertions(+), 1 deletion(-)
+ usr/Kconfig  | 20 ++++++++++++++++++++
+ usr/Makefile |  1 +
+ 2 files changed, 21 insertions(+)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 20a6ac33761c..9b646a25918e 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -173,13 +173,16 @@ config HAVE_KERNEL_LZO
- config HAVE_KERNEL_LZ4
- 	bool
+diff --git a/usr/Kconfig b/usr/Kconfig
+index bdf5bbd40727..43aca37d09b5 100644
+--- a/usr/Kconfig
++++ b/usr/Kconfig
+@@ -100,6 +100,15 @@ config RD_LZ4
+ 	  Support loading of a LZ4 encoded initial ramdisk or cpio buffer
+ 	  If unsure, say N.
  
-+config HAVE_KERNEL_ZSTD
-+	bool
++config RD_ZSTD
++	bool "Support initial ramdisk/ramfs compressed using ZSTD"
++	default y
++	depends on BLK_DEV_INITRD
++	select DECOMPRESS_ZSTD
++	help
++	  Support loading of a ZSTD encoded initial ramdisk or cpio buffer.
++	  If unsure, say N.
 +
- config HAVE_KERNEL_UNCOMPRESSED
- 	bool
- 
  choice
- 	prompt "Kernel compression mode"
- 	default KERNEL_GZIP
--	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_UNCOMPRESSED
-+	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_ZSTD || HAVE_KERNEL_UNCOMPRESSED
- 	help
- 	  The linux kernel is a kind of self-extracting executable.
- 	  Several compression algorithms are available, which differ
-@@ -258,6 +261,16 @@ config KERNEL_LZ4
- 	  is about 8% bigger than LZO. But the decompression speed is
- 	  faster than LZO.
+ 	prompt "Built-in initramfs compression mode"
+ 	depends on INITRAMFS_SOURCE != ""
+@@ -207,4 +216,15 @@ config INITRAMFS_COMPRESSION_LZ4
+ 	  If you choose this, keep in mind that most distros don't provide lz4
+ 	  by default which could cause a build failure.
  
-+config KERNEL_ZSTD
++config INITRAMFS_COMPRESSION_ZSTD
 +	bool "ZSTD"
-+	depends on HAVE_KERNEL_ZSTD
++	depends on RD_ZSTD
 +	help
 +	  ZSTD is a compression algorithm targeting intermediate compression
 +	  with fast decompression speed. It will compress better than GZIP and
-+	  decompress around the same speed as LZO, but slower than LZ4. You
-+	  will need at least 192 KB RAM or more for booting. The zstd command
-+	  line tools is required for compression.
++	  decompress around the same speed as LZO, but slower than LZ4.
 +
- config KERNEL_UNCOMPRESSED
- 	bool "None"
- 	depends on HAVE_KERNEL_UNCOMPRESSED
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 752ff0a225a9..4b99893efa3d 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -394,6 +394,21 @@ quiet_cmd_xzkern = XZKERN  $@
- quiet_cmd_xzmisc = XZMISC  $@
-       cmd_xzmisc = cat $(real-prereqs) | xz --check=crc32 --lzma2=dict=1MiB > $@
++	  If you choose this, keep in mind that you may need to install the zstd
++	  tool to be able to compress the initram.
++
+ endchoice
+diff --git a/usr/Makefile b/usr/Makefile
+index c12e6b15ce72..b1a81a40eab1 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -15,6 +15,7 @@ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZMA)	:= lzma
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_XZ)	:= xzmisc
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZO)	:= lzo
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZ4)	:= lz4
++compress-$(CONFIG_INITRAMFS_COMPRESSION_ZSTD)	:= zstd
  
-+# ZSTD
-+# ---------------------------------------------------------------------------
-+# Appends the uncompressed size of the data using size_append. The .zst
-+# format has the size information available at the beginning of the file too,
-+# but it's in a more complex format and it's good to avoid changing the part
-+# of the boot code that reads the uncompressed size.
-+# Note that the bytes added by size_append will make the zstd tool think that
-+# the file is corrupt. This is expected.
-+
-+quiet_cmd_zstd = ZSTD    $@
-+cmd_zstd = (cat $(filter-out FORCE,$^) | \
-+	zstd -19 && \
-+        $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-+	(rm -f $@ ; false)
-+
- # ASM offsets
- # ---------------------------------------------------------------------------
+ obj-$(CONFIG_BLK_DEV_INITRD) := initramfs_data.o
  
 -- 
 2.26.0
