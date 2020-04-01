@@ -1,62 +1,172 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34482 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727627AbgDAKAf (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51801 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726974AbgDAK7i (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Apr 2020 06:00:35 -0400
+        Wed, 1 Apr 2020 06:59:38 -0400
+From: Gabriel C <nix.or.die@googlemail.com>
+Subject: Re: [PATCH v4 0/8] Add support for ZSTD-compressed kernel and
+ initramfs
+References: <20200401053913.216783-1-nickrterrell@gmail.com>
+Message-ID: <e16e279f-d220-3fab-5a11-05829f34f1f7@gmail.com>
+Date: Wed, 1 Apr 2020 12:59:29 +0200
 MIME-Version: 1.0
-References: <CA+icZUXCn2an9aNDrm+-eneSAOyGibz0W1xYhwkA5k3B3U-5vQ@mail.gmail.com>
- <1A630698-E385-4CDF-9755-ACDAAF60DBB9@fb.com> <CA+icZUWBJz6765Szg65HcOfhDh9tyoarJTnZ_kmahqvB5QKU=g@mail.gmail.com>
- <5F9D2C8D-B1DE-4F95-992E-524E02851CF4@fb.com> <20200401072725.GB27371@angband.pl>
-In-Reply-To: <20200401072725.GB27371@angband.pl>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Wed, 1 Apr 2020 12:00:35 +0200
-Message-ID: <CA+icZUXufL22Fp7ge9uzZ7K5K2MfX-C+HJcDcr06KKNYQOBXoA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/8] Add support for ZSTD-compressed kernel and initramfs
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200401053913.216783-1-nickrterrell@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Nick Terrell <terrelln@fb.com>, Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Nick Desaulniers <ndesaulniers@google.com>
+To: Nick Terrell <nickrterrell@gmail.com>, Nick Terrell <terrelln@fb.com>
+Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Wed, Apr 1, 2020 at 9:27 AM Adam Borowski <kilobyte@angband.pl> wrote:
+
+On 01.04.20 07:39, Nick Terrell wrote:
+> From: Nick Terrell <terrelln@fb.com>
 >
-> On Wed, Apr 01, 2020 at 02:52:06AM +0000, Nick Terrell wrote:
-> > > On Mar 31, 2020, at 8:11 AM, Sedat Dilek <sedat.dilek@gmail.com> wrot=
-e:
-> > > On Tue, Mar 31, 2020 at 6:15 AM Nick Terrell <terrelln@fb.com> wrote:
+> Hi all,
 
-[...]
 
-> > I don=E2=80=99t expect any distro specific changes are required to cont=
-inue operating
-> > as-is. However, if a distro wanted to switch to a zstd compressed initr=
-amfs
-> > they would need to update their toolchain to compress with zstd.
+Hi Nick,
+
+
+> This patch set adds support for a ZSTD-compressed kernel, ramdisk, and
+> initramfs in the kernel boot process. ZSTD-compressed ramdisk and initramfs
+> are supported on all architectures. The ZSTD-compressed kernel is only
+> hooked up to x86 in this patch set.
 >
-> Just setting COMPRESS=3Dzstd is enough -- it'll say:
-> W: Unknown compression command zstd
-> but will do everything right.
+> Zstandard requires slightly more memory during the kernel decompression
+> on x86 (192 KB vs 64 KB), and the memory usage is independent of the
+> window size.
 >
-> Also, just minutes ago someone filed https://bugs.debian.org/955469
+> Zstandard requires memory proprortional to the window size used during
+> compression for decompressing the ramdisk image, since streaming mode is
+> used. Newer versions of zstd (1.3.2+) list the window size of a file
+> with `zstd -lv <file>'. The absolute maximum amount of memory required
+> is just over 8 MB, but it can be controlled at compression time.
 >
+> This patch set has been boot tested with buildroot and QEMU based off
+> of linux-5.6-rc6.
+>
+> On i386 and x86_64 I have tested the following configurations:
+> * zstd compressed kernel and a separate zstd compressed initramfs
+> * zstd compressed kernel and a built-in zstd compressed initramfs
+> * gzip compressed kernel and a separate gzip compressed initramfs
+> * gzip compressed kernel and a built-in gzip compressed initramfs
 
-Hi Adam,
 
-thanks for your feedback and the pointer to the Debian bug #955469.
+I tested this and already v2 and v3 on some boxes without a problem.
 
-With "distro-specific changes" I meant the ones to userland - for
-Debian - namely initramfs-tools{,-core} packages.
-For generating, inspecting and unpacking an initramfs the Debian way
-you need a bit more.
 
-In the Bug-BR a patch called "enable_zstd.patch" is attached - seems
-to have all what I mentioned in [1].
+Also I've tested :
 
-Regards,
-- Sedat -
+XZ compressed kernel ZSTD compressed initramfs ( XZ compressed modules )
 
-[1] LINK: https://lore.kernel.org/lkml/CA+icZUXCn2an9aNDrm+-eneSAOyGibz0W1x=
-YhwkA5k3B3U-5vQ@mail.gmail.com/
+XZ compressed kernel ZSTD compressed initramfs ( ZSTD compressed modules 
+, that need an kmod patch )
+
+ZSTD compressed kernel ZSTD compressed initramfs ( ZSTD compressed 
+modules, that need an kmod patch )
+
+ZSTD compressed kernel XZ compressed initramfs ( ZSTD/XZ compressed 
+modules )
+
+
+> On arm and aarch64 I tested the same configurations, except that the kernel is
+> always gzip compressed.
+>
+> Facebook has been using v1 of these patches on x86_64 devices for more than 6
+> months. When we switched from a xz compressed initramfs to a zstd compressed
+> initramfs decompression time shrunk from 12 seconds to 3 seconds. When we
+> switched from a xz compressed kernel to a zstd compressed kernel we saved 2
+> seconds of boot time.
+
+
+I can confirm that on my server I tested the patches decompression went 
+down
+
+6 secs and 3.1 seconds faster boot time with zstd compressed kernel.
+
+
+Also I see around 2++seconds faster boot across all testing boxes.
+
+
+> Facebook has been using v2 of these patches on aarch64 devices for a few weeks.
+> When we switched from an lzma compressed initramfs to a zstd compressed initramfs
+> decompression time shrunk from 27 seconds to 8 seconds.
+>
+> The zstd compressed kernel is smaller than the gzip compressed kernel but larger
+> than the xz or lzma compressed kernels, and it decompresses faster than
+> everything except lz4. See the table below for the measurement of an x86_64
+> kernel ordered by compressed size:
+>
+> algo	size
+> xz  	 6,509,792
+> lzma	 6,856,576
+> zstd	 7,399,157
+> gzip	 8,522,527
+> bzip	 8,629,603
+> lzo 	 9,808,035
+> lz4 	10,705,570
+> none	32,565,672
+>
+> v1 -> v2:
+> - Rebase
+>    - usr/Makefile and init/Kconfig were changed so the patches were updated
+> - No functional changes except to rebase
+> - Split the patches up into smaller chunks
+>
+> v2 -> v3:
+> - Add *.zst to the .gitignore in patch 8
+> - Style nits in patch 3
+> - Rename the PREBOOT macro to ZSTD_PREBOOT and XXH_PREBOOT in patches
+>    1 through 3
+>
+> v3 -> v4:
+> - Increase the ZSTD_IOBUF_SIZE from 4KB to 128KB to improve performance.
+>    With this change I switch from malloc() to large_malloc() for the
+>    buffers.
+> - Increase the maximum allowed window size from 8 MB to 128 MB, which is
+>    the max that zstd in the kernel supports.
+
+Tested-by: Gabriel Craciunescu <nix.or.die@gmail.com>
+
+> Best,
+> Nick Terrell
+>
+> Adam Borowski (1):
+>    .gitignore: add ZSTD-compressed files//
+>
+> Nick Terrell (7):
+>    lib: prepare zstd for preboot environment
+>    lib: prepare xxhash for preboot environment
+>    lib: add zstd support to decompress
+>    init: add support for zstd compressed kernel
+>    usr: add support for zstd compressed initramfs
+>    x86: bump ZO_z_extra_bytes margin for zstd
+>    x86: Add support for ZSTD compressed kernel
+>
+>   .gitignore                        |   1 +
+>   Documentation/x86/boot.rst        |   6 +-
+>   arch/x86/Kconfig                  |   1 +
+>   arch/x86/boot/compressed/Makefile |   5 +-
+>   arch/x86/boot/compressed/misc.c   |   4 +
+>   arch/x86/boot/header.S            |   8 +-
+>   arch/x86/include/asm/boot.h       |   6 +-
+>   include/linux/decompress/unzstd.h |  11 +
+>   init/Kconfig                      |  15 +-
+>   lib/Kconfig                       |   4 +
+>   lib/Makefile                      |   1 +
+>   lib/decompress.c                  |   5 +
+>   lib/decompress_unzstd.c           | 342 ++++++++++++++++++++++++++++++
+>   lib/xxhash.c                      |  21 +-
+>   lib/zstd/decompress.c             |   2 +
+>   lib/zstd/fse_decompress.c         |   9 +-
+>   lib/zstd/zstd_internal.h          |  14 +-
+>   scripts/Makefile.lib              |  15 ++
+>   usr/Kconfig                       |  20 ++
+>   usr/Makefile                      |   1 +
+>   20 files changed, 464 insertions(+), 27 deletions(-)
+>   create mode 100644 include/linux/decompress/unzstd.h
+>   create mode 100644 lib/decompress_unzstd.c
+>
