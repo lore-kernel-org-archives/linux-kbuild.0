@@ -1,112 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:36074 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727734AbgDBSWP (ORCPT
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:45056 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389212AbgDBSbL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 14:22:15 -0400
-Received: by mail-vk1-f195.google.com with SMTP id m131so1224271vkh.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 11:22:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <202004020117.6E434C035@keescook> <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
-In-Reply-To: <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 2 Apr 2020 11:22:02 -0700
-Message-ID: <CAKwvOdnO_-jiQzCmy7pQNMGmZsgD9J=PYXVzOQ1NF1+u44MsOA@mail.gmail.com>
+        Thu, 2 Apr 2020 14:31:11 -0400
+Received: by mail-pl1-f196.google.com with SMTP id t4so1644403plq.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 11:31:10 -0700 (PDT)
+Date: Thu, 2 Apr 2020 11:31:08 -0700
+From: Kees Cook <keescook@chromium.org>
 Subject: Re: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <202004021129.F688E2D@keescook>
+References: <202004020117.6E434C035@keescook>
+ <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
+ <CAKwvOdnO_-jiQzCmy7pQNMGmZsgD9J=PYXVzOQ1NF1+u44MsOA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdnO_-jiQzCmy7pQNMGmZsgD9J=PYXVzOQ1NF1+u44MsOA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sandeep Patil <sspatil@google.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sandeep Patil <sspatil@google.com>
 
-On Thu, Apr 2, 2020 at 10:02 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Hi Kees,
->
-> On Thu, Apr 2, 2020 at 5:18 PM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > When doing Clang builds of the kernel, it is possible to link with
-> > either ld.bfd (binutils) or ld.lld (LLVM), but it is not possible to
-> > discover this from a running kernel. Add the "$LD -v" output to
-> > /proc/version.
-> >
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > ---
-> >  init/Makefile       | 2 +-
-> >  scripts/mkcompile_h | 8 ++++++--
-> >  2 files changed, 7 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/init/Makefile b/init/Makefile
-> > index 6246a06364d0..82c15bdb42d7 100644
-> > --- a/init/Makefile
-> > +++ b/init/Makefile
-> > @@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
-> >         @$($(quiet)chk_compile.h)
-> >         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@   \
-> >         "$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"    \
-> > -       "$(CONFIG_PREEMPT_RT)" "$(CC) $(KBUILD_CFLAGS)"
-> > +       "$(CONFIG_PREEMPT_RT)" "$(LD)" "$(CC) $(KBUILD_CFLAGS)"
-> > diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-> > index 3a5a4b210c86..f98c07709370 100755
-> > --- a/scripts/mkcompile_h
-> > +++ b/scripts/mkcompile_h
-> > @@ -6,7 +6,8 @@ ARCH=$2
-> >  SMP=$3
-> >  PREEMPT=$4
-> >  PREEMPT_RT=$5
-> > -CC=$6
-> > +LD=$6
-> > +CC=$7
->
->
-> Just a nit.
->
-> If you just append 'LD',
-> you do not need to touch the 'CC=$6' line.
->
->
-> If you do not mind, I will fold the following
-> on top of your patch.
+On Thu, Apr 02, 2020 at 11:22:02AM -0700, Nick Desaulniers wrote:
+> With Kees patch + Masahiro's diff applied:
+> $ cat /proc/version
+> Linux version 5.6.0-rc7-next-20200330+ (ndesaulniers@<hostname
+> scrubbed>) (clang version 11.0.0 (git@github.com:llvm/llvm-project.git
+> 6d71daed03ced011cd25f4e4f4122a368fdc757d), LLD 11.0.0
+> (git@github.com:llvm/llvm-project.git
+> 6d71daed03ced011cd25f4e4f4122a368fdc757d)) #167 SMP Thu Apr 2 11:17:36
+> PDT 2020
+> 
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 
-With Kees patch + Masahiro's diff applied:
-$ cat /proc/version
-Linux version 5.6.0-rc7-next-20200330+ (ndesaulniers@<hostname
-scrubbed>) (clang version 11.0.0 (git@github.com:llvm/llvm-project.git
-6d71daed03ced011cd25f4e4f4122a368fdc757d), LLD 11.0.0
-(git@github.com:llvm/llvm-project.git
-6d71daed03ced011cd25f4e4f4122a368fdc757d)) #167 SMP Thu Apr 2 11:17:36
-PDT 2020
+Awesome! Thanks for testing. :)
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+> We could actually use this in Android for a VTS test I've, uh, been
+> meaning to write.  Also, LOL at scrubbing the "compatible with" part,
+> reminds me of user agent strings in the browser, which are god awful.
 
-We could actually use this in Android for a VTS test I've, uh, been
-meaning to write.  Also, LOL at scrubbing the "compatible with" part,
-reminds me of user agent strings in the browser, which are god awful.
+Heh, yeah. That's there because (actually, I think _you_ told me this
+when I asked during the ClangBuiltLinux summit) other tools scanned the
+LD version string for the binutils-specific bits. For this, since it's
+newly added to the kernel /proc/version, nothing is already expecting to
+find an LD string, and it looked super weird in there if I left it
+as-is. Hence, scrub!
 
-
-> --- a/init/Makefile
-> +++ b/init/Makefile
-> @@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
->         @$($(quiet)chk_compile.h)
->         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@   \
->         "$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"    \
-> -       "$(CONFIG_PREEMPT_RT)" "$(LD)" "$(CC) $(KBUILD_CFLAGS)"
-> +       "$(CONFIG_PREEMPT_RT)" "$(CC) $(KBUILD_CFLAGS)" "$(LD)"
-> diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-> index 8b38a96163e2..5b80a4699740 100755
-> --- a/scripts/mkcompile_h
-> +++ b/scripts/mkcompile_h
-> @@ -6,8 +6,8 @@ ARCH=$2
->  SMP=$3
->  PREEMPT=$4
->  PREEMPT_RT=$5
-> -LD=$6
-> -CC=$7
-> +CC=$6
-> +LD=$7
-
+-Kees
 
 -- 
-Thanks,
-~Nick Desaulniers
+Kees Cook
