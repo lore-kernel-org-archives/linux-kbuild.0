@@ -1,67 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48560 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49264 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725965AbgDBJ2A (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 05:28:00 -0400
-Date: Thu, 2 Apr 2020 11:27:47 +0200
+        id S2387734AbgDBJ2J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Apr 2020 05:28:09 -0400
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: Re: [PATCH 0/4] media Kconfig reorg - part 2
-Message-ID: <20200402112747.57dd1cfe@coco.lan>
-In-Reply-To: <20200401105949.GB2001@kadam>
-References: <cover.1585151701.git.mchehab+huawei@kernel.org>
- <6fadc6ea-8512-03ba-da30-43c64d7562f6@collabora.com>
- <20200401105949.GB2001@kadam>
+Subject: [PATCH 6/6] kconfig: qconf: Fix a few alignment issues
+Date: Thu,  2 Apr 2020 11:28:03 +0200
+Message-Id: <e1d57b9e1dca8680b32744920642ab27aec14ad7.1585819250.git.mchehab+huawei@kernel.org>
+In-Reply-To: <cover.1585819250.git.mchehab+huawei@kernel.org>
+References: <cover.1585819250.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Helen Koike <helen.koike@collabora.com>, Linux Media Mailing List <linux-media@vger.kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Sylwester Nawrocki <s.nawrocki@samsung.com>, Michal Simek <michal.simek@xilinx.com>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Pavel Machek <pavel@ucw.cz>, devel@driverdev.osuosl.org, linux-renesas-soc@vger.kernel.org, linux-samsung-soc@vger.kernel.org, Ludovic Desroches <ludovic.desroches@microchip.com>, Krzysztof Kozlowski <krzk@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Kukjin Kim <kgene@kernel.org>, NXP Linux Team <linux-imx@nxp.com>, Steve Longerbeam <slongerbeam@gmail.com>, Bingbu Cao <bingbu.cao@intel.com>, Tian Shu Qiu <tian.shu.qiu@intel.com>, Yong Zhi <yong.zhi@intel.com>, Philipp Zabel <p.zabel@pengutronix.de>, Sakari Ailus <sakari.ailus@linux.intel.com>, Sascha Hauer <s.hauer@pengutronix.de>, Maxime Ripard <mripard@kernel.org>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?= <niklas.soderlund@ragnatech.se>, Yong Deng <yong.deng@magewell.com>, Ezequiel Garcia <ezequiel@collabora.com>, linux-arm-kernel@lists.infradead.org, Hyun Kwon <hyun.kwon@xilinx.com>, Heungjun Kim <riverful.kim@samsung.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Paul Kocialkowski <paul.kocialkowski@bootlin.com>, Kyungmin Park <kyungmin.park@samsung.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Hans Verkuil <hverkuil-cisco@xs4all.nl>, Shawn Guo <shawnguo@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Dan Carpenter <dan.carpenter@oracle.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
 
-Em Wed, 1 Apr 2020 13:59:49 +0300
-Dan Carpenter <dan.carpenter@oracle.com> escreveu:
+There are a few items with wrong alignments. Solve them.
 
-> On Wed, Mar 25, 2020 at 04:36:31PM -0300, Helen Koike wrote:
-> > Hello,
-> > 
-> > On 3/25/20 1:03 PM, Mauro Carvalho Chehab wrote:  
-> > > That's the second part of media Kconfig changes. The entire series is
-> > > at:
-> > > 
-> > > 	https://git.linuxtv.org/mchehab/experimental.git/log/?h=media-kconfig  
-> > 
-> > I made a quick experiment (using this branch) with someone who works
-> > with the kernel for his master degree, but doesn't have much experience in kernel development in general.
-> > I asked him to enable Vimc (from default configs, where multimedia starts disabled).  
-> 
-> The whole config system is really outdated.
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ scripts/kconfig/qconf.cc | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-Agreed. 
-
-Btw, when compiled against Qt 5.14, "make xconfig" is currently
-broken. I'm sending in a few some fixup patches for it.
-
-> It should be that this task was done with a command like "kconfig enable
-> vimc".  It would ask necessary questions and pull in the dependencies
-> automatically.
-
-Yes. That's something that it is missing for a long time. There were
-some efforts to add a SAT solver at the Kernel that could be used for
-that, but I dunno what's current status.
-
-> Twenty years ago it made sense to go through the menus and select things
-> one by one.  Does anyone really start from defconfig any more?  Surely
-> everyone starts with a known working config and just enables specific
-> options.
-
-Yeah, that's my feeling too.
-
-> I started to hack together some code to create a kconfig program to
-> enable and disable options.  The problem is that all library code
-> assumes we want to display menus so it was a lot of work and I gave up.
-
-:-(
-
-Thanks,
-Mauro
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index f3eaeb2b70da..84976b9d2174 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -635,7 +635,7 @@ void ConfigList::updateMenuList(ConfigItem *parent, struct menu* menu)
+ 			last = item;
+ 			continue;
+ 		}
+-	hide:
++hide:
+ 		if (item && item->menu == child) {
+ 			last = parent->firstChild();
+ 			if (last == item)
+@@ -700,7 +700,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
+ 			last = item;
+ 			continue;
+ 		}
+-	hide:
++hide:
+ 		if (item && item->menu == child) {
+ 			last = (ConfigItem*)parent->topLevelItem(0);
+ 			if (last == item)
+@@ -1239,10 +1239,11 @@ QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
+ {
+ 	QMenu* popup = Parent::createStandardContextMenu(pos);
+ 	QAction* action = new QAction("Show Debug Info", popup);
+-	  action->setCheckable(true);
+-	  connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
+-	  connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
+-	  action->setChecked(showDebug());
++
++	action->setCheckable(true);
++	connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
++	connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
++	action->setChecked(showDebug());
+ 	popup->addSeparator();
+ 	popup->addAction(action);
+ 	return popup;
+-- 
+2.25.1
