@@ -1,69 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41622 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388908AbgDBR0l (ORCPT
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:37081 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389875AbgDBRdc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 13:26:41 -0400
-Received: by mail-pg1-f196.google.com with SMTP id b1so2137620pgm.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 10:26:40 -0700 (PDT)
-Date: Thu, 2 Apr 2020 10:26:38 -0700
+        Thu, 2 Apr 2020 13:33:32 -0400
+Received: by mail-pf1-f196.google.com with SMTP id u65so2081764pfb.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 10:33:31 -0700 (PDT)
+Date: Thu, 2 Apr 2020 10:33:28 -0700
 From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 0/9] Enable orphan section warning
-Message-ID: <202004021023.D3D8AA3BE@keescook>
-References: <20200228002244.15240-1-keescook@chromium.org>
- <CA+icZUWTnP8DYfbaMwKtJbG30v7bB4w6=ywo8gn8fvwr731mUQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
+Message-ID: <202004021031.511103E30D@keescook>
+References: <202004020117.6E434C035@keescook>
+ <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+icZUWTnP8DYfbaMwKtJbG30v7bB4w6=ywo8gn8fvwr731mUQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Borislav Petkov <bp@suse.de>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Apr 02, 2020 at 06:20:57PM +0200, Sedat Dilek wrote:
-> On Fri, Feb 28, 2020 at 1:22 AM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > Hi!
-> >
-> > A recent bug was solved for builds linked with ld.lld, and tracking
-> > it down took way longer than it needed to (a year). Ultimately, it
-> > boiled down to differences between ld.bfd and ld.lld's handling of
-> > orphan sections. Similarly, the recent FGKASLR series brough up orphan
-> > section handling too[2]. In both cases, it would have been nice if the
-> > linker was running with --orphan-handling=warn so that surprise sections
-> > wouldn't silently get mapped into the kernel image at locations up to
-> > the whim of the linker's orphan handling logic. Instead, all desired
-> > sections should be explicitly identified in the linker script (to be
-> > either kept or discarded) with any orphans throwing a warning. The
-> > powerpc architecture actually already does this, so this series seeks
-> > to extend this coverage to x86, arm64, and arm.
-> >
-> > This series depends on tip/x86/boot (where recent .eh_frame fixes[3]
-> > landed), and has a minor conflict[4] with the ARM tree (related to
-> > the earlier mentioned bug). As it uses refactorings in the asm-generic
-> > linker script, and makes changes to kbuild, I think the cleanest place
-> > for this series to land would also be through -tip. Once again (like
-> > my READ_IMPLIES_EXEC series), I'm looking to get maintainer Acks so
-> > this can go all together with the least disruption. Splitting it up by
-> > architecture seems needlessly difficult.
-> >
-> > Thanks!
-> >
-> 
+On Fri, Apr 03, 2020 at 02:00:52AM +0900, Masahiro Yamada wrote:
 > Hi Kees,
 > 
-> what is the status of this patchset?
-> Looks like it is not in tip or linux-next Git.
+> On Thu, Apr 2, 2020 at 5:18 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > When doing Clang builds of the kernel, it is possible to link with
+> > either ld.bfd (binutils) or ld.lld (LLVM), but it is not possible to
+> > discover this from a running kernel. Add the "$LD -v" output to
+> > /proc/version.
+> >
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  init/Makefile       | 2 +-
+> >  scripts/mkcompile_h | 8 ++++++--
+> >  2 files changed, 7 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/init/Makefile b/init/Makefile
+> > index 6246a06364d0..82c15bdb42d7 100644
+> > --- a/init/Makefile
+> > +++ b/init/Makefile
+> > @@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
+> >         @$($(quiet)chk_compile.h)
+> >         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@   \
+> >         "$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"    \
+> > -       "$(CONFIG_PREEMPT_RT)" "$(CC) $(KBUILD_CFLAGS)"
+> > +       "$(CONFIG_PREEMPT_RT)" "$(LD)" "$(CC) $(KBUILD_CFLAGS)"
+> > diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+> > index 3a5a4b210c86..f98c07709370 100755
+> > --- a/scripts/mkcompile_h
+> > +++ b/scripts/mkcompile_h
+> > @@ -6,7 +6,8 @@ ARCH=$2
+> >  SMP=$3
+> >  PREEMPT=$4
+> >  PREEMPT_RT=$5
+> > -CC=$6
+> > +LD=$6
+> > +CC=$7
+> 
+> 
+> Just a nit.
+> 
+> If you just append 'LD',
+> you do not need to touch the 'CC=$6' line.
 
-Based on the feedback, I have 3 TODO items:
+Oh! Yes, good point. I had convinced myself that the "CC=$6" was dropping
+all the passed-in KBUILD_CFLAGS, but I failed to notice the double quotes.
 
-- track down and eliminate (or explain) the source of the .got.plt on arm64
-- enable orphan warnings for _all_ architectures
-- refactor final link logic to perform the orphan warning in a clean way
+> If you do not mind, I will fold the following
+> on top of your patch.
 
-I'm working through these (and other work) still. I'm hoping to have
-another version up some time next week.
+Yes, that would be great; thanks!
+
+-Kees
+
+> 
+> 
+> 
+> 
+> --- a/init/Makefile
+> +++ b/init/Makefile
+> @@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
+>         @$($(quiet)chk_compile.h)
+>         $(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@   \
+>         "$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"    \
+> -       "$(CONFIG_PREEMPT_RT)" "$(LD)" "$(CC) $(KBUILD_CFLAGS)"
+> +       "$(CONFIG_PREEMPT_RT)" "$(CC) $(KBUILD_CFLAGS)" "$(LD)"
+> diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+> index 8b38a96163e2..5b80a4699740 100755
+> --- a/scripts/mkcompile_h
+> +++ b/scripts/mkcompile_h
+> @@ -6,8 +6,8 @@ ARCH=$2
+>  SMP=$3
+>  PREEMPT=$4
+>  PREEMPT_RT=$5
+> -LD=$6
+> -CC=$7
+> +CC=$6
+> +LD=$7
+> 
+> 
+> 
+> 
+> 
+> 
+> --
+> Best Regards
+> Masahiro Yamada
 
 -- 
 Kees Cook
