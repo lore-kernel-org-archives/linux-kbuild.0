@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49230 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49244 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387721AbgDBJ2I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S2387723AbgDBJ2I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 2 Apr 2020 05:28:08 -0400
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: [PATCH 2/6] kconfig: qconf: Change title for the item window
-Date: Thu,  2 Apr 2020 11:27:59 +0200
-Message-Id: <39c72450d98fc16b735237df296b066c8eebb066.1585819250.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 3/6] kconfig: qconf: fix the content of the main widget
+Date: Thu,  2 Apr 2020 11:28:00 +0200
+Message-Id: <3f87c3c69b198ee3b42b92d5d230c3976115b60e.1585819250.git.mchehab+huawei@kernel.org>
 In-Reply-To: <cover.1585819250.git.mchehab+huawei@kernel.org>
 References: <cover.1585819250.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
@@ -15,45 +15,60 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Dan Carpenter <dan.carpenter@oracle.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
 
-Both main config window and the item window have "Option"
-name. That sounds weird, and makes harder to debug issues
-of a window appearing at the wrong place.
+The port to Qt5 tried to preserve the same way as it used
+to work with Qt3 and Qt4. However, at least with newer
+versions of Qt5 (5.13), this doesn't work properly.
 
-So, change the title to reflect the contents of each
-window.
+Change the schema by adding a vertical layout, in order
+for it to start working properly again.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- scripts/kconfig/qconf.cc | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ scripts/kconfig/qconf.cc | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index daa3325c0a49..2f4971906207 100644
+index 2f4971906207..81ae6c059c1c 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -318,7 +318,10 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 	setVerticalScrollMode(ScrollPerPixel);
- 	setHorizontalScrollMode(ScrollPerPixel);
+@@ -1362,21 +1362,32 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	if ((x.isValid())&&(y.isValid()))
+ 		move(x.toInt(), y.toInt());
  
--	setHeaderLabels(QStringList() << "Option" << "Name" << "N" << "M" << "Y" << "Value");
-+	if (mode == symbolMode)
-+		setHeaderLabels(QStringList() << "Item" << "Name" << "N" << "M" << "Y" << "Value");
-+	else
-+		setHeaderLabels(QStringList() << "Option" << "Name" << "N" << "M" << "Y" << "Value");
- 
- 	connect(this, SIGNAL(itemSelectionChanged(void)),
- 		SLOT(updateSelection(void)));
-@@ -399,6 +402,11 @@ void ConfigList::updateSelection(void)
- 	struct menu *menu;
- 	enum prop_type type;
- 
-+	if (mode == symbolMode)
-+		setHeaderLabels(QStringList() << "Item" << "Name" << "N" << "M" << "Y" << "Value");
-+	else
-+		setHeaderLabels(QStringList() << "Option" << "Name" << "N" << "M" << "Y" << "Value");
+-	split1 = new QSplitter(this);
++	QWidget *widget = new QWidget(this);
++	QVBoxLayout *layout = new QVBoxLayout(widget);
++	setCentralWidget(widget);
 +
- 	if (selectedItems().count() == 0)
- 		return;
++	split1 = new QSplitter(widget);
+ 	split1->setOrientation(Qt::Horizontal);
+-	setCentralWidget(split1);
++	split1->setChildrenCollapsible(false);
  
+-	menuView = new ConfigView(split1, "menu");
++	menuView = new ConfigView(widget, "menu");
+ 	menuList = menuView->list;
+ 
+-	split2 = new QSplitter(split1);
++	split2 = new QSplitter(widget);
++	split2->setChildrenCollapsible(false);
+ 	split2->setOrientation(Qt::Vertical);
+ 
+ 	// create config tree
+-	configView = new ConfigView(split2, "config");
++	configView = new ConfigView(widget, "config");
+ 	configList = configView->list;
+ 
+-	helpText = new ConfigInfoView(split2, "help");
++	helpText = new ConfigInfoView(widget, "help");
++
++	layout->addWidget(split2);
++	split2->addWidget(split1);
++	split1->addWidget(configView);
++	split1->addWidget(menuView);
++	split2->addWidget(helpText);
+ 
+ 	setTabOrder(configList, helpText);
+ 	configList->setFocus();
 -- 
 2.25.1
