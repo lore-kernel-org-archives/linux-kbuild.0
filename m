@@ -1,73 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34645 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387736AbgDBISm (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 04:18:42 -0400
-Received: by mail-pf1-f193.google.com with SMTP id 23so1428608pfj.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 01:18:40 -0700 (PDT)
-Date: Thu, 2 Apr 2020 01:18:37 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
-Message-ID: <202004020117.6E434C035@keescook>
+Received: from mail.kernel.org ([198.145.29.99]:48560 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725965AbgDBJ2A (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Apr 2020 05:28:00 -0400
+Date: Thu, 2 Apr 2020 11:27:47 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: Re: [PATCH 0/4] media Kconfig reorg - part 2
+Message-ID: <20200402112747.57dd1cfe@coco.lan>
+In-Reply-To: <20200401105949.GB2001@kadam>
+References: <cover.1585151701.git.mchehab+huawei@kernel.org>
+ <6fadc6ea-8512-03ba-da30-43c64d7562f6@collabora.com>
+ <20200401105949.GB2001@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Helen Koike <helen.koike@collabora.com>, Linux Media Mailing List <linux-media@vger.kernel.org>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Sylwester Nawrocki <s.nawrocki@samsung.com>, Michal Simek <michal.simek@xilinx.com>, "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Pavel Machek <pavel@ucw.cz>, devel@driverdev.osuosl.org, linux-renesas-soc@vger.kernel.org, linux-samsung-soc@vger.kernel.org, Ludovic Desroches <ludovic.desroches@microchip.com>, Krzysztof Kozlowski <krzk@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Kukjin Kim <kgene@kernel.org>, NXP Linux Team <linux-imx@nxp.com>, Steve Longerbeam <slongerbeam@gmail.com>, Bingbu Cao <bingbu.cao@intel.com>, Tian Shu Qiu <tian.shu.qiu@intel.com>, Yong Zhi <yong.zhi@intel.com>, Philipp Zabel <p.zabel@pengutronix.de>, Sakari Ailus <sakari.ailus@linux.intel.com>, Sascha Hauer <s.hauer@pengutronix.de>, Maxime Ripard <mripard@kernel.org>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?= <niklas.soderlund@ragnatech.se>, Yong Deng <yong.deng@magewell.com>, Ezequiel Garcia <ezequiel@collabora.com>, linux-arm-kernel@lists.infradead.org, Hyun Kwon <hyun.kwon@xilinx.com>, Heungjun Kim <riverful.kim@samsung.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Paul Kocialkowski <paul.kocialkowski@bootlin.com>, Kyungmin Park <kyungmin.park@samsung.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Hans Verkuil <hverkuil-cisco@xs4all.nl>, Shawn Guo <shawnguo@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
 
-When doing Clang builds of the kernel, it is possible to link with
-either ld.bfd (binutils) or ld.lld (LLVM), but it is not possible to
-discover this from a running kernel. Add the "$LD -v" output to
-/proc/version.
+Em Wed, 1 Apr 2020 13:59:49 +0300
+Dan Carpenter <dan.carpenter@oracle.com> escreveu:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- init/Makefile       | 2 +-
- scripts/mkcompile_h | 8 ++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+> On Wed, Mar 25, 2020 at 04:36:31PM -0300, Helen Koike wrote:
+> > Hello,
+> > 
+> > On 3/25/20 1:03 PM, Mauro Carvalho Chehab wrote:  
+> > > That's the second part of media Kconfig changes. The entire series is
+> > > at:
+> > > 
+> > > 	https://git.linuxtv.org/mchehab/experimental.git/log/?h=media-kconfig  
+> > 
+> > I made a quick experiment (using this branch) with someone who works
+> > with the kernel for his master degree, but doesn't have much experience in kernel development in general.
+> > I asked him to enable Vimc (from default configs, where multimedia starts disabled).  
+> 
+> The whole config system is really outdated.
 
-diff --git a/init/Makefile b/init/Makefile
-index 6246a06364d0..82c15bdb42d7 100644
---- a/init/Makefile
-+++ b/init/Makefile
-@@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
- 	@$($(quiet)chk_compile.h)
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@	\
- 	"$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"	\
--	"$(CONFIG_PREEMPT_RT)" "$(CC) $(KBUILD_CFLAGS)"
-+	"$(CONFIG_PREEMPT_RT)" "$(LD)" "$(CC) $(KBUILD_CFLAGS)"
-diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index 3a5a4b210c86..f98c07709370 100755
---- a/scripts/mkcompile_h
-+++ b/scripts/mkcompile_h
-@@ -6,7 +6,8 @@ ARCH=$2
- SMP=$3
- PREEMPT=$4
- PREEMPT_RT=$5
--CC=$6
-+LD=$6
-+CC=$7
- 
- vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
- 
-@@ -72,7 +73,10 @@ UTS_VERSION="$(echo $UTS_VERSION $CONFIG_FLAGS $TIMESTAMP | cut -b -$UTS_LEN)"
-   printf '#define LINUX_COMPILE_BY "%s"\n' "$LINUX_COMPILE_BY"
-   echo \#define LINUX_COMPILE_HOST \"$LINUX_COMPILE_HOST\"
- 
--  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//'`\"
-+  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
-+  LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
-+		      | sed 's/[[:space:]]*$//')
-+  printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
- } > .tmpcompile
- 
- # Only replace the real compile.h if the new one is different,
--- 
-2.20.1
+Agreed. 
 
+Btw, when compiled against Qt 5.14, "make xconfig" is currently
+broken. I'm sending in a few some fixup patches for it.
 
--- 
-Kees Cook
+> It should be that this task was done with a command like "kconfig enable
+> vimc".  It would ask necessary questions and pull in the dependencies
+> automatically.
+
+Yes. That's something that it is missing for a long time. There were
+some efforts to add a SAT solver at the Kernel that could be used for
+that, but I dunno what's current status.
+
+> Twenty years ago it made sense to go through the menus and select things
+> one by one.  Does anyone really start from defconfig any more?  Surely
+> everyone starts with a known working config and just enables specific
+> options.
+
+Yeah, that's my feeling too.
+
+> I started to hack together some code to create a kconfig program to
+> enable and disable options.  The problem is that all library code
+> assumes we want to display menus so it was a lot of work and I gave up.
+
+:-(
+
+Thanks,
+Mauro
