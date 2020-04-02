@@ -1,113 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:31125 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388136AbgDBRO2 (ORCPT
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41622 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388908AbgDBR0l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 13:14:28 -0400
+        Thu, 2 Apr 2020 13:26:41 -0400
+Received: by mail-pg1-f196.google.com with SMTP id b1so2137620pgm.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 10:26:40 -0700 (PDT)
+Date: Thu, 2 Apr 2020 10:26:38 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 0/9] Enable orphan section warning
+Message-ID: <202004021023.D3D8AA3BE@keescook>
+References: <20200228002244.15240-1-keescook@chromium.org>
+ <CA+icZUWTnP8DYfbaMwKtJbG30v7bB4w6=ywo8gn8fvwr731mUQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200311223725.27662-1-masahiroy@kernel.org> <20200311223725.27662-2-masahiroy@kernel.org>
-In-Reply-To: <20200311223725.27662-2-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 3 Apr 2020 02:13:43 +0900
-Message-ID: <CAK7LNAT3SR3rc5F1BYA0=Wxp3PRbd+ueDZ-h_UzCj=9m8CLWLQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] kbuild: link lib-y objects to vmlinux forcibly
- when CONFIG_MODULES=y
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+icZUWTnP8DYfbaMwKtJbG30v7bB4w6=ywo8gn8fvwr731mUQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: sparclinux <sparclinux@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, clang-built-linux <clang-built-linux@googlegroups.com>, Al Viro <viro@zeniv.linux.org.uk>, Nick Desaulniers <ndesaulniers@google.com>, Ilie Halip <ilie.halip@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Borislav Petkov <bp@suse.de>, "H.J. Lu" <hjl.tools@gmail.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Peter Collingbourne <pcc@google.com>, James Morse <james.morse@arm.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, linux-kernel@vger.kernel.org
 
-On Thu, Mar 12, 2020 at 7:38 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Kbuild supports not only obj-y but also lib-y to list objects linked to
-> vmlinux.
->
-> The difference between them is that all the objects from obj-y are
-> forcibly linked to vmlinux by using --whole-archive, whereas the objects
-> from lib-y are linked as needed; if there is no user of a lib-y object,
-> it is not linked.
->
-> lib-y is intended to list utility functions that may be called from all
-> over the place (and may be unused at all), but it is a problem for
-> EXPORT_SYMBOL(). Even if there is no call-site in the vmlinux, we need
-> to keep exported symbols for the use from loadable modules.
->
-> Commit 7f2084fa55e6 ("[kbuild] handle exports in lib-y objects reliably")
-> worked around it by linking a dummy object, lib-ksyms.o, which contains
-> references to all the symbols exported from lib.a in that directory.
-> It uses the linker script command, EXTERN. Unfortunately, the meaning of
-> EXTERN of ld.lld is different from that of ld.bfd. Therefore, this does
-> not work with LD=ld.lld (CBL issue #515).
->
-> Anyway, the build rule of lib-ksyms.o is somewhat tricky. So, I want to
-> get rid of it.
->
-> At first, I was thinking of accumulating lib-y objects into obj-y
-> (or even replacing lib-y with obj-y entirely), but the lib-y syntax
-> is used beyond the ordinary use in lib/ and arch/*/lib/.
->
-> Examples:
->
->  - drivers/firmware/efi/libstub/Makefile builds lib.a, which is linked
->    into vmlinux in the own way (arm64), or linked to the decompressor
->    (arm, x86).
->
->  - arch/alpha/lib/Makefile builds lib.a which is linked not only to
->    vmlinux, but also to bootloaders in arch/alpha/boot/Makefile.
->
->  - arch/xtensa/boot/lib/Makefile builds lib.a for use from
->    arch/xtensa/boot/boot-redboot/Makefile.
->
-> One more thing, adding everything to obj-y would increase the vmlinux
-> size of allnoconfig (or tinyconfig).
->
-> For less impact, I tweaked the destination of lib.a at the top Makefile;
-> when CONFIG_MODULES=y, lib.a goes to KBUILD_VMLINUX_OBJS, which is
-> forcibly linked to vmlinux, otherwise lib.a goes to KBUILD_VMLINUX_LIBS
-> as before.
->
-> The size impact for normal usecases is quite small since at lease one
-> symbol in every lib-y object is eventually called by someone. In case
-> you are intrested, here are the figures.
->
-> x86_64_defconfig:
->
->    text    data     bss     dec     hex filename
-> 19566602 5422072 1589328 26578002 1958c52 vmlinux.before
-> 19566932 5422104 1589328 26578364 1958dbc vmlinux.after
->
-> The case with the biggest impact is allnoconfig + CONFIG_MODULES=y.
->
-> ARCH=x86 allnoconfig + CONFIG_MODULES=y:
->
->    text    data     bss     dec     hex filename
-> 1175162  254740 1220608 2650510  28718e vmlinux.before
-> 1177974  254836 1220608 2653418  287cea vmlinux.after
->
-> Hopefully this is still not a big deal. The per-file trimming with the
-> static library is not so effective after all.
->
-> If fine-grained optimization is desired, some architectures support
-> CONFIG_LD_DEAD_CODE_DATA_ELIMINATION, which trims dead code per-symbol
-> basis. When LTO is supported in mainline, even better optimization will
-> be possible.
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/515
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> Reported-by: kbuild test robot <lkp@intel.com>
-> ---
+On Thu, Apr 02, 2020 at 06:20:57PM +0200, Sedat Dilek wrote:
+> On Fri, Feb 28, 2020 at 1:22 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > Hi!
+> >
+> > A recent bug was solved for builds linked with ld.lld, and tracking
+> > it down took way longer than it needed to (a year). Ultimately, it
+> > boiled down to differences between ld.bfd and ld.lld's handling of
+> > orphan sections. Similarly, the recent FGKASLR series brough up orphan
+> > section handling too[2]. In both cases, it would have been nice if the
+> > linker was running with --orphan-handling=warn so that surprise sections
+> > wouldn't silently get mapped into the kernel image at locations up to
+> > the whim of the linker's orphan handling logic. Instead, all desired
+> > sections should be explicitly identified in the linker script (to be
+> > either kept or discarded) with any orphans throwing a warning. The
+> > powerpc architecture actually already does this, so this series seeks
+> > to extend this coverage to x86, arm64, and arm.
+> >
+> > This series depends on tip/x86/boot (where recent .eh_frame fixes[3]
+> > landed), and has a minor conflict[4] with the ARM tree (related to
+> > the earlier mentioned bug). As it uses refactorings in the asm-generic
+> > linker script, and makes changes to kbuild, I think the cleanest place
+> > for this series to land would also be through -tip. Once again (like
+> > my READ_IMPLIES_EXEC series), I'm looking to get maintainer Acks so
+> > this can go all together with the least disruption. Splitting it up by
+> > architecture seems needlessly difficult.
+> >
+> > Thanks!
+> >
+> 
+> Hi Kees,
+> 
+> what is the status of this patchset?
+> Looks like it is not in tip or linux-next Git.
 
-Applied to linux-kbuild.
+Based on the feedback, I have 3 TODO items:
 
-I will rebase my branch during this MW,
-so the commit ID will be unstable.
-Please do not record it until it lands in Linus' tree.
+- track down and eliminate (or explain) the source of the .got.plt on arm64
+- enable orphan warnings for _all_ architectures
+- refactor final link logic to perform the orphan warning in a clean way
 
-
-
-
+I'm working through these (and other work) still. I'm hoping to have
+another version up some time next week.
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
