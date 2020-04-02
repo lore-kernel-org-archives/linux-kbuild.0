@@ -1,54 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:45056 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389212AbgDBSbL (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:13772 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389523AbgDBU0S (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 14:31:11 -0400
-Received: by mail-pl1-f196.google.com with SMTP id t4so1644403plq.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2020 11:31:10 -0700 (PDT)
-Date: Thu, 2 Apr 2020 11:31:08 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
-Message-ID: <202004021129.F688E2D@keescook>
-References: <202004020117.6E434C035@keescook>
- <CAK7LNAQGTAgtADfY4H-k8X1J9nTMeOWvo8ZFfrUSHQUbhgcLKw@mail.gmail.com>
- <CAKwvOdnO_-jiQzCmy7pQNMGmZsgD9J=PYXVzOQ1NF1+u44MsOA@mail.gmail.com>
+        Thu, 2 Apr 2020 16:26:18 -0400
+From: Nick Terrell <terrelln@fb.com>
+Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
+Date: Thu, 2 Apr 2020 20:25:49 +0000
+Message-ID: <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
+References: <20200401053913.216783-1-nickrterrell@gmail.com>
+ <20200401053913.216783-7-nickrterrell@gmail.com>
+ <20200401093310.GA13748@zn.tnic>
+ <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com> <20200402155810.GD9352@zn.tnic>
+In-Reply-To: <20200402155810.GD9352@zn.tnic>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CEB30BF64D2AC240AB499C2CF5EFE247@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdnO_-jiQzCmy7pQNMGmZsgD9J=PYXVzOQ1NF1+u44MsOA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sandeep Patil <sspatil@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Thu, Apr 02, 2020 at 11:22:02AM -0700, Nick Desaulniers wrote:
-> With Kees patch + Masahiro's diff applied:
-> $ cat /proc/version
-> Linux version 5.6.0-rc7-next-20200330+ (ndesaulniers@<hostname
-> scrubbed>) (clang version 11.0.0 (git@github.com:llvm/llvm-project.git
-> 6d71daed03ced011cd25f4e4f4122a368fdc757d), LLD 11.0.0
-> (git@github.com:llvm/llvm-project.git
-> 6d71daed03ced011cd25f4e4f4122a368fdc757d)) #167 SMP Thu Apr 2 11:17:36
-> PDT 2020
-> 
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-
-Awesome! Thanks for testing. :)
-
-> We could actually use this in Android for a VTS test I've, uh, been
-> meaning to write.  Also, LOL at scrubbing the "compatible with" part,
-> reminds me of user agent strings in the browser, which are god awful.
-
-Heh, yeah. That's there because (actually, I think _you_ told me this
-when I asked during the ClangBuiltLinux summit) other tools scanned the
-LD version string for the binutils-specific bits. For this, since it's
-newly added to the kernel /proc/version, nothing is already expecting to
-find an LD string, and it looked super weird in there if I left it
-as-is. Hence, scrub!
-
--Kees
-
--- 
-Kees Cook
+DQoNCj4gT24gQXByIDIsIDIwMjAsIGF0IDg6NTggQU0sIEJvcmlzbGF2IFBldGtvdiA8YnBAYWxp
+ZW44LmRlPiB3cm90ZToNCj4gDQo+IE9uIFdlZCwgQXByIDAxLCAyMDIwIGF0IDA1OjMzOjAzUE0g
+KzAwMDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IFRoZSBjb2RlIGlzIGN1cnJlbnRseSB3cml0
+dGVuIHNvIHRoYXQgYWxsIHRoZSBjb21wcmVzc2lvbiBhbGdvcml0aG1zIHVzZSB0aGUNCj4+IHNh
+bWUgWk9fel9leHRyYV9ieXRlcy4gSXQgaXMgdGFrZW4gdG8gYmUgdGhlIG1heGltdW0gb2YgdGhl
+IGdyb3d0aCByYXRlDQo+PiBwbHVzIHRoZSBtYXhpbXVtIGZpeGVkIG92ZXJoZWFkLiBKdXN0IGEg
+ZmV3IGxpbmVzIGFib3ZlIGlzIHRoZSBjb21tZW50Og0KPj4gDQo+PiAjIOKApiBIZW5jZSBzYWZl
+dHkNCj4+ICMgbWFyZ2luIHNob3VsZCBiZSB1cGRhdGVkIHRvIGNvdmVyIGFsbCBkZWNvbXByZXNz
+b3JzIHNvIHRoYXQgd2UgZG9uJ3QNCj4+ICMgbmVlZCB0byBkZWFsIHdpdGggZWFjaCBvZiB0aGVt
+IHNlcGFyYXRlbHkuIFBsZWFzZSBjaGVjaw0KPj4gIyB0aGUgZGVzY3JpcHRpb24gaW4gbGliL2Rl
+Y29tcHJlc3Nvcl94eHguYyBmb3Igc3BlY2lmaWMgaW5mb3JtYXRpb24uDQo+PiANCj4+IFNvIEkg
+d2FzIGJlZW4gZm9sbG93aW5nIHRoZSBndWlkYW5jZSBpbiB0aGUgY29tbWVudHMuDQo+IA0KPiBQ
+bGVhc2Ugc3RhdGUgdGhhdCBpbiB0aGUgY29tbWl0IG1lc3NhZ2Ugd2hlbiB5b3Ugc2VuZCB5b3Vy
+IG5leHQNCj4gcmV2aXNpb24uDQoNCldpbGwgZG8uDQoNCj4+IERvZXMgaXQgbWF0dGVyPyBJ4oCZ
+bSBub3QgYW4gZXhwZXJ0IGhlcmUsDQo+IA0KPiBIdWgsIHlvdSdyZSBvbmx5IHNlbmRpbmcgdGhl
+IGNvZGUgdGhlbj8gT3Igd2hhdCBkbyB5b3UgbWVhbiB3aXRoIG5vdA0KPiBiZWluZyBhbiBleHBl
+cnQ/DQoNCkkgbWVhbiB0aGF0IHdoaWxlIEnigJl2ZSByZWFkIGFuZCB1bmRlcnN0b29kIHRoaXMg
+cGllY2Ugb2YgdGhlIGNvZGUsIGhhdmUgdGVzdGVkDQp0aGUgcGF0Y2hlcywgaGF2ZSBmb2xsb3dl
+ZCB0aGUgdGVtcGxhdGUgb2Ygb3RoZXIgY29tcHJlc3Npb24gbWV0aG9kcw0KYWRkZWQsIGFuZCBh
+bSBjb25maWRlbnQgaW4gdGhlIGNvcnJlY3RuZXNzIG9mIHRoZSBjb2RlLCBJ4oCZbSBub3QgYSBy
+ZWd1bGFyDQpjb250cmlidXRvciB0byB0aGUgcHJlLWJvb3QgeDg2IGtlcm5lbCBjb2RlLiBTbyBp
+dCBpcyBwb3NzaWJsZSB0aGF0IHRoZXJlIGlzIGENCnVzZSBjYXNlIGZvciBrZXJuZWwgY29tcHJl
+c3Npb24gdGhhdCBJ4oCZbSBub3QgYXdhcmUgb2Ygd2hlcmUgUkFNIGlzIGV4dHJlbWVseQ0KdGln
+aHQgYW5kIHdpdGhpbiA2NCBLQiBvZiB0aGUgY3VycmVudCBsaW1pdHMuDQoNCkl0IHNlZW1zIHRv
+IG1lIHRoYXQgYWRkaW5nIDY0S0IgdG8gdGhlIG1lbW9yeSByZXF1aXJlbWVudCBmb3Iga2VybmVs
+DQpkZWNvbXByZXNzaW9uIGlzIG5vdCBnb2luZyB0byBicmVhayBhbnlvbmUuIElmIGl0IGRpZCB0
+aGUga2VybmVsIGltYWdlIGlzIHRha2luZw0KdXAgbmVhcmx5IGFsbCBhdmFpbGFibGUgUkFNLCB3
+aGljaCBkb2VzbuKAmXQgc2VlbSBsaWtlbHkuIEJ1dCwgSSBkb27igJl0IGtub3cgYWxsDQp1c2Ug
+Y2FzZXMuIElmIGl0IGRvZXMgYnJlYWsgc29tZW9uZSwgd2UgY2FuIHB1dCB1cCBhIHNlcGFyYXRl
+IHBhdGNoIHRoYXQNCnN3aXRjaGVzIGFsbCB0aGUgY29tcHJlc3Npb24gbWV0aG9kcyBvdmVyIGEg
+cGVyLW1ldGhvZCBaT196X2V4dHJhX2J5dGVzLg0KDQpCZXN0LA0KTmljaw0KDQo=
