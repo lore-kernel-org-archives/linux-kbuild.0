@@ -1,74 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49244 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49214 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387723AbgDBJ2I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S2387722AbgDBJ2I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 2 Apr 2020 05:28:08 -0400
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: [PATCH 3/6] kconfig: qconf: fix the content of the main widget
-Date: Thu,  2 Apr 2020 11:28:00 +0200
-Message-Id: <3f87c3c69b198ee3b42b92d5d230c3976115b60e.1585819250.git.mchehab+huawei@kernel.org>
-In-Reply-To: <cover.1585819250.git.mchehab+huawei@kernel.org>
-References: <cover.1585819250.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 0/6] Fix several issues at qconf.cc
+Date: Thu,  2 Apr 2020 11:27:57 +0200
+Message-Id: <cover.1585819250.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Dan Carpenter <dan.carpenter@oracle.com>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Dan Carpenter <dan.carpenter@oracle.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-The port to Qt5 tried to preserve the same way as it used
-to work with Qt3 and Qt4. However, at least with newer
-versions of Qt5 (5.13), this doesn't work properly.
+Since its conversion to support Qt5, back on Kernel 3.14, the qconf.cc tool
+has been having some issues.  With Kernel 5.6 (and Qt 5.13) it doesn't
+work at all, on any of its modes.
 
-Change the schema by adding a vertical layout, in order
-for it to start working properly again.
+This patch series restore its functionality to what it had before Kernel 3.14.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- scripts/kconfig/qconf.cc | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+Now, all three modes should work as expected, and the layout will be shown
+with a vertical split, with the help messages at the botton, for both Single and
+Full modes.
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 2f4971906207..81ae6c059c1c 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1362,21 +1362,32 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	if ((x.isValid())&&(y.isValid()))
- 		move(x.toInt(), y.toInt());
- 
--	split1 = new QSplitter(this);
-+	QWidget *widget = new QWidget(this);
-+	QVBoxLayout *layout = new QVBoxLayout(widget);
-+	setCentralWidget(widget);
-+
-+	split1 = new QSplitter(widget);
- 	split1->setOrientation(Qt::Horizontal);
--	setCentralWidget(split1);
-+	split1->setChildrenCollapsible(false);
- 
--	menuView = new ConfigView(split1, "menu");
-+	menuView = new ConfigView(widget, "menu");
- 	menuList = menuView->list;
- 
--	split2 = new QSplitter(split1);
-+	split2 = new QSplitter(widget);
-+	split2->setChildrenCollapsible(false);
- 	split2->setOrientation(Qt::Vertical);
- 
- 	// create config tree
--	configView = new ConfigView(split2, "config");
-+	configView = new ConfigView(widget, "config");
- 	configList = configView->list;
- 
--	helpText = new ConfigInfoView(split2, "help");
-+	helpText = new ConfigInfoView(widget, "help");
-+
-+	layout->addWidget(split2);
-+	split2->addWidget(split1);
-+	split1->addWidget(configView);
-+	split1->addWidget(menuView);
-+	split2->addWidget(helpText);
- 
- 	setTabOrder(configList, helpText);
- 	configList->setFocus();
+The Split mode should also work properly, with its horizontal split showing
+the main config items at the left and a per-items view at the right.
+
+Mauro Carvalho Chehab (6):
+  kconfig: qconf: clean deprecated warnings
+  kconfig: qconf: Change title for the item window
+  kconfig: qconf: fix the content of the main widget
+  kconfig: qconf: fix support for the split view mode
+  kconfig: qconf: remove some old bogus TODOs
+  kconfig: qconf: Fix a few alignment issues
+
+ scripts/kconfig/qconf.cc | 90 ++++++++++++++++++++++++++++------------
+ scripts/kconfig/qconf.h  |  2 +
+ 2 files changed, 66 insertions(+), 26 deletions(-)
+
 -- 
 2.25.1
