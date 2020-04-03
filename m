@@ -1,56 +1,158 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:13772 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389523AbgDBU0S (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:59337 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726024AbgDCFSP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Apr 2020 16:26:18 -0400
-From: Nick Terrell <terrelln@fb.com>
-Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
-Date: Thu, 2 Apr 2020 20:25:49 +0000
-Message-ID: <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
-References: <20200401053913.216783-1-nickrterrell@gmail.com>
- <20200401053913.216783-7-nickrterrell@gmail.com>
- <20200401093310.GA13748@zn.tnic>
- <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com> <20200402155810.GD9352@zn.tnic>
-In-Reply-To: <20200402155810.GD9352@zn.tnic>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CEB30BF64D2AC240AB499C2CF5EFE247@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Fri, 3 Apr 2020 01:18:15 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: support 'LLVM' to switch the default tools to Clang/LLVM
+Date: Fri,  3 Apr 2020 14:17:09 +0900
+Message-Id: <20200403051709.22407-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, clang-built-linux@googlegroups.com, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-DQoNCj4gT24gQXByIDIsIDIwMjAsIGF0IDg6NTggQU0sIEJvcmlzbGF2IFBldGtvdiA8YnBAYWxp
-ZW44LmRlPiB3cm90ZToNCj4gDQo+IE9uIFdlZCwgQXByIDAxLCAyMDIwIGF0IDA1OjMzOjAzUE0g
-KzAwMDAsIE5pY2sgVGVycmVsbCB3cm90ZToNCj4+IFRoZSBjb2RlIGlzIGN1cnJlbnRseSB3cml0
-dGVuIHNvIHRoYXQgYWxsIHRoZSBjb21wcmVzc2lvbiBhbGdvcml0aG1zIHVzZSB0aGUNCj4+IHNh
-bWUgWk9fel9leHRyYV9ieXRlcy4gSXQgaXMgdGFrZW4gdG8gYmUgdGhlIG1heGltdW0gb2YgdGhl
-IGdyb3d0aCByYXRlDQo+PiBwbHVzIHRoZSBtYXhpbXVtIGZpeGVkIG92ZXJoZWFkLiBKdXN0IGEg
-ZmV3IGxpbmVzIGFib3ZlIGlzIHRoZSBjb21tZW50Og0KPj4gDQo+PiAjIOKApiBIZW5jZSBzYWZl
-dHkNCj4+ICMgbWFyZ2luIHNob3VsZCBiZSB1cGRhdGVkIHRvIGNvdmVyIGFsbCBkZWNvbXByZXNz
-b3JzIHNvIHRoYXQgd2UgZG9uJ3QNCj4+ICMgbmVlZCB0byBkZWFsIHdpdGggZWFjaCBvZiB0aGVt
-IHNlcGFyYXRlbHkuIFBsZWFzZSBjaGVjaw0KPj4gIyB0aGUgZGVzY3JpcHRpb24gaW4gbGliL2Rl
-Y29tcHJlc3Nvcl94eHguYyBmb3Igc3BlY2lmaWMgaW5mb3JtYXRpb24uDQo+PiANCj4+IFNvIEkg
-d2FzIGJlZW4gZm9sbG93aW5nIHRoZSBndWlkYW5jZSBpbiB0aGUgY29tbWVudHMuDQo+IA0KPiBQ
-bGVhc2Ugc3RhdGUgdGhhdCBpbiB0aGUgY29tbWl0IG1lc3NhZ2Ugd2hlbiB5b3Ugc2VuZCB5b3Vy
-IG5leHQNCj4gcmV2aXNpb24uDQoNCldpbGwgZG8uDQoNCj4+IERvZXMgaXQgbWF0dGVyPyBJ4oCZ
-bSBub3QgYW4gZXhwZXJ0IGhlcmUsDQo+IA0KPiBIdWgsIHlvdSdyZSBvbmx5IHNlbmRpbmcgdGhl
-IGNvZGUgdGhlbj8gT3Igd2hhdCBkbyB5b3UgbWVhbiB3aXRoIG5vdA0KPiBiZWluZyBhbiBleHBl
-cnQ/DQoNCkkgbWVhbiB0aGF0IHdoaWxlIEnigJl2ZSByZWFkIGFuZCB1bmRlcnN0b29kIHRoaXMg
-cGllY2Ugb2YgdGhlIGNvZGUsIGhhdmUgdGVzdGVkDQp0aGUgcGF0Y2hlcywgaGF2ZSBmb2xsb3dl
-ZCB0aGUgdGVtcGxhdGUgb2Ygb3RoZXIgY29tcHJlc3Npb24gbWV0aG9kcw0KYWRkZWQsIGFuZCBh
-bSBjb25maWRlbnQgaW4gdGhlIGNvcnJlY3RuZXNzIG9mIHRoZSBjb2RlLCBJ4oCZbSBub3QgYSBy
-ZWd1bGFyDQpjb250cmlidXRvciB0byB0aGUgcHJlLWJvb3QgeDg2IGtlcm5lbCBjb2RlLiBTbyBp
-dCBpcyBwb3NzaWJsZSB0aGF0IHRoZXJlIGlzIGENCnVzZSBjYXNlIGZvciBrZXJuZWwgY29tcHJl
-c3Npb24gdGhhdCBJ4oCZbSBub3QgYXdhcmUgb2Ygd2hlcmUgUkFNIGlzIGV4dHJlbWVseQ0KdGln
-aHQgYW5kIHdpdGhpbiA2NCBLQiBvZiB0aGUgY3VycmVudCBsaW1pdHMuDQoNCkl0IHNlZW1zIHRv
-IG1lIHRoYXQgYWRkaW5nIDY0S0IgdG8gdGhlIG1lbW9yeSByZXF1aXJlbWVudCBmb3Iga2VybmVs
-DQpkZWNvbXByZXNzaW9uIGlzIG5vdCBnb2luZyB0byBicmVhayBhbnlvbmUuIElmIGl0IGRpZCB0
-aGUga2VybmVsIGltYWdlIGlzIHRha2luZw0KdXAgbmVhcmx5IGFsbCBhdmFpbGFibGUgUkFNLCB3
-aGljaCBkb2VzbuKAmXQgc2VlbSBsaWtlbHkuIEJ1dCwgSSBkb27igJl0IGtub3cgYWxsDQp1c2Ug
-Y2FzZXMuIElmIGl0IGRvZXMgYnJlYWsgc29tZW9uZSwgd2UgY2FuIHB1dCB1cCBhIHNlcGFyYXRl
-IHBhdGNoIHRoYXQNCnN3aXRjaGVzIGFsbCB0aGUgY29tcHJlc3Npb24gbWV0aG9kcyBvdmVyIGEg
-cGVyLW1ldGhvZCBaT196X2V4dHJhX2J5dGVzLg0KDQpCZXN0LA0KTmljaw0KDQo=
+As Documentation/kbuild/llvm.rst implies, building the kernel with a
+full set of LLVM tools gets very verbose and unwieldy.
+
+Provide a single switch 'LLVM' to use Clang and LLVM tools instead of
+GCC and Binutils. You can pass LLVM=1 from the command line or as an
+environment variable. Then, Kbuild will use LLVM toolchains in your
+PATH environment.
+
+Please note LLVM=1 does not turn on the LLVM integrated assembler.
+You need to explicitly pass AS=clang to use it. When the upstream
+kernel is ready for the integrated assembler, I think we can make
+it default.
+
+We discussed what we need, and we agreed to go with a simple boolean
+switch (https://lkml.org/lkml/2020/3/28/494).
+
+Some items in the discussion:
+
+- LLVM_DIR
+
+  When multiple versions of LLVM are installed, I just thought supporting
+  LLVM_DIR=/path/to/my/llvm/bin/ might be useful.
+
+  CC      = $(LLVM_DIR)clang
+  LD      = $(LLVM_DIR)ld.lld
+    ...
+
+  However, we can handle this by modifying PATH. So, we decided to not do
+  this.
+
+- LLVM_SUFFIX
+
+  Some distributions (e.g. Debian) package specific versions of LLVM with
+  naming conventions that use the version as a suffix.
+
+  CC      = clang$(LLVM_SUFFIX)
+  LD      = ld.lld(LLVM_SUFFIX)
+    ...
+
+  will allow a user to pass LLVM_SUFFIX=-11 to use clang-11 etc.,
+  but the suffixed versions in /usr/bin/ are symlinks to binaries in
+  /usr/lib/llvm-#/bin/, so this can also be handled by PATH.
+
+- HOSTCC, HOSTCXX, etc.
+
+  We can switch the host compilers in the same way:
+
+  ifneq ($(LLVM),)
+  HOSTCC       = clang
+  HOSTCXX      = clang++
+  else
+  HOSTCC       = gcc
+  HOSTCXX      = g++
+  endif
+
+  This may the right thing to do, but I could not make up my mind.
+  Because we do not frequently switch the host compiler, a counter
+  solution I had in my mind was to leave it to the default of the
+  system.
+
+  HOSTCC       = cc
+  HOSTCXX      = c++
+
+  Many distributions support update-alternatives to switch the default
+  to GCC, Clang, or whatever, but reviewers were opposed to this
+  approach. So, this commit does not touch the host tools.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Documentation/kbuild/kbuild.rst |  5 +++++
+ Documentation/kbuild/llvm.rst   |  5 +++++
+ Makefile                        | 20 ++++++++++++++++----
+ 3 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
+index 510f38d7e78a..2d1fc03d346e 100644
+--- a/Documentation/kbuild/kbuild.rst
++++ b/Documentation/kbuild/kbuild.rst
+@@ -262,3 +262,8 @@ KBUILD_BUILD_USER, KBUILD_BUILD_HOST
+ These two variables allow to override the user@host string displayed during
+ boot and in /proc/version. The default value is the output of the commands
+ whoami and host, respectively.
++
++LLVM
++----
++If this variable is set to 1, Kbuild will use Clang and LLVM utilities instead
++of GCC and GNU binutils to build the kernel.
+diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+index d6c79eb4e23e..4602369f6a4f 100644
+--- a/Documentation/kbuild/llvm.rst
++++ b/Documentation/kbuild/llvm.rst
+@@ -55,6 +55,11 @@ additional parameters to `make`.
+ 	  READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
+ 	  HOSTLD=ld.lld
+ 
++You can use a single switch `LLVM=1` to use LLVM utilities by default (except
++for building host programs).
++
++	make LLVM=1 HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTLD=ld.lld
++
+ Getting Help
+ ------------
+ 
+diff --git a/Makefile b/Makefile
+index c91342953d9e..6db89ecdd942 100644
+--- a/Makefile
++++ b/Makefile
+@@ -409,16 +409,28 @@ KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
+ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
+ 
+ # Make variables (CC, etc...)
+-LD		= $(CROSS_COMPILE)ld
+-CC		= $(CROSS_COMPILE)gcc
+ CPP		= $(CC) -E
++ifneq ($(LLVM),)
++CC		= clang
++LD		= ld.lld
++AR		= llvm-ar
++NM		= llvm-nm
++OBJCOPY		= llvm-objcopy
++OBJDUMP		= llvm-objdump
++READELF		= llvm-readelf
++OBJSIZE		= llvm-size
++STRIP		= llvm-strip
++else
++CC		= $(CROSS_COMPILE)gcc
++LD		= $(CROSS_COMPILE)ld
+ AR		= $(CROSS_COMPILE)ar
+ NM		= $(CROSS_COMPILE)nm
+-STRIP		= $(CROSS_COMPILE)strip
+ OBJCOPY		= $(CROSS_COMPILE)objcopy
+ OBJDUMP		= $(CROSS_COMPILE)objdump
+-OBJSIZE		= $(CROSS_COMPILE)size
+ READELF		= $(CROSS_COMPILE)readelf
++OBJSIZE		= $(CROSS_COMPILE)size
++STRIP		= $(CROSS_COMPILE)strip
++endif
+ PAHOLE		= pahole
+ LEX		= flex
+ YACC		= bison
+-- 
+2.17.1
