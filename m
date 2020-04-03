@@ -1,91 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44894 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727924AbgDCJq6 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Apr 2020 05:46:58 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0339VTWL098394
-        for <linux-kbuild@vger.kernel.org>; Fri, 3 Apr 2020 05:46:57 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 304r51gxnv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Fri, 03 Apr 2020 05:46:57 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <prudo@linux.ibm.com>;
-        Fri, 3 Apr 2020 10:46:35 +0100
-Date: Fri, 3 Apr 2020 11:46:49 +0200
-From: Philipp Rudo <prudo@linux.ibm.com>
-Subject: Re: [PATCH] kbuild: add dummy toolchains to enable all cc-option
- etc. in Kconfig
-In-Reply-To: <20200403090224.24045-1-masahiroy@kernel.org>
-References: <20200403090224.24045-1-masahiroy@kernel.org>
+Received: from mail.skyhub.de ([5.9.137.197]:53496 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727835AbgDCKTd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 3 Apr 2020 06:19:33 -0400
+Date: Fri, 3 Apr 2020 12:19:29 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
+Message-ID: <20200403101929.GC20218@zn.tnic>
+References: <20200401053913.216783-1-nickrterrell@gmail.com>
+ <20200401053913.216783-7-nickrterrell@gmail.com>
+ <20200401093310.GA13748@zn.tnic>
+ <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com>
+ <20200402155810.GD9352@zn.tnic>
+ <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20200403114649.1c1a149f@laptop2-ibm.local>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Jeremy Cline <jcline@redhat.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, linux-kernel@vger.kernel.org
+To: Nick Terrell <terrelln@fb.com>
+Cc: Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-Hi Masahiro,
+On Thu, Apr 02, 2020 at 08:25:49PM +0000, Nick Terrell wrote:
+> So it is possible that there is a use case for kernel compression that
+> I’m not aware of where RAM is extremely tight and within 64 KB of
+> the current limits.
 
-On Fri,  3 Apr 2020 18:02:24 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
+That's exactly my concern, albeit a very minor one.
 
-> Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-> options your compiler does not support. This works well if you configure
-> and build the kernel on the same host machine.
-> 
-> It is inconvenient if you prepare the .config that is carried to a
-> different build environment (typically this happens when you package
-> the kernel for distros) because using a different compiler potentially
-> produces different CONFIG options than the real build environment.
-> So, you probably want to make as many options visible as possible.
-> In other words, you need to create a super-set of CONFIG options that
-> cover any build environment. If some of the CONFIG options turned out
-> to be unsupported on the build machine, they are automatically disabled
-> by the nature of Kconfig.
-> 
-> However, it is not feasible to get a full-featured compiler for every
-> arch.
-> 
-> This issue was discussed here:
-> 
->   https://lkml.org/lkml/2019/12/9/620
-> 
-> Other than distros, savedefconfig is also a problem. Some arch subsytems
-> periodically resync defconfig files. If you use a less-capable compiler
-> for savedefconfig, options that do not meet 'depends on $(cc-option,...)'
-> will be forcibly disabled. So, defconfig && savedefconfig may silently
-> change the behavior.
-> 
-> This commit adds a set of dummy toolchains that pretend to support any
-> feature.
-> 
-> Most of compiler features are tested by cc-option, which simply checks
-> the exit code of $(CC). The dummy tools are just a shell script that
-> exits with 0 in most cases. So, $(cc-option, ...) is evaluated as 'y'.
-> 
-> There are more complicated checks such as:
-> 
->   scripts/gcc-x86_{32,64}-has-stack-protector.sh
->   scripts/gcc-plugin.sh
->   scripts/tools-support-relr.sh
-> 
-> I tried my best to implement the dummy scripts to pass all checks.
-> 
-> From the top directory of the source tree, you can do:
-> 
->    $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> It seems to me that adding 64KB to the memory requirement for kernel
+> decompression is not going to break anyone. If it did the kernel image
+> is taking up nearly all available RAM, which doesn’t seem likely.
+> But, I don’t know all use cases. If it does break someone, we can
+> put up a separate patch that switches all the compression methods over
+> a per-method ZO_z_extra_bytes.
 
-look good to me
+Ok.
 
-Reviewed-by: Philipp Rudo <prudo@linux.ibm.com>
+Thx.
 
-Thanks a lot
-Philipp
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
