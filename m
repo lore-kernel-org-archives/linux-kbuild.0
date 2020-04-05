@@ -1,52 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:16577 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbgDEN4a (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:31221 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726667AbgDEQcV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Apr 2020 09:56:30 -0400
-MIME-Version: 1.0
-References: <202004020117.6E434C035@keescook> <CA+icZUW0R9LDGJ1YjJAB2oWkcEQxCO79xYmdVEoh=P8Fy_AL1A@mail.gmail.com>
- <CA+icZUVowLVpAxiWw=FJHfQ38KtU7AXXkVnw46D2XLM41-NCEA@mail.gmail.com>
-In-Reply-To: <CA+icZUVowLVpAxiWw=FJHfQ38KtU7AXXkVnw46D2XLM41-NCEA@mail.gmail.com>
+        Sun, 5 Apr 2020 12:32:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 5 Apr 2020 22:55:35 +0900
-Message-ID: <CAK7LNAQ6ji3=2+7R1DL7eFveH7L7No6e3XkqfqgiH5QFyQj==A@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] MIPS: fw: arc: add __weak to prom_meminit and prom_free_prom_memory
+Date: Mon,  6 Apr 2020 01:30:52 +0900
+Message-Id: <20200405163052.18942-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Kees Cook <keescook@chromium.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org
+Cc: clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, linux-mips@vger.kernel.org
 
-On Sun, Apr 5, 2020 at 8:23 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> On Thu, Apr 2, 2020 at 4:24 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > On Thu, Apr 2, 2020 at 10:18 AM Kees Cook <keescook@chromium.org> wrote:
-> > >
-> > > When doing Clang builds of the kernel, it is possible to link with
-> > > either ld.bfd (binutils) or ld.lld (LLVM), but it is not possible to
-> > > discover this from a running kernel. Add the "$LD -v" output to
-> > > /proc/version.
-> > >
-> > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> >
->
-> Please feel free and add:
->
-> Reviewed-by: Sedat Dilek <sedat.dilek@gmail.com>
-> Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
+is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
+CONFIG_SGI_IP32 is enabled.
 
+The use of EXPORT_SYMBOL in static libraries potentially causes a
+problem for the llvm linker [1]. So, I want to forcibly link lib-y
+objects to vmlinux when CONFIG_MODULES=y.
 
-Thanks.
+As a groundwork, we must fix multiple definitions that have previously
+been hidden by lib-y.
 
-I collected all Reviewed-by and Tested-by.
+The prom_cleanup() in this file is already marked as __weak (because
+it is overridden by the one in arch/mips/sgi-ip22/ip22-mc.c).
+I think it should be OK to do the same for these two.
 
+[1]: https://github.com/ClangBuiltLinux/linux/issues/515
 
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+If MIPS maintainers ack this patch,
+I want to inser it before the following patch:
 
+https://patchwork.kernel.org/patch/11432969/
 
+ arch/mips/fw/arc/memory.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/arch/mips/fw/arc/memory.c b/arch/mips/fw/arc/memory.c
+index dbbcddc82823..89fa6e62a3b3 100644
+--- a/arch/mips/fw/arc/memory.c
++++ b/arch/mips/fw/arc/memory.c
+@@ -117,7 +117,7 @@ static int __init prom_memtype_classify(union linux_memtypes type)
+ 	return memtype_classify_arc(type);
+ }
+ 
+-void __init prom_meminit(void)
++void __weak __init prom_meminit(void)
+ {
+ 	struct linux_mdesc *p;
+ 
+@@ -162,7 +162,7 @@ void __weak __init prom_cleanup(void)
+ {
+ }
+ 
+-void __init prom_free_prom_memory(void)
++void __weak __init prom_free_prom_memory(void)
+ {
+ 	int i;
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.17.1
