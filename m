@@ -1,81 +1,182 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:41102 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726841AbgDFKrM (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38410 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727193AbgDFLWY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Apr 2020 06:47:12 -0400
+        Mon, 6 Apr 2020 07:22:24 -0400
+Received: by mail-wm1-f68.google.com with SMTP id f20so6338637wmh.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 04:22:22 -0700 (PDT)
+Date: Mon, 6 Apr 2020 13:22:20 +0200
+From: Matthias Maennich <maennich@google.com>
+Subject: Re: [PATCH] kbuild: support 'LLVM' to switch the default tools to
+ Clang/LLVM
+Message-ID: <20200406112220.GB126804@google.com>
+References: <20200403051709.22407-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <20200401053913.216783-1-nickrterrell@gmail.com>
- <20200401053913.216783-7-nickrterrell@gmail.com> <20200401093310.GA13748@zn.tnic>
- <D45F637D-6BB0-4F08-BEBE-FAB9B56F36F6@fb.com> <20200402155810.GD9352@zn.tnic> <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
-In-Reply-To: <2370741E-FE5A-44C1-8BF3-24A03E321F4E@fb.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 6 Apr 2020 12:47:30 +0200
-Message-ID: <CA+icZUWP0HR5ZiWq438bpcyu71cxmkv2HPqeuR2EwUAz5CjwBg@mail.gmail.com>
-Subject: Re: [PATCH v4 6/8] x86: bump ZO_z_extra_bytes margin for zstd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200403051709.22407-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Terrell <terrelln@fb.com>
-Cc: Borislav Petkov <bp@alien8.de>, Nick Terrell <nickrterrell@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <natechancellor@gmail.com>, clang-built-linux@googlegroups.com, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Apr 2, 2020 at 10:26 PM Nick Terrell <terrelln@fb.com> wrote:
+On Fri, Apr 03, 2020 at 02:17:09PM +0900, Masahiro Yamada wrote:
+>As Documentation/kbuild/llvm.rst implies, building the kernel with a
+>full set of LLVM tools gets very verbose and unwieldy.
 >
+>Provide a single switch 'LLVM' to use Clang and LLVM tools instead of
+>GCC and Binutils. You can pass LLVM=1 from the command line or as an
+>environment variable. Then, Kbuild will use LLVM toolchains in your
+>PATH environment.
 >
+>Please note LLVM=1 does not turn on the LLVM integrated assembler.
+>You need to explicitly pass AS=clang to use it. When the upstream
+>kernel is ready for the integrated assembler, I think we can make
+>it default.
 >
-> > On Apr 2, 2020, at 8:58 AM, Borislav Petkov <bp@alien8.de> wrote:
-> >
-> > On Wed, Apr 01, 2020 at 05:33:03PM +0000, Nick Terrell wrote:
-> >> The code is currently written so that all the compression algorithms u=
-se the
-> >> same ZO_z_extra_bytes. It is taken to be the maximum of the growth rat=
-e
-> >> plus the maximum fixed overhead. Just a few lines above is the comment=
-:
-> >>
-> >> # =E2=80=A6 Hence safety
-> >> # margin should be updated to cover all decompressors so that we don't
-> >> # need to deal with each of them separately. Please check
-> >> # the description in lib/decompressor_xxx.c for specific information.
-> >>
-> >> So I was been following the guidance in the comments.
-> >
-> > Please state that in the commit message when you send your next
-> > revision.
+>We discussed what we need, and we agreed to go with a simple boolean
+>switch (https://lkml.org/lkml/2020/3/28/494).
 >
-> Will do.
+>Some items in the discussion:
 >
-> >> Does it matter? I=E2=80=99m not an expert here,
-> >
-> > Huh, you're only sending the code then? Or what do you mean with not
-> > being an expert?
+>- LLVM_DIR
 >
-> I mean that while I=E2=80=99ve read and understood this piece of the code=
-, have tested
-> the patches, have followed the template of other compression methods
-> added, and am confident in the correctness of the code, I=E2=80=99m not a=
- regular
-> contributor to the pre-boot x86 kernel code. So it is possible that there=
- is a
-> use case for kernel compression that I=E2=80=99m not aware of where RAM i=
-s extremely
-> tight and within 64 KB of the current limits.
+>  When multiple versions of LLVM are installed, I just thought supporting
+>  LLVM_DIR=/path/to/my/llvm/bin/ might be useful.
 >
-> It seems to me that adding 64KB to the memory requirement for kernel
-> decompression is not going to break anyone. If it did the kernel image is=
- taking
-> up nearly all available RAM, which doesn=E2=80=99t seem likely. But, I do=
-n=E2=80=99t know all
-> use cases. If it does break someone, we can put up a separate patch that
-> switches all the compression methods over a per-method ZO_z_extra_bytes.
+>  CC      = $(LLVM_DIR)clang
+>  LD      = $(LLVM_DIR)ld.lld
+>    ...
 >
+>  However, we can handle this by modifying PATH. So, we decided to not do
+>  this.
+>
+>- LLVM_SUFFIX
+>
+>  Some distributions (e.g. Debian) package specific versions of LLVM with
+>  naming conventions that use the version as a suffix.
+>
+>  CC      = clang$(LLVM_SUFFIX)
+>  LD      = ld.lld(LLVM_SUFFIX)
+>    ...
+>
+>  will allow a user to pass LLVM_SUFFIX=-11 to use clang-11 etc.,
+>  but the suffixed versions in /usr/bin/ are symlinks to binaries in
+>  /usr/lib/llvm-#/bin/, so this can also be handled by PATH.
+>
+>- HOSTCC, HOSTCXX, etc.
+>
+>  We can switch the host compilers in the same way:
+>
+>  ifneq ($(LLVM),)
+>  HOSTCC       = clang
+>  HOSTCXX      = clang++
+>  else
+>  HOSTCC       = gcc
+>  HOSTCXX      = g++
+>  endif
+>
+>  This may the right thing to do, but I could not make up my mind.
+>  Because we do not frequently switch the host compiler, a counter
+>  solution I had in my mind was to leave it to the default of the
+>  system.
+>
+>  HOSTCC       = cc
+>  HOSTCXX      = c++
 
-Hi Nick,
+What about HOSTLD ? I saw recently, that setting HOSTLD=ld.lld is not
+yielding the expected result (some tools, like e.g. fixdep still require
+an `ld` to be in PATH to be built). I did not find the time to look into
+that yet, but I would like to consistently switch to the llvm toolchain
+(including linker and possibly more) also for hostprogs.
 
-are you planning a zstd-v5?
-If yes, please CC me, thanks.
+Cheers,
+Matthias
 
-Regards,
-- Sedat -
+>
+>  Many distributions support update-alternatives to switch the default
+>  to GCC, Clang, or whatever, but reviewers were opposed to this
+>  approach. So, this commit does not touch the host tools.
+>
+>Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+>---
+>
+> Documentation/kbuild/kbuild.rst |  5 +++++
+> Documentation/kbuild/llvm.rst   |  5 +++++
+> Makefile                        | 20 ++++++++++++++++----
+> 3 files changed, 26 insertions(+), 4 deletions(-)
+>
+>diff --git a/Documentation/kbuild/kbuild.rst b/Documentation/kbuild/kbuild.rst
+>index 510f38d7e78a..2d1fc03d346e 100644
+>--- a/Documentation/kbuild/kbuild.rst
+>+++ b/Documentation/kbuild/kbuild.rst
+>@@ -262,3 +262,8 @@ KBUILD_BUILD_USER, KBUILD_BUILD_HOST
+> These two variables allow to override the user@host string displayed during
+> boot and in /proc/version. The default value is the output of the commands
+> whoami and host, respectively.
+>+
+>+LLVM
+>+----
+>+If this variable is set to 1, Kbuild will use Clang and LLVM utilities instead
+>+of GCC and GNU binutils to build the kernel.
+>diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+>index d6c79eb4e23e..4602369f6a4f 100644
+>--- a/Documentation/kbuild/llvm.rst
+>+++ b/Documentation/kbuild/llvm.rst
+>@@ -55,6 +55,11 @@ additional parameters to `make`.
+> 	  READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
+> 	  HOSTLD=ld.lld
+>
+>+You can use a single switch `LLVM=1` to use LLVM utilities by default (except
+>+for building host programs).
+>+
+>+	make LLVM=1 HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTLD=ld.lld
+>+
+> Getting Help
+> ------------
+>
+>diff --git a/Makefile b/Makefile
+>index c91342953d9e..6db89ecdd942 100644
+>--- a/Makefile
+>+++ b/Makefile
+>@@ -409,16 +409,28 @@ KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
+> KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
+>
+> # Make variables (CC, etc...)
+>-LD		= $(CROSS_COMPILE)ld
+>-CC		= $(CROSS_COMPILE)gcc
+> CPP		= $(CC) -E
+>+ifneq ($(LLVM),)
+>+CC		= clang
+>+LD		= ld.lld
+>+AR		= llvm-ar
+>+NM		= llvm-nm
+>+OBJCOPY		= llvm-objcopy
+>+OBJDUMP		= llvm-objdump
+>+READELF		= llvm-readelf
+>+OBJSIZE		= llvm-size
+>+STRIP		= llvm-strip
+>+else
+>+CC		= $(CROSS_COMPILE)gcc
+>+LD		= $(CROSS_COMPILE)ld
+> AR		= $(CROSS_COMPILE)ar
+> NM		= $(CROSS_COMPILE)nm
+>-STRIP		= $(CROSS_COMPILE)strip
+> OBJCOPY		= $(CROSS_COMPILE)objcopy
+> OBJDUMP		= $(CROSS_COMPILE)objdump
+>-OBJSIZE		= $(CROSS_COMPILE)size
+> READELF		= $(CROSS_COMPILE)readelf
+>+OBJSIZE		= $(CROSS_COMPILE)size
+>+STRIP		= $(CROSS_COMPILE)strip
+>+endif
+> PAHOLE		= pahole
+> LEX		= flex
+> YACC		= bison
+>-- 
+>2.17.1
+>
+>-- 
+>You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+>To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+>To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200403051709.22407-1-masahiroy%40kernel.org.
