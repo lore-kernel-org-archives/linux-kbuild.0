@@ -1,53 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from elvis.franken.de ([193.175.24.41]:55913 "EHLO elvis.franken.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727192AbgDFLgU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Apr 2020 07:36:20 -0400
-Date: Mon, 6 Apr 2020 13:03:33 +0200
-From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Received: from eddie.linux-mips.org ([148.251.95.138]:34734 "EHLO
+        cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727192AbgDFLyR (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Apr 2020 07:54:17 -0400
+Date: Mon, 6 Apr 2020 12:54:14 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
 Subject: Re: [PATCH] MIPS: fw: arc: add __weak to prom_meminit and
  prom_free_prom_memory
-Message-ID: <20200406110333.GA6266@alpha.franken.de>
-References: <20200405163052.18942-1-masahiroy@kernel.org>
+In-Reply-To: <CAK7LNATKLcCPYxQZNbrS-jMPg+_BETU0dGv0qYvLqUkJ2fMt5w@mail.gmail.com>
+Message-ID: <alpine.LFD.2.21.2004061240060.4156324@eddie.linux-mips.org>
+References: <20200405163052.18942-1-masahiroy@kernel.org> <alpine.LFD.2.21.2004051813150.4156324@eddie.linux-mips.org> <CAK7LNATKLcCPYxQZNbrS-jMPg+_BETU0dGv0qYvLqUkJ2fMt5w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200405163052.18942-1-masahiroy@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, linux-mips@vger.kernel.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, linux-mips@vger.kernel.org, =?UTF-8?Q?F=C4=81ng-ru=C3=AC_S=C3=B2ng?= <maskray@google.com>
 
-On Mon, Apr 06, 2020 at 01:30:52AM +0900, Masahiro Yamada wrote:
-> As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
-> is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
-> CONFIG_SGI_IP32 is enabled.
-> 
-> The use of EXPORT_SYMBOL in static libraries potentially causes a
-> problem for the llvm linker [1]. So, I want to forcibly link lib-y
-> objects to vmlinux when CONFIG_MODULES=y.
-> 
-> As a groundwork, we must fix multiple definitions that have previously
-> been hidden by lib-y.
-> 
-> The prom_cleanup() in this file is already marked as __weak (because
-> it is overridden by the one in arch/mips/sgi-ip22/ip22-mc.c).
-> I think it should be OK to do the same for these two.
-> 
-> [1]: https://github.com/ClangBuiltLinux/linux/issues/515
-> 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
-> If MIPS maintainers ack this patch,
-> I want to inser it before the following patch:
+On Mon, 6 Apr 2020, Masahiro Yamada wrote:
 
+> > > As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
+> > > is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
+> > > CONFIG_SGI_IP32 is enabled.
+> > >
+> > > The use of EXPORT_SYMBOL in static libraries potentially causes a
+> > > problem for the llvm linker [1]. So, I want to forcibly link lib-y
+> > > objects to vmlinux when CONFIG_MODULES=y.
+> >
+> >  It looks to me like a bug in the linker in the handling of the EXTERN
+> > command.  Why not fix the linker instead?
+[...]
+> I am not sure if this is a bug.
+> Anyway, they decided to not change ld.lld
 
-Acked-By: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+ Well, maybe that was a conscious decision, however it's a linker feature 
+that has been there since forever and projects like Linux can legitimately 
+rely on it.  In this case perhaps sticking to other linkers, which have 
+the right features, is the right solution rather than trying to turn a 
+complex and mature project like Linux upside down (and quite possibly 
+introducing bugs and pessimisations on the way) just to match an inferior 
+tool.  Adapt your tool to the task, not the task to your tool.
 
-Thomas.
+> MIPS code is so confusing.
+> There are multiple definitions,
+> and lib.a is (ab)used to hide them.
 
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+ It's a standard feature of libraries that a symbol reference is satisfied 
+by the first symbol definition encountered.  Any extra ones provided later 
+in the link order are ignored.  And we have control over the link order.
+
+> I fixed another one for MIPS before, and
+> 0-day bot reported this recently.
+> 
+> 
+> There are lots of prom_meminit() definitions
+> in arch/mips/.
+
+ Naturally, many platforms will have its own, in addition to some generic 
+(possibly dummy) one.
+
+> Making the intention clearer is a good thing, IMHO.
+
+ Hmm, what intention?  Can you please be more specific?
+
+  Maciej
