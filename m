@@ -1,100 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38740 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbgDFSCj (ORCPT
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42366 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726534AbgDFSGJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Apr 2020 14:02:39 -0400
-Received: by mail-pf1-f194.google.com with SMTP id c21so7937467pfo.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 11:02:38 -0700 (PDT)
+        Mon, 6 Apr 2020 14:06:09 -0400
+Received: by mail-qt1-f198.google.com with SMTP id n89so574219qte.15
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 11:06:01 -0700 (PDT)
+Date: Mon, 6 Apr 2020 14:05:58 -0400
+From: Jeremy Cline <jcline@redhat.com>
+Subject: Re: [PATCH] kbuild: add dummy toolchains to enable all cc-option
+ etc. in Kconfig
+Message-ID: <20200406180558.GA22412@dev.jcline.org>
+References: <20200403090224.24045-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <20200405163052.18942-1-masahiroy@kernel.org> <alpine.LFD.2.21.2004051813150.4156324@eddie.linux-mips.org>
- <CAK7LNATKLcCPYxQZNbrS-jMPg+_BETU0dGv0qYvLqUkJ2fMt5w@mail.gmail.com> <alpine.LFD.2.21.2004061240060.4156324@eddie.linux-mips.org>
-In-Reply-To: <alpine.LFD.2.21.2004061240060.4156324@eddie.linux-mips.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 6 Apr 2020 11:02:27 -0700
-Message-ID: <CAKwvOdkAXuTPR7Bm4+ai3GcKv+ytes3S2UZxOxqSrRtqkt485Q@mail.gmail.com>
-Subject: Re: [PATCH] MIPS: fw: arc: add __weak to prom_meminit and prom_free_prom_memory
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200403090224.24045-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Maciej W. Rozycki" <macro@linux-mips.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, linux-mips@vger.kernel.org, =?UTF-8?B?RsSBbmctcnXDrCBTw7JuZw==?= <maskray@google.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Philipp Rudo <prudo@linux.ibm.com>, linux-kernel@vger.kernel.org
 
-On Mon, Apr 6, 2020 at 4:54 AM Maciej W. Rozycki <macro@linux-mips.org> wrote:
->
-> On Mon, 6 Apr 2020, Masahiro Yamada wrote:
->
-> > > > As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
-> > > > is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
-> > > > CONFIG_SGI_IP32 is enabled.
-> > > >
-> > > > The use of EXPORT_SYMBOL in static libraries potentially causes a
-> > > > problem for the llvm linker [1]. So, I want to forcibly link lib-y
-> > > > objects to vmlinux when CONFIG_MODULES=y.
-> > >
-> > >  It looks to me like a bug in the linker in the handling of the EXTERN
-> > > command.  Why not fix the linker instead?
-> [...]
-> > I am not sure if this is a bug.
-> > Anyway, they decided to not change ld.lld
->
->  Well, maybe that was a conscious decision, however it's a linker feature
-> that has been there since forever and projects like Linux can legitimately
-> rely on it.  In this case perhaps sticking to other linkers, which have
-> the right features, is the right solution rather than trying to turn a
-> complex and mature project like Linux upside down (and quite possibly
-> introducing bugs and pessimisations on the way) just to match an inferior
-> tool.  Adapt your tool to the task, not the task to your tool.
+On Fri, Apr 03, 2020 at 06:02:24PM +0900, Masahiro Yamada wrote:
+> Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
+> options your compiler does not support. This works well if you configure
+> and build the kernel on the same host machine.
+> 
+> It is inconvenient if you prepare the .config that is carried to a
+> different build environment (typically this happens when you package
+> the kernel for distros) because using a different compiler potentially
+> produces different CONFIG options than the real build environment.
+> So, you probably want to make as many options visible as possible.
+> In other words, you need to create a super-set of CONFIG options that
+> cover any build environment. If some of the CONFIG options turned out
+> to be unsupported on the build machine, they are automatically disabled
+> by the nature of Kconfig.
+> 
+> However, it is not feasible to get a full-featured compiler for every
+> arch.
+> 
+> This issue was discussed here:
+> 
+>   https://lkml.org/lkml/2019/12/9/620
+> 
+> Other than distros, savedefconfig is also a problem. Some arch subsytems
+> periodically resync defconfig files. If you use a less-capable compiler
+> for savedefconfig, options that do not meet 'depends on $(cc-option,...)'
+> will be forcibly disabled. So, defconfig && savedefconfig may silently
+> change the behavior.
+> 
+> This commit adds a set of dummy toolchains that pretend to support any
+> feature.
+> 
+> Most of compiler features are tested by cc-option, which simply checks
+> the exit code of $(CC). The dummy tools are just a shell script that
+> exits with 0 in most cases. So, $(cc-option, ...) is evaluated as 'y'.
+> 
+> There are more complicated checks such as:
+> 
+>   scripts/gcc-x86_{32,64}-has-stack-protector.sh
+>   scripts/gcc-plugin.sh
+>   scripts/tools-support-relr.sh
+> 
+> I tried my best to implement the dummy scripts to pass all checks.
+> 
+> From the top directory of the source tree, you can do:
+> 
+>    $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>  scripts/dummy-tools/gcc     | 91 +++++++++++++++++++++++++++++++++++++
+>  scripts/dummy-tools/ld      |  4 ++
+>  scripts/dummy-tools/nm      |  4 ++
+>  scripts/dummy-tools/objcopy |  4 ++
+>  4 files changed, 103 insertions(+)
+>  create mode 100755 scripts/dummy-tools/gcc
+>  create mode 100755 scripts/dummy-tools/ld
+>  create mode 100755 scripts/dummy-tools/nm
+>  create mode 100755 scripts/dummy-tools/objcopy
+> 
 
-The feature you refer to and the feature Masahiro is referring to are
-two separate issues.  If you care to understand the issue Masahiro is
-trying to fix, please take the time to read the full discussion:
-https://github.com/ClangBuiltLinux/linux/issues/515 and particularly
-https://reviews.llvm.org/D63564
+<snip>
 
->
-> > MIPS code is so confusing.
-> > There are multiple definitions,
-> > and lib.a is (ab)used to hide them.
->
->  It's a standard feature of libraries that a symbol reference is satisfied
-> by the first symbol definition encountered.  Any extra ones provided later
-> in the link order are ignored.  And we have control over the link order.
+> diff --git a/scripts/dummy-tools/ld b/scripts/dummy-tools/ld
+> new file mode 100755
+> index 000000000000..3bc56ae4cc15
+> --- /dev/null
+> +++ b/scripts/dummy-tools/ld
+> @@ -0,0 +1,4 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +# Dummy script that always succeeds
 
-Relying on link order is terribly brittle. Renaming a file can cause
-your implementation to change, and ties your hands from ever using
-things like LTO or newer build systems like ninja.  Static
-initialization order is a plague to C and C++.  It's explicitly
-undefined behavior you've just admitted you prefer to rely on.  (A
-Google search for "static initialization order" wants to autocomplete
-to "static initialization order fiasco" which is also an interesting
-read; https://www.cryptopp.com/wiki/Static_Initialization_Order_Fiasco).
+It looks like scripts/Kbuild.include expects "$(LD) --version" to return
+something. If it doesn't "ld-ifversion" stops working.
 
-Masahiro is right that this case has some questionable choices in
-terms of redefining symbols with different implementations.  I think
-__HAVE_ARCH_STRCPY and friends in lib/string.c is actually the best
-pattern for not providing multiple definitions of a symbol, followed
-by marking symbols meant to be overridden at link time based on config
-as __weak.  He's just trying to help clean this up.
+Other than that it seems to work as advertised. Thanks!
 
->
-> > I fixed another one for MIPS before, and
-> > 0-day bot reported this recently.
-> >
-> >
-> > There are lots of prom_meminit() definitions
-> > in arch/mips/.
->
->  Naturally, many platforms will have its own, in addition to some generic
-> (possibly dummy) one.
->
-> > Making the intention clearer is a good thing, IMHO.
->
->  Hmm, what intention?  Can you please be more specific?
-
-That prom_meminit and prom_free_prom_memory are meant to be overridden
-by other configs.
-
--- 
-Thanks,
-~Nick Desaulniers
+- Jeremy
