@@ -1,103 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42366 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726534AbgDFSGJ (ORCPT
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:51375 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726749AbgDFSRI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Apr 2020 14:06:09 -0400
-Received: by mail-qt1-f198.google.com with SMTP id n89so574219qte.15
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 11:06:01 -0700 (PDT)
-Date: Mon, 6 Apr 2020 14:05:58 -0400
-From: Jeremy Cline <jcline@redhat.com>
-Subject: Re: [PATCH] kbuild: add dummy toolchains to enable all cc-option
- etc. in Kconfig
-Message-ID: <20200406180558.GA22412@dev.jcline.org>
-References: <20200403090224.24045-1-masahiroy@kernel.org>
+        Mon, 6 Apr 2020 14:17:08 -0400
+Received: by mail-pj1-f68.google.com with SMTP id fr8so198571pjb.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 11:17:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200403090224.24045-1-masahiroy@kernel.org>
+References: <20200405163052.18942-1-masahiroy@kernel.org>
+In-Reply-To: <20200405163052.18942-1-masahiroy@kernel.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 6 Apr 2020 11:16:57 -0700
+Message-ID: <CAKwvOdmEcC7SszqpEYeT3v_gi89vAyDyofZaKkfF_YhEXu=E5A@mail.gmail.com>
+Subject: Re: [PATCH] MIPS: fw: arc: add __weak to prom_meminit and prom_free_prom_memory
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Philipp Rudo <prudo@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, clang-built-linux <clang-built-linux@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, linux-mips@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 06:02:24PM +0900, Masahiro Yamada wrote:
-> Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-> options your compiler does not support. This works well if you configure
-> and build the kernel on the same host machine.
-> 
-> It is inconvenient if you prepare the .config that is carried to a
-> different build environment (typically this happens when you package
-> the kernel for distros) because using a different compiler potentially
-> produces different CONFIG options than the real build environment.
-> So, you probably want to make as many options visible as possible.
-> In other words, you need to create a super-set of CONFIG options that
-> cover any build environment. If some of the CONFIG options turned out
-> to be unsupported on the build machine, they are automatically disabled
-> by the nature of Kconfig.
-> 
-> However, it is not feasible to get a full-featured compiler for every
-> arch.
-> 
-> This issue was discussed here:
-> 
->   https://lkml.org/lkml/2019/12/9/620
-> 
-> Other than distros, savedefconfig is also a problem. Some arch subsytems
-> periodically resync defconfig files. If you use a less-capable compiler
-> for savedefconfig, options that do not meet 'depends on $(cc-option,...)'
-> will be forcibly disabled. So, defconfig && savedefconfig may silently
-> change the behavior.
-> 
-> This commit adds a set of dummy toolchains that pretend to support any
-> feature.
-> 
-> Most of compiler features are tested by cc-option, which simply checks
-> the exit code of $(CC). The dummy tools are just a shell script that
-> exits with 0 in most cases. So, $(cc-option, ...) is evaluated as 'y'.
-> 
-> There are more complicated checks such as:
-> 
->   scripts/gcc-x86_{32,64}-has-stack-protector.sh
->   scripts/gcc-plugin.sh
->   scripts/tools-support-relr.sh
-> 
-> I tried my best to implement the dummy scripts to pass all checks.
-> 
-> From the top directory of the source tree, you can do:
-> 
->    $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-> 
+On Sun, Apr 5, 2020 at 9:31 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
+> is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
+> CONFIG_SGI_IP32 is enabled.
+
+I'm curious if this issue is affected by other combinations of files
+that each define prom_meminit with external linkage and symbol
+visibility.  I would expect __weak to be used when there's a base
+implementation that we expect to be overridden, but I don't think
+that's what's happening in this case.  It's not clear to me which
+definition would be the default, let alone the one in
+arch/mips/fw/arc/memory.c.
+
+Looks like CONFIG_SGI_IP32 selects CONFIG_FW_ARC, so it's not clear
+why arch/mips/sgi-ip32/ip32-memory.c and arch/mips/fw/arc/memory.c
+define different implementations of prom_meminit, and which one was
+expected to be used.
+
+Hopefully the maintainers can clarify.
+
+>
+> The use of EXPORT_SYMBOL in static libraries potentially causes a
+> problem for the llvm linker [1]. So, I want to forcibly link lib-y
+> objects to vmlinux when CONFIG_MODULES=y.
+>
+> As a groundwork, we must fix multiple definitions that have previously
+> been hidden by lib-y.
+>
+> The prom_cleanup() in this file is already marked as __weak (because
+> it is overridden by the one in arch/mips/sgi-ip22/ip22-mc.c).
+> I think it should be OK to do the same for these two.
+>
+> [1]: https://github.com/ClangBuiltLinux/linux/issues/515
+>
+> Reported-by: kbuild test robot <lkp@intel.com>
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
-> 
->  scripts/dummy-tools/gcc     | 91 +++++++++++++++++++++++++++++++++++++
->  scripts/dummy-tools/ld      |  4 ++
->  scripts/dummy-tools/nm      |  4 ++
->  scripts/dummy-tools/objcopy |  4 ++
->  4 files changed, 103 insertions(+)
->  create mode 100755 scripts/dummy-tools/gcc
->  create mode 100755 scripts/dummy-tools/ld
->  create mode 100755 scripts/dummy-tools/nm
->  create mode 100755 scripts/dummy-tools/objcopy
-> 
+>
+> If MIPS maintainers ack this patch,
+> I want to inser it before the following patch:
+>
+> https://patchwork.kernel.org/patch/11432969/
+>
+>  arch/mips/fw/arc/memory.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/mips/fw/arc/memory.c b/arch/mips/fw/arc/memory.c
+> index dbbcddc82823..89fa6e62a3b3 100644
+> --- a/arch/mips/fw/arc/memory.c
+> +++ b/arch/mips/fw/arc/memory.c
+> @@ -117,7 +117,7 @@ static int __init prom_memtype_classify(union linux_memtypes type)
+>         return memtype_classify_arc(type);
+>  }
+>
+> -void __init prom_meminit(void)
+> +void __weak __init prom_meminit(void)
+>  {
+>         struct linux_mdesc *p;
+>
+> @@ -162,7 +162,7 @@ void __weak __init prom_cleanup(void)
+>  {
+>  }
+>
+> -void __init prom_free_prom_memory(void)
+> +void __weak __init prom_free_prom_memory(void)
+>  {
+>         int i;
+>
+> --
 
-<snip>
-
-> diff --git a/scripts/dummy-tools/ld b/scripts/dummy-tools/ld
-> new file mode 100755
-> index 000000000000..3bc56ae4cc15
-> --- /dev/null
-> +++ b/scripts/dummy-tools/ld
-> @@ -0,0 +1,4 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +# Dummy script that always succeeds
-
-It looks like scripts/Kbuild.include expects "$(LD) --version" to return
-something. If it doesn't "ld-ifversion" stops working.
-
-Other than that it seems to work as advertised. Thanks!
-
-- Jeremy
+-- 
+Thanks,
+~Nick Desaulniers
