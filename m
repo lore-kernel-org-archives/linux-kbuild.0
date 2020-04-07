@@ -1,246 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57751 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726393AbgDGRMB (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:23040 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726332AbgDGRq6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Apr 2020 13:12:01 -0400
-Received: by mail-qt1-f197.google.com with SMTP id u88so3622991qtd.17
-        for <linux-kbuild@vger.kernel.org>; Tue, 07 Apr 2020 10:11:55 -0700 (PDT)
-Date: Tue, 7 Apr 2020 13:11:52 -0400
-From: Jeremy Cline <jcline@redhat.com>
-Subject: Re: [PATCH v2] kbuild: add dummy toolchains to enable all cc-option
- etc. in Kconfig
-Message-ID: <20200407171152.GC196945@dev.jcline.org>
-References: <20200407155352.16617-1-masahiroy@kernel.org>
+        Tue, 7 Apr 2020 13:46:58 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200407155352.16617-1-masahiroy@kernel.org>
+References: <20200403051709.22407-1-masahiroy@kernel.org> <20200406112220.GB126804@google.com>
+ <CAK7LNARkFN8jTD8F3CU7r_AL8dbqaKpUuou4MCLZvAYLGs9bYA@mail.gmail.com> <CAKwvOdmHxeZ+T1OsOhW25pPygHM4D21OgZqRk141xbjP437-1w@mail.gmail.com>
+In-Reply-To: <CAKwvOdmHxeZ+T1OsOhW25pPygHM4D21OgZqRk141xbjP437-1w@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 8 Apr 2020 02:46:04 +0900
+Message-ID: <CAK7LNARSMvGZ6T4Ct=U4Xe1WQCgkaWE8m8BxRuYiaokKVjA_ig@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: support 'LLVM' to switch the default tools to Clang/LLVM
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Philipp Rudo <prudo@linux.ibm.com>, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Matthias Maennich <maennich@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Nathan Chancellor <natechancellor@gmail.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Apr 08, 2020 at 12:53:52AM +0900, Masahiro Yamada wrote:
-> Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-> options your compiler does not support. This works well if you configure
-> and build the kernel on the same host machine.
-> 
-> It is inconvenient if you prepare the .config that is carried to a
-> different build environment (typically this happens when you package
-> the kernel for distros) because using a different compiler potentially
-> produces different CONFIG options than the real build environment.
-> So, you probably want to make as many options visible as possible.
-> In other words, you need to create a super-set of CONFIG options that
-> cover any build environment. If some of the CONFIG options turned out
-> to be unsupported on the build machine, they are automatically disabled
-> by the nature of Kconfig.
-> 
-> However, it is not feasible to get a full-featured compiler for every
-> arch.
-> 
-> This issue was discussed here:
-> 
->   https://lkml.org/lkml/2019/12/9/620
-> 
-> Other than distros, savedefconfig is also a problem. Some arch sub-systems
-> periodically resync defconfig files. If you use a less-capable compiler
-> for savedefconfig, options that do not meet 'depends on $(cc-option,...)'
-> will be forcibly disabled. So, 'make defconfig && make savedefconfig'
-> may silently change the behavior.
-> 
-> This commit adds a set of dummy toolchains that pretend to support any
-> feature.
-> 
-> Most of compiler features are tested by cc-option, which simply checks
-> the exit code of $(CC). The dummy tools are shell scripts that always
-> exit with 0. So, $(cc-option, ...) is evaluated as 'y'.
-> 
-> There are more complicated checks such as:
-> 
->   scripts/gcc-x86_{32,64}-has-stack-protector.sh
->   scripts/gcc-plugin.sh
->   scripts/tools-support-relr.sh
-> 
-> scripts/dummy-tools/gcc passes all checks.
-> 
-> From the top directory of the source tree, you can do:
-> 
->    $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> Reviewed-by: Philipp Rudo <prudo@linux.ibm.com>
-> ---
-> 
-> Changes in v2:
->   - support --version and -v for ld, objdump, nm
+On Wed, Apr 8, 2020 at 2:01 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Tue, Apr 7, 2020 at 9:17 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > On Mon, Apr 6, 2020 at 8:22 PM 'Matthias Maennich' via Clang Built
+> > Linux <clang-built-linux@googlegroups.com> wrote:
+> > >
+> > > On Fri, Apr 03, 2020 at 02:17:09PM +0900, Masahiro Yamada wrote:
+> > > >As Documentation/kbuild/llvm.rst implies, building the kernel with a
+> > > >full set of LLVM tools gets very verbose and unwieldy.
+> > > >
+> > > >Provide a single switch 'LLVM' to use Clang and LLVM tools instead of
+> > > >GCC and Binutils. You can pass LLVM=1 from the command line or as an
+> > > >environment variable. Then, Kbuild will use LLVM toolchains in your
+> > > >PATH environment.
+> > > >
+> > > >Please note LLVM=1 does not turn on the LLVM integrated assembler.
+> > > >You need to explicitly pass AS=clang to use it. When the upstream
+> > > >kernel is ready for the integrated assembler, I think we can make
+> > > >it default.
+> > > >
+> > > >We discussed what we need, and we agreed to go with a simple boolean
+> > > >switch (https://lkml.org/lkml/2020/3/28/494).
+> > > >
+> > > >Some items in the discussion:
+> > > >
+> > > >- LLVM_DIR
+> > > >
+> > > >  When multiple versions of LLVM are installed, I just thought supporting
+> > > >  LLVM_DIR=/path/to/my/llvm/bin/ might be useful.
+> > > >
+> > > >  CC      = $(LLVM_DIR)clang
+> > > >  LD      = $(LLVM_DIR)ld.lld
+> > > >    ...
+> > > >
+> > > >  However, we can handle this by modifying PATH. So, we decided to not do
+> > > >  this.
+> > > >
+> > > >- LLVM_SUFFIX
+> > > >
+> > > >  Some distributions (e.g. Debian) package specific versions of LLVM with
+> > > >  naming conventions that use the version as a suffix.
+> > > >
+> > > >  CC      = clang$(LLVM_SUFFIX)
+> > > >  LD      = ld.lld(LLVM_SUFFIX)
+> > > >    ...
+> > > >
+> > > >  will allow a user to pass LLVM_SUFFIX=-11 to use clang-11 etc.,
+> > > >  but the suffixed versions in /usr/bin/ are symlinks to binaries in
+> > > >  /usr/lib/llvm-#/bin/, so this can also be handled by PATH.
+> > > >
+> > > >- HOSTCC, HOSTCXX, etc.
+> > > >
+> > > >  We can switch the host compilers in the same way:
+> > > >
+> > > >  ifneq ($(LLVM),)
+> > > >  HOSTCC       = clang
+> > > >  HOSTCXX      = clang++
+> > > >  else
+> > > >  HOSTCC       = gcc
+> > > >  HOSTCXX      = g++
+> > > >  endif
+> > > >
+> > > >  This may the right thing to do, but I could not make up my mind.
+> > > >  Because we do not frequently switch the host compiler, a counter
+> > > >  solution I had in my mind was to leave it to the default of the
+> > > >  system.
+> > > >
+> > > >  HOSTCC       = cc
+> > > >  HOSTCXX      = c++
+> > >
+> > > What about HOSTLD ? I saw recently, that setting HOSTLD=ld.lld is not
+> > > yielding the expected result (some tools, like e.g. fixdep still require
+> > > an `ld` to be in PATH to be built). I did not find the time to look into
+> > > that yet, but I would like to consistently switch to the llvm toolchain
+> > > (including linker and possibly more) also for hostprogs.
+> >
+> >
+> > HOSTLD=ld.lld worked for me, but HOSTCC=clang did not.
+> >
+> >
+> >
+> > HOSTCC=clang without CC=clang fails to build objtool.
+> >
+> > The build system of objtool is meh.  :(
+>
+> Let's tackle that in a follow up, with the goal of build hermiticity
+> in mind.  I think there's good feedback in this thread to inform the
+> design of a v2:
+> 1. CLANG_AS=0 to disable integrated as.  Hopefully we won't need this
+> much longer, so we don't need to spend too much time on this, Masahiro
+> please just choose a name for this.  llvm-as naming conventions
+> doesn't follow the rest of binutils.
 
-Great, "make ARCH=powerpc CROSS_COMPILE=scripts/dummy-tools/ help" no
-longer spits out "/bin/sh: line 0: [: -ge: unary operator expected" and
-everything looks to work as expected.
+I am not so familiar with the terminology in LLVM,
+but I feel 'integrated' is a keyword IMHO.
+I prefer LLVM_IA=1.  (or  LLVM_INTEGRATED_AS=1)
 
-Tested-by: Jeremy Cline <jcline@redhat.com>
 
-> 
->  scripts/dummy-tools/gcc     | 91 +++++++++++++++++++++++++++++++++++++
->  scripts/dummy-tools/ld      | 30 ++++++++++++
->  scripts/dummy-tools/nm      |  1 +
->  scripts/dummy-tools/objcopy |  1 +
->  4 files changed, 123 insertions(+)
->  create mode 100755 scripts/dummy-tools/gcc
->  create mode 100755 scripts/dummy-tools/ld
->  create mode 120000 scripts/dummy-tools/nm
->  create mode 120000 scripts/dummy-tools/objcopy
-> 
-> diff --git a/scripts/dummy-tools/gcc b/scripts/dummy-tools/gcc
-> new file mode 100755
-> index 000000000000..33487e99d83e
-> --- /dev/null
-> +++ b/scripts/dummy-tools/gcc
-> @@ -0,0 +1,91 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-> +# options your compiler does not support. This works well if you configure and
-> +# build the kernel on the same host machine.
-> +#
-> +# It is inconvenient if you prepare the .config that is carried to a different
-> +# build environment (typically this happens when you package the kernel for
-> +# distros) because using a different compiler potentially produces different
-> +# CONFIG options than the real build environment. So, you probably want to make
-> +# as many options visible as possible. In other words, you need to create a
-> +# super-set of CONFIG options that cover any build environment. If some of the
-> +# CONFIG options turned out to be unsupported on the build machine, they are
-> +# automatically disabled by the nature of Kconfig.
-> +#
-> +# However, it is not feasible to get a full-featured compiler for every arch.
-> +# Hence these dummy toolchains to make all compiler tests pass.
-> +#
-> +# Usage:
-> +#
-> +# From the top directory of the source tree, run
-> +#
-> +#   $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-> +#
-> +# Most of compiler features are tested by cc-option, which simply checks the
-> +# exit code of $(CC). This script does nothing and just exits with 0 in most
-> +# cases. So, $(cc-option, ...) is evaluated as 'y'.
-> +#
-> +# This scripts caters to more checks; handle --version and pre-process __GNUC__
-> +# etc. to pretend to be GCC, and also do right things to satisfy some scripts.
-> +
-> +# Check if the first parameter appears in the rest. Succeeds if found.
-> +# This helper is useful if a particular option was passed to this script.
-> +# Typically used like this:
-> +#   arg_contain <word-you-are-searching-for> "$@"
-> +arg_contain ()
-> +{
-> +	search="$1"
-> +	shift
-> +
-> +	while [ $# -gt 0 ]
-> +	do
-> +		if [ "$search" = "$1" ]; then
-> +			return 0
-> +		fi
-> +		shift
-> +	done
-> +
-> +	return 1
-> +}
-> +
-> +# To set CONFIG_CC_IS_GCC=y
-> +if arg_contain --version "$@"; then
-> +	echo "gcc (scripts/dummy-tools/gcc)"
-> +	exit 0
-> +fi
-> +
-> +if arg_contain -E "$@"; then
-> +	# For scripts/gcc-version.sh; This emulates GCC 20.0.0
-> +	if arg_contain - "$@"; then
-> +		sed 's/^__GNUC__$/20/; s/^__GNUC_MINOR__$/0/; s/^__GNUC_PATCHLEVEL__$/0/'
-> +		exit 0
-> +	else
-> +		echo "no input files" >&2
-> +		exit 1
-> +	fi
-> +fi
-> +
-> +if arg_contain -S "$@"; then
-> +	# For scripts/gcc-x86-*-has-stack-protector.sh
-> +	if arg_contain -fstack-protector "$@"; then
-> +		echo "%gs"
-> +		exit 0
-> +	fi
-> +fi
-> +
-> +# For scripts/gcc-plugin.sh
-> +if arg_contain -print-file-name=plugin "$@"; then
-> +	plugin_dir=$(mktemp -d)
-> +
-> +	sed -n 's/.*#include "\(.*\)"/\1/p' $(dirname $0)/../gcc-plugins/gcc-common.h |
-> +	while read header
-> +	do
-> +		mkdir -p $plugin_dir/include/$(dirname $header)
-> +		touch $plugin_dir/include/$header
-> +	done
-> +
-> +	echo $plugin_dir
-> +	exit 0
-> +fi
-> diff --git a/scripts/dummy-tools/ld b/scripts/dummy-tools/ld
-> new file mode 100755
-> index 000000000000..f68233050405
-> --- /dev/null
-> +++ b/scripts/dummy-tools/ld
-> @@ -0,0 +1,30 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +# Dummy script that always succeeds.
-> +
-> +# Check if the first parameter appears in the rest. Succeeds if found.
-> +# This helper is useful if a particular option was passed to this script.
-> +# Typically used like this:
-> +#   arg_contain <word-you-are-searching-for> "$@"
-> +arg_contain ()
-> +{
-> +	search="$1"
-> +	shift
-> +
-> +	while [ $# -gt 0 ]
-> +	do
-> +		if [ "$search" = "$1" ]; then
-> +			return 0
-> +		fi
-> +		shift
-> +	done
-> +
-> +	return 1
-> +}
-> +
-> +if arg_contain --version "$@" || arg_contain -v "$@"; then
-> +	progname=$(basename $0)
-> +	echo "GNU $progname (scripts/dummy-tools/$progname) 2.50"
-> +	exit 0
-> +fi
-> diff --git a/scripts/dummy-tools/nm b/scripts/dummy-tools/nm
-> new file mode 120000
-> index 000000000000..c0648b38dd42
-> --- /dev/null
-> +++ b/scripts/dummy-tools/nm
-> @@ -0,0 +1 @@
-> +ld
-> \ No newline at end of file
-> diff --git a/scripts/dummy-tools/objcopy b/scripts/dummy-tools/objcopy
-> new file mode 120000
-> index 000000000000..c0648b38dd42
-> --- /dev/null
-> +++ b/scripts/dummy-tools/objcopy
-> @@ -0,0 +1 @@
-> +ld
-> \ No newline at end of file
-> -- 
-> 2.17.1
-> 
+> 2. HOSTCC=clang HOSTLD=ld.lld set by LLVM=1 for helping with build hermiticity.
+>
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
