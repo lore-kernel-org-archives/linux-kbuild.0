@@ -1,32 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:33294 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgDGSph (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:23206 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbgDGS4q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Apr 2020 14:45:37 -0400
-Date: Tue, 7 Apr 2020 11:45:33 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: replace AS=clang with LLVM_IA=1
-Message-ID: <20200407184533.GA48427@ubuntu-s3-xlarge-x86>
-References: <20200407184336.14612-1-masahiroy@kernel.org>
+        Tue, 7 Apr 2020 14:56:46 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200407184336.14612-1-masahiroy@kernel.org>
+References: <CA+icZUWnZwaNooj4WLvS7FKhkDgq3R3xUaQ8hFjuDgZTSj0s2Q@mail.gmail.com>
+In-Reply-To: <CA+icZUWnZwaNooj4WLvS7FKhkDgq3R3xUaQ8hFjuDgZTSj0s2Q@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 8 Apr 2020 03:55:59 +0900
+Message-ID: <CAK7LNATub3fpeTY67miVYJ27MtfwaeETW0HrWHYdM0mmaKCYPA@mail.gmail.com>
+Subject: Re: kbuild: do not pass $(KBUILD_CFLAGS) to scripts/mkcompile_h
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Thomas Gleixner <tglx@linutronix.de>
 
-On Wed, Apr 08, 2020 at 03:43:35AM +0900, Masahiro Yamada wrote:
-> The 'AS' variable is unused for building the kernel. Only the remaining
-> usage is to turn on the integrated assembler. A boolean flag is a better
-> fit for this purpose.
-> 
-> AS=clang was added for experts. So, I replaced it with LLVM_IA=1,
-> breaking the backward compatibility.
-> 
-> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Hi Sedat,
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+On Mon, Apr 6, 2020 at 7:01 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>
+> [ Please CC me I am not subscribed to this mailing-list ]
+>
+> Hi,
+>
+> I think with your patch in [1] line #56 can go away, too?
+>
+> [ scripts/mkcompile_h ]
+>
+> 53 # Generate a temporary compile.h
+> 54
+> 55 { echo /\* This file is auto generated, version $VERSION \*/
+> 56   if [ -n "$CONFIG_FLAGS" ] ; then echo "/* $CONFIG_FLAGS */"; fi
+
+
+
+I think the this inserts a comment line
+to make sure compile.h is updated
+when any of CONFIG_SMP, CONFIG_PREEMPT, CONFIG_PREEMPT_RT
+is changed.
+
+So, this is unrelated to my patch at least.
+
+
+> Thanks.
+>
+> Regards,
+> - Sedat -
+>
+> [1] https://patchwork.kernel.org/patch/11473667/
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
