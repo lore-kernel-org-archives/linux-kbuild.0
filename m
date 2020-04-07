@@ -1,229 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:46188 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727078AbgDGPzA (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:24499 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727991AbgDGQDt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Apr 2020 11:55:00 -0400
+        Tue, 7 Apr 2020 12:03:49 -0400
+MIME-Version: 1.0
+References: <20200405163052.18942-1-masahiroy@kernel.org> <20200406110333.GA6266@alpha.franken.de>
+In-Reply-To: <20200406110333.GA6266@alpha.franken.de>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2] kbuild: add dummy toolchains to enable all cc-option etc. in Kconfig
-Date: Wed,  8 Apr 2020 00:53:52 +0900
-Message-Id: <20200407155352.16617-1-masahiroy@kernel.org>
+Date: Wed, 8 Apr 2020 01:02:53 +0900
+Message-ID: <CAK7LNARGO5ciqaseZ7z1k+e-dVh9rU+HY3-1H0XYMwq6+5PqaQ@mail.gmail.com>
+Subject: Re: [PATCH] MIPS: fw: arc: add __weak to prom_meminit and prom_free_prom_memory
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jeremy Cline <jcline@redhat.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Masahiro Yamada <masahiroy@kernel.org>, Philipp Rudo <prudo@linux.ibm.com>, linux-kernel@vger.kernel.org
+To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux-MIPS <linux-mips@linux-mips.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Paul Burton <paulburton@kernel.org>, linux-mips@vger.kernel.org
 
-Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-options your compiler does not support. This works well if you configure
-and build the kernel on the same host machine.
+On Mon, Apr 6, 2020 at 8:36 PM Thomas Bogendoerfer
+<tsbogend@alpha.franken.de> wrote:
+>
+> On Mon, Apr 06, 2020 at 01:30:52AM +0900, Masahiro Yamada wrote:
+> > As far as I understood, prom_meminit() in arch/mips/fw/arc/memory.c
+> > is overridden by the one in arch/mips/sgi-ip32/ip32-memory.c if
+> > CONFIG_SGI_IP32 is enabled.
+> >
+> > The use of EXPORT_SYMBOL in static libraries potentially causes a
+> > problem for the llvm linker [1]. So, I want to forcibly link lib-y
+> > objects to vmlinux when CONFIG_MODULES=y.
+> >
+> > As a groundwork, we must fix multiple definitions that have previously
+> > been hidden by lib-y.
+> >
+> > The prom_cleanup() in this file is already marked as __weak (because
+> > it is overridden by the one in arch/mips/sgi-ip22/ip22-mc.c).
+> > I think it should be OK to do the same for these two.
+> >
+> > [1]: https://github.com/ClangBuiltLinux/linux/issues/515
+> >
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> > If MIPS maintainers ack this patch,
+> > I want to inser it before the following patch:
+>
+>
+> Acked-By: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+>
+> Thomas.
 
-It is inconvenient if you prepare the .config that is carried to a
-different build environment (typically this happens when you package
-the kernel for distros) because using a different compiler potentially
-produces different CONFIG options than the real build environment.
-So, you probably want to make as many options visible as possible.
-In other words, you need to create a super-set of CONFIG options that
-cover any build environment. If some of the CONFIG options turned out
-to be unsupported on the build machine, they are automatically disabled
-by the nature of Kconfig.
 
-However, it is not feasible to get a full-featured compiler for every
-arch.
+Applied to linux-kbuild with Thomas' Ack.
 
-This issue was discussed here:
+Thanks.
 
-  https://lkml.org/lkml/2019/12/9/620
 
-Other than distros, savedefconfig is also a problem. Some arch sub-systems
-periodically resync defconfig files. If you use a less-capable compiler
-for savedefconfig, options that do not meet 'depends on $(cc-option,...)'
-will be forcibly disabled. So, 'make defconfig && make savedefconfig'
-may silently change the behavior.
+>
+> --
+> Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+> good idea.                                                [ RFC1925, 2.3 ]
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200406110333.GA6266%40alpha.franken.de.
 
-This commit adds a set of dummy toolchains that pretend to support any
-feature.
 
-Most of compiler features are tested by cc-option, which simply checks
-the exit code of $(CC). The dummy tools are shell scripts that always
-exit with 0. So, $(cc-option, ...) is evaluated as 'y'.
 
-There are more complicated checks such as:
-
-  scripts/gcc-x86_{32,64}-has-stack-protector.sh
-  scripts/gcc-plugin.sh
-  scripts/tools-support-relr.sh
-
-scripts/dummy-tools/gcc passes all checks.
-
-From the top directory of the source tree, you can do:
-
-   $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Philipp Rudo <prudo@linux.ibm.com>
----
-
-Changes in v2:
-  - support --version and -v for ld, objdump, nm
-
- scripts/dummy-tools/gcc     | 91 +++++++++++++++++++++++++++++++++++++
- scripts/dummy-tools/ld      | 30 ++++++++++++
- scripts/dummy-tools/nm      |  1 +
- scripts/dummy-tools/objcopy |  1 +
- 4 files changed, 123 insertions(+)
- create mode 100755 scripts/dummy-tools/gcc
- create mode 100755 scripts/dummy-tools/ld
- create mode 120000 scripts/dummy-tools/nm
- create mode 120000 scripts/dummy-tools/objcopy
-
-diff --git a/scripts/dummy-tools/gcc b/scripts/dummy-tools/gcc
-new file mode 100755
-index 000000000000..33487e99d83e
---- /dev/null
-+++ b/scripts/dummy-tools/gcc
-@@ -0,0 +1,91 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Staring v4.18, Kconfig evaluates compiler capabilities, and hides CONFIG
-+# options your compiler does not support. This works well if you configure and
-+# build the kernel on the same host machine.
-+#
-+# It is inconvenient if you prepare the .config that is carried to a different
-+# build environment (typically this happens when you package the kernel for
-+# distros) because using a different compiler potentially produces different
-+# CONFIG options than the real build environment. So, you probably want to make
-+# as many options visible as possible. In other words, you need to create a
-+# super-set of CONFIG options that cover any build environment. If some of the
-+# CONFIG options turned out to be unsupported on the build machine, they are
-+# automatically disabled by the nature of Kconfig.
-+#
-+# However, it is not feasible to get a full-featured compiler for every arch.
-+# Hence these dummy toolchains to make all compiler tests pass.
-+#
-+# Usage:
-+#
-+# From the top directory of the source tree, run
-+#
-+#   $ make CROSS_COMPILE=scripts/dummy-tools/ oldconfig
-+#
-+# Most of compiler features are tested by cc-option, which simply checks the
-+# exit code of $(CC). This script does nothing and just exits with 0 in most
-+# cases. So, $(cc-option, ...) is evaluated as 'y'.
-+#
-+# This scripts caters to more checks; handle --version and pre-process __GNUC__
-+# etc. to pretend to be GCC, and also do right things to satisfy some scripts.
-+
-+# Check if the first parameter appears in the rest. Succeeds if found.
-+# This helper is useful if a particular option was passed to this script.
-+# Typically used like this:
-+#   arg_contain <word-you-are-searching-for> "$@"
-+arg_contain ()
-+{
-+	search="$1"
-+	shift
-+
-+	while [ $# -gt 0 ]
-+	do
-+		if [ "$search" = "$1" ]; then
-+			return 0
-+		fi
-+		shift
-+	done
-+
-+	return 1
-+}
-+
-+# To set CONFIG_CC_IS_GCC=y
-+if arg_contain --version "$@"; then
-+	echo "gcc (scripts/dummy-tools/gcc)"
-+	exit 0
-+fi
-+
-+if arg_contain -E "$@"; then
-+	# For scripts/gcc-version.sh; This emulates GCC 20.0.0
-+	if arg_contain - "$@"; then
-+		sed 's/^__GNUC__$/20/; s/^__GNUC_MINOR__$/0/; s/^__GNUC_PATCHLEVEL__$/0/'
-+		exit 0
-+	else
-+		echo "no input files" >&2
-+		exit 1
-+	fi
-+fi
-+
-+if arg_contain -S "$@"; then
-+	# For scripts/gcc-x86-*-has-stack-protector.sh
-+	if arg_contain -fstack-protector "$@"; then
-+		echo "%gs"
-+		exit 0
-+	fi
-+fi
-+
-+# For scripts/gcc-plugin.sh
-+if arg_contain -print-file-name=plugin "$@"; then
-+	plugin_dir=$(mktemp -d)
-+
-+	sed -n 's/.*#include "\(.*\)"/\1/p' $(dirname $0)/../gcc-plugins/gcc-common.h |
-+	while read header
-+	do
-+		mkdir -p $plugin_dir/include/$(dirname $header)
-+		touch $plugin_dir/include/$header
-+	done
-+
-+	echo $plugin_dir
-+	exit 0
-+fi
-diff --git a/scripts/dummy-tools/ld b/scripts/dummy-tools/ld
-new file mode 100755
-index 000000000000..f68233050405
---- /dev/null
-+++ b/scripts/dummy-tools/ld
-@@ -0,0 +1,30 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+# Dummy script that always succeeds.
-+
-+# Check if the first parameter appears in the rest. Succeeds if found.
-+# This helper is useful if a particular option was passed to this script.
-+# Typically used like this:
-+#   arg_contain <word-you-are-searching-for> "$@"
-+arg_contain ()
-+{
-+	search="$1"
-+	shift
-+
-+	while [ $# -gt 0 ]
-+	do
-+		if [ "$search" = "$1" ]; then
-+			return 0
-+		fi
-+		shift
-+	done
-+
-+	return 1
-+}
-+
-+if arg_contain --version "$@" || arg_contain -v "$@"; then
-+	progname=$(basename $0)
-+	echo "GNU $progname (scripts/dummy-tools/$progname) 2.50"
-+	exit 0
-+fi
-diff --git a/scripts/dummy-tools/nm b/scripts/dummy-tools/nm
-new file mode 120000
-index 000000000000..c0648b38dd42
---- /dev/null
-+++ b/scripts/dummy-tools/nm
-@@ -0,0 +1 @@
-+ld
-\ No newline at end of file
-diff --git a/scripts/dummy-tools/objcopy b/scripts/dummy-tools/objcopy
-new file mode 120000
-index 000000000000..c0648b38dd42
---- /dev/null
-+++ b/scripts/dummy-tools/objcopy
-@@ -0,0 +1 @@
-+ld
-\ No newline at end of file
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
