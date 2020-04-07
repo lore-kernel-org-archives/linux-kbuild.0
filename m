@@ -1,58 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:23206 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbgDGS4q (ORCPT
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34527 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726332AbgDGTDl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Apr 2020 14:56:46 -0400
+        Tue, 7 Apr 2020 15:03:41 -0400
+Received: by mail-pf1-f194.google.com with SMTP id v23so1875564pfm.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Apr 2020 12:03:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+icZUWnZwaNooj4WLvS7FKhkDgq3R3xUaQ8hFjuDgZTSj0s2Q@mail.gmail.com>
-In-Reply-To: <CA+icZUWnZwaNooj4WLvS7FKhkDgq3R3xUaQ8hFjuDgZTSj0s2Q@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 8 Apr 2020 03:55:59 +0900
-Message-ID: <CAK7LNATub3fpeTY67miVYJ27MtfwaeETW0HrWHYdM0mmaKCYPA@mail.gmail.com>
-Subject: Re: kbuild: do not pass $(KBUILD_CFLAGS) to scripts/mkcompile_h
+References: <20200407184336.14612-1-masahiroy@kernel.org>
+In-Reply-To: <20200407184336.14612-1-masahiroy@kernel.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 7 Apr 2020 12:03:29 -0700
+Message-ID: <CAKwvOd=pz7yWSyZ-v3uGNpc9u4zDAiycBrdGczp5oWrY7H_rvg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: replace AS=clang with LLVM_IA=1
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Thomas Gleixner <tglx@linutronix.de>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Hi Sedat,
-
-On Mon, Apr 6, 2020 at 7:01 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+On Tue, Apr 7, 2020 at 11:44 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> [ Please CC me I am not subscribed to this mailing-list ]
+> The 'AS' variable is unused for building the kernel. Only the remaining
+> usage is to turn on the integrated assembler. A boolean flag is a better
+> fit for this purpose.
 >
-> Hi,
+> AS=clang was added for experts. So, I replaced it with LLVM_IA=1,
+> breaking the backward compatibility.
 >
-> I think with your patch in [1] line #56 can go away, too?
+> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Thank you for this series!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+
+> ---
 >
-> [ scripts/mkcompile_h ]
+> Changes in v2:
+>   - new patch
 >
-> 53 # Generate a temporary compile.h
-> 54
-> 55 { echo /\* This file is auto generated, version $VERSION \*/
-> 56   if [ -n "$CONFIG_FLAGS" ] ; then echo "/* $CONFIG_FLAGS */"; fi
-
-
-
-I think the this inserts a comment line
-to make sure compile.h is updated
-when any of CONFIG_SMP, CONFIG_PREEMPT, CONFIG_PREEMPT_RT
-is changed.
-
-So, this is unrelated to my patch at least.
-
-
-> Thanks.
+>  Documentation/kbuild/llvm.rst | 5 ++++-
+>  Makefile                      | 2 +-
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 >
-> Regards,
-> - Sedat -
+> diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+> index eefbdfa3e4d9..2b40afa58049 100644
+> --- a/Documentation/kbuild/llvm.rst
+> +++ b/Documentation/kbuild/llvm.rst
+> @@ -50,11 +50,14 @@ LLVM Utilities
+>  LLVM has substitutes for GNU binutils utilities. These can be invoked as
+>  additional parameters to `make`.
 >
-> [1] https://patchwork.kernel.org/patch/11473667/
+> -       make CC=clang AS=clang LD=ld.lld AR=llvm-ar NM=llvm-nm STRIP=llvm-strip \\
+> +       make CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm STRIP=llvm-strip \\
+>           OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump OBJSIZE=llvm-size \\
+>           READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar \\
+>           HOSTLD=ld.lld
+>
+> +Currently, the integrated assembler is disabled by default. You can pass
+> +LLVM_IA=1 to enable it.
+> +
+>  Getting Help
+>  ------------
+>
+> diff --git a/Makefile b/Makefile
+> index 1b2691057cb5..f9beb696d6d3 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -538,7 +538,7 @@ endif
+>  ifneq ($(GCC_TOOLCHAIN),)
+>  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+> -ifeq ($(if $(AS),$(shell $(AS) --version 2>&1 | head -n 1 | grep clang)),)
+> +ifneq ($(LLVM_IA),1)
+>  CLANG_FLAGS    += -no-integrated-as
+>  endif
+>  CLANG_FLAGS    += -Werror=unknown-warning-option
+> --
+> 2.17.1
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200407184336.14612-1-masahiroy%40kernel.org.
 
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
