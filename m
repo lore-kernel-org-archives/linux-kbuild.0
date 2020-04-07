@@ -1,45 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:45300 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726877AbgDGFMm (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:23941 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728917AbgDGPkW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Apr 2020 01:12:42 -0400
-Received: by mail-ot1-f67.google.com with SMTP id c9so460140otl.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Apr 2020 22:12:41 -0700 (PDT)
+        Tue, 7 Apr 2020 11:40:22 -0400
 MIME-Version: 1.0
-From: SANDRA DEWI <dewisandra154@gmail.com>
-Date: Tue, 7 Apr 2020 05:12:40 +0000
-Message-ID: <CABRVPWys0xe4CWBkaU0ZXQW+4d=tjDOjyo8cKohc5-VFkWPkcA@mail.gmail.com>
-Subject: whether this is your correct email address or not
+References: <20200403090224.24045-1-masahiroy@kernel.org> <20200406180558.GA22412@dev.jcline.org>
+In-Reply-To: <20200406180558.GA22412@dev.jcline.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 8 Apr 2020 00:39:34 +0900
+Message-ID: <CAK7LNASn8z4SF9YeyidjYDmA+1MMV9VArem=Scui51LaB3Q1wg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add dummy toolchains to enable all cc-option etc.
+ in Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Jeremy Cline <jcline@redhat.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-s390 <linux-s390@vger.kernel.org>, Michal Kubecek <mkubecek@suse.cz>, Philipp Rudo <prudo@linux.ibm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Dear ,Pastor
+On Tue, Apr 7, 2020 at 3:06 AM Jeremy Cline <jcline@redhat.com> wrote:
 
-
-
-I have a client who is an oil business man and he made a fixed deposit
-of $26 million USD in my bank, where I am the director of the branch,
-My client died with his entire family in Jordanian
-
-50% of the fund will be for the church  for the work of God,the
-balance 50% we share it in the ratio of 50/50. Meaning 50% to you and
-50% for me
-
-intervention in the Syrian Civil War 2014 leaving behind no next of
-kin. I Propose to present you as next of kin to claim the funds, if
-interested reply me for full details and how we are to
-
-
-
-proceed to close this deal.
+> > diff --git a/scripts/dummy-tools/ld b/scripts/dummy-tools/ld
+> > new file mode 100755
+> > index 000000000000..3bc56ae4cc15
+> > --- /dev/null
+> > +++ b/scripts/dummy-tools/ld
+> > @@ -0,0 +1,4 @@
+> > +#!/bin/sh
+> > +# SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +# Dummy script that always succeeds
+>
+> It looks like scripts/Kbuild.include expects "$(LD) --version" to return
+> something. If it doesn't "ld-ifversion" stops working.
 
 
+Actually, scripts/Kbuild.include is not used in the Kconfig stage.
+So, scripts/dummy-tools/ld does not need to handle --version or -v,
+but we may do that in the future.
+
+I will support it in v2.
 
 
-Mrs. Sandra Dewi
+> Other than that it seems to work as advertised. Thanks!
+>
+> - Jeremy
+>
 
 
-
-Email  mrsdewi@gmx.com
+-- 
+Best Regards
+Masahiro Yamada
