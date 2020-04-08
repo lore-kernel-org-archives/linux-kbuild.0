@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pj1-f43.google.com ([209.85.216.43]:51614 "EHLO
-        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726799AbgDHV4W (ORCPT
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38207 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726937AbgDHV4Y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Apr 2020 17:56:22 -0400
+        Wed, 8 Apr 2020 17:56:24 -0400
 From: Nick Terrell <nickrterrell@gmail.com>
-Subject: [PATCH v5 7/8] x86: Add support for ZSTD compressed kernel
-Date: Wed,  8 Apr 2020 14:57:10 -0700
-Message-Id: <20200408215711.137639-8-nickrterrell@gmail.com>
+Subject: [PATCH v5 8/8] .gitignore: add ZSTD-compressed files
+Date: Wed,  8 Apr 2020 14:57:11 -0700
+Message-Id: <20200408215711.137639-9-nickrterrell@gmail.com>
 In-Reply-To: <20200408215711.137639-1-nickrterrell@gmail.com>
 References: <20200408215711.137639-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
@@ -17,127 +17,30 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Nick Terrell <terrelln@fb.com>
 Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Nick Terrell <nickrterrell@gmail.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-From: Nick Terrell <terrelln@fb.com>
+From: Adam Borowski <kilobyte@angband.pl>
 
-* Add support for zstd compressed kernel
-* Bump the heap size for zstd.
-* Update the documentation.
+For now, that's arch/x86/boot/compressed/vmlinux.bin.zst but probably more
+will come, thus let's be consistent with all other compressors.
 
-Integrates the ZSTD decompression code to the x86 pre-boot code.
-
-Zstandard requires slightly more memory during the kernel decompression
-on x86 (192 KB vs 64 KB), and the memory usage is independent of the
-window size.
-
-This patch has been boot tested with both a zstd and gzip compressed
-kernel on i386 and x86_64 using buildroot and QEMU.
-
-Additionally, this has been tested in production on x86_64 devices.
-We saw a 2 second boot time reduction by switching kernel compression
-from xz to zstd.
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Nick Terrell <terrelln@fb.com>
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
 ---
- Documentation/x86/boot.rst        | 6 +++---
- arch/x86/Kconfig                  | 1 +
- arch/x86/boot/compressed/Makefile | 5 ++++-
- arch/x86/boot/compressed/misc.c   | 4 ++++
- arch/x86/include/asm/boot.h       | 6 ++++--
- 5 files changed, 16 insertions(+), 6 deletions(-)
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/x86/boot.rst b/Documentation/x86/boot.rst
-index fa7ddc0428c8..0404e99dc1d4 100644
---- a/Documentation/x86/boot.rst
-+++ b/Documentation/x86/boot.rst
-@@ -782,9 +782,9 @@ Protocol:	2.08+
-   uncompressed data should be determined using the standard magic
-   numbers.  The currently supported compression formats are gzip
-   (magic numbers 1F 8B or 1F 9E), bzip2 (magic number 42 5A), LZMA
--  (magic number 5D 00), XZ (magic number FD 37), and LZ4 (magic number
--  02 21).  The uncompressed payload is currently always ELF (magic
--  number 7F 45 4C 46).
-+  (magic number 5D 00), XZ (magic number FD 37), LZ4 (magic number
-+  02 21) and ZSTD (magic number 28 B5). The uncompressed payload is
-+  currently always ELF (magic number 7F 45 4C 46).
- 
- ============	==============
- Field name:	payload_length
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 886fa8368256..912f783bc01a 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -185,6 +185,7 @@ config X86
- 	select HAVE_KERNEL_LZMA
- 	select HAVE_KERNEL_LZO
- 	select HAVE_KERNEL_XZ
-+	select HAVE_KERNEL_ZSTD
- 	select HAVE_KPROBES
- 	select HAVE_KPROBES_ON_FTRACE
- 	select HAVE_FUNCTION_ERROR_INJECTION
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 7619742f91c9..471e61400a2e 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -26,7 +26,7 @@ OBJECT_FILES_NON_STANDARD	:= y
- KCOV_INSTRUMENT		:= n
- 
- targets := vmlinux vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2 vmlinux.bin.lzma \
--	vmlinux.bin.xz vmlinux.bin.lzo vmlinux.bin.lz4
-+	vmlinux.bin.xz vmlinux.bin.lzo vmlinux.bin.lz4 vmlinux.bin.zst
- 
- KBUILD_CFLAGS := -m$(BITS) -O2
- KBUILD_CFLAGS += -fno-strict-aliasing $(call cc-option, -fPIE, -fPIC)
-@@ -145,6 +145,8 @@ $(obj)/vmlinux.bin.lzo: $(vmlinux.bin.all-y) FORCE
- 	$(call if_changed,lzo)
- $(obj)/vmlinux.bin.lz4: $(vmlinux.bin.all-y) FORCE
- 	$(call if_changed,lz4)
-+$(obj)/vmlinux.bin.zst: $(vmlinux.bin.all-y) FORCE
-+	$(call if_changed,zstd)
- 
- suffix-$(CONFIG_KERNEL_GZIP)	:= gz
- suffix-$(CONFIG_KERNEL_BZIP2)	:= bz2
-@@ -152,6 +154,7 @@ suffix-$(CONFIG_KERNEL_LZMA)	:= lzma
- suffix-$(CONFIG_KERNEL_XZ)	:= xz
- suffix-$(CONFIG_KERNEL_LZO) 	:= lzo
- suffix-$(CONFIG_KERNEL_LZ4) 	:= lz4
-+suffix-$(CONFIG_KERNEL_ZSTD)	:= zst
- 
- quiet_cmd_mkpiggy = MKPIGGY $@
-       cmd_mkpiggy = $(obj)/mkpiggy $< > $@
-diff --git a/arch/x86/boot/compressed/misc.c b/arch/x86/boot/compressed/misc.c
-index 9652d5c2afda..39e592d0e0b4 100644
---- a/arch/x86/boot/compressed/misc.c
-+++ b/arch/x86/boot/compressed/misc.c
-@@ -77,6 +77,10 @@ static int lines, cols;
- #ifdef CONFIG_KERNEL_LZ4
- #include "../../../../lib/decompress_unlz4.c"
- #endif
-+
-+#ifdef CONFIG_KERNEL_ZSTD
-+#include "../../../../lib/decompress_unzstd.c"
-+#endif
- /*
-  * NOTE: When adding a new decompressor, please update the analysis in
-  * ../header.S.
-diff --git a/arch/x86/include/asm/boot.h b/arch/x86/include/asm/boot.h
-index 680c320363db..d6dd43d25d9f 100644
---- a/arch/x86/include/asm/boot.h
-+++ b/arch/x86/include/asm/boot.h
-@@ -24,9 +24,11 @@
- # error "Invalid value for CONFIG_PHYSICAL_ALIGN"
- #endif
- 
--#ifdef CONFIG_KERNEL_BZIP2
-+#if defined(CONFIG_KERNEL_BZIP2)
- # define BOOT_HEAP_SIZE		0x400000
--#else /* !CONFIG_KERNEL_BZIP2 */
-+#elif defined(CONFIG_KERNEL_ZSTD)
-+# define BOOT_HEAP_SIZE		 0x30000
-+#else
- # define BOOT_HEAP_SIZE		 0x10000
- #endif
- 
+diff --git a/.gitignore b/.gitignore
+index 2258e906f01c..23871de69072 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -44,6 +44,7 @@
+ *.tab.[ch]
+ *.tar
+ *.xz
++*.zst
+ Module.symvers
+ modules.builtin
+ modules.order
 -- 
 2.26.0
