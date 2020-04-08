@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43829 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726799AbgDHV4B (ORCPT
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:51093 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726799AbgDHV4O (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Apr 2020 17:56:01 -0400
+        Wed, 8 Apr 2020 17:56:14 -0400
 From: Nick Terrell <nickrterrell@gmail.com>
-Subject: [PATCH v5 2/8] lib: prepare xxhash for preboot environment
-Date: Wed,  8 Apr 2020 14:57:05 -0700
-Message-Id: <20200408215711.137639-3-nickrterrell@gmail.com>
+Subject: [PATCH v5 5/8] usr: add support for zstd compressed initramfs
+Date: Wed,  8 Apr 2020 14:57:08 -0700
+Message-Id: <20200408215711.137639-6-nickrterrell@gmail.com>
 In-Reply-To: <20200408215711.137639-1-nickrterrell@gmail.com>
 References: <20200408215711.137639-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
@@ -19,111 +19,80 @@ Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.ke
 
 From: Nick Terrell <terrelln@fb.com>
 
-Don't export symbols if XXH_PREBOOT is defined.
+* Add support for a zstd compressed initramfs.
+* Add compression for compressing built-in initramfs with zstd.
 
-This change is necessary to get xxhash to work in a preboot environment,
-which is needed to support zstd-compressed kernels.
+I have tested this patch by boot testing with buildroot and QEMU.
+Specifically, I booted the kernel with both a zstd and gzip compressed
+initramfs, both built into the kernel and separate. I ensured that the
+correct compression algorithm was used. I tested on arm, aarch64, i386,
+and x86_64.
+
+This patch has been tested in production on aarch64 and x86_64 devices.
+
+Additionally, I have performance measurements from internal use in
+production. On an aarch64 device we saw 19 second boot time improvement
+from switching from lzma to zstd (27 seconds to 8 seconds). On an x86_64
+device we saw a 9 second boot time reduction from switching from xz to
+zstd.
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
 Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
- lib/xxhash.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ usr/Kconfig  | 20 ++++++++++++++++++++
+ usr/Makefile |  1 +
+ 2 files changed, 21 insertions(+)
 
-diff --git a/lib/xxhash.c b/lib/xxhash.c
-index aa61e2a3802f..b4364e011392 100644
---- a/lib/xxhash.c
-+++ b/lib/xxhash.c
-@@ -80,13 +80,11 @@ void xxh32_copy_state(struct xxh32_state *dst, const struct xxh32_state *src)
- {
- 	memcpy(dst, src, sizeof(*dst));
- }
--EXPORT_SYMBOL(xxh32_copy_state);
+diff --git a/usr/Kconfig b/usr/Kconfig
+index 96afb03b65f9..2599bc21c1b2 100644
+--- a/usr/Kconfig
++++ b/usr/Kconfig
+@@ -100,6 +100,15 @@ config RD_LZ4
+ 	  Support loading of a LZ4 encoded initial ramdisk or cpio buffer
+ 	  If unsure, say N.
  
- void xxh64_copy_state(struct xxh64_state *dst, const struct xxh64_state *src)
- {
- 	memcpy(dst, src, sizeof(*dst));
- }
--EXPORT_SYMBOL(xxh64_copy_state);
- 
- /*-***************************
-  * Simple Hash Functions
-@@ -151,7 +149,6 @@ uint32_t xxh32(const void *input, const size_t len, const uint32_t seed)
- 
- 	return h32;
- }
--EXPORT_SYMBOL(xxh32);
- 
- static uint64_t xxh64_round(uint64_t acc, const uint64_t input)
- {
-@@ -234,7 +231,6 @@ uint64_t xxh64(const void *input, const size_t len, const uint64_t seed)
- 
- 	return h64;
- }
--EXPORT_SYMBOL(xxh64);
- 
- /*-**************************************************
-  * Advanced Hash Functions
-@@ -251,7 +247,6 @@ void xxh32_reset(struct xxh32_state *statePtr, const uint32_t seed)
- 	state.v4 = seed - PRIME32_1;
- 	memcpy(statePtr, &state, sizeof(state));
- }
--EXPORT_SYMBOL(xxh32_reset);
- 
- void xxh64_reset(struct xxh64_state *statePtr, const uint64_t seed)
- {
-@@ -265,7 +260,6 @@ void xxh64_reset(struct xxh64_state *statePtr, const uint64_t seed)
- 	state.v4 = seed - PRIME64_1;
- 	memcpy(statePtr, &state, sizeof(state));
- }
--EXPORT_SYMBOL(xxh64_reset);
- 
- int xxh32_update(struct xxh32_state *state, const void *input, const size_t len)
- {
-@@ -334,7 +328,6 @@ int xxh32_update(struct xxh32_state *state, const void *input, const size_t len)
- 
- 	return 0;
- }
--EXPORT_SYMBOL(xxh32_update);
- 
- uint32_t xxh32_digest(const struct xxh32_state *state)
- {
-@@ -372,7 +365,6 @@ uint32_t xxh32_digest(const struct xxh32_state *state)
- 
- 	return h32;
- }
--EXPORT_SYMBOL(xxh32_digest);
- 
- int xxh64_update(struct xxh64_state *state, const void *input, const size_t len)
- {
-@@ -439,7 +431,6 @@ int xxh64_update(struct xxh64_state *state, const void *input, const size_t len)
- 
- 	return 0;
- }
--EXPORT_SYMBOL(xxh64_update);
- 
- uint64_t xxh64_digest(const struct xxh64_state *state)
- {
-@@ -494,7 +485,19 @@ uint64_t xxh64_digest(const struct xxh64_state *state)
- 
- 	return h64;
- }
++config RD_ZSTD
++	bool "Support initial ramdisk/ramfs compressed using ZSTD"
++	default y
++	depends on BLK_DEV_INITRD
++	select DECOMPRESS_ZSTD
++	help
++	  Support loading of a ZSTD encoded initial ramdisk or cpio buffer.
++	  If unsure, say N.
 +
-+#ifndef XXH_PREBOOT
-+EXPORT_SYMBOL(xxh32_copy_state);
-+EXPORT_SYMBOL(xxh64_copy_state);
-+EXPORT_SYMBOL(xxh32);
-+EXPORT_SYMBOL(xxh64);
-+EXPORT_SYMBOL(xxh32_reset);
-+EXPORT_SYMBOL(xxh64_reset);
-+EXPORT_SYMBOL(xxh32_update);
-+EXPORT_SYMBOL(xxh32_digest);
-+EXPORT_SYMBOL(xxh64_update);
- EXPORT_SYMBOL(xxh64_digest);
+ choice
+ 	prompt "Built-in initramfs compression mode"
+ 	depends on INITRAMFS_SOURCE != ""
+@@ -196,6 +205,17 @@ config INITRAMFS_COMPRESSION_LZ4
+ 	  If you choose this, keep in mind that most distros don't provide lz4
+ 	  by default which could cause a build failure.
  
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_DESCRIPTION("xxHash");
-+#endif
++config INITRAMFS_COMPRESSION_ZSTD
++	bool "ZSTD"
++	depends on RD_ZSTD
++	help
++	  ZSTD is a compression algorithm targeting intermediate compression
++	  with fast decompression speed. It will compress better than GZIP and
++	  decompress around the same speed as LZO, but slower than LZ4.
++
++	  If you choose this, keep in mind that you may need to install the zstd
++	  tool to be able to compress the initram.
++
+ config INITRAMFS_COMPRESSION_NONE
+ 	bool "None"
+ 	help
+diff --git a/usr/Makefile b/usr/Makefile
+index c12e6b15ce72..b1a81a40eab1 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -15,6 +15,7 @@ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZMA)	:= lzma
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_XZ)	:= xzmisc
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZO)	:= lzo
+ compress-$(CONFIG_INITRAMFS_COMPRESSION_LZ4)	:= lz4
++compress-$(CONFIG_INITRAMFS_COMPRESSION_ZSTD)	:= zstd
+ 
+ obj-$(CONFIG_BLK_DEV_INITRD) := initramfs_data.o
+ 
 -- 
 2.26.0
