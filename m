@@ -1,67 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43082 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbgDHIAp (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:54122 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726436AbgDHKWr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Apr 2020 04:00:45 -0400
+        Wed, 8 Apr 2020 06:22:47 -0400
 MIME-Version: 1.0
-References: <CA+icZUWnZwaNooj4WLvS7FKhkDgq3R3xUaQ8hFjuDgZTSj0s2Q@mail.gmail.com>
- <CAK7LNATub3fpeTY67miVYJ27MtfwaeETW0HrWHYdM0mmaKCYPA@mail.gmail.com>
-In-Reply-To: <CAK7LNATub3fpeTY67miVYJ27MtfwaeETW0HrWHYdM0mmaKCYPA@mail.gmail.com>
+References: <202004020117.6E434C035@keescook>
+In-Reply-To: <202004020117.6E434C035@keescook>
 Reply-To: sedat.dilek@gmail.com
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Wed, 8 Apr 2020 10:00:30 +0200
-Message-ID: <CA+icZUV0omDqrmcR__bLVCDevCBQV7KjJ=dOyuQct5AZEoKWew@mail.gmail.com>
-Subject: Re: kbuild: do not pass $(KBUILD_CFLAGS) to scripts/mkcompile_h
+Date: Wed, 8 Apr 2020 12:22:33 +0200
+Message-ID: <CA+icZUU_5St7Z31_vSb_57YSm=u9NCKW=MJ2gZUGXnQ8Wx9Mbg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: mkcompile_h: Include $LD version in /proc/version
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, Thomas Gleixner <tglx@linutronix.de>
+To: Kees Cook <keescook@chromium.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, linux-kernel@vger.kernel.org
 
-On Tue, Apr 7, 2020 at 8:56 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Thu, Apr 2, 2020 at 10:18 AM Kees Cook <keescook@chromium.org> wrote:
 >
-> Hi Sedat,
->
-> On Mon, Apr 6, 2020 at 7:01 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > [ Please CC me I am not subscribed to this mailing-list ]
-> >
-> > Hi,
-> >
-> > I think with your patch in [1] line #56 can go away, too?
-> >
-> > [ scripts/mkcompile_h ]
-> >
-> > 53 # Generate a temporary compile.h
-> > 54
-> > 55 { echo /\* This file is auto generated, version $VERSION \*/
-> > 56   if [ -n "$CONFIG_FLAGS" ] ; then echo "/* $CONFIG_FLAGS */"; fi
->
->
->
-> I think the this inserts a comment line
-> to make sure compile.h is updated
-> when any of CONFIG_SMP, CONFIG_PREEMPT, CONFIG_PREEMPT_RT
-> is changed.
->
-> So, this is unrelated to my patch at least.
+> When doing Clang builds of the kernel, it is possible to link with
+> either ld.bfd (binutils) or ld.lld (LLVM), but it is not possible to
+> discover this from a running kernel. Add the "$LD -v" output to
+> /proc/version.
 >
 
-I mixed up CONFIG_FLAGS with KBUILD_CFLAGS - my bad.
+What about also having the linker and its version in the generated
+linux-config file?
 
-- sed@ -
+$ git diff
+diff --git a/Kconfig b/Kconfig
+index e10b3ee084d4..98fd210786e5 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -5,7 +5,7 @@
+ #
+ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
 
->
-> > Thanks.
-> >
-> > Regards,
-> > - Sedat -
-> >
-> > [1] https://patchwork.kernel.org/patch/11473667/
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+-comment "Compiler: $(CC_VERSION_TEXT)"
++comment "Compiler: $(CC_VERSION_TEXT) Linker: $(LD_VERSION_TEXT)"
+
+ source "scripts/Kconfig.include"
+
+diff --git a/Makefile b/Makefile
+index 91b90ec1737c..42d6834b2255 100644
+--- a/Makefile
++++ b/Makefile
+@@ -553,6 +553,9 @@ endif
+ # and from include/config/auto.conf.cmd to detect the compiler upgrade.
+ CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
+
++# LD_VERSION_TEXT is referenced from Kconfig (so it needs export).
++LD_VERSION_TEXT = $(shell $(LD) --version 2>/dev/null | head -n 1)
++
+ ifdef config-build
+ # ===========================================================================
+ # *config targets only - make sure prerequisites are updated, and descend
+@@ -562,7 +565,7 @@ ifdef config-build
+ # KBUILD_DEFCONFIG may point out an alternative default configuration
+ # used for 'make defconfig'
+ include arch/$(SRCARCH)/Makefile
+-export KBUILD_DEFCONFIG KBUILD_KCONFIG CC_VERSION_TEXT
++export KBUILD_DEFCONFIG KBUILD_KCONFIG CC_VERSION_TEXT LD_VERSION_TEXT
+
+ config: outputmakefile scripts_basic FORCE
+        $(Q)$(MAKE) $(build)=scripts/kconfig $@
+
+This generates here:
+
+--- /boot/config-5.6.0-3-amd64-clang    2020-04-01 13:18:13.000000000 +0200
++++ .config     2020-04-08 12:16:43.477674201 +0200
+@@ -1,10 +1,10 @@
+ #
+ # Automatically generated file; DO NOT EDIT.
+-# Linux/x86 5.6.0 Kernel Configuration
++# Linux/x86 5.6.3 Kernel Configuration
+ #
+
+ #
+-# Compiler: clang version 10.0.0-1
++# Compiler: clang version 10.0.0-2  Linker: LLD 10.0.0 (compatible
+with GNU linkers)
+
+- Sedat -
