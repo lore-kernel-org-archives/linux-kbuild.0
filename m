@@ -1,101 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:33636 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726799AbgDHV4K (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.133]:54596 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726234AbgDJRg2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Apr 2020 17:56:10 -0400
-From: Nick Terrell <nickrterrell@gmail.com>
-Subject: [PATCH v5 4/8] init: add support for zstd compressed kernel
-Date: Wed,  8 Apr 2020 14:57:07 -0700
-Message-Id: <20200408215711.137639-5-nickrterrell@gmail.com>
-In-Reply-To: <20200408215711.137639-1-nickrterrell@gmail.com>
-References: <20200408215711.137639-1-nickrterrell@gmail.com>
+        Fri, 10 Apr 2020 13:36:28 -0400
+Subject: Re: [PATCH] scripts/config: allow colons in option strings for sed
+References: <20200410165741.27078-1-jeremie.francois@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <1b824b27-aa2d-91ca-5540-15695994ef9a@infradead.org>
+Date: Fri, 10 Apr 2020 10:36:27 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200410165741.27078-1-jeremie.francois@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Terrell <terrelln@fb.com>
-Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Nick Terrell <nickrterrell@gmail.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
+To: "Jeremie Francois (on alpha)" <jeremie.francois@gmail.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-From: Nick Terrell <terrelln@fb.com>
+[adding Cc's]
 
-* Adds the zstd cmd to scripts/Makefile.lib
-* Adds the HAVE_KERNEL_ZSTD and KERNEL_ZSTD options
+On 4/10/20 9:57 AM, Jeremie Francois (on alpha) wrote:
+> Sed broke on some strings as it used colon as a separator.
+> I made it more robust by using \001, which is legit POSIX AFAIK.
+> 
+> E.g. ./config --set-str CONFIG_USBNET_DEVADDR "de:ad:be:ef:00:01"
+> failed with: sed: -e expression #1, char 55: unknown option to `s'
+> 
+> Signed-off-by: Jeremie Francois (on alpha) <jeremie.francois@gmail.com>
+> ---
+>  scripts/config | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/config b/scripts/config
+> index e0e39826dae9..d365081b60b2 100755
+> --- a/scripts/config
+> +++ b/scripts/config
+> @@ -7,6 +7,9 @@ myname=${0##*/}
+>  # If no prefix forced, use the default CONFIG_
+>  CONFIG_="${CONFIG_-CONFIG_}"
+>  
+> +# We use an uncommon delimiter for sed substitutions
+> +SED_DELIM=$(echo -en "\001")
+> +
+>  usage() {
+>  	cat >&2 <<EOL
+>  Manipulate options in a .config file from the command line.
+> @@ -83,7 +86,7 @@ txt_subst() {
+>  	local infile="$3"
+>  	local tmpfile="$infile.swp"
+>  
+> -	sed -e "s:$before:$after:" "$infile" >"$tmpfile"
+> +	sed -e "s$SED_DELIM$before$SED_DELIM$after$SED_DELIM" "$infile" >"$tmpfile"
+>  	# replace original file with the edited one
+>  	mv "$tmpfile" "$infile"
+>  }
+> 
 
-Architecture specific support is still needed for decompression.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
-Signed-off-by: Nick Terrell <terrelln@fb.com>
----
- init/Kconfig         | 15 ++++++++++++++-
- scripts/Makefile.lib | 15 +++++++++++++++
- 2 files changed, 29 insertions(+), 1 deletion(-)
-
-diff --git a/init/Kconfig b/init/Kconfig
-index 492bb7000aa4..806874fdd663 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -176,13 +176,16 @@ config HAVE_KERNEL_LZO
- config HAVE_KERNEL_LZ4
- 	bool
- 
-+config HAVE_KERNEL_ZSTD
-+	bool
-+
- config HAVE_KERNEL_UNCOMPRESSED
- 	bool
- 
- choice
- 	prompt "Kernel compression mode"
- 	default KERNEL_GZIP
--	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_UNCOMPRESSED
-+	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_ZSTD || HAVE_KERNEL_UNCOMPRESSED
- 	help
- 	  The linux kernel is a kind of self-extracting executable.
- 	  Several compression algorithms are available, which differ
-@@ -261,6 +264,16 @@ config KERNEL_LZ4
- 	  is about 8% bigger than LZO. But the decompression speed is
- 	  faster than LZO.
- 
-+config KERNEL_ZSTD
-+	bool "ZSTD"
-+	depends on HAVE_KERNEL_ZSTD
-+	help
-+	  ZSTD is a compression algorithm targeting intermediate compression
-+	  with fast decompression speed. It will compress better than GZIP and
-+	  decompress around the same speed as LZO, but slower than LZ4. You
-+	  will need at least 192 KB RAM or more for booting. The zstd command
-+	  line tools is required for compression.
-+
- config KERNEL_UNCOMPRESSED
- 	bool "None"
- 	depends on HAVE_KERNEL_UNCOMPRESSED
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index b12dd5ba4896..efe69b78d455 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -405,6 +405,21 @@ quiet_cmd_xzkern = XZKERN  $@
- quiet_cmd_xzmisc = XZMISC  $@
-       cmd_xzmisc = cat $(real-prereqs) | xz --check=crc32 --lzma2=dict=1MiB > $@
- 
-+# ZSTD
-+# ---------------------------------------------------------------------------
-+# Appends the uncompressed size of the data using size_append. The .zst
-+# format has the size information available at the beginning of the file too,
-+# but it's in a more complex format and it's good to avoid changing the part
-+# of the boot code that reads the uncompressed size.
-+# Note that the bytes added by size_append will make the zstd tool think that
-+# the file is corrupt. This is expected.
-+
-+quiet_cmd_zstd = ZSTD    $@
-+cmd_zstd = (cat $(filter-out FORCE,$^) | \
-+	zstd -19 && \
-+        $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-+	(rm -f $@ ; false)
-+
- # ASM offsets
- # ---------------------------------------------------------------------------
- 
 -- 
-2.26.0
+~Randy
