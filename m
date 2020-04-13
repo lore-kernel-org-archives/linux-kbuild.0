@@ -1,42 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:22932 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728194AbgDMPgE (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60618 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388123AbgDMTsK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Apr 2020 11:36:04 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kconfig: do not assign a variable in the return statement
-Date: Tue, 14 Apr 2020 00:35:42 +0900
-Message-Id: <20200413153542.94064-1-masahiroy@kernel.org>
+        Mon, 13 Apr 2020 15:48:10 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746E9C0A3BE2
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 Apr 2020 12:48:10 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id t40so4238125pjb.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 Apr 2020 12:48:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200413115815.141587-1-vitor@massaru.org>
+In-Reply-To: <20200413115815.141587-1-vitor@massaru.org>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Mon, 13 Apr 2020 12:47:58 -0700
+Message-ID: <CAFd5g45yG1sSyuft4e_hrFxTNeES5fQVVyjmN8qOFyEmoUU4fg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: arch/$(SUBARCH)/include/generated/ aren't cleaned
+ by mrproper
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
+To: Vitor Massaru Iha <vitor@massaru.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Shuah Khan <skhan@linuxfoundation.org>
 
-I am not a big fan of doing assignment in a return statement.
-Split it into two lines.
+On Mon, Apr 13, 2020 at 4:58 AM Vitor Massaru Iha <vitor@massaru.org> wrote:
+>
+> This bug was introduced in this commit a788b2ed81abe
+>
+> Related bug: https://bugzilla.kernel.org/show_bug.cgi?id=205219
+>
+> Signed-off-by: Vitor Massaru Iha <vitor@massaru.org>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Please elaborate on what this change does and why it is necessary.
+Shuah and I are not the only ones who will want to understand what is
+going on here.
 
- scripts/kconfig/menu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Otherwise, the change itself looks good to me.
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index e436ba44c9c5..a5fbd6ccc006 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -65,7 +65,8 @@ void menu_add_entry(struct symbol *sym)
- struct menu *menu_add_menu(void)
- {
- 	last_entry_ptr = &current_entry->list;
--	return current_menu = current_entry;
-+	current_menu = current_entry;
-+	return current_menu;
- }
- 
- void menu_end_menu(void)
--- 
-2.25.1
+Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
+Tested-by: Brendan Higgins <brendanhiggins@google.com>
