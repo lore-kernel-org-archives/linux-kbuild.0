@@ -1,91 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34896 "EHLO mail.kernel.org"
+Received: from mga03.intel.com ([134.134.136.65]:64180 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2636157AbgDONhJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Apr 2020 09:37:09 -0400
-From: Leon Romanovsky <leon@kernel.org>
-Subject: [PATCH net-next v1 4/4] kernel/module: Hide vermagic header file from general use
-Date: Wed, 15 Apr 2020 16:36:48 +0300
-Message-Id: <20200415133648.1306956-5-leon@kernel.org>
-In-Reply-To: <20200415133648.1306956-1-leon@kernel.org>
-References: <20200415133648.1306956-1-leon@kernel.org>
+        id S2442228AbgDOVFf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 15 Apr 2020 17:05:35 -0400
+From: Kristen Carlson Accardi <kristen@linux.intel.com>
+Subject: [PATCH 4/9] x86: Makefile: Add build and config option for CONFIG_FG_KASLR
+Date: Wed, 15 Apr 2020 14:04:46 -0700
+Message-Id: <20200415210452.27436-5-kristen@linux.intel.com>
+In-Reply-To: <20200415210452.27436-1-kristen@linux.intel.com>
+References: <20200415210452.27436-1-kristen@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leonro@mellanox.com>, Borislav Petkov <bp@suse.de>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org
+To: keescook@chromium.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, x86@kernel.org
+Cc: arjan@linux.intel.com, linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com, rick.p.edgecomb@intel.com, linux-kbuild@vger.kernel.org
 
-From: Leon Romanovsky <leonro@mellanox.com>
+Allow user to select CONFIG_FG_KASLR if dependencies are met. Change
+the make file to build with -ffunction-sections if CONFIG_FG_KASLR
 
-VERMAGIC* definitions are not supposed to be used by the drivers,
-see this [1] bug report, so simply move this header file to be visible
-to kernel/* and scripts files only.
-
-In-tree module build:
-➜  kernel git:(vermagic) ✗ make clean
-➜  kernel git:(vermagic) ✗ make M=drivers/infiniband/hw/mlx5
-➜  kernel git:(vermagic) ✗ modinfo drivers/infiniband/hw/mlx5/mlx5_ib.ko
-filename:	/images/leonro/src/kernel/drivers/infiniband/hw/mlx5/mlx5_ib.ko
-<...>
-vermagic:       5.6.0+ SMP mod_unload modversions
-
-Out-of-tree module build:
-➜  mlx5 make -C /images/leonro/src/kernel clean M=/tmp/mlx5
-➜  mlx5 make -C /images/leonro/src/kernel M=/tmp/mlx5
-➜  mlx5 modinfo /tmp/mlx5/mlx5_ib.ko
-filename:       /tmp/mlx5/mlx5_ib.ko
-<...>
-vermagic:       5.6.0+ SMP mod_unload modversions
-
-[1] https://lore.kernel.org/lkml/20200411155623.GA22175@zn.tnic
-Reported-by: Borislav Petkov <bp@suse.de>
-Acked-by: Borislav Petkov <bp@suse.de>
-Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+Signed-off-by: Kristen Carlson Accardi <kristen@linux.intel.com>
 ---
- kernel/module.c                      | 2 +-
- {include/linux => kernel}/vermagic.h | 0
- scripts/mod/modpost.c                | 2 +-
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename {include/linux => kernel}/vermagic.h (100%)
+ Makefile         |  4 ++++
+ arch/x86/Kconfig | 13 +++++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/kernel/module.c b/kernel/module.c
-index 3447f3b74870..fce06095d341 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -29,7 +29,6 @@
- #include <linux/moduleparam.h>
- #include <linux/errno.h>
- #include <linux/err.h>
--#include <linux/vermagic.h>
- #include <linux/notifier.h>
- #include <linux/sched.h>
- #include <linux/device.h>
-@@ -55,6 +54,7 @@
- #include <linux/audit.h>
- #include <uapi/linux/module.h>
- #include "module-internal.h"
-+#include "vermagic.h"
-
- #define CREATE_TRACE_POINTS
- #include <trace/events/module.h>
-diff --git a/include/linux/vermagic.h b/kernel/vermagic.h
-similarity index 100%
-rename from include/linux/vermagic.h
-rename to kernel/vermagic.h
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 5c3c50c5ec52..91f86261bcfe 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2252,7 +2252,7 @@ static void add_header(struct buffer *b, struct module *mod)
- 	 * inherit the definitions.
- 	 */
- 	buf_printf(b, "#include <linux/build-salt.h>\n");
--	buf_printf(b, "#include <linux/vermagic.h>\n");
-+	buf_printf(b, "#include <../kernel/vermagic.h>\n");
- 	buf_printf(b, "#include <linux/compiler.h>\n");
- 	buf_printf(b, "\n");
- 	buf_printf(b, "BUILD_SALT;\n");
---
-2.25.2
+diff --git a/Makefile b/Makefile
+index 70def4907036..337b72787200 100644
+--- a/Makefile
++++ b/Makefile
+@@ -866,6 +866,10 @@ ifdef CONFIG_LIVEPATCH
+ KBUILD_CFLAGS += $(call cc-option, -flive-patching=inline-clone)
+ endif
+ 
++ifdef CONFIG_FG_KASLR
++KBUILD_CFLAGS += -ffunction-sections
++endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 1d6104ea8af0..6aaece89f712 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2182,6 +2182,19 @@ config RANDOMIZE_BASE
+ 
+ 	  If unsure, say Y.
+ 
++config FG_KASLR
++	bool "Function Granular Kernel Address Space Layout Randomization"
++	depends on $(cc-option, -ffunction-sections)
++	depends on RANDOMIZE_BASE && X86_64
++	help
++	  This option improves the randomness of the kernel text
++	  over basic Kernel Address Space Layout Randomization (KASLR)
++	  by reordering the kernel text at boot time. This feature
++	  uses information generated at compile time to re-layout the
++	  kernel text section at boot time at function level granularity.
++
++	  If unsure, say N.
++
+ # Relocation on x86 needs some additional build support
+ config X86_NEED_RELOCS
+ 	def_bool y
+-- 
+2.20.1
