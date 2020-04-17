@@ -1,173 +1,207 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:49844 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730323AbgDQSNy (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Apr 2020 14:13:54 -0400
+Received: from mail-eopbgr50087.outbound.protection.outlook.com ([40.107.5.87]:12773
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730573AbgDQUHV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Apr 2020 16:07:21 -0400
+From: Saeed Mahameed <saeedm@mellanox.com>
+Subject: [RFC PATCH v2 1/3] Kconfig: Introduce "uses" keyword
+Date: Fri, 17 Apr 2020 13:06:25 -0700
+Message-Id: <20200417200627.129849-1-saeedm@mellanox.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 MIME-Version: 1.0
-References: <20200414012132.32721-1-vitor@massaru.org>
-In-Reply-To: <20200414012132.32721-1-vitor@massaru.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 18 Apr 2020 03:12:41 +0900
-Message-ID: <CAK7LNAQYxtcNinV7JR+c8Pn9Rp1g0TxJ7m_mOFNOJQsB=OiAoA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: ensure mrproper removes arch/$(SUBARCH)/include/generated/
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vitor Massaru Iha <vitor@massaru.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Brendan Higgins <brendanhiggins@google.com>, Shuah Khan <skhan@linuxfoundation.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Jason Gunthorpe <jgg@ziepe.ca>, Nicolas Pitre <nico@fluxnic.net>, Jani Nikula <jani.nikula@linux.intel.com>, Saeed Mahameed <saeedm@mellanox.com>, narmstrong@baylibre.com, Laurent.pinchart@ideasonboard.com, leon@kernel.org, kieran.bingham+renesas@ideasonboard.com, jonas@kwiboo.se, airlied@linux.ie, jernej.skrabec@siol.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
 
-Hi.
+Due to the changes to the semantics of the imply keyword [1], which now
+will not force any config options to the implied configs any more.
 
-On Tue, Apr 14, 2020 at 10:21 AM Vitor Massaru Iha <vitor@massaru.org> wrote:
->
-> In the following use case, when compiling the kernel for the UML
-> architecture, for example:
->
->  * `make ARCH=um defconfig && make ARCH=um -j8`,
->
-> SUBARCH files are generated, however when we run the command:
->
->  * `mrproper ARCH=um`
+A module (FOO) that has a weak dependency on some other modules (BAR)
+is now broken if it was using imply to force dependency restrictions.
+e.g.: FOO needs BAR to be reachable, especially when FOO=y and BAR=m.
+Which might now introduce build/link errors.
 
+There are two options to solve this:
+1. use IS_REACHABLE(BAR), everywhere BAR is referenced inside FOO.
+2. in FOO's Kconfig add: depends on (BAR || !BAR)
 
-      make ARCH=um mrproper
+The first option is not desirable, and will leave the user confused when
+setting FOO=y and BAR=m, FOO will never reach BAR even though both are
+compiled.
 
+The 2nd one is the preferred approach, and will guarantee BAR is always
+reachable by FOO if both are compiled. But, (BAR || !BAR) is really
+confusing for those who don't really get how kconfig tristate arithmetics
+work.
 
-> the files `arch/$(SUBARCH)/include/generated/ aren't cleaned up.
->
-> This generates compilation errors by running the following command:
->
->  * `make ARCH=um defconfig O=./build_um && make ARCH=um -j8 O=./build_um`
->
-> This PATCH fix that problem.
+To solve this and hide this weird expression and to avoid repetition
+across the tree, we introduce new keyword "uses" to the Kconfig options
+family.
 
-  This patch fixes ...
+uses BAR:
+Equivalent to: depends on symbol || !symbol
+Semantically it means, if FOO is enabled (y/m) and has the option:
+uses BAR, make sure it can reach/use BAR when possible.
 
->
-> This makes it possible to compile on different architectures that use the
-> SUBARCH variable, in different build directories and root directory of the
-> linux directory. This is important because we can compile without the object
-> files being overwritten. This reduces the re-compilation time in this use case.
+For example: if FOO=y and BAR=m, FOO will be forced to m.
 
-Sorry, I do not understand this paragraph.
+[1] https://lore.kernel.org/linux-doc/20200302062340.21453-1-masahiroy@kernel.org/
 
+Link: https://lkml.org/lkml/2020/4/8/839
+Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
 
-Brendan Higgins just reported the build error
-in the out-of-tree build after in-tree build.
+V2: - Fix double free due to single allocation of sym expr.
+    - Added a 3rd patch to convert to new keyword treewide.
 
+ Documentation/kbuild/kconfig-language.rst | 10 ++++++++++
+ scripts/kconfig/expr.h                    |  1 +
+ scripts/kconfig/lexer.l                   |  1 +
+ scripts/kconfig/menu.c                    |  4 +++-
+ scripts/kconfig/parser.y                  | 16 ++++++++++++++++
+ scripts/kconfig/symbol.c                  |  2 ++
+ 6 files changed, 33 insertions(+), 1 deletion(-)
 
-[1] make ARCH=um defconfig all
-[2] make ARCH=um mrproper
-[3] make ARCH=um O=foo defconfig all
-
-  -> build error
-
-Ins't it?
-
-
-
->
-> Besides that, in the workflow of developing unit tests, using kunit, and
-> compiling in different architectures to develop or test a PATCH, this use case
-> applies.
->
->  * This bug was introduced in this commit a788b2ed81abe
-
-
-Instead, adding Fixes tag is the convention.
-
-Fixes: a788b2ed81ab ("kbuild: check arch/$(SRCARCH)/include/generated
-before out-of-tree build")
-
-
->
->  * Related bug: https://bugzilla.kernel.org/show_bug.cgi?id=205219
-
-
-Maybe, this can be also a tag.
-
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=205219
-
-
-
-
->
-> Signed-off-by: Vitor Massaru Iha <vitor@massaru.org>
-
-
-Reported-by: Brendan Higgins <brendanhiggins@google.com>
-
-
-
-> Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
-> Tested-by: Brendan Higgins <brendanhiggins@google.com>
-> ---
-> v2:
->  * Explains what this PATCH does and the importance as suggested
->    by Brendan Higgins.
-> ---
->  Makefile | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 70def4907036..e1a79796032e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -532,7 +532,8 @@ outputmakefile:
->  ifdef building_out_of_srctree
->         $(Q)if [ -f $(srctree)/.config -o \
->                  -d $(srctree)/include/config -o \
-> -                -d $(srctree)/arch/$(SRCARCH)/include/generated ]; then \
-> +                -d $(srctree)/arch/$(SRCARCH)/include/generated -o \
-> +                -d $(srctree)/arch/$(SUBARCH)/include/generated ]; then \
-
-
-This hunk is unneeded.
-
-
-
->                 echo >&2 "***"; \
->                 echo >&2 "*** The source tree is not clean, please run 'make$(if $(findstring command line, $(origin ARCH)), ARCH=$(ARCH)) mrproper'"; \
->                 echo >&2 "*** in $(abs_srctree)";\
-> @@ -1388,6 +1389,7 @@ CLEAN_FILES += modules.builtin modules.builtin.modinfo modules.nsdeps
->  # Directories & files removed with 'make mrproper'
->  MRPROPER_DIRS  += include/config include/generated          \
->                   arch/$(SRCARCH)/include/generated .tmp_objdiff \
-> +                 arch/$(SUBARCH)/include/generated \
->                   debian/ snap/ tar-install/
->  MRPROPER_FILES += .config .config.old .version \
->                   Module.symvers \
-> --
-> 2.25.1
->
-
-
-This problem is only related to ARCH=um builds.
-So, it should be fixed in arch/um/Makefile.
-
-
-
-
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index d2daa206872d..275f5ffdf6f0 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -140,6 +140,7 @@ export CFLAGS_vmlinux := $(LINK-y) $(LINK_WRAPS)
-$(LD_FLAGS_CMDLINE)
- # When cleaning we don't include .config, so we don't include
- # TT or skas makefiles and don't clean skas_ptregs.h.
- CLEAN_FILES += linux x.i gmon.out
-+MRPROPER_DIRS += arch/$(SUBARCH)/include/generated
-
- archclean:
-        @find . \( -name '*.bb' -o -name '*.bbg' -o -name '*.da' \
-
-
-
-
-
---
-Best Regards
-Masahiro Yamada
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index a1601ec3317b..8db8c2d80794 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -130,6 +130,16 @@ applicable everywhere (see syntax).
+ 	bool "foo"
+ 	default y
+ 
++- uses dependencies: "uses" <symbol>
++
++  Equivalent to: depends on symbol || !symbol
++  Semantically it means, if FOO is enabled (y/m) and has the option:
++  uses BAR, make sure it can reach/use BAR when possible.
++  For example: if FOO=y and BAR=m, FOO will be forced to m.
++
++  Note:
++      To understand how (symbol || !symbol) is actually computed, please see `Menu dependencies`_
++
+ - reverse dependencies: "select" <symbol> ["if" <expr>]
+ 
+   While normal dependencies reduce the upper limit of a symbol (see
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 5c3443692f34..face672fb4b4 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -185,6 +185,7 @@ enum prop_type {
+ 	P_CHOICE,   /* choice value */
+ 	P_SELECT,   /* select BAR */
+ 	P_IMPLY,    /* imply BAR */
++	P_USES,     /* uses BAR */
+ 	P_RANGE,    /* range 7..100 (for a symbol) */
+ 	P_SYMBOL,   /* where a symbol is defined */
+ };
+diff --git a/scripts/kconfig/lexer.l b/scripts/kconfig/lexer.l
+index 6354c905b006..c6a0017b10d4 100644
+--- a/scripts/kconfig/lexer.l
++++ b/scripts/kconfig/lexer.l
+@@ -102,6 +102,7 @@ n	[A-Za-z0-9_-]
+ "default"		return T_DEFAULT;
+ "defconfig_list"	return T_DEFCONFIG_LIST;
+ "depends"		return T_DEPENDS;
++"uses"			return T_USES;
+ "endchoice"		return T_ENDCHOICE;
+ "endif"			return T_ENDIF;
+ "endmenu"		return T_ENDMENU;
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e436ba44c9c5..e26161b31a11 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -274,7 +274,9 @@ static void sym_check_prop(struct symbol *sym)
+ 			break;
+ 		case P_SELECT:
+ 		case P_IMPLY:
+-			use = prop->type == P_SELECT ? "select" : "imply";
++		case P_USES:
++			use = prop->type == P_SELECT ? "select" :
++				prop->type == P_IMPLY ? "imply" : "uses";
+ 			sym2 = prop_get_symbol(prop);
+ 			if (sym->type != S_BOOLEAN && sym->type != S_TRISTATE)
+ 				prop_warn(prop,
+diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
+index 708b6c4b13ca..0356ecbaf87d 100644
+--- a/scripts/kconfig/parser.y
++++ b/scripts/kconfig/parser.y
+@@ -57,6 +57,7 @@ static struct menu *current_menu, *current_entry;
+ %token T_DEF_BOOL
+ %token T_DEF_TRISTATE
+ %token T_DEPENDS
++%token T_USES
+ %token T_ENDCHOICE
+ %token T_ENDIF
+ %token T_ENDMENU
+@@ -169,6 +170,7 @@ config_option_list:
+ 	  /* empty */
+ 	| config_option_list config_option
+ 	| config_option_list depends
++	| config_option_list uses
+ 	| config_option_list help
+ ;
+ 
+@@ -261,6 +263,7 @@ choice_option_list:
+ 	  /* empty */
+ 	| choice_option_list choice_option
+ 	| choice_option_list depends
++	| choice_option_list uses
+ 	| choice_option_list help
+ ;
+ 
+@@ -360,6 +363,7 @@ menu_option_list:
+ 	  /* empty */
+ 	| menu_option_list visible
+ 	| menu_option_list depends
++	| menu_option_list uses
+ ;
+ 
+ source_stmt: T_SOURCE T_WORD_QUOTE T_EOL
+@@ -384,6 +388,7 @@ comment_stmt: comment comment_option_list
+ comment_option_list:
+ 	  /* empty */
+ 	| comment_option_list depends
++	| comment_option_list uses
+ ;
+ 
+ /* help option */
+@@ -418,6 +423,17 @@ depends: T_DEPENDS T_ON expr T_EOL
+ 	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
+ };
+ 
++/* uses symbol: depends on symbol || !symbol */
++uses: T_USES symbol T_EOL
++{
++	struct expr *symexpr1 = expr_alloc_symbol($2);
++	struct expr *symexpr2 = expr_alloc_symbol($2);
++
++	menu_add_dep(expr_alloc_two(E_OR, symexpr1, expr_alloc_one(E_NOT, symexpr2)));
++	printd(DEBUG_PARSE, "%s:%d: uses: depends on %s || ! %s\n",
++	       zconf_curname(), zconf_lineno(), $2->name, $2->name);
++};
++
+ /* visibility option */
+ visible: T_VISIBLE if_expr T_EOL
+ {
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 3dc81397d003..422f7ea47722 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1295,6 +1295,8 @@ const char *prop_get_type_name(enum prop_type type)
+ 		return "choice";
+ 	case P_SELECT:
+ 		return "select";
++	case P_USES:
++		return "uses";
+ 	case P_IMPLY:
+ 		return "imply";
+ 	case P_RANGE:
+-- 
+2.25.2
