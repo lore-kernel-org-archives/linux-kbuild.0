@@ -1,83 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vi1eur05on2042.outbound.protection.outlook.com ([40.107.21.42]:60896
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730304AbgDQLfp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Apr 2020 07:35:45 -0400
-From: Saeed Mahameed <saeedm@mellanox.com>
-Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-Date: Fri, 17 Apr 2020 11:35:40 +0000
-Message-ID: <f6f8ff1119123f920d1af5203a04acd7d13f6d90.camel@mellanox.com>
-References: <20200417011146.83973-1-saeedm@mellanox.com>
-         <CAK8P3a2LXR1pHoid7F69Q6VZp4E0g-Fcdt03PaGdebxWpguexw@mail.gmail.com>
-In-Reply-To: <CAK8P3a2LXR1pHoid7F69Q6VZp4E0g-Fcdt03PaGdebxWpguexw@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <14163460FA14EA42913FD2A51FFF5908@eurprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:17652 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728099AbgDQMIG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Apr 2020 08:08:06 -0400
 MIME-Version: 1.0
+References: <20200415133648.1306956-1-leon@kernel.org> <20200415133648.1306956-5-leon@kernel.org>
+In-Reply-To: <20200415133648.1306956-5-leon@kernel.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 17 Apr 2020 21:07:10 +0900
+Message-ID: <CAK7LNASacDbi-2sQ9uk+37gaU5J6p7YrucyWbzxYP1wQiU+NZA@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 4/4] kernel/module: Hide vermagic header file
+ from general use
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "arnd@arndb.de" <arnd@arndb.de>
-Cc: "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "nico@fluxnic.net" <nico@fluxnic.net>, "airlied@linux.ie" <airlied@linux.ie>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "leon@kernel.org" <leon@kernel.org>, "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leonro@mellanox.com>, Borislav Petkov <bp@suse.de>, Jessica Yu <jeyu@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Networking <netdev@vger.kernel.org>
 
-T24gRnJpLCAyMDIwLTA0LTE3IGF0IDEyOjI0ICswMjAwLCBBcm5kIEJlcmdtYW5uIHdyb3RlOg0K
-PiBPbiBGcmksIEFwciAxNywgMjAyMCBhdCAzOjEyIEFNIFNhZWVkIE1haGFtZWVkIDxzYWVlZG1A
-bWVsbGFub3guY29tPg0KPiB3cm90ZToNCj4gPiBEdWUgdG8gdGhlIGNoYW5nZXMgdG8gdGhlIHNl
-bWFudGljcyBvZiBpbXBseSBrZXl3b3JkIFsxXSwgd2hpY2ggbm93DQo+ID4gZG9lc24ndCBmb3Jj
-ZSBhbnkgY29uZmlnIG9wdGlvbnMgdG8gdGhlIGltcGxpZWQgY29uZmlncyBhbnkgbW9yZS4NCj4g
-PiANCj4gPiBBIG1vZHVsZSAoRk9PKSB0aGF0IGhhcyBhIHdlYWsgZGVwZW5kZW5jeSBvbiBzb21l
-IG90aGVyIG1vZHVsZXMNCj4gPiAoQkFSKQ0KPiA+IGlzIG5vdyBicm9rZW4gaWYgaXQgd2FzIHVz
-aW5nIGltcGx5IHRvIGZvcmNlIGRlcGVuZGVuY3kNCj4gPiByZXN0cmljdGlvbnMuDQo+ID4gZS5n
-LjogRk9PIG5lZWRzIEJBUiB0byBiZSByZWFjaGFibGUsIGVzcGVjaWFsbHkgd2hlbiBGT089eSBh
-bmQNCj4gPiBCQVI9bS4NCj4gPiBXaGljaCBtaWdodCBub3cgaW50cm9kdWNlIGJ1aWxkL2xpbmsg
-ZXJyb3JzLg0KPiA+IA0KPiA+IFRoZXJlIGFyZSB0d28gb3B0aW9ucyB0byBzb2x2ZSB0aGlzOg0K
-PiA+IDEuIHVzZSBJU19SRUFDSEFCTEUoQkFSKSwgZXZlcnl3aGVyZSBCQVIgaXMgcmVmZXJlbmNl
-ZCBpbnNpZGUgRk9PLg0KPiA+IDIuIGluIEZPTydzIEtjb25maWcgYWRkOiBkZXBlbmRzIG9uIChC
-QVIgfHwgIUJBUikNCj4gPiANCj4gPiBUaGUgZmlyc3Qgb3B0aW9uIGlzIG5vdCBkZXNpcmFibGUs
-IGFuZCB3aWxsIGxlYXZlIHRoZSB1c2VyIGNvbmZ1c2VkDQo+ID4gd2hlbg0KPiA+IHNldHRpbmcg
-Rk9PPXkgYW5kIEJBUj1tLCBGT08gd2lsbCBuZXZlciByZWFjaCBCQVIgZXZlbiB0aG91Z2ggYm90
-aA0KPiA+IGFyZQ0KPiA+IGNvbXBpbGVkLg0KPiA+IA0KPiA+IFRoZSAybmQgb25lIGlzIHRoZSBw
-cmVmZXJyZWQgYXBwcm9hY2gsIGFuZCB3aWxsIGd1YXJhbnRlZSBCQVIgaXMNCj4gPiBhbHdheXMN
-Cj4gPiByZWFjaGFibGUgYnkgRk9PIGlmIGJvdGggYXJlIGNvbXBpbGVkLiBCdXQsIChCQVIgfHwg
-IUJBUikgaXMgcmVhbGx5DQo+ID4gY29uZnVzaW5nIGZvciB0aG9zZSB3aG8gZG9uJ3QgcmVhbGx5
-IGdldCBob3cga2NvbmZpZyB0cmlzdGF0ZQ0KPiA+IGFyaXRobWV0aWNzDQo+ID4gd29yay4NCj4g
-PiANCj4gPiBUbyBzb2x2ZSB0aGlzIGFuZCBoaWRlIHRoaXMgd2VpcmQgZXhwcmVzc2lvbiBhbmQg
-dG8gYXZvaWQNCj4gPiByZXBldGl0aW9uDQo+ID4gYWNyb3NzIHRoZSB0cmVlLCB3ZSBpbnRyb2R1
-Y2UgbmV3IGtleXdvcmQgInVzZXMiIHRvIHRoZSBLY29uZmlnDQo+ID4gb3B0aW9ucw0KPiA+IGZh
-bWlseS4NCj4gPiANCj4gPiB1c2VzIEJBUjoNCj4gPiBFcXVpdmFsZW50IHRvOiBkZXBlbmRzIG9u
-IHN5bWJvbCB8fCAhc3ltYm9sDQo+ID4gU2VtYW50aWNhbGx5IGl0IG1lYW5zLCBpZiBGT08gaXMg
-ZW5hYmxlZCAoeS9tKSBhbmQgaGFzIHRoZSBvcHRpb246DQo+ID4gdXNlcyBCQVIsIG1ha2Ugc3Vy
-ZSBpdCBjYW4gcmVhY2gvdXNlIEJBUiB3aGVuIHBvc3NpYmxlLg0KPiA+IA0KPiA+IEZvciBleGFt
-cGxlOiBpZiBGT089eSBhbmQgQkFSPW0sIEZPTyB3aWxsIGJlIGZvcmNlZCB0byBtLg0KPiA+IA0K
-PiA+IFsxXSANCj4gPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1kb2MvMjAyMDAzMDIw
-NjIzNDAuMjE0NTMtMS1tYXNhaGlyb3lAa2VybmVsLm9yZy8NCj4gDQo+IFRoYW5rcyBhIGxvdCBm
-b3IgZ2V0dGluZyB0aGlzIGRvbmUuIEkndmUgdHJpZWQgaXQgb3V0IG9uIG15DQo+IHJhbmRjb25m
-aWcNCj4gYnVpbGQgdHJlZQ0KPiBhbmQgY2FuIGNvbmZpcm0gdGhhdCB0aGlzIHdvcmtzIHRvZ2V0
-aGVyIHdpdGggeW91ciBzZWNvbmQgcGF0Y2ggdG8NCj4gYWRkcmVzcyB0aGUNCj4gc3BlY2lmaWMg
-TUxYNSBwcm9ibGVtLg0KPiANCj4gSSBhbHNvIHRyaWVkIG91dCByZXBsYWNpbmcgYWxsIG90aGVy
-IGluc3RhbmNlcyBvZiAnZGVwZW5kcyBvbiBGT08gfHwNCj4gIUZPTycsIHVzaW5nDQo+IHRoaXMg
-b25lbGluZSBzY3JpcHQ6DQo+IA0KPiBnaXQgbHMtZmlsZXMgfCBncmVwIEtjb25maWcgfCAgeGFy
-Z3Mgc2VkIC1pDQo+ICdzOmRlcGVuZHMub24uXChbQS1aMC05X2Etel1cK1wpIHx8IFwoXDEgXD89
-IFw/blx8IVwxXCk6dXNlcyBcMTonDQo+IA0KPiBVbmZvcnR1bmF0ZWx5LCB0aGlzIGltbWVkaWF0
-ZWx5IGNyYXNoZXMgd2l0aDoNCj4gDQo+ICQgbWFrZSAtc2tqMzANCj4gaG93IHRvIGZyZWUgdHlw
-ZSAwPw0KPiBkb3VibGUgZnJlZSBvciBjb3JydXB0aW9uIChmYXN0dG9wKQ0KPiBtYWtlWzZdOiAq
-KiogWy9naXQvYXJtLXNvYy9zY3JpcHRzL2tjb25maWcvTWFrZWZpbGU6NzE6IG9sZGRlZmNvbmZp
-Z10NCj4gQWJvcnRlZCAoY29yZSBkdW1wZWQpDQo+IG1ha2VbNV06ICoqKiBbL2dpdC9hcm0tc29j
-L01ha2VmaWxlOjU4Nzogb2xkZGVmY29uZmlnXSBFcnJvciAyDQo+IG1ha2VbNF06ICoqKiBbL2dp
-dC9hcm0tc29jL3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZTo5NToNCj4gYWxscmFuZG9tLmNvbmZp
-Z10gRXJyb3IgMg0KPiBtYWtlWzNdOiAqKiogWy9naXQvYXJtLXNvYy9NYWtlZmlsZTo1ODc6IGFs
-bHJhbmRvbS5jb25maWddIEVycm9yIDINCj4gbWFrZVsyXTogKioqIFtNYWtlZmlsZToxODA6IHN1
-Yi1tYWtlXSBFcnJvciAyDQo+IG1ha2VbMl06IFRhcmdldCAnYWxscmFuZG9tLmNvbmZpZycgbm90
-IHJlbWFkZSBiZWNhdXNlIG9mIGVycm9ycy4NCj4gbWFrZVsxXTogKioqIFttYWtlZmlsZToxMjc6
-IGFsbHJhbmRvbS5jb25maWddIEVycm9yIDINCj4gDQoNCj4gSXQncyBwcm9iYWJseSBlYXN5IHRv
-IGZpeCwgYnV0IEkgZGlkIG5vdCBsb29rIGFueSBkZWVwZXIgaW50byB0aGUNCj4gYnVnLg0KPiAN
-Cg0KQWhoLCBJIGtub3cgd2hhdCBpdCBpcywgaSBhbSBhbGxvY2F0aW5nIG9ubHkgb25lIGV4cHJl
-c3Npb24gZm9yIHRoZSB0d28NCnN5bWJvbHMgKEZPTyB8fCAhRk9PKSAuLiBpbiB0aGUgcnVsZSBh
-Y3Rpb24gaW4gcGFyc2VyLnksIGkgbXVzdA0KYWxsb2NhdGUgdHdvIGluZGl2aWR1YWwgaW5zdGFu
-Y2VzIHBlciBlYWNoIG9mIHRoZSBGT08gYXBwZWFyYW5jZXMgLi4gDQoNCnNvbWV0aGluZyBsaWtl
-Og0KDQpzdHJ1Y3QgZXhwciAqc3ltZXhwcjEgPSBleHByX2FsbG9jX3N5bWJvbCgkMik7DQpzdHJ1
-Y3QgZXhwciAqc3ltZXhwcjIgPSBleHByX2FsbG9jX3N5bWJvbCgkMik7DQoJDQptZW51X2FkZF9k
-ZXAoZXhwcl9hbGxvY190d28oRV9PUiwgc3ltZXhwcjEsIGV4cHJfYWxsb2Nfb25lKEVfTk9ULA0K
-c3ltZXhwcjIpKSk7DQoNCg0KVGhhbmtzIEFybmQgZm9yIHRlc3RpbmcgdGhpcyAhIEkgd2lsbCB0
-ZXN0IHRoaXMgYW5kIHNlbmQgVjIgbGF0ZXIuDQo=
+On Wed, Apr 15, 2020 at 10:37 PM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> From: Leon Romanovsky <leonro@mellanox.com>
+>
+> VERMAGIC* definitions are not supposed to be used by the drivers,
+> see this [1] bug report, so simply move this header file to be visible
+> to kernel/* and scripts files only.
+>
+> In-tree module build:
+> =E2=9E=9C  kernel git:(vermagic) =E2=9C=97 make clean
+> =E2=9E=9C  kernel git:(vermagic) =E2=9C=97 make M=3Ddrivers/infiniband/hw=
+/mlx5
+> =E2=9E=9C  kernel git:(vermagic) =E2=9C=97 modinfo drivers/infiniband/hw/=
+mlx5/mlx5_ib.ko
+> filename:       /images/leonro/src/kernel/drivers/infiniband/hw/mlx5/mlx5=
+_ib.ko
+> <...>
+> vermagic:       5.6.0+ SMP mod_unload modversions
+>
+> Out-of-tree module build:
+> =E2=9E=9C  mlx5 make -C /images/leonro/src/kernel clean M=3D/tmp/mlx5
+> =E2=9E=9C  mlx5 make -C /images/leonro/src/kernel M=3D/tmp/mlx5
+> =E2=9E=9C  mlx5 modinfo /tmp/mlx5/mlx5_ib.ko
+> filename:       /tmp/mlx5/mlx5_ib.ko
+> <...>
+> vermagic:       5.6.0+ SMP mod_unload modversions
+>
+> [1] https://lore.kernel.org/lkml/20200411155623.GA22175@zn.tnic
+> Reported-by: Borislav Petkov <bp@suse.de>
+> Acked-by: Borislav Petkov <bp@suse.de>
+> Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+> ---
+>  kernel/module.c                      | 2 +-
+>  {include/linux =3D> kernel}/vermagic.h | 0
+>  scripts/mod/modpost.c                | 2 +-
+>  3 files changed, 2 insertions(+), 2 deletions(-)
+>  rename {include/linux =3D> kernel}/vermagic.h (100%)
+>
+> diff --git a/kernel/module.c b/kernel/module.c
+> index 3447f3b74870..fce06095d341 100644
+> --- a/kernel/module.c
+> +++ b/kernel/module.c
+> @@ -29,7 +29,6 @@
+>  #include <linux/moduleparam.h>
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+> -#include <linux/vermagic.h>
+>  #include <linux/notifier.h>
+>  #include <linux/sched.h>
+>  #include <linux/device.h>
+> @@ -55,6 +54,7 @@
+>  #include <linux/audit.h>
+>  #include <uapi/linux/module.h>
+>  #include "module-internal.h"
+> +#include "vermagic.h"
+>
+>  #define CREATE_TRACE_POINTS
+>  #include <trace/events/module.h>
+> diff --git a/include/linux/vermagic.h b/kernel/vermagic.h
+> similarity index 100%
+> rename from include/linux/vermagic.h
+> rename to kernel/vermagic.h
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 5c3c50c5ec52..91f86261bcfe 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -2252,7 +2252,7 @@ static void add_header(struct buffer *b, struct mod=
+ule *mod)
+>          * inherit the definitions.
+>          */
+>         buf_printf(b, "#include <linux/build-salt.h>\n");
+> -       buf_printf(b, "#include <linux/vermagic.h>\n");
+> +       buf_printf(b, "#include <../kernel/vermagic.h>\n");
+
+
+I hate this.
+
+
+#error can break the build if the header is included in a wrong way.
+
+For example, include/acpi/platform/aclinux.h
+
+
+
+I prefer something like this if a big hammer is needed here.
+
+diff --git a/include/linux/vermagic.h b/include/linux/vermagic.h
+index 9aced11e9000..d69fa4661715 100644
+--- a/include/linux/vermagic.h
++++ b/include/linux/vermagic.h
+@@ -1,4 +1,9 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef INCLUDE_VERMAGIC
++#error "This header can be included from kernel/module.c or *.mod.c"
++#endif
++
+ #include <generated/utsrelease.h>
+
+ /* Simply sanity version stamp for modules. */
+diff --git a/kernel/module.c b/kernel/module.c
+index 646f1e2330d2..8833e848b73c 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -4,6 +4,9 @@
+    Copyright (C) 2001 Rusty Russell, 2002, 2010 Rusty Russell IBM.
+
+ */
++
++#define INCLUDE_VERMAGIC
++
+ #include <linux/export.h>
+ #include <linux/extable.h>
+ #include <linux/moduleloader.h>
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 5c3c50c5ec52..7f7d4ee7b652 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2251,6 +2251,7 @@ static void add_header(struct buffer *b, struct
+module *mod)
+         * Include build-salt.h after module.h in order to
+         * inherit the definitions.
+         */
++       buf_printf(b, "#define INCLUDE_VERMAGIC\n");
+        buf_printf(b, "#include <linux/build-salt.h>\n");
+        buf_printf(b, "#include <linux/vermagic.h>\n");
+        buf_printf(b, "#include <linux/compiler.h>\n");
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
