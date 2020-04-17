@@ -1,54 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:17012 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730563AbgDQOB0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Apr 2020 10:01:26 -0400
-From: Jani Nikula <jani.nikula@linux.intel.com>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730852AbgDQOHx (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Apr 2020 10:07:53 -0400
+Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6EAC061A0F
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 Apr 2020 07:07:53 -0700 (PDT)
+Received: by mail-qv1-xf44.google.com with SMTP id q73so921464qvq.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 Apr 2020 07:07:53 -0700 (PDT)
+Date: Fri, 17 Apr 2020 11:07:50 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
 Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-In-Reply-To: <20200417122827.GD5100@ziepe.ca>
-References: <20200417011146.83973-1-saeedm@mellanox.com> <87v9ly3a0w.fsf@intel.com> <20200417122827.GD5100@ziepe.ca>
-Date: Fri, 17 Apr 2020 17:01:18 +0300
-Message-ID: <87h7xi2oup.fsf@intel.com>
+Message-ID: <20200417140750.GF26002@ziepe.ca>
+References: <20200417011146.83973-1-saeedm@mellanox.com>
+ <87v9ly3a0w.fsf@intel.com>
+ <20200417122827.GD5100@ziepe.ca>
+ <87h7xi2oup.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h7xi2oup.fsf@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jani Nikula <jani.nikula@linux.intel.com>
 Cc: Saeed Mahameed <saeedm@mellanox.com>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Nicolas Pitre <nico@fluxnic.net>, narmstrong@baylibre.com, Laurent.pinchart@ideasonboard.com, leon@kernel.org, kieran.bingham+renesas@ideasonboard.com, jonas@kwiboo.se, airlied@linux.ie, jernej.skrabec@siol.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, Andrzej Hajda <a.hajda@samsung.com>
 
-On Fri, 17 Apr 2020, Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> On Fri, Apr 17, 2020 at 09:23:59AM +0300, Jani Nikula wrote:
->
->> Which means that would have to split up to two. Not ideal, but
->> doable.
->
-> Why is this not ideal?
->
-> I think the one per line is easier to maintain (eg for merge
-> conflicts) and easier to read than a giant && expression.
->
-> I would not complicate things further by extending the boolean
-> language..
+On Fri, Apr 17, 2020 at 05:01:18PM +0300, Jani Nikula wrote:
+> On Fri, 17 Apr 2020, Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > On Fri, Apr 17, 2020 at 09:23:59AM +0300, Jani Nikula wrote:
+> >
+> >> Which means that would have to split up to two. Not ideal, but
+> >> doable.
+> >
+> > Why is this not ideal?
+> >
+> > I think the one per line is easier to maintain (eg for merge
+> > conflicts) and easier to read than a giant && expression.
+> >
+> > I would not complicate things further by extending the boolean
+> > language..
+> 
+> Fair enough. I only found one instance where the patch at hand does not
+> cut it:
+> 
+> drivers/hwmon/Kconfig:  depends on !OF || IIO=n || IIO
 
-Fair enough. I only found one instance where the patch at hand does not
-cut it:
+Ideally this constraint would be expressed as:
 
-drivers/hwmon/Kconfig:  depends on !OF || IIO=n || IIO
+   optionally depends on OF && IIO
 
-That can of course be left as it is.
+And if the expression is n then IIO is not prevented from being y.
 
-As to the bikeshedding topic, I think I'm now leaning towards Andrzej's
-suggestion:
+Ie the code is just doing:
 
-	optionally depends on FOO
+#if defined(CONFIG_OF) && IS_ENABLED(CONFIG_IIO)
 
-in [1]. But I reserve my right to change my mind. ;)
-
-BR,
-Jani.
-
-
-[1] http://lore.kernel.org/r/01f964ae-9c32-7531-1f07-2687616b6a71@samsung.com
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
+Jason
