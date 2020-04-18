@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37442 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:53256 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726669AbgDROJq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Apr 2020 10:09:46 -0400
+        id S1728442AbgDROmu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:42:50 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.5 28/75] kconfig: qconf: Fix a few alignment issues
-Date: Sat, 18 Apr 2020 10:08:23 -0400
-Message-Id: <20200418140910.8280-28-sashal@kernel.org>
-In-Reply-To: <20200418140910.8280-1-sashal@kernel.org>
-References: <20200418140910.8280-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 17/47] kconfig: qconf: Fix a few alignment issues
+Date: Sat, 18 Apr 2020 10:41:57 -0400
+Message-Id: <20200418144227.9802-17-sashal@kernel.org>
+In-Reply-To: <20200418144227.9802-1-sashal@kernel.org>
+References: <20200418144227.9802-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -30,7 +30,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 82773cc35d356..0f8c77f847114 100644
+index ef4310f2558b1..8f004db6f6034 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
 @@ -627,7 +627,7 @@ void ConfigList::updateMenuList(ConfigItem *parent, struct menu* menu)
