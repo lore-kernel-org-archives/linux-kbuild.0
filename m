@@ -1,70 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728470AbgDQWTk (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Apr 2020 18:19:40 -0400
-Date: Fri, 17 Apr 2020 15:19:36 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: Re: [PATCH] um: do not evaluate compiler's library path when cleaning
-Message-ID: <20200417221936.GA13833@ubuntu-s3-xlarge-x86>
-References: <20200417180455.1174340-1-masahiroy@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55542 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726618AbgDRNsy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 18 Apr 2020 09:48:54 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 30/73] kconfig: qconf: Fix a few alignment issues
+Date: Sat, 18 Apr 2020 09:47:32 -0400
+Message-Id: <20200418134815.6519-30-sashal@kernel.org>
+In-Reply-To: <20200418134815.6519-1-sashal@kernel.org>
+References: <20200418134815.6519-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200417180455.1174340-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, linux-um@lists.infradead.org, linux-kbuild@vger.kernel.org, Alex Dewar <alex.dewar@gmx.co.uk>, Erel Geron <erelx.geron@intel.com>, Johannes Berg <johannes.berg@intel.com>, Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-On Sat, Apr 18, 2020 at 03:04:55AM +0900, Masahiro Yamada wrote:
-> Since commit a83e4ca26af8 ("kbuild: remove cc-option switch from
-> -Wframe-larger-than="), 'make ARCH=um clean' emits an error message
-> as follows:
-> 
->   $ make ARCH=um clean
->   gcc: error: missing argument to '-Wframe-larger-than='
-> 
-> We do not care compiler flags when cleaning.
-> 
-> Use the '=' operator for lazy expansion because we do not use
-> LDFLAGS_pcap.o or LDFLAGS_vde.o when cleaning.
-> 
-> While I was here, I removed the redundant -r option because it
-> already exists in the recipe.
-> 
-> Fixes: a83e4ca26af8 ("kbuild: remove cc-option switch from -Wframe-larger-than=")
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  arch/um/drivers/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/um/drivers/Makefile b/arch/um/drivers/Makefile
-> index a290821e355c..2a249f619467 100644
-> --- a/arch/um/drivers/Makefile
-> +++ b/arch/um/drivers/Makefile
-> @@ -18,9 +18,9 @@ ubd-objs := ubd_kern.o ubd_user.o
->  port-objs := port_kern.o port_user.o
->  harddog-objs := harddog_kern.o harddog_user.o
->  
-> -LDFLAGS_pcap.o := -r $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libpcap.a)
-> +LDFLAGS_pcap.o = $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libpcap.a)
->  
-> -LDFLAGS_vde.o := -r $(shell $(CC) $(CFLAGS) -print-file-name=libvdeplug.a)
-> +LDFLAGS_vde.o = $(shell $(CC) $(CFLAGS) -print-file-name=libvdeplug.a)
->  
->  targets := pcap_kern.o pcap_user.o vde_kern.o vde_user.o
->  
-> -- 
-> 2.25.1
-> 
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-I tested building pcap.o both before and after this change, no changes
-there.
+[ Upstream commit 60969f02f07ae1445730c7b293c421d179da729c ]
 
-I do see the clean error fixed.
+There are a few items with wrong alignments. Solve them.
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com> [build]
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/kconfig/qconf.cc | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 82773cc35d356..0f8c77f847114 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -627,7 +627,7 @@ void ConfigList::updateMenuList(ConfigItem *parent, struct menu* menu)
+ 			last = item;
+ 			continue;
+ 		}
+-	hide:
++hide:
+ 		if (item && item->menu == child) {
+ 			last = parent->firstChild();
+ 			if (last == item)
+@@ -692,7 +692,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
+ 			last = item;
+ 			continue;
+ 		}
+-	hide:
++hide:
+ 		if (item && item->menu == child) {
+ 			last = (ConfigItem*)parent->topLevelItem(0);
+ 			if (last == item)
+@@ -1225,10 +1225,11 @@ QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
+ {
+ 	QMenu* popup = Parent::createStandardContextMenu(pos);
+ 	QAction* action = new QAction("Show Debug Info", popup);
+-	  action->setCheckable(true);
+-	  connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
+-	  connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
+-	  action->setChecked(showDebug());
++
++	action->setCheckable(true);
++	connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
++	connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
++	action->setChecked(showDebug());
+ 	popup->addSeparator();
+ 	popup->addAction(action);
+ 	return popup;
+-- 
+2.20.1
