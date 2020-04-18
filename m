@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55542 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:37442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726618AbgDRNsy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Apr 2020 09:48:54 -0400
+        id S1726669AbgDROJq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 18 Apr 2020 10:09:46 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.6 30/73] kconfig: qconf: Fix a few alignment issues
-Date: Sat, 18 Apr 2020 09:47:32 -0400
-Message-Id: <20200418134815.6519-30-sashal@kernel.org>
-In-Reply-To: <20200418134815.6519-1-sashal@kernel.org>
-References: <20200418134815.6519-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 28/75] kconfig: qconf: Fix a few alignment issues
+Date: Sat, 18 Apr 2020 10:08:23 -0400
+Message-Id: <20200418140910.8280-28-sashal@kernel.org>
+In-Reply-To: <20200418140910.8280-1-sashal@kernel.org>
+References: <20200418140910.8280-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
