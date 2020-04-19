@@ -1,104 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:50151 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727927AbgDRUI5 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Apr 2020 16:08:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40808 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725905AbgDSOTE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 19 Apr 2020 10:19:04 -0400
+From: Leon Romanovsky <leon@kernel.org>
+Subject: [PATCH net-next v2 0/4] Remove vermagic header from global include folder
+Date: Sun, 19 Apr 2020 17:18:46 +0300
+Message-Id: <20200419141850.126507-1-leon@kernel.org>
 MIME-Version: 1.0
-References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com>
- <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr>
-In-Reply-To: <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 19 Apr 2020 05:07:43 +0900
-Message-ID: <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Saeed Mahameed <saeedm@mellanox.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Jason Gunthorpe <jgg@ziepe.ca>, Jani Nikula <jani.nikula@linux.intel.com>, Neil Armstrong <narmstrong@baylibre.com>, Laurent Pinchart <Laurent.pinchart@ideasonboard.com>, Leon Romanovsky <leon@kernel.org>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, jonas@kwiboo.se, David Airlie <airlied@linux.ie>, jernej.skrabec@siol.net, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Leon Romanovsky <leonro@mellanox.com>, Andy Gospodarek <andy@greyhouse.net>, Borislav Petkov <bp@suse.de>, Ion Badulescu <ionut@badula.org>, Jay Vosburgh <j.vosburgh@gmail.com>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org, oss-drivers@netronome.com, Salil Mehta <salil.mehta@huawei.com>, Sebastian Reichel <sre@kernel.org>, Shannon Nelson <snelson@pensando.io>, Veaceslav Falico <vfalico@gmail.com>, Yisen Zhuang <yisen.zhuang@huawei.com>
 
-On Sun, Apr 19, 2020 at 4:11 AM Nicolas Pitre <nico@fluxnic.net> wrote:
->
-> On Sun, 19 Apr 2020, Masahiro Yamada wrote:
->
-> > (FOO || !FOO) is difficult to understand, but
-> > the behavior of "uses FOO" is as difficult to grasp.
->
-> Can't this be expressed as the following instead:
->
->         depends on FOO if FOO
->
-> That would be a little clearer.
->
->
-> Nicolas
+From: Leon Romanovsky <leonro@mellanox.com>
 
+Changelog:
+v2:
+ * Changed the implementation of patch #4 to be like Masahiro wants.
+I personally don't like this implementation and changing it just to move forward
+this this patchset.
+v1:
+https://lore.kernel.org/lkml/20200415133648.1306956-1-leon@kernel.org
+ * Added tags
+ * Updated patch #4 with test results
+ * Changed scripts/mod/modpost.c to create inclusion of vermagic.h
+   from kernel folder and not from general include/linux. This is
+   needed to generate *.mod.c files, while building modules.
+v0:
+https://lore.kernel.org/lkml/20200414155732.1236944-1-leon@kernel.org
+----------------------------------------------------------------------------
 
+Hi,
 
-'depends on' does not take the 'if <expr>'
+This is followup to the failure reported by Borislav [1] and suggested
+fix later on [2].
 
-'depends on A if B' is the syntax sugar of
-'depends on (A || !B), right ?
+The series removes all includes of linux/vermagic.h, updates hns and
+nfp to use same kernel versioning scheme (exactly like we did for
+other drivers in previous cycle) and removes vermagic.h from global
+include folder.
 
-I do not know how clearer it would make things.
+[1] https://lore.kernel.org/lkml/20200411155623.GA22175@zn.tnic
+[2] https://lore.kernel.org/lkml/20200413080452.GA3772@zn.tnic
 
-depends on (m || FOO != m)
-is another equivalent, but we are always
-talking about a matter of expression.
+------------------------------------------------------------
+1. Honestly, I have no idea if it can go to net-rc, clearly not all my
+patches are fixes, so I'm sending them to the net-next.
+2. Still didn't get response from kbuild, but it passed my own
+compilation tests.
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=vermagic
 
+Thanks
 
-How important is it to stick to
-depends on (FOO || !FOO)
-or its equivalents?
+Leon Romanovsky (4):
+  drivers: Remove inclusion of vermagic header
+  net/hns: Remove custom driver version in favour of global one
+  net/nfp: Update driver to use global kernel version
+  kernel/module: Hide vermagic header file from general use
 
+ drivers/net/bonding/bonding_priv.h                   | 2 +-
+ drivers/net/ethernet/3com/3c509.c                    | 1 -
+ drivers/net/ethernet/3com/3c515.c                    | 1 -
+ drivers/net/ethernet/adaptec/starfire.c              | 1 -
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c      | 3 ---
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.h      | 4 ----
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c   | 4 ----
+ drivers/net/ethernet/netronome/nfp/nfp_main.c        | 3 ---
+ drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 2 --
+ drivers/net/ethernet/pensando/ionic/ionic_main.c     | 2 +-
+ drivers/power/supply/test_power.c                    | 2 +-
+ include/linux/vermagic.h                             | 5 +++++
+ kernel/module.c                                      | 3 +++
+ net/ethtool/ioctl.c                                  | 3 +--
+ scripts/mod/modpost.c                                | 1 +
+ 15 files changed, 13 insertions(+), 24 deletions(-)
 
-If a driver wants to use the feature FOO
-in most usecases, 'depends on FOO' is sensible.
-
-If FOO is just optional, you can get rid of the dependency,
-and IS_REACHABLE() will do logically correct things.
-
-
-I do not think IS_REACHABLE() is too bad,
-but if it is confusing, we can add one more
-option to make it explicit.
-
-
-
-config DRIVER_X
-       tristate "driver x"
-
-config DRIVER_X_USES_FOO
-       bool "use FOO from driver X"
-       depends on DRIVER_X
-       depends on DRIVER_X <= FOO
-       help
-         DRIVER_X works without FOO, but
-         Using FOO will provide better usability.
-         Say Y if you want to make driver X use FOO.
-
-
-
-Of course,
-
-      if (IS_ENABLED(CONFIG_DRIVER_X_USES_FOO))
-               foo_init();
-
-works like
-
-      if (IS_REACHABLE(CONFIG_FOO))
-                foo_init();
-
-
-At lease, it will eliminate a question like
-"I loaded the module FOO, I swear.
-But my built-in driver X still would not use FOO, why?"
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+--
+2.25.2
