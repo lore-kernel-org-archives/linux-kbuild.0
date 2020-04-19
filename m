@@ -1,97 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46168 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725939AbgDSPzg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Apr 2020 11:55:36 -0400
-From: Leon Romanovsky <leon@kernel.org>
-Subject: [PATCH net-next v2 4/4] kernel/module: Hide vermagic header file from general use
-Date: Sun, 19 Apr 2020 18:55:06 +0300
-Message-Id: <20200419155506.129392-1-leon@kernel.org>
-In-Reply-To: <20200419141850.126507-1-leon@kernel.org>
-References: <20200419141850.126507-1-leon@kernel.org>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726472AbgDSSE6 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 19 Apr 2020 14:04:58 -0400
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH 1/2] kbuild: add CONFIG_LD_IS_LLD
+Date: Sun, 19 Apr 2020 11:04:44 -0700
+Message-Id: <20200419180445.26722-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leonro@mellanox.com>, Borislav Petkov <bp@suse.de>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org
+To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Dmitry Golovin <dima@golovin.in>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>
 
-From: Leon Romanovsky <leonro@mellanox.com>
+From: Sami Tolvanen <samitolvanen@google.com>
 
-VERMAGIC* definitions are not supposed to be used by the drivers,
-see this [1] bug report, so introduce special define to guard inclusion
-of this header file and define it in kernel/modules.h and in internal
-script that generates *.mod.c files.
+Similarly to the CC_IS_CLANG config, add LD_IS_LLD to avoid GNU ld
+specific logic such as ld-version or ld-ifversion and gain the
+ability to select potential features that depend on the linker at
+configuration time such as LTO.
 
-In-tree module build:
-➜  kernel git:(vermagic) ✗ make clean
-➜  kernel git:(vermagic) ✗ make M=drivers/infiniband/hw/mlx5
-➜  kernel git:(vermagic) ✗ modinfo drivers/infiniband/hw/mlx5/mlx5_ib.ko
-filename:	/images/leonro/src/kernel/drivers/infiniband/hw/mlx5/mlx5_ib.ko
-<...>
-vermagic:       5.6.0+ SMP mod_unload modversions
-
-Out-of-tree module build:
-➜  mlx5 make -C /images/leonro/src/kernel clean M=/tmp/mlx5
-➜  mlx5 make -C /images/leonro/src/kernel M=/tmp/mlx5
-➜  mlx5 modinfo /tmp/mlx5/mlx5_ib.ko
-filename:       /tmp/mlx5/mlx5_ib.ko
-<...>
-vermagic:       5.6.0+ SMP mod_unload modversions
-
-[1] https://lore.kernel.org/lkml/20200411155623.GA22175@zn.tnic
-Reported-by: Borislav Petkov <bp@suse.de>
-Acked-by: Borislav Petkov <bp@suse.de>
-Acked-by: Jessica Yu <jeyu@kernel.org>
-Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Leon Romanovsky <leonro@mellanox.com>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+[nc: Reword commit message]
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
- include/linux/vermagic.h | 5 +++++
- kernel/module.c          | 3 +++
- scripts/mod/modpost.c    | 1 +
- 3 files changed, 9 insertions(+)
 
-diff --git a/include/linux/vermagic.h b/include/linux/vermagic.h
-index 9aced11e9000..7768d20ada39 100644
---- a/include/linux/vermagic.h
-+++ b/include/linux/vermagic.h
-@@ -1,4 +1,9 @@
- /* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef INCLUDE_VERMAGIC
-+#error "This header can be included from kernel/module.c or *.mod.c only"
-+#endif
-+
- #include <generated/utsrelease.h>
+Sami, please scream if you are unhappy with how I worded this commit.
 
- /* Simply sanity version stamp for modules. */
-diff --git a/kernel/module.c b/kernel/module.c
-index 646f1e2330d2..8833e848b73c 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -4,6 +4,9 @@
-    Copyright (C) 2001 Rusty Russell, 2002, 2010 Rusty Russell IBM.
+ init/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
- */
+diff --git a/init/Kconfig b/init/Kconfig
+index 9e22ee8fbd75..c15ee42b8272 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -23,6 +23,9 @@ config LD_VERSION
+ config CC_IS_CLANG
+ 	def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
+ 
++config LD_IS_LLD
++	def_bool $(success,$(LD) -v | head -n 1 | grep -q LLD)
 +
-+#define INCLUDE_VERMAGIC
-+
- #include <linux/export.h>
- #include <linux/extable.h>
- #include <linux/moduleloader.h>
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 5c3c50c5ec52..7f7d4ee7b652 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2251,6 +2251,7 @@ static void add_header(struct buffer *b, struct module *mod)
- 	 * Include build-salt.h after module.h in order to
- 	 * inherit the definitions.
- 	 */
-+	buf_printf(b, "#define INCLUDE_VERMAGIC\n");
- 	buf_printf(b, "#include <linux/build-salt.h>\n");
- 	buf_printf(b, "#include <linux/vermagic.h>\n");
- 	buf_printf(b, "#include <linux/compiler.h>\n");
---
-2.25.2
+ config CLANG_VERSION
+ 	int
+ 	default $(shell,$(srctree)/scripts/clang-version.sh $(CC))
+
+base-commit: 50cc09c18985eacbbd666acfd7be2391394733f5
+-- 
+2.26.1
