@@ -1,137 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbgDSUVv (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725848AbgDSWE0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Apr 2020 16:21:51 -0400
-From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH v2 2/3] MIPS: VDSO: Move disabling the VDSO logic to Kconfig
-Date: Sun, 19 Apr 2020 13:21:27 -0700
-Message-Id: <20200419202128.20571-2-natechancellor@gmail.com>
-In-Reply-To: <20200419202128.20571-1-natechancellor@gmail.com>
-References: <20200419180445.26722-1-natechancellor@gmail.com>
- <20200419202128.20571-1-natechancellor@gmail.com>
+        Sun, 19 Apr 2020 18:04:26 -0400
+Received: from eidolon.nox.tf (eidolon.nox.tf [IPv6:2a07:2ec0:2185::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B116AC061A0C
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 Apr 2020 15:04:25 -0700 (PDT)
+Date: Sun, 19 Apr 2020 23:55:58 +0200
+From: David Lamparter <equinox@diac24.net>
+Subject: gcc extended format checking plugin
+Message-ID: <20200419215558.GU30496@eidolon.nox.tf>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Dmitry Golovin <dima@golovin.in>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>
+To: linux-kbuild@vger.kernel.org
 
-After commit 9553d16fa671 ("init/kconfig: Add LD_VERSION Kconfig"), we
-have access to GNU ld's version at configuration time. As a result, we
-can make it clearer under what configuration circumstances the MIPS VDSO
-needs to be disabled.
+Hello kernel build hackers,
 
-This is a prerequisite for getting rid of the MIPS VDSO binutils
-warning and linking the VDSO when LD is ld.lld. Wrapping the call to
-ld-ifversion with CONFIG_LD_IS_LLD does not work because the config
-values are wiped away during 'make clean'.
 
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
+in case it is of interest to anyone, we've recently added an extended
+format string checking plugin in the FRRouting project.  We took
+inspiration from the Linux kernel and modified a printf (funnily enough,
+the one from FreeBSD) to support things like %pI4, and we wanted better
+warnings for this.  Since the scheme is the same as in the Linux kernel,
+it may or may not be worth someone's time to take a look.
 
-v1 -> v2:
+The plugin is found here:
+https://github.com/FRRouting/frr/tree/master/tools/gcc-plugins
 
-* New patch.
+It's derived from gcc's "c-format.c", as such it may make sense to look
+at the diff instead of the straight source.  The original GCC code is in
+the git history there.  It's tested against gcc 9.3.0, YMMV on other
+versions.
 
- arch/mips/Kconfig         |  2 ++
- arch/mips/vdso/Kconfig    | 18 ++++++++++++++++++
- arch/mips/vdso/Makefile   | 30 ++----------------------------
- arch/mips/vdso/vdso.lds.S |  2 +-
- 4 files changed, 23 insertions(+), 29 deletions(-)
- create mode 100644 arch/mips/vdso/Kconfig
+Note that the plugin needs a single-line GCC source code modification:
+https://github.com/FRRouting/frr/blob/master/tools/gcc-plugins/gcc-retain-typeinfo.patch
+this is to stop GCC from prematurely stripping information, specifically
+from casts in function parameters.  It does work without the change, but
+it may produce false-positive/negative warnings.
 
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 690718b3701a..45220e4b8a65 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -3275,3 +3275,5 @@ endmenu
- source "drivers/firmware/Kconfig"
- 
- source "arch/mips/kvm/Kconfig"
-+
-+source "arch/mips/vdso/Kconfig"
-diff --git a/arch/mips/vdso/Kconfig b/arch/mips/vdso/Kconfig
-new file mode 100644
-index 000000000000..36a52158d849
---- /dev/null
-+++ b/arch/mips/vdso/Kconfig
-@@ -0,0 +1,18 @@
-+# For the pre-R6 code in arch/mips/vdso/vdso.h for locating
-+# the base address of VDSO, the linker will emit a R_MIPS_PC32
-+# relocation in binutils > 2.25 but it will fail with older versions
-+# because that relocation is not supported for that symbol. As a result
-+# of which we are forced to disable the VDSO symbols when building
-+# with < 2.25 binutils on pre-R6 kernels. For more references on why we
-+# can't use other methods to get the base address of VDSO please refer to
-+# the comments on that file.
-+#
-+# GCC (at least up to version 9.2) appears to emit function calls that make use
-+# of the GOT when targeting microMIPS, which we can't use in the VDSO due to
-+# the lack of relocations. As such, we disable the VDSO for microMIPS builds.
-+
-+config MIPS_LD_CAN_LINK_VDSO
-+	def_bool LD_VERSION >= 225000000
-+
-+config MIPS_DISABLE_VDSO
-+	def_bool CPU_MICROMIPS || (!CPU_MIPSR6 && !MIPS_LD_CAN_LINK_VDSO)
-diff --git a/arch/mips/vdso/Makefile b/arch/mips/vdso/Makefile
-index d7fe8408603e..92b53d1df42c 100644
---- a/arch/mips/vdso/Makefile
-+++ b/arch/mips/vdso/Makefile
-@@ -52,37 +52,11 @@ endif
- 
- CFLAGS_REMOVE_vgettimeofday.o = -pg
- 
--DISABLE_VDSO := n
--
--#
--# For the pre-R6 code in arch/mips/vdso/vdso.h for locating
--# the base address of VDSO, the linker will emit a R_MIPS_PC32
--# relocation in binutils > 2.25 but it will fail with older versions
--# because that relocation is not supported for that symbol. As a result
--# of which we are forced to disable the VDSO symbols when building
--# with < 2.25 binutils on pre-R6 kernels. For more references on why we
--# can't use other methods to get the base address of VDSO please refer to
--# the comments on that file.
--#
--ifndef CONFIG_CPU_MIPSR6
--  ifeq ($(call ld-ifversion, -lt, 225000000, y),y)
-+ifdef CONFIG_MIPS_DISABLE_VDSO
-+  ifndef CONFIG_MIPS_LD_CAN_LINK_VDSO
-     $(warning MIPS VDSO requires binutils >= 2.25)
--    DISABLE_VDSO := y
-   endif
--endif
--
--#
--# GCC (at least up to version 9.2) appears to emit function calls that make use
--# of the GOT when targeting microMIPS, which we can't use in the VDSO due to
--# the lack of relocations. As such, we disable the VDSO for microMIPS builds.
--#
--ifdef CONFIG_CPU_MICROMIPS
--  DISABLE_VDSO := y
--endif
--
--ifeq ($(DISABLE_VDSO),y)
-   obj-vdso-y := $(filter-out vgettimeofday.o, $(obj-vdso-y))
--  ccflags-vdso += -DDISABLE_MIPS_VDSO
- endif
- 
- # VDSO linker flags.
-diff --git a/arch/mips/vdso/vdso.lds.S b/arch/mips/vdso/vdso.lds.S
-index da4627430aba..ffcb5fc12708 100644
---- a/arch/mips/vdso/vdso.lds.S
-+++ b/arch/mips/vdso/vdso.lds.S
-@@ -91,7 +91,7 @@ PHDRS
- VERSION
- {
- 	LINUX_2.6 {
--#ifndef DISABLE_MIPS_VDSO
-+#ifndef CONFIG_DISABLE_MIPS_VDSO
- 	global:
- 		__vdso_clock_gettime;
- 		__vdso_gettimeofday;
--- 
-2.26.1
+Aside from %pXX suffix support, the plugin also contains two other
+changes that are probably irrelevant to kernel land:
+- it makes some typedefs "final" types since these are not guaranteed to
+  be consistent in size across platforms and therefore can't be
+  printf'd without a cast (e.g. pid_t, uid_t, time_t, etc.)
+- it reserves %Lu for uint64_t
+
+Please don't expect too much on its code quality, I'm not a GCC
+developer and essentially wrote this by trial and error ;)
+
+Cheers,
+
+
+-David
