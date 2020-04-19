@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41070 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:46168 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725905AbgDSOTP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 19 Apr 2020 10:19:15 -0400
+        id S1725939AbgDSPzg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 19 Apr 2020 11:55:36 -0400
 From: Leon Romanovsky <leon@kernel.org>
 Subject: [PATCH net-next v2 4/4] kernel/module: Hide vermagic header file from general use
-Date: Sun, 19 Apr 2020 17:18:50 +0300
-Message-Id: <20200419141850.126507-5-leon@kernel.org>
+Date: Sun, 19 Apr 2020 18:55:06 +0300
+Message-Id: <20200419155506.129392-1-leon@kernel.org>
 In-Reply-To: <20200419141850.126507-1-leon@kernel.org>
 References: <20200419141850.126507-1-leon@kernel.org>
 MIME-Version: 1.0
@@ -15,7 +15,7 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leonro@mellanox.com>, Borislav Petkov <bp@suse.de>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: Leon Romanovsky <leonro@mellanox.com>, Borislav Petkov <bp@suse.de>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org
 
 From: Leon Romanovsky <leonro@mellanox.com>
 
