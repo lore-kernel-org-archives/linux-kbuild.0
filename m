@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33072 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726828AbgDTVjT (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726181AbgDTW1I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:39:19 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A42C061A0C
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 14:39:16 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id v10so1485609qvr.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 14:39:16 -0700 (PDT)
-Message-ID: <f0f3a22042bdab2cffe12600f17f1485ca71caae.camel@massaru.org>
+        Mon, 20 Apr 2020 18:27:08 -0400
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2315CC061A0C
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 15:27:08 -0700 (PDT)
+Received: by mail-qk1-x742.google.com with SMTP id v7so12645698qkc.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 15:27:08 -0700 (PDT)
+Message-ID: <b82142248b38085fa3ab49a9d3181cabd5a79a91.camel@massaru.org>
 Subject: Re: [PATCH v2] kbuild: ensure mrproper removes
  arch/$(SUBARCH)/include/generated/
 From: Vitor Massaru Iha <vitor@massaru.org>
-Date: Mon, 20 Apr 2020 18:39:12 -0300
+Date: Mon, 20 Apr 2020 19:27:03 -0300
 In-Reply-To: <CAK7LNAQYxtcNinV7JR+c8Pn9Rp1g0TxJ7m_mOFNOJQsB=OiAoA@mail.gmail.com>
 References: <20200414012132.32721-1-vitor@massaru.org>
          <CAK7LNAQYxtcNinV7JR+c8Pn9Rp1g0TxJ7m_mOFNOJQsB=OiAoA@mail.gmail.com>
@@ -24,6 +24,8 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Brendan Higgins <brendanhiggins@google.com>, Shuah Khan <skhan@linuxfoundation.org>, "linux-kernel-mentees@lists.linuxfoundation.org" <linux-kernel-mentees@lists.linuxfoundation.org>
+
+Hi Masahiro,
 
 On Sat, 2020-04-18 at 03:12 +0900, Masahiro Yamada wrote:
 > Hi.
@@ -106,6 +108,10 @@ On Sat, 2020-04-18 at 03:12 +0900, Masahiro Yamada wrote:
 > > Signed-off-by: Vitor Massaru Iha <vitor@massaru.org>
 > 
 > Reported-by: Brendan Higgins <brendanhiggins@google.com>
+
+Was actually Reported-by Theodore Ts'o <tytso@mit.edu>	
+https://groups.google.com/forum/#!msg/kunit-dev/QmA27YEgEgI/hvS1kiz2CwAJ
+
 > 
 > 
 > 
@@ -172,7 +178,9 @@ On Sat, 2020-04-18 at 03:12 +0900, Masahiro Yamada wrote:
 >  # TT or skas makefiles and don't clean skas_ptregs.h.
 >  CLEAN_FILES += linux x.i gmon.out
 > +MRPROPER_DIRS += arch/$(SUBARCH)/include/generated
-> 
+
+Can I add suggested-by Masahiro Yamada <masahiroy@kernel.org> ?
+
 >  archclean:
 >         @find . \( -name '*.bb' -o -name '*.bbg' -o -name '*.da' \
 > 
@@ -183,5 +191,3 @@ On Sat, 2020-04-18 at 03:12 +0900, Masahiro Yamada wrote:
 > --
 > Best Regards
 > Masahiro Yamada
-
-Thanks for review. I agree with the suggested changes.
