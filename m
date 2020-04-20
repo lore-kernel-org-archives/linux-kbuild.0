@@ -1,77 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35056 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725773AbgDTJyI (ORCPT
+        by vger.kernel.org with ESMTP id S1726673AbgDTNxR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Apr 2020 05:54:08 -0400
+        Mon, 20 Apr 2020 09:53:17 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF893C061A10
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 06:53:16 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id b62so10550655qkf.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 Apr 2020 06:53:16 -0700 (PDT)
+Date: Mon, 20 Apr 2020 10:53:13 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+Message-ID: <20200420135313.GN26002@ziepe.ca>
+References: <20200417011146.83973-1-saeedm@mellanox.com>
+ <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200419180445.26722-1-natechancellor@gmail.com>
- <20200419202128.20571-1-natechancellor@gmail.com> <20200419202128.20571-2-natechancellor@gmail.com>
-In-Reply-To: <20200419202128.20571-2-natechancellor@gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Mon, 20 Apr 2020 11:53:55 +0200
-Message-ID: <CA+icZUVaLW+38WEJhqnfO7B_unHvrbSr0moKnfJ6zXGGA06CWQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] MIPS: VDSO: Move disabling the VDSO logic to Kconfig
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Masahiro Yamada <masahiroy@kernel.org>, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Dmitry Golovin <dima@golovin.in>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Saeed Mahameed <saeedm@mellanox.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Nicolas Pitre <nico@fluxnic.net>, Jani Nikula <jani.nikula@linux.intel.com>, Neil Armstrong <narmstrong@baylibre.com>, Laurent Pinchart <Laurent.pinchart@ideasonboard.com>, Leon Romanovsky <leon@kernel.org>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, jonas@kwiboo.se, David Airlie <airlied@linux.ie>, jernej.skrabec@siol.net, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 10:21 PM Nathan Chancellor
-<natechancellor@gmail.com> wrote:
->
-> After commit 9553d16fa671 ("init/kconfig: Add LD_VERSION Kconfig"), we
-> have access to GNU ld's version at configuration time. As a result, we
-> can make it clearer under what configuration circumstances the MIPS VDSO
-> needs to be disabled.
->
-> This is a prerequisite for getting rid of the MIPS VDSO binutils
-> warning and linking the VDSO when LD is ld.lld. Wrapping the call to
-> ld-ifversion with CONFIG_LD_IS_LLD does not work because the config
-> values are wiped away during 'make clean'.
->
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
->
-> v1 -> v2:
->
-> * New patch.
->
->  arch/mips/Kconfig         |  2 ++
->  arch/mips/vdso/Kconfig    | 18 ++++++++++++++++++
->  arch/mips/vdso/Makefile   | 30 ++----------------------------
->  arch/mips/vdso/vdso.lds.S |  2 +-
->  4 files changed, 23 insertions(+), 29 deletions(-)
->  create mode 100644 arch/mips/vdso/Kconfig
->
-> diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-> index 690718b3701a..45220e4b8a65 100644
-> --- a/arch/mips/Kconfig
-> +++ b/arch/mips/Kconfig
-> @@ -3275,3 +3275,5 @@ endmenu
->  source "drivers/firmware/Kconfig"
->
->  source "arch/mips/kvm/Kconfig"
-> +
-> +source "arch/mips/vdso/Kconfig"
-> diff --git a/arch/mips/vdso/Kconfig b/arch/mips/vdso/Kconfig
-...
-> --- /dev/null
-> +++ b/arch/mips/vdso/Kconfig
-...
-> +config MIPS_DISABLE_VDSO
-> +       def_bool CPU_MICROMIPS || (!CPU_MIPSR6 && !MIPS_LD_CAN_LINK_VDSO)
-...
-> diff --git a/arch/mips/vdso/vdso.lds.S b/arch/mips/vdso/vdso.lds.S
-...
-> --- a/arch/mips/vdso/vdso.lds.S
-> +++ b/arch/mips/vdso/vdso.lds.S
-...
-> -#ifndef DISABLE_MIPS_VDSO
-> +#ifndef CONFIG_DISABLE_MIPS_VDSO
+On Sun, Apr 19, 2020 at 04:00:43AM +0900, Masahiro Yamada wrote:
 
-Should be s/CONFIG_DISABLE_MIPS_VDSO/CONFIG_MIPS_DISABLE_VDSO ?
+> People would wonder, "what 'uses FOO' means?",
+> then they would find the explanation in kconfig-language.rst:
+> 
+>   "Equivalent to: depends on symbol || !symbol
+>   Semantically it means, if FOO is enabled (y/m) and has the option:
+>   uses BAR, make sure it can reach/use BAR when possible."
+> 
+> To understand this correctly, people must study
+> the arithmetic of (symbol || !symbol) anyway.
 
-- Sedat -
+I think people will just cargo-cult copy it and not think too hard
+about how kconfig works.
+
+The descriptions in kconfig-language.rst can be improved to better
+guide C people using kconfig without entirely understanding
+it. Something like:
+
+ BAR depends on FOO // BAR selects FOO: BAR requires functionality from
+ FOO
+
+ BAR uses FOO: BAR optionally consumes functionality from FOO using
+ IS_ENABLED
+
+ BAR implies FOO: BAR optionally consumes functionality from FOO using
+ IS_REACHABLE
+
+Now someone adding IS_ENABLED or IS_REACHABLE checks to C code knows
+exactly what to put in the kconfig.
+
+Jason
