@@ -1,62 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:49485 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725870AbgDURhy (ORCPT
+Received: from pb-smtp20.pobox.com ([173.228.157.52]:61107 "EHLO
+        pb-smtp20.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgDUSX5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 13:37:54 -0400
+        Tue, 21 Apr 2020 14:23:57 -0400
+Date: Tue, 21 Apr 2020 14:23:47 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+In-Reply-To: <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
+Message-ID: <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
+References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com> <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr> <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
+ <87v9lu1ra6.fsf@intel.com> <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com> <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
 MIME-Version: 1.0
-References: <20200229003731.2728-1-robh@kernel.org> <20200421100749.GA5429@pendragon.ideasonboard.com>
- <CAK7LNARvPytUQoncngLe=s-TzQByQCXd64H99UgrW40=X34JyQ@mail.gmail.com>
- <20200421110537.GC5983@pendragon.ideasonboard.com> <CAK7LNAQtfyqfbQx2ivg=sVdhxDH9ShVBa+bL-4sC7MU1N=y+cw@mail.gmail.com>
- <20200421134654.GD5983@pendragon.ideasonboard.com>
-In-Reply-To: <20200421134654.GD5983@pendragon.ideasonboard.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 22 Apr 2020 02:36:36 +0900
-Message-ID: <CAK7LNARcL5tfwFWE=EbW6pnpJKwfQY5n93WmFD0Ggw+EkSJ8mg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Rob Herring <robh@kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Saeed Mahameed <saeedm@mellanox.com>
+Cc: "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-Hi Laurent,
+On Tue, 21 Apr 2020, Saeed Mahameed wrote:
 
-On Tue, Apr 21, 2020 at 10:47 PM Laurent Pinchart
-<laurent.pinchart@ideasonboard.com> wrote:
+> On Tue, 2020-04-21 at 09:58 -0400, Nicolas Pitre wrote:
+> > On Tue, 21 Apr 2020, Saeed Mahameed wrote:
+> > 
+> > > I wonder how many of those 8889 cases wanted a weak dependency but
+> > > couldn't figure out how to do it ? 
+> > > 
+> > > Users of depends on FOO || !FOO
+> > > 
+> > > $ git ls-files | grep Kconfig | xargs grep -E \
+> > >   "depends\s+on\s+([A-Za-z0-9_]+)\s*\|\|\s*(\!\s*\1|\1\s*=\s*n)" \
+> > >  | wc -l
+> > > 
+> > > 156
+> > > 
+> > > a new keyword is required :) .. 
+> > > 
+> > > 
+> > > > In another mail I suggested
+> > > > 
+> > > > 	optionally depends on FOO
+> > > > 
+> > > > might be a better alternative than "uses".
+> > > > 
+> > > > 
+> > > 
+> > > how about just:
+> > >       optional FOO
+> > > 
+> > > It is clear and easy to document .. 
+> > 
+> > I don't dispute your argument for having a new keyword. But the most 
+> > difficult part as Arnd said is to find it. You cannot pretend that 
+> 
+> kconfig-language.rst  ?
+> 
+> > "optional FOO" is clear when it actually imposes a restriction when 
+> > FOO=m. Try to justify to people why they cannot select y because of
+> > this 
+> > "optional" thing.
+> > 
+> 
+> Then let's use "uses" it is more assertive. Documentation will cover
+> any vague anything about it .. 
 
->   HOSTLD  scripts/dtc/dtc
->   CHKDT   Documentation/devicetree/bindings/arm/psci.yaml
-> make[2]: execvp: /bin/sh: Argument list too long
-> make[2]: *** [/home/laurent/src/kernel/this_is_a_long_directory_name/linux/Documentation/devicetree/bindings/Makefile:38: Documentation/devicetree/bindings/processed-schema-examples.yaml] Error 127
-> make[1]: *** [/home/laurent/src/kernel/this_is_a_long_directory_name/linux/Makefile:1300: dt_binding_check] Error 2
-> make[1]: Leaving directory '/home/laurent/src/kernel/this_is_a_long_directory_name/linux/output/x86'
-> make: *** [Makefile:180: sub-make] Error 2
->
-> It seems to only fail with out of tree builds (O=...). I expect that
-> failures will become more common the more YAML bindings we have, even
-> without long directory names.
+It uses what? And why can't I configure this with "uses FOO" when FOO=m?
+That's not any clearer. And saying that "this is weird but it is 
+described in the documentation" is not good enough. We must make things 
+clear in the first place.
 
-Indeed. This will be a common problem sooner or later.
+This is really a conditional dependency. That's all this is about.
+So why not simply making it so rather than fooling ourselves? All that 
+is required is an extension that would allow:
 
-Rob already suggested a solution.
+	depends on (expression) if (expression)
 
-
-Another way is to use a pipe.
-
-See the following code in scripts/Makefile.modpost
+This construct should be obvious even without reading the doc, is 
+already used extensively for other things already, and is flexible 
+enough to cover all sort of cases in addition to this particular one.
 
 
-# Read out modules.order instead of expanding $(modules) to pass in modpost.
-# Otherwise, allmodconfig would fail with "Argument list too long".
-quiet_cmd_modpost = MODPOST $(words $(modules)) modules
-      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST)
-
-
-The same issue happens for modpost
-because allmodconfig floods the command line.
-
-
--- 
-Best Regards
-Masahiro Yamada
+Nicolas
