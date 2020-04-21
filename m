@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:65216 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728576AbgDUMcz (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:38131 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbgDUMsn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 08:32:55 -0400
+        Tue, 21 Apr 2020 08:48:43 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
 Subject: [PATCH 2/2] kbuild: use -MMD instead of -MD to exclude system headers from dependency
-Date: Tue, 21 Apr 2020 21:32:27 +0900
-Message-Id: <20200421123227.1270021-2-masahiroy@kernel.org>
-In-Reply-To: <20200421123227.1270021-1-masahiroy@kernel.org>
-References: <20200421123227.1270021-1-masahiroy@kernel.org>
+Date: Tue, 21 Apr 2020 21:48:04 +0900
+Message-Id: <20200421124804.1272909-2-masahiroy@kernel.org>
+In-Reply-To: <20200421124804.1272909-1-masahiroy@kernel.org>
+References: <20200421124804.1272909-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,8 +19,8 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.ne
 
 This omits system header files from the generated header dependency.
 
-System headers are not updated (unless you upgrade the compiler).
-Nor do they contain CONFIG options, so fixdep does not need to parse them.
+System headers are not updated unless you upgrade the compiler. Nor do
+they contain CONFIG options, so fixdep does not need to parse them.
 
 Having said that, the effect of this optimization will be small because
 the kernel code generally does not include system headers except
