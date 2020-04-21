@@ -1,48 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-eopbgr30068.outbound.protection.outlook.com ([40.107.3.68]:47513
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726741AbgDUMOL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 08:14:11 -0400
-Date: Tue, 21 Apr 2020 15:14:04 +0300
-From: Leon Romanovsky <leonro@mellanox.com>
-Subject: Re: [PATCH net-next v2 0/4] Remove vermagic header from global
- include folder
-Message-ID: <20200421121404.GL121146@unreal>
-References: <20200419141850.126507-1-leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200419141850.126507-1-leon@kernel.org>
+Received: from conuserg-11.nifty.com ([210.131.2.78]:65215 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728316AbgDUMcz (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Apr 2020 08:32:55 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 1/2] kbuild: ensure full rebuild when the compiler is updated
+Date: Tue, 21 Apr 2020 21:32:26 +0900
+Message-Id: <20200421123227.1270021-1-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Andy Gospodarek <andy@greyhouse.net>, Borislav Petkov <bp@suse.de>, Ion Badulescu <ionut@badula.org>, Jay Vosburgh <j.vosburgh@gmail.com>, Jessica Yu <jeyu@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org, oss-drivers@netronome.com, Salil Mehta <salil.mehta@huawei.com>, Sebastian Reichel <sre@kernel.org>, Shannon Nelson <snelson@pensando.io>, Veaceslav Falico <vfalico@gmail.com>, Yisen Zhuang <yisen.zhuang@huawei.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-On Sun, Apr 19, 2020 at 05:18:46PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@mellanox.com>
->
-> Changelog:
-> v2:
->  * Changed the implementation of patch #4 to be like Masahiro wants.
-> I personally don't like this implementation and changing it just to move forward
-> this this patchset.
-> v1:
-> https://lore.kernel.org/lkml/20200415133648.1306956-1-leon@kernel.org
->  * Added tags
->  * Updated patch #4 with test results
->  * Changed scripts/mod/modpost.c to create inclusion of vermagic.h
->    from kernel folder and not from general include/linux. This is
->    needed to generate *.mod.c files, while building modules.
-> v0:
-> https://lore.kernel.org/lkml/20200414155732.1236944-1-leon@kernel.org
-> ----------------------------------------------------------------------------
+Commit 21c54b774744 ("kconfig: show compiler version text in the top
+comment") added the environment variable, CC_VERSION_TEXT in the comment
+of the top Kconfig file. It can detect the compiler update, and invoke
+the syncconfig because all environment variables referenced in Kconfig
+files are recorded in include/config/auto.conf.cmd
 
-Dave,
+This commit makes it a CONFIG option in order to ensure the full rebuild
+when the compiler is updated.
 
-I see in the patchworks that this series is marked as "Needs Review/ACK".
-Can you please help me to understand who is needed to be approached?
+This works like as follows:
 
-https://patchwork.ozlabs.org/project/netdev/list/?series=171189
+include/config/kconfig.h contains "CONFIG_CC_VERSION_TEXT" in the comment
+block.
 
-Thanks
+The top Makefile specifies "-include $(srctree)/include/linux/kconfig.h"
+to guarantee it is included from all kernel source files.
+
+fixdep parses every source file and all headers included from it,
+searching for words prefixed with "CONFIG_". Then, fixdep finds
+CONFIG_CC_VERSION_TEXT in include/config/kconfig.h and adds
+include/config/cc/version/text.h into every .*.cmd file.
+
+When the compiler is updated, syncconfig is invoked since the environment
+variable is referenced. CONFIG_CC_VERSION_TEXT is updated to the new
+version string, and include/config/cc/version/text.h is touched.
+
+In the next rebuild, Make rebuilds every files since the timestamp of
+include/config/cc/version/text.h is newer than that of target.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Kconfig                 |  2 --
+ include/linux/kconfig.h |  9 +++++++++
+ init/Kconfig            | 12 ++++++++++++
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/Kconfig b/Kconfig
+index e10b3ee084d4..745bc773f567 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -5,8 +5,6 @@
+ #
+ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
+ 
+-comment "Compiler: $(CC_VERSION_TEXT)"
+-
+ source "scripts/Kconfig.include"
+ 
+ source "init/Kconfig"
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+index cc8fa109cfa3..406b8a2521b5 100644
+--- a/include/linux/kconfig.h
++++ b/include/linux/kconfig.h
+@@ -2,6 +2,15 @@
+ #ifndef __LINUX_KCONFIG_H
+ #define __LINUX_KCONFIG_H
+ 
++/*
++ * Do not remove this comment block. This contains "CONFIG_CC_VERSION_TEXT"
++ * to ensure the full rebuild when the compiler is updated.
++ *
++ * fixdep parses this header, which is included by every kernel source file,
++ * and adds include/config/cc/version/text.h to the dependency in .*.cmd files.
++ * When the compiler is updated, syncconfig touches it so every file is rebuilt.
++ */
++
+ #include <generated/autoconf.h>
+ 
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+diff --git a/init/Kconfig b/init/Kconfig
+index 9e22ee8fbd75..d3d153815d88 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -8,6 +8,18 @@ config DEFCONFIG_LIST
+ 	default "/boot/config-$(shell,uname -r)"
+ 	default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
+ 
++config CC_VERSION_TEXT
++	string
++	default "$(CC_VERSION_TEXT)"
++	help
++	  There two purposes for this entry:
++
++	  1. Reference the environment variable, CC_VERSION_TEXT, so Kconfig
++	     is invoked if the compiler is updated.
++
++	  2. Touch include/config/cc/version/text.h to force the full rebuild
++	     if the compiler is updated. See comment in include/linux/kconfig.h
++
+ config CC_IS_GCC
+ 	def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
+ 
+-- 
+2.25.1
