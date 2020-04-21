@@ -1,83 +1,163 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp20.pobox.com ([173.228.157.52]:61107 "EHLO
-        pb-smtp20.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbgDUSX5 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725870AbgDUS31 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 14:23:57 -0400
-Date: Tue, 21 Apr 2020 14:23:47 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-In-Reply-To: <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
-Message-ID: <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
-References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com> <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr> <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
- <87v9lu1ra6.fsf@intel.com> <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com> <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
+        Tue, 21 Apr 2020 14:29:27 -0400
+Date: Tue, 21 Apr 2020 21:29:09 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
+Message-ID: <20200421182909.GE5983@pendragon.ideasonboard.com>
+References: <20200229003731.2728-1-robh@kernel.org>
+ <20200421100749.GA5429@pendragon.ideasonboard.com>
+ <CAK7LNARvPytUQoncngLe=s-TzQByQCXd64H99UgrW40=X34JyQ@mail.gmail.com>
+ <20200421110537.GC5983@pendragon.ideasonboard.com>
+ <CAK7LNAQtfyqfbQx2ivg=sVdhxDH9ShVBa+bL-4sC7MU1N=y+cw@mail.gmail.com>
+ <20200421134654.GD5983@pendragon.ideasonboard.com>
+ <CAL_JsqJQpwN4tH0KWOB1s6NWf3sRqqGRsRiKazi=CJGCwb2T+Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqJQpwN4tH0KWOB1s6NWf3sRqqGRsRiKazi=CJGCwb2T+Q@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Saeed Mahameed <saeedm@mellanox.com>
-Cc: "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Tue, 21 Apr 2020, Saeed Mahameed wrote:
+Hi Rob,
 
-> On Tue, 2020-04-21 at 09:58 -0400, Nicolas Pitre wrote:
-> > On Tue, 21 Apr 2020, Saeed Mahameed wrote:
-> > 
-> > > I wonder how many of those 8889 cases wanted a weak dependency but
-> > > couldn't figure out how to do it ? 
-> > > 
-> > > Users of depends on FOO || !FOO
-> > > 
-> > > $ git ls-files | grep Kconfig | xargs grep -E \
-> > >   "depends\s+on\s+([A-Za-z0-9_]+)\s*\|\|\s*(\!\s*\1|\1\s*=\s*n)" \
-> > >  | wc -l
-> > > 
-> > > 156
-> > > 
-> > > a new keyword is required :) .. 
-> > > 
-> > > 
-> > > > In another mail I suggested
-> > > > 
-> > > > 	optionally depends on FOO
-> > > > 
-> > > > might be a better alternative than "uses".
-> > > > 
-> > > > 
-> > > 
-> > > how about just:
-> > >       optional FOO
-> > > 
-> > > It is clear and easy to document .. 
-> > 
-> > I don't dispute your argument for having a new keyword. But the most 
-> > difficult part as Arnd said is to find it. You cannot pretend that 
+On Tue, Apr 21, 2020 at 09:01:32AM -0500, Rob Herring wrote:
+> On Tue, Apr 21, 2020 at 8:47 AM Laurent Pinchart wrote:
+> > On Tue, Apr 21, 2020 at 10:15:02PM +0900, Masahiro Yamada wrote:
+> > > On Tue, Apr 21, 2020 at 8:05 PM Laurent Pinchart wrote:
+> > > > On Tue, Apr 21, 2020 at 07:45:05PM +0900, Masahiro Yamada wrote:
+> > > > > On Tue, Apr 21, 2020 at 7:08 PM Laurent Pinchart wrote:
+> > > > > > On Fri, Feb 28, 2020 at 06:37:30PM -0600, Rob Herring wrote:
+> > > > > > > Most folks only run dt_binding_check on the single schema they care about
+> > > > > > > by setting DT_SCHEMA_FILES. That means example is only checked against
+> > > > > > > that one schema which is not always sufficient.
+> > > > > > >
+> > > > > > > Let's address this by splitting processed-schema.yaml into 2 files: one
+> > > > > > > that's always all schemas for the examples and one that's just the schema
+> > > > > > > in DT_SCHEMA_FILES for dtbs.
+> > > > > >
+> > > > > > This broke
+> > > > > >
+> > > > > > make DT_SCHEMA_FILES=Documentation/devicetree/.. dt_binding_check
+> > > > >
+> > > > > What is intended by
+> > > > > "DT_SCHEMA_FILES=Documentation/devicetree/.."  ?
+> > > >
+> > > > My bad, I forgot to write that ... is the continuation of the string.
+> > > > It's any yaml schema file that has an example.
+> > >
+> > > Ah, OK. I just input verbatim.
+> > >
+> > > Is it broken?
+> > >
+> > > You can specify any individual file(s) under Documentation/devicetree/bindings/.
+> > >
+> > > For example, the following worked for me.
+> > >
+> > > $ make DT_SCHEMA_FILES=Documentation/devicetree/bindings/arm/psci.yaml
+> > >  dt_binding_check
+> > >   HOSTCC  scripts/basic/fixdep
+> > >   HOSTCC  scripts/dtc/dtc.o
+> > >   HOSTCC  scripts/dtc/flattree.o
+> > >   HOSTCC  scripts/dtc/fstree.o
+> > >   HOSTCC  scripts/dtc/data.o
+> > >   HOSTCC  scripts/dtc/livetree.o
+> > >   HOSTCC  scripts/dtc/treesource.o
+> > >   HOSTCC  scripts/dtc/srcpos.o
+> > >   HOSTCC  scripts/dtc/checks.o
+> > >   HOSTCC  scripts/dtc/util.o
+> > >   LEX     scripts/dtc/dtc-lexer.lex.c
+> > >   YACC    scripts/dtc/dtc-parser.tab.[ch]
+> > >   HOSTCC  scripts/dtc/dtc-lexer.lex.o
+> > >   HOSTCC  scripts/dtc/dtc-parser.tab.o
+> > >   HOSTCC  scripts/dtc/yamltree.o
+> > >   HOSTLD  scripts/dtc/dtc
+> > >   CHKDT   Documentation/devicetree/bindings/arm/psci.yaml
+> > >   SCHEMA  Documentation/devicetree/bindings/processed-schema-examples.yaml
+> > >   DTC     Documentation/devicetree/bindings/arm/psci.example.dt.yaml
+> > >   CHECK   Documentation/devicetree/bindings/arm/psci.example.dt.yaml
+> > >   SCHEMA  Documentation/devicetree/bindings/processed-schema.yaml
+> >
+> > This is getting interesting.
+> >
+> > ~/src/kernel/linux $ make O=output/x86 DT_SCHEMA_FILES=Documentation/devicetree/bindings/arm/psci.yaml dt_binding_check
+> > make[1]: Entering directory '/home/laurent/src/kernel/linux/output/x86'
+> >   HOSTCC  scripts/basic/fixdep
+> >   HOSTCC  scripts/dtc/dtc.o
+> >   HOSTCC  scripts/dtc/flattree.o
+> >   HOSTCC  scripts/dtc/fstree.o
+> >   HOSTCC  scripts/dtc/data.o
+> >   HOSTCC  scripts/dtc/livetree.o
+> >   HOSTCC  scripts/dtc/treesource.o
+> >   HOSTCC  scripts/dtc/srcpos.o
+> >   HOSTCC  scripts/dtc/checks.o
+> >   HOSTCC  scripts/dtc/util.o
+> >   LEX     scripts/dtc/dtc-lexer.lex.c
+> >   YACC    scripts/dtc/dtc-parser.tab.[ch]
+> >   HOSTCC  scripts/dtc/dtc-lexer.lex.o
+> >   HOSTCC  scripts/dtc/dtc-parser.tab.o
+> >   HOSTCC  scripts/dtc/yamltree.o
+> >   HOSTLD  scripts/dtc/dtc
+> >   CHKDT   Documentation/devicetree/bindings/arm/psci.yaml
+> >   SCHEMA  Documentation/devicetree/bindings/processed-schema-examples.yaml
+> >   DTC     Documentation/devicetree/bindings/arm/psci.example.dt.yaml
+> >   CHECK   Documentation/devicetree/bindings/arm/psci.example.dt.yaml
+> >   SCHEMA  Documentation/devicetree/bindings/processed-schema.yaml
+> > make[1]: Leaving directory '/home/laurent/src/kernel/linux/output/x86'
+> >
+> > ~/src/kernel/this_is_a_long_directory_name/linux $ make O=output/x86 DT_SCHEMA_FILES=Documentation/devicetree/bindings/arm/psci.yaml dt_binding_check
+> > make[1]: Entering directory '/home/laurent/src/kernel/this_is_a_long_directory_name/linux/output/x86'
+> >   HOSTCC  scripts/basic/fixdep
+> >   HOSTCC  scripts/dtc/dtc.o
+> >   HOSTCC  scripts/dtc/flattree.o
+> >   HOSTCC  scripts/dtc/fstree.o
+> >   HOSTCC  scripts/dtc/data.o
+> >   HOSTCC  scripts/dtc/livetree.o
+> >   HOSTCC  scripts/dtc/treesource.o
+> >   HOSTCC  scripts/dtc/srcpos.o
+> >   HOSTCC  scripts/dtc/checks.o
+> >   HOSTCC  scripts/dtc/util.o
+> >   LEX     scripts/dtc/dtc-lexer.lex.c
+> >   YACC    scripts/dtc/dtc-parser.tab.[ch]
+> >   HOSTCC  scripts/dtc/dtc-lexer.lex.o
+> >   HOSTCC  scripts/dtc/dtc-parser.tab.o
+> >   HOSTCC  scripts/dtc/yamltree.o
+> >   HOSTLD  scripts/dtc/dtc
+> >   CHKDT   Documentation/devicetree/bindings/arm/psci.yaml
+> > make[2]: execvp: /bin/sh: Argument list too long
+> > make[2]: *** [/home/laurent/src/kernel/this_is_a_long_directory_name/linux/Documentation/devicetree/bindings/Makefile:38: Documentation/devicetree/bindings/processed-schema-examples.yaml] Error 127
+> > make[1]: *** [/home/laurent/src/kernel/this_is_a_long_directory_name/linux/Makefile:1300: dt_binding_check] Error 2
+> > make[1]: Leaving directory '/home/laurent/src/kernel/this_is_a_long_directory_name/linux/output/x86'
+> > make: *** [Makefile:180: sub-make] Error 2
+> >
+> > It seems to only fail with out of tree builds (O=...). I expect that
+> > failures will become more common the more YAML bindings we have, even
+> > without long directory names.
 > 
-> kconfig-language.rst  ?
+> dt-mk-schema can take and recurse a single directory already, so does
+> this fix it for you:
+
+Yes, the change below fixes my problem, thank you.
+
+> @@ -22,7 +22,7 @@ $(obj)/%.example.dts: $(src)/%.yaml
+> check_dtschema_version FORCE
+>  DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
 > 
-> > "optional FOO" is clear when it actually imposes a restriction when 
-> > FOO=m. Try to justify to people why they cannot select y because of
-> > this 
-> > "optional" thing.
-> > 
+>  quiet_cmd_mk_schema = SCHEMA  $@
+> -      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+> $(real-prereqs)
+> +      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+> $(srctree)/$(src)
 > 
-> Then let's use "uses" it is more assertive. Documentation will cover
-> any vague anything about it .. 
+>  DT_DOCS = $(addprefix $(src)/, \
+>         $(shell \
 
-It uses what? And why can't I configure this with "uses FOO" when FOO=m?
-That's not any clearer. And saying that "this is weird but it is 
-described in the documentation" is not good enough. We must make things 
-clear in the first place.
+-- 
+Regards,
 
-This is really a conditional dependency. That's all this is about.
-So why not simply making it so rather than fooling ourselves? All that 
-is required is an extension that would allow:
-
-	depends on (expression) if (expression)
-
-This construct should be obvious even without reading the doc, is 
-already used extensively for other things already, and is flexible 
-enough to cover all sort of cases in addition to this particular one.
-
-
-Nicolas
+Laurent Pinchart
