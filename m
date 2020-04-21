@@ -1,36 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:54508 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbgDUU2L (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 16:28:11 -0400
-Date: Tue, 21 Apr 2020 13:28:08 -0700 (PDT)
-Message-Id: <20200421.132808.1673635156407152563.davem@davemloft.net>
-Subject: Re: [PATCH net-next v2 0/4] Remove vermagic header from global
- include folder
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20200419141850.126507-1-leon@kernel.org>
-References: <20200419141850.126507-1-leon@kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail.kernel.org ([198.145.29.99]:46348 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725850AbgDUUkr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 21 Apr 2020 16:40:47 -0400
+MIME-Version: 1.0
+References: <20200229003731.2728-1-robh@kernel.org> <20200421100749.GA5429@pendragon.ideasonboard.com>
+ <CAK7LNARvPytUQoncngLe=s-TzQByQCXd64H99UgrW40=X34JyQ@mail.gmail.com>
+ <20200421110537.GC5983@pendragon.ideasonboard.com> <CAK7LNAQtfyqfbQx2ivg=sVdhxDH9ShVBa+bL-4sC7MU1N=y+cw@mail.gmail.com>
+ <20200421134654.GD5983@pendragon.ideasonboard.com> <CAL_JsqJQpwN4tH0KWOB1s6NWf3sRqqGRsRiKazi=CJGCwb2T+Q@mail.gmail.com>
+ <CAK7LNASe9ahgo04=cAuXcsaoffb9CtnUCYOObJd5=Awaak+YZw@mail.gmail.com> <CAL_JsqKV4UQeSX1ArJb4es1_kkMp1kbkd2kd17qVc=Oy988F7Q@mail.gmail.com>
+In-Reply-To: <CAL_JsqKV4UQeSX1ArJb4es1_kkMp1kbkd2kd17qVc=Oy988F7Q@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 21 Apr 2020 15:40:34 -0500
+Message-ID: <CAL_JsqJRsqCW20o3tAxMWE=dQrxts7jG7P=3yfDDx7HP+w38rQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: leon@kernel.org
-Cc: kuba@kernel.org, leonro@mellanox.com, andy@greyhouse.net, bp@suse.de, ionut@badula.org, j.vosburgh@gmail.com, jeyu@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, masahiroy@kernel.org, michal.lkml@markovi.net, netdev@vger.kernel.org, oss-drivers@netronome.com, salil.mehta@huawei.com, sre@kernel.org, snelson@pensando.io, vfalico@gmail.com, yisen.zhuang@huawei.com
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Leon Romanovsky <leon@kernel.org>
-Date: Sun, 19 Apr 2020 17:18:46 +0300
+On Tue, Apr 21, 2020 at 2:31 PM Rob Herring <robh@kernel.org> wrote:
+>
+> On Tue, Apr 21, 2020 at 11:57 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > Hi Rob,
+> >
+> >
+> > On Tue, Apr 21, 2020 at 11:01 PM Rob Herring <robh@kernel.org> wrote:
+> > > >
+> > > > It seems to only fail with out of tree builds (O=...). I expect that
+> > > > failures will become more common the more YAML bindings we have, even
+> > > > without long directory names.
+> > >
+> > > dt-mk-schema can take and recurse a single directory already, so does
+> > > this fix it for you:
+> > >
+> > > @@ -22,7 +22,7 @@ $(obj)/%.example.dts: $(src)/%.yaml
+> > > check_dtschema_version FORCE
+> > >  DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
+> > >
+> > >  quiet_cmd_mk_schema = SCHEMA  $@
+> > > -      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+> > > $(real-prereqs)
+> > > +      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+> > > $(srctree)/$(src)
+> >
+> >
+> > I am just curious.
+> >
+> > How come the tool excludes 'processed-schema*' and '*.example.dt.yaml'
+> > from $(srctree)/$(src) ?
+>
+> Uggg, it wouldn't. Can't everyone build out of tree. ;) I guess the options are:
+>
+> - Call dt-mk-schema on each file individually appending the result
+> - Make dt-mk-schema take stdin or a file with a list of files as
+> Masahiro suggested
+>
+> I'd like to avoid a dt-mk-schema change so I'll try to make the former
+> work. It's only been a day since adding a minimum version. :(
 
-> This is followup to the failure reported by Borislav [1] and suggested
-> fix later on [2].
-> 
-> The series removes all includes of linux/vermagic.h, updates hns and
-> nfp to use same kernel versioning scheme (exactly like we did for
-> other drivers in previous cycle) and removes vermagic.h from global
-> include folder.
-> 
-> [1] https://lore.kernel.org/lkml/20200411155623.GA22175@zn.tnic
-> [2] https://lore.kernel.org/lkml/20200413080452.GA3772@zn.tnic
+Laurent, does this work for you? I've reproduced the problem, but just
+double checking.
 
-Series applied to net-next, thanks.
+ DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
+
+ quiet_cmd_mk_schema = SCHEMA  $@
+-      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
+$(real-prereqs)
++      cmd_mk_schema = $(file >$@.tmp, $(real-prereqs)) \
++                      cat $@.tmp | xargs $(DT_MK_SCHEMA)
+$(DT_MK_SCHEMA_FLAGS) -o $@
+
+ DT_DOCS = $(addprefix $(src)/, \
+        $(shell \
