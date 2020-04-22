@@ -1,151 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp21.pobox.com ([173.228.157.53]:63763 "EHLO
-        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726161AbgDVVNU (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725839AbgDVWh6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Apr 2020 17:13:20 -0400
-Date: Wed, 22 Apr 2020 17:13:09 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
+        Wed, 22 Apr 2020 18:37:58 -0400
 Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-In-Reply-To: <871rofdhtg.fsf@intel.com>
-Message-ID: <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
-References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com> <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr> <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
- <87v9lu1ra6.fsf@intel.com> <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com> <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com> <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
- <871rofdhtg.fsf@intel.com>
+References: <20200417011146.83973-1-saeedm@mellanox.com>
+ <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com>
+ <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr>
+ <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
+ <87v9lu1ra6.fsf@intel.com>
+ <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com>
+ <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr>
+ <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
+ <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr> <871rofdhtg.fsf@intel.com>
+ <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <940d3add-4d12-56ed-617a-8b3bf8ef3a0f@infradead.org>
+Date: Wed, 22 Apr 2020 15:37:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@linux.intel.com>
+To: Nicolas Pitre <nico@fluxnic.net>, Jani Nikula <jani.nikula@linux.intel.com>
 Cc: Saeed Mahameed <saeedm@mellanox.com>, "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-On Wed, 22 Apr 2020, Jani Nikula wrote:
-
-> On Tue, 21 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
-> > This is really a conditional dependency. That's all this is about.
-> > So why not simply making it so rather than fooling ourselves? All that 
-> > is required is an extension that would allow:
-> >
-> > 	depends on (expression) if (expression)
-> >
-> > This construct should be obvious even without reading the doc, is 
-> > already used extensively for other things already, and is flexible 
-> > enough to cover all sort of cases in addition to this particular one.
+On 4/22/20 2:13 PM, Nicolas Pitre wrote:
+> On Wed, 22 Apr 2020, Jani Nikula wrote:
 > 
-> Okay, you convinced me. Now you only need to convince whoever is doing
-> the actual work of implementing this stuff. ;)
+>> On Tue, 21 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
+>>> This is really a conditional dependency. That's all this is about.
+>>> So why not simply making it so rather than fooling ourselves? All that 
+>>> is required is an extension that would allow:
+>>>
+>>> 	depends on (expression) if (expression)
+>>>
+>>> This construct should be obvious even without reading the doc, is 
+>>> already used extensively for other things already, and is flexible 
+>>> enough to cover all sort of cases in addition to this particular one.
+>>
+>> Okay, you convinced me. Now you only need to convince whoever is doing
+>> the actual work of implementing this stuff. ;)
+> 
+> What about this:
+> 
+> ----- >8
+> Subject: [PATCH] kconfig: allow for conditional dependencies
+> 
+> This might appear to be a strange concept, but sometimes we want
+> a dependency to be conditionally applied. One such case is currently
+> expressed with:
+> 
+> 	depends on FOO || !FOO
+> 
+> This pattern is strange enough to give one's pause. Given that it is
+> also frequent, let's make the intent more obvious with some syntaxic 
+> sugar by effectively making dependencies optionally conditional.
+> This also makes the kconfig language more uniform.
+> 
+> Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
 
-What about this:
+Hi,
 
------ >8
-Subject: [PATCH] kconfig: allow for conditional dependencies
+If we must do something here, I prefer this one.
 
-This might appear to be a strange concept, but sometimes we want
-a dependency to be conditionally applied. One such case is currently
-expressed with:
+Nicolas, would you do another example, specifically for
+CRAMFS_MTD in fs/cramfs/Kconfig, please?
 
-	depends on FOO || !FOO
-
-This pattern is strange enough to give one's pause. Given that it is
-also frequent, let's make the intent more obvious with some syntaxic 
-sugar by effectively making dependencies optionally conditional.
-This also makes the kconfig language more uniform.
-
-Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
-
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index d0111dd264..0f841e0037 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -114,7 +114,7 @@ applicable everywhere (see syntax).
-   This is a shorthand notation for a type definition plus a value.
-   Optionally dependencies for this default value can be added with "if".
- 
--- dependencies: "depends on" <expr>
-+- dependencies: "depends on" <expr> ["if" <expr>]
- 
-   This defines a dependency for this menu entry. If multiple
-   dependencies are defined, they are connected with '&&'. Dependencies
-@@ -130,6 +130,16 @@ applicable everywhere (see syntax).
- 	bool "foo"
- 	default y
- 
-+  The dependency definition itself may be conditional by appending "if"
-+  followed by an expression. If such expression is false (n) then this
-+  dependency is ignored. One possible use case is:
-+
-+    config FOO
-+	tristate
-+	depends on BAZ if BAZ != n
-+
-+  meaning that FOO is constrained by the value of BAZ only when it is set.
-+
- - reverse dependencies: "select" <symbol> ["if" <expr>]
- 
-   While normal dependencies reduce the upper limit of a symbol (see
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index d4ca829736..1a9337d1b9 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -72,7 +72,7 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
- struct menu *menu_add_menu(void);
- void menu_end_menu(void);
- void menu_add_entry(struct symbol *sym);
--void menu_add_dep(struct expr *dep);
-+void menu_add_dep(struct expr *dep, struct expr *cond);
- void menu_add_visibility(struct expr *dep);
- struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
- void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index e436ba44c9..e6b204225e 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -103,8 +103,22 @@ static struct expr *rewrite_m(struct expr *e)
- 	return e;
- }
- 
--void menu_add_dep(struct expr *dep)
-+void menu_add_dep(struct expr *dep, struct expr *cond)
- {
-+	if (cond) {
-+		struct expr *cond2, *left, *right;
-+		/*
-+		 * We have "depends on X if Y" and we want:
-+		 *	Y != n --> X
-+		 *	Y == n --> y
-+		 * Meaning: ((Y != n) && X) || (Y == n)
-+		 */
-+		cond2 = expr_copy(cond);
-+		left = expr_trans_compare(cond2, E_UNEQUAL, &symbol_no);
-+		left = expr_alloc_and(dep, left);
-+		right = expr_trans_compare(cond, E_EQUAL, &symbol_no);
-+		dep = expr_alloc_or(left, right);
-+	}
- 	current_entry->dep = expr_alloc_and(current_entry->dep, dep);
- }
- 
-diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-index 708b6c4b13..4161207da2 100644
---- a/scripts/kconfig/parser.y
-+++ b/scripts/kconfig/parser.y
-@@ -316,7 +316,7 @@ if_entry: T_IF expr T_EOL
- {
- 	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
- 	menu_add_entry(NULL);
--	menu_add_dep($2);
-+	menu_add_dep($2, NULL);
- 	$$ = menu_add_menu();
- };
- 
-@@ -412,9 +412,9 @@ help: help_start T_HELPTEXT
- 
- /* depends option */
- 
--depends: T_DEPENDS T_ON expr T_EOL
-+depends: T_DEPENDS T_ON expr if_expr T_EOL
- {
--	menu_add_dep($3);
-+	menu_add_dep($3, $4);
- 	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
- };
- 
+thanks.
+-- 
+~Randy
