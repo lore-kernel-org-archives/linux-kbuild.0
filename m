@@ -1,63 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:52481 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726057AbgDVQHR (ORCPT
+Received: from pb-smtp21.pobox.com ([173.228.157.53]:63763 "EHLO
+        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726161AbgDVVNU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Apr 2020 12:07:17 -0400
+        Wed, 22 Apr 2020 17:13:20 -0400
+Date: Wed, 22 Apr 2020 17:13:09 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+In-Reply-To: <871rofdhtg.fsf@intel.com>
+Message-ID: <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
+References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com> <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr> <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
+ <87v9lu1ra6.fsf@intel.com> <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com> <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com> <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
+ <871rofdhtg.fsf@intel.com>
 MIME-Version: 1.0
-References: <20200421161355.1357112-1-masahiroy@kernel.org> <20200422131729.GB20103@linux-8ccs>
-In-Reply-To: <20200422131729.GB20103@linux-8ccs>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 23 Apr 2020 01:06:26 +0900
-Message-ID: <CAK7LNAQ-WcKf1QDOnefjkzg7Cq1fKNuEPDvH9TYU8tLwbUhtmg@mail.gmail.com>
-Subject: Re: [PATCH v2] arch: split MODULE_ARCH_VERMAGIC definitions out to <asm/vermagic.h>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jessica Yu <jeyu@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@suse.de>
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Saeed Mahameed <saeedm@mellanox.com>, "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-On Wed, Apr 22, 2020 at 10:17 PM Jessica Yu <jeyu@kernel.org> wrote:
->
-> +++ Masahiro Yamada [22/04/20 01:13 +0900]:
-> [snip]
-> >diff --git a/arch/xtensa/include/asm/module.h b/arch/xtensa/include/asm/vermagic.h
-> >similarity index 72%
-> >rename from arch/xtensa/include/asm/module.h
-> >rename to arch/xtensa/include/asm/vermagic.h
-> >index 488b40c6f9b9..6f9e359a54ac 100644
-> >--- a/arch/xtensa/include/asm/module.h
-> >+++ b/arch/xtensa/include/asm/vermagic.h
-> >@@ -1,6 +1,4 @@
-> > /*
-> >- * include/asm-xtensa/module.h
-> >- *
-> >  * This file contains the module code specific to the Xtensa architecture.
->
-> Maybe we can remove this comment too? Since it's now asm/vermagic.h and
-> not asm/module.h anymore.
+On Wed, 22 Apr 2020, Jani Nikula wrote:
 
-OK, I will delete it.
+> On Tue, 21 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
+> > This is really a conditional dependency. That's all this is about.
+> > So why not simply making it so rather than fooling ourselves? All that 
+> > is required is an extension that would allow:
+> >
+> > 	depends on (expression) if (expression)
+> >
+> > This construct should be obvious even without reading the doc, is 
+> > already used extensively for other things already, and is flexible 
+> > enough to cover all sort of cases in addition to this particular one.
+> 
+> Okay, you convinced me. Now you only need to convince whoever is doing
+> the actual work of implementing this stuff. ;)
 
-Thanks for checking it closely.
+What about this:
 
+----- >8
+Subject: [PATCH] kconfig: allow for conditional dependencies
 
+This might appear to be a strange concept, but sometimes we want
+a dependency to be conditionally applied. One such case is currently
+expressed with:
 
+	depends on FOO || !FOO
 
->
-> Thanks for the cleanup. I agree that <linux/vermagic.h> shouldn't have
-> any ordering dependency on <linux/module.h>.
->
-> I just double checked to see if there were any other users of
-> MODULE_ARCH_VERMAGIC that needed it through module.h, and there are
-> none. It was literally just being defined in asm/module.h to be used
-> in linux/vermagic.h. So there was no reason really to confine the
-> MODULE_ARCH_VERMAGIC definition to asm/module.h.
->
-> Acked-by: Jessica Yu <jeyu@kernel.org>
+This pattern is strange enough to give one's pause. Given that it is
+also frequent, let's make the intent more obvious with some syntaxic 
+sugar by effectively making dependencies optionally conditional.
+This also makes the kconfig language more uniform.
 
+Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
 
-
--- 
-Best Regards
-Masahiro Yamada
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index d0111dd264..0f841e0037 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -114,7 +114,7 @@ applicable everywhere (see syntax).
+   This is a shorthand notation for a type definition plus a value.
+   Optionally dependencies for this default value can be added with "if".
+ 
+-- dependencies: "depends on" <expr>
++- dependencies: "depends on" <expr> ["if" <expr>]
+ 
+   This defines a dependency for this menu entry. If multiple
+   dependencies are defined, they are connected with '&&'. Dependencies
+@@ -130,6 +130,16 @@ applicable everywhere (see syntax).
+ 	bool "foo"
+ 	default y
+ 
++  The dependency definition itself may be conditional by appending "if"
++  followed by an expression. If such expression is false (n) then this
++  dependency is ignored. One possible use case is:
++
++    config FOO
++	tristate
++	depends on BAZ if BAZ != n
++
++  meaning that FOO is constrained by the value of BAZ only when it is set.
++
+ - reverse dependencies: "select" <symbol> ["if" <expr>]
+ 
+   While normal dependencies reduce the upper limit of a symbol (see
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index d4ca829736..1a9337d1b9 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -72,7 +72,7 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
+ struct menu *menu_add_menu(void);
+ void menu_end_menu(void);
+ void menu_add_entry(struct symbol *sym);
+-void menu_add_dep(struct expr *dep);
++void menu_add_dep(struct expr *dep, struct expr *cond);
+ void menu_add_visibility(struct expr *dep);
+ struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
+ void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e436ba44c9..e6b204225e 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -103,8 +103,22 @@ static struct expr *rewrite_m(struct expr *e)
+ 	return e;
+ }
+ 
+-void menu_add_dep(struct expr *dep)
++void menu_add_dep(struct expr *dep, struct expr *cond)
+ {
++	if (cond) {
++		struct expr *cond2, *left, *right;
++		/*
++		 * We have "depends on X if Y" and we want:
++		 *	Y != n --> X
++		 *	Y == n --> y
++		 * Meaning: ((Y != n) && X) || (Y == n)
++		 */
++		cond2 = expr_copy(cond);
++		left = expr_trans_compare(cond2, E_UNEQUAL, &symbol_no);
++		left = expr_alloc_and(dep, left);
++		right = expr_trans_compare(cond, E_EQUAL, &symbol_no);
++		dep = expr_alloc_or(left, right);
++	}
+ 	current_entry->dep = expr_alloc_and(current_entry->dep, dep);
+ }
+ 
+diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
+index 708b6c4b13..4161207da2 100644
+--- a/scripts/kconfig/parser.y
++++ b/scripts/kconfig/parser.y
+@@ -316,7 +316,7 @@ if_entry: T_IF expr T_EOL
+ {
+ 	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
+ 	menu_add_entry(NULL);
+-	menu_add_dep($2);
++	menu_add_dep($2, NULL);
+ 	$$ = menu_add_menu();
+ };
+ 
+@@ -412,9 +412,9 @@ help: help_start T_HELPTEXT
+ 
+ /* depends option */
+ 
+-depends: T_DEPENDS T_ON expr T_EOL
++depends: T_DEPENDS T_ON expr if_expr T_EOL
+ {
+-	menu_add_dep($3);
++	menu_add_dep($3, $4);
+ 	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
+ };
+ 
