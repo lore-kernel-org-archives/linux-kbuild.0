@@ -1,75 +1,215 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725839AbgDVWh6 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44202 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbgDVXYV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Apr 2020 18:37:58 -0400
-Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
-References: <20200417011146.83973-1-saeedm@mellanox.com>
- <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com>
- <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr>
- <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com>
- <87v9lu1ra6.fsf@intel.com>
- <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com>
- <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr>
- <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
- <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr> <871rofdhtg.fsf@intel.com>
- <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <940d3add-4d12-56ed-617a-8b3bf8ef3a0f@infradead.org>
-Date: Wed, 22 Apr 2020 15:37:46 -0700
-MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 22 Apr 2020 19:24:21 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215FBC03C1AB
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Apr 2020 16:24:21 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id w70so3092755pgw.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Apr 2020 16:24:21 -0700 (PDT)
+Date: Wed, 22 Apr 2020 16:24:17 -0700
+Message-Id: <20200422232417.72162-1-samitolvanen@google.com>
+Mime-Version: 1.0
+Subject: [PATCH] recordmcount: support >64k sections
+From: Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>, Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Saeed Mahameed <saeedm@mellanox.com>, "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
+To: "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Matt Helsley <mhelsley@vmware.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>, Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
 
-On 4/22/20 2:13 PM, Nicolas Pitre wrote:
-> On Wed, 22 Apr 2020, Jani Nikula wrote:
-> 
->> On Tue, 21 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
->>> This is really a conditional dependency. That's all this is about.
->>> So why not simply making it so rather than fooling ourselves? All that 
->>> is required is an extension that would allow:
->>>
->>> 	depends on (expression) if (expression)
->>>
->>> This construct should be obvious even without reading the doc, is 
->>> already used extensively for other things already, and is flexible 
->>> enough to cover all sort of cases in addition to this particular one.
->>
->> Okay, you convinced me. Now you only need to convince whoever is doing
->> the actual work of implementing this stuff. ;)
-> 
-> What about this:
-> 
-> ----- >8
-> Subject: [PATCH] kconfig: allow for conditional dependencies
-> 
-> This might appear to be a strange concept, but sometimes we want
-> a dependency to be conditionally applied. One such case is currently
-> expressed with:
-> 
-> 	depends on FOO || !FOO
-> 
-> This pattern is strange enough to give one's pause. Given that it is
-> also frequent, let's make the intent more obvious with some syntaxic 
-> sugar by effectively making dependencies optionally conditional.
-> This also makes the kconfig language more uniform.
-> 
-> Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
+When compiling a kernel with Clang and LTO, we need to run
+recordmcount on vmlinux.o with a large number of sections, which
+currently fails as the program doesn't understand extended
+section indexes. This change adds support for processing binaries
+with >64k sections.
 
-Hi,
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+---
+ scripts/recordmcount.h | 75 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 69 insertions(+), 6 deletions(-)
 
-If we must do something here, I prefer this one.
+diff --git a/scripts/recordmcount.h b/scripts/recordmcount.h
+index 74eab03e31d4..b48163864cca 100644
+--- a/scripts/recordmcount.h
++++ b/scripts/recordmcount.h
+@@ -29,6 +29,9 @@
+ #undef has_rel_mcount
+ #undef tot_relsize
+ #undef get_mcountsym
++#undef get_shnum
++#undef get_shstrndx
++#undef get_symindex
+ #undef get_sym_str_and_relp
+ #undef do_func
+ #undef Elf_Addr
+@@ -58,6 +61,9 @@
+ # define __has_rel_mcount	__has64_rel_mcount
+ # define has_rel_mcount		has64_rel_mcount
+ # define tot_relsize		tot64_relsize
++# define get_shnum		get_shnum64
++# define get_shstrndx		get_shstrndx64
++# define get_symindex		get_symindex64
+ # define get_sym_str_and_relp	get_sym_str_and_relp_64
+ # define do_func		do64
+ # define get_mcountsym		get_mcountsym_64
+@@ -91,6 +97,9 @@
+ # define __has_rel_mcount	__has32_rel_mcount
+ # define has_rel_mcount		has32_rel_mcount
+ # define tot_relsize		tot32_relsize
++# define get_shnum		get_shnum32
++# define get_shstrndx		get_shstrndx32
++# define get_symindex		get_symindex32
+ # define get_sym_str_and_relp	get_sym_str_and_relp_32
+ # define do_func		do32
+ # define get_mcountsym		get_mcountsym_32
+@@ -173,6 +182,38 @@ static int MIPS_is_fake_mcount(Elf_Rel const *rp)
+ 	return is_fake;
+ }
+ 
++static unsigned int get_symindex(Elf_Sym const *sym, Elf32_Word const *symtab,
++				 Elf32_Word const *symtab_shndx)
++{
++	unsigned long offset;
++	int index;
++
++	if (sym->st_shndx != SHN_XINDEX)
++		return w2(sym->st_shndx);
++
++	offset = (unsigned long)sym - (unsigned long)symtab;
++	index = offset / sizeof(*sym);
++
++	return w(symtab_shndx[index]);
++}
++
++static unsigned int get_shnum(Elf_Ehdr const *ehdr, Elf_Shdr const *shdr0)
++{
++	if (shdr0 && !ehdr->e_shnum)
++		return w(shdr0->sh_size);
++
++	return w2(ehdr->e_shnum);
++}
++
++static int get_shstrndx(Elf_Ehdr const *ehdr, Elf_Shdr const *shdr0)
++{
++	if (ehdr->e_shstrndx != SHN_XINDEX)
++		return w2(ehdr->e_shstrndx);
++
++	return w(shdr0->sh_link);
++}
++
++
+ /* Append the new shstrtab, Elf_Shdr[], __mcount_loc and its relocations. */
+ static int append_func(Elf_Ehdr *const ehdr,
+ 			Elf_Shdr *const shstr,
+@@ -188,10 +229,12 @@ static int append_func(Elf_Ehdr *const ehdr,
+ 	char const *mc_name = (sizeof(Elf_Rela) == rel_entsize)
+ 		? ".rela__mcount_loc"
+ 		:  ".rel__mcount_loc";
+-	unsigned const old_shnum = w2(ehdr->e_shnum);
+ 	uint_t const old_shoff = _w(ehdr->e_shoff);
+ 	uint_t const old_shstr_sh_size   = _w(shstr->sh_size);
+ 	uint_t const old_shstr_sh_offset = _w(shstr->sh_offset);
++	Elf_Shdr *const shdr0 = (Elf_Shdr *)(old_shoff + (void *)ehdr);
++	unsigned const old_shnum = get_shnum(ehdr, shdr0);
++	unsigned const new_shnum = 2 + old_shnum; /* {.rel,}__mcount_loc */
+ 	uint_t t = 1 + strlen(mc_name) + _w(shstr->sh_size);
+ 	uint_t new_e_shoff;
+ 
+@@ -201,6 +244,12 @@ static int append_func(Elf_Ehdr *const ehdr,
+ 	t += (_align & -t);  /* word-byte align */
+ 	new_e_shoff = t;
+ 
++	if (!ehdr->e_shnum || new_shnum >= SHN_LORESERVE) {
++		ehdr->e_shnum = 0;
++		shdr0->sh_size = w(new_shnum);
++	} else
++		ehdr->e_shnum = w2(2 + w2(ehdr->e_shnum));
++
+ 	/* body for new shstrtab */
+ 	if (ulseek(sb.st_size, SEEK_SET) < 0)
+ 		return -1;
+@@ -255,7 +304,6 @@ static int append_func(Elf_Ehdr *const ehdr,
+ 		return -1;
+ 
+ 	ehdr->e_shoff = _w(new_e_shoff);
+-	ehdr->e_shnum = w2(2 + w2(ehdr->e_shnum));  /* {.rel,}__mcount_loc */
+ 	if (ulseek(0, SEEK_SET) < 0)
+ 		return -1;
+ 	if (uwrite(ehdr, sizeof(*ehdr)) < 0)
+@@ -434,6 +482,8 @@ static int find_secsym_ndx(unsigned const txtndx,
+ 				uint_t *const recvalp,
+ 				unsigned int *sym_index,
+ 				Elf_Shdr const *const symhdr,
++				Elf32_Word const *symtab,
++				Elf32_Word const *symtab_shndx,
+ 				Elf_Ehdr const *const ehdr)
+ {
+ 	Elf_Sym const *const sym0 = (Elf_Sym const *)(_w(symhdr->sh_offset)
+@@ -445,7 +495,7 @@ static int find_secsym_ndx(unsigned const txtndx,
+ 	for (symp = sym0, t = nsym; t; --t, ++symp) {
+ 		unsigned int const st_bind = ELF_ST_BIND(symp->st_info);
+ 
+-		if (txtndx == w2(symp->st_shndx)
++		if (txtndx == get_symindex(symp, symtab, symtab_shndx)
+ 			/* avoid STB_WEAK */
+ 		    && (STB_LOCAL == st_bind || STB_GLOBAL == st_bind)) {
+ 			/* function symbols on ARM have quirks, avoid them */
+@@ -516,21 +566,23 @@ static unsigned tot_relsize(Elf_Shdr const *const shdr0,
+ 	return totrelsz;
+ }
+ 
+-
+ /* Overall supervision for Elf32 ET_REL file. */
+ static int do_func(Elf_Ehdr *const ehdr, char const *const fname,
+ 		   unsigned const reltype)
+ {
+ 	Elf_Shdr *const shdr0 = (Elf_Shdr *)(_w(ehdr->e_shoff)
+ 		+ (void *)ehdr);
+-	unsigned const nhdr = w2(ehdr->e_shnum);
+-	Elf_Shdr *const shstr = &shdr0[w2(ehdr->e_shstrndx)];
++	unsigned const nhdr = get_shnum(ehdr, shdr0);
++	Elf_Shdr *const shstr = &shdr0[get_shstrndx(ehdr, shdr0)];
+ 	char const *const shstrtab = (char const *)(_w(shstr->sh_offset)
+ 		+ (void *)ehdr);
+ 
+ 	Elf_Shdr const *relhdr;
+ 	unsigned k;
+ 
++	Elf32_Word *symtab = NULL;
++	Elf32_Word *symtab_shndx = NULL;
++
+ 	/* Upper bound on space: assume all relevant relocs are for mcount. */
+ 	unsigned       totrelsz;
+ 
+@@ -561,6 +613,16 @@ static int do_func(Elf_Ehdr *const ehdr, char const *const fname,
+ 		return -1;
+ 	}
+ 
++	for (relhdr = shdr0, k = nhdr; k; --k, ++relhdr) {
++		if (relhdr->sh_type == SHT_SYMTAB)
++			symtab = (void *)ehdr + relhdr->sh_offset;
++		else if (relhdr->sh_type == SHT_SYMTAB_SHNDX)
++			symtab_shndx = (void *)ehdr + relhdr->sh_offset;
++
++		if (symtab && symtab_shndx)
++			break;
++	}
++
+ 	for (relhdr = shdr0, k = nhdr; k; --k, ++relhdr) {
+ 		char const *const txtname = has_rel_mcount(relhdr, shdr0,
+ 			shstrtab, fname);
+@@ -577,6 +639,7 @@ static int do_func(Elf_Ehdr *const ehdr, char const *const fname,
+ 			result = find_secsym_ndx(w(relhdr->sh_info), txtname,
+ 						&recval, &recsym,
+ 						&shdr0[symsec_sh_link],
++						symtab, symtab_shndx,
+ 						ehdr);
+ 			if (result)
+ 				goto out;
 
-Nicolas, would you do another example, specifically for
-CRAMFS_MTD in fs/cramfs/Kconfig, please?
-
-thanks.
+base-commit: c578ddb39e565139897124e74e5a43e56538cb33
 -- 
-~Randy
+2.26.1.301.g55bc3eb7cb9-goog
