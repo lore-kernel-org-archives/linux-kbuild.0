@@ -1,77 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46348 "EHLO mail.kernel.org"
+Received: from mga07.intel.com ([134.134.136.100]:25276 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725850AbgDUUkr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 21 Apr 2020 16:40:47 -0400
+        id S1725836AbgDVIvd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 22 Apr 2020 04:51:33 -0400
+From: Jani Nikula <jani.nikula@linux.intel.com>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+In-Reply-To: <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
+References: <20200417011146.83973-1-saeedm@mellanox.com> <CAK7LNAQZd_LUyA2V_pCvMTr_201nSX1Nm0TDw5kOeNV64rOfpA@mail.gmail.com> <nycvar.YSQ.7.76.2004181509030.2671@knanqh.ubzr> <CAK7LNATmPD1R+Ranis2u3yohx8b0+dGKAvFpjg8Eo9yEHRT6zQ@mail.gmail.com> <87v9lu1ra6.fsf@intel.com> <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com> <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com> <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
+Date: Wed, 22 Apr 2020 11:51:23 +0300
+Message-ID: <871rofdhtg.fsf@intel.com>
 MIME-Version: 1.0
-References: <20200229003731.2728-1-robh@kernel.org> <20200421100749.GA5429@pendragon.ideasonboard.com>
- <CAK7LNARvPytUQoncngLe=s-TzQByQCXd64H99UgrW40=X34JyQ@mail.gmail.com>
- <20200421110537.GC5983@pendragon.ideasonboard.com> <CAK7LNAQtfyqfbQx2ivg=sVdhxDH9ShVBa+bL-4sC7MU1N=y+cw@mail.gmail.com>
- <20200421134654.GD5983@pendragon.ideasonboard.com> <CAL_JsqJQpwN4tH0KWOB1s6NWf3sRqqGRsRiKazi=CJGCwb2T+Q@mail.gmail.com>
- <CAK7LNASe9ahgo04=cAuXcsaoffb9CtnUCYOObJd5=Awaak+YZw@mail.gmail.com> <CAL_JsqKV4UQeSX1ArJb4es1_kkMp1kbkd2kd17qVc=Oy988F7Q@mail.gmail.com>
-In-Reply-To: <CAL_JsqKV4UQeSX1ArJb4es1_kkMp1kbkd2kd17qVc=Oy988F7Q@mail.gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 21 Apr 2020 15:40:34 -0500
-Message-ID: <CAL_JsqJRsqCW20o3tAxMWE=dQrxts7jG7P=3yfDDx7HP+w38rQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: Always validate DT binding examples
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>, DTML <devicetree@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nicolas Pitre <nico@fluxnic.net>, Saeed Mahameed <saeedm@mellanox.com>
+Cc: "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-On Tue, Apr 21, 2020 at 2:31 PM Rob Herring <robh@kernel.org> wrote:
+On Tue, 21 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
+> On Tue, 21 Apr 2020, Saeed Mahameed wrote:
 >
-> On Tue, Apr 21, 2020 at 11:57 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > Hi Rob,
-> >
-> >
-> > On Tue, Apr 21, 2020 at 11:01 PM Rob Herring <robh@kernel.org> wrote:
-> > > >
-> > > > It seems to only fail with out of tree builds (O=...). I expect that
-> > > > failures will become more common the more YAML bindings we have, even
-> > > > without long directory names.
-> > >
-> > > dt-mk-schema can take and recurse a single directory already, so does
-> > > this fix it for you:
-> > >
-> > > @@ -22,7 +22,7 @@ $(obj)/%.example.dts: $(src)/%.yaml
-> > > check_dtschema_version FORCE
-> > >  DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
-> > >
-> > >  quiet_cmd_mk_schema = SCHEMA  $@
-> > > -      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
-> > > $(real-prereqs)
-> > > +      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
-> > > $(srctree)/$(src)
-> >
-> >
-> > I am just curious.
-> >
-> > How come the tool excludes 'processed-schema*' and '*.example.dt.yaml'
-> > from $(srctree)/$(src) ?
+>> On Tue, 2020-04-21 at 09:58 -0400, Nicolas Pitre wrote:
+>> > On Tue, 21 Apr 2020, Saeed Mahameed wrote:
+>> > 
+>> > > I wonder how many of those 8889 cases wanted a weak dependency but
+>> > > couldn't figure out how to do it ? 
+>> > > 
+>> > > Users of depends on FOO || !FOO
+>> > > 
+>> > > $ git ls-files | grep Kconfig | xargs grep -E \
+>> > >   "depends\s+on\s+([A-Za-z0-9_]+)\s*\|\|\s*(\!\s*\1|\1\s*=\s*n)" \
+>> > >  | wc -l
+>> > > 
+>> > > 156
+>> > > 
+>> > > a new keyword is required :) .. 
+>> > > 
+>> > > 
+>> > > > In another mail I suggested
+>> > > > 
+>> > > > 	optionally depends on FOO
+>> > > > 
+>> > > > might be a better alternative than "uses".
+>> > > > 
+>> > > > 
+>> > > 
+>> > > how about just:
+>> > >       optional FOO
+>> > > 
+>> > > It is clear and easy to document .. 
+>> > 
+>> > I don't dispute your argument for having a new keyword. But the most 
+>> > difficult part as Arnd said is to find it. You cannot pretend that 
+>> 
+>> kconfig-language.rst  ?
+>> 
+>> > "optional FOO" is clear when it actually imposes a restriction when 
+>> > FOO=m. Try to justify to people why they cannot select y because of
+>> > this 
+>> > "optional" thing.
+>> > 
+>> 
+>> Then let's use "uses" it is more assertive. Documentation will cover
+>> any vague anything about it .. 
 >
-> Uggg, it wouldn't. Can't everyone build out of tree. ;) I guess the options are:
+> It uses what? And why can't I configure this with "uses FOO" when FOO=m?
+> That's not any clearer. And saying that "this is weird but it is 
+> described in the documentation" is not good enough. We must make things 
+> clear in the first place.
 >
-> - Call dt-mk-schema on each file individually appending the result
-> - Make dt-mk-schema take stdin or a file with a list of files as
-> Masahiro suggested
+> This is really a conditional dependency. That's all this is about.
+> So why not simply making it so rather than fooling ourselves? All that 
+> is required is an extension that would allow:
 >
-> I'd like to avoid a dt-mk-schema change so I'll try to make the former
-> work. It's only been a day since adding a minimum version. :(
+> 	depends on (expression) if (expression)
+>
+> This construct should be obvious even without reading the doc, is 
+> already used extensively for other things already, and is flexible 
+> enough to cover all sort of cases in addition to this particular one.
 
-Laurent, does this work for you? I've reproduced the problem, but just
-double checking.
+Okay, you convinced me. Now you only need to convince whoever is doing
+the actual work of implementing this stuff. ;)
 
- DT_TMP_SCHEMA := $(obj)/processed-schema-examples.yaml
+BR,
+Jani.
 
- quiet_cmd_mk_schema = SCHEMA  $@
--      cmd_mk_schema = $(DT_MK_SCHEMA) $(DT_MK_SCHEMA_FLAGS) -o $@
-$(real-prereqs)
-+      cmd_mk_schema = $(file >$@.tmp, $(real-prereqs)) \
-+                      cat $@.tmp | xargs $(DT_MK_SCHEMA)
-$(DT_MK_SCHEMA_FLAGS) -o $@
-
- DT_DOCS = $(addprefix $(src)/, \
-        $(shell \
+-- 
+Jani Nikula, Intel Open Source Graphics Center
