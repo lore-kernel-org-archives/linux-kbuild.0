@@ -1,123 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pb-smtp21.pobox.com ([173.228.157.53]:54994 "EHLO
-        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729014AbgDWPTW (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.131]:33431 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728865AbgDWP21 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 11:19:22 -0400
-Date: Thu, 23 Apr 2020 11:19:15 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: [PATCH] kconfig: allow for conditional dependencies
-Message-ID: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr>
+        Thu, 23 Apr 2020 11:28:27 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <45b9efec57b2e250e8e39b3b203eb8cee10cb6e8.camel@mellanox.com>
+ <nycvar.YSQ.7.76.2004210951160.2671@knanqh.ubzr> <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
+ <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr> <871rofdhtg.fsf@intel.com>
+ <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr> <940d3add-4d12-56ed-617a-8b3bf8ef3a0f@infradead.org>
+ <nycvar.YSQ.7.76.2004231059170.2671@knanqh.ubzr> <20200423150556.GZ26002@ziepe.ca>
+ <nycvar.YSQ.7.76.2004231109500.2671@knanqh.ubzr> <20200423151624.GA26002@ziepe.ca>
+In-Reply-To: <20200423151624.GA26002@ziepe.ca>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Thu, 23 Apr 2020 17:28:08 +0200
+Message-ID: <CAK8P3a0ydfp79Us-WhwwHOB2MGgtj=ovfYa_g8qhazA4gmv8eg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@linux.intel.com>, Saeed Mahameed <saeedm@mellanox.com>, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Nicolas Pitre <nico@fluxnic.net>, Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@linux.intel.com>, Saeed Mahameed <saeedm@mellanox.com>, "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-This might appear to be a strange concept, but sometimes we want
-a dependency to be conditionally applied. One such case is currently
-expressed with:
+On Thu, Apr 23, 2020 at 5:16 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> On Thu, Apr 23, 2020 at 11:11:46AM -0400, Nicolas Pitre wrote:
 
-        depends on FOO || !FOO
+> > > > I don't see how that one can be helped. The MTD dependency is not
+> > > > optional.
+> > >
+> > > Could it be done as
+> > >
+> > > config MTD
+> > >    depends on CRAMFS if CRAMFS_MTD
+> > >
+> > > ?
+> >
+> > No. There is no logic in restricting MTD usage based on CRAMFS or
+> > CRAMFS_MTD.
+>
+> Ah, I got it backwards, maybe this:
+>
+> config CRAMFS
+>    depends on MTD if CRAMFS_MTD
 
-This pattern is strange enough to give one's pause. Given that it is
-also frequent, let's make the intent more obvious with some syntaxic
-sugar by effectively making dependencies optionally conditional.
+I'm not sure this can work if you also have the requirement that 'CRAMFS_MTD
+depends on CRAMFS': dependencies in Kconfig generally cannot have
+loops in them.
 
-This also makes the kconfig language more uniform.
-
-Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
-
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index d0111dd264..0f841e0037 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -114,7 +114,7 @@ applicable everywhere (see syntax).
-   This is a shorthand notation for a type definition plus a value.
-   Optionally dependencies for this default value can be added with "if".
- 
--- dependencies: "depends on" <expr>
-+- dependencies: "depends on" <expr> ["if" <expr>]
- 
-   This defines a dependency for this menu entry. If multiple
-   dependencies are defined, they are connected with '&&'. Dependencies
-@@ -130,6 +130,16 @@ applicable everywhere (see syntax).
- 	bool "foo"
- 	default y
- 
-+  The dependency definition itself may be conditional by appending "if"
-+  followed by an expression. If such expression is false (n) then this
-+  dependency is ignored. One possible use case is:
-+
-+    config FOO
-+	tristate
-+	depends on BAZ if BAZ != n
-+
-+  meaning that FOO is constrained by the value of BAZ only when it is set.
-+
- - reverse dependencies: "select" <symbol> ["if" <expr>]
- 
-   While normal dependencies reduce the upper limit of a symbol (see
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index d4ca829736..1a9337d1b9 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -72,7 +72,7 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
- struct menu *menu_add_menu(void);
- void menu_end_menu(void);
- void menu_add_entry(struct symbol *sym);
--void menu_add_dep(struct expr *dep);
-+void menu_add_dep(struct expr *dep, struct expr *cond);
- void menu_add_visibility(struct expr *dep);
- struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
- void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index e436ba44c9..47928cdbc2 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -103,8 +103,18 @@ static struct expr *rewrite_m(struct expr *e)
- 	return e;
- }
- 
--void menu_add_dep(struct expr *dep)
-+void menu_add_dep(struct expr *dep, struct expr *cond)
- {
-+	if (cond) {
-+		/*
-+		 * We have "depends on X if Y" and we want:
-+		 *	Y != n --> X
-+		 *	Y == n --> y
-+		 * That simplifies to: (X || (Y == n))
-+		 */
-+		dep = expr_alloc_or(dep,
-+				expr_trans_compare(cond, E_EQUAL, &symbol_no));
-+	}
- 	current_entry->dep = expr_alloc_and(current_entry->dep, dep);
- }
- 
-diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-index 708b6c4b13..4161207da2 100644
---- a/scripts/kconfig/parser.y
-+++ b/scripts/kconfig/parser.y
-@@ -316,7 +316,7 @@ if_entry: T_IF expr T_EOL
- {
- 	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
- 	menu_add_entry(NULL);
--	menu_add_dep($2);
-+	menu_add_dep($2, NULL);
- 	$$ = menu_add_menu();
- };
- 
-@@ -412,9 +412,9 @@ help: help_start T_HELPTEXT
- 
- /* depends option */
- 
--depends: T_DEPENDS T_ON expr T_EOL
-+depends: T_DEPENDS T_ON expr if_expr T_EOL
- {
--	menu_add_dep($3);
-+	menu_add_dep($3, $4);
- 	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
- };
- 
+       Arnd
