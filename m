@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:42829 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:42830 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726456AbgDWOYi (ORCPT
+        with ESMTP id S1726458AbgDWOYi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 23 Apr 2020 10:24:38 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 4/4] kbuild: use CONFIG_CC_VERSION_TEXT to construct LINUX_COMPILER macro
-Date: Thu, 23 Apr 2020 23:23:54 +0900
-Message-Id: <20200423142354.312088-4-masahiroy@kernel.org>
+Subject: [PATCH v2 2/4] kbuild: ensure full rebuild when the compiler is updated
+Date: Thu, 23 Apr 2020 23:23:52 +0900
+Message-Id: <20200423142354.312088-2-masahiroy@kernel.org>
 In-Reply-To: <20200423142354.312088-1-masahiroy@kernel.org>
 References: <20200423142354.312088-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -15,56 +15,102 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-scripts/mkcompile_h runs $(CC) just for getting the version string.
-Re-use CONFIG_CC_VERSION_TEXT to optimize it.
+Commit 21c54b774744 ("kconfig: show compiler version text in the top
+comment") added the environment variable, CC_VERSION_TEXT in the comment
+of the top Kconfig file. It can detect the compiler update, and invoke
+the syncconfig because all environment variables referenced in Kconfig
+files are recorded in include/config/auto.conf.cmd
 
-For GCC, this slightly changes the version string. I do not think it
-is a big deal as we do not have the defined format for LINUX_COMPILER.
-In fact, the recent commit 4dcc9a88448a ("kbuild: mkcompile_h:
-Include $LD version in /proc/version") added the linker version.
+This commit makes it a CONFIG option in order to ensure the full rebuild
+when the compiler is updated.
+
+This works like follows:
+
+include/config/kconfig.h contains "CONFIG_CC_VERSION_TEXT" in the comment
+block.
+
+The top Makefile specifies "-include $(srctree)/include/linux/kconfig.h"
+to guarantee it is included from all kernel source files.
+
+fixdep parses every source file and all headers included from it,
+searching for words prefixed with "CONFIG_". Then, fixdep finds
+CONFIG_CC_VERSION_TEXT in include/config/kconfig.h and adds
+include/config/cc/version/text.h into every .*.cmd file.
+
+When the compiler is updated, syncconfig is invoked because init/Kconfig
+contains the reference to the environment variable CC_VERTION_TEXT.
+CONFIG_CC_VERSION_TEXT is updated to the new version string, and
+include/config/cc/version/text.h is touched.
+
+In the next rebuild, Make will rebuild every files since the timestamp
+of include/config/cc/version/text.h is newer than that of target.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2:
-  - new patch
+  - Move detailed comments to Kconfig help
 
- init/Makefile       | 2 +-
- scripts/mkcompile_h | 3 +--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ Kconfig                 |  2 --
+ include/linux/kconfig.h |  2 ++
+ init/Kconfig            | 17 +++++++++++++++++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/init/Makefile b/init/Makefile
-index d45e967483b2..30c7345e4fe2 100644
---- a/init/Makefile
-+++ b/init/Makefile
-@@ -35,4 +35,4 @@ include/generated/compile.h: FORCE
- 	@$($(quiet)chk_compile.h)
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@	\
- 	"$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"	\
--	"$(CONFIG_PREEMPT_RT)" "$(CC)" "$(LD)"
-+	"$(CONFIG_PREEMPT_RT)" "$(CONFIG_CC_VERSION_TEXT)" "$(LD)"
-diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index 5b80a4699740..baf3ab8d9d49 100755
---- a/scripts/mkcompile_h
-+++ b/scripts/mkcompile_h
-@@ -6,7 +6,7 @@ ARCH=$2
- SMP=$3
- PREEMPT=$4
- PREEMPT_RT=$5
--CC=$6
-+CC_VERSION="$6"
- LD=$7
+diff --git a/Kconfig b/Kconfig
+index e10b3ee084d4..745bc773f567 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -5,8 +5,6 @@
+ #
+ mainmenu "Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration"
  
- vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
-@@ -62,7 +62,6 @@ UTS_VERSION="$(echo $UTS_VERSION $CONFIG_FLAGS $TIMESTAMP | cut -b -$UTS_LEN)"
-   printf '#define LINUX_COMPILE_BY "%s"\n' "$LINUX_COMPILE_BY"
-   echo \#define LINUX_COMPILE_HOST \"$LINUX_COMPILE_HOST\"
+-comment "Compiler: $(CC_VERSION_TEXT)"
+-
+ source "scripts/Kconfig.include"
  
--  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
-   LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
- 		      | sed 's/[[:space:]]*$//')
-   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
+ source "init/Kconfig"
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+index cc8fa109cfa3..9d12c970f18f 100644
+--- a/include/linux/kconfig.h
++++ b/include/linux/kconfig.h
+@@ -2,6 +2,8 @@
+ #ifndef __LINUX_KCONFIG_H
+ #define __LINUX_KCONFIG_H
+ 
++/* CONFIG_CC_VERSION_TEXT (Do not delete this comment. See help in Kconfig) */
++
+ #include <generated/autoconf.h>
+ 
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+diff --git a/init/Kconfig b/init/Kconfig
+index 5f797df3f043..a494212a3a79 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -8,6 +8,23 @@ config DEFCONFIG_LIST
+ 	default "/boot/config-$(shell,uname -r)"
+ 	default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
+ 
++config CC_VERSION_TEXT
++	string
++	default "$(CC_VERSION_TEXT)"
++	help
++	  This is used in unclear ways:
++
++	  - Re-run Kconfig when the compiler is updated
++	    The 'default' property references the environment variable,
++	    CC_VERSION_TEXT so it is recorded in include/config/auto.conf.cmd.
++	    When the compiler is updated, Kconfig will be invoked.
++
++	  - Ensure full rebuild when the compier is updated
++	    include/linux/kconfig.h contains this option in the comment line so
++	    fixdep adds include/config/cc/version/text.h into the auto-generated
++	    dependency. When the compiler is updated, syncconfig will touch it
++	    and then every file will be rebuilt.
++
+ config CC_IS_GCC
+ 	def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
+ 
 -- 
 2.25.1
