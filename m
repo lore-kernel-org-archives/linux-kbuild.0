@@ -1,53 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52834 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730309AbgDWS0y (ORCPT
+        with ESMTP id S1730102AbgDWSa5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 14:26:54 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AC7C02549D
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 Apr 2020 11:26:52 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id c16so6573742ilr.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 Apr 2020 11:26:52 -0700 (PDT)
+        Thu, 23 Apr 2020 14:30:57 -0400
+Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62AD9C09B042
+        for <linux-kbuild@vger.kernel.org>; Thu, 23 Apr 2020 11:30:57 -0700 (PDT)
+Received: by mail-qt1-x842.google.com with SMTP id x8so5692593qtp.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 23 Apr 2020 11:30:57 -0700 (PDT)
+Date: Thu, 23 Apr 2020 15:30:55 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [RFC PATCH 1/2] Kconfig: Introduce "uses" keyword
+Message-ID: <20200423183055.GB26002@ziepe.ca>
+References: <62a51b2e5425a3cca4f7a66e2795b957f237b2da.camel@mellanox.com>
+ <nycvar.YSQ.7.76.2004211411500.2671@knanqh.ubzr>
+ <871rofdhtg.fsf@intel.com>
+ <nycvar.YSQ.7.76.2004221649480.2671@knanqh.ubzr>
+ <940d3add-4d12-56ed-617a-8b3bf8ef3a0f@infradead.org>
+ <nycvar.YSQ.7.76.2004231059170.2671@knanqh.ubzr>
+ <20200423150556.GZ26002@ziepe.ca>
+ <nycvar.YSQ.7.76.2004231109500.2671@knanqh.ubzr>
+ <20200423151624.GA26002@ziepe.ca>
+ <nycvar.YSQ.7.76.2004231128210.2671@knanqh.ubzr>
 MIME-Version: 1.0
-Reply-To: boa.benin107@yahoo.com
-From: "Mrs. Angella Michelle" <info.zennitbankplcnigerian@gmail.com>
-Date: Thu, 23 Apr 2020 20:26:49 +0200
-Message-ID: <CABHzvr=N78snvtMHePMOa+RLFdcZEjXLPkuhkojt4VoZGNzBsQ@mail.gmail.com>
-Subject: Contact Bank of Africa-Benin to receive your payment funds transfer
- amount of $12.800.000,00 Million USD,approved this morning by IMF.
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nycvar.YSQ.7.76.2004231128210.2671@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@linux.intel.com>, Saeed Mahameed <saeedm@mellanox.com>, "masahiroy@kernel.org" <masahiroy@kernel.org>, "Laurent.pinchart@ideasonboard.com" <Laurent.pinchart@ideasonboard.com>, "airlied@linux.ie" <airlied@linux.ie>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>, "arnd@arndb.de" <arnd@arndb.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jonas@kwiboo.se" <jonas@kwiboo.se>, "kieran.bingham+renesas@ideasonboard.com" <kieran.bingham+renesas@ideasonboard.com>, "narmstrong@baylibre.com" <narmstrong@baylibre.com>, "leon@kernel.org" <leon@kernel.org>
 
-Attn Dear.
-Contact Bank of Africa-Benin to receive your payment funds transfer amount =
-of
-$12.800.000,00 Million USD,approved this morning by IMF.
-Happy to inform you, we have finally deposited your payment funds
-$12.8 million us dollars with the Paying Bank of Africa-Benin
-to transfer the payment amount of $12.800,000,00 Million Us Dollars to you
-Contact the bank immediately you receive this email now.
-Director Bank of Africa-Benin: Dr. Festus Obiara
-Email id:  boa.benin107@yahoo.com
-Tel/mobile, (229) 62819378
-BOA-BENIN | GROUPE BANK OF AFRICA, boa-benin
-Avenue Jean-Paul II - 08 BP 0879 - Cotonou - B=C3=A9nin
-Phone:(229) 62819378.
-2020 GROUPE BANK OF AFRICA
-Be advised to re-confirm your bank details to this bank as listed.
-Your account Holder's name----------------
-Bank Name----------------------------------------------------------
-Bank address----------------------------------------------
-Account Numbers---------------------------------------
-Rounting-----------------------------------------------------------------
-Your direct Phone Numbers----------------------------------------------
-Note,I have paid the deposit and insurance fees for you
-But the only money you are to send to this bank is $150.00 us dollars
-Been for the wire transfer fees of your funds
-Contact Him now to receive your transfer deposited this morning
-I wait for your reply upon confirmation
-Mrs. Angella Michelle
-Editor, Zenith Bank- Companies Benin
-mrsa9389@gmail.com
+On Thu, Apr 23, 2020 at 11:33:33AM -0400, Nicolas Pitre wrote:
+> > > No. There is no logic in restricting MTD usage based on CRAMFS or 
+> > > CRAMFS_MTD.
+> > 
+> > Ah, I got it backwards, maybe this:
+> > 
+> > config CRAMFS
+> >    depends on MTD if CRAMFS_MTD
+> > 
+> > ?
+> 
+> Still half-backward. CRAMFS should not depend on either MTD nor
+> CRAMFS_MTD.
+
+Well, I would view this the same as all the other cases.. the CRAMFS
+module has an optional ability consume symbols from MTD.  Here that is
+controlled by another 'CRAMFS_MTD' selection, but it should still
+settle it out the same way as other cases like this - ie CRAMFS is
+restricted to m if MTD is m
+
+Arnd's point that kconfig is acyclic does kill it though :(
+
+> It is CRAMFS_MTD that needs both CRAMFS and MTD.
+> Furthermore CRAMFS_MTD can't be built-in if MTD is modular.
+
+CRAMFS_MTD is a bool feature flag for the CRAMFS tristate - it is
+CRAMFS that can't be built in if MTD is modular.
+
+Jason
