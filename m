@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:31786 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31787 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbgDWHkd (ORCPT
+        with ESMTP id S1726859AbgDWHkd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 23 Apr 2020 03:40:33 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 15/16] samples: timers: use 'userprogs' syntax
-Date: Thu, 23 Apr 2020 16:39:28 +0900
-Message-Id: <20200423073929.127521-16-masahiroy@kernel.org>
+Subject: [PATCH 14/16] samples: auxdisplay: use 'userprogs' syntax
+Date: Thu, 23 Apr 2020 16:39:27 +0900
+Message-Id: <20200423073929.127521-15-masahiroy@kernel.org>
 In-Reply-To: <20200423073929.127521-1-masahiroy@kernel.org>
 References: <20200423073929.127521-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -30,61 +30,54 @@ because $(CC) may not necessarily provide libc.
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- samples/Kconfig         |  4 ++++
- samples/Makefile        |  1 +
- samples/timers/Makefile | 17 +++--------------
- 3 files changed, 8 insertions(+), 14 deletions(-)
+ samples/Kconfig             |  4 ++++
+ samples/Makefile            |  1 +
+ samples/auxdisplay/Makefile | 11 ++---------
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/samples/Kconfig b/samples/Kconfig
-index cdb0091e4734..55548a487d3c 100644
+index b9dafee5d3af..cdb0091e4734 100644
 --- a/samples/Kconfig
 +++ b/samples/Kconfig
-@@ -135,6 +135,10 @@ config SAMPLE_SECCOMP
- 	  Build samples of seccomp filters using various methods of
- 	  BPF filter construction.
+@@ -6,6 +6,10 @@ menuconfig SAMPLES
  
-+config SAMPLE_TIMER
-+	bool "Build timer sample code"
-+	depends on CC_CAN_LINK && HEADERS_INSTALL
+ if SAMPLES
+ 
++config SAMPLE_AUXDISPLAY
++	bool "auxdisplay sample"
++	depends on CC_CAN_LINK
 +
- config SAMPLE_UHID
- 	bool "Build UHID sample code"
- 	depends on CC_CAN_LINK && HEADERS_INSTALL
+ config SAMPLE_TRACE_EVENTS
+ 	tristate "Build trace_events examples -- loadable modules only"
+ 	depends on EVENT_TRACING && m
 diff --git a/samples/Makefile b/samples/Makefile
-index 0c43b5d34b15..042208326689 100644
+index bdc168405452..0c43b5d34b15 100644
 --- a/samples/Makefile
 +++ b/samples/Makefile
-@@ -16,6 +16,7 @@ subdir-$(CONFIG_SAMPLE_PIDFD)		+= pidfd
- obj-$(CONFIG_SAMPLE_QMI_CLIENT)		+= qmi/
- obj-$(CONFIG_SAMPLE_RPMSG_CLIENT)	+= rpmsg/
- subdir-$(CONFIG_SAMPLE_SECCOMP)		+= seccomp
-+subdir-$(CONFIG_SAMPLE_TIMER)		+= timers
- obj-$(CONFIG_SAMPLE_TRACE_EVENTS)	+= trace_events/
- obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
- obj-$(CONFIG_SAMPLE_FTRACE_DIRECT)	+= ftrace/
-diff --git a/samples/timers/Makefile b/samples/timers/Makefile
-index f9fa07460802..c5f46e8caa80 100644
---- a/samples/timers/Makefile
-+++ b/samples/timers/Makefile
-@@ -1,16 +1,5 @@
+@@ -1,6 +1,7 @@
  # SPDX-License-Identifier: GPL-2.0
--ifndef CROSS_COMPILE
--uname_M := $(shell uname -m 2>/dev/null || echo not)
--ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
-+userprogs := hpet_example
-+always-y := $(userprogs)
+ # Makefile for Linux samples code
  
--ifeq ($(ARCH),x86)
++subdir-$(CONFIG_SAMPLE_AUXDISPLAY)	+= auxdisplay
+ obj-$(CONFIG_SAMPLE_ANDROID_BINDERFS)	+= binderfs/
+ obj-$(CONFIG_SAMPLE_CONFIGFS)		+= configfs/
+ obj-$(CONFIG_SAMPLE_CONNECTOR)		+= connector/
+diff --git a/samples/auxdisplay/Makefile b/samples/auxdisplay/Makefile
+index 0273bab27233..dbdf939af94a 100644
+--- a/samples/auxdisplay/Makefile
++++ b/samples/auxdisplay/Makefile
+@@ -1,10 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
 -CC := $(CROSS_COMPILE)gcc
--PROGS := hpet_example
+-CFLAGS := -I../../usr/include
+-
+-PROGS := cfag12864b-example
 -
 -all: $(PROGS)
 -
 -clean:
 -	rm -fr $(PROGS)
--
--endif
--endif
-+user-ccflags += -I usr/include
++userprogs := cfag12864b-example
++always-y := $(userprogs)
 -- 
 2.25.1
