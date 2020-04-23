@@ -1,55 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:55269 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbgDWCBR (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31738 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726639AbgDWHkb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Apr 2020 22:01:17 -0400
-MIME-Version: 1.0
-References: <20200423014919.31713-1-masahiroy@kernel.org>
-In-Reply-To: <20200423014919.31713-1-masahiroy@kernel.org>
+        Thu, 23 Apr 2020 03:40:31 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 23 Apr 2020 11:00:18 +0900
-Message-ID: <CAK7LNAQ-5aKSn0J81NMey5+nTis8LZT_mv+bYbndx99SBf_w6w@mail.gmail.com>
-Subject: Re: [PATCH] Documentation: kbuild: fix the section title format
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 10/16] samples: connector: build sample program for target architecture
+Date: Thu, 23 Apr 2020 16:39:23 +0900
+Message-Id: <20200423073929.127521-11-masahiroy@kernel.org>
+In-Reply-To: <20200423073929.127521-1-masahiroy@kernel.org>
+References: <20200423073929.127521-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: bpf@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 10:49 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Make it consistent with the other sections.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+This userspace program includes UAPI headers exported to usr/include/.
+'make headers' always works for the target architecture (i.e. the same
+architecture as the kernel), so the sample program must be built for
+the target as well. Kbuild now supports the 'userprogs' syntax to
+describe it cleanly.
 
-Applied to linux/fixes.
+$(CC) can always compile cn_text.o since it is the kenrel-space code,
+but building ucon requires libc.
 
+I guarded it by:
 
+  always-$(CONFIG_CC_CAN_LINK) := $(userprogs)
 
->  Documentation/kbuild/makefiles.rst | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-> index 04d5c01a2e99..b80257a03830 100644
-> --- a/Documentation/kbuild/makefiles.rst
-> +++ b/Documentation/kbuild/makefiles.rst
-> @@ -1241,7 +1241,8 @@ When kbuild executes, the following steps are followed (roughly):
->         will be displayed with "make KBUILD_VERBOSE=0".
->
->
-> ---- 6.9 Preprocessing linker scripts
-> +6.9 Preprocessing linker scripts
-> +--------------------------------
->
->         When the vmlinux image is built, the linker script
->         arch/$(ARCH)/kernel/vmlinux.lds is used.
-> --
-> 2.25.1
->
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ samples/connector/Makefile | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
+diff --git a/samples/connector/Makefile b/samples/connector/Makefile
+index b785cbde5ffa..7b5117e96fd0 100644
+--- a/samples/connector/Makefile
++++ b/samples/connector/Makefile
+@@ -1,13 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_SAMPLE_CONNECTOR) += cn_test.o
+ 
+-# List of programs to build
+-hostprogs := ucon
+-always-y := $(hostprogs)
++userprogs := ucon
++always-$(CONFIG_CC_CAN_LINK) := $(userprogs)
+ 
+-HOSTCFLAGS_ucon.o += -I$(objtree)/usr/include
+-
+-all: modules
+-
+-modules clean:
+-	$(MAKE) -C ../.. M=$(CURDIR) $@
++user-ccflags += -I usr/include
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
