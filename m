@@ -1,196 +1,123 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:55307 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729016AbgDWPQa (ORCPT
+Received: from pb-smtp21.pobox.com ([173.228.157.53]:54994 "EHLO
+        pb-smtp21.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729014AbgDWPTW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 11:16:30 -0400
+        Thu, 23 Apr 2020 11:19:22 -0400
+Date: Thu, 23 Apr 2020 11:19:15 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: [PATCH] kconfig: allow for conditional dependencies
+Message-ID: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr>
 MIME-Version: 1.0
-References: <20200423073929.127521-1-masahiroy@kernel.org> <20200423073929.127521-4-masahiroy@kernel.org>
-In-Reply-To: <20200423073929.127521-4-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 24 Apr 2020 00:15:12 +0900
-Message-ID: <CAK7LNASpLsw5SUasmpwQ++yyXJi714HDOfEo4=O5SywwYQxtQA@mail.gmail.com>
-Subject: Re: [PATCH 03/16] kbuild: add infrastructure to build userspace programs
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: bpf <bpf@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andriin@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>, Martin KaFai Lau <kafai@fb.com>, Michal Marek <michal.lkml@markovi.net>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>, Jani Nikula <jani.nikula@linux.intel.com>, Saeed Mahameed <saeedm@mellanox.com>, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
 
-On Thu, Apr 23, 2020 at 4:40 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Kbuild supports the infrastructure to build host programs, but there
-> was no support to build userspace programs for the target architecture
-> (i.e. the same architecture as the kernel).
->
-> Sam Ravnborg worked on this a long time ago.
->
->   https://lkml.org/lkml/2014/7/13/154
->
-> But, it was not merged. One problem at that time was, there was no
-> good way to know whether $(CC) can link standalone programs. In fact,
-> pre-built kernel.org toolchains [1] do not provide libc.
->
-> Now, we can handle this cleanly because the compiler capability is
-> evaluated at the Kconfig time. If $(CC) cannot link standalone programs,
-> the relevant options are hidden by 'depends on CC_CAN_LINK'.
->
-> The implementation just mimics scripts/Makefile.host
->
-> The userspace programs are compiled with the same flags as the host
-> programs. In addition, it uses -m32 or -m64 if it is found in
-> $(KBUILD_CFLAGS).
->
-> This new syntax has at least two usecases.
->
-> - Sample programs
->
->   Several userspace programs under samples/ include UAPI headers
->   installed in usr/include. Most of them were previously built for
->   the host architecture just to use 'hostprogs' syntax.
->
->   However, 'make headers' always works for the target architecture.
->   This caused the arch mismatch in cross-compiling. To fix this
->   distortion, sample code should be built for the target architecture.
->
-> - Bpfilter
->
->   net/bpfilter/Makefile compiles bpfilter_umh as the user mode helper,
->   and embeds it into the kernel code. Currently, it overrides HOSTCC
->   with CC to use the 'hostprogs' syntax. This hack should go away.
->
-> [1]: https://mirrors.edge.kernel.org/pub/tools/crosstool/
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  Makefile                   | 11 +++++++---
->  scripts/Makefile.build     |  5 +++++
->  scripts/Makefile.clean     |  2 +-
->  scripts/Makefile.userprogs | 44 ++++++++++++++++++++++++++++++++++++++
->  4 files changed, 58 insertions(+), 4 deletions(-)
->  create mode 100644 scripts/Makefile.userprogs
->
-> diff --git a/Makefile b/Makefile
-> index 49b2709ff44e..f20597820131 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -406,9 +406,11 @@ else
->  HOSTCC = gcc
->  HOSTCXX        = g++
->  endif
-> -KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
-> -               -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
-> -               $(HOSTCFLAGS)
-> +
-> +export KBUILD_USERCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
-> +                             -O2 -fomit-frame-pointer -std=gnu89
-> +
-> +KBUILD_HOSTCFLAGS   := $(KBUILD_USERCFLAGS) $(HOST_LFS_CFLAGS) $(HOSTCFLAGS)
->  KBUILD_HOSTCXXFLAGS := -Wall -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
->  KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
->  KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
-> @@ -937,6 +939,9 @@ ifeq ($(CONFIG_RELR),y)
->  LDFLAGS_vmlinux        += --pack-dyn-relocs=relr
->  endif
->
-> +# Align the bit size of userspace programs with the kernel
-> +KBUILD_USERCFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> +
->  # make the checker run with the right architecture
->  CHECKFLAGS += --arch=$(ARCH)
->
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 9fcbfac15d1d..94f2f7016172 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -50,6 +50,11 @@ ifneq ($(hostprogs)$(hostcxxlibs-y)$(hostcxxlibs-m),)
->  include scripts/Makefile.host
->  endif
->
-> +# Do not include userprogs rules unless needed
-> +ifneq ($(userprogs),)
-> +include scripts/Makefile.userprogs
-> +endif
-> +
->  ifndef obj
->  $(warning kbuild: Makefile.build is included improperly)
->  endif
-> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
-> index 075f0cc2d8d7..e2c76122319d 100644
-> --- a/scripts/Makefile.clean
-> +++ b/scripts/Makefile.clean
-> @@ -29,7 +29,7 @@ subdir-ymn    := $(addprefix $(obj)/,$(subdir-ymn))
->
->  __clean-files  := $(extra-y) $(extra-m) $(extra-)       \
->                    $(always) $(always-y) $(always-m) $(always-) $(targets) $(clean-files)   \
-> -                  $(hostprogs) $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
-> +                  $(hostprogs) $(hostprogs-y) $(hostprogs-m) $(hostprogs-) $(userprogs) \
->                    $(hostcxxlibs-y) $(hostcxxlibs-m)
->
->  __clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
-> diff --git a/scripts/Makefile.userprogs b/scripts/Makefile.userprogs
-> new file mode 100644
-> index 000000000000..0d987085819b
-> --- /dev/null
-> +++ b/scripts/Makefile.userprogs
-> @@ -0,0 +1,44 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# Build userspace programs for the target system
-> +#
-> +
-> +userprogs      := $(sort $(userprogs))
-> +
-> +# Executables compiled from a single .c file
-> +user-csingle   := $(foreach m, $(userprogs), $(if $($(m)-objs),,$(m)))
-> +
-> +# C executables linked based on several .o files
-> +user-cmulti    := $(foreach m, $(userprogs), $(if $($(m)-objs),$(m)))
-> +
-> +# Object (.o) files compiled from .c files
-> +user-cobjs     := $(foreach m, $(userprogs), $($(m)-objs))
-> +
-> +user-csingle   := $(addprefix $(obj)/, $(user-csingle))
-> +user-cmulti    := $(addprefix $(obj)/, $(user-cmulti))
-> +user-cobjs     := $(addprefix $(obj)/, $(user-cobjs))
-> +
-> +user_c_flags   = -Wp,-MMD,$(depfile) $(KBUILD_USERCFLAGS) $(user-ccflags) \
-> +                       $($(target-stem)-ccflags)
-> +
-> +# Create an executable from a single .c file
-> +quiet_cmd_user_cc_c = CC [U]  $@
-> +      cmd_user_cc_c = $(CC) $(user_c_flags) -o $@ $<
+This might appear to be a strange concept, but sometimes we want
+a dependency to be conditionally applied. One such case is currently
+expressed with:
 
+        depends on FOO || !FOO
 
-                  $($(target-stem)-ldlibs)
+This pattern is strange enough to give one's pause. Given that it is
+also frequent, let's make the intent more obvious with some syntaxic
+sugar by effectively making dependencies optionally conditional.
 
-is needed here too.
+This also makes the kconfig language more uniform.
 
+Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
 
-
-> +$(user-csingle): $(obj)/%: $(src)/%.c FORCE
-> +       $(call if_changed_dep,user_cc_c)
-> +
-> +# Link an executable based on list of .o files
-> +quiet_cmd_user_ld = LD [U]  $@
-> +      cmd_user_ld = $(CC) -o $@ $(addprefix $(obj)/, $($(target-stem)-objs)) \
-> +                      $($(target-stem)-ldlibs)
-> +$(user-cmulti): FORCE
-> +       $(call if_changed,user_ld)
-> +$(call multi_depend, $(user-cmulti), , -objs)
-> +
-> +# Create .o file from a .c file
-> +quiet_cmd_user_cc_o_c = CC [U]  $@
-> +      cmd_user_cc_o_c = $(CC) $(user_c_flags) -c -o $@ $<
-> +$(user-cobjs): $(obj)/%.o: $(src)/%.c FORCE
-> +       $(call if_changed_dep,user_cc_o_c)
-> +
-> +targets += $(user-csingle) $(user-cmulti) $(user-cobjs)
-> --
-> 2.25.1
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+index d0111dd264..0f841e0037 100644
+--- a/Documentation/kbuild/kconfig-language.rst
++++ b/Documentation/kbuild/kconfig-language.rst
+@@ -114,7 +114,7 @@ applicable everywhere (see syntax).
+   This is a shorthand notation for a type definition plus a value.
+   Optionally dependencies for this default value can be added with "if".
+ 
+-- dependencies: "depends on" <expr>
++- dependencies: "depends on" <expr> ["if" <expr>]
+ 
+   This defines a dependency for this menu entry. If multiple
+   dependencies are defined, they are connected with '&&'. Dependencies
+@@ -130,6 +130,16 @@ applicable everywhere (see syntax).
+ 	bool "foo"
+ 	default y
+ 
++  The dependency definition itself may be conditional by appending "if"
++  followed by an expression. If such expression is false (n) then this
++  dependency is ignored. One possible use case is:
++
++    config FOO
++	tristate
++	depends on BAZ if BAZ != n
++
++  meaning that FOO is constrained by the value of BAZ only when it is set.
++
+ - reverse dependencies: "select" <symbol> ["if" <expr>]
+ 
+   While normal dependencies reduce the upper limit of a symbol (see
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index d4ca829736..1a9337d1b9 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -72,7 +72,7 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
+ struct menu *menu_add_menu(void);
+ void menu_end_menu(void);
+ void menu_add_entry(struct symbol *sym);
+-void menu_add_dep(struct expr *dep);
++void menu_add_dep(struct expr *dep, struct expr *cond);
+ void menu_add_visibility(struct expr *dep);
+ struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
+ void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e436ba44c9..47928cdbc2 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -103,8 +103,18 @@ static struct expr *rewrite_m(struct expr *e)
+ 	return e;
+ }
+ 
+-void menu_add_dep(struct expr *dep)
++void menu_add_dep(struct expr *dep, struct expr *cond)
+ {
++	if (cond) {
++		/*
++		 * We have "depends on X if Y" and we want:
++		 *	Y != n --> X
++		 *	Y == n --> y
++		 * That simplifies to: (X || (Y == n))
++		 */
++		dep = expr_alloc_or(dep,
++				expr_trans_compare(cond, E_EQUAL, &symbol_no));
++	}
+ 	current_entry->dep = expr_alloc_and(current_entry->dep, dep);
+ }
+ 
+diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
+index 708b6c4b13..4161207da2 100644
+--- a/scripts/kconfig/parser.y
++++ b/scripts/kconfig/parser.y
+@@ -316,7 +316,7 @@ if_entry: T_IF expr T_EOL
+ {
+ 	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
+ 	menu_add_entry(NULL);
+-	menu_add_dep($2);
++	menu_add_dep($2, NULL);
+ 	$$ = menu_add_menu();
+ };
+ 
+@@ -412,9 +412,9 @@ help: help_start T_HELPTEXT
+ 
+ /* depends option */
+ 
+-depends: T_DEPENDS T_ON expr T_EOL
++depends: T_DEPENDS T_ON expr if_expr T_EOL
+ {
+-	menu_add_dep($3);
++	menu_add_dep($3, $4);
+ 	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
+ };
+ 
