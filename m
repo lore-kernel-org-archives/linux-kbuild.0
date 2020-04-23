@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:31737 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31739 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgDWHkb (ORCPT
+        with ESMTP id S1726692AbgDWHkb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 23 Apr 2020 03:40:31 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 11/16] samples: vfs: build sample programs for target architecture
-Date: Thu, 23 Apr 2020 16:39:24 +0900
-Message-Id: <20200423073929.127521-12-masahiroy@kernel.org>
+Subject: [PATCH 07/16] samples: uhid: fix warnings in uhid-example
+Date: Thu, 23 Apr 2020 16:39:20 +0900
+Message-Id: <20200423073929.127521-8-masahiroy@kernel.org>
 In-Reply-To: <20200423073929.127521-1-masahiroy@kernel.org>
 References: <20200423073929.127521-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,52 +17,44 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: bpf@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-These userspace programs include UAPI headers exported to usr/include/.
-'make headers' always works for the target architecture (i.e. the same
-architecture as the kernel), so the sample programs must be built for
-the target as well. Kbuild now supports the 'userprogs' syntax to
-describe it cleanly.
+From: Sam Ravnborg <sam@ravnborg.org>
 
-I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
-$(CC) may not necessarily provide libc.
+Fix warnings seen when building for 32-bit architecture.
 
+Use "%xd" for arguments of type size_t to fix the warnings.
+
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- samples/Kconfig      |  2 +-
- samples/vfs/Makefile | 11 +++--------
- 2 files changed, 4 insertions(+), 9 deletions(-)
+This is the same as Sam's patch in 2014.
+https://lkml.org/lkml/2014/7/13/152
 
-diff --git a/samples/Kconfig b/samples/Kconfig
-index 2e0ef2cc1aa8..b8beb6fd75b4 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -184,7 +184,7 @@ config SAMPLE_ANDROID_BINDERFS
- 
- config SAMPLE_VFS
- 	bool "Build example programs that use new VFS system calls"
--	depends on HEADERS_INSTALL
-+	depends on CC_CAN_LINK && HEADERS_INSTALL
- 	help
- 	  Build example userspace programs that use new VFS system calls such
- 	  as mount API and statx().  Note that this is restricted to the x86
-diff --git a/samples/vfs/Makefile b/samples/vfs/Makefile
-index 65acdde5c117..f3831466c1bb 100644
---- a/samples/vfs/Makefile
-+++ b/samples/vfs/Makefile
-@@ -1,10 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
--# List of programs to build
--hostprogs := \
--	test-fsmount \
--	test-statx
-+userprogs := test-fsmount test-statx
-+always-y := $(userprogs)
- 
--always-y := $(hostprogs)
--
--HOSTCFLAGS_test-fsmount.o += -I$(objtree)/usr/include
--HOSTCFLAGS_test-statx.o += -I$(objtree)/usr/include
-+user-ccflags += -I usr/include
+
+ samples/uhid/uhid-example.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/samples/uhid/uhid-example.c b/samples/uhid/uhid-example.c
+index b72d645ce828..015cb06a241e 100644
+--- a/samples/uhid/uhid-example.c
++++ b/samples/uhid/uhid-example.c
+@@ -165,7 +165,7 @@ static int uhid_write(int fd, const struct uhid_event *ev)
+ 		fprintf(stderr, "Cannot write to uhid: %m\n");
+ 		return -errno;
+ 	} else if (ret != sizeof(*ev)) {
+-		fprintf(stderr, "Wrong size written to uhid: %ld != %lu\n",
++		fprintf(stderr, "Wrong size written to uhid: %zd != %zu\n",
+ 			ret, sizeof(ev));
+ 		return -EFAULT;
+ 	} else {
+@@ -236,7 +236,7 @@ static int event(int fd)
+ 		fprintf(stderr, "Cannot read uhid-cdev: %m\n");
+ 		return -errno;
+ 	} else if (ret != sizeof(ev)) {
+-		fprintf(stderr, "Invalid size read from uhid-dev: %ld != %lu\n",
++		fprintf(stderr, "Invalid size read from uhid-dev: %zd != %zu\n",
+ 			ret, sizeof(ev));
+ 		return -EFAULT;
+ 	}
 -- 
 2.25.1
