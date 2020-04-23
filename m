@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:31787 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31892 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726859AbgDWHkd (ORCPT
+        with ESMTP id S1726790AbgDWHkg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 03:40:33 -0400
+        Thu, 23 Apr 2020 03:40:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 14/16] samples: auxdisplay: use 'userprogs' syntax
-Date: Thu, 23 Apr 2020 16:39:27 +0900
-Message-Id: <20200423073929.127521-15-masahiroy@kernel.org>
+Subject: [PATCH 08/16] samples: uhid: build sample program for target architecture
+Date: Thu, 23 Apr 2020 16:39:21 +0900
+Message-Id: <20200423073929.127521-9-masahiroy@kernel.org>
 In-Reply-To: <20200423073929.127521-1-masahiroy@kernel.org>
 References: <20200423073929.127521-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,9 +17,11 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: bpf@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-Kbuild now supports the 'userprogs' syntax to describe the build rules
-of userspace programs for the target architecture (i.e. the same
-architecture as the kernel).
+This userspace program includes UAPI headers exported to usr/include/.
+'make headers' always works for the target architecture (i.e. the same
+architecture as the kernel), so the sample program must be built for
+the target as well. Kbuild now supports the 'userprogs' syntax to
+describe it cleanly.
 
 Add the entry to samples/Makefile to put this into the build bot
 coverage.
@@ -30,54 +32,65 @@ because $(CC) may not necessarily provide libc.
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- samples/Kconfig             |  4 ++++
- samples/Makefile            |  1 +
- samples/auxdisplay/Makefile | 11 ++---------
- 3 files changed, 7 insertions(+), 9 deletions(-)
+ samples/Kconfig         | 6 ++++++
+ samples/Makefile        | 1 +
+ samples/uhid/.gitignore | 2 ++
+ samples/uhid/Makefile   | 9 +++------
+ 4 files changed, 12 insertions(+), 6 deletions(-)
+ create mode 100644 samples/uhid/.gitignore
 
 diff --git a/samples/Kconfig b/samples/Kconfig
-index b9dafee5d3af..cdb0091e4734 100644
+index 8949e9646125..ff9126ef1c79 100644
 --- a/samples/Kconfig
 +++ b/samples/Kconfig
-@@ -6,6 +6,10 @@ menuconfig SAMPLES
+@@ -131,6 +131,12 @@ config SAMPLE_SECCOMP
+ 	  Build samples of seccomp filters using various methods of
+ 	  BPF filter construction.
  
- if SAMPLES
- 
-+config SAMPLE_AUXDISPLAY
-+	bool "auxdisplay sample"
-+	depends on CC_CAN_LINK
++config SAMPLE_UHID
++	bool "Build UHID sample code"
++	depends on CC_CAN_LINK && HEADERS_INSTALL
++	help
++	  Build UHID sample program.
 +
- config SAMPLE_TRACE_EVENTS
- 	tristate "Build trace_events examples -- loadable modules only"
- 	depends on EVENT_TRACING && m
+ config SAMPLE_VFIO_MDEV_MTTY
+ 	tristate "Build VFIO mtty example mediated device sample code -- loadable modules only"
+ 	depends on VFIO_MDEV_DEVICE && m
 diff --git a/samples/Makefile b/samples/Makefile
-index bdc168405452..0c43b5d34b15 100644
+index 5ce50ef0f2b2..bdc168405452 100644
 --- a/samples/Makefile
 +++ b/samples/Makefile
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- # Makefile for Linux samples code
- 
-+subdir-$(CONFIG_SAMPLE_AUXDISPLAY)	+= auxdisplay
- obj-$(CONFIG_SAMPLE_ANDROID_BINDERFS)	+= binderfs/
- obj-$(CONFIG_SAMPLE_CONFIGFS)		+= configfs/
- obj-$(CONFIG_SAMPLE_CONNECTOR)		+= connector/
-diff --git a/samples/auxdisplay/Makefile b/samples/auxdisplay/Makefile
-index 0273bab27233..dbdf939af94a 100644
---- a/samples/auxdisplay/Makefile
-+++ b/samples/auxdisplay/Makefile
-@@ -1,10 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0
--CC := $(CROSS_COMPILE)gcc
--CFLAGS := -I../../usr/include
--
--PROGS := cfag12864b-example
--
--all: $(PROGS)
--
--clean:
--	rm -fr $(PROGS)
-+userprogs := cfag12864b-example
+@@ -19,6 +19,7 @@ obj-$(CONFIG_SAMPLE_TRACE_EVENTS)	+= trace_events/
+ obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
+ obj-$(CONFIG_SAMPLE_FTRACE_DIRECT)	+= ftrace/
+ obj-$(CONFIG_SAMPLE_TRACE_ARRAY)	+= ftrace/
++subdir-$(CONFIG_SAMPLE_UHID)		+= uhid
+ obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
+ obj-y					+= vfio-mdev/
+ subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
+diff --git a/samples/uhid/.gitignore b/samples/uhid/.gitignore
+new file mode 100644
+index 000000000000..0e0a5a929f5d
+--- /dev/null
++++ b/samples/uhid/.gitignore
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++/uhid-example
+diff --git a/samples/uhid/Makefile b/samples/uhid/Makefile
+index 5f44ea40d6d5..1dc58c40298c 100644
+--- a/samples/uhid/Makefile
++++ b/samples/uhid/Makefile
+@@ -1,8 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-# List of programs to build
+-hostprogs := uhid-example
++userprogs := uhid-example
 +always-y := $(userprogs)
+ 
+-# Tell kbuild to always build the programs
+-always-y := $(hostprogs)
+-
+-HOSTCFLAGS_uhid-example.o += -I$(objtree)/usr/include
++user-ccflags += -I usr/include
 -- 
 2.25.1
