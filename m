@@ -1,61 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:33701 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31741 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726790AbgDWHlh (ORCPT
+        with ESMTP id S1726790AbgDWHkc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 03:41:37 -0400
+        Thu, 23 Apr 2020 03:40:32 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 04/16] net: bpfilter: use 'userprogs' syntax to build bpfilter_umh
-Date: Thu, 23 Apr 2020 16:39:17 +0900
-Message-Id: <20200423073929.127521-5-masahiroy@kernel.org>
+Subject: [PATCH 16/16] samples: watchdog: use 'userprogs' syntax
+Date: Thu, 23 Apr 2020 16:39:29 +0900
+Message-Id: <20200423073929.127521-17-masahiroy@kernel.org>
 In-Reply-To: <20200423073929.127521-1-masahiroy@kernel.org>
 References: <20200423073929.127521-1-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: bpf@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andriin@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>, Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-The user mode helper should be compiled for the same architecture as
-the kernel.
+Kbuild now supports the 'userprogs' syntax to describe the build rules
+of userspace programs for the target architecture (i.e. the same
+architecture as the kernel).
 
-This Makefile reuses the 'hostprogs' syntax by overriding HOSTCC with CC.
+Add the entry to samples/Makefile to put this into the build bot
+coverage.
 
-Now that Kbuild provides the syntax 'userprogs', use it to fix the
-Makefile mess.
+I also added the CONFIG option guarded by 'depends on CC_CAN_LINK'
+because $(CC) may not necessarily provide libc.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- net/bpfilter/Makefile | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ samples/Kconfig           |  3 +++
+ samples/Makefile          |  1 +
+ samples/watchdog/Makefile | 10 ++--------
+ 3 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/net/bpfilter/Makefile b/net/bpfilter/Makefile
-index 36580301da70..6ee650c6badb 100644
---- a/net/bpfilter/Makefile
-+++ b/net/bpfilter/Makefile
-@@ -3,17 +3,14 @@
- # Makefile for the Linux BPFILTER layer.
- #
+diff --git a/samples/Kconfig b/samples/Kconfig
+index 55548a487d3c..4aa89d24a19e 100644
+--- a/samples/Kconfig
++++ b/samples/Kconfig
+@@ -205,5 +205,8 @@ config SAMPLE_INTEL_MEI
+ 	help
+ 	  Build a sample program to work with mei device.
  
--hostprogs := bpfilter_umh
-+userprogs := bpfilter_umh
- bpfilter_umh-objs := main.o
--KBUILD_HOSTCFLAGS += -I $(srctree)/tools/include/ -I $(srctree)/tools/include/uapi
--HOSTCC := $(CC)
-+user-ccflags += -I $(srctree)/tools/include/ -I $(srctree)/tools/include/uapi
++config SAMPLE_WATCHDOG
++	bool "watchdog sample"
++	depends on CC_CAN_LINK
  
--ifeq ($(CONFIG_BPFILTER_UMH), y)
--# builtin bpfilter_umh should be compiled with -static
-+# builtin bpfilter_umh should be linked with -static
- # since rootfs isn't mounted at the time of __init
- # function is called and do_execv won't find elf interpreter
--KBUILD_HOSTLDFLAGS += -static
--endif
-+bpfilter_umh-ldflags += -static
- 
- $(obj)/bpfilter_umh_blob.o: $(obj)/bpfilter_umh
- 
+ endif # SAMPLES
+diff --git a/samples/Makefile b/samples/Makefile
+index 042208326689..29c66aadd954 100644
+--- a/samples/Makefile
++++ b/samples/Makefile
+@@ -26,3 +26,4 @@ obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
+ obj-y					+= vfio-mdev/
+ subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
+ obj-$(CONFIG_SAMPLE_INTEL_MEI)		+= mei/
++subdir-$(CONFIG_SAMPLE_WATCHDOG)	+= watchdog
+diff --git a/samples/watchdog/Makefile b/samples/watchdog/Makefile
+index a9430fa60253..17384cfb387e 100644
+--- a/samples/watchdog/Makefile
++++ b/samples/watchdog/Makefile
+@@ -1,9 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+-CC := $(CROSS_COMPILE)gcc
+-PROGS := watchdog-simple
+-
+-all: $(PROGS)
+-
+-clean:
+-	rm -fr $(PROGS)
+-
++userprogs := watchdog-simple
++always-y := $(userprogs)
 -- 
 2.25.1
