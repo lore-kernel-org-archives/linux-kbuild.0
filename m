@@ -1,147 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:37548 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729230AbgDWPyB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Apr 2020 11:54:01 -0400
-From: Jani Nikula <jani.nikula@linux.intel.com>
+Received: from pb-smtp2.pobox.com ([64.147.108.71]:65029 "EHLO
+        pb-smtp2.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729405AbgDWQFU (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 23 Apr 2020 12:05:20 -0400
+Date: Thu, 23 Apr 2020 12:05:17 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
 Subject: Re: [PATCH] kconfig: allow for conditional dependencies
-In-Reply-To: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr>
-References: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr>
-Date: Thu, 23 Apr 2020 18:53:49 +0300
-Message-ID: <87imhqb3le.fsf@intel.com>
+In-Reply-To: <87imhqb3le.fsf@intel.com>
+Message-ID: <nycvar.YSQ.7.76.2004231155060.2671@knanqh.ubzr>
+References: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr> <87imhqb3le.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>, Saeed Mahameed <saeedm@mellanox.com>, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Saeed Mahameed <saeedm@mellanox.com>, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
 
-On Thu, 23 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
-> This might appear to be a strange concept, but sometimes we want
-> a dependency to be conditionally applied. One such case is currently
-> expressed with:
->
->         depends on FOO || !FOO
->
-> This pattern is strange enough to give one's pause. Given that it is
-> also frequent, let's make the intent more obvious with some syntaxic
-> sugar by effectively making dependencies optionally conditional.
->
-> This also makes the kconfig language more uniform.
+On Thu, 23 Apr 2020, Jani Nikula wrote:
 
-Thanks, I prefer this over all the previous proposals. Versatile yet
-self-explanatory.
+> On Thu, 23 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
+> > This might appear to be a strange concept, but sometimes we want
+> > a dependency to be conditionally applied. One such case is currently
+> > expressed with:
+> >
+> >         depends on FOO || !FOO
+> >
+> > This pattern is strange enough to give one's pause. Given that it is
+> > also frequent, let's make the intent more obvious with some syntaxic
+> > sugar by effectively making dependencies optionally conditional.
+> >
+> > This also makes the kconfig language more uniform.
+> 
+> Thanks, I prefer this over all the previous proposals. Versatile yet
+> self-explanatory.
+> 
+> > Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
+> >
+> > diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+> > index d0111dd264..0f841e0037 100644
+> > --- a/Documentation/kbuild/kconfig-language.rst
+> > +++ b/Documentation/kbuild/kconfig-language.rst
+> > @@ -114,7 +114,7 @@ applicable everywhere (see syntax).
+> >    This is a shorthand notation for a type definition plus a value.
+> >    Optionally dependencies for this default value can be added with "if".
+> >  
+> > -- dependencies: "depends on" <expr>
+> > +- dependencies: "depends on" <expr> ["if" <expr>]
+> >  
+> >    This defines a dependency for this menu entry. If multiple
+> >    dependencies are defined, they are connected with '&&'. Dependencies
+> > @@ -130,6 +130,16 @@ applicable everywhere (see syntax).
+> >  	bool "foo"
+> >  	default y
+> >  
+> > +  The dependency definition itself may be conditional by appending "if"
+> > +  followed by an expression. If such expression is false (n) then this
+> > +  dependency is ignored. One possible use case is:
+> > +
+> > +    config FOO
+> > +	tristate
+> > +	depends on BAZ if BAZ != n
+> 
+> I presume this is the same as
+> 
+> 	depends on BAZ if BAZ
+> 
+> which makes me wonder if that should be the example. At least current
+> usage for select is predominantly
+> 
+> 	select FOO if BAR
+> 
+> without "!= n".
 
-> Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
->
-> diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-> index d0111dd264..0f841e0037 100644
-> --- a/Documentation/kbuild/kconfig-language.rst
-> +++ b/Documentation/kbuild/kconfig-language.rst
-> @@ -114,7 +114,7 @@ applicable everywhere (see syntax).
->    This is a shorthand notation for a type definition plus a value.
->    Optionally dependencies for this default value can be added with "if".
->  
-> -- dependencies: "depends on" <expr>
-> +- dependencies: "depends on" <expr> ["if" <expr>]
->  
->    This defines a dependency for this menu entry. If multiple
->    dependencies are defined, they are connected with '&&'. Dependencies
-> @@ -130,6 +130,16 @@ applicable everywhere (see syntax).
->  	bool "foo"
->  	default y
->  
-> +  The dependency definition itself may be conditional by appending "if"
-> +  followed by an expression. If such expression is false (n) then this
-> +  dependency is ignored. One possible use case is:
-> +
-> +    config FOO
-> +	tristate
-> +	depends on BAZ if BAZ != n
-
-I presume this is the same as
-
-	depends on BAZ if BAZ
-
-which makes me wonder if that should be the example. At least current
-usage for select is predominantly
-
-	select FOO if BAR
-
-without "!= n".
-
-BR,
-Jani.
+Yes, it is the same thing. I prefer making the documentation a little 
+more explicit than necessary so the explanation is really obvious.
 
 
-> +
-> +  meaning that FOO is constrained by the value of BAZ only when it is set.
-> +
->  - reverse dependencies: "select" <symbol> ["if" <expr>]
->  
->    While normal dependencies reduce the upper limit of a symbol (see
-> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-> index d4ca829736..1a9337d1b9 100644
-> --- a/scripts/kconfig/lkc.h
-> +++ b/scripts/kconfig/lkc.h
-> @@ -72,7 +72,7 @@ void menu_warn(struct menu *menu, const char *fmt, ...);
->  struct menu *menu_add_menu(void);
->  void menu_end_menu(void);
->  void menu_add_entry(struct symbol *sym);
-> -void menu_add_dep(struct expr *dep);
-> +void menu_add_dep(struct expr *dep, struct expr *cond);
->  void menu_add_visibility(struct expr *dep);
->  struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
->  void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index e436ba44c9..47928cdbc2 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -103,8 +103,18 @@ static struct expr *rewrite_m(struct expr *e)
->  	return e;
->  }
->  
-> -void menu_add_dep(struct expr *dep)
-> +void menu_add_dep(struct expr *dep, struct expr *cond)
->  {
-> +	if (cond) {
-> +		/*
-> +		 * We have "depends on X if Y" and we want:
-> +		 *	Y != n --> X
-> +		 *	Y == n --> y
-> +		 * That simplifies to: (X || (Y == n))
-> +		 */
-> +		dep = expr_alloc_or(dep,
-> +				expr_trans_compare(cond, E_EQUAL, &symbol_no));
-> +	}
->  	current_entry->dep = expr_alloc_and(current_entry->dep, dep);
->  }
->  
-> diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-> index 708b6c4b13..4161207da2 100644
-> --- a/scripts/kconfig/parser.y
-> +++ b/scripts/kconfig/parser.y
-> @@ -316,7 +316,7 @@ if_entry: T_IF expr T_EOL
->  {
->  	printd(DEBUG_PARSE, "%s:%d:if\n", zconf_curname(), zconf_lineno());
->  	menu_add_entry(NULL);
-> -	menu_add_dep($2);
-> +	menu_add_dep($2, NULL);
->  	$$ = menu_add_menu();
->  };
->  
-> @@ -412,9 +412,9 @@ help: help_start T_HELPTEXT
->  
->  /* depends option */
->  
-> -depends: T_DEPENDS T_ON expr T_EOL
-> +depends: T_DEPENDS T_ON expr if_expr T_EOL
->  {
-> -	menu_add_dep($3);
-> +	menu_add_dep($3, $4);
->  	printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
->  };
->  
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
+Nicolas
