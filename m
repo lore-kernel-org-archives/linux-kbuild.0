@@ -1,144 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:58088 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725554AbgDXFuG (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:33109 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726920AbgDXQKZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Apr 2020 01:50:06 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/2] kconfig: allow only 'config', 'comment', and 'if' statements inside choice
-Date: Fri, 24 Apr 2020 14:49:29 +0900
-Message-Id: <20200424054929.502485-2-masahiroy@kernel.org>
-In-Reply-To: <20200424054929.502485-1-masahiroy@kernel.org>
-References: <20200424054929.502485-1-masahiroy@kernel.org>
+        Fri, 24 Apr 2020 12:10:25 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 25 Apr 2020 01:09:27 +0900
+Message-ID: <CAK7LNAQRXn_n60K9LF=pBz0HHg55Lj-1p5gwwmT=YSOdMBXKCA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.7-rc3
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-The statement block surrounded by 'if' ... 'endif' is reduced into
-if_stmt, which is accepted in the choice context. Therefore, you can
-do anything within a choice block by wrapping 'if y' ... 'end'.
+Hi Linus,
 
-For example, you can create a menu inside a choice.
+Please pull Kbuild fixes.
+Thanks.
 
-[Test Code]
 
----------------->8----------------
-  choice
-          prompt "choice"
+The following changes since commit ae83d0b416db002fe95601e7f97f64b59514d936:
 
-  config A
-          bool "A"
+  Linux 5.7-rc2 (2020-04-19 14:35:30 -0700)
 
-  config B
-          bool "B"
+are available in the Git repository at:
 
-  if y
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.7
 
-  menu "strange menu"
+for you to fetch changes up to d9451798998df3a72dce1bc365bc9e76401b0d3a:
 
-  config C
-          bool "C"
+  h8300: ignore vmlinux.lds (2020-04-23 16:41:26 +0900)
 
-  endmenu
+----------------------------------------------------------------
+Kbuild fixes for v5.7
 
-  endif
+ - fix scripts/config to properly handle ':' in string type CONFIG options
 
-  endchoice
----------------->8----------------
+ - fix unneeded rebuilds of DT schema check rule
 
-I want to make such a weird structure a syntax error.
+ - git rid of ordering dependency between <linux/vermagic.h> and
+   <linux/module.h> to fix build errors in some network drivers
 
-In fact, the USB gadget Kconfig file used nested choice for no good
-reason until commit df8df5e4bc37 ("usb: get rid of 'choice' for
-legacy gadget drivers") killed it.
+ - clean up generated headers of host arch with 'make ARCH=um mrproper'
 
-I think the 'source' statement inside choice is on the fence. It is
-at least gramatically sensible as long as the included file contains
-only bool/tristate config statements. However, it makes the code
-unreadable, and in the end, people forget the fact that the file is
-included from the choice block. Commit 10e5e6c24963 ("usb: gadget: move
-choice ... endchoice to legacy/Kconfig") got rid of the only user.
+----------------------------------------------------------------
+Jeremie Francois (on alpha) (1):
+      scripts/config: allow colons in option strings for sed
 
-Going forward, you can only use 'config', 'comment', and 'if' inside
-choice blocks. This also recursively applies to 'if' blocks inside
-choice blocks.
+Masahiro Yamada (4):
+      kbuild: fix DT binding schema rule again to avoid needless rebuilds
+      arch: split MODULE_ARCH_VERMAGIC definitions out to <asm/vermagic.h>
+      Documentation: kbuild: fix the section title format
+      h8300: ignore vmlinux.lds
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Vitor Massaru Iha (1):
+      um: ensure `make ARCH=um mrproper` removes
+arch/$(SUBARCH)/include/generated/
 
- scripts/kconfig/parser.y | 30 ++++++++++++++++--------------
- 1 file changed, 16 insertions(+), 14 deletions(-)
+ Documentation/kbuild/makefiles.rst                |  3 +-
+ arch/arc/include/asm/module.h                     |  5 --
+ arch/arc/include/asm/vermagic.h                   |  8 +++
+ arch/arm/include/asm/module.h                     | 24 ---------
+ arch/arm/include/asm/vermagic.h                   | 31 ++++++++++++
+ arch/arm64/include/asm/module.h                   |  2 -
+ arch/arm64/include/asm/vermagic.h                 | 10 ++++
+ arch/h8300/kernel/.gitignore                      |  2 +
+ arch/hexagon/include/asm/{module.h => vermagic.h} |  8 +--
+ arch/ia64/include/asm/module.h                    |  4 --
+ arch/ia64/include/asm/vermagic.h                  | 15 ++++++
+ arch/mips/include/asm/module.h                    | 61 -----------------------
+ arch/mips/include/asm/vermagic.h                  | 66
++++++++++++++++++++++++++
+ arch/nds32/include/asm/{module.h => vermagic.h}   |  8 ++-
+ arch/powerpc/include/asm/module.h                 | 18 -------
+ arch/powerpc/include/asm/vermagic.h               | 20 ++++++++
+ arch/riscv/include/asm/module.h                   |  2 -
+ arch/riscv/include/asm/vermagic.h                 |  9 ++++
+ arch/sh/include/asm/module.h                      | 28 -----------
+ arch/sh/include/asm/vermagic.h                    | 34 +++++++++++++
+ arch/um/Makefile                                  |  1 +
+ arch/x86/include/asm/module.h                     | 60 -----------------------
+ arch/x86/include/asm/vermagic.h                   | 68
+++++++++++++++++++++++++++
+ arch/xtensa/include/asm/{module.h => vermagic.h}  | 15 +++---
+ include/asm-generic/Kbuild                        |  1 +
+ include/asm-generic/vermagic.h                    |  7 +++
+ include/linux/vermagic.h                          |  8 +--
+ scripts/Makefile.lib                              |  2 +-
+ scripts/config                                    |  5 +-
+ 29 files changed, 297 insertions(+), 228 deletions(-)
+ create mode 100644 arch/arc/include/asm/vermagic.h
+ create mode 100644 arch/arm/include/asm/vermagic.h
+ create mode 100644 arch/arm64/include/asm/vermagic.h
+ create mode 100644 arch/h8300/kernel/.gitignore
+ rename arch/hexagon/include/asm/{module.h => vermagic.h} (64%)
+ create mode 100644 arch/ia64/include/asm/vermagic.h
+ create mode 100644 arch/mips/include/asm/vermagic.h
+ rename arch/nds32/include/asm/{module.h => vermagic.h} (52%)
+ create mode 100644 arch/powerpc/include/asm/vermagic.h
+ create mode 100644 arch/riscv/include/asm/vermagic.h
+ create mode 100644 arch/sh/include/asm/vermagic.h
+ create mode 100644 arch/x86/include/asm/vermagic.h
+ rename arch/xtensa/include/asm/{module.h => vermagic.h} (57%)
+ create mode 100644 include/asm-generic/vermagic.h
 
-diff --git a/scripts/kconfig/parser.y b/scripts/kconfig/parser.y
-index 708b6c4b13ca..190f1117f35a 100644
---- a/scripts/kconfig/parser.y
-+++ b/scripts/kconfig/parser.y
-@@ -119,20 +119,24 @@ mainmenu_stmt: T_MAINMENU T_WORD_QUOTE T_EOL
- 
- stmt_list:
- 	  /* empty */
--	| stmt_list common_stmt
-+	| stmt_list assignment_stmt
- 	| stmt_list choice_stmt
-+	| stmt_list comment_stmt
-+	| stmt_list config_stmt
-+	| stmt_list if_stmt
- 	| stmt_list menu_stmt
-+	| stmt_list menuconfig_stmt
-+	| stmt_list source_stmt
- 	| stmt_list T_WORD error T_EOL	{ zconf_error("unknown statement \"%s\"", $2); }
- 	| stmt_list error T_EOL		{ zconf_error("invalid statement"); }
- ;
- 
--common_stmt:
--	  if_stmt
--	| comment_stmt
--	| config_stmt
--	| menuconfig_stmt
--	| source_stmt
--	| assignment_stmt
-+stmt_list_in_choice:
-+	  /* empty */
-+	| stmt_list_in_choice comment_stmt
-+	| stmt_list_in_choice config_stmt
-+	| stmt_list_in_choice if_stmt_in_choice
-+	| stmt_list_in_choice error T_EOL	{ zconf_error("invalid statement"); }
- ;
- 
- /* config/menuconfig entry */
-@@ -254,7 +258,7 @@ choice_end: end
- 	}
- };
- 
--choice_stmt: choice_entry choice_block choice_end
-+choice_stmt: choice_entry stmt_list_in_choice choice_end
- ;
- 
- choice_option_list:
-@@ -305,11 +309,6 @@ default:
- 	| T_DEF_BOOL		{ $$ = S_BOOLEAN; }
- 	| T_DEF_TRISTATE	{ $$ = S_TRISTATE; }
- 
--choice_block:
--	  /* empty */
--	| choice_block common_stmt
--;
--
- /* if entry */
- 
- if_entry: T_IF expr T_EOL
-@@ -331,6 +330,9 @@ if_end: end
- if_stmt: if_entry stmt_list if_end
- ;
- 
-+if_stmt_in_choice: if_entry stmt_list_in_choice if_end
-+;
-+
- /* menu entry */
- 
- menu: T_MENU T_WORD_QUOTE T_EOL
+
 -- 
-2.25.1
+Best Regards
+Masahiro Yamada
