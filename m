@@ -1,28 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:36460 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728908AbgDXSkU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Apr 2020 14:40:20 -0400
-Subject: Re: [GIT PULL] Kbuild fixes for v5.7-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNAQRXn_n60K9LF=pBz0HHg55Lj-1p5gwwmT=YSOdMBXKCA@mail.gmail.com>
-References: <CAK7LNAQRXn_n60K9LF=pBz0HHg55Lj-1p5gwwmT=YSOdMBXKCA@mail.gmail.com>
-Message-Id: <158775362043.26557.16458024691321952772.pr-tracker-bot@kernel.org>
-Date: Fri, 24 Apr 2020 18:40:20 +0000
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726793AbgDXTSl (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 24 Apr 2020 15:18:41 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C1DC09B049
+        for <linux-kbuild@vger.kernel.org>; Fri, 24 Apr 2020 12:18:40 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id x2so1535438pfx.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 24 Apr 2020 12:18:40 -0700 (PDT)
+Date: Fri, 24 Apr 2020 12:18:32 -0700
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH] recordmcount: support >64k sections
+Message-ID: <20200424191832.GA231432@google.com>
+References: <20200422232417.72162-1-samitolvanen@google.com>
+ <20200423214734.GB9040@rlwimi.vmware.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200423214734.GB9040@rlwimi.vmware.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Matt Helsley <mhelsley@vmware.com>, "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The pull request you sent on Sat, 25 Apr 2020 01:09:27 +0900:
+Hi Matt,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.7
+On Thu, Apr 23, 2020 at 02:47:34PM -0700, Matt Helsley wrote:
+> > +static unsigned int get_shnum(Elf_Ehdr const *ehdr, Elf_Shdr const *shdr0)
+> 
+> I noticed this returns an unsigned int ...
+> 
+> > +	Elf_Shdr *const shdr0 = (Elf_Shdr *)(old_shoff + (void *)ehdr);
+> > +	unsigned const old_shnum = get_shnum(ehdr, shdr0);
+> 
+> While this is not explicitly called out as an unsigned int. Perhaps we
+> could just make this and new_shnum explicit unsigned ints and then...
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b9916af776013051a34ccf47bc5e13acffef16c3
+> > +	if (!ehdr->e_shnum || new_shnum >= SHN_LORESERVE) {
+> > +		ehdr->e_shnum = 0;
+> > +		shdr0->sh_size = w(new_shnum);
+> > +	} else
+> > +		ehdr->e_shnum = w2(2 + w2(ehdr->e_shnum));
+> 
+> If we make the unsigned int change proposed above can we reuse new_shnum
+> here like so:
+> 		ehdr->e_shnum = w2(new_shnum);
+> 
+> So this if/else is doing the inverse of get_shnum(). I think the code
+> could be cleaned up a little and prepare for moving to objtool by
+> putting it in a helper function.
 
-Thank you!
+Sure, sounds good to me.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+> > +	for (relhdr = shdr0, k = nhdr; k; --k, ++relhdr) {
+> > +		if (relhdr->sh_type == SHT_SYMTAB)
+> > +			symtab = (void *)ehdr + relhdr->sh_offset;
+> > +		else if (relhdr->sh_type == SHT_SYMTAB_SHNDX)
+> > +			symtab_shndx = (void *)ehdr + relhdr->sh_offset;
+> > +
+> > +		if (symtab && symtab_shndx)
+> > +			break;
+> > +	}
+> 
+> Could you break this out into a helper function? find_symtab() maybe? Again, I think
+> that helper would go away with conversion to objtool.
+
+Agreed, this wouldn't be needed with libelf. I'll send v2 shortly.
+Thanks for the review!
+
+Sami
