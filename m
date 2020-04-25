@@ -1,45 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ex13-edg-ou-001.vmware.com ([208.91.0.189]:32761 "EHLO
-        EX13-EDG-OU-001.vmware.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725874AbgDXWWS (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:62627 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725909AbgDYFSl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Apr 2020 18:22:18 -0400
-Date: Fri, 24 Apr 2020 15:22:14 -0700
-From: Matt Helsley <mhelsley@vmware.com>
-Subject: Re: [PATCH v2] recordmcount: support >64k sections
-Message-ID: <20200424222214.GC9040@rlwimi.vmware.com>
-References: <20200422232417.72162-1-samitolvanen@google.com>
- <20200424193046.160744-1-samitolvanen@google.com>
+        Sat, 25 Apr 2020 01:18:41 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] h8300: suppress error messages for 'make clean'
+Date: Sat, 25 Apr 2020 14:18:16 +0900
+Message-Id: <20200425051816.791423-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200424193046.160744-1-samitolvanen@google.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: "Steven Rostedt (VMware)" <rostedt@goodmis.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-h8-devel@lists.sourceforge.jp, Masahiro Yamada <masahiroy@kernel.org>
 
-On Fri, Apr 24, 2020 at 12:30:46PM -0700, Sami Tolvanen wrote:
-> When compiling a kernel with Clang and LTO, we need to run
-> recordmcount on vmlinux.o with a large number of sections, which
-> currently fails as the program doesn't understand extended
-> section indexes. This change adds support for processing binaries
-> with >64k sections.
-> 
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+'make ARCH=h8300 clean' emits error messages as follows:
 
-Feel free to add
+  $ make ARCH=h8300 clean
+  gcc: error: missing argument to '-Wframe-larger-than='
+  gcc: error: unrecognized command line option '-mint32'
 
-Reviewed-by: Matt Helsley <mhelsley@vmware.com>
+You can suppress the second one by setting the correct CROSS_COMPILE=,
+but we should not require any compiler for cleaning.
 
-> ---
-> Changes in v2:
->  - Switched to unsigned int for (old|new)_shnum in append_func.
->  - Added set_shnum and find_symtab helper functions and moved
->    the new logic there.
-> 
-> ---
->  scripts/recordmcount.h | 98 +++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 92 insertions(+), 6 deletions(-)
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-<snip>
+ arch/h8300/boot/compressed/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/h8300/boot/compressed/Makefile b/arch/h8300/boot/compressed/Makefile
+index 9e2701069bbe..5942793f77a0 100644
+--- a/arch/h8300/boot/compressed/Makefile
++++ b/arch/h8300/boot/compressed/Makefile
+@@ -18,7 +18,7 @@ CONFIG_MEMORY_START     ?= 0x00400000
+ CONFIG_BOOT_LINK_OFFSET ?= 0x00280000
+ IMAGE_OFFSET := $(shell printf "0x%08x" $$(($(CONFIG_MEMORY_START)+$(CONFIG_BOOT_LINK_OFFSET))))
+ 
+-LIBGCC := $(shell $(CROSS-COMPILE)$(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
++LIBGCC := $(shell $(CROSS-COMPILE)$(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name 2>/dev/null)
+ LDFLAGS_vmlinux := -Ttext $(IMAGE_OFFSET) -estartup -T $(obj)/vmlinux.lds \
+ 	--defsym output=$(CONFIG_MEMORY_START)
+ 
+-- 
+2.25.1
