@@ -1,50 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:28353 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbgD0QE0 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726162AbgD0Rvo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Apr 2020 12:04:26 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kbuild: warn if always, hostprogs-y, or hostprogs-m is used
-Date: Tue, 28 Apr 2020 01:03:57 +0900
-Message-Id: <20200427160357.253085-1-masahiroy@kernel.org>
+        Mon, 27 Apr 2020 13:51:44 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031F4C0610D5
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Apr 2020 10:51:42 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id w3so7270511plz.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Apr 2020 10:51:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200425060640.823362-1-masahiroy@kernel.org>
+In-Reply-To: <20200425060640.823362-1-masahiroy@kernel.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 27 Apr 2020 10:51:31 -0700
+Message-ID: <CAKwvOd=0hnjUh9eZFVJhQc4-7dq+T0c9BGEd7UM-dDXVehqOeQ@mail.gmail.com>
+Subject: Re: [PATCH] unicore32: do not evaluate compiler's library path when cleaning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Guan Xuetao <gxt@pku.edu.cn>, Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>
 
-always, hostprogs-y, and hostprogs-m are deprecated.
+On Fri, Apr 24, 2020 at 11:07 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Since commit a83e4ca26af8 ("kbuild: remove cc-option switch from
+> -Wframe-larger-than="), 'make ARCH=unicore32 clean' emits error
+> messages as follows:
+>
+>   $ make ARCH=unicore32 clean
+>   gcc: error: missing argument to '-Wframe-larger-than='
+>   gcc: error: missing argument to '-Wframe-larger-than='
+>
+> We do not care compiler flags when cleaning.
+>
+> Use the '=' operator for lazy expansion because we do not use
+> GNU_LIBC_A or GNU_LIBGCC_A when cleaning.
 
-There is no user in upstream code, but I am keeping them for external
-modules. I want to remove them entirely someday. Notify the deprecation
-to downstream users.
+So many assignment operators!
+https://www.gnu.org/software/make/manual/html_node/Setting.html
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+>
+> Fixes: a83e4ca26af8 ("kbuild: remove cc-option switch from -Wframe-larger-than=")
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  arch/unicore32/lib/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/unicore32/lib/Makefile b/arch/unicore32/lib/Makefile
+> index 098981a01841..5af06645b8f0 100644
+> --- a/arch/unicore32/lib/Makefile
+> +++ b/arch/unicore32/lib/Makefile
+> @@ -10,12 +10,12 @@ lib-y       += strncpy_from_user.o strnlen_user.o
+>  lib-y  += clear_user.o copy_page.o
+>  lib-y  += copy_from_user.o copy_to_user.o
+>
+> -GNU_LIBC_A             := $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libc.a)
+> +GNU_LIBC_A             = $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libc.a)
+>  GNU_LIBC_A_OBJS                := memchr.o memcpy.o memmove.o memset.o
+>  GNU_LIBC_A_OBJS                += strchr.o strrchr.o
+>  GNU_LIBC_A_OBJS                += rawmemchr.o                  # needed by strrchr.o
+>
+> -GNU_LIBGCC_A           := $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libgcc.a)
+> +GNU_LIBGCC_A           = $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libgcc.a)
+>  GNU_LIBGCC_A_OBJS      := _ashldi3.o _ashrdi3.o _lshrdi3.o
+>  GNU_LIBGCC_A_OBJS      += _divsi3.o _modsi3.o _ucmpdi2.o _umodsi3.o _udivsi3.o
+>
+> --
+> 2.25.1
+>
 
- scripts/Makefile.lib | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index cd52a8c6428f..f869a4b2646c 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -4,8 +4,14 @@ asflags-y  += $(EXTRA_AFLAGS)
- ccflags-y  += $(EXTRA_CFLAGS)
- cppflags-y += $(EXTRA_CPPFLAGS)
- ldflags-y  += $(EXTRA_LDFLAGS)
-+ifneq ($(always),)
-+$(warning 'always' is deprecated. Please use 'always-y' instead)
- always-y   += $(always)
-+endif
-+ifneq ($(hostprogs-y)$(hostprogs-m),)
-+$(warning 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead)
- hostprogs  += $(hostprogs-y) $(hostprogs-m)
-+endif
- 
- # flags that take effect in current and sub directories
- KBUILD_AFLAGS += $(subdir-asflags-y)
 -- 
-2.25.1
+Thanks,
+~Nick Desaulniers
