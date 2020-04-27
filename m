@@ -1,78 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726162AbgD0Rvo (ORCPT
+        by vger.kernel.org with ESMTP id S1726204AbgD0XYJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Apr 2020 13:51:44 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031F4C0610D5
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Apr 2020 10:51:42 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id w3so7270511plz.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Apr 2020 10:51:42 -0700 (PDT)
+        Mon, 27 Apr 2020 19:24:09 -0400
+Date: Mon, 27 Apr 2020 16:24:06 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH v3 3/4] MIPS: VDSO: Use $(LD) instead of $(CC) to link
+ VDSO
+Message-ID: <20200427232406.GA8226@ubuntu-s3-xlarge-x86>
+References: <20200419202128.20571-1-natechancellor@gmail.com>
+ <20200423171807.29713-1-natechancellor@gmail.com>
+ <20200423171807.29713-3-natechancellor@gmail.com>
+ <20200426162737.GA9322@alpha.franken.de>
+ <20200427020830.GA260@Ryzen-7-3700X.localdomain>
+ <alpine.LFD.2.21.2004271712130.851719@eddie.linux-mips.org>
 MIME-Version: 1.0
-References: <20200425060640.823362-1-masahiroy@kernel.org>
-In-Reply-To: <20200425060640.823362-1-masahiroy@kernel.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 27 Apr 2020 10:51:31 -0700
-Message-ID: <CAKwvOd=0hnjUh9eZFVJhQc4-7dq+T0c9BGEd7UM-dDXVehqOeQ@mail.gmail.com>
-Subject: Re: [PATCH] unicore32: do not evaluate compiler's library path when cleaning
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.21.2004271712130.851719@eddie.linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Guan Xuetao <gxt@pku.edu.cn>, Nathan Chancellor <natechancellor@gmail.com>, LKML <linux-kernel@vger.kernel.org>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Masahiro Yamada <masahiroy@kernel.org>, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Dmitry Golovin <dima@golovin.in>, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Fri, Apr 24, 2020 at 11:07 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Since commit a83e4ca26af8 ("kbuild: remove cc-option switch from
-> -Wframe-larger-than="), 'make ARCH=unicore32 clean' emits error
-> messages as follows:
->
->   $ make ARCH=unicore32 clean
->   gcc: error: missing argument to '-Wframe-larger-than='
->   gcc: error: missing argument to '-Wframe-larger-than='
->
-> We do not care compiler flags when cleaning.
->
-> Use the '=' operator for lazy expansion because we do not use
-> GNU_LIBC_A or GNU_LIBGCC_A when cleaning.
+On Mon, Apr 27, 2020 at 05:22:53PM +0100, Maciej W. Rozycki wrote:
+> On Sun, 26 Apr 2020, Nathan Chancellor wrote:
+> 
+> > > this causes build errors for me when (cross) compiling a big endian target:
+> > > 
+> > > target is little endian
+> > > mips64-linux-gnu-ld: arch/mips/vdso/elf.o: endianness incompatible with that of the selected emulation
+> > > mips64-linux-gnu-ld: failed to merge target specific data of file arch/mips/vdso/elf.o
+> > 
+> > Thanks for the report. I will look into it tomorrow and hopefully have a
+> > v4 by then.
+> 
+>  Can you actually record in the change description what the difference in 
+> the relevant link command is, as shown where `V=1' has been used with 
+> `make' invocation?
 
-So many assignment operators!
-https://www.gnu.org/software/make/manual/html_node/Setting.html
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+That will be rather unweildy to put in the commit message since
+currently, $(CC) + $(KBUILD_CFLAGS) is being used but I can if it is
+really desired. Otherwise, I can just put it where I put the changelog.
 
->
-> Fixes: a83e4ca26af8 ("kbuild: remove cc-option switch from -Wframe-larger-than=")
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  arch/unicore32/lib/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/unicore32/lib/Makefile b/arch/unicore32/lib/Makefile
-> index 098981a01841..5af06645b8f0 100644
-> --- a/arch/unicore32/lib/Makefile
-> +++ b/arch/unicore32/lib/Makefile
-> @@ -10,12 +10,12 @@ lib-y       += strncpy_from_user.o strnlen_user.o
->  lib-y  += clear_user.o copy_page.o
->  lib-y  += copy_from_user.o copy_to_user.o
->
-> -GNU_LIBC_A             := $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libc.a)
-> +GNU_LIBC_A             = $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libc.a)
->  GNU_LIBC_A_OBJS                := memchr.o memcpy.o memmove.o memset.o
->  GNU_LIBC_A_OBJS                += strchr.o strrchr.o
->  GNU_LIBC_A_OBJS                += rawmemchr.o                  # needed by strrchr.o
->
-> -GNU_LIBGCC_A           := $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libgcc.a)
-> +GNU_LIBGCC_A           = $(shell $(CC) $(KBUILD_CFLAGS) -print-file-name=libgcc.a)
->  GNU_LIBGCC_A_OBJS      := _ashldi3.o _ashrdi3.o _lshrdi3.o
->  GNU_LIBGCC_A_OBJS      += _divsi3.o _modsi3.o _ucmpdi2.o _umodsi3.o _udivsi3.o
->
-> --
-> 2.25.1
->
+>  Actually running `diff -bu' on the whole `V=1' build log obtained without 
+> and with your proposed change applied and ensuring there are no unwanted 
+> changes elsewhere will be a good measure of the correctness of your patch. 
+> You may have to prepare to be patient and run with `-j1' to make sure any 
+> `make' parallelism does not interfere with the order of commands printed.
+> 
+>   Maciej
+> 
 
+Thanks for the input, I will take a look.
 
--- 
-Thanks,
-~Nick Desaulniers
+Cheers,
+Nathan
