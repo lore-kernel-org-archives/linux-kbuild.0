@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50682 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726256AbgD1WOm (ORCPT
+        by vger.kernel.org with ESMTP id S1726884AbgD1WOr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 18:14:42 -0400
+        Tue, 28 Apr 2020 18:14:47 -0400
 From: Nathan Chancellor <natechancellor@gmail.com>
-Subject: [PATCH v4 1/5] kbuild: add CONFIG_LD_IS_LLD
-Date: Tue, 28 Apr 2020 15:14:15 -0700
-Message-Id: <20200428221419.2530697-2-natechancellor@gmail.com>
+Subject: [PATCH v4 3/5] MIPS: Unconditionally specify '-EB' or '-EL'
+Date: Tue, 28 Apr 2020 15:14:17 -0700
+Message-Id: <20200428221419.2530697-4-natechancellor@gmail.com>
 In-Reply-To: <20200428221419.2530697-1-natechancellor@gmail.com>
 References: <20200423171807.29713-1-natechancellor@gmail.com>
  <20200428221419.2530697-1-natechancellor@gmail.com>
@@ -18,51 +18,102 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Masahiro Yamada <masahiroy@kernel.org>
 Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Fangrui Song <maskray@google.com>, Sami Tolvanen <samitolvanen@google.com>, Dmitry Golovin <dima@golovin.in>, Sedat Dilek <sedat.dilek@gmail.com>, Nathan Chancellor <natechancellor@gmail.com>
 
-From: Sami Tolvanen <samitolvanen@google.com>
+This was all done to work around a GCC bug that has been fixed after
+4.2. The kernel requires GCC 4.6 or newer so remove all of these hacks
+and just use the traditional flags.
 
-Similarly to the CC_IS_CLANG config, add LD_IS_LLD to avoid GNU ld
-specific logic such as ld-version or ld-ifversion and gain the
-ability to select potential features that depend on the linker at
-configuration time such as LTO.
+ $ mips64-linux-gcc --version | head -n1
+ mips64-linux-gcc (GCC) 4.6.3
 
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Masahiro Yamada <masahiroy@kernel.org>
-[nc: Reword commit message]
+ $ mips64-linux-gcc -EB -dM -E -C -x c /dev/null | grep MIPSE
+ #define MIPSEB 1
+ #define __MIPSEB__ 1
+ #define _MIPSEB 1
+ #define __MIPSEB 1
+
+ $ mips64-linux-gcc -EL -dM -E -C -x c /dev/null | grep MIPSE
+ #define __MIPSEL__ 1
+ #define MIPSEL 1
+ #define _MIPSEL 1
+ #define __MIPSEL 1
+
+This is necessary when converting the MIPS VDSO to use $(LD) instead of
+$(CC) to link because the OUTPUT_FORMAT is defaulted to little endian
+and only flips to big endian when '-EB' is set on the command line.
+There is no issue currently because the compiler explicitly passes
+'-EB' or '-EL' to the linker regardless of whether or not it was
+provided by the user. Passing '-v' to VDSO_LDFLAGS shows:
+
+<gcc_prefix>/libexec/gcc/mips64-linux/9.3.0/collect2 ... -EB ...
+
+even though '-EB' is nowhere to be found in KBUILD_CFLAGS. The VDSO
+Makefile already supports getting '-EB' or '-EL' from KBUILD_CFLAGS
+through a filter directive but '-EB' or '-EL' is not always present.
+
+If we do not do this, we will see the following error when compiling
+for big endian:
+
+$ make -j$(nproc) ARCH=mips CROSS_COMPILE=mips64-linux- \
+  64r2el_defconfig arch/mips/vdso/
+...
+mips64-linux-ld: arch/mips/vdso/elf.o: compiled for a big endian system
+and target is little endian
+mips64-linux-ld: arch/mips/vdso/elf.o: endianness incompatible with that
+of the selected emulation
+mips64-linux-ld: failed to merge target specific data of file
+arch/mips/vdso/elf.o
+...
+
+Remove this legacy hack and just use '-EB' and '-EL' unconditionally.
+
+Reported-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
 
 v3 -> v4:
 
-* No changes.
+* New patch.
 
-v2 -> v3:
+ arch/mips/Makefile | 25 -------------------------
+ 1 file changed, 25 deletions(-)
 
-* Add Masahiro's ack.
-
-v1 -> v2:
-
-* No changes.
-
-Sami, please scream if you are unhappy with how I worded this commit.
-
- init/Kconfig | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/init/Kconfig b/init/Kconfig
-index 9e22ee8fbd75e..c15ee42b82726 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -23,6 +23,9 @@ config LD_VERSION
- config CC_IS_CLANG
- 	def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
+diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+index e1c44aed81565..301efb90b51ed 100644
+--- a/arch/mips/Makefile
++++ b/arch/mips/Makefile
+@@ -116,33 +116,8 @@ endif
  
-+config LD_IS_LLD
-+	def_bool $(success,$(LD) -v | head -n 1 | grep -q LLD)
-+
- config CLANG_VERSION
- 	int
- 	default $(shell,$(srctree)/scripts/clang-version.sh $(CC))
-
-base-commit: 96c9a7802af7d500a582d89a8b864584fe878c1b
+ cflags-y += -ffreestanding
+ 
+-#
+-# We explicitly add the endianness specifier if needed, this allows
+-# to compile kernels with a toolchain for the other endianness. We
+-# carefully avoid to add it redundantly because gcc 3.3/3.4 complains
+-# when fed the toolchain default!
+-#
+-# Certain gcc versions up to gcc 4.1.1 (probably 4.2-subversion as of
+-# 2006-10-10 don't properly change the predefined symbols if -EB / -EL
+-# are used, so we kludge that here.  A bug has been filed at
+-# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=29413.
+-#
+-# clang doesn't suffer from these issues and our checks against -dumpmachine
+-# don't work so well when cross compiling, since without providing --target
+-# clang's output will be based upon the build machine. So for clang we simply
+-# unconditionally specify -EB or -EL as appropriate.
+-#
+-ifdef CONFIG_CC_IS_CLANG
+ cflags-$(CONFIG_CPU_BIG_ENDIAN)		+= -EB
+ cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= -EL
+-else
+-undef-all += -UMIPSEB -U_MIPSEB -U__MIPSEB -U__MIPSEB__
+-undef-all += -UMIPSEL -U_MIPSEL -U__MIPSEL -U__MIPSEL__
+-predef-be += -DMIPSEB -D_MIPSEB -D__MIPSEB -D__MIPSEB__
+-predef-le += -DMIPSEL -D_MIPSEL -D__MIPSEL -D__MIPSEL__
+-cflags-$(CONFIG_CPU_BIG_ENDIAN)		+= $(shell $(CC) -dumpmachine |grep -q 'mips.*el-.*' && echo -EB $(undef-all) $(predef-be))
+-cflags-$(CONFIG_CPU_LITTLE_ENDIAN)	+= $(shell $(CC) -dumpmachine |grep -q 'mips.*el-.*' || echo -EL $(undef-all) $(predef-le))
+-endif
+ 
+ cflags-$(CONFIG_SB1XXX_CORELIS)	+= $(call cc-option,-mno-sched-prolog) \
+ 				   -fno-omit-frame-pointer
 -- 
 2.26.2
