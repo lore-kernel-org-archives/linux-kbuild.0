@@ -1,109 +1,150 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:30777 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30768 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbgD2Dq3 (ORCPT
+        with ESMTP id S1726621AbgD2Dq3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 28 Apr 2020 23:46:29 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 04/15] samples: seccomp: build sample programs for target architecture
-Date: Wed, 29 Apr 2020 12:45:16 +0900
-Message-Id: <20200429034527.590520-5-masahiroy@kernel.org>
-In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
-References: <20200429034527.590520-1-masahiroy@kernel.org>
+Subject: [PATCH v2 00/15] kbuild: support 'userprogs' syntax
+Date: Wed, 29 Apr 2020 12:45:12 +0900
+Message-Id: <20200429034527.590520-1-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-These userspace programs include UAPI headers exported to usr/include/.
-'make headers' always works for the target architecture (i.e. the same
-architecture as the kernel), so the sample programs should be built for
-the target as well. Kbuild now supports 'userprogs' for that.
 
-I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
-$(CC) may not provide libc.
+Several Makefiles use 'hostprogs' to build programs for the host
+architecture where it is not appropriate to do so.
+This is just because Kbuild lacks the support for building programs
+for the target architecture.
 
-The 'ifndef CROSS_COMPILE' is no longer needed.
+This series introduce 'userprogs' syntax and use it from
+sample and bpf Makefiles.
 
-BTW, the -m31 for s390 is left-over code. Commit 5a79859ae0f3 ("s390:
-remove 31 bit support") killed it.
+Sam worked on this in 2014.
+https://lkml.org/lkml/2014/7/13/154
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
----
+He used 'uapiprogs-y' but I just thought the meaning of
+"UAPI programs" is unclear.
 
-Changes in v2: None
+Naming the syntax is one of the most difficult parts.
 
- samples/Kconfig          |  2 +-
- samples/seccomp/Makefile | 42 +++-------------------------------------
- 2 files changed, 4 insertions(+), 40 deletions(-)
+I chose 'userprogs'. Anothor choice I had in my mind was 'targetprogs'.
 
-diff --git a/samples/Kconfig b/samples/Kconfig
-index 9d236c346de5..8949e9646125 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -126,7 +126,7 @@ config SAMPLE_PIDFD
- 
- config SAMPLE_SECCOMP
- 	bool "Build seccomp sample code"
--	depends on SECCOMP_FILTER && HEADERS_INSTALL
-+	depends on SECCOMP_FILTER && CC_CAN_LINK && HEADERS_INSTALL
- 	help
- 	  Build samples of seccomp filters using various methods of
- 	  BPF filter construction.
-diff --git a/samples/seccomp/Makefile b/samples/seccomp/Makefile
-index 89279e8b87df..75916c23e416 100644
---- a/samples/seccomp/Makefile
-+++ b/samples/seccomp/Makefile
-@@ -1,44 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
--ifndef CROSS_COMPILE
--hostprogs := bpf-fancy dropper bpf-direct user-trap
-+userprogs := bpf-fancy dropper bpf-direct user-trap
- 
--HOSTCFLAGS_bpf-fancy.o += -I$(objtree)/usr/include
--HOSTCFLAGS_bpf-fancy.o += -idirafter $(objtree)/include
--HOSTCFLAGS_bpf-helper.o += -I$(objtree)/usr/include
--HOSTCFLAGS_bpf-helper.o += -idirafter $(objtree)/include
- bpf-fancy-objs := bpf-fancy.o bpf-helper.o
- 
--HOSTCFLAGS_dropper.o += -I$(objtree)/usr/include
--HOSTCFLAGS_dropper.o += -idirafter $(objtree)/include
--dropper-objs := dropper.o
-+userccflags += -I usr/include
- 
--HOSTCFLAGS_bpf-direct.o += -I$(objtree)/usr/include
--HOSTCFLAGS_bpf-direct.o += -idirafter $(objtree)/include
--bpf-direct-objs := bpf-direct.o
--
--HOSTCFLAGS_user-trap.o += -I$(objtree)/usr/include
--HOSTCFLAGS_user-trap.o += -idirafter $(objtree)/include
--user-trap-objs := user-trap.o
--
--# Try to match the kernel target.
--ifndef CONFIG_64BIT
--
--# s390 has -m31 flag to build 31 bit binaries
--ifndef CONFIG_S390
--MFLAG = -m32
--else
--MFLAG = -m31
--endif
--
--HOSTCFLAGS_bpf-direct.o += $(MFLAG)
--HOSTCFLAGS_dropper.o += $(MFLAG)
--HOSTCFLAGS_bpf-helper.o += $(MFLAG)
--HOSTCFLAGS_bpf-fancy.o += $(MFLAG)
--HOSTCFLAGS_user-trap.o += $(MFLAG)
--HOSTLDLIBS_bpf-direct += $(MFLAG)
--HOSTLDLIBS_bpf-fancy += $(MFLAG)
--HOSTLDLIBS_dropper += $(MFLAG)
--HOSTLDLIBS_user-trap += $(MFLAG)
--endif
--always-y := $(hostprogs)
--endif
-+always-y := $(userprogs)
+You can test this series quickly by 'make allmodconfig samples/'
+
+When building objects for userspace, [U] is displayed.
+
+masahiro@oscar:~/workspace/linux$ make allmodconfig samples/
+  [snip]
+  AR      samples/vfio-mdev/built-in.a
+  CC [M]  samples/vfio-mdev/mtty.o
+  CC [M]  samples/vfio-mdev/mdpy.o
+  CC [M]  samples/vfio-mdev/mdpy-fb.o
+  CC [M]  samples/vfio-mdev/mbochs.o
+  AR      samples/mei/built-in.a
+  CC [U]  samples/mei/mei-amt-version
+  CC [U]  samples/auxdisplay/cfag12864b-example
+  CC [M]  samples/configfs/configfs_sample.o
+  CC [M]  samples/connector/cn_test.o
+  CC [U]  samples/connector/ucon
+  CC [M]  samples/ftrace/ftrace-direct.o
+  CC [M]  samples/ftrace/ftrace-direct-too.o
+  CC [M]  samples/ftrace/ftrace-direct-modify.o
+  CC [M]  samples/ftrace/sample-trace-array.o
+  CC [U]  samples/hidraw/hid-example
+  CC [M]  samples/hw_breakpoint/data_breakpoint.o
+  CC [M]  samples/kdb/kdb_hello.o
+  CC [M]  samples/kfifo/bytestream-example.o
+  CC [M]  samples/kfifo/dma-example.o
+  CC [M]  samples/kfifo/inttype-example.o
+  CC [M]  samples/kfifo/record-example.o
+  CC [M]  samples/kobject/kobject-example.o
+  CC [M]  samples/kobject/kset-example.o
+  CC [M]  samples/kprobes/kprobe_example.o
+  CC [M]  samples/kprobes/kretprobe_example.o
+  CC [M]  samples/livepatch/livepatch-sample.o
+  CC [M]  samples/livepatch/livepatch-shadow-mod.o
+  CC [M]  samples/livepatch/livepatch-shadow-fix1.o
+  CC [M]  samples/livepatch/livepatch-shadow-fix2.o
+  CC [M]  samples/livepatch/livepatch-callbacks-demo.o
+  CC [M]  samples/livepatch/livepatch-callbacks-mod.o
+  CC [M]  samples/livepatch/livepatch-callbacks-busymod.o
+  CC [M]  samples/rpmsg/rpmsg_client_sample.o
+  CC [U]  samples/seccomp/bpf-fancy.o
+  CC [U]  samples/seccomp/bpf-helper.o
+  LD [U]  samples/seccomp/bpf-fancy
+  CC [U]  samples/seccomp/dropper
+  CC [U]  samples/seccomp/bpf-direct
+  CC [U]  samples/seccomp/user-trap
+  CC [U]  samples/timers/hpet_example
+  CC [M]  samples/trace_events/trace-events-sample.o
+  CC [M]  samples/trace_printk/trace-printk.o
+  CC [U]  samples/uhid/uhid-example
+  CC [M]  samples/v4l/v4l2-pci-skeleton.o
+  CC [U]  samples/vfs/test-fsmount
+  CC [U]  samples/vfs/test-statx
+samples/vfs/test-statx.c:24:15: warning: ‘struct foo’ declared inside parameter list will not be visible outside of this definition or declaration
+   24 | #define statx foo
+      |               ^~~
+  CC [U]  samples/watchdog/watchdog-simple
+  AR      samples/built-in.a
+
+Changes for v2:
+  - Fix ARCH=i386 build error for bpfilter_umh
+  - Rename 'user-ccflags' to 'userccflags'
+    because 'user-ccflags' would conflict if an object
+    called 'user.o' exists in the directory.
+  - Support 'userldflags'
+
+Masahiro Yamada (14):
+  bpfilter: match bit size of bpfilter_umh to that of the kernel
+  kbuild: add infrastructure to build userspace programs
+  bpfilter: use 'userprogs' syntax to build bpfilter_umh
+  samples: seccomp: build sample programs for target architecture
+  kbuild: doc: document the new syntax 'userprogs'
+  samples: uhid: build sample program for target architecture
+  samples: hidraw: build sample program for target architecture
+  samples: connector: build sample program for target architecture
+  samples: vfs: build sample programs for target architecture
+  samples: pidfd: build sample program for target architecture
+  samples: mei: build sample program for target architecture
+  samples: auxdisplay: use 'userprogs' syntax
+  samples: timers: use 'userprogs' syntax
+  samples: watchdog: use 'userprogs' syntax
+
+Sam Ravnborg (1):
+  samples: uhid: fix warnings in uhid-example
+
+ Documentation/kbuild/makefiles.rst | 183 +++++++++++++++++++++--------
+ Makefile                           |  13 +-
+ init/Kconfig                       |   4 +-
+ net/bpfilter/Makefile              |  11 +-
+ samples/Kconfig                    |  26 +++-
+ samples/Makefile                   |   4 +
+ samples/auxdisplay/Makefile        |  11 +-
+ samples/connector/Makefile         |  12 +-
+ samples/hidraw/Makefile            |   9 +-
+ samples/mei/Makefile               |   9 +-
+ samples/pidfd/Makefile             |   8 +-
+ samples/seccomp/Makefile           |  42 +------
+ samples/timers/Makefile            |  17 +--
+ samples/uhid/.gitignore            |   2 +
+ samples/uhid/Makefile              |   9 +-
+ samples/uhid/uhid-example.c        |   4 +-
+ samples/vfs/Makefile               |  11 +-
+ samples/watchdog/Makefile          |  10 +-
+ scripts/Makefile.build             |   6 +
+ scripts/Makefile.clean             |   2 +-
+ scripts/Makefile.userprogs         |  45 +++++++
+ usr/include/Makefile               |   4 +
+ 22 files changed, 267 insertions(+), 175 deletions(-)
+ create mode 100644 samples/uhid/.gitignore
+ create mode 100644 scripts/Makefile.userprogs
+
 -- 
 2.25.1
