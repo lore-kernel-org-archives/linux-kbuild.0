@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:31325 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:31551 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726815AbgD2Dqs (ORCPT
+        with ESMTP id S1726900AbgD2Dq4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 23:46:48 -0400
+        Tue, 28 Apr 2020 23:46:56 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 13/15] samples: auxdisplay: use 'userprogs' syntax
-Date: Wed, 29 Apr 2020 12:45:25 +0900
-Message-Id: <20200429034527.590520-14-masahiroy@kernel.org>
+Subject: [PATCH v2 14/15] samples: timers: use 'userprogs' syntax
+Date: Wed, 29 Apr 2020 12:45:26 +0900
+Message-Id: <20200429034527.590520-15-masahiroy@kernel.org>
 In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
 References: <20200429034527.590520-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -15,7 +15,7 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
 Kbuild now supports the 'userprogs' syntax to compile userspace
 programs for the same architecture as the kernel.
@@ -27,60 +27,66 @@ I also added the CONFIG option guarded by 'depends on CC_CAN_LINK'
 because $(CC) may not provide libc.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 Acked-by: Sam Ravnborg <sam@ravnborg.org>
 ---
 
 Changes in v2: None
 
- samples/Kconfig             |  4 ++++
- samples/Makefile            |  1 +
- samples/auxdisplay/Makefile | 11 ++---------
- 3 files changed, 7 insertions(+), 9 deletions(-)
+ samples/Kconfig         |  4 ++++
+ samples/Makefile        |  1 +
+ samples/timers/Makefile | 17 +++--------------
+ 3 files changed, 8 insertions(+), 14 deletions(-)
 
 diff --git a/samples/Kconfig b/samples/Kconfig
-index 69699db49675..2322e11e8b80 100644
+index 2322e11e8b80..a8629a0d4f96 100644
 --- a/samples/Kconfig
 +++ b/samples/Kconfig
-@@ -6,6 +6,10 @@ menuconfig SAMPLES
+@@ -135,6 +135,10 @@ config SAMPLE_SECCOMP
+ 	  Build samples of seccomp filters using various methods of
+ 	  BPF filter construction.
  
- if SAMPLES
- 
-+config SAMPLE_AUXDISPLAY
-+	bool "auxdisplay sample"
-+	depends on CC_CAN_LINK
++config SAMPLE_TIMER
++	bool "Timer sample"
++	depends on CC_CAN_LINK && HEADERS_INSTALL
 +
- config SAMPLE_TRACE_EVENTS
- 	tristate "Build trace_events examples -- loadable modules only"
- 	depends on EVENT_TRACING && m
+ config SAMPLE_UHID
+ 	bool "UHID sample"
+ 	depends on CC_CAN_LINK && HEADERS_INSTALL
 diff --git a/samples/Makefile b/samples/Makefile
-index bdc168405452..0c43b5d34b15 100644
+index 0c43b5d34b15..042208326689 100644
 --- a/samples/Makefile
 +++ b/samples/Makefile
-@@ -1,6 +1,7 @@
+@@ -16,6 +16,7 @@ subdir-$(CONFIG_SAMPLE_PIDFD)		+= pidfd
+ obj-$(CONFIG_SAMPLE_QMI_CLIENT)		+= qmi/
+ obj-$(CONFIG_SAMPLE_RPMSG_CLIENT)	+= rpmsg/
+ subdir-$(CONFIG_SAMPLE_SECCOMP)		+= seccomp
++subdir-$(CONFIG_SAMPLE_TIMER)		+= timers
+ obj-$(CONFIG_SAMPLE_TRACE_EVENTS)	+= trace_events/
+ obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
+ obj-$(CONFIG_SAMPLE_FTRACE_DIRECT)	+= ftrace/
+diff --git a/samples/timers/Makefile b/samples/timers/Makefile
+index f9fa07460802..15c7ddbc8c51 100644
+--- a/samples/timers/Makefile
++++ b/samples/timers/Makefile
+@@ -1,16 +1,5 @@
  # SPDX-License-Identifier: GPL-2.0
- # Makefile for Linux samples code
+-ifndef CROSS_COMPILE
+-uname_M := $(shell uname -m 2>/dev/null || echo not)
+-ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
++userprogs := hpet_example
++always-y := $(userprogs)
  
-+subdir-$(CONFIG_SAMPLE_AUXDISPLAY)	+= auxdisplay
- obj-$(CONFIG_SAMPLE_ANDROID_BINDERFS)	+= binderfs/
- obj-$(CONFIG_SAMPLE_CONFIGFS)		+= configfs/
- obj-$(CONFIG_SAMPLE_CONNECTOR)		+= connector/
-diff --git a/samples/auxdisplay/Makefile b/samples/auxdisplay/Makefile
-index 0273bab27233..dbdf939af94a 100644
---- a/samples/auxdisplay/Makefile
-+++ b/samples/auxdisplay/Makefile
-@@ -1,10 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0
+-ifeq ($(ARCH),x86)
 -CC := $(CROSS_COMPILE)gcc
--CFLAGS := -I../../usr/include
--
--PROGS := cfag12864b-example
+-PROGS := hpet_example
 -
 -all: $(PROGS)
 -
 -clean:
 -	rm -fr $(PROGS)
-+userprogs := cfag12864b-example
-+always-y := $(userprogs)
+-
+-endif
+-endif
++userccflags += -I usr/include
 -- 
 2.25.1
