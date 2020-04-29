@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:30983 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:31325 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726766AbgD2Dqh (ORCPT
+        with ESMTP id S1726815AbgD2Dqs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 23:46:37 -0400
+        Tue, 28 Apr 2020 23:46:48 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 10/15] samples: vfs: build sample programs for target architecture
-Date: Wed, 29 Apr 2020 12:45:22 +0900
-Message-Id: <20200429034527.590520-11-masahiroy@kernel.org>
+Subject: [PATCH v2 13/15] samples: auxdisplay: use 'userprogs' syntax
+Date: Wed, 29 Apr 2020 12:45:25 +0900
+Message-Id: <20200429034527.590520-14-masahiroy@kernel.org>
 In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
 References: <20200429034527.590520-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -15,56 +15,72 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
+Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 
-These userspace programs include UAPI headers exported to usr/include/.
-'make headers' always works for the target architecture (i.e. the same
-architecture as the kernel), so the sample programs should be built for
-the target as well. Kbuild now supports 'userprogs' for that.
+Kbuild now supports the 'userprogs' syntax to compile userspace
+programs for the same architecture as the kernel.
 
-I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
-$(CC) may not provide libc.
+Add the entry to samples/Makefile to put this into the build bot
+coverage.
+
+I also added the CONFIG option guarded by 'depends on CC_CAN_LINK'
+because $(CC) may not provide libc.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 Acked-by: Sam Ravnborg <sam@ravnborg.org>
 ---
 
 Changes in v2: None
 
- samples/Kconfig      |  2 +-
- samples/vfs/Makefile | 11 +++--------
- 2 files changed, 4 insertions(+), 9 deletions(-)
+ samples/Kconfig             |  4 ++++
+ samples/Makefile            |  1 +
+ samples/auxdisplay/Makefile | 11 ++---------
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/samples/Kconfig b/samples/Kconfig
-index 08f2d025ca05..831a7ecd3352 100644
+index 69699db49675..2322e11e8b80 100644
 --- a/samples/Kconfig
 +++ b/samples/Kconfig
-@@ -184,7 +184,7 @@ config SAMPLE_ANDROID_BINDERFS
+@@ -6,6 +6,10 @@ menuconfig SAMPLES
  
- config SAMPLE_VFS
- 	bool "Build example programs that use new VFS system calls"
--	depends on HEADERS_INSTALL
-+	depends on CC_CAN_LINK && HEADERS_INSTALL
- 	help
- 	  Build example userspace programs that use new VFS system calls such
- 	  as mount API and statx().  Note that this is restricted to the x86
-diff --git a/samples/vfs/Makefile b/samples/vfs/Makefile
-index 65acdde5c117..00b6824f9237 100644
---- a/samples/vfs/Makefile
-+++ b/samples/vfs/Makefile
-@@ -1,10 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
--# List of programs to build
--hostprogs := \
--	test-fsmount \
--	test-statx
-+userprogs := test-fsmount test-statx
-+always-y := $(userprogs)
+ if SAMPLES
  
--always-y := $(hostprogs)
++config SAMPLE_AUXDISPLAY
++	bool "auxdisplay sample"
++	depends on CC_CAN_LINK
++
+ config SAMPLE_TRACE_EVENTS
+ 	tristate "Build trace_events examples -- loadable modules only"
+ 	depends on EVENT_TRACING && m
+diff --git a/samples/Makefile b/samples/Makefile
+index bdc168405452..0c43b5d34b15 100644
+--- a/samples/Makefile
++++ b/samples/Makefile
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Makefile for Linux samples code
+ 
++subdir-$(CONFIG_SAMPLE_AUXDISPLAY)	+= auxdisplay
+ obj-$(CONFIG_SAMPLE_ANDROID_BINDERFS)	+= binderfs/
+ obj-$(CONFIG_SAMPLE_CONFIGFS)		+= configfs/
+ obj-$(CONFIG_SAMPLE_CONNECTOR)		+= connector/
+diff --git a/samples/auxdisplay/Makefile b/samples/auxdisplay/Makefile
+index 0273bab27233..dbdf939af94a 100644
+--- a/samples/auxdisplay/Makefile
++++ b/samples/auxdisplay/Makefile
+@@ -1,10 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+-CC := $(CROSS_COMPILE)gcc
+-CFLAGS := -I../../usr/include
 -
--HOSTCFLAGS_test-fsmount.o += -I$(objtree)/usr/include
--HOSTCFLAGS_test-statx.o += -I$(objtree)/usr/include
-+userccflags += -I usr/include
+-PROGS := cfag12864b-example
+-
+-all: $(PROGS)
+-
+-clean:
+-	rm -fr $(PROGS)
++userprogs := cfag12864b-example
++always-y := $(userprogs)
 -- 
 2.25.1
