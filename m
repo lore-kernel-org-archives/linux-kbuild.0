@@ -1,63 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:48211 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726598AbgD2Co4 (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30762 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbgD2Dq2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 22:44:56 -0400
-MIME-Version: 1.0
-References: <20200423073929.127521-1-masahiroy@kernel.org> <20200423073929.127521-3-masahiroy@kernel.org>
- <20200424203231.b4lonbdgzkoxf7ug@treble>
-In-Reply-To: <20200424203231.b4lonbdgzkoxf7ug@treble>
+        Tue, 28 Apr 2020 23:46:28 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 29 Apr 2020 11:43:39 +0900
-Message-ID: <CAK7LNATrGDegfn2j5gmHTSj8V=Wd53SpLqG4-T1gfn3j19mEtg@mail.gmail.com>
-Subject: Re: [PATCH 02/16] Revert "objtool: Skip samples subdirectory"
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2 06/15] samples: uhid: fix warnings in uhid-example
+Date: Wed, 29 Apr 2020 12:45:18 +0900
+Message-Id: <20200429034527.590520-7-masahiroy@kernel.org>
+In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
+References: <20200429034527.590520-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, bpf <bpf@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-On Sat, Apr 25, 2020 at 5:32 AM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
->
-> On Thu, Apr 23, 2020 at 04:39:15PM +0900, Masahiro Yamada wrote:
-> > This reverts commit 8728497895794d1f207a836e02dae762ad175d56.
-> >
-> > This directory contains no object.
-> >
-> > Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  samples/Makefile | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/samples/Makefile b/samples/Makefile
-> > index f8f847b4f61f..5ce50ef0f2b2 100644
-> > --- a/samples/Makefile
-> > +++ b/samples/Makefile
-> > @@ -1,6 +1,5 @@
-> >  # SPDX-License-Identifier: GPL-2.0
-> >  # Makefile for Linux samples code
-> > -OBJECT_FILES_NON_STANDARD := y
-> >
-> >  obj-$(CONFIG_SAMPLE_ANDROID_BINDERFS)        += binderfs/
-> >  obj-$(CONFIG_SAMPLE_CONFIGFS)                += configfs/
-> > --
-> > 2.25.1
->
-> Hm, somehow I was thinking this would work recursively for
-> subdirectories.  Anyway, you're right:
->
-> Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
->
-> --
-> Josh
->
+From: Sam Ravnborg <sam@ravnborg.org>
 
-Applied to linux-kbuild.
+Fix warnings seen when building for 32-bit architecture.
 
+Use "%xd" for arguments of type size_t to fix the warnings.
 
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v2: None
+
+ samples/uhid/uhid-example.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/samples/uhid/uhid-example.c b/samples/uhid/uhid-example.c
+index b72d645ce828..015cb06a241e 100644
+--- a/samples/uhid/uhid-example.c
++++ b/samples/uhid/uhid-example.c
+@@ -165,7 +165,7 @@ static int uhid_write(int fd, const struct uhid_event *ev)
+ 		fprintf(stderr, "Cannot write to uhid: %m\n");
+ 		return -errno;
+ 	} else if (ret != sizeof(*ev)) {
+-		fprintf(stderr, "Wrong size written to uhid: %ld != %lu\n",
++		fprintf(stderr, "Wrong size written to uhid: %zd != %zu\n",
+ 			ret, sizeof(ev));
+ 		return -EFAULT;
+ 	} else {
+@@ -236,7 +236,7 @@ static int event(int fd)
+ 		fprintf(stderr, "Cannot read uhid-cdev: %m\n");
+ 		return -errno;
+ 	} else if (ret != sizeof(ev)) {
+-		fprintf(stderr, "Invalid size read from uhid-dev: %ld != %lu\n",
++		fprintf(stderr, "Invalid size read from uhid-dev: %zd != %zu\n",
+ 			ret, sizeof(ev));
+ 		return -EFAULT;
+ 	}
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
