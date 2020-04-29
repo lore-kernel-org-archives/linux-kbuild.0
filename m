@@ -1,68 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:30764 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726596AbgD2Dq2 (ORCPT
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:58852 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726355AbgD2Gqm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 23:46:28 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 08/15] samples: hidraw: build sample program for target architecture
-Date: Wed, 29 Apr 2020 12:45:20 +0900
-Message-Id: <20200429034527.590520-9-masahiroy@kernel.org>
-In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
-References: <20200429034527.590520-1-masahiroy@kernel.org>
+        Wed, 29 Apr 2020 02:46:42 -0400
+From: Huaixin Chang <changhuaixin@linux.alibaba.com>
+Subject: [PATCH 0/2] Build ORC fast lookup table in scripts/sorttable tool
+Date: Wed, 29 Apr 2020 14:46:24 +0800
+Message-Id: <20200429064626.16389-1-changhuaixin@linux.alibaba.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: bp@alien8.de, hpa@zytor.com, jpoimboe@redhat.com, luto@amacapital.net, michal.lkml@markovi.net, mingo@redhat.com, peterz@infradead.org, tglx@linutronix.de, x86@kernel.org, yamada.masahiro@socionext.com
 
-This userspace program includes UAPI headers exported to usr/include/.
-'make headers' always works for the target architecture (i.e. the same
-architecture as the kernel), so the sample program should be built for
-the target as well. Kbuild now supports 'userprogs' for that.
+Move building of fast lookup table from boot to sorttable tool. This saves us
+6380us boot time on Intel(R) Xeon(R) CPU E5-2682 v4 @ 2.50GHz with cores.
 
-I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
-$(CC) may not provide libc.
+Huaixin Chang (2):
+  scripts/sorttable: Build orc fast lookup table via sorttable tool
+  x86/unwind/orc: Remove unwind_init() from x86 boot
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
----
+ arch/x86/include/asm/unwind.h |  2 -
+ arch/x86/kernel/setup.c       |  2 -
+ arch/x86/kernel/unwind_orc.c  | 51 ----------------------
+ scripts/sorttable.h           | 99 ++++++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 92 insertions(+), 62 deletions(-)
 
-Changes in v2: None
-
- samples/Kconfig         | 2 +-
- samples/hidraw/Makefile | 9 +++------
- 2 files changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/samples/Kconfig b/samples/Kconfig
-index 2560e87c9cae..08f2d025ca05 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -118,7 +118,7 @@ config SAMPLE_CONNECTOR
- 
- config SAMPLE_HIDRAW
- 	bool "hidraw sample"
--	depends on HEADERS_INSTALL
-+	depends on CC_CAN_LINK && HEADERS_INSTALL
- 
- config SAMPLE_PIDFD
- 	bool "pidfd sample"
-diff --git a/samples/hidraw/Makefile b/samples/hidraw/Makefile
-index 8bd25f77671f..d2c77ed60b39 100644
---- a/samples/hidraw/Makefile
-+++ b/samples/hidraw/Makefile
-@@ -1,8 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--# List of programs to build
--hostprogs := hid-example
--always-y := $(hostprogs)
-+userprogs := hid-example
-+always-y := $(userprogs)
- 
--HOSTCFLAGS_hid-example.o += -I$(objtree)/usr/include
--
--all: hid-example
-+userccflags += -I usr/include
 -- 
-2.25.1
+2.14.4.44.g2045bb6
