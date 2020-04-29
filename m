@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:30763 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:30777 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726530AbgD2Dq2 (ORCPT
+        with ESMTP id S1726631AbgD2Dq3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Apr 2020 23:46:28 -0400
+        Tue, 28 Apr 2020 23:46:29 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 07/15] samples: uhid: build sample program for target architecture
-Date: Wed, 29 Apr 2020 12:45:19 +0900
-Message-Id: <20200429034527.590520-8-masahiroy@kernel.org>
+Subject: [PATCH v2 04/15] samples: seccomp: build sample programs for target architecture
+Date: Wed, 29 Apr 2020 12:45:16 +0900
+Message-Id: <20200429034527.590520-5-masahiroy@kernel.org>
 In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
 References: <20200429034527.590520-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,16 +17,18 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-This userspace program includes UAPI headers exported to usr/include/.
+These userspace programs include UAPI headers exported to usr/include/.
 'make headers' always works for the target architecture (i.e. the same
-architecture as the kernel), so the sample program should be built for
+architecture as the kernel), so the sample programs should be built for
 the target as well. Kbuild now supports 'userprogs' for that.
 
-Add the entry to samples/Makefile to put this into the build bot
-coverage.
+I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
+$(CC) may not provide libc.
 
-I also added the CONFIG option guarded by 'depends on CC_CAN_LINK'
-because $(CC) may not provide libc.
+The 'ifndef CROSS_COMPILE' is no longer needed.
+
+BTW, the -m31 for s390 is left-over code. Commit 5a79859ae0f3 ("s390:
+remove 31 bit support") killed it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Acked-by: Sam Ravnborg <sam@ravnborg.org>
@@ -34,65 +36,74 @@ Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
 Changes in v2: None
 
- samples/Kconfig         | 6 ++++++
- samples/Makefile        | 1 +
- samples/uhid/.gitignore | 2 ++
- samples/uhid/Makefile   | 9 +++------
- 4 files changed, 12 insertions(+), 6 deletions(-)
- create mode 100644 samples/uhid/.gitignore
+ samples/Kconfig          |  2 +-
+ samples/seccomp/Makefile | 42 +++-------------------------------------
+ 2 files changed, 4 insertions(+), 40 deletions(-)
 
 diff --git a/samples/Kconfig b/samples/Kconfig
-index 8949e9646125..2560e87c9cae 100644
+index 9d236c346de5..8949e9646125 100644
 --- a/samples/Kconfig
 +++ b/samples/Kconfig
-@@ -131,6 +131,12 @@ config SAMPLE_SECCOMP
+@@ -126,7 +126,7 @@ config SAMPLE_PIDFD
+ 
+ config SAMPLE_SECCOMP
+ 	bool "Build seccomp sample code"
+-	depends on SECCOMP_FILTER && HEADERS_INSTALL
++	depends on SECCOMP_FILTER && CC_CAN_LINK && HEADERS_INSTALL
+ 	help
  	  Build samples of seccomp filters using various methods of
  	  BPF filter construction.
+diff --git a/samples/seccomp/Makefile b/samples/seccomp/Makefile
+index 89279e8b87df..75916c23e416 100644
+--- a/samples/seccomp/Makefile
++++ b/samples/seccomp/Makefile
+@@ -1,44 +1,8 @@
+ # SPDX-License-Identifier: GPL-2.0
+-ifndef CROSS_COMPILE
+-hostprogs := bpf-fancy dropper bpf-direct user-trap
++userprogs := bpf-fancy dropper bpf-direct user-trap
  
-+config SAMPLE_UHID
-+	bool "UHID sample"
-+	depends on CC_CAN_LINK && HEADERS_INSTALL
-+	help
-+	  Build UHID sample program.
-+
- config SAMPLE_VFIO_MDEV_MTTY
- 	tristate "Build VFIO mtty example mediated device sample code -- loadable modules only"
- 	depends on VFIO_MDEV_DEVICE && m
-diff --git a/samples/Makefile b/samples/Makefile
-index 5ce50ef0f2b2..bdc168405452 100644
---- a/samples/Makefile
-+++ b/samples/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_SAMPLE_TRACE_EVENTS)	+= trace_events/
- obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
- obj-$(CONFIG_SAMPLE_FTRACE_DIRECT)	+= ftrace/
- obj-$(CONFIG_SAMPLE_TRACE_ARRAY)	+= ftrace/
-+subdir-$(CONFIG_SAMPLE_UHID)		+= uhid
- obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
- obj-y					+= vfio-mdev/
- subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
-diff --git a/samples/uhid/.gitignore b/samples/uhid/.gitignore
-new file mode 100644
-index 000000000000..0e0a5a929f5d
---- /dev/null
-+++ b/samples/uhid/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+/uhid-example
-diff --git a/samples/uhid/Makefile b/samples/uhid/Makefile
-index 5f44ea40d6d5..9e652fc34103 100644
---- a/samples/uhid/Makefile
-+++ b/samples/uhid/Makefile
-@@ -1,8 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
--# List of programs to build
--hostprogs := uhid-example
-+userprogs := uhid-example
-+always-y := $(userprogs)
+-HOSTCFLAGS_bpf-fancy.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_bpf-fancy.o += -idirafter $(objtree)/include
+-HOSTCFLAGS_bpf-helper.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_bpf-helper.o += -idirafter $(objtree)/include
+ bpf-fancy-objs := bpf-fancy.o bpf-helper.o
  
--# Tell kbuild to always build the programs
--always-y := $(hostprogs)
--
--HOSTCFLAGS_uhid-example.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_dropper.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_dropper.o += -idirafter $(objtree)/include
+-dropper-objs := dropper.o
 +userccflags += -I usr/include
+ 
+-HOSTCFLAGS_bpf-direct.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_bpf-direct.o += -idirafter $(objtree)/include
+-bpf-direct-objs := bpf-direct.o
+-
+-HOSTCFLAGS_user-trap.o += -I$(objtree)/usr/include
+-HOSTCFLAGS_user-trap.o += -idirafter $(objtree)/include
+-user-trap-objs := user-trap.o
+-
+-# Try to match the kernel target.
+-ifndef CONFIG_64BIT
+-
+-# s390 has -m31 flag to build 31 bit binaries
+-ifndef CONFIG_S390
+-MFLAG = -m32
+-else
+-MFLAG = -m31
+-endif
+-
+-HOSTCFLAGS_bpf-direct.o += $(MFLAG)
+-HOSTCFLAGS_dropper.o += $(MFLAG)
+-HOSTCFLAGS_bpf-helper.o += $(MFLAG)
+-HOSTCFLAGS_bpf-fancy.o += $(MFLAG)
+-HOSTCFLAGS_user-trap.o += $(MFLAG)
+-HOSTLDLIBS_bpf-direct += $(MFLAG)
+-HOSTLDLIBS_bpf-fancy += $(MFLAG)
+-HOSTLDLIBS_dropper += $(MFLAG)
+-HOSTLDLIBS_user-trap += $(MFLAG)
+-endif
+-always-y := $(hostprogs)
+-endif
++always-y := $(userprogs)
 -- 
 2.25.1
