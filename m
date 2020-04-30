@@ -1,71 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:35227 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726337AbgD3GTF (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Apr 2020 02:19:05 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kconfig: announce removal of 'kvmconfig' and 'xenconfig' shorthands
-Date: Thu, 30 Apr 2020 15:18:45 +0900
-Message-Id: <20200430061845.775144-1-masahiroy@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:36966 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726309AbgD3LRU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 30 Apr 2020 07:17:20 -0400
+Date: Thu, 30 Apr 2020 13:17:15 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: bug: Kbuild seems to require "make prepare-objtool" in order to use
+ (some) new config vars
+Message-ID: <20200430131715.32c1a1f6@coco.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org
 
-kvmconfig' is a shorthand for kvm_guest.config to save 7 character typing.
+Hi Masahiro,
 
-xenconfig' is a shorthand for xen.config to save 1 character typing.
+Not sure if this was already reported (or eventually fixed) upstream.
 
-There is nothing more than that.
+While doing a Kconfig reorg on media, I noticed a few weird things,
+requiring me to call, on a few situations, "make modules_prepare"
+manually after some changes.
 
-There are more files in kernel/configs/, so it is not maintainable
-to wire-up every config fragment to the Kconfig Makefile. Hence,
-we should not do this at all.
+I'm now working on a patchset to yet to be merged upstream aiming to
+resurrect a driver from staging. It is currently on this tree
+(with is based at the media development tree, on the top of 5.7-rc1):
 
-These will be removed after Linux 5.10. Meanwhile, the following
-warning message will be displayed if they are used.
+	https://git.linuxtv.org/mchehab/experimental.git/log/?h=atomisp_v2
 
-WARNING: 'make kvmconfig' will be removed after Linux 5.10
-         Please use 'make kvm_guest.config' instead.
+There, I was able to identify a misbehavior that it is probably
+what forced me to need calling "make modules_prepare".
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+The atomisp driver is on a very bad shape. Among its problems, it has a 
+set of header definitions that should be different for two different
+variants of the supported devices. In order to be able to compile for
+either one of the variants, I added a new config var:
+CONFIG_VIDEO_ATOMISP_ISP2401.
 
- scripts/kconfig/Makefile | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+The problem is that calling just
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 1015abec9e58..30c69e83652b 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -96,11 +96,13 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
- 
- PHONY += kvmconfig
- kvmconfig: kvm_guest.config
--	@:
-+	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
-+	@echo >&2 "         Please use 'make $<' instead."
- 
- PHONY += xenconfig
- xenconfig: xen.config
--	@:
-+	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
-+	@echo >&2 "         Please use 'make $<' instead."
- 
- PHONY += tinyconfig
- tinyconfig:
-@@ -137,9 +139,6 @@ help:
- 	@echo  '  helpnewconfig   - List new options and help text'
- 	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
- 	@echo  '                    default value without prompting'
--	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
--	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
--	@echo  '                    support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
- 	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
- 
--- 
-2.25.1
+	./scripts/config -e CONFIG_VIDEO_ATOMISP_ISP2401
+
+or
+	./scripts/config -d CONFIG_VIDEO_ATOMISP_ISP2401
+
+is not enough anymore for the build to actually use the new config value.
+
+It just keeps silently using the old config value.
+
+I double-checked it by adding this macro at the Makefile:
+
+	$(info ************ ISP2401: $(CONFIG_VIDEO_ATOMISP_ISP2401) ************)
+
+The Makefile doesn't see the change, except if I explicitly call
+"make modules_prepare" or "make prepare-objtool".
+
+Even calling "make oldconfig" doesn't make it use the new CONFIG_*
+value.
+
+Thanks,
+Mauro
