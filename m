@@ -1,92 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.nic.cz ([217.31.204.67]:58688 "EHLO mail.nic.cz"
+Received: from lists.nic.cz ([217.31.204.67]:36504 "EHLO mail.nic.cz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726405AbgEAThP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 May 2020 15:37:15 -0400
+        id S1726045AbgEAWnK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 May 2020 18:43:10 -0400
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>
-Subject: [PATCH v2] dtc: Use better check for libyaml
-Date: Fri,  1 May 2020 21:37:12 +0200
-Message-Id: <20200501193712.18930-1-marek.behun@nic.cz>
-In-Reply-To: <20200501015147.32391-1-marek.behun@nic.cz>
-References: 
+Subject: [PATCH kbuild RFC] kbuild: fix modpost throwing away module symvers when linking vmlinux.o
+Date: Sat,  2 May 2020 00:43:00 +0200
+Message-Id: <20200501224300.1012-1-marek.behun@nic.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org
-Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>, Pavel Modilaynen <pavel.modilaynen@axis.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-The current check for libyaml based on pkg-config may succeed even if
-yaml.h header is missing. Try to determine if header and library are
-present by compiling a simple program.
+If vmlinux.o is rebuilt after modules, the current modpost code throws
+away the information already stored in Module.symvers. This is due to
+commit mentioned in the Fixes tag, which introduced this
+backward-incompatible change which may break ceratin build systems (such
+as that of OpenWRT).
 
-This creates macros hostcc-header and hostcc-symbol in
-scripts/Kbuild.include, which check whether a header file and a library
-symbol are present on host system, by compiling a simple program.
+Add code to look if modules.order is present when doing modpost for
+vmlinux.o, and if it is, include it in modpost.
 
-Fixes: 067c650c456e ("dtc: Use pkg-config to locate libyaml")
+The change introduced here is ugly, therefore this is only a RFC patch.
+Please comment whether fixing this backward-incompatibility is
+acceptable.
+
+Fixes: a721588d9475 ("kbuild: modpost: do not parse unnecessary ...")
 Signed-off-by: Marek Behún <marek.behun@nic.cz>
-Cc: Pavel Modilaynen <pavel.modilaynen@axis.com>
-Cc: Rob Herring <robh+dt@kernel.org>
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
 ---
- scripts/Kbuild.include | 14 ++++++++++++++
- scripts/dtc/Makefile   | 10 ++++++----
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ scripts/Makefile.modpost | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 6cabf20ce66a..33af76aa86c1 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -154,6 +154,20 @@ ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
- # Usage:  $(call ld-ifversion, -ge, 22252, y)
- ld-ifversion = $(shell [ $(ld-version) $(1) $(2) ] && echo $(3) || echo $(4))
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 952fff485546..d1eb4923e21b 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -60,7 +60,12 @@ MODPOST = scripts/mod/modpost						\
+ ifdef MODPOST_VMLINUX
  
-+# hostcc-header
-+# Usage: $(call hostcc-header,header.h,-I/usr/include/libname)
-+# third argument is optional
-+hostcc-header = $(call try-run,					\
-+	{ echo "\#include <$(1)>" ; echo "int main(){}"; } |	\
-+	$(HOSTCC) $(2) -x c - -o /dev/null,y,n)
-+
-+# hostcc-symbol
-+# Usage: $(call hostcc-symbol,symbol_name,-llibname)
-+# third argument is optional
-+hostcc-symbol = $(call try-run,				\
-+	echo "void $(1)();int main(){$(1)();}" |	\
-+	$(HOSTCC) -x c - -o /dev/null $(2),y,n)
-+
- ######
- 
- ###
-diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
-index ef85f8b7d4a7..d04c03b0899d 100644
---- a/scripts/dtc/Makefile
-+++ b/scripts/dtc/Makefile
-@@ -12,15 +12,17 @@ dtc-objs	+= dtc-lexer.lex.o dtc-parser.tab.o
- # Source files need to get at the userspace version of libfdt_env.h to compile
- HOST_EXTRACFLAGS := -I $(srctree)/$(src)/libfdt
- 
--ifeq ($(shell pkg-config --exists yaml-0.1 2>/dev/null && echo yes),)
-+_yaml_libs = $(shell pkg-config --libs yaml-0.1 2>/dev/null)
-+ifeq ($(call hostcc-header,yaml.h)$(call hostcc-symbol,yaml_get_version,\
-+				    $(_yaml_libs)),yy)
-+dtc-objs	+= yamltree.o
-+HOSTLDLIBS_dtc	:= $(_yaml_libs)
+ quiet_cmd_modpost = MODPOST vmlinux.o
++ifeq ($(wildcard $(MODORDER)),)
+       cmd_modpost = $(MODPOST) vmlinux.o
 +else
- ifneq ($(CHECK_DT_BINDING)$(CHECK_DTBS),)
- $(error dtc needs libyaml for DT schema validation support. \
- 	Install the necessary libyaml development package.)
- endif
- HOST_EXTRACFLAGS += -DNO_YAML
--else
--dtc-objs	+= yamltree.o
--HOSTLDLIBS_dtc	:= $(shell pkg-config yaml-0.1 --libs)
- endif
++MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T -
++      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) vmlinux.o
++endif
  
- # Generated files need one more search path to include headers in source tree
+ __modpost:
+ 	$(call cmd,modpost)
 -- 
 2.24.1
