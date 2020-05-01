@@ -1,106 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:62324 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727889AbgEAD2R (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:37858 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726452AbgEAFfD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Apr 2020 23:28:17 -0400
+        Fri, 1 May 2020 01:35:03 -0400
 MIME-Version: 1.0
-References: <20200430131715.32c1a1f6@coco.lan> <CAK7LNASmVoZequqaj6MTimeZ0MG0fk7Wb5-9haFhgG03kDBpxg@mail.gmail.com>
- <20200430184948.27191975@coco.lan> <CAK7LNASx5qfV_6Wow-MVKsHXUX96m8yYvpeK1QVt+2i46FTMNg@mail.gmail.com>
- <20200430211009.3fef03f3@coco.lan> <20200430212511.2115ed98@coco.lan>
-In-Reply-To: <20200430212511.2115ed98@coco.lan>
+References: <20200423142354.312088-1-masahiroy@kernel.org>
+In-Reply-To: <20200423142354.312088-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 1 May 2020 12:27:19 +0900
-Message-ID: <CAK7LNARA2+S5mjzRucvdJ-zQo6UEAuNi9npJvJB+JcVgh+d_3w@mail.gmail.com>
-Subject: Re: [PATCH RFC] Kbuild: Makefile: warn if auto.conf is obsolete
+Date: Fri, 1 May 2020 14:34:11 +0900
+Message-ID: <CAK7LNAQH07KvoCgv5B8jUs+EUsJ167omM1U2AWHKdaAB+nAMCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] kbuild: use $(CC_VERSION_TEXT) to evaluate
+ CC_IS_GCC and CC_IS_CLANG
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Media Mailing List <linux-media@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, May 1, 2020 at 4:25 AM Mauro Carvalho Chehab
-<mchehab+huawei@kernel.org> wrote:
+On Thu, Apr 23, 2020 at 11:24 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> A new behavior on more recent kernels require to always call
-> "make modules_prepare" after *any* Kconfig changes.
-
-
-Again, this is the behavior since 2004.
-
-This commit:
-https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=95065ad3fa787c417008a36d3a5d9a3bab17ab98
-
-
-Shrug if you complain about what has been stable
-more than 15 years.
-
-
-> This is not what a poor mortal would be expecting on a building
-> system, as it should, IMHO, be able to detect and auto-run
-> whatever is needed to use the newer setup.
-
-No. External module builds should never ever attempt to update
-in-tree files.
-
-This is because the build environment for external modules
-is usually located in /lib/modules/$(uname -r)/build/,
-which is read-only.
-
-
-A number of upstream developers (ab)use
-M= to compile test individual directories,
-despite the fact Kbuild supports
-the single target 'make drivers/staging/media/stomisp/'
-
-
-
-You need to cope with this conflicting comment line:
-https://github.com/masahir0y/linux/blob/v5.6/Makefile#L681
-since you care if auto.conf is up-to-date.
-
-
-
-
-
-> Yet, while this is not solved, let's at least stop the build
-> and produce a warning, to notify the user about that.
+> The result of '$(CC) --version | head -n 1' is already computed by the
+> top Makefile, and stored in the environment variable, CC_VERSION_TEXT.
 >
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> 'echo' is probably less expensive than the two commands $(CC) and
+> 'head' although this optimization is not noticeable level.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Applied to linux-kbuild.
+
+
+
 > ---
 >
-> I would still prefer to call "make modules_prepare" directly,
-> on such cases, but just calling "make -C . modules_prepare" doesn't
-> work. So, the next best thing would be to at least print a message
-> and don't try to do a build with a broken auto.conf file.
+> Changes in v2:
+>   - new patch
 >
->  Makefile | 5 +++++
->  1 file changed, 5 insertions(+)
+>  init/Kconfig | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/Makefile b/Makefile
-> index 70def4907036..492ee2396ab9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1632,6 +1632,11 @@ $(objtree)/Module.symvers:
->  build-dirs := $(KBUILD_EXTMOD)
->  PHONY += modules
->  modules: descend $(objtree)/Module.symvers
-> +       @if [ $(KCONFIG_CONFIG) -nt include/config/auto.conf ]; then \
-> +               echo "  WARNING: $(KCONFIG_CONFIG) was modified. Need to run:"; \
-> +               echo "           $(MAKE) modules_prepare"; \
-> +               exit -1; \
-> +       fi
->         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 9e22ee8fbd75..5f797df3f043 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -9,7 +9,7 @@ config DEFCONFIG_LIST
+>         default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
 >
->  PHONY += modules_install
+>  config CC_IS_GCC
+> -       def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
+> +       def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
+>
+>  config GCC_VERSION
+>         int
+> @@ -21,7 +21,7 @@ config LD_VERSION
+>         default $(shell,$(LD) --version | $(srctree)/scripts/ld-version.sh)
+>
+>  config CC_IS_CLANG
+> -       def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
+> +       def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q clang)
+>
+>  config CLANG_VERSION
+>         int
+> --
+> 2.25.1
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200423142354.312088-1-masahiroy%40kernel.org.
 
 
 
-
-
-
-
-
---
+-- 
 Best Regards
 Masahiro Yamada
