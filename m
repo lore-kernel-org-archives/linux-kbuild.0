@@ -1,77 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:59735 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbgEAFiF (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:26606 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726452AbgEAFn2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 May 2020 01:38:05 -0400
+        Fri, 1 May 2020 01:43:28 -0400
 MIME-Version: 1.0
-References: <20200427141251.154129-1-masahiroy@kernel.org>
-In-Reply-To: <20200427141251.154129-1-masahiroy@kernel.org>
+References: <20200427003019.2401592-1-masahiroy@kernel.org> <20200427080600.GC11787@willie-the-truck>
+In-Reply-To: <20200427080600.GC11787@willie-the-truck>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 1 May 2020 14:37:07 +0900
-Message-ID: <CAK7LNAQq6Z4Czf56EF02oA1JnFvrv=hwnPraxkfP+80hLQuqCw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: determine the output format of DTC by the target suffix
+Date: Fri, 1 May 2020 14:42:36 +0900
+Message-ID: <CAK7LNAT-O6C0WO3d0bx+sWCzJF5YmOVcnPYMFMX0wTz6y+C0pA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove unused AS assignment
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Rob Herring <robh+dt@kernel.org>, DTML <devicetree@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, Joel Stanley <joel@jms.id.au>, Linus Walleij <linus.walleij@linaro.org>, Nathan Chancellor <natechancellor@gmail.com>, Nathan Huckleberry <nhuck15@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Russell King <linux@armlinux.org.uk>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Apr 27, 2020 at 11:13 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Mon, Apr 27, 2020 at 5:06 PM Will Deacon <will@kernel.org> wrote:
 >
-> cmd_dtc takes the additional parameter $(2) to select the target
-> format, dtb or yaml. This makes things complicated when it is used
-> with cmd_and_fixdep and if_changed_rule. I actually stumbled on this.
-> See commit 3d4b2238684a ("kbuild: fix DT binding schema rule again to
-> avoid needless rebuilds").
+> On Mon, Apr 27, 2020 at 09:30:19AM +0900, Masahiro Yamada wrote:
+> > $(AS) is not used anywhere, hence commit aa824e0c962b ("kbuild: remove
+> > AS variable") killed it.
+> >
+> > Remove the left-over code in arch/{arm,arm64}/Makefile.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  arch/arm/Makefile   | 2 --
+> >  arch/arm64/Makefile | 2 --
+> >  2 files changed, 4 deletions(-)
 >
-> Extract the suffix part of the target instead of passing the parameter.
-> Fortunately, this works for both $(obj)/%.dtb and $(obj)/%.dt.yaml .
+> Acked-by: Will Deacon <will@kernel.org>
 >
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> (If you post the arm64 part as a separate patch, I can pick it up)
 
+
+This is just a trivial cleanup patch.
+So, I do not split it per-arch.
 
 
 Applied to linux-kbuild.
-
-
-> ---
->
->  scripts/Makefile.lib | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 12f6a331a8f3..cd52a8c6428f 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -287,13 +287,13 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
->  quiet_cmd_dtc = DTC     $@
->  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
->         $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-> -       $(DTC) -O $(2) -o $@ -b 0 \
-> +       $(DTC) -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
->                 $(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
->                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
->         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
->
->  $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
-> -       $(call if_changed_dep,dtc,dtb)
-> +       $(call if_changed_dep,dtc)
->
->  DT_CHECKER ?= dt-validate
->  DT_BINDING_DIR := Documentation/devicetree/bindings
-> @@ -304,7 +304,7 @@ quiet_cmd_dtb_check =       CHECK   $@
->        cmd_dtb_check =  $(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
->
->  define rule_dtc
-> -       $(call cmd_and_fixdep,dtc,yaml)
-> +       $(call cmd_and_fixdep,dtc)
->         $(call cmd,dtb_check)
->  endef
->
-> --
-> 2.25.1
->
 
 
 -- 
