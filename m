@@ -1,75 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:37858 "EHLO
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:39466 "EHLO
         conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbgEAFfD (ORCPT
+        with ESMTP id S1726452AbgEAFfy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 May 2020 01:35:03 -0400
+        Fri, 1 May 2020 01:35:54 -0400
 MIME-Version: 1.0
-References: <20200423142354.312088-1-masahiroy@kernel.org>
-In-Reply-To: <20200423142354.312088-1-masahiroy@kernel.org>
+References: <20200425051816.791423-1-masahiroy@kernel.org>
+In-Reply-To: <20200425051816.791423-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Fri, 1 May 2020 14:34:11 +0900
-Message-ID: <CAK7LNAQH07KvoCgv5B8jUs+EUsJ167omM1U2AWHKdaAB+nAMCQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] kbuild: use $(CC_VERSION_TEXT) to evaluate
- CC_IS_GCC and CC_IS_CLANG
+Date: Fri, 1 May 2020 14:34:52 +0900
+Message-ID: <CAK7LNASMbv2cyEyjZCuXM3emmOOkwGwTreKyx-XzjU4vbt0Pjw@mail.gmail.com>
+Subject: Re: [PATCH] h8300: suppress error messages for 'make clean'
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: clang-built-linux <clang-built-linux@googlegroups.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, "moderated list:H8/300 ARCHITECTURE" <uclinux-h8-devel@lists.sourceforge.jp>
 
-On Thu, Apr 23, 2020 at 11:24 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Sat, Apr 25, 2020 at 2:18 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> The result of '$(CC) --version | head -n 1' is already computed by the
-> top Makefile, and stored in the environment variable, CC_VERSION_TEXT.
+> 'make ARCH=h8300 clean' emits error messages as follows:
 >
-> 'echo' is probably less expensive than the two commands $(CC) and
-> 'head' although this optimization is not noticeable level.
+>   $ make ARCH=h8300 clean
+>   gcc: error: missing argument to '-Wframe-larger-than='
+>   gcc: error: unrecognized command line option '-mint32'
+>
+> You can suppress the second one by setting the correct CROSS_COMPILE=,
+> but we should not require any compiler for cleaning.
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+
 
 Applied to linux-kbuild.
 
 
-
-> ---
 >
-> Changes in v2:
->   - new patch
+>  arch/h8300/boot/compressed/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->  init/Kconfig | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/arch/h8300/boot/compressed/Makefile b/arch/h8300/boot/compressed/Makefile
+> index 9e2701069bbe..5942793f77a0 100644
+> --- a/arch/h8300/boot/compressed/Makefile
+> +++ b/arch/h8300/boot/compressed/Makefile
+> @@ -18,7 +18,7 @@ CONFIG_MEMORY_START     ?= 0x00400000
+>  CONFIG_BOOT_LINK_OFFSET ?= 0x00280000
+>  IMAGE_OFFSET := $(shell printf "0x%08x" $$(($(CONFIG_MEMORY_START)+$(CONFIG_BOOT_LINK_OFFSET))))
 >
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 9e22ee8fbd75..5f797df3f043 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -9,7 +9,7 @@ config DEFCONFIG_LIST
->         default "arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)"
+> -LIBGCC := $(shell $(CROSS-COMPILE)$(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name)
+> +LIBGCC := $(shell $(CROSS-COMPILE)$(CC) $(KBUILD_CFLAGS) -print-libgcc-file-name 2>/dev/null)
+>  LDFLAGS_vmlinux := -Ttext $(IMAGE_OFFSET) -estartup -T $(obj)/vmlinux.lds \
+>         --defsym output=$(CONFIG_MEMORY_START)
 >
->  config CC_IS_GCC
-> -       def_bool $(success,$(CC) --version | head -n 1 | grep -q gcc)
-> +       def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
->
->  config GCC_VERSION
->         int
-> @@ -21,7 +21,7 @@ config LD_VERSION
->         default $(shell,$(LD) --version | $(srctree)/scripts/ld-version.sh)
->
->  config CC_IS_CLANG
-> -       def_bool $(success,$(CC) --version | head -n 1 | grep -q clang)
-> +       def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q clang)
->
->  config CLANG_VERSION
->         int
 > --
 > 2.25.1
 >
-> --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200423142354.312088-1-masahiroy%40kernel.org.
-
 
 
 -- 
