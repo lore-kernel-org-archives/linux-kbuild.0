@@ -1,60 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58630 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728020AbgEBObL (ORCPT
+        with ESMTP id S1728193AbgEBPbH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 May 2020 10:31:11 -0400
-Date: Sat, 2 May 2020 14:31:08 +0000
+        Sat, 2 May 2020 11:31:07 -0400
 From: Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH] streamline_config.pl: add LOCALMODCONFIG_PRESERVE to
- preserve some kconfigs
-Message-ID: <20200502143106.7cpbots6oriib26v@mail.google.com>
-References: <20200501023708.108830-1-changbin.du@gmail.com>
- <20200501130729.3a3e4994@gandalf.local.home>
- <20200502133054.gx77eoas7u7gnxxm@mail.google.com>
- <20200502094024.6142a04e@oasis.local.home>
+Subject: [PATCH v3] streamline_config.pl: add LMC_KEEP to preserve some kconfigs
+Date: Sat,  2 May 2020 23:30:52 +0800
+Message-Id: <20200502153052.5461-1-changbin.du@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200502094024.6142a04e@oasis.local.home>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Changbin Du <changbin.du@gmail.com>
 
-Hi, Steven,
-On Sat, May 02, 2020 at 09:40:24AM -0400, Steven Rostedt wrote:
-> On Sat, 2 May 2020 21:30:54 +0800
-> Changbin Du <changbin.du@gmail.com> wrote:
-> 
-> > > > Sometimes it is useful to preserve batches of configs when making
-> > > > localmodconfig. For example, I usually don't want any usb and fs
-> > > > modules to be disabled. Now we can do it by:
-> > > > 
-> > > >  $ make LOCALMODCONFIG_PRESERVE="drivers/usb;fs" localmodconfig  
-> > > 
-> > > That's too much typing ;-) What about just "KEEP='drivers/usb;fs'"?
-> > >  
-> > I think we'd better use a long name since it will be passed to the entire kbuild.
-> > And we alreay have one named LOCALMODCONFIG_DEBUG. The prefix LOCALMODCONFIG_
-> > can help to avoid namespace pollution.
-> 
-> I politely disagree. Build options is not common. The
-> LOCALMODCONFIG_DEBUG is an environment variable, which I couldn't just
-> use DEBUG.
-> 
-This is what I am worried about since LOCALMODCONFIG_PRESERVE also is an
-environment variable. A short name possibly overwrite internal kbuild
-variables.
+Sometimes it is useful to preserve batches of configs when making
+localmodconfig. For example, I usually don't want any usb and fs
+modules to be disabled. Now we can do it by:
 
-> If you absolutely require a prefix, shorten it to LMC_ or something. I
-> already hate typing 'localmodconfig' once ;-)
-> 
-I undstand your pain. This why I never type 'localmodconfig' but copy it
-from 'make help' :). Maybe we can get more inputs from others.
+ $ make LMC_KEEP="drivers/usb;fs" localmodconfig
 
-> -- Steve
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
 
+---
+v3: rename LOCALMODCONFIG_PRESERVE to shorter LMC_KEEP.
+v2: fix typo in documentation. (Randy Dunlap)
+---
+ Documentation/admin-guide/README.rst |  8 +++++++-
+ scripts/kconfig/Makefile             |  1 +
+ scripts/kconfig/streamline_config.pl | 23 +++++++++++++++++++++++
+ 3 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+index cc6151fc0845..f7b02ce61ea7 100644
+--- a/Documentation/admin-guide/README.rst
++++ b/Documentation/admin-guide/README.rst
+@@ -209,10 +209,16 @@ Configuring the kernel
+                            store the lsmod of that machine into a file
+                            and pass it in as a LSMOD parameter.
+ 
++                           Also, you can preserve modules in certain folders
++                           or kconfig files by spcifying their paths in
++                           parameter LMC_KEEP.
++
+                    target$ lsmod > /tmp/mylsmod
+                    target$ scp /tmp/mylsmod host:/tmp
+ 
+-                   host$ make LSMOD=/tmp/mylsmod localmodconfig
++                   host$ make LSMOD=/tmp/mylsmod \
++                           LMC_KEEP="drivers/usb;drivers/gpu;fs" \
++                           localmodconfig
+ 
+                            The above also works when cross compiling.
+ 
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index c9d0a4a8efb3..e0abbf5805f5 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -123,6 +123,7 @@ help:
+ 	@echo  '  gconfig	  - Update current config utilising a GTK+ based front-end'
+ 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
+ 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
++	@echo  '                    except those preserved by LMC_KEEP environment variable'
+ 	@echo  '  localyesconfig  - Update current config converting local mods to core'
+ 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
+ 	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index e2f8504f5a2d..f3a2ceed1e82 100755
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -143,6 +143,7 @@ my %depends;
+ my %selects;
+ my %prompts;
+ my %objects;
++my %config2kfile;
+ my $var;
+ my $iflevel = 0;
+ my @ifdeps;
+@@ -201,6 +202,7 @@ sub read_kconfig {
+ 	if (/^\s*(menu)?config\s+(\S+)\s*$/) {
+ 	    $state = "NEW";
+ 	    $config = $2;
++	    $config2kfile{"CONFIG_$config"} = $kconfig;
+ 
+ 	    # Add depends for 'if' nesting
+ 	    for (my $i = 0; $i < $iflevel; $i++) {
+@@ -592,6 +594,22 @@ while ($repeat) {
+ 
+ my %setconfigs;
+ 
++my @presevered_kconfigs;
++@presevered_kconfigs = split(/;/,$ENV{LMC_KEEP}) if (defined($ENV{LMC_KEEP}));
++
++sub in_presevered_kconfigs {
++    my $kconfig = $config2kfile{$_[0]};
++    if (!defined($kconfig)) {
++        return 0;
++    }
++    foreach my $excl (@presevered_kconfigs) {
++        if($kconfig =~ /^$excl/) {
++            return 1;
++        }
++    }
++    return 0;
++}
++
+ # Finally, read the .config file and turn off any module enabled that
+ # we could not find a reason to keep enabled.
+ foreach my $line (@config_file) {
+@@ -644,6 +662,11 @@ foreach my $line (@config_file) {
+     }
+ 
+     if (/^(CONFIG.*)=(m|y)/) {
++        if (in_presevered_kconfigs($1)) {
++            dprint "Preserve config $1";
++            print;
++            next;
++        }
+ 	if (defined($configs{$1})) {
+ 	    if ($localyesconfig) {
+ 	        $setconfigs{$1} = 'y';
 -- 
-Cheers,
-Changbin Du
+2.25.1
