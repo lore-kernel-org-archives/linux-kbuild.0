@@ -1,57 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.nic.cz ([217.31.204.67]:36504 "EHLO mail.nic.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726045AbgEAWnK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 May 2020 18:43:10 -0400
-From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>
-Subject: [PATCH kbuild RFC] kbuild: fix modpost throwing away module symvers when linking vmlinux.o
-Date: Sat,  2 May 2020 00:43:00 +0200
-Message-Id: <20200501224300.1012-1-marek.behun@nic.cz>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727902AbgEBN0a (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 2 May 2020 09:26:30 -0400
+Date: Sat, 2 May 2020 21:26:20 +0800
+From: Changbin Du <changbin.du@gmail.com>
+Subject: Re: [PATCH] streamline_config.pl: add LOCALMODCONFIG_PRESERVE to
+ preserve some kconfigs
+Message-ID: <20200502132620.z6bo66ypc65eukge@mail.google.com>
+References: <20200501023708.108830-1-changbin.du@gmail.com>
+ <07f3fe15-ae8d-c11a-c29f-ed9c51c2addc@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07f3fe15-ae8d-c11a-c29f-ed9c51c2addc@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-If vmlinux.o is rebuilt after modules, the current modpost code throws
-away the information already stored in Module.symvers. This is due to
-commit mentioned in the Fixes tag, which introduced this
-backward-incompatible change which may break ceratin build systems (such
-as that of OpenWRT).
+On Fri, May 01, 2020 at 09:51:17AM -0700, Randy Dunlap wrote:
+> On 4/30/20 7:37 PM, Changbin Du wrote:
+> > Sometimes it is useful to preserve batches of configs when making
+> > localmodconfig. For example, I usually don't want any usb and fs
+> > modules to be disabled. Now we can do it by:
+> > 
+> >  $ make LOCALMODCONFIG_PRESERVE="drivers/usb;fs" localmodconfig
+> > 
+> > Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> > ---
+> >  Documentation/admin-guide/README.rst |  8 +++++++-
+> >  scripts/kconfig/streamline_config.pl | 23 +++++++++++++++++++++++
+> >  2 files changed, 30 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+> > index cc6151fc0845..6deff95362f8 100644
+> > --- a/Documentation/admin-guide/README.rst
+> > +++ b/Documentation/admin-guide/README.rst
+> > @@ -209,10 +209,16 @@ Configuring the kernel
+> >                             store the lsmod of that machine into a file
+> >                             and pass it in as a LSMOD parameter.
+> >  
+> > +                           Also, you can preserve modules in certen folders
+> 
+> typo:                                                           certain
+> 
+> > +                           or kconfig files by spcifying there paths in
+> 
+> again:                                            specifying their
+> 
+Thank you, I will fix them.
 
-Add code to look if modules.order is present when doing modpost for
-vmlinux.o, and if it is, include it in modpost.
+> > +                           parameter LOCALMODCONFIG_PRESERVE.
+> > +
+> >                     target$ lsmod > /tmp/mylsmod
+> >                     target$ scp /tmp/mylsmod host:/tmp
+> >  
+> > -                   host$ make LSMOD=/tmp/mylsmod localmodconfig
+> > +                   host$ make LSMOD=/tmp/mylsmod \
+> > +                           LOCALMODCONFIG_PRESERVE="drivers/usb;drivers/gpu;fs" \
+> > +                           localmodconfig
+> >  
+> >                             The above also works when cross compiling.
+> >  
+> > diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> > index e2f8504f5a2d..ab5d1e10a5d0 100755
+> > --- a/scripts/kconfig/streamline_config.pl
+> > +++ b/scripts/kconfig/streamline_config.pl
+> > @@ -143,6 +143,7 @@ my %depends;
+> >  my %selects;
+> >  my %prompts;
+> >  my %objects;
+> > +my %config2kfile;
+> >  my $var;
+> >  my $iflevel = 0;
+> >  my @ifdeps;
+> > @@ -201,6 +202,7 @@ sub read_kconfig {
+> >  	if (/^\s*(menu)?config\s+(\S+)\s*$/) {
+> >  	    $state = "NEW";
+> >  	    $config = $2;
+> > +	    $config2kfile{"CONFIG_$config"} = $kconfig;
+> >  
+> >  	    # Add depends for 'if' nesting
+> >  	    for (my $i = 0; $i < $iflevel; $i++) {
+> > @@ -592,6 +594,22 @@ while ($repeat) {
+> >  
+> >  my %setconfigs;
+> >  
+> > +my @presevered_kconfigs;
+> > +@presevered_kconfigs = split(/;/,$ENV{LOCALMODCONFIG_PRESERVE}) if (defined($ENV{LOCALMODCONFIG_PRESERVE}));
+> > +
+> > +sub in_presevered_kconfigs {
+> > +    my $kconfig = $config2kfile{$_[0]};
+> > +    if (!defined($kconfig)) {
+> > +        return 0;
+> > +    }
+> > +    foreach my $excl (@presevered_kconfigs) {
+> > +        if($kconfig =~ /^$excl/) {
+> > +            return 1;
+> > +        }
+> > +    }
+> > +    return 0;
+> > +}
+> > +
+> >  # Finally, read the .config file and turn off any module enabled that
+> >  # we could not find a reason to keep enabled.
+> >  foreach my $line (@config_file) {
+> > @@ -644,6 +662,11 @@ foreach my $line (@config_file) {
+> >      }
+> >  
+> >      if (/^(CONFIG.*)=(m|y)/) {
+> > +        if (in_presevered_kconfigs($1)) {
+> > +            dprint "Preserve config $1";
+> > +            print;
+> > +            next;
+> > +        }
+> >  	if (defined($configs{$1})) {
+> >  	    if ($localyesconfig) {
+> >  	        $setconfigs{$1} = 'y';
+> > 
+> 
+> 
+> -- 
+> ~Randy
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
 
-The change introduced here is ugly, therefore this is only a RFC patch.
-Please comment whether fixing this backward-incompatibility is
-acceptable.
-
-Fixes: a721588d9475 ("kbuild: modpost: do not parse unnecessary ...")
-Signed-off-by: Marek Behún <marek.behun@nic.cz>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>
----
- scripts/Makefile.modpost | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 952fff485546..d1eb4923e21b 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -60,7 +60,12 @@ MODPOST = scripts/mod/modpost						\
- ifdef MODPOST_VMLINUX
- 
- quiet_cmd_modpost = MODPOST vmlinux.o
-+ifeq ($(wildcard $(MODORDER)),)
-       cmd_modpost = $(MODPOST) vmlinux.o
-+else
-+MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T -
-+      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) vmlinux.o
-+endif
- 
- __modpost:
- 	$(call cmd,modpost)
 -- 
-2.24.1
+Cheers,
+Changbin Du
