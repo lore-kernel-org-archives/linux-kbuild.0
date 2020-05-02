@@ -1,32 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727902AbgEBN0a (ORCPT
+        with ESMTP id S1727791AbgEBNbF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 May 2020 09:26:30 -0400
-Date: Sat, 2 May 2020 21:26:20 +0800
+        Sat, 2 May 2020 09:31:05 -0400
+Date: Sat, 2 May 2020 21:30:54 +0800
 From: Changbin Du <changbin.du@gmail.com>
 Subject: Re: [PATCH] streamline_config.pl: add LOCALMODCONFIG_PRESERVE to
  preserve some kconfigs
-Message-ID: <20200502132620.z6bo66ypc65eukge@mail.google.com>
+Message-ID: <20200502133054.gx77eoas7u7gnxxm@mail.google.com>
 References: <20200501023708.108830-1-changbin.du@gmail.com>
- <07f3fe15-ae8d-c11a-c29f-ed9c51c2addc@infradead.org>
+ <20200501130729.3a3e4994@gandalf.local.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <07f3fe15-ae8d-c11a-c29f-ed9c51c2addc@infradead.org>
+In-Reply-To: <20200501130729.3a3e4994@gandalf.local.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Changbin Du <changbin.du@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, May 01, 2020 at 09:51:17AM -0700, Randy Dunlap wrote:
-> On 4/30/20 7:37 PM, Changbin Du wrote:
+On Fri, May 01, 2020 at 01:07:29PM -0400, Steven Rostedt wrote:
+> On Fri,  1 May 2020 10:37:08 +0800
+> Changbin Du <changbin.du@gmail.com> wrote:
+> 
 > > Sometimes it is useful to preserve batches of configs when making
 > > localmodconfig. For example, I usually don't want any usb and fs
 > > modules to be disabled. Now we can do it by:
 > > 
 > >  $ make LOCALMODCONFIG_PRESERVE="drivers/usb;fs" localmodconfig
+> 
+> That's too much typing ;-) What about just "KEEP='drivers/usb;fs'"?
+>
+I think we'd better use a long name since it will be passed to the entire kbuild.
+And we alreay have one named LOCALMODCONFIG_DEBUG. The prefix LOCALMODCONFIG_
+can help to avoid namespace pollution.
+
+> 
 > > 
 > > Signed-off-by: Changbin Du <changbin.du@gmail.com>
 > > ---
@@ -43,15 +53,7 @@ On Fri, May 01, 2020 at 09:51:17AM -0700, Randy Dunlap wrote:
 > >                             and pass it in as a LSMOD parameter.
 > >  
 > > +                           Also, you can preserve modules in certen folders
-> 
-> typo:                                                           certain
-> 
 > > +                           or kconfig files by spcifying there paths in
-> 
-> again:                                            specifying their
-> 
-Thank you, I will fix them.
-
 > > +                           parameter LOCALMODCONFIG_PRESERVE.
 > > +
 > >                     target$ lsmod > /tmp/mylsmod
@@ -119,12 +121,10 @@ Thank you, I will fix them.
 > >  	if (defined($configs{$1})) {
 > >  	    if ($localyesconfig) {
 > >  	        $setconfigs{$1} = 'y';
-> > 
 > 
+> I'll have to test it out, but I like the idea!
 > 
-> -- 
-> ~Randy
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> -- Steve
 
 -- 
 Cheers,
