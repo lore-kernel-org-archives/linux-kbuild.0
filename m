@@ -1,126 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726291AbgECALv (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:56759 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726282AbgEDCHz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 May 2020 20:11:51 -0400
-From: Changbin Du <changbin.du@gmail.com>
-Subject: [PATCH v4] streamline_config.pl: add LMC_KEEP to preserve some kconfigs
-Date: Sun,  3 May 2020 08:11:41 +0800
-Message-Id: <20200503001141.9647-1-changbin.du@gmail.com>
+        Sun, 3 May 2020 22:07:55 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 1/2] kbuild: use separate commands for generating *.dtb and *.dt.yaml
+Date: Mon,  4 May 2020 11:06:50 +0900
+Message-Id: <20200504020651.37031-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Changbin Du <changbin.du@gmail.com>
+To: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?q?Marek=20Beh=8F=AB=E2n?= <marek.behun@nic.cz>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-Sometimes it is useful to preserve batches of configs when making
-localmodconfig. For example, I usually don't want any usb and fs
-modules to be disabled. Now we can do it by:
+Currently, cmd_dtc takes $(2) to select the target format. The
+additional parameter complicates things when it is used with
+cmd_and_fixdep and if_changed_rule.
 
- $ make LMC_KEEP="drivers/usb;fs" localmodconfig
+To make it easier to understand, use a separate cmd_dtc_yaml.
 
-Signed-off-by: Changbin Du <changbin.du@gmail.com>
+One visible change is, 'DTCYAML' is used for the log when compiling
+*.dts to *.dt.yaml.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
-v4: fix typo.
-v3: rename LOCALMODCONFIG_PRESERVE to shorter LMC_KEEP.
-v2: fix typo in documentation. (Randy Dunlap)
----
- Documentation/admin-guide/README.rst |  8 +++++++-
- scripts/kconfig/Makefile             |  1 +
- scripts/kconfig/streamline_config.pl | 23 +++++++++++++++++++++++
- 3 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
-index cc6151fc0845..1371deab8bc7 100644
---- a/Documentation/admin-guide/README.rst
-+++ b/Documentation/admin-guide/README.rst
-@@ -209,10 +209,16 @@ Configuring the kernel
-                            store the lsmod of that machine into a file
-                            and pass it in as a LSMOD parameter.
+ scripts/Makefile.lib | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 4b799737722c..8f9f2abf3d67 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -284,32 +284,37 @@ cmd_dt_S_dtb=						\
+ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+ 	$(call if_changed,dt_S_dtb)
  
-+                           Also, you can preserve modules in certain folders
-+                           or kconfig files by specifying their paths in
-+                           parameter LMC_KEEP.
+-quiet_cmd_dtc = DTC     $@
+-cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
++__cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
+ 	$(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+-	$(DTC) -O $(2) -o $@ -b 0 \
++	$(DTC) -O $(1) -o $@ -b 0 \
+ 		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
+ 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
+ 	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
+ 
++quiet_cmd_dtc = DTC     $@
++      cmd_dtc = $(call __cmd_dtc,dtb)
 +
-                    target$ lsmod > /tmp/mylsmod
-                    target$ scp /tmp/mylsmod host:/tmp
+ $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
+-	$(call if_changed_dep,dtc,dtb)
++	$(call if_changed_dep,dtc)
  
--                   host$ make LSMOD=/tmp/mylsmod localmodconfig
-+                   host$ make LSMOD=/tmp/mylsmod \
-+                           LMC_KEEP="drivers/usb;drivers/gpu;fs" \
-+                           localmodconfig
+ DT_CHECKER ?= dt-validate
+ DT_BINDING_DIR := Documentation/devicetree/bindings
+ # DT_TMP_SCHEMA may be overridden from Documentation/devicetree/bindings/Makefile
+ DT_TMP_SCHEMA ?= $(objtree)/$(DT_BINDING_DIR)/processed-schema.yaml
  
-                            The above also works when cross compiling.
- 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index c9d0a4a8efb3..e0abbf5805f5 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -123,6 +123,7 @@ help:
- 	@echo  '  gconfig	  - Update current config utilising a GTK+ based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
-+	@echo  '                    except those preserved by LMC_KEEP environment variable'
- 	@echo  '  localyesconfig  - Update current config converting local mods to core'
- 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
- 	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index e2f8504f5a2d..d26543a807c9 100755
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -143,6 +143,7 @@ my %depends;
- my %selects;
- my %prompts;
- my %objects;
-+my %config2kfile;
- my $var;
- my $iflevel = 0;
- my @ifdeps;
-@@ -201,6 +202,7 @@ sub read_kconfig {
- 	if (/^\s*(menu)?config\s+(\S+)\s*$/) {
- 	    $state = "NEW";
- 	    $config = $2;
-+	    $config2kfile{"CONFIG_$config"} = $kconfig;
- 
- 	    # Add depends for 'if' nesting
- 	    for (my $i = 0; $i < $iflevel; $i++) {
-@@ -592,6 +594,22 @@ while ($repeat) {
- 
- my %setconfigs;
- 
-+my @preserved_kconfigs;
-+@preserved_kconfigs = split(/;/,$ENV{LMC_KEEP}) if (defined($ENV{LMC_KEEP}));
++quiet_cmd_dtc_yaml = DTCYAML $@
++      cmd_dtc_yaml = $(call __cmd_dtc,yaml)
 +
-+sub in_preserved_kconfigs {
-+    my $kconfig = $config2kfile{$_[0]};
-+    if (!defined($kconfig)) {
-+        return 0;
-+    }
-+    foreach my $excl (@preserved_kconfigs) {
-+        if($kconfig =~ /^$excl/) {
-+            return 1;
-+        }
-+    }
-+    return 0;
-+}
-+
- # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
- foreach my $line (@config_file) {
-@@ -644,6 +662,11 @@ foreach my $line (@config_file) {
-     }
+ quiet_cmd_dtb_check =	CHECK   $@
+       cmd_dtb_check =	$(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
  
-     if (/^(CONFIG.*)=(m|y)/) {
-+        if (in_preserved_kconfigs($1)) {
-+            dprint "Preserve config $1";
-+            print;
-+            next;
-+        }
- 	if (defined($configs{$1})) {
- 	    if ($localyesconfig) {
- 	        $setconfigs{$1} = 'y';
+-define rule_dtc
+-	$(call cmd_and_fixdep,dtc,yaml)
++define rule_dtc_yaml
++	$(call cmd_and_fixdep,dtc_yaml)
+ 	$(call cmd,dtb_check)
+ endef
+ 
+ $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
+-	$(call if_changed_rule,dtc,yaml)
++	$(call if_changed_rule,dtc_yaml)
+ 
+ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+ 
 -- 
 2.25.1
