@@ -1,176 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728338AbgEFMwy (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:59652 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbgEFOiZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 May 2020 08:52:54 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D92C061A0F
-        for <linux-kbuild@vger.kernel.org>; Wed,  6 May 2020 05:52:53 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id g4so2236687ljl.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 06 May 2020 05:52:53 -0700 (PDT)
-From: Jukka Kaartinen <jukka.kaartinen@unikie.com>
-Subject: [PATCH 2/2] kconfig: Extend kconfig with setall option
-Date: Wed,  6 May 2020 15:52:36 +0300
-Message-Id: <20200506125236.16415-3-jukka.kaartinen@unikie.com>
-In-Reply-To: <20200506125236.16415-1-jukka.kaartinen@unikie.com>
-References: <20200506125236.16415-1-jukka.kaartinen@unikie.com>
+        Wed, 6 May 2020 10:38:25 -0400
+MIME-Version: 1.0
+References: <cd20b888-7f3d-e7ff-8096-2cc8305a5107@gmail.com>
+In-Reply-To: <cd20b888-7f3d-e7ff-8096-2cc8305a5107@gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 6 May 2020 23:37:34 +0900
+Message-ID: <CAK7LNAR5TsnUn2n2nDFHywQyqCT7si840yE2nyuxx70AYj+nDQ@mail.gmail.com>
+Subject: Re: Proper use for linking foo.o_shipped after 69ea912fda74 ("kbuild:
+ remove unneeded link_multi_deps")?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, lukas.bulwahn@gmail.com, jouni.hogander@unikie.com, dan.carpenter@oracle.com, Jukka Kaartinen <jukka.kaartinen@unikie.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-setall will set all possible dependencies automatically to
-value "y".
+On Wed, May 6, 2020 at 1:45 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
+>
+> Hi Masahiro, Michal,
+>
+> While updating our systems from 4.9 to 5.4, we noticed that one of the
+> kernel modules that we build, which is done by linking an object that we
+> pre-compile out of Kbuild stopped working.
+>
+> I bisected it down to:
+>
+> commit 69ea912fda74a673d330d23595385e5b73e3a2b9 (refs/bisect/bad)
+> Author: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Date:   Thu Oct 4 13:25:19 2018 +0900
+>
+>     kbuild: remove unneeded link_multi_deps
+>
+>     Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
+>     appropriately"), $^ really represents all the prerequisite of the
+>     composite object being built.
+>
+>     Hence, $(filter %.o,$^) contains all the objects to link together,
+>     which is much simpler than link_multi_deps calculation.
+>
+>     Please note $(filter-out FORCE,$^) does not work here. When a single
+>     object module is turned into a multi object module, $^ will contain
+>     header files that were previously included for building the single
+>     object, and recorded in the .*.cmd file. To filter out such headers,
+>     $(filter %.o,$^) should be used here.
+>
+>     Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
+> and the linker now fails with the following:
+>
+> mkdir -p /home/florian/dev/lkm/.tmp_versions ; rm -f
+> /home/florian/dev/lkm/.tmp_versions/*
+>
+>   WARNING: Symbol version dump ./Module.symvers
+>            is missing; modules will have no dependencies and modversions.
+>
+> make -f ./scripts/Makefile.build obj=/home/florian/dev/lkm
+> (cat /dev/null;   echo kernel//home/florian/dev/lkm/hello.ko;) >
+> /home/florian/dev/lkm/modules.order
+>   ld -m elf_x86_64  -z max-page-size=0x200000    -r -o
+> /home/florian/dev/lkm/hello.o
+> ld: no input files
+> make[1]: *** [scripts/Makefile.build:492: /home/florian/dev/lkm/hello.o]
+> Error 1
+> make: *** [Makefile:1530: _module_/home/florian/dev/lkm] Error 2
+>
+> and here are some steps to reproduce this:
+>
+> Kbuild:
+> obj-m   := hello.o
+> hello-y := test.o_shipped
+>
+> test.c can be a simple hello world, and you can compile it using a
+> standard Kbuild file first, and then move test.o as test.o_shipped.
 
-Signed-off-by: Jukka Kaartinen <jukka.kaartinen@unikie.com>
----
- scripts/kconfig/kconfig | 75 ++++++++++++++++++++++++++++++++++-------
- scripts/kconfig/lconf.c | 16 +++++++++
- 2 files changed, 78 insertions(+), 13 deletions(-)
 
-diff --git a/scripts/kconfig/kconfig b/scripts/kconfig/kconfig
-index 2762c8dc04a8..0546ad5a44c1 100755
---- a/scripts/kconfig/kconfig
-+++ b/scripts/kconfig/kconfig
-@@ -2,33 +2,82 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- usage() {
--	echo "kconfig [search|set] string"
-+	echo "kconfig [search|set|setall|val|out] string"
-+	echo "      search         Search config option"
-+	echo "      set            Config option"
-+	echo "      setall         Set all possible dependencies to 'y'"
-+	echo "      val            Value for config option"
-+	echo "      out            Directory for O=<out>"
-+	echo ""
-+	echo " example:"
-+	echo "   $0 set I2C val y"
- 	exit 1;
- }
- 
--if [ "$1" = "" ] ; then
--	usage
--fi
-+search=""
-+search_val=""
-+config=""
-+config_val=""
-+output=""
-+setting=""
-+
-+while [[ $# -gt 0 ]]
-+do
-+	key="$1"
-+	case $key in
-+		search)
-+			search=1
-+			search_val="$2"
-+			shift # past argument
-+			shift # past value
-+			;;
-+		set)
-+			config=1
-+			config_val="$2"
-+			shift # past argument
-+			shift # past value
-+			;;
-+		setall)
-+			all="y"
-+			shift # past argument
-+			;;
-+		val)
-+			setting="$2"
-+			shift # past argument
-+			shift # past value
-+			;;
-+		out)
-+			output="O=$2"
-+			shift # past argument
-+			shift # past value
-+			;;
-+		*)    # unknown option
-+			echo "Unknown option: $1"
-+			usage
-+			exit 1
-+			;;
-+	esac
-+done
- 
--if [ "$1" = "search" ] ; then
-+if [ "$search" != "" ] ; then
- 
--	search=$2
--	NCONFIG_MODE=kconfig_search SEARCH=${search} make lconfig
-+	if [ $search_val = "" ] ; then
-+		echo "nothing to search"
-+		exit 1
-+	fi
- 
--elif [ "$1" = "set" ] ; then
-+	NCONFIG_MODE=kconfig_search SEARCH=${search_val} make lconfig ${output}
- 
--	config=$2
--	setting=$3
-+elif [ "$config" != "" ] ; then
- 
--	if [ $config = "" ] ; then
-+	if [ $config_val = "" ] ; then
- 		echo "nothing to set"
- 		exit 1
- 	fi
- 
--	NCONFIG_MODE=kconfig_set CONFIG=${config} SETTING=${setting} make lconfig
-+	ALLYES=${all} NCONFIG_MODE=kconfig_set CONFIG=${config_val} SETTING=${setting} make lconfig ${output}
- 
- else
- 	usage
- fi
- 
--
-diff --git a/scripts/kconfig/lconf.c b/scripts/kconfig/lconf.c
-index cde717f36eb1..b8634f8f662d 100644
---- a/scripts/kconfig/lconf.c
-+++ b/scripts/kconfig/lconf.c
-@@ -14,6 +14,7 @@
- 
- static int indent;
- static char line[128];
-+static char *ask_from_user;
- 
- static int get_depends(struct symbol *sym);
- 
-@@ -57,6 +58,12 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 		return 0;
- 	}
- 
-+	if (ask_from_user) {
-+		line[0] = 'y';
-+		line[1] = '\0';
-+		return 0;
-+	}
-+
- 	fflush(stdout);
- 	xfgets(line, 128, stdin);
- 
-@@ -232,8 +239,17 @@ static void kconfig_set(void)
- 	struct symbol *sym;
- 	char *config;
- 	char *setting;
-+	char *allyes;
- 	int res;
- 
-+	allyes = getenv("ALLYES");
-+	if (allyes) {
-+		if (strncmp(allyes, "y", 1) == 0) {
-+			ask_from_user = "y";
-+			printf("Set all dependencies to yes.\n");
-+		}
-+	}
-+
- 	config = getenv("CONFIG");
- 	if (!config)
- 		return;
+
+Why don't you do like this?
+
+obj-m   := hello.o
+hello-y := test.o
+
+
+
+
+
+
+
+
+
+
+> I am afraid I do not speak Kbuild fluently enough to recommend a fix for
+> that.
+>
+> Thanks!
+> --
+> Florian
+
+
+
 -- 
-2.17.1
+Best Regards
+Masahiro Yamada
