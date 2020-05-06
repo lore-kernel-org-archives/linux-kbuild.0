@@ -1,89 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:54822 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729757AbgEFSg6 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729477AbgEFWKV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 May 2020 14:36:58 -0400
+        Wed, 6 May 2020 18:10:21 -0400
+Subject: Re: Proper use for linking foo.o_shipped after 69ea912fda74 ("kbuild:
+ remove unneeded link_multi_deps")?
+References: <cd20b888-7f3d-e7ff-8096-2cc8305a5107@gmail.com>
+ <CAK7LNAR5TsnUn2n2nDFHywQyqCT7si840yE2nyuxx70AYj+nDQ@mail.gmail.com>
+ <01279bfe-95a3-dbdb-3785-bd2d92dc4f95@gmail.com>
+ <CAK7LNASKHb5QzD-5d7Vam9t4C1U64_2tTk7eVAmK2oDVquy0MA@mail.gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <365fcf52-8132-24eb-80d0-bb212a3534f1@gmail.com>
+Date: Wed, 6 May 2020 15:10:17 -0700
 MIME-Version: 1.0
-References: <20200505115420.18765-1-anders.roxell@linaro.org>
-In-Reply-To: <20200505115420.18765-1-anders.roxell@linaro.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 7 May 2020 03:36:08 +0900
-Message-ID: <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
-Subject: Re: [PATCH] scripts: fix deprecated always and hostprogs-y
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNASKHb5QzD-5d7Vam9t4C1U64_2tTk7eVAmK2oDVquy0MA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anders Roxell <anders.roxell@linaro.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-
-On Tue, May 5, 2020 at 8:54 PM Anders Roxell <anders.roxell@linaro.org> wrote:
->
-> When I did an allmodconfig build the following warning showed up:
->
-> scripts/Makefile.lib:8: 'always' is deprecated. Please use 'always-y' instead
-> scripts/Makefile.lib:12: 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead
->
-> Rework to use the new 'always-y' and 'hostprogs'.
->
-> Fixes: ee066c3ddf7b ("kbuild: warn if always, hostprogs-y, or hostprogs-m is used")
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-
-
-As Stephen Rothwell reported
-(https://lkml.org/lkml/2020/5/3/392),
-this warning appears by merging the
-two different trees.
-
-
-You sent this patch to the kbuild maintainers,
-but samples/watch_queue/Makefile does not exist
-in the kbuild tree.
-
-
-Also, please drop the fixes tag.
-The commit hash might change.
-
-
-> ---
->  samples/watch_queue/Makefile | 4 ++--
->  scripts/Makefile.build       | 1 -
->  2 files changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
-> index eec00dd0a8df..8511fb6c53d2 100644
-> --- a/samples/watch_queue/Makefile
-> +++ b/samples/watch_queue/Makefile
-> @@ -1,7 +1,7 @@
->  # List of programs to build
-> -hostprogs-y := watch_test
-> +hostprogs := watch_test
->
->  # Tell kbuild to always build the programs
-> -always := $(hostprogs-y)
-> +always-y := $(hostprogs)
->
->  HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 3665b1a0bc8e..abdba70f33a1 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -15,7 +15,6 @@ obj-y :=
->  obj-m :=
->  lib-y :=
->  lib-m :=
-> -always :=
->  always-y :=
->  always-m :=
->  targets :=
-
-
-Why are you deleting 'always'?
-It would immediately break
-the downstream Makefiles immediately.
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
 
 
---
-Best Regards
-Masahiro Yamada
+On 5/6/2020 9:24 AM, Masahiro Yamada wrote:
+>> To me this is a regression, as it used to work and now it does not, thus
+>> we should be fixing it, any idea about how we go about it without doing
+>> a plain revert?
+> 
+> 
+> In fact, a patch exists.
+> 
+> https://patchwork.kernel.org/patch/11318691/
+> 
+> It allows you to link whatever file name to a module,
+> but please read the comments from Christoph and Greg.
+> 
+> 
+> In this case, your Makefile is doing strange.
+> 
+> I'd recommend to fix your Makefile.
+
+Yes, I ended up finding a way to fix it, thank you for your time.
+-- 
+Florian
