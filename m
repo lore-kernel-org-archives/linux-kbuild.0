@@ -1,135 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:39790 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730055AbgEFQoV (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:54822 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729757AbgEFSg6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 May 2020 12:44:21 -0400
+        Wed, 6 May 2020 14:36:58 -0400
 MIME-Version: 1.0
-References: <nycvar.YSQ.7.76.2004231102480.2671@knanqh.ubzr>
- <87imhqb3le.fsf@intel.com> <nycvar.YSQ.7.76.2004231155060.2671@knanqh.ubzr>
-In-Reply-To: <nycvar.YSQ.7.76.2004231155060.2671@knanqh.ubzr>
+References: <20200505115420.18765-1-anders.roxell@linaro.org>
+In-Reply-To: <20200505115420.18765-1-anders.roxell@linaro.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 7 May 2020 01:43:08 +0900
-Message-ID: <CAK7LNARpRMZb18FFnX1WPV4Xzh2B_n2E+KLf5QXqiqkZEKhTbQ@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: allow for conditional dependencies
+Date: Thu, 7 May 2020 03:36:08 +0900
+Message-ID: <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: fix deprecated always and hostprogs-y
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Jani Nikula <jani.nikula@linux.intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Saeed Mahameed <saeedm@mellanox.com>, Arnd Bergmann <arnd@arndb.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Anders Roxell <anders.roxell@linaro.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Apr 24, 2020 at 1:05 AM Nicolas Pitre <nico@fluxnic.net> wrote:
+On Tue, May 5, 2020 at 8:54 PM Anders Roxell <anders.roxell@linaro.org> wrote:
 >
-> On Thu, 23 Apr 2020, Jani Nikula wrote:
+> When I did an allmodconfig build the following warning showed up:
 >
-> > On Thu, 23 Apr 2020, Nicolas Pitre <nico@fluxnic.net> wrote:
-> > > This might appear to be a strange concept, but sometimes we want
-> > > a dependency to be conditionally applied. One such case is currently
-> > > expressed with:
-> > >
-> > >         depends on FOO || !FOO
-> > >
-> > > This pattern is strange enough to give one's pause. Given that it is
-> > > also frequent, let's make the intent more obvious with some syntaxic
-> > > sugar by effectively making dependencies optionally conditional.
-> > >
-> > > This also makes the kconfig language more uniform.
-> >
-> > Thanks, I prefer this over all the previous proposals. Versatile yet
-> > self-explanatory.
-> >
-> > > Signed-off-by: Nicolas Pitre <nico@fluxnic.net>
-> > >
-> > > diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-> > > index d0111dd264..0f841e0037 100644
-> > > --- a/Documentation/kbuild/kconfig-language.rst
-> > > +++ b/Documentation/kbuild/kconfig-language.rst
-> > > @@ -114,7 +114,7 @@ applicable everywhere (see syntax).
-> > >    This is a shorthand notation for a type definition plus a value.
-> > >    Optionally dependencies for this default value can be added with "if".
-> > >
-> > > -- dependencies: "depends on" <expr>
-> > > +- dependencies: "depends on" <expr> ["if" <expr>]
-> > >
-> > >    This defines a dependency for this menu entry. If multiple
-> > >    dependencies are defined, they are connected with '&&'. Dependencies
-> > > @@ -130,6 +130,16 @@ applicable everywhere (see syntax).
-> > >     bool "foo"
-> > >     default y
-> > >
-> > > +  The dependency definition itself may be conditional by appending "if"
-> > > +  followed by an expression. If such expression is false (n) then this
-> > > +  dependency is ignored. One possible use case is:
-> > > +
-> > > +    config FOO
-> > > +   tristate
-> > > +   depends on BAZ if BAZ != n
-> >
-> > I presume this is the same as
-> >
-> >       depends on BAZ if BAZ
-> >
-> > which makes me wonder if that should be the example. At least current
-> > usage for select is predominantly
-> >
-> >       select FOO if BAR
-> >
-> > without "!= n".
+> scripts/Makefile.lib:8: 'always' is deprecated. Please use 'always-y' instead
+> scripts/Makefile.lib:12: 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead
 >
-> Yes, it is the same thing. I prefer making the documentation a little
-> more explicit than necessary so the explanation is really obvious.
+> Rework to use the new 'always-y' and 'hostprogs'.
+>
+> Fixes: ee066c3ddf7b ("kbuild: warn if always, hostprogs-y, or hostprogs-m is used")
+> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
 
 
-For the case of 'select',
-
-  select FOO if BAR != n
-
-is NOT equivalent to:
-
-  select FOO if BAR
+As Stephen Rothwell reported
+(https://lkml.org/lkml/2020/5/3/392),
+this warning appears by merging the
+two different trees.
 
 
-
-I do not think "if <expr>" in Kconfig
-is so easy to understand.
-I tend to hesitate to extend it.
-
-Sometimes, it means "the property is visible if <expr> != n".
-Sometimes, not.
+You sent this patch to the kbuild maintainers,
+but samples/watch_queue/Makefile does not exist
+in the kbuild tree.
 
 
+Also, please drop the fixes tag.
+The commit hash might change.
 
 
-For the case of 'depends on',
-the 'depends on' is effective if <expr> != n
-because Nicolas implemented it in this way.
+> ---
+>  samples/watch_queue/Makefile | 4 ++--
+>  scripts/Makefile.build       | 1 -
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
+> index eec00dd0a8df..8511fb6c53d2 100644
+> --- a/samples/watch_queue/Makefile
+> +++ b/samples/watch_queue/Makefile
+> @@ -1,7 +1,7 @@
+>  # List of programs to build
+> -hostprogs-y := watch_test
+> +hostprogs := watch_test
+>
+>  # Tell kbuild to always build the programs
+> -always := $(hostprogs-y)
+> +always-y := $(hostprogs)
+>
+>  HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 3665b1a0bc8e..abdba70f33a1 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -15,7 +15,6 @@ obj-y :=
+>  obj-m :=
+>  lib-y :=
+>  lib-m :=
+> -always :=
+>  always-y :=
+>  always-m :=
+>  targets :=
+
+
+Why are you deleting 'always'?
+It would immediately break
+the downstream Makefiles immediately.
 
 
 
-We can do:
-
-    depends on X || X = n
-
-instead of:
-
-    depends on X || !X
-
-        or
-
-    depends on X if X
-
-
-
-
-
-
-I guess the source of the complaint is
-!X is difficult to understand
-when X is tristate.
-
-But, is there any confusion in 'X = n' ?
-I think not.
-
--- 
+--
 Best Regards
 Masahiro Yamada
