@@ -1,64 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728180AbgEELy0 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbgEFEpL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 May 2020 07:54:26 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3FDC061A0F
-        for <linux-kbuild@vger.kernel.org>; Tue,  5 May 2020 04:54:26 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id g4so1301755ljl.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 May 2020 04:54:26 -0700 (PDT)
-From: Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] scripts: fix deprecated always and hostprogs-y
-Date: Tue,  5 May 2020 13:54:20 +0200
-Message-Id: <20200505115420.18765-1-anders.roxell@linaro.org>
+        Wed, 6 May 2020 00:45:11 -0400
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Proper use for linking foo.o_shipped after 69ea912fda74 ("kbuild:
+ remove unneeded link_multi_deps")?
+Message-ID: <cd20b888-7f3d-e7ff-8096-2cc8305a5107@gmail.com>
+Date: Tue, 5 May 2020 21:45:08 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org, michal.lkml@markovi.net
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Anders Roxell <anders.roxell@linaro.org>
+To: masahiroy@kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
 
-When I did an allmodconfig build the following warning showed up:
+Hi Masahiro, Michal,
 
-scripts/Makefile.lib:8: 'always' is deprecated. Please use 'always-y' instead
-scripts/Makefile.lib:12: 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead
+While updating our systems from 4.9 to 5.4, we noticed that one of the
+kernel modules that we build, which is done by linking an object that we
+pre-compile out of Kbuild stopped working.
 
-Rework to use the new 'always-y' and 'hostprogs'.
+I bisected it down to:
 
-Fixes: ee066c3ddf7b ("kbuild: warn if always, hostprogs-y, or hostprogs-m is used")
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
----
- samples/watch_queue/Makefile | 4 ++--
- scripts/Makefile.build       | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
+commit 69ea912fda74a673d330d23595385e5b73e3a2b9 (refs/bisect/bad)
+Author: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date:   Thu Oct 4 13:25:19 2018 +0900
 
-diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
-index eec00dd0a8df..8511fb6c53d2 100644
---- a/samples/watch_queue/Makefile
-+++ b/samples/watch_queue/Makefile
-@@ -1,7 +1,7 @@
- # List of programs to build
--hostprogs-y := watch_test
-+hostprogs := watch_test
- 
- # Tell kbuild to always build the programs
--always := $(hostprogs-y)
-+always-y := $(hostprogs)
- 
- HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 3665b1a0bc8e..abdba70f33a1 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -15,7 +15,6 @@ obj-y :=
- obj-m :=
- lib-y :=
- lib-m :=
--always :=
- always-y :=
- always-m :=
- targets :=
+    kbuild: remove unneeded link_multi_deps
+
+    Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
+    appropriately"), $^ really represents all the prerequisite of the
+    composite object being built.
+
+    Hence, $(filter %.o,$^) contains all the objects to link together,
+    which is much simpler than link_multi_deps calculation.
+
+    Please note $(filter-out FORCE,$^) does not work here. When a single
+    object module is turned into a multi object module, $^ will contain
+    header files that were previously included for building the single
+    object, and recorded in the .*.cmd file. To filter out such headers,
+    $(filter %.o,$^) should be used here.
+
+    Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+and the linker now fails with the following:
+
+mkdir -p /home/florian/dev/lkm/.tmp_versions ; rm -f
+/home/florian/dev/lkm/.tmp_versions/*
+
+  WARNING: Symbol version dump ./Module.symvers
+           is missing; modules will have no dependencies and modversions.
+
+make -f ./scripts/Makefile.build obj=/home/florian/dev/lkm
+(cat /dev/null;   echo kernel//home/florian/dev/lkm/hello.ko;) >
+/home/florian/dev/lkm/modules.order
+  ld -m elf_x86_64  -z max-page-size=0x200000    -r -o
+/home/florian/dev/lkm/hello.o
+ld: no input files
+make[1]: *** [scripts/Makefile.build:492: /home/florian/dev/lkm/hello.o]
+Error 1
+make: *** [Makefile:1530: _module_/home/florian/dev/lkm] Error 2
+
+and here are some steps to reproduce this:
+
+Kbuild:
+obj-m   := hello.o
+hello-y := test.o_shipped
+
+test.c can be a simple hello world, and you can compile it using a
+standard Kbuild file first, and then move test.o as test.o_shipped.
+
+I am afraid I do not speak Kbuild fluently enough to recommend a fix for
+that.
+
+Thanks!
 -- 
-2.20.1
+Florian
