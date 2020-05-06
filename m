@@ -1,81 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgEFEpL (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728081AbgEFMws (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 May 2020 00:45:11 -0400
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Proper use for linking foo.o_shipped after 69ea912fda74 ("kbuild:
- remove unneeded link_multi_deps")?
-Message-ID: <cd20b888-7f3d-e7ff-8096-2cc8305a5107@gmail.com>
-Date: Tue, 5 May 2020 21:45:08 -0700
+        Wed, 6 May 2020 08:52:48 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1764C061A0F
+        for <linux-kbuild@vger.kernel.org>; Wed,  6 May 2020 05:52:47 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id x73so1242144lfa.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 May 2020 05:52:47 -0700 (PDT)
+From: Jukka Kaartinen <jukka.kaartinen@unikie.com>
+Subject: [PATCH 0/2] [RFC] kconfig: new command line tool to set configs
+Date: Wed,  6 May 2020 15:52:34 +0300
+Message-Id: <20200506125236.16415-1-jukka.kaartinen@unikie.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <michal.lkml@markovi.net>
+To: linux-kbuild@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, lukas.bulwahn@gmail.com, jouni.hogander@unikie.com, dan.carpenter@oracle.com, Jukka Kaartinen <jukka.kaartinen@partner.bmw.de>
 
-Hi Masahiro, Michal,
+From: Jukka Kaartinen <jukka.kaartinen@partner.bmw.de>
 
-While updating our systems from 4.9 to 5.4, we noticed that one of the
-kernel modules that we build, which is done by linking an object that we
-pre-compile out of Kbuild stopped working.
+Me, Jouni Högander and Lukas Bulwahn are working on to improve
+syzkaller with configuration bisect
+feature: https://github.com/google/syzkaller/pull/1689
+For that we need to set kernel configurations without human
+interaction.
+Currently there are no tools to set config options on if it has 
+dependencies without human interaction if dependencies are not known beforehand.
 
-I bisected it down to:
+I found this old patch from Dan Carpenter 
+https://patchwork.kernel.org/patch/6387181/ that can handle the 
+dependencies using only commandline and with a small feature added 
+it can be automated to say "yes" to all dependencies.
 
-commit 69ea912fda74a673d330d23595385e5b73e3a2b9 (refs/bisect/bad)
-Author: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date:   Thu Oct 4 13:25:19 2018 +0900
+Dan Carpenter (1):
+  kconfig: a new command line tool to set configs
 
-    kbuild: remove unneeded link_multi_deps
+Jukka Kaartinen (1):
+  kconfig: Extend kconfig with setall option
 
-    Since commit c8589d1e9e01 ("kbuild: handle multi-objs dependency
-    appropriately"), $^ really represents all the prerequisite of the
-    composite object being built.
+ scripts/kconfig/Makefile |   7 +
+ scripts/kconfig/kconfig  |  83 ++++++++++
+ scripts/kconfig/lconf.c  | 328 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 418 insertions(+)
+ create mode 100755 scripts/kconfig/kconfig
+ create mode 100644 scripts/kconfig/lconf.c
 
-    Hence, $(filter %.o,$^) contains all the objects to link together,
-    which is much simpler than link_multi_deps calculation.
-
-    Please note $(filter-out FORCE,$^) does not work here. When a single
-    object module is turned into a multi object module, $^ will contain
-    header files that were previously included for building the single
-    object, and recorded in the .*.cmd file. To filter out such headers,
-    $(filter %.o,$^) should be used here.
-
-    Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-and the linker now fails with the following:
-
-mkdir -p /home/florian/dev/lkm/.tmp_versions ; rm -f
-/home/florian/dev/lkm/.tmp_versions/*
-
-  WARNING: Symbol version dump ./Module.symvers
-           is missing; modules will have no dependencies and modversions.
-
-make -f ./scripts/Makefile.build obj=/home/florian/dev/lkm
-(cat /dev/null;   echo kernel//home/florian/dev/lkm/hello.ko;) >
-/home/florian/dev/lkm/modules.order
-  ld -m elf_x86_64  -z max-page-size=0x200000    -r -o
-/home/florian/dev/lkm/hello.o
-ld: no input files
-make[1]: *** [scripts/Makefile.build:492: /home/florian/dev/lkm/hello.o]
-Error 1
-make: *** [Makefile:1530: _module_/home/florian/dev/lkm] Error 2
-
-and here are some steps to reproduce this:
-
-Kbuild:
-obj-m   := hello.o
-hello-y := test.o_shipped
-
-test.c can be a simple hello world, and you can compile it using a
-standard Kbuild file first, and then move test.o as test.o_shipped.
-
-I am afraid I do not speak Kbuild fluently enough to recommend a fix for
-that.
-
-Thanks!
 -- 
-Florian
+2.17.1
