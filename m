@@ -1,149 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57820 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:52306 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726007AbgEGNSK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 May 2020 09:18:10 -0400
-Date: Thu, 7 May 2020 09:18:07 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v4] streamline_config.pl: add LMC_KEEP to preserve some
- kconfigs
-Message-ID: <20200507091807.0a789fbd@gandalf.local.home>
-In-Reply-To: <CAK7LNATBt1NxRSWiv8Ab-pKBRemp43WUs96KWELTf+vFq_VPTA@mail.gmail.com>
-References: <20200503001141.9647-1-changbin.du@gmail.com>
-        <CAK7LNATBt1NxRSWiv8Ab-pKBRemp43WUs96KWELTf+vFq_VPTA@mail.gmail.com>
+        id S1726950AbgEGSvg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 7 May 2020 14:51:36 -0400
+Date: Thu, 7 May 2020 13:56:01 -0500
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: [PATCH] modpost: Replace zero-length array with flexible-array
+Message-ID: <20200507185601.GA14759@embeddedor>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Changbin Du <changbin.du@gmail.com>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 7 May 2020 12:19:57 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
+The current codebase makes use of the zero-length array language
+extension to the C90 standard, but the preferred mechanism to declare
+variable-length types such as these ones is a flexible array member[1][2],
+introduced in C99:
 
-> On Sun, May 3, 2020 at 9:11 AM Changbin Du <changbin.du@gmail.com> wrote:
-> >
-> > Sometimes it is useful to preserve batches of configs when making
-> > localmodconfig. For example, I usually don't want any usb and fs
-> > modules to be disabled. Now we can do it by:
-> >
-> >  $ make LMC_KEEP="drivers/usb;fs" localmodconfig
-> >
-> > Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> >
-> > ---
-> > v4: fix typo.
-> > v3: rename LOCALMODCONFIG_PRESERVE to shorter LMC_KEEP.
-> > v2: fix typo in documentation. (Randy Dunlap)
-> > ---  
-> 
-> 
-> Personally, I do not mind the long LOCALMODCONFIG_PRESERVE,
+struct foo {
+        int stuff;
+        struct boo array[];
+};
 
-Perhasp we allow both? ;-)
+By making use of the mechanism above, we will get a compiler warning
+in case the flexible array does not occur last in the structure, which
+will help us prevent some kind of undefined behavior bugs from being
+inadvertently introduced[3] to the codebase from now on.
 
-And just have one set to the other.
+Also, notice that, dynamic memory allocations won't be affected by
+this change:
 
-> but this tends to be bike-sheding.
-> I do not have a strong opinion.
-> 
-> 
-> >  Documentation/admin-guide/README.rst |  8 +++++++-
-> >  scripts/kconfig/Makefile             |  1 +
-> >  scripts/kconfig/streamline_config.pl | 23 +++++++++++++++++++++++
-> >  3 files changed, 31 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
-> > index cc6151fc0845..1371deab8bc7 100644
-> > --- a/Documentation/admin-guide/README.rst
-> > +++ b/Documentation/admin-guide/README.rst
-> > @@ -209,10 +209,16 @@ Configuring the kernel
-> >                             store the lsmod of that machine into a file
-> >                             and pass it in as a LSMOD parameter.
-> >
-> > +                           Also, you can preserve modules in certain folders
-> > +                           or kconfig files by specifying their paths in
-> > +                           parameter LMC_KEEP.
-> > +
-> >                     target$ lsmod > /tmp/mylsmod
-> >                     target$ scp /tmp/mylsmod host:/tmp
-> >
-> > -                   host$ make LSMOD=/tmp/mylsmod localmodconfig
-> > +                   host$ make LSMOD=/tmp/mylsmod \
-> > +                           LMC_KEEP="drivers/usb;drivers/gpu;fs" \  
-> 
-> 
-> This might be another bike-sheding item, but
-> can you use a space for the delimiter?
-> 
-> 
-> LMC_KEEP="drivers/usb drivers/gpu fs"
-> 
-> If you pass multiple directories,
-> you will need to surround them with double-quotes.
+"Flexible array members have incomplete type, and so the sizeof operator
+may not be applied. As a quirk of the original implementation of
+zero-length arrays, sizeof evaluates to zero."[1]
 
-I agree that spaces look better.
+sizeof(flexible-array-member) triggers a warning because flexible array
+members have incomplete type[1]. There are some instances of code in
+which the sizeof operator is being incorrectly/erroneously applied to
+zero-length arrays and the result is zero. Such instances may be hiding
+some bugs. So, this work (flexible-array member conversions) will also
+help to get completely rid of those sorts of issues.
 
-> 
-> 
-> 
-> 
-> > +                           localmodconfig
-> >
-> >                             The above also works when cross compiling.
-> >
-> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> > index c9d0a4a8efb3..e0abbf5805f5 100644
-> > --- a/scripts/kconfig/Makefile
-> > +++ b/scripts/kconfig/Makefile
-> > @@ -123,6 +123,7 @@ help:
-> >         @echo  '  gconfig         - Update current config utilising a GTK+ based front-end'
-> >         @echo  '  oldconfig       - Update current config utilising a provided .config as base'
-> >         @echo  '  localmodconfig  - Update current config disabling modules not loaded'
-> > +       @echo  '                    except those preserved by LMC_KEEP environment variable'
-> >         @echo  '  localyesconfig  - Update current config converting local mods to core'
-> >         @echo  '  defconfig       - New config with default from ARCH supplied defconfig'
-> >         @echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
-> > diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> > index e2f8504f5a2d..d26543a807c9 100755
-> > --- a/scripts/kconfig/streamline_config.pl
-> > +++ b/scripts/kconfig/streamline_config.pl
-> > @@ -143,6 +143,7 @@ my %depends;
-> >  my %selects;
-> >  my %prompts;
-> >  my %objects;
-> > +my %config2kfile;
-> >  my $var;
-> >  my $iflevel = 0;
-> >  my @ifdeps;
-> > @@ -201,6 +202,7 @@ sub read_kconfig {
-> >         if (/^\s*(menu)?config\s+(\S+)\s*$/) {
-> >             $state = "NEW";
-> >             $config = $2;
-> > +           $config2kfile{"CONFIG_$config"} = $kconfig;
-> >
-> >             # Add depends for 'if' nesting
-> >             for (my $i = 0; $i < $iflevel; $i++) {
-> > @@ -592,6 +594,22 @@ while ($repeat) {
-> >
-> >  my %setconfigs;
-> >
-> > +my @preserved_kconfigs;
-> > +@preserved_kconfigs = split(/;/,$ENV{LMC_KEEP}) if (defined($ENV{LMC_KEEP}));  
-> 
-> Maybe, you can do 'my' declaration and the assignment
-> in a single line?
-> 
-> Can you drop the 'if ...' conditional?
-> 
-> 
-> Does this work for you?
-> 
-> my @preserved_kconfigs = split(/;/,$ENV{LMC_KEEP});
-> 
-> 
+This issue was found with the help of Coccinelle.
 
-Will an undefined warning happen if LMC_KEEP isn't defined?
+[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+[2] https://github.com/KSPP/linux/issues/21
+[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
 
--- Steve
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ scripts/basic/fixdep.c |    2 +-
+ scripts/mod/modpost.c  |    2 +-
+ scripts/mod/modpost.h  |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 877ca2c88246..d98540552941 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -160,7 +160,7 @@ struct item {
+ 	struct item	*next;
+ 	unsigned int	len;
+ 	unsigned int	hash;
+-	char		name[0];
++	char		name[];
+ };
+ 
+ #define HASHSZ 256
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 5c3c50c5ec52..4d4b979d76be 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -166,7 +166,7 @@ struct symbol {
+ 				    *  (only for external modules) **/
+ 	unsigned int is_static:1;  /* 1 if symbol is not global */
+ 	enum export  export;       /* Type of export */
+-	char name[0];
++	char name[];
+ };
+ 
+ static struct symbol *symbolhash[SYMBOL_HASH_SIZE];
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 60dca9b7106b..39f6c29fb568 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -111,7 +111,7 @@ buf_write(struct buffer *buf, const char *s, int len);
+ 
+ struct namespace_list {
+ 	struct namespace_list *next;
+-	char namespace[0];
++	char namespace[];
+ };
+ 
+ struct module {
