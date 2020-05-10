@@ -1,66 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726744AbgEJRuK (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728385AbgEJTEd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 May 2020 13:50:10 -0400
-Subject: Re: Using a custom LDFLAG for all objects and binaries
-References: <CADa2P2UP1AtEmQYtyqUFKVNz8Rxii+-Zut3ibc5pMYnQB90-zw@mail.gmail.com>
- <32637993-b73f-c2cb-6823-590c1638b5a6@infradead.org>
- <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ff3401cc-e2c1-f510-c971-2151e9d540fe@infradead.org>
-Date: Sun, 10 May 2020 10:50:05 -0700
+        Sun, 10 May 2020 15:04:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CADa2P2UP1AtEmQYtyqUFKVNz8Rxii+-Zut3ibc5pMYnQB90-zw@mail.gmail.com>
+ <32637993-b73f-c2cb-6823-590c1638b5a6@infradead.org> <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
+ <ff3401cc-e2c1-f510-c971-2151e9d540fe@infradead.org>
+In-Reply-To: <ff3401cc-e2c1-f510-c971-2151e9d540fe@infradead.org>
+From: Mahmood Naderan <mahmood.nt@gmail.com>
+Date: Sun, 10 May 2020 23:34:20 +0430
+Message-ID: <CADa2P2VP6-aLgTqiTDpBjU+gnzT0dPT9SqGu9GY8c+OZ_xhfcw@mail.gmail.com>
+Subject: Re: Using a custom LDFLAG for all objects and binaries
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mahmood Naderan <mahmood.nt@gmail.com>
+To: Randy Dunlap <rdunlap@infradead.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 5/10/20 10:13 AM, Mahmood Naderan wrote:
->> Have you read Documentation/kbuild/makefiles.rst ?
->>
->>     LDFLAGS
->>         Generic $(LD) options
->>
->>         Flags used for all invocations of the linker.
-> 
-> 
-> What I see is this in Documentation/kbuild/makefiles.txt
-> 
->     LDFLAGS             Generic $(LD) options
-> 
->         Flags used for all invocations of the linker.
->         Often specifying the emulation is sufficient.
-> 
->         Example:
->                 #arch/s390/Makefile
->                 LDFLAGS         := -m elf_s390
->         Note: ldflags-y can be used to further customise
->         the flags used. See chapter 3.7.
-> 
-> 
-> 
-> I have two questions then:
-> 1- Can I use that as a bash variable? Like "LDFLAGS=--emit-relocs make"
+> > or
+> > 2- Editing arch/x86/Makefile with
+> >    KBUILD_LDFLAGS := -m --emit-relocs elf_$(UTS_MACHINE)
+>
+> That should work.
 
-I don't know. You could experiment with it to see.
-(again by using 'make V=1' to see the commands that are being used)
 
-> or
-> 2- Editing arch/x86/Makefile with
->    KBUILD_LDFLAGS := -m --emit-relocs elf_$(UTS_MACHINE)
+Seems not... I ran the following commands:
 
-That should work.
+$ cp -v /boot/config-$(uname -r) .config
+$ make menuconfig  -> Exit -> Save
+$ vim arch/x86/Makefile
+     KBUILD_LDFLAGS := -m --emit-relocs elf_$(UTS_MACHINE)
+$ make V=1
 
-> Thanks for your help.
+This is the error that I get
 
-It would be better to ask these questions on the linux-kbuild mailing list
-(added now).
+make -f ./scripts/Makefile.build obj=usr need-builtin=1
+/bin/bash ./usr/gen_initramfs_list.sh -l -d > usr/.initramfs_data.cpio.d
+(cat /dev/null; ) > usr/modules.order
+make -f ./scripts/Makefile.build obj=arch/x86 need-builtin=1
+make -f ./scripts/Makefile.build obj=arch/x86/crypto need-builtin=1
+make -f ./scripts/Makefile.build obj=arch/x86/crypto/sha1-mb need-builtin=
+(cat /dev/null;   echo kernel/arch/x86/crypto/sha1-mb/sha1-mb.ko;) >
+arch/x86/crypto/sha1-mb/modules.order
+  ld -m --emit-relocs elf_x86_64     -r -o
+arch/x86/crypto/sha1-mb/sha1-mb.o arch/x86/crypto/sha1-mb/sha1_mb.o
+arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.o
+arch/x86/crypto/sha1-mb/sha1_mb_mgr_init_avx2.o
+arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.o
+arch/x86/crypto/sha1-mb/sha1_x8_avx2.o
+ld: unrecognised emulation mode: --emit-relocs
+Supported emulations: elf_x86_64 elf32_x86_64 elf_i386 elf_iamcu
+i386linux elf_l1om elf_k1om i386pep i386pe
+scripts/Makefile.build:516: recipe for target
+'arch/x86/crypto/sha1-mb/sha1-mb.o' failed
+make[3]: *** [arch/x86/crypto/sha1-mb/sha1-mb.o] Error 1
+scripts/Makefile.build:544: recipe for target 'arch/x86/crypto/sha1-mb' failed
+make[2]: *** [arch/x86/crypto/sha1-mb] Error 2
+scripts/Makefile.build:544: recipe for target 'arch/x86/crypto' failed
+make[1]: *** [arch/x86/crypto] Error 2
+Makefile:1053: recipe for target 'arch/x86' failed
+make: *** [arch/x86] Error 2
 
--- 
-~Randy
+
+
+
+
+ORIGINAL QUESTION:
+
+>Hi
+>I would like to modify the kernel makefile in a way to include
+>--emit-relocs for every file that is linked during the process of
+>kernel make.
+>I see
+>
+>KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
+>LDFLAGS_MODULE  =
+>LDFLAGS_vmlinux =
+>...
+>
+>But I don't know which one is the main. Should I put that option in
+>front of every LD* variable? Or it is possible to apply one variable
+>for every file that is linked?
+>Appreciate your help.
+>
+
+
+Regards,
+Mahmood
