@@ -1,48 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bluehome.net ([96.66.250.149]:54828 "EHLO bluehome.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725648AbgEJEGT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 May 2020 00:06:19 -0400
-From: Jason Self <j@jxself.org>
-Subject: [PATCH] make builddeb invoke calls to linux-update-symlink
-Date: Sat,  9 May 2020 21:06:16 -0700
-Message-Id: <20200510040616.2207-1-j@jxself.org>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726744AbgEJRuK (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 10 May 2020 13:50:10 -0400
+Subject: Re: Using a custom LDFLAG for all objects and binaries
+References: <CADa2P2UP1AtEmQYtyqUFKVNz8Rxii+-Zut3ibc5pMYnQB90-zw@mail.gmail.com>
+ <32637993-b73f-c2cb-6823-590c1638b5a6@infradead.org>
+ <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <ff3401cc-e2c1-f510-c971-2151e9d540fe@infradead.org>
+Date: Sun, 10 May 2020 10:50:05 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: j@jxself.org
+To: Mahmood Naderan <mahmood.nt@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-The official Debian kernel packages, in addition to running the
-scripts in /etc/kernel, also runs linux-update-symlinks via the
-postinst and postrm scripts. This maintains the /vmlinuz and
-/initrd.img (if it uses an initramfs) symlinks. This change makes the
-builddeb script generate those same calls.
+On 5/10/20 10:13 AM, Mahmood Naderan wrote:
+>> Have you read Documentation/kbuild/makefiles.rst ?
+>>
+>>     LDFLAGS
+>>         Generic $(LD) options
+>>
+>>         Flags used for all invocations of the linker.
+> 
+> 
+> What I see is this in Documentation/kbuild/makefiles.txt
+> 
+>     LDFLAGS             Generic $(LD) options
+> 
+>         Flags used for all invocations of the linker.
+>         Often specifying the emulation is sufficient.
+> 
+>         Example:
+>                 #arch/s390/Makefile
+>                 LDFLAGS         := -m elf_s390
+>         Note: ldflags-y can be used to further customise
+>         the flags used. See chapter 3.7.
+> 
+> 
+> 
+> I have two questions then:
+> 1- Can I use that as a bash variable? Like "LDFLAGS=--emit-relocs make"
 
-Signed-off-by: Jason Self <j@jxself.org>
----
- scripts/package/builddeb | 8 ++++++++
- 1 file changed, 8 insertions(+)
+I don't know. You could experiment with it to see.
+(again by using 'make V=1' to see the commands that are being used)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 6df3c9f8b2da..f34c11c63ede 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -195,6 +195,14 @@ export DEB_MAINT_PARAMS="\$*"
- # Tell initramfs builder whether it's wanted
- export INITRD=$(if_enabled_echo CONFIG_BLK_DEV_INITRD Yes No)
- 
-+$(case $script in
-+postinst)
-+        echo linux-update-symlinks install $version $installed_image_path
-+        ;;
-+postrm)
-+        echo linux-update-symlinks remove $version $installed_image_path
-+esac)
-+
- test -d $debhookdir/$script.d && run-parts --arg="$version" --arg="/$installed_image_path" $debhookdir/$script.d
- exit 0
- EOF
+> or
+> 2- Editing arch/x86/Makefile with
+>    KBUILD_LDFLAGS := -m --emit-relocs elf_$(UTS_MACHINE)
+
+That should work.
+
+> Thanks for your help.
+
+It would be better to ask these questions on the linux-kbuild mailing list
+(added now).
+
 -- 
-2.26.0
+~Randy
