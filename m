@@ -1,82 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:29748 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725790AbgEKEXP (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725993AbgEKNTM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 May 2020 00:23:15 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] kbuild: make module name conflict fatal error
-Date: Mon, 11 May 2020 13:21:49 +0900
-Message-Id: <20200511042149.1712876-1-masahiroy@kernel.org>
+        Mon, 11 May 2020 09:19:12 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69A2C061A0C
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 May 2020 06:19:10 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id u4so7471846lfm.7
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 May 2020 06:19:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200505115420.18765-1-anders.roxell@linaro.org> <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Mon, 11 May 2020 15:18:56 +0200
+Message-ID: <CADYN=9+MZyCHdp2VbBCjk4u9zVaSXYe6vWwyFa6cy5GOA+-a8w@mail.gmail.com>
+Subject: Re: [PATCH] scripts: fix deprecated always and hostprogs-y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Lucas De Marchi <lucas.demarchi@intel.com>, Michal Marek <michal.lkml@markovi.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-I think all the warnings have been fixed by now. Make it a fatal error.
+On Wed, 6 May 2020 at 20:36, Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> On Tue, May 5, 2020 at 8:54 PM Anders Roxell <anders.roxell@linaro.org> wrote:
+> >
+> > When I did an allmodconfig build the following warning showed up:
+> >
+> > scripts/Makefile.lib:8: 'always' is deprecated. Please use 'always-y' instead
+> > scripts/Makefile.lib:12: 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead
+> >
+> > Rework to use the new 'always-y' and 'hostprogs'.
+> >
+> > Fixes: ee066c3ddf7b ("kbuild: warn if always, hostprogs-y, or hostprogs-m is used")
+> > Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+>
+>
+> As Stephen Rothwell reported
+> (https://lkml.org/lkml/2020/5/3/392),
+> this warning appears by merging the
+> two different trees.
 
-Check it before modpost because we need to stop building *.ko files.
-Also, pass modules.order via a script parameter.
+Right, I see.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+>
+>
+> You sent this patch to the kbuild maintainers,
+> but samples/watch_queue/Makefile does not exist
+> in the kbuild tree.
 
- Makefile                 |  7 +++++--
- scripts/modules-check.sh | 16 +++++++++++++---
- 2 files changed, 18 insertions(+), 5 deletions(-)
+oops, I'm sorry.
 
-diff --git a/Makefile b/Makefile
-index 1162cb04860c..a2e4d0945500 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1328,9 +1328,12 @@ all: modules
- # using awk while concatenating to the final file.
- 
- PHONY += modules
--modules: $(if $(KBUILD_BUILTIN),vmlinux) modules.order
-+modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_check
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh
-+
-+PHONY += modules_check
-+modules_check: modules.order
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh $<
- 
- modules.order: descend
- 	$(Q)$(AWK) '!x[$$0]++' $(addsuffix /$@, $(build-dirs)) > $@
-diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-index f51f446707b8..43de226071ae 100755
---- a/scripts/modules-check.sh
-+++ b/scripts/modules-check.sh
-@@ -3,14 +3,24 @@
- 
- set -e
- 
-+if [ $# != 1 ]; then
-+	echo "Usage: $0 <modules.order>" >& 2
-+	exit 1
-+fi
-+
-+exit_code=0
-+
- # Check uniqueness of module names
- check_same_name_modules()
- {
--	for m in $(sed 's:.*/::' modules.order | sort | uniq -d)
-+	for m in $(sed 's:.*/::' $1 | sort | uniq -d)
- 	do
--		echo "warning: same module names found:" >&2
-+		echo "error: the following would cause module name conflict:" >&2
- 		sed -n "/\/$m/s:^:  :p" modules.order >&2
-+		exit_code=1
- 	done
- }
- 
--check_same_name_modules
-+check_same_name_modules "$1"
-+
-+exit $exit_code
--- 
-2.25.1
+>
+>
+> Also, please drop the fixes tag.
+
+I will.
+
+> The commit hash might change.
+>
+>
+> > ---
+> >  samples/watch_queue/Makefile | 4 ++--
+> >  scripts/Makefile.build       | 1 -
+> >  2 files changed, 2 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
+> > index eec00dd0a8df..8511fb6c53d2 100644
+> > --- a/samples/watch_queue/Makefile
+> > +++ b/samples/watch_queue/Makefile
+> > @@ -1,7 +1,7 @@
+> >  # List of programs to build
+> > -hostprogs-y := watch_test
+> > +hostprogs := watch_test
+> >
+> >  # Tell kbuild to always build the programs
+> > -always := $(hostprogs-y)
+> > +always-y := $(hostprogs)
+> >
+> >  HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
+> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > index 3665b1a0bc8e..abdba70f33a1 100644
+> > --- a/scripts/Makefile.build
+> > +++ b/scripts/Makefile.build
+> > @@ -15,7 +15,6 @@ obj-y :=
+> >  obj-m :=
+> >  lib-y :=
+> >  lib-m :=
+> > -always :=
+> >  always-y :=
+> >  always-m :=
+> >  targets :=
+>
+>
+> Why are you deleting 'always'?
+> It would immediately break
+> the downstream Makefiles immediately.
+
+Thank you, you are correct.
+
+I will send out a new patch shortly to the correct list.
+
+Cheers,
+Anders
