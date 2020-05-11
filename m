@@ -1,94 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41874 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728468AbgEJUa4 (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:43402 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728058AbgEKDub (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 May 2020 16:30:56 -0400
-Subject: Re: Using a custom LDFLAG for all objects and binaries
-References: <CADa2P2UP1AtEmQYtyqUFKVNz8Rxii+-Zut3ibc5pMYnQB90-zw@mail.gmail.com>
- <32637993-b73f-c2cb-6823-590c1638b5a6@infradead.org>
- <CADa2P2UTMwwYPFLW+UM5FNBL+_8Pi_Am+saa+Y2ywpi0jPDvWw@mail.gmail.com>
- <ff3401cc-e2c1-f510-c971-2151e9d540fe@infradead.org>
- <CADa2P2VP6-aLgTqiTDpBjU+gnzT0dPT9SqGu9GY8c+OZ_xhfcw@mail.gmail.com>
- <a8c709ff-67df-09b6-25ff-a4b46a5a2a79@infradead.org>
- <CADa2P2WqYxUjZWMYw5aq_5e8XLf8zRCnTsMaF98sFg8==F+WNw@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ae0bfc33-312a-6163-9381-786db6264024@infradead.org>
-Date: Sun, 10 May 2020 13:30:51 -0700
+        Sun, 10 May 2020 23:50:31 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 1/2] kbuild: add this-makefile as a shorthand for $(lastword $(MAKEFILE_LIST))
+Date: Mon, 11 May 2020 12:50:12 +0900
+Message-Id: <20200511035013.1629672-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CADa2P2WqYxUjZWMYw5aq_5e8XLf8zRCnTsMaF98sFg8==F+WNw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mahmood Naderan <mahmood.nt@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On 5/10/20 12:53 PM, Mahmood Naderan wrote:
->> OK, I suggest that you reorder the options like so:
->>
->>        KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE) --emit-relocs
-> 
-> 
-> I did that. After
-> 
-> $ make V=1
-> $ sudo make modules_install V=1
-> $ sudo make install
-> 
-> I grepped for "emit-relocs" in the log and saw many instances such as
-> 
->   gcc -Wp,-MD,drivers/rtc/.rtc-ds1305.o.d  -nostdinc -isystem
-> /usr/lib/gcc/x86_64-linux-gnu/5/include -I./arch/x86/include
-> -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi
-> -I./arch/x86/include/generated/uapi -I./include/uapi
-> -I./include/generated/uapi -include ./include/linux/kconfig.h -include
-> ./include/linux/compiler_types.h -D__KERNEL__ -Wall -Wundef
-> -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common
-> -fshort-wchar -Werror-implicit-function-declaration
-> -Wno-format-security -std=gnu89 -fno-PIE -mno-sse -mno-mmx -mno-sse2
-> -mno-3dnow -mno-avx -m64 -falign-jumps=1 -falign-loops=1 -mno-80387
-> -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup
-> -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time
-> -DCONFIG_X86_X32_ABI -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1
-> -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1
-> -DCONFIG_AS_CRC32=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1
-> -DCONFIG_AS_AVX512=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1
-> -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables
-> -mindirect-branch=thunk-extern -mindirect-branch-register
-> -fno-jump-tables -fno-delete-null-pointer-checks -O2
-> --param=allow-store-data-races=0 -Wframe-larger-than=1024
-> -fstack-protector-strong -Wno-unused-but-set-variable
-> -fno-omit-frame-pointer -fno-optimize-sibling-calls
-> -fno-var-tracking-assignments -g -gdwarf-4 -pg -mrecord-mcount
-> -mfentry -DCC_USING_FENTRY -Wdeclaration-after-statement
-> -Wno-pointer-sign -fno-strict-overflow -fno-merge-all-constants
-> -fmerge-constants -fno-stack-check -fconserve-stack
-> -Werror=implicit-int -Werror=strict-prototypes -Werror=date-time
-> -Werror=incompatible-pointer-types -Werror=designated-init  -DMODULE
-> -DKBUILD_BASENAME='"rtc_ds1305"' -DKBUILD_MODNAME='"rtc_ds1305"' -c -o
-> drivers/rtc/rtc-ds1305.o drivers/rtc/rtc-ds1305.c
->    ./tools/objtool/objtool check  --module --retpoline
-> "drivers/scsi/aacraid/dpcsup.o";
-> 
-> OR
-> 
->   ld -r -m elf_x86_64 --emit-relocs  -z max-page-size=0x200000 -T
-> ./scripts/module-common.lds  --build-id  -o
-> sound/usb/line6/snd-usb-line6.ko sound/usb/line6/snd-usb-line6.o
-> sound/usb/line6/snd-usb-line6.mod.o ;  true
-> 
-> 
-> 
-> I guess that all kernel modules are now use --emit-relocs.
-> I would like to be sure that libc and those files related to syscalls
-> are also using that.
-> 
-> I grepped for "libc.so" but it seems that there is no such match.
-> Did I miss something?
+Make it clearer, and self-documenting.
 
-The kernel doesn't use libc...
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 119a08c90abb..1a4977ad7cd9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -157,12 +157,14 @@ MAKEFLAGS += --include-dir=$(abs_srctree)
+ need-sub-make := 1
+ endif
+ 
++this-makefile := $(lastword $(MAKEFILE_LIST))
++
+ ifneq ($(filter 3.%,$(MAKE_VERSION)),)
+ # 'MAKEFLAGS += -rR' does not immediately become effective for GNU Make 3.x
+ # We need to invoke sub-make to avoid implicit rules in the top Makefile.
+ need-sub-make := 1
+ # Cancel implicit rules for this Makefile.
+-$(lastword $(MAKEFILE_LIST)): ;
++$(this-makefile): ;
+ endif
+ 
+ export abs_srctree abs_objtree
+@@ -172,7 +174,7 @@ ifeq ($(need-sub-make),1)
+ 
+ PHONY += $(MAKECMDGOALS) sub-make
+ 
+-$(filter-out _all sub-make $(lastword $(MAKEFILE_LIST)), $(MAKECMDGOALS)) _all: sub-make
++$(filter-out _all sub-make $(this-makefile), $(MAKECMDGOALS)) _all: sub-make
+ 	@:
+ 
+ # Invoke a second make in the output directory, passing relevant variables
 -- 
-~Randy
+2.25.1
