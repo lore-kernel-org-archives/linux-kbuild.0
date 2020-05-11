@@ -1,106 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725993AbgEKNTM (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730799AbgEKRLE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 May 2020 09:19:12 -0400
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69A2C061A0C
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 May 2020 06:19:10 -0700 (PDT)
-Received: by mail-lf1-x143.google.com with SMTP id u4so7471846lfm.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 May 2020 06:19:10 -0700 (PDT)
+        Mon, 11 May 2020 13:11:04 -0400
 MIME-Version: 1.0
-References: <20200505115420.18765-1-anders.roxell@linaro.org> <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
-In-Reply-To: <CAK7LNAR6MeBRhP1A3oc-UVATNN4r2Ru1LUp2=DqiLSKDL9gwOQ@mail.gmail.com>
-From: Anders Roxell <anders.roxell@linaro.org>
-Date: Mon, 11 May 2020 15:18:56 +0200
-Message-ID: <CADYN=9+MZyCHdp2VbBCjk4u9zVaSXYe6vWwyFa6cy5GOA+-a8w@mail.gmail.com>
-Subject: Re: [PATCH] scripts: fix deprecated always and hostprogs-y
+References: <20200207083550.360461-1-e.velu@criteo.com> <20200211142112.649d7237@endymion>
+ <ba5b88c9-f056-9375-d1fb-7832c76db29f@criteo.com>
+In-Reply-To: <ba5b88c9-f056-9375-d1fb-7832c76db29f@criteo.com>
+From: Erwan Velu <erwanaliasr1@gmail.com>
+Date: Mon, 11 May 2020 19:10:52 +0200
+Message-ID: <CAL2Jzuw8K-p11kZ1DdcVtTn76GE-Y+nr-=UM86DJAiUGSNh6zg@mail.gmail.com>
+Subject: Re: [PATCH] firmware/dmi: Report DMI Bios & EC firmware release
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Erwan Velu <e.velu@criteo.com>
+Cc: Jean Delvare <jdelvare@suse.de>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Mattias Jacobsson <2pi@mok.nu>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, "Darren Hart (VMware)" <dvhart@infradead.org>, Changbin Du <changbin.du@intel.com>, Russell King <rmk+kernel@armlinux.org.uk>, open list <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, 6 May 2020 at 20:36, Masahiro Yamada <masahiroy@kernel.org> wrote:
+Jean, I don't see my patches in the 5.7-rc series.
+Is there anything wrong with them ?
+
+Le mar. 11 f=C3=A9vr. 2020 =C3=A0 14:31, Erwan Velu <e.velu@criteo.com> a =
+=C3=A9crit :
 >
-> On Tue, May 5, 2020 at 8:54 PM Anders Roxell <anders.roxell@linaro.org> wrote:
+> No issue with that.
+>
+> Thanks for applying.
+>
+> Erwan,
+>
+> On 11/02/2020 14:21, Jean Delvare wrote:
+> > On Fri,  7 Feb 2020 09:35:47 +0100, Erwan Velu wrote:
+> >> Some vendors like HPe or Dell, encode the release version of their BIO=
+S
+> >> in the "System BIOS {Major|Minor} Release" fields of Type 0.
+> >>
+> >> This information is used to know which bios release actually runs.
+> >> It could be used for some quirks, debugging sessions or inventory task=
+s.
+> >>
+> >> A typical output for a Dell system running the 65.27 bios is :
+> >>      [root@t1700 ~]# cat /sys/devices/virtual/dmi/id/bios_release
+> >>      65.27
+> >>      [root@t1700 ~]#
+> >>
+> >> Servers that have a BMC encode the release version of their firmware i=
+n the
+> >>   "Embedded Controller Firmware {Major|Minor} Release" fields of Type =
+0.
+> >>
+> >> This information is used to know which BMC release actually runs.
+> >> It could be used for some quirks, debugging sessions or inventory task=
+s.
+> >>
+> >> A typical output for a Dell system running the 3.75 bmc release is :
+> >>      [root@t1700 ~]# cat /sys/devices/virtual/dmi/id/ec_firmware_relea=
+se
+> >>      3.75
+> >>      [root@t1700 ~]#
+> >>
+> >> Signed-off-by: Erwan Velu <e.velu@criteo.com>
+> >> ---
+> >>   drivers/firmware/dmi-id.c       |  6 ++++++
+> >>   drivers/firmware/dmi_scan.c     | 30 ++++++++++++++++++++++++++++++
+> >>   include/linux/mod_devicetable.h |  2 ++
+> >>   scripts/mod/file2alias.c        |  2 ++
+> >>   4 files changed, 40 insertions(+)
+> >> (...)
+> > Applied, thanks. Note that I went for "efr" as the shortcut string for
+> > DMI_EC_FIRMWARE_RELEASE, which was your first choice and has my
+> > preference.
 > >
-> > When I did an allmodconfig build the following warning showed up:
-> >
-> > scripts/Makefile.lib:8: 'always' is deprecated. Please use 'always-y' instead
-> > scripts/Makefile.lib:12: 'hostprogs-y' and 'hostprogs-m' are deprecated. Please use 'hostprogs' instead
-> >
-> > Rework to use the new 'always-y' and 'hostprogs'.
-> >
-> > Fixes: ee066c3ddf7b ("kbuild: warn if always, hostprogs-y, or hostprogs-m is used")
-> > Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
->
->
-> As Stephen Rothwell reported
-> (https://lkml.org/lkml/2020/5/3/392),
-> this warning appears by merging the
-> two different trees.
-
-Right, I see.
-
->
->
-> You sent this patch to the kbuild maintainers,
-> but samples/watch_queue/Makefile does not exist
-> in the kbuild tree.
-
-oops, I'm sorry.
-
->
->
-> Also, please drop the fixes tag.
-
-I will.
-
-> The commit hash might change.
->
->
-> > ---
-> >  samples/watch_queue/Makefile | 4 ++--
-> >  scripts/Makefile.build       | 1 -
-> >  2 files changed, 2 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
-> > index eec00dd0a8df..8511fb6c53d2 100644
-> > --- a/samples/watch_queue/Makefile
-> > +++ b/samples/watch_queue/Makefile
-> > @@ -1,7 +1,7 @@
-> >  # List of programs to build
-> > -hostprogs-y := watch_test
-> > +hostprogs := watch_test
-> >
-> >  # Tell kbuild to always build the programs
-> > -always := $(hostprogs-y)
-> > +always-y := $(hostprogs)
-> >
-> >  HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index 3665b1a0bc8e..abdba70f33a1 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -15,7 +15,6 @@ obj-y :=
-> >  obj-m :=
-> >  lib-y :=
-> >  lib-m :=
-> > -always :=
-> >  always-y :=
-> >  always-m :=
-> >  targets :=
->
->
-> Why are you deleting 'always'?
-> It would immediately break
-> the downstream Makefiles immediately.
-
-Thank you, you are correct.
-
-I will send out a new patch shortly to the correct list.
-
-Cheers,
-Anders
