@@ -1,105 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:44054 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728058AbgEKDux (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:29748 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725790AbgEKEXP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 May 2020 23:50:53 -0400
+        Mon, 11 May 2020 00:23:15 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/2] kbuild: error out if targets prefixed with '__' are directly run
-Date: Mon, 11 May 2020 12:50:13 +0900
-Message-Id: <20200511035013.1629672-2-masahiroy@kernel.org>
-In-Reply-To: <20200511035013.1629672-1-masahiroy@kernel.org>
-References: <20200511035013.1629672-1-masahiroy@kernel.org>
+Subject: [PATCH] kbuild: make module name conflict fatal error
+Date: Mon, 11 May 2020 13:21:49 +0900
+Message-Id: <20200511042149.1712876-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Lucas De Marchi <lucas.demarchi@intel.com>, Michal Marek <michal.lkml@markovi.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kernel@vger.kernel.org
 
-Some targets are internal-use only.
+I think all the warnings have been fixed by now. Make it a fatal error.
 
-It is tedious to care about "what if __build_one_by_one is contained
-in $(MAKECMDGOALS)?" etc.
-
-Prefix internal targets with double underscores. Stop parsing Makefile
-if they are directly run.
+Check it before modpost because we need to stop building *.ko files.
+Also, pass modules.order via a script parameter.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+ Makefile                 |  7 +++++--
+ scripts/modules-check.sh | 16 +++++++++++++---
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 1a4977ad7cd9..1162cb04860c 100644
+index 1162cb04860c..a2e4d0945500 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -11,9 +11,12 @@ NAME = Kleptomaniac Octopus
- # Comments in this file are targeted only to the developer, do not
- # expect to learn how to build the kernel reading this file.
+@@ -1328,9 +1328,12 @@ all: modules
+ # using awk while concatenating to the final file.
  
-+$(if $(filter __%, $(MAKECMDGOALS)), \
-+	$(error targets prefixed with '__' are only for internal use))
+ PHONY += modules
+-modules: $(if $(KBUILD_BUILTIN),vmlinux) modules.order
++modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_check
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh
 +
- # That's our default target when none is given on the command line
--PHONY := _all
--_all:
-+PHONY := __all
-+__all:
++PHONY += modules_check
++modules_check: modules.order
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules-check.sh $<
  
- # We are using a recursive build, so we need to do a little thinking
- # to get the ordering right.
-@@ -172,13 +175,13 @@ export sub_make_done := 1
+ modules.order: descend
+ 	$(Q)$(AWK) '!x[$$0]++' $(addsuffix /$@, $(build-dirs)) > $@
+diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
+index f51f446707b8..43de226071ae 100755
+--- a/scripts/modules-check.sh
++++ b/scripts/modules-check.sh
+@@ -3,14 +3,24 @@
  
- ifeq ($(need-sub-make),1)
+ set -e
  
--PHONY += $(MAKECMDGOALS) sub-make
-+PHONY += $(MAKECMDGOALS) __sub-make
++if [ $# != 1 ]; then
++	echo "Usage: $0 <modules.order>" >& 2
++	exit 1
++fi
++
++exit_code=0
++
+ # Check uniqueness of module names
+ check_same_name_modules()
+ {
+-	for m in $(sed 's:.*/::' modules.order | sort | uniq -d)
++	for m in $(sed 's:.*/::' $1 | sort | uniq -d)
+ 	do
+-		echo "warning: same module names found:" >&2
++		echo "error: the following would cause module name conflict:" >&2
+ 		sed -n "/\/$m/s:^:  :p" modules.order >&2
++		exit_code=1
+ 	done
+ }
  
--$(filter-out _all sub-make $(this-makefile), $(MAKECMDGOALS)) _all: sub-make
-+$(filter-out $(this-makefile), $(MAKECMDGOALS)) __all: __sub-make
- 	@:
- 
- # Invoke a second make in the output directory, passing relevant variables
--sub-make:
-+__sub-make:
- 	$(Q)$(MAKE) -C $(abs_objtree) -f $(abs_srctree)/Makefile $(MAKECMDGOALS)
- 
- endif # need-sub-make
-@@ -323,7 +326,7 @@ ifdef mixed-build
- 
- PHONY += $(MAKECMDGOALS) __build_one_by_one
- 
--$(filter-out __build_one_by_one, $(MAKECMDGOALS)): __build_one_by_one
-+$(MAKECMDGOALS): __build_one_by_one
- 	@:
- 
- __build_one_by_one:
-@@ -598,12 +601,12 @@ else #!config-build
- # targets and others. In general all targets except *config targets.
- 
- # If building an external module we do not care about the all: rule
--# but instead _all depend on modules
-+# but instead __all depend on modules
- PHONY += all
- ifeq ($(KBUILD_EXTMOD),)
--_all: all
-+__all: all
- else
--_all: modules
-+__all: modules
- endif
- 
- # Decide whether to build built-in, modular, or both.
-@@ -625,7 +628,7 @@ endif
- # in addition to whatever we do anyway.
- # Just "make" or "make all" shall build modules as well
- 
--ifneq ($(filter all _all modules nsdeps,$(MAKECMDGOALS)),)
-+ifneq ($(filter all modules nsdeps,$(MAKECMDGOALS)),)
-   KBUILD_MODULES := 1
- endif
- 
+-check_same_name_modules
++check_same_name_modules "$1"
++
++exit $exit_code
 -- 
 2.25.1
