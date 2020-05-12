@@ -1,121 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33340 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728275AbgELUBT (ORCPT
+        with ESMTP id S1731048AbgELUDD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 May 2020 16:01:19 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F94FC061A0C
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 May 2020 13:01:19 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id a5so10069828pjh.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 May 2020 13:01:19 -0700 (PDT)
-Date: Tue, 12 May 2020 13:01:14 -0700
-From: Fangrui Song <maskray@google.com>
-Subject: Re: [PATCH] Makefile: support compressed debug info
-Message-ID: <20200512200114.64vo5lbl7wk2tzxk@google.com>
+        Tue, 12 May 2020 16:03:03 -0400
+MIME-Version: 1.0
 References: <20200504031340.7103-1-nick.desaulniers@gmail.com>
  <CA+icZUUOaqeKeh6n4BJq2k6XQWAfNghUj57j42ZX5qyd3iOmLw@mail.gmail.com>
- <20200505004738.ew2lcp27c2n4jqia@google.com>
- <CAK7LNAR7-VMEWBcJ_Wd+61ZDHEa0gD8FaSs63YPu7m_FgH8Htg@mail.gmail.com>
+ <20200505004738.ew2lcp27c2n4jqia@google.com> <CAK7LNAR7-VMEWBcJ_Wd+61ZDHEa0gD8FaSs63YPu7m_FgH8Htg@mail.gmail.com>
  <CAKwvOdmEP9Auuc+M+MqPoQmx+70DgdsPYZQ6pg=8oGnfCviqRA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
 In-Reply-To: <CAKwvOdmEP9Auuc+M+MqPoQmx+70DgdsPYZQ6pg=8oGnfCviqRA@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Tue, 12 May 2020 22:02:51 +0200
+Message-ID: <CA+icZUUSgkUM3oYUzDdhz9tdU+HGG+BMGwqJdb5RXZNNYHn5ng@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: support compressed debug info
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Sedat Dilek <sedat.dilek@gmail.com>, Nick Desaulniers <nick.desaulniers@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Krzysztof Kozlowski <krzk@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Fangrui Song <maskray@google.com>, Nick Desaulniers <nick.desaulniers@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Krzysztof Kozlowski <krzk@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
 
-On 2020-05-12, Nick Desaulniers wrote:
->On Mon, May 11, 2020 at 10:54 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->>
->> > >On Mon, May 4, 2020 at 5:13 AM Nick Desaulniers
->> > ><nick.desaulniers@gmail.com> wrote:
->> > >>
->> > >> As debug information gets larger and larger, it helps significantly save
->> > >> the size of vmlinux images to compress the information in the debug
->> > >> information sections. Note: this debug info is typically split off from
->> > >> the final compressed kernel image, which is why vmlinux is what's used
->> > >> in conjunction with GDB. Minimizing the debug info size should have no
->> > >> impact on boot times, or final compressed kernel image size.
->> > >>
->> Nick,
->>
->> I am OK with this patch.
->>
->> Fangrui provided the minimal requirement for
->> --compress-debug-sections=zlib
->>
->>
->> Is it worth recording in the help text?
->> Do you want to send v2?
+On Tue, May 12, 2020 at 9:23 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
->Yes I'd like to record that information.  I can also record Sedat's
->Tested-by tag.  Thank you for testing Sedat.
+> On Mon, May 11, 2020 at 10:54 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > > >On Mon, May 4, 2020 at 5:13 AM Nick Desaulniers
+> > > ><nick.desaulniers@gmail.com> wrote:
+> > > >>
+> > > >> As debug information gets larger and larger, it helps significantly save
+> > > >> the size of vmlinux images to compress the information in the debug
+> > > >> information sections. Note: this debug info is typically split off from
+> > > >> the final compressed kernel image, which is why vmlinux is what's used
+> > > >> in conjunction with GDB. Minimizing the debug info size should have no
+> > > >> impact on boot times, or final compressed kernel image size.
+> > > >>
+> > Nick,
+> >
+> > I am OK with this patch.
+> >
+> > Fangrui provided the minimal requirement for
+> > --compress-debug-sections=zlib
+> >
+> >
+> > Is it worth recording in the help text?
+> > Do you want to send v2?
 >
->I don't know what "linux-image-dbg file" are, or why they would be
->bigger.  The size of the debug info is the primary concern with this
->config.  It sounds like however that file is created might be
->problematic.
+> Yes I'd like to record that information.  I can also record Sedat's
+> Tested-by tag.  Thank you for testing Sedat.
 >
->Fangrui, I wasn't able to easily find what version of binutils first
->added support.  Can you please teach me how to fish?
+> I don't know what "linux-image-dbg file" are, or why they would be
+> bigger.  The size of the debug info is the primary concern with this
+> config.  It sounds like however that file is created might be
+> problematic.
+>
 
-I actually downloaded https://ftp.gnu.org/gnu/binutils/ archives and
-located the sources... I think an easier way is:
+Hi Nick,
 
-% cd binutils-gdb
-% git show binutils-2_26:./gas/as.c | grep compress-debug-sections
---compress-debug-sections[={none|zlib|zlib-gnu|zlib-gabi}]\n\
-...
+sorry, I try to explain the magic of "linux-image-dbg file".
 
-GNU as 2.25 only supports --compress-debug-sections which means "zlib-gnu" in
-newer versions.
+In my workflow, I use the "scripts/package/{builddeb,mkdebian}"
+shipped with the Linux-kernel as a base to build my Debian packages.
 
-Similarly, for GNU ld:
+With enabled debugging (CONFIG_DEBUG_INFO=y) a
+"linux-image-$KERNELRELEASE-dbg" Debian package is created.
 
-% git show binutils-2_26:./ld/lexsup.c | grep compress-debug-sections
-   --compress-debug-sections=[none|zlib|zlib-gnu|zlib-gabi]\n\
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/package/mkdebian#n203
 
-(I have spent a lot of time investigating GNU ld's behavior :)
+As you can see below...
 
->Another question I had for Fangrui is, if the linker can compress
->these sections, shouldn't we just have the linker do it, not the the
->compiler and assembler?  IIUC the debug info can contain relocations,
->so the linker would have to decompress these, perform relocations,
->then recompress these?  I guess having the compiler and assembler
->compress the debug info as well would minimize the size of the .o
->files on disk.
+[ CONFIG_DEBUG_INFO_COMPRESSED=n ]
 
-The linker will decompress debug info unconditionally. Because
-input .debug_info sections need to be concatenated to form the output
-.debug_info . Whether the output .debug_info is compressed is controlled
-by the linker option --compress-debug-sections=zlib, which is not
-affected by the compression state of object files.
+47      5.7.0-rc4-1-amd64-clang/linux-image-5.7.0-rc4-1-amd64-clang_5.7.0~rc4-1~bullseye+dileks1_amd64.deb
+424     5.7.0-rc4-1-amd64-clang/linux-image-5.7.0-rc4-1-amd64-clang-dbg_5.7.0~rc4-1~bullseye+dileks1_amd64.deb
 
-Both GNU as and GNU ld name the option --compress-debug-sections=zlib.
-In a compiler driver context, an unfamiliar user may find
--Wa,--compress-debug-sections=zlib -Wl,--compress-debug-sections=zlib
-confusing:/
+[ CONFIG_DEBUG_INFO_COMPRESSED=y ]
 
->Otherwise I should add this flag to the assembler invocation, too, in
->v2.  Thoughts?
+47      5.7.0-rc4-2-amd64-clang/linux-image-5.7.0-rc4-2-amd64-clang_5.7.0~rc4-2~bullseye+dileks1_amd64.deb
+771     5.7.0-rc4-2-amd64-clang/linux-image-5.7.0-rc4-2-amd64-clang-dbg_5.7.0~rc4-2~bullseye+dileks1_amd64.deb
 
-Compressing object files along with the linked output should be fine. It
-can save disk space. (It'd be great if you paste the comparison
-with and w/o object files compressed)
+...there is minimal change in the size for the Debian package w/o
+debug-infos - approx. 47M.
+As said 424M vs. 771M for the dbg packages.
 
-Feel free to add:
+There is another big benefit checking my recorded stats:
 
-Reviewed-by: Fangrui Song <maskray@google.com>
+$ grep 'cache size' stats/5.7.0-rc4-*/ccache-s.txt
+stats/5.7.0-rc4-1-amd64-clang/ccache-s.txt:cache size
+         4.7 GB
+stats/5.7.0-rc4-1-amd64-clang/ccache-s.txt:max cache size
+        10.0 GB
+stats/5.7.0-rc4-2-amd64-clang/ccache-s.txt:cache size
+         3.4 GB
+stats/5.7.0-rc4-2-amd64-clang/ccache-s.txt:max cache size
+        10.0 GB
 
->I have a patch series that enables dwarf5 support in the kernel that
->I'm working up to.  I wanted to send this first.  Both roughly reduce
->the debug info size by 20% each, though I haven't measured them
->together, yet.  Requires ToT binutils because there have been many
->fixes from reports of mine recently.
+So the cache of ccache is reduced: 4.7 GB vs. 3.4 GB
 
-This will be awesome! I also heard that enabling DWARF v5 for our object
-files can easily make debug info size smaller by 20%. Glad that the
-kernel can benefit it as well:)
+If you have any questions, "Don't ask to ask - just ask." :-).
+
+Thanks.
+
+Regards,
+- Sedat -
