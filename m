@@ -1,49 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.zx2c4.com ([192.95.5.64]:35809 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727886AbgELAoD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 May 2020 20:44:03 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:44719 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725814AbgELEdy (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 12 May 2020 00:33:54 -0400
 MIME-Version: 1.0
-References: <20200508090202.7s3kcqpvpxx32syu@butterfly.localdomain>
- <20200511215720.303181-1-Jason@zx2c4.com> <CAHk-=wi87j=wj0ijkYZ3WoPVkZ9Fq1U2bLnQ66nk425B5kW0Cw@mail.gmail.com>
-In-Reply-To: <CAHk-=wi87j=wj0ijkYZ3WoPVkZ9Fq1U2bLnQ66nk425B5kW0Cw@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 11 May 2020 18:43:48 -0600
-Message-ID: <CAHmME9pXnYurszyvX8FAYHbMysknpegUSF1g2wZPdBybxD-xZQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Kconfig: default to CC_OPTIMIZE_FOR_PERFORMANCE_O3 for
- gcc >= 10
+References: <20200509073915.860588-1-masahiroy@kernel.org> <CAADnVQJvJWwziwDj0ZgPc02iHNNk8EJetDqNZ6SoWq045C-gXQ@mail.gmail.com>
+In-Reply-To: <CAADnVQJvJWwziwDj0ZgPc02iHNNk8EJetDqNZ6SoWq045C-gXQ@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 12 May 2020 13:32:53 +0900
+Message-ID: <CAK7LNARg96EfyZTHdDDToGqwhaokaG-PQCOyCHL1id14YxY3-A@mail.gmail.com>
+Subject: Re: [PATCH] bpfilter: check if $(CC) can static link in Kconfig
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, stable <stable@vger.kernel.org>, "H.J. Lu" <hjl.tools@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Jakub Jelinek <jakub@redhat.com>, Oleksandr Natalenko <oleksandr@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, David Laight <David.Laight@aculab.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Valdis Kletnieks <valdis.kletnieks@vt.edu>, LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andriin@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>, Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, Network Development <netdev@vger.kernel.org>
 
-On Mon, May 11, 2020 at 6:05 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> There's a reason -O3 isn't even offered as an option.
+On Sun, May 10, 2020 at 10:04 AM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> Maybe things have changed, and maybe they've improved. But I'd like to
-> see actual numbers for something like this.
+> On Sat, May 9, 2020 at 12:40 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > On Fedora, linking static libraries requires the glibc-static RPM
+> > package, which is not part of the glibc-devel package.
+> >
+> > CONFIG_CC_CAN_LINK does not check the capability of static linking,
+> > so you can enable CONFIG_BPFILTER_UMH, then fail to build.
+> >
+> >   HOSTLD  net/bpfilter/bpfilter_umh
+> > /usr/bin/ld: cannot find -lc
+> > collect2: error: ld returned 1 exit status
+> >
+> > Add CONFIG_CC_CAN_LINK_STATIC, and make CONFIG_BPFILTER_UMH depend
+> > on it.
+> >
+> > Reported-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 >
-> Not inlining as aggressively is not necessarily a bad thing. It can
-> be, of course. But I've actually also done gcc bugreports about gcc
-> inlining too much, and generating _worse_ code as a result (ie
-> inlinging things that were behind an "if (unlikely())" test, and
-> causing the likely path to grow a stack fram and stack spills as a
-> result).
->
-> So just "O3 inlines more" is not a valid argument.
+> Thanks!
+> Acked-by: Alexei Starovoitov <ast@kernel.org>
 
-Alright. It might be possible to produce some benchmarks, and then
-isolate the precise inlining parameter that makes the difference, and
-include that for gcc-10. But you made a compelling argument in that
-old gcc bug report about not going down the finicky rabbit hole of gcc
-inlining switches that seem to change meaning between releases, which
-is persuasive.
+Applied to linux-kbuild
+with Alexei's Ack.
 
-The other possibility would be if -O3 actually isn't bad like it used
-to be and the codegen is markedly better, alongside some numbers to
-back it up. I'm not presently making that argument and don't have
-those numbers, but perhaps others who were interested in this patch
-for other reasons do have strong arguments there and want to chime in.
-Otherwise, no problem dropping this.
+
+-- 
+Best Regards
+Masahiro Yamada
