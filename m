@@ -1,168 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:51674 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726582AbgELEfb (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:55760 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725851AbgELEgz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 May 2020 00:35:31 -0400
+        Tue, 12 May 2020 00:36:55 -0400
 MIME-Version: 1.0
-References: <20200429034527.590520-1-masahiroy@kernel.org>
-In-Reply-To: <20200429034527.590520-1-masahiroy@kernel.org>
+References: <20200504080807.126396-1-masahiroy@kernel.org>
+In-Reply-To: <20200504080807.126396-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 12 May 2020 13:34:36 +0900
-Message-ID: <CAK7LNARgFip=ywrLdF8Z5uznQBmYTZfxn5PHR9jSnYEJDxYc_w@mail.gmail.com>
-Subject: Re: [PATCH v2 00/15] kbuild: support 'userprogs' syntax
+Date: Tue, 12 May 2020 13:36:05 +0900
+Message-ID: <CAK7LNAQ0U_QAeQR_Ab2wD06pNKvKXcoG6OJL+SFaCtJymuG5Kw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: remove misleading stale FIXME comment
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: bpf <bpf@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-On Wed, Apr 29, 2020 at 12:45 PM Masahiro Yamada <masahiroy@kernel.org> wro=
-te:
+On Mon, May 4, 2020 at 5:08 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
+> This comment was added by commit ("kbuild: Restore build nr, improve
+> vmlinux link") [1].
 >
-> Several Makefiles use 'hostprogs' to build programs for the host
-> architecture where it is not appropriate to do so.
-> This is just because Kbuild lacks the support for building programs
-> for the target architecture.
+> It was talking about if_changed_rule at that time. Now, it is unclear
+> what to fix.
 >
-> This series introduce 'userprogs' syntax and use it from
-> sample and bpf Makefiles.
->
-> Sam worked on this in 2014.
-> https://lkml.org/lkml/2014/7/13/154
->
-> He used 'uapiprogs-y' but I just thought the meaning of
-> "UAPI programs" is unclear.
->
-> Naming the syntax is one of the most difficult parts.
->
-> I chose 'userprogs'. Anothor choice I had in my mind was 'targetprogs'.
->
-> You can test this series quickly by 'make allmodconfig samples/'
->
-> When building objects for userspace, [U] is displayed.
->
-> masahiro@oscar:~/workspace/linux$ make allmodconfig samples/
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=ea52ca1b3e3882b499cc6c043f384958b88b62ff
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+
+Applied to linux-kbuild.
 
 
-All applied to linux-kbuild.
-
-
->   [snip]
->   AR      samples/vfio-mdev/built-in.a
->   CC [M]  samples/vfio-mdev/mtty.o
->   CC [M]  samples/vfio-mdev/mdpy.o
->   CC [M]  samples/vfio-mdev/mdpy-fb.o
->   CC [M]  samples/vfio-mdev/mbochs.o
->   AR      samples/mei/built-in.a
->   CC [U]  samples/mei/mei-amt-version
->   CC [U]  samples/auxdisplay/cfag12864b-example
->   CC [M]  samples/configfs/configfs_sample.o
->   CC [M]  samples/connector/cn_test.o
->   CC [U]  samples/connector/ucon
->   CC [M]  samples/ftrace/ftrace-direct.o
->   CC [M]  samples/ftrace/ftrace-direct-too.o
->   CC [M]  samples/ftrace/ftrace-direct-modify.o
->   CC [M]  samples/ftrace/sample-trace-array.o
->   CC [U]  samples/hidraw/hid-example
->   CC [M]  samples/hw_breakpoint/data_breakpoint.o
->   CC [M]  samples/kdb/kdb_hello.o
->   CC [M]  samples/kfifo/bytestream-example.o
->   CC [M]  samples/kfifo/dma-example.o
->   CC [M]  samples/kfifo/inttype-example.o
->   CC [M]  samples/kfifo/record-example.o
->   CC [M]  samples/kobject/kobject-example.o
->   CC [M]  samples/kobject/kset-example.o
->   CC [M]  samples/kprobes/kprobe_example.o
->   CC [M]  samples/kprobes/kretprobe_example.o
->   CC [M]  samples/livepatch/livepatch-sample.o
->   CC [M]  samples/livepatch/livepatch-shadow-mod.o
->   CC [M]  samples/livepatch/livepatch-shadow-fix1.o
->   CC [M]  samples/livepatch/livepatch-shadow-fix2.o
->   CC [M]  samples/livepatch/livepatch-callbacks-demo.o
->   CC [M]  samples/livepatch/livepatch-callbacks-mod.o
->   CC [M]  samples/livepatch/livepatch-callbacks-busymod.o
->   CC [M]  samples/rpmsg/rpmsg_client_sample.o
->   CC [U]  samples/seccomp/bpf-fancy.o
->   CC [U]  samples/seccomp/bpf-helper.o
->   LD [U]  samples/seccomp/bpf-fancy
->   CC [U]  samples/seccomp/dropper
->   CC [U]  samples/seccomp/bpf-direct
->   CC [U]  samples/seccomp/user-trap
->   CC [U]  samples/timers/hpet_example
->   CC [M]  samples/trace_events/trace-events-sample.o
->   CC [M]  samples/trace_printk/trace-printk.o
->   CC [U]  samples/uhid/uhid-example
->   CC [M]  samples/v4l/v4l2-pci-skeleton.o
->   CC [U]  samples/vfs/test-fsmount
->   CC [U]  samples/vfs/test-statx
-> samples/vfs/test-statx.c:24:15: warning: =E2=80=98struct foo=E2=80=99 dec=
-lared inside parameter list will not be visible outside of this definition =
-or declaration
->    24 | #define statx foo
->       |               ^~~
->   CC [U]  samples/watchdog/watchdog-simple
->   AR      samples/built-in.a
 >
-> Changes for v2:
->   - Fix ARCH=3Di386 build error for bpfilter_umh
->   - Rename 'user-ccflags' to 'userccflags'
->     because 'user-ccflags' would conflict if an object
->     called 'user.o' exists in the directory.
->   - Support 'userldflags'
+>  Makefile | 3 ---
+>  1 file changed, 3 deletions(-)
 >
-> Masahiro Yamada (14):
->   bpfilter: match bit size of bpfilter_umh to that of the kernel
->   kbuild: add infrastructure to build userspace programs
->   bpfilter: use 'userprogs' syntax to build bpfilter_umh
->   samples: seccomp: build sample programs for target architecture
->   kbuild: doc: document the new syntax 'userprogs'
->   samples: uhid: build sample program for target architecture
->   samples: hidraw: build sample program for target architecture
->   samples: connector: build sample program for target architecture
->   samples: vfs: build sample programs for target architecture
->   samples: pidfd: build sample program for target architecture
->   samples: mei: build sample program for target architecture
->   samples: auxdisplay: use 'userprogs' syntax
->   samples: timers: use 'userprogs' syntax
->   samples: watchdog: use 'userprogs' syntax
+> diff --git a/Makefile b/Makefile
+> index 9ff00bfe0575..ffd80afcd0bb 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1827,9 +1827,6 @@ tools/%: FORCE
+>         $(Q)mkdir -p $(objtree)/tools
+>         $(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(srctree)/tools/ $*
 >
-> Sam Ravnborg (1):
->   samples: uhid: fix warnings in uhid-example
->
->  Documentation/kbuild/makefiles.rst | 183 +++++++++++++++++++++--------
->  Makefile                           |  13 +-
->  init/Kconfig                       |   4 +-
->  net/bpfilter/Makefile              |  11 +-
->  samples/Kconfig                    |  26 +++-
->  samples/Makefile                   |   4 +
->  samples/auxdisplay/Makefile        |  11 +-
->  samples/connector/Makefile         |  12 +-
->  samples/hidraw/Makefile            |   9 +-
->  samples/mei/Makefile               |   9 +-
->  samples/pidfd/Makefile             |   8 +-
->  samples/seccomp/Makefile           |  42 +------
->  samples/timers/Makefile            |  17 +--
->  samples/uhid/.gitignore            |   2 +
->  samples/uhid/Makefile              |   9 +-
->  samples/uhid/uhid-example.c        |   4 +-
->  samples/vfs/Makefile               |  11 +-
->  samples/watchdog/Makefile          |  10 +-
->  scripts/Makefile.build             |   6 +
->  scripts/Makefile.clean             |   2 +-
->  scripts/Makefile.userprogs         |  45 +++++++
->  usr/include/Makefile               |   4 +
->  22 files changed, 267 insertions(+), 175 deletions(-)
->  create mode 100644 samples/uhid/.gitignore
->  create mode 100644 scripts/Makefile.userprogs
+> -# FIXME Should go into a make.lib or something
+> -# ===========================================================================
+> -
+>  quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
+>        cmd_rmdirs = rm -rf $(rm-dirs)
 >
 > --
 > 2.25.1
 >
 
 
---=20
+-- 
 Best Regards
 Masahiro Yamada
