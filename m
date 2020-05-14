@@ -1,270 +1,136 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:46805 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726056AbgENNOR (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 09:14:17 -0400
-From: Denis Efremov <efremov@linux.com>
-Subject: [RFC PATCH] kbuild: add variables for compression tools
-Date: Thu, 14 May 2020 16:12:34 +0300
-Message-Id: <20200514131234.380097-1-efremov@linux.com>
+Received: from mail.kernel.org ([198.145.29.99]:51800 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728510AbgENSw6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 May 2020 14:52:58 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 54/62] Stop the ad-hoc games with -Wno-maybe-initialized
+Date: Thu, 14 May 2020 14:51:39 -0400
+Message-Id: <20200514185147.19716-54-sashal@kernel.org>
+In-Reply-To: <20200514185147.19716-1-sashal@kernel.org>
+References: <20200514185147.19716-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Denis Efremov <efremov@linux.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Dmitry Vyukov <dvyukov@google.com>
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-Allow user to use alternative implementations of compression tools.
-For example, multi-threaded tools to speed up the build:
-$ make KGZIP=pigz KXZ=pxz
+From: Linus Torvalds <torvalds@linux-foundation.org>
 
-Variable KGZIP is used instead of GZIP because the latter is reserved
-by the tool. Other variables are prefixed with 'K' for consistency.
+[ Upstream commit 78a5255ffb6a1af189a83e493d916ba1c54d8c75 ]
 
-The credit goes to @grsecurity.
+We have some rather random rules about when we accept the
+"maybe-initialized" warnings, and when we don't.
 
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Dmitry Vyukov <dvyukov@google.com>
-Signed-off-by: Denis Efremov <efremov@linux.com>
+For example, we consider it unreliable for gcc versions < 4.9, but also
+if -O3 is enabled, or if optimizing for size.  And then various kernel
+config options disabled it, because they know that they trigger that
+warning by confusing gcc sufficiently (ie PROFILE_ALL_BRANCHES).
+
+And now gcc-10 seems to be introducing a lot of those warnings too, so
+it falls under the same heading as 4.9 did.
+
+At the same time, we have a very straightforward way to _enable_ that
+warning when wanted: use "W=2" to enable more warnings.
+
+So stop playing these ad-hoc games, and just disable that warning by
+default, with the known and straight-forward "if you want to work on the
+extra compiler warnings, use W=123".
+
+Would it be great to have code that is always so obvious that it never
+confuses the compiler whether a variable is used initialized or not?
+Yes, it would.  In a perfect world, the compilers would be smarter, and
+our source code would be simpler.
+
+That's currently not the world we live in, though.
+
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile                          | 11 +++++++++--
- arch/arm/boot/deflate_xip_data.sh |  6 +++++-
- arch/ia64/Makefile                |  2 +-
- arch/m68k/Makefile                |  4 ++--
- arch/mips/lasat/image/Makefile    |  2 +-
- arch/parisc/Makefile              |  2 +-
- kernel/gen_kheaders.sh            |  6 +++++-
- scripts/Makefile.lib              | 12 ++++++------
- scripts/Makefile.package          |  6 +++---
- scripts/xz_wrap.sh                |  6 +++++-
- 10 files changed, 38 insertions(+), 19 deletions(-)
+ Makefile             |  7 +++----
+ init/Kconfig         | 18 ------------------
+ kernel/trace/Kconfig |  1 -
+ 3 files changed, 3 insertions(+), 23 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 11fe9b1535de..9af13cfeed7a 100644
+index 744245f0c96cf..d226ec8bd167f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -447,6 +447,12 @@ PYTHON		= python
- PYTHON3		= python3
- CHECK		= sparse
- BASH		= bash
-+KGZIP		= gzip
-+KBZIP2		= bzip2
-+KLZMA		= lzma
-+KLZOP		= lzop
-+KLZ4		= lz4c
-+KXZ		= xz
- 
- CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
- 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
-@@ -496,6 +502,7 @@ export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD
- export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
- export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
- export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
-+export KGZIP KBZIP2 KLZMA KLZOP KLZ4 KXZ
- 
- export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
- export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
-@@ -1005,10 +1012,10 @@ export mod_strip_cmd
- mod_compress_cmd = true
- ifdef CONFIG_MODULE_COMPRESS
-   ifdef CONFIG_MODULE_COMPRESS_GZIP
--    mod_compress_cmd = gzip -n -f
-+    mod_compress_cmd = $(KGZIP) -n -f
-   endif # CONFIG_MODULE_COMPRESS_GZIP
-   ifdef CONFIG_MODULE_COMPRESS_XZ
--    mod_compress_cmd = xz -f
-+    mod_compress_cmd = $(KXZ) -f
-   endif # CONFIG_MODULE_COMPRESS_XZ
- endif # CONFIG_MODULE_COMPRESS
- export mod_compress_cmd
-diff --git a/arch/arm/boot/deflate_xip_data.sh b/arch/arm/boot/deflate_xip_data.sh
-index 40937248cebe..08dd50e08c17 100755
---- a/arch/arm/boot/deflate_xip_data.sh
-+++ b/arch/arm/boot/deflate_xip_data.sh
-@@ -19,6 +19,10 @@ XIPIMAGE="$2"
- 
- DD="dd status=none"
- 
-+if [ x$KGZIP = "x" ]; then
-+	KGZIP=gzip
-+fi
-+
- # Use "make V=1" to debug this script.
- case "$KBUILD_VERBOSE" in
- *1*)
-@@ -56,7 +60,7 @@ trap 'rm -f "$XIPIMAGE.tmp"; exit 1' 1 2 3
- # substitute the data section by a compressed version
- $DD if="$XIPIMAGE" count=$data_start iflag=count_bytes of="$XIPIMAGE.tmp"
- $DD if="$XIPIMAGE"  skip=$data_start iflag=skip_bytes |
--gzip -9 >> "$XIPIMAGE.tmp"
-+$KGZIP -9 >> "$XIPIMAGE.tmp"
- 
- # replace kernel binary
- mv -f "$XIPIMAGE.tmp" "$XIPIMAGE"
-diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
-index 32240000dc0c..2876a7df1b0a 100644
---- a/arch/ia64/Makefile
-+++ b/arch/ia64/Makefile
-@@ -40,7 +40,7 @@ $(error Sorry, you need a newer version of the assember, one that is built from
+@@ -708,10 +708,6 @@ else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS += -Os
  endif
  
- quiet_cmd_gzip = GZIP    $@
--cmd_gzip = cat $(real-prereqs) | gzip -n -f -9 > $@
-+cmd_gzip = cat $(real-prereqs) | $(KGZIP) -n -f -9 > $@
+-ifdef CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+-KBUILD_CFLAGS   += -Wno-maybe-uninitialized
+-endif
+-
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
+@@ -862,6 +858,9 @@ KBUILD_CFLAGS += -Wno-pointer-sign
+ # disable stringop warnings in gcc 8+
+ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
  
- quiet_cmd_objcopy = OBJCOPY $@
- cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
-diff --git a/arch/m68k/Makefile b/arch/m68k/Makefile
-index 5d9288384096..e6c7c92aa72e 100644
---- a/arch/m68k/Makefile
-+++ b/arch/m68k/Makefile
-@@ -148,10 +148,10 @@ vmlinux.bz2: vmlinux
- ifndef CONFIG_KGDB
- 	cp vmlinux vmlinux.tmp
- 	$(STRIP) vmlinux.tmp
--	bzip2 -1c vmlinux.tmp >vmlinux.bz2
-+	$(KBZIP2) -1c vmlinux.tmp >vmlinux.bz2
- 	rm vmlinux.tmp
- else
--	bzip2 -1c vmlinux >vmlinux.bz2
-+	$(KBZIP2) -1c vmlinux >vmlinux.bz2
- endif
- 
- archclean:
-diff --git a/arch/mips/lasat/image/Makefile b/arch/mips/lasat/image/Makefile
-index 78ce4cff1012..617ccb1659d5 100644
---- a/arch/mips/lasat/image/Makefile
-+++ b/arch/mips/lasat/image/Makefile
-@@ -44,7 +44,7 @@ $(obj)/%.o: $(obj)/%.gz
- 	$(LD) -r -o $@ -b binary $<
- 
- $(obj)/%.gz: $(obj)/%.bin
--	gzip -cf -9 $< > $@
-+	$(KGZIP) -cf -9 $< > $@
- 
- $(obj)/kImage.bin: $(KERNEL_IMAGE)
- 	$(OBJCOPY) -O binary -S $^ $@
-diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
-index 628cd8bb7ad8..412ddec0297d 100644
---- a/arch/parisc/Makefile
-+++ b/arch/parisc/Makefile
-@@ -162,7 +162,7 @@ vmlinuz: bzImage
- 	$(OBJCOPY) $(boot)/bzImage $@
- else
- vmlinuz: vmlinux
--	@gzip -cf -9 $< > $@
-+	@$(KGZIP) -cf -9 $< > $@
- endif
- 
- install:
-diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
-index e13ca842eb7e..f3dfaf9f6647 100755
---- a/kernel/gen_kheaders.sh
-+++ b/kernel/gen_kheaders.sh
-@@ -9,6 +9,10 @@ outdir="$(pwd)"
- tarfile=$1
- cpio_dir=$outdir/$tarfile.tmp
- 
-+if [ x$KXZ = "x" ]; then
-+	KXZ=xz
-+fi
++# Enabled with W=2, disabled by default as noisy
++KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
 +
- dir_list="
- include/
- arch/$SRCARCH/include/
-@@ -88,7 +92,7 @@ find $cpio_dir -type f -print0 |
- find $cpio_dir -printf "./%P\n" | LC_ALL=C sort | \
-     tar "${KBUILD_BUILD_TIMESTAMP:+--mtime=$KBUILD_BUILD_TIMESTAMP}" \
-     --owner=0 --group=0 --numeric-owner --no-recursion \
--    -Jcf $tarfile -C $cpio_dir/ -T - > /dev/null
-+    -I $KXZ -cf $tarfile -C $cpio_dir/ -T - > /dev/null
+ # disable invalid "can't wrap" optimizations for signed / pointers
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
  
- echo $headers_md5 > kernel/kheaders.md5
- echo "$this_file_md5" >> kernel/kheaders.md5
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 4b799737722c..dd38f5ac8d48 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -241,7 +241,7 @@ cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
- # ---------------------------------------------------------------------------
+diff --git a/init/Kconfig b/init/Kconfig
+index 4f717bfdbfe2d..ef59c5c36cdb5 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -36,22 +36,6 @@ config TOOLS_SUPPORT_RELR
+ config CC_HAS_ASM_INLINE
+ 	def_bool $(success,echo 'void foo(void) { asm inline (""); }' | $(CC) -x c - -c -o /dev/null)
  
- quiet_cmd_gzip = GZIP    $@
--      cmd_gzip = cat $(real-prereqs) | gzip -n -f -9 > $@
-+      cmd_gzip = cat $(real-prereqs) | $(KGZIP) -n -f -9 > $@
+-config CC_HAS_WARN_MAYBE_UNINITIALIZED
+-	def_bool $(cc-option,-Wmaybe-uninitialized)
+-	help
+-	  GCC >= 4.7 supports this option.
+-
+-config CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+-	bool
+-	depends on CC_HAS_WARN_MAYBE_UNINITIALIZED
+-	default CC_IS_GCC && GCC_VERSION < 40900  # unreliable for GCC < 4.9
+-	help
+-	  GCC's -Wmaybe-uninitialized is not reliable by definition.
+-	  Lots of false positive warnings are produced in some cases.
+-
+-	  If this option is enabled, -Wno-maybe-uninitialzed is passed
+-	  to the compiler to suppress maybe-uninitialized warnings.
+-
+ config CONSTRUCTORS
+ 	bool
+ 	depends on !UML
+@@ -1249,14 +1233,12 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
+ config CC_OPTIMIZE_FOR_PERFORMANCE_O3
+ 	bool "Optimize more for performance (-O3)"
+ 	depends on ARC
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  Choosing this option will pass "-O3" to your compiler to optimize
+ 	  the kernel yet more for performance.
  
- # DTC
- # ---------------------------------------------------------------------------
-@@ -334,19 +334,19 @@ printf "%08x\n" $$dec_size |						\
- )
- 
- quiet_cmd_bzip2 = BZIP2   $@
--      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9; $(size_append); } > $@
-+      cmd_bzip2 = { cat $(real-prereqs) | $(KBZIP2) -9; $(size_append); } > $@
- 
- # Lzma
- # ---------------------------------------------------------------------------
- 
- quiet_cmd_lzma = LZMA    $@
--      cmd_lzma = { cat $(real-prereqs) | lzma -9; $(size_append); } > $@
-+      cmd_lzma = { cat $(real-prereqs) | $(KLZMA) -9; $(size_append); } > $@
- 
- quiet_cmd_lzo = LZO     $@
--      cmd_lzo = { cat $(real-prereqs) | lzop -9; $(size_append); } > $@
-+      cmd_lzo = { cat $(real-prereqs) | $(KLZOP) -9; $(size_append); } > $@
- 
- quiet_cmd_lz4 = LZ4     $@
--      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout; \
-+      cmd_lz4 = { cat $(real-prereqs) | $(KLZ4) -l -c1 stdin stdout; \
-                   $(size_append); } > $@
- 
- # U-Boot mkimage
-@@ -393,7 +393,7 @@ quiet_cmd_xzkern = XZKERN  $@
-                      $(size_append); } > $@
- 
- quiet_cmd_xzmisc = XZMISC  $@
--      cmd_xzmisc = cat $(real-prereqs) | xz --check=crc32 --lzma2=dict=1MiB > $@
-+      cmd_xzmisc = cat $(real-prereqs) | $(KXZ) --check=crc32 --lzma2=dict=1MiB > $@
- 
- # ASM offsets
- # ---------------------------------------------------------------------------
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 02135d2671a6..1b91fe1bfcdb 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -127,9 +127,9 @@ util/PERF-VERSION-GEN $(CURDIR)/$(perf-tar)/);              \
- tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
- rm -r $(perf-tar);                                                  \
- $(if $(findstring tar-src,$@),,                                     \
--$(if $(findstring bz2,$@),bzip2,                                    \
--$(if $(findstring gz,$@),gzip,                                      \
--$(if $(findstring xz,$@),xz,                                        \
-+$(if $(findstring bz2,$@),$(KBZIP2),                                \
-+$(if $(findstring gz,$@),$(KGZIP),                                  \
-+$(if $(findstring xz,$@),$(KXZ),                                    \
- $(error unknown target $@))))                                       \
- 	-f -9 $(perf-tar).tar)
- 
-diff --git a/scripts/xz_wrap.sh b/scripts/xz_wrap.sh
-index 7a2d372f4885..4922102dbfe7 100755
---- a/scripts/xz_wrap.sh
-+++ b/scripts/xz_wrap.sh
-@@ -9,6 +9,10 @@
- # You can do whatever you want with this file.
- #
- 
-+if [ x$KXZ = "x" ]; then
-+	KXZ=xz
-+fi
-+
- BCJ=
- LZMA2OPTS=
- 
-@@ -20,4 +24,4 @@ case $SRCARCH in
- 	sparc)          BCJ=--sparc ;;
- esac
- 
--exec xz --check=crc32 $BCJ --lzma2=$LZMA2OPTS,dict=32MiB
-+exec $KXZ --check=crc32 $BCJ --lzma2=$LZMA2OPTS,dict=32MiB
+ config CC_OPTIMIZE_FOR_SIZE
+ 	bool "Optimize for size (-Os)"
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  Choosing this option will pass "-Os" to your compiler resulting
+ 	  in a smaller kernel.
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index 402eef84c859a..743647005f64e 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -466,7 +466,6 @@ config PROFILE_ANNOTATED_BRANCHES
+ config PROFILE_ALL_BRANCHES
+ 	bool "Profile all if conditionals" if !FORTIFY_SOURCE
+ 	select TRACE_BRANCH_PROFILING
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  This tracer profiles all branch conditions. Every if ()
+ 	  taken in the kernel is recorded whether it hit or miss.
 -- 
-2.25.4
+2.20.1
