@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55232 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:54168 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729159AbgENSy6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 14:54:58 -0400
+        id S1728990AbgENSyQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 May 2020 14:54:16 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 01/39] Makefile: disallow data races on gcc-10 as well
-Date: Thu, 14 May 2020 14:54:18 -0400
-Message-Id: <20200514185456.21060-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 01/31] Makefile: disallow data races on gcc-10 as well
+Date: Thu, 14 May 2020 14:53:43 -0400
+Message-Id: <20200514185413.20755-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -32,16 +32,16 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index 525565f44b171..35640d40a7845 100644
+index 68fa15edd662c..3008cf448649c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -670,6 +670,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+@@ -671,6 +671,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
  
  # Tell gcc to never replace conditional load with a non-conditional one
  KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
 +KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
  
- # check for 'asm goto'
- ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
+ include scripts/Makefile.kcov
+ include scripts/Makefile.gcc-plugins
 -- 
 2.20.1
