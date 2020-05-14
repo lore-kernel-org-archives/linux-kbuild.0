@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51854 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:51932 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728475AbgENSxA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 14:53:00 -0400
+        id S1728543AbgENSxC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 May 2020 14:53:02 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.6 56/62] gcc-10: disable 'array-bounds' warning for now
-Date: Thu, 14 May 2020 14:51:41 -0400
-Message-Id: <20200514185147.19716-56-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 58/62] gcc-10: disable 'restrict' warning for now
+Date: Thu, 14 May 2020 14:51:43 -0400
+Message-Id: <20200514185147.19716-58-sashal@kernel.org>
 In-Reply-To: <20200514185147.19716-1-sashal@kernel.org>
 References: <20200514185147.19716-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -18,54 +18,65 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sasha Levin <sashal@kernel.o
 
 From: Linus Torvalds <torvalds@linux-foundation.org>
 
-[ Upstream commit 44720996e2d79e47d508b0abe99b931a726a3197 ]
+[ Upstream commit adc71920969870dfa54e8f40dac8616284832d02 ]
 
-This is another fine warning, related to the 'zero-length-bounds' one,
-but hitting the same historical code in the kernel.
+gcc-10 now warns about passing aliasing pointers to functions that take
+restricted pointers.
 
-Because C didn't historically support flexible array members, we have
-code that instead uses a one-sized array, the same way we have cases of
-zero-sized arrays.
+That's actually a great warning, and if we ever start using 'restrict'
+in the kernel, it might be quite useful.  But right now we don't, and it
+turns out that the only thing this warns about is an idiom where we have
+declared a few functions to be "printf-like" (which seems to make gcc
+pick up the restricted pointer thing), and then we print to the same
+buffer that we also use as an input.
 
-The one-sized arrays come from either not wanting to use the gcc
-zero-sized array extension, or from a slight convenience-feature, where
-particularly for strings, the size of the structure now includes the
-allocation for the final NUL character.
+And people do that as an odd concatenation pattern, with code like this:
 
-So with a "char name[1];" at the end of a structure, you can do things
-like
+    #define sysfs_show_gen_prop(buffer, fmt, ...) \
+        snprintf(buffer, PAGE_SIZE, "%s"fmt, buffer, __VA_ARGS__)
 
-       v = my_malloc(sizeof(struct vendor) + strlen(name));
+where we have 'buffer' as both the destination of the final result, and
+as the initial argument.
 
-and avoid the "+1" for the terminator.
+Yes, it's a bit questionable.  And outside of the kernel, people do have
+standard declarations like
 
-Yes, the modern way to do that is with a flexible array, and using
-'offsetof()' instead of 'sizeof()', and adding the "+1" by hand.  That
-also technically gets the size "more correct" in that it avoids any
-alignment (and thus padding) issues, but this is another long-term
-cleanup thing that will not happen for 5.7.
+    int snprintf( char *restrict buffer, size_t bufsz,
+                  const char *restrict format, ... );
 
-So disable the warning for now, even though it's potentially quite
-useful.  Having a slew of warnings that then hide more urgent new issues
-is not an improvement.
+where that output buffer is marked as a restrict pointer that cannot
+alias with any other arguments.
+
+But in the context of the kernel, that 'use snprintf() to concatenate to
+the end result' does work, and the pattern shows up in multiple places.
+And we have not marked our own version of snprintf() as taking restrict
+pointers, so the warning is incorrect for now, and gcc picks it up on
+its own.
+
+If we do start using 'restrict' in the kernel (and it might be a good
+idea if people find places where it matters), we'll need to figure out
+how to avoid this issue for snprintf and friends.  But in the meantime,
+this warning is not useful.
 
 Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index daef13f382906..bc5e9a5fc5cbf 100644
+index dde725d9c17d2..c679a260f8ad3 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -860,6 +860,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
+@@ -863,6 +863,9 @@ KBUILD_CFLAGS += $(call cc-disable-warning, zero-length-bounds)
+ KBUILD_CFLAGS += $(call cc-disable-warning, array-bounds)
+ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-overflow)
  
- # We'll want to enable this eventually, but it's not going away for 5.7 at least
- KBUILD_CFLAGS += $(call cc-disable-warning, zero-length-bounds)
-+KBUILD_CFLAGS += $(call cc-disable-warning, array-bounds)
- 
++# Another good warning that we'll want to enable eventually
++KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
++
  # Enabled with W=2, disabled by default as noisy
  KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
+ 
 -- 
 2.20.1
