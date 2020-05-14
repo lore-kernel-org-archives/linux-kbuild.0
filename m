@@ -1,96 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49724 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727084AbgENSvw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 14:51:52 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.6 01/62] kbuild: avoid concurrency issue in parallel building dtbs and dtbs_check
-Date: Thu, 14 May 2020 14:50:46 -0400
-Message-Id: <20200514185147.19716-1-sashal@kernel.org>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728229AbgENWng (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 May 2020 18:43:36 -0400
+From: Yuxuan Shui <yshuiv7@gmail.com>
+Subject: [PATCH] kbuild: compile_h: fix compiler version detection with clang
+Date: Thu, 14 May 2020 23:19:05 +0100
+Message-ID: <87imgykunh.fsf@m5Zedd9JOGzJrf0>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Rob Herring <robh@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: masahiroy@kernel.org, michal.lkml@markovi.net, linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
 
-From: Masahiro Yamada <masahiroy@kernel.org>
+--=-=-=
+Content-Type: text/plain
 
-[ Upstream commit b5154bf63e5577faaaca1d942df274f7de91dd2a ]
 
-'make dtbs_check' checks the shecma in addition to building *.dtb files,
-in other words, 'make dtbs_check' is a super-set of 'make dtbs'.
-So, you do not have to do 'make dtbs dtbs_check', but I want to keep
-the build system as robust as possible in any use.
+In some setup clang will print a line about CUDA version it detects,
+like this:
 
-Currently, 'dtbs' and 'dtbs_check' are independent of each other.
-In parallel building, two threads descend into arch/*/boot/dts/,
-one for dtbs and the other for dtbs_check, then end up with building
-the same DTB simultaneously.
+    Found CUDA installation: /opt/cuda, version 10.1
 
-This commit fixes the concurrency issue. Otherwise, I see build errors
-like follows:
+So grepping ' version ' matches 2 lines, and results in a broken string in
+compiler.h, which doesn't compile.
 
-$ make ARCH=arm64 defconfig
-$ make -j16 ARCH=arm64 DT_SCHEMA_FILES=Documentation/devicetree/bindings/arm/psci.yaml dtbs dtbs_check
-  <snip>
-  DTC     arch/arm64/boot/dts/qcom/sdm845-cheza-r2.dtb
-  DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtb
-  DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb
-  DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb
-  DTC     arch/arm64/boot/dts/freescale/imx8mn-evk.dtb
-  DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb
-  DTC     arch/arm64/boot/dts/zte/zx296718-pcbox.dtb
-  DTC     arch/arm64/boot/dts/altera/socfpga_stratix10_socdk.dt.yaml
-  DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p230.dtb
-  DTC     arch/arm64/boot/dts/xilinx/zynqmp-zc1254-revA.dtb
-  DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-pine-h64.dtb
-  DTC     arch/arm64/boot/dts/rockchip/rk3399-gru-scarlet-inx.dtb
-  DTC     arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb
-  CHECK   arch/arm64/boot/dts/altera/socfpga_stratix10_socdk.dt.yaml
-fixdep: error opening file: arch/arm64/boot/dts/allwinner/.sun50i-h6-orangepi-lite2.dtb.d: No such file or directory
-make[2]: *** [scripts/Makefile.lib:296: arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb] Error 2
-make[2]: *** Deleting file 'arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-lite2.dtb'
-make[2]: *** Waiting for unfinished jobs....
-  DTC     arch/arm64/boot/dts/rockchip/rk3399-gru-scarlet-kd.dtb
-  DTC     arch/arm64/boot/dts/amlogic/meson-gxl-s905d-p231.dtb
-  DTC     arch/arm64/boot/dts/xilinx/zynqmp-zc1275-revA.dtb
-  DTC     arch/arm64/boot/dts/freescale/imx8mn-ddr4-evk.dtb
-fixdep: parse error; no targets found
-make[2]: *** [scripts/Makefile.lib:296: arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb] Error 1
-make[2]: *** Deleting file 'arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dtb'
-make[1]: *** [scripts/Makefile.build:505: arch/arm64/boot/dts/allwinner] Error 2
-make[1]: *** Waiting for unfinished jobs....
-  DTC     arch/arm64/boot/dts/renesas/r8a77951-salvator-xs.dtb
+This commit adds a "head -n1" to fix this problem.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Yuxuan Shui <yshuiv7@gmail.com>
 ---
- Makefile | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ scripts/mkcompile_h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index d252219666fdd..6a8f0b278f1bb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1240,11 +1240,15 @@ ifneq ($(dtstree),)
- 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
- 
- PHONY += dtbs dtbs_install dtbs_check
--dtbs dtbs_check: include/config/kernel.release scripts_dtc
-+dtbs: include/config/kernel.release scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(dtstree)
- 
-+ifneq ($(filter dtbs_check, $(MAKECMDGOALS)),)
-+dtbs: dt_binding_check
-+endif
-+
- dtbs_check: export CHECK_DTBS=1
--dtbs_check: dt_binding_check
-+dtbs_check: dtbs
- 
- dtbs_install:
- 	$(Q)$(MAKE) $(dtbinst)=$(dtstree)
--- 
-2.20.1
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 5b80a4699740..8e6b4fc6fdd9 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -62,7 +62,7 @@ UTS_VERSION="$(echo $UTS_VERSION $CONFIG_FLAGS $TIMESTAMP | cut -b -$UTS_LEN)"
+   printf '#define LINUX_COMPILE_BY "%s"\n' "$LINUX_COMPILE_BY"
+   echo \#define LINUX_COMPILE_HOST \"$LINUX_COMPILE_HOST\"
+
+-  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//')
++  CC_VERSION=$($CC -v 2>&1 | grep ' version ' | head -n1 | sed 's/[[:space:]]*$//')
+   LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
+ 		      | sed 's/[[:space:]]*$//')
+   printf '#define LINUX_COMPILER "%s"\n' "$CC_VERSION, $LD_VERSION"
+--
+2.26.2
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEL6EJkr0WlitWahBy06RAW+bMF/QFAl69yYwACgkQ06RAW+bM
+F/QVYA/+Iqa09i83Gi0bUr1ZSpujLj3Pke7A3qzGr1WxDx+WgeUsN466dtbmo3x3
+Gvxocu+lzO2fhJuG8/Lk3DcNUrpBaxi/qfTq5SXK0IMQmAbhIQRVVQw8Vz+C9nuk
+IatyTz5sgaBpVZlQzOs81bcfcF3Q1jlP57okNbZLIkhDk74seIRFddiY3gR3TNb1
+3VUQDmoPT7Xo0N7whzERmfzCPlrWZphDT8nh6OwOt/InJJPvB1i8235ckCZbhIty
+KFYH1nxB19QkURZ12zGxmnHJeGEXTc+Yy/NcpNH/lA1h2IvcD9qmE/E1TBoueiPy
+MrgxczwhPgjhzeNv0AwSK0JhjWEDl3Jg2GXNhngIckfn+DrEZN4WreF5fNZNctqs
+4+GOKreqGvJqXL9hUF6Pjwv/ef4zi3Py2qkJEQRxATPEf8Kk8t2Ok/Xkf+e0uRCL
+tWVlCbHtkotEjycImzNbyRGoquIfIamuidtq+k5Bs0OIGUETVK6hEng45F2PQ27E
+YHo7SXKDeQjrHHr/05ues02xecf0JRhvn/vBr8E/uddXAPEgYn25P7N5Al4KpMiV
+U7TlikB/r6V8IUfQjqki9qGaPmMGp790QNQwx/jR8hOPZ5aBN57qTcRM/NSs4vgl
+RFTwHAK9KrWpRsrU9E9s9BWXgGdTwKOjzAZpLX0jygr2iJXVjP4=
+=WfVw
+-----END PGP SIGNATURE-----
+--=-=-=--
