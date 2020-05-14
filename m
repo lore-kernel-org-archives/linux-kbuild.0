@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51932 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:53818 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728543AbgENSxC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 14:53:02 -0400
+        id S1728923AbgENSyD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 14 May 2020 14:54:03 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.6 58/62] gcc-10: disable 'restrict' warning for now
-Date: Thu, 14 May 2020 14:51:43 -0400
-Message-Id: <20200514185147.19716-58-sashal@kernel.org>
-In-Reply-To: <20200514185147.19716-1-sashal@kernel.org>
-References: <20200514185147.19716-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 41/49] Stop the ad-hoc games with -Wno-maybe-initialized
+Date: Thu, 14 May 2020 14:53:02 -0400
+Message-Id: <20200514185311.20294-41-sashal@kernel.org>
+In-Reply-To: <20200514185311.20294-1-sashal@kernel.org>
+References: <20200514185311.20294-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,65 +18,119 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Sasha Levin <sashal@kernel.o
 
 From: Linus Torvalds <torvalds@linux-foundation.org>
 
-[ Upstream commit adc71920969870dfa54e8f40dac8616284832d02 ]
+[ Upstream commit 78a5255ffb6a1af189a83e493d916ba1c54d8c75 ]
 
-gcc-10 now warns about passing aliasing pointers to functions that take
-restricted pointers.
+We have some rather random rules about when we accept the
+"maybe-initialized" warnings, and when we don't.
 
-That's actually a great warning, and if we ever start using 'restrict'
-in the kernel, it might be quite useful.  But right now we don't, and it
-turns out that the only thing this warns about is an idiom where we have
-declared a few functions to be "printf-like" (which seems to make gcc
-pick up the restricted pointer thing), and then we print to the same
-buffer that we also use as an input.
+For example, we consider it unreliable for gcc versions < 4.9, but also
+if -O3 is enabled, or if optimizing for size.  And then various kernel
+config options disabled it, because they know that they trigger that
+warning by confusing gcc sufficiently (ie PROFILE_ALL_BRANCHES).
 
-And people do that as an odd concatenation pattern, with code like this:
+And now gcc-10 seems to be introducing a lot of those warnings too, so
+it falls under the same heading as 4.9 did.
 
-    #define sysfs_show_gen_prop(buffer, fmt, ...) \
-        snprintf(buffer, PAGE_SIZE, "%s"fmt, buffer, __VA_ARGS__)
+At the same time, we have a very straightforward way to _enable_ that
+warning when wanted: use "W=2" to enable more warnings.
 
-where we have 'buffer' as both the destination of the final result, and
-as the initial argument.
+So stop playing these ad-hoc games, and just disable that warning by
+default, with the known and straight-forward "if you want to work on the
+extra compiler warnings, use W=123".
 
-Yes, it's a bit questionable.  And outside of the kernel, people do have
-standard declarations like
+Would it be great to have code that is always so obvious that it never
+confuses the compiler whether a variable is used initialized or not?
+Yes, it would.  In a perfect world, the compilers would be smarter, and
+our source code would be simpler.
 
-    int snprintf( char *restrict buffer, size_t bufsz,
-                  const char *restrict format, ... );
-
-where that output buffer is marked as a restrict pointer that cannot
-alias with any other arguments.
-
-But in the context of the kernel, that 'use snprintf() to concatenate to
-the end result' does work, and the pattern shows up in multiple places.
-And we have not marked our own version of snprintf() as taking restrict
-pointers, so the warning is incorrect for now, and gcc picks it up on
-its own.
-
-If we do start using 'restrict' in the kernel (and it might be a good
-idea if people find places where it matters), we'll need to figure out
-how to avoid this issue for snprintf and friends.  But in the meantime,
-this warning is not useful.
+That's currently not the world we live in, though.
 
 Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ Makefile             |  7 +++----
+ init/Kconfig         | 18 ------------------
+ kernel/trace/Kconfig |  1 -
+ 3 files changed, 3 insertions(+), 23 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index dde725d9c17d2..c679a260f8ad3 100644
+index 388b7b49a52d0..68708ae07fbd3 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -863,6 +863,9 @@ KBUILD_CFLAGS += $(call cc-disable-warning, zero-length-bounds)
- KBUILD_CFLAGS += $(call cc-disable-warning, array-bounds)
- KBUILD_CFLAGS += $(call cc-disable-warning, stringop-overflow)
+@@ -707,10 +707,6 @@ else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS += -Os
+ endif
  
-+# Another good warning that we'll want to enable eventually
-+KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
+-ifdef CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+-KBUILD_CFLAGS   += -Wno-maybe-uninitialized
+-endif
+-
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
+@@ -861,6 +857,9 @@ KBUILD_CFLAGS += -Wno-pointer-sign
+ # disable stringop warnings in gcc 8+
+ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
+ 
++# Enabled with W=2, disabled by default as noisy
++KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
 +
- # Enabled with W=2, disabled by default as noisy
- KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
+ # disable invalid "can't wrap" optimizations for signed / pointers
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
  
+diff --git a/init/Kconfig b/init/Kconfig
+index 0bffc8fdbf3da..6db3e310a5e42 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -36,22 +36,6 @@ config TOOLS_SUPPORT_RELR
+ config CC_HAS_ASM_INLINE
+ 	def_bool $(success,echo 'void foo(void) { asm inline (""); }' | $(CC) -x c - -c -o /dev/null)
+ 
+-config CC_HAS_WARN_MAYBE_UNINITIALIZED
+-	def_bool $(cc-option,-Wmaybe-uninitialized)
+-	help
+-	  GCC >= 4.7 supports this option.
+-
+-config CC_DISABLE_WARN_MAYBE_UNINITIALIZED
+-	bool
+-	depends on CC_HAS_WARN_MAYBE_UNINITIALIZED
+-	default CC_IS_GCC && GCC_VERSION < 40900  # unreliable for GCC < 4.9
+-	help
+-	  GCC's -Wmaybe-uninitialized is not reliable by definition.
+-	  Lots of false positive warnings are produced in some cases.
+-
+-	  If this option is enabled, -Wno-maybe-uninitialzed is passed
+-	  to the compiler to suppress maybe-uninitialized warnings.
+-
+ config CONSTRUCTORS
+ 	bool
+ 	depends on !UML
+@@ -1226,14 +1210,12 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
+ config CC_OPTIMIZE_FOR_PERFORMANCE_O3
+ 	bool "Optimize more for performance (-O3)"
+ 	depends on ARC
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  Choosing this option will pass "-O3" to your compiler to optimize
+ 	  the kernel yet more for performance.
+ 
+ config CC_OPTIMIZE_FOR_SIZE
+ 	bool "Optimize for size (-Os)"
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  Choosing this option will pass "-Os" to your compiler resulting
+ 	  in a smaller kernel.
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index e08527f50d2a9..f3f2fc8ad81aa 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -371,7 +371,6 @@ config PROFILE_ANNOTATED_BRANCHES
+ config PROFILE_ALL_BRANCHES
+ 	bool "Profile all if conditionals" if !FORTIFY_SOURCE
+ 	select TRACE_BRANCH_PROFILING
+-	imply CC_DISABLE_WARN_MAYBE_UNINITIALIZED  # avoid false positives
+ 	help
+ 	  This tracer profiles all branch conditions. Every if ()
+ 	  taken in the kernel is recorded whether it hit or miss.
 -- 
 2.20.1
