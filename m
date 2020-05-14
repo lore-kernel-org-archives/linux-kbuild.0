@@ -1,49 +1,270 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58437 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725925AbgENLfE (ORCPT
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:46805 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726056AbgENNOR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 07:35:04 -0400
-References: <20200504031340.7103-1-nick.desaulniers@gmail.com>
- <CA+icZUUOaqeKeh6n4BJq2k6XQWAfNghUj57j42ZX5qyd3iOmLw@mail.gmail.com>
- <20200505004738.ew2lcp27c2n4jqia@google.com>
- <CAK7LNAR7-VMEWBcJ_Wd+61ZDHEa0gD8FaSs63YPu7m_FgH8Htg@mail.gmail.com>
- <CAKwvOdmEP9Auuc+M+MqPoQmx+70DgdsPYZQ6pg=8oGnfCviqRA@mail.gmail.com>
- <20200512200114.64vo5lbl7wk2tzxk@google.com>
- <CAKwvOdnArcsqusvmMDUJyTjVhkOufJZoRHxg-ARDfPhfjNj_JA@mail.gmail.com>
-From: Nick Clifton <nickc@redhat.com>
-Subject: Re: [PATCH] Makefile: support compressed debug info
-Message-ID: <10f4fb0b-1012-b0e6-af05-0aa5a906de21@redhat.com>
-Date: Thu, 14 May 2020 12:34:53 +0100
+        Thu, 14 May 2020 09:14:17 -0400
+From: Denis Efremov <efremov@linux.com>
+Subject: [RFC PATCH] kbuild: add variables for compression tools
+Date: Thu, 14 May 2020 16:12:34 +0300
+Message-Id: <20200514131234.380097-1-efremov@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOdnArcsqusvmMDUJyTjVhkOufJZoRHxg-ARDfPhfjNj_JA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>, Fangrui Song <maskray@google.com>, "H.J. Lu" <hjl.tools@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Sedat Dilek <sedat.dilek@gmail.com>, Nick Desaulniers <nick.desaulniers@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Krzysztof Kozlowski <krzk@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Denis Efremov <efremov@linux.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Dmitry Vyukov <dvyukov@google.com>
 
-Hi Nick,
+Allow user to use alternative implementations of compression tools.
+For example, multi-threaded tools to speed up the build:
+$ make KGZIP=pigz KXZ=pxz
 
-> + Nick, H.J.
-> I'm unfamiliar with the git tag conventions of binutils.  Does a patch
-> that landed in 2.25.51.0.4 mean it shipped in the official 2.25
-> release, or 2.26 release?  Specifically, commit 19a7fe52ae3d.
+Variable KGZIP is used instead of GZIP because the latter is reserved
+by the tool. Other variables are prefixed with 'K' for consistency.
 
-2.26.
+The credit goes to @grsecurity.
 
-The convention is that a released form of the binutils has a version
-number of X.XX or possible X.XX.N.  The current mainline development 
-sources have a version of X.XX.50 where X.XX is the latest release.
-(So the current mainline sources are version 2.34.50).  When a release
-happens the XX value is incremented by one as part of the release
-process, and the .50 is dropped.  (So the next binutils release will 
-be 2.35).
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+ Makefile                          | 11 +++++++++--
+ arch/arm/boot/deflate_xip_data.sh |  6 +++++-
+ arch/ia64/Makefile                |  2 +-
+ arch/m68k/Makefile                |  4 ++--
+ arch/mips/lasat/image/Makefile    |  2 +-
+ arch/parisc/Makefile              |  2 +-
+ kernel/gen_kheaders.sh            |  6 +++++-
+ scripts/Makefile.lib              | 12 ++++++------
+ scripts/Makefile.package          |  6 +++---
+ scripts/xz_wrap.sh                |  6 +++++-
+ 10 files changed, 38 insertions(+), 19 deletions(-)
 
-So 2.25.51.0.4 is a development version which will then have been
-released as binutils 2.26.
-
-Cheers
-  Nick
+diff --git a/Makefile b/Makefile
+index 11fe9b1535de..9af13cfeed7a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -447,6 +447,12 @@ PYTHON		= python
+ PYTHON3		= python3
+ CHECK		= sparse
+ BASH		= bash
++KGZIP		= gzip
++KBZIP2		= bzip2
++KLZMA		= lzma
++KLZOP		= lzop
++KLZ4		= lz4c
++KXZ		= xz
+ 
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+ 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
+@@ -496,6 +502,7 @@ export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD
+ export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
+ export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+ export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
++export KGZIP KBZIP2 KLZMA KLZOP KLZ4 KXZ
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE
+@@ -1005,10 +1012,10 @@ export mod_strip_cmd
+ mod_compress_cmd = true
+ ifdef CONFIG_MODULE_COMPRESS
+   ifdef CONFIG_MODULE_COMPRESS_GZIP
+-    mod_compress_cmd = gzip -n -f
++    mod_compress_cmd = $(KGZIP) -n -f
+   endif # CONFIG_MODULE_COMPRESS_GZIP
+   ifdef CONFIG_MODULE_COMPRESS_XZ
+-    mod_compress_cmd = xz -f
++    mod_compress_cmd = $(KXZ) -f
+   endif # CONFIG_MODULE_COMPRESS_XZ
+ endif # CONFIG_MODULE_COMPRESS
+ export mod_compress_cmd
+diff --git a/arch/arm/boot/deflate_xip_data.sh b/arch/arm/boot/deflate_xip_data.sh
+index 40937248cebe..08dd50e08c17 100755
+--- a/arch/arm/boot/deflate_xip_data.sh
++++ b/arch/arm/boot/deflate_xip_data.sh
+@@ -19,6 +19,10 @@ XIPIMAGE="$2"
+ 
+ DD="dd status=none"
+ 
++if [ x$KGZIP = "x" ]; then
++	KGZIP=gzip
++fi
++
+ # Use "make V=1" to debug this script.
+ case "$KBUILD_VERBOSE" in
+ *1*)
+@@ -56,7 +60,7 @@ trap 'rm -f "$XIPIMAGE.tmp"; exit 1' 1 2 3
+ # substitute the data section by a compressed version
+ $DD if="$XIPIMAGE" count=$data_start iflag=count_bytes of="$XIPIMAGE.tmp"
+ $DD if="$XIPIMAGE"  skip=$data_start iflag=skip_bytes |
+-gzip -9 >> "$XIPIMAGE.tmp"
++$KGZIP -9 >> "$XIPIMAGE.tmp"
+ 
+ # replace kernel binary
+ mv -f "$XIPIMAGE.tmp" "$XIPIMAGE"
+diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+index 32240000dc0c..2876a7df1b0a 100644
+--- a/arch/ia64/Makefile
++++ b/arch/ia64/Makefile
+@@ -40,7 +40,7 @@ $(error Sorry, you need a newer version of the assember, one that is built from
+ endif
+ 
+ quiet_cmd_gzip = GZIP    $@
+-cmd_gzip = cat $(real-prereqs) | gzip -n -f -9 > $@
++cmd_gzip = cat $(real-prereqs) | $(KGZIP) -n -f -9 > $@
+ 
+ quiet_cmd_objcopy = OBJCOPY $@
+ cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
+diff --git a/arch/m68k/Makefile b/arch/m68k/Makefile
+index 5d9288384096..e6c7c92aa72e 100644
+--- a/arch/m68k/Makefile
++++ b/arch/m68k/Makefile
+@@ -148,10 +148,10 @@ vmlinux.bz2: vmlinux
+ ifndef CONFIG_KGDB
+ 	cp vmlinux vmlinux.tmp
+ 	$(STRIP) vmlinux.tmp
+-	bzip2 -1c vmlinux.tmp >vmlinux.bz2
++	$(KBZIP2) -1c vmlinux.tmp >vmlinux.bz2
+ 	rm vmlinux.tmp
+ else
+-	bzip2 -1c vmlinux >vmlinux.bz2
++	$(KBZIP2) -1c vmlinux >vmlinux.bz2
+ endif
+ 
+ archclean:
+diff --git a/arch/mips/lasat/image/Makefile b/arch/mips/lasat/image/Makefile
+index 78ce4cff1012..617ccb1659d5 100644
+--- a/arch/mips/lasat/image/Makefile
++++ b/arch/mips/lasat/image/Makefile
+@@ -44,7 +44,7 @@ $(obj)/%.o: $(obj)/%.gz
+ 	$(LD) -r -o $@ -b binary $<
+ 
+ $(obj)/%.gz: $(obj)/%.bin
+-	gzip -cf -9 $< > $@
++	$(KGZIP) -cf -9 $< > $@
+ 
+ $(obj)/kImage.bin: $(KERNEL_IMAGE)
+ 	$(OBJCOPY) -O binary -S $^ $@
+diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+index 628cd8bb7ad8..412ddec0297d 100644
+--- a/arch/parisc/Makefile
++++ b/arch/parisc/Makefile
+@@ -162,7 +162,7 @@ vmlinuz: bzImage
+ 	$(OBJCOPY) $(boot)/bzImage $@
+ else
+ vmlinuz: vmlinux
+-	@gzip -cf -9 $< > $@
++	@$(KGZIP) -cf -9 $< > $@
+ endif
+ 
+ install:
+diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
+index e13ca842eb7e..f3dfaf9f6647 100755
+--- a/kernel/gen_kheaders.sh
++++ b/kernel/gen_kheaders.sh
+@@ -9,6 +9,10 @@ outdir="$(pwd)"
+ tarfile=$1
+ cpio_dir=$outdir/$tarfile.tmp
+ 
++if [ x$KXZ = "x" ]; then
++	KXZ=xz
++fi
++
+ dir_list="
+ include/
+ arch/$SRCARCH/include/
+@@ -88,7 +92,7 @@ find $cpio_dir -type f -print0 |
+ find $cpio_dir -printf "./%P\n" | LC_ALL=C sort | \
+     tar "${KBUILD_BUILD_TIMESTAMP:+--mtime=$KBUILD_BUILD_TIMESTAMP}" \
+     --owner=0 --group=0 --numeric-owner --no-recursion \
+-    -Jcf $tarfile -C $cpio_dir/ -T - > /dev/null
++    -I $KXZ -cf $tarfile -C $cpio_dir/ -T - > /dev/null
+ 
+ echo $headers_md5 > kernel/kheaders.md5
+ echo "$this_file_md5" >> kernel/kheaders.md5
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 4b799737722c..dd38f5ac8d48 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -241,7 +241,7 @@ cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_gzip = GZIP    $@
+-      cmd_gzip = cat $(real-prereqs) | gzip -n -f -9 > $@
++      cmd_gzip = cat $(real-prereqs) | $(KGZIP) -n -f -9 > $@
+ 
+ # DTC
+ # ---------------------------------------------------------------------------
+@@ -334,19 +334,19 @@ printf "%08x\n" $$dec_size |						\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-      cmd_bzip2 = { cat $(real-prereqs) | bzip2 -9; $(size_append); } > $@
++      cmd_bzip2 = { cat $(real-prereqs) | $(KBZIP2) -9; $(size_append); } > $@
+ 
+ # Lzma
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_lzma = LZMA    $@
+-      cmd_lzma = { cat $(real-prereqs) | lzma -9; $(size_append); } > $@
++      cmd_lzma = { cat $(real-prereqs) | $(KLZMA) -9; $(size_append); } > $@
+ 
+ quiet_cmd_lzo = LZO     $@
+-      cmd_lzo = { cat $(real-prereqs) | lzop -9; $(size_append); } > $@
++      cmd_lzo = { cat $(real-prereqs) | $(KLZOP) -9; $(size_append); } > $@
+ 
+ quiet_cmd_lz4 = LZ4     $@
+-      cmd_lz4 = { cat $(real-prereqs) | lz4c -l -c1 stdin stdout; \
++      cmd_lz4 = { cat $(real-prereqs) | $(KLZ4) -l -c1 stdin stdout; \
+                   $(size_append); } > $@
+ 
+ # U-Boot mkimage
+@@ -393,7 +393,7 @@ quiet_cmd_xzkern = XZKERN  $@
+                      $(size_append); } > $@
+ 
+ quiet_cmd_xzmisc = XZMISC  $@
+-      cmd_xzmisc = cat $(real-prereqs) | xz --check=crc32 --lzma2=dict=1MiB > $@
++      cmd_xzmisc = cat $(real-prereqs) | $(KXZ) --check=crc32 --lzma2=dict=1MiB > $@
+ 
+ # ASM offsets
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+index 02135d2671a6..1b91fe1bfcdb 100644
+--- a/scripts/Makefile.package
++++ b/scripts/Makefile.package
+@@ -127,9 +127,9 @@ util/PERF-VERSION-GEN $(CURDIR)/$(perf-tar)/);              \
+ tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
+ rm -r $(perf-tar);                                                  \
+ $(if $(findstring tar-src,$@),,                                     \
+-$(if $(findstring bz2,$@),bzip2,                                    \
+-$(if $(findstring gz,$@),gzip,                                      \
+-$(if $(findstring xz,$@),xz,                                        \
++$(if $(findstring bz2,$@),$(KBZIP2),                                \
++$(if $(findstring gz,$@),$(KGZIP),                                  \
++$(if $(findstring xz,$@),$(KXZ),                                    \
+ $(error unknown target $@))))                                       \
+ 	-f -9 $(perf-tar).tar)
+ 
+diff --git a/scripts/xz_wrap.sh b/scripts/xz_wrap.sh
+index 7a2d372f4885..4922102dbfe7 100755
+--- a/scripts/xz_wrap.sh
++++ b/scripts/xz_wrap.sh
+@@ -9,6 +9,10 @@
+ # You can do whatever you want with this file.
+ #
+ 
++if [ x$KXZ = "x" ]; then
++	KXZ=xz
++fi
++
+ BCJ=
+ LZMA2OPTS=
+ 
+@@ -20,4 +24,4 @@ case $SRCARCH in
+ 	sparc)          BCJ=--sparc ;;
+ esac
+ 
+-exec xz --check=crc32 $BCJ --lzma2=$LZMA2OPTS,dict=32MiB
++exec $KXZ --check=crc32 $BCJ --lzma2=$LZMA2OPTS,dict=32MiB
+-- 
+2.25.4
