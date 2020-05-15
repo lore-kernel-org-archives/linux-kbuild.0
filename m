@@ -1,28 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbgENXZy (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:27817 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728243AbgEOAnN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 May 2020 19:25:54 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B990C061A0C
-        for <linux-kbuild@vger.kernel.org>; Thu, 14 May 2020 16:25:54 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id t11so99632pgg.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 14 May 2020 16:25:54 -0700 (PDT)
+        Thu, 14 May 2020 20:43:13 -0400
 MIME-Version: 1.0
 References: <87imgykunh.fsf@m5Zedd9JOGzJrf0>
 In-Reply-To: <87imgykunh.fsf@m5Zedd9JOGzJrf0>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 14 May 2020 16:25:42 -0700
-Message-ID: <CAKwvOdnJ9p+iGYP31TJcaCLBqk2gOes4=5z=K8Tv_jytn6+RgA@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Fri, 15 May 2020 09:42:09 +0900
+Message-ID: <CAK7LNAQKz9Cu2aPxM2xo22Y_1b2+E1NQibi0ZgLRyGr5+ZLWoQ@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: compile_h: fix compiler version detection with clang
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Yuxuan Shui <yshuiv7@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Thu, May 14, 2020 at 3:43 PM Yuxuan Shui <yshuiv7@gmail.com> wrote:
+On Fri, May 15, 2020 at 7:43 AM Yuxuan Shui <yshuiv7@gmail.com> wrote:
 >
 >
 > In some setup clang will print a line about CUDA version it detects,
@@ -37,14 +32,26 @@ On Thu, May 14, 2020 at 3:43 PM Yuxuan Shui <yshuiv7@gmail.com> wrote:
 >
 > Signed-off-by: Yuxuan Shui <yshuiv7@gmail.com>
 
-Hi Yuxuan, thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Might be worthwhile for Masahiro to add
+I do not know what to do about this.
 
-Cc: stable@vger.kernel.org
 
-if/when picked up?
+This problem had already been fixed by a different
+patch, which is queued up in linux-next.
+
+9a950154668729a472d17b8e307d92e7c60f45f7
+
+This patch
+https://patchwork.kernel.org/patch/11505803/
+
+So, the future releases will be OK.
+
+
+For back-porting to the stable kernel,
+your one-liner fixup is simpler.
+
+
+
 
 > ---
 >  scripts/mkcompile_h | 2 +-
@@ -67,6 +74,7 @@ if/when picked up?
 > 2.26.2
 
 
--- 
-Thanks,
-~Nick Desaulniers
+
+--
+Best Regards
+Masahiro Yamada
