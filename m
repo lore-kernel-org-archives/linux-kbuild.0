@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38327 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:39048 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727814AbgEQJth (ORCPT
+        with ESMTP id S1727825AbgEQJuC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 May 2020 05:49:37 -0400
+        Sun, 17 May 2020 05:50:02 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 03/29] modpost: add read_text_file() and get_line() helpers
-Date: Sun, 17 May 2020 18:48:33 +0900
-Message-Id: <20200517094859.2376211-4-masahiroy@kernel.org>
+Subject: [PATCH 27/29] modpost: strip .o from modname before calling new_module()
+Date: Sun, 17 May 2020 18:48:57 +0900
+Message-Id: <20200517094859.2376211-28-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,85 +17,82 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-modpost uses grab_file() to open a file, but it is not suitable for
-a text file because the mmaped file is not terminated by null byte.
-Actually, I see some issues for the use of grab_file().
+new_module() conditionally strips the .o because the modname has .o
+suffix when it is called from read_symbols(), but no .o when it is
+called from read_dump().
 
-The new helper, read_text_file() loads the whole file content into a
-malloc'ed buffer, and appends a null byte. Then, get_line() reads
-each line.
+It is clearer to strip .o in read_symbols().
 
-To handle text files, I intend to replace as follows:
-
- grab_file()    -> read_text_file()
- get_new_line() -> get_line()
+I also used flexible-array for mod->name.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 36 ++++++++++++++++++++++++++++++++++++
- scripts/mod/modpost.h |  2 ++
- 2 files changed, 38 insertions(+)
+ scripts/mod/modpost.c | 20 +++++++++++---------
+ scripts/mod/modpost.h |  2 +-
+ 2 files changed, 12 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index af098d7efc22..2c6319f0ce19 100644
+index 79622939a6c7..6669b3ace968 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -112,6 +112,42 @@ void *do_nofail(void *ptr, const char *expr)
- 	return ptr;
- }
+@@ -164,18 +164,12 @@ static struct module *find_module(const char *modname)
+ static struct module *new_module(const char *modname)
+ {
+ 	struct module *mod;
+-	char *p;
  
-+char *read_text_file(const char *filename)
-+{
-+	struct stat st;
-+	int fd;
-+	char *buf;
+-	mod = NOFAIL(malloc(sizeof(*mod)));
++	mod = NOFAIL(malloc(sizeof(*mod) + strlen(modname) + 1));
+ 	memset(mod, 0, sizeof(*mod));
+-	p = NOFAIL(strdup(modname));
+-
+-	/* strip trailing .o */
+-	if (strends(p, ".o"))
+-		p[strlen(p) - 2] = '\0';
+ 
+ 	/* add to list */
+-	mod->name = p;
++	strcpy(mod->name, modname);
+ 	mod->is_vmlinux = is_vmlinux(modname);
+ 	mod->gpl_compatible = -1;
+ 	mod->next = modules;
+@@ -2003,7 +1997,15 @@ static void read_symbols(const char *modname)
+ 	if (!parse_elf(&info, modname))
+ 		return;
+ 
+-	mod = new_module(modname);
++	{
++		char *tmp;
 +
-+	fd = open(filename, O_RDONLY);
-+	if (fd < 0)
-+		return NULL;
-+
-+	if (fstat(fd, &st) < 0)
-+		return NULL;
-+
-+	buf = NOFAIL(malloc(st.st_size + 1));
-+
-+	if (read(fd, buf, st.st_size) != st.st_size) {
-+		free(buf);
-+		buf = NULL;
-+		goto close;
++		/* strip trailing .o */
++		tmp = NOFAIL(strdup(modname));
++		tmp[strlen(tmp) - 2] = '\0';
++		mod = new_module(tmp);
++		free(tmp);
 +	}
-+	buf[st.st_size] = '\0';
-+close:
-+	close(fd);
-+
-+	return buf;
-+}
-+
-+char *get_line(char **stringp)
-+{
-+	/* do not return the unwanted extra line at EOF */
-+	if (*stringp && **stringp == '\0')
-+		return NULL;
-+
-+	return strsep(stringp, "\n");
-+}
-+
- /* A list of all modules we processed */
- static struct module *modules;
  
+ 	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
 diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index bbaf5cc37bfb..dfadaa0c01ec 100644
+index 264c0c51defa..1df87d204c9a 100644
 --- a/scripts/mod/modpost.h
 +++ b/scripts/mod/modpost.h
-@@ -190,6 +190,8 @@ void add_moddevtable(struct buffer *buf, struct module *mod);
- void get_src_version(const char *modname, char sum[], unsigned sumlen);
+@@ -116,7 +116,6 @@ struct namespace_list {
  
- /* from modpost.c */
-+char *read_text_file(const char *filename);
-+char *get_line(char **stringp);
- void *grab_file(const char *filename, unsigned long *size);
- char* get_next_line(unsigned long *pos, void *file, unsigned long size);
- void release_file(void *file, unsigned long size);
+ struct module {
+ 	struct module *next;
+-	const char *name;
+ 	int gpl_compatible;
+ 	struct symbol *unres;
+ 	int from_dump;  /* 1 if module was loaded from *.symver */
+@@ -130,6 +129,7 @@ struct module {
+ 	struct namespace_list *missing_namespaces;
+ 	// Actual imported namespaces
+ 	struct namespace_list *imported_namespaces;
++	char name[];
+ };
+ 
+ struct elf_info {
 -- 
 2.25.1
