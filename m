@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:39055 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38325 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728015AbgEQJuC (ORCPT
+        with ESMTP id S1727803AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 May 2020 05:50:02 -0400
+        Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 28/29] modpost: remove is_vmlinux() helper
-Date: Sun, 17 May 2020 18:48:58 +0900
-Message-Id: <20200517094859.2376211-29-masahiroy@kernel.org>
+Subject: [PATCH 25/29] modpost: remove mod->skip struct member
+Date: Sun, 17 May 2020 18:48:55 +0900
+Message-Id: <20200517094859.2376211-26-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,54 +17,78 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Now that is_vmlinux() is called only in new_module(), we can inline
-the function call.
+The meaning of 'skip' is obscure since it does not explain
+"what to skip".
 
-modname is the basename with '.o' is stripped. No need to compare it
-with 'vmlinux.o'.
+mod->skip is set when it is vmlinux or the module info came from
+a dump file.
 
-vmlinux is always located at the current working directory. No need
-to strip the directory path.
+So, mod->skip is equivalent to (mod->is_vmlinux || mod->from_dump).
+
+For the check in write_namespace_deps_files(), mod->is_vmlinux is
+unneeded because the -d option is not passed in the first pass of
+modpost.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 16 +---------------
- 1 file changed, 1 insertion(+), 15 deletions(-)
+ scripts/mod/modpost.c | 9 +++------
+ scripts/mod/modpost.h | 1 -
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6669b3ace968..bcab010f09ce 100644
+index 0df0fc82412d..003b6fb2303c 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -90,20 +90,6 @@ static inline bool strends(const char *str, const char *postfix)
- 	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
- }
+@@ -2002,10 +2002,8 @@ static void read_symbols(const char *modname)
  
--static int is_vmlinux(const char *modname)
--{
--	const char *myname;
--
--	myname = strrchr(modname, '/');
--	if (myname)
--		myname++;
--	else
--		myname = modname;
--
--	return (strcmp(myname, "vmlinux") == 0) ||
--	       (strcmp(myname, "vmlinux.o") == 0);
--}
--
- void *do_nofail(void *ptr, const char *expr)
- {
- 	if (!ptr)
-@@ -170,7 +156,7 @@ static struct module *new_module(const char *modname)
+ 	mod = new_module(modname);
  
- 	/* add to list */
- 	strcpy(mod->name, modname);
--	mod->is_vmlinux = is_vmlinux(modname);
-+	mod->is_vmlinux = (strcmp(modname, "vmlinux") == 0);
- 	mod->gpl_compatible = -1;
- 	mod->next = modules;
- 	modules = mod;
+-	if (mod->is_vmlinux) {
++	if (mod->is_vmlinux)
+ 		have_vmlinux = 1;
+-		mod->skip = 1;
+-	}
+ 
+ 	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
+@@ -2456,7 +2454,6 @@ static void read_dump(const char *fname)
+ 			mod = new_module(modname);
+ 			if (mod->is_vmlinux)
+ 				have_vmlinux = 1;
+-			mod->skip = 1;
+ 			mod->from_dump = 1;
+ 		}
+ 		s = sym_add_exported(symname, mod, export_no(export));
+@@ -2517,7 +2514,7 @@ static void write_namespace_deps_files(const char *fname)
+ 
+ 	for (mod = modules; mod; mod = mod->next) {
+ 
+-		if (mod->skip || !mod->missing_namespaces)
++		if (mod->from_dump || !mod->missing_namespaces)
+ 			continue;
+ 
+ 		buf_printf(&ns_deps_buf, "%s.ko:", mod->name);
+@@ -2622,7 +2619,7 @@ int main(int argc, char **argv)
+ 	for (mod = modules; mod; mod = mod->next) {
+ 		char fname[PATH_MAX];
+ 
+-		if (mod->skip)
++		if (mod->is_vmlinux || mod->from_dump)
+ 			continue;
+ 
+ 		buf.pos = 0;
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index ec717ab20b98..264c0c51defa 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -122,7 +122,6 @@ struct module {
+ 	int from_dump;  /* 1 if module was loaded from *.symver */
+ 	int is_vmlinux;
+ 	int seen;
+-	int skip;
+ 	int has_init;
+ 	int has_cleanup;
+ 	struct buffer dev_table_buf;
 -- 
 2.25.1
