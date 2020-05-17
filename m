@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38303 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38296 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727768AbgEQJtf (ORCPT
+        with ESMTP id S1727125AbgEQJte (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 May 2020 05:49:35 -0400
+        Sun, 17 May 2020 05:49:34 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 05/29] modpost: re-add warning about missing *.mod file
-Date: Sun, 17 May 2020 18:48:35 +0900
-Message-Id: <20200517094859.2376211-6-masahiroy@kernel.org>
+Subject: [PATCH 10/29] modpost: move -T option close to the modpost command
+Date: Sun, 17 May 2020 18:48:40 +0900
+Message-Id: <20200517094859.2376211-11-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,43 +17,37 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-This reverts 4be40e22233c ("kbuild: do not emit src version warning for
-non-modules").
+The '-T -' option reads the file list from stdin.
 
-I do not fully understand what that commit addressed, but commit
-91341d4b2c19 ("kbuild: introduce new option to enhance section mismatch
-analysis") introduced partial section checks by using modpost. built-in.o
-was parsed by modpost. Even modules had a problem because *.mod files
-were created after the modpost check.
-
-Commit b7dca6dd1e59 ("kbuild: create *.mod with full directory path and
-remove MODVERDIR") stopped doing that. Now that modpost is only invoked
-after the directory descend, *.mod files should always exist at the
-modpost stage. If not, something went wrong, which should be warned.
+It is clearer to put it close to the piped command.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/sumversion.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ scripts/Makefile.modpost | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index f9aa532d93cf..f9df0b1863f1 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -402,9 +402,11 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- 		 (int)strlen(modname) - 1, modname);
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index b79bf0e30d32..da7730a43819 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -66,7 +66,7 @@ __modpost:
  
- 	buf = read_text_file(filelist);
--	if (!buf)
--		/* not a module or .mod file missing - ignore */
-+	if (!buf) {
-+		warn("failed to open %s. cannot calculate checksum\n",
-+		     filelist);
- 		return;
-+	}
+ else
  
- 	pos = buf;
- 	firstline = get_line(&pos);
+-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T - \
++MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+@@ -88,7 +88,7 @@ modules := $(sort $(shell cat $(MODORDER)))
+ # Read out modules.order instead of expanding $(modules) to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
+ quiet_cmd_modpost = MODPOST $(words $(modules)) modules
+-      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST)
++      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) -T -
+ 
+ __modpost:
+ 	$(call cmd,modpost)
 -- 
 2.25.1
