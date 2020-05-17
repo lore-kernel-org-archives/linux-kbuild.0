@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38340 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38314 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727825AbgEQJtg (ORCPT
+        with ESMTP id S1727796AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 24/29] modpost: add mod->is_vmlinux struct member
-Date: Sun, 17 May 2020 18:48:54 +0900
-Message-Id: <20200517094859.2376211-25-masahiroy@kernel.org>
+Subject: [PATCH 20/29] modpost: generate vmlinux.symvers and reuse it for the second modpost
+Date: Sun, 17 May 2020 18:48:50 +0900
+Message-Id: <20200517094859.2376211-21-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,109 +17,113 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-is_vmlinux() is called in several places to check whether the current
-module is vmlinux or not.
+The full build runs modpost twice, first for vmlinux.o and second for
+modules.
 
-It is faster and clearer to check mod->is_vmlinux flag.
+The first pass dumps all the vmlinux symbols into Module.symvers, but
+the second pass parses vmlinux again instead of reusing the dump file,
+presumably because it needs to avoid accumulating stale symbols.
+
+Loading symbol info from a dump file is faster than parsing an ELF object.
+Besides, modpost deals with various issues to parse vmlinux in the second
+pass.
+
+A solution is to make the first pass dumps symbols into a separate file,
+vmlinux.symvers. The second pass reads it, and parses module .o files.
+The merged symbol information is dumped into Module.symvers as before.
+
+This makes further modpost cleanups possible.
+
+Also, it fixes the problem of 'make vmlinux', which previously overwrote
+Module.symvers, throwing away module symbols.
+
+I slightly touched scripts/link-vmlinux.sh so that vmlinux is re-linked
+when you cross this commit. Otherwise, vmlinux.symvers would not be
+generated.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 19 ++++++++++---------
- scripts/mod/modpost.h |  1 +
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ .gitignore               |  1 +
+ Makefile                 |  2 +-
+ scripts/Makefile.modpost | 11 +++++++----
+ scripts/link-vmlinux.sh  |  2 --
+ 4 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4155669a92bd..0df0fc82412d 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -176,6 +176,7 @@ static struct module *new_module(const char *modname)
+diff --git a/.gitignore b/.gitignore
+index 2258e906f01c..87b9dd8a163b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -56,6 +56,7 @@ modules.order
+ /linux
+ /vmlinux
+ /vmlinux.32
++/vmlinux.symvers
+ /vmlinux-gdb.py
+ /vmlinuz
+ /System.map
+diff --git a/Makefile b/Makefile
+index 27e8a0522a3c..43988ce4e17e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1405,7 +1405,7 @@ endif # CONFIG_MODULES
+ # make distclean Remove editor backup files, patch leftover files and the like
  
- 	/* add to list */
- 	mod->name = p;
-+	mod->is_vmlinux = is_vmlinux(modname);
- 	mod->gpl_compatible = -1;
- 	mod->next = modules;
- 	modules = mod;
-@@ -417,11 +418,11 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ # Directories & files removed with 'make clean'
+-CLEAN_FILES += include/ksym \
++CLEAN_FILES += include/ksym vmlinux.symvers \
+ 	       modules.builtin modules.builtin.modinfo modules.nsdeps
  
- 	if (!s) {
- 		s = new_symbol(name, mod, export);
--	} else if (!external_module || is_vmlinux(s->module->name) ||
-+	} else if (!external_module || s->module->is_vmlinux ||
- 		   s->module == mod) {
- 		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
- 		     mod->name, name, s->module->name,
--		     is_vmlinux(s->module->name) ? "" : ".ko");
-+		     s->module->is_vmlinux ? "" : ".ko");
- 		return s;
- 	}
+ # Directories & files removed with 'make mrproper'
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index d14143b30b7a..1c597999b6a0 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -43,17 +43,17 @@ __modpost:
+ include include/config/auto.conf
+ include scripts/Kbuild.include
  
-@@ -678,7 +679,7 @@ static void handle_modversion(const struct module *mod,
+-kernelsymfile := $(objtree)/Module.symvers
+-
+ MODPOST = scripts/mod/modpost								\
+ 	$(if $(CONFIG_MODVERSIONS),-m)							\
+ 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
+-	$(if $(KBUILD_EXTMOD),,-o $(kernelsymfile))					\
+ 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
+ 	$(if $(KBUILD_MODPOST_WARN),-w)
  
- 	if (sym->st_shndx == SHN_UNDEF) {
- 		warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
--		     symname, mod->name, is_vmlinux(mod->name) ? "":".ko");
-+		     symname, mod->name, mod->is_vmlinux ? "" : ".ko");
- 		return;
- 	}
+ ifdef MODPOST_VMLINUX
  
-@@ -2001,12 +2002,12 @@ static void read_symbols(const char *modname)
++# modpost options for vmlinux.o
++MODPOST += -o vmlinux.symvers
++
+ quiet_cmd_modpost = MODPOST vmlinux.o
+       cmd_modpost = $(MODPOST) vmlinux.o
  
- 	mod = new_module(modname);
+@@ -68,7 +68,10 @@ MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
  
--	if (is_vmlinux(modname)) {
-+	if (mod->is_vmlinux) {
- 		have_vmlinux = 1;
- 		mod->skip = 1;
- 	}
+ ifeq ($(KBUILD_EXTMOD),)
+-MODPOST += $(wildcard vmlinux)
++
++# modpost options for in-kernel modules
++MODPOST += -i vmlinux.symvers -o Module.symvers
++
+ else
  
--	if (!is_vmlinux(modname)) {
-+	if (!mod->is_vmlinux) {
- 		license = get_modinfo(&info, "license");
- 		if (!license)
- 			warn("missing MODULE_LICENSE() in %s\n", modname);
-@@ -2065,7 +2066,7 @@ static void read_symbols(const char *modname)
+ # set src + obj - they may be used in the modules's Makefile
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index d09ab4afbda4..d5af6be50b50 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -218,8 +218,6 @@ on_signals()
+ }
+ trap on_signals HUP INT QUIT TERM
  
- 	check_sec_ref(mod, modname, &info);
- 
--	if (!is_vmlinux(modname)) {
-+	if (!mod->is_vmlinux) {
- 		version = get_modinfo(&info, "version");
- 		if (version || all_versions)
- 			get_src_version(modname, mod->srcversion,
-@@ -2335,7 +2336,7 @@ static void add_depends(struct buffer *b, struct module *mod)
- 	/* Clear ->seen flag of modules that own symbols needed by this. */
- 	for (s = mod->unres; s; s = s->next)
- 		if (s->module)
--			s->module->seen = is_vmlinux(s->module->name);
-+			s->module->seen = s->module->is_vmlinux;
- 
- 	buf_printf(b, "\n");
- 	buf_printf(b, "MODULE_INFO(depends, \"");
-@@ -2452,9 +2453,9 @@ static void read_dump(const char *fname)
- 			goto fail;
- 		mod = find_module(modname);
- 		if (!mod) {
--			if (is_vmlinux(modname))
--				have_vmlinux = 1;
- 			mod = new_module(modname);
-+			if (mod->is_vmlinux)
-+				have_vmlinux = 1;
- 			mod->skip = 1;
- 			mod->from_dump = 1;
- 		}
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 554f02c69ac2..ec717ab20b98 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -120,6 +120,7 @@ struct module {
- 	int gpl_compatible;
- 	struct symbol *unres;
- 	int from_dump;  /* 1 if module was loaded from *.symver */
-+	int is_vmlinux;
- 	int seen;
- 	int skip;
- 	int has_init;
+-#
+-#
+ # Use "make V=1" to debug this script
+ case "${KBUILD_VERBOSE}" in
+ *1*)
 -- 
 2.25.1
