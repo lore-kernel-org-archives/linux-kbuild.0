@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38329 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38340 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727811AbgEQJtg (ORCPT
+        with ESMTP id S1727825AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 22/29] modpost: remove mod->is_dot_o struct member
-Date: Sun, 17 May 2020 18:48:52 +0900
-Message-Id: <20200517094859.2376211-23-masahiroy@kernel.org>
+Subject: [PATCH 24/29] modpost: add mod->is_vmlinux struct member
+Date: Sun, 17 May 2020 18:48:54 +0900
+Message-Id: <20200517094859.2376211-25-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,82 +17,109 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Previously, there were two cases where mod->is_dot_o is unset:
+is_vmlinux() is called in several places to check whether the current
+module is vmlinux or not.
 
-[1] the executable 'vmlinux' in the second pass of modpost
-[2] modules loaded by read_dump()
-
-I think [1] was intended usage to distinguish 'vmlinux.o' and 'vmlinux'.
-Now that modpost does not parse the executable 'vmlinux', this case
-does not happen.
-
-[2] is obscure, maybe a bug. Module.symver stores module paths without
-extension. So, none of modules loaded by read_dump() has the .o suffix,
-and new_module() unsets ->is_dot_o. Anyway, it is not a big deal because
-handle_symbol() is not called for the case.
-
-To sum up, all the parsed ELF files are .o files.
-
-mod->is_dot_o is unneeded.
+It is faster and clearer to check mod->is_vmlinux flag.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 14 ++------------
- scripts/mod/modpost.h |  1 -
- 2 files changed, 2 insertions(+), 13 deletions(-)
+ scripts/mod/modpost.c | 19 ++++++++++---------
+ scripts/mod/modpost.h |  1 +
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index c6e1a349421c..7136bfc8f46a 100644
+index 4155669a92bd..0df0fc82412d 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -171,10 +171,8 @@ static struct module *new_module(const char *modname)
- 	p = NOFAIL(strdup(modname));
- 
- 	/* strip trailing .o */
--	if (strends(p, ".o")) {
-+	if (strends(p, ".o"))
- 		p[strlen(p) - 2] = '\0';
--		mod->is_dot_o = 1;
--	}
+@@ -176,6 +176,7 @@ static struct module *new_module(const char *modname)
  
  	/* add to list */
  	mod->name = p;
-@@ -702,8 +700,7 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 	enum export export;
- 	const char *name;
++	mod->is_vmlinux = is_vmlinux(modname);
+ 	mod->gpl_compatible = -1;
+ 	mod->next = modules;
+ 	modules = mod;
+@@ -417,11 +418,11 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
  
--	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
--	    strstarts(symname, "__ksymtab"))
-+	if (strstarts(symname, "__ksymtab"))
- 		export = export_from_secname(info, get_secindex(info, sym));
- 	else
- 		export = export_from_sec(info, get_secindex(info, sym));
-@@ -2661,13 +2658,6 @@ int main(int argc, char **argv)
- 		struct symbol *s;
+ 	if (!s) {
+ 		s = new_symbol(name, mod, export);
+-	} else if (!external_module || is_vmlinux(s->module->name) ||
++	} else if (!external_module || s->module->is_vmlinux ||
+ 		   s->module == mod) {
+ 		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+ 		     mod->name, name, s->module->name,
+-		     is_vmlinux(s->module->name) ? "" : ".ko");
++		     s->module->is_vmlinux ? "" : ".ko");
+ 		return s;
+ 	}
  
- 		for (s = symbolhash[n]; s; s = s->next) {
--			/*
--			 * Do not check "vmlinux". This avoids the same warnings
--			 * shown twice, and false-positives for ARCH=um.
--			 */
--			if (is_vmlinux(s->module->name) && !s->module->is_dot_o)
--				continue;
--
- 			if (s->is_static)
- 				warn("\"%s\" [%s] is a static %s\n",
- 				     s->name, s->module->name,
+@@ -678,7 +679,7 @@ static void handle_modversion(const struct module *mod,
+ 
+ 	if (sym->st_shndx == SHN_UNDEF) {
+ 		warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
+-		     symname, mod->name, is_vmlinux(mod->name) ? "":".ko");
++		     symname, mod->name, mod->is_vmlinux ? "" : ".ko");
+ 		return;
+ 	}
+ 
+@@ -2001,12 +2002,12 @@ static void read_symbols(const char *modname)
+ 
+ 	mod = new_module(modname);
+ 
+-	if (is_vmlinux(modname)) {
++	if (mod->is_vmlinux) {
+ 		have_vmlinux = 1;
+ 		mod->skip = 1;
+ 	}
+ 
+-	if (!is_vmlinux(modname)) {
++	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
+ 		if (!license)
+ 			warn("missing MODULE_LICENSE() in %s\n", modname);
+@@ -2065,7 +2066,7 @@ static void read_symbols(const char *modname)
+ 
+ 	check_sec_ref(mod, modname, &info);
+ 
+-	if (!is_vmlinux(modname)) {
++	if (!mod->is_vmlinux) {
+ 		version = get_modinfo(&info, "version");
+ 		if (version || all_versions)
+ 			get_src_version(modname, mod->srcversion,
+@@ -2335,7 +2336,7 @@ static void add_depends(struct buffer *b, struct module *mod)
+ 	/* Clear ->seen flag of modules that own symbols needed by this. */
+ 	for (s = mod->unres; s; s = s->next)
+ 		if (s->module)
+-			s->module->seen = is_vmlinux(s->module->name);
++			s->module->seen = s->module->is_vmlinux;
+ 
+ 	buf_printf(b, "\n");
+ 	buf_printf(b, "MODULE_INFO(depends, \"");
+@@ -2452,9 +2453,9 @@ static void read_dump(const char *fname)
+ 			goto fail;
+ 		mod = find_module(modname);
+ 		if (!mod) {
+-			if (is_vmlinux(modname))
+-				have_vmlinux = 1;
+ 			mod = new_module(modname);
++			if (mod->is_vmlinux)
++				have_vmlinux = 1;
+ 			mod->skip = 1;
+ 			mod->from_dump = 1;
+ 		}
 diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index aaf3c4ad5d60..554f02c69ac2 100644
+index 554f02c69ac2..ec717ab20b98 100644
 --- a/scripts/mod/modpost.h
 +++ b/scripts/mod/modpost.h
-@@ -126,7 +126,6 @@ struct module {
- 	int has_cleanup;
- 	struct buffer dev_table_buf;
- 	char	     srcversion[25];
--	int is_dot_o;
- 	// Missing namespace dependencies
- 	struct namespace_list *missing_namespaces;
- 	// Actual imported namespaces
+@@ -120,6 +120,7 @@ struct module {
+ 	int gpl_compatible;
+ 	struct symbol *unres;
+ 	int from_dump;  /* 1 if module was loaded from *.symver */
++	int is_vmlinux;
+ 	int seen;
+ 	int skip;
+ 	int has_init;
 -- 
 2.25.1
