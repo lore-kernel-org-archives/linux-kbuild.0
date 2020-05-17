@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38336 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38335 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727823AbgEQJth (ORCPT
+        with ESMTP id S1727819AbgEQJth (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:37 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 21/29] modpost: remove -s option
-Date: Sun, 17 May 2020 18:48:51 +0900
-Message-Id: <20200517094859.2376211-22-masahiroy@kernel.org>
+Subject: [PATCH 04/29] modpost: fix potential mmap'ed file overrun in get_src_version()
+Date: Sun, 17 May 2020 18:48:34 +0900
+Message-Id: <20200517094859.2376211-5-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,73 +17,89 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The -s option was added by commit 8d8d8289df65 ("kbuild: do not do
-section mismatch checks on vmlinux in 2nd pass").
+I do not know how reliably this function works, but it seems dangerous
+to me, at least.
 
-Now that the second pass does not parse vmlinux, this option is
-unneeded.
+The function call
+
+    strchr(sources, '\n');
+
+... continues searching until it finds '\n' or it reaches the '\0'
+terminator. In other words, 'sources' should be a null-terminated
+string.
+
+However, grab_file() just mmaps a file, so 'sources' is not terminated
+with null byte. If the file does not contain '\n' at all, strchr() will
+go beyond the mmap'ed memory.
+
+Instead, use read_text_file(), which loads the file content into a
+malloc'ed buffer, appending null-byte.
+
+Here we are interested only in the first line of *.mod files. Use
+get_line() helper to get the first line.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.modpost |  2 +-
- scripts/mod/modpost.c    | 10 ++--------
- 2 files changed, 3 insertions(+), 9 deletions(-)
+ scripts/mod/sumversion.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 1c597999b6a0..67db4bba2d45 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -63,7 +63,7 @@ __modpost:
- else
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index f27f22420cbc..f9aa532d93cf 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -392,40 +392,37 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
+ /* Calc and record src checksum. */
+ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ {
+-	void *file;
+-	unsigned long len;
++	char *buf, *pos, *firstline;
+ 	struct md4_ctx md;
+-	char *sources, *end, *fname;
++	char *fname;
+ 	char filelist[PATH_MAX + 1];
  
- # modpost options for modules (both in-kernel and external)
--MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
-+MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) \
- 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
- 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 	/* objects for a module are listed in the first line of *.mod file. */
+ 	snprintf(filelist, sizeof(filelist), "%.*smod",
+ 		 (int)strlen(modname) - 1, modname);
  
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index ff715623b37e..c6e1a349421c 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -30,8 +30,6 @@ static int have_vmlinux = 0;
- static int all_versions = 0;
- /* If we are modposting external module set to 1 */
- static int external_module = 0;
--/* Warn about section mismatch in vmlinux if set to 1 */
--static int vmlinux_section_warnings = 1;
- /* Only warn about unresolved symbols */
- static int warn_unresolved = 0;
- /* How a symbol is exported */
-@@ -2068,8 +2066,7 @@ static void read_symbols(const char *modname)
- 		}
+-	file = grab_file(filelist, &len);
+-	if (!file)
++	buf = read_text_file(filelist);
++	if (!buf)
+ 		/* not a module or .mod file missing - ignore */
+ 		return;
+ 
+-	sources = file;
+-
+-	end = strchr(sources, '\n');
+-	if (!end) {
++	pos = buf;
++	firstline = get_line(&pos);
++	if (!firstline) {
+ 		warn("bad ending versions file for %s\n", modname);
+-		goto release;
++		goto free;
+ 	}
+-	*end = '\0';
+ 
+ 	md4_init(&md);
+-	while ((fname = strsep(&sources, " ")) != NULL) {
++	while ((fname = strsep(&firstline, " "))) {
+ 		if (!*fname)
+ 			continue;
+ 		if (!(is_static_library(fname)) &&
+ 				!parse_source_files(fname, &md))
+-			goto release;
++			goto free;
  	}
  
--	if (!is_vmlinux(modname) || vmlinux_section_warnings)
--		check_sec_ref(mod, modname, &info);
-+	check_sec_ref(mod, modname, &info);
- 
- 	if (!is_vmlinux(modname)) {
- 		version = get_modinfo(&info, "version");
-@@ -2558,7 +2555,7 @@ int main(int argc, char **argv)
- 	struct dump_list *dump_read_start = NULL;
- 	struct dump_list **dump_read_iter = &dump_read_start;
- 
--	while ((opt = getopt(argc, argv, "ei:mnsT:o:awENd:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
- 		switch (opt) {
- 		case 'e':
- 			external_module = 1;
-@@ -2581,9 +2578,6 @@ int main(int argc, char **argv)
- 		case 'a':
- 			all_versions = 1;
- 			break;
--		case 's':
--			vmlinux_section_warnings = 0;
--			break;
- 		case 'T':
- 			files_source = optarg;
- 			break;
+ 	md4_final_ascii(&md, sum, sumlen);
+-release:
+-	release_file(file, len);
++free:
++	free(buf);
+ }
 -- 
 2.25.1
