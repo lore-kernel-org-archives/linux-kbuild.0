@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38322 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38304 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727799AbgEQJtf (ORCPT
+        with ESMTP id S1727780AbgEQJtf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:35 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 23/29] modpost: remove is_vmlinux() call in check_for_{gpl_usage,unused}()
-Date: Sun, 17 May 2020 18:48:53 +0900
-Message-Id: <20200517094859.2376211-24-masahiroy@kernel.org>
+Subject: [PATCH 18/29] modpost: show warning if vmlinux is not found when processing modules
+Date: Sun, 17 May 2020 18:48:48 +0900
+Message-Id: <20200517094859.2376211-19-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,66 +17,48 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-check_exports() is never called for vmlinux because mod->skip is set
-for vmlinux.
+check_exports() does not print warnings about unresolved symbols if
+vmlinux is missing because there would be too many.
 
-Hence, check_for_gpl_usage() and check_for_unused() are not called
-for vmlinux, either. is_vmlinux() is always false here.
+This situation happens when you do 'make modules' from the clean
+tree, or compile external modules against a kernel tree that has
+not been completely built.
 
-Remove the is_vmlinux() calls, and hard-code the ".ko" suffix.
+Not checking unresolved symbols is dangerous because you might be
+building useless modules. At least it should be noted.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ scripts/mod/modpost.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 7136bfc8f46a..4155669a92bd 100644
+index b14ecfbfd640..8150be00e3df 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2134,20 +2134,18 @@ void buf_write(struct buffer *buf, const char *s, int len)
+@@ -2004,8 +2004,6 @@ static void read_symbols(const char *modname)
  
- static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
- {
--	const char *e = is_vmlinux(m) ?"":".ko";
--
- 	switch (exp) {
- 	case export_gpl:
--		fatal("GPL-incompatible module %s%s "
--		      "uses GPL-only symbol '%s'\n", m, e, s);
-+		fatal("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
-+		      m, s);
- 		break;
- 	case export_unused_gpl:
--		fatal("GPL-incompatible module %s%s "
--		      "uses GPL-only symbol marked UNUSED '%s'\n", m, e, s);
-+		fatal("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
-+		      m, s);
- 		break;
- 	case export_gpl_future:
--		warn("GPL-incompatible module %s%s "
--		      "uses future GPL-only symbol '%s'\n", m, e, s);
-+		warn("GPL-incompatible module %s.ko uses future GPL-only symbol '%s'\n",
-+		     m, s);
- 		break;
- 	case export_plain:
- 	case export_unused:
-@@ -2159,13 +2157,11 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+ 	mod = new_module(modname);
  
- static void check_for_unused(enum export exp, const char *m, const char *s)
- {
--	const char *e = is_vmlinux(m) ?"":".ko";
--
- 	switch (exp) {
- 	case export_unused:
- 	case export_unused_gpl:
--		warn("module %s%s "
--		      "uses symbol '%s' marked UNUSED\n", m, e, s);
-+		warn("module %s.ko uses symbol '%s' marked UNUSED\n",
-+		     m, s);
- 		break;
- 	default:
- 		/* ignore */
+-	/* When there's no vmlinux, don't print warnings about
+-	 * unresolved symbols (since there'll be too many ;) */
+ 	if (is_vmlinux(modname)) {
+ 		have_vmlinux = 1;
+ 		mod->skip = 1;
+@@ -2617,6 +2615,13 @@ int main(int argc, char **argv)
+ 	if (files_source)
+ 		read_symbols_from_files(files_source);
+ 
++	/*
++	 * When there's no vmlinux, don't print warnings about
++	 * unresolved symbols (since there'll be too many ;)
++	 */
++	if (!have_vmlinux)
++		warn("Symbol info of vmlinux is missing. Unresolved symbol check will be entirely skipped.\n");
++
+ 	err = 0;
+ 
+ 	for (mod = modules; mod; mod = mod->next) {
 -- 
 2.25.1
