@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38318 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38334 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727798AbgEQJtg (ORCPT
+        with ESMTP id S1727815AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 15/29] modpost: allow to pass -i option multiple times remove -e option
-Date: Sun, 17 May 2020 18:48:45 +0900
-Message-Id: <20200517094859.2376211-16-masahiroy@kernel.org>
+Subject: [PATCH 19/29] modpost: show warning if it fails to read symbol dump file
+Date: Sun, 17 May 2020 18:48:49 +0900
+Message-Id: <20200517094859.2376211-20-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,68 +17,80 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Now that there is no difference in the functionality of -i and -e,
-they can be unified.
+If modpost fails to load a symbol dump file, it cannot check unresolved
+symbols, hence module dependency will not be added. Nor CRCs can be added.
 
-Make modpost accept the -i option multiple times, then remove -e.
+Currently, external module builds check only $(objtree)/Module.symvers,
+but it should check files specified by KBUILD_EXTRA_SYMBOLS as well.
 
-I will reuse -e for a different purpose.
+Print the warnings in modpost. The warning in Makefile is unneeded.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.modpost | 2 +-
- scripts/mod/modpost.c    | 9 +--------
- 2 files changed, 2 insertions(+), 9 deletions(-)
+ Makefile              | 10 +---------
+ scripts/mod/modpost.c | 11 +++++++++--
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 8321068abb31..a316095c843c 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -82,7 +82,7 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
- # modpost options for external modules
- MODPOST += \
- 	-i Module.symvers \
--	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
-+	$(addprefix -i ,$(KBUILD_EXTRA_SYMBOLS)) \
- 	-o $(KBUILD_EXTMOD)/Module.symvers
+diff --git a/Makefile b/Makefile
+index aeb690c692ee..27e8a0522a3c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1638,17 +1638,9 @@ else # KBUILD_EXTMOD
+ # We are always building modules
+ KBUILD_MODULES := 1
  
- endif
+-PHONY += $(objtree)/Module.symvers
+-$(objtree)/Module.symvers:
+-	@test -e $(objtree)/Module.symvers || ( \
+-	echo; \
+-	echo "  WARNING: Symbol version dump $(objtree)/Module.symvers"; \
+-	echo "           is missing; modules will have no dependencies and modversions."; \
+-	echo )
+-
+ build-dirs := $(KBUILD_EXTMOD)
+ PHONY += modules
+-modules: descend $(objtree)/Module.symvers
++modules: descend
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ PHONY += modules_install
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 340b88647e94..d3141b217b57 100644
+index 8150be00e3df..ff715623b37e 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2548,7 +2548,6 @@ int main(int argc, char **argv)
- {
- 	struct module *mod;
- 	struct buffer buf = { };
--	char *kernel_read = NULL;
- 	char *missing_namespace_deps = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
-@@ -2557,13 +2556,9 @@ int main(int argc, char **argv)
- 	struct ext_sym_list *extsym_start = NULL;
- 	struct ext_sym_list **extsym_iter = &extsym_start;
+@@ -41,6 +41,8 @@ static int sec_mismatch_fatal = 0;
+ static int ignore_missing_files;
+ /* If set to 1, only warn (instead of error) about missing ns imports */
+ static int allow_missing_ns_imports;
++/* Set when at list one dump file is missing */
++static int missing_dump_file;
  
--	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
-+	while ((opt = getopt(argc, argv, "i:mnsT:o:awENd:")) != -1) {
- 		switch (opt) {
- 		case 'i':
--			kernel_read = optarg;
--			external_module = 1;
--			break;
--		case 'e':
- 			external_module = 1;
- 			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
- 			(*extsym_iter)->file = optarg;
-@@ -2604,8 +2599,6 @@ int main(int argc, char **argv)
- 		}
- 	}
+ enum export {
+ 	export_plain,      export_unused,     export_gpl,
+@@ -2428,9 +2430,11 @@ static void read_dump(const char *fname)
+ 	char *buf, *pos, *line;
  
--	if (kernel_read)
--		read_dump(kernel_read);
- 	while (extsym_start) {
- 		struct ext_sym_list *tmp;
+ 	buf = read_text_file(fname);
+-	if (!buf)
+-		/* No symbol versions, silently ignore */
++	if (!buf) {
++		warn("failed to read '%s'\n", fname);
++		missing_dump_file = 1;
+ 		return;
++	}
  
+ 	pos = buf;
+ 
+@@ -2615,6 +2619,9 @@ int main(int argc, char **argv)
+ 	if (files_source)
+ 		read_symbols_from_files(files_source);
+ 
++	if (missing_dump_file)
++		warn("Symbol dump file is missing. Modules may not have dependencies or movversions.\n");
++
+ 	/*
+ 	 * When there's no vmlinux, don't print warnings about
+ 	 * unresolved symbols (since there'll be too many ;)
 -- 
 2.25.1
