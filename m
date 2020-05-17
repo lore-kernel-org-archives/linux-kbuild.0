@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38313 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38328 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727785AbgEQJtg (ORCPT
+        with ESMTP id S1727805AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 01/29] modpost: drop RCS/CVS $Revision handling in MODULE_VERSION()
-Date: Sun, 17 May 2020 18:48:31 +0900
-Message-Id: <20200517094859.2376211-2-masahiroy@kernel.org>
+Subject: [PATCH 14/29] modpost: track if the symbol origin is a dump file or ELF object
+Date: Sun, 17 May 2020 18:48:44 +0900
+Message-Id: <20200517094859.2376211-15-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,121 +17,108 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-As far as I understood, this code gets rid of '$Revision$' or '$Revision:'
-of CVS, RCS or whatever in MODULE_VERSION() tags.
+The meaning of sym->kernel is obscure; it is set for in-kernel symbols
+loaded from Modules.symver. This happens only when we are building
+external modules, and it is used to determine whether to dump symbols
+to $(KBUILD_EXTMOD)/Modules.symver
 
-Remove the primeval code.
+It is clearer to remember whether the symbol or module came from a dump
+file or ELF object.
+
+This changes the KBUILD_EXTRA_SYMBOLS behavior. Previously, symbols
+loaded from KBUILD_EXTRA_SYMBOLS are accumulated into the current
+$(KBUILD_EXTMOD)/Modules.symver
+
+Going forward, they will be only used to check symbol references, but
+not dumped into the current $(KBUILD_EXTMOD)/Modules.symver. I believe
+this makes more sense.
+
+sym->vmlinux will have no user. Remove it too.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c    |  3 --
- scripts/mod/modpost.h    |  4 ---
- scripts/mod/sumversion.c | 66 ----------------------------------------
- 3 files changed, 73 deletions(-)
+ scripts/mod/modpost.c | 15 +++++----------
+ scripts/mod/modpost.h |  1 +
+ 2 files changed, 6 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4d4b979d76be..77e5425759e2 100644
+index dc8f15f10da0..340b88647e94 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2074,9 +2074,6 @@ static void read_symbols(const char *modname)
- 		check_sec_ref(mod, modname, &info);
+@@ -197,9 +197,6 @@ struct symbol {
+ 	int crc_valid;
+ 	char *namespace;
+ 	unsigned int weak:1;
+-	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
+-	unsigned int kernel:1;     /* 1 if symbol is from kernel
+-				    *  (only for external modules) **/
+ 	unsigned int is_static:1;  /* 1 if symbol is not global */
+ 	enum export  export;       /* Type of export */
+ 	char name[];
+@@ -431,8 +428,6 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 	}
  
- 	version = get_modinfo(&info, "version");
--	if (version)
--		maybe_frob_rcs_version(modname, version, info.modinfo,
--				       version - (char *)info.hdr);
- 	if (version || (all_versions && !is_vmlinux(modname)))
- 		get_src_version(modname, mod->srcversion,
- 				sizeof(mod->srcversion)-1);
+ 	s->module = mod;
+-	s->vmlinux   = is_vmlinux(mod->name);
+-	s->kernel    = 0;
+ 	s->export    = export;
+ 	return s;
+ }
+@@ -2430,7 +2425,7 @@ static void write_if_changed(struct buffer *b, const char *fname)
+ /* parse Module.symvers file. line format:
+  * 0x12345678<tab>symbol<tab>module<tab>export<tab>namespace
+  **/
+-static void read_dump(const char *fname, unsigned int kernel)
++static void read_dump(const char *fname)
+ {
+ 	char *buf, *pos, *line;
+ 
+@@ -2469,9 +2464,9 @@ static void read_dump(const char *fname, unsigned int kernel)
+ 				have_vmlinux = 1;
+ 			mod = new_module(modname);
+ 			mod->skip = 1;
++			mod->from_dump = 1;
+ 		}
+ 		s = sym_add_exported(symname, mod, export_no(export));
+-		s->kernel    = kernel;
+ 		s->is_static = 0;
+ 		sym_set_crc(symname, crc);
+ 		sym_update_namespace(symname, namespace);
+@@ -2491,7 +2486,7 @@ static int dump_sym(struct symbol *sym)
+ {
+ 	if (!external_module)
+ 		return 1;
+-	if (sym->vmlinux || sym->kernel)
++	if (sym->module->from_dump)
+ 		return 0;
+ 	return 1;
+ }
+@@ -2610,11 +2605,11 @@ int main(int argc, char **argv)
+ 	}
+ 
+ 	if (kernel_read)
+-		read_dump(kernel_read, 1);
++		read_dump(kernel_read);
+ 	while (extsym_start) {
+ 		struct ext_sym_list *tmp;
+ 
+-		read_dump(extsym_start->file, 0);
++		read_dump(extsym_start->file);
+ 		tmp = extsym_start->next;
+ 		free(extsym_start);
+ 		extsym_start = tmp;
 diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 39f6c29fb568..bbaf5cc37bfb 100644
+index 232a0e11fcaa..aaf3c4ad5d60 100644
 --- a/scripts/mod/modpost.h
 +++ b/scripts/mod/modpost.h
-@@ -187,10 +187,6 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
- void add_moddevtable(struct buffer *buf, struct module *mod);
- 
- /* sumversion.c */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long modinfo_offset);
- void get_src_version(const char *modname, char sum[], unsigned sumlen);
- 
- /* from modpost.c */
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 63062024ce0e..f27f22420cbc 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -429,69 +429,3 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- release:
- 	release_file(file, len);
- }
--
--static void write_version(const char *filename, const char *sum,
--			  unsigned long offset)
--{
--	int fd;
--
--	fd = open(filename, O_RDWR);
--	if (fd < 0) {
--		warn("changing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		return;
--	}
--
--	if (lseek(fd, offset, SEEK_SET) == (off_t)-1) {
--		warn("changing sum in %s:%lu failed: %s\n",
--			filename, offset, strerror(errno));
--		goto out;
--	}
--
--	if (write(fd, sum, strlen(sum)+1) != strlen(sum)+1) {
--		warn("writing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		goto out;
--	}
--out:
--	close(fd);
--}
--
--static int strip_rcs_crap(char *version)
--{
--	unsigned int len, full_len;
--
--	if (strncmp(version, "$Revision", strlen("$Revision")) != 0)
--		return 0;
--
--	/* Space for version string follows. */
--	full_len = strlen(version) + strlen(version + strlen(version) + 1) + 2;
--
--	/* Move string to start with version number: prefix will be
--	 * $Revision$ or $Revision: */
--	len = strlen("$Revision");
--	if (version[len] == ':' || version[len] == '$')
--		len++;
--	while (isspace(version[len]))
--		len++;
--	memmove(version, version+len, full_len-len);
--	full_len -= len;
--
--	/* Preserve up to next whitespace. */
--	len = 0;
--	while (version[len] && !isspace(version[len]))
--		len++;
--	memmove(version + len, version + strlen(version),
--		full_len - strlen(version));
--	return 1;
--}
--
--/* Clean up RCS-style version numbers. */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long version_offset)
--{
--	if (strip_rcs_crap(version))
--		write_version(modfilename, version, version_offset);
--}
+@@ -119,6 +119,7 @@ struct module {
+ 	const char *name;
+ 	int gpl_compatible;
+ 	struct symbol *unres;
++	int from_dump;  /* 1 if module was loaded from *.symver */
+ 	int seen;
+ 	int skip;
+ 	int has_init;
 -- 
 2.25.1
