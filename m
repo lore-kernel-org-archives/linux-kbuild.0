@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38304 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38299 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbgEQJtf (ORCPT
+        with ESMTP id S1727779AbgEQJtf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:35 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 18/29] modpost: show warning if vmlinux is not found when processing modules
-Date: Sun, 17 May 2020 18:48:48 +0900
-Message-Id: <20200517094859.2376211-19-masahiroy@kernel.org>
+Subject: [PATCH 13/29] modpost: load KBUILD_EXTRA_SYMBOLS files in order
+Date: Sun, 17 May 2020 18:48:43 +0900
+Message-Id: <20200517094859.2376211-14-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,48 +17,61 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-check_exports() does not print warnings about unresolved symbols if
-vmlinux is missing because there would be too many.
+Currently, modpost reads extra symbol dump files in the reverse order.
+If '-e foo -e bar' is given, modpost reads bar, foo, in this order.
 
-This situation happens when you do 'make modules' from the clean
-tree, or compile external modules against a kernel tree that has
-not been completely built.
-
-Not checking unresolved symbols is dangerous because you might be
-building useless modules. At least it should be noted.
+This is probably not a big deal, but there is no good reason to reverse
+the order. Read files in the given order.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ scripts/mod/modpost.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index b14ecfbfd640..8150be00e3df 100644
+index cd3cb781a2e7..dc8f15f10da0 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2004,8 +2004,6 @@ static void read_symbols(const char *modname)
+@@ -2559,8 +2559,8 @@ int main(int argc, char **argv)
+ 	int opt;
+ 	int err;
+ 	int n;
+-	struct ext_sym_list *extsym_iter;
+ 	struct ext_sym_list *extsym_start = NULL;
++	struct ext_sym_list **extsym_iter = &extsym_start;
  
- 	mod = new_module(modname);
- 
--	/* When there's no vmlinux, don't print warnings about
--	 * unresolved symbols (since there'll be too many ;) */
- 	if (is_vmlinux(modname)) {
- 		have_vmlinux = 1;
- 		mod->skip = 1;
-@@ -2617,6 +2615,13 @@ int main(int argc, char **argv)
- 	if (files_source)
- 		read_symbols_from_files(files_source);
- 
-+	/*
-+	 * When there's no vmlinux, don't print warnings about
-+	 * unresolved symbols (since there'll be too many ;)
-+	 */
-+	if (!have_vmlinux)
-+		warn("Symbol info of vmlinux is missing. Unresolved symbol check will be entirely skipped.\n");
+ 	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
+ 		switch (opt) {
+@@ -2570,11 +2570,9 @@ int main(int argc, char **argv)
+ 			break;
+ 		case 'e':
+ 			external_module = 1;
+-			extsym_iter =
+-			   NOFAIL(malloc(sizeof(*extsym_iter)));
+-			extsym_iter->next = extsym_start;
+-			extsym_iter->file = optarg;
+-			extsym_start = extsym_iter;
++			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
++			(*extsym_iter)->file = optarg;
++			extsym_iter = &(*extsym_iter)->next;
+ 			break;
+ 		case 'm':
+ 			modversions = 1;
+@@ -2614,10 +2612,12 @@ int main(int argc, char **argv)
+ 	if (kernel_read)
+ 		read_dump(kernel_read, 1);
+ 	while (extsym_start) {
++		struct ext_sym_list *tmp;
 +
- 	err = 0;
+ 		read_dump(extsym_start->file, 0);
+-		extsym_iter = extsym_start->next;
++		tmp = extsym_start->next;
+ 		free(extsym_start);
+-		extsym_start = extsym_iter;
++		extsym_start = tmp;
+ 	}
  
- 	for (mod = modules; mod; mod = mod->next) {
+ 	while (optind < argc)
 -- 
 2.25.1
