@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38321 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38336 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727801AbgEQJtg (ORCPT
+        with ESMTP id S1727823AbgEQJth (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 17 May 2020 05:49:36 -0400
+        Sun, 17 May 2020 05:49:37 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 16/29] modpost: rename ext_sym_list to dump_list
-Date: Sun, 17 May 2020 18:48:46 +0900
-Message-Id: <20200517094859.2376211-17-masahiroy@kernel.org>
+Subject: [PATCH 21/29] modpost: remove -s option
+Date: Sun, 17 May 2020 18:48:51 +0900
+Message-Id: <20200517094859.2376211-22-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,74 +17,73 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The -i option is used to include Modules.symver as well as files from
-$(KBUILD_EXTRA_SYMBOLS).
+The -s option was added by commit 8d8d8289df65 ("kbuild: do not do
+section mismatch checks on vmlinux in 2nd pass").
 
-Make the struct and variable names more generic.
+Now that the second pass does not parse vmlinux, this option is
+unneeded.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ scripts/Makefile.modpost |  2 +-
+ scripts/mod/modpost.c    | 10 ++--------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 1c597999b6a0..67db4bba2d45 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -63,7 +63,7 @@ __modpost:
+ else
+ 
+ # modpost options for modules (both in-kernel and external)
+-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
++MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) \
+ 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index d3141b217b57..a5bac158d344 100644
+index ff715623b37e..c6e1a349421c 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2539,8 +2539,8 @@ static void write_namespace_deps_files(const char *fname)
- 	free(ns_deps_buf.p);
- }
- 
--struct ext_sym_list {
--	struct ext_sym_list *next;
-+struct dump_list {
-+	struct dump_list *next;
- 	const char *file;
- };
- 
-@@ -2553,16 +2553,17 @@ int main(int argc, char **argv)
- 	int opt;
- 	int err;
- 	int n;
--	struct ext_sym_list *extsym_start = NULL;
--	struct ext_sym_list **extsym_iter = &extsym_start;
-+	struct dump_list *dump_read_start = NULL;
-+	struct dump_list **dump_read_iter = &dump_read_start;
- 
- 	while ((opt = getopt(argc, argv, "i:mnsT:o:awENd:")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			external_module = 1;
--			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
--			(*extsym_iter)->file = optarg;
--			extsym_iter = &(*extsym_iter)->next;
-+			*dump_read_iter =
-+				NOFAIL(calloc(1, sizeof(**dump_read_iter)));
-+			(*dump_read_iter)->file = optarg;
-+			dump_read_iter = &(*dump_read_iter)->next;
- 			break;
- 		case 'm':
- 			modversions = 1;
-@@ -2599,13 +2600,13 @@ int main(int argc, char **argv)
+@@ -30,8 +30,6 @@ static int have_vmlinux = 0;
+ static int all_versions = 0;
+ /* If we are modposting external module set to 1 */
+ static int external_module = 0;
+-/* Warn about section mismatch in vmlinux if set to 1 */
+-static int vmlinux_section_warnings = 1;
+ /* Only warn about unresolved symbols */
+ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+@@ -2068,8 +2066,7 @@ static void read_symbols(const char *modname)
  		}
  	}
  
--	while (extsym_start) {
--		struct ext_sym_list *tmp;
-+	while (dump_read_start) {
-+		struct dump_list *tmp;
+-	if (!is_vmlinux(modname) || vmlinux_section_warnings)
+-		check_sec_ref(mod, modname, &info);
++	check_sec_ref(mod, modname, &info);
  
--		read_dump(extsym_start->file);
--		tmp = extsym_start->next;
--		free(extsym_start);
--		extsym_start = tmp;
-+		read_dump(dump_read_start->file);
-+		tmp = dump_read_start->next;
-+		free(dump_read_start);
-+		dump_read_start = tmp;
- 	}
+ 	if (!is_vmlinux(modname)) {
+ 		version = get_modinfo(&info, "version");
+@@ -2558,7 +2555,7 @@ int main(int argc, char **argv)
+ 	struct dump_list *dump_read_start = NULL;
+ 	struct dump_list **dump_read_iter = &dump_read_start;
  
- 	while (optind < argc)
+-	while ((opt = getopt(argc, argv, "ei:mnsT:o:awENd:")) != -1) {
++	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
+ 		switch (opt) {
+ 		case 'e':
+ 			external_module = 1;
+@@ -2581,9 +2578,6 @@ int main(int argc, char **argv)
+ 		case 'a':
+ 			all_versions = 1;
+ 			break;
+-		case 's':
+-			vmlinux_section_warnings = 0;
+-			break;
+ 		case 'T':
+ 			files_source = optarg;
+ 			break;
 -- 
 2.25.1
