@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:38331 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38318 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727812AbgEQJtg (ORCPT
+        with ESMTP id S1727798AbgEQJtg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 17 May 2020 05:49:36 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 07/29] modpost: use read_text_file() and get_line() for reading text files
-Date: Sun, 17 May 2020 18:48:37 +0900
-Message-Id: <20200517094859.2376211-8-masahiroy@kernel.org>
+Subject: [PATCH 15/29] modpost: allow to pass -i option multiple times remove -e option
+Date: Sun, 17 May 2020 18:48:45 +0900
+Message-Id: <20200517094859.2376211-16-masahiroy@kernel.org>
 In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
 References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,100 +17,68 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-grab_file() mmaps a file, but it is not so efficient here because
-get_next_line() copies every line to the temporary buffer anyway.
+Now that there is no difference in the functionality of -i and -e,
+they can be unified.
 
-read_text_file() and get_line() are simpler. get_line() exploits the
-library function strchr().
+Make modpost accept the -i option multiple times, then remove -e.
+
+I will reuse -e for a different purpose.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c    | 15 ++++++++-------
- scripts/mod/sumversion.c | 11 ++++++-----
- 2 files changed, 14 insertions(+), 12 deletions(-)
+ scripts/Makefile.modpost | 2 +-
+ scripts/mod/modpost.c    | 9 +--------
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8321068abb31..a316095c843c 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -82,7 +82,7 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+ # modpost options for external modules
+ MODPOST += \
+ 	-i Module.symvers \
+-	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
++	$(addprefix -i ,$(KBUILD_EXTRA_SYMBOLS)) \
+ 	-o $(KBUILD_EXTMOD)/Module.symvers
+ 
+ endif
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 2c6319f0ce19..8021f7e93448 100644
+index 340b88647e94..d3141b217b57 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2466,15 +2466,16 @@ static void write_if_changed(struct buffer *b, const char *fname)
-  **/
- static void read_dump(const char *fname, unsigned int kernel)
+@@ -2548,7 +2548,6 @@ int main(int argc, char **argv)
  {
--	unsigned long size, pos = 0;
--	void *file = grab_file(fname, &size);
--	char *line;
-+	char *buf, *pos, *line;
+ 	struct module *mod;
+ 	struct buffer buf = { };
+-	char *kernel_read = NULL;
+ 	char *missing_namespace_deps = NULL;
+ 	char *dump_write = NULL, *files_source = NULL;
+ 	int opt;
+@@ -2557,13 +2556,9 @@ int main(int argc, char **argv)
+ 	struct ext_sym_list *extsym_start = NULL;
+ 	struct ext_sym_list **extsym_iter = &extsym_start;
  
--	if (!file)
-+	buf = read_text_file(fname);
-+	if (!buf)
- 		/* No symbol versions, silently ignore */
- 		return;
- 
--	while ((line = get_next_line(&pos, file, size))) {
-+	pos = buf;
-+
-+	while ((line = get_line(&pos))) {
- 		char *symname, *namespace, *modname, *d, *export;
- 		unsigned int crc;
- 		struct module *mod;
-@@ -2509,10 +2510,10 @@ static void read_dump(const char *fname, unsigned int kernel)
- 		sym_set_crc(symname, crc);
- 		sym_update_namespace(symname, namespace);
- 	}
--	release_file(file, size);
-+	free(buf);
- 	return;
- fail:
--	release_file(file, size);
-+	free(buf);
- 	fatal("parse error in symbol dump file\n");
- }
- 
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index a1c7b0f4cd5a..89c8baefde9d 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -306,9 +306,8 @@ static int is_static_library(const char *objfile)
-  * to figure out source files. */
- static int parse_source_files(const char *objfile, struct md4_ctx *md)
- {
--	char *cmd, *file, *line, *dir;
-+	char *cmd, *file, *line, *dir, *pos;
- 	const char *base;
--	unsigned long flen, pos = 0;
- 	int dirlen, ret = 0, check_files = 0;
- 
- 	cmd = NOFAIL(malloc(strlen(objfile) + sizeof("..cmd")));
-@@ -326,14 +325,16 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 	strncpy(dir, objfile, dirlen);
- 	dir[dirlen] = '\0';
- 
--	file = grab_file(cmd, &flen);
-+	file = read_text_file(cmd);
- 	if (!file) {
- 		warn("could not find %s for %s\n", cmd, objfile);
- 		goto out;
+-	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
++	while ((opt = getopt(argc, argv, "i:mnsT:o:awENd:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+-			kernel_read = optarg;
+-			external_module = 1;
+-			break;
+-		case 'e':
+ 			external_module = 1;
+ 			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
+ 			(*extsym_iter)->file = optarg;
+@@ -2604,8 +2599,6 @@ int main(int argc, char **argv)
+ 		}
  	}
  
-+	pos = file;
-+
- 	/* Sum all files in the same dir or subdirs. */
--	while ((line = get_next_line(&pos, file, flen)) != NULL) {
-+	while ((line = get_line(&pos))) {
- 		char* p = line;
+-	if (kernel_read)
+-		read_dump(kernel_read);
+ 	while (extsym_start) {
+ 		struct ext_sym_list *tmp;
  
- 		if (strncmp(line, "source_", sizeof("source_")-1) == 0) {
-@@ -384,7 +385,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 	/* Everyone parsed OK */
- 	ret = 1;
- out_file:
--	release_file(file, flen);
-+	free(file);
- out:
- 	free(dir);
- 	free(cmd);
 -- 
 2.25.1
