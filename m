@@ -1,40 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-il1-f200.google.com ([209.85.166.200]:38552 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726694AbgEPV1F (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:38297 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbgEQJte (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 May 2020 17:27:05 -0400
-Received: by mail-il1-f200.google.com with SMTP id u11so5863495ilg.5
-        for <linux-kbuild@vger.kernel.org>; Sat, 16 May 2020 14:27:03 -0700 (PDT)
+        Sun, 17 May 2020 05:49:34 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 06/29] modpost: avoid false-positive file open error
+Date: Sun, 17 May 2020 18:48:36 +0900
+Message-Id: <20200517094859.2376211-7-masahiroy@kernel.org>
+In-Reply-To: <20200517094859.2376211-1-masahiroy@kernel.org>
+References: <20200517094859.2376211-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Date: Sat, 16 May 2020 14:27:03 -0700
-In-Reply-To: <0000000000003692760578e651dd@google.com>
-Message-ID: <00000000000044329005a5ca97eb@google.com>
-Subject: Re: KASAN: use-after-free Write in hci_sock_release
-From: syzbot <syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: bigeasy@linutronix.de, davem@davemloft.net, dvyukov@google.com, jack@suse.cz, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, marcel@holtmann.org, mmarek@suse.com, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, torvalds@linux-foundation.org, xiyou.wangcong@gmail.com
+To: linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-syzbot suspects this bug was fixed by commit:
+One problem of grab_file() is that it cannot distinguish the following
+two cases:
 
-commit f1e67e355c2aafeddf1eac31335709236996d2fe
-Author: Thomas Gleixner <tglx@linutronix.de>
-Date:   Mon Nov 18 13:28:24 2019 +0000
+ - I cannot read the file (the file does not exist, or read permission
+   is not set)
 
-    fs/buffer: Make BH_Uptodate_Lock bit_spin_lock a regular spinlock_t
+ - It can read the file, but the file size is zero
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1761ce06100000
-start commit:   645ff1e8 Merge branch 'for-linus' of git://git.kernel.org/..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7308e68273924137
-dashboard link: https://syzkaller.appspot.com/bug?extid=b364ed862aa07c74bc62
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152532bb400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f73320c00000
+This is because grab_file() calls mmap(), which requires the mapped
+length is greater than 0. Hence, grab_file() fails for both cases.
 
-If the result looks correct, please mark the bug fixed by replying with:
+If an empty header file were included from a module that requires checksum
+calculation, the following warning would be printed:
 
-#syz fix: fs/buffer: Make BH_Uptodate_Lock bit_spin_lock a regular spinlock_t
+  WARNING: modpost: could not open ...: Invalid argument
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+An empty file is a valid source file, so it should not fail.
+
+Use read_text_file() instead. It can read a zero-length file.
+Then, parse_file() will succeed with doing nothing.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/mod/sumversion.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index f9df0b1863f1..a1c7b0f4cd5a 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -258,10 +258,12 @@ static int parse_file(const char *fname, struct md4_ctx *md)
+ 	char *file;
+ 	unsigned long i, len;
+ 
+-	file = grab_file(fname, &len);
++	file = read_text_file(fname);
+ 	if (!file)
+ 		return 0;
+ 
++	len = strlen(file);
++
+ 	for (i = 0; i < len; i++) {
+ 		/* Collapse and ignore \ and CR. */
+ 		if (file[i] == '\\' && (i+1 < len) && file[i+1] == '\n') {
+@@ -287,7 +289,7 @@ static int parse_file(const char *fname, struct md4_ctx *md)
+ 
+ 		add_char(file[i], md);
+ 	}
+-	release_file(file, len);
++	free(file);
+ 	return 1;
+ }
+ /* Check whether the file is a static library or not */
+-- 
+2.25.1
