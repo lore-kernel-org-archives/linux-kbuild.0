@@ -1,101 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37417 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727006AbgERQBB (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726958AbgERQtv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 18 May 2020 12:01:01 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20200518145723.65b89375@canb.auug.org.au>
-References: <20200518145723.65b89375@canb.auug.org.au>
-Subject: How should we handle a bool depending on a tristate?
+        Mon, 18 May 2020 12:49:51 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2544C061A0C
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 May 2020 09:49:50 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id u15so10629039ljd.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 May 2020 09:49:50 -0700 (PDT)
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com. [209.85.167.50])
+        by smtp.gmail.com with ESMTPSA id f2sm5947989ljg.98.2020.05.18.09.49.47
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 May 2020 09:49:47 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 82so8691886lfh.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 May 2020 09:49:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <968393.1589817650.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2020 17:00:50 +0100
-Message-ID: <968394.1589817650@warthog.procyon.org.uk>
+References: <20200518145723.65b89375@canb.auug.org.au> <968394.1589817650@warthog.procyon.org.uk>
+In-Reply-To: <968394.1589817650@warthog.procyon.org.uk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 18 May 2020 09:49:29 -0700
+Message-ID: <CAHk-=wj6J-iqrCr_7oLDCbS8qXQ69EF=nPLWmvBiDmgdNWZ6KA@mail.gmail.com>
+Subject: Re: How should we handle a bool depending on a tristate?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>, Masahiro Yamada <masahiroy@kernel.org>
-Cc: dhowells@redhat.com, torvalds@linux-foundation.org, linux-kbuild@vger.kernel.org, Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+On Mon, May 18, 2020 at 9:01 AM David Howells <dhowells@redhat.com> wrote:
+>
+>
+> Blech.  Yeah.  "depends on" doesn't work either.  The problem actually lies
+> within the Kconfig framework.  It doesn't know how to handle a bool depending
+> on a tristate.
 
-> After merging the keys tree, today's linux-next build (x86_64
-> allmodconfig) failed like this:
-> =
+No problem with Kconfig. It knows exactly how to let a bool depend on
+a tristate.
 
-> x86_64-linux-gnu-ld: security/keys/big_key.o: in function `big_key_read'=
-:
-> big_key.c:(.text+0x562): undefined reference to `chacha20poly1305_decryp=
-t'
-> x86_64-linux-gnu-ld: security/keys/big_key.o: in function `big_key_prepa=
-rse':
-> big_key.c:(.text+0x825): undefined reference to `chacha20poly1305_encryp=
-t'
-> =
+It's just that there are two different kinds of dependencies.
 
-> Caused by commit
-> =
+For example, the dependency can be a hard and absolute dependency
+(linking doesn't work, or whatever), and then obviously built-in code
+cannot be enabled if the thing it depends on is a loadable module.
 
->   e0a715753a88 ("security/keys: rewrite big_key crypto to use library in=
-terface")
-> =
+But the dependency can also be a conceptual one: "This option doesn't
+make sense unless that option is set". Then a bool can make sense even
+if the other config is a modular one.
 
-> I have used the version from next-20200512 again tdoay.
+And Kconfig can deal with either situation just fine.
 
-Blech.  Yeah.  "depends on" doesn't work either.  The problem actually lie=
-s
-within the Kconfig framework.  It doesn't know how to handle a bool depend=
-ing
-on a tristate.
+Do
 
-So the issue is that with Jason's patch, we now have:
+    depends on XYZ = y
 
-	config BIG_KEYS
-		bool "Large payload keys"
-		depends on KEYS
-		depends on TMPFS
-		depends on CRYPTO_LIB_CHACHA20POLY1305
+or
 
-	...
+    depends on XYZ != n
 
-	config CRYPTO_LIB_CHACHA20POLY1305
-		tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
-		depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
-		depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY13=
-05
-		select CRYPTO_LIB_CHACHA
-		select CRYPTO_LIB_POLY1305
+to clarify the choice. One requires a hard dependency, the other
+requires that the  option just be enabled.
 
-But you're allowed to set CONFIG_CRYPTO_LIB_CHACHA20POLY1305=3Dm.
+Now, if you just do "depends on XYZ", it allows a bool to be enabled
+even for just a module (ie that second case). That makes sense for a
+lot of "allow this feature in the module" kind of options, where it
+would be pointless to even ask about a boolean feature if the parent
+module isn't even enabled.
 
-Using "select" instead can lead to warnings about circular dependencies an=
-d,
-in any case, doesn't propagate the selection up the tree.
+But that "depends on XYZ=y" is not uncommon. It basically says "this
+option makes sense only when built in". Either because it requires it
+for linking, or just because it doesn't work or make sense without it.
 
-Also, in this case, having BIG_KEYS select everything isn't practical as
-CRYPTO_LIB_CHACHA20POLY1305 has a logical-XOR in its depends on.
-
-I think one or more of the following things need to happen:
-
- (1) The configurator needs to give an error if it detects this.
-
- (2) The configurator needs to propagate select rootwards.
-
- (3) The configurator needs to propagate "=3Dy" rootwards over depends on,
-     prohibiting "=3Dm".
-
- (4) The BIG_KEYS config needs to switch to a tristate.[*]
-
-Do we have a preference?
-
-David
-
-[*] Note there have been situations where switching to a tristate isn't
-    technically an option because the dependency target was required durin=
-g
-    boot (crypto used by module checking, for example), but we've just had=
- to
-    work around it and hope whoever was configuring the kernel built
-    everything in.
+                     Linus
