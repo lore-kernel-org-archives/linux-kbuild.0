@@ -1,144 +1,145 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40676 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728327AbgEUV5r (ORCPT
+        with ESMTP id S1729370AbgEUWAt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 May 2020 17:57:47 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72C0C061A0E
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 14:57:47 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id x11so2526889plv.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 14:57:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <10f4fb0b-1012-b0e6-af05-0aa5a906de21@redhat.com>
- <20200520193637.6015-1-ndesaulniers@google.com> <CAK7LNAS_PMz9r3e1UcuM+r18JC2KeM2RqGOms1u3kVzN_N1MmA@mail.gmail.com>
-In-Reply-To: <CAK7LNAS_PMz9r3e1UcuM+r18JC2KeM2RqGOms1u3kVzN_N1MmA@mail.gmail.com>
+        Thu, 21 May 2020 18:00:49 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C527AC061A0E
+        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 15:00:48 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 5so6955886ybe.17
+        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 15:00:48 -0700 (PDT)
+Date: Thu, 21 May 2020 15:00:40 -0700
+In-Reply-To: <CAKwvOd=jOr4ZaLx-dSNTqZnGRATY1PZktUfu4JGWKRwRH=Ujnw@mail.gmail.com>
+Message-Id: <20200521220041.87368-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+References: <CAKwvOd=jOr4ZaLx-dSNTqZnGRATY1PZktUfu4JGWKRwRH=Ujnw@mail.gmail.com>
+Subject: [PATCH v3] Makefile: support compressed debug info
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 21 May 2020 14:57:34 -0700
-Message-ID: <CAKwvOd=jOr4ZaLx-dSNTqZnGRATY1PZktUfu4JGWKRwRH=Ujnw@mail.gmail.com>
-Subject: Re: [PATCH v2] Makefile: support compressed debug info
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>, Fangrui Song <maskray@google.com>, Nick Clifton <nickc@redhat.com>, David Blaikie <blakie@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, Krzysztof Kozlowski <krzk@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+Cc: Sedat Dilek <sedat.dilek@gmail.com>, Fangrui Song <maskray@google.com>, Nick Clifton <nickc@redhat.com>, Nick Desaulniers <ndesaulniers@google.com>, David Blaikie <blaikie@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Anshuman Khandual <anshuman.khandual@arm.com>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
 
-On Wed, May 20, 2020 at 7:48 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> > Suggested-by: Fangrui Song <maskray@google.com>
->
->
-> Suggested-by -> Reviewed-by
->
-> https://patchwork.kernel.org/patch/11524939/#23349551
+As debug information gets larger and larger, it helps significantly save
+the size of vmlinux images to compress the information in the debug
+information sections. Note: this debug info is typically split off from
+the final compressed kernel image, which is why vmlinux is what's used
+in conjunction with GDB. Minimizing the debug info size should have no
+impact on boot times, or final compressed kernel image size.
 
-Yes, my mistake.
+All of the debug sections will have a `C` flag set.
+$ readelf -S <object file>
 
-> > Suggested-by: Nick Clifton <nickc@redhat.com>
->
->
-> I do not know where this tag came from.
->
-> Nick Clifton taught us the version rule of binutils,but did not state
-> anything about this patch itself.
->
-> https://patchwork.kernel.org/patch/11524939/#23355175
->
->
-> > Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
->
-> I do not see the source of this tag, either...
+$ bloaty vmlinux.gcc75.compressed.dwarf4 -- \
+    vmlinux.gcc75.uncompressed.dwarf4
 
-Not all contributions to open source need to be in the form of
-patches.  Both Sedat and Nick gave suggestions which ultimately
-informed the contents of this patch.  They should be rewarded for
-their efforts, and incentivized to help improve the code base further.
-I think suggested by tags are a good way to do that; but if it's
-against a written convention or if you still disagree, it's not the
-end of the world to me, and you may drop those tags from the v3.
+    FILE SIZE        VM SIZE
+ --------------  --------------
+  +0.0%     +18  [ = ]       0    [Unmapped]
+ -73.3%  -114Ki  [ = ]       0    .debug_aranges
+ -76.2% -2.01Mi  [ = ]       0    .debug_frame
+ -73.6% -2.89Mi  [ = ]       0    .debug_str
+ -80.7% -4.66Mi  [ = ]       0    .debug_abbrev
+ -82.9% -4.88Mi  [ = ]       0    .debug_ranges
+ -70.5% -9.04Mi  [ = ]       0    .debug_line
+ -79.3% -10.9Mi  [ = ]       0    .debug_loc
+ -39.5% -88.6Mi  [ = ]       0    .debug_info
+ -18.2%  -123Mi  [ = ]       0    TOTAL
 
-> > --- a/lib/Kconfig.debug
-> > +++ b/lib/Kconfig.debug
-> > @@ -225,6 +225,21 @@ config DEBUG_INFO_REDUCED
-> >           DEBUG_INFO build and compile times are reduced too.
-> >           Only works with newer gcc versions.
-> >
-> > +config DEBUG_INFO_COMPRESSED
-> > +       bool "Compressed debugging information"
-> > +       depends on DEBUG_INFO
-> > +       depends on $(cc-option,-gz=zlib)
-> > +       depends on $(as-option,-Wa,--compress-debug-sections=zlib)
->
-> This does not work. (always false)
+$ bloaty vmlinux.clang11.compressed.dwarf4 -- \
+    vmlinux.clang11.uncompressed.dwarf4
 
-Technically, always true. `-Wa` disables all warnings from the
-assembler.  Also, I did test this via `make menuconfig`.
+    FILE SIZE        VM SIZE
+ --------------  --------------
+  +0.0%     +23  [ = ]       0    [Unmapped]
+ -65.6%    -871  [ = ]       0    .debug_aranges
+ -77.4% -1.84Mi  [ = ]       0    .debug_frame
+ -82.9% -2.33Mi  [ = ]       0    .debug_abbrev
+ -73.1% -2.43Mi  [ = ]       0    .debug_str
+ -84.8% -3.07Mi  [ = ]       0    .debug_ranges
+ -65.9% -8.62Mi  [ = ]       0    .debug_line
+ -86.2% -40.0Mi  [ = ]       0    .debug_loc
+ -42.0% -64.1Mi  [ = ]       0    .debug_info
+ -22.1%  -122Mi  [ = ]       0    TOTAL
 
-> You cannot enable this option.
->
-> The comma between -Wa and --compress-debug-sections=zlib
-> is eaten by Kconfig parser because commas are delimiters
-> of function parameters.
->
->
-> Please write like this.
->
->     depends on $(as-option,-Wa$(comma)--compress-debug-sections=zlib)
+For x86_64 defconfig + LLVM=1 (before):
+Elapsed (wall clock) time (h:mm:ss or m:ss): 3:22.03
+Maximum resident set size (kbytes): 43856
 
-You're right, I knew this bug forgot. Will fix in v3.
+For x86_64 defconfig + LLVM=1 (after):
+Elapsed (wall clock) time (h:mm:ss or m:ss): 3:32.52
+Maximum resident set size (kbytes): 1566776
 
-> > +       depends on $(ld-option,--compress-debug-sections=zlib)
-> > +       help
-> > +         Compress the debug information using zlib.  Requires GCC 5.0+ or Clang
-> > +         5.0+, binutils 2.26+, and zlib.
-> > +
-> > +         Users of dpkg-deb via scripts/package/builddeb may
-> > +         wish to set the $KDEB_COMPRESS env var to "none" to avoid recompressing
-> > +         the debug info again with a different compression scheme, which can
-> > +         result in larger binaries.
->
-> No. This is not correct.
->
-> CONFIG_DEBUG_INFO_COMPRESSED compresses the only debug info part.
-> The other parts still get by benefit from the default KDEB_COMPRESS=xz.
->
->
-> The numbers are here:
->
->
-> CONFIG_DEBUG_INFO_COMPRESSED=y
-> -rw-r--r-- 1 masahiro masahiro 209077584 May 21 11:19
-> linux-image-5.7.0-rc5+-dbg_5.7.0-rc5+-26_amd64.deb
->
->
-> CONFIG_DEBUG_INFO_COMPRESSED=y and KDEB_COMPRESS=none
-> -rw-r--r-- 1 masahiro masahiro 643051712 May 21 11:22
-> linux-image-5.7.0-rc5+-dbg_5.7.0-rc5+-27_amd64.deb
->
->
-> CONFIG_DEBUG_INFO_COMPRESSED=n
-> -rw-r--r-- 1 masahiro masahiro 112200308 May 21 11:40
-> linux-image-5.7.0-rc5+-dbg_5.7.0-rc5+-30_amd64.deb
->
->
->
->
-> For the deb package size perspective,
-> it is better to keep KDEB_COMPRESS as default.
->
-> The main motivation for changing KDEB_COMPRESS
-> is the build speed.  (see commit 1a7f0a34ea7d05)
->
->
->
->
-> CONFIG_DEBUG_INFO_COMPRESSED has a downside
-> for the debug deb package, but we need to accept it.
+Suggested-by: David Blaikie <blaikie@google.com>
+Suggested-by: Nick Clifton <nickc@redhat.com>
+Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Reviewed-by: Fangrui Song <maskray@google.com>
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+Changes V2 -> V3:
+* Fix blaikie@'s email addr.
+* Fix Fangrui's Reviewed-by tag as per Masahiro.
+* Fix help text as per Masahiro.
+* Fix -Wa$(comma)foo as per Masahiro.
 
-Ah, I see. Thank you for those measurements.  I'll send a v3 with
-fixed up help text, but ultimately, I don't really care what it says
-here.  Please feel empowered to reword it should you choose to accept
-+ apply it.
+Changes V1 -> V2:
+* rebase on linux-next.
+* Add assembler flags as per Fangrui.
+* Add note about KDEB_COMPRESS+scripts/package/builddeb
+  as per Sedat and Masahiro.
+* Add note about bintutils version requirements as per Nick C.
+* Add note about measured increased build time and max RSS.
+ Makefile          |  6 ++++++
+ lib/Kconfig.debug | 17 +++++++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 71687bfe1cd9..be8835296754 100644
+--- a/Makefile
++++ b/Makefile
+@@ -822,6 +822,12 @@ DEBUG_CFLAGS	+= $(call cc-option, -femit-struct-debug-baseonly) \
+ 		   $(call cc-option,-fno-var-tracking)
+ endif
+ 
++ifdef CONFIG_DEBUG_INFO_COMPRESSED
++DEBUG_CFLAGS	+= -gz=zlib
++KBUILD_AFLAGS	+= -Wa,--compress-debug-sections=zlib
++KBUILD_LDFLAGS	+= --compress-debug-sections=zlib
++endif
++
+ KBUILD_CFLAGS += $(DEBUG_CFLAGS)
+ export DEBUG_CFLAGS
+ 
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index b8f023e054b9..7fc82dcf814b 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -225,6 +225,23 @@ config DEBUG_INFO_REDUCED
+ 	  DEBUG_INFO build and compile times are reduced too.
+ 	  Only works with newer gcc versions.
+ 
++config DEBUG_INFO_COMPRESSED
++	bool "Compressed debugging information"
++	depends on DEBUG_INFO
++	depends on $(cc-option,-gz=zlib)
++	depends on $(as-option,-Wa$(comma)--compress-debug-sections=zlib)
++	depends on $(ld-option,--compress-debug-sections=zlib)
++	help
++	  Compress the debug information using zlib.  Requires GCC 5.0+ or Clang
++	  5.0+, binutils 2.26+, and zlib.
++
++	  Users of dpkg-deb via scripts/package/builddeb may find an increase in
++	  size of their debug .deb packages with this config set, due to the
++	  debug info being compressed with zlib, then the object files being
++	  recompressed with a different compression scheme. But this is still
++	  preferable to setting $KDEB_COMPRESS to "none" which would be even
++	  larger.
++
+ config DEBUG_INFO_SPLIT
+ 	bool "Produce split debuginfo in .dwo files"
+ 	depends on DEBUG_INFO
 -- 
-Thanks,
-~Nick Desaulniers
+2.27.0.rc0.183.gde8f92d652-goog
