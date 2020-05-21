@@ -1,53 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:33507 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727007AbgEUD6o (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:50204 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726282AbgEUEcQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 May 2020 23:58:44 -0400
-MIME-Version: 1.0
-References: <20200517094859.2376211-1-masahiroy@kernel.org>
- <20200517094859.2376211-10-masahiroy@kernel.org> <fe378a92bba24164a4f901902ab06820@AcuMS.aculab.com>
-In-Reply-To: <fe378a92bba24164a4f901902ab06820@AcuMS.aculab.com>
+        Thu, 21 May 2020 00:32:16 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 21 May 2020 12:57:31 +0900
-Message-ID: <CAK7LNAQNyD-1-tHkjgc3_cG2XGbLN7rmPM4m371iO2eWAfX55Q@mail.gmail.com>
-Subject: Re: [PATCH 09/29] kbuild: disallow multi-word in M= or KBUILD_EXTMOD
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] kbuild: doc: remove documentation about copying Module.symvers around
+Date: Thu, 21 May 2020 13:31:17 +0900
+Message-Id: <20200521043117.242585-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Laight <David.Laight@aculab.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jessica Yu <jeyu@kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Jessica Yu <jeyu@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, May 17, 2020 at 9:33 PM David Laight <David.Laight@aculab.com> wrote:
->
-> From: Masahiro Yamada
-> > Sent: 17 May 2020 10:49
-> > $(firstword ...) in scripts/Makefile.modpost was added by commit
-> > 3f3fd3c05585 ("[PATCH] kbuild: allow multi-word $M in Makefile.modpost")
-> > to build multiple external module directories.
-> >
-> > This feature has been broken for a while. Remove the bitrotten code, and
-> > stop parsing if M or KBUILD_EXTMOD contains multiple words.
->
-> ISTR that one of the kernel documentation files says that it is possible
-> to build multiple modules together in order to avoid 'faffing' with
-> exported symbol lists.
->
-> So the docs need updating to match.
+This is a left-over of commit 39808e451fdf ("kbuild: do not read
+$(KBUILD_EXTMOD)/Module.symvers").
 
+Kbuild no longer supports this way.
 
-Do you remember which doc mentions it?
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ Documentation/kbuild/modules.rst | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-
->         David
->
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
->
-
-
+diff --git a/Documentation/kbuild/modules.rst b/Documentation/kbuild/modules.rst
+index e0b45a257f21..a45cccff467d 100644
+--- a/Documentation/kbuild/modules.rst
++++ b/Documentation/kbuild/modules.rst
+@@ -528,18 +528,6 @@ build.
+ 		will then do the expected and compile both modules with
+ 		full knowledge of symbols from either module.
+ 
+-	Use an extra Module.symvers file
+-		When an external module is built, a Module.symvers file
+-		is generated containing all exported symbols which are
+-		not defined in the kernel. To get access to symbols
+-		from bar.ko, copy the Module.symvers file from the
+-		compilation of bar.ko to the directory where foo.ko is
+-		built. During the module build, kbuild will read the
+-		Module.symvers file in the directory of the external
+-		module, and when the build is finished, a new
+-		Module.symvers file is created containing the sum of
+-		all symbols defined and not part of the kernel.
+-
+ 	Use "make" variable KBUILD_EXTRA_SYMBOLS
+ 		If it is impractical to add a top-level kbuild file,
+ 		you can assign a space separated list
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
