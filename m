@@ -1,151 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728356AbgEVL5M (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:46773 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730665AbgEVRCc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 May 2020 07:57:12 -0400
+        Fri, 22 May 2020 13:02:32 -0400
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 04MH1skM012772
+        for <linux-kbuild@vger.kernel.org>; Sat, 23 May 2020 02:01:54 +0900
+Received: by mail-ua1-f54.google.com with SMTP id f9so4022571uaq.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 May 2020 10:01:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAKwvOd=jOr4ZaLx-dSNTqZnGRATY1PZktUfu4JGWKRwRH=Ujnw@mail.gmail.com>
- <20200521220041.87368-1-ndesaulniers@google.com>
-In-Reply-To: <20200521220041.87368-1-ndesaulniers@google.com>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 22 May 2020 13:56:59 +0200
-Message-ID: <CA+icZUWGB8bp1UZHQpB_W8YL7SeN23h5V9NTq-p3jeUqO4MK+w@mail.gmail.com>
-Subject: Re: [PATCH v3] Makefile: support compressed debug info
+References: <20200510040616.2207-1-j@jxself.org>
+In-Reply-To: <20200510040616.2207-1-j@jxself.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 23 May 2020 02:01:17 +0900
+Message-ID: <CAK7LNAScfa9bqc3ViVX-+u3uJU=Zv_oWXCWdN6O_N_fw=AdQ5w@mail.gmail.com>
+Subject: Re: [PATCH] make builddeb invoke calls to linux-update-symlink
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Fangrui Song <maskray@google.com>, Nick Clifton <nickc@redhat.com>, David Blaikie <blaikie@google.com>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Changbin Du <changbin.du@intel.com>, Randy Dunlap <rdunlap@infradead.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Anshuman Khandual <anshuman.khandual@arm.com>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
+To: Jason Self <j@jxself.org>, Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, May 22, 2020 at 12:00 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> As debug information gets larger and larger, it helps significantly save
-> the size of vmlinux images to compress the information in the debug
-> information sections. Note: this debug info is typically split off from
-> the final compressed kernel image, which is why vmlinux is what's used
-> in conjunction with GDB. Minimizing the debug info size should have no
-> impact on boot times, or final compressed kernel image size.
->
-> All of the debug sections will have a `C` flag set.
-> $ readelf -S <object file>
->
-> $ bloaty vmlinux.gcc75.compressed.dwarf4 -- \
->     vmlinux.gcc75.uncompressed.dwarf4
->
->     FILE SIZE        VM SIZE
->  --------------  --------------
->   +0.0%     +18  [ = ]       0    [Unmapped]
->  -73.3%  -114Ki  [ = ]       0    .debug_aranges
->  -76.2% -2.01Mi  [ = ]       0    .debug_frame
->  -73.6% -2.89Mi  [ = ]       0    .debug_str
->  -80.7% -4.66Mi  [ = ]       0    .debug_abbrev
->  -82.9% -4.88Mi  [ = ]       0    .debug_ranges
->  -70.5% -9.04Mi  [ = ]       0    .debug_line
->  -79.3% -10.9Mi  [ = ]       0    .debug_loc
->  -39.5% -88.6Mi  [ = ]       0    .debug_info
->  -18.2%  -123Mi  [ = ]       0    TOTAL
->
-> $ bloaty vmlinux.clang11.compressed.dwarf4 -- \
->     vmlinux.clang11.uncompressed.dwarf4
->
->     FILE SIZE        VM SIZE
->  --------------  --------------
->   +0.0%     +23  [ = ]       0    [Unmapped]
->  -65.6%    -871  [ = ]       0    .debug_aranges
->  -77.4% -1.84Mi  [ = ]       0    .debug_frame
->  -82.9% -2.33Mi  [ = ]       0    .debug_abbrev
->  -73.1% -2.43Mi  [ = ]       0    .debug_str
->  -84.8% -3.07Mi  [ = ]       0    .debug_ranges
->  -65.9% -8.62Mi  [ = ]       0    .debug_line
->  -86.2% -40.0Mi  [ = ]       0    .debug_loc
->  -42.0% -64.1Mi  [ = ]       0    .debug_info
->  -22.1%  -122Mi  [ = ]       0    TOTAL
->
-> For x86_64 defconfig + LLVM=1 (before):
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 3:22.03
-> Maximum resident set size (kbytes): 43856
->
-> For x86_64 defconfig + LLVM=1 (after):
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 3:32.52
-> Maximum resident set size (kbytes): 1566776
->
-> Suggested-by: David Blaikie <blaikie@google.com>
-> Suggested-by: Nick Clifton <nickc@redhat.com>
-> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
-> Reviewed-by: Fangrui Song <maskray@google.com>
-> Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+Hi Ben,
 
-Re-tested V3 on top of Linux v5.7-rc6+ with Clang/LLD v10.0.1-rc1.
+On Sun, May 10, 2020 at 1:06 PM Jason Self <j@jxself.org> wrote:
+>
+> The official Debian kernel packages,
 
-- Sedat -
+I'd like to consult you.
+Does this patch look OK?
 
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+
+Thanks.
+
+
+
+> in addition to running the
+> scripts in /etc/kernel, also runs linux-update-symlinks via the
+> postinst and postrm scripts. This maintains the /vmlinuz and
+> /initrd.img (if it uses an initramfs) symlinks. This change makes the
+> builddeb script generate those same calls.
+>
+> Signed-off-by: Jason Self <j@jxself.org>
 > ---
-> Changes V2 -> V3:
-> * Fix blaikie@'s email addr.
-> * Fix Fangrui's Reviewed-by tag as per Masahiro.
-> * Fix help text as per Masahiro.
-> * Fix -Wa$(comma)foo as per Masahiro.
+>  scripts/package/builddeb | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 >
-> Changes V1 -> V2:
-> * rebase on linux-next.
-> * Add assembler flags as per Fangrui.
-> * Add note about KDEB_COMPRESS+scripts/package/builddeb
->   as per Sedat and Masahiro.
-> * Add note about bintutils version requirements as per Nick C.
-> * Add note about measured increased build time and max RSS.
->  Makefile          |  6 ++++++
->  lib/Kconfig.debug | 17 +++++++++++++++++
->  2 files changed, 23 insertions(+)
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 6df3c9f8b2da..f34c11c63ede 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -195,6 +195,14 @@ export DEB_MAINT_PARAMS="\$*"
+>  # Tell initramfs builder whether it's wanted
+>  export INITRD=$(if_enabled_echo CONFIG_BLK_DEV_INITRD Yes No)
 >
-> diff --git a/Makefile b/Makefile
-> index 71687bfe1cd9..be8835296754 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -822,6 +822,12 @@ DEBUG_CFLAGS       += $(call cc-option, -femit-struct-debug-baseonly) \
->                    $(call cc-option,-fno-var-tracking)
->  endif
->
-> +ifdef CONFIG_DEBUG_INFO_COMPRESSED
-> +DEBUG_CFLAGS   += -gz=zlib
-> +KBUILD_AFLAGS  += -Wa,--compress-debug-sections=zlib
-> +KBUILD_LDFLAGS += --compress-debug-sections=zlib
-> +endif
+> +$(case $script in
+> +postinst)
+> +        echo linux-update-symlinks install $version $installed_image_path
+> +        ;;
+> +postrm)
+> +        echo linux-update-symlinks remove $version $installed_image_path
+> +esac)
 > +
->  KBUILD_CFLAGS += $(DEBUG_CFLAGS)
->  export DEBUG_CFLAGS
->
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index b8f023e054b9..7fc82dcf814b 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -225,6 +225,23 @@ config DEBUG_INFO_REDUCED
->           DEBUG_INFO build and compile times are reduced too.
->           Only works with newer gcc versions.
->
-> +config DEBUG_INFO_COMPRESSED
-> +       bool "Compressed debugging information"
-> +       depends on DEBUG_INFO
-> +       depends on $(cc-option,-gz=zlib)
-> +       depends on $(as-option,-Wa$(comma)--compress-debug-sections=zlib)
-> +       depends on $(ld-option,--compress-debug-sections=zlib)
-> +       help
-> +         Compress the debug information using zlib.  Requires GCC 5.0+ or Clang
-> +         5.0+, binutils 2.26+, and zlib.
-> +
-> +         Users of dpkg-deb via scripts/package/builddeb may find an increase in
-> +         size of their debug .deb packages with this config set, due to the
-> +         debug info being compressed with zlib, then the object files being
-> +         recompressed with a different compression scheme. But this is still
-> +         preferable to setting $KDEB_COMPRESS to "none" which would be even
-> +         larger.
-> +
->  config DEBUG_INFO_SPLIT
->         bool "Produce split debuginfo in .dwo files"
->         depends on DEBUG_INFO
+>  test -d $debhookdir/$script.d && run-parts --arg="$version" --arg="/$installed_image_path" $debhookdir/$script.d
+>  exit 0
+>  EOF
 > --
-> 2.27.0.rc0.183.gde8f92d652-goog
+> 2.26.0
 >
+
+
+-- 
+Best Regards
+Masahiro Yamada
