@@ -1,41 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43978 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728701AbgEUWSj (ORCPT
+Received: from conuserg-10.nifty.com ([210.131.2.77]:37242 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726567AbgEVCA1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 May 2020 18:18:39 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C685BC061A0E
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 15:18:39 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id t7so3556080plr.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 May 2020 15:18:39 -0700 (PDT)
-Date: Thu, 21 May 2020 15:18:37 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] kbuild: reuse vmlinux.o in vmlinux_link
-Message-ID: <202005211515.481BD90@keescook>
-References: <20200521202716.193316-1-samitolvanen@google.com>
+        Thu, 21 May 2020 22:00:27 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 2/5] kbuild: clear KBUILD_MODULES in top Makefile if CONFIG_MODULES=n
+Date: Fri, 22 May 2020 10:59:59 +0900
+Message-Id: <20200522020002.504506-2-masahiroy@kernel.org>
+In-Reply-To: <20200522020002.504506-1-masahiroy@kernel.org>
+References: <20200522020002.504506-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200521202716.193316-1-samitolvanen@google.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Thu, May 21, 2020 at 01:27:16PM -0700, Sami Tolvanen wrote:
-> Instead of linking all compilation units again each time vmlinux_link is
-> called, reuse vmlinux.o from modpost_link.
-> 
-> With x86_64 allyesconfig, vmlinux_link is called three times and reusing
-> vmlinux.o reduces the build time ~38 seconds on my system (59% reduction
-> in the time spent in vmlinux_link).
+Do not try to build any module-related artifacts when CONFIG_MODULES
+is disabled.
 
-BTW, I'll see this most in that it knocks about 6% off my "I changed
-1 .c file and now I'm rebuilding" workflow time (which is obviously
-dominated by linking), from 25 seconds to 23.5 seconds. And since most
-of those seconds are spent staring at the build, it feels like a lot
-more. ;)
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ Makefile               | 4 ++++
+ scripts/Makefile.build | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 1f5bbfb31103..72eb55a36545 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1724,6 +1724,10 @@ build-dirs := $(foreach d, $(build-dirs), \
+ 
+ endif
+ 
++ifndef CONFIG_MODULES
++KBUILD_MODULES :=
++endif
++
+ # Handle descending into subdirectories listed in $(build-dirs)
+ # Preset locale variables to speed up the build process. Limit locale
+ # tweaks to this spot to avoid wrong language settings when running
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 9af88f4cacb8..f46d25441804 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -77,7 +77,7 @@ ifdef need-builtin
+ builtin-target := $(obj)/built-in.a
+ endif
+ 
+-ifeq ($(CONFIG_MODULES)$(need-modorder),y1)
++ifdef need-modorder
+ modorder-target := $(obj)/modules.order
+ endif
+ 
 -- 
-Kees Cook
+2.25.1
