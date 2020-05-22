@@ -1,77 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:27085 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726373AbgEVSRo (ORCPT
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52235 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726373AbgEVS20 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 May 2020 14:17:44 -0400
+        Fri, 22 May 2020 14:28:26 -0400
+Date: Fri, 22 May 2020 13:28:15 -0500
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH 0/2] Build ORC fast lookup table in scripts/sorttable tool
+Message-ID: <20200522182815.ezanmvbemhzq2fmm@treble>
+References: <20200429064626.16389-1-changhuaixin@linux.alibaba.com>
 MIME-Version: 1.0
-References: <20200521202716.193316-1-samitolvanen@google.com> <202005211506.2700F86@keescook>
-In-Reply-To: <202005211506.2700F86@keescook>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 23 May 2020 03:16:49 +0900
-Message-ID: <CAK7LNAQ1HTTSq-yp0t6Z4V-Z9PHg+O2n=NC89FJJFNQnhaOcSA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: reuse vmlinux.o in vmlinux_link
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200429064626.16389-1-changhuaixin@linux.alibaba.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Huaixin Chang <changhuaixin@linux.alibaba.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@alien8.de, hpa@zytor.com, luto@amacapital.net, michal.lkml@markovi.net, mingo@redhat.com, peterz@infradead.org, tglx@linutronix.de, x86@kernel.org, yamada.masahiro@socionext.com
 
-On Fri, May 22, 2020 at 7:08 AM Kees Cook <keescook@chromium.org> wrote:
->
-> On Thu, May 21, 2020 at 01:27:16PM -0700, Sami Tolvanen wrote:
-> > Instead of linking all compilation units again each time vmlinux_link is
-> > called, reuse vmlinux.o from modpost_link.
-> >
-> > With x86_64 allyesconfig, vmlinux_link is called three times and reusing
-> > vmlinux.o reduces the build time ~38 seconds on my system (59% reduction
-> > in the time spent in vmlinux_link).
->
-> Nice! Any time savings at final link is a big cumulative win.
->
-> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> > ---
-> >  scripts/link-vmlinux.sh | 5 +----
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
-> >
-> > diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-> > index d09ab4afbda4..c6cc4305950c 100755
-> > --- a/scripts/link-vmlinux.sh
-> > +++ b/scripts/link-vmlinux.sh
-> > @@ -77,11 +77,8 @@ vmlinux_link()
-> >
-> >       if [ "${SRCARCH}" != "um" ]; then
-> >               objects="--whole-archive                        \
-> > -                     ${KBUILD_VMLINUX_OBJS}                  \
-> > +                     vmlinux.o                               \
-> >                       --no-whole-archive                      \
-> > -                     --start-group                           \
-> > -                     ${KBUILD_VMLINUX_LIBS}                  \
-> > -                     --end-group                             \
-> >                       ${@}"
-> >
-> >               ${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}      \
->
-> I think the "um" case can be updated as well too, yes?
+On Wed, Apr 29, 2020 at 02:46:24PM +0800, Huaixin Chang wrote:
+> Move building of fast lookup table from boot to sorttable tool. This saves us
+> 6380us boot time on Intel(R) Xeon(R) CPU E5-2682 v4 @ 2.50GHz with cores.
+> 
+> Huaixin Chang (2):
+>   scripts/sorttable: Build orc fast lookup table via sorttable tool
+>   x86/unwind/orc: Remove unwind_init() from x86 boot
+> 
+>  arch/x86/include/asm/unwind.h |  2 -
+>  arch/x86/kernel/setup.c       |  2 -
+>  arch/x86/kernel/unwind_orc.c  | 51 ----------------------
+>  scripts/sorttable.h           | 99 ++++++++++++++++++++++++++++++++++++++++---
+>  4 files changed, 92 insertions(+), 62 deletions(-)
 
-I agree.
-
-I changed the um part, then ARCH=um build is successful.
-
-
-
-
-
-
-
-> Also, I think the comment above modpost_link() needs to be updated now
-> to reflect the nature of how vmlinux.o gets used after this patch.
->
-> --
-> Kees Cook
-
-
+I tested this (rebased on tip/master), it seems to break ORC
+completely... e.g. /proc/self/stack is empty.
 
 -- 
-Best Regards
-Masahiro Yamada
+Josh
