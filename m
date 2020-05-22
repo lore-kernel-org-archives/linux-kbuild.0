@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:37247 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:37245 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727084AbgEVCA2 (ORCPT
+        with ESMTP id S1726693AbgEVCA1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 May 2020 22:00:28 -0400
+        Thu, 21 May 2020 22:00:27 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 3/5] kbuild: move subdir-obj-y to scripts/Makefile.build
-Date: Fri, 22 May 2020 11:00:00 +0900
-Message-Id: <20200522020002.504506-3-masahiroy@kernel.org>
+Subject: [PATCH 5/5] kbuild: make modules.order rule consistent with built-in.a
+Date: Fri, 22 May 2020 11:00:02 +0900
+Message-Id: <20200522020002.504506-5-masahiroy@kernel.org>
 In-Reply-To: <20200522020002.504506-1-masahiroy@kernel.org>
 References: <20200522020002.504506-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,50 +17,78 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Save $(addprefix ...) for subdir-obj-y.
+built-in.a contains the built-in object paths from the current and sub
+directories.
+
+module.order collects the module paths from the current and sub
+directories.
+
+Make their build rules look more symmetrical.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build | 2 ++
- scripts/Makefile.lib   | 5 -----
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ scripts/Makefile.build | 10 ++++++----
+ scripts/Makefile.lib   |  2 ++
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f46d25441804..ee283efc1b45 100644
+index 323264607b9f..ee9a817e19a3 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -69,6 +69,8 @@ endif
+@@ -69,8 +69,9 @@ endif
  
  # ===========================================================================
  
-+subdir-obj-y := $(filter %/built-in.a, $(real-obj-y))
-+
+-# subdir-builtin may contain duplications. Use $(sort ...)
++# subdir-builtin and subdir-modorder may contain duplications. Use $(sort ...)
+ subdir-builtin := $(sort $(filter %/built-in.a, $(real-obj-y)))
++subdir-modorder := $(sort $(filter %/modules.order, $(modorder)))
+ 
  ifneq ($(strip $(lib-y) $(lib-m) $(lib-)),)
  lib-target := $(obj)/lib.a
- endif
+@@ -383,6 +384,7 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
+ 
+ # To build objects in subdirs, we need to descend into the directories
+ $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
++$(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ 
+ #
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+@@ -401,9 +403,9 @@ targets += $(builtin-target)
+ #
+ # Create commands to either record .ko file or cat modules.order from
+ # a subdirectory
+-$(modorder-target): $(subdir-ym) FORCE
++$(obj)/modules.order: $(subdir-modorder) FORCE
+ 	$(Q){ $(foreach m, $(modorder), \
+-	$(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
++	$(if $(filter $^, $m), cat $m, echo $m);) :; } \
+ 	| $(AWK) '!x[$$0]++' - > $@
+ 
+ #
+@@ -491,7 +493,7 @@ $(subdir-ym):
+ 	$(Q)$(MAKE) $(build)=$@ \
+ 	$(if $(filter $@/, $(KBUILD_SINGLE_TARGETS)),single-build=) \
+ 	need-builtin=$(if $(filter $@/built-in.a, $(subdir-builtin)),1) \
+-	need-modorder=$(if $(need-modorder),$(if $(filter $@/modules.order, $(modorder)),1))
++	need-modorder=$(if $(filter $@/modules.order, $(subdir-modorder)),1)
+ 
+ # Add FORCE to the prequisites of a target to force it to be always rebuilt.
+ # ---------------------------------------------------------------------------
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 52299d5dba28..a41a4bbd20e2 100644
+index a41a4bbd20e2..0d931cc0df94 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -62,10 +62,6 @@ multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m
- multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))), $(m))))
- multi-used   := $(multi-used-y) $(multi-used-m)
+@@ -35,7 +35,9 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ # Determine modorder.
+ # Unfortunately, we don't have information about ordering between -y
+ # and -m subdirs.  Just put -y's first.
++ifdef need-modorder
+ modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
++endif
  
--# $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
--# tell kbuild to descend
--subdir-obj-y := $(filter %/built-in.a, $(obj-y))
--
- # Replace multi-part objects by their individual parts,
- # including built-in.a from subdirectories
- real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
-@@ -91,7 +87,6 @@ targets		:= $(addprefix $(obj)/,$(targets))
- modorder	:= $(addprefix $(obj)/,$(modorder))
- obj-m		:= $(addprefix $(obj)/,$(obj-m))
- lib-y		:= $(addprefix $(obj)/,$(lib-y))
--subdir-obj-y	:= $(addprefix $(obj)/,$(subdir-obj-y))
- real-obj-y	:= $(addprefix $(obj)/,$(real-obj-y))
- real-obj-m	:= $(addprefix $(obj)/,$(real-obj-m))
- multi-used-m	:= $(addprefix $(obj)/,$(multi-used-m))
+ # Handle objects in subdirs
+ # ---------------------------------------------------------------------------
 -- 
 2.25.1
