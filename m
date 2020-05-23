@@ -1,28 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55810 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388204AbgEWSAj (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 23 May 2020 14:00:39 -0400
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21BC5C05BD43
-        for <linux-kbuild@vger.kernel.org>; Sat, 23 May 2020 11:00:39 -0700 (PDT)
-Received: by mail-qt1-x844.google.com with SMTP id l1so10937890qtp.6
-        for <linux-kbuild@vger.kernel.org>; Sat, 23 May 2020 11:00:39 -0700 (PDT)
+Received: from bluehome.net ([96.66.250.149]:52126 "EHLO bluehome.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387911AbgEWUiS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 23 May 2020 16:38:18 -0400
+From: Jason Self <j@jxself.org>
+Subject: [PATCH] make builddeb invoke calls to linux-update-symlinks
+Date: Sat, 23 May 2020 13:38:01 -0700
+Message-Id: <20200523203801.18277-1-j@jxself.org>
+In-Reply-To: <235c4776ddc5cbb94a45643098a50a20b14e530e.camel@decadent.org.uk>
+References: <235c4776ddc5cbb94a45643098a50a20b14e530e.camel@decadent.org.uk>
 MIME-Version: 1.0
-Reply-To: mrs.chantala2055@gmail.com
-From: mrs chantal <mrs.chantalas1@gmail.com>
-Date: Sat, 23 May 2020 18:00:37 +0000
-Message-ID: <CAMdkyyDY_0O7YgysHCjgRTJ=8-B7XurK7o1razRHDVOjgr2V2g@mail.gmail.com>
-Subject: jjCompliment
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: masahiroy@kernel.org, ben@decadent.org.uk, Jason Self <j@jxself.org>
 
-     Compliment of the day to you. I am Mrs.CHANTAL I am sending this brief
-    letter to solicit your partnership to transfer $13.5 Million US
-    Dollars.I shall send you more information and procedures when I receive
-    positive response From you. Please send me a message in My private
-    email address is ( mrschantal066@gmail.com  )
-    Best Regards
-    MrS.Chantal
+The official Debian kernel packages, in addition to running the
+scripts in /etc/kernel, also runs linux-update-symlinks via the
+postinst script. This updates the /vmlinuz and /initrd.img (if it uses
+an initramfs) symlinks to point to the newly installed kernel. This
+update causes the builddeb script to do the same.
+
+This version of the patch incorporates the feedback from Ben
+Hutchings.
+
+Signed-off-by: Jason Self <j@jxself.org>
+---
+ scripts/package/builddeb | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6df3c9f8b2da..707693867c29 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -195,6 +195,37 @@ export DEB_MAINT_PARAMS="\$*"
+ # Tell initramfs builder whether it's wanted
+ export INITRD=$(if_enabled_echo CONFIG_BLK_DEV_INITRD Yes No)
+ 
++$(case $script in
++    postinst)
++        echo "if [ -f /lib/modules/$version/.fresh-install ]; then
++    change=install
++else
++    change=upgrade
++fi
++if command -v linux-update-symlinks > /dev/null; then
++    linux-update-symlinks $change $version /$installed_image_path
++fi
++rm -f /lib/modules/$version/.fresh-install"
++        ;;
++    postrm)
++        echo "if command -v linux-update-symlinks > /dev/null; then
++    linux-update-symlinks remove $version /$installed_image_path
++fi"
++        ;;
++    preinst)
++        echo 'if [ "$1" = install ]; then
++    # Create a flag file for postinst
++    mkdir -p /lib/modules/$version
++    touch /lib/modules/$version/.fresh-install
++fi'
++        ;;
++    prerm)
++        echo "if command -v linux-check-removal > /dev/null; then
++    linux-check-removal $version
++fi"
++        ;;
++esac)
++
+ test -d $debhookdir/$script.d && run-parts --arg="$version" --arg="/$installed_image_path" $debhookdir/$script.d
+ exit 0
+ EOF
+-- 
+2.26.0
