@@ -1,64 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bluehome.net ([96.66.250.149]:51766 "EHLO bluehome.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387497AbgEWAlq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 22 May 2020 20:41:46 -0400
-Date: Fri, 22 May 2020 17:41:43 -0700
-From: Jason Self <j@jxself.org>
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:50148 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387418AbgEWBOd (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 22 May 2020 21:14:33 -0400
+Message-ID: <235c4776ddc5cbb94a45643098a50a20b14e530e.camel@decadent.org.uk>
 Subject: Re: [PATCH] make builddeb invoke calls to linux-update-symlink
-Message-ID: <20200522174143.72ac4ddc@pc>
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 23 May 2020 02:14:24 +0100
 In-Reply-To: <CAK7LNAScfa9bqc3ViVX-+u3uJU=Zv_oWXCWdN6O_N_fw=AdQ5w@mail.gmail.com>
 References: <20200510040616.2207-1-j@jxself.org>
-        <CAK7LNAScfa9bqc3ViVX-+u3uJU=Zv_oWXCWdN6O_N_fw=AdQ5w@mail.gmail.com>
+         <CAK7LNAScfa9bqc3ViVX-+u3uJU=Zv_oWXCWdN6O_N_fw=AdQ5w@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-DfmREO/+C/iuCFeOJvzV"
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- boundary="Sig_/HJc/dD9jaJ6H0tQT55bY4a3"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Ben Hutchings <ben@decadent.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Jason Self <j@jxself.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
---Sig_/HJc/dD9jaJ6H0tQT55bY4a3
-Content-Type: text/plain; charset=US-ASCII
+
+--=-DfmREO/+C/iuCFeOJvzV
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 23 May 2020 02:01:17 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
-
+On Sat, 2020-05-23 at 02:01 +0900, Masahiro Yamada wrote:
 > Hi Ben,
 >=20
 > On Sun, May 10, 2020 at 1:06 PM Jason Self <j@jxself.org> wrote:
-> >
-> > The official Debian kernel packages, =20
+> > The official Debian kernel packages,
 >=20
 > I'd like to consult you.
 > Does this patch look OK?
 
-No. After submitting the patch I saw that I made a stupid mistake and
-forgot to terminate one of the case statements and to use=20
-/$installed_image_path instead of $installed_image_path so that it
-provides the absolute path. I can resubmit it with those corrections
-but have been waiting before doing so in case there is more feedback.
+No, it doesn't.
 
---Sig_/HJc/dD9jaJ6H0tQT55bY4a3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> > in addition to running the
+> > scripts in /etc/kernel, also runs linux-update-symlinks via the
+> > postinst and postrm scripts. This maintains the /vmlinuz and
+> > /initrd.img (if it uses an initramfs) symlinks. This change makes the
+> > builddeb script generate those same calls.
+> >=20
+> > Signed-off-by: Jason Self <j@jxself.org>
+> > ---
+> >  scripts/package/builddeb | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >=20
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index 6df3c9f8b2da..f34c11c63ede 100755
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -195,6 +195,14 @@ export DEB_MAINT_PARAMS=3D"\$*"
+> >  # Tell initramfs builder whether it's wanted
+> >  export INITRD=3D$(if_enabled_echo CONFIG_BLK_DEV_INITRD Yes No)
+> >=20
+> > +$(case $script in
+> > +postinst)
+> > +        echo linux-update-symlinks install $version $installed_image_p=
+ath
+> > +        ;;
+> > +postrm)
+> > +        echo linux-update-symlinks remove $version $installed_image_pa=
+th
+> > +esac)
+
+This doesn't handle upgrades properly.  The extra conditions in the
+maintainer scripts for official Debian packages really are needed.
+
+It's also not correct to assume that linux-update-symlinks is always
+available.  If the generated linux-image package depends on "linux-base=20
+(>=3D 4.1~)" then the postinst script can use it unconditionally.=20
+However, the postrm script will always have to check whether it is
+present.
+
+Ben.
+
+> >  test -d $debhookdir/$script.d && run-parts --arg=3D"$version" --arg=3D=
+"/$installed_image_path" $debhookdir/$script.d
+> >  exit 0
+> >  EOF
+> > --
+> > 2.26.0
+> >=20
+>=20
+>=20
+--=20
+Ben Hutchings
+Every program is either trivial or else contains at least one bug
+
+
+
+--=-DfmREO/+C/iuCFeOJvzV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBCgAGBQJeyHFIAAoJEJ0NsxtUWjGYWEMP/3gsJki6urbxT2CdCENVkwTY
-Pffk7oPTfPY9UHflRAKPeTNlPt9GJNTyaZBsTIPpByu3JQ0tv4CQ7l13kAbRkxEC
-RpLWuY/gMhfz22jIugbF/v+yAH7rgIPOMcCB+MeQ4i9Yk2WNaOqVcp27O4551QIS
-ROCFpJKjVnAw2CWx0AzdEXeqNVODKj9WaZxvKJ70z7fDiRRpFIn8BhqAgvvVmG8z
-GWh7EE+pFn+VJJiix1H9A/kkXfRaT/g0U7nU0vcfC/scphf6PImHLcnz2dZr1Tw1
-JFuNqZZ5DW41UI1YOzcz4Xm5+CJEkEJlJgS/FY2t817GaoL3cQUfvQ+8qeiwyfv0
-SRwjQ7B22uojzIyBo2hiifV0yY0rdE8FSopbFFQ4d/C4ipIilk/zHSnVZljqI8nY
-ywS4vwVHyZBS3FmyhLlWdUreI9teoJk84rQ8FTx3DwveVq1HbE94Tsu1sC3BHplN
-gjleH+fwOLVeM3HgTdqTtFYptPfqCiX1lK1OsAvt0AGAbg4O1QFIp2hzM5rIc51m
-9ddZmACZfH3c0nlq7Tb45I4HyZF/oNCgYBJJE7GKJfvtooqzmdDMkpWLxOa5XGzu
-tHyjrNNzIRY8RvLqfw2ZHGA4mwupIvw/iU3f1aP1Pq4Fj/xmSbDyxVHuTNEZUDHo
-BDzSGEcNRfBuoJIEq3Zt
-=dW2Y
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl7IePAACgkQ57/I7JWG
+EQmfwRAAm1jTB/oeOV+2t5vKf/0hDcKLgNRJOlgGo2mBndu4DScqOHag+o4QY3cE
+GOsEG9VGnFzpZSW2y8gjCiAwvwIFu9nv3GW0IQxOGP7V1LO7xdb/+5jsIRPSfIyQ
+dfGIeCV+fNFoe2cD5dvV5Kw7Ux7X5GQbdAfc8ZNbbT7VioklGvXs6tzjgphd7Jt0
+cd8n0NNFd5mpO3IXRIwfaiff8RHEtzIB9n7W3EOOkx6XSdUFxu1MXOvAjtRS1RHJ
+Ec8QAgCON5VzZFAO2bS6v+yWTdckjCksYXK9Tm+p8mQaKOStasyXbSBLYGJMaUQE
++aw171Vr44vuEIIX/3G62CooOZ1NL1lowKvs/50S95Wqb1zxuX+ND8rxe/qWJrDA
+OS/40URnTehUW8rJh4Rb2faE+oA0gZ/DhKU5pfoxeuv7TIER38ZoTJwjLiUKJdzu
+tXoXZktfNIYDCA/A3w37+F1mEvIQMy+hYnVU50LJpG6a7/olXAuPasU9g76t+nW5
+FfZdMMsonOv3NEybMLCTw17wZddsKwo9OBudDGeQK1pebVJB1V6LRmfkilArWlEF
+UHQVC9U0rU2b6ah6SfyCvlpyDJavp71jHHkAIPPqjcOe7jQ5yLHVatNkuLGVQCsV
+7IPHsvyUCoRG67feIITRoEgzv2p7XymSaWD1jUSu8GBv5DSzeeY=
+=XArB
 -----END PGP SIGNATURE-----
 
---Sig_/HJc/dD9jaJ6H0tQT55bY4a3--
+--=-DfmREO/+C/iuCFeOJvzV--
