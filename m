@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19689 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19704 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727899AbgEXPnX (ORCPT
+        with ESMTP id S1728500AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 12/29] modpost: move external module options
-Date: Mon, 25 May 2020 00:42:18 +0900
-Message-Id: <20200524154235.380482-13-masahiroy@kernel.org>
+Subject: [PATCH v2 24/29] modpost: add mod->is_vmlinux struct member
+Date: Mon, 25 May 2020 00:42:30 +0900
+Message-Id: <20200524154235.380482-25-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,49 +17,111 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Separate out the external-only code for readability.
+is_vmlinux() is called in several places to check whether the current
+module is vmlinux or not.
+
+It is faster and clearer to check mod->is_vmlinux flag.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/Makefile.modpost | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c | 19 ++++++++++---------
+ scripts/mod/modpost.h |  1 +
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index bc5561aedb24..8321068abb31 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -44,14 +44,11 @@ include include/config/auto.conf
- include scripts/Kbuild.include
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index c0bc8a2ea026..0d065f8f5087 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -186,6 +186,7 @@ static struct module *new_module(const char *modname)
  
- kernelsymfile := $(objtree)/Module.symvers
--modulesymfile := $(KBUILD_EXTMOD)/Module.symvers
+ 	/* add to list */
+ 	mod->name = p;
++	mod->is_vmlinux = is_vmlinux(modname);
+ 	mod->gpl_compatible = -1;
+ 	mod->next = modules;
+ 	modules = mod;
+@@ -427,11 +428,11 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
  
- MODPOST = scripts/mod/modpost								\
- 	$(if $(CONFIG_MODVERSIONS),-m)							\
- 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
--	$(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)					\
--	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))			\
--	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))					\
-+	$(if $(KBUILD_EXTMOD),,-o $(kernelsymfile))					\
- 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
- 	$(if $(KBUILD_MODPOST_WARN),-w)
+ 	if (!s) {
+ 		s = new_symbol(name, mod, export);
+-	} else if (!external_module || is_vmlinux(s->module->name) ||
++	} else if (!external_module || s->module->is_vmlinux ||
+ 		   s->module == mod) {
+ 		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+ 		     mod->name, name, s->module->name,
+-		     is_vmlinux(s->module->name) ? "" : ".ko");
++		     s->module->is_vmlinux ? "" : ".ko");
+ 		return s;
+ 	}
  
-@@ -81,6 +78,13 @@ src := $(obj)
- # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
- include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
-              $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
-+
-+# modpost options for external modules
-+MODPOST += \
-+	-i Module.symvers \
-+	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
-+	-o $(KBUILD_EXTMOD)/Module.symvers
-+
- endif
+@@ -688,7 +689,7 @@ static void handle_modversion(const struct module *mod,
  
- # find all modules listed in modules.order
+ 	if (sym->st_shndx == SHN_UNDEF) {
+ 		warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n",
+-		     symname, mod->name, is_vmlinux(mod->name) ? "":".ko");
++		     symname, mod->name, mod->is_vmlinux ? "" : ".ko");
+ 		return;
+ 	}
+ 
+@@ -2011,12 +2012,12 @@ static void read_symbols(const char *modname)
+ 
+ 	mod = new_module(modname);
+ 
+-	if (is_vmlinux(modname)) {
++	if (mod->is_vmlinux) {
+ 		have_vmlinux = 1;
+ 		mod->skip = 1;
+ 	}
+ 
+-	if (!is_vmlinux(modname)) {
++	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
+ 		if (!license)
+ 			warn("missing MODULE_LICENSE() in %s\n", modname);
+@@ -2075,7 +2076,7 @@ static void read_symbols(const char *modname)
+ 
+ 	check_sec_ref(mod, modname, &info);
+ 
+-	if (!is_vmlinux(modname)) {
++	if (!mod->is_vmlinux) {
+ 		version = get_modinfo(&info, "version");
+ 		if (version || all_versions)
+ 			get_src_version(modname, mod->srcversion,
+@@ -2345,7 +2346,7 @@ static void add_depends(struct buffer *b, struct module *mod)
+ 	/* Clear ->seen flag of modules that own symbols needed by this. */
+ 	for (s = mod->unres; s; s = s->next)
+ 		if (s->module)
+-			s->module->seen = is_vmlinux(s->module->name);
++			s->module->seen = s->module->is_vmlinux;
+ 
+ 	buf_printf(b, "\n");
+ 	buf_printf(b, "MODULE_INFO(depends, \"");
+@@ -2462,9 +2463,9 @@ static void read_dump(const char *fname)
+ 			goto fail;
+ 		mod = find_module(modname);
+ 		if (!mod) {
+-			if (is_vmlinux(modname))
+-				have_vmlinux = 1;
+ 			mod = new_module(modname);
++			if (mod->is_vmlinux)
++				have_vmlinux = 1;
+ 			mod->skip = 1;
+ 			mod->from_dump = 1;
+ 		}
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 554f02c69ac2..ec717ab20b98 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -120,6 +120,7 @@ struct module {
+ 	int gpl_compatible;
+ 	struct symbol *unres;
+ 	int from_dump;  /* 1 if module was loaded from *.symver */
++	int is_vmlinux;
+ 	int seen;
+ 	int skip;
+ 	int has_init;
 -- 
 2.25.1
