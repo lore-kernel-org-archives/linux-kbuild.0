@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19701 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19699 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728399AbgEXPnX (ORCPT
+        with ESMTP id S1728393AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 08/29] modpost: remove get_next_text() and make {grab,release_}file static
-Date: Mon, 25 May 2020 00:42:14 +0900
-Message-Id: <20200524154235.380482-9-masahiroy@kernel.org>
+Subject: [PATCH v2 11/29] modpost: pass -N option only for modules modpost
+Date: Mon, 25 May 2020 00:42:17 +0900
+Message-Id: <20200524154235.380482-12-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,89 +17,40 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-get_next_line() is no longer used. Remove.
+The built-in only code is not required to have MODULE_IMPORT_NS() to
+use symbols. So, the namespace is not checked for vmlinux(.o).
 
-grab_file() and release_file() are only used in modpost.c. Make them
-static.
+Do not pass the meaningless -N option to the first pass of modpost.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/modpost.c | 38 ++------------------------------------
- scripts/mod/modpost.h |  3 ---
- 2 files changed, 2 insertions(+), 39 deletions(-)
+ scripts/Makefile.modpost | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 40c6414aaeec..33cdb78a4ba1 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -462,7 +462,7 @@ static void sym_set_crc(const char *name, unsigned int crc)
- 	s->crc_valid = 1;
- }
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index da7730a43819..bc5561aedb24 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -53,7 +53,6 @@ MODPOST = scripts/mod/modpost								\
+ 	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))			\
+ 	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))					\
+ 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
+-	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) 	\
+ 	$(if $(KBUILD_MODPOST_WARN),-w)
  
--void *grab_file(const char *filename, unsigned long *size)
-+static void *grab_file(const char *filename, unsigned long *size)
- {
- 	struct stat st;
- 	void *map = MAP_FAILED;
-@@ -484,41 +484,7 @@ void *grab_file(const char *filename, unsigned long *size)
- 	return map;
- }
+ ifdef MODPOST_VMLINUX
+@@ -66,7 +65,9 @@ __modpost:
  
--/**
--  * Return a copy of the next line in a mmap'ed file.
--  * spaces in the beginning of the line is trimmed away.
--  * Return a pointer to a static buffer.
--  **/
--char *get_next_line(unsigned long *pos, void *file, unsigned long size)
--{
--	static char line[4096];
--	int skip = 1;
--	size_t len = 0;
--	signed char *p = (signed char *)file + *pos;
--	char *s = line;
--
--	for (; *pos < size ; (*pos)++) {
--		if (skip && isspace(*p)) {
--			p++;
--			continue;
--		}
--		skip = 0;
--		if (*p != '\n' && (*pos < size)) {
--			len++;
--			*s++ = *p++;
--			if (len > 4095)
--				break; /* Too long, stop */
--		} else {
--			/* End of string */
--			*s = '\0';
--			return line;
--		}
--	}
--	/* End of buffer */
--	return NULL;
--}
--
--void release_file(void *file, unsigned long size)
-+static void release_file(void *file, unsigned long size)
- {
- 	munmap(file, size);
- }
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index dfadaa0c01ec..232a0e11fcaa 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -192,9 +192,6 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen);
- /* from modpost.c */
- char *read_text_file(const char *filename);
- char *get_line(char **stringp);
--void *grab_file(const char *filename, unsigned long *size);
--char* get_next_line(unsigned long *pos, void *file, unsigned long size);
--void release_file(void *file, unsigned long size);
+ else
  
- enum loglevel {
- 	LOG_WARN,
++# modpost options for modules (both in-kernel and external)
+ MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
++	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
+ ifeq ($(KBUILD_EXTMOD),)
 -- 
 2.25.1
