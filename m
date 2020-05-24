@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19688 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19689 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727027AbgEXPnX (ORCPT
+        with ESMTP id S1727899AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 01/29] modpost: drop RCS/CVS $Revision handling in MODULE_VERSION()
-Date: Mon, 25 May 2020 00:42:07 +0900
-Message-Id: <20200524154235.380482-2-masahiroy@kernel.org>
+Subject: [PATCH v2 12/29] modpost: move external module options
+Date: Mon, 25 May 2020 00:42:18 +0900
+Message-Id: <20200524154235.380482-13-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,123 +17,49 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-As far as I understood, this code gets rid of '$Revision$' or '$Revision:'
-of CVS, RCS or whatever in MODULE_VERSION() tags.
-
-Remove the primeval code.
+Separate out the external-only code for readability.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/modpost.c    |  3 --
- scripts/mod/modpost.h    |  4 ---
- scripts/mod/sumversion.c | 66 ----------------------------------------
- 3 files changed, 73 deletions(-)
+ scripts/Makefile.modpost | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4d4b979d76be..77e5425759e2 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2074,9 +2074,6 @@ static void read_symbols(const char *modname)
- 		check_sec_ref(mod, modname, &info);
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index bc5561aedb24..8321068abb31 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -44,14 +44,11 @@ include include/config/auto.conf
+ include scripts/Kbuild.include
  
- 	version = get_modinfo(&info, "version");
--	if (version)
--		maybe_frob_rcs_version(modname, version, info.modinfo,
--				       version - (char *)info.hdr);
- 	if (version || (all_versions && !is_vmlinux(modname)))
- 		get_src_version(modname, mod->srcversion,
- 				sizeof(mod->srcversion)-1);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 39f6c29fb568..bbaf5cc37bfb 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -187,10 +187,6 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
- void add_moddevtable(struct buffer *buf, struct module *mod);
+ kernelsymfile := $(objtree)/Module.symvers
+-modulesymfile := $(KBUILD_EXTMOD)/Module.symvers
  
- /* sumversion.c */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long modinfo_offset);
- void get_src_version(const char *modname, char sum[], unsigned sumlen);
+ MODPOST = scripts/mod/modpost								\
+ 	$(if $(CONFIG_MODVERSIONS),-m)							\
+ 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
+-	$(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)					\
+-	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))			\
+-	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))					\
++	$(if $(KBUILD_EXTMOD),,-o $(kernelsymfile))					\
+ 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
+ 	$(if $(KBUILD_MODPOST_WARN),-w)
  
- /* from modpost.c */
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 63062024ce0e..f27f22420cbc 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -429,69 +429,3 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- release:
- 	release_file(file, len);
- }
--
--static void write_version(const char *filename, const char *sum,
--			  unsigned long offset)
--{
--	int fd;
--
--	fd = open(filename, O_RDWR);
--	if (fd < 0) {
--		warn("changing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		return;
--	}
--
--	if (lseek(fd, offset, SEEK_SET) == (off_t)-1) {
--		warn("changing sum in %s:%lu failed: %s\n",
--			filename, offset, strerror(errno));
--		goto out;
--	}
--
--	if (write(fd, sum, strlen(sum)+1) != strlen(sum)+1) {
--		warn("writing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		goto out;
--	}
--out:
--	close(fd);
--}
--
--static int strip_rcs_crap(char *version)
--{
--	unsigned int len, full_len;
--
--	if (strncmp(version, "$Revision", strlen("$Revision")) != 0)
--		return 0;
--
--	/* Space for version string follows. */
--	full_len = strlen(version) + strlen(version + strlen(version) + 1) + 2;
--
--	/* Move string to start with version number: prefix will be
--	 * $Revision$ or $Revision: */
--	len = strlen("$Revision");
--	if (version[len] == ':' || version[len] == '$')
--		len++;
--	while (isspace(version[len]))
--		len++;
--	memmove(version, version+len, full_len-len);
--	full_len -= len;
--
--	/* Preserve up to next whitespace. */
--	len = 0;
--	while (version[len] && !isspace(version[len]))
--		len++;
--	memmove(version + len, version + strlen(version),
--		full_len - strlen(version));
--	return 1;
--}
--
--/* Clean up RCS-style version numbers. */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long version_offset)
--{
--	if (strip_rcs_crap(version))
--		write_version(modfilename, version, version_offset);
--}
+@@ -81,6 +78,13 @@ src := $(obj)
+ # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
+ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+              $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
++
++# modpost options for external modules
++MODPOST += \
++	-i Module.symvers \
++	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
++	-o $(KBUILD_EXTMOD)/Module.symvers
++
+ endif
+ 
+ # find all modules listed in modules.order
 -- 
 2.25.1
