@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19697 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19691 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728398AbgEXPnX (ORCPT
+        with ESMTP id S1728008AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 14/29] modpost: track if the symbol origin is a dump file or ELF object
-Date: Mon, 25 May 2020 00:42:20 +0900
-Message-Id: <20200524154235.380482-15-masahiroy@kernel.org>
+Subject: [PATCH v2 09/29] kbuild: disallow multi-word in M= or KBUILD_EXTMOD
+Date: Mon, 25 May 2020 00:42:15 +0900
+Message-Id: <20200524154235.380482-10-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,110 +17,67 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The meaning of sym->kernel is obscure; it is set for in-kernel symbols
-loaded from Modules.symver. This happens only when we are building
-external modules, and it is used to determine whether to dump symbols
-to $(KBUILD_EXTMOD)/Modules.symver
+$(firstword ...) in scripts/Makefile.modpost was added by commit
+3f3fd3c05585 ("[PATCH] kbuild: allow multi-word $M in Makefile.modpost")
+to build multiple external module directories.
 
-It is clearer to remember whether the symbol or module came from a dump
-file or ELF object.
+It was a solution to resolve symbol dependencies when an external
+module depends on another external module.
 
-This changes the KBUILD_EXTRA_SYMBOLS behavior. Previously, symbols
-loaded from KBUILD_EXTRA_SYMBOLS are accumulated into the current
-$(KBUILD_EXTMOD)/Modules.symver
+Commit 0d96fb20b7ed ("kbuild: Add new Kbuild variable
+KBUILD_EXTRA_SYMBOLS") introduced another solution by passing symbol
+info via KBUILD_EXTRA_SYMBOLS, then broke the multi-word M= support.
 
-Going forward, they will be only used to check symbol references, but
-not dumped into the current $(KBUILD_EXTMOD)/Modules.symver. I believe
-this makes more sense.
+  include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+               $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
 
-sym->vmlinux will have no user. Remove it too.
+... does not work if KBUILD_EXTMOD contains multiple words.
+
+This feature has been broken for more than a decade. Remove the
+bitrotten code, and stop parsing if M or KBUILD_EXTMOD contains
+multiple words.
+
+As Documentation/kbuild/modules.rst explains, if your module depends
+on another one, there are two solutions:
+  - add a common top-level Kbuild file
+  - use KBUILD_EXTRA_SYMBOLS
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v2: None
+Changes in v2:
+  - Add more commit log
 
- scripts/mod/modpost.c | 15 +++++----------
- scripts/mod/modpost.h |  1 +
- 2 files changed, 6 insertions(+), 10 deletions(-)
+ Makefile                 | 3 +++
+ scripts/Makefile.modpost | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 2f5fab40d859..76599dd44bae 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -207,9 +207,6 @@ struct symbol {
- 	int crc_valid;
- 	char *namespace;
- 	unsigned int weak:1;
--	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
--	unsigned int kernel:1;     /* 1 if symbol is from kernel
--				    *  (only for external modules) **/
- 	unsigned int is_static:1;  /* 1 if symbol is not global */
- 	enum export  export;       /* Type of export */
- 	char name[];
-@@ -441,8 +438,6 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	}
+diff --git a/Makefile b/Makefile
+index 72eb55a36545..48a2dfaf3bf3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -218,6 +218,9 @@ ifeq ("$(origin M)", "command line")
+   KBUILD_EXTMOD := $(M)
+ endif
  
- 	s->module = mod;
--	s->vmlinux   = is_vmlinux(mod->name);
--	s->kernel    = 0;
- 	s->export    = export;
- 	return s;
- }
-@@ -2440,7 +2435,7 @@ static void write_if_changed(struct buffer *b, const char *fname)
- /* parse Module.symvers file. line format:
-  * 0x12345678<tab>symbol<tab>module<tab>export<tab>namespace
-  **/
--static void read_dump(const char *fname, unsigned int kernel)
-+static void read_dump(const char *fname)
- {
- 	char *buf, *pos, *line;
++$(if $(word 2, $(KBUILD_EXTMOD)), \
++	$(error building multiple external modules is not supported))
++
+ export KBUILD_CHECKSRC KBUILD_EXTMOD
  
-@@ -2479,9 +2474,9 @@ static void read_dump(const char *fname, unsigned int kernel)
- 				have_vmlinux = 1;
- 			mod = new_module(modname);
- 			mod->skip = 1;
-+			mod->from_dump = 1;
- 		}
- 		s = sym_add_exported(symname, mod, export_no(export));
--		s->kernel    = kernel;
- 		s->is_static = 0;
- 		sym_set_crc(symname, crc);
- 		sym_update_namespace(symname, namespace);
-@@ -2501,7 +2496,7 @@ static int dump_sym(struct symbol *sym)
- {
- 	if (!external_module)
- 		return 1;
--	if (sym->vmlinux || sym->kernel)
-+	if (sym->module->from_dump)
- 		return 0;
- 	return 1;
- }
-@@ -2620,11 +2615,11 @@ int main(int argc, char **argv)
- 	}
+ extmod-prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 957eed6a17a5..b79bf0e30d32 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -44,7 +44,7 @@ include include/config/auto.conf
+ include scripts/Kbuild.include
  
- 	if (kernel_read)
--		read_dump(kernel_read, 1);
-+		read_dump(kernel_read);
- 	while (extsym_start) {
- 		struct ext_sym_list *tmp;
+ kernelsymfile := $(objtree)/Module.symvers
+-modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
++modulesymfile := $(KBUILD_EXTMOD)/Module.symvers
  
--		read_dump(extsym_start->file, 0);
-+		read_dump(extsym_start->file);
- 		tmp = extsym_start->next;
- 		free(extsym_start);
- 		extsym_start = tmp;
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 232a0e11fcaa..aaf3c4ad5d60 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -119,6 +119,7 @@ struct module {
- 	const char *name;
- 	int gpl_compatible;
- 	struct symbol *unres;
-+	int from_dump;  /* 1 if module was loaded from *.symver */
- 	int seen;
- 	int skip;
- 	int has_init;
+ MODPOST = scripts/mod/modpost								\
+ 	$(if $(CONFIG_MODVERSIONS),-m)							\
 -- 
 2.25.1
