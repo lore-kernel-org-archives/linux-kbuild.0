@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19711 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19713 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728551AbgEXPnY (ORCPT
+        with ESMTP id S1728584AbgEXPnY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:24 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 23/29] modpost: remove is_vmlinux() call in check_for_{gpl_usage,unused}()
-Date: Mon, 25 May 2020 00:42:29 +0900
-Message-Id: <20200524154235.380482-24-masahiroy@kernel.org>
+Subject: [PATCH v2 27/29] modpost: strip .o from modname before calling new_module()
+Date: Mon, 25 May 2020 00:42:33 +0900
+Message-Id: <20200524154235.380482-28-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,68 +17,84 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-check_exports() is never called for vmlinux because mod->skip is set
-for vmlinux.
+new_module() conditionally strips the .o because the modname has .o
+suffix when it is called from read_symbols(), but no .o when it is
+called from read_dump().
 
-Hence, check_for_gpl_usage() and check_for_unused() are not called
-for vmlinux, either. is_vmlinux() is always false here.
+It is clearer to strip .o in read_symbols().
 
-Remove the is_vmlinux() calls, and hard-code the ".ko" suffix.
+I also used flexible-array for mod->name.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/modpost.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ scripts/mod/modpost.c | 20 +++++++++++---------
+ scripts/mod/modpost.h |  2 +-
+ 2 files changed, 12 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 94404374262a..c0bc8a2ea026 100644
+index 662dc1ca10f8..2c783adbfc34 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2144,20 +2144,18 @@ void buf_write(struct buffer *buf, const char *s, int len)
- 
- static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+@@ -174,18 +174,12 @@ static struct module *find_module(const char *modname)
+ static struct module *new_module(const char *modname)
  {
--	const char *e = is_vmlinux(m) ?"":".ko";
--
- 	switch (exp) {
- 	case export_gpl:
--		fatal("GPL-incompatible module %s%s "
--		      "uses GPL-only symbol '%s'\n", m, e, s);
-+		fatal("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
-+		      m, s);
- 		break;
- 	case export_unused_gpl:
--		fatal("GPL-incompatible module %s%s "
--		      "uses GPL-only symbol marked UNUSED '%s'\n", m, e, s);
-+		fatal("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
-+		      m, s);
- 		break;
- 	case export_gpl_future:
--		warn("GPL-incompatible module %s%s "
--		      "uses future GPL-only symbol '%s'\n", m, e, s);
-+		warn("GPL-incompatible module %s.ko uses future GPL-only symbol '%s'\n",
-+		     m, s);
- 		break;
- 	case export_plain:
- 	case export_unused:
-@@ -2169,13 +2167,11 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+ 	struct module *mod;
+-	char *p;
  
- static void check_for_unused(enum export exp, const char *m, const char *s)
- {
--	const char *e = is_vmlinux(m) ?"":".ko";
+-	mod = NOFAIL(malloc(sizeof(*mod)));
++	mod = NOFAIL(malloc(sizeof(*mod) + strlen(modname) + 1));
+ 	memset(mod, 0, sizeof(*mod));
+-	p = NOFAIL(strdup(modname));
 -
- 	switch (exp) {
- 	case export_unused:
- 	case export_unused_gpl:
--		warn("module %s%s "
--		      "uses symbol '%s' marked UNUSED\n", m, e, s);
-+		warn("module %s.ko uses symbol '%s' marked UNUSED\n",
-+		     m, s);
- 		break;
- 	default:
- 		/* ignore */
+-	/* strip trailing .o */
+-	if (strends(p, ".o"))
+-		p[strlen(p) - 2] = '\0';
+ 
+ 	/* add to list */
+-	mod->name = p;
++	strcpy(mod->name, modname);
+ 	mod->is_vmlinux = is_vmlinux(modname);
+ 	mod->gpl_compatible = -1;
+ 	mod->next = modules;
+@@ -2013,7 +2007,15 @@ static void read_symbols(const char *modname)
+ 	if (!parse_elf(&info, modname))
+ 		return;
+ 
+-	mod = new_module(modname);
++	{
++		char *tmp;
++
++		/* strip trailing .o */
++		tmp = NOFAIL(strdup(modname));
++		tmp[strlen(tmp) - 2] = '\0';
++		mod = new_module(tmp);
++		free(tmp);
++	}
+ 
+ 	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 264c0c51defa..1df87d204c9a 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -116,7 +116,6 @@ struct namespace_list {
+ 
+ struct module {
+ 	struct module *next;
+-	const char *name;
+ 	int gpl_compatible;
+ 	struct symbol *unres;
+ 	int from_dump;  /* 1 if module was loaded from *.symver */
+@@ -130,6 +129,7 @@ struct module {
+ 	struct namespace_list *missing_namespaces;
+ 	// Actual imported namespaces
+ 	struct namespace_list *imported_namespaces;
++	char name[];
+ };
+ 
+ struct elf_info {
 -- 
 2.25.1
