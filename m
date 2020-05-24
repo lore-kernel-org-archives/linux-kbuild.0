@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19696 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19688 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728347AbgEXPnX (ORCPT
+        with ESMTP id S1727027AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 04/29] modpost: fix potential mmap'ed file overrun in get_src_version()
-Date: Mon, 25 May 2020 00:42:10 +0900
-Message-Id: <20200524154235.380482-5-masahiroy@kernel.org>
+Subject: [PATCH v2 01/29] modpost: drop RCS/CVS $Revision handling in MODULE_VERSION()
+Date: Mon, 25 May 2020 00:42:07 +0900
+Message-Id: <20200524154235.380482-2-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,91 +17,123 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-I do not know how reliably this function works, but it seems dangerous
-to me, at least.
+As far as I understood, this code gets rid of '$Revision$' or '$Revision:'
+of CVS, RCS or whatever in MODULE_VERSION() tags.
 
-The function call
-
-    strchr(sources, '\n');
-
-... continues searching until it finds '\n' or it reaches the '\0'
-terminator. In other words, 'sources' should be a null-terminated
-string.
-
-However, grab_file() just mmaps a file, so 'sources' is not terminated
-with null byte. If the file does not contain '\n' at all, strchr() will
-go beyond the mmap'ed memory.
-
-Instead, use read_text_file(), which loads the file content into a
-malloc'ed buffer, appending null-byte.
-
-Here we are interested only in the first line of *.mod files. Use
-get_line() helper to get the first line.
+Remove the primeval code.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/sumversion.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ scripts/mod/modpost.c    |  3 --
+ scripts/mod/modpost.h    |  4 ---
+ scripts/mod/sumversion.c | 66 ----------------------------------------
+ 3 files changed, 73 deletions(-)
 
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4d4b979d76be..77e5425759e2 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2074,9 +2074,6 @@ static void read_symbols(const char *modname)
+ 		check_sec_ref(mod, modname, &info);
+ 
+ 	version = get_modinfo(&info, "version");
+-	if (version)
+-		maybe_frob_rcs_version(modname, version, info.modinfo,
+-				       version - (char *)info.hdr);
+ 	if (version || (all_versions && !is_vmlinux(modname)))
+ 		get_src_version(modname, mod->srcversion,
+ 				sizeof(mod->srcversion)-1);
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 39f6c29fb568..bbaf5cc37bfb 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -187,10 +187,6 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
+ void add_moddevtable(struct buffer *buf, struct module *mod);
+ 
+ /* sumversion.c */
+-void maybe_frob_rcs_version(const char *modfilename,
+-			    char *version,
+-			    void *modinfo,
+-			    unsigned long modinfo_offset);
+ void get_src_version(const char *modname, char sum[], unsigned sumlen);
+ 
+ /* from modpost.c */
 diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index f27f22420cbc..f9aa532d93cf 100644
+index 63062024ce0e..f27f22420cbc 100644
 --- a/scripts/mod/sumversion.c
 +++ b/scripts/mod/sumversion.c
-@@ -392,40 +392,37 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- /* Calc and record src checksum. */
- void get_src_version(const char *modname, char sum[], unsigned sumlen)
- {
--	void *file;
--	unsigned long len;
-+	char *buf, *pos, *firstline;
- 	struct md4_ctx md;
--	char *sources, *end, *fname;
-+	char *fname;
- 	char filelist[PATH_MAX + 1];
- 
- 	/* objects for a module are listed in the first line of *.mod file. */
- 	snprintf(filelist, sizeof(filelist), "%.*smod",
- 		 (int)strlen(modname) - 1, modname);
- 
--	file = grab_file(filelist, &len);
--	if (!file)
-+	buf = read_text_file(filelist);
-+	if (!buf)
- 		/* not a module or .mod file missing - ignore */
- 		return;
- 
--	sources = file;
--
--	end = strchr(sources, '\n');
--	if (!end) {
-+	pos = buf;
-+	firstline = get_line(&pos);
-+	if (!firstline) {
- 		warn("bad ending versions file for %s\n", modname);
--		goto release;
-+		goto free;
- 	}
--	*end = '\0';
- 
- 	md4_init(&md);
--	while ((fname = strsep(&sources, " ")) != NULL) {
-+	while ((fname = strsep(&firstline, " "))) {
- 		if (!*fname)
- 			continue;
- 		if (!(is_static_library(fname)) &&
- 				!parse_source_files(fname, &md))
--			goto release;
-+			goto free;
- 	}
- 
- 	md4_final_ascii(&md, sum, sumlen);
--release:
--	release_file(file, len);
-+free:
-+	free(buf);
+@@ -429,69 +429,3 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ release:
+ 	release_file(file, len);
  }
+-
+-static void write_version(const char *filename, const char *sum,
+-			  unsigned long offset)
+-{
+-	int fd;
+-
+-	fd = open(filename, O_RDWR);
+-	if (fd < 0) {
+-		warn("changing sum in %s failed: %s\n",
+-			filename, strerror(errno));
+-		return;
+-	}
+-
+-	if (lseek(fd, offset, SEEK_SET) == (off_t)-1) {
+-		warn("changing sum in %s:%lu failed: %s\n",
+-			filename, offset, strerror(errno));
+-		goto out;
+-	}
+-
+-	if (write(fd, sum, strlen(sum)+1) != strlen(sum)+1) {
+-		warn("writing sum in %s failed: %s\n",
+-			filename, strerror(errno));
+-		goto out;
+-	}
+-out:
+-	close(fd);
+-}
+-
+-static int strip_rcs_crap(char *version)
+-{
+-	unsigned int len, full_len;
+-
+-	if (strncmp(version, "$Revision", strlen("$Revision")) != 0)
+-		return 0;
+-
+-	/* Space for version string follows. */
+-	full_len = strlen(version) + strlen(version + strlen(version) + 1) + 2;
+-
+-	/* Move string to start with version number: prefix will be
+-	 * $Revision$ or $Revision: */
+-	len = strlen("$Revision");
+-	if (version[len] == ':' || version[len] == '$')
+-		len++;
+-	while (isspace(version[len]))
+-		len++;
+-	memmove(version, version+len, full_len-len);
+-	full_len -= len;
+-
+-	/* Preserve up to next whitespace. */
+-	len = 0;
+-	while (version[len] && !isspace(version[len]))
+-		len++;
+-	memmove(version + len, version + strlen(version),
+-		full_len - strlen(version));
+-	return 1;
+-}
+-
+-/* Clean up RCS-style version numbers. */
+-void maybe_frob_rcs_version(const char *modfilename,
+-			    char *version,
+-			    void *modinfo,
+-			    unsigned long version_offset)
+-{
+-	if (strip_rcs_crap(version))
+-		write_version(modfilename, version, version_offset);
+-}
 -- 
 2.25.1
