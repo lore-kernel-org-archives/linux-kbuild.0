@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19694 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19693 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728213AbgEXPnX (ORCPT
+        with ESMTP id S1728292AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 29/29] modpost: change elf_info->size to size_t
-Date: Mon, 25 May 2020 00:42:35 +0900
-Message-Id: <20200524154235.380482-30-masahiroy@kernel.org>
+Subject: [PATCH v2 07/29] modpost: use read_text_file() and get_line() for reading text files
+Date: Mon, 25 May 2020 00:42:13 +0900
+Message-Id: <20200524154235.380482-8-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,63 +17,102 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Align with the mmap / munmap APIs.
+grab_file() mmaps a file, but it is not so efficient here because
+get_next_line() copies every line to the temporary buffer anyway.
+
+read_text_file() and get_line() are simpler. get_line() exploits the
+library function strchr().
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/modpost.c | 9 ++++-----
- scripts/mod/modpost.h | 2 +-
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ scripts/mod/modpost.c    | 15 ++++++++-------
+ scripts/mod/sumversion.c | 11 ++++++-----
+ 2 files changed, 14 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 527f71b662b0..a0e44991a525 100644
+index 139b811dc183..40c6414aaeec 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -439,7 +439,7 @@ static void sym_set_crc(const char *name, unsigned int crc)
- 	s->crc_valid = 1;
- }
- 
--static void *grab_file(const char *filename, unsigned long *size)
-+static void *grab_file(const char *filename, size_t *size)
+@@ -2476,15 +2476,16 @@ static void write_if_changed(struct buffer *b, const char *fname)
+  **/
+ static void read_dump(const char *fname, unsigned int kernel)
  {
- 	struct stat st;
- 	void *map = MAP_FAILED;
-@@ -461,7 +461,7 @@ static void *grab_file(const char *filename, unsigned long *size)
- 	return map;
+-	unsigned long size, pos = 0;
+-	void *file = grab_file(fname, &size);
+-	char *line;
++	char *buf, *pos, *line;
+ 
+-	if (!file)
++	buf = read_text_file(fname);
++	if (!buf)
+ 		/* No symbol versions, silently ignore */
+ 		return;
+ 
+-	while ((line = get_next_line(&pos, file, size))) {
++	pos = buf;
++
++	while ((line = get_line(&pos))) {
+ 		char *symname, *namespace, *modname, *d, *export;
+ 		unsigned int crc;
+ 		struct module *mod;
+@@ -2519,10 +2520,10 @@ static void read_dump(const char *fname, unsigned int kernel)
+ 		sym_set_crc(symname, crc);
+ 		sym_update_namespace(symname, namespace);
+ 	}
+-	release_file(file, size);
++	free(buf);
+ 	return;
+ fail:
+-	release_file(file, size);
++	free(buf);
+ 	fatal("parse error in symbol dump file\n");
  }
  
--static void release_file(void *file, unsigned long size)
-+static void release_file(void *file, size_t size)
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index a1c7b0f4cd5a..89c8baefde9d 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -306,9 +306,8 @@ static int is_static_library(const char *objfile)
+  * to figure out source files. */
+ static int parse_source_files(const char *objfile, struct md4_ctx *md)
  {
- 	munmap(file, size);
- }
-@@ -517,9 +517,8 @@ static int parse_elf(struct elf_info *info, const char *filename)
+-	char *cmd, *file, *line, *dir;
++	char *cmd, *file, *line, *dir, *pos;
+ 	const char *base;
+-	unsigned long flen, pos = 0;
+ 	int dirlen, ret = 0, check_files = 0;
  
- 	/* Check if file offset is correct */
- 	if (hdr->e_shoff > info->size) {
--		fatal("section header offset=%lu in file '%s' is bigger than "
--		      "filesize=%lu\n", (unsigned long)hdr->e_shoff,
--		      filename, info->size);
-+		fatal("section header offset=%lu in file '%s' is bigger than filesize=%zu\n",
-+		      (unsigned long)hdr->e_shoff, filename, info->size);
- 		return 0;
+ 	cmd = NOFAIL(malloc(strlen(objfile) + sizeof("..cmd")));
+@@ -326,14 +325,16 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
+ 	strncpy(dir, objfile, dirlen);
+ 	dir[dirlen] = '\0';
+ 
+-	file = grab_file(cmd, &flen);
++	file = read_text_file(cmd);
+ 	if (!file) {
+ 		warn("could not find %s for %s\n", cmd, objfile);
+ 		goto out;
  	}
  
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 1df87d204c9a..efb74dba19e2 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -133,7 +133,7 @@ struct module {
- };
++	pos = file;
++
+ 	/* Sum all files in the same dir or subdirs. */
+-	while ((line = get_next_line(&pos, file, flen)) != NULL) {
++	while ((line = get_line(&pos))) {
+ 		char* p = line;
  
- struct elf_info {
--	unsigned long size;
-+	size_t size;
- 	Elf_Ehdr     *hdr;
- 	Elf_Shdr     *sechdrs;
- 	Elf_Sym      *symtab_start;
+ 		if (strncmp(line, "source_", sizeof("source_")-1) == 0) {
+@@ -384,7 +385,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
+ 	/* Everyone parsed OK */
+ 	ret = 1;
+ out_file:
+-	release_file(file, flen);
++	free(file);
+ out:
+ 	free(dir);
+ 	free(cmd);
 -- 
 2.25.1
