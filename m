@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19699 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19684 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728393AbgEXPnX (ORCPT
+        with ESMTP id S1728216AbgEXPnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:23 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 11/29] modpost: pass -N option only for modules modpost
-Date: Mon, 25 May 2020 00:42:17 +0900
-Message-Id: <20200524154235.380482-12-masahiroy@kernel.org>
+Subject: [PATCH v2 10/29] modpost: move -T option close to the modpost command
+Date: Mon, 25 May 2020 00:42:16 +0900
+Message-Id: <20200524154235.380482-11-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,40 +17,39 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The built-in only code is not required to have MODULE_IMPORT_NS() to
-use symbols. So, the namespace is not checked for vmlinux(.o).
+The '-T -' option reads the file list from stdin.
 
-Do not pass the meaningless -N option to the first pass of modpost.
+It is clearer to put it close to the piped command.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/Makefile.modpost | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/Makefile.modpost | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index da7730a43819..bc5561aedb24 100644
+index b79bf0e30d32..da7730a43819 100644
 --- a/scripts/Makefile.modpost
 +++ b/scripts/Makefile.modpost
-@@ -53,7 +53,6 @@ MODPOST = scripts/mod/modpost								\
- 	$(if $(KBUILD_EXTMOD),$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)))			\
- 	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))					\
- 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
--	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) 	\
- 	$(if $(KBUILD_MODPOST_WARN),-w)
- 
- ifdef MODPOST_VMLINUX
-@@ -66,7 +65,9 @@ __modpost:
+@@ -66,7 +66,7 @@ __modpost:
  
  else
  
-+# modpost options for modules (both in-kernel and external)
- MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
-+	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
+-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T - \
++MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
  	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
  
  ifeq ($(KBUILD_EXTMOD),)
+@@ -88,7 +88,7 @@ modules := $(sort $(shell cat $(MODORDER)))
+ # Read out modules.order instead of expanding $(modules) to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
+ quiet_cmd_modpost = MODPOST $(words $(modules)) modules
+-      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST)
++      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) -T -
+ 
+ __modpost:
+ 	$(call cmd,modpost)
 -- 
 2.25.1
