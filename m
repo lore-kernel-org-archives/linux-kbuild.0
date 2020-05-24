@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19703 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19711 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728511AbgEXPnY (ORCPT
+        with ESMTP id S1728551AbgEXPnY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:24 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 21/29] modpost: remove -s option
-Date: Mon, 25 May 2020 00:42:27 +0900
-Message-Id: <20200524154235.380482-22-masahiroy@kernel.org>
+Subject: [PATCH v2 23/29] modpost: remove is_vmlinux() call in check_for_{gpl_usage,unused}()
+Date: Mon, 25 May 2020 00:42:29 +0900
+Message-Id: <20200524154235.380482-24-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,75 +17,68 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-The -s option was added by commit 8d8d8289df65 ("kbuild: do not do
-section mismatch checks on vmlinux in 2nd pass").
+check_exports() is never called for vmlinux because mod->skip is set
+for vmlinux.
 
-Now that the second pass does not parse vmlinux, this option is
-unneeded.
+Hence, check_for_gpl_usage() and check_for_unused() are not called
+for vmlinux, either. is_vmlinux() is always false here.
+
+Remove the is_vmlinux() calls, and hard-code the ".ko" suffix.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/Makefile.modpost |  2 +-
- scripts/mod/modpost.c    | 10 ++--------
- 2 files changed, 3 insertions(+), 9 deletions(-)
+ scripts/mod/modpost.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 1c597999b6a0..67db4bba2d45 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -63,7 +63,7 @@ __modpost:
- else
- 
- # modpost options for modules (both in-kernel and external)
--MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
-+MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) \
- 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
- 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
- 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 34f2aa3a021f..7a108bec933b 100644
+index 94404374262a..c0bc8a2ea026 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -30,8 +30,6 @@ static int have_vmlinux = 0;
- static int all_versions = 0;
- /* If we are modposting external module set to 1 */
- static int external_module = 0;
--/* Warn about section mismatch in vmlinux if set to 1 */
--static int vmlinux_section_warnings = 1;
- /* Only warn about unresolved symbols */
- static int warn_unresolved = 0;
- /* How a symbol is exported */
-@@ -2078,8 +2076,7 @@ static void read_symbols(const char *modname)
- 		}
- 	}
+@@ -2144,20 +2144,18 @@ void buf_write(struct buffer *buf, const char *s, int len)
  
--	if (!is_vmlinux(modname) || vmlinux_section_warnings)
--		check_sec_ref(mod, modname, &info);
-+	check_sec_ref(mod, modname, &info);
+ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+ {
+-	const char *e = is_vmlinux(m) ?"":".ko";
+-
+ 	switch (exp) {
+ 	case export_gpl:
+-		fatal("GPL-incompatible module %s%s "
+-		      "uses GPL-only symbol '%s'\n", m, e, s);
++		fatal("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
++		      m, s);
+ 		break;
+ 	case export_unused_gpl:
+-		fatal("GPL-incompatible module %s%s "
+-		      "uses GPL-only symbol marked UNUSED '%s'\n", m, e, s);
++		fatal("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
++		      m, s);
+ 		break;
+ 	case export_gpl_future:
+-		warn("GPL-incompatible module %s%s "
+-		      "uses future GPL-only symbol '%s'\n", m, e, s);
++		warn("GPL-incompatible module %s.ko uses future GPL-only symbol '%s'\n",
++		     m, s);
+ 		break;
+ 	case export_plain:
+ 	case export_unused:
+@@ -2169,13 +2167,11 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
  
- 	if (!is_vmlinux(modname)) {
- 		version = get_modinfo(&info, "version");
-@@ -2568,7 +2565,7 @@ int main(int argc, char **argv)
- 	struct dump_list *dump_read_start = NULL;
- 	struct dump_list **dump_read_iter = &dump_read_start;
- 
--	while ((opt = getopt(argc, argv, "ei:mnsT:o:awENd:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
- 		switch (opt) {
- 		case 'e':
- 			external_module = 1;
-@@ -2591,9 +2588,6 @@ int main(int argc, char **argv)
- 		case 'a':
- 			all_versions = 1;
- 			break;
--		case 's':
--			vmlinux_section_warnings = 0;
--			break;
- 		case 'T':
- 			files_source = optarg;
- 			break;
+ static void check_for_unused(enum export exp, const char *m, const char *s)
+ {
+-	const char *e = is_vmlinux(m) ?"":".ko";
+-
+ 	switch (exp) {
+ 	case export_unused:
+ 	case export_unused_gpl:
+-		warn("module %s%s "
+-		      "uses symbol '%s' marked UNUSED\n", m, e, s);
++		warn("module %s.ko uses symbol '%s' marked UNUSED\n",
++		     m, s);
+ 		break;
+ 	default:
+ 		/* ignore */
 -- 
 2.25.1
