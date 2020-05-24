@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19712 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19703 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728564AbgEXPnY (ORCPT
+        with ESMTP id S1728511AbgEXPnY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:24 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 15/29] modpost: allow to pass -i option multiple times remove -e option
-Date: Mon, 25 May 2020 00:42:21 +0900
-Message-Id: <20200524154235.380482-16-masahiroy@kernel.org>
+Subject: [PATCH v2 21/29] modpost: remove -s option
+Date: Mon, 25 May 2020 00:42:27 +0900
+Message-Id: <20200524154235.380482-22-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,70 +17,75 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Now that there is no difference in the functionality of -i and -e,
-they can be unified.
+The -s option was added by commit 8d8d8289df65 ("kbuild: do not do
+section mismatch checks on vmlinux in 2nd pass").
 
-Make modpost accept the -i option multiple times, then remove -e.
-
-I will reuse -e for a different purpose.
+Now that the second pass does not parse vmlinux, this option is
+unneeded.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/Makefile.modpost | 2 +-
- scripts/mod/modpost.c    | 9 +--------
- 2 files changed, 2 insertions(+), 9 deletions(-)
+ scripts/Makefile.modpost |  2 +-
+ scripts/mod/modpost.c    | 10 ++--------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 8321068abb31..a316095c843c 100644
+index 1c597999b6a0..67db4bba2d45 100644
 --- a/scripts/Makefile.modpost
 +++ b/scripts/Makefile.modpost
-@@ -82,7 +82,7 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
- # modpost options for external modules
- MODPOST += \
- 	-i Module.symvers \
--	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
-+	$(addprefix -i ,$(KBUILD_EXTRA_SYMBOLS)) \
- 	-o $(KBUILD_EXTMOD)/Module.symvers
+@@ -63,7 +63,7 @@ __modpost:
+ else
  
- endif
+ # modpost options for modules (both in-kernel and external)
+-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s \
++MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) \
+ 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N) \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 76599dd44bae..2ecf72a176cf 100644
+index 34f2aa3a021f..7a108bec933b 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2558,7 +2558,6 @@ int main(int argc, char **argv)
- {
- 	struct module *mod;
- 	struct buffer buf = { };
--	char *kernel_read = NULL;
- 	char *missing_namespace_deps = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
-@@ -2567,13 +2566,9 @@ int main(int argc, char **argv)
- 	struct ext_sym_list *extsym_start = NULL;
- 	struct ext_sym_list **extsym_iter = &extsym_start;
- 
--	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
-+	while ((opt = getopt(argc, argv, "i:mnsT:o:awENd:")) != -1) {
- 		switch (opt) {
- 		case 'i':
--			kernel_read = optarg;
--			external_module = 1;
--			break;
--		case 'e':
- 			external_module = 1;
- 			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
- 			(*extsym_iter)->file = optarg;
-@@ -2614,8 +2609,6 @@ int main(int argc, char **argv)
+@@ -30,8 +30,6 @@ static int have_vmlinux = 0;
+ static int all_versions = 0;
+ /* If we are modposting external module set to 1 */
+ static int external_module = 0;
+-/* Warn about section mismatch in vmlinux if set to 1 */
+-static int vmlinux_section_warnings = 1;
+ /* Only warn about unresolved symbols */
+ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+@@ -2078,8 +2076,7 @@ static void read_symbols(const char *modname)
  		}
  	}
  
--	if (kernel_read)
--		read_dump(kernel_read);
- 	while (extsym_start) {
- 		struct ext_sym_list *tmp;
+-	if (!is_vmlinux(modname) || vmlinux_section_warnings)
+-		check_sec_ref(mod, modname, &info);
++	check_sec_ref(mod, modname, &info);
  
+ 	if (!is_vmlinux(modname)) {
+ 		version = get_modinfo(&info, "version");
+@@ -2568,7 +2565,7 @@ int main(int argc, char **argv)
+ 	struct dump_list *dump_read_start = NULL;
+ 	struct dump_list **dump_read_iter = &dump_read_start;
+ 
+-	while ((opt = getopt(argc, argv, "ei:mnsT:o:awENd:")) != -1) {
++	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
+ 		switch (opt) {
+ 		case 'e':
+ 			external_module = 1;
+@@ -2591,9 +2588,6 @@ int main(int argc, char **argv)
+ 		case 'a':
+ 			all_versions = 1;
+ 			break;
+-		case 's':
+-			vmlinux_section_warnings = 0;
+-			break;
+ 		case 'T':
+ 			files_source = optarg;
+ 			break;
 -- 
 2.25.1
