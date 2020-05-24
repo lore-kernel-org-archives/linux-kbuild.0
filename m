@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:19709 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:19712 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728508AbgEXPnY (ORCPT
+        with ESMTP id S1728564AbgEXPnY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 May 2020 11:43:24 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 13/29] modpost: load KBUILD_EXTRA_SYMBOLS files in order
-Date: Mon, 25 May 2020 00:42:19 +0900
-Message-Id: <20200524154235.380482-14-masahiroy@kernel.org>
+Subject: [PATCH v2 15/29] modpost: allow to pass -i option multiple times remove -e option
+Date: Mon, 25 May 2020 00:42:21 +0900
+Message-Id: <20200524154235.380482-16-masahiroy@kernel.org>
 In-Reply-To: <20200524154235.380482-1-masahiroy@kernel.org>
 References: <20200524154235.380482-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,63 +17,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-Currently, modpost reads extra symbol dump files in the reverse order.
-If '-e foo -e bar' is given, modpost reads bar, foo, in this order.
+Now that there is no difference in the functionality of -i and -e,
+they can be unified.
 
-This is probably not a big deal, but there is no good reason to reverse
-the order. Read files in the given order.
+Make modpost accept the -i option multiple times, then remove -e.
+
+I will reuse -e for a different purpose.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2: None
 
- scripts/mod/modpost.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ scripts/Makefile.modpost | 2 +-
+ scripts/mod/modpost.c    | 9 +--------
+ 2 files changed, 2 insertions(+), 9 deletions(-)
 
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8321068abb31..a316095c843c 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -82,7 +82,7 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+ # modpost options for external modules
+ MODPOST += \
+ 	-i Module.symvers \
+-	$(addprefix -e ,$(KBUILD_EXTRA_SYMBOLS)) \
++	$(addprefix -i ,$(KBUILD_EXTRA_SYMBOLS)) \
+ 	-o $(KBUILD_EXTMOD)/Module.symvers
+ 
+ endif
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 33cdb78a4ba1..2f5fab40d859 100644
+index 76599dd44bae..2ecf72a176cf 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2569,8 +2569,8 @@ int main(int argc, char **argv)
+@@ -2558,7 +2558,6 @@ int main(int argc, char **argv)
+ {
+ 	struct module *mod;
+ 	struct buffer buf = { };
+-	char *kernel_read = NULL;
+ 	char *missing_namespace_deps = NULL;
+ 	char *dump_write = NULL, *files_source = NULL;
  	int opt;
- 	int err;
- 	int n;
--	struct ext_sym_list *extsym_iter;
+@@ -2567,13 +2566,9 @@ int main(int argc, char **argv)
  	struct ext_sym_list *extsym_start = NULL;
-+	struct ext_sym_list **extsym_iter = &extsym_start;
+ 	struct ext_sym_list **extsym_iter = &extsym_start;
  
- 	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
+-	while ((opt = getopt(argc, argv, "i:e:mnsT:o:awENd:")) != -1) {
++	while ((opt = getopt(argc, argv, "i:mnsT:o:awENd:")) != -1) {
  		switch (opt) {
-@@ -2580,11 +2580,9 @@ int main(int argc, char **argv)
- 			break;
- 		case 'e':
+ 		case 'i':
+-			kernel_read = optarg;
+-			external_module = 1;
+-			break;
+-		case 'e':
  			external_module = 1;
--			extsym_iter =
--			   NOFAIL(malloc(sizeof(*extsym_iter)));
--			extsym_iter->next = extsym_start;
--			extsym_iter->file = optarg;
--			extsym_start = extsym_iter;
-+			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
-+			(*extsym_iter)->file = optarg;
-+			extsym_iter = &(*extsym_iter)->next;
- 			break;
- 		case 'm':
- 			modversions = 1;
-@@ -2624,10 +2622,12 @@ int main(int argc, char **argv)
- 	if (kernel_read)
- 		read_dump(kernel_read, 1);
- 	while (extsym_start) {
-+		struct ext_sym_list *tmp;
-+
- 		read_dump(extsym_start->file, 0);
--		extsym_iter = extsym_start->next;
-+		tmp = extsym_start->next;
- 		free(extsym_start);
--		extsym_start = extsym_iter;
-+		extsym_start = tmp;
+ 			*extsym_iter = NOFAIL(calloc(1, sizeof(**extsym_iter)));
+ 			(*extsym_iter)->file = optarg;
+@@ -2614,8 +2609,6 @@ int main(int argc, char **argv)
+ 		}
  	}
  
- 	while (optind < argc)
+-	if (kernel_read)
+-		read_dump(kernel_read);
+ 	while (extsym_start) {
+ 		struct ext_sym_list *tmp;
+ 
 -- 
 2.25.1
