@@ -1,87 +1,225 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:62121 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388745AbgEYFr2 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:29996 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729125AbgEYGOC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 May 2020 01:47:28 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/2] modpost: fix potential segmentation fault for addend_i386_rel()
-Date: Mon, 25 May 2020 14:47:04 +0900
-Message-Id: <20200525054705.1066033-1-masahiroy@kernel.org>
+        Mon, 25 May 2020 02:14:02 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200521202716.193316-1-samitolvanen@google.com>
+ <CAK7LNARq3g5vA6vy9449SHsKQmbwJrQDSBz4ZbH1pBEvPmusuA@mail.gmail.com>
+ <CAK7LNASm2t-Dkr+p_EWvqf_eoKn5R2iXWuBHnTB9n6MUxr3-pQ@mail.gmail.com>
+ <1590226253.lnkg0jun9x.astroid@bobo.none> <CAK7LNAR_-q3jhaUzDpkC3ej_DpAerzMsORT-tFw_3AwX7xM0Yw@mail.gmail.com>
+ <20200523165355.GA5570@ravnborg.org>
+In-Reply-To: <20200523165355.GA5570@ravnborg.org>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Mon, 25 May 2020 15:13:04 +0900
+Message-ID: <CAK7LNATwkmndM9yOV2=ytnGnSh5hS3dH3pdz-Yun00uFPa8j+Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: reuse vmlinux.o in vmlinux_link
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Sami Tolvanen <samitolvanen@google.com>, Kees Cook <keescook@chromium.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
 
-This may not be a practical problem, but the second pass of ARCH=i386
-modpost causes segmentation fault if the -s option is not passed.
+Hi Sam,
 
-    MODPOST 12 modules
-  Segmentation fault (core dumped)
-  make[2]: *** [scripts/Makefile.modpost:94: __modpost] Error 139
-  make[1]: *** [Makefile:1339: modules] Error 2
-  make[1]: *** Waiting for unfinished jobs....
+Thanks for the comments.
 
-The segmentation fault occurs when section_rel() is called for vmlinux,
-which is untested in regular builds. The cause of the problem is
-reloc_location() returns a wrong pointer for ET_EXEC object type.
-In this case, you need to subtract sechdr->sh_addr, otherwise it would
-get access beyond the mmap'ed memory.
+On Sun, May 24, 2020 at 1:54 AM Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> Hi Masahiro.
+>
+> On Sun, May 24, 2020 at 12:12:35AM +0900, Masahiro Yamada wrote:
+> > Hi Nicholas,
+> > (+CC: Sam Ravnborg)
+> >
+> >
+> > On Sat, May 23, 2020 at 7:06 PM Nicholas Piggin <npiggin@gmail.com> wrote:
+> > >
+> > > Excerpts from Masahiro Yamada's message of May 23, 2020 3:44 am:
+> > > > + Michael, and PPC ML.
+> > > >
+> > > > They may know something about the reason of failure.
+> > >
+> > > Because the linker can't put branch stubs within object code sections,
+> > > so when you incrementally link them too large, the linker can't resolve
+> > > branches into other object files.
+> >
+> >
+> > Ah, you are right.
+> >
+> > So, this is a problem not only for PPC
+> > but also for ARM (both 32 and 64 bit), etc.
+> >
+> > ARM needs to insert a veneer to jump far.
+> >
+> > Prior to thin archive, we could not compile
+> > ARCH=arm allyesconfig because
+> > drivers/built-in.o was too large.
+> >
+> > This patch gets us back to the too large
+> > incremental object situation.
+> >
+> > With my quick compile-testing,
+> > ARCH=arm allyesconfig
+> > and ARCH=arm64 allyesconfig are broken.
+> >
+> >
+> > > This is why we added incremental linking in the first place. I suppose
+> > > it could be made conditional for platforms that can use this
+> > > optimization.
+> > >
+> > > What'd be really nice is if we could somehow build and link kallsyms
+> > > without relinking everything twice, and if we could do section mismatch
+> > > analysis without making that vmlinux.o as well. I had a few ideas but
+> > > not enough time to do much work on it.
+> >
+> >
+> > Right, kallsyms links 3 times. (not twice)
+> >
+> >
+> > Hmm, I think Sami's main motivation is Clang LTO.
+> >
+> > LTO is very time-consuming.
+> > So, the android common kernel implements Clang LTO
+> > in the pre modpost stage:
+> >
+> >
+> > 1) LTO against vmlinux.o
+> >
+> > 2) modpost against vmlinux.o
+> >
+> > 3) Link vmlinux.o + kallsyms into vmlinux
+> >    (this requires linking 3 times)
+>
+> We have kallsyms we had to link three times because the linking
+> increased the object a little in size so symbols did not match.
+> The last time was added more or less only to check that we did
+> have stable symbol addresses.
 
-Add sym_get_data_offset() helper to avoid code duplication.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Usually vmlinux_link is invoked 3 times if CONFIG_KALLSYMS=y.
 
- scripts/mod/modpost.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+(kallsyms_step 1, kallsyms_step 2, and final vmlinux_link)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 34f2aa3a021f..a8306adb3554 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -345,19 +345,23 @@ static const char *sec_name(struct elf_info *elf, int secindex)
- 	return sech_name(elf, &elf->sechdrs[secindex]);
- }
- 
--static void *sym_get_data(const struct elf_info *info, const Elf_Sym *sym)
-+static void *sym_get_data_offset(const struct elf_info *info,
-+				 unsigned int secindex, unsigned long offset)
- {
--	unsigned int secindex = get_secindex(info, sym);
- 	Elf_Shdr *sechdr = &info->sechdrs[secindex];
--	unsigned long offset;
- 
--	offset = sym->st_value;
- 	if (info->hdr->e_type != ET_REL)
- 		offset -= sechdr->sh_addr;
- 
- 	return (void *)info->hdr + sechdr->sh_offset + offset;
- }
- 
-+static void *sym_get_data(const struct elf_info *info, const Elf_Sym *sym)
-+{
-+	return sym_get_data_offset(info, get_secindex(info, sym),
-+				   sym->st_value);
-+}
-+
- #define strstarts(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
- 
- static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
-@@ -1761,11 +1765,7 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
- static unsigned int *reloc_location(struct elf_info *elf,
- 				    Elf_Shdr *sechdr, Elf_Rela *r)
- {
--	Elf_Shdr *sechdrs = elf->sechdrs;
--	int section = sechdr->sh_info;
--
--	return (void *)elf->hdr + sechdrs[section].sh_offset +
--		r->r_offset;
-+	return sym_get_data_offset(elf, sechdr->sh_info, r->r_offset);
- }
- 
- static int addend_386_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
--- 
-2.25.1
+If the elf size does not match after kallsyms_step 2,
+kallsyms_step 3 is invoked.
+
+So, 4 times including the extra check pass.
+
+If CONFIG_DEBUG_INFO_BTF=y, vmlinux_link is invoked
+one more time.
+
+So, linked 5 times at most.
+
+
+
+>
+> All this predates LTO stuff which we only introduced later.
+>
+> The reason for doing modpost on vmlinux.o was that we had cases
+> where everything in drivers/ was fine but there was section mismatch
+> references from arch/* to drivers/*
+> This is back when there were much more drivers in arch/ than what we
+> have today.
+> And back then we also had much more to check ad we had cPU hotplug
+> that could really cause section mismatches - this is no longer the case
+> which is a good thing.
+>
+>
+>
+> ...
+> >
+> > The following two commits.
+> > I did not fully understand the background, though.
+> >
+> > I CC'ed Sam in case he may add some comments.
+> >
+> > commit 85bd2fddd68e757da8e1af98f857f61a3c9ce647
+> > Author: Sam Ravnborg <sam@ravnborg.org>
+> > Date:   Mon Feb 26 15:33:52 2007 +0100
+> >
+> >     kbuild: fix section mismatch check for vmlinux
+> >
+> >     vmlinux does not contain relocation entries which is
+> >     used by the section mismatch checks.
+> >     Reported by: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+> >
+> >     Use the individual objects as inputs to overcome
+> >     this limitation.
+> >     In modpost check the .o files and skip non-ELF files.
+> >
+> >     Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+>
+>
+> So we checked vmlinx - but vmlinx did have too much stripped away.
+> so in reality nothing was checked.
+> To allow the warnings to be as precise as possible move the checks
+> out to the indovidual .o files.
+> Sometimes the names was mangled a little so if warnigns was only
+> reported on vmlinx level in could be difficult to track down the
+> offender.
+> This would then also do the check on .o files that had all the
+> relocation symbols rtequired.
+>
+> >
+> > commit 741f98fe298a73c9d47ed53703c1279a29718581
+> > Author: Sam Ravnborg <sam@ravnborg.org>
+> > Date:   Tue Jul 17 10:54:06 2007 +0200
+> >
+> >     kbuild: do section mismatch check on full vmlinux
+> >
+> >     Previously we did do the check on the .o files used to link
+> >     vmlinux but that failed to find questionable references across
+> >     the .o files.
+> >     Create a dedicated vmlinux.o file used only for section mismatch checks
+> >     that uses the defualt linker script so section does not get renamed.
+> >
+> >     The vmlinux.o may later be used as part of the the final link of vmlinux
+> >     but for now it is used fo section mismatch only.
+> >     For a defconfig build this is instant but for an allyesconfig this
+> >     add two minutes to a full build (that anyways takes ~2 hours).
+> >
+> >     Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+>
+> But when we introduced check of the individual .o fiules we missed when
+> the references spanned outside the .o files as explained previously.
+> So included a link of vmlinx.o that did NOT drop the relocations
+> so we could use it to check for the remaining section mismatch warnings.
+>
+> Remember - back when we started this we had many hundred warnings
+> and it was a fight to keep that number low.
+> But we also wanted to report as much as possible.
+>
+> There was back then several discussions if this was really worth the
+> effort. How much was gained from discarding the memory where the
+> section mismatch warnigns was triggered.
+> In other words - how about just keeping the init code in memory so there
+> were no illegal references anymore.
+> That is something that is maybe worth to consiuder again as we have even
+> less memory we save by throwing away the init code.
+> But I think this is a topic for another mail thread.
+
+
+I am not sure if we want to go as far as stop doing __init.
+I want to reuse memory after initialization.
+
+Anyway, the section mismatch checks highly rely on
+REL or RELA.
+
+The REL(A) sections do not exist in the final vmlinux,
+or is useless at least. So, it does not work for most of
+architectures.
+
+If we use individual .o files, modpost cannot check
+function calls to a different object file.
+
+So, the conclusion is we definitely need vmlinux.o for section
+mismatch checks.
+
+
+
+
+--
+Best Regards
+Masahiro Yamada
