@@ -1,64 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:61556 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731745AbgEZK3i (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:59901 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388460AbgEZKaY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 May 2020 06:29:38 -0400
+        Tue, 26 May 2020 06:30:24 -0400
 MIME-Version: 1.0
-References: <20200521043117.242585-1-masahiroy@kernel.org>
-In-Reply-To: <20200521043117.242585-1-masahiroy@kernel.org>
+References: <20200522020002.504506-1-masahiroy@kernel.org>
+In-Reply-To: <20200522020002.504506-1-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 26 May 2020 19:28:32 +0900
-Message-ID: <CAK7LNAT6p5kj5BWvF8M+7LFyOM0dxUe1w9DL5SzY65ZNraWutQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: doc: remove documentation about copying
- Module.symvers around
+Date: Tue, 26 May 2020 19:29:25 +0900
+Message-ID: <CAK7LNARuxFq5NVR5xuD0vEVarQ8te-p1ZEj5990x7Wd3DesTjg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: remove ifdef builtin-target / lib-target
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Jessica Yu <jeyu@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <michal.lkml@markovi.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, May 21, 2020 at 1:31 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Fri, May 22, 2020 at 11:00 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> This is a left-over of commit 39808e451fdf ("kbuild: do not read
-> $(KBUILD_EXTMOD)/Module.symvers").
->
-> Kbuild no longer supports this way.
+> I do not see a good reason to add ifdef here.
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
->
+
 
 Applied to linux-kbuild.
 
 
 
->  Documentation/kbuild/modules.rst | 12 ------------
->  1 file changed, 12 deletions(-)
+>  scripts/Makefile.build | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
 >
-> diff --git a/Documentation/kbuild/modules.rst b/Documentation/kbuild/modules.rst
-> index e0b45a257f21..a45cccff467d 100644
-> --- a/Documentation/kbuild/modules.rst
-> +++ b/Documentation/kbuild/modules.rst
-> @@ -528,18 +528,6 @@ build.
->                 will then do the expected and compile both modules with
->                 full knowledge of symbols from either module.
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 3665b1a0bc8e..9af88f4cacb8 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -384,16 +384,14 @@ $(obj)/%/built-in.a: $(obj)/% ;
+>  #
+>  # Rule to compile a set of .o files into one .a file (without symbol table)
+>  #
+> -ifdef builtin-target
 >
-> -       Use an extra Module.symvers file
-> -               When an external module is built, a Module.symvers file
-> -               is generated containing all exported symbols which are
-> -               not defined in the kernel. To get access to symbols
-> -               from bar.ko, copy the Module.symvers file from the
-> -               compilation of bar.ko to the directory where foo.ko is
-> -               built. During the module build, kbuild will read the
-> -               Module.symvers file in the directory of the external
-> -               module, and when the build is finished, a new
-> -               Module.symvers file is created containing the sum of
-> -               all symbols defined and not part of the kernel.
+>  quiet_cmd_ar_builtin = AR      $@
+>        cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+>
+> -$(builtin-target): $(real-obj-y) FORCE
+> +$(obj)/built-in.a: $(real-obj-y) FORCE
+>         $(call if_changed,ar_builtin)
+>
+>  targets += $(builtin-target)
+> -endif # builtin-target
+>
+>  #
+>  # Rule to create modules.order file
+> @@ -408,15 +406,11 @@ $(modorder-target): $(subdir-ym) FORCE
+>  #
+>  # Rule to compile a set of .o files into one .a file (with symbol table)
+>  #
+> -ifdef lib-target
 > -
->         Use "make" variable KBUILD_EXTRA_SYMBOLS
->                 If it is impractical to add a top-level kbuild file,
->                 you can assign a space separated list
+> -$(lib-target): $(lib-y) FORCE
+> +$(obj)/lib.a: $(lib-y) FORCE
+>         $(call if_changed,ar)
+>
+>  targets += $(lib-target)
+>
+> -endif
+> -
+>  # NOTE:
+>  # Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
+>  # module is turned into a multi object module, $^ will contain header file
 > --
 > 2.25.1
 >
