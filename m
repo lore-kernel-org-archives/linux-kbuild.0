@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33076 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730065AbgE0NRD (ORCPT
+        with ESMTP id S2389102AbgE0N6f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 May 2020 09:17:03 -0400
-Date: Wed, 27 May 2020 22:09:40 +0900
+        Wed, 27 May 2020 09:58:35 -0400
+Date: Wed, 27 May 2020 22:58:33 +0900
 From: "Mrs.Judith Rice" <hamurafujimi@tmail.plala.or.jp>
 Reply-To: jonesevansje@gmail.com
-Message-ID: <20200527220940.C5BT6.807.root@mwebp13>
+Message-ID: <20200527225834.AOWGS.1026.root@mwebp13>
 Subject: Spende
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-2022-jp
