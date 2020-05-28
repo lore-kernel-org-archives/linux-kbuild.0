@@ -1,43 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405041AbgE1Rei (ORCPT
+Received: from mail.bnv.gob.ve ([201.249.200.115]:48048 "EHLO
+        correo.bnv.gob.ve" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2437326AbgE1WuX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 May 2020 13:34:38 -0400
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH -next] kbuild: modpost: fix a message typo
-Message-ID: <085ad1e6-f9a1-06ee-c8f1-7ac6b6ae8552@infradead.org>
-Date: Thu, 28 May 2020 10:34:34 -0700
+        Thu, 28 May 2020 18:50:23 -0400
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Spende von 2.000.000,00 Euro
+From: "manuel franco" <manuel@info.com>
+Date: Thu, 28 May 2020 18:29:52 +0200
+Reply-To: manuelfrancospende11@gmail.com
+Message-Id: <20200528163007.06CA438E0A1F@correo.bnv.gob.ve>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Recipients <manuel@info.com>
 
-From: Randy Dunlap <rdunlap@infradead.org>
-
-Fix typo/spello:
-
-WARNING: modpost: Symbol dump file is missing. Modules may not have dependencies or movversions.
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
----
- scripts/mod/modpost.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- linux-next-20200528.orig/scripts/mod/modpost.c
-+++ linux-next-20200528/scripts/mod/modpost.c
-@@ -2600,7 +2600,7 @@ int main(int argc, char **argv)
- 		read_symbols_from_files(files_source);
- 
- 	if (missing_dump_file)
--		warn("Symbol dump file is missing. Modules may not have dependencies or movversions.\n");
-+		warn("Symbol dump file is missing. Modules may not have dependencies or modversions.\n");
- 
- 	/*
- 	 * When there's no vmlinux, don't print warnings about
+Ich bin Manuel Franco, ich spende Ihnen 2.000.000,00 Euro. Nehmen Sie jetzt Kontakt mit mir auf, damit wir fortfahren können.
