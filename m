@@ -1,54 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:20673 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726008AbgEaSRx (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:29407 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726008AbgEaSb4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 31 May 2020 14:17:53 -0400
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 04VIHa98020285
-        for <linux-kbuild@vger.kernel.org>; Mon, 1 Jun 2020 03:17:37 +0900
-Received: by mail-vs1-f45.google.com with SMTP id q2so148342vsr.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 31 May 2020 11:17:37 -0700 (PDT)
+        Sun, 31 May 2020 14:31:56 -0400
 MIME-Version: 1.0
-References: <288d045f9429fc4cfd9ffb244e1be2f8@talpidae.net>
-In-Reply-To: <288d045f9429fc4cfd9ffb244e1be2f8@talpidae.net>
+References: <20200524154235.380482-1-masahiroy@kernel.org> <20200524154235.380482-10-masahiroy@kernel.org>
+In-Reply-To: <20200524154235.380482-10-masahiroy@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 1 Jun 2020 03:16:59 +0900
-Message-ID: <CAK7LNARx2dcjedkN8cBq0veh6H1cVG6yyGq=Vf6xr2Bd_aHuRA@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: allow modules_install if CONFIG_MODULES=n
+Date: Mon, 1 Jun 2020 03:31:05 +0900
+Message-ID: <CAK7LNARYdPsu9feYR4N+rvNhn2J73jf5VwcV7U5Pi=jFzePddw@mail.gmail.com>
+Subject: Re: [PATCH v2 09/29] kbuild: disallow multi-word in M= or KBUILD_EXTMOD
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonas Zeiger <jonas.zeiger@talpidae.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, May 28, 2020 at 1:44 PM Jonas Zeiger <jonas.zeiger@talpidae.net> wrote:
+On Mon, May 25, 2020 at 12:43 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Many applications check for available kernel features via:
+> $(firstword ...) in scripts/Makefile.modpost was added by commit
+> 3f3fd3c05585 ("[PATCH] kbuild: allow multi-word $M in Makefile.modpost")
+> to build multiple external module directories.
 >
->   * /proc/modules (loaded modules, present if CONFIG_MODULES=y)
->   * $(MODLIB)/modules.builtin (builtin modules)
+> It was a solution to resolve symbol dependencies when an external
+> module depends on another external module.
 >
-> They fail to detect features if the kernel was built with
-> CONFIG_MODULES=n
-> and modules.builtin isn't installed.
+> Commit 0d96fb20b7ed ("kbuild: Add new Kbuild variable
+> KBUILD_EXTRA_SYMBOLS") introduced another solution by passing symbol
+> info via KBUILD_EXTRA_SYMBOLS, then broke the multi-word M= support.
 >
-> Therefore, allow the Makefile's modules_install target to be used
-> always.
+>   include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+>                $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
 >
-> Tested Makefile targets with different CONFIG_MODULES states:
+> ... does not work if KBUILD_EXTMOD contains multiple words.
 >
->   * (CONFIG_MODULES=n) modules_install: install modules.builtin etc.
->   * (CONFIG_MODULES=y) modules_install: produce same result as before
->   * (CONFIG_MODULES=y) modules_install: still fail if no modules.order
->   * (CONFIG_MODULES=y) modules: build modules, as before
->   * (CONFIG_MODULES=n) modules: still fail and warn
+> This feature has been broken for more than a decade. Remove the
+> bitrotten code, and stop parsing if M or KBUILD_EXTMOD contains
+> multiple words.
 >
-> Signed-off-by: Jonas Zeiger <jonas.zeiger@talpidae.net>
+> As Documentation/kbuild/modules.rst explains, if your module depends
+> on another one, there are two solutions:
+>   - add a common top-level Kbuild file
+>   - use KBUILD_EXTRA_SYMBOLS
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+This patch, applied to linux-kbuild.
 
 
-Maybe, module.builtin and module.builtin.modinfo should be
-installed by 'make install' because they are byproducts of vmlinux.
+
+> ---
+>
+> Changes in v2:
+>   - Add more commit log
+>
+>  Makefile                 | 3 +++
+>  scripts/Makefile.modpost | 2 +-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 72eb55a36545..48a2dfaf3bf3 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -218,6 +218,9 @@ ifeq ("$(origin M)", "command line")
+>    KBUILD_EXTMOD := $(M)
+>  endif
+>
+> +$(if $(word 2, $(KBUILD_EXTMOD)), \
+> +       $(error building multiple external modules is not supported))
+> +
+>  export KBUILD_CHECKSRC KBUILD_EXTMOD
+>
+>  extmod-prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 957eed6a17a5..b79bf0e30d32 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -44,7 +44,7 @@ include include/config/auto.conf
+>  include scripts/Kbuild.include
+>
+>  kernelsymfile := $(objtree)/Module.symvers
+> -modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
+> +modulesymfile := $(KBUILD_EXTMOD)/Module.symvers
+>
+>  MODPOST = scripts/mod/modpost                                                          \
+>         $(if $(CONFIG_MODVERSIONS),-m)                                                  \
+> --
+> 2.25.1
+>
 
 
 -- 
