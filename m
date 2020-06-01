@@ -1,98 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40551 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726117AbgFAF6k (ORCPT
+Received: from hs-162.6.buanalintas.co.id ([223.165.6.162]:60668 "EHLO
+        mx.bestprofit-futures.co.id" rhost-flags-OK-FAIL-OK-OK)
+        by vger.kernel.org with ESMTP id S1726186AbgFAGyh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Jun 2020 01:58:40 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 07/37] modpost: fix -i (--ignore-errors) MAKEFLAGS detection
-Date: Mon,  1 Jun 2020 14:57:01 +0900
-Message-Id: <20200601055731.3006266-7-masahiroy@kernel.org>
-In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
-References: <20200601055731.3006266-1-masahiroy@kernel.org>
+        Mon, 1 Jun 2020 02:54:37 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: =?utf-8?q?Wohlt=C3=A4tigkeitsspende_von_2=2E000=2E000_Millionen_Euro?=
+From: ''Tayeb Souami'' <yoshi@bestprofit-futures.co.id>
+Date: Mon, 01 Jun 2020 03:18:24 +0200
+Reply-To: Tayebsouam.spende@gmail.com
+Message-Id: <20200601011833.C81AE524AF4@mx.bestprofit-futures.co.id>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Guenter Roeck <linux@roeck-us.net>
+To: Recipients <yoshi@bestprofit-futures.co.id>
 
-$(filter -i,$(MAKEFLAGS)) works only for some cases.
+Lieber Freund,
 
-The representation of $(MAKEFLAGS) depends on various factors:
-  - GNU Make version (version 3.8x or version 4.x)
-  - The context where $(MAKEFLAGS) is expanded (parse stage or recipe)
-  - The presence of other flags like -j
+Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der =
+Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zu=
+f=C3=A4llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Ma=
+il nach einem Spinball ausgew=C3=A4hlt.Ich habe den gr=C3=B6=C3=9Ften Teil =
+meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=A4tigkeitsorganisationen =
+und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die =
+Summe von =E2=82=AC 2.000.000,00 an Sie als eine der ausgew=C3=A4hlten 5 zu=
+ spenden, um meine Gewinne zu =C3=BCberpr=C3=BCfen, sehen Sie bitte meine Y=
+ou Tube Seite unten.
 
-In my experiments, $(MAKEFLAGS) is expanded as follows:
+UHR MICH HIER: https://www.youtube.com/watch?v=3DZ6ui8ZDQ6Ks
 
-  * GNU Make 3.8x:
-    * without -j option:
-      --no-print-directory -Rri
-    * with -j option
-      * parse stage
-        --no-print-directory -Rri
-      * recipe line
-        --no-print-directory -Rr --jobserver-fds=3,4 -j -i
-  * GNU Make 4.x:
-    * without -j option
-      irR --no-print-directory
-    * with -j option
-      * parse stage
-        irR --no-print-directory
-      * recipe line
-        irR -j --jobserver-fds=3,4 --no-print-directory
 
-If you use GNU Make 4.x, the flags are grouped together like 'irR',
-which does not work.
+Das ist dein Spendencode: [TS530342018]
 
-For the single thread build with GNU Make 3.8x, the flags are grouped
-like '-Rri', which does not work either.
 
-To make it work for all cases, do likewise as commit 6f0fa58e4596
-("kbuild: simplify silent build (-s) detection").
+Antworten Sie mit dem SPENDE-CODE an diese
 
-BTW, since commit ff9b45c55b26 ("kbuild: modpost: read modules.order
-instead of $(MODVERDIR)/*.mod"), you also need to pass -k option to
-build final *.ko files. 'make -i -k' ignores compile errors in modules,
-and build as many remaining *.ko as possible.
+ E-Mail:Tayebsouam.spende@gmail.com
 
-Please note this feature is kind of dangerous because a module may
-depend on another module. If the prerequisite module fails to build,
-other modules may lack the correct module dependency or CRC.
-Honestly, I am not a big fan of it, but I am keeping this feature.
+Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
 
-Fixes: eed380f3f593 ("modpost: Optionally ignore secondary errors seen if a single module build fails")
-Cc: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/Makefile.modpost | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index b79bf0e30d32..451bbd16c3cd 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -66,7 +66,7 @@ __modpost:
- 
- else
- 
--MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T - \
-+MODPOST += -s -T - \
- 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
- 
- ifeq ($(KBUILD_EXTMOD),)
-@@ -82,6 +82,10 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
-              $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
- endif
- 
-+ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
-+MODPOST += -n
-+endif
-+
- # find all modules listed in modules.order
- modules := $(sort $(shell cat $(MODORDER)))
- 
--- 
-2.25.1
+Gr=C3=BC=C3=9Fe
+Herr Tayeb Souami
