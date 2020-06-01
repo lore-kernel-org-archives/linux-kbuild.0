@@ -1,45 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hs-162.6.buanalintas.co.id ([223.165.6.162]:60668 "EHLO
-        mx.bestprofit-futures.co.id" rhost-flags-OK-FAIL-OK-OK)
-        by vger.kernel.org with ESMTP id S1726186AbgFAGyh (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:36892 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725925AbgFALCc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Jun 2020 02:54:37 -0400
-Content-Type: text/plain; charset="utf-8"
+        Mon, 1 Jun 2020 07:02:32 -0400
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 051B1vMN023247
+        for <linux-kbuild@vger.kernel.org>; Mon, 1 Jun 2020 20:01:57 +0900
+Received: by mail-ua1-f41.google.com with SMTP id w20so3184238uaa.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 01 Jun 2020 04:01:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: =?utf-8?q?Wohlt=C3=A4tigkeitsspende_von_2=2E000=2E000_Millionen_Euro?=
-From: ''Tayeb Souami'' <yoshi@bestprofit-futures.co.id>
-Date: Mon, 01 Jun 2020 03:18:24 +0200
-Reply-To: Tayebsouam.spende@gmail.com
-Message-Id: <20200601011833.C81AE524AF4@mx.bestprofit-futures.co.id>
+References: <1590920904-60002-1-git-send-email-alios_sys_security@linux.alibaba.com>
+In-Reply-To: <1590920904-60002-1-git-send-email-alios_sys_security@linux.alibaba.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Mon, 1 Jun 2020 20:01:19 +0900
+Message-ID: <CAK7LNAS290zRibWqbu1AxQ1W9afPR21OYSia+xkqwoot9zRd2w@mail.gmail.com>
+Subject: Re: [PATCH] mksysmap: Fix the mismatch of '.L' symbols in System.map
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <yoshi@bestprofit-futures.co.id>
+To: AliOS system security <alios_sys_security@linux.alibaba.com>
+Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Lieber Freund,
+On Sun, May 31, 2020 at 7:28 PM AliOS system security
+<alios_sys_security@linux.alibaba.com> wrote:
+>
+> When System.map was generated, the kernel used mksysmap to filter the
+> kernel symbols, but all the symbols with the second letter 'L' in the
+> kernel were filtered out, not just the symbols starting with 'dot + L'.
+>
+> For example:
+> ashimida@ubuntu:~/linux$ cat System.map |grep ' .L'
+> ashimida@ubuntu:~/linux$ nm -n vmlinux |grep ' .L'
+> ffff0000088028e0 t bLength_show
+> ......
+> ffff0000092e0408 b PLLP_OUTC_lock
+> ffff0000092e0410 b PLLP_OUTA_lock
+>
+> I see that in the original patch[1], the original intent should be to
+> filter all local symbols starting with '.L', so I wonder if the code
+> here may add a '\' before '.L'?
 
-Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der =
-Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zu=
-f=C3=A4llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Ma=
-il nach einem Spinball ausgew=C3=A4hlt.Ich habe den gr=C3=B6=C3=9Ften Teil =
-meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=A4tigkeitsorganisationen =
-und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die =
-Summe von =E2=82=AC 2.000.000,00 an Sie als eine der ausgew=C3=A4hlten 5 zu=
- spenden, um meine Gewinne zu =C3=BCberpr=C3=BCfen, sehen Sie bitte meine Y=
-ou Tube Seite unten.
 
-UHR MICH HIER: https://www.youtube.com/watch?v=3DZ6ui8ZDQ6Ks
+You are right, but please avoid the interrogatory sentence.
+
+Shall I reword as follows?
 
 
-Das ist dein Spendencode: [TS530342018]
+The original intent should be to filter out all local symbols
+starting with '.L', so the dot should be escaped.
 
 
-Antworten Sie mit dem SPENDE-CODE an diese
 
- E-Mail:Tayebsouam.spende@gmail.com
 
-Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
 
-Gr=C3=BC=C3=9Fe
-Herr Tayeb Souami
+>
+> [1]. mksysmap: Add h8300 local symbol pattern
+>
+> Signed-off-by: AliOS system security <alios_sys_security@linux.alibaba.com>
+> ---
+>  scripts/mksysmap | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/mksysmap b/scripts/mksysmap
+> index a35acc0..9aa23d1 100755
+> --- a/scripts/mksysmap
+> +++ b/scripts/mksysmap
+> @@ -41,4 +41,4 @@
+>  # so we just ignore them to let readprofile continue to work.
+>  # (At least sparc64 has __crc_ in the middle).
+>
+> -$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( .L\)' > $2
+> +$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $2
+> --
+> 2.7.4
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
