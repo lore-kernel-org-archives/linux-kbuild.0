@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40000 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40004 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726322AbgFAF6V (ORCPT
+        with ESMTP id S1726825AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 33/37] modpost: remove mod->skip struct member
-Date: Mon,  1 Jun 2020 14:57:27 +0900
-Message-Id: <20200601055731.3006266-33-masahiroy@kernel.org>
+Subject: [PATCH 22/37] modpost: do not call get_modinfo() for vmlinux(.o)
+Date: Mon,  1 Jun 2020 14:57:16 +0900
+Message-Id: <20200601055731.3006266-22-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,78 +17,83 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-The meaning of 'skip' is obscure since it does not explain
-"what to skip".
+The three calls of get_modinfo() ("license", "import_ns", "version")
+always return NULL for vmlinux(.o) because the built-in module info is
+prefixed with __MODULE_INFO_PREFIX.
 
-mod->skip is set when it is vmlinux or the module info came from
-a dump file.
-
-So, mod->skip is equivalent to (mod->is_vmlinux || mod->from_dump).
-
-For the check in write_namespace_deps_files(), mod->is_vmlinux is
-unneeded because the -d option is not passed in the first pass of
-modpost.
+It is harmless to call get_modinfo(), but there is no point to search
+for what apparently does not exist.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 9 +++------
- scripts/mod/modpost.h | 1 -
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ scripts/mod/modpost.c | 45 +++++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 167700a7b80f..925c1a1856aa 100644
+index fbb3d3391e52..a5da633af700 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2012,10 +2012,8 @@ static void read_symbols(const char *modname)
+@@ -2006,25 +2006,26 @@ static void read_symbols(const char *modname)
+ 		mod->skip = 1;
+ 	}
  
- 	mod = new_module(modname);
- 
--	if (mod->is_vmlinux) {
-+	if (mod->is_vmlinux)
- 		have_vmlinux = 1;
--		mod->skip = 1;
+-	license = get_modinfo(&info, "license");
+-	if (!license && !is_vmlinux(modname))
+-		warn("missing MODULE_LICENSE() in %s\n"
+-		     "see include/linux/module.h for "
+-		     "more information\n", modname);
+-	while (license) {
+-		if (license_is_gpl_compatible(license))
+-			mod->gpl_compatible = 1;
+-		else {
+-			mod->gpl_compatible = 0;
+-			break;
++	if (!is_vmlinux(modname)) {
++		license = get_modinfo(&info, "license");
++		if (!license)
++			warn("missing MODULE_LICENSE() in %s\n", modname);
++		while (license) {
++			if (license_is_gpl_compatible(license))
++				mod->gpl_compatible = 1;
++			else {
++				mod->gpl_compatible = 0;
++				break;
++			}
++			license = get_next_modinfo(&info, "license", license);
+ 		}
+-		license = get_next_modinfo(&info, "license", license);
 -	}
  
- 	if (!mod->is_vmlinux) {
- 		license = get_modinfo(&info, "license");
-@@ -2474,7 +2472,6 @@ static void read_dump(const char *fname)
- 			mod = new_module(modname);
- 			if (mod->is_vmlinux)
- 				have_vmlinux = 1;
--			mod->skip = 1;
- 			mod->from_dump = 1;
- 		}
- 		s = sym_add_exported(symname, mod, export_no(export));
-@@ -2535,7 +2532,7 @@ static void write_namespace_deps_files(const char *fname)
+-	namespace = get_modinfo(&info, "import_ns");
+-	while (namespace) {
+-		add_namespace(&mod->imported_namespaces, namespace);
+-		namespace = get_next_modinfo(&info, "import_ns", namespace);
++		namespace = get_modinfo(&info, "import_ns");
++		while (namespace) {
++			add_namespace(&mod->imported_namespaces, namespace);
++			namespace = get_next_modinfo(&info, "import_ns",
++						     namespace);
++		}
+ 	}
  
- 	for (mod = modules; mod; mod = mod->next) {
+ 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+@@ -2065,10 +2066,12 @@ static void read_symbols(const char *modname)
+ 	if (!is_vmlinux(modname) || vmlinux_section_warnings)
+ 		check_sec_ref(mod, modname, &info);
  
--		if (mod->skip || !mod->missing_namespaces)
-+		if (mod->from_dump || !mod->missing_namespaces)
- 			continue;
+-	version = get_modinfo(&info, "version");
+-	if (version || (all_versions && !is_vmlinux(modname)))
+-		get_src_version(modname, mod->srcversion,
+-				sizeof(mod->srcversion)-1);
++	if (!is_vmlinux(modname)) {
++		version = get_modinfo(&info, "version");
++		if (version || all_versions)
++			get_src_version(modname, mod->srcversion,
++					sizeof(mod->srcversion) - 1);
++	}
  
- 		buf_printf(&ns_deps_buf, "%s.ko:", mod->name);
-@@ -2637,7 +2634,7 @@ int main(int argc, char **argv)
- 	for (mod = modules; mod; mod = mod->next) {
- 		char fname[PATH_MAX];
+ 	parse_elf_finish(&info);
  
--		if (mod->skip)
-+		if (mod->is_vmlinux || mod->from_dump)
- 			continue;
- 
- 		buf.pos = 0;
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index ec717ab20b98..264c0c51defa 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -122,7 +122,6 @@ struct module {
- 	int from_dump;  /* 1 if module was loaded from *.symver */
- 	int is_vmlinux;
- 	int seen;
--	int skip;
- 	int has_init;
- 	int has_cleanup;
- 	struct buffer dev_table_buf;
 -- 
 2.25.1
