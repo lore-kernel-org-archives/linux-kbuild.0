@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40028 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40008 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727776AbgFAF6V (ORCPT
+        with ESMTP id S1727063AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 24/37] modpost: fix potential mmap'ed file overrun in get_src_version()
-Date: Mon,  1 Jun 2020 14:57:18 +0900
-Message-Id: <20200601055731.3006266-24-masahiroy@kernel.org>
+Subject: [PATCH 18/37] modpost: invoke modpost only when input files are updated
+Date: Mon,  1 Jun 2020 14:57:12 +0900
+Message-Id: <20200601055731.3006266-18-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,102 +17,122 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-I do not know how reliably this function works, but it looks dangerous
-to me.
+Currently, the second pass of modpost is always invoked when you run
+'make' or 'make modules' even if none of modules is changed.
 
-    strchr(sources, '\n');
-
-... continues searching until it finds '\n' or it reaches the '\0'
-terminator. In other words, 'sources' should be a null-terminated
-string.
-
-However, grab_file() just mmaps a file, so 'sources' is not terminated
-with null byte. If the file does not contain '\n' at all, strchr() will
-go beyond the mmap'ed memory.
-
-Use read_text_file(), which loads the file content into a malloc'ed
-buffer, appending null byte.
-
-Here we are interested only in the first line of *.mod files. Use
-get_line() helper to get the first line.
-
-This also makes missing *.mod file a fatal error.
-
-Commit 4be40e22233c ("kbuild: do not emit src version warning for
-non-modules") ignored missing *.mod files.
-
-I do not fully understand what that commit addressed, but commit
-91341d4b2c19 ("kbuild: introduce new option to enhance section mismatch
-analysis") introduced partial section checks by using modpost. built-in.o
-was parsed by modpost. Even modules had a problem because *.mod files
-were created after the modpost check.
-
-Commit b7dca6dd1e59 ("kbuild: create *.mod with full directory path and
-remove MODVERDIR") stopped doing that. Now that modpost is only invoked
-after the directory descend, *.mod files should always exist at the
-modpost stage.
+Use if_changed to invoke it only when it is necessary.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/sumversion.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
+ scripts/Makefile.modpost | 20 ++++++++++++++++----
+ scripts/mod/modpost.c    | 32 +++++++++++++++++++++-----------
+ 2 files changed, 37 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index f27f22420cbc..5fb142db6195 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -392,40 +392,34 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- /* Calc and record src checksum. */
- void get_src_version(const char *modname, char sum[], unsigned sumlen)
- {
--	void *file;
--	unsigned long len;
-+	char *buf, *pos, *firstline;
- 	struct md4_ctx md;
--	char *sources, *end, *fname;
-+	char *fname;
- 	char filelist[PATH_MAX + 1];
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 6db692a5d547..7d564a39f938 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -90,20 +90,25 @@ endif
  
- 	/* objects for a module are listed in the first line of *.mod file. */
- 	snprintf(filelist, sizeof(filelist), "%.*smod",
- 		 (int)strlen(modname) - 1, modname);
+ # modpost options for modules (both in-kernel and external)
+ MODPOST += \
+-	$(addprefix -i ,$(input-symdump)) \
++	$(addprefix -i ,$(wildcard $(input-symdump))) \
+ 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N)
  
--	file = grab_file(filelist, &len);
--	if (!file)
--		/* not a module or .mod file missing - ignore */
--		return;
-+	buf = read_text_file(filelist);
+ ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
+ MODPOST += -n
+ endif
  
--	sources = file;
--
--	end = strchr(sources, '\n');
--	if (!end) {
-+	pos = buf;
-+	firstline = get_line(&pos);
-+	if (!firstline) {
- 		warn("bad ending versions file for %s\n", modname);
--		goto release;
-+		goto free;
++$(input-symdump):
++	@:
++
+ # Read out modules.order to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
+ quiet_cmd_modpost = MODPOST $@
+-      cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) -T -
++      cmd_modpost = sed 's/ko$$/o/' $< | $(MODPOST) -T -
+ 
+-$(output-symdump): FORCE
+-	$(call cmd,modpost)
++$(output-symdump): $(MODORDER) $(input-symdump) FORCE
++	$(call if_changed,modpost)
++
++targets += $(output-symdump)
+ 
+ __modpost: $(output-symdump)
+ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+@@ -113,6 +118,13 @@ endif
+ PHONY += FORCE
+ FORCE:
+ 
++existing-targets := $(wildcard $(sort $(targets)))
++
++-include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
++
++PHONY += FORCE
++FORCE:
++
+ endif
+ 
+ .PHONY: $(PHONY)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4a2f27d97bf1..b839c48689df 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2375,6 +2375,25 @@ static void add_srcversion(struct buffer *b, struct module *mod)
  	}
--	*end = '\0';
- 
- 	md4_init(&md);
--	while ((fname = strsep(&sources, " ")) != NULL) {
-+	while ((fname = strsep(&firstline, " "))) {
- 		if (!*fname)
- 			continue;
- 		if (!(is_static_library(fname)) &&
- 				!parse_source_files(fname, &md))
--			goto release;
-+			goto free;
- 	}
- 
- 	md4_final_ascii(&md, sum, sumlen);
--release:
--	release_file(file, len);
-+free:
-+	free(buf);
  }
+ 
++static void write_buf(struct buffer *b, const char *fname)
++{
++	FILE *file;
++
++	file = fopen(fname, "w");
++	if (!file) {
++		perror(fname);
++		exit(1);
++	}
++	if (fwrite(b->p, 1, b->pos, file) != b->pos) {
++		perror(fname);
++		exit(1);
++	}
++	if (fclose(file) != 0) {
++		perror(fname);
++		exit(1);
++	}
++}
++
+ static void write_if_changed(struct buffer *b, const char *fname)
+ {
+ 	char *tmp;
+@@ -2407,16 +2426,7 @@ static void write_if_changed(struct buffer *b, const char *fname)
+  close_write:
+ 	fclose(file);
+  write:
+-	file = fopen(fname, "w");
+-	if (!file) {
+-		perror(fname);
+-		exit(1);
+-	}
+-	if (fwrite(b->p, 1, b->pos, file) != b->pos) {
+-		perror(fname);
+-		exit(1);
+-	}
+-	fclose(file);
++	write_buf(b, fname);
+ }
+ 
+ /* parse Module.symvers file. line format:
+@@ -2508,7 +2518,7 @@ static void write_dump(const char *fname)
+ 			symbol = symbol->next;
+ 		}
+ 	}
+-	write_if_changed(&buf, fname);
++	write_buf(&buf, fname);
+ 	free(buf.p);
+ }
+ 
 -- 
 2.25.1
