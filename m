@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:39999 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40026 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726265AbgFAF6V (ORCPT
+        with ESMTP id S1727121AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 26/37] modpost: use read_text_file() and get_line() for reading text files
-Date: Mon,  1 Jun 2020 14:57:20 +0900
-Message-Id: <20200601055731.3006266-26-masahiroy@kernel.org>
+Subject: [PATCH 36/37] modpost: remove is_vmlinux() helper
+Date: Mon,  1 Jun 2020 14:57:30 +0900
+Message-Id: <20200601055731.3006266-36-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,105 +17,54 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-grab_file() mmaps a file, but it is not so efficient here because
-get_next_line() copies every line to the temporary buffer anyway.
+Now that is_vmlinux() is called only in new_module(), we can inline
+the function call.
 
-read_text_file() and get_line() are simpler. get_line() exploits the
-library function strchr().
+modname is the basename with '.o' is stripped. No need to compare it
+with 'vmlinux.o'.
 
-Going forward, the missing *.symvers or *.cmd is a fatal error.
-This should not happen because scripts/Makefile.modpost guards the
--i option files with $(wildcard $(input-symdump)).
+vmlinux is always located at the current working directory. No need
+to strip the directory path.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c    | 15 ++++++++-------
- scripts/mod/sumversion.c | 16 ++++++----------
- 2 files changed, 14 insertions(+), 17 deletions(-)
+ scripts/mod/modpost.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 0a844902998e..4fdf992e9729 100644
+index ebfa9b76ba92..a3ffabf4eca5 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2481,15 +2481,16 @@ static void write_if_changed(struct buffer *b, const char *fname)
-  **/
- static void read_dump(const char *fname)
- {
--	unsigned long size, pos = 0;
--	void *file = grab_file(fname, &size);
--	char *line;
-+	char *buf, *pos, *line;
- 
--	if (!file)
-+	buf = read_text_file(fname);
-+	if (!buf)
- 		/* No symbol versions, silently ignore */
- 		return;
- 
--	while ((line = get_next_line(&pos, file, size))) {
-+	pos = buf;
-+
-+	while ((line = get_line(&pos))) {
- 		char *symname, *namespace, *modname, *d, *export;
- 		unsigned int crc;
- 		struct module *mod;
-@@ -2524,10 +2525,10 @@ static void read_dump(const char *fname)
- 		sym_set_crc(symname, crc);
- 		sym_update_namespace(symname, namespace);
- 	}
--	release_file(file, size);
-+	free(buf);
- 	return;
- fail:
--	release_file(file, size);
-+	free(buf);
- 	fatal("parse error in symbol dump file\n");
+@@ -88,20 +88,6 @@ static inline bool strends(const char *str, const char *postfix)
+ 	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
  }
  
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 9f77c9dfce20..d587f40f1117 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -303,9 +303,8 @@ static int is_static_library(const char *objfile)
-  * to figure out source files. */
- static int parse_source_files(const char *objfile, struct md4_ctx *md)
+-static int is_vmlinux(const char *modname)
+-{
+-	const char *myname;
+-
+-	myname = strrchr(modname, '/');
+-	if (myname)
+-		myname++;
+-	else
+-		myname = modname;
+-
+-	return (strcmp(myname, "vmlinux") == 0) ||
+-	       (strcmp(myname, "vmlinux.o") == 0);
+-}
+-
+ void *do_nofail(void *ptr, const char *expr)
  {
--	char *cmd, *file, *line, *dir;
-+	char *cmd, *file, *line, *dir, *pos;
- 	const char *base;
--	unsigned long flen, pos = 0;
- 	int dirlen, ret = 0, check_files = 0;
+ 	if (!ptr)
+@@ -181,7 +167,7 @@ static struct module *new_module(const char *modname)
  
- 	cmd = NOFAIL(malloc(strlen(objfile) + sizeof("..cmd")));
-@@ -323,14 +322,12 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 	strncpy(dir, objfile, dirlen);
- 	dir[dirlen] = '\0';
- 
--	file = grab_file(cmd, &flen);
--	if (!file) {
--		warn("could not find %s for %s\n", cmd, objfile);
--		goto out;
--	}
-+	file = read_text_file(cmd);
-+
-+	pos = file;
- 
- 	/* Sum all files in the same dir or subdirs. */
--	while ((line = get_next_line(&pos, file, flen)) != NULL) {
-+	while ((line = get_line(&pos))) {
- 		char* p = line;
- 
- 		if (strncmp(line, "source_", sizeof("source_")-1) == 0) {
-@@ -381,8 +378,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 	/* Everyone parsed OK */
- 	ret = 1;
- out_file:
--	release_file(file, flen);
--out:
-+	free(file);
- 	free(dir);
- 	free(cmd);
- 	return ret;
+ 	/* add to list */
+ 	strcpy(mod->name, modname);
+-	mod->is_vmlinux = is_vmlinux(modname);
++	mod->is_vmlinux = (strcmp(modname, "vmlinux") == 0);
+ 	mod->gpl_compatible = -1;
+ 	mod->next = modules;
+ 	modules = mod;
 -- 
 2.25.1
