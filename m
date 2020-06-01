@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40025 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40007 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727772AbgFAF6V (ORCPT
+        with ESMTP id S1727061AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 27/37] modpost: remove get_next_text() and make {grab,release_}file static
-Date: Mon,  1 Jun 2020 14:57:21 +0900
-Message-Id: <20200601055731.3006266-27-masahiroy@kernel.org>
+Subject: [PATCH 20/37] modpost: show warning if any of symbol dump files is missing
+Date: Mon,  1 Jun 2020 14:57:14 +0900
+Message-Id: <20200601055731.3006266-20-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,87 +17,61 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-get_next_line() is no longer used. Remove.
+If modpost fails to load a symbol dump file, it cannot check unresolved
+symbols, hence module dependency will not be added. Nor CRCs can be added.
 
-grab_file() and release_file() are only used in modpost.c. Make them
-static.
+Currently, external module builds check only $(objtree)/Module.symvers,
+but it should check files specified by KBUILD_EXTRA_SYMBOLS as well.
+
+Move the warning message from the top Makefile to scripts/Makefile.modpost
+and print the warning if any dump file is missing.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 38 ++------------------------------------
- scripts/mod/modpost.h |  3 ---
- 2 files changed, 2 insertions(+), 39 deletions(-)
+ Makefile                 | 10 +---------
+ scripts/Makefile.modpost |  5 ++++-
+ 2 files changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4fdf992e9729..93019349f022 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -463,7 +463,7 @@ static void sym_set_crc(const char *name, unsigned int crc)
- 	s->crc_valid = 1;
- }
+diff --git a/Makefile b/Makefile
+index 6280c7597a2d..f80c4ff93ec9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1649,17 +1649,9 @@ else # KBUILD_EXTMOD
+ # We are always building modules
+ KBUILD_MODULES := 1
  
--void *grab_file(const char *filename, unsigned long *size)
-+static void *grab_file(const char *filename, unsigned long *size)
- {
- 	struct stat st;
- 	void *map = MAP_FAILED;
-@@ -485,41 +485,7 @@ void *grab_file(const char *filename, unsigned long *size)
- 	return map;
- }
- 
--/**
--  * Return a copy of the next line in a mmap'ed file.
--  * spaces in the beginning of the line is trimmed away.
--  * Return a pointer to a static buffer.
--  **/
--char *get_next_line(unsigned long *pos, void *file, unsigned long size)
--{
--	static char line[4096];
--	int skip = 1;
--	size_t len = 0;
--	signed char *p = (signed char *)file + *pos;
--	char *s = line;
+-PHONY += $(objtree)/Module.symvers
+-$(objtree)/Module.symvers:
+-	@test -e $(objtree)/Module.symvers || ( \
+-	echo; \
+-	echo "  WARNING: Symbol version dump $(objtree)/Module.symvers"; \
+-	echo "           is missing; modules will have no dependencies and modversions."; \
+-	echo )
 -
--	for (; *pos < size ; (*pos)++) {
--		if (skip && isspace(*p)) {
--			p++;
--			continue;
--		}
--		skip = 0;
--		if (*p != '\n' && (*pos < size)) {
--			len++;
--			*s++ = *p++;
--			if (len > 4095)
--				break; /* Too long, stop */
--		} else {
--			/* End of string */
--			*s = '\0';
--			return line;
--		}
--	}
--	/* End of buffer */
--	return NULL;
--}
--
--void release_file(void *file, unsigned long size)
-+static void release_file(void *file, unsigned long size)
- {
- 	munmap(file, size);
- }
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 205afc90b08a..aaf3c4ad5d60 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -193,9 +193,6 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen);
- /* from modpost.c */
- char *read_text_file(const char *filename);
- char *get_line(char **stringp);
--void *grab_file(const char *filename, unsigned long *size);
--char* get_next_line(unsigned long *pos, void *file, unsigned long size);
--void release_file(void *file, unsigned long size);
+ build-dirs := $(KBUILD_EXTMOD)
+ PHONY += modules
+-modules: descend $(objtree)/Module.symvers
++modules: descend
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
  
- enum loglevel {
- 	LOG_WARN,
+ PHONY += modules_install
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 7d564a39f938..16fe19724c34 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -97,8 +97,11 @@ ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
+ MODPOST += -n
+ endif
+ 
++# Clear VPATH to not search for *.symvers in $(srctree). Check only $(objtree).
++VPATH :=
+ $(input-symdump):
+-	@:
++	@echo >&2 'WARNING: Symbol version dump "$@" is missing.'
++	@echo >&2 '         Modules may not have dependencies or modversions.'
+ 
+ # Read out modules.order to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
 -- 
 2.25.1
