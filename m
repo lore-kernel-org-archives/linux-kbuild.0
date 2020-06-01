@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40014 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40021 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727100AbgFAF6V (ORCPT
+        with ESMTP id S1727119AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 25/37] modpost: avoid false-positive file open error
-Date: Mon,  1 Jun 2020 14:57:19 +0900
-Message-Id: <20200601055731.3006266-25-masahiroy@kernel.org>
+Subject: [PATCH 15/37] modpost: print symbol dump file as the build target in short log
+Date: Mon,  1 Jun 2020 14:57:09 +0900
+Message-Id: <20200601055731.3006266-15-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,61 +17,99 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-One problem of grab_file() is that it cannot distinguish the following
-two cases:
-
- - It cannot read the file (the file does not exist, or read permission
-   is not set)
-
- - It can read the file, but the file size is zero
-
-This is because grab_file() calls mmap(), which requires the mapped
-length is greater than 0. Hence, grab_file() fails for both cases.
-
-If an empty header file were included for checksum calculation, the
-following warning would be printed:
-
-  WARNING: modpost: could not open ...: Invalid argument
-
-An empty file is a valid source file, so it should not fail.
-
-Use read_text_file() instead. It can read a zero-length file.
-Then, parse_file() will succeed with doing nothing.
-
-Going forward, the first case (it cannot read the file) is a fatal
-error. If the source file from which an object was compiled is missing,
-something went wrong.
+The symbol dump *.symvers is the output of modpost. Print it in
+the short log.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/sumversion.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ scripts/Makefile.modpost | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 5fb142db6195..9f77c9dfce20 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -258,9 +258,8 @@ static int parse_file(const char *fname, struct md4_ctx *md)
- 	char *file;
- 	unsigned long i, len;
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index b017085dc91a..8d000987b201 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -44,25 +44,26 @@ include include/config/auto.conf
+ include scripts/Kbuild.include
  
--	file = grab_file(fname, &len);
--	if (!file)
--		return 0;
-+	file = read_text_file(fname);
-+	len = strlen(file);
+ kernelsymfile := $(objtree)/Module.symvers
+-modulesymfile := $(KBUILD_EXTMOD)/Module.symvers
  
- 	for (i = 0; i < len; i++) {
- 		/* Collapse and ignore \ and CR. */
-@@ -287,7 +286,7 @@ static int parse_file(const char *fname, struct md4_ctx *md)
+ MODPOST = scripts/mod/modpost								\
+ 	$(if $(CONFIG_MODVERSIONS),-m)							\
+ 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
+-	$(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)					\
++	$(if $(KBUILD_EXTMOD),-i $(kernelsymfile))					\
+ 	$(if $(KBUILD_EXTMOD),$(addprefix -i ,$(KBUILD_EXTRA_SYMBOLS)))			\
+-	$(if $(KBUILD_EXTMOD),-o $(modulesymfile))					\
+ 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
+-	$(if $(KBUILD_MODPOST_WARN),-w)
++	$(if $(KBUILD_MODPOST_WARN),-w) \
++	-o $@
  
- 		add_char(file[i], md);
- 	}
--	release_file(file, len);
-+	free(file);
- 	return 1;
- }
- /* Check whether the file is a static library or not */
+ ifdef MODPOST_VMLINUX
+ 
+-quiet_cmd_modpost = MODPOST vmlinux.o
+-      cmd_modpost = $(MODPOST) vmlinux.o
++quiet_cmd_modpost = MODPOST $@
++      cmd_modpost = $(MODPOST) $<
+ 
+-__modpost:
++Module.symvers: vmlinux.o
+ 	$(call cmd,modpost)
+ 
++__modpost: Module.symvers
++
+ else
+ 
+ MODPOST += -s \
+@@ -70,6 +71,8 @@ MODPOST += -s \
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+ MODPOST += $(wildcard vmlinux)
++output-symdump := Module.symvers
++
+ else
+ 
+ # set src + obj - they may be used in the modules's Makefile
+@@ -83,6 +86,8 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+ # modpost option for external modules
+ MODPOST += -e
+ 
++output-symdump := $(KBUILD_EXTMOD)/Module.symvers
++
+ endif
+ 
+ # modpost options for modules (both in-kernel and external)
+@@ -93,20 +98,22 @@ ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
+ MODPOST += -n
+ endif
+ 
+-# find all modules listed in modules.order
+-modules := $(sort $(shell cat $(MODORDER)))
+-
+-# Read out modules.order instead of expanding $(modules) to pass in modpost.
++# Read out modules.order to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
+-quiet_cmd_modpost = MODPOST $(words $(modules)) modules
++quiet_cmd_modpost = MODPOST $@
+       cmd_modpost = sed 's/ko$$/o/' $(MODORDER) | $(MODPOST) -T -
+ 
+-__modpost:
++$(output-symdump): FORCE
+ 	$(call cmd,modpost)
++
++__modpost: $(output-symdump)
+ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modfinal
+ endif
+ 
++PHONY += FORCE
++FORCE:
++
+ endif
+ 
+ .PHONY: $(PHONY)
 -- 
 2.25.1
