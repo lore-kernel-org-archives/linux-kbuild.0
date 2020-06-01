@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:39992 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40013 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726056AbgFAF6U (ORCPT
+        with ESMTP id S1727068AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Jun 2020 01:58:20 -0400
+        Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 21/37] modpost: drop RCS/CVS $Revision handling in MODULE_VERSION()
-Date: Mon,  1 Jun 2020 14:57:15 +0900
-Message-Id: <20200601055731.3006266-21-masahiroy@kernel.org>
+Subject: [PATCH 31/37] modpost: remove is_vmlinux() call in check_for_{gpl_usage,unused}()
+Date: Mon,  1 Jun 2020 14:57:25 +0900
+Message-Id: <20200601055731.3006266-31-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,121 +17,66 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-As far as I understood, this code gets rid of '$Revision$' or '$Revision:'
-of CVS, RCS or whatever in MODULE_VERSION() tags.
+check_exports() is never called for vmlinux because mod->skip is set
+for vmlinux.
 
-Remove the primeval code.
+Hence, check_for_gpl_usage() and check_for_unused() are not called
+for vmlinux, either. is_vmlinux() is always false here.
+
+Remove the is_vmlinux() calls, and hard-code the ".ko" suffix.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c    |  3 --
- scripts/mod/modpost.h    |  4 ---
- scripts/mod/sumversion.c | 66 ----------------------------------------
- 3 files changed, 73 deletions(-)
+ scripts/mod/modpost.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 3df26789c2e6..fbb3d3391e52 100644
+index bc00bbac50bb..84a642c14775 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2066,9 +2066,6 @@ static void read_symbols(const char *modname)
- 		check_sec_ref(mod, modname, &info);
+@@ -2144,20 +2144,18 @@ void buf_write(struct buffer *buf, const char *s, int len)
  
- 	version = get_modinfo(&info, "version");
--	if (version)
--		maybe_frob_rcs_version(modname, version, info.modinfo,
--				       version - (char *)info.hdr);
- 	if (version || (all_versions && !is_vmlinux(modname)))
- 		get_src_version(modname, mod->srcversion,
- 				sizeof(mod->srcversion)-1);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index b8b7a82d2ff7..f728e250b8d2 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -188,10 +188,6 @@ void handle_moddevtable(struct module *mod, struct elf_info *info,
- void add_moddevtable(struct buffer *buf, struct module *mod);
+ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+ {
+-	const char *e = is_vmlinux(m) ?"":".ko";
+-
+ 	switch (exp) {
+ 	case export_gpl:
+-		fatal("GPL-incompatible module %s%s "
+-		      "uses GPL-only symbol '%s'\n", m, e, s);
++		fatal("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
++		      m, s);
+ 		break;
+ 	case export_unused_gpl:
+-		fatal("GPL-incompatible module %s%s "
+-		      "uses GPL-only symbol marked UNUSED '%s'\n", m, e, s);
++		fatal("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
++		      m, s);
+ 		break;
+ 	case export_gpl_future:
+-		warn("GPL-incompatible module %s%s "
+-		      "uses future GPL-only symbol '%s'\n", m, e, s);
++		warn("GPL-incompatible module %s.ko uses future GPL-only symbol '%s'\n",
++		     m, s);
+ 		break;
+ 	case export_plain:
+ 	case export_unused:
+@@ -2169,13 +2167,11 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
  
- /* sumversion.c */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long modinfo_offset);
- void get_src_version(const char *modname, char sum[], unsigned sumlen);
- 
- /* from modpost.c */
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 63062024ce0e..f27f22420cbc 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -429,69 +429,3 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- release:
- 	release_file(file, len);
- }
+ static void check_for_unused(enum export exp, const char *m, const char *s)
+ {
+-	const char *e = is_vmlinux(m) ?"":".ko";
 -
--static void write_version(const char *filename, const char *sum,
--			  unsigned long offset)
--{
--	int fd;
--
--	fd = open(filename, O_RDWR);
--	if (fd < 0) {
--		warn("changing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		return;
--	}
--
--	if (lseek(fd, offset, SEEK_SET) == (off_t)-1) {
--		warn("changing sum in %s:%lu failed: %s\n",
--			filename, offset, strerror(errno));
--		goto out;
--	}
--
--	if (write(fd, sum, strlen(sum)+1) != strlen(sum)+1) {
--		warn("writing sum in %s failed: %s\n",
--			filename, strerror(errno));
--		goto out;
--	}
--out:
--	close(fd);
--}
--
--static int strip_rcs_crap(char *version)
--{
--	unsigned int len, full_len;
--
--	if (strncmp(version, "$Revision", strlen("$Revision")) != 0)
--		return 0;
--
--	/* Space for version string follows. */
--	full_len = strlen(version) + strlen(version + strlen(version) + 1) + 2;
--
--	/* Move string to start with version number: prefix will be
--	 * $Revision$ or $Revision: */
--	len = strlen("$Revision");
--	if (version[len] == ':' || version[len] == '$')
--		len++;
--	while (isspace(version[len]))
--		len++;
--	memmove(version, version+len, full_len-len);
--	full_len -= len;
--
--	/* Preserve up to next whitespace. */
--	len = 0;
--	while (version[len] && !isspace(version[len]))
--		len++;
--	memmove(version + len, version + strlen(version),
--		full_len - strlen(version));
--	return 1;
--}
--
--/* Clean up RCS-style version numbers. */
--void maybe_frob_rcs_version(const char *modfilename,
--			    char *version,
--			    void *modinfo,
--			    unsigned long version_offset)
--{
--	if (strip_rcs_crap(version))
--		write_version(modfilename, version, version_offset);
--}
+ 	switch (exp) {
+ 	case export_unused:
+ 	case export_unused_gpl:
+-		warn("module %s%s "
+-		      "uses symbol '%s' marked UNUSED\n", m, e, s);
++		warn("module %s.ko uses symbol '%s' marked UNUSED\n",
++		     m, s);
+ 		break;
+ 	default:
+ 		/* ignore */
 -- 
 2.25.1
