@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:40015 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:40001 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727096AbgFAF6V (ORCPT
+        with ESMTP id S1726289AbgFAF6V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 1 Jun 2020 01:58:21 -0400
 From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 11/37] modpost: track if the symbol origin is a dump file or ELF object
-Date: Mon,  1 Jun 2020 14:57:05 +0900
-Message-Id: <20200601055731.3006266-11-masahiroy@kernel.org>
+Subject: [PATCH 17/37] modpost: generate vmlinux.symvers and reuse it for the second modpost
+Date: Mon,  1 Jun 2020 14:57:11 +0900
+Message-Id: <20200601055731.3006266-17-masahiroy@kernel.org>
 In-Reply-To: <20200601055731.3006266-1-masahiroy@kernel.org>
 References: <20200601055731.3006266-1-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -17,108 +17,117 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-The meaning of sym->kernel is obscure; it is set for in-kernel symbols
-loaded from Modules.symver. This happens only when we are building
-external modules, and it is used to determine whether to dump symbols
-to $(KBUILD_EXTMOD)/Modules.symver
+The full build runs modpost twice, first for vmlinux.o and second for
+modules.
 
-It is clearer to remember whether the symbol or module came from a dump
-file or ELF object.
+The first pass dumps all the vmlinux symbols into Module.symvers, but
+the second pass parses vmlinux again instead of reusing the dump file,
+presumably because it needs to avoid accumulating stale symbols.
 
-This changes the KBUILD_EXTRA_SYMBOLS behavior. Previously, symbols
-loaded from KBUILD_EXTRA_SYMBOLS are accumulated into the current
-$(KBUILD_EXTMOD)/Modules.symver
+Loading symbol info from a dump file is faster than parsing an ELF object.
+Besides, modpost deals with various issues to parse vmlinux in the second
+pass.
 
-Going forward, they will be only used to check symbol references, but
-not dumped into the current $(KBUILD_EXTMOD)/Modules.symver. I believe
-this makes more sense.
+A solution is to make the first pass dumps symbols into a separate file,
+vmlinux.symvers. The second pass reads it, and parses module .o files.
+The merged symbol information is dumped into Module.symvers in the same
+way as before.
 
-sym->vmlinux will have no user. Remove it too.
+This makes further modpost cleanups possible.
+
+Also, it fixes the problem of 'make vmlinux', which previously overwrote
+Module.symvers, throwing away module symbols.
+
+I slightly touched scripts/link-vmlinux.sh so that vmlinux is re-linked
+when you cross this commit. Otherwise, vmlinux.symvers would not be
+generated.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 15 +++++----------
- scripts/mod/modpost.h |  1 +
- 2 files changed, 6 insertions(+), 10 deletions(-)
+ .gitignore               | 1 +
+ Documentation/dontdiff   | 1 +
+ Makefile                 | 2 +-
+ scripts/Makefile.modpost | 7 ++++---
+ scripts/link-vmlinux.sh  | 2 --
+ 5 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 5224a02edbf2..60f35b89cea2 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -161,9 +161,6 @@ struct symbol {
- 	int crc_valid;
- 	char *namespace;
- 	unsigned int weak:1;
--	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
--	unsigned int kernel:1;     /* 1 if symbol is from kernel
--				    *  (only for external modules) **/
- 	unsigned int is_static:1;  /* 1 if symbol is not global */
- 	enum export  export;       /* Type of export */
- 	char name[];
-@@ -398,8 +395,6 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	}
+diff --git a/.gitignore b/.gitignore
+index 2258e906f01c..87b9dd8a163b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -56,6 +56,7 @@ modules.order
+ /linux
+ /vmlinux
+ /vmlinux.32
++/vmlinux.symvers
+ /vmlinux-gdb.py
+ /vmlinuz
+ /System.map
+diff --git a/Documentation/dontdiff b/Documentation/dontdiff
+index 72fc2e9e2b63..ef9519c32c55 100644
+--- a/Documentation/dontdiff
++++ b/Documentation/dontdiff
+@@ -251,6 +251,7 @@ vmlinux-*
+ vmlinux.aout
+ vmlinux.bin.all
+ vmlinux.lds
++vmlinux.symvers
+ vmlinuz
+ voffset.h
+ vsyscall.lds
+diff --git a/Makefile b/Makefile
+index b40420a0b991..6280c7597a2d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1416,7 +1416,7 @@ endif # CONFIG_MODULES
+ # make distclean Remove editor backup files, patch leftover files and the like
  
- 	s->module = mod;
--	s->vmlinux   = is_vmlinux(mod->name);
--	s->kernel    = 0;
- 	s->export    = export;
- 	return s;
+ # Directories & files removed with 'make clean'
+-CLEAN_FILES += include/ksym \
++CLEAN_FILES += include/ksym vmlinux.symvers \
+ 	       modules.builtin modules.builtin.modinfo modules.nsdeps
+ 
+ # Directories & files removed with 'make mrproper'
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 6808086075b6..6db692a5d547 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -55,10 +55,10 @@ ifdef MODPOST_VMLINUX
+ quiet_cmd_modpost = MODPOST $@
+       cmd_modpost = $(MODPOST) $<
+ 
+-Module.symvers: vmlinux.o
++vmlinux.symvers: vmlinux.o
+ 	$(call cmd,modpost)
+ 
+-__modpost: Module.symvers
++__modpost: vmlinux.symvers
+ 
+ else
+ 
+@@ -66,7 +66,8 @@ MODPOST += -s \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-MODPOST += $(wildcard vmlinux)
++
++input-symdump := vmlinux.symvers
+ output-symdump := Module.symvers
+ 
+ else
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index d09ab4afbda4..d5af6be50b50 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -218,8 +218,6 @@ on_signals()
  }
-@@ -2427,7 +2422,7 @@ static void write_if_changed(struct buffer *b, const char *fname)
- /* parse Module.symvers file. line format:
-  * 0x12345678<tab>symbol<tab>module<tab>export<tab>namespace
-  **/
--static void read_dump(const char *fname, unsigned int kernel)
-+static void read_dump(const char *fname)
- {
- 	unsigned long size, pos = 0;
- 	void *file = grab_file(fname, &size);
-@@ -2465,9 +2460,9 @@ static void read_dump(const char *fname, unsigned int kernel)
- 				have_vmlinux = 1;
- 			mod = new_module(modname);
- 			mod->skip = 1;
-+			mod->from_dump = 1;
- 		}
- 		s = sym_add_exported(symname, mod, export_no(export));
--		s->kernel    = kernel;
- 		s->is_static = 0;
- 		sym_set_crc(symname, crc);
- 		sym_update_namespace(symname, namespace);
-@@ -2487,7 +2482,7 @@ static int dump_sym(struct symbol *sym)
- {
- 	if (!external_module)
- 		return 1;
--	if (sym->vmlinux || sym->kernel)
-+	if (sym->module->from_dump)
- 		return 0;
- 	return 1;
- }
-@@ -2606,11 +2601,11 @@ int main(int argc, char **argv)
- 	}
+ trap on_signals HUP INT QUIT TERM
  
- 	if (kernel_read)
--		read_dump(kernel_read, 1);
-+		read_dump(kernel_read);
- 	while (extsym_start) {
- 		struct ext_sym_list *tmp;
- 
--		read_dump(extsym_start->file, 0);
-+		read_dump(extsym_start->file);
- 		tmp = extsym_start->next;
- 		free(extsym_start);
- 		extsym_start = tmp;
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 39f6c29fb568..b8b7a82d2ff7 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -119,6 +119,7 @@ struct module {
- 	const char *name;
- 	int gpl_compatible;
- 	struct symbol *unres;
-+	int from_dump;  /* 1 if module was loaded from *.symver */
- 	int seen;
- 	int skip;
- 	int has_init;
+-#
+-#
+ # Use "make V=1" to debug this script
+ case "${KBUILD_VERBOSE}" in
+ *1*)
 -- 
 2.25.1
