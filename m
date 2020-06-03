@@ -1,105 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:34629 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725866AbgFCNsU (ORCPT
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:60018 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725834AbgFCObb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Jun 2020 09:48:20 -0400
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 0/2] Build ORC fast lookup table in scripts/sorttable tool
-From: changhuaixin <changhuaixin@linux.alibaba.com>
+        Wed, 3 Jun 2020 10:31:31 -0400
+From: Huaixin Chang <changhuaixin@linux.alibaba.com>
+Subject: [PATCH v2 0/3] Build ORC fast lookup table in scripts/sorttable tool
+Date: Wed,  3 Jun 2020 22:31:20 +0800
+Message-Id: <20200603143123.57364-1-changhuaixin@linux.alibaba.com>
 In-Reply-To: <20200601173840.3f36m6l4fsu5bill@treble>
-Date: Wed, 3 Jun 2020 21:47:47 +0800
-Content-Transfer-Encoding: 8BIT
-Message-Id: <037BCC2F-FEF5-40AB-8F7B-7A966073113C@linux.alibaba.com>
-References: <20200429064626.16389-1-changhuaixin@linux.alibaba.com>
- <20200522182815.ezanmvbemhzq2fmm@treble>
- <482837A8-E9D9-4229-B7B1-8E14403FB2AC@linux.alibaba.com>
- <20200601173840.3f36m6l4fsu5bill@treble>
+References: <20200601173840.3f36m6l4fsu5bill@treble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: changhuaixin <changhuaixin@linux.alibaba.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@alien8.de, hpa@zytor.com, luto@amacapital.net, michal.lkml@markovi.net, mingo@redhat.com, peterz@infradead.org, tglx@linutronix.de, x86@kernel.org, yamada.masahiro@socionext.com
+To: jpoimboe@redhat.com
+Cc: bp@alien8.de, changhuaixin@linux.alibaba.com, hpa@zytor.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, luto@amacapital.net, michal.lkml@markovi.net, mingo@redhat.com, peterz@infradead.org, tglx@linutronix.de, x86@kernel.org, yamada.masahiro@socionext.com
 
+Move building of fast lookup table from boot to sorttable tool. This saves us
+6380us boot time on Intel(R) Xeon(R) CPU E5-2682 v4 @ 2.50GHz with cores.
 
+Changelog v2:
+1. Type of section orc_lookup needs to be SHT_PROGBITS.
+2. unwind_init() cannot be removed totally as setting lookup_num_blocks is needed.
 
-> On Jun 2, 2020, at 1:38 AM, Josh Poimboeuf <jpoimboe@redhat.com> wrote:
-> 
-> On Sun, May 31, 2020 at 01:26:54PM +0800, changhuaixin wrote:
->>   It turned out to be an alignment problem. If sh_size of previous section
->>   orc_unwind is not 4-byte aligned, sh_offset of the following orc_lookup
->>   section is not 4-byte aligned too. However, the VMA of section orc_lookup
->>   is aligned to the nearest 4-byte. Thus, the orc_lookup section means two
->>   different ares for scripts/sorttable tool and kernel.
->> 
->>   Sections headers look like this when it happens:
->> 
->>   12 .orc_unwind_ip 00172124  ffffffff82573b28  0000000002573b28  01773b28
->>    2**0
->>                    CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
->>   13 .orc_unwind   0022b1b6  ffffffff826e5c4c  00000000026e5c4c  018e5c4c
->>    2**0
->>                    CONTENTS, ALLOC, LOAD, READONLY, DATA
->>   14 .orc_lookup   0003003c  ffffffff82910e04  0000000002910e04  01b10e02
->>    2**0
->>                    ALLOC
->>   15 .vvar         00001000  ffffffff82941000  0000000002941000  01b41000
->>    2**4
->>                    CONTENTS, ALLOC, LOAD, DATA
->> 
->>   Sorttable tool uses the are starting with offset 0x01b10e02 for 0x0003003c
->>   bytes. While kernel use the area starting with VMA at  0xffffffff82910e04
->>   for 0x0003003c bytes, meaning that each entry in this table used by kernel
->>   is actually 2 bytes behind the corresponding entry set from sorttable
->>   tool.
->> 
->>   Any suggestion on fixing this？
-> 
-> The VMA and LMA are both 4-byte aligned.  The file offset alignment
-> (0x01b10e02) shouldn't matter.
-> 
-> Actually it looks like the problem is that the section doesn't have
-> CONTENTS, so it's just loaded as a BSS section (all zeros).  The section
-> needs to be type SHT_PROGBITS instead of SHT_NOBITS.
-> 
-> $ readelf -S vmlinux |grep orc_lookup
->  [16] .orc_lookup       NOBITS           ffffffff82b68418  01d68418
-> 
-> I tried to fix it with
-> 
-> diff --git a/scripts/sorttable.h b/scripts/sorttable.h
-> index a36c76c17be4..76adb1fb88f8 100644
-> --- a/scripts/sorttable.h
-> +++ b/scripts/sorttable.h
-> @@ -341,6 +341,7 @@ static int do_sort(Elf_Ehdr *ehdr,
-> 			param.lookup_table_size = s->sh_size;
-> 			param.orc_lookup_table = (unsigned int *)
-> 				((void *)ehdr + s->sh_offset);
-> +			w(SHT_PROGBITS, &s->sh_type);
-> 		}
-> 		if (!strcmp(secstrings + idx, ".text")) {
-> 			param.text_size = s->sh_size;
-> 
-> 
-> But that makes kallsyms unhappy, so I guess we need to do it from the
-> linker script where .orc_lookup is created.
-> 
-> Linker script doesn't seem to allow manual specification of the section
-> type, so this is the best I could come up with:
-> 
-> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-> index db600ef218d7..49f4f5bc6165 100644
-> --- a/include/asm-generic/vmlinux.lds.h
-> +++ b/include/asm-generic/vmlinux.lds.h
-> @@ -826,6 +826,8 @@
-> 		. += (((SIZEOF(.text) + LOOKUP_BLOCK_SIZE - 1) /	\
-> 			LOOKUP_BLOCK_SIZE) + 1) * 4;			\
-> 		orc_lookup_end = .;					\
-> +		/* HACK: force SHT_PROGBITS so sorttable can edit: */	\
-> +		BYTE(1);						\
-> 	}
-> #else
-> #define ORC_UNWIND_TABLE
+Huaixin Chang (3):
+  scripts/sorttable: Change section type of orc_lookup to SHT_PROGBITS
+  scripts/sorttable: Build orc fast lookup table via sorttable tool
+  x86/unwind/orc: Simplify unwind_init() for x86 boot
 
-Thanks! It works.
+ arch/x86/kernel/unwind_orc.c      | 40 ----------------
+ include/asm-generic/vmlinux.lds.h |  2 +
+ scripts/sorttable.h               | 99 ++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 94 insertions(+), 47 deletions(-)
+
+-- 
+2.14.4.44.g2045bb6
