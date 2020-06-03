@@ -1,103 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:63276 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725275AbgFCEWu (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725275AbgFCEYI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Jun 2020 00:22:50 -0400
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 0534MVnr030768
-        for <linux-kbuild@vger.kernel.org>; Wed, 3 Jun 2020 13:22:31 +0900
-Received: by mail-vk1-f179.google.com with SMTP id u15so145272vkk.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Jun 2020 21:22:31 -0700 (PDT)
+        Wed, 3 Jun 2020 00:24:08 -0400
+Date: Wed, 3 Jun 2020 14:24:04 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: ARCH=arm64 build breakage for Kbuild for-next branch
+Message-ID: <20200603142404.33123d7d@canb.auug.org.au>
+In-Reply-To: <CAK7LNAT_rgoDQPgDB2cTvwmXrQv2mFH1ysuhvWxp2HnVMd0W7Q@mail.gmail.com>
+References: <CAK7LNAT_rgoDQPgDB2cTvwmXrQv2mFH1ysuhvWxp2HnVMd0W7Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200601055731.3006266-1-masahiroy@kernel.org> <20200601055731.3006266-5-masahiroy@kernel.org>
-In-Reply-To: <20200601055731.3006266-5-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 3 Jun 2020 13:21:53 +0900
-Message-ID: <CAK7LNATYmRbYH0O=4P3ce26OMNtTk_Zz2YhAUPLGkQib+UpWWA@mail.gmail.com>
-Subject: Re: [PATCH 05/37] kbuild: refactor KBUILD_VMLINUX_{OBJS,LIBS} calculation
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/3Zi8rxl9_RJnvHIR2Xal4Sa";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jun 1, 2020 at 2:57 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Do not overwrite core-y or drivers-y. Remove libs-y1 and libs-y2.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+--Sig_/3Zi8rxl9_RJnvHIR2Xal4Sa
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-To mend ARCH=arm64 build error,
-I will fix up as follows.
+Hi Masahiro,
 
-diff --git a/Makefile b/Makefile
-index 0416760aeb28..24cf37c21cba 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1070,7 +1070,7 @@ build-dirs        := $(vmlinux-dirs)
- clean-dirs     := $(vmlinux-alldirs)
-
- # Externally visible symbols (used by link-vmlinux.sh)
--KBUILD_VMLINUX_OBJS := $(head-y) $(addsuffix built-in.a, $(core-y))
-+KBUILD_VMLINUX_OBJS := $(head-y) $(patsubst %/,%/built-in.a, $(core-y))
- KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(filter %/, $(libs-y)))
- ifdef CONFIG_MODULES
- KBUILD_VMLINUX_OBJS += $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
-@@ -1078,7 +1078,7 @@ KBUILD_VMLINUX_LIBS := $(filter-out %/, $(libs-y))
- else
- KBUILD_VMLINUX_LIBS := $(patsubst %/,%/lib.a, $(libs-y))
- endif
--KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(drivers-y))
-+KBUILD_VMLINUX_OBJS += $(patsubst %/,%/built-in.a, $(drivers-y))
-
- export KBUILD_VMLINUX_OBJS KBUILD_VMLINUX_LIBS
- export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
-
-
-
-
->
->  Makefile | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
->
+On Wed, 3 Jun 2020 13:11:59 +0900 Masahiro Yamada <masahiroy@kernel.org> wr=
+ote:
+>=20
+> If you pull the latest kbuild for-next branch,
+> ARCH=3Darm64 will fail to build.
+>=20
+> I will fix it soon.
+>=20
+> For today's linux-next, you can patch
+> as follows.
+> (or, you can use the old branch)
+>=20
+>=20
 > diff --git a/Makefile b/Makefile
-> index c0c086d06753..0416760aeb28 100644
+> index f80c4ff93ec9..fbb4b95ae648 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -1069,19 +1069,18 @@ vmlinux-alldirs := $(sort $(vmlinux-dirs) Documentation \
->  build-dirs     := $(vmlinux-dirs)
->  clean-dirs     := $(vmlinux-alldirs)
->
-> -core-y         := $(patsubst %/, %/built-in.a, $(core-y))
-> -drivers-y      := $(patsubst %/, %/built-in.a, $(drivers-y))
-> -libs-y2                := $(patsubst %/, %/built-in.a, $(filter %/, $(libs-y)))
-> +# Externally visible symbols (used by link-vmlinux.sh)
-> +KBUILD_VMLINUX_OBJS := $(head-y) $(addsuffix built-in.a, $(core-y))
-> +KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(filter %/, $(libs-y)))
+> @@ -1074,7 +1074,7 @@ build-dirs        :=3D $(vmlinux-dirs)
+>  clean-dirs     :=3D $(vmlinux-alldirs)
+>=20
+>  # Externally visible symbols (used by link-vmlinux.sh)
+> -KBUILD_VMLINUX_OBJS :=3D $(head-y) $(addsuffix built-in.a, $(core-y))
+> +KBUILD_VMLINUX_OBJS :=3D $(head-y) $(patsubst %/,%/built-in.a, $(core-y))
+>  KBUILD_VMLINUX_OBJS +=3D $(addsuffix built-in.a, $(filter %/, $(libs-y)))
 >  ifdef CONFIG_MODULES
-> -libs-y1                := $(filter-out %/, $(libs-y))
-> -libs-y2                += $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
-> +KBUILD_VMLINUX_OBJS += $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
-> +KBUILD_VMLINUX_LIBS := $(filter-out %/, $(libs-y))
->  else
-> -libs-y1                := $(patsubst %/, %/lib.a, $(libs-y))
-> +KBUILD_VMLINUX_LIBS := $(patsubst %/,%/lib.a, $(libs-y))
->  endif
-> +KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(drivers-y))
->
-> -# Externally visible symbols (used by link-vmlinux.sh)
-> -export KBUILD_VMLINUX_OBJS := $(head-y) $(core-y) $(libs-y2) $(drivers-y)
-> -export KBUILD_VMLINUX_LIBS := $(libs-y1)
-> +export KBUILD_VMLINUX_OBJS KBUILD_VMLINUX_LIBS
->  export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
->  export LDFLAGS_vmlinux
->  # used by scripts/Makefile.package
-> --
-> 2.25.1
->
+>  KBUILD_VMLINUX_OBJS +=3D $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
 
+OK, thanks, I will apply that at some point, since I have already
+merged your tree.
 
--- 
-Best Regards
-Masahiro Yamada
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/3Zi8rxl9_RJnvHIR2Xal4Sa
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7XJeQACgkQAVBC80lX
+0GzUbggAkU/kt74T6bUPKK+eofowxA+Kn0iM6h19munVmEu91EtXbQk1+BVhzB1U
+Nc39JXnpDQtNP+Zw9E3L/NNriIj7pJZpRQrD+ER0i2w7GUtn7ZhuqhgvD2T8bwV4
+BVBx3+boUwab72mPbvU8ZeaMnFkVqyYz9Y1fwx5QqWmZzfmzfcJq5G/iKd5yab7z
+inzNPGWJIqkGOZSGzOjqsWc450TbL+ewYGVyQDFvW2a+P60pqMZ0WeFffy1u8Pqo
+MR8YisqJNTIYkPbXP6TPJI0Vxy4w830TKB9Yb8tQlm5sYSVCnMd+5xAUAa4tY9iH
+CnoNJbs+6i7xE9FIJ5MqSrmKCcBmUg==
+=1GnE
+-----END PGP SIGNATURE-----
+
+--Sig_/3Zi8rxl9_RJnvHIR2Xal4Sa--
