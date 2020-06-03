@@ -1,58 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:58939 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725919AbgFBOnV (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:55479 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725275AbgFCENA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Jun 2020 10:43:21 -0400
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 052Eh31q014219
-        for <linux-kbuild@vger.kernel.org>; Tue, 2 Jun 2020 23:43:04 +0900
-Received: by mail-ua1-f50.google.com with SMTP id a10so1324818uan.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Jun 2020 07:43:03 -0700 (PDT)
+        Wed, 3 Jun 2020 00:13:00 -0400
 MIME-Version: 1.0
-References: <1590920904-60002-1-git-send-email-alios_sys_security@linux.alibaba.com>
- <1591083917-63371-1-git-send-email-ashimida@linux.alibaba.com>
-In-Reply-To: <1591083917-63371-1-git-send-email-ashimida@linux.alibaba.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 2 Jun 2020 23:42:26 +0900
-Message-ID: <CAK7LNASLZ4t1=5pDBMvTNryQf_1=-1GASA=unk8asumUDEzsoQ@mail.gmail.com>
-Subject: Re: [PATCH v2] mksysmap: Fix the mismatch of '.L' symbols in System.map
+Date: Wed, 3 Jun 2020 13:11:59 +0900
+Message-ID: <CAK7LNAT_rgoDQPgDB2cTvwmXrQv2mFH1ysuhvWxp2HnVMd0W7Q@mail.gmail.com>
+Subject: ARCH=arm64 build breakage for Kbuild for-next branch
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: ashimida <ashimida@linux.alibaba.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 2, 2020 at 4:45 PM ashimida <ashimida@linux.alibaba.com> wrote:
->
-> When System.map was generated, the kernel used mksysmap to
-> filter the kernel symbols, but all the symbols with the
-> second letter 'L' in the kernel were filtered out, not just
-> the symbols starting with 'dot + L'.
->
-> For example:
-> ashimida@ubuntu:~/linux$ cat System.map |grep ' .L'
-> ashimida@ubuntu:~/linux$ nm -n vmlinux |grep ' .L'
-> ffff0000088028e0 t bLength_show
-> ......
-> ffff0000092e0408 b PLLP_OUTC_lock
-> ffff0000092e0410 b PLLP_OUTA_lock
->
-> In the original patch[1], the original intent should
-> be to filter out all local symbols starting with '.L',
-> so the dot should be escaped.
->
-> [1]. mksysmap: Add h8300 local symbol pattern
->
-> Signed-off-by: ashimida <ashimida@linux.alibaba.com>
-> ---
+Hi Stephen,
 
-Applied to linux-kbuild. Thanks.
+If you pull the latest kbuild for-next branch,
+ARCH=arm64 will fail to build.
+
+I will fix it soon.
+
+For today's linux-next, you can patch
+as follows.
+(or, you can use the old branch)
 
 
+diff --git a/Makefile b/Makefile
+index f80c4ff93ec9..fbb4b95ae648 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1074,7 +1074,7 @@ build-dirs        := $(vmlinux-dirs)
+ clean-dirs     := $(vmlinux-alldirs)
+
+ # Externally visible symbols (used by link-vmlinux.sh)
+-KBUILD_VMLINUX_OBJS := $(head-y) $(addsuffix built-in.a, $(core-y))
++KBUILD_VMLINUX_OBJS := $(head-y) $(patsubst %/,%/built-in.a, $(core-y))
+ KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(filter %/, $(libs-y)))
+ ifdef CONFIG_MODULES
+ KBUILD_VMLINUX_OBJS += $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
 
 
-
+Thanks.
 
 -- 
 Best Regards
