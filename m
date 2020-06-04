@@ -1,59 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbgFDNF1 (ORCPT
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:43459 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728337AbgFDNuk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jun 2020 09:05:27 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB7EC08C5C0
-        for <linux-kbuild@vger.kernel.org>; Thu,  4 Jun 2020 06:05:26 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id t8so5953088ilm.7
-        for <linux-kbuild@vger.kernel.org>; Thu, 04 Jun 2020 06:05:26 -0700 (PDT)
+        Thu, 4 Jun 2020 09:50:40 -0400
+From: Alexander Popov <alex.popov@linux.com>
+Subject: [PATCH 0/5] Improvements of the stackleak gcc plugin
+Date: Thu,  4 Jun 2020 16:49:52 +0300
+Message-Id: <20200604134957.505389-1-alex.popov@linux.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Thu, 4 Jun 2020 15:05:14 +0200
-Message-ID: <CA+icZUU7AAzpYfktqCvn8oKpFMzZud6fQEh=fNWi4xkuqKmYog@mail.gmail.com>
-Subject: [PATCH] kbuild: add variables for compression tools
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denis Efremov <efremov@linux.com>
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
+To: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Thiago Jung Bauermann <bauerman@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>, Jessica Yu <jeyu@kernel.org>, Sven Schnelle <svens@stackframe.org>, Iurii Zaikin <yzaikin@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Collingbourne <pcc@google.com>, Naohiro Aota <naohiro.aota@wdc.com>, Alexander Monakov <amonakov@ispras.ru>, Mathias Krause <minipli@googlemail.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Laura Abbott <labbott@redhat.com>, Florian Weimer <fweimer@redhat.com>, Alexander Popov <alex.popov@linux.com>, kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gcc@gcc.gnu.org
+Cc: notify@kernel.org
 
-Hi Denis,
+In this patch series I collected various improvements of the stackleak
+gcc plugin.
 
-is it possible to add ZSTD compression support with the possibility to
-add - for example multithreading - options?
+The first patch excludes alloca() from the stackleak instrumentation logic
+to make it simpler.
 
-Quote from your patch:
+The second patch is the main improvement. It eliminates an unwanted
+side-effect of kernel code instrumentation. This patch is a deep
+reengineering of the idea described on grsecurity blog:
+  https://grsecurity.net/resolving_an_unfortunate_stackleak_interaction
 
-> As a sidenote, for multi-threaded lzma, xz compression one can use:
-> $ export XZ_OPT=3D"--threads=3D0"
+The third patch adds 'verbose' plugin parameter for printing additional
+info about the kernel code instrumentation.
 
-man zstd says:
+Two other patches disable unneeded stackleak instrumentation for some
+files.
 
-       -T#, --threads=3D#
-              Compress using # working threads (default: 1). If # is
-0, attempt to detect and use the number of physical CPU cores. In all
-cases, the nb  of  threads  is  capped  to  ZST=E2=80=90
-              DMT_NBTHREADS_MAX=3D=3D200. This modifier does nothing if
-zstd is compiled without multithread support.
+I would like to thank Alexander Monakov <amonakov@ispras.ru> for his
+advisory on gcc internals.
 
-Of course, I can help with testing.
-
-For the documentation - which I have not checked - are the tools and
-libs mentioned you will need to have installed for certain compression
-tools?
-For ZSTD on Debian - these are zstd and libzstd1:amd64 packages.
-
-Thanks.
-
-Regards,
-- Sedat -
+This patch series was tested for gcc version 4.8, 5, 6, 7, 8, 9, and 10
+on x86_64, i386 and arm64.
+That was done using the project 'kernel-build-containers':
+  https://github.com/a13xp0p0v/kernel-build-containers
 
 
-[1] https://patchwork.kernel.org/patch/11585381/
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.=
-git/commit/?h=3Dkbuild&id=3D1312a1e434c1816e3bbcd4f806aa862dc735dec0
+Alexander Popov (5):
+  gcc-plugins/stackleak: Exclude alloca() from the instrumentation logic
+  gcc-plugins/stackleak: Use asm instrumentation to avoid useless
+    register saving
+  gcc-plugins/stackleak: Add 'verbose' plugin parameter
+  gcc-plugins/stackleak: Don't instrument itself
+  gcc-plugins/stackleak: Don't instrument vgettimeofday.c in arm64 VDSO
+
+ arch/arm64/kernel/vdso/Makefile        |   3 +-
+ include/linux/compiler_attributes.h    |  13 ++
+ kernel/Makefile                        |   1 +
+ kernel/stackleak.c                     |  16 +-
+ scripts/Makefile.gcc-plugins           |   2 +
+ scripts/gcc-plugins/stackleak_plugin.c | 260 ++++++++++++++++++++-----
+ 6 files changed, 232 insertions(+), 63 deletions(-)
+
+-- 
+2.25.2
