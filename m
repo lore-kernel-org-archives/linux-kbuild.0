@@ -1,44 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:40568 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728337AbgFDNvP (ORCPT
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:38412 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728679AbgFDNzH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jun 2020 09:51:15 -0400
-From: Alexander Popov <alex.popov@linux.com>
-Subject: [PATCH 5/5] gcc-plugins/stackleak: Don't instrument vgettimeofday.c in arm64 VDSO
-Date: Thu,  4 Jun 2020 16:49:57 +0300
-Message-Id: <20200604134957.505389-6-alex.popov@linux.com>
-In-Reply-To: <20200604134957.505389-1-alex.popov@linux.com>
-References: <20200604134957.505389-1-alex.popov@linux.com>
+        Thu, 4 Jun 2020 09:55:07 -0400
+Received: by mail-lf1-f66.google.com with SMTP id 202so3657918lfe.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Jun 2020 06:55:06 -0700 (PDT)
+Reply-To: efremov@linux.com
+References: <CA+icZUU7AAzpYfktqCvn8oKpFMzZud6fQEh=fNWi4xkuqKmYog@mail.gmail.com>
+From: Denis Efremov <efremov@linux.com>
+Subject: Re: [PATCH] kbuild: add variables for compression tools
+Message-ID: <635d02d6-05a9-7620-c386-dac766cd49da@linux.com>
+Date: Thu, 4 Jun 2020 16:55:03 +0300
 MIME-Version: 1.0
+In-Reply-To: <CA+icZUU7AAzpYfktqCvn8oKpFMzZud6fQEh=fNWi4xkuqKmYog@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Thiago Jung Bauermann <bauerman@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>, Jessica Yu <jeyu@kernel.org>, Sven Schnelle <svens@stackframe.org>, Iurii Zaikin <yzaikin@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Collingbourne <pcc@google.com>, Naohiro Aota <naohiro.aota@wdc.com>, Alexander Monakov <amonakov@ispras.ru>, Mathias Krause <minipli@googlemail.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Laura Abbott <labbott@redhat.com>, Florian Weimer <fweimer@redhat.com>, Alexander Popov <alex.popov@linux.com>, kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gcc@gcc.gnu.org
-Cc: notify@kernel.org
+To: sedat.dilek@gmail.com
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>
 
-Don't try instrumenting functions in arch/arm64/kernel/vdso/vgettimeofday.c.
-Otherwise that can cause issues if the cleanup pass of stackleak gcc plugin
-is disabled.
+Hi,
 
-Signed-off-by: Alexander Popov <alex.popov@linux.com>
----
- arch/arm64/kernel/vdso/Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 6/4/20 4:05 PM, Sedat Dilek wrote:
+> Hi Denis,
+> 
+> is it possible to add ZSTD compression support with the possibility to
+> add - for example multithreading - options?
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index 3862cad2410c..9b84cafbd2da 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -32,7 +32,8 @@ UBSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
- KCOV_INSTRUMENT			:= n
- 
--CFLAGS_vgettimeofday.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables
-+CFLAGS_vgettimeofday.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables \
-+		$(DISABLE_STACKLEAK_PLUGIN)
- 
- ifneq ($(c-gettimeofday-y),)
-   CFLAGS_vgettimeofday.o += -include $(c-gettimeofday-y)
--- 
-2.25.2
+Where do you want to use zstd in kernel?
+
+For example, to compress headers xz is used, to compress /proc/config.gz
+gzip is used. It could be relatively easy patched to use zstd for it and
+it could be easy to add tarzstd-pkg target for building the kernel
+as a zstd compressed tarball. However, I doubt that someone really needs it.
+xz is best for headers because of compression ratio, gzip is best for config
+because gzip is installed by default on most systems.
+To compress modules, ramdisk or kernel image with zstd one needs
+to implement zstd decompression algorithm in kernel. Given that there
+are already gzip,bzip2,lzma,xz,lzo,lz4 I really doubt that it will be
+useful. There should be a good comparison showing that kernel image
+with zstd, for example, beats gzip and couple of others in comression ratio
+and decompression speed to properly position the zstd algo.
+
+> For the documentation - which I have not checked - are the tools and
+> libs mentioned you will need to have installed for certain compression
+> tools?
+
+gzip, bzip2 are already installed on most systems. It's highly likely that
+lzo, lzma, xz will require you to install them.
+
+Thanks,
+Denis
