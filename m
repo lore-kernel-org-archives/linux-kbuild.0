@@ -1,57 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:38231 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729170AbgFDPXy (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40538 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726026AbgFDQII (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Jun 2020 11:23:54 -0400
-Reply-To: alex.popov@linux.com
-Subject: Re: [PATCH 1/5] gcc-plugins/stackleak: Exclude alloca() from the
- instrumentation logic
-References: <20200604134957.505389-1-alex.popov@linux.com>
- <20200604134957.505389-2-alex.popov@linux.com>
- <CAG48ez05JOvqzYGr3PvyQGwFURspFWvNvf-b8Y613PX0biug8w@mail.gmail.com>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <70319f78-2c7c-8141-d751-07f28203db7c@linux.com>
-Date: Thu, 4 Jun 2020 18:23:38 +0300
+        Thu, 4 Jun 2020 12:08:08 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95F7C08C5C0
+        for <linux-kbuild@vger.kernel.org>; Thu,  4 Jun 2020 09:08:08 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id r2so6955766ioo.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Jun 2020 09:08:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAG48ez05JOvqzYGr3PvyQGwFURspFWvNvf-b8Y613PX0biug8w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CA+icZUU7AAzpYfktqCvn8oKpFMzZud6fQEh=fNWi4xkuqKmYog@mail.gmail.com>
+ <635d02d6-05a9-7620-c386-dac766cd49da@linux.com>
+In-Reply-To: <635d02d6-05a9-7620-c386-dac766cd49da@linux.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Thu, 4 Jun 2020 18:07:56 +0200
+Message-ID: <CA+icZUUGgtsxw7UXDQYpouRuRhFWnfA3-XN7zp3OK7Yv2Ase+w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: add variables for compression tools
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jann Horn <jannh@google.com>, Kees Cook <keescook@chromium.org>, Elena Reshetova <elena.reshetova@intel.com>
-Cc: Emese Revfy <re.emese@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Thiago Jung Bauermann <bauerman@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>, Jessica Yu <jeyu@kernel.org>, Sven Schnelle <svens@stackframe.org>, Iurii Zaikin <yzaikin@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Collingbourne <pcc@google.com>, Naohiro Aota <naohiro.aota@wdc.com>, Alexander Monakov <amonakov@ispras.ru>, Mathias Krause <minipli@googlemail.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Laura Abbott <labbott@redhat.com>, Florian Weimer <fweimer@redhat.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-kbuild@vger.kernel.org, the arch/x86 maintainers <x86@kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, kernel list <linux-kernel@vger.kernel.org>, gcc@gcc.gnu.org, notify@kernel.org
+To: efremov@linux.com
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Nick Terrell <terrelln@fb.com>
 
-On 04.06.2020 17:01, Jann Horn wrote:
-> On Thu, Jun 4, 2020 at 3:51 PM Alexander Popov <alex.popov@linux.com> wrote:
->> Some time ago Variable Length Arrays (VLA) were removed from the kernel.
->> The kernel is built with '-Wvla'. Let's exclude alloca() from the
->> instrumentation logic and make it simpler. The build-time assertion
->> against alloca() is added instead.
-> [...]
->> +                       /* Variable Length Arrays are forbidden in the kernel */
->> +                       gcc_assert(!is_alloca(stmt));
-> 
-> There is a patch series from Elena and Kees on the kernel-hardening
-> list that deliberately uses __builtin_alloca() in the syscall entry
-> path to randomize the stack pointer per-syscall - see
-> <https://lore.kernel.org/kernel-hardening/20200406231606.37619-4-keescook@chromium.org/>.
+On Thu, Jun 4, 2020 at 3:55 PM Denis Efremov <efremov@linux.com> wrote:
+>
+> Hi,
+>
+> On 6/4/20 4:05 PM, Sedat Dilek wrote:
+> > Hi Denis,
+> >
+> > is it possible to add ZSTD compression support with the possibility to
+> > add - for example multithreading - options?
+>
+> Where do you want to use zstd in kernel?
+>
+> For example, to compress headers xz is used, to compress /proc/config.gz
+> gzip is used. It could be relatively easy patched to use zstd for it and
+> it could be easy to add tarzstd-pkg target for building the kernel
+> as a zstd compressed tarball. However, I doubt that someone really needs it.
+> xz is best for headers because of compression ratio, gzip is best for config
+> because gzip is installed by default on most systems.
+> To compress modules, ramdisk or kernel image with zstd one needs
+> to implement zstd decompression algorithm in kernel. Given that there
+> are already gzip,bzip2,lzma,xz,lzo,lz4 I really doubt that it will be
+> useful. There should be a good comparison showing that kernel image
+> with zstd, for example, beats gzip and couple of others in comression ratio
+> and decompression speed to properly position the zstd algo.
+>
 
-Thanks, Jann.
+[ CC Nick ]
 
-At first glance, leaving alloca() handling in stackleak instrumentation logic
-would allow to integrate stackleak and this version of random_kstack_offset.
+Hi,
 
-Kees, Elena, did you try random_kstack_offset with upstream stackleak?
+me and other people use "support for ZSTD-compressed kernel and
+initramfs" for a long time successfully.
 
-It looks to me that without stackleak erasing random_kstack_offset can be
-weaker. I mean, if next syscall has a bigger stack randomization gap, the data
-on thread stack from the previous syscall is not overwritten and can be used. Am
-I right?
+I have modified Debian's initramfs-tools package to support creating
+such an initrd.img and boot it successfully.
+See Debian Bug #955469.
 
-Another aspect: CONFIG_STACKLEAK_METRICS can be used for guessing kernel stack
-offset, which is bad. It should be disabled if random_kstack_offset is on.
+There is a pull-request sent out to integrate into Linus tree.
 
-Best regards,
-Alexander
+Some numbers from Nick Terell in his pull-request:
+"
+The zstd compressed kernel is smaller than the gzip compressed kernel but larger
+than the xz or lzma compressed kernels, and it decompresses faster than
+everything except lz4. See the table below for the measurement of an x86_64
+kernel ordered by compressed size:
+
+algo size
+xz   6,509,792
+lzma 6,856,576
+zstd 7,399,157
+gzip 8,522,527
+bzip 8,629,603
+lzo 9,808,035
+lz4 10,705,570
+none 32,565,672
+"
+
+More numbers in [0].
+
+Hope this helps you to position the zstd algo.
+
+Maybe, Nick can give you some more details.
+
+Thanks.
+
+Regards,
+- Sedat -
+
+[0] https://lwn.net/Articles/817134/
+[1] https://github.com/terrelln/linux/commits/zstd-v5
+[2] https://lkml.org/lkml/2020/6/1/1590
+[3] https://bugs.debian.org/955469
+
+> > For the documentation - which I have not checked - are the tools and
+> > libs mentioned you will need to have installed for certain compression
+> > tools?
+>
+> gzip, bzip2 are already installed on most systems. It's highly likely that
+> lzo, lzma, xz will require you to install them.
+>
+> Thanks,
+> Denis
