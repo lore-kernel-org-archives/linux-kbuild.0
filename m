@@ -1,26 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:50808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726404AbgFIH6w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Jun 2020 03:58:52 -0400
-Date: Tue, 9 Jun 2020 09:58:48 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] kbuild: make module name conflict fatal error
-Message-ID: <20200609075848.GA509002@kroah.com>
-References: <20200511042149.1712876-1-masahiroy@kernel.org>
- <20200608020256.GA256950@roeck-us.net>
- <20200609062012.GA499862@kroah.com>
- <CAK8P3a2Pn22c8Z=w0FD15w4_+7LCWOpcbJ9b-Skh5iXzBjEx1g@mail.gmail.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:46502 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbgFIIoA (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Jun 2020 04:44:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20200511042149.1712876-1-masahiroy@kernel.org>
+ <20200608020256.GA256950@roeck-us.net> <20200609062012.GA499862@kroah.com> <CAK8P3a2Pn22c8Z=w0FD15w4_+7LCWOpcbJ9b-Skh5iXzBjEx1g@mail.gmail.com>
 In-Reply-To: <CAK8P3a2Pn22c8Z=w0FD15w4_+7LCWOpcbJ9b-Skh5iXzBjEx1g@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 9 Jun 2020 17:42:59 +0900
+Message-ID: <CAK7LNARM8UoE_L8EzhqQquu5FQwrUZLwrtjTFW_Va5ygBwhRmg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: make module name conflict fatal error
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Guenter Roeck <linux@roeck-us.net>, Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, Michal Marek <michal.lkml@markovi.net>, Stephen Rothwell <sfr@canb.auug.org.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, Michal Marek <michal.lkml@markovi.net>, Stephen Rothwell <sfr@canb.auug.org.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 09, 2020 at 09:51:46AM +0200, Arnd Bergmann wrote:
+On Tue, Jun 9, 2020 at 4:52 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
 > On Tue, Jun 9, 2020 at 8:20 AM Greg Kroah-Hartman
 > <gregkh@linuxfoundation.org> wrote:
 > >
@@ -50,11 +49,11 @@ On Tue, Jun 09, 2020 at 09:51:46AM +0200, Arnd Bergmann wrote:
 > > renaming either of them.
 > >
 > > Any ideas?
-> 
+>
 > I see zero chance of a kernel actually needing to provide both drivers,
 > given that the hardware is 20 years apart and gameports are almost
 > exclusive to x86 PCs. How about an ugly hack:
-> 
+>
 > diff --git a/drivers/input/joystick/Kconfig b/drivers/input/joystick/Kconfig
 > index 940b744639c7..6f73f02059b5 100644
 > --- a/drivers/input/joystick/Kconfig
@@ -67,9 +66,14 @@ On Tue, Jun 09, 2020 at 09:51:46AM +0200, Arnd Bergmann wrote:
 >         help
 >           Say Y here if you have a Logitech controller using the ADI
 >           protocol over the PC gameport.
-> 
+>
 >       Arnd
 
-Looks sane to me, thanks!
 
-greg k-h
+I am OK with this.
+Thank you.
+
+
+-- 
+Best Regards
+Masahiro Yamada
