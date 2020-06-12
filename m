@@ -1,22 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60790 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726085AbgFLPBB (ORCPT
+        with ESMTP id S1726089AbgFLPJq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jun 2020 11:01:01 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03387C03E96F
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 08:01:01 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id c75so9029692ila.8
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 08:01:00 -0700 (PDT)
+        Fri, 12 Jun 2020 11:09:46 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9913CC03E96F
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 08:09:45 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id t8so9064845ilm.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 08:09:45 -0700 (PDT)
 MIME-Version: 1.0
 References: <CA+icZUX20_yarSs7fJWq6Sxy3xBaeUXSQjmMbjcQFXB4JnyijA@mail.gmail.com>
  <CAK7LNAQuiuj5UifVBYEN7Xkp5GH0RNiWc5F3VyA1BAjGAUhqhw@mail.gmail.com>
 In-Reply-To: <CAK7LNAQuiuj5UifVBYEN7Xkp5GH0RNiWc5F3VyA1BAjGAUhqhw@mail.gmail.com>
 Reply-To: sedat.dilek@gmail.com
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 12 Jun 2020 17:00:47 +0200
-Message-ID: <CA+icZUW8JF+2-+U4=EuvF=HgjN18P7BnfhLpMvmWxA-G7Hak_g@mail.gmail.com>
+Date: Fri, 12 Jun 2020 17:09:32 +0200
+Message-ID: <CA+icZUUhq5cbUV+_pd6SxKbj__OFcpZEvRA9Op7eGMGbvJRb=A@mail.gmail.com>
 Subject: Re: x86/crypto: Set -no-integrated-as for specific object-file when
  building with LLVM_IAS=1
 Content-Type: text/plain; charset="UTF-8"
@@ -74,27 +74,41 @@ On Fri, Jun 12, 2020 at 4:54 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 > , which is effective for all .S files in the directory.
 >
 
-Hi Masahiro,
+It worked - here adapted:
 
-thanks for the feedback.
+git diff arch/x86/lib/Makefile
+diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
+index 619107bec0d9..ff6ae9ecb0ab 100644
+--- a/arch/x86/lib/Makefile
++++ b/arch/x86/lib/Makefile
+@@ -3,10 +3,6 @@
+ # Makefile for x86 specific library files.
+ #
 
-I could solve all breakage in arch/x86/crypto - for one issue I needed
-OBJDUMP=llvm-objdump in my make-options.
-So, I keep this in mind.
+-ifdef LLVM_IAS
+-KBUILD_CPPFLAGS += -no-integrated-as
+-endif
+-
+ # Produces uninteresting flaky coverage.
+ KCOV_INSTRUMENT_delay.o        := n
 
-Can we document this in llvm.rst kernel-doc as "troubleshooting"?
+@@ -39,6 +35,9 @@ obj-$(CONFIG_SMP) += msr-smp.o cache-smp.o
+ lib-y := delay.o misc.o cmdline.o cpu.o
+ lib-y += usercopy_$(BITS).o usercopy.o getuser.o putuser.o
+ lib-y += memcpy_$(BITS).o
++ifdef LLVM_IAS
++AFLAGS_memcpy_$(BITS).o += -no-integrated-as
++endif
+ lib-$(CONFIG_INSTRUCTION_DECODER) += insn.o inat.o insn-eval.o
+ lib-$(CONFIG_RANDOMIZE_BASE) += kaslr.o
+ lib-$(CONFIG_FUNCTION_ERROR_INJECTION) += error-inject.o
 
-Hope you are well.
+So, only memcpy_$(BITS).o is built with -no-integrated-as flag.
 
-Regards,
+Thanks.
+
 - Sedat -
 
->
->
->
->
->
->
 > > or
 > >
 > > CPPFLAGS_aes_ctrby8_avx-x86_64.o += -no-integrated-as
