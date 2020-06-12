@@ -1,114 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42746 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726263AbgFLTJx (ORCPT
+        with ESMTP id S1726268AbgFLTRV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 12 Jun 2020 15:09:53 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5320FC03E96F
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 12:09:52 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id b5so9772875iln.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 12:09:52 -0700 (PDT)
+        Fri, 12 Jun 2020 15:17:21 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82BC8C03E96F
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 12:17:21 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id b5so9791968iln.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jun 2020 12:17:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <CA+icZUX20_yarSs7fJWq6Sxy3xBaeUXSQjmMbjcQFXB4JnyijA@mail.gmail.com>
  <CAK7LNAQuiuj5UifVBYEN7Xkp5GH0RNiWc5F3VyA1BAjGAUhqhw@mail.gmail.com>
 In-Reply-To: <CAK7LNAQuiuj5UifVBYEN7Xkp5GH0RNiWc5F3VyA1BAjGAUhqhw@mail.gmail.com>
 Reply-To: sedat.dilek@gmail.com
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Fri, 12 Jun 2020 21:09:38 +0200
-Message-ID: <CA+icZUW2YAbA82BFgYKEr8FDZ239V-fPd_+X_XssqNEt79Aw7w@mail.gmail.com>
-Subject: Re: x86/crypto: Set -no-integrated-as for specific object-file when
- building with LLVM_IAS=1
+Date: Fri, 12 Jun 2020 21:17:09 +0200
+Message-ID: <CA+icZUUaNujMwrZFbwT1FtksCXFgnM9AohzRoq7xM8jrMN=Q5A@mail.gmail.com>
+Subject: LLVM_IAS=1 and DWARF-4
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Jun 12, 2020 at 4:54 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Hi Sedat,
->
->
-> On Fri, Jun 12, 2020 at 10:47 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > Hi Masahiro,
-> >
-> > I am trying to build with clang-10, ld.lld-10 and LLVM_IAS=1.
-> >
-> > I fell over some problems in x86/crypto area where I have found fixes.
-> >
-> > But how on hell can I set -no-integrated-as for specific object-file?
-> >
-> > [ arch/x86/crypto/Makefile ]
-> >
-> > ifdef LLVM_IAS
-> > KBUILD_CPPFLAGS += -no-integrated-as
-> > endif
-> >
-> > ...at the top sets -no-integrated-as for all object-files.
-> >
-> > I have two broken object-files (or more exact the corresponding *.S
-> > file is broken):
-> > #1: aes_ctrby8_avx-x86_64.o <--- FIXED
-> > <https://github.com/ClangBuiltLinux/linux/issues/1008>
-> > #2: crc32c-pcl-intel-asm_64.o <--- PATCH exist - does not work for me
-> >
-> > I tried...
-> >
-> > CFLAGS_aes_ctrby8_avx-x86_64.o += -no-integrated-as
-> > CLAGS_crc32c-pcl-intel-asm_64.o += -no-integrated-as
->
->
->
-> The source file is .S (assembly file),
-> so
->
->    AFLAGS_aes_ctrby8_avx-x86_64.o += -no-integrated-as
->
->
-> Or,
->
->    asflags-y += -no-integrated-as
->
-> , which is effective for all .S files in the directory.
->
->
->
->
->
->
->
-> > or
-> >
-> > CPPFLAGS_aes_ctrby8_avx-x86_64.o += -no-integrated-as
-> > CPPFLAGS_crc32c-pcl-intel-asm_64.o += -no-integrated-as
-> >
-> > or
-> >
-> > cflags-$(CONFIG_CRYPTO_AES_NI_INTEL) += -no-integrated-as
-> > cflags-$(CONFIG_CRYPTO_CRC32C_INTEL) += -no-integrated-as
-> >
-> > or
-> >
-> > cppflags-$(CONFIG_CRYPTO_AES_NI_INTEL) += -no-integrated-as
-> > cppflags-$(CONFIG_CRYPTO_CRC32C_INTEL) += -no-integrated-as
-> >
-> > All above also with "-fno-integrated-as" at the top and at the bottom
-> > of the Makefile.
-> >
-> > Can you give a hint?
-> >
-> > Thanks.
-> >
-> > Regards,
-> > - Sedat -
-> >
-> > [1] https://github.com/ClangBuiltLinux/linux/issues/1049
-> > [1] https://github.com/ClangBuiltLinux/linux/issues/1050
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Hi Masahiro,
+
+when I build with LLVM_IAS=1 I want to force DWARF-4.
+
+CONFIG_DEBUG_INFO_DWARF4=y sets "DEBUG_CFLAGS += -gdwarf-4".
+
+I tried:
+
+[ Makefile ]
+
+ifdef CONFIG_DEBUG_INFO
+ifdef CONFIG_DEBUG_INFO_SPLIT
+DEBUG_CFLAGS    += -gsplit-dwarf
+else
+DEBUG_CFLAGS    += -g
+endif
+ifndef LLVM_IAS
+KBUILD_AFLAGS    += -Wa,-gdwarf-2
+endif
+endif
+ifdef CONFIG_DEBUG_INFO_DWARF4
+DEBUG_CFLAGS    += -gdwarf-4
+ifdef LLVM_IAS
+KBUILD_AFLAGS    += -Wa,-gdwarf-4
+endif
+endif
+
+If I set LLVM_IAS=1 ---> CONFIG_DEBUG_INFO_DWARF4=y shall be set automatically.
+
+Dunno if "KBUILD_AFLAGS += -Wa,-gdwarf-4" is a good idea.
+
+"KBUILD_AFLAGS += -Wa,-gdwarf-2" is known to break with LLVM_IAS=1.
+
+I am lost in ifdef-eries...
+
+Any cool ideas?
+
+Regards,
+- Sedat -
