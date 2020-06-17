@@ -1,57 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728175AbgFPSpc (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:45317 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbgFQCJK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:45:32 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD996C061573
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2020 11:45:32 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id k2so1823774pjs.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2020 11:45:32 -0700 (PDT)
-Date: Tue, 16 Jun 2020 11:45:30 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v2] recordmcount: support >64k sections
-Message-ID: <202006161145.25387D9@keescook>
-References: <20200422232417.72162-1-samitolvanen@google.com>
- <20200424193046.160744-1-samitolvanen@google.com>
- <20200424222214.GC9040@rlwimi.vmware.com>
- <202006161101.34B26E6@keescook>
- <20200616143844.5599804d@oasis.local.home>
+        Tue, 16 Jun 2020 22:09:10 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] samples: watch_queue: build sample program for target architecture
+Date: Wed, 17 Jun 2020 11:08:38 +0900
+Message-Id: <20200617020838.22134-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200616143844.5599804d@oasis.local.home>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Matt Helsley <mhelsley@vmware.com>, Sami Tolvanen <samitolvanen@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner <tglx@linutronix.de>, "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>, Kristen Carlson Accardi <kristen@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 02:38:44PM -0400, Steven Rostedt wrote:
-> On Tue, 16 Jun 2020 11:03:18 -0700
-> Kees Cook <keescook@chromium.org> wrote:
-> 
-> > > Reviewed-by: Matt Helsley <mhelsley@vmware.com>  
-> > 
-> > Hi!
-> > 
-> > Can this patch please be applied and sent before -rc2? FGKASLR, LTO, and
-> > link time improvements[1] all depend on this fix, and I'd really like
-> > them all to be able to sanely rebase for the development window.
-> > 
-> > Thanks!
-> > 
-> > -Kees
-> > 
-> > [1] https://lore.kernel.org/lkml/CAK7LNARbZhoaA=Nnuw0=gBrkuKbr_4Ng_Ei57uafujZf7Xazgw@mail.gmail.com/
-> 
-> The patch seems to have fallen behind in my patch stack (unfortunately,
-> it's most recent first!)
-> 
-> Anyway, I'm putting together now a set of patches for -rc2. I'll
-> include this one in it as well.
+This userspace program includes UAPI headers exported to usr/include/.
+'make headers' always works for the target architecture (i.e. the same
+architecture as the kernel), so the sample program should be built for
+the target as well. Kbuild now supports 'userprogs' for that.
 
-Awesome! Thanks very much. :)
+I also guarded the CONFIG option by 'depends on CC_CAN_LINK' because
+$(CC) may not provide libc.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ samples/Kconfig              |  2 +-
+ samples/watch_queue/Makefile | 10 ++++------
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/samples/Kconfig b/samples/Kconfig
+index f3ac549a53b0..0ed6e4d71d87 100644
+--- a/samples/Kconfig
++++ b/samples/Kconfig
+@@ -211,7 +211,7 @@ config SAMPLE_WATCHDOG
+ 
+ config SAMPLE_WATCH_QUEUE
+ 	bool "Build example /dev/watch_queue notification consumer"
+-	depends on HEADERS_INSTALL
++	depends on CC_CAN_LINK && HEADERS_INSTALL
+ 	help
+ 	  Build example userspace program to use the new mount_notify(),
+ 	  sb_notify() syscalls and the KEYCTL_WATCH_KEY keyctl() function.
+diff --git a/samples/watch_queue/Makefile b/samples/watch_queue/Makefile
+index 8511fb6c53d2..792b22f593cf 100644
+--- a/samples/watch_queue/Makefile
++++ b/samples/watch_queue/Makefile
+@@ -1,7 +1,5 @@
+-# List of programs to build
+-hostprogs := watch_test
++# SPDX-License-Identifier: GPL-2.0-only
++userprogs := watch_test
++always-y := $(userprogs)
+ 
+-# Tell kbuild to always build the programs
+-always-y := $(hostprogs)
+-
+-HOSTCFLAGS_watch_test.o += -I$(objtree)/usr/include
++userccflags += -I usr/include
 -- 
-Kees Cook
+2.25.1
