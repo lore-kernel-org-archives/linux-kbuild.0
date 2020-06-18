@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34440 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:56834 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731724AbgFRB0p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:26:45 -0400
+        id S1730945AbgFRBXS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:23:18 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 033/108] mksysmap: Fix the mismatch of '.L' symbols in System.map
-Date: Wed, 17 Jun 2020 21:24:45 -0400
-Message-Id: <20200618012600.608744-33-sashal@kernel.org>
-In-Reply-To: <20200618012600.608744-1-sashal@kernel.org>
-References: <20200618012600.608744-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 044/172] mksysmap: Fix the mismatch of '.L' symbols in System.map
+Date: Wed, 17 Jun 2020 21:20:10 -0400
+Message-Id: <20200618012218.607130-44-sashal@kernel.org>
+In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
+References: <20200618012218.607130-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
