@@ -1,78 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0231.hostedemail.com ([216.40.44.231]:52636 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725814AbgFQEoK (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jun 2020 00:44:10 -0400
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave02.hostedemail.com (Postfix) with ESMTP id A37FE18008256
-        for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2020 04:36:45 +0000 (UTC)
-Message-ID: <b1eef508475f2ad501a153bb9d90d64a5128ecdd.camel@perches.com>
-Subject: Re: [PATCH 2/2] Revert "checkpatch: kconfig: prefer 'help' over
- '---help---'"
-From: Joe Perches <joe@perches.com>
-Date: Tue, 16 Jun 2020 21:36:42 -0700
-In-Reply-To: <20200617030220.34733-2-masahiroy@kernel.org>
-References: <20200617030220.34733-1-masahiroy@kernel.org>
-         <20200617030220.34733-2-masahiroy@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
+Received: from mail.kernel.org ([198.145.29.99]:40566 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732549AbgFRBac (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:30:32 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 19/60] mksysmap: Fix the mismatch of '.L' symbols in System.map
+Date: Wed, 17 Jun 2020 21:29:23 -0400
+Message-Id: <20200618013004.610532-19-sashal@kernel.org>
+In-Reply-To: <20200618013004.610532-1-sashal@kernel.org>
+References: <20200618013004.610532-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Andy Whitcroft <apw@canonical.com>, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: ashimida <ashimida@linux.alibaba.com>, Masahiro Yamada <masahiroy@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, 2020-06-17 at 12:02 +0900, Masahiro Yamada wrote:
-> This reverts commit 84af7a6194e493fae312a2b7fa5a3b51f76d9282.
+From: ashimida <ashimida@linux.alibaba.com>
 
-Also: https://lore.kernel.org/patchwork/patch/1255848/
+[ Upstream commit 72d24accf02add25e08733f0ecc93cf10fcbd88c ]
+
+When System.map was generated, the kernel used mksysmap to
+filter the kernel symbols, but all the symbols with the
+second letter 'L' in the kernel were filtered out, not just
+the symbols starting with 'dot + L'.
+
+For example:
+ashimida@ubuntu:~/linux$ cat System.map |grep ' .L'
+ashimida@ubuntu:~/linux$ nm -n vmlinux |grep ' .L'
+ffff0000088028e0 t bLength_show
+......
+ffff0000092e0408 b PLLP_OUTC_lock
+ffff0000092e0410 b PLLP_OUTA_lock
+
+The original intent should be to filter out all local symbols
+starting with '.L', so the dot should be escaped.
+
+Fixes: 00902e984732 ("mksysmap: Add h8300 local symbol pattern")
+Signed-off-by: ashimida <ashimida@linux.alibaba.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/checkkconfigsymbols.py | 2 +-
- scripts/checkpatch.pl          | 6 +-----
- scripts/kconfig/lexer.l        | 2 +-
- 3 files changed, 3 insertions(+), 7 deletions(-)
+ scripts/mksysmap | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/checkkconfigsymbols.py b/scripts/checkkconfigsymbols.py
-index 00a10a293f4f..1548f9ce4682 100755
---- a/scripts/checkkconfigsymbols.py
-+++ b/scripts/checkkconfigsymbols.py
-@@ -34,7 +34,7 @@ REGEX_SOURCE_SYMBOL = re.compile(SOURCE_SYMBOL)
- REGEX_KCONFIG_DEF = re.compile(DEF)
- REGEX_KCONFIG_EXPR = re.compile(EXPR)
- REGEX_KCONFIG_STMT = re.compile(STMT)
--REGEX_KCONFIG_HELP = re.compile(r"^\s+(help|---help---)\s*$")
-+REGEX_KCONFIG_HELP = re.compile(r"^\s+help\s*$")
- REGEX_FILTER_SYMBOLS = re.compile(r"[A-Za-z0-9]$")
- REGEX_NUMERIC = re.compile(r"0[xX][0-9a-fA-F]+|[0-9]+")
- REGEX_QUOTES = re.compile("(\"(.*?)\")")
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 524df88f9364..738bb3fcf202 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -3044,11 +3044,7 @@ sub process {
+diff --git a/scripts/mksysmap b/scripts/mksysmap
+index a35acc0d0b82..9aa23d15862a 100755
+--- a/scripts/mksysmap
++++ b/scripts/mksysmap
+@@ -41,4 +41,4 @@
+ # so we just ignore them to let readprofile continue to work.
+ # (At least sparc64 has __crc_ in the middle).
  
- 				if ($lines[$ln - 1] =~ /^\+\s*(?:bool|tristate|prompt)\s*["']/) {
- 					$is_start = 1;
--				} elsif ($lines[$ln - 1] =~ /^\+\s*(?:help|---help---)\s*$/) {
--					if ($lines[$ln - 1] =~ "---help---") {
--						WARN("CONFIG_DESCRIPTION",
--						     "prefer 'help' over '---help---' for new help texts\n" . $herecurr);
--					}
-+				} elsif ($lines[$ln - 1] =~ /^\+\s*help\s*$/) {
- 					$length = -1;
- 				}
- 
-diff --git a/scripts/kconfig/lexer.l b/scripts/kconfig/lexer.l
-index 6354c905b006..4b7339ff4c8b 100644
---- a/scripts/kconfig/lexer.l
-+++ b/scripts/kconfig/lexer.l
-@@ -105,7 +105,7 @@ n	[A-Za-z0-9_-]
- "endchoice"		return T_ENDCHOICE;
- "endif"			return T_ENDIF;
- "endmenu"		return T_ENDMENU;
--"help"|"---help---"	return T_HELP;
-+"help"			return T_HELP;
- "hex"			return T_HEX;
- "if"			return T_IF;
- "imply"			return T_IMPLY;
+-$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( .L\)' > $2
++$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $2
+-- 
+2.25.1
