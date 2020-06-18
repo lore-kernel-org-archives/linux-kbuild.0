@@ -1,58 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49612 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:44978 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729894AbgFRBSO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:18:14 -0400
+        id S1728689AbgFRBPC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:15:02 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.4 074/266] mksysmap: Fix the mismatch of '.L' symbols in System.map
-Date: Wed, 17 Jun 2020 21:13:19 -0400
-Message-Id: <20200618011631.604574-74-sashal@kernel.org>
-In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
-References: <20200618011631.604574-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 322/388] modpost: fix -i (--ignore-errors) MAKEFLAGS detection
+Date: Wed, 17 Jun 2020 21:06:59 -0400
+Message-Id: <20200618010805.600873-322-sashal@kernel.org>
+In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
+References: <20200618010805.600873-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: ashimida <ashimida@linux.alibaba.com>, Masahiro Yamada <masahiroy@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Guenter Roeck <linux@roeck-us.net>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
 
-From: ashimida <ashimida@linux.alibaba.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
 
-[ Upstream commit 72d24accf02add25e08733f0ecc93cf10fcbd88c ]
+[ Upstream commit 91e6ee581270b8ae970f028b898314d73f16870b ]
 
-When System.map was generated, the kernel used mksysmap to
-filter the kernel symbols, but all the symbols with the
-second letter 'L' in the kernel were filtered out, not just
-the symbols starting with 'dot + L'.
+$(filter -i,$(MAKEFLAGS)) works only in limited use-cases.
 
-For example:
-ashimida@ubuntu:~/linux$ cat System.map |grep ' .L'
-ashimida@ubuntu:~/linux$ nm -n vmlinux |grep ' .L'
-ffff0000088028e0 t bLength_show
-......
-ffff0000092e0408 b PLLP_OUTC_lock
-ffff0000092e0410 b PLLP_OUTA_lock
+The representation of $(MAKEFLAGS) depends on various factors:
+  - GNU Make version (version 3.8x or version 4.x)
+  - The presence of other flags like -j
 
-The original intent should be to filter out all local symbols
-starting with '.L', so the dot should be escaped.
+In my experiments, $(MAKEFLAGS) is expanded as follows:
 
-Fixes: 00902e984732 ("mksysmap: Add h8300 local symbol pattern")
-Signed-off-by: ashimida <ashimida@linux.alibaba.com>
+  * GNU Make 3.8x:
+
+    * without -j option:
+      --no-print-directory -Rri
+
+    * with -j option:
+      --no-print-directory -Rr --jobserver-fds=3,4 -j -i
+
+  * GNU Make 4.x:
+
+    * without -j option:
+      irR --no-print-directory
+
+    * with -j option:
+      irR -j --jobserver-fds=3,4 --no-print-directory
+
+For GNU Make 4.x, the flags are grouped as 'irR', which does not work.
+
+For the single thread build with GNU Make 3.8x, the flags are grouped
+as '-Rri', which does not work either.
+
+To make it work for all cases, do likewise as commit 6f0fa58e4596
+("kbuild: simplify silent build (-s) detection").
+
+BTW, since commit ff9b45c55b26 ("kbuild: modpost: read modules.order
+instead of $(MODVERDIR)/*.mod"), you also need to pass -k option to
+build final *.ko files. 'make -i -k' ignores compile errors in modules,
+and build as many remaining *.ko as possible.
+
+Please note this feature is kind of dangerous if other modules depend
+on the broken module because the generated modules will lack the correct
+module dependency or CRC. Honestly, I am not a big fan of it, but I am
+keeping this feature.
+
+Fixes: eed380f3f593 ("modpost: Optionally ignore secondary errors seen if a single module build fails")
+Cc: Guenter Roeck <linux@roeck-us.net>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/mksysmap | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Makefile.modpost | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/mksysmap b/scripts/mksysmap
-index a35acc0d0b82..9aa23d15862a 100755
---- a/scripts/mksysmap
-+++ b/scripts/mksysmap
-@@ -41,4 +41,4 @@
- # so we just ignore them to let readprofile continue to work.
- # (At least sparc64 has __crc_ in the middle).
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 957eed6a17a5..33aaa572f686 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -66,7 +66,7 @@ __modpost:
  
--$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( .L\)' > $2
-+$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $2
+ else
+ 
+-MODPOST += $(subst -i,-n,$(filter -i,$(MAKEFLAGS))) -s -T - \
++MODPOST += -s -T - \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS))
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+@@ -82,6 +82,11 @@ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+              $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
+ endif
+ 
++# 'make -i -k' ignores compile errors, and builds as many modules as possible.
++ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
++MODPOST += -n
++endif
++
+ # find all modules listed in modules.order
+ modules := $(sort $(shell cat $(MODORDER)))
+ 
 -- 
 2.25.1
