@@ -1,58 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37406 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728446AbgFRBKR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:10:17 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.7 097/388] mksysmap: Fix the mismatch of '.L' symbols in System.map
-Date: Wed, 17 Jun 2020 21:03:14 -0400
-Message-Id: <20200618010805.600873-97-sashal@kernel.org>
-In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
-References: <20200618010805.600873-1-sashal@kernel.org>
+Received: from conuserg-10.nifty.com ([210.131.2.77]:32689 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726002AbgFSEtY (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Jun 2020 00:49:24 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] Revert "Makefile: install modules.builtin even if CONFIG_MODULES=n"
+Date: Fri, 19 Jun 2020 13:48:23 +0900
+Message-Id: <20200619044823.863461-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: ashimida <ashimida@linux.alibaba.com>, Masahiro Yamada <masahiroy@kernel.org>, Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Douglas Anderson <dianders@chromium.org>, Guenter Roeck <linux@roeck-us.net>, Jonas Karlman <jonas@kwiboo.se>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-From: ashimida <ashimida@linux.alibaba.com>
+This reverts commit e0b250b57dcf403529081e5898a9de717f96b76b.
 
-[ Upstream commit 72d24accf02add25e08733f0ecc93cf10fcbd88c ]
+Now that "make install" copies modules.builtin to $(INSTALL_MOD_PATH),
+it breaks systems that do not set INSTALL_MOD_PATH for "make install".
 
-When System.map was generated, the kernel used mksysmap to
-filter the kernel symbols, but all the symbols with the
-second letter 'L' in the kernel were filtered out, not just
-the symbols starting with 'dot + L'.
+While modules.builtin is useful for CONFIG_MODULES=n, this way gives
+unexpected impact to existing systems. Maybe "make modules_install"
+can install modules.builtin irrespective of CONFIG_MODULES as Jonas
+originally suggested. Anyway, this commit should be reverted ASAP.
 
-For example:
-ashimida@ubuntu:~/linux$ cat System.map |grep ' .L'
-ashimida@ubuntu:~/linux$ nm -n vmlinux |grep ' .L'
-ffff0000088028e0 t bLength_show
-......
-ffff0000092e0408 b PLLP_OUTC_lock
-ffff0000092e0410 b PLLP_OUTA_lock
-
-The original intent should be to filter out all local symbols
-starting with '.L', so the dot should be escaped.
-
-Fixes: 00902e984732 ("mksysmap: Add h8300 local symbol pattern")
-Signed-off-by: ashimida <ashimida@linux.alibaba.com>
+Reported-by: Douglas Anderson <dianders@chromium.org>
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Cc: Jonas Karlman <jonas@kwiboo.se>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- scripts/mksysmap | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/mksysmap b/scripts/mksysmap
-index a35acc0d0b82..9aa23d15862a 100755
---- a/scripts/mksysmap
-+++ b/scripts/mksysmap
-@@ -41,4 +41,4 @@
- # so we just ignore them to let readprofile continue to work.
- # (At least sparc64 has __crc_ in the middle).
+ Makefile | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 29abe44ada91..9880e911afe3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1336,16 +1336,6 @@ dt_binding_check: scripts_dtc
+ # ---------------------------------------------------------------------------
+ # Modules
  
--$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( .L\)' > $2
-+$NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)\|\( \.L\)' > $2
+-# install modules.builtin regardless of CONFIG_MODULES
+-PHONY += _builtin_inst_
+-_builtin_inst_:
+-	@mkdir -p $(MODLIB)/
+-	@cp -f modules.builtin $(MODLIB)/
+-	@cp -f $(objtree)/modules.builtin.modinfo $(MODLIB)/
+-
+-PHONY += install
+-install: _builtin_inst_
+-
+ ifdef CONFIG_MODULES
+ 
+ # By default, build modules as well
+@@ -1389,7 +1379,7 @@ PHONY += modules_install
+ modules_install: _modinst_ _modinst_post
+ 
+ PHONY += _modinst_
+-_modinst_: _builtin_inst_
++_modinst_:
+ 	@rm -rf $(MODLIB)/kernel
+ 	@rm -f $(MODLIB)/source
+ 	@mkdir -p $(MODLIB)/kernel
+@@ -1399,6 +1389,8 @@ _modinst_: _builtin_inst_
+ 		ln -s $(CURDIR) $(MODLIB)/build ; \
+ 	fi
+ 	@sed 's:^:kernel/:' modules.order > $(MODLIB)/modules.order
++	@cp -f modules.builtin $(MODLIB)/
++	@cp -f $(objtree)/modules.builtin.modinfo $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ 
+ # This depmod is only for convenience to give the initial
 -- 
 2.25.1
