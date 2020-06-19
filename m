@@ -1,20 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33652 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405071AbgFSPkl (ORCPT
+        with ESMTP id S2405074AbgFSPl4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Jun 2020 11:40:41 -0400
-Date: Fri, 19 Jun 2020 08:40:34 -0700
+        Fri, 19 Jun 2020 11:41:56 -0400
+Date: Fri, 19 Jun 2020 08:41:54 -0700
 From: Guenter Roeck <linux@roeck-us.net>
 Subject: Re: [PATCH v2] Revert "Makefile: install modules.builtin even if
  CONFIG_MODULES=n"
-Message-ID: <20200619154034.GB57109@roeck-us.net>
-References: <20200619150955.13417-1-masahiroy@kernel.org>
+Message-ID: <20200619154154.GA210604@roeck-us.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200619150955.13417-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
@@ -42,7 +40,7 @@ On Sat, Jun 20, 2020 at 12:09:55AM +0900, Masahiro Yamada wrote:
 > Cc: Jonas Karlman <jonas@kwiboo.se>
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
 > ---
 > 
