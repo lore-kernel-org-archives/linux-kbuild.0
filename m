@@ -1,79 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:46949 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730425AbgFURHw (ORCPT
+Received: from smtprelay0207.hostedemail.com ([216.40.44.207]:45460 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729279AbgFUTM4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 Jun 2020 13:07:52 -0400
-MIME-Version: 1.0
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 22 Jun 2020 02:06:58 +0900
-Message-ID: <CAK7LNAT6C26gEHyT17cwHkvjx3NgvjtuFuuhqYWwH5fSz7R6wA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.8-rc2
+        Sun, 21 Jun 2020 15:12:56 -0400
+Message-ID: <cb10e0a1a35e7dfc4f6a27dacb7883eaa3864811.camel@perches.com>
+Subject: Re: kbuild: separate kerneldoc warnings from compiler warnings
+From: Joe Perches <joe@perches.com>
+Date: Sun, 21 Jun 2020 12:12:53 -0700
+In-Reply-To: <591473.1592679153@turing-police>
+References: <591473.1592679153@turing-police>
 Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Valdis =?UTF-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Sat, 2020-06-20 at 14:52 -0400, Valdis Klētnieks wrote:
+> This patch introduces a new build flag 'K=1' which controls whether kerneldoc
+> warnings should be issued, separating them from the compiler warnings that W=
+> controls.
+[]
+> diff --git a/Makefile b/Makefile
+[]
+> @@ -1605,6 +1605,7 @@ PHONY += help
+>  	@echo  '                       (sparse by default)'
+>  	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+>  	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+> +	@echo  '  make K=1   [targets] Warn about problems in kerneldoc comments'
 
-Please pull some Kbuild fixes.
-Thanks.
-
-
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
-
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.8
-
-for you to fetch changes up to 214377e9b7e3185abf5998b8a90450e01bab21a7:
-
-  samples: watch_queue: build sample program for target architecture
-(2020-06-22 01:56:09 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.8
-
- - fix -gz=zlib compiler option test for CONFIG_DEBUG_INFO_COMPRESSED
-
- - improve cc-option in scripts/Kbuild.include to clean up temp files
-
- - improve cc-option in scripts/Kconfig.include for more reliable compile
-   option test
-
- - do not copy modules.builtin by 'make install' because it would break
-   existing systems
-
- - use 'userprogs' syntax for watch_queue sample
-
-----------------------------------------------------------------
-Arvind Sankar (1):
-      Makefile: Improve compressed debug info support detection
-
-Masahiro Yamada (4):
-      kbuild: improve cc-option to clean up all temporary files
-      kconfig: unify cc-option and as-option
-      Revert "Makefile: install modules.builtin even if CONFIG_MODULES=n"
-      samples: watch_queue: build sample program for target architecture
-
-Masanari Iida (1):
-      scripts: Fix typo in headers_install.sh
-
- Makefile                     | 16 ++++------------
- arch/arm64/Kconfig           |  2 +-
- lib/Kconfig.debug            |  1 -
- samples/Kconfig              |  2 +-
- samples/watch_queue/Makefile | 10 ++++------
- scripts/Kbuild.include       | 11 ++++++-----
- scripts/Kconfig.include      |  8 +-------
- scripts/headers_install.sh   |  2 +-
- 8 files changed, 18 insertions(+), 34 deletions(-)
-
-
---
-Best Regards
-Masahiro Yamada
+Seems sensible. Thanks.
