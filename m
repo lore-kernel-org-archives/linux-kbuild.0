@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33534 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:34984 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387558AbgFWRgX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:36:23 -0400
+        id S2387751AbgFWRhK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:37:10 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.4 19/24] kbuild: improve cc-option to clean up all temporary files
-Date: Tue, 23 Jun 2020 13:35:54 -0400
-Message-Id: <20200623173559.1355728-19-sashal@kernel.org>
-In-Reply-To: <20200623173559.1355728-1-sashal@kernel.org>
-References: <20200623173559.1355728-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 2/3] kbuild: improve cc-option to clean up all temporary files
+Date: Tue, 23 Jun 2020 13:37:05 -0400
+Message-Id: <20200623173706.1356340-2-sashal@kernel.org>
+In-Reply-To: <20200623173706.1356340-1-sashal@kernel.org>
+References: <20200623173706.1356340-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -50,11 +50,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index d1dd4a6b6adb6..7da10afc92c61 100644
+index e61a5c29b08c5..b6f055157b89a 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -82,20 +82,21 @@ cc-cross-prefix = $(firstword $(foreach c, $(1), \
- 			$(if $(shell command -v -- $(c)gcc 2>/dev/null), $(c))))
+@@ -81,20 +81,21 @@ cc-cross-prefix =  \
+ 		fi)))
  
  # output directory for tests below
 -TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
@@ -62,8 +62,8 @@ index d1dd4a6b6adb6..7da10afc92c61 100644
  
  # try-run
  # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
- # Exit code chooses option. "$$TMP" serves as a temporary file and is
- # automatically cleaned up.
+ # Exit code chooses option. "$$TMP" is can be used as temporary file and
+ # is automatically cleaned up.
  try-run = $(shell set -e;		\
 -	TMP="$(TMPOUT).$$$$.tmp";	\
 -	TMPO="$(TMPOUT).$$$$.o";	\
