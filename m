@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34984 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:34838 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387751AbgFWRhK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:37:10 -0400
+        id S2387728AbgFWRhF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:37:05 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 2/3] kbuild: improve cc-option to clean up all temporary files
-Date: Tue, 23 Jun 2020 13:37:05 -0400
-Message-Id: <20200623173706.1356340-2-sashal@kernel.org>
-In-Reply-To: <20200623173706.1356340-1-sashal@kernel.org>
-References: <20200623173706.1356340-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 5/6] kbuild: improve cc-option to clean up all temporary files
+Date: Tue, 23 Jun 2020 13:36:57 -0400
+Message-Id: <20200623173658.1356241-5-sashal@kernel.org>
+In-Reply-To: <20200623173658.1356241-1-sashal@kernel.org>
+References: <20200623173658.1356241-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -50,10 +50,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index e61a5c29b08c5..b6f055157b89a 100644
+index 558dea61db114..1920b9e2d2514 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -81,20 +81,21 @@ cc-cross-prefix =  \
+@@ -82,20 +82,21 @@ cc-cross-prefix =  \
  		fi)))
  
  # output directory for tests below
