@@ -1,44 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40477 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731158AbgFWKQn (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52170 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732227AbgFWLNd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Jun 2020 06:16:43 -0400
-Reply-To: alex.popov@linux.com
-Subject: Re: [PATCH 5/5] gcc-plugins/stackleak: Don't instrument
- vgettimeofday.c in arm64 VDSO
-References: <20200604134957.505389-1-alex.popov@linux.com>
- <20200604134957.505389-6-alex.popov@linux.com>
- <20200604135806.GA3170@willie-the-truck> <202006091149.6C78419@keescook>
- <20200610073046.GA15939@willie-the-truck>
-From: Alexander Popov <alex.popov@linux.com>
-Message-ID: <02f576e5-6512-99ca-0de0-a4239c6063ca@linux.com>
-Date: Tue, 23 Jun 2020 13:16:28 +0300
+        Tue, 23 Jun 2020 07:13:33 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD365C0617B9
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Jun 2020 04:13:31 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id t85so9510341ili.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Jun 2020 04:13:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200610073046.GA15939@willie-the-truck>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Reply-To: sarahkoffi389@yahoo.co.jp
+From: Sarah Koffi <elnana194@gmail.com>
+Date: Tue, 23 Jun 2020 12:13:30 +0100
+Message-ID: <CA+NUCuTpRBCNhzPsUx6VPrOLF5ST46h_JaJQFi9zwqK2yEciSw@mail.gmail.com>
+Subject: Greetings From Mrs. Sarah Koffi
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will@kernel.org>, Kees Cook <keescook@chromium.org>
-Cc: Emese Revfy <re.emese@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Thiago Jung Bauermann <bauerman@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>, Jessica Yu <jeyu@kernel.org>, Sven Schnelle <svens@stackframe.org>, Iurii Zaikin <yzaikin@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Collingbourne <pcc@google.com>, Naohiro Aota <naohiro.aota@wdc.com>, Alexander Monakov <amonakov@ispras.ru>, Mathias Krause <minipli@googlemail.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Laura Abbott <labbott@redhat.com>, Florian Weimer <fweimer@redhat.com>, kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gcc@gcc.gnu.org, notify@kernel.org
+To: sarahkoffi389@yahoo.co.jp
 
-On 10.06.2020 10:30, Will Deacon wrote:
-> On Tue, Jun 09, 2020 at 12:09:27PM -0700, Kees Cook wrote:
->> arm_ssp_per_task_plugin.c
->> 	32-bit ARM only (but likely needs disabling for 32-bit ARM vDSO?)
+Greetings From Mrs. Sarah Koffi
 
-I tested: on 32-bit arm vDSO is built with plugin flags. I will filter them out
-in a separate patch in v2 of the series.
+I'm contacting you based on your good profiles I read and for a good
+reasons, I am in search of a property to buy in your country as I
+intended to come over to your
+country for investment, Though I have not meet with you before but I
+believe that one has to risk confiding in someone to succeed sometimes
+in life.
 
-> On arm64, the 32-bit toolchain is picked up via CC_COMPAT -- does that still
-> get the plugins?
-I tested it with this command:
-  make  ARCH=arm64 CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
-CROSS_COMPILE=aarch64-linux-gnu- V=1
+My name is Mrs. Sarah Koffi. My late husband deals on Crude Oil with
+Federal Government of Sudan and he has a personal Oil firm in Bentiu
+Oil zone town and Upper
+Nile city. What I have experience physically, I don't wish to
+experience it again in my life due to the recent civil Ethnic war
+cause by our President Mr. Salva Kiir
+and the rebel leader Mr Riek Machar, I have been Under United Nation
+refuge camp in chad to save my life and that of my little daughter.
 
-I see that COMPAT_VDSO is built without plugin flags. So it's ok.
+Though, I do not know how you will feel to my proposal, but the truth
+is that I sneaked into Chad our neighboring country where I am living
+now as a refugee.
+I escaped with my little daughter when the rebels bust into our house
+and killed my husband as one of the big oil dealers in the country,
+ever since then, I have being on the run.
 
-Best regards,
-Alexander
+I left my country and move to Chad our neighboring country with the
+little ceasefire we had, due to the face to face peace meeting accord
+coordinated by the US Secretary of State, Mr John Kerry and United
+Nations in Ethiopia (Addis Ababa) between our President Mr Salva Kiir
+and the rebel leader Mr Riek Machar to stop this war.
+
+I want to solicit for your partnership with trust to invest the $8
+million dollars deposited by my late husband in Bank because my life
+is no longer safe in our country, since the rebels are looking for the
+families of all the oil business men in the country to kill, saying
+that they are they one that is milking the country dry.
+
+I will offer you 20% of the total fund for your help while I will
+partner with you for the investment in your country.
+If I get your reply.
+
+I will wait to hear from you so as to give you details.With love from
+
+ i need you to contact me here sarahkoffi389@yahoo.co.jp
+
+Mrs. Sarah Koffi
