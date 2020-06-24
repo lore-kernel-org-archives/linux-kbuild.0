@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38574 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390646AbgFXMe1 (ORCPT
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:45492 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403929AbgFXMet (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 08:34:27 -0400
+        Wed, 24 Jun 2020 08:34:49 -0400
 From: Alexander Popov <alex.popov@linux.com>
-Subject: [PATCH v2 3/5] arm64: vdso: Don't use gcc plugins for building vgettimeofday.c
-Date: Wed, 24 Jun 2020 15:33:28 +0300
-Message-Id: <20200624123330.83226-4-alex.popov@linux.com>
+Subject: [PATCH v2 5/5] gcc-plugins/stackleak: Add 'verbose' plugin parameter
+Date: Wed, 24 Jun 2020 15:33:30 +0300
+Message-Id: <20200624123330.83226-6-alex.popov@linux.com>
 In-Reply-To: <20200624123330.83226-1-alex.popov@linux.com>
 References: <20200624123330.83226-1-alex.popov@linux.com>
 MIME-Version: 1.0
@@ -17,26 +17,130 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Kees Cook <keescook@chromium.org>, Jann Horn <jannh@google.com>, Emese Revfy <re.emese@gmail.com>, Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Thiago Jung Bauermann <bauerman@linux.ibm.com>, Luis Chamberlain <mcgrof@kernel.org>, Jessica Yu <jeyu@kernel.org>, Sven Schnelle <svens@stackframe.org>, Iurii Zaikin <yzaikin@google.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Peter Collingbourne <pcc@google.com>, Naohiro Aota <naohiro.aota@wdc.com>, Alexander Monakov <amonakov@ispras.ru>, Mathias Krause <minipli@googlemail.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Laura Abbott <labbott@redhat.com>, Florian Weimer <fweimer@redhat.com>, Alexander Popov <alex.popov@linux.com>, kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, gcc@gcc.gnu.org
 Cc: notify@kernel.org
 
-Don't use gcc plugins for building arch/arm64/kernel/vdso/vgettimeofday.c
-to avoid unneeded instrumentation.
+Add 'verbose' plugin parameter for stackleak gcc plugin.
+It can be used for printing additional info about the kernel code
+instrumentation.
+
+For using it add the following to scripts/Makefile.gcc-plugins:
+  gcc-plugin-cflags-$(CONFIG_GCC_PLUGIN_STACKLEAK) \
+    += -fplugin-arg-stackleak_plugin-verbose
 
 Signed-off-by: Alexander Popov <alex.popov@linux.com>
 ---
- arch/arm64/kernel/vdso/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/gcc-plugins/stackleak_plugin.c | 47 +++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index 556d424c6f52..0f1ad63b3326 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -29,7 +29,7 @@ ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 --hash-style=sysv \
- ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
- ccflags-y += -DDISABLE_BRANCH_PROFILING
+diff --git a/scripts/gcc-plugins/stackleak_plugin.c b/scripts/gcc-plugins/stackleak_plugin.c
+index a18b0d4af456..48e141e07956 100644
+--- a/scripts/gcc-plugins/stackleak_plugin.c
++++ b/scripts/gcc-plugins/stackleak_plugin.c
+@@ -34,6 +34,8 @@ __visible int plugin_is_GPL_compatible;
+ static int track_frame_size = -1;
+ static bool build_for_x86 = false;
+ static const char track_function[] = "stackleak_track_stack";
++static bool disable = false;
++static bool verbose = false;
  
--CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS)
-+CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
- KBUILD_CFLAGS			+= $(DISABLE_LTO)
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
+ /*
+  * Mark these global variables (roots) for gcc garbage collector since
+@@ -46,6 +48,7 @@ static struct plugin_info stackleak_plugin_info = {
+ 	.help = "track-min-size=nn\ttrack stack for functions with a stack frame size >= nn bytes\n"
+ 		"arch=target_arch\tspecify target build arch\n"
+ 		"disable\t\tdo not activate the plugin\n"
++		"verbose\t\tprint info about the instrumentation\n"
+ };
+ 
+ static void add_stack_tracking_gcall(gimple_stmt_iterator *gsi, bool after)
+@@ -102,6 +105,10 @@ static tree get_current_stack_pointer_decl(void)
+ 		return var;
+ 	}
+ 
++	if (verbose) {
++		fprintf(stderr, "stackleak: missing current_stack_pointer in %s()\n",
++			DECL_NAME_POINTER(current_function_decl));
++	}
+ 	return NULL_TREE;
+ }
+ 
+@@ -195,6 +202,11 @@ static unsigned int stackleak_instrument_execute(void)
+ 			if (!is_alloca(stmt))
+ 				continue;
+ 
++			if (verbose) {
++				fprintf(stderr, "stackleak: be careful, alloca() in %s()\n",
++					DECL_NAME_POINTER(current_function_decl));
++			}
++
+ 			/* Insert stackleak_track_stack() call after alloca() */
+ 			add_stack_tracking(&gsi, true);
+ 			if (bb == entry_bb)
+@@ -384,13 +396,31 @@ static bool remove_stack_tracking_gasm(void)
+  */
+ static unsigned int stackleak_cleanup_execute(void)
+ {
++	const char *fn = DECL_NAME_POINTER(current_function_decl);
+ 	bool removed = false;
+ 
+-	if (cfun->calls_alloca)
++	/*
++	 * Leave stack tracking in functions that call alloca().
++	 * Additional case:
++	 *   gcc before version 7 called allocate_dynamic_stack_space() from
++	 *   expand_stack_vars() for runtime alignment of constant-sized stack
++	 *   variables. That caused cfun->calls_alloca to be set for functions
++	 *   that in fact don't use alloca().
++	 *   For more info see gcc commit 7072df0aae0c59ae437e.
++	 *   Let's leave such functions instrumented as well.
++	 */
++	if (cfun->calls_alloca) {
++		if (verbose)
++			fprintf(stderr, "stackleak: instrument %s(): calls_alloca\n", fn);
+ 		return 0;
++	}
+ 
+-	if (large_stack_frame())
++	/* Leave stack tracking in functions with large stack frame */
++	if (large_stack_frame()) {
++		if (verbose)
++			fprintf(stderr, "stackleak: instrument %s()\n", fn);
+ 		return 0;
++	}
+ 
+ 	if (lookup_attribute_spec(get_identifier("no_caller_saved_registers")))
+ 		removed = remove_stack_tracking_gasm();
+@@ -516,9 +546,6 @@ __visible int plugin_init(struct plugin_name_args *plugin_info,
+ 
+ 	/* Parse the plugin arguments */
+ 	for (i = 0; i < argc; i++) {
+-		if (!strcmp(argv[i].key, "disable"))
+-			return 0;
+-
+ 		if (!strcmp(argv[i].key, "track-min-size")) {
+ 			if (!argv[i].value) {
+ 				error(G_("no value supplied for option '-fplugin-arg-%s-%s'"),
+@@ -541,6 +568,10 @@ __visible int plugin_init(struct plugin_name_args *plugin_info,
+ 
+ 			if (!strcmp(argv[i].value, "x86"))
+ 				build_for_x86 = true;
++		} else if (!strcmp(argv[i].key, "disable")) {
++			disable = true;
++		} else if (!strcmp(argv[i].key, "verbose")) {
++			verbose = true;
+ 		} else {
+ 			error(G_("unknown option '-fplugin-arg-%s-%s'"),
+ 					plugin_name, argv[i].key);
+@@ -548,6 +579,12 @@ __visible int plugin_init(struct plugin_name_args *plugin_info,
+ 		}
+ 	}
+ 
++	if (disable) {
++		if (verbose)
++			fprintf(stderr, "stackleak: disabled for this translation unit\n");
++		return 0;
++	}
++
+ 	/* Give the information about the plugin */
+ 	register_callback(plugin_name, PLUGIN_INFO, NULL,
+ 						&stackleak_plugin_info);
 -- 
 2.25.4
