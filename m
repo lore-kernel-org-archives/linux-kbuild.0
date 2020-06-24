@@ -1,21 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54320 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387735AbgFXU5Z (ORCPT
+        with ESMTP id S2389708AbgFXU7L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 16:57:25 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2F0C0613ED
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:57:25 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id p3so2041453pgh.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:57:25 -0700 (PDT)
+        Wed, 24 Jun 2020 16:59:11 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF2AC061796
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:59:10 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id ev7so1204837pjb.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:59:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200624203200.78870-1-samitolvanen@google.com> <20200624203200.78870-14-samitolvanen@google.com>
-In-Reply-To: <20200624203200.78870-14-samitolvanen@google.com>
+References: <20200624203200.78870-1-samitolvanen@google.com> <20200624203200.78870-18-samitolvanen@google.com>
+In-Reply-To: <20200624203200.78870-18-samitolvanen@google.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 24 Jun 2020 13:57:11 -0700
-Message-ID: <CAKwvOd=XxsGowjitcqDrw6g-cxB=kqAsvRS+PyaMrYWnPgjqbg@mail.gmail.com>
-Subject: Re: [PATCH 13/22] scripts/mod: disable LTO for empty.c
+Date: Wed, 24 Jun 2020 13:58:57 -0700
+Message-ID: <CAKwvOdnEbCfYZ9o=OF51oswyqDvN4iP-9syWUDhxfueq4q0xcw@mail.gmail.com>
+Subject: Re: [PATCH 17/22] arm64: vdso: disable LTO
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -24,29 +24,33 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg 
 
 On Wed, Jun 24, 2020 at 1:33 PM Sami Tolvanen <samitolvanen@google.com> wrote:
 >
-> With CONFIG_LTO_CLANG, clang generates LLVM IR instead of ELF object
-> files. As empty.o is used for probing target properties, disable LTO
-> for it to produce an object file instead.
+> Filter out CC_FLAGS_LTO for the vDSO.
+
+Just curious about this patch (and the following one for x86's vdso),
+do you happen to recall specifically what the issues with the vdso's
+are?
+
 >
 > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-
 > ---
->  scripts/mod/Makefile | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/arm64/kernel/vdso/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-> index 296b6a3878b2..b6e3b40c6eeb 100644
-> --- a/scripts/mod/Makefile
-> +++ b/scripts/mod/Makefile
-> @@ -1,5 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  OBJECT_FILES_NON_STANDARD := y
-> +CFLAGS_REMOVE_empty.o += $(CC_FLAGS_LTO)
+> diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
+> index 556d424c6f52..cfad4c296ca1 100644
+> --- a/arch/arm64/kernel/vdso/Makefile
+> +++ b/arch/arm64/kernel/vdso/Makefile
+> @@ -29,8 +29,8 @@ ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 --hash-style=sysv \
+>  ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
+>  ccflags-y += -DDISABLE_BRANCH_PROFILING
 >
->  hostprogs      := modpost mk_elfconfig
->  always-y       := $(hostprogs) empty.o
+> -CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS)
+> -KBUILD_CFLAGS                  += $(DISABLE_LTO)
+> +CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
+> +                               $(CC_FLAGS_LTO)
+>  KASAN_SANITIZE                 := n
+>  UBSAN_SANITIZE                 := n
+>  OBJECT_FILES_NON_STANDARD      := y
 > --
 > 2.27.0.212.ge8ba1cc988-goog
 >
