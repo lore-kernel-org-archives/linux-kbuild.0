@@ -1,21 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54650 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389708AbgFXU7L (ORCPT
+        with ESMTP id S2388743AbgFXVCM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 16:59:11 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF2AC061796
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:59:10 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id ev7so1204837pjb.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:59:10 -0700 (PDT)
+        Wed, 24 Jun 2020 17:02:12 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31B5C061795
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:02:11 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id b5so1780281pfp.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:02:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200624203200.78870-1-samitolvanen@google.com> <20200624203200.78870-18-samitolvanen@google.com>
-In-Reply-To: <20200624203200.78870-18-samitolvanen@google.com>
+References: <20200624203200.78870-1-samitolvanen@google.com> <20200624203200.78870-8-samitolvanen@google.com>
+In-Reply-To: <20200624203200.78870-8-samitolvanen@google.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 24 Jun 2020 13:58:57 -0700
-Message-ID: <CAKwvOdnEbCfYZ9o=OF51oswyqDvN4iP-9syWUDhxfueq4q0xcw@mail.gmail.com>
-Subject: Re: [PATCH 17/22] arm64: vdso: disable LTO
+Date: Wed, 24 Jun 2020 14:01:59 -0700
+Message-ID: <CAKwvOdkY2M9+BgA5FELK+7bjv1sZYMuTmVOztCYijas_OHfVDQ@mail.gmail.com>
+Subject: Re: [PATCH 07/22] kbuild: lto: merge module sections
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -24,33 +24,71 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg 
 
 On Wed, Jun 24, 2020 at 1:33 PM Sami Tolvanen <samitolvanen@google.com> wrote:
 >
-> Filter out CC_FLAGS_LTO for the vDSO.
+> LLD always splits sections with LTO, which increases module sizes. This
+> change adds a linker script that merges the split sections in the final
+> module and discards the .eh_frame section that LLD may generate.
 
-Just curious about this patch (and the following one for x86's vdso),
-do you happen to recall specifically what the issues with the vdso's
-are?
+For discarding .eh_frame, Kees is currently fighting with a series
+that I would really like to see land that enables warnings on orphan
+section placement.  I don't see any new flags to inhibit .eh_frame
+generation, or discard it in the linker script, so I'd expect it to be
+treated as an orphan section and kept.  Was that missed, or should
+that be removed from the commit message?
 
 >
+> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
 > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 > ---
->  arch/arm64/kernel/vdso/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  Makefile               |  2 ++
+>  scripts/module-lto.lds | 26 ++++++++++++++++++++++++++
+>  2 files changed, 28 insertions(+)
+>  create mode 100644 scripts/module-lto.lds
 >
-> diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-> index 556d424c6f52..cfad4c296ca1 100644
-> --- a/arch/arm64/kernel/vdso/Makefile
-> +++ b/arch/arm64/kernel/vdso/Makefile
-> @@ -29,8 +29,8 @@ ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 --hash-style=sysv \
->  ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
->  ccflags-y += -DDISABLE_BRANCH_PROFILING
+> diff --git a/Makefile b/Makefile
+> index ee66513a5b66..9ffec5fe1737 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -898,6 +898,8 @@ CC_FLAGS_LTO_CLANG += -fvisibility=default
+>  # Limit inlining across translation units to reduce binary size
+>  LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5
+>  KBUILD_LDFLAGS += $(LD_FLAGS_LTO_CLANG)
+> +
+> +KBUILD_LDS_MODULE += $(srctree)/scripts/module-lto.lds
+>  endif
 >
-> -CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS)
-> -KBUILD_CFLAGS                  += $(DISABLE_LTO)
-> +CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
-> +                               $(CC_FLAGS_LTO)
->  KASAN_SANITIZE                 := n
->  UBSAN_SANITIZE                 := n
->  OBJECT_FILES_NON_STANDARD      := y
+>  ifdef CONFIG_LTO
+> diff --git a/scripts/module-lto.lds b/scripts/module-lto.lds
+> new file mode 100644
+> index 000000000000..65884c652bf2
+> --- /dev/null
+> +++ b/scripts/module-lto.lds
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
+> + * -ffunction-sections, which increases the size of the final module.
+> + * Merge the split sections in the final binary.
+> + */
+> +SECTIONS {
+> +       __patchable_function_entries : { *(__patchable_function_entries) }
+> +
+> +       .bss : {
+> +               *(.bss .bss.[0-9a-zA-Z_]*)
+> +               *(.bss..L* .bss..compoundliteral*)
+> +       }
+> +
+> +       .data : {
+> +               *(.data .data.[0-9a-zA-Z_]*)
+> +               *(.data..L* .data..compoundliteral*)
+> +       }
+> +
+> +       .rodata : {
+> +               *(.rodata .rodata.[0-9a-zA-Z_]*)
+> +               *(.rodata..L* .rodata..compoundliteral*)
+> +       }
+> +
+> +       .text : { *(.text .text.[0-9a-zA-Z_]*) }
+> +}
 > --
 > 2.27.0.212.ge8ba1cc988-goog
 >
