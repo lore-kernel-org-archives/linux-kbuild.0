@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50594 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406549AbgFXUd0 (ORCPT
+        with ESMTP id S2406477AbgFXUdR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 16:33:26 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08718C061799
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:26 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id w3so2506322qvl.9
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:25 -0700 (PDT)
-Date: Wed, 24 Jun 2020 13:31:53 -0700
+        Wed, 24 Jun 2020 16:33:17 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D51C061795
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:17 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b135so3498656yba.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:17 -0700 (PDT)
+Date: Wed, 24 Jun 2020 13:31:48 -0700
 In-Reply-To: <20200624203200.78870-1-samitolvanen@google.com>
-Message-Id: <20200624203200.78870-16-samitolvanen@google.com>
+Message-Id: <20200624203200.78870-11-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200624203200.78870-1-samitolvanen@google.com>
-Subject: [PATCH 15/22] drivers/misc/lkdtm: disable LTO for rodata.o
+Subject: [PATCH 10/22] init: lto: fix PREL32 relocations
 From: Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,26 +22,73 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>
 
-Disable LTO for rodata.o to allow objcopy to be used to
-manipulate sections.
+With LTO, the compiler can rename static functions to avoid global
+naming collisions. As initcall functions are typically static,
+renaming can break references to them in inline assembly. This
+change adds a global stub with a stable name for each initcall to
+fix the issue when PREL32 relocations are used.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/misc/lkdtm/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/init.h | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/misc/lkdtm/Makefile b/drivers/misc/lkdtm/Makefile
-index c70b3822013f..dd4c936d4d73 100644
---- a/drivers/misc/lkdtm/Makefile
-+++ b/drivers/misc/lkdtm/Makefile
-@@ -13,6 +13,7 @@ lkdtm-$(CONFIG_LKDTM)		+= cfi.o
+diff --git a/include/linux/init.h b/include/linux/init.h
+index af638cd6dd52..5b4bdc5a8399 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -209,26 +209,48 @@ extern bool initcall_debug;
+  */
+ #define __initcall_section(__sec, __iid)			\
+ 	#__sec ".init.." #__iid
++
++/*
++ * With LTO, the compiler can rename static functions to avoid
++ * global naming collisions. We use a global stub function for
++ * initcalls to create a stable symbol name whose address can be
++ * taken in inline assembly when PREL32 relocations are used.
++ */
++#define __initcall_stub(fn, __iid, id)				\
++	__initcall_name(initstub, __iid, id)
++
++#define __define_initcall_stub(__stub, fn)			\
++	int __init __stub(void)					\
++	{ 							\
++		return fn();					\
++	}							\
++	__ADDRESSABLE(__stub)
+ #else
+ #define __initcall_section(__sec, __iid)			\
+ 	#__sec ".init"
++
++#define __initcall_stub(fn, __iid, id)	fn
++
++#define __define_initcall_stub(__stub, fn)			\
++	__ADDRESSABLE(fn)
+ #endif
  
- KASAN_SANITIZE_stackleak.o	:= n
- KCOV_INSTRUMENT_rodata.o	:= n
-+CFLAGS_REMOVE_rodata.o		+= $(CC_FLAGS_LTO)
+ #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
+-#define ____define_initcall(fn, __name, __sec)			\
+-	__ADDRESSABLE(fn)					\
++#define ____define_initcall(fn, __stub, __name, __sec)		\
++	__define_initcall_stub(__stub, fn)			\
+ 	asm(".section	\"" __sec "\", \"a\"		\n"	\
+ 	    __stringify(__name) ":			\n"	\
+-	    ".long	" #fn " - .			\n"	\
++	    ".long	" __stringify(__stub) " - .	\n"	\
+ 	    ".previous					\n");
+ #else
+-#define ____define_initcall(fn, __name, __sec)			\
++#define ____define_initcall(fn, __unused, __name, __sec)	\
+ 	static initcall_t __name __used 			\
+ 		__attribute__((__section__(__sec))) = fn;
+ #endif
  
- OBJCOPYFLAGS :=
- OBJCOPYFLAGS_rodata_objcopy.o	:= \
+ #define __unique_initcall(fn, id, __sec, __iid)			\
+ 	____define_initcall(fn,					\
++		__initcall_stub(fn, __iid, id),			\
+ 		__initcall_name(initcall, __iid, id),		\
+ 		__initcall_section(__sec, __iid))
+ 
 -- 
 2.27.0.212.ge8ba1cc988-goog
