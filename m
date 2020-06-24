@@ -1,62 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33656 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404580AbgFXVpi (ORCPT
+        with ESMTP id S2404962AbgFXVtd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 17:45:38 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE602C061796
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:45:37 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id cm23so1823123pjb.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:45:37 -0700 (PDT)
-Date: Wed, 24 Jun 2020 14:45:30 -0700
+        Wed, 24 Jun 2020 17:49:33 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DBBC061795
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:49:32 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id x11so1682961plo.7
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 14:49:32 -0700 (PDT)
+Date: Wed, 24 Jun 2020 14:49:25 -0700
 From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 04/22] kbuild: lto: fix recordmcount
-Message-ID: <20200624214530.GA120457@google.com>
+Subject: Re: [PATCH 05/22] kbuild: lto: postpone objtool
+Message-ID: <20200624214925.GB120457@google.com>
 References: <20200624203200.78870-1-samitolvanen@google.com>
- <20200624203200.78870-5-samitolvanen@google.com>
- <20200624212737.GV4817@hirez.programming.kicks-ass.net>
+ <20200624203200.78870-6-samitolvanen@google.com>
+ <20200624211908.GT4817@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200624212737.GV4817@hirez.programming.kicks-ass.net>
+In-Reply-To: <20200624211908.GT4817@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>
+To: Peter Zijlstra <peterz@infradead.org>
 Cc: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org
 
-On Wed, Jun 24, 2020 at 11:27:37PM +0200, Peter Zijlstra wrote:
-> On Wed, Jun 24, 2020 at 01:31:42PM -0700, Sami Tolvanen wrote:
-> > With LTO, LLVM bitcode won't be compiled into native code until
-> > modpost_link. This change postpones calls to recordmcount until after
-> > this step.
-> > 
-> > In order to exclude specific functions from inspection, we add a new
-> > code section .text..nomcount, which we tell recordmcount to ignore, and
-> > a __nomcount attribute for moving functions to this section.
+On Wed, Jun 24, 2020 at 11:19:08PM +0200, Peter Zijlstra wrote:
+> On Wed, Jun 24, 2020 at 01:31:43PM -0700, Sami Tolvanen wrote:
+> > diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+> > index 30827f82ad62..12b115152532 100644
+> > --- a/include/linux/compiler.h
+> > +++ b/include/linux/compiler.h
+> > @@ -120,7 +120,7 @@ void ftrace_likely_update(struct ftrace_likely_data *f, int val,
+> >  /* Annotate a C jump table to allow objtool to follow the code flow */
+> >  #define __annotate_jump_table __section(.rodata..c_jump_table)
+> >  
+> > -#ifdef CONFIG_DEBUG_ENTRY
+> > +#if defined(CONFIG_DEBUG_ENTRY) || defined(CONFIG_LTO_CLANG)
+> >  /* Begin/end of an instrumentation safe region */
+> >  #define instrumentation_begin() ({					\
+> >  	asm volatile("%c0:\n\t"						\
 > 
-> I'm confused, you only add this to functions in ftrace itself, which is
-> compiled with:
-> 
->  KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
-> 
-> and so should not have mcount/fentry sites anyway. So what's the point
-> of ignoring them further?
-> 
-> This Changelog does not explain.
+> Why would you be doing noinstr validation for lto builds? That doesn't
+> make sense.
 
-Normally, recordmcount ignores each ftrace.o file, but since we are
-running it on vmlinux.o, we need another way to stop it from looking
-at references to mcount/fentry that are not calls. Here's a comment
-from recordmcount.c:
+This is just to avoid a ton of noinstr warnings when we run objtool on
+vmlinux.o, but I'm also fine with skipping noinstr validation with LTO.
 
-  /*
-   * The file kernel/trace/ftrace.o references the mcount
-   * function but does not call it. Since ftrace.o should
-   * not be traced anyway, we just skip it.
-   */
+> > +ifdef CONFIG_STACK_VALIDATION
+> > +ifneq ($(SKIP_STACK_VALIDATION),1)
+> > +cmd_ld_ko_o +=								\
+> > +	$(objtree)/tools/objtool/objtool				\
+> > +		$(if $(CONFIG_UNWINDER_ORC),orc generate,check)		\
+> > +		--module						\
+> > +		$(if $(CONFIG_FRAME_POINTER),,--no-fp)			\
+> > +		$(if $(CONFIG_GCOV_KERNEL),--no-unreachable,)		\
+> > +		$(if $(CONFIG_RETPOLINE),--retpoline,)			\
+> > +		$(if $(CONFIG_X86_SMAP),--uaccess,)			\
+> > +		$(@:.ko=$(prelink-ext).o);
+> > +
+> > +endif # SKIP_STACK_VALIDATION
+> > +endif # CONFIG_STACK_VALIDATION
+> 
+> What about the objtool invocation from link-vmlinux.sh ?
 
-But I agree, the commit message could use more defails. Also +Steven
-for thoughts about this approach.
+What about it? The existing objtool_link invocation in link-vmlinux.sh
+works fine for our purposes as well.
 
 Sami
