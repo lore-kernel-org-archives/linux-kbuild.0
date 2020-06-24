@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50674 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406600AbgFXUdg (ORCPT
+        with ESMTP id S2406579AbgFXUdd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 16:33:36 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C990C061797
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:35 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id p9so2445734qtn.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:35 -0700 (PDT)
-Date: Wed, 24 Jun 2020 13:31:58 -0700
+        Wed, 24 Jun 2020 16:33:33 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7956C061795
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:31 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id s75so2510697qka.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:31 -0700 (PDT)
+Date: Wed, 24 Jun 2020 13:31:56 -0700
 In-Reply-To: <20200624203200.78870-1-samitolvanen@google.com>
-Message-Id: <20200624203200.78870-21-samitolvanen@google.com>
+Message-Id: <20200624203200.78870-19-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200624203200.78870-1-samitolvanen@google.com>
-Subject: [PATCH 20/22] x86, ftrace: disable recordmcount for ftrace_make_nop
+Subject: [PATCH 18/22] arm64: allow LTO_CLANG and THINLTO to be selected
 From: Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,24 +22,25 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>
 
-Ignore mcount relocations in ftrace_make_nop.
+Allow CONFIG_LTO_CLANG and CONFIG_THINLTO to be enabled.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- arch/x86/kernel/ftrace.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kernel/ftrace.c b/arch/x86/kernel/ftrace.c
-index 51504566b3a6..c3b28b81277b 100644
---- a/arch/x86/kernel/ftrace.c
-+++ b/arch/x86/kernel/ftrace.c
-@@ -121,6 +121,7 @@ ftrace_modify_code_direct(unsigned long ip, const char *old_code,
- 	return 0;
- }
- 
-+__nomcount
- int ftrace_make_nop(struct module *mod, struct dyn_ftrace *rec, unsigned long addr)
- {
- 	unsigned long ip = rec->ip;
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index a4a094bedcb2..e1961653964d 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -72,6 +72,8 @@ config ARM64
+ 	select ARCH_USE_SYM_ANNOTATIONS
+ 	select ARCH_SUPPORTS_MEMORY_FAILURE
+ 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
++	select ARCH_SUPPORTS_LTO_CLANG
++	select ARCH_SUPPORTS_THINLTO
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
+ 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
+ 	select ARCH_SUPPORTS_NUMA_BALANCING
 -- 
 2.27.0.212.ge8ba1cc988-goog
