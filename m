@@ -1,94 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50548 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406477AbgFXUdR (ORCPT
+        with ESMTP id S2406514AbgFXUdU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Jun 2020 16:33:17 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D51C061795
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:17 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b135so3498656yba.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:17 -0700 (PDT)
-Date: Wed, 24 Jun 2020 13:31:48 -0700
+        Wed, 24 Jun 2020 16:33:20 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87376C061797
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:20 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id q5so2476765qvq.18
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Jun 2020 13:33:20 -0700 (PDT)
+Date: Wed, 24 Jun 2020 13:31:50 -0700
 In-Reply-To: <20200624203200.78870-1-samitolvanen@google.com>
-Message-Id: <20200624203200.78870-11-samitolvanen@google.com>
+Message-Id: <20200624203200.78870-13-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200624203200.78870-1-samitolvanen@google.com>
-Subject: [PATCH 10/22] init: lto: fix PREL32 relocations
+Subject: [PATCH 12/22] modpost: lto: strip .lto from module names
 From: Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>, Bill Wendling <morbo@google.com>
 
-With LTO, the compiler can rename static functions to avoid global
-naming collisions. As initcall functions are typically static,
-renaming can break references to them in inline assembly. This
-change adds a global stub with a stable name for each initcall to
-fix the issue when PREL32 relocations are used.
+With LTO, everything is compiled into LLVM bitcode, so we have to link
+each module into native code before modpost. Kbuild uses the .lto.o
+suffix for these files, which also ends up in module information. This
+change strips the unnecessary .lto suffix from the module name.
 
+Suggested-by: Bill Wendling <morbo@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- include/linux/init.h | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c    | 16 +++++++---------
+ scripts/mod/modpost.h    |  9 +++++++++
+ scripts/mod/sumversion.c |  6 +++++-
+ 3 files changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/init.h b/include/linux/init.h
-index af638cd6dd52..5b4bdc5a8399 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -209,26 +209,48 @@ extern bool initcall_debug;
-  */
- #define __initcall_section(__sec, __iid)			\
- 	#__sec ".init.." #__iid
-+
-+/*
-+ * With LTO, the compiler can rename static functions to avoid
-+ * global naming collisions. We use a global stub function for
-+ * initcalls to create a stable symbol name whose address can be
-+ * taken in inline assembly when PREL32 relocations are used.
-+ */
-+#define __initcall_stub(fn, __iid, id)				\
-+	__initcall_name(initstub, __iid, id)
-+
-+#define __define_initcall_stub(__stub, fn)			\
-+	int __init __stub(void)					\
-+	{ 							\
-+		return fn();					\
-+	}							\
-+	__ADDRESSABLE(__stub)
- #else
- #define __initcall_section(__sec, __iid)			\
- 	#__sec ".init"
-+
-+#define __initcall_stub(fn, __iid, id)	fn
-+
-+#define __define_initcall_stub(__stub, fn)			\
-+	__ADDRESSABLE(fn)
- #endif
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 6aea65c65745..8352f8a1a138 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -17,7 +17,6 @@
+ #include <ctype.h>
+ #include <string.h>
+ #include <limits.h>
+-#include <stdbool.h>
+ #include <errno.h>
+ #include "modpost.h"
+ #include "../../include/linux/license.h"
+@@ -80,14 +79,6 @@ modpost_log(enum loglevel loglevel, const char *fmt, ...)
+ 		exit(1);
+ }
  
- #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
--#define ____define_initcall(fn, __name, __sec)			\
--	__ADDRESSABLE(fn)					\
-+#define ____define_initcall(fn, __stub, __name, __sec)		\
-+	__define_initcall_stub(__stub, fn)			\
- 	asm(".section	\"" __sec "\", \"a\"		\n"	\
- 	    __stringify(__name) ":			\n"	\
--	    ".long	" #fn " - .			\n"	\
-+	    ".long	" __stringify(__stub) " - .	\n"	\
- 	    ".previous					\n");
- #else
--#define ____define_initcall(fn, __name, __sec)			\
-+#define ____define_initcall(fn, __unused, __name, __sec)	\
- 	static initcall_t __name __used 			\
- 		__attribute__((__section__(__sec))) = fn;
- #endif
+-static inline bool strends(const char *str, const char *postfix)
+-{
+-	if (strlen(str) < strlen(postfix))
+-		return false;
+-
+-	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
+-}
+-
+ void *do_nofail(void *ptr, const char *expr)
+ {
+ 	if (!ptr)
+@@ -1975,6 +1966,10 @@ static char *remove_dot(char *s)
+ 		size_t m = strspn(s + n + 1, "0123456789");
+ 		if (m && (s[n + m] == '.' || s[n + m] == 0))
+ 			s[n] = 0;
++
++		/* strip trailing .lto */
++		if (strends(s, ".lto"))
++			s[strlen(s) - 4] = '\0';
+ 	}
+ 	return s;
+ }
+@@ -1998,6 +1993,9 @@ static void read_symbols(const char *modname)
+ 		/* strip trailing .o */
+ 		tmp = NOFAIL(strdup(modname));
+ 		tmp[strlen(tmp) - 2] = '\0';
++		/* strip trailing .lto */
++		if (strends(tmp, ".lto"))
++			tmp[strlen(tmp) - 4] = '\0';
+ 		mod = new_module(tmp);
+ 		free(tmp);
+ 	}
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 3aa052722233..fab30d201f9e 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -2,6 +2,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
++#include <stdbool.h>
+ #include <string.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -180,6 +181,14 @@ static inline unsigned int get_secindex(const struct elf_info *info,
+ 	return info->symtab_shndx_start[sym - info->symtab_start];
+ }
  
- #define __unique_initcall(fn, id, __sec, __iid)			\
- 	____define_initcall(fn,					\
-+		__initcall_stub(fn, __iid, id),			\
- 		__initcall_name(initcall, __iid, id),		\
- 		__initcall_section(__sec, __iid))
++static inline bool strends(const char *str, const char *postfix)
++{
++	if (strlen(str) < strlen(postfix))
++		return false;
++
++	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
++}
++
+ /* file2alias.c */
+ extern unsigned int cross_build;
+ void handle_moddevtable(struct module *mod, struct elf_info *info,
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index d587f40f1117..760e6baa7eda 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -391,10 +391,14 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ 	struct md4_ctx md;
+ 	char *fname;
+ 	char filelist[PATH_MAX + 1];
++	int postfix_len = 1;
++
++	if (strends(modname, ".lto.o"))
++		postfix_len = 5;
+ 
+ 	/* objects for a module are listed in the first line of *.mod file. */
+ 	snprintf(filelist, sizeof(filelist), "%.*smod",
+-		 (int)strlen(modname) - 1, modname);
++		 (int)strlen(modname) - postfix_len, modname);
+ 
+ 	buf = read_text_file(filelist);
  
 -- 
 2.27.0.212.ge8ba1cc988-goog
