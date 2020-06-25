@@ -1,129 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from georges.telenet-ops.be ([195.130.137.68]:53073 "EHLO
-	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753178Ab2FYUc5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jun 2012 16:32:57 -0400
-Date: Mon, 25 Jun 2012 22:32:53 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH] mod/file2alias: make modalias generation safe for cross
- compiling
-In-Reply-To: <m2d34n1sz9.fsf_-_@igel.home>
-Message-ID: <alpine.DEB.2.00.1206252217580.21346@ayla.of.borg>
-References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com> <20120615201021.GB14544@kroah.com> <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com> <20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no>
- <m2bokjb6tv.fsf@igel.home> <87fw9urqau.fsf@nemi.mork.no> <m2d34n1sz9.fsf_-_@igel.home>
+Received: from [61.139.77.53] ([61.139.77.53]:2951 "HELO zdit.cn"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with SMTP
+	id S1756095Ab2FYVYF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Jun 2012 17:24:05 -0400
+Message-ID: <20200626031821516081@zdit.cn>
+From: =?utf-8?B?5pyJ5pWI5p6c5YaN5LuY5qy+?= <admin@zdit.cn>
+Subject: =?utf-8?B?MjAxMuaYpeWtozExMeWxiuW5v+S6pOS8muS5sOWutu+8jEIyQuivog==?=
+	=?utf-8?B?55uY5Lmw5a6244CBdGhvbWFzbmV0IOmHh+i0reWVhizmtbflhbM=?=
+	=?utf-8?B?5pWw5o2uLOe+pOWPkei9r+S7tu+8jOWxleS8muS5sOWutiDku4UzMDDlhYMh?=
+Date: Fri, 26 Jun 2020 03:18:13 +0800
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@linux-m68k.org>
-Cc: =?ISO-8859-15?Q?Bj=F8rn_Mork?= <bjorn@mork.no>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: linuo168@linuo.net.cn, linux24@ml.ascii.co.jp, linux-acpi@vger.kernel.org, linuxfan@linux.org, linuxfever@hotmail.com, linux-kbuild@vger.kernel.org, linuxmag@ml.ascii.co.jp, linux-ok@263.net, linux-shop@163.net, linuxtech02@yahoo.com
 
-	Hi Andreas,
+MjAxMuaYpeWtozExMeWxiuW5v+S6pOS8muS5sOWutu+8jOa1t+WFs+aVsOaNruaPkOWNlXBpZXJz
+54mI77yMMjAwOC0yMDEy5bm0OeWxiuW5v+S6pOS8muaVsOaNruOAgg0KDQrkuIDlhbExMOS4quWM
+hSjmlbDmja7mmK/lhajooYzkuJrnmoTvvIzlj6/ku6XmjInnhaflhbPplK7or43mj5Dlj5blh7rm
+naXnmoQp77yaIA0KMe+8jDIwMTLmmKXlraMxMTHlsYrlub/kuqTkvJrkubDlrrbnjrDlnLror6Ln
+m5jmlbDmja7lupPmlrDpspzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDm
+ja7vvIzlrrnmmJPmiJDljZXvvIEgDQoy77yM6LSt5Lmw5ZCO5Y+v5Lul5YWN6LS55pu05pawMjAx
+Mueni+Wto+W5v+S6pOS8muS5sOWutuaVsOaNruOAguWkqui2heWAvOS6huOAgg0KM++8jDIwMTLm
+nIDmlrDlhajnkIPlsZXkvJrnjrDlnLrkubDlrrblupMo5LiO6LS45Y+R5ZCM5q2lKSzlhbE0NuS4
+h+adoeaVsOaNruOAgiAo5oyJ54Wn6KGM5Lia5YiG57G7KQ0KNO+8jDIwMTEsMjAxMOW5tCwyMDA5
+5bm0LDIwMDjlubQg5pil5a2jK+eni+Wto+W5v+S6pOS8muS5sOWutuWQjeW9le+8jDEwMyAxMDQg
+MTA1IDEwNiAxMDcgMTA4LDEwOSwxMTAg5YWx5YWt5bGKIOWFsTEyMC425LiH5pWw5o2u44CCDQo1
+77yMNDguNjjkuIfmnaHmnIDmlrDkubDlrrbor6Lnm5jvvIzpg73luKbmnIlFbWFpbO+8jOacgOac
+ieS7t+WAvOeahOivouebmOOAgg0KNu+8jDIwMTHmnIDmlrAgQjJCIOiLseaWh+WbvemZheermTYw
+5LiH5bim6IGU57uc5pa55byP6K+i55uYIOacgOacieS7t+WAvOivouebmOS5i+S4gC4NCjfvvIwy
+MDEw5rW35YWz5o+Q5Y2VcGllcnPniYgxMDAw5LiH5pWw5o2uLg0KOO+8jDIwMTHlubTliLDpppnm
+uK/ph4fotK3nmoTlm73lpJblrqLkurrlkI3lvZUo6aaZ5riv6LS45Y+R5bGA5o+Q5L6bKe+8jOi2
+hee6p+mHjeimgeeahOS5sOWutuOAgg0KOe+8jDIwMTHlubTmlrDlop7liqDnmoQt576O5Zu9QjJC
+IHRob21hc25ldCDph4fotK3llYblkI3ljZXjgIINCjEw77yM576k5Y+R6L2v5Lu25a6J6KOF5LiO
+6YOo572y5pyN5Yqh44CCDQoNCui/meS6m+WFqOacie+8jOWFsTEyODDkuIcg5pWw5o2u44CCDQoN
+CiANCuimgeeahOaKk+e0p+iBlOezu1FROiA0NjAxMjI2NDEg5oiW6ICF56uL5Y2z5Zue5aSN6YKu
+566xOiA0NjAxMjI2NDFAcXEuY29tDQropoHnmoTmipPntKfogZTns7tRUTogNDYwMTIyNjQxIOaI
+luiAheeri+WNs+WbnuWkjemCrueusTogNDYwMTIyNjQxQHFxLmNvbQ0K6KaB55qE5oqT57Sn6IGU
+57O7UVE6IDQ2MDEyMjY0MSDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDQ2MDEyMjY0MUBxcS5j
+b20NCg0K6K+a5L+h5Li65pys77yM5aaC5p6c5LiN5L+h5Lu75pys5Lq6LOWPr+S7pei1sOa3mOWu
+neS6pOaYkyzmlLbliLDmlbDmja7pqozor4Ez5aSp5ZCO5YaN5LuY5qy+LOi/meaYr+WvueaCqOac
+gOWlveeahOS/nemanOS6huOAgiANCg0KDQoNCuWwj+aKgOW3p++8miANCuaKijUwMOS4h+S5sOWu
+tue+pOWPkeS7peS4gOmBje+8jOWdh+S8muacieaVsOWNg+S4quWbnuWkjeeahO+8jOi/meS6m+Ww
+seaYr+mdnuW4uOmrmOi0qOmHj+eahOS5sOWutuOAgiANCuS9v+eUqOaIkeS7rOmAgeeahOe+pOWP
+kei9r+S7tu+8jDEtMuWRqOWwseWPr+WujOWFqOWPkeWujOOAgg0KDQoNCg0KDQoNCuW5v+S6pOS8
+muS5sOWutuaMieS6p+WTgeexu+WIq+WIhuexu++8jOWIhuS4uuS7peS4i+WHoOexu++8mg0KMSDl
+ip7lhazorr7lpIcNCjIg57yW57uH5Y+K6Jek6ZOB5bel6Im65ZOBDQozIOeOu+eSgw0KNCDppJDl
+jqjnlKjlhbcNCjUg6L2m6L6GDQo2IOWkp+Wei+acuuaisOWPiuiuvuWkhw0KNyDnlLXlrZDnlLXm
+sJQNCjgg55S15a2Q5raI6LS55ZOBDQo5IOe6uue7hw0KMTAg5pyN6KOFDQoxMSDkuKrkurrmiqTn
+kIYNCjEyIOW3peeoi+acuuaisA0KMTMg5bel5YW3DQoxNCDljJblt6UNCjE1IOiuoeeul+acuuWP
+iumAmuiurw0KMTYg5a625bGF55So5ZOBDQoxNyDlrrblsYXoo4XppbANCjE4IOWutuWFtw0KMTkg
+5a6255So55S15ZmoDQoyMCDlu7rnrZHlj4roo4XppbDmnZDmlpkNCjIxIOiKguaXpeeUqOWTgQ0K
+MjIg56S85ZOB5Y+K6LWg5ZOBDQoyMyDmkanmiZjovaYNCjI0IOaxvei9pumFjeS7tg0KMjUg6aOf
+5ZOBDQoyNiDpmbbnk7cNCjI3IOmTgeefsw0KMjgg546p5YW3DQoyOSDljavmtbQNCjMwIOS6lOmH
+kQ0KMzEg5bCP5Z6L5py65qKwDQozMiDpnosNCjMzIOS8kemXsueUqOWTgQ0KMzQg5Yy755aXDQoz
+NSDmtbTlrqTkuqflk4ENCjM2IOWbreaelw0KMzcg54Wn5piO5Lqn5ZOBDQozOCDpkp/ooajnnLzp
+lZwNCjM5IOiHquihjOi9pg0KNDAg5YyFDQoNCg0K5paw6bKc5pWw5o2uLeaIkOWNleeOh+aegemr
+mA0K5paw6bKc5pWw5o2uLeaIkOWNleeOh+aegemrmA0K5paw6bKc5pWw5o2uLeaIkOWNleeOh+ae
+gemrmA0K5paw6bKc5pWw5o2uLeaIkOWNleeOh+aegemrmA0K5paw6bKc5pWw5o2uLeaIkOWNleeO
+h+aegemrmA0K
 
-On Mon, 25 Jun 2012, Andreas Schwab wrote:
-> Use the target compiler to compute the offsets of the fields of the
-> device_id structures, so that it won't be broken by different alignments
-> between the host and target ABIs.
 
-Thanks, very nice!
-
-> --- a/include/linux/mod_devicetable.h
-> +++ b/include/linux/mod_devicetable.h
-> @@ -33,8 +33,7 @@ struct ieee1394_device_id {
->  	__u32 model_id;
->  	__u32 specifier_id;
->  	__u32 version;
-> -	kernel_ulong_t driver_data
-> -		__attribute__((aligned(sizeof(kernel_ulong_t))));
-> +	kernel_ulong_t driver_data;
-
-After this, we can also get rid of kernel_ulong_t, but that's a more intruisive
-patch all over the place.
-
-> --- /dev/null
-> +++ b/scripts/mod/devicetable-offsets.c
-> @@ -0,0 +1,171 @@
-> +#include <linux/kbuild.h>
-> +#include <linux/mod_devicetable.h>
-> +
-> +#define DEVID(devid) DEFINE(SIZE_##devid, sizeof(struct devid))
-> +#define DEVID_FIELD(devid, field) \
-> +	DEFINE(OFF_##devid##_##field, offsetof(struct devid, field))
-> +
-> +int main(void)
-> +{
-> +	DEVID(usb_device_id);
-> +	DEVID_FIELD(usb_device_id, match_flags);
-> +	DEVID_FIELD(usb_device_id, idVendor);
-> +	DEVID_FIELD(usb_device_id, idProduct);
-> +	DEVID_FIELD(usb_device_id, bcdDevice_lo);
-> +	DEVID_FIELD(usb_device_id, bcdDevice_hi);
-> +	DEVID_FIELD(usb_device_id, bDeviceClass);
-> +	DEVID_FIELD(usb_device_id, bDeviceSubClass);
-> +	DEVID_FIELD(usb_device_id, bDeviceProtocol);
-> +	DEVID_FIELD(usb_device_id, bInterfaceClass);
-> +	DEVID_FIELD(usb_device_id, bInterfaceSubClass);
-> +	DEVID_FIELD(usb_device_id, bInterfaceProtocol);
-
-These are all duplicates of the structures in <linux/mod_devicetable.h>.
-Can't you get rid of the duplication by putting e.g. the following
-in <linux/mod_devicetable.h>:
-
-    DEVID_START(usb_device_id);
-    DEVID_FIELD(usb_device_id, __u16, match_flags);
-    DEVID_FIELD(usb_device_id, __u16, idVendor);
-    DEVID_FIELD(usb_device_id, __u16, idProduct);
-    DEVID_FIELD(usb_device_id, __u16, bcdDevice_lo);
-    DEVID_FIELD(usb_device_id, __u16, bcdDevice_hi);
-    DEVID_FIELD(usb_device_id, __u8, bDeviceClass);
-    DEVID_FIELD(usb_device_id, __u8, bDeviceSubClass);
-    DEVID_FIELD(usb_device_id, __u8, bDeviceProtocol);
-    DEVID_FIELD(usb_device_id, __u8, bInterfaceClass);
-    DEVID_FIELD(usb_device_id, __u8, bInterfaceSubClass);
-    DEVID_FIELD(usb_device_id, __u8, bInterfaceProtocol);
-    DEVID_END();
-
-and redefining the DEVID_*() macros depending on
-  1. __KERNEL__, to generate the C struct definitions for kernel builds,
-  2. first inclusion by devicetable-offsets.c, also to generate C struct
-     definitions,
-  3. second inclusion by devicetable-offsets.c, to generate the sizes and
-     offset definitions for modalias?
-
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -116,7 +129,6 @@ static inline void add_wildcard(char *str)
->  		strcat(str + len, "*");
->  }
->  
-> -unsigned int cross_build = 0;
->  /**
->   * Check that sizeof(device_id type) are consistent with size of section
->   * in .o file. If in-consistent then userspace and kernel does not agree
-> @@ -131,8 +143,6 @@ static void device_id_check(const char *modname, const char *device_id,
->  	int i;
->  
->  	if (size % id_size || size < id_size) {
-> -		if (cross_build != 0)
-> -			return;
->  		fatal("%s: sizeof(struct %s_device_id)=%lu is not a modulo "
->  		      "of the size of section __mod_%s_device_table=%lu.\n"
->  		      "Fix definition of struct %s_device_id "
-
-Funny, I didn't know there was a check for cross-compiling, supposedly to
-ignore the warnings.
-And it didn't work, as the problem was noticed originally on the linux-next
-build service (which uses cross-compiling), and also showed up for my own
-cross-builds.
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
