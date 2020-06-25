@@ -1,47 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-11.nifty.com ([210.131.2.78]:51071 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404376AbgFYRFN (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403908AbgFYSe0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jun 2020 13:05:13 -0400
-From: Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 2/4] dt-bindings: do not build processed-schema.yaml for 'make dt_binding_check'
-Date: Fri, 26 Jun 2020 02:04:32 +0900
-Message-Id: <20200625170434.635114-3-masahiroy@kernel.org>
-In-Reply-To: <20200625170434.635114-1-masahiroy@kernel.org>
-References: <20200625170434.635114-1-masahiroy@kernel.org>
+        Thu, 25 Jun 2020 14:34:26 -0400
+Date: Thu, 25 Jun 2020 20:33:51 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 05/22] kbuild: lto: postpone objtool
+Message-ID: <20200625183351.GH4800@hirez.programming.kicks-ass.net>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <20200624203200.78870-6-samitolvanen@google.com>
+ <20200624211908.GT4817@hirez.programming.kicks-ass.net>
+ <20200624214925.GB120457@google.com>
+ <20200625074716.GX4817@hirez.programming.kicks-ass.net>
+ <20200625162226.GC173089@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200625162226.GC173089@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org
-Cc: Frank Rowand <frowand.list@gmail.com>, linux-kbuild@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com, kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, x86@kernel.org
 
-Currently, processed-schema.yaml is always built, but it is actually
-used only for 'make dtbs_check'.
+On Thu, Jun 25, 2020 at 09:22:26AM -0700, Sami Tolvanen wrote:
+> On Thu, Jun 25, 2020 at 09:47:16AM +0200, Peter Zijlstra wrote:
 
-'make dt_binding_check' uses processed-schema-example.yaml instead.
+> > Right, then we need to make --no-vmlinux work properly when
+> > !DEBUG_ENTRY, which I think might be buggered due to us overriding the
+> > argument when the objname ends with "vmlinux.o".
+> 
+> Right. Can we just remove that and  pass --vmlinux to objtool in
+> link-vmlinux.sh, or is the override necessary somewhere else?
 
-Build processed-schema.yaml only for 'make dtbs_check'.
+Think we can remove it; it was just convenient when running manually.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+> > > > > +ifdef CONFIG_STACK_VALIDATION
+> > > > > +ifneq ($(SKIP_STACK_VALIDATION),1)
+> > > > > +cmd_ld_ko_o +=								\
+> > > > > +	$(objtree)/tools/objtool/objtool				\
+> > > > > +		$(if $(CONFIG_UNWINDER_ORC),orc generate,check)		\
+> > > > > +		--module						\
+> > > > > +		$(if $(CONFIG_FRAME_POINTER),,--no-fp)			\
+> > > > > +		$(if $(CONFIG_GCOV_KERNEL),--no-unreachable,)		\
+> > > > > +		$(if $(CONFIG_RETPOLINE),--retpoline,)			\
+> > > > > +		$(if $(CONFIG_X86_SMAP),--uaccess,)			\
+> > > > > +		$(@:.ko=$(prelink-ext).o);
+> > > > > +
+> > > > > +endif # SKIP_STACK_VALIDATION
+> > > > > +endif # CONFIG_STACK_VALIDATION
+> > > > 
+> > > > What about the objtool invocation from link-vmlinux.sh ?
+> > > 
+> > > What about it? The existing objtool_link invocation in link-vmlinux.sh
+> > > works fine for our purposes as well.
+> > 
+> > Well, I was wondering why you're adding yet another objtool invocation
+> > while we already have one.
+> 
+> Because we can't run objtool until we have compiled bitcode to native
+> code, so for modules, we're need another invocation after everything has
+> been compiled.
 
- Documentation/devicetree/bindings/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
-index f20d234aec46..aa243328ed43 100644
---- a/Documentation/devicetree/bindings/Makefile
-+++ b/Documentation/devicetree/bindings/Makefile
-@@ -52,7 +52,7 @@ $(obj)/processed-schema.yaml: DT_MK_SCHEMA_FLAGS := $(DT_MK_SCHEMA_USERONLY_FLAG
- $(obj)/processed-schema.yaml: $(DT_SCHEMA_FILES) check_dtschema_version FORCE
- 	$(call if_changed,mk_schema)
- 
--extra-y += processed-schema.yaml
-+extra-$(CHECK_DTBS) += processed-schema.yaml
- 
- # Hack: avoid 'Argument list too long' error for 'make clean'. Remove most of
- # build artifacts here before they are processed by scripts/Makefile.clean
--- 
-2.25.1
+Well, that I understand, my question was why we need one in
+scripts/link-vmlinux.sh and an additional one. I think we're just
+talking past one another and agree we only need one.
