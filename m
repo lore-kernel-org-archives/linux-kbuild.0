@@ -1,65 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.23]:9901 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390330AbgFYIxS (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52072 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390330AbgFYI6T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jun 2020 04:53:18 -0400
-From: "H. Nikolaus Schaller" <hns@goldelico.com>
-Subject: [PATCH] modpost: remove use of non-standard strsep() in HOSTCC code
-Date: Thu, 25 Jun 2020 10:41:13 +0200
-Message-Id: <11c1e65b393b4c3ca6118515c77bbf19524dab11.1593074472.git.hns@goldelico.com>
+        Thu, 25 Jun 2020 04:58:19 -0400
+Date: Thu, 25 Jun 2020 10:57:45 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200625085745.GD117543@hirez.programming.kicks-ass.net>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <20200624211540.GS4817@hirez.programming.kicks-ass.net>
+ <CAKwvOdmxz91c-M8egR9GdR1uOjeZv7-qoTP=pQ55nU8TCpkK6g@mail.gmail.com>
+ <20200625080313.GY4817@hirez.programming.kicks-ass.net>
+ <20200625082433.GC117543@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200625082433.GC117543@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, letux-kernel@openphoenux.org, "H. Nikolaus Schaller" <hns@goldelico.com>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-strsep() is neither standard C nor POSIX and used outside
-the kernel code here. Using it here requires that the
-build host supports it out of the box which is e.g.
-not true for a Darwin build host and using a cross-compiler.
-This leads to:
+On Thu, Jun 25, 2020 at 10:24:33AM +0200, Peter Zijlstra wrote:
+> On Thu, Jun 25, 2020 at 10:03:13AM +0200, Peter Zijlstra wrote:
 
-scripts/mod/modpost.c:145:2: warning: implicit declaration of function 'strsep' [-Wimplicit-function-declaration]
-  return strsep(stringp, "\n");
-  ^
+> > I'm sure Will will respond, but the basic issue is the trainwreck C11
+> > made of dependent loads.
+> > 
+> > Anyway, here's a link to the last time this came up:
+> > 
+> >   https://lore.kernel.org/linux-arm-kernel/20171116174830.GX3624@linux.vnet.ibm.com/
+> 
+> Another good read:
+> 
+>   https://lore.kernel.org/lkml/20150520005510.GA23559@linux.vnet.ibm.com/
+> 
+> and having (partially) re-read that, I now worry intensily about things
+> like latch_tree_find(), cyc2ns_read_begin, __ktime_get_fast_ns().
+> 
+> It looks like kernel/time/sched_clock.c uses raw_read_seqcount() which
+> deviates from the above patterns by, for some reason, using a primitive
+> that includes an extra smp_rmb().
+> 
+> And this is just the few things I could remember off the top of my head,
+> who knows what else is out there.
 
-and a segfault when running MODPOST.
+As an example, let us consider __ktime_get_fast_ns(), the critical bit
+is:
 
-See also: https://stackoverflow.com/a/7219504
+		seq = raw_read_seqcount_latch(&tkf->seq);
+		tkr = tkf->base + (seq & 0x01);
+		now = tkr->base;
 
-So let's add some lines of code separating the string at the
-next newline character instead of using strsep(). It does not
-hurt kernel size or speed since this code is run on the build host.
+And we hard rely on that being a dependent load, so:
 
-Fixes: ac5100f5432967 ("modpost: add read_text_file() and get_line() helpers")
-Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
----
- scripts/mod/modpost.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+  LOAD	seq, (tkf->seq)
+  LOAD  tkr, tkf->base
+  AND   seq, 1
+  MUL   seq, sizeof(tk_read_base)
+  ADD	tkr, seq
+  LOAD  now, (tkr->base)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6aea65c65745..8fe63989c6e1 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -138,11 +138,16 @@ char *read_text_file(const char *filename)
- 
- char *get_line(char **stringp)
- {
-+	char *p;
- 	/* do not return the unwanted extra line at EOF */
- 	if (*stringp && **stringp == '\0')
- 		return NULL;
- 
--	return strsep(stringp, "\n");
-+	p = *stringp;
-+	while (**stringp != '\n')
-+		(*stringp)++;
-+	*(*stringp)++ = '\0';
-+	return p;
- }
- 
- /* A list of all modules we processed */
--- 
-2.26.2
+Such that we obtain 'now' as a direct dependency on 'seq'. This ensures
+the loads are ordered.
+
+A compiler can wreck this by translating it into something like:
+
+  LOAD	seq, (tkf->seq)
+  LOAD  tkr, tkf->base
+  AND   seq, 1
+  CMP	seq, 0
+  JE	1f
+  ADD	tkr, sizeof(tk_read_base)
+1:
+  LOAD  now, (tkr->base)
+
+Because now the machine can speculate and load now before seq, breaking
+the ordering.
