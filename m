@@ -1,80 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52072 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390330AbgFYI6T (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Jun 2020 04:58:19 -0400
-Date: Thu, 25 Jun 2020 10:57:45 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200625085745.GD117543@hirez.programming.kicks-ass.net>
-References: <20200624203200.78870-1-samitolvanen@google.com>
- <20200624211540.GS4817@hirez.programming.kicks-ass.net>
- <CAKwvOdmxz91c-M8egR9GdR1uOjeZv7-qoTP=pQ55nU8TCpkK6g@mail.gmail.com>
- <20200625080313.GY4817@hirez.programming.kicks-ass.net>
- <20200625082433.GC117543@hirez.programming.kicks-ass.net>
+Received: from mail.kernel.org ([198.145.29.99]:48900 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405604AbgFYOxE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 25 Jun 2020 10:53:04 -0400
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: [PATCH] kconfig: qconf: Fix find on split mode
+Date: Thu, 25 Jun 2020 16:52:56 +0200
+Message-Id: <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
+In-Reply-To: <20200625154226.25692cd1@coco.lan>
+References: <20200625154226.25692cd1@coco.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200625082433.GC117543@hirez.programming.kicks-ass.net>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
 
-On Thu, Jun 25, 2020 at 10:24:33AM +0200, Peter Zijlstra wrote:
-> On Thu, Jun 25, 2020 at 10:03:13AM +0200, Peter Zijlstra wrote:
+The logic handling find on split mode is currently broken.
+Fix it, making it work again as expected.
 
-> > I'm sure Will will respond, but the basic issue is the trainwreck C11
-> > made of dependent loads.
-> > 
-> > Anyway, here's a link to the last time this came up:
-> > 
-> >   https://lore.kernel.org/linux-arm-kernel/20171116174830.GX3624@linux.vnet.ibm.com/
-> 
-> Another good read:
-> 
->   https://lore.kernel.org/lkml/20150520005510.GA23559@linux.vnet.ibm.com/
-> 
-> and having (partially) re-read that, I now worry intensily about things
-> like latch_tree_find(), cyc2ns_read_begin, __ktime_get_fast_ns().
-> 
-> It looks like kernel/time/sched_clock.c uses raw_read_seqcount() which
-> deviates from the above patterns by, for some reason, using a primitive
-> that includes an extra smp_rmb().
-> 
-> And this is just the few things I could remember off the top of my head,
-> who knows what else is out there.
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ scripts/kconfig/qconf.cc | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-As an example, let us consider __ktime_get_fast_ns(), the critical bit
-is:
-
-		seq = raw_read_seqcount_latch(&tkf->seq);
-		tkr = tkf->base + (seq & 0x01);
-		now = tkr->base;
-
-And we hard rely on that being a dependent load, so:
-
-  LOAD	seq, (tkf->seq)
-  LOAD  tkr, tkf->base
-  AND   seq, 1
-  MUL   seq, sizeof(tk_read_base)
-  ADD	tkr, seq
-  LOAD  now, (tkr->base)
-
-Such that we obtain 'now' as a direct dependency on 'seq'. This ensures
-the loads are ordered.
-
-A compiler can wreck this by translating it into something like:
-
-  LOAD	seq, (tkf->seq)
-  LOAD  tkr, tkf->base
-  AND   seq, 1
-  CMP	seq, 0
-  JE	1f
-  ADD	tkr, sizeof(tk_read_base)
-1:
-  LOAD  now, (tkr->base)
-
-Because now the machine can speculate and load now before seq, breaking
-the ordering.
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index c0ac8f7b5f1a..b8f577c6e8aa 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+ 			return;
+ 		list->setRootMenu(parent);
+ 		break;
+-	case symbolMode:
++	case menuMode:
+ 		if (menu->flags & MENU_ROOT) {
+-			configList->setRootMenu(menu);
++			menuList->setRootMenu(menu);
+ 			configList->clearSelection();
+-			list = menuList;
+-		} else {
+ 			list = configList;
++		} else {
++			configList->setRootMenu(menu);
++			configList->clearSelection();
++
+ 			parent = menu_get_parent_menu(menu->parent);
+ 			if (!parent)
+ 				return;
+-			item = menuList->findConfigItem(parent);
+-			if (item) {
+-				item->setSelected(true);
+-				menuList->scrollToItem(item);
+-			}
+-			list->setRootMenu(parent);
++			menuList->setRootMenu(parent);
++
++			list = menuList;
+ 		}
+ 		break;
+ 	case fullMode:
+-- 
+2.26.2
