@@ -1,81 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44270 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbgF0VVU (ORCPT
+        with ESMTP id S1726057AbgF0Vyf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jun 2020 17:21:20 -0400
-Date: Sat, 27 Jun 2020 23:21:12 +0200
-From: Domenico Andreoli <domenico.andreoli@linux.com>
-Subject: Re: [PATCH v2] kbuild: buildtar: add arm64 dtbs support
-Message-ID: <20200627212112.GA18721@dumbo>
-References: <5ef50e52.1c69fb81.b6cbd.bd8e@mx.google.com>
- <CAK7LNASta=UfbK-C=6R+tT2nug8_MYyr9515J4CN8odWCh0CpA@mail.gmail.com>
- <20200626214026.GB25753@dumbo>
- <CAK7LNASRL6jaaxZreFK+iDmFHuw6QLSS0n08gZNkyhcsNunAnw@mail.gmail.com>
+        Sat, 27 Jun 2020 17:54:35 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34D2EC08C5DC
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Jun 2020 14:54:34 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id dm19so3339638edb.13
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Jun 2020 14:54:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASRL6jaaxZreFK+iDmFHuw6QLSS0n08gZNkyhcsNunAnw@mail.gmail.com>
+Reply-To: un.org@i.ua
+From: helen <info.isaacgeorge@gmail.com>
+Date: Sat, 27 Jun 2020 22:54:31 +0100
+Message-ID: <CAABX3N8zm7a58jU5g8fzjfpsKNf48aUsUHECRV0m9PDLWU814A@mail.gmail.com>
+Subject: 
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Olof Johansson <olof@lixom.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: zhang@intel.com
 
-On Sat, Jun 27, 2020 at 09:02:52PM +0900, Masahiro Yamada wrote:
-> On Sat, Jun 27, 2020 at 6:40 AM Domenico Andreoli <domenico.andreoli@linux.com> wrote:
-> > On Fri, Jun 26, 2020 at 03:16:58PM +0900, Masahiro Yamada wrote:
-> > > On Fri, Jun 26, 2020 at 5:51 AM Domenico Andreoli <domenico.andreoli@linux.com> wrote:
+MONEY-GRAM TRANSFERRED PAYMENT INFO:
 
-[...]
-
-> > > >
-> > > > +       arm64)
-> > > > +               make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_DTBS_PATH="${tmpdir}/boot/dtbs/${KERNELRELEASE}" dtbs_install
-> > > > +               ;;
-> > > > +esac
-> > > > +
-> > >
-> > >
-> > > Or, you can use INSTALL_PATH="${tmpdir}/boot"
-> > > to make it shorter.
-> >
-> > This does not work, INSTALL_DTBS_PATH gets somehow defined along the
-> > twisted path to buildtar and therefore needs to be explicitly specified
-> > for the new destination.
-> 
-> It works.
-> 
-> See line 1002 of the top Makefile
-> 
-> export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
-
-Exactly. INSTALL_DTBS_PATH is _exported_ in the top Makefile.
+Below is the sender=E2=80=99s information
 
 
-This is what it seems to happen, in the order:
 
-1. outer 'make dir-pkg'
-   INSTALL_DTBS_PATH is exported with some content
+1. MG. REFERENCE NO#: 36360857
 
-2. control arrives to buildtar
-   INSTALL_DTBS_PATH is there as environment variable
+2. SENDER'S NAME: Johnson Williams
 
-3. inner 'make INSTALL_PATH=${tmpdir}/boot dtbs_install'
-   INSTALL_DTBS_PATH is already set, therefore it is not modified
+3. AMOUNT TO PICKUP: US$10,000
 
 
-To make the inner invocation work, I see these two options:
 
-1. 'make INSTALL_DTBS_PATH= INSTALL_PATH=${tmpdir}/boot dtb_install' (untested)
+Go to any Money Gram office near you and pick up the payment Track the
 
-2. 'make INSTALL_DTBS_PATH=${tmpdir}/boot/dtbs/${KERNELRELEASE} dtbs_install'
+Reference Number by visiting and click the link below
 
-I chose 2 but I can switch to 1, if you prefer. No problem.
+(https://secure.moneygram.com/embed/track) and enter the Reference
 
+Number: 36360857 and the Last Name: Williams, you will find the payment
 
-Regards,
-Domenico
+available for pickup instantly.
 
--- 
-rsa4096: 3B10 0CA1 8674 ACBA B4FE  FCD2 CE5B CF17 9960 DE13
-ed25519: FFB4 0CC3 7F2E 091D F7DA  356E CC79 2832 ED38 CB05
+Yours Sincerely,
+
+Mrs. Helen Marvis
+United Nations Liaison Office
+Directorate for International Payments
