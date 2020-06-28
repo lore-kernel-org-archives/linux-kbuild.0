@@ -1,217 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:61703 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726397AbgF1OVE (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:59087 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726411AbgF1Omm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 10:21:04 -0400
+        Sun, 28 Jun 2020 10:42:42 -0400
 MIME-Version: 1.0
-References: <11c1e65b393b4c3ca6118515c77bbf19524dab11.1593074472.git.hns@goldelico.com>
- <CAK7LNATCLscXNDZ1RUmbnM5BeV-tvKjz9kQB8eo0SNp10WbjFQ@mail.gmail.com>
- <2D851B90-5F85-4136-AF70-E764FDF4D7DD@goldelico.com> <CAK7LNARfgaVgmqzsa+n2rvPx5K1dsmcqMLSeLe_tMP0O017=Yw@mail.gmail.com>
- <2F77152B-BF7D-4098-AE60-2F13794B027A@goldelico.com>
-In-Reply-To: <2F77152B-BF7D-4098-AE60-2F13794B027A@goldelico.com>
+References: <ff9d1c3369b96c1d14b1e898e3d5f64ad945b604.1593346883.git.mchehab+huawei@kernel.org>
+In-Reply-To: <ff9d1c3369b96c1d14b1e898e3d5f64ad945b604.1593346883.git.mchehab+huawei@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 28 Jun 2020 23:20:08 +0900
-Message-ID: <CAK7LNASRocttsA9xGOm45QPnjfk4sMZMoYC-kazrCWccj=fK7Q@mail.gmail.com>
-Subject: Re: [PATCH] modpost: remove use of non-standard strsep() in HOSTCC code
+Date: Sun, 28 Jun 2020 23:41:46 +0900
+Message-ID: <CAK7LNARnDe0ToxYj9mMpocxzmrUvp6yf14iDRxgG8nGuGcxFKw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: qconf: make debug links work again
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Media Mailing List <linux-media@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>
 
-On Sun, Jun 28, 2020 at 5:20 PM H. Nikolaus Schaller <hns@goldelico.com> wrote:
+On Sun, Jun 28, 2020 at 9:21 PM Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
 >
+> The Qt5 conversion broke support for debug info links.
 >
-> > Am 28.06.2020 um 09:52 schrieb Masahiro Yamada <masahiroy@kernel.org>:
-> >
-> > On Sun, Jun 28, 2020 at 3:17 PM H. Nikolaus Schaller <hns@goldelico.com> wrote:
-> >>
-> >> Hi,
-> >>
-> >>> Am 28.06.2020 um 07:51 schrieb Masahiro Yamada <masahiroy@kernel.org>:
-> >>>
-> >>> On Thu, Jun 25, 2020 at 5:47 PM H. Nikolaus Schaller <hns@goldelico.com> wrote:
-> >>>>
-> >>>> strsep() is neither standard C nor POSIX and used outside
-> >>>> the kernel code here. Using it here requires that the
-> >>>> build host supports it out of the box which is e.g.
-> >>>> not true for a Darwin build host and using a cross-compiler.
-> >>>> This leads to:
-> >>>>
-> >>>> scripts/mod/modpost.c:145:2: warning: implicit declaration of function 'strsep' [-Wimplicit-function-declaration]
-> >>>> return strsep(stringp, "\n");
-> >>>> ^
-> >>>>
-> >>>> and a segfault when running MODPOST.
-> >>>>
-> >>>> See also: https://stackoverflow.com/a/7219504
-> >>>>
-> >>>> So let's add some lines of code separating the string at the
-> >>>> next newline character instead of using strsep(). It does not
-> >>>> hurt kernel size or speed since this code is run on the build host.
-> >>>>
-> >>>> Fixes: ac5100f5432967 ("modpost: add read_text_file() and get_line() helpers")
-> >>>> Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
-> >>>> ---
-> >>>> scripts/mod/modpost.c | 7 ++++++-
-> >>>> 1 file changed, 6 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> >>>> index 6aea65c65745..8fe63989c6e1 100644
-> >>>> --- a/scripts/mod/modpost.c
-> >>>> +++ b/scripts/mod/modpost.c
-> >>>> @@ -138,11 +138,16 @@ char *read_text_file(const char *filename)
-> >>>>
-> >>>> char *get_line(char **stringp)
-> >>>> {
-> >>>> +       char *p;
-> >>>>       /* do not return the unwanted extra line at EOF */
-> >>>>       if (*stringp && **stringp == '\0')
-> >>>
-> >>> This check does not make sense anymore.
-> >>>
-> >>> Previously, get_line(NULL) returns NULL.
-> >>>
-> >>> With your patch, get_line(NULL) crashes
-> >>> due to NULL-pointer dereference.
-> >>
-> >> Well, that is original code.
-> >
-> >
-> > Sorry for confusion.
-> >
-> > I meant this:
-> >
-> >  char *s = NULL;
-> >  get_line(&s);
-> >
-> >
-> > In the current code, get_line(&s) returns NULL.
-> > As 'man strsep' says this:
-> >  "If *stringp is NULL, the strsep() function returns NULL
-> >   and does nothing else."
-> >
-> > With your patch, **stringp will cause
-> > NULL-pointer dereference.
+> Restore the behaviour added by changeset
+> ab45d190fd4a ("kconfig: create links in info window").
 >
-> Ah, now I see. strsep() has a special case that is not covered
-> by my patch.
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+
+I tested this patch, but this caused
+segmentation fault.
+
+
+I enabled 'Show Debug Info',
+and then clicked
+dep: <symbol name>.
+
+Then, xconfig crashed.
+
+(without this patch, it did not cause
+segfault at least)
+
+Did you see this?
+
+
+
+
+
+
+
+
+
+
+
+> ---
+>  scripts/kconfig/qconf.cc | 35 ++++++++++++++++++++++++++++++++++-
+>  scripts/kconfig/qconf.h  |  1 +
+>  2 files changed, 35 insertions(+), 1 deletion(-)
 >
-> On the other hand, get_line() is only called as get_line(&pos) and
-> pos = buf can not be NULL because that is checked before in read_dump().
-> This is why I did not observe a segfault.
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index 631e19659504..03cadf27a376 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1012,7 +1012,7 @@ ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
+>         : Parent(parent), sym(0), _menu(0)
+>  {
+>         setObjectName(name);
+> -
+> +       setOpenLinks(false);
 >
-> But it is wise to make get_line() it more robust than needed. We do
-> never know who will copy this code fragment... And I am tempted to
-> handle the get_line(NULL) case as well.
-
-No.
-(stringp == NULL) is a bug.
-Better to not handle.
-
-
-(*stringp == NULL) has a good reason to be handled.
-
-
-*stringp is updated to point to the next.
-
-But, there is no more delimiter, *stringp reaches
-the end of a string (**stringp == '\0').
-In this case, we cannot advance *stringp any more.
-(We cannot point the next character of '\0';
-it would cause buffer overrun).
-
-So,*stringp is set to NULL to represent no more string.
-In the next iteration, (*stringp == NULL) is input,
-then NULL is returned.
-
-
-
-
+>         if (!objectName().isEmpty()) {
+>                 configSettings->beginGroup(objectName());
+> @@ -1224,6 +1224,36 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
+>                 *text += str2;
+>  }
 >
-> >> I have only replaced the strsep() function.
-> >> But yes, it looks to be better in addition to
-> >> my patch.
-> >>
-> >>>
-> >>>
-> >>>
-> >>>>               return NULL;
-> >>>>
-> >>>> -       return strsep(stringp, "\n");
-> >>>> +       p = *stringp;
-> >>>> +       while (**stringp != '\n')
-> >>>> +               (*stringp)++;
-> >>>
-> >>>
-> >>> Is this a safe conversion?
-> >>>
-> >>> If the input file does not contain '\n' at all,
-> >>> this while-loop continues running,
-> >>> and results in the segmentation fault
-> >>> due to buffer over-run.
-> >>
-> >> Ah, yes, you are right.
-> >>
-> >> We should use
-> >>
-> >> +       while (**stringp && **stringp != '\n')
-> >>
-> >>>
-> >>>
-> >>>
-> >>>> +       *(*stringp)++ = '\0';
-> >>>> +       return p;
-> >>>> }
-> >>>
-> >>>
-> >>>
-> >>> How about this?
-> >>>
-> >>> char *get_line(char **stringp)
-> >>> {
-> >>>       char *orig = *stringp;
-> >>
-> >> ^^^ this still segfaults with get_line(NULL)
-> >
-> >
-> > This is OK.
-> >
-> > get_line(NULL) should crash because we never expect
-> > the case  ' stringp == NULL'.
-> >
-> > We need to care about the case ' *stringp == NULL'.
-> > In this case, get_line() should return NULL.
-> >
-> >
-> >
-> >
-> >>>       char *next;
-> >>>
-> >>>       /* do not return the unwanted extra line at EOF */
-> >>>       if (!orig || *orig == '\0')
-> >>>               return NULL;
-> >>>
-> >>>       next = strchr(orig, '\n');
-> >>>       if (next)
-> >>>               *next++ = '\0';
-> >>>
-> >>>       *stringp = next;
-> >>
-> >> Yes, this code is easier to understand than my while loop.
-> >> And strchr() is POSIX.
-> >>
-> >> So should I submit an updated patch or do you want to submit
-> >> it (with a suggested-by: H. Nikolaus Schaller <hns@goldelico.com>)
-> >
-> > Please send a patch.
-> > (Co-developed-by if you want to give some credit to me)
+> +void ConfigInfoView::clicked(const QUrl &url)
+> +{
+> +       QByteArray str = url.toEncoded();
+> +       const std::size_t count = str.size();
+> +       char *hex = new char[count];
+> +       unsigned long p;
+> +
+> +       if (count < 1)
+> +               return;
+> +
+> +       memcpy(hex, str.constData(), count);
+> +       p = (int)strtol(hex + 1, NULL, 16);
+> +
+> +       if (!p)
+> +               return;
+> +
+> +       if (hex[0] == 's') {
+> +               struct symbol *s = (struct symbol *)p;
+> +
+> +               sym = s;
+> +               symbolInfo();
+> +       } else {
+> +               struct menu *m = (struct menu *)p;
+> +
+> +               _menu = m;
+> +               menuInfo();
+> +       }
+> +       emit showDebugChanged(true);
+> +}
+> +
+>  QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
+>  {
+>         QMenu* popup = Parent::createStandardContextMenu(pos);
+> @@ -1497,6 +1527,9 @@ ConfigMainWindow::ConfigMainWindow(void)
+>         helpMenu->addAction(showIntroAction);
+>         helpMenu->addAction(showAboutAction);
 >
-> Yes, I will do in the next days.
+> +       connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
+> +                helpText, SLOT (clicked (const QUrl &)) );
+> +
+>         connect(configList, SIGNAL(menuChanged(struct menu *)),
+>                 helpText, SLOT(setInfo(struct menu *)));
+>         connect(configList, SIGNAL(menuSelected(struct menu *)),
+> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+> index d913a02967ae..a193137f2314 100644
+> --- a/scripts/kconfig/qconf.h
+> +++ b/scripts/kconfig/qconf.h
+> @@ -250,6 +250,7 @@ public slots:
+>         void setInfo(struct menu *menu);
+>         void saveSettings(void);
+>         void setShowDebug(bool);
+> +       void clicked (const QUrl &url);
 >
-> BR and thanks,
-> Nikolaus Schaller
+>  signals:
+>         void showDebugChanged(bool);
+> --
+> 2.26.2
 >
 
 
