@@ -1,121 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:53856 "EHLO
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:19303 "EHLO
         conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725913AbgF1Fv5 (ORCPT
+        with ESMTP id S1725936AbgF1GAu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 01:51:57 -0400
+        Sun, 28 Jun 2020 02:00:50 -0400
 MIME-Version: 1.0
-References: <11c1e65b393b4c3ca6118515c77bbf19524dab11.1593074472.git.hns@goldelico.com>
-In-Reply-To: <11c1e65b393b4c3ca6118515c77bbf19524dab11.1593074472.git.hns@goldelico.com>
+References: <20200213122410.1605-1-masahiroy@kernel.org> <202002251057.C4E397A@keescook>
+In-Reply-To: <202002251057.C4E397A@keescook>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 28 Jun 2020 14:51:04 +0900
-Message-ID: <CAK7LNATCLscXNDZ1RUmbnM5BeV-tvKjz9kQB8eo0SNp10WbjFQ@mail.gmail.com>
-Subject: Re: [PATCH] modpost: remove use of non-standard strsep() in HOSTCC code
+Date: Sun, 28 Jun 2020 14:59:47 +0900
+Message-ID: <CAK7LNASw0YT8_itaa0OeZi8toV1TUj6EKCMbg6rchdYub0cgww@mail.gmail.com>
+Subject: Re: [PATCH] gcc-plugins: fix gcc-plugins directory path in documentation
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Emese Revfy <re.emese@gmail.com>, Michal Marek <michal.lkml@markovi.net>, Kernel Hardening <kernel-hardening@lists.openwall.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, Jun 25, 2020 at 5:47 PM H. Nikolaus Schaller <hns@goldelico.com> wrote:
+On Wed, Feb 26, 2020 at 3:58 AM Kees Cook <keescook@chromium.org> wrote:
 >
-> strsep() is neither standard C nor POSIX and used outside
-> the kernel code here. Using it here requires that the
-> build host supports it out of the box which is e.g.
-> not true for a Darwin build host and using a cross-compiler.
-> This leads to:
+> On Thu, Feb 13, 2020 at 09:24:10PM +0900, Masahiro Yamada wrote:
+> > Fix typos "plgins" -> "plugins".
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 >
-> scripts/mod/modpost.c:145:2: warning: implicit declaration of function 'strsep' [-Wimplicit-function-declaration]
->   return strsep(stringp, "\n");
->   ^
+> Thanks!
 >
-> and a segfault when running MODPOST.
+> Acked-by: Kees Cook <keescook@chromium.org>
 >
-> See also: https://stackoverflow.com/a/7219504
+> Jon, can you take this?
+
+I noticed this patch had fallen into a crack.
+
+Applied to linux-kbuild now.
+Thanks.
+
+
+
+
+
+> -Kees
 >
-> So let's add some lines of code separating the string at the
-> next newline character instead of using strsep(). It does not
-> hurt kernel size or speed since this code is run on the build host.
+> > ---
+> >
+> >  Documentation/kbuild/reproducible-builds.rst | 2 +-
+> >  scripts/gcc-plugins/Kconfig                  | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/Documentation/kbuild/reproducible-builds.rst b/Documentation/kbuild/reproducible-builds.rst
+> > index 503393854e2e..3b25655e441b 100644
+> > --- a/Documentation/kbuild/reproducible-builds.rst
+> > +++ b/Documentation/kbuild/reproducible-builds.rst
+> > @@ -101,7 +101,7 @@ Structure randomisation
+> >
+> >  If you enable ``CONFIG_GCC_PLUGIN_RANDSTRUCT``, you will need to
+> >  pre-generate the random seed in
+> > -``scripts/gcc-plgins/randomize_layout_seed.h`` so the same value
+> > +``scripts/gcc-plugins/randomize_layout_seed.h`` so the same value
+> >  is used in rebuilds.
+> >
+> >  Debug info conflicts
+> > diff --git a/scripts/gcc-plugins/Kconfig b/scripts/gcc-plugins/Kconfig
+> > index e3569543bdac..7b63c819610c 100644
+> > --- a/scripts/gcc-plugins/Kconfig
+> > +++ b/scripts/gcc-plugins/Kconfig
+> > @@ -86,7 +86,7 @@ config GCC_PLUGIN_RANDSTRUCT
+> >         source tree isn't cleaned after kernel installation).
+> >
+> >         The seed used for compilation is located at
+> > -       scripts/gcc-plgins/randomize_layout_seed.h.  It remains after
+> > +       scripts/gcc-plugins/randomize_layout_seed.h.  It remains after
+> >         a make clean to allow for external modules to be compiled with
+> >         the existing seed and will be removed by a make mrproper or
+> >         make distclean.
+> > --
+> > 2.17.1
+> >
 >
-> Fixes: ac5100f5432967 ("modpost: add read_text_file() and get_line() helpers")
-> Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
-> ---
->  scripts/mod/modpost.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 6aea65c65745..8fe63989c6e1 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -138,11 +138,16 @@ char *read_text_file(const char *filename)
->
->  char *get_line(char **stringp)
->  {
-> +       char *p;
->         /* do not return the unwanted extra line at EOF */
->         if (*stringp && **stringp == '\0')
-
-This check does not make sense anymore.
-
-Previously, get_line(NULL) returns NULL.
-
-With your patch, get_line(NULL) crashes
-due to NULL-pointer dereference.
-
-
-
->                 return NULL;
->
-> -       return strsep(stringp, "\n");
-> +       p = *stringp;
-> +       while (**stringp != '\n')
-> +               (*stringp)++;
-
-
-Is this a safe conversion?
-
-If the input file does not contain '\n' at all,
-this while-loop continues running,
-and results in the segmentation fault
-due to buffer over-run.
-
-
-
-> +       *(*stringp)++ = '\0';
-> +       return p;
->  }
-
-
-
-How about this?
-
-char *get_line(char **stringp)
-{
-        char *orig = *stringp;
-        char *next;
-
-        /* do not return the unwanted extra line at EOF */
-        if (!orig || *orig == '\0')
-                return NULL;
-
-        next = strchr(orig, '\n');
-        if (next)
-                *next++ = '\0';
-
-        *stringp = next;
-
-        return orig;
-}
-
-
-
-
->  /* A list of all modules we processed */
 > --
-> 2.26.2
->
+> Kees Cook
+
 
 
 --
 Best Regards
+
 Masahiro Yamada
