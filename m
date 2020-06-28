@@ -1,75 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:31859 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726038AbgF1Ikp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 04:40:45 -0400
-From: Xiao Yang <yangx.jy@cn.fujitsu.com>
-Subject: [PATCH] arm, kbuild: Add new 'xipinstall' target
-Date: Sun, 28 Jun 2020 16:24:28 +0800
-Message-ID: <20200628082428.647002-1-yangx.jy@cn.fujitsu.com>
+Received: from mail.kernel.org ([198.145.29.99]:45434 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726243AbgF1MFB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 28 Jun 2020 08:05:01 -0400
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: [PATCH] kconfig: qconf: Fix find on split mode
+Date: Sun, 28 Jun 2020 14:04:53 +0200
+Message-Id: <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593345886.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org, linux@armlinux.org.uk
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Xiao Yang <yangx.jy@cn.fujitsu.com>, kernel test robot <lkp@intel.com>
+To: Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
 
-Only xipImage is available when CONFIG_XIP_KERNEL is set but no target can
-be used to install xipImage currently, so add a new 'xipinstall' target.
+The logic handling find on split mode is currently broken.
+Fix it, making it work again as expected.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Xiao Yang <yangx.jy@cn.fujitsu.com>
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- arch/arm/Makefile      | 3 ++-
- arch/arm/boot/Makefile | 6 +++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ scripts/kconfig/qconf.cc | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index 59fde2d598d8..063f973b77bf 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -332,7 +332,7 @@ archprepare:
- bzImage: zImage
- 
- BOOT_TARGETS	= zImage Image xipImage bootpImage uImage
--INSTALL_TARGETS	= zinstall uinstall install
-+INSTALL_TARGETS	= zinstall uinstall install xipinstall
- 
- PHONY += bzImage $(BOOT_TARGETS) $(INSTALL_TARGETS)
- 
-@@ -369,6 +369,7 @@ define archhelp
-   echo  '                  (supply initrd image via make variable INITRD=<path>)'
-   echo  '  install       - Install uncompressed kernel'
-   echo  '  zinstall      - Install compressed kernel'
-+  echo  '  xipinstall    - Install XIP kernel image'
-   echo  '  uinstall      - Install U-Boot wrapped compressed kernel'
-   echo  '                  Install using (your) ~/bin/$(INSTALLKERNEL) or'
-   echo  '                  (distribution) /sbin/$(INSTALLKERNEL) or'
-diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
-index 0b3cd7a33a26..c02b4961ff0a 100644
---- a/arch/arm/boot/Makefile
-+++ b/arch/arm/boot/Makefile
-@@ -96,7 +96,7 @@ $(obj)/bootp/bootp: $(obj)/zImage initrd FORCE
- $(obj)/bootpImage: $(obj)/bootp/bootp FORCE
- 	$(call if_changed,objcopy)
- 
--PHONY += initrd install zinstall uinstall
-+PHONY += initrd install zinstall xipinstall uinstall
- initrd:
- 	@test "$(INITRD_PHYS)" != "" || \
- 	(echo This machine does not support INITRD; exit -1)
-@@ -111,6 +111,10 @@ zinstall:
- 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh "$(KERNELRELEASE)" \
- 	$(obj)/zImage System.map "$(INSTALL_PATH)"
- 
-+xipinstall:
-+	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh "$(KERNELRELEASE)" \
-+	$(obj)/xipImage System.map "$(INSTALL_PATH)"
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index c0ac8f7b5f1a..b8f577c6e8aa 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+ 			return;
+ 		list->setRootMenu(parent);
+ 		break;
+-	case symbolMode:
++	case menuMode:
+ 		if (menu->flags & MENU_ROOT) {
+-			configList->setRootMenu(menu);
++			menuList->setRootMenu(menu);
+ 			configList->clearSelection();
+-			list = menuList;
+-		} else {
+ 			list = configList;
++		} else {
++			configList->setRootMenu(menu);
++			configList->clearSelection();
 +
- uinstall:
- 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh "$(KERNELRELEASE)" \
- 	$(obj)/uImage System.map "$(INSTALL_PATH)"
+ 			parent = menu_get_parent_menu(menu->parent);
+ 			if (!parent)
+ 				return;
+-			item = menuList->findConfigItem(parent);
+-			if (item) {
+-				item->setSelected(true);
+-				menuList->scrollToItem(item);
+-			}
+-			list->setRootMenu(parent);
++			menuList->setRootMenu(parent);
++
++			list = menuList;
+ 		}
+ 		break;
+ 	case fullMode:
 -- 
-2.25.1
+2.26.2
