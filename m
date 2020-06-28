@@ -1,63 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45434 "EHLO mail.kernel.org"
+Received: from mout.web.de ([217.72.192.78]:55449 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726243AbgF1MFB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 08:05:01 -0400
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: [PATCH] kconfig: qconf: Fix find on split mode
-Date: Sun, 28 Jun 2020 14:04:53 +0200
-Message-Id: <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593345886.git.mchehab+huawei@kernel.org>
+        id S1726250AbgF1MSa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 28 Jun 2020 08:18:30 -0400
+Subject: Re: [PATCH] kconfig: qconf: Fix find on split mode
+From: Markus Elfring <Markus.Elfring@web.de>
+Message-ID: <9048b1ca-87aa-dfee-2be3-2f399d2b7fe6@web.de>
+Date: Sun, 28 Jun 2020 14:18:22 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Media Mailing List <linux-media@vger.kernel.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>
 
-The logic handling find on split mode is currently broken.
-Fix it, making it work again as expected.
+> The logic handling find on split mode is currently broken.
 
-Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- scripts/kconfig/qconf.cc | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+* Is there a word missing in this change description?
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index c0ac8f7b5f1a..b8f577c6e8aa 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
- 			return;
- 		list->setRootMenu(parent);
- 		break;
--	case symbolMode:
-+	case menuMode:
- 		if (menu->flags & MENU_ROOT) {
--			configList->setRootMenu(menu);
-+			menuList->setRootMenu(menu);
- 			configList->clearSelection();
--			list = menuList;
--		} else {
- 			list = configList;
-+		} else {
-+			configList->setRootMenu(menu);
-+			configList->clearSelection();
-+
- 			parent = menu_get_parent_menu(menu->parent);
- 			if (!parent)
- 				return;
--			item = menuList->findConfigItem(parent);
--			if (item) {
--				item->setSelected(true);
--				menuList->scrollToItem(item);
--			}
--			list->setRootMenu(parent);
-+			menuList->setRootMenu(parent);
-+
-+			list = menuList;
- 		}
- 		break;
- 	case fullMode:
--- 
-2.26.2
+* Can any information become clearer another bit?
+
+
+> Fix it, =E2=80=A6
+
+Please replace the beginning of this sentence with the tag =E2=80=9CFixes=
+=E2=80=9D.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?id=3D719fdd32921fb7e3208db8832d=
+32ae1c2d68900f#n183
+
+Regards,
+Markus
