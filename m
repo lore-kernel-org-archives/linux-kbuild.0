@@ -1,92 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:58484 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726411AbgF1Ont (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53394 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726573AbgF1OsR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 10:43:49 -0400
-MIME-Version: 1.0
-References: <20200625154226.25692cd1@coco.lan> <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
- <c3c58115168c983eb1d441daa7cc84378cf33f39.camel@redhat.com>
-In-Reply-To: <c3c58115168c983eb1d441daa7cc84378cf33f39.camel@redhat.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 28 Jun 2020 23:42:48 +0900
-Message-ID: <CAK7LNAT5meMz0LF3C-2FnA6S8dettg4uJO-=FvsnCZ3H6+CVng@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: qconf: Fix find on split mode
+        Sun, 28 Jun 2020 10:48:17 -0400
+Message-ID: <9ed32076053cd860900366dc9e12e5cb76d031b5.camel@redhat.com>
+Subject: Re: [PATCH] kconfig: qconf: make debug links work again
+From: Maxim Levitsky <mlevitsk@redhat.com>
+Date: Sun, 28 Jun 2020 17:48:08 +0300
+In-Reply-To: <CAK7LNARnDe0ToxYj9mMpocxzmrUvp6yf14iDRxgG8nGuGcxFKw@mail.gmail.com>
+References: <ff9d1c3369b96c1d14b1e898e3d5f64ad945b604.1593346883.git.mchehab+huawei@kernel.org>
+         <CAK7LNARnDe0ToxYj9mMpocxzmrUvp6yf14iDRxgG8nGuGcxFKw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Media Mailing List <linux-media@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Sun, Jun 28, 2020 at 5:40 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Thu, 2020-06-25 at 16:52 +0200, Mauro Carvalho Chehab wrote:
-> > The logic handling find on split mode is currently broken.
-> > Fix it, making it work again as expected.
->
-> I tested this patch and it works well.
-> There is one really small cosmetic issue:
->
-> If you select search result, and then select another search result
-> which happens not to update the 'menu', then both the results are
-> selected (that is the old one doesn't clear its selection)
-
-I see this too.
-So, this can be improved somehow...
-
-
-
->
-> Best regards,
->         Maxim Levitsky
->
-> >
+On Sun, 2020-06-28 at 23:41 +0900, Masahiro Yamada wrote:
+> On Sun, Jun 28, 2020 at 9:21 PM Mauro Carvalho Chehab
+> <mchehab+huawei@kernel.org> wrote:
+> > The Qt5 conversion broke support for debug info links.
+> > 
+> > Restore the behaviour added by changeset
+> > ab45d190fd4a ("kconfig: create links in info window").
+> > 
 > > Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> 
+> I tested this patch, but this caused
+> segmentation fault.
+> 
+> 
+> I enabled 'Show Debug Info',
+> and then clicked
+> dep: <symbol name>.
+> 
+> Then, xconfig crashed.
+> 
+> (without this patch, it did not cause
+> segfault at least)
+> 
+> Did you see this?
+
+Works for me - tested this again 
+(I have both patches applied on top on mainline master branch).
+Maybe you have Qt4?
+
+One thing that I forgot to report is that when clicking on the symbol,
+only config descripion updates and not config/menu windows.
+It might even be always like that, I don't remember, but it would be nice if 
+these were updated too.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
 > > ---
-> >  scripts/kconfig/qconf.cc | 19 +++++++++----------
-> >  1 file changed, 9 insertions(+), 10 deletions(-)
-> >
+> >  scripts/kconfig/qconf.cc | 35 ++++++++++++++++++++++++++++++++++-
+> >  scripts/kconfig/qconf.h  |  1 +
+> >  2 files changed, 35 insertions(+), 1 deletion(-)
+> > 
 > > diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> > index c0ac8f7b5f1a..b8f577c6e8aa 100644
+> > index 631e19659504..03cadf27a376 100644
 > > --- a/scripts/kconfig/qconf.cc
 > > +++ b/scripts/kconfig/qconf.cc
-> > @@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
-> >                       return;
-> >               list->setRootMenu(parent);
-> >               break;
-> > -     case symbolMode:
-> > +     case menuMode:
-> >               if (menu->flags & MENU_ROOT) {
-> > -                     configList->setRootMenu(menu);
-> > +                     menuList->setRootMenu(menu);
-> >                       configList->clearSelection();
-> > -                     list = menuList;
-> > -             } else {
-> >                       list = configList;
-> > +             } else {
-> > +                     configList->setRootMenu(menu);
-> > +                     configList->clearSelection();
+> > @@ -1012,7 +1012,7 @@ ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
+> >         : Parent(parent), sym(0), _menu(0)
+> >  {
+> >         setObjectName(name);
+> > -
+> > +       setOpenLinks(false);
+> > 
+> >         if (!objectName().isEmpty()) {
+> >                 configSettings->beginGroup(objectName());
+> > @@ -1224,6 +1224,36 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
+> >                 *text += str2;
+> >  }
+> > 
+> > +void ConfigInfoView::clicked(const QUrl &url)
+> > +{
+> > +       QByteArray str = url.toEncoded();
+> > +       const std::size_t count = str.size();
+> > +       char *hex = new char[count];
+> > +       unsigned long p;
 > > +
-> >                       parent = menu_get_parent_menu(menu->parent);
-> >                       if (!parent)
-> >                               return;
-> > -                     item = menuList->findConfigItem(parent);
-> > -                     if (item) {
-> > -                             item->setSelected(true);
-> > -                             menuList->scrollToItem(item);
-> > -                     }
-> > -                     list->setRootMenu(parent);
-> > +                     menuList->setRootMenu(parent);
+> > +       if (count < 1)
+> > +               return;
 > > +
-> > +                     list = menuList;
-> >               }
-> >               break;
-> >       case fullMode:
->
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+> > +       memcpy(hex, str.constData(), count);
+> > +       p = (int)strtol(hex + 1, NULL, 16);
+> > +
+> > +       if (!p)
+> > +               return;
+> > +
+> > +       if (hex[0] == 's') {
+> > +               struct symbol *s = (struct symbol *)p;
+> > +
+> > +               sym = s;
+> > +               symbolInfo();
+> > +       } else {
+> > +               struct menu *m = (struct menu *)p;
+> > +
+> > +               _menu = m;
+> > +               menuInfo();
+> > +       }
+> > +       emit showDebugChanged(true);
+> > +}
+> > +
+> >  QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
+> >  {
+> >         QMenu* popup = Parent::createStandardContextMenu(pos);
+> > @@ -1497,6 +1527,9 @@ ConfigMainWindow::ConfigMainWindow(void)
+> >         helpMenu->addAction(showIntroAction);
+> >         helpMenu->addAction(showAboutAction);
+> > 
+> > +       connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
+> > +                helpText, SLOT (clicked (const QUrl &)) );
+> > +
+> >         connect(configList, SIGNAL(menuChanged(struct menu *)),
+> >                 helpText, SLOT(setInfo(struct menu *)));
+> >         connect(configList, SIGNAL(menuSelected(struct menu *)),
+> > diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+> > index d913a02967ae..a193137f2314 100644
+> > --- a/scripts/kconfig/qconf.h
+> > +++ b/scripts/kconfig/qconf.h
+> > @@ -250,6 +250,7 @@ public slots:
+> >         void setInfo(struct menu *menu);
+> >         void saveSettings(void);
+> >         void setShowDebug(bool);
+> > +       void clicked (const QUrl &url);
+> > 
+> >  signals:
+> >         void showDebugChanged(bool);
+> > --
+> > 2.26.2
+> > 
+> 
+> 
