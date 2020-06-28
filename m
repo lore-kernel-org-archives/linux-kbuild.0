@@ -1,192 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.22]:26869 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbgF1IXN (ORCPT
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27788 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726069AbgF1IkR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 04:23:13 -0400
-Subject: Re: [PATCH] modpost: remove use of non-standard strsep() in HOSTCC code
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Content-Type: text/plain; charset=us-ascii
-From: "H. Nikolaus Schaller" <hns@goldelico.com>
-In-Reply-To: <CAK7LNARfgaVgmqzsa+n2rvPx5K1dsmcqMLSeLe_tMP0O017=Yw@mail.gmail.com>
-Date: Sun, 28 Jun 2020 10:20:04 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2F77152B-BF7D-4098-AE60-2F13794B027A@goldelico.com>
-References: <11c1e65b393b4c3ca6118515c77bbf19524dab11.1593074472.git.hns@goldelico.com> <CAK7LNATCLscXNDZ1RUmbnM5BeV-tvKjz9kQB8eo0SNp10WbjFQ@mail.gmail.com> <2D851B90-5F85-4136-AF70-E764FDF4D7DD@goldelico.com> <CAK7LNARfgaVgmqzsa+n2rvPx5K1dsmcqMLSeLe_tMP0O017=Yw@mail.gmail.com>
+        Sun, 28 Jun 2020 04:40:17 -0400
+Message-ID: <c3c58115168c983eb1d441daa7cc84378cf33f39.camel@redhat.com>
+Subject: Re: [PATCH] kconfig: qconf: Fix find on split mode
+From: Maxim Levitsky <mlevitsk@redhat.com>
+Date: Sun, 28 Jun 2020 11:40:10 +0300
+In-Reply-To: <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
+References: <20200625154226.25692cd1@coco.lan>
+         <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+On Thu, 2020-06-25 at 16:52 +0200, Mauro Carvalho Chehab wrote:
+> The logic handling find on split mode is currently broken.
+> Fix it, making it work again as expected.
 
-> Am 28.06.2020 um 09:52 schrieb Masahiro Yamada <masahiroy@kernel.org>:
->=20
-> On Sun, Jun 28, 2020 at 3:17 PM H. Nikolaus Schaller =
-<hns@goldelico.com> wrote:
->>=20
->> Hi,
->>=20
->>> Am 28.06.2020 um 07:51 schrieb Masahiro Yamada =
-<masahiroy@kernel.org>:
->>>=20
->>> On Thu, Jun 25, 2020 at 5:47 PM H. Nikolaus Schaller =
-<hns@goldelico.com> wrote:
->>>>=20
->>>> strsep() is neither standard C nor POSIX and used outside
->>>> the kernel code here. Using it here requires that the
->>>> build host supports it out of the box which is e.g.
->>>> not true for a Darwin build host and using a cross-compiler.
->>>> This leads to:
->>>>=20
->>>> scripts/mod/modpost.c:145:2: warning: implicit declaration of =
-function 'strsep' [-Wimplicit-function-declaration]
->>>> return strsep(stringp, "\n");
->>>> ^
->>>>=20
->>>> and a segfault when running MODPOST.
->>>>=20
->>>> See also: https://stackoverflow.com/a/7219504
->>>>=20
->>>> So let's add some lines of code separating the string at the
->>>> next newline character instead of using strsep(). It does not
->>>> hurt kernel size or speed since this code is run on the build host.
->>>>=20
->>>> Fixes: ac5100f5432967 ("modpost: add read_text_file() and =
-get_line() helpers")
->>>> Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
->>>> ---
->>>> scripts/mod/modpost.c | 7 ++++++-
->>>> 1 file changed, 6 insertions(+), 1 deletion(-)
->>>>=20
->>>> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
->>>> index 6aea65c65745..8fe63989c6e1 100644
->>>> --- a/scripts/mod/modpost.c
->>>> +++ b/scripts/mod/modpost.c
->>>> @@ -138,11 +138,16 @@ char *read_text_file(const char *filename)
->>>>=20
->>>> char *get_line(char **stringp)
->>>> {
->>>> +       char *p;
->>>>       /* do not return the unwanted extra line at EOF */
->>>>       if (*stringp && **stringp =3D=3D '\0')
->>>=20
->>> This check does not make sense anymore.
->>>=20
->>> Previously, get_line(NULL) returns NULL.
->>>=20
->>> With your patch, get_line(NULL) crashes
->>> due to NULL-pointer dereference.
->>=20
->> Well, that is original code.
->=20
->=20
-> Sorry for confusion.
->=20
-> I meant this:
->=20
->  char *s =3D NULL;
->  get_line(&s);
->=20
->=20
-> In the current code, get_line(&s) returns NULL.
-> As 'man strsep' says this:
->  "If *stringp is NULL, the strsep() function returns NULL
->   and does nothing else."
->=20
-> With your patch, **stringp will cause
-> NULL-pointer dereference.
+I tested this patch and it works well.
+There is one really small cosmetic issue:
 
-Ah, now I see. strsep() has a special case that is not covered
-by my patch.
+If you select search result, and then select another search result
+which happens not to update the 'menu', then both the results are
+selected (that is the old one doesn't clear its selection)
 
-On the other hand, get_line() is only called as get_line(&pos) and
-pos =3D buf can not be NULL because that is checked before in =
-read_dump().
-This is why I did not observe a segfault.
+Best regards,
+	Maxim Levitsky
 
-But it is wise to make get_line() it more robust than needed. We do
-never know who will copy this code fragment... And I am tempted to
-handle the get_line(NULL) case as well.
-
->> I have only replaced the strsep() function.
->> But yes, it looks to be better in addition to
->> my patch.
->>=20
->>>=20
->>>=20
->>>=20
->>>>               return NULL;
->>>>=20
->>>> -       return strsep(stringp, "\n");
->>>> +       p =3D *stringp;
->>>> +       while (**stringp !=3D '\n')
->>>> +               (*stringp)++;
->>>=20
->>>=20
->>> Is this a safe conversion?
->>>=20
->>> If the input file does not contain '\n' at all,
->>> this while-loop continues running,
->>> and results in the segmentation fault
->>> due to buffer over-run.
->>=20
->> Ah, yes, you are right.
->>=20
->> We should use
->>=20
->> +       while (**stringp && **stringp !=3D '\n')
->>=20
->>>=20
->>>=20
->>>=20
->>>> +       *(*stringp)++ =3D '\0';
->>>> +       return p;
->>>> }
->>>=20
->>>=20
->>>=20
->>> How about this?
->>>=20
->>> char *get_line(char **stringp)
->>> {
->>>       char *orig =3D *stringp;
->>=20
->> ^^^ this still segfaults with get_line(NULL)
->=20
->=20
-> This is OK.
->=20
-> get_line(NULL) should crash because we never expect
-> the case  ' stringp =3D=3D NULL'.
->=20
-> We need to care about the case ' *stringp =3D=3D NULL'.
-> In this case, get_line() should return NULL.
->=20
->=20
->=20
->=20
->>>       char *next;
->>>=20
->>>       /* do not return the unwanted extra line at EOF */
->>>       if (!orig || *orig =3D=3D '\0')
->>>               return NULL;
->>>=20
->>>       next =3D strchr(orig, '\n');
->>>       if (next)
->>>               *next++ =3D '\0';
->>>=20
->>>       *stringp =3D next;
->>=20
->> Yes, this code is easier to understand than my while loop.
->> And strchr() is POSIX.
->>=20
->> So should I submit an updated patch or do you want to submit
->> it (with a suggested-by: H. Nikolaus Schaller <hns@goldelico.com>)
->=20
-> Please send a patch.
-> (Co-developed-by if you want to give some credit to me)
-
-Yes, I will do in the next days.
-
-BR and thanks,
-Nikolaus Schaller
+> 
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  scripts/kconfig/qconf.cc | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index c0ac8f7b5f1a..b8f577c6e8aa 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+>  			return;
+>  		list->setRootMenu(parent);
+>  		break;
+> -	case symbolMode:
+> +	case menuMode:
+>  		if (menu->flags & MENU_ROOT) {
+> -			configList->setRootMenu(menu);
+> +			menuList->setRootMenu(menu);
+>  			configList->clearSelection();
+> -			list = menuList;
+> -		} else {
+>  			list = configList;
+> +		} else {
+> +			configList->setRootMenu(menu);
+> +			configList->clearSelection();
+> +
+>  			parent = menu_get_parent_menu(menu->parent);
+>  			if (!parent)
+>  				return;
+> -			item = menuList->findConfigItem(parent);
+> -			if (item) {
+> -				item->setSelected(true);
+> -				menuList->scrollToItem(item);
+> -			}
+> -			list->setRootMenu(parent);
+> +			menuList->setRootMenu(parent);
+> +
+> +			list = menuList;
+>  		}
+>  		break;
+>  	case fullMode:
