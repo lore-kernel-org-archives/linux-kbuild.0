@@ -1,92 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:38090 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbgF1DrX (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:29721 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725973AbgF1Drn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jun 2020 23:47:23 -0400
+        Sat, 27 Jun 2020 23:47:43 -0400
 MIME-Version: 1.0
-References: <5ef50e52.1c69fb81.b6cbd.bd8e@mx.google.com> <CAK7LNASta=UfbK-C=6R+tT2nug8_MYyr9515J4CN8odWCh0CpA@mail.gmail.com>
- <20200626214026.GB25753@dumbo> <CAK7LNASRL6jaaxZreFK+iDmFHuw6QLSS0n08gZNkyhcsNunAnw@mail.gmail.com>
- <20200627212112.GA18721@dumbo>
-In-Reply-To: <20200627212112.GA18721@dumbo>
+References: <20200627122505.GA6095@dumbo>
+In-Reply-To: <20200627122505.GA6095@dumbo>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 28 Jun 2020 12:46:28 +0900
-Message-ID: <CAK7LNARhsyo0OoS+fibCn3tt4J7_iwfsSn8TvzjxZ4K_bwreUA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: buildtar: add arm64 dtbs support
+Date: Sun, 28 Jun 2020 12:46:52 +0900
+Message-ID: <CAK7LNASQNRdY1B8=XChZsnS8nGJwptKnZL=eES8sXgX+hCu6-Q@mail.gmail.com>
+Subject: Re: [PATCH v4] kbuild: buildtar: add dtbs support
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Domenico Andreoli <domenico.andreoli@linux.com>
-Cc: Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Olof Johansson <olof@lixom.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Olof Johansson <olof@lixom.net>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 
-On Sun, Jun 28, 2020 at 6:21 AM Domenico Andreoli
+On Sat, Jun 27, 2020 at 9:25 PM Domenico Andreoli
 <domenico.andreoli@linux.com> wrote:
 >
-> On Sat, Jun 27, 2020 at 09:02:52PM +0900, Masahiro Yamada wrote:
-> > On Sat, Jun 27, 2020 at 6:40 AM Domenico Andreoli <domenico.andreoli@linux.com> wrote:
-> > > On Fri, Jun 26, 2020 at 03:16:58PM +0900, Masahiro Yamada wrote:
-> > > > On Fri, Jun 26, 2020 at 5:51 AM Domenico Andreoli <domenico.andreoli@linux.com> wrote:
+> From: Domenico Andreoli <domenico.andreoli@linux.com>
 >
-> [...]
+> Make 'make tar-pkg' install dtbs.
 >
-> > > > >
-> > > > > +       arm64)
-> > > > > +               make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_DTBS_PATH="${tmpdir}/boot/dtbs/${KERNELRELEASE}" dtbs_install
-> > > > > +               ;;
-> > > > > +esac
-> > > > > +
-> > > >
-> > > >
-> > > > Or, you can use INSTALL_PATH="${tmpdir}/boot"
-> > > > to make it shorter.
-> > >
-> > > This does not work, INSTALL_DTBS_PATH gets somehow defined along the
-> > > twisted path to buildtar and therefore needs to be explicitly specified
-> > > for the new destination.
-> >
-> > It works.
-> >
-> > See line 1002 of the top Makefile
-> >
-> > export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
+> v4:
+>  - Install the dtbs before modules & kernel, not after
+>  - Check for the dtbs_install target before attempting to invoke it
 >
-> Exactly. INSTALL_DTBS_PATH is _exported_ in the top Makefile.
+> v3:
+>  - Check for CONFIG_OF_EARLY_FLATTREE=y instead of ARCH before installing dtbs
 >
+> v2:
+>  - Add the kernel release to the destination path
 >
-> This is what it seems to happen, in the order:
->
-> 1. outer 'make dir-pkg'
->    INSTALL_DTBS_PATH is exported with some content
->
-> 2. control arrives to buildtar
->    INSTALL_DTBS_PATH is there as environment variable
->
-> 3. inner 'make INSTALL_PATH=${tmpdir}/boot dtbs_install'
->    INSTALL_DTBS_PATH is already set, therefore it is not modified
-
-Sorry, I was wrong.
-Your analysis is definitely right.
+> Cc: Will Deacon <will.deacon@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Domenico Andreoli <domenico.andreoli@linux.com>
 
 
-I will apply v4.
-
+Applied to linux-kbuild.
 Thanks.
 
-
-
-
+> ---
+>  scripts/package/buildtar |   12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
-> To make the inner invocation work, I see these two options:
+> Index: b/scripts/package/buildtar
+> ===================================================================
+> --- a/scripts/package/buildtar
+> +++ b/scripts/package/buildtar
+> @@ -53,6 +53,18 @@ rm -rf -- "${tmpdir}"
+>  mkdir -p -- "${tmpdir}/boot"
+>  dirs=boot
 >
-> 1. 'make INSTALL_DTBS_PATH= INSTALL_PATH=${tmpdir}/boot dtb_install' (untested)
->
-> 2. 'make INSTALL_DTBS_PATH=${tmpdir}/boot/dtbs/${KERNELRELEASE} dtbs_install'
->
-> I chose 2 but I can switch to 1, if you prefer. No problem.
->
->
-> Regards,
-> Domenico
+> +
+> +#
+> +# Try to install dtbs
+> +#
+> +if grep -q '^CONFIG_OF_EARLY_FLATTREE=y' include/config/auto.conf; then
+> +       # Only some architectures with OF support have this target
+> +       if [ -d "${srctree}/arch/${SRCARCH}/boot/dts" ]; then
+> +               $MAKE ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_DTBS_PATH="${tmpdir}/boot/dtbs/${KERNELRELEASE}" dtbs_install
+> +    fi
+> +fi
+> +
+> +
+>  #
+>  # Try to install modules
+>  #
 >
 > --
 > rsa4096: 3B10 0CA1 8674 ACBA B4FE  FCD2 CE5B CF17 9960 DE13
