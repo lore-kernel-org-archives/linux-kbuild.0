@@ -1,67 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:45700 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725838AbgF1CRW (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:28455 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725838AbgF1CSt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Jun 2020 22:17:22 -0400
+        Sat, 27 Jun 2020 22:18:49 -0400
 MIME-Version: 1.0
-References: <20200622124343.121043-1-dovmurik@linux.vnet.ibm.com>
-In-Reply-To: <20200622124343.121043-1-dovmurik@linux.vnet.ibm.com>
+References: <20200625154226.25692cd1@coco.lan> <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
+In-Reply-To: <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 28 Jun 2020 11:16:13 +0900
-Message-ID: <CAK7LNASD4ha4AGSPY4=mALo4JY0WfSLTrmJBUPeiH8yWjSsO=Q@mail.gmail.com>
-Subject: Re: [PATCH] docs: kbuild: fix ReST formatting
+Date: Sun, 28 Jun 2020 11:17:38 +0900
+Message-ID: <CAK7LNATnariwQ14w7dDKRS76yXKzLn6pSbk02zQF6LHm4i=ppw@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: qconf: Fix find on split mode
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dov Murik <dovmurik@linux.vnet.ibm.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>
 
-On Mon, Jun 22, 2020 at 9:44 PM Dov Murik <dovmurik@linux.vnet.ibm.com> wrote:
+On Thu, Jun 25, 2020 at 11:53 PM Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
 >
-> Commit cd238effefa2 ("docs: kbuild: convert docs to ReST and rename to
-> *.rst") missed a ReST header and a verbatim file content area.
+> The logic handling find on split mode is currently broken.
+> Fix it, making it work again as expected.
 >
-> Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > ---
+
 
 Applied to linux-kbuild.
 Thanks.
 
 
->  Documentation/kbuild/modules.rst | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  scripts/kconfig/qconf.cc | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 >
-> diff --git a/Documentation/kbuild/modules.rst b/Documentation/kbuild/modules.rst
-> index a45cccff467d..85ccc878895e 100644
-> --- a/Documentation/kbuild/modules.rst
-> +++ b/Documentation/kbuild/modules.rst
-> @@ -182,7 +182,8 @@ module 8123.ko, which is built from the following files::
->         8123_pci.c
->         8123_bin.o_shipped      <= Binary blob
->
-> ---- 3.1 Shared Makefile
-> +3.1 Shared Makefile
-> +-------------------
->
->         An external module always includes a wrapper makefile that
->         supports building the module using "make" with no arguments.
-> @@ -470,9 +471,9 @@ build.
->
->         The syntax of the Module.symvers file is::
->
-> -       <CRC>       <Symbol>         <Module>                         <Export Type>     <Namespace>
-> +               <CRC>       <Symbol>         <Module>                         <Export Type>     <Namespace>
->
-> -       0xe1cc2a05  usb_stor_suspend drivers/usb/storage/usb-storage  EXPORT_SYMBOL_GPL USB_STORAGE
-> +               0xe1cc2a05  usb_stor_suspend drivers/usb/storage/usb-storage  EXPORT_SYMBOL_GPL USB_STORAGE
->
->         The fields are separated by tabs and values may be empty (e.g.
->         if no namespace is defined for an exported symbol).
->
-> base-commit: b103c607654e55dcb1da40557628a2044b72c936
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index c0ac8f7b5f1a..b8f577c6e8aa 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1645,22 +1645,21 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+>                         return;
+>                 list->setRootMenu(parent);
+>                 break;
+> -       case symbolMode:
+> +       case menuMode:
+>                 if (menu->flags & MENU_ROOT) {
+> -                       configList->setRootMenu(menu);
+> +                       menuList->setRootMenu(menu);
+>                         configList->clearSelection();
+> -                       list = menuList;
+> -               } else {
+>                         list = configList;
+> +               } else {
+> +                       configList->setRootMenu(menu);
+> +                       configList->clearSelection();
+> +
+>                         parent = menu_get_parent_menu(menu->parent);
+>                         if (!parent)
+>                                 return;
+> -                       item = menuList->findConfigItem(parent);
+> -                       if (item) {
+> -                               item->setSelected(true);
+> -                               menuList->scrollToItem(item);
+> -                       }
+> -                       list->setRootMenu(parent);
+> +                       menuList->setRootMenu(parent);
+> +
+> +                       list = menuList;
+>                 }
+>                 break;
+>         case fullMode:
 > --
-> 2.20.1
+> 2.26.2
+>
 >
 
 
