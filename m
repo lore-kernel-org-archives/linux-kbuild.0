@@ -1,68 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:26493 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726229AbgF2AzN (ORCPT
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:50419 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726404AbgF2COH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Jun 2020 20:55:13 -0400
-MIME-Version: 1.0
-References: <20200617030220.34733-1-masahiroy@kernel.org>
-In-Reply-To: <20200617030220.34733-1-masahiroy@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 29 Jun 2020 09:54:17 +0900
-Message-ID: <CAK7LNATGmbunTT2KkS6-GTuangCUXJSOOoaxm=Y4Vn=sAf1UEA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kconfig: remove '---help---' support
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 28 Jun 2020 22:14:07 -0400
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v3 0/3] Build ORC fast lookup table in scripts/sorttable
+ tool
+From: changhuaixin <changhuaixin@linux.alibaba.com>
+In-Reply-To: <20200603143945.64248-1-changhuaixin@linux.alibaba.com>
+Date: Mon, 29 Jun 2020 10:14:01 +0800
+Content-Transfer-Encoding: 8BIT
+Message-Id: <217C22B3-D08F-4CB9-BC8D-3645C8389F5D@linux.alibaba.com>
+References: <20200601173840.3f36m6l4fsu5bill@treble>
+ <20200603143945.64248-1-changhuaixin@linux.alibaba.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Ulf Magnusson <ulfalizer@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: jpoimboe@redhat.com
+Cc: changhuaixin <changhuaixin@linux.alibaba.com>, bp@alien8.de, hpa@zytor.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, luto@amacapital.net, michal.lkml@markovi.net, mingo@redhat.com, Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de, x86@kernel.org, yamada.masahiro@socionext.com
 
-On Wed, Jun 17, 2020 at 12:02 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> The conversion is done. No more user of '---help---'.
->
-> Cc: Ulf Magnusson <ulfalizer@gmail.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Hi Josh, will you please have a look at this patchset?
 
-Applied to linux-kbuild.
+There might be another way to set SHT_PROGBITS of section .orc_lookup by writing section headers when orc_unwind and orc_unwind_ip tables are writen. It might be as follows:
 
-> ---
->
->  scripts/checkkconfigsymbols.py | 2 +-
->  scripts/kconfig/lexer.l        | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/checkkconfigsymbols.py b/scripts/checkkconfigsymbols.py
-> index 00a10a293f4f..1548f9ce4682 100755
-> --- a/scripts/checkkconfigsymbols.py
-> +++ b/scripts/checkkconfigsymbols.py
-> @@ -34,7 +34,7 @@ REGEX_SOURCE_SYMBOL = re.compile(SOURCE_SYMBOL)
->  REGEX_KCONFIG_DEF = re.compile(DEF)
->  REGEX_KCONFIG_EXPR = re.compile(EXPR)
->  REGEX_KCONFIG_STMT = re.compile(STMT)
-> -REGEX_KCONFIG_HELP = re.compile(r"^\s+(help|---help---)\s*$")
-> +REGEX_KCONFIG_HELP = re.compile(r"^\s+help\s*$")
->  REGEX_FILTER_SYMBOLS = re.compile(r"[A-Za-z0-9]$")
->  REGEX_NUMERIC = re.compile(r"0[xX][0-9a-fA-F]+|[0-9]+")
->  REGEX_QUOTES = re.compile("(\"(.*?)\")")
-> diff --git a/scripts/kconfig/lexer.l b/scripts/kconfig/lexer.l
-> index 6354c905b006..4b7339ff4c8b 100644
-> --- a/scripts/kconfig/lexer.l
-> +++ b/scripts/kconfig/lexer.l
-> @@ -105,7 +105,7 @@ n   [A-Za-z0-9_-]
->  "endchoice"            return T_ENDCHOICE;
->  "endif"                        return T_ENDIF;
->  "endmenu"              return T_ENDMENU;
-> -"help"|"---help---"    return T_HELP;
-> +"help"                 return T_HELP;
->  "hex"                  return T_HEX;
->  "if"                   return T_IF;
->  "imply"                        return T_IMPLY;
-> --
-> 2.25.1
->
+diff --git a/tools/objtool/orc_gen.c b/tools/objtool/orc_gen.c
+index 3f98dcfbc177..860d4dcec8e6 100644
+--- a/tools/objtool/orc_gen.c
++++ b/tools/objtool/orc_gen.c
+@@ -183,6 +183,10 @@ int create_orc_sections(struct objtool_file *file)
+        u_sec = elf_create_section(file->elf, ".orc_unwind",
+                                   sizeof(struct orc_entry), idx);
 
++       /* make flags of section orc_lookup right */
++       if (!elf_create_section(file->elf, ".orc_lookup", sizeof(int), 0))
++               return -1;
++
 
--- 
-Best Regards
-Masahiro Yamada
+What do you think about this way of setting SHT_PROGBITS?
+
+> On Jun 3, 2020, at 10:39 PM, Huaixin Chang <changhuaixin@linux.alibaba.com> wrote:
+> 
+> Move building of fast lookup table from boot to sorttable tool. This saves us
+> 6380us boot time on Intel(R) Xeon(R) CPU E5-2682 v4 @ 2.50GHz with cores. It
+> adds a little more than 7ms to boot time when testing on the same CPU.
+> 
+> Changelog v3:
+> 1. Modify annotation of unwind_init().
+> 
+> Changelog v2:
+> 1. Type of section orc_lookup needs to be SHT_PROGBITS.
+> 2. unwind_init() cannot be removed totally as setting lookup_num_blocks is needed.
+> 
+> Huaixin Chang (3):
+>  scripts/sorttable: Change section type of orc_lookup to SHT_PROGBITS
+>  scripts/sorttable: Build orc fast lookup table via sorttable tool
+>  x86/unwind/orc: Simplify unwind_init() for x86 boot
+> 
+> arch/x86/kernel/unwind_orc.c      | 41 +---------------
+> include/asm-generic/vmlinux.lds.h |  2 +
+> scripts/sorttable.h               | 99 ++++++++++++++++++++++++++++++++++++---
+> 3 files changed, 96 insertions(+), 46 deletions(-)
+> 
+> -- 
+> 2.14.4.44.g2045bb6
