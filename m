@@ -1,41 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46664 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731473AbgF2UuI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 16:50:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40908 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730134AbgF2S5n (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:57:43 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65F7C031C5A
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 10:39:07 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id y18so7372897plr.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 10:39:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200625170434.635114-1-masahiroy@kernel.org> <20200625170434.635114-5-masahiroy@kernel.org>
-In-Reply-To: <20200625170434.635114-5-masahiroy@kernel.org>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Mon, 29 Jun 2020 14:49:55 -0600
-Message-ID: <CAL_JsqL4pTFK_pSNn1cSvjzwdg71dVzM3P06BYYEwDj2t+swPA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] dt-bindings: split DT schema check rules
+References: <20200629085911.1676554-1-masahiroy@kernel.org>
+In-Reply-To: <20200629085911.1676554-1-masahiroy@kernel.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 29 Jun 2020 10:38:56 -0700
+Message-ID: <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: make Clang build userprogs for target architecture
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: devicetree@vger.kernel.org, Frank Rowand <frowand.list@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-On Thu, Jun 25, 2020 at 11:05 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Mon, Jun 29, 2020 at 1:59 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> When building %.dt.yaml from %.dts, two things happen in a row:
+> Programs added 'userprogs' should be compiled for the target
+> architecture i.e. the same architecture as the kernel.
 >
->  [1] Run DTC to convert %.dts into %.dt.yaml
+> GCC does this correctly since the target architecture is implied
+> by the toolchain prefix.
 >
->  [2] Run dt-validate against %.dt.yaml
+> Clang builds standalone programs always for the host architecture
+> because the target triple is currently missing.
 >
-> Currently, when any .yaml schema file is updated, processed-schema.yaml
-> is regenerated, then both [1] and [2] are rerun for all .dts files.
+> Fix this.
 >
-> Actually, we do not need to rerun [1] since the original .dts is not
-> updated.
+> Fixes: 7f3a59db274c ("kbuild: add infrastructure to build userspace programs")
 
-I have plans (and an intern working on it) to integrate the schema
-checks into dtc. That's going to make turning on the schema checks
-just a flag to dtc. I'm not sure if adding the complexity here is
-worth it as I'd expect much of this patch to go away again.
+This is a neat feature I didn't know about; looks relatively new.
+What's the test case command line invocation to test this with Clang?
 
-Is there any negative impact on the absolute clean build time? I'm
-more concerned about that than optimizing rerunning.
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 73948798ce3f..cac29cc2ec25 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -970,8 +970,8 @@ LDFLAGS_vmlinux     += --pack-dyn-relocs=relr
+>  endif
+>
+>  # Align the bit size of userspace programs with the kernel
+> -KBUILD_USERCFLAGS  += $(filter -m32 -m64, $(KBUILD_CFLAGS))
+> -KBUILD_USERLDFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
+> +KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
+> +KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
 
-Rob
+That should be fine.
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+https://www.gnu.org/software/make/manual/html_node/Text-Functions.html
+
+>
+>  # make the checker run with the right architecture
+>  CHECKFLAGS += --arch=$(ARCH)
+> --
+
+
+-- 
+Thanks,
+~Nick Desaulniers
