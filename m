@@ -1,35 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43990 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731903AbgF2TQF (ORCPT
+        with ESMTP id S1731758AbgF2TOU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:16:05 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6500FC03E97E
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 12:16:02 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id q8so18393483iow.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 12:16:02 -0700 (PDT)
+        Mon, 29 Jun 2020 15:14:20 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH] kbuild: introduce ccflags-remove-y and asflags-remove-y
+In-Reply-To: <20200628015041.1000002-1-masahiroy@kernel.org>
+References: <20200628015041.1000002-1-masahiroy@kernel.org>
+Date: Mon, 29 Jun 2020 15:57:11 +1000
+Message-ID: <87imfa8le0.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Reply-To: mrs.victoria.alexander2@gmail.com
-From: "mrs.victoria alexander" <markalexandermilley321@gmail.com>
-Date: Mon, 29 Jun 2020 12:15:58 -0700
-Message-ID: <CAP7XNCwEGQ+-Q==u4yk4yvJdk1X+gsfSU6pUV_hROjmF=p-DHw@mail.gmail.com>
-Subject: Hello,
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Rich Felker <dalias@libc.org>, Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-Dear friend,
+Masahiro Yamada <masahiroy@kernel.org> writes:
+> CFLAGS_REMOVE_<file>.o works per object, that is, there is no
+> convenient way to filter out flags for every object in a directory.
+>
+> Add ccflags-remove-y and asflags-remove-y to make it easily.
+>
+> Use ccflags-remove-y to clean up some Makefiles.
+>
+> Suggested-by: Sami Tolvanen <samitolvanen@google.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  arch/arm/boot/compressed/Makefile | 6 +-----
+>  arch/powerpc/xmon/Makefile        | 3 +--
+>  arch/sh/boot/compressed/Makefile  | 5 +----
+>  kernel/trace/Makefile             | 4 ++--
+>  lib/Makefile                      | 5 +----
+>  scripts/Makefile.lib              | 4 ++--
+>  6 files changed, 8 insertions(+), 19 deletions(-)
+>
+> diff --git a/arch/powerpc/xmon/Makefile b/arch/powerpc/xmon/Makefile
+> index 89c76ca35640..55cbcdd88ac0 100644
+> --- a/arch/powerpc/xmon/Makefile
+> +++ b/arch/powerpc/xmon/Makefile
+> @@ -7,8 +7,7 @@ UBSAN_SANITIZE := n
+>  KASAN_SANITIZE := n
+>  
+>  # Disable ftrace for the entire directory
+> -ORIG_CFLAGS := $(KBUILD_CFLAGS)
+> -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
+> +ccflags-remove-y += $(CC_FLAGS_FTRACE)
 
+This could be:
 
-I have a business container transaction what that some of( $13million dollars)
+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
 
- I would like to discuss with you. If you are interested, please
-contact my email
+Similar to kernel/trace/Makefile below.
 
-address (mrs.victoria.alexander2@gmail.com)
+I don't mind though.
 
-My WhatsApp number but only message (+19293737780)
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-Please do not reply if you are not ready
-Thanks
+cheers
+
+> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> index 6575bb0a0434..7492844a8b1b 100644
+> --- a/kernel/trace/Makefile
+> +++ b/kernel/trace/Makefile
+> @@ -2,9 +2,9 @@
+>  
+>  # Do not instrument the tracer itself:
+>  
+> +ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+> +
+>  ifdef CONFIG_FUNCTION_TRACER
+> -ORIG_CFLAGS := $(KBUILD_CFLAGS)
+> -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
+>  
+>  # Avoid recursion due to instrumentation.
+>  KCSAN_SANITIZE := n
