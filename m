@@ -1,74 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730134AbgF2S5n (ORCPT
+Received: from mail-il1-f196.google.com ([209.85.166.196]:46325 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391015AbgF2VYk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:57:43 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65F7C031C5A
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 10:39:07 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id y18so7372897plr.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 10:39:07 -0700 (PDT)
+        Mon, 29 Jun 2020 17:24:40 -0400
+Date: Mon, 29 Jun 2020 15:24:36 -0600
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/4] dt-bindings: fix error in 'make clean' after 'make
+ dt_binding_check'
+Message-ID: <20200629212436.GA2933965@bogus>
+References: <20200625170434.635114-1-masahiroy@kernel.org>
+ <20200625170434.635114-2-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <20200629085911.1676554-1-masahiroy@kernel.org>
-In-Reply-To: <20200629085911.1676554-1-masahiroy@kernel.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 29 Jun 2020 10:38:56 -0700
-Message-ID: <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: make Clang build userprogs for target architecture
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200625170434.635114-2-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>
 
-On Mon, Jun 29, 2020 at 1:59 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Programs added 'userprogs' should be compiled for the target
-> architecture i.e. the same architecture as the kernel.
->
-> GCC does this correctly since the target architecture is implied
-> by the toolchain prefix.
->
-> Clang builds standalone programs always for the host architecture
-> because the target triple is currently missing.
->
-> Fix this.
->
-> Fixes: 7f3a59db274c ("kbuild: add infrastructure to build userspace programs")
-
-This is a neat feature I didn't know about; looks relatively new.
-What's the test case command line invocation to test this with Clang?
-
+On Fri, 26 Jun 2020 02:04:31 +0900, Masahiro Yamada wrote:
+> We are having more and more schema files.
+> 
+> Commit 8b6b80218b01 ("dt-bindings: Fix command line length limit
+> calling dt-mk-schema") fixed the 'Argument list too long' error of
+> the schema checks, but the same error happens while cleaning too.
+> 
+> 'make clean' after 'make dt_binding_check' fails as follows:
+> 
+>   $ make dt_binding_check
+>     [ snip ]
+>   $ make clean
+>   make[2]: execvp: /bin/sh: Argument list too long
+>   make[2]: *** [scripts/Makefile.clean:52: __clean] Error 127
+>   make[1]: *** [scripts/Makefile.clean:66: Documentation/devicetree/bindings] Error 2
+>   make: *** [Makefile:1763: _clean_Documentation] Error 2
+> 
+> 'make dt_binding_check' generates so many .example.dts, .dt.yaml files,
+> which are passed to the 'rm' command when you run 'make clean'.
+> 
+> I added a small hack to use the 'find' command to clean up most of the
+> build artifacts before they are processed by scripts/Makefile.clean
+> 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
->
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 73948798ce3f..cac29cc2ec25 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -970,8 +970,8 @@ LDFLAGS_vmlinux     += --pack-dyn-relocs=relr
->  endif
->
->  # Align the bit size of userspace programs with the kernel
-> -KBUILD_USERCFLAGS  += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> -KBUILD_USERLDFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> +KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
-> +KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
+> 
+>  Documentation/devicetree/bindings/Makefile | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
 
-That should be fine.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-https://www.gnu.org/software/make/manual/html_node/Text-Functions.html
-
->
->  # make the checker run with the right architecture
->  CHECKFLAGS += --arch=$(ARCH)
-> --
-
-
--- 
-Thanks,
-~Nick Desaulniers
+Applied, thanks!
