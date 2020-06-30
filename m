@@ -1,92 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:60726 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726813AbgF3CJA (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:62879 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728816AbgF3Cua (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 22:09:00 -0400
+        Mon, 29 Jun 2020 22:50:30 -0400
 MIME-Version: 1.0
-References: <20200628015041.1000002-1-masahiroy@kernel.org> <87imfa8le0.fsf@mpe.ellerman.id.au>
-In-Reply-To: <87imfa8le0.fsf@mpe.ellerman.id.au>
+References: <cover.1593423060.git.mchehab+huawei@kernel.org> <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
+In-Reply-To: <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 30 Jun 2020 11:08:07 +0900
-Message-ID: <CAK7LNATusciypBJ4dYZcyrugdi_rXEV_s=zxAehDxsX+Sd5z4g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: introduce ccflags-remove-y and asflags-remove-y
+Date: Tue, 30 Jun 2020 11:49:24 +0900
+Message-ID: <CAK7LNASSeZiod0i1205_HrWNOb5BLb9FNbK2Y4ekx0sZ7QRLpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] kconfig: qconf: navigate menus on hyperlinks
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Rich Felker <dalias@libc.org>, Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux-sh list <linux-sh@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jun 29, 2020 at 2:55 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
+On Mon, Jun 29, 2020 at 6:35 PM Mauro Carvalho Chehab
+<mchehab+huawei@kernel.org> wrote:
 >
-> Masahiro Yamada <masahiroy@kernel.org> writes:
-> > CFLAGS_REMOVE_<file>.o works per object, that is, there is no
-> > convenient way to filter out flags for every object in a directory.
-> >
-> > Add ccflags-remove-y and asflags-remove-y to make it easily.
-> >
-> > Use ccflags-remove-y to clean up some Makefiles.
-> >
-> > Suggested-by: Sami Tolvanen <samitolvanen@google.com>
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  arch/arm/boot/compressed/Makefile | 6 +-----
-> >  arch/powerpc/xmon/Makefile        | 3 +--
-> >  arch/sh/boot/compressed/Makefile  | 5 +----
-> >  kernel/trace/Makefile             | 4 ++--
-> >  lib/Makefile                      | 5 +----
-> >  scripts/Makefile.lib              | 4 ++--
-> >  6 files changed, 8 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/arch/powerpc/xmon/Makefile b/arch/powerpc/xmon/Makefile
-> > index 89c76ca35640..55cbcdd88ac0 100644
-> > --- a/arch/powerpc/xmon/Makefile
-> > +++ b/arch/powerpc/xmon/Makefile
-> > @@ -7,8 +7,7 @@ UBSAN_SANITIZE := n
-> >  KASAN_SANITIZE := n
-> >
-> >  # Disable ftrace for the entire directory
-> > -ORIG_CFLAGS := $(KBUILD_CFLAGS)
-> > -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
-> > +ccflags-remove-y += $(CC_FLAGS_FTRACE)
+> Instead of just changing the helper window to show a
+> dependency, also navigate to it at the config and menu
+> widgets.
 >
-> This could be:
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+
+Thanks, I think this is a nice improvement.
+
+When I click a link, both the previous config
+and the new one are highlighted.
+Is this intentional behavior?
+
+For example, put the following simple Kconfig
+at the top-level.
+
+From the info window of FOO,
+click the 'select BAR' link,
+and then both FOO and BAR are highlighted.
+
+------------>8---------------
+config FOO
+       bool "foo"
+       select BAR
+       default y
+
+config BAR
+       bool "bar"
+       default y
+------------>8-----------------
+
+
+
+
+
+
+
+
+> ---
+>  scripts/kconfig/qconf.cc | 24 +++++-------------------
+>  1 file changed, 5 insertions(+), 19 deletions(-)
 >
-> ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index 49f0688fceb8..d8870b15a178 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1232,7 +1232,6 @@ void ConfigInfoView::clicked(const QUrl &url)
+>         char *data = new char[count + 1];
+>         struct symbol **result;
+>         struct menu *m = NULL;
+> -       char type;
 >
-> Similar to kernel/trace/Makefile below.
-
-
-I fixed it up, and applied to linux-kbuild.
-Thanks.
-
-
-> I don't mind though.
+>         if (count < 1) {
+>                 qInfo() << "Clicked link is empty";
+> @@ -1242,7 +1241,6 @@ void ConfigInfoView::clicked(const QUrl &url)
 >
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+>         memcpy(data, str.constData(), count);
+>         data[count] = '\0';
+> -       type = data[0];
 >
-> cheers
+>         /* Seek for exact match */
+>         data[0] = '^';
+> @@ -1255,15 +1253,8 @@ void ConfigInfoView::clicked(const QUrl &url)
+>         }
 >
-> > diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-> > index 6575bb0a0434..7492844a8b1b 100644
-> > --- a/kernel/trace/Makefile
-> > +++ b/kernel/trace/Makefile
-> > @@ -2,9 +2,9 @@
-> >
-> >  # Do not instrument the tracer itself:
-> >
-> > +ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-> > +
-> >  ifdef CONFIG_FUNCTION_TRACER
-> > -ORIG_CFLAGS := $(KBUILD_CFLAGS)
-> > -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
-> >
-> >  # Avoid recursion due to instrumentation.
-> >  KCSAN_SANITIZE := n
+>         sym = *result;
+> -       if (type == 's') {
+> -               symbolInfo();
+> -               emit showDebugChanged(true);
+> -               free(result);
+> -               delete data;
+> -               return;
+> -       }
+>
+> -       /* URL is a menu */
+> +       /* Seek for the menu which holds the symbol */
+>         for (struct property *prop = sym->prop; prop; prop = prop->next) {
+>                     if (prop->type != P_PROMPT && prop->type != P_MENU)
+>                             continue;
+> @@ -1271,17 +1262,11 @@ void ConfigInfoView::clicked(const QUrl &url)
+>                     break;
+>         }
+>
+> -       if (!m) {
+> +       if (!m)
+>                 qInfo() << "Clicked menu is invalid:" << data;
+> -               free(result);
+> -               delete data;
+> -               return;
+> -       }
+> +       else
+> +               emit menuSelected(m);
+>
+> -       _menu = m;
+> -       menuInfo();
+> -
+> -       emit showDebugChanged(true);
+>         free(result);
+>         delete data;
+>  }
+> @@ -1750,6 +1735,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+>                         item->setSelected(true);
+>                         list->scrollToItem(item);
+>                         list->setFocus();
+> +                       helpText->setInfo(menu);
+>                 }
+>         }
+>  }
+> --
+> 2.26.2
+>
 
 
-
--- 
+--
 Best Regards
 Masahiro Yamada
