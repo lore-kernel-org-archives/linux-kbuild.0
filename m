@@ -1,95 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729596AbgF2XVG (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:60299 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726003AbgF3Bwo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 19:21:06 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43770C03E97B
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 16:21:06 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id z5so9020414pgb.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Jun 2020 16:21:06 -0700 (PDT)
-Date: Mon, 29 Jun 2020 16:20:59 -0700
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200629232059.GA3787278@google.com>
-References: <20200624203200.78870-1-samitolvanen@google.com>
- <CAK7LNASvb0UDJ0U5wkYYRzTAdnEs64HjXpEUL7d=V0CXiAXcNw@mail.gmail.com>
+        Mon, 29 Jun 2020 21:52:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASvb0UDJ0U5wkYYRzTAdnEs64HjXpEUL7d=V0CXiAXcNw@mail.gmail.com>
+References: <20200625170434.635114-1-masahiroy@kernel.org> <20200625170434.635114-5-masahiroy@kernel.org>
+ <CAL_JsqL4pTFK_pSNn1cSvjzwdg71dVzM3P06BYYEwDj2t+swPA@mail.gmail.com>
+In-Reply-To: <CAL_JsqL4pTFK_pSNn1cSvjzwdg71dVzM3P06BYYEwDj2t+swPA@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 30 Jun 2020 10:51:34 +0900
+Message-ID: <CAK7LNAQzG5ty=knL4eh=8w43p57BGMf6mRMTR1rPrhdFoKs7YA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] dt-bindings: split DT schema check rules
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, X86 ML <x86@kernel.org>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: DTML <devicetree@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Hi Masahiro,
-
-On Mon, Jun 29, 2020 at 01:56:19AM +0900, Masahiro Yamada wrote:
-> On Thu, Jun 25, 2020 at 5:32 AM 'Sami Tolvanen' via Clang Built Linux
-> <clang-built-linux@googlegroups.com> wrote:
+On Tue, Jun 30, 2020 at 5:50 AM Rob Herring <robh+dt@kernel.org> wrote:
+>
+> On Thu, Jun 25, 2020 at 11:05 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 > >
-> > This patch series adds support for building x86_64 and arm64 kernels
-> > with Clang's Link Time Optimization (LTO).
+> > When building %.dt.yaml from %.dts, two things happen in a row:
 > >
-> > In addition to performance, the primary motivation for LTO is to allow
-> > Clang's Control-Flow Integrity (CFI) to be used in the kernel. Google's
-> > Pixel devices have shipped with LTO+CFI kernels since 2018.
+> >  [1] Run DTC to convert %.dts into %.dt.yaml
 > >
-> > Most of the patches are build system changes for handling LLVM bitcode,
-> > which Clang produces with LTO instead of ELF object files, postponing
-> > ELF processing until a later stage, and ensuring initcall ordering.
+> >  [2] Run dt-validate against %.dt.yaml
 > >
-> > Note that first objtool patch in the series is already in linux-next,
-> > but as it's needed with LTO, I'm including it also here to make testing
-> > easier.
-> 
-> 
-> I put this series on a testing branch,
-> and 0-day bot started reporting some issues.
+> > Currently, when any .yaml schema file is updated, processed-schema.yaml
+> > is regenerated, then both [1] and [2] are rerun for all .dts files.
+> >
+> > Actually, we do not need to rerun [1] since the original .dts is not
+> > updated.
+>
+> I have plans (and an intern working on it) to integrate the schema
+> checks into dtc. That's going to make turning on the schema checks
+> just a flag to dtc. I'm not sure if adding the complexity here is
+> worth it as I'd expect much of this patch to go away again.
+>
+> Is there any negative impact on the absolute clean build time? I'm
+> more concerned about that than optimizing rerunning.
 
-Yes, I'll fix those issues in v2.
+No benefit on the absolute clean build time.
 
-> (but 0-day bot is quieter than I expected.
-> Perhaps, 0-day bot does not turn on LLVM=1 ?)
+OK, then please skip this patch.
 
-In order for it to test an LTO build, it would need to enable LTO_CLANG
-explicitly though, in addition to LLVM=1.
 
-> I also got an error for
-> ARCH=arm64 allyesconfig + CONFIG_LTO_CLANG=y
-> 
-> 
-> 
-> $ make ARCH=arm64 LLVM=1 LLVM_IAS=1
-> CROSS_COMPILE=~/tools/aarch64-linaro-7.5/bin/aarch64-linux-gnu-
-> -j24
-> 
->   ...
-> 
->   GEN     .version
->   CHK     include/generated/compile.h
->   UPD     include/generated/compile.h
->   CC      init/version.o
->   AR      init/built-in.a
->   GEN     .tmp_initcalls.lds
->   GEN     .tmp_symversions.lds
->   LTO     vmlinux.o
->   MODPOST vmlinux.symvers
->   MODINFO modules.builtin.modinfo
->   GEN     modules.builtin
->   LD      .tmp_vmlinux.kallsyms1
-> ld.lld: error: undefined symbol: __compiletime_assert_905
-> >>> referenced by irqbypass.c
-> >>>               vmlinux.o:(jeq_imm)
-> make: *** [Makefile:1161: vmlinux] Error 1
 
-I can reproduce this with ToT LLVM and it's BUILD_BUG_ON_MSG(..., "value
-too large for the field") in drivers/net/ethernet/netronome/nfp/bpf/jit.c.
-Specifically, the FIELD_FIT / __BF_FIELD_CHECK macro in ur_load_imm_any.
 
-This compiles just fine with an earlier LLVM revision, so it could be a
-relatively recent regression. I'll take a look. Thanks for catching this!
-
-Sami
+-- 
+Best Regards
+Masahiro Yamada
