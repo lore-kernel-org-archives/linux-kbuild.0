@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55704 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55664 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730047AbgF3G0q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1729984AbgF3G0q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 30 Jun 2020 02:26:46 -0400
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: [PATCH v3 4/7] kconfig: qconf: re-implement setSelected()
-Date: Tue, 30 Jun 2020 08:26:38 +0200
-Message-Id: <872efc941f9780bb9e2ee919437be3babbc38da8.1593498345.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 1/7] kconfig: qconf: cleanup includes
+Date: Tue, 30 Jun 2020 08:26:35 +0200
+Message-Id: <c138cd9af908952a85a0fc0f0ff30c57b0e547ba.1593498345.git.mchehab+huawei@kernel.org>
 In-Reply-To: <cover.1593498345.git.mchehab+huawei@kernel.org>
 References: <cover.1593498345.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
@@ -15,97 +15,87 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The default implementation for setSelected() at QTreeWidgetItem
-allows multiple items to be selected.
+The usage of c-like include is deprecated on modern Qt
+versions. Use the c++ style includes.
 
-Well, this should never be possible for the configItem lists.
-
-So, implement a function that will automatically clean any
-previous selection. This simplifies the logic somewhat, while
-making the selection logic to be applied atomically, avoiding
-future issues on that.
+While here, remove uneeded and redundant ones, sorting
+them on alphabetic order.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- scripts/kconfig/qconf.cc | 15 ++++-----------
- scripts/kconfig/qconf.h  | 14 ++++++++++----
- 2 files changed, 14 insertions(+), 15 deletions(-)
+ scripts/kconfig/qconf.cc | 27 +++++++++------------------
+ scripts/kconfig/qconf.h  | 14 +++++++-------
+ 2 files changed, 16 insertions(+), 25 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 1fddbdfa58b4..29ca4823cfb9 100644
+index c0ac8f7b5f1a..0e06afa08908 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -537,7 +537,7 @@ void ConfigList::setRootMenu(struct menu *menu)
- 	rootEntry = menu;
- 	updateListAll();
- 	if (currentItem()) {
--		currentItem()->setSelected(hasFocus());
-+		setSelected(currentItem(), hasFocus());
- 		scrollToItem(currentItem());
- 	}
- }
-@@ -865,7 +865,7 @@ void ConfigList::focusInEvent(QFocusEvent *e)
+@@ -4,27 +4,18 @@
+  * Copyright (C) 2015 Boris Barbulovski <bbarbulovski@gmail.com>
+  */
  
- 	ConfigItem* item = (ConfigItem *)currentItem();
- 	if (item) {
--		item->setSelected(true);
-+		setSelected(item, true);
- 		menu = item->menu;
- 	}
- 	emit gotFocus(menu);
-@@ -1711,17 +1711,10 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
- 			if (!parent)
- 				return;
- 
--			/* Clear an already-selected item */
--			if (!configList->selectedItems().isEmpty()) {
--				item = (ConfigItem*)configList->selectedItems().first();
--				if (item)
--					item->setSelected(false);
--			}
+-#include <qglobal.h>
 -
- 			/* Select the config view */
- 			item = configList->findConfigItem(parent);
- 			if (item) {
--				item->setSelected(true);
-+				configList->setSelected(item, true);
- 				configList->scrollToItem(item);
- 			}
+-#include <QMainWindow>
+-#include <QList>
+-#include <qtextbrowser.h>
+ #include <QAction>
++#include <QApplication>
++#include <QCloseEvent>
++#include <QDesktopWidget>
+ #include <QFileDialog>
++#include <QLabel>
++#include <QLayout>
++#include <QList>
+ #include <QMenu>
+-
+-#include <qapplication.h>
+-#include <qdesktopwidget.h>
+-#include <qtoolbar.h>
+-#include <qlayout.h>
+-#include <qsplitter.h>
+-#include <qlineedit.h>
+-#include <qlabel.h>
+-#include <qpushbutton.h>
+-#include <qmenubar.h>
+-#include <qmessagebox.h>
+-#include <qregexp.h>
+-#include <qevent.h>
++#include <QMenuBar>
++#include <QMessageBox>
++#include <QToolBar>
  
-@@ -1740,7 +1733,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
- 	if (list) {
- 		item = list->findConfigItem(menu);
- 		if (item) {
--			item->setSelected(true);
-+			list->setSelected(item, true);
- 			list->scrollToItem(item);
- 			list->setFocus();
- 		}
+ #include <stdlib.h>
+ 
 diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index a193137f2314..fb9e9729266f 100644
+index c879d79ce817..d913a02967ae 100644
 --- a/scripts/kconfig/qconf.h
 +++ b/scripts/kconfig/qconf.h
-@@ -45,11 +45,17 @@ class ConfigList : public QTreeWidget {
- public:
- 	ConfigList(ConfigView* p, const char *name = 0);
- 	void reinit(void);
--	ConfigView* parent(void) const
--	{
--		return (ConfigView*)Parent::parent();
--	}
- 	ConfigItem* findConfigItem(struct menu *);
-+	ConfigView* parent(void) const
-+	{
-+		return (ConfigView*)Parent::parent();
-+	}
-+	void setSelected(QTreeWidgetItem *item, bool enable) {
-+		for (int i = 0; i < selectedItems().size(); i++)
-+			selectedItems().at(i)->setSelected(false);
-+
-+		item->setSelected(enable);
-+	}
+@@ -3,17 +3,17 @@
+  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
+  */
  
- protected:
- 	void keyPressEvent(QKeyEvent *e);
+-#include <QTextBrowser>
+-#include <QTreeWidget>
+-#include <QMainWindow>
++#include <QCheckBox>
++#include <QDialog>
+ #include <QHeaderView>
+-#include <qsettings.h>
++#include <QLineEdit>
++#include <QMainWindow>
+ #include <QPushButton>
+ #include <QSettings>
+-#include <QLineEdit>
+ #include <QSplitter>
+-#include <QCheckBox>
+-#include <QDialog>
++#include <QTextBrowser>
++#include <QTreeWidget>
++
+ #include "expr.h"
+ 
+ class ConfigView;
 -- 
 2.26.2
