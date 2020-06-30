@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:16508 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728930AbgF3Dhn (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:30217 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726686AbgF3DtR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 23:37:43 -0400
+        Mon, 29 Jun 2020 23:49:17 -0400
 MIME-Version: 1.0
-References: <cover.1593423060.git.mchehab+huawei@kernel.org> <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
-In-Reply-To: <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
+References: <cover.1593423060.git.mchehab+huawei@kernel.org> <b10b8bf2c21f4288ecb6081a967c302000346ff1.1593423060.git.mchehab+huawei@kernel.org>
+In-Reply-To: <b10b8bf2c21f4288ecb6081a967c302000346ff1.1593423060.git.mchehab+huawei@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 30 Jun 2020 12:36:27 +0900
-Message-ID: <CAK7LNASbWXkRZ3OrmDSXj4jfu6jGcMnjnOOJ4+cV22fweJ9OJA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] kconfig: qconf: navigate menus on hyperlinks
+Date: Tue, 30 Jun 2020 12:48:13 +0900
+Message-ID: <CAK7LNARkzq=D8hhqYERcjRzv5LXsepunQCX8rhG7nORZuBAj7Q@mail.gmail.com>
+Subject: Re: [PATCH v2 4/5] kconfig: qconf: make debug links work again
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -20,111 +20,182 @@ Cc: Maxim Levitsky <mlevitsk@redhat.com>, Linux Kbuild mailing list <linux-kbuil
 On Mon, Jun 29, 2020 at 6:35 PM Mauro Carvalho Chehab
 <mchehab+huawei@kernel.org> wrote:
 >
-> Instead of just changing the helper window to show a
-> dependency, also navigate to it at the config and menu
-> widgets.
+> The Qt5 conversion broke support for debug info links.
 >
+> Restore the behaviour added by changeset
+> ab45d190fd4a ("kconfig: create links in info window").
+>
+> The original approach were to pass a pointer for a data struct
+
+"were" -> "was" ?
+
+
+> via an <a href>. That doesn't sound a good idea, as, if something
+> gets wrong, the app could crash. So, instead, pass the name of
+> the symbol, and validate such symbol at the hyperlink handling
+> logic.
+>
+> Link: https://lore.kernel.org/lkml/20200628125421.12458086@coco.lan/
+> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
 > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+
+
+This patch does not cause segmentation fault any more.
+Thanks.
+
+
 > ---
-
-
-I noticed a regression.
-
-Visit "Networking support",
-and click "select: BPF"
-from the window at the bottom.
-
-Nothing happens except the following error message
-in the console:
-
-Clicked menu is invalid: ^BPF$
-
-
-If I apply only 1-4 in this series,
-this works fine.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->  scripts/kconfig/qconf.cc | 24 +++++-------------------
->  1 file changed, 5 insertions(+), 19 deletions(-)
+>  scripts/kconfig/qconf.cc | 75 +++++++++++++++++++++++++++++++++++++---
+>  scripts/kconfig/qconf.h  |  1 +
+>  2 files changed, 71 insertions(+), 5 deletions(-)
 >
 > diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index 49f0688fceb8..d8870b15a178 100644
+> index 85782da3e464..49f0688fceb8 100644
 > --- a/scripts/kconfig/qconf.cc
 > +++ b/scripts/kconfig/qconf.cc
-> @@ -1232,7 +1232,6 @@ void ConfigInfoView::clicked(const QUrl &url)
->         char *data = new char[count + 1];
->         struct symbol **result;
->         struct menu *m = NULL;
-> -       char type;
->
->         if (count < 1) {
->                 qInfo() << "Clicked link is empty";
-> @@ -1242,7 +1241,6 @@ void ConfigInfoView::clicked(const QUrl &url)
->
->         memcpy(data, str.constData(), count);
->         data[count] = '\0';
-> -       type = data[0];
->
->         /* Seek for exact match */
->         data[0] = '^';
-> @@ -1255,15 +1253,8 @@ void ConfigInfoView::clicked(const QUrl &url)
->         }
->
->         sym = *result;
-> -       if (type == 's') {
-> -               symbolInfo();
-> -               emit showDebugChanged(true);
-> -               free(result);
-> -               delete data;
-> -               return;
-> -       }
->
-> -       /* URL is a menu */
-> +       /* Seek for the menu which holds the symbol */
->         for (struct property *prop = sym->prop; prop; prop = prop->next) {
->                     if (prop->type != P_PROMPT && prop->type != P_MENU)
->                             continue;
-> @@ -1271,17 +1262,11 @@ void ConfigInfoView::clicked(const QUrl &url)
->                     break;
->         }
->
-> -       if (!m) {
-> +       if (!m)
->                 qInfo() << "Clicked menu is invalid:" << data;
-> -               free(result);
-> -               delete data;
-> -               return;
-> -       }
-> +       else
-> +               emit menuSelected(m);
->
-> -       _menu = m;
-> -       menuInfo();
+> @@ -7,6 +7,7 @@
+>  #include <QAction>
+>  #include <QApplication>
+>  #include <QCloseEvent>
+> +#include <QDebug>
+>  #include <QDesktopWidget>
+>  #include <QFileDialog>
+>  #include <QLabel>
+> @@ -1012,7 +1013,7 @@ ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
+>         : Parent(parent), sym(0), _menu(0)
+>  {
+>         setObjectName(name);
 > -
-> -       emit showDebugChanged(true);
->         free(result);
->         delete data;
+> +       setOpenLinks(false);
+>
+>         if (!objectName().isEmpty()) {
+>                 configSettings->beginGroup(objectName());
+> @@ -1085,7 +1086,7 @@ void ConfigInfoView::menuInfo(void)
+>                         if (sym->name) {
+>                                 head += " (";
+>                                 if (showDebug())
+> -                                       head += QString().sprintf("<a href=\"s%p\">", sym);
+> +                                       head += QString().sprintf("<a href=\"s%s\">", sym->name);
+>                                 head += print_filter(sym->name);
+>                                 if (showDebug())
+>                                         head += "</a>";
+> @@ -1094,7 +1095,7 @@ void ConfigInfoView::menuInfo(void)
+>                 } else if (sym->name) {
+>                         head += "<big><b>";
+>                         if (showDebug())
+> -                               head += QString().sprintf("<a href=\"s%p\">", sym);
+> +                               head += QString().sprintf("<a href=\"s%s\">", sym->name);
+>                         head += print_filter(sym->name);
+>                         if (showDebug())
+>                                 head += "</a>";
+> @@ -1145,7 +1146,7 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
+>                 switch (prop->type) {
+>                 case P_PROMPT:
+>                 case P_MENU:
+> -                       debug += QString().sprintf("prompt: <a href=\"m%p\">", prop->menu);
+> +                       debug += QString().sprintf("prompt: <a href=\"m%s\">", sym->name);
+>                         debug += print_filter(prop->text);
+>                         debug += "</a><br>";
+>                         break;
+> @@ -1217,13 +1218,74 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
+>         QString str2 = print_filter(str);
+>
+>         if (sym && sym->name && !(sym->flags & SYMBOL_CONST)) {
+> -               *text += QString().sprintf("<a href=\"s%p\">", sym);
+> +               *text += QString().sprintf("<a href=\"s%s\">", sym->name);
+>                 *text += str2;
+>                 *text += "</a>";
+>         } else
+>                 *text += str2;
 >  }
-> @@ -1750,6 +1735,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
->                         item->setSelected(true);
->                         list->scrollToItem(item);
->                         list->setFocus();
-> +                       helpText->setInfo(menu);
->                 }
->         }
->  }
+>
+> +void ConfigInfoView::clicked(const QUrl &url)
+> +{
+> +       QByteArray str = url.toEncoded();
+> +       const std::size_t count = str.size();
+> +       char *data = new char[count + 1];
+> +       struct symbol **result;
+> +       struct menu *m = NULL;
+> +       char type;
+> +
+> +       if (count < 1) {
+> +               qInfo() << "Clicked link is empty";
+> +               delete data;
+> +               return;
+> +       }
+> +
+> +       memcpy(data, str.constData(), count);
+> +       data[count] = '\0';
+> +       type = data[0];
+> +
+> +       /* Seek for exact match */
+> +       data[0] = '^';
+> +       strcat(data, "$");
+> +       result = sym_re_search(data);
+> +       if (!result) {
+> +               qInfo() << "Clicked symbol is invalid:" << data;
+> +               delete data;
+> +               return;
+> +       }
+> +
+> +       sym = *result;
+> +       if (type == 's') {
+> +               symbolInfo();
+> +               emit showDebugChanged(true);
+> +               free(result);
+> +               delete data;
+> +               return;
+> +       }
+> +
+> +       /* URL is a menu */
+> +       for (struct property *prop = sym->prop; prop; prop = prop->next) {
+> +                   if (prop->type != P_PROMPT && prop->type != P_MENU)
+> +                           continue;
+> +                   m = prop->menu;
+> +                   break;
+> +       }
+> +
+> +       if (!m) {
+> +               qInfo() << "Clicked menu is invalid:" << data;
+> +               free(result);
+> +               delete data;
+> +               return;
+> +       }
+> +
+> +       _menu = m;
+> +       menuInfo();
+> +
+> +       emit showDebugChanged(true);
+> +       free(result);
+> +       delete data;
+> +}
+> +
+>  QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
+>  {
+>         QMenu* popup = Parent::createStandardContextMenu(pos);
+> @@ -1497,6 +1559,9 @@ ConfigMainWindow::ConfigMainWindow(void)
+>         helpMenu->addAction(showIntroAction);
+>         helpMenu->addAction(showAboutAction);
+>
+> +       connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
+> +                helpText, SLOT (clicked (const QUrl &)) );
+> +
+>         connect(configList, SIGNAL(menuChanged(struct menu *)),
+>                 helpText, SLOT(setInfo(struct menu *)));
+>         connect(configList, SIGNAL(menuSelected(struct menu *)),
+> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+> index d913a02967ae..a193137f2314 100644
+> --- a/scripts/kconfig/qconf.h
+> +++ b/scripts/kconfig/qconf.h
+> @@ -250,6 +250,7 @@ public slots:
+>         void setInfo(struct menu *menu);
+>         void saveSettings(void);
+>         void setShowDebug(bool);
+> +       void clicked (const QUrl &url);
+>
+>  signals:
+>         void showDebugChanged(bool);
 > --
 > 2.26.2
 >
