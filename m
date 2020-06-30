@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:62879 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728816AbgF3Cua (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:16508 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728930AbgF3Dhn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 22:50:30 -0400
+        Mon, 29 Jun 2020 23:37:43 -0400
 MIME-Version: 1.0
 References: <cover.1593423060.git.mchehab+huawei@kernel.org> <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
 In-Reply-To: <45fa5ad583de1766de6169366df1df5837c5dc7c.1593423060.git.mchehab+huawei@kernel.org>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 30 Jun 2020 11:49:24 +0900
-Message-ID: <CAK7LNASSeZiod0i1205_HrWNOb5BLb9FNbK2Y4ekx0sZ7QRLpQ@mail.gmail.com>
+Date: Tue, 30 Jun 2020 12:36:27 +0900
+Message-ID: <CAK7LNASbWXkRZ3OrmDSXj4jfu6jGcMnjnOOJ4+cV22fweJ9OJA@mail.gmail.com>
 Subject: Re: [PATCH v2 5/5] kconfig: qconf: navigate menus on hyperlinks
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -25,40 +25,37 @@ On Mon, Jun 29, 2020 at 6:35 PM Mauro Carvalho Chehab
 > widgets.
 >
 > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-
-
-Thanks, I think this is a nice improvement.
-
-When I click a link, both the previous config
-and the new one are highlighted.
-Is this intentional behavior?
-
-For example, put the following simple Kconfig
-at the top-level.
-
-From the info window of FOO,
-click the 'select BAR' link,
-and then both FOO and BAR are highlighted.
-
------------->8---------------
-config FOO
-       bool "foo"
-       select BAR
-       default y
-
-config BAR
-       bool "bar"
-       default y
------------->8-----------------
-
-
-
-
-
-
-
-
 > ---
+
+
+I noticed a regression.
+
+Visit "Networking support",
+and click "select: BPF"
+from the window at the bottom.
+
+Nothing happens except the following error message
+in the console:
+
+Clicked menu is invalid: ^BPF$
+
+
+If I apply only 1-4 in this series,
+this works fine.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 >  scripts/kconfig/qconf.cc | 24 +++++-------------------
 >  1 file changed, 5 insertions(+), 19 deletions(-)
 >
@@ -133,6 +130,6 @@ config BAR
 >
 
 
---
+-- 
 Best Regards
 Masahiro Yamada
