@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55664 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55718 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729984AbgF3G0q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jun 2020 02:26:46 -0400
+        id S1730080AbgF3G0r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 30 Jun 2020 02:26:47 -0400
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: [PATCH v3 1/7] kconfig: qconf: cleanup includes
-Date: Tue, 30 Jun 2020 08:26:35 +0200
-Message-Id: <c138cd9af908952a85a0fc0f0ff30c57b0e547ba.1593498345.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v3 7/7] kconfig: qconf: navigate menus on hyperlinks
+Date: Tue, 30 Jun 2020 08:26:41 +0200
+Message-Id: <6f7162e40f127e76c7169315d33a14946a85719a.1593498345.git.mchehab+huawei@kernel.org>
 In-Reply-To: <cover.1593498345.git.mchehab+huawei@kernel.org>
 References: <cover.1593498345.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
@@ -15,87 +15,80 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The usage of c-like include is deprecated on modern Qt
-versions. Use the c++ style includes.
-
-While here, remove uneeded and redundant ones, sorting
-them on alphabetic order.
+Instead of just changing the helper window to show a
+dependency, also navigate to it at the config and menu
+widgets.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- scripts/kconfig/qconf.cc | 27 +++++++++------------------
- scripts/kconfig/qconf.h  | 14 +++++++-------
- 2 files changed, 16 insertions(+), 25 deletions(-)
+ scripts/kconfig/qconf.cc | 24 +++++-------------------
+ 1 file changed, 5 insertions(+), 19 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index c0ac8f7b5f1a..0e06afa08908 100644
+index 6a327b69ff5f..f49fbac91995 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -4,27 +4,18 @@
-  * Copyright (C) 2015 Boris Barbulovski <bbarbulovski@gmail.com>
-  */
+@@ -1233,7 +1233,6 @@ void ConfigInfoView::clicked(const QUrl &url)
+ 	char *data = new char[count + 1];
+ 	struct symbol **result;
+ 	struct menu *m = NULL;
+-	char type;
  
--#include <qglobal.h>
+ 	if (count < 1) {
+ 		qInfo() << "Clicked link is empty";
+@@ -1243,7 +1242,6 @@ void ConfigInfoView::clicked(const QUrl &url)
+ 
+ 	memcpy(data, str.constData(), count);
+ 	data[count] = '\0';
+-	type = data[0];
+ 
+ 	/* Seek for exact match */
+ 	data[0] = '^';
+@@ -1256,15 +1254,8 @@ void ConfigInfoView::clicked(const QUrl &url)
+ 	}
+ 
+ 	sym = *result;
+-	if (type == 's') {
+-		symbolInfo();
+-		emit showDebugChanged(true);
+-		free(result);
+-		delete data;
+-		return;
+-	}
+ 
+-	/* URL is a menu */
++	/* Seek for the menu which holds the symbol */
+ 	for (struct property *prop = sym->prop; prop; prop = prop->next) {
+ 		    if (prop->type != P_PROMPT && prop->type != P_MENU)
+ 			    continue;
+@@ -1272,17 +1263,11 @@ void ConfigInfoView::clicked(const QUrl &url)
+ 		    break;
+ 	}
+ 
+-	if (!m) {
++	if (!m)
+ 		qInfo() << "Clicked menu is invalid:" << data;
+-		free(result);
+-		delete data;
+-		return;
+-	}
++	else
++		emit menuSelected(m);
+ 
+-	_menu = m;
+-	menuInfo();
 -
--#include <QMainWindow>
--#include <QList>
--#include <qtextbrowser.h>
- #include <QAction>
-+#include <QApplication>
-+#include <QCloseEvent>
-+#include <QDesktopWidget>
- #include <QFileDialog>
-+#include <QLabel>
-+#include <QLayout>
-+#include <QList>
- #include <QMenu>
--
--#include <qapplication.h>
--#include <qdesktopwidget.h>
--#include <qtoolbar.h>
--#include <qlayout.h>
--#include <qsplitter.h>
--#include <qlineedit.h>
--#include <qlabel.h>
--#include <qpushbutton.h>
--#include <qmenubar.h>
--#include <qmessagebox.h>
--#include <qregexp.h>
--#include <qevent.h>
-+#include <QMenuBar>
-+#include <QMessageBox>
-+#include <QToolBar>
- 
- #include <stdlib.h>
- 
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index c879d79ce817..d913a02967ae 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
-  */
- 
--#include <QTextBrowser>
--#include <QTreeWidget>
--#include <QMainWindow>
-+#include <QCheckBox>
-+#include <QDialog>
- #include <QHeaderView>
--#include <qsettings.h>
-+#include <QLineEdit>
-+#include <QMainWindow>
- #include <QPushButton>
- #include <QSettings>
--#include <QLineEdit>
- #include <QSplitter>
--#include <QCheckBox>
--#include <QDialog>
-+#include <QTextBrowser>
-+#include <QTreeWidget>
-+
- #include "expr.h"
- 
- class ConfigView;
+-	emit showDebugChanged(true);
+ 	free(result);
+ 	delete data;
+ }
+@@ -1731,6 +1716,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+ 			list->setSelected(item, true);
+ 			list->scrollToItem(item);
+ 			list->setFocus();
++			helpText->setInfo(menu);
+ 		}
+ 	}
+ }
 -- 
 2.26.2
