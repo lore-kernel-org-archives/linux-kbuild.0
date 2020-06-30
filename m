@@ -1,136 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55222 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727082AbgF3UaR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jun 2020 16:30:17 -0400
-Date: Tue, 30 Jun 2020 13:30:16 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200630203016.GI9247@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200624203200.78870-1-samitolvanen@google.com>
- <20200624211540.GS4817@hirez.programming.kicks-ass.net>
- <CAKwvOdmxz91c-M8egR9GdR1uOjeZv7-qoTP=pQ55nU8TCpkK6g@mail.gmail.com>
- <20200625080313.GY4817@hirez.programming.kicks-ass.net>
- <20200625082433.GC117543@hirez.programming.kicks-ass.net>
- <20200625085745.GD117543@hirez.programming.kicks-ass.net>
- <20200630191931.GA884155@elver.google.com>
- <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728658AbgF3VOK (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 30 Jun 2020 17:14:10 -0400
+Date: Tue, 30 Jun 2020 14:14:07 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: fix CONFIG_CC_CAN_LINK(_STATIC) for
+ cross-compilation with Clang
+Message-ID: <20200630211407.GA4163361@ubuntu-s3-xlarge-x86>
+References: <20200630150625.12056-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+In-Reply-To: <20200630150625.12056-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
 
-On Tue, Jun 30, 2020 at 10:12:43PM +0200, Peter Zijlstra wrote:
-> On Tue, Jun 30, 2020 at 09:19:31PM +0200, Marco Elver wrote:
-> > I was asked for input on this, and after a few days digging through some
-> > history, thought I'd comment. Hope you don't mind.
+On Wed, Jul 01, 2020 at 12:06:24AM +0900, Masahiro Yamada wrote:
+> scripts/cc-can-link.sh tests if the compiler can link userspace
+> programs.
 > 
-> Not at all, being the one that asked :-)
+> When $(CC) is GCC, it is checked against the target architecture
+> because the toolchain prefix is specified as a part of $(CC).
 > 
-> > First of all, I agree with the concerns, but not because of LTO.
-> > 
-> > To set the stage better, and summarize the fundamental problem again:
-> > we're in the unfortunate situation that no compiler today has a way to
-> > _efficiently_ deal with C11's memory_order_consume
-> > [https://lwn.net/Articles/588300/]. If we did, we could just use that
-> > and be done with it. But, sadly, that doesn't seem possible right now --
-> > compilers just say consume==acquire.
+> When $(CC) is Clang, it is checked against the host architecture
+> because --target option is missing.
 > 
-> I'm not convinced C11 memory_order_consume would actually work for us,
-> even if it would work. That is, given:
+> Pass $(CLANG_FLAGS) to scripts/cc-can-link.sh to evaluate the link
+> capability for the target architecture.
 > 
->   https://lore.kernel.org/lkml/20150520005510.GA23559@linux.vnet.ibm.com/
-> 
-> only pointers can have consume, but like I pointed out, we have code
-> that relies on dependent loads from integers.
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-I agree that C11 memory_order_consume is not normally what we want,
-given that it is universally promoted to memory_order_acquire.
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 
-However, dependent loads from integers are, if anything, more difficult
-to defend from the compiler than are control dependencies.  This applies
-doubly to integers that are used to index two-element arrays, in which
-case you are just asking the compiler to destroy your dependent loads
-by converting them into control dependencies.
-
-> > Will suggests doing the same in the
-> > kernel: https://lkml.kernel.org/r/20200630173734.14057-19-will@kernel.org
+> ---
 > 
-> PowerPC would need a similar thing, it too will not preserve causality
-> for control dependecies.
+> Changes in v2:
+>   - New patch
 > 
-> > What we're most worried about right now is the existence of compiler
-> > transformations that could break data dependencies by e.g. turning them
-> > into control dependencies.
+>  init/Kconfig | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> Correct.
+> diff --git a/init/Kconfig b/init/Kconfig
+> index a46aa8f3174d..d0313e7725fa 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -49,13 +49,13 @@ config CLANG_VERSION
+>  
+>  config CC_CAN_LINK
+>  	bool
+> -	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(m64-flag)) if 64BIT
+> -	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(m32-flag))
+> +	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(CLANG_FLAGS) $(m64-flag)) if 64BIT
+> +	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(CLANG_FLAGS) $(m32-flag))
+>  
+>  config CC_CAN_LINK_STATIC
+>  	bool
+> -	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) -static $(m64-flag)) if 64BIT
+> -	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) -static $(m32-flag))
+> +	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(CLANG_FLAGS) -static $(m64-flag)) if 64BIT
+> +	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(CLANG_FLAGS) -static $(m32-flag))
+>  
+>  config CC_HAS_ASM_GOTO
+>  	def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
+> -- 
+> 2.25.1
 > 
-> > If this is a real worry, I don't think LTO is the magical feature that
-> > will uncover those optimizations. If these compiler transformations are
-> > real, they also exist in a normal build! 
-> 
-> Agreed, _however_ with the caveat that LTO could make them more common.
-> 
-> After all, with whole program analysis, the compiler might be able to
-> more easily determine that our pointer @ptr is only ever assigned the
-> values of &A, &B or &C, while without that visibility it would not be
-> able to determine this.
-> 
-> Once it knows @ptr has a limited number of determined values, the
-> conversion into control dependencies becomes much more likely.
-
-Which would of course break dependent loads.
-
-> > And if we are worried about them, we need to stop relying on dependent
-> > load ordering across the board; or switch to -O0 for everything.
-> > Clearly, we don't want either.
-> 
-> Agreed.
-> 
-> > Why do we think LTO is special?
-> 
-> As argued above, whole-program analysis would make it more likely. But I
-> agree the fundamental problem exists independent from LTO.
-> 
-> > But as far as we can tell, there is no evidence of the dreaded "data
-> > dependency to control dependency" conversion with LTO that isn't there
-> > in non-LTO builds, if it's even there at all. Has the data to control
-> > dependency conversion been encountered in the wild? If not, is the
-> > resulting reaction an overreaction? If so, we need to be careful blaming
-> > LTO for something that it isn't even guilty of.
-> 
-> It is mostly paranoia; in a large part driven by the fact that even if
-> such a conversion were to be done, it could go a very long time without
-> actually causing problems, and longer still for such problems to be
-> traced back to such an 'optimization'.
-> 
-> That is, the collective hurt from debugging too many ordering issues.
-> 
-> > So, we are probably better off untangling LTO from the story:
-> > 
-> > 1. LTO or no LTO does not matter. The LTO series should not get tangled
-> >    up with memory model issues.
-> > 
-> > 2. The memory model question and problems need to be answered and
-> >    addressed separately.
-> > 
-> > Thoughts?
-> 
-> How hard would it be to creates something that analyzes a build and
-> looks for all 'dependent load -> control dependency' transformations
-> headed by a volatile (and/or from asm) load and issues a warning for
-> them?
-> 
-> This would give us an indication of how valuable this transformation is
-> for the kernel. I'm hoping/expecting it's vanishingly rare, but what do
-> I know.
-> 
-
-This could be quite useful!
-
-							Thanx, Paul
