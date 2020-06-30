@@ -1,204 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:30217 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726686AbgF3DtR (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:43326 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726710AbgF3Dyd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 23:49:17 -0400
+        Mon, 29 Jun 2020 23:54:33 -0400
 MIME-Version: 1.0
-References: <cover.1593423060.git.mchehab+huawei@kernel.org> <b10b8bf2c21f4288ecb6081a967c302000346ff1.1593423060.git.mchehab+huawei@kernel.org>
-In-Reply-To: <b10b8bf2c21f4288ecb6081a967c302000346ff1.1593423060.git.mchehab+huawei@kernel.org>
+References: <20200625154226.25692cd1@coco.lan> <371f4815f6daac50e90057520d5f2b40a6ca3a74.1593096720.git.mchehab+huawei@kernel.org>
+ <c3c58115168c983eb1d441daa7cc84378cf33f39.camel@redhat.com> <CAK7LNAT5meMz0LF3C-2FnA6S8dettg4uJO-=FvsnCZ3H6+CVng@mail.gmail.com>
+In-Reply-To: <CAK7LNAT5meMz0LF3C-2FnA6S8dettg4uJO-=FvsnCZ3H6+CVng@mail.gmail.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 30 Jun 2020 12:48:13 +0900
-Message-ID: <CAK7LNARkzq=D8hhqYERcjRzv5LXsepunQCX8rhG7nORZuBAj7Q@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] kconfig: qconf: make debug links work again
+Date: Tue, 30 Jun 2020 12:53:28 +0900
+Message-ID: <CAK7LNAR55e+7KOULho2smK82Z0LxSg0UC8V9R8GTvfZOhg4i0A@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: qconf: Fix find on split mode
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Mon, Jun 29, 2020 at 6:35 PM Mauro Carvalho Chehab
-<mchehab+huawei@kernel.org> wrote:
+On Sun, Jun 28, 2020 at 11:42 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> The Qt5 conversion broke support for debug info links.
+> On Sun, Jun 28, 2020 at 5:40 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> >
+> > On Thu, 2020-06-25 at 16:52 +0200, Mauro Carvalho Chehab wrote:
+> > > The logic handling find on split mode is currently broken.
+> > > Fix it, making it work again as expected.
+> >
+> > I tested this patch and it works well.
+> > There is one really small cosmetic issue:
+> >
+> > If you select search result, and then select another search result
+> > which happens not to update the 'menu', then both the results are
+> > selected (that is the old one doesn't clear its selection)
 >
-> Restore the behaviour added by changeset
-> ab45d190fd4a ("kconfig: create links in info window").
->
-> The original approach were to pass a pointer for a data struct
-
-"were" -> "was" ?
-
-
-> via an <a href>. That doesn't sound a good idea, as, if something
-> gets wrong, the app could crash. So, instead, pass the name of
-> the symbol, and validate such symbol at the hyperlink handling
-> logic.
->
-> Link: https://lore.kernel.org/lkml/20200628125421.12458086@coco.lan/
-> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> I see this too.
+> So, this can be improved somehow...
 
 
 
-This patch does not cause segmentation fault any more.
-Thanks.
-
-
-> ---
->  scripts/kconfig/qconf.cc | 75 +++++++++++++++++++++++++++++++++++++---
->  scripts/kconfig/qconf.h  |  1 +
->  2 files changed, 71 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index 85782da3e464..49f0688fceb8 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -7,6 +7,7 @@
->  #include <QAction>
->  #include <QApplication>
->  #include <QCloseEvent>
-> +#include <QDebug>
->  #include <QDesktopWidget>
->  #include <QFileDialog>
->  #include <QLabel>
-> @@ -1012,7 +1013,7 @@ ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
->         : Parent(parent), sym(0), _menu(0)
->  {
->         setObjectName(name);
-> -
-> +       setOpenLinks(false);
->
->         if (!objectName().isEmpty()) {
->                 configSettings->beginGroup(objectName());
-> @@ -1085,7 +1086,7 @@ void ConfigInfoView::menuInfo(void)
->                         if (sym->name) {
->                                 head += " (";
->                                 if (showDebug())
-> -                                       head += QString().sprintf("<a href=\"s%p\">", sym);
-> +                                       head += QString().sprintf("<a href=\"s%s\">", sym->name);
->                                 head += print_filter(sym->name);
->                                 if (showDebug())
->                                         head += "</a>";
-> @@ -1094,7 +1095,7 @@ void ConfigInfoView::menuInfo(void)
->                 } else if (sym->name) {
->                         head += "<big><b>";
->                         if (showDebug())
-> -                               head += QString().sprintf("<a href=\"s%p\">", sym);
-> +                               head += QString().sprintf("<a href=\"s%s\">", sym->name);
->                         head += print_filter(sym->name);
->                         if (showDebug())
->                                 head += "</a>";
-> @@ -1145,7 +1146,7 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
->                 switch (prop->type) {
->                 case P_PROMPT:
->                 case P_MENU:
-> -                       debug += QString().sprintf("prompt: <a href=\"m%p\">", prop->menu);
-> +                       debug += QString().sprintf("prompt: <a href=\"m%s\">", sym->name);
->                         debug += print_filter(prop->text);
->                         debug += "</a><br>";
->                         break;
-> @@ -1217,13 +1218,74 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
->         QString str2 = print_filter(str);
->
->         if (sym && sym->name && !(sym->flags & SYMBOL_CONST)) {
-> -               *text += QString().sprintf("<a href=\"s%p\">", sym);
-> +               *text += QString().sprintf("<a href=\"s%s\">", sym->name);
->                 *text += str2;
->                 *text += "</a>";
->         } else
->                 *text += str2;
->  }
->
-> +void ConfigInfoView::clicked(const QUrl &url)
-> +{
-> +       QByteArray str = url.toEncoded();
-> +       const std::size_t count = str.size();
-> +       char *data = new char[count + 1];
-> +       struct symbol **result;
-> +       struct menu *m = NULL;
-> +       char type;
-> +
-> +       if (count < 1) {
-> +               qInfo() << "Clicked link is empty";
-> +               delete data;
-> +               return;
-> +       }
-> +
-> +       memcpy(data, str.constData(), count);
-> +       data[count] = '\0';
-> +       type = data[0];
-> +
-> +       /* Seek for exact match */
-> +       data[0] = '^';
-> +       strcat(data, "$");
-> +       result = sym_re_search(data);
-> +       if (!result) {
-> +               qInfo() << "Clicked symbol is invalid:" << data;
-> +               delete data;
-> +               return;
-> +       }
-> +
-> +       sym = *result;
-> +       if (type == 's') {
-> +               symbolInfo();
-> +               emit showDebugChanged(true);
-> +               free(result);
-> +               delete data;
-> +               return;
-> +       }
-> +
-> +       /* URL is a menu */
-> +       for (struct property *prop = sym->prop; prop; prop = prop->next) {
-> +                   if (prop->type != P_PROMPT && prop->type != P_MENU)
-> +                           continue;
-> +                   m = prop->menu;
-> +                   break;
-> +       }
-> +
-> +       if (!m) {
-> +               qInfo() << "Clicked menu is invalid:" << data;
-> +               free(result);
-> +               delete data;
-> +               return;
-> +       }
-> +
-> +       _menu = m;
-> +       menuInfo();
-> +
-> +       emit showDebugChanged(true);
-> +       free(result);
-> +       delete data;
-> +}
-> +
->  QMenu* ConfigInfoView::createStandardContextMenu(const QPoint & pos)
->  {
->         QMenu* popup = Parent::createStandardContextMenu(pos);
-> @@ -1497,6 +1559,9 @@ ConfigMainWindow::ConfigMainWindow(void)
->         helpMenu->addAction(showIntroAction);
->         helpMenu->addAction(showAboutAction);
->
-> +       connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
-> +                helpText, SLOT (clicked (const QUrl &)) );
-> +
->         connect(configList, SIGNAL(menuChanged(struct menu *)),
->                 helpText, SLOT(setInfo(struct menu *)));
->         connect(configList, SIGNAL(menuSelected(struct menu *)),
-> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-> index d913a02967ae..a193137f2314 100644
-> --- a/scripts/kconfig/qconf.h
-> +++ b/scripts/kconfig/qconf.h
-> @@ -250,6 +250,7 @@ public slots:
->         void setInfo(struct menu *menu);
->         void saveSettings(void);
->         void setShowDebug(bool);
-> +       void clicked (const QUrl &url);
->
->  signals:
->         void showDebugChanged(bool);
-> --
-> 2.26.2
->
+I dropped this one
+because it was superseded by the new version.
 
 
 -- 
