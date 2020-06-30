@@ -1,51 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:60299 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726003AbgF3Bwo (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:60726 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726813AbgF3CJA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Jun 2020 21:52:44 -0400
+        Mon, 29 Jun 2020 22:09:00 -0400
 MIME-Version: 1.0
-References: <20200625170434.635114-1-masahiroy@kernel.org> <20200625170434.635114-5-masahiroy@kernel.org>
- <CAL_JsqL4pTFK_pSNn1cSvjzwdg71dVzM3P06BYYEwDj2t+swPA@mail.gmail.com>
-In-Reply-To: <CAL_JsqL4pTFK_pSNn1cSvjzwdg71dVzM3P06BYYEwDj2t+swPA@mail.gmail.com>
+References: <20200628015041.1000002-1-masahiroy@kernel.org> <87imfa8le0.fsf@mpe.ellerman.id.au>
+In-Reply-To: <87imfa8le0.fsf@mpe.ellerman.id.au>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 30 Jun 2020 10:51:34 +0900
-Message-ID: <CAK7LNAQzG5ty=knL4eh=8w43p57BGMf6mRMTR1rPrhdFoKs7YA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] dt-bindings: split DT schema check rules
+Date: Tue, 30 Jun 2020 11:08:07 +0900
+Message-ID: <CAK7LNATusciypBJ4dYZcyrugdi_rXEV_s=zxAehDxsX+Sd5z4g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: introduce ccflags-remove-y and asflags-remove-y
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: DTML <devicetree@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Ingo Molnar <mingo@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Paul Mackerras <paulus@samba.org>, Rich Felker <dalias@libc.org>, Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux-sh list <linux-sh@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 
-On Tue, Jun 30, 2020 at 5:50 AM Rob Herring <robh+dt@kernel.org> wrote:
+On Mon, Jun 29, 2020 at 2:55 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
 >
-> On Thu, Jun 25, 2020 at 11:05 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> Masahiro Yamada <masahiroy@kernel.org> writes:
+> > CFLAGS_REMOVE_<file>.o works per object, that is, there is no
+> > convenient way to filter out flags for every object in a directory.
 > >
-> > When building %.dt.yaml from %.dts, two things happen in a row:
+> > Add ccflags-remove-y and asflags-remove-y to make it easily.
 > >
-> >  [1] Run DTC to convert %.dts into %.dt.yaml
+> > Use ccflags-remove-y to clean up some Makefiles.
 > >
-> >  [2] Run dt-validate against %.dt.yaml
+> > Suggested-by: Sami Tolvanen <samitolvanen@google.com>
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
 > >
-> > Currently, when any .yaml schema file is updated, processed-schema.yaml
-> > is regenerated, then both [1] and [2] are rerun for all .dts files.
+> >  arch/arm/boot/compressed/Makefile | 6 +-----
+> >  arch/powerpc/xmon/Makefile        | 3 +--
+> >  arch/sh/boot/compressed/Makefile  | 5 +----
+> >  kernel/trace/Makefile             | 4 ++--
+> >  lib/Makefile                      | 5 +----
+> >  scripts/Makefile.lib              | 4 ++--
+> >  6 files changed, 8 insertions(+), 19 deletions(-)
 > >
-> > Actually, we do not need to rerun [1] since the original .dts is not
-> > updated.
+> > diff --git a/arch/powerpc/xmon/Makefile b/arch/powerpc/xmon/Makefile
+> > index 89c76ca35640..55cbcdd88ac0 100644
+> > --- a/arch/powerpc/xmon/Makefile
+> > +++ b/arch/powerpc/xmon/Makefile
+> > @@ -7,8 +7,7 @@ UBSAN_SANITIZE := n
+> >  KASAN_SANITIZE := n
+> >
+> >  # Disable ftrace for the entire directory
+> > -ORIG_CFLAGS := $(KBUILD_CFLAGS)
+> > -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
+> > +ccflags-remove-y += $(CC_FLAGS_FTRACE)
 >
-> I have plans (and an intern working on it) to integrate the schema
-> checks into dtc. That's going to make turning on the schema checks
-> just a flag to dtc. I'm not sure if adding the complexity here is
-> worth it as I'd expect much of this patch to go away again.
+> This could be:
 >
-> Is there any negative impact on the absolute clean build time? I'm
-> more concerned about that than optimizing rerunning.
+> ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+>
+> Similar to kernel/trace/Makefile below.
 
-No benefit on the absolute clean build time.
 
-OK, then please skip this patch.
+I fixed it up, and applied to linux-kbuild.
+Thanks.
 
+
+> I don't mind though.
+>
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+>
+> cheers
+>
+> > diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> > index 6575bb0a0434..7492844a8b1b 100644
+> > --- a/kernel/trace/Makefile
+> > +++ b/kernel/trace/Makefile
+> > @@ -2,9 +2,9 @@
+> >
+> >  # Do not instrument the tracer itself:
+> >
+> > +ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+> > +
+> >  ifdef CONFIG_FUNCTION_TRACER
+> > -ORIG_CFLAGS := $(KBUILD_CFLAGS)
+> > -KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
+> >
+> >  # Avoid recursion due to instrumentation.
+> >  KCSAN_SANITIZE := n
 
 
 
