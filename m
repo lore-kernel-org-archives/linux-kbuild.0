@@ -1,230 +1,156 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:65505 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387536AbgF3QYu (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46670 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728022AbgF3QrN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Jun 2020 12:24:50 -0400
+        Tue, 30 Jun 2020 12:47:13 -0400
+Date: Tue, 30 Jun 2020 09:47:08 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [PATCH 04/16] net: bpfilter: use 'userprogs' syntax to build
+ bpfilter_umh
+Message-ID: <20200630164708.aeuoq4ruhivu5o2d@ast-mbp.dhcp.thefacebook.com>
+References: <20200423073929.127521-1-masahiroy@kernel.org>
+ <20200423073929.127521-5-masahiroy@kernel.org>
+ <20200608115628.osizkpo76cgn2ci7@lion.mk-sys.cz>
+ <CAK7LNARGKCyWbfWUOX3nLLOBS3gi1QU3acdXLPVK4C+ErMDLpA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200629085911.1676554-1-masahiroy@kernel.org> <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
-In-Reply-To: <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Wed, 1 Jul 2020 01:23:53 +0900
-Message-ID: <CAK7LNAR49jFZkEmBqpACE0V_-VyCXfFRcKe1Zq+cqO65QX1ozg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: make Clang build userprogs for target architecture
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARGKCyWbfWUOX3nLLOBS3gi1QU3acdXLPVK4C+ErMDLpA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Michal Kubecek <mkubecek@suse.cz>, Alexei Starovoitov <ast@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, bpf <bpf@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Andrii Nakryiko <andriin@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>, Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>
 
-On Tue, Jun 30, 2020 at 2:39 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
->
-> On Mon, Jun 29, 2020 at 1:59 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Tue, Jun 30, 2020 at 03:30:04PM +0900, Masahiro Yamada wrote:
+> Hi Michal, Alexei,
+> 
+> On Mon, Jun 8, 2020 at 8:56 PM Michal Kubecek <mkubecek@suse.cz> wrote:
 > >
-> > Programs added 'userprogs' should be compiled for the target
-> > architecture i.e. the same architecture as the kernel.
+> > On Thu, Apr 23, 2020 at 04:39:17PM +0900, Masahiro Yamada wrote:
+> > > The user mode helper should be compiled for the same architecture as
+> > > the kernel.
+> > >
+> > > This Makefile reuses the 'hostprogs' syntax by overriding HOSTCC with CC.
+> > >
+> > > Now that Kbuild provides the syntax 'userprogs', use it to fix the
+> > > Makefile mess.
+> > >
+> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > > Reported-by: kbuild test robot <lkp@intel.com>
+> > > ---
+> > >
+> > >  net/bpfilter/Makefile | 11 ++++-------
+> > >  1 file changed, 4 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/net/bpfilter/Makefile b/net/bpfilter/Makefile
+> > > index 36580301da70..6ee650c6badb 100644
+> > > --- a/net/bpfilter/Makefile
+> > > +++ b/net/bpfilter/Makefile
+> > > @@ -3,17 +3,14 @@
+> > >  # Makefile for the Linux BPFILTER layer.
+> > >  #
+> > >
+> > > -hostprogs := bpfilter_umh
+> > > +userprogs := bpfilter_umh
+> > >  bpfilter_umh-objs := main.o
+> > > -KBUILD_HOSTCFLAGS += -I $(srctree)/tools/include/ -I $(srctree)/tools/include/uapi
+> > > -HOSTCC := $(CC)
+> > > +user-ccflags += -I $(srctree)/tools/include/ -I $(srctree)/tools/include/uapi
+> > >
+> > > -ifeq ($(CONFIG_BPFILTER_UMH), y)
+> > > -# builtin bpfilter_umh should be compiled with -static
+> > > +# builtin bpfilter_umh should be linked with -static
+> > >  # since rootfs isn't mounted at the time of __init
+> > >  # function is called and do_execv won't find elf interpreter
+> > > -KBUILD_HOSTLDFLAGS += -static
+> > > -endif
+> > > +bpfilter_umh-ldflags += -static
+> > >
+> > >  $(obj)/bpfilter_umh_blob.o: $(obj)/bpfilter_umh
 > >
-> > GCC does this correctly since the target architecture is implied
-> > by the toolchain prefix.
+> > Hello,
 > >
-> > Clang builds standalone programs always for the host architecture
-> > because the target triple is currently missing.
+> > I just noticed that this patch (now in mainline as commit 8a2cc0505cc4)
+> > drops the test if CONFIG_BPFILTER_UMH is "y" so that -static is now
+> > passed to the linker even if bpfilter_umh is built as a module which
+> > wasn't the case in v5.7.
 > >
-> > Fix this.
+> > This is not mentioned in the commit message and the comment still says
+> > "*builtin* bpfilter_umh should be linked with -static" so this change
+> > doesn't seem to be intentional. Did I miss something?
 > >
-> > Fixes: 7f3a59db274c ("kbuild: add infrastructure to build userspace programs")
->
-> This is a neat feature I didn't know about; looks relatively new.
-> What's the test case command line invocation to test this with Clang?
+> > Michal Kubecek
+> 
+> I was away for a while from this because I saw long discussion in
+> "net/bpfilter: Remove this broken and apparently unmaintained"
+> 
+> 
+> Please let me resume this topic now.
+> 
+> 
+> The original behavior of linking umh was like this:
+>   - If CONFIG_BPFILTER_UMH=y, bpfilter_umh was linked with -static
+>   - If CONFIG_BPFILTER_UMH=m, bpfilter_umh was linked without -static
 
+That was done to make sure both static and dynamic linking work.
+For production -static is necessary.
+For debugging of usermode blob dynamic is beneficial.
 
+> Restoring the original behavior will add more complexity because
+> now we have CONFIG_CC_CAN_LINK and CONFIG_CC_CAN_LINK_STATIC
+> since commit b1183b6dca3e0d5
+> 
+> If CONFIG_BPFILTER_UMH=y, we need to check CONFIG_CC_CAN_LINK_STATIC.
+> If CONFIG_BPFILTER_UMH=m, we need to check CONFIG_CC_CAN_LINK.
+> This would make the Kconfig dependency logic too complicated.
 
-Test command:
+Currently I'm working on adding bpf_iter to use 'user mode driver'
+(old user mode blob) facility on top of Eric's patches.
+So there will be quite a bit more complexity to build system.
+Folks who don't want to deal with -static requirement should
+just disable the feature.
 
-$ make -j24 ARCH=arm  LLVM=1 CROSS_COMPILE=arm-linux-gnueabi-
-allyesconfig  samples/
-  [ snip ]
-  CC [U]  samples/watch_queue/watch_test
-  CC [U]  samples/timers/hpet_example
-  CC [U]  samples/vfs/test-fsmount
-  CC [U]  samples/binderfs/binderfs_example
-  CC [U]  samples/auxdisplay/cfag12864b-example
-  CC [U]  samples/hidraw/hid-example
-  CC [U]  samples/uhid/uhid-example
-  CC [U]  samples/connector/ucon
-  CC [U]  samples/watchdog/watchdog-simple
-  CC [U]  samples/vfs/test-statx
+> To make it simpler, I'd like to suggest two options.
+> 
+> 
+> 
+> Idea 1:
+> 
+>   Always use -static irrespective of whether
+>   CONFIG_BPFILTER_UMH is y or m.
 
+I don't think it's making it much simpler.
+It's a tiny change to makefile.
+I could be missing something.
+Requiring -static for =y and =m is fine.
 
-Then, check if the sample programs
-were correctly built for ARM.
+>   Add two more lines to clarify this
+>   in the comment in net/bpfilter/Makefile:
+> 
+>   # builtin bpfilter_umh should be linked with -static
+>   # since rootfs isn't mounted at the time of __init
+>   # function is called and do_execv won't find elf interpreter.
+>   # Static linking is not required when bpfilter is modular, but
+>   # we always pass -static to keep the 'depends on' in Kconfig simple.
+> 
+> 
+> 
+> Idea 2:
+> 
+>    Allow umh to become only modular,
+>    and drop -static flag entirely.
 
+absolutely not.
+Both =y and =m are mandatory.
 
+> 
+>    If you look at net/bpfilter/Kconfig,
+>    BPFILTER_UMH already has 'default m'.
+>    So, I assume the most expected use-case
+>    is modular.
 
-Before this commit:
+The default for BPFILTER is =N.
+Distros should NOT be turning that to =y
 
-$ file samples/vfs/test-statx
-samples/vfs/test-statx: ELF 64-bit LSB executable, x86-64, version 1
-(SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,
-for GNU/Linux 3.2.0, not stripped
-
-
-
-After this commit:
-
-$ file samples/vfs/test-statx
-samples/vfs/test-statx: ELF 32-bit LSB executable, ARM, EABI5 version
-1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.3, for
-GNU/Linux 3.2.0, not stripped
-
-
-
-To test this, having LLVM is not enough
-because building userspace programs
-requires target-specific libraries.
-
-As for GCC, libc is usually bundled together
-with toolchains, but as for LLVM we need
-to provide target-specific libc.
-
-This introduces a different kind of complexity
-than building the kernel.
-
-I read this article:
-https://clang.llvm.org/docs/CrossCompilation.html
-
-
-I use tc-build to compile llvm from source code,
-but I also needed to install ARM libc.
-
-"apt install gcc-arm-linux-gnueabi"
-especially
-"apt install libc6-dev-armel-cross".
-
-
-
-
-
-If I build sample code for ARCH=arm64,
-I see the following warnings.
-
-
-$ make -j24 ARCH=arm64  LLVM=1 CROSS_COMPILE=aarch64-linux-gnu-
-allyesconfig  samples/
-  [ snip ]
-  CC [U]  samples/uhid/uhid-example
-samples/uhid/uhid-example.c:169:4: warning: format specifies type
-'ssize_t' (aka 'long') but the argument has type 'ssize_t' (aka 'int')
-[-Wformat]
-                        ret, sizeof(ev));
-                        ^~~
-samples/uhid/uhid-example.c:240:4: warning: format specifies type
-'ssize_t' (aka 'long') but the argument has type 'ssize_t' (aka 'int')
-[-Wformat]
-                        ret, sizeof(ev));
-                        ^~~
-2 warnings generated.
-  CC [U]  samples/vfs/test-fsmount
-  CC [U]  samples/vfs/test-statx
-  CC [U]  samples/watch_queue/watch_test
-samples/watch_queue/watch_test.c:86:50: warning: format specifies type
-'ssize_t' (aka 'long') but the argument has type 'ssize_t' (aka 'int')
-[-Wformat]
-                        fprintf(stderr, "Read buffer overrun: %zd\n", buf_len);
-                                                              ~~~     ^~~~~~~
-                                                              %d
-samples/watch_queue/watch_test.c:90:28: warning: format specifies type
-'ssize_t' (aka 'long') but the argument has type 'ssize_t' (aka 'int')
-[-Wformat]
-                printf("read() = %zd\n", buf_len);
-                                 ~~~     ^~~~~~~
-                                 %d
-2 warnings generated.
-  CC [U]  samples/watchdog/watchdog-simple
-  AR      samples/built-in.a
-
-
-
-
-
-I do not know how to solve this issue.
-
-
-I can reproduce this in the following
-simple test code:
-
-
------------------>8----------------
-#include <stdio.h>
-
-int main(void)
-{
-        ssize_t x = 1;
-
-        printf("%zd", x);
-
-        return 0;
-}
---------------->8-------------------
-
-$ clang --target=aarch64-linux-gnu test.c
-test.c:7:16: warning: format specifies type 'ssize_t' (aka 'long') but
-the argument has type 'ssize_t' (aka 'int') [-Wformat]
-        printf("%zd", x);
-                ~~~   ^
-                %zd
-1 warning generated.
-
-
-ssize_t is defined in /usr/include/stdio.h
-but perhaps this is not suitable
-for cross-compilation for aarch64.
-
-
-
-Is there any solution?
-
-
-
-
-
-
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  Makefile | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 73948798ce3f..cac29cc2ec25 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -970,8 +970,8 @@ LDFLAGS_vmlinux     += --pack-dyn-relocs=relr
-> >  endif
-> >
-> >  # Align the bit size of userspace programs with the kernel
-> > -KBUILD_USERCFLAGS  += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> > -KBUILD_USERLDFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> > +KBUILD_USERCFLAGS  += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
-> > +KBUILD_USERLDFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
->
-> That should be fine.
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> https://www.gnu.org/software/make/manual/html_node/Text-Functions.html
->
-> >
-> >  # make the checker run with the right architecture
-> >  CHECKFLAGS += --arch=$(ARCH)
-> > --
->
->
-> --
-> Thanks,
-> ~Nick Desaulniers
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Same thing with upcoming bpf_iter. It will default to =n.
