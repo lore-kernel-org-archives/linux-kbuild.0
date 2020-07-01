@@ -1,70 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:22158 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727113AbgGAGSf (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729571AbgGAJLG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Jul 2020 02:18:35 -0400
-From: "H. Nikolaus Schaller" <hns@goldelico.com>
-Subject: [PATCH v2] modpost: remove use of non-standard strsep() in HOSTCC code
-Date: Wed,  1 Jul 2020 08:18:27 +0200
-Message-Id: <60381408622ebbb7d205b2cf6edcf8c6acecf1d7.1593584306.git.hns@goldelico.com>
+        Wed, 1 Jul 2020 05:11:06 -0400
+Date: Wed, 1 Jul 2020 11:10:54 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200701091054.GW4781@hirez.programming.kicks-ass.net>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <20200624211540.GS4817@hirez.programming.kicks-ass.net>
+ <CAKwvOdmxz91c-M8egR9GdR1uOjeZv7-qoTP=pQ55nU8TCpkK6g@mail.gmail.com>
+ <20200625080313.GY4817@hirez.programming.kicks-ass.net>
+ <20200625082433.GC117543@hirez.programming.kicks-ass.net>
+ <20200625085745.GD117543@hirez.programming.kicks-ass.net>
+ <20200630191931.GA884155@elver.google.com>
+ <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+ <20200630203016.GI9247@paulmck-ThinkPad-P72>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200630203016.GI9247@paulmck-ThinkPad-P72>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, letux-kernel@openphoenux.org, "H. Nikolaus Schaller" <hns@goldelico.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-strsep() is neither standard C nor POSIX and used outside
-the kernel code here. Using it here requires that the
-build host supports it out of the box which is e.g.
-not true for a Darwin build host and using a cross-compiler.
-This leads to:
+On Tue, Jun 30, 2020 at 01:30:16PM -0700, Paul E. McKenney wrote:
+> On Tue, Jun 30, 2020 at 10:12:43PM +0200, Peter Zijlstra wrote:
 
-scripts/mod/modpost.c:145:2: warning: implicit declaration of function 'strsep' [-Wimplicit-function-declaration]
-  return strsep(stringp, "\n");
-  ^
+> > I'm not convinced C11 memory_order_consume would actually work for us,
+> > even if it would work. That is, given:
+> > 
+> >   https://lore.kernel.org/lkml/20150520005510.GA23559@linux.vnet.ibm.com/
+> > 
+> > only pointers can have consume, but like I pointed out, we have code
+> > that relies on dependent loads from integers.
+> 
+> I agree that C11 memory_order_consume is not normally what we want,
+> given that it is universally promoted to memory_order_acquire.
+> 
+> However, dependent loads from integers are, if anything, more difficult
+> to defend from the compiler than are control dependencies.  This applies
+> doubly to integers that are used to index two-element arrays, in which
+> case you are just asking the compiler to destroy your dependent loads
+> by converting them into control dependencies.
 
-and a segfault when running MODPOST.
+Yes, I'm aware. However, as you might know, I'm firmly in the 'C is a
+glorified assembler' camp (as I expect most actual OS people are, out of
+necessity if nothing else) and if I wanted a control dependency I
+would've bloody well written one.
 
-See also: https://stackoverflow.com/a/7219504
+I think an optimizing compiler is awesome, but only in so far as that
+optimization is actually helpful -- and yes, I just stepped into a giant
+twilight zone there. That is, any optimization that has _any_
+controversy should be controllable (like -fno-strict-overflow
+-fno-strict-aliasing) and I'd very much like the same here.
 
-So let's replace this by strchr() instead of using strsep().
-It does not hurt kernel size or speed since this code is run
-on the build host.
-
-Fixes: ac5100f5432967 ("modpost: add read_text_file() and get_line() helpers")
-Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
----
- scripts/mod/modpost.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6aea65c657454..45f2ab2ec2d46 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -138,11 +138,19 @@ char *read_text_file(const char *filename)
- 
- char *get_line(char **stringp)
- {
-+	char *orig = *stringp, *next;
-+
- 	/* do not return the unwanted extra line at EOF */
--	if (*stringp && **stringp == '\0')
-+	if (!orig || *orig == '\0')
- 		return NULL;
- 
--	return strsep(stringp, "\n");
-+	next = strchr(orig, '\n');
-+	if (next)
-+		*next++ = '\0';
-+
-+	*stringp = next;
-+
-+	return orig;
- }
- 
- /* A list of all modules we processed */
--- 
-2.26.2
+In a larger context, I still think that eliminating speculative stores
+is both necessary and sufficient to avoid out-of-thin-air. So I'd also
+love to get some control on that.
