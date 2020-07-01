@@ -1,45 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sonic317-20.consmr.mail.gq1.yahoo.com ([98.137.66.146]:38967
-        "EHLO sonic317-20.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731542AbgGARc7 (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726500AbgGARqN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Jul 2020 13:32:59 -0400
-Date: Wed, 01 Jul 2020 13:32:52 -0400
-From: "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Subject: Re: Kernel compression benchmarks
-References: <20200701153028.GA30962.ref@hsiangkao-HP-ZHAN-66-Pro-G1>
-        <20200701153028.GA30962@hsiangkao-HP-ZHAN-66-Pro-G1>
-In-Reply-To: <20200701153028.GA30962@hsiangkao-HP-ZHAN-66-Pro-G1>
+        Wed, 1 Jul 2020 13:46:13 -0400
+Date: Wed, 1 Jul 2020 10:46:09 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [PATCH] bpfilter: allow to build bpfilter_umh as a module
+ without static library
+Message-ID: <20200701174609.mw5ovqe7d5o6ptel@ast-mbp.dhcp.thefacebook.com>
+References: <20200701092644.762234-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Message-Id: <1593624505.w282woxb43.none@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200701092644.762234-1-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gao Xiang <hsiangkao@aol.com>
-Cc: Chris Mason <clm@fb.com>, gregkh@linuxfoundation.org, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@kernel.org, Nick Terrell <nickrterrell@gmail.com>, Norbert Lange <nolange79@gmail.com>, Petr Malat <oss@malat.biz>, Patrick Williams <patrick@stwcx.xyz>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, Sedat Dilek <sedat.dilek@gmail.com>, Nick Terrell <terrelln@fb.com>, x86@kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, linux-kernel@vger.kernel.org, Andrii Nakryiko <andriin@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>, Martin KaFai Lau <kafai@fb.com>, Sam Ravnborg <sam@ravnborg.org>, Song Liu <songliubraving@fb.com>, Valdis Kl =?utf-8?B?xJM=?= tnieks <valdis.kletnieks@vt.edu>, Yonghong Song <yhs@fb.com>
 
-Excerpts from Gao Xiang's message of July 1, 2020 11:50 am:
->  Anyway, I think LZMA (xz) is still useful and which is more
->  friendly to fixed-sized output compression than Zstd yet (But
->  yeah, I'm not familar with all ZSTD internals. I will dig
->  into that if I've more extra time).
+On Wed, Jul 01, 2020 at 06:26:44PM +0900, Masahiro Yamada wrote:
+> Originally, bpfilter_umh was linked with -static only when
+> CONFIG_BPFILTER_UMH=y.
+> 
+> Commit 8a2cc0505cc4 ("bpfilter: use 'userprogs' syntax to build
+> bpfilter_umh") silently, accidentally dropped the CONFIG_BPFILTER_UMH=y
+> test in the Makefile. Revive it in order to link it dynamically when
+> CONFIG_BPFILTER_UMH=m.
+> 
+> Since commit b1183b6dca3e ("bpfilter: check if $(CC) can link static
+> libc in Kconfig"), the compiler must be capable of static linking to
+> enable CONFIG_BPFILTER_UMH, but it requires more than needed.
+> 
+> To loosen the compiler requirement, I changed the dependency as follows:
+> 
+>     depends on CC_CAN_LINK
+>     depends on m || CC_CAN_LINK_STATIC
+> 
+> If CONFIG_CC_CAN_LINK_STATIC in unset, CONFIG_BPFILTER_UMH is restricted
+> to 'm' or 'n'.
+> 
+> In theory, CONFIG_CC_CAN_LINK is not required for CONFIG_BPFILTER_UMH=y,
+> but I did not come up with a good way to describe it.
+> 
+> Fixes: 8a2cc0505cc4 ("bpfilter: use 'userprogs' syntax to build bpfilter_umh")
+> Reported-by: Michal Kubecek <mkubecek@suse.cz>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Yes, I agree. If you look at the graphs, LZMA2 (xz/7zip) still produces=20
-smaller results, even compared to zstd maximum settings, so definitely=20
-LZMA2 should be kept, at least for now. I am only suggesting removing=20
-LZMA, since it has no benefits over xz and zstd combination (bigger than=20
-xz, slower than zstd).
-
->> - modern compressors (xz, lz4, zstd) decompress about as fast for each=20
->>   compression level, only requiring more memory
->=20
->  lz4 has fixed sliding window (dictionary, 64k), so it won't
->  require more memory among different compression level when
->  decompressing.
-
-Yes, this is true. I tried to simplify among all compressors, but I=20
-think I simplified too much. Thanks for clarifying.
-
-Cheers,
-Alex.
+lgtm
+Do you mind I'll take it into bpf-next tree?
+Eric is working on a bunch of patches in this area. I'll take his set
+into bpf-next as well and then can apply this patch.
+Just to make sure there are no conflicts.
