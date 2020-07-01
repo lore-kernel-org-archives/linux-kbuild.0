@@ -1,76 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725272AbgGAGB6 (ORCPT
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:22158 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727113AbgGAGSf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Jul 2020 02:01:58 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A2CC061755
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jun 2020 23:01:57 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id r12so22430862wrj.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jun 2020 23:01:57 -0700 (PDT)
-Date: Wed, 1 Jul 2020 08:01:50 +0200
-From: Marco Elver <elver@google.com>
-Subject: Re: [PATCH 1/2] kbuild: remove cc-option test of -fno-stack-protector
-Message-ID: <20200701060150.GA1181113@elver.google.com>
-References: <20200626185913.92890-1-masahiroy@kernel.org>
+        Wed, 1 Jul 2020 02:18:35 -0400
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+Subject: [PATCH v2] modpost: remove use of non-standard strsep() in HOSTCC code
+Date: Wed,  1 Jul 2020 08:18:27 +0200
+Message-Id: <60381408622ebbb7d205b2cf6edcf8c6acecf1d7.1593584306.git.hns@goldelico.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200626185913.92890-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com, x86@kernel.org, linux-efi@vger.kernel.org, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, paulmck@kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, letux-kernel@openphoenux.org, "H. Nikolaus Schaller" <hns@goldelico.com>
 
-On Sat, Jun 27, 2020 at 03:59AM +0900, Masahiro Yamada wrote:
-> Some Makefiles already pass -fno-stack-protector unconditionally.
-> For example, arch/arm64/kernel/vdso/Makefile, arch/x86/xen/Makefile.
-> No problem report so far about hard-coding this option. So, we can
-> assume all supported compilers know -fno-stack-protector.
-> 
-> GCC 4.8 and Clang support this option (https://godbolt.org/z/_HDGzN)
-> 
-> Get rid of cc-option from -fno-stack-protector.
-> 
-> Remove CONFIG_CC_HAS_STACKPROTECTOR_NONE, which should always be 'y'.
-> 
-> Note:
-> arch/mips/vdso/Makefile adds -fno-stack-protector twice, first
-> unconditionally, and second conditionally. I removed the second one.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  Documentation/kbuild/kconfig-language.rst | 4 ++--
->  Makefile                                  | 2 +-
->  arch/Kconfig                              | 3 ---
->  arch/arm/boot/compressed/Makefile         | 3 +--
->  arch/mips/vdso/Makefile                   | 3 +--
->  arch/powerpc/kernel/Makefile              | 2 +-
->  arch/powerpc/platforms/powermac/Makefile  | 2 +-
->  arch/sparc/vdso/Makefile                  | 4 ++--
->  arch/um/Makefile                          | 3 +--
->  arch/x86/Makefile                         | 2 +-
->  arch/x86/boot/compressed/Makefile         | 2 +-
->  arch/x86/entry/vdso/Makefile              | 4 ++--
->  arch/x86/kernel/cpu/Makefile              | 3 +--
->  arch/x86/lib/Makefile                     | 2 +-
->  arch/x86/mm/Makefile                      | 7 +++----
->  arch/x86/power/Makefile                   | 3 +--
->  arch/x86/purgatory/Makefile               | 2 +-
->  arch/x86/um/vdso/Makefile                 | 2 +-
->  arch/x86/xen/Makefile                     | 5 ++---
->  drivers/firmware/efi/libstub/Makefile     | 2 +-
->  drivers/xen/Makefile                      | 3 +--
->  kernel/kcsan/Makefile                     | 3 +--
+strsep() is neither standard C nor POSIX and used outside
+the kernel code here. Using it here requires that the
+build host supports it out of the box which is e.g.
+not true for a Darwin build host and using a cross-compiler.
+This leads to:
 
-Is it possible that this patch drops the KCSAN portion? We have a patch
-that is part of a series intended for 5.9 that also removes the
-cc-option from -fno-stack-protector, but can't easily be dropped from
-the surrounding series.
+scripts/mod/modpost.c:145:2: warning: implicit declaration of function 'strsep' [-Wimplicit-function-declaration]
+  return strsep(stringp, "\n");
+  ^
 
-Please see: https://lkml.kernel.org/r/20200624190236.GA6603@paulmck-ThinkPad-P72
+and a segfault when running MODPOST.
 
-Thanks,
--- Marco
+See also: https://stackoverflow.com/a/7219504
+
+So let's replace this by strchr() instead of using strsep().
+It does not hurt kernel size or speed since this code is run
+on the build host.
+
+Fixes: ac5100f5432967 ("modpost: add read_text_file() and get_line() helpers")
+Co-developed-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: H. Nikolaus Schaller <hns@goldelico.com>
+---
+ scripts/mod/modpost.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 6aea65c657454..45f2ab2ec2d46 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -138,11 +138,19 @@ char *read_text_file(const char *filename)
+ 
+ char *get_line(char **stringp)
+ {
++	char *orig = *stringp, *next;
++
+ 	/* do not return the unwanted extra line at EOF */
+-	if (*stringp && **stringp == '\0')
++	if (!orig || *orig == '\0')
+ 		return NULL;
+ 
+-	return strsep(stringp, "\n");
++	next = strchr(orig, '\n');
++	if (next)
++		*next++ = '\0';
++
++	*stringp = next;
++
++	return orig;
+ }
+ 
+ /* A list of all modules we processed */
+-- 
+2.26.2
