@@ -1,57 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:19989 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731586AbgGAPXQ (ORCPT
+Received: from sonic314-19.consmr.mail.gq1.yahoo.com ([98.137.69.82]:43730
+        "EHLO sonic314-19.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731638AbgGAPue (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Jul 2020 11:23:16 -0400
+        Wed, 1 Jul 2020 11:50:34 -0400
+Date: Wed, 1 Jul 2020 23:50:05 +0800
+From: Gao Xiang <hsiangkao@aol.com>
+Subject: Re: Kernel compression benchmarks
+Message-ID: <20200701153028.GA30962@hsiangkao-HP-ZHAN-66-Pro-G1>
 MIME-Version: 1.0
-References: <3f61abe3ae457bb5b61fb217394bbb9590ca17ef.1593499731.git.mchehab+huawei@kernel.org>
-In-Reply-To: <3f61abe3ae457bb5b61fb217394bbb9590ca17ef.1593499731.git.mchehab+huawei@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 2 Jul 2020 00:22:23 +0900
-Message-ID: <CAK7LNATkdfnFYGaKBr1-CFath=btDW8uudeWfq0GWE5JMX5Aog@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: qconf: parse newer types at debug info
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1588791882.08g1378g67.none@localhost>
+References: <20200701153028.GA30962.ref@hsiangkao-HP-ZHAN-66-Pro-G1>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Cc: linux-kernel@vger.kernel.org, Nick Terrell <nickrterrell@gmail.com>, Nick Terrell <terrelln@fb.com>, Norbert Lange <nolange79@gmail.com>, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Tue, Jun 30, 2020 at 3:49 PM Mauro Carvalho Chehab
-<mchehab+huawei@kernel.org> wrote:
->
-> There are 3 types that are not parsed by the debug info logic.
-> Add support for them.
->
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
+Hi Alex,
 
+(sorry... maybe my @gmx.com email is broken again...)
 
-Applied to linux-kbuild.
+On Wed, Jul 01, 2020 at 10:35:48AM -0400, Alex Xu (Hello71) wrote:
+> 
+> My conclusions:
+> 
+> - zstd is an improvement on almost all metrics.
+> - bzip2 and lzma should be removed post-haste.
 
+I'm some familar with LZ4 and LZMA (xz) internals.
 
->  scripts/kconfig/qconf.cc | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index fd721c6c4c94..4a616128a154 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -1154,6 +1154,9 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
->                 case P_DEFAULT:
->                 case P_SELECT:
->                 case P_RANGE:
-> +               case P_COMMENT:
-> +               case P_IMPLY:
-> +               case P_SYMBOL:
->                         debug += prop_get_type_name(prop->type);
->                         debug += ": ";
->                         expr_print(prop->expr, expr_print_help, &debug, E_NONE);
-> --
-> 2.26.2
->
+I'd like to add some notes from the principle perspective,
+but I'm not sure if I would join some further topic
+about this...
 
+ XZ is another form of LZMA2, which is based on LZMA.
+ It uses range coder technology. In principle, it has better
+ compession ratio with slowest speed (due to multiplication
+ by bits rather than lookup table). Instead, Zstd uses huffman
+ (which is much like deflate, aka. gzip) and FSE (If I'm not
+  wrong about Zstd)...
 
--- 
-Best Regards
-Masahiro Yamada
+ So in general (apart from the specific implementation),
+ the decompression speed vs compression ratio ralationship are
+  LZ4  -  Zstd  -  LZMA
+
+ Some arguments such as compression level have impact on
+ LZ matchfinder (yeah, except for bzip2, all algorithms
+ are LZ-based) and dictionary size. And some specific
+ compressors aren't well-optimized (e.g. zlib).
+
+ Anyway, I think LZMA (xz) is still useful and which is more
+ friendly to fixed-sized output compression than Zstd yet (But
+ yeah, I'm not familar with all ZSTD internals. I will dig
+ into that if I've more extra time).
+
+> - lzo should be removed once zstd is merged.
+> - compression level is important to consider for compression speed: the 
+>   default lz4 -1 compresses very fast but has a very poor compression 
+>   ratio. zstd -19 compresses barely better than zstd -18, but takes 
+>   significantly longer to compress.
+> - compression level should be configurable: lz4 -1 is useful, but so is 
+>   lz4 -9. zstd -1 is useful, but so is zstd -19. zstd -1 is useful for 
+>   developers who want kernel builds as fast as possible, zstd -19 for 
+>   everybody else.
+> - gzip is by far not the fastest compressor (even excluding cat)
+> - modern compressors (xz, lz4, zstd) decompress about as fast for each 
+>   compression level, only requiring more memory
+
+ lz4 has fixed sliding window (dictionary, 64k), so it won't
+ require more memory among different compression level when
+ decompressing.
+
+Thanks,
+Gao Xiang
