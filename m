@@ -1,59 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59892 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731759AbgGAP4D (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Jul 2020 11:56:03 -0400
-Message-ID: <4c23e1d782be86a965f5fbc4592f7bbd515d37bb.camel@redhat.com>
-Subject: Re: [PATCH v3.1 7/7] kconfig: qconf: navigate menus on hyperlinks
-From: Maxim Levitsky <mlevitsk@redhat.com>
-Date: Wed, 01 Jul 2020 18:55:39 +0300
-In-Reply-To: <20200701175144.501abc91@coco.lan>
-References: <cover.1593498345.git.mchehab+huawei@kernel.org>
-         <6f7162e40f127e76c7169315d33a14946a85719a.1593498345.git.mchehab+huawei@kernel.org>
-         <20200630084835.4db1331f@coco.lan>
-         <CAK7LNARjZWwKeFXMbDy76jYu21oCckz8qxkMSu7y1xmL+a3C3g@mail.gmail.com>
-         <20200701175144.501abc91@coco.lan>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.kernel.org ([198.145.29.99]:40324 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731672AbgGAQDi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 1 Jul 2020 12:03:38 -0400
+Date: Wed, 1 Jul 2020 09:03:38 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200701160338.GN9247@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200625080313.GY4817@hirez.programming.kicks-ass.net>
+ <20200625082433.GC117543@hirez.programming.kicks-ass.net>
+ <20200625085745.GD117543@hirez.programming.kicks-ass.net>
+ <20200630191931.GA884155@elver.google.com>
+ <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+ <20200630203016.GI9247@paulmck-ThinkPad-P72>
+ <CANpmjNP+7TtE0WPU=nX5zs3T2+4hPkkm08meUm2VDVY3RgsHDw@mail.gmail.com>
+ <20200701114027.GO4800@hirez.programming.kicks-ass.net>
+ <20200701140654.GL9247@paulmck-ThinkPad-P72>
+ <20200701150512.GH4817@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200701150512.GH4817@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-On Wed, 2020-07-01 at 17:51 +0200, Mauro Carvalho Chehab wrote:
-> Em Thu, 2 Jul 2020 00:21:36 +0900
-> Masahiro Yamada <masahiroy@kernel.org> escreveu:
+On Wed, Jul 01, 2020 at 05:05:12PM +0200, Peter Zijlstra wrote:
+> On Wed, Jul 01, 2020 at 07:06:54AM -0700, Paul E. McKenney wrote:
 > 
-> > On Tue, Jun 30, 2020 at 3:48 PM Mauro Carvalho Chehab
-> > <mchehab+huawei@kernel.org> wrote:
-> > > Instead of just changing the helper window to show a
-> > > dependency, also navigate to it at the config and menu
-> > > widgets.
-> > > 
-> > > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> > > 
-> > > 
-> > > ---
-> > > 
-> > > I ended re-sending the same version as on patch series 2.  
-> > 
-> > Do you mean this one should substitute 7/7 in v3, right?
+> > The current state in the C++ committee is that marking variables
+> > carrying dependencies is the way forward.  This is of course not what
+> > the Linux kernel community does, but it should not be hard to have a
+> > -fall-variables-dependent or some such that causes all variables to be
+> > treated as if they were marked.  Though I was hoping for only pointers.
+> > Are they -sure- that they -absolutely- need to carry dependencies
+> > through integers???
 > 
-> Yes.
-> 
-> > Applied to linux-kbuild.
-> 
-> Thank you!
-> 
-> Mauro
-> 
+> What's 'need'? :-)
 
-I tested these series yestarday, but found a but which I haven't yet had time to debug.
-Now when I click on a item that goes to a submenu in the right panel, the app
-segfaults. I'll debug this soon.
+Turning off all dependency-killing optimizations on all pointers is
+likely a non-event.  Turning off all dependency-killing optimizations
+on all integers is not the road to happiness.
 
+So whatever "need" might be, it would need to be rather earthshaking.  ;-)
+It is probably not -that- hard to convert to pointers, even if they
+are indexing multiple arrays.
 
-Best regards,
-	Maxim evitsky
+> I'm thinking __ktime_get_fast_ns() is better off with a dependent load
+> than it is with an extra smp_rmb().
+> 
+> Yes we can stick an smp_rmb() in there, but I don't like it. Like I
+> wrote earlier, if I wanted a control dependency, I'd have written one.
+
+No argument here.
+
+But it looks like we are going to have to tell the compiler.
+
+							Thanx, Paul
