@@ -1,59 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:52846 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727927AbgGBSAn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Jul 2020 14:00:43 -0400
-Date: Thu, 2 Jul 2020 11:00:42 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200702180042.GW9247@paulmck-ThinkPad-P72>
-Reply-To: paulmck@kernel.org
-References: <20200625080313.GY4817@hirez.programming.kicks-ass.net>
- <20200625082433.GC117543@hirez.programming.kicks-ass.net>
- <20200625085745.GD117543@hirez.programming.kicks-ass.net>
- <20200630191931.GA884155@elver.google.com>
- <20200630201243.GD4817@hirez.programming.kicks-ass.net>
- <20200630203016.GI9247@paulmck-ThinkPad-P72>
- <20200701091054.GW4781@hirez.programming.kicks-ass.net>
- <4427b0f825324da4b1640e32265b04bd@AcuMS.aculab.com>
- <20200701160624.GO9247@paulmck-ThinkPad-P72>
- <aeed740a4d86470d84ae7d5f1cf07951@AcuMS.aculab.com>
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:55243 "EHLO
+        out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725915AbgGBXjf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Jul 2020 19:39:35 -0400
+From: Danny Lin <danny@kdrag0n.dev>
+Subject: [PATCH] kbuild: Allow Clang global merging if !MODULES
+Date: Thu,  2 Jul 2020 16:39:29 -0700
+Message-Id: <20200702233929.181409-1-danny@kdrag0n.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeed740a4d86470d84ae7d5f1cf07951@AcuMS.aculab.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: 'Peter Zijlstra' <peterz@infradead.org>, Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
+Cc: Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Danny Lin <danny@kdrag0n.dev>
 
-On Thu, Jul 02, 2020 at 09:37:26AM +0000, David Laight wrote:
-> From: Paul E. McKenney
-> > Sent: 01 July 2020 17:06
-> ...
-> > > Would an asm statement that uses the same 'register' for input and
-> > > output but doesn't actually do anything help?
-> > > It won't generate any code, but the compiler ought to assume that
-> > > it might change the value - so can't do optimisations that track
-> > > the value across the call.
-> > 
-> > It might replace the volatile load, but there are optimizations that
-> > apply to the downstream code as well.
-> > 
-> > Or are you suggesting periodically pushing the dependent variable
-> > through this asm?  That might work, but it would be easier and
-> > more maintainable to just mark the variable.
-> 
-> Marking the variable requires compiler support.
-> Although what 'volatile register int foo;' means might be interesting.
-> 
-> So I was thinking that in the case mentioned earlier you do:
-> 	ptr += LAUNDER(offset & 1);
-> to ensure the compiler didn't convert to:
-> 	if (offset & 1) ptr++;
-> (Which is probably a pessimisation - the reverse is likely better.)
+The old reasoning for disabling Clang's global merging optimization is
+that it breaks modpost by coalescing many symbols into _MergedGlobals.
+However, modpost is only used in builds with dynamic modules;
+vmlinux.symvers is still created during standalone builds, but it's
+effectively just an empty dummy file.
 
-Indeed, Akshat's prototype follows the "volatile" qualifier in many
-ways.  https://github.com/AKG001/gcc/
+Enabling the optimization whenever possible allows us to reap the
+benefits of reduced register pressure when many global variables are
+used in the same function.
 
-							Thanx, Paul
+An x86 defconfig kernel built with this optimization boots fine in qemu,
+and a downstream 4.14 kernel has been used on arm64 for nearly a year
+without any issues caused by this optimization.
+
+Signed-off-by: Danny Lin <danny@kdrag0n.dev>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index a60c98519c37..f04c3639cf61 100644
+--- a/Makefile
++++ b/Makefile
+@@ -772,10 +772,13 @@ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+ KBUILD_CFLAGS += -Wno-format-invalid-specifier
+ KBUILD_CFLAGS += -Wno-gnu
++
++ifdef CONFIG_MODULES
+ # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+ # See modpost pattern 2
+ KBUILD_CFLAGS += -mno-global-merge
++endif
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.27.0
