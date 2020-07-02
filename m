@@ -1,37 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726117AbgGBPSs (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:18:48 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07729C08C5C1
-        for <linux-kbuild@vger.kernel.org>; Thu,  2 Jul 2020 08:18:48 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id j19so6752075pgm.11
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Jul 2020 08:18:48 -0700 (PDT)
-Date: Thu, 2 Jul 2020 08:18:45 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: Kernel compression benchmarks
-Message-ID: <202007020818.87EA89106@keescook>
-References: <1588791882.08g1378g67.none.ref@localhost>
- <1588791882.08g1378g67.none@localhost>
+Received: from mail.kernel.org ([198.145.29.99]:52286 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726349AbgGBR7t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Jul 2020 13:59:49 -0400
+Date: Thu, 2 Jul 2020 10:59:48 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200702175948.GV9247@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200625085745.GD117543@hirez.programming.kicks-ass.net>
+ <20200630191931.GA884155@elver.google.com>
+ <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+ <20200630203016.GI9247@paulmck-ThinkPad-P72>
+ <CANpmjNP+7TtE0WPU=nX5zs3T2+4hPkkm08meUm2VDVY3RgsHDw@mail.gmail.com>
+ <20200701114027.GO4800@hirez.programming.kicks-ass.net>
+ <20200701140654.GL9247@paulmck-ThinkPad-P72>
+ <20200701150512.GH4817@hirez.programming.kicks-ass.net>
+ <20200701160338.GN9247@paulmck-ThinkPad-P72>
+ <20200702082040.GB4781@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1588791882.08g1378g67.none@localhost>
+In-Reply-To: <20200702082040.GB4781@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Cc: linux-kernel@vger.kernel.org, Nick Terrell <nickrterrell@gmail.com>, Nick Terrell <terrelln@fb.com>, Norbert Lange <nolange79@gmail.com>, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-On Wed, Jul 01, 2020 at 10:35:48AM -0400, Alex Xu (Hello71) wrote:
-> ZSTD compression patches have been sent in a number of times over the 
-> past few years. Every time, someone asks for benchmarks. Every time, 
-> someone is concerned about compression time. Sometimes, someone provides 
-> benchmarks.
+On Thu, Jul 02, 2020 at 10:20:40AM +0200, Peter Zijlstra wrote:
+> On Wed, Jul 01, 2020 at 09:03:38AM -0700, Paul E. McKenney wrote:
+> 
+> > But it looks like we are going to have to tell the compiler.
+> 
+> What does the current proposal look like? I can certainly annotate the
+> seqcount latch users, but who knows what other code is out there....
 
-Where's the latest series for this, btw? I thought it had landed. :P It
-seemed like it was done.
+For pointers, yes, within the Linux kernel it is hopeless, thus the
+thought of a -fall-dependent-ptr or some such that makes the compiler
+pretend that each and every pointer is marked with the _Dependent_ptr
+qualifier.
 
--- 
-Kees Cook
+New non-Linux-kernel code might want to use his qualifier explicitly,
+perhaps something like the following:
+
+	_Dependent_ptr struct foo *p;  // Or maybe after the "*"?
+
+	rcu_read_lock();
+	p = rcu_dereference(gp);
+	// And so on...
+
+If a function is to take a dependent pointer as a function argument,
+then the corresponding parameter need the _Dependent_ptr marking.
+Ditto for return values.
+
+The proposal did not cover integers due to concerns about the number of
+optimization passes that would need to be reviewed to make that work.
+Nevertheless, using a marked integer would be safer than using an unmarked
+one, and if the review can be carried out, why not?  Maybe something
+like this:
+
+	_Dependent_ptr int idx;
+
+	rcu_read_lock();
+	idx = READ_ONCE(gidx);
+	d = rcuarray[idx];
+	rcu_read_unlock();
+	do_something_with(d);
+
+So use of this qualifier is quite reasonable.
+
+The prototype for GCC is here: https://github.com/AKG001/gcc/
+
+							Thanx, Paul
