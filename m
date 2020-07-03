@@ -1,15 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59686 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725984AbgGCNNj (ORCPT
+        with ESMTP id S1726022AbgGCNZe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Jul 2020 09:13:39 -0400
-Date: Fri, 3 Jul 2020 15:13:30 +0200
+        Fri, 3 Jul 2020 09:25:34 -0400
+Date: Fri, 3 Jul 2020 15:25:23 +0200
 From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200703131330.GX4800@hirez.programming.kicks-ass.net>
-References: <20200630191931.GA884155@elver.google.com>
- <20200630201243.GD4817@hirez.programming.kicks-ass.net>
+Message-ID: <20200703132523.GM117543@hirez.programming.kicks-ass.net>
+References: <20200630201243.GD4817@hirez.programming.kicks-ass.net>
  <20200630203016.GI9247@paulmck-ThinkPad-P72>
  <CANpmjNP+7TtE0WPU=nX5zs3T2+4hPkkm08meUm2VDVY3RgsHDw@mail.gmail.com>
  <20200701114027.GO4800@hirez.programming.kicks-ass.net>
@@ -18,74 +17,28 @@ References: <20200630191931.GA884155@elver.google.com>
  <20200701160338.GN9247@paulmck-ThinkPad-P72>
  <20200702082040.GB4781@hirez.programming.kicks-ass.net>
  <20200702175948.GV9247@paulmck-ThinkPad-P72>
+ <20200703131330.GX4800@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200702175948.GV9247@paulmck-ThinkPad-P72>
+In-Reply-To: <20200703131330.GX4800@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Paul E. McKenney" <paulmck@kernel.org>
 Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-On Thu, Jul 02, 2020 at 10:59:48AM -0700, Paul E. McKenney wrote:
-> On Thu, Jul 02, 2020 at 10:20:40AM +0200, Peter Zijlstra wrote:
-> > On Wed, Jul 01, 2020 at 09:03:38AM -0700, Paul E. McKenney wrote:
-> > 
-> > > But it looks like we are going to have to tell the compiler.
-> > 
-> > What does the current proposal look like? I can certainly annotate the
-> > seqcount latch users, but who knows what other code is out there....
+On Fri, Jul 03, 2020 at 03:13:30PM +0200, Peter Zijlstra wrote:
+> > The prototype for GCC is here: https://github.com/AKG001/gcc/
 > 
-> For pointers, yes, within the Linux kernel it is hopeless, thus the
-> thought of a -fall-dependent-ptr or some such that makes the compiler
-> pretend that each and every pointer is marked with the _Dependent_ptr
-> qualifier.
+> Thanks! Those test cases are somewhat over qualified though:
 > 
-> New non-Linux-kernel code might want to use his qualifier explicitly,
-> perhaps something like the following:
-> 
-> 	_Dependent_ptr struct foo *p;  // Or maybe after the "*"?
+>        static volatile _Atomic (TYPE) * _Dependent_ptr a;     		\
 
-After, as you've written it, it's a pointer to a '_Dependent struct
-foo'.
+One question though; since its a qualifier, and we've recently spend a
+whole lot of effort to strip qualifiers in say READ_ONCE(), how does,
+and how do we want, this qualifier to behave.
 
-> 
-> 	rcu_read_lock();
-> 	p = rcu_dereference(gp);
-> 	// And so on...
-> 
-> If a function is to take a dependent pointer as a function argument,
-> then the corresponding parameter need the _Dependent_ptr marking.
-> Ditto for return values.
-> 
-> The proposal did not cover integers due to concerns about the number of
-> optimization passes that would need to be reviewed to make that work.
-> Nevertheless, using a marked integer would be safer than using an unmarked
-> one, and if the review can be carried out, why not?  Maybe something
-> like this:
-> 
-> 	_Dependent_ptr int idx;
-> 
-> 	rcu_read_lock();
-> 	idx = READ_ONCE(gidx);
-> 	d = rcuarray[idx];
-> 	rcu_read_unlock();
-> 	do_something_with(d);
-> 
-> So use of this qualifier is quite reasonable.
-
-The above usage might warrant a rename of the qualifier though, since
-clearly there isn't anything ptr around.
-
-> The prototype for GCC is here: https://github.com/AKG001/gcc/
-
-Thanks! Those test cases are somewhat over qualified though:
-
-       static volatile _Atomic (TYPE) * _Dependent_ptr a;     		\
-
-Also, if C goes and specifies load dependencies, in any form, is then
-not the corrolary that they need to specify control dependencies? How
-else can they exclude the transformation.
-
-And of course, once we're there, can we get explicit support for control
-dependencies too? :-) :-)
+C++ has very convenient means of manipulating qualifiers, so it's not
+much of a problem there, but for C it is, as we've found, really quite
+cumbersome. Even with _Generic() we can't manipulate individual
+qualifiers afaict.
