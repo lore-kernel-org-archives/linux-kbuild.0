@@ -1,56 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:55243 "EHLO
-        out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725915AbgGBXjf (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42146 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725648AbgGCIPc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Jul 2020 19:39:35 -0400
-From: Danny Lin <danny@kdrag0n.dev>
-Subject: [PATCH] kbuild: Allow Clang global merging if !MODULES
-Date: Thu,  2 Jul 2020 16:39:29 -0700
-Message-Id: <20200702233929.181409-1-danny@kdrag0n.dev>
+        Fri, 3 Jul 2020 04:15:32 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1588791882.08g1378g67.none.ref@localhost> <1588791882.08g1378g67.none@localhost>
+ <202007020818.87EA89106@keescook>
+In-Reply-To: <202007020818.87EA89106@keescook>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Fri, 3 Jul 2020 10:15:20 +0200
+Message-ID: <CA+icZUUBAzBNwqThSF=YS1zg9EVCuSZ-XDc5Pu3NrO6R3Fi2Zw@mail.gmail.com>
+Subject: Re: Kernel compression benchmarks
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>
-Cc: Nathan Chancellor <natechancellor@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Kees Cook <keescook@chromium.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com, Danny Lin <danny@kdrag0n.dev>
+To: Kees Cook <keescook@chromium.org>
+Cc: "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>, linux-kernel@vger.kernel.org, Nick Terrell <nickrterrell@gmail.com>, Nick Terrell <terrelln@fb.com>, Norbert Lange <nolange79@gmail.com>, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>
 
-The old reasoning for disabling Clang's global merging optimization is
-that it breaks modpost by coalescing many symbols into _MergedGlobals.
-However, modpost is only used in builds with dynamic modules;
-vmlinux.symvers is still created during standalone builds, but it's
-effectively just an empty dummy file.
+On Thu, Jul 2, 2020 at 5:18 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Wed, Jul 01, 2020 at 10:35:48AM -0400, Alex Xu (Hello71) wrote:
+> > ZSTD compression patches have been sent in a number of times over the
+> > past few years. Every time, someone asks for benchmarks. Every time,
+> > someone is concerned about compression time. Sometimes, someone provides
+> > benchmarks.
+>
+> Where's the latest series for this, btw? I thought it had landed. :P It
+> seemed like it was done.
+>
 
-Enabling the optimization whenever possible allows us to reap the
-benefits of reduced register pressure when many global variables are
-used in the same function.
+Hi,
 
-An x86 defconfig kernel built with this optimization boots fine in qemu,
-and a downstream 4.14 kernel has been used on arm64 for nearly a year
-without any issues caused by this optimization.
+Again, I would like to see this upstream, too.
 
-Signed-off-by: Danny Lin <danny@kdrag0n.dev>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+Last I asked for a rebase against Linux v5.8-rc1 or later.
 
-diff --git a/Makefile b/Makefile
-index a60c98519c37..f04c3639cf61 100644
---- a/Makefile
-+++ b/Makefile
-@@ -772,10 +772,13 @@ ifdef CONFIG_CC_IS_CLANG
- KBUILD_CPPFLAGS += -Qunused-arguments
- KBUILD_CFLAGS += -Wno-format-invalid-specifier
- KBUILD_CFLAGS += -Wno-gnu
-+
-+ifdef CONFIG_MODULES
- # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
- # source of a reference will be _MergedGlobals and not on of the whitelisted names.
- # See modpost pattern 2
- KBUILD_CFLAGS += -mno-global-merge
-+endif
- else
- 
- # These warnings generated too much noise in a regular build.
--- 
-2.27.0
+Beyond above adaptations, the latest series "zstd-v5" of Nick T.s
+patchset needs some addition of zstd to the patch (see [1]):
+
+commit 8dfb61dcbaceb19a5ded5e9c9dcf8d05acc32294
+"kbuild: add variables for compression tools"
+
+NOTE:
+"zstd-v5" was against Linux-next 20200408 or download the series from
+patchwork LKML which applies cleanly against Linux v5.7 - last is what
+I did.
+
+There was a follow-up to the above patch (see [2]):
+
+commit e4a42c82e943b97ce124539fcd7a47445b43fa0d
+"kbuild: fix broken builds because of GZIP,BZIP2,LZOP variables"
+
+Nevertheless, this is the kernel-side of doing - user-space like for
+example Debian's initramfs-tools needs adaptations (see [3]).
+
+@Kees: Can you aid Nick T. to get this upstream? You know the
+processes a bit better than me.
+
+Regards,
+- Sedat -
+
+[0] https://github.com/terrelln/linux/tree/zstd-v5
+[0] https://lore.kernel.org/patchwork/project/lkml/list/?series=437934
+[1] https://git.kernel.org/linus/8dfb61dcbaceb19a5ded5e9c9dcf8d05acc32294
+[2] https://git.kernel.org/linus/e4a42c82e943b97ce124539fcd7a47445b43fa0d
+[2] https://bugs.debian.org/955469
