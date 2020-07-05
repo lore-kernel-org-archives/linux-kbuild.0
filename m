@@ -1,83 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:36677 "EHLO
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:59550 "EHLO
         conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726826AbgGEPOO (ORCPT
+        with ESMTP id S1726877AbgGEPaO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Jul 2020 11:14:14 -0400
+        Sun, 5 Jul 2020 11:30:14 -0400
 MIME-Version: 1.0
+References: <20200629085911.1676554-1-masahiroy@kernel.org>
+ <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
+ <CAK7LNAR49jFZkEmBqpACE0V_-VyCXfFRcKe1Zq+cqO65QX1ozg@mail.gmail.com> <CANiq72nE+1F3yM+e9XzfphzOe3mb9DUcRCAtPuLMyFE4Rh38pg@mail.gmail.com>
+In-Reply-To: <CANiq72nE+1F3yM+e9XzfphzOe3mb9DUcRCAtPuLMyFE4Rh38pg@mail.gmail.com>
 From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 6 Jul 2020 00:13:09 +0900
-Message-ID: <CAK7LNAQEMNSM2PRaTwPoX+2hn3FpU2=kQEyJdFjH2xkz+eq5gg@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.8-rc4
+Date: Mon, 6 Jul 2020 00:29:16 +0900
+Message-ID: <CAK7LNATRAuEXp+Wz7f_VUTSFS4jqmdTE4Xugi1MZozimsj6zuA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: make Clang build userprogs for target architecture
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, clang-built-linux <clang-built-linux@googlegroups.com>
 
-Hi Linus,
+On Wed, Jul 1, 2020 at 4:13 AM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Tue, Jun 30, 2020 at 6:26 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > I can reproduce this in the following
+> > simple test code:
+> >
+> >
+> > ----------------->8----------------
+> > #include <stdio.h>
+> >
+> > int main(void)
+> > {
+> >         ssize_t x = 1;
+> >
+> >         printf("%zd", x);
+> >
+> >         return 0;
+> > }
+> > --------------->8-------------------
+>
+> That is the old implicit int rule. Try including sys/types.h or
+> compiling with a standard like -std=c99 for instance.
+>
+> Cheers,
+> Miguel
 
-Please pull some more Kbuild fixes.
-Thanks.
-
-
-
-The following changes since commit 48778464bb7d346b47157d21ffde2af6b2d39110:
-
-  Linux 5.8-rc2 (2020-06-21 15:45:29 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.8-2
-
-for you to fetch changes up to ba77dca584f5abf30340672bc752fe7912731af5:
-
-  .gitignore: Do not track `defconfig` from `make savedefconfig`
-(2020-07-05 16:15:46 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.8 (2nd)
-
- - fix various bugs in xconfig
-
- - fix some issues in cross-compilation using Clang
-
- - fix documentation
-
-----------------------------------------------------------------
-Dov Murik (1):
-      docs: kbuild: fix ReST formatting
-
-Masahiro Yamada (3):
-      gcc-plugins: fix gcc-plugins directory path in documentation
-      kbuild: fix CONFIG_CC_CAN_LINK(_STATIC) for cross-compilation with Clang
-      kbuild: make Clang build userprogs for target architecture
-
-Mauro Carvalho Chehab (8):
-      kconfig: qconf: cleanup includes
-      kconfig: qconf: make search fully work again on split mode
-      kconfig: qconf: make debug links work again
-      kconfig: qconf: re-implement setSelected()
-      kconfig: qconf: simplify the goBack() logic
-      kconfig: qconf: don't show goback button on splitMode
-      kconfig: qconf: navigate menus on hyperlinks
-      kconfig: qconf: parse newer types at debug info
-
-Paul Menzel (1):
-      .gitignore: Do not track `defconfig` from `make savedefconfig`
-
- .gitignore                                   |   3 +
- Documentation/kbuild/modules.rst             |   7 +-
- Documentation/kbuild/reproducible-builds.rst |   2 +-
- Makefile                                     |   4 +-
- init/Kconfig                                 |   8 +-
- scripts/gcc-plugins/Kconfig                  |   2 +-
- scripts/kconfig/qconf.cc                     | 173 ++++++++++++++++-----------
- scripts/kconfig/qconf.h                      |  23 ++--
- 8 files changed, 136 insertions(+), 86 deletions(-)
+Hmm, adding '#include <sys/types.h>' did not make any difference.
 
 
--- 
+
+
+If I add -std=c99, I get a different error.
+
+
+$ clang -std=c99 --target=aarch64-linux-gnu test.c
+test.c:5:10: error: unknown type name 'ssize_t'; did you mean 'size_t'?
+         ssize_t x = 1;
+         ^~~~~~~
+         size_t
+/home/masahiro/tools/clang-latest/lib/clang/11.0.0/include/stddef.h:46:23:
+note: 'size_t' declared here
+typedef __SIZE_TYPE__ size_t;
+                      ^
+1 error generated.
+
+
+
+
+
+In contrast, 'size_t' has no problem.
+
+
+----------------->8----------------
+#include <stdio.h>
+
+int main(void)
+{
+         size_t x = 1;
+
+         printf("%zu", x);
+
+         return 0;
+}
+--------------->8-------------------
+
+$ clang  --target=aarch64-linux-gnu test.c
+[ No warning ]
+
+
+
+
+--
 Best Regards
 Masahiro Yamada
