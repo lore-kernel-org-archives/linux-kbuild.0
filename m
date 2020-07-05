@@ -1,97 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:59550 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726877AbgGEPaO (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Jul 2020 11:30:14 -0400
-MIME-Version: 1.0
-References: <20200629085911.1676554-1-masahiroy@kernel.org>
- <CAKwvOd=qe5KE1vdUYQmpsW2zmDbk5i-MgRujs9B7wqnAj+af0w@mail.gmail.com>
- <CAK7LNAR49jFZkEmBqpACE0V_-VyCXfFRcKe1Zq+cqO65QX1ozg@mail.gmail.com> <CANiq72nE+1F3yM+e9XzfphzOe3mb9DUcRCAtPuLMyFE4Rh38pg@mail.gmail.com>
-In-Reply-To: <CANiq72nE+1F3yM+e9XzfphzOe3mb9DUcRCAtPuLMyFE4Rh38pg@mail.gmail.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Mon, 6 Jul 2020 00:29:16 +0900
-Message-ID: <CAK7LNATRAuEXp+Wz7f_VUTSFS4jqmdTE4Xugi1MZozimsj6zuA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: make Clang build userprogs for target architecture
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.kernel.org ([198.145.29.99]:43992 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727891AbgGETzG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 5 Jul 2020 15:55:06 -0400
+Subject: Re: [GIT PULL] Kbuild fixes for v5.8-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNAQEMNSM2PRaTwPoX+2hn3FpU2=kQEyJdFjH2xkz+eq5gg@mail.gmail.com>
+References: <CAK7LNAQEMNSM2PRaTwPoX+2hn3FpU2=kQEyJdFjH2xkz+eq5gg@mail.gmail.com>
+Message-Id: <159397890594.7489.740680151892513260.pr-tracker-bot@kernel.org>
+Date: Sun, 05 Jul 2020 19:55:05 +0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <michal.lkml@markovi.net>, Sam Ravnborg <sam@ravnborg.org>, clang-built-linux <clang-built-linux@googlegroups.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Wed, Jul 1, 2020 at 4:13 AM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Tue, Jun 30, 2020 at 6:26 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > I can reproduce this in the following
-> > simple test code:
-> >
-> >
-> > ----------------->8----------------
-> > #include <stdio.h>
-> >
-> > int main(void)
-> > {
-> >         ssize_t x = 1;
-> >
-> >         printf("%zd", x);
-> >
-> >         return 0;
-> > }
-> > --------------->8-------------------
->
-> That is the old implicit int rule. Try including sys/types.h or
-> compiling with a standard like -std=c99 for instance.
->
-> Cheers,
-> Miguel
+The pull request you sent on Mon, 6 Jul 2020 00:13:09 +0900:
 
-Hmm, adding '#include <sys/types.h>' did not make any difference.
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.8-2
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4bc927367db11d8c5b1e20d05729f1ee748791b9
 
+Thank you!
 
-
-If I add -std=c99, I get a different error.
-
-
-$ clang -std=c99 --target=aarch64-linux-gnu test.c
-test.c:5:10: error: unknown type name 'ssize_t'; did you mean 'size_t'?
-         ssize_t x = 1;
-         ^~~~~~~
-         size_t
-/home/masahiro/tools/clang-latest/lib/clang/11.0.0/include/stddef.h:46:23:
-note: 'size_t' declared here
-typedef __SIZE_TYPE__ size_t;
-                      ^
-1 error generated.
-
-
-
-
-
-In contrast, 'size_t' has no problem.
-
-
------------------>8----------------
-#include <stdio.h>
-
-int main(void)
-{
-         size_t x = 1;
-
-         printf("%zu", x);
-
-         return 0;
-}
---------------->8-------------------
-
-$ clang  --target=aarch64-linux-gnu test.c
-[ No warning ]
-
-
-
-
---
-Best Regards
-Masahiro Yamada
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
