@@ -1,69 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:22002 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729121AbgGFPGA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Jul 2020 11:06:00 -0400
-From: Nick Terrell <terrelln@fb.com>
-Subject: Re: Kernel compression benchmarks
-Date: Mon, 6 Jul 2020 15:05:41 +0000
-Message-ID: <C3E7DA59-BDC7-4B81-B2B1-58BD9E865840@fb.com>
-References: <1588791882.08g1378g67.none.ref@localhost>
- <1588791882.08g1378g67.none@localhost> <202007020818.87EA89106@keescook>
- <CA+icZUUBAzBNwqThSF=YS1zg9EVCuSZ-XDc5Pu3NrO6R3Fi2Zw@mail.gmail.com>
- <202007030855.ED7AABDF@keescook>
-In-Reply-To: <202007030855.ED7AABDF@keescook>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <560B3F278B024642A9978184FABB4CB7@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail.kernel.org ([198.145.29.99]:59546 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729358AbgGFQ0e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Jul 2020 12:26:34 -0400
+Date: Mon, 6 Jul 2020 09:26:33 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200706162633.GA13288@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200630203016.GI9247@paulmck-ThinkPad-P72>
+ <CANpmjNP+7TtE0WPU=nX5zs3T2+4hPkkm08meUm2VDVY3RgsHDw@mail.gmail.com>
+ <20200701114027.GO4800@hirez.programming.kicks-ass.net>
+ <20200701140654.GL9247@paulmck-ThinkPad-P72>
+ <20200701150512.GH4817@hirez.programming.kicks-ass.net>
+ <20200701160338.GN9247@paulmck-ThinkPad-P72>
+ <20200702082040.GB4781@hirez.programming.kicks-ass.net>
+ <20200702175948.GV9247@paulmck-ThinkPad-P72>
+ <20200703131330.GX4800@hirez.programming.kicks-ass.net>
+ <20200703144228.GF9247@paulmck-ThinkPad-P72>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200703144228.GF9247@paulmck-ThinkPad-P72>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Nick Terrell <nickrterrell@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>, "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Norbert Lange <nolange79@gmail.com>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Marco Elver <elver@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
 
-DQoNCj4gT24gSnVsIDMsIDIwMjAsIGF0IDEyOjA2IFBNLCBLZWVzIENvb2sgPGtlZXNjb29rQGNo
-cm9taXVtLm9yZz4gd3JvdGU6DQo+IA0KPiBPbiBGcmksIEp1bCAwMywgMjAyMCBhdCAxMDoxNToy
-MEFNICswMjAwLCBTZWRhdCBEaWxlayB3cm90ZToNCj4+IE9uIFRodSwgSnVsIDIsIDIwMjAgYXQg
-NToxOCBQTSBLZWVzIENvb2sgPGtlZXNjb29rQGNocm9taXVtLm9yZz4gd3JvdGU6DQo+Pj4gDQo+
-Pj4gT24gV2VkLCBKdWwgMDEsIDIwMjAgYXQgMTA6MzU6NDhBTSAtMDQwMCwgQWxleCBYdSAoSGVs
-bG83MSkgd3JvdGU6DQo+Pj4+IFpTVEQgY29tcHJlc3Npb24gcGF0Y2hlcyBoYXZlIGJlZW4gc2Vu
-dCBpbiBhIG51bWJlciBvZiB0aW1lcyBvdmVyIHRoZQ0KPj4+PiBwYXN0IGZldyB5ZWFycy4gRXZl
-cnkgdGltZSwgc29tZW9uZSBhc2tzIGZvciBiZW5jaG1hcmtzLiBFdmVyeSB0aW1lLA0KPj4+PiBz
-b21lb25lIGlzIGNvbmNlcm5lZCBhYm91dCBjb21wcmVzc2lvbiB0aW1lLiBTb21ldGltZXMsIHNv
-bWVvbmUgcHJvdmlkZXMNCj4+Pj4gYmVuY2htYXJrcy4NCj4+PiANCj4+PiBXaGVyZSdzIHRoZSBs
-YXRlc3Qgc2VyaWVzIGZvciB0aGlzLCBidHc/IEkgdGhvdWdodCBpdCBoYWQgbGFuZGVkLiA6UCBJ
-dA0KPj4+IHNlZW1lZCBsaWtlIGl0IHdhcyBkb25lLg0KPj4+IA0KPj4gDQo+PiBIaSwNCj4+IA0K
-Pj4gQWdhaW4sIEkgd291bGQgbGlrZSB0byBzZWUgdGhpcyB1cHN0cmVhbSwgdG9vLg0KPj4gDQo+
-PiBMYXN0IEkgYXNrZWQgZm9yIGEgcmViYXNlIGFnYWluc3QgTGludXggdjUuOC1yYzEgb3IgbGF0
-ZXIuDQo+PiANCj4+IEJleW9uZCBhYm92ZSBhZGFwdGF0aW9ucywgdGhlIGxhdGVzdCBzZXJpZXMg
-InpzdGQtdjUiIG9mIE5pY2sgVC5zDQo+PiBwYXRjaHNldCBuZWVkcyBzb21lIGFkZGl0aW9uIG9m
-IHpzdGQgdG8gdGhlIHBhdGNoIChzZWUgWzFdKToNCj4+IA0KPj4gY29tbWl0IDhkZmI2MWRjYmFj
-ZWIxOWE1ZGVkNWU5YzlkY2Y4ZDA1YWNjMzIyOTQNCj4+ICJrYnVpbGQ6IGFkZCB2YXJpYWJsZXMg
-Zm9yIGNvbXByZXNzaW9uIHRvb2xzIg0KPj4gDQo+PiBOT1RFOg0KPj4gInpzdGQtdjUiIHdhcyBh
-Z2FpbnN0IExpbnV4LW5leHQgMjAyMDA0MDggb3IgZG93bmxvYWQgdGhlIHNlcmllcyBmcm9tDQo+
-PiBwYXRjaHdvcmsgTEtNTCB3aGljaCBhcHBsaWVzIGNsZWFubHkgYWdhaW5zdCBMaW51eCB2NS43
-IC0gbGFzdCBpcyB3aGF0DQo+PiBJIGRpZC4NCj4+IA0KPj4gVGhlcmUgd2FzIGEgZm9sbG93LXVw
-IHRvIHRoZSBhYm92ZSBwYXRjaCAoc2VlIFsyXSk6DQo+PiANCj4+IGNvbW1pdCBlNGE0MmM4MmU5
-NDNiOTdjZTEyNDUzOWZjZDdhNDc0NDViNDNmYTBkDQo+PiAia2J1aWxkOiBmaXggYnJva2VuIGJ1
-aWxkcyBiZWNhdXNlIG9mIEdaSVAsQlpJUDIsTFpPUCB2YXJpYWJsZXMiDQo+IA0KPiBPa2F5LCBj
-b29sLiBZZXMsIG5vdyBpcyB0aGUgcmlnaHQgdGltZSB0byBzZW5kIGFuIHVwZGF0ZWQgc2VyaWVz
-IGJhc2VkDQo+IG9uIHY1LjgtcmMyIHdpdGggYW55IG91dHN0YW5kaW5nIGFkanVzdGVkL2ZpeGVz
-IG1hZGUuDQo+IA0KPiBJdCBzZWVtcyB2NSBpcyBoZXJlPw0KPiBodHRwczovL2xvcmUua2VybmVs
-Lm9yZy9sa21sLzIwMjAwNDA4MjE1NzExLjEzNzYzOS0xLW5pY2tydGVycmVsbEBnbWFpbC5jb20v
-DQo+IA0KPiBUaGF0IHdhc24ndCBzZW50ICJ0byIgYSBtYWludGFpbmVyLCBzbyBpdCBsaWtlbHkg
-d2VudCB1bm5vdGljZWQgYnkgZWl0aGVyDQo+IGFrcG0gb3IgdGhlIHg4NiBtYWludGFpbmVycy4g
-SSB0aGluayB0aGlzIHNob3VsZCBsaWtlbHkgZ28gdmlhIHRoZSB4ODYNCj4gdHJlZS4NCj4gDQo+
-PiBOZXZlcnRoZWxlc3MsIHRoaXMgaXMgdGhlIGtlcm5lbC1zaWRlIG9mIGRvaW5nIC0gdXNlci1z
-cGFjZSBsaWtlIGZvcg0KPj4gZXhhbXBsZSBEZWJpYW4ncyBpbml0cmFtZnMtdG9vbHMgbmVlZHMg
-YWRhcHRhdGlvbnMgKHNlZSBbM10pLg0KPiANCj4gUmlnaHQsIGJ1dCB0aGUga2VybmVsIG5lZWRz
-IHRvIGltcGxlbWVudCB0aGUgc3VwcG9ydCBmaXJzdC4gOikNCj4gDQo+PiBAS2VlczogQ2FuIHlv
-dSBhaWQgTmljayBULiB0byBnZXQgdGhpcyB1cHN0cmVhbT8gWW91IGtub3cgdGhlDQo+PiBwcm9j
-ZXNzZXMgYSBiaXQgYmV0dGVyIHRoYW4gbWUuDQo+IA0KPiBTdXJlOyBOaWNrLCBjYW4geW91IHBs
-ZWFzZSByZWJhc2UgYW5kIGhhbmRsZSBhbnkgaXNzdWVzIGZyb20gdjU/IFdpdGgNCj4gdGhlIHJl
-c3VsdCwgc2VuZCBhIHY2IGFzIHlvdSBkaWQgZm9yIHY1IGJlZm9yZSwgYnV0IEkgd291bGQgbWFr
-ZSB5b3VyDQo+ICJ0byIgYmU6DQo+IA0KPiBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT4N
-Cj4gVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+DQo+IA0KPiBhbmQga2VlcCB0
-aGUgQ0MgYXMgeW91IGhhZCBpdC4NCg0KSeKAmWxsIHNlbmQgaXQgb3V0IHRvZGF5LCB0aGFua3Mg
-Zm9yIHRoZSBhZHZpY2UhDQoNCi1OaWNrDQoNCg==
+On Fri, Jul 03, 2020 at 07:42:28AM -0700, Paul E. McKenney wrote:
+> On Fri, Jul 03, 2020 at 03:13:30PM +0200, Peter Zijlstra wrote:
+> > On Thu, Jul 02, 2020 at 10:59:48AM -0700, Paul E. McKenney wrote:
+> > > On Thu, Jul 02, 2020 at 10:20:40AM +0200, Peter Zijlstra wrote:
+> > > > On Wed, Jul 01, 2020 at 09:03:38AM -0700, Paul E. McKenney wrote:
+
+[ . . . ]
+
+> > Also, if C goes and specifies load dependencies, in any form, is then
+> > not the corrolary that they need to specify control dependencies? How
+> > else can they exclude the transformation.
+> 
+> By requiring that any temporaries generated from variables that are
+> marked _Dependent_ptr also be marked _Dependent_ptr.  This is of course
+> one divergence of _Dependent_ptr from the volatile keyword.
+> 
+> > And of course, once we're there, can we get explicit support for control
+> > dependencies too? :-) :-)
+> 
+> Keep talking like this and I am going to make sure that you attend a
+> standards committee meeting.  If need be, by arranging for you to be
+> physically dragged there.  ;-)
+> 
+> More seriously, for control dependencies, the variable that would need
+> to be marked would be the program counter, which might require some
+> additional syntax.
+
+And perhaps more constructively, we do need to prioritize address and data
+dependencies over control dependencies.  For one thing, there are a lot
+more address/data dependencies in existing code than there are control
+dependencies, and (sadly, perhaps more importantly) there are a lot more
+people who are convinced that address/data dependencies are important.
+
+For another (admittedly more theoretical) thing, the OOTA scenarios
+stemming from control dependencies are a lot less annoying than those
+from address/data dependencies.
+
+And address/data dependencies are as far as I know vulnerable to things
+like conditional-move instructions that can cause problems for control
+dependencies.
+
+Nevertheless, yes, control dependencies also need attention.
+
+							Thanx, Paul
