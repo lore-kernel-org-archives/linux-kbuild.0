@@ -1,46 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60852 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727793AbgGGQCQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jul 2020 12:02:16 -0400
-Date: Tue, 7 Jul 2020 12:02:12 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v2 2/2] kbuild: trace functions in subdirectories of
- lib/
-Message-ID: <20200707120212.7010fa4f@oasis.local.home>
-In-Reply-To: <20200707092117.963394-2-masahiroy@kernel.org>
-References: <20200707092117.963394-1-masahiroy@kernel.org>
-        <20200707092117.963394-2-masahiroy@kernel.org>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728321AbgGGQFg (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 Jul 2020 12:05:36 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6921C08C5E1
+        for <linux-kbuild@vger.kernel.org>; Tue,  7 Jul 2020 09:05:36 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id m22so9842195pgv.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jul 2020 09:05:36 -0700 (PDT)
+Date: Tue, 7 Jul 2020 09:05:28 -0700
+From: Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH 00/22] add support for Clang LTO
+Message-ID: <20200707160528.GA1300535@google.com>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <CAK7LNASvb0UDJ0U5wkYYRzTAdnEs64HjXpEUL7d=V0CXiAXcNw@mail.gmail.com>
+ <20200629232059.GA3787278@google.com>
+ <20200707155107.GA3357035@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200707155107.GA3357035@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, Anders Roxell <anders.roxell@linaro.org>, Sami Tolvanen <samitolvanen@google.com>, Brendan Higgins <brendanhiggins@google.com>, "David S. Miller" <davem@davemloft.net>, Haren Myneni <haren@us.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jiri Kosina <jikos@kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, live-patching@vger.kernel.org
+To: Masahiro Yamada <masahiroy@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, X86 ML <x86@kernel.org>
 
-On Tue,  7 Jul 2020 18:21:17 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
-
->   ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+On Tue, Jul 07, 2020 at 08:51:07AM -0700, Sami Tolvanen wrote:
+> After spending some time debugging this with Nick, it looks like the
+> error is caused by a recent optimization change in LLVM, which together
+> with the inlining of ur_load_imm_any into jeq_imm, changes a runtime
+> check in FIELD_FIT that would always fail, to a compile-time check that
+> breaks the build. In jeq_imm, we have:
 > 
-> exists here in sub-directories of lib/ to keep the behavior of
-> commit 2464a609ded0 ("ftrace: do not trace library functions").
+>     /* struct bpf_insn: _s32 imm */
+>     u64 imm = insn->imm; /* sign extend */
+>     ...
+>     if (imm >> 32) { /* non-zero only if insn->imm is negative */
+>     	/* inlined from ur_load_imm_any */
+> 	u32 __imm = imm >> 32; /* therefore, always 0xffffffff */
 > 
-> Since that commit, not only the objects in lib/ but also the ones in
-> the sub-directories are excluded from ftrace (although the commit
-> description did not explicitly mention this).
-> 
-> However, most of library functions in sub-directories are not so hot.
-> Re-add them to ftrace.
+>         /*
+> 	 * __imm has a value known at compile-time, which means
+> 	 * __builtin_constant_p(__imm) is true and we end up with
+> 	 * essentially this in __BF_FIELD_CHECK:
+> 	 */
+> 	if (__builtin_constant_p(__imm) && __imm <= 255)
 
-I'm OK with this change, but note, it wasn't just the hot path that I
-disabled ftrace on lib for, but some of these calls are done very early
-at boot up. It may have been PowerPC that I was stumbling over. The
-issue is that they would call mcount before the kernel was mapped
-properly, and the system would crash.
+Should be __imm > 255, of course, which means the compiler will generate
+a call to __compiletime_assert.
 
-My PowerPC box no longer boots so I can't test this anymore. But a lot
-has changed since 2008, and all this may very well be OK.
+> Jiong, Jakub, do you see any issues here?
 
--- Steve
+(Jiong's email bounced, so removing from the recipient list.)
+
+Sami
