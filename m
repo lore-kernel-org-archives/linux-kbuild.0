@@ -1,57 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39168 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728321AbgGGQFg (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:41914 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726911AbgGGQf6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jul 2020 12:05:36 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6921C08C5E1
-        for <linux-kbuild@vger.kernel.org>; Tue,  7 Jul 2020 09:05:36 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id m22so9842195pgv.9
-        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jul 2020 09:05:36 -0700 (PDT)
-Date: Tue, 7 Jul 2020 09:05:28 -0700
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200707160528.GA1300535@google.com>
-References: <20200624203200.78870-1-samitolvanen@google.com>
- <CAK7LNASvb0UDJ0U5wkYYRzTAdnEs64HjXpEUL7d=V0CXiAXcNw@mail.gmail.com>
- <20200629232059.GA3787278@google.com>
- <20200707155107.GA3357035@google.com>
+        Tue, 7 Jul 2020 12:35:58 -0400
+From: Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kbuild: fix single target builds for external modules
+Date: Wed,  8 Jul 2020 01:35:08 +0900
+Message-Id: <20200707163508.1191105-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200707155107.GA3357035@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, X86 ML <x86@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?Bj=8F=A9=CCrn=20Mork?= <bjorn@mork.no>, Masahiro Yamada <masahiroy@kernel.org>, Michal Marek <michal.lkml@markovi.net>, linux-kernel@vger.kernel.org
 
-On Tue, Jul 07, 2020 at 08:51:07AM -0700, Sami Tolvanen wrote:
-> After spending some time debugging this with Nick, it looks like the
-> error is caused by a recent optimization change in LLVM, which together
-> with the inlining of ur_load_imm_any into jeq_imm, changes a runtime
-> check in FIELD_FIT that would always fail, to a compile-time check that
-> breaks the build. In jeq_imm, we have:
-> 
->     /* struct bpf_insn: _s32 imm */
->     u64 imm = insn->imm; /* sign extend */
->     ...
->     if (imm >> 32) { /* non-zero only if insn->imm is negative */
->     	/* inlined from ur_load_imm_any */
-> 	u32 __imm = imm >> 32; /* therefore, always 0xffffffff */
-> 
->         /*
-> 	 * __imm has a value known at compile-time, which means
-> 	 * __builtin_constant_p(__imm) is true and we end up with
-> 	 * essentially this in __BF_FIELD_CHECK:
-> 	 */
-> 	if (__builtin_constant_p(__imm) && __imm <= 255)
+Commit f566e1fbadb6 ("kbuild: make multiple directory targets work")
+broke single target builds for external modules. Fix this.
 
-Should be __imm > 255, of course, which means the compiler will generate
-a call to __compiletime_assert.
+Fixes: f566e1fbadb6 ("kbuild: make multiple directory targets work")
+Reported-by: Bjørn Mork <bjorn@mork.no>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> Jiong, Jakub, do you see any issues here?
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(Jiong's email bounced, so removing from the recipient list.)
-
-Sami
+diff --git a/Makefile b/Makefile
+index fe0164a654c7..676f1cfb1d56 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1754,7 +1754,7 @@ PHONY += descend $(build-dirs)
+ descend: $(build-dirs)
+ $(build-dirs): prepare
+ 	$(Q)$(MAKE) $(build)=$@ \
+-	single-build=$(if $(filter-out $@/, $(filter $@/%, $(single-no-ko))),1) \
++	single-build=$(if $(filter-out $@/, $(filter $@/%, $(KBUILD_SINGLE_TARGETS))),1) \
+ 	need-builtin=1 need-modorder=1
+ 
+ clean-dirs := $(addprefix _clean_, $(clean-dirs))
+-- 
+2.25.1
