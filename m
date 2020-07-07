@@ -1,98 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33158 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727834AbgGGRaO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jul 2020 13:30:14 -0400
-Date: Tue, 7 Jul 2020 10:30:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 00/22] add support for Clang LTO
-Message-ID: <20200707103011.173d38c1@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <CAKwvOd=z0n2+1voMCzC6Hft9EBdLM+6PUi9qBVTVvea_3kM91w@mail.gmail.com>
-References: <20200624203200.78870-1-samitolvanen@google.com>
-        <CAK7LNASvb0UDJ0U5wkYYRzTAdnEs64HjXpEUL7d=V0CXiAXcNw@mail.gmail.com>
-        <20200629232059.GA3787278@google.com>
-        <20200707155107.GA3357035@google.com>
-        <20200707160528.GA1300535@google.com>
-        <20200707095651.422f0b22@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-        <CAKwvOd=z0n2+1voMCzC6Hft9EBdLM+6PUi9qBVTVvea_3kM91w@mail.gmail.com>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47224 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727826AbgGGT6N (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 Jul 2020 15:58:13 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BB5C061755
+        for <linux-kbuild@vger.kernel.org>; Tue,  7 Jul 2020 12:58:13 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id o1so10598308plk.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jul 2020 12:58:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20200707092117.963394-1-masahiroy@kernel.org>
+In-Reply-To: <20200707092117.963394-1-masahiroy@kernel.org>
+From: Brendan Higgins <brendanhiggins@google.com>
+Date: Tue, 7 Jul 2020 12:58:01 -0700
+Message-ID: <CAFd5g46eCjZA-e4akYc1K8u29tp94gpmrAOxZ_joZ=9kJtZeuA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: introduce ccflags-remove-y and asflags-remove-y
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, Will Deacon <will@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>, Kees Cook <keescook@chromium.org>, clang-built-linux <clang-built-linux@googlegroups.com>, Kernel Hardening <kernel-hardening@lists.openwall.com>, linux-arch <linux-arch@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org, X86 ML <x86@kernel.org>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Anders Roxell <anders.roxell@linaro.org>, Sami Tolvanen <samitolvanen@google.com>, Michael Ellerman <mpe@ellerman.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, "David S. Miller" <davem@davemloft.net>, Haren Myneni <haren@us.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, Jiri Kosina <jikos@kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@redhat.com>, Michal Marek <michal.lkml@markovi.net>, Miroslav Benes <mbenes@suse.cz>, Paul Mackerras <paulus@samba.org>, Petr Mladek <pmladek@suse.com>, Rich Felker <dalias@libc.org>, Russell King <linux@armlinux.org.uk>, Tal Gilboa <talgi@mellanox.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, KUnit Development <kunit-dev@googlegroups.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-crypto@vger.kernel.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-sh@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, live-patching@vger.kernel.org
 
-On Tue, 7 Jul 2020 10:17:25 -0700 Nick Desaulniers wrote:
-> On Tue, Jul 7, 2020 at 9:56 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> >  
-> > > On Tue, Jul 07, 2020 at 08:51:07AM -0700, Sami Tolvanen wrote:  
-> > > > After spending some time debugging this with Nick, it looks like the
-> > > > error is caused by a recent optimization change in LLVM, which together
-> > > > with the inlining of ur_load_imm_any into jeq_imm, changes a runtime
-> > > > check in FIELD_FIT that would always fail, to a compile-time check that
-> > > > breaks the build. In jeq_imm, we have:
-> > > >
-> > > >     /* struct bpf_insn: _s32 imm */
-> > > >     u64 imm = insn->imm; /* sign extend */
-> > > >     ...
-> > > >     if (imm >> 32) { /* non-zero only if insn->imm is negative */
-> > > >             /* inlined from ur_load_imm_any */
-> > > >     u32 __imm = imm >> 32; /* therefore, always 0xffffffff */
-> > > >
-> > > >         /*
-> > > >      * __imm has a value known at compile-time, which means
-> > > >      * __builtin_constant_p(__imm) is true and we end up with
-> > > >      * essentially this in __BF_FIELD_CHECK:
-> > > >      */
-> > > >     if (__builtin_constant_p(__imm) && __imm > 255)  
-> >
-> > I think FIELD_FIT() should not pass the value into __BF_FIELD_CHECK().
-> >
-> > So:
-> >
-> > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> > index 48ea093ff04c..4e035aca6f7e 100644
-> > --- a/include/linux/bitfield.h
-> > +++ b/include/linux/bitfield.h
-> > @@ -77,7 +77,7 @@
-> >   */
-> >  #define FIELD_FIT(_mask, _val)                                         \
-> >         ({                                                              \
-> > -               __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_FIT: ");     \
-> > +               __BF_FIELD_CHECK(_mask, 0ULL, 0ULL, "FIELD_FIT: ");     \
-> >                 !((((typeof(_mask))_val) << __bf_shf(_mask)) & ~(_mask)); \
-> >         })
-> >
-> > It's perfectly legal to pass a constant which does not fit, in which
-> > case FIELD_FIT() should just return false not break the build.
-> >
-> > Right?  
-> 
-> I see the value of the __builtin_constant_p check; this is just a very
-> interesting case where rather than an integer literal appearing in the
-> source, the compiler is able to deduce that the parameter can only
-> have one value in one case, and allows __builtin_constant_p to
-> evaluate to true for it.
-> 
-> I had definitely asked Sami about the comment above FIELD_FIT:
-> """
->  76  * Return: true if @_val can fit inside @_mask, false if @_val is
-> too big.
-> """
-> in which FIELD_FIT doesn't return false if @_val is too big and a
-> compile time constant. (Rather it breaks the build).
-> 
-> Of the 14 expansion sites of FIELD_FIT I see in mainline, it doesn't
-> look like any integral literals are passed, so maybe the compile time
-> checks of _val are of little value for FIELD_FIT.
+On Tue, Jul 7, 2020 at 2:22 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> CFLAGS_REMOVE_<file>.o filters out flags when compiling a particular
+> object, but there is no convenient way to do that for every object in
+> a directory.
+>
+> Add ccflags-remove-y and asflags-remove-y to make it easily.
+>
+> Use ccflags-remove-y to clean up some Makefiles.
+>
+> The add/remove order works as follows:
+>
+>  [1] KBUILD_CFLAGS specifies compiler flags used globally
+>
+>  [2] ccflags-y adds compiler flags for all objects in the
+>      current Makefile
+>
+>  [3] ccflags-remove-y removes compiler flags for all objects in the
+>      current Makefile (New feature)
+>
+>  [4] CFLAGS_<file> adds compiler flags per file.
+>
+>  [5] CFLAGS_REMOVE_<file> removes compiler flags per file.
+>
+> Having [3] before [4] allows us to remove flags from most (but not all)
+> objects in the current Makefile.
+>
+> For example, kernel/trace/Makefile removes $(CC_FLAGS_FTRACE)
+> from all objects in the directory, then adds it back to
+> trace_selftest_dynamic.o and CFLAGS_trace_kprobe_selftest.o
+>
+> Please note ccflags-remove-y has no effect to the sub-directories.
+> In contrast, the previous notation got rid of compiler flags also from
+> all the sub-directories.
+>
+>   arch/arm/boot/compressed/
+>   arch/powerpc/xmon/
+>   arch/sh/
+>   kernel/trace/
+>
+> ... have no sub-directories.
+>
+>   lib/
+>
+> ... has several sub-directories.
+>
+> To keep the behavior, I added ccflags-remove-y to all Makefiles
+> in subdirectories of lib/, except:
+>
+>   lib/vdso/Makefile        - Kbuild does not descend into this Makefile
+>   lib/raid/test/Makefile   - This is not used for the kernel build
+>
+> I think commit 2464a609ded0 ("ftrace: do not trace library functions")
+> excluded too much. In later commit, I will try to remove ccflags-remove-y
+> from sub-directory Makefiles.
+>
+> Suggested-by: Sami Tolvanen <samitolvanen@google.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-Also I just double checked and all FIELD_FIT() uses check the return
-value.
-
-> So I think your suggested diff is the most concise fix.
-
-Feel free to submit that officially as a patch if it fixes the build
-for you, here's my sign-off:
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Brendan Higgins <brendanhiggins@google.com> (KUnit)
