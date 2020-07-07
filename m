@@ -1,41 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:44609 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728029AbgGGORI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jul 2020 10:17:08 -0400
-Subject: =?UTF-8?Q?Re=3a_kbuild=3a_Improve_descriptions_for_the_make_paramet?=
- =?UTF-8?B?ZXIg4oCcQ+KAnQ==?=
-From: Markus Elfring <Markus.Elfring@web.de>
-References: <e546930c-0022-c0ea-059f-0c5ec782b5ab@web.de>
-Message-ID: <f4012005-ade5-5c2f-c9b2-4c93fbc6b835@web.de>
-Date: Tue, 7 Jul 2020 16:16:43 +0200
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:38806 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728575AbgGGPcb (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 7 Jul 2020 11:32:31 -0400
+From: Nick Terrell <terrelln@fb.com>
+Subject: Re: [PATCH v6 4/8] init: add support for zstd compressed kernel
+Date: Tue, 7 Jul 2020 15:31:47 +0000
+Message-ID: <3C253838-35BF-4B0D-AE19-E81B08B3A377@fb.com>
+References: <20200707034604.1539157-1-nickrterrell@gmail.com>
+ <20200707034604.1539157-5-nickrterrell@gmail.com>
+ <CADYdroOfCsGsjid9aSOLoRf9gycc1iLD9JndH8WF+Rg+a5Gu-g@mail.gmail.com>
+In-Reply-To: <CADYdroOfCsGsjid9aSOLoRf9gycc1iLD9JndH8WF+Rg+a5Gu-g@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FC35105E87ADE94D8AAE6676A617C96D@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <e546930c-0022-c0ea-059f-0c5ec782b5ab@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Coccinelle <cocci@systeme.lip6.fr>, kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Julia Lawall <julia.lawall@lip6.fr>, Gilles Muller <Gilles.Muller@lip6.fr>, Masahiro Yamada <masahiroy@kernel.org>, Matthew Wilcox <willy@infradead.org>, Michal Marek <michal.lkml@markovi.net>, Nicolas Palix <nicolas.palix@imag.fr>, Randy Dunlap <rdunlap@infradead.org>
+To: Norbert Lange <nolange79@gmail.com>
+Cc: Nick Terrell <nickrterrell@gmail.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, linux-kernel <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Makefile?id=3Dcdd3bb54332f82295ed90cd0c09c78cd0c0ee822#n201
->
-> =E2=80=9C=E2=80=A6
-> # Use 'make C=3D1' to enable checking of only re-compiled files.
-> # Use 'make C=3D2' to enable checking of *all* source files, regardless
-> # of whether they are re-compiled or not.
-> =E2=80=A6=E2=80=9D
-
-I got the impression that source files would be checked according to
-such build parameters before a corresponding compilation try.
-How do you think about to adjust descriptions which were added with
-the commit 1c7bafe7206d928eaccbcbd08d868733e0fb7054 ("kbuild: clarify
-"make C=3D" build option")?
-https://lkml.org/lkml/2006/9/24/176
-https://lore.kernel.org/patchwork/patch/65119/
-https://lore.kernel.org/lkml/115913270694-git-send-email-sam@ravnborg.org/
-
-Regards,
-Markus
+DQoNCj4gT24gSnVsIDcsIDIwMjAsIGF0IDM6MTkgQU0sIE5vcmJlcnQgTGFuZ2UgPG5vbGFuZ2U3
+OUBnbWFpbC5jb20+IHdyb3RlOg0KPiANCj4gVGhhbmtzIGZvciB0aGUgcmVzcGluLg0KPiANCj4g
+QW0gRGkuLCA3LiBKdWxpIDIwMjAgdW0gMDU6NTEgVWhyIHNjaHJpZWIgTmljayBUZXJyZWxsIDxu
+aWNrcnRlcnJlbGxAZ21haWwuY29tPjoNCj4+IA0KPj4gRnJvbTogTmljayBUZXJyZWxsIDx0ZXJy
+ZWxsbkBmYi5jb20+DQo+PiANCj4+ICogQWRkcyB0aGUgenN0ZCBjbWQgdG8gc2NyaXB0cy9NYWtl
+ZmlsZS5saWINCj4+ICogQWRkcyB0aGUgSEFWRV9LRVJORUxfWlNURCBhbmQgS0VSTkVMX1pTVEQg
+b3B0aW9ucw0KPj4gDQo+PiBBcmNoaXRlY3R1cmUgc3BlY2lmaWMgc3VwcG9ydCBpcyBzdGlsbCBu
+ZWVkZWQgZm9yIGRlY29tcHJlc3Npb24uDQo+PiANCj4+IFJldmlld2VkLWJ5OiBLZWVzIENvb2sg
+PGtlZXNjb29rQGNocm9taXVtLm9yZz4NCj4+IFRlc3RlZC1ieTogU2VkYXQgRGlsZWsgPHNlZGF0
+LmRpbGVrQGdtYWlsLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IE5pY2sgVGVycmVsbCA8dGVycmVs
+bG5AZmIuY29tPg0KPj4gLS0tDQo+PiBpbml0L0tjb25maWcgICAgICAgICB8IDE1ICsrKysrKysr
+KysrKysrLQ0KPj4gc2NyaXB0cy9NYWtlZmlsZS5saWIgfCAxNSArKysrKysrKysrKysrKysNCj4+
+IDIgZmlsZXMgY2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4gDQo+
+PiBkaWZmIC0tZ2l0IGEvaW5pdC9LY29uZmlnIGIvaW5pdC9LY29uZmlnDQo+PiBpbmRleCAwNDk4
+YWY1NjdmNzAuLjhkOTlmMGM1ZTI0MCAxMDA2NDQNCj4+IC0tLSBhL2luaXQvS2NvbmZpZw0KPj4g
+KysrIGIvaW5pdC9LY29uZmlnDQo+PiBAQCAtMTkxLDEzICsxOTEsMTYgQEAgY29uZmlnIEhBVkVf
+S0VSTkVMX0xaTw0KPj4gY29uZmlnIEhBVkVfS0VSTkVMX0xaNA0KPj4gICAgICAgIGJvb2wNCj4+
+IA0KPj4gK2NvbmZpZyBIQVZFX0tFUk5FTF9aU1REDQo+PiArICAgICAgIGJvb2wNCj4+ICsNCj4+
+IGNvbmZpZyBIQVZFX0tFUk5FTF9VTkNPTVBSRVNTRUQNCj4+ICAgICAgICBib29sDQo+PiANCj4+
+IGNob2ljZQ0KPj4gICAgICAgIHByb21wdCAiS2VybmVsIGNvbXByZXNzaW9uIG1vZGUiDQo+PiAg
+ICAgICAgZGVmYXVsdCBLRVJORUxfR1pJUA0KPj4gLSAgICAgICBkZXBlbmRzIG9uIEhBVkVfS0VS
+TkVMX0daSVAgfHwgSEFWRV9LRVJORUxfQlpJUDIgfHwgSEFWRV9LRVJORUxfTFpNQSB8fCBIQVZF
+X0tFUk5FTF9YWiB8fCBIQVZFX0tFUk5FTF9MWk8gfHwgSEFWRV9LRVJORUxfTFo0IHx8IEhBVkVf
+S0VSTkVMX1VOQ09NUFJFU1NFRA0KPj4gKyAgICAgICBkZXBlbmRzIG9uIEhBVkVfS0VSTkVMX0da
+SVAgfHwgSEFWRV9LRVJORUxfQlpJUDIgfHwgSEFWRV9LRVJORUxfTFpNQSB8fCBIQVZFX0tFUk5F
+TF9YWiB8fCBIQVZFX0tFUk5FTF9MWk8gfHwgSEFWRV9LRVJORUxfTFo0IHx8IEhBVkVfS0VSTkVM
+X1pTVEQgfHwgSEFWRV9LRVJORUxfVU5DT01QUkVTU0VEDQo+PiAgICAgICAgaGVscA0KPj4gICAg
+ICAgICAgVGhlIGxpbnV4IGtlcm5lbCBpcyBhIGtpbmQgb2Ygc2VsZi1leHRyYWN0aW5nIGV4ZWN1
+dGFibGUuDQo+PiAgICAgICAgICBTZXZlcmFsIGNvbXByZXNzaW9uIGFsZ29yaXRobXMgYXJlIGF2
+YWlsYWJsZSwgd2hpY2ggZGlmZmVyDQo+PiBAQCAtMjc2LDYgKzI3OSwxNiBAQCBjb25maWcgS0VS
+TkVMX0xaNA0KPj4gICAgICAgICAgaXMgYWJvdXQgOCUgYmlnZ2VyIHRoYW4gTFpPLiBCdXQgdGhl
+IGRlY29tcHJlc3Npb24gc3BlZWQgaXMNCj4+ICAgICAgICAgIGZhc3RlciB0aGFuIExaTy4NCj4+
+IA0KPj4gK2NvbmZpZyBLRVJORUxfWlNURA0KPj4gKyAgICAgICBib29sICJaU1REIg0KPj4gKyAg
+ICAgICBkZXBlbmRzIG9uIEhBVkVfS0VSTkVMX1pTVEQNCj4+ICsgICAgICAgaGVscA0KPj4gKyAg
+ICAgICAgIFpTVEQgaXMgYSBjb21wcmVzc2lvbiBhbGdvcml0aG0gdGFyZ2V0aW5nIGludGVybWVk
+aWF0ZSBjb21wcmVzc2lvbg0KPj4gKyAgICAgICAgIHdpdGggZmFzdCBkZWNvbXByZXNzaW9uIHNw
+ZWVkLiBJdCB3aWxsIGNvbXByZXNzIGJldHRlciB0aGFuIEdaSVAgYW5kDQo+PiArICAgICAgICAg
+ZGVjb21wcmVzcyBhcm91bmQgdGhlIHNhbWUgc3BlZWQgYXMgTFpPLCBidXQgc2xvd2VyIHRoYW4g
+TFo0LiBZb3UNCj4+ICsgICAgICAgICB3aWxsIG5lZWQgYXQgbGVhc3QgMTkyIEtCIFJBTSBvciBt
+b3JlIGZvciBib290aW5nLiBUaGUgenN0ZCBjb21tYW5kDQo+PiArICAgICAgICAgbGluZSB0b29s
+cyBpcyByZXF1aXJlZCBmb3IgY29tcHJlc3Npb24uDQo+PiArDQo+PiBjb25maWcgS0VSTkVMX1VO
+Q09NUFJFU1NFRA0KPj4gICAgICAgIGJvb2wgIk5vbmUiDQo+PiAgICAgICAgZGVwZW5kcyBvbiBI
+QVZFX0tFUk5FTF9VTkNPTVBSRVNTRUQNCj4+IGRpZmYgLS1naXQgYS9zY3JpcHRzL01ha2VmaWxl
+LmxpYiBiL3NjcmlwdHMvTWFrZWZpbGUubGliDQo+PiBpbmRleCA5MTZiMmY3ZjcwOTguLmQ5NjBm
+ODgxNWY4NyAxMDA2NDQNCj4+IC0tLSBhL3NjcmlwdHMvTWFrZWZpbGUubGliDQo+PiArKysgYi9z
+Y3JpcHRzL01ha2VmaWxlLmxpYg0KPj4gQEAgLTQxMyw2ICs0MTMsMjEgQEAgcXVpZXRfY21kX3h6
+a2VybiA9IFhaS0VSTiAgJEANCj4+IHF1aWV0X2NtZF94em1pc2MgPSBYWk1JU0MgICRADQo+PiAg
+ICAgICBjbWRfeHptaXNjID0gY2F0ICQocmVhbC1wcmVyZXFzKSB8ICQoWFopIC0tY2hlY2s9Y3Jj
+MzIgLS1sem1hMj1kaWN0PTFNaUIgPiAkQA0KPj4gDQo+PiArIyBaU1REDQo+PiArIyAtLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0NCj4+ICsjIEFwcGVuZHMgdGhlIHVuY29tcHJlc3NlZCBzaXplIG9mIHRoZSBk
+YXRhIHVzaW5nIHNpemVfYXBwZW5kLiBUaGUgLnpzdA0KPj4gKyMgZm9ybWF0IGhhcyB0aGUgc2l6
+ZSBpbmZvcm1hdGlvbiBhdmFpbGFibGUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZmlsZSB0b28s
+DQo+PiArIyBidXQgaXQncyBpbiBhIG1vcmUgY29tcGxleCBmb3JtYXQgYW5kIGl0J3MgZ29vZCB0
+byBhdm9pZCBjaGFuZ2luZyB0aGUgcGFydA0KPj4gKyMgb2YgdGhlIGJvb3QgY29kZSB0aGF0IHJl
+YWRzIHRoZSB1bmNvbXByZXNzZWQgc2l6ZS4NCj4+ICsjIE5vdGUgdGhhdCB0aGUgYnl0ZXMgYWRk
+ZWQgYnkgc2l6ZV9hcHBlbmQgd2lsbCBtYWtlIHRoZSB6c3RkIHRvb2wgdGhpbmsgdGhhdA0KPj4g
+KyMgdGhlIGZpbGUgaXMgY29ycnVwdC4gVGhpcyBpcyBleHBlY3RlZC4NCj4+ICsNCj4+ICtxdWll
+dF9jbWRfenN0ZCA9IFpTVEQgICAgJEANCj4+ICtjbWRfenN0ZCA9IChjYXQgJChmaWx0ZXItb3V0
+IEZPUkNFLCReKSB8IFwNCj4+ICsgICAgICAgenN0ZCAtMTkgJiYgXA0KPj4gKyAgICAgICAgJChj
+YWxsIHNpemVfYXBwZW5kLCAkKGZpbHRlci1vdXQgRk9SQ0UsJF4pKSkgPiAkQCB8fCBcDQo+PiAr
+ICAgICAgIChybSAtZiAkQCA7IGZhbHNlKQ0KPiANCj4gSXMgdGhlcmUgYW55IHJlYXNvbiBub3Qg
+dG8gdXNlICctLXVsdHJhIC0yMicgPw0KPiBBcyBmYXIgYXMgSSB1bmRlcnN0YW5kIHRoZSBvdGhl
+ciBwYXRjaGVzLCB0aGUgZGVjb21wcmVzc2lvbiBzaG91bGQgYmUNCj4gYWJsZSB0byBoYW5kbGUg
+aXQsDQo+IGFuZCBpbiB0ZXJtcyBvZiB0aW1lIHJlcXVpcmVkIGZvciBhIGtlcm5lbCBidWlsZCB0
+aGUgZGlmZmVyZW5jZSBpcw0KPiBpbnNpZ25pZmljYW50Lg0KDQpGb3Iga2VybmVsIGNvbXByZXNz
+aW9uIHRoZXJlIGlzbuKAmXQgYSBzdHJvbmcgcmVhc29uIG5vdCB0byB1c2UgYC0tdWx0cmEgLTIy
+YC4NCkl0IG1heSBzbG93IGRvd24gZGVjb21wcmVzc2lvbiBhIHNtYWxsIGFtb3VudCwgYmVjYXVz
+ZSB0aGUgZGlmZmVyZW5jZQ0KaXMgdGhhdCBpdCBoYXMgYSAxMjggTUIgd2luZG93IHNpemUgaW5z
+dGVhZCBvZiBhIDggTUIgd2luZG93IHNpemUuDQoNCkhvd2V2ZXIsIHRoYXQgcHJvYmFibHkgaXNu
+4oCZdCB3YW50IHlvdSB3YW50IGZvciBpbml0cmFtZnMgY29tcHJlc3Npb24sDQp3aGljaCBjYW4g
+b3B0aW9uYWxseSBub3cgdXNlIHRoaXMgc2FtZSBjb21tYW5kLiBXZSBjb3VsZCBnbyBsaWtlIHh6
+DQphbmQgaGF2ZSBib3RoIGNtZF96c3RkbWlzYyBhbmQgY21kX3pzdGRrZXJuLCBhbmQgb25seSB1
+c2UgYC0yMmAgZm9yIHRoZQ0Ka2VybmVsIHZlcnNpb24uDQoNCkl0IGFsc28gbG9va3MgbGlrZSB0
+aGVyZSB3ZXJlIGEgZmV3IG1pbm9yIGNoYW5nZXMgbWFkZSB0byB0aGUgb3RoZXINCmNvbXByZXNz
+IGNtZHMgaW4gdGhpcyBmaWxlIHdoaWxlIHRoZXNlIHBhdGNoZXMgaGF2ZSBiZWVuIG91dCwgc28g
+SSB3aWxsIGFwcGx5DQp0aGVtIHRvIHpzdGQgYXMgd2VsbC4NCg0KSeKAmWxsIHN1Ym1pdCBhIG5l
+dyB2ZXJzaW9uIHdpdGggdGhlc2UgY2hhbmdlcyB0b2RheS4NCg0KPiBBbmQgd291bGQgaXQgYmUg
+YmV0dGVyIHRvIHJ1biB6c3RkIG9uIGEgcHJlcGFyZWQgZmlsZSBpbnN0ZWFkIG9mDQo+IHN0cmVh
+bSBlbmNvbmRpbmc/DQo+IHdpbmRvd3NpemUgd291bGQgYmUgYWRqdXN0ZWQgdG8gbWluKHdpbmRv
+d3NpemUsIGZpbGVzaXplKSBmb3Igb25lLg0KDQpZZWFoLCB0aGF0IHdvdWxkIGJlIGhlbHBmdWwg
+Zm9yIGluaXRyYW1mcyBjb21wcmVzc2lvbiB3aGVuIHRoZSBmaWxlIGlzDQpzbWFsbGVyIHRoYW4g
+dGhlIHdpbmRvdyBzaXplLCBzaW5jZSBpdCB3b3VsZCBsaW1pdCB0aGUgbWVtb3J5IG5lY2Vzc2Fy
+eQ0KRm9yIGRlY29tcHJlc3Npb24uIEJ1dCwgaXQgd291bGRu4oCZdCBoZWxwIGtlcm5lbCBjb21w
+cmVzc2lvbi4NCg0KRm9yIHRoYXQgd2XigJlkIGhhdmUgdG8gY3JlYXRlIGEgdGVtcG9yYXJ5IGZp
+bGUsIGJlY2F1c2UgaXQgbG9va3MgbGlrZSB0aGVzZQ0KY29tbWFuZHMgcG90ZW50aWFsbHkgYWNj
+ZXB0IG1vcmUgdGhhbiBvbmUgaW5wdXQgZmlsZS4gRG8geW91IGtub3cgdGhlDQpzdGFuZGFyZCBw
+cmFjdGljZSBmb3IgdGVtcG9yYXJ5IGZpbGVzIGluIHRoZSBidWlsZCBzeXN0ZW0/DQoNClRoYW5r
+cyBmb3IgdGhlIHJldmlldywNCk5pY2s=
