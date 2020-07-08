@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34880 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726144AbgGHSzI (ORCPT
+        with ESMTP id S1726830AbgGHSzQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 14:55:08 -0400
+        Wed, 8 Jul 2020 14:55:16 -0400
 From: Nick Terrell <nickrterrell@gmail.com>
-Subject: [PATCH v7 1/7] lib: prepare zstd for preboot environment
-Date: Wed,  8 Jul 2020 11:50:18 -0700
-Message-Id: <20200708185024.2767937-2-nickrterrell@gmail.com>
+Subject: [PATCH v7 3/7] init: add support for zstd compressed kernel
+Date: Wed,  8 Jul 2020 11:50:20 -0700
+Message-Id: <20200708185024.2767937-4-nickrterrell@gmail.com>
 In-Reply-To: <20200708185024.2767937-1-nickrterrell@gmail.com>
 References: <20200708185024.2767937-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
@@ -19,91 +19,112 @@ Cc: linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.ke
 
 From: Nick Terrell <terrelln@fb.com>
 
-* Remove a double definition of the CHECK_F macro when the zstd
-  library is amalgamated.
-* Switch ZSTD_copy8() to __builtin_memcpy(), because in the preboot
-  environment on x86 gcc can't inline `memcpy()` otherwise.
-* Limit the gcc hack in ZSTD_wildcopy() to the broken gcc version. See
-  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81388.
+* Adds the zstd and zstd22 cmds to scripts/Makefile.lib
+* Adds the HAVE_KERNEL_ZSTD and KERNEL_ZSTD options
 
-These changes are necessary to get the build to work in the preboot
-environment, and to get reasonable performance. ZSTD_copy8() and
-ZSTD_wildcopy() are in the core of the zstd hot loop. So outlining
-these calls to memcpy(), and having an extra branch are very
-detrimental to performance.
+Architecture specific support is still needed for decompression.
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
 Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
- lib/zstd/fse_decompress.c |  9 +--------
- lib/zstd/zstd_internal.h  | 14 ++++++++++++--
- 2 files changed, 13 insertions(+), 10 deletions(-)
+ Makefile             |  3 ++-
+ init/Kconfig         | 15 ++++++++++++++-
+ scripts/Makefile.lib | 22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 2 deletions(-)
 
-diff --git a/lib/zstd/fse_decompress.c b/lib/zstd/fse_decompress.c
-index a84300e5a013..0b353530fb3f 100644
---- a/lib/zstd/fse_decompress.c
-+++ b/lib/zstd/fse_decompress.c
-@@ -47,6 +47,7 @@
- ****************************************************************/
- #include "bitstream.h"
- #include "fse.h"
-+#include "zstd_internal.h"
- #include <linux/compiler.h>
- #include <linux/kernel.h>
- #include <linux/string.h> /* memcpy, memset */
-@@ -60,14 +61,6 @@
- 		enum { FSE_static_assert = 1 / (int)(!!(c)) }; \
- 	} /* use only *after* variable declarations */
+diff --git a/Makefile b/Makefile
+index fe0164a654c7..d14f9b7038ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -464,6 +464,7 @@ KLZOP		= lzop
+ LZMA		= lzma
+ LZ4		= lz4c
+ XZ		= xz
++ZSTD		= zstd
  
--/* check and forward error code */
--#define CHECK_F(f)                  \
--	{                           \
--		size_t const e = f; \
--		if (FSE_isError(e)) \
--			return e;   \
--	}
--
- /* **************************************************************
- *  Templates
- ****************************************************************/
-diff --git a/lib/zstd/zstd_internal.h b/lib/zstd/zstd_internal.h
-index 1a79fab9e13a..dac753397f86 100644
---- a/lib/zstd/zstd_internal.h
-+++ b/lib/zstd/zstd_internal.h
-@@ -127,7 +127,14 @@ static const U32 OF_defaultNormLog = OF_DEFAULTNORMLOG;
- *  Shared functions to include for inlining
- *********************************************/
- ZSTD_STATIC void ZSTD_copy8(void *dst, const void *src) {
--	memcpy(dst, src, 8);
-+	/*
-+	 * zstd relies heavily on gcc being able to analyze and inline this
-+	 * memcpy() call, since it is called in a tight loop. Preboot mode
-+	 * is compiled in freestanding mode, which stops gcc from analyzing
-+	 * memcpy(). Use __builtin_memcpy() to tell gcc to analyze this as a
-+	 * regular memcpy().
-+	 */
-+	__builtin_memcpy(dst, src, 8);
- }
- /*! ZSTD_wildcopy() :
- *   custom version of memcpy(), can copy up to 7 bytes too many (8 bytes if length==0) */
-@@ -137,13 +144,16 @@ ZSTD_STATIC void ZSTD_wildcopy(void *dst, const void *src, ptrdiff_t length)
- 	const BYTE* ip = (const BYTE*)src;
- 	BYTE* op = (BYTE*)dst;
- 	BYTE* const oend = op + length;
--	/* Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81388.
-+#if defined(GCC_VERSION) && GCC_VERSION >= 70000 && GCC_VERSION < 70200
-+	/*
-+	 * Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81388.
- 	 * Avoid the bad case where the loop only runs once by handling the
- 	 * special case separately. This doesn't trigger the bug because it
- 	 * doesn't involve pointer/integer overflow.
- 	 */
- 	if (length <= 8)
- 		return ZSTD_copy8(dst, src);
-+#endif
- 	do {
- 		ZSTD_copy8(op, ip);
- 		op += 8;
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+ 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
+@@ -512,7 +513,7 @@ CLANG_FLAGS :=
+ export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE LEX YACC AWK INSTALLKERNEL
+ export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
+-export KGZIP KBZIP2 KLZOP LZMA LZ4 XZ
++export KGZIP KBZIP2 KLZOP LZMA LZ4 XZ ZSTD
+ export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS KBUILD_LDFLAGS
+diff --git a/init/Kconfig b/init/Kconfig
+index 0498af567f70..8d99f0c5e240 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -191,13 +191,16 @@ config HAVE_KERNEL_LZO
+ config HAVE_KERNEL_LZ4
+ 	bool
+ 
++config HAVE_KERNEL_ZSTD
++	bool
++
+ config HAVE_KERNEL_UNCOMPRESSED
+ 	bool
+ 
+ choice
+ 	prompt "Kernel compression mode"
+ 	default KERNEL_GZIP
+-	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_UNCOMPRESSED
++	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4 || HAVE_KERNEL_ZSTD || HAVE_KERNEL_UNCOMPRESSED
+ 	help
+ 	  The linux kernel is a kind of self-extracting executable.
+ 	  Several compression algorithms are available, which differ
+@@ -276,6 +279,16 @@ config KERNEL_LZ4
+ 	  is about 8% bigger than LZO. But the decompression speed is
+ 	  faster than LZO.
+ 
++config KERNEL_ZSTD
++	bool "ZSTD"
++	depends on HAVE_KERNEL_ZSTD
++	help
++	  ZSTD is a compression algorithm targeting intermediate compression
++	  with fast decompression speed. It will compress better than GZIP and
++	  decompress around the same speed as LZO, but slower than LZ4. You
++	  will need at least 192 KB RAM or more for booting. The zstd command
++	  line tools is required for compression.
++
+ config KERNEL_UNCOMPRESSED
+ 	bool "None"
+ 	depends on HAVE_KERNEL_UNCOMPRESSED
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 916b2f7f7098..54f7b7eb580b 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -413,6 +413,28 @@ quiet_cmd_xzkern = XZKERN  $@
+ quiet_cmd_xzmisc = XZMISC  $@
+       cmd_xzmisc = cat $(real-prereqs) | $(XZ) --check=crc32 --lzma2=dict=1MiB > $@
+ 
++# ZSTD
++# ---------------------------------------------------------------------------
++# Appends the uncompressed size of the data using size_append. The .zst
++# format has the size information available at the beginning of the file too,
++# but it's in a more complex format and it's good to avoid changing the part
++# of the boot code that reads the uncompressed size.
++#
++# Note that the bytes added by size_append will make the zstd tool think that
++# the file is corrupt. This is expected.
++#
++# zstd uses a maximum window size of 8 MB. zstd22 uses a maximum window size of
++# 128 MB. zstd22 is used for kernel compression because it is decompressed in a
++# single pass, so zstd doesn't need to allocate a window buffer. When streaming
++# decompression is used, like initramfs decompression, zstd22 should likely not
++# be used because it would require zstd to allocate a 128 MB buffer.
++
++quiet_cmd_zstd = ZSTD    $@
++      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) -19; $(size_append); } > $@
++
++quiet_cmd_zstd22 = ZSTD22  $@
++      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) -22 --ultra; $(size_append); } > $@
++
+ # ASM offsets
+ # ---------------------------------------------------------------------------
+ 
 -- 
 2.27.0
