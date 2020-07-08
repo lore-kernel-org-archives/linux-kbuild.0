@@ -1,31 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45972 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726144AbgGHJX1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 05:23:27 -0400
-Date: Wed, 8 Jul 2020 11:23:24 +0200
-From: Petr Mladek <pmladek@suse.com>
-Subject: Re: [PATCH v2 2/2] kbuild: trace functions in subdirectories of lib/
-Message-ID: <20200708092324.GA4751@alley>
-References: <20200707092117.963394-1-masahiroy@kernel.org>
- <20200707092117.963394-2-masahiroy@kernel.org>
- <20200708065223.GA11164@alley>
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729192AbgGHMda (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Jul 2020 08:33:30 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E35C08E9A8
+        for <linux-kbuild@vger.kernel.org>; Wed,  8 Jul 2020 05:33:29 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id q74so23201034iod.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jul 2020 05:33:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200708065223.GA11164@alley>
+Reply-To: mmsafiatou057@gmail.com
+From: "Mrs. Safitaou Zoungrana" <richardlaurentdr@gmail.com>
+Date: Wed, 8 Jul 2020 12:33:28 +0000
+Message-ID: <CALJAiTVXhrKZYOHVoupnx6hmXXD0i2k4MOSO6HW+mj1BAydXhA@mail.gmail.com>
+Subject: My Dear Beloved One,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Anders Roxell <anders.roxell@linaro.org>, Sami Tolvanen <samitolvanen@google.com>, Brendan Higgins <brendanhiggins@google.com>, "David S. Miller" <davem@davemloft.net>, Haren Myneni <haren@us.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jiri Kosina <jikos@kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, live-patching@vger.kernel.org
 
-On Wed 2020-07-08 08:52:23, Petr Mladek wrote:
->
-> PS: BTW: The livepatch selftests fail in Linus's master now. But it
-> seems to be for another reason. I am going to dig into it.
+My Dear Beloved One,
 
-JFYI, the livepatch selftests are actually working. I have messed
-the testing here. I am sorry for the noise.
+I greet you in the name of God almighty the givers of all good things
+in life. Please kindly pardon me for any inconvenience this letter may
+cost you because I know it may come to you as a surprise as we have no
+previous correspondence.  I sent this mail praying for it to reach you
+in good health, since I myself are in a very critical health condition
+in which I sleep every night without knowing if I may be alive to see
+the next day.
 
-Best Regards,
-Petr
+I am Mrs. Safiatou Zoungrana,  the wife of late Engineer Ralph
+Alphonso Zoungrana from Paris France but based here in Burkina Faso
+West Africa since eight years ago as a business woman dealing with
+gold exportation and Sales. We have been married for years before his
+sudden death although we were childless. I have been diagnosed with
+ovarian cancer and I have been battling with the sickness when my late
+lovely husband of a blessed memory was alive. May his soul rest in
+peace, Amen.
+
+My late Husband left the sum of =E2=82=AC7.900.000.00 Seven Million Nine
+Hundred Thousand Euros in a fix/suspense account in one of the prime
+bank here in Burkina Faso. Recently, my Doctor told me that I have few
+days to live due to the cancer problem. The one that disturbs me most
+is my blood pressure sickness.
+
+Having known my health condition I decided to seek for your kind
+assistance to transfer this fund into your account and you will use it
+to establish an orphanage home in my name. I will give you more
+details about the project as soon as I receive your reply in my
+private email (mmsafiatou057@gmail.com) to handle this project because
+I do not want to state all here until I see your reply, desire and
+commitment to handle this project.
+
+My Regards to your family.
+Mrs. Safiatou Zoungrana.
