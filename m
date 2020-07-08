@@ -1,29 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725787AbgGHUtb (ORCPT
+Received: from a27-192.smtp-out.us-west-2.amazonses.com ([54.240.27.192]:33982
+        "EHLO a27-192.smtp-out.us-west-2.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725787AbgGHUth (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 16:49:31 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1B0C061A0B
-        for <linux-kbuild@vger.kernel.org>; Wed,  8 Jul 2020 13:49:30 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id j19so15371905pgm.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jul 2020 13:49:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+        Wed, 8 Jul 2020 16:49:37 -0400
+Subject: [Kernel.org Helpdesk #93182] [linuxfoundation.org #93182] Re: linux-kbuild missing from lore?
+From: "Nick Desaulniers via RT" <kernel-helpdesk@rt.linuxfoundation.org>
+Reply-To: kernel-helpdesk@rt.linuxfoundation.org
+In-Reply-To: <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
+References: <RT-Ticket-93182@linuxfoundation>
+ <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
  <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
- <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org> <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
+ <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
+ <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
  <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
-In-Reply-To: <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 8 Jul 2020 13:49:18 -0700
-Message-ID: <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
-Subject: Re: linux-kbuild missing from lore?
-Content-Type: text/plain; charset="UTF-8"
+ <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
+Message-ID: <010101733030e04a-f798b5e8-0b1b-43be-8a61-fc777399ae37-000000@us-west-2.amazonses.com>
+Content-Type: text/plain; charset="utf-8"
+Date: Wed, 8 Jul 2020 20:49:36 +0000
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, webguy@marc.info
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, helpdesk@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Nathan Huckleberry <nhuck@google.com>, Michal Marek <michal.lkml@markovi.net>
+Cc: linux-kbuild@vger.kernel.org, masahiroy@kernel.org, michal.lkml@markovi.net, nhuck@google.com, rdunlap@infradead.org, sam@ravnborg.org
 
 On Wed, Jul 8, 2020 at 1:43 PM Randy Dunlap <rdunlap@infradead.org> wrote:
 >
