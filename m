@@ -1,52 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35258 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726206AbgGHGww (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 02:52:52 -0400
-Received: from canardo.mork.no (canardo.mork.no [IPv6:2001:4641::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1D1C061755
-        for <linux-kbuild@vger.kernel.org>; Tue,  7 Jul 2020 23:52:52 -0700 (PDT)
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-Subject: Re: Kbuild support for rebuilding a single driver gone?
-References: <87lfjvbfkw.fsf@miraculix.mork.no>
-        <CAK7LNAS=1M0NXeQUMnD63O=fAKTptnSRwjE_o6_jVKUv3_7q5Q@mail.gmail.com>
-Date: Wed, 08 Jul 2020 08:52:45 +0200
-In-Reply-To: <CAK7LNAS=1M0NXeQUMnD63O=fAKTptnSRwjE_o6_jVKUv3_7q5Q@mail.gmail.com>
-        (Masahiro Yamada's message of "Wed, 8 Jul 2020 01:42:35 +0900")
-Message-ID: <87y2nua476.fsf@miraculix.mork.no>
+Received: from mx2.suse.de ([195.135.220.15]:37322 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729960AbgGHGw1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Jul 2020 02:52:27 -0400
+Date: Wed, 8 Jul 2020 08:52:23 +0200
+From: Petr Mladek <pmladek@suse.com>
+Subject: Re: [PATCH v2 2/2] kbuild: trace functions in subdirectories of lib/
+Message-ID: <20200708065223.GA11164@alley>
+References: <20200707092117.963394-1-masahiroy@kernel.org>
+ <20200707092117.963394-2-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200707092117.963394-2-masahiroy@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Anders Roxell <anders.roxell@linaro.org>, Sami Tolvanen <samitolvanen@google.com>, Brendan Higgins <brendanhiggins@google.com>, "David S. Miller" <davem@davemloft.net>, Haren Myneni <haren@us.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, Jiri Kosina <jikos@kernel.org>, Joe Lawrence <joe.lawrence@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, live-patching@vger.kernel.org
 
-Masahiro Yamada <masahiroy@kernel.org> writes:
+On Tue 2020-07-07 18:21:17, Masahiro Yamada wrote:
+>   ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+> 
+> exists here in sub-directories of lib/ to keep the behavior of
+> commit 2464a609ded0 ("ftrace: do not trace library functions").
+> 
+> Since that commit, not only the objects in lib/ but also the ones in
+> the sub-directories are excluded from ftrace (although the commit
+> description did not explicitly mention this).
+> 
+> However, most of library functions in sub-directories are not so hot.
+> Re-add them to ftrace.
+> 
+> Going forward, only the objects right under lib/ will be excluded.
+ 
+> diff --git a/lib/livepatch/Makefile b/lib/livepatch/Makefile
+> index 9abdf615b088..295b94bff370 100644
+> --- a/lib/livepatch/Makefile
+> +++ b/lib/livepatch/Makefile
+> @@ -2,8 +2,6 @@
+>  #
+>  # Makefile for livepatch test code.
+>  
+> -ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+> -
+>  obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
+>  				test_klp_callbacks_demo.o \
+>  				test_klp_callbacks_demo2.o \
 
-> Please check this:
-> https://patchwork.kernel.org/patch/11649263/
->
->
-> It will be included in the next pull request,
-> and eventually back-ported to stable kernels.
+With this change it might be possible to remove also the last few
+lines that explicitly added $(CC_FLAGS_FTRACE) for two test modules.
 
-Thanks.  That was really fast!
+The two modules really needed these flags. But they are fine also
+for the other modules.
 
-I can confirm that this patch fixes the issue.
+We could do this later as a followup patch but it would be nice
+to do so here.
 
-> Meanwhile, if M=3D build is not important,
-> you can compile-test a particular module
-> with in-tree build:
->
->
-> $ make drivers/net/usb/qmi_wwan.ko
+Best Regards,
+Petr
 
-Yes, I know.  I use the M=3D build to do some basic load/run testing on
-distro kernels.  Which is obviously a best effort thing. But it saves me
-some time when it works, not needing to build and boot a more recent
-kernel to just test a simple driver patch.
-
-
-Bj=C3=B8rn
+PS: BTW: The livepatch selftests fail in Linus's master now. But it
+seems to be for another reason. I am going to dig into it.
