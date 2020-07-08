@@ -1,45 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:63506 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728676AbgGHCDz (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728294AbgGHCt2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jul 2020 22:03:55 -0400
-From: Nick Terrell <terrelln@fb.com>
+        Tue, 7 Jul 2020 22:49:28 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF3AC061755
+        for <linux-kbuild@vger.kernel.org>; Tue,  7 Jul 2020 19:49:28 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id z5so20942353pgb.6
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Jul 2020 19:49:28 -0700 (PDT)
+Date: Tue, 7 Jul 2020 19:49:25 -0700
+From: Kees Cook <keescook@chromium.org>
 Subject: Re: [PATCH v6 2/8] lib: prepare xxhash for preboot environment
-Date: Wed, 8 Jul 2020 02:03:24 +0000
-Message-ID: <ACBA859B-4BB3-40F3-A6D9-F22A48E5C1E2@fb.com>
+Message-ID: <202007071947.5E9723AF48@keescook>
 References: <20200707034604.1539157-1-nickrterrell@gmail.com>
  <20200707034604.1539157-3-nickrterrell@gmail.com>
  <20200707215925.GA1591079@rani.riverdale.lan>
-In-Reply-To: <20200707215925.GA1591079@rani.riverdale.lan>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E13629502AE10640976B1E9A4203D7C5@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200707215925.GA1591079@rani.riverdale.lan>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arvind Sankar <nivedita@alum.mit.edu>
-Cc: Nick Terrell <nickrterrell@gmail.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, linux-kernel <linux-kernel@vger.kernel.org>, Chris Mason <clm@fb.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, Michael van der Westhuizen <rmikey@fb.com>, "mingo@kernel.org" <mingo@kernel.org>, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>, Norbert Lange <nolange79@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Nick Terrell <nickrterrell@gmail.com>, Borislav Petkov <bp@alien8.de>, Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>, Kernel Team <Kernel-team@fb.com>, Adam Borowski <kilobyte@angband.pl>, Patrick Williams <patrickw3@fb.com>, rmikey@fb.com, mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>, Sedat Dilek <sedat.dilek@gmail.com>, Norbert Lange <nolange79@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Nick Terrell <terrelln@fb.com>
 
-
-
-> On Jul 7, 2020, at 5:59 PM, Arvind Sankar <nivedita@alum.mit.edu> wrote:
->=20
+On Tue, Jul 07, 2020 at 05:59:25PM -0400, Arvind Sankar wrote:
 > On Mon, Jul 06, 2020 at 08:45:58PM -0700, Nick Terrell wrote:
->> From: Nick Terrell <terrelln@fb.com>
->>=20
->> Don't export symbols if XXH_PREBOOT is defined.
->>=20
->> This change is necessary to get xxhash to work in a preboot environment,
->> which is needed to support zstd-compressed kernels.
->=20
-> The usual way to do it is by adding -D__DISABLE_EXPORTS to the CFLAGS, wh=
-ich will
+> > From: Nick Terrell <terrelln@fb.com>
+> > 
+> > Don't export symbols if XXH_PREBOOT is defined.
+> > 
+> > This change is necessary to get xxhash to work in a preboot environment,
+> > which is needed to support zstd-compressed kernels.
+> 
+> The usual way to do it is by adding -D__DISABLE_EXPORTS to the CFLAGS, which will
 > cause EXPORT_SYMBOL to be stubbed out. Doesn't that work here?
 
-I can do that. I did it this way because this was how other compressors did=
- it.
+This is quite rare, actually:
 
-Thanks,
-Nick=
+$ git grep DISABLE_EXPORTS
+arch/s390/purgatory/Makefile:CFLAGS_sha256.o := -D__DISABLE_EXPORTS
+arch/x86/boot/compressed/kaslr.c:#define __DISABLE_EXPORTS
+arch/x86/purgatory/Makefile:CFLAGS_sha256.o := -D__DISABLE_EXPORTS
+drivers/firmware/efi/libstub/Makefile: -D__DISABLE_EXPORTS
+include/linux/export.h:#if !defined(CONFIG_MODULES) || defined(__DISABLE_EXPORTS)
+
+But yes, it seems that would be the better approach.
+
+-- 
+Kees Cook
