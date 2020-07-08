@@ -1,29 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51722 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbgGHUnU (ORCPT
+Received: from a27-45.smtp-out.us-west-2.amazonses.com ([54.240.27.45]:59910
+        "EHLO a27-45.smtp-out.us-west-2.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725848AbgGHUnY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 16:43:20 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7290DC061A0B
-        for <linux-kbuild@vger.kernel.org>; Wed,  8 Jul 2020 13:43:20 -0700 (PDT)
-Subject: Re: linux-kbuild missing from lore?
-References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+        Wed, 8 Jul 2020 16:43:24 -0400
+Subject: [Kernel.org Helpdesk #93182] [linuxfoundation.org #93182] Re: linux-kbuild missing from lore?
+From: "rdunlap@infradead.org via RT"
+        <kernel-helpdesk@rt.linuxfoundation.org>
+Reply-To: kernel-helpdesk@rt.linuxfoundation.org
+In-Reply-To: <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
+References: <RT-Ticket-93182@linuxfoundation>
+ <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
  <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
  <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
  <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
-Date: Wed, 8 Jul 2020 13:42:59 -0700
+ <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
+Message-ID: <01010173302b2dad-aee643d2-a7ff-4dfc-a162-f1fe17fcec26-000000@us-west-2.amazonses.com>
+Content-Type: text/plain; charset="utf-8"
+Date: Wed, 8 Jul 2020 20:43:22 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, helpdesk@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Nathan Huckleberry <nhuck@google.com>, Michal Marek <michal.lkml@markovi.net>
+To: ndesaulniers@google.com
+Cc: linux-kbuild@vger.kernel.org, masahiroy@kernel.org, michal.lkml@markovi.net, nhuck@google.com, sam@ravnborg.org
 
 On 7/8/20 11:42 AM, Nick Desaulniers wrote:
 > On Mon, Mar 16, 2020 at 6:06 PM Randy Dunlap <rdunlap@infradead.org> wrote:
