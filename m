@@ -1,103 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a27-192.smtp-out.us-west-2.amazonses.com ([54.240.27.192]:33982
-        "EHLO a27-192.smtp-out.us-west-2.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725787AbgGHUth (ORCPT
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33402 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbgGHVrU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 16:49:37 -0400
-Subject: [Kernel.org Helpdesk #93182] [linuxfoundation.org #93182] Re: linux-kbuild missing from lore?
-From: "Nick Desaulniers via RT" <kernel-helpdesk@rt.linuxfoundation.org>
-Reply-To: kernel-helpdesk@rt.linuxfoundation.org
-In-Reply-To: <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
-References: <RT-Ticket-93182@linuxfoundation>
- <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
- <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
- <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
- <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
- <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org>
- <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
-Message-ID: <010101733030e04a-f798b5e8-0b1b-43be-8a61-fc777399ae37-000000@us-west-2.amazonses.com>
-Content-Type: text/plain; charset="utf-8"
-Date: Wed, 8 Jul 2020 20:49:36 +0000
+        Wed, 8 Jul 2020 17:47:20 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21F7C061A0B
+        for <linux-kbuild@vger.kernel.org>; Wed,  8 Jul 2020 14:47:20 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id k5so143276pjg.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jul 2020 14:47:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+ <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
+ <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org> <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
+ <acc9cbac-982b-e3a0-d1bf-5d3d4ffd9b08@infradead.org> <CAKwvOdnNW0JiX1SMUePKCS37Cjfa+rx=SKrcu0jU1qyMNCq0yA@mail.gmail.com>
+ <20200708214526.GA1893@ultron.spinoli.org>
+In-Reply-To: <20200708214526.GA1893@ultron.spinoli.org>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Wed, 8 Jul 2020 14:47:08 -0700
+Message-ID: <CAKwvOdnBNkJerfFXotFNMtgHUgY9PAb0ec1yQ+D20Y-Db5efQg@mail.gmail.com>
+Subject: Re: linux-kbuild missing from lore?
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: linux-kbuild@vger.kernel.org, masahiroy@kernel.org, michal.lkml@markovi.net, nhuck@google.com, rdunlap@infradead.org, sam@ravnborg.org
+To: Hank Leininger <hlein@marc.info>
+Cc: Randy Dunlap <rdunlap@infradead.org>, webguy@marc.info, Masahiro Yamada <masahiroy@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, helpdesk@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Nathan Huckleberry <nhuck@google.com>, Michal Marek <michal.lkml@markovi.net>
 
-On Wed, Jul 8, 2020 at 1:43 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+On Wed, Jul 8, 2020 at 2:45 PM Hank Leininger <hlein@marc.info> wrote:
 >
-> On 7/8/20 11:42 AM, Nick Desaulniers wrote:
-> > On Mon, Mar 16, 2020 at 6:06 PM Randy Dunlap <rdunlap@infradead.org> wrote:
-> >>
-> >> On 3/16/20 5:47 PM, Masahiro Yamada wrote:
-> >>> Hi Nick,
-> >>>
-> >>> On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
-> >>> <ndesaulniers@google.com> wrote:
-> >>>>
-> >>>> Hi Masahiro,
-> >>>> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
-> >>>> https://lore.kernel.org/lists.html.  Is that intentional or
-> >>>> accidental?
-> >>>> --
-> >>>> Thanks,
-> >>>> ~Nick Desaulniers
-> >>>
-> >>>
-> >>> Thanks for letting me know this.
-> >>> I guess it is accidental.
-> >>>
-> >>> In fact, I do not know what to do
-> >>> to take good care of the kbuild ML.
-> >>
-> >> Maybe ask Sam Ravnborg or Michal Marek if they have kbuild ML archives.
-> >>
-> >> or see if they are available from some other ML archive site, like
-> >> https://www.spinics.net/lists/linux-kbuild/
-> >>
-> >>
-> >> My kbuild archive has about 20,000 emails in it, beginning around the
-> >> middle of 2011.
-> >> I could make that available, but I don't claim that it is complete.
-> >>
-> >> And I'm sure that it has some duplicate emails in it [if an email is
-> >> kbuild-related, I put the email into this "folder", no matter what
-> >> mailing list it came from].
+> On Wed, Jul 08, 2020 at 01:49:18PM -0700, Nick Desaulniers wrote:
+> > On Wed, Jul 8, 2020 at 1:43 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+> > >
+> > > On 7/8/20 11:42 AM, Nick Desaulniers wrote:
+> > > > On Mon, Mar 16, 2020 at 6:06 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+> > > >>
+> > > >> On 3/16/20 5:47 PM, Masahiro Yamada wrote:
+> > > >>> Hi Nick,
+> > > >>>
+> > > >>> On Tue, Mar 17, 2020 at 8:22 AM Nick Desaulniers
+> > > >>> <ndesaulniers@google.com> wrote:
+> > > >>>>
+> > > >>>> Hi Masahiro,
+> > > >>>> I noticed that linux-kbuild@vger.kernel.org seems to be missing from
+> > > >>>> https://lore.kernel.org/lists.html.  Is that intentional or
+> > > >>>> accidental?
+> [snip]
+> > > Has anyone thought about trying to get the kbuild archive from
+> > > marc.info/?l=linux-kbuild ?  or contacted the marc.info admin?
 > >
-> > https://lore.kernel.org/lists.html links to
-> > https://www.kernel.org/lore.html links to
-> > https://korg.docs.kernel.org/lore.html
-> > which seems to indicate that we need such an archive.
-> >
-> > cc'ing help desk for the request.  It looks like we need to
-> > collect+merge then sanitize mboxes.  Randy, if we could start with
-> > your archive, I'd be happy to help drive this across the finish line.
+> > Clicking "add a list" on
+> > https://marc.info/
+> > opens an emailto: link to webguy@marc.info, so adding them here.
+> > Dear marc.info admin, is exporting a copy of the linux-kbuild mail
+> > archive something that you can help us with?
 >
-> Hi,
+> Hi! That sounds like it should be doable; we keep .gz backups of all
+> the lists we're subscribed to. At a quick glance I have them going back
+> to Jan 2, 2008, I thiiiink uninterrupted. There's probably some spam
+> that got sent to the list and/or sent to our subscribed address
+> included.
 >
-> As long as you or someone will go thru the mbox file (about 164 MB or
-> 34 MB when gzipped) and select emails that are To: or Cc:
-> linux-kbuild@vger.kernel.org, I'm OK with making it available.
-> The reason I say that is because it just might have some personal
-> emails in it that should not be added to a public archive.
+> Can someone please contact me off-thread and we'll work out details of
+> how to best get them to you?
 
-Oh, sure. Maybe better than to try to get a cleaner copy from
-marc.info then, as you suggest.
+(On thread) I'll follow up on this (so that we don't have a bunch of
+off threads created)
 
 >
-> Also, as I said earlier, once the correct emails are selected,
-> there are going to be duplicates of many of them, so dropping
-> those duplicates (or triplicates etc.) would be a Good Idea.
+> Thanks,
 >
+> --
 >
-> Has anyone thought about trying to get the kbuild archive from
-> marc.info/?l=linux-kbuild ?  or contacted the marc.info admin?
+> Hank Leininger <hlein@marc.info>
+> ED0E 3040 4240 1DD9 5B2E  6DEC A60B CB9D 0939 76F7
 
-Clicking "add a list" on
-https://marc.info/
-opens an emailto: link to webguy@marc.info, so adding them here.
-Dear marc.info admin, is exporting a copy of the linux-kbuild mail
-archive something that you can help us with?
+
 
 -- 
 Thanks,
