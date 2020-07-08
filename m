@@ -1,53 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay5-d.mail.gandi.net ([217.70.183.197]:34943 "EHLO
-        relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729323AbgGHNc3 (ORCPT
+Received: from relay9-d.mail.gandi.net ([217.70.183.199]:59219 "EHLO
+        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728148AbgGHNgG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 8 Jul 2020 09:32:29 -0400
+        Wed, 8 Jul 2020 09:36:06 -0400
 From: Maxime Chretien <maxime.chretien@bootlin.com>
-Subject: [PATCH] kconfig qconf: Fix mouse events in search view
-Date: Wed,  8 Jul 2020 15:32:15 +0200
-Message-Id: <20200708133215.12532-1-maxime.chretien@bootlin.com>
+Subject: [PATCH] kconfig confdata: Add an option to keep all .config backups
+Date: Wed,  8 Jul 2020 15:35:56 +0200
+Message-Id: <20200708133556.12934-1-maxime.chretien@bootlin.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Maxime Chretien <maxime.chretien@bootlin.com>
+To: masahiroy@kernel.org, michal.lkml@markovi.net, corbet@lwn.net
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Maxime Chretien <maxime.chretien@bootlin.com>
 
-On menu properties mouse events didn't do anything in search view
-(listMode).
+When KCONFIG_KEEPALLBACKUPS is set in the environment,
+instead of renaming the old .config to .config.old, kconfig puts it in
+a folder named .config.backupdir that stores all backups
+with the name .config.oldX where X is a number.
 
-As there are no menus in listMode we can add an exception in tests to
-always change the value on mouse events if we are in listMode.
+The latest backup is the one with the highest number.
+
+This is useful to avoid doing a lot of manual backups to make sure to have
+a working build when you make a lot of changes that can break everything.
 
 Signed-off-by: Maxime Chretien <maxime.chretien@bootlin.com>
 ---
- scripts/kconfig/qconf.cc | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Documentation/kbuild/kconfig.rst |  6 ++++++
+ Makefile                         |  2 +-
+ scripts/kconfig/confdata.c       | 15 ++++++++++++++-
+ 3 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index c0ac8f7b5f1a..53864e02d14b 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -802,7 +802,8 @@ void ConfigList::mouseReleaseEvent(QMouseEvent* e)
- 					break;
- 				ptype = menu->prompt ? menu->prompt->type : P_UNKNOWN;
- 				if (ptype == P_MENU && rootEntry != menu &&
--				    mode != fullMode && mode != menuMode)
-+				    mode != fullMode && mode != menuMode &&
-+                                    mode != listMode)
- 					emit menuSelected(menu);
- 				else
- 					changeValue(item);
-@@ -852,7 +853,7 @@ void ConfigList::mouseDoubleClickEvent(QMouseEvent* e)
- 	if (!menu)
- 		goto skip;
- 	ptype = menu->prompt ? menu->prompt->type : P_UNKNOWN;
--	if (ptype == P_MENU) {
-+	if (ptype == P_MENU && mode != listMode) {
- 		if (mode == singleMode)
- 			emit itemSelected(menu);
- 		else if (mode == symbolMode)
+diff --git a/Documentation/kbuild/kconfig.rst b/Documentation/kbuild/kconfig.rst
+index dce6801d66c9..0f1dac4f1fc2 100644
+--- a/Documentation/kbuild/kconfig.rst
++++ b/Documentation/kbuild/kconfig.rst
+@@ -46,6 +46,12 @@ KCONFIG_OVERWRITECONFIG
+ If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
+ break symlinks when .config is a symlink to somewhere else.
+ 
++KCONFIG_KEEPALLBACKUPS
++-----------------------
++If you set KCONFIG_KEEPALLBACKUPS in the environment, Kconfig will save
++all .config.old as .config.oldX where X is a number (lower is older)
++inside a folder named .config.backupdir .
++
+ `CONFIG_`
+ ---------
+ If you set `CONFIG_` in the environment, Kconfig will prefix all symbols
+diff --git a/Makefile b/Makefile
+index ac2c61c37a73..c74a18c60107 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1437,7 +1437,7 @@ CLEAN_FILES += include/ksym vmlinux.symvers \
+ MRPROPER_FILES += include/config include/generated          \
+ 		  arch/$(SRCARCH)/include/generated .tmp_objdiff \
+ 		  debian snap tar-install \
+-		  .config .config.old .version \
++		  .config .config.old .config.backupdir .version \
+ 		  Module.symvers \
+ 		  signing_key.pem signing_key.priv signing_key.x509	\
+ 		  x509.genkey extra_certificates signing_key.x509.keyid	\
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index a39d93e3c6ae..a019752816a0 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -923,7 +923,20 @@ int conf_write(const char *name)
+ 			return 0;
+ 		}
+ 
+-		snprintf(oldname, sizeof(oldname), "%s.old", name);
++		env = getenv("KCONFIG_KEEPALLBACKUPS");
++		if (env) {
++			i = 0;
++			do {
++				snprintf(oldname, sizeof(oldname),
++					 "%s.backupdir/%s.old%d", name, name, i);
++				i++;
++			} while(is_present(oldname));
++
++			if (make_parent_dir(oldname))
++				return -1;
++		} else {
++			snprintf(oldname, sizeof(oldname), "%s.old", name);
++		}
+ 		rename(name, oldname);
+ 		if (rename(tmpname, name))
+ 			return 1;
 -- 
 2.27.0
