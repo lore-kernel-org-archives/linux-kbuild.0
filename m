@@ -2,148 +2,155 @@ Return-Path: <SRS0=PE23=BI=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36121C433E0
-	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 03:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265B3C433E0
+	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 15:14:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0639920672
-	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 03:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3DEF20829
+	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 15:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595993110;
-	bh=73C4hjWJ1i//PJgQIyTg0dr9hGkKSVuAU02bki5N6Tw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rK9qQfKngGqSw5a59Mbt97GAJc4KRmox9fc1wc01bS0XzrJDDDhsnQFN8eHf7MlcV
-	 uG+rszbzQOSQuSa2YZ2KuY3LA8PtkwuxDjK4HPTU9aDLuDXDlD1IFmT/GVXsd8E71A
-	 nYYYTSdN6sblW3EsvQCH4ErubHiiYzYh2qwxxBWY=
+	s=default; t=1596035692;
+	bh=nKNEQKTvIoBzcmYITZ+D9Tf7NnPmwUDUufW9bzlqp5M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=zJPaKC3kD19S6I1E6nCMRq23ycJ3/iBH3V05kdcHtXVFsJB/uOkXdDvmeFCE6/QzD
+	 scY8f/vd/YZgf9pmLgqbreCxqs1fOXMSJQYHTZem8Ms36zeCfwOOI2h2zGB+z+GhOe
+	 h8QVsCKsN99dV4vQWEeW/ASQkvcdOYLmzcYJfZR8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbgG2DZJ (ORCPT
+        id S1726449AbgG2POv (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 28 Jul 2020 23:25:09 -0400
-Received: from condef-08.nifty.com ([202.248.20.73]:25122 "EHLO
-        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbgG2DZJ (ORCPT
+        Wed, 29 Jul 2020 11:14:51 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:29214 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726365AbgG2POv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Jul 2020 23:25:09 -0400
-X-Greylist: delayed 376 seconds by postgrey-1.27 at vger.kernel.org; Tue, 28 Jul 2020 23:25:08 EDT
-Received: from conuserg-11.nifty.com ([10.126.8.74])by condef-08.nifty.com with ESMTP id 06T3GJ8i030079;
-        Wed, 29 Jul 2020 12:16:19 +0900
-Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 06T3Fi05000857;
-        Wed, 29 Jul 2020 12:15:45 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 06T3Fi05000857
+        Wed, 29 Jul 2020 11:14:51 -0400
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 06TFEDHc030372;
+        Thu, 30 Jul 2020 00:14:14 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 06TFEDHc030372
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1595992545;
-        bh=UempUcm31dYx4tjARW5o0hFSDrdGFkdiTyxqMOHP3V8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Odfzr8aX6Tyca6O/rRqMtQdZXr3EPMx6pSPeCEFWrYfjx4IqQciybu5qqI2HAKXpU
-         XD/H9wE4uMyumfoZHg3Kiqp6NYk8+L8TlgOBas5B16hl2OcQCyErBZzzUxthYOYjK+
-         K9MShcztZiwH5AaBPBj/liQMI258Iw2yjIrm8hls7OKggRsiNHtN9X8bklPEP4on4n
-         sR2rxT+x9pKH36vI40ZYxQeu7oTj8AhUlwOEvF5t9kgjNRwf3J6G3auVGSi4EJvUst
-         R5kCNoaOimDjRSqZeGqQonGHcOnEo0f6R4cGzLhBTbXgSWwfjxW29bO/Tw4lVjLGrV
-         YgP7U1UBgSlSg==
-X-Nifty-SrcIP: [126.25.67.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] kbuild: sort hostprogs before passing it to ifneq
-Date:   Wed, 29 Jul 2020 12:15:37 +0900
-Message-Id: <20200729031537.37926-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200729031537.37926-1-masahiroy@kernel.org>
-References: <20200729031537.37926-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1596035654;
+        bh=K/lBXbWR+x3txyjbotv/nZAEEMUAZKchfnFj0DToDWk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=uvIaubtEdgqQhZN5q3je9HyiqlDhgFOwhJAXmAorB38dYKVyuf3iaU/4QIQekt/ou
+         q2s7aKQmNuFezqPlFZdXU1JmjILyBT5HH6dWcKBIEbOHRVl92uthyb/1gx6LSULxEf
+         d5BaDB86rifemvBOgKQX5hfXkEGRSS02NQ0msW7LBBvAuBDIz4FwrzvQBKoXdbEdRG
+         qyWwL0/Gg597sCbwgEPAhc7xENBYiptI1+381Tw7+Rg8xnlBqyFHjynfPkPI3lR5P4
+         gpJauwPT7iZF6PkRLC2xSjXf3LXHtsW9x2shvSFq5cBmLqW9/im4Mase5tWr3U7i1B
+         tRfM+NK8I3T9Q==
+X-Nifty-SrcIP: [209.85.222.52]
+Received: by mail-ua1-f52.google.com with SMTP id p27so3477359uaa.12;
+        Wed, 29 Jul 2020 08:14:14 -0700 (PDT)
+X-Gm-Message-State: AOAM532OJ/T+3gtbxaA7HjHnBpn1DNBKfPT8rU7ckCByo2Nbf+O7ejts
+        SOp57ysObCGe928NkAr9DZnkPGYLyFmRue7l5Pw=
+X-Google-Smtp-Source: ABdhPJyCO5ocIjSjCCCrBg/b+UNbHdAmrpbxBUNLui4XBSWgs2nOELlaJBu55/dPeNbkp8CEnFdZM5xW9ytKZxMTdfg=
+X-Received: by 2002:ab0:2390:: with SMTP id b16mr6263692uan.25.1596035652852;
+ Wed, 29 Jul 2020 08:14:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <DB7PR08MB380100FDD4D1B11062FA57819C690@DB7PR08MB3801.eurprd08.prod.outlook.com>
+ <CAK7LNAQm87ykKi=OfToZRy2JtNt0OX3n6kXpNxNW5W7HREh4NA@mail.gmail.com> <DB7PR08MB38014590A0A929CF017546E89C700@DB7PR08MB3801.eurprd08.prod.outlook.com>
+In-Reply-To: <DB7PR08MB38014590A0A929CF017546E89C700@DB7PR08MB3801.eurprd08.prod.outlook.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 30 Jul 2020 00:13:35 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATO-z+S_jH_g9J1WFvzG1vqtODdK5vrav6xOV341yGX9g@mail.gmail.com>
+Message-ID: <CAK7LNATO-z+S_jH_g9J1WFvzG1vqtODdK5vrav6xOV341yGX9g@mail.gmail.com>
+Subject: Re: linux-5.8-rc4/scripts/kconfig/qconf.cc: 2 * bad delete ?
+To:     David Binderman <dcb314@hotmail.com>
+Cc:     "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The conditional:
+On Wed, Jul 29, 2020 at 3:28 PM David Binderman <dcb314@hotmail.com> wrote:
+>
+> Hello there,
+>
+> >Will you send a patch, or shall I do it?
+>
+> Option 2 please. I gave up doing kernel patches a long time ago.
 
-  ifneq ($(hostprogs),)
+OK, I will send a patch.
 
-... is evaluated to true if $(hostprogs) does not contain any word but
-whitespace characters.
 
-  ifneq ($(strip $(hostprogs)),)
+> >Could you please teach me how to reproduce them?
+>
+> --language=c++ looks like a good candidate for a fix.
+>
+> Regards
+>
+> David Binderman
+>
 
-... is a safe way to avoid interpreting whitespace as a non-empty value,
-but I'd rather want to use the side-effect of $(sort ...) to do the
-equivalent.
+--language=c++ made no difference, but
+I figured out why cppcheck did not work for me.
 
-$(sort ...) is used in scripts/Makefile.host in order to drop duplication
-in $(hostprogs). It is also useful to strip excessive spaces.
 
-Move $(sort ...) before evaluating the ifneq.
+If scripts/kconfig/qconf.moc is remaining,
+cppcheck does not work.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- scripts/Makefile.build |  5 ++++-
- scripts/Makefile.host  | 10 ++++------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+After I deleted it, cppcheck worked for me.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d41c1cd453b9..e0b6b5db11c2 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -45,12 +45,15 @@ include $(kbuild-file)
- 
- include scripts/Makefile.lib
- 
--# Do not include hostprogs rules unless needed
-+# Do not include hostprogs rules unless needed.
-+# $(sort ...) is used here to remove duplicated words and excessive spaces.
-+hostprogs := $(sort $(hostprogs))
- ifneq ($(hostprogs),)
- include scripts/Makefile.host
- endif
- 
- # Do not include userprogs rules unless needed.
-+# $(sort ...) is used here to remove duplicated words and excessive spaces.
- userprogs := $(sort $(userprogs))
- ifneq ($(userprogs),)
- include scripts/Makefile.userprogs
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 687ca3f309e9..278b4d6ac945 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -38,24 +38,22 @@ $(obj)/%.tab.c $(obj)/%.tab.h: $(src)/%.y FORCE
- # Will compile qconf as a C++ program, and menu as a C program.
- # They are linked as C++ code to the executable qconf
- 
--__hostprogs := $(sort $(hostprogs))
--
- # C code
- # Executables compiled from a single .c file
--host-csingle	:= $(foreach m,$(__hostprogs), \
-+host-csingle	:= $(foreach m,$(hostprogs), \
- 			$(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
- 
- # C executables linked based on several .o files
--host-cmulti	:= $(foreach m,$(__hostprogs),\
-+host-cmulti	:= $(foreach m,$(hostprogs),\
- 		   $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
- 
- # Object (.o) files compiled from .c files
--host-cobjs	:= $(sort $(foreach m,$(__hostprogs),$($(m)-objs)))
-+host-cobjs	:= $(sort $(foreach m,$(hostprogs),$($(m)-objs)))
- 
- # C++ code
- # C++ executables compiled from at least one .cc file
- # and zero or more .c files
--host-cxxmulti	:= $(foreach m,$(__hostprogs),$(if $($(m)-cxxobjs),$(m)))
-+host-cxxmulti	:= $(foreach m,$(hostprogs),$(if $($(m)-cxxobjs),$(m)))
- 
- # C++ Object (.o) files compiled from .cc files
- host-cxxobjs	:= $(sort $(foreach m,$(host-cxxmulti),$($(m)-cxxobjs)))
+
+masahiro@oscar:~/workspace/linux$ make build_xconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/images.o
+  HOSTCC  scripts/kconfig/confdata.o
+  HOSTCC  scripts/kconfig/expr.o
+  LEX     scripts/kconfig/lexer.lex.c
+  YACC    scripts/kconfig/parser.tab.[ch]
+  HOSTCC  scripts/kconfig/lexer.lex.o
+  HOSTCC  scripts/kconfig/parser.tab.o
+  HOSTCC  scripts/kconfig/preprocess.o
+  HOSTCC  scripts/kconfig/symbol.o
+  HOSTCC  scripts/kconfig/util.o
+  UPD     scripts/kconfig/qconf-cfg
+  MOC     scripts/kconfig/qconf.moc
+  HOSTCXX scripts/kconfig/qconf.o
+  HOSTLD  scripts/kconfig/qconf
+masahiro@oscar:~/workspace/linux$ cppcheck  scripts/kconfig/qconf.cc
+Checking scripts/kconfig/qconf.cc ...
+masahiro@oscar:~/workspace/linux$ rm -f scripts/kconfig/qconf.moc
+masahiro@oscar:~/workspace/linux$ cppcheck  scripts/kconfig/qconf.cc
+Checking scripts/kconfig/qconf.cc ...
+scripts/kconfig/qconf.cc:1242:10: error: Mismatching allocation and
+deallocation: data [mismatchAllocDealloc]
+  delete data;
+         ^
+scripts/kconfig/qconf.cc:1236:15: note: Mismatching allocation and
+deallocation: data
+ char *data = new char[count + 1];
+              ^
+scripts/kconfig/qconf.cc:1242:10: note: Mismatching allocation and
+deallocation: data
+  delete data;
+         ^
+scripts/kconfig/qconf.cc:1255:10: error: Mismatching allocation and
+deallocation: data [mismatchAllocDealloc]
+  delete data;
+         ^
+scripts/kconfig/qconf.cc:1236:15: note: Mismatching allocation and
+deallocation: data
+ char *data = new char[count + 1];
+              ^
+scripts/kconfig/qconf.cc:1255:10: note: Mismatching allocation and
+deallocation: data
+  delete data;
+         ^
+
+
+
+
+
+
+
+
 -- 
-2.25.1
-
+Best Regards
+Masahiro Yamada
