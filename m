@@ -1,134 +1,162 @@
-Return-Path: <SRS0=PE23=BI=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=kh6A=BJ=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E32B8C433DF
-	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 21:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0421C433DF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Jul 2020 18:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC2B820809
-	for <linux-kbuild@archiver.kernel.org>; Wed, 29 Jul 2020 21:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7CD320829
+	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Jul 2020 18:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ov00EPcp"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="KhHHz4Bv";
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="e4CnuqOS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbgG2VSU (ORCPT
+        id S1726544AbgG3SNz (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 29 Jul 2020 17:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726581AbgG2VSU (ORCPT
+        Thu, 30 Jul 2020 14:13:55 -0400
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:14916 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726343AbgG3SNy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 29 Jul 2020 17:18:20 -0400
-Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161F9C0619D2
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Jul 2020 14:18:20 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id f9so2878920pju.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Jul 2020 14:18:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=g0KUC06W8wfVDa5/aZnaCNDXj9N7Ln444BL6AjoPMxY=;
-        b=Ov00EPcpcds4iXOLfFieegwR7hRlUtJeKUY5QQkoF0Jh9tZT4y47ON4fxaZEsShZVi
-         fUtVBaFg6UI206ysebvZU7XlJKrNCGUtO3b3dYfZbBpeEv2+k58TFlsv9W2l+H5RlU/x
-         xMnrIcH5vYD2zHkhisMgP8KYicUzt69+3EeaY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=g0KUC06W8wfVDa5/aZnaCNDXj9N7Ln444BL6AjoPMxY=;
-        b=CT2jToJPje8fk7ZDMSlvCggSZwKx+DSmcbO1N5DDbWNeZiVwWQk4+F6HYS8MMnFpJB
-         utpbhsMB4SPWRVmozNDJHQvzi9v5Rw/XwLwcqbcP/CZnRPNABbHl/ggx2pjGtOzE1GZi
-         5Y9U+murDc35L9+ySzurXlGQmkLAbjVQOdLTLOPIIkWbASNxeAY4XSR6gh4Bfx+0eeAC
-         FZVXusnUSbMwUH9kNkPf8k/WyKwwTv7UQObZlxXCwV2uj1vFiJIW0sRXlIDLnvFVqQ9d
-         SbAFIx66D9jl939zB44fx3lukUrBWSb62ovMaqWIf6IDC2VW3nQ09rSH47Ij9aE/Z5+H
-         P87A==
-X-Gm-Message-State: AOAM531Mat2rSxKi/JthaLwh+OPGg6LYbqibN+soQ/z5aIkEegMFfw0g
-        4JoXRbx90LlKwBTFRzcUoWIExw==
-X-Google-Smtp-Source: ABdhPJwi4J+xm/nvozPDUCQnat7NJCVcTCoGI36EfCZlyYLjp9/7AClfhzP1RAFLsh2ytY1lCy1vVg==
-X-Received: by 2002:a17:90a:3488:: with SMTP id p8mr12222748pjb.211.1596057499443;
-        Wed, 29 Jul 2020 14:18:19 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h63sm2367630pjb.29.2020.07.29.14.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2020 14:18:18 -0700 (PDT)
-Date:   Wed, 29 Jul 2020 14:18:17 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, Emese Revfy <re.emese@gmail.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] kbuild: move shared library build rules to
- scripts/gcc-plugins/Makefile
-Message-ID: <202007291401.A50E25BB@keescook>
-References: <20200729031537.37926-1-masahiroy@kernel.org>
+        Thu, 30 Jul 2020 14:13:54 -0400
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06UIDFX4012232;
+        Thu, 30 Jul 2020 11:13:18 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=facebook;
+ bh=iRcJYr1zkhzCasQJtaVqUCELqv9qKbYKnGu+XXFDQMc=;
+ b=KhHHz4BvIOZN+7DJqnc4LFYaZ+OANp1laZb6mdVOXop4pt5EUTHHECrYqkBVpYXyFpaA
+ O9GNw1byE+EwHanJQOTrdYpjf3/khp1pd4IhPmrvrC+8+Tbuz+amL39U9hSiE/iH8cPE
+ LWhPv3ug8JydWfuJAKKyz0liBD8vq5bLsK0= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com with ESMTP id 32k7hw7dgs-4
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Thu, 30 Jul 2020 11:13:18 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (100.104.31.183)
+ by o365-in.thefacebook.com (100.104.36.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1979.3; Thu, 30 Jul 2020 11:12:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B9GpUeBxfA1xnW5rIRgwipNoZTRS7gOAkccq+4BEnMt3FMD84qCwMr1IPZletOD1iiowbWg9gqku7gqpB0yZmW4zGHR1UH6nWdJoGfaRO0leyuZVZwAt/7uVQmBdQCQE/tz9cEs41tnXME6z/7yrqKf/07f1A2ixRhgPsPBYTUHb8O4e1iWd59mcTozXaejCcvQDMwrPoNmjLGDaVWz/X2HbaiuDW3atpwgaDUb0+A5OT6Rl32MiUBB2IpyHDlVjy3JTuvOjwm8/9JnWI4GcMhuLq5LArC3SLHEW83VjPAh/0gyuAlNoAYxnx9nUemrdzZ9ThhFNQBO/S8sdr/nMOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iRcJYr1zkhzCasQJtaVqUCELqv9qKbYKnGu+XXFDQMc=;
+ b=PK2rYNO3ATm442RFu3PhLpY16o9R9g/csSZrJTJWq8Tx1f6SJZdqg5QVhKArph+Dey1v3khqjEDsdRWRZcqY3ug9oMKfu7uSiFC9aEcpGgcLMSZL27X+SVD/t9A4Ula15h5icHuWE8zHGtbtsRnD1WdsZZEo+YXzxeKXeuZGxG0NKpBNgPPCxkRn9qeG1kUluOgFjPABDp1oeKVKdhNcZtsy0a1VHfb22llY+lEsT2GZW4fuAKK35mtCSexL6DY6Psl0UAOLR5A4wp44HjUyDJtmfTWPVYkDSswIe39VPkuwdRbZSe/EpJo+FOi8RTYYWRYXFP8zfvTzXAPwpExefg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
+ header.d=fb.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector2-fb-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iRcJYr1zkhzCasQJtaVqUCELqv9qKbYKnGu+XXFDQMc=;
+ b=e4CnuqOSnd5XV0Px6cfZ3pxI2Lyg86M0L9YE/6ck3dVdzGp15kH3NqTSH93qyDtYEZCPhIwXZzPjAg3005P0BA5OR99HSJxC/OWY8ie22csmGyYyfRnrDcPv1HjldcAbjWSeER6Fs2/7KyPMPagWY30RHGDkwphgoBlR4Xgs47c=
+Received: from BY5PR15MB3667.namprd15.prod.outlook.com (2603:10b6:a03:1f9::18)
+ by BY5PR15MB3571.namprd15.prod.outlook.com (2603:10b6:a03:1f6::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16; Thu, 30 Jul
+ 2020 18:12:45 +0000
+Received: from BY5PR15MB3667.namprd15.prod.outlook.com
+ ([fe80::f4b9:8011:9aaa:e4ea]) by BY5PR15MB3667.namprd15.prod.outlook.com
+ ([fe80::f4b9:8011:9aaa:e4ea%3]) with mapi id 15.20.3216.034; Thu, 30 Jul 2020
+ 18:12:45 +0000
+From:   Nick Terrell <terrelln@fb.com>
+To:     Arvind Sankar <nivedita@alum.mit.edu>
+CC:     Nick Terrell <nickrterrell@gmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Chris Mason <clm@fb.com>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>,
+        Kernel Team <Kernel-team@fb.com>,
+        Adam Borowski <kilobyte@angband.pl>,
+        Patrick Williams <patrickw3@fb.com>,
+        "Michael van der Westhuizen" <rmikey@fb.com>,
+        "mingo@kernel.org" <mingo@kernel.org>,
+        "Patrick Williams" <patrick@stwcx.xyz>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        "Norbert Lange" <nolange79@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Alex Xu" <alex_y_xu@yahoo.ca>
+Subject: Re: [PATCH v9 6/7] x86: Add support for ZSTD compressed kernel
+Thread-Topic: [PATCH v9 6/7] x86: Add support for ZSTD compressed kernel
+Thread-Index: AQHWZGtJP6i+3aGT+0aLlu4R7hiSkqkcQ4EAgAQtswA=
+Date:   Thu, 30 Jul 2020 18:12:44 +0000
+Message-ID: <8CDBA7E1-B456-439B-86F7-363EFDF127F2@fb.com>
+References: <20200727230606.906598-1-nickrterrell@gmail.com>
+ <20200727230606.906598-7-nickrterrell@gmail.com>
+ <20200728022408.GA3553606@rani.riverdale.lan>
+In-Reply-To: <20200728022408.GA3553606@rani.riverdale.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: alum.mit.edu; dkim=none (message not signed)
+ header.d=none;alum.mit.edu; dmarc=none action=none header.from=fb.com;
+x-originating-ip: [2620:10d:c090:400::5:aaef]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c15e8e21-3a10-4162-c14c-08d834b428a2
+x-ms-traffictypediagnostic: BY5PR15MB3571:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR15MB35712B71DC64303C586167ADAB710@BY5PR15MB3571.namprd15.prod.outlook.com>
+x-fb-source: Internal
+x-ms-oob-tlc-oobclassifiers: OLM:989;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tXrTLiIREdd1j9/xk3p1whKJLwDx3sx08JUOi1Xa5BKwQqoiVKiCmK8MNKpyZtbJy2eRfQLMuii/L0Gi8zmuAH1A7fWPAAWPkTqhCQeiysuCkk0pqslm4etbbpUSy0SCjGZMyzzQYesCtpueHCBDNevmeJPUG5ZXHq/xXDle1mxDGo8KAlogAZZyTycJLaLFYgHshkSp5TeAv6qdPZN4FCXEZbc3v+qBlINXjti/is8L2wXft6UGIJxc0kaAvPkQRWTzxnhQdQjw1zkRgnFtSu1VunnE39yhoRSed5+zfm/9vMaB6aGv15wsb/2hJrWT1F54tv+qfp7bQT+j9+0U0g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR15MB3667.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(376002)(346002)(136003)(39860400002)(396003)(366004)(66946007)(6486002)(478600001)(4326008)(33656002)(2906002)(86362001)(6506007)(6916009)(6512007)(83380400001)(76116006)(53546011)(5660300002)(316002)(8936002)(186003)(8676002)(54906003)(66556008)(71200400001)(2616005)(66446008)(36756003)(64756008)(66476007)(7416002)(4744005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: NzZd6veRbQw/onsDGLbW5UPxtTRjhi29HsaRgxG/YWVz0W32psjJIk4esnXTJOZPCE1UI8N95p9aAWXm2rTNd0Orge50gZh5i39dCKdMYUl34Ilef4KCwXIGX37dqlfP+eWhGhTWHH6XwNhc135kZePybOTdPw7JMQffTq1JFbdKkeHytnR9+QYugHKoDcl0dYOcsKG5nhUsWRwO0vtS2lp/TdfvsstLzCPgwPk0c6pZ5IMzOgswlpAXziv1uPLwHWLfhrbVIzgDuxQRb3+sYAnym0R4iZkUzHFrvJy+g+cM4wFRcjVnguy+UGf8z6Q7pagnC21Jyr9zk1V/+MmHvf/mvSNpPZTDdBbVoE5EyZYWvvP7+LEmpnhDdsA2lfLVOFFw+QRjLht+mBErktwiaalBAp+lKcmVZVtpt3t7VL925G64PaikBZ95JZkjHEZxdFLUPbzvCDd92Us5/mpeCltPhxUdvW5AxmPAArV+4jcemcCMSruhpsHrcea0lfZ7euKmZephchu+pGMImloIS7hPeSukKCY4JqwjWXNzkRDGB951P3HgElEevdIuL+13I5nr/r2edfiVwGF/Z2nnu26UvZ7bCygCUoBkfuIWzRLaolD/Bh5nJmqKVOUmlOMgCJhg8Z5huGlBeGAzz12GTxZiNOyn1+nGr3kTX6SXOGpVtUu/TZ8hkcySGrON0/Cf
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <BDAF2659D000794283223659FF11EB8E@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200729031537.37926-1-masahiroy@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR15MB3667.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c15e8e21-3a10-4162-c14c-08d834b428a2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2020 18:12:45.2318
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: NGuEFetKF5UrG/H0MdhB58EasXyNxA232gad7zrMn1D2BnoM5auY6QGFmA+M3ROK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR15MB3571
+X-OriginatorOrg: fb.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-30_13:2020-07-30,2020-07-30 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 suspectscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ adultscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300130
+X-FB-Internal: deliver
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Jul 29, 2020 at 12:15:36PM +0900, Masahiro Yamada wrote:
-> The shared library build rules are currently implemented in
-> scripts/Makefile.host, but actually GCC-plugin is the only user of
-> them. Hence, they do not need to be treewide available.
 
-Are none of the VDSOs intending to use these rules?
 
-> Move all the relevant build rules to scripts/gcc-plugins/Makefile.
-> 
-> I also optimized the build steps so *.so is directly built from .c
-> because every upstream plugin is compiled from a single source file.
-> 
-> I am still keeping the infrastructure to build a plugin from multiple
-> files because Kees suggested to do so in my previous attempt.
-> (https://lkml.org/lkml/2019/1/11/1107)
-> 
-> If the plugin, foo.so, is compiled from two files foo.c and foo2.c,
-> then you can do like follows:
-> 
->   foo-objs := foo.o foo2.o
-> 
-> Single-file plugins do not need the *-objs notation.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> On Jul 27, 2020, at 7:24 PM, Arvind Sankar <nivedita@alum.mit.edu> wrote:
+>=20
+> On Mon, Jul 27, 2020 at 04:06:05PM -0700, Nick Terrell wrote:
+>> From: Nick Terrell <terrelln@fb.com>
+>>=20
+>> * Define __DISABLE_EXPORTS in misc.c
+> ...
+>> __DISABLE_EXPORTS is defined in misc.c instead of the Makefile because
+>> kaslr.c defines __DISABLE_EXPORTS, and defining it in the Makefile gives
+>> duplicate definition warnings.
+>>=20
+> I think the commit message missed getting updated?
 
-But, yeah, sure!
+Thanks! Putting up a reworded patch now.
 
-Acked-by: Kees Cook <keescook@chromium.org>
-
-Unrelated, but I do note that objtool maybe has the wrong indentation,
-path name reporting, and tool names (HOSTLD vs CC)?
-
-...
-  HOSTCC  scripts/asn1_compiler
-  HOSTCC  scripts/extract-cert
-  HOSTCC  scripts/genksyms/genksyms.o
-  YACC    scripts/genksyms/parse.tab.[ch]
-  LEX     scripts/genksyms/lex.lex.c
-  DESCEND  objtool
-  HOSTCXX scripts/gcc-plugins/cyc_complexity_plugin.so
-  HOSTCXX scripts/gcc-plugins/latent_entropy_plugin.so
-  HOSTCXX scripts/gcc-plugins/structleak_plugin.so
-  GENSEED scripts/gcc-plugins/randomize_layout_seed.h
-  HOSTCXX scripts/gcc-plugins/stackleak_plugin.so
-  HOSTCC  scripts/genksyms/parse.tab.o
-  HOSTCC  scripts/genksyms/lex.lex.o
-  HOSTCC   /home/kees/src/linux-build/plugins/tools/objtool/fixdep.o
-  HOSTLD  arch/x86/tools/relocs
-  HOSTLD   /home/kees/src/linux-build/plugins/tools/objtool/fixdep-in.o
-  LINK     /home/kees/src/linux-build/plugins/tools/objtool/fixdep
-  CC       /home/kees/src/linux-build/plugins/tools/objtool/exec-cmd.o
-  CC       /home/kees/src/linux-build/plugins/tools/objtool/help.o
-  CC       /home/kees/src/linux-build/plugins/tools/objtool/weak.o
-...
-
--- 
-Kees Cook
