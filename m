@@ -1,121 +1,164 @@
-Return-Path: <SRS0=kh6A=BJ=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=5qEa=BK=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 787F9C433DF
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Jul 2020 19:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F204CC433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 31 Jul 2020 04:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57A5F2083B
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Jul 2020 19:11:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOJH1I3/"
+	by mail.kernel.org (Postfix) with ESMTP id C25B721744
+	for <linux-kbuild@archiver.kernel.org>; Fri, 31 Jul 2020 04:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596169034;
+	bh=D1cPi/di/CUaLEW+RsCTPAwci0FNd8ABTW23PTjjUts=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=xO4UJO8Yg0pVn75iSNLa4A5n/gJeZ1m/4wbQmTqQ7EB048Al8BXh1fHqLbQgho0nv
+	 SBWfo/DwSkbcGejDUup/FWv/rNadYVy6DGy3h4aIqnC3ijmi5yfznwrkpcdL2NwR0B
+	 QwhMCAkf5WUikUMlngnhYr8D16lDrd3kTIEi9jT4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730517AbgG3TLr (ORCPT
+        id S1725818AbgGaERO (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 30 Jul 2020 15:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730444AbgG3TLj (ORCPT
+        Fri, 31 Jul 2020 00:17:14 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:51186 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725800AbgGaERO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Jul 2020 15:11:39 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CBEC061574;
-        Thu, 30 Jul 2020 12:11:39 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id g19so2463370plq.0;
-        Thu, 30 Jul 2020 12:11:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=033/koxi8tBQP0JLIdsncSOzrcGFA+WfwhEA16y7708=;
-        b=VOJH1I3/2EUXK2+wuA1Qck7sGAXLG+sr+IPGIjUgVGyQ8D8d3YnpK09z6N6KE7fG2Y
-         cu1nLPOjj4U3vJ1cNHVd1qhL17ZzhCjjMEXqwgiNg/hTEZvxwMR7uXhbXO7+YcFnDR+X
-         jgfOWzGjbtrV+R41GOlTRCKS/cOUwYDrBwVLuMjtiKY5OFa/4xSELAsl9dET4AA/X/UR
-         lPraacU5i7lhcurzr/uZs1ax0zi7JPXwEn+vGnfvXgoHWd0NPxnys6vyAPkm5YCeD1lH
-         kBoRnAvnjbjQeC9Ucqy04omLCjYOZZ/shrpY+PLLPIil4Xz0CZN4vpvlW0hqFja2Muyl
-         D5JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=033/koxi8tBQP0JLIdsncSOzrcGFA+WfwhEA16y7708=;
-        b=N8mkWXX3K7eOymuHAPkfrK7ibmb81qGZsDMHubEpGMmdbsYbcsUE41w0kiqg+0uEcv
-         l4pzUGVshty3HTox/gBAIcnC+OsHsjeqRMRXzP2qVsnNi66QPNfQHKnUJh3hPzxNPT2i
-         +dRvUQa/wrJ70AZszUu+tTB9307rFAvxiUkeWhc9K/VW9fd5pEND4tZP2AuQYFOQaGT2
-         IccWZo61f8LsKo7F9lxw2w3lBBvqDtIG02V0PVes4+7sKL1SccTO+xgoYJ0RUSndtcpH
-         wk7FugNeqyyd4QRanlLKuNDNvsA9q+asITuPDdPvr/ocjHKb2jiuXKlku6tB/zBoD1p5
-         JDfQ==
-X-Gm-Message-State: AOAM53208XR29xsrkHw3YVZvhBFU7+KOhqfsZe1Z2AGgI5YZ5q6mL8AG
-        3F2tNfobZ1rMmlqqOispgBI=
-X-Google-Smtp-Source: ABdhPJzhH1KCDavhn1SyTstAYmZDkp0/vMIpOz8PMPIheimgqMBK62Ia4E0QQnxqNbKZdMMQAwxB3g==
-X-Received: by 2002:a17:902:b7c2:: with SMTP id v2mr623822plz.34.1596136298588;
-        Thu, 30 Jul 2020 12:11:38 -0700 (PDT)
-Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
-        by smtp.gmail.com with ESMTPSA id o22sm8644976pfu.206.2020.07.30.12.11.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2020 12:11:37 -0700 (PDT)
-From:   Nick Terrell <nickrterrell@gmail.com>
-To:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, Chris Mason <clm@fb.com>,
-        linux-kbuild@vger.kernel.org, x86@kernel.org,
-        gregkh@linuxfoundation.org, Petr Malat <oss@malat.biz>,
-        Kees Cook <keescook@chromium.org>,
-        Kernel Team <Kernel-team@fb.com>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Adam Borowski <kilobyte@angband.pl>,
-        Patrick Williams <patrickw3@fb.com>, rmikey@fb.com,
-        mingo@kernel.org, Patrick Williams <patrick@stwcx.xyz>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        Norbert Lange <nolange79@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alex Xu <alex_y_xu@yahoo.ca>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Terrell <terrelln@fb.com>
-Subject: [PATCH v10 7/8] .gitignore: add ZSTD-compressed files
-Date:   Thu, 30 Jul 2020 12:08:40 -0700
-Message-Id: <20200730190841.2071656-8-nickrterrell@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200730190841.2071656-1-nickrterrell@gmail.com>
-References: <20200730190841.2071656-1-nickrterrell@gmail.com>
+        Fri, 31 Jul 2020 00:17:14 -0400
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 06V4GsBH006071;
+        Fri, 31 Jul 2020 13:16:55 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 06V4GsBH006071
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1596169015;
+        bh=R1IrfvP9cuBPNOuEO/yY0TGNkg04pM5nMVUeGi+yTK8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=RG9cV5YUeDYircoip5N+K9h2SxEtE9Y8oHHWV/qPJECi1kRphgYBVi/n1pvuOe0oR
+         oYoYQ3F7gj4MJRsKkg2AXyMyR1va8Y8MaP+DPmSl2IsVFr28ogcU9g9aiQ8YSCSt1a
+         b9/nSn7IrH/U+ZPRVBxt9oc9ZBcst8EgyXLkEkDtMfPLG8v9JjfrBSHwT/Svv/aq3k
+         dFQH+k3VVrHKnVLRQTZWoj0sljhsLSJ0KbbmJ9oB3VDPDe4YYeEsoKS3SmkfpUMqEu
+         j1YODArqV5lUy0RJYf6/ZCaRIZ3yjGcLdV8sYWmyYOdPWjR5+eyCAIzZyZbqkOBK15
+         zfhZSu8SjjDZQ==
+X-Nifty-SrcIP: [209.85.217.45]
+Received: by mail-vs1-f45.google.com with SMTP id j23so8859995vsq.7;
+        Thu, 30 Jul 2020 21:16:55 -0700 (PDT)
+X-Gm-Message-State: AOAM533DFgbexf8imQEbPsJTwdUaYfJihmp92040FAnq6A9h8JSGyh8k
+        A40+JfjBlOtYRRsA9Hx2m0JfFyKYfKrnTDnJyoI=
+X-Google-Smtp-Source: ABdhPJz+g9DAv5sd7YqE3RvXYJ01euot2DXSjrp71DbvIbsn55drU8dWkBhosZUpWoJaGkCWqiazywDaYVxaITNEqEE=
+X-Received: by 2002:a67:de09:: with SMTP id q9mr1889244vsk.179.1596169014216;
+ Thu, 30 Jul 2020 21:16:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200729031537.37926-1-masahiroy@kernel.org> <202007291401.A50E25BB@keescook>
+In-Reply-To: <202007291401.A50E25BB@keescook>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 31 Jul 2020 13:16:17 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASRoqNfO+JAj9kKRgi3ee5mcdV99spy4t6jKG1RGC4KXA@mail.gmail.com>
+Message-ID: <CAK7LNASRoqNfO+JAj9kKRgi3ee5mcdV99spy4t6jKG1RGC4KXA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: move shared library build rules to scripts/gcc-plugins/Makefile
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Emese Revfy <re.emese@gmail.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Adam Borowski <kilobyte@angband.pl>
+On Thu, Jul 30, 2020 at 6:18 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Wed, Jul 29, 2020 at 12:15:36PM +0900, Masahiro Yamada wrote:
+> > The shared library build rules are currently implemented in
+> > scripts/Makefile.host, but actually GCC-plugin is the only user of
+> > them. Hence, they do not need to be treewide available.
+>
+> Are none of the VDSOs intending to use these rules?
 
-For now, that's arch/x86/boot/compressed/vmlinux.bin.zst but probably more
-will come, thus let's be consistent with all other compressors.
 
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Nick Terrell <terrelln@fb.com>
-Signed-off-by: Adam Borowski <kilobyte@angband.pl>
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Right.
 
-diff --git a/.gitignore b/.gitignore
-index d5f4804ed07c..162bd2b67bdf 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -44,6 +44,7 @@
- *.tab.[ch]
- *.tar
- *.xz
-+*.zst
- Module.symvers
- modules.builtin
- modules.order
--- 
-2.27.0
+GCC plugin .so files are compiled for the _host_ architecture.
+vDSO .so files are compiled for the _target_ architecture.
 
+They are built in completely different ways.
+
+
+
+> > Move all the relevant build rules to scripts/gcc-plugins/Makefile.
+> >
+> > I also optimized the build steps so *.so is directly built from .c
+> > because every upstream plugin is compiled from a single source file.
+> >
+> > I am still keeping the infrastructure to build a plugin from multiple
+> > files because Kees suggested to do so in my previous attempt.
+> > (https://lkml.org/lkml/2019/1/11/1107)
+> >
+> > If the plugin, foo.so, is compiled from two files foo.c and foo2.c,
+> > then you can do like follows:
+> >
+> >   foo-objs := foo.o foo2.o
+> >
+> > Single-file plugins do not need the *-objs notation.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+>
+> But, yeah, sure!
+>
+> Acked-by: Kees Cook <keescook@chromium.org>
+>
+> Unrelated, but I do note that objtool maybe has the wrong indentation,
+> path name reporting, and tool names (HOSTLD vs CC)?
+
+
+Right.
+Many people know it.
+
+
+objtool opts out the Kbuild instructure.
+
+I wrote a patch to make objtool join the Kbuild:
+https://patchwork.kernel.org/patch/10839051/
+
+The objtool maintainers refused to do this.
+
+
+
+
+
+
+> ...
+>   HOSTCC  scripts/asn1_compiler
+>   HOSTCC  scripts/extract-cert
+>   HOSTCC  scripts/genksyms/genksyms.o
+>   YACC    scripts/genksyms/parse.tab.[ch]
+>   LEX     scripts/genksyms/lex.lex.c
+>   DESCEND  objtool
+>   HOSTCXX scripts/gcc-plugins/cyc_complexity_plugin.so
+>   HOSTCXX scripts/gcc-plugins/latent_entropy_plugin.so
+>   HOSTCXX scripts/gcc-plugins/structleak_plugin.so
+>   GENSEED scripts/gcc-plugins/randomize_layout_seed.h
+>   HOSTCXX scripts/gcc-plugins/stackleak_plugin.so
+>   HOSTCC  scripts/genksyms/parse.tab.o
+>   HOSTCC  scripts/genksyms/lex.lex.o
+>   HOSTCC   /home/kees/src/linux-build/plugins/tools/objtool/fixdep.o
+>   HOSTLD  arch/x86/tools/relocs
+>   HOSTLD   /home/kees/src/linux-build/plugins/tools/objtool/fixdep-in.o
+>   LINK     /home/kees/src/linux-build/plugins/tools/objtool/fixdep
+>   CC       /home/kees/src/linux-build/plugins/tools/objtool/exec-cmd.o
+>   CC       /home/kees/src/linux-build/plugins/tools/objtool/help.o
+>   CC       /home/kees/src/linux-build/plugins/tools/objtool/weak.o
+> ...
+>
+> --
+> Kees Cook
+
+
+
+--
+Best Regards
+Masahiro Yamada
