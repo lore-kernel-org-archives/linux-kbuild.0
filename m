@@ -4,56 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EED1C433DF
-	for <linux-kbuild@archiver.kernel.org>; Sat,  1 Aug 2020 15:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FA9C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sat,  1 Aug 2020 15:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 237AE2071E
-	for <linux-kbuild@archiver.kernel.org>; Sat,  1 Aug 2020 15:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19C682071E
+	for <linux-kbuild@archiver.kernel.org>; Sat,  1 Aug 2020 15:01:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596294088;
-	bh=h+QvBZvTQeHckmI/tg4qrDAcMtAVOXBhTfcgC17m434=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NwSgVvab9FnM7X3E/nWIhIC8tFMgSMvfwBBx/zqxHcgpzWysztl9lyCl3M/5ZN13F
-	 LTVexTy2NXvfRFW6JCuJqu8ak6DuXJiktRIPjKRkr88hmYwPcLkK/8XAdNLnf7LzQp
-	 y4Sraejy7mxQE+jFNahwr5ej03dpSNM1Ss9ZFHQA=
+	s=default; t=1596294114;
+	bh=MGNluP/9a7NuKGLRcBQR/ggshEl8NQsTVywMrBmelYk=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=gz8txejNeNUaloxDllqBppm1CDTU0VULLrpx0Q3tB1pzwli1eYU4XssY1d7OcQPum
+	 RgvlRPvrqYdtT38c9w7OzXlrnRmgTq6yB+lLR5ft/N4bTqKFfKtm/mNs4TRScYeaQG
+	 88D0QhfYw58pd7cbzAu1EKY0Fj229oABDd/yQuzs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725841AbgHAPB1 (ORCPT
+        id S1726523AbgHAPBx (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 1 Aug 2020 11:01:27 -0400
-Received: from conuserg-11.nifty.com ([210.131.2.78]:52858 "EHLO
+        Sat, 1 Aug 2020 11:01:53 -0400
+Received: from conuserg-11.nifty.com ([210.131.2.78]:53478 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbgHAPB1 (ORCPT
+        with ESMTP id S1725804AbgHAPBx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Aug 2020 11:01:27 -0400
+        Sat, 1 Aug 2020 11:01:53 -0400
 Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 071F0q52015446;
-        Sun, 2 Aug 2020 00:00:54 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 071F0q52015446
+        by conuserg-11.nifty.com with ESMTP id 071F0q51015446;
+        Sun, 2 Aug 2020 00:00:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 071F0q51015446
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596294054;
-        bh=tOAxt/j1JhH6AssVaD3P2jNNLUCqu0fvMz1gL/uy2Nc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Aew+XXgxDTsJJ+V71E9b8rdKrHNtDcwTn0g3ojdbmH52hnHTtUFalzg4JL69ChJSh
-         R0IV/GLNMHQoiT4xTCOjDcC28oFx5ejl02iUY+Y5eUIh5J47lCYiTk1q/+V9l+hfeQ
-         rnfusbF1Xo+WRk2t2UFKO52vUcQieL6yf8nWNd6Ll53P8Bpy7APDa9Rog8xqnok+1u
-         BT/IIBDbUzQDaiqeIEfpzh8qvzk+QG6T67tbAY57s7yd0uEbxPMUBOXSmfvV9DOwjd
-         r5VHi+YqedEPQH+W4q97TbZU64/w6W0ZWHKgtsdFAOuq1JBM/XXb97bZ0u0qWN3zkE
-         678fXUPU76/LA==
+        s=dec2015msa; t=1596294053;
+        bh=iB+4Axh/LScTu6iv9y46G7fJslW+Ej8Wjx6mPd1aNvk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=c0JKLZBNUX/vFZqw09nlPS+4PAOgo05+nSaDmnRBC+w4C4BBIOPD1P/14Qky4UvOa
+         y1RzB7zGuMTnS39bGaAB1SjW/zO2DrKJ6qcVxOvUd3LJAVMWoYph0ZPUadt+CSyJa/
+         hNSnC3z5Ew5NXQ+zid0xZRDgLm4kpVHTo40YOy6Vu0E89mE+Up1sgKm1jQz6Orz/b7
+         7nAntrZOgykP7Ea4zi2Kf4EgLpri8bOhGzwWZQ29sR5DHylnPsAO0WGctyBR+Gt48R
+         dbj0TrN4vJOjv6+IPYIYFPOZbWeqrFkSFZnlqzBe6yL+BI89hOQXcwux6aFhUXivMz
+         j1GV0bHAKVbeQ==
 X-Nifty-SrcIP: [126.25.67.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 2/2] kbuild: stop filtering out $(GCC_PLUGINS_CFLAGS) from cc-option base
-Date:   Sun,  2 Aug 2020 00:00:50 +0900
-Message-Id: <20200801150050.767038-2-masahiroy@kernel.org>
+        Dmitry Vyukov <dvyukov@google.com>,
+        Marco Elver <elver@google.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        kasan-dev@googlegroups.com
+Subject: [PATCH 1/2] kbuild: include scripts/Makefile.* only when relevant CONFIG is enabled
+Date:   Sun,  2 Aug 2020 00:00:49 +0900
+Message-Id: <20200801150050.767038-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200801150050.767038-1-masahiroy@kernel.org>
-References: <20200801150050.767038-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -61,75 +62,105 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit d26e94149276 ("kbuild: no gcc-plugins during cc-option tests")
-was neeeded because scripts/Makefile.gcc-plugins was too early.
+Currently, the top Makefile includes all of scripts/Makefile.<feature>
+even if the associated CONFIG option is disabled.
 
-This is unneeded by including scripts/Makefile.gcc-plugins last,
-and being careful to not add cc-option tests after it.
+Do not include unneeded Makefiles in order to slightly optimize the
+parse stage.
+
+Include $(include-y), and ignore $(include-).
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile               |  5 ++++-
- scripts/Kbuild.include | 10 +++-------
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ Makefile               | 16 +++++++++-------
+ scripts/Makefile.kcov  |  4 ----
+ scripts/Makefile.kcsan |  4 ----
+ scripts/Makefile.ubsan |  3 ---
+ 4 files changed, 9 insertions(+), 18 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 483456d5dd3e..712206381a27 100644
+index ebf4d3ce492c..483456d5dd3e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -506,7 +506,6 @@ KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE :=
- export KBUILD_LDS_MODULE := $(srctree)/scripts/module-common.lds
- KBUILD_LDFLAGS :=
--GCC_PLUGINS_CFLAGS :=
- CLANG_FLAGS :=
+@@ -745,9 +745,6 @@ endif
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-allow-store-data-races)
  
- export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
-@@ -955,6 +954,10 @@ include-$(CONFIG_GCC_PLUGINS)	+= scripts/Makefile.gcc-plugins
+-include scripts/Makefile.kcov
+-include scripts/Makefile.gcc-plugins
+-
+ ifdef CONFIG_READABLE_ASM
+ # Disable optimizations that make assembler listings hard to read.
+ # reorder blocks reorders the control in the function
+@@ -948,10 +945,15 @@ ifdef CONFIG_RETPOLINE
+ KBUILD_CFLAGS += $(call cc-option,-fcf-protection=none)
+ endif
  
- include $(addprefix $(srctree)/, $(include-y))
- 
-+# scripts/Makefile.gcc-plugins is intentionally included last.
-+# Do not add $(call cc-option,...) below this line. When you build the kernel
-+# from the clean source tree, the GCC plugins do not exist at this point.
+-include scripts/Makefile.kasan
+-include scripts/Makefile.extrawarn
+-include scripts/Makefile.ubsan
+-include scripts/Makefile.kcsan
++# include additional Makefiles when needed
++include-y			:= scripts/Makefile.extrawarn
++include-$(CONFIG_KASAN)		+= scripts/Makefile.kasan
++include-$(CONFIG_KCSAN)		+= scripts/Makefile.kcsan
++include-$(CONFIG_UBSAN)		+= scripts/Makefile.ubsan
++include-$(CONFIG_KCOV)		+= scripts/Makefile.kcov
++include-$(CONFIG_GCC_PLUGINS)	+= scripts/Makefile.gcc-plugins
 +
++include $(addprefix $(srctree)/, $(include-y))
+ 
  # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
  KBUILD_CPPFLAGS += $(KCPPFLAGS)
- KBUILD_AFLAGS   += $(KAFLAGS)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 9a15fbf66aa1..83a1637417e5 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -119,25 +119,21 @@ as-instr = $(call try-run,\
- __cc-option = $(call try-run,\
- 	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
- 
--# Do not attempt to build with gcc plugins during cc-option tests.
--# (And this uses delayed resolution so the flags will be up to date.)
--CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+diff --git a/scripts/Makefile.kcov b/scripts/Makefile.kcov
+index 52b113302443..67e8cfe3474b 100644
+--- a/scripts/Makefile.kcov
++++ b/scripts/Makefile.kcov
+@@ -1,10 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ifdef CONFIG_KCOV
 -
- # cc-option
- # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+ kcov-flags-$(CONFIG_CC_HAS_SANCOV_TRACE_PC)	+= -fsanitize-coverage=trace-pc
+ kcov-flags-$(CONFIG_KCOV_ENABLE_COMPARISONS)	+= -fsanitize-coverage=trace-cmp
+ kcov-flags-$(CONFIG_GCC_PLUGIN_SANCOV)		+= -fplugin=$(objtree)/scripts/gcc-plugins/sancov_plugin.so
  
- cc-option = $(call __cc-option, $(CC),\
--	$(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS),$(1),$(2))
-+	$(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS),$(1),$(2))
- 
- # cc-option-yn
- # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
- cc-option-yn = $(call try-run,\
--	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
-+	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
- 
- # cc-disable-warning
- # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
- cc-disable-warning = $(call try-run,\
--	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
-+	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
- 
- # cc-ifversion
- # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+ export CFLAGS_KCOV := $(kcov-flags-y)
+-
+-endif
+diff --git a/scripts/Makefile.kcsan b/scripts/Makefile.kcsan
+index bd4da1af5953..2b0743e6566e 100644
+--- a/scripts/Makefile.kcsan
++++ b/scripts/Makefile.kcsan
+@@ -1,6 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+-ifdef CONFIG_KCSAN
+-
+ # GCC and Clang accept backend options differently. Do not wrap in cc-option,
+ # because Clang accepts "--param" even if it is unused.
+ ifdef CONFIG_CC_IS_CLANG
+@@ -15,5 +13,3 @@ CFLAGS_KCSAN := -fsanitize=thread \
+ 	$(call cc-option,$(call cc-param,tsan-instrument-func-entry-exit=0) -fno-optimize-sibling-calls) \
+ 	$(call cc-option,$(call cc-param,tsan-instrument-read-before-write=1)) \
+ 	$(call cc-param,tsan-distinguish-volatile=1)
+-
+-endif # CONFIG_KCSAN
+diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
+index 5b15bc425ec9..27348029b2b8 100644
+--- a/scripts/Makefile.ubsan
++++ b/scripts/Makefile.ubsan
+@@ -1,6 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+-ifdef CONFIG_UBSAN
+-
+ ifdef CONFIG_UBSAN_ALIGNMENT
+       CFLAGS_UBSAN += $(call cc-option, -fsanitize=alignment)
+ endif
+@@ -26,4 +24,3 @@ endif
+       # -fsanitize=* options makes GCC less smart than usual and
+       # increase number of 'maybe-uninitialized false-positives
+       CFLAGS_UBSAN += $(call cc-option, -Wno-maybe-uninitialized)
+-endif
 -- 
 2.25.1
 
