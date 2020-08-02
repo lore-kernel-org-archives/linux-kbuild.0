@@ -2,87 +2,117 @@ Return-Path: <SRS0=uJQl=BM=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6F7C433DF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B83C433DF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A2B8206F6
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0B2720738
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:35:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596385132;
-	bh=NH6wp9sy9LymNQIHzQnIUIHpd3Gx5UrH0K5K9t+ghzA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=0rZNPLveQNCj/kEwVKjicYG1HzpEDVNJlRriq7bLAJbEejJXtsjQcaXkKpEXj4/7L
-	 JDmo5k7iiPigTRt8PyrPos/Lv6+W4YlRp1cnxCFsROuLp+Zz7TS0CZy1Tb7p7yZWJO
-	 9awyjLcwoL0emDFgGB8XNuLVuIyVngUihAb+kKrk=
+	s=default; t=1596386148;
+	bh=f++43ND36E/PvWawbSmQCGIUPSGjWCiEQnp/AygD4tg=;
+	h=From:Date:Subject:To:Cc:List-ID:From;
+	b=k774HlYQ7yLoRM2JZzPtoqEU1uqYmVSqAWd0hNsPBDtV8+cI2BHG2Mt/GAPRR992W
+	 +dkG1dKhM8wT78vtTTP2F7wxpuub3yoe0I1GX/n5XzRyxRiTTa1XEsfIc2+gHCZ2CT
+	 YzYCMKOAaot+sllwnqtrbQMlVg3kAtJ3sY+Yn2yI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727813AbgHBQSv (ORCPT
+        id S1726150AbgHBQfs (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 2 Aug 2020 12:18:51 -0400
-Received: from conuserg-07.nifty.com ([210.131.2.74]:48898 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726948AbgHBQSG (ORCPT
+        Sun, 2 Aug 2020 12:35:48 -0400
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:59477 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbgHBQfs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 2 Aug 2020 12:18:06 -0400
-Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 072GHOag003720;
-        Mon, 3 Aug 2020 01:17:26 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOag003720
+        Sun, 2 Aug 2020 12:35:48 -0400
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 072GZYAE010032;
+        Mon, 3 Aug 2020 01:35:34 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 072GZYAE010032
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596385047;
-        bh=VYR6SHz+m2VPEa2TZmAxDgYUIVGzNeKSGROTaBC77oM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GIKNAeUx6AC+rMG+irVlMJS7DPgAe/3Te94a0r8KI6wTWIpYvt+As81yVnrfwoNj7
-         bcvMKdODzAdqRRQINQkxpKxopwX2NUnTXP0tpDXgP9ckeq1oqAaF5dBeotzPH4buNu
-         YrOB7fstV5tVmexegy7R14nk7otmdfC0BbpwM3MhXCENpwZc93cDS1bkKo4iTQuqem
-         kXTbbZ4d/Eo9qM5fk251/Iyr5s5WB2JmXkajUrgTpyiAGOc2EDa6ok9bKCnUv/8ubp
-         9Mjni48e55smVaSx9nQwjkL/oQa5mBnBsJWlpqRw7OT4mpeXQ5zcFSdOTfT+dgnOPP
-         h9jLUHrFgP66Q==
-X-Nifty-SrcIP: [126.25.67.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 05/16] kconfig: qconf: remove unused ConfigList::listView()
-Date:   Mon,  3 Aug 2020 01:17:10 +0900
-Message-Id: <20200802161721.921721-5-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200802161721.921721-1-masahiroy@kernel.org>
-References: <20200802161721.921721-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1596386135;
+        bh=buqQ+5V+jZVeUJqv5ynUltuexC7jQ90Idd2IOU9lLI8=;
+        h=From:Date:Subject:To:Cc:From;
+        b=Yiq/eYwc8od/CXLN3XIPvlPlxaljXLc1FTZ2wdoNOG7A4UoREGeqkyxUs+VEZshJS
+         IRoVU+zuT2lc67UdqhPQqug2I14rN/wcZkjPf1pGubYTUXO2FeCriS7NtGJNEJkecx
+         eWy1j345MU4q3pR4nDLJn/Sd+jeTw2FySUQ05FY4BXl1LS8sw+Nu5gp42BPCc0U4PA
+         g4MZf8CNVb4dxzUZBUP/Jm12xGsboE4eY0GXd+TNEhbVLyakwFpSB5JpcYltyjuisn
+         CLkMsl6XyBaWJIEv6UTSIQAvQO0nPXH4/Ua3CwHF1BYv6o6vo4omczVggz6ERJsu/W
+         FZVvBTQJC8xYg==
+X-Nifty-SrcIP: [209.85.222.50]
+Received: by mail-ua1-f50.google.com with SMTP id r63so11104738uar.9;
+        Sun, 02 Aug 2020 09:35:34 -0700 (PDT)
+X-Gm-Message-State: AOAM533td9vdpq0XEouWqMGxXmstbl9Ja7npSxt2c1gaw+gQFZQ6DaPj
+        1Ev0R8nxJIBS2847964rD+xAOw4jHO4Iwn10mD4=
+X-Google-Smtp-Source: ABdhPJwxFY3d019c2MX2wWRgJzpZrgSNxbaBHJ5+SamHhXc5OnRNKaTx7RUHCanswWoV0JyG8eJQ5icSEAuqNUDAroU=
+X-Received: by 2002:ab0:2390:: with SMTP id b16mr8660376uan.25.1596386133613;
+ Sun, 02 Aug 2020 09:35:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 3 Aug 2020 01:34:57 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATJbLfuj8bbjPevXWTk5HAra3n2aG-B2ueTPxMpYhbZnQ@mail.gmail.com>
+Message-ID: <CAK7LNATJbLfuj8bbjPevXWTk5HAra3n2aG-B2ueTPxMpYhbZnQ@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.8(-rc8)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-I do not know how this function can be useful. In fact, it is unsed.
+Hi Linus,
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Please pull some more Kbuild fixes.
+Thanks.
 
- scripts/kconfig/qconf.h | 4 ----
- 1 file changed, 4 deletions(-)
+The following changes since commit 92ed301919932f777713b9172e525674157e983d:
 
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index b80683998635..6e6bb0a96348 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -88,10 +88,6 @@ public slots:
- 		updateList(NULL);
- 		updateAll = false;
- 	}
--	ConfigList* listView()
--	{
--		return this;
--	}
- 	void addColumn(colIdx idx)
- 	{
- 		showColumn(idx);
+  Linux 5.8-rc7 (2020-07-26 14:14:06 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.8-4
+
+for you to fetch changes up to 28ab576ba8de934ee3145b6d75119f016de567cb:
+
+  kbuild: remove redundant FORCE definition in
+scripts/Makefile.modpost (2020-08-02 23:09:16 +0900)
+
+----------------------------------------------------------------
+Kbuild fixes for v5.8 (4th)
+
+ - clean the generated moc file for xconfig
+
+ - fix xconfig bugs, and revert some bad commits
+
+----------------------------------------------------------------
+Masahiro Yamada (8):
+      kconfig: qconf: use if_changed for qconf.moc rule
+      kconfig: qconf: compile moc object separately
+      kconfig: qconf: use delete[] instead of delete to free array
+      kconfig: qconf: remove "goBack" debug message
+      Revert "kconfig: qconf: Change title for the item window"
+      Revert "kconfig: qconf: don't show goback button on splitMode"
+      kconfig: qconf: remove wrong ConfigList::firstChild()
+      kbuild: remove redundant FORCE definition in scripts/Makefile.modpost
+
+Wolfram Sang (1):
+      modpost: explain why we can't use strsep
+
+ scripts/Makefile.modpost   |  3 ---
+ scripts/kconfig/.gitignore |  2 +-
+ scripts/kconfig/Makefile   | 13 ++++++++-----
+ scripts/kconfig/qconf.cc   | 23 ++++++-----------------
+ scripts/kconfig/qconf.h    |  4 ----
+ scripts/mod/modpost.c      |  1 +
+ 6 files changed, 16 insertions(+), 30 deletions(-)
+
 -- 
-2.25.1
-
+Best Regards
+Masahiro Yamada
