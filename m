@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6A2C433DF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6601DC433E0
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F976207BB
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43F8622B3F
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596385130;
-	bh=wHTOrJnmmvaQ39KiSciZ+BzsInDpBJ9IEewHVShrfq4=;
+	s=default; t=1596385131;
+	bh=aboaBR6RRTYYaNz5bJVZ9Tl9ih7f0bSEdb23IP62Cik=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=fjc5+6I4HwyDQqbGtWijNsS3Ls72SLGzeIcInYxiiPFAs27MEU9b/MlOCtNROw/Lr
-	 efyfJlgISSFhGArbb5hiiaN7908s75WWipJQxQH54LInnDoU6gsqVz6t91vRFY2LFa
-	 pZG0M+Za45fWQRgnu/Y4U807bcs7IsGINr3TYGRc=
+	b=13rM91wqkXivCUk+tvHp2d4CN/OiT/o9Y1rjh6WYKH/POw1TxZDV85Te7nI86D1/u
+	 ip6XaYi9PnEzq03fhqK8V/rJR3EElJMhYIyrpEPYGYwHRyT5GxwmM5mhrptUEWojNq
+	 QoBSQclgQB5FWzcfksukJV8OUcEJpBPoLU2m01Y4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727100AbgHBQSd (ORCPT
+        id S1726971AbgHBQSu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 2 Aug 2020 12:18:33 -0400
-Received: from conuserg-07.nifty.com ([210.131.2.74]:48909 "EHLO
+        Sun, 2 Aug 2020 12:18:50 -0400
+Received: from conuserg-07.nifty.com ([210.131.2.74]:48901 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726968AbgHBQSG (ORCPT
+        with ESMTP id S1726958AbgHBQSG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 2 Aug 2020 12:18:06 -0400
 Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 072GHOan003720;
-        Mon, 3 Aug 2020 01:17:30 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOan003720
+        by conuserg-07.nifty.com with ESMTP id 072GHOap003720;
+        Mon, 3 Aug 2020 01:17:31 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOap003720
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596385051;
-        bh=1QwsYPX/TRZCCEnjbvN03XB9oaYZ36pUlFuofsrgnTo=;
+        s=dec2015msa; t=1596385052;
+        bh=V5J5sm6nLIl/m9xpCzrGnEere1jzBD0dqwZAtD550+Y=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WupozzFfskp/G//KCA4Rb+9BC2a8z28/W9jGmyZ4oW8GZLNs/pTndSguwyyEJHpHA
-         QEXsoZ9XohiW6bzBJx5PAjKlPBz2gBGrt6r2iIZkwPI0kGloQNdXOVWfmBQHSYRuHp
-         M9AJB1RtzMrB5vGFhE9UEeL7nPwbxEDMjACi4eZME5e/f5XoJxS9oIhY0M7Q3wXB6c
-         96Jl+a66930LeP1BIld2ezFst4EDUXOL26D6Cio/WBMKMDrQTzk5/5pRjWNmzvtYdC
-         d3gemRwz1kEQO779y6esFmBve2WXa5zaE8fcgQiiVZtxtwId/n1Z9OV/qCof3dyBj6
-         umML8E8O+pZ5Q==
+        b=rq7aBXp3ly9FQFch8StWv+KZDAlnPaTp/hOC8JZC8zc6ZpQ6CkjNIu6KpvO5Nye7Q
+         mQLhL5/yvtLyF+Xja7T81hXUmYPGIDosEC3U+8fY+Aku8odTpdn1cqOgrwPProvpcw
+         mrVDVhMJW+qFquvO0QmVsCAH1C2phUSx23Nn0L/kYTVWAELMVNMfuWqXuXmaxqDtfD
+         sI7zr8ziXb5t1f/cYJy1PIula6ZzIkqzvwibhRLVNMtCRcXx4m9zjPrcDNn8G7xJu5
+         hAKfYlxJxDCbS6ro65yzXl0A+9VbI/p3xPH7TQLa3RGJUozPphFum65RmYzGmoyp4t
+         NHc+8+XyWFfeg==
 X-Nifty-SrcIP: [126.25.67.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 12/16] kconfig: qconf: remove ConfigItem::pixmap/setPixmap
-Date:   Mon,  3 Aug 2020 01:17:17 +0900
-Message-Id: <20200802161721.921721-12-masahiroy@kernel.org>
+Subject: [PATCH 14/16] kconfig: qconf: remove ConfigItem::text/setText
+Date:   Mon,  3 Aug 2020 01:17:19 +0900
+Message-Id: <20200802161721.921721-14-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200802161721.921721-1-masahiroy@kernel.org>
 References: <20200802161721.921721-1-masahiroy@kernel.org>
@@ -60,108 +60,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use QTreeWidgetItem::icon/setIcon directly.
+Use QTreeWidgetItem::text/setText directly
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/qconf.cc | 22 +++++++++++-----------
- scripts/kconfig/qconf.h  |  8 --------
- 2 files changed, 11 insertions(+), 19 deletions(-)
+ scripts/kconfig/qconf.h | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index de46a2fc3f98..94ffb64d3eca 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -97,7 +97,7 @@ void ConfigItem::updateMenu(void)
- 
- 	list = listView();
- 	if (goParent) {
--		setPixmap(promptColIdx, list->menuBackPix);
-+		setIcon(promptColIdx, list->menuBackPix);
- 		prompt = "..";
- 		goto set_prompt;
- 	}
-@@ -114,15 +114,15 @@ void ConfigItem::updateMenu(void)
- 			 */
- 			if (sym && list->rootEntry == menu)
- 				break;
--			setPixmap(promptColIdx, list->menuPix);
-+			setIcon(promptColIdx, list->menuPix);
- 		} else {
- 			if (sym)
- 				break;
--			setPixmap(promptColIdx, QIcon());
-+			setIcon(promptColIdx, QIcon());
- 		}
- 		goto set_prompt;
- 	case P_COMMENT:
--		setPixmap(promptColIdx, QIcon());
-+		setIcon(promptColIdx, QIcon());
- 		goto set_prompt;
- 	default:
- 		;
-@@ -139,7 +139,7 @@ void ConfigItem::updateMenu(void)
- 		char ch;
- 
- 		if (!sym_is_changeable(sym) && list->optMode == normalOpt) {
--			setPixmap(promptColIdx, QIcon());
-+			setIcon(promptColIdx, QIcon());
- 			setText(noColIdx, QString());
- 			setText(modColIdx, QString());
- 			setText(yesColIdx, QString());
-@@ -149,22 +149,22 @@ void ConfigItem::updateMenu(void)
- 		switch (expr) {
- 		case yes:
- 			if (sym_is_choice_value(sym) && type == S_BOOLEAN)
--				setPixmap(promptColIdx, list->choiceYesPix);
-+				setIcon(promptColIdx, list->choiceYesPix);
- 			else
--				setPixmap(promptColIdx, list->symbolYesPix);
-+				setIcon(promptColIdx, list->symbolYesPix);
- 			setText(yesColIdx, "Y");
- 			ch = 'Y';
- 			break;
- 		case mod:
--			setPixmap(promptColIdx, list->symbolModPix);
-+			setIcon(promptColIdx, list->symbolModPix);
- 			setText(modColIdx, "M");
- 			ch = 'M';
- 			break;
- 		default:
- 			if (sym_is_choice_value(sym) && type == S_BOOLEAN)
--				setPixmap(promptColIdx, list->choiceNoPix);
-+				setIcon(promptColIdx, list->choiceNoPix);
- 			else
--				setPixmap(promptColIdx, list->symbolNoPix);
-+				setIcon(promptColIdx, list->symbolNoPix);
- 			setText(noColIdx, "N");
- 			ch = 'N';
- 			break;
-@@ -769,7 +769,7 @@ void ConfigList::mouseReleaseEvent(QMouseEvent* e)
- 	idx = header()->logicalIndexAt(x);
- 	switch (idx) {
- 	case promptColIdx:
--		icon = item->pixmap(promptColIdx);
-+		icon = item->icon(promptColIdx);
- 		if (!icon.isNull()) {
- 			int off = header()->sectionPosition(0) + visualRect(indexAt(p)).x() + 4; // 4 is Hardcoded image offset. There might be a way to do it properly.
- 			if (x >= off && x < off + icon.availableSizes().first().width()) {
 diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 952bd98d7912..5cda89a51740 100644
+index daa180bdb9b4..012414dcdee5 100644
 --- a/scripts/kconfig/qconf.h
 +++ b/scripts/kconfig/qconf.h
-@@ -172,14 +172,6 @@ class ConfigItem : public QTreeWidgetItem {
- 	{
- 		return Parent::text(idx);
+@@ -156,14 +156,6 @@ class ConfigItem : public QTreeWidgetItem {
+ 
+ 		return ret;
  	}
--	void setPixmap(colIdx idx, const QIcon &icon)
+-	void setText(colIdx idx, const QString& text)
 -	{
--		Parent::setIcon(idx, icon);
+-		Parent::setText(idx, text);
 -	}
--	const QIcon pixmap(colIdx idx) const
+-	QString text(colIdx idx) const
 -	{
--		return icon(idx);
+-		return Parent::text(idx);
 -	}
  	// TODO: Implement paintCell
  
