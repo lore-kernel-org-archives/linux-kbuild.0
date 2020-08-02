@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA573C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD48C433E0
 	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A80F322B3F
+	by mail.kernel.org (Postfix) with ESMTP id CA1A522B42
 	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1596385129;
-	bh=RTCe6IeA67y79Bg5j2LyAnYXfC3BZdBTSzGijq1fSJg=;
+	bh=oSoiLgLkhT7/7ytL42pA7OfrN+xEwzR+5SA+u+KCI0M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=fwCKyu+SWU0S9yO5x7z/Ap82FZXxMFMa3e6LnpnpFpsbJlFH/BFsQ6Xd3AQzuBRa9
-	 y1Gcghl9b2L7ngeRf3igV+tJEc3dcj4BMnI6s1BbOSSCQrjd9TcASeeXlCmRMEvOxm
-	 HP6a7OFgUA7lMQ1CT1Jw7VHdvN2P90DYwrWfgG+w=
+	b=xNR2DKA5L0smki3ulo1FQpDPIORLPmogm3NJOJqoJwdba6ENe/0L0fxQAniRIhk6T
+	 i3MvrJI1cFYLAJ02vliP48hiM8YdlW0MGtgZiCThca6KOaNRWU1MO2fKdpqMHrZ2t0
+	 iCzQ7H0UkSPzP+QZodEgFLcoJPS7OA5S/9oKftHk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbgHBQSe (ORCPT
+        id S1727112AbgHBQSe (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 2 Aug 2020 12:18:34 -0400
-Received: from conuserg-07.nifty.com ([210.131.2.74]:48911 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:48905 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726971AbgHBQSG (ORCPT
+        with ESMTP id S1726964AbgHBQSG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 2 Aug 2020 12:18:06 -0400
 Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 072GHOaq003720;
-        Mon, 3 Aug 2020 01:17:32 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOaq003720
+        by conuserg-07.nifty.com with ESMTP id 072GHOal003720;
+        Mon, 3 Aug 2020 01:17:29 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOal003720
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596385052;
-        bh=ZR2FWOJCoBwcQ4UI0mBLm+oIcogMAJji5OgIw/+72aM=;
+        s=dec2015msa; t=1596385049;
+        bh=qPig2vflg/7ZPARWjjn8bjUvyZZG6lOHLx5Ds8QNDF4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R3k56eW1kn70rjiilKrjvdzBL4dlQng9/U/UNm3rseHU8r+E2jJOOCXPo6wmPFQAq
-         +2asqdD18pV0XSYVy9lA7EbJTROj8GQEhynufZ4/JXmY1g7zNEwo28WII4CX3WMQCB
-         Yy6tu0QTs3iVS/cL9pXhiXPz+Y7AZwcJbFU96xbRlJNJuS0+za0jKJJKSpemWCEQOX
-         f2s6snyPqgMtEMypQCJm73I0nb1Ib6xql0vxgKSTHHBroTgHPMwZEY5kCiDfl8tczH
-         hg+9T1Yp5AIHY8a5THNaljNAzh7vg6D7JFv+kMFYxXpMTT2u3wZjfvXFFlNEGd2mgt
-         IZBp/Fi6ZXkjw==
+        b=dt5KpR2Hmfslmk/Y0EYV5HeJSJTHofvwodcGZCEFSk9DShmFyPpeLxwbLA0vTDmWg
+         7KVSXCQsDugEZaqS2K5w2nHv+IyplDy7sYAj8Qo1065QLVR9r6x4jF9guxS8Z6IvYR
+         X7yj1coShLhnO6c8klRV2L7n+0TcMrjxGfN4G+bdfyOvkXlh2aClpdql9z4rKH7vXV
+         MZIvtS40FldagXQDjQgZ05bS7p1vjMieJNyPjdXKH4faI885/6JGG/0g8OomvksPPJ
+         VNMA4P8c9nIBnSWWgUbkQIDaC1lA089n2ZkQDMiu7wmq7X7MQ9glDnfVs1L48a8cpU
+         gIfpViYlLIp8A==
 X-Nifty-SrcIP: [126.25.67.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 15/16] kconfig: qconf: remove unused voidPix, menuInvPix
-Date:   Mon,  3 Aug 2020 01:17:20 +0900
-Message-Id: <20200802161721.921721-15-masahiroy@kernel.org>
+Subject: [PATCH 10/16] kconfig: qconf: remove 'parent' from ConfigList::updateMenuList()
+Date:   Mon,  3 Aug 2020 01:17:15 +0900
+Message-Id: <20200802161721.921721-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200802161721.921721-1-masahiroy@kernel.org>
 References: <20200802161721.921721-1-masahiroy@kernel.org>
@@ -60,41 +60,103 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-These are initialized, but not used by anyone.
+All the callers of this function passes 'this' to the first argument.
+
+So, 'parent' is always 'this'.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/qconf.cc | 2 +-
- scripts/kconfig/qconf.h  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/kconfig/qconf.cc | 18 +++++++++---------
+ scripts/kconfig/qconf.h  |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index a73665d9ca78..00b2f56186c2 100644
+index f492e8810f89..7f7164c71163 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -291,7 +291,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 	  updateAll(false),
- 	  symbolYesPix(xpm_symbol_yes), symbolModPix(xpm_symbol_mod), symbolNoPix(xpm_symbol_no),
- 	  choiceYesPix(xpm_choice_yes), choiceNoPix(xpm_choice_no),
--	  menuPix(xpm_menu), menuInvPix(xpm_menu_inv), menuBackPix(xpm_menuback), voidPix(xpm_void),
-+	  menuPix(xpm_menu), menuBackPix(xpm_menuback),
- 	  showName(false), showRange(false), showData(false), mode(singleMode), optMode(normalOpt),
- 	  rootEntry(0), headerPopup(0)
+@@ -446,7 +446,7 @@ void ConfigList::updateList()
+ 		return;
+ 	}
+ update:
+-	updateMenuList(this, rootEntry);
++	updateMenuList(rootEntry);
+ 	update();
+ 	resizeColumnToContents(0);
+ }
+@@ -524,7 +524,7 @@ void ConfigList::setRootMenu(struct menu *menu)
+ 	type = menu && menu->prompt ? menu->prompt->type : P_UNKNOWN;
+ 	if (type != P_MENU)
+ 		return;
+-	updateMenuList(this, 0);
++	updateMenuList(0);
+ 	rootEntry = menu;
+ 	updateListAll();
+ 	if (currentItem()) {
+@@ -628,7 +628,7 @@ hide:
+ 	}
+ }
+ 
+-void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
++void ConfigList::updateMenuList(struct menu* menu)
  {
+ 	struct menu* child;
+ 	ConfigItem* item;
+@@ -637,19 +637,19 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
+ 	enum prop_type type;
+ 
+ 	if (!menu) {
+-		while (parent->topLevelItemCount() > 0)
++		while (topLevelItemCount() > 0)
+ 		{
+-			delete parent->takeTopLevelItem(0);
++			delete takeTopLevelItem(0);
+ 		}
+ 
+ 		return;
+ 	}
+ 
+-	last = (ConfigItem*)parent->topLevelItem(0);
++	last = (ConfigItem*)topLevelItem(0);
+ 	if (last && !last->goParent)
+ 		last = 0;
+ 	for (child = menu->list; child; child = child->next) {
+-		item = last ? last->nextSibling() : (ConfigItem*)parent->topLevelItem(0);
++		item = last ? last->nextSibling() : (ConfigItem*)topLevelItem(0);
+ 		type = child->prompt ? child->prompt->type : P_UNKNOWN;
+ 
+ 		switch (mode) {
+@@ -670,7 +670,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
+ 			if (!child->sym && !child->list && !child->prompt)
+ 				continue;
+ 			if (!item || item->menu != child)
+-				item = new ConfigItem(parent, last, child, visible);
++				item = new ConfigItem(this, last, child, visible);
+ 			else
+ 				item->testUpdateMenu(visible);
+ 
+@@ -683,7 +683,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
+ 		}
+ hide:
+ 		if (item && item->menu == child) {
+-			last = (ConfigItem*)parent->topLevelItem(0);
++			last = (ConfigItem*)topLevelItem(0);
+ 			if (last == item)
+ 				last = 0;
+ 			else while (last->nextSibling() != item)
 diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 012414dcdee5..c46a79a69001 100644
+index 6d06ec399ff0..952bd98d7912 100644
 --- a/scripts/kconfig/qconf.h
 +++ b/scripts/kconfig/qconf.h
-@@ -100,7 +100,7 @@ public slots:
+@@ -102,7 +102,7 @@ public slots:
+ 	bool menuSkip(struct menu *);
  
- 	QPixmap symbolYesPix, symbolModPix, symbolNoPix;
- 	QPixmap choiceYesPix, choiceNoPix;
--	QPixmap menuPix, menuInvPix, menuBackPix, voidPix;
-+	QPixmap menuPix, menuBackPix;
+ 	void updateMenuList(ConfigItem *parent, struct menu*);
+-	void updateMenuList(ConfigList *parent, struct menu*);
++	void updateMenuList(struct menu *menu);
  
- 	bool showName, showRange, showData;
- 	enum listMode mode;
+ 	bool updateAll;
+ 
 -- 
 2.25.1
 
