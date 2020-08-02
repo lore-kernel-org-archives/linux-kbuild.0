@@ -4,53 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F59DC433DF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 13:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C130FC433E0
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:17:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43F0420738
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 13:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D7A7207BB
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 Aug 2020 16:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596376501;
-	bh=7qQJ93q1RrpgvTCcNvuCXCg5h2hoU5gIetaCG7XCcVw=;
+	s=default; t=1596385061;
+	bh=7w+Bb8wDvVrOyA3cttHY7n9+OnJymn2rQTqsXKxnIok=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=m7tmNwIjm7SgdUuoquAUrfV6omvJZeKprb5x7C/1VKIwyoeGzselrH17f8DSC5NhO
-	 001Ui2VFR1iLWM5cQmxN9+KBdplEJbD2aSzt42roz+T2Mz7PtgcA3VQmObUG2Z/I6V
-	 9Q7sf5IvnPT5rB0ibxO0nmdLTZMPirBsnHck5YOs=
+	b=qyW9buJcJGTTh01eSF51kMemqKsGx3IQ8mW+MJgnVKuocNAsQaWI1InmNnjksp17d
+	 EkxyU1XchqdXDQVOJ+blL28iU0UbfRVyRGgfj9o+wpcVuW5XDsAhy5z4rpILOMx4+5
+	 4Xg+6Z2y5UrTAkQhoz3Ki5mmap43/FUJ3j02lWnM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726215AbgHBNzB (ORCPT
+        id S1726370AbgHBQRk (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 2 Aug 2020 09:55:01 -0400
-Received: from conuserg-08.nifty.com ([210.131.2.75]:17761 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726149AbgHBNzA (ORCPT
+        Sun, 2 Aug 2020 12:17:40 -0400
+Received: from conuserg-07.nifty.com ([210.131.2.74]:48423 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725907AbgHBQRk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 2 Aug 2020 09:55:00 -0400
+        Sun, 2 Aug 2020 12:17:40 -0400
 Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 072Dsgea012913;
-        Sun, 2 Aug 2020 22:54:42 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 072Dsgea012913
+        by conuserg-07.nifty.com with ESMTP id 072GHOac003720;
+        Mon, 3 Aug 2020 01:17:24 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 072GHOac003720
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596376482;
-        bh=RdkndB5XJ9WbOLDonCmP4swNinqbwX3r5LJ4jdQxIps=;
+        s=dec2015msa; t=1596385044;
+        bh=Ms1SMsEQKmMZBTX6ILMMZvwlhQrJfGkj/nzYKWYupUU=;
         h=From:To:Cc:Subject:Date:From;
-        b=chlbue1H5xj0XefuTkfybI6XJm0qG8SwrfihffgCKiRUEVvefFZgESPKUz/BCzZBc
-         uQoEY3HHZ7tjbkOAqsUuJW/SSxs+ozGP4b2+FIEKShXNyUeP0haqi0xZMmEVV+fDyX
-         8p96cdj9RlN0gR/z+sY4PWLMWBk+ZG7ox/23bbQ/hFyLgU/ZKJcPzP1XB1dB+4XeaG
-         2SbDDAK9K2BhQUvUsWApf0PrM4XuJdy+C7SVoXSaZdvvxs+MJ0nGsuOTQ7FGjhA9Bt
-         w7UID+OGL4DgKTlpILqZNkEoQf5NOGXVzIiEGa+2UfeQU65taFQn0Jw/FeiOjEq9vw
-         uTfowsB56nMOw==
+        b=cz0pM2jYAUHhklEwWU1tDkhSOB9zD9qYha53HYhPqOUnaOI6CjqCcQYOLWqCloRcR
+         sYay2GaNHL6m1L29pHHrXW/HqCOiXrooEFjQbyI4woXDgiCBQYa/99VMDLYNUCxQWH
+         Og1Eol4BGdL0QYayG7l8gHZhPwEkj1iRX/WI+d4tex7iwACkcM+D0m9vjdW7em8cQP
+         azbyrAvtmLXnTozoQJWVPLcxEa7Gcnl19CBmkYCXJMNIPlulkV7wZyaZGWzVWPU8zP
+         utoibfro10iJpjn7+zxU3eNjfDeFJyW7v99WXO9tdXJu6vCT2ZIiK9wAnBIwAb1Qtr
+         V9JBkrpUnI/xQ==
 X-Nifty-SrcIP: [126.25.67.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] kbuild: remove redundant FORCE definition in scripts/Makefile.modpost
-Date:   Sun,  2 Aug 2020 22:54:40 +0900
-Message-Id: <20200802135440.908059-1-masahiroy@kernel.org>
+Subject: [PATCH 01/16] kconfig: qconf: rename 'config' to 'fileMenu'
+Date:   Mon,  3 Aug 2020 01:17:06 +0900
+Message-Id: <20200802161721.921721-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,29 +58,39 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The same code exists a few lines above.
+Rename for clarification and consistency.
 
-Fixes: 436b2ac603d5 ("modpost: invoke modpost only when input files are updated")
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.modpost | 3 ---
- 1 file changed, 3 deletions(-)
+ scripts/kconfig/qconf.cc | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 3651cbf6ad49..f54b6ac37ac2 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -124,9 +124,6 @@ existing-targets := $(wildcard $(sort $(targets)))
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 23d1cb01a41a..9513c0ba8d0c 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1517,13 +1517,13 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	toolBar->addAction(splitViewAction);
+ 	toolBar->addAction(fullViewAction);
  
- -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+-	// create config menu
+-	QMenu* config = menu->addMenu("&File");
+-	config->addAction(loadAction);
+-	config->addAction(saveAction);
+-	config->addAction(saveAsAction);
+-	config->addSeparator();
+-	config->addAction(quitAction);
++	// create file menu
++	QMenu *fileMenu = menu->addMenu("&File");
++	fileMenu->addAction(loadAction);
++	fileMenu->addAction(saveAction);
++	fileMenu->addAction(saveAsAction);
++	fileMenu->addSeparator();
++	fileMenu->addAction(quitAction);
  
--PHONY += FORCE
--FORCE:
--
- endif
- 
- .PHONY: $(PHONY)
+ 	// create edit menu
+ 	QMenu* editMenu = menu->addMenu("&Edit");
 -- 
 2.25.1
 
