@@ -1,130 +1,201 @@
-Return-Path: <SRS0=LZJI=BO=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=VdcQ=BP=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 958E1C433DF
-	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Aug 2020 09:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4472C433DF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  5 Aug 2020 10:35:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A472020792
-	for <linux-kbuild@archiver.kernel.org>; Tue,  4 Aug 2020 09:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93721207FC
+	for <linux-kbuild@archiver.kernel.org>; Wed,  5 Aug 2020 10:35:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D48Bi4O/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730080AbgHDJUE (ORCPT
+        id S1727941AbgHEK2c (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 4 Aug 2020 05:20:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37980 "EHLO
+        Wed, 5 Aug 2020 06:28:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgHDJUD (ORCPT
+        with ESMTP id S1728119AbgHEK0T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Aug 2020 05:20:03 -0400
-Received: from tartarus.angband.pl (tartarus.angband.pl [IPv6:2001:41d0:602:dbe::8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F622C06174A;
-        Tue,  4 Aug 2020 02:20:03 -0700 (PDT)
-Received: from kilobyte by tartarus.angband.pl with local (Exim 4.92)
-        (envelope-from <kilobyte@angband.pl>)
-        id 1k2t6r-00025G-El; Tue, 04 Aug 2020 11:19:49 +0200
-Date:   Tue, 4 Aug 2020 11:19:49 +0200
-From:   Adam Borowski <kilobyte@angband.pl>
-To:     Sedat Dilek <sedat.dilek@gmail.com>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Chris Mason <clm@fb.com>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Petr Malat <oss@malat.biz>, Kees Cook <keescook@chromium.org>,
-        Kernel Team <Kernel-team@fb.com>,
-        Patrick Williams <patrickw3@fb.com>, rmikey@fb.com,
-        Ingo Molnar <mingo@kernel.org>,
-        Patrick Williams <patrick@stwcx.xyz>,
-        Norbert Lange <nolange79@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alex Xu <alex_y_xu@yahoo.ca>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Terrell <terrelln@fb.com>
-Subject: Re: [PATCH v10 4/8] usr: add support for zstd compressed initramfs
-Message-ID: <20200804091949.GB9657@angband.pl>
-References: <20200730190841.2071656-1-nickrterrell@gmail.com>
- <20200730190841.2071656-5-nickrterrell@gmail.com>
- <CAMuHMdUo5tfcEUaq4x_b9HJy25HXWmBZ3GPfqJy491zDsct5Rg@mail.gmail.com>
- <CA+icZUXGbV1x0YJn-0mLA2TtU2jWS6PO3bqdDrqJBMYOMS9Eog@mail.gmail.com>
+        Wed, 5 Aug 2020 06:26:19 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF9AC0617A1;
+        Wed,  5 Aug 2020 03:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=EgLuoy51jN5BCDfpowjvn/C6CCPgestz5KEkr0EylHg=; b=D48Bi4O/xIUdkOl8ASViOO/4Qn
+        qTmxKGEPzQYyL2+G+R9sz5mPzXIcsdpAu61JPqlqB+SqmDKLEEQLAXLqQVdirVLnZiaktVkziOmTS
+        ZODos8mb1qDk8msepdHWej00l7W9cq4Uzg02VD0hllTmrbPf4YcCaEzZCCV++O+b6W9tSsKXQ/gdd
+        xW7D8JXXHQyKUMcyJxcCI8HZWQJe1UatrpLjx5yrpREAUBHTtiE2z0TQan+2i7qBRtaCLpaqsWYSM
+        JUkgCl/kjAuG0zp0JO5/vk6gStU3hPGYul3cKadsKHW+CaujXc9qHjXXVMwNGqo0celd3rLLm8WuN
+        +37zncQg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k3GcL-0004td-Ap; Wed, 05 Aug 2020 10:25:53 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BA3A33012DC;
+        Wed,  5 Aug 2020 12:25:50 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 653F42B7C12A6; Wed,  5 Aug 2020 12:25:50 +0200 (CEST)
+Date:   Wed, 5 Aug 2020 12:25:50 +0200
+From:   peterz@infradead.org
+To:     yamada.masahiro@socionext.com
+Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: [PATCH] scipts/tags.sh: Add custom sort order
+Message-ID: <20200805102550.GO2674@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+icZUXGbV1x0YJn-0mLA2TtU2jWS6PO3bqdDrqJBMYOMS9Eog@mail.gmail.com>
-X-Junkbait: aaron@angband.pl, zzyx@angband.pl
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Mail-From: kilobyte@angband.pl
-X-SA-Exim-Scanned: No (on tartarus.angband.pl); SAEximRunCond expanded to false
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Aug 04, 2020 at 09:25:23AM +0200, Sedat Dilek wrote:
-> On Tue, Aug 4, 2020 at 8:52 AM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > On Thu, Jul 30, 2020 at 9:13 PM Nick Terrell <nickrterrell@gmail.com> wrote:
-> > > From: Nick Terrell <terrelln@fb.com>
-> > > * Add support for a zstd compressed initramfs.
-> > > * Add compression for compressing built-in initramfs with zstd.
 
-> > > --- a/usr/Kconfig
-> > > +++ b/usr/Kconfig
-> > > @@ -100,6 +100,15 @@ config RD_LZ4
-> > >           Support loading of a LZ4 encoded initial ramdisk or cpio buffer
-> > >           If unsure, say N.
-> > >
-> > > +config RD_ZSTD
-> > > +       bool "Support initial ramdisk/ramfs compressed using ZSTD"
-> > > +       default y
-> > > +       depends on BLK_DEV_INITRD
-> > > +       select DECOMPRESS_ZSTD
-> > > +       help
-> > > +         Support loading of a ZSTD encoded initial ramdisk or cpio buffer.
-> > > +         If unsure, say N.
-> >
-> > I'm aware you copied this from the other entries, but IMHO "default y",
-> > and "If unsure, say N" are not a good combination.
+One long standing annoyance I have with using vim-tags is that our tags
+file is not properly sorted. That is, the sorting exhuberant Ctags does
+is only on the tag itself.
 
-> you are right - for new stuff it should be "default n".
+The problem with that is that, for example, the tag 'mutex' appears a
+mere 505 times, 492 of those are structure members. However it is _far_
+more likely that someone wants the struct definition when looking for
+the mutex tag than any of those members. However, due to the nature of
+the sorting, the struct definition will not be first.
 
-It got already applied to Linus' tree with "y", and I think it'd be nice
-to have it as a default.  Let's disable other compressors instead.
+So add a script that does a custom sort of the tags file, taking the tag
+kind into account.
 
-On the other hand, having an unsupported rd compressor results in a boot
-failure that's not immediately obvious, so that's a reason for keeping
-the setting as "y".
+The kind ordering is roughly: 'type', 'function', 'macro', 'enum', rest.
 
-On the third hand, distributions default to either gz or xz, thus I'd say:
-* let's have gz xz zstd default to y, all others to n
-* drop bzip2 lzma1 completely
-* distros can't switch the mkinitramfs default yet, but if RD_ZSTD=y now,
-  they'll be able to once they drop support for old kernels in a few years
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ scripts/sort-tags.awk | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ scripts/tags.sh       |  8 +++++-
+ 2 files changed, 86 insertions(+), 1 deletion(-)
 
-> What I am missing - still - is a note - that your user-space should
-> have the correct bits to support zstd-initramfs.
-> Unsure where to place such an information.
+diff --git a/scripts/sort-tags.awk b/scripts/sort-tags.awk
+new file mode 100755
+index 000000000000..1eb50406c9d3
+--- /dev/null
++++ b/scripts/sort-tags.awk
+@@ -0,0 +1,79 @@
++#!/usr/bin/awk -f
++
++# $ ctags --list-kinds
++# C
++#   c  classes
++#   s  structure names
++#   t  typedefs
++#   g  enumeration names
++#   u  union names
++#   n  namespaces
++
++#   f  function definitions
++#   p  function prototypes [off]
++#   d  macro definitions
++
++#   e  enumerators (values inside an enumeration)
++#   m  class, struct, and union members
++#   v  variable definitions
++
++#   l  local variables [off]
++#   x  external and forward variable declarations [off]
++
++BEGIN {
++	FS = "\t"
++
++	sort = "LC_ALL=C sort"
++
++	# our sort order for C kinds:
++	order["c"] = "A"
++	order["s"] = "B"
++	order["t"] = "C"
++	order["g"] = "D"
++	order["u"] = "E"
++	order["n"] = "F"
++	order["f"] = "G"
++	order["p"] = "H"
++	order["d"] = "I"
++	order["e"] = "J"
++	order["m"] = "K"
++	order["v"] = "L"
++	order["l"] = "M"
++	order["x"] = "N"
++}
++
++# pass through header
++/^!_TAG/ {
++	print $0
++	next
++}
++
++{
++	# find 'kinds'
++	for (i = 1; i <= NF; i++) {
++		if ($i ~ /;"$/) {
++			kind = $(i+1)
++			break;
++		}
++	}
++
++	# create sort key
++	if (order[kind])
++		key = $1 order[kind];
++	else
++		key = $1 "Z";
++
++	# get it sorted
++	print key "\t" $0 |& sort
++}
++
++END {
++	close(sort, "to")
++	while ((sort |& getline) > 0) {
++		# strip key
++		sub(/[^[:space:]]*[[:space:]]*/, "")
++		print $0
++	}
++	close(sort)
++}
++
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 4e18ae5282a6..93d729392a7b 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -251,6 +251,8 @@ setup_regex()
+ 
+ exuberant()
+ {
++	rm -f tags.unsorted
++
+ 	setup_regex exuberant asm c
+ 	all_target_sources | xargs $1 -a                        \
+ 	-I __initdata,__exitdata,__initconst,__ro_after_init	\
+@@ -266,12 +268,16 @@ exuberant()
+ 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
+ 	-I static,const						\
+ 	--extra=+fq --c-kinds=+px --fields=+iaS --langmap=c:+.h \
++	--sort=no -o tags.unsorted				\
+ 	"${regex[@]}"
+ 
+ 	setup_regex exuberant kconfig
+ 	all_kconfigs | xargs $1 -a                              \
+-	--langdef=kconfig --language-force=kconfig "${regex[@]}"
++	--langdef=kconfig --language-force=kconfig --sort=no	\
++	-o tags.unsorted "${regex[@]}"
+ 
++	scripts/sort-tags.awk tags.unsorted > tags
++	rm -f tags.unsorted
+ }
+ 
+ emacs()
 
-Looks like INITRAMFS_COMPRESSION_* have lengthy prose but are not shown in
-menuconfig, while RD_*, with no such prose, are shown.
-
-The prose itself is grossly obsolete, too.  I have some updates in:
-    https://github.com/kilobyte/linux/commits/nobz2-v3
-but that patchset needs rebasing and refreshing.
-
-
-Meow!
--- 
-⢀⣴⠾⠻⢶⣦⠀
-⣾⠁⢠⠒⠀⣿⡁
-⢿⡄⠘⠷⠚⠋⠀ It's time to migrate your Imaginary Protocol from version 4i to 6i.
-⠈⠳⣄⠀⠀⠀⠀
