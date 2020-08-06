@@ -2,118 +2,95 @@ Return-Path: <SRS0=X4+w=BQ=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2E6C433E1
-	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 16:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36AAC433DF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:27:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B504523135
-	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 16:36:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596731814;
-	bh=kXFEFcQbGFAyZthtqBKGE5NblPCw+yWna5WHqn9lX/k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=zJzpwbdA4qbsCXDKw2dcMovGWb8zZItFFEbBXMvpZHybwH1VXSl7bEFvqMh5H/ha/
-	 LRCm/fPlNtaVgOxeUXBfYVLMRJF0Eeb7X3Hc/8ytfgSraeK1QWmZGAIhN7uvLtS9Vq
-	 UyVg356usc5uimwIjhcqxrevRp945hUrWS4YRay0=
+	by mail.kernel.org (Postfix) with ESMTP id 6052623119
+	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:27:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=rt.linuxfoundation.org header.i=@rt.linuxfoundation.org header.b="EPmpwNsI";
+	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="JGOiEcuM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728970AbgHFQfs (ORCPT
+        id S1729855AbgHFR1h (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 6 Aug 2020 12:35:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726150AbgHFQfY (ORCPT
+        Thu, 6 Aug 2020 13:27:37 -0400
+Received: from a27-192.smtp-out.us-west-2.amazonses.com ([54.240.27.192]:51316
+        "EHLO a27-192.smtp-out.us-west-2.amazonses.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730369AbgHFR1d (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Aug 2020 12:35:24 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9355C0A893C;
-        Thu,  6 Aug 2020 08:08:16 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id i26so32073921edv.4;
-        Thu, 06 Aug 2020 08:08:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/NBVKOjlAWWfsV7g9wQU/wL49LI80XYT8ZZs5+X9WF4=;
-        b=X0/iNYVseeiv7KKCcoHOOF+EgAeIK3Jhiqd/cqA341huobn7TndXq1Xkph67VmiIIQ
-         pL8KNuqR9x09+LI3pU1gcxrBk4ffIub0jP2cj9GfKvNY+c1QALaWRd2uSovGRaO8fhiP
-         uyJkUPPDA4ggB3mgn0K4MiFUaU5ZAzJC1IqwqJH8IY+Vm9rAeRqdYPnGgZjXQPZAUX9d
-         lD/yHm37Y7GShrMpO60wOb2AzykPpn0tbk5EkF4BExNpSy7MJV9U8YDZ6YOdHvEVzF09
-         Ri/5Vn9xpo2XomBE4jkhZbLdHRmTK6kEZrCsJnNzvKEhYhjBRYE9ILZzFDCs93li9gil
-         qPHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=/NBVKOjlAWWfsV7g9wQU/wL49LI80XYT8ZZs5+X9WF4=;
-        b=gBugjOcQ68WL+pel+9/6nwRgCh31FJlMPaogSCwghNSUpiC+iFj8IREXiVIcFQKONo
-         YSm4ik2UzVqcNkAoJ0j4/py66+b5L7xTPv5ri8wwxf+eW4vjpScvrDXREFopr5SxZ0Jb
-         B62UIZPleEAyEDeibqHhYKOTSlHC+/lRo9TDhHaYis3Pr83k8HaaeoXk8RQhjQIh8N/q
-         uISll/xFlFqiEA+hiX6BGDNI4VHKh3OmLzphKDdYCCWUq6KlSrSEBA/OD3VPDfO9yPKO
-         WJAMEl1L5NDmh8DSqORAM6s/l9c1NZGaIWiPKbODCfkwU1ULdQeRYangKHSyN0QuwMZe
-         cBXA==
-X-Gm-Message-State: AOAM53283/BerG7oWJIXavA7PkYScGK16Jc2cgAM+u2K5q+c55lICrN8
-        mAmeGZbjv+Vpr1hIoQXZiQg=
-X-Google-Smtp-Source: ABdhPJx4tglb5q6BahdDY6UfNDnLH/fg9q5/lMjer49/21DCpLvr0dFIv9J/IPh1tHwgokZaqFNpmg==
-X-Received: by 2002:aa7:c74f:: with SMTP id c15mr4558837eds.331.1596726495566;
-        Thu, 06 Aug 2020 08:08:15 -0700 (PDT)
-Received: from gmail.com (54033286.catv.pool.telekom.hu. [84.3.50.134])
-        by smtp.gmail.com with ESMTPSA id 4sm3886474ejn.84.2020.08.06.08.08.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2020 08:08:14 -0700 (PDT)
-Date:   Thu, 6 Aug 2020 17:08:10 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     changhuaixin <changhuaixin@linux.alibaba.com>
-Cc:     bp@alien8.de, hpa@zytor.com, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@amacapital.net,
-        michal.lkml@markovi.net, mingo@redhat.com,
-        Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
-        x86@kernel.org, yamada.masahiro@socionext.com, jpoimboe@redhat.com
-Subject: Re: [PATCH 1/3] scripts/sorttable: Change section type of orc_lookup
- to SHT_PROGBITS
-Message-ID: <20200806150810.GA2127855@gmail.com>
-References: <20200723034643.33537-1-changhuaixin@linux.alibaba.com>
- <20200723034643.33537-2-changhuaixin@linux.alibaba.com>
- <2714DF66-5F65-4CB1-A232-B88E4D5AF566@linux.alibaba.com>
+        Thu, 6 Aug 2020 13:27:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=7jvkchcrhflv7qhbkgrcypyraifp65wy; d=rt.linuxfoundation.org;
+        t=1596734851;
+        h=Subject:From:Reply-To:In-Reply-To:References:Message-ID:CC:Content-Type:Date:MIME-Version:Content-Transfer-Encoding;
+        bh=7XGxqHa7N9NredT0VTXJdFUTHg3OaFDutLRn2lT5pHY=;
+        b=EPmpwNsIhimDo78/YcilHsp2NqeUT1D18jvApDB3Q99yhd2EYPNpdXVg8ApXUkT7
+        DeloezwrHCqaLjSRMNZmmx41qbYJCi0ACNJHw/H0uTDZOeiuxEuK+kkH2FoEZKGe8yX
+        onqh6aZ8YLgZ+EyHypOvu35jRbxAoGbUkpTqgyKc=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=hsbnp7p3ensaochzwyq5wwmceodymuwv; d=amazonses.com; t=1596734851;
+        h=Subject:From:Reply-To:In-Reply-To:References:Message-ID:CC:Content-Type:Date:MIME-Version:Content-Transfer-Encoding:Feedback-ID;
+        bh=7XGxqHa7N9NredT0VTXJdFUTHg3OaFDutLRn2lT5pHY=;
+        b=JGOiEcuMI4URtm6LqApXl4zm8At7YCz/c8fnJQ+c358Bv59xd9lsprpNgOSGD2jb
+        rr50FS1k2sNg9zUiLfvUNld+LGHa5drGf8PWhCWr8nebf9d84vqSDLBBoqkTgxt45mX
+        SKfrfzdF+LQzA54XHzfyZP6TlU3oCEBXaWdFjDtg=
+Subject: Re: [Kernel.org Helpdesk #93182] Re: linux-kbuild missing from lore?
+From:   "Nick Desaulniers via RT" <kernel-helpdesk@rt.linuxfoundation.org>
+Reply-To: kernel-helpdesk@rt.linuxfoundation.org
+In-Reply-To: <CAKwvOd=xLc1=kRRM8NBaeXqhXOTSYDg7AgLtqRth4vm7ODFA6w@mail.gmail.com>
+References: <RT-Ticket-93182@linuxfoundation>
+ <CAKwvOd=i8mLYsSNtJTcZ=RTk76F_mYy9fM9FBtDveFybxyGyiw@mail.gmail.com>
+ <CAK7LNARc4L18CP6ZbTheh43VobQZ1s_2Q=4O7oKmTZRLgiTw6Q@mail.gmail.com>
+ <f30f6849-9d94-4ba9-f875-9ab8c0700620@infradead.org>
+ <CAKwvOdnknZNPuucvy0Kim6xCfyUhmNKXQiERCQcoSMYdo6=6FQ@mail.gmail.com>
+ <01010173c1e35fde-0cbf88a3-5ebe-43fa-be6b-af9c00a50864-000000@us-west-2.amazonses.com> <CAKwvOd=xLc1=kRRM8NBaeXqhXOTSYDg7AgLtqRth4vm7ODFA6w@mail.gmail.com>
+Message-ID: <01010173c4d0486a-c210b3db-b00a-414b-81a4-33abab967678-000000@us-west-2.amazonses.com>
+X-RT-Loop-Prevention: linuxfoundation.org
+X-RT-Ticket: linuxfoundation.org #93182
+X-Managed-BY: RT 4.4.0 (http://www.bestpractical.com/rt/)
+X-RT-Originator: ndesaulniers@google.com
+CC:     linux-kbuild@vger.kernel.org, masahiroy@kernel.org,
+        michal.lkml@markovi.net, nhuck@google.com, rdunlap@infradead.org,
+        sam@ravnborg.org
+Content-Type: text/plain; charset="utf-8"
+X-RT-Original-Encoding: utf-8
+Date:   Thu, 6 Aug 2020 17:27:31 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2714DF66-5F65-4CB1-A232-B88E4D5AF566@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-SES-Outgoing: 2020.08.06-54.240.27.192
+Feedback-ID: 1.us-west-2.3ULHQnc20aILdVzjlbQ8UqO1WRWzA1U01b2uFAcT62w=:AmazonSES
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Wed, Aug 5, 2020 at 8:49 PM Chris Hoy Poy via RT
+<kernel-helpdesk@rt.linuxfoundation.org> wrote:
+>
+>
+> Hi all,
+>
+> This should be active at
+>
+> https://lore.kernel.org/linux-kbuild
 
-* changhuaixin <changhuaixin@linux.alibaba.com> wrote:
+Looks great! Thanks for getting this stood up for us Chris, we appreciate it.
 
-> Hi, Ingo
-> 
-> Another way to write SHT_PROGBITS is using elf_create_section to write orc_lookup table headers, when orc_unwind_ip table and orc_unwind table are written. Is this a better solution?
-> 
-> diff --git a/tools/objtool/orc_gen.c b/tools/objtool/orc_gen.c
-> index 3f98dcfbc177..860d4dcec8e6 100644
-> --- a/tools/objtool/orc_gen.c
-> +++ b/tools/objtool/orc_gen.c
-> @@ -183,6 +183,10 @@ int create_orc_sections(struct objtool_file *file)
->         u_sec = elf_create_section(file->elf, ".orc_unwind",
->                                    sizeof(struct orc_entry), idx);
-> 
-> +       /* make flags of section orc_lookup right */
-> +       if (!elf_create_section(file->elf, ".orc_lookup", sizeof(int), 0))
-> +               return -1;
-> +
->         /* populate sections */
->         idx = 0;
->         for_each_sec(file, sec) {
+>
+> I dont think we missed any, but there might have been a few slip past the gap between the archive and the subscription being active, feel free to forward a quick list of those days if necessary, and I'll pull them in too.
 
-Looks much nicer IMO.
-
-Mind turning this into a proper patch that does it plus reverts the 
-hack?
-
+Comparing https://marc.info/?l=linux-kbuild, there's a small hole
+between July 8-July 27/29.  I've reached out to Hank who can help get
+me the archive for those dates, and I'll rerun the sanitizer and reach
+out to you with a link.  Then it looks like lore.kernel.org should be
+pretty complete for kbuild.
+-- 
 Thanks,
+~Nick Desaulniers
 
-	Ingo
