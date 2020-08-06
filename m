@@ -1,211 +1,84 @@
 Return-Path: <SRS0=X4+w=BQ=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=BAYES_50,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_DBL_ABUSE_MALW autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EFAC433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5126BC433DF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C094E22DCC
-	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35195221E2
+	for <linux-kbuild@archiver.kernel.org>; Thu,  6 Aug 2020 17:46:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RZ97opg7"
+	dkim=pass (2048-bit key) header.d=tecarga.com.ar header.i=@tecarga.com.ar header.b="eRPnmdPG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729222AbgHFR2q (ORCPT
+        id S1730220AbgHFRpX (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 6 Aug 2020 13:28:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44986 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729725AbgHFRA4 (ORCPT
+        Thu, 6 Aug 2020 13:45:23 -0400
+Received: from DU154-145.fibertel.com.ar ([200.49.145.154]:25644 "EHLO
+        mail.tecarga.com.ar" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1728982AbgHFQiU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Aug 2020 13:00:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EEB6C061A15;
-        Thu,  6 Aug 2020 05:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=EGNqm2OAGxLKcqDl+GdAdBwWIqcANnBJ4vDsUT0HyC0=; b=RZ97opg7YyhEx3dt2aRYJLyN3x
-        sMcvQavppfwGjG6PNlaXjS36Sq3ScvJf6bnKt3qzer4f3S3Sx95AtBW4LFMR72fd0NlV/kp8vGTPB
-        laZ7kd9VE78v9mtPcE8z5B5fik228y4ZayWvIqcpYVqEC/fCCYv77IHJtdUP0QlkO4g1xTO+fAuPZ
-        JzJCoI1T95ENxYHpdzzy4dOm9Aw7Rbg1Y4bWhLhpqW3EOhlImxGfe7+TxanKtXtXgqwMaBFeXKTCD
-        oXkkciAw+5ENq2rfPqispnr2q376UgbEvwdxMbxW3PBW50Jl4DqH8SHeHv13V5awAq7ItNidFq1K0
-        txEb0Qig==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1k3edT-0007ez-KY; Thu, 06 Aug 2020 12:04:39 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C2E34301A66;
-        Thu,  6 Aug 2020 14:04:38 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 6CCE12123A1E1; Thu,  6 Aug 2020 14:04:38 +0200 (CEST)
-Date:   Thu, 6 Aug 2020 14:04:38 +0200
-From:   peterz@infradead.org
-To:     yamada.masahiro@socionext.com
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH -v2] scipts/tags.sh: Add custom sort order
-Message-ID: <20200806120438.GG35926@hirez.programming.kicks-ass.net>
-References: <20200805102550.GO2674@hirez.programming.kicks-ass.net>
+        Thu, 6 Aug 2020 12:38:20 -0400
+X-Greylist: delayed 558 seconds by postgrey-1.27 at vger.kernel.org; Thu, 06 Aug 2020 12:38:19 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.tecarga.com.ar (Postfix) with ESMTP id ED9B78A7BF6
+        for <linux-kbuild@vger.kernel.org>; Thu,  6 Aug 2020 13:44:33 -0300 (ART)
+Received: from mail.tecarga.com.ar ([127.0.0.1])
+        by localhost (mail.tecarga.com.ar [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id gOlUoMyrP6Go for <linux-kbuild@vger.kernel.org>;
+        Thu,  6 Aug 2020 13:44:32 -0300 (ART)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.tecarga.com.ar (Postfix) with ESMTP id 9AF098A7BF3
+        for <linux-kbuild@vger.kernel.org>; Thu,  6 Aug 2020 13:44:32 -0300 (ART)
+DKIM-Filter: OpenDKIM Filter v2.9.2 mail.tecarga.com.ar 9AF098A7BF3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tecarga.com.ar;
+        s=correo; t=1596732272;
+        bh=VewhKY35eVyjv8AKZzDXorQdjw63oxXaUSLoh4/GHU4=;
+        h=Date:From:To:Subject:MIME-Version:Content-Type:
+         Content-Transfer-Encoding:Message-Id;
+        b=eRPnmdPGoldR4BWQ7NKI2UpHTTBCB2BMKz99xaPidDCP0p/WZIZaD25kSK3OSlc4D
+         qxZztEmZbLmE36OWIGWVni7YEWrRnGlVqRB2Uy9nxEHxQo3pHr/oPOhfJnGv5k4qMC
+         iSzKyWQehzAQqKi+Xhg2ZbrYZ3eQPT5OzCfgVewCmt8dqlBJ6rpjD+JHFyjTh9/kkn
+         SRNCPJl0YdFJjQ1LPwApaLqy19LOC6+zW0lPdpqB3vcbFjbzY5H4mizcS1SfoxC3gI
+         ptPX1ofQDO2oqCTUFi2tvu4C5eqgXPsGE5oESsJahSEyLMYYqwt51svvFdomqq4Ou+
+         RIqP7jhKmxK+Q==
+X-Virus-Scanned: amavisd-new at tecarga.com.ar
+Received: from mail.tecarga.com.ar ([127.0.0.1])
+        by localhost (mail.tecarga.com.ar [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id fxbODssdZQhe for <linux-kbuild@vger.kernel.org>;
+        Thu,  6 Aug 2020 13:44:32 -0300 (ART)
+Received: from [201.93.161.202] (201-93-161-202.dsl.telesp.net.br [201.93.161.202])
+        by mail.tecarga.com.ar (Postfix) with ESMTPSA id 379E18A7BBD
+        for <linux-kbuild@vger.kernel.org>; Thu,  6 Aug 2020 13:44:32 -0300 (ART)
+Date:   Thu, 06 Aug 2020 13:18:06 -0300
+From:   "sales@airlineuk.co.uk" <gterribile@tecarga.com.ar>
+To:     "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+Subject: Re: Contact Us (Airlineuk.co.uk - Emirates)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200805102550.GO2674@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20200806164432.379E18A7BBD@mail.tecarga.com.ar>
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
-One long standing annoyance I have with using vim-tags is that our tags
-file is not properly sorted. That is, the sorting exhuberant Ctags does
-is only on the tag itself.
+=0D
+=0DThe results of the test (medical certificate)
 
-The problem with that is that, for example, the tag 'mutex' appears a
-mere 505 times, 492 of those are structure members. However it is _far_
-more likely that someone wants the struct definition when looking for
-the mutex tag than any of those members. However, due to the nature of
-the sorting, the struct definition will not be first.
+If you are unable to see the message below, click here to view
+http://www.twilightshadows.net/ACT/closed_37395971_l1jQqsWLH6/70hdk_j8b_clo=
+ud/0339228_pSe58dwSoO/
 
-So add a script that does a custom sort of the tags file, taking the tag
-kind into account.
 
-The kind ordering is roughly: 'type', 'function', 'macro', 'enum', rest.
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
-Changes since v1:
- - removed the need for tags.unsorted by using a pipe
+=20
 
-Due to this change 'make tags' is now actually faster than it was before
-due to less sorting.
 
- scripts/sort-tags.awk | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
- scripts/tags.sh       | 11 +++++--
- 2 files changed, 87 insertions(+), 3 deletions(-)
+=0Dsales@airlineuk.co.uk=0D<sales@airlineuk.co.uk>
 
-diff --git a/scripts/sort-tags.awk b/scripts/sort-tags.awk
-new file mode 100755
-index 000000000000..1eb50406c9d3
---- /dev/null
-+++ b/scripts/sort-tags.awk
-@@ -0,0 +1,79 @@
-+#!/usr/bin/awk -f
-+
-+# $ ctags --list-kinds
-+# C
-+#   c  classes
-+#   s  structure names
-+#   t  typedefs
-+#   g  enumeration names
-+#   u  union names
-+#   n  namespaces
-+
-+#   f  function definitions
-+#   p  function prototypes [off]
-+#   d  macro definitions
-+
-+#   e  enumerators (values inside an enumeration)
-+#   m  class, struct, and union members
-+#   v  variable definitions
-+
-+#   l  local variables [off]
-+#   x  external and forward variable declarations [off]
-+
-+BEGIN {
-+	FS = "\t"
-+
-+	sort = "LC_ALL=C sort"
-+
-+	# our sort order for C kinds:
-+	order["c"] = "A"
-+	order["s"] = "B"
-+	order["t"] = "C"
-+	order["g"] = "D"
-+	order["u"] = "E"
-+	order["n"] = "F"
-+	order["f"] = "G"
-+	order["p"] = "H"
-+	order["d"] = "I"
-+	order["e"] = "J"
-+	order["m"] = "K"
-+	order["v"] = "L"
-+	order["l"] = "M"
-+	order["x"] = "N"
-+}
-+
-+# pass through header
-+/^!_TAG/ {
-+	print $0
-+	next
-+}
-+
-+{
-+	# find 'kinds'
-+	for (i = 1; i <= NF; i++) {
-+		if ($i ~ /;"$/) {
-+			kind = $(i+1)
-+			break;
-+		}
-+	}
-+
-+	# create sort key
-+	if (order[kind])
-+		key = $1 order[kind];
-+	else
-+		key = $1 "Z";
-+
-+	# get it sorted
-+	print key "\t" $0 |& sort
-+}
-+
-+END {
-+	close(sort, "to")
-+	while ((sort |& getline) > 0) {
-+		# strip key
-+		sub(/[^[:space:]]*[[:space:]]*/, "")
-+		print $0
-+	}
-+	close(sort)
-+}
-+
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 4e18ae5282a6..51087c3d8b1e 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -251,8 +251,10 @@ setup_regex()
- 
- exuberant()
- {
-+	(
-+
- 	setup_regex exuberant asm c
--	all_target_sources | xargs $1 -a                        \
-+	all_target_sources | xargs $1				\
- 	-I __initdata,__exitdata,__initconst,__ro_after_init	\
- 	-I __initdata_memblock					\
- 	-I __refdata,__attribute,__maybe_unused,__always_unused \
-@@ -266,12 +268,15 @@ exuberant()
- 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
- 	-I static,const						\
- 	--extra=+fq --c-kinds=+px --fields=+iaS --langmap=c:+.h \
-+	--sort=no -o -						\
- 	"${regex[@]}"
- 
- 	setup_regex exuberant kconfig
--	all_kconfigs | xargs $1 -a                              \
--	--langdef=kconfig --language-force=kconfig "${regex[@]}"
-+	all_kconfigs | xargs $1					\
-+	--langdef=kconfig --language-force=kconfig --sort=no	\
-+	-o - "${regex[@]}"
- 
-+	) | scripts/sort-tags.awk > tags
- }
- 
- emacs()
