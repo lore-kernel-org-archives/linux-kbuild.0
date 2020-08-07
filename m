@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 869D3C433E0
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A89F6C433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F1872177B
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F27220855
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596792057;
-	bh=bRoaUZupeasNKEwMT5Le1pzOWSxogpGGuQvkFWfPhz0=;
+	s=default; t=1596792061;
+	bh=taNbGV1s+WsvssYEnTWNWm1NJW4IOkVZ5ZMeNigoG9Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=B8LrQiOjRcjiyU3YgKbUFFbYgZLz9M5ek77H2qr5W91VqctFWgbUxfh8K3BkfOT0Z
-	 gK8Uslp3VI+zwCFu9V2q6kxF1zBiMTxgugcs5NZ6ufHUZ9pM8DIdqBA6fDkCgUfDgk
-	 qxzBt/M42IwcAxj++jXJocmO5vrkk5RE3qnOJaN4=
+	b=sjhwBIh+jqZgi6iWTIiuVaTWRvaHf2TCS8j0UtUJjJp+5YyEKiVAg5mssS8HeQjL7
+	 7QrgcFW6MvtSDYsRLrv4Bvx6rBu+50WfXTMN3Xkxj4LqWnJhu/7abe/n5aDcslJFkq
+	 qZpcUsQienUtWvZfI//4MMga5T3V4PS2vak/abcY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728291AbgHGJUv (ORCPT
+        id S1728197AbgHGJU6 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:20:51 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:42284 "EHLO
+        Fri, 7 Aug 2020 05:20:58 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:41594 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728233AbgHGJUH (ORCPT
+        with ESMTP id S1727986AbgHGJTk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:20:07 -0400
+        Fri, 7 Aug 2020 05:19:40 -0400
 Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 0779JBQE032147;
-        Fri, 7 Aug 2020 18:19:25 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQE032147
+        by conuserg-12.nifty.com with ESMTP id 0779JBQ8032147;
+        Fri, 7 Aug 2020 18:19:21 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQ8032147
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596791965;
-        bh=CHGYyKC6ZwhAz/bcMeo5wBWhWaERIRrhB+YayXBw4hI=;
+        s=dec2015msa; t=1596791962;
+        bh=4uKyPxqgpR7kYRHZT9Kv76QwzC1/t5RlOrA5ow9oRUo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n2fdm4SUDFq97F7DLvTR/XgQoWX2yAQgDfA47hg4gkV2eDQtS9mMrNpO7BIfX0scK
-         Zm+0/SAZ6T/076XK3sQhNZgbSula/eMAEMOOUB0BMwETFNcFWqbUw9BCalmBCOJjwH
-         hvyTkJJZBO3gnBrRI6N1ZcuqJI5G55nHj9P+VSBeCjK+XOSn6JXFcILW0yeATV3SFb
-         PIcpOfwzZq60WZEHDJ5B+AuqoIZLVM7hqxIjF02gmUaw+vUo5eysJe76YmOAZGL8lj
-         weJPo6afGzmDRqcdeg3Z1ReWFEi0u5FR/mDFjatThEKXuUMj39T3oW8egTYesgdkTS
-         KvzKfBgLSBAxQ==
+        b=MbAtpUCKwwX8Quug095DvEZBNhJuh65aWZzHVxTvgYYI0ldnI1KWbUUL/JffouoOK
+         x7ASvoNe8ef/OVvQOxSv+D1hsNOWhzqLPcn8MRwY3rXVUkSlLnfaoTZmZjnd5fiBwA
+         y550SKz0eTZwNPsFJNLzMwqbzPDLFQA1n0MAvzuio5iyHf8e1hjqtWwOcpHwCP6HDz
+         +YJHo3RsJvv2OGoJ896xJzK0VCEuACWbNtM/85mL49hTRSrSlWct4+0PHrfCIk7Afj
+         nwik3e/XOQ6FYdawxF26RTMNyYcpIylQ09FhyQCc2ebXKv0oj70iWzAewSETwTbiY9
+         iDJoO1Yy9u98g==
 X-Nifty-SrcIP: [60.134.47.170]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 18/19] kconfig: qconf: do not limit the pop-up menu to the first row
-Date:   Fri,  7 Aug 2020 18:19:08 +0900
-Message-Id: <20200807091909.2985787-18-masahiroy@kernel.org>
+Subject: [PATCH v2 12/19] kconfig: qconf: drop more localization code
+Date:   Fri,  7 Aug 2020 18:19:02 +0900
+Message-Id: <20200807091909.2985787-12-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
 References: <20200807091909.2985787-1-masahiroy@kernel.org>
@@ -60,109 +60,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-If you right-click the first row in the option tree, the pop-up menu
-shows up, but if you right-click the second row or below, the event
-is ignored due to the following check:
+This is a remnant of commit 694c49a7c01c ("kconfig: drop localization
+support").
 
-  if (e->y() <= header()->geometry().bottom()) {
-
-Perhaps, the intention was to show the pop-menu only when the tree
-header was right-clicked, but this handler is not called in that case.
-
-Since the origin of e->y() starts from the bottom of the header,
-this check is odd.
-
-Going forward, you can right-click anywhere in the tree to get the
-pop-up menu.
+Get it back to the code prior to commit 3b9fa0931dd8 ("[PATCH] Kconfig
+i18n support").
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v2:
- - new patch
+(no changes since v1)
 
- scripts/kconfig/qconf.cc | 68 ++++++++++++++++++++--------------------
- 1 file changed, 34 insertions(+), 34 deletions(-)
+ scripts/kconfig/qconf.cc | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 19f7764c1d68..8eacebfeb030 100644
+index 604f7855b070..230ce621d85b 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -863,40 +863,40 @@ void ConfigList::focusInEvent(QFocusEvent *e)
+@@ -31,11 +31,6 @@ static ConfigSettings *configSettings;
  
- void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- {
--	if (e->y() <= header()->geometry().bottom()) {
--		if (!headerPopup) {
--			QAction *action;
+ QAction *ConfigMainWindow::saveAction;
+ 
+-static inline QString qgettext(const char* str)
+-{
+-	return QString::fromLocal8Bit(str);
+-}
 -
--			headerPopup = new QMenu(this);
--			action = new QAction("Show Name", this);
--			  action->setCheckable(true);
--			  connect(action, SIGNAL(toggled(bool)),
--				  parent(), SLOT(setShowName(bool)));
--			  connect(parent(), SIGNAL(showNameChanged(bool)),
--				  action, SLOT(setOn(bool)));
--			  action->setChecked(showName);
--			  headerPopup->addAction(action);
--			action = new QAction("Show Range", this);
--			  action->setCheckable(true);
--			  connect(action, SIGNAL(toggled(bool)),
--				  parent(), SLOT(setShowRange(bool)));
--			  connect(parent(), SIGNAL(showRangeChanged(bool)),
--				  action, SLOT(setOn(bool)));
--			  action->setChecked(showRange);
--			  headerPopup->addAction(action);
--			action = new QAction("Show Data", this);
--			  action->setCheckable(true);
--			  connect(action, SIGNAL(toggled(bool)),
--				  parent(), SLOT(setShowData(bool)));
--			  connect(parent(), SIGNAL(showDataChanged(bool)),
--				  action, SLOT(setOn(bool)));
--			  action->setChecked(showData);
--			  headerPopup->addAction(action);
--		}
--		headerPopup->exec(e->globalPos());
--		e->accept();
--	} else
--		e->ignore();
-+	if (!headerPopup) {
-+		QAction *action;
-+
-+		headerPopup = new QMenu(this);
-+		action = new QAction("Show Name", this);
-+		action->setCheckable(true);
-+		connect(action, SIGNAL(toggled(bool)),
-+			parent(), SLOT(setShowName(bool)));
-+		connect(parent(), SIGNAL(showNameChanged(bool)),
-+			action, SLOT(setOn(bool)));
-+		action->setChecked(showName);
-+		headerPopup->addAction(action);
-+
-+		action = new QAction("Show Range", this);
-+		action->setCheckable(true);
-+		connect(action, SIGNAL(toggled(bool)),
-+			parent(), SLOT(setShowRange(bool)));
-+		connect(parent(), SIGNAL(showRangeChanged(bool)),
-+			action, SLOT(setOn(bool)));
-+		action->setChecked(showRange);
-+		headerPopup->addAction(action);
-+
-+		action = new QAction("Show Data", this);
-+		action->setCheckable(true);
-+		connect(action, SIGNAL(toggled(bool)),
-+			parent(), SLOT(setShowData(bool)));
-+		connect(parent(), SIGNAL(showDataChanged(bool)),
-+			action, SLOT(setOn(bool)));
-+		action->setChecked(showData);
-+		headerPopup->addAction(action);
-+	}
-+
-+	headerPopup->exec(e->globalPos());
-+	e->accept();
- }
+ ConfigSettings::ConfigSettings()
+ 	: QSettings("kernel.org", "qconf")
+ {
+@@ -109,7 +104,7 @@ void ConfigItem::updateMenu(void)
  
- ConfigView*ConfigView::viewList;
+ 	sym = menu->sym;
+ 	prop = menu->prompt;
+-	prompt = qgettext(menu_get_prompt(menu));
++	prompt = menu_get_prompt(menu);
+ 
+ 	if (prop) switch (prop->type) {
+ 	case P_MENU:
+@@ -135,7 +130,7 @@ void ConfigItem::updateMenu(void)
+ 	if (!sym)
+ 		goto set_prompt;
+ 
+-	setText(nameColIdx, QString::fromLocal8Bit(sym->name));
++	setText(nameColIdx, sym->name);
+ 
+ 	type = sym_get_type(sym);
+ 	switch (type) {
+@@ -265,7 +260,7 @@ void ConfigLineEdit::show(ConfigItem* i)
+ {
+ 	item = i;
+ 	if (sym_get_string_value(item->menu->sym))
+-		setText(QString::fromLocal8Bit(sym_get_string_value(item->menu->sym)));
++		setText(sym_get_string_value(item->menu->sym));
+ 	else
+ 		setText(QString());
+ 	Parent::show();
 -- 
 2.25.1
 
