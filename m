@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3779C433E3
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23022C433E1
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FEDD2177B
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3D5B2177B
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596791977;
-	bh=y+UA5p3ED5L0oldnwtzdnO0tQj+s1KsXDxuIDsqtj9E=;
+	s=default; t=1596791979;
+	bh=JMVA6QZopZKOZFfRtHPxuyJo8cFY0bidgmNHNbGochc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WJpjc4sr8riFuWCAizUZ1TkR0Ou1oVHG1nZWdza2KOPfJvj/jTDpFoChbAq1Iwd7a
-	 zFQSUQfGIg9s+xH7Pzc2sWs7oHO7nIR9qWFPb9TjeCN18fw5rkL14BeSzKZ9gmCuxW
-	 Rz+XjXvHP+UMkbUNfiVdYlUd0UZHVvuqcKmu+Lt4=
+	b=LKaqaLttc0BSL9ZZIK91JxHIXIHmTFGIlDKkRHur4Adsphy/mtVNdTwUPaaNepIS8
+	 egA1hHXTBBhpI9jFyl8IMCUnX/AcHOyut6VP0KarrkOq3l3QLzXuhJ4MSOE0UegtXw
+	 Dg5N9yc8E4lK2eAGkd93cZRxw8PHRB3MjRyoWPfs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727936AbgHGJTg (ORCPT
+        id S1728004AbgHGJTi (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:19:36 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:41484 "EHLO
+        Fri, 7 Aug 2020 05:19:38 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:41481 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727821AbgHGJTf (ORCPT
+        with ESMTP id S1727843AbgHGJTg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:19:35 -0400
+        Fri, 7 Aug 2020 05:19:36 -0400
 Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 0779JBQ0032147;
+        by conuserg-12.nifty.com with ESMTP id 0779JBPx032147;
         Fri, 7 Aug 2020 18:19:13 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQ0032147
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBPx032147
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596791954;
-        bh=mpfNPfPqiVao3oZ/c3NU7ZKvxQ18iH//rapEaLj9PUo=;
+        s=dec2015msa; t=1596791953;
+        bh=l6uF0cV4W2EhnygKik53RY21xJuQdqw7BWYuhjEKF/A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=v30nadyfDA8UYzFtmonPfnRZG28HBDhwm6GYLzUmd/0iRRTkiSvB8l0bONPmZ3oN2
-         Zjg8P1EgKKnWjqkEccf9pI/clA2GPsxJjthDSzqmI2wVNPtKglGiuCcNSd+PFin4a6
-         cyqNUIOz1fWq5JHKm3Zzg0BTL2Da0Y7S/HG8l/ToG+S4o1x2wk3xHmKpQ3OYzm5sFw
-         WxrWG8tiCjW2NFSAZGUg6DIU0WzbmBn2OpZxWVxDSdEP5/KxBkWARdC7vzxRlHo5UK
-         87/+nu0LDYm741p9ShQTRqpVLc9xMKpZ2I2XSC9mF6W23tuS11ytMCe5IxGRnJSwu4
-         M+JC0IflpRpcA==
+        b=P+RqlobI6lW91VFUhdS9vUc2cI+Nk7wwJOcrJfh8P0XLiUlTXySwBZLxfi0RCfAyr
+         l2dziH41osxyOkEpjsXgoYBTLB+0ctmHRSvThYmlCDLxQhj/QaZji+nEepboDgMwEn
+         Wyoh2V/J/HGSG8cWNoy7V8y5GOJEjE69f2GBxS0w5QQFEdpQOI1RZcvprvOpJojFmX
+         QLi0qWDjwX7FQlVJbK+t+QG2LIYyAWeCfeRF8f5YRH74obSa6FQQyATUbTHGnTR7r7
+         HfNstP99E6XfvWHK9GAf2Gg2ofgEv2WgkoILZZ9srsGlMe5WG5RMsNPDzetAtBTPRM
+         cpoEBTf6BvmuA==
 X-Nifty-SrcIP: [60.134.47.170]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 04/19] kconfig: qconf: remove toolBar from ConfigMainWindow members
-Date:   Fri,  7 Aug 2020 18:18:54 +0900
-Message-Id: <20200807091909.2985787-4-masahiroy@kernel.org>
+Subject: [PATCH v2 03/19] kconfig: qconf: use 'menu' variable for (QMenu *)
+Date:   Fri,  7 Aug 2020 18:18:53 +0900
+Message-Id: <20200807091909.2985787-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
 References: <20200807091909.2985787-1-masahiroy@kernel.org>
@@ -60,44 +60,77 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This pointer is only used in the ConfigMainWindow constructor.
+The variable 'config' for the file menu is inconsistent.
 
-Drop it from the private members.
+You do not need to use different variables. Use 'menu' for every menu.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - new patch
 
- scripts/kconfig/qconf.cc | 2 +-
- scripts/kconfig/qconf.h  | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ scripts/kconfig/qconf.cc | 41 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 2f7c13a758b6..b4f32199e0df 100644
+index aa2792f4ac46..2f7c13a758b6 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -1431,7 +1431,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	setTabOrder(configList, helpText);
- 	configList->setFocus();
+@@ -1515,33 +1515,32 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	toolBar->addAction(splitViewAction);
+ 	toolBar->addAction(fullViewAction);
  
--	toolBar = new QToolBar("Tools", this);
-+	QToolBar *toolBar = new QToolBar("Tools", this);
- 	addToolBar(toolBar);
+-	// create config menu
+-	QMenu* config = menuBar()->addMenu("&File");
+-	config->addAction(loadAction);
+-	config->addAction(saveAction);
+-	config->addAction(saveAsAction);
+-	config->addSeparator();
+-	config->addAction(quitAction);
++	// create file menu
++	QMenu *menu = menuBar()->addMenu("&File");
++	menu->addAction(loadAction);
++	menu->addAction(saveAction);
++	menu->addAction(saveAsAction);
++	menu->addSeparator();
++	menu->addAction(quitAction);
  
- 	backAction = new QAction(QPixmap(xpm_back), "Back", this);
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 5eeab4a8bb43..b80683998635 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -326,7 +326,6 @@ public slots:
- 	ConfigView *configView;
- 	ConfigList *configList;
- 	ConfigInfoView *helpText;
--	QToolBar *toolBar;
- 	QAction *backAction;
- 	QAction *singleViewAction;
- 	QAction *splitViewAction;
+ 	// create edit menu
+-	QMenu* editMenu = menuBar()->addMenu("&Edit");
+-	editMenu->addAction(searchAction);
++	menu = menuBar()->addMenu("&Edit");
++	menu->addAction(searchAction);
+ 
+ 	// create options menu
+-	QMenu* optionMenu = menuBar()->addMenu("&Option");
+-	optionMenu->addAction(showNameAction);
+-
+-	optionMenu->addAction(showRangeAction);
+-	optionMenu->addAction(showDataAction);
+-	optionMenu->addSeparator();
+-	optionMenu->addActions(optGroup->actions());
+-	optionMenu->addSeparator();
+-	optionMenu->addAction(showDebugAction);
++	menu = menuBar()->addMenu("&Option");
++	menu->addAction(showNameAction);
++	menu->addAction(showRangeAction);
++	menu->addAction(showDataAction);
++	menu->addSeparator();
++	menu->addActions(optGroup->actions());
++	menu->addSeparator();
++	menu->addAction(showDebugAction);
+ 
+ 	// create help menu
+-	QMenu* helpMenu = menuBar()->addMenu("&Help");
+-	helpMenu->addAction(showIntroAction);
+-	helpMenu->addAction(showAboutAction);
++	menu = menuBar()->addMenu("&Help");
++	menu->addAction(showIntroAction);
++	menu->addAction(showAboutAction);
+ 
+ 	connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
+ 		 helpText, SLOT (clicked (const QUrl &)) );
 -- 
 2.25.1
 
