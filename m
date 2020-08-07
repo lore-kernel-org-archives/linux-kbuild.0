@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23022C433E1
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E031C433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3D5B2177B
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5871022D07
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596791979;
-	bh=JMVA6QZopZKOZFfRtHPxuyJo8cFY0bidgmNHNbGochc=;
+	s=default; t=1596791996;
+	bh=1gRM7WcrezYD46EQiAzCWuXjNxmgD4F8L0KFb84P0OU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LKaqaLttc0BSL9ZZIK91JxHIXIHmTFGIlDKkRHur4Adsphy/mtVNdTwUPaaNepIS8
-	 egA1hHXTBBhpI9jFyl8IMCUnX/AcHOyut6VP0KarrkOq3l3QLzXuhJ4MSOE0UegtXw
-	 Dg5N9yc8E4lK2eAGkd93cZRxw8PHRB3MjRyoWPfs=
+	b=YIFhBGWRaezFzA26U+WQad7Q1nK9QyDzNpscJluv0/PS+7OajC3asyaQ7sl2DWWhF
+	 9jYpyNb54czCXphhS/HNiRe0+zmJmQqKl4sTVetVZXIj/O/ez09vxEZR9LreAqV6Pt
+	 BiD+saiN+N147qb3i0odbHxzXmBJZiYIasQFOUaU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728004AbgHGJTi (ORCPT
+        id S1728072AbgHGJTm (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:19:38 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:41481 "EHLO
+        Fri, 7 Aug 2020 05:19:42 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:41597 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727843AbgHGJTg (ORCPT
+        with ESMTP id S1728003AbgHGJTl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:19:36 -0400
+        Fri, 7 Aug 2020 05:19:41 -0400
 Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 0779JBPx032147;
-        Fri, 7 Aug 2020 18:19:13 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBPx032147
+        by conuserg-12.nifty.com with ESMTP id 0779JBQA032147;
+        Fri, 7 Aug 2020 18:19:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQA032147
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596791953;
-        bh=l6uF0cV4W2EhnygKik53RY21xJuQdqw7BWYuhjEKF/A=;
+        s=dec2015msa; t=1596791963;
+        bh=BVTMN4LAdRMgBfNC+zBOHVAbvF2zmdeoZJN01upM2bU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=P+RqlobI6lW91VFUhdS9vUc2cI+Nk7wwJOcrJfh8P0XLiUlTXySwBZLxfi0RCfAyr
-         l2dziH41osxyOkEpjsXgoYBTLB+0ctmHRSvThYmlCDLxQhj/QaZji+nEepboDgMwEn
-         Wyoh2V/J/HGSG8cWNoy7V8y5GOJEjE69f2GBxS0w5QQFEdpQOI1RZcvprvOpJojFmX
-         QLi0qWDjwX7FQlVJbK+t+QG2LIYyAWeCfeRF8f5YRH74obSa6FQQyATUbTHGnTR7r7
-         HfNstP99E6XfvWHK9GAf2Gg2ofgEv2WgkoILZZ9srsGlMe5WG5RMsNPDzetAtBTPRM
-         cpoEBTf6BvmuA==
+        b=bw5R/WPbADMT1mvPdOOZ01NI4TWmg3l20wQpyxbYrJRh3Tkb1rMIfyIKxUWn2A94a
+         gjumf0aNaIWdx0yPM/3hrlMzcBo1hM878nH/R1HYu+5jOEKGkftIvBI8i2B964nlpn
+         ZgLugdta9kOq99dDLZ0rg8F/OPqj6MUAZ9AKsZu8RX+VHLh1L4URijftBla0tgxR7H
+         ogZEdOxd+xnWaBTMDJmvtKTWliAi3GPc/Z8VSXUzrOZs7TrenGZKz2JpDIAhPgyV/9
+         Eueb4qk9GvNiCF/NReU2vC1Xv5Q8N4YUcIMJgOo2qBkmO8wVduPbHogxG/06uqLFXh
+         Cx9P2PfOYgEyw==
 X-Nifty-SrcIP: [60.134.47.170]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 03/19] kconfig: qconf: use 'menu' variable for (QMenu *)
-Date:   Fri,  7 Aug 2020 18:18:53 +0900
-Message-Id: <20200807091909.2985787-3-masahiroy@kernel.org>
+Subject: [PATCH v2 14/19] kconfig: qconf: remove ConfigList::addColumn/removeColumn
+Date:   Fri,  7 Aug 2020 18:19:04 +0900
+Message-Id: <20200807091909.2985787-14-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
 References: <20200807091909.2985787-1-masahiroy@kernel.org>
@@ -60,77 +60,81 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The variable 'config' for the file menu is inconsistent.
-
-You do not need to use different variables. Use 'menu' for every menu.
+Use QTreeView::showColumn/hideColumn directly.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v2:
-  - new patch
+(no changes since v1)
 
- scripts/kconfig/qconf.cc | 41 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ scripts/kconfig/qconf.cc | 22 +++++++++++-----------
+ scripts/kconfig/qconf.h  |  8 --------
+ 2 files changed, 11 insertions(+), 19 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index aa2792f4ac46..2f7c13a758b6 100644
+index 56b5cdd8b1c9..04da1397575a 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -1515,33 +1515,32 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	toolBar->addAction(splitViewAction);
- 	toolBar->addAction(fullViewAction);
+@@ -317,7 +317,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
+ 	}
  
--	// create config menu
--	QMenu* config = menuBar()->addMenu("&File");
--	config->addAction(loadAction);
--	config->addAction(saveAction);
--	config->addAction(saveAsAction);
--	config->addSeparator();
--	config->addAction(quitAction);
-+	// create file menu
-+	QMenu *menu = menuBar()->addMenu("&File");
-+	menu->addAction(loadAction);
-+	menu->addAction(saveAction);
-+	menu->addAction(saveAsAction);
-+	menu->addSeparator();
-+	menu->addAction(quitAction);
+-	addColumn(promptColIdx);
++	showColumn(promptColIdx);
  
- 	// create edit menu
--	QMenu* editMenu = menuBar()->addMenu("&Edit");
--	editMenu->addAction(searchAction);
-+	menu = menuBar()->addMenu("&Edit");
-+	menu->addAction(searchAction);
+ 	reinit();
+ }
+@@ -335,21 +335,21 @@ bool ConfigList::menuSkip(struct menu *menu)
  
- 	// create options menu
--	QMenu* optionMenu = menuBar()->addMenu("&Option");
--	optionMenu->addAction(showNameAction);
--
--	optionMenu->addAction(showRangeAction);
--	optionMenu->addAction(showDataAction);
--	optionMenu->addSeparator();
--	optionMenu->addActions(optGroup->actions());
--	optionMenu->addSeparator();
--	optionMenu->addAction(showDebugAction);
-+	menu = menuBar()->addMenu("&Option");
-+	menu->addAction(showNameAction);
-+	menu->addAction(showRangeAction);
-+	menu->addAction(showDataAction);
-+	menu->addSeparator();
-+	menu->addActions(optGroup->actions());
-+	menu->addSeparator();
-+	menu->addAction(showDebugAction);
+ void ConfigList::reinit(void)
+ {
+-	removeColumn(dataColIdx);
+-	removeColumn(yesColIdx);
+-	removeColumn(modColIdx);
+-	removeColumn(noColIdx);
+-	removeColumn(nameColIdx);
++	hideColumn(dataColIdx);
++	hideColumn(yesColIdx);
++	hideColumn(modColIdx);
++	hideColumn(noColIdx);
++	hideColumn(nameColIdx);
  
- 	// create help menu
--	QMenu* helpMenu = menuBar()->addMenu("&Help");
--	helpMenu->addAction(showIntroAction);
--	helpMenu->addAction(showAboutAction);
-+	menu = menuBar()->addMenu("&Help");
-+	menu->addAction(showIntroAction);
-+	menu->addAction(showAboutAction);
+ 	if (showName)
+-		addColumn(nameColIdx);
++		showColumn(nameColIdx);
+ 	if (showRange) {
+-		addColumn(noColIdx);
+-		addColumn(modColIdx);
+-		addColumn(yesColIdx);
++		showColumn(noColIdx);
++		showColumn(modColIdx);
++		showColumn(yesColIdx);
+ 	}
+ 	if (showData)
+-		addColumn(dataColIdx);
++		showColumn(dataColIdx);
  
- 	connect (helpText, SIGNAL (anchorClicked (const QUrl &)),
- 		 helpText, SLOT (clicked (const QUrl &)) );
+ 	updateListAll();
+ }
+diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+index 5cda89a51740..daa180bdb9b4 100644
+--- a/scripts/kconfig/qconf.h
++++ b/scripts/kconfig/qconf.h
+@@ -88,14 +88,6 @@ public slots:
+ 		updateList();
+ 		updateAll = false;
+ 	}
+-	void addColumn(colIdx idx)
+-	{
+-		showColumn(idx);
+-	}
+-	void removeColumn(colIdx idx)
+-	{
+-		hideColumn(idx);
+-	}
+ 	void setAllOpen(bool open);
+ 	void setParentMenu(void);
+ 
 -- 
 2.25.1
 
