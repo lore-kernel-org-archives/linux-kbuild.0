@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BA1C433E0
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6039EC433E0
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04CDF20855
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 410D72177B
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:20:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596792001;
-	bh=PCCMQ+e8IOq/n7lHMEagBTG2jDrHDhpxYyFVZyI+vLg=;
+	s=default; t=1596792052;
+	bh=LuExjSohpBpiwirQn+MUQi2JpovhROD8nF5LsSRI8uA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=oURKwA7rd3k4XJNexNODlj4eP+iHRPM+tzRMB2Go8LvDxghy7W0P+fX2hygYU/xfN
-	 vNJ8UOyxcYQ9wonAefUFu/qju/I7Z6QYhAgBVrS9w6k4Q8jMStYMOiJ4PAbPhN4YVf
-	 5EImCjlXk+b/Kqp/1ckWv6t76tGtAhEI62m/J3EA=
+	b=wBYcPLUhCjrZtsg46VgI4PFDraimrz6iaIIYHzVnINTxRI8kz1DxdkdhVvZLOBc/K
+	 P1fHxEW9XL5s/P+ur6ioMuIoEoJEtrjQXvG6AZcrx3khYPuqDkeSejJny0DPWomShb
+	 4v6B2Y4WpmXs1tCGYyWUz5Jh8EWXtiZIBzVNiRhs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728216AbgHGJT7 (ORCPT
+        id S1728268AbgHGJUv (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:19:59 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:41591 "EHLO
+        Fri, 7 Aug 2020 05:20:51 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:42276 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727978AbgHGJTk (ORCPT
+        with ESMTP id S1728228AbgHGJUI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:19:40 -0400
+        Fri, 7 Aug 2020 05:20:08 -0400
 Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 0779JBQ7032147;
-        Fri, 7 Aug 2020 18:19:20 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQ7032147
+        by conuserg-12.nifty.com with ESMTP id 0779JBQF032147;
+        Fri, 7 Aug 2020 18:19:25 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQF032147
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596791961;
-        bh=EJhoMRVdg1iJz0MBe3Kh5K5U+at9Y10mnIWZA0y2KL0=;
+        s=dec2015msa; t=1596791966;
+        bh=vg1UK8X3+Dt2794jmYGfE1ZPMS7oNKG3Ek8+eQungWw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m+Uzc6mPyPLS/bwDdxzoFNlqCTEyjgY41G6c6Xmko6mEpkBGCdch8/jmnBpulnOYz
-         w/VwujH7yyZqlcl608uxOC/WZ71tSDKUNit+mt9P8D3NYi/oVW0qYy+MzJiiBLkjy0
-         0cJ3hfXu+AuujTsK/W3EHflObQ4Odcb59oXh+8/ay8YFrTlkqdfyd9umpXVFOLVfus
-         poXt9wMuCzj7GxIHc4sUhopJArR3NLcyP0NMO8FKJuR/ME4zlFeKded6regXZ9+GS4
-         I0toRGnm3Njb5ldyVsrxIIx1+qwuGkq4g9GWNIG7IYGcLcmBjfxlSEl1xaHyUkUxi3
-         auPHhSK88GJMg==
+        b=XLrJq71ZCbrj4N4ifnUJFyfAHX7jl1wvjbNreybb077uwaoT2FZek9lEhLC/cNXbt
+         l9wvyJUj8GFDriihv1Gfnu+pq+NfCXwssx2L6p+PnzqUSwGPBFSMYQYTMMw5ULASsh
+         Qmqod5g2vOYKcp0/HBVeqkWbvzZotykhDTB6TLM4TuylLlVnoizYEr+Cusn9Pu+6Bq
+         zxt9+BxG4Ng1SKe8x3D0tOyeU9INM7TAnoJOuiVv8GEEqWJ6H/3uifQyHflvl3Hmv2
+         gXPbwTr1jEuC5nxtxqW9af/eMvdRQ+aAyzM3FWodsN2syY/s0vb3B2RcMuilnfiEy+
+         8jhsxUwPJJF3Q==
 X-Nifty-SrcIP: [60.134.47.170]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 11/19] kconfig: qconf: remove 'parent' from ConfigList::updateMenuList()
-Date:   Fri,  7 Aug 2020 18:19:01 +0900
-Message-Id: <20200807091909.2985787-11-masahiroy@kernel.org>
+Subject: [PATCH v2 19/19] kconfig: qconf: move setOptionMode() to ConfigList from ConfigView
+Date:   Fri,  7 Aug 2020 18:19:09 +0900
+Message-Id: <20200807091909.2985787-19-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
 References: <20200807091909.2985787-1-masahiroy@kernel.org>
@@ -60,105 +60,142 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-All the call-sites of this function pass 'this' to the first argument.
+ConfigView::setOptionMode() only gets access to the 'list' member.
 
-So, 'parent' is always the 'this' pointer.
+Move it to the more relevant ConfigList class.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - new patch
 
- scripts/kconfig/qconf.cc | 18 +++++++++---------
- scripts/kconfig/qconf.h  |  2 +-
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ scripts/kconfig/qconf.cc | 46 ++++++++++++++++++++--------------------
+ scripts/kconfig/qconf.h  |  9 ++++----
+ 2 files changed, 27 insertions(+), 28 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 808bc311e335..604f7855b070 100644
+index 8eacebfeb030..ee6da1a8c636 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -446,7 +446,7 @@ void ConfigList::updateList()
- 		return;
- 	}
- update:
--	updateMenuList(this, rootEntry);
-+	updateMenuList(rootEntry);
- 	update();
- 	resizeColumnToContents(0);
- }
-@@ -524,7 +524,7 @@ void ConfigList::setRootMenu(struct menu *menu)
- 	type = menu && menu->prompt ? menu->prompt->type : P_UNKNOWN;
- 	if (type != P_MENU)
- 		return;
--	updateMenuList(this, 0);
-+	updateMenuList(0);
- 	rootEntry = menu;
+@@ -358,6 +358,18 @@ void ConfigList::reinit(void)
  	updateListAll();
- 	if (currentItem()) {
-@@ -628,7 +628,7 @@ hide:
+ }
+ 
++void ConfigList::setOptionMode(QAction *action)
++{
++	if (action == showNormalAction)
++		optMode = normalOpt;
++	else if (action == showAllAction)
++		optMode = allOpt;
++	else
++		optMode = promptOpt;
++
++	updateListAll();
++}
++
+ void ConfigList::saveSettings(void)
+ {
+ 	if (!objectName().isEmpty()) {
+@@ -900,9 +912,9 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+ }
+ 
+ ConfigView*ConfigView::viewList;
+-QAction *ConfigView::showNormalAction;
+-QAction *ConfigView::showAllAction;
+-QAction *ConfigView::showPromptAction;
++QAction *ConfigList::showNormalAction;
++QAction *ConfigList::showAllAction;
++QAction *ConfigList::showPromptAction;
+ 
+ ConfigView::ConfigView(QWidget* parent, const char *name)
+ 	: Parent(parent)
+@@ -933,18 +945,6 @@ ConfigView::~ConfigView(void)
  	}
  }
  
--void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
-+void ConfigList::updateMenuList(struct menu* menu)
+-void ConfigView::setOptionMode(QAction *act)
+-{
+-	if (act == showNormalAction)
+-		list->optMode = normalOpt;
+-	else if (act == showAllAction)
+-		list->optMode = allOpt;
+-	else
+-		list->optMode = promptOpt;
+-
+-	list->updateListAll();
+-}
+-
+ void ConfigView::setShowName(bool b)
  {
- 	struct menu* child;
- 	ConfigItem* item;
-@@ -637,19 +637,19 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
- 	enum prop_type type;
+ 	if (list->showName != b) {
+@@ -1487,17 +1487,17 @@ ConfigMainWindow::ConfigMainWindow(void)
  
- 	if (!menu) {
--		while (parent->topLevelItemCount() > 0)
-+		while (topLevelItemCount() > 0)
- 		{
--			delete parent->takeTopLevelItem(0);
-+			delete takeTopLevelItem(0);
- 		}
+ 	QActionGroup *optGroup = new QActionGroup(this);
+ 	optGroup->setExclusive(true);
+-	connect(optGroup, SIGNAL(triggered(QAction*)), configView,
++	connect(optGroup, SIGNAL(triggered(QAction*)), configList,
+ 		SLOT(setOptionMode(QAction *)));
+-	connect(optGroup, SIGNAL(triggered(QAction *)), menuView,
++	connect(optGroup, SIGNAL(triggered(QAction *)), menuList,
+ 		SLOT(setOptionMode(QAction *)));
  
- 		return;
- 	}
+-	configView->showNormalAction = new QAction("Show Normal Options", optGroup);
+-	configView->showAllAction = new QAction("Show All Options", optGroup);
+-	configView->showPromptAction = new QAction("Show Prompt Options", optGroup);
+-	configView->showNormalAction->setCheckable(true);
+-	configView->showAllAction->setCheckable(true);
+-	configView->showPromptAction->setCheckable(true);
++	ConfigList::showNormalAction = new QAction("Show Normal Options", optGroup);
++	ConfigList::showNormalAction->setCheckable(true);
++	ConfigList::showAllAction = new QAction("Show All Options", optGroup);
++	ConfigList::showAllAction->setCheckable(true);
++	ConfigList::showPromptAction = new QAction("Show Prompt Options", optGroup);
++	ConfigList::showPromptAction->setCheckable(true);
  
--	last = (ConfigItem*)parent->topLevelItem(0);
-+	last = (ConfigItem*)topLevelItem(0);
- 	if (last && !last->goParent)
- 		last = 0;
- 	for (child = menu->list; child; child = child->next) {
--		item = last ? last->nextSibling() : (ConfigItem*)parent->topLevelItem(0);
-+		item = last ? last->nextSibling() : (ConfigItem*)topLevelItem(0);
- 		type = child->prompt ? child->prompt->type : P_UNKNOWN;
- 
- 		switch (mode) {
-@@ -670,7 +670,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
- 			if (!child->sym && !child->list && !child->prompt)
- 				continue;
- 			if (!item || item->menu != child)
--				item = new ConfigItem(parent, last, child, visible);
-+				item = new ConfigItem(this, last, child, visible);
- 			else
- 				item->testUpdateMenu(visible);
- 
-@@ -683,7 +683,7 @@ void ConfigList::updateMenuList(ConfigList *parent, struct menu* menu)
- 		}
- hide:
- 		if (item && item->menu == child) {
--			last = (ConfigItem*)parent->topLevelItem(0);
-+			last = (ConfigItem*)topLevelItem(0);
- 			if (last == item)
- 				last = 0;
- 			else while (last->nextSibling() != item)
+ 	QAction *showDebugAction = new QAction("Show Debug Info", this);
+ 	  showDebugAction->setCheckable(true);
 diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 6d06ec399ff0..952bd98d7912 100644
+index 460b858b0faa..461df6419f15 100644
 --- a/scripts/kconfig/qconf.h
 +++ b/scripts/kconfig/qconf.h
-@@ -102,7 +102,7 @@ public slots:
- 	bool menuSkip(struct menu *);
+@@ -74,6 +74,8 @@ public slots:
+ 	void changeValue(ConfigItem* item);
+ 	void updateSelection(void);
+ 	void saveSettings(void);
++	void setOptionMode(QAction *action);
++
+ signals:
+ 	void menuChanged(struct menu *menu);
+ 	void menuSelected(struct menu *menu);
+@@ -105,6 +107,8 @@ public slots:
+ 	QPalette disabledColorGroup;
+ 	QPalette inactivedColorGroup;
+ 	QMenu* headerPopup;
++
++	static QAction *showNormalAction, *showAllAction, *showPromptAction;
+ };
  
- 	void updateMenuList(ConfigItem *parent, struct menu*);
--	void updateMenuList(ConfigList *parent, struct menu*);
-+	void updateMenuList(struct menu *menu);
+ class ConfigItem : public QTreeWidgetItem {
+@@ -196,7 +200,6 @@ public slots:
+ 	void setShowName(bool);
+ 	void setShowRange(bool);
+ 	void setShowData(bool);
+-	void setOptionMode(QAction *);
+ signals:
+ 	void showNameChanged(bool);
+ 	void showRangeChanged(bool);
+@@ -207,10 +210,6 @@ public slots:
  
- 	bool updateAll;
+ 	static ConfigView* viewList;
+ 	ConfigView* nextView;
+-
+-	static QAction *showNormalAction;
+-	static QAction *showAllAction;
+-	static QAction *showPromptAction;
+ };
  
+ class ConfigInfoView : public QTextBrowser {
 -- 
 2.25.1
 
