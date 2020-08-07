@@ -2,93 +2,98 @@ Return-Path: <SRS0=rBkX=BR=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3672BC433DF
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 04:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE130C433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FE2322D07
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 04:23:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBE2A20855
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:19:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596791976;
+	bh=wHEX8SV/6qyWDHYup2Kr6fgbIr8JiKA4gMob7FgBrSE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=HlD4KLVkcovF5IY3E1NubOg3hgxsNYBP88Yl/PPGT4hxC5sKogHFCpt4CCrTRhqLi
+	 HWv/UFPfikS7EoHIGhJ9UnNKDZ04M95CwxCG3hKzt+XhhFY2P7wzGYYkEknfDPJcCJ
+	 RznMzZ+JtWKqK9AjwkiEGGCgxBUT+RKAkunRXA1E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725263AbgHGEXA convert rfc822-to-8bit (ORCPT
+        id S1727899AbgHGJTg (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 00:23:00 -0400
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:52662 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725379AbgHGEXA (ORCPT
+        Fri, 7 Aug 2020 05:19:36 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:41485 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727037AbgHGJTf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 00:23:00 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R671e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01355;MF=changhuaixin@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0U4zfFVC_1596774176;
-Received: from 30.27.116.2(mailfrom:changhuaixin@linux.alibaba.com fp:SMTPD_---0U4zfFVC_1596774176)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 07 Aug 2020 12:22:57 +0800
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 1/3] scripts/sorttable: Change section type of orc_lookup
- to SHT_PROGBITS
-From:   changhuaixin <changhuaixin@linux.alibaba.com>
-In-Reply-To: <20200806150810.GA2127855@gmail.com>
-Date:   Fri, 7 Aug 2020 12:22:56 +0800
-Cc:     changhuaixin <changhuaixin@linux.alibaba.com>, bp@alien8.de,
-        hpa@zytor.com, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@amacapital.net,
-        michal.lkml@markovi.net, mingo@redhat.com,
-        Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
-        x86@kernel.org, yamada.masahiro@socionext.com, jpoimboe@redhat.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C605557D-951C-4FA7-9CE2-940B92FD198D@linux.alibaba.com>
-References: <20200723034643.33537-1-changhuaixin@linux.alibaba.com>
- <20200723034643.33537-2-changhuaixin@linux.alibaba.com>
- <2714DF66-5F65-4CB1-A232-B88E4D5AF566@linux.alibaba.com>
- <20200806150810.GA2127855@gmail.com>
-To:     Ingo Molnar <mingo@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Fri, 7 Aug 2020 05:19:35 -0400
+Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 0779JBQ1032147;
+        Fri, 7 Aug 2020 18:19:14 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQ1032147
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1596791955;
+        bh=JVeY+lZTgfed2xMudnwbriYDO7ghha4ZbXi0Duc0vcI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=pJXmMtD924wU0Od0S0fHunemS5zFp6+ADAl9dmAkYZ0xVhCyV/PSkZVquakqWyGC3
+         QUAAEdtWZgwDYsujy/O4jeicRkJM+BMExhrFVW8RUAgOHEJ+q8dW2j7vU5n+3K0Qiq
+         YAXMsNfOuMnTIhmeha/cE8fRuCliQgoey/rX9bDw69syG8NdC83982A7CareN9KZIS
+         /7PeeuPNqv57sHSMgN+J0H1I08C7pLXgJz97wvLgWbeQWYFNndlWFKnVksScy/GFKV
+         wcAvr/t4JbiWQK97u2YvLt8DMLZfk9X0UDHFY7ognQutHY5c6tFGvRwhAxym5PiWs7
+         pSVu9C1ylc5ew==
+X-Nifty-SrcIP: [60.134.47.170]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 05/19] kconfig: qconf: overload addToolBar() to create and insert toolbar
+Date:   Fri,  7 Aug 2020 18:18:55 +0900
+Message-Id: <20200807091909.2985787-5-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
+References: <20200807091909.2985787-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+Use the overloaded function, addToolBar(const QString &title)
+to create a QToolBar object, setting its window title, and inserts
+it into the toolbar area.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> On Aug 6, 2020, at 11:08 PM, Ingo Molnar <mingo@kernel.org> wrote:
-> 
-> 
-> * changhuaixin <changhuaixin@linux.alibaba.com> wrote:
-> 
->> Hi, Ingo
->> 
->> Another way to write SHT_PROGBITS is using elf_create_section to write orc_lookup table headers, when orc_unwind_ip table and orc_unwind table are written. Is this a better solution?
->> 
->> diff --git a/tools/objtool/orc_gen.c b/tools/objtool/orc_gen.c
->> index 3f98dcfbc177..860d4dcec8e6 100644
->> --- a/tools/objtool/orc_gen.c
->> +++ b/tools/objtool/orc_gen.c
->> @@ -183,6 +183,10 @@ int create_orc_sections(struct objtool_file *file)
->>        u_sec = elf_create_section(file->elf, ".orc_unwind",
->>                                   sizeof(struct orc_entry), idx);
->> 
->> +       /* make flags of section orc_lookup right */
->> +       if (!elf_create_section(file->elf, ".orc_lookup", sizeof(int), 0))
->> +               return -1;
->> +
->>        /* populate sections */
->>        idx = 0;
->>        for_each_sec(file, sec) {
-> 
-> Looks much nicer IMO.
-> 
-> Mind turning this into a proper patch that does it plus reverts the 
-> hack?
-> 
-A new patchset is sent.
+(no changes since v1)
 
-Thanks,
-huaixin
+ scripts/kconfig/qconf.cc | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> Thanks,
-> 
-> 	Ingo
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index b4f32199e0df..0385804cfd08 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1431,9 +1431,6 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	setTabOrder(configList, helpText);
+ 	configList->setFocus();
+ 
+-	QToolBar *toolBar = new QToolBar("Tools", this);
+-	addToolBar(toolBar);
+-
+ 	backAction = new QAction(QPixmap(xpm_back), "Back", this);
+ 	connect(backAction, SIGNAL(triggered(bool)), SLOT(goBack()));
+ 
+@@ -1506,6 +1503,7 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	  connect(showAboutAction, SIGNAL(triggered(bool)), SLOT(showAbout()));
+ 
+ 	// init tool bar
++	QToolBar *toolBar = addToolBar("Tools");
+ 	toolBar->addAction(backAction);
+ 	toolBar->addSeparator();
+ 	toolBar->addAction(loadAction);
+-- 
+2.25.1
 
