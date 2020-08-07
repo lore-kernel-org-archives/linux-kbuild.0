@@ -7,52 +7,50 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A89F6C433DF
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94737C433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F27220855
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 704AF20855
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 09:21:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596792061;
-	bh=taNbGV1s+WsvssYEnTWNWm1NJW4IOkVZ5ZMeNigoG9Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=sjhwBIh+jqZgi6iWTIiuVaTWRvaHf2TCS8j0UtUJjJp+5YyEKiVAg5mssS8HeQjL7
-	 7QrgcFW6MvtSDYsRLrv4Bvx6rBu+50WfXTMN3Xkxj4LqWnJhu/7abe/n5aDcslJFkq
-	 qZpcUsQienUtWvZfI//4MMga5T3V4PS2vak/abcY=
+	s=default; t=1596792063;
+	bh=DMEUnGWXCxDB9FusoShrs0uRuWClPbV19iPYiWhgqJ4=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=STo2Yy38YFb9PSHRJybEn1Q7YEUWHDNqs/QsMvc6bJO6x0UO3yRCPwxCXiJD6gzX+
+	 5aHHi1EW3ihqXJScOOKRI5YaIzXt/TRf1csMPJvcEJOrrnjtfp3QlRT9ku/884vFA9
+	 3Aen1ZcAYkhwU48xjk6Vlyv7/zOFboYCPG4PjA1g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbgHGJU6 (ORCPT
+        id S1727969AbgHGJTh (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:20:58 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:41594 "EHLO
+        Fri, 7 Aug 2020 05:19:37 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:41486 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727986AbgHGJTk (ORCPT
+        with ESMTP id S1727897AbgHGJTg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:19:40 -0400
+        Fri, 7 Aug 2020 05:19:36 -0400
 Received: from localhost.localdomain (softbank060134047170.bbtec.net [60.134.47.170]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 0779JBQ8032147;
-        Fri, 7 Aug 2020 18:19:21 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBQ8032147
+        by conuserg-12.nifty.com with ESMTP id 0779JBPv032147;
+        Fri, 7 Aug 2020 18:19:11 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 0779JBPv032147
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596791962;
-        bh=4uKyPxqgpR7kYRHZT9Kv76QwzC1/t5RlOrA5ow9oRUo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MbAtpUCKwwX8Quug095DvEZBNhJuh65aWZzHVxTvgYYI0ldnI1KWbUUL/JffouoOK
-         x7ASvoNe8ef/OVvQOxSv+D1hsNOWhzqLPcn8MRwY3rXVUkSlLnfaoTZmZjnd5fiBwA
-         y550SKz0eTZwNPsFJNLzMwqbzPDLFQA1n0MAvzuio5iyHf8e1hjqtWwOcpHwCP6HDz
-         +YJHo3RsJvv2OGoJ896xJzK0VCEuACWbNtM/85mL49hTRSrSlWct4+0PHrfCIk7Afj
-         nwik3e/XOQ6FYdawxF26RTMNyYcpIylQ09FhyQCc2ebXKv0oj70iWzAewSETwTbiY9
-         iDJoO1Yy9u98g==
+        s=dec2015msa; t=1596791951;
+        bh=PmJ0GVxR3KXmtIUW/pYRqsxX2UAZbsS3qkoMiv7ZHE8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=BN/fPfN9+CsRd7c5l6WGpeN/qLi5F++n1lharkHduu8WFNWBXjJ9udGRsVOdwTPbH
+         i8TET+gjnrMTVPFrHVLD8//hQIJJH801jrgHjbFmL0NLSmMegvGQelpDVeW8QMl4u7
+         FJKRHFEl45dAblwo6mHRhHlKsIwPhFN6lAKHUAqJgD5h6zRijDPaUskqwbGKO13S8m
+         YuG+teVXj/xr/mf+gUV/B+JFfVJHvSImPXdhDwDxrgyB6ETMXsIYLXw0kG0BhjhyBo
+         uSv4Ok8UIOHc2FmC9gKoRDkCPYh7no5TsLoeqQBr8+Gse7Oz5+1slkawHmnezmrxle
+         XxSFmKx4GsvWw==
 X-Nifty-SrcIP: [60.134.47.170]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 12/19] kconfig: qconf: drop more localization code
-Date:   Fri,  7 Aug 2020 18:19:02 +0900
-Message-Id: <20200807091909.2985787-12-masahiroy@kernel.org>
+Subject: [PATCH v2 01/19] kconfig: qconf: remove ->addSeparator() to menuBar
+Date:   Fri,  7 Aug 2020 18:18:51 +0900
+Message-Id: <20200807091909.2985787-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200807091909.2985787-1-masahiroy@kernel.org>
-References: <20200807091909.2985787-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -60,63 +58,30 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This is a remnant of commit 694c49a7c01c ("kconfig: drop localization
-support").
-
-Get it back to the code prior to commit 3b9fa0931dd8 ("[PATCH] Kconfig
-i18n support").
+I do not understand the purpose of this ->addSeparator().
+It does not make any difference.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - new patch
 
- scripts/kconfig/qconf.cc | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ scripts/kconfig/qconf.cc | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 604f7855b070..230ce621d85b 100644
+index 23d1cb01a41a..55023a9e8315 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -31,11 +31,6 @@ static ConfigSettings *configSettings;
+@@ -1540,7 +1540,6 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	optionMenu->addAction(showDebugAction);
  
- QAction *ConfigMainWindow::saveAction;
- 
--static inline QString qgettext(const char* str)
--{
--	return QString::fromLocal8Bit(str);
--}
--
- ConfigSettings::ConfigSettings()
- 	: QSettings("kernel.org", "qconf")
- {
-@@ -109,7 +104,7 @@ void ConfigItem::updateMenu(void)
- 
- 	sym = menu->sym;
- 	prop = menu->prompt;
--	prompt = qgettext(menu_get_prompt(menu));
-+	prompt = menu_get_prompt(menu);
- 
- 	if (prop) switch (prop->type) {
- 	case P_MENU:
-@@ -135,7 +130,7 @@ void ConfigItem::updateMenu(void)
- 	if (!sym)
- 		goto set_prompt;
- 
--	setText(nameColIdx, QString::fromLocal8Bit(sym->name));
-+	setText(nameColIdx, sym->name);
- 
- 	type = sym_get_type(sym);
- 	switch (type) {
-@@ -265,7 +260,7 @@ void ConfigLineEdit::show(ConfigItem* i)
- {
- 	item = i;
- 	if (sym_get_string_value(item->menu->sym))
--		setText(QString::fromLocal8Bit(sym_get_string_value(item->menu->sym)));
-+		setText(sym_get_string_value(item->menu->sym));
- 	else
- 		setText(QString());
- 	Parent::show();
+ 	// create help menu
+-	menu->addSeparator();
+ 	QMenu* helpMenu = menu->addMenu("&Help");
+ 	helpMenu->addAction(showIntroAction);
+ 	helpMenu->addAction(showAboutAction);
 -- 
 2.25.1
 
