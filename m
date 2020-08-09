@@ -1,64 +1,62 @@
-Return-Path: <SRS0=rBkX=BR=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=KymV=BT=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 840C3C433E0
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 13:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A45C433DF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  9 Aug 2020 16:45:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53B18221E2
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Aug 2020 13:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 025F220772
+	for <linux-kbuild@archiver.kernel.org>; Sun,  9 Aug 2020 16:45:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596808541;
-	bh=uo/k0+/MlwPZ2rch4XlEqR7CSq0fEKYhTbnLN15/Xis=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=yHo6kZJEamcP9Xha3uNVrsqS/cImLQn3YVehaQnQbfY/yFcmpvyd79GGN412351JQ
-	 j8FyLxs0BawCrLdTFgz1//JGS2SrCN9jZVUg1PlyWWNUNO1Ptbn3orB9XBsAY058Kn
-	 4GparKGG4itjUs8mEToFPtRjd3IWKpk/H0WRWsrc=
+	s=default; t=1596991522;
+	bh=o3+gvkRYHXmkCK5K6UoAuUi+HTxdUxSJHGrGr2DP/Ng=;
+	h=From:Date:Subject:To:Cc:List-ID:From;
+	b=kG2G9I9ThGEB8G7+vLuSPouN723DtPRP4PxvqWUN8/LIyZn3f5xFo1X/H2DeF4xdY
+	 qzYQDmhKQhc9jFzV5BU3TU7yRWeDJNG6x5SZ6uaf97zsQlInO2Ir1vcjIGn8b+n+0Z
+	 VyVchJnpIOl6ND3nGkv8cakdECGBWi4SY/XJLFw0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726150AbgHGNzk (ORCPT
+        id S1726415AbgHIQpV (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Aug 2020 09:55:40 -0400
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:30773 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbgHGNzk (ORCPT
+        Sun, 9 Aug 2020 12:45:21 -0400
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:57832 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726428AbgHIQpS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Aug 2020 09:55:40 -0400
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 077DtHJ8010749;
-        Fri, 7 Aug 2020 22:55:18 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 077DtHJ8010749
+        Sun, 9 Aug 2020 12:45:18 -0400
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 079GixTM028732;
+        Mon, 10 Aug 2020 01:45:00 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 079GixTM028732
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1596808518;
-        bh=kxd75shqpUDCrWO6tl08NjmmCC2WGIAYElGpbYzOIWM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JZIU+GWr4nr9BXEu654yyZx5GPzcPX5LduAigEvpw3RBvdjpChf9/IGhVsd4Y8HNH
-         LqZdf4VY6McyRdtPIAKr0bqr1GzkTpZPHz0qG6HoLjcvvx8SRP9NjL365Mp5NoN2cz
-         9/rHJiGiuU05UnSyjlp+AMZnMq7Tpf5pBN0qEBXDwm7Uu8PLSzpPJgubP4BegaQDs4
-         q4hYKWWLfecNTxkzPiBo6+LV4mYTIi01fvlNtjk7DyFnNI/YmFzC3UJgUkzJwkgkYZ
-         TQCgkpdNdFxC8xUp42lTcaZOnI93hevbxIGkLQD+TH0KjW/939vvgcZptdQxef4jVD
-         fwlQFTZ1B1HNg==
-X-Nifty-SrcIP: [209.85.217.49]
-Received: by mail-vs1-f49.google.com with SMTP id p8so866395vsm.12;
-        Fri, 07 Aug 2020 06:55:18 -0700 (PDT)
-X-Gm-Message-State: AOAM5314UcsxEh9oD2kycqOBxXvmjS/NpwO7ZcSDQy6bMLXZFb7gY3UF
-        bo7G/w5qWwY+QpBe979gF873VdrrkXVP3kEFcvA=
-X-Google-Smtp-Source: ABdhPJwGNgtHcxnjmriCTHVsk/7QbBL5IwjRVD6FQFxzFRVjRYM9C48mG/o5qZkvzESZE4GuK6e7x55JL3XE1e/O/AY=
-X-Received: by 2002:a67:7c11:: with SMTP id x17mr10979837vsc.155.1596808516824;
- Fri, 07 Aug 2020 06:55:16 -0700 (PDT)
+        s=dec2015msa; t=1596991500;
+        bh=4/Wuc/SZmcBLjxjCab/4kWn1GAKRas6rkaBR2EHWo20=;
+        h=From:Date:Subject:To:Cc:From;
+        b=fXe5iqgEsZZNZOomxBIqwTx2ZpqZ0c2DwWZO7dBnUdO4hPRH1OPigz3cAVRNurY8y
+         clfvDuhM0ntIqNCs8JfNqTiH8Vu+qbGDLW8h2WnThIu8z5Avqg6Ufs48strU48F+W/
+         FOeBZJNr+WTA2nrKooBvjvJJQqKxLHBD8CiKAiJyHR9bA6NTlTcYY7w1aFDlWcnyCP
+         nlCBMJF3KhMjdMaSdXBgVv972N63E0HG0ZTmg06sJtiNZsXr4CMyiixzt+K6ppGhPT
+         Fn9v5tDeXxYQKTZc/JKO51ExqbbahqHAmnQMUf0DJzAwWVS5AauvQnKgvObzuKuuKP
+         5RKrp2J4TuzCg==
+X-Nifty-SrcIP: [209.85.217.48]
+Received: by mail-vs1-f48.google.com with SMTP id i129so3129589vsi.3;
+        Sun, 09 Aug 2020 09:45:00 -0700 (PDT)
+X-Gm-Message-State: AOAM530xo3yOb+t5ZZFMO/C1Hb4t9M/AlTNzyFJONdlImQp7tAbyoMdv
+        hwKsRI/6btemzSMTXKbeBu7sGCGwfhKWIg9JO4Q=
+X-Google-Smtp-Source: ABdhPJzmegxrhBUJkpqQlxlRB6LMHJWnb2qh+gXiiLgEY5iHTAm8kJYLhuDU2AlNZBxL8OXAxsDf5A54WI/UKy740Ac=
+X-Received: by 2002:a05:6102:2247:: with SMTP id e7mr16099231vsb.181.1596991498725;
+ Sun, 09 Aug 2020 09:44:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200708133015.12286-1-maxime.chretien@bootlin.com>
-In-Reply-To: <20200708133015.12286-1-maxime.chretien@bootlin.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 7 Aug 2020 22:54:40 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASpZ=By_-5KKps_q3emHuLBNv7AneLh9eNwBqbZToivSA@mail.gmail.com>
-Message-ID: <CAK7LNASpZ=By_-5KKps_q3emHuLBNv7AneLh9eNwBqbZToivSA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig qconf: Add grey background for hidden options
-To:     Maxime Chretien <maxime.chretien@bootlin.com>
+Date:   Mon, 10 Aug 2020 01:44:22 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARMCg0vPjZL0o-sFr+vMu17-nFcV4v4pbLazLK8iTSQWQ@mail.gmail.com>
+Message-ID: <CAK7LNARMCg0vPjZL0o-sFr+vMu17-nFcV4v4pbLazLK8iTSQWQ@mail.gmail.com>
+Subject: [GIT PULL] Kbuild updates for v5.9-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -67,117 +65,137 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Jul 8, 2020 at 10:30 PM Maxime Chretien
-<maxime.chretien@bootlin.com> wrote:
->
-> This is useful to see which configuration parameters can be edited
-> or not when "Show All Options" is enabled.
->
-> Signed-off-by: Maxime Chretien <maxime.chretien@bootlin.com>
-> ---
->  scripts/kconfig/qconf.cc | 7 +++++++
->  scripts/kconfig/qconf.h  | 4 ++++
->  2 files changed, 11 insertions(+)
+Hi Linus,
+
+Please pull Kbuild updates for v5.9-rc1
+Thanks.
 
 
-I like the idea, but
-maybe this patch could be improved?
+The following changes since commit dcb7fd82c75ee2d6e6f9d8cc71c52519ed52e258:
 
-For example, in the following test code,
-BAR is correctly painted grey when CONFIG_FOO=n,
-but "my menu" is always white despite of
-"depends on FOO"
+  Linux 5.8-rc4 (2020-07-05 16:20:22 -0700)
 
-----(test code)------
+are available in the Git repository at:
 
-config FOO
-       bool "foo"
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v5.9
 
-config BAR
-       bool "bar"
-       depends on FOO
+for you to fetch changes up to 132305b3b474a85152302ceda4551384cce3904e:
 
-menu "my menu"
-       depends on FOO
+  kbuild: stop filtering out $(GCC_PLUGINS_CFLAGS) from cc-option base
+(2020-08-10 01:32:59 +0900)
 
-endmenu
+----------------------------------------------------------------
+Kbuild updates for v5.9
 
--------(test code end)----
+ - run the checker (e.g. sparse) after the compiler
 
+ - remove unneeded cc-option tests for old compiler flags
 
+ - fix tar-pkg to install dtbs
 
+ - introduce ccflags-remove-y and asflags-remove-y syntax
 
+ - allow to trace functions in sub-directories of lib/
 
+ - introduce hostprogs-always-y and userprogs-always-y syntax
 
+ - various Makefile cleanups
 
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index c0ac8f7b5f1a..be9ff4651da1 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -208,6 +208,13 @@ void ConfigItem::updateMenu(void)
->         }
->         if (!sym_has_value(sym) && visible)
->                 prompt += " (NEW)";
-> +
-> +       if(!visible) {
-> +               setBackground(promptColIdx, QBrush(QColor("#E0E0E0")));
-> +       } else {
-> +               setBackground(promptColIdx, QBrush());
-> +       }
-> +
+----------------------------------------------------------------
+Alexander A. Klimov (1):
+      kbuild: Replace HTTP links with HTTPS ones
 
+Domenico Andreoli (1):
+      kbuild: buildtar: add dtbs support
 
-I think all the columns should be grey-grounded.
-Please note you can click other columns to
-toggle y/m/n.
+Luc Van Oostenryck (1):
+      kbuild: run the checker after the compiler
 
+Masahiro Yamada (13):
+      Revert "kbuild: Create directory for target DTB"
+      kbuild: remove cc-option test of -fno-stack-protector
+      kbuild: remove cc-option test of -ffreestanding
+      powerpc/boot: add DTB to 'targets'
+      kbuild: always create directories of targets
+      kbuild: do not export LDFLAGS_vmlinux
+      kbuild: introduce ccflags-remove-y and asflags-remove-y
+      kbuild: trace functions in subdirectories of lib/
+      kbuild: move host .so build rules to scripts/gcc-plugins/Makefile
+      kbuild: sort hostprogs before passing it to ifneq
+      kbuild: introduce hostprogs-always-y and userprogs-always-y
+      kbuild: include scripts/Makefile.* only when relevant CONFIG is enabled
+      kbuild: stop filtering out $(GCC_PLUGINS_CFLAGS) from cc-option base
 
-How about something like this?
-
-
-
-QBrush brush;
-
-if (visible)
-        brush = QBrush()
-else
-        brush = QBrush(QColor("#E0E0E0"));
-
-setBackground(promptColIdx, brush);
-setBackground(nameColIdx, brush);
-setBackground(noColIdx, brush);
-setBackground(modColIdx, brush);
-setBackground(yesColIdx, brush);
-setBackground(dataColIdx, brush);
-
-
-
-
->  set_prompt:
->         setText(promptColIdx, prompt);
->  }
-> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-> index c879d79ce817..79e47e8c1ae7 100644
-> --- a/scripts/kconfig/qconf.h
-> +++ b/scripts/kconfig/qconf.h
-> @@ -174,6 +174,10 @@ class ConfigItem : public QTreeWidgetItem {
->         {
->                 return Parent::text(idx);
->         }
-> +       void setBackground(colIdx idx, const QBrush& brush)
-> +       {
-> +               Parent::setBackground(idx, brush);
-> +       }
-
-I do not understand why this wrapper is useful...
-
-
->         void setPixmap(colIdx idx, const QIcon &icon)
->         {
->                 Parent::setIcon(idx, icon);
-> --
-> 2.27.0
->
+ Documentation/kbuild/Kconfig.recursion-issue-02 |  2 +-
+ Documentation/kbuild/kconfig-language.rst       | 18 +++++++-------
+ Documentation/kbuild/llvm.rst                   |  2 +-
+ Documentation/kbuild/makefiles.rst              | 45
+++++++++++++++++++++++++++++++++++-
+ Makefile                                        | 26 ++++++++++++---------
+ arch/Kconfig                                    |  3 ---
+ arch/arm/boot/compressed/Makefile               |  9 ++-----
+ arch/mips/vdso/Makefile                         |  3 +--
+ arch/powerpc/boot/Makefile                      |  2 ++
+ arch/powerpc/kernel/Makefile                    |  2 +-
+ arch/powerpc/platforms/powermac/Makefile        |  2 +-
+ arch/powerpc/xmon/Makefile                      |  3 +--
+ arch/s390/Makefile                              |  2 +-
+ arch/sh/boot/compressed/Makefile                |  5 +---
+ arch/sparc/vdso/Makefile                        |  4 ++--
+ arch/um/Makefile                                |  3 +--
+ arch/x86/Makefile                               |  4 ++--
+ arch/x86/boot/compressed/Makefile               |  4 ++--
+ arch/x86/entry/vdso/Makefile                    |  4 ++--
+ arch/x86/kernel/cpu/Makefile                    |  3 +--
+ arch/x86/lib/Makefile                           |  2 +-
+ arch/x86/mm/Makefile                            |  7 +++---
+ arch/x86/power/Makefile                         |  3 +--
+ arch/x86/purgatory/Makefile                     |  2 +-
+ arch/x86/um/vdso/Makefile                       |  2 +-
+ arch/x86/xen/Makefile                           |  5 ++--
+ arch/xtensa/boot/boot-elf/Makefile              |  2 +-
+ drivers/firmware/efi/libstub/Makefile           |  4 ++--
+ drivers/xen/Makefile                            |  3 +--
+ kernel/trace/Makefile                           |  4 ++--
+ lib/Makefile                                    |  9 +++----
+ lib/livepatch/Makefile                          |  4 ----
+ mm/kasan/Makefile                               |  2 +-
+ samples/auxdisplay/Makefile                     |  3 +--
+ samples/binderfs/Makefile                       |  3 +--
+ samples/connector/Makefile                      |  3 +--
+ samples/hidraw/Makefile                         |  3 +--
+ samples/mei/Makefile                            |  4 +---
+ samples/pidfd/Makefile                          |  4 +---
+ samples/seccomp/Makefile                        |  4 +---
+ samples/timers/Makefile                         |  3 +--
+ samples/uhid/Makefile                           |  3 +--
+ samples/vfs/Makefile                            |  3 +--
+ samples/watch_queue/Makefile                    |  3 +--
+ samples/watchdog/Makefile                       |  3 +--
+ scripts/Kbuild.include                          | 10 +++-----
+ scripts/Makefile                                | 18 +++++++-------
+ scripts/Makefile.build                          | 15 ++++++------
+ scripts/Makefile.clean                          | 13 +++++++----
+ scripts/Makefile.host                           | 40
++++++--------------------------
+ scripts/Makefile.kcov                           |  4 ----
+ scripts/Makefile.kcsan                          |  4 ----
+ scripts/Makefile.lib                            | 28 +++++++++++++++-------
+ scripts/Makefile.ubsan                          |  3 ---
+ scripts/basic/Makefile                          |  3 +--
+ scripts/dtc/Makefile                            |  5 ++--
+ scripts/gcc-plugins/Makefile                    | 61
++++++++++++++++++++++++++++++++++++++++---------
+ scripts/genksyms/Makefile                       |  3 +--
+ scripts/link-vmlinux.sh                         |  4 ++++
+ scripts/mod/Makefile                            |  4 ++--
+ scripts/package/buildtar                        | 12 ++++++++++
+ scripts/package/mkdebian                        |  2 +-
+ scripts/package/mkspec                          |  2 +-
+ scripts/selinux/genheaders/Makefile             |  4 +---
+ scripts/selinux/mdp/Makefile                    |  3 +--
+ 65 files changed, 251 insertions(+), 221 deletions(-)
 
 
 -- 
