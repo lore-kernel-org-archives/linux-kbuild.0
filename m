@@ -7,51 +7,56 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D96AC433E0
-	for <linux-kbuild@archiver.kernel.org>; Wed, 12 Aug 2020 14:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CCAC433E0
+	for <linux-kbuild@archiver.kernel.org>; Wed, 12 Aug 2020 17:41:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E264020838
-	for <linux-kbuild@archiver.kernel.org>; Wed, 12 Aug 2020 14:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D5F820781
+	for <linux-kbuild@archiver.kernel.org>; Wed, 12 Aug 2020 17:41:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597243794;
-	bh=D4aC0deIjWOcbNAKz5ZK44yUZtLAE7MFHApNt+iA1+w=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=1OkJOuiLg8CHK7nmoPKmQmkaN4Crd2ew+s0z7CMNZb0DSz2IhRsys5syPzna9uzOg
-	 ADWeGLF2cYauDJaXJWlpOKlE9QgbP2/3Tcqg4BB4Vl78XGswluYPmyB8/WLb88Blpb
-	 E9Y37+0VG4N+XycRyHrcNXeNVHuhWD2v/VlzxP/w=
+	s=default; t=1597254075;
+	bh=+84vL+r6w53WoQuz/nkk+qICrMgemgjRWv+t3f4GPow=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=cH9DWnlffN0sLxlYz77m4XlMCKfh+tJ0wSf6cD4zhoXMpWA+KgD2rFx2T3WcdCgu7
+	 3K+vvSy3yl7qXNR0teQMmCPNmuqYc0FpY8RKZGw8p4PB0gRSiyhCXY1dlXCDwIHBt1
+	 xTctmMDHd30oWKObJvw4vU8c+GTJI62mYKJ0C82M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726468AbgHLOtw (ORCPT
+        id S1726506AbgHLRlN (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 12 Aug 2020 10:49:52 -0400
-Received: from conuserg-08.nifty.com ([210.131.2.75]:62323 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726505AbgHLOtw (ORCPT
+        Wed, 12 Aug 2020 13:41:13 -0400
+Received: from conuserg-11.nifty.com ([210.131.2.78]:55363 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726503AbgHLRlM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Aug 2020 10:49:52 -0400
+        Wed, 12 Aug 2020 13:41:12 -0400
 Received: from oscar.flets-west.jp (softbank126025067101.bbtec.net [126.25.67.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 07CEnQ1a030156;
-        Wed, 12 Aug 2020 23:49:27 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 07CEnQ1a030156
+        by conuserg-11.nifty.com with ESMTP id 07CHeC4D012279;
+        Thu, 13 Aug 2020 02:40:13 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 07CHeC4D012279
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1597243767;
-        bh=DhmA+0HaX2aM2uWibI/FmSiCbk/WILIOdMgaK5iY8KA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=YXSY50s1jrpS6iR6SZGsAt3lUPqQL7rgDK2RC07FgqCQZ899VcpEVVF845u3RdSFp
-         qup/dUgcuu4rhPTUjQ5ojJTqQSpxoH24FiRY6lV9KGz0D5Txwx8GUHjmI7KddwKzll
-         9zorE6C08op6bPjf0yDLf5TEJbw1R9sQZbOJxRfnhK7u4F+P5d/q9PFIIUQolKYRrw
-         u+6LwT+56Pbq8IMR6ZwfYsSOcPGlJrskfgW/IJWHzVPWC45FAeEYDBAaUbx8WOuZrL
-         OFZYN0hRThho64oUuyPeJuDIv4KqBEEF0pAhajozZBQ6jXgxYjf+d4TuybAmm9r/uG
-         uXnH7iKBBGVXw==
+        s=dec2015msa; t=1597254014;
+        bh=bdhsF+PGnDpUOrgplpToSYPg+6kuHpkICPzCUi4Ew4w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Q27VHY3b/ONWLVm1yKoov1048y7ZwKoC0NTica0jMpOvPaCQcOcRtFA6wOrn7HlNz
+         R6I9epcxlfFFeCJEPk8adkeYB5HlSXRX5m7+F9DycLJ2sRX34llJIDXHXiMUY9Beuy
+         ZKXKLpsihPXX8TPvuCM4WPE/7OGGLn5UZ+WLUFGrXsmV/rBFuIFVhqApSNdzaPcNT+
+         ourNBeTsH35lhF7Gun/74hF5loeASuSgU8aw0z3PWQn+R/TdPkD0Du6ykKhCzbxmx4
+         iBMdmKFP3wmlwYvq9BWzrHn12PdTVKSm7us2Ldwr68OLE9ZFFoQqGnXU3O6aZzwhtS
+         /J9KBNA5VaQeg==
 X-Nifty-SrcIP: [126.25.67.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
+Cc:     Nathan Huckleberry <nhuck@google.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Roeder <tmroeder@google.com>,
+        clang-built-linux@googlegroups.com,
+        Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] kbuild: remove redundant patterns in filter/filter-out
-Date:   Wed, 12 Aug 2020 23:49:23 +0900
-Message-Id: <20200812144923.1932593-1-masahiroy@kernel.org>
+Subject: [PATCH 1/3] gen_compile_commands: parse only the first line of .*.cmd files
+Date:   Thu, 13 Aug 2020 02:39:56 +0900
+Message-Id: <20200812173958.2307251-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200812173958.2307251-1-masahiroy@kernel.org>
+References: <20200812173958.2307251-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -59,42 +64,40 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The '%' in filter/filter-out matches to any number of any characters,
-including empty string.
+After the allmodconfig build, this script takes about 5 sec on my
+machine. Most of the run-time is consumed for needless regex matching.
 
-So, '%config' matches to 'config', and '%install' to 'install'.
+We know the format of .*.cmd file; the first line is the build command.
+There is no need to parse the remaining.
 
-Drop the redundant patterns.
+With this optimization, now it runs in about 1 sec with the allmodconfig
+build.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ scripts/gen_compile_commands.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 952f833dc405..51212c3e3851 100644
---- a/Makefile
-+++ b/Makefile
-@@ -265,8 +265,7 @@ no-dot-config-targets := $(clean-targets) \
- 			 $(version_h) headers headers_% archheaders archscripts \
- 			 %asm-generic kernelversion %src-pkg dt_binding_check \
- 			 outputmakefile
--no-sync-config-targets := $(no-dot-config-targets) install %install \
--			   kernelrelease
-+no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease
- single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
+index c458696ef3a7..19c7338740e7 100755
+--- a/scripts/gen_compile_commands.py
++++ b/scripts/gen_compile_commands.py
+@@ -125,11 +125,9 @@ def main():
+             filepath = os.path.join(dirpath, filename)
  
- config-build	:=
-@@ -292,7 +291,7 @@ ifneq ($(KBUILD_EXTMOD),)
- endif
- 
- ifeq ($(KBUILD_EXTMOD),)
--        ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-+        ifneq ($(filter %config,$(MAKECMDGOALS)),)
- 		config-build := 1
-                 ifneq ($(words $(MAKECMDGOALS)),1)
- 			mixed-build := 1
+             with open(filepath, 'rt') as f:
+-                for line in f:
+-                    result = line_matcher.match(line)
+-                    if not result:
+-                        continue
+-
++                line = f.readline()
++                result = line_matcher.match(line)
++                if result:
+                     try:
+                         entry = process_line(directory, dirpath,
+                                              result.group(1), result.group(2))
 -- 
 2.25.1
 
