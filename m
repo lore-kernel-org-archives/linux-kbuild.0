@@ -2,118 +2,115 @@ Return-Path: <SRS0=AD72=B3=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D32C433DF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 21:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D87BC433E1
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 21:36:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91BAC20738
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 21:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58FF32065D
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 21:36:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1597700212;
+	bh=TCjzNp4qKJTaPscgXMtW9r99luBrplGHLhswQnzjIoA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=qYJx4C/LoYqYzJRS4BxoZWZV2DrGltobtS1T3aS9e+fowDDl04XKI5RJWNIzN8NzT
+	 IQdlS3K4vLjj8OOooCskWKjBuffEm/zvg23UiPWBMLlJgJg7cf081mfb+taXADZ7U6
+	 NuGZsZqUWG71APKyr74PqDVD4bZ7w9ZU20vGPTDo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgHQVPq (ORCPT
+        id S1728524AbgHQVgv (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 17 Aug 2020 17:15:46 -0400
-Received: from out03.mta.xmission.com ([166.70.13.233]:48070 "EHLO
-        out03.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727885AbgHQVPp (ORCPT
+        Mon, 17 Aug 2020 17:36:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34758 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726634AbgHQVgt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Aug 2020 17:15:45 -0400
-Received: from in01.mta.xmission.com ([166.70.13.51])
-        by out03.mta.xmission.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1k7mTk-001Bwu-Sg; Mon, 17 Aug 2020 15:15:40 -0600
-Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=x220.xmission.com)
-        by in01.mta.xmission.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.87)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1k7mTk-00074A-6O; Mon, 17 Aug 2020 15:15:40 -0600
-From:   ebiederm@xmission.com (Eric W. Biederman)
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Mon, 17 Aug 2020 17:36:49 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C1AC061389
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 14:36:48 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id cq28so13588910edb.10
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 14:36:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jm8jZArYddhqUYv8uma7iesaEBvjq6SOsDLcRZUaQ/E=;
+        b=K9ybUtGr6t0dUEotn+b5ds3wNHdUEMLBrVq/JaBumu59HnobQacNfCGqQl5mJHNbVA
+         hkLWBuL6YoF8g3a1YCO+tfDSdddHQkHB/d4NFnZf0r0jOWl5e4HE9u22yd9cLQ+svWGM
+         1fKT0VIsFmJ3woXTAuGbLupTo9xre9P3/nkK8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jm8jZArYddhqUYv8uma7iesaEBvjq6SOsDLcRZUaQ/E=;
+        b=dgTnKhtA3jcrdQfAaTpgkdtr6yWiMsTmRYwIJTvvHSJ78I+StsOJ5ai72pIDbK9h2x
+         xDqK5taP2v1PKXi8GFGxuXiFX+iIW9Lv7ps1W8ocpyXyOiE1/sdFeDBscY5JvgmMKsZe
+         JQaeOflsv4LWBnPp3gJjRZHbPPdKPvQuslzK3yva4YWewAUyAvMTNC5VX8+6H3yXrHcX
+         LG3/trbhC6q/YDx3YbdRRsJumCWjvDKsCwsHJ7ZLAvIEXBdiLOJeFSUFXxV2a5NrFrMn
+         TC9kbBOFdodpfVgeOyN5asKzLO68DEN8V8G/OyVNXkaAzZiPuy8b/n4txYdfnhHoUhOH
+         Kw1w==
+X-Gm-Message-State: AOAM530Kt2Mz35nNXeKJoVaLB/RP77pYcml0oC7ji9CRxvtsIjZ6zNyi
+        OiwFinTxbQuCsb1dwzSZrU0aLOB0ALPbXA==
+X-Google-Smtp-Source: ABdhPJxsV0Bt3wv1zOPjuXISv4zYGm31wOG8UaWU2D7rNH+XEwAmXz2gp5iaUtx7PTjPjFbsS67teA==
+X-Received: by 2002:a05:6402:17f7:: with SMTP id t23mr17094077edy.301.1597700207269;
+        Mon, 17 Aug 2020 14:36:47 -0700 (PDT)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
+        by smtp.gmail.com with ESMTPSA id ay5sm14419052edb.2.2020.08.17.14.36.46
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Aug 2020 14:36:47 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id t15so13548233edq.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 14:36:46 -0700 (PDT)
+X-Received: by 2002:a05:6512:3b7:: with SMTP id v23mr8282877lfp.10.1597699793904;
+ Mon, 17 Aug 2020 14:29:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <c6fda26e8d134264b04fadc3386d6c32@gmail.com> <20200816175303.GB1236603@ZenIV.linux.org.uk>
+ <20200817204223.GB12414@amd> <87lfid6kpi.fsf@x220.int.ebiederm.org>
+In-Reply-To: <87lfid6kpi.fsf@x220.int.ebiederm.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 17 Aug 2020 14:29:37 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj04wKCjHz6b6d7N58xoS4AftnwTUBaXsEekQ5RhfWVnw@mail.gmail.com>
+Message-ID: <CAHk-=wj04wKCjHz6b6d7N58xoS4AftnwTUBaXsEekQ5RhfWVnw@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: Yes. Finally remove '-Wdeclaration-after-statement'
+To:     "Eric W. Biederman" <ebiederm@xmission.com>
+Cc:     Pavel Machek <pavel@ucw.cz>, Al Viro <viro@zeniv.linux.org.uk>,
         Michael Witten <mfwitten@gmail.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Cong Wang <xiyou.wangcong@gmail.com>,
         Johannes Weiner <hannes@cmpxchg.org>,
-        Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, John Levon <john.levon@joyent.com>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        John Levon <john.levon@joyent.com>,
         John Levon <levon@movementarian.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
         Andrew Morton <akpm@linux-foundation.org>
-References: <c6fda26e8d134264b04fadc3386d6c32@gmail.com>
-        <20200816175303.GB1236603@ZenIV.linux.org.uk>
-        <20200817204223.GB12414@amd>
-Date:   Mon, 17 Aug 2020 16:12:09 -0500
-In-Reply-To: <20200817204223.GB12414@amd> (Pavel Machek's message of "Mon, 17
-        Aug 2020 22:42:24 +0200")
-Message-ID: <87lfid6kpi.fsf@x220.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1k7mTk-00074A-6O;;;mid=<87lfid6kpi.fsf@x220.int.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
-X-XM-AID: U2FsdGVkX1//ZQ9z85heRXtRqSwjyTMi/k4mhCF2Zkk=
-X-SA-Exim-Connect-IP: 68.227.160.95
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-Subject: Re: [PATCH] Makefile: Yes. Finally remove '-Wdeclaration-after-statement'
-X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
-X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Pavel Machek <pavel@ucw.cz> writes:
-
-> Hi!
+On Mon, Aug 17, 2020 at 2:15 PM Eric W. Biederman <ebiederm@xmission.com> wrote:
 >
->> > This is not just a matter of style; this is a matter of semantics,
->> > especially with regard to:
->> > 
->> >   * const Correctness.
->> >     A const-declared variable must be initialized when defined.
->> > 
->> >   * Conditional Compilation.
->> >     When there is complex interaction between compile-time
->> >     configuration options, it's essential to be able to
->> >     make declarations where needed; otherwise unnecessary
->> >     gymnastics are required to silence the compiler.
->> > 
->> > Gentleman... Just let people say exactly what they mean to say.
-> ..
->
->> You obviously need every bit of help in that task, judging by the amount
->> of clarity (or thoughts, for that matter) visible in the spew above...
->> 
->> NAK.  And as for letting people say exactly what they mean to say...
->> I am tempted to take you on that invitation, but that would be cruel
->> to gregkh - he would have to reply to inevitable screeds about
->> CoC-violating postings on l-k.
->
-> We should really get rid of CoC, because I'd really like to see you
-> _not_ resist that temptation.
->
-> But... he's right.
->
-> With rust-like programming style with widespread consts, this warning
-> has to go. And it is causing additional/ugly #ifdefs in some cases.
->
-> Maybe author can show examples in kernel .c where disabling the
-> warning would lead to nicer code. I believe we should give it a try.
+> Does anyone remember why we added this warning?  I had always thought
+> it's purpose was to ensure we stayed within our chosen dialect of C.
 
+As far as I'm concerned, that's the primary motivation.
 
-This change came in with 535231e8252e ("[PATCH] add
--Wdeclaration-after-statement").  AKA
-https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=535231e8252eea14abf4f14d28f6c1c03f5e0f02
+I'm not seeing why we'd suddenly allow the "put variable declarations
+anywhere" when we've been able to keep from doing it until now.
 
-Does anyone remember why we added this warning?  I had always thought
-it's purpose was to ensure we stayed within our chosen dialect of C.
-The actual commit says that it was in reaction to gcc miscompiling proc.
-Which is a far more serious thing.
+We're still building primarily good old K&R ANSI C, just with
+extensions. Wild variable placement doesn't seem like a useful
+extension.
 
-With all of the our bumping of our gcc version lately perhaps it is safe
-to remove this warning.
+(Other variable placement improvements are: block-scope variable
+declarations inside the "for()" statement is very syntactically
+useful, for example. THAT would be useful if we can finally enable it
+without gcc going all wonky on us)
 
-Eric
+                Linus
