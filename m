@@ -2,62 +2,67 @@ Return-Path: <SRS0=AD72=B3=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569DDC433E3
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B80E3C433E3
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:02:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33579207FB
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91D2920738
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:02:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ImA5y6OS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gQoHfUpb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728131AbgHQWCW (ORCPT
+        id S1729331AbgHQWCl (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 17 Aug 2020 18:02:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
+        Mon, 17 Aug 2020 18:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729256AbgHQWCS (ORCPT
+        with ESMTP id S1729306AbgHQWCf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Aug 2020 18:02:18 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E33C061343
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:18 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id s4so11581312pjq.8
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:18 -0700 (PDT)
+        Mon, 17 Aug 2020 18:02:35 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E225C061344
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:34 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id y7so11855449qvj.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=SCGP1B0GabBPIIHG5VJ2o7cUGzZ8S7iKHRNNa+xeYyE=;
-        b=ImA5y6OSZJsSxIPHsXDdYNsmOWF03t/GCF1wydDTkMNPnwFYHmAoquiUE1s1V7h8jH
-         UXrSnaNxxzBdcEXBZ2qo9Qw+m9RgBQRony04zbdg/4XMUNjpbSmAUDgMqTmRtowMDeGJ
-         kewoEMjj+PZYqbE9CSY+3R4Cg7XUc+y5DEPvMt22tvVMtoJS1y9zcahOkuDtmU+eVBQd
-         cUjgV6APd8twafZwkYF+WYlhVyFPKtSEVN6aqA2n6/C5tzcICXlukjmNMzL9NRiRIMmt
-         fcouD5X6n88sMsMTcROVsdKKWRTxpSeWeFuALYEGTrJYLJFF1ez8g5m6ZZJUFKsWVr1Y
-         Q9lA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=kIk9FUx7DIlhGhFIt2N6cpuJCia592mQ/iQfMoiZ3iE=;
+        b=gQoHfUpbLM0sDU/kmKlEItWnjMkZ07La/np9HovfFux6Z2VP9+/zZrQWA4ecIjJgvq
+         dnD+gK0MB87V5MirFehxDF/9Y0qyw5jGSnVPfhphz46yfpH/a+RlENfRfPyt87lKvXNt
+         3M8YGTf9geBnYZq62BRsxzKcJtfiB7A2JPR7UVcm63uyarEjTgfrxkjaTulCAKeb73LZ
+         exzQUda0T8aom4mtZLMJVL/LVK8eWeJNZoH1geb6HQxDryALTxFmCJwMm+oFzaxPCUpi
+         A0f2OynWzgOjSsioBKP8o4nkCzdHdYSkPkC8fIcVqpZ5VTuRGrg4J4X3JxxkwMH7CMgJ
+         uOEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=SCGP1B0GabBPIIHG5VJ2o7cUGzZ8S7iKHRNNa+xeYyE=;
-        b=p4z0v0XxFKoCyPlqKINeBWhpvyoXBtv8mq/ZrEDL13PWXcM/hwEXAMKlzMtBoFHaJv
-         lqtRj31uTwUZs6GuTKJxuQIgunSLjDJoNSJMAOdCb2c4tJyQ0fLnjfv+07tdgOunK2NQ
-         dTKFuQTzBtAFuKBXUZ2ghHiU5O7RUuLCHwe6zoZsgPNAlaXtYf/a31zjLazV6S+eG79o
-         pnCy39MBwB0sCDhvg0a5KJC1k5bArGbE6NUkfPEDGRWC9z13pZO4cIj019+si8IavBhX
-         MvIEE5P9eoxesuqAI9K5xse4W18atr1PElP1DLkiESCSSWOJO7R4kC5zYZmyRYDmIFmp
-         YkVQ==
-X-Gm-Message-State: AOAM532TLvJQk0+UQSFJGBbRylnEEsOi3W67s3VXX0dgSXVPaV/jvBBm
-        YTFjmY3SHWUD6/VssRq+ZL1wepUog/y9kIerzNM=
-X-Google-Smtp-Source: ABdhPJz+qTv6DNAPpLl1NNFe6vUzEWyhgMT8911arSjyrAqqr+1/c8Xk2osiyz6NvqgiYJnN1HAimTN3fhEsKUXGFR8=
-X-Received: by 2002:a62:6142:: with SMTP id v63mr13080841pfb.179.1597701737995;
- Mon, 17 Aug 2020 15:02:17 -0700 (PDT)
-Date:   Mon, 17 Aug 2020 15:02:08 -0700
-Message-Id: <20200817220212.338670-1-ndesaulniers@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=kIk9FUx7DIlhGhFIt2N6cpuJCia592mQ/iQfMoiZ3iE=;
+        b=NQJldEmnSQh0cm0LORObY3szeVblm80HlFlJl2nhW+STjMbD0TDiJcuGpZxliT7XLl
+         mz+Fo5IQrOdyd/QYTmCVvi6rkhCrRzrMFifxGi7qswv9DWRhwcMPUCpbi3o/5Cg+qMgu
+         Z2GR1OefbrNG42OzZVGQG7ivZmxYPaHtUqSGGXKyWCKdPSqUz+0RkOFgKV62ocj1mMkr
+         SdJYynu5u3lfpm3EnNGK0T3vtJiyTViNHNwkB9Kli+kmYBdg/MgtmYXTLADMImiQvEMD
+         XVgH/qOI3z+FT9CiiOWiueG7oRIhortC9LYV5Qerhcb/tgozuao4IiBVP8opKdEaUv2c
+         bZJw==
+X-Gm-Message-State: AOAM533CK+4/unQyrX/PZdiQHT9bJ5X42xWO3dFgt2QpDmOGIFWe+SBZ
+        GIzhwwKcdYMlHZ9dX3nlgRQTxCE1AHURjXp12Nw=
+X-Google-Smtp-Source: ABdhPJze4jPqkvcvZSWv8Q0KrJb4yDurztXHgzvX3/5K52RQR+v2CCftP6RNB8hQqPr5ZzSxOih+qN1vIkvEECe6SWQ=
+X-Received: by 2002:ad4:470f:: with SMTP id k15mr16321629qvz.216.1597701753768;
+ Mon, 17 Aug 2020 15:02:33 -0700 (PDT)
+Date:   Mon, 17 Aug 2020 15:02:12 -0700
+In-Reply-To: <20200817220212.338670-1-ndesaulniers@google.com>
+Message-Id: <20200817220212.338670-5-ndesaulniers@google.com>
 Mime-Version: 1.0
+References: <20200817220212.338670-1-ndesaulniers@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH 0/4] -ffreestanding/-fno-builtin-* patches
+Subject: [PATCH 4/4] x86: don't build CONFIG_X86_32 as -ffreestanding
 From:   Nick Desaulniers <ndesaulniers@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -114,31 +119,30 @@ such a function (ie. in lib/string.c) or disable the transform outright
 via -fno-builtin-* flag (where * is the name of the library routine, ie.
 -fno-builtin-bcmp).
 
-Patch 1 unbreaks the build with ToT clang, which has been red all
-weekend, by adding -fno-builtin-stpcpy.
-Patch 2 is a revert but adds -fno-builtin-bcmp.
-Patch 3 does the same for x86 purgatory.
-Patch 4 removes -ffreestanding from i386.
+i386_defconfig build+boot tested with GCC and Clang. Removes a pretty
+old TODO from the codebase.
 
-The first patch makes sense for Kbuild, the second maybe akpm@, the
-third and forth for x86.  Not sure who should pick up the series (they
-can be merged out of order, technically) but I really need the first
-patch soon. The 3 latter patches are cleanups.
+Fixes: 6edfba1b33c7 ("x86_64: Don't define string functions to builtin")
+Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ arch/x86/Makefile | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Nick Desaulniers (4):
-  Makefile: add -fno-builtin-stpcpy
-  Revert "lib/string.c: implement a basic bcmp"
-  x86/boot: use -fno-builtin-bcmp
-  x86: don't build CONFIG_X86_32 as -ffreestanding
-
- Makefile               |  7 +++++++
- arch/x86/Makefile      |  3 ---
- arch/x86/boot/Makefile |  1 +
- arch/x86/boot/string.c |  8 --------
- include/linux/string.h |  3 ---
- lib/string.c           | 20 --------------------
- 6 files changed, 8 insertions(+), 34 deletions(-)
-
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 4346ffb2e39f..2383a96cf4fd 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -80,9 +80,6 @@ ifeq ($(CONFIG_X86_32),y)
+         # CPU-specific tuning. Anything which can be shared with UML should go here.
+         include arch/x86/Makefile_32.cpu
+         KBUILD_CFLAGS += $(cflags-y)
+-
+-        # temporary until string.h is fixed
+-        KBUILD_CFLAGS += -ffreestanding
+ else
+         BITS := 64
+         UTS_MACHINE := x86_64
 -- 
 2.28.0.220.ged08abb693-goog
 
