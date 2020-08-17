@@ -2,155 +2,105 @@ Return-Path: <SRS0=AD72=B3=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-25.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 618B7C433EA
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21668C433E1
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:09:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 398912072E
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:04:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LiE9k63v"
+	by mail.kernel.org (Postfix) with ESMTP id EE1942072E
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Aug 2020 22:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729278AbgHQWE4 (ORCPT
+        id S1730041AbgHQWJU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 17 Aug 2020 18:04:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38746 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729277AbgHQWCY (ORCPT
+        Mon, 17 Aug 2020 18:09:20 -0400
+Received: from jabberwock.ucw.cz ([46.255.230.98]:50968 "EHLO
+        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728426AbgHQWJN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Aug 2020 18:02:24 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5233EC061342
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:24 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x6so15139677ybp.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Aug 2020 15:02:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc:content-transfer-encoding;
-        bh=UpYGtC8VuPYbMUYzVChohylhl5f+DwA/jtv3WLbpTdU=;
-        b=LiE9k63vyCkhMTzCYeoaOM75uDKE+XeLSj2h/3vVFNBtsbG28nLNlqtKpTLxlj5faJ
-         AAYS7sxuGNAA16qzVg1TR2Xrv4mJvPmQInmvyq957XguEVvW2RlgPL24OfTHYZyM7jTd
-         aYh3VfLRRQofH8X4nGmNCAahxvnwi+L5GwOV6amHL6jODkxTtu+gCzfcVlnUcpjEhjLv
-         i4zVI2Y07P0ZX3H26HpgtYeiV+DfeXO+PoBd/WycXbEG4u3e1rv9smrAfL1pQ1kMTEaR
-         eD9vQkiLdGUIg/t0Cz5lu6Ku1Wop0JRuKdYyFaNxzSm3dlF/+n1KvP2pYqjs2LUfecLh
-         dzLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc:content-transfer-encoding;
-        bh=UpYGtC8VuPYbMUYzVChohylhl5f+DwA/jtv3WLbpTdU=;
-        b=sNKuQ8n5gRPDaesJalXxDoqd1ACGRB3djTafARNjrRgqoQ5uWByghdNqh4XIq5f0vE
-         eSe/nkhAspPmQfK9fX0Y/TV9A7fHL9eu/9nAg9CcYKs0j4q8ZB7PQVL6OyhgKTqh3byl
-         jQYpZxRSidwZF58sgqYPHEZPitcleFPXkTLwwgvDVXcDzQ1JeSdvrekqyJp3MoUZzz3b
-         n3MociYQTDfmAA/85ajgqB7ywBmUWUb57uLmyFcrB2VPSPGTfEUcEfDZpcjktsx6kOSN
-         NH26nWqRQv53qqyilUVW55kBSGoiW1iA7aVjNOZKIvSqEjfWhpdW+KWn+cuxUUkZ+TIt
-         PkTA==
-X-Gm-Message-State: AOAM533HU5bPMN1OLU+po4KJM+pppFIfT/XdQD30m7xRejiJ+Kjw5mkH
-        RztuXsOkW5m5PRrwCDq8CQERFywI2chJPaf37EM=
-X-Google-Smtp-Source: ABdhPJxizyp67lNME36xRZPdIHp+ZAc9h1Guk5DKKetBtfDNGZaI3fQVyPo4QkcGpgpnPDnBe+lR31JKDOpF3hrgtgc=
-X-Received: by 2002:a25:4252:: with SMTP id p79mr24577079yba.229.1597701743469;
- Mon, 17 Aug 2020 15:02:23 -0700 (PDT)
-Date:   Mon, 17 Aug 2020 15:02:09 -0700
-In-Reply-To: <20200817220212.338670-1-ndesaulniers@google.com>
-Message-Id: <20200817220212.338670-2-ndesaulniers@google.com>
-Mime-Version: 1.0
-References: <20200817220212.338670-1-ndesaulniers@google.com>
-X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH 1/4] Makefile: add -fno-builtin-stpcpy
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kees Cook <keescook@chromium.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Joe Perches <joe@perches.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Daniel Axtens <dja@axtens.net>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Alexandru Ardelean <alexandru.ardelean@analog.com>,
-        Yury Norov <yury.norov@gmail.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Daniel Kiper <daniel.kiper@oracle.com>,
-        Bruce Ashfield <bruce.ashfield@gmail.com>,
-        Marco Elver <elver@google.com>,
-        Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>,
-        Andi Kleen <ak@suse.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "=?UTF-8?q?D=C3=A1vid=20Bolvansk=C3=BD?=" <david.bolvansky@gmail.com>,
-        Eli Friedman <efriedma@quicinc.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        stable@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 17 Aug 2020 18:09:13 -0400
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 1AF0D1C0BB6; Tue, 18 Aug 2020 00:09:09 +0200 (CEST)
+Date:   Tue, 18 Aug 2020 00:09:08 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Michael Witten <mfwitten@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        John Levon <john.levon@joyent.com>,
+        John Levon <levon@movementarian.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] Makefile: Yes. Finally remove
+ '-Wdeclaration-after-statement'
+Message-ID: <20200817220908.GA3701@amd>
+References: <c6fda26e8d134264b04fadc3386d6c32@gmail.com>
+ <20200816175303.GB1236603@ZenIV.linux.org.uk>
+ <20200817204223.GB12414@amd>
+ <87lfid6kpi.fsf@x220.int.ebiederm.org>
+ <CAHk-=wj04wKCjHz6b6d7N58xoS4AftnwTUBaXsEekQ5RhfWVnw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="45Z9DzgjV8m4Oswq"
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wj04wKCjHz6b6d7N58xoS4AftnwTUBaXsEekQ5RhfWVnw@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-LLVM implemented a recent "libcall optimization" that lowers calls to
-`sprintf(dest, "%s", str)` where the return value is used to
-`stpcpy(dest, str) - dest`. This generally avoids the machinery involved
-in parsing format strings. This optimization was introduced into
-clang-12. Because the kernel does not provide an implementation of
-stpcpy, we observe linkage failures for almost all targets when building
-with ToT clang.
 
-The interface is unsafe as it does not perform any bounds checking.
-Disable this "libcall optimization" via `-fno-builtin-stpcpy`.
+--45Z9DzgjV8m4Oswq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Unlike
-commit 5f074f3e192f ("lib/string.c: implement a basic bcmp")
-which cited failures with `-fno-builtin-*` flags being retained in LLVM
-LTO, that bug seems to have been fixed by
-https://reviews.llvm.org/D71193, so the above sha can now be reverted in
-favor of `-fno-builtin-bcmp`.
+On Mon 2020-08-17 14:29:37, Linus Torvalds wrote:
+> On Mon, Aug 17, 2020 at 2:15 PM Eric W. Biederman <ebiederm@xmission.com>=
+ wrote:
+> >
+> > Does anyone remember why we added this warning?  I had always thought
+> > it's purpose was to ensure we stayed within our chosen dialect of C.
+>=20
+> As far as I'm concerned, that's the primary motivation.
+>=20
+> I'm not seeing why we'd suddenly allow the "put variable declarations
+> anywhere" when we've been able to keep from doing it until now.
+>=20
+> We're still building primarily good old K&R ANSI C, just with
+> extensions. Wild variable placement doesn't seem like a useful
+> extension.
 
-Cc: stable@vger.kernel.org # 4.4
-Link: https://bugs.llvm.org/show_bug.cgi?id=3D47162
-Link: https://github.com/ClangBuiltLinux/linux/issues/1126
-Link: https://reviews.llvm.org/D85963
-Reported-by: Sami Tolvanen <samitolvanen@google.com>
-Suggested-by: D=C3=A1vid Bolvansk=C3=BD <david.bolvansky@gmail.com>
-Suggested-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
- Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
+I certainly hope we are not going back to good old K&R C :-).
 
-diff --git a/Makefile b/Makefile
-index 9cac6fde3479..211a1b6f6478 100644
---- a/Makefile
-+++ b/Makefile
-@@ -959,6 +959,12 @@ ifdef CONFIG_RETPOLINE
- KBUILD_CFLAGS +=3D $(call cc-option,-fcf-protection=3Dnone)
- endif
-=20
-+# The compiler may "libcall optimize" certain function calls into the belo=
-w
-+# functions, for architectures that don't use -ffreestanding. If we don't =
-plan
-+# to provide implementations of these routines, then prevent the compiler =
-from
-+# emitting calls to what will be undefined symbols.
-+KBUILD_CFLAGS	+=3D -fno-builtin-stpcpy
-+
- # include additional Makefiles when needed
- include-y			:=3D scripts/Makefile.extrawarn
- include-$(CONFIG_KASAN)		+=3D scripts/Makefile.kasan
+Submitter believes "wild variable placement" can help with
+#ifdefs.. and that may be actually good tradeoff.
+
+Best regards,
+									Pavel
 --=20
-2.28.0.220.ged08abb693-goog
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
+--45Z9DzgjV8m4Oswq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAl87AAQACgkQMOfwapXb+vKiVgCeIkXAgbXAQQ5tusMee++/3DR4
+lz8AnRYXzPxLP4LdF9kvOHHKNW1y76Vk
+=KDJT
+-----END PGP SIGNATURE-----
+
+--45Z9DzgjV8m4Oswq--
