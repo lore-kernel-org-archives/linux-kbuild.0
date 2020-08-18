@@ -2,45 +2,60 @@ Return-Path: <SRS0=YDk0=B4=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98735C433E3
-	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Aug 2020 07:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1458AC433E1
+	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Aug 2020 07:29:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7694F20825
-	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Aug 2020 07:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E97222063A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 18 Aug 2020 07:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597735509;
-	bh=N2APiQQepxSYCzop4Qp1o77O54Y1HK1//Wr9CEjh4fI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=O3qqsNsif8muwBMr5bwpJjEpVD6e0OI+ffr3IEIuApJt1pqaYd8f6eZnT5oDxLIUy
-	 GaxTLNUp/GBUErJCm6HQLjUYsrcXhcBUoZIL7sPuKZmRTnhDByw8VXjfvFH/fMwitY
-	 8J+ZWmJRIFaMhoXsEZvT7wa2r7B/0hOu7piqS6Sc=
+	s=default; t=1597735795;
+	bh=dWTUC1fFQYcq9xj79KofFxMFTVMIj82URXFAR3kd498=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=nmOJ7LB4tPtjVHXXt4bk86tdIAg92pLzjPKwHorGuQdXAzgu/y5+QfDfdUMAX4ND+
+	 NNuTGOeDRuil4w6c9n7RT+8NpHYWiu1l68jCahPCdy9s8GTFKfLdiCyJltZHmi9AIb
+	 mkOS64nrMqoGM7qL9/dOGLrNVrXGEcCKVWptXA5Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbgHRHZJ (ORCPT
+        id S1726374AbgHRH3w (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 18 Aug 2020 03:25:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52576 "EHLO mail.kernel.org"
+        Tue, 18 Aug 2020 03:29:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57052 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726370AbgHRHZI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Aug 2020 03:25:08 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726203AbgHRH3w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Aug 2020 03:29:52 -0400
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2C541205CB;
-        Tue, 18 Aug 2020 07:25:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 86FC7208B3;
+        Tue, 18 Aug 2020 07:29:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597735507;
-        bh=N2APiQQepxSYCzop4Qp1o77O54Y1HK1//Wr9CEjh4fI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ULGeP8jyfskRDwys6jK46JZVSeX56BII0NNgpCECczBC+KpvIXPogM4Q1HVJvnADo
-         5VJmaLBVinajow8/gOPXYUYoWqwOFTjugqSa6fvNspRq57ArW7izT0hMBa8h9/oTks
-         9tKe1cHeVM/V49yQNG2ZlweKwPAq5Xr04bK10aFs=
-Date:   Tue, 18 Aug 2020 09:25:31 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
+        s=default; t=1597735791;
+        bh=dWTUC1fFQYcq9xj79KofFxMFTVMIj82URXFAR3kd498=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=mebGcVMemOIARqitXyHsXvB1+ymMhvaDQ2dhbGfkbf2zo9fxLpInApPYAKZqjHbQ8
+         wxZ3h2VTPF6CxlEa5dcZAnJyT5Tll3eynk2NFC5OuYypVx075W82G7bfmujqRWvZIY
+         J2SrEWZ2+r6j5/YDP8iQfu7Eai61sCiVt1OzS92E=
+Received: by mail-ot1-f51.google.com with SMTP id q9so15527515oth.5;
+        Tue, 18 Aug 2020 00:29:51 -0700 (PDT)
+X-Gm-Message-State: AOAM531Xm2+HmisYsLQ+SVKPdDuQumWOfJ6dexJdHv0FElfLLwKmKCBq
+        wRf1oIaYT6MK5v0AFHgwha+Dt1UnWXVZb8YmIso=
+X-Google-Smtp-Source: ABdhPJw5l/iLYjUWeYo8U/CoNBj00ngiBw9q35ZJ9OgGlkuBvd2jJgj8iBbTiT998ynF/uVt02W7p/SsFEST/JG26Y8=
+X-Received: by 2002:a9d:774d:: with SMTP id t13mr13589334otl.108.1597735790648;
+ Tue, 18 Aug 2020 00:29:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200817220212.338670-1-ndesaulniers@google.com>
+ <20200817220212.338670-2-ndesaulniers@google.com> <CAMj1kXH0gRCaoF0NziC870=eSEy0ghi8b0b6A+LMu8PMd58C0Q@mail.gmail.com>
+ <20200818072531.GC9254@kroah.com>
+In-Reply-To: <20200818072531.GC9254@kroah.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 18 Aug 2020 09:29:39 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXF_RhV7D8D8J_fwTruiKWbHapeGe-omwyBoR8t4gRv7QA@mail.gmail.com>
+Message-ID: <CAMj1kXF_RhV7D8D8J_fwTruiKWbHapeGe-omwyBoR8t4gRv7QA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Makefile: add -fno-builtin-stpcpy
+To:     Greg KH <gregkh@linuxfoundation.org>
 Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -68,59 +83,54 @@ Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>,
         Andi Kleen <ak@suse.de>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        =?iso-8859-1?Q?D=E1vid_Bolvansk=FD?= <david.bolvansky@gmail.com>,
+        =?UTF-8?B?RMOhdmlkIEJvbHZhbnNrw70=?= <david.bolvansky@gmail.com>,
         Eli Friedman <efriedma@quicinc.com>,
         "# 3.4.x" <stable@vger.kernel.org>,
         Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 1/4] Makefile: add -fno-builtin-stpcpy
-Message-ID: <20200818072531.GC9254@kroah.com>
-References: <20200817220212.338670-1-ndesaulniers@google.com>
- <20200817220212.338670-2-ndesaulniers@google.com>
- <CAMj1kXH0gRCaoF0NziC870=eSEy0ghi8b0b6A+LMu8PMd58C0Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXH0gRCaoF0NziC870=eSEy0ghi8b0b6A+LMu8PMd58C0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 09:10:01AM +0200, Ard Biesheuvel wrote:
-> On Tue, 18 Aug 2020 at 00:02, Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Tue, 18 Aug 2020 at 09:25, Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Tue, Aug 18, 2020 at 09:10:01AM +0200, Ard Biesheuvel wrote:
+> > On Tue, 18 Aug 2020 at 00:02, Nick Desaulniers <ndesaulniers@google.com> wrote:
+> > >
+> > > LLVM implemented a recent "libcall optimization" that lowers calls to
+> > > `sprintf(dest, "%s", str)` where the return value is used to
+> > > `stpcpy(dest, str) - dest`. This generally avoids the machinery involved
+> > > in parsing format strings. This optimization was introduced into
+> > > clang-12. Because the kernel does not provide an implementation of
+> > > stpcpy, we observe linkage failures for almost all targets when building
+> > > with ToT clang.
+> > >
+> > > The interface is unsafe as it does not perform any bounds checking.
+> > > Disable this "libcall optimization" via `-fno-builtin-stpcpy`.
+> > >
+> > > Unlike
+> > > commit 5f074f3e192f ("lib/string.c: implement a basic bcmp")
+> > > which cited failures with `-fno-builtin-*` flags being retained in LLVM
+> > > LTO, that bug seems to have been fixed by
+> > > https://reviews.llvm.org/D71193, so the above sha can now be reverted in
+> > > favor of `-fno-builtin-bcmp`.
+> > >
+> > > Cc: stable@vger.kernel.org # 4.4
 > >
-> > LLVM implemented a recent "libcall optimization" that lowers calls to
-> > `sprintf(dest, "%s", str)` where the return value is used to
-> > `stpcpy(dest, str) - dest`. This generally avoids the machinery involved
-> > in parsing format strings. This optimization was introduced into
-> > clang-12. Because the kernel does not provide an implementation of
-> > stpcpy, we observe linkage failures for almost all targets when building
-> > with ToT clang.
-> >
-> > The interface is unsafe as it does not perform any bounds checking.
-> > Disable this "libcall optimization" via `-fno-builtin-stpcpy`.
-> >
-> > Unlike
-> > commit 5f074f3e192f ("lib/string.c: implement a basic bcmp")
-> > which cited failures with `-fno-builtin-*` flags being retained in LLVM
-> > LTO, that bug seems to have been fixed by
-> > https://reviews.llvm.org/D71193, so the above sha can now be reverted in
-> > favor of `-fno-builtin-bcmp`.
-> >
-> > Cc: stable@vger.kernel.org # 4.4
-> 
-> Why does a fix for Clang-12 have to be backported all the way to v4.4?
-> How does that meet the requirements for stable patches?
+> > Why does a fix for Clang-12 have to be backported all the way to v4.4?
+> > How does that meet the requirements for stable patches?
+>
+> Because people like to build older kernels with new compliler versions.
+>
+> And those "people" include me, who doesn't want to keep around old
+> compilers just because my distro moved to the latest one...
+>
+> We've been doing this for the past 4+ years, for new versions of gcc,
+> keeping 4.4.y building properly with the bleeding edge of that compiler,
+> why is clang any different here?
+>
 
-Because people like to build older kernels with new compliler versions.
-
-And those "people" include me, who doesn't want to keep around old
-compilers just because my distro moved to the latest one...
-
-We've been doing this for the past 4+ years, for new versions of gcc,
-keeping 4.4.y building properly with the bleeding edge of that compiler,
-why is clang any different here?
-
-thanks,
-
-greg k-h
+Fair enough. I am just struggling to match stable-kernel-rules.rst
+with the actual practices - perhaps it is time to update that
+document?
