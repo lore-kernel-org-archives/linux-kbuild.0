@@ -2,67 +2,67 @@ Return-Path: <SRS0=ZCXy=B5=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-25.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C274C433DF
-	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Aug 2020 19:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01447C433E1
+	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Aug 2020 19:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FDDE207BB
-	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Aug 2020 19:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D91062078D
+	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Aug 2020 19:17:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hU5/8DJY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="it6ogAFi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbgHSTRT (ORCPT
+        id S1727033AbgHSTRh (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 19 Aug 2020 15:17:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38516 "EHLO
+        Wed, 19 Aug 2020 15:17:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726990AbgHSTRK (ORCPT
+        with ESMTP id S1727016AbgHSTR2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Aug 2020 15:17:10 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B215C061383
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Aug 2020 12:17:09 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id a75so22043774ybg.15
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Aug 2020 12:17:09 -0700 (PDT)
+        Wed, 19 Aug 2020 15:17:28 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528C5C061342
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Aug 2020 12:17:27 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id 1so16106834qkm.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 19 Aug 2020 12:17:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc:content-transfer-encoding;
-        bh=AYTx8OTXrfy1fkjiQ/QJZUTx1nYyS440PAIctrO8h/4=;
-        b=hU5/8DJYdBVIul76iBEmEZ0CUUQxYYOOHdwBe4d4zyPtB5gIZh8vrm6Ccwlw+L7mfG
-         jT4Y2xyv2gvx6x+GF1XuIP6lvuA20HdADAoN96ldTrsTtbKn1/+bcvafV0ipxVGPvx5T
-         OVGD/OW/Rm/RcYoUIfpfQAlOuAUQ5mPdB6lE+Pq/kfD1VWh7KsAWKxXxroLPwLw40+1i
-         kvI45eNE7kkOgbXRICBXBMXLPlBDZYoiRoJLP51z6Bh+cy81LCawEG//TZN3rxPJtz6E
-         aLLhREs3LcMxpShnPm0ZN5pRx9wDMtIvvkd7xgXg9RTXshqTL+GmUQ2DHv1Dd734CK3p
-         ZQEw==
+         :cc;
+        bh=OuLK0vtF0dRJLQuNywRonpISXfPNRGHrBGFIst0MHFI=;
+        b=it6ogAFiEgasFY/BOPvy6O/Foy17MRI7R1IECbMRIf/jTsP/cJ8JIoaqKYcyVT/ZBV
+         b1hQzk31FQy+8iEkpytd3nthZ4jbovIrYjVMxYqnS3+HY0NwULL8R+8tK1cHvD6Ax5Xz
+         OK41QXEI4IIlv6ox/0AdHB/75aC3klHvhCvZlrQaDevBAsaq4BTSbiHCV5joVCPgZKTU
+         dggAMLqVkzlK0H44SClcB43UOTcZtdO19cjVuEZNo5PBpiLqCZJD4Wf6BuPdmT38j4FE
+         Hu1iP1w8Hm2m2x/vOll7mtQWtz/bA6DW3HFwMoIc3JSCheg8w4pfdCxSVLhSvLe/WKxs
+         RsRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc:content-transfer-encoding;
-        bh=AYTx8OTXrfy1fkjiQ/QJZUTx1nYyS440PAIctrO8h/4=;
-        b=tzIPRMhCb3WsFMrSR4el9ySiHIMTEbxWbERofLpjhVr7mg+01dSXwKTcHPK/vCJbX7
-         F1/UXIDlH6P0veQL1UKYZApxFF2KGyN4BEpT2iFyzV5X9qalXjVPMtXV5Hiy2v5Pfegf
-         X9+9teEAnakR3cO3TQ9Iz8MXsxgbMkXX8SqN8WBvlUHk0VxQ6k/nl7rJTALRiZVFnxMg
-         EPhBBZhpN7RVzK8QmY3/GFYLfdXg+8JIFTdvLE90EnBVWhsJEU7WpZcfpIUIl4L7rvO0
-         80IttLIjIj2MwR8weW7Dc4jmy+aBSVpbKZ4wTcSpO0xL3oGM3XGqYdMLN7BT6G8e5x+M
-         B/2Q==
-X-Gm-Message-State: AOAM532++WqE7kfT7BXNhtIrCENetVo3MJVfNDq1x6vhcitmFdbg8Uwl
-        avwE1USMqtudtMrKlHYJFDhhXMWc4fUfio0fDc8=
-X-Google-Smtp-Source: ABdhPJxETf8t+SYq21D8M+YylDYX3q4MAl4M/CU8Tsm+guyliSGVos5yJOYpig0Mf0L2E13QKLQC7j9HxW70uBCx9fg=
-X-Received: by 2002:a5b:c08:: with SMTP id f8mr34030464ybq.198.1597864628624;
- Wed, 19 Aug 2020 12:17:08 -0700 (PDT)
-Date:   Wed, 19 Aug 2020 12:16:50 -0700
+         :references:subject:from:to:cc;
+        bh=OuLK0vtF0dRJLQuNywRonpISXfPNRGHrBGFIst0MHFI=;
+        b=Eq+Ji4h4GkuDGU7qfXU8w+Tp9v4JNMW57qqOQcbun+qLSHFFaLMD8exe09G9ggphAh
+         xzvrY2lEn8gTXRq1DCJzxTq4JxtwuNxrqLC0vF8cwxLK5El+IxRy4HfwcfwE5PmswsrA
+         pgPW3b46AbxNvn7dhF++P289oa5nFfpkjR/97EpsVgD579t1mdTnJO2gX4iW0ULieqgu
+         NaSPD+9k0b0QwGH+FvghngkXRiNhj2lzC8smJLTZvLvRy52q4ublJIUNVHwDyW9rYT3Z
+         Lcf/MQXYPsa0ob2GIRbVC5/AtUNMpnLkhz+WR/8mUF9e/AxuOn4yjKaPvbLqx4nGzZY9
+         xr+g==
+X-Gm-Message-State: AOAM533G6eNNlqlgILK2EZCwnw/fygz6ONAE9Gm1YIVczGvUCmyheK+n
+        RnjJ4pMfhGQt4JrFb4FEDqrfk7h58McFCI9uIW8=
+X-Google-Smtp-Source: ABdhPJybzC2cRIjyVbTGIcAbbyv/3nL+YTTCv6sTjuWenHOvyLQE3ASARbEAL9G5mwIYU92auG+3ArLd6RP5ciEy9Po=
+X-Received: by 2002:a0c:f84b:: with SMTP id g11mr3652053qvo.184.1597864646404;
+ Wed, 19 Aug 2020 12:17:26 -0700 (PDT)
+Date:   Wed, 19 Aug 2020 12:16:54 -0700
 In-Reply-To: <20200819191654.1130563-1-ndesaulniers@google.com>
-Message-Id: <20200819191654.1130563-2-ndesaulniers@google.com>
+Message-Id: <20200819191654.1130563-6-ndesaulniers@google.com>
 Mime-Version: 1.0
 References: <20200819191654.1130563-1-ndesaulniers@google.com>
 X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [PATCH v2 1/5] Makefile: add -fno-builtin-stpcpy
+Subject: [PATCH v2 5/5] x86: don't build CONFIG_X86_32 as -ffreestanding
 From:   Nick Desaulniers <ndesaulniers@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -92,51 +92,63 @@ Cc:     Michal Marek <michal.lkml@markovi.net>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         "=?UTF-8?q?D=C3=A1vid=20Bolvansk=C3=BD?=" <david.bolvansky@gmail.com>,
         Eli Friedman <efriedma@quicinc.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        stable@vger.kernel.org, Sami Tolvanen <samitolvanen@google.com>
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-LLVM implemented a recent "libcall optimization" that lowers calls to
-`sprintf(dest, "%s", str)` where the return value is used to
-`stpcpy(dest, str) - dest`. This generally avoids the machinery involved
-in parsing format strings. This optimization was introduced into
-clang-12. Because the kernel does not provide an implementation of
-stpcpy, we observe linkage failures for almost all targets when building
-with ToT clang.
+-ffreestanding typically inhibits "libcall optimizations" where calls to
+certain library functions can be replaced by the compiler in certain
+cases to calls to other library functions that may be more efficient.
+This can be problematic for embedded targets that don't provide full
+libc implementations.
 
-The interface is unsafe as it does not perform any bounds checking.
-Disable this "libcall optimization" via `-fno-builtin-stpcpy`.
+-ffreestanding inhibits all optimizations, which
+is the safe choice, but generally we want the optimizations that are
+performed. The Linux kernel does implement a fair amount of libc
+routines. Instead of -ffreestanding (which makes more sense in smaller
+images like kexec's purgatory image), prefer -fno-builtin-* flags to
+disable the compiler from emitting calls to functions which may not be
+defined.
 
-Cc: stable@vger.kernel.org # 4.4
-Link: https://bugs.llvm.org/show_bug.cgi?id=3D47162
-Link: https://github.com/ClangBuiltLinux/linux/issues/1126
-Link: https://reviews.llvm.org/D85963
-Reported-by: Sami Tolvanen <samitolvanen@google.com>
-Suggested-by: D=C3=A1vid Bolvansk=C3=BD <david.bolvansky@gmail.com>
-Suggested-by: Kees Cook <keescook@chromium.org>
+If you see a linkage failure due to a missing symbol that's typically
+defined in a libc, and not explicitly called from the source code, then
+the compiler may have done such a transform.  You can either implement
+such a function (ie. in lib/string.c) or disable the transform outright
+via -fno-builtin-* flag (where * is the name of the library routine, ie.
+-fno-builtin-bcmp).
+
+i386_defconfig build+boot tested with GCC and Clang. Removes a pretty
+old TODO from the codebase.
+
+Fixes: 6edfba1b33c7 ("x86_64: Don't define string functions to builtin")
+Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+Might be nice to have
+https://lore.kernel.org/lkml/CAKwvOdn-mv1D1GEk3pWnPYsyzQRRk5qZFhSi0CYn6tRDo1O_iw@mail.gmail.com/T/#u
+first.
 
-diff --git a/Makefile b/Makefile
-index 9cac6fde3479..e523dc8d30e0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -578,6 +578,7 @@ ifneq ($(LLVM_IAS),1)
- CLANG_FLAGS	+=3D -no-integrated-as
- endif
- CLANG_FLAGS	+=3D -Werror=3Dunknown-warning-option
-+CLANG_FLAGS	+=3D -fno-builtin-stpcpy
- KBUILD_CFLAGS	+=3D $(CLANG_FLAGS)
- KBUILD_AFLAGS	+=3D $(CLANG_FLAGS)
- export CLANG_FLAGS
---=20
+ arch/x86/Makefile | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 4346ffb2e39f..2383a96cf4fd 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -80,9 +80,6 @@ ifeq ($(CONFIG_X86_32),y)
+         # CPU-specific tuning. Anything which can be shared with UML should go here.
+         include arch/x86/Makefile_32.cpu
+         KBUILD_CFLAGS += $(cflags-y)
+-
+-        # temporary until string.h is fixed
+-        KBUILD_CFLAGS += -ffreestanding
+ else
+         BITS := 64
+         UTS_MACHINE := x86_64
+-- 
 2.28.0.297.g1956fa8f8d-goog
 
