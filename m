@@ -2,46 +2,46 @@ Return-Path: <SRS0=pthm=B7=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3DCC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 965E2C433E3
 	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C496A20791
+	by mail.kernel.org (Postfix) with ESMTP id 74AED20791
 	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1598036599;
-	bh=KFrUKI/xkQWwpy87dXjZHNLyICaGFwTl8vubHKQOh8c=;
+	bh=EnPx5ed5nFQQ48F75ZzKaPerYrv74qCef+3eKRc5OiQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=n+cTBNv1gKQyuAZUbJaCtVdXxNtRBbgKePcBCR4D+cy+V6NuxxQR0a1n3jDIRqeFk
-	 PeDSAeZBUR4/xfo9lZyMpDYqGKBi7C0UbLO2pGJzLEYW8dkgkwbgFHRf4DZPRj/mzZ
-	 ETFLXJcQkYUgA8ZFRfDW5ujAglSqg8RgwsFiC1K0=
+	b=1MFArOLMhy6qOoe5VpJALorUJdkZoFw8Vn4vjS0INOJWoSHkog+2t3Ee3OPF82bga
+	 D5CS0Rr881S3z/3iW+n4aN/icsttzecHDyuAIJx6CMGNOMWKBMl/LG0qxcc0qKmwDk
+	 CAtvbirXialVUM8RhnjbZSe+mcXf8mMugxgDrJVo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726706AbgHUTDT (ORCPT
+        id S1726414AbgHUTDT (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Fri, 21 Aug 2020 15:03:19 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:62808 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:63053 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726373AbgHUTC4 (ORCPT
+        with ESMTP id S1725801AbgHUTDH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Aug 2020 15:02:56 -0400
+        Fri, 21 Aug 2020 15:03:07 -0400
 Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07LJ23eT027595;
-        Sat, 22 Aug 2020 04:02:04 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07LJ23eT027595
+        by conuserg-09.nifty.com with ESMTP id 07LJ23eb027595;
+        Sat, 22 Aug 2020 04:02:11 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07LJ23eb027595
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598036525;
-        bh=DyUxhByC5o5hgSX6EDv5IVyqWsClHjdMK/ZV+YDLY8I=;
+        s=dec2015msa; t=1598036531;
+        bh=may07TN/E9M6QqtFSP+c/0evMKANYT+YPi6JrwTRamU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h07vOh/wBtWbLyuCquTttTnX5O1S/Z+7Z0Qkskvxj6Zo7hCiNU4EminTfdrQCCxig
-         Vo7ycScQluiIx51DZoCyVCSObbQuWTo4ElCp8RY7FAgb/fEvqNBGIxn7y5shWOAr1g
-         mprth8lB/2ANgeUfRYmI/BSGfc4W2SPjGIULAIfI2y90QZFL7I8BMGOqHP64K+1Mke
-         2UUeYf+LrFPy8ujCYBVs3mME6h6YA2iKWRCQqRPiHRTb/4Rfwt8K4uQmx0j+6wjJbm
-         NmHdFbsdllbz28S9Inrpi+T7wbMgnVxVWYtxu4nY7FLTPW1EJg+4aKz8UQFI/F8Lb+
-         ryBpapCh9gEyg==
+        b=qyEu1Gsksgw3eT7Ert0fmXAt+/f3Kww0sWsL6bXpD3fUB5UDReHL8huLNohdZqap+
+         QNGULMnid4SsHXs2zcmE0pJZu0pux6SCzcsWuRaDdy60tyCsH7hngoft/TXJihJYyT
+         N0YX5aSjE1/cDSZ0YKvduy8/Divtn+x7sgHZjHyNZw791DWv6pyVwkfSwoDv9tsKTX
+         Ygi5KEhXW24Bfc5dPivGfW2yedloz2w6UsgMd+ijmM393BbXR9u+vWdZBBQWQzN8mE
+         1iZY03WK2FHPoll6Q5msFRbiVLZlKO65INSKb7zVfex4+CSv05nms3/JDqD5itE5eS
+         hOMg4JrlcrhpQ==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -49,11 +49,13 @@ Cc:     Nathan Huckleberry <nhuck@google.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Tom Roeder <tmroeder@google.com>,
         clang-built-linux@googlegroups.com,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/9] gen_compile_commands: parse only the first line of .*.cmd files
-Date:   Sat, 22 Aug 2020 04:01:51 +0900
-Message-Id: <20200821190159.1033740-2-masahiroy@kernel.org>
+Subject: [PATCH v2 9/9] Makefile: Add clang-tidy and static analyzer support to makefile
+Date:   Sat, 22 Aug 2020 04:01:59 +0900
+Message-Id: <20200821190159.1033740-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200821190159.1033740-1-masahiroy@kernel.org>
 References: <20200821190159.1033740-1-masahiroy@kernel.org>
@@ -64,43 +66,216 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-After the allmodconfig build, this script takes about 5 sec on my
-machine. Most of the run-time is consumed for needless regex matching.
+From: Nathan Huckleberry <nhuck@google.com>
 
-We know the format of .*.cmd file; the first line is the build command.
-There is no need to parse the rest.
+This patch adds clang-tidy and the clang static-analyzer as make
+targets. The goal of this patch is to make static analysis tools
+usable and extendable by any developer or researcher who is familiar
+with basic c++.
 
-With this optimization, now it runs 4 times faster.
+The current static analysis tools require intimate knowledge of the
+internal workings of the static analysis. Clang-tidy and the clang
+static analyzers expose an easy to use api and allow users unfamiliar
+with clang to write new checks with relative ease.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+===Clang-tidy===
+
+Clang-tidy is an easily extendable 'linter' that runs on the AST.
+Clang-tidy checks are easy to write and understand. A check consists of
+two parts, a matcher and a checker. The matcher is created using a
+domain specific language that acts on the AST
+(https://clang.llvm.org/docs/LibASTMatchersReference.html).  When AST
+nodes are found by the matcher a callback is made to the checker. The
+checker can then execute additional checks and issue warnings.
+
+Here is an example clang-tidy check to report functions that have calls
+to local_irq_disable without calls to local_irq_enable and vice-versa.
+Functions flagged with __attribute((annotation("ignore_irq_balancing")))
+are ignored for analysis. (https://reviews.llvm.org/D65828)
+
+===Clang static analyzer===
+
+The clang static analyzer is a more powerful static analysis tool that
+uses symbolic execution to find bugs. Currently there is a check that
+looks for potential security bugs from invalid uses of kmalloc and
+kfree. There are several more general purpose checks that are useful for
+the kernel.
+
+The clang static analyzer is well documented and designed to be
+extensible.
+(https://clang-analyzer.llvm.org/checker_dev_manual.html)
+(https://github.com/haoNoQ/clang-analyzer-guide/releases/download/v0.1/clang-analyzer-guide-v0.1.pdf)
+
+The main draw of the clang tools is how accessible they are. The clang
+documentation is very nice and these tools are built specifically to be
+easily extendable by any developer. They provide an accessible method of
+bug-finding and research to people who are not overly familiar with the
+kernel codebase.
+
+Signed-off-by: Nathan Huckleberry <nhuck@google.com>
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v2:
-  - Remove the unneeded variable 'line'
+(no changes since v1)
 
- scripts/gen_compile_commands.py | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ MAINTAINERS                                   |  1 +
+ Makefile                                      | 20 ++++-
+ .../{ => clang-tools}/gen_compile_commands.py |  0
+ scripts/clang-tools/run-clang-tools.py        | 74 +++++++++++++++++++
+ 4 files changed, 93 insertions(+), 2 deletions(-)
+ rename scripts/{ => clang-tools}/gen_compile_commands.py (100%)
+ create mode 100755 scripts/clang-tools/run-clang-tools.py
 
-diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
-index c458696ef3a7..1bcf33a93cb9 100755
---- a/scripts/gen_compile_commands.py
-+++ b/scripts/gen_compile_commands.py
-@@ -125,11 +125,8 @@ def main():
-             filepath = os.path.join(dirpath, filename)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index deaafb617361..19b916dbc796 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4247,6 +4247,7 @@ W:	https://clangbuiltlinux.github.io/
+ B:	https://github.com/ClangBuiltLinux/linux/issues
+ C:	irc://chat.freenode.net/clangbuiltlinux
+ F:	Documentation/kbuild/llvm.rst
++F:	scripts/clang-tools/
+ K:	\b(?i:clang|llvm)\b
  
-             with open(filepath, 'rt') as f:
--                for line in f:
--                    result = line_matcher.match(line)
--                    if not result:
--                        continue
--
-+                result = line_matcher.match(f.readline())
-+                if result:
-                     try:
-                         entry = process_line(directory, dirpath,
-                                              result.group(1), result.group(2))
+ CLEANCACHE API
+diff --git a/Makefile b/Makefile
+index 65ed336a6de1..9ece191d8d51 100644
+--- a/Makefile
++++ b/Makefile
+@@ -635,7 +635,7 @@ endif
+ # in addition to whatever we do anyway.
+ # Just "make" or "make all" shall build modules as well
+ 
+-ifneq ($(filter all modules nsdeps %compile_commands.json,$(MAKECMDGOALS)),)
++ifneq ($(filter all modules nsdeps %compile_commands.json clang-%,$(MAKECMDGOALS)),)
+   KBUILD_MODULES := 1
+ endif
+ 
+@@ -1577,6 +1577,8 @@ help:
+ 	@echo  '  export_report   - List the usages of all exported symbols'
+ 	@echo  '  headerdep       - Detect inclusion cycles in headers'
+ 	@echo  '  coccicheck      - Check with Coccinelle'
++	@echo  '  clang-analyzer  - Check with clang static analyzer'
++	@echo  '  clang-tidy      - Check with clang-tidy'
+ 	@echo  ''
+ 	@echo  'Tools:'
+ 	@echo  '  nsdeps          - Generate missing symbol namespace dependencies'
+@@ -1842,13 +1844,27 @@ nsdeps: modules
+ quiet_cmd_gen_compile_commands = GEN     $@
+       cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
+ 
+-$(extmod-prefix)compile_commands.json: scripts/gen_compile_commands.py \
++$(extmod-prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
+ 	$(if $(KBUILD_EXTMOD),,$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)) \
+ 	$(if $(CONFIG_MODULES), $(MODORDER)) FORCE
+ 	$(call if_changed,gen_compile_commands)
+ 
+ targets += $(extmod-prefix)compile_commands.json
+ 
++PHONY += clang-tidy clang-analyzer
++
++ifdef CONFIG_CC_IS_CLANG
++quiet_cmd_clang_tools = CHECK   $<
++      cmd_clang_tools = $(PYTHON3) $(srctree)/scripts/clang-tools/run-clang-tools.py $@ $<
++
++clang-tidy clang-analyzer: $(extmod-prefix)compile_commands.json
++	$(call cmd,clang_tools)
++else
++clang-tidy clang-analyzer:
++	@echo "$@ requires CC=clang" >&2
++	@false
++endif
++
+ # Scripts to check various things for consistency
+ # ---------------------------------------------------------------------------
+ 
+diff --git a/scripts/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
+similarity index 100%
+rename from scripts/gen_compile_commands.py
+rename to scripts/clang-tools/gen_compile_commands.py
+diff --git a/scripts/clang-tools/run-clang-tools.py b/scripts/clang-tools/run-clang-tools.py
+new file mode 100755
+index 000000000000..fa7655c7cec0
+--- /dev/null
++++ b/scripts/clang-tools/run-clang-tools.py
+@@ -0,0 +1,74 @@
++#!/usr/bin/env python
++# SPDX-License-Identifier: GPL-2.0
++#
++# Copyright (C) Google LLC, 2020
++#
++# Author: Nathan Huckleberry <nhuck@google.com>
++#
++"""A helper routine run clang-tidy and the clang static-analyzer on
++compile_commands.json.
++"""
++
++import argparse
++import json
++import multiprocessing
++import os
++import subprocess
++import sys
++
++
++def parse_arguments():
++    """Set up and parses command-line arguments.
++    Returns:
++        args: Dict of parsed args
++        Has keys: [path, type]
++    """
++    usage = """Run clang-tidy or the clang static-analyzer on a
++        compilation database."""
++    parser = argparse.ArgumentParser(description=usage)
++
++    type_help = "Type of analysis to be performed"
++    parser.add_argument("type",
++                        choices=["clang-tidy", "clang-analyzer"],
++                        help=type_help)
++    path_help = "Path to the compilation database to parse"
++    parser.add_argument("path", type=str, help=path_help)
++
++    return parser.parse_args()
++
++
++def init(l, a):
++    global lock
++    global args
++    lock = l
++    args = a
++
++
++def run_analysis(entry):
++    # Disable all checks, then re-enable the ones we want
++    checks = "-checks=-*,"
++    if args.type == "clang-tidy":
++        checks += "linuxkernel-*"
++    else:
++        checks += "clang-analyzer-*"
++    p = subprocess.run(["clang-tidy", "-p", args.path, checks, entry["file"]],
++                       stdout=subprocess.PIPE,
++                       stderr=subprocess.STDOUT,
++                       cwd=entry["directory"])
++    with lock:
++        sys.stderr.buffer.write(p.stdout)
++
++
++def main():
++    args = parse_arguments()
++
++    lock = multiprocessing.Lock()
++    pool = multiprocessing.Pool(initializer=init, initargs=(lock, args))
++    # Read JSON data into the datastore variable
++    with open(args.path, "r") as f:
++        datastore = json.load(f)
++        pool.map(run_analysis, datastore)
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.25.1
 
