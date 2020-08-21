@@ -2,46 +2,46 @@ Return-Path: <SRS0=pthm=B7=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965E2C433E3
-	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70862C433E1
+	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74AED20791
-	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4879A2076E
+	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598036599;
-	bh=EnPx5ed5nFQQ48F75ZzKaPerYrv74qCef+3eKRc5OiQ=;
+	s=default; t=1598036600;
+	bh=p+zJsDjR4SP7DhiBXUof0cVW54VN6X5d90+Lt5fVszM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1MFArOLMhy6qOoe5VpJALorUJdkZoFw8Vn4vjS0INOJWoSHkog+2t3Ee3OPF82bga
-	 D5CS0Rr881S3z/3iW+n4aN/icsttzecHDyuAIJx6CMGNOMWKBMl/LG0qxcc0qKmwDk
-	 CAtvbirXialVUM8RhnjbZSe+mcXf8mMugxgDrJVo=
+	b=h0jLdup0LCeu0mzV2WiIW2wHSQadxzlxvD77/pMun0vDguJoPQhJWCBO+jMHj0jQ+
+	 vZsXYLu34WDbBkAMsg2bb3xr7wcFVX60fzsfHMzMS87qaUy0Jdyl1smlAOfsGH7kQC
+	 Uk65dgBSkwZmPDoG3ICO4fvv/3r3Rv4kzmtx82ZY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbgHUTDT (ORCPT
+        id S1726730AbgHUTDU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 21 Aug 2020 15:03:19 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:63053 "EHLO
+        Fri, 21 Aug 2020 15:03:20 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:62786 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725801AbgHUTDH (ORCPT
+        with ESMTP id S1726187AbgHUTCy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Aug 2020 15:03:07 -0400
+        Fri, 21 Aug 2020 15:02:54 -0400
 Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07LJ23eb027595;
-        Sat, 22 Aug 2020 04:02:11 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07LJ23eb027595
+        by conuserg-09.nifty.com with ESMTP id 07LJ23eY027595;
+        Sat, 22 Aug 2020 04:02:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07LJ23eY027595
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598036531;
-        bh=may07TN/E9M6QqtFSP+c/0evMKANYT+YPi6JrwTRamU=;
+        s=dec2015msa; t=1598036528;
+        bh=3PUSp7mVBqud9anwd0ucZBfkurt/2z7oLee7GQu34i8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qyEu1Gsksgw3eT7Ert0fmXAt+/f3Kww0sWsL6bXpD3fUB5UDReHL8huLNohdZqap+
-         QNGULMnid4SsHXs2zcmE0pJZu0pux6SCzcsWuRaDdy60tyCsH7hngoft/TXJihJYyT
-         N0YX5aSjE1/cDSZ0YKvduy8/Divtn+x7sgHZjHyNZw791DWv6pyVwkfSwoDv9tsKTX
-         Ygi5KEhXW24Bfc5dPivGfW2yedloz2w6UsgMd+ijmM393BbXR9u+vWdZBBQWQzN8mE
-         1iZY03WK2FHPoll6Q5msFRbiVLZlKO65INSKb7zVfex4+CSv05nms3/JDqD5itE5eS
-         hOMg4JrlcrhpQ==
+        b=Kc68fjPEb+zFm8L/7ee629y34L35PVghuM7M0EXEFkfIWkRnXZ4FDNrWqVaTqSDAp
+         PVBoUnzdZKado9qH6wX4RkqECQXKFjcomS55/PmekmIRzsic3VgH37DhMxcEFLr8GJ
+         cqy7gGI32nzCfSpnQWffgEJslr4VGmdeC71m6yuweoIQkP7f/hVGODzkgcdOBjBwuy
+         91RWRKRB+57FP6uIsaMLdtPXx+zm40jkMK32ZWScKlNA6kpw9dTb275y2/51uwOcU3
+         PXLq/z9Pz8W1AafAG8H9eNcMQKJ/a5+hB1HXakEPGL5CYQ1iQrQuYWKySps1RnF1/j
+         f0kjHh1sN5OKw==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -49,13 +49,11 @@ Cc:     Nathan Huckleberry <nhuck@google.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Tom Roeder <tmroeder@google.com>,
         clang-built-linux@googlegroups.com,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 9/9] Makefile: Add clang-tidy and static analyzer support to makefile
-Date:   Sat, 22 Aug 2020 04:01:59 +0900
-Message-Id: <20200821190159.1033740-10-masahiroy@kernel.org>
+Subject: [PATCH v2 6/9] gen_compile_commands: move directory walk to a generator function
+Date:   Sat, 22 Aug 2020 04:01:56 +0900
+Message-Id: <20200821190159.1033740-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200821190159.1033740-1-masahiroy@kernel.org>
 References: <20200821190159.1033740-1-masahiroy@kernel.org>
@@ -66,216 +64,107 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Nathan Huckleberry <nhuck@google.com>
+Currently, this script walks under the specified directory (default to
+the current directory), then parses all .cmd files found.
 
-This patch adds clang-tidy and the clang static-analyzer as make
-targets. The goal of this patch is to make static analysis tools
-usable and extendable by any developer or researcher who is familiar
-with basic c++.
+Split it into a separate helper function because the next commit will
+add more helpers to pick up .cmd files associated with given file(s).
 
-The current static analysis tools require intimate knowledge of the
-internal workings of the static analysis. Clang-tidy and the clang
-static analyzers expose an easy to use api and allow users unfamiliar
-with clang to write new checks with relative ease.
+There is no point to build and return a huge list at once. I used a
+generator so it works in the for-loop with less memory.
 
-===Clang-tidy===
-
-Clang-tidy is an easily extendable 'linter' that runs on the AST.
-Clang-tidy checks are easy to write and understand. A check consists of
-two parts, a matcher and a checker. The matcher is created using a
-domain specific language that acts on the AST
-(https://clang.llvm.org/docs/LibASTMatchersReference.html).  When AST
-nodes are found by the matcher a callback is made to the checker. The
-checker can then execute additional checks and issue warnings.
-
-Here is an example clang-tidy check to report functions that have calls
-to local_irq_disable without calls to local_irq_enable and vice-versa.
-Functions flagged with __attribute((annotation("ignore_irq_balancing")))
-are ignored for analysis. (https://reviews.llvm.org/D65828)
-
-===Clang static analyzer===
-
-The clang static analyzer is a more powerful static analysis tool that
-uses symbolic execution to find bugs. Currently there is a check that
-looks for potential security bugs from invalid uses of kmalloc and
-kfree. There are several more general purpose checks that are useful for
-the kernel.
-
-The clang static analyzer is well documented and designed to be
-extensible.
-(https://clang-analyzer.llvm.org/checker_dev_manual.html)
-(https://github.com/haoNoQ/clang-analyzer-guide/releases/download/v0.1/clang-analyzer-guide-v0.1.pdf)
-
-The main draw of the clang tools is how accessible they are. The clang
-documentation is very nice and these tools are built specifically to be
-easily extendable by any developer. They provide an accessible method of
-bug-finding and research to people who are not overly familiar with the
-kernel codebase.
-
-Signed-off-by: Nathan Huckleberry <nhuck@google.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - New patch
 
- MAINTAINERS                                   |  1 +
- Makefile                                      | 20 ++++-
- .../{ => clang-tools}/gen_compile_commands.py |  0
- scripts/clang-tools/run-clang-tools.py        | 74 +++++++++++++++++++
- 4 files changed, 93 insertions(+), 2 deletions(-)
- rename scripts/{ => clang-tools}/gen_compile_commands.py (100%)
- create mode 100755 scripts/clang-tools/run-clang-tools.py
+ scripts/gen_compile_commands.py | 44 ++++++++++++++++++++++++---------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index deaafb617361..19b916dbc796 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4247,6 +4247,7 @@ W:	https://clangbuiltlinux.github.io/
- B:	https://github.com/ClangBuiltLinux/linux/issues
- C:	irc://chat.freenode.net/clangbuiltlinux
- F:	Documentation/kbuild/llvm.rst
-+F:	scripts/clang-tools/
- K:	\b(?i:clang|llvm)\b
+diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
+index 3ed958b64658..6dec7e2c4098 100755
+--- a/scripts/gen_compile_commands.py
++++ b/scripts/gen_compile_commands.py
+@@ -33,6 +33,7 @@ def parse_arguments():
+         log_level: A logging level to filter log output.
+         directory: The work directory where the objects were built
+         output: Where to write the compile-commands JSON file.
++        paths: The list of directories to handle to find .cmd files
+     """
+     usage = 'Creates a compile_commands.json database from kernel .cmd files'
+     parser = argparse.ArgumentParser(description=usage)
+@@ -56,7 +57,28 @@ def parse_arguments():
  
- CLEANCACHE API
-diff --git a/Makefile b/Makefile
-index 65ed336a6de1..9ece191d8d51 100644
---- a/Makefile
-+++ b/Makefile
-@@ -635,7 +635,7 @@ endif
- # in addition to whatever we do anyway.
- # Just "make" or "make all" shall build modules as well
- 
--ifneq ($(filter all modules nsdeps %compile_commands.json,$(MAKECMDGOALS)),)
-+ifneq ($(filter all modules nsdeps %compile_commands.json clang-%,$(MAKECMDGOALS)),)
-   KBUILD_MODULES := 1
- endif
- 
-@@ -1577,6 +1577,8 @@ help:
- 	@echo  '  export_report   - List the usages of all exported symbols'
- 	@echo  '  headerdep       - Detect inclusion cycles in headers'
- 	@echo  '  coccicheck      - Check with Coccinelle'
-+	@echo  '  clang-analyzer  - Check with clang static analyzer'
-+	@echo  '  clang-tidy      - Check with clang-tidy'
- 	@echo  ''
- 	@echo  'Tools:'
- 	@echo  '  nsdeps          - Generate missing symbol namespace dependencies'
-@@ -1842,13 +1844,27 @@ nsdeps: modules
- quiet_cmd_gen_compile_commands = GEN     $@
-       cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
- 
--$(extmod-prefix)compile_commands.json: scripts/gen_compile_commands.py \
-+$(extmod-prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
- 	$(if $(KBUILD_EXTMOD),,$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)) \
- 	$(if $(CONFIG_MODULES), $(MODORDER)) FORCE
- 	$(call if_changed,gen_compile_commands)
- 
- targets += $(extmod-prefix)compile_commands.json
- 
-+PHONY += clang-tidy clang-analyzer
-+
-+ifdef CONFIG_CC_IS_CLANG
-+quiet_cmd_clang_tools = CHECK   $<
-+      cmd_clang_tools = $(PYTHON3) $(srctree)/scripts/clang-tools/run-clang-tools.py $@ $<
-+
-+clang-tidy clang-analyzer: $(extmod-prefix)compile_commands.json
-+	$(call cmd,clang_tools)
-+else
-+clang-tidy clang-analyzer:
-+	@echo "$@ requires CC=clang" >&2
-+	@false
-+endif
-+
- # Scripts to check various things for consistency
- # ---------------------------------------------------------------------------
- 
-diff --git a/scripts/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-similarity index 100%
-rename from scripts/gen_compile_commands.py
-rename to scripts/clang-tools/gen_compile_commands.py
-diff --git a/scripts/clang-tools/run-clang-tools.py b/scripts/clang-tools/run-clang-tools.py
-new file mode 100755
-index 000000000000..fa7655c7cec0
---- /dev/null
-+++ b/scripts/clang-tools/run-clang-tools.py
-@@ -0,0 +1,74 @@
-+#!/usr/bin/env python
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) Google LLC, 2020
-+#
-+# Author: Nathan Huckleberry <nhuck@google.com>
-+#
-+"""A helper routine run clang-tidy and the clang static-analyzer on
-+compile_commands.json.
-+"""
-+
-+import argparse
-+import json
-+import multiprocessing
-+import os
-+import subprocess
-+import sys
+     return (args.log_level,
+             os.path.abspath(args.directory),
+-            args.output)
++            args.output,
++            [args.directory])
 +
 +
-+def parse_arguments():
-+    """Set up and parses command-line arguments.
-+    Returns:
-+        args: Dict of parsed args
-+        Has keys: [path, type]
++def cmdfiles_in_dir(directory):
++    """Generate the iterator of .cmd files found under the directory.
++
++    Walk under the given directory, and yield every .cmd file found.
++
++    Args:
++        directory: The directory to search for .cmd files.
++
++    Yields:
++        The path to a .cmd file.
 +    """
-+    usage = """Run clang-tidy or the clang static-analyzer on a
-+        compilation database."""
-+    parser = argparse.ArgumentParser(description=usage)
 +
-+    type_help = "Type of analysis to be performed"
-+    parser.add_argument("type",
-+                        choices=["clang-tidy", "clang-analyzer"],
-+                        help=type_help)
-+    path_help = "Path to the compilation database to parse"
-+    parser.add_argument("path", type=str, help=path_help)
++    filename_matcher = re.compile(_FILENAME_PATTERN)
 +
-+    return parser.parse_args()
++    for dirpath, _, filenames in os.walk(directory):
++        for filename in filenames:
++            if filename_matcher.match(filename):
++                yield os.path.join(dirpath, filename)
+ 
+ 
+ def process_line(root_directory, command_prefix, file_path):
+@@ -94,31 +116,29 @@ def process_line(root_directory, command_prefix, file_path):
+ 
+ def main():
+     """Walks through the directory and finds and parses .cmd files."""
+-    log_level, directory, output = parse_arguments()
++    log_level, directory, output, paths = parse_arguments()
+ 
+     level = getattr(logging, log_level)
+     logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
+ 
+-    filename_matcher = re.compile(_FILENAME_PATTERN)
+     line_matcher = re.compile(_LINE_PATTERN)
+ 
+     compile_commands = []
+-    for dirpath, _, filenames in os.walk(directory):
+-        for filename in filenames:
+-            if not filename_matcher.match(filename):
+-                continue
+-            filepath = os.path.join(dirpath, filename)
+ 
+-            with open(filepath, 'rt') as f:
++    for path in paths:
++        cmdfiles = cmdfiles_in_dir(path)
 +
-+
-+def init(l, a):
-+    global lock
-+    global args
-+    lock = l
-+    args = a
-+
-+
-+def run_analysis(entry):
-+    # Disable all checks, then re-enable the ones we want
-+    checks = "-checks=-*,"
-+    if args.type == "clang-tidy":
-+        checks += "linuxkernel-*"
-+    else:
-+        checks += "clang-analyzer-*"
-+    p = subprocess.run(["clang-tidy", "-p", args.path, checks, entry["file"]],
-+                       stdout=subprocess.PIPE,
-+                       stderr=subprocess.STDOUT,
-+                       cwd=entry["directory"])
-+    with lock:
-+        sys.stderr.buffer.write(p.stdout)
-+
-+
-+def main():
-+    args = parse_arguments()
-+
-+    lock = multiprocessing.Lock()
-+    pool = multiprocessing.Pool(initializer=init, initargs=(lock, args))
-+    # Read JSON data into the datastore variable
-+    with open(args.path, "r") as f:
-+        datastore = json.load(f)
-+        pool.map(run_analysis, datastore)
-+
-+
-+if __name__ == "__main__":
-+    main()
++        for cmdfile in cmdfiles:
++            with open(cmdfile, 'rt') as f:
+                 result = line_matcher.match(f.readline())
+                 if result:
+                     try:
+-                        entry = process_line(directory,
+-                                             result.group(1), result.group(2))
++                        entry = process_line(directory, result.group(1),
++                                             result.group(2))
+                         compile_commands.append(entry)
+                     except ValueError as err:
+                         logging.info('Could not add line from %s: %s',
+-                                     filepath, err)
++                                     cmdfile, err)
+ 
+     with open(output, 'wt') as f:
+         json.dump(compile_commands, f, indent=2, sort_keys=True)
 -- 
 2.25.1
 
