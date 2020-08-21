@@ -2,113 +2,134 @@ Return-Path: <SRS0=pthm=B7=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72906C433E1
-	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA1CC433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:15:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4716D20791
-	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:03:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598036628;
-	bh=OxxODlaBZhAq+4BoFGtzeAOFDFghljs6LHnF4hlclzU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cDR3cLjFoFts1aPZLrCPnMBSHJ3X0b96DAG1RtZNuUBX8PkW0tCx0m5CnHTzavX6V
-	 KRO88fmZKFPgQlWZiCXmOq0GJxInPnJjaBFIsLRs9Y+7iCq6+jdOdzJFzAiX2jKoYc
-	 jg/G1O0mglZSRHVnEk6EocNjQ8SQSxBdnzzMXZkQ=
+	by mail.kernel.org (Postfix) with ESMTP id 2FE302076E
+	for <linux-kbuild@archiver.kernel.org>; Fri, 21 Aug 2020 19:15:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xah160YC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726711AbgHUTDT (ORCPT
+        id S1726612AbgHUTPH (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 21 Aug 2020 15:03:19 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:62788 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726181AbgHUTCy (ORCPT
+        Fri, 21 Aug 2020 15:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726243AbgHUTPC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Aug 2020 15:02:54 -0400
-Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07LJ23eW027595;
-        Sat, 22 Aug 2020 04:02:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07LJ23eW027595
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598036527;
-        bh=mg0M4bAejUOuEVILMgIjbEef+kFqOFGf8lqJ8WZirB8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=llJj/4JUV1O9m1gvCaXK72idAQ40EKl7Tmu8UsrlZrFSn61y0ZV7ZgT+5VxnqdjwB
-         Zj2B/FG9/35+AFcDrk0TyMxq05SxCGDe0cOgiPW4gurpPdEpgqtezYmxHrWb3eXWRd
-         Mz31RPgyN/OEzZm5cRtFtmDnNfgQp4u2wS/cOEGmtbOffaVwRNSF+fWtF9OdJisnjV
-         YEGRXRAfLh9NMIA2gGcB8L2X+s+yL8Clpsy9dfGBcf39+2cJBZMCMTJDw7RHVry0/4
-         zTJPCfZMKjMYTsznIMvmX9hjZZCZWVGUeoihWi0sk2xXhwg8+0Q1SZ3QwYnzxQztkt
-         2dBb4V14G6/nw==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Nathan Huckleberry <nhuck@google.com>,
+        Fri, 21 Aug 2020 15:15:02 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A4FC061573;
+        Fri, 21 Aug 2020 12:15:02 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id x69so2342043qkb.1;
+        Fri, 21 Aug 2020 12:15:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=0sLKvJx3aFnV8gtyaecG7WJ6uhDEbkAGQLVXZ3qP928=;
+        b=Xah160YCM0xzn9UUnKwjd0claCM16C/euOHhTTE9ub37R9WxWzmf/MF1E4NIHpdfdQ
+         koPkrqtlc4zIsZwVMU5ndHSLC6pPRXvHIYdmMPriU4OUVg/x0Pqx/mw9q1w2h+Q4o8/K
+         kChmgNYiy9C4UScQOFMZn2aTcKJUObYHdXIIEfCFkgKoS+qL14kmcnbXkWldyzpn+L4t
+         vFnIkshF7iA/UYigdg0+v9a11nVsTYGPBfRB67k6GGLvvXRhHmIQ8C4u4Qivvk6dlu0d
+         rKVJ9aGesIrp7nm1pH35rfXmpnbfp6hdOSJ+n0zizmtUcA7EkdBaOUUpSjJ1dcuR6swG
+         7rjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=0sLKvJx3aFnV8gtyaecG7WJ6uhDEbkAGQLVXZ3qP928=;
+        b=jGRnWhTgZYzf855ueLsWxjRU909w+jKG9DbbtoUwwaAbzCjrFZMK9IstCvSsAP3/Bq
+         wPXA4m23F5gpZ0DMc8nmxKDIh+RunuAVDogaqZj3kmhRWSHaMGJnhbs4A8OZD6Om2GLO
+         eZtyOVx3GhTcpD4YG5AC0Q5x1yCgIbNxI8L2B9CqBqBCWhmbbpmSKw2m+xxrBXa0IyC7
+         LEuBNe+MSAe5umJK8N5eVoiH41YSLnEFSzxJhfxUQ8Z+o3jG8vfpxW/Yw1GFyzS7E8GI
+         mCX6175wUR+pM0idefLa0v/sKILnP8pDv2klE+gXz+ezKviOImyAqvcXunCZaSBoVuFw
+         WrSA==
+X-Gm-Message-State: AOAM530b9V9z79IvnETlgKARp3CzoOlxdHMy8H4PhDNRUgGkW4xyFwTJ
+        sz2EPOvYdkVqxfZJUsNgGSQ=
+X-Google-Smtp-Source: ABdhPJz8iysSUxGCA55UQ5iXlD4Gs/QH7SLXCNC+V5QN/wcnVdmjYLu5nATOqx54Mm7/5VktdlOJiQ==
+X-Received: by 2002:a37:9e48:: with SMTP id h69mr4206764qke.249.1598037301820;
+        Fri, 21 Aug 2020 12:15:01 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id y46sm2945634qth.78.2020.08.21.12.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Aug 2020 12:15:01 -0700 (PDT)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Fri, 21 Aug 2020 15:14:58 -0400
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Arvind Sankar <nivedita@alum.mit.edu>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        clang-built-linux@googlegroups.com,
+        =?utf-8?B?RMOhdmlkIEJvbHZhbnNrw70=?= <david.bolvansky@gmail.com>,
+        Eli Friedman <efriedma@quicinc.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/9] gen_compile_commands: reword the help message of -d option
-Date:   Sat, 22 Aug 2020 04:01:54 +0900
-Message-Id: <20200821190159.1033740-5-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200821190159.1033740-1-masahiroy@kernel.org>
-References: <20200821190159.1033740-1-masahiroy@kernel.org>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Joe Perches <joe@perches.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Daniel Axtens <dja@axtens.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Alexandru Ardelean <alexandru.ardelean@analog.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Daniel Kiper <daniel.kiper@oracle.com>,
+        Bruce Ashfield <bruce.ashfield@gmail.com>,
+        Marco Elver <elver@google.com>,
+        Vamshi K Sthambamkadi <vamshi.k.sthambamkadi@gmail.com>
+Subject: Re: [PATCH 0/4] -ffreestanding/-fno-builtin-* patches
+Message-ID: <20200821191458.GA1475504@rani.riverdale.lan>
+References: <20200818202407.GA3143683@rani.riverdale.lan>
+ <CAKwvOdnfh9nWwu1xV=WDbETGiabwDxXxQDRCAfpa-+kSZijb9w@mail.gmail.com>
+ <CAKwvOdkA4SC==vGZ4e7xqFG3Zo=fnhU=FgnSazmWkkVWhkaSYw@mail.gmail.com>
+ <20200818214146.GA3196105@rani.riverdale.lan>
+ <df6c1da4-b910-ecb8-0de2-6156dd651be6@rasmusvillemoes.dk>
+ <20200820175617.GA604994@rani.riverdale.lan>
+ <CAHk-=whn91ar+EbcBXQb9UXad00Q5WjU-TCB6UBzVba682a4ew@mail.gmail.com>
+ <20200821172935.GA1411923@rani.riverdale.lan>
+ <CAHk-=wi8vdb+wo-DACDpSijYfAbCs135YcnnAbRhGJcU+A=-+Q@mail.gmail.com>
+ <CAHk-=whjVCTjZG0Y88WhJruLdbxF=7q3mmFThD+N5WK0P5giSw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whjVCTjZG0Y88WhJruLdbxF=7q3mmFThD+N5WK0P5giSw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-I think the help message of the -d option is somewhat misleading.
+On Fri, Aug 21, 2020 at 11:02:08AM -0700, Linus Torvalds wrote:
+> On Fri, Aug 21, 2020 at 10:54 AM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > On Fri, Aug 21, 2020 at 10:29 AM Arvind Sankar <nivedita@alum.mit.edu> wrote:
+> > >
+> > > This is why I'm saying clang's no-builtin-foo option is useful for
+> > > embedded: it doesn't prevent the programmer using __builtin_foo(), it
+> > > prevents the _compiler_ using __builtin_foo() on its own.
+> >
+> > And that's fine. But it's apparently not what gcc does.
+> 
+> Oh, testing it seems to say that that is exactly what gcc does too. I
+> must have misunderstood some comment in this thread to mean otherwise.
+> 
+>                 Linus
 
-  Path to the kernel source directory to search (defaults to the working directory)
+How are you testing it?
 
-The part "kernel source directory" is the source of the confusion.
-Some people misunderstand as if this script did not support separate
-output directories.
-
-Actually, this script also works for out-of-tree builds. You can
-use the -d option to point to the object output directory, not to
-the source directory. It should match to the O= option used in the
-previous kernel build, and then appears in the "directory" field of
-compile_commands.json.
-
-Reword the help message.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
-Changes in v2:
-  - New patch
-
- scripts/gen_compile_commands.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
-index 1b9899892d99..5f6318da01a2 100755
---- a/scripts/gen_compile_commands.py
-+++ b/scripts/gen_compile_commands.py
-@@ -31,13 +31,13 @@ def parse_arguments():
- 
-     Returns:
-         log_level: A logging level to filter log output.
--        directory: The directory to search for .cmd files.
-+        directory: The work directory where the objects were built
-         output: Where to write the compile-commands JSON file.
-     """
-     usage = 'Creates a compile_commands.json database from kernel .cmd files'
-     parser = argparse.ArgumentParser(description=usage)
- 
--    directory_help = ('Path to the kernel source directory to search '
-+    directory_help = ('specify the output directory used for the kernel build '
-                       '(defaults to the working directory)')
-     parser.add_argument('-d', '--directory', type=str, help=directory_help)
- 
--- 
-2.25.1
-
+https://godbolt.org/z/eahdGn
