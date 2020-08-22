@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC6AC433E1
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D6FC433E1
+	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08DB82080D
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFFC32078D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598108234;
-	bh=7tU2JSwdAxQ3AStTHU9D1r/ibInF+JSBrnPYfQDWEzg=;
+	s=default; t=1598108241;
+	bh=5yk1kkRJMSsDhsOA+5w1pBH7nd2PwF2x0bjMlmbYyfY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=14GXZ5GJL3BtWwTUL2+eBmV8Kdc6Trzzg6DS4SZv76ZQrMd0suOQaDbmf/wTYSgEI
-	 2lXRgCqsrRuTF8kt7OHCM3unabJQMw1vjG8kA8SRpeC5To1sZ4SjK9N8uf512+LzaY
-	 K5qniOgQOSuSHIt+1U5fGn6/j1QXhlUjr6HqLSfM=
+	b=hOxx+WW4W9YnCOox4zAY9iK96h3uEkKwXVzJ7oj/WdhN1YMP/RK7SGRvEEyfy1RqZ
+	 rzVan/8FlZiLQM+dpfO3x9vnc5L+2xPqj1cDuly7ExzEdmgrnd3YcmxiwmLkM2Q+UJ
+	 1c/aiCBq7IuFR/wRVJ2qaPqDIznl5Ulrjm8+AKDg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728192AbgHVO5M (ORCPT
+        id S1728207AbgHVO5U (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 22 Aug 2020 10:57:12 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47418 "EHLO
+        Sat, 22 Aug 2020 10:57:20 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47410 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728019AbgHVO5M (ORCPT
+        with ESMTP id S1728124AbgHVO5M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 22 Aug 2020 10:57:12 -0400
 Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07MEuKVV025434;
-        Sat, 22 Aug 2020 23:56:25 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07MEuKVV025434
+        by conuserg-09.nifty.com with ESMTP id 07MEuKVR025434;
+        Sat, 22 Aug 2020 23:56:22 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07MEuKVR025434
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598108185;
-        bh=jH2tLSORRhlXDuP+7ApdPBfQ1QixQf9c+4qwpQLm8xk=;
+        s=dec2015msa; t=1598108182;
+        bh=IBZFRCC+dauuYn3v7p0fADfhiey+2jMphRtB7L0P/CE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XCcHsUJFon+sjkDt/sF4cmBipK+M3z/uIpLS97rIiAkegFB/PmFLCO9s5n3J0M284
-         xAEpaVQ5VVF89hevHo9UOPOh7aQnhYAQWigyPMoUbeY420NAt2pFqrBnMuDehvvKLa
-         U4wTGK5tizgqR+nB3Zly+6Qhswx1nj6aR38oyJT0n2OEdTkEpzascAzoEHHrIkx1yw
-         c/KzjmsIPt5fjDqBcho33KO5IXp5z6zQ/KvRgTbk6ndnP0Vt+Yfh2P6UY8DHsSjQeb
-         SFneOkEnH5qn5sxeDsyeKN90E8i6VMruuDSBnCw35rzRjkIaczSXmllJ4+AgLffAn2
-         vi7f/IJeSfpgQ==
+        b=2Qp4fqRO02umY4vHVytB6cc/5LxtS7YxrjgHlW2Pw96JvedtvpxUsG3mN7ouGROnM
+         1sKl0QngqSf0hMA6M6W9ciUUS+q3vrftp7gDLNs6I+E8w0xODDv5bPZFgYZi/IQPrw
+         czf9dQRG3is6Ekd94pxyTgbvk0Tsh8TdKRkzjS+pxROA5DmpFNYhREqoA7swV8bvsD
+         cYfeIsva7JL47SGTBA0hQDhWtGmPUcT9A/0rui1i67MIiwopZPAlWn9Fh7TFl9BG+z
+         S/rO0GEn8owjS7SfEAq737gVbH/Of/C5OBYiTyik3MoKtWZtmbKugTQHgW6kjLNEhf
+         1m+7PY06fHuVw==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -51,9 +51,9 @@ Cc:     Nathan Huckleberry <nhuck@google.com>,
         clang-built-linux@googlegroups.com,
         Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 06/10] gen_compile_commands: move directory walk to a generator function
-Date:   Sat, 22 Aug 2020 23:56:14 +0900
-Message-Id: <20200822145618.1222514-7-masahiroy@kernel.org>
+Subject: [PATCH v3 02/10] gen_compile_commands: use choices for --log_levels option
+Date:   Sat, 22 Aug 2020 23:56:10 +0900
+Message-Id: <20200822145618.1222514-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200822145618.1222514-1-masahiroy@kernel.org>
 References: <20200822145618.1222514-1-masahiroy@kernel.org>
@@ -64,111 +64,67 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently, this script walks under the specified directory (default to
-the current directory), then parses all .cmd files found.
+Use 'choices' instead of the own code to check if the given parameter
+is valid.
 
-Split it into a separate helper function because the next commit will
-add more helpers to pick up .cmd files associated with given file(s).
+I also simplified the help message because, with 'choices', --help
+shows the list of valid parameters:
 
-There is no point to build and return a huge list at once. I used a
-generator so it works in the for-loop with less memory.
+  --log_level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+
+I started the help message with a lower case, "the level of log ..."
+in order to be consistent with the -h option:
+
+  -h, --help            show this help message and exit
+
+The message "show this help ..." comes from the ArgumentParser library
+code, and I do not know how to change it. So, I changed our code.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-Changes in v3:
-  - Add the missing punctuation in the comment
+(no changes since v2)
 
 Changes in v2:
   - New patch
 
- scripts/gen_compile_commands.py | 44 ++++++++++++++++++++++++---------
- 1 file changed, 32 insertions(+), 12 deletions(-)
+ scripts/gen_compile_commands.py | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
-index 71a0630ae188..e45f17be8817 100755
+index 1bcf33a93cb9..535248cf2d7e 100755
 --- a/scripts/gen_compile_commands.py
 +++ b/scripts/gen_compile_commands.py
-@@ -33,6 +33,7 @@ def parse_arguments():
-         log_level: A logging level to filter log output.
-         directory: The work directory where the objects were built.
-         output: Where to write the compile-commands JSON file.
-+        paths: The list of directories to handle to find .cmd files.
-     """
-     usage = 'Creates a compile_commands.json database from kernel .cmd files'
-     parser = argparse.ArgumentParser(description=usage)
-@@ -56,7 +57,28 @@ def parse_arguments():
+@@ -45,24 +45,18 @@ def parse_arguments():
+                    'compile_commands.json in the search directory)')
+     parser.add_argument('-o', '--output', type=str, help=output_help)
  
-     return (args.log_level,
-             os.path.abspath(args.directory),
--            args.output)
-+            args.output,
-+            [args.directory])
-+
-+
-+def cmdfiles_in_dir(directory):
-+    """Generate the iterator of .cmd files found under the directory.
-+
-+    Walk under the given directory, and yield every .cmd file found.
-+
-+    Args:
-+        directory: The directory to search for .cmd files.
-+
-+    Yields:
-+        The path to a .cmd file.
-+    """
-+
-+    filename_matcher = re.compile(_FILENAME_PATTERN)
-+
-+    for dirpath, _, filenames in os.walk(directory):
-+        for filename in filenames:
-+            if filename_matcher.match(filename):
-+                yield os.path.join(dirpath, filename)
+-    log_level_help = ('The level of log messages to produce (one of ' +
+-                      ', '.join(_VALID_LOG_LEVELS) + '; defaults to ' +
++    log_level_help = ('the level of log messages to produce (defaults to ' +
+                       _DEFAULT_LOG_LEVEL + ')')
+-    parser.add_argument(
+-        '--log_level', type=str, default=_DEFAULT_LOG_LEVEL,
+-        help=log_level_help)
++    parser.add_argument('--log_level', choices=_VALID_LOG_LEVELS,
++                        default=_DEFAULT_LOG_LEVEL, help=log_level_help)
+ 
+     args = parser.parse_args()
+ 
+-    log_level = args.log_level
+-    if log_level not in _VALID_LOG_LEVELS:
+-        raise ValueError('%s is not a valid log level' % log_level)
+-
+     directory = args.directory or os.getcwd()
+     output = args.output or os.path.join(directory, _DEFAULT_OUTPUT)
+     directory = os.path.abspath(directory)
+ 
+-    return log_level, directory, output
++    return args.log_level, directory, output
  
  
- def process_line(root_directory, command_prefix, file_path):
-@@ -95,31 +117,29 @@ def process_line(root_directory, command_prefix, file_path):
- 
- def main():
-     """Walks through the directory and finds and parses .cmd files."""
--    log_level, directory, output = parse_arguments()
-+    log_level, directory, output, paths = parse_arguments()
- 
-     level = getattr(logging, log_level)
-     logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
- 
--    filename_matcher = re.compile(_FILENAME_PATTERN)
-     line_matcher = re.compile(_LINE_PATTERN)
- 
-     compile_commands = []
--    for dirpath, _, filenames in os.walk(directory):
--        for filename in filenames:
--            if not filename_matcher.match(filename):
--                continue
--            filepath = os.path.join(dirpath, filename)
- 
--            with open(filepath, 'rt') as f:
-+    for path in paths:
-+        cmdfiles = cmdfiles_in_dir(path)
-+
-+        for cmdfile in cmdfiles:
-+            with open(cmdfile, 'rt') as f:
-                 result = line_matcher.match(f.readline())
-                 if result:
-                     try:
--                        entry = process_line(directory,
--                                             result.group(1), result.group(2))
-+                        entry = process_line(directory, result.group(1),
-+                                             result.group(2))
-                         compile_commands.append(entry)
-                     except ValueError as err:
-                         logging.info('Could not add line from %s: %s',
--                                     filepath, err)
-+                                     cmdfile, err)
- 
-     with open(output, 'wt') as f:
-         json.dump(compile_commands, f, indent=2, sort_keys=True)
+ def process_line(root_directory, file_directory, command_prefix, relative_path):
 -- 
 2.25.1
 
