@@ -2,124 +2,173 @@ Return-Path: <SRS0=GRY9=CA=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB00C433DF
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC6AC433E1
+	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAFC32078D
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08DB82080D
+	for <linux-kbuild@archiver.kernel.org>; Sat, 22 Aug 2020 14:57:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598104915;
-	bh=RuuOuTFsBQxKDq+rAgJ/oGGcelgBwRH+cc12YY5IbkM=;
-	h=From:Date:Subject:To:Cc:List-ID:From;
-	b=OaVvZ4fpDiXNQ6VJW6cB0I//9LEpg2EIjLwPo6TK2IorOCKT8BGwU0oW9Ejxmod0N
-	 9rgfWjFwoiOzF3QLBfx8VhSwGsKZm8kVd/AQ65ZgVcTOh/RGQXXGCT58+v5oZcOjQM
-	 altUks6983AybNda6wf1RoRCSmgx/jKMy0FqkqHs=
+	s=default; t=1598108234;
+	bh=7tU2JSwdAxQ3AStTHU9D1r/ibInF+JSBrnPYfQDWEzg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=14GXZ5GJL3BtWwTUL2+eBmV8Kdc6Trzzg6DS4SZv76ZQrMd0suOQaDbmf/wTYSgEI
+	 2lXRgCqsrRuTF8kt7OHCM3unabJQMw1vjG8kA8SRpeC5To1sZ4SjK9N8uf512+LzaY
+	 K5qniOgQOSuSHIt+1U5fGn6/j1QXhlUjr6HqLSfM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727979AbgHVOBw (ORCPT
+        id S1728192AbgHVO5M (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 22 Aug 2020 10:01:52 -0400
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:17295 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727900AbgHVOBv (ORCPT
+        Sat, 22 Aug 2020 10:57:12 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47418 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728019AbgHVO5M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Aug 2020 10:01:51 -0400
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 07ME1ZUc017206;
-        Sat, 22 Aug 2020 23:01:35 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 07ME1ZUc017206
+        Sat, 22 Aug 2020 10:57:12 -0400
+Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 07MEuKVV025434;
+        Sat, 22 Aug 2020 23:56:25 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07MEuKVV025434
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598104896;
-        bh=MjkieH40oii2YMzKu3SKODp3QDBS3K0rjAk0cDB5Zps=;
-        h=From:Date:Subject:To:Cc:From;
-        b=m4YXpdxHv5FCWkZBlVE2V/bI+YT4aJZRzj9uPL04CS8/uAiqF+LbgT1nSseLU5Vk0
-         c8eBtE8sjAa2SZ/0boIi6aM+RzDJrP9LF811gZFpbbeaX9JzG6KOOJHuJKhgdQfwhQ
-         JBksbv/vha3x5jLlQMhqTDnQTIwo1zIlSWAqYwJd8wQ6fY010tiVaSCG8yMHiyHGRX
-         629FWTTXDpU5UV6i7eTgi+KuqsXNvHMWczYX4DgGXzSUKqr8H0rCeRPE+K57vYjFFV
-         1XUtpOkuNMArDuDKexFy2/uUV1sU1us+7AOT9RkVIEkiNMp0Og9j3r8ygoa0JJY73J
-         xuQDMd7tzd6sA==
-X-Nifty-SrcIP: [209.85.217.49]
-Received: by mail-vs1-f49.google.com with SMTP id a127so2232660vsd.1;
-        Sat, 22 Aug 2020 07:01:35 -0700 (PDT)
-X-Gm-Message-State: AOAM532eCs+a/E92T70GDEZU6j+7sePeHc+Odq8t23fif/IAqpUzTQKf
-        Y6grPLPzK5/oF61ym3yzedPgobnkOEfy9ofHM/w=
-X-Google-Smtp-Source: ABdhPJwTDs8bYuPENZQB5UNqUoMUHEy0fXrC8V6VwN9Imrsde4mI+zHapfkCrzKWgmoD0Ar1yhhACBp+No6DOqLc5NA=
-X-Received: by 2002:a67:7905:: with SMTP id u5mr4492670vsc.179.1598104894545;
- Sat, 22 Aug 2020 07:01:34 -0700 (PDT)
-MIME-Version: 1.0
+        s=dec2015msa; t=1598108185;
+        bh=jH2tLSORRhlXDuP+7ApdPBfQ1QixQf9c+4qwpQLm8xk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XCcHsUJFon+sjkDt/sF4cmBipK+M3z/uIpLS97rIiAkegFB/PmFLCO9s5n3J0M284
+         xAEpaVQ5VVF89hevHo9UOPOh7aQnhYAQWigyPMoUbeY420NAt2pFqrBnMuDehvvKLa
+         U4wTGK5tizgqR+nB3Zly+6Qhswx1nj6aR38oyJT0n2OEdTkEpzascAzoEHHrIkx1yw
+         c/KzjmsIPt5fjDqBcho33KO5IXp5z6zQ/KvRgTbk6ndnP0Vt+Yfh2P6UY8DHsSjQeb
+         SFneOkEnH5qn5sxeDsyeKN90E8i6VMruuDSBnCw35rzRjkIaczSXmllJ4+AgLffAn2
+         vi7f/IJeSfpgQ==
+X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 22 Aug 2020 23:00:58 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQO7kay52Dxku3sgyYk=4OGEB8m+gmN7wLemjc0f-pY-A@mail.gmail.com>
-Message-ID: <CAK7LNAQO7kay52Dxku3sgyYk=4OGEB8m+gmN7wLemjc0f-pY-A@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.9-rc2
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     Nathan Huckleberry <nhuck@google.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Roeder <tmroeder@google.com>,
+        clang-built-linux@googlegroups.com,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 06/10] gen_compile_commands: move directory walk to a generator function
+Date:   Sat, 22 Aug 2020 23:56:14 +0900
+Message-Id: <20200822145618.1222514-7-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200822145618.1222514-1-masahiroy@kernel.org>
+References: <20200822145618.1222514-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+Currently, this script walks under the specified directory (default to
+the current directory), then parses all .cmd files found.
 
-Please pull Kbuild fixes for v5.9-rc2
+Split it into a separate helper function because the next commit will
+add more helpers to pick up .cmd files associated with given file(s).
 
-Thanks.
+There is no point to build and return a huge list at once. I used a
+generator so it works in the for-loop with less memory.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+---
 
+Changes in v3:
+  - Add the missing punctuation in the comment
 
-The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
+Changes in v2:
+  - New patch
 
-  Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
+ scripts/gen_compile_commands.py | 44 ++++++++++++++++++++++++---------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.9
-
-for you to fetch changes up to 510bc3cb1ddc32f9533e6ed0a68c980544c3ca3f:
-
-  kconfig: qconf: replace deprecated QString::sprintf() with
-QTextStream (2020-08-21 10:23:38 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.9
-
- - move -Wsign-compare warning from W=2 to W=3
-
- - fix the keyword _restrict to __restrict in genksyms
-
- - fix more bugs in qconf
-
-----------------------------------------------------------------
-Joe Perches (2):
-      Makefile.extrawarn: Move sign-compare from W=2 to W=3
-      genksyms: keywords: Use __restrict not _restrict
-
-Masahiro Yamada (8):
-      extract-cert: add static to local data
-      kbuild: remove redundant patterns in filter/filter-out
-      kconfig: qconf: fix signal connection to invalid slots
-      kconfig: qconf: fix the popup menu in the ConfigInfoView window
-      kconfig: qconf: remove unused colNr
-      kconfig: qconf: remove qInfo() to get back Qt4 support
-      kconfig: qconf: remove redundant help in the info view
-      kconfig: qconf: replace deprecated QString::sprintf() with QTextStream
-
- Makefile                    |   5 +-
- scripts/Makefile.extrawarn  |   2 +-
- scripts/extract-cert.c      |   2 +-
- scripts/genksyms/keywords.c |   4 +-
- scripts/kconfig/qconf.cc    | 156 +++++++++++++++++++--------------------
- scripts/kconfig/qconf.h     |   6 +-
- 6 files changed, 86 insertions(+), 89 deletions(-)
-
-
+diff --git a/scripts/gen_compile_commands.py b/scripts/gen_compile_commands.py
+index 71a0630ae188..e45f17be8817 100755
+--- a/scripts/gen_compile_commands.py
++++ b/scripts/gen_compile_commands.py
+@@ -33,6 +33,7 @@ def parse_arguments():
+         log_level: A logging level to filter log output.
+         directory: The work directory where the objects were built.
+         output: Where to write the compile-commands JSON file.
++        paths: The list of directories to handle to find .cmd files.
+     """
+     usage = 'Creates a compile_commands.json database from kernel .cmd files'
+     parser = argparse.ArgumentParser(description=usage)
+@@ -56,7 +57,28 @@ def parse_arguments():
+ 
+     return (args.log_level,
+             os.path.abspath(args.directory),
+-            args.output)
++            args.output,
++            [args.directory])
++
++
++def cmdfiles_in_dir(directory):
++    """Generate the iterator of .cmd files found under the directory.
++
++    Walk under the given directory, and yield every .cmd file found.
++
++    Args:
++        directory: The directory to search for .cmd files.
++
++    Yields:
++        The path to a .cmd file.
++    """
++
++    filename_matcher = re.compile(_FILENAME_PATTERN)
++
++    for dirpath, _, filenames in os.walk(directory):
++        for filename in filenames:
++            if filename_matcher.match(filename):
++                yield os.path.join(dirpath, filename)
+ 
+ 
+ def process_line(root_directory, command_prefix, file_path):
+@@ -95,31 +117,29 @@ def process_line(root_directory, command_prefix, file_path):
+ 
+ def main():
+     """Walks through the directory and finds and parses .cmd files."""
+-    log_level, directory, output = parse_arguments()
++    log_level, directory, output, paths = parse_arguments()
+ 
+     level = getattr(logging, log_level)
+     logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
+ 
+-    filename_matcher = re.compile(_FILENAME_PATTERN)
+     line_matcher = re.compile(_LINE_PATTERN)
+ 
+     compile_commands = []
+-    for dirpath, _, filenames in os.walk(directory):
+-        for filename in filenames:
+-            if not filename_matcher.match(filename):
+-                continue
+-            filepath = os.path.join(dirpath, filename)
+ 
+-            with open(filepath, 'rt') as f:
++    for path in paths:
++        cmdfiles = cmdfiles_in_dir(path)
++
++        for cmdfile in cmdfiles:
++            with open(cmdfile, 'rt') as f:
+                 result = line_matcher.match(f.readline())
+                 if result:
+                     try:
+-                        entry = process_line(directory,
+-                                             result.group(1), result.group(2))
++                        entry = process_line(directory, result.group(1),
++                                             result.group(2))
+                         compile_commands.append(entry)
+                     except ValueError as err:
+                         logging.info('Could not add line from %s: %s',
+-                                     filepath, err)
++                                     cmdfile, err)
+ 
+     with open(output, 'wt') as f:
+         json.dump(compile_commands, f, indent=2, sort_keys=True)
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
+
