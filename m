@@ -2,36 +2,35 @@ Return-Path: <SRS0=Wgjp=CC=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64347C433DF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Aug 2020 13:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D84C433E1
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Aug 2020 13:30:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DFD8206B5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Aug 2020 13:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C14B2177B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Aug 2020 13:30:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725781AbgHXN2e (ORCPT
+        id S1726831AbgHXNaY (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Aug 2020 09:28:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52384 "EHLO mail.kernel.org"
+        Mon, 24 Aug 2020 09:30:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54752 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725780AbgHXN2e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Aug 2020 09:28:34 -0400
+        id S1725780AbgHXNaX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 24 Aug 2020 09:30:23 -0400
 Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EE44220838;
-        Mon, 24 Aug 2020 13:28:30 +0000 (UTC)
-Date:   Mon, 24 Aug 2020 09:28:28 -0400
+        by mail.kernel.org (Postfix) with ESMTPSA id ACAAB206B5;
+        Mon, 24 Aug 2020 13:30:21 +0000 (UTC)
+Date:   Mon, 24 Aug 2020 09:30:20 -0400
 From:   Steven Rostedt <rostedt@goodmis.org>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     'Nicolas Boichat' <drinkcat@chromium.org>,
-        "dianders@chromium.org" <dianders@chromium.org>,
-        "groeck@chromium.org" <groeck@chromium.org>,
+To:     Nicolas Boichat <drinkcat@chromium.org>
+Cc:     dianders@chromium.org, groeck@chromium.org,
         Andrew Morton <akpm@linux-foundation.org>,
-        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Daniel Vetter <daniel.vetter@ffwll.ch>,
         "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
         Kars Mulder <kerneldev@karsmulder.nl>,
@@ -41,13 +40,11 @@ Cc:     'Nicolas Boichat' <drinkcat@chromium.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Tiezhu Yang <yangtiezhu@loongson.cn>,
         Will Deacon <will@kernel.org>, Yue Hu <huyue2@yulong.com>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v5] kernel/trace: Add DISALLOW_TRACE_PRINTK make option
-Message-ID: <20200824092828.4386bd25@oasis.local.home>
-In-Reply-To: <3f84781f12424cbfa552981af42dfaf2@AcuMS.aculab.com>
+Message-ID: <20200824093020.073ae8d8@oasis.local.home>
+In-Reply-To: <20200824105852.v5.1.I4feb11d34ce7a0dd5ee2c3327fb5a1a9a646be30@changeid>
 References: <20200824105852.v5.1.I4feb11d34ce7a0dd5ee2c3327fb5a1a9a646be30@changeid>
-        <3f84781f12424cbfa552981af42dfaf2@AcuMS.aculab.com>
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -57,27 +54,70 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, 24 Aug 2020 08:26:13 +0000
-David Laight <David.Laight@ACULAB.COM> wrote:
+On Mon, 24 Aug 2020 10:59:13 +0800
+Nicolas Boichat <drinkcat@chromium.org> wrote:
 
-> Since the objective seems to be to ensure there are no
-> calls to trace_printk() in the git tree, but to allow
-> them in uncommitted sources. Why not use a config option
-> and rely on rand-config builds to detect any 'accidental'
-> commits?
+> ---
+> 
+> Changes since v4:
+>  - Turns this into a make option, instead of a config
+>    option, as suggested by Steven Rostedt <rostedt@goodmis.org>.
+> 
+> Changes since v2/v3:
+>  - Rebase only, v3 didn't exist as I just split out the other
+>    necessary patches.
+>  - Added patch 3/3 to fix atomisp_compat_css20.c
+> 
+> Changes since v1:
+>  - Use static_assert instead of __static_assert (Jason Gunthorpe)
+>  - Fix issues that can be detected by this patch (running some
+>    randconfig in a loop, kernel test robot, or manual inspection),
+>    by:
+>    - Making some debug config options that use trace_printk depend
+>      on the new config option.
+>    - Adding 3 patches before this one.
+> 
+>  Makefile               | 14 ++++++++++++++
+>  include/linux/kernel.h | 17 ++++++++++++++++-
+>  2 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index c4470a4e131f2ce..fb8b0d7fb4b2df7 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -100,6 +100,16 @@ endif
+>  
+>  export quiet Q KBUILD_VERBOSE
+>  
+> +# Disallow use of trace_printk. Can be used by production kernels.
+> +ifeq ("$(origin DISALLOW_TRACE_PRINTK)", "command line")
+> +  KBUILD_DISALLOW_TRACE_PRINTK = $(DISALLOW_TRACE_PRINTK)
+> +endif
+> +ifndef KBUILD_DISALLOW_TRACE_PRINTK
+> +  KBUILD_DISALLOW_TRACE_PRINTK = 0
+> +endif
+> +
+> +export KBUILD_DISALLOW_TRACE_PRINTK
+> +
+>  # Kbuild will save output files in the current working directory.
+>  # This does not need to match to the root of the kernel source tree.
+>  #
+> @@ -838,6 +848,10 @@ KBUILD_AFLAGS	+= -gz=zlib
+>  KBUILD_LDFLAGS	+= --compress-debug-sections=zlib
+>  endif
+>  
+> +ifeq ($(KBUILD_DISALLOW_TRACE_PRINTK),1)
+> +KBUILD_CFLAGS += -DDISALLOW_TRACE_PRINTK
+> +endif
+> +
+>  KBUILD_CFLAGS += $(DEBUG_CFLAGS)
+>  export DEBUG_CFLAGS
+>  
 
-Because we don't want distros to ship with disallowing trace_printk,
-where someone finds a bug, sends the config to a developer, who then
-adds trace_printk() just to find that they can't use it.
 
-The point of avoiding a config was to keep the burden of having the
-developer needing it and having to then modify the config given to them.
-
-Also, it would then prevent those developing modules from using
-trace_printk() in their module if they build against one of these
-kernels.
-
-Finally, there's debug code in the kernel that legitimately uses
-trace_printk(), and those randconfigs will trigger on them.
+There's one more thing we need to do, is if you build without this option
+then build with it, you should trigger a full kernel rebuild.
+Otherwise, if you build without the option, then build with it, and it
+doesn't rebuild the tree, it wont catch anything.
 
 -- Steve
