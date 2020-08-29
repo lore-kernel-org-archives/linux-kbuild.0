@@ -2,226 +2,108 @@ Return-Path: <SRS0=/aPn=CH=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A7FC433E2
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 05:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AE8C433E2
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 06:29:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 879D420838
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 05:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A84AB20936
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 06:29:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598678216;
-	bh=58Uhm+UZvU9AR3eP4VCr3y8u04zCdU5bB3kUYa/dAKg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=u5CEUKYH9wTE1MWTzffOWo+QHCnP3+qU82OOSrvJVe5ni692pv8APgs0yJpVBCmr8
-	 QR5flbJeD1nfxvqH4GtKSHHEFI3vy8mohdXGmJrZMgVvSISbhuZvdotr4K8+bHNI69
-	 ym/Ba+RYxJpzCwF9/wEW3CTGvCfn/swtLpCN3DDM=
+	s=default; t=1598682562;
+	bh=HCcn7+ju7xj8lcn3EWfBdTbKpr7wOrGUkfNLXo9iirY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=AYa6cFlMswzbdlnUGY6PJEU8LsqQbZlZv7l7HCXL7+g3JiKCEXDCuIe/qPxN+p0Rz
+	 +7W2XgA2nfI95nhN2kEXk+iZgnoRAOqaNE3/iykmmdUKMLXmt9B+hxD6xYC3hzndVK
+	 XM8bQQbyIXnwUfXzHiNXv93ZGtooteGSq2uinRGU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbgH2FQv (ORCPT
+        id S1725987AbgH2G3W (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 Aug 2020 01:16:51 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:35325 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726380AbgH2FQq (ORCPT
+        Sat, 29 Aug 2020 02:29:22 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:57369 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725886AbgH2G3V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Aug 2020 01:16:46 -0400
-Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 07T5FRB8012582;
-        Sat, 29 Aug 2020 14:15:29 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 07T5FRB8012582
+        Sat, 29 Aug 2020 02:29:21 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 07T6Sxov013611;
+        Sat, 29 Aug 2020 15:28:59 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 07T6Sxov013611
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598678129;
-        bh=pTE3lmBGOvNowbrsAqN2/QBMVw6Grccak2qbFkGyA24=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mJDfCDlPox01f1bR0WpCvIst3BadiOOImr0xkFpOKy0/sPefP8vp3F/CNIG8k9r6M
-         c1D/IAUpGpkZLwX597TrDap1Kxp2kDd7j5nmTXaCZxtlQpLao7tATzlAfokopPTvRQ
-         PJPdPMQvr5prA/Ua3wWm9qc9PvFn/q3R4+vNPwgBbSapDn94PRCvSQjIIt8CC2KwOi
-         dn8MT89I3yfleeGGFzNcB2aCF8/872eQrlt8tQtr4E9gTUfliPFczbpEz6YqTuhWpR
-         2vokwTn4y0Q6bYNSYYnauejcYrvYzunulVesW3FhurUi/hsDADVnawZP4OcYhQ41MO
-         MY/GNhp7KPLyw==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>,
-        linux-ia64@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        afzal mohammed <afzal.mohd.ma@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] ia64: do not typedef struct pal_min_state_area_s
-Date:   Sat, 29 Aug 2020 14:15:22 +0900
-Message-Id: <20200829051524.706585-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200829051524.706585-1-masahiroy@kernel.org>
-References: <20200829051524.706585-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1598682539;
+        bh=D0KDDfZRswDZUpbRNqoXENgbaSZ1/hZOTYmHbtoCsdE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=cWXQxthh2n73pWOHxkf8aYe5Nm6wkQrWxISZ3qlLkywglNRU2Fr07JYAabPCBOQZe
+         ATg20QO2nEJbZTkbV2QdT3tNKyCcKFnBt6hmq5cR2J7xoIf1CHepwEY8nHHA+n1a8f
+         Q0vESdgZiLfwbPtY5kF6mscE8J7h1MhNyx9glWM6G687Cd2NwVP7rwlDSwW8WOMfpi
+         CwI1yMWivLUcOUiYgGMDEu6DKpjF4KG/Tr+BcWMif+89BB2LkyqChDTdCp439xx5Yk
+         jLN2jE067H70nhx4fULPjSadxQYd2TBUNLzHAaBPW3bWV5N8i+5H9XkgtZzjuB49pm
+         IQhAmZe/dQBdw==
+X-Nifty-SrcIP: [209.85.214.179]
+Received: by mail-pl1-f179.google.com with SMTP id v16so677282plo.1;
+        Fri, 28 Aug 2020 23:28:59 -0700 (PDT)
+X-Gm-Message-State: AOAM531/KFEaJ8c8zK32KJ3u6RcDsHgd0emyY+PCq3sUK5Qd3bG1x4Jo
+        ZQVE7HLrSRFoctFN/HjAgedp70PUVkqgnNqIlRE=
+X-Google-Smtp-Source: ABdhPJwvhbZW7ZeMw5RrwwUFv/gAzHE/i2Jwa8e06clO7+Y+fLN5/snjiw/k41ofQ5rYMAeyvyJwjxugYdwBXenMQew=
+X-Received: by 2002:a17:90a:6f01:: with SMTP id d1mr2007164pjk.198.1598682538080;
+ Fri, 28 Aug 2020 23:28:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <21eddfa7-2b7c-00c4-ad5b-40878036f987@infradead.org>
+In-Reply-To: <21eddfa7-2b7c-00c4-ad5b-40878036f987@infradead.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sat, 29 Aug 2020 15:28:21 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATA5vpEaPHXEgnzR3PDpPZbXYXNtr2ZOgyL2QqVxcmE_g@mail.gmail.com>
+Message-ID: <CAK7LNATA5vpEaPHXEgnzR3PDpPZbXYXNtr2ZOgyL2QqVxcmE_g@mail.gmail.com>
+Subject: Re: [PATCH] microblaze: fix kbuild redundant file warning
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        Michal Simek <monstr@monstr.eu>,
+        Michal Simek <michal.simek@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Documentation/process/coding-style.rst says:
+On Sat, Aug 29, 2020 at 3:35 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> Fix build warning since this file is already listed in
+> include/asm-generic/Kbuild.
+>
+> ../scripts/Makefile.asm-generic:25: redundant generic-y found in arch/microblaze/include/asm/Kbuild: hw_irq.h
+>
+> Fixes: 7e8f54cd4e26 ("microblaze: Remove empty headers")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Michal Simek <monstr@monstr.eu>
+> Cc: Michal Simek <michal.simek@xilinx.com>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
 
-  Please don't use things like ``vps_t``.
-  It's a **mistake** to use typedef for structures and pointers.
+Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
 
-This commit converts as follows:
 
-  struct pal_min_state_area_s  ->  struct pal_min_state_area
-         pal_min_state_area_t  ->  struct pal_min_state_area
 
-My main motivation for this is to slim down the include directives
-of <asm/mca.h> in the next commit.
+> ---
+>  arch/microblaze/include/asm/Kbuild |    1 -
+>  1 file changed, 1 deletion(-)
+>
+> --- linux-next-20200825.orig/arch/microblaze/include/asm/Kbuild
+> +++ linux-next-20200825/arch/microblaze/include/asm/Kbuild
+> @@ -1,7 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  generated-y += syscall_table.h
+>  generic-y += extable.h
+> -generic-y += hw_irq.h
+>  generic-y += kvm_para.h
+>  generic-y += local64.h
+>  generic-y += mcs_spinlock.h
+>
 
-Currently, <asm/mca.h> is required to include <asm/pal.h> directly
-or indirectly due to (pal_min_state_area_t *). Otherwise, it would
-have no idea what pal_min_state_area_t is.
 
-Replacing it with (struct pal_min_state_area *) will relax the header
-dependency since it is enough to tell it is a pointer to a structure,
-and to resolve the size of struct pal_min_state_area. It will make
-<asm/mca.h> independent of <asm/pal.h>.
-
-<asm/pal.h> typedef's a lot of structures, but it is trivial to
-convert the others in the same way.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- arch/ia64/include/asm/mca.h    |  2 +-
- arch/ia64/include/asm/pal.h    |  4 ++--
- arch/ia64/include/asm/sal.h    |  2 +-
- arch/ia64/kernel/asm-offsets.c | 18 +++++++++---------
- arch/ia64/kernel/mca.c         |  4 ++--
- arch/ia64/kernel/mca_drv.c     |  2 +-
- 6 files changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/arch/ia64/include/asm/mca.h b/arch/ia64/include/asm/mca.h
-index 726df17f1b51..c92b9c15962c 100644
---- a/arch/ia64/include/asm/mca.h
-+++ b/arch/ia64/include/asm/mca.h
-@@ -83,7 +83,7 @@ struct ia64_sal_os_state {
- 	/* common */
- 	unsigned long		sal_ra;			/* Return address in SAL, physical */
- 	unsigned long		sal_gp;			/* GP of the SAL - physical */
--	pal_min_state_area_t	*pal_min_state;		/* from R17.  physical in asm, virtual in C */
-+	struct pal_min_state_area *pal_min_state;	/* from R17.  physical in asm, virtual in C */
- 	/* Previous values of IA64_KR(CURRENT) and IA64_KR(CURRENT_STACK).
- 	 * Note: if the MCA/INIT recovery code wants to resume to a new context
- 	 * then it must change these values to reflect the new kernel stack.
-diff --git a/arch/ia64/include/asm/pal.h b/arch/ia64/include/asm/pal.h
-index f9d2b3b2dfad..b1d87955e8cc 100644
---- a/arch/ia64/include/asm/pal.h
-+++ b/arch/ia64/include/asm/pal.h
-@@ -750,7 +750,7 @@ typedef union pal_mc_error_info_u {
-  * for PAL.
-  */
- 
--typedef struct pal_min_state_area_s {
-+struct pal_min_state_area {
- 	u64	pmsa_nat_bits;		/* nat bits for saved GRs  */
- 	u64	pmsa_gr[15];		/* GR1	- GR15		   */
- 	u64	pmsa_bank0_gr[16];	/* GR16 - GR31		   */
-@@ -766,7 +766,7 @@ typedef struct pal_min_state_area_s {
- 	u64	pmsa_xfs;		/* previous ifs		   */
- 	u64	pmsa_br1;		/* branch register 1	   */
- 	u64	pmsa_reserved[70];	/* pal_min_state_area should total to 1KB */
--} pal_min_state_area_t;
-+};
- 
- 
- struct ia64_pal_retval {
-diff --git a/arch/ia64/include/asm/sal.h b/arch/ia64/include/asm/sal.h
-index 08f5b6aaed73..78f4f7b40435 100644
---- a/arch/ia64/include/asm/sal.h
-+++ b/arch/ia64/include/asm/sal.h
-@@ -385,7 +385,7 @@ typedef struct sal_processor_static_info {
- 		    fr              : 1,
- 		    reserved        : 58;
- 	} valid;
--	pal_min_state_area_t min_state_area;
-+	struct pal_min_state_area min_state_area;
- 	u64 br[8];
- 	u64 cr[128];
- 	u64 ar[128];
-diff --git a/arch/ia64/kernel/asm-offsets.c b/arch/ia64/kernel/asm-offsets.c
-index fb0deb8a4221..be3b90fef2e9 100644
---- a/arch/ia64/kernel/asm-offsets.c
-+++ b/arch/ia64/kernel/asm-offsets.c
-@@ -245,23 +245,23 @@ void foo(void)
- 	BLANK();
- 
- 	DEFINE(IA64_PMSA_GR_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_gr));
-+	       offsetof(struct pal_min_state_area, pmsa_gr));
- 	DEFINE(IA64_PMSA_BANK1_GR_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_bank1_gr));
-+	       offsetof(struct pal_min_state_area, pmsa_bank1_gr));
- 	DEFINE(IA64_PMSA_PR_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_pr));
-+	       offsetof(struct pal_min_state_area, pmsa_pr));
- 	DEFINE(IA64_PMSA_BR0_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_br0));
-+	       offsetof(struct pal_min_state_area, pmsa_br0));
- 	DEFINE(IA64_PMSA_RSC_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_rsc));
-+	       offsetof(struct pal_min_state_area, pmsa_rsc));
- 	DEFINE(IA64_PMSA_IIP_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_iip));
-+	       offsetof(struct pal_min_state_area, pmsa_iip));
- 	DEFINE(IA64_PMSA_IPSR_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_ipsr));
-+	       offsetof(struct pal_min_state_area, pmsa_ipsr));
- 	DEFINE(IA64_PMSA_IFS_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_ifs));
-+	       offsetof(struct pal_min_state_area, pmsa_ifs));
- 	DEFINE(IA64_PMSA_XIP_OFFSET,
--	       offsetof (struct pal_min_state_area_s, pmsa_xip));
-+	       offsetof(struct pal_min_state_area, pmsa_xip));
- 	BLANK();
- 
- 	/* used by fsys_gettimeofday in arch/ia64/kernel/fsys.S */
-diff --git a/arch/ia64/kernel/mca.c b/arch/ia64/kernel/mca.c
-index 2703f7795672..17151269d655 100644
---- a/arch/ia64/kernel/mca.c
-+++ b/arch/ia64/kernel/mca.c
-@@ -894,7 +894,7 @@ static void
- finish_pt_regs(struct pt_regs *regs, struct ia64_sal_os_state *sos,
- 		unsigned long *nat)
- {
--	const pal_min_state_area_t *ms = sos->pal_min_state;
-+	const struct pal_min_state_area *ms = sos->pal_min_state;
- 	const u64 *bank;
- 
- 	/* If ipsr.ic then use pmsa_{iip,ipsr,ifs}, else use
-@@ -970,7 +970,7 @@ ia64_mca_modify_original_stack(struct pt_regs *regs,
- 	char *p;
- 	ia64_va va;
- 	extern char ia64_leave_kernel[];	/* Need asm address, not function descriptor */
--	const pal_min_state_area_t *ms = sos->pal_min_state;
-+	const struct pal_min_state_area *ms = sos->pal_min_state;
- 	struct task_struct *previous_current;
- 	struct pt_regs *old_regs;
- 	struct switch_stack *old_sw;
-diff --git a/arch/ia64/kernel/mca_drv.c b/arch/ia64/kernel/mca_drv.c
-index 4d0ab323dee8..36a69b4e6169 100644
---- a/arch/ia64/kernel/mca_drv.c
-+++ b/arch/ia64/kernel/mca_drv.c
-@@ -496,7 +496,7 @@ recover_from_read_error(slidx_table_t *slidx,
- 			struct ia64_sal_os_state *sos)
- {
- 	u64 target_identifier;
--	pal_min_state_area_t *pmsa;
-+	struct pal_min_state_area *pmsa;
- 	struct ia64_psr *psr1, *psr2;
- 	ia64_fptr_t *mca_hdlr_bh = (ia64_fptr_t*)mca_handler_bhhook;
- 
 -- 
-2.25.1
-
+Best Regards
+Masahiro Yamada
