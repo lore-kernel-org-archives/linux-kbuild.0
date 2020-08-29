@@ -2,115 +2,175 @@ Return-Path: <SRS0=/aPn=CH=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BF5C433E7
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179BBC433E6
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:38:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4F80206C0
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA94E20791
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:38:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598688954;
-	bh=2xBQwpYW3C+U+EZAmz9aUgrw1B10SLVziDjYrMH3QBM=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=bAEx81wrmipx6cY7hz81CtVz96SYOJ4l+tlJvOrGGY0r8WOzevOr+8ZbGfTEdb4YM
-	 hP0o57Vyq8R80EMrXiF54GVlIdm7zaj6XGIQ6+pJ0K1W3lffQ/V7dhyuDKVcoDgSFB
-	 Vezq0BcNYrU+i8XIlAfQL4en/3oLo3s3ot4bB3PM=
+	s=default; t=1598690300;
+	bh=c+5dIJCZOkB8KbvzgpuLQ1nU9NLAKGlBMn9pZEBlSt8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=I2ZhQDkgkEF15xbFF9ahirWElzyczlkcktK40U5bBFTaOLUK+dKvc972hRXFMNqa+
+	 XMEqUHA7VasisUM7v81H7Cy2tLWcKtPqiudkCKGhyae5r5r2sKZHvLcXdi4q8LqiMV
+	 pm2Um6FyIdfQSODczSgbsvIaUWIrNK103cDcRZwE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728020AbgH2IPt (ORCPT
+        id S1726333AbgH2IiT (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 Aug 2020 04:15:49 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47525 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726280AbgH2IOz (ORCPT
+        Sat, 29 Aug 2020 04:38:19 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:31013 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726083AbgH2IiS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Aug 2020 04:14:55 -0400
-Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07T8ELfh014307;
-        Sat, 29 Aug 2020 17:14:21 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07T8ELfh014307
+        Sat, 29 Aug 2020 04:38:18 -0400
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 07T8bbuv003773;
+        Sat, 29 Aug 2020 17:37:37 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 07T8bbuv003773
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598688861;
-        bh=rnMeFxtUozgRoWaZOL+eXZBgvS1kKsvPqvmSLOem0ZM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=D8kMxkhPZnYAOPqqTCXoj2ogevhLJAt4RKNqt9a++veTajLxSbTL+PRKQfuXG/SjU
-         RWDP8EOoFdIqg5c81atNI0kO+h0WBnAxfLO/AUV5nSgcagvKxYAIj3mKYP+TR6szEo
-         J5kG5569QItVGN0vxuozLCACK/2Mwrj4NPVn0qoFRB6hmpzU0+i7Mb1SkYrtIR9u9M
-         y2G5JkVje/an3rusIUBE4/cX+e+dgRkdAtDwE0YEjzDiJd+/Fp8R0HLWnNvr0zf9DA
-         OZkx1nOxDbLZ1WlpwRAgulxnQv2pIfzZcBwjT5I5trxjJC7PvwLT3HxSzall05QmTR
-         xke13ZVWkWNXA==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 01/11] kconfig: qconf: reformat the intro message
-Date:   Sat, 29 Aug 2020 17:14:07 +0900
-Message-Id: <20200829081417.725978-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        s=dec2015msa; t=1598690257;
+        bh=TDHUeNZsKPwy/PD6mwXkHIvgKkQTHeNe2XKf3jC0y7M=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=hPiZzQ3d4eOr+PX6UC+rUsw/FWWZ27FFbvTVOs5Bi1qWUapeKYf5SArOiWqxXHNZ5
+         MWJT+is3FljOgtIAIOsiVTyhfJjikZXiHMu0LsY7vRQ+1ChxPa0cf2B7jgFLmCKkrt
+         ZIcTFY3+JbkEPTF2VIFfMvXKLAuEQK1zhW28fEipAw3PutHndZjb/HhFnx/ouvx2uc
+         E0tlBwvMAy3k9ho14L82eCBS8vqb0+hzcX9J15OQ7S8phuPYp8ME3KJffJKPFXthxq
+         YSn3Btk7Lw9BBxRlE2GmsaJfH5Nq1NnCog1f4wjYMDuQG2QbIZK5m8rpK4kXFnnruM
+         /Q3x4SpgFhkCQ==
+X-Nifty-SrcIP: [209.85.216.41]
+Received: by mail-pj1-f41.google.com with SMTP id ls14so629587pjb.3;
+        Sat, 29 Aug 2020 01:37:37 -0700 (PDT)
+X-Gm-Message-State: AOAM5339+0Bsr72GbSppD55MNbWzsiG/x2eM6mvV5mwBg86ijE+KtaXV
+        x8e8E2vDIMMW3ao6/rLKWifarBnkmmS1/XfwjsU=
+X-Google-Smtp-Source: ABdhPJwg+EvBeHoEW1CrXTn7x7w/ZDM3P4oC+tmp1R3reUzXjKf9Y1GMauas8WUyJTGHsRwRqCn6gAQU8OrNi7KvtjM=
+X-Received: by 2002:a17:90a:8904:: with SMTP id u4mr2425907pjn.87.1598690256580;
+ Sat, 29 Aug 2020 01:37:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <9fea5110-680e-2876-f014-c1e9f0484179@infradead.org>
+In-Reply-To: <9fea5110-680e-2876-f014-c1e9f0484179@infradead.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sat, 29 Aug 2020 17:36:59 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT8zFav2dB53BfBcE0YN4rmbvPKpYYrDzJOWA58f3Mr2A@mail.gmail.com>
+Message-ID: <CAK7LNAT8zFav2dB53BfBcE0YN4rmbvPKpYYrDzJOWA58f3Mr2A@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Documentation: clean up makefiles.rst
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kbuild <linux-kbuild@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The introduction message displayed by 'Help -> Introduction' does not
-look nice due to excessive new lines.
+On Sat, Aug 29, 2020 at 2:26 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> From: Randy Dunlap <rdunlap@infradead.org>
+>
+> This is a general cleanup of kbuild/makefiles.rst:
+>
+> * Use "Chapter" for major heading references and use "section" for
+>   the next-level heading references, for consistency.
+> * Section 3.8 was deleted long ago.
+> * Drop the ending ':' in section names in the contents list.
+> * Correct some section numbering references.
+> * Correct verb agreement typo.
+> * Fix run-on sentence punctuation.
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: linux-kbuild@vger.kernel.org
 
-Reformat the message.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Applied to linux-kbuild/fixes.
+Thanks.
 
- scripts/kconfig/qconf.cc | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 8638785328a7..c40e37656f3f 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1831,17 +1831,24 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
- 
- void ConfigMainWindow::showIntro(void)
- {
--	static const QString str = "Welcome to the qconf graphical configuration tool.\n\n"
--		"For each option, a blank box indicates the feature is disabled, a check\n"
--		"indicates it is enabled, and a dot indicates that it is to be compiled\n"
--		"as a module.  Clicking on the box will cycle through the three states.\n\n"
--		"If you do not see an option (e.g., a device driver) that you believe\n"
--		"should be present, try turning on Show All Options under the Options menu.\n"
--		"Although there is no cross reference yet to help you figure out what other\n"
--		"options must be enabled to support the option you are interested in, you can\n"
--		"still view the help of a grayed-out option.\n\n"
--		"Toggling Show Debug Info under the Options menu will show the dependencies,\n"
--		"which you can then match by examining other options.\n\n";
-+	static const QString str =
-+		"Welcome to the qconf graphical configuration tool.\n\n"
-+
-+		"For each option, a blank box indicates the feature is "
-+		"disabled, a check indicates it is enabled, and a dot "
-+		"indicates that it is to be compiled as a module. Clicking on "
-+		"the box will cycle through the three states.\n\n"
-+
-+		"If you do not see an option (e.g., a device driver) that you "
-+		"believe should be present, try turning on Show All Options "
-+		"under the Options menu. Although there is no cross reference "
-+		"yet to help you figure out what other options must be enabled "
-+		"to support the option you are interested in, you can still "
-+		"view the help of a grayed-out option.\n\n"
-+
-+		"Toggling Show Debug Info under the Options menu will show the "
-+		"dependencies, which you can then match by examining other "
-+		"options.\n\n";
- 
- 	QMessageBox::information(this, "qconf", str);
- }
+> ---
+>  Documentation/kbuild/makefiles.rst |   18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> --- linux-next-20200828.orig/Documentation/kbuild/makefiles.rst
+> +++ linux-next-20200828/Documentation/kbuild/makefiles.rst
+> @@ -16,7 +16,7 @@ This document describes the Linux kernel
+>            --- 3.5 Library file goals - lib-y
+>            --- 3.6 Descending down in directories
+>            --- 3.7 Compilation flags
+> -          --- 3.8 Command line dependency
+> +          --- 3.8 <deleted>
+>            --- 3.9 Dependency tracking
+>            --- 3.10 Special Rules
+>            --- 3.11 $(CC) support functions
+> @@ -39,8 +39,8 @@ This document describes the Linux kernel
+>
+>         === 7 Architecture Makefiles
+>            --- 7.1 Set variables to tweak the build to the architecture
+> -          --- 7.2 Add prerequisites to archheaders:
+> -          --- 7.3 Add prerequisites to archprepare:
+> +          --- 7.2 Add prerequisites to archheaders
+> +          --- 7.3 Add prerequisites to archprepare
+>            --- 7.4 List directories to visit when descending
+>            --- 7.5 Architecture-specific boot images
+>            --- 7.6 Building non-kbuild targets
+> @@ -129,7 +129,7 @@ The preferred name for the kbuild files
+>  be used and if both a 'Makefile' and a 'Kbuild' file exists, then the 'Kbuild'
+>  file will be used.
+>
+> -Section 3.1 "Goal definitions" is a quick intro, further chapters provide
+> +Section 3.1 "Goal definitions" is a quick intro; further chapters provide
+>  more details, with real examples.
+>
+>  3.1 Goal definitions
+> @@ -965,7 +965,7 @@ When kbuild executes, the following step
+>                 KBUILD_LDFLAGS         := -m elf_s390
+>
+>         Note: ldflags-y can be used to further customise
+> -       the flags used. See chapter 3.7.
+> +       the flags used. See section 3.7.
+>
+>      LDFLAGS_vmlinux
+>         Options for $(LD) when linking vmlinux
+> @@ -1121,7 +1121,7 @@ When kbuild executes, the following step
+>
+>         In this example, the file target maketools will be processed
+>         before descending down in the subdirectories.
+> -       See also chapter XXX-TODO that describe how kbuild supports
+> +       See also chapter XXX-TODO that describes how kbuild supports
+>         generating offset header files.
+>
+>
+> @@ -1261,7 +1261,7 @@ When kbuild executes, the following step
+>         always be built.
+>         Assignments to $(targets) are without $(obj)/ prefix.
+>         if_changed may be used in conjunction with custom commands as
+> -       defined in 6.8 "Custom kbuild commands".
+> +       defined in 7.8 "Custom kbuild commands".
+>
+>         Note: It is a typical mistake to forget the FORCE prerequisite.
+>         Another common pitfall is that whitespace is sometimes
+> @@ -1411,7 +1411,7 @@ When kbuild executes, the following step
+>         that may be shared between individual architectures.
+>         The recommended approach how to use a generic header file is
+>         to list the file in the Kbuild file.
+> -       See "7.2 generic-y" for further info on syntax etc.
+> +       See "8.2 generic-y" for further info on syntax etc.
+>
+>  7.11 Post-link pass
+>  -------------------
+> @@ -1601,4 +1601,4 @@ is the right choice.
+>
+>  - Describe how kbuild supports shipped files with _shipped.
+>  - Generating offset header files.
+> -- Add more variables to section 7?
+> +- Add more variables to chapters 7 or 9?
+>
+
+
 -- 
-2.25.1
-
+Best Regards
+Masahiro Yamada
