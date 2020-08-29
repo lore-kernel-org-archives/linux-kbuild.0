@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB4BC433E2
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5E9C433E6
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89B54206C0
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 405142137B
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598688938;
-	bh=aHHDlqdxD5BCAq0GTd/cobwZozAxrqHTORwszeg+TMk=;
+	s=default; t=1598688939;
+	bh=++1G+Sr6mB9yr4kwl1CXOBqWxRcJgZQEnLi2Io/oYG4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zU8YxKBchbfEd0pRuLD46RdJIi7tz3jNn7QCWhVVsog9DgfALlhKHDHARf494Um2y
-	 rAqz/YBj+bw/vq+uil0SZU+aYkQfwAVZR4C2KfnX+VjYtoCfRNx8ozKbP3VffKIkFj
-	 uHdUfDOV4beVf1FomHond2PnDqp3wcabjWDux2Pw=
+	b=DNACPBnzWhQyWAMZ7GFVmPqH2+YXdpL7QP26mD9JjnWxAiPKwk9TGah9YjquYgvGy
+	 gwMohtIDLb3KR4o6i+08qRcDdAYM6Vr5vNg/9sgMBj1g5tUMBixYuKVRyzkKeWbhSo
+	 PRxRUYculPXbqaCmhb589Kv/TGTy8E9wn1JcSCKM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbgH2IPX (ORCPT
+        id S1728010AbgH2IPi (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 Aug 2020 04:15:23 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47660 "EHLO
+        Sat, 29 Aug 2020 04:15:38 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47602 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbgH2IPA (ORCPT
+        with ESMTP id S1727040AbgH2IO6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Aug 2020 04:15:00 -0400
+        Sat, 29 Aug 2020 04:14:58 -0400
 Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07T8ELfm014307;
-        Sat, 29 Aug 2020 17:14:24 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07T8ELfm014307
+        by conuserg-09.nifty.com with ESMTP id 07T8ELfr014307;
+        Sat, 29 Aug 2020 17:14:27 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07T8ELfr014307
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598688864;
-        bh=1hIq6ZEqp/v1iB+uAOdAiLH/pwMC3I09n/InGsbAoME=;
+        s=dec2015msa; t=1598688867;
+        bh=DJwawnqNEjOuongm+fSBHgHFb7bZ8vPqaDUmQxjHe+s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b+p5ipOtVuitKAgcNXrGjRHbfeBTHBOB/sdoucymsTuJcidjFCIl/dHZPbgurzUR3
-         CD+Te41EEUbs50QN33xtO33wYZiYeqnz9Qi0LS/oNDlVsbjqC1LHQ2AxDxrKspa7Qa
-         7BumVGgSzKrqoR+b8RHRjWsmWkBqB+yDcuTl9UsqtXZ3BdLGQtK9oNok52X7agwgOZ
-         xzA9AvPtehCvf9v0K7mCq0okl1X68Z4xdZlpuPrkgBO7pM3X0ghA35LST2RWEZbn5s
-         92GXsyOouPAs+1HQsGRkuz4RQMP5pKOAuT/5UWKruCD4adg0KE8s9+UW6B1TKMZYRa
-         Jh2b/CYJyCURQ==
+        b=eTyFit+u2E1/kXGLPVJ99i12ni1JGLB+5TRkOeCz/W/1hBSRt3Fao5sisYnG9U0ZM
+         ATiEVVuVWfNYiSqQOGC4PV+378nStQHKuySjpgRzIJ5+XiVZAZqUJMH6LDu4oMS9I4
+         u5jPI4NctKByHCOl+ArfkHtg53KsMu/bh537/4KhmX1/fpCQ+lwuOUDRa7JXIkoBmT
+         SB9dtR6CQyclxbBw8vIYg4efdayhKUgx5djnhF+0I9Ig2UeGutL7PK9E9L4rVJ5PBA
+         npF0s34njjel/vvat3WCizkENr1ju6mrdhuF6NRqw0MI7V+/TuCWkHK4eQ4eZvVIX6
+         0GkHP84Za+A9g==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -49,9 +49,9 @@ Cc:     Randy Dunlap <rdunlap@infradead.org>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 06/11] kconfig: qconf: allow to edit "int", "hex", "string" menus in-place
-Date:   Sat, 29 Aug 2020 17:14:12 +0900
-Message-Id: <20200829081417.725978-6-masahiroy@kernel.org>
+Subject: [PATCH 11/11] kconfig: qconf: create QApplication after option checks
+Date:   Sat, 29 Aug 2020 17:14:17 +0900
+Message-Id: <20200829081417.725978-11-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200829081417.725978-1-masahiroy@kernel.org>
 References: <20200829081417.725978-1-masahiroy@kernel.org>
@@ -62,208 +62,39 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Previously, when you double-clicked the "int", "hex", or "string" menus,
-a line-edit gadget showed up to allow you to input the value, which
-looked clumsy.
+'scripts/kconfig/qconf -h' just calls usage() and exits, with
+QApplication unused.
 
-Also, it was buggy; the editor opened even if the config option was not
-editable. For example, just try to double-click CC_VERSION_TEXT, which
-has no prompt.
-
-This commit sub-classes QStyleItemDelegate to allow users to edit
-"int", "hex", "string" menus in-place. Just double-click (or press
-the F2 key) in the data column. Then, an editor widget is placed on
-top of the item view.
-
-The two methods are overridden:
-
- createEditor - process only when the data column is being accessed
- and the menu is visible. Otherwise, return nullptr to disallow editing.
-
- setModelData - take the new data from the editor, and set it to the
- addressed symbol. If it was successful, update all the list windows.
- Otherwise, (the reason for the failure is possibly the input data was
- out of range), set the old value back to the editor.
+There is no need to construct QApplication so early. Do it after
+the parse stage.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/qconf.cc | 93 ++++++++++++++++++++++++++++++++--------
- scripts/kconfig/qconf.h  | 15 +++++++
- 2 files changed, 91 insertions(+), 17 deletions(-)
+ scripts/kconfig/qconf.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index c48e48a3735f..d592f05363c9 100644
+index 09e98814485a..beaed6d177bb 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -180,15 +180,7 @@ void ConfigItem::updateMenu(void)
- 	case S_INT:
- 	case S_HEX:
- 	case S_STRING:
--		const char* data;
--
--		data = sym_get_string_value(sym);
--
--		setText(dataColIdx, data);
--		if (type == S_STRING)
--			prompt = QString("%1: %2").arg(prompt).arg(data);
--		else
--			prompt = QString("(%2) %1").arg(prompt).arg(data);
-+		setText(dataColIdx, sym_get_string_value(sym));
- 		break;
- 	}
- 	if (!sym_has_value(sym) && visible)
-@@ -229,6 +221,17 @@ void ConfigItem::init(void)
- 		if (list->mode != fullMode)
- 			setExpanded(true);
- 		sym_calc_value(menu->sym);
-+
-+		if (menu->sym) {
-+			enum symbol_type type = menu->sym->type;
-+
-+			// Allow to edit "int", "hex", and "string" in-place in
-+			// the data column. Unfortunately, you cannot specify
-+			// the flags per column. Set ItemIsEditable for all
-+			// columns here, and check the column in createEditor().
-+			if (type == S_INT || type == S_HEX || type == S_STRING)
-+				setFlags(flags() | Qt::ItemIsEditable);
-+		}
- 	}
- 	updateMenu();
- }
-@@ -249,6 +252,61 @@ ConfigItem::~ConfigItem(void)
- 	}
- }
+@@ -1846,7 +1846,6 @@ int main(int ac, char** av)
+ 	const char *name;
  
-+QWidget *ConfigItemDelegate::createEditor(QWidget *parent,
-+					  const QStyleOptionViewItem &option,
-+					  const QModelIndex &index) const
-+{
-+	ConfigItem *item;
-+
-+	// Only the data column is editable
-+	if (index.column() != dataColIdx)
-+		return nullptr;
-+
-+	// You cannot edit invisible menus
-+	item = static_cast<ConfigItem *>(index.internalPointer());
-+	if (!item || !item->menu || !menu_is_visible(item->menu))
-+		return nullptr;
-+
-+	return QStyledItemDelegate::createEditor(parent, option, index);
-+}
-+
-+void ConfigItemDelegate::setModelData(QWidget *editor,
-+				      QAbstractItemModel *model,
-+				      const QModelIndex &index) const
-+{
-+	QLineEdit *lineEdit;
-+	ConfigItem *item;
-+	struct symbol *sym;
-+	bool success;
-+
-+	lineEdit = qobject_cast<QLineEdit *>(editor);
-+	// If this is not a QLineEdit, use the parent's default.
-+	// (does this happen?)
-+	if (!lineEdit)
-+		goto parent;
-+
-+	item = static_cast<ConfigItem *>(index.internalPointer());
-+	if (!item || !item->menu)
-+		goto parent;
-+
-+	sym = item->menu->sym;
-+	if (!sym)
-+		goto parent;
-+
-+	success = sym_set_string_value(sym, lineEdit->text().toUtf8().data());
-+	if (success) {
-+		ConfigList::updateListForAll();
-+	} else {
-+		QMessageBox::information(editor, "qconf",
-+			"Cannot set the data (maybe due to out of range).\n"
-+			"Setting the old value.");
-+		lineEdit->setText(sym_get_string_value(sym));
-+	}
-+
-+parent:
-+	QStyledItemDelegate::setModelData(editor, model, index);
-+}
-+
- ConfigLineEdit::ConfigLineEdit(ConfigView* parent)
- 	: Parent(parent)
- {
-@@ -314,6 +372,8 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 	progname = av[0];
+-	configApp = new QApplication(ac, av);
+ 	if (ac > 1 && av[1][0] == '-') {
+ 		switch (av[1][1]) {
+ 		case 's':
+@@ -1867,6 +1866,8 @@ int main(int ac, char** av)
+ 	conf_read(NULL);
+ 	//zconfdump(stdout);
  
- 	showColumn(promptColIdx);
- 
-+	setItemDelegate(new ConfigItemDelegate(this));
++	configApp = new QApplication(ac, av);
 +
- 	allLists.append(this);
- 
- 	reinit();
-@@ -534,10 +594,7 @@ void ConfigList::changeValue(ConfigItem* item)
- 		if (oldexpr != newexpr)
- 			ConfigList::updateListForAll();
- 		break;
--	case S_INT:
--	case S_HEX:
--	case S_STRING:
--		parent()->lineEdit->show(item);
-+	default:
- 		break;
- 	}
- }
-@@ -1797,10 +1854,12 @@ void ConfigMainWindow::showIntro(void)
- 	static const QString str =
- 		"Welcome to the qconf graphical configuration tool.\n\n"
- 
--		"For each option, a blank box indicates the feature is "
--		"disabled, a check indicates it is enabled, and a dot "
--		"indicates that it is to be compiled as a module. Clicking on "
--		"the box will cycle through the three states.\n\n"
-+		"For bool and tristate options, a blank box indicates the "
-+		"feature is disabled, a check indicates it is enabled, and a "
-+		"dot indicates that it is to be compiled as a module. Clicking "
-+		"on the box will cycle through the three states. For int, hex, "
-+		"and string options, double-clicking or pressing F2 on the "
-+		"Value cell will allow you to edit the value.\n\n"
- 
- 		"If you do not see an option (e.g., a device driver) that you "
- 		"believe should be present, try turning on Show All Options "
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index d01a6c620dbb..b02acf2464ec 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -11,6 +11,7 @@
- #include <QPushButton>
- #include <QSettings>
- #include <QSplitter>
-+#include <QStyledItemDelegate>
- #include <QTextBrowser>
- #include <QTreeWidget>
- 
-@@ -172,6 +173,20 @@ class ConfigItem : public QTreeWidgetItem {
- 	static QIcon menuIcon, menubackIcon;
- };
- 
-+class ConfigItemDelegate : public QStyledItemDelegate
-+{
-+private:
-+	struct menu *menu;
-+public:
-+	ConfigItemDelegate(QObject *parent = nullptr)
-+		: QStyledItemDelegate(parent) {}
-+	QWidget *createEditor(QWidget *parent,
-+			      const QStyleOptionViewItem &option,
-+			      const QModelIndex &index) const override;
-+	void setModelData(QWidget *editor, QAbstractItemModel *model,
-+			  const QModelIndex &index) const override;
-+};
-+
- class ConfigLineEdit : public QLineEdit {
- 	Q_OBJECT
- 	typedef class QLineEdit Parent;
+ 	configSettings = new ConfigSettings();
+ 	configSettings->beginGroup("/kconfig/qconf");
+ 	v = new ConfigMainWindow();
 -- 
 2.25.1
 
