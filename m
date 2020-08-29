@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734EFC433E6
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475E1C433E7
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A1762075B
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 284162075B
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 08:15:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598688923;
-	bh=ikFkh3GHjpTvMZfA2Bn4wiPzm8K6WuCfgt8wgEy6x1Y=;
+	s=default; t=1598688938;
+	bh=ejdFeGYSJEDJKBzEdypLhEyussjVuaEcy95Qo0TI4ww=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=HK7gYskTGcljiWXPUVoSbQZgAjfboVJ/WNz6K7W/pmpNh1jdJYZaRxNHKxFPxPgID
-	 gTcbOgOTNXwyRQkDtH3tYvKgO8Kr43Y6O15u+ei/8HXAaALsjlRFF/CDvqhfQRql9n
-	 v2objLNdD4M1GSb1glrJHZCrbVnxDgESDYYW+cwY=
+	b=pr+EfPBf8BuidpU/kFWpr9Ic0O1LJimHOBhuloh6gtkYzL2dI7pjG3DnL8LymE/VX
+	 Ty4VblBd60NfmsWQpMfITYPMMf83hsyxPLIVGquz1e+biRzrpc1KxCQUAuxUoQ6v5d
+	 SDLefAX9RHjCUg1eiBFT/DfFM/kuUDG+0NfeC+h8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbgH2IPW (ORCPT
+        id S1727955AbgH2IPX (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 Aug 2020 04:15:22 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47661 "EHLO
+        Sat, 29 Aug 2020 04:15:23 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:47652 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727781AbgH2IPA (ORCPT
+        with ESMTP id S1727093AbgH2IPA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 29 Aug 2020 04:15:00 -0400
 Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 07T8ELfq014307;
-        Sat, 29 Aug 2020 17:14:26 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07T8ELfq014307
+        by conuserg-09.nifty.com with ESMTP id 07T8ELfl014307;
+        Sat, 29 Aug 2020 17:14:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 07T8ELfl014307
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1598688867;
-        bh=cAwiyDQBc4rVj6A9uC7Rxsf1FCuTHT5ceickHFJ37uw=;
+        s=dec2015msa; t=1598688864;
+        bh=BZ/dWAzubQyO+3A+DUU3NFdKv2g0TsDuGaAwSvn85Q4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=28OF1KSVHt7W9WDBcE4giF5C7id3W9NsgpZElaz+ROkluHSNzmbZkFRdmaJx3Gxm+
-         fsRJlnZ5rf2zM38Y0pcXhzQMPK9g44A3hVloZ/QTQfMjTGOoiXe6KIjuMED1igAgI8
-         mREO4hayAkygxDfB8nlRXPhE2wk93uyU/yZ/qn7YGgT7OHXMZGus+okVH1HFnHAJCa
-         f6qqcVnqL1IzFzzNW5U+PGobjiETQEOveVCPbDnU3imFMdtuH2J5BqLmTjNZPYMZC9
-         LF/AV0Fjx+CigQzzFYrFgY6mljb97ZPNQZguw0TOGthNEQv35mLUNQWgzzbFVIKPKw
-         /Pq8e1+1QynJg==
+        b=rMIyff6jmWXKQZaAWJoFetXJvi6AkLmmfjLm0A8DaaIFux1P8UUNiR9GE7weLmPb1
+         mwQSF+0JMdnmdMxAoWEtSA55TWC6UjvROYbbsGKMAQi1VXrZ/SeoOZQ7V7Q2yQz8oo
+         6tfyYipNUWJkz8TYHRXlhOq4txtZj9eQ8QzIKA2whe1pndGrE9xBTLit5xESHW1A2M
+         X3KE3JT53KVctB3GTX/fCEnIShI3bnRCb+2jz7E1K+rb6OD5m+LrJaIp92RVcSttti
+         JXQatinI30tl14k31MUi/WO8HrHnMKH6y1BgtaCtOLDFg5JruV3O8HU0jnj3VB+RGW
+         c8DtucGKeqDvg==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -49,9 +49,9 @@ Cc:     Randy Dunlap <rdunlap@infradead.org>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 10/11] kconfig: qconf: remove Y, M, N columns
-Date:   Sat, 29 Aug 2020 17:14:16 +0900
-Message-Id: <20200829081417.725978-10-masahiroy@kernel.org>
+Subject: [PATCH 05/11] kconfig: qconf: show data column all the time
+Date:   Sat, 29 Aug 2020 17:14:11 +0900
+Message-Id: <20200829081417.725978-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200829081417.725978-1-masahiroy@kernel.org>
 References: <20200829081417.725978-1-masahiroy@kernel.org>
@@ -62,220 +62,143 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-There are so many ways to toggle bool / tristate options.
+The next commit will allow users to edit "int", "hex", "string"
+menus in-place from the data column.
 
-I do not know how useful these columns are.
+The data column should be always displayed.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/qconf.cc | 59 ++--------------------------------------
- scripts/kconfig/qconf.h  |  6 ++--
- 2 files changed, 4 insertions(+), 61 deletions(-)
+ scripts/kconfig/qconf.cc | 29 +----------------------------
+ scripts/kconfig/qconf.h  |  5 +----
+ 2 files changed, 2 insertions(+), 32 deletions(-)
 
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index b9333115dda3..09e98814485a 100644
+index 035101984bd3..c48e48a3735f 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -139,9 +139,6 @@ void ConfigItem::updateMenu(void)
- 
- 		if (!sym_is_changeable(sym) && list->optMode == normalOpt) {
- 			setIcon(promptColIdx, QIcon());
--			setText(noColIdx, QString());
--			setText(modColIdx, QString());
--			setText(yesColIdx, QString());
- 			break;
- 		}
- 		expr = sym_get_tristate_value(sym);
-@@ -151,12 +148,10 @@ void ConfigItem::updateMenu(void)
- 				setIcon(promptColIdx, choiceYesIcon);
- 			else
- 				setIcon(promptColIdx, symbolYesIcon);
--			setText(yesColIdx, "Y");
- 			ch = 'Y';
- 			break;
- 		case mod:
- 			setIcon(promptColIdx, symbolModIcon);
--			setText(modColIdx, "M");
- 			ch = 'M';
- 			break;
- 		default:
-@@ -164,16 +159,9 @@ void ConfigItem::updateMenu(void)
- 				setIcon(promptColIdx, choiceNoIcon);
- 			else
- 				setIcon(promptColIdx, symbolNoIcon);
--			setText(noColIdx, "N");
- 			ch = 'N';
- 			break;
- 		}
--		if (expr != no)
--			setText(noColIdx, sym_tristate_within_range(sym, no) ? "_" : 0);
--		if (expr != mod)
--			setText(modColIdx, sym_tristate_within_range(sym, mod) ? "_" : 0);
--		if (expr != yes)
--			setText(yesColIdx, sym_tristate_within_range(sym, yes) ? "_" : 0);
- 
- 		setText(dataColIdx, QChar(ch));
- 		break;
-@@ -310,7 +298,7 @@ parent:
- ConfigList::ConfigList(QWidget *parent, const char *name)
- 	: QTreeWidget(parent),
+@@ -288,7 +288,7 @@ void ConfigLineEdit::keyPressEvent(QKeyEvent* e)
+ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 	: Parent(p),
  	  updateAll(false),
--	  showName(false), showRange(false), mode(singleMode), optMode(normalOpt),
-+	  showName(false), mode(singleMode), optMode(normalOpt),
+-	  showName(false), showRange(false), showData(false), mode(singleMode), optMode(normalOpt),
++	  showName(false), showRange(false), mode(singleMode), optMode(normalOpt),
  	  rootEntry(0), headerPopup(0)
  {
  	setObjectName(name);
-@@ -320,7 +308,7 @@ ConfigList::ConfigList(QWidget *parent, const char *name)
- 	setVerticalScrollMode(ScrollPerPixel);
- 	setHorizontalScrollMode(ScrollPerPixel);
- 
--	setHeaderLabels(QStringList() << "Option" << "Name" << "N" << "M" << "Y" << "Value");
-+	setHeaderLabels(QStringList() << "Option" << "Name" << "Value");
- 
- 	connect(this, SIGNAL(itemSelectionChanged(void)),
- 		SLOT(updateSelection(void)));
-@@ -328,7 +316,6 @@ ConfigList::ConfigList(QWidget *parent, const char *name)
- 	if (name) {
+@@ -307,7 +307,6 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
  		configSettings->beginGroup(name);
  		showName = configSettings->value("/showName", false).toBool();
--		showRange = configSettings->value("/showRange", false).toBool();
+ 		showRange = configSettings->value("/showRange", false).toBool();
+-		showData = configSettings->value("/showData", false).toBool();
  		optMode = (enum optionMode)configSettings->value("/optionMode", 0).toInt();
  		configSettings->endGroup();
  		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
-@@ -361,18 +348,10 @@ bool ConfigList::menuSkip(struct menu *menu)
+@@ -338,7 +337,6 @@ bool ConfigList::menuSkip(struct menu *menu)
  
  void ConfigList::reinit(void)
  {
--	hideColumn(yesColIdx);
--	hideColumn(modColIdx);
--	hideColumn(noColIdx);
- 	hideColumn(nameColIdx);
- 
- 	if (showName)
- 		showColumn(nameColIdx);
--	if (showRange) {
--		showColumn(noColIdx);
--		showColumn(modColIdx);
--		showColumn(yesColIdx);
--	}
+-	hideColumn(dataColIdx);
+ 	hideColumn(yesColIdx);
+ 	hideColumn(modColIdx);
+ 	hideColumn(noColIdx);
+@@ -351,8 +349,6 @@ void ConfigList::reinit(void)
+ 		showColumn(modColIdx);
+ 		showColumn(yesColIdx);
+ 	}
+-	if (showData)
+-		showColumn(dataColIdx);
  
  	updateListAll();
  }
-@@ -394,7 +373,6 @@ void ConfigList::saveSettings(void)
- 	if (!objectName().isEmpty()) {
+@@ -375,7 +371,6 @@ void ConfigList::saveSettings(void)
  		configSettings->beginGroup(objectName());
  		configSettings->setValue("/showName", showName);
--		configSettings->setValue("/showRange", showRange);
+ 		configSettings->setValue("/showRange", showRange);
+-		configSettings->setValue("/showData", showData);
  		configSettings->setValue("/optionMode", (int)optMode);
  		configSettings->endGroup();
  	}
-@@ -841,15 +819,6 @@ void ConfigList::mouseReleaseEvent(QMouseEvent* e)
- 			}
- 		}
- 		break;
--	case noColIdx:
--		setValue(item, no);
--		break;
--	case modColIdx:
--		setValue(item, mod);
--		break;
--	case yesColIdx:
--		setValue(item, yes);
--		break;
- 	case dataColIdx:
- 		changeValue(item);
- 		break;
-@@ -925,15 +894,6 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+@@ -918,15 +913,6 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
  			action, SLOT(setChecked(bool)));
- 		action->setChecked(showName);
+ 		action->setChecked(showRange);
  		headerPopup->addAction(action);
 -
--		action = new QAction("Show Range", this);
+-		action = new QAction("Show Data", this);
 -		action->setCheckable(true);
 -		connect(action, SIGNAL(toggled(bool)),
--			SLOT(setShowRange(bool)));
--		connect(this, SIGNAL(showRangeChanged(bool)),
+-			parent(), SLOT(setShowData(bool)));
+-		connect(parent(), SIGNAL(showDataChanged(bool)),
 -			action, SLOT(setChecked(bool)));
--		action->setChecked(showRange);
+-		action->setChecked(showData);
 -		headerPopup->addAction(action);
  	}
  
  	headerPopup->exec(e->globalPos());
-@@ -950,16 +910,6 @@ void ConfigList::setShowName(bool on)
- 	emit showNameChanged(on);
+@@ -970,15 +956,6 @@ void ConfigView::setShowRange(bool b)
+ 	}
  }
  
--void ConfigList::setShowRange(bool on)
+-void ConfigView::setShowData(bool b)
 -{
--	if (showRange == on)
--		return;
--
--	showRange = on;
--	reinit();
--	emit showRangeChanged(on);
+-	if (list->showData != b) {
+-		list->showData = b;
+-		list->reinit();
+-		emit showDataChanged(b);
+-	}
 -}
 -
- QList<ConfigList *> ConfigList::allLists;
- QAction *ConfigList::showNormalAction;
- QAction *ConfigList::showAllAction;
-@@ -1452,10 +1402,6 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	connect(showNameAction, SIGNAL(toggled(bool)), configList, SLOT(setShowName(bool)));
- 	showNameAction->setChecked(configList->showName);
+ void ConfigList::setAllOpen(bool open)
+ {
+ 	QTreeWidgetItemIterator it(this);
+@@ -1470,9 +1447,6 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	QAction *showRangeAction = new QAction("Show Range", this);
+ 	  showRangeAction->setCheckable(true);
+ 	  connect(showRangeAction, SIGNAL(toggled(bool)), configView, SLOT(setShowRange(bool)));
+-	QAction *showDataAction = new QAction("Show Data", this);
+-	  showDataAction->setCheckable(true);
+-	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
  
--	QAction *showRangeAction = new QAction("Show Range", this);
--	  showRangeAction->setCheckable(true);
--	connect(showRangeAction, SIGNAL(toggled(bool)), configList, SLOT(setShowRange(bool)));
--
  	QActionGroup *optGroup = new QActionGroup(this);
  	optGroup->setExclusive(true);
- 	connect(optGroup, SIGNAL(triggered(QAction*)), configList,
-@@ -1506,7 +1452,6 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	// create options menu
+@@ -1525,7 +1499,6 @@ ConfigMainWindow::ConfigMainWindow(void)
  	menu = menuBar()->addMenu("&Option");
  	menu->addAction(showNameAction);
--	menu->addAction(showRangeAction);
+ 	menu->addAction(showRangeAction);
+-	menu->addAction(showDataAction);
  	menu->addSeparator();
  	menu->addActions(optGroup->actions());
  	menu->addSeparator();
 diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 1289fdaa7d82..78b0a1dfcd53 100644
+index 818e00617ae3..d01a6c620dbb 100644
 --- a/scripts/kconfig/qconf.h
 +++ b/scripts/kconfig/qconf.h
-@@ -29,7 +29,7 @@ class ConfigSettings : public QSettings {
- };
- 
- enum colIdx {
--	promptColIdx, nameColIdx, noColIdx, modColIdx, yesColIdx, dataColIdx
-+	promptColIdx, nameColIdx, dataColIdx
- };
- enum listMode {
- 	singleMode, menuMode, symbolMode, fullMode, listMode
-@@ -72,7 +72,6 @@ public slots:
- 	void saveSettings(void);
- 	void setOptionMode(QAction *action);
- 	void setShowName(bool on);
--	void setShowRange(bool on);
- 
- signals:
- 	void menuChanged(struct menu *menu);
-@@ -81,7 +80,6 @@ public slots:
- 	void parentSelected(void);
- 	void gotFocus(struct menu *);
- 	void showNameChanged(bool on);
--	void showRangeChanged(bool on);
- 
- public:
- 	void updateListAll(void)
-@@ -100,7 +98,7 @@ public slots:
+@@ -101,7 +101,7 @@ public slots:
  
  	bool updateAll;
  
--	bool showName, showRange;
-+	bool showName;
+-	bool showName, showRange, showData;
++	bool showName, showRange;
  	enum listMode mode;
  	enum optionMode optMode;
  	struct menu *rootEntry;
+@@ -196,15 +196,12 @@ class ConfigView : public QWidget {
+ 
+ 	bool showName(void) const { return list->showName; }
+ 	bool showRange(void) const { return list->showRange; }
+-	bool showData(void) const { return list->showData; }
+ public slots:
+ 	void setShowName(bool);
+ 	void setShowRange(bool);
+-	void setShowData(bool);
+ signals:
+ 	void showNameChanged(bool);
+ 	void showRangeChanged(bool);
+-	void showDataChanged(bool);
+ public:
+ 	ConfigList* list;
+ 	ConfigLineEdit* lineEdit;
 -- 
 2.25.1
 
