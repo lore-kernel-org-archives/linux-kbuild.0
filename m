@@ -1,108 +1,177 @@
-Return-Path: <SRS0=oOk0=CG=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=/aPn=CH=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8A4C433E2
-	for <linux-kbuild@archiver.kernel.org>; Fri, 28 Aug 2020 19:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D91C433E2
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 05:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D62462075B
-	for <linux-kbuild@archiver.kernel.org>; Fri, 28 Aug 2020 19:45:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1II6VGyl"
+	by mail.kernel.org (Postfix) with ESMTP id 6434620838
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 05:16:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598678188;
+	bh=nriQ105te2l67FwsUduPQFL1byR9bDKMl/Mz9Mlj/KA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=BjPVaSJvIU07S2UCs6HD/CUwUhG8NL4V2YKqU/jHzXpoN4+eKCT5qoDFIocqh/dhk
+	 ecLUGHP5gH1ZHT2daxvWrR0kYvPQE7HL9jbRGx9inGq6tuRybX3ee3G/HLIJV7xKbV
+	 N+0E9jhJflQIKLtgXX/rMjp6vRz4N0jhA44Z04eg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726010AbgH1Tpr (ORCPT
+        id S1726020AbgH2FQ1 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 28 Aug 2020 15:45:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbgH1Tpr (ORCPT
+        Sat, 29 Aug 2020 01:16:27 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:34619 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbgH2FQ0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Aug 2020 15:45:47 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2086EC061264
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Aug 2020 12:45:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=8PD1/BpWIslNswVVkVaTPc5yN2SEZqOXPj0yWOEuEfg=; b=1II6VGylHmYMayF8THV7nintSS
-        SXR08N9dXuR7D7meL9PZjVs7PFOuh1SSrwtcgYZVG419aVEd/icMipnklfiCO8zQ/q6QWJl6GT4vZ
-        P6SuxuUGAE7CERIQN/L6SkLn01sa8mU+XYpIQb4tnVe4upqkNlfE2Y9AWVpBlM8919wWvMUP+eGjG
-        icoq3gkn6l8JqNz5RwW/C446BSjCqVQl5FH+y6SFrMhF5yQFZ1puvEDttT16K1U2ll62EM+MAWEkv
-        r+FRWm65el5/MB9bBuPeeeAlJn3JwtcUCXErYEEeNXoIdkLYz8YKnPjkuTZZ9uLd0TXzGZEl3nw0l
-        ZP4ONiag==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kBkJk-0001a1-BQ; Fri, 28 Aug 2020 19:45:45 +0000
-Subject: Re: ia64 kbuild warning message
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild <linux-kbuild@vger.kernel.org>
-References: <9c333a75-a851-a055-e879-0967c32e2300@infradead.org>
- <CAK7LNAQ25mHHZJaShczfiS=YiZ77EqhjX5QaYubpyPE2Axw4vw@mail.gmail.com>
- <CAK7LNAQidMqfmECAGu-2aVNCcLkV0iuV-ZHkCZG++t5v2KRyGQ@mail.gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <1eb5107c-83ea-4d7e-08e1-8f19f1218542@infradead.org>
-Date:   Fri, 28 Aug 2020 12:45:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Sat, 29 Aug 2020 01:16:26 -0400
+Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 07T5FRBA012582;
+        Sat, 29 Aug 2020 14:15:31 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 07T5FRBA012582
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1598678131;
+        bh=UpWzyGtnastAPoHDlH8oDyzAcCCJ1dW9lC89fSAz9Xg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=uhLs3MZAZ1Rv6AE0eYXFmWt9YQpnmXP5sIwXfCx6W8cnVeCNxwtxPMVZKEkBTyQPx
+         Oa64x2VbzFBPkJ5i4B0Z9Sv21sNTSHgpZ9ih4v+TbxZYGjxjVjRFB2yZGRHi7KR3cb
+         HkwyRsJEI3tWByjEX7Ms4EVoaoruUvS5nSGRKupkAOzR2pql88kBYiaiySyUDdKrng
+         eJH27ywaBIZlZv/08YzjufdiElmwHa8qFPSpTomgkyNmWeGsBDgZdEXlULOkxylml7
+         eQp+2Cw2gv82PkkTbOX1MRcEKXeZn6FbBVMkC5Ow071z0+tTnQeQK6IiKM2JlOAgKs
+         dKWYkDi5qBeqQ==
+X-Nifty-SrcIP: [126.90.211.135]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>,
+        linux-ia64@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/3] ia64: remove generated/nr-irqs.h generation to fix build warning
+Date:   Sat, 29 Aug 2020 14:15:24 +0900
+Message-Id: <20200829051524.706585-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200829051524.706585-1-masahiroy@kernel.org>
+References: <20200829051524.706585-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQidMqfmECAGu-2aVNCcLkV0iuV-ZHkCZG++t5v2KRyGQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 8/28/20 12:34 PM, Masahiro Yamada wrote:
-> On Sat, Aug 29, 2020 at 2:41 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->>
->> On Sat, Aug 29, 2020 at 1:34 AM Randy Dunlap <rdunlap@infradead.org> wrote:
->>>
->>> Hi Yamada-san,
->>>
->>> I am seeing this on ia64 builds:
->>>
->>> ../scripts/Makefile.build:68: 'arch/ia64/kernel/palinfo.ko' will not be built even though obj-m is specified.
->>> ../scripts/Makefile.build:69: You cannot use subdir-y/m to visit a module Makefile. Use obj-y/m instead.
->>>
->>> with CONFIG_IA64_PALINFO=y
->>>
->>> Can you explain, please?
->>>
->>
->>
->> This warning is emitted in the archprepare stage.
->>
->>
->> The following code in arch/ia64/Makefile:
->>
->> make_nr_irqs_h:
->>         $(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
->>
->>
->>
->> I am wondering if we could merge
->> arch/ia64/kernel/nr-irqs.c into
->> arch/ia64/kernel/asm-offsets.c
-> 
-> 
-> 
-> OK, I figured out how to clean this up.
-> 
-> I will send a patch set tomorrow.
-> For now, I need some sleep.
+Randy reports the following warning when building ARCH=ia64 with
+CONFIG_IA64_PALINFO=m:
 
-Sounds good.
+../scripts/Makefile.build:68: 'arch/ia64/kernel/palinfo.ko' will not be built even though obj-m is specified.
+../scripts/Makefile.build:69: You cannot use subdir-y/m to visit a module Makefile. Use obj-y/m instead.
 
-thanks.
+This message is actually false-positive, and you can get palinfo.ko
+correctly built. It is emitted in the archprepare stage, where Kbuild
+descends into arch/ia64/kernel to generate include/generated/nr-irqs.h
+instead of any kind of kernel objects.
 
+arch/ia64/kernel/nr-irqs.c was introduced by commit 213060a4d699
+("[IA64] pvops: paravirtualize NR_IRQS") to pre-calculate:
+
+   NR_IRQS = max(IA64_NATIVE_NR_IRQS, XEN_NR_IRQS, FOO_NR_IRQS...)
+
+Since commit d52eefb47d4e ("ia64/xen: Remove Xen support for ia64"), this
+union contains just one field, making NR_IRQS and IA64_NATIVE_NR_IRQS
+always match.
+
+So, the following hard-coding now works:
+
+  #define NR_IRQS                IA64_NATIVE_NR_IRQS
+
+If you need to re-introduce NR_IRQS = max(...) gimmick in the future,
+please try to implement it in asm-offsets.c instead of a separate file.
+It will be possible because the header inclusion has been consolidated
+to make asm-offsets.c independent of <asm/irqs.h>.
+
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ arch/ia64/Makefile          |  6 ------
+ arch/ia64/include/asm/irq.h |  4 +++-
+ arch/ia64/kernel/Makefile   |  5 -----
+ arch/ia64/kernel/nr-irqs.c  | 22 ----------------------
+ 4 files changed, 3 insertions(+), 34 deletions(-)
+ delete mode 100644 arch/ia64/kernel/nr-irqs.c
+
+diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+index 2876a7df1b0a..3d54d411fcc4 100644
+--- a/arch/ia64/Makefile
++++ b/arch/ia64/Makefile
+@@ -87,9 +87,3 @@ define archhelp
+   echo '  install	- Install compressed kernel image'
+   echo '* unwcheck	- Check vmlinux for invalid unwind info'
+ endef
+-
+-archprepare: make_nr_irqs_h
+-PHONY += make_nr_irqs_h
+-
+-make_nr_irqs_h:
+-	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
+diff --git a/arch/ia64/include/asm/irq.h b/arch/ia64/include/asm/irq.h
+index 5acf52e90872..0eccf33dfe8b 100644
+--- a/arch/ia64/include/asm/irq.h
++++ b/arch/ia64/include/asm/irq.h
+@@ -14,7 +14,9 @@
+ 
+ #include <linux/types.h>
+ #include <linux/cpumask.h>
+-#include <generated/nr-irqs.h>
++#include <asm/native/irq.h>
++
++#define NR_IRQS		IA64_NATIVE_NR_IRQS
+ 
+ static __inline__ int
+ irq_canonicalize (int irq)
+diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+index 1a8df6669eee..7c9354ee4b3e 100644
+--- a/arch/ia64/kernel/Makefile
++++ b/arch/ia64/kernel/Makefile
+@@ -48,8 +48,3 @@ CFLAGS_traps.o  += -mfixed-range=f2-f5,f16-f31
+ 
+ # The gate DSO image is built using a special linker script.
+ include $(src)/Makefile.gate
+-
+-include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s FORCE
+-	$(call filechk,offsets,__ASM_NR_IRQS_H__)
+-
+-targets += nr-irqs.s
+diff --git a/arch/ia64/kernel/nr-irqs.c b/arch/ia64/kernel/nr-irqs.c
+deleted file mode 100644
+index f2633b22d3be..000000000000
+--- a/arch/ia64/kernel/nr-irqs.c
++++ /dev/null
+@@ -1,22 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * calculate
+- * NR_IRQS = max(IA64_NATIVE_NR_IRQS, XEN_NR_IRQS, FOO_NR_IRQS...)
+- * depending on config.
+- * This must be calculated before processing asm-offset.c.
+- */
+-
+-#define ASM_OFFSETS_C 1
+-
+-#include <linux/kbuild.h>
+-#include <linux/threads.h>
+-#include <asm/native/irq.h>
+-
+-void foo(void)
+-{
+-	union paravirt_nr_irqs_max {
+-		char ia64_native_nr_irqs[IA64_NATIVE_NR_IRQS];
+-	};
+-
+-	DEFINE(NR_IRQS, sizeof (union paravirt_nr_irqs_max));
+-}
 -- 
-~Randy
+2.25.1
 
