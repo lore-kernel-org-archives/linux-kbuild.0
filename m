@@ -1,59 +1,59 @@
-Return-Path: <SRS0=/aPn=CH=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=8RbX=CI=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9565CC433E6
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 18:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB02C433E6
+	for <linux-kbuild@archiver.kernel.org>; Sun, 30 Aug 2020 04:54:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 781F32075B
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 Aug 2020 18:22:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 673182083E
+	for <linux-kbuild@archiver.kernel.org>; Sun, 30 Aug 2020 04:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BcLH4wp5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bLc/Xhve"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728417AbgH2SWW (ORCPT
+        id S1725825AbgH3EyZ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 Aug 2020 14:22:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60318 "EHLO
+        Sun, 30 Aug 2020 00:54:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728333AbgH2SWU (ORCPT
+        with ESMTP id S1725815AbgH3EyZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Aug 2020 14:22:20 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C757C061236;
-        Sat, 29 Aug 2020 11:22:07 -0700 (PDT)
+        Sun, 30 Aug 2020 00:54:25 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A2FC061573;
+        Sat, 29 Aug 2020 21:54:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
         In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
         :Reply-To:Content-ID:Content-Description;
-        bh=jOWSL7YMNppSparAg77dbZ6fJiWHneGJnmZYvPY6oW0=; b=BcLH4wp5wsdb1A6/+fcAVfpZx3
-        BQzmir9XB7NRPzzoGTRZeMbEQJZBCD5JoUKrKoX4ckwoUWmelPR7km55DXMRDZgA5KzcypRgg+Gyi
-        cz3otssgJBigGdFtVNa/LxVnVVs6tL0FAKcQcYTmg6zlm/CpplhLs3punUejhv/Leu9677ygpb2Vv
-        GKL0lbe+MszCipmGofBLmA7mIYHWJpsblnJgzNiKw0VvTZu0OnY16zYXhsctPsdTsLdlFCgmrb+um
-        kjOye1CvKCWiNt1CnjdXgJAcW/qHVZipGIL9DqlIuI465/2wRMqIDUwQtkccdxmt40OHz/vxMjJxj
-        KC8alnAQ==;
+        bh=MFqiM3hTwV/fkTjmipGxqNOxLLgA3iwwXkUUehMy8qg=; b=bLc/XhveXRAuGg14wNB8lRn0UP
+        5ZOGfYtKqW1DzbwqjzenMhl6yEdIYWJW/AsNFDDq8yBZoefIlmMdIvXq5iqjlhr6TX4Y+64vtEjOD
+        bSCuNbDTv3widKza3Re2tb8SWVabLdF8XpJnGZHvh1BQvOeOzV4g1958drtJvPrTgi428Omdr0XzV
+        dNMlTRiJFDo1xtHBRiLK7HJEZaQ0UyF1f0bcFbpt1FsgglpzH9Xqy50BssNLncArJq9U2STkAmLf2
+        VlHc5A6ZFJahyMN/kdkl0jJMO7GUKkaGmvNRp/Us+FasX0GDVl+u8Vyu6BGg/ikqvznYVCWH5Od4P
+        23Bg+btg==;
 Received: from [2601:1c0:6280:3f0::19c2]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kC5UL-0007cU-0c; Sat, 29 Aug 2020 18:22:05 +0000
-Subject: Re: [PATCH 3/3] ia64: remove generated/nr-irqs.h generation to fix
- build warning
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kCFME-0006Y2-VA; Sun, 30 Aug 2020 04:54:23 +0000
+Subject: Re: [PATCH 06/11] kconfig: qconf: allow to edit "int", "hex",
+ "string" menus in-place
 To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>, linux-ia64@vger.kernel.org
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200829051524.706585-1-masahiroy@kernel.org>
- <20200829051524.706585-4-masahiroy@kernel.org>
+        linux-kbuild@vger.kernel.org
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-kernel@vger.kernel.org
+References: <20200829081417.725978-1-masahiroy@kernel.org>
+ <20200829081417.725978-6-masahiroy@kernel.org>
 From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <d98592ec-d74b-27c6-f7d2-9d304b1d9eda@infradead.org>
-Date:   Sat, 29 Aug 2020 11:22:01 -0700
+Message-ID: <bd8696df-72b7-fb92-d53a-edff715fe5a0@infradead.org>
+Date:   Sat, 29 Aug 2020 21:54:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200829051524.706585-4-masahiroy@kernel.org>
+In-Reply-To: <20200829081417.725978-6-masahiroy@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -62,54 +62,42 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 8/28/20 10:15 PM, Masahiro Yamada wrote:
-> Randy reports the following warning when building ARCH=ia64 with
-> CONFIG_IA64_PALINFO=m:
+On 8/29/20 1:14 AM, Masahiro Yamada wrote:
+> Previously, when you double-clicked the "int", "hex", or "string" menus,
+> a line-edit gadget showed up to allow you to input the value, which
+> looked clumsy.
 > 
-> ../scripts/Makefile.build:68: 'arch/ia64/kernel/palinfo.ko' will not be built even though obj-m is specified.
-> ../scripts/Makefile.build:69: You cannot use subdir-y/m to visit a module Makefile. Use obj-y/m instead.
+> Also, it was buggy; the editor opened even if the config option was not
+> editable. For example, just try to double-click CC_VERSION_TEXT, which
+> has no prompt.
 > 
-> This message is actually false-positive, and you can get palinfo.ko
-> correctly built. It is emitted in the archprepare stage, where Kbuild
-> descends into arch/ia64/kernel to generate include/generated/nr-irqs.h
-> instead of any kind of kernel objects.
+> This commit sub-classes QStyleItemDelegate to allow users to edit
+> "int", "hex", "string" menus in-place. Just double-click (or press
+> the F2 key) in the data column. Then, an editor widget is placed on
+> top of the item view.
+
+The F2 key doesn't work for me. I guess that's a desktop environment
+issue (I am using Xfce).
+
+> The two methods are overridden:
 > 
-> arch/ia64/kernel/nr-irqs.c was introduced by commit 213060a4d699
-> ("[IA64] pvops: paravirtualize NR_IRQS") to pre-calculate:
+>  createEditor - process only when the data column is being accessed
+>  and the menu is visible. Otherwise, return nullptr to disallow editing.
 > 
->    NR_IRQS = max(IA64_NATIVE_NR_IRQS, XEN_NR_IRQS, FOO_NR_IRQS...)
+>  setModelData - take the new data from the editor, and set it to the
+>  addressed symbol. If it was successful, update all the list windows.
+>  Otherwise, (the reason for the failure is possibly the input data was
+>  out of range), set the old value back to the editor.
 > 
-> Since commit d52eefb47d4e ("ia64/xen: Remove Xen support for ia64"), this
-> union contains just one field, making NR_IRQS and IA64_NATIVE_NR_IRQS
-> always match.
-> 
-> So, the following hard-coding now works:
-> 
->   #define NR_IRQS                IA64_NATIVE_NR_IRQS
-> 
-> If you need to re-introduce NR_IRQS = max(...) gimmick in the future,
-> please try to implement it in asm-offsets.c instead of a separate file.
-> It will be possible because the header inclusion has been consolidated
-> to make asm-offsets.c independent of <asm/irqs.h>.
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-
 > ---
 > 
->  arch/ia64/Makefile          |  6 ------
->  arch/ia64/include/asm/irq.h |  4 +++-
->  arch/ia64/kernel/Makefile   |  5 -----
->  arch/ia64/kernel/nr-irqs.c  | 22 ----------------------
->  4 files changed, 3 insertions(+), 34 deletions(-)
->  delete mode 100644 arch/ia64/kernel/nr-irqs.c
+>  scripts/kconfig/qconf.cc | 93 ++++++++++++++++++++++++++++++++--------
+>  scripts/kconfig/qconf.h  | 15 +++++++
+>  2 files changed, 91 insertions(+), 17 deletions(-)
 > 
 
 
-thanks.
 -- 
 ~Randy
 
