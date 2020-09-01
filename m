@@ -2,198 +2,117 @@ Return-Path: <SRS0=FJnX=CK=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F8CC433E7
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6C3C433E6
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Sep 2020 16:16:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1FF5206C0
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IERvtppr"
+	by mail.kernel.org (Postfix) with ESMTP id 96E25208CA
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Sep 2020 16:16:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbgIAOzV (ORCPT
+        id S1730724AbgIAQQW (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Sep 2020 10:55:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45262 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726623AbgIALbA (ORCPT
+        Tue, 1 Sep 2020 12:16:22 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:51229 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728275AbgIAPeU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Sep 2020 07:31:00 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504A6C061247;
-        Tue,  1 Sep 2020 04:29:57 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id d27so550478qtg.4;
-        Tue, 01 Sep 2020 04:29:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Bmg6XgtUWDx4HuERt6+WNca9MkrxDIzUrFEsZ8s0eNY=;
-        b=IERvtpprRpsI2hed0dHnnYBJc2bTsfXDoVwNNjG0Ec1Sz8CRuOUarz+Porf5yRfHFu
-         30cRoDkuZP41QRrigZa6y9lS/Q9+jFle0rPTgtwQN4bp84V8ocprAVuzMQ9FqTehBEzY
-         4MDJIPAYpDQqg5MZ+6ZUTXTmOnuGZXEK8IgCV4orCkGUrRtsYcj/Ywc1ICPwnctC/GyI
-         dJzhbEYwl61cZTl24h34xARkW2Zaqa/kOmK3OayGekDtkeFds1gFNQRmSyQ/QvyDfdw+
-         OEnwNuiuobwmd/AEPMOV6cmL4S085Ju8J83/4o3yZA4u2o3mkHjbyG61560pFu+G2c5p
-         TvfA==
+        Tue, 1 Sep 2020 11:34:20 -0400
+Received: by mail-pj1-f66.google.com with SMTP id ds1so806083pjb.1;
+        Tue, 01 Sep 2020 08:34:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Bmg6XgtUWDx4HuERt6+WNca9MkrxDIzUrFEsZ8s0eNY=;
-        b=G71dvjwIu488zUUjmMoWDTLeZ/wY1GVSDhux2sTucSujqYmKot2Nq0A7QY/g/nSguk
-         /2MnBBotSaK6dVANc/725/FqCJ76wRfpBHGaoIQpdxZboGa8QSBikS/eS7DotIMV2Lpx
-         pEokqnWf1EyBjlovce/6LFBQ3llUYbjDuc5giQkAmfxyAggVnhdEsMWUvidyqlE3Fd3y
-         UDfTeqfiWixrCUALqrS1wMQOuD08ftGEfcq+JpnG/SM6w/3+Oj7sYZNQ6HLBn6eheGwt
-         AYPQFxmmu6mwzEpbar+V42Lj/Trs6OQ6qurh7R/AmS/xm1yJIBrnGIKCFrSGA6j5jkSv
-         RqYw==
-X-Gm-Message-State: AOAM533xxmhHTiJ3mQLWUvys/hzohLIhit6UpntJGSYOiftYuztVxs46
-        oApsWFtjQW14glwe6JoEiU9T3HzlHpIhxU9GPEArsfF1lf43xA==
-X-Google-Smtp-Source: ABdhPJwVT407rq1wSU6XLfBx35x7TqzLfOV0jdufGiWqhxHXDja0Uvn0+tpPRWaGd0lmv1UnRMyszboqVwIOVOloAYU=
-X-Received: by 2002:ac8:7741:: with SMTP id g1mr1183471qtu.28.1598959796622;
- Tue, 01 Sep 2020 04:29:56 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=i38RE50+o+7Xi/V63EnQit0knXFO0KJ4UL6nDtZEEQk=;
+        b=YkvHt5TI0bIBIsQ3ZTD3opgXy+Qf3qOooRXxIuTuanNaGdyJppaXuCRpn2r42lU6MM
+         PNx/pSftiqiU1NYvT1udUU+r0SIXvhSKOLTxe+qyuX/M8NULvsXpFlb1/PfCP2hIBKc+
+         mklt9EezQJ4aNmFPWb7lWIDafWhl3NTccTB3BHx17gfaBjpf7FdFpOTw2VxnSZRTm6Z8
+         pY/kFsdNY5hd702SofvYBQ2no6YNICuJR087soW/hM+32qOCEhBIWDZXoUiAHSCAqJLu
+         7/H7+0kpjPtTiSMl6h1nfRVSJqXZI67ww/viLJqmctBnU07pLD36kYuLQ9k7ZlMDJeXd
+         90+g==
+X-Gm-Message-State: AOAM5331TLHsPNyf+Hpp221MeurcD7Zw7piv7bjf1ex3zTkfGF1hgTid
+        8tmmbUtpmADpl25Wed91iOSIPzvgPAE=
+X-Google-Smtp-Source: ABdhPJyvs4WVpd10KSuRKdfbQOMaxQxGZ/9QR5e8uOVAmfHd8e/2ltBv0qN+Izrqj7NFH7th+Ivydw==
+X-Received: by 2002:a17:90a:c28e:: with SMTP id f14mr2084142pjt.83.1598974459739;
+        Tue, 01 Sep 2020 08:34:19 -0700 (PDT)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id g17sm2915153pge.9.2020.09.01.08.34.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Sep 2020 08:34:18 -0700 (PDT)
+Subject: Re: [PATCH 0/1] block io layer filters api
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "michal.lkml@markovi.net" <michal.lkml@markovi.net>,
+        "koct9i@gmail.com" <koct9i@gmail.com>,
+        "jack@suse.cz" <jack@suse.cz>,
+        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "steve@sk2.org" <steve@sk2.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1598555619-14792-1-git-send-email-sergei.shtepa@veeam.com>
+ <7a517822-6be2-7d0d-fae3-31472c85f543@kernel.dk>
+ <20200901132957.GA18251@veeam.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Autocrypt: addr=bvanassche@acm.org; prefer-encrypt=mutual; keydata=
+ mQENBFSOu4oBCADcRWxVUvkkvRmmwTwIjIJvZOu6wNm+dz5AF4z0FHW2KNZL3oheO3P8UZWr
+ LQOrCfRcK8e/sIs2Y2D3Lg/SL7qqbMehGEYcJptu6mKkywBfoYbtBkVoJ/jQsi2H0vBiiCOy
+ fmxMHIPcYxaJdXxrOG2UO4B60Y/BzE6OrPDT44w4cZA9DH5xialliWU447Bts8TJNa3lZKS1
+ AvW1ZklbvJfAJJAwzDih35LxU2fcWbmhPa7EO2DCv/LM1B10GBB/oQB5kvlq4aA2PSIWkqz4
+ 3SI5kCPSsygD6wKnbRsvNn2mIACva6VHdm62A7xel5dJRfpQjXj2snd1F/YNoNc66UUTABEB
+ AAG0JEJhcnQgVmFuIEFzc2NoZSA8YnZhbmFzc2NoZUBhY20ub3JnPokBOQQTAQIAIwUCVI67
+ igIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEHFcPTXFzhAJ8QkH/1AdXblKL65M
+ Y1Zk1bYKnkAb4a98LxCPm/pJBilvci6boefwlBDZ2NZuuYWYgyrehMB5H+q+Kq4P0IBbTqTa
+ jTPAANn62A6jwJ0FnCn6YaM9TZQjM1F7LoDX3v+oAkaoXuq0dQ4hnxQNu792bi6QyVdZUvKc
+ macVFVgfK9n04mL7RzjO3f+X4midKt/s+G+IPr4DGlrq+WH27eDbpUR3aYRk8EgbgGKvQFdD
+ CEBFJi+5ZKOArmJVBSk21RHDpqyz6Vit3rjep7c1SN8s7NhVi9cjkKmMDM7KYhXkWc10lKx2
+ RTkFI30rkDm4U+JpdAd2+tP3tjGf9AyGGinpzE2XY1K5AQ0EVI67igEIAKiSyd0nECrgz+H5
+ PcFDGYQpGDMTl8MOPCKw/F3diXPuj2eql4xSbAdbUCJzk2ETif5s3twT2ER8cUTEVOaCEUY3
+ eOiaFgQ+nGLx4BXqqGewikPJCe+UBjFnH1m2/IFn4T9jPZkV8xlkKmDUqMK5EV9n3eQLkn5g
+ lco+FepTtmbkSCCjd91EfThVbNYpVQ5ZjdBCXN66CKyJDMJ85HVr5rmXG/nqriTh6cv1l1Js
+ T7AFvvPjUPknS6d+BETMhTkbGzoyS+sywEsQAgA+BMCxBH4LvUmHYhpS+W6CiZ3ZMxjO8Hgc
+ ++w1mLeRUvda3i4/U8wDT3SWuHcB3DWlcppECLkAEQEAAYkBHwQYAQIACQUCVI67igIbDAAK
+ CRBxXD01xc4QCZ4dB/0QrnEasxjM0PGeXK5hcZMT9Eo998alUfn5XU0RQDYdwp6/kMEXMdmT
+ oH0F0xB3SQ8WVSXA9rrc4EBvZruWQ+5/zjVrhhfUAx12CzL4oQ9Ro2k45daYaonKTANYG22y
+ //x8dLe2Fv1By4SKGhmzwH87uXxbTJAUxiWIi1np0z3/RDnoVyfmfbbL1DY7zf2hYXLLzsJR
+ mSsED/1nlJ9Oq5fALdNEPgDyPUerqHxcmIub+pF0AzJoYHK5punqpqfGmqPbjxrJLPJfHVKy
+ goMj5DlBMoYqEgpbwdUYkH6QdizJJCur4icy8GUNbisFYABeoJ91pnD4IGei3MTdvINSZI5e
+Message-ID: <b99a1577-6f39-9228-d176-5a8bc38bd64d@acm.org>
+Date:   Tue, 1 Sep 2020 08:34:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200831182239.480317-1-masahiroy@kernel.org>
-In-Reply-To: <20200831182239.480317-1-masahiroy@kernel.org>
-From:   Greentime Hu <green.hu@gmail.com>
-Date:   Tue, 1 Sep 2020 19:29:19 +0800
-Message-ID: <CAEbi=3cqogHs=p_y=_jfcC+D5a9e5=Nic=ECr_YvJ9p-DZEAJQ@mail.gmail.com>
-Subject: Re: [PATCH] arch: vdso: add vdso linker script to 'targets' instead
- of extra-y
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nick Hu <nickhu@andestech.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200901132957.GA18251@veeam.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Masahiro Yamada <masahiroy@kernel.org> =E6=96=BC 2020=E5=B9=B49=E6=9C=881=
-=E6=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8A=E5=8D=882:23=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> The vdso linker script is preprocessed on demand.
-> Adding it to 'targets' is enough to include the .cmd file.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  arch/arm64/kernel/vdso/Makefile     | 2 +-
->  arch/arm64/kernel/vdso32/Makefile   | 2 +-
->  arch/nds32/kernel/vdso/Makefile     | 2 +-
->  arch/powerpc/kernel/vdso32/Makefile | 2 +-
->  arch/powerpc/kernel/vdso64/Makefile | 2 +-
->  arch/s390/kernel/vdso64/Makefile    | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Mak=
-efile
-> index 45d5cfe46429..7cd8aafbe96e 100644
-> --- a/arch/arm64/kernel/vdso/Makefile
-> +++ b/arch/arm64/kernel/vdso/Makefile
-> @@ -54,7 +54,7 @@ endif
->  GCOV_PROFILE :=3D n
->
->  obj-y +=3D vdso.o
-> -extra-y +=3D vdso.lds
-> +targets +=3D vdso.lds
->  CPPFLAGS_vdso.lds +=3D -P -C -U$(ARCH)
->
->  # Force dependency (incbin is bad)
-> diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32=
-/Makefile
-> index d6adb4677c25..572475b7b7ed 100644
-> --- a/arch/arm64/kernel/vdso32/Makefile
-> +++ b/arch/arm64/kernel/vdso32/Makefile
-> @@ -155,7 +155,7 @@ asm-obj-vdso :=3D $(addprefix $(obj)/, $(asm-obj-vdso=
-))
->  obj-vdso :=3D $(c-obj-vdso) $(c-obj-vdso-gettimeofday) $(asm-obj-vdso)
->
->  obj-y +=3D vdso.o
-> -extra-y +=3D vdso.lds
-> +targets +=3D vdso.lds
->  CPPFLAGS_vdso.lds +=3D -P -C -U$(ARCH)
->
->  # Force dependency (vdso.s includes vdso.so through incbin)
-> diff --git a/arch/nds32/kernel/vdso/Makefile b/arch/nds32/kernel/vdso/Mak=
-efile
-> index 7c3c1ccb196e..55df25ef0057 100644
-> --- a/arch/nds32/kernel/vdso/Makefile
-> +++ b/arch/nds32/kernel/vdso/Makefile
-> @@ -20,7 +20,7 @@ GCOV_PROFILE :=3D n
->
->
->  obj-y +=3D vdso.o
-> -extra-y +=3D vdso.lds
-> +targets +=3D vdso.lds
->  CPPFLAGS_vdso.lds +=3D -P -C -U$(ARCH)
->
->  # Force dependency
-> diff --git a/arch/powerpc/kernel/vdso32/Makefile b/arch/powerpc/kernel/vd=
-so32/Makefile
-> index 87ab1152d5ce..fd5072a4c73c 100644
-> --- a/arch/powerpc/kernel/vdso32/Makefile
-> +++ b/arch/powerpc/kernel/vdso32/Makefile
-> @@ -29,7 +29,7 @@ ccflags-y :=3D -shared -fno-common -fno-builtin -nostdl=
-ib \
->  asflags-y :=3D -D__VDSO32__ -s
->
->  obj-y +=3D vdso32_wrapper.o
-> -extra-y +=3D vdso32.lds
-> +targets +=3D vdso32.lds
->  CPPFLAGS_vdso32.lds +=3D -P -C -Upowerpc
->
->  # Force dependency (incbin is bad)
-> diff --git a/arch/powerpc/kernel/vdso64/Makefile b/arch/powerpc/kernel/vd=
-so64/Makefile
-> index 38c317f25141..c737b3ea3207 100644
-> --- a/arch/powerpc/kernel/vdso64/Makefile
-> +++ b/arch/powerpc/kernel/vdso64/Makefile
-> @@ -17,7 +17,7 @@ ccflags-y :=3D -shared -fno-common -fno-builtin -nostdl=
-ib \
->  asflags-y :=3D -D__VDSO64__ -s
->
->  obj-y +=3D vdso64_wrapper.o
-> -extra-y +=3D vdso64.lds
-> +targets +=3D vdso64.lds
->  CPPFLAGS_vdso64.lds +=3D -P -C -U$(ARCH)
->
->  # Force dependency (incbin is bad)
-> diff --git a/arch/s390/kernel/vdso64/Makefile b/arch/s390/kernel/vdso64/M=
-akefile
-> index 4a66a1cb919b..d0d406cfffa9 100644
-> --- a/arch/s390/kernel/vdso64/Makefile
-> +++ b/arch/s390/kernel/vdso64/Makefile
-> @@ -25,7 +25,7 @@ $(targets:%=3D$(obj)/%.dbg): KBUILD_CFLAGS =3D $(KBUILD=
-_CFLAGS_64)
->  $(targets:%=3D$(obj)/%.dbg): KBUILD_AFLAGS =3D $(KBUILD_AFLAGS_64)
->
->  obj-y +=3D vdso64_wrapper.o
-> -extra-y +=3D vdso64.lds
-> +targets +=3D vdso64.lds
->  CPPFLAGS_vdso64.lds +=3D -P -C -U$(ARCH)
->
->  # Disable gcov profiling, ubsan and kasan for VDSO code
+On 2020-09-01 06:29, Sergei Shtepa wrote:
+> However, the same time requirement also presents a big immediate problem -
+> as until this is done, over a hundred thousands of Linux users will not be
+> able to protect their servers running the impacted kernels
+> (our backup agent is free).
+> They will be forced to stop using the new version of the kernel
+> (or take a risk of data loss).
 
-For nds32:
+How can backup software work at the block layer level without any cooperation
+of higher layers? How is it e.g. guaranteed that backups are crash-consistent?
 
-Acked-by: Greentime Hu <green.hu@gmail.com>
+What happens if the network connection with the backup server is lost? How
+much time is needed to recover after the network connection has been restored?
+Does the contents of the entire block device has to be resent to the backup
+server?
+
+Thanks,
+
+Bart.
