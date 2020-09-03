@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC40C43461
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 20:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B76C1C2D0E2
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 20:39:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D752A20678
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 20:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B19420678
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 20:39:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="U4ImwICE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="b5tk49KK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729238AbgICUiS (ORCPT
+        id S1729464AbgICUiu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 3 Sep 2020 16:38:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35502 "EHLO
+        Thu, 3 Sep 2020 16:38:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729506AbgICUbr (ORCPT
+        with ESMTP id S1729450AbgICUbW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 3 Sep 2020 16:31:47 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A61C0619C8
-        for <linux-kbuild@vger.kernel.org>; Thu,  3 Sep 2020 13:31:16 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id h191so705796qke.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Sep 2020 13:31:16 -0700 (PDT)
+        Thu, 3 Sep 2020 16:31:22 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C851C0611E1
+        for <linux-kbuild@vger.kernel.org>; Thu,  3 Sep 2020 13:31:08 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id p20so2531359qvl.4
+        for <linux-kbuild@vger.kernel.org>; Thu, 03 Sep 2020 13:31:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=LIPIlpem17zgU4dqkoYs+mU8v2ON9dEQqlQffjFpd2g=;
-        b=U4ImwICEFBq2oFmNCINYdH0F9HYGmqQ3UN6AytIDExw8upDRXh9Ix/GvPYcxLnHuju
-         9UTLnpJ98fdkotKWLguXsBoVvPoAqDS7O4xf6Go646tJFpPkh1vQI423uv4kjMzUeqzr
-         NWrbgDl++pGaJxpZCWVqElkHeOVzIUNLgCK2UWuSiwcSQGj2pfVFzBRmxXXI1BUXRl+7
-         Ju0vfjaDaoIR0UsUTfn0sHidLpf3qUkfPm9doFl52D1yRDeqrjU35dLcVrrBj4JG1eYv
-         y/8O8ygKSLIOZxEwwSS479fp/4ePp+GZhtY3mcL5TmGxtCVb4XBFZ/97s3PvmBJIHir+
-         GFxQ==
+        bh=wK1JwNZBEF40N5fcic2drFAc7pvy5JBQESDnmBr5608=;
+        b=b5tk49KKD8j0uO3HReOPELDX6rYUucGnG4IzHyDxn6fDckayxGEUatWRFd27ufwbN3
+         LjHaKo6hawTTCLkFq/jB8M9122OZSHcLgzaa1kZ5TFxETy4pPx2LsDP8oo9eOYjDXBz7
+         gNpyQkQIvkYvnL5+EjfoeJN95WFjivWmiIbSp2qvJ03cyGsJSq1lYlWvaFOZhIdNaq+5
+         j6+vcEESIOZXWOu6Is/sHhbycCztGA5Mt6Pgiu+Wg6bUXf3c+poWdfZZ6+6srlaCIaFO
+         pcBRWSF8ZbXrir1GVg/PkMsK2/dchsv3U7ph0bwwq2vz87O6fqdiQ1ehoBzkWoRkVWQL
+         mL3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=LIPIlpem17zgU4dqkoYs+mU8v2ON9dEQqlQffjFpd2g=;
-        b=iiscB1EpSYd1c2FV7PY/y+ib4f2i6NWQ1mB0aPKY410nlFcIu1fucxnnt5aViiBXzY
-         0FUO8XyH34ruo0LMv7/UPP4IK/CRv5PlPzv92RSZhyY92Akeyc+/CHy5JcXjERKUrCzW
-         TnPui/4I5TFudH4Fn+cTYSzJ31OiUujmzo/gO1CiJJYpELnU6R05LtnaRF/yDNkFVNfB
-         wROCgahUdAa7msCt8NLUREvfd3CBXKaFPIfeShsIdbtumODqMRDtewqQjY/YE8SNfemR
-         8Fo2lK7XEgy5dwvJDWC65qkXasbR4933MHKGSlMLYjKRGekMcd/AG1XrKqAL+dXi2WoP
-         B6mQ==
-X-Gm-Message-State: AOAM530i2QHYf8s69le96WILWIbZuI9KpfiTC6hg1rOt7EFpKSPrcMMS
-        kzNY/1zxVVLYLvu+mnvRa5uEzX4PCLD2I/uDs8w=
-X-Google-Smtp-Source: ABdhPJw9de2LNzKwdf2geUU36TsETNvofuiC1pIa8fKhxrhhm9sAzktGq1uX0m6ta07g36kYHSBpcNCRixPOU97/hr4=
+        bh=wK1JwNZBEF40N5fcic2drFAc7pvy5JBQESDnmBr5608=;
+        b=IxiD+40m4SIZpBfHNZobSCv1VqMArN1GQUA7fhkry42WSNx4ZTVC6meEuZZ9bhGM/R
+         RnCxEwYHERR57s5B+94xqnTh91tLpRCA6neisQA4GU3fxzCGXLw6JOdlwijo8DbNT2Ua
+         TzphZHJQG8LOWuPyuxg5ubTsZQC4sd8SSutsyYXBcjNhJQY7TVgk8ejEKLYdolQF4KW8
+         4gmICXFy7n2YwqYEUkS7CcGDWHZPm5lC6WJe913a5jEjfsA9Sv04PjOF+d7SwiaC7VCM
+         SCHRPJD3tnvi2eFlumFddKNNYgJ8rQTOANc10hkgkTVKqrUvrcGo6zi5FHr11+ZxzbMS
+         3KGg==
+X-Gm-Message-State: AOAM5307njWK8enfQ3XJMC2yIBbEe+49eIb+lLK9ds9O9ULDGJ4SOWye
+        H2ujPsaJ8HJctOLn/LC+HzxmG5f1wwLmYsmGaWU=
+X-Google-Smtp-Source: ABdhPJz4POZjDvj1G4FCKsXnFupG7AWZGi6zga2my5XWqYNc1MAqG6z13ElXHTlIUNSUYKf3wk2VH6yuqmwJK87vTpw=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a0c:e892:: with SMTP id
- b18mr3645531qvo.4.1599165075210; Thu, 03 Sep 2020 13:31:15 -0700 (PDT)
-Date:   Thu,  3 Sep 2020 13:30:35 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a0c:f982:: with SMTP id
+ t2mr3575617qvn.5.1599165067207; Thu, 03 Sep 2020 13:31:07 -0700 (PDT)
+Date:   Thu,  3 Sep 2020 13:30:31 -0700
 In-Reply-To: <20200903203053.3411268-1-samitolvanen@google.com>
-Message-Id: <20200903203053.3411268-11-samitolvanen@google.com>
+Message-Id: <20200903203053.3411268-7-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200624203200.78870-1-samitolvanen@google.com> <20200903203053.3411268-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.526.ge36021eeef-goog
-Subject: [PATCH v2 10/28] kbuild: lto: fix module versioning
+Subject: [PATCH v2 06/28] objtool: Don't autodetect vmlinux.o
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>
@@ -84,217 +84,54 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_MODVERSIONS, version information is linked into each
-compilation unit that exports symbols. With LTO, we cannot use this
-method as all C code is compiled into LLVM bitcode instead. This
-change collects symbol versions into .symversions files and merges
-them in link-vmlinux.sh where they are all linked into vmlinux.o at
-the same time.
+With LTO, we run objtool on vmlinux.o, but don't want noinstr
+validation. This change requires --vmlinux to be passed to objtool
+explicitly.
 
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- .gitignore               |  1 +
- Makefile                 |  3 ++-
- arch/Kconfig             |  1 -
- scripts/Makefile.build   | 33 +++++++++++++++++++++++++++++++--
- scripts/Makefile.modpost |  2 ++
- scripts/link-vmlinux.sh  | 25 ++++++++++++++++++++++++-
- 6 files changed, 60 insertions(+), 5 deletions(-)
+ scripts/link-vmlinux.sh       |  2 +-
+ tools/objtool/builtin-check.c | 10 +---------
+ 2 files changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 162bd2b67bdf..06e76dc39ffe 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -41,6 +41,7 @@
- *.so.dbg
- *.su
- *.symtypes
-+*.symversions
- *.tab.[ch]
- *.tar
- *.xz
-diff --git a/Makefile b/Makefile
-index dd49eaea7c25..2752be67b460 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1847,7 +1847,8 @@ clean: $(clean-dirs)
- 		-o -name '.tmp_*.o.*' \
- 		-o -name '*.c.[012]*.*' \
- 		-o -name '*.ll' \
--		-o -name '*.gcno' \) -type f -print | xargs rm -f
-+		-o -name '*.gcno' \
-+		-o -name '*.*.symversions' \) -type f -print | xargs rm -f
- 
- # Generate tags for editors
- # ---------------------------------------------------------------------------
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 11bb2f48dfe8..71392e4a8900 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -602,7 +602,6 @@ config LTO_CLANG
- 	depends on !FTRACE_MCOUNT_RECORD
- 	depends on !KASAN
- 	depends on !GCOV_KERNEL
--	depends on !MODVERSIONS
- 	select LTO
- 	help
-           This option enables Clang's Link Time Optimization (LTO), which
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a5f4b5d407e6..c348e6d6b436 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -166,6 +166,15 @@ ifdef CONFIG_MODVERSIONS
- #   the actual value of the checksum generated by genksyms
- # o remove .tmp_<file>.o to <file>.o
- 
-+ifdef CONFIG_LTO_CLANG
-+# Generate .o.symversions files for each .o with exported symbols, and link these
-+# to the kernel and/or modules at the end.
-+cmd_modversions_c =								\
-+	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
-+		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-+		    > $@.symversions;						\
-+	fi;
-+else
- cmd_modversions_c =								\
- 	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
- 		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-@@ -177,6 +186,7 @@ cmd_modversions_c =								\
- 		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
- 	fi
- endif
-+endif
- 
- ifdef USE_RECORDMCOUNT
- # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
-@@ -393,6 +403,18 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
- $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
- $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- 
-+# combine symversions for later processing
-+quiet_cmd_update_lto_symversions = SYMVER  $@
-+ifeq ($(CONFIG_LTO_CLANG) $(CONFIG_MODVERSIONS),y y)
-+      cmd_update_lto_symversions =					\
-+	rm -f $@.symversions						\
-+	$(foreach n, $(filter-out FORCE,$^),				\
-+		$(if $(wildcard $(n).symversions),			\
-+			; cat $(n).symversions >> $@.symversions))
-+else
-+      cmd_update_lto_symversions = echo >/dev/null
-+endif
-+
- #
- # Rule to compile a set of .o files into one .a file (without symbol table)
- #
-@@ -400,8 +422,11 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- quiet_cmd_ar_builtin = AR      $@
-       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
- 
-+quiet_cmd_ar_and_symver = AR      $@
-+      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
-+
- $(obj)/built-in.a: $(real-obj-y) FORCE
--	$(call if_changed,ar_builtin)
-+	$(call if_changed,ar_and_symver)
- 
- #
- # Rule to create modules.order file
-@@ -421,8 +446,11 @@ $(obj)/modules.order: $(obj-m) FORCE
- #
- # Rule to compile a set of .o files into one .a file (with symbol table)
- #
-+quiet_cmd_ar_lib = AR      $@
-+      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
-+
- $(obj)/lib.a: $(lib-y) FORCE
--	$(call if_changed,ar)
-+	$(call if_changed,ar_lib)
- 
- # NOTE:
- # Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
-@@ -431,6 +459,7 @@ $(obj)/lib.a: $(lib-y) FORCE
- ifdef CONFIG_LTO_CLANG
- quiet_cmd_link_multi-m = AR [M]  $@
- cmd_link_multi-m =						\
-+	$(cmd_update_lto_symversions);				\
- 	rm -f $@; 						\
- 	$(AR) rcsTP$(KBUILD_ARFLAGS) $@ $(filter %.o,$^)
- else
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index a70f1f7da6aa..f9718bf4172d 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -110,6 +110,8 @@ prelink-ext = .lto
- quiet_cmd_cc_lto_link_modules = LTO [M] $@
- cmd_cc_lto_link_modules =						\
- 	$(LD) $(ld_flags) -r -o $@					\
-+		$(shell [ -s $(@:.lto.o=.o.symversions) ] &&		\
-+			echo -T $(@:.lto.o=.o.symversions))		\
- 		--whole-archive $(filter-out FORCE,$^)
- 
- %.lto.o: %.o FORCE
 diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index ebb9f912aab6..3e99a19b9195 100755
+index e6e2d9e5ff48..372c3719f94c 100755
 --- a/scripts/link-vmlinux.sh
 +++ b/scripts/link-vmlinux.sh
-@@ -43,11 +43,28 @@ info()
- 	fi
- }
+@@ -64,7 +64,7 @@ objtool_link()
+ 	local objtoolopt;
  
-+# If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
-+# .tmp_symversions.lds
-+gen_symversions()
-+{
-+	info GEN .tmp_symversions.lds
-+	rm -f .tmp_symversions.lds
-+
-+	for a in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
-+		for o in $(${AR} t $a 2>/dev/null); do
-+			if [ -f ${o}.symversions ]; then
-+				cat ${o}.symversions >> .tmp_symversions.lds
-+			fi
-+		done
-+	done
-+}
-+
- # Link of vmlinux.o used for section mismatch analysis
- # ${1} output file
- modpost_link()
+ 	if [ -n "${CONFIG_VMLINUX_VALIDATION}" ]; then
+-		objtoolopt="check"
++		objtoolopt="check --vmlinux"
+ 		if [ -z "${CONFIG_FRAME_POINTER}" ]; then
+ 			objtoolopt="${objtoolopt} --no-fp"
+ 		fi
+diff --git a/tools/objtool/builtin-check.c b/tools/objtool/builtin-check.c
+index 71595cf4946d..eaa06eb18690 100644
+--- a/tools/objtool/builtin-check.c
++++ b/tools/objtool/builtin-check.c
+@@ -41,18 +41,10 @@ const struct option check_options[] = {
+ 
+ int cmd_check(int argc, const char **argv)
  {
- 	local objects
-+	local lds=""
+-	const char *objname, *s;
+-
+ 	argc = parse_options(argc, argv, check_options, check_usage, 0);
  
- 	objects="--whole-archive				\
- 		${KBUILD_VMLINUX_OBJS}				\
-@@ -57,6 +74,11 @@ modpost_link()
- 		--end-group"
+ 	if (argc != 1)
+ 		usage_with_options(check_usage, check_options);
  
- 	if [ -n "${CONFIG_LTO_CLANG}" ]; then
-+		if [ -n "${CONFIG_MODVERSIONS}" ]; then
-+			gen_symversions
-+			lds="${lds} -T .tmp_symversions.lds"
-+		fi
-+
- 		# This might take a while, so indicate that we're doing
- 		# an LTO link
- 		info LTO ${1}
-@@ -64,7 +86,7 @@ modpost_link()
- 		info LD ${1}
- 	fi
- 
--	${LD} ${KBUILD_LDFLAGS} -r -o ${1} ${objects}
-+	${LD} ${KBUILD_LDFLAGS} -r -o ${1} ${lds} ${objects}
+-	objname = argv[0];
+-
+-	s = strstr(objname, "vmlinux.o");
+-	if (s && !s[9])
+-		vmlinux = true;
+-
+-	return check(objname, false);
++	return check(argv[0], false);
  }
- 
- objtool_link()
-@@ -242,6 +264,7 @@ cleanup()
- {
- 	rm -f .btf.*
- 	rm -f .tmp_System.map
-+	rm -f .tmp_symversions.lds
- 	rm -f .tmp_vmlinux*
- 	rm -f System.map
- 	rm -f vmlinux
 -- 
 2.28.0.402.g5ffc5be6b7-goog
 
