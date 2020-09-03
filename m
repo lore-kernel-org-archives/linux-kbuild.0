@@ -2,70 +2,66 @@ Return-Path: <SRS0=yz/N=CM=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4C6C433E2
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 02:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F004BC433E7
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 02:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 223FE20773
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 02:18:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gX3y3MR8"
+	by mail.kernel.org (Postfix) with ESMTP id C3F442086A
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Sep 2020 02:43:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599101029;
+	bh=wSdnK9EK3cn9BWVceilg/laGb14SLihQHTT+htVISis=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=G8uxFpvOWyp1SMKezabtnstFs67jHqHl9L/7BvcQW3TvspdGwnThZc5Tq283MKPVs
+	 xuPo0RWdZycM8rBV8UCMZvjolDyi8rFtvMUbk99cqg72ieBL5Tpz4G+93VgG48FaB2
+	 hEcgVbY+dVJWFQqQRysnV1AasCLb2VnsmLHjXLxU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726526AbgICCSy (ORCPT
+        id S1727944AbgICCns (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 2 Sep 2020 22:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726177AbgICCSx (ORCPT
+        Wed, 2 Sep 2020 22:43:48 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:17934 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726523AbgICCns (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Sep 2020 22:18:53 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9C6C061244;
-        Wed,  2 Sep 2020 19:18:53 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id cr8so609081qvb.10;
-        Wed, 02 Sep 2020 19:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cLhB9WMKmrTzJrIfToVBunW2YW14xJnlM/mfN1FhJG4=;
-        b=gX3y3MR80ivVl7Wr5JGLNIUlIupUMgrEYDyZ/eVweQaVyjyN3T//LKvYJWXrCsSQXH
-         GkfX3bls2sQNeJJi3GvVbIli3Ui0z+JqV5LBfGwi/XyR+qCwZQ4UX0+b+zqbEMe56iKO
-         P6wQmvKxaIMDqHewpXCNWA8Gooxol7hQjTTh5UJC0PFZ17wNfUsQV8HoELxK6/sjuQ2h
-         hnkg5DcOhxev4LgPT8Z6m7m5nxk3Na9kboOMBxp16mJvj+yrBr26YrTKm1Vi964JHvfx
-         ogr3ugUlSAV57RoqkIFTdl2Zyg2WafQtECslol5FOFGwFrXdWzT/V7aTbSI7VRdNCZ+V
-         FTqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cLhB9WMKmrTzJrIfToVBunW2YW14xJnlM/mfN1FhJG4=;
-        b=Sazb7mc/lHD10Ij5pIV7f69LSEXwMNkHA4V55bnnUQFSIH/u57dBIjNpj7RSWha8Fj
-         4cuzSiFbxTaXIIbaLjr4wO/49OiZar1v9VAnzaHCtwVSOwiP3ZTy4SnvAMBR0Igv9f7q
-         MgHLHiMVSWs9WfijrAdY4+gmFrwJgtW07AkHl8j0P1lRRs9UnnjjmHQqDVp3onuEh30n
-         X+uj8M4P7f51655LcAI3jCIY4lQaF+2U5kWaYVe50bTl/B5cyDlX2fGgcWwLs1cNL6+Y
-         mlvLTQ0miFsbHBDH5DEUAtvl2r92ZEAfdniOkOBFn8S0bpr2bnjdf7134fTCV5ZleNN/
-         ik0Q==
-X-Gm-Message-State: AOAM531ouWzeiloRZhYdWHoarImpDtH0Cl5KtZ4jUhyncZRyUBMmBSVT
-        cJaGa8taHcjlKeyquuM/77uKd+EcsmKptezA7EQ=
-X-Google-Smtp-Source: ABdhPJys6BLrvwI+u7/CfWKaY93C9EOeqt1aHbH1XCRC2U2Q3WI/hnaJWrQ5dA5Nv0Zk4NsGH3OxJFjcvT9WmKjFwUY=
-X-Received: by 2002:a0c:e188:: with SMTP id p8mr395319qvl.9.1599099532757;
- Wed, 02 Sep 2020 19:18:52 -0700 (PDT)
+        Wed, 2 Sep 2020 22:43:48 -0400
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 0832hHWY027036;
+        Thu, 3 Sep 2020 11:43:18 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 0832hHWY027036
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1599100998;
+        bh=T86p3R1UH15ZPoKGCOPyksmepZB9QQB30q3jQAGkwRE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=fV/JumyRvG8kodg5McCAZLsnkb1n5nP8xONCgYzdUr4ntano6BjPuu52cRhTcnJuN
+         1XFb0Kc1u5NqxbCunIveZs4wmdICx+N351PtrxPDUhkCBBsIq/1Mh39yCfVfVnTCfd
+         g+ZIYGRci3JLMsyAEZPU7aR7n/82eWXLsGCspzKdIv9nQXR1PmRY5LkIXTpPUm5C1P
+         GTZaxBpSarQ+0NXqiDLFQXdFpNqz56bAaQxW1Y96r6ncl4JwFSgRmVnsUjP7Tj6D8L
+         4ICJu4fa+15yMxo1w33F7s3kPMkNkLeFRZAJz5/cEZwG+jmkewwrSiswOjtoTCfufP
+         cOHFIHLalgdrg==
+X-Nifty-SrcIP: [209.85.215.177]
+Received: by mail-pg1-f177.google.com with SMTP id d19so860558pgl.10;
+        Wed, 02 Sep 2020 19:43:18 -0700 (PDT)
+X-Gm-Message-State: AOAM530OXpBLsYE0b8s7QRVhXxFx+MKfOuJ/u9KSryuAqm9BkG35cqgZ
+        odJE3HGJGty9698b1yMSGJMp4FxhYUDm7Abz4BA=
+X-Google-Smtp-Source: ABdhPJzWZumYo+YwOqw2M5VZl8AaHtf7nEfOU3fo5VFC0j5NrdhFt1CSGIFbvlah7dSMPqXRlDT8nfl8QHu77ZME7Iw=
+X-Received: by 2002:a63:541e:: with SMTP id i30mr937750pgb.47.1599100997560;
+ Wed, 02 Sep 2020 19:43:17 -0700 (PDT)
 MIME-Version: 1.0
 References: <be80ceda-596b-03aa-394f-166cc6388aa0@infradead.org>
  <CAK7LNAQekh08D6=+CqRWiB7F4KCLOgSK9oof8ArVUvMc7B1YXQ@mail.gmail.com>
- <CALaQ_hq01BCA7=sVJjm6LQrjjBFy1V79uUXcRXeLBB5g3k9M1Q@mail.gmail.com> <CAK7LNARp41EXMmT+ghGVw0Ew8wgHND+Ufn_uCevaVk+OP2-UFQ@mail.gmail.com>
-In-Reply-To: <CAK7LNARp41EXMmT+ghGVw0Ew8wgHND+Ufn_uCevaVk+OP2-UFQ@mail.gmail.com>
-From:   Nathan Royce <nroycea+kernel@gmail.com>
-Date:   Wed, 2 Sep 2020 21:18:41 -0500
-Message-ID: <CALaQ_hrs8piRh2-JacEkmrHZQ=rM7yvZUStWfO0YPhNRRYiSBw@mail.gmail.com>
+ <CALaQ_hq01BCA7=sVJjm6LQrjjBFy1V79uUXcRXeLBB5g3k9M1Q@mail.gmail.com>
+ <CAK7LNARp41EXMmT+ghGVw0Ew8wgHND+Ufn_uCevaVk+OP2-UFQ@mail.gmail.com> <CALaQ_hrs8piRh2-JacEkmrHZQ=rM7yvZUStWfO0YPhNRRYiSBw@mail.gmail.com>
+In-Reply-To: <CALaQ_hrs8piRh2-JacEkmrHZQ=rM7yvZUStWfO0YPhNRRYiSBw@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 3 Sep 2020 11:42:41 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQWLbH2+01_-Z6ts899FbA0SWndXAc4mjzNT7_BNT_Uwg@mail.gmail.com>
+Message-ID: <CAK7LNAQWLbH2+01_-Z6ts899FbA0SWndXAc4mjzNT7_BNT_Uwg@mail.gmail.com>
 Subject: Re: [PATCH] kconfig: streamline_config.pl: check defined(ENV
  variable) before using it
-To:     Masahiro Yamada <masahiroy@kernel.org>
+To:     Nathan Royce <nroycea+kernel@gmail.com>
 Cc:     Randy Dunlap <rdunlap@infradead.org>,
         linux-kbuild <linux-kbuild@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -77,21 +73,16 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Heard, but all the same if it isn't important (which I'm assuming),
-I'd just as soon be left out of it. That's just the way I am in
-general, not wanting to be seen unless I have to be seen. Thanks
-though.
+On Thu, Sep 3, 2020 at 11:18 AM Nathan Royce <nroycea+kernel@gmail.com> wrote:
+>
+> Heard, but all the same if it isn't important (which I'm assuming),
+> I'd just as soon be left out of it. That's just the way I am in
+> general, not wanting to be seen unless I have to be seen. Thanks
+> though.
 
-On Wed, Sep 2, 2020 at 9:14 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Even if you do not write the code,
-> reporting bugs is a great contribution,
-> and the Reported-by exists for that, I think.
->
-> So, I just want to add your Reported-by tag
-> (if you do not mind).
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+OK, I will drop your tag.
+
+
+-- 
+Best Regards
+Masahiro Yamada
