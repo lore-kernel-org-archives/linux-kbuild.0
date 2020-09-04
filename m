@@ -2,82 +2,68 @@ Return-Path: <SRS0=YWiN=CN=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B5EC43461
-	for <linux-kbuild@archiver.kernel.org>; Fri,  4 Sep 2020 20:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A08EC433E2
+	for <linux-kbuild@archiver.kernel.org>; Fri,  4 Sep 2020 20:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F095208C7
-	for <linux-kbuild@archiver.kernel.org>; Fri,  4 Sep 2020 20:14:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 417B821481
+	for <linux-kbuild@archiver.kernel.org>; Fri,  4 Sep 2020 20:49:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599252582;
+	bh=Dbe+ZU7NeU/LYWkuVfmdnBJ892z1QCYezrf2zSz/xc4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=mUOUTO087HKqdeh55F4fXLujXKqzG43NWFX9+LeYkhsQipduNIMGRBwaF4ekoSggI
+	 2LB7+4LrL0aTyd360C+kQvCuQfBC2+RkCQo8vkWV6ItFK77mkV9rCZhhfzB6zoWPb2
+	 NCKickif4fSGKGSio3TyWBRw76kPROy5nCk9rZ4Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728024AbgIDUOw (ORCPT
+        id S1728145AbgIDUt3 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 4 Sep 2020 16:14:52 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:37459 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726791AbgIDUOv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Sep 2020 16:14:51 -0400
-Received: by mail-lj1-f193.google.com with SMTP id w14so9435116ljj.4;
-        Fri, 04 Sep 2020 13:14:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3XhSnjbH4LNvROC1KGa4RbBBuJXx+HscGx/nuzRhKi4=;
-        b=csZ9sQX4GAGvZlWqM5lO8SFjSpai02VKLj37OFXJHhmyYVCn19+zE4Uisx7tojS2i8
-         YbHo4WEwvJUPNHhf+idQyagjDWx7RETME7VsDtnk/D2TlieLK/hUTOLvN42cR5kJoF9d
-         bkMHTa8zYrKGMtcVQtLpkJNakcdbZA0SV7lYv2n2UsZ2gmgJWaQPRq4nzWoFTfoSfmoZ
-         Uuh6HGSvjnNNTe3tgR73Uvj2IY/i4S4pTr2gJmVyNvupug/RmccaBO1jFFMs5fC1fn6h
-         Q4WdP3lmw7VWixfD8rRstq2ccVQIFWEuTRXUCs2UgryjwnHg/7eh3CGyPdgfLCL3Okvs
-         9KIQ==
-X-Gm-Message-State: AOAM532P0BvjivCVBg1p/uUXnF66gWwgAFq66CwhCGX/umHornWmEowA
-        VZODoeIBSU84KfNnv3iHo1Q=
-X-Google-Smtp-Source: ABdhPJzXJOW130FzdJUGS6UuQt5VBqDxfzwsc9hptue+bOvUkgYU2sQ6YEi41Af7ZkI6ITGH3cgu4w==
-X-Received: by 2002:a05:651c:1253:: with SMTP id h19mr2118949ljh.55.1599250489648;
-        Fri, 04 Sep 2020 13:14:49 -0700 (PDT)
-Received: from localhost.localdomain (broadband-37-110-38-130.ip.moscow.rt.ru. [37.110.38.130])
-        by smtp.googlemail.com with ESMTPSA id a16sm1468533ljj.108.2020.09.04.13.14.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Sep 2020 13:14:49 -0700 (PDT)
-From:   Denis Efremov <efremov@linux.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>, Guo Ren <guoren@kernel.org>
-Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
-        linux-csky@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH 2/2] csky: Drop GZFLAGS definition
-Date:   Fri,  4 Sep 2020 23:12:58 +0300
-Message-Id: <20200904201258.795438-3-efremov@linux.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904201258.795438-1-efremov@linux.com>
-References: <20200904201258.795438-1-efremov@linux.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Fri, 4 Sep 2020 16:49:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60990 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728075AbgIDUtL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 4 Sep 2020 16:49:11 -0400
+Subject: Re: [GIT PULL] Kbuild fixes for v5.9-rc4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599252550;
+        bh=Dbe+ZU7NeU/LYWkuVfmdnBJ892z1QCYezrf2zSz/xc4=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=JCP9pS1/1Pj5XfNJs2EHHGsHqwvWtCrDw2ZHVy3qTgYjaKadwQLwaOYJYV0WdCOSa
+         Z3cwt+/SkvDTBnwjEUpMdjk+dS0KEaKFV30MY+wDdIHEAUVbOY+AZNK3rc2CO8uQPc
+         uyM0VHKOySthRoUOSNcIjwXNw3pi3VtTAD9Ltg+k=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNARx_s1pyrU=PKSWLr6nX7=+=U78OjXVNdX7B2-bXzpX6Q@mail.gmail.com>
+References: <CAK7LNARx_s1pyrU=PKSWLr6nX7=+=U78OjXVNdX7B2-bXzpX6Q@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kbuild.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAK7LNARx_s1pyrU=PKSWLr6nX7=+=U78OjXVNdX7B2-bXzpX6Q@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.9-2
+X-PR-Tracked-Commit-Id: 163e0c27fead96fd6804fa59a55fc4f841d38db8
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 41bef91c8aa351255cd19e7e72608ee86f7f4bab
+Message-Id: <159925255074.25529.6568571537959073713.pr-tracker-bot@kernel.org>
+Date:   Fri, 04 Sep 2020 20:49:10 +0000
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Drop the definition of GZFLAGS because it's not used.
+The pull request you sent on Fri, 4 Sep 2020 21:21:15 +0900:
 
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- arch/csky/Makefile | 1 -
- 1 file changed, 1 deletion(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.9-2
 
-diff --git a/arch/csky/Makefile b/arch/csky/Makefile
-index 37f593a4bf53..715b839bf998 100644
---- a/arch/csky/Makefile
-+++ b/arch/csky/Makefile
-@@ -1,6 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
- OBJCOPYFLAGS		:=-O binary
--GZFLAGS			:=-9
- 
- ifdef CONFIG_CPU_HAS_FPU
- FPUEXT = f
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/41bef91c8aa351255cd19e7e72608ee86f7f4bab
+
+Thank you!
+
 -- 
-2.26.2
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
