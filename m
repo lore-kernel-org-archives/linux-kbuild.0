@@ -2,90 +2,174 @@ Return-Path: <SRS0=D3sw=CR=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC282C433E2
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Sep 2020 20:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423BDC43461
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Sep 2020 21:08:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4A7720732
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Sep 2020 20:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599598602;
-	bh=pYo35JiaNcZMuL8vZ7AtSkgG/jNrI3ubDn9xCJSrOvQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=eKsKDcWQJveVzSdCLqKW7HG/5a4srmKrmkSLAIX0OIBpVXaaZjT59J69bGUTOQIYn
-	 AJZREgWZBPhXBg2cRG/NKzI2+6GYuquXkeuaWjq2iXVuQTxZWuZh3l/ezDVCteGPue
-	 OAESCzPINGVvqLT3j1FtMrwMVs4FUs0YJDBT+mHU=
+	by mail.kernel.org (Postfix) with ESMTP id 038042137B
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Sep 2020 21:08:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a7GjBHoh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729305AbgIHU4l (ORCPT
+        id S1730176AbgIHVIC (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 8 Sep 2020 16:56:41 -0400
-Received: from conuserg-07.nifty.com ([210.131.2.74]:32333 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729941AbgIHU4i (ORCPT
+        Tue, 8 Sep 2020 17:08:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728197AbgIHVH4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Sep 2020 16:56:38 -0400
-Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 088Ku0N4015321;
-        Wed, 9 Sep 2020 05:56:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 088Ku0N4015321
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1599598561;
-        bh=LX+XJs0yGQNfGdRdOODWn2d8GyxE3kmbFFKuth+1obY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=c13f+fwghiGlkOh/iS+d87XXylCY1v40ms1Bi3rnW2Y42HlCZQbVDcZ2lYSmCS9/3
-         E9k8Jum3BUAqWqYh/EymQCGWPXbtobclHxwLqdGIDOJ/RM654+nmCEvinbKDtG+miv
-         LhGMzA39jvrOEj2ceix01rJB+djf9mNBa2ReO6UNjJJ/iE2bHybGgADZn2+zxbFEm7
-         2F/3mEQq7JxDvBO8RudfxYdFaIOYOsL4f0/j8C290DCjDX33Hwjk8A0fk09/Ynwhy9
-         OoatrKPPo7wZQ3WJH4oM3uTwwRoDVfwvSk6udWwlBVHQgiwdnq0ja3T7xFHvLxhaCy
-         HnZ1QKWhlZkRw==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] kbuild: do not create built-in objects for external module builds
-Date:   Wed,  9 Sep 2020 05:55:57 +0900
-Message-Id: <20200908205557.2746352-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        Tue, 8 Sep 2020 17:07:56 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41749C061573
+        for <linux-kbuild@vger.kernel.org>; Tue,  8 Sep 2020 14:07:56 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id d6so188766pfn.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Sep 2020 14:07:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Wm1YZJP5IHcZuymW2XEKoD0pUveQe7CoNm7r9bi/W1k=;
+        b=a7GjBHohAGSJ4PnMwooOuv5ACDnGE0C26cMuDHZo5+wvUiXv0xO8J2AUkV5JHb2FOP
+         ldjjgjbqwFWCWq9Zw5W0LDK9PPh+xyYdY8hA2Wm743DJYsOoYFFThh9hJZBSdXRUCfFd
+         cvOqVo7OMhMtAPX/2sp6Mz72uNjnDoYA9p//eZpjffoGYl/RG2xg8YzDi7C2OcRP5Eml
+         H1IcomixFJ6jH0HEQSWDpcx4jVmZUZKnlbr7q8YvW0FORqPMCHn3losN4VKggIRBYbX6
+         PtF8QxirnS7Espc0n9SSG2KH2rmz6/CIoNi2jCnfqCKNNgM5GJGJNXvMfd4DY5Oii+fR
+         uTRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Wm1YZJP5IHcZuymW2XEKoD0pUveQe7CoNm7r9bi/W1k=;
+        b=b1fmIB0y7M/ImsYcvgwIUxDAbeHmidSEsFtD/hLdels17+m9McqIW6ADk7We2qigTl
+         LbQ4Yq7xXSP8tE0WWbMwE/bdjy0Y6Dji/VspB2TCZMfMXlBX/DS7agywhNKdrkvWcZLZ
+         UgBHQk9vtyEPrr0i6ZQcooUjwTbrfzCUImoTJEWeutUxOjor/0LEmapQKFSm71LNY5Cq
+         5x/fX1XdIfcmFAobWL+UZ9K+BuqCU1eUq9BR0L6Is4MB0MeX5WPlX7bUB055pS2T84YY
+         3do6dNnbjZFhlm/YTqhaP8RLL8s3miUaV0RB1/mJfsQ5cUxlK42KxHfj3HeB8ukYP6aM
+         0U3A==
+X-Gm-Message-State: AOAM5313mag3JhGTlwV+005rbdk2geiIpOLoXaYDk4Yx9uwDApQHAcSN
+        JWCikA3hcg127jto6b00iEIYAQ==
+X-Google-Smtp-Source: ABdhPJz6/bLvTnKJTjhD++qFUgr8FkqyQitq4tmijOh19Mp/UXDDqyF/xILPr1db4moWKg5d5d7hXA==
+X-Received: by 2002:a17:902:c38a:: with SMTP id g10mr511116plg.23.1599599275319;
+        Tue, 08 Sep 2020 14:07:55 -0700 (PDT)
+Received: from google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
+        by smtp.gmail.com with ESMTPSA id m188sm323916pfd.56.2020.09.08.14.07.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Sep 2020 14:07:54 -0700 (PDT)
+Date:   Tue, 8 Sep 2020 14:07:48 -0700
+From:   Sami Tolvanen <samitolvanen@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Will Deacon <will@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-pci@vger.kernel.org, X86 ML <x86@kernel.org>
+Subject: Re: [PATCH v2 13/28] kbuild: lto: merge module sections
+Message-ID: <20200908210748.GB1060586@google.com>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <20200903203053.3411268-1-samitolvanen@google.com>
+ <20200903203053.3411268-14-samitolvanen@google.com>
+ <CAK7LNARnh-7a8Lq-y2u72cnk2uxSuWxjaZ8Y-JHCYu5gwt7Ekg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARnh-7a8Lq-y2u72cnk2uxSuWxjaZ8Y-JHCYu5gwt7Ekg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-'make M=/path/to/your/external/module' creates a pointless built-in.a
-in the top of the external module directory because KBUILD_BUILTIN is
-set to 1.
+On Tue, Sep 08, 2020 at 12:25:54AM +0900, Masahiro Yamada wrote:
+> On Fri, Sep 4, 2020 at 5:31 AM Sami Tolvanen <samitolvanen@google.com> wrote:
+> >
+> > LLD always splits sections with LTO, which increases module sizes. This
+> > change adds a linker script that merges the split sections in the final
+> > module.
+> >
+> > Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> > ---
+> >  Makefile               |  2 ++
+> >  scripts/module-lto.lds | 26 ++++++++++++++++++++++++++
+> >  2 files changed, 28 insertions(+)
+> >  create mode 100644 scripts/module-lto.lds
+> >
+> > diff --git a/Makefile b/Makefile
+> > index c69e07bd506a..bb82a4323f1d 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -921,6 +921,8 @@ CC_FLAGS_LTO_CLANG += -fvisibility=default
+> >  # Limit inlining across translation units to reduce binary size
+> >  LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5
+> >  KBUILD_LDFLAGS += $(LD_FLAGS_LTO_CLANG)
+> > +
+> > +KBUILD_LDS_MODULE += $(srctree)/scripts/module-lto.lds
+> >  endif
+> >
+> >  ifdef CONFIG_LTO
+> > diff --git a/scripts/module-lto.lds b/scripts/module-lto.lds
+> > new file mode 100644
+> > index 000000000000..cbb11dc3639a
+> > --- /dev/null
+> > +++ b/scripts/module-lto.lds
+> > @@ -0,0 +1,26 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
+> > + * -ffunction-sections, which increases the size of the final module.
+> > + * Merge the split sections in the final binary.
+> > + */
+> > +SECTIONS {
+> > +       __patchable_function_entries : { *(__patchable_function_entries) }
+> > +
+> > +       .bss : {
+> > +               *(.bss .bss.[0-9a-zA-Z_]*)
+> > +               *(.bss..L*)
+> > +       }
+> > +
+> > +       .data : {
+> > +               *(.data .data.[0-9a-zA-Z_]*)
+> > +               *(.data..L*)
+> > +       }
+> > +
+> > +       .rodata : {
+> > +               *(.rodata .rodata.[0-9a-zA-Z_]*)
+> > +               *(.rodata..L*)
+> > +       }
+> > +
+> > +       .text : { *(.text .text.[0-9a-zA-Z_]*) }
+> > +}
+> > --
+> > 2.28.0.402.g5ffc5be6b7-goog
+> >
+> 
+> 
+> After I apply https://patchwork.kernel.org/patch/11757323/,
+> is it possible to do like this ?
+> 
+> 
+> #ifdef CONFIG_LTO
+> SECTIONS {
+>      ...
+> };
+> #endif
+> 
+> in scripts/module.lds.S
 
-Clear KBUILD_BUILTIN when we are building external modules so that
-'make M=...' and 'make M=... modules' work equivalently.
+Yes, that should work. I'll change this in v3 after your change is
+applied.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index ec2330ce0fc5..29878033f9d6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1692,7 +1692,8 @@ else # KBUILD_EXTMOD
- #                      Install the modules built in the module directory
- #                      Assumes install directory is already created
- 
--# We are always building modules
-+# We are always building only modules.
-+KBUILD_BUILTIN :=
- KBUILD_MODULES := 1
- 
- build-dirs := $(KBUILD_EXTMOD)
--- 
-2.25.1
-
+Sami
