@@ -2,83 +2,131 @@ Return-Path: <SRS0=5hFL=CT=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6902AC43461
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E097FC433E2
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 18:31:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03AA221941
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89C5821D40
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 18:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JzOHMYvn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UCp+FppW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726746AbgIJSEg (ORCPT
+        id S1726901AbgIJSap (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Sep 2020 14:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
+        Thu, 10 Sep 2020 14:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725991AbgIJSEC (ORCPT
+        with ESMTP id S1726738AbgIJS3m (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Sep 2020 14:04:02 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB91C061573;
-        Thu, 10 Sep 2020 11:04:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=lkjSc0oNKJsgw7+XYMws5doAYQy29kpb0njFyLk4OHE=; b=JzOHMYvnbMG1Qm3sPuHXlGnTVC
-        LG6XRhMA+jft1D3Up4XI2InlqjC2sHe1isMB+WETewtc0urNhE69YuNJjJCMMVwMgUrok5M+d/JcD
-        BGuRCsbK6A8jYxhbM+unXqN3rZoO4gqJNW8U7kLmM+KmUHL2LMhYnnnGie+qCeMDCyKyBiWvlt7yg
-        kdxUgZsXGnWvkE5fCvRys7ZJtP1NLYeW2Qgd/YhPkz15f7vpNnl/qi3NG+x+vs4ob+OmAYgY+fwos
-        Dp0Em1ckq7Sk+Guwm4y+o0q1Ns+wWCkXhkr9LdT6TLTkC9gP8nMGQWhhWnUizQTUJkbVml/udjAdr
-        sUTw/Phg==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kGQvJ-0003JI-Pt; Thu, 10 Sep 2020 18:03:53 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-doc@vger.kernel.org
-Subject: [PATCH] build: Fix documentation checking
-Date:   Thu, 10 Sep 2020 19:03:52 +0100
-Message-Id: <20200910180352.12632-1-willy@infradead.org>
-X-Mailer: git-send-email 2.21.3
+        Thu, 10 Sep 2020 14:29:42 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA568C061756
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2020 11:29:40 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id b17so444746pji.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2020 11:29:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wjAWuNbVBoEPyXn+QBzLMnCnG3b1YEYkoDZS6EgQpPI=;
+        b=UCp+FppW+25RCEWuidrdmD2H7oNwJWAPscXMA2ljdT7Hwfc6emJQQRXJKlonqRXwCr
+         ZNZwT1diexj1oIPFx0vZRCKp8ePiBMfI0fNJK+PDlwitnt2/pXVXXfcmv7xMHDx85MGD
+         jjgpGgVOnGdOdetQ71hUdu1jBGb560fU84u+I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wjAWuNbVBoEPyXn+QBzLMnCnG3b1YEYkoDZS6EgQpPI=;
+        b=jOIETH09mKolzJxa+ZJ3ngIdM1cTlXrinugJaKpya+UhTfut4kfTt5i2rRL314mGrD
+         oyCXJ0mmZ0z25S3OQvmZDN/Iuhb1uXyiapPC54C8VUHfPDVlLdy444w/LuEsRd274XJO
+         7WWAv81Kmqzwqq3jWdpt9p8oCTOFyfryg5DKsnX+v9JHC1EyRsSGoL58dPMb8JB22g3r
+         k8IqnP1b0mlx6N8U9/ALMpydUKet577bSs3/b2cEzzCZ7XDRomI1EW0YPOC7J1mQKCyR
+         FetBV4VRhwYO2Wv1iuVB0kelp6PwFdP467RCRDrSladm8B30AhkG13wycYi8aYZOFTtp
+         Rq8Q==
+X-Gm-Message-State: AOAM532DDgtNNVVhjxz5AFeLBi9CdH3zxy1zfn5VUt7ycourWCphdK9u
+        pxYfSrFPzWOSVDv6jzNIMfx6/g==
+X-Google-Smtp-Source: ABdhPJwQHia5IxoItB0v8TFyFBQYaMjt9d9oEodKfnuR8Fqxq3O6+WSooIjqvBiG9AzcqTroMIMGDQ==
+X-Received: by 2002:a17:90b:3717:: with SMTP id mg23mr1229702pjb.42.1599762580221;
+        Thu, 10 Sep 2020 11:29:40 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id z9sm6606733pfk.118.2020.09.10.11.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Sep 2020 11:29:39 -0700 (PDT)
+Date:   Thu, 10 Sep 2020 11:29:38 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Sami Tolvanen <samitolvanen@google.com>, peterz@infradead.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org,
+        X86 ML <x86@kernel.org>
+Subject: Re: [PATCH v2 05/28] objtool: Add a pass for generating __mcount_loc
+Message-ID: <202009101127.28B4414D2A@keescook>
+References: <20200624203200.78870-1-samitolvanen@google.com>
+ <20200903203053.3411268-1-samitolvanen@google.com>
+ <20200903203053.3411268-6-samitolvanen@google.com>
+ <202009031450.31C71DB@keescook>
+ <CABCJKueF1RbpOKHsA8yS_yMujzHi8dzAVz8APwpMJyMTTGhmDA@mail.gmail.com>
+ <20200904093104.GH1362448@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200904093104.GH1362448@hirez.programming.kicks-ass.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Using $(call cmd,...) requires that there be a quiet_ version of the
-command, otherwise it's silently skipped.
+On Fri, Sep 04, 2020 at 11:31:04AM +0200, peterz@infradead.org wrote:
+> On Thu, Sep 03, 2020 at 03:03:30PM -0700, Sami Tolvanen wrote:
+> > On Thu, Sep 3, 2020 at 2:51 PM Kees Cook <keescook@chromium.org> wrote:
+> > >
+> > > On Thu, Sep 03, 2020 at 01:30:30PM -0700, Sami Tolvanen wrote:
+> > > > From: Peter Zijlstra <peterz@infradead.org>
+> > > >
+> > > > Add the --mcount option for generating __mcount_loc sections
+> > > > needed for dynamic ftrace. Using this pass requires the kernel to
+> > > > be compiled with -mfentry and CC_USING_NOP_MCOUNT to be defined
+> > > > in Makefile.
+> > > >
+> > > > Link: https://lore.kernel.org/lkml/20200625200235.GQ4781@hirez.programming.kicks-ass.net/
+> > > > Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+> > >
+> > > Hmm, I'm not sure why this hasn't gotten picked up yet. Is this expected
+> > > to go through -tip or something else?
+> > 
+> > Note that I picked up this patch from Peter's original email, to which
+> > I included a link in the commit message, but it wasn't officially
+> > submitted as a patch. However, the previous discussion seems to have
+> > died, so I included the patch in this series, as it cleanly solves the
+> > problem of whitelisting non-call references to __fentry__. I was
+> > hoping for Peter and Steven to comment on how they prefer to proceed
+> > here.
+> 
+> Right; so I'm obviously fine with this patch and I suppose I can pick it
+> (and the next) into tip/objtool/core, provided Steve is okay with this
+> approach.
 
-Fixes: 3a2429e1faf4 ("kbuild: change if_changed_rule for multi-line recipe")
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- scripts/Makefile.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hello Steven-of-the-future-after-4000-emails![1] ;)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a467b9323442..571d75777b6f 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -104,7 +104,8 @@ else ifeq ($(KBUILD_CHECKSRC),2)
- endif
- 
- ifneq ($(KBUILD_EXTRA_WARN),)
--  cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $<
-+  quiet_cmd_checkdoc = CHKDOC  $<
-+        cmd_checkdoc = $(srctree)/scripts/kernel-doc -none $<
- endif
- 
- # Compile C sources (.c)
+Getting your Ack on this would be very welcome, and would unblock a
+portion of this series.
+
+Thanks! :)
+
+[1] https://twitter.com/srostedt/status/1303697650592755712
+
 -- 
-2.28.0
-
+Kees Cook
