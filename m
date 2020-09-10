@@ -2,135 +2,127 @@ Return-Path: <SRS0=5hFL=CT=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334A4C433E2
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 16:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E26B5C433E2
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 17:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2B4E21D40
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 16:48:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599756489;
-	bh=cLKSor5atuj8G8GBnsdIp/NaSJrBV6Cacvlv9xcD5uI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=HZLNhIJ1oo/ZOVHu9yvb1vB68l2Al6p5dTUxy/9ie6yWmhvgLR/6xYo6UeSKsmmls
-	 WTDIvzuakoeJa35t+VDWVofdNufvTms6zuxeSSDnpyEiDW04LbYfOVQz5xWq5kV6AP
-	 glhTcRCzOg+sA71ZX9oT3b+KiO1wpagneObiPu/E=
+	by mail.kernel.org (Postfix) with ESMTP id 9215E21582
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Sep 2020 17:28:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qMZpuCyY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726812AbgIJQsB (ORCPT
+        id S1726961AbgIJR2a (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Sep 2020 12:48:01 -0400
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:59044 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726987AbgIJQmk (ORCPT
+        Thu, 10 Sep 2020 13:28:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726769AbgIJRYp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Sep 2020 12:42:40 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 08AGg6hG030582;
-        Fri, 11 Sep 2020 01:42:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 08AGg6hG030582
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1599756127;
-        bh=+6n9Ppki6VT5Ezj3CVThftdXoJBLCgvbs+E684WSLWQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Db8+aEeRsHxQzx3ItxeUj48irYaveRBOu/6JsWRdSfEEhZG9EUQf+bfQkMrgOsYZn
-         fhPv4hEmmPbm6IXE8FnFumAIUjFf7QfTk/E7JB8algWB3uJqWN1Pduh56bRbm9Y5S8
-         5b+FkuJo61aSJozVPBUlXbs7If45fPxLGxdUx+URnZlXOE6btEAwrnODZzzmI4K87c
-         Bo41kO4sju+7FxyIAP2D0AArLne8ArrHEEf8nib+AEP14OoTQKlnG2hE48YdlB0hGC
-         hcEVzXZBAmPLKxUu96Yz0vVk9Qc23MWg3No9XiRnMnd8MCo2BjdcGMfQXWTX1P9qev
-         viWmRySeLk7Xw==
-X-Nifty-SrcIP: [209.85.216.51]
-Received: by mail-pj1-f51.google.com with SMTP id n3so1511542pjq.1;
-        Thu, 10 Sep 2020 09:42:07 -0700 (PDT)
-X-Gm-Message-State: AOAM5310pUOokFVmUiYz+ydD+tHEW19GpuD6myNgYHI5fSPujQTqvtks
-        qYAtN4Kpevq+mR9mpavoHjwq0HYofepw/ZUajcQ=
-X-Google-Smtp-Source: ABdhPJy8ZEvHkdbLCECmFhoubpkNyxJl1yM1jZlATF3A248P90vzBQMLMmP5xhwwifp+IH/oIxsi2WXLKi+7cwno7+A=
-X-Received: by 2002:a17:902:ac8b:b029:d0:89f4:6220 with SMTP id
- h11-20020a170902ac8bb02900d089f46220mr6535483plr.8.1599756126225; Thu, 10 Sep
- 2020 09:42:06 -0700 (PDT)
+        Thu, 10 Sep 2020 13:24:45 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A705CC061757
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2020 10:24:45 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id b124so4984558pfg.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Sep 2020 10:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g/DxpxIJfXdy7C8opyI8o+XkWeSXniE6Oz2qu6dzaF4=;
+        b=qMZpuCyYWD6jZb+YzEyDAHOq9S96Dlc35zPEjydyxNKaUZLI+nsnTqKBltm7I7VQby
+         HADCCTM9PWgXBnh/yMcjkuvxmRlsT5UNJXub/kYzv20GW2EKNQChlxY6p1hDrhjikVEM
+         Y+KdEXPqXZ38Ol+OaDahwozrZuq1MEwyZ2pzintGUyw4fpxqp9GWD0eGlWbL4iCvW9Bj
+         ofC7YnNgP7EgwY2vyDqqmL5l163B1x17PQenBv/kPXwJ3NQU2iMK+zB/IWAXaj3bZoaW
+         oayGFBuGysrV56Qz+yWBWg7vkmwI0lExK3a6Cqh86+l2SoKA3YHsQx5QxJRwY1D4m3Gs
+         hNwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g/DxpxIJfXdy7C8opyI8o+XkWeSXniE6Oz2qu6dzaF4=;
+        b=ci4bdOVrleLqLpsym3b+/DJaEnSP7ezfsFlV4bcrdun1e/pmrHJwzQAOHIIRctapp/
+         bPH/NtBkff8ICBeaqKC70ggnVG3xTpXLSCrSpYhjMlQZ3L4HRB05UnoK6vo4uBjS7cpj
+         5DScmd6DhCXwKa1gELqC1Il3idDX1K7TnqyAMf6/eaGfAVPgEIJD3wYCyG7Uc4Qt8Mit
+         Z78f7CmJVqoWghn0GBLEP2qmp4OPQcJHth+nmNI2jbbWZskMXPJAK8Qhn9/l8PUztFZn
+         QIy4wkYCWwmGVt642nVYQ+zHHgacblAM9tLzOrvU0aFHommo4UMOTZfLu9/0mJp9ZKh4
+         7ulQ==
+X-Gm-Message-State: AOAM531E2u4bDajOycQtjc9O/1oUKflqoXRt+slXxoVCc8SNCKGAuhVo
+        7Dlxwx+qji54M6PnBSL/uS9KHpOjYOuFfsWOr4/t6w==
+X-Google-Smtp-Source: ABdhPJy84r1DwOSmKuO14ubUxn/70iTZvTReoqQc3tEIf4yVSD6MRkGs/ON+GUp+U07oYBFP6qROw9QwQ7dzGR8qvH4=
+X-Received: by 2002:a62:8349:: with SMTP id h70mr6667701pfe.47.1599758684979;
+ Thu, 10 Sep 2020 10:24:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200910135120.3527468-1-masahiroy@kernel.org>
- <20200910135120.3527468-2-masahiroy@kernel.org> <20200910163311.GB3119896@ubuntu-n2-xlarge-x86>
-In-Reply-To: <20200910163311.GB3119896@ubuntu-n2-xlarge-x86>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 11 Sep 2020 01:41:29 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQbjsKpbSKRNEzFTXsD1+nj-gkKon3c1u9J=x8wL4H-DA@mail.gmail.com>
-Message-ID: <CAK7LNAQbjsKpbSKRNEzFTXsD1+nj-gkKon3c1u9J=x8wL4H-DA@mail.gmail.com>
-Subject: Re: [PATCH 2/4] kbuild: remove cc-option test of -fno-merge-all-constants
-To:     Nathan Chancellor <natechancellor@gmail.com>
+References: <20200908221638.2782778-1-masahiroy@kernel.org>
+In-Reply-To: <20200908221638.2782778-1-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 10 Sep 2020 10:24:33 -0700
+Message-ID: <CAKwvOdnP7UmpRPL8XjzoMPjgQb9Di8OXk9UEX8NWaa35A01Q3Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kconfig: qconf: use delete[] instead of delete to
+ free array (again)
+To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Sep 11, 2020 at 1:33 AM Nathan Chancellor
-<natechancellor@gmail.com> wrote:
+On Tue, Sep 8, 2020 at 3:17 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> On Thu, Sep 10, 2020 at 10:51:18PM +0900, Masahiro Yamada wrote:
-> > The minimal compiler versions, GCC 4.9 and Clang 10 support this flag.
-> >
-> > Here is the godbolt:
-> > https://godbolt.org/z/8T4177
-> >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Commit c9b09a9249e6 ("kconfig: qconf: use delete[] instead of delete
+> to free array") fixed two lines, but there is one more.
+> (cppcheck does not report it for some reason...)
 >
-> For what it's worth, the commit that introduced this block is going to
-> be reverted:
+> This was detected by Clang.
 >
-> https://lore.kernel.org/mm-commits/20200903201518.JKrRS%25akpm@linux-foundation.org/
-
-
-My bad - you are right.
-This hunk has already gone by Nick's patch.
-
-Thanks.
-
-
-
-> Regardless, it was introduced in LLVM 2.7.0 in commit
-> f9d41df0930986c52e198292cf875eb5d1761ece.
+> "make HOSTCXX=clang++ xconfig" reports the following:
 >
-> Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+> scripts/kconfig/qconf.cc:1279:2: warning: 'delete' applied to a pointer that was allocated with 'new[]'; did you mean 'delete[]'? [-Wmismatched-new-delete]
+>         delete data;
+>         ^
+>               []
+> scripts/kconfig/qconf.cc:1239:15: note: allocated with 'new[]' here
+>         char *data = new char[count + 1];
+>                      ^
 >
-> > ---
-> >
-> >  Makefile | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 059b36f2ea53..1b6abecc5cab 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -927,7 +927,7 @@ KBUILD_CFLAGS     += -fno-strict-overflow
-> >  # clang sets -fmerge-all-constants by default as optimization, but this
-> >  # is non-conforming behavior for C and in fact breaks the kernel, so we
-> >  # need to disable it here generally.
-> > -KBUILD_CFLAGS        += $(call cc-option,-fno-merge-all-constants)
-> > +KBUILD_CFLAGS        += -fno-merge-all-constants
-> >
-> >  # for gcc -fno-merge-all-constants disables everything, but it is fine
-> >  # to have actual conforming behavior enabled.
-> > --
-> > 2.25.1
-> >
+> Fixes: c4f7398bee9c ("kconfig: qconf: make debug links work again")
+> Fixes: c9b09a9249e6 ("kconfig: qconf: use delete[] instead of delete to free array")
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+
+> ---
 >
+>  scripts/kconfig/qconf.cc | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> index 8638785328a7..c7216b9110fc 100644
+> --- a/scripts/kconfig/qconf.cc
+> +++ b/scripts/kconfig/qconf.cc
+> @@ -1276,7 +1276,7 @@ void ConfigInfoView::clicked(const QUrl &url)
+>         }
+>
+>         free(result);
+> -       delete data;
+> +       delete[] data;
+>  }
+>
+>  void ConfigInfoView::contextMenuEvent(QContextMenuEvent *event)
 > --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20200910163311.GB3119896%40ubuntu-n2-xlarge-x86.
-
+> 2.25.1
+>
 
 
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
