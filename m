@@ -1,84 +1,80 @@
-Return-Path: <SRS0=G9oK=CU=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=hJtZ=CW=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3027DC43461
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Sep 2020 16:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A08F6C43461
+	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Sep 2020 13:21:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3DD3221EB
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Sep 2020 16:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599841593;
-	bh=BKLdy4IRivTz8mf+Py2iEA2QbIQ46WCjrnO5DWhj2/c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kld5N/Bkw0ECBB3e4SfHRFvgxdEvoqHxI71VKB3EjzMAktsVaC7h8UGdjc8S0s8D0
-	 wJw6jamH5oWvcN7zwjzQPv5WAzdKmYPJqnHWVzIaAxnj32xC89apeGrcWcyMxAevRB
-	 YdTR1gWngmThWi7Ds9ivGqW1yvjWX7CMijd//gd8=
+	by mail.kernel.org (Postfix) with ESMTP id 4E7DE2158C
+	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Sep 2020 13:21:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TisuCYK2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726503AbgIKQ0c (ORCPT
+        id S1725950AbgIMNVo (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Sep 2020 12:26:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55304 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726465AbgIKPWb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Sep 2020 11:22:31 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sun, 13 Sep 2020 09:21:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34217 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725940AbgIMNVm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 13 Sep 2020 09:21:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600003300;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OOpFezetXI8IrrJSgLq7um+2koSqBSrOyBGfrptdubM=;
+        b=TisuCYK25vV7UwnRxpIeoCk6LfoBOtEsvu45FvboQrnTxN6NNE9F78+Knewg4YD6OHOLN4
+        JaTvcAvZZ6cXOTPOWL32O0wOdA/Dltzy9bQTa61wRL47YkjVMYVQ2D/5L29o7cENF0hgcr
+        xR/H4fjCWFHJjFR1qnG7vO4Zh+wV9Mo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-uYiXA8wFPvKx7CGNoN5Csw-1; Sun, 13 Sep 2020 09:21:37 -0400
+X-MC-Unique: uYiXA8wFPvKx7CGNoN5Csw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 208ED2076C;
-        Fri, 11 Sep 2020 15:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599837751;
-        bh=BKLdy4IRivTz8mf+Py2iEA2QbIQ46WCjrnO5DWhj2/c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZaScDjksZQfTvPPFWBLq3BHa2J7z1whP1167eiKIIuOZMaV0yYLKTKe7aKsaLt1Nw
-         qhddBbhj3e4ZqsKizZZtgyq0I+ERl0AY6xVuYBvOX3ElN3S8vJuWRBnrBgih8Jf7p9
-         AAoowWlIZ+c9KM+5aJ8eie4bNrKHofd2gmiLhLZs=
-Date:   Fri, 11 Sep 2020 16:22:25 +0100
-From:   Will Deacon <will@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D4A1DDF7;
+        Sun, 13 Sep 2020 13:21:35 +0000 (UTC)
+Received: from starship (unknown [10.35.206.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 80A627839F;
+        Sun, 13 Sep 2020 13:21:34 +0000 (UTC)
+Message-ID: <e04f1e9372f896d435d972cc6b70d1eb3b0c32a2.camel@redhat.com>
+Subject: xconfig is broken again on Qt5
+From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        clang-built-linux@googlegroups.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] kbuild: remove cc-option test of -fno-strict-overflow
-Message-ID: <20200911152225.GB20374@willie-the-truck>
-References: <20200910135120.3527468-1-masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org
+Date:   Sun, 13 Sep 2020 16:21:33 +0300
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910135120.3527468-1-masahiroy@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 10:51:17PM +0900, Masahiro Yamada wrote:
-> The minimal compiler versions, GCC 4.9 and Clang 10 support this flag.
-> 
-> Here is the godbolt:
-> https://godbolt.org/z/odq8h9
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  Makefile                          | 2 +-
->  arch/arm64/kernel/vdso32/Makefile | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+I hate to say it, but xconfig got broken again.
 
-This, and the other patch (4/4 -- I didn't see 2 or 3), look good to me.
-Are you taking them via the kbuild tree, or shall I queue them in the arm64
-tree? Please just let me know what you prefer.
+After commit 68fd110b3e7e2 ("kconfig: qconf: remove redundant help in the info view")
+help description disappered completely from xconfig (both normal and split mode)
 
-Will
+I reverted this and next commit to get this back.
+
+I have a feeling that there were several bugs introduced to xconfig recently
+due to attempt to support both Qt4 and Qt5. Maybe we should only support one version?
+
+I tried gconfig even thinking maybe nobody uses xconfig these days
+but gconfig seems to lack search function.
+
+Best regards,
+	Maxim Levitsky
+
