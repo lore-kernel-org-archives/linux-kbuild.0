@@ -1,80 +1,112 @@
-Return-Path: <SRS0=hJtZ=CW=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=rOOZ=CX=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08F6C43461
-	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Sep 2020 13:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F413C433E2
+	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Sep 2020 12:55:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E7DE2158C
-	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Sep 2020 13:21:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TisuCYK2"
+	by mail.kernel.org (Postfix) with ESMTP id D28AB216C4
+	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Sep 2020 12:55:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600088123;
+	bh=V+7fTKSIcha+jqJ1hJPL8PDgiGwtxNVXKJW5N+sWefI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=fWUNU3+9acdzCw89Mri1B1WEfxItmjZuoWDIiuYqzlzoTNSReCSg/1Ze3aI4bgMKO
+	 qj3cEYzmX8QQ9xXjtydgCR9azVj3hyl53a+Qqpgmbzfg6PwTRbyx9C5NPokPtM5RcR
+	 LnNA6J4ml08i6wJaljzoOWMV0Ns1CQWwbLnv+4ro=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725950AbgIMNVo (ORCPT
+        id S1726561AbgINMzA (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 13 Sep 2020 09:21:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34217 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725940AbgIMNVm (ORCPT
+        Mon, 14 Sep 2020 08:55:00 -0400
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:17902 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726595AbgINMwt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 Sep 2020 09:21:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600003300;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OOpFezetXI8IrrJSgLq7um+2koSqBSrOyBGfrptdubM=;
-        b=TisuCYK25vV7UwnRxpIeoCk6LfoBOtEsvu45FvboQrnTxN6NNE9F78+Knewg4YD6OHOLN4
-        JaTvcAvZZ6cXOTPOWL32O0wOdA/Dltzy9bQTa61wRL47YkjVMYVQ2D/5L29o7cENF0hgcr
-        xR/H4fjCWFHJjFR1qnG7vO4Zh+wV9Mo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-uYiXA8wFPvKx7CGNoN5Csw-1; Sun, 13 Sep 2020 09:21:37 -0400
-X-MC-Unique: uYiXA8wFPvKx7CGNoN5Csw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D4A1DDF7;
-        Sun, 13 Sep 2020 13:21:35 +0000 (UTC)
-Received: from starship (unknown [10.35.206.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 80A627839F;
-        Sun, 13 Sep 2020 13:21:34 +0000 (UTC)
-Message-ID: <e04f1e9372f896d435d972cc6b70d1eb3b0c32a2.camel@redhat.com>
-Subject: xconfig is broken again on Qt5
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org
-Date:   Sun, 13 Sep 2020 16:21:33 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32) 
+        Mon, 14 Sep 2020 08:52:49 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 08ECq8GV011982;
+        Mon, 14 Sep 2020 21:52:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 08ECq8GV011982
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1600087929;
+        bh=AANCansO4f2OQwh1V7EIeJev25Fm+ij4Oyg5MtSWhG0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=InQnywGFmtgMc2L6uJH8qzb+0+s9k5VBJW7cQHQ8Z+w6LZd6cIsePRTkKBMw+Rnmk
+         VObaXaRkG/f7ovSxM8hr875QcVH7U1G9kf0BxGJi+ly/AdurZIuE0utepzLQf4gY2f
+         c/8k3b3YLPJZAOqWRMjn6EPbsqdMbbIbkXif/40GwjmQoEUG4HzuGrIkZKAKyDzdGh
+         cSWb5BkmFwZ+Laqf9kshX4PruLwk9xELi9JFC1anPjjd2VPsgV7W+Jt2C7CekSRVYn
+         LrM9NrqHHJA+Pd9KPV86yTzdibEr9t4xI3A9h4PfocdK+tg0C6v5C/h4u5eXA/EXEx
+         sBXPFrgbr/3QQ==
+X-Nifty-SrcIP: [209.85.216.43]
+Received: by mail-pj1-f43.google.com with SMTP id gf14so5316811pjb.5;
+        Mon, 14 Sep 2020 05:52:08 -0700 (PDT)
+X-Gm-Message-State: AOAM532yOF2XhzR7ILVFYuvXCXXz+xQuAysLWMw5d8YyoMosZzuGa7EQ
+        xMUoGEAunv1L2hjx0k4gE+g1sJMWCXGwdt/yxIQ=
+X-Google-Smtp-Source: ABdhPJwgJOYHw1L3yX/BIwQso0Z1rc3QjvxT2sPrKrR3d97kn9XxdD5cGvNrsj7bYD9TY3gyDNcoo2pdjD5BFvg++WM=
+X-Received: by 2002:a17:90b:1211:: with SMTP id gl17mr14246762pjb.87.1600087927887;
+ Mon, 14 Sep 2020 05:52:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20200910135120.3527468-1-masahiroy@kernel.org> <20200911152225.GB20374@willie-the-truck>
+In-Reply-To: <20200911152225.GB20374@willie-the-truck>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 14 Sep 2020 21:51:31 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASijUXVmZ+AfuGOnAFnbfUpr3S2ncSxABt4bGF+agxg+A@mail.gmail.com>
+Message-ID: <CAK7LNASijUXVmZ+AfuGOnAFnbfUpr3S2ncSxABt4bGF+agxg+A@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kbuild: remove cc-option test of -fno-strict-overflow
+To:     Will Deacon <will@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-I hate to say it, but xconfig got broken again.
+Hi Will,
 
-After commit 68fd110b3e7e2 ("kconfig: qconf: remove redundant help in the info view")
-help description disappered completely from xconfig (both normal and split mode)
+On Sat, Sep 12, 2020 at 12:22 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Thu, Sep 10, 2020 at 10:51:17PM +0900, Masahiro Yamada wrote:
+> > The minimal compiler versions, GCC 4.9 and Clang 10 support this flag.
+> >
+> > Here is the godbolt:
+> > https://godbolt.org/z/odq8h9
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  Makefile                          | 2 +-
+> >  arch/arm64/kernel/vdso32/Makefile | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> This, and the other patch (4/4 -- I didn't see 2 or 3), look good to me.
+> Are you taking them via the kbuild tree, or shall I queue them in the arm64
+> tree? Please just let me know what you prefer.
+>
+> Will
 
-I reverted this and next commit to get this back.
 
-I have a feeling that there were several bugs introduced to xconfig recently
-due to attempt to support both Qt4 and Qt5. Maybe we should only support one version?
+I will apply all to the kbuild tree.
+Your Ack is appreciated.
 
-I tried gconfig even thinking maybe nobody uses xconfig these days
-but gconfig seems to lack search function.
+Thanks.
 
-Best regards,
-	Maxim Levitsky
 
+
+-- 
+Best Regards
+Masahiro Yamada
