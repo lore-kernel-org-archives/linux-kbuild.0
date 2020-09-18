@@ -2,70 +2,70 @@ Return-Path: <SRS0=/tcE=C3=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-25.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C8AC4346B
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02271C43464
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E98D2388B
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E3C82344C
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VAY1d+BK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kOFoCTd2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgIRUO6 (ORCPT
+        id S1726380AbgIRUPE (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Sep 2020 16:14:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52700 "EHLO
+        Fri, 18 Sep 2020 16:15:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726309AbgIRUOm (ORCPT
+        with ESMTP id S1726426AbgIRUPD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Sep 2020 16:14:42 -0400
+        Fri, 18 Sep 2020 16:15:03 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57F0C0613CF
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:41 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id l67so6661678ybb.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B27AEC0613DD
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v3so6684051yba.12
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=skSGpFbYMPCYyMt3xD2UXrEbXnhCXJcxNWr+Xyy+zNQ=;
-        b=VAY1d+BKJBvFH1+plE6Ne6NojDosoRo9j26NV8dlVGXM//ycIlCDZru6h0GwYf6PGK
-         oVDTueoqNoahOkpRrBlNbroVu/FB1veyRVPAgf/45GgzWqf6Xsq0Y+GXu2hi+twUmF4M
-         UWlrMiOG7qzpx/rugvq9ImdavvJF+euLmvDRVYx6xTfAs6YbiMljlvnEF0AxzVWwqwE0
-         Wlnm4GTIQPvLwoJ7Q6dUKY/MHQfiWIXB6ndcTD3C4Ky4vDcOB9wdWqOfH1nmSHu8+xDC
-         GmhmT101k2ut9EE13MQG/mtNTs23zRSYi6edJX+ofgh4sM6lA1iJVwk3pkcZdBV+lO+m
-         xpbA==
+        bh=TOBnIZLn7hTmqm3x2JBReVnrcc+31akc4aFm1uMW9E4=;
+        b=kOFoCTd2FrUUKnCgnEw8fv7o1qa+wmfRKSJE7DESuzOriLdT6KRMVuJelBjZTPWmjv
+         hcDMZ6eRTe3iEYXYYraJYirqopgmczBB1BvP5hOrngWEf/fJbpBz7Sj2ruTbsoRETl29
+         O7E7brX0kO22gIX86Vdn9SrCa3mebEscFAw0lojJhTqtnAkLGvP02ofXmERBjubIHHQK
+         t7UD4ZZSX0u9/8uvxMAjisPSz3BRkcsoaicvmVdgo3PttZXSpnN03wSqMqeZkfmkBk2J
+         sEFprVm9QM8nc23vRgjZ+UPh4svXmTbLma/ZToJN6dcDACCd3xjRpcEHrZhhhibZCAUO
+         2qfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=skSGpFbYMPCYyMt3xD2UXrEbXnhCXJcxNWr+Xyy+zNQ=;
-        b=S+CH67CUjfC5MIN9s89QnzD7yTk058GypK/4LtgAi8dFRUidQ2FgJnP3YYC7CYtTa+
-         WFnh+0JUguMThbjTxSPBI6qwH+YVIDwMQ2LQ8JLnIZXQsb9EUrMQIj/9QeA1WeSVD3gP
-         iiArevbpWgUzesmsqKrETotz0hj/lqdm/CAbZiMZWQCwfG3O2sm0xdNrzMcLD42KKwOl
-         GPDc4IC/Z0tGO8VBbICoM578nx6RDSZZNTbR4VNUkK/56dncrRVAfHuPB4k7fR7XAkTc
-         tBU3nB23BOv0ksNtp1/n7h5+rs0L6477PUAuYM2pB4yZ9HitKtpwtew0ZSJqvahI37SE
-         UaMQ==
-X-Gm-Message-State: AOAM533Mpt2rCIuw3PrtPSAcKNfHBafjVYMNLXFDvU+d1/TkXV35wdAC
-        WOc2gE6elw3ITcMVIKt5ABGFiMh1ltFnYRa7KGA=
-X-Google-Smtp-Source: ABdhPJzcj7wCxo8E12yukgL7sAuybdWWQ1AJ64l97WPGZG7w7s7z827ZYArDZS6m8vlRS9reaOndS152UiN0Two7+9I=
+        bh=TOBnIZLn7hTmqm3x2JBReVnrcc+31akc4aFm1uMW9E4=;
+        b=EQVPIL1e9Kv1kuMLbDE4lEoTvS1oNYL0kwxsPTbxO2bAAW6BnZf4PFVBv6fj/yq4Ia
+         i3vJVc3aDTQVE5ObyXi/Yq5RITKJDRFHu3je8fzpSR+eyvSP1oe5+pY9J6nuSWiESJeW
+         0F9WPupHroeQWnWFzVtl/hM3hAliu5rjrh2Q97UHEEb9fNOLfaQtWYjtl/B54WAykz44
+         RjvHMWeBflZUwEQuug3VOCkvPEQzf5led08lsCJbtEt60c74XHZMzHqRDDxUvCfwzNp/
+         6W8mEHB9M6tHbgQl26rhL6qxkvsC5CalV+oaaQG0D91hrFVeKfDz9yj5FRg+Zxzxw8Tb
+         Uv9w==
+X-Gm-Message-State: AOAM530b7zDaFZP0vzbRsbdCKNd3itDDilMsRRol4S4MwMaBPckke5Tx
+        QautdP9uyIsNvA3Fc7E0q06Ib3vXEzTqD2Nt/qU=
+X-Google-Smtp-Source: ABdhPJwPfv5GKIky8nZ4/qO1HfgSl+GRdDXQT/EDjzvo193fwzx6dbwv1k7QAc3pOuPuB6s1Frhn6PBXdOnzsCVgbLU=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:6f89:: with SMTP id
- k131mr40244617ybc.214.1600460081050; Fri, 18 Sep 2020 13:14:41 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 13:14:07 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:be13:: with SMTP id
+ h19mr55802534ybk.50.1600460094899; Fri, 18 Sep 2020 13:14:54 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 13:14:13 -0700
 In-Reply-To: <20200918201436.2932360-1-samitolvanen@google.com>
-Message-Id: <20200918201436.2932360-2-samitolvanen@google.com>
+Message-Id: <20200918201436.2932360-8-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200918201436.2932360-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v3 01/30] lib/string.c: implement stpcpy
+Subject: [PATCH v3 07/30] objtool: Don't autodetect vmlinux.o
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>
@@ -85,118 +85,55 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Nick Desaulniers <ndesaulniers@google.com>
+With LTO, we run objtool on vmlinux.o, but don't want noinstr
+validation. This change requires --vmlinux to be passed to objtool
+explicitly.
 
-LLVM implemented a recent "libcall optimization" that lowers calls to
-`sprintf(dest, "%s", str)` where the return value is used to
-`stpcpy(dest, str) - dest`. This generally avoids the machinery involved
-in parsing format strings.  `stpcpy` is just like `strcpy` except it
-returns the pointer to the new tail of `dest`.  This optimization was
-introduced into clang-12.
-
-Implement this so that we don't observe linkage failures due to missing
-symbol definitions for `stpcpy`.
-
-Similar to last year's fire drill with:
-commit 5f074f3e192f ("lib/string.c: implement a basic bcmp")
-
-The kernel is somewhere between a "freestanding" environment (no full libc)
-and "hosted" environment (many symbols from libc exist with the same
-type, function signature, and semantics).
-
-As H. Peter Anvin notes, there's not really a great way to inform the
-compiler that you're targeting a freestanding environment but would like
-to opt-in to some libcall optimizations (see pr/47280 below), rather than
-opt-out.
-
-Arvind notes, -fno-builtin-* behaves slightly differently between GCC
-and Clang, and Clang is missing many __builtin_* definitions, which I
-consider a bug in Clang and am working on fixing.
-
-Masahiro summarizes the subtle distinction between compilers justly:
-  To prevent transformation from foo() into bar(), there are two ways in
-  Clang to do that; -fno-builtin-foo, and -fno-builtin-bar.  There is
-  only one in GCC; -fno-buitin-foo.
-
-(Any difference in that behavior in Clang is likely a bug from a missing
-__builtin_* definition.)
-
-Masahiro also notes:
-  We want to disable optimization from foo() to bar(),
-  but we may still benefit from the optimization from
-  foo() into something else. If GCC implements the same transform, we
-  would run into a problem because it is not -fno-builtin-bar, but
-  -fno-builtin-foo that disables that optimization.
-
-  In this regard, -fno-builtin-foo would be more future-proof than
-  -fno-built-bar, but -fno-builtin-foo is still potentially overkill. We
-  may want to prevent calls from foo() being optimized into calls to
-  bar(), but we still may want other optimization on calls to foo().
-
-It seems that compilers today don't quite provide the fine grain control
-over which libcall optimizations pseudo-freestanding environments would
-prefer.
-
-Finally, Kees notes that this interface is unsafe, so we should not
-encourage its use.  As such, I've removed the declaration from any
-header, but it still needs to be exported to avoid linkage errors in
-modules.
-
-Reported-by: Sami Tolvanen <samitolvanen@google.com>
-Suggested-by: Andy Lavr <andy.lavr@gmail.com>
-Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
-Suggested-by: Joe Perches <joe@perches.com>
-Suggested-by: Kees Cook <keescook@chromium.org>
-Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-Cc: stable@vger.kernel.org
-Link: https://bugs.llvm.org/show_bug.cgi?id=47162
-Link: https://bugs.llvm.org/show_bug.cgi?id=47280
-Link: https://github.com/ClangBuiltLinux/linux/issues/1126
-Link: https://man7.org/linux/man-pages/man3/stpcpy.3.html
-Link: https://pubs.opengroup.org/onlinepubs/9699919799/functions/stpcpy.html
-Link: https://reviews.llvm.org/D85963
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- lib/string.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ scripts/link-vmlinux.sh       |  2 +-
+ tools/objtool/builtin-check.c | 10 +---------
+ 2 files changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/lib/string.c b/lib/string.c
-index 6012c385fb31..4288e0158d47 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -272,6 +272,30 @@ ssize_t strscpy_pad(char *dest, const char *src, size_t count)
- }
- EXPORT_SYMBOL(strscpy_pad);
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index e6e2d9e5ff48..372c3719f94c 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -64,7 +64,7 @@ objtool_link()
+ 	local objtoolopt;
  
-+/**
-+ * stpcpy - copy a string from src to dest returning a pointer to the new end
-+ *          of dest, including src's %NUL-terminator. May overrun dest.
-+ * @dest: pointer to end of string being copied into. Must be large enough
-+ *        to receive copy.
-+ * @src: pointer to the beginning of string being copied from. Must not overlap
-+ *       dest.
-+ *
-+ * stpcpy differs from strcpy in a key way: the return value is a pointer
-+ * to the new %NUL-terminating character in @dest. (For strcpy, the return
-+ * value is a pointer to the start of @dest). This interface is considered
-+ * unsafe as it doesn't perform bounds checking of the inputs. As such it's
-+ * not recommended for usage. Instead, its definition is provided in case
-+ * the compiler lowers other libcalls to stpcpy.
-+ */
-+char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
-+char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)
-+{
-+	while ((*dest++ = *src++) != '\0')
-+		/* nothing */;
-+	return --dest;
-+}
-+EXPORT_SYMBOL(stpcpy);
-+
- #ifndef __HAVE_ARCH_STRCAT
- /**
-  * strcat - Append one %NUL-terminated string to another
+ 	if [ -n "${CONFIG_VMLINUX_VALIDATION}" ]; then
+-		objtoolopt="check"
++		objtoolopt="check --vmlinux"
+ 		if [ -z "${CONFIG_FRAME_POINTER}" ]; then
+ 			objtoolopt="${objtoolopt} --no-fp"
+ 		fi
+diff --git a/tools/objtool/builtin-check.c b/tools/objtool/builtin-check.c
+index 71595cf4946d..eaa06eb18690 100644
+--- a/tools/objtool/builtin-check.c
++++ b/tools/objtool/builtin-check.c
+@@ -41,18 +41,10 @@ const struct option check_options[] = {
+ 
+ int cmd_check(int argc, const char **argv)
+ {
+-	const char *objname, *s;
+-
+ 	argc = parse_options(argc, argv, check_options, check_usage, 0);
+ 
+ 	if (argc != 1)
+ 		usage_with_options(check_usage, check_options);
+ 
+-	objname = argv[0];
+-
+-	s = strstr(objname, "vmlinux.o");
+-	if (s && !s[9])
+-		vmlinux = true;
+-
+-	return check(objname, false);
++	return check(argv[0], false);
+ }
 -- 
 2.28.0.681.g6f77f65b4e-goog
 
