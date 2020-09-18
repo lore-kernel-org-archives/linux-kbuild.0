@@ -5,67 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E1FC43466
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F67C43465
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E6792311C
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 466182311A
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W2h/XnuG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m59NkH3j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726367AbgIRUP3 (ORCPT
+        id S1726627AbgIRUPc (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Sep 2020 16:15:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52826 "EHLO
+        Fri, 18 Sep 2020 16:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726503AbgIRUPI (ORCPT
+        with ESMTP id S1726620AbgIRUPb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Sep 2020 16:15:08 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5693C0613D2
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:07 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id b3so6637989ybg.23
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:07 -0700 (PDT)
+        Fri, 18 Sep 2020 16:15:31 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B51C0613E6
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:30 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id t7so4613791qvz.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=D6tDM47xuke5ysE5WIIDa5rp1LAjlEXtWPHN9k1Y8+8=;
-        b=W2h/XnuGzNlKV5NdC0adWKa37kl3xmgZiDqkHmcnEkH94kFjcNL9vASQEpry+o2tlh
-         SfBC+DPIuAYiWU8pBcYhnBkk4MYMSQRxr8vnp5P4hse97LNHXff1HXT35d3k/6a2XuiT
-         eFQ65bo3PHYA7ZULXIlrNE7ssaJVXvCHdWIs+w/N0bZjj4lG2tqKCTllU5W+bHP/uz3K
-         qkChF8ODGR3zGLdbJMA86AqPoAhtjbqY74f8cX4z9omNFOlRGFgXhKC5HHQta0ZlGQBH
-         vhvzn8bkpPjmmImHGKDSv1Gxy6AGXkufMcQ4EpIviMGuJbclkq23h5JjEGAU9g2QcPcL
-         eVBQ==
+        bh=6wkvNORTwM39S5uL0TTc53qeLnDmqjDSKMDvKwEqUnA=;
+        b=m59NkH3jdBVGi3dXc89rIxXW0NE7GMfjZfL5ODM7hicbW9tRbSExno6sIVoWVPk/b2
+         6ew8lrdf0hw7stNFVAv/okktVg/LjpO4I7jNzt6a8VoaOl/pRpNH1xks4v9BW7bxD/Sr
+         i6vq8H7yjf2sd8Aini4O9MK38tgJzNMOIkbJl3sG/G/kVyi9tS3kdWyXupCYVuHY/tg6
+         KLw2X/vONosgXWGz3RGoeu4MpReDPfkBwBqpqDUmYFeEC91faan+J54tUJcmpgPMtnOY
+         BvbaH2KVwWvnm9Y2AQvGn+V2h5meg1oOgj2ERRg9cb5ebYhX4XX5VX8BZKgVsjjWQeQu
+         IcZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=D6tDM47xuke5ysE5WIIDa5rp1LAjlEXtWPHN9k1Y8+8=;
-        b=VFoYn4BqgfhtrhYeP6hu1kI0sFA03qZ5nz6HuyVx6oCIJhrrFUOtpFhIg3dzpR5NZo
-         t2nCY3OeX2Zpei5g3JDdOyaOgXK7T8/+Vd0zb6uWwTDdZwXa5Br23ekql3tZnCeT9Cle
-         OyzK9ity6FQqsgdOL0nDlNQCuQorVaKOpVSdhq2rHXJ4PH34asCKs7hO+qTqNM2TAx+o
-         diTvOdnRfVhLPAwnr8y1PG1It2awZi0DeNxZRWQwEqxGeJKCcaMvDM74cKRaNn5RmWdF
-         zATO6xjQxnvEb7ffy4Y3EXcEjZSVW30TrKpu/LEjBGPZuJIXnRhZCJbALwuP2zlnFLkV
-         mopQ==
-X-Gm-Message-State: AOAM530GIzjnmajxaLw87dRRrHUWkUIVvaw18L9zHqsykF+05EvCfrkc
-        IY8jwqTtbDpGdC2EZaS3hFMMO7M/iw0PXill540=
-X-Google-Smtp-Source: ABdhPJwIKm2mW/7B7okzAhOoDkKFEdpCgso3ba9La2/d/DUtgiXB+PAEgrZZLuGQAGZ/+GH6mv8G2aj/fuFfm+e2Dis=
+        bh=6wkvNORTwM39S5uL0TTc53qeLnDmqjDSKMDvKwEqUnA=;
+        b=nw+fLlZIelSxj9XtULGoC7p/oENVg9LvAOWNZadFHCHmbjes5rPln1yDpkwIIGb/rD
+         mPnNw2OgpE7GkRAAvAia6N4mVlc5B14WtRdg3xJpxiCLSFqE1IJAOEcjczu9Z84yfJOn
+         ha83akV3p8EdF/vPtRSTTwJ3df4t53MIfM4PE5/b8v7/S6Bo7zQIHHC5v5t3gmZCcIU5
+         0cvPEDBe9k0RnmVQCRciT3et8SLg53Nmt8lMiBSPW7geiMqdNZVR4gjJ51VPNv2CRkpj
+         f8fA87T2+FWI0sgrFhK1eEQhm0SdBvOd7di304Z92T4Q0SZs7vPjTqqcWZc9nLCWC6Gl
+         yxvg==
+X-Gm-Message-State: AOAM530Dx1WlmxOWzMF0r+M5tJb/OfdXm9MpGkWAEc0//HhkTiQ+IpIU
+        45/qVZDdIvOxm7NzkawMYMBcihe86NHyCqBPP8s=
+X-Google-Smtp-Source: ABdhPJyhl0O3HrtpwK2+/eq92loT21+CwrJm1w5RAc9ZKC6o0au3sfzPs9arIL72JQf6OFaC7oO4rGV/iT2i5XrFZMM=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:bc46:: with SMTP id
- d6mr41185316ybk.511.1600460106948; Fri, 18 Sep 2020 13:15:06 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 13:14:18 -0700
+ (user=samitolvanen job=sendgmr) by 2002:ad4:57cc:: with SMTP id
+ y12mr19090228qvx.48.1600460129171; Fri, 18 Sep 2020 13:15:29 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 13:14:27 -0700
 In-Reply-To: <20200918201436.2932360-1-samitolvanen@google.com>
-Message-Id: <20200918201436.2932360-13-samitolvanen@google.com>
+Message-Id: <20200918201436.2932360-22-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200918201436.2932360-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v3 12/30] kbuild: lto: fix module versioning
+Subject: [PATCH v3 21/30] scripts/mod: disable LTO for empty.c
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>
@@ -85,222 +85,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_MODVERSIONS, version information is linked into each
-compilation unit that exports symbols. With LTO, we cannot use this
-method as all C code is compiled into LLVM bitcode instead. This
-change collects symbol versions into .symversions files and merges
-them in link-vmlinux.sh where they are all linked into vmlinux.o at
-the same time.
+With CONFIG_LTO_CLANG, clang generates LLVM IR instead of ELF object
+files. As empty.o is used for probing target properties, disable LTO
+for it to produce an object file instead.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- .gitignore               |  1 +
- Makefile                 |  3 ++-
- arch/Kconfig             |  1 -
- scripts/Makefile.build   | 33 +++++++++++++++++++++++++++++++--
- scripts/Makefile.modpost |  6 +++++-
- scripts/link-vmlinux.sh  | 25 ++++++++++++++++++++++++-
- 6 files changed, 63 insertions(+), 6 deletions(-)
+ scripts/mod/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/.gitignore b/.gitignore
-index 162bd2b67bdf..06e76dc39ffe 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -41,6 +41,7 @@
- *.so.dbg
- *.su
- *.symtypes
-+*.symversions
- *.tab.[ch]
- *.tar
- *.xz
-diff --git a/Makefile b/Makefile
-index be923c18421a..629d4b18e413 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1845,7 +1845,8 @@ clean: $(clean-dirs)
- 		-o -name '.tmp_*.o.*' \
- 		-o -name '*.c.[012]*.*' \
- 		-o -name '*.ll' \
--		-o -name '*.gcno' \) -type f -print | xargs rm -f
-+		-o -name '*.gcno' \
-+		-o -name '*.*.symversions' \) -type f -print | xargs rm -f
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 78071681d924..c9e38ad937fd 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ OBJECT_FILES_NON_STANDARD := y
++CFLAGS_REMOVE_empty.o += $(CC_FLAGS_LTO)
  
- # Generate tags for editors
- # ---------------------------------------------------------------------------
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 0742ec643d79..520e900efc75 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -603,7 +603,6 @@ config LTO_CLANG
- 	depends on !FTRACE_MCOUNT_RECORD
- 	depends on !KASAN
- 	depends on !GCOV_KERNEL
--	depends on !MODVERSIONS
- 	select LTO
- 	help
-           This option enables Clang's Link Time Optimization (LTO), which
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index cab9d1024c23..44b6d964bcad 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -166,6 +166,15 @@ ifdef CONFIG_MODVERSIONS
- #   the actual value of the checksum generated by genksyms
- # o remove .tmp_<file>.o to <file>.o
- 
-+ifdef CONFIG_LTO_CLANG
-+# Generate .o.symversions files for each .o with exported symbols, and link these
-+# to the kernel and/or modules at the end.
-+cmd_modversions_c =								\
-+	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
-+		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-+		    > $@.symversions;						\
-+	fi;
-+else
- cmd_modversions_c =								\
- 	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
- 		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-@@ -177,6 +186,7 @@ cmd_modversions_c =								\
- 		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
- 	fi
- endif
-+endif
- 
- ifdef USE_RECORDMCOUNT
- # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
-@@ -393,6 +403,18 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
- $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
- $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- 
-+# combine symversions for later processing
-+quiet_cmd_update_lto_symversions = SYMVER  $@
-+ifeq ($(CONFIG_LTO_CLANG) $(CONFIG_MODVERSIONS),y y)
-+      cmd_update_lto_symversions =					\
-+	rm -f $@.symversions						\
-+	$(foreach n, $(filter-out FORCE,$^),				\
-+		$(if $(wildcard $(n).symversions),			\
-+			; cat $(n).symversions >> $@.symversions))
-+else
-+      cmd_update_lto_symversions = echo >/dev/null
-+endif
-+
- #
- # Rule to compile a set of .o files into one .a file (without symbol table)
- #
-@@ -400,8 +422,11 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- quiet_cmd_ar_builtin = AR      $@
-       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
- 
-+quiet_cmd_ar_and_symver = AR      $@
-+      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
-+
- $(obj)/built-in.a: $(real-obj-y) FORCE
--	$(call if_changed,ar_builtin)
-+	$(call if_changed,ar_and_symver)
- 
- #
- # Rule to create modules.order file
-@@ -421,8 +446,11 @@ $(obj)/modules.order: $(obj-m) FORCE
- #
- # Rule to compile a set of .o files into one .a file (with symbol table)
- #
-+quiet_cmd_ar_lib = AR      $@
-+      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
-+
- $(obj)/lib.a: $(lib-y) FORCE
--	$(call if_changed,ar)
-+	$(call if_changed,ar_lib)
- 
- # NOTE:
- # Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
-@@ -431,6 +459,7 @@ $(obj)/lib.a: $(lib-y) FORCE
- ifdef CONFIG_LTO_CLANG
- quiet_cmd_link_multi-m = AR [M]  $@
- cmd_link_multi-m =						\
-+	$(cmd_update_lto_symversions);				\
- 	rm -f $@; 						\
- 	$(AR) cDPrsT $@ $(filter %.o,$^)
- else
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 66e0c256403c..753725b88683 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -108,7 +108,11 @@ ifdef CONFIG_LTO_CLANG
- prelink-ext = .lto
- 
- quiet_cmd_cc_lto_link_modules = LTO [M] $@
--cmd_cc_lto_link_modules = $(LD) $(ld_flags) -r -o $@ --whole-archive $^
-+cmd_cc_lto_link_modules =						\
-+	$(LD) $(ld_flags) -r -o $@					\
-+		$(shell [ -s $(@:.lto.o=.o.symversions) ] &&		\
-+			echo -T $(@:.lto.o=.o.symversions))		\
-+		--whole-archive $^
- 
- %.lto.o: %.o
- 	$(call if_changed,cc_lto_link_modules)
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index ebb9f912aab6..3e99a19b9195 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -43,11 +43,28 @@ info()
- 	fi
- }
- 
-+# If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
-+# .tmp_symversions.lds
-+gen_symversions()
-+{
-+	info GEN .tmp_symversions.lds
-+	rm -f .tmp_symversions.lds
-+
-+	for a in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
-+		for o in $(${AR} t $a 2>/dev/null); do
-+			if [ -f ${o}.symversions ]; then
-+				cat ${o}.symversions >> .tmp_symversions.lds
-+			fi
-+		done
-+	done
-+}
-+
- # Link of vmlinux.o used for section mismatch analysis
- # ${1} output file
- modpost_link()
- {
- 	local objects
-+	local lds=""
- 
- 	objects="--whole-archive				\
- 		${KBUILD_VMLINUX_OBJS}				\
-@@ -57,6 +74,11 @@ modpost_link()
- 		--end-group"
- 
- 	if [ -n "${CONFIG_LTO_CLANG}" ]; then
-+		if [ -n "${CONFIG_MODVERSIONS}" ]; then
-+			gen_symversions
-+			lds="${lds} -T .tmp_symversions.lds"
-+		fi
-+
- 		# This might take a while, so indicate that we're doing
- 		# an LTO link
- 		info LTO ${1}
-@@ -64,7 +86,7 @@ modpost_link()
- 		info LD ${1}
- 	fi
- 
--	${LD} ${KBUILD_LDFLAGS} -r -o ${1} ${objects}
-+	${LD} ${KBUILD_LDFLAGS} -r -o ${1} ${lds} ${objects}
- }
- 
- objtool_link()
-@@ -242,6 +264,7 @@ cleanup()
- {
- 	rm -f .btf.*
- 	rm -f .tmp_System.map
-+	rm -f .tmp_symversions.lds
- 	rm -f .tmp_vmlinux*
- 	rm -f System.map
- 	rm -f vmlinux
+ hostprogs-always-y	+= modpost mk_elfconfig
+ always-y		+= empty.o
 -- 
 2.28.0.681.g6f77f65b4e-goog
 
