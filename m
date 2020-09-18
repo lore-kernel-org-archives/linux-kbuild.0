@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6F2C43467
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2046C43469
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:17:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 795522311B
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:17:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71E69235FD
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:17:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QatnRemB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BHDVtSDH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbgIRUPE (ORCPT
+        id S1726465AbgIRUPD (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Sep 2020 16:15:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52784 "EHLO
+        Fri, 18 Sep 2020 16:15:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726460AbgIRUPD (ORCPT
+        with ESMTP id S1726438AbgIRUPD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 18 Sep 2020 16:15:03 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387BEC0613D1
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:03 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id a16so6094437qtj.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:03 -0700 (PDT)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C681C0613E0
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:58 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id r9so6661898ybd.20
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:14:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=8Z9k7hZvEPmq++QcMDZiZsWcl46Vj1BocbQ0cOU/FNM=;
-        b=QatnRemB8cKq9+uR9uPhgVc2Bc6FwkGBsqtwIjGXf6ksklkrNv4kL3LeGcIpnb3kJD
-         +VwOOFb1L9qdjGWufD737L0mHuhxu80I2Ipso4IMvzIJas82S09muHkdzoE5crcC0K4X
-         jHnkPNr0LNFGuuBIJcIPGhqG0P+7+VZZuQ3chCGeXzDp4qjhYbwW4Yvw5E4Lq+DHRE2x
-         +SvZeCiBoXRrsWh3eS0wWEht2cZnd0r3e6+aOgBH5CI14gyZ1vwHI2sjtDN3qmhUcK4j
-         NDhnu6OrCJmznwP7zF474cCOa4gKRKf9OVdwozqYVkj615Ymd9ke7k8+4OAc2VqFRZta
-         u5VQ==
+        bh=0FkP4B0/Lnp0DM8m5kyaL0nHymB5hvp+911UgypF4fg=;
+        b=BHDVtSDHetldKKo2hdUPaejxOUg5e/yc8Cf5jPF8KvuEYU3GPeekWljxiMYHIrEQq0
+         SlyjQ7nTB2hb4xCe7jrH9NeG7+TDkN36Iz/j80rDR1o/RiwSrjXAJOEYsiCKVTp1EsS6
+         kPHqV1oAHjGCvpXDEdRkyfZWKXgLztHP1xvR0z0sbav9R8NYsmyZq8qKO5Ia151oKysY
+         OCZWaSCUeytDPg1IKXVAcTOAuX1oTxatIgD0DWK0uypAG8DRSWlWJ4vJsZUQFtoH7CT/
+         NjL3ZYY2wH7uPQXbbCEmQSU4LkhsBSSMBwvyPvVqydWk1LcDUSp0FxblKNC9q59gwKrA
+         ljEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=8Z9k7hZvEPmq++QcMDZiZsWcl46Vj1BocbQ0cOU/FNM=;
-        b=TK9WyXNymIagtJGEpMAr5Vt6dqQPE8lXtNXhW/YvzQX7i+SXd0v8JFoD5JuW/8njoo
-         k5vdYcO3VdJUyJbyEw6OqZj+SNCRQOX7ibGt4mfM2d0BGaow0BDbekCT3mvVcXHmkxYk
-         mkT99IrgMiecLmDqa9Kd3JlaR1ccZq9dhLbKAbG2CZEXbkKzO8usdQK07UG69Xt6EyuE
-         Ip+G8uqqgo1m+OfkzVmmH93rTZ/+ae2Go62I2nWVvy+g41bvxEMCFUhiRQL1TkqA+Klh
-         rv0Ty15MFc97UvsFcEe7HGavYjxv9klPkqJTi5n6dCnDpSc22DdyyCoLHD36FMWGH4ZC
-         83Uw==
-X-Gm-Message-State: AOAM531bo2+9zoVyE3Kyrt7TKHKnufeIov71/zowqMQkG0iqfaFe8S8Z
-        OTp5pwhQDoS9N3/4LcGVv9zsUJo6ImlSuiMOsQc=
-X-Google-Smtp-Source: ABdhPJz+7Css5KK1OpZUjZgXWLDi39JN/gWO7PRZZDMxz/EqUbcEpWKFi5QyByaFuSTBObLpkxNksopPJp16SrRkt4s=
+        bh=0FkP4B0/Lnp0DM8m5kyaL0nHymB5hvp+911UgypF4fg=;
+        b=cxejWwjLqkifchrmtPipLJ+eZav8N6dQRW1FNqXT0V9hPtfOTT+lAQYoaaQ2qMVG6r
+         3nNbx5e+cyWWbLZomy+GO1oNauxZiN1EDhba7VflX1+htXTTT7LaLVw2Q184niA7zZFs
+         Sc01bbrYYeS3GiTLvzY/dfjhWG4TgKSL47UChS3Kl6M6z7gPBhNCByjVwKtxH046K2bb
+         3p3OQnsxKZYzc/9PurCics0LB+m3pETMp112Sci9KDL+XoRsoIUtm5uULtkdON5FFKVT
+         01ZpfNCJFVF9Za4inMCnW52TmZVePOXy3/aq/+kAAvF1n3igROH8GjJeFhI2rwsfVcln
+         G5gw==
+X-Gm-Message-State: AOAM5308qMpwPZh5E5V1bUHC6bWNB/xv7u5mf19i3h/HhLSslVFTKcDa
+        5wMH7iVkvCs2SdttLoa7ed39xm74QCFBlQiBOuo=
+X-Google-Smtp-Source: ABdhPJwQq1wvH1AAA6gtJNKkwcmiCxJWA5rmyg/i+mPJ3ehFUf0yVGK9jkmjYXbCBq8XTq/g+Yqu8LuBqPuiMAszYNA=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a0c:e152:: with SMTP id
- c18mr18505590qvl.41.1600460102349; Fri, 18 Sep 2020 13:15:02 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 13:14:16 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:cf15:: with SMTP id
+ f21mr5192645ybg.408.1600460097335; Fri, 18 Sep 2020 13:14:57 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 13:14:14 -0700
 In-Reply-To: <20200918201436.2932360-1-samitolvanen@google.com>
-Message-Id: <20200918201436.2932360-11-samitolvanen@google.com>
+Message-Id: <20200918201436.2932360-9-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200918201436.2932360-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v3 10/30] treewide: remove DISABLE_LTO
+Subject: [PATCH v3 08/30] kbuild: add support for objtool mcount
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>
@@ -85,85 +85,131 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This change removes all instances of DISABLE_LTO from
-Makefiles, as they are currently unused, and the preferred
-method of disabling LTO is to filter out the flags instead.
+This change adds build support for using objtool to generate
+__mcount_loc sections.
 
-Suggested-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/kernel/vdso/Makefile | 1 -
- arch/sparc/vdso/Makefile        | 2 --
- arch/x86/entry/vdso/Makefile    | 2 --
- kernel/Makefile                 | 3 ---
- scripts/Makefile.build          | 2 +-
- 5 files changed, 1 insertion(+), 9 deletions(-)
+ Makefile               | 38 ++++++++++++++++++++++++++++++--------
+ kernel/trace/Kconfig   |  5 +++++
+ scripts/Makefile.build |  9 +++++----
+ 3 files changed, 40 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index 45d5cfe46429..e836e300440f 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -31,7 +31,6 @@ ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
- ccflags-y += -DDISABLE_BRANCH_PROFILING
+diff --git a/Makefile b/Makefile
+index 24fd733c142e..d2fb3cd0f506 100644
+--- a/Makefile
++++ b/Makefile
+@@ -858,17 +858,34 @@ ifdef CONFIG_HAVE_FENTRY
+   ifeq ($(call cc-option-yn, -mfentry),y)
+     CC_FLAGS_FTRACE	+= -mfentry
+     CC_FLAGS_USING	+= -DCC_USING_FENTRY
++    export CC_USING_FENTRY := 1
+   endif
+ endif
+ export CC_FLAGS_FTRACE
+-KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
+-KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
+ ifdef CONFIG_DYNAMIC_FTRACE
+-	ifdef CONFIG_HAVE_C_RECORDMCOUNT
+-		BUILD_C_RECORDMCOUNT := y
+-		export BUILD_C_RECORDMCOUNT
+-	endif
++  ifndef CC_USING_RECORD_MCOUNT
++  ifndef CC_USING_PATCHABLE_FUNCTION_ENTRY
++    # use objtool or recordmcount to generate mcount tables
++    ifdef CONFIG_HAVE_OBJTOOL_MCOUNT
++      ifdef CC_USING_FENTRY
++        USE_OBJTOOL_MCOUNT := y
++        CC_FLAGS_USING += -DCC_USING_NOP_MCOUNT
++        export USE_OBJTOOL_MCOUNT
++      endif
++    endif
++    ifndef USE_OBJTOOL_MCOUNT
++      USE_RECORDMCOUNT := y
++      export USE_RECORDMCOUNT
++      ifdef CONFIG_HAVE_C_RECORDMCOUNT
++        BUILD_C_RECORDMCOUNT := y
++        export BUILD_C_RECORDMCOUNT
++      endif
++    endif
++  endif
++  endif
+ endif
++KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
++KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
+ endif
  
- CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
--KBUILD_CFLAGS			+= $(DISABLE_LTO)
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
-diff --git a/arch/sparc/vdso/Makefile b/arch/sparc/vdso/Makefile
-index f44355e46f31..476c4b315505 100644
---- a/arch/sparc/vdso/Makefile
-+++ b/arch/sparc/vdso/Makefile
-@@ -3,8 +3,6 @@
- # Building vDSO images for sparc.
- #
+ # We trigger additional mismatches with less inlining
+@@ -1213,11 +1230,16 @@ uapi-asm-generic:
+ PHONY += prepare-objtool prepare-resolve_btfids
+ prepare-objtool: $(objtool_target)
+ ifeq ($(SKIP_STACK_VALIDATION),1)
++objtool-lib-prompt := "please install libelf-dev, libelf-devel or elfutils-libelf-devel"
++ifdef USE_OBJTOOL_MCOUNT
++	@echo "error: Cannot generate __mcount_loc for CONFIG_DYNAMIC_FTRACE=y, $(objtool-lib-prompt)" >&2
++	@false
++endif
+ ifdef CONFIG_UNWINDER_ORC
+-	@echo "error: Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel" >&2
++	@echo "error: Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, $(objtool-lib-prompt)" >&2
+ 	@false
+ else
+-	@echo "warning: Cannot use CONFIG_STACK_VALIDATION=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel" >&2
++	@echo "warning: Cannot use CONFIG_STACK_VALIDATION=y, $(objtool-lib-prompt)" >&2
+ endif
+ endif
  
--KBUILD_CFLAGS += $(DISABLE_LTO)
--
- VDSO64-$(CONFIG_SPARC64)	:= y
- VDSOCOMPAT-$(CONFIG_COMPAT)	:= y
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index a4020c0b4508..b510af5b216c 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -56,6 +56,11 @@ config HAVE_C_RECORDMCOUNT
+ 	help
+ 	  C version of recordmcount available?
  
-diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-index 215376d975a2..ecc27018ae13 100644
---- a/arch/x86/entry/vdso/Makefile
-+++ b/arch/x86/entry/vdso/Makefile
-@@ -9,8 +9,6 @@ ARCH_REL_TYPE_ABS := R_X86_64_JUMP_SLOT|R_X86_64_GLOB_DAT|R_X86_64_RELATIVE|
- ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
- include $(srctree)/lib/vdso/Makefile
++config HAVE_OBJTOOL_MCOUNT
++	bool
++	help
++	  Arch supports objtool --mcount
++
+ config TRACER_MAX_TRACE
+ 	bool
  
--KBUILD_CFLAGS += $(DISABLE_LTO)
--
- # Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 9a20016d4900..347254f07dab 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -38,9 +38,6 @@ KASAN_SANITIZE_kcov.o := n
- KCSAN_SANITIZE_kcov.o := n
- CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack) -fno-stack-protector
- 
--# cond_syscall is currently not LTO compatible
--CFLAGS_sys_ni.o = $(DISABLE_LTO)
--
- obj-y += sched/
- obj-y += locking/
- obj-y += power/
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 6ecf30c70ced..ed2b8ce9d4c2 100644
+index a467b9323442..6ecf30c70ced 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -111,7 +111,7 @@ endif
- # ---------------------------------------------------------------------------
+@@ -178,8 +178,7 @@ cmd_modversions_c =								\
+ 	fi
+ endif
  
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-+      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) -fverbose-asm -S -o $@ $<
+-ifdef CONFIG_FTRACE_MCOUNT_RECORD
+-ifndef CC_USING_RECORD_MCOUNT
++ifdef USE_RECORDMCOUNT
+ # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
+ ifdef BUILD_C_RECORDMCOUNT
+ ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
+@@ -206,8 +205,7 @@ recordmcount_source := $(srctree)/scripts/recordmcount.pl
+ endif # BUILD_C_RECORDMCOUNT
+ cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),	\
+ 	$(sub_cmd_record_mcount))
+-endif # CC_USING_RECORD_MCOUNT
+-endif # CONFIG_FTRACE_MCOUNT_RECORD
++endif # USE_RECORDMCOUNT
  
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
+ ifdef CONFIG_STACK_VALIDATION
+ ifneq ($(SKIP_STACK_VALIDATION),1)
+@@ -230,6 +228,9 @@ endif
+ ifdef CONFIG_X86_SMAP
+   objtool_args += --uaccess
+ endif
++ifdef USE_OBJTOOL_MCOUNT
++  objtool_args += --mcount
++endif
+ 
+ # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
 -- 
 2.28.0.681.g6f77f65b4e-goog
 
