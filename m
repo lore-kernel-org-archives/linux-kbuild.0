@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA62C43463
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10BE4C43463
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02FB6238E6
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2F212376F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Sep 2020 20:15:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ObhRsoWs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="REd95VnF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726662AbgIRUPk (ORCPT
+        id S1726687AbgIRUPo (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Sep 2020 16:15:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52986 "EHLO
+        Fri, 18 Sep 2020 16:15:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726664AbgIRUPj (ORCPT
+        with ESMTP id S1726685AbgIRUPm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Sep 2020 16:15:39 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A00C0613CF
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:37 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id q131so5539062qke.22
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:37 -0700 (PDT)
+        Fri, 18 Sep 2020 16:15:42 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DB7C0613D2
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:42 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 139so1599030ybe.15
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Sep 2020 13:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=/0ldiyB2nVfkSW+Z4ZqugZ1I2eeQ0sdYMfFHH6J6dWM=;
-        b=ObhRsoWs56/ckOGNxhhvSliY51cEtV0g/uMSUnztF/O7z31SMtCH/329m8ibTSKZpG
-         fiez3GHcBYfc9o5RBx52gPxMzE2kT7BpfP1ZD4q5GKOuEItaIBhl8DMnx+NNI8ef7ycs
-         b8R96aDxgD2UiGsnLon+7daf2qTD2JY7NXxEElaPkmsOHkoKvbT8QFHFiJaUXRtTLxH0
-         55yHN4z3tf4xECFWt3X9nwCecG7xNYuYAMLaw4tETvqQQGxC0C2DOdr9nz2poaLSjtvv
-         1tZdTBVYTcwfiT3/yI4GgTADGX+HKVoqImsQX1FHpwsSfHwO0fR0fgmBvCx0ByfTr/Ho
-         8lWw==
+        bh=oXJMXy02LqTQDpBkn8PPtjYwJPq4evUojZhZLMc3uvo=;
+        b=REd95VnFXwmD3ND7Lapf6wTEKHlyfaSDlXa6A5g8OMe6rD7mXFuEioeTzTVuP+wKYy
+         krseyNRuMtJa9ctfWr2TjaEjNcbStkBCBOxYrTttidotv9Qbdv5f70T8rfirifUlhiGO
+         fbpwKXewIVSjSWcELClY8rHyvPgkF2XdC/QZF4KVfiVKi0xCd18r7fnei+hqOeW0nZel
+         JhxqIwpbgtSIJrJ5e9QQl5CT7x9s7Yh2DeXazsVf3ebafU4M8/COaXTHkTmNbs2X65vv
+         uvYLZii0pQgCywSqGr9bhM6Jz3cwSDm+sYfUU2OyMAh4+XaJbe4V1f+DGOyRxBJY+8Ct
+         N4eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=/0ldiyB2nVfkSW+Z4ZqugZ1I2eeQ0sdYMfFHH6J6dWM=;
-        b=ViYDpWlK/kWQxmWRBNK7jbo1A5tXBf1Ndqb9GWwMH2npr16HBKQ4MUBEceb4ccElcT
-         hsH2Bl4WWzUdlewDXCBmGM6dZw3mo1xmyza9Eefae/QpoeLxJi5+kjlWm050VPSRfNNL
-         B9vjvq0bk0U36aFN5oxkLrj5a8RWKNAzjQ/a1Jcqi99CWM60lEGVHG5jd+XHxUepRJ4r
-         K4NCj6aZsxNRZ1+Y+2hvJpHqdcEdevcKQGdUMGQ1opdKdGUpa5fv66LPwMLNqzxXPrj9
-         ZJCBxmLro0aQWRcvoArV5UlrtO13W2a6Q8oUmKd/bIsRcMZxLR3DMJ2auQd6cfr5c0Eo
-         y87g==
-X-Gm-Message-State: AOAM533X4KY7/St8PRWOKTEgcYRSb7wLn89OQWWSXcahGrpCf+13ze1J
-        xwl2mQJazm8GdZykLC4vLeQ+AfiAnSrA3T61yFQ=
-X-Google-Smtp-Source: ABdhPJzlCcwfWl9pGOxTGz2mpuA0ZcI0OzyXT/6tCo4MOeFDLBSH0AjygGOTnITZPst0myY84qe7t61m7gd1U0GYQLc=
+        bh=oXJMXy02LqTQDpBkn8PPtjYwJPq4evUojZhZLMc3uvo=;
+        b=roXfOZjVIGoRCZ+jg8Of6rkXRnl2fkJ+w+Wrk+HjxOkGOVB6ulOYd9Igsf6M1h6U9e
+         XJP07Ou1iKqd2Eh2TP8z5urv6CXOZx4BlSLX6FkF18GpRGxG7X/F7Uc3fAouL4vVWcpX
+         MegTa9i2lMh8MWTFGMbhzTKDEStpKgEkXi1eem0JGpgrYcehbGxvCDNX9NBj/Q9k0mpS
+         VUYbCWwcDK/Y7Xcuyw8RUj+oHG/YK72L5NXtPZu5S8Ufj7d2LvEq+NqqOOusrg4rpLpw
+         rFXntxTn08ffydyeXJtiynrlWnEnY3F8CFkHhq1oQnxtyx/AI3ns5TKEhm+35+Ad6wk7
+         qCOA==
+X-Gm-Message-State: AOAM533mVY3H96hES4b0ae62PlzVysU54uJaMCQOhdTqWgN501t+86zy
+        KXF3ozGTbY11BKxyuBi0qnAC1MeJhV5uYvBkp/w=
+X-Google-Smtp-Source: ABdhPJxMyDngZuNnNx1wL9/fMd7ntfJVtVGTW6/hjVnBGEbXwyy4OggBNEJrH2U3qB1vnImsc26NsteebpxVgOTzfOI=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a0c:8b02:: with SMTP id
- q2mr19161266qva.48.1600460136604; Fri, 18 Sep 2020 13:15:36 -0700 (PDT)
-Date:   Fri, 18 Sep 2020 13:14:30 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:14c4:: with SMTP id
+ 187mr54928163ybu.449.1600460141424; Fri, 18 Sep 2020 13:15:41 -0700 (PDT)
+Date:   Fri, 18 Sep 2020 13:14:32 -0700
 In-Reply-To: <20200918201436.2932360-1-samitolvanen@google.com>
-Message-Id: <20200918201436.2932360-25-samitolvanen@google.com>
+Message-Id: <20200918201436.2932360-27-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200918201436.2932360-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.681.g6f77f65b4e-goog
-Subject: [PATCH v3 24/30] arm64: export CC_USING_PATCHABLE_FUNCTION_ENTRY
+Subject: [PATCH v3 26/30] KVM: arm64: disable LTO for the nVHE directory
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>
@@ -85,28 +85,32 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Since arm64 does not use -pg in CC_FLAGS_FTRACE with
-DYNAMIC_FTRACE_WITH_REGS, skip running recordmcount by
-exporting CC_USING_PATCHABLE_FUNCTION_ENTRY.
+We use objcopy to manipulate ELF binaries for the nVHE code,
+which fails with LTO as the compiler produces LLVM bitcode
+instead. Disable LTO for this code to allow objcopy to be used.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/hyp/nvhe/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 4e8bb73359c8..57b875099b17 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -123,6 +123,7 @@ CHECKFLAGS	+= -D__aarch64__
- ifeq ($(CONFIG_DYNAMIC_FTRACE_WITH_REGS),y)
-   KBUILD_CPPFLAGS += -DCC_USING_PATCHABLE_FUNCTION_ENTRY
-   CC_FLAGS_FTRACE := -fpatchable-function-entry=2
-+  export CC_USING_PATCHABLE_FUNCTION_ENTRY := 1
- endif
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index aef76487edc2..c903c8f31280 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -45,9 +45,9 @@ quiet_cmd_hypcopy = HYPCOPY $@
+ 		   --rename-section=.text=.hyp.text			\
+ 		   $< $@
  
- # Default value
+-# Remove ftrace and Shadow Call Stack CFLAGS.
++# Remove ftrace, LTO, and Shadow Call Stack CFLAGS.
+ # This is equivalent to the 'notrace' and '__noscs' annotations.
+-KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
++KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_LTO) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
+ 
+ # KVM nVHE code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
 -- 
 2.28.0.681.g6f77f65b4e-goog
 
