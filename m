@@ -1,127 +1,163 @@
-Return-Path: <SRS0=jjXG=C6=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=uPCA=C7=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7A8C4346E
-	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Sep 2020 18:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF807C4346E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 22 Sep 2020 03:29:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C46C220C09
-	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Sep 2020 18:58:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F64120637
+	for <linux-kbuild@archiver.kernel.org>; Tue, 22 Sep 2020 03:29:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VwM6SxPc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoKe73aF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727339AbgIUS6c (ORCPT
+        id S1728680AbgIVD3F (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 21 Sep 2020 14:58:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54884 "EHLO
+        Mon, 21 Sep 2020 23:29:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbgIUS6c (ORCPT
+        with ESMTP id S1728546AbgIVD3F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Sep 2020 14:58:32 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9889C0613CF
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2020 11:58:31 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id z22so19235575ejl.7
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Sep 2020 11:58:31 -0700 (PDT)
+        Mon, 21 Sep 2020 23:29:05 -0400
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A62C061755;
+        Mon, 21 Sep 2020 20:29:05 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id i17so19486855oig.10;
+        Mon, 21 Sep 2020 20:29:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rrEufNVuY5dCBzinzTyZLnRAK6NDit4k748EnZ9ZGyU=;
-        b=VwM6SxPchzpHYvDq5MuGqptnfOCO+2u8UOZQsUHmvXP+yQTF+Z7wlraeVtjd/s9jlB
-         wV193ZvJeoHSX0mG5NaEp1P+oe7FoNjVRmUSb2Z+JinKsMwFIqn+MpalsijQarctvj4U
-         FH4y6mRhga1p9JKtJgLYS2O01gvN0JoRMzpIJ8sTPjHm+K3XvxLJoxyawOroxTt3ewXo
-         2erVwwtPxW6qCdmd6A02Wa5wSMbzwpQ/xA7DOELk4+u1Yv0Dw6Gb0gPjk1AInJx+Npb8
-         9g541oYiyMOVYQWN0p1s+dSK+qehJVoUb8ZcAzai39YkrQsAMRZIWHvBa3cE/5jkadoT
-         Dtig==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=UV9LYgvlr7nqZDgZi3jIcKJdwzfRvVah5SxtcsrnOGM=;
+        b=KoKe73aFPikkUbG8GYe06ozeJAu4/2a25kb63aOfPdf90P/bCMwXrXxQNWEj/+BdMG
+         emVMirahXvWmG4+kn7I/1OuV9dDo9AYiUjdXfevVkAto9uGr85XaCyu0wIp42YQdiyNS
+         Cx9XPXV4VimluUOcyRQmXgBYYa7wTxxJLhBdRq17SJIPCZ6a+0POJPqTmgeziISK4Euu
+         4kZLlxL748D/pYQcZAdrezzUnpdbcj4KkdUEGKOnCcJITH9/fJsbqBo/drmyFmc//utD
+         MShls/2vlEp/Dz+iLZRVq9S6H/3RLcwHQ69617Fos5u/F/g0tvUZZstfQrrpXNTMpiLn
+         kcLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rrEufNVuY5dCBzinzTyZLnRAK6NDit4k748EnZ9ZGyU=;
-        b=pNl4QrYE4N0YuZ0qT3cCZbzy8gsjST7bmGmjInT4ohs6CMm2rjOFslx5KQwD5EvOyH
-         ZEeQwyXgVuA0bg3zfXVQkyOGqeAKw0p1FtwKjxazWckOzzRZwIF3AJUNu/KtbXvhUb/S
-         tIegKmMFzLr9hcNkDABS0BJZigaQoFu0/1tIRJybjWIMgnr1Ve1+MlGPrPozMvjEADZ1
-         E7BoMvSEjYPrhGRTVs4fitmSFj64drAjkraujcMsy8Ew65wUsNcAxkE9JH9OWcfnlpdc
-         yYnDw7DnNXdJL6nnHACO6egEph+r8itw9KVJLeRxYYAV4vxdfufNtMfgg6v/n7S16KSn
-         Eemw==
-X-Gm-Message-State: AOAM533kktpXmIJnC+uKp46yIUdU9X34is4NKF4aNrJB30v/A8kGYYzL
-        QsAm7W0wYkcukz26fJtgeWEBZFXVaZpKsAx8wqrquQ==
-X-Google-Smtp-Source: ABdhPJwAs9ksH6re9qMXbI2fsKP5Ghj4mOoCzkBFQS+BQszgLy1pqKFO8fFSdMFWe7XQ/UpW1tcdUlWla4BBqoqymc8=
-X-Received: by 2002:a17:906:ecf1:: with SMTP id qt17mr960026ejb.158.1600714709946;
- Mon, 21 Sep 2020 11:58:29 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=UV9LYgvlr7nqZDgZi3jIcKJdwzfRvVah5SxtcsrnOGM=;
+        b=E5ybhSFT2q90rsrBN8v64pHkf5XedI+l53jb9vouJHe6iw+IJt9Vf5IAOxkLJrtBdn
+         dOey7h9HViNJ+dNqCS4L/FSsoJoqS2jKD8fq9Uz0hM5A8T+RyVTj9+xs6tAaV66daD09
+         2LrLrzE3P8Zirg7OzkvJj6BR9XEu7j87VtjbSrV/bxjuMdNWW8X9lDcLRsY2hRiKSKoj
+         2o74oq570L3c6ova3P74KNlG0yhvar1Z1nquq1ai+OqPvICzxogmTTgO+pb7K84nik8Z
+         P6mKqyBZllTxxb3sXLLBEFJaB8xfhmDeGiS6TDgKGoxTjX+AYzdzxYiI6AVmv4+HvJLI
+         YHcg==
+X-Gm-Message-State: AOAM533DzFtzdeAdhLEaC71dMPAiDhf+xatw+UgE8La4M+0hj3DgaNm/
+        KgktbpHkSHSuW1gw8NpCjtU=
+X-Google-Smtp-Source: ABdhPJyCLJN/QaBzUgpC9F4GziOQoNNqGuKYPZbXVB7xkaiYJ+VN1C1N9URFbTPlRwyYFy9iFI/Utg==
+X-Received: by 2002:aca:913:: with SMTP id 19mr1404267oij.169.1600745344779;
+        Mon, 21 Sep 2020 20:29:04 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 34sm6355428otg.23.2020.09.21.20.29.04
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 21 Sep 2020 20:29:04 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Mon, 21 Sep 2020 20:29:03 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] kbuild: Try up to eight kallsyms link passes
+Message-ID: <20200922032903.GA222779@roeck-us.net>
+References: <20200910153204.156871-1-linux@roeck-us.net>
 MIME-Version: 1.0
-References: <20200918201436.2932360-1-samitolvanen@google.com>
- <20200918201436.2932360-14-samitolvanen@google.com> <202009181427.86DE61B@keescook>
-In-Reply-To: <202009181427.86DE61B@keescook>
-From:   Sami Tolvanen <samitolvanen@google.com>
-Date:   Mon, 21 Sep 2020 11:58:19 -0700
-Message-ID: <CABCJKuf5pKqEDaAKix5CaUmv92M5HOAB-psdNg=awF7BDZ+yvA@mail.gmail.com>
-Subject: Re: [PATCH v3 13/30] kbuild: lto: postpone objtool
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org,
-        X86 ML <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200910153204.156871-1-linux@roeck-us.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Nick and 0-day bot both let me know that there's a typo in this patch,
-which I'll fix in v4:
+On Thu, Sep 10, 2020 at 08:32:04AM -0700, Guenter Roeck wrote:
+> Since v5.8, powerpc:allmodconfig often fails to build with the following
+> error message.
+> 
+> 	Inconsistent kallsyms data
+> 	Try make KALLSYMS_EXTRA_PASS=1 as a workaround
+> 
+> Setting KALLSYMS_EXTRA_PASS=1 does not help. As it turns out, the build
+> currently needs up to four link passes to succeed.
+> 
+> Similar problems have been observed over time for other architectures.
+> 
+> Make the number of link passes dynamic to solve the problem. Try up to
+> eight passes before giving up. If KALLSYMS_EXTRA_PASS is set, add one
+> additional pass after succeeding.
+> 
+> Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index f7daa59ff14f..00d7baaf7949 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -223,7 +223,7 @@ dtc_cpp_flags  = -Wp,-MMD,$(depfile).pre.tmp
--nostdinc                    \
- objtool_args =                                                         \
-        $(if $(CONFIG_UNWINDER_ORC),orc generate,check)                 \
-        $(if $(part-of-module), --module,)                              \
--       $(if $(CONFIG_FRAME_POINTER), --no-fp,)                         \
-+       $(if $(CONFIG_FRAME_POINTER),, --no-fp)                         \
-        $(if $(CONFIG_GCOV_KERNEL), --no-unreachable,)                  \
-        $(if $(CONFIG_RETPOLINE), --retpoline,)                         \
-        $(if $(CONFIG_X86_SMAP), --uaccess,)                            \
+I still see a build failure for powerpc:allmodconfig due to this problem.
 
-Sami
+Feedback/comments/thoughts ? Does anyone have a better idea ?
 
-On Fri, Sep 18, 2020 at 2:27 PM Kees Cook <keescook@chromium.org> wrote:
->
-> On Fri, Sep 18, 2020 at 01:14:19PM -0700, Sami Tolvanen wrote:
-> > With LTO, LLVM bitcode won't be compiled into native code until
-> > modpost_link, or modfinal for modules. This change postpones calls
-> > to objtool until after these steps, and moves objtool_args to
-> > Makefile.lib, so the arguments can be reused in Makefile.modfinal.
-> >
-> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
->
-> Thanks for reorganizing this!
->
-> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> --
-> Kees Cook
->
-> --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/202009181427.86DE61B%40keescook.
+Thanks,
+Guenter
+
+> ---
+>  scripts/link-vmlinux.sh | 31 +++++++++++++++++++------------
+>  1 file changed, 19 insertions(+), 12 deletions(-)
+> 
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index e6e2d9e5ff48..72abdee0e649 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -316,11 +316,10 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+>  	#     From here, we generate a correct .tmp_kallsyms2.o
+>  	# 3)  That link may have expanded the kernel image enough that
+>  	#     more linker branch stubs / trampolines had to be added, which
+> -	#     introduces new names, which further expands kallsyms. Do another
+> -	#     pass if that is the case. In theory it's possible this results
+> -	#     in even more stubs, but unlikely.
+> -	#     KALLSYMS_EXTRA_PASS=1 may also used to debug or work around
+> -	#     other bugs.
+> +	#     introduces new names, which further expands kallsyms. Try up
+> +	#     to eight passes to handle that situation before giving up.
+> +	#     KALLSYMS_EXTRA_PASS=1 may be used to add an extra step
+> +	#     for debugging or to work around other bugs.
+>  	# 4)  The correct ${kallsymso} is linked into the final vmlinux.
+>  	#
+>  	# a)  Verify that the System.map from vmlinux matches the map from
+> @@ -329,13 +328,21 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
+>  	kallsyms_step 1
+>  	kallsyms_step 2
+>  
+> -	# step 3
+> -	size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso_prev})
+> -	size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
+> -
+> -	if [ $size1 -ne $size2 ] || [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+> -		kallsyms_step 3
+> -	fi
+> +	# step n
+> +	step=3
+> +	while [ $step -le 8 ]; do
+> +		size1=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso_prev})
+> +		size2=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" ${kallsymso})
+> +
+> +		if [ $size1 -eq $size2 ]; then
+> +			if [ -z "${KALLSYMS_EXTRA_PASS}" ]; then
+> +				break
+> +			fi
+> +			KALLSYMS_EXTRA_PASS=""
+> +		fi
+> +		kallsyms_step $step
+> +		step="$(expr $step + 1)"
+> +	done
+>  fi
+>  
+>  vmlinux_link vmlinux "${kallsymso}" ${btf_vmlinux_bin_o}
+> -- 
+> 2.17.1
+> 
