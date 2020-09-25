@@ -3,229 +3,111 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC26C4363D
-	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Sep 2020 07:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97656C4727C
+	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Sep 2020 15:21:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAD5523718
-	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Sep 2020 07:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5284B208B6
+	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Sep 2020 15:21:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="klgRI5xc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oxe8hyB3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727067AbgIYHdY (ORCPT
+        id S1729003AbgIYPVb (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 25 Sep 2020 03:33:24 -0400
-Received: from mail-eopbgr80058.outbound.protection.outlook.com ([40.107.8.58]:50689
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727044AbgIYHdX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Sep 2020 03:33:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PaKDSR1f38dT+DXhO77JHgfaNMhaeX/b+1BYDckHJPy+ITxK0CvLX0p9tDKRcQ7X23y0lqbwl3/ILmvqjksy0jUUJhaM2LHwnITRZQ6MENKqEdXLwae4tQjDuBQeE+RQtiHWGaXqTnIyIIbaqHSbrfPbhnMnOPlARn6FlLICGPgECzgJ+KeHFiqxEjiHUApVbXFBSv8uUXwAbFPt4WrVYXSfa7JTesmUaWqqgQhbFCPgbha3NvekhDTjhl3N2rR9CsafgChgnwfuyXuqBPzQTQCDep5upAmLgjbMV6dG1ftTGvYUk1hi1ZwhSLHEVfIJK4DBCVEQtOdNE4D3uzLWMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8FrmW9+Lon+YV5W8Wq5B5pDCEeczdxCd82AWQ2FDrf8=;
- b=cA+eFsjFMxyK8Q4t6IKo2aaG1NMy5/mNypbuHo8r8a+Tb6m1LNqe6wImOcZi6LmXssXPZEG4SEmtHR1n9Gk6R99tUu3z+RYf9YXYKZfQPLdGouedaBLNsnx3XDDZEvV4hwYo2RgVtPVb25YzApajUdM5TDRptBeQGVgdbqkXNKC68GGEMshxrJ6272BthzHrIqPiRaGRpvi3v5OqcOu69o6JUyw+VXVFQZnKeXlIF/f91ni6AWyohNtruEwBEZO52Fo5uIjvuHFoaYaJCA29Be2u+PLIJvWTRcF1UMnPRs8q7yXqypcdj+dQCqUBYrESEluc24ojJdgkhUMqg6TDFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8FrmW9+Lon+YV5W8Wq5B5pDCEeczdxCd82AWQ2FDrf8=;
- b=klgRI5xcI0etwUCFJAVnVOOJgRDoyprLxdwsha6DkFiBXGROKpqkidOHpUlBixRQuvd9Kw0GjIF52e6ET5UDBHHGm4hqUrdOhYDdMYdALNKd2TAdfikGn/FBCJwQGUHRqm8OYIfhw2z/3TDfBOq3KQP0qaTKKv/0UsMp2JJt2Kc=
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4960.eurprd04.prod.outlook.com (2603:10a6:803:57::21)
- by VI1PR0402MB3759.eurprd04.prod.outlook.com (2603:10a6:803:1f::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.15; Fri, 25 Sep
- 2020 07:33:21 +0000
-Received: from VI1PR04MB4960.eurprd04.prod.outlook.com
- ([fe80::b178:a37b:1f9e:3a6]) by VI1PR04MB4960.eurprd04.prod.outlook.com
- ([fe80::b178:a37b:1f9e:3a6%3]) with mapi id 15.20.3412.024; Fri, 25 Sep 2020
- 07:33:21 +0000
-From:   Sherry Sun <sherry.sun@nxp.com>
-To:     sudeep.dutt@intel.com, ashutosh.dixit@intel.com, arnd@arndb.de,
-        gregkh@linuxfoundation.org, masahiroy@kernel.org,
-        michal.lkml@markovi.net, lee.jones@linaro.org,
-        rikard.falkeborn@gmail.com, mst@redhat.co, bp@suse.de,
-        jhugo@codeaurora.org, tglx@linutronix.de,
-        manivannan.sadhasivam@linaro.org, mgross@linux.intel.com,
-        pierre-louis.bossart@linux.intel.com
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-imx@nxp.com
-Subject: [PATCH 3/3] mic: cosm: module autoprobing support for cosm driver
-Date:   Fri, 25 Sep 2020 15:31:58 +0800
-Message-Id: <20200925073158.8238-4-sherry.sun@nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200925073158.8238-1-sherry.sun@nxp.com>
-References: <20200925073158.8238-1-sherry.sun@nxp.com>
-Content-Type: text/plain
-X-ClientProxiedBy: AM0P190CA0001.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::11) To VI1PR04MB4960.eurprd04.prod.outlook.com
- (2603:10a6:803:57::21)
+        Fri, 25 Sep 2020 11:21:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33634 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728750AbgIYPVa (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 25 Sep 2020 11:21:30 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E43CC0613CE;
+        Fri, 25 Sep 2020 08:21:30 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id 7so2841997pgm.11;
+        Fri, 25 Sep 2020 08:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HfdKNxFN//fHQRteZ3ano4yEULisk9Ub6ql9G5B3xNA=;
+        b=oxe8hyB3SWoORMJx2Fg35b7spl30TjSgnbPZjGJVk6sS6rhFD96ISWOevGjmuBDi4N
+         DhzBdjFTeeK67b7waaPtxuVSbKdGK8HdpJOFCGyynvcNzRYBPNca4DN4/QsM7ooGZrcd
+         WsP/Ajt4zhN+5EwGmgbbP9cP5gG7CD7lmEy26yf4q6X7px4QGiODop3OJfN3oH3nMg0L
+         G/jwVvERTuCU8LKLqUatu0st4i/C6Vurd/9+ofCYqTd8TEs4wF0SE/YXQFYjrcdhPbmA
+         wWIhrFBSL2rrJeGLzJeZtp/DPD5aWDotB4wQEOlGucBFRp/ogUnRhAFcsBIfZW7BM7tH
+         DVaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HfdKNxFN//fHQRteZ3ano4yEULisk9Ub6ql9G5B3xNA=;
+        b=IaatSI7Tr13aXBMMkox3D5r+C/U9tgt/vhJcH223OsoeUIZe4UIaGaRokTwtbc+ZEe
+         B2n1K5ngXfOrB/7WXqdGxDbmU8Pgw0qu/QsHGjnWcIrzKL9hq1PWsZDbMM/9fLbc773S
+         kZ7z3qHZprbccIp1MvbUGBAEOxdSUIZGm24lePNvfjR0JuMHUEykeF3V0rNyMaYQW+3E
+         L+zteHdufkjbEVeS5ZFRBQXILxZka+++7G5QelFQC3lW8WlWiocp1qXjA/hyopXVV3Da
+         0f1BdxF5yPF2COsdFT7NDUdlulbcfQgJAgplkhJV/dsMRzEGPTnyyUgDcsY+f+bsLpZI
+         JkWQ==
+X-Gm-Message-State: AOAM5313HbWbVE6X3LNXalQM0utqxf1/qshGOwK1kdg179j4dO0B7UXC
+        tVvXiq9G4qo86j44mTh2DD2PqXOO1JFi8g==
+X-Google-Smtp-Source: ABdhPJx3SX4VU6qPahtPnpvBQkwftTxqRgX/Y/NQGT9VlhrynmpafqUBKJ6pXMXIuzy3KtKBOY9G1Q==
+X-Received: by 2002:a17:902:9698:b029:d1:9492:745b with SMTP id n24-20020a1709029698b02900d19492745bmr5152587plp.26.1601047289728;
+        Fri, 25 Sep 2020 08:21:29 -0700 (PDT)
+Received: from localhost.localdomain (ip68-111-84-250.oc.oc.cox.net. [68.111.84.250])
+        by smtp.gmail.com with ESMTPSA id gf12sm2323324pjb.16.2020.09.25.08.21.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Sep 2020 08:21:28 -0700 (PDT)
+From:   Florian Fainelli <f.fainelli@gmail.com>
+To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc:     Florian Fainelli <f.fainelli@gmail.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Kees Cook <keescook@chromium.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        clang-built-linux@googlegroups.com (open list:CLANG/LLVM BUILD SUPPORT),
+        linux-doc@vger.kernel.org (open list:DOCUMENTATION)
+Subject: [PATCH] Documentation/llvm: Fix clang target examples
+Date:   Fri, 25 Sep 2020 08:21:14 -0700
+Message-Id: <20200925152121.20527-1-f.fainelli@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from nxp.ap.freescale.net (119.31.174.71) by AM0P190CA0001.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.24 via Frontend Transport; Fri, 25 Sep 2020 07:33:13 +0000
-X-Mailer: git-send-email 2.17.1
-X-Originating-IP: [119.31.174.71]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9e0f8236-f9c3-425f-d7e0-08d8612546f4
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3759:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB37598B5E1278919E08BF678092360@VI1PR0402MB3759.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8nf7+qn4uoat+obPLW+bqFFZoQwip2MyFxWLzzBeaar5mSA1bp+t0nPfGTXPxiT19y+uEG1/ZNESc6LeNMgdL56OSjDGcq/BT0kpRO/6C8Vz7H/F9w1l9nMKCoFCcJhyBKx6ZACf1CTwhNLvflQ4f1SsyoG5U2h0Gcfzv2fCDRUYrGVKjW+qo16aBBb+6talvcAgB0uPWYungPRzwFT9vi8hqO60nbXKiW/MxDQRA6OqooF7OB8hgygmPnNGSyZJ93M1CFBzNHK5ASVEHItzrP514LaSDsth7VKm8K998128u0EKizTu2cznlA63zrVIOWOwN8Z6hIYYbYQmfp6wOl9jVW4ust2MwBxU1x1TpsKV5MvAWHCPPKUTOM/9DWFzgPZAh6KQcbl/0YCFPlmkcoUq181csLyM/yRCZ94xy24=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4960.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(396003)(346002)(39860400002)(376002)(16526019)(186003)(6666004)(52116002)(2906002)(1076003)(26005)(66556008)(66946007)(66476007)(2616005)(956004)(86362001)(44832011)(4326008)(6512007)(8676002)(7416002)(6486002)(36756003)(316002)(8936002)(478600001)(5660300002)(83380400001)(6506007)(921003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: xWNUd+sEGnRIo2MER8DDiQ4Qp+S1PUyddy0bVfltKU1o0vJr1ccMdUMTTr8e9VG6oXlTvzNSJvmgYo27ENPAydkEQbq0GdSC8uwHBTvKaoA0G8gVgW56mdFwKNpzTU0I+sK/Jkg/hOZWXUQIJXNY7fun0GQiJFvjG0ndgzSxMIoWhR4ZUP5rKDVR1lHC8tTBiDZS7DHfwd818zmuHqUmpQjQHKvPx+Dgxc040eQe197j7V4FtvLzsFSxaAajKvUh2yxPyXDEGAMAh44M73pVIiVIsAWif4Gx1N/fZqN696crHE92pIbtBrAKIiF92rQeS0nuQjBIqsOZKehC1Xfn/jvqt/KXmGAj991qrU+k+HZzbzlomzm4HCmZd8N4NQUGMNTTQ9YAgM5YuXNFrcl3MiD2ppDt9P2buZmkRKbd+z9Lm0mOXprrwjXSSpOum746XiQvbCktsN96cUZJAlpb4UXfPftg7JuCLnWorPzpqb4Q7Tvti9xIT8lpTF88tFqE0KvaqgpDLJkTkSK2vzVTG/OzeS0Qywe+F7Pv1wZcYiZsXqHFPDYO2Jlxx1prjD52obUmkd7avT9srtI4KOeN1NDiUu6R2/2aKAKBxaBZiYA24bsKRnRqo1JnwqFq/tTNVB3QIlQu6td3g76k0w9FtA==
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e0f8236-f9c3-425f-d7e0-08d8612546f4
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4960.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2020 07:33:21.0637
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R11qcD6sTJZIpONcWD34TVS9ioM+EVKKLi34hyzJqesWoL3jYrrw8dNi/CAHZmNKjNlFq75PxC5nfXxH8rk0NA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3759
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add uevent callback for cosm_bus and add cosm_device_id for cosm driver
-which is needed for MODULE_DEVICE_TABLE. Also adding struct
-cosm_device_id in devicetable-offsets.c and the cosm entry point in
-file2alias.c.
+clang --target=<triple> is how we can specify a particular toolchain
+triple to be use, fix the two occurences in the documentation.
 
-Cosm driver will be autoloaded when cosm device appears.
-
-Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
+Fixes: fcf1b6a35c16 ("Documentation/llvm: add documentation on building w/ Clang/LLVM")
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/misc/mic/bus/cosm_bus.c   |  8 ++++++++
- drivers/misc/mic/cosm/cosm_main.c |  7 +++++++
- include/linux/mod_devicetable.h   |  8 ++++++++
- scripts/mod/devicetable-offsets.c |  3 +++
- scripts/mod/file2alias.c          | 11 +++++++++++
- 5 files changed, 37 insertions(+)
+ Documentation/kbuild/llvm.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/misc/mic/bus/cosm_bus.c b/drivers/misc/mic/bus/cosm_bus.c
-index 5f2141c71738..736e27bbc9f9 100644
---- a/drivers/misc/mic/bus/cosm_bus.c
-+++ b/drivers/misc/mic/bus/cosm_bus.c
-@@ -14,6 +14,13 @@
- /* Unique numbering for cosm devices. */
- static DEFINE_IDA(cosm_index_ida);
+diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+index 334df758dce3..dae90c21aed3 100644
+--- a/Documentation/kbuild/llvm.rst
++++ b/Documentation/kbuild/llvm.rst
+@@ -39,10 +39,10 @@ which can help simplify cross compiling. ::
+ 	ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- make CC=clang
  
-+static int cosm_uevent(struct device *d, struct kobj_uevent_env *env)
-+{
-+	struct cosm_device *dev = dev_to_cosm(d);
-+
-+	return add_uevent_var(env, "MODALIAS=cosm:cosm-dev%u", dev->index);
-+}
-+
- static int cosm_dev_probe(struct device *d)
- {
- 	struct cosm_device *dev = dev_to_cosm(d);
-@@ -33,6 +40,7 @@ static int cosm_dev_remove(struct device *d)
+ ``CROSS_COMPILE`` is not used to prefix the Clang compiler binary, instead
+-``CROSS_COMPILE`` is used to set a command line flag: ``--target <triple>``. For
++``CROSS_COMPILE`` is used to set a command line flag: ``--target=<triple>``. For
+ example: ::
  
- static struct bus_type cosm_bus = {
- 	.name  = "cosm_bus",
-+	.uevent = cosm_uevent,
- 	.probe = cosm_dev_probe,
- 	.remove = cosm_dev_remove,
- };
-diff --git a/drivers/misc/mic/cosm/cosm_main.c b/drivers/misc/mic/cosm/cosm_main.c
-index ebb0eac43754..627e7d5f3a83 100644
---- a/drivers/misc/mic/cosm/cosm_main.c
-+++ b/drivers/misc/mic/cosm/cosm_main.c
-@@ -12,6 +12,7 @@
- #include <linux/idr.h>
- #include <linux/slab.h>
- #include <linux/cred.h>
-+#include <linux/mod_devicetable.h>
- #include "cosm_main.h"
+-	clang --target aarch64-linux-gnu foo.c
++	clang --target=aarch64-linux-gnu foo.c
  
- static const char cosm_driver_name[] = "mic";
-@@ -323,6 +324,12 @@ static int cosm_suspend(struct device *dev)
- 	return 0;
- }
- 
-+static struct cosm_device_id __maybe_unused cosm_driver_id_table[] = {
-+	{ .name	= "cosm-dev*" },
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(cosm, cosm_driver_id_table);
-+
- static const struct dev_pm_ops cosm_pm_ops = {
- 	.suspend = cosm_suspend,
- 	.freeze = cosm_suspend
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 736cdc236cf9..ea6cdfe1a3a3 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -845,4 +845,12 @@ struct vop_device_id {
- };
- #define VOP_DEV_ANY_ID	0xffffffff
- 
-+/* cosm */
-+#define COSM_NAME_SIZE			32
-+#define COSM_MODULE_PREFIX	"cosm:"
-+
-+struct cosm_device_id {
-+	char name[COSM_NAME_SIZE];
-+};
-+
- #endif /* LINUX_MOD_DEVICETABLE_H */
-diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
-index 393acaa5302a..499a2832878d 100644
---- a/scripts/mod/devicetable-offsets.c
-+++ b/scripts/mod/devicetable-offsets.c
-@@ -247,5 +247,8 @@ int main(void)
- 	DEVID_FIELD(vop_device_id, device);
- 	DEVID_FIELD(vop_device_id, vendor);
- 
-+	DEVID(cosm_device_id);
-+	DEVID_FIELD(cosm_device_id, name);
-+
- 	return 0;
- }
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 8063b778eedf..f7c80e4da137 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -1383,6 +1383,16 @@ static int do_vop_entry(const char *filename, void *symval,
- 	return 1;
- }
- 
-+/* Looks like: cosm:S */
-+static int do_cosm_entry(const char *filename, void *symval,
-+			  char *alias)
-+{
-+	DEF_FIELD_ADDR(symval, cosm_device_id, name);
-+	sprintf(alias, COSM_MODULE_PREFIX "%s", *name);
-+
-+	return 1;
-+}
-+
- /* Does namelen bytes of name exactly match the symbol? */
- static bool sym_is(const char *name, unsigned namelen, const char *symbol)
- {
-@@ -1458,6 +1468,7 @@ static const struct devtable devtable[] = {
- 	{"wmi", SIZE_wmi_device_id, do_wmi_entry},
- 	{"mhi", SIZE_mhi_device_id, do_mhi_entry},
- 	{"vop", SIZE_vop_device_id, do_vop_entry},
-+	{"cosm", SIZE_cosm_device_id, do_cosm_entry},
- };
- 
- /* Create MODULE_ALIAS() statements.
+ LLVM Utilities
+ --------------
 -- 
-2.17.1
+2.25.1
 
