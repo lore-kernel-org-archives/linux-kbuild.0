@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 757DAC47423
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAE0C47425
 	for <linux-kbuild@archiver.kernel.org>; Tue, 29 Sep 2020 21:49:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F80B2076D
+	by mail.kernel.org (Postfix) with ESMTP id 8F83F2076D
 	for <linux-kbuild@archiver.kernel.org>; Tue, 29 Sep 2020 21:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VQOoXlSc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjtEviXm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728384AbgI2VtE (ORCPT
+        id S1729214AbgI2VtE (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Tue, 29 Sep 2020 17:49:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48488 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729214AbgI2Vrp (ORCPT
+        with ESMTP id S1729209AbgI2Vrp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 29 Sep 2020 17:47:45 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95AFC0613DB
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2020 14:47:26 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id 16so3666904qky.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2020 14:47:26 -0700 (PDT)
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA701C061787
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2020 14:47:33 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id w92so4074550qte.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Sep 2020 14:47:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=dEqcNX1Djl0IV1+V4O1jZ3zX0CSjG7hkO+H8f2GKot0=;
-        b=VQOoXlScak0WysBr/W0lMAFEgBmf32Hfw3oXYJ6KFr0fKBu3y13ZA46qQn/qdgZK8G
-         i7ux8V3oo0qTphW/9JBrWhu78R0GtF1wBcMFmXjLpLEc7GSsvPNid7x6lav1uJEis2a7
-         9W/iGpPEQWtZ88Ylf6C8QNA3xu3tblmY6b/lZ2G2WdHJgfBPHmhOTR1ICCMpX+ICACEs
-         gkyzgzySrJUDgSqaEtM3K6Q4WXigD1N/jiQrFgmXGoYkLUA/xKM7BuINs/wO+fWF4DHc
-         JWaw9z1iMdO3i+MVSCqHWvgzTM8qRNCbnWvbhhOBb0dwF6b5pI+bPyepJLJRhfWXJMhQ
-         QkeA==
+        bh=HR6xYTbNbcDM2Zx8OyOOjD6y5MQ06zsj0pUhq+j+6f0=;
+        b=mjtEviXmAKLxRM/LKJDKCHLIap39YYCJi8bXUSknQxexGmScOixPfgLk2saryOKVhr
+         MDXdwtc03Qsk8BhzaMB6wWLfJxFsJFr3vbeje5KUt1CCBDcvypxfH4Fd/DWdOskLuiWX
+         NuoS4Bfi9pPbelk7+Wps01W1gREOYAgy0hs0foMuoNPzPZHoq/3Nbj/lsE5jTNdKMozj
+         B1pDJbVp/H5WbOFBXWVr5QnvhRybtlvviWImhHwfWGzZfBrzqfvE+v/WN27Qnhw99flS
+         d+zHsrVrZeZ906dvjvCq1dGlmBlNMTipr0bhZn+88+kegFwV/4iyBn9hGct0i3bRdod1
+         YlfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=dEqcNX1Djl0IV1+V4O1jZ3zX0CSjG7hkO+H8f2GKot0=;
-        b=QXLpJ9H7OMRBnDXzIEzCg35ZafOlsxiO5dFbxN1y05a94SAz0OAq/OVaTDvDMRPxGH
-         s0JJmhXht9Vu7OPwh/8UVpPR8JD2H+qx0XeugmAAI4NW4OaZJ0qupZt1KQ5CkDYdk5hx
-         CG5Dswaf8yQbNGF2OFQ770MXtc2zImIntCXFh3niSD72R5x4/gap49PTi8aWmwviAdTd
-         PEKvoPGSRks0Us/AX9LDBFK+FPE/Xfd3dM4XClYUkmPIagE+prcdFteAPIBEiLXh7jpw
-         D9NyZuMVZRRKUiitHVpebuHV8vOut2IROrE9PXz2I1Pv2sVNXLEKADn2zk4CE4FQC1eP
-         QaYg==
-X-Gm-Message-State: AOAM530WF4r0+RVSnd5X5f1EMc+CN+iHLySZxrS9ULYXdHQlpGREiwC7
-        uQp4D1s9beFMwb8qYvUNJPIySxPi0k9v5ioA59Q=
-X-Google-Smtp-Source: ABdhPJx3IHLlEpEE6lKzgLbRoH8pUHS5aZ5bMzeasJnHs8u5b0ZHEbgeZKYJBmfQeDJ5khZeV7Cye7dg816GPppPI2c=
+        bh=HR6xYTbNbcDM2Zx8OyOOjD6y5MQ06zsj0pUhq+j+6f0=;
+        b=Pd5zCvzV90odI7lU5nucbVDcdkPflWXOqdD86HLnfJ9FOC10v8sZBn5p1V9ZlzfYnz
+         usWc/wyYYRFvp5GKqyfCbLyYTJEUJwCtg3Pce5JrWhUYsb0XTYZmBboJ6slwac+inC3K
+         2NrScMP9P4bjB59fSxpBfhM6aBAP8FC+R1nKC2k2P3KsYGa/g9MGNFriMGY2jMPXyd3P
+         rJn2K75Rdo05X41rt/IMDt827tRMPSf/inWqRfcjw+kk3818pQC5sPxQEJ8riEc6jdl/
+         9EDeI5ucg9kJnrt1mmyhuSgPNxRnoNPLEw8ZsjigJBATp98bt8dc63LLJCe0Q88C0GM1
+         XwxA==
+X-Gm-Message-State: AOAM531Sw7uz/aAASMS8xLm/reZtEia9NidB8J3rdKaUI9i0y7DZqo4w
+        qAyizBlpnDp7haZCUWiYYqOQisHjMyXoLY1t3Qc=
+X-Google-Smtp-Source: ABdhPJzU2WBEA+8eGCg04PobSkCT+PMZ1E++tYvTMvMYCJ02D4tu/Rlfu13A0+WZqSX+Koxe9SboRRHBjqEXIi3STU4=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a0c:abc7:: with SMTP id
- k7mr6181365qvb.45.1601416045978; Tue, 29 Sep 2020 14:47:25 -0700 (PDT)
-Date:   Tue, 29 Sep 2020 14:46:25 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a0c:d682:: with SMTP id
+ k2mr6249286qvi.27.1601416052963; Tue, 29 Sep 2020 14:47:32 -0700 (PDT)
+Date:   Tue, 29 Sep 2020 14:46:28 -0700
 In-Reply-To: <20200929214631.3516445-1-samitolvanen@google.com>
-Message-Id: <20200929214631.3516445-24-samitolvanen@google.com>
+Message-Id: <20200929214631.3516445-27-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20200929214631.3516445-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.709.gb0816b6eb0-goog
-Subject: [PATCH v4 23/29] drivers/misc/lkdtm: disable LTO for rodata.o
+Subject: [PATCH v4 26/29] arm64: allow LTO_CLANG and THINLTO to be selected
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
@@ -85,27 +85,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Disable LTO for rodata.o to allow objcopy to be used to
-manipulate sections.
+Allow CONFIG_LTO_CLANG and CONFIG_THINLTO to be enabled.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/misc/lkdtm/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/misc/lkdtm/Makefile b/drivers/misc/lkdtm/Makefile
-index c70b3822013f..dd4c936d4d73 100644
---- a/drivers/misc/lkdtm/Makefile
-+++ b/drivers/misc/lkdtm/Makefile
-@@ -13,6 +13,7 @@ lkdtm-$(CONFIG_LKDTM)		+= cfi.o
- 
- KASAN_SANITIZE_stackleak.o	:= n
- KCOV_INSTRUMENT_rodata.o	:= n
-+CFLAGS_REMOVE_rodata.o		+= $(CC_FLAGS_LTO)
- 
- OBJCOPYFLAGS :=
- OBJCOPYFLAGS_rodata_objcopy.o	:= \
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index ad522b021f35..7016d193864f 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -72,6 +72,8 @@ config ARM64
+ 	select ARCH_USE_SYM_ANNOTATIONS
+ 	select ARCH_SUPPORTS_MEMORY_FAILURE
+ 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
++	select ARCH_SUPPORTS_LTO_CLANG
++	select ARCH_SUPPORTS_THINLTO
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
+ 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
+ 	select ARCH_SUPPORTS_NUMA_BALANCING
 -- 
 2.28.0.709.gb0816b6eb0-goog
 
