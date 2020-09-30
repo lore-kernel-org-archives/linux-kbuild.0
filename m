@@ -2,33 +2,35 @@ Return-Path: <SRS0=Xovq=DH=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DA2C4727C
-	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Sep 2020 00:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DECC4727E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Sep 2020 09:59:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 059C32074B
-	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Sep 2020 00:13:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 993522075F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Sep 2020 09:59:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728291AbgI3ANB (ORCPT
+        id S1729104AbgI3J7O (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 29 Sep 2020 20:13:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36094 "EHLO mail.kernel.org"
+        Wed, 30 Sep 2020 05:59:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:33026 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728192AbgI3ANB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Sep 2020 20:13:01 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5580B20739;
-        Wed, 30 Sep 2020 00:12:59 +0000 (UTC)
-Date:   Tue, 29 Sep 2020 20:12:57 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
+        id S1728235AbgI3J7O (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 30 Sep 2020 05:59:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47BA9D6E;
+        Wed, 30 Sep 2020 02:59:13 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.48.174])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C3E9A3F70D;
+        Wed, 30 Sep 2020 02:59:09 -0700 (PDT)
+Date:   Wed, 30 Sep 2020 10:58:50 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
 To:     Sami Tolvanen <samitolvanen@google.com>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Paul E. McKenney" <paulmck@kernel.org>,
@@ -39,53 +41,54 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
         x86@kernel.org
-Subject: Re: [PATCH v4 06/29] tracing: move function tracer options to
- Kconfig
-Message-ID: <20200929201257.1570aadd@oasis.local.home>
-In-Reply-To: <20200929214631.3516445-7-samitolvanen@google.com>
+Subject: Re: [PATCH v4 09/29] arm64: disable recordmcount with
+ DYNAMIC_FTRACE_WITH_REGS
+Message-ID: <20200930095850.GA68612@C02TD0UTHF1T.local>
 References: <20200929214631.3516445-1-samitolvanen@google.com>
-        <20200929214631.3516445-7-samitolvanen@google.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ <20200929214631.3516445-10-samitolvanen@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200929214631.3516445-10-samitolvanen@google.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, 29 Sep 2020 14:46:08 -0700
-Sami Tolvanen <samitolvanen@google.com> wrote:
+Hi Sami,
 
-> +++ b/kernel/trace/Kconfig
-> @@ -595,6 +595,22 @@ config FTRACE_MCOUNT_RECORD
->  	depends on DYNAMIC_FTRACE
->  	depends on HAVE_FTRACE_MCOUNT_RECORD
->  
-> +config FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-> +	bool
-> +	depends on FTRACE_MCOUNT_RECORD
-> +
-> +config FTRACE_MCOUNT_USE_CC
-> +	def_bool y
-> +	depends on $(cc-option,-mrecord-mcount)
+On Tue, Sep 29, 2020 at 02:46:11PM -0700, Sami Tolvanen wrote:
+> Select FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY to disable
+> recordmcount when DYNAMIC_FTRACE_WITH_REGS is selected.
 
-Does the above get executed at every build? Or does a make *config need
-to be done? If someone were to pass a .config to someone else that had
-a compiler that didn't support this, would it be changed if the person
-just did a make?
+Could you please add an explanation as to /why/ this is necessary in the
+commit message? I couldn't figure this out form the commit message
+alone, and reading the cover letter also didn't help.
 
--- Steve
+If the minimum required GCC version supports patchable-function-entry
+I'd be happy to make that a requirement for dynamic ftrace on arm64, as
+then we'd only need to support one mechanism, and can get rid of some
+redundant code. We already default to it when present anyhow.
 
+> 
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> ---
+>  arch/arm64/Kconfig | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 6d232837cbee..ad522b021f35 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -155,6 +155,8 @@ config ARM64
+>  	select HAVE_DYNAMIC_FTRACE
+>  	select HAVE_DYNAMIC_FTRACE_WITH_REGS \
+>  		if $(cc-option,-fpatchable-function-entry=2)
+> +	select FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY \
+> +		if DYNAMIC_FTRACE_WITH_REGS
 
-> +	depends on !FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-> +	depends on FTRACE_MCOUNT_RECORD
-> +
-> +config FTRACE_MCOUNT_USE_RECORDMCOUNT
-> +	def_bool y
-> +	depends on !FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-> +	depends on !FTRACE_MCOUNT_USE_CC
-> +	depends on FTRACE_MCOUNT_RECORD
-> +
->  config TRACING_MAP
->  	bool
->  	depends on ARCH_HAVE_NMI_SAFE_CMPXCHG
+This doesn't look quite right to me. Presumably we shouldn't allow
+DYNAMIC_FTRACE_WITH_REGS to be selected if HAVE_DYNAMIC_FTRACE_WITH_REGS
+isn't.
+
+Thanks,
+Mark.
