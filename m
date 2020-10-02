@@ -2,58 +2,58 @@ Return-Path: <SRS0=VMwD=DJ=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BDDC46466
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81448C35257
 	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64FFB21481
-	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 279B220738
+	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="P86qJ26z"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NspRsNBo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725772AbgJBWPd (ORCPT
+        id S1725747AbgJBWPc (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 2 Oct 2020 18:15:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
+        Fri, 2 Oct 2020 18:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725355AbgJBWPd (ORCPT
+        with ESMTP id S1725562AbgJBWPc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Oct 2020 18:15:33 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2090C0613E2
-        for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2020 15:15:31 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id q18so1733415pgk.7
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2020 15:15:31 -0700 (PDT)
+        Fri, 2 Oct 2020 18:15:32 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A866C0613D0
+        for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2020 15:15:32 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id 34so1714654pgo.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2020 15:15:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=W38dVAPuerCLRPng7jlZI5vlQvHBD4rfwSORzTtYXKQ=;
-        b=P86qJ26zBTlGzUNxp4OC0MsOBNi/tpsFSeK6wcegzOcCeUa3XqFl/Ab45EktTGWVmT
-         WDJU25a6cT72PvQXY3i14T9zxSdj3mDUKOZQXJVKxVLk8THyKRo9cDtmvJ0w60PzSF8D
-         qjFvoco0nsdU5F3wyT0KnCJwALvIBvnmJCpY0=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=V0SUsmWACvD3dNMBDG6SPv9xQ8I4+FrehwcPDr9x9nQ=;
+        b=NspRsNBoQmAwlT7ORJjoYtbzCkS8Mem1PHd5ELyCp11qlcVrFG/e9NIs9mzirqBWRb
+         sy2KeczTIFS+05DESF5CXcTDsPhucuYeI88jXAgsYuq8GCfBtZ3/bX0BRQ7aw9M6uYNy
+         uz+algmJ3/4kBFBTVxv4JjL7VqNnzzFzjRQ0w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=W38dVAPuerCLRPng7jlZI5vlQvHBD4rfwSORzTtYXKQ=;
-        b=g+21bXVsRQEtAgZDRsyW6gvC6fGoGZkgx2B7KxTs5aYaKxY/FEc4C9QPjIiVTgcQa4
-         6PUBZ6UbUN1ajDMV2hSIKnRqfkJ2jbAUL8FFAKGr7S2iJjfnpFrCjoPWqTAT8Mye4jgX
-         uSMg8xviR+huabCzwEzXVJwheNUB6erUQd12DMfBoD/u++B8SAnTVmgZXpxY62pDAjjG
-         DY33u2kmb129ao7BfhPJmBPRqUoIvb4pfwEXQdmv3l6K+dT0AmFC2ttGU/QL5/AhfFtV
-         9VveFdHfphLj6L4D7Kld9lsZdGisjQh0B6kfbmvaosvF7MKPq2rUreWbuoj5mtTPMMA2
-         wmqA==
-X-Gm-Message-State: AOAM531hBQMenq1+XZljrvRDQygWVB5sEVKRmBOJGRgYOs+vvfqgjHm+
-        JG+b5D8ObG35QJdng/xfrNBt0Q==
-X-Google-Smtp-Source: ABdhPJwkAsUpzwleQKAEzT+p6nflOsz5Rf8YkJbRfNibKIrcjJp5Zw/DCWLxEksgkxLbLFyq+v6hqA==
-X-Received: by 2002:a63:511d:: with SMTP id f29mr4133234pgb.11.1601676930990;
-        Fri, 02 Oct 2020 15:15:30 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=V0SUsmWACvD3dNMBDG6SPv9xQ8I4+FrehwcPDr9x9nQ=;
+        b=RjIwrqGjJnWMbBNQ8EJuVQLl8HIHSYrBzXlE6ReRZc39l+ZlaVFpsPjyQ/F0j9ghSW
+         RpFS4v9sJrBUjOcUM+RAkG/rE/kmIFUTQweF2t1+jkwJxZN1xs3mIYGfmAFSbk60qlao
+         hLXHVwQeP9eYCbmucb6i1ZvdY4R0d3lfgTVkH3tZj2KhmXTo6DTS0zLG46G7WHFQ3G7f
+         Sv6hIJItb6h5FeAgMdxfX8ztsD/S79/9tdEp9rC7MIf4MD97JrctEFt3sRSaQZOv6th6
+         3PYPuuJyEtq6Dh33Sg7XyHrbaw6CTnP9YEf4iNuVrxsqxYUQEoRQ1fZIgiXJ+efsD3rD
+         qY4A==
+X-Gm-Message-State: AOAM530hKBiD/YnyCTFBn9T3uBR9co7Zo6qDXzd0/j0hbnNpuYkizWLx
+        BMzB8umlbXhUKXFfp9ykdnPA0w==
+X-Google-Smtp-Source: ABdhPJwUyVVoH5EXUD3PrxRHDmHm6dp6faop7SkvnztMQv9qaPMVwZugN89ctYIKMniZcrQvA9CcJQ==
+X-Received: by 2002:a63:794e:: with SMTP id u75mr4097073pgc.233.1601676931560;
+        Fri, 02 Oct 2020 15:15:31 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id q16sm3210133pfj.117.2020.10.02.15.15.29
+        by smtp.gmail.com with ESMTPSA id k4sm3349568pfp.189.2020.10.02.15.15.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 02 Oct 2020 15:15:29 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -75,38 +75,42 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>,
         clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] Clean up UBSAN Makefile
-Date:   Fri,  2 Oct 2020 15:15:23 -0700
-Message-Id: <20201002221527.177500-1-keescook@chromium.org>
+Subject: [PATCH 2/4] ubsan: Disable object-size sanitizer under GCC
+Date:   Fri,  2 Oct 2020 15:15:25 -0700
+Message-Id: <20201002221527.177500-3-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201002221527.177500-1-keescook@chromium.org>
+References: <20201002221527.177500-1-keescook@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi,
+GCC's -fsanitize=object-size (as part of CONFIG_UBSAN_MISC) greatly
+increases stack utilization. Do not allow this under GCC.
 
-This series attempts to address the issues seen with UBSAN's object-size
-sanitizer causing problems under GCC. In the process, the Kconfig and
-Makefile are refactored to do all the cc-option calls in the Kconfig.
-Additionally start to detangle -Wno-maybe-uninitialized, and disable
-UBSAN_TRAP under COMPILE_TEST for wider build coverage.
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/lkml/CAHk-=wjPasyJrDuwDnpHJS2TuQfExwe=px-SzLeN8GFMAQJPmQ@mail.gmail.com/
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ lib/Kconfig.ubsan | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thanks!
-
--Kees
-
-Kees Cook (4):
-  ubsan: Move cc-option tests into Kconfig
-  ubsan: Disable object-size sanitizer under GCC
-  ubsan: Force -Wno-maybe-uninitialized only for GCC
-  ubsan: Disable UBSAN_TRAP for all*config
-
- lib/Kconfig.ubsan      | 58 +++++++++++++++++++++++++++++++++++++++++-
- scripts/Makefile.ubsan | 50 +++++++++++++-----------------------
- 2 files changed, 74 insertions(+), 34 deletions(-)
-
+diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
+index c0b801871e0b..aeb2cdea0b94 100644
+--- a/lib/Kconfig.ubsan
++++ b/lib/Kconfig.ubsan
+@@ -104,6 +104,9 @@ config UBSAN_UNSIGNED_OVERFLOW
+ 
+ config UBSAN_OBJECT_SIZE
+ 	def_bool UBSAN_MISC
++	# gcc hugely expands stack usage with -fsanitize=object-size
++	# https://lore.kernel.org/lkml/CAHk-=wjPasyJrDuwDnpHJS2TuQfExwe=px-SzLeN8GFMAQJPmQ@mail.gmail.com/
++	depends on !CC_IS_GCC
+ 	depends on $(cc-option,-fsanitize=object-size)
+ 
+ config UBSAN_BOOL
 -- 
 2.25.1
 
