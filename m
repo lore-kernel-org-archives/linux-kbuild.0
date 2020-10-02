@@ -8,53 +8,53 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22952C41604
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8C1C47095
 	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C19C22072E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7556420738
+	for <linux-kbuild@archiver.kernel.org>; Fri,  2 Oct 2020 22:15:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DhD8t5kr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jxxjLAVh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725783AbgJBWPh (ORCPT
+        id S1725780AbgJBWPg (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 2 Oct 2020 18:15:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
+        Fri, 2 Oct 2020 18:15:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbgJBWPd (ORCPT
+        with ESMTP id S1725774AbgJBWPe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Oct 2020 18:15:33 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5ECC0613E2
-        for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2020 15:15:33 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id j8so50160pjy.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2020 15:15:33 -0700 (PDT)
+        Fri, 2 Oct 2020 18:15:34 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 920E6C0613D0
+        for <linux-kbuild@vger.kernel.org>; Fri,  2 Oct 2020 15:15:32 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id y14so1722184pgf.12
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Oct 2020 15:15:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/J1gHtjcOOv6Rq1ls75T0pkphOgixxdtxsRzhxRApII=;
-        b=DhD8t5kr8ElFUdmH3JdVP9GXM33yLmm67FT7fIl5wwRBQKJJ/2B8l4IoqTbHRe71Lm
-         rDMxMTHC1vGlbvnJqy//diKkTio5j2dEzjhWQuYbgIY6As/lRsNAcxn35knW+xPcOyUk
-         Osj4zkWGzG57f/iA9OCnsuvHzDqlOO1JFlFDU=
+        bh=ZbgeNKSFkQV6HyhEuVenlb7h0oRDKk8aNnzV1dp+u/c=;
+        b=jxxjLAVhqgNV8pV6V+zph33zFLdgUf+5TWx4YYjqEojQm4I0eEVVBoM1H6Hp5FvfLC
+         QYt82Esp0qBHXqXKM0Ax1a4r6Iik1ZtaxQhprJrY1fFkOiOVtoeTgRczHdsY/OgOI75P
+         A9p1ol+7i5xnMeVnG4sek2DBQoZgTRm4BDBek=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/J1gHtjcOOv6Rq1ls75T0pkphOgixxdtxsRzhxRApII=;
-        b=inD0QMyB0Wrt9q/5YL44GpXFbJA9Na49KsNZhM8GJDDymJIzSgwwPPRp2g2seskkiu
-         C2GsPj/w5xhNzT7Bp3F2EDtJ9DiijenvuFxWoGIMXs9DS+XhwjY5Mq7ckJ1eZhSizVIP
-         deROUOqHFZEpvcUX2y7tOx0oq9pKcwImm6DhkP63eHmYujS0JeHF/9lZyC6fTYuh3JFh
-         DXudjnUuW+nd/oS5MXCXS/qRqbxSArdINgavXGUOnbKp1T/heaIeZB3E+VjgLmWdsW1r
-         pQ8UJFfKV1GHozGqgablkH0pGUCjeoFcns3JQIABqUg9AbS1uI4v4YgsfBL/CkD8PSfw
-         YRWw==
-X-Gm-Message-State: AOAM5308P2nxRatatoyodAliUE0oNRpBUiMfLJMkAs+pNQZfuvJYWEFg
-        5idKtBPTsn6OkU1bvSag0NSZug==
-X-Google-Smtp-Source: ABdhPJynp5+FxeGECOIttGZMHkFLTgnPXv32Y6n64K/4v4HDOsUQ1brucRflNmhHdgLmUmfggxKPqA==
-X-Received: by 2002:a17:90a:800c:: with SMTP id b12mr4837503pjn.179.1601676933444;
-        Fri, 02 Oct 2020 15:15:33 -0700 (PDT)
+        bh=ZbgeNKSFkQV6HyhEuVenlb7h0oRDKk8aNnzV1dp+u/c=;
+        b=dir1jUmxZ7IM1Eqwnx591vA8ej3sZJhiv5SrYF8WYY+tWtPgt6JcxQhBnx5pP/PvSH
+         Qw2Y/ESMDsp7aBWc6lusvJEknmi3BfIE4ECklJn1JrMMXBci9kGFt5PTS0TdIwPV3yH5
+         a1Hemw6IPWD/wTdT8YWjCH/koq0yNMiqQmaXTj506YcQF7cSpmz4VPciGFzLPiSNys8A
+         gU1p8454AfaQ2hdM71gyjyvhwN1IRBzjazTBo0/pFSoeUYu4UQ8DCFMCvGL/UnCUy6iM
+         j8zhTTZctEbdTbhaQ8jFY4s1NwRkIZNwadvHi0Gd85a13tCyA2jW0hXo0lyHCiE41Pmd
+         SArw==
+X-Gm-Message-State: AOAM533ZUn1BryNkQVblXdpnvqdPJr4CApds36xtTQ0HaFfb09688hCo
+        cTwuubaN3cKmoy3Mc1U4hQ3fng==
+X-Google-Smtp-Source: ABdhPJwSla2mXu1bnKfnCi7nfqWrHkn3nEgEq/mYJgCSxqxrMOE9rx9AIP2Kdh7JzaQK5Mb0rgOzNQ==
+X-Received: by 2002:a63:454f:: with SMTP id u15mr4144313pgk.198.1601676932082;
+        Fri, 02 Oct 2020 15:15:32 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id bt13sm2640065pjb.23.2020.10.02.15.15.29
+        by smtp.gmail.com with ESMTPSA id j25sm3071266pfn.212.2020.10.02.15.15.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 02 Oct 2020 15:15:29 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -76,9 +76,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>,
         clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] ubsan: Disable UBSAN_TRAP for all*config
-Date:   Fri,  2 Oct 2020 15:15:27 -0700
-Message-Id: <20201002221527.177500-5-keescook@chromium.org>
+Subject: [PATCH 1/4] ubsan: Move cc-option tests into Kconfig
+Date:   Fri,  2 Oct 2020 15:15:24 -0700
+Message-Id: <20201002221527.177500-2-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201002221527.177500-1-keescook@chromium.org>
 References: <20201002221527.177500-1-keescook@chromium.org>
@@ -88,27 +88,165 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Doing all*config builds attempts build as much as possible. UBSAN_TRAP
-effectively short-circuits lib/usban.c, so it should be disabled for
-COMPILE_TEST so that the lib/ubsan.c code gets built.
+Instead of doing if/endif blocks with cc-option calls in the UBSAN
+Makefile, move all the tests into Kconfig and use the Makefile to
+collect the results.
 
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/lkml/CAHk-=wjPasyJrDuwDnpHJS2TuQfExwe=px-SzLeN8GFMAQJPmQ@mail.gmail.com/
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- lib/Kconfig.ubsan | 1 +
- 1 file changed, 1 insertion(+)
+ lib/Kconfig.ubsan      | 48 +++++++++++++++++++++++++++++++++++++++-
+ scripts/Makefile.ubsan | 50 ++++++++++++++----------------------------
+ 2 files changed, 64 insertions(+), 34 deletions(-)
 
 diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
-index 1fc07f936e06..b5b9da0b635a 100644
+index 58f8d03d037b..c0b801871e0b 100644
 --- a/lib/Kconfig.ubsan
 +++ b/lib/Kconfig.ubsan
-@@ -14,6 +14,7 @@ if UBSAN
+@@ -36,10 +36,17 @@ config UBSAN_KCOV_BROKEN
+ 	  See https://bugs.llvm.org/show_bug.cgi?id=45831 for the status
+ 	  in newer releases.
  
- config UBSAN_TRAP
- 	bool "On Sanitizer warnings, abort the running kernel code"
-+	depends on !COMPILE_TEST
- 	depends on $(cc-option, -fsanitize-undefined-trap-on-error)
++config CC_HAS_UBSAN_BOUNDS
++	def_bool $(cc-option,-fsanitize=bounds)
++
++config CC_HAS_UBSAN_ARRAY_BOUNDS
++	def_bool $(cc-option,-fsanitize=array-bounds)
++
+ config UBSAN_BOUNDS
+ 	bool "Perform array index bounds checking"
+ 	default UBSAN
+ 	depends on !UBSAN_KCOV_BROKEN
++	depends on CC_HAS_UBSAN_ARRAY_BOUNDS || CC_HAS_UBSAN_BOUNDS
  	help
- 	  Building kernels with Sanitizer features enabled tends to grow
+ 	  This option enables detection of directly indexed out of bounds
+ 	  array accesses, where the array size is known at compile time.
+@@ -47,11 +54,17 @@ config UBSAN_BOUNDS
+ 	  to the {str,mem}*cpy() family of functions (that is addressed
+ 	  by CONFIG_FORTIFY_SOURCE).
+ 
++config CC_ARG_UBSAN_BOUNDS
++	string
++	default "-fsanitize=array-bounds" if CC_HAS_UBSAN_ARRAY_BOUNDS
++	default "-fsanitize=bounds"
++	depends on UBSAN_BOUNDS
++
+ config UBSAN_LOCAL_BOUNDS
+ 	bool "Perform array local bounds checking"
+ 	depends on UBSAN_TRAP
+-	depends on CC_IS_CLANG
+ 	depends on !UBSAN_KCOV_BROKEN
++	depends on $(cc-option,-fsanitize=local-bounds)
+ 	help
+ 	  This option enables -fsanitize=local-bounds which traps when an
+ 	  exception/error is detected. Therefore, it should be enabled only
+@@ -69,6 +82,38 @@ config UBSAN_MISC
+ 	  own Kconfig options. Disable this if you only want to have
+ 	  individually selected checks.
+ 
++config UBSAN_SHIFT
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=shift)
++
++config UBSAN_DIV_ZERO
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=integer-divide-by-zero)
++
++config UBSAN_UNREACHABLE
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=unreachable)
++
++config UBSAN_SIGNED_OVERFLOW
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=signed-integer-overflow)
++
++config UBSAN_UNSIGNED_OVERFLOW
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=unsigned-integer-overflow)
++
++config UBSAN_OBJECT_SIZE
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=object-size)
++
++config UBSAN_BOOL
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=bool)
++
++config UBSAN_ENUM
++	def_bool UBSAN_MISC
++	depends on $(cc-option,-fsanitize=enum)
++
+ config UBSAN_SANITIZE_ALL
+ 	bool "Enable instrumentation for the entire kernel"
+ 	depends on ARCH_HAS_UBSAN_SANITIZE_ALL
+@@ -89,6 +134,7 @@ config UBSAN_ALIGNMENT
+ 	bool "Enable checks for pointers alignment"
+ 	default !HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	depends on !UBSAN_TRAP
++	depends on $(cc-option,-fsanitize=alignment)
+ 	help
+ 	  This option enables the check of unaligned memory accesses.
+ 	  Enabling this option on architectures that support unaligned
+diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
+index 9716dab06bc7..72862da47baf 100644
+--- a/scripts/Makefile.ubsan
++++ b/scripts/Makefile.ubsan
+@@ -1,37 +1,21 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-export CFLAGS_UBSAN :=
++# -fsanitize=* options makes GCC less smart than usual and
++# increases the number of 'maybe-uninitialized' false-positives.
++ubsan-cflags-$(CONFIG_UBSAN) += $(call cc-disable-warning, maybe-uninitialized)
+ 
+-ifdef CONFIG_UBSAN_ALIGNMENT
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=alignment)
+-endif
++# Enable available and selected UBSAN features.
++ubsan-cflags-$(CONFIG_UBSAN_ALIGNMENT)		+= -fsanitize=alignment
++ubsan-cflags-$(CONFIG_UBSAN_BOUNDS)		+= $(CONFIG_CC_ARG_UBSAN_BOUNDS)
++ubsan-cflags-$(CONFIG_UBSAN_LOCAL_BOUNDS)	+= -fsanitize=local-bounds
++ubsan-cflags-$(CONFIG_UBSAN_SHIFT)		+= -fsanitize=shift
++ubsan-cflags-$(CONFIG_UBSAN_DIV_ZERO)		+= -fsanitize=integer-divide-by-zero
++ubsan-cflags-$(CONFIG_UBSAN_UNREACHABLE)	+= -fsanitize=unreachable
++ubsan-cflags-$(CONFIG_UBSAN_SIGNED_OVERFLOW)	+= -fsanitize=signed-integer-overflow
++ubsan-cflags-$(CONFIG_UBSAN_UNSIGNED_OVERFLOW)	+= -fsanitize=unsigned-integer-overflow
++ubsan-cflags-$(CONFIG_UBSAN_OBJECT_SIZE)	+= -fsanitize=object-size
++ubsan-cflags-$(CONFIG_UBSAN_BOOL)		+= -fsanitize=bool
++ubsan-cflags-$(CONFIG_UBSAN_ENUM)		+= -fsanitize=enum
++ubsan-cflags-$(CONFIG_UBSAN_TRAP)		+= -fsanitize-undefined-trap-on-error
+ 
+-ifdef CONFIG_UBSAN_BOUNDS
+-      ifdef CONFIG_CC_IS_CLANG
+-            CFLAGS_UBSAN += -fsanitize=array-bounds
+-      else
+-            CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+-      endif
+-endif
+-
+-ifdef CONFIG_UBSAN_LOCAL_BOUNDS
+-      CFLAGS_UBSAN += -fsanitize=local-bounds
+-endif
+-
+-ifdef CONFIG_UBSAN_MISC
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=shift)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=integer-divide-by-zero)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=unreachable)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=signed-integer-overflow)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=object-size)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=bool)
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize=enum)
+-endif
+-
+-ifdef CONFIG_UBSAN_TRAP
+-      CFLAGS_UBSAN += $(call cc-option, -fsanitize-undefined-trap-on-error)
+-endif
+-
+-      # -fsanitize=* options makes GCC less smart than usual and
+-      # increase number of 'maybe-uninitialized false-positives
+-      CFLAGS_UBSAN += $(call cc-option, -Wno-maybe-uninitialized)
++export CFLAGS_UBSAN := $(ubsan-cflags-y)
 -- 
 2.25.1
 
