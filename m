@@ -1,65 +1,130 @@
-Return-Path: <SRS0=bUPT=DO=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=puYF=DP=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E89C4363C
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Oct 2020 06:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8EBC433DF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Oct 2020 23:25:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEAEF21527
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Oct 2020 06:22:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF87B20708
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Oct 2020 23:25:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oWgkus4V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbgJGGWM (ORCPT
+        id S1730809AbgJHXZQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 7 Oct 2020 02:22:12 -0400
-Received: from bmailout3.hostsharing.net ([176.9.242.62]:43891 "EHLO
-        bmailout3.hostsharing.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbgJGGWM (ORCPT
+        Thu, 8 Oct 2020 19:25:16 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:34014 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730206AbgJHXZQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Oct 2020 02:22:12 -0400
-X-Greylist: delayed 484 seconds by postgrey-1.27 at vger.kernel.org; Wed, 07 Oct 2020 02:22:11 EDT
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "*.hostsharing.net", Issuer "COMODO RSA Domain Validation Secure Server CA" (not verified))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id 226D910029E43;
-        Wed,  7 Oct 2020 08:14:05 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id C9C4378767; Wed,  7 Oct 2020 08:14:04 +0200 (CEST)
-Date:   Wed, 7 Oct 2020 08:14:04 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org,
-        kernel-team@fedoraproject.org, kernel@gentoo.org,
-        opensuse-kernel@opensuse.org
-Subject: Re: [PATCH] kbuild: Cross-compile binaries to build modules on target
-Message-ID: <20201007061404.GA9356@wunner.de>
-References: <c744107b341e487cf37139597a7775f6f62e12e8.1596702608.git.lukas@wunner.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c744107b341e487cf37139597a7775f6f62e12e8.1596702608.git.lukas@wunner.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Thu, 8 Oct 2020 19:25:16 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 098NOF8l067270;
+        Thu, 8 Oct 2020 23:25:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=nZnWsiDFEcPgQ5B79nIlPz4Zz2ktxkZud96KgKbHQLw=;
+ b=oWgkus4VuCsFXS/7NnKOK/q5NxnzspOoazFY7ub40NTnUqaCzr3IRxOMJi4dN8XfQ0ZY
+ XQToF863lZyuH2KmXfqEaG3v7ADxZHcr51Z62TtqMMUTt2ExjTERmAIoH84NPuEmqagk
+ ODqkDVu+RrQjHqv/W2diF/5Tvs1GnNwfVrqEWQ7xUCUHZBokSkeEEjBl0VH0ZwLeHbgI
+ VIeo1E03Huc4OhrPuCFF1O7kWpnBipADE6WMpOwhq9KiI+1wXbComaD6TmUwH0+KbDho
+ WHLzSA3DjEKXunR23qkyoFWSowSauPmXS09xJHbq3PuA0ofmg2WoNOPwu0SxC7NwQ19t GQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 3429jurrt5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 08 Oct 2020 23:25:13 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 098NLNhS113561;
+        Thu, 8 Oct 2020 23:25:13 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 3429kk4hsb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Oct 2020 23:25:13 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 098NPBw4032394;
+        Thu, 8 Oct 2020 23:25:11 GMT
+Received: from toshiba-tecra.attlocal.net (/10.159.157.36)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 08 Oct 2020 16:25:11 -0700
+From:   Victor Erminpour <victor.erminpour@oracle.com>
+To:     masahiroy@kernel.org
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] merge_config.sh: Add switch to specify ARCH variable
+Date:   Thu,  8 Oct 2020 16:26:28 -0700
+Message-Id: <1602199588-24468-1-git-send-email-victor.erminpour@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9768 signatures=668681
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=913
+ spamscore=0 adultscore=0 mlxscore=0 malwarescore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010080164
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9768 signatures=668681
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=928 mlxscore=0
+ phishscore=0 bulkscore=0 suspectscore=1 lowpriorityscore=0 spamscore=0
+ clxscore=1011 malwarescore=0 priorityscore=1501 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010080164
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Aug 06, 2020 at 10:33:22AM +0200, Lukas Wunner wrote:
-> To build external modules, one needs executables such as fixdep and
-> modpost.  But when cross-compiling the kernel, those executables are
-> only generated for the host arch, not the target arch.
-[...]
-> Make distribution maintainers' lives easier by providing a new target
-> "make kbuild_install" which cross-compiles the required executables for
-> the target arch and installs them below $(INSTALL_KBUILD_PATH).
+Add a switch to merge_config.sh to specify the ARCH variable
+which defines the target architecture.
 
-Two months have passed since I submitted this, alas without any
-comments.  Masahiro, Michal, what are your thoughts on this patch?
-Pretty please?
+Set x86 as the default architecture.
 
-Thank you,
+Signed-off-by: Victor Erminpour <victor.erminpour@oracle.com>
+---
+ scripts/kconfig/merge_config.sh | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Lukas
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 63c8565206a4..b7a687f093f0 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -22,6 +22,7 @@ clean_up() {
+ 
+ usage() {
+ 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
++	echo "  -a    set ARCH variable to define the target architecture"
+ 	echo "  -h    display this help text"
+ 	echo "  -m    only merge the fragments, do not execute the make command"
+ 	echo "  -n    use allnoconfig instead of alldefconfig"
+@@ -34,6 +35,7 @@ usage() {
+ 
+ RUNMAKE=true
+ ALLTARGET=alldefconfig
++ARCH=x86
+ WARNREDUN=false
+ BUILTIN=false
+ OUTPUT=.
+@@ -46,6 +48,11 @@ while true; do
+ 		shift
+ 		continue
+ 		;;
++	"-a")
++		ARCH=$2
++		shift 2
++		continue
++		;;
+ 	"-m")
+ 		RUNMAKE=false
+ 		shift
+@@ -172,7 +179,7 @@ fi
+ # Use the merged file as the starting point for:
+ # alldefconfig: Fills in any missing symbols with Kconfig default
+ # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+-make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
++make ARCH=$ARCH KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ 
+ 
+ # Check all specified config values took (might have missed-dependency issues)
+-- 
+1.8.3.1
+
