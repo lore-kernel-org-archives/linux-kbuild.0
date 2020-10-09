@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A677C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F72C04EBE
 	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E83922261
+	by mail.kernel.org (Postfix) with ESMTP id 833B422282
 	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sEoOB3be"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OqvMiRbT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389715AbgJIQOn (ORCPT
+        id S2389814AbgJIQOn (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Fri, 9 Oct 2020 12:14:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389717AbgJIQOI (ORCPT
+        with ESMTP id S2389715AbgJIQOI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 9 Oct 2020 12:14:08 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE63C0613D5
-        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:08 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id n125so7113673qke.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:08 -0700 (PDT)
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90A52C0613E1
+        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:13:54 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id n8so6823484qtf.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=i0HfMD/wRChzzw+H0j5SIQI+XYlsyfomuEvjB0A2b7U=;
-        b=sEoOB3beinnRwWhTbfM8SalF0cypydPh216467a4z4b5/i0LPdWiZ5comfR+CiYfuB
-         Eu6WnuwqDQWg3zWFoeOdTsPbYHhw3tNqNZ8MjpSQcdjSRgi7EG1dWI1RykapF9xZWiY2
-         le1HF/WqJI6Jl13HF5R6zyktQuEsBMAEVBeei7ZFW9w6SZcy2RVolvTp6Wll1P+Fel+u
-         qLJQ4BMU4abl2vfwj62MA6cUp201pkizABLlY7j94v8InIgak3mqGIgyVYCkdDVXzKLs
-         jgf681rPIiD2mLYPe4v1fiJI8parpj4mo1rgorOkKlmmsNOrBR5zrp7/pX8UClF3X8DT
-         0uzg==
+        bh=xL7tn5bk8rd7QhzERnW5XDCxrWNQLuaGbP7lLdALs6Y=;
+        b=OqvMiRbTLr7vQGkxZV+PzeN6OVnsvLKpKhipsC6rP2jdI7Y08eG9SJBUZ2mgdSJMkz
+         x9QYY+hyJILnVTzv1B5ofQttFgWo7nBVjEgzundXt0DKJFBiSX7gz99ELfNKZbc2BUdu
+         GQMlCWP+SMb3Czho/JwY5yFAdN3ZemagwBRj9FsPu58e2Af0yK9l4pesMcwC48QrH+Tx
+         dQRg1+j/gMRSCddCjO1H4ILpvwOtSODFimUgDlcNLZ9DVwxxTNXijF18Aa3WiggyxUrV
+         V/7JINREru8rAbs/3tG8GRSCPMpt5bAArAPyPhPEspa0qrdfHyj8Ao7YvCGIThXpmbGh
+         raVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=i0HfMD/wRChzzw+H0j5SIQI+XYlsyfomuEvjB0A2b7U=;
-        b=lxgAAZq1baa0SI5nc9SYfwB9wJTYvqB3nMimZPD0oEDNp6BJAz3GMC7GedOVVUzmAr
-         7d5F5X0WePGHuOthwkbMF9Uned/+OdWWZDVJH1qW4eskJMDJp+BGVQVB7FOvzYrHjmFF
-         fkm+EaLO+BdrJJpWhzCCzcH7iz8dO+KjoqYEiC/wSvKhdNl4u+IzwkTInO4wn86RtYG8
-         fn2b3YGgZFzmm+Hqs2d8/rLnlPMIRLah6HT8EEtUQPm0tr3TD2KSuv/fGZQ2jMf2u2Cl
-         K4OYAurHrOaMhZwKu9d/81aU9WiiISTGyCVAVQ4l4gXSyK+oquk94YdOZtLn1zsSchsz
-         LK6Q==
-X-Gm-Message-State: AOAM530NgY/Yv27Khjmrv+2d612TGohWlfL8Whp4e6SyhG42rdETMeHo
-        vm2lghOjWFntIlFZCyF+wybx59XrYxwRDh7Y35w=
-X-Google-Smtp-Source: ABdhPJy/D8/0u+nzbzzf55/nK574QK9COSo5VcbQLJEKAJhBGhwXDRm3vwXt4Hczxebu5BRqeLM/xZZizY5eXSIgq20=
+        bh=xL7tn5bk8rd7QhzERnW5XDCxrWNQLuaGbP7lLdALs6Y=;
+        b=N7aFFnNtMx5vaXrKq5UJQ3WZhusQuZ6tQH3Q1Kc8LnCiPLTjgKGnjruujoJaFx3wLN
+         3ZUgkl82xsux9t1LEg3Hdip1+hfYmFVLaC27gUFEo54CUX80mKYspuxXBaJMtQofnHD6
+         KgzorE4ARNbJNiq4OAZcGeqBRBXRcBfNDnOESeW+S3yrqNLicFprRnuwqxqheQEOWMD1
+         6rrkJbU1At8gHRuSOejj7MBk10Yf0k72K37bwiXW9pKMDyMFzUIIcVKsngkrtHG7zz54
+         BF+pLeqapHaGlz2GJIYy3QxBnwd7LrAI+q/2b7p8Ss+cAWo9pS0nDlSVfrKM03xc5fw9
+         ud/Q==
+X-Gm-Message-State: AOAM530MFlG1Pvi/OuV+7ZsJO1OxmtITr6TnSuR+898NP1MlCbSaOcuR
+        4s7hYYL4rXEMaaZyAJZdbviG6qLtuxC2laWA8gs=
+X-Google-Smtp-Source: ABdhPJzJNs9VefAdVXIx8sE3q7uXvK82feETKtZCmngvw33KH61VeZxl20uF5X/PWOLcLy230cxOgVWyuUcI+4L/D/I=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:ad4:456c:: with SMTP id
- o12mr14223376qvu.48.1602260047185; Fri, 09 Oct 2020 09:14:07 -0700 (PDT)
-Date:   Fri,  9 Oct 2020 09:13:22 -0700
+ (user=samitolvanen job=sendgmr) by 2002:ad4:5747:: with SMTP id
+ q7mr1648297qvx.0.1602260033580; Fri, 09 Oct 2020 09:13:53 -0700 (PDT)
+Date:   Fri,  9 Oct 2020 09:13:15 -0700
 In-Reply-To: <20201009161338.657380-1-samitolvanen@google.com>
-Message-Id: <20201009161338.657380-14-samitolvanen@google.com>
+Message-Id: <20201009161338.657380-7-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201009161338.657380-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v5 13/29] kbuild: lto: merge module sections
+Subject: [PATCH v5 06/29] x86, build: use objtool mcount
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
@@ -85,55 +85,28 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-LLD always splits sections with LTO, which increases module sizes. This
-change adds linker script rules to merge the split sections in the final
-module.
+Select HAVE_OBJTOOL_MCOUNT if STACK_VALIDATION is selected to use
+objtool to generate __mcount_loc sections for dynamic ftrace with
+Clang and gcc <5 (later versions of gcc use -mrecord-mcount).
 
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- scripts/module.lds.S | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/x86/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/module.lds.S b/scripts/module.lds.S
-index 69b9b71a6a47..037120173a22 100644
---- a/scripts/module.lds.S
-+++ b/scripts/module.lds.S
-@@ -25,5 +25,33 @@ SECTIONS {
- 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
- }
- 
-+#ifdef CONFIG_LTO_CLANG
-+/*
-+ * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
-+ * -ffunction-sections, which increases the size of the final module.
-+ * Merge the split sections in the final binary.
-+ */
-+SECTIONS {
-+	__patchable_function_entries : { *(__patchable_function_entries) }
-+
-+	.bss : {
-+		*(.bss .bss.[0-9a-zA-Z_]*)
-+		*(.bss..L*)
-+	}
-+
-+	.data : {
-+		*(.data .data.[0-9a-zA-Z_]*)
-+		*(.data..L*)
-+	}
-+
-+	.rodata : {
-+		*(.rodata .rodata.[0-9a-zA-Z_]*)
-+		*(.rodata..L*)
-+	}
-+
-+	.text : { *(.text .text.[0-9a-zA-Z_]*) }
-+}
-+#endif
-+
- /* bring in arch-specific sections */
- #include <asm/module.lds.h>
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 5e832fd520b5..6d67646153bc 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -163,6 +163,7 @@ config X86
+ 	select HAVE_CMPXCHG_LOCAL
+ 	select HAVE_CONTEXT_TRACKING		if X86_64
+ 	select HAVE_C_RECORDMCOUNT
++	select HAVE_OBJTOOL_MCOUNT		if STACK_VALIDATION
+ 	select HAVE_DEBUG_KMEMLEAK
+ 	select HAVE_DMA_CONTIGUOUS
+ 	select HAVE_DYNAMIC_FTRACE
 -- 
 2.28.0.1011.ga647a8990f-goog
 
