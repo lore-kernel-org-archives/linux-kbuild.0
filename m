@@ -4,61 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A39C43457
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 15:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E33CFC433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 15:47:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E695E22265
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 15:47:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABAE62225D
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 15:47:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602258422;
-	bh=DCC94fiF0zL0pCd3oiiXHW8ADT3zaRBjrVFqAQv7L1g=;
+	s=default; t=1602258453;
+	bh=IOsvsi0jYHg1KaZSqf2VqJKXKpd7em5DsjAd2mDhMVQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Jwa/NyVDT+SCkevNEDErxm9LA/WrfUjclz+Gtd2vb8bsBL4hvxG+RRv9UUesUBN5P
-	 tL9QumgLrDMOTa7RyOmpAfgJgX0oUQpnwRM9o1LUapEm6ZgF/1HKMOaTUEYzI5sg11
-	 iB0Hvi3er057nYDTz28aLaaqkBU9RPJAg5Krx8gY=
+	b=aMruvm3s9dph0KQZO+F11/R4AiI+iBpjlYUh/wKaoHvSmzx0mdf3oCzy63W6IRX3c
+	 qd642kH9Mjmj0jNRO8jWr3fDSikDJ7Ve0FOHMfC1HmsPlAWAcJw9H7ZHKqmhlqXwFg
+	 DKRsZ0pjsNStEnr8cAVHT1Beq7veO1lrFS9jywnw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389252AbgJIPrC (ORCPT
+        id S2389235AbgJIPrd (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Oct 2020 11:47:02 -0400
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:18570 "EHLO
+        Fri, 9 Oct 2020 11:47:33 -0400
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:19249 "EHLO
         conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389144AbgJIPrC (ORCPT
+        with ESMTP id S2389144AbgJIPrd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Oct 2020 11:47:02 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 099Fkdow031281;
-        Sat, 10 Oct 2020 00:46:39 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 099Fkdow031281
+        Fri, 9 Oct 2020 11:47:33 -0400
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id 099Fl85a031515;
+        Sat, 10 Oct 2020 00:47:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 099Fl85a031515
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1602258400;
-        bh=uPHqCtH8kBQ7ooTjgeJwJmEs8QwVySn7ud+lvCOesSw=;
+        s=dec2015msa; t=1602258429;
+        bh=9BONNUlHhf6AE+4W2DzN6J68ojMcRVO/ShsdhtHkyp0=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=nrjlfyFUFt3jPXO/bY1d3TpLjsyP24l4TetE1EaFUPVS06e/LCFER9MbUClHx88Vp
-         5l8W5hj6Pon+XwVWPsezWmHqLk7zbqISpwyoYJHdUKFqygwbIzgd37Wm3Xm9TGWc1s
-         KSZDwFyI9DjtX1hYD12snc/09SphcSm1kXlwiAizLMcXzXNxmr4OytkPW9B8pb6+XT
-         /U8BAjaJdLb7T26H7LbcMW2XU2AoRUUQLQeJL9bQUdHi3F1GT+ZyPpc7WOLgq+1Yoo
-         VLWAgtqH8/7cgRIStTryQEVMPKV1L6H7E10KZcuZXdLk3QSCoyrD0Az6GMDevhZXzr
-         sOzrvx/Itwavg==
-X-Nifty-SrcIP: [209.85.214.173]
-Received: by mail-pl1-f173.google.com with SMTP id h2so4627166pll.11;
-        Fri, 09 Oct 2020 08:46:39 -0700 (PDT)
-X-Gm-Message-State: AOAM532FQ26RVAGPTjbtQECQWQKPB2tB4vVexaMka3NEfxSDSSvJXXXz
-        0hogTneEQ1FgAK46fsRSPYItUVLsAgwesKdHRwQ=
-X-Google-Smtp-Source: ABdhPJzp5vEo3+xl6wEj6qPaVl4cErLF6gu0zKH8TjHr4KR1KbxQsEK0tRKbguCjgRqc6IOjP4MSAk+n7esBZWo2YHY=
-X-Received: by 2002:a17:902:c3d4:b029:d3:df24:1619 with SMTP id
- j20-20020a170902c3d4b02900d3df241619mr12143028plj.1.1602258398929; Fri, 09
- Oct 2020 08:46:38 -0700 (PDT)
+        b=GrDgLVmVUiLbDO/hk0RVgv+GFj7HMOThHWoZ7BtDmYwwGnstTXL+XY+HqxNnBxlHd
+         gLbcu5yzeictjqbcfMX8Lst7xlMnKSkYHqXom+VUwanVZINR9oquDj4j1UBGHr37Jz
+         qd0UhtR0ifH6UMnlgrgdd4JmmUxPZy1xRe/dILvTmQureAIha9vyp7WT4R/tiRNlGW
+         ATJMB2qlom0Z1Ssnq5eYm5gNu1vwWLBUHFtljucBi3qd1QNN0GK3DsSXXIMyVIR7fY
+         oSwOLbzI9nPDM0r385HYE60rBP9bXR/JLT8NZmn+Z+TsyGCedJaQ+gxSI/Bhsj1gSy
+         rmqYhbH4zD+tQ==
+X-Nifty-SrcIP: [209.85.215.176]
+Received: by mail-pg1-f176.google.com with SMTP id h6so7488271pgk.4;
+        Fri, 09 Oct 2020 08:47:09 -0700 (PDT)
+X-Gm-Message-State: AOAM531XszrkKLYItaGeVkSqxSvg9RuvkQsol7+5/wr3dJ/eOm624hek
+        i8qXRMfLJZFDFaKOuUOipx6U3XHEAGq5rI9lA+o=
+X-Google-Smtp-Source: ABdhPJzqCLMraLOEhUmHp20XOxqk7furZLn5IGmqXBR7Y33xMcM50z2WKCkxvY4zxXgKg1ni/LKAeoq//lStBDHrj14=
+X-Received: by 2002:a17:90b:1b12:: with SMTP id nu18mr4273823pjb.153.1602258428293;
+ Fri, 09 Oct 2020 08:47:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200920222556.10002-1-guillem@hadrons.org> <20200920222556.10002-5-guillem@hadrons.org>
-In-Reply-To: <20200920222556.10002-5-guillem@hadrons.org>
+References: <20200920222556.10002-1-guillem@hadrons.org> <20200920222556.10002-6-guillem@hadrons.org>
+In-Reply-To: <20200920222556.10002-6-guillem@hadrons.org>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 10 Oct 2020 00:46:02 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARvmvBVa25=bgobTTnKr7VLOFPqEjtBMUiDRsPb97XMaw@mail.gmail.com>
-Message-ID: <CAK7LNARvmvBVa25=bgobTTnKr7VLOFPqEjtBMUiDRsPb97XMaw@mail.gmail.com>
-Subject: Re: [PATCH 4/7] builddeb: Add support for all required debian/rules targets
+Date:   Sat, 10 Oct 2020 00:46:31 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQu3VZZ4F7UkMTM5P86zaKqTeWSpXy=xjPafC5ceP+XTQ@mail.gmail.com>
+Message-ID: <CAK7LNAQu3VZZ4F7UkMTM5P86zaKqTeWSpXy=xjPafC5ceP+XTQ@mail.gmail.com>
+Subject: Re: [PATCH 5/7] builddeb: Enable rootless builds
 To:     Guillem Jover <guillem@hadrons.org>
 Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
@@ -70,55 +69,66 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 On Mon, Sep 21, 2020 at 7:48 AM Guillem Jover <guillem@hadrons.org> wrote:
 >
-> These have been required by the Debian policy for a while, even though
-> the tooling can detect and workaround their omission, but are a hard
-> requirement when using rootless builds.
+> This makes it possible to build the Debian packages without requiring
+> (pseudo-)root privileges, when the build drivers support this mode
+> of operation.
 >
+> See-Also: /usr/share/doc/dpkg/rootless-builds.txt.gz
+> Signed-off-by: Guillem Jover <guillem@hadrons.org>
+> ---
 
 
 Applied to linux-kbuild. Thanks.
 
 
-I added a little more explanation about why this patch is needed.
-
-[masahiro:
-The following Debian policy is particularly important for rootless builds:
-"Both binary-* targets should depend on the build target, or on the
- appropriate build-arch or build-indep target, so that the package is
- built if it has not been already."
-]
-
-
-
-
-
-
-> Signed-off-by: Guillem Jover <guillem@hadrons.org>
-> ---
->  scripts/package/mkdebian | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  scripts/package/builddeb | 9 +++++++--
+>  scripts/package/mkdebian | 1 +
+>  2 files changed, 8 insertions(+), 2 deletions(-)
 >
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index b14abbe5afbb..d428c0945d4b 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -26,6 +26,7 @@ if_enabled_echo() {
+>
+>  create_package() {
+>         local pname="$1" pdir="$2"
+> +       local dpkg_deb_opts
+>
+>         mkdir -m 755 -p "$pdir/DEBIAN"
+>         mkdir -p "$pdir/usr/share/doc/$pname"
+> @@ -36,14 +37,18 @@ create_package() {
+>                 | xargs -r0 md5sum > DEBIAN/md5sums"
+>
+>         # Fix ownership and permissions
+> -       chown -R root:root "$pdir"
+> +       if [ "$DEB_RULES_REQUIRES_ROOT" = "no" ]; then
+> +               dpkg_deb_opts="--root-owner-group"
+> +       else
+> +               chown -R root:root "$pdir"
+> +       fi
+>         chmod -R go-w "$pdir"
+>         # in case we are in a restrictive umask environment like 0077
+>         chmod -R a+rX "$pdir"
+>
+>         # Create the package
+>         dpkg-gencontrol -p$pname -P"$pdir"
+> -       dpkg-deb ${KDEB_COMPRESS:+-Z$KDEB_COMPRESS} --build "$pdir" ..
+> +       dpkg-deb $dpkg_deb_opts ${KDEB_COMPRESS:+-Z$KDEB_COMPRESS} --build "$pdir" ..
+>  }
+>
+>  deploy_kernel_headers () {
 > diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-> index 69f2a6d7f009..dae6c0ec0bd6 100755
+> index dae6c0ec0bd6..b98c382f967a 100755
 > --- a/scripts/package/mkdebian
 > +++ b/scripts/package/mkdebian
-> @@ -231,11 +231,15 @@ cat <<EOF > debian/rules
->
->  srctree ?= .
->
-> -build:
-> +build-indep:
-> +build-arch:
->         \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
->         KBUILD_BUILD_VERSION=${revision} -f \$(srctree)/Makefile
->
-> -binary-arch:
-> +build: build-arch
-> +
-> +binary-indep:
-> +binary-arch: build-arch
->         \$(MAKE) KERNELRELEASE=${version} ARCH=${ARCH} \
->         KBUILD_BUILD_VERSION=${revision} -f \$(srctree)/Makefile intdeb-pkg
+> @@ -188,6 +188,7 @@ Source: $sourcename
+>  Section: kernel
+>  Priority: optional
+>  Maintainer: $maintainer
+> +Rules-Requires-Root: no
+>  Build-Depends: bc, rsync, kmod, cpio, bison, flex | flex:native $extra_build_depends
+>  Homepage: https://www.kernel.org/
 >
 > --
 > 2.28.0.297.g1956fa8f8d
