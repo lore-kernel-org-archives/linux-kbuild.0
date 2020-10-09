@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D7DC43457
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265FCC433DF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03C1222261
+	by mail.kernel.org (Postfix) with ESMTP id DCB2F22261
 	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hLqKbNF2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Plxh6rO8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389868AbgJIQP0 (ORCPT
+        id S2389845AbgJIQPZ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Oct 2020 12:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41486 "EHLO
+        Fri, 9 Oct 2020 12:15:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389843AbgJIQOy (ORCPT
+        with ESMTP id S2389706AbgJIQOy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 9 Oct 2020 12:14:54 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5DCC0613E5
-        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:27 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id w3so6821391qtn.16
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:27 -0700 (PDT)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E896CC0613BA
+        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:32 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id h64so9483203ybc.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=Et6zTjz3rLwF/ItBI285hLUQ1f4GO0wd9iXT0eGoats=;
-        b=hLqKbNF2l/HYOLCmWO8LMR1Uka12gSYz+AhlYm3DhRPL1fLs1dqzgWcxHxLzH/tZup
-         gPnuymUDkXuAc3XIouGPBl/8T1D9Bq3u8jG17jrp2vSb0X7xbVT7014aW5js5Evi+PN3
-         kKq8Au1B/gTOGttR3rccDlmrr+eH/zq2d6aYrZsLtb2MQbJ36nj/aUKfg72cXmKRuCd1
-         7W0h22twgcbXNdk0LlNmNDt5u3BwGoQ5OGeQI2TU/FzlveqBrl5YUYIEveqDRG1UMD5e
-         GdFmF67K9M+DZq777bIKNPeg4Db6qpIFUOK6o+EmyYf4xc69CphrXuFUAoqVvoIG7cn6
-         VIkA==
+        bh=eOx9MhffeJ9wDXWdE5ocpTXQ8u7ymKHm7bpeM0Lggio=;
+        b=Plxh6rO8fZsaoEQYUiFTv8Gctd0ORGzpZ7B+rZvfUdc7hYRYEfwwGuB/jOOB4N8mRZ
+         iAAD+kQylOB8+xnUsPp1FuxiMJFvWDb9+nHFjKZSUxLvWnE/9FbEqxjRwOpDx5ONEslI
+         8qXKafYcstPuDgNqimTWoairPVZO2J3rswrWaBPN8Qj/9SVTW+SDOPJ/1LdMPf3bODQ3
+         tIT8O2Z6HcQ4IP/C1bLPAj4juZIAgQDUFSX0gtccixqyP1Lwa6S3qb2MSbgtHQfAoxEv
+         QRJywRQXLDBTL6z66phNxnXE5ujjd1RTPx5601HvsGfueNCH/Cf7DS82U8ob3oCEPZMJ
+         O6DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Et6zTjz3rLwF/ItBI285hLUQ1f4GO0wd9iXT0eGoats=;
-        b=LepfCT0SjjY10w40jgTczUqdxawmsT6p7Y64oGODLL6z2LtbZ6LM2dKaND6VQXQA+5
-         v+sc93HeV1VG67poSI0Mep4g6hLdKBDT7GbmBsyAv4ccHR4DT44Pe2Hxz7zCFyba+brT
-         RIzeujOOMBE65zgnmR+As1MWukyj0RKHAwP8lHR4NTvw3kZAnh31UpmoyOoqe7GyBcMd
-         CCPSFije/N1vLgeNY8Ea2Hea5GgOKoxEl+a74wbbEmwnhdh99I+dLcVLtXH36RDh3kyN
-         ixxFQJkdnV/2q0CCMg5nX58217coqTXtUoD25q51FDvF7VvDJJOWg/jU0IW4G/zlaraN
-         PfRQ==
-X-Gm-Message-State: AOAM5307x4wln06WDeSJUPE7+B3FpbBCqbx8MqUn4R1zGA50tTqZDOz8
-        cK1DnsA+fz2kskZjOmk8XooKhev6wLClR4aIyQA=
-X-Google-Smtp-Source: ABdhPJx3xuV21n1yE2Lye3nQEPP50bMJ0EgQCylMeDfKaqKItuqqn+slZ4N1DGo94IMuiaWaihoXxmQJwU6XAlrqwU0=
+        bh=eOx9MhffeJ9wDXWdE5ocpTXQ8u7ymKHm7bpeM0Lggio=;
+        b=iAdsDXdNY5WE8YHciq98kctxqgi9XZWYfvf/d01gq1w72MvltfZgFtyoPB8e0LKmSd
+         2lqMFIEASCUNTmJa9WmcjuVZo57iDFZyLSdggTz7RDkSZZdeTlgPLDDwWD0EbjP4KWA6
+         jdVBhG3+EHzGH2k/jtT6n4Qa/4+K0RyzTyJYtgsIwv/fdPpuzE3bfQu/yEBBUCYBpG9U
+         e9U/Usd+QFkm0WK8OGbx26wt5OP1WR0JEMMyyvMRoCCbtN+Gh5xtAaElpHpyUm2cpfWi
+         jgD7RasJzyI6W0d5xY5elbhRUUFBwD7lapBHIJAkR+meIy6bBG1mUCDK4ZEy+pUE9m9a
+         E+hw==
+X-Gm-Message-State: AOAM531FNn7bcHCGmsmMJq+otruqPIypE5WobTPxNLc+XTyXxIfi4vyx
+        6ulBZCrFowbkAxjce7+Ls962Xs5rfUr41q+Z7UE=
+X-Google-Smtp-Source: ABdhPJxyS0XHBxv62ZqOUe+ZCIUsnixCIBFhk+Syvlgu7UF8/267koanykdI+IOKX/T5PRLdfssp5bIj1Kz2wguq10U=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:ad4:544a:: with SMTP id
- h10mr13840738qvt.35.1602260066836; Fri, 09 Oct 2020 09:14:26 -0700 (PDT)
-Date:   Fri,  9 Oct 2020 09:13:32 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:8209:: with SMTP id
+ q9mr19033461ybk.353.1602260072154; Fri, 09 Oct 2020 09:14:32 -0700 (PDT)
+Date:   Fri,  9 Oct 2020 09:13:35 -0700
 In-Reply-To: <20201009161338.657380-1-samitolvanen@google.com>
-Message-Id: <20201009161338.657380-24-samitolvanen@google.com>
+Message-Id: <20201009161338.657380-27-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201009161338.657380-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v5 23/29] KVM: arm64: disable LTO for the nVHE directory
+Subject: [PATCH v5 26/29] x86/asm: annotate indirect jumps
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
@@ -85,32 +85,91 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-We use objcopy to manipulate ELF binaries for the nVHE code,
-which fails with LTO as the compiler produces LLVM bitcode
-instead. Disable LTO for this code to allow objcopy to be used.
+Running objtool --vmlinux --duplicate on vmlinux.o produces a few
+warnings about indirect jumps with retpoline:
+
+  vmlinux.o: warning: objtool: wakeup_long64()+0x61: indirect jump
+  found in RETPOLINE build
+  ...
+
+This change adds ANNOTATE_RETPOLINE_SAFE annotations to the jumps
+in assembly code to stop the warnings.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/kvm/hyp/nvhe/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kernel/acpi/wakeup_64.S  | 2 ++
+ arch/x86/platform/pvh/head.S      | 2 ++
+ arch/x86/power/hibernate_asm_64.S | 3 +++
+ 3 files changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index aef76487edc2..c903c8f31280 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -45,9 +45,9 @@ quiet_cmd_hypcopy = HYPCOPY $@
- 		   --rename-section=.text=.hyp.text			\
- 		   $< $@
+diff --git a/arch/x86/kernel/acpi/wakeup_64.S b/arch/x86/kernel/acpi/wakeup_64.S
+index c8daa92f38dc..041e79c4e195 100644
+--- a/arch/x86/kernel/acpi/wakeup_64.S
++++ b/arch/x86/kernel/acpi/wakeup_64.S
+@@ -7,6 +7,7 @@
+ #include <asm/msr.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/frame.h>
++#include <asm/nospec-branch.h>
  
--# Remove ftrace and Shadow Call Stack CFLAGS.
-+# Remove ftrace, LTO, and Shadow Call Stack CFLAGS.
- # This is equivalent to the 'notrace' and '__noscs' annotations.
--KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
-+KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_LTO) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
+ # Copyright 2003 Pavel Machek <pavel@suse.cz
  
- # KVM nVHE code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
+@@ -39,6 +40,7 @@ SYM_FUNC_START(wakeup_long64)
+ 	movq	saved_rbp, %rbp
+ 
+ 	movq	saved_rip, %rax
++	ANNOTATE_RETPOLINE_SAFE
+ 	jmp	*%rax
+ SYM_FUNC_END(wakeup_long64)
+ 
+diff --git a/arch/x86/platform/pvh/head.S b/arch/x86/platform/pvh/head.S
+index 43b4d864817e..640b79cc64b8 100644
+--- a/arch/x86/platform/pvh/head.S
++++ b/arch/x86/platform/pvh/head.S
+@@ -15,6 +15,7 @@
+ #include <asm/asm.h>
+ #include <asm/boot.h>
+ #include <asm/processor-flags.h>
++#include <asm/nospec-branch.h>
+ #include <asm/msr.h>
+ #include <xen/interface/elfnote.h>
+ 
+@@ -105,6 +106,7 @@ SYM_CODE_START_LOCAL(pvh_start_xen)
+ 	/* startup_64 expects boot_params in %rsi. */
+ 	mov $_pa(pvh_bootparams), %rsi
+ 	mov $_pa(startup_64), %rax
++	ANNOTATE_RETPOLINE_SAFE
+ 	jmp *%rax
+ 
+ #else /* CONFIG_X86_64 */
+diff --git a/arch/x86/power/hibernate_asm_64.S b/arch/x86/power/hibernate_asm_64.S
+index 7918b8415f13..715509d94fa3 100644
+--- a/arch/x86/power/hibernate_asm_64.S
++++ b/arch/x86/power/hibernate_asm_64.S
+@@ -21,6 +21,7 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/processor-flags.h>
+ #include <asm/frame.h>
++#include <asm/nospec-branch.h>
+ 
+ SYM_FUNC_START(swsusp_arch_suspend)
+ 	movq	$saved_context, %rax
+@@ -66,6 +67,7 @@ SYM_CODE_START(restore_image)
+ 
+ 	/* jump to relocated restore code */
+ 	movq	relocated_restore_code(%rip), %rcx
++	ANNOTATE_RETPOLINE_SAFE
+ 	jmpq	*%rcx
+ SYM_CODE_END(restore_image)
+ 
+@@ -97,6 +99,7 @@ SYM_CODE_START(core_restore_code)
+ 
+ .Ldone:
+ 	/* jump to the restore_registers address from the image header */
++	ANNOTATE_RETPOLINE_SAFE
+ 	jmpq	*%r8
+ SYM_CODE_END(core_restore_code)
+ 
 -- 
 2.28.0.1011.ga647a8990f-goog
 
