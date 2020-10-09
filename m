@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 313E3C4363D
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A677C433E7
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F02D32227E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E83922261
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:14:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e07k19OI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sEoOB3be"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389700AbgJIQOo (ORCPT
+        id S2389715AbgJIQOn (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Oct 2020 12:14:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41502 "EHLO
+        Fri, 9 Oct 2020 12:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389497AbgJIQOI (ORCPT
+        with ESMTP id S2389717AbgJIQOI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 9 Oct 2020 12:14:08 -0400
 Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C833C0613E5
-        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:13:56 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id m23so7085705qkh.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:13:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE63C0613D5
+        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:08 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id n125so7113673qke.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=12T1A1azkBzH1KIsslD3g0EQSyhK52WZ2+GRw7jYbTw=;
-        b=e07k19OIq9oax/CB2AffG/6TydfogOfDDk0KX7I+JxzSAaAbLl65bsDNUHJX/ojN/s
-         KSMPf6VDfgJnLALeBxU3rrfClErgy/hNkiow87cxorPmO8YHGg+xgtzvwZ7Rm5lDlkMX
-         wi6oXvbL+dMcLCSU7y3ysPBseqSqfUkwnHXN5Hy6d7rFQ/0vShW6uiN8YLS1cTyol5kA
-         itU+HxKLN9ZdhKB0cK6ePYYWFYcOAsCTUawiA/tqE4Xlsxfc8STGHWhqbWNVJOOLzS/w
-         wQKIMAaMAM9UHitdxDccMxpUkeJSDg/F+CxmPXS7fd1kWf26XtGeGvvonBKyAJLDG7f7
-         0NHA==
+        bh=i0HfMD/wRChzzw+H0j5SIQI+XYlsyfomuEvjB0A2b7U=;
+        b=sEoOB3beinnRwWhTbfM8SalF0cypydPh216467a4z4b5/i0LPdWiZ5comfR+CiYfuB
+         Eu6WnuwqDQWg3zWFoeOdTsPbYHhw3tNqNZ8MjpSQcdjSRgi7EG1dWI1RykapF9xZWiY2
+         le1HF/WqJI6Jl13HF5R6zyktQuEsBMAEVBeei7ZFW9w6SZcy2RVolvTp6Wll1P+Fel+u
+         qLJQ4BMU4abl2vfwj62MA6cUp201pkizABLlY7j94v8InIgak3mqGIgyVYCkdDVXzKLs
+         jgf681rPIiD2mLYPe4v1fiJI8parpj4mo1rgorOkKlmmsNOrBR5zrp7/pX8UClF3X8DT
+         0uzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=12T1A1azkBzH1KIsslD3g0EQSyhK52WZ2+GRw7jYbTw=;
-        b=eKU1gnhU+e54tB3+6J/gztV+amTNhE+6kdKWWwqZBGmAZeoVNAkjE7BwbSo6ZVyIUQ
-         fjPRkV0Ty6ndJX/nu+3pcpysBGPl7by15xFMiszw7Rgnqp6G62O/QpIStuR5+j0Foy7U
-         Fy8Ln+uKnTL8O0HAZhhPtHDND5B8YO6CC9d+KeNAcxuHjxGBWjPFRK1NWu307HmGdMbX
-         AERDKveT/qfR/oNBf1WtnuhH08wvI4GR+TGwvOTlknI1CBPglsM+GLE+YIo9IM8ed5cB
-         UsXdSUOTqJnag2WuE8A+le3cn5HadhSk3HLTRHFk3RKGsSCP+k4B+4R1g+ktT3lsAFHB
-         QHFw==
-X-Gm-Message-State: AOAM531Zd+SI3WqB1BoRxRJK6RsQ/gWF6A4w7KCIEMw29I5i8twcy0wt
-        jHiKH2l3FwkoWmnRNozxrWi+IG3pt/mwisE7bvQ=
-X-Google-Smtp-Source: ABdhPJxy7fzvsnbwIgNuwmXVp1dYnrQ3tbT2nSSahJHHp9B3PtEQO2IIsK5rylpivHyzmGwMoLI97Xg+p6rq77H+cK4=
+        bh=i0HfMD/wRChzzw+H0j5SIQI+XYlsyfomuEvjB0A2b7U=;
+        b=lxgAAZq1baa0SI5nc9SYfwB9wJTYvqB3nMimZPD0oEDNp6BJAz3GMC7GedOVVUzmAr
+         7d5F5X0WePGHuOthwkbMF9Uned/+OdWWZDVJH1qW4eskJMDJp+BGVQVB7FOvzYrHjmFF
+         fkm+EaLO+BdrJJpWhzCCzcH7iz8dO+KjoqYEiC/wSvKhdNl4u+IzwkTInO4wn86RtYG8
+         fn2b3YGgZFzmm+Hqs2d8/rLnlPMIRLah6HT8EEtUQPm0tr3TD2KSuv/fGZQ2jMf2u2Cl
+         K4OYAurHrOaMhZwKu9d/81aU9WiiISTGyCVAVQ4l4gXSyK+oquk94YdOZtLn1zsSchsz
+         LK6Q==
+X-Gm-Message-State: AOAM530NgY/Yv27Khjmrv+2d612TGohWlfL8Whp4e6SyhG42rdETMeHo
+        vm2lghOjWFntIlFZCyF+wybx59XrYxwRDh7Y35w=
+X-Google-Smtp-Source: ABdhPJy/D8/0u+nzbzzf55/nK574QK9COSo5VcbQLJEKAJhBGhwXDRm3vwXt4Hczxebu5BRqeLM/xZZizY5eXSIgq20=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:ad4:5843:: with SMTP id
- de3mr14074420qvb.12.1602260035381; Fri, 09 Oct 2020 09:13:55 -0700 (PDT)
-Date:   Fri,  9 Oct 2020 09:13:16 -0700
+ (user=samitolvanen job=sendgmr) by 2002:ad4:456c:: with SMTP id
+ o12mr14223376qvu.48.1602260047185; Fri, 09 Oct 2020 09:14:07 -0700 (PDT)
+Date:   Fri,  9 Oct 2020 09:13:22 -0700
 In-Reply-To: <20201009161338.657380-1-samitolvanen@google.com>
-Message-Id: <20201009161338.657380-8-samitolvanen@google.com>
+Message-Id: <20201009161338.657380-14-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201009161338.657380-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v5 07/29] treewide: remove DISABLE_LTO
+Subject: [PATCH v5 13/29] kbuild: lto: merge module sections
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
@@ -85,86 +85,55 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This change removes all instances of DISABLE_LTO from
-Makefiles, as they are currently unused, and the preferred
-method of disabling LTO is to filter out the flags instead.
+LLD always splits sections with LTO, which increases module sizes. This
+change adds linker script rules to merge the split sections in the final
+module.
 
-Suggested-by: Kees Cook <keescook@chromium.org>
+Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/kernel/vdso/Makefile | 1 -
- arch/sparc/vdso/Makefile        | 2 --
- arch/x86/entry/vdso/Makefile    | 2 --
- kernel/Makefile                 | 3 ---
- scripts/Makefile.build          | 2 +-
- 5 files changed, 1 insertion(+), 9 deletions(-)
+ scripts/module.lds.S | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index 45d5cfe46429..e836e300440f 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -31,7 +31,6 @@ ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
- ccflags-y += -DDISABLE_BRANCH_PROFILING
+diff --git a/scripts/module.lds.S b/scripts/module.lds.S
+index 69b9b71a6a47..037120173a22 100644
+--- a/scripts/module.lds.S
++++ b/scripts/module.lds.S
+@@ -25,5 +25,33 @@ SECTIONS {
+ 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
+ }
  
- CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
--KBUILD_CFLAGS			+= $(DISABLE_LTO)
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
-diff --git a/arch/sparc/vdso/Makefile b/arch/sparc/vdso/Makefile
-index f44355e46f31..476c4b315505 100644
---- a/arch/sparc/vdso/Makefile
-+++ b/arch/sparc/vdso/Makefile
-@@ -3,8 +3,6 @@
- # Building vDSO images for sparc.
- #
- 
--KBUILD_CFLAGS += $(DISABLE_LTO)
--
- VDSO64-$(CONFIG_SPARC64)	:= y
- VDSOCOMPAT-$(CONFIG_COMPAT)	:= y
- 
-diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-index 215376d975a2..ecc27018ae13 100644
---- a/arch/x86/entry/vdso/Makefile
-+++ b/arch/x86/entry/vdso/Makefile
-@@ -9,8 +9,6 @@ ARCH_REL_TYPE_ABS := R_X86_64_JUMP_SLOT|R_X86_64_GLOB_DAT|R_X86_64_RELATIVE|
- ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
- include $(srctree)/lib/vdso/Makefile
- 
--KBUILD_CFLAGS += $(DISABLE_LTO)
--
- # Sanitizer runtimes are unavailable and cannot be linked here.
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 16ec9262ce9d..2561abc91961 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -38,9 +38,6 @@ KASAN_SANITIZE_kcov.o := n
- KCSAN_SANITIZE_kcov.o := n
- CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack) -fno-stack-protector
- 
--# cond_syscall is currently not LTO compatible
--CFLAGS_sys_ni.o = $(DISABLE_LTO)
--
- obj-y += sched/
- obj-y += locking/
- obj-y += power/
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a4634aae1506..2175ddb1ee0c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -111,7 +111,7 @@ endif
- # ---------------------------------------------------------------------------
- 
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-+      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) -fverbose-asm -S -o $@ $<
- 
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
++#ifdef CONFIG_LTO_CLANG
++/*
++ * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
++ * -ffunction-sections, which increases the size of the final module.
++ * Merge the split sections in the final binary.
++ */
++SECTIONS {
++	__patchable_function_entries : { *(__patchable_function_entries) }
++
++	.bss : {
++		*(.bss .bss.[0-9a-zA-Z_]*)
++		*(.bss..L*)
++	}
++
++	.data : {
++		*(.data .data.[0-9a-zA-Z_]*)
++		*(.data..L*)
++	}
++
++	.rodata : {
++		*(.rodata .rodata.[0-9a-zA-Z_]*)
++		*(.rodata..L*)
++	}
++
++	.text : { *(.text .text.[0-9a-zA-Z_]*) }
++}
++#endif
++
+ /* bring in arch-specific sections */
+ #include <asm/module.lds.h>
 -- 
 2.28.0.1011.ga647a8990f-goog
 
