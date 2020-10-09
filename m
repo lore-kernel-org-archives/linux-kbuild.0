@@ -8,65 +8,64 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36DE7C43467
-	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CC2C43457
+	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E778E2225D
+	by mail.kernel.org (Postfix) with ESMTP id 5893222261
 	for <linux-kbuild@archiver.kernel.org>; Fri,  9 Oct 2020 16:15:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M0h0mH4w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T3uphKT5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389829AbgJIQPr (ORCPT
+        id S2389927AbgJIQPr (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Fri, 9 Oct 2020 12:15:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41572 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389709AbgJIQOw (ORCPT
+        with ESMTP id S2389711AbgJIQOT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Oct 2020 12:14:52 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F60FC0613E0
-        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:25 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id v6so6653518plo.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:25 -0700 (PDT)
+        Fri, 9 Oct 2020 12:14:19 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A09E5C0613D2
+        for <linux-kbuild@vger.kernel.org>; Fri,  9 Oct 2020 09:14:19 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v4so5163101ybp.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 09:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=JHNK5VWD3ddVakk1msJzGMuIHjr7wcpFWGy1F5g4J2Y=;
-        b=M0h0mH4wlOZcaJsIi5sQEuaiXKV7B0eKEoaPKg3kbfXsWnZ9dgEuFhvr4GvOUISD/R
-         eAtFXUMTPEOVHW+XOblcQS/ISTtHpag/wILGcioqEck1N+9WCscWL7vFacbN6GUuar+k
-         4PnFjNWO2auD2wONFsEZeyA0wE6HkoReMLefaUGdvzHpzi2jFdR2nk7TLMGHQ6IGcOSj
-         3cIInTMXmsjJLQw59hUKMC6ilpXp3px/V6+ZuAnx5tBy0UDfBXrEN1SKQjcZ2XbWb2iB
-         va5v3rnvQOCmgyUdtx7z8zjGiV0r6NCEuQQzlxkUNcl+QUN74zldCyfQQhUYvV8F8BwK
-         NdzQ==
+        bh=KGusc3+RBCNZzwrkW+3708RrOouUa5FTnw8PnBTY3Ig=;
+        b=T3uphKT5yiHzmre9bkTK6EvjVmGfnhT7ZFFnV4sLcrb7aMVmDOpxZyPoKPeEcaNKtw
+         bLwWcg0u4RVu56DBE1l/EFAJo/HHanmlaklCdVV/xwdWBpRNFhzn+X3/LxWAUfbhp/U/
+         GNlO7yw6b8BkEnALpByL0X9MzDTLW7NBXjJemt4oO0kn7GZ7tQAc2izO8jd84Mn+pfZ9
+         Q8VycjN+4DsNFujjU1a5crzy/UM0hIFVYyz+EvyZkDNQQ+Ssi6Zd8LRvcNgb7ixFU1dN
+         ctSt5By/Q4V+U/wi5Rp7dpEjeliEfwZMggEzSUoN5urCLveVN2ERv75kNnLo9GLtwhM6
+         5wTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JHNK5VWD3ddVakk1msJzGMuIHjr7wcpFWGy1F5g4J2Y=;
-        b=MhEJS0DE3HyGanQtmrkNWl0ZwPBzZFwFGIH9h4YTh+c6Cd55f9rPdxClgvra9LTu25
-         vwYCcXwlk8OoL+Ro6fbP3XZo74A1qK1gqiIuG63BmS8KHH0PZ3H2il54GjKWR55exAF6
-         fv9BQabXokZ4wIV/lsKYu9Ve/tGGROY3trdDhMDqhZfl3BN3q2ggSAOksoWiXKNGTdun
-         kO9yy7stjQ/9yIbcfrGCdvHJbMFOAXI/bYyERYzsVxpgAOmHEU01VRyGL8TC9J5gZMLq
-         k+MFNcM5i8ykB508yJoudwjiethEpN1scgCFOeFISWeAw1l+dNVBmQP+Ff0ABos1CTxV
-         LhuA==
-X-Gm-Message-State: AOAM531kvScnotX5ip4xts2Y9725GGBfWpXr2Mq8FWcJ2XylLSjRWv2p
-        WowBkqA6UbI7Qd0GGrBpJklL+rMe8HTZC+eUZ2w=
-X-Google-Smtp-Source: ABdhPJyNU5RpFXb6oDaPa5kfxyMLH3rqIIuf9in4Eo1ivOzj/QSIy554fzdbu1UoaF9jnvjswSLNZfW1sHDa3cxCuBM=
+        bh=KGusc3+RBCNZzwrkW+3708RrOouUa5FTnw8PnBTY3Ig=;
+        b=Ud0Len88085ApIKh6IptE0AFWJLlwUj5z/670jad63FbUOI9mVbSynzx63ZzdFcjnp
+         CfFXJ6inMhMfA0/dCFJyDZyNu7EexOrRnhwx/zAohjsgOAoSkllszxMxrFnzxcS39+DN
+         G9vZG6ULuwxD4AsMKv+ffRUkF95m91+HYDA0NERznnrrgyk424XpJ5vLFWt7vF8urpeL
+         yENLl6VEL3994RHcY+QJEYsuca2hDVhVFXrxy3DA+V3PErBIwY26vKgctXjf8ws3qyTe
+         gwBMcdvgFC0niLwXOXf69M734k8i7S0ZA22tKl1Zyz7xEEMCuYrVtBQcNCfuSLd1maGh
+         Y9IQ==
+X-Gm-Message-State: AOAM533Z1BI5EKbQUQflA940s3S0lNLaXy7HNt0TipVcFPSofGkbUo9k
+        qGNtGxV0R0yMVR6EXwejGEG98DA7bbwBCap+7M0=
+X-Google-Smtp-Source: ABdhPJyXF5PEn5u0UASyOtBGN61NWqU4GwvxlOzGlhXJZtvZt0XNABboerQ6XEYrKTpOJFOpPCSvjnoA42FIJ7VzrPg=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a62:7a53:0:b029:152:5482:8935 with
- SMTP id v80-20020a627a530000b029015254828935mr13281502pfc.31.1602260064759;
- Fri, 09 Oct 2020 09:14:24 -0700 (PDT)
-Date:   Fri,  9 Oct 2020 09:13:31 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:cd05:: with SMTP id
+ d5mr18037401ybf.212.1602260058814; Fri, 09 Oct 2020 09:14:18 -0700 (PDT)
+Date:   Fri,  9 Oct 2020 09:13:28 -0700
 In-Reply-To: <20201009161338.657380-1-samitolvanen@google.com>
-Message-Id: <20201009161338.657380-23-samitolvanen@google.com>
+Message-Id: <20201009161338.657380-20-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201009161338.657380-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v5 22/29] arm64: vdso: disable LTO
+Subject: [PATCH v5 19/29] scripts/mod: disable LTO for empty.c
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Will Deacon <will@kernel.org>,
@@ -86,29 +85,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Disable LTO for the vDSO by filtering out CC_FLAGS_LTO, as there's no
-point in using link-time optimization for the small about of C code.
+With CONFIG_LTO_CLANG, clang generates LLVM IR instead of ELF object
+files. As empty.o is used for probing target properties, disable LTO
+for it to produce an object file instead.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/kernel/vdso/Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/mod/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index e836e300440f..aa47070a3ccf 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -30,7 +30,8 @@ ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 --hash-style=sysv	\
- ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
- ccflags-y += -DDISABLE_BRANCH_PROFILING
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 78071681d924..c9e38ad937fd 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ OBJECT_FILES_NON_STANDARD := y
++CFLAGS_REMOVE_empty.o += $(CC_FLAGS_LTO)
  
--CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
-+CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS) \
-+				$(CC_FLAGS_LTO)
- KASAN_SANITIZE			:= n
- UBSAN_SANITIZE			:= n
- OBJECT_FILES_NON_STANDARD	:= y
+ hostprogs-always-y	+= modpost mk_elfconfig
+ always-y		+= empty.o
 -- 
 2.28.0.1011.ga647a8990f-goog
 
