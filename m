@@ -2,94 +2,140 @@ Return-Path: <SRS0=S3oA=DR=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB1BC433E7
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 02:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42368C43457
+	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 03:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D75152225D
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 02:01:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08B4E2225F
+	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 03:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602295264;
-	bh=1GQZoxkKDcODDvQVtci6zcphjEBRdQeWqn9ZvswDQas=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=R560cqRf7Ga82h3QQZkuxiAkvSP18B9fTY/XD7KnXM3tZUxK2gCVkj2d1QeDGFJyc
-	 cHsdLw2wECZ1J22xjy9KXQOBU0DOP6B7mKU8pSX5cIdNDbRHxyAwmNKaOKkiJwg2JF
-	 Zhg1lkjXTQgkCz63dJAy9taVdHeCfPWZAAgRbWQk=
+	s=default; t=1602300036;
+	bh=3SJy+72j78sGqCok/pPZNklUfujRl33rd3sDPeDFUOw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=1fkBCeB06JGW/A0vQDjSk6jszVeyC42l+HE/2AOcZQMvC41wrgwiqCEZD+bHMifNP
+	 UHqAOAQUdHw/lUoTDUsBHFzk8P1hXSx2jLK9RCiiXqnu546GilXD/8lkpLHFWniDGt
+	 DCcKfEmsvn3BgSWVVxa0MASK8z6JaEQGwF594/ZQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729402AbgJJBpJ (ORCPT
+        id S1730348AbgJJDTs (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Oct 2020 21:45:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50600 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729390AbgJJBG4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Oct 2020 21:06:56 -0400
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 348A52076E;
-        Sat, 10 Oct 2020 01:06:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602292000;
-        bh=1GQZoxkKDcODDvQVtci6zcphjEBRdQeWqn9ZvswDQas=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NwJHmxyzOPGH60Ie9ztyQykx4u8a8e5STiuhiiyD83jgtn6PQ4blwYuQOzrhyjPGU
-         ujaRkqJNkUiHFjJgwwB9ru6yKgBffeENkrjWXJOaHQ4Mh6Cbd8ATbvCAX7UV5oFjNe
-         yHZlnSz6froJx2tN6vo44HS4PJFOuPLhqC0MKt7w=
-Date:   Fri, 9 Oct 2020 18:06:38 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Jacob Keller <jacob.e.keller@intel.com>
-Cc:     <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH] scripts: remove namespace.pl
-Message-ID: <20201009180638.2a2950a5@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20201010001844.2925318-1-jacob.e.keller@intel.com>
-References: <20201010001844.2925318-1-jacob.e.keller@intel.com>
+        Fri, 9 Oct 2020 23:19:48 -0400
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:57374 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730251AbgJJC74 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Oct 2020 22:59:56 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 09A2xUAl005630;
+        Sat, 10 Oct 2020 11:59:31 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 09A2xUAl005630
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1602298771;
+        bh=WWDM+o/wL6A812KwHUZbKNpAETbnnn+w7BV/JJ86H8k=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=1tL8Qokml2GcAc/4rKCb2deYlB5nRlYF5l2qFWYF0NdhrYeV6gJJuP2mhX0OeqM58
+         KRJFV5FRF6GgODXzVCq5PO+gikKFtxO36sL+z/aqfOIAiQq+k8nbWhSaBhMFMs9Y7x
+         xRp3ChKa7vRLu99dySfDNEofB9acA8BU2Z+FE7M1CydYzhF1yL1boXoFXTW7dfoK5p
+         woPQtiz1xuOtXyZUbeXU2WeF/9g3E7SxK76GeGC6CmLW6GmpU2a1T8gXx9vRJO6gCG
+         gZtHmHEGH1DFLDZeIRKaqS0fXo8O1j/TYgkiPYgwUIE30ISHx9ySmWXiRxnFRe5vdA
+         NatIcfNllpNQg==
+X-Nifty-SrcIP: [209.85.215.170]
+Received: by mail-pg1-f170.google.com with SMTP id h6so8797111pgk.4;
+        Fri, 09 Oct 2020 19:59:31 -0700 (PDT)
+X-Gm-Message-State: AOAM531nH7klLdgqpdL+n4BYaPTouFjzWR6CfbWCKhw99kaYrK11NiCr
+        csXDoljrUEFXzxdkWDhVJ0dyPGKBcGQ9E+XN4Mc=
+X-Google-Smtp-Source: ABdhPJwphC6cuOTQtA14yFr11HstFwMCUogPzJ6fyu1fi9MD3elUuZvTP88pEo/pxJLAHAMo2xeIoKY0Ako0OB9SqcY=
+X-Received: by 2002:a17:90a:aa91:: with SMTP id l17mr7675532pjq.198.1602298770233;
+ Fri, 09 Oct 2020 19:59:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <1602199588-24468-1-git-send-email-victor.erminpour@oracle.com>
+In-Reply-To: <1602199588-24468-1-git-send-email-victor.erminpour@oracle.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sat, 10 Oct 2020 11:58:53 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASWnCn3=iXFrQ=kj4eRcE+5SDyob-oqOMUzTLCMRut7BQ@mail.gmail.com>
+Message-ID: <CAK7LNASWnCn3=iXFrQ=kj4eRcE+5SDyob-oqOMUzTLCMRut7BQ@mail.gmail.com>
+Subject: Re: [PATCH] merge_config.sh: Add switch to specify ARCH variable
+To:     Victor Erminpour <victor.erminpour@oracle.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri,  9 Oct 2020 17:18:44 -0700 Jacob Keller wrote:
-> namespace.pl is intended to help locate symbols which are defined but
-> are not used externally. The goal is to avoid bloat of the namespace in
-> the resulting kernel image.
-> 
-> The script relies on object data, and only finds unused symbols for the
-> configuration used to generate that object data. This results in a lot
-> of false positive warnings such as symbols only used by a single
-> architecture, or symbols which are used externally only under certain
-> configurations.
-> 
-> Running namespace.pl using allyesconfig, allmodconfig, and
-> x86_64_defconfig yields the following results:
-> 
-> * allmodconfig
->   * 11122 unique symbol names with no external reference
->   * 1194 symbols listed as multiply defined
->   * 214 symbols it can't resolve
-> * allyesconfig
->   * 10997 unique symbol names with no external reference
->   * 1194 symbols listed as multiply defined
->   * 214 symbols it can't resolve
-> * x86_64_defconfig
->   * 5757 unique symbol names with no external reference
->   * 528 symbols listed as multiply defined
->   * 154 symbols it can't resolve
-> 
-> The script also has no way to easily limit the scope of the checks to
-> a given subset of the kernel, such as only checking for symbols defined
-> within a module or subsystem.
-> 
-> Discussion on public mailing lists seems to indicate that many view the
-> tool output as suspect or not very useful (see discussions at [1] and
-> [2] for further context).
+On Fri, Oct 9, 2020 at 8:25 AM Victor Erminpour
+<victor.erminpour@oracle.com> wrote:
+>
+> Add a switch to merge_config.sh to specify the ARCH variable
+> which defines the target architecture.
+>
+> Set x86 as the default architecture.
+>
+> Signed-off-by: Victor Erminpour <victor.erminpour@oracle.com>
+> ---
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-Thanks!
+You can do
+
+ARCH=arm ./scripts/kconfig/merge_config.sh
+
+
+
+
+
+
+>  scripts/kconfig/merge_config.sh | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> index 63c8565206a4..b7a687f093f0 100755
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -22,6 +22,7 @@ clean_up() {
+>
+>  usage() {
+>         echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
+> +       echo "  -a    set ARCH variable to define the target architecture"
+>         echo "  -h    display this help text"
+>         echo "  -m    only merge the fragments, do not execute the make command"
+>         echo "  -n    use allnoconfig instead of alldefconfig"
+> @@ -34,6 +35,7 @@ usage() {
+>
+>  RUNMAKE=true
+>  ALLTARGET=alldefconfig
+> +ARCH=x86
+>  WARNREDUN=false
+>  BUILTIN=false
+>  OUTPUT=.
+> @@ -46,6 +48,11 @@ while true; do
+>                 shift
+>                 continue
+>                 ;;
+> +       "-a")
+> +               ARCH=$2
+> +               shift 2
+> +               continue
+> +               ;;
+>         "-m")
+>                 RUNMAKE=false
+>                 shift
+> @@ -172,7 +179,7 @@ fi
+>  # Use the merged file as the starting point for:
+>  # alldefconfig: Fills in any missing symbols with Kconfig default
+>  # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+> -make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+> +make ARCH=$ARCH KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+>
+>
+>  # Check all specified config values took (might have missed-dependency issues)
+> --
+> 1.8.3.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
