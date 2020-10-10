@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 238B1C433DF
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 03:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A64C433DF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 05:51:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1CD92224A
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 03:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDAE8207CD
+	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Oct 2020 05:51:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602300035;
-	bh=WEbdKHbqX+XAVHjl1AY9Q2x29YnrVmu4DkHXQGxdUzY=;
+	s=default; t=1602309064;
+	bh=UrjWNPsgjKdzEN7jSrZFg5e/tnKxYMFzNmRSAEcvic4=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=dbEgUb7JfNCR3ntNCx9EmM19oToaH5662w/s1Y8RXO36R/QlLjHFNyeEXz0RUFDmC
-	 wGvdP28qnpzUWMXHVKKNSh3J5+aK4Js9eS82RKZoqfV45rLf3z+ilWbFEn4Vp3q/7W
-	 UmrnyEfKnsspp7xVQRySuPwF/klSJWgR/sEORzj0=
+	b=zaiQ4k4C8giYTTkxNLBSRWSsFbZXIFYYyS1Y5X6yOdoC5ZHgb88S0mZcCobigvxyR
+	 fjJcE026HeBeaeY9QWreSSywud0XtM3v+gChX3mayOTS9BI2OEXAIMD67okOkuSWOG
+	 vGroD42Us09lJwdvuDNYylkS8rAGqO+0keW2boFU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730768AbgJJDTF (ORCPT
+        id S1730837AbgJJFum (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 9 Oct 2020 23:19:05 -0400
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:23768 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730348AbgJJCko (ORCPT
+        Sat, 10 Oct 2020 01:50:42 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:21180 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730839AbgJJFsj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Oct 2020 22:40:44 -0400
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 09A2dhw5028175
-        for <linux-kbuild@vger.kernel.org>; Sat, 10 Oct 2020 11:39:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 09A2dhw5028175
+        Sat, 10 Oct 2020 01:48:39 -0400
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 09A5kXgP029072;
+        Sat, 10 Oct 2020 14:46:33 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 09A5kXgP029072
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1602297584;
-        bh=GvxKOZuoN4wsnwWGt5BK93981iq6oSKY+vVo8MsXvk4=;
+        s=dec2015msa; t=1602308794;
+        bh=NPo/PU0xjf6bUc6qck9bsAJ9RoIFLYMxO3tXOKXVC+E=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Uqcp7zr6Wg21ALDJ4vt7L8xu5AQMd14PJRVs/0Uuz+CSIt5GNqyVKgTIXVlrnKJsI
-         xpPNA0Da9nnK9XGbPUpK/FH+Tg7YyFreasea5RNlarMpRewfmJHqlRkVWfR/BQTrZh
-         ZSGRS7+HPoKIuWQScp8GT0gXEnqXLKSme4MTco79g9/FEbIfJlYWYIyOsfBB9br7tx
-         0Gw1e/WLBSBBKNg3B+Dh6fXVBqvFV4hJ/R+EOGMFlg5LGNn9Li1SPVy6HuiY0rPK2J
-         Aelps/ybr43cL9o3GE0IrknVn6WQ2XrNzt2WC/M/bp7x3q+rnFTkRqopo2xM0NS85s
-         7cCgFuomAMrOg==
-X-Nifty-SrcIP: [209.85.210.172]
-Received: by mail-pf1-f172.google.com with SMTP id x22so8398911pfo.12
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Oct 2020 19:39:44 -0700 (PDT)
-X-Gm-Message-State: AOAM532BRdZyK8yhc0x5Cj8GbRTIYiEmugBCiKP11k3VvL+ByHtRLOJG
-        iNIvjYQ4Yw0Ot86fSd80GcZUNdekLxlhDGhXb4A=
-X-Google-Smtp-Source: ABdhPJy18SRwKPobwp1SV+4FRmo3dIPkC1S3dBoDr04bBsym1opDfrJrz4Xi9iHmVtOt3Y4r+99sdj88yTPLqXFHJrY=
-X-Received: by 2002:a17:90b:1b12:: with SMTP id nu18mr6842305pjb.153.1602297583130;
- Fri, 09 Oct 2020 19:39:43 -0700 (PDT)
+        b=WiUHm0PuOzoJbbgxbj9WSiQ/mvOqV/VLCJEpiYB9m2hiG+pKY2RS6ZNzoFsin3pMj
+         mpxnLhKMMe1HuF/nTzTvQAkqelwnuWfrkxQbW9ejDVELHxEKjYEzSiin0x5FaXsu3z
+         qJlNv8/Wyk4t65z6UiDVU93KHVmY4QT2hG2WLAIsT2nZ/36OhFLrTqdoeS6hGgSjEq
+         60T96jHwaB2XLGcES2hHG2KNIV5tZ1ycTi7L77QAdpiGN4mcE6hw0bDU7ZtbOjWQkK
+         UvM9mPpFIXpWwZ1QkW2Pgff7PYFNzn9AvpeF7j5+46r0x691KPzLYBPyqXIkPL8kbw
+         eFP1iDZh/QeZw==
+X-Nifty-SrcIP: [209.85.215.174]
+Received: by mail-pg1-f174.google.com with SMTP id y14so8972053pgf.12;
+        Fri, 09 Oct 2020 22:46:33 -0700 (PDT)
+X-Gm-Message-State: AOAM530QoL6VrthI0FRpSpXacvWK19KdYMgZSU3mOeAn0pEKOAI0rO/x
+        9gf08PFuLazi1gH/obEwslx06OeXobVyXVVr5yA=
+X-Google-Smtp-Source: ABdhPJxNe/aQP9PvGoegQO5mOK5zzMdyRP61T3m8LPMs22XdE/iDvPhae0dd9Wi5ZFgEjcaB/qjj0hODfh2Q7kOJvqU=
+X-Received: by 2002:a63:1b44:: with SMTP id b4mr5940457pgm.175.1602308792647;
+ Fri, 09 Oct 2020 22:46:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201008232559.2866491-1-jacob.e.keller@intel.com>
-In-Reply-To: <20201008232559.2866491-1-jacob.e.keller@intel.com>
+References: <20201010001844.2925318-1-jacob.e.keller@intel.com>
+In-Reply-To: <20201010001844.2925318-1-jacob.e.keller@intel.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 10 Oct 2020 11:39:05 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATrifkTq9m+33KBtwkHZ+f039ZWD7wB911nVxiDrypeYA@mail.gmail.com>
-Message-ID: <CAK7LNATrifkTq9m+33KBtwkHZ+f039ZWD7wB911nVxiDrypeYA@mail.gmail.com>
-Subject: Re: [RFC PATCH] scripts: remove namespace.pl
+Date:   Sat, 10 Oct 2020 14:45:55 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQv9y5m50_v9Q=aMecNfQiAx87WtVmZnKwm7DOk2rWvrQ@mail.gmail.com>
+Message-ID: <CAK7LNAQv9y5m50_v9Q=aMecNfQiAx87WtVmZnKwm7DOk2rWvrQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: remove namespace.pl
 To:     Jacob Keller <jacob.e.keller@intel.com>
 Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -67,7 +68,7 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Oct 9, 2020 at 8:27 AM Jacob Keller <jacob.e.keller@intel.com> wrote:
+On Sat, Oct 10, 2020 at 9:20 AM Jacob Keller <jacob.e.keller@intel.com> wrote:
 >
 > namespace.pl is intended to help locate symbols which are defined but
 > are not used externally. The goal is to avoid bloat of the namespace in
@@ -141,17 +142,13 @@ On Fri, Oct 9, 2020 at 8:27 AM Jacob Keller <jacob.e.keller@intel.com> wrote:
 > [4] https://lore.kernel.org/netdev/20190827210928.576c5fef@cakuba.netronome.com/
 >
 > Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Acked-by: Randy Dunlap <rdunlap@infradead.org>
 > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Randy Dunlap <rdunlap@infradead.org>
 > Cc: Jakub Kicinski <kuba@kernel.org>
 
 
-Thanks for coming back to this.
-
 Applied to linux-kbuild.
-
-
-
+Thanks.
 
 > ---
 >  Documentation/process/submit-checklist.rst |   3 +-
@@ -691,6 +688,6 @@ Applied to linux-kbuild.
 >
 
 
---
+-- 
 Best Regards
 Masahiro Yamada
