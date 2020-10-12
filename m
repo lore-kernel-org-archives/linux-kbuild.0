@@ -2,64 +2,46 @@ Return-Path: <SRS0=gho2=DT=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FC4C433DF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 20:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16528C433DF
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 20:51:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F726208D5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 20:45:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iBvAVUob"
+	by mail.kernel.org (Postfix) with ESMTP id B02BF208D5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 20:51:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1602535876;
+	bh=0GkuUU3uNC/spWLd0lGLXk3f0NEQnPHerA+y4i0HfIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=jXUgCgUr9Z2pX0NhNNvjPDzSoHiL8om/VByZ49S8WU957yhBVKYIpaDh0AIQhkpNk
+	 FseXY5tEAKVx+5JDIKYp+/88W6nnd5Q0TwEPXBJO9AcE4N86DNTOhdiRLzDpxzxkom
+	 RRrA1sP0yILvoDKkNxZAKN+4x6G7p0rq/NVFAor0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388054AbgJLUpK (ORCPT
+        id S1729825AbgJLUvQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Oct 2020 16:45:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40624 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730795AbgJLUpB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Oct 2020 16:45:01 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639C2C0613D2
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 13:45:00 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id w21so6559866plq.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 13:45:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/je9IGonHzFsuF/SNifo0ZcXgtv4yeAu6zOR0qhli4g=;
-        b=iBvAVUobGLxYChgzQDFIjdgKitAhC2jHTTevcSYvj7umuQsfw68FrsiS588nddPL9n
-         rvr2pXp07ZQWqM/LOhZO8EaapVG+BSzu0jORrfEH3ohPyD3qyDxXqnlKu5B0F1SooZd2
-         mIgofFGRcvthuFUyb4XxZSLu96zkfV5bLY9hc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/je9IGonHzFsuF/SNifo0ZcXgtv4yeAu6zOR0qhli4g=;
-        b=WSq4xflEralyYpdZVV8CH7M2WNNzba+Es5bR7J5usnzYaZ903xH0wm81tRTKs0SeJG
-         TEtJXyucuBD/zJo35sVvQtoMhlPBp+C1DV5mhU9uuGp6CGk+hwBCOzelZJMTfEPgIvwy
-         YOq0u2YOy4xNG5bohH59Kw5C/wLb8w+pSJ2xsYzZqg6eQzeCrnyI49z5SrOQJKfjP4Ti
-         nYYYuU0cx5zxyYOHT/2iB1SPyByJjyauVnprfe/hSJyE0+ST0Br5LyEQaaSXvGAX/ob0
-         7iFxM80wX14qAqA/FTLrzSYRKN/yePUJ3JgCqkFj3aj4tO7j35XHBSZySPZt8kANRhj1
-         hzyA==
-X-Gm-Message-State: AOAM532cNCmm2fDuIfkrsrL85petbU4sbwYfSplVq20yAHkNYayohTLA
-        iM7fRE+891hwVbc6Q/Ms5HJbag==
-X-Google-Smtp-Source: ABdhPJxf12qi2TvIPdMo3b44hzG/IVxwKW/VadUKNptF9UK+YkxRipHLl4jP/u0pgN9HY2DkPgijnw==
-X-Received: by 2002:a17:902:cd07:b029:d3:9be0:2679 with SMTP id g7-20020a170902cd07b02900d39be02679mr25530237ply.68.1602535499967;
-        Mon, 12 Oct 2020 13:44:59 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id v20sm16032300pjh.5.2020.10.12.13.44.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Oct 2020 13:44:58 -0700 (PDT)
-Date:   Mon, 12 Oct 2020 13:44:56 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Will Deacon <will@kernel.org>
+        Mon, 12 Oct 2020 16:51:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36684 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726510AbgJLUvQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Oct 2020 16:51:16 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B24EB2078E;
+        Mon, 12 Oct 2020 20:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602535875;
+        bh=0GkuUU3uNC/spWLd0lGLXk3f0NEQnPHerA+y4i0HfIc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aUA4p24mfdDVp8gVMcJs3cg4QcRdzKI2RfnmgjjYH0yIvLOULOXyZL1YYb40RXCIL
+         0j4QZMJA0d4Jf96ySlvQCMNewtFUSD3KgMkUuWXetoBRKiLSWzbvYrWq0FC+1nMHyw
+         66F2X0FbdKKOd7lh9w7SiCHjg714ONHZLITlgfQo=
+Date:   Mon, 12 Oct 2020 21:51:09 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
 Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -74,48 +56,53 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         x86@kernel.org
 Subject: Re: [PATCH v5 25/29] arm64: allow LTO_CLANG and THINLTO to be
  selected
-Message-ID: <202010121344.53780D8CD2@keescook>
+Message-ID: <20201012205108.GA1620@willie-the-truck>
 References: <20201009161338.657380-1-samitolvanen@google.com>
  <20201009161338.657380-26-samitolvanen@google.com>
  <20201012083116.GA785@willie-the-truck>
+ <202010121344.53780D8CD2@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201012083116.GA785@willie-the-truck>
+In-Reply-To: <202010121344.53780D8CD2@keescook>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 09:31:16AM +0100, Will Deacon wrote:
-> On Fri, Oct 09, 2020 at 09:13:34AM -0700, Sami Tolvanen wrote:
-> > Allow CONFIG_LTO_CLANG and CONFIG_THINLTO to be enabled.
+On Mon, Oct 12, 2020 at 01:44:56PM -0700, Kees Cook wrote:
+> On Mon, Oct 12, 2020 at 09:31:16AM +0100, Will Deacon wrote:
+> > On Fri, Oct 09, 2020 at 09:13:34AM -0700, Sami Tolvanen wrote:
+> > > Allow CONFIG_LTO_CLANG and CONFIG_THINLTO to be enabled.
+> > > 
+> > > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> > > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > > ---
+> > >  arch/arm64/Kconfig | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> > > index ad522b021f35..7016d193864f 100644
+> > > --- a/arch/arm64/Kconfig
+> > > +++ b/arch/arm64/Kconfig
+> > > @@ -72,6 +72,8 @@ config ARM64
+> > >  	select ARCH_USE_SYM_ANNOTATIONS
+> > >  	select ARCH_SUPPORTS_MEMORY_FAILURE
+> > >  	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
+> > > +	select ARCH_SUPPORTS_LTO_CLANG
+> > > +	select ARCH_SUPPORTS_THINLTO
 > > 
-> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > ---
-> >  arch/arm64/Kconfig | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index ad522b021f35..7016d193864f 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -72,6 +72,8 @@ config ARM64
-> >  	select ARCH_USE_SYM_ANNOTATIONS
-> >  	select ARCH_SUPPORTS_MEMORY_FAILURE
-> >  	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
-> > +	select ARCH_SUPPORTS_LTO_CLANG
-> > +	select ARCH_SUPPORTS_THINLTO
+> > Please don't enable this for arm64 until we have the dependency stuff sorted
+> > out. I posted patches [1] for this before, but I think they should be part
+> > of this series as they don't make sense on their own.
 > 
-> Please don't enable this for arm64 until we have the dependency stuff sorted
-> out. I posted patches [1] for this before, but I think they should be part
-> of this series as they don't make sense on their own.
+> Oh, hm. We've been trying to trim down this series, since it's already
+> quite large. Why can't [1] land first? It would make this easier to deal
+> with, IMO.
 
-Oh, hm. We've been trying to trim down this series, since it's already
-quite large. Why can't [1] land first? It would make this easier to deal
-with, IMO.
+I'm happy to handle [1] along with the LTO Kconfig change when the time
+comes, if that helps. I just don't want to merge dead code!
 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/log/?h=rwonce/read-barrier-depends
+Will
 
--- 
-Kees Cook
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/log/?h=rwonce/read-barrier-depends
