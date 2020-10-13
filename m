@@ -8,64 +8,65 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB520C4363A
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF27C2D0AE
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8560D221FC
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B625D221EB
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXTPLb0y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CfMw3Lf2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727554AbgJMAdB (ORCPT
+        id S1727531AbgJMAdX (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Oct 2020 20:33:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47670 "EHLO
+        Mon, 12 Oct 2020 20:33:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727161AbgJMAcK (ORCPT
+        with ESMTP id S1727215AbgJMAdB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Oct 2020 20:32:10 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B093C0613D5
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:10 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id c21so13464652pgi.21
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:10 -0700 (PDT)
+        Mon, 12 Oct 2020 20:33:01 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B908C0613DF
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:36 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id z9so10745644pfk.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=TMDqK7SaU5cOFiGBMdZ8Uvp/vuFhiQD2dpfcaMKefDQ=;
-        b=IXTPLb0yFS0o2Ga79gr7xdNEuO4HV13KRVxV2TTekWKuTZxx//v6pgCz5d15EYldkD
-         BZ57RN/e61FhDemXvwUx/f/NWB6TRPm+Js/jxH+Ozhr38+xqoMr+mLGrfiRquS2j3kZJ
-         fYrUrVndpVuef4YOld3pXFi3jcBOAwRlkcsfQZwg/xUdayEHuKtVYacnXMtm0b/I38Qx
-         WxiKUnZ+mL2wNK3BuVJubCd8sZKHY38WZpOm/vNkaFMYl+vqbCp10u/22PEAKbjAh45D
-         sMdah9r1FW+zKiF03OY7alXL/9E4fBd9YI1yEFlLk7unOBGLusyORO3j8boBtmXDyJax
-         UZbw==
+        bh=s6lKkOY6jDvHdKU5rddxnOybuTgb4UG6S62YgATiqsw=;
+        b=CfMw3Lf2RqxuH1gK/LplrUVdrli+0+CHSSkm8IVXoxiERluD9UBxqoVgGLYbB0zcGH
+         fcd+f/qjElRp1j6Jdey9Bh7NDBDe4hB9i6yurpQFinDV80y/ezy2gjJtTugW6x9+TxXB
+         lOD7ufXL8OAxIH+6uzRqxS9SQox8gQ5U7CudTH1hC4sfe/ktNYfAhjsreZIIFTMjFG1C
+         RQt8+AhPqYKsAgf3F+x4HsSqm87l4hiDBx+TxXtL+Ap2+aCO42F+hEV40MZGJK2CkBo8
+         P4FhwGbSHoh+MmiJ53pkyum1T4qHIVaGpa4LSlzx+7mtM5okXCbjhUku3Y3pd0VFE6Pn
+         ksJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=TMDqK7SaU5cOFiGBMdZ8Uvp/vuFhiQD2dpfcaMKefDQ=;
-        b=rpkBEv32P18J8RmycuZjSqX21o4OkE07B4ad5KMAT7UiFBjTpah9zB+3ou5Anj7+v9
-         pGZ6lpgByKEnZUCHFhtU8npcJl4GJlk89T+MvCkQwTy+Pb82kquut2+4JmKeTmMg/JGT
-         KfZ3CuDVtn/BqAIEYFJe0PkSxA07Rob2+gZW78zP+/FxxVOco6ENd3PVBHoKQlslNKxO
-         Y0AKvP3NAlMQTlZ6JmhRBAloLRfLCwOA8d0T2iim5l4yEHNANWvw352dCoMAjSlNmgRj
-         pwChf18KtfoXbrNjl4mdH+b4NT1AOrlJ09KhVy6zKF4FK5m9DZc1AaHFEE8E56g66wO3
-         Ewig==
-X-Gm-Message-State: AOAM530DWRnuQBhOcZH+fBBXKQTJF10FL/a1WaBijs9WYjfy7JQyIANn
-        CBjQdnNQnmpQUTFxoiPpm8UjzDxOsyeXvNuYkLw=
-X-Google-Smtp-Source: ABdhPJzsd4CCmnhcLZkBRbfSKkJeEB8ZYCNEDRSF1U6z3faMrYXBKcMOZdLok8oHysnniolDxRFIZGt/9cwSiZFRwQU=
+        bh=s6lKkOY6jDvHdKU5rddxnOybuTgb4UG6S62YgATiqsw=;
+        b=DpuJXx1WliobL9HRAJvDB4EueX/nkwee4R6OYiJCbJpoLMKrhnia+8rQ7o7jzRPgKJ
+         I4/bfVL5k09DEVTGY8F9wOVEhJvTVXXfySydIykHI58HhulruyZ3nB9Lvm95byE+i/Ec
+         ycd226oY4oRFeDdkZiByxUKFKmX+sJs44wXAc5R15k/cshRK3SMshaYFpR05a//yptak
+         OfV8BXGbjTUwVVmELflmKFbOI5vLSMGuAMGnBUWTN3oG/yFxPJrUTWluL1wdk7BEUg6I
+         A//JZQRMRwC8LtsmZWtboo8XzxgSupvR61UvV0csHmX2zpbH3rRKYv6E8+apmMZBtHsi
+         kEoQ==
+X-Gm-Message-State: AOAM5327FVI5vowb1kEQ1M90Clnz4J3J57AuxKHyPBEWHm5huVYmhgiG
+        D0Sliqp6YpSRur5CG9ufYmEum3wi8JlLofipheU=
+X-Google-Smtp-Source: ABdhPJyFxyU35wX46NP9k8EgBAnMCUQ4LjUrf9Ha6HBecKs6BME4DjIGIM9k+HTmfXPW/UAyVK3X9uWCjK1Lv7DEg7U=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a17:90a:940c:: with SMTP id
- r12mr3210626pjo.1.1602549129256; Mon, 12 Oct 2020 17:32:09 -0700 (PDT)
-Date:   Mon, 12 Oct 2020 17:31:40 -0700
+ (user=samitolvanen job=sendgmr) by 2002:aa7:8492:0:b029:155:79b1:437a with
+ SMTP id u18-20020aa784920000b029015579b1437amr18970192pfn.26.1602549155518;
+ Mon, 12 Oct 2020 17:32:35 -0700 (PDT)
+Date:   Mon, 12 Oct 2020 17:31:52 -0700
 In-Reply-To: <20201013003203.4168817-1-samitolvanen@google.com>
-Message-Id: <20201013003203.4168817-3-samitolvanen@google.com>
+Message-Id: <20201013003203.4168817-15-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201013003203.4168817-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v6 02/25] objtool: Add a pass for generating __mcount_loc
+Subject: [PATCH v6 14/25] kbuild: lto: remove duplicate dependencies from .mod files
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>
@@ -85,205 +86,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Peter Zijlstra <peterz@infradead.org>
+With LTO, llvm-nm prints out symbols for each archive member
+separately, which results in a lot of duplicate dependencies in the
+.mod file when CONFIG_TRIM_UNUSED_SYMS is enabled. When a module
+consists of several compilation units, the output can exceed the
+default xargs command size limit and split the dependency list to
+multiple lines, which results in used symbols getting trimmed.
 
-Add the --mcount option for generating __mcount_loc sections
-needed for dynamic ftrace. Using this pass requires the kernel to
-be compiled with -mfentry and CC_USING_NOP_MCOUNT to be defined
-in Makefile.
+This change removes duplicate dependencies, which will reduce the
+probability of this happening and makes .mod files smaller and
+easier to read.
 
-Link: https://lore.kernel.org/lkml/20200625200235.GQ4781@hirez.programming.kicks-ass.net/
-Signed-off-by: Peter Zijlstra <peterz@infradead.org>
-[Sami: rebased, dropped config changes, fixed to actually use --mcount,
-       and wrote a commit message.]
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- tools/objtool/builtin-check.c |  3 +-
- tools/objtool/builtin.h       |  2 +-
- tools/objtool/check.c         | 82 +++++++++++++++++++++++++++++++++++
- tools/objtool/check.h         |  1 +
- tools/objtool/objtool.c       |  1 +
- tools/objtool/objtool.h       |  1 +
- 6 files changed, 88 insertions(+), 2 deletions(-)
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/objtool/builtin-check.c b/tools/objtool/builtin-check.c
-index c6d199bfd0ae..e92e76f69176 100644
---- a/tools/objtool/builtin-check.c
-+++ b/tools/objtool/builtin-check.c
-@@ -18,7 +18,7 @@
- #include "builtin.h"
- #include "objtool.h"
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index ab0ddf4884fd..96d6c9e18901 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -266,7 +266,7 @@ endef
  
--bool no_fp, no_unreachable, retpoline, module, backtrace, uaccess, stats, validate_dup, vmlinux;
-+bool no_fp, no_unreachable, retpoline, module, backtrace, uaccess, stats, validate_dup, vmlinux, mcount;
- 
- static const char * const check_usage[] = {
- 	"objtool check [<options>] file.o",
-@@ -35,6 +35,7 @@ const struct option check_options[] = {
- 	OPT_BOOLEAN('s', "stats", &stats, "print statistics"),
- 	OPT_BOOLEAN('d', "duplicate", &validate_dup, "duplicate validation for vmlinux.o"),
- 	OPT_BOOLEAN('l', "vmlinux", &vmlinux, "vmlinux.o validation"),
-+	OPT_BOOLEAN('M', "mcount", &mcount, "generate __mcount_loc"),
- 	OPT_END(),
- };
- 
-diff --git a/tools/objtool/builtin.h b/tools/objtool/builtin.h
-index 85c979caa367..94565a72b701 100644
---- a/tools/objtool/builtin.h
-+++ b/tools/objtool/builtin.h
-@@ -8,7 +8,7 @@
- #include <subcmd/parse-options.h>
- 
- extern const struct option check_options[];
--extern bool no_fp, no_unreachable, retpoline, module, backtrace, uaccess, stats, validate_dup, vmlinux;
-+extern bool no_fp, no_unreachable, retpoline, module, backtrace, uaccess, stats, validate_dup, vmlinux, mcount;
- 
- extern int cmd_check(int argc, const char **argv);
- extern int cmd_orc(int argc, const char **argv);
-diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index c6ab44543c92..c39c4d2b432a 100644
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -523,6 +523,65 @@ static int create_static_call_sections(struct objtool_file *file)
- 	return 0;
- }
- 
-+static int create_mcount_loc_sections(struct objtool_file *file)
-+{
-+	struct section *sec, *reloc_sec;
-+	struct reloc *reloc;
-+	unsigned long *loc;
-+	struct instruction *insn;
-+	int idx;
-+
-+	sec = find_section_by_name(file->elf, "__mcount_loc");
-+	if (sec) {
-+		INIT_LIST_HEAD(&file->mcount_loc_list);
-+		WARN("file already has __mcount_loc section, skipping");
-+		return 0;
-+	}
-+
-+	if (list_empty(&file->mcount_loc_list))
-+		return 0;
-+
-+	idx = 0;
-+	list_for_each_entry(insn, &file->mcount_loc_list, mcount_loc_node)
-+		idx++;
-+
-+	sec = elf_create_section(file->elf, "__mcount_loc", 0, sizeof(unsigned long), idx);
-+	if (!sec)
-+		return -1;
-+
-+	reloc_sec = elf_create_reloc_section(file->elf, sec, SHT_RELA);
-+	if (!reloc_sec)
-+		return -1;
-+
-+	idx = 0;
-+	list_for_each_entry(insn, &file->mcount_loc_list, mcount_loc_node) {
-+
-+		loc = (unsigned long *)sec->data->d_buf + idx;
-+		memset(loc, 0, sizeof(unsigned long));
-+
-+		reloc = malloc(sizeof(*reloc));
-+		if (!reloc) {
-+			perror("malloc");
-+			return -1;
-+		}
-+		memset(reloc, 0, sizeof(*reloc));
-+
-+		reloc->sym = insn->sec->sym;
-+		reloc->addend = insn->offset;
-+		reloc->type = R_X86_64_64;
-+		reloc->offset = idx * sizeof(unsigned long);
-+		reloc->sec = reloc_sec;
-+		elf_add_reloc(file->elf, reloc);
-+
-+		idx++;
-+	}
-+
-+	if (elf_rebuild_reloc_section(file->elf, reloc_sec))
-+		return -1;
-+
-+	return 0;
-+}
-+
- /*
-  * Warnings shouldn't be reported for ignored functions.
-  */
-@@ -949,6 +1008,22 @@ static int add_call_destinations(struct objtool_file *file)
- 			insn->type = INSN_NOP;
- 		}
- 
-+		if (mcount && !strcmp(insn->call_dest->name, "__fentry__")) {
-+			if (reloc) {
-+				reloc->type = R_NONE;
-+				elf_write_reloc(file->elf, reloc);
-+			}
-+
-+			elf_write_insn(file->elf, insn->sec,
-+				       insn->offset, insn->len,
-+				       arch_nop_insn(insn->len));
-+
-+			insn->type = INSN_NOP;
-+
-+			list_add_tail(&insn->mcount_loc_node,
-+				      &file->mcount_loc_list);
-+		}
-+
- 		/*
- 		 * Whatever stack impact regular CALLs have, should be undone
- 		 * by the RETURN of the called function.
-@@ -2920,6 +2995,13 @@ int check(struct objtool_file *file)
- 		goto out;
- 	warnings += ret;
- 
-+	if (mcount) {
-+		ret = create_mcount_loc_sections(file);
-+		if (ret < 0)
-+			goto out;
-+		warnings += ret;
-+	}
-+
- out:
- 	if (ret < 0) {
- 		/*
-diff --git a/tools/objtool/check.h b/tools/objtool/check.h
-index 5ec00a4b891b..070baec2050a 100644
---- a/tools/objtool/check.h
-+++ b/tools/objtool/check.h
-@@ -23,6 +23,7 @@ struct instruction {
- 	struct list_head list;
- 	struct hlist_node hash;
- 	struct list_head static_call_node;
-+	struct list_head mcount_loc_node;
- 	struct section *sec;
- 	unsigned long offset;
- 	unsigned int len;
-diff --git a/tools/objtool/objtool.c b/tools/objtool/objtool.c
-index 9df0cd86d310..c1819a6f2a18 100644
---- a/tools/objtool/objtool.c
-+++ b/tools/objtool/objtool.c
-@@ -62,6 +62,7 @@ struct objtool_file *objtool_open_read(const char *_objname)
- 	INIT_LIST_HEAD(&file.insn_list);
- 	hash_init(file.insn_hash);
- 	INIT_LIST_HEAD(&file.static_call_list);
-+	INIT_LIST_HEAD(&file.mcount_loc_list);
- 	file.c_file = !vmlinux && find_section_by_name(file.elf, ".comment");
- 	file.ignore_unreachables = no_unreachable;
- 	file.hints = false;
-diff --git a/tools/objtool/objtool.h b/tools/objtool/objtool.h
-index 4125d4578b23..cf004dd60c2b 100644
---- a/tools/objtool/objtool.h
-+++ b/tools/objtool/objtool.h
-@@ -19,6 +19,7 @@ struct objtool_file {
- 	struct list_head insn_list;
- 	DECLARE_HASHTABLE(insn_hash, 20);
- 	struct list_head static_call_list;
-+	struct list_head mcount_loc_list;
- 	bool ignore_unreachables, c_file, hints, rodata;
- };
- 
+ # List module undefined symbols (or empty line if not enabled)
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+-cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | xargs echo
++cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | sort -u | xargs echo
+ else
+ cmd_undef_syms = echo
+ endif
 -- 
 2.28.0.1011.ga647a8990f-goog
 
