@@ -1,202 +1,170 @@
-Return-Path: <SRS0=gho2=DT=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=YaqL=DU=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A640FC433DF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 21:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 907CFC388D1
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:41:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4001920797
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Oct 2020 21:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 478A121D81
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:41:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LTRLFCNL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tToV5WHA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730321AbgJLVst (ORCPT
+        id S1727293AbgJMAcW (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Oct 2020 17:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50698 "EHLO
+        Mon, 12 Oct 2020 20:32:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729273AbgJLVst (ORCPT
+        with ESMTP id S1727265AbgJMAcU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Oct 2020 17:48:49 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C705C0613D0;
-        Mon, 12 Oct 2020 14:48:49 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id j7so4952122pgk.5;
-        Mon, 12 Oct 2020 14:48:49 -0700 (PDT)
+        Mon, 12 Oct 2020 20:32:20 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04BBCC0613D1
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:20 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id w7so9285662qvf.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5hpUBhYkynzWSO/MyOJOUvzRQxBbeKodFS5ENFGt1Cw=;
-        b=LTRLFCNLVioFU/DVKBPzF3b0xS54PVoSo7PO4zXv9Ign+qVU4TULsnKmBdI4qvOy/K
-         pwBGlElzg1R9+sWqnbQQXfVzpsrckEDujiqzp3mQtlJNPNMvZlN9zNpsLq3lxuKdfNa7
-         OARt4MdYOUqz02g0z/Esn5buWbAaAR/qSjB56C4pdvnmM29FFMFHiYPGDVD9hg8rGplG
-         YUJwD5EpvWwwHXwyvcTvLC8+n0zr8llmK02cgWznQ13JMUcw1SzhTnkjQxz1YaQklGHk
-         Nl95KEpncg+Ojoov5rNEx1o0L1HxPARbL9XvxVFhmLTI1ISROf0Fpys5Kua7ZrpF3ZRW
-         ax0A==
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=DpKDWbKTWTks9tV0s5R4bAv6I99K4U3GWyHtOORPWq0=;
+        b=tToV5WHAo5KqbZWvmvK6V50kBP7lFH3FOB2CpC/8vUKu1aRiVvkQ0yMN0vQ89CF6e5
+         JRyw7EkAwMm6H7peFQHQIMNjEArgToT8cMngzUtewp6pjEsEnKihkjsnBtvO6oPWyoY5
+         0jEoVe5t1I0r/WTDYyCiLYBEDIC8osSOQ1G5cl4z6TNyAQclWkSSmuTXoRh0op1Xl5s4
+         0Q1DPTZbYn6GTjC25XWRmtS3tD3Yc9zFyn9Pd4h3pvxgPKUIZShi/wu0rDWou0nHcj7q
+         RIn/E/s2/75f3avHOb7sHbB3x3aWYsCQGwnME8C9IgglpttXQYXa7cI9BcTPqzUO1vEH
+         +83Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5hpUBhYkynzWSO/MyOJOUvzRQxBbeKodFS5ENFGt1Cw=;
-        b=NZnfnhy1uuOnKIHixSG+R45bSPikgKujDrXVkRFSb05BNpgQJwGxnfbYVo4zQLBl6e
-         LHUpIJ1WY1YARdg2KqZjPqwpgQYgRRt07VYQ2nRqQWIAWLQWV5r9yg7OngJx67NzR95V
-         /O6ZmWkY6xLR3jBNNByjHGlF41vR5YAmm2DMpRQtY20jzUFEcDLzOtPWYHP/9Wb9VeGa
-         tWY9+bLKyoqOH0kAbxXVuP3jvfgqqdBrfGA7tFO4/5Okv5ndFej4LHC3l6ajklFQnW1I
-         y5jJeNE+ZTV26y+/kZhBKf7cUiGZvMEe0NMeX4nbOWSZNWPjyGEUovwWhxXGwdQhnv4p
-         hrUA==
-X-Gm-Message-State: AOAM5313kDRcIQvykHMgLrHngHrlZGJ9ifdALyn+JxFedY4QIpPxcqbm
-        XKPRMxx7j6wtIJyPoIphu/I=
-X-Google-Smtp-Source: ABdhPJz5Lp2adF9xI3yV5LRvSTjct73bdnYZ9/vx/AS1+EGaAwshFUhsI9eDn+I6rbF84Pp9iczIxw==
-X-Received: by 2002:a17:90a:ec13:: with SMTP id l19mr22866654pjy.51.1602539328974;
-        Mon, 12 Oct 2020 14:48:48 -0700 (PDT)
-Received: from localhost.localdomain ([2405:201:a404:280a:90bd:7a49:dcda:1fb1])
-        by smtp.gmail.com with ESMTPSA id y80sm16836402pfb.144.2020.10.12.14.48.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Oct 2020 14:48:48 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] kbuild: use interpreters to invoke scripts
-To:     Bernd Petrovitsch <bernd@petrovitsch.priv.at>
-Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=DpKDWbKTWTks9tV0s5R4bAv6I99K4U3GWyHtOORPWq0=;
+        b=Caz817Af18OQUE+PDOEQtdXeSp/960Y6CH9XR928s42jW2qBvIAt8VDQlb0NGj0+F2
+         YntLOE5Cvb7rshvt9AZBMnBccPKkgJufBAkzP6XNyablfwKkbY1jRB0J+iuSo9D3pmkE
+         ISb4NW3ZWFFfu4FlpgCkiHGdbFc9VX1XDIGGYopJh6IDG3GbahWqvVD8BJHRJxXVUUav
+         lIwTVb9kJRJjBVKYrc5Uz9gjzcksSKgaD9r7vhqy0Hh9TED81QGACnZBE3PYcRjKR/4B
+         4D/DAaWrAKMLPX9KT3nrUKGRSv9MUW8BE5q0Tg9bWbzW2J3h2EZ/d4VBwcchnrxc+C62
+         VCQQ==
+X-Gm-Message-State: AOAM533SDOgzeZYeA952Wo29cS4JaeVvIlv3l5hmoOKrPPUVuBjQLBsG
+        WA2WCVLQitMISKhdbec0ibb6hNWvtdopnA16xyQ=
+X-Google-Smtp-Source: ABdhPJx3VxsNQ9tGu8xO95a1t6wVsoYxq4cLAxTVRK8Lq6kP9gEUNleSTLK5SuOy50JiEDn6GMUiyP2OF00DUvOhVxA=
+Sender: "samitolvanen via sendgmr" 
+        <samitolvanen@samitolvanen1.mtv.corp.google.com>
+X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
+ (user=samitolvanen job=sendgmr) by 2002:a0c:e1d1:: with SMTP id
+ v17mr25826493qvl.15.1602549139059; Mon, 12 Oct 2020 17:32:19 -0700 (PDT)
+Date:   Mon, 12 Oct 2020 17:31:45 -0700
+In-Reply-To: <20201013003203.4168817-1-samitolvanen@google.com>
+Message-Id: <20201013003203.4168817-8-samitolvanen@google.com>
+Mime-Version: 1.0
+References: <20201013003203.4168817-1-samitolvanen@google.com>
+X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
+Subject: [PATCH v6 07/25] treewide: remove DISABLE_LTO
+From:   Sami Tolvanen <samitolvanen@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>
+Cc:     Will Deacon <will@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
         Kees Cook <keescook@chromium.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-ia64@vger.kernel.org,
         clang-built-linux@googlegroups.com,
-        linux-kernel-mentees@lists.linuxfoundation.org
-References: <20201012170631.1241502-1-ujjwalkumar0501@gmail.com>
- <20201012170631.1241502-3-ujjwalkumar0501@gmail.com>
- <alpine.DEB.2.21.2010122019410.17866@felia>
- <b4fdc7c5-8edf-3895-69fc-1bcf9efb5d4a@gmail.com>
- <53b7257e-b192-07da-9dd3-06497ce826f0@petrovitsch.priv.at>
-From:   Ujjwal Kumar <ujjwalkumar0501@gmail.com>
-Message-ID: <4969477f-8833-9b5e-6756-0d72fe59ef4d@gmail.com>
-Date:   Tue, 13 Oct 2020 03:18:39 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <53b7257e-b192-07da-9dd3-06497ce826f0@petrovitsch.priv.at>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 13/10/20 12:24 am, Bernd Petrovitsch wrote:
-> Hi all!
-> 
->>>> diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
->>>> index 703b1c4f6d12..86d42a2d09cb 100644
->>>> --- a/arch/ia64/Makefile
->>>> +++ b/arch/ia64/Makefile
->>>> @@ -27,8 +27,8 @@ cflags-y	:= -pipe $(EXTRA) -ffixed-r13 -mfixed-range=f12-f15,f32-f127 \
->>>>  		   -falign-functions=32 -frename-registers -fno-optimize-sibling-calls
->>>>  KBUILD_CFLAGS_KERNEL := -mconstant-gp
->>>>
->>>> -GAS_STATUS	= $(shell $(srctree)/arch/ia64/scripts/check-gas "$(CC)" "$(OBJDUMP)")
->>>> -KBUILD_CPPFLAGS += $(shell $(srctree)/arch/ia64/scripts/toolchain-flags "$(CC)" "$(OBJDUMP)" "$(READELF)")
->>>> +GAS_STATUS	= $(shell $(CONFIG_SHELL) $(srctree)/arch/ia64/scripts/check-gas "$(CC)" "$(OBJDUMP)")
->>>> +KBUILD_CPPFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/arch/ia64/scripts/toolchain-flags "$(CC)" "$(OBJDUMP)" "$(READELF)")
->>>
->>> Here is an instance of what Masahiro-san pointed out being wrong.
->>>
->>> Ujjwal, will you send a v3?
->>
->> Following is the quoted text from the reply mail from Masahiro
->>
->>>> -GAS_STATUS     = $(shell $(srctree)/arch/ia64/scripts/check-gas "$(CC)" "$(OBJDUMP)")
->>>> -KBUILD_CPPFLAGS += $(shell $(srctree)/arch/ia64/scripts/toolchain-flags "$(CC)" "$(OBJDUMP)" "$(READELF)")
->>>> +GAS_STATUS     = $($(CONFIG_SHELL) $(srctree)/arch/ia64/scripts/check-gas "$(CC)" "$(OBJDUMP)")
->>>> +KBUILD_CPPFLAGS += $($(CONFIG_SHELL) $(srctree)/arch/ia64/scripts/toolchain-flags "$(CC)" "$(OBJDUMP)" "$(READELF)")
->>>
->>>
->>>
->>> These changes look wrong to me.
->>>
->>> $($(CONFIG_SHELL)    ->  $(shell $(CONFIG_SHELL)
->>>
->>
->> From the above text, I understand as follows:
-> 
-> Did you actually *test* that (expecially) these lines work
-> afterwards as good as before?
+This change removes all instances of DISABLE_LTO from
+Makefiles, as they are currently unused, and the preferred
+method of disabling LTO is to filter out the flags instead.
 
-Yes, I did check my changes. TBH, I spent a considerable
-amount of time in doing so (given that I'm new to the
-community). And I explicitly mentioned the ones I couldn't
-test in the cover letter.
+Suggested-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+---
+ arch/arm64/kernel/vdso/Makefile | 1 -
+ arch/sparc/vdso/Makefile        | 2 --
+ arch/x86/entry/vdso/Makefile    | 2 --
+ kernel/Makefile                 | 3 ---
+ scripts/Makefile.build          | 2 +-
+ 5 files changed, 1 insertion(+), 9 deletions(-)
 
-But I'm afraid this particular change that Masahiro pointed
-must have been overlooked by me (and possibly by others
-involved in the process). Being the author of the patch I
-accept my mistake.
+diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
+index 45d5cfe46429..e836e300440f 100644
+--- a/arch/arm64/kernel/vdso/Makefile
++++ b/arch/arm64/kernel/vdso/Makefile
+@@ -31,7 +31,6 @@ ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
+ ccflags-y += -DDISABLE_BRANCH_PROFILING
+ 
+ CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) $(GCC_PLUGINS_CFLAGS)
+-KBUILD_CFLAGS			+= $(DISABLE_LTO)
+ KASAN_SANITIZE			:= n
+ UBSAN_SANITIZE			:= n
+ OBJECT_FILES_NON_STANDARD	:= y
+diff --git a/arch/sparc/vdso/Makefile b/arch/sparc/vdso/Makefile
+index f44355e46f31..476c4b315505 100644
+--- a/arch/sparc/vdso/Makefile
++++ b/arch/sparc/vdso/Makefile
+@@ -3,8 +3,6 @@
+ # Building vDSO images for sparc.
+ #
+ 
+-KBUILD_CFLAGS += $(DISABLE_LTO)
+-
+ VDSO64-$(CONFIG_SPARC64)	:= y
+ VDSOCOMPAT-$(CONFIG_COMPAT)	:= y
+ 
+diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
+index 215376d975a2..ecc27018ae13 100644
+--- a/arch/x86/entry/vdso/Makefile
++++ b/arch/x86/entry/vdso/Makefile
+@@ -9,8 +9,6 @@ ARCH_REL_TYPE_ABS := R_X86_64_JUMP_SLOT|R_X86_64_GLOB_DAT|R_X86_64_RELATIVE|
+ ARCH_REL_TYPE_ABS += R_386_GLOB_DAT|R_386_JMP_SLOT|R_386_RELATIVE
+ include $(srctree)/lib/vdso/Makefile
+ 
+-KBUILD_CFLAGS += $(DISABLE_LTO)
+-
+ # Sanitizer runtimes are unavailable and cannot be linked here.
+ KASAN_SANITIZE			:= n
+ UBSAN_SANITIZE			:= n
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 16ec9262ce9d..2561abc91961 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -38,9 +38,6 @@ KASAN_SANITIZE_kcov.o := n
+ KCSAN_SANITIZE_kcov.o := n
+ CFLAGS_kcov.o := $(call cc-option, -fno-conserve-stack) -fno-stack-protector
+ 
+-# cond_syscall is currently not LTO compatible
+-CFLAGS_sys_ni.o = $(DISABLE_LTO)
+-
+ obj-y += sched/
+ obj-y += locking/
+ obj-y += power/
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cd4294435fef..6db5b1f55b14 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -111,7 +111,7 @@ endif
+ # ---------------------------------------------------------------------------
+ 
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+-      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
++      cmd_cc_s_c = $(CC) $(filter-out $(DEBUG_CFLAGS), $(c_flags)) -fverbose-asm -S -o $@ $<
+ 
+ $(obj)/%.s: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cc_s_c)
+-- 
+2.28.0.1011.ga647a8990f-goog
 
-Because this construct was new to me I read about it
-thoroughly in the docs.
-As soon as it was pointed out to me, I at once realised
-that the change proposed by me was wrong (i didn't
-have to look at the docs).
-
-> 
->> That my proposed change:
->> $(shell $(src...)    ->  $($(CONFIG_SHELL) $(src...)
->>
->> is WRONG
-> 
-> Yup, as it's in a Makefile and that's a Makefile construct> 
->> and in the next line he suggested the required correction.
->> That being:
->> $($(CONFIG_SHELL)    ->  $(shell $(CONFIG_SHELL)
-> 
-> Such stuff should generally not be needed as the to-be-used
-> shell can be set in Makefiles via a "SHELL = " assignment
-
-It's not about setting shell but rather using it at required
-place. The 'shell function' is meant to execute provided 
-commands in an environment outside of make; and executing
-commands in that environment is somewhat similar to running
-commands on a terminal.
-Invoking a script file without setting the x bits will give
-a permission denied error.
-Similar thing happens when 'shell function' tries to invoke
-the provided script. So the task was simply to prepend the
-$CONFIG_SHELL (or $SHELL whichever is configured; simple sh
-would also suffice) with the script file in 'shell function'.
-
-> (defaulting to /bin/sh - what else;-).
-> Flags for the shell can BTW set with ".SHELLFLAGS = ".
-
-setting flags might not be the solution either.
-
-> 
-> So please
-> -) learn basic "Makefile" + "make" before brainlessly patching
->    a Makefile.
-> -) actually testy your changes to make sure the patch didn't
->    broke anything
-> -) and - last but not least - check if there isn't a shell
->    already set (and which).
-
-btw, I do agree with your points.
-
-> 
-> MfG,
-> 	Bernd
-> 
-
-If I said anything incorrect please correct me.
-
-
-Thanks
-Ujjwal Kumar
