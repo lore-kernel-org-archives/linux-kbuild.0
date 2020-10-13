@@ -2,526 +2,184 @@ Return-Path: <SRS0=YaqL=DU=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6676C6377D
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE90C433DF
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 03:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 730AF221FC
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 02:42:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7335C2073A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Oct 2020 03:41:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HkPk8tpK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ic1DgpAt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbgJMAe7 (ORCPT
+        id S1730412AbgJMDlU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Oct 2020 20:34:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47898 "EHLO
+        Mon, 12 Oct 2020 23:41:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727558AbgJMAdD (ORCPT
+        with ESMTP id S1727831AbgJMDlT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Oct 2020 20:33:03 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26972C0613D5
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id z27so9379501ybi.17
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Oct 2020 17:32:39 -0700 (PDT)
+        Mon, 12 Oct 2020 23:41:19 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB81C0613D0;
+        Mon, 12 Oct 2020 20:41:19 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id g29so16588884pgl.2;
+        Mon, 12 Oct 2020 20:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=8qK4bJZyQDR87RnO4mGuyFKTVY7cPxnhOBu/7+99VLY=;
-        b=HkPk8tpKW7WNnX/puTQlfRj44UC27N1NhH2tG/YyUiPz4mI9bSOC4Y6B6fSEEEn+IG
-         ElaLzdBOf9b7tZxNWFrEcImnIIH6aSKSkYSToht73sjFdvn+kDlp0b+oKIP6LenxYBWT
-         DKbVWaGk97x1MWhB+s+oGuhH1a5ZllEus6dVqCOlEuDZJTH+dsRVKikqCuLIzzVaNsL9
-         BCc1skei0i5aLHnUTJbxRQXQ9k0Ogj8Foq09Ag7oTZ/Tx+UgJH+oGlAa2ZKEmbAxkZJZ
-         Ooz89u5G0Q1uQnIADF8Vlg61uMyLhDXZx+rQzbVRWiy9eQohNScX437uj2ZdjCx7eniW
-         MMBQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QnFBf559stGtGycK6x7rPCyISX6Wjd0zGUVwkdWXItY=;
+        b=Ic1DgpAtmYSK3H9X+FshZNBMed9A+u0Is3uJTYQoFwqpNo+dm0KU8kCJcTVb8aijJO
+         NK36xXlolH80VTP3ZdEXEWliYUj/9+t2Al50Q3uN68xRJyGb4Hnw71fxBsLcxJX5ACDc
+         +N0zKKQhQUq0Jri3ZDZC/DfQVsd7rFWFRxRjkXjtqqfEdZM+u5Y70pVzCHx/WRj/Fd1A
+         NHuc7y6eYwfORXPksrbbGewbaU6JWX0HDs3jcQC1l1Bdyrqjzdyy3DaEl3vfo1j7pqEt
+         ooz3ezPuNcvKFoxUGKoMKRGFTITVvudk3ZNtOf/O4Gpk1ymVmXzLMMu+IblYmQn4G4pp
+         7C1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=8qK4bJZyQDR87RnO4mGuyFKTVY7cPxnhOBu/7+99VLY=;
-        b=djNLlsDeNTZ5l5K3ctENMuQB1dxD7XDDrCKNp0lQveNjN5FRNr7OqRse47m5aAUXb1
-         uGTCfMRSF1Hg+QY5tZhy0fhUv3sES6fXEGeuhfvExSv8CS9yVhVmzhhxwdOIX9/fxG4I
-         wx/VGWuYEGZ0cTuwiWlQxtfufuePRFY9uAF5nIJa8tKbwSOyr1CZhy+oTNFiIfhKEKKX
-         hS5HkTmZXU/lXy3JbsoJSZcZdE3JJOLzM3Yh2hVL+WlqwhJXZIIqeHjdK9tcH/5ne3ni
-         9tH0qc3UUNIP4Vm7hMSVDlnnLlWhtMbk/PyPqXLB2104VH3C3xWD8rEdkqVV8cXNFMzD
-         kyQQ==
-X-Gm-Message-State: AOAM531z47kUB//+VqioHAo8Mm9qtjjs6/Hl2B6/HEFrJx9RG6YRcQlR
-        up0qYT3lFW/kYHZ3+78FfdKvGx0WvCA/lE8pfSw=
-X-Google-Smtp-Source: ABdhPJzs0fNxnyU0pJ6O0O4KvAY+CnrL+OVeruHaXnFCM0PX2NsfWKm0CCwR1utz9RzO9ELdZrJZ4TqAmm4y8CBBhBU=
-Sender: "samitolvanen via sendgmr" 
-        <samitolvanen@samitolvanen1.mtv.corp.google.com>
-X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:2bc4:: with SMTP id
- r187mr36581790ybr.218.1602549158339; Mon, 12 Oct 2020 17:32:38 -0700 (PDT)
-Date:   Mon, 12 Oct 2020 17:31:53 -0700
-In-Reply-To: <20201013003203.4168817-1-samitolvanen@google.com>
-Message-Id: <20201013003203.4168817-16-samitolvanen@google.com>
-Mime-Version: 1.0
-References: <20201013003203.4168817-1-samitolvanen@google.com>
-X-Mailer: git-send-email 2.28.0.1011.ga647a8990f-goog
-Subject: [PATCH v6 15/25] init: lto: ensure initcall ordering
-From:   Sami Tolvanen <samitolvanen@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>
-Cc:     Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com,
-        kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QnFBf559stGtGycK6x7rPCyISX6Wjd0zGUVwkdWXItY=;
+        b=cWN7h3GdP3qEiT+8E7n5nUoC5r/YX89SJnGJ+SYzkMuBaPFhM0VUP543lguhLK7k+S
+         P8wvz8d3ODZ5/yDbMWB8EXYztGMp1nbAL80gI8r0Fv/AQwSxs4DAMHFoUZ1PlM2n3EgE
+         mEQIPYnTT875A2MM6br8sz0zee+KEYECkcKDN+8vnSi+Yx5exSvviR+H/3xNgWLlHAbS
+         S/uSKocYgpJf5gVU0cFSRMJvuD7lqut7kIG6PcqQrRyJDIknBtbm8LaUcE51pkLeubZL
+         bVRlUPt8bVFSgybHcXVdIhSN7vum2Ovyy8Bc8b6kp1PpkA9RGdXEsP5vsivIimpBZGDF
+         KolQ==
+X-Gm-Message-State: AOAM531mgzomrEibww19ZWgqier5D/D7JT7dz+8QNmsU/OvUwaIZ9jUx
+        dOQCZViQHqdZWkh3NbHzAOCJhNFR/4o=
+X-Google-Smtp-Source: ABdhPJyGwYce2sNmmbxXit4l2re9HBR70WjzKY24wEySbkGo9wMoKKJVaEd2pbN7PkAVsKz3HH/ksQ==
+X-Received: by 2002:a17:90a:62c5:: with SMTP id k5mr23551844pjs.100.1602560479246;
+        Mon, 12 Oct 2020 20:41:19 -0700 (PDT)
+Received: from localhost.localdomain ([2604:1380:45e1:2200::1])
+        by smtp.gmail.com with ESMTPSA id b21sm13944484pfb.97.2020.10.12.20.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Oct 2020 20:41:18 -0700 (PDT)
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Vincenzo Frascino <vincenzo.frascino@arm.com>,
         linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        x86@kernel.org, Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH] arm64: vdso32: Allow ld.lld to properly link the VDSO
+Date:   Mon, 12 Oct 2020 20:39:48 -0700
+Message-Id: <20201013033947.2257501-1-natechancellor@gmail.com>
+X-Mailer: git-send-email 2.29.0.rc0
+MIME-Version: 1.0
+X-Patchwork-Bot: notify
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With LTO, the compiler doesn't necessarily obey the link order for
-initcalls, and initcall variables need globally unique names to avoid
-collisions at link time.
+As it stands now, the vdso32 Makefile hardcodes the linker to ld.bfd
+using -fuse-ld=bfd with $(CC). This was taken from the arm vDSO
+Makefile, as the comment notes, done in commit d2b30cd4b722 ("ARM:
+8384/1: VDSO: force use of BFD linker").
 
-This change exports __KBUILD_MODNAME and adds the initcall_id() macro,
-which uses it together with __COUNTER__ and __LINE__ to help ensure
-these variables have unique names, and moves each variable to its own
-section when LTO is enabled, so the correct order can be specified using
-a linker script.
+Commit fe00e50b2db8 ("ARM: 8858/1: vdso: use $(LD) instead of $(CC) to
+link VDSO") changed that Makefile to use $(LD) directly instead of
+through $(CC), which matches how the rest of the kernel operates. Since
+then, LD=ld.lld means that the arm vDSO will be linked with ld.lld,
+which has shown no problems so far.
 
-The generate_initcall_ordering.pl script uses nm to find initcalls from
-the object files passed to the linker, and generates a linker script
-that specifies the same order for initcalls that we would have without
-LTO. With LTO enabled, the script is called in link-vmlinux.sh through
-jobserver-exec to limit the number of jobs spawned.
+Allow ld.lld to link this vDSO as we do the regular arm vDSO. To do
+this, we need to do a few things:
 
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+* Add a LD_COMPAT variable, which defaults to $(CROSS_COMPILE_COMPAT)ld
+  with gcc and $(LD) if LLVM is 1, which will be ld.lld, or
+  $(CROSS_COMPILE_COMPAT)ld if not, which matches the logic of the main
+  Makefile. It is overrideable for further customization and avoiding
+  breakage.
+
+* Eliminate cc32-ldoption, which matches commit 055efab3120b ("kbuild:
+  drop support for cc-ldoption").
+
+With those, we can use $(LD_COMPAT) in cmd_ldvdso and change the flags
+from compiler linker flags to linker flags directly. We eliminate
+-mfloat-abi=soft because it is not handled by the linker.
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/1033
+Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
- include/linux/init.h               |  52 +++++-
- scripts/Makefile.lib               |   6 +-
- scripts/generate_initcall_order.pl | 270 +++++++++++++++++++++++++++++
- scripts/link-vmlinux.sh            |  15 ++
- 4 files changed, 334 insertions(+), 9 deletions(-)
- create mode 100755 scripts/generate_initcall_order.pl
 
-diff --git a/include/linux/init.h b/include/linux/init.h
-index 212fc9e2f691..af638cd6dd52 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -184,19 +184,57 @@ extern bool initcall_debug;
-  * as KEEP() in the linker script.
-  */
+NOTE: This patch is currently based on the kbuild tree due to the
+--build-id -> --build-id=sha1 change that Bill did. If the arm64
+maintainers would prefer to take this patch, I can rebase it (althought
+presumably this won't hit mainline until at least 5.11 so it can
+probably just stay as is for now).
+
+ arch/arm64/kernel/vdso32/Makefile | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32/Makefile
+index 7f96a1a9f68c..1cf00c58805d 100644
+--- a/arch/arm64/kernel/vdso32/Makefile
++++ b/arch/arm64/kernel/vdso32/Makefile
+@@ -22,16 +22,21 @@ endif
  
-+/* Format: <modname>__<counter>_<line>_<fn> */
-+#define __initcall_id(fn)					\
-+	__PASTE(__KBUILD_MODNAME,				\
-+	__PASTE(__,						\
-+	__PASTE(__COUNTER__,					\
-+	__PASTE(_,						\
-+	__PASTE(__LINE__,					\
-+	__PASTE(_, fn))))))
+ CC_COMPAT ?= $(CC)
+ CC_COMPAT += $(CC_COMPAT_CLANG_FLAGS)
 +
-+/* Format: __<prefix>__<iid><id> */
-+#define __initcall_name(prefix, __iid, id)			\
-+	__PASTE(__,						\
-+	__PASTE(prefix,						\
-+	__PASTE(__,						\
-+	__PASTE(__iid, id))))
-+
-+#ifdef CONFIG_LTO_CLANG
-+/*
-+ * With LTO, the compiler doesn't necessarily obey link order for
-+ * initcalls. In order to preserve the correct order, we add each
-+ * variable into its own section and generate a linker script (in
-+ * scripts/link-vmlinux.sh) to specify the order of the sections.
-+ */
-+#define __initcall_section(__sec, __iid)			\
-+	#__sec ".init.." #__iid
-+#else
-+#define __initcall_section(__sec, __iid)			\
-+	#__sec ".init"
-+#endif
-+
- #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
--#define ___define_initcall(fn, id, __sec)			\
-+#define ____define_initcall(fn, __name, __sec)			\
- 	__ADDRESSABLE(fn)					\
--	asm(".section	\"" #__sec ".init\", \"a\"	\n"	\
--	"__initcall_" #fn #id ":			\n"	\
-+	asm(".section	\"" __sec "\", \"a\"		\n"	\
-+	    __stringify(__name) ":			\n"	\
- 	    ".long	" #fn " - .			\n"	\
- 	    ".previous					\n");
- #else
--#define ___define_initcall(fn, id, __sec) \
--	static initcall_t __initcall_##fn##id __used \
--		__attribute__((__section__(#__sec ".init"))) = fn;
-+#define ____define_initcall(fn, __name, __sec)			\
-+	static initcall_t __name __used 			\
-+		__attribute__((__section__(__sec))) = fn;
- #endif
++ifeq ($(LLVM),1)
++LD_COMPAT ?= $(LD)
++else
++LD_COMPAT ?= $(CROSS_COMPILE_COMPAT)ld
++endif
+ else
+ CC_COMPAT ?= $(CROSS_COMPILE_COMPAT)gcc
++LD_COMPAT ?= $(CROSS_COMPILE_COMPAT)ld
+ endif
  
-+#define __unique_initcall(fn, id, __sec, __iid)			\
-+	____define_initcall(fn,					\
-+		__initcall_name(initcall, __iid, id),		\
-+		__initcall_section(__sec, __iid))
-+
-+#define ___define_initcall(fn, id, __sec)			\
-+	__unique_initcall(fn, id, __sec, __initcall_id(fn))
-+
- #define __define_initcall(fn, id) ___define_initcall(fn, id, .initcall##id)
+ cc32-option = $(call try-run,\
+         $(CC_COMPAT) $(1) -c -x c /dev/null -o "$$TMP",$(1),$(2))
+ cc32-disable-warning = $(call try-run,\
+ 	$(CC_COMPAT) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+-cc32-ldoption = $(call try-run,\
+-        $(CC_COMPAT) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
+ cc32-as-instr = $(call try-run,\
+ 	printf "%b\n" "$(1)" | $(CC_COMPAT) $(VDSO_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
  
- /*
-@@ -236,7 +274,7 @@ extern bool initcall_debug;
- #define __exitcall(fn)						\
- 	static exitcall_t __exitcall_##fn __exit_call = fn
+@@ -122,14 +127,10 @@ dmbinstr := $(call cc32-as-instr,dmb ishld,-DCONFIG_AS_DMB_ISHLD=1)
+ VDSO_CFLAGS += $(dmbinstr)
+ VDSO_AFLAGS += $(dmbinstr)
  
--#define console_initcall(fn)	___define_initcall(fn,, .con_initcall)
-+#define console_initcall(fn)	___define_initcall(fn, con, .con_initcall)
+-VDSO_LDFLAGS := $(VDSO_CPPFLAGS)
+ # From arm vDSO Makefile
+-VDSO_LDFLAGS += -Wl,-Bsymbolic -Wl,--no-undefined -Wl,-soname=linux-vdso.so.1
+-VDSO_LDFLAGS += -Wl,-z,max-page-size=4096 -Wl,-z,common-page-size=4096
+-VDSO_LDFLAGS += -nostdlib -shared -mfloat-abi=soft
+-VDSO_LDFLAGS += -Wl,--hash-style=sysv
+-VDSO_LDFLAGS += -Wl,--build-id=sha1
+-VDSO_LDFLAGS += $(call cc32-ldoption,-fuse-ld=bfd)
++VDSO_LDFLAGS += -Bsymbolic --no-undefined -soname=linux-vdso.so.1
++VDSO_LDFLAGS += -z max-page-size=4096 -z common-page-size=4096
++VDSO_LDFLAGS += -nostdlib -shared --hash-style=sysv --build-id=sha1
  
- struct obs_kernel_param {
- 	const char *str;
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index ecb97c9f5feb..1142de6a4161 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -117,9 +117,11 @@ target-stem = $(basename $(patsubst $(obj)/%,%,$@))
- # These flags are needed for modversions and compiling, so we define them here
- # $(modname_flags) defines KBUILD_MODNAME as the name of the module it will
- # end up in (or would, if it gets compiled in)
--name-fix = $(call stringify,$(subst $(comma),_,$(subst -,_,$1)))
-+name-fix-token = $(subst $(comma),_,$(subst -,_,$1))
-+name-fix = $(call stringify,$(call name-fix-token,$1))
- basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
--modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(modname))
-+modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(modname)) \
-+		 -D__KBUILD_MODNAME=kmod_$(call name-fix-token,$(modname))
- modfile_flags  = -DKBUILD_MODFILE=$(call stringify,$(modfile))
  
- _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(target-stem).o), \
-diff --git a/scripts/generate_initcall_order.pl b/scripts/generate_initcall_order.pl
-new file mode 100755
-index 000000000000..1a88d3f1b913
---- /dev/null
-+++ b/scripts/generate_initcall_order.pl
-@@ -0,0 +1,270 @@
-+#!/usr/bin/env perl
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Generates a linker script that specifies the correct initcall order.
-+#
-+# Copyright (C) 2019 Google LLC
-+
-+use strict;
-+use warnings;
-+use IO::Handle;
-+use IO::Select;
-+use POSIX ":sys_wait_h";
-+
-+my $nm = $ENV{'NM'} || die "$0: ERROR: NM not set?";
-+my $objtree = $ENV{'objtree'} || '.';
-+
-+## currently active child processes
-+my $jobs = {};		# child process pid -> file handle
-+## results from child processes
-+my $results = {};	# object index -> [ { level, secname }, ... ]
-+
-+## reads _NPROCESSORS_ONLN to determine the maximum number of processes to
-+## start
-+sub get_online_processors {
-+	open(my $fh, "getconf _NPROCESSORS_ONLN 2>/dev/null |")
-+		or die "$0: ERROR: failed to execute getconf: $!";
-+	my $procs = <$fh>;
-+	close($fh);
-+
-+	if (!($procs =~ /^\d+$/)) {
-+		return 1;
-+	}
-+
-+	return int($procs);
-+}
-+
-+## writes results to the parent process
-+## format: <file index> <initcall level> <base initcall section name>
-+sub write_results {
-+	my ($index, $initcalls) = @_;
-+
-+	# sort by the counter value to ensure the order of initcalls within
-+	# each object file is correct
-+	foreach my $counter (sort { $a <=> $b } keys(%{$initcalls})) {
-+		my $level = $initcalls->{$counter}->{'level'};
-+
-+		# section name for the initcall function
-+		my $secname = $initcalls->{$counter}->{'module'} . '__' .
-+			      $counter . '_' .
-+			      $initcalls->{$counter}->{'line'} . '_' .
-+			      $initcalls->{$counter}->{'function'};
-+
-+		print "$index $level $secname\n";
-+	}
-+}
-+
-+## reads a result line from a child process and adds it to the $results array
-+sub read_results{
-+	my ($fh) = @_;
-+
-+	# each child prints out a full line w/ autoflush and exits after the
-+	# last line, so even if buffered I/O blocks here, it shouldn't block
-+	# very long
-+	my $data = <$fh>;
-+
-+	if (!defined($data)) {
-+		return 0;
-+	}
-+
-+	chomp($data);
-+
-+	my ($index, $level, $secname) = $data =~
-+		/^(\d+)\ ([^\ ]+)\ (.*)$/;
-+
-+	if (!defined($index) ||
-+		!defined($level) ||
-+		!defined($secname)) {
-+		die "$0: ERROR: child process returned invalid data: $data\n";
-+	}
-+
-+	$index = int($index);
-+
-+	if (!exists($results->{$index})) {
-+		$results->{$index} = [];
-+	}
-+
-+	push (@{$results->{$index}}, {
-+		'level'   => $level,
-+		'secname' => $secname
-+	});
-+
-+	return 1;
-+}
-+
-+## finds initcalls from an object file or all object files in an archive, and
-+## writes results back to the parent process
-+sub find_initcalls {
-+	my ($index, $file) = @_;
-+
-+	die "$0: ERROR: file $file doesn't exist?" if (! -f $file);
-+
-+	open(my $fh, "\"$nm\" --defined-only \"$file\" 2>/dev/null |")
-+		or die "$0: ERROR: failed to execute \"$nm\": $!";
-+
-+	my $initcalls = {};
-+
-+	while (<$fh>) {
-+		chomp;
-+
-+		# check for the start of a new object file (if processing an
-+		# archive)
-+		my ($path)= $_ =~ /^(.+)\:$/;
-+
-+		if (defined($path)) {
-+			write_results($index, $initcalls);
-+			$initcalls = {};
-+			next;
-+		}
-+
-+		# look for an initcall
-+		my ($module, $counter, $line, $symbol) = $_ =~
-+			/[a-z]\s+__initcall__(\S*)__(\d+)_(\d+)_(.*)$/;
-+
-+		if (!defined($module)) {
-+			$module = ''
-+		}
-+
-+		if (!defined($counter) ||
-+			!defined($line) ||
-+			!defined($symbol)) {
-+			next;
-+		}
-+
-+		# parse initcall level
-+		my ($function, $level) = $symbol =~
-+			/^(.*)((early|rootfs|con|[0-9])s?)$/;
-+
-+		die "$0: ERROR: invalid initcall name $symbol in $file($path)"
-+			if (!defined($function) || !defined($level));
-+
-+		$initcalls->{$counter} = {
-+			'module'   => $module,
-+			'line'     => $line,
-+			'function' => $function,
-+			'level'    => $level,
-+		};
-+	}
-+
-+	close($fh);
-+	write_results($index, $initcalls);
-+}
-+
-+## waits for any child process to complete, reads the results, and adds them to
-+## the $results array for later processing
-+sub wait_for_results {
-+	my ($select) = @_;
-+
-+	my $pid = 0;
-+	do {
-+		# unblock children that may have a full write buffer
-+		foreach my $fh ($select->can_read(0)) {
-+			read_results($fh);
-+		}
-+
-+		# check for children that have exited, read the remaining data
-+		# from them, and clean up
-+		$pid = waitpid(-1, WNOHANG);
-+		if ($pid > 0) {
-+			if (!exists($jobs->{$pid})) {
-+				next;
-+			}
-+
-+			my $fh = $jobs->{$pid};
-+			$select->remove($fh);
-+
-+			while (read_results($fh)) {
-+				# until eof
-+			}
-+
-+			close($fh);
-+			delete($jobs->{$pid});
-+		}
-+	} while ($pid > 0);
-+}
-+
-+## forks a child to process each file passed in the command line and collects
-+## the results
-+sub process_files {
-+	my $index = 0;
-+	my $njobs = $ENV{'PARALLELISM'} || get_online_processors();
-+	my $select = IO::Select->new();
-+
-+	while (my $file = shift(@ARGV)) {
-+		# fork a child process and read it's stdout
-+		my $pid = open(my $fh, '-|');
-+
-+		if (!defined($pid)) {
-+			die "$0: ERROR: failed to fork: $!";
-+		} elsif ($pid) {
-+			# save the child process pid and the file handle
-+			$select->add($fh);
-+			$jobs->{$pid} = $fh;
-+		} else {
-+			# in the child process
-+			STDOUT->autoflush(1);
-+			find_initcalls($index, "$objtree/$file");
-+			exit;
-+		}
-+
-+		$index++;
-+
-+		# limit the number of children to $njobs
-+		if (scalar(keys(%{$jobs})) >= $njobs) {
-+			wait_for_results($select);
-+		}
-+	}
-+
-+	# wait for the remaining children to complete
-+	while (scalar(keys(%{$jobs})) > 0) {
-+		wait_for_results($select);
-+	}
-+}
-+
-+sub generate_initcall_lds() {
-+	process_files();
-+
-+	my $sections = {};	# level -> [ secname, ...]
-+
-+	# sort results to retain link order and split to sections per
-+	# initcall level
-+	foreach my $index (sort { $a <=> $b } keys(%{$results})) {
-+		foreach my $result (@{$results->{$index}}) {
-+			my $level = $result->{'level'};
-+
-+			if (!exists($sections->{$level})) {
-+				$sections->{$level} = [];
-+			}
-+
-+			push(@{$sections->{$level}}, $result->{'secname'});
-+		}
-+	}
-+
-+	die "$0: ERROR: no initcalls?" if (!keys(%{$sections}));
-+
-+	# print out a linker script that defines the order of initcalls for
-+	# each level
-+	print "SECTIONS {\n";
-+
-+	foreach my $level (sort(keys(%{$sections}))) {
-+		my $section;
-+
-+		if ($level eq 'con') {
-+			$section = '.con_initcall.init';
-+		} else {
-+			$section = ".initcall${level}.init";
-+		}
-+
-+		print "\t${section} : {\n";
-+
-+		foreach my $secname (@{$sections->{$level}}) {
-+			print "\t\t*(${section}..${secname}) ;\n";
-+		}
-+
-+		print "\t}\n";
-+	}
-+
-+	print "}\n";
-+}
-+
-+generate_initcall_lds();
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 7f4d19271180..cd649dc21c04 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -43,6 +43,17 @@ info()
- 	fi
- }
+ # Borrow vdsomunge.c from the arm vDSO
+@@ -189,8 +190,8 @@ quiet_cmd_vdsold_and_vdso_check = LD32    $@
+       cmd_vdsold_and_vdso_check = $(cmd_vdsold); $(cmd_vdso_check)
  
-+# Generate a linker script to ensure correct ordering of initcalls.
-+gen_initcalls()
-+{
-+	info GEN .tmp_initcalls.lds
-+
-+	${PYTHON} ${srctree}/scripts/jobserver-exec		\
-+	${PERL} ${srctree}/scripts/generate_initcall_order.pl	\
-+		${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}	\
-+		> .tmp_initcalls.lds
-+}
-+
- # If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
- # .tmp_symversions.lds
- gen_symversions()
-@@ -72,6 +83,9 @@ modpost_link()
- 		--end-group"
- 
- 	if [ -n "${CONFIG_LTO_CLANG}" ]; then
-+		gen_initcalls
-+		lds="-T .tmp_initcalls.lds"
-+
- 		if [ -n "${CONFIG_MODVERSIONS}" ]; then
- 			gen_symversions
- 			lds="${lds} -T .tmp_symversions.lds"
-@@ -284,6 +298,7 @@ cleanup()
- {
- 	rm -f .btf.*
- 	rm -f .tmp_System.map
-+	rm -f .tmp_initcalls.lds
- 	rm -f .tmp_symversions.lds
- 	rm -f .tmp_vmlinux*
- 	rm -f System.map
+ quiet_cmd_vdsold = LD32    $@
+-      cmd_vdsold = $(CC_COMPAT) -Wp,-MD,$(depfile) $(VDSO_LDFLAGS) \
+-                   -Wl,-T $(filter %.lds,$^) $(filter %.o,$^) -o $@
++      cmd_vdsold = $(LD_COMPAT) $(VDSO_LDFLAGS) \
++                   -T $(filter %.lds,$^) $(filter %.o,$^) -o $@
+ quiet_cmd_vdsocc = CC32    $@
+       cmd_vdsocc = $(CC_COMPAT) -Wp,-MD,$(depfile) $(VDSO_CFLAGS) -c -o $@ $<
+ quiet_cmd_vdsocc_gettimeofday = CC32    $@
+
+base-commit: 172aad81a882443eefe1bd860c4eddc81b14dd5b
 -- 
-2.28.0.1011.ga647a8990f-goog
+2.29.0.rc0
 
