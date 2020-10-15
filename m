@@ -2,55 +2,53 @@ Return-Path: <SRS0=YbPX=DW=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2281EC433E7
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 10:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBBEC43457
+	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 20:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B25EA22250
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 10:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FBA22074D
+	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 20:10:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H7urFq9t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bq4WPG2k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389296AbgJOKWo (ORCPT
+        id S2389033AbgJOUKR (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 15 Oct 2020 06:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389271AbgJOKWo (ORCPT
+        Thu, 15 Oct 2020 16:10:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44927 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388893AbgJOUKR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Oct 2020 06:22:44 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA8BC061755;
-        Thu, 15 Oct 2020 03:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rmt+w86dS/ArDl7p6coE3p1FQiRlDnETDOF85EAeo80=; b=H7urFq9tcKjVEHrGlgs6qqhDf4
-        oQMvOJQ0ykGC0OUWm6j6P40c2ClfoS4N1iUdDzI7NszgLIB2YI4qMJ892z90AJsTn11EvwW+MtOVh
-        ddVXM7uYTIl+ahd+gEQFvcaxfyuaPnkbEsTt/vmXLtStZfCQlSfc+oQ9GKbTIbh1QtEndZUFKS8iQ
-        RG2CeCNJ8oLWOZ1j2VOtlC36cNeboOcj3IpHWd0dVqImsYZOp+GtYIoL4M+5SqxrBrt55upHkAlVA
-        rdh+0h6U56l/Lqn5r2zQ2t0WOc1/OVeHC7M8/6/Im8NyIi7W3dDDZL1d8iqegaLUsqXcJBsUpBLPv
-        pDxD+k8g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kT0Oo-0006aX-4e; Thu, 15 Oct 2020 10:22:18 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 835C0300DAE;
-        Thu, 15 Oct 2020 12:22:16 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 6F7A9235F4457; Thu, 15 Oct 2020 12:22:16 +0200 (CEST)
-Date:   Thu, 15 Oct 2020 12:22:16 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Jann Horn <jannh@google.com>
-Cc:     Sami Tolvanen <samitolvanen@google.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
+        Thu, 15 Oct 2020 16:10:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602792615;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JSZZdQFYiEF1TvfexFPRAVhe3w/8OtEerqz5dRK9QXg=;
+        b=Bq4WPG2kaLIR4kk9GJJ4JBxw+XX5grZ3bV4dLUCVT5qp9UxOX/jnD8NbjK/Okm4qfZtaGq
+        iA1J/CrjsYcQCfArvGbQ3gJb/V+4QOYms12j00s80fXvVRVAqjqLHYAemZ73LidRT/6Xra
+        F6oTXfCXRUl9KSUix3wwn1zTuMHyxUw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-te9p4b8XOfue84xzeHLT6w-1; Thu, 15 Oct 2020 16:10:10 -0400
+X-MC-Unique: te9p4b8XOfue84xzeHLT6w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59D8A803651;
+        Thu, 15 Oct 2020 20:10:07 +0000 (UTC)
+Received: from treble (ovpn-115-218.rdu2.redhat.com [10.10.115.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 233035C1BB;
+        Thu, 15 Oct 2020 20:10:02 +0000 (UTC)
+Date:   Thu, 15 Oct 2020 15:10:00 -0500
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Will Deacon <will@kernel.org>,
@@ -58,33 +56,42 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         "Paul E. McKenney" <paulmck@kernel.org>,
         Kees Cook <keescook@chromium.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-kbuild@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-pci@vger.kernel.org
-Subject: Re: [PATCH v6 22/25] x86/asm: annotate indirect jumps
-Message-ID: <20201015102216.GB2611@hirez.programming.kicks-ass.net>
+        clang-built-linux@googlegroups.com,
+        kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        x86@kernel.org
+Subject: Re: [PATCH v6 02/25] objtool: Add a pass for generating __mcount_loc
+Message-ID: <20201015201000.poiepgn5fssnogtf@treble>
 References: <20201013003203.4168817-1-samitolvanen@google.com>
- <20201013003203.4168817-23-samitolvanen@google.com>
- <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
+ <20201013003203.4168817-3-samitolvanen@google.com>
+ <20201014165004.GA3593121@gmail.com>
+ <20201014182115.GF2594@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
+In-Reply-To: <20201014182115.GF2594@hirez.programming.kicks-ass.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Oct 15, 2020 at 01:23:41AM +0200, Jann Horn wrote:
+On Wed, Oct 14, 2020 at 08:21:15PM +0200, Peter Zijlstra wrote:
+> On Wed, Oct 14, 2020 at 06:50:04PM +0200, Ingo Molnar wrote:
+> > Meh, adding --mcount as an option to 'objtool check' was a valid hack for a 
+> > prototype patchset, but please turn this into a proper subcommand, just 
+> > like 'objtool orc' is.
+> > 
+> > 'objtool check' should ... keep checking. :-)
+> 
+> No, no subcommands. orc being a subcommand was a mistake.
 
-> It would probably be good to keep LTO and non-LTO builds in sync about
-> which files are subjected to objtool checks. So either you should be
-> removing the OBJECT_FILES_NON_STANDARD annotations for anything that
-> is linked into the main kernel (which would be a nice cleanup, if that
-> is possible), 
+Yup, it gets real awkward when trying to combine subcommands.
 
-This, I've had to do that for a number of files already for the limited
-vmlinux.o passes we needed for noinstr validation.
+I proposed a more logical design:
+
+  https://lkml.kernel.org/r/20201002141303.hyl72to37wudoi66@treble
+
+-- 
+Josh
+
