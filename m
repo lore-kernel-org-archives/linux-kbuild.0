@@ -2,106 +2,89 @@ Return-Path: <SRS0=YbPX=DW=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ACADC43467
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 02:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2281EC433E7
+	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 10:22:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA15222259
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 02:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B25EA22250
+	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 10:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WE3ire40"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H7urFq9t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730065AbgJOCYq (ORCPT
+        id S2389296AbgJOKWo (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 14 Oct 2020 22:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
+        Thu, 15 Oct 2020 06:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726575AbgJOCYi (ORCPT
+        with ESMTP id S2389271AbgJOKWo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Oct 2020 22:24:38 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E56C05BD2B
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2020 15:47:02 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id 1so493549ple.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2020 15:47:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1ZkeuWYx0x8NcK97W3bc1qXSyhy0ywO9Zu1gztVJSpU=;
-        b=WE3ire40GLinUOppIi7ZcbOVETm0WyX7RLx7xCaymADCWSNOR8y2/RwcPtSnft1aFu
-         0ChZJ7ygTGlmsX8EVM6bGmei1Zx5q2bj0yebVv+SOHsAiV0uEn+oar9jyVds8dZOPeFt
-         NDilDA6BdcrnvpJnue+wzGel9tWEzsFUzutQ0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1ZkeuWYx0x8NcK97W3bc1qXSyhy0ywO9Zu1gztVJSpU=;
-        b=HfB57xWfgaKV9TFd7wjYAJ8s50a/iAqTqk4xL3Dvyr7tY32/pcb2gCohoZ8B5422w+
-         yS1l1FETiGZjhN1aaiqw9v5qn7s/pAQBnAiE+NgTW/m7Ttn98IhrvBAqA1CXVnn2cWpX
-         oeOqbMRmb8/JBtmlIHJmLqHTx7m7qQ77cZz+Ozfhw66Oqf1MllULPQ42VwSrAxr1rNeN
-         rP57pjo9zacrXGGG5OEjG3VK25Jay6umBi0KAYv8FnY1+aUjLZK4GgMS9L9p4OBHCWw9
-         LWmTZxVo1uozt/fHjcSwhYJu9ASiJ4t919rsAsWGRLbYjM+KKSr+4BA4ayLXzBR8doh1
-         /Cfg==
-X-Gm-Message-State: AOAM532tXXoRhijDjhVkheSTWzyiWx76vclOKwqIqTWpbsOIqCGayNb0
-        o5fivQZzsfFFiun1cdp2JBbLSQ==
-X-Google-Smtp-Source: ABdhPJw7BSKlM7cAv8r7/0jhJx32xhaKYpzsb2RiBeH0xy7bNtYmDuLkURklLKzHhQnxbTes9rTU2A==
-X-Received: by 2002:a17:90a:f0ca:: with SMTP id fa10mr1313834pjb.130.1602715621497;
-        Wed, 14 Oct 2020 15:47:01 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id d9sm591245pjx.47.2020.10.14.15.47.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Oct 2020 15:47:00 -0700 (PDT)
-Date:   Wed, 14 Oct 2020 15:46:59 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
+        Thu, 15 Oct 2020 06:22:44 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA8BC061755;
+        Thu, 15 Oct 2020 03:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rmt+w86dS/ArDl7p6coE3p1FQiRlDnETDOF85EAeo80=; b=H7urFq9tcKjVEHrGlgs6qqhDf4
+        oQMvOJQ0ykGC0OUWm6j6P40c2ClfoS4N1iUdDzI7NszgLIB2YI4qMJ892z90AJsTn11EvwW+MtOVh
+        ddVXM7uYTIl+ahd+gEQFvcaxfyuaPnkbEsTt/vmXLtStZfCQlSfc+oQ9GKbTIbh1QtEndZUFKS8iQ
+        RG2CeCNJ8oLWOZ1j2VOtlC36cNeboOcj3IpHWd0dVqImsYZOp+GtYIoL4M+5SqxrBrt55upHkAlVA
+        rdh+0h6U56l/Lqn5r2zQ2t0WOc1/OVeHC7M8/6/Im8NyIi7W3dDDZL1d8iqegaLUsqXcJBsUpBLPv
+        pDxD+k8g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kT0Oo-0006aX-4e; Thu, 15 Oct 2020 10:22:18 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 835C0300DAE;
+        Thu, 15 Oct 2020 12:22:16 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 6F7A9235F4457; Thu, 15 Oct 2020 12:22:16 +0200 (CEST)
+Date:   Thu, 15 Oct 2020 12:22:16 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Jann Horn <jannh@google.com>
+Cc:     Sami Tolvanen <samitolvanen@google.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Paul E. McKenney" <paulmck@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com,
-        kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        x86@kernel.org
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-kbuild@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        linux-pci@vger.kernel.org
 Subject: Re: [PATCH v6 22/25] x86/asm: annotate indirect jumps
-Message-ID: <202010141545.1E2A393C62@keescook>
+Message-ID: <20201015102216.GB2611@hirez.programming.kicks-ass.net>
 References: <20201013003203.4168817-1-samitolvanen@google.com>
  <20201013003203.4168817-23-samitolvanen@google.com>
+ <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201013003203.4168817-23-samitolvanen@google.com>
+In-Reply-To: <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 12, 2020 at 05:32:00PM -0700, Sami Tolvanen wrote:
-> Running objtool --vmlinux --duplicate on vmlinux.o produces a few
-> warnings about indirect jumps with retpoline:
-> 
->   vmlinux.o: warning: objtool: wakeup_long64()+0x61: indirect jump
->   found in RETPOLINE build
->   ...
-> 
-> This change adds ANNOTATE_RETPOLINE_SAFE annotations to the jumps
-> in assembly code to stop the warnings.
-> 
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+On Thu, Oct 15, 2020 at 01:23:41AM +0200, Jann Horn wrote:
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+> It would probably be good to keep LTO and non-LTO builds in sync about
+> which files are subjected to objtool checks. So either you should be
+> removing the OBJECT_FILES_NON_STANDARD annotations for anything that
+> is linked into the main kernel (which would be a nice cleanup, if that
+> is possible), 
 
-This looks like it's an independent fix -- can an x86 maintainer pick
-up this patch directly?
-
--- 
-Kees Cook
+This, I've had to do that for a number of files already for the limited
+vmlinux.o passes we needed for noinstr validation.
