@@ -1,103 +1,100 @@
-Return-Path: <SRS0=YbPX=DW=vger.kernel.org=linux-kbuild-owner@kernel.org>
+Return-Path: <SRS0=qdbG=DX=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA91C433E7
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 20:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E24C43457
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Oct 2020 12:59:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED1320759
-	for <linux-kbuild@archiver.kernel.org>; Thu, 15 Oct 2020 20:39:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40C022158C
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Oct 2020 12:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSegud+n"
+	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="ZpEn7SMY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730678AbgJOUjy (ORCPT
+        id S2395411AbgJPM7Q (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 15 Oct 2020 16:39:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23556 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729881AbgJOUjy (ORCPT
+        Fri, 16 Oct 2020 08:59:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40286 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2395342AbgJPM7Q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Oct 2020 16:39:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1602794393;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=drNAM9RnP6kYRtro33MBF8DkJ/VVjdpQLGpKNAKGMr0=;
-        b=SSegud+nTAD5c1MXo7JyNPsW/1pIdspVwQD2mgwTbJcOQH610aWg4iB6RhepLYLEBeV7Fl
-        4HywDIAonXb9zoG6XdZvqi3mjS8SinjrXh221fFuB0oWyHNPwV4hZafMiuq6zyOcSsixMd
-        RYwY2NZ1hGrUJ2x/seX5cb3k5cIo6RI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-RnX1X4qvPkWYUnhEN4Iw2A-1; Thu, 15 Oct 2020 16:39:51 -0400
-X-MC-Unique: RnX1X4qvPkWYUnhEN4Iw2A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07DC2107466A;
-        Thu, 15 Oct 2020 20:39:49 +0000 (UTC)
-Received: from treble (ovpn-115-218.rdu2.redhat.com [10.10.115.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 036CA6EF72;
-        Thu, 15 Oct 2020 20:39:44 +0000 (UTC)
-Date:   Thu, 15 Oct 2020 15:39:42 -0500
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Jann Horn <jannh@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Will Deacon <will@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-kbuild@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
-        linux-pci@vger.kernel.org
-Subject: Re: [PATCH v6 22/25] x86/asm: annotate indirect jumps
-Message-ID: <20201015203942.f3kwcohcwwa6lagd@treble>
-References: <20201013003203.4168817-1-samitolvanen@google.com>
- <20201013003203.4168817-23-samitolvanen@google.com>
- <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
- <20201015102216.GB2611@hirez.programming.kicks-ass.net>
+        Fri, 16 Oct 2020 08:59:16 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0BEBC0613D3
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2020 05:59:15 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id z2so2778270lfr.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 16 Oct 2020 05:59:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rasmusvillemoes.dk; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QskU2jKYuIV2PkAqqrC1eswLmoY8gP4EeJ4XVgA384U=;
+        b=ZpEn7SMYQ0e9QC6e95fu3NR7MthennBKxsk3Fl0+ciAfQXNuTv8fy4zehey7SOQgKP
+         WYopCS+rp8JhNMtzs0AooHaPVsCuE93euAmm2sPCI8YVI0bhl7GBSjRrppIQD7saDx0/
+         VPtlAxJQfvY4jBAVqxRlna9cbFcTAXaSkjN50=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QskU2jKYuIV2PkAqqrC1eswLmoY8gP4EeJ4XVgA384U=;
+        b=ZDHfK2o8DSzw3R6d93OvjjLyhwHEcooRxHaJXTDqYlmqo+RJybD8hgVzLZ2jv9IYTM
+         H7YTW4bA4rWe5D8EZ99Kt7pPbyG9AGHvv/FNtatCxP40i2v0LJG8mFqch/+r+lEW6Srl
+         fDJjDS9xOPYwa18b3LerPa5vdFk5AjP5PbfpY2/fz2DQgSKAFIJthVqDyYuyCGsV/z9O
+         v4Q4l4Tve9a8JvBdE5XwLvQJA9AUSIKaTXBMD91wP1DPK/JUUWl7lEwvCZEz/x3Ndn5i
+         V/ub/36B8rpIwMWTOWiQl+8AgAH5HeTBArJfx4+M1pjjeW+RzygkBk4DlvRB2Ju17gct
+         5wnA==
+X-Gm-Message-State: AOAM5332vVE5tqpE0d4rbPUt7eq+I+aviKlwNeG2vICBHbYxs6LK/ksi
+        7KhSlIZMYsH+Tonpp8YSe6ToRKoOShq51uRV4Bw=
+X-Google-Smtp-Source: ABdhPJwPL4sxJoqOIIX6rp6HWa59jbRSOvCsoIA9bVDjugS20ljvbzOaZ+HGlVq2ZgN5Et3xkspxXQ==
+X-Received: by 2002:ac2:4dad:: with SMTP id h13mr1344981lfe.351.1602853154334;
+        Fri, 16 Oct 2020 05:59:14 -0700 (PDT)
+Received: from prevas-ravi.prevas.se ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id v4sm802467lfn.6.2020.10.16.05.59.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Oct 2020 05:59:13 -0700 (PDT)
+From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Kbuild.include: remove leftover comment for filechk utility
+Date:   Fri, 16 Oct 2020 14:58:46 +0200
+Message-Id: <20201016125846.8156-1-linux@rasmusvillemoes.dk>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201015102216.GB2611@hirez.programming.kicks-ass.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Oct 15, 2020 at 12:22:16PM +0200, Peter Zijlstra wrote:
-> On Thu, Oct 15, 2020 at 01:23:41AM +0200, Jann Horn wrote:
-> 
-> > It would probably be good to keep LTO and non-LTO builds in sync about
-> > which files are subjected to objtool checks. So either you should be
-> > removing the OBJECT_FILES_NON_STANDARD annotations for anything that
-> > is linked into the main kernel (which would be a nice cleanup, if that
-> > is possible), 
-> 
-> This, I've had to do that for a number of files already for the limited
-> vmlinux.o passes we needed for noinstr validation.
+After commit 43fee2b23895 ("kbuild: do not redirect the first
+prerequisite for filechk"), the rule is no longer automatically passed
+$< as stdin, so remove the stale comment.
 
-Getting rid of OBJECT_FILES_NON_STANDARD is indeed the end goal, though
-I'm not sure how practical that will be for some of the weirder edge
-case.
+Fixes: 43fee2b23895 ("kbuild: do not redirect the first prerequisite for filechk")
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+---
+ scripts/Kbuild.include | 2 --
+ 1 file changed, 2 deletions(-)
 
-On a related note, I have some old crypto cleanups which need dusting
-off.
-
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 83a1637417e5..08e011175b4c 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -56,8 +56,6 @@ kecho := $($(quiet)kecho)
+ # - If no file exist it is created
+ # - If the content differ the new file is used
+ # - If they are equal no change, and no timestamp update
+-# - stdin is piped in from the first prerequisite ($<) so one has
+-#   to specify a valid file as first prerequisite (often the kbuild file)
+ define filechk
+ 	$(Q)set -e;						\
+ 	mkdir -p $(dir $@);					\
 -- 
-Josh
+2.23.0
 
