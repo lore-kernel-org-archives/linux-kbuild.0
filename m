@@ -2,127 +2,190 @@ Return-Path: <SRS0=X4Go=D6=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021C3C55178
-	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Oct 2020 11:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E72AEC388F9
+	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Oct 2020 17:36:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1F1424248
-	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Oct 2020 11:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75A74241A3
+	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Oct 2020 17:36:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h66UMP+m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z3Q8f+9R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S463266AbgJWL54 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 23 Oct 2020 07:57:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43448 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S463255AbgJWL5y (ORCPT
+        id S1753573AbgJWRgZ (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 23 Oct 2020 13:36:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58868 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751579AbgJWRgZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Oct 2020 07:57:54 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09NBXL5L143516;
-        Fri, 23 Oct 2020 07:57:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : mime-version : content-type; s=pp1;
- bh=n4tnJxvfTW0oJFfhDlOKMXdZwKcOKgxdp3PFV/BHuCw=;
- b=h66UMP+mM6etFu/peg8BpF9/mIuqlKw2dFkEKu38tYsHbXQFCV3vGCdBtjOgnpu/iICm
- 2I/TRATZNcD0OUfuK2IA6+z6Ph/N0FioRurpsmyLh2ulw3F6q7Ly5119f3IByLqeTdWo
- Qd2Jo0g1fwNCcslpEYicmYJzCvJUB2OT503x+rvP0o5hS28/jrSHp53xZ+l3pP3b0KSK
- M6//AQwWY3BMYMi9JBjFXMusuwzvNL3KLJWrPyCg6TblBzHCCmI5UJEAMva6VcSKFF18
- 9O573sSlxGN3tMxnqDukHVIEus21w5ZKjMG7ynTmW5qzj/HRMeKkkTH6uQJqDS1U/LvA cA== 
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 34bcaprcwh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Oct 2020 07:57:41 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09NBvejX008099;
-        Fri, 23 Oct 2020 11:57:40 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 347r87udf8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Oct 2020 11:57:39 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 09NBvbMa27263452
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Oct 2020 11:57:37 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5F0A852051;
-        Fri, 23 Oct 2020 11:57:37 +0000 (GMT)
-Received: from localhost (unknown [9.145.183.202])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id EDA8152052;
-        Fri, 23 Oct 2020 11:57:36 +0000 (GMT)
-Date:   Fri, 23 Oct 2020 13:57:35 +0200
-From:   Vasily Gorbik <gor@linux.ibm.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH 0/2] add option to save vmlinux link map
-Message-ID: <cover.thread-ba6b03.your-ad-here.call-01603453670-ext-0242@work.hours>
+        Fri, 23 Oct 2020 13:36:25 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BDD4C0613CE
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2020 10:36:25 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id x13so1790700pgp.7
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Oct 2020 10:36:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v3oHNxup2Z/X3RcAQV9SdzT2AuZvE2TJPMlTRy4UVdg=;
+        b=Z3Q8f+9RLq4ubmLePTMZVaggismFpKyU9D+I+6AiCOk4KvSVUOSNNZHXKxoPBh7GWY
+         RClqHZm+Nfyudz9TEQyjxZMXOurxVJZX4mhjPfYxWkNyr/cAAEGYBbDAp5v2k6CMHKfq
+         MxenOHLvWzjF6pubORCn8kVCK413lsXyOSsLbJ1trk61ipxsduiT0ok47wFrcNPbCcVG
+         iiwP2bcnvlcv3dbrI1o9h1196320FtFTcf/aywJkmezF05US8O7ooXg0u/bJ/hMpDIr5
+         +3GbzQLq4yHFL0EImfjvXUY3X7MZpkijg/UDpo6v1eWZb+7VchisG+G2qcBvKiNl6iKu
+         Zb3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=v3oHNxup2Z/X3RcAQV9SdzT2AuZvE2TJPMlTRy4UVdg=;
+        b=ShSA+RyA4dM9NVUNXjlhf6/cwCNZPgbWv1l2vOtzwvUkGiRl2BOagqJvHaNHHOM3Ip
+         oyq/O+dTfkhdtnR8hhZcpcFZ+oLhfilbO1HWHLs2ijvNG/d0gkZdz48CDXvAlU869mff
+         mtfjwK+nxRyvfG672cRNaPG8vL1qidFuzZQVW9Pcgoac0y2H7fnVPQ3cyaiQq4ZRZnWV
+         rpZa2kEn+NiGuFq7dR4wNKvAmHvZhPl1AiUvekAm39yst+3enxXphdR1O4ZuU3UNz5on
+         27QhmTS+FLtSFYs35cOJOneWm70aAgYozCxIlGNl3TCdNkWwuZo7e2z8d4vU5dyq70t2
+         7uKw==
+X-Gm-Message-State: AOAM533J3Mifrt2Ko2hKMxDH+Ji1nB325SK6y0YT0uiMI5at1t0tqMHJ
+        aq3ytybooWqotsHMfePTGhc+Cw==
+X-Google-Smtp-Source: ABdhPJy9hwXaRUl3z4AovIgAs9ZJu1Si99KmTZKm04vtb887MHqVl15EEMpST1nCdQo3PBn3pgvq6Q==
+X-Received: by 2002:a63:370f:: with SMTP id e15mr3039898pga.124.1603474584438;
+        Fri, 23 Oct 2020 10:36:24 -0700 (PDT)
+Received: from google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
+        by smtp.gmail.com with ESMTPSA id m3sm2611808pfk.23.2020.10.23.10.36.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2020 10:36:23 -0700 (PDT)
+Date:   Fri, 23 Oct 2020 10:36:17 -0700
+From:   Sami Tolvanen <samitolvanen@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Josh Poimboeuf <jpoimboe@redhat.com>, Jann Horn <jannh@google.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Will Deacon <will@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        linux-pci@vger.kernel.org
+Subject: Re: [PATCH v6 22/25] x86/asm: annotate indirect jumps
+Message-ID: <20201023173617.GA3021099@google.com>
+References: <20201013003203.4168817-1-samitolvanen@google.com>
+ <20201013003203.4168817-23-samitolvanen@google.com>
+ <CAG48ez2baAvKDA0wfYLKy-KnM_1CdOwjU873VJGDM=CErjsv_A@mail.gmail.com>
+ <20201015102216.GB2611@hirez.programming.kicks-ass.net>
+ <20201015203942.f3kwcohcwwa6lagd@treble>
+ <CABCJKufDLmBCwmgGnfLcBw_B_4U8VY-R-dSNNp86TFfuMobPMw@mail.gmail.com>
+ <20201020185217.ilg6w5l7ujau2246@treble>
+ <CABCJKucVjFtrOsw58kn4OnW5kdkUh8G7Zs4s6QU9s6O7soRiAA@mail.gmail.com>
+ <20201021085606.GZ2628@hirez.programming.kicks-ass.net>
+ <CABCJKufL6=FiaeD8T0P+mK4JeR9J80hhjvJ6Z9S-m9UnCESxVA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Patchwork-Bot: notify
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.737
- definitions=2020-10-23_04:2020-10-23,2020-10-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=2
- mlxlogscore=967 adultscore=0 mlxscore=0 priorityscore=1501 clxscore=1015
- bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010230082
+In-Reply-To: <CABCJKufL6=FiaeD8T0P+mK4JeR9J80hhjvJ6Z9S-m9UnCESxVA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Linker -Map option allows to save detailed link map which provides far
-more information then the objdump tool might extract.
+On Wed, Oct 21, 2020 at 05:22:59PM -0700, Sami Tolvanen wrote:
+> There are a couple of differences, like the first "undefined stack
+> state" warning pointing to set_bringup_idt_handler.constprop.0()
+> instead of __switch_to_asm(). I tried running this with --backtrace,
+> but objtool segfaults at the first .entry.text warning:
 
-Discarded input sections
- .text.__s390_indirect_jump_r14
-                0x0000000000000000        0xc arch/s390/kernel/process.o
+Looks like it segfaults when calling BT_FUNC() for an instruction that
+doesn't have a section (?). Applying this patch allows objtool to finish
+with --backtrace:
 
-Detailed information on sections, objects and symbols.
-.init.data      0x0000000001276000    0x671f0
- *(SORT_BY_NAME(___kentry+*))
- *(.init.data init.data.*)
- .init.data     0x0000000001276000     0x31b8 init/main.o
-                0x0000000001276128                late_time_init
-                0x00000000012781b8                boot_command_line
- .init.data     0x00000000012791b8       0x60 init/do_mounts.o
- .init.data     0x0000000001279218        0x4 init/do_mounts_rd.o
-                0x0000000001279218                rd_image_start
- *fill*         0x000000000127921c        0x4
- .init.data     0x0000000001279220       0x18 init/do_mounts_initrd.o
-                0x0000000001279228                phys_initrd_start
-                0x0000000001279230                phys_initrd_size
+diff --git a/tools/objtool/check.c b/tools/objtool/check.c
+index c216dd4d662c..618b0c4f2890 100644
+--- a/tools/objtool/check.c
++++ b/tools/objtool/check.c
+@@ -2604,7 +2604,7 @@ static int validate_branch(struct objtool_file *file, struct symbol *func,
+ 				ret = validate_branch(file, func,
+ 						      insn->jump_dest, state);
+ 				if (ret) {
+-					if (backtrace)
++					if (backtrace && insn->sec)
+ 						BT_FUNC("(branch)", insn);
+ 					return ret;
+ 				}
 
-It helps to bring the light on linker decisions and debug linker scripts.
- FILL mask 0xff
-                0x000000000082f000                . = ALIGN (0x1000)
- *fill*         0x000000000082e3fa      0xc06 ff
-                0x000000000082f000                _end = .
 
-Resulting vmlinux.map is currently 8.8M for s390.
-And 48K for the decompressor's arch/s390/boot/compressed/vmlinux.map
+Running objtool -barfld on an allyesconfig+LTO vmlinux.o prints out the
+following, ignoring the crypto warnings for now:
 
-- First patch introduces CONFIG_SAVE_LINK_MAP option, which enables
-  link map and is arch independent.
-- Second patch is s390 specific and additionally enables decompressor's
-  link map saving if CONFIG_SAVE_LINK_MAP is enabled.
+__switch_to_asm()+0x0: undefined stack state
+  xen_hypercall_set_trap_table()+0x0: <=== (sym)
+.entry.text+0xffd: sibling call from callable instruction with modified stack frame
+  .entry.text+0xfcb: (branch)
+  .entry.text+0xfb5: (alt)
+  .entry.text+0xfb0: (alt)
+  .entry.text+0xf78: (branch)
+  .entry.text+0x9c: (branch)
+  xen_syscall_target()+0x15: (branch)
+  xen_syscall_target()+0x0: <=== (sym)
+.entry.text+0x1754: unsupported instruction in callable function
+  .entry.text+0x171d: (branch)
+  .entry.text+0x1707: (alt)
+  .entry.text+0x1701: (alt)
+  xen_syscall32_target()+0x15: (branch)
+  xen_syscall32_target()+0x0: <=== (sym)
+.entry.text+0x1634: redundant CLD
+do_suspend_lowlevel()+0x116: sibling call from callable instruction with modified stack frame
+  do_suspend_lowlevel()+0x9a: (branch)
+  do_suspend_lowlevel()+0x0: <=== (sym)
+... [skipping crypto stack pointer alignment warnings] ...
+__x86_retpoline_rdi()+0x10: return with modified stack frame
+  __x86_retpoline_rdi()+0x0: (branch)
+  .altinstr_replacement+0x13d: (branch)
+  .text+0xaf4c7: (alt)
+  .text+0xb03b0: (branch)
+  .text+0xaf482: (branch)
+  crc_pcl()+0x10: (branch)
+  crc_pcl()+0x0: <=== (sym)
+__x86_retpoline_rdi()+0x0: stack state mismatch: cfa1=7+32 cfa2=7+8
+  .altinstr_replacement+0x20b: (branch)
+  __x86_indirect_thunk_rdi()+0x0: (alt)
+  __x86_indirect_thunk_rdi()+0x0: <=== (sym)
+.head.text+0xfb: unsupported instruction in callable function
+  .head.text+0x207: (branch)
+  sev_es_play_dead()+0xff: (branch)
+  sev_es_play_dead()+0xd2: (branch)
+  sev_es_play_dead()+0xa8: (alt)
+  sev_es_play_dead()+0x144: (branch)
+  sev_es_play_dead()+0x10b: (branch)
+  sev_es_play_dead()+0x1f: (branch)
+  sev_es_play_dead()+0x0: <=== (sym)
+__x86_retpoline_rdi()+0x0: stack state mismatch: cfa1=7+32 cfa2=-1+0
+  .altinstr_replacement+0x107: (branch)
+  .text+0x2885: (alt)
+  .text+0x2860: <=== (hint)
+.entry.text+0x48: stack state mismatch: cfa1=7-8 cfa2=-1+0
+  .altinstr_replacement+0xffffffffffffffff: (branch)
+  .entry.text+0x21: (alt)
+  .entry.text+0x1c: (alt)
+  .entry.text+0x10: <=== (hint)
+.entry.text+0x15fd: stack state mismatch: cfa1=7-8 cfa2=-1+0
+  .altinstr_replacement+0xffffffffffffffff: (branch)
+  .entry.text+0x15dc: (alt)
+  .entry.text+0x15d7: (alt)
+  .entry.text+0x15d0: <=== (hint)
+.entry.text+0x168c: stack state mismatch: cfa1=7-8 cfa2=-1+0
+  .altinstr_replacement+0xffffffffffffffff: (branch)
+  .entry.text+0x166b: (alt)
+  .entry.text+0x1666: (alt)
+  .entry.text+0x1660: <=== (hint)
 
-It is probably better if both changes would go via kbuild tree.
-
-Vasily Gorbik (2):
-  kbuild: add config option to save link map file(s)
-  s390/decompressor: support link map saving
-
- .gitignore                         |  1 +
- Makefile                           |  6 +++++-
- arch/s390/boot/compressed/Makefile |  4 +++-
- lib/Kconfig.debug                  | 13 +++++++++++++
- 4 files changed, 22 insertions(+), 2 deletions(-)
-
--- 
-2.25.4
+Sami
