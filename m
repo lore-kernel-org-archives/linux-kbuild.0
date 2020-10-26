@@ -2,141 +2,99 @@ Return-Path: <SRS0=c+w1=EB=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6456C5517A
-	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Oct 2020 17:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C91C4363A
+	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Oct 2020 19:32:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8508C22400
-	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Oct 2020 17:58:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7839D2070E
+	for <linux-kbuild@archiver.kernel.org>; Mon, 26 Oct 2020 19:32:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=beagleboard-org.20150623.gappssmtp.com header.i=@beagleboard-org.20150623.gappssmtp.com header.b="ZOOw+V2R"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="L0byklSn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1782723AbgJZR6K (ORCPT
+        id S1784888AbgJZTcw (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 26 Oct 2020 13:58:10 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:36351 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1782232AbgJZR6J (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Oct 2020 13:58:09 -0400
-Received: by mail-pl1-f195.google.com with SMTP id r10so5097317plx.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Oct 2020 10:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard-org.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jVqFrGJ54qznF12EgJgnYEytgLpa/16deYrykuVS5Rk=;
-        b=ZOOw+V2RHRZn8HxQIHaNmwEX9HGWCqhQ6DHV/MT0C3Rp3Amv/+2dZBRKec0rKvIx7d
-         QOLN9EQ2s2Ve/eWQJZydilAgqLnLxN0OZls4cB+SxV6QEuUadkBlJ2nwI133LYHphuFU
-         MAGSYY9jpJ+dMiWxWQ184HapvtHCF87KI2UQJFuZ4TxTXjmZVAKrD5/bPhD8ib+8UiPi
-         SbrGzY3mvZyat/E6dGLrHxOrC0V3aY974cLwKvBBJix2xB57NUK+HT4K8Pdk09OoQ8wd
-         FjIFQQ0RgTs6w8qpYhI7fBDtyi1jexSkkK019NqWZR6rWsr4qGrMciRNByssmjlmx374
-         Pu1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jVqFrGJ54qznF12EgJgnYEytgLpa/16deYrykuVS5Rk=;
-        b=uJdTz8c0CTkRDN2ZWdCNb/vXKeCLPxsHNX34WH+WB3FxnsEB4/q23klvVsjvpZOp9k
-         77RtrpeLZOQ2+PSnfOfWADB/DDkzNyDowEcLcq6moWr5pg/Yzjn5DwTSGADkKcsCcAAP
-         E33S8zC0oXkPOUvLtbVwrHmgtoqnJiJ2E8M90RPF3RQlfYLkREcqa0eqNT/wwz6p56fb
-         1W+sDwFjke/lLH59jbSUt4ZbmUWgDerQn/XnIpkxKOiJA4moyeJ/Z3/MDZNpg8IauFwz
-         jzvoQwbA7KuQfNzQode9F3juLXPlrcvk7KjygZOrKu6sgkFQ3ily2kuQn2p8bRr5Y9l9
-         SgdQ==
-X-Gm-Message-State: AOAM533o9hcM1TxcKec+omIdXmXLEiTKrbW5GTk1lJkWhWONzlHJRenM
-        pxNgqaDH13WXy9C4v91krAUR
-X-Google-Smtp-Source: ABdhPJzgATxazG66Vln/+4UlHaSHpaVSkUndwcviy4e28WWIsUcCoLM3wud9RK8Mjr2Ro4ZSZPzfug==
-X-Received: by 2002:a17:902:b70f:b029:d6:5bcb:1b24 with SMTP id d15-20020a170902b70fb02900d65bcb1b24mr181099pls.82.1603735088185;
-        Mon, 26 Oct 2020 10:58:08 -0700 (PDT)
-Received: from localhost.localdomain ([116.68.74.56])
-        by smtp.gmail.com with ESMTPSA id o65sm11583088pga.42.2020.10.26.10.58.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2020 10:58:07 -0700 (PDT)
-From:   Vaishnav M A <vaishnav@beagleboard.org>
-To:     johan@kernel.org
-Cc:     ribalda@kernel.org, robh@kernel.org, gregkh@linuxfoundation.org,
-        jirislaby@kernel.org, masahiroy@kernel.org,
-        andriy.shevchenko@linux.intel.com, linux-kernel@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        jkridner@beagleboard.org, drew@beagleboard.org,
-        robertcnelson@beagleboard.org, vaishnav@beagleboard.org
-Subject: [RFC PATCH 3/5] serdev: add of_ helper to get serdev controller
-Date:   Mon, 26 Oct 2020 23:27:16 +0530
-Message-Id: <20201026175718.965773-4-vaishnav@beagleboard.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201026175718.965773-1-vaishnav@beagleboard.org>
-References: <20201026175718.965773-1-vaishnav@beagleboard.org>
+        Mon, 26 Oct 2020 15:32:52 -0400
+Received: from mout.gmx.net ([212.227.17.21]:59685 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1784784AbgJZTcw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 26 Oct 2020 15:32:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1603740765;
+        bh=CZCsGaqX+45NNOYzXFKIkh4B51ifkFDZAdb/wH6esZY=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=L0byklSnqI9OVDheqrpE35/Z9sNKTHqU/UmoyY2HwwQqn5nauwuRp8jGedoM79DcD
+         tkbykd7RKO/ytn8W1G+g0mS1ZOAEtihDITgX0N8KFWakmwZmnIFO91hEdPYhA+aUEt
+         nYhoLYT2BlfMBtu0qOlnc6ouWLk1lN4zJxS9mjWg=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([79.223.32.86]) by mail.gmx.com
+ (mrgmx105 [212.227.17.168]) with ESMTPSA (Nemesis) id
+ 1MCsUC-1kftfw45LM-008s1A; Mon, 26 Oct 2020 20:32:45 +0100
+Received: by localhost.localdomain (Postfix, from userid 1000)
+        id 546ED800D9; Mon, 26 Oct 2020 20:32:44 +0100 (CET)
+From:   Sven Joachim <svenjoac@gmx.de>
+To:     linux-kbuild@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>
+Subject: [PATCH 2/2] builddeb: Consolidate consecutive chmod calls into one
+Date:   Mon, 26 Oct 2020 20:32:17 +0100
+Message-Id: <20201026193217.402412-2-svenjoac@gmx.de>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201026193217.402412-1-svenjoac@gmx.de>
+References: <20201026193217.402412-1-svenjoac@gmx.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:HPUyY7qSnCfueopvEerzEZHdTsL9dwjTDbT+OxmyjzpjeSqntXG
+ C3nqTJtDZUpEH+GaVSLo//900D+86Q/elvHDuFUtdNe8DPGFEDFMY/TUpX1BdF6ngY/PD2S
+ HuSIxS/8xVDTKXu7yYfn1S5bXEiNVl4O+MRWOlewIVgpU3SxxseRnMPhK+0Tn3aP3trmaW6
+ RjQBobuk29x2vDp4g0jVg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lUdz68dIrvA=:Fke7mghXiCg9irhS+jM0+P
+ g+KEN0vPb4l6+YiZPln11bW48kI/RKDo2cZc3smMVx+F1zpfUwFBF5cPWKaS5XzU4TV3zq1IK
+ JdI4WBdEk8ZahxKr1s/NQd+XRQDPnIPXJD1fmo8XDadS072hJn2kUaKmAg7Rrg2GPNKvgqXwX
+ c1zkLUaeCdWWGyxe+bsgdaFWUP/cUWtgn6pk1mq/waoh6H3mS4HE9f18GChvSbHQYwF60TCuV
+ JqwIvHaixd3yEaBwi/KiqS2NZ5nYYEBnRHfonMOLCL7R15aK6ewRasygpTQpj5FvregqYOzof
+ PPJadSrlRn7HPU/VVEj40kGwaW3XBwdPRkLkrE8iJaoL1Q3LZa8N0Q+U86qS/FZT8UpRKmKJ7
+ pVMwNAtJloRbdt6Mx8K4Q0YjtY0YFFIyqS5HGAF/3L2vR637xt8RTCnzshBQriUhdBGv8rY0q
+ S11z6YY0z5g+/OuO/9iZ+flwoe5Tm2xonfbhineq3Zb2FD1A/xSStCKi0N68smYYSsuYlJJV2
+ uCG8O5m95c7HXzBYURB2iGL1wBO5SB2XstXyFC6CN44gfQS5zAGI5LHxOeuIG3yv65x/b9El4
+ gfcUe+IXPKJ/14AP6JRihMLD0aBRLyJeLRCv6CbVLCauY8gRIPSpFkXohiv/eZli72d4Etppz
+ 9oDuNbIsh9ZL5F4JWkDnKKbxJJX3FFX1k3FjhIVinOrjuFgA5DerpuDgHhdvIXuxk/HW/NrxS
+ K8z3wTFATregi+03UivRSJUJIhiYCKuhcubZNgSknJwRC/2M7H9ACdrbDvBYjWS707p63fRrj
+ CTJlWeGOrE3ww0M4+DpQDU0ohvm17npACM0KPLXNW45tK4Eg3igJXJF1W4Pwp0gzTyeEBeLSu
+ HEjCKlj+Aq0ShonbQf/Q==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-add of_find_serdev_controller_by_node() to obtain a
-serdev_controller from the device_node, which can 
-help if the serdev_device is not described over 
-device tree and instantiation of the device happens later
-from a different driver, for the same purpose an option
-to not delete an empty serdev controller is added.
+No need to call chmod three times when it can do everything at once.
 
-Signed-off-by: Vaishnav M A <vaishnav@beagleboard.org>
----
- drivers/tty/serdev/core.c | 17 +++++++++++++++++
- include/linux/serdev.h    |  2 ++
- 2 files changed, 19 insertions(+)
+Signed-off-by: Sven Joachim <svenjoac@gmx.de>
+=2D--
+ scripts/package/builddeb | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index 01b248fdc264..85977b36ed7f 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
-@@ -582,6 +582,17 @@ static int of_serdev_register_devices(struct serdev_controller *ctrl)
- 	return 0;
- }
- 
-+struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node)
-+{
-+	struct device *dev = bus_find_device_by_of_node(&serdev_bus_type, node);
-+
-+	if (!dev)
-+		return NULL;
-+
-+	return (dev->type == &serdev_ctrl_type) ? to_serdev_controller(dev) : NULL;
-+}
-+EXPORT_SYMBOL_GPL(of_find_serdev_controller_by_node);
-+
- #ifdef CONFIG_ACPI
- 
- #define SERDEV_ACPI_MAX_SCAN_DEPTH 32
-@@ -779,6 +790,12 @@ int serdev_controller_add(struct serdev_controller *ctrl)
- 
- 	pm_runtime_enable(&ctrl->dev);
- 
-+	/* provide option to not delete a serdev controller without devices
-+	 * if property is present
-+	 */
-+	if (device_property_present(&ctrl->dev, "force-empty-serdev-controller"))
-+		return 0;
-+
- 	ret_of = of_serdev_register_devices(ctrl);
- 	ret_acpi = acpi_serdev_register_devices(ctrl);
- 	if (ret_of && ret_acpi) {
-diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-index 0d9c90a250b0..2e1eb4d17e1b 100644
---- a/include/linux/serdev.h
-+++ b/include/linux/serdev.h
-@@ -115,6 +115,8 @@ static inline struct serdev_controller *to_serdev_controller(struct device *d)
- 	return container_of(d, struct serdev_controller, dev);
- }
- 
-+struct serdev_controller *of_find_serdev_controller_by_node(struct device_node *node);
-+
- static inline void *serdev_device_get_drvdata(const struct serdev_device *serdev)
- {
- 	return dev_get_drvdata(&serdev->dev);
--- 
-2.25.1
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 91a502bb97e8..81ec6414726c 100755
+=2D-- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -42,11 +42,7 @@ create_package() {
+ 	else
+ 		chown -R root:root "$pdir"
+ 	fi
+-	chmod -R go-w "$pdir"
+-	# in case we are in a restrictive umask environment like 0077
+-	chmod -R a+rX "$pdir"
+-	# in case we build in a setuid/setgid directory
+-	chmod -R ug-s "$pdir"
++	chmod -R go-w,a+rX,ug-s "$pdir"
+
+ 	# Create the package
+ 	dpkg-gencontrol -p$pname -P"$pdir"
+=2D-
+2.28.0
 
