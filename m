@@ -2,139 +2,115 @@ Return-Path: <SRS0=bY5Y=EF=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 076DDC2D0A3
-	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Oct 2020 01:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC62AC55178
+	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Oct 2020 16:56:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83D9220719
-	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Oct 2020 01:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54B6620797
+	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Oct 2020 16:56:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j2mMXk5W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jL9pPh3g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725771AbgJ3Bjz (ORCPT
+        id S1727370AbgJ3Q4S (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Oct 2020 21:39:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56590 "EHLO
+        Fri, 30 Oct 2020 12:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725372AbgJ3Bjz (ORCPT
+        with ESMTP id S1726384AbgJ3Q4R (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Oct 2020 21:39:55 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D922CC0613CF
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2020 18:39:54 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id g7so5117432ilr.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Oct 2020 18:39:54 -0700 (PDT)
+        Fri, 30 Oct 2020 12:56:17 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66BF9C0613CF
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2020 09:56:17 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id v4so7412274edi.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 30 Oct 2020 09:56:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=V958ZyTN1p6gJ00+JwBE3K6tYpjufiw0XznD9MNyE4A=;
-        b=j2mMXk5WSxrAZMv4q6/NGNqr4kSMId1iVd6ZAJk9iVhAnZaqiAZ9OD5QvIKlbdKESw
-         Hq38tpp3JkVEvOkwVZ5YYpe+1xrqNnHnPqPb1GkBcLO0kQm4N26ja9Tlihfh9QLxQ9iL
-         hJNEs2JZKnp4X5gTxaJqK3mvRTr0tTyTbK5Jm1VAGoauZ4YLB4kz10aP4aErDZOnz5g8
-         ZH1c51xpTnGtfMABbZQ2Mlk3QRhZXXKynwVWU4gPF/YvYLzRoqLMmgaZIrBXedgEPJJW
-         I7/aDM5T3Tn4qWNfWHsBkHXSjierfqTiwf1+UYwMwmqrWaZfRDgD4I6zZd0DFmn5nAZU
-         UA7g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bJmUqHliwDf+v+2v8jHmqj+HKvfb00c+QEwMxqXzHHk=;
+        b=jL9pPh3gCZ402gpfrWOS7KQMVSqLsQHX9fStIHbXf8OO1B3MtkJ46wAIiZxmTBwd1J
+         Dexa0ROJK5lnpOtDz0Ozh8RWPa3CCjeR0cQzwmTKrARoUNi2SUfwFWsGCNUwFYLkoM9e
+         RPiMgN6pudoZeGVwBj8ZrXeWkprYzjNCPIGWM9H4SBgzRv3VurywbKxj8eOBI7d8B5fd
+         a0j7TOmZqXWzq+JJ287Sn662ObBEXSXfJd4Jt4YqWospi9yePjIbP3RdGZUMsZJyK0Q+
+         EQUL8prXVxU6ZbT6zQ1pgsyHh4dSfA4Z3+SBKv1UhBC+rze6Lrq/mIwXkk2p4wTOi1/O
+         F1aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=V958ZyTN1p6gJ00+JwBE3K6tYpjufiw0XznD9MNyE4A=;
-        b=f0VzWurxCYno+6OSMtehkTdtr7V71cZPa9kVsYRxRtQyI+HeANGNVz7JZUZtszNVSg
-         1URq39wGP+xwItnfXKbTD8CHlQSE+7koyayC9KDayrQ9VxTIQQAPSWQCHjCGKvl3Mh4p
-         jDEBUwRgiCkvsCC3i8sSsJhmODxMQhuxyXO9my+eJzNbZ9xPeyaoGB0jfnvY5N2Y0Pzj
-         Z17y8JyJMkrK37cgaZ+fYrAjB+2tpONQs4ghdaDy/+TfwX7MVXO2AovcC7EMp5r6Lsca
-         +T9gj8i2nESV3y3TOor7AYEqmFbJwvh1WWp4A6DPTwwT62F/Wl5T/+ZWsrAugCRCqULO
-         u5pg==
-X-Gm-Message-State: AOAM533zQjCqv8eaaHLE5He+3YX6pxzb+MWqf65jyB1ZfcW4megHu5PJ
-        cx18s3lnJIwzaAR7oTNLpDtjMPOFS0tcwin3zCBgeoag3RU=
-X-Google-Smtp-Source: ABdhPJxqi17V4H/3gp3NQRAXHXczxl7SEZB9D3G4Av6jRfZBaXNOQmJKFVQ+hwx6zt1UAVIR2iENvmGI9x4MC4qJaEI=
-X-Received: by 2002:a92:c8c8:: with SMTP id c8mr202288ilq.21.1604021994023;
- Thu, 29 Oct 2020 18:39:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bJmUqHliwDf+v+2v8jHmqj+HKvfb00c+QEwMxqXzHHk=;
+        b=S6WDkW67IRIG/FsdwLUOgHwh3Vzj+BuPYxKosRimuqV7OLTGoMwYpQTGKDPUE9yjM8
+         iUUE3Xh9TF+pwk/bgaxV88S1ED2dBLJ3B9rU+E0lAWAAMOC7Y0rCMMeMZXNJn4ns73vC
+         HTIIS/Lfu6m74qrPgQeNN2+iKZzQioH6fAROKnrKVI+/4vYB8m4K1TMRXxPox/xzfDV+
+         fD4RFjZcGvlUgu7rGmhobJnsezv9WbHVa4yk4ViLoY7X99iwn5ckjdlsMzG4UWL8dN2P
+         EjVH8UNAE3ITka0NUGAZFUoXCM66cREmlToSK5StutNQfBFEni/RVdMH1NSQBI0C9N9B
+         xlCg==
+X-Gm-Message-State: AOAM531GKHus6eTFLi6wbfDt01dMPrkH0kLEMqckYpJoKJCQmGGslunm
+        YrFoIjarHyF6/jHkX7efDdUcrJ2ep/7AAw==
+X-Google-Smtp-Source: ABdhPJx05bar/zfvFTvExZ8aMchUU3eCj1vNd075yuMbTaTkc0sVxaAwAHUysL+SFvH+LE17i9PxNQ==
+X-Received: by 2002:a50:f190:: with SMTP id x16mr3353583edl.292.1604076976019;
+        Fri, 30 Oct 2020 09:56:16 -0700 (PDT)
+Received: from localhost.localdomain ([62.201.25.198])
+        by smtp.gmail.com with ESMTPSA id c14sm3290323edy.13.2020.10.30.09.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Oct 2020 09:56:15 -0700 (PDT)
+From:   Petr Vorel <petr.vorel@gmail.com>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Petr Vorel <petr.vorel@gmail.com>,
+        Guillem Jover <guillem@hadrons.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>
+Subject: [PATCH] builddeb: Fix build on non-Debian/Ubuntu distros
+Date:   Fri, 30 Oct 2020 17:56:07 +0100
+Message-Id: <20201030165607.290612-1-petr.vorel@gmail.com>
+X-Mailer: git-send-email 2.27.0.rc0
 MIME-Version: 1.0
-References: <CAOMFOmUUJ4C95J3psPBgfaFX=VCqAZEcRrf2Y0pzR+C=xxNMyg@mail.gmail.com>
- <CAK7LNARAPLxx5_NEgopyXOouQ0QWP0B3L6UsuuEL7FNNdrLa=g@mail.gmail.com>
-In-Reply-To: <CAK7LNARAPLxx5_NEgopyXOouQ0QWP0B3L6UsuuEL7FNNdrLa=g@mail.gmail.com>
-From:   Anatol Pomozov <anatol.pomozov@gmail.com>
-Date:   Thu, 29 Oct 2020 18:39:32 -0700
-Message-ID: <CAOMFOmUGNzNa9mAUeC7sLYEafeMTaECvE=GcjH1U=F5TMdusZw@mail.gmail.com>
-Subject: Re: "Permission denied" when using system-installed kernel headers
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello
+This fixes make bindeb-pkg for RPM based distros, which don't have
+dpkg-dev (and thus not /usr/bin/dpkg-buildpackage), which sets
+$DEB_RULES_REQUIRES_ROOT.
 
-On Thu, Oct 29, 2020 at 6:21 PM Masahiro Yamada <masahiroy@kernel.org> wrot=
-e:
->
-> On Fri, Oct 30, 2020 at 2:35 AM Anatol Pomozov <anatol.pomozov@gmail.com>=
- wrote:
-> >
-> > Hi folks
-> >
-> > Here is a follow-up for this issue
-> > https://github.com/Open-CAS/open-cas-linux/issues/540
-> >
-> > opencas project builds an out-of-tree kernel module and uses
-> > system-level kernel header. In my case these headers are installed to
-> > /lib/modules/5.9.1-arch1-1/build
-> >
-> > So if I do
-> >
-> > $ cd /lib/modules/5.9.1-arch1-1/build
-> > $ make kernelversion
-> >
-> > I get following output:
-> >
-> > mkdir: cannot create directory =E2=80=98.tmp_86541=E2=80=99: Permission=
- denied
-> > mkdir: cannot create directory =E2=80=98.tmp_86543=E2=80=99: Permission=
- denied
-> > mkdir: cannot create directory =E2=80=98.tmp_86545=E2=80=99: Permission=
- denied
-> > mkdir: cannot create directory =E2=80=98.tmp_86547=E2=80=99: Permission=
- denied
-> > .......
-> > mkdir: cannot create directory =E2=80=98.tmp_86626=E2=80=99: Permission=
- denied
-> > mkdir: cannot create directory =E2=80=98.tmp_86628=E2=80=99: Permission=
- denied
-> > mkdir: cannot create directory =E2=80=98.tmp_86630=E2=80=99: Permission=
- denied
-> > 5.9.1-arch1
->
->
->
-> This is because you did not pass M=3D option.
->
->
->
-> /lib/modules/$(uname -r)/build
-> is used for building external modules.
->
-> You cannot work in that directory
-> since it is usually read-only.
->
->
-> You need to pass M=3D<path-to-your-module>
->
->
-> This may work for you.
->
->
->
-> $ cd  /lib/modules/$(uname -r)/build
-> $ mkdir $HOME/foo
-> $ make M=3D$HOME/foo  kernelversion
+Fixes: 3e8541803624 ("builddeb: Enable rootless builds")
 
-Thanks a lot, it works!
+Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+---
+Hi,
+
+I admit not many people compile kernel with bindeb-pkg on  RPM based
+distro, but it'd be nice it were working.
+
+openSUSE has most of other required packages, although there are some
+missing dependencies, thus DPKG_FLAGS="-d" is needed.
+
+Kind regards,
+Petr
+
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 1b11f8993629..287e4bbd222c 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -37,7 +37,7 @@ create_package() {
+ 		| xargs -r0 md5sum > DEBIAN/md5sums"
+ 
+ 	# Fix ownership and permissions
+-	if [ "$DEB_RULES_REQUIRES_ROOT" = "no" ]; then
++	if [ -z "$DEB_RULES_REQUIRES_ROOT" -o "$DEB_RULES_REQUIRES_ROOT" = "no" ]; then
+ 		dpkg_deb_opts="--root-owner-group"
+ 	else
+ 		chown -R root:root "$pdir"
+-- 
+2.27.0.rc0
+
