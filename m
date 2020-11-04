@@ -2,69 +2,71 @@ Return-Path: <SRS0=nXfU=EK=vger.kernel.org=linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D80C388F7
-	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Nov 2020 00:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B79C388F7
+	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Nov 2020 00:53:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B451223C7
-	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Nov 2020 00:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 185BA22403
+	for <linux-kbuild@archiver.kernel.org>; Wed,  4 Nov 2020 00:53:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bxOTw/FS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PhJTUPR2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728857AbgKDAxt (ORCPT
+        id S1729918AbgKDAxx (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 3 Nov 2020 19:53:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60188 "EHLO
+        Tue, 3 Nov 2020 19:53:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727754AbgKDAxt (ORCPT
+        with ESMTP id S1729864AbgKDAxx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Nov 2020 19:53:49 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944EEC0401C1
-        for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2020 16:53:47 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id a1so11596678qvj.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Nov 2020 16:53:47 -0800 (PST)
+        Tue, 3 Nov 2020 19:53:53 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02517C0401C3
+        for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2020 16:53:53 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id q16so13403677pfj.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Nov 2020 16:53:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=ozY6qdV80EEdEz3LDLEtJ+2VRilA83Eh+aRjlDLkLJ8=;
-        b=bxOTw/FSCq2/D3ukSPSlo5pkso1+jVH15V1mEAsq4uXXJswR6edUcaUcRdCg93HJk7
-         7R/I+QkbxRQDRS3SEx+zrKjEBTPZoTze9TQOsp7mnt3DSV4M6MHJ3NwG4E1Wazg6snMy
-         KbO5ENidAogXlfQtZyZlCYSVO7VEn3HvX+avxPTOrkzJOtV/WNs3Z9KS1+lHde9zC1/6
-         xmQ3sjbGOWToTSx9jl3qRz+y56192GC6d5AU+k4SpWyIy4pCNO6ya5HwjjyqdXg4/eeJ
-         ZZBYCNv9eoOLwrE1IW18kZQmiSpI/0c2FRB/xIWTBy4krv+DPOayj9HJKvesj6xwmJIe
-         QQYw==
+        bh=sEoLa2K7mY/J71l6bRl2EaWMrBUYyyUbe4HY5uHEuDw=;
+        b=PhJTUPR2xqSR+ujql+GZQjnimaFdfxKUJ4XBGPiMU7prjL2P411miMnABec+34UJbU
+         lEKGHURwGefRBq0nC27kvgNP0xItZS+Geo1izk8BzrbEPCv3GMCtWSi4afJ4+s8nDp8R
+         GPdIImMke9cA45MztHtbStm/oIZa+tOk98FuUFW8lrt1YVWJKPllBYXv1fTeWzAIGAE/
+         3OxNZXZYsXnSXm+yHf1uIb1CdtnXvZkoOOzAA4Kj7XcI1h1ncA2G3+zz5/GrHiyZhE0d
+         jwDvwi96cUT951aVwsQpUcDe85Bwkvgq2ANfgKPah+IgoW0/usGq2KDrIADGoimjN5He
+         38KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ozY6qdV80EEdEz3LDLEtJ+2VRilA83Eh+aRjlDLkLJ8=;
-        b=anGeQl2ha72BfoVY5yPOZ6zBsENTmAFSoOwmgsCXc2wdnuUbE6fDQj7rfIaghujoKl
-         Un8vDgSAzPgwhQOX05MMO/8HRKHu4NGK0rzK7d6sItQYh/iQRTOuWAt91sa62ELmloNa
-         RQfbUqaowad13cacLnZm+HEKZg9Go20ldOo0r1YtV2qKA+HRmhPK+HVSiXMx7yRjj1uf
-         ZbAuEs6V68Vp21psk0FHVhF75Ptr4KGbMkRPJii4zWQtgoe/5zI5IIINIrH6WBmITBKW
-         ExtbvtMnKwjOyNdp494KTvqIWkPY56wTt0GsjEwHy52wcwFCV7/McqbFOXH2WZ7wkLzy
-         BzXw==
-X-Gm-Message-State: AOAM531ok1e7uASqQu9F/rwxBl1h4QgX+2pmUE0QxhErN+KbiwY7PAvS
-        QeLPBq2Rx9Fr4KCfzggVBp0fWMedZDERKvYRkwE=
-X-Google-Smtp-Source: ABdhPJzFeJPtArXndiS7fYN24JqXcFlvglHjq/P0AetsiQAVxPd1F4kWgNqWsByTQs0Jf2p1lt35T7HKyHCxHvm7lU0=
+        bh=sEoLa2K7mY/J71l6bRl2EaWMrBUYyyUbe4HY5uHEuDw=;
+        b=YiBA0XkKYO33hZLTlQrRedvlFK6KRpWT3Sduu+jXrZsQ6krHh/BnRMQE3vC5hvBeNj
+         fw+Hplh1kFn/52AsC8o+CH2Es4q3L93RIOOecKTKGHGShI9+KoVzQarWjlPUyWSXUomS
+         VivHihOXufpWKva7OoETsr6LrFTOr5mAmVozQwjYFjpk2h3QQWYhUtt4fMlcHazqr7My
+         8M/5O6SpS1GJRNZNjF4/YfFi7beHhupOpXDhMZVTgS7Ohggq+q7YC1tliNz/mWOiRzb+
+         3wMr7WB3Ch8/vt/mS6MvCKRTKoKzBCThvjLOWKivZEqFPq1sEFqIG+qkDHcnoTzuyQW7
+         xYUw==
+X-Gm-Message-State: AOAM5328Pkb7N76ObV05FDv/A96s8Y6E7VCHDqBWZzLU6+pJJek/PUey
+        iqR9WgUuVYNaDTrO1R6ItkTyjAsl0I65/oVmlIA=
+X-Google-Smtp-Source: ABdhPJx+vniXuliRZxPCV1tJZAPoVtuEyLpBn4TU0/yRbnY3b+b6/tkfu9lmHs2Ad8bg5JYW4wiKwzEQK/rjF7E9tPE=
 Sender: "ndesaulniers via sendgmr" 
         <ndesaulniers@ndesaulniers1.mtv.corp.google.com>
 X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:f693:9fff:fef4:4d25])
- (user=ndesaulniers job=sendgmr) by 2002:a05:6214:192d:: with SMTP id
- es13mr28271108qvb.27.1604451226656; Tue, 03 Nov 2020 16:53:46 -0800 (PST)
-Date:   Tue,  3 Nov 2020 16:53:39 -0800
-In-Reply-To: <CAK7LNAST0Ma4bGGOA_HATzYAmRhZG=x_X=8p_9dKGX7bYc2FMA@mail.gmail.com>
-Message-Id: <20201104005343.4192504-1-ndesaulniers@google.com>
+ (user=ndesaulniers job=sendgmr) by 2002:a65:50c5:: with SMTP id
+ s5mr18813679pgp.399.1604451232483; Tue, 03 Nov 2020 16:53:52 -0800 (PST)
+Date:   Tue,  3 Nov 2020 16:53:42 -0800
+In-Reply-To: <20201104005343.4192504-1-ndesaulniers@google.com>
+Message-Id: <20201104005343.4192504-4-ndesaulniers@google.com>
 Mime-Version: 1.0
 References: <CAK7LNAST0Ma4bGGOA_HATzYAmRhZG=x_X=8p_9dKGX7bYc2FMA@mail.gmail.com>
+ <20201104005343.4192504-1-ndesaulniers@google.com>
 X-Mailer: git-send-email 2.29.1.341.ge80a0c044ae-goog
-Subject: [PATCH v2 0/4] Kbuild: DWARF v5 support
+Subject: [PATCH v2 3/4] Kbuild: make DWARF version a choice
 From:   Nick Desaulniers <ndesaulniers@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     Jakub Jelinek <jakub@redhat.com>,
@@ -83,53 +85,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-DWARF v5 is the latest standard of the DWARF debug info format.
+Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice. Adds an
+explicit CONFIG_DEBUG_INFO_DWARF2, which is the default. Does so in a
+way that's forward compatible with existing configs, and makes adding
+future versions more straightforward.
 
-DWARF5 wins significantly in terms of size when mixed with compression
-(CONFIG_DEBUG_INFO_COMPRESSED).
+Suggested-by: Fangrui Song <maskray@google.com>
+Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ Makefile          | 14 ++++++++------
+ lib/Kconfig.debug | 19 +++++++++++++++----
+ 2 files changed, 23 insertions(+), 10 deletions(-)
 
-Link: http://www.dwarfstd.org/doc/DWARF5.pdf
-
-Patch 1 is a fixup already sent, but necessary for trying to use
-LLVM_IAS=1 with ToT LLVM.
-https://lore.kernel.org/stable/20201103012358.168682-1-maskray@google.com/
-
-Patches 2 and 3 are cleanups that lay the ground work and aren't DWARF
-v5 specific. In particular, I would like to see Patch 2 sent to stable
-so that Android and CrOS can move to LLVM_IAS=1 ASAP.
-
-Patch 4 implements Kconfig and Kbuild support for DWARFv5.
-
-Changes from the RFC:
-* split patch in 3 patch series, include Fangrui's patch, too.
-* prefer `DWARF vX` format, as per Fangrui.
-* use spaces between assignment in Makefile as per Masahiro.
-* simplify setting dwarf-version-y as per Masahiro.
-* indent `prompt` in Kconfig change as per Masahiro.
-* remove explicit default in Kconfig as per Masahiro.
-* add comments to test_dwarf5_support.sh.
-* change echo in test_dwarf5_support.sh as per Masahiro.
-* remove -u from test_dwarf5_support.sh as per Masahiro.
-* add a -gdwarf-5 cc-option check to Kconfig as per Jakub.
-
-Fangrui Song (1):
-  x86_64: Change .weak to SYM_FUNC_START_WEAK for arch/x86/lib/mem*_64.S
-
-Nick Desaulniers (3):
-  Kbuild: do not emit debug info for assembly with LLVM_IAS=1
-  Kbuild: make DWARF version a choice
-  Kbuild: implement support for DWARF v5
-
- Makefile                          | 13 +++++++++----
- arch/x86/lib/memcpy_64.S          |  4 +---
- arch/x86/lib/memmove_64.S         |  4 +---
- arch/x86/lib/memset_64.S          |  4 +---
- include/asm-generic/vmlinux.lds.h |  6 +++++-
- lib/Kconfig.debug                 | 27 +++++++++++++++++++++++----
- scripts/test_dwarf5_support.sh    |  9 +++++++++
- 7 files changed, 49 insertions(+), 18 deletions(-)
- create mode 100755 scripts/test_dwarf5_support.sh
-
+diff --git a/Makefile b/Makefile
+index 75b1a3dcbf30..e23786a4c1c7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -826,12 +826,14 @@ else
+ DEBUG_CFLAGS	+= -g
+ endif
+ 
+-ifndef LLVM_IAS
+-KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+-endif
+-
+-ifdef CONFIG_DEBUG_INFO_DWARF4
+-DEBUG_CFLAGS	+= -gdwarf-4
++dwarf-version-$(CONFIG_DEBUG_INFO_DWARF2) := 2
++dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
++DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
++ifneq ($(dwarf-version-y)$(LLVM_IAS),21)
++# Binutils 2.35+ required for -gdwarf-4+ support.
++dwarf-aflag	:= $(call as-option,-Wa$(comma)-gdwarf-$(dwarf-version-y))
++DEBUG_CFLAGS	+= $(dwarf-aflag)
++KBUILD_AFLAGS	+= $(dwarf-aflag)
+ endif
+ 
+ ifdef CONFIG_DEBUG_INFO_REDUCED
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 83a860126897..03c494eefabd 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -256,14 +256,25 @@ config DEBUG_INFO_SPLIT
+ 	  to know about the .dwo files and include them.
+ 	  Incompatible with older versions of ccache.
+ 
++choice
++	prompt "DWARF version"
++	help
++	  Which version of DWARF debug info to emit.
++
++config DEBUG_INFO_DWARF2
++	bool "Generate DWARF v2 debuginfo"
++	help
++	  Generate DWARF v2 debug info.
++
+ config DEBUG_INFO_DWARF4
+ 	bool "Generate dwarf4 debuginfo"
+ 	depends on $(cc-option,-gdwarf-4)
+ 	help
+-	  Generate dwarf4 debug info. This requires recent versions
+-	  of gcc and gdb. It makes the debug information larger.
+-	  But it significantly improves the success of resolving
+-	  variables in gdb on optimized code.
++	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
++	  It makes the debug information larger, but it significantly
++	  improves the success of resolving variables in gdb on optimized code.
++
++endchoice # "DWARF version"
+ 
+ config DEBUG_INFO_BTF
+ 	bool "Generate BTF typeinfo"
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
