@@ -2,120 +2,132 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E66C64E7C
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE26BC5519F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 23:06:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAFE4246DD
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 311C1246A6
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 23:06:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OOlRBBd1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBtqEPVu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727251AbgKRWHo (ORCPT
+        id S1726375AbgKRXFl (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Nov 2020 17:07:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53776 "EHLO
+        Wed, 18 Nov 2020 18:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727252AbgKRWHl (ORCPT
+        with ESMTP id S1726098AbgKRXFk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Nov 2020 17:07:41 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7E3C061A4F
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id z28so2089029pfr.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
+        Wed, 18 Nov 2020 18:05:40 -0500
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E355BC0613D4
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 15:05:57 -0800 (PST)
+Received: by mail-pl1-x641.google.com with SMTP id b3so1847622pls.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 15:05:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=OmvLBVHrXYJgk90zzJ7qPiL6Oqy/f8wdr2oL1+M7ruk=;
-        b=OOlRBBd15lFDmzj+eQqhl6JOtOXoAglrgb4iMn+oJHxK0ENZkBjJjpLRPk8q5A7SFY
-         ZxOzbIi6eI8fOpXWY6S1PtuFb9wg3TX+Bl/FrS4kXMHRbAe+z1Spr6ZgEqWyaJ5aKKGh
-         CYZOPt70DGmhjLkIIlNFkUn5wAZcqd9p24/TP07dxXRKEgV6/xSmfaZiGowvpnrChr3h
-         oRO+CqR4Ru8/QzOnLXn22YARn7ZtJna8chF9gED7FTMLvJ5bG1fnbkKMtM2vVSGmCzM9
-         01mn+DFFeos8A/Ej3OQuxmZxuUaqeCTk5sVd6ATqwCmTjVTPWyZ/EVXTwx/DNAKAAf5i
-         Lm3g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pK9Er3U8wzUpc5Ph5vwpd9eRfxvPgKOSxbNh1R/cIyQ=;
+        b=qBtqEPVu57Elst2R12JNUW2yDdqme72UJq+j8B0KRMqaTWXE4Jb1RBA0uBEPC+4gUC
+         cwNzl/PBwFYa9lfSCljv6SI+9YLvJMAcAKQcf6332IEIGFx1bEyB4t843r3loVTouYCp
+         EBHO4763PSurh/yifzv5CkiyWsX0GIot99a3ebjYWhIaP+pJf9JTpCnZzl8MYI9WDwFG
+         OMufIi9lNxEy0cLWZxlOh/WB5GlWXES1d7XwB75xaVa+bsosmHlEG6ddnN4dnjZLgt82
+         e1LLxc1B9mN0WtxIB00A8ae/+yjvn6BeKYjEAtIMCqcJ3G9dlk89fKRWfIG8JcYCVn8u
+         3k0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=OmvLBVHrXYJgk90zzJ7qPiL6Oqy/f8wdr2oL1+M7ruk=;
-        b=d1T3hT+51Bri3Fc6gOfT2Lz2aajK/FUARRvVUs4ydAUSpqq8128pJjqyA7gkmxkARY
-         g60QrAYmhohDZs0YtiZgOpPOqQ1a1udUtLdNkNd/E56cPK01OMYhkH+Th4i8KVrvKcNM
-         oRgtUipwz7Ujy1qHnBXtR3jZKARDttMK7d55Tqy6SsfL0uPSNi3JftZZBV87T0UlmkSq
-         95NTXviQ61+SPKyRkagNppZW+mUnmfr7fmkvUaG1pPzG6HcUCssjDwVLDm+nr4wCpxWf
-         FE3s/lrgKKo0/4pfxDgIrHtIClCJxpyT4OEhdZ7irIXEk4KSQVGcvbo3A878glUmYRyY
-         xG/A==
-X-Gm-Message-State: AOAM533lNsKNYrs2aolJNfWirKAeh3LNxivQx0HxeiylB/DJVwoZyuX6
-        f/ysY3FfQPC33zpvVhnWjUmIilIsxyJ6MeCcczE=
-X-Google-Smtp-Source: ABdhPJzDNOiTYuvtSCpROfZDlglre2puYkkaLcBNYl9GE1qztV2AAXOG3khM8OqSsFXToIMyXQUc4gcbg+Ue1s/szjs=
-Sender: "samitolvanen via sendgmr" 
-        <samitolvanen@samitolvanen1.mtv.corp.google.com>
-X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a63:550d:: with SMTP id
- j13mr10510189pgb.365.1605737261156; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
-Date:   Wed, 18 Nov 2020 14:07:18 -0800
-In-Reply-To: <20201118220731.925424-1-samitolvanen@google.com>
-Message-Id: <20201118220731.925424-5-samitolvanen@google.com>
-Mime-Version: 1.0
-References: <20201118220731.925424-1-samitolvanen@google.com>
-X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v7 04/17] kbuild: lto: limit inlining
-From:   Sami Tolvanen <samitolvanen@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Will Deacon <will@kernel.org>
-Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com,
-        kernel-hardening@lists.openwall.com, linux-arch@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        Sami Tolvanen <samitolvanen@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pK9Er3U8wzUpc5Ph5vwpd9eRfxvPgKOSxbNh1R/cIyQ=;
+        b=X84hjeh/H3nbhaduh/WHI/souoRqRvEFlPy64pTy9Lod/xUUReSan1Cy4Pge4e0GDA
+         j8MsNSxQNzx1J4SJBs+x6BejnocREWFwjI7uhORTYJ/GnREpcGcuh54Vw6mwvZTBjL2t
+         c72h7o+/ciAhLoX//WgwoKU3+NPs3FGHFlu0J91G2pUAVC77e4NaI56w+n33xtItj75n
+         +99J7tQuDuycozJ14ZaEFJ/HtO5BHcYcTiOjCNfB5QUd42Rl3fOTCHiO0OgNi3rXk+V+
+         5jIixMekxPUfrYngJPN/91eQ3iFA/Oy+KdZF+K24FIIFpTmRCbqJcd8ZwLi0xZRcrPBo
+         cnFw==
+X-Gm-Message-State: AOAM5306Z3GkGlgTAxze1NWD2IW5IxU7tPGPEkeimcc4SUX4RGv725h+
+        +jkaUxTy4XNpCUoJnWuZK1ZGLeE0tY+2tRl67xZZ1g==
+X-Google-Smtp-Source: ABdhPJx1KDsDxRgKYnaY8s7A1LaCEAgZ3k75SP2XAXWwuKK+TgoYSXGDwJEdbrp/TZpc04v4UBtcYvQauYdJ5LEX4To=
+X-Received: by 2002:a17:902:221:b029:d8:f938:b112 with SMTP id
+ 30-20020a1709020221b02900d8f938b112mr6374426plc.10.1605740757172; Wed, 18 Nov
+ 2020 15:05:57 -0800 (PST)
+MIME-Version: 1.0
+References: <20201112183839.1009297-1-natechancellor@gmail.com>
+ <CAKwvOdkShrqgNDWO0bsPcPZLx-+u79mfmPrGy7CnSKZVdcYzSA@mail.gmail.com>
+ <20201113005347.GA3625030@ubuntu-m3-large-x86> <CAMj1kXHYG7d-BDtbZ-4+wGdHb0rxXiMLuSvSMW_JFHgp3G6kTg@mail.gmail.com>
+ <CAKwvOdk1ir=D---9xVAxcErJWSGVxK1Mv6AC=TK3RVwNdcvFjw@mail.gmail.com>
+In-Reply-To: <CAKwvOdk1ir=D---9xVAxcErJWSGVxK1Mv6AC=TK3RVwNdcvFjw@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 18 Nov 2020 15:05:45 -0800
+Message-ID: <CAKwvOdnauFdUgS0Ww=O-PHrXWhXQEEYd806NUcy8_7MOG0Uo2g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Always link with '-z norelro'
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Abbott Liu <liuwenliang@huawei.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Jian Cai <jiancai@google.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Fangrui Song <maskray@google.com>,
+        Dan Rue <dan.rue@linaro.org>, Mark Brown <broonie@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This change limits function inlining across translation unit boundaries
-in order to reduce the binary size with LTO. The -import-instr-limit
-flag defines a size limit, as the number of LLVM IR instructions, for
-importing functions from other TUs, defaulting to 100.
+On Fri, Nov 13, 2020 at 11:34 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> On Thu, Nov 12, 2020 at 10:06 PM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > On Fri, 13 Nov 2020 at 01:53, Nathan Chancellor
+> > <natechancellor@gmail.com> wrote:
+> > >
+> > > On Thu, Nov 12, 2020 at 04:44:46PM -0800, Nick Desaulniers wrote:
+> > > > On Thu, Nov 12, 2020 at 10:41 AM Nathan Chancellor
+> > > > <natechancellor@gmail.com> wrote:
+> > > > >
+> > > > > Commit 3bbd3db86470 ("arm64: relocatable: fix inconsistencies in linker
+> > > > > script and options") added '-z norelro' to the arm64 Makefile when
+> > > > > CONFIG_RELOCATABLE was set to help support ld.lld because ld.lld
+> > > > > defaults to '-z relro' but the kernel does not use program headers or
+> > > > > adhere to the section layout that is required for RELRO to work.
+> > > > >
+> > > > > Commit 3b92fa7485eb ("arm64: link with -z norelro regardless of
+> > > > > CONFIG_RELOCATABLE") unconditionally added it to LDFLAGS_vmlinux because
+> > > > > an error occurs with CONFIG_KASAN set even when CONFIG_RELOCATABLE is
+> > > > > unset.
+> > > > >
+> > > > > As it turns out, ARM experiences the same error after CONFIG_KASAN was
+> > > > > implemented, meaning that '-z norelro' needs to be added to that
+> > > > > Makefile as well (multi_v7_defconfig + CONFIG_KASAN=y + LD=ld.lld):
+> > > > >
+> > > > > $ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- LLVM=1 zImage
+> > > > > ld.lld: error: section: .exit.data is not contiguous with other relro sections
+> > > > >
+> > > > > To avoid playing whack-a-mole with different architectures over time,
+> > > > > hoist '-z norelro' into the main Makefile. This does not affect ld.bfd
+> > > > > because '-z norelro' is the default for it.
 
-Based on testing with arm64 defconfig, we found that a limit of 5 is a
-reasonable compromise between performance and binary size, reducing the
-size of a stripped vmlinux by 11%.
-
-Suggested-by: George Burgess IV <gbiv@google.com>
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index f27c0da5d05a..bee378f9fd50 100644
---- a/Makefile
-+++ b/Makefile
-@@ -901,6 +901,9 @@ else
- CC_FLAGS_LTO	+= -flto
- endif
- CC_FLAGS_LTO	+= -fvisibility=default
-+
-+# Limit inlining across translation units to reduce binary size
-+KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
- endif
- 
- ifdef CONFIG_LTO
+Fangrui pointed out off list that this might need an ld-option wrapper
+for older versions of GNU binutils.  Dan was showing me some build
+logs today, and I thought I spotted such warnings about `-z norelro
+will be ignored`.
 -- 
-2.29.2.299.gdc1121823c-goog
-
+Thanks,
+~Nick Desaulniers
