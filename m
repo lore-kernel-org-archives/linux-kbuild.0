@@ -2,117 +2,88 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1419C2D0E4
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 03:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F6AC63798
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 13:04:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FD1924698
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 03:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70F9F24695
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 13:04:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWX89Bo+"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="MuH2MxtW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbgKRDNA (ORCPT
+        id S1726243AbgKRNEE (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 17 Nov 2020 22:13:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725613AbgKRDNA (ORCPT
+        Wed, 18 Nov 2020 08:04:04 -0500
+Received: from alln-iport-5.cisco.com ([173.37.142.92]:28633 "EHLO
+        alln-iport-5.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbgKRNEE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Nov 2020 22:13:00 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBEBC0613D4;
-        Tue, 17 Nov 2020 19:13:00 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id t5so673126qtp.2;
-        Tue, 17 Nov 2020 19:13:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HgvttKSz6Ny3sSVlQN/E9G/7G2kWLjw/Bo0sdK0fdRk=;
-        b=CWX89Bo+RFqfV61MMdOpdtn/KsRiAv0G0nWF2X55CWUA3vxzkGmwgNiYrMRFCHUiB/
-         o0l8A6oe7FDsV+fo36st+m1IqF34qmR/K5FK0pDOVozjatjBMqp+aiaYhnVO0JMvUfmW
-         97CpMbMaCSWeQsTkCc7Y5BqlIGPIRHqIJ8MMyLx0f2BZz29e282yoOJyhPQM7GjwI+0B
-         XFIC5yRLu6obhArZoDhs4yD0XZ1ZfH5DHBWQytkK5H1wp0zeG5ZF5Fud9EKQk8dX9LqT
-         PSdC1hq90vaC4bpCLuG0I8nY+S/q1MaNGb/xdIbbSpX8361oQ6V/d1/NUfKzZ9vwAtDU
-         82Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HgvttKSz6Ny3sSVlQN/E9G/7G2kWLjw/Bo0sdK0fdRk=;
-        b=rw828WykykCXs00F256H96zNgS8EXdNOnPID9lc18zYLEEeiF7ZxMVwOrubiO3bcWd
-         xPjQHryXonyBGB7s9SwzDI9LB2KX+3Z5/nqA+FxxdaaoWdEI04KvJwuxFX/2rTuxH/i1
-         +lyDv8rU6TgyQlVvxDjtCZyN0SecZwFWe4HRFYMlmya1m8O7U1PJ6AwmfdgUJE+SnP6X
-         RwmRYTAZB/crSsPin4Lppb5DbEjg2dP8XFISjXp97eycNGop8N1PvnBRH+dr2trD2nXL
-         a6q8JtnsdNSIhpD6pdOHrm5RCcvl/y+Ntwkzs+4TZ1ica9WYZLH+UKcyWvyZXtIlaj3o
-         ZssA==
-X-Gm-Message-State: AOAM530hthwsdJsWZHmXtj3Uaq8nZC1TqEsDR3ryysngA5lEMUdcD0Kx
-        8698Qjf2nfwXaPd2oLG5rQc=
-X-Google-Smtp-Source: ABdhPJzuIDnMCVG5Tuz116cq6Z1nlyfDBVH+eUiGr+rwEJQdkH3cFq7bPI+slF+97TRva76BZFWfMA==
-X-Received: by 2002:aed:2051:: with SMTP id 75mr2388981qta.332.1605669179405;
-        Tue, 17 Nov 2020 19:12:59 -0800 (PST)
-Received: from ubuntu-m3-large-x86 ([2604:1380:45f1:1d00::1])
-        by smtp.gmail.com with ESMTPSA id h11sm15438617qtr.13.2020.11.17.19.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2020 19:12:58 -0800 (PST)
-Date:   Tue, 17 Nov 2020 20:12:57 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Nick Desaulniers <ndesaulniers@google.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, clang-built-linux@googlegroups.com,
-        "kernelci . org bot" <bot@kernelci.org>,
-        Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 2/2] kbuild: Disable CONFIG_LD_ORPHAN_WARN for ld.lld
- 10.0.1
-Message-ID: <20201118031257.GB1001457@ubuntu-m3-large-x86>
-References: <20201113195553.1487659-1-natechancellor@gmail.com>
- <20201113195553.1487659-2-natechancellor@gmail.com>
- <202011171350.F95127F@keescook>
+        Wed, 18 Nov 2020 08:04:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=cisco.com; i=@cisco.com; l=82; q=dns/txt; s=iport;
+  t=1605704643; x=1606914243;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Pokb30QME/DR4pSJY2FHisPZhDALkkBGM6TUcjHTLeM=;
+  b=MuH2MxtWXAxMVlvsd1ZJhXFHS9O3/bpCnVhsCkqSLcS1T+oRq8ZUE317
+   PW8TxA28D8dnJqDv5285ZkpQFceBB00OXyEDIIOnA/IOWZcvEwwbTspKQ
+   ZHWVFcNw+IeyrslTa/La8H3qCM7jYBXzUkxjN02V8iy9t5ByIsNqmEA9C
+   w=;
+X-IPAS-Result: =?us-ascii?q?A0DTBQDrGrVffYYNJK1iHgEBCxIMggQLg3cvOJVakESJb?=
+ =?us-ascii?q?oF8CwEBAQ0BAS0CBAEBhEoCgiUCJTQJDgIDAQEBAwIDAQEBAQUBAQECAQYEF?=
+ =?us-ascii?q?AEBhj0LhXMBAgIBeQULAgEIISUPIyUCBA6GEiCuIXSBNIpNgTiIQIUAG4FBP?=
+ =?us-ascii?q?4QjPoQ+hXYEnEabbwoggk2bGSKDBwGecpNToFcCERWBMyE4gVlwFYMlTxcCD?=
+ =?us-ascii?q?ZxogUIJfIw7AYEQAQE?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="5.77,486,1596499200"; 
+   d="scan'208";a="608378531"
+Received: from alln-core-12.cisco.com ([173.36.13.134])
+  by alln-iport-5.cisco.com with ESMTP/TLS/DHE-RSA-SEED-SHA; 18 Nov 2020 13:04:03 +0000
+Received: from XCH-RCD-004.cisco.com (xch-rcd-004.cisco.com [173.37.102.14])
+        by alln-core-12.cisco.com (8.15.2/8.15.2) with ESMTPS id 0AID427N021075
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=FAIL);
+        Wed, 18 Nov 2020 13:04:03 GMT
+Received: from xch-aln-004.cisco.com (173.36.7.14) by XCH-RCD-004.cisco.com
+ (173.37.102.14) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 18 Nov
+ 2020 07:04:02 -0600
+Received: from xch-aln-004.cisco.com ([173.36.7.14]) by XCH-ALN-004.cisco.com
+ ([173.36.7.14]) with mapi id 15.00.1497.000; Wed, 18 Nov 2020 07:04:02 -0600
+From:   "Denys Zagorui -X (dzagorui - GLOBALLOGIC INC at Cisco)" 
+        <dzagorui@cisco.com>
+To:     "masahiroy@kernel.org" <masahiroy@kernel.org>
+CC:     "michal.lkml@markovi.net" <michal.lkml@markovi.net>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] kbuild: use -fmacro-prefix-map for .S sources
+Thread-Topic: [PATCH v3] kbuild: use -fmacro-prefix-map for .S sources
+Thread-Index: AQHWsRJPpKcKNHVlGkuCBAHPiPYhnqm/255bgA4Yo8Y=
+Date:   Wed, 18 Nov 2020 13:04:02 +0000
+Message-ID: <1605704642269.72893@cisco.com>
+References: <20201102120853.96855-1-dzagorui@cisco.com>,<1604929732138.17256@cisco.com>
+In-Reply-To: <1604929732138.17256@cisco.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [173.38.209.7]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202011171350.F95127F@keescook>
+X-Outbound-SMTP-Client: 173.37.102.14, xch-rcd-004.cisco.com
+X-Outbound-Node: alln-core-12.cisco.com
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Nov 17, 2020 at 01:51:43PM -0800, Kees Cook wrote:
-> On Fri, Nov 13, 2020 at 12:55:53PM -0700, Nathan Chancellor wrote:
-> >  config LD_ORPHAN_WARN
-> > -	def_bool ARCH_WANT_LD_ORPHAN_WARN && $(ld-option,--orphan-handling=warn)
-> > +	def_bool ARCH_WANT_LD_ORPHAN_WARN && $(ld-option,--orphan-handling=warn) && (!LD_IS_LLD || LLD_VERSION >= 110000)
-> 
-> Readability nit-pick... I prefer separate "depends" lines to make things
-> a little easier to parse, change, etc:
-> 
-> config LD_ORPHAN_WARN
-> 	def_bool y
-> 	depends on ARCH_WANT_LD_ORPHAN_WARN
-> 	depends on !LD_IS_LLD || LLD_VERSION >= 110000
-> 	depends on $(ld-option,--orphan-handling=warn)
-> 
-> Otherwise, yeah, looks good to me. With this and the other suggestions,
-> please consider it:
-> 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-
-Thank you, I have updated it locally for v2!
-
-Cheers,
-Nathan
+> ping=0A=
+=0A=
+Any comments on this ?=0A=
+=0A=
+Thanks,=0A=
+Denys=0A=
+=0A=
