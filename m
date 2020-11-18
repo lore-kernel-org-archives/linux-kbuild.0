@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EC0C64E7A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E66C64E7C
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77F2D206CA
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAFE4246DD
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oq8r6SCN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OOlRBBd1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727193AbgKRWHh (ORCPT
+        id S1727251AbgKRWHo (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Nov 2020 17:07:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
+        Wed, 18 Nov 2020 17:07:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726886AbgKRWHf (ORCPT
+        with ESMTP id S1727252AbgKRWHl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Nov 2020 17:07:35 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5CCC061A51
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:35 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id a13so4535128ybj.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:35 -0800 (PST)
+        Wed, 18 Nov 2020 17:07:41 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7E3C061A4F
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id z28so2089029pfr.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=kod53Z9Bn/oLp+88TnQNrWTDZiAkcCd5b++0bm6KqDA=;
-        b=Oq8r6SCNamOHoS7iSUmJRRev5DGFdlnvFFu0GIi+STeDi/2VxvM9bYiQjKuTfjLCAf
-         X7p4TRLUESowZaZNgKuuIfZO5b2odS7+x2ubT/aFKQrV+o/bQpkDUCuuQ+uEb1OdNofk
-         gyWDaXNvo32HCUdIUsKJKgTCnCmshX/5gGSe7kgfDUd1vWxv/fIYYnYCLUe7y1UiwEPL
-         1HPFqlQKwycMl+fWUgllMc17t4YP4tBatTmTzNly75QmRLVXHG+shI6tsS1/2JjB03hV
-         mCttBb9qsBFxYfJBfWt4guKh937AQ44YGt8peZ1CR7fqFHZAN5cE3N1fTS63ad9uCbFi
-         kp1A==
+        bh=OmvLBVHrXYJgk90zzJ7qPiL6Oqy/f8wdr2oL1+M7ruk=;
+        b=OOlRBBd15lFDmzj+eQqhl6JOtOXoAglrgb4iMn+oJHxK0ENZkBjJjpLRPk8q5A7SFY
+         ZxOzbIi6eI8fOpXWY6S1PtuFb9wg3TX+Bl/FrS4kXMHRbAe+z1Spr6ZgEqWyaJ5aKKGh
+         CYZOPt70DGmhjLkIIlNFkUn5wAZcqd9p24/TP07dxXRKEgV6/xSmfaZiGowvpnrChr3h
+         oRO+CqR4Ru8/QzOnLXn22YARn7ZtJna8chF9gED7FTMLvJ5bG1fnbkKMtM2vVSGmCzM9
+         01mn+DFFeos8A/Ej3OQuxmZxuUaqeCTk5sVd6ATqwCmTjVTPWyZ/EVXTwx/DNAKAAf5i
+         Lm3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=kod53Z9Bn/oLp+88TnQNrWTDZiAkcCd5b++0bm6KqDA=;
-        b=E+NReh7uYiCjCLoGttoyEXwvRNU00aBpZZi1XNpuU5v3TSpv3g2zdJG5wvji70VffX
-         V90AsEym6fRRkbLK6Zig62n9rYNZGQuKfutzDcU8lATIg8ejw1xmDXIj1ncQRutMVWj7
-         284vzkwuTZMTmj2gkL8MsAnOigBeXJnlZ9d2gV8/+NJXwWAShfiaRCeCKR2Uts8wZaW5
-         yuJ1P6HJOyajED1jfaer7xu/FS8E8k7ARAqS2Cdm6ENgb77AZEOke+/DCeNqyIBvZYI+
-         tyGm+hnnKGbDLhy9Zgxt689rPhTj0RY3atiqgNFueX7lFf/wAPBwxDyoFE6gI1xRe+Dy
-         f4Qw==
-X-Gm-Message-State: AOAM533+BMU1KdPRZ+JZ8t+Zsxt3tv6ASzWXAB0zjHYt8LRYzcOBZ8hA
-        OowjRyzam/lr4cQFlGMFrJ4UGhdDCjS6t/NP+7s=
-X-Google-Smtp-Source: ABdhPJzJieOsn4JuNK/fNek5dpK0KwEKnqVJ5VjcmWHbrJqO30ArGzOEitVj3onNlAiY/AvgfqfGAcAMvdZ4a69M8d0=
+        bh=OmvLBVHrXYJgk90zzJ7qPiL6Oqy/f8wdr2oL1+M7ruk=;
+        b=d1T3hT+51Bri3Fc6gOfT2Lz2aajK/FUARRvVUs4ydAUSpqq8128pJjqyA7gkmxkARY
+         g60QrAYmhohDZs0YtiZgOpPOqQ1a1udUtLdNkNd/E56cPK01OMYhkH+Th4i8KVrvKcNM
+         oRgtUipwz7Ujy1qHnBXtR3jZKARDttMK7d55Tqy6SsfL0uPSNi3JftZZBV87T0UlmkSq
+         95NTXviQ61+SPKyRkagNppZW+mUnmfr7fmkvUaG1pPzG6HcUCssjDwVLDm+nr4wCpxWf
+         FE3s/lrgKKo0/4pfxDgIrHtIClCJxpyT4OEhdZ7irIXEk4KSQVGcvbo3A878glUmYRyY
+         xG/A==
+X-Gm-Message-State: AOAM533lNsKNYrs2aolJNfWirKAeh3LNxivQx0HxeiylB/DJVwoZyuX6
+        f/ysY3FfQPC33zpvVhnWjUmIilIsxyJ6MeCcczE=
+X-Google-Smtp-Source: ABdhPJzDNOiTYuvtSCpROfZDlglre2puYkkaLcBNYl9GE1qztV2AAXOG3khM8OqSsFXToIMyXQUc4gcbg+Ue1s/szjs=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:830e:: with SMTP id
- s14mr10156827ybk.213.1605737254956; Wed, 18 Nov 2020 14:07:34 -0800 (PST)
-Date:   Wed, 18 Nov 2020 14:07:15 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a63:550d:: with SMTP id
+ j13mr10510189pgb.365.1605737261156; Wed, 18 Nov 2020 14:07:41 -0800 (PST)
+Date:   Wed, 18 Nov 2020 14:07:18 -0800
 In-Reply-To: <20201118220731.925424-1-samitolvanen@google.com>
-Message-Id: <20201118220731.925424-2-samitolvanen@google.com>
+Message-Id: <20201118220731.925424-5-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201118220731.925424-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v7 01/17] tracing: move function tracer options to Kconfig
+Subject: [PATCH v7 04/17] kbuild: lto: limit inlining
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -86,117 +86,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Move function tracer options to Kconfig to make it easier to add
-new methods for generating __mcount_loc, and to make the options
-available also when building kernel modules.
+This change limits function inlining across translation unit boundaries
+in order to reduce the binary size with LTO. The -import-instr-limit
+flag defines a size limit, as the number of LLVM IR instructions, for
+importing functions from other TUs, defaulting to 100.
 
-Note that FTRACE_MCOUNT_USE_* options are updated on rebuild and
-therefore, work even if the .config was generated in a different
-environment.
+Based on testing with arm64 defconfig, we found that a limit of 5 is a
+reasonable compromise between performance and binary size, reducing the
+size of a stripped vmlinux by 11%.
 
+Suggested-by: George Burgess IV <gbiv@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- Makefile               | 20 ++++++++------------
- kernel/trace/Kconfig   | 16 ++++++++++++++++
- scripts/Makefile.build |  6 ++----
- 3 files changed, 26 insertions(+), 16 deletions(-)
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index e2c3f65c4721..8c8feb4245a6 100644
+index f27c0da5d05a..bee378f9fd50 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -851,12 +851,8 @@ KBUILD_CFLAGS += $(DEBUG_CFLAGS)
- export DEBUG_CFLAGS
- 
- ifdef CONFIG_FUNCTION_TRACER
--ifdef CONFIG_FTRACE_MCOUNT_RECORD
--  # gcc 5 supports generating the mcount tables directly
--  ifeq ($(call cc-option-yn,-mrecord-mcount),y)
--    CC_FLAGS_FTRACE	+= -mrecord-mcount
--    export CC_USING_RECORD_MCOUNT := 1
--  endif
-+ifdef CONFIG_FTRACE_MCOUNT_USE_CC
-+  CC_FLAGS_FTRACE	+= -mrecord-mcount
-   ifdef CONFIG_HAVE_NOP_MCOUNT
-     ifeq ($(call cc-option-yn, -mnop-mcount),y)
-       CC_FLAGS_FTRACE	+= -mnop-mcount
-@@ -864,6 +860,12 @@ ifdef CONFIG_FTRACE_MCOUNT_RECORD
-     endif
-   endif
+@@ -901,6 +901,9 @@ else
+ CC_FLAGS_LTO	+= -flto
  endif
-+ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
-+  ifdef CONFIG_HAVE_C_RECORDMCOUNT
-+    BUILD_C_RECORDMCOUNT := y
-+    export BUILD_C_RECORDMCOUNT
-+  endif
-+endif
- ifdef CONFIG_HAVE_FENTRY
-   ifeq ($(call cc-option-yn, -mfentry),y)
-     CC_FLAGS_FTRACE	+= -mfentry
-@@ -873,12 +875,6 @@ endif
- export CC_FLAGS_FTRACE
- KBUILD_CFLAGS	+= $(CC_FLAGS_FTRACE) $(CC_FLAGS_USING)
- KBUILD_AFLAGS	+= $(CC_FLAGS_USING)
--ifdef CONFIG_DYNAMIC_FTRACE
--	ifdef CONFIG_HAVE_C_RECORDMCOUNT
--		BUILD_C_RECORDMCOUNT := y
--		export BUILD_C_RECORDMCOUNT
--	endif
--endif
+ CC_FLAGS_LTO	+= -fvisibility=default
++
++# Limit inlining across translation units to reduce binary size
++KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
  endif
  
- # We trigger additional mismatches with less inlining
-diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-index a4020c0b4508..927ad004888a 100644
---- a/kernel/trace/Kconfig
-+++ b/kernel/trace/Kconfig
-@@ -595,6 +595,22 @@ config FTRACE_MCOUNT_RECORD
- 	depends on DYNAMIC_FTRACE
- 	depends on HAVE_FTRACE_MCOUNT_RECORD
- 
-+config FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-+	bool
-+	depends on FTRACE_MCOUNT_RECORD
-+
-+config FTRACE_MCOUNT_USE_CC
-+	def_bool y
-+	depends on $(cc-option,-mrecord-mcount)
-+	depends on !FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-+	depends on FTRACE_MCOUNT_RECORD
-+
-+config FTRACE_MCOUNT_USE_RECORDMCOUNT
-+	def_bool y
-+	depends on !FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-+	depends on !FTRACE_MCOUNT_USE_CC
-+	depends on FTRACE_MCOUNT_RECORD
-+
- config TRACING_MAP
- 	bool
- 	depends on ARCH_HAVE_NMI_SAFE_CMPXCHG
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ae647379b579..2175ddb1ee0c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -178,8 +178,7 @@ cmd_modversions_c =								\
- 	fi
- endif
- 
--ifdef CONFIG_FTRACE_MCOUNT_RECORD
--ifndef CC_USING_RECORD_MCOUNT
-+ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
- # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
- ifdef BUILD_C_RECORDMCOUNT
- ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
-@@ -206,8 +205,7 @@ recordmcount_source := $(srctree)/scripts/recordmcount.pl
- endif # BUILD_C_RECORDMCOUNT
- cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),	\
- 	$(sub_cmd_record_mcount))
--endif # CC_USING_RECORD_MCOUNT
--endif # CONFIG_FTRACE_MCOUNT_RECORD
-+endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
- 
- ifdef CONFIG_STACK_VALIDATION
- ifneq ($(SKIP_STACK_VALIDATION),1)
+ ifdef CONFIG_LTO
 -- 
 2.29.2.299.gdc1121823c-goog
 
