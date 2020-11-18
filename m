@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6132FC64E90
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F9C83011
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B2DC246CB
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEC1B206CA
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n0bp9cJv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tgB3HeaM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727558AbgKRWIP (ORCPT
+        id S1727352AbgKRWHu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Nov 2020 17:08:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
+        Wed, 18 Nov 2020 17:07:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727561AbgKRWIO (ORCPT
+        with ESMTP id S1727315AbgKRWHq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Nov 2020 17:08:14 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E132BC061A4D
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:08:13 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id w8so4621308ybq.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:08:13 -0800 (PST)
+        Wed, 18 Nov 2020 17:07:46 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7F6C061A48
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:46 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id w8so4620047ybq.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=zNEbBbUjVUwNrqsw9c+UpkNEFF7VA0EYfHLp5cIzntw=;
-        b=n0bp9cJvxDsjt7xTCOt5iMFW1d/2tTomLx5U5GAiKgRUC31U0PGdIlVksp+a0VVrdY
-         g5/MehVGAk5dAFkfZ/0D3/kc0qKP/5ghMg0SX2rzCLQrn7ZzkYIMJRTQA4tAkeENX90q
-         zMfWfxpHMr797C3+ufNsF8n5E2EarI0M+SxfmyYFrfheXFRY/USHp0McDL2ojl4Lgr9c
-         ZSVHHwyxFBuJf6EQIB49Tm2/Idyx3u+mRdPPOBh4ppAaY5/pZ300gTIMAOc0hbNqctmz
-         NshfWwPYJRHHUsUv7bRZJJIdOYMWpv3CBbpJoRLYa/A5uDpHU91hRb4ca8tn+CBC/z2v
-         7wmg==
+        bh=tITgh0Ssflf3KIdl9iLTasR/nuysgEKXGj2aGzu0djg=;
+        b=tgB3HeaMLte4FwdwEskpNo3M1G5NMSWdaU3NGnSytOclNILrFVdkD4YBIH/89JtDHP
+         XW414KEtYQqChtXVzZCo6FESh8Tttug6ipG4Xwymb06bhNxw7eh44JTB82tQMjdgKeKe
+         mvE5QooVVjUOl15f8Ufkoo4CuDQMkoEAowvId9Xo6ILJqfJzsuuAiniFNxOTXgItR15s
+         eH6Dk79v+bV/G/7k27PzU2M0pCmQclWaJYIJjA3ojY/R+Z8tO+3QxQrtlIwXnz5RyeCM
+         j8ggYjzxLirUlC9AaKsU1v+JkHXIBzxtLSTtx1qvPQUhEgNQSe/pESJS3QjFV5EMv/+O
+         IZUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zNEbBbUjVUwNrqsw9c+UpkNEFF7VA0EYfHLp5cIzntw=;
-        b=VBHrwEudJlNMYMubpkIBYCPgonHGDhZ039SjrOkR0lg1XA0K2wI2yZ8kPEy67v94AQ
-         BQPgy3l9s4z+ks7VT283eDFeAa5mWWamdsSF0QWK1kMlnpteG88xQU3eOGfeAdLHRMpq
-         o3tbPHshE9i/PHTScreKCtO2MHwU2Kv50huSyezhGXrFFK8XqXNeEVoJIgmvv9muPifF
-         f1Gh4HMQ/6wQWiwyHyRMwpuJVyZOrQc+DAYrcbyQ27p1cSEH6KNHatdM1N9uAqTg7L0/
-         4ET06i3ytFuyG7BE4bbXARvSdgy0eW2qCjONgrLFe14Q/qf1rUdn2q12Iq1E1xmSWfBI
-         JpGQ==
-X-Gm-Message-State: AOAM530b1V1dqu9/tkchC4EvMC4j5lEwIqH2+HAdPQOemeXfStxuhaq3
-        fBC9mn0vmHZO4sggmwvOkfArvumC9++BfePfobk=
-X-Google-Smtp-Source: ABdhPJwWbtiTp58G6aNpNqEPufDWDe2zDs+IKNE1XLpICWlrRQN8YWmIrp5YpIBo0gnH6aOzErytNSLLgd+pskDj6ew=
+        bh=tITgh0Ssflf3KIdl9iLTasR/nuysgEKXGj2aGzu0djg=;
+        b=F0MX8NP3+G7dlQo8UxaHp/dxQNHCmdLqrLUT25tLTa4hCWBCwafU5Bshu9z+acbXRi
+         IKWiEltoEiHadwWd1h3tREzjLk2GWnu/1tp9dzRf0nZVlvTKzLd2cBEVUoY5HDIwLEgu
+         aaMtouEI4/orgb1vFVyLA7/SU31F9Ydy6Jaz5bsKm6GXujPgu37VCqCgIwOSj1TWFg/A
+         Kyosto9DMatf8jWIc4A6PvKBNpWmWTXKH6NZDYo+oAv/AJYEXAHqr1geYMmI9pkQ6uKP
+         QNEhRug8VcXqODGvou34MxXs2LDlPts1xOJT+J/xDpfVYBfLW6+o1mztfJKnUdjPU0gQ
+         8AGw==
+X-Gm-Message-State: AOAM530O54OtYl2thi3tyt/kwmdUw+p419BlcNTKGUBYL+5GJtRqXpeV
+        9Au81LHTsGzajdmeRyX2X+e2q7vGETeKwP+n2ww=
+X-Google-Smtp-Source: ABdhPJyru6u4Sy3c6z545hXKz2Lse9yOurfwR7Sqj4soym8ldc5jriOTeAoDW2j8p87AYgdDtayu2H1jxl4fDBYzugo=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:aa04:: with SMTP id
- s4mr8172287ybi.285.1605737293084; Wed, 18 Nov 2020 14:08:13 -0800 (PST)
-Date:   Wed, 18 Nov 2020 14:07:31 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a5b:c0e:: with SMTP id
+ f14mr12957716ybq.83.1605737265629; Wed, 18 Nov 2020 14:07:45 -0800 (PST)
+Date:   Wed, 18 Nov 2020 14:07:20 -0800
 In-Reply-To: <20201118220731.925424-1-samitolvanen@google.com>
-Message-Id: <20201118220731.925424-18-samitolvanen@google.com>
+Message-Id: <20201118220731.925424-7-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201118220731.925424-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v7 17/17] arm64: allow LTO_CLANG and THINLTO to be selected
+Subject: [PATCH v7 06/17] kbuild: lto: remove duplicate dependencies from .mod files
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -86,27 +86,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Allow CONFIG_LTO_CLANG and CONFIG_THINLTO to be enabled.
+With LTO, llvm-nm prints out symbols for each archive member
+separately, which results in a lot of duplicate dependencies in the
+.mod file when CONFIG_TRIM_UNUSED_SYMS is enabled. When a module
+consists of several compilation units, the output can exceed the
+default xargs command size limit and split the dependency list to
+multiple lines, which results in used symbols getting trimmed.
+
+This change removes duplicate dependencies, which will reduce the
+probability of this happening and makes .mod files smaller and
+easier to read.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index c7f07978f5b6..56bd83a764f4 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -73,6 +73,8 @@ config ARM64
- 	select ARCH_USE_SYM_ANNOTATIONS
- 	select ARCH_SUPPORTS_MEMORY_FAILURE
- 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
-+	select ARCH_SUPPORTS_LTO_CLANG
-+	select ARCH_SUPPORTS_THINLTO
- 	select ARCH_SUPPORTS_ATOMIC_RMW
- 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
- 	select ARCH_SUPPORTS_NUMA_BALANCING
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index eae2f5386a03..f80ada58271d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -281,7 +281,7 @@ endef
+ 
+ # List module undefined symbols (or empty line if not enabled)
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+-cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | xargs echo
++cmd_undef_syms = $(NM) $< | sed -n 's/^  *U //p' | sort -u | xargs echo
+ else
+ cmd_undef_syms = echo
+ endif
 -- 
 2.29.2.299.gdc1121823c-goog
 
