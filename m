@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6220C64E7D
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 161B4C56201
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77779246E1
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1F82246CB
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Nov 2020 22:08:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JUEhAG5/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sYNH5IyS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727312AbgKRWHq (ORCPT
+        id S1726788AbgKRWIC (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Nov 2020 17:07:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53788 "EHLO
+        Wed, 18 Nov 2020 17:08:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbgKRWHp (ORCPT
+        with ESMTP id S1727471AbgKRWIB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Nov 2020 17:07:45 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00397C061A51
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:43 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id k5so2506534qvu.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:07:43 -0800 (PST)
+        Wed, 18 Nov 2020 17:08:01 -0500
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4F5C061A4F
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:08:01 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id q6so2491507qvr.21
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2020 14:08:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=7xcmRRx6qvqOlAhBXvPUxdlcJiFGDszFPn6Uy8LsYGg=;
-        b=JUEhAG5/26jx0k7UneLL1f8TdMXEdBCuTZJVLjQZ+iZWRpM2bbt0EXRlMyK8xh/rhj
-         JL4aCETLnrd/8DvtoDDkLX34DHCsBE1h9hQQTOHP3TNRNJUaUtVu/5oPiKBq0scCRP6Z
-         +kh1Oyf9NPyMM2Lo7bgcXU9P4bjc/YYA21H9WcxDydQqHpZaclET/mWLe+Q6TCvtF3wo
-         mKxhKgjFnSmEhpPgl/7XzG7iiLKXi7xIewYjRRnbWXMkQNf1t/hl5/7hnFoxRkDw2MOb
-         rVfAfcrlGtLV3PMRjEVyZEJWFeaaAKgzOew1LFSh6KyTd7yH/s0nFEbQGjmL0toalfsR
-         lLAQ==
+        bh=4XuhSBro4JmbEzc1ahwEF0ocfPBDRGYBwGKNTvA6UGE=;
+        b=sYNH5IySg/OAzl6C1030j5KrdvL/TknJ66ncYZZ0VJfRnkJWabJqF72HyVEtrFqsuV
+         xHZDm78BMKoevfVrShC34UAWPm7inA3f5NPp/T5mwxJWNUaUEmUhisnupmkn6fu/2Gwc
+         kjHvUXUV8ClEbbYTv/sJSHv6xAYf/ZgciW+HWWd1Obttcn34VOfLfUiaEuwE1mBQcIyI
+         J7VEKckt5CvBwsRjuSRuQDHCbWNKrS0m4sNytF7pqSs/Xbr+4gRn0wdtIjpFJpzvj09z
+         m7KNcyrQeKkKkgoq4NE1+LYU1VECryxaLniuQ5P+UABuyCF4PafQeFexbMmZ21dv9FUI
+         l/PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7xcmRRx6qvqOlAhBXvPUxdlcJiFGDszFPn6Uy8LsYGg=;
-        b=llkB9Xjmu9vGz3iUTJdnBqs8FHV3Z8zA/lVSM/Q4rEFynaAb6Zfr5OyjUQ5kxx+Sgk
-         JN1pcg+0wkh1o/U+aw0vPJ+wr0ExfT3TFOzlzE12JbCKXPsbMc35f9oSZHKraJUUBbLQ
-         mxSpnHxPYgGSxzT/nm9Qy2BikLNCaXEf7PfjbItEwdsF+bsBeQU3v4oiCGkkBy7Corll
-         5w9i0FZ/3fam9dA3jts/xL6IT6jGoZQFxPzboWlzWU/Mumxx8cOvMmawTtq+QTOmdXnZ
-         M0wIKYtjZfQL1E/VUNbPvOe1eJ1mxUn8eZdkJ5a9mfWg/D0ddzwwPsT1M2Faq3sEiRfi
-         wpbw==
-X-Gm-Message-State: AOAM531zhKIMKNDtPtViohx2Cpl5QalRuPt9lFrn+vBp3pprlnCLE5CY
-        3x/FlJ3UeJTrkM5OQpTKSLyVPGermdABR1doxv8=
-X-Google-Smtp-Source: ABdhPJwZi43l7NEtfrn2Ph6B8PwX83axN27eYs3bBjDKHIbJhot79HMgDc9/Lz03zP5kBQUcskAGDJr3yB94zqzoXoQ=
+        bh=4XuhSBro4JmbEzc1ahwEF0ocfPBDRGYBwGKNTvA6UGE=;
+        b=dOGBVxcf+zm/51tawKPByNrxMJIMc0Lp12XX0YjGVJ8OOY7NEBszGLXm79rNS1KgB8
+         RTsQTsommkHDqzVG43LpAsd64mLWgYsGd5T6e6T0E4YVGyQlOgmCyBOJraqpk7FqWh9I
+         ZxEpZEvY6dOZGI83i64I48bDsDzLFS4KaI+Ay0Sv8R4wERRM6HpGaeXKLla2MYOCMH/o
+         QmwVaTLlhSWdpeYQ/FK7ZxaRPGkUBN5eB+KSRiA3End1AzPbaIjlttvht/avcyXA1xmP
+         aQHF60DNfPsY4f2479OijCdWXb8GRHlPKXnhK8KLN/fGGlZ8IcLYsNgkHFJWiY6AvAwE
+         jhfQ==
+X-Gm-Message-State: AOAM5300a/V83PoYKfcaKLdCKQi9KLX0tBreWxlxXaHMg02ZZ5kLylGr
+        rxPowKyZBqJJr/zdrz7myLr6e7a/47xhcYj5DCs=
+X-Google-Smtp-Source: ABdhPJz+m+xG4KrpgdWsllrU16+uPERUb2CyF3GRyM+22sZfjEXDruR1i7vglehue0hFGlNRVCYfCWncFBgvChpJLaQ=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a0c:8004:: with SMTP id
- 4mr7501644qva.5.1605737263123; Wed, 18 Nov 2020 14:07:43 -0800 (PST)
-Date:   Wed, 18 Nov 2020 14:07:19 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a0c:e790:: with SMTP id
+ x16mr7088555qvn.21.1605737280219; Wed, 18 Nov 2020 14:08:00 -0800 (PST)
+Date:   Wed, 18 Nov 2020 14:07:26 -0800
 In-Reply-To: <20201118220731.925424-1-samitolvanen@google.com>
-Message-Id: <20201118220731.925424-6-samitolvanen@google.com>
+Message-Id: <20201118220731.925424-13-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201118220731.925424-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.454.gaff20da3a2-goog
-Subject: [PATCH v7 05/17] kbuild: lto: merge module sections
+Subject: [PATCH v7 12/17] efi/libstub: disable LTO
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -86,52 +86,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-LLD always splits sections with LTO, which increases module sizes. This
-change adds linker script rules to merge the split sections in the final
-module.
+With CONFIG_LTO_CLANG, we produce LLVM bitcode instead of ELF object
+files. Since LTO is not really needed here and the Makefile assumes we
+produce an object file, disable LTO for libstub.
 
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- scripts/module.lds.S | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ drivers/firmware/efi/libstub/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/scripts/module.lds.S b/scripts/module.lds.S
-index 69b9b71a6a47..18d5b8423635 100644
---- a/scripts/module.lds.S
-+++ b/scripts/module.lds.S
-@@ -23,6 +23,30 @@ SECTIONS {
- 	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }
+diff --git a/drivers/firmware/efi/libstub/Makefile b/drivers/firmware/efi/libstub/Makefile
+index 8a94388e38b3..c23466e05e60 100644
+--- a/drivers/firmware/efi/libstub/Makefile
++++ b/drivers/firmware/efi/libstub/Makefile
+@@ -38,6 +38,8 @@ KBUILD_CFLAGS			:= $(cflags-y) -Os -DDISABLE_BRANCH_PROFILING \
  
- 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
-+
-+	__patchable_function_entries : { *(__patchable_function_entries) }
-+
-+	/*
-+	 * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
-+	 * -ffunction-sections, which increases the size of the final module.
-+	 * Merge the split sections in the final binary.
-+	 */
-+	.bss : {
-+		*(.bss .bss.[0-9a-zA-Z_]*)
-+		*(.bss..L*)
-+	}
-+
-+	.data : {
-+		*(.data .data.[0-9a-zA-Z_]*)
-+		*(.data..L*)
-+	}
-+
-+	.rodata : {
-+		*(.rodata .rodata.[0-9a-zA-Z_]*)
-+		*(.rodata..L*)
-+	}
-+
-+	.text : { *(.text .text.[0-9a-zA-Z_]*) }
- }
+ # remove SCS flags from all objects in this directory
+ KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
++# disable LTO
++KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_LTO), $(KBUILD_CFLAGS))
  
- /* bring in arch-specific sections */
+ GCOV_PROFILE			:= n
+ # Sanitizer runtimes are unavailable and cannot be linked here.
 -- 
 2.29.2.299.gdc1121823c-goog
 
