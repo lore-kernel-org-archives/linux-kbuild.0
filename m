@@ -2,69 +2,59 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 269A2C63798
-	for <linux-kbuild@archiver.kernel.org>; Sat, 21 Nov 2020 03:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52D0C388F9
+	for <linux-kbuild@archiver.kernel.org>; Sat, 21 Nov 2020 07:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEFBE2415A
-	for <linux-kbuild@archiver.kernel.org>; Sat, 21 Nov 2020 03:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E50222254
+	for <linux-kbuild@archiver.kernel.org>; Sat, 21 Nov 2020 07:36:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsNR/Cpm"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBoERCzx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727375AbgKUDON (ORCPT
+        id S1726596AbgKUHfq (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 20 Nov 2020 22:14:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38112 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727358AbgKUDOM (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Nov 2020 22:14:12 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4CCC0613CF;
-        Fri, 20 Nov 2020 19:14:12 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id e10so1289579qte.4;
-        Fri, 20 Nov 2020 19:14:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MnceUBKO5CKDULZmr15ARJRXunPRBIoWz0MuHJiULrg=;
-        b=gsNR/CpmvNQ3U+ijqCwO8esji7bm1QnpPb+gjcQIHmOVilGJtCH7wljw5OuoR2+ByD
-         Eu3ArHbg0KOX4QqUwemDaTkU/zaCmVz9NXecmCRSJQykGNIqev281MSCPFW6iyFfCalh
-         OXU5NgKpKUUxeSGcDHdTDiB+8xUj7RQbdjIsa52m2B9JAVMTC4wE43lynK1gJnIiNcfD
-         9l3VbICmSeaGwxXVG1ypIdI92hsCdUXBe06U+zSDwzqwaBADLFUpJVMg61p6t8YeCIac
-         RAunoKa4yJRKwIKPoTystOV6bK3iAFZIuzfr8A4Wxoe8TDYQp/m8PUNb++rax2JElIaq
-         lP0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MnceUBKO5CKDULZmr15ARJRXunPRBIoWz0MuHJiULrg=;
-        b=EgbDUOfMxzfU4Cj+0mbak3nJaclCFNOiwP1R5ABmxMSKucFyaViGAZsqXmZj5pgiJL
-         R0l0ePWME+9XeTbwBclsEevSzCB3FuN8okiwSI5xt/htcgjjEfzOFKn7lhXK9ZOjOmde
-         qCPy4+lwCSzfJvK+/rOHIy9t7Ic5QQCd2Do29dH9co8QEYAK9N1WbusYoj1R6JizEM6t
-         P1+XRpLwhSftomTz5OioeRzqDSwyEXXY+rlg/micHbnciLX3L69l1chOP28von0uyKAy
-         ncwp1gwjghzYth7T0IOq+af9GG3Y/UIFZey65Oun6wL2AiRNksR+LT/9TJWKRRdrA4YE
-         /cfw==
-X-Gm-Message-State: AOAM532N2ds0qWRc/xPpf9pcEIxG35BVEqWzsmLBLROllNi7gE25wdm6
-        RvnbzrdEwpHO55J7RdNIbOU=
-X-Google-Smtp-Source: ABdhPJwFM1Zex8JyH4dWcYr9Ean4nPf9JBfv8fPcfexg+IsjIR+dtwfqcokR9OMKLw5/d/3ypGQmrg==
-X-Received: by 2002:a05:622a:1cd:: with SMTP id t13mr19064421qtw.39.1605928451613;
-        Fri, 20 Nov 2020 19:14:11 -0800 (PST)
-Received: from ubuntu-m3-large-x86 ([2604:1380:45f1:1d00::1])
-        by smtp.gmail.com with ESMTPSA id o9sm3406683qte.35.2020.11.20.19.14.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 19:14:10 -0800 (PST)
-Date:   Fri, 20 Nov 2020 20:14:09 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
+        Sat, 21 Nov 2020 02:35:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57236 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726161AbgKUHfp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 21 Nov 2020 02:35:45 -0500
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A43012224A;
+        Sat, 21 Nov 2020 07:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605944144;
+        bh=JIOyIP3Z1qYK7PEjNX1ygOHQ10RRXlMdlRpxuOVqaF4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=NBoERCzx0bOfs1Spi/qI4Jr4R9gR8nafDvLzNl5y954yhL+AaVOlArn46YJkANI7T
+         7abJYj5XFHRgl30rA/lbg/rqlMovYayapPUq/NdCriwpLmDqbHGPoFB/SLz/cLTFne
+         1lltJvXcAoTRU2aCkyn4SJsnZCZs0Biim543HgXo=
+Received: by mail-oi1-f177.google.com with SMTP id c80so13347823oib.2;
+        Fri, 20 Nov 2020 23:35:44 -0800 (PST)
+X-Gm-Message-State: AOAM533XGJRslAI2T+3QpkpO+RvNRSTokXUTYapch7qFcAvRgtNw5gjL
+        pF3r1REgFKT6pLRKz68m5wAup7lQ0Now8fP87ps=
+X-Google-Smtp-Source: ABdhPJx40jOdwbcNKyqzBINwkmCmwPpkhWi97MwgNpvEdbPfdyMgPT4NA53Xt6JomdsOtV9RsBYuyUMJZVUA9Le699M=
+X-Received: by 2002:aca:d4d5:: with SMTP id l204mr7701517oig.174.1605944144026;
+ Fri, 20 Nov 2020 23:35:44 -0800 (PST)
+MIME-Version: 1.0
+References: <20201118220731.925424-1-samitolvanen@google.com>
+ <CAKwvOd=5PhCTZ-yHr08gPYNEsGEjZa=rDY0-unhkhofjXhqwLQ@mail.gmail.com>
+ <CAMj1kXEVzDi5=uteUAzG5E=j+aTCHEbMxwDfor-s=DthpREpyw@mail.gmail.com>
+ <CAKwvOdmpBNx9iSguGXivjJ03FaN5rgv2oaXZUQxYPdRccQmdyQ@mail.gmail.com>
+ <CAMj1kXEoPEd6GzjL1XuxTPwitbR03BiBEXpAGtUytMj-h=vCkg@mail.gmail.com> <CAKwvOdmk1D0dLDOHEWX=jHpUxUT2JbwgnF62Qv3Rv=coNPadHg@mail.gmail.com>
+In-Reply-To: <CAKwvOdmk1D0dLDOHEWX=jHpUxUT2JbwgnF62Qv3Rv=coNPadHg@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 21 Nov 2020 08:35:33 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHTtXqssica=ADMOrA+7mhBQv=nGBsR-XR0+LAKk_-dWA@mail.gmail.com>
+Message-ID: <CAMj1kXHTtXqssica=ADMOrA+7mhBQv=nGBsR-XR0+LAKk_-dWA@mail.gmail.com>
+Subject: Re: [PATCH v7 00/17] Add support for Clang LTO
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Will Deacon <will@kernel.org>,
@@ -79,93 +69,68 @@ Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        PCI <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v7 00/17] Add support for Clang LTO
-Message-ID: <20201121031409.GA2282710@ubuntu-m3-large-x86>
-References: <20201118220731.925424-1-samitolvanen@google.com>
- <CAKwvOd=5PhCTZ-yHr08gPYNEsGEjZa=rDY0-unhkhofjXhqwLQ@mail.gmail.com>
- <CAMj1kXEVzDi5=uteUAzG5E=j+aTCHEbMxwDfor-s=DthpREpyw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXEVzDi5=uteUAzG5E=j+aTCHEbMxwDfor-s=DthpREpyw@mail.gmail.com>
+        PCI <linux-pci@vger.kernel.org>,
+        Alistair Delva <adelva@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 11:29:51AM +0100, Ard Biesheuvel wrote:
-> On Thu, 19 Nov 2020 at 00:42, Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Sat, 21 Nov 2020 at 00:53, Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Fri, Nov 20, 2020 at 3:30 PM Ard Biesheuvel <ardb@kernel.org> wrote:
 > >
-> > On Wed, Nov 18, 2020 at 2:07 PM Sami Tolvanen <samitolvanen@google.com> wrote:
+> > On Fri, 20 Nov 2020 at 21:19, Nick Desaulniers <ndesaulniers@google.com> wrote:
 > > >
-> > > This patch series adds support for building the kernel with Clang's
-> > > Link Time Optimization (LTO). In addition to performance, the primary
-> > > motivation for LTO is to allow Clang's Control-Flow Integrity (CFI) to
-> > > be used in the kernel. Google has shipped millions of Pixel devices
-> > > running three major kernel versions with LTO+CFI since 2018.
+> > > On Fri, Nov 20, 2020 at 2:30 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> > > >
+> > > > On Thu, 19 Nov 2020 at 00:42, Nick Desaulniers <ndesaulniers@google.com> wrote:
+> > > > >
+> > > > > Thanks for continuing to drive this series Sami.  For the series,
+> > > > >
+> > > > > Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+> > > > >
+> > > > > I did virtualized boot tests with the series applied to aarch64
+> > > > > defconfig without CONFIG_LTO, with CONFIG_LTO_CLANG, and a third time
+> > > > > with CONFIG_THINLTO.  If you make changes to the series in follow ups,
+> > > > > please drop my tested by tag from the modified patches and I'll help
+> > > > > re-test.  Some minor feedback on the Kconfig change, but I'll post it
+> > > > > off of that patch.
+> > > > >
+> > > >
+> > > > When you say 'virtualized" do you mean QEMU on x86? Or actual
+> > > > virtualization on an AArch64 KVM host?
 > > >
-> > > Most of the patches are build system changes for handling LLVM bitcode,
-> > > which Clang produces with LTO instead of ELF object files, postponing
-> > > ELF processing until a later stage, and ensuring initcall ordering.
+> > > aarch64 guest on x86_64 host.  If you have additional configurations
+> > > that are important to you, additional testing help would be
+> > > appreciated.
 > > >
-> > > Note that v7 brings back arm64 support as Will has now staged the
-> > > prerequisite memory ordering patches [1], and drops x86_64 while we work
-> > > on fixing the remaining objtool warnings [2].
-> > >
-> > > [1] https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=for-next/lto
-> > > [2] https://lore.kernel.org/lkml/20201114004911.aip52eimk6c2uxd4@treble/
-> > >
-> > > You can also pull this series from
-> > >
-> > >   https://github.com/samitolvanen/linux.git lto-v7
 > >
-> > Thanks for continuing to drive this series Sami.  For the series,
-> >
-> > Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-> >
-> > I did virtualized boot tests with the series applied to aarch64
-> > defconfig without CONFIG_LTO, with CONFIG_LTO_CLANG, and a third time
-> > with CONFIG_THINLTO.  If you make changes to the series in follow ups,
-> > please drop my tested by tag from the modified patches and I'll help
-> > re-test.  Some minor feedback on the Kconfig change, but I'll post it
-> > off of that patch.
-> >
-> 
-> When you say 'virtualized" do you mean QEMU on x86? Or actual
-> virtualization on an AArch64 KVM host?
-> 
-> The distinction is important here, given the potential impact of LTO
-> on things that QEMU simply does not model when it runs in TCG mode on
-> a foreign host architecture.
+> > Could you run this on an actual phone? Or does Android already ship
+> > with this stuff?
+>
+> By `this`, if you mean "the LTO series", it has been shipping on
+> Android phones for years now, I think it's even required in the latest
+> release.
+>
+> If you mean "the LTO series + mainline" on a phone, well there's the
+> android-mainline of https://android.googlesource.com/kernel/common/,
+> in which this series was recently removed in order to facilitate
+> rebasing Android's patches on ToT-mainline until getting the series
+> landed upstream.  Bit of a chicken and the egg problem there.
+>
+> If you mean "the LTO series + mainline + KVM" on a phone; I don't know
+> the precise state of aarch64 KVM and Android (Will or Marc would
+> know).  We did experiment recently with RockPI's for aach64 KVM, IIRC;
+> I think Android is tricky as it still requires A64+A32/T32 chipsets,
+> Alistair would know more.  Might be interesting to boot a virtualized
+> (or paravirtualized?) guest built with LTO in a host built with LTO
+> for sure, but I don't know if we have tried that yet (I think we did
+> try LTO guests of android kernels, but I think they were on the stock
+> RockPI host BSP image IIRC).
+>
 
-I have booted this series on my Raspberry Pi 4 (ARCH=arm64 defconfig).
-
-$ uname -r
-5.10.0-rc4-00108-g830200082c74
-
-$ zgrep LTO /proc/config.gz
-CONFIG_LTO=y
-CONFIG_ARCH_SUPPORTS_LTO_CLANG=y
-CONFIG_ARCH_SUPPORTS_THINLTO=y
-CONFIG_THINLTO=y
-# CONFIG_LTO_NONE is not set
-CONFIG_LTO_CLANG=y
-# CONFIG_HID_WALTOP is not set
-
-and I have taken that same kernel and booted it under QEMU with
-'-enable-kvm' without any visible issues.
-
-I have tested four combinations:
-
-clang 12 @ f9f0a4046e11c2b4c130640f343e3b2b5db08c1:
-    * CONFIG_THINLTO=y
-    * CONFIG_THINLTO=n
-
-clang 11.0.0
-    * CONFIG_THINLTO=y
-    * CONFIG_THINLTO=n
-
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-
-Cheers,
-Nathan
+I don't think testing under KVM gives us more confidence or coverage
+than testing on bare metal. I was just pointing out that 'virtualized'
+is misleading, and if you test things under QEMU/x86 + TCG, it is
+better to be clear about this, and refer to it as 'under emulation'.
