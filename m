@@ -2,43 +2,43 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E95AC63777
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49093C83014
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7049222C2
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1429922404
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="bBlIUNiI"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="nWR2a++I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387972AbgK1VtQ (ORCPT
+        id S1730659AbgK1VtQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:49:16 -0500
-Received: from condef-05.nifty.com ([202.248.20.70]:54918 "EHLO
-        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732680AbgK1RzN (ORCPT
+Received: from condef-08.nifty.com ([202.248.20.73]:24420 "EHLO
+        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732603AbgK1RyS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Nov 2020 12:55:13 -0500
-Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-05.nifty.com with ESMTP id 0ASBqZ45018999;
+        Sat, 28 Nov 2020 12:54:18 -0500
+Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-08.nifty.com with ESMTP id 0ASBqZ1a006246;
         Sat, 28 Nov 2020 20:52:35 +0900
 Received: from grover.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 0ASBpD6F027804;
-        Sat, 28 Nov 2020 20:51:18 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 0ASBpD6F027804
+        by conuserg-07.nifty.com with ESMTP id 0ASBpD6C027804;
+        Sat, 28 Nov 2020 20:51:15 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 0ASBpD6C027804
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606564278;
-        bh=XyszwlfQ3hvNfVNGL6RnB28DMsdpvA6WSiiDWams/Co=;
+        s=dec2015msa; t=1606564276;
+        bh=rX5Xp2DQ7Fb1cQZ9EkV0O0kQNgRf2+LwScKyCXET4yg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bBlIUNiIm7lTudPcHNSRotKD8Aj8uAV7rzjaW8mbgWPuGWiFyTn58IbdE5yCIROcd
-         Gqvvo7gpdv4GQJKzWTWLzSK/unYxCtBc+eZ05OM4fTBudZ9FiEW0BszvgD6Sj+2XiI
-         T1euA+eFXHQOdOvdoovw41f3SY1qs2pgW5Fq8HU75M6+WFmEymB3E8I2moDCE0ggey
-         KquEwpTdu3zqDL2ApRCaS8HTEwrhBCeWVMsXXwywJRFBJdgRD8wju6jRqKgNUhy4ab
-         AuEYAN0aib8fZgnDP9GVMalL9Zo0mCkgRGruveNkGn3Lf6aMhCVlIb+7Vuy5tbxFfP
-         2afeKU0+KrZNA==
+        b=nWR2a++IXEGtghjl9z0jqeZ7+BR6ExiUmTDFhWNvckXgvnD4xiZM0KCHJtGJmY70l
+         BK99VIcJMVGgI95LumCd4Vis5hmm3ntDOuHlAq9lgPbj3ofXTJ6KfCXAFWecQyStJ4
+         Ge6EMu9V63gbYdf6TzXq7B4zvutNDOoKU0pemzt+dV8a3sFKQBy0r71a5lVwIcGpKY
+         E7u6uKFIE4+ytW0tPEpTUbIGO2CUMdNxiicjqJhxg/eyBRHfZ7mWBf+M+bePrZDPAH
+         U987raOwJ0+ETcOrjmu9CkbcKaPMbwm4MV6fDUcGsIvUk+fzvmlFx5moA7L0wSEX9v
+         7OVE8uI+DEt5A==
 X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -47,9 +47,9 @@ Cc:     Randy Dunlap <rdunlap@infradead.org>,
         Jonathan Corbet <corbet@lwn.net>,
         Michal Marek <michal.lkml@markovi.net>,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 6/7] kbuild: doc: clarify the difference between extra-y and always-y
-Date:   Sat, 28 Nov 2020 20:51:07 +0900
-Message-Id: <20201128115108.179256-6-masahiroy@kernel.org>
+Subject: [PATCH v2 3/7] kbuild: doc: fix 'List directories to visit when descending' section
+Date:   Sat, 28 Nov 2020 20:51:04 +0900
+Message-Id: <20201128115108.179256-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20201128115108.179256-1-masahiroy@kernel.org>
 References: <20201128115108.179256-1-masahiroy@kernel.org>
@@ -59,230 +59,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The difference between extra-y and always-y is obscure.
+Fix stale information:
 
-Basically, Kbuild builds targets listed in extra-y and always-y in
-visited Makefiles without relying on any dependency.
+ - Fix the section number in the reference from 6.4 to 7.4.
 
-The difference is that extra-y is used to list the targets needed for
-vmlinux whereas always-y is used to list the targets that must be always
-built irrespective of final targets.
+ - Remove init-y and net-y. They were removed by commit 23febe375d94
+   ("kbuild: merge init-y into core-y") and commit 95fb6317b3ab
+   ("kbuild: merge net-y and virt-y into drivers-y"), respectively.
 
-Kbuild skips extra-y when it is building only modules (i.e.
-'make modules'). This is the long-standing behavior since extra-y was
-introduced in 2003, and it is explained in that commit log [1].
-
-For clarification, this is the extra-y vs always-y table:
-
-                  extra-y    always-y
-  'make'             y          y
-  'make vmlinux'     y          y
-  'make modules'     n          y
-
-Kbuild skips extra-y also when building external modules since obviously
-it never builds vmlinux.
-
-Unfortunately, extra-y is wrongly used in many places of upstream code,
-and even in external modules.
-
-Using extra-y in external module Makefiles is wrong. What you should
-use is probably always-y or 'targets'.
-
-The current documentation for extra-y is misleading. I rewrote it, and
-moved it to the section 3.7.
-
-always-y is not documented anywhere. I added.
-
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=f94e5fd7e5d09a56a60670a9bb211a791654bba8
+ - Update the example because arch/sparc64/Makefile does not exit.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 ---
 
-Changes in v2:
-  - Use y/n instead of o/x
-  - Fix a typo
+(no changes since v1)
 
- Documentation/kbuild/makefiles.rst | 110 +++++++++++++++++++----------
- 1 file changed, 71 insertions(+), 39 deletions(-)
+ Documentation/kbuild/makefiles.rst | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index 1dde4a096226..4fd6b327a19f 100644
+index 1d4335c7f496..283ccfec7613 100644
 --- a/Documentation/kbuild/makefiles.rst
 +++ b/Documentation/kbuild/makefiles.rst
-@@ -15,13 +15,15 @@ This document describes the Linux kernel Makefiles.
- 	   --- 3.4 Objects which export symbols
- 	   --- 3.5 Library file goals - lib-y
- 	   --- 3.6 Descending down in directories
--	   --- 3.7 Compilation flags
--	   --- 3.8 Dependency tracking
--	   --- 3.9 Custom Rules
--	   --- 3.10 Command change detection
--	   --- 3.11 $(CC) support functions
--	   --- 3.12 $(LD) support functions
--	   --- 3.13 Script Invocation
-+	   --- 3.7 Non-builtin vmlinux targets - extra-y
-+	   --- 3.8 Always built goals - always-y
-+	   --- 3.9 Compilation flags
-+	   --- 3.10 Dependency tracking
-+	   --- 3.11 Custom Rules
-+	   --- 3.12 Command change detection
-+	   --- 3.13 $(CC) support functions
-+	   --- 3.14 $(LD) support functions
-+	   --- 3.15 Script Invocation
+@@ -278,7 +278,7 @@ more details, with real examples.
+ 	actually recognize that there is a lib.a being built, the directory
+ 	shall be listed in libs-y.
  
- 	=== 4 Host Program support
- 	   --- 4.1 Simple Host Program
-@@ -321,7 +323,60 @@ more details, with real examples.
- 	names. This allows kbuild to totally skip the directory if the
- 	corresponding `CONFIG_` option is neither 'y' nor 'm'.
+-	See also "6.4 List directories to visit when descending".
++	See also "7.4 List directories to visit when descending".
  
--3.7 Compilation flags
-+3.7 Non-builtin vmlinux targets - extra-y
-+-----------------------------------------
-+
-+	extra-y specifies targets which are needed for building vmlinux,
-+	but not combined into built-in.a.
-+
-+	Examples are:
-+
-+	1) head objects
-+
-+	    Some objects must be placed at the head of vmlinux. They are
-+	    directly linked to vmlinux without going through built-in.a
-+	    A typical use-case is an object that contains the entry point.
-+
-+	    arch/$(SRCARCH)/Makefile should specify such objects as head-y.
-+
-+	    Discussion:
-+	      Given that we can control the section order in the linker script,
-+	      why do we need head-y?
-+
-+	2) vmlinux linker script
-+
-+	    The linker script for vmlinux is located at
-+	    arch/$(SRCARCH)/kernel/vmlinux.lds
-+
-+	Example::
-+
-+		# arch/x86/kernel/Makefile
-+		extra-y	:= head_$(BITS).o
-+		extra-y	+= head$(BITS).o
-+		extra-y	+= ebda.o
-+		extra-y	+= platform-quirks.o
-+		extra-y	+= vmlinux.lds
-+
-+	$(extra-y) should only contain targets needed for vmlinux.
-+
-+	Kbuild skips extra-y when vmlinux is apparently not a final goal.
-+	(e.g. 'make modules', or building external modules)
-+
-+	If you intend to build targets unconditionally, always-y (explained
-+	in the next section) is the correct syntax to use.
-+
-+3.8 Always built goals - always-y
-+---------------------------------
-+
-+	always-y specifies targets which are literally always built when
-+	Kbuild visits the Makefile.
-+
-+	Example::
-+	  # ./Kbuild
-+	  offsets-file := include/generated/asm-offsets.h
-+	  always-y += $(offsets-file)
-+
-+3.9 Compilation flags
- ---------------------
+ 	Use of lib-y is normally restricted to `lib/` and `arch/*/lib`.
  
-     ccflags-y, asflags-y and ldflags-y
-@@ -410,8 +465,8 @@ more details, with real examples.
- 		AFLAGS_iwmmxt.o      := -Wa,-mcpu=iwmmxt
+@@ -1154,7 +1154,7 @@ When kbuild executes, the following steps are followed (roughly):
+ 	machinery is all architecture-independent.
  
  
--3.8 Dependency tracking
-------------------------
-+3.10 Dependency tracking
-+------------------------
+-	head-y, init-y, core-y, libs-y, drivers-y, net-y
++	head-y, core-y, libs-y, drivers-y
+ 	    $(head-y) lists objects to be linked first in vmlinux.
  
- 	Kbuild tracks dependencies on the following:
+ 	    $(libs-y) lists directories where a lib.a archive can be located.
+@@ -1162,11 +1162,9 @@ When kbuild executes, the following steps are followed (roughly):
+ 	    The rest list directories where a built-in.a object file can be
+ 	    located.
  
-@@ -422,8 +477,8 @@ more details, with real examples.
- 	Thus, if you change an option to $(CC) all affected files will
- 	be re-compiled.
- 
--3.9 Custom Rules
------------------
-+3.11 Custom Rules
-+-----------------
- 
- 	Custom rules are used when the kbuild infrastructure does
- 	not provide the required support. A typical example is
-@@ -499,7 +554,7 @@ more details, with real examples.
- 
- 	will be displayed with "make KBUILD_VERBOSE=0".
- 
--3.10 Command change detection
-+3.12 Command change detection
- -----------------------------
- 
- 	When the rule is evaluated, timestamps are compared between the target
-@@ -545,7 +600,7 @@ more details, with real examples.
- 		unwanted results when the target is up to date and only the
- 		tests on changed commands trigger execution of commands.
- 
--3.11 $(CC) support functions
-+3.13 $(CC) support functions
- ----------------------------
- 
- 	The kernel may be built with several different versions of
-@@ -660,7 +715,7 @@ more details, with real examples.
- 			endif
- 		endif
- 
--3.12 $(LD) support functions
-+3.14 $(LD) support functions
- ----------------------------
- 
-     ld-option
-@@ -674,7 +729,7 @@ more details, with real examples.
- 		#Makefile
- 		LDFLAGS_vmlinux += $(call ld-option, -X)
- 
--3.13 Script invocation
-+3.15 Script invocation
- ----------------------
- 
- 	Make rules may invoke scripts to build the kernel. The rules shall
-@@ -1304,29 +1359,6 @@ When kbuild executes, the following steps are followed (roughly):
- 
- 	When "make" is executed without arguments, bzImage will be built.
- 
--7.6 Building non-kbuild targets
---------------------------------
+-	    $(init-y) objects will be located after $(head-y).
 -
--    extra-y
--	extra-y specifies additional targets created in the current
--	directory, in addition to any targets specified by `obj-*`.
--
--	Listing all targets in extra-y is required for two purposes:
--
--	1) Enable kbuild to check changes in command lines
--
--	   - When $(call if_changed,xxx) is used
--
--	2) kbuild knows what files to delete during "make clean"
--
--	Example::
--
--		#arch/x86/kernel/Makefile
--		extra-y := head.o init_task.o
--
--	In this example, extra-y is used to list object files that
--	shall be built, but shall not be linked as part of built-in.a.
--
- 7.7 Commands useful for building a boot image
- ---------------------------------------------
+ 	    Then the rest follows in this order:
  
+-		$(core-y), $(libs-y), $(drivers-y) and $(net-y).
++		$(core-y), $(libs-y), $(drivers-y)
+ 
+ 	    The top level Makefile defines values for all generic directories,
+ 	    and arch/$(SRCARCH)/Makefile only adds architecture-specific
+@@ -1174,11 +1172,14 @@ When kbuild executes, the following steps are followed (roughly):
+ 
+ 	    Example::
+ 
+-		#arch/sparc64/Makefile
+-		core-y += arch/sparc64/kernel/
+-		libs-y += arch/sparc64/prom/ arch/sparc64/lib/
+-		drivers-$(CONFIG_OPROFILE)  += arch/sparc64/oprofile/
++		# arch/sparc/Makefile
++		core-y                 += arch/sparc/
++
++		libs-y                 += arch/sparc/prom/
++		libs-y                 += arch/sparc/lib/
+ 
++		drivers-$(CONFIG_PM) += arch/sparc/power/
++		drivers-$(CONFIG_OPROFILE)	+= arch/sparc/oprofile/
+ 
+ 7.5 Architecture-specific boot images
+ -------------------------------------
 -- 
 2.27.0
 
