@@ -2,164 +2,215 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B5BC71156
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3583BC63777
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:25:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95374223AB
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDF5C222C2
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="oisVV3r5"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="W+Jc+ZCD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729979AbgK1VtQ (ORCPT
+        id S2387992AbgK1VtR (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 28 Nov 2020 16:49:16 -0500
-Received: from condef-03.nifty.com ([202.248.20.68]:61803 "EHLO
-        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732673AbgK1RzM (ORCPT
+        Sat, 28 Nov 2020 16:49:17 -0500
+Received: from condef-01.nifty.com ([202.248.20.66]:31357 "EHLO
+        condef-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727355AbgK1SCE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Nov 2020 12:55:12 -0500
-Received: from conssluserg-05.nifty.com ([10.126.8.84])by condef-03.nifty.com with ESMTP id 0AS7598n011099;
-        Sat, 28 Nov 2020 16:05:09 +0900
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 0AS74obX013284;
-        Sat, 28 Nov 2020 16:04:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 0AS74obX013284
+        Sat, 28 Nov 2020 13:02:04 -0500
+Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-01.nifty.com with ESMTP id 0ASBqZtX012099;
+        Sat, 28 Nov 2020 20:52:35 +0900
+Received: from grover.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 0ASBpD6E027804;
+        Sat, 28 Nov 2020 20:51:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 0ASBpD6E027804
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606547091;
-        bh=PE39hdI/e7+EZBc7ywdHmRsFj/6iCzNiPht7cSP0zfw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=oisVV3r5ysBMBGWOwAVbjJbHfbOgIv3VbZT4LEWZZQMqNI8e5bEz1MoRINUbV5F6E
-         j+v3cDS11iW4CfXpK9+8yFJViMXmLRQ++rHmFdqt31q7I8WEMxKZM6w9NTkbxEYTSO
-         mhxUthLTsPkzmEZSonXL7s/mew+HSo2iWVQn7ooqkTZ+Cp639rP/7+oGsqRoXS7fS+
-         96ZTqOni4JfYr8J9dWcM6ekydFEsBFaeMZQATYXjexfKrHZ2XSR5VP08sOxwwEOrh+
-         /TFu3eQ8AkSGqgn1oi1M9qKq61A5Ov42wsDW2TUanC0f2e7jaBJ5crNeUt0m3n2U4I
-         UULs77IScPSUg==
-X-Nifty-SrcIP: [209.85.210.173]
-Received: by mail-pf1-f173.google.com with SMTP id x24so6364889pfn.6;
-        Fri, 27 Nov 2020 23:04:51 -0800 (PST)
-X-Gm-Message-State: AOAM533jnjWbMXAaieLrFMyZPHFbj5ouFMszpEmlBptOWyJ7MjVNLO1Q
-        NBINUKNMDiVFhWDAmYp6pM2xISHYaLDuAd83iPI=
-X-Google-Smtp-Source: ABdhPJyEbE7fUISaIUmbRWAYArE+Qu8uv+lh7GUBnbnVkWeGUL6BRii61yVbTAjL74jQpHB7kYEDj3RRjnhV03dHmiQ=
-X-Received: by 2002:a63:3205:: with SMTP id y5mr9717508pgy.47.1606547090308;
- Fri, 27 Nov 2020 23:04:50 -0800 (PST)
-MIME-Version: 1.0
-References: <CAK7LNASn4Si3=YhAPtc06wEqajpU0uBh46-4T10f=cHy=LY2iA@mail.gmail.com>
- <CAHk-=wihYvkKOcXWPjY7wN13DXbh3k2YX_6JxK_1cQ=krbi9kg@mail.gmail.com>
- <CAHk-=wi86Eu8Whu66CVu+GVTxbuJG+QNvDuk-hXnWu+5q90Zeg@mail.gmail.com>
- <CAHk-=winw=9xh6SmFJPZgi8ngVR-ECTA-kDAAU3DEPLMoUrzVA@mail.gmail.com> <CAHk-=wjU4DCuwQ4pXshRbwDCUQB31ScaeuDo1tjoZ0_PjhLHzQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wjU4DCuwQ4pXshRbwDCUQB31ScaeuDo1tjoZ0_PjhLHzQ@mail.gmail.com>
+        s=dec2015msa; t=1606564278;
+        bh=TODuxMl8gWL+vxXaObR8ZNOwfF1y+B82Besh1F6wfpQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=W+Jc+ZCDMPWdX1l67/4zrQT2ep2rn3LFUjolf7sJAU7DCIhWFFISBtJcQTm+XQAGB
+         ZtLyDnWBrFbN0K6wLancl6womFfRueMZW8+39xX9g4CJ5VxhUJC/nqsojSUws4wjFs
+         rXdM3khAS0bw8d897l7XK3+WToVnQ5Ue0dGzffamORXBlJFsP0hxuMY6rJRz8itO0e
+         J61gyn0mrR7ZTQyfjOYvVe4lIk6EEPxYMFUhR+9a1YdQgpgpBL5WkxnCz46bsXGcQ1
+         HNPZjknhkisX1Q9qiQcPTQnizJxEvrgxR9mXrqiTf920Ik7e5Phb9nkL6enFXWKDcz
+         ud8Cm8ygwhf9g==
+X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 28 Nov 2020 16:04:13 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQtABssBH2LGThgv-F3_aSrz9Hd-ra9Yyu4-FFzY1nsUw@mail.gmail.com>
-Message-ID: <CAK7LNAQtABssBH2LGThgv-F3_aSrz9Hd-ra9Yyu4-FFzY1nsUw@mail.gmail.com>
-Subject: Re: [GIT PULL 2/2] Kconfig updates for v5.10-rc1
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Emese Revfy <re.emese@gmail.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 5/7] kbuild: doc: split if_changed explanation to a separate section
+Date:   Sat, 28 Nov 2020 20:51:06 +0900
+Message-Id: <20201128115108.179256-5-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20201128115108.179256-1-masahiroy@kernel.org>
+References: <20201128115108.179256-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Nov 28, 2020 at 7:05 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Fri, Nov 27, 2020 at 1:53 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> >     33.68%  cc1plus
->
-> So a third of the time is the _single_ invocation of cc1plus, which
-> happens from scrips/gcc-plugin.sh doing that
->
->      $HOSTCC -c -x c++ -std=gnu++98 - -fsyntax-only
->
-> thing. Which is purely to verify that plugins work.
->
-> Ugh.
->
-> Emese - I'm talking to myself while I'm looking at why "make
-> allmodconfig" is so unbearably slow. This is part of it.
->
->               Linus
+The if_changed macro is currently explained in the section
+"Commands useful for building a boot image", but the use of
+if_changed is not limited to the boot image.
 
+It is often used together with custom rules. Let's split it as a
+separate section, and insert it after the "Custom Rules" section.
 
-If you do 'make allmodconfig' from the clean source tree,
-some logs are displayed.
+I slightly reworded the explanation, re-numbered to fill the <deleted>
+section, and also fixed the broken indentation of the Note: part.
 
-If you do that once again, no logs,
-which means no recompilation of the 'conf' binary.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Of course, GNU Make evaluates some recipes due to the FORCE,
-but the costs are quite small.
+Changes in v2:
+  - fix typos
 
+ Documentation/kbuild/makefiles.rst | 94 +++++++++++++++++-------------
+ 1 file changed, 52 insertions(+), 42 deletions(-)
 
-
-As for the cc1plus cost, I got a similar result.
-
-Running scripts/gcc-plugin.sh directly
-took me 0.5 sec, which is a fourth
-of the allmodconfig run-time.
-
-Actually, I did not know this shell script
-was so expensive to run...
-
-I also added Kees to CC.
-
-
-Even if we are able to manage this script somehow,
-Kconfig invocation still takes more than 1 sec
-due to the current design.
-
-
-
-masahiro@grover:~/workspace/linux$ make mrproper
-masahiro@grover:~/workspace/linux$ time make allmodconfig
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTCC  scripts/kconfig/confdata.o
-  HOSTCC  scripts/kconfig/expr.o
-  LEX     scripts/kconfig/lexer.lex.c
-  YACC    scripts/kconfig/parser.tab.[ch]
-  HOSTCC  scripts/kconfig/lexer.lex.o
-  HOSTCC  scripts/kconfig/parser.tab.o
-  HOSTCC  scripts/kconfig/preprocess.o
-  HOSTCC  scripts/kconfig/symbol.o
-  HOSTCC  scripts/kconfig/util.o
-  HOSTLD  scripts/kconfig/conf
-#
-# configuration written to .config
-#
-
-real 0m4.415s
-user 0m3.686s
-sys 0m0.763s
-masahiro@grover:~/workspace/linux$ time make allmodconfig
-#
-# No change to .config
-#
-
-real 0m2.041s
-user 0m1.564s
-sys 0m0.519s
-
-masahiro@grover:~/workspace/linux$ export HOSTCC=gcc
-masahiro@grover:~/workspace/linux$ time  scripts/gcc-plugin.sh gcc
-
-real 0m0.560s
-user 0m0.512s
-sys 0m0.048s
-
-
-
-
-
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index 29101d2a0072..1dde4a096226 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -16,9 +16,9 @@ This document describes the Linux kernel Makefiles.
+ 	   --- 3.5 Library file goals - lib-y
+ 	   --- 3.6 Descending down in directories
+ 	   --- 3.7 Compilation flags
+-	   --- 3.8 <deleted>
+-	   --- 3.9 Dependency tracking
+-	   --- 3.10 Custom Rules
++	   --- 3.8 Dependency tracking
++	   --- 3.9 Custom Rules
++	   --- 3.10 Command change detection
+ 	   --- 3.11 $(CC) support functions
+ 	   --- 3.12 $(LD) support functions
+ 	   --- 3.13 Script Invocation
+@@ -410,7 +410,7 @@ more details, with real examples.
+ 		AFLAGS_iwmmxt.o      := -Wa,-mcpu=iwmmxt
+ 
+ 
+-3.9 Dependency tracking
++3.8 Dependency tracking
+ -----------------------
+ 
+ 	Kbuild tracks dependencies on the following:
+@@ -422,8 +422,8 @@ more details, with real examples.
+ 	Thus, if you change an option to $(CC) all affected files will
+ 	be re-compiled.
+ 
+-3.10 Custom Rules
+-------------------
++3.9 Custom Rules
++----------------
+ 
+ 	Custom rules are used when the kbuild infrastructure does
+ 	not provide the required support. A typical example is
+@@ -499,6 +499,52 @@ more details, with real examples.
+ 
+ 	will be displayed with "make KBUILD_VERBOSE=0".
+ 
++3.10 Command change detection
++-----------------------------
++
++	When the rule is evaluated, timestamps are compared between the target
++	and its prerequisite files. GNU Make updates the target when any of the
++	prerequisites is newer than that.
++
++	The target should be rebuilt also when the command line has changed
++	since the last invocation. This is not supported by Make itself, so
++	Kbuild achieves this by a kind of meta-programming.
++
++	if_changed is the macro used for this purpose, in the following form::
++
++		quiet_cmd_<command> = ...
++		      cmd_<command> = ...
++
++		<target>: <source(s)> FORCE
++			$(call if_changed,<command>)
++
++	Any target that utilizes if_changed must be listed in $(targets),
++	otherwise the command line check will fail, and the target will
++	always be built.
++
++	If the target is already listed in the recognized syntax such as
++	obj-y/m, lib-y/m, extra-y/m, always-y, hostprogs, userprogs, Kbuild
++	automatically adds it to $(targets). Otherwise, the target must be
++	explicitly added to $(targets).
++
++	Assignments to $(targets) are without $(obj)/ prefix. if_changed may be
++	used in conjunction with custom rules as defined in "3.9 Custom Rules".
++
++	Note: It is a typical mistake to forget the FORCE prerequisite.
++	Another common pitfall is that whitespace is sometimes significant; for
++	instance, the below will fail (note the extra space after the comma)::
++
++		target: source(s) FORCE
++
++	**WRONG!**	$(call if_changed, objcopy)
++
++	Note:
++		if_changed should not be used more than once per target.
++		It stores the executed command in a corresponding .cmd
++		file and multiple calls would result in overwrites and
++		unwanted results when the target is up to date and only the
++		tests on changed commands trigger execution of commands.
++
+ 3.11 $(CC) support functions
+ ----------------------------
+ 
+@@ -1287,42 +1333,6 @@ When kbuild executes, the following steps are followed (roughly):
+     Kbuild provides a few macros that are useful when building a
+     boot image.
+ 
+-    if_changed
+-	if_changed is the infrastructure used for the following commands.
+-
+-	Usage::
+-
+-		target: source(s) FORCE
+-			$(call if_changed,ld/objcopy/gzip/...)
+-
+-	When the rule is evaluated, it is checked to see if any files
+-	need an update, or the command line has changed since the last
+-	invocation. The latter will force a rebuild if any options
+-	to the executable have changed.
+-	Any target that utilises if_changed must be listed in $(targets),
+-	otherwise the command line check will fail, and the target will
+-	always be built.
+-	Assignments to $(targets) are without $(obj)/ prefix.
+-	if_changed may be used in conjunction with custom rules as
+-	defined in "3.10 Custom Rules".
+-
+-	Note: It is a typical mistake to forget the FORCE prerequisite.
+-	Another common pitfall is that whitespace is sometimes
+-	significant; for instance, the below will fail (note the extra space
+-	after the comma)::
+-
+-		target: source(s) FORCE
+-
+-	**WRONG!**	$(call if_changed, ld/objcopy/gzip/...)
+-
+-        Note:
+-	      if_changed should not be used more than once per target.
+-              It stores the executed command in a corresponding .cmd
+-
+-        file and multiple calls would result in overwrites and
+-        unwanted results when the target is up to date and only the
+-        tests on changed commands trigger execution of commands.
+-
+     ld
+ 	Link target. Often, LDFLAGS_$@ is used to set specific options to ld.
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.27.0
+
