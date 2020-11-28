@@ -2,202 +2,287 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC40DC83024
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E95AC63777
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1CDE223C6
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7049222C2
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="XCLpMLLg"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="bBlIUNiI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732919AbgK1VtR (ORCPT
+        id S2387972AbgK1VtQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 28 Nov 2020 16:49:17 -0500
-Received: from condef-03.nifty.com ([202.248.20.68]:63932 "EHLO
-        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729527AbgK1R63 (ORCPT
+        Sat, 28 Nov 2020 16:49:16 -0500
+Received: from condef-05.nifty.com ([202.248.20.70]:54918 "EHLO
+        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732680AbgK1RzN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Nov 2020 12:58:29 -0500
-Received: from conssluserg-02.nifty.com ([10.126.8.81])by condef-03.nifty.com with ESMTP id 0AS8eI3S019852;
-        Sat, 28 Nov 2020 17:40:18 +0900
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 0AS8drbQ002155;
-        Sat, 28 Nov 2020 17:39:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 0AS8drbQ002155
+        Sat, 28 Nov 2020 12:55:13 -0500
+Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-05.nifty.com with ESMTP id 0ASBqZ45018999;
+        Sat, 28 Nov 2020 20:52:35 +0900
+Received: from grover.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 0ASBpD6F027804;
+        Sat, 28 Nov 2020 20:51:18 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 0ASBpD6F027804
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606552793;
-        bh=aTlTwGLzXn8vCp/ha6WBQD6lF7cen5u0CpCO9/N2svo=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=XCLpMLLgBRXQcGl0KKFHI6raLksfEzuSsh8yzrdb+4Z1Lk0bHRIHAynHWpwLdhOoB
-         M7q0oTBr2lQZdbdepYchKl/XBX3ERsdLkrChd0kHbJ27E2B1CXpzKwlKgSAPaOv9VY
-         lsEseVFlYZJj4NKml6t5QgSCwndSuKs7RybFP8yBTRESn2LQCN5i2mldEKR66xfXBm
-         kIUAMkjaaWGs67oIulDHlMuM8bAcqUR4GNk+YlUPLHaWq5lW/9iUb7Ar+qjCNCNcEC
-         HQkHme1cTmIgCVhaKTTkxpMyi3ftO0bflSpM6uDXZ7FU1LMDCzQp8l0T6NTOquqrej
-         lvKfdA8Z+cK0w==
-X-Nifty-SrcIP: [209.85.210.173]
-Received: by mail-pf1-f173.google.com with SMTP id w202so6478386pff.10;
-        Sat, 28 Nov 2020 00:39:53 -0800 (PST)
-X-Gm-Message-State: AOAM5335L7i9zzUqQY5xBw6oC+JOCIM58aHddbXsy1NC1LA0jZ1ORt2d
-        T1B+zXyXJ9vPcTMTc+OMghu+8wAD3GaxoSlD5/I=
-X-Google-Smtp-Source: ABdhPJzH/RRTTCVpDoB9YseNUTY4WRgLuqAm/Y6Usk7qhxKIJVnareeHP77zIoSHjf+XPw5jSr6uwLefc/4a7s+VYwk=
-X-Received: by 2002:a17:90a:5905:: with SMTP id k5mr14878352pji.198.1606552792634;
- Sat, 28 Nov 2020 00:39:52 -0800 (PST)
-MIME-Version: 1.0
-References: <20201125172544.GJ4332@42.do-not-panic.com>
-In-Reply-To: <20201125172544.GJ4332@42.do-not-panic.com>
+        s=dec2015msa; t=1606564278;
+        bh=XyszwlfQ3hvNfVNGL6RnB28DMsdpvA6WSiiDWams/Co=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bBlIUNiIm7lTudPcHNSRotKD8Aj8uAV7rzjaW8mbgWPuGWiFyTn58IbdE5yCIROcd
+         Gqvvo7gpdv4GQJKzWTWLzSK/unYxCtBc+eZ05OM4fTBudZ9FiEW0BszvgD6Sj+2XiI
+         T1euA+eFXHQOdOvdoovw41f3SY1qs2pgW5Fq8HU75M6+WFmEymB3E8I2moDCE0ggey
+         KquEwpTdu3zqDL2ApRCaS8HTEwrhBCeWVMsXXwywJRFBJdgRD8wju6jRqKgNUhy4ab
+         AuEYAN0aib8fZgnDP9GVMalL9Zo0mCkgRGruveNkGn3Lf6aMhCVlIb+7Vuy5tbxFfP
+         2afeKU0+KrZNA==
+X-Nifty-SrcIP: [126.90.211.135]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 28 Nov 2020 17:39:15 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATaDqZdOF_KK4z+mPz7FO6gPFCWCviamzR8TmDdpaXYmg@mail.gmail.com>
-Message-ID: <CAK7LNATaDqZdOF_KK4z+mPz7FO6gPFCWCviamzR8TmDdpaXYmg@mail.gmail.com>
-Subject: Re: kconfig as a git subtree on Linux
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Boris Kolpackov <boris@codesynthesis.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Felix Fietkau <nbd@openwrt.org>,
-        Patrick Franz <patfra71@gmail.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Junio C Hamano <gitster@pobox.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 6/7] kbuild: doc: clarify the difference between extra-y and always-y
+Date:   Sat, 28 Nov 2020 20:51:07 +0900
+Message-Id: <20201128115108.179256-6-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20201128115108.179256-1-masahiroy@kernel.org>
+References: <20201128115108.179256-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 2:25 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> I'd like to propose we discuss the possibility of taking kconfig and
-> making it a git subtree under the Linux kernel. This would allow
-> other projects outside of the Linux kernel to be able to update their
-> own copy / fork of kconfig in a jiffie *very* easily.
->
-> Why? kconfig has far outlived its own purpose as a modeling variablity
-> language hack on the Linux kernel, and *is* forked and *used* by *many*
-> projects, to the point I think ignoring its use outside of the Linux
-> kernel is doing a disservice to its own growth. Counting just personal
-> projects I have 3 projects which use kconfig alone. Last time I counted
-> about 30 or so external projects. I'm confident this is a shy number
-> of today's reality.
->
-> Yes this does beg the question, that if this is done, can / should
-> this be considered elsewhere. And yes, I'd like to hear the rants
-> about why this would be a completely unacceptable practice *at all*.
->
-> I've been using git subtrees now for another project and I'm *very*
-> happy with it so far. It lets me keep a project with some code on
-> its own git tree, and then multiple third party trees can embrace
-> it, and decide to update later whenever they want. An example is the
-> update_ssh_config [0] python script which I use on kdevops [1] for
-> vagrant, but since it is also used for terraform and terraform uses
-> modules I ended up sharing the code for terraform for its own
-> terrarorm module [2] [3]. I do most development and unit testing
-> on the main update_ssh_config git tree, and when I want to integrate
-> its changes into kdevops I just run:
->
-> make refresh
->
-> This is because on kdevops I have:
->
-> $ cat Makefile.subtrees
-> # If you need to use a git subtree, please add it here.
-> add-remotes:
->         git remote add update_ssh_config https://github.com/mcgrof/update_ssh_config.git
->
-> add-commits:
->         git subtree add --prefix=playbooks/roles/update_ssh_config_vagrant/update_ssh_config update_ssh_config master
->
-> refresh:
->         git fetch update_ssh_config git subtree pull --prefix=playbooks/roles/update_ssh_config_vagrant/update_ssh_config update_ssh_config master
->
-> Likewise for my terraform module, however there I just have these
-> targets on my make Makefile. A person who first git cloned either the
-> kdevops tree of the terraform module tree would first have to run the
-> targets:
->
->    * make add-remotes
->    * make add-commits
->
-> Today's process for updating kconfig on external projects requires
-> substrantial manual oversight.
->
-> [0] https://github.com/mcgrof/update_ssh_config
-> [1] https://github.com/mcgrof/kdevops/
-> [2] https://github.com/mcgrof/terraform-kdevops-add-host-ssh-config
-> [3] https://registry.terraform.io/modules/mcgrof/add-host-ssh-config/kdevops/latest
->
->   Luis
+The difference between extra-y and always-y is obscure.
 
+Basically, Kbuild builds targets listed in extra-y and always-y in
+visited Makefiles without relying on any dependency.
 
+The difference is that extra-y is used to list the targets needed for
+vmlinux whereas always-y is used to list the targets that must be always
+built irrespective of final targets.
 
+Kbuild skips extra-y when it is building only modules (i.e.
+'make modules'). This is the long-standing behavior since extra-y was
+introduced in 2003, and it is explained in that commit log [1].
 
-I want to keep Kconfig in the kernel tree.
+For clarification, this is the extra-y vs always-y table:
 
-Other projects can throw in scripts/kconfig/,
-but in some cases, they might need some adjustments
-for their use.
+                  extra-y    always-y
+  'make'             y          y
+  'make vmlinux'     y          y
+  'make modules'     n          y
 
+Kbuild skips extra-y also when building external modules since obviously
+it never builds vmlinux.
 
+Unfortunately, extra-y is wrongly used in many places of upstream code,
+and even in external modules.
 
-Kconfig is almost standalone, but in reality,
-there are some interactions between the build system
-and kconfig.
+Using extra-y in external module Makefiles is wrong. What you should
+use is probably always-y or 'targets'.
 
+The current documentation for extra-y is misleading. I rewrote it, and
+moved it to the section 3.7.
 
-I want to reserve the freedom for optimizations
-that span across both kbuild and kconfig.
+always-y is not documented anywhere. I added.
 
-For example,
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=f94e5fd7e5d09a56a60670a9bb211a791654bba8
 
-058507195b534e6a1b3e8bf716b816ecf090c9c3
-8b41fc4454e36fbfdbb23f940d023d4dece2de29
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+---
 
-If we split Kconfig out as a standalone project,
-such optimizations would become difficult.
+Changes in v2:
+  - Use y/n instead of o/x
+  - Fix a typo
 
+ Documentation/kbuild/makefiles.rst | 110 +++++++++++++++++++----------
+ 1 file changed, 71 insertions(+), 39 deletions(-)
 
-
-
-A long time has passed since the Kconfig introduction, but
-the Kconfig implementation is still in an immature state, in my opinion.
-
-
-I want to fix them, and some of them are done
-in a way that breaks backward compatibility.
-
-
-In such cases, I fix in-kernel Kconfig files first,
-and then, I fix the kconfig implementation.
-
-For example,
-
-Fix users:   8636a1f9677db4f883f29a072f401303acfc2edd
-Fix Kconfig: f5451582c4e22ce8912aae4950810f3598c9b516
-
-
-Fix users:   df8df5e4bc37e39010cfdf5d50cf726fe08aae5b
-Fix Kconfig: 09d5873e4d1f70202314b5fe40160f9b14b9d2d0
-
-
-I can proceed confidently because we have Kconfig files
-and scripts/kconfig in the same tree, and I can
-do build tests easily.
-
-
-Again, if we split Kconfig as a standalone project,
-I would need to care about which projects would be
-affected by such changes, say, not only Linux but also
-dozens of projects, which I do not know much about.
-
-
-
-
-
-
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index 1dde4a096226..4fd6b327a19f 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -15,13 +15,15 @@ This document describes the Linux kernel Makefiles.
+ 	   --- 3.4 Objects which export symbols
+ 	   --- 3.5 Library file goals - lib-y
+ 	   --- 3.6 Descending down in directories
+-	   --- 3.7 Compilation flags
+-	   --- 3.8 Dependency tracking
+-	   --- 3.9 Custom Rules
+-	   --- 3.10 Command change detection
+-	   --- 3.11 $(CC) support functions
+-	   --- 3.12 $(LD) support functions
+-	   --- 3.13 Script Invocation
++	   --- 3.7 Non-builtin vmlinux targets - extra-y
++	   --- 3.8 Always built goals - always-y
++	   --- 3.9 Compilation flags
++	   --- 3.10 Dependency tracking
++	   --- 3.11 Custom Rules
++	   --- 3.12 Command change detection
++	   --- 3.13 $(CC) support functions
++	   --- 3.14 $(LD) support functions
++	   --- 3.15 Script Invocation
+ 
+ 	=== 4 Host Program support
+ 	   --- 4.1 Simple Host Program
+@@ -321,7 +323,60 @@ more details, with real examples.
+ 	names. This allows kbuild to totally skip the directory if the
+ 	corresponding `CONFIG_` option is neither 'y' nor 'm'.
+ 
+-3.7 Compilation flags
++3.7 Non-builtin vmlinux targets - extra-y
++-----------------------------------------
++
++	extra-y specifies targets which are needed for building vmlinux,
++	but not combined into built-in.a.
++
++	Examples are:
++
++	1) head objects
++
++	    Some objects must be placed at the head of vmlinux. They are
++	    directly linked to vmlinux without going through built-in.a
++	    A typical use-case is an object that contains the entry point.
++
++	    arch/$(SRCARCH)/Makefile should specify such objects as head-y.
++
++	    Discussion:
++	      Given that we can control the section order in the linker script,
++	      why do we need head-y?
++
++	2) vmlinux linker script
++
++	    The linker script for vmlinux is located at
++	    arch/$(SRCARCH)/kernel/vmlinux.lds
++
++	Example::
++
++		# arch/x86/kernel/Makefile
++		extra-y	:= head_$(BITS).o
++		extra-y	+= head$(BITS).o
++		extra-y	+= ebda.o
++		extra-y	+= platform-quirks.o
++		extra-y	+= vmlinux.lds
++
++	$(extra-y) should only contain targets needed for vmlinux.
++
++	Kbuild skips extra-y when vmlinux is apparently not a final goal.
++	(e.g. 'make modules', or building external modules)
++
++	If you intend to build targets unconditionally, always-y (explained
++	in the next section) is the correct syntax to use.
++
++3.8 Always built goals - always-y
++---------------------------------
++
++	always-y specifies targets which are literally always built when
++	Kbuild visits the Makefile.
++
++	Example::
++	  # ./Kbuild
++	  offsets-file := include/generated/asm-offsets.h
++	  always-y += $(offsets-file)
++
++3.9 Compilation flags
+ ---------------------
+ 
+     ccflags-y, asflags-y and ldflags-y
+@@ -410,8 +465,8 @@ more details, with real examples.
+ 		AFLAGS_iwmmxt.o      := -Wa,-mcpu=iwmmxt
+ 
+ 
+-3.8 Dependency tracking
+------------------------
++3.10 Dependency tracking
++------------------------
+ 
+ 	Kbuild tracks dependencies on the following:
+ 
+@@ -422,8 +477,8 @@ more details, with real examples.
+ 	Thus, if you change an option to $(CC) all affected files will
+ 	be re-compiled.
+ 
+-3.9 Custom Rules
+-----------------
++3.11 Custom Rules
++-----------------
+ 
+ 	Custom rules are used when the kbuild infrastructure does
+ 	not provide the required support. A typical example is
+@@ -499,7 +554,7 @@ more details, with real examples.
+ 
+ 	will be displayed with "make KBUILD_VERBOSE=0".
+ 
+-3.10 Command change detection
++3.12 Command change detection
+ -----------------------------
+ 
+ 	When the rule is evaluated, timestamps are compared between the target
+@@ -545,7 +600,7 @@ more details, with real examples.
+ 		unwanted results when the target is up to date and only the
+ 		tests on changed commands trigger execution of commands.
+ 
+-3.11 $(CC) support functions
++3.13 $(CC) support functions
+ ----------------------------
+ 
+ 	The kernel may be built with several different versions of
+@@ -660,7 +715,7 @@ more details, with real examples.
+ 			endif
+ 		endif
+ 
+-3.12 $(LD) support functions
++3.14 $(LD) support functions
+ ----------------------------
+ 
+     ld-option
+@@ -674,7 +729,7 @@ more details, with real examples.
+ 		#Makefile
+ 		LDFLAGS_vmlinux += $(call ld-option, -X)
+ 
+-3.13 Script invocation
++3.15 Script invocation
+ ----------------------
+ 
+ 	Make rules may invoke scripts to build the kernel. The rules shall
+@@ -1304,29 +1359,6 @@ When kbuild executes, the following steps are followed (roughly):
+ 
+ 	When "make" is executed without arguments, bzImage will be built.
+ 
+-7.6 Building non-kbuild targets
+--------------------------------
+-
+-    extra-y
+-	extra-y specifies additional targets created in the current
+-	directory, in addition to any targets specified by `obj-*`.
+-
+-	Listing all targets in extra-y is required for two purposes:
+-
+-	1) Enable kbuild to check changes in command lines
+-
+-	   - When $(call if_changed,xxx) is used
+-
+-	2) kbuild knows what files to delete during "make clean"
+-
+-	Example::
+-
+-		#arch/x86/kernel/Makefile
+-		extra-y := head.o init_task.o
+-
+-	In this example, extra-y is used to list object files that
+-	shall be built, but shall not be linked as part of built-in.a.
+-
+ 7.7 Commands useful for building a boot image
+ ---------------------------------------------
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.27.0
+
