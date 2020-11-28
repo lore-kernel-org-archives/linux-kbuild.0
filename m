@@ -2,135 +2,164 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49093C83014
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B5BC71156
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1429922404
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95374223AB
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Nov 2020 22:24:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="nWR2a++I"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="oisVV3r5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730659AbgK1VtQ (ORCPT
+        id S1729979AbgK1VtQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:49:16 -0500
-Received: from condef-08.nifty.com ([202.248.20.73]:24420 "EHLO
-        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732603AbgK1RyS (ORCPT
+Received: from condef-03.nifty.com ([202.248.20.68]:61803 "EHLO
+        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732673AbgK1RzM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 28 Nov 2020 12:54:18 -0500
-Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-08.nifty.com with ESMTP id 0ASBqZ1a006246;
-        Sat, 28 Nov 2020 20:52:35 +0900
-Received: from grover.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 0ASBpD6C027804;
-        Sat, 28 Nov 2020 20:51:15 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 0ASBpD6C027804
+        Sat, 28 Nov 2020 12:55:12 -0500
+Received: from conssluserg-05.nifty.com ([10.126.8.84])by condef-03.nifty.com with ESMTP id 0AS7598n011099;
+        Sat, 28 Nov 2020 16:05:09 +0900
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 0AS74obX013284;
+        Sat, 28 Nov 2020 16:04:51 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 0AS74obX013284
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606564276;
-        bh=rX5Xp2DQ7Fb1cQZ9EkV0O0kQNgRf2+LwScKyCXET4yg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nWR2a++IXEGtghjl9z0jqeZ7+BR6ExiUmTDFhWNvckXgvnD4xiZM0KCHJtGJmY70l
-         BK99VIcJMVGgI95LumCd4Vis5hmm3ntDOuHlAq9lgPbj3ofXTJ6KfCXAFWecQyStJ4
-         Ge6EMu9V63gbYdf6TzXq7B4zvutNDOoKU0pemzt+dV8a3sFKQBy0r71a5lVwIcGpKY
-         E7u6uKFIE4+ytW0tPEpTUbIGO2CUMdNxiicjqJhxg/eyBRHfZ7mWBf+M+bePrZDPAH
-         U987raOwJ0+ETcOrjmu9CkbcKaPMbwm4MV6fDUcGsIvUk+fzvmlFx5moA7L0wSEX9v
-         7OVE8uI+DEt5A==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/7] kbuild: doc: fix 'List directories to visit when descending' section
-Date:   Sat, 28 Nov 2020 20:51:04 +0900
-Message-Id: <20201128115108.179256-3-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201128115108.179256-1-masahiroy@kernel.org>
-References: <20201128115108.179256-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1606547091;
+        bh=PE39hdI/e7+EZBc7ywdHmRsFj/6iCzNiPht7cSP0zfw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=oisVV3r5ysBMBGWOwAVbjJbHfbOgIv3VbZT4LEWZZQMqNI8e5bEz1MoRINUbV5F6E
+         j+v3cDS11iW4CfXpK9+8yFJViMXmLRQ++rHmFdqt31q7I8WEMxKZM6w9NTkbxEYTSO
+         mhxUthLTsPkzmEZSonXL7s/mew+HSo2iWVQn7ooqkTZ+Cp639rP/7+oGsqRoXS7fS+
+         96ZTqOni4JfYr8J9dWcM6ekydFEsBFaeMZQATYXjexfKrHZ2XSR5VP08sOxwwEOrh+
+         /TFu3eQ8AkSGqgn1oi1M9qKq61A5Ov42wsDW2TUanC0f2e7jaBJ5crNeUt0m3n2U4I
+         UULs77IScPSUg==
+X-Nifty-SrcIP: [209.85.210.173]
+Received: by mail-pf1-f173.google.com with SMTP id x24so6364889pfn.6;
+        Fri, 27 Nov 2020 23:04:51 -0800 (PST)
+X-Gm-Message-State: AOAM533jnjWbMXAaieLrFMyZPHFbj5ouFMszpEmlBptOWyJ7MjVNLO1Q
+        NBINUKNMDiVFhWDAmYp6pM2xISHYaLDuAd83iPI=
+X-Google-Smtp-Source: ABdhPJyEbE7fUISaIUmbRWAYArE+Qu8uv+lh7GUBnbnVkWeGUL6BRii61yVbTAjL74jQpHB7kYEDj3RRjnhV03dHmiQ=
+X-Received: by 2002:a63:3205:: with SMTP id y5mr9717508pgy.47.1606547090308;
+ Fri, 27 Nov 2020 23:04:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAK7LNASn4Si3=YhAPtc06wEqajpU0uBh46-4T10f=cHy=LY2iA@mail.gmail.com>
+ <CAHk-=wihYvkKOcXWPjY7wN13DXbh3k2YX_6JxK_1cQ=krbi9kg@mail.gmail.com>
+ <CAHk-=wi86Eu8Whu66CVu+GVTxbuJG+QNvDuk-hXnWu+5q90Zeg@mail.gmail.com>
+ <CAHk-=winw=9xh6SmFJPZgi8ngVR-ECTA-kDAAU3DEPLMoUrzVA@mail.gmail.com> <CAHk-=wjU4DCuwQ4pXshRbwDCUQB31ScaeuDo1tjoZ0_PjhLHzQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wjU4DCuwQ4pXshRbwDCUQB31ScaeuDo1tjoZ0_PjhLHzQ@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sat, 28 Nov 2020 16:04:13 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQtABssBH2LGThgv-F3_aSrz9Hd-ra9Yyu4-FFzY1nsUw@mail.gmail.com>
+Message-ID: <CAK7LNAQtABssBH2LGThgv-F3_aSrz9Hd-ra9Yyu4-FFzY1nsUw@mail.gmail.com>
+Subject: Re: [GIT PULL 2/2] Kconfig updates for v5.10-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Emese Revfy <re.emese@gmail.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Fix stale information:
+On Sat, Nov 28, 2020 at 7:05 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Fri, Nov 27, 2020 at 1:53 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> >     33.68%  cc1plus
+>
+> So a third of the time is the _single_ invocation of cc1plus, which
+> happens from scrips/gcc-plugin.sh doing that
+>
+>      $HOSTCC -c -x c++ -std=gnu++98 - -fsyntax-only
+>
+> thing. Which is purely to verify that plugins work.
+>
+> Ugh.
+>
+> Emese - I'm talking to myself while I'm looking at why "make
+> allmodconfig" is so unbearably slow. This is part of it.
+>
+>               Linus
 
- - Fix the section number in the reference from 6.4 to 7.4.
 
- - Remove init-y and net-y. They were removed by commit 23febe375d94
-   ("kbuild: merge init-y into core-y") and commit 95fb6317b3ab
-   ("kbuild: merge net-y and virt-y into drivers-y"), respectively.
+If you do 'make allmodconfig' from the clean source tree,
+some logs are displayed.
 
- - Update the example because arch/sparc64/Makefile does not exit.
+If you do that once again, no logs,
+which means no recompilation of the 'conf' binary.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Of course, GNU Make evaluates some recipes due to the FORCE,
+but the costs are quite small.
 
-(no changes since v1)
 
- Documentation/kbuild/makefiles.rst | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index 1d4335c7f496..283ccfec7613 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -278,7 +278,7 @@ more details, with real examples.
- 	actually recognize that there is a lib.a being built, the directory
- 	shall be listed in libs-y.
- 
--	See also "6.4 List directories to visit when descending".
-+	See also "7.4 List directories to visit when descending".
- 
- 	Use of lib-y is normally restricted to `lib/` and `arch/*/lib`.
- 
-@@ -1154,7 +1154,7 @@ When kbuild executes, the following steps are followed (roughly):
- 	machinery is all architecture-independent.
- 
- 
--	head-y, init-y, core-y, libs-y, drivers-y, net-y
-+	head-y, core-y, libs-y, drivers-y
- 	    $(head-y) lists objects to be linked first in vmlinux.
- 
- 	    $(libs-y) lists directories where a lib.a archive can be located.
-@@ -1162,11 +1162,9 @@ When kbuild executes, the following steps are followed (roughly):
- 	    The rest list directories where a built-in.a object file can be
- 	    located.
- 
--	    $(init-y) objects will be located after $(head-y).
--
- 	    Then the rest follows in this order:
- 
--		$(core-y), $(libs-y), $(drivers-y) and $(net-y).
-+		$(core-y), $(libs-y), $(drivers-y)
- 
- 	    The top level Makefile defines values for all generic directories,
- 	    and arch/$(SRCARCH)/Makefile only adds architecture-specific
-@@ -1174,11 +1172,14 @@ When kbuild executes, the following steps are followed (roughly):
- 
- 	    Example::
- 
--		#arch/sparc64/Makefile
--		core-y += arch/sparc64/kernel/
--		libs-y += arch/sparc64/prom/ arch/sparc64/lib/
--		drivers-$(CONFIG_OPROFILE)  += arch/sparc64/oprofile/
-+		# arch/sparc/Makefile
-+		core-y                 += arch/sparc/
-+
-+		libs-y                 += arch/sparc/prom/
-+		libs-y                 += arch/sparc/lib/
- 
-+		drivers-$(CONFIG_PM) += arch/sparc/power/
-+		drivers-$(CONFIG_OPROFILE)	+= arch/sparc/oprofile/
- 
- 7.5 Architecture-specific boot images
- -------------------------------------
+As for the cc1plus cost, I got a similar result.
+
+Running scripts/gcc-plugin.sh directly
+took me 0.5 sec, which is a fourth
+of the allmodconfig run-time.
+
+Actually, I did not know this shell script
+was so expensive to run...
+
+I also added Kees to CC.
+
+
+Even if we are able to manage this script somehow,
+Kconfig invocation still takes more than 1 sec
+due to the current design.
+
+
+
+masahiro@grover:~/workspace/linux$ make mrproper
+masahiro@grover:~/workspace/linux$ time make allmodconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/confdata.o
+  HOSTCC  scripts/kconfig/expr.o
+  LEX     scripts/kconfig/lexer.lex.c
+  YACC    scripts/kconfig/parser.tab.[ch]
+  HOSTCC  scripts/kconfig/lexer.lex.o
+  HOSTCC  scripts/kconfig/parser.tab.o
+  HOSTCC  scripts/kconfig/preprocess.o
+  HOSTCC  scripts/kconfig/symbol.o
+  HOSTCC  scripts/kconfig/util.o
+  HOSTLD  scripts/kconfig/conf
+#
+# configuration written to .config
+#
+
+real 0m4.415s
+user 0m3.686s
+sys 0m0.763s
+masahiro@grover:~/workspace/linux$ time make allmodconfig
+#
+# No change to .config
+#
+
+real 0m2.041s
+user 0m1.564s
+sys 0m0.519s
+
+masahiro@grover:~/workspace/linux$ export HOSTCC=gcc
+masahiro@grover:~/workspace/linux$ time  scripts/gcc-plugin.sh gcc
+
+real 0m0.560s
+user 0m0.512s
+sys 0m0.048s
+
+
+
+
+
 -- 
-2.27.0
-
+Best Regards
+Masahiro Yamada
