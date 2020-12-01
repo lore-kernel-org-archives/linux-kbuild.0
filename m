@@ -2,85 +2,81 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81452C64E8A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 09:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E2FC64E7A
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 401A52064C
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 09:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E4852084C
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:35:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="U1xVk2u+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgLAJiy (ORCPT
+        id S1729895AbgLAKfd (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Dec 2020 04:38:54 -0500
-Received: from gate.crashing.org ([63.228.1.57]:50576 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727035AbgLAJix (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Dec 2020 04:38:53 -0500
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 0B19WsYY019369;
-        Tue, 1 Dec 2020 03:32:54 -0600
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id 0B19Wrls019366;
-        Tue, 1 Dec 2020 03:32:53 -0600
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Tue, 1 Dec 2020 03:32:53 -0600
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     =?utf-8?B?RsSBbmctcnXDrCBTw7JuZw==?= <maskray@google.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-toolchains@vger.kernel.org,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        Dmitry Golovin <dima@golovin.in>,
-        Alistair Delva <adelva@google.com>
-Subject: Re: [PATCH v2 3/4] Kbuild: make DWARF version a choice
-Message-ID: <20201201093253.GJ2672@gate.crashing.org>
-References: <CAK7LNAST0Ma4bGGOA_HATzYAmRhZG=x_X=8p_9dKGX7bYc2FMA@mail.gmail.com> <20201104005343.4192504-1-ndesaulniers@google.com> <20201104005343.4192504-4-ndesaulniers@google.com> <CAK7LNAT5MQqUddv+QbFu5ToLBK3eUPArHSBR=5AOS3ONtMqKaw@mail.gmail.com> <CAFP8O3Ki9HoqcV450fn29fBOWAbmuGAdB6USLz8pGsW4Vzf7sg@mail.gmail.com> <CAK7LNAS_hxevOS7hKxepyCBVU-4j87Yf5Y8DB6mFq+4xuaz3AA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAS_hxevOS7hKxepyCBVU-4j87Yf5Y8DB6mFq+4xuaz3AA@mail.gmail.com>
-User-Agent: Mutt/1.4.2.3i
+        Tue, 1 Dec 2020 05:35:33 -0500
+Received: from conuserg-09.nifty.com ([210.131.2.76]:24196 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726134AbgLAKfc (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 1 Dec 2020 05:35:32 -0500
+Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 0B1AYKHf001992;
+        Tue, 1 Dec 2020 19:34:22 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 0B1AYKHf001992
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1606818862;
+        bh=vxNOmjnE2Q8XUTZRqrq4YwyDHWncDyyWUqu6+/iHq3I=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=U1xVk2u+cWbQfDXWWm4VAHedcterADfb+IalZAMfAYnjhfucOVNQvUtVLgi7aBAVD
+         m6nLIOoirE9hjR3ZRBOH56/qcoX5LGY2ehfXNLjH3ajV9Nx7m/HE2ZxHDqlKCZdSsr
+         dj3Gx0Pn31RsgT2PtBY4qBEVcvM4o8KP74P/EikHI1leG9QLNGTsR8E745wtFrFG77
+         lAoGp6dbw/akJl/sC6FqlwVlhf+A5rrbt/CdY97XoPaU+DcdP6IoAIQ2ZAWkeIRAph
+         7Iam8+vI/+y735IQVwuPIWNOy9vBLCD1jxZp8qf86yZm+6SCYu2dFirMlBJc/W+7iL
+         7V5gJCTjfeM+Q==
+X-Nifty-SrcIP: [126.90.211.135]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Quentin Perret <qperret@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/5] modpost: turn missing MODULE_LICENSE() into error
+Date:   Tue,  1 Dec 2020 19:34:16 +0900
+Message-Id: <20201201103418.675850-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20201201103418.675850-1-masahiroy@kernel.org>
+References: <20201201103418.675850-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 12:38:16PM +0900, Masahiro Yamada wrote:
-> > We can bump -Wa,-gdwarf-2 to -Wa,-gdwarf-3 since GNU actually emits
-> > DWARF v3 DW_AT_ranges (see
-> > https://sourceware.org/bugzilla/show_bug.cgi?id=26850 )
-> > This can avoid the `warning: DWARF2 only supports one section per
-> > compilation unit` warning for Clang.
+Do not create modules with no license tag.
 
-That warning should be "there can be only one section with executable
-code per translation unit", or similar.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> I am not a DWARF spec expert.
+ scripts/mod/modpost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Neither am I.
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 43e00867623a..d55d7e5ef111 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2018,7 +2018,7 @@ static void read_symbols(const char *modname)
+ 	if (!mod->is_vmlinux) {
+ 		license = get_modinfo(&info, "license");
+ 		if (!license)
+-			warn("missing MODULE_LICENSE() in %s\n", modname);
++			error("missing MODULE_LICENSE() in %s\n", modname);
+ 		while (license) {
+ 			if (license_is_gpl_compatible(license))
+ 				mod->gpl_compatible = 1;
+-- 
+2.27.0
 
-> Please teach me.
-> 
-> In my understanding, "DWARF2 only supports one section ..."
-> is warned only when building .S files with LLVM_IAS=1
-
-.S files are simply run through the C preprocessor first, and then given
-to the assembler.  The only difference there should be wrt debug info is
-you could have some macros that expand to assembler debug statements.
-
-> If this is due to the limitation of DWARF v2, why is it OK to
-> build .c files with LLVM_IAS?
-
-The compiler can of course make sure not to use certain constructs in
-its generated assembler code, while the assembler will have to swallow
-whatever the user wrote.
-
-
-Segher
