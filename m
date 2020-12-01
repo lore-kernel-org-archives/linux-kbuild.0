@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02155C8302B
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 21:39:46 +0000 (UTC)
-Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95C532085B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41492C8302A
 	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 21:39:43 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id D2A71208DB
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 21:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZHmcfGNp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vXHUajvU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390159AbgLAVjg (ORCPT
+        id S2389934AbgLAVj2 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Dec 2020 16:39:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56506 "EHLO
+        Tue, 1 Dec 2020 16:39:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390015AbgLAVjb (ORCPT
+        with ESMTP id S2389855AbgLAVj1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Dec 2020 16:39:31 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C90A9C094242
-        for <linux-kbuild@vger.kernel.org>; Tue,  1 Dec 2020 13:37:30 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id v13so3969352ybe.18
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Dec 2020 13:37:30 -0800 (PST)
+        Tue, 1 Dec 2020 16:39:27 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D38C09425C
+        for <linux-kbuild@vger.kernel.org>; Tue,  1 Dec 2020 13:37:43 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id b15so2199127qvm.10
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Dec 2020 13:37:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=9TLfWaf58UYL7wICLMCVVnhaOCpYf+H5DpQSRdiy6Cc=;
-        b=ZHmcfGNpa7ZNviH3Lhbi7/0SDEQ3Jls1Fd4loR1GsDVBD7tyPoyw8FMMexSiO0w9DW
-         9RjrozMTcLSgrBxEv1Vz8SoUuZs1OCJb++caQa3OdSsaiYW67cFBU7PQ9LNeGNpQOT/K
-         9NZ2TIpPQb7/71Uv+3b78ioZtiLnITOk2KjhIvpWKQSdMkCVpud7TsnvOO4ORqlpu2u5
-         nOj1pZxLhS/1QmdqjetYddIidvonWTCSBDRIzR5umGDHjrntwGXK/yd6oSDTP2uLIXdB
-         crW36MjeZXAzVs/1lqNDI0q9ni6fGs696oymio04cAycbm2CdWTbsus3NowlMPBHIFwm
-         bePw==
+        bh=aPTc8wYkBIIZS9XLhaJqPHrVGew/rHRzWtLqs6SwnEk=;
+        b=vXHUajvUgn40LQCYOvZPKvqCWjM82atINdDHUGd5EhIZaxvZWNECR6Puf1wV/Xm1fz
+         RZFUluVJoen54/2OkeSIKDLooJAqo6nO6jmid/KnIY+pQsB0jUK1FLQCjzUfvDCGjqfW
+         5DsweDMH7mPM+webX4KoPPbT06j0wd8ib/BAqCtFcLiXN9fRxFfzVzezsrV61oCpnhyb
+         7uduG6UItD7EnvVpEffELx2wbLPqlD3Oqd6UlZIDNGhgDg+wEFbzFvokQCivtnRsGs7N
+         92Et/EOjPux1Tii1bL3i8/gTtmbaMJpflMTGhVRAPssOG6ib3nwdVtng5zkY0hoNy4H7
+         BGdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=9TLfWaf58UYL7wICLMCVVnhaOCpYf+H5DpQSRdiy6Cc=;
-        b=XcOJWUfT0grVvZDRD2QioDneXfSmndwCnLaPEiG3RHlluqCqewuhePcn5sWcQip9H1
-         K7Tk0t+OYcHJlBWm2MMuoKyKmVBuw1giNy3zAv35/jegQ/2ZVb5nJoveUsEUNMQEj78D
-         u+q1HWi5p6JDypYEeyBdg8kIpal8v29T4i/IrDg7PhsNhSGPxumH3KFuudiFCJUyxqwP
-         BwReLuhO5+sAzobxFBzfxzI1RVtOz60jQAVgW9kU67tZOwoHaDS4VigyT5qc01JfsUcL
-         TKWpGcHMFYsfw7k/haoiJk2lLfPptSYN8QBveboMW484utZzIjgshsWCasj6I4KZeSc/
-         sDCw==
-X-Gm-Message-State: AOAM531eGjD/RWruDnxa+mPtOolMUI0Oz3O3BKJyYj03SiXB8eTKgXNi
-        oG+j7APaKbqdpAEk2C6WNAxBZONwexd0v8k3/QQ=
-X-Google-Smtp-Source: ABdhPJznzlwtgR/lC41/SY0FFtURTSnCC2xOHrCPe7akB5kk2L1nv9Me4GAJGApMzwCD081JTdMBkBEIq4IXR3L5M2Q=
+        bh=aPTc8wYkBIIZS9XLhaJqPHrVGew/rHRzWtLqs6SwnEk=;
+        b=ctyDnAfTMQsE9Z/HZ6p+k7xq5QEl4IR9MCwsUHbChiU9cnm3qxxQem+JL6aQdNJpu+
+         ZNIQyXDG7hEm9vr0ffhViGDGFduiAhlIgbTxKX4zdstXacG+2igRVDF99gJS9YsGaqk+
+         Ni2KIdOX+mqb3lVDHMKiO1l3SD9qfz3ibMjazZZg8FlvvFconKOsDktqauyo93djExfR
+         Dx8ZiW3K9wkbh+yeJuCmKYMgL8sSgLGyQ+cA5RwNuOIn9x+0FA8uthgbgD7yO9QrUtcG
+         T6RPfSbdb7c7kS6vEYGElqj1Vk15jXPT45QsVkm4nnNzpO80vOLRYyasDjvmn3GW23vA
+         N9Ow==
+X-Gm-Message-State: AOAM532Boo5d8z5VTExFBibN3Lu+Gnmpri2MuUGtOww2TEmeAB4pK6B1
+        AF+T/fNxPPcX3o5RNo5eUpkV+PNF6Ueoe13ToOQ=
+X-Google-Smtp-Source: ABdhPJx2UMQKvzPc9YbjuAcaOdZsXhK7RlcIM2M9pkfdRpnDBi+U9k28DqELenlSlo2tvxUYIND8c9jWK0Acmjv4ppQ=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:cf0a:: with SMTP id
- f10mr7383764ybg.353.1606858650073; Tue, 01 Dec 2020 13:37:30 -0800 (PST)
-Date:   Tue,  1 Dec 2020 13:36:59 -0800
+ (user=samitolvanen job=sendgmr) by 2002:ad4:5685:: with SMTP id
+ bc5mr5091015qvb.48.1606858662372; Tue, 01 Dec 2020 13:37:42 -0800 (PST)
+Date:   Tue,  1 Dec 2020 13:37:04 -0800
 In-Reply-To: <20201201213707.541432-1-samitolvanen@google.com>
-Message-Id: <20201201213707.541432-9-samitolvanen@google.com>
+Message-Id: <20201201213707.541432-14-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201201213707.541432-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v8 08/16] init: lto: fix PREL32 relocations
+Subject: [PATCH v8 13/16] drivers/misc/lkdtm: disable LTO for rodata.o
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -86,76 +86,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With LTO, the compiler can rename static functions to avoid global
-naming collisions. As initcall functions are typically static,
-renaming can break references to them in inline assembly. This
-change adds a global stub with a stable name for each initcall to
-fix the issue when PREL32 relocations are used.
+Disable LTO for rodata.o to allow objcopy to be used to
+manipulate sections.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Acked-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/init.h | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ drivers/misc/lkdtm/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/init.h b/include/linux/init.h
-index d466bea7ecba..27b9478dcdef 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -209,26 +209,49 @@ extern bool initcall_debug;
-  */
- #define __initcall_section(__sec, __iid)			\
- 	#__sec ".init.." #__iid
-+
-+/*
-+ * With LTO, the compiler can rename static functions to avoid
-+ * global naming collisions. We use a global stub function for
-+ * initcalls to create a stable symbol name whose address can be
-+ * taken in inline assembly when PREL32 relocations are used.
-+ */
-+#define __initcall_stub(fn, __iid, id)				\
-+	__initcall_name(initstub, __iid, id)
-+
-+#define __define_initcall_stub(__stub, fn)			\
-+	int __init __stub(void);				\
-+	int __init __stub(void)					\
-+	{ 							\
-+		return fn();					\
-+	}							\
-+	__ADDRESSABLE(__stub)
- #else
- #define __initcall_section(__sec, __iid)			\
- 	#__sec ".init"
-+
-+#define __initcall_stub(fn, __iid, id)	fn
-+
-+#define __define_initcall_stub(__stub, fn)			\
-+	__ADDRESSABLE(fn)
- #endif
+diff --git a/drivers/misc/lkdtm/Makefile b/drivers/misc/lkdtm/Makefile
+index c70b3822013f..dd4c936d4d73 100644
+--- a/drivers/misc/lkdtm/Makefile
++++ b/drivers/misc/lkdtm/Makefile
+@@ -13,6 +13,7 @@ lkdtm-$(CONFIG_LKDTM)		+= cfi.o
  
- #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
--#define ____define_initcall(fn, __name, __sec)			\
--	__ADDRESSABLE(fn)					\
-+#define ____define_initcall(fn, __stub, __name, __sec)		\
-+	__define_initcall_stub(__stub, fn)			\
- 	asm(".section	\"" __sec "\", \"a\"		\n"	\
- 	    __stringify(__name) ":			\n"	\
--	    ".long	" #fn " - .			\n"	\
-+	    ".long	" __stringify(__stub) " - .	\n"	\
- 	    ".previous					\n");
- #else
--#define ____define_initcall(fn, __name, __sec)			\
-+#define ____define_initcall(fn, __unused, __name, __sec)	\
- 	static initcall_t __name __used 			\
- 		__attribute__((__section__(__sec))) = fn;
- #endif
+ KASAN_SANITIZE_stackleak.o	:= n
+ KCOV_INSTRUMENT_rodata.o	:= n
++CFLAGS_REMOVE_rodata.o		+= $(CC_FLAGS_LTO)
  
- #define __unique_initcall(fn, id, __sec, __iid)			\
- 	____define_initcall(fn,					\
-+		__initcall_stub(fn, __iid, id),			\
- 		__initcall_name(initcall, __iid, id),		\
- 		__initcall_section(__sec, __iid))
- 
+ OBJCOPYFLAGS :=
+ OBJCOPYFLAGS_rodata_objcopy.o	:= \
 -- 
 2.29.2.576.ga3fc446d84-goog
 
