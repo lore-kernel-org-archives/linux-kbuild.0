@@ -2,77 +2,136 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBC3C64E7A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E599BC64E90
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:30:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2FFA207FF
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:19:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87B322084C
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="QlWjGD6P"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="iWwW+u7A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390852AbgLANTM (ORCPT
+        id S2391138AbgLANaU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Dec 2020 08:19:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35078 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390847AbgLANTM (ORCPT
+        Tue, 1 Dec 2020 08:30:20 -0500
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:44554 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387677AbgLANaU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Dec 2020 08:19:12 -0500
-Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21DD1C0617A6
-        for <linux-kbuild@vger.kernel.org>; Tue,  1 Dec 2020 05:18:32 -0800 (PST)
-Received: by nautica.notk.org (Postfix, from userid 1001)
-        id 08008C01B; Tue,  1 Dec 2020 14:17:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-        t=1606828669; bh=O5J2LaBS/B6Qc/kO9fyndSOGTTNP9IO7bp/boMw+3Y4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QlWjGD6Psl1SfsHUD7Xj9QTgTwIXkxOAnP8eFudDsHmBmOdoqCUUDNd+8VQRIZely
-         9xFuxggNqn+Qm/mVipTrDytMQp6IbQNEty30qqaheyerHIg3uk4nYPC9celMWLdZS0
-         KwDmCZOv8r2kZdlTM7Y8LJWqSB1IDi0zhVQr/BHO2ULjXuQ+SlMlgSLqS66B6vUvm3
-         pI6EyL8cgDY4oKkW8rSYlossFbg84Iv/mOIcJfYD5ffBF1pwAoQymp+eIMkcNIIg3w
-         ynIGK8ChwsA86e4PCnl1YE7fWfbiZHkbM9He28twNGJmppM6OAY400dnV9LnltwBgA
-         6fh8jazelFVFA==
-From:   Dominique Martinet <asmadeus@codewreck.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dominique Martinet <asmadeus@codewreck.org>
-Subject: [PATCH 2/2] kbuild: don't hardcode depmod path
-Date:   Tue,  1 Dec 2020 14:17:30 +0100
-Message-Id: <1606828650-29841-2-git-send-email-asmadeus@codewreck.org>
-X-Mailer: git-send-email 1.7.10.4
-In-Reply-To: <1606828650-29841-1-git-send-email-asmadeus@codewreck.org>
-References: <1606828650-29841-1-git-send-email-asmadeus@codewreck.org>
+        Tue, 1 Dec 2020 08:30:20 -0500
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 0B1DT7KD007726;
+        Tue, 1 Dec 2020 22:29:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 0B1DT7KD007726
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1606829348;
+        bh=zMmj+GVqjUXMVH8pNvSfsy5XEgzhkJMYROtJdnMN3pY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=iWwW+u7AL0wi0eiCli/wxrySa1Ui0X2/+q040eqPUcBUg0OpAQVTSbNkrpTlbQiVo
+         y2Gn/lLQ1NrrOj1Epa0ZR4DXlxVXAFSrPi4LKHY+1m4cT1RatL/mDTpnbQ27Ft5UuS
+         ZMSkRtKi179h2FVxV4/ywcJJshTUC5dXcO92eRfmcU/1V5/YvOC1i8q21I/RYslapR
+         QaFcRUytmzIvxKR5E/N1DgSrDcIg3y6JhOHkTmoUQg+ghDvEF0otzPtYF2XQdXmWcS
+         +5igzk5l1lvtycWphzgOoIDGHXH9pH+UJfdQBtyfPJDLWbpG6+CR9kmQhskO3eBaIA
+         QNDTwavPoQk6w==
+X-Nifty-SrcIP: [209.85.215.181]
+Received: by mail-pg1-f181.google.com with SMTP id t37so1193127pga.7;
+        Tue, 01 Dec 2020 05:29:08 -0800 (PST)
+X-Gm-Message-State: AOAM530sgs5smY12zI0S1bx15OVJCzGD5Fb2ONo4vxDnm9V/tgAqjkph
+        yGeirDcZ8BHNnUSXxzI1wqbSPtz4fnhCsF3C+Rc=
+X-Google-Smtp-Source: ABdhPJwLhVrfKiBGqZeTDEx8ocu6LlfKlsT/3v235qiU0r8c0WZO0DqBqtiJr5jMPBwrzY0PYOy/XUJP6+BhtIdsI3s=
+X-Received: by 2002:aa7:9606:0:b029:198:14c4:4f44 with SMTP id
+ q6-20020aa796060000b029019814c44f44mr2478107pfg.80.1606829347544; Tue, 01 Dec
+ 2020 05:29:07 -0800 (PST)
+MIME-Version: 1.0
+References: <20201113195553.1487659-1-natechancellor@gmail.com>
+ <20201119204656.3261686-1-natechancellor@gmail.com> <202011201607.75FA476@keescook>
+In-Reply-To: <202011201607.75FA476@keescook>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 1 Dec 2020 22:28:30 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASmiWkw3+F1_AJWYDAXntcpcNQmdX0d_hVQq7oxQ_m74A@mail.gmail.com>
+Message-ID: <CAK7LNASmiWkw3+F1_AJWYDAXntcpcNQmdX0d_hVQq7oxQ_m74A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kbuild: Hoist '--orphan-handling' into Kconfig
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-depmod is not guaranteed to be in /sbin, just let make look for
-it in the path like all the other invoked programs
+On Sat, Nov 21, 2020 at 9:08 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> On Thu, Nov 19, 2020 at 01:46:56PM -0700, Nathan Chancellor wrote:
+> > Currently, '--orphan-handling=warn' is spread out across four different
+> > architectures in their respective Makefiles, which makes it a little
+> > unruly to deal with in case it needs to be disabled for a specific
+> > linker version (in this case, ld.lld 10.0.1).
+> >
+> > To make it easier to control this, hoist this warning into Kconfig and
+> > the main Makefile so that disabling it is simpler, as the warning will
+> > only be enabled in a couple places (main Makefile and a couple of
+> > compressed boot folders that blow away LDFLAGS_vmlinx) and making it
+> > conditional is easier due to Kconfig syntax. One small additional
+> > benefit of this is saving a call to ld-option on incremental builds
+> > because we will have already evaluated it for CONFIG_LD_ORPHAN_WARN.
+> >
+> > To keep the list of supported architectures the same, introduce
+> > CONFIG_ARCH_WANT_LD_ORPHAN_WARN, which an architecture can select to
+> > gain this automatically after all of the sections are specified and size
+> > asserted. A special thanks to Kees Cook for the help text on this
+> > config.
+> >
+> > Link: https://github.com/ClangBuiltLinux/linux/issues/1187
+> > Acked-by: Kees Cook <keescook@chromium.org>
+> > Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+> > Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+>
+> Masahiro, do you want to take these to get them to Linus for v5.10? I
+> can send them if you'd prefer.
+>
 
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 9e7fd6a065a7..d7bd114836a9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -452,7 +452,7 @@ LEX		= flex
- YACC		= bison
- AWK		= awk
- INSTALLKERNEL  := installkernel
--DEPMOD		= /sbin/depmod
-+DEPMOD		= depmod
- PERL		= perl
- PYTHON		= python
- PYTHON3		= python3
+
+Sorry for the delay.
+
+Applied to linux-kbuild.
+
+
+
+
+
+> -Kees
+>
+> --
+> Kees Cook
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/202011201607.75FA476%40keescook.
+
+
+
 -- 
-2.28.0
-
+Best Regards
+Masahiro Yamada
