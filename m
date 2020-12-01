@@ -2,89 +2,97 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50187C83017
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68891C64E7A
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D3E42080A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 033BB2076C
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 10:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="0NohZ6uJ"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="sh82VYY8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387432AbgLAKfd (ORCPT
+        id S1729538AbgLAKoU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Dec 2020 05:35:33 -0500
-Received: from conuserg-09.nifty.com ([210.131.2.76]:24195 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729504AbgLAKfc (ORCPT
+        Tue, 1 Dec 2020 05:44:20 -0500
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:58145 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729324AbgLAKoU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Dec 2020 05:35:32 -0500
-Received: from oscar.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 0B1AYKHg001992;
-        Tue, 1 Dec 2020 19:34:23 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 0B1AYKHg001992
+        Tue, 1 Dec 2020 05:44:20 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 0B1AhFxh002630;
+        Tue, 1 Dec 2020 19:43:15 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 0B1AhFxh002630
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606818863;
-        bh=VfcHSo85/XelpNnmCDHDeOKYCBPm09TwO459Oz9cQto=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0NohZ6uJ6Ar8tU1eZcEOZGknrP0NGIzAIdZrKKSMyqeNh/V2yGeLElpqEWSzlfmwb
-         zWKfLkv0rnZjiAaSuV85Hojb569KDa+DBvjIoJs3lYBfiUDbpZxOU4XXhZKplnDZnQ
-         IIWraw+YwJCa1zNQPouR4ktX+fc3S4Tq6pF1cXsc/CFVWjrl2FrjU2lwtAM236SPnl
-         bLfmdM+ZzSN2Sn+32IaJwU7FymAmu+IyiZrvN+iwoWBnivPCZcMR7nzFChFsJtaM0u
-         M2GHWgnHe/eWBMYLaT7TZJIFApJ8iEJXtrlnCFaAJ17AZSLeEYZD3sqpVtCxz9qiQb
-         xn2JkuFhdKKEA==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Quentin Perret <qperret@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] modpost: change license incompatibility to error() from fatal()
-Date:   Tue,  1 Dec 2020 19:34:17 +0900
-Message-Id: <20201201103418.675850-4-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201201103418.675850-1-masahiroy@kernel.org>
-References: <20201201103418.675850-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1606819395;
+        bh=pMIMQvJ5hrz3FqswIIZKhGNQpY6MFXLxRQkeQgLnDqM=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=sh82VYY8qV3Oq9A/eOqKCgG43FzFvvLteHZj++uNT+v7RlJSHMr/UNkFu9fL1udVp
+         DTTMjQWokwZWEmQ/Fn4mEMcZN7itGNa6bmkjbow8XJMZ6JswNadXPducC5M3SfnS6+
+         sc/knl0Hq0E/BNOhoEoLPDMjFeSw+hEaKhUu0mD/Q7WPZPm45YNmOeVIOhGqZNwN3j
+         0BeGHCGX0e4dKym4mGUqvjbHbYQw/usKptdBAyHcFLJ7nEqqMtEvmoE+wPMq4sYsn1
+         LxdYUbqr/3xhtOg76JNG3Jqew/HgP4F+fBpmWApq2P7mJ9WElYN0V7gqxRTIdaYpaQ
+         HZbhDPCfbS2SA==
+X-Nifty-SrcIP: [209.85.214.182]
+Received: by mail-pl1-f182.google.com with SMTP id bj5so929983plb.4;
+        Tue, 01 Dec 2020 02:43:15 -0800 (PST)
+X-Gm-Message-State: AOAM533X64oSETEM5iw5zxNpnqNlUdEQ9yfuC0YUTRoHbiZZjRKjFkEB
+        jT0cTqcJqQ1h1dnqUibMZrYVd/9Oy01KwPW3Rnw=
+X-Google-Smtp-Source: ABdhPJzU9mhbmZrWnB67E+X7PCt4UV40yWzMeu2zDhscE9PrkWjTvxP7Whk3SFEd5nK4FCl10HJnDlSbWJS6MRvA3Uw=
+X-Received: by 2002:a17:90a:5304:: with SMTP id x4mr2048220pjh.153.1606819394577;
+ Tue, 01 Dec 2020 02:43:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201117104736.24997-1-olaf@aepfle.de>
+In-Reply-To: <20201117104736.24997-1-olaf@aepfle.de>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 1 Dec 2020 19:42:37 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATq68FyLEuck34uD6zTOfsOu2UP=yS=TX4Bvq+OR-zoNA@mail.gmail.com>
+Message-ID: <CAK7LNATq68FyLEuck34uD6zTOfsOu2UP=yS=TX4Bvq+OR-zoNA@mail.gmail.com>
+Subject: Re: [PATCH v1] kbuild: enforce -Werror=unused-result
+To:     Olaf Hering <olaf@aepfle.de>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Change fatal() to error() to continue running to report more possible
-issues.
+On Tue, Nov 17, 2020 at 7:47 PM Olaf Hering <olaf@aepfle.de> wrote:
+>
+> It is a hard error if a return value is ignored.
+> In case the return value has no meaning, remove the attribute.
+>
+> Signed-off-by: Olaf Hering <olaf@aepfle.de>
 
-There is no difference in the fact that modpost will fail anyway.
+Applied to linux-kbuild.
+Thanks.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- scripts/mod/modpost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index e2c3f65c4721..c7f9acffad42 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -497,7 +497,7 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
+>  KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+>                    -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
+>                    -Werror=implicit-function-declaration -Werror=implicit-int \
+> -                  -Werror=return-type -Wno-format-security \
+> +                  -Werror=return-type -Werror=unused-result -Wno-format-security \
+>                    -std=gnu89
+>  KBUILD_CPPFLAGS := -D__KERNEL__
+>  KBUILD_AFLAGS_KERNEL :=
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index d55d7e5ef111..d907c63b948f 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2145,11 +2145,11 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
- {
- 	switch (exp) {
- 	case export_gpl:
--		fatal("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
-+		error("GPL-incompatible module %s.ko uses GPL-only symbol '%s'\n",
- 		      m, s);
- 		break;
- 	case export_unused_gpl:
--		fatal("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
-+		error("GPL-incompatible module %s.ko uses GPL-only symbol marked UNUSED '%s'\n",
- 		      m, s);
- 		break;
- 	case export_gpl_future:
+
+
 -- 
-2.27.0
-
+Best Regards
+Masahiro Yamada
