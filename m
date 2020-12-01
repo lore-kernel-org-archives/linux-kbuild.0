@@ -2,155 +2,76 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3F6C64E7A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 12:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD04C64E7B
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:19:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47E30206DF
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 12:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49DC1207FF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Dec 2020 13:19:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="nJfgxtSf"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="eQMgz0nD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728349AbgLAM1h (ORCPT
+        id S2390840AbgLANTL (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Dec 2020 07:27:37 -0500
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:41466 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbgLAM1h (ORCPT
+        Tue, 1 Dec 2020 08:19:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35070 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387931AbgLANTJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Dec 2020 07:27:37 -0500
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 0B1CQWoB009844;
-        Tue, 1 Dec 2020 21:26:33 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 0B1CQWoB009844
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1606825593;
-        bh=KWhXf126QdKZSIcCJw3jkh2GX10MniKd1jCj0kydoFw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=nJfgxtSftWBlTEWVRbAeA1HNHcvxd6vqlY3IDtDzIPGx3weWblfqIepRRZLUYVnlj
-         X4623+/a44Ec7DYryjwWxZgPC+tXZ/BVTKwvMla2Ipr+m544Qw9qnqBBc3CWdTqGZI
-         SABly++IBGRjSrVs3/VNT5LowTIsjDK6Doqi+KnyE6bJ077uiDm26c8juHY/gtEGi5
-         6v8IGqH2toM0aLPmbIcEMLlVoNYL/dMyxLKrcIwnRVtHkAzmqd1blQ2ydRTerBRxsw
-         vOYGM86e/PPxDrJpownLV4sdioCtRQeMlBmiVMOz7xjdnzgKrH9ZlLvRWCa8DDRijp
-         nJ4GEYrtfaLJw==
-X-Nifty-SrcIP: [209.85.216.48]
-Received: by mail-pj1-f48.google.com with SMTP id v1so1129771pjr.2;
-        Tue, 01 Dec 2020 04:26:32 -0800 (PST)
-X-Gm-Message-State: AOAM533aih94qkAQmebMSGtBs6ep7SJEiAnBCbRZu3sv/i8a8Usr34HG
-        6Pc3GiQL9kr96t6j7DZKJuqsHxE6aWZe1Kl63P0=
-X-Google-Smtp-Source: ABdhPJxrotxNyHz233h6Czrg+SlWWO9Z9TFpx4dm8LPfrSJcncE+mazgZwdvVQ573qCfB2t7UjUoLvqxAyFiV3KyE4I=
-X-Received: by 2002:a17:90a:c209:: with SMTP id e9mr2490401pjt.87.1606825592194;
- Tue, 01 Dec 2020 04:26:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20201128004505.27619-1-scott.branden@broadcom.com>
-In-Reply-To: <20201128004505.27619-1-scott.branden@broadcom.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 1 Dec 2020 21:25:55 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATD0J3C_mFrXAju8-WmdCmrPmRFn7Um0yebnfL-_zcu8w@mail.gmail.com>
-Message-ID: <CAK7LNATD0J3C_mFrXAju8-WmdCmrPmRFn7Um0yebnfL-_zcu8w@mail.gmail.com>
-Subject: Re: [PATCH] menuconfig,mconf-cfg: Allow specification of ncurses location
-To:     Scott Branden <scott.branden@broadcom.com>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Broadcom Kernel Feedback List 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Bruce Ashfield <bruce.ashfield@gmail.com>,
-        Bruce Ashfield <bruce.ashfield@windriver.com>,
-        Jason Wessel <jason.wessel@windriver.com>,
-        Michal Marek <mmarek@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 1 Dec 2020 08:19:09 -0500
+Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A9C2C0613D6
+        for <linux-kbuild@vger.kernel.org>; Tue,  1 Dec 2020 05:18:29 -0800 (PST)
+Received: by nautica.notk.org (Postfix, from userid 1001)
+        id 4F544C009; Tue,  1 Dec 2020 14:17:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+        t=1606828665; bh=fITzHpExu91uhcfVWcxzP50E4edwLr25ewFvtJBm5bs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=eQMgz0nD+YSPrNTzOhZUBln+D3DKkxBAgKAjxVxQwHLxnzzX+D2Un8qnzCf9bnZIr
+         L6g1ri4KLrRQ5UF1Uuu+aJscTINWWSpNVGHyn+GpXv2g9VtJkLzZwKN1e78e4Mj7lI
+         8JR9vqdJGB7dPnG4oz+3tAoCUkCwoRzqqmwPMf8h1OZcWYwCKwEPGIgai1hxgDgoy0
+         0V1FqT9+9CVKwTg4hTffVjcnezTeb3ZO5pWpiv7Sc8Hgwg1I2y67+Vd0a3vHMU1oel
+         8Qij1U/0dUcjvYhZLWdcYy+tgFt1mm1EupzLyrA1/YyPFYMCo4fKRtWOH2W+mwh/qJ
+         T3MkEAz6XpJbw==
+From:   Dominique Martinet <asmadeus@codewreck.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dominique Martinet <asmadeus@codewreck.org>
+Subject: [PATCH 1/2] ld-version: use /usr/bin/env awk for shebank
+Date:   Tue,  1 Dec 2020 14:17:29 +0100
+Message-Id: <1606828650-29841-1-git-send-email-asmadeus@codewreck.org>
+X-Mailer: git-send-email 1.7.10.4
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Nov 28, 2020 at 9:45 AM Scott Branden
-<scott.branden@broadcom.com> wrote:
->
-> From: Bruce Ashfield <bruce.ashfield@windriver.com>
->
-> In some cross build environments such as the Yocto Project build
-> environment it provides an ncurses library that is compiled
-> differently than the host's version.  This causes display corruption
-> problems when the host's curses includes are used instead of the
-> includes from the provided compiler are overridden.  There is a second
-> case where there is no curses libraries at all on the host system and
-> menuconfig will just fail entirely.
->
-> The solution is simply to allow an override variable in
-> check-lxdialog.sh for environments such as the Yocto Project.  Adding
-> a CROSS_CURSES_LIB and CROSS_CURSES_INC solves the issue and allowing
-> compiling and linking against the right headers and libraries.
->
-> Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
-> cc: Michal Marek <mmarek@suse.cz>
-> cc: linux-kbuild@vger.kernel.org
-> Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
-> Signed-off-by: Scott Branden <scott.branden@broadcom.com>
-> ---
+/usr/bin/awk is not garanteed to exist (and doesn't on e.g. nixos),
+using /usr/bin/env to have it look in PATH is more robust
 
+Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
+---
+I've been carrying these two patchs for local kernel development on
+nixos for a while, I don't think it'd break anything for anyone so
+might as well submit these -- please consider it :)
 
-Some people solve the cross-compiling in Yocto
-by using pkg-config.
+ scripts/ld-version.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-For example,
-
-commit 067c650c456e758f933aaf87a202f841d34be269
-Author: Pavel Modilaynen <pavel.modilaynen@axis.com>
-Date:   Fri Jul 12 13:52:19 2019 +0200
-
-    dtc: Use pkg-config to locate libyaml
-
-    Using Makefile's wildcard with absolute path to detect
-    the presence of libyaml results in false-positive
-    detection when cross-compiling e.g. in yocto environment.
-
-
-
-mconf-cfg.sh already allows the path flexibility with pkg-config.
-Why do you want yet another hook?
-
-
-
-
-
-
-
-
->  scripts/kconfig/mconf-cfg.sh | 8 ++++++++
->  1 file changed, 8 insertions(+)
->  mode change 100755 => 100644 scripts/kconfig/mconf-cfg.sh
->
-> diff --git a/scripts/kconfig/mconf-cfg.sh b/scripts/kconfig/mconf-cfg.sh
-> old mode 100755
-> new mode 100644
-> index aa68ec95620d..32448bc198a5
-> --- a/scripts/kconfig/mconf-cfg.sh
-> +++ b/scripts/kconfig/mconf-cfg.sh
-> @@ -4,6 +4,14 @@
->  PKG="ncursesw"
->  PKG2="ncurses"
->
-> +if [ "$CROSS_CURSES_LIB" != "" ]; then
-> +    echo libs=\'$CROSS_CURSES_LIB\'
-> +    if [ x"$CROSS_CURSES_INC" != x ]; then
-> +       echo cflags=\'$CROSS_CURSES_INC\'
-> +    fi
-> +    exit 0
-> +fi
-> +
->  if [ -n "$(command -v pkg-config)" ]; then
->         if pkg-config --exists $PKG; then
->                 echo cflags=\"$(pkg-config --cflags $PKG)\"
-> --
-> 2.17.1
->
-
-
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+index f2be0ff9a738..05476b8f8925 100755
+--- a/scripts/ld-version.sh
++++ b/scripts/ld-version.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/awk -f
++#!/usr/bin/env -S awk -f
+ # SPDX-License-Identifier: GPL-2.0
+ # extract linker version number from stdin and turn into single number
+ 	{
 -- 
-Best Regards
-Masahiro Yamada
+2.28.0
+
