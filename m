@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA709C83013
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2330BC8300F
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:46:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABF72221FB
+	by mail.kernel.org (Postfix) with ESMTP id D9C45221FD
 	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:46:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728110AbgLCAqQ (ORCPT
+        id S1727088AbgLCAqQ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 2 Dec 2020 19:46:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53880 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727088AbgLCAqO (ORCPT
+        with ESMTP id S1728009AbgLCAqO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 2 Dec 2020 19:46:14 -0500
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A48C061A51
-        for <linux-kbuild@vger.kernel.org>; Wed,  2 Dec 2020 16:44:52 -0800 (PST)
-Received: by mail-pl1-x644.google.com with SMTP id t18so193165plo.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Dec 2020 16:44:52 -0800 (PST)
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262A4C061A52
+        for <linux-kbuild@vger.kernel.org>; Wed,  2 Dec 2020 16:44:54 -0800 (PST)
+Received: by mail-pg1-x542.google.com with SMTP id w16so320890pga.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Dec 2020 16:44:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dc/B94hjAeeyKCOv3YRX+BzkhQc/9V1asn3WsTw2Emg=;
-        b=KCozItYQFWLllJ/3pMAxfk37c5QpWqP3NQUj14wmLRKek80rHiUS1DZNCv0Q4KMxHU
-         5ejxgGHJdYtjtFFmvZqlkr7a6bJJlthvCpWz+9MxqB/qYgicf9da4F8mcbhAft0oYzCk
-         RWU9I+B0O2HNtnqfmJv9wBdTJs3AzyiFYuFkA=
+        bh=Z1WNWr4Yssq0/5Vtew+l4Dfo12ADeEEDmVhirIMi4z0=;
+        b=V09WbiGv0UIvjMaB1tgeu63AuzE7TH1mzAOpyP3g3j9W5AgLjwKDvgnE3LHFfgqWjW
+         0kKOM/r4AIPvRv1TX1FsfW9kXlB+PkWLSohCBDpg5eHla2bgYm0rWENsuCZaC8Vj9cFv
+         QvCrHlRR0Zp7FaQJQNfH6O0b2exmGO1EXUayA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dc/B94hjAeeyKCOv3YRX+BzkhQc/9V1asn3WsTw2Emg=;
-        b=mPEAu/U1gIiGNTadeeZne2cMAsu3WlCxcoljOcIMm4lT33PO1W9T+H7SMTXg+43dDg
-         33fFvJmFjFIPawW4fKAR+/TvC+4pnIq1X1JMR789nap0fvNM4M3Solgn/JOeksxNU2B8
-         xcnP9mEP+wqDib5f5dAXrxwHK8xDwQZgBfIMueosEu5v262JEphNzypUDUC8NIhEn48C
-         hTPwCu/TMlLUl+yA+hJtoMeh3bwbjlkBv2ncbgce8/GYLpYHbvGVg9JrXcWbfb0pTAod
-         KNYBz0m4Qj53+aFfaM7ybpoM68FOMO3Uzmx5gHSJyhtgtqIBDx9Ecwxb6tgMOQrMkgeF
-         OmbA==
-X-Gm-Message-State: AOAM5334kzWj4LX9FBzQTwmblPtZHiKHk4OLaiF/Zs8qLBSvCN1hMV7f
-        UxETStnolgw3Tr1pl8Fn6A/qBA==
-X-Google-Smtp-Source: ABdhPJx6xQenCwuNX2ZCZy/A6ik6/e/dmVRk804M2XukKlxvRwKY15kPrAy5XgSLxnGDaXlwpripig==
-X-Received: by 2002:a17:90a:2941:: with SMTP id x1mr536181pjf.25.1606956292378;
-        Wed, 02 Dec 2020 16:44:52 -0800 (PST)
+        bh=Z1WNWr4Yssq0/5Vtew+l4Dfo12ADeEEDmVhirIMi4z0=;
+        b=TJ85/Qh2yXc4a0mOyU83xhNT7JHpXBdFbEX6xhbd9uTi1JFQJ+Ko0bwEj0SWSZ8c/B
+         co0Jj9yWazqTIfEvLqKApixBeN9cvSRljrX+TLMRMaqvaiQmdNRtmTMH9tZ0knncSL8S
+         kawrdxUyXYcbYX7/3ICyq+C+4mEJff4Waq6PxL27YxFI1xrlh12EDdfyOb+zsKbuofy8
+         CVPw7pu8ahVQYdOpdDU21qAUKR6s7A/VlOWDJ5F8mtQuQWGiJ5dhVnd5R2sFhWRlu9iY
+         3vbEYXKkSEWF4qFHU8VajUhfy/ecJ3i3ygIVHxm8nnuOYpkt2j6V5KstZbj40qQlERoF
+         p7cg==
+X-Gm-Message-State: AOAM532fymnlkRW/Fasi4DSgrCpvFpddz7JXTdpfev8gGYvLPWd07LI5
+        AIoejtQiTatLGdL2LcMY13U7DfDAmukqaNWh
+X-Google-Smtp-Source: ABdhPJxupcqKAfA+6spUnlhW8IX/viTvkmgPPQK2M4J/B8WH49ApqBuj68hx69v8fVuEibwX6AJSQA==
+X-Received: by 2002:a05:6a00:804:b029:198:28cb:5564 with SMTP id m4-20020a056a000804b029019828cb5564mr585025pfk.34.1606956293726;
+        Wed, 02 Dec 2020 16:44:53 -0800 (PST)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id v17sm182577pga.58.2020.12.02.16.44.48
+        by smtp.gmail.com with ESMTPSA id e3sm230780pfe.154.2020.12.02.16.44.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 02 Dec 2020 16:44:50 -0800 (PST)
 From:   Kees Cook <keescook@chromium.org>
@@ -73,51 +73,215 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>,
         clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/7] ubsan: Enable for all*config builds
-Date:   Wed,  2 Dec 2020 16:44:35 -0800
-Message-Id: <20201203004437.389959-6-keescook@chromium.org>
+Subject: [PATCH v2 7/7] ubsan: Expand tests and reporting
+Date:   Wed,  2 Dec 2020 16:44:37 -0800
+Message-Id: <20201203004437.389959-8-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201203004437.389959-1-keescook@chromium.org>
 References: <20201203004437.389959-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Patch-Hashes: v=1; h=sha256; g=b538973a44c54262367b4d33deb73da5b9328033; i=y2ZB2kMMmteaaxHC5mHSUdhJgsBf0nGKs7RacrLCqlE=; m=zUsL7RmnkOj+b6Khcg8fr3fiXPqryJ08VhnTKbEU1Mg=; p=adBx699hUBCCxPOKJsyVzds6QQ4qK9em/JNMtma7uYk=
-X-Patch-Sig: m=pgp; i=keescook@chromium.org; s=0x0x8972F4DFDC6DC026; b=iQIzBAABCgAdFiEEpcP2jyKd1g9yPm4TiXL039xtwCYFAl/INPQACgkQiXL039xtwCbckw/+MHF DMemlYPqFYSNUkcUBfZkp72BYFal/uMFeRTNr+JH7SmQ4qADnIuKPhg/IkuA1CrBhfLoCIVZz0wJp 9uXYIeY73Y9goLfi/uQycbAv2+6n0Ev1ZnEKbRWTXDmJ1PBJdM+SIxx6LgRh+6pwNhF9w+0l4GCuD lU10CJhAwxFaCaA92ijuU25oCLheb+3gCqKK4N0u6diUnxDr61oGnupq/ErwQs0jI5JcoP8tM6T2Y BDRqMr7ZcM5nf/BUTL44oFo0xTWzCfpRzae2Q/OwzWOrAD/ni6Vxtuh59XtxEtMhPXj/GqJTbfl+t DP1xgLbIOiWPC/SCWcg5KS4XEwVCTttkr5pfITzNMs2aqkq5ZvwrX3tHrKHuwZTnje9g1Sxqc8Klq ivVMtK/UrUIZNjMjgzuKIzDwomKSD1u+u2k9Lj+1hnMM+6IceZSDVufUKHMbDnQDZqpBzWGLd07Uv e9EHanX905neUm1uHstqg3R0vX+AP+7DfhYZPwLCTRR2fQoIZIlWvE31QwgZZaSML8wCUUhYAIb4n X2Y/CFvjoyQrNIGHgmOnX9DlUZyFwiljzrqGgUUQCSWv5r3M2tdqkqDtZv99lBPJo/p+Bq3aNUp1V SH9kNgtWPR7W5Gk/bdHcXz7b/lYxykHiAFMe+nZzOBSr4nn/jSKTTDQPJqE8e7Tc=
+X-Patch-Hashes: v=1; h=sha256; g=2cf313139724ec58519e6664e9a14e6268ecf30d; i=5lkU2JU0knpRbnEGI0MkYsIoBxjXl4xXGIllYmzSIGQ=; m=kgOPxhW7R6TIbM/bwRigMo8Ka2QwPGpIF95ynIKphxM=; p=/LAtDzvPWFywHprOgzGx/Lz/VhGmTOdUpXFh8ZmZT5A=
+X-Patch-Sig: m=pgp; i=keescook@chromium.org; s=0x0x8972F4DFDC6DC026; b=iQIzBAABCgAdFiEEpcP2jyKd1g9yPm4TiXL039xtwCYFAl/INPQACgkQiXL039xtwCYy2g//e1+ EI1BbChrdfCHCWJRFW7pVBIi1oM7zL0fF/he+6qvH91idsBFvsoEuQ371CZ4yo5uemkHx/KHNRemK 2q+lvPRUKztKEAK7aaF6SWheUaR5xWDzz6ny7xH2xAfvbe2oX4ahOv9fNhXaAeWaUri7d17/1HV7D P7Z7RgPYEmp056ngiT2jSlktgQBG0Q+r45RDL/Sla86inHgveJd2sSN+PMJyQGspcy2XyxqpQZxl7 LJ0/cRVRcJ8VXx+ufiJlyxNujf2edBwJRuc6+1L/MUzKfFykDKkyNalC7wgPhPJIAiAiFlxgf+hU5 ZJEAKmrN+kLai7Z+8sMy4n/m3zR6rrY0Tl93gFGoThoZwqrbbMut/qC0SogF1WWZ/xNd/zkQ8iVJi Jt60P6ogGMslmJqbBMxBLi6xGIPLr6950ImItmEz5IiHqL8XLlEIsxgyY7KazqxjCNAP3iXaihhZF 4TSscntGIXvD8lZyC9QyZHosH4WrLAcVlJg8hWPxQ6HzbVecyvPRiDJSYWlV2J3OmqEb7jlZvKlOE evxk1QPQx9PiGLAnIPyj2szgqkcMnRZzpQlBKZ9IhmKEzGp2T6PnOnq+UKbBpL3Pd4xC/DinXUkME SEzxqPks1RSUkIZMGt14EUdHymcTu6QVY5QZASn2sUz7Pt6ytA3kqrlOX+5q/ZSQ=
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With UBSAN_OBJECT_SIZE disabled for GCC, only UBSAN_ALIGNMENT remained
-a noisy UBSAN option. Disable it for COMPILE_TEST so the rest of UBSAN
-can be used for full all*config builds or other large combinations.
+Expand the UBSAN tests to include some additional UB cases. Notably the
+out-of-bounds enum loading appears not to work. Also include per-test
+reporting, including the relevant CONFIG_UBSAN... Kconfigs.
 
-Link: https://lore.kernel.org/lkml/CAHk-=wgXW=YLxGN0QVpp-1w5GDd2pf1W-FqY15poKzoVfik2qA@mail.gmail.com/
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- lib/Kconfig.ubsan | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ lib/test_ubsan.c | 74 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 66 insertions(+), 8 deletions(-)
 
-diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
-index 6e8b67d4b0d9..fa78f0f3c1dc 100644
---- a/lib/Kconfig.ubsan
-+++ b/lib/Kconfig.ubsan
-@@ -130,7 +130,6 @@ config UBSAN_ENUM
- config UBSAN_SANITIZE_ALL
- 	bool "Enable instrumentation for the entire kernel"
- 	depends on ARCH_HAS_UBSAN_SANITIZE_ALL
--	depends on !COMPILE_TEST
- 	default y
- 	help
- 	  This option activates instrumentation for the entire kernel.
-@@ -142,7 +141,7 @@ config UBSAN_SANITIZE_ALL
- config UBSAN_ALIGNMENT
- 	bool "Enable checks for pointers alignment"
- 	default !HAVE_EFFICIENT_UNALIGNED_ACCESS
--	depends on !UBSAN_TRAP
-+	depends on !UBSAN_TRAP && !COMPILE_TEST
- 	depends on $(cc-option,-fsanitize=alignment)
- 	help
- 	  This option enables the check of unaligned memory accesses.
+diff --git a/lib/test_ubsan.c b/lib/test_ubsan.c
+index 9ea10adf7a66..5e5d9355ef49 100644
+--- a/lib/test_ubsan.c
++++ b/lib/test_ubsan.c
+@@ -5,32 +5,54 @@
+ 
+ typedef void(*test_ubsan_fp)(void);
+ 
++#define UBSAN_TEST(config, ...)	do {					\
++		pr_info("%s " __VA_ARGS__ "%s(%s=%s)\n", __func__,	\
++			sizeof(" " __VA_ARGS__) > 2 ? " " : "",		\
++			#config, IS_ENABLED(config) ? "y" : "n");	\
++	} while (0)
++
+ static void test_ubsan_add_overflow(void)
+ {
+ 	volatile int val = INT_MAX;
++	volatile unsigned int uval = UINT_MAX;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_SIGNED_OVERFLOW);
+ 	val += 2;
++
++	UBSAN_TEST(CONFIG_UBSAN_UNSIGNED_OVERFLOW);
++	uval += 2;
+ }
+ 
+ static void test_ubsan_sub_overflow(void)
+ {
+ 	volatile int val = INT_MIN;
++	volatile unsigned int uval = 0;
+ 	volatile int val2 = 2;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_SIGNED_OVERFLOW);
+ 	val -= val2;
++
++	UBSAN_TEST(CONFIG_UBSAN_UNSIGNED_OVERFLOW);
++	uval -= val2;
+ }
+ 
+ static void test_ubsan_mul_overflow(void)
+ {
+ 	volatile int val = INT_MAX / 2;
++	volatile unsigned int uval = UINT_MAX / 2;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_SIGNED_OVERFLOW);
+ 	val *= 3;
++
++	UBSAN_TEST(CONFIG_UBSAN_UNSIGNED_OVERFLOW);
++	uval *= 3;
+ }
+ 
+ static void test_ubsan_negate_overflow(void)
+ {
+ 	volatile int val = INT_MIN;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_SIGNED_OVERFLOW);
+ 	val = -val;
+ }
+ 
+@@ -39,37 +61,67 @@ static void test_ubsan_divrem_overflow(void)
+ 	volatile int val = 16;
+ 	volatile int val2 = 0;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_DIV_ZERO);
+ 	val /= val2;
+ }
+ 
+ static void test_ubsan_shift_out_of_bounds(void)
+ {
+-	volatile int val = -1;
+-	int val2 = 10;
++	volatile int neg = -1, wrap = 4;
++	int val1 = 10;
++	int val2 = INT_MAX;
++
++	UBSAN_TEST(CONFIG_UBSAN_SHIFT, "negative exponent");
++	val1 <<= neg;
+ 
+-	val2 <<= val;
++	UBSAN_TEST(CONFIG_UBSAN_SHIFT, "left overflow");
++	val2 <<= wrap;
+ }
+ 
+ static void test_ubsan_out_of_bounds(void)
+ {
+-	volatile int i = 4, j = 5;
++	volatile int i = 4, j = 5, k = -1;
++	volatile char above[4] = { }; /* Protect surrounding memory. */
+ 	volatile int arr[4];
++	volatile char below[4] = { }; /* Protect surrounding memory. */
+ 
++	above[0] = below[0];
++
++	UBSAN_TEST(CONFIG_UBSAN_BOUNDS, "above");
+ 	arr[j] = i;
++
++	UBSAN_TEST(CONFIG_UBSAN_BOUNDS, "below");
++	arr[k] = i;
+ }
+ 
++enum ubsan_test_enum {
++	UBSAN_TEST_ZERO = 0,
++	UBSAN_TEST_ONE,
++	UBSAN_TEST_MAX,
++};
++
+ static void test_ubsan_load_invalid_value(void)
+ {
+ 	volatile char *dst, *src;
+ 	bool val, val2, *ptr;
+-	char c = 4;
++	enum ubsan_test_enum eval, eval2, *eptr;
++	unsigned char c = 0xff;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_BOOL, "bool");
+ 	dst = (char *)&val;
+ 	src = &c;
+ 	*dst = *src;
+ 
+ 	ptr = &val2;
+ 	val2 = val;
++
++	UBSAN_TEST(CONFIG_UBSAN_ENUM, "enum");
++	dst = (char *)&eval;
++	src = &c;
++	*dst = *src;
++
++	eptr = &eval2;
++	eval2 = eval;
+ }
+ 
+ static void test_ubsan_null_ptr_deref(void)
+@@ -77,6 +129,7 @@ static void test_ubsan_null_ptr_deref(void)
+ 	volatile int *ptr = NULL;
+ 	int val;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_OBJECT_SIZE);
+ 	val = *ptr;
+ }
+ 
+@@ -85,6 +138,7 @@ static void test_ubsan_misaligned_access(void)
+ 	volatile char arr[5] __aligned(4) = {1, 2, 3, 4, 5};
+ 	volatile int *ptr, val = 6;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_ALIGNMENT);
+ 	ptr = (int *)(arr + 1);
+ 	*ptr = val;
+ }
+@@ -95,6 +149,7 @@ static void test_ubsan_object_size_mismatch(void)
+ 	volatile int val __aligned(8) = 4;
+ 	volatile long long *ptr, val2;
+ 
++	UBSAN_TEST(CONFIG_UBSAN_OBJECT_SIZE);
+ 	ptr = (long long *)&val;
+ 	val2 = *ptr;
+ }
+@@ -104,15 +159,19 @@ static const test_ubsan_fp test_ubsan_array[] = {
+ 	test_ubsan_sub_overflow,
+ 	test_ubsan_mul_overflow,
+ 	test_ubsan_negate_overflow,
+-	test_ubsan_divrem_overflow,
+ 	test_ubsan_shift_out_of_bounds,
+ 	test_ubsan_out_of_bounds,
+ 	test_ubsan_load_invalid_value,
+-	//test_ubsan_null_ptr_deref, /* exclude it because there is a crash */
+ 	test_ubsan_misaligned_access,
+ 	test_ubsan_object_size_mismatch,
+ };
+ 
++/* Excluded because they Oops the module. */
++static const test_ubsan_fp skip_ubsan_array[] = {
++	test_ubsan_divrem_overflow,
++	test_ubsan_null_ptr_deref,
++};
++
+ static int __init test_ubsan_init(void)
+ {
+ 	unsigned int i;
+@@ -120,7 +179,6 @@ static int __init test_ubsan_init(void)
+ 	for (i = 0; i < ARRAY_SIZE(test_ubsan_array); i++)
+ 		test_ubsan_array[i]();
+ 
+-	(void)test_ubsan_null_ptr_deref; /* to avoid unsed-function warning */
+ 	return 0;
+ }
+ module_init(test_ubsan_init);
 -- 
 2.25.1
 
