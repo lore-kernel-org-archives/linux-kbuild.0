@@ -5,65 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C108C83014
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47004C6369E
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:46:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13746221FB
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E99CE221F7
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Dec 2020 00:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727352AbgLCAph (ORCPT
+        id S1726962AbgLCAqI (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 2 Dec 2020 19:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53734 "EHLO
+        Wed, 2 Dec 2020 19:46:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726929AbgLCAp2 (ORCPT
+        with ESMTP id S1726811AbgLCAqI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Dec 2020 19:45:28 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F84C0617A7
-        for <linux-kbuild@vger.kernel.org>; Wed,  2 Dec 2020 16:44:48 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id b10so149460pfo.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Dec 2020 16:44:48 -0800 (PST)
+        Wed, 2 Dec 2020 19:46:08 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6F7C061A49
+        for <linux-kbuild@vger.kernel.org>; Wed,  2 Dec 2020 16:44:49 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id t18so193099plo.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Dec 2020 16:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=mRr7mYLqkJh9ZS5e88iIisISPz90UDtap+MXccYRY0c=;
-        b=Cu3txwmM9L0Et0fJH8IoAet6yyQ45awEeS2IvEN9eZ3t+2BUdTbcGdjV6zQL50F6z2
-         BepwR5GGPU4tUfeIemqLYZGa01qWnISnY/bgQjRqIcs8dvpt8kxFWwXwBPcz3k6IAjBt
-         ktY1ul4dKagosMycRI0EML92cS4vRAfGIuoZ0=
+        bh=momj+ASHgDWNBxEWCpbYT3s2xBxAd5KeNj7yfrmXJ4k=;
+        b=J+UiHoEEgerhs/xVR+QdCDPPoxkgHW42MgeCYEP5ZKzf7Vvn4mu1VCtSWvVzwKZB05
+         9IhO2K9pkWg0FX/FPQ0tO6LB9WweTORmn2J7OMPzRrV3rXwlbo5KSyQXc/GWZ07BB0TK
+         Tfab9wMOgBc1pnTcUA0ZNC1ry+dKUWeoPPeNA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=mRr7mYLqkJh9ZS5e88iIisISPz90UDtap+MXccYRY0c=;
-        b=E8TmuqBoj3DETDhDNGXErtQv2Wn/bmZ5eF7sJmXA57chsy9EpUXcyjyAINukSUinBX
-         idRiiwoPWlP8KBqwI6I6Vo2sa3H01ccbkTO1takRbDy5Zowin1FKmeU5AIOWBtcYrAMS
-         P0/EYyrcSJSkr6HEdeCdJ6QbhFFGGP8ryNr3FMJHFJORoKnzY20eoggUblBZt9sMpLSJ
-         bL4I86C8eTHDWWPakVkIH+T0MLA7K9KAuv86mhjxJN/z8U8ySwh0MoXia5igutDz5fi9
-         DVDA3OKnDcNYawwnt2MH97gd1UMsX4caZ78pgFt35zttmnsbnYy0IgG3xgP1wPwUh2vD
-         NYLA==
-X-Gm-Message-State: AOAM531q5BaU9REmCPAZxLWOf+4vZE8/ywCjqjq/D//x+MQBsf4g1pP4
-        Cfo8xUOipvBAAVvYzzUE9zdLF3s9Qi2lfooH
-X-Google-Smtp-Source: ABdhPJwdDXWg2OKGgjRlcJO+km1WMMWpfuYnvRzFihiv5/Yr6V3754zxNcB71q0sVnOmBJf9S7gO3g==
-X-Received: by 2002:a62:8c08:0:b029:197:491c:bab1 with SMTP id m8-20020a628c080000b0290197491cbab1mr792967pfd.49.1606956288226;
-        Wed, 02 Dec 2020 16:44:48 -0800 (PST)
+        bh=momj+ASHgDWNBxEWCpbYT3s2xBxAd5KeNj7yfrmXJ4k=;
+        b=oYK3lQwFPjrjPNzgG0RkJazlHtczdunrgKDuIduIaEQ9/phGueQsoycp5QsNJkZbay
+         lUWYIg5KWYM9b3vz/ii9g74GNOfJWWAwPSNaJo3kKhscDY+TRiaGBXSMUrTk42e2jk4p
+         9hVASLDlcy0bvb1W94fPF9MhSr20R2Y0u8U6p0vBv+6PG2gsyLld50aTEnNpfvKJpRCD
+         qs8wA2QhNYSPENO3l6d1CWNJsDMc68txNSR9VsDfaiOFdqyko7G2QoY4n4TIVh6W6GXb
+         Tng3jAMDpjBMunC9YC7Y2lFQuF5GMJZLviT+7p3EmdMY8zJdO44n6NlPRbzlw+82fEoC
+         msww==
+X-Gm-Message-State: AOAM533GWOPWy98xgdLApt8200+figTLNnLQmhrfI1bvDyiAuVFRyez3
+        5G3PDHva3Q+EY+0CRGLlRgHpLg==
+X-Google-Smtp-Source: ABdhPJz7IimuMbq8NNgEZKFOWjQEbfSl4zo0aZDs3ZgHm/hyGTkmgZC5RM5dMSOQOdUowmLVJIq/ug==
+X-Received: by 2002:a17:90b:3355:: with SMTP id lm21mr527519pjb.115.1606956289515;
+        Wed, 02 Dec 2020 16:44:49 -0800 (PST)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id k1sm184483pgm.21.2020.12.02.16.44.46
+        by smtp.gmail.com with ESMTPSA id y25sm231806pfn.44.2020.12.02.16.44.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 02 Dec 2020 16:44:46 -0800 (PST)
 From:   Kees Cook <keescook@chromium.org>
 To:     Andrew Morton <akpm@linux-foundation.org>
 Cc:     Kees Cook <keescook@chromium.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
         Ard Biesheuvel <ardb@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <natechancellor@gmail.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Marco Elver <elver@google.com>,
         Randy Dunlap <rdunlap@infradead.org>,
@@ -74,57 +73,45 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Andrey Ryabinin <aryabinin@virtuozzo.com>,
         clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/7] ubsan: Remove redundant -Wno-maybe-uninitialized
-Date:   Wed,  2 Dec 2020 16:44:31 -0800
-Message-Id: <20201203004437.389959-2-keescook@chromium.org>
+Subject: [PATCH v2 3/7] ubsan: Disable object-size sanitizer under GCC
+Date:   Wed,  2 Dec 2020 16:44:33 -0800
+Message-Id: <20201203004437.389959-4-keescook@chromium.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201203004437.389959-1-keescook@chromium.org>
 References: <20201203004437.389959-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Patch-Hashes: v=1; h=sha256; g=2428e02de8b30f15f15bc076dd88e170ee9eea11; i=tpvA3+fDxfvnjYyYEKdmdqLWx/khXLfRHgeeHKGh3Vo=; m=OMBuArH9nHFHNkTHOfr/Yb/WsrRHnLzoto2YCF8BEV8=; p=EMeFqCFTi1hC44l8oQ2Bi9blFo1D8E+67Yi9oa+iGTQ=
-X-Patch-Sig: m=pgp; i=keescook@chromium.org; s=0x0x8972F4DFDC6DC026; b=iQIzBAABCgAdFiEEpcP2jyKd1g9yPm4TiXL039xtwCYFAl/INPMACgkQiXL039xtwCZx2g//QBg FTuWhD0o/zTNyMw/Qi9B+fGJLdV7PU0UJcWeheVINnp5Glwm6ycnOs71nNBqYzAwL8xWBJ79QEaRi DgQGlEItQQbq6NkkdnMk7eYUJJPeiDDcRBHYPZIsKS37llGUmhLCoMHDAPeLpWVOgRd7vH3yGFMw8 eTQTMszn6DXNhGx9s8mNGvK/nR8L5Vqncnw3s2zAENb9TpMUnasUbK9IKarPEmob4opb2UYI0clVr AnnuK/HO0Cnn1+zXSJbiwuiCGy3xBacnxhSUm78iNCjkIOau7X7H6qvUAj/cu6OxsYbY4OzCFYmLS sdBtaCRhwwBAXIFHuif85o0WX1rLRv8XsFPDXjbP1JA7K/RPnHPgSgVu69DXr6e0RXM2VhATpzECI 0v5NuhVqhYovZOGEb+QH2I+UJNFBND/8j3Rygr5YivuRVNfoKGFnkRFg9Zxe7xteFDHNLXMcYa48w ZlXZskdEcKlSbCwchYuPOVHsrvwKp6yjwCuejp/otAU3xl5NWVwN2gfOlFn7RbuTGo4L7kBSXVMb3 zPZhMm1sTKqUDM6F/0S9uq7z3KaqTqpmic6qEGM1MTZgn21MhB2XqpbwM01jj9fuokKxAtGFQ9pgO bwL1j50imJgh62z2kNREDuY0zMe98wZzmUGJn4ICZCMUXXYma5yVUpZ2ljoFrw1o=
+X-Patch-Hashes: v=1; h=sha256; g=21c865d368e205cfd26bd9d13e0f9f89f171384b; i=L4GcuPKCev5MNqQc0RCGb8oc+Sj9uj4IyIr1ANDlbWc=; m=PBJG7bVEbrc41Z+BEj2wLGOXm7yrIzzNY1qvha6xoa8=; p=jGS9rva7ilUpon3Qx1DX+0oWwKBNC+al8p6dZtl31EM=
+X-Patch-Sig: m=pgp; i=keescook@chromium.org; s=0x0x8972F4DFDC6DC026; b=iQIzBAABCgAdFiEEpcP2jyKd1g9yPm4TiXL039xtwCYFAl/INPMACgkQiXL039xtwCbIUQ/+OkV vjffTNt2uERV7vMRuPwpM9Ir02sn2AX3wrTDxTrLYtPKqDQ6Nv0c6If7kt/ix1Z9j6iPVez1vmnT7 N3DCeyorgb97zQFmYBlpuyEHsIix9bA2anZmEsjoB1l0ipZbjuPM2TiXeD+MppW23DcZkVyrhwXe5 ztJkUJ4H2yark/GEYoKKRqU99wCbLNkcd+UqpOEKZramY8SmOXaWZOrARgDtd9mEWSvQ5ZU0cFQxV cmki5bWEQ4VjPbJNFbICL19bQ67TR/fhZk8BkUbW0+YNozVxOCgkRA64YO+CZHnw3kUq5fcP0y/Dl VVqQ1VAvlBXwSZxjrbZxfdY7PtVGDkIUwuWqECT0wgn0Uv8KYFVPABjnI379t1+JrPiQ338pGRCIJ yL5xJCYeuZOKTFinRoko5o9qODMwVFpx/3CAmafnoItqQ9mrD9Oo/a3sCliuPaXSD1Dn6+ISruKdm s1Tv5MeTaEMHnAnsCgr7ZPExglNSNE2hhlciEJhqcOsad6qivPuIoeVt1qIQxfHMhZv56BH15ndSZ zvn0HcwnYU87shYo5CmlStdL4qMi+TaX9t8zUmiAt4mgDgWnzcD9h04B5WKo6Uf0+AaaDUjJd+ZmZ BuA2kGzeINXkrbt45W/br+R2YMpnWBFPx8go/Psajs84OaxalYGLC2AGy0MzUeVQ=
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In commit 78a5255ffb6a ("Stop the ad-hoc games with -Wno-maybe-initialized")
--Wmaybe-uninitialized was disabled globally, so keeping the disabling logic
-here too doesn't make sense.
+GCC's -fsanitize=object-size (as part of CONFIG_UBSAN_MISC) greatly
+increases stack utilization. Do not allow this under GCC.
 
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/lkml/CAHk-=wjPasyJrDuwDnpHJS2TuQfExwe=px-SzLeN8GFMAQJPmQ@mail.gmail.com/
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- lib/Kconfig.ubsan      | 4 ----
- scripts/Makefile.ubsan | 4 ----
- 2 files changed, 8 deletions(-)
+ lib/Kconfig.ubsan | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
-index 58f8d03d037b..d8d4d6557b80 100644
+index 05147112b355..4190a99b1eaa 100644
 --- a/lib/Kconfig.ubsan
 +++ b/lib/Kconfig.ubsan
-@@ -72,10 +72,6 @@ config UBSAN_MISC
- config UBSAN_SANITIZE_ALL
- 	bool "Enable instrumentation for the entire kernel"
- 	depends on ARCH_HAS_UBSAN_SANITIZE_ALL
--
--	# We build with -Wno-maybe-uninitilzed, but we still want to
--	# use -Wmaybe-uninitilized in allmodconfig builds.
--	# So dependsy bellow used to disable this option in allmodconfig
- 	depends on !COMPILE_TEST
- 	default y
- 	help
-diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
-index 9716dab06bc7..c18fecc53605 100644
---- a/scripts/Makefile.ubsan
-+++ b/scripts/Makefile.ubsan
-@@ -31,7 +31,3 @@ endif
- ifdef CONFIG_UBSAN_TRAP
-       CFLAGS_UBSAN += $(call cc-option, -fsanitize-undefined-trap-on-error)
- endif
--
--      # -fsanitize=* options makes GCC less smart than usual and
--      # increase number of 'maybe-uninitialized false-positives
--      CFLAGS_UBSAN += $(call cc-option, -Wno-maybe-uninitialized)
+@@ -113,6 +113,9 @@ config UBSAN_UNSIGNED_OVERFLOW
+ 
+ config UBSAN_OBJECT_SIZE
+ 	def_bool UBSAN_MISC
++	# gcc hugely expands stack usage with -fsanitize=object-size
++	# https://lore.kernel.org/lkml/CAHk-=wjPasyJrDuwDnpHJS2TuQfExwe=px-SzLeN8GFMAQJPmQ@mail.gmail.com/
++	depends on !CC_IS_GCC
+ 	depends on $(cc-option,-fsanitize=object-size)
+ 
+ config UBSAN_BOOL
 -- 
 2.25.1
 
