@@ -2,106 +2,124 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C70CDC2BB48
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Dec 2020 20:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47318C2BB48
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Dec 2020 21:11:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC64223AA8
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Dec 2020 20:23:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A6F9207AA
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Dec 2020 21:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731360AbgLHUQM (ORCPT
+        id S1729635AbgLHVLS (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 8 Dec 2020 15:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36448 "EHLO
+        Tue, 8 Dec 2020 16:11:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731107AbgLHUNB (ORCPT
+        with ESMTP id S1729625AbgLHVLS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Dec 2020 15:13:01 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2A8C061793
-        for <linux-kbuild@vger.kernel.org>; Tue,  8 Dec 2020 12:12:13 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id l8so3121268ybj.16
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Dec 2020 12:12:13 -0800 (PST)
+        Tue, 8 Dec 2020 16:11:18 -0500
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA1FC0617B0
+        for <linux-kbuild@vger.kernel.org>; Tue,  8 Dec 2020 13:10:07 -0800 (PST)
+Received: by mail-pg1-x541.google.com with SMTP id q3so13367559pgr.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Dec 2020 13:10:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=iPNyURoyyg37PtP5buaF7be4u+mklyusgvVkQ9lf5c4=;
-        b=d8kI5DC6RP4DJ49rtv3HRDmO4lX8xauTeqDg/yxTGOoLSDqV4wdfCyFv+CcWvtjldX
-         4ejQ3sBafhcxKGySlAHEv1lExckfO6zdtRI3cxmx+Ps0/PWoqXlh3RLRpjVB8eeFRVTq
-         5BuqliT5XjXJdQBUHIet86bv4wvG53o48LmzyhRCFmL5UfX9v3Z1Dmh5U1T2edPYRjYL
-         Gq0RyizZJ+a2Das9vAKJIf17GswbLZ/KzC9s/vsYO/GA5lZko3lLclFbZ0k7yRwaHg0S
-         g7jUg2MRJ7776jHriyV4cRG32UwIwgIKjnpRF2H/P7xImiQdCgVrcUHZFHZC3xzUylYD
-         PfDw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JlsOI1fRDP5hh5RRN78La/q8WBPdxUn50gvC+PZHts8=;
+        b=P0U7Ogd8zoiY2n175d1X/g+/fJdAmGtiw6Ed5UHTXp8ErBagDDkxCwMTGBF9BCIOjy
+         pbq/5qwvvmMeWHqUKqTbcNu+xhFsava13TOOa+wLsx8wIArkRm1a9Ar0K9/Kvv8AKw8K
+         wAIbNzDXN/ALgxyANFROrjx2Duw9tqQCdjAO5s/bky5fQ31eeRIzwiwPCCeJ9G21PMfp
+         0uSk9B6jy06FghAAJqiXpgYoIS0I+PnwdJ8bmYhf7TSY4IKWk8Dfbpn8T2PQYftvQb0G
+         TqVBRNnLA45BlEuMp1qEk5rIQLxsS4U1OGfqsttmRzHkFoLCsLcFH/cjS3FxF+XpxVrk
+         VA1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=iPNyURoyyg37PtP5buaF7be4u+mklyusgvVkQ9lf5c4=;
-        b=DIk/SmbJe+Dz2aYE7LSY3iVR8SVjvLwd0lVrL9i0qurvVABmi1U91xLFBpzvJbee5r
-         gg60TcJh/fDkzeK9cp7YIuhgMnaIUKN+zMyo+0NDoMWQkb2MBr3bdR7rPtwvnqvBM0wS
-         Ddo3dUY8rEai9uZNq5XGTVpJna2wLSp9qE1SlMLn+RPdisvSB9Kz/O1jGq3hR1hRBceq
-         lLJ7wcq5fte1sNKX9cNC1W5O1y9t50Rp5cTgBoKdJPCZMb64JlDgf7snrCVc9YWgM20l
-         I59Znj7g7HrglgwSLvgr/Nr0Ru0E0WMikqE+XIAeMkXWjwLVoMZduxbG4WZIRB+5mCMD
-         DOrw==
-X-Gm-Message-State: AOAM530DUT8FZJN5PuqVhYjR8BGDjjR7QNjmFKLeoYkSAdPoxnTDHMRA
-        y66scNL58ErpzvaSo9Wg1oXD4zp7eg9ONWsaVvw=
-X-Google-Smtp-Source: ABdhPJwMJgfuO061kxGkmUoA9VEBMsGmQvj/8WZA4Ev6G7KxHkHqqvemJJmaP6cJeK0oakrTQPUUr/G0FMzTPMjrftk=
-Sender: "willmcvicker via sendgmr" <willmcvicker@willmcvicker.c.googlers.com>
-X-Received: from willmcvicker.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:2dd0])
- (user=willmcvicker job=sendgmr) by 2002:a25:cb45:: with SMTP id
- b66mr27002244ybg.185.1607457914395; Tue, 08 Dec 2020 12:05:14 -0800 (PST)
-Date:   Tue,  8 Dec 2020 20:05:06 +0000
-In-Reply-To: <20201207153116.GA15772@linux-8ccs>
-Message-Id: <20201208200508.4107399-1-willmcvicker@google.com>
-Mime-Version: 1.0
-References: <20201207153116.GA15772@linux-8ccs>
-X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v3 0/2] modules: add scmversion field
-From:   Will McVicker <willmcvicker@google.com>
-To:     Jessica Yu <jeyu@kernel.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JlsOI1fRDP5hh5RRN78La/q8WBPdxUn50gvC+PZHts8=;
+        b=t6heqABH/G4ApGka9zu2PRgjfl+7vSHVdUo1svSqrwu/4FHItjMUvgSaSqA3tCM5GW
+         ockDCqO2Np5Jt/p2pO1v7fESNr/+BK05fzPcPjWkYl68UBOjxYFvvFjtzmyCcsV7E9+6
+         8aXeHbTIOHijCQPhtfdHcBDRFHMPqA8w/jRuEqUs6ecCzEbux7t6cWPb/H4y2HV23qMJ
+         oiKKlQuQ7WZyloC9sRTafY/FhXvVEXiX/7o1pC/He+kZ8P00okyvYsdHbTonamAqmM7+
+         u8/mbB2MPbba2KBplbpxog6OMh91wyrcUJ0kanx3ijhBqZWrlfU/ZaVlc0Rfm/sLB1WE
+         LgNg==
+X-Gm-Message-State: AOAM532DsjSWKPBCrHFKVrtVmU+iXA2M5ESaAzASSeh5rilJ2EbxQPGp
+        Ua/qbuUcYc4sJa48vE9r8tJUv5veFdPCiHy+TGz8UQ==
+X-Google-Smtp-Source: ABdhPJyLnu/bEkr1l2p2adVzNhFUDAMWuxSKY6xfqwbS1B4vhRKyNpYWWFzDSp2GEeJ76KAN+nCTPZuawZcHYARPCnA=
+X-Received: by 2002:a63:3247:: with SMTP id y68mr4840pgy.10.1607461806350;
+ Tue, 08 Dec 2020 13:10:06 -0800 (PST)
+MIME-Version: 1.0
+References: <20201201213707.541432-1-samitolvanen@google.com>
+ <CAK8P3a1WEAo2SEgKUEs3SB7n7QeeHa0=cx_nO==rDK0jjDArow@mail.gmail.com>
+ <CABCJKueCHo2RYfx_A21m+=d1gQLR9QsOOxCsHFeicCqyHkb-Kg@mail.gmail.com> <CAK8P3a1Xfpt7QLkvxjtXKcgzcWkS8g9bmxD687+rqjTafTzKrg@mail.gmail.com>
+In-Reply-To: <CAK8P3a1Xfpt7QLkvxjtXKcgzcWkS8g9bmxD687+rqjTafTzKrg@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 8 Dec 2020 13:09:54 -0800
+Message-ID: <CAKwvOd=hL=Vt1ATYqky9jmv+tM5hpTnLRuZudG-7ki0EYoFGJQ@mail.gmail.com>
+Subject: Re: [PATCH v8 00/16] Add support for Clang LTO
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Saravana Kannan <saravanak@google.com>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        kernel-team@android.com, Will McVicker <willmcvicker@google.com>
+        Steven Rostedt <rostedt@goodmis.org>,
+        Will Deacon <will@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi All,
+On Tue, Dec 8, 2020 at 1:00 PM Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> On Tue, Dec 8, 2020 at 5:43 PM 'Sami Tolvanen' via Clang Built Linux
+> <clang-built-linux@googlegroups.com> wrote:
+> >
+> > On Tue, Dec 8, 2020 at 4:15 AM Arnd Bergmann <arnd@kernel.org> wrote:
+> > >
+> > > - one build seems to take even longer to link. It's currently at 35GB RAM
+> > >   usage and 40 minutes into the final link, but I'm worried it might
+> > > not complete
+> > >   before it runs out of memory.  I only have 128GB installed, and google-chrome
+> > >   uses another 30GB of that, and I'm also doing some other builds in parallel.
+> > >   Is there a minimum recommended amount of memory for doing LTO builds?
+> >
+> > When building arm64 defconfig, the maximum memory usage I measured
+> > with ThinLTO was 3.5 GB, and with full LTO 20.3 GB. I haven't measured
+> > larger configurations, but I believe LLD can easily consume 3-4x that
+> > much with full LTO allyesconfig.
+>
+> Ok, that's not too bad then. Is there actually a reason to still
+> support full-lto
+> in your series? As I understand it, full LTO was the initial approach and
+> used to work better, but thin LTO is actually what we want to use in the
+> long run. Perhaps dropping the full LTO option from your series now
+> that thin LTO works well enough and uses less resources would help
+> avoid some of the problems.
 
-Thanks Jessica for the feedback! I have updated the commit message to
-include the justification and common use cases for the patch series. I
-have also added the config MODULE_SCMVERSION so that this is not enabled
-by default.
-
-Please take a look and let me know of any concerns or issues found.
-
-Thanks,
-Will
-
-Will McVicker (2):
-  scripts/setlocalversion: allow running in a subdir
-  modules: introduce the MODULE_SCMVERSION config
-
- Documentation/ABI/stable/sysfs-module | 18 ++++++++++++++++++
- include/linux/module.h                |  1 +
- init/Kconfig                          | 12 ++++++++++++
- kernel/module.c                       |  2 ++
- scripts/Makefile.modpost              | 22 ++++++++++++++++++++++
- scripts/mod/modpost.c                 | 24 +++++++++++++++++++++++-
- scripts/setlocalversion               |  5 ++---
- 7 files changed, 80 insertions(+), 4 deletions(-)
-
+While all developers agree that ThinLTO is a much more palatable
+experience than full LTO; our product teams prefer the excessive build
+time and memory high water mark (at build time) costs in exchange for
+slightly better performance than ThinLTO in <benchmarks that I've been
+told are important>.  Keeping support for full LTO in tree would help
+our product teams reduce the amount of out of tree code they have.  As
+long as <benchmarks that I've been told are important> help
+sell/differentiate phones, I suspect our product teams will continue
+to ship full LTO in production.
 -- 
-2.29.2.576.ga3fc446d84-goog
-
+Thanks,
+~Nick Desaulniers
