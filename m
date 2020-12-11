@@ -2,46 +2,37 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0D5C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 21:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EB2C4361B
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 00:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6441923372
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 21:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE06B221F5
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 00:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394281AbgLKUuY (ORCPT
+        id S2407187AbgLKXzj (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Dec 2020 15:50:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393915AbgLKUuV (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Dec 2020 15:50:21 -0500
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AABC0613CF
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 12:49:41 -0800 (PST)
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 33CB72CA;
-        Fri, 11 Dec 2020 20:49:00 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 33CB72CA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1607719740; bh=TUKuBk1yLTj6iJl57tiIUylufG0Uuv+IzcChQMN3mgU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DLCsy9KhstfgEKIf/LylZp0NnHpDxD0qTRlJfmrEtCNvDVipTAWkeyamFBiJnbuC3
-         hs5QykQKEQoNcPQimiy8rJnRNWdoNg3FbhBdm3Zz5ERZkQjiCWYMnEIbEgg5i21at3
-         O2PQYM+beUlJTHubQGYz1wnJST0bHe5n6jMiiSriscmA77ZpU1jRgndDqc8KUD9oGq
-         bU66sZie6MIzPd+JDCAIo6hCwqekZai5F6K7F4trRa0C7xkojt0FtBsFDal633DWsy
-         PIdV2iO811offKh65uSecAz+77Xjhr/Xhc4yS/gFf/Q9hSJ8HrvaGmBD3ArnlJMlJC
-         S+aV9TeyzdVOg==
-Date:   Fri, 11 Dec 2020 13:48:59 -0700
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+        Fri, 11 Dec 2020 18:55:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52758 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404293AbgLKXzV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 11 Dec 2020 18:55:21 -0500
+Date:   Sat, 12 Dec 2020 00:54:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607730881;
+        bh=SCz8bzPsELDUq0lGSB7IHwi2nUf6eCFNm8SUjmyOLOI=;
+        h=From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZEHV91Um2wvOW33SMCUsi/9yIfdGDU2ugjj4kQyE0l1pnHF7WaR1ez/vGMvlRgJ5U
+         LPn2ZHoZoSy951pnGE/4G9Rm6bCvVm/ebLXFcxHfWdjVjW/8/xG1hLQyNwWY5Ij0Da
+         TIlEnlVIK7bsecL32JA/kUUv7nr1+8vehp6qPReUnWkSio5fgBAWHvGCRvp/WbKY61
+         viCkMcHkeJvxHU7i2XIuZoqhOXJTLNYu7LoSMxKaXk22mOnN9lnijwJ0cW7h/WC9zo
+         J4kg+jZVQQ2NeeODD88csRTTjIc+u3JzP/c2ORoBKaXEJrJuEN4Vaf6vNLD00mbuzR
+         TE5gTw5Hm1rRA==
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Jonathan Corbet <corbet@lwn.net>
 Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
@@ -49,66 +40,103 @@ Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-media@vger.kernel.org
 Subject: Re: [PATCH RFC v2] docs: experimental: build PDF with rst2pdf
-Message-ID: <20201211134859.5ab8e0c2@lwn.net>
-In-Reply-To: <b73c93c6946ab324443608fac62333b7e327a7e4.1607675494.git.mchehab+huawei@kernel.org>
+Message-ID: <20201212005435.0e1a0871@coco.lan>
+In-Reply-To: <20201211134859.5ab8e0c2@lwn.net>
 References: <20201210172938.3b3086b6@coco.lan>
         <b73c93c6946ab324443608fac62333b7e327a7e4.1607675494.git.mchehab+huawei@kernel.org>
-Organization: LWN.net
+        <20201211134859.5ab8e0c2@lwn.net>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, 11 Dec 2020 09:33:32 +0100
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+Em Fri, 11 Dec 2020 13:48:59 -0700
+Jonathan Corbet <corbet@lwn.net> escreveu:
 
-> Add an experimental PDF builder using rst2pdf
+> On Fri, 11 Dec 2020 09:33:32 +0100
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 > 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
+> > Add an experimental PDF builder using rst2pdf
+> > 
+> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> > ---
+> > 
+> > Please notice that 18 documents (of a total of 71) won't build with 
+> > rst2pdf. There's an opened issue about that at:
+> > 
+> >     https://github.com/rst2pdf/rst2pdf/issues/958
+> > 
+> > v2: usage of SPHINXDIRS was fixed.
+> > 
+> > 
+> >  Documentation/Makefile                     |  5 +++++
+> >  Documentation/conf.py                      | 21 +++++++++++++++------
+> >  Documentation/sphinx/load_config.py        | 12 ++++++++++++
+> >  Documentation/userspace-api/media/Makefile |  1 +
+> >  Makefile                                   |  4 ++--
+> >  5 files changed, 35 insertions(+), 8 deletions(-)  
 > 
-> Please notice that 18 documents (of a total of 71) won't build with 
-> rst2pdf. There's an opened issue about that at:
+> So I would dearly love to have rst2pdf working.
 > 
->     https://github.com/rst2pdf/rst2pdf/issues/958
+> I applied this, then tried to see what would happen if I ran a build
+> without having rst2pdf installed:
 > 
-> v2: usage of SPHINXDIRS was fixed.
+> > 1108 meer kernel: make htmldocs
+> >   SPHINX  htmldocs --> file:///stuff/k/git/kernel/Documentation/output
+> > make[2]: Nothing to be done for 'html'.
+> > WARNING: The kernel documentation build process
+> >         support for Sphinx v3.0 and above is brand new. Be prepared for
+> >         possible issues in the generated output.
+> >         enabling CJK for LaTeX builder
+> > 
+> > Extension error:
+> > Could not import extension rst2pdf.pdfbuilder (exception: No module named 'rst2pdf')
+> > make[1]: *** [Documentation/Makefile:91: htmldocs] Error 2
+> > make: *** [Makefile:1663: htmldocs] Error 2  
 > 
-> 
->  Documentation/Makefile                     |  5 +++++
->  Documentation/conf.py                      | 21 +++++++++++++++------
->  Documentation/sphinx/load_config.py        | 12 ++++++++++++
->  Documentation/userspace-api/media/Makefile |  1 +
->  Makefile                                   |  4 ++--
->  5 files changed, 35 insertions(+), 8 deletions(-)
+> Methinks it's perhaps not quite ready for linux-next yet :)
 
-So I would dearly love to have rst2pdf working.
+Well, I haven't test this.
 
-I applied this, then tried to see what would happen if I ran a build
-without having rst2pdf installed:
+I'm not an usual python programmer, so, don't know much about its 
+specifics... Yet, I would be expecting that something like this:
 
-> 1108 meer kernel: make htmldocs
->   SPHINX  htmldocs --> file:///stuff/k/git/kernel/Documentation/output
-> make[2]: Nothing to be done for 'html'.
-> WARNING: The kernel documentation build process
->         support for Sphinx v3.0 and above is brand new. Be prepared for
->         possible issues in the generated output.
->         enabling CJK for LaTeX builder
-> 
-> Extension error:
-> Could not import extension rst2pdf.pdfbuilder (exception: No module named 'rst2pdf')
-> make[1]: *** [Documentation/Makefile:91: htmldocs] Error 2
-> make: *** [Makefile:1663: htmldocs] Error 2
+	try:
+	    extensions.append("rst2pdf.pdfbuilder")
+	except:
+	    sys.stderr.write('rst2pdf extension not available.\n')
+	
 
-Methinks it's perhaps not quite ready for linux-next yet :)
+Would avoid it to crash, if the extension is not available.
+Silly me :-)
 
-With rst2pdf installed I get a bunch of zero-length files, as promised.
-Pretty much none of the larger "books" make it through.  It's a start,
-though.  I'll happily apply this as a step forward once it doesn't break
-the docs build if rst2pdf is missing.
+Still, I suspect that it should not be hard to modify the above to
+avoid the crash. 
+
+I shouldn't be doing much development those days, as I'm taking
+some vacations, after sending media stuff for 5.11. 
+
+So, if you have a better idea about how to optionally probe an
+extension, feel free to modify my patch.
+
+
+> With rst2pdf installed I get a bunch of zero-length files, as promised.
+> Pretty much none of the larger "books" make it through.  
+
+Yeah. I guess one of the issues is with tables that don't fit into
+a single page.
+
+Yet, devicetree book is empty. That sounds really weird, as there are
+few files on it, and I didn't see anything uncommon on the rst files.
+
+> It's a start,
+> though.  I'll happily apply this as a step forward once it doesn't break
+> the docs build if rst2pdf is missing.
+
+Sounds like a plan.
 
 Thanks,
-
-jon
+Mauro
