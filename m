@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486F1C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1158AC433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01A9523125
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCA3723E1B
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:18:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406234AbgLKSsm (ORCPT
+        id S2406215AbgLKSso (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:48:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
+        Fri, 11 Dec 2020 13:48:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392428AbgLKSsF (ORCPT
+        with ESMTP id S2406213AbgLKSsj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:48:05 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF4D8C0611CE
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id n186so11795145ybg.17
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
+        Fri, 11 Dec 2020 13:48:39 -0500
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23CB5C0619DC
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:52 -0800 (PST)
+Received: by mail-qt1-x849.google.com with SMTP id a11so6093609qto.16
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=6mEKvNeY3wq0rs7jAFLZaZQm6yt6Fm86WJ405HnCM0w=;
-        b=F3+ZlsJ4J/cRnUap6emR8N4b+Xouboife2S7UkAulyFopMjE2taVk9b7ehRGq4lP6n
-         TWsU42g66xrNtUHSwJP7KHpC9+dzh6DjSzVNB4ihF3HNbGrWLATePQMHxzMsDj13lrQP
-         azC/S2KiPkBzTIoYgS+nAssox204PVtPACYv3/zBjhusnbk5UjStmi3SxWetk5Rg2kzv
-         z8nqf6A2Nm0mG//A4/l4+LYdtA+F++wU6dqyimvIcOKEyC4WJMPShNvMtY4e0/LfP4ix
-         QdZ5G0gBeKAaM4Af5u8Kd8vvAtx6eHRH3G4aF6b+OJSo0XA9zUkdzMJPMR2eih4tOekj
-         Yqmg==
+        bh=9TLfWaf58UYL7wICLMCVVnhaOCpYf+H5DpQSRdiy6Cc=;
+        b=HYjrQ1sMOOn7ObkUbybc+wvc4I5EDo2ggFgwIjqmySqyqvcxKUz9U7SM7Iku6XAD3L
+         MaZfkgEgX8bO5VzFU2gtMQNWgcu/wOnkSTwXPIFeVvlEzpMkLiHIbHpRj8g4yDu1jHZA
+         3CxXJVzpzKe4SOfBmr81hNI0UbqvcB2S9srss5KkoPp6DWrNCN9YKq4L3D8K0njH4hkb
+         YiZREXyM6H7MRSRk5aoMuIbQJAGK7qyIC/Vh6N5H5PAnKudPsvjj6Xkm2vgSii8TALn6
+         7lDbS9j6fQNA0FCLEENh5zRwh0RcunHnF5d9mlF3zyS30HlqX3tlEMim0v00ijfjLPOW
+         Ri5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6mEKvNeY3wq0rs7jAFLZaZQm6yt6Fm86WJ405HnCM0w=;
-        b=MggqifsbLOYNgsH3QF0X4x42NAeVpa5HbnDpmeOYyfxMDkovZto+H1hVeN9MgFm1FQ
-         sRdzPQV7M4yDkavRMcj9w78PR9iaobymlufIYuQJ7mlWsA0mbFvTyabrnq3TXJncKFs1
-         AarEfgPCXABW9i2cVPQrUxjMMHYfX+Pzup6TUQ1hHez3PX8dt+AC3ID203AxUztyhlar
-         ypjSZ1TdMmfF+dE2IMZNexAIJo4d24Yj71EmKkaeDgLngn3Lqmp+UJLgLZqqW3HDZogJ
-         9eA3VjAmwR9EgjkYbbTBjN4MNATatNQE45yIAa6qyR75BcT8FOVlO949FbMd8BNc/Y+l
-         Ksug==
-X-Gm-Message-State: AOAM531G3+FZMirLV9NI1apd/r1mpTqCg2GKHCjloTrdIT4apVwQf0qJ
-        jprMlwXHmRdSyMOccBvGsUgzUx0Dv1twx+35nKU=
-X-Google-Smtp-Source: ABdhPJztdLpOmb8z2bOpx13eLpmFbg1IRTYkNtur403j5lUtJlMBrXobhq6mew9nU+bYggfLn4Aj28+KN30Fe9rq1PM=
+        bh=9TLfWaf58UYL7wICLMCVVnhaOCpYf+H5DpQSRdiy6Cc=;
+        b=ZQ/GkCrCOt5YHJROhWU55F8L71NNRi7B9oYPnJkzdHDD1QOd3UAi9YCSCmPt1AoM2q
+         O8pt5AxLBMhIJNOxSfnLau9YzaxY+LcYtp8tai/Fquy9H3FvhwRrcW/vNz8KmvsMZ2MO
+         wZV1ZihuHkIEa7LlQ/9F3YmEP/Jz+BIE7MzSluWpmoqGEkzt6pH8VTzMA6XTha3rFHxW
+         kEvBK3dRRCXoOR90ob2owWo4N72y1oGVk3QdMNiYpdNjP6Q5u2X5+TYuDP2ex1gnD/AL
+         r6vIF7Tgp8x6XuNKbUE31tJ2BSF8gIPBFQiP0bNW4gnPI5CJRE/SSwPRffPyKv2xa9aG
+         +ewQ==
+X-Gm-Message-State: AOAM530lf4uPNGfD4jJDoHe4gI5Q1SqfRmfYo20UhgjWZnElU664xMSj
+        vvBvkYqmDRCDLA+MiD7JKBbg0UTtD/3N0JYBmE4=
+X-Google-Smtp-Source: ABdhPJxOTg1pZ6kKhg4/TLTiKW5mUxnxwTfGU0xF4tIiotwCBx+K30YxUBmIUhBVi6sN8mztOiZkcgmhCe/rnpjaMvs=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:7d04:: with SMTP id
- y4mr20471824ybc.110.1607712403064; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
-Date:   Fri, 11 Dec 2020 10:46:21 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a05:6214:302:: with SMTP id
+ i2mr1391507qvu.14.1607712411329; Fri, 11 Dec 2020 10:46:51 -0800 (PST)
+Date:   Fri, 11 Dec 2020 10:46:25 -0800
 In-Reply-To: <20201211184633.3213045-1-samitolvanen@google.com>
-Message-Id: <20201211184633.3213045-5-samitolvanen@google.com>
+Message-Id: <20201211184633.3213045-9-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201211184633.3213045-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v9 04/16] kbuild: lto: limit inlining
+Subject: [PATCH v9 08/16] init: lto: fix PREL32 relocations
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -84,36 +84,76 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This change limits function inlining across translation unit boundaries
-in order to reduce the binary size with LTO. The -import-instr-limit
-flag defines a size limit, as the number of LLVM IR instructions, for
-importing functions from other TUs, defaulting to 100.
+With LTO, the compiler can rename static functions to avoid global
+naming collisions. As initcall functions are typically static,
+renaming can break references to them in inline assembly. This
+change adds a global stub with a stable name for each initcall to
+fix the issue when PREL32 relocations are used.
 
-Based on testing with arm64 defconfig, we found that a limit of 5 is a
-reasonable compromise between performance and binary size, reducing the
-size of a stripped vmlinux by 11%.
-
-Suggested-by: George Burgess IV <gbiv@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/init.h | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index a07e3909e5d0..84c60f38ee3e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -901,6 +901,9 @@ else
- CC_FLAGS_LTO	+= -flto
- endif
- CC_FLAGS_LTO	+= -fvisibility=hidden
+diff --git a/include/linux/init.h b/include/linux/init.h
+index d466bea7ecba..27b9478dcdef 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -209,26 +209,49 @@ extern bool initcall_debug;
+  */
+ #define __initcall_section(__sec, __iid)			\
+ 	#__sec ".init.." #__iid
 +
-+# Limit inlining across translation units to reduce binary size
-+KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
- endif
++/*
++ * With LTO, the compiler can rename static functions to avoid
++ * global naming collisions. We use a global stub function for
++ * initcalls to create a stable symbol name whose address can be
++ * taken in inline assembly when PREL32 relocations are used.
++ */
++#define __initcall_stub(fn, __iid, id)				\
++	__initcall_name(initstub, __iid, id)
++
++#define __define_initcall_stub(__stub, fn)			\
++	int __init __stub(void);				\
++	int __init __stub(void)					\
++	{ 							\
++		return fn();					\
++	}							\
++	__ADDRESSABLE(__stub)
+ #else
+ #define __initcall_section(__sec, __iid)			\
+ 	#__sec ".init"
++
++#define __initcall_stub(fn, __iid, id)	fn
++
++#define __define_initcall_stub(__stub, fn)			\
++	__ADDRESSABLE(fn)
+ #endif
  
- ifdef CONFIG_LTO
+ #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
+-#define ____define_initcall(fn, __name, __sec)			\
+-	__ADDRESSABLE(fn)					\
++#define ____define_initcall(fn, __stub, __name, __sec)		\
++	__define_initcall_stub(__stub, fn)			\
+ 	asm(".section	\"" __sec "\", \"a\"		\n"	\
+ 	    __stringify(__name) ":			\n"	\
+-	    ".long	" #fn " - .			\n"	\
++	    ".long	" __stringify(__stub) " - .	\n"	\
+ 	    ".previous					\n");
+ #else
+-#define ____define_initcall(fn, __name, __sec)			\
++#define ____define_initcall(fn, __unused, __name, __sec)	\
+ 	static initcall_t __name __used 			\
+ 		__attribute__((__section__(__sec))) = fn;
+ #endif
+ 
+ #define __unique_initcall(fn, id, __sec, __iid)			\
+ 	____define_initcall(fn,					\
++		__initcall_stub(fn, __iid, id),			\
+ 		__initcall_name(initcall, __iid, id),		\
+ 		__initcall_section(__sec, __iid))
+ 
 -- 
 2.29.2.576.ga3fc446d84-goog
 
