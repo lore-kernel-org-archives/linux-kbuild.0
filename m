@@ -4,63 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC00C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486F1C433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:17:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3347F23125
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:16:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01A9523125
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:17:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390368AbgLKSri (ORCPT
+        id S2406234AbgLKSsm (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:47:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56142 "EHLO
+        Fri, 11 Dec 2020 13:48:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389635AbgLKSrQ (ORCPT
+        with ESMTP id S2392428AbgLKSsF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:47:16 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13052C061794
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:36 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id n186so11794809ybg.17
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:36 -0800 (PST)
+        Fri, 11 Dec 2020 13:48:05 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF4D8C0611CE
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id n186so11795145ybg.17
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=9znxVvQ/9PAVTHgEOV292+fDBKHMlDcfsU9d9H/6O4k=;
-        b=dDPDz2owZCXqbcbTzyDFDHaLvLysHx0+EojIIsUxOE+4+nVDQN3cySzJWf+v38GzE6
-         itt4delaGLVPa1agOcoLlx6yvf8/Rvpbx90SpVAfQWw4Gienn1eBmn3U01FJOI8ozMIr
-         oMwqy/QUN545CHIweR5daxLHf67HQMOOpqjFZBTDMYiIgeSPbYC+HR2Mp72lyQexsgH2
-         le8MqKN1R49giFoPdbvq5e2AAwJFmKDPhtJK56jSZ1yU84DMqlwnkKWfajf4PJtMFRlg
-         MB4gCztbRGqrOceiEJjc4NYhFy6Vpnx8PltpWjcUUixEZtuM8A1KmPcSyof8U8uYsIsl
-         LJDA==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=6mEKvNeY3wq0rs7jAFLZaZQm6yt6Fm86WJ405HnCM0w=;
+        b=F3+ZlsJ4J/cRnUap6emR8N4b+Xouboife2S7UkAulyFopMjE2taVk9b7ehRGq4lP6n
+         TWsU42g66xrNtUHSwJP7KHpC9+dzh6DjSzVNB4ihF3HNbGrWLATePQMHxzMsDj13lrQP
+         azC/S2KiPkBzTIoYgS+nAssox204PVtPACYv3/zBjhusnbk5UjStmi3SxWetk5Rg2kzv
+         z8nqf6A2Nm0mG//A4/l4+LYdtA+F++wU6dqyimvIcOKEyC4WJMPShNvMtY4e0/LfP4ix
+         QdZ5G0gBeKAaM4Af5u8Kd8vvAtx6eHRH3G4aF6b+OJSo0XA9zUkdzMJPMR2eih4tOekj
+         Yqmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=9znxVvQ/9PAVTHgEOV292+fDBKHMlDcfsU9d9H/6O4k=;
-        b=rkbSGMbVZ0tovXnxtAQ80LKM6IX4o7CePbWZHy0gOpgYBn7dd20t2Y+yDcii224gH7
-         VauhdNkv3TzNd7MRKJHxWIGtvRZNjqym3pORjLByx7Zy0FbL1TXEd9OyvqTOMOxhjNMA
-         EdTDPoCGLB4VFW+o9zqAH2lEldHZr6CFvBcXEkNQRlAzned5PM4HyUoUU6kxtKtu3YMu
-         vqwYYC4ObRuseNnUomqaRelb41oEpApfVFw8htP9AWO3vZUpqxom/fWgN0/raa6ba63X
-         xHlNeeaJtdZzCw9nOLANuwcWkQzxbXJtYGQzgkfolm/whHs2dvTr4lH0i5E2dIhawq4m
-         nj9w==
-X-Gm-Message-State: AOAM532ek3IjvyD/XmJrFOP7VG+LzFRyM3rCTwEJt0s05CH3czpGFIov
-        W/aCNhW014p8YDK79BiYI+kFxx7qr30yc9rJCLY=
-X-Google-Smtp-Source: ABdhPJz0ek2SN2U3fjfWQhqwMXyCIcZwDvklDVCCSVaJyxuiJlfb7KJJKz1h/PtZ4xu/S0R9tK22wDIg3yDTEgQwy4E=
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=6mEKvNeY3wq0rs7jAFLZaZQm6yt6Fm86WJ405HnCM0w=;
+        b=MggqifsbLOYNgsH3QF0X4x42NAeVpa5HbnDpmeOYyfxMDkovZto+H1hVeN9MgFm1FQ
+         sRdzPQV7M4yDkavRMcj9w78PR9iaobymlufIYuQJ7mlWsA0mbFvTyabrnq3TXJncKFs1
+         AarEfgPCXABW9i2cVPQrUxjMMHYfX+Pzup6TUQ1hHez3PX8dt+AC3ID203AxUztyhlar
+         ypjSZ1TdMmfF+dE2IMZNexAIJo4d24Yj71EmKkaeDgLngn3Lqmp+UJLgLZqqW3HDZogJ
+         9eA3VjAmwR9EgjkYbbTBjN4MNATatNQE45yIAa6qyR75BcT8FOVlO949FbMd8BNc/Y+l
+         Ksug==
+X-Gm-Message-State: AOAM531G3+FZMirLV9NI1apd/r1mpTqCg2GKHCjloTrdIT4apVwQf0qJ
+        jprMlwXHmRdSyMOccBvGsUgzUx0Dv1twx+35nKU=
+X-Google-Smtp-Source: ABdhPJztdLpOmb8z2bOpx13eLpmFbg1IRTYkNtur403j5lUtJlMBrXobhq6mew9nU+bYggfLn4Aj28+KN30Fe9rq1PM=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:22d5:: with SMTP id
- i204mr22729999ybi.0.1607712395089; Fri, 11 Dec 2020 10:46:35 -0800 (PST)
-Date:   Fri, 11 Dec 2020 10:46:17 -0800
-Message-Id: <20201211184633.3213045-1-samitolvanen@google.com>
+ (user=samitolvanen job=sendgmr) by 2002:a25:7d04:: with SMTP id
+ y4mr20471824ybc.110.1607712403064; Fri, 11 Dec 2020 10:46:43 -0800 (PST)
+Date:   Fri, 11 Dec 2020 10:46:21 -0800
+In-Reply-To: <20201211184633.3213045-1-samitolvanen@google.com>
+Message-Id: <20201211184633.3213045-5-samitolvanen@google.com>
 Mime-Version: 1.0
+References: <20201211184633.3213045-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v9 00/16] Add support for Clang LTO
+Subject: [PATCH v9 04/16] kbuild: lto: limit inlining
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -81,212 +84,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This patch series adds support for building the kernel with Clang's
-Link Time Optimization (LTO). In addition to performance, the primary
-motivation for LTO is to allow Clang's Control-Flow Integrity (CFI)
-to be used in the kernel. Google has shipped millions of Pixel
-devices running three major kernel versions with LTO+CFI since 2018.
+This change limits function inlining across translation unit boundaries
+in order to reduce the binary size with LTO. The -import-instr-limit
+flag defines a size limit, as the number of LLVM IR instructions, for
+importing functions from other TUs, defaulting to 100.
 
-Most of the patches are build system changes for handling LLVM
-bitcode, which Clang produces with LTO instead of ELF object files,
-postponing ELF processing until a later stage, and ensuring initcall
-ordering.
+Based on testing with arm64 defconfig, we found that a limit of 5 is a
+reasonable compromise between performance and binary size, reducing the
+size of a stripped vmlinux by 11%.
 
-Note that arm64 support depends on Will's memory ordering patches
-[1]. I will post x86_64 patches separately after we have fixed the
-remaining objtool warnings [2][3].
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=for-next/lto
-[2] https://lore.kernel.org/lkml/20201120040424.a3wctajzft4ufoiw@treble/
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/jpoimboe/linux.git/log/?h=objtool-vmlinux
-
-You can also pull this series from
-
-  https://github.com/samitolvanen/linux.git lto-v9
-
+Suggested-by: George Burgess IV <gbiv@google.com>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
-Changes in v9:
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-  - Added HAS_LTO_CLANG dependencies to LLVM=1 and LLVM_IAS=1 to avoid
-    issues with mismatched toolchains.
-
-  - Dropped the .mod patch as Masahiro landed a better solution to
-    the split line issue in commit 7d32358be8ac ("kbuild: avoid split
-    lines in .mod files").
-
-  - Updated CC_FLAGS_LTO to use -fvisibility=hidden to avoid weak symbol
-    visibility issues with ThinLTO on x86.
-
-  - Changed LTO_CLANG_FULL to depend on !COMPILE_TEST to prevent
-    timeouts in automated testing.
-
-  - Added a dependency to CPU_LITTLE_ENDIAN to ARCH_SUPPORTS_LTO_CLANG
-    in arch/arm64/Kconfig.
-
-  - Added a default symbol list to fix an issue with TRIM_UNUSED_KSYMS.
-
-  Changes in v8:
-
-  - Cleaned up the LTO Kconfig options based on suggestions from
-    Nick and Kees.
-
-  - Dropped the patch to disable LTO for the arm64 nVHE KVM code as
-    David pointed out it's not needed anymore.
-
-Changes in v7:
-
-  - Rebased to master again.
-
-  - Added back arm64 patches as the prerequisites are now staged,
-    and dropped x86_64 support until the remaining objtool issues
-    are resolved.
-
-  - Dropped ifdefs from module.lds.S.
-
-Changes in v6:
-
-  - Added the missing --mcount flag to patch 5.
-
-  - Dropped the arm64 patches from this series and will repost them
-    later.
-
-Changes in v5:
-
-  - Rebased on top of tip/master.
-
-  - Changed the command line for objtool to use --vmlinux --duplicate
-    to disable warnings about retpoline thunks and to fix .orc_unwind
-    generation for vmlinux.o.
-
-  - Added --noinstr flag to objtool, so we can use --vmlinux without
-    also enabling noinstr validation.
-
-  - Disabled objtool's unreachable instruction warnings with LTO to
-    disable false positives for the int3 padding in vmlinux.o.
-
-  - Added ANNOTATE_RETPOLINE_SAFE annotations to the indirect jumps
-    in x86 assembly code to fix objtool warnings with retpoline.
-
-  - Fixed modpost warnings about missing version information with
-    CONFIG_MODVERSIONS.
-
-  - Included Makefile.lib into Makefile.modpost for ld_flags. Thanks
-    to Sedat for pointing this out.
-
-  - Updated the help text for ThinLTO to better explain the trade-offs.
-
-  - Updated commit messages with better explanations.
-
-Changes in v4:
-
-  - Fixed a typo in Makefile.lib to correctly pass --no-fp to objtool.
-
-  - Moved ftrace configs related to generating __mcount_loc to Kconfig,
-    so they are available also in Makefile.modfinal.
-
-  - Dropped two prerequisite patches that were merged to Linus' tree.
-
-Changes in v3:
-
-  - Added a separate patch to remove the unused DISABLE_LTO treewide,
-    as filtering out CC_FLAGS_LTO instead is preferred.
-
-  - Updated the Kconfig help to explain why LTO is behind a choice
-    and disabled by default.
-
-  - Dropped CC_FLAGS_LTO_CLANG, compiler-specific LTO flags are now
-    appended directly to CC_FLAGS_LTO.
-
-  - Updated $(AR) flags as KBUILD_ARFLAGS was removed earlier.
-
-  - Fixed ThinLTO cache handling for external module builds.
-
-  - Rebased on top of Masahiro's patch for preprocessing modules.lds,
-    and moved the contents of module-lto.lds to modules.lds.S.
-
-  - Moved objtool_args to Makefile.lib to avoid duplication of the
-    command line parameters in Makefile.modfinal.
-
-  - Clarified in the commit message for the initcall ordering patch
-    that the initcall order remains the same as without LTO.
-
-  - Changed link-vmlinux.sh to use jobserver-exec to control the
-    number of jobs started by generate_initcall_ordering.pl.
-
-  - Dropped the x86/relocs patch to whitelist L4_PAGE_OFFSET as it's
-    no longer needed with ToT kernel.
-
-  - Disabled LTO for arch/x86/power/cpu.c to work around a Clang bug
-    with stack protector attributes.
-
-Changes in v2:
-
-  - Fixed -Wmissing-prototypes warnings with W=1.
-
-  - Dropped cc-option from -fsplit-lto-unit and added .thinlto-cache
-    scrubbing to make distclean.
-
-  - Added a comment about Clang >=11 being required.
-
-  - Added a patch to disable LTO for the arm64 KVM nVHE code.
-
-  - Disabled objtool's noinstr validation with LTO unless enabled.
-
-  - Included Peter's proposed objtool mcount patch in the series
-    and replaced recordmcount with the objtool pass to avoid
-    whitelisting relocations that are not calls.
-
-  - Updated several commit messages with better explanations.
-
-
-Sami Tolvanen (16):
-  tracing: move function tracer options to Kconfig
-  kbuild: add support for Clang LTO
-  kbuild: lto: fix module versioning
-  kbuild: lto: limit inlining
-  kbuild: lto: merge module sections
-  kbuild: lto: add a default list of used symbols
-  init: lto: ensure initcall ordering
-  init: lto: fix PREL32 relocations
-  PCI: Fix PREL32 relocations for LTO
-  modpost: lto: strip .lto from module names
-  scripts/mod: disable LTO for empty.c
-  efi/libstub: disable LTO
-  drivers/misc/lkdtm: disable LTO for rodata.o
-  arm64: vdso: disable LTO
-  arm64: disable recordmcount with DYNAMIC_FTRACE_WITH_REGS
-  arm64: allow LTO to be selected
-
- .gitignore                            |   1 +
- Makefile                              |  45 +++--
- arch/Kconfig                          |  90 +++++++++
- arch/arm64/Kconfig                    |   4 +
- arch/arm64/kernel/vdso/Makefile       |   3 +-
- drivers/firmware/efi/libstub/Makefile |   2 +
- drivers/misc/lkdtm/Makefile           |   1 +
- include/asm-generic/vmlinux.lds.h     |  11 +-
- include/linux/init.h                  |  79 +++++++-
- include/linux/pci.h                   |  19 +-
- init/Kconfig                          |   1 +
- kernel/trace/Kconfig                  |  16 ++
- scripts/Makefile.build                |  48 ++++-
- scripts/Makefile.lib                  |   6 +-
- scripts/Makefile.modfinal             |   9 +-
- scripts/Makefile.modpost              |  25 ++-
- scripts/generate_initcall_order.pl    | 270 ++++++++++++++++++++++++++
- scripts/link-vmlinux.sh               |  70 ++++++-
- scripts/lto-used-symbollist           |   5 +
- scripts/mod/Makefile                  |   1 +
- scripts/mod/modpost.c                 |  16 +-
- scripts/mod/modpost.h                 |   9 +
- scripts/mod/sumversion.c              |   6 +-
- scripts/module.lds.S                  |  24 +++
- 24 files changed, 696 insertions(+), 65 deletions(-)
- create mode 100755 scripts/generate_initcall_order.pl
- create mode 100644 scripts/lto-used-symbollist
-
-
-base-commit: 33dc9614dc208291d0c4bcdeb5d30d481dcd2c4c
+diff --git a/Makefile b/Makefile
+index a07e3909e5d0..84c60f38ee3e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -901,6 +901,9 @@ else
+ CC_FLAGS_LTO	+= -flto
+ endif
+ CC_FLAGS_LTO	+= -fvisibility=hidden
++
++# Limit inlining across translation units to reduce binary size
++KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
+ endif
+ 
+ ifdef CONFIG_LTO
 -- 
 2.29.2.576.ga3fc446d84-goog
 
