@@ -8,63 +8,62 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16562C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D68C4361B
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCB0923F38
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B75023F38
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395088AbgLKSsm (ORCPT
+        id S2391889AbgLKSsn (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:48:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56308 "EHLO
+        Fri, 11 Dec 2020 13:48:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406138AbgLKSsg (ORCPT
+        with ESMTP id S2391314AbgLKSsa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:48:36 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C8AC061A00
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:57 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id l2so1341252pgi.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:57 -0800 (PST)
+        Fri, 11 Dec 2020 13:48:30 -0500
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF04C0619E1
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:54 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id l3so6939289qvr.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=sUICI29mkgxH8XDf6qhMCrhn46+Hzc1owynREvsajYA=;
-        b=Mt5+qfjfZ+VylSyluHh2VZfop+oBL3rJXxZDwRaX22l0TfpVmfjZWdRRf4EjcTdwNZ
-         tI2smkjeD1V9WDfLcVGcM0q3lBKc5wUlQ0PV2xNazny/qeDxBgjfBw3M6ZeazZiiVTRk
-         PuilV1bsANPSfYl5rf4CFzgLv9TH7xZEN6ZdlxzmXfi8iZ0NN8yPkHKEhjrDZeO93M3Z
-         Is2ezXs/oAG91woA/WjRTGjceaiPw8zQ6gbt9xphaeSWeIK5J0CKds3mJv3qxGB+SGOL
-         yPRehVrtvjhUpPjpNJk+E+PHpWf8LAXA2fOr5tqj7a6NYji5/SC+3IO85wAjvRUlfz9n
-         9oSw==
+        bh=B5HJdqCXUeL43UIVLVZJnxtwrYZ/thw26FrV4EWKXXk=;
+        b=CI1Z1ksraZ9iV323F1+iZqU11ohoR7PeCXzqdRVa+VPq1uQ3aVlILlGyCMggutWSZh
+         toLJVqMi1M53AWHDdaW4XL+FYrTYFeGJoBHf5coo7gwbFzOhZJL8v1qpLIOTb3z8aV1q
+         LU62sjLP3/2xVwScgJOjKxlGys5dCTJXM7F9pbwXc3Us7y1Bms4nmyLFiAyAGs8raRLu
+         mCsKDkGu/2yqUolqiz63Y9CA2BRHkf8FRGTon8/JBgKj4dTg9k2vBkMRQRW0bWup9J5Z
+         B9KEUS2NCp+GN2iFEIoblQjbVITiJ1piXgw1hDZ29L9ZLU1esZxkERsW394RCsQNRyy0
+         8b3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=sUICI29mkgxH8XDf6qhMCrhn46+Hzc1owynREvsajYA=;
-        b=q8X1a/XLkq6xYvh8kTge8pAd4nto42PG4dwi4C0UMvLDJ0ZHN6v5Z1m0wSdESdq1KY
-         GSamBl/p6mP56AUv3D+xZXnWANeclQH/OXyexzgHg158Tp66xggROVuL4r37C0XvU1dX
-         jGMRuBftgtu3JNSeGJyxlNqSX0wV4PWK4Zoqi/MMchP+pC1COZtX41Uu58R4mpLcknIg
-         hkKQhTgjVoj0UWPhssI6R+AOWyL+mOwamNxnL6rmxxaO9/EIqQfefcfglLmGKDbVSZEW
-         gSw+re5Ur+RtBAaYZ2EBnmlsgKi/wVnLMaHiGYAIeYYZA7NXr+WIkhizZP1nt+ykbqKQ
-         bSOA==
-X-Gm-Message-State: AOAM533iw/9kJD3+w9VKnxhpN5SzSt7PxYM873DU2XLqPUdEcUpZalMj
-        EU+56KvOpZcK67ZlgeBVHGG52RsGFVvTIM2wbuM=
-X-Google-Smtp-Source: ABdhPJyLTnaXTvQFzdGZbemjJUsFLRdMqMxsuXqAqm5rCyQnrHrKDgTVs/Qim5syv8mGMDSyRXsRkeSRJzrM/1+uvUc=
+        bh=B5HJdqCXUeL43UIVLVZJnxtwrYZ/thw26FrV4EWKXXk=;
+        b=qsSEai2o05isK0hfKJVrAUI+yxPLZ3OUWI+r4S7m/Foh99w6/hc5Jghi00QsymgfjO
+         3f8Q6M8WFCI2EN9XSbYXjxbfo5KrcJ4B4rvpZ8mUGjMIjdYAmDpSnyF7EsXxRE4c8XdN
+         u6i9O2S1ksrBZUvoCVmni0VoNVS7PCW8RWobJVHePOXO0rtCOAoZFoRQhNCSBA3/83Mo
+         4ztjZtqo+thmoG+ggI7hYz3/FwOGj/18+1nw/gZk3XQbPmOxKVpIcfsBzwQ2t2aaho4G
+         xiqAZFFHYSVnin+TFpA5+2nYuOahUTDBQMLLpfj9yxDwBUjY+zFDpzU2UL5pkqC39L4T
+         j61w==
+X-Gm-Message-State: AOAM532A9APYOEj0xtFr11T9Vs43Ai2O9SgB9u0wWvFPrXUgkWZ0cSTT
+        Ph+US/Jaq+qv0cSfmUZ/6/RF2hGXW2kYefB8Ac8=
+X-Google-Smtp-Source: ABdhPJwrma1lcyBdkKY9Fn3d/aj96Xjbcqm6ANOmxB5F+S78NXSz4LS+Jidn8aXBd6ggUskWzgWXGBBPQ7DVfOBFzGY=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a17:902:8343:b029:da:cf6a:f65c with
- SMTP id z3-20020a1709028343b02900dacf6af65cmr12048006pln.5.1607712417071;
- Fri, 11 Dec 2020 10:46:57 -0800 (PST)
-Date:   Fri, 11 Dec 2020 10:46:28 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a0c:e312:: with SMTP id
+ s18mr17700151qvl.60.1607712413271; Fri, 11 Dec 2020 10:46:53 -0800 (PST)
+Date:   Fri, 11 Dec 2020 10:46:26 -0800
 In-Reply-To: <20201211184633.3213045-1-samitolvanen@google.com>
-Message-Id: <20201211184633.3213045-12-samitolvanen@google.com>
+Message-Id: <20201211184633.3213045-10-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201211184633.3213045-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v9 11/16] scripts/mod: disable LTO for empty.c
+Subject: [PATCH v9 09/16] PCI: Fix PREL32 relocations for LTO
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -85,27 +84,58 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_LTO_CLANG, clang generates LLVM IR instead of ELF object
-files. As empty.o is used for probing target properties, disable LTO
-for it to produce an object file instead.
+With Clang's Link Time Optimization (LTO), the compiler can rename
+static functions to avoid global naming collisions. As PCI fixup
+functions are typically static, renaming can break references
+to them in inline assembly. This change adds a global stub to
+DECLARE_PCI_FIXUP_SECTION to fix the issue when PREL32 relocations
+are used.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- scripts/mod/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/pci.h | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index 78071681d924..c9e38ad937fd 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- OBJECT_FILES_NON_STANDARD := y
-+CFLAGS_REMOVE_empty.o += $(CC_FLAGS_LTO)
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 22207a79762c..5b8505a5ca5f 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -1912,19 +1912,28 @@ enum pci_fixup_pass {
+ };
  
- hostprogs-always-y	+= modpost mk_elfconfig
- always-y		+= empty.o
+ #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
+-#define __DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
+-				    class_shift, hook)			\
+-	__ADDRESSABLE(hook)						\
++#define ___DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
++				    class_shift, hook, stub)		\
++	void stub(struct pci_dev *dev);					\
++	void stub(struct pci_dev *dev)					\
++	{ 								\
++		hook(dev); 						\
++	}								\
+ 	asm(".section "	#sec ", \"a\"				\n"	\
+ 	    ".balign	16					\n"	\
+ 	    ".short "	#vendor ", " #device "			\n"	\
+ 	    ".long "	#class ", " #class_shift "		\n"	\
+-	    ".long "	#hook " - .				\n"	\
++	    ".long "	#stub " - .				\n"	\
+ 	    ".previous						\n");
++
++#define __DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
++				  class_shift, hook, stub)		\
++	___DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
++				  class_shift, hook, stub)
+ #define DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
+ 				  class_shift, hook)			\
+ 	__DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
+-				  class_shift, hook)
++				  class_shift, hook, __UNIQUE_ID(hook))
+ #else
+ /* Anonymous variables would be nice... */
+ #define DECLARE_PCI_FIXUP_SECTION(section, name, vendor, device, class,	\
 -- 
 2.29.2.576.ga3fc446d84-goog
 
