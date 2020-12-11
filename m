@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF82C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2962CC4361B
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:35:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EFC72074B
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3FC22404C
+	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Dec 2020 20:35:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436870AbgLKSto (ORCPT
+        id S2436840AbgLKStd (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:49:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        Fri, 11 Dec 2020 13:49:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436551AbgLKStD (ORCPT
+        with ESMTP id S2394257AbgLKSsO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:49:03 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9842DC08C5C1
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:47:08 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id m203so11802291ybf.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:47:08 -0800 (PST)
+        Fri, 11 Dec 2020 13:48:14 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A6FC0619D2
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:46 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id c1so2903339pjo.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Dec 2020 10:46:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=aVrOLfHwyYehNryqhGtvwSuHF6d3RoXEKFD3yMxv9WQ=;
-        b=crCjjtbF0LFHKaU166OM2hJGeHx2ZHgEPciM6YDUtvwCc0Wk4S0mHDEftwdDa0NcAd
-         jVAeZYS/m2qVwB/wLayUO/zJ7OQ9GjKp3zIKQxrh85/izPBL52cGu+wOe5xhEuDbMihD
-         jtqoSCSPAiWs1YHR/KQXLgIREQJzaCse6S5YKqzfvzE3xM9PHb8XFuHpON0Lx2wF5dvI
-         jdDA/FurnwgxMiNVD8vMMoJgmDP/60Ko/cbUmNw+NN3ZiXIXUK+gSk6MdZLTk5pwRNWm
-         GbcOKP0kdz3TCy88sneI6VUHEzRwj4dCnx7ptdr9FonuwDoHCGtCu9MNXQ48V8VaX9gP
-         pMug==
+        bh=IWPxRCPjFejanLxpgRG3fapg45p9YOPZWT66lZNPqfI=;
+        b=NmW10Ys2Tgg9pvNOzRC87vTxzQN/QNTXAjHd7AFTV8ok00h9tGhhYMLsRuxKeNhXDl
+         iMPagwzzegEY0NAWkP8VdeyEnPICgOM5AE4FTcCbPPAinuDjGz68sbCLgXPYhkRq1Pep
+         /oDzt2sWciOe12Hb0BMOoaCF9qAfZgz+jdivhEhkTAz3ohV7gcdM13QrPXPixLmDjCSe
+         nTPKcCoKQq0gq3xcii2Dkj1W1xDXw/X3VKykyVsM1VgUoEe62p+1hemZShAFUHpH1Tsi
+         8OfLqN3hCowWbgVvrwWk8fm6stKJ1NblXBwjNE+NVf/Ofnn3fkAOASnNgDC94IzGVftK
+         2nnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=aVrOLfHwyYehNryqhGtvwSuHF6d3RoXEKFD3yMxv9WQ=;
-        b=OMZ+o0f3MpWFhKFHhYp81wwwhhHDKOUfR5cxRM24DCFVEb5yX2BqWMx6crI7hiB9b0
-         +UjZSFZ182IDrwYvdOuebxcdgsZb20754EbCXhFUKa9wX0959U9RR4FmJi+d+k+pdXA4
-         UC4GcSfgdiY7waEAKaCc3HkbTZKpeRmqd3yx+VIyU6hFOLyM4lPpvASfSCUM7UuLOhNL
-         bA9oynE4SQd3pNinri2sRc2kseZVyUMpXIziFCL6Qmrgfp5ZdJevXGU78aUgVnOUoLLt
-         Bh+04KeUjyn9d7BIbIclimEwHogzcwPLXZYrG4wQUf93xMI/2RqJZ9vD6iDHwfzLTlbi
-         gaHw==
-X-Gm-Message-State: AOAM5325+bZBjv1W/3C4liy2MuvcJDx2yavzqOIoyPi5v7HQzGPhMT6X
-        351cS6uvPYMXmguUZR5WoI2lLrbBhtvU+mOEoxo=
-X-Google-Smtp-Source: ABdhPJwNZuID1jcIf8cIxU0Ww5TlvyKdStjDCRvIBB9uhldEdK3D2TeNkVuM9PMADcBOExwezp45jHxla8E+Sk+8d04=
+        bh=IWPxRCPjFejanLxpgRG3fapg45p9YOPZWT66lZNPqfI=;
+        b=dZ3eL0o9QGEjoYSkGzpXXqqwtzJnrzj3zr+R+ZFmPRXWb7S2jKik6I2a8LkecT0xV0
+         BfHNq1HdTnKeTlw5ieIbmeyIj62MW9G+Nz1JBnEcKmFKVwblwAQKXDglj5tnU6sSkwwX
+         NjTy+6V4VbA0wf2+EzbDpUp+kFcLPYOmCjxpOuGbj/3a1j89B/5eXiiin8bCTQPjpQzX
+         sH9Ba2QGlrvTqlXpIoYqfdCqABOvGqmVe1iS52V0z0OPIFNumnTXyRiY1Bm6jcCkFGIx
+         nAR9ZVHWglNjzRQhWwKBXVtocwLyogyk6xdi43yiRng0rP4akbKQuv1D9DtFtIv9t38y
+         5zNA==
+X-Gm-Message-State: AOAM5320tq1S4fHH+Q0ytx4s2RvNBrc7jK/aK6m3ROzb1Y9gbCh/43bN
+        4WXkPhjOyB4A8/NyZICvbL+C3jYV4hhYabvdQh0=
+X-Google-Smtp-Source: ABdhPJzm7bBo2qDvtUgK6v6rrLGQ/0dJj/ATzhcF3Fgu3P9N3k/LVow1+5c7Y8w8YkEUkh1r4Djckvq7KIZM8TNXHU4=
 Sender: "samitolvanen via sendgmr" 
         <samitolvanen@samitolvanen1.mtv.corp.google.com>
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:f693:9fff:fef4:1b6d])
- (user=samitolvanen job=sendgmr) by 2002:a25:9a48:: with SMTP id
- r8mr18569721ybo.294.1607712427760; Fri, 11 Dec 2020 10:47:07 -0800 (PST)
-Date:   Fri, 11 Dec 2020 10:46:33 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a17:90a:8b94:: with SMTP id
+ z20mr136813pjn.1.1607712405109; Fri, 11 Dec 2020 10:46:45 -0800 (PST)
+Date:   Fri, 11 Dec 2020 10:46:22 -0800
 In-Reply-To: <20201211184633.3213045-1-samitolvanen@google.com>
-Message-Id: <20201211184633.3213045-17-samitolvanen@google.com>
+Message-Id: <20201211184633.3213045-6-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20201211184633.3213045-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.29.2.576.ga3fc446d84-goog
-Subject: [PATCH v9 16/16] arm64: allow LTO to be selected
+Subject: [PATCH v9 05/16] kbuild: lto: merge module sections
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
@@ -84,28 +84,52 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Allow CONFIG_LTO_CLANG to be enabled.
+LLD always splits sections with LTO, which increases module sizes. This
+change adds linker script rules to merge the split sections in the final
+module.
 
+Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
-Acked-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/module.lds.S | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index cf7eaaa0fb2f..59abe44845f3 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -73,6 +73,8 @@ config ARM64
- 	select ARCH_USE_SYM_ANNOTATIONS
- 	select ARCH_SUPPORTS_MEMORY_FAILURE
- 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
-+	select ARCH_SUPPORTS_LTO_CLANG if CPU_LITTLE_ENDIAN
-+	select ARCH_SUPPORTS_LTO_CLANG_THIN
- 	select ARCH_SUPPORTS_ATOMIC_RMW
- 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
- 	select ARCH_SUPPORTS_NUMA_BALANCING
+diff --git a/scripts/module.lds.S b/scripts/module.lds.S
+index 69b9b71a6a47..18d5b8423635 100644
+--- a/scripts/module.lds.S
++++ b/scripts/module.lds.S
+@@ -23,6 +23,30 @@ SECTIONS {
+ 	.init_array		0 : ALIGN(8) { *(SORT(.init_array.*)) *(.init_array) }
+ 
+ 	__jump_table		0 : ALIGN(8) { KEEP(*(__jump_table)) }
++
++	__patchable_function_entries : { *(__patchable_function_entries) }
++
++	/*
++	 * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
++	 * -ffunction-sections, which increases the size of the final module.
++	 * Merge the split sections in the final binary.
++	 */
++	.bss : {
++		*(.bss .bss.[0-9a-zA-Z_]*)
++		*(.bss..L*)
++	}
++
++	.data : {
++		*(.data .data.[0-9a-zA-Z_]*)
++		*(.data..L*)
++	}
++
++	.rodata : {
++		*(.rodata .rodata.[0-9a-zA-Z_]*)
++		*(.rodata..L*)
++	}
++
++	.text : { *(.text .text.[0-9a-zA-Z_]*) }
+ }
+ 
+ /* bring in arch-specific sections */
 -- 
 2.29.2.576.ga3fc446d84-goog
 
