@@ -2,181 +2,128 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D39AC4361B
-	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 16:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7992DC433FE
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 17:31:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5436822AAC
-	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 16:57:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E10B22AAC
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Dec 2020 17:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407587AbgLLQ5x (ORCPT
+        id S1726230AbgLLRbC (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 12 Dec 2020 11:57:53 -0500
-Received: from conuserg-10.nifty.com ([210.131.2.77]:46864 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389793AbgLLQ5o (ORCPT
+        Sat, 12 Dec 2020 12:31:02 -0500
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:6123 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407639AbgLLRav (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 Dec 2020 11:57:44 -0500
-Received: from grover.flets-west.jp (softbank126090211135.bbtec.net [126.90.211.135]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 0BCGsX0P010674;
-        Sun, 13 Dec 2020 01:54:34 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 0BCGsX0P010674
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1607792075;
-        bh=eJ5Cl9vaV3peCTWnjThcO43m5nD+IuQbQHBUpPBgwss=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GUqDhJnQJfqRknnuI7KuDtElIpvSZmXvCBC31yR0YA3SETJINlVt6pwFgto1Fn0Wy
-         1GHMjU0SsZs22UmGiy5TlmyAnVZJ44W415oeBoVwLE5fmA9tH7TLdUwAVAhT3b8dN2
-         LeeP8YRpQ1bJaJa5HNMXUV9/b2FXbeLO8QkzOniOPI4N8Z6cwmTpLaLvNa/aQ3inAy
-         RSeZ2JbBDzkCIgSSo+8T77Lkpa7Jx/x4YF5CZWfwfR9ZVGYAAVXNzjqhQ66KoAmHUT
-         4FWkHvsFDZy5LO76e/oD3/pKgjiXhubVmkJk29aOPYu7PBn3cPF01xSEAyMJ447aIj
-         3AAyuYpJIOLqQ==
-X-Nifty-SrcIP: [126.90.211.135]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Dominique Martinet <asmadeus@codewreck.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhc@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 2/3] kbuild: LD_VERSION redenomination
-Date:   Sun, 13 Dec 2020 01:54:30 +0900
-Message-Id: <20201212165431.150750-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        Sat, 12 Dec 2020 12:30:51 -0500
+X-IronPort-AV: E=Sophos;i="5.78,414,1599516000"; 
+   d="scan'208";a="482633059"
+Received: from 173.121.68.85.rev.sfr.net (HELO hadrien) ([85.68.121.173])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2020 18:30:06 +0100
+Date:   Sat, 12 Dec 2020 18:30:06 +0100 (CET)
+From:   Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To:     Masahiro Yamada <masahiroy@kernel.org>
+cc:     linux-kbuild@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>,
+        Gilles Muller <Gilles.Muller@lip6.fr>,
+        Nicolas Palix <nicolas.palix@imag.fr>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Matthias Maennich <maennich@google.com>,
+        linux-kernel@vger.kernel.org, cocci@systeme.lip6.fr
+Subject: Re: [Cocci] [PATCH 1/3] kbuild: do not use scripts/ld-version.sh
+ for    checking spatch version
 In-Reply-To: <20201212165431.150750-1-masahiroy@kernel.org>
+Message-ID: <alpine.DEB.2.22.394.2012121829560.3058@hadrien>
 References: <20201212165431.150750-1-masahiroy@kernel.org>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion
-macros") introduced scripts/ld-version.sh for GCC LTO.
 
-At that time, this script handled 5 version fields because GCC LTO
-needed the downstream binutils. (https://lkml.org/lkml/2014/4/8/272)
 
-The code snippet from the submitted patch was as follows:
+On Sun, 13 Dec 2020, Masahiro Yamada wrote:
 
-    # We need HJ Lu's Linux binutils because mainline binutils does not
-    # support mixing assembler and LTO code in the same ld -r object.
-    # XXX check if the gcc plugin ld is the expected one too
-    # XXX some Fedora binutils should also support it. How to check for that?
-    ifeq ($(call ld-ifversion,-ge,22710001,y),y)
-        ...
+> scripts/ld-version.sh was, as its file name implies, originally intended
+> for the GNU ld version, but is (ab)used for the spatch version too.
+>
+> Use 'sort -CV' for the version comparison, then coccicheck does not need
+> to use scripts/ld-version.sh. Fix nsdeps as well.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-However, GCC LTO was not merged into the mainline after all.
-(https://lkml.org/lkml/2014/4/8/272)
+Applied, thanks.
 
-So, the 4th and 5th fields were never used, and finally removed by
-commit 0d61ed17dd30 ("ld-version: Drop the 4th and 5th version
-components").
+julia
 
-Since then, the last 4-digits returned by this script is always zeros.
-
-Remove the meaningless last 4-digits. This makes the version format
-consistent with GCC_VERSION, CLANG_VERSION, LLD_VERSION.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- arch/arm64/Kconfig            | 2 +-
- arch/mips/loongson64/Platform | 2 +-
- arch/mips/vdso/Kconfig        | 2 +-
- arch/powerpc/Makefile         | 2 +-
- arch/powerpc/lib/Makefile     | 2 +-
- scripts/ld-version.sh         | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index a6b5b7ef40ae..69d56b21a6ec 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1499,7 +1499,7 @@ config ARM64_PTR_AUTH
- 	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
- 	# Modern compilers insert a .note.gnu.property section note for PAC
- 	# which is only understood by binutils starting with version 2.33.1.
--	depends on LD_IS_LLD || LD_VERSION >= 233010000 || (CC_IS_GCC && GCC_VERSION < 90100)
-+	depends on LD_IS_LLD || LD_VERSION >= 23301 || (CC_IS_GCC && GCC_VERSION < 90100)
- 	depends on !CC_IS_CLANG || AS_HAS_CFI_NEGATE_RA_STATE
- 	depends on (!FUNCTION_GRAPH_TRACER || DYNAMIC_FTRACE_WITH_REGS)
- 	help
-diff --git a/arch/mips/loongson64/Platform b/arch/mips/loongson64/Platform
-index ec42c5085905..cc0b9c87f9ad 100644
---- a/arch/mips/loongson64/Platform
-+++ b/arch/mips/loongson64/Platform
-@@ -35,7 +35,7 @@ cflags-$(CONFIG_CPU_LOONGSON64)	+= $(call as-option,-Wa$(comma)-mno-fix-loongson
- # can't easily be used safely within the kbuild framework.
- #
- ifeq ($(call cc-ifversion, -ge, 0409, y), y)
--  ifeq ($(call ld-ifversion, -ge, 225000000, y), y)
-+  ifeq ($(call ld-ifversion, -ge, 22500, y), y)
-     cflags-$(CONFIG_CPU_LOONGSON64)  += \
-       $(call cc-option,-march=loongson3a -U_MIPS_ISA -D_MIPS_ISA=_MIPS_ISA_MIPS64)
-   else
-diff --git a/arch/mips/vdso/Kconfig b/arch/mips/vdso/Kconfig
-index 7aec721398d5..a665f6108cb5 100644
---- a/arch/mips/vdso/Kconfig
-+++ b/arch/mips/vdso/Kconfig
-@@ -12,7 +12,7 @@
- # the lack of relocations. As such, we disable the VDSO for microMIPS builds.
- 
- config MIPS_LD_CAN_LINK_VDSO
--	def_bool LD_VERSION >= 225000000 || LD_IS_LLD
-+	def_bool LD_VERSION >= 22500 || LD_IS_LLD
- 
- config MIPS_DISABLE_VDSO
- 	def_bool CPU_MICROMIPS || (!CPU_MIPSR6 && !MIPS_LD_CAN_LINK_VDSO)
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 5c8c06215dd4..6a9a852c3d56 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -65,7 +65,7 @@ UTS_MACHINE := $(subst $(space),,$(machine-y))
- ifdef CONFIG_PPC32
- KBUILD_LDFLAGS_MODULE += arch/powerpc/lib/crtsavres.o
- else
--ifeq ($(call ld-ifversion, -ge, 225000000, y),y)
-+ifeq ($(call ld-ifversion, -ge, 22500, y),y)
- # Have the linker provide sfpr if possible.
- # There is a corresponding test in arch/powerpc/lib/Makefile
- KBUILD_LDFLAGS_MODULE += --save-restore-funcs
-diff --git a/arch/powerpc/lib/Makefile b/arch/powerpc/lib/Makefile
-index 69a91b571845..d4efc182662a 100644
---- a/arch/powerpc/lib/Makefile
-+++ b/arch/powerpc/lib/Makefile
-@@ -31,7 +31,7 @@ obj-$(CONFIG_FUNCTION_ERROR_INJECTION)	+= error-inject.o
- # 64-bit linker creates .sfpr on demand for final link (vmlinux),
- # so it is only needed for modules, and only for older linkers which
- # do not support --save-restore-funcs
--ifeq ($(call ld-ifversion, -lt, 225000000, y),y)
-+ifeq ($(call ld-ifversion, -lt, 22500, y),y)
- extra-$(CONFIG_PPC64)	+= crtsavres.o
- endif
- 
-diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-index f2be0ff9a738..0f8a2c0f9502 100755
---- a/scripts/ld-version.sh
-+++ b/scripts/ld-version.sh
-@@ -6,6 +6,6 @@
- 	gsub(".*version ", "");
- 	gsub("-.*", "");
- 	split($1,a, ".");
--	print a[1]*100000000 + a[2]*1000000 + a[3]*10000;
-+	print a[1]*10000 + a[2]*100 + a[3];
- 	exit
- 	}
--- 
-2.27.0
-
+> ---
+>
+>  scripts/coccicheck | 14 +++++---------
+>  scripts/nsdeps     |  4 +---
+>  2 files changed, 6 insertions(+), 12 deletions(-)
+>
+> diff --git a/scripts/coccicheck b/scripts/coccicheck
+> index 209bb0427b43..d7f6b7ff130a 100755
+> --- a/scripts/coccicheck
+> +++ b/scripts/coccicheck
+> @@ -16,7 +16,6 @@ if [ ! -x "$SPATCH" ]; then
+>  fi
+>
+>  SPATCH_VERSION=$($SPATCH --version | head -1 | awk '{print $3}')
+> -SPATCH_VERSION_NUM=$(echo $SPATCH_VERSION | ${DIR}/scripts/ld-version.sh)
+>
+>  USE_JOBS="no"
+>  $SPATCH --help | grep "\-\-jobs" > /dev/null && USE_JOBS="yes"
+> @@ -186,14 +185,11 @@ coccinelle () {
+>
+>      OPT=`grep "Options:" $COCCI | cut -d':' -f2`
+>      REQ=`grep "Requires:" $COCCI | cut -d':' -f2 | sed "s| ||"`
+> -    REQ_NUM=$(echo $REQ | ${DIR}/scripts/ld-version.sh)
+> -    if [ "$REQ_NUM" != "0" ] ; then
+> -	    if [ "$SPATCH_VERSION_NUM" -lt "$REQ_NUM" ] ; then
+> -		    echo "Skipping coccinelle SmPL patch: $COCCI"
+> -		    echo "You have coccinelle:           $SPATCH_VERSION"
+> -		    echo "This SmPL patch requires:      $REQ"
+> -		    return
+> -	    fi
+> +    if [ -n "$REQ" ] && ! { echo "$REQ"; echo "$SPATCH_VERSION"; } | sort -CV ; then
+> +	    echo "Skipping coccinelle SmPL patch: $COCCI"
+> +	    echo "You have coccinelle:           $SPATCH_VERSION"
+> +	    echo "This SmPL patch requires:      $REQ"
+> +	    return
+>      fi
+>
+>  #   The option '--parse-cocci' can be used to syntactically check the SmPL files.
+> diff --git a/scripts/nsdeps b/scripts/nsdeps
+> index dab4c1a0e27d..e8ce2a4d704a 100644
+> --- a/scripts/nsdeps
+> +++ b/scripts/nsdeps
+> @@ -12,11 +12,9 @@ if [ ! -x "$SPATCH" ]; then
+>  	exit 1
+>  fi
+>
+> -SPATCH_REQ_VERSION_NUM=$(echo $SPATCH_REQ_VERSION | ${DIR}/scripts/ld-version.sh)
+>  SPATCH_VERSION=$($SPATCH --version | head -1 | awk '{print $3}')
+> -SPATCH_VERSION_NUM=$(echo $SPATCH_VERSION | ${DIR}/scripts/ld-version.sh)
+>
+> -if [ "$SPATCH_VERSION_NUM" -lt "$SPATCH_REQ_VERSION_NUM" ] ; then
+> +if ! { echo "$SPATCH_REQ_VERSION"; echo "$SPATCH_VERSION"; } | sort -CV ; then
+>  	echo "spatch needs to be version $SPATCH_REQ_VERSION or higher"
+>  	exit 1
+>  fi
+> --
+> 2.27.0
+>
+> _______________________________________________
+> Cocci mailing list
+> Cocci@systeme.lip6.fr
+> https://systeme.lip6.fr/mailman/listinfo/cocci
+>
