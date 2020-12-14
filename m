@@ -2,103 +2,114 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467BFC4361B
-	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 09:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76756C4361B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 23:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 016A422583
-	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 09:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A0302250F
+	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 23:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729843AbgLNJbg (ORCPT
+        id S2441286AbgLNXGJ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 14 Dec 2020 04:31:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55598 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730038AbgLNJba (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 Dec 2020 04:31:30 -0500
-Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA95CC0613D3
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Dec 2020 01:30:49 -0800 (PST)
-Received: by mail-vk1-xa42.google.com with SMTP id l187so3750726vki.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Dec 2020 01:30:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=p6a8zIGEYd/dUK9tmUWZsvDn+M6hDmHSJE85v0a6mTE=;
-        b=NRHKzaTAJbv8q/yoExkQdIFi5aom63CJhgwXsnhH0X85eASbJAQhqH/CLNPmdSecd3
-         c2L3JC/uS4IZy7GJoZeHa6jAASqOVgZgzqE5wKHH0549gJT2Qv8ntRe2RF6SU5il89RX
-         Z2ZVG2R7EXQMDNN82F5nSs3LHMrywP/2WyMySKbnV8YYby5U1i/92PPpphBiZyRJ0MVb
-         DQ08AO5RfCrUP++J0gyB6qoONrkHeAW2L/dntoyEIAFA3XJTxDZb6qiZwsd+S5/+oxao
-         sFSD6sQcT47Q2uTBIPOoMPcF/Jt8hpNobm04V3NmM2bRXQl5BKfnLzUyo5cddKNMvGdr
-         +KLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=p6a8zIGEYd/dUK9tmUWZsvDn+M6hDmHSJE85v0a6mTE=;
-        b=dQtuw/JAlw7ctIDkvwtN13D9ajRvzQPeV/RAVXMWQ7YjEPe1zvW5iihenwDj6Ybd7D
-         4aaaaS5VM/tDHfrqm912p72cNa0Gw1UHS168Vl1hA5L3JAlVZrAVvuWBac+nGpHxEl+S
-         g1tmvaHJ+vVScPwVBpseuSqoJvvd9rxHoH0No6VXL8ekOrTgsiyMam6mflj/wOr5khbJ
-         uiwHhkOhb21myPayPWKIerqi2IcZ7fkeLtncUa+Hanld5TgQYdWw1H+bX2+BiQCwJKzW
-         jhn/8yP/kAWoLP7DbEvPAd/URVxpISVLT5QuyqqnmodbKTVp1OdTnfVcKdwBMES8G7WO
-         r39g==
-X-Gm-Message-State: AOAM5339KD+ZeuBDodjihWcwHnqyHLE/Hmr7o9gVrtR3maGVBPvUzzfD
-        eIhkCT2xKqrGiy1HeL8a25My5qKkazbu0Z3l2xU=
-X-Google-Smtp-Source: ABdhPJytfuVdeVUuaFg4X75X5huB2dWNVuyotJxpnOjw5xgxpICDT+cwwsMmjUaH/KMfwz+nzT+NcL2Bc9JornPDrx8=
-X-Received: by 2002:a1f:b40c:: with SMTP id d12mr23747586vkf.17.1607938248870;
- Mon, 14 Dec 2020 01:30:48 -0800 (PST)
+        Mon, 14 Dec 2020 18:06:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45844 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2441285AbgLNXGJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 14 Dec 2020 18:06:09 -0500
+Date:   Mon, 14 Dec 2020 23:05:22 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607987128;
+        bh=5TsguwUz8VJK8ed5bDwSWwfzf/cJOL0KfWWRDjoJhzQ=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UAk4LB1gakF+U6GGpj55Ykx0xhrgf1wtLYgo9r9mFeGtMMIUlQosvriFGgdFwiXeC
+         IMuICyeGuCBx+14A+DqLiEZQP22TONAInVWdM5n49DxlVWfXAhICFXY58y6wpVsqU9
+         +/x+SeHiERi8NqQ18agSEF4pSFmSFlQy5i2Cz8iQpiYgJLYkvasjxZ+mgFNNEpahMT
+         UGmUFefAp3QT9mdbW9QFW/LuG3NPWfVA0lyiu0fI/XKpBCjF35lh0ax0CdwhdD03kG
+         djx8wy94NUek0W0az2sJTnimVI7JdePAliR5FelHiMnIvT+Qyj+PDJcZZDKH9ttMKk
+         rirQyugEJC3JQ==
+From:   Will Deacon <will@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhc@lemote.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 2/3] kbuild: LD_VERSION redenomination
+Message-ID: <20201214230521.GA14124@willie-the-truck>
+References: <20201212165431.150750-1-masahiroy@kernel.org>
+ <20201212165431.150750-2-masahiroy@kernel.org>
 MIME-Version: 1.0
-From:   John Millikin <jmillikin@gmail.com>
-Date:   Mon, 14 Dec 2020 18:30:37 +0900
-Message-ID: <CAL1ky9qQtFnJ0+2BBu6OwafaZex9_i+DQJgs3Nij2J06tge26w@mail.gmail.com>
-Subject: [PATCH] kconfig: Support building mconf with vendor sysroot ncurses.
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201212165431.150750-2-masahiroy@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Adds a new fallback path in the ncurses locator for mconf to support
-host compilers with a non-default sysroot.
+On Sun, Dec 13, 2020 at 01:54:30AM +0900, Masahiro Yamada wrote:
+> Commit ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion
+> macros") introduced scripts/ld-version.sh for GCC LTO.
+> 
+> At that time, this script handled 5 version fields because GCC LTO
+> needed the downstream binutils. (https://lkml.org/lkml/2014/4/8/272)
+> 
+> The code snippet from the submitted patch was as follows:
+> 
+>     # We need HJ Lu's Linux binutils because mainline binutils does not
+>     # support mixing assembler and LTO code in the same ld -r object.
+>     # XXX check if the gcc plugin ld is the expected one too
+>     # XXX some Fedora binutils should also support it. How to check for that?
+>     ifeq ($(call ld-ifversion,-ge,22710001,y),y)
+>         ...
+> 
+> However, GCC LTO was not merged into the mainline after all.
+> (https://lkml.org/lkml/2014/4/8/272)
+> 
+> So, the 4th and 5th fields were never used, and finally removed by
+> commit 0d61ed17dd30 ("ld-version: Drop the 4th and 5th version
+> components").
+> 
+> Since then, the last 4-digits returned by this script is always zeros.
+> 
+> Remove the meaningless last 4-digits. This makes the version format
+> consistent with GCC_VERSION, CLANG_VERSION, LLD_VERSION.
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>  arch/arm64/Kconfig            | 2 +-
+>  arch/mips/loongson64/Platform | 2 +-
+>  arch/mips/vdso/Kconfig        | 2 +-
+>  arch/powerpc/Makefile         | 2 +-
+>  arch/powerpc/lib/Makefile     | 2 +-
+>  scripts/ld-version.sh         | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index a6b5b7ef40ae..69d56b21a6ec 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1499,7 +1499,7 @@ config ARM64_PTR_AUTH
+>  	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
+>  	# Modern compilers insert a .note.gnu.property section note for PAC
+>  	# which is only understood by binutils starting with version 2.33.1.
+> -	depends on LD_IS_LLD || LD_VERSION >= 233010000 || (CC_IS_GCC && GCC_VERSION < 90100)
+> +	depends on LD_IS_LLD || LD_VERSION >= 23301 || (CC_IS_GCC && GCC_VERSION < 90100)
+>  	depends on !CC_IS_CLANG || AS_HAS_CFI_NEGATE_RA_STATE
+>  	depends on (!FUNCTION_GRAPH_TRACER || DYNAMIC_FTRACE_WITH_REGS)
+>  	help
 
-This is similar to the hardcoded search for ncurses under
-'/usr/include', but can support compilers that keep their default
-header and library directories elsewhere.
+Acked-by: Will Deacon <will@kernel.org>
 
-For nconfig, do nothing because the only vendor compiler I'm aware
-of with this layout (Apple Clang) ships an ncurses version that's too
-old for nconfig anyway.
-
-Signed-off-by: John Millikin <john@john-millikin.com>
----
- scripts/kconfig/mconf-cfg.sh | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/scripts/kconfig/mconf-cfg.sh b/scripts/kconfig/mconf-cfg.sh
-index aa68ec95620d..d38f44976418 100755
---- a/scripts/kconfig/mconf-cfg.sh
-+++ b/scripts/kconfig/mconf-cfg.sh
-@@ -39,6 +39,15 @@ if [ -f /usr/include/ncurses.h ]; then
-  exit 0
- fi
-
-+# As a final fallback before giving up, check if $HOSTCC knows of a default
-+# ncurses installation (e.g. from a vendor-specific sysroot).
-+echo '#include <ncurses.h>' | "${HOSTCC}" -E - >/dev/null 2>&1
-+if [ $? -eq 0 ]; then
-+ echo cflags=\"-D_GNU_SOURCE\"
-+ echo libs=\"-lncurses\"
-+ exit 0
-+fi
-+
- echo >&2 "*"
- echo >&2 "* Unable to find the ncurses package."
- echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
--- 
-2.24.3 (Apple Git-128)
+Will
