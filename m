@@ -2,36 +2,31 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76756C4361B
-	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 23:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C581C4361B
+	for <linux-kbuild@archiver.kernel.org>; Tue, 15 Dec 2020 14:19:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A0302250F
-	for <linux-kbuild@archiver.kernel.org>; Mon, 14 Dec 2020 23:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C1262250F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 15 Dec 2020 14:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441286AbgLNXGJ (ORCPT
+        id S1728926AbgLOOT2 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 14 Dec 2020 18:06:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45844 "EHLO mail.kernel.org"
+        Tue, 15 Dec 2020 09:19:28 -0500
+Received: from elvis.franken.de ([193.175.24.41]:42342 "EHLO elvis.franken.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2441285AbgLNXGJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 Dec 2020 18:06:09 -0500
-Date:   Mon, 14 Dec 2020 23:05:22 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607987128;
-        bh=5TsguwUz8VJK8ed5bDwSWwfzf/cJOL0KfWWRDjoJhzQ=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UAk4LB1gakF+U6GGpj55Ykx0xhrgf1wtLYgo9r9mFeGtMMIUlQosvriFGgdFwiXeC
-         IMuICyeGuCBx+14A+DqLiEZQP22TONAInVWdM5n49DxlVWfXAhICFXY58y6wpVsqU9
-         +/x+SeHiERi8NqQ18agSEF4pSFmSFlQy5i2Cz8iQpiYgJLYkvasjxZ+mgFNNEpahMT
-         UGmUFefAp3QT9mdbW9QFW/LuG3NPWfVA0lyiu0fI/XKpBCjF35lh0ax0CdwhdD03kG
-         djx8wy94NUek0W0az2sJTnimVI7JdePAliR5FelHiMnIvT+Qyj+PDJcZZDKH9ttMKk
-         rirQyugEJC3JQ==
-From:   Will Deacon <will@kernel.org>
+        id S1727879AbgLOOT1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Dec 2020 09:19:27 -0500
+Received: from uucp (helo=alpha)
+        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
+        id 1kpBA4-0002PO-00; Tue, 15 Dec 2020 15:18:44 +0100
+Received: by alpha.franken.de (Postfix, from userid 1000)
+        id 6A4DEC03B1; Tue, 15 Dec 2020 14:48:36 +0100 (CET)
+Date:   Tue, 15 Dec 2020 14:48:36 +0100
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -41,11 +36,11 @@ Cc:     linux-kbuild@vger.kernel.org,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Paul Mackerras <paulus@samba.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Will Deacon <will@kernel.org>,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 Subject: Re: [PATCH 2/3] kbuild: LD_VERSION redenomination
-Message-ID: <20201214230521.GA14124@willie-the-truck>
+Message-ID: <20201215134836.GA9946@alpha.franken.de>
 References: <20201212165431.150750-1-masahiroy@kernel.org>
  <20201212165431.150750-2-masahiroy@kernel.org>
 MIME-Version: 1.0
@@ -88,28 +83,13 @@ On Sun, Dec 13, 2020 at 01:54:30AM +0900, Masahiro Yamada wrote:
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
 > 
->  arch/arm64/Kconfig            | 2 +-
 >  arch/mips/loongson64/Platform | 2 +-
 >  arch/mips/vdso/Kconfig        | 2 +-
->  arch/powerpc/Makefile         | 2 +-
->  arch/powerpc/lib/Makefile     | 2 +-
->  scripts/ld-version.sh         | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index a6b5b7ef40ae..69d56b21a6ec 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1499,7 +1499,7 @@ config ARM64_PTR_AUTH
->  	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
->  	# Modern compilers insert a .note.gnu.property section note for PAC
->  	# which is only understood by binutils starting with version 2.33.1.
-> -	depends on LD_IS_LLD || LD_VERSION >= 233010000 || (CC_IS_GCC && GCC_VERSION < 90100)
-> +	depends on LD_IS_LLD || LD_VERSION >= 23301 || (CC_IS_GCC && GCC_VERSION < 90100)
->  	depends on !CC_IS_CLANG || AS_HAS_CFI_NEGATE_RA_STATE
->  	depends on (!FUNCTION_GRAPH_TRACER || DYNAMIC_FTRACE_WITH_REGS)
->  	help
 
-Acked-by: Will Deacon <will@kernel.org>
+Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 
-Will
+Thomas.
+
+-- 
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
