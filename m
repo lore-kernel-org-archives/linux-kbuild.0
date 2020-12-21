@@ -2,110 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FACBC433DB
-	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Dec 2020 14:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDFCC433DB
+	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Dec 2020 14:53:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E73622B43
-	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Dec 2020 14:31:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B069E22C7B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 21 Dec 2020 14:53:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbgLUObD (ORCPT
+        id S1727123AbgLUOw7 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 21 Dec 2020 09:31:03 -0500
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:28732 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727148AbgLUObC (ORCPT
+        Mon, 21 Dec 2020 09:52:59 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:47969 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726841AbgLUOw6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Dec 2020 09:31:02 -0500
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 0BLETlte009471;
-        Mon, 21 Dec 2020 23:29:47 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 0BLETlte009471
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1608560987;
-        bh=PY+0ThPVWND3Lt3Y+ClnFLJcNefmldtQqyCaw9pnlNY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Bw3IaApZWwPkn22WMTgwWffkvKmG4J+ON3tiUcP/znPabxxBsef+qgZ83cTnKbNd5
-         m+9m3XxggedPMEBaUkQqIbCTUrvYyZpDIPEDwpjbo8608V71MhqlZDlZuVXkvNqooL
-         5BEdFagN3Pm2oSy0rq5AhfJv+4YfnXKWWIyaZ7PgJy1nRr7n1xWWNH3jy07Swv4WcZ
-         OFTuvd0T1+ys6Q6Zzo5UCnhA2qUInjTnVkoGYjX50KIVvDz7PCwHmMYua7EIVJhO3X
-         r5hp+FrzYzf0OJq8lKjAt3xZssv21iWdsQJDTf98DoLnZemJoxFTWRDbqLtodIGiFT
-         PYtN/nZmmVgSg==
-X-Nifty-SrcIP: [209.85.215.170]
-Received: by mail-pg1-f170.google.com with SMTP id z21so6454580pgj.4;
-        Mon, 21 Dec 2020 06:29:47 -0800 (PST)
-X-Gm-Message-State: AOAM532M7lBHV4iaBWKRykXaTkyZFu9WMrAjA0Zx1tFOYcrsEuCxGpoP
-        FKzwLqtZutouQrA/9gan+LFswwWRwSuHls1Ehks=
-X-Google-Smtp-Source: ABdhPJx1i2sUSv2jDc69OziBsRnfR7tJle94dwX/H2E9VzZIt1Ci5INaQwjjjE7NMi1cp7Bn8Afrnp6quqw2QDO0c4M=
-X-Received: by 2002:aa7:9501:0:b029:155:3b11:d5c4 with SMTP id
- b1-20020aa795010000b02901553b11d5c4mr15472118pfp.76.1608560986910; Mon, 21
- Dec 2020 06:29:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20201212165431.150750-1-masahiroy@kernel.org> <20201212165431.150750-3-masahiroy@kernel.org>
- <ff1adc79f7884ba1a1dcbdd806e81d7b@AcuMS.aculab.com>
-In-Reply-To: <ff1adc79f7884ba1a1dcbdd806e81d7b@AcuMS.aculab.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Mon, 21 Dec 2020 23:29:10 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAT0-_C3N1AO9uPV-G9U99YMeusD5HULnSmX2CfswQsuYQ@mail.gmail.com>
-Message-ID: <CAK7LNAT0-_C3N1AO9uPV-G9U99YMeusD5HULnSmX2CfswQsuYQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] kbuild: rewrite ld-version.sh in shell script
-To:     David Laight <David.Laight@aculab.com>
-Cc:     "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
+        Mon, 21 Dec 2020 09:52:58 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-114-ZT--plLVNhuSAIaNfelOAQ-1; Mon, 21 Dec 2020 14:51:19 +0000
+X-MC-Unique: ZT--plLVNhuSAIaNfelOAQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 21 Dec 2020 14:51:16 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 21 Dec 2020 14:51:16 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Masahiro Yamada' <masahiroy@kernel.org>
+CC:     "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "Dominique Martinet" <asmadeus@codewreck.org>,
         Michal Marek <michal.lkml@markovi.net>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: RE: [PATCH 3/3] kbuild: rewrite ld-version.sh in shell script
+Thread-Topic: [PATCH 3/3] kbuild: rewrite ld-version.sh in shell script
+Thread-Index: AQHW0KfRQeCeMjpix0eG5Uz36Tqg2qnz/UVAgA2stgCAAAFxEA==
+Date:   Mon, 21 Dec 2020 14:51:16 +0000
+Message-ID: <2a0911ccea3d47e0bfa5ab6ca2d26bb5@AcuMS.aculab.com>
+References: <20201212165431.150750-1-masahiroy@kernel.org>
+ <20201212165431.150750-3-masahiroy@kernel.org>
+ <ff1adc79f7884ba1a1dcbdd806e81d7b@AcuMS.aculab.com>
+ <CAK7LNAT0-_C3N1AO9uPV-G9U99YMeusD5HULnSmX2CfswQsuYQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAT0-_C3N1AO9uPV-G9U99YMeusD5HULnSmX2CfswQsuYQ@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Dec 13, 2020 at 6:47 AM David Laight <David.Laight@aculab.com> wrote:
->
-> From: Masahiro Yamada
-> > Sent: 12 December 2020 16:55
-> >
-> > This script was written in awk in spite of the file extension '.sh'.
-> > Rewrite it as a shell script.
-> ...
-> > +#
-> > +# Usage: $ ./scripts/ld-version.sh ld
-> > +#
-> > +# Print the linker version of `ld' in a 5 or 6-digit form
-> > +# such as `23501' for GNU ld 2.35.1 etc.
-> > +
-> > +first_line="$($* --version | head -n 1)"
-> > +
-> > +if ! ( echo $first_line | grep -q "GNU ld"); then
-> > +     echo 0
-> > +     exit 1
-> > +fi
-> > +
-> > +# Distributions may append an extra string like 2.35-15.fc33
-> > +# Take the part that consists of numbers and dots.
-> > +VERSION=$(echo $first_line | sed 's/.* \([^ ]*\)$/\1/' | sed 's/^\(^[0-9.]*\).*/\1/')
-> > +MAJOR=$(echo $VERSION | cut -d . -f 1)
-> > +MINOR=$(echo $VERSION | cut -d . -f 2)
-> > +PATCHLEVEL=$(echo $VERSION | cut -d . -f 3)
-> > +printf "%d%02d%02d\\n" $MAJOR $MINOR $PATCHLEVEL
->
->
-> Hmmmm.....
-> You've managed to convert an awk script into something that requires
-> sh, head, grep, sed (twice), and cut (thrice).
-> Plus (probably) a few sub-shells.
->
-> It is quite ease to do it all in all in the shell.
->
->         David
->
+RnJvbTogTWFzYWhpcm8gWWFtYWRhDQo+IFNlbnQ6IDIxIERlY2VtYmVyIDIwMjAgMTQ6MjkNCj4g
+DQo+IE9uIFN1biwgRGVjIDEzLCAyMDIwIGF0IDY6NDcgQU0gRGF2aWQgTGFpZ2h0IDxEYXZpZC5M
+YWlnaHRAYWN1bGFiLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBGcm9tOiBNYXNhaGlybyBZYW1hZGEN
+Cj4gPiA+IFNlbnQ6IDEyIERlY2VtYmVyIDIwMjAgMTY6NTUNCj4gPiA+DQo+ID4gPiBUaGlzIHNj
+cmlwdCB3YXMgd3JpdHRlbiBpbiBhd2sgaW4gc3BpdGUgb2YgdGhlIGZpbGUgZXh0ZW5zaW9uICcu
+c2gnLg0KPiA+ID4gUmV3cml0ZSBpdCBhcyBhIHNoZWxsIHNjcmlwdC4NCj4gPiAuLi4NCj4gPiA+
+ICsjDQo+ID4gPiArIyBVc2FnZTogJCAuL3NjcmlwdHMvbGQtdmVyc2lvbi5zaCBsZA0KPiA+ID4g
+KyMNCj4gPiA+ICsjIFByaW50IHRoZSBsaW5rZXIgdmVyc2lvbiBvZiBgbGQnIGluIGEgNSBvciA2
+LWRpZ2l0IGZvcm0NCj4gPiA+ICsjIHN1Y2ggYXMgYDIzNTAxJyBmb3IgR05VIGxkIDIuMzUuMSBl
+dGMuDQo+ID4gPiArDQo+ID4gPiArZmlyc3RfbGluZT0iJCgkKiAtLXZlcnNpb24gfCBoZWFkIC1u
+IDEpIg0KPiA+ID4gKw0KPiA+ID4gK2lmICEgKCBlY2hvICRmaXJzdF9saW5lIHwgZ3JlcCAtcSAi
+R05VIGxkIik7IHRoZW4NCj4gPiA+ICsgICAgIGVjaG8gMA0KPiA+ID4gKyAgICAgZXhpdCAxDQo+
+ID4gPiArZmkNCj4gPiA+ICsNCj4gPiA+ICsjIERpc3RyaWJ1dGlvbnMgbWF5IGFwcGVuZCBhbiBl
+eHRyYSBzdHJpbmcgbGlrZSAyLjM1LTE1LmZjMzMNCj4gPiA+ICsjIFRha2UgdGhlIHBhcnQgdGhh
+dCBjb25zaXN0cyBvZiBudW1iZXJzIGFuZCBkb3RzLg0KPiA+ID4gK1ZFUlNJT049JChlY2hvICRm
+aXJzdF9saW5lIHwgc2VkICdzLy4qIFwoW14gXSpcKSQvXDEvJyB8IHNlZCAncy9eXCheWzAtOS5d
+KlwpLiovXDEvJykNCj4gPiA+ICtNQUpPUj0kKGVjaG8gJFZFUlNJT04gfCBjdXQgLWQgLiAtZiAx
+KQ0KPiA+ID4gK01JTk9SPSQoZWNobyAkVkVSU0lPTiB8IGN1dCAtZCAuIC1mIDIpDQo+ID4gPiAr
+UEFUQ0hMRVZFTD0kKGVjaG8gJFZFUlNJT04gfCBjdXQgLWQgLiAtZiAzKQ0KPiA+ID4gK3ByaW50
+ZiAiJWQlMDJkJTAyZFxcbiIgJE1BSk9SICRNSU5PUiAkUEFUQ0hMRVZFTA0KPiA+DQo+ID4NCj4g
+PiBIbW1tbS4uLi4uDQo+ID4gWW91J3ZlIG1hbmFnZWQgdG8gY29udmVydCBhbiBhd2sgc2NyaXB0
+IGludG8gc29tZXRoaW5nIHRoYXQgcmVxdWlyZXMNCj4gPiBzaCwgaGVhZCwgZ3JlcCwgc2VkICh0
+d2ljZSksIGFuZCBjdXQgKHRocmljZSkuDQo+ID4gUGx1cyAocHJvYmFibHkpIGEgZmV3IHN1Yi1z
+aGVsbHMuDQo+ID4NCj4gPiBJdCBpcyBxdWl0ZSBlYXNlIHRvIGRvIGl0IGFsbCBpbiBhbGwgaW4g
+dGhlIHNoZWxsLg0KPiA+DQo+ID4gICAgICAgICBEYXZpZA0KPiA+DQo+IA0KPiBPSywgcGxlYXNl
+IHJld3JpdGUgdGhlIGNvZGUuDQoNCkkndmUgcG9zdGVkIGEgY291cGxlIG9mIHZlcnNpb25zIGJl
+Zm9yZSwgaG93IGFib3V0IHRoaXMgb25lLg0KSSd2ZSBhZGRlZCBhIGZldyBjb21tZW50cyAtIHdo
+aWNoIGRvbid0IG5lZWQgdG8gYmUgaW4gdGhlIGZpbmFsIHZlcnNpb24uDQoNCiMgR2V0IHRoZSBm
+aXJzdCBsaW5lIG9mIHRoZSAnbGQgLS12ZXJzaW9uJyBvdXRwdXQNCmlmIGlucHV0X2Zyb21fZnJv
+bV9zdGRpbjsgdGhlbg0KCXJlYWQgbGluZQ0KZWxzZQ0KCUlGUz0nDQonDQoJc2V0IC0tICQoIiRA
+IikNCglsaW5lPSIkMSINCmZpDQoNCiMgU3BsaXQgdGhlIGxpbmUgb24gJ3NwYWNlJyBhbmQgZ2V0
+IHRoZSBsYXN0IHdvcmQNCklGUz0nICcNCnNldCAtLSAkbGluZQ0Kc2hpZnQgJCgoJCMgLSAxKSkN
+CnZlcnNpb249IiQxIg0KDQojIFNwbGl0IG9uICcuJyBhbmQgJy0nDQpJRlM9Jy4tJw0Kc2V0IC0t
+ICR2ZXJzaW9uDQoNCiMgVGhlIHRocmVlIHZlcnNpb24gY29tcG9uZW50cyBhcmUgbm93ICQxICQy
+IGFuZCAkMw0KIyBzbyB5b3UgY2FuIGRvIGVpdGhlcg0KcHJpbnRmICIlZCUwMmQlMDJkXFxuIiAk
+MSAkMiAkMw0KIyBvcg0KZWNobyAkKCgkMSAqIDEwMDAwICsgJDIgKiAxMDAgKyAkMykpDQojIGJv
+dGggYXJlIGJ1aWx0aW5zIG9uIHJlY2VudCBzaGVsbHMgKHByaW50ZiBpcyBtb3N0IGxpa2VseSBu
+b3QgdG8gYmUpLg0KDQpTbyB0aGlzIHNob3VsZCBiZSB0aGUgc2FtZSBhcyB0aGUgc2NyaXB0IGFi
+b3ZlOg0KDQojISAvYmluL3NoDQpJRlM9Jw0KJw0Kc2V0IC0tICQoIiRAIikNCiMgVGhlIGxhc3Qg
+d29yZCBjb250YWlucyB0aGUgdmVyc2lvbg0KSUZTPScgJw0Kc2V0IC0tICQxDQpzaGlmdCAkKCgk
+IyAtIDEpKQ0KIyBHZXQgdGhlIGZpcnN0IDMgcGFydHMgb2YgdGhlIHZlcnNpb24NCklGUz0nLi0n
+DQpzZXQgLS0gJDENCnByaW50ZiAiJWQlMDJkJTAyZFxcbiIgJDEgJDIgJDMNCg0KU2VlbXMgdG8g
+d29yayBmb3IgbWUuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUs
+IEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJl
+Z2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-OK, please rewrite the code.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
