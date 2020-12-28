@@ -2,95 +2,124 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B99C433E0
-	for <linux-kbuild@archiver.kernel.org>; Wed, 23 Dec 2020 15:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7F8C433DB
+	for <linux-kbuild@archiver.kernel.org>; Mon, 28 Dec 2020 07:34:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00DE52332A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 23 Dec 2020 15:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DAEB221E5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 28 Dec 2020 07:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727360AbgLWPHp (ORCPT
+        id S1726465AbgL1HeU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 23 Dec 2020 10:07:45 -0500
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:23038 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727176AbgLWPHp (ORCPT
+        Mon, 28 Dec 2020 02:34:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54012 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726420AbgL1HeU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Dec 2020 10:07:45 -0500
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 0BNF6Z1U031951;
-        Thu, 24 Dec 2020 00:06:36 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 0BNF6Z1U031951
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1608735996;
-        bh=rVleOCwdA5mNcHzx2fk9F0Qc+X+VP6kaTvPtwieTX9o=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=GUb3J/lvEcnx5jM74AWQpKMYWQID2N+iJGg4E5mV5Qs3XN15V/maSlCtMhcDJVgCY
-         SKWmVkvnHTaS4kozn/ZOdREtjK8O5SlNboQPHKHNrpVDJuNbSzYcgDKCa7WdyffEjw
-         yqSDlqOpgQWX/9VRR+cd0DWNqD2MWRV1+fiZ0cGcOkBsf6YvgnBwSU6fhNWL91U/0x
-         qLq9jStlDtLvuk7L3okDItHbIAu/0lutVS9Rz3vYe0aIexqN2g0bvzP2Xoc2KQ5K/g
-         TtHg2TtcT3wuWUaTUy/zzoaqQoRastd3o0ofL6VlzSWacUzp0WW3zRV1GtPu2uMC+D
-         Tzk/r89oOnAkQ==
-X-Nifty-SrcIP: [209.85.210.177]
-Received: by mail-pf1-f177.google.com with SMTP id c79so10530484pfc.2;
-        Wed, 23 Dec 2020 07:06:36 -0800 (PST)
-X-Gm-Message-State: AOAM530KPAfftiW3aSQWHHGihF+ZBo4B3Lz7G003/71MPE/ithg7Pged
-        6echfWeCUBh25ppC6mEZCGNkXfUnPlJdmjB3TJE=
-X-Google-Smtp-Source: ABdhPJyG0PVPLrfWb+gE/h6hG28LKhOLIsv7LZcm00nbzrKSKvxq5R5+PcMkkB4imNBKyhEkWxpIqQw8LcNZAoYstIg=
-X-Received: by 2002:a63:ff09:: with SMTP id k9mr6019331pgi.175.1608735995368;
- Wed, 23 Dec 2020 07:06:35 -0800 (PST)
+        Mon, 28 Dec 2020 02:34:20 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58B9C061794
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Dec 2020 23:33:39 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id r17so8725849ilo.11
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Dec 2020 23:33:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to;
+        bh=QKNiGGdlJRHU6tNaNc0JB9aZkK6AAVcU5541+Et+KKo=;
+        b=DeK9XTQINDknQtEh9z3HSit7EmK0Qg9FcGvrblgDj/WQ2E+6e8m24SX9+Uuer6wjFb
+         VNh2XZKZrX0sAuhXivmF955ZaXAmRwibNxJob3v18MH386V/3kPCDpKoFKuOE7r/7tP/
+         2ePG2E+GTGp7awvDYZYOIRdZl1fOU1yIBb+90ha3hZwg2dZDw/TOVel/J7OHAGYOGMsJ
+         +CnXziJXohxj6TgPDxsOiVVi5a47o00W8AiXFrXnuFiay8D5yIRxStDoBgfjG9JSBpWr
+         i0vNpquAxoM1zet2g1eevEwjQFeMOe8JIKQZoyQFuC2dhHrLqJOZWQxhJeGOGO2MPMJH
+         +8qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to;
+        bh=QKNiGGdlJRHU6tNaNc0JB9aZkK6AAVcU5541+Et+KKo=;
+        b=Mnrh+cgH7juLZb7m/EuawcAEEHRbc7BsqxTjcB2ARW9oS+a1H1blDpAx+15QAuP43t
+         GR1VbttPdWB620k+UlLvlO1/p7ShoMm7Nc+by6Jaqsn19BdLgtvM3jDWBDu7QzeFbLlC
+         2IKHqUR4+hgnm5GgKl61nH/9gq0S5ueyFIT2ZA4FAqvzmEogUcKsN9sSUgzK8/ZfdOeu
+         cSPV9/gMCrzVbeit9qkF8g+dcAoZbx108+oKSXQz004GkNZT5vY6Nwlq6H2GX6XEzQCv
+         5tXWfTPwUU7k7NTd8Pzzy06OVOXbvFGM0aOFOaocsRNhexHBlFJiKeEgEMZYkuV3Vz5d
+         ZrFQ==
+X-Gm-Message-State: AOAM53065Pe6bq9L378ydOkpzM9O0Pj35drqOAiOVTWnLXHg3vGI/UH2
+        sFhMhB6eLi8LpAp6cs2jSC6PRkh1gD+ViWmjanZmFp9TOrN4hQ==
+X-Google-Smtp-Source: ABdhPJzX5dMxKVFUcWWWhsxGDdzfA57oj5DQCcB0S8Gf6REudZkDA6yHHfw+hmnf5qOD8YbHoDXSlA1S9KELFy+oR78=
+X-Received: by 2002:a05:6e02:1ba3:: with SMTP id n3mr43130979ili.10.1609140819208;
+ Sun, 27 Dec 2020 23:33:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20201219170805.7151-1-rdunlap@infradead.org>
-In-Reply-To: <20201219170805.7151-1-rdunlap@infradead.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 24 Dec 2020 00:05:58 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARBo-Kww4PQmZseoYddWiFFSbZeNkaoOTik9bFjMM__-Q@mail.gmail.com>
-Message-ID: <CAK7LNARBo-Kww4PQmZseoYddWiFFSbZeNkaoOTik9bFjMM__-Q@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: config script: add a little user help
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+References: <CA+icZUUQRKuZzN0ZbaG6vprRWcKPKYVYTryiMFac7q_PRcBvgA@mail.gmail.com>
+In-Reply-To: <CA+icZUUQRKuZzN0ZbaG6vprRWcKPKYVYTryiMFac7q_PRcBvgA@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Mon, 28 Dec 2020 08:33:27 +0100
+Message-ID: <CA+icZUV5VnJBFD50jLENU4Js1-vT7FX_z7EH-y2de2UKebO=wA@mail.gmail.com>
+Subject: Linux 5.11-rc1
+To:     linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Dec 20, 2020 at 2:08 AM Randy Dunlap <rdunlap@infradead.org> wrote:
->
-> Give the user a clue about the problem along with the 35 lines of
-> usage/help text.
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Andi Kleen <ak@linux.intel.com>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> ---
-> v2: spell out "command" & send to STDERR; (Yamada-san)
+Grrr, wrong email it should be <linux-kbuild@vger.kernel.org>
 
-Applied to linux-kbuild. Thanks.
+- sed@ -
+
+---------- Forwarded message ---------
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Mon, Dec 28, 2020 at 8:30 AM
+Subject: Re: Linux 5.11-rc1
+To: Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada
+<masahiroy@kernel.org>
+Cc: <inux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 
 
->  scripts/config |    1 +
->  1 file changed, 1 insertion(+)
->
-> --- linux-next-20201218.orig/scripts/config
-> +++ linux-next-20201218/scripts/config
-> @@ -223,6 +223,7 @@ while [ "$1" != "" ] ; do
->                 ;;
->
->         *)
-> +               echo "bad command: $CMD" >&2
->                 usage
->                 ;;
->         esac
+[ Please CC me I am not subscribed to LKML and linux-kbuild ML ]
 
+Hi Linus, Hi Mashiro,
 
+thanks for the Linux v5.11-rc1 release.
 
--- 
-Best Regards
-Masahiro Yamada
+With a new release I always do my first builds with my distro's
+default compiler and linker (GCC v10.2.1 and GNU/ld BFD v2.35.1).
+( It's approx. 40% faster than LLVM toolchain v11.0.1-rc2 here on
+Debian/testing AMD64. )
+
+The only warning I see for the first time (with v5.10.3 not observed):
+
+  sh ./scripts/depmod.sh depmod 5.11.0-rc1-1-amd64-gcc10-bfd
+Warning: 'make modules_install' requires depmod. Please install it.
+This is probably in the kmod package.
+
+The only change I see in this area is:
+
+436e980e2ed5 kbuild: don't hardcode depmod path
+
+depmod from kmod Debian package is placed and I have no /sbin in my
+user's path (and not before?):
+
+$ dpkg -L kmod | grep bin | grep depmod
+/sbin/depmod
+
+$ which depmod
+[ empty ]
+
+$ echo $PATH
+/opt/proxychains-ng/bin:/home/dileks/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+
+OK, this is a warning, but might confuse other users.
+
+Please, let me know if you need further information and keep me CCed.
+
+Thanks.
+
+Regards,
+- Sedat -
+
+[1] https://git.kernel.org/linus/436e980e2ed526832de822cbf13c317a458b78e1
