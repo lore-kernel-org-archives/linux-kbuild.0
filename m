@@ -2,71 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6DBC433DB
-	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Jan 2021 12:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07610C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Jan 2021 12:12:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE88D2151B
-	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Jan 2021 12:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C206E22285
+	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Jan 2021 12:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726517AbhABMEH (ORCPT
+        id S1726486AbhABMMm (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 2 Jan 2021 07:04:07 -0500
-Received: from esgaroth.petrovitsch.at ([78.47.184.11]:3391 "EHLO
-        esgaroth.tuxoid.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbhABMEH (ORCPT
+        Sat, 2 Jan 2021 07:12:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45236 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726327AbhABMMl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Jan 2021 07:04:07 -0500
-Received: from thorin.petrovitsch.priv.at (80-110-120-81.cgn.dynamic.surfer.at [80.110.120.81])
-        (authenticated bits=0)
-        by esgaroth.tuxoid.at (8.15.2/8.15.2) with ESMTPSA id 102B5Llo015542
-        (version=TLSv1 cipher=AES256-SHA bits=256 verify=NO);
-        Sat, 2 Jan 2021 12:05:22 +0100
-Message-ID: <b9d3c1063d4c3f9a0cb71442cc92ad77a859d438.camel@petrovitsch.priv.at>
+        Sat, 2 Jan 2021 07:12:41 -0500
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2205BC061573;
+        Sat,  2 Jan 2021 04:12:01 -0800 (PST)
+Received: by mail-io1-xd2b.google.com with SMTP id d9so20790868iob.6;
+        Sat, 02 Jan 2021 04:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=Zia7YjD81hBGAI5yZOzHqZVEQYTe6YXjIf2zZ75X41Y=;
+        b=hOSuah95K0svAcYLL52cUU95FM8NpMHWq9pNsckGUgE9NCEeSDKsk2HUJDLlLzbW/3
+         8wuISAtgQnEnrq49gaQY6tFLj0/9m+qWafRmPwWfm3sAonYkdIlCK8yw2ZULhwr0gEJ/
+         CYnF5XRXLvtL8aZ8TMzxGnZTFwc2pis0rYAhBG1g1RM6i+e8lyh0hbRgyoyBM1iksXJv
+         cJ+/7ZhHTYF3Fa7zsU4Zj7FVqNWnnkxEwzoDzfB+8t/0k0SBLoNYgIdPb58U/yR1ecw7
+         GhRSb2GBi40Dp9HXkrrSRrh2Bn0WMZjgO5Uclhk4CnpZ9i/3W62J5oG/R975Sk81rfGC
+         ftSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=Zia7YjD81hBGAI5yZOzHqZVEQYTe6YXjIf2zZ75X41Y=;
+        b=q2BxaE1wq1WGn4Gey+lLZE7vVlJB8K9yImfHy40cVyWuhh9CRN8EQWX9hgfEDAlayc
+         I1nRtNSoqe28v8sklc6XchcXyDIxOZ1RHgu7uYhtdYpEFQzcG6ksfuUDvHTI8pp9CQ0J
+         GuLNWm6ZFgPyzdlcegn2W4EI5bEHP01VYrUdOpcS/MtNHHiU7fLjEfNU8mcvTqrQNEZq
+         AuZaEp2HSIKxGYfTAWNE2nR5Uj7b1TaHN9JZZ8jA9gqK6wvbqJwqFrroYJAhpIWgO0UJ
+         J4TMAOnEXR2mY1XtypJguJxOisizAjATNW1wU+1m+GaQPbGtwGhtRqA0fRYE0N/k+qXm
+         UnWg==
+X-Gm-Message-State: AOAM533j/PBscvldqszTEGGvYI1tXdCR15FPHbcd0d7F+vn+RtsseVpv
+        OyNnf+TnT2X/qIDmEn9sThlH4MPR0DqXJ16pEjY=
+X-Google-Smtp-Source: ABdhPJzyUF8qG0JcJzis3vCKIjJZSirsEXij9KA3QmlhPCs6wnjVSA6Qa/EAVEsLoPlIE9mIVQNxB5/FHlReaLz5WWU=
+X-Received: by 2002:a5e:9b06:: with SMTP id j6mr53019260iok.171.1609589520440;
+ Sat, 02 Jan 2021 04:12:00 -0800 (PST)
+MIME-Version: 1.0
+References: <CA+icZUUQRKuZzN0ZbaG6vprRWcKPKYVYTryiMFac7q_PRcBvgA@mail.gmail.com>
+ <CA+icZUWHiCu9=+80Z8OV+Q3r-TJ4Vm0t62P_Qgck5bRzjrtaWg@mail.gmail.com>
+ <CAHk-=wh3AsdUVZ8GKNCdUmY0_nGmoiOVTwy7rR5QM7K31QiSqw@mail.gmail.com>
+ <20210101161435.GA344@duo.ucw.cz> <CA+icZUXKXt3NfgVxZN+m+3d_dqBi+o0EyJH53h-sXU8buaUe7g@mail.gmail.com>
+ <CAK7LNASQZ7SWrAykdH71iq6SyLj=gG-EGhCy8SHkDz_bdq2BMw@mail.gmail.com>
+ <CA+icZUXyfv0sOP=UG6oeoxpHbEpOrufJzzUWb3ZOpE_TMQerwQ@mail.gmail.com>
+ <b9d3c1063d4c3f9a0cb71442cc92ad77a859d438.camel@petrovitsch.priv.at>
+ <CA+icZUWsffXuBUTcjLhrGvDKRp8fut=k_HdyhQ-QLZHjfXpqmg@mail.gmail.com> <0b797d40843b2cd54a5840ee97a9f77fb60e4658.camel@petrovitsch.priv.at>
+In-Reply-To: <0b797d40843b2cd54a5840ee97a9f77fb60e4658.camel@petrovitsch.priv.at>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Sat, 2 Jan 2021 13:11:49 +0100
+Message-ID: <CA+icZUV8hjw47ixSNf3ZbpyEPKFdcWwiCYn8F4dzSETuQO-gFg@mail.gmail.com>
 Subject: Re: Linux 5.11-rc1
-From:   Bernd Petrovitsch <bernd@petrovitsch.priv.at>
-To:     sedat.dilek@gmail.com, Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Pavel Machek <pavel@ucw.cz>,
+To:     Bernd Petrovitsch <bernd@petrovitsch.priv.at>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Date:   Sat, 02 Jan 2021 12:05:11 +0100
-In-Reply-To: <CA+icZUXyfv0sOP=UG6oeoxpHbEpOrufJzzUWb3ZOpE_TMQerwQ@mail.gmail.com>
-References: <CA+icZUUQRKuZzN0ZbaG6vprRWcKPKYVYTryiMFac7q_PRcBvgA@mail.gmail.com>
-         <CA+icZUWHiCu9=+80Z8OV+Q3r-TJ4Vm0t62P_Qgck5bRzjrtaWg@mail.gmail.com>
-         <CAHk-=wh3AsdUVZ8GKNCdUmY0_nGmoiOVTwy7rR5QM7K31QiSqw@mail.gmail.com>
-         <20210101161435.GA344@duo.ucw.cz>
-         <CA+icZUXKXt3NfgVxZN+m+3d_dqBi+o0EyJH53h-sXU8buaUe7g@mail.gmail.com>
-         <CAK7LNASQZ7SWrAykdH71iq6SyLj=gG-EGhCy8SHkDz_bdq2BMw@mail.gmail.com>
-         <CA+icZUXyfv0sOP=UG6oeoxpHbEpOrufJzzUWb3ZOpE_TMQerwQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-DCC--Metrics: esgaroth.tuxoid.at 1480; Body=6 Fuz1=6 Fuz2=6
-X-Virus-Scanned: clamav-milter 0.97 at esgaroth.tuxoid.at
-X-Virus-Status: Clean
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, 2021-01-02 at 10:13 +0100, Sedat Dilek wrote:
-[...]
-> To be honest I wondered why there were no more reports on this.
+> > IMHO users should not need to fix their environment.
+> > ( The discussion is a bit obsolete as we now have a fix. )
+>
+> FWIW, I have no (and don't see any) problems simply appending
+> /sbin:/usr/sbin to the $PATH in/for the kernel's scripts.
+>
 
-Perhaps I'm not the only one who has /sbin and /usr/sbin in the
-$PATH of normal accounts too (and idk what's the default
-behaviour of distributions is - my .bashrc "fixes" the
-$PATH).
+Another workaround is to pass DEPMOD=/path/to/depmod in the kernel-build script.
 
-MfG,
-	Bernd
--- 
-Bernd Petrovitsch                  Email : bernd@petrovitsch.priv.at
-There is no cloud, just other people computers. - FSFE
-                     LUGA : http://www.luga.at
+Again, such custom workarounds should not be necessary.
 
-
+- Sedat -
