@@ -2,147 +2,167 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCE8C433DB
-	for <linux-kbuild@archiver.kernel.org>; Sun,  3 Jan 2021 18:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6066C433DB
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Jan 2021 23:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7EF8207FB
-	for <linux-kbuild@archiver.kernel.org>; Sun,  3 Jan 2021 18:35:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72E40207BC
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Jan 2021 23:10:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726999AbhACSfc (ORCPT
+        id S1727384AbhADXKq (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 3 Jan 2021 13:35:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
+        Mon, 4 Jan 2021 18:10:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726718AbhACSfb (ORCPT
+        with ESMTP id S1727191AbhADXKp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 3 Jan 2021 13:35:31 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B2FBC0613C1
-        for <linux-kbuild@vger.kernel.org>; Sun,  3 Jan 2021 10:34:51 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id 22so21704043qkf.9
-        for <linux-kbuild@vger.kernel.org>; Sun, 03 Jan 2021 10:34:51 -0800 (PST)
+        Mon, 4 Jan 2021 18:10:45 -0500
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E700C061794;
+        Mon,  4 Jan 2021 15:10:05 -0800 (PST)
+Received: by mail-qk1-x731.google.com with SMTP id d14so24996684qkc.13;
+        Mon, 04 Jan 2021 15:10:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vt-edu.20150623.gappssmtp.com; s=20150623;
-        h=sender:from:to:cc:subject:in-reply-to:references:mime-version
-         :content-transfer-encoding:date:message-id;
-        bh=MmTjkRuj793Lrb7TSe0lB3EZ2poUQhlcldBZ+7guGy8=;
-        b=ObsHT6yRPjvpQyoB176eIqNs/b944Z1hmrvwlu4sCeKFl/Yx4rfbNRL0YwLpZ/t2GS
-         wIdGtIgEJVuklbOT9VygG35QHBoNmaAUFYayOdSlzA9+WFGS5UxFh2aVk/YUHLQp0HiT
-         sm0F25bhtYm2MdpXfacjiQ3kDgQAP3YTd636zrK5o0V0P94MNB9WdIHoagZ84NsxUUjV
-         G0wVFeYo60QK+bJHZjjSXMOEGyzh6QQBAbV85UQM5ExcE0MkveIIAfM3C2p6DUwgM0Jw
-         wIlD/WJfrVNQEIE72mTSKWVzntRygGOIBtUiGeOSB6QPwoAFBja7q/45N+XarIxhYlOh
-         lftA==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vJ3RfD8rR9bTAqytKoHNwBuoJEeDfrDCx0M5UaMLsiY=;
+        b=m9mGjmR2KJtQfDzCJM6wYqdTqnIcauGy2bexGKOIKKZ91hOfuqJl5tsfC9mTlXvPrW
+         Sn/kr6nLvsVUYWW9jS9WvlOLFeC9XbDjfPRBqHmiEvGjcRThNjkHO7KTfvXYCXX5HSKv
+         t3W9guYD+88c6GE54v7OogpNF8Fw71TlaoCBSsMuJgveCn5vJCs0e05B2N6vPn2Thxhx
+         EHVoYegONoHBP0V8h+oKBHVH/t22V8/fK4jnYpSx0GgZCrCOxjYiK+/M9il314CxJQGy
+         nmMIxJxydlNnTST32qU9QH84hpVWoKHhJG+0Z8yeaYCAEdDOnDbXIpxVpKp/tvO/npYx
+         WkWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:in-reply-to:references
-         :mime-version:content-transfer-encoding:date:message-id;
-        bh=MmTjkRuj793Lrb7TSe0lB3EZ2poUQhlcldBZ+7guGy8=;
-        b=CuGG0qt7f/MjgTU32F/4D3HY0yAfKDlE4y0xXC61ZE6/ahRbJufk5d+blLNAoZq1uw
-         QGIdjGTaL9UXSS1FI7LvNGfDr84eyEAkndRkasgH3rymO06MgzwXswupXLwIjxLY+EiT
-         zGGKPiJ471YFF4zsTRWZleIHjInFA9sP3Ub0v28+5uxkb8Xsxx3WGYzsonbEluwx/QE2
-         xHPE/lfHZ9w0znuHKfv4Z1kVWX/uOnUtExiCfxTzWYxEa+Yu+kQg+gqMD968yYXzf+o4
-         ir5dEyAH4go5pX6+XIex6LYQdLYJdsw1ix4LkxkgyfZ2yV+HAmu5KqPF2KJ5uJr6MgyJ
-         MvuA==
-X-Gm-Message-State: AOAM531ApNebC8Mg1KdA3uHcHhzNBtwiJUnzfDrD8vf1PO5Gd29CHF4D
-        qMnuzSEiljpQyJuUjqTnHWvmlw==
-X-Google-Smtp-Source: ABdhPJzmksCghBQCKNUBUmWlNysGW6rkbkGmA4QvcvxUcU/tQjHH6fMS1vLzcMc45tAo4kLSaFbWzg==
-X-Received: by 2002:a37:4394:: with SMTP id q142mr67683739qka.113.1609698890469;
-        Sun, 03 Jan 2021 10:34:50 -0800 (PST)
-Received: from turing-police ([2601:5c0:c380:d61::359])
-        by smtp.gmail.com with ESMTPSA id c7sm35839738qtm.60.2021.01.03.10.34.48
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vJ3RfD8rR9bTAqytKoHNwBuoJEeDfrDCx0M5UaMLsiY=;
+        b=K5NQkINpJdO9LaY4a9siKGel32GQn8IrUimrnxps41FvUHTo/I+2/t4+B6K0/5I3dv
+         Cf69m6VlInbf95rDI/ILbMR+N42kndIsQgmTYQl2nOQLxrdQOnKYazBF7NNWMeMXi0gx
+         +3LQV21CUXOPIon/wVLJyApr404Pr83fd54sWtc/jlHg/lbs4chWwlth0CLuvJ8dx4fy
+         y01e6OKXqDTIcHkiRnNzxRQGbxySFErY7787P4U8cXYIRflN9KfGtY8pC1EHEPX5sjlw
+         kR7NPmPy4qHAJfWm8lLkiY95Rj4CbC531dqxGnlklUVzx2mArpeeNhNdhgCJJWqt3B77
+         onsg==
+X-Gm-Message-State: AOAM533GRs6AWtsSwfxt+Mf+mBZ75b9bLtZNRb6prrYGKD+DKXYuI6AF
+        j7JKAoZZlV+zr65h2vC7WzL/9+sfOow=
+X-Google-Smtp-Source: ABdhPJwJLFrh/o1UkZ3qZm7egy/GpMq2K5sYFuKN9wsvg0qho3H7HAnxQE1YVHu1eiv7zNs1HVjmlw==
+X-Received: by 2002:ac8:6f4f:: with SMTP id n15mr73864340qtv.216.1609797788503;
+        Mon, 04 Jan 2021 14:03:08 -0800 (PST)
+Received: from ubuntu-m3-large-x86 ([2604:1380:45f1:1d00::1])
+        by smtp.gmail.com with ESMTPSA id i4sm36389618qti.78.2021.01.04.14.03.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Jan 2021 10:34:49 -0800 (PST)
-Sender: Valdis Kletnieks <valdis@vt.edu>
-From:   "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <valdis.kletnieks@vt.edu>
-X-Google-Original-From: "Valdis Kl=?utf-8?Q?=c4=93?=tnieks" <Valdis.Kletnieks@vt.edu>
-X-Mailer: exmh version 2.9.0 11/07/2018 with nmh-1.7+dev
-To:     Stephen Hemminger <stephen@networkplumber.org>
+        Mon, 04 Jan 2021 14:03:07 -0800 (PST)
+Date:   Mon, 4 Jan 2021 15:03:06 -0700
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     Nick Desaulniers <ndesaulniers@google.com>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        clang-built-linux@googlegroups.com,
+        Nick Clifton <nickc@redhat.com>,
         Michal Marek <michal.lkml@markovi.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Networking <netdev@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Kconfig, DEFAULT_NETSCH, and shooting yourself in the foot..
-In-Reply-To: <20210103102011.444ecaa4@hermes.local>
-References: <16871.1609618487@turing-police> <CAK7LNAQU61eccDfh_jX_cnZHnyxfbfgBGu1845QM8XbBTJPnsw@mail.gmail.com>
- <20210103102011.444ecaa4@hermes.local>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1609698888_2273P";
-         micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date:   Sun, 03 Jan 2021 13:34:48 -0500
-Message-ID: <76815.1609698888@turing-police>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] Kbuild: make DWARF version a choice
+Message-ID: <20210104220306.GA1405526@ubuntu-m3-large-x86>
+References: <20201204011129.2493105-1-ndesaulniers@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201204011129.2493105-1-ndesaulniers@google.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
---==_Exmh_1609698888_2273P
-Content-Type: text/plain; charset=us-ascii
+On Thu, Dec 03, 2020 at 05:11:26PM -0800, 'Nick Desaulniers' via Clang Built Linux wrote:
+> Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice. Adds an
+> explicit CONFIG_DEBUG_INFO_DWARF2, which is the default. Does so in a
+> way that's forward compatible with existing configs, and makes adding
+> future versions more straightforward.
+> 
+> Suggested-by: Fangrui Song <maskray@google.com>
+> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 
-On Sun, 03 Jan 2021 10:20:11 -0800, Stephen Hemminger said:
-> You can use a qdisc that is a module, it just has to be available when device
-> is loaded. Typically that means putting it in initramfs.
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 
-Apparently, that's not *quite* true regarding the default qdisc, because I
-hit this situation (copying from another email):
-
----
-[/proc/sys/net] cat core/default_qdisc
-fq_codel
-
-[/proc/sys/net] tc -s qdisc show
-qdisc noqueue 0: dev lo root refcnt 2
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-qdisc pfifo_fast 0: dev eth0 root refcnt 2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-qdisc noqueue 0: dev wlan0 root refcnt 2
- Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-
-But if I give it a kick in the head...
-
-[/proc/sys/net] tc qdisc add dev wlan0 root fq_codel
-[/proc/sys/net] tc -s qdisc show dev wlan0
-qdisc fq_codel 8001: root refcnt 2 limit 10240p flows 1024 quantum 1514 target 5ms interval 100ms memory_limit 32Mb ecn
-drop_batch 64
- Sent 812 bytes 12 pkt (dropped 0, overlimits 0 requeues 0)
- backlog 0b 0p requeues 0
-  maxpacket 0 drop_overlimit 0 new_flow_count 0 ecn_mark 0
-  new_flows_len 0 old_flows_len 0
----
-
-Note that wlan0 doesn't actually get plumbed up until after the initramfs
-has done its thing and we're quite late in the boot process and the /lib/modules
-on the production system is accessible, so it doesn't look like an implicit modprobe
-gets done in that case - fq_codel.ko was very much available when the device
-was brought up.
-
---==_Exmh_1609698888_2273P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Comment: Exmh version 2.9.0 11/07/2018
-
-iQIVAwUBX/IORwdmEQWDXROgAQLm3A/+MSlQovP8k9Gxrq0QufB4K1mYoHnEhr/x
-/gD3Nc7RAijmmBnO1fD3eOSyH2vjy6ONhGldU+wiuzRirWG9aP1soCqY6X3l7ZNK
-aPS+Gy8yKa2B9nNNHhiDp41CiF9pFkZiGefS+btFiZsE+hSRi/e+UA4GGPL158ce
-85xrgtsBzV6/HHubwFyaGeQyxFovcrZhxnjAbVvN6yszlNVAmTrVMgYB2RqlZO9p
-PKv+n5p9NjDrLY6newLJFSgocVl2U6sKB0VGg+tLvaUvE2E0LdFu5lO61RRjs9a7
-Rd8bgvLFZSjoC5XA4Sp7IATSxLjWeMe2ErAOe89MlZmT8NNtNKITCRNP9YcH3zhA
-dJL3l32euWMxI4/Cim7bAq6s8an5jOwfsy2hUJhMNGePo6MqKUr109BodUHSf9ie
-1T1/I0S7CzN8ZRGOySjDhpvp9tt/LdWYn9tMK3wtZMsenk8FZ1REOqAybu50IWdo
-jVyS5hzg1MdIZJQRMDnFwUmDb36yya9flfkYe7b8px3rYsUFkQQQ1+6YXkFWyyGJ
-K4bVx/Lc8OX6gq6+YWKLbv1HBwQ/4Ed/2d6xCdnddAtc925byMcODd+77zAQXLPw
-Q1aiUsCOBzvjyPq15Pa1Jrb5OTX6ysdb/oxvzDYASBSOR0OcbvtzViIMYbmmhXco
-YU0wERhKQTk=
-=vJbt
------END PGP SIGNATURE-----
-
---==_Exmh_1609698888_2273P--
+> ---
+>  Makefile          | 14 ++++++++------
+>  lib/Kconfig.debug | 21 ++++++++++++++++-----
+>  2 files changed, 24 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index a2ded5029084..2430e1ee7c44 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -826,12 +826,14 @@ else
+>  DEBUG_CFLAGS	+= -g
+>  endif
+>  
+> -ifneq ($(LLVM_IAS),1)
+> -KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+> -endif
+> -
+> -ifdef CONFIG_DEBUG_INFO_DWARF4
+> -DEBUG_CFLAGS	+= -gdwarf-4
+> +dwarf-version-$(CONFIG_DEBUG_INFO_DWARF2) := 2
+> +dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
+> +DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
+> +ifneq ($(dwarf-version-y)$(LLVM_IAS),21)
+> +# Binutils 2.35+ required for -gdwarf-4+ support.
+> +dwarf-aflag	:= $(call as-option,-Wa$(comma)-gdwarf-$(dwarf-version-y))
+> +DEBUG_CFLAGS	+= $(dwarf-aflag)
+> +KBUILD_AFLAGS	+= $(dwarf-aflag)
+>  endif
+>  
+>  ifdef CONFIG_DEBUG_INFO_REDUCED
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 0c7380e36370..04719294a7a3 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -256,14 +256,25 @@ config DEBUG_INFO_SPLIT
+>  	  to know about the .dwo files and include them.
+>  	  Incompatible with older versions of ccache.
+>  
+> +choice
+> +	prompt "DWARF version"
+> +	help
+> +	  Which version of DWARF debug info to emit.
+> +
+> +config DEBUG_INFO_DWARF2
+> +	bool "Generate DWARF Version 2 debuginfo"
+> +	help
+> +	  Generate DWARF v2 debug info.
+> +
+>  config DEBUG_INFO_DWARF4
+> -	bool "Generate dwarf4 debuginfo"
+> +	bool "Generate DWARF Version 4 debuginfo"
+>  	depends on $(cc-option,-gdwarf-4)
+>  	help
+> -	  Generate dwarf4 debug info. This requires recent versions
+> -	  of gcc and gdb. It makes the debug information larger.
+> -	  But it significantly improves the success of resolving
+> -	  variables in gdb on optimized code.
+> +	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
+> +	  It makes the debug information larger, but it significantly
+> +	  improves the success of resolving variables in gdb on optimized code.
+> +
+> +endchoice # "DWARF version"
+>  
+>  config DEBUG_INFO_BTF
+>  	bool "Generate BTF typeinfo"
+> -- 
+> 2.29.2.576.ga3fc446d84-goog
+> 
