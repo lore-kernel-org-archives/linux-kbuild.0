@@ -2,251 +2,309 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-25.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3D4C433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu,  7 Jan 2021 19:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3620EC433E0
+	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 00:31:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A62A823443
-	for <linux-kbuild@archiver.kernel.org>; Thu,  7 Jan 2021 19:42:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F153320793
+	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 00:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727246AbhAGTmw (ORCPT
+        id S1729390AbhAHAbY (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 7 Jan 2021 14:42:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48834 "EHLO
+        Thu, 7 Jan 2021 19:31:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727177AbhAGTmw (ORCPT
+        with ESMTP id S1727235AbhAHAbY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jan 2021 14:42:52 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA62EC0612F6
-        for <linux-kbuild@vger.kernel.org>; Thu,  7 Jan 2021 11:42:11 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id g24so5034099qtq.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jan 2021 11:42:11 -0800 (PST)
+        Thu, 7 Jan 2021 19:31:24 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0081AC0612F4
+        for <linux-kbuild@vger.kernel.org>; Thu,  7 Jan 2021 16:30:43 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id k21so6093386pgh.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jan 2021 16:30:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CLKyO0V7gDngVlGI7pgl0SlpTEPLmQs9Jw8dHDtXgak=;
-        b=ZrGnMcWt5YlDl9xLPUa/NZ2qTa+ZV8kU9SmgDHeQtZcIH3xPBmsNo1pG1z/I4HpNxX
-         ZevcNOde/mrT04xMjFFt9+ZTbAQyRwVqGpPDb7PIQHFoe4MjMqH/U+SqwuAHj27L/KJg
-         94G2jJFEvmvE1cuX5rTfgKJEYyk89vMLGp6wVC5zAlb2cnH0Qi8QPy2tqpKkqE3WPQBh
-         kpwg/iJcOHOTvYLL1f1FOlTAz+TlVaI+ieFCTAAtWzOXW/CzipP4qsd3Yb6RpRDyX0Ti
-         qORGuRx18TSYalpg5ehKEeuzaR2uTD3zkkADvkjsgJ2USIeHEElgFJMikGSF/0XT5Qng
-         9Smw==
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=Nplr4obYZhTigkVU/n6i7dQLmPyw1YDLtDm6tMWrmf4=;
+        b=ntGsm/gWCHkfPEeAqZsCZK2mP4fFyUhkcVsAn4srv7Qx5NctmZ2j8WSbHdOlOU0wXq
+         r16GdCijP9gjIJZjdwFokfMwaYKoLQkYkUyaaG3p62sYcuu54qlefrs+HMkAQYHVodeF
+         wuKha78FtSDE3cZdib3FOHv+0YKTrta0RUNLvhNn1ko+5lynz9lCAGTrT6enetD+3v8g
+         A3MD2VaghoU9diqPyVSdVNzhEIdbfIRnumVMomriur3vbZ+J0XCfaQV3pldzGbq8GPtz
+         s7ryzyt9H5mMiHgZGxKEch3ARpJat4YaVW5JYSCMv+ABoor8ndXYhgItuQI53q7rh9Vb
+         O0IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CLKyO0V7gDngVlGI7pgl0SlpTEPLmQs9Jw8dHDtXgak=;
-        b=jjCetqwveCGuCNBrEq229Rd63G4JcoZjIBAFgKTDBa9Bj2m2aVGOyvlW3mVHHaOyAa
-         +huu/KMfbq03v43KbpIr8sVy23jvPf0p3gpHxn/AZJvnxFdwlFfbLpUhwRaZSB++ztJE
-         GFu4ld+7I5pqLiljUz4YZaOT3YrAmAJlgBXzp3qOyeMzyYOHf8wBoHSXEwGgZ8WZ59XF
-         fIIie9PKZyyej/PjlXoAQw3Nnq1HopMS0EKX7H8etVSRF8QfoYZSVQcu2/Qcik1HytkL
-         LRkHMOCGIK/K+u9y960YPVWtPeSs0+aZVNO/0jvHazIoZyei+1sn4cAMFhx6ydWzUsZi
-         AV5Q==
-X-Gm-Message-State: AOAM532Kyc1s5hSkywRnnnh/qjB0kjKFmb6HZqgw7F+lMdTNhvOIdJ56
-        eS2tvAkSWUgUOmLFhRkfMeqTRA==
-X-Google-Smtp-Source: ABdhPJxOXy6evhdqwl97isTQM5M9r4VhmoGo6e1D+pUsNPYP0PivH0cLY6sWlls2AshSXfoZK/Yn1Q==
-X-Received: by 2002:ac8:578d:: with SMTP id v13mr170661qta.247.1610048530863;
-        Thu, 07 Jan 2021 11:42:10 -0800 (PST)
-Received: from ?IPv6:2601:144:4100:fd1:12bf:48ff:fed7:9537? ([2601:144:4100:fd1:12bf:48ff:fed7:9537])
-        by smtp.gmail.com with ESMTPSA id x49sm3430907qtx.6.2021.01.07.11.42.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jan 2021 11:42:09 -0800 (PST)
-Subject: Re: [RFC 0/2] kbuild: Add support to build overlays (%.dtbo)
-To:     Rob Herring <robh+dt@kernel.org>,
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=Nplr4obYZhTigkVU/n6i7dQLmPyw1YDLtDm6tMWrmf4=;
+        b=MCL2lk8ySXqGgrNNhko9rJyWh5rZ9zO2lU3GsefE4qo5g6u4qQmZ791zwSLu3h2xd0
+         lTK5wq6dH8zHPyQc7M5Dvz4NPue4DOQUJebwhja4s/H+ni5KQdF8Ndr3El19YL8kCsQ1
+         1sjgniu3WrT2W0urzcsX59JXTH38zviPcPD9lrrr9DUlDrC+PA0+66ROF5PV9OR3FnCX
+         EFEXsTGUYswIBYUADI2cjj32x5jsu4TIohH8O4hIUln5mAxlAMnIH40W2rqdqbuWCf3c
+         xotIaydLOcD/W4fwUjSNQmr2Jd2s+IRYnDQSOp7YbsANVWfqFIeB6DkHzfaGyxd+awnd
+         EO5Q==
+X-Gm-Message-State: AOAM5301Z7ClQ7thrnUSbXMu5KxzQlfM5ByJu/Aqu0XsQ5TuvGflkqS3
+        YOHjn7dYwX6CZ+8F+JMwvPeYoNOxrfcenPe7vSY=
+X-Google-Smtp-Source: ABdhPJyRXrmC6sasq6oIyZ6V9xME71fUTTx7OBgcBVL2JL2FHq69BKkavpOwNXrZzNDuweS6InEjP9Xl13N6ncdYiQI=
+Sender: "willmcvicker via sendgmr" <willmcvicker@willmcvicker.c.googlers.com>
+X-Received: from willmcvicker.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:2dd0])
+ (user=willmcvicker job=sendgmr) by 2002:a17:902:67:b029:dc:3cdb:6e50 with
+ SMTP id 94-20020a1709020067b02900dc3cdb6e50mr1294263pla.61.1610065843443;
+ Thu, 07 Jan 2021 16:30:43 -0800 (PST)
+Date:   Fri,  8 Jan 2021 00:30:35 +0000
+Message-Id: <20210108003035.1930475-1-willmcvicker@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
+Subject: [PATCH v5] modules: introduce the MODULE_SCMVERSION config
+From:   Will McVicker <willmcvicker@google.com>
+To:     Jessica Yu <jeyu@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
-        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        DTML <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        tero.kristo@gmail.com
-References: <cover.1609844956.git.viresh.kumar@linaro.org>
- <CAL_JsqJMr3vfz2B29vzvFALCt_5-J__eJv2TZHJ0sR9nM=xXaw@mail.gmail.com>
- <CAK7LNAR9fdjZ7iWKSWvJ9etGZkd+n87cmXKN-Hah8DBDYbuAwA@mail.gmail.com>
- <CAL_Jsq+DFF0tRv61XCAGLJYYu=ow8Ah8prd6su=6dpoU_AyMXw@mail.gmail.com>
-From:   Bill Mills <bill.mills@linaro.org>
-Message-ID: <a01a68c5-fbc9-92dd-e374-6839fd8a93e2@linaro.org>
-Date:   Thu, 7 Jan 2021 14:42:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <CAL_Jsq+DFF0tRv61XCAGLJYYu=ow8Ah8prd6su=6dpoU_AyMXw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Saravana Kannan <saravanak@google.com>,
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        kernel-team@android.com, Will McVicker <willmcvicker@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+Config MODULE_SCMVERSION introduces a new module attribute --
+`scmversion` -- which can be used to identify a given module's SCM
+version.  This is very useful for developers that update their kernel
+independently from their kernel modules or vice-versa since the SCM
+version provided by UTS_RELEASE (`uname -r`) will now differ from the
+module's vermagic attribute.
 
-On 1/7/21 2:02 PM, Rob Herring wrote:
-> On Wed, Jan 6, 2021 at 10:35 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->>
->> On Wed, Jan 6, 2021 at 12:21 AM Rob Herring <robh+dt@kernel.org> wrote:
->>>
->>> On Tue, Jan 5, 2021 at 4:24 AM Viresh Kumar <viresh.kumar@linaro.org> wrote:
->>>>
->>>> Hello,
->>>>
->>>> Here is an attempt to make some changes in the kernel to allow building
->>>> of device tree overlays.
->>>>
->>>> While at it, I would also like to discuss about how we should mention
->>>> the base DT blobs in the Makefiles for the overlays, so they can be
->>>> build tested to make sure the overlays apply properly.
->>>>
->>>> A simple way is to mention that with -base extension, like this:
->>>>
->>>> $(overlay-file)-base := platform-base.dtb
->>>>
->>>> Any other preference ?
->>
->>
->>
->> Viresh's patch is not enough.
->>
->> We will need to change .gitignore
->> and scripts/Makefile.dtbinst as well.
->>
->>
->> In my understanding, the build rule is completely the same
->> between .dtb and .dtbo
->> As Rob mentioned, I am not sure if we really need/want
->> a separate extension.
->>
->>
->> A counter approach is to use an extension like '.ovl.dtb'
->> It clarifies it is an overlay fragment without changing
->> anything in our build system or the upstream DTC project.
+For example, we have a CI setup that tests new kernel changes on the
+hikey960 and db845c devices without updating their kernel modules. When
+these tests fail, we need to be able to identify the exact device
+configuration the test was using. By including MODULE_SCMVERSION, we can
+identify the exact kernel and modules' SCM versions for debugging the
+failures.
 
-*.dtbo is already a well established defato standard.  I see little 
-value in changing it and doing so will likely just bifurcate common usage.
+Additionally, by exposing the SCM version via the sysfs node
+/sys/module/MODULENAME/scmversion, one can also verify the SCM versions
+of the modules loaded from the initramfs. Currently, modinfo can only
+retrieve module attributes from the module's ko on disk and not from the
+actual module that is loaded in RAM.
 
->>
->> We use chained extension in some places, for example,
->> .dt.yaml for schema yaml files.
->>
->>
->>
->> dtb-$(CONFIG_ARCH_FOO) += \
->>      foo-board.dtb \
->>      foo-overlay1.ovl.dtb \
->>      foo-overlay2.ovl.dtb
->>
->>
->> Overlay DT source file names must end with '.ovl.dts'
-> 
-> I like that suggestion as then it's also clear looking at the source
-> files which ones are overlays. Or we'd need .dtso to be consistent.
-> 
+You can retrieve the SCM version in two ways,
 
-I don't think there is much of a problem renaming the source side.
-Don't know if that helps if the output is still dtbo.
+1) By using modinfo:
+    > modinfo -F scmversion MODULENAME
+2) By module sysfs node:
+    > cat /sys/module/MODULENAME/scmversion
 
-"Be consistent on dtso" sounds good to me.
-Can it be enforced via build time checks?
+Signed-off-by: Will McVicker <willmcvicker@google.com>
+---
+ Documentation/ABI/stable/sysfs-module | 18 ++++++++++++++++++
+ include/linux/module.h                |  1 +
+ init/Kconfig                          | 14 ++++++++++++++
+ kernel/module.c                       |  2 ++
+ scripts/Makefile.modpost              | 22 ++++++++++++++++++++++
+ scripts/mod/modpost.c                 | 24 +++++++++++++++++++++++-
+ 6 files changed, 80 insertions(+), 1 deletion(-)
 
-> 
->>> I think we'll want something similar to how '-objs' works for modules:
->>>
->>> foo-board-1-dtbs := foo-board.dtb foo-overlay1.dtbo
->>> foo-board-2-dtbs := foo-board.dtb foo-overlay2.dtbo
->>> foo-board-1-2-dtbs := foo-board.dtb foo-overlay1.dtbo foo-overlay2.dtbo
->>> dtbs-y += foo-board-1.dtb foo-board-2.dtb foo-board-1-2.dtb
->>>
->>> (One difference here is we will want all the intermediate targets
->>> unlike .o files.)
->>>
->>> You wouldn't necessarily have all the above combinations, but you have
->>> to allow for them. I'm not sure how we'd handle applying any common
->>> overlays where the base and overlay are in different directories.
->>
->>
->> I guess the motivation for supporting -dtbs is to
->> add per-board -@ option only when it contains *.dtbo pattern.
-> 
-> I hadn't thought that far, but yeah, that would be good. Really, I
-> just want it to be controlled per SoC family at least.
-> 
->> But, as you notice, if the overlay files are located
->> under drivers/, it is difficult to add -@ per board.
-> 
-> Generally, they shouldn't be. The exceptions are what we already have
-> there which are old dt fixups and unittests.
-> 
-> We want the stripped DT repo (devicetree-rebasing) to have all this
-> and drivers/ is stripped out. (Which reminds me, the DT repo will need
-> some work to support all this. It's a different build sys.)
-> 
->> Another scenario is, some people may want to compile
->> downstream overlay files (i.e. similar concept as external modules),
->> then we have no idea which base board should be given with the -@ flag.
->>
->>
->> I'd rather be tempted to add it globally
->>
->>
->> ifdef CONFIG_OF_OVERLAY
->> DTC_FLAGS += -@
->> endif
-> 
-> We've already rejected doing that. Turning on '-@' can grow the dtb
-> size by a significant amount which could be problematic for some
-> boards >
->>> Another thing here is adding all the above is not really going to
->>> scale on arm32 where we have a single dts directory. We need to move
->>> things to per vendor/soc family directories. I have the script to do
->>> this. We just need to agree on the vendor names and get Arnd/Olof to
->>> run it. I also want that so we can enable schema checks by default
->>> once a vendor is warning free (the whole tree is going to take
->>> forever).
->>
->>
->> If this is a big churn, perhaps we could make it extreme
->> to decouple DT and Linux-arch.
-> 
-> I would be fine with that, but I don't think we'll get agreement
-> there. With that amount of change, we'll be discussing git submodule
-> again.
-> 
-> Rereading the thread on vendor directories[1], we may just move boards
-> one vendor at a time. We could just make that a prerequisite for
-> vendor supporting overlays.
-> 
->> arch/*/boot/dts/*.dts
->>   ->  dts/<vendor>/*.dts
->>
->> Documentation/devicetree/bindings
->>   -> dts/Bindings/
->>
->> include/dt-bindings/
->>   -> dts/include/dt-bindings/
->>
->>
->>
->> Then, other project can take dts/
->> to reuse for them.
-> 
-> This is already possible with devicetree-rebasing.git. Though it is
-> still by arch.
-> 
-> Rob
-> 
-> [1] https://lore.kernel.org/linux-devicetree/20181204183649.GA5716@bogus/
-> 
+diff --git a/Documentation/ABI/stable/sysfs-module b/Documentation/ABI/stable/sysfs-module
+index 6272ae5fb366..a75d137e79f4 100644
+--- a/Documentation/ABI/stable/sysfs-module
++++ b/Documentation/ABI/stable/sysfs-module
+@@ -32,3 +32,21 @@ Description:
+ 		Note: If the module is built into the kernel, or if the
+ 		CONFIG_MODULE_UNLOAD kernel configuration value is not enabled,
+ 		this file will not be present.
++
++What:		/sys/module/MODULENAME/scmversion
++Date:		November 2020
++KernelVersion:	5.12
++Contact:	Will McVicker <willmcvicker@google.com>
++Description:	This read-only file will appear if modpost was supplied with an
++		SCM version for the module. It can be enabled with the config
++		MODULE_SCMVERSION. The SCM version is retrieved by
++		scripts/setlocalversion, which means that the presence of this
++		file depends on CONFIG_LOCALVERSION_AUTO=y. When read, the SCM
++		version that the module was compiled with is returned. The SCM
++		version is returned in the following format::
++
++		===
++		Git:		g[a-f0-9]\+(-dirty)\?
++		Mercurial:	hg[a-f0-9]\+(-dirty)\?
++		Subversion:	svn[0-9]\+
++		===
+diff --git a/include/linux/module.h b/include/linux/module.h
+index 7a0bcb5b1ffc..3b1612193cf9 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -372,6 +372,7 @@ struct module {
+ 	struct module_attribute *modinfo_attrs;
+ 	const char *version;
+ 	const char *srcversion;
++	const char *scmversion;
+ 	struct kobject *holders_dir;
+ 
+ 	/* Exported symbols */
+diff --git a/init/Kconfig b/init/Kconfig
+index b77c60f8b963..3d9dac3c4e8f 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2131,6 +2131,20 @@ config MODULE_SRCVERSION_ALL
+ 	  the version).  With this option, such a "srcversion" field
+ 	  will be created for all modules.  If unsure, say N.
+ 
++config MODULE_SCMVERSION
++	bool "SCM version for modules"
++	depends on LOCALVERSION_AUTO
++	help
++	  This enables the module attribute "scmversion" which can be used
++	  by developers to identify the SCM version of a given module, e.g.
++	  git sha1 or hg sha1. The SCM version can be queried by modinfo or
++	  via the sysfs node: /sys/modules/MODULENAME/scmversion. This is
++	  useful when the kernel or kernel modules are updated separately
++	  since that causes the vermagic of the kernel and the module to
++	  differ.
++
++	  If unsure, say N.
++
+ config MODULE_SIG
+ 	bool "Module signature verification"
+ 	select MODULE_SIG_FORMAT
+diff --git a/kernel/module.c b/kernel/module.c
+index 4bf30e4b3eaa..d0b359c7e9c9 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -837,6 +837,7 @@ static struct module_attribute modinfo_##field = {                    \
+ 
+ MODINFO_ATTR(version);
+ MODINFO_ATTR(srcversion);
++MODINFO_ATTR(scmversion);
+ 
+ static char last_unloaded_module[MODULE_NAME_LEN+1];
+ 
+@@ -1298,6 +1299,7 @@ static struct module_attribute *modinfo_attrs[] = {
+ 	&module_uevent,
+ 	&modinfo_version,
+ 	&modinfo_srcversion,
++	&modinfo_scmversion,
+ 	&modinfo_initstate,
+ 	&modinfo_coresize,
+ 	&modinfo_initsize,
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index f54b6ac37ac2..f1126b60adb7 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -66,6 +66,7 @@ ifeq ($(KBUILD_EXTMOD),)
+ 
+ input-symdump := vmlinux.symvers
+ output-symdump := Module.symvers
++module_srcpath := $(srctree)
+ 
+ else
+ 
+@@ -77,6 +78,17 @@ src := $(obj)
+ include $(if $(wildcard $(KBUILD_EXTMOD)/Kbuild), \
+              $(KBUILD_EXTMOD)/Kbuild, $(KBUILD_EXTMOD)/Makefile)
+ 
++# Get the external module's source path. KBUILD_EXTMOD could either be an
++# absolute path or relative path from $(srctree). This makes sure that we
++# aren't using a relative path from a separate working directory (O= or
++# KBUILD_OUTPUT) since that may not be the actual module's SCM project path.
++# So check the path relative to $(srctree) first.
++ifneq ($(realpath $(srctree)/$(KBUILD_EXTMOD) 2>/dev/null),)
++	module_srcpath := $(srctree)/$(KBUILD_EXTMOD)
++else
++	module_srcpath := $(KBUILD_EXTMOD)
++endif
++
+ # modpost option for external modules
+ MODPOST += -e
+ 
+@@ -85,6 +97,16 @@ output-symdump := $(KBUILD_EXTMOD)/Module.symvers
+ 
+ endif
+ 
++ifeq ($(CONFIG_MODULE_SCMVERSION),y)
++# Get the SCM version of the module. Sed verifies setlocalversion returns
++# a proper revision based on the SCM type, e.g. git, mercurial, or svn.
++module_scmversion := $(shell $(srctree)/scripts/setlocalversion $(module_srcpath) | \
++	sed -n 's/.*-\(\(g\|hg\)[a-fA-F0-9]\+\(-dirty\)\?\|svn[0-9]\+\).*/\1/p')
++ifneq ($(module_scmversion),)
++MODPOST += -v$(module_scmversion)
++endif
++endif
++
+ # modpost options for modules (both in-kernel and external)
+ MODPOST += \
+ 	$(addprefix -i ,$(wildcard $(input-symdump))) \
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index d6c81657d695..489b65bc37de 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -30,6 +30,8 @@ static int have_vmlinux = 0;
+ static int all_versions = 0;
+ /* If we are modposting external module set to 1 */
+ static int external_module = 0;
++#define MODULE_SCMVERSION_SIZE 64
++static char module_scmversion[MODULE_SCMVERSION_SIZE];
+ /* Only warn about unresolved symbols */
+ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+@@ -2264,6 +2266,20 @@ static void add_intree_flag(struct buffer *b, int is_intree)
+ 		buf_printf(b, "\nMODULE_INFO(intree, \"Y\");\n");
+ }
+ 
++/**
++ * add_scmversion() - Adds the MODULE_INFO macro for the scmversion.
++ * @b: Buffer to append to.
++ *
++ * This function fills in the module attribute `scmversion` for the kernel
++ * module. This is useful for determining a given module's SCM version on
++ * device via /sys/modules/<module>/scmversion and/or using the modinfo tool.
++ */
++static void add_scmversion(struct buffer *b)
++{
++	if (module_scmversion[0] != '\0')
++		buf_printf(b, "\nMODULE_INFO(scmversion, \"%s\");\n", module_scmversion);
++}
++
+ /* Cannot check for assembler */
+ static void add_retpoline(struct buffer *b)
+ {
+@@ -2546,7 +2562,7 @@ int main(int argc, char **argv)
+ 	struct dump_list *dump_read_start = NULL;
+ 	struct dump_list **dump_read_iter = &dump_read_start;
+ 
+-	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
++	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:v:")) != -1) {
+ 		switch (opt) {
+ 		case 'e':
+ 			external_module = 1;
+@@ -2584,6 +2600,11 @@ int main(int argc, char **argv)
+ 		case 'd':
+ 			missing_namespace_deps = optarg;
+ 			break;
++		case 'v':
++			if (!optarg)
++				fatal("'-v' requires an argument defining the SCM version.");
++			strncpy(module_scmversion, optarg, sizeof(module_scmversion) - 1);
++			break;
+ 		default:
+ 			exit(1);
+ 		}
+@@ -2630,6 +2651,7 @@ int main(int argc, char **argv)
+ 		add_depends(&buf, mod);
+ 		add_moddevtable(&buf, mod);
+ 		add_srcversion(&buf, mod);
++		add_scmversion(&buf);
+ 
+ 		sprintf(fname, "%s.mod.c", mod->name);
+ 		write_if_changed(&buf, fname);
+-- 
+2.30.0.284.gd98b1dd5eaa7-goog
 
-Thanks for digging up this script!
-
-Bill
