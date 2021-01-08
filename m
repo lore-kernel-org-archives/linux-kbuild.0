@@ -2,215 +2,151 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2943CC433E6
-	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 00:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F665C433E9
+	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 08:42:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D66992376E
-	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 00:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C40CC22248
+	for <linux-kbuild@archiver.kernel.org>; Fri,  8 Jan 2021 08:42:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729377AbhAHAbb (ORCPT
+        id S1725816AbhAHImN (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 7 Jan 2021 19:31:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37944 "EHLO
+        Fri, 8 Jan 2021 03:42:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729406AbhAHAbY (ORCPT
+        with ESMTP id S1727511AbhAHImN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Jan 2021 19:31:24 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52630C0612F8
-        for <linux-kbuild@vger.kernel.org>; Thu,  7 Jan 2021 16:30:44 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id o13so18987281lfr.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jan 2021 16:30:44 -0800 (PST)
+        Fri, 8 Jan 2021 03:42:13 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CECC5C0612F5
+        for <linux-kbuild@vger.kernel.org>; Fri,  8 Jan 2021 00:41:32 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id t6so5324188plq.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 08 Jan 2021 00:41:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=v3fiFgkxHB4dBg8a/pmTLn8VoKflEyyrskKHexKjc5k=;
-        b=eK4zjuxyXFJ2gaG0Wd4Ql9BVBbzLZSVW7Sw7Jh5FoHSpPl1vDZ5D1DNDbBtczEmxKJ
-         V3ScVZRCqrjYfEBAQ+Z0oItJOvxSkoVEMDhcbXcNTxlhFFFF0pua6Sxv+589A67dZ1A2
-         5idHoiVnGNpRfGBDdY0PklWQT5JaSw9ylIp8/8HYNedqRkMUvAuF+u1pVfL8wSoDjHjo
-         jsPSZNdKZtFf6Ud/9buvO3Qdy8qlPi2AYwDOvUR284bTL4quc2/vKN+PNTv7ML5gMc2K
-         JwBwc48MGkdYJZxyMTfh2Xl4bhFqlb7NvvxFHlc7oC14bJAsSQ2a6FR24gkCIqhaQDCQ
-         XMJw==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5YW50Ah03cn2qpITNLfaRsXD4PDGBQyXlcG2G1/LKtg=;
+        b=CvsP4jxX8IdJOfZqoADc6APWHfTrnbb4YDQ8/D9XHeFZTvFrPC6BQURCTw8A/MdFxt
+         xwxrQX9aGXqNpW5FDCmpb4h/2txCkELIINMpfXkv7JfnJDd60a1Jcij7JMpEVQdjBmOE
+         R0ylNEbBYp9Uiyey3dutCWTdpGHPulnnNdHy3rkUJgu8U0nwB9aziLcqODRoIccQjHtM
+         xFLL3OYcjF0ZP3unUG8fmK3XL0DxqfoE1dR0k2k5VdpRWMSvYz7tO1QYBhRee7UMdljP
+         Coz4z0j8lBzMuoaX/h/LDHeXxqcC9B9qenOEfovKY8FPeW15E0rbhMHRH1fBxLhdzCIj
+         V/kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=v3fiFgkxHB4dBg8a/pmTLn8VoKflEyyrskKHexKjc5k=;
-        b=TittKCYI0ee16P9p8Pvk027+MhdH8V0op9Fv1yMGXwkylDqlH9Hq8zcUKnw1ArFfHF
-         S4xtbi3RVfvDOH/w8fsFz43onrJdVg8R0iDEyngFKZn5dNqJ5WrlioZyTfdd8oQD9Fxd
-         40y1wKzTueP1rFMakFosrdBocavbdw3YzP09ss3tCW3++5dRK2J3k2PsB87XdO3/FWTx
-         tSupyVIv7K/2Fi5HwUud3A/zU1lkVucYXy8fPC2XlTU3n5Wh08ANX2Kq8VQgMzfdWGuD
-         RaiWdpVcLCF1NLSnThU/8TdqC1hlqr20gcxsP/gkNvocy2ZnqzcN3O7Dr1GV/+4HTmHk
-         XNag==
-X-Gm-Message-State: AOAM531zDtDOWehNSS+c1LcoDOioi3o6TPFLGqucuR/i2qn1qk86J64z
-        F+362nMt5nW0t0UKa+KPqKtB5ocZvYiZFaqx0FOU3w==
-X-Google-Smtp-Source: ABdhPJxXbgn6/QKXbLmBk9FdnADkBECjNCpnK86g/sLTMWMxY37KrrmlfvjRzDy9pO5zEu5cCDMedRtb4ExQ7bRCExE=
-X-Received: by 2002:a2e:240f:: with SMTP id k15mr401941ljk.506.1610065842399;
- Thu, 07 Jan 2021 16:30:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20201216220850.659584-1-willmcvicker@google.com>
- <20201218120138.GA5265@linux-8ccs> <CABYd82bf+RACxboKCxoV=N63ynKwPspGhb6G5yYPiCFKnOk9Hw@mail.gmail.com>
- <20210107143111.GA30412@linux-8ccs>
-In-Reply-To: <20210107143111.GA30412@linux-8ccs>
-From:   Will McVicker <willmcvicker@google.com>
-Date:   Thu, 7 Jan 2021 16:30:25 -0800
-Message-ID: <CABYd82bVo4+M18dZ1d2x6e6-_o8YMs50v-VV_Z_DUr2vdRb-Bg@mail.gmail.com>
-Subject: Re: [PATCH v4] modules: introduce the MODULE_SCMVERSION config
-To:     Jessica Yu <jeyu@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Saravana Kannan <saravanak@google.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5YW50Ah03cn2qpITNLfaRsXD4PDGBQyXlcG2G1/LKtg=;
+        b=iXpqX8OJEaxSqYOLuSWhb2p8+fsbMVISB/HV150+Xe8vahSj5gvP/mnkVAOWu4Zf3W
+         MoWPdaOSSFX5B6fAjT6yM84341DHRh1u3mU+TY8i2G9bn5OluFQso9sI3N7wRT5sjJ/p
+         45xj6FLk+bxdteDjh6jo2C4zpuKN9HdykbYMLcZcvWsgvaaWtMtlhdyz098opvnw7fX8
+         I/dZHmqFTZJwjQeOK4AOPw38z+VxSenaMkY5uyml5N3I/Tw277UsYlG+FRHlqLDZ3Veq
+         wQXx5PqB1Qz26NIZAeLuxSFD+IzSkn1bHgwVEhmHy5ce61mphXD2eshRZo+xZ74KR3R9
+         K0Jg==
+X-Gm-Message-State: AOAM530OVo+xVGDLZdN1Sq6YyVxIRtV3mvYF5HQ/VPCjiPW29k2OzQjq
+        FtiKDcfqEHbhK8X+Zps2q2+VaA==
+X-Google-Smtp-Source: ABdhPJxURUQK4OfLPAV2tJmJ/OaEPV8xqk6SEh+SIZHFSg3frcbKUp34+oZhmVq913w3ZytX4WXxeA==
+X-Received: by 2002:a17:90a:450c:: with SMTP id u12mr2715278pjg.93.1610095292255;
+        Fri, 08 Jan 2021 00:41:32 -0800 (PST)
+Received: from localhost ([122.172.20.109])
+        by smtp.gmail.com with ESMTPSA id m15sm8393768pfa.72.2021.01.08.00.41.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Jan 2021 00:41:31 -0800 (PST)
+From:   Viresh Kumar <viresh.kumar@linaro.org>
+To:     Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     Viresh Kumar <viresh.kumar@linaro.org>, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Bill Mills <bill.mills@linaro.org>, anmar.oueja@linaro.org,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] of: unittest: Statically apply overlays using fdtoverlay
+Date:   Fri,  8 Jan 2021 14:11:20 +0530
+Message-Id: <1e42183ccafa1afba33b3e79a4e3efd3329fd133.1610095159.git.viresh.kumar@linaro.org>
+X-Mailer: git-send-email 2.25.0.rc1.19.g042ed3e048af
+In-Reply-To: <be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org>
+References: <be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Jessica,
+Now that fdtoverlay is part of the kernel build, start using it to test
+the unitest overlays we have by applying them statically.
 
-I looked into the LOCALVERSION= part more and finally figured out how
-that part of the script works. I wasn't familiar with how the
-parameter substitution worked -- ${parameter:+alt_value}. I verified
-that we will only get an SCM version returned when LOCALVERSION_AUTO=y
-and updated the Documentation in v5.
+The file overlay_base.dtb have symbols of its own and we need to apply
+overlay.dtb to overlay_base.dtb alone first to make it work, which gives
+us intermediate-overlay.dtb file.
 
-Thanks,
-Will
+The intermediate-overlay.dtb file along with all other overlays is them
+applied to testcases.dtb to generate the master.dtb file.
 
-On Thu, Jan 7, 2021 at 6:31 AM Jessica Yu <jeyu@kernel.org> wrote:
->
-> +++ Will McVicker [06/01/21 10:44 -0800]:
-> >Thanks for the vacation notice Jessica! I'm just letting you know I'm
-> >back as well and am happy to respond to any concerns regarding v4 when
-> >you get all caught up.
-> >
-> >I hope you had a relaxing holiday :)
->
-> Hi Will - thanks, same to you!
->
-> >On Fri, Dec 18, 2020 at 4:01 AM Jessica Yu <jeyu@kernel.org> wrote:
-> >>
-> >> +++ Will McVicker [16/12/20 22:08 +0000]:
-> >> >Config MODULE_SCMVERSION introduces a new module attribute --
-> >> >`scmversion` -- which can be used to identify a given module's SCM
-> >> >version.  This is very useful for developers that update their kernel
-> >> >independently from their kernel modules or vice-versa since the SCM
-> >> >version provided by UTS_RELEASE (`uname -r`) will now differ from the
-> >> >module's vermagic attribute.
-> >> >
-> >> >For example, we have a CI setup that tests new kernel changes on the
-> >> >hikey960 and db845c devices without updating their kernel modules. When
-> >> >these tests fail, we need to be able to identify the exact device
-> >> >configuration the test was using. By including MODULE_SCMVERSION, we can
-> >> >identify the exact kernel and modules' SCM versions for debugging the
-> >> >failures.
-> >> >
-> >> >Additionally, by exposing the SCM version via the sysfs node
-> >> >/sys/module/MODULENAME/scmversion, one can also verify the SCM versions
-> >> >of the modules loaded from the initramfs. Currently, modinfo can only
-> >> >retrieve module attributes from the module's ko on disk and not from the
-> >> >actual module that is loaded in RAM.
-> >> >
-> >> >You can retrieve the SCM version in two ways,
-> >> >
-> >> >1) By using modinfo:
-> >> >    > modinfo -F scmversion MODULENAME
-> >> >2) By module sysfs node:
-> >> >    > cat /sys/module/MODULENAME/scmversion
-> >> >
-> >> >Signed-off-by: Will McVicker <willmcvicker@google.com>
-> >> >---
-> [ added back diff ]
-> >> >Changelog since v3:
-> >> >- Dropped [PATCH v2 1/2] scripts/setlocalversion: allow running in a subdir
-> >> >
-> >> > Documentation/ABI/stable/sysfs-module | 18 ++++++++++++++++++
-> >> > include/linux/module.h                |  1 +
-> >> > init/Kconfig                          | 12 ++++++++++++
-> >> > kernel/module.c                       |  2 ++
-> >> > scripts/Makefile.modpost              | 22 ++++++++++++++++++++++
-> >> > scripts/mod/modpost.c                 | 24 +++++++++++++++++++++++-
-> >> > 6 files changed, 78 insertions(+), 1 deletion(-)
-> >> >
-> >> >diff --git a/Documentation/ABI/stable/sysfs-module b/Documentation/ABI/stable/sysfs-module
-> >> >index 6272ae5fb366..2ba731767737 100644
-> >> >--- a/Documentation/ABI/stable/sysfs-module
-> >> >+++ b/Documentation/ABI/stable/sysfs-module
-> >> >@@ -32,3 +32,21 @@ Description:
-> >> >            Note: If the module is built into the kernel, or if the
-> >> >            CONFIG_MODULE_UNLOAD kernel configuration value is not enabled,
-> >> >            this file will not be present.
-> >> >+
-> >> >+What:              /sys/module/MODULENAME/scmversion
-> >> >+Date:              November 2020
-> >> >+KernelVersion:     5.11
->
-> I guess we'll have to bump KernelVersion now (sorry about the timing!)
->
-> >> >+Contact:   Will McVicker <willmcvicker@google.com>
-> >> >+Description:       This read-only file will appear if modpost was supplied with an
-> >> >+           SCM version for the module. It can be enabled with the config
-> >> >+           MODULE_SCMVERSION. The SCM version is retrieved by
-> >> >+           scripts/setlocalversion, which means that the presence of this
-> >> >+           file depends on CONFIG_LOCALVERSION_AUTO=y or LOCALVERSION=.
->
-> I think the "or LOCALVERSION=" part is inaccurate, right? We need
-> just LOCALVERSION_AUTO for the full scm string for this to work.
->
-> >> >+           When read, the SCM version that the module was compiled with is
-> >> >+           returned. The SCM version is returned in the following format::
-> >> >+
-> >> >+           ===
-> >> >+           Git:            g[a-f0-9]\+(-dirty)\?
-> >> >+           Mercurial:      hg[a-f0-9]\+(-dirty)\?
-> >> >+           Subversion:     svn[0-9]\+
-> >> >+           ===
-> >> >diff --git a/include/linux/module.h b/include/linux/module.h
-> >> >index c4e7a887f469..6bd710308863 100644
-> >> >--- a/include/linux/module.h
-> >> >+++ b/include/linux/module.h
-> >> >@@ -372,6 +372,7 @@ struct module {
-> >> >    struct module_attribute *modinfo_attrs;
-> >> >    const char *version;
-> >> >    const char *srcversion;
-> >> >+   const char *scmversion;
-> >> >    struct kobject *holders_dir;
-> >> >
-> >> >    /* Exported symbols */
-> >> >diff --git a/init/Kconfig b/init/Kconfig
-> >> >index b77c60f8b963..d9ae12f16ba2 100644
-> >> >--- a/init/Kconfig
-> >> >+++ b/init/Kconfig
-> >> >@@ -2131,6 +2131,18 @@ config MODULE_SRCVERSION_ALL
-> >> >      the version).  With this option, such a "srcversion" field
-> >> >      will be created for all modules.  If unsure, say N.
-> >> >
-> >> >+config MODULE_SCMVERSION
-> >> >+   bool "SCM version for modules"
-> >> >+   depends on LOCALVERSION_AUTO
-> >> >+   help
-> >> >+     This enables the module attribute "scmversion" which can be used
-> >> >+     by developers to identify the SCM version of a given module, e.g.
-> >> >+     git sha1 or hg sha1. The SCM version can be queried by modinfo or
-> >> >+     via the sysfs node: /sys/modules/MODULENAME/scmversion. This is
-> >> >+     useful when the kernel or kernel modules are updated separately
-> >> >+     since that causes the vermagic of the kernel and the module to
-> >> >+     differ.
->
-> Since I consider this a debug/developer option, let's add a "If
-> unsure, say N." at the end of this, similar to the other
-> module options.
->
-> Thanks!
->
-> Jessica
+Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+
+---
+Depends on:
+
+https://lore.kernel.org/lkml/be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org/
+
+I have kept the .dtb naming for overlays for now, lets see how we do it
+eventually.
+
+Rob/Frank, this doesn't work properly right now. Maybe I missed how
+these overlays must be applied or there is a bug in fdtoverlay.
+
+The master.dtb doesn't include any nodes from overlay_base.dtb or
+overlay.dtb probably because 'testcase-data-2' node isn't present in
+testcases.dtb and fdtoverlay doesn't allow applying new nodes to the
+root node, i.e. allows new sub-nodes once it gets phandle to the parent
+but nothing can be added to the root node itself. Though I get a feel
+that it works while applying the nodes dynamically and it is expected to
+work here as well.
+
+(And yeah, this is my first serious attempt at updating Makefiles, I am
+sure there is a scope of improvement here :))
+
+---
+ drivers/of/unittest-data/Makefile | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/of/unittest-data/Makefile b/drivers/of/unittest-data/Makefile
+index 009f4045c8e4..f17bce85f65f 100644
+--- a/drivers/of/unittest-data/Makefile
++++ b/drivers/of/unittest-data/Makefile
+@@ -38,3 +38,26 @@ DTC_FLAGS_testcases += -@
+ 
+ # suppress warnings about intentional errors
+ DTC_FLAGS_testcases += -Wno-interrupts_property
++
++# Apply overlays statically with fdtoverlay
++intermediate-overlay	:= overlay.dtb
++master			:= overlay_0.dtb overlay_1.dtb overlay_2.dtb \
++			   overlay_3.dtb overlay_4.dtb overlay_5.dtb \
++			   overlay_6.dtb overlay_7.dtb overlay_8.dtb \
++			   overlay_9.dtb overlay_10.dtb overlay_11.dtb \
++			   overlay_12.dtb overlay_13.dtb overlay_15.dtb \
++			   overlay_gpio_01.dtb overlay_gpio_02a.dtb \
++			   overlay_gpio_02b.dtb overlay_gpio_03.dtb \
++			   overlay_gpio_04a.dtb overlay_gpio_04b.dtb \
++			   intermediate-overlay.dtb
++
++quiet_cmd_fdtoverlay = fdtoverlay $@
++      cmd_fdtoverlay = $(objtree)/scripts/dtc/fdtoverlay -o $@ -i $^
++
++$(obj)/intermediate-overlay.dtb: $(obj)/overlay_base.dtb $(addprefix $(obj)/,$(intermediate-overlay))
++	$(call if_changed,fdtoverlay)
++
++$(obj)/master.dtb: $(obj)/testcases.dtb $(addprefix $(obj)/,$(master))
++	$(call if_changed,fdtoverlay)
++
++always-$(CONFIG_OF_OVERLAY) += intermediate-overlay.dtb master.dtb
+-- 
+2.25.0.rc1.19.g042ed3e048af
+
