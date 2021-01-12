@@ -2,158 +2,224 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AFCC4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55639C4332E
 	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Jan 2021 00:50:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06C8B23132
+	by mail.kernel.org (Postfix) with ESMTP id 36E3523371
 	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Jan 2021 00:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393622AbhAMAnC (ORCPT
+        id S2392381AbhAMAnB (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 12 Jan 2021 19:43:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55050 "EHLO
+        Tue, 12 Jan 2021 19:43:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392433AbhAMAeJ (ORCPT
+        with ESMTP id S2390246AbhALXoe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jan 2021 19:34:09 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9967C0617A5
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jan 2021 16:32:51 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id x17so564116ybs.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jan 2021 16:32:51 -0800 (PST)
+        Tue, 12 Jan 2021 18:44:34 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A56C061795;
+        Tue, 12 Jan 2021 15:43:54 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id r9so421164ioo.7;
+        Tue, 12 Jan 2021 15:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=uqIln+HstZctFggtrRu2n6nxYwh4ZFHKHHQOBI++guI=;
-        b=pvdFGS6OG2KgZMUrZd158HXq4dc4tWjUyc78+KbjfGWlFFk1MJrL+jUE9o7jJLc1Hj
-         t2TCiMIZKwBGThTs2NswSLciBDyKsrsSxS1Ll6lBF1snZ9sZR93tiExU0dIipgFDeRun
-         0fW7Vrisk711AmpujZzLhlMZldz4VaGa66ZtXLkHUfXQ31Zr9hRz4qliyXzhIFm7xBSJ
-         hIhUapntVkuUk4GDDrnUUbskeYNnIH42HwwqT8cu1ppIykqr+j/rE0pXTS/f7IV1TjHF
-         i92XgCYDkUoX3kpSs4/BTH+3h0uIxGYsuyuRmZF0wo64a5WZ4Yy1eAaVThcKVClYEG3q
-         eC0w==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=UjqLWBff2oAK5ITVU1oqIMtLhE5XUJaVTO6IhzmEgyE=;
+        b=EDsfLPV4vrt/W4PZd9DRhmCdwvvtq0w8+LEJLTfx8FZ7u6W+EKIBGr3mNgEXS0fIdt
+         DME307Wmd//3s8MtFDgFZNieHuREheLUMaZpaszuUxowqdlO5186D4oVDy8uBcnwR/E6
+         CGTYOcB6lgTTpv6NsOi9yuzEBg7V7C30GMxqFYjTKlDQmsWcU/vlmnPC1/yZO7/fmEIN
+         ujt4qss+0ZM96XwUYT7vQb2gAhYFXdE7sGIHC9ySdZB1PFO7TAGIlylHRZdsIS8UqVO+
+         YTugWGVwN9RyIAsam1CD990I1dDIVqP/dEnh8ZsHwexc8Sq/aFUtc+RZwPJBu/vDSriF
+         b8zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=uqIln+HstZctFggtrRu2n6nxYwh4ZFHKHHQOBI++guI=;
-        b=l2So8XnHT6C1unbChNvm19f43PfNEp3Y9YhkHUYhnoOlmpWASt5hfbPL4KXdyYTOd0
-         hnlfcPq7rBDFncIDf1HNb0oYWC2pTQnksW7O8KFpjZdbKgW7w38XIHBxEUXyUgXy/MzH
-         +qAsaeDCGv6wAyXhEQxtY+WQf8LyRU0xKu9UQYEWuyhTaowkaZfu6kFK4S4JvKF7NNTP
-         8qZ2zOBmHQOctAizxJ7BTNzeEDAmKSFxr2Uta9SPJ4o7pOn851mNocxYmt61fOaNeIU3
-         fx2AAvnsnIGYClbQU5ByMd6PUp70XTyvlXZK49G/ksgzWigQ2R0OqFK6fGCSU2Kax9Rj
-         sJYA==
-X-Gm-Message-State: AOAM531o+bqF2Q+LzCWH4Ib032I09wa63Ri+hcVtiCGKbYrAbgMYIXoY
-        w0mVqJI5kHIVKYEPT+grgLTU3/gohH+lHwGk8ok=
-X-Google-Smtp-Source: ABdhPJxJm9HtYy+kYsBH/PWQjN06dKOIWrIF4tKGocsrMidrfwb4fDMqj6pOBPLr6bEVyRjV9m5PQoN+3rKI/fbp5qk=
-Sender: "ndesaulniers via sendgmr" 
-        <ndesaulniers@ndesaulniers1.mtv.corp.google.com>
-X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:f693:9fff:fef4:4d25])
- (user=ndesaulniers job=sendgmr) by 2002:a5b:2cf:: with SMTP id
- h15mr2951368ybp.475.1610497971198; Tue, 12 Jan 2021 16:32:51 -0800 (PST)
-Date:   Tue, 12 Jan 2021 16:32:34 -0800
-In-Reply-To: <20210113003235.716547-1-ndesaulniers@google.com>
-Message-Id: <20210113003235.716547-3-ndesaulniers@google.com>
-Mime-Version: 1.0
-References: <20210113003235.716547-1-ndesaulniers@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH v4 2/3] Kbuild: make DWARF version a choice
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
-        Jakub Jelinek <jakub@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Caroline Tice <cmtice@google.com>,
-        Nick Clifton <nickc@redhat.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=UjqLWBff2oAK5ITVU1oqIMtLhE5XUJaVTO6IhzmEgyE=;
+        b=H2EIO6xaSalF47N8qqCqcWzyyTJxwLflfgp6AQJw6W3YkUgxinLybXY4wRq1HLr26y
+         mVMIG3jhXL8+3ei6cEorEnvVyaoIUUoLjrhPkZv50OfxXE3a7WZzLKfrlSjRcIecYLrw
+         cJ3wLRs1BAmmv2AEFuc/CKy3ar8Dg5T7KvyjR4cIbFw2xhX9UKBcw98BnVCUbv4GW7vu
+         8gjbNIS6XQP1KfAbTyjDw0K/RVCBQb97hbY6Lp9VMrj7ixUeSb+5phyLhshOHCHI+Kqo
+         rnVJq0Ki0z/v0mqthfHD+4fo95ZQPGtoau0NP8kmJKEhTZeMyFJlXcQkm5dHjL+Sgo3W
+         D4lw==
+X-Gm-Message-State: AOAM530fVR9ZSfiBVAEhp9hOHtXlc3N00NmFiTNO1xgrXYFXGt8CxW3X
+        8L8LedwKUthCOGiebOdaImj/qCMDiE4hWuzmMnZXtpMcz6eI2g==
+X-Google-Smtp-Source: ABdhPJz5UQydtVFyQkapceVkeXgXLEU2zu+TJjfwekFMpYmQxv1TC9yWVtHQPhujSFXyn2UUDF3SeyLd/mAI0bhV7Ug=
+X-Received: by 2002:a5e:d70e:: with SMTP id v14mr1247099iom.75.1610495033522;
+ Tue, 12 Jan 2021 15:43:53 -0800 (PST)
+MIME-Version: 1.0
+References: <20210111180609.713998-1-natechancellor@gmail.com>
+In-Reply-To: <20210111180609.713998-1-natechancellor@gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Wed, 13 Jan 2021 00:43:41 +0100
+Message-ID: <CA+icZUXcsjwXOcoHRL3HSDMbE9thq7G3A9Uvzeg8tbNfLP7dfw@mail.gmail.com>
+Subject: Re: [PATCH] bpf: Hoise pahole version checks into Kconfig
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice. Adds an
-explicit CONFIG_DEBUG_INFO_DWARF2, which is the default. Does so in a
-way that's forward compatible with existing configs, and makes adding
-future versions more straightforward.
+On Mon, Jan 11, 2021 at 7:06 PM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
+>
+> After commit da5fb18225b4 ("bpf: Support pre-2.25-binutils objcopy for
+> vmlinux BTF"), having CONFIG_DEBUG_INFO_BTF enabled but lacking a valid
+> copy of pahole results in a kernel that will fully compile but fail to
+> link. The user then has to either install pahole or disable
+> CONFIG_DEBUG_INFO_BTF and rebuild the kernel but only after their build
+> has failed, which could have been a significant amount of time depending
+> on the hardware.
+>
+> Avoid a poor user experience and require pahole to be installed with an
+> appropriate version to select and use CONFIG_DEBUG_INFO_BTF, which is
+> standard for options that require a specific tools version.
+>
+> Suggested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 
-Suggested-by: Fangrui Song <maskray@google.com>
-Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
- Makefile          | 14 +++++++++-----
- lib/Kconfig.debug | 21 ++++++++++++++++-----
- 2 files changed, 25 insertions(+), 10 deletions(-)
+Thanks for the patch, Nathan,
 
-diff --git a/Makefile b/Makefile
-index d49c3f39ceb4..656fff17b331 100644
---- a/Makefile
-+++ b/Makefile
-@@ -826,12 +826,16 @@ else
- DEBUG_CFLAGS	+= -g
- endif
- 
--ifneq ($(LLVM_IAS),1)
--KBUILD_AFLAGS	+= -Wa,-gdwarf-2
-+dwarf-version-$(CONFIG_DEBUG_INFO_DWARF2) := 2
-+dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
-+DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
-+ifneq ($(dwarf-version-y)$(LLVM_IAS),21)
-+# Binutils 2.35+ required for -gdwarf-4+ support.
-+dwarf-aflag	:= $(call as-option,-Wa$(comma)-gdwarf-$(dwarf-version-y))
-+ifdef CONFIG_CC_IS_CLANG
-+DEBUG_CFLAGS	+= $(dwarf-aflag)
- endif
--
--ifdef CONFIG_DEBUG_INFO_DWARF4
--DEBUG_CFLAGS	+= -gdwarf-4
-+KBUILD_AFLAGS	+= $(dwarf-aflag)
- endif
- 
- ifdef CONFIG_DEBUG_INFO_REDUCED
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index dd7d8d35b2a5..e80770fac4f0 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -256,13 +256,24 @@ config DEBUG_INFO_SPLIT
- 	  to know about the .dwo files and include them.
- 	  Incompatible with older versions of ccache.
- 
-+choice
-+	prompt "DWARF version"
-+	help
-+	  Which version of DWARF debug info to emit.
-+
-+config DEBUG_INFO_DWARF2
-+	bool "Generate DWARF Version 2 debuginfo"
-+	help
-+	  Generate DWARF v2 debug info.
-+
- config DEBUG_INFO_DWARF4
--	bool "Generate dwarf4 debuginfo"
-+	bool "Generate DWARF Version 4 debuginfo"
- 	help
--	  Generate dwarf4 debug info. This requires recent versions
--	  of gcc and gdb. It makes the debug information larger.
--	  But it significantly improves the success of resolving
--	  variables in gdb on optimized code.
-+	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
-+	  It makes the debug information larger, but it significantly
-+	  improves the success of resolving variables in gdb on optimized code.
-+
-+endchoice # "DWARF version"
- 
- config DEBUG_INFO_BTF
- 	bool "Generate BTF typeinfo"
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
+Might be good to gave a hint to the user if pahole version does not
+match requirements?
 
+Feel free to add my:
+
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+
+- Sedat -
+
+
+
+> ---
+>  MAINTAINERS               |  1 +
+>  init/Kconfig              |  4 ++++
+>  lib/Kconfig.debug         |  6 ++----
+>  scripts/link-vmlinux.sh   | 13 -------------
+>  scripts/pahole-version.sh | 16 ++++++++++++++++
+>  5 files changed, 23 insertions(+), 17 deletions(-)
+>  create mode 100755 scripts/pahole-version.sh
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b8db7637263a..6f6e24285a94 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3282,6 +3282,7 @@ F:        net/core/filter.c
+>  F:     net/sched/act_bpf.c
+>  F:     net/sched/cls_bpf.c
+>  F:     samples/bpf/
+> +F:     scripts/pahole-version.sh
+>  F:     tools/bpf/
+>  F:     tools/lib/bpf/
+>  F:     tools/testing/selftests/bpf/
+> diff --git a/init/Kconfig b/init/Kconfig
+> index b77c60f8b963..872c61b5d204 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -74,6 +74,10 @@ config TOOLS_SUPPORT_RELR
+>  config CC_HAS_ASM_INLINE
+>         def_bool $(success,echo 'void foo(void) { asm inline (""); }' | $(CC) -x c - -c -o /dev/null)
+>
+> +config PAHOLE_VERSION
+> +       int
+> +       default $(shell,$(srctree)/scripts/pahole-version.sh $(PAHOLE))
+> +
+>  config CONSTRUCTORS
+>         bool
+>         depends on !UML
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 7937265ef879..70c446af9664 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -267,6 +267,7 @@ config DEBUG_INFO_DWARF4
+>
+>  config DEBUG_INFO_BTF
+>         bool "Generate BTF typeinfo"
+> +       depends on PAHOLE_VERSION >= 116
+>         depends on !DEBUG_INFO_SPLIT && !DEBUG_INFO_REDUCED
+>         depends on !GCC_PLUGIN_RANDSTRUCT || COMPILE_TEST
+>         help
+> @@ -274,12 +275,9 @@ config DEBUG_INFO_BTF
+>           Turning this on expects presence of pahole tool, which will convert
+>           DWARF type info into equivalent deduplicated BTF type info.
+>
+> -config PAHOLE_HAS_SPLIT_BTF
+> -       def_bool $(success, test `$(PAHOLE) --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/'` -ge "119")
+> -
+>  config DEBUG_INFO_BTF_MODULES
+>         def_bool y
+> -       depends on DEBUG_INFO_BTF && MODULES && PAHOLE_HAS_SPLIT_BTF
+> +       depends on DEBUG_INFO_BTF && MODULES && PAHOLE_VERSION >= 119
+>         help
+>           Generate compact split BTF type information for kernel modules.
+>
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index 6eded325c837..eef40fa9485d 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -139,19 +139,6 @@ vmlinux_link()
+>  # ${2} - file to dump raw BTF data into
+>  gen_btf()
+>  {
+> -       local pahole_ver
+> -
+> -       if ! [ -x "$(command -v ${PAHOLE})" ]; then
+> -               echo >&2 "BTF: ${1}: pahole (${PAHOLE}) is not available"
+> -               return 1
+> -       fi
+> -
+> -       pahole_ver=$(${PAHOLE} --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/')
+> -       if [ "${pahole_ver}" -lt "116" ]; then
+> -               echo >&2 "BTF: ${1}: pahole version $(${PAHOLE} --version) is too old, need at least v1.16"
+> -               return 1
+> -       fi
+> -
+>         vmlinux_link ${1}
+>
+>         info "BTF" ${2}
+> diff --git a/scripts/pahole-version.sh b/scripts/pahole-version.sh
+> new file mode 100755
+> index 000000000000..6de6f734a345
+> --- /dev/null
+> +++ b/scripts/pahole-version.sh
+> @@ -0,0 +1,16 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Usage: $ ./scripts/pahole-version.sh pahole
+> +#
+> +# Print the pahole version as a three digit string
+> +# such as `119' for pahole v1.19 etc.
+> +
+> +pahole="$*"
+> +
+> +if ! [ -x "$(command -v $pahole)" ]; then
+> +    echo 0
+> +    exit 1
+> +fi
+> +
+> +$pahole --version | sed -E 's/v([0-9]+)\.([0-9]+)/\1\2/'
+>
+> base-commit: e22d7f05e445165e58feddb4e40cc9c0f94453bc
+> --
+> 2.30.0
+>
