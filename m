@@ -2,88 +2,106 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A90C433E6
-	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 13:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84342C43331
+	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 14:06:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62FE322E03
-	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 13:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EA2222E03
+	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 14:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729686AbhALNRY (ORCPT
+        id S1729714AbhALOFu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 12 Jan 2021 08:17:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53866 "EHLO mail.kernel.org"
+        Tue, 12 Jan 2021 09:05:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48920 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389870AbhALM5S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jan 2021 07:57:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D16872312E;
-        Tue, 12 Jan 2021 12:56:10 +0000 (UTC)
+        id S1727954AbhALOFu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 12 Jan 2021 09:05:50 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4EFF423102;
+        Tue, 12 Jan 2021 14:05:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610456171;
-        bh=lqfhIIKAmyes3uhDE1lG7FzPk5jU+FKGHbA35jjLNzs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uD1s5iS9YAtw10DTNt4X+pOMnNXlVmrVBg9ChAG3IeoCV3b3yF3IP42sOG7qxnvIR
-         yxR4BPglmwfv8/y5LMoAbcZf/uteRx1gCZVOazocJzILmUtUNHXk86RD9C2YaCRfUO
-         M9VWAwvnaPdX8mGCbPrfmWPoTgUvBZrJBtmBdt4hMxR1484iBepqo4qRJN9SSsGKi3
-         L0wo/aABR8ne1RedhnUXSpRQxx54QzTfRC7fZPsPBWzjbR4FLIJKG/CLouAkFuaiX2
-         IHSxdoSAJM1sp1OoRCgpvscQSnsr2xWj4gEky8vS+Jk83k6gsR5SoMPcCqzTLi2Go7
-         pLoy/48Dbm89Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 28/51] kconfig: remove 'kvmconfig' and 'xenconfig' shorthands
-Date:   Tue, 12 Jan 2021 07:55:10 -0500
-Message-Id: <20210112125534.70280-28-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210112125534.70280-1-sashal@kernel.org>
-References: <20210112125534.70280-1-sashal@kernel.org>
+        s=k20201202; t=1610460309;
+        bh=hEyF8u1jTp1PdY2BgjCeEQOjkCa4GQKBP+Ai0lRFwnI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ZAkvt9t8Aor96P99OppfBioEuqN08bN/qqHnCLPzBFsvHwmv+TS5L8y1SfDjvkb6Z
+         XFZX5vBv7oYPhEdmv8k5dra3x9f96FoJg4SPVBSKq/f8uJKTa26JsEUf3UDBvCdSt8
+         8i4IOG28IJ62lXksW63gSRG5A0QTggaL/riLMgJE6f6WqZMHx7yMvtNPCMAwYdDz7F
+         LO5NUok+6iBA7bs1wo0ggXTchXqxQEUm5k1mNuiXRj0bv1JXHa48RH6GnQ3GDZjsaf
+         hEU76Wzmzvelqd7vTZ2wVCp2qRXE4QAGzB6Uzbpzzt8j7JVJ1CUp0O6zAlNDNCAzAA
+         FtrPayBvBq32w==
+Received: by mail-ed1-f44.google.com with SMTP id b2so2439674edm.3;
+        Tue, 12 Jan 2021 06:05:09 -0800 (PST)
+X-Gm-Message-State: AOAM53316nN7HgC7KDeycUKipurB+TP2owX5sEGSKLRWTdJWChSp7zdU
+        xIaqTYV4IxcUX05D3SfV4rA/Al8KmkCDGlrL9Q==
+X-Google-Smtp-Source: ABdhPJzjVbF8BgyTS7DJvzisOGRLdNi2IpAmco42wRjcHhwS40VmHg7+FIb+DgXEMB/Ze3HWtm2nQceT3ldNB4rsaeE=
+X-Received: by 2002:a50:f404:: with SMTP id r4mr3569989edm.62.1610460307833;
+ Tue, 12 Jan 2021 06:05:07 -0800 (PST)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org>
+ <1e42183ccafa1afba33b3e79a4e3efd3329fd133.1610095159.git.viresh.kumar@linaro.org>
+ <23e16d20-36eb-87d9-4473-142504ad8a95@gmail.com>
+In-Reply-To: <23e16d20-36eb-87d9-4473-142504ad8a95@gmail.com>
+From:   Rob Herring <robh+dt@kernel.org>
+Date:   Tue, 12 Jan 2021 08:04:55 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKqSVGCjcue=ka2=bB1Os9pczNTCqDeaoFPFfRxnvsteQ@mail.gmail.com>
+Message-ID: <CAL_JsqKqSVGCjcue=ka2=bB1Os9pczNTCqDeaoFPFfRxnvsteQ@mail.gmail.com>
+Subject: Re: [PATCH] of: unittest: Statically apply overlays using fdtoverlay
+To:     Frank Rowand <frowand.list@gmail.com>
+Cc:     Viresh Kumar <viresh.kumar@linaro.org>,
+        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
+        devicetree@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Bill Mills <bill.mills@linaro.org>,
+        Anmar Oueja <anmar.oueja@linaro.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Masahiro Yamada <masahiroy@kernel.org>
+On Mon, Jan 11, 2021 at 4:06 PM Frank Rowand <frowand.list@gmail.com> wrote:
+>
+> On 1/8/21 2:41 AM, Viresh Kumar wrote:
+> > Now that fdtoverlay is part of the kernel build, start using it to test
+> > the unitest overlays we have by applying them statically.
+> >
+> > The file overlay_base.dtb have symbols of its own and we need to apply
+> > overlay.dtb to overlay_base.dtb alone first to make it work, which gives
+> > us intermediate-overlay.dtb file.
+> >
+> > The intermediate-overlay.dtb file along with all other overlays is them
+> > applied to testcases.dtb to generate the master.dtb file.
+> >
+> > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+>
+> NACK to this specific patch, in its current form.
+>
+> There are restrictions on applying an overlay at runtime that do not apply
+> to applying an overlay to an FDT that will be loaded by the kernel during
+> early boot.  Thus the unittest overlays _must_ be applied using the kernel
+> overlay loading methods to test the kernel runtime overlay loading feature.
 
-[ Upstream commit 9bba03d4473df0b707224d4d2067b62d1e1e2a77 ]
+This patch doesn't take away from any of that and it completely orthogonal.
 
-Linux 5.10 is out. Remove the 'kvmconfig' and 'xenconfig' shorthands
-as previously announced.
+> I agree that testing fdtoverlay is a good idea.  I have not looked at the
+> parent project to see how much testing of fdtoverlay occurs there, but I
+> would prefer that fdtoverlay tests reside in the parent project if practical
+> and reasonable.  If there is some reason that some fdtoverlay tests are
+> more practical in the Linux kernel repository then I am open to adding
+> them to the Linux kernel tree.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- scripts/kconfig/Makefile | 10 ----------
- 1 file changed, 10 deletions(-)
+If you (or more importantly someone else sending us patches) make
+changes to the overlays, you can test that they apply at build time
+rather than runtime. I'll take it! So please help on fixing the issue
+because I want to apply this.
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index e46df0a2d4f9d..2c40e68853dde 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -94,16 +94,6 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m .config $(configfiles)
- 	$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
- 
--PHONY += kvmconfig
--kvmconfig: kvm_guest.config
--	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
--	@echo >&2 "         Please use 'make $<' instead."
--
--PHONY += xenconfig
--xenconfig: xen.config
--	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
--	@echo >&2 "         Please use 'make $<' instead."
--
- PHONY += tinyconfig
- tinyconfig:
- 	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
--- 
-2.27.0
+And yes, dtc has fdtoverlay tests. But this patch shows there's at
+least 2 issues. fdtoverlay can't apply overlays to the root and using
+an overlay as the base tree in UML is odd IMO.
 
+Rob
