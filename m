@@ -2,132 +2,106 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6ABC433DB
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 01:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C316C4332E
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54D672343B
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 01:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26DFD235F8
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727143AbhANBzq (ORCPT
+        id S1727417AbhANCAS (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 13 Jan 2021 20:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
+        Wed, 13 Jan 2021 21:00:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729618AbhAMXuZ (ORCPT
+        with ESMTP id S1729489AbhAMXj4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jan 2021 18:50:25 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08268C0617A5
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2021 15:27:22 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id p18so2476386pgm.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2021 15:27:22 -0800 (PST)
+        Wed, 13 Jan 2021 18:39:56 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F58C0617A9;
+        Wed, 13 Jan 2021 15:07:42 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id y12so2038743pji.1;
+        Wed, 13 Jan 2021 15:07:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Rhh6w6PnAshqzzDi7tIorGSnjSwjXHOfLfkdJH6Oxgk=;
-        b=UsAe64kOAc8ogK7jOBzOesd7Gj13f2B4Po8m+3R3dmVXJk6pEq3gYcmuaRd7El09bO
-         Pp9zCxf2v08t8ZWzssQTx0k0WdOnBcT3jgcHctNfwEtJoZYm3e3My7kUgzf5amFidX7U
-         3RAcgUTqJ/nW4n7VBXamre7h42HseZwdwLdsy8OXsvbzJcBMowDxF2ZoCDZz1+kzzXJv
-         j704xO1uL9COVu3l3LUelEPeCyK9q/+k0NcEh72F2vqTVL5V6wFlhm4hKS66EXiGDsqT
-         OIP8nNh5erhaKpw9pbAOhJIe0W3K8OMJi6dJhV32YQQE5oiccvLsW6hzifztteos5F4h
-         cXyw==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=m4PIDzYT3CXhoACwt4A5q0aBFravQnGjz5z9j8ZUsEY=;
+        b=kSQ5AATGqJZ1OZcYKgwWY5EamTo6erdhBn8bkSwXMwNhcF7BCVo9sbg80BYZt14h/X
+         WRETpPnEcpfjBwMcAfT6nVWS7rl/zjTc9uqDfmVBydaJkiH80gHIpSxxTchw7nacf0Za
+         gh6XJyD2mZnCktbfjPnCPtUk3wBxDscxfYH+Ryrx1jozwqwLS+f8wSKLkE6kHDFFhjJS
+         ly7S4GM7zj3gxUKPbS9xxituOC9XKYq4TouBRaDT0BfiNP9YFap3ZtsIfWH9gY2H/XRQ
+         XUuOCy9Y1L1RkUbq8pLQhTxUo/UG03EVThoUtbWoL8uLja4Xh6ARab+sw1wtdeCWR+xL
+         73ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Rhh6w6PnAshqzzDi7tIorGSnjSwjXHOfLfkdJH6Oxgk=;
-        b=W/ZjAppFdfV5jtUJ7h4dp0DRN99IMTDwX0frMzqYUPC0rwuUXfcuuLM+4n7XhQBP2n
-         LqjDtpyjpHs6scsm/ZEAb5xSURd6JrfFfY1LPVbozfrhlbKcZfOc/3LvtaquUu8ajR9f
-         /A4UEMQ7Ab5/b5bPzfpklzyLcd37rbKbSGFflfiW4Pbxxrttb4VFKkwj02qPFvWvXFyY
-         CEINfUVDWwji5zvVSmWfAiCf3mP0szyZLT5PcJk0G/AoqAxoQDezWMUi3AFyhG5wcHas
-         KB37VOGP0M7rvwzAFJX6ppImtASvwteqTi0xqQJDmhGyu5JIUeUYvd0ymLs/Zw5b+Gks
-         g9rA==
-X-Gm-Message-State: AOAM530VHfhP0ZKzVmkENF1whorkn0ZphYLYAJ818Ji3pfCrdNx5j61C
-        0/LYnHhLVROQVRIJL64hEiGBfCnxjGXRLsl32UTKoA==
-X-Google-Smtp-Source: ABdhPJynbg/QsB8oO89RHz2rLF3RFS5Hrqec+YsAoymztXcghiURgnIYfZbNXYr16Sz5/nfz/+3mrTX2fRX2z2LbEqI=
-X-Received: by 2002:a63:1142:: with SMTP id 2mr4397001pgr.263.1610580441323;
- Wed, 13 Jan 2021 15:27:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20210113003235.716547-1-ndesaulniers@google.com>
- <20210113003235.716547-3-ndesaulniers@google.com> <CA+icZUV6pNP1AN_JEhqon6Hgk3Yfq0_VNghvRX0N9mw6pGtpVw@mail.gmail.com>
-In-Reply-To: <CA+icZUV6pNP1AN_JEhqon6Hgk3Yfq0_VNghvRX0N9mw6pGtpVw@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 13 Jan 2021 15:27:09 -0800
-Message-ID: <CAKwvOdm40Z3YutxwWyV922XdchN7Dz+v9kJNjF13vKxNUXrJnQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] Kbuild: make DWARF version a choice
-To:     Sedat Dilek <sedat.dilek@gmail.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=m4PIDzYT3CXhoACwt4A5q0aBFravQnGjz5z9j8ZUsEY=;
+        b=d/CuTKqHDrAXaXxDmvUY2cnYkOV4uYeC35p4/83X04DMESNMn6pGX/oR+vkT3YDSOx
+         Mmycbuy/4M5gpu51GncIxQqaoMiKD94KjE+7NTQQJbv/b9dPKa7lMKfVj70cPCyTIMWu
+         XfXvePhUrHPJNcCo4F76gQpsyn9fyL7w1LRfHzRNmw5H8bqctUtZPnKVF1GSC8ruJnZG
+         KB0MYcXsliijIJf0NfJxxKZoUoNZd6CjrO48ehc3pP9KwchvonRgIEs/HRJl6nDt5e8i
+         /61ID96si6kHVciCFmWWfsOdZen2HpFVQ7C7tUfv4wcmy2PktB805bpiR85KEwvf3ngP
+         EfLw==
+X-Gm-Message-State: AOAM531zzS5GiCPv+au5QzZjzKmJDMQUmBPyAUy6dd3wK+9wJWJBZ1Dg
+        NdYRLtFxEehminafAtVJ3ao=
+X-Google-Smtp-Source: ABdhPJxQjXFrORq7aRfjX5AzuzrkieozDdbOI+BgMpe3PbPu7LmqaHSUfdR9PjmJQind1uC0ObZucQ==
+X-Received: by 2002:a17:90a:fd08:: with SMTP id cv8mr1652767pjb.29.1610579261988;
+        Wed, 13 Jan 2021 15:07:41 -0800 (PST)
+Received: from Ryzen-9-3900X.localdomain (ip68-104-204-241.ph.ph.cox.net. [68.104.204.241])
+        by smtp.gmail.com with ESMTPSA id t1sm3515705pfq.154.2021.01.13.15.07.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jan 2021 15:07:41 -0800 (PST)
+Date:   Wed, 13 Jan 2021 16:07:39 -0700
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     Andrii Nakryiko <andrii.nakryiko@gmail.com>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Caroline Tice <cmtice@google.com>,
-        Nick Clifton <nickc@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Networking <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>
+Subject: Re: [PATCH] bpf: Hoise pahole version checks into Kconfig
+Message-ID: <20210113230739.GA22747@Ryzen-9-3900X.localdomain>
+References: <20210111180609.713998-1-natechancellor@gmail.com>
+ <CAK7LNAQ=38BUi-EG5v2UiuAF-BOsVe5BTd-=jVYHHHPD7ikS5A@mail.gmail.com>
+ <20210111193400.GA1343746@ubuntu-m3-large-x86>
+ <CAK7LNASZuWp=aPOCKo6QkdHwM5KG6MUv8305v3x-2yR7cKEX-w@mail.gmail.com>
+ <20210111200010.GA3635011@ubuntu-m3-large-x86>
+ <CAEf4BzaL18a2+j3EYaD7jcnbJzqwG2MuBxXR2iRZ3KV9Jwrj6w@mail.gmail.com>
+ <CAEf4Bzbv6nrJNxbZAvFx4Djvf1zbWnrV_i90vPGHtV-W7Tz=bQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEf4Bzbv6nrJNxbZAvFx4Djvf1zbWnrV_i90vPGHtV-W7Tz=bQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Sedat,
-Thanks for testing, and congrats on https://lwn.net/Articles/839772/.
-I always appreciate you taking the time to help test my work, and
-other Clang+Linux kernel patches!
+On Wed, Jan 13, 2021 at 02:38:27PM -0800, Andrii Nakryiko wrote:
+> Hm.. Just saw Linus proposing using $(error-if) in Kconfig for an
+> unrelated issue ([0]). If we can make this work, then it would catch
+> such issue early on, yet won't have any downsides of hiding
+> CONFIG_DEBUG_INFO_BTF if pahole is too old. WDYT?
+> 
+>   [0] https://lore.kernel.org/lkml/CAHk-=wh-+TMHPTFo1qs-MYyK7tZh-OQovA=pP3=e06aCVp6_kA@mail.gmail.com/
 
-On Wed, Jan 13, 2021 at 1:24 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> On Wed, Jan 13, 2021 at 1:32 AM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
-> >
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -826,12 +826,16 @@ else
-> >  DEBUG_CFLAGS   += -g
-> >  endif
-> >
-> > -ifneq ($(LLVM_IAS),1)
-> > -KBUILD_AFLAGS  += -Wa,-gdwarf-2
-> > +dwarf-version-$(CONFIG_DEBUG_INFO_DWARF2) := 2
-> > +dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
-> > +DEBUG_CFLAGS   += -gdwarf-$(dwarf-version-y)
+Yes, I think that would be exactly what we want because DEBUG_INFO_BTF
+could cause the build to error if PAHOLE_VERSION is not >= 116. I will
+try to keep an eye on that thread to see how it goes then respin this
+based on anything that comes from it.
 
-^ DEBUG_CFLAGS are set for everyone (all toolchains) if
-CONFIG_DEBUG_INFO is defined.
-
-> > +ifneq ($(dwarf-version-y)$(LLVM_IAS),21)
-
-^ "If not using dwarf 2 and LLVM_IAS=1", ie. CONFIG_DEBUG_INFO_DWARF5
-&& CONFIG_CC_IS_GCC
-
-> > +# Binutils 2.35+ required for -gdwarf-4+ support.
-> > +dwarf-aflag    := $(call as-option,-Wa$(comma)-gdwarf-$(dwarf-version-y))
-> > +ifdef CONFIG_CC_IS_CLANG
-
-^ "if clang"
-
-> > +DEBUG_CFLAGS   += $(dwarf-aflag)
-> >  endif
->
-> Why is that "ifdef CONFIG_CC_IS_CLANG"?
-
-That's what Arvind requested on v2, IIUC:
-https://lore.kernel.org/lkml/X8psgMuL4jMjP%2FOy@rani.riverdale.lan/
-
-> When I use GCC v10.2.1 DEBUG_CFLAGS are not set.
-
-You should have -gdwarf-4 (and not -Wa,-gwarf-4) set for DEBUG_CFLAGS
-when compiling with GCC and enabling CONFIG_DEBUG_INFO_DWARF4. Can you
-please confirm? (Perhaps you may have accidentally disabled
-CONFIG_DEBUG_INFO by rerunning `make defconfig`?)
--- 
-Thanks,
-~Nick Desaulniers
+Cheers,
+Nathan
