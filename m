@@ -2,184 +2,143 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22EBC43219
-	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 21:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5F0C433E0
+	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Jan 2021 00:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F8F323123
-	for <linux-kbuild@archiver.kernel.org>; Tue, 12 Jan 2021 21:46:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60EC02313A
+	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Jan 2021 00:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436627AbhALVhJ (ORCPT
+        id S2393617AbhAMAnB (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 12 Jan 2021 16:37:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37926 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437035AbhALUrU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 12 Jan 2021 15:47:20 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C5F4822DFA;
-        Tue, 12 Jan 2021 20:46:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610484399;
-        bh=6C4FcXaTex9YSJhTt/hDbVABmaMZGgd5xL/KaWRt3iY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=RehPUdGa+mBVp0ZUVaEOPx1noJiGroSWcESAiiR4uz6CLTaZd4YjLjgKovIkkivcd
-         xjV02oeA6iZFg2KTyU2At7vjDB3tnRDPJVlEjhxgik1b5dnUa1BCHrW0v4pI48DlRb
-         1Qv3ROg7LijMPadsxZtldjWhxQFylhy4560fpq9dQiZtfKKhKdS45P7s2XgzWTsMv8
-         cr3lWv5qyeydCccj4cm6qr72u307nqHKP+ffjhG0PwrGASJaIfV0aHRWLwxZYIxNNq
-         4F/xfNWU2jlVMODd4z6k4eW5fi6Ezmaza7PqzQ/GEpXzyU5GUXKh27xjn1tq5o2/6v
-         68QFCT+Q/Mziw==
-Received: by mail-ed1-f52.google.com with SMTP id h16so3864335edt.7;
-        Tue, 12 Jan 2021 12:46:38 -0800 (PST)
-X-Gm-Message-State: AOAM5300WqA+F1VF9IWkhi7KgcJGEEGavzIARx/j2Z7/sJHtzvL9YhKj
-        kHc7UBJBSufP6Ch/Mq7uanvB3WK1XSfFLuk0Bg==
-X-Google-Smtp-Source: ABdhPJzHL8hEzkUMk94Hn1de+iimXy75BRTADHer8kKo3ydsZMgHK9uauUzifJrV5kKxlyNzhM/pJo24SVcTyeuLeBk=
-X-Received: by 2002:a05:6402:541:: with SMTP id i1mr786962edx.289.1610484397247;
- Tue, 12 Jan 2021 12:46:37 -0800 (PST)
-MIME-Version: 1.0
-References: <be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org>
- <1e42183ccafa1afba33b3e79a4e3efd3329fd133.1610095159.git.viresh.kumar@linaro.org>
- <23e16d20-36eb-87d9-4473-142504ad8a95@gmail.com> <CAL_JsqKqSVGCjcue=ka2=bB1Os9pczNTCqDeaoFPFfRxnvsteQ@mail.gmail.com>
- <e549c7ce-d01e-08a3-9ed0-7325a34e9c29@gmail.com> <CAL_Jsq+W4X5H2myCzX1bGTEqJG9dpwLXdmqbpq6oGm5wpF7WMQ@mail.gmail.com>
- <de50f7a5-d0d7-86b0-a1eb-84a91438b586@gmail.com>
-In-Reply-To: <de50f7a5-d0d7-86b0-a1eb-84a91438b586@gmail.com>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Tue, 12 Jan 2021 14:46:25 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLMeX_f-TpX4j5tgxJOxDafP9tiunvcF_Ed4MGV90982A@mail.gmail.com>
-Message-ID: <CAL_JsqLMeX_f-TpX4j5tgxJOxDafP9tiunvcF_Ed4MGV90982A@mail.gmail.com>
-Subject: Re: [PATCH] of: unittest: Statically apply overlays using fdtoverlay
-To:     Frank Rowand <frowand.list@gmail.com>
-Cc:     Viresh Kumar <viresh.kumar@linaro.org>,
-        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
-        devicetree@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Bill Mills <bill.mills@linaro.org>,
-        Anmar Oueja <anmar.oueja@linaro.org>,
-        Masahiro Yamada <masahiroy@kernel.org>
+        Tue, 12 Jan 2021 19:43:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392403AbhAMAd3 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 12 Jan 2021 19:33:29 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D307C06179F
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jan 2021 16:32:49 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id l2so354787pgi.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jan 2021 16:32:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=dP6j6wcQj1tq0vOLcWGfFHo7iRnRUUl3C2I4O7J7Ozg=;
+        b=HZ1OdG3AUYYjnfuIgSl2h48zf8Lc8TWv0B1ET6Q23GEo4BkJjbddMItpDsuFBvKrjp
+         V9Lybk1v5NoyoXQzjgPuD0Ee1SNw1OxfZtUOc8wKcVYm4W1/MwBB6QvZHbqNoY/5YpPI
+         Rs52mOOCneWpnNsEPyrAYvG5JiqK8UYr0BMxT4NCHNiMeH1Q/JCt2u64AbB/Hgo/+8gO
+         0zySVBzWlPqREI+U/ri2WS5YZBEC6gtegTnMcwfo1ee7cyJe3m5EMt1llZJ6L1XQMULn
+         VXuv6CbDtvOq/NBp8KrxjW2cxl8BIqo5o+XRXSPs48u4akZ1PtV6XAaWUyupqa7rX0wb
+         3cMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=dP6j6wcQj1tq0vOLcWGfFHo7iRnRUUl3C2I4O7J7Ozg=;
+        b=spLqi5Ba/18HvtiMWS+MM3ulcl8r3NCoCleq+KSa7GaKj/O0d1XA9n4HzIj1dOQEHv
+         80IJQWohUCNZz+1Usuapq27f8SMBZuU4x4Spq+U6i5w47jHIYaDwjSv61fuo7ktY2huH
+         lIRkYW24YiWteFyOP3PvFv5GB61pUrGx+bDk8kT9O/4hrqvR3h0l2UNf88stV5BmUPQS
+         voJjjrj7HbhWjcFLuv+DXds8jHwgm2N4l0lXkskEtz/E60A0zs7T5ICzZx/DCTKp1u1K
+         FTqQBBgy9MzgP0avJ2r+4jN4u0577GnKjAZJXk1+j6tLlrMsYaVLCAvKhfSvaRK0wxE8
+         SoWw==
+X-Gm-Message-State: AOAM5316DuhOaaI4Fg/d2HbnD2O5lDCK+vyK0Bt2dcrbmEFQTeit6f2n
+        1Wp88AN5LNizmTLrtwBMJVK5ZczQ47aKoXS2UR0=
+X-Google-Smtp-Source: ABdhPJwq5fbkvZctrZiF7pXQ41VncnRxpB/+3veDd4p8cC9GtOVC+KE7VsOZMV/3VwRTIIjPqQle1f8xxEWkHZ/9bMw=
+Sender: "ndesaulniers via sendgmr" 
+        <ndesaulniers@ndesaulniers1.mtv.corp.google.com>
+X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:f693:9fff:fef4:4d25])
+ (user=ndesaulniers job=sendgmr) by 2002:a17:90a:ce0c:: with SMTP id
+ f12mr301315pju.89.1610497969060; Tue, 12 Jan 2021 16:32:49 -0800 (PST)
+Date:   Tue, 12 Jan 2021 16:32:33 -0800
+In-Reply-To: <20210113003235.716547-1-ndesaulniers@google.com>
+Message-Id: <20210113003235.716547-2-ndesaulniers@google.com>
+Mime-Version: 1.0
+References: <20210113003235.716547-1-ndesaulniers@google.com>
+X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
+Subject: [PATCH v4 1/3] Remove $(cc-option,-gdwarf-4) dependency from CONFIG_DEBUG_INFO_DWARF4
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        Nick Clifton <nickc@redhat.com>,
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 2:05 PM Frank Rowand <frowand.list@gmail.com> wrote:
->
-> On 1/12/21 1:41 PM, Rob Herring wrote:
-> > On Tue, Jan 12, 2021 at 1:06 PM Frank Rowand <frowand.list@gmail.com> wrote:
-> >>
-> >> On 1/12/21 8:04 AM, Rob Herring wrote:
-> >>> On Mon, Jan 11, 2021 at 4:06 PM Frank Rowand <frowand.list@gmail.com> wrote:
-> >>>>
-> >>>> On 1/8/21 2:41 AM, Viresh Kumar wrote:
-> >>>>> Now that fdtoverlay is part of the kernel build, start using it to test
-> >>>>> the unitest overlays we have by applying them statically.
-> >>>>>
-> >>>>> The file overlay_base.dtb have symbols of its own and we need to apply
-> >>>>> overlay.dtb to overlay_base.dtb alone first to make it work, which gives
-> >>>>> us intermediate-overlay.dtb file.
-> >>>>>
-> >>>>> The intermediate-overlay.dtb file along with all other overlays is them
-> >>>>> applied to testcases.dtb to generate the master.dtb file.
-> >>>>>
-> >>>>> Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
-> >>>>
-> >>>> NACK to this specific patch, in its current form.
-> >>>>
-> >>>> There are restrictions on applying an overlay at runtime that do not apply
-> >>>> to applying an overlay to an FDT that will be loaded by the kernel during
-> >>>> early boot.  Thus the unittest overlays _must_ be applied using the kernel
-> >>>> overlay loading methods to test the kernel runtime overlay loading feature.
-> >>>
-> >>> This patch doesn't take away from any of that and it completely orthogonal.
-> >>
-> >> Mea culpa.  I took the patch header comment at face value, and read more into
-> >> the header comment than what was written there.  I then skimmed the patch
-> >> instead of actually reading what it was doing.
-> >>
-> >> I incorrectly _assumed_ (bad!) that the intent was to replace applying the
-> >> individual overlay dtb's with the master.dtb.  Reading more closely, I see
-> >> that the assumed final step of actually _using_ master.dtb does not exist.
-> >>
-> >> So, yes, I agree that the patch as written is orthogonal to my concern.
-> >>
-> >> My updated understanding is that this patch is attempting to use the existing
-> >> unittest overlay dts files as source to test fdtoverlay.  And that the resulting
-> >> dtb from fdtoverlay is not intended to be consumed by the kernel unittest.
-> >
-> > The goal is not to test fdtoverlay. dtc unittests do that. The goal is
-> > testing overlays we expect to be able to apply can actually apply and
-> > doing this at build time. That's also the goal for all the 'real'
-> > overlays which get added.
-> >
-> >> I do not agree that this is a good approach to testing fdtoverlay.  The
-> >> unittest overlay dts files are constructed specifically to test various
-> >> parts of the kernel overlay code and dynamic OF code.  Some of the content
-> >> of the overlays is constructed to trigger error conditions in that code,
-> >> and thus will not be able to be processed without error by fdtoverlay.
-> >
-> > Then those should be omitted.
-> >
-> >> Trying to use overlay dts files that are constructed to test runtime kernel
-> >> code as fdtoverlay input data mixes two different test environments and
-> >> objectives.  If fdtoverlay test cases are desired, then fdtoverlay specific
-> >> dts files should be created.
-> >>
-> >>>
-> >>>> I agree that testing fdtoverlay is a good idea.  I have not looked at the
-> >>>> parent project to see how much testing of fdtoverlay occurs there, but I
-> >>>> would prefer that fdtoverlay tests reside in the parent project if practical
-> >>>> and reasonable.  If there is some reason that some fdtoverlay tests are
-> >>>> more practical in the Linux kernel repository then I am open to adding
-> >>>> them to the Linux kernel tree.
-> >>>
-> >>> If you (or more importantly someone else sending us patches) make
-> >>> changes to the overlays, you can test that they apply at build time
-> >>> rather than runtime. I'll take it! So please help on fixing the issue
-> >>> because I want to apply this.
-> >>
-> >> If the tests can be added to the upstream project, I would much prefer
-> >> they reside there.  If there is some reason a certain test is more
-> >> suited to be in the Linux kernel source tree then I also would like
-> >> it to be accepted here.
-> >
-> > Again, this is just about doing sanity checks at build time rather
-> > than *only* rely on runtime.
->
-> I'm fine with adding tests for applying overlays at build time (in
-> other words, tests of fdtoverlay).
+From: Masahiro Yamada <masahiroy@kernel.org>
 
-Again, it's not tests of fdtoverlay. It's a test of the dts files. We
-are testing that an overlay dts can apply to the base dts we claim it
-applies. If the overlay dts has crap then we'll catch it.
+The -gdwarf-4 flag is supported by GCC 4.5+, and also by Clang.
 
-We shouldn't accept overlays that can't apply to a base in the kernel
-tree. That's either because it's broken or because the base doesn't
-exist. With the exception of overlays designed to fail for tests,
-unittest overlays should not be any different.
+You can see it at https://godbolt.org/z/6ed1oW
 
-> But the constraints on applying an overlay at build time are different
-> than the runtime constraints.
+  For gcc 4.5.3 pane,    line 37:    .value 0x4
+  For clang 10.0.1 pane, line 117:   .short 4
 
-Like what specifically? Runtime is more constrained than build time.
-Or at least it should be. It's not really and that's why we have
-limited runtime applied overlay support.
+Given Documentation/process/changes.rst stating GCC 4.9 is the minimal
+version, this cc-option is unneeded.
 
-> The existing unittest overlay dts files are not designed to test applying
-> overlays at build time.  Tests for fdtoverlay should be designed to test
-> that overlays that meet the build time constraints can be applied
-> properly by fdtoverlay, and that overlays that fail to meet those
-> constraints are rejected by fdtoverlay.
->
-> Trying to use the same data (dts) files for tests that have different
-> constraints is likely to make both tests more fragile when a data file
-> is modified for one environment without careful consideration of the
-> other environment.
+Note
+----
 
-We're not changing nor constraining the data files. Just adding
-another sanity test on them.
+CONFIG_DEBUG_INFO_DWARF4 controls the DWARF version only for C files.
 
-Rob
+As you can see in the top Makefile, -gdwarf-4 is only passed to CFLAGS.
+
+  ifdef CONFIG_DEBUG_INFO_DWARF4
+  DEBUG_CFLAGS    += -gdwarf-4
+  endif
+
+This flag is used when compiling *.c files.
+
+On the other hand, the assembler is always given -gdwarf-2.
+
+  KBUILD_AFLAGS   += -Wa,-gdwarf-2
+
+Hence, the debug info that comes from *.S files is always DWARF v2.
+This is simply because GAS supported only -gdwarf-2 for a long time.
+
+Recently, GAS gained the support for --dwarf-[3|4|5] options. [1]
+And, also we have Clang integrated assembler. So, the debug info
+for *.S files might be improved if we want.
+
+In my understanding, the current code is intentional, not a bug.
+
+[1] https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=31bf18645d98b4d3d7357353be840e320649a67d
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ lib/Kconfig.debug | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 78361f0abe3a..dd7d8d35b2a5 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -258,7 +258,6 @@ config DEBUG_INFO_SPLIT
+ 
+ config DEBUG_INFO_DWARF4
+ 	bool "Generate dwarf4 debuginfo"
+-	depends on $(cc-option,-gdwarf-4)
+ 	help
+ 	  Generate dwarf4 debug info. This requires recent versions
+ 	  of gcc and gdb. It makes the debug information larger.
+-- 
+2.30.0.284.gd98b1dd5eaa7-goog
+
