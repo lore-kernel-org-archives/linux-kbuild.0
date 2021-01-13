@@ -2,75 +2,150 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3293C433E9
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEE1C4332D
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:12:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B36CE235F8
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C4AA2242A
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 02:12:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729784AbhANCKc (ORCPT
+        id S1729249AbhAMWCN (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 13 Jan 2021 21:10:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28314 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729250AbhAMWWt (ORCPT
+        Wed, 13 Jan 2021 17:02:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729232AbhAMWAx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jan 2021 17:22:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610576478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=t343ybiazYo2WtvCjU7Ts19VKzTmTogn/vAlmRldwVc=;
-        b=b1uCit51fiwkwjj1n0Fi3Dergl0wrNCeEccEJJNVDf7EPxZjl8gS6K7GC07GNeoVIQrWR8
-        ju50p+BXpHdC+iyunwLCCO8UElUaLxLpVb8HOccF1xP7NK7Bhj11r9ziIPCsz4cA7AVlmd
-        b5njhJGyDeQOAB0pIRHRuLzm+uSPRQA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-CAXIf4SaNXuUxloxnEFeWA-1; Wed, 13 Jan 2021 17:21:16 -0500
-X-MC-Unique: CAXIf4SaNXuUxloxnEFeWA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15D4C801FCC;
-        Wed, 13 Jan 2021 22:21:15 +0000 (UTC)
-Received: from treble (ovpn-120-156.rdu2.redhat.com [10.10.120.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9310D6F969;
-        Wed, 13 Jan 2021 22:21:14 +0000 (UTC)
-Date:   Wed, 13 Jan 2021 16:21:12 -0600
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Toolchain-dependent config options
-Message-ID: <20210113222112.ej4rrd5xw2pwegvw@treble>
+        Wed, 13 Jan 2021 17:00:53 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7FBC061575
+        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2021 14:00:11 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id u19so3608891edx.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2021 14:00:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mT4FJ5faHT6kx4m/+VpI3KjNLQvDBDZDe9LTS609qwU=;
+        b=uT51003CLT7E627tBqLkwWrU1PVJGq2/ZMQqORYgP/O2pHjSbQU/+++0TXmm4i8is6
+         OARUSIgqWunXkWiEvn7QA6CKb35uF8Ku1QQbQxnLocI54fY87d1EbdIGaxJQgPGPPNpG
+         sKynEK0BQxUKiAsyo3I9mUReOW0Yrn9p14437+A6dsPP1Ah98uXS0jQMFvcovol60ZyS
+         mpErIteohbvU2Vbc+tBEoTDcHUGjD8plBHS/VvZ8bC2qUmYs/Fh4YqJFb8PwkbC7S/Rl
+         h50qDhicSqelFiRP/M/ZqC6YzDMO9fwpdFAwGPpyDIkmBqB7cEsEmSgmsxP3cOFv8Hau
+         BwqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mT4FJ5faHT6kx4m/+VpI3KjNLQvDBDZDe9LTS609qwU=;
+        b=rRNK+SOFcHTI0o9Q3ALBIfmobDWeyZqYFXkubMIIHWdaUj+DqkuABNq2oOx6oHg169
+         Egk/hp7/lxGlrRRaw4GLxQ9zqFp9G/pRtTu3c6yDPD4XIfp9BVQGr8AA4GE2/D52w3C8
+         AYshI1f2TdFTsgeXxpXSSOsLC/d/NG9Hxk/wcJmR3BIYZ9HM7Wyi9wr++YTpd08as7KE
+         ZJdjQke0K9hiBCwpkjQIRA8JzIzrYZAl+mgmto4JjlLWsG3Jrsyv0qxNNiZBJ5HRvfbI
+         c8Hk47NgNrsXtwxTZ73bcTkme4Vkw3rvtTst6mZPvTG+VUSS9IDv+3hZyA7/UPci+zig
+         aZOA==
+X-Gm-Message-State: AOAM532YgJA5aYL8lyVUNlDllKwLd2sGVhW6nfHiVYF2MhBNY9JTiQaE
+        Thi2RZjQoyVJCcfCvbVPJdxtqnx0Qon79Gq2NFdY
+X-Google-Smtp-Source: ABdhPJyE5JEDE4oM6JhTLtfMhJ6qJ3TrnMrYS6u1lrad/w+TvlD7eZ8Y1v59rsqWDpKMCpdfypcrgKeOBUbXOvRRpc4=
+X-Received: by 2002:a05:6402:513:: with SMTP id m19mr3469396edv.244.1610575209296;
+ Wed, 13 Jan 2021 14:00:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20210112053113.4180271-1-morbo@google.com> <20210113061958.886723-1-morbo@google.com>
+ <20210113205547.GA21653@Ryzen-9-3900X.localdomain>
+In-Reply-To: <20210113205547.GA21653@Ryzen-9-3900X.localdomain>
+From:   Bill Wendling <morbo@google.com>
+Date:   Wed, 13 Jan 2021 13:59:57 -0800
+Message-ID: <CAGG=3QVK9KvxDi7b51Fyh=NLKVQka8ZxJeWzchaiDM=78_X3Tw@mail.gmail.com>
+Subject: Re: [PATCH v4] pgo: add clang's Profile Guided Optimization infrastructure
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
+On Wed, Jan 13, 2021 at 12:55 PM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
+>
+> Hi Bill,
+>
+> On Tue, Jan 12, 2021 at 10:19:58PM -0800, Bill Wendling wrote:
+> > From: Sami Tolvanen <samitolvanen@google.com>
+> >
+> > Enable the use of clang's Profile-Guided Optimization[1]. To generate a
+> > profile, the kernel is instrumented with PGO counters, a representative
+> > workload is run, and the raw profile data is collected from
+> > /sys/kernel/debug/pgo/profraw.
+> >
+> > The raw profile data must be processed by clang's "llvm-profdata" tool
+> > before it can be used during recompilation:
+> >
+> >   $ cp /sys/kernel/debug/pgo/profraw vmlinux.profraw
+> >   $ llvm-profdata merge --output=vmlinux.profdata vmlinux.profraw
+> >
+> > Multiple raw profiles may be merged during this step.
+> >
+> > The data can now be used by the compiler:
+> >
+> >   $ make LLVM=1 KCFLAGS=-fprofile-use=vmlinux.profdata ...
+> >
+> > This initial submission is restricted to x86, as that's the platform we
+> > know works. This restriction can be lifted once other platforms have
+> > been verified to work with PGO.
+> >
+> > Note that this method of profiling the kernel is clang-native, unlike
+> > the clang support in kernel/gcov.
+> >
+> > [1] https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization
+> >
+> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> > Co-developed-by: Bill Wendling <morbo@google.com>
+> > Signed-off-by: Bill Wendling <morbo@google.com>
+> > Change-Id: Ic78e69c682286d3a44c4549a0138578c98138b77
+>
+> Small nit: This should be removed.
+>
+Grrr....The git hook keeps adding it in there. :-(
 
-If I copy a config with CONFIG_GCC_PLUGINS to another system which
-doesn't have the gcc-plugin-devel package, it gets silently disabled by
-"make olddefconfig".
+> I applied this patch on top of v5.11-rc3, built it with LLVM 12
+> (f1d5cbbdee5526bc86eac0a5652b115d9bc158e5 + D94470) with Microsoft's
+> WSL 5.4 config [1] + CONFIG_PGO_CLANG=y, and ran it on WSL2.
+>
+> $ zgrep PGO /proc/config.gz
+> # Profile Guided Optimization (PGO) (EXPERIMENTAL)
+> CONFIG_ARCH_SUPPORTS_PGO_CLANG=y
+> CONFIG_PGO_CLANG=y
+> # end of Profile Guided Optimization (PGO) (EXPERIMENTAL)
+>
+> However, I see an issue with actually using the data:
+>
+> $ sudo -s
+> # mount -t debugfs none /sys/kernel/debug
+> # cp -a /sys/kernel/debug/pgo/profraw vmlinux.profraw
+> # chown nathan:nathan vmlinux.profraw
+> # exit
+> $ tc-build/build/llvm/stage1/bin/llvm-profdata merge --output=vmlinux.profdata vmlinux.profraw
+> warning: vmlinux.profraw: Invalid instrumentation profile data (bad magic)
+> error: No profiles could be merged.
+>
+> Am I holding it wrong? :) Note, this is virtualized, I do not have any
+> "real" x86 hardware that I can afford to test on right now.
+>
+> [1]: https://github.com/microsoft/WSL2-Linux-Kernel/raw/linux-msft-wsl-5.4.y/Microsoft/config-wsl
+>
+Could you send me the vmlinux.profraw file? (Don't CC this list.)
 
-I've seen multiple cases lately where this is causing confusion.  I
-suspect the problem is getting worse with recent added support for a
-variety of toolchains and toolchain-dependent features.
-
-Would it be possible to have an error (or at least a warning) in this
-case?
-
-For example, a "depends-error" which triggers an error if its failure
-would disable a feature?
-
--- 
-Josh
-
+-bw
