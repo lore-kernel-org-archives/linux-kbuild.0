@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 697F6C433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 04:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166ADC433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 04:26:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17002238E2
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 04:18:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8071238E9
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jan 2021 04:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726612AbhANESg (ORCPT
+        id S1725890AbhANE0L (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 13 Jan 2021 23:18:36 -0500
-Received: from conuserg-09.nifty.com ([210.131.2.76]:47393 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726677AbhANESg (ORCPT
+        Wed, 13 Jan 2021 23:26:11 -0500
+Received: from conuserg-12.nifty.com ([210.131.2.79]:22603 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725875AbhANE0L (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Jan 2021 23:18:36 -0500
+        Wed, 13 Jan 2021 23:26:11 -0500
 Received: from grover.flets-west.jp (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 10E4GUgk019534;
-        Thu, 14 Jan 2021 13:16:30 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 10E4GUgk019534
+        by conuserg-12.nifty.com with ESMTP id 10E4OL30001381;
+        Thu, 14 Jan 2021 13:24:21 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 10E4OL30001381
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1610597791;
-        bh=vXt3fQKlnIzjAfWl8omKqKrQwNJT0bJYQbc0iaRJj6U=;
+        s=dec2015msa; t=1610598262;
+        bh=m8zZwtFAg5WmGHXtJHmazUEIpyhdCe3SE8+pATwVEHw=;
         h=From:To:Cc:Subject:Date:From;
-        b=WTePnO4W1EbPsEkaEecXJGq+I2pm7sSccAQUUjslnDHbwv3WOLjWMJCIlmT3IbK69
-         gS/tRiNZUK7R28gKdsT0Wn0R5W5Smkc/ZXzYeBLTOyS1EU9LJMwdlSWoFiBrqYwORz
-         IE2e2reipll6RNIcRY6dRfLiPY6uXF1b/Q+K0DKCSlCYRX7c2N93/Qwct7R9HS7oOB
-         VACZ83xntMTpyf6lZ55EqnlNYTvSyGXDc9D1O1AtrjBGqeY0AaGNX3SyHBgRPQVkc6
-         +TFCrNJNwH38YZ05f+lpF8MFXXOo0tyVxtMPQMTpSpsPwODcpD1tm7CFwR/0IfzUIb
-         Yru4FSNQdx0fw==
+        b=1+bYoysUSyNctxCZLx3RT5pHwuYAxEVnTwdeQuKU5niC3ju+2QnX2vr/rbHh1cLsX
+         0x9VVUOtg60m8PFkdrMZsj1UlE6dr7vj8Mqb7dpwTPTev/vt7gWFe5ABksJ8G+/cNv
+         Sgc04pMwE2TFXqAsUTXZTqh6eqYBA2uZ/lPGe94SKAophNc5f2IxbODrOWXCDPTw9+
+         YPDVqktCsU/3Z+4N0VTd7222PI6PyzcT9P6DV2/sySoz3y9d34D2I26FuTXB6XTG5o
+         bTajTvGb+9AErfCxp4yAcNIsN7i+0fQL34SzgiFzH0sFx4/B8DAyKOWZNWt8LKULC1
+         b4Vk/2brnibbQ==
 X-Nifty-SrcIP: [126.26.94.251]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     Paul Gortmaker <paul.gortmaker@windriver.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Will Deacon <will@kernel.org>,
         clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
-Subject: [PATCH] kbuild: check the minimum compiler version in Kconfig
-Date:   Thu, 14 Jan 2021 13:16:23 +0900
-Message-Id: <20210114041623.226419-1-masahiroy@kernel.org>
+Subject: [PATCH v2] kbuild: check the minimum compiler version in Kconfig
+Date:   Thu, 14 Jan 2021 13:24:19 +0900
+Message-Id: <20210114042420.229524-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -119,6 +119,9 @@ Reported-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
+
+Changes in v2:
+  - fix the function name
 
  include/linux/compiler-clang.h | 10 -----
  init/Kconfig                   |  9 +++--
@@ -207,7 +210,7 @@ index a5fe72c504ff..cdc8726d2904 100644
  
 diff --git a/scripts/cc-version.sh b/scripts/cc-version.sh
 new file mode 100755
-index 000000000000..32df0e2940f5
+index 000000000000..9c17c1de401c
 --- /dev/null
 +++ b/scripts/cc-version.sh
 @@ -0,0 +1,69 @@
@@ -251,7 +254,7 @@ index 000000000000..32df0e2940f5
 +
 +# $@ instead of $1 because multiple words might be given e.g. CC="ccache gcc"
 +orig_args="$@"
-+set -- $(run_preprocessor "$@")
++set -- $(get_compiler_info "$@")
 +
 +name=$1
 +version=$2.$3.$4
