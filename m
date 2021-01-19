@@ -8,58 +8,58 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA9DC10F07
-	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jan 2021 18:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B54C10F26
+	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jan 2021 18:27:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32FB423340
-	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jan 2021 18:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88D9122E01
+	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jan 2021 18:27:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731449AbhASQ24 (ORCPT
+        id S1730714AbhASQdE (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 19 Jan 2021 11:28:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50082 "EHLO
+        Tue, 19 Jan 2021 11:33:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731236AbhASQ2t (ORCPT
+        with ESMTP id S1730577AbhASQc6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Jan 2021 11:28:49 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A95C061574;
-        Tue, 19 Jan 2021 08:28:08 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id 143so22335379qke.10;
-        Tue, 19 Jan 2021 08:28:08 -0800 (PST)
+        Tue, 19 Jan 2021 11:32:58 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD723C061573;
+        Tue, 19 Jan 2021 08:32:16 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id l7so9409145qvt.4;
+        Tue, 19 Jan 2021 08:32:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EW8XrT7JtMKJbnFCv1YRnev1AQPs+Hl+bUMfJys3xoQ=;
-        b=UZCzTkkjsjT1pA7Mv+p6MiXPbtyHr40esKXDMjjQ1R6ykbEp/T3m//LtX1e11hiyT6
-         +Lve7769zBfr7HumVckVtxLJiuAIgdw5ITIRFkPxNFC9YiQuC7gEY7KSmurB02FgyEJj
-         m6QcY9ssG+XskJvwK3j4fTrV5MzZp1FjQjowKY4aD/hIHja9QRuRLXZ+r/noRpGEcVLz
-         c3wVXt/nyqqtAvNgbOeUGGHHWOgs5gAv7FZcxj08QPwAq8pHRb+iG7ENhrqF+rA6Pc6o
-         r9O/wpbg+Cft0VBECoeh105uhM/PUNVW/Oik6EqlvTSeIh5IPzdTzh7/56X9GuDFlbL+
-         pOqw==
+        bh=Vb/8GQGBmEYoUwaU56KAkeG9p8iEq0+1rXD7yKBnb2s=;
+        b=K3PYestxgUUx2GT5/UjCWcenRn769y7JlN1u9Q6kQ6RWWpu+L2+KaNuKii5kpw1Rv9
+         qh/lrNjgYsiOrtP6kOt08qs3oj1BjbaMC/6zsa4iZCYqBfn4AjlSjQ5QnLnUfLnjImAX
+         VRKMvV9srYPGlrsysdyr92m6TGUxcHhjehyqwVrKFZ7DUpaGb4Dz2kZInJo73dC2Mesc
+         x4INrIOjPPMe77GCO8KME/KQ9USwor8Qy2hI6AOA131AZle2WUtOBKRu2aLVdFkpTVRB
+         cNnTcJC5d9ujEpzfbs1S4GS4GDgUqwcL0itaQZ3T7Sc1nbZmP5tZZLi2X524nH70iaP5
+         /J8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EW8XrT7JtMKJbnFCv1YRnev1AQPs+Hl+bUMfJys3xoQ=;
-        b=tCXlSEjsS/mrqC//6501M/AUyk9g+Bp68uw45GfP0bVhaT+DdNEUR1+QHM4lzfseLq
-         IVKD8ydPnVHCJzcPzJugqIYMJeCQTv3yWF5grtqWndcOPbZ+a5v0SluekMiH9cprsceP
-         zrVfaLYRAS2xkkB1im7PzxK8qBi04xdWzYeRQaOMWB7oSwcLG64q4jgeMhigwIYVBUFs
-         75V8Z7M3wb+YQ7MVXDyK3gmxNUCZKRYHA2acV1Ex/V9KIcZDzL1qYgDgohIKSssNxEYW
-         rxKpVOyhCWcl40/skxHr7ASNTHk8g0UuFOBnkIUykuQlQ+ZINDQk/mOnck8/jwyraFTQ
-         t56Q==
-X-Gm-Message-State: AOAM530CfphrUvNvFuhJpHVQlxIpYJr4TrSnzh7abaRlsYK217iCzm21
-        bojEpBc4YIn3KQnr6m4wDYTQGX1EVgiu8g==
-X-Google-Smtp-Source: ABdhPJwcSyDBih4gpQEkhh/F2mbFuhXuR6MVs6vP7KIB9FyQJu87Y7m77b5D8nvOMcmB25S98gj3Dg==
-X-Received: by 2002:a37:ad0d:: with SMTP id f13mr5119460qkm.355.1611073686981;
-        Tue, 19 Jan 2021 08:28:06 -0800 (PST)
+        bh=Vb/8GQGBmEYoUwaU56KAkeG9p8iEq0+1rXD7yKBnb2s=;
+        b=kyWa0/u+evNev952gwp/7IIiZDUZFu3shRrz0TmWOkW4SG/0xoOKva3Q3gp3VasDey
+         Nd5FWXjU6c/Ta58/b9LNlixrz/SvGXwac6UmqTHx2LpigJ0HX0c8fvegLEru/H5r+U+Q
+         mPNEI6VEaU2wJFWMhbEM2S0ev1Sllp20YMq0G8aVEHQOrimAijfNp+oBFN9PAUoshkyB
+         +P08mJlo0tPVR+5x+vmWR5Bfo2E0KXD5O69OpWoK4tz36ttNmv/aHp3pRZtZ6rZGv77L
+         PfaLohXgZGP4Sx89xAtrLF1sE6raea3+Et1PRO4Wchn72E5lLZrfRJ3B3wUueTH04nbu
+         guhQ==
+X-Gm-Message-State: AOAM5323i7MTZit5wycnGvlbIXnxxJBXUktC6GSbkC3qRgI5CXzxxBfd
+        mez+sxDqdOCnWez2IPE6pok=
+X-Google-Smtp-Source: ABdhPJz5+Z1Xj8CWizd+LgcyV8YJjUu9uFL9VQfuVC1s9YFZX3S8mqDHfEbize32hrronSvFMwzl/A==
+X-Received: by 2002:a05:6214:1764:: with SMTP id et4mr5346092qvb.2.1611073936197;
+        Tue, 19 Jan 2021 08:32:16 -0800 (PST)
 Received: from [192.168.1.49] (c-67-187-90-124.hsd1.tn.comcast.net. [67.187.90.124])
-        by smtp.gmail.com with ESMTPSA id x25sm12963742qkx.88.2021.01.19.08.28.06
+        by smtp.gmail.com with ESMTPSA id v145sm13643072qka.27.2021.01.19.08.32.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Jan 2021 08:28:06 -0800 (PST)
-Subject: Re: [PATCH V2 2/2] scripts: dtc: Build fdtoverlay and fdtdump tools
+        Tue, 19 Jan 2021 08:32:15 -0800 (PST)
+Subject: Re: [PATCH V4 1/3] scripts: dtc: Add fdtoverlay.c to DTC_SOURCE
 To:     Viresh Kumar <viresh.kumar@linaro.org>,
         Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
         Rob Herring <robh+dt@kernel.org>
@@ -67,16 +67,16 @@ Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kbuild@vger.kernel.org,
         Vincent Guittot <vincent.guittot@linaro.org>,
         Bill Mills <bill.mills@linaro.org>, anmar.oueja@linaro.org,
-        Frank Rowand <frowand.list@gmail.com>
-References: <be5cb12a68d9ac2c35ad9dd50d6b168f7cad6837.1609996381.git.viresh.kumar@linaro.org>
- <d6e4edd213433d24a2a5c7e6a816bc40b0ada32d.1609996381.git.viresh.kumar@linaro.org>
+        Masahiro Yamada <masahiroy@kernel.org>
+References: <cover.1610431620.git.viresh.kumar@linaro.org>
+ <a1587678b2d5e23c4a3e6248825e285a403f3ad1.1610431620.git.viresh.kumar@linaro.org>
 From:   Frank Rowand <frowand.list@gmail.com>
-Message-ID: <8e6395db-6ae4-f231-22fb-910eb2208477@gmail.com>
-Date:   Tue, 19 Jan 2021 10:28:05 -0600
+Message-ID: <93a19789-b060-ea93-f6d5-e52633b854ac@gmail.com>
+Date:   Tue, 19 Jan 2021 10:32:14 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <d6e4edd213433d24a2a5c7e6a816bc40b0ada32d.1609996381.git.viresh.kumar@linaro.org>
+In-Reply-To: <a1587678b2d5e23c4a3e6248825e285a403f3ad1.1610431620.git.viresh.kumar@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,54 +84,38 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 1/6/21 11:15 PM, Viresh Kumar wrote:
+On 1/12/21 2:29 AM, Viresh Kumar wrote:
 > We will start building overlays for platforms soon in the kernel and
-> would need these tools going forward. Lets start building them.
+> would need fdtoverlay tool going forward. Lets start fetching it.
 > 
 > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
 > ---
->  scripts/dtc/Makefile | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>  scripts/dtc/update-dtc-source.sh | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/scripts/dtc/Makefile b/scripts/dtc/Makefile
-> index 4852bf44e913..c607980a5c17 100644
-> --- a/scripts/dtc/Makefile
-> +++ b/scripts/dtc/Makefile
-> @@ -1,12 +1,18 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # scripts/dtc makefile
+> diff --git a/scripts/dtc/update-dtc-source.sh b/scripts/dtc/update-dtc-source.sh
+> index bc704e2a6a4a..f1c802011e1e 100755
+> --- a/scripts/dtc/update-dtc-source.sh
+> +++ b/scripts/dtc/update-dtc-source.sh
+> @@ -31,9 +31,9 @@ set -ev
+>  DTC_UPSTREAM_PATH=`pwd`/../dtc
+>  DTC_LINUX_PATH=`pwd`/scripts/dtc
 >  
-> -hostprogs-always-$(CONFIG_DTC)		+= dtc
-> +hostprogs-always-$(CONFIG_DTC)		+= dtc fdtdump fdtoverlay
->  hostprogs-always-$(CHECK_DT_BINDING)	+= dtc
->  
->  dtc-objs	:= dtc.o flattree.o fstree.o data.o livetree.o treesource.o \
->  		   srcpos.o checks.o util.o
->  dtc-objs	+= dtc-lexer.lex.o dtc-parser.tab.o
-> +fdtdump-objs	:= fdtdump.o util.o
-> +
-
-# The upstream project builds libfdt as a separate library.  We are choosing to
-# instead directly link the libfdt object files into fdtoverly
-
-> +libfdt_dir	= libfdt
-> +libfdt-objs	:= fdt.o fdt_ro.o fdt_wip.o fdt_sw.o fdt_rw.o fdt_strerror.o fdt_empty_tree.o fdt_addresses.o fdt_overlay.o
-> +libfdt		= $(addprefix $(libfdt_dir)/,$(libfdt-objs))
-> +fdtoverlay-objs	:= $(libfdt) fdtoverlay.o util.o
->  
->  # Source files need to get at the userspace version of libfdt_env.h to compile
->  HOST_EXTRACFLAGS += -I $(srctree)/$(src)/libfdt
+> -DTC_SOURCE="checks.c data.c dtc.c dtc.h flattree.c fstree.c livetree.c srcpos.c \
+> -		srcpos.h treesource.c util.c util.h version_gen.h yamltree.c \
+> -		dtc-lexer.l dtc-parser.y"
+> +DTC_SOURCE="checks.c data.c dtc.c dtc.h fdtoverlay.c flattree.c fstree.c \
+> +		livetree.c srcpos.c srcpos.h treesource.c util.c \
+> +		util.h version_gen.h yamltree.c dtc-lexer.l dtc-parser.y"
+>  LIBFDT_SOURCE="fdt.c fdt.h fdt_addresses.c fdt_empty_tree.c \
+>  		fdt_overlay.c fdt_ro.c fdt_rw.c fdt_strerror.c fdt_sw.c \
+>  		fdt_wip.c libfdt.h libfdt_env.h libfdt_internal.h"
 > 
 
-In general, I am a proponent of using shared libraries (which the upstream project
-builds by default) because if a security bug in the library is fixed, it is fixed
-for all users of the library.
+I made this comment in the v2 email thread.  Copying it here since v4 is
+the current version of the patch series.
 
-In this specific case, I actually prefer the implementation that the patch provides
-(directly linking the library object files into fdtoverlay, which uses the library)
-because it is the only user of the library _and_ fdtoverlay will not inadvertently
-use the system wide libfdt if it happens to be installed (as it is on my system).
-
-Any thoughts on this Rob?
+DTC_SOURCE is for the dtc program.  Please add a FDTOVERLAY_SOURCE and
+related use for the fdtoverlay program.
 
 -Frank
