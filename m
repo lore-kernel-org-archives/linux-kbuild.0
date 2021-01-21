@@ -2,68 +2,58 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD67C433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 16:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C51C433DB
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 17:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A441206D8
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 16:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8EC42054F
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 17:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387844AbhAUQ04 (ORCPT
+        id S1731791AbhAUR2e (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 21 Jan 2021 11:26:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49814 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387852AbhAUQ0p (ORCPT
+        Thu, 21 Jan 2021 12:28:34 -0500
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:37704 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388426AbhAUR2I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jan 2021 11:26:45 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0CEBC06174A;
-        Thu, 21 Jan 2021 08:26:02 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id q129so5177645iod.0;
-        Thu, 21 Jan 2021 08:26:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aaKhKct3ImPnrveXxBya8SOIzEUzRg0gfWNOxlVt5NM=;
-        b=PwgJ1uAXRIIQ4yGRndNE5e3r+59O+ZUAlqEtwbWWLr80GCiWjnnsQYYbh7JeBiy6AT
-         IGUybexdKWddsOFXzcARoiqUjWeMes4vyQmXMmHi+a+AtIi30PGLuDD63XoPX+sSMuPH
-         HQG/iXtB8q1esk1tu1qjmFHFSZUbW0YIswwKyvtuG8TOMUfuJmVu82bFgzcYDVHZkdt7
-         f4oqEigfe08Y5Rn8yNndSeAfHvTS1NZkSVi3id0wjRc78FNy721GJyF+5N3ZVG5x6iTv
-         WnW+OSaU3dzGCon4huh4SqxokcDA0CH6OiZHr19NWpNr2fQLYxjtNQG7NKMoc9LmIFpw
-         HIgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aaKhKct3ImPnrveXxBya8SOIzEUzRg0gfWNOxlVt5NM=;
-        b=sXeVD22a30bXvIhSG66P3rcau6URlISZD3eZjchow4UQAnCTtTqlslU8vyiofCS3iK
-         s2E02iFNKzT64VZVxTZ+PCToP+NYA19hUqSnet0PVrqzWr0ORF23xfJc1xwB/CIgqXWl
-         Cgwx6vWFHdznvVogkShhGqkJxvyMBgKFnYPPvnVCCWdX+eeY+K6M9mjoUS1apVsXZs8n
-         mNsgOr9hQYugp+eLMUA+SbCvHvE+sliGmGQoVT58vjfQo2ny4j2kfP3jTUYo9hE3VT6h
-         uOj8AuuElTY81TnubDxyuWwWw/Go6Buf3yD20BTvmmfOc5unGZIULMhPUQrDklPiDuVc
-         bdQg==
-X-Gm-Message-State: AOAM532Bjj7YboHQQvbjBgwMPZp9qsBbK3wg9WW+KdB31rlnYwlSxgQw
-        RPFhPW9rqvw8iRjs0n6M5npBYxSMLodrnT3kQOc=
-X-Google-Smtp-Source: ABdhPJwzEKcRBy1sUJPZf40mDTB/CaBGVVSaAJuPdl+lRXEIaTluerNXxkybsCn1h3mZ87VAsjlq/gpAX87NtAAAANU=
-X-Received: by 2002:a92:cd8c:: with SMTP id r12mr417902ilb.221.1611246362296;
- Thu, 21 Jan 2021 08:26:02 -0800 (PST)
+        Thu, 21 Jan 2021 12:28:08 -0500
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id 10LHQtq4012691;
+        Fri, 22 Jan 2021 02:26:56 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 10LHQtq4012691
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1611250016;
+        bh=o/g6QDTxEay9heg2+A4lesF7Relum8HJDPSF7wKHZiU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Cof4QTbiXebSo/fE21iLkmLX6HTlc5q5IJ+nKF9JYRb9mkX5YgMYYpDlXsArXzBeU
+         Z/RUhZy33qeb4DqX352cFfmNCmSpOyQvzLlZIynkCPLArcGvHDI8SuJSlKUiGFtXLG
+         wV+o6SBHutlGMgpVx1qQVwIENxCwB8pylPoZ8oo/QAiLhL4rrKf/TGuQhJALkE0zh+
+         AWQXEdyG/BKL98+0+52FMTIeKdEo5w1cIt/Y6BXemhpOyNoK6PXzzvrgUv/CO5xQcY
+         yOi7QM1qTmt5goukbvelfboUP0RkgqR2B+70bV91Ulx82y8g03HmbwcY4zcv+rK95o
+         HRZTIMyHiVS6A==
+X-Nifty-SrcIP: [209.85.167.45]
+Received: by mail-lf1-f45.google.com with SMTP id q8so3597289lfm.10;
+        Thu, 21 Jan 2021 09:26:56 -0800 (PST)
+X-Gm-Message-State: AOAM5313de695GlJ83J+5enXLh33/qxXW159MQ8H5BmbVRtCf1iz4tXg
+        nU6h0Hv/X9FjOHlXggJGRMeSyU9ICWnUiznP2oo=
+X-Google-Smtp-Source: ABdhPJyXMM+E1YlvQyKE1IftMIlUjbhsTwQEOU8dmg8SCdVLqTlOChmpB/jWu0f/YShwXX6g7k5JQ7dYunCzmmo5M90=
+X-Received: by 2002:a19:5e5b:: with SMTP id z27mr111567lfi.143.1611250014405;
+ Thu, 21 Jan 2021 09:26:54 -0800 (PST)
 MIME-Version: 1.0
 References: <20210121160115.4676-1-lukas.bulwahn@gmail.com> <20210121161640.GA1101379@ubuntu-m3-large-x86>
 In-Reply-To: <20210121161640.GA1101379@ubuntu-m3-large-x86>
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Date:   Thu, 21 Jan 2021 17:25:51 +0100
-Message-ID: <CAKXUXMyrE6OPmn8ETKqRJ9DOaeRO_n3=uUP3vhjAnqmUGmqdYA@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 22 Jan 2021 02:26:16 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQGR=f6G_QXSgjLCKukELHyT9fg3O3c_UC=PR5Oqv4XDA@mail.gmail.com>
+Message-ID: <CAK7LNAQGR=f6G_QXSgjLCKukELHyT9fg3O3c_UC=PR5Oqv4XDA@mail.gmail.com>
 Subject: Re: [PATCH] MAINTAINERS: adjust to clang-version.sh removal
 To:     Nathan Chancellor <natechancellor@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
+Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
@@ -77,7 +67,7 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jan 21, 2021 at 5:16 PM Nathan Chancellor
+On Fri, Jan 22, 2021 at 1:16 AM Nathan Chancellor
 <natechancellor@gmail.com> wrote:
 >
 > On Thu, Jan 21, 2021 at 05:01:15PM +0100, Lukas Bulwahn wrote:
@@ -109,18 +99,66 @@ On Thu, Jan 21, 2021 at 5:16 PM Nathan Chancellor
 > and pick up the second one I sent, which allows us to deal with this:
 >
 > https://lore.kernel.org/lkml/20210114171629.592007-1-natechancellor@gmail.com/
->
+
+
+I agree.
+
+
 > I am not sure it is right for us to maintain cc-version.sh but I am open
 > to it if Masahiro agrees.
+
+I am not sure either.
+
+
+The part in cc-version.sh maintained by Clang folks
+will be this single line:
+
+clang_min_version=10.0.1
+
+
+You can add cc-version.sh to the coverage if you want.
+
+Or, the following line in MAINTAINERS might be
+enough to catch the clang version change.
+
+
+K:      \b(?i:clang|llvm)\b
+
+
+
+I will leave up to you guys.
+
+
+
 >
+> >  MAINTAINERS | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index e5d7cf38ec82..aafbea806a82 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -4355,8 +4355,8 @@ B:      https://github.com/ClangBuiltLinux/linux/issues
+> >  C:   irc://chat.freenode.net/clangbuiltlinux
+> >  F:   Documentation/kbuild/llvm.rst
+> >  F:   include/linux/compiler-clang.h
+> > +F:   scripts/cc-version.sh
+> >  F:   scripts/clang-tools/
+> > -F:   scripts/clang-version.sh
+> >  F:   scripts/lld-version.sh
+> >  K:   \b(?i:clang|llvm)\b
+> >
+> > --
+> > 2.17.1
+> >
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20210121161640.GA1101379%40ubuntu-m3-large-x86.
 
-Okay, I did not see in linux-next that both changes are coming into
-linux-next through to different trees.
 
-Nathan, I guess if you send a follow-up patch to Andrew that is the
-best way to handle it, or we wait until both trees land in mainline,
-and then just provide a quick fix like this afterwards.
 
-So, Masahiro-san, no need to pick this patch here.
-
-Lukas
+-- 
+Best Regards
+Masahiro Yamada
