@@ -4,111 +4,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AD0C433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 04:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D628C433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 04:34:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 830E9238E5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 04:17:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4CB6238E2
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 04:34:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbhAUERI (ORCPT
+        id S1727085AbhAUEd6 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 20 Jan 2021 23:17:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32924 "EHLO
+        Wed, 20 Jan 2021 23:33:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728016AbhAUEPB (ORCPT
+        with ESMTP id S1729154AbhAUENn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 20 Jan 2021 23:15:01 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5737DC0613C1
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jan 2021 20:14:21 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id c132so552068pga.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jan 2021 20:14:21 -0800 (PST)
+        Wed, 20 Jan 2021 23:13:43 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A715C0613D6
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jan 2021 20:13:03 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id w18so728508pfu.9
+        for <linux-kbuild@vger.kernel.org>; Wed, 20 Jan 2021 20:13:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=/js51H5j8YEkJ1QAw4QUNhESpoDZcZaipkmvSBF3vJ8=;
-        b=jnfP/qhXcbEDwzaMplikgATYtZSVhAMgAERfcc+QbcAAHWoiuPaZZwIqTw1GHNSwJi
-         YE0BkUGg1NnruNPc23VaSZUq+d/l8ymq1LaCCQXBB4sWgDsEDyofNnfAF1U1BnwhaTli
-         tBfRJ9+7mlOtv13cI/s8LErc9jEEjAcboQahMLpCqx4dx+a6aDQ3fMtLXAQN2vNewO/5
-         u4y/QM44MVVb9D3Lc47AZCvQgp4gjs9P1zuyqu9y46fQuAnChNnhDf0NmbCTjZ1fyoI/
-         IepsQI4PhkGUBdEEa+XsTWjy6p/ZdaJlXncJ4KstLhL4cZ8k3Oi/EGe9KSR6JE2jjjWD
-         9S+Q==
+        bh=yc5sQoByld/hyuMTGXnutyShMdqAx6iOCrjbfzusVe8=;
+        b=OkllhuEWFCX1TeteF/cwCQCaB8qVbP3JtdM3NiPeIa67Snmy5RTlWnTmY1aQ6FnQOS
+         U1whlfJjuzCbGmQVFEEncQEDCfi+QFZaT3vo6jfp3AYGoor+tfaDAnNUxHcRg7JbZMiR
+         1Qb7LU/B+/WXxYqU95NkV8n4vMDX1FQ3SCzQL5u4nuZWheHDJrPcgXJdvGjYpTK8k+3E
+         cf6CnQGh72zO2SQfuJQgVHD1gttD8bg9vjX3cGXOgKHIwqn98UJn5X+u3hIw/TBfv9pt
+         p+ZEzJFb9LRlL851AqLoDp6Y8CcPNSMYXP20M16aPaz0mCl4nVqh/7tEst8l4z+V9Nxi
+         XdGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/js51H5j8YEkJ1QAw4QUNhESpoDZcZaipkmvSBF3vJ8=;
-        b=dDxajxxXQPOeyeQS+Fg89V7wlarQmR3+9C6z/u9w30aLtG/j2FjFF+AkczBlMJyGT+
-         1wOx9GKF8ifnac+b7tNLYtNVbl266uRT8qndjAklFY06GMXVoJp0UijM46bHqkklYS+M
-         tZX0Bgupah+1W3uuO2/FNxm79wQ2GhYjB7i6DENNV72fL10+SedxuCpV6u5ucnGidxyv
-         OEr/F7VyS5AQncHV6RIc1D3q/LHbOIdXPfDiKMK67n8fyWb1HnMKUNuLnFTjYhqoxLHh
-         cwhiAZVDQ33oZE05mRsg1ZAnhpjEMNQnyKU/Wh8BO7zmET7jO0rzZNgGkiUanDn83yvD
-         AJQw==
-X-Gm-Message-State: AOAM5304LRsbKi4tr+fhuS0zrzgzeRwolYKf0WvAfHrRU70nX3hK2gNJ
-        s/nJpTaEJJHnw7ZJIMQZgN/n9w==
-X-Google-Smtp-Source: ABdhPJyNfu1oKhNTMhCWniKsJbvK5Z/+fGSCjJ0F7YGqkrUuyMSmojyCynTGUOGPqX23gVBM6LLiaQ==
-X-Received: by 2002:a63:c54c:: with SMTP id g12mr12427133pgd.449.1611202460901;
-        Wed, 20 Jan 2021 20:14:20 -0800 (PST)
+        bh=yc5sQoByld/hyuMTGXnutyShMdqAx6iOCrjbfzusVe8=;
+        b=WzTjLVTSfTO6iDN4Tjgxie0vzjN+FD5dYT2asqh3jJBKUsv9OxghVReOejLGbtIP81
+         0N2PV5N7uwQg8aQv0mpP+SOmJQE/7OpEEYUh8sStEAcgC3fbtH6p5VSS/kpu1uEQmnmv
+         E+z+jkZHZW5I8AdN/nEOd7k376NJ5PL+KnACkeOY4ctdN0IcaPxGNdde0MbvcNjmfdD/
+         u5Ye6lh2b8T2nUsHBgvDiFTkyMSI9sYuz5Ro+A1XonmbXf26oRIAfdzKMNNUmfM+dsQ6
+         NkK8+V3Z1NNIOBtQ7EJ6Z2zIbyFXosYcSvWfrscE5S0artfBXY0Czy4mbsXmP2d3/l9m
+         TN7Q==
+X-Gm-Message-State: AOAM533sjamHmIHWCDN+nkIUzsaXv/0XFpyqAmiw51M3r6czHPDOp8E0
+        I2m77NuGDlL41vOChAYx12V/SQ==
+X-Google-Smtp-Source: ABdhPJzyBgR2jF8DPAxnHdQlNowaHrlEIfkQvW2esOvhX/6tHDmlitN+26RRuC2jJxpD8CQXlyzuNA==
+X-Received: by 2002:a65:450d:: with SMTP id n13mr12582028pgq.208.1611202382444;
+        Wed, 20 Jan 2021 20:13:02 -0800 (PST)
 Received: from localhost ([122.172.59.240])
-        by smtp.gmail.com with ESMTPSA id k141sm1520411pfd.9.2021.01.20.20.14.19
+        by smtp.gmail.com with ESMTPSA id k15sm3857699pfp.115.2021.01.20.20.13.01
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Jan 2021 20:14:20 -0800 (PST)
-Date:   Thu, 21 Jan 2021 09:44:18 +0530
+        Wed, 20 Jan 2021 20:13:01 -0800 (PST)
+Date:   Thu, 21 Jan 2021 09:43:00 +0530
 From:   Viresh Kumar <viresh.kumar@linaro.org>
-To:     Rob Herring <robh+dt@kernel.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
 Cc:     Frank Rowand <frowand.list@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
         Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Vincent Guittot <vincent.guittot@linaro.org>,
-        devicetree@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Bill Mills <bill.mills@linaro.org>,
-        Anmar Oueja <anmar.oueja@linaro.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH V5 0/5] dt: build overlays
-Message-ID: <20210121041418.jcruqgfxnkblluah@vireshk-i7>
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bill Mills <bill.mills@linaro.org>, anmar.oueja@linaro.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH V5 4/5] kbuild: Add support to build overlays (%.dtbo)
+Message-ID: <20210121041300.ocerhqaieytj6gds@vireshk-i7>
 References: <cover.1611124778.git.viresh.kumar@linaro.org>
- <CAL_JsqLoxHGphf4TbQtGPggq=kEUnpoR2QqCQD77ttjnVNt0wg@mail.gmail.com>
+ <6e57e9c84429416c628f1f4235c42a5809747c4c.1611124778.git.viresh.kumar@linaro.org>
+ <20210121004955.GE5174@yekko.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL_JsqLoxHGphf4TbQtGPggq=kEUnpoR2QqCQD77ttjnVNt0wg@mail.gmail.com>
+In-Reply-To: <20210121004955.GE5174@yekko.fritz.box>
 User-Agent: NeoMutt/20180716-391-311a52
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 20-01-21, 09:43, Rob Herring wrote:
-> On Wed, Jan 20, 2021 at 1:07 AM Viresh Kumar <viresh.kumar@linaro.org> wrote:
-> >
-> > Hi Frank/Rob,
-> >
-> > I have picked all the related patches together into a single patchset,
-> > so they can be properly reviewed/tested.
-> >
-> > This patchset makes necessary changes to the kernel to add support for
-> > building overlays (%.dtbo) and the required fdtoverlay tool. This also
-> > builds static_test.dtb using some of the existing overlay tests present
-> > in drivers/of/unittest-data/ for better test coverage.
-> >
-> > Note that in order for anyone to test this stuff, you need to manually
-> > run the ./update-dtc-source.sh script once to fetch the necessary
-> > changes from the external DTC project (i.e. fdtoverlay.c and this[1]
-> > patch).
-> 
-> Do we need a fdtoverlay fix for applying root node changes?
+On 21-01-21, 11:49, David Gibson wrote:
+> If you're using overlays, you probably need the -@ flag, for both the
+> base file and the overlays, which AFAICT is not already the case.
 
-I have dropped the overlay files which were updating the root-node as
-it looks like it shouldn't be done. Frank suggested (in his patch) to
-drop overlay.dtb and I dropped overlay_base.dtb as well.
-
-With that no other fixes are required.
+I think the idea was to do that in the platform specific Makefiles,
+unless I have misunderstood that from earlier discussions. So a
+platform may want to do that per-file or just enable it for the entire
+platform.
 
 -- 
 viresh
