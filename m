@@ -2,85 +2,165 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 460EAC433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 19:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9BAC433E6
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 20:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E951C23A5E
-	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 19:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D586923A5E
+	for <linux-kbuild@archiver.kernel.org>; Thu, 21 Jan 2021 20:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726286AbhAUTkn (ORCPT
+        id S1726204AbhAUISy (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 21 Jan 2021 14:40:43 -0500
-Received: from mail-03.mail-europe.com ([91.134.188.129]:37310 "EHLO
-        mail-03.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726410AbhAUSs2 (ORCPT
+        Thu, 21 Jan 2021 03:18:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727910AbhAUH4n (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 21 Jan 2021 13:48:28 -0500
-Date:   Thu, 21 Jan 2021 18:45:55 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me; s=protonmail;
-        t=1611254762; bh=1Awk2X9LSHOQQZek4o1ELWbmO0BY+pTltTaN3f2WBw4=;
-        h=Date:To:From:Cc:Reply-To:Subject:From;
-        b=CrQodZ1xZM2FLIl9dUu8OGQbAxk8pFD5PDH+MeGcVSm7yNrjJgMYceYpJ4DtZ6Sz9
-         G/sT2qYGM4zcgSHo9UI6KRunrCt2lTG0vIvGYhsz9kz4rNQgA4Ezy7jbPUVTNIcVJL
-         f6IRqw8gtdbvMnVWdzcFu1tb0zBq5sC+tjaJTl8RpxB5H9BAOGuxyp8vDr83yRf18S
-         HymS15rUgb8k/enkIRmNlOLFHj/PGIhv7Xf2pJrkpU55bodYBCL52/62XlNDcz9v/P
-         fg25BXyyT2dj95PJUi7CWskvbskXafSVA27y9dZV8ER7go6NBgPOxEdr4deCWYFAdG
-         Tb+Pk1nLNANug==
-To:     Kees Cook <keescook@chromium.org>
-From:   Alexander Lobakin <alobakin@pm.me>
-Cc:     Sami Tolvanen <samitolvanen@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
+        Thu, 21 Jan 2021 02:56:43 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE82EC0613D3;
+        Wed, 20 Jan 2021 23:55:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=pDVrAQODm5MVEOopuQVfAeRLjXskf/bF8mZuyUX3ZZA=; b=ESsvgyjnfo/9h/O2QrIVrOVh84
+        ID9uydF9M6oVObzA4HwZIF2bshL9psjwIVVdtPWQ/mdl0u8LY3qvS7nICXTvlcW7QeM59CgSH59+p
+        YESRp7AANijbNBaGAmHcLzVAMjg3lDja22MN+wJoMI8zbcyGLzidqoq3DKxSInB1fqf74hlcw21f/
+        x5aJ3fvDnaCs3vxzpvN5EN+olckdQCRPXhYgCHNeMY0LQXN1vuuWGzgWQjP+0Ngp7q8gEsOjrWjRC
+        95zxt51w7ULeLNJEMQWrF7PaiEDebcNM4yw3K064lypfQASrIv/oD1Z5d106G2azwZTRPyMrHvh7m
+        EwmMp5gQ==;
+Received: from [2001:4bb8:188:1954:d5b3:2657:287:e45f] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l2Unz-00Gm9t-Ky; Thu, 21 Jan 2021 07:55:04 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Jessica Yu <jeyu@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Alexander Lobakin <alobakin@pm.me>,
-        kernel-hardening@lists.openwall.com,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Reply-To: Alexander Lobakin <alobakin@pm.me>
-Subject: [PATCH kspp-next] kbuild: prevent CC_FLAGS_LTO self-bloating on recursive rebuilds
-Message-ID: <20210121184544.659998-1-alobakin@pm.me>
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: [PATCH 08/13] drm: remove drm_fb_helper_modinit
+Date:   Thu, 21 Jan 2021 08:49:54 +0100
+Message-Id: <20210121074959.313333-9-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210121074959.313333-1-hch@lst.de>
+References: <20210121074959.313333-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-CC_FLAGS_LTO gets initialized only via +=3D, never with :=3D or =3D.
-When building with CONFIG_TRIM_UNUSED_KSYMS, Kbuild may perform
-several kernel rebuilds to satisfy symbol dependencies. In this
-case, value of CC_FLAGS_LTO is concatenated each time, which
-triggers a full rebuild.
-Initialize it with :=3D to fix this.
+drm_fb_helper_modinit has a lot of boilerplate for what is not very
+simple functionality.  Just open code it in the only caller using
+IS_ENABLED and IS_MODULE.
 
-Fixes: dc5723b02e52 ("kbuild: add support for Clang LTO")
-Signed-off-by: Alexander Lobakin <alobakin@pm.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/gpu/drm/drm_crtc_helper_internal.h | 10 ---------
+ drivers/gpu/drm/drm_fb_helper.c            | 16 -------------
+ drivers/gpu/drm/drm_kms_helper_common.c    | 26 +++++++++++-----------
+ 3 files changed, 13 insertions(+), 39 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 668909e7a460..2233951666f7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -895,10 +895,10 @@ endif
-=20
- ifdef CONFIG_LTO_CLANG
- ifdef CONFIG_LTO_CLANG_THIN
--CC_FLAGS_LTO=09+=3D -flto=3Dthin -fsplit-lto-unit
-+CC_FLAGS_LTO=09:=3D -flto=3Dthin -fsplit-lto-unit
- KBUILD_LDFLAGS=09+=3D --thinlto-cache-dir=3D$(extmod-prefix).thinlto-cache
- else
--CC_FLAGS_LTO=09+=3D -flto
-+CC_FLAGS_LTO=09:=3D -flto
- endif
- CC_FLAGS_LTO=09+=3D -fvisibility=3Dhidden
-=20
---=20
-2.30.0
-
+diff --git a/drivers/gpu/drm/drm_crtc_helper_internal.h b/drivers/gpu/drm/drm_crtc_helper_internal.h
+index 25ce42e799952c..61e09f8a8d0ff0 100644
+--- a/drivers/gpu/drm/drm_crtc_helper_internal.h
++++ b/drivers/gpu/drm/drm_crtc_helper_internal.h
+@@ -32,16 +32,6 @@
+ #include <drm/drm_encoder.h>
+ #include <drm/drm_modes.h>
+ 
+-/* drm_fb_helper.c */
+-#ifdef CONFIG_DRM_FBDEV_EMULATION
+-int drm_fb_helper_modinit(void);
+-#else
+-static inline int drm_fb_helper_modinit(void)
+-{
+-	return 0;
+-}
+-#endif
+-
+ /* drm_dp_aux_dev.c */
+ #ifdef CONFIG_DRM_DP_AUX_CHARDEV
+ int drm_dp_aux_dev_init(void);
+diff --git a/drivers/gpu/drm/drm_fb_helper.c b/drivers/gpu/drm/drm_fb_helper.c
+index ce6d63ca75c32a..0b9f1ae1b7864c 100644
+--- a/drivers/gpu/drm/drm_fb_helper.c
++++ b/drivers/gpu/drm/drm_fb_helper.c
+@@ -2499,19 +2499,3 @@ void drm_fbdev_generic_setup(struct drm_device *dev,
+ 	drm_client_register(&fb_helper->client);
+ }
+ EXPORT_SYMBOL(drm_fbdev_generic_setup);
+-
+-/* The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
+- * but the module doesn't depend on any fb console symbols.  At least
+- * attempt to load fbcon to avoid leaving the system without a usable console.
+- */
+-int __init drm_fb_helper_modinit(void)
+-{
+-#if defined(CONFIG_FRAMEBUFFER_CONSOLE_MODULE) && !defined(CONFIG_EXPERT)
+-	const char name[] = "fbcon";
+-
+-	if (!module_loaded(name))
+-		request_module_nowait(name);
+-#endif
+-	return 0;
+-}
+-EXPORT_SYMBOL(drm_fb_helper_modinit);
+diff --git a/drivers/gpu/drm/drm_kms_helper_common.c b/drivers/gpu/drm/drm_kms_helper_common.c
+index 221a8528c9937a..b694a7da632eae 100644
+--- a/drivers/gpu/drm/drm_kms_helper_common.c
++++ b/drivers/gpu/drm/drm_kms_helper_common.c
+@@ -64,19 +64,19 @@ MODULE_PARM_DESC(edid_firmware,
+ 
+ static int __init drm_kms_helper_init(void)
+ {
+-	int ret;
+-
+-	/* Call init functions from specific kms helpers here */
+-	ret = drm_fb_helper_modinit();
+-	if (ret < 0)
+-		goto out;
+-
+-	ret = drm_dp_aux_dev_init();
+-	if (ret < 0)
+-		goto out;
+-
+-out:
+-	return ret;
++	/*
++	 * The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
++	 * but the module doesn't depend on any fb console symbols.  At least
++	 * attempt to load fbcon to avoid leaving the system without a usable
++	 * console.
++	 */
++	if (IS_ENABLED(CONFIG_DRM_FBDEV_EMULATION) &&
++	    IS_MODULE(CONFIG_FRAMEBUFFER_CONSOLE) &&
++	    !IS_ENABLED(CONFIG_EXPERT) &&
++	    !module_loaded("fbcon"))
++		request_module_nowait("fbcon");
++
++	return drm_dp_aux_dev_init();
+ }
+ 
+ static void __exit drm_kms_helper_exit(void)
+-- 
+2.29.2
 
