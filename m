@@ -2,107 +2,131 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABB0C433E0
-	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD060C433E9
+	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 23:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE559207B1
-	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8681721D93
+	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 23:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732769AbhAYV6t (ORCPT
+        id S1732890AbhAYXTZ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 25 Jan 2021 16:58:49 -0500
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:16863 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733030AbhAYV4r (ORCPT
+        Mon, 25 Jan 2021 18:19:25 -0500
+Received: from conuserg-07.nifty.com ([210.131.2.74]:45862 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732660AbhAYXTW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Jan 2021 16:56:47 -0500
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 10PLtVuv010003;
-        Tue, 26 Jan 2021 06:55:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 10PLtVuv010003
+        Mon, 25 Jan 2021 18:19:22 -0500
+Received: from localhost.localdomain (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 10PNHDrD029059;
+        Tue, 26 Jan 2021 08:17:13 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 10PNHDrD029059
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1611611732;
-        bh=MveyNhX/Q55BK5TLqNfAZkfF+yHw/qazmwfJNs3YUFQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=K1q4ibmji9cgyLczPPDOd/kGDPeGCQnoaywDs3oY2NNKJsfjHRAAd2qK1JXBfh+Y1
-         VxUnxk6h08mNQG7v7rF+B4GlWFzBNYvhEMVQrw+PG2gylCkWuCDESv/3X9wU/Tr4z4
-         UZaFvqgs3hDdpYsY3OWchNBscpqSVKSptywk4B/LtjHvEBBF348FVTYg8mp1pigcsd
-         svz4zOybb9sdQal8cFns8vvHAVldiegt9xYUGIvSu1YCpZfsOo7SnaC2yZgOIamAt4
-         apQSovqzXiBMaUyUlwU+b92rSiDTZMVcIoEinauPOjUYlnCKUVOlWBATnhGoS6z9Ws
-         a3X+RAudXzf3A==
-X-Nifty-SrcIP: [209.85.216.50]
-Received: by mail-pj1-f50.google.com with SMTP id kx7so440916pjb.2;
-        Mon, 25 Jan 2021 13:55:31 -0800 (PST)
-X-Gm-Message-State: AOAM530bsZXWj9ZXKGX26pLfYkJGv9WIiLfN2Lsi2CKEJZmlxtQF+aYQ
-        6Ff4QalWK3cPHjmm8w6q4HcO8s88QZEnwxyH8+k=
-X-Google-Smtp-Source: ABdhPJwhZb6x1b4UxKLwPs9cja3rm1ktMGQrT/2LvmPOdOPBPLNVG1bEO2b/KFoRx721rPIVTVOZ0zSXnvJGyvP+g3M=
-X-Received: by 2002:a17:903:248e:b029:de:b329:ffaa with SMTP id
- p14-20020a170903248eb02900deb329ffaamr2685673plw.71.1611611730923; Mon, 25
- Jan 2021 13:55:30 -0800 (PST)
-MIME-Version: 1.0
-References: <20210123091631.716794-1-masahiroy@kernel.org>
-In-Reply-To: <20210123091631.716794-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1611616634;
+        bh=xwIb0oqMknXVdymXEZ6iq/BFlhwRA9qFCQ7anGrVqGg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=KzyJpXCJXKnGOOfVfP7oeCny6KI2hL5T3EDgyMyAb+lYn3rwWdPjwK9PvjZFtKYcU
+         bA4VVOSCpV8WTjKjxQEu2XIxwqBVLoss4P8n1F5j5agQr+x3v8y6V9dU4MB2Cxoh2p
+         GiSZ2TlgyFpVHkQCSPG8ooIziLm7DWLXMQHUJ6sqPpS2MstSTEjSjOVxoAx5LFvGf9
+         DRJScYKPhBqD1DNmTfsn76fg83DAOIDo+bdUVK3+7miCW5jiWU4HDhXrouMRfzITBe
+         NMDZXItfH4c7BkZSzAio/ps7SEx7YETugX0ZtUyQEs4FT8xlmsyT1R9U43ZW/WzFs2
+         CAaZfTYhldI+w==
+X-Nifty-SrcIP: [126.26.94.251]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 26 Jan 2021 06:54:53 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATsEURRtV0Rcmm3KctA6je5yRfYAhe10Y4Gj5rbwULxNQ@mail.gmail.com>
-Message-ID: <CAK7LNATsEURRtV0Rcmm3KctA6je5yRfYAhe10Y4Gj5rbwULxNQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: simplify GCC_PLUGINS enablement in dummy-tools/gcc
-To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc:     Philipp Rudo <prudo@linux.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     netdev@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] net: move CONFIG_NET guard to top Makefile
+Date:   Tue, 26 Jan 2021 08:16:55 +0900
+Message-Id: <20210125231659.106201-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jan 23, 2021 at 6:16 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> With commit 1e860048c53e ("gcc-plugins: simplify GCC plugin-dev
-> capability test") applied, this check can be way simpler because
-> now scripts/gcc-plugins/Kconfig only checks plugin-version.h
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  scripts/dummy-tools/gcc | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
->
-> diff --git a/scripts/dummy-tools/gcc b/scripts/dummy-tools/gcc
-> index 33487e99d83e..5c113cad5601 100755
-> --- a/scripts/dummy-tools/gcc
-> +++ b/scripts/dummy-tools/gcc
-> @@ -75,16 +75,12 @@ if arg_contain -S "$@"; then
->         fi
->  fi
->
-> -# For scripts/gcc-plugin.sh
-> +# To set GCC_PLUGINS
->  if arg_contain -print-file-name=plugin "$@"; then
->         plugin_dir=$(mktemp -d)
->
-> -       sed -n 's/.*#include "\(.*\)"/\1/p' $(dirname $0)/../gcc-plugins/gcc-common.h |
-> -       while read header
-> -       do
-> -               mkdir -p $plugin_dir/include/$(dirname $header)
-> -               touch $plugin_dir/include/$header
-> -       done
-> +       mkdir -p $plugin_dir/include
-> +       touch $plugin_dir/include/plugin-version.h
->
->         echo $plugin_dir
->         exit 0
-> --
-> 2.27.0
->
+When CONFIG_NET is disabled, nothing under the net/ directory is
+compiled. Move the CONFIG_NET guard to the top Makefile so the net/
+directory is entirely skipped.
 
-Applied to linux-kbuild.
+When Kbuild visits net/Makefile, CONFIG_NET is obvioulsy 'y' because
+CONFIG_NET is a bool option. Clean up net/Makefile.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ Makefile     |  3 ++-
+ net/Makefile | 11 ++++-------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b0e4767735dc..61357f7eb55f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -649,7 +649,8 @@ ifeq ($(KBUILD_EXTMOD),)
+ core-y		:= init/ usr/
+ drivers-y	:= drivers/ sound/
+ drivers-$(CONFIG_SAMPLES) += samples/
+-drivers-y	+= net/ virt/
++drivers-$(CONFIG_NET) += net/
++drivers-y	+= virt/
+ libs-y		:= lib/
+ endif # KBUILD_EXTMOD
+ 
+diff --git a/net/Makefile b/net/Makefile
+index d96b0aa8f39f..6fa3b2e26cab 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -6,20 +6,19 @@
+ # Rewritten to use lists instead of if-statements.
+ #
+ 
+-obj-$(CONFIG_NET)		:= devres.o socket.o core/
++obj-y				:= devres.o socket.o core/
+ 
+-tmp-$(CONFIG_COMPAT) 		:= compat.o
+-obj-$(CONFIG_NET)		+= $(tmp-y)
++obj-$(CONFIG_COMPAT)		+= compat.o
+ 
+ # LLC has to be linked before the files in net/802/
+ obj-$(CONFIG_LLC)		+= llc/
+-obj-$(CONFIG_NET)		+= ethernet/ 802/ sched/ netlink/ bpf/ ethtool/
++obj-y				+= ethernet/ 802/ sched/ netlink/ bpf/ ethtool/
+ obj-$(CONFIG_NETFILTER)		+= netfilter/
+ obj-$(CONFIG_INET)		+= ipv4/
+ obj-$(CONFIG_TLS)		+= tls/
+ obj-$(CONFIG_XFRM)		+= xfrm/
+ obj-$(CONFIG_UNIX_SCM)		+= unix/
+-obj-$(CONFIG_NET)		+= ipv6/
++obj-y				+= ipv6/
+ obj-$(CONFIG_BPFILTER)		+= bpfilter/
+ obj-$(CONFIG_PACKET)		+= packet/
+ obj-$(CONFIG_NET_KEY)		+= key/
+@@ -63,9 +62,7 @@ obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
+ obj-$(CONFIG_IEEE802154)	+= ieee802154/
+ obj-$(CONFIG_MAC802154)		+= mac802154/
+ 
+-ifeq ($(CONFIG_NET),y)
+ obj-$(CONFIG_SYSCTL)		+= sysctl_net.o
+-endif
+ obj-$(CONFIG_DNS_RESOLVER)	+= dns_resolver/
+ obj-$(CONFIG_CEPH_LIB)		+= ceph/
+ obj-$(CONFIG_BATMAN_ADV)	+= batman-adv/
 -- 
-Best Regards
-Masahiro Yamada
+2.27.0
+
