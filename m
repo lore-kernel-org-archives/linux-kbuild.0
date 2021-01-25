@@ -2,84 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 537F4C433DB
-	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABB0C433E0
+	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:25:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EB0B2072C
-	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE559207B1
+	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Jan 2021 22:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726231AbhAYWVa (ORCPT
+        id S1732769AbhAYV6t (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 25 Jan 2021 17:21:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20622 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732315AbhAYWV0 (ORCPT
+        Mon, 25 Jan 2021 16:58:49 -0500
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:16863 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733030AbhAYV4r (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Jan 2021 17:21:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611613200;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m3GTxAXy/n7abTboCl2AAMZcR1+hfsyo/eH4M6+Glow=;
-        b=IIcm8Y1TApBt0mBMfWYOFquB3xPHKHvynElJ/lK0nfC9aF1C+qPf88tWnkFpuIhAuwgXnb
-        Mb55wbkC1DPFAohIU6cq/goQInSLXKI7V1e+kr6PoGJAiBQpOdnls50N40Mhb+eLYJrQQl
-        Yl9xlE7UCc10vT1OzueNpGmszRVLfts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-_TXAzB81MEO-MvEgpRfhAA-1; Mon, 25 Jan 2021 17:19:59 -0500
-X-MC-Unique: _TXAzB81MEO-MvEgpRfhAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C327AFA83;
-        Mon, 25 Jan 2021 22:19:57 +0000 (UTC)
-Received: from treble (ovpn-120-118.rdu2.redhat.com [10.10.120.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74C7860C62;
-        Mon, 25 Jan 2021 22:19:55 +0000 (UTC)
-Date:   Mon, 25 Jan 2021 16:19:53 -0600
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Justin Forbes <jforbes@redhat.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
- modules
-Message-ID: <20210125221953.wng3gk3qc32eahil@treble>
-References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
- <202101251401.F18409FDD1@keescook>
+        Mon, 25 Jan 2021 16:56:47 -0500
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id 10PLtVuv010003;
+        Tue, 26 Jan 2021 06:55:31 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 10PLtVuv010003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1611611732;
+        bh=MveyNhX/Q55BK5TLqNfAZkfF+yHw/qazmwfJNs3YUFQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=K1q4ibmji9cgyLczPPDOd/kGDPeGCQnoaywDs3oY2NNKJsfjHRAAd2qK1JXBfh+Y1
+         VxUnxk6h08mNQG7v7rF+B4GlWFzBNYvhEMVQrw+PG2gylCkWuCDESv/3X9wU/Tr4z4
+         UZaFvqgs3hDdpYsY3OWchNBscpqSVKSptywk4B/LtjHvEBBF348FVTYg8mp1pigcsd
+         svz4zOybb9sdQal8cFns8vvHAVldiegt9xYUGIvSu1YCpZfsOo7SnaC2yZgOIamAt4
+         apQSovqzXiBMaUyUlwU+b92rSiDTZMVcIoEinauPOjUYlnCKUVOlWBATnhGoS6z9Ws
+         a3X+RAudXzf3A==
+X-Nifty-SrcIP: [209.85.216.50]
+Received: by mail-pj1-f50.google.com with SMTP id kx7so440916pjb.2;
+        Mon, 25 Jan 2021 13:55:31 -0800 (PST)
+X-Gm-Message-State: AOAM530bsZXWj9ZXKGX26pLfYkJGv9WIiLfN2Lsi2CKEJZmlxtQF+aYQ
+        6Ff4QalWK3cPHjmm8w6q4HcO8s88QZEnwxyH8+k=
+X-Google-Smtp-Source: ABdhPJwhZb6x1b4UxKLwPs9cja3rm1ktMGQrT/2LvmPOdOPBPLNVG1bEO2b/KFoRx721rPIVTVOZ0zSXnvJGyvP+g3M=
+X-Received: by 2002:a17:903:248e:b029:de:b329:ffaa with SMTP id
+ p14-20020a170903248eb02900deb329ffaamr2685673plw.71.1611611730923; Mon, 25
+ Jan 2021 13:55:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202101251401.F18409FDD1@keescook>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20210123091631.716794-1-masahiroy@kernel.org>
+In-Reply-To: <20210123091631.716794-1-masahiroy@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 26 Jan 2021 06:54:53 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATsEURRtV0Rcmm3KctA6je5yRfYAhe10Y4Gj5rbwULxNQ@mail.gmail.com>
+Message-ID: <CAK7LNATsEURRtV0Rcmm3KctA6je5yRfYAhe10Y4Gj5rbwULxNQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: simplify GCC_PLUGINS enablement in dummy-tools/gcc
+To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc:     Philipp Rudo <prudo@linux.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 02:03:07PM -0800, Kees Cook wrote:
-> On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
-> > When a GCC version mismatch is detected, print a warning and disable the
-> > plugin.  The only exception is the RANDSTRUCT plugin which needs all
-> > code to see the same struct layouts.  In that case print an error.
-> 
-> I prefer this patch as-is: only randstruct needs a hard failure. The
-> others likely work (in fact, randstruct likely works too).
+On Sat, Jan 23, 2021 at 6:16 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> With commit 1e860048c53e ("gcc-plugins: simplify GCC plugin-dev
+> capability test") applied, this check can be way simpler because
+> now scripts/gcc-plugins/Kconfig only checks plugin-version.h
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  scripts/dummy-tools/gcc | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/scripts/dummy-tools/gcc b/scripts/dummy-tools/gcc
+> index 33487e99d83e..5c113cad5601 100755
+> --- a/scripts/dummy-tools/gcc
+> +++ b/scripts/dummy-tools/gcc
+> @@ -75,16 +75,12 @@ if arg_contain -S "$@"; then
+>         fi
+>  fi
+>
+> -# For scripts/gcc-plugin.sh
+> +# To set GCC_PLUGINS
+>  if arg_contain -print-file-name=plugin "$@"; then
+>         plugin_dir=$(mktemp -d)
+>
+> -       sed -n 's/.*#include "\(.*\)"/\1/p' $(dirname $0)/../gcc-plugins/gcc-common.h |
+> -       while read header
+> -       do
+> -               mkdir -p $plugin_dir/include/$(dirname $header)
+> -               touch $plugin_dir/include/$header
+> -       done
+> +       mkdir -p $plugin_dir/include
+> +       touch $plugin_dir/include/plugin-version.h
+>
+>         echo $plugin_dir
+>         exit 0
+> --
+> 2.27.0
+>
 
-I'm curious about this last statement, why would randstruct likely work?
+Applied to linux-kbuild.
 
-Even struct module has '__randomize_layout', wouldn't basic module init
-go splat?
 
 -- 
-Josh
-
+Best Regards
+Masahiro Yamada
