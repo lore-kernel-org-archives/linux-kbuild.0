@@ -2,131 +2,99 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B259C433E0
-	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 19:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49230C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 23:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF45E2079A
-	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 19:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 113A720663
+	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 23:01:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732438AbhAZFwG (ORCPT
+        id S1731268AbhAZXAU (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:52:06 -0500
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:23744 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731259AbhAZBzI (ORCPT
+        Tue, 26 Jan 2021 18:00:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392154AbhAZR67 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 25 Jan 2021 20:55:08 -0500
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 10Q1s0YE007298;
-        Tue, 26 Jan 2021 10:54:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 10Q1s0YE007298
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1611626040;
-        bh=oagMBAQOcxiRZ10Xc720/BqDn/zB60BP15C0zBwRb4w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=zI91evfU1dQERp5iU3LtP62wJx77tUr8nmioJzfKCIUdXRqdNGY50QKTCfHsXDczC
-         TLHadaES9+8s70Z0DNoxPGz9jadiJZaOwZNh9GyPPKS1GpBKQH52m4WtdOta1EYkNS
-         xkgJT3MwbzyJz28JMiLxavtq5Ui2SI9gMfZUK20ox55+HQ2tI2dDeGAnyovQvNHyzQ
-         gPeuJxmoE0CMK9wplQfJlTmC7VDnsWHie7kJuJyl6A0yaPb2gG9Ptp5pnhfMHG3mCY
-         evGg1fma2gtyWqFdxLUs11ySnYLw0heiBoezBfZtrWRZJ/67pc6dTdx3dM8Ia+U1Pf
-         rD5WSVxjOXnmA==
-X-Nifty-SrcIP: [209.85.216.53]
-Received: by mail-pj1-f53.google.com with SMTP id gx1so873911pjb.1;
-        Mon, 25 Jan 2021 17:54:00 -0800 (PST)
-X-Gm-Message-State: AOAM532h1dvsVcTA77q1OLt8DJK7e/lG0YiRxWL0xeq8RHxoPai0g854
-        wqn0EJuaDhF1ghU7CM6JupEEwhtBF1woeeY8fiY=
-X-Google-Smtp-Source: ABdhPJwJ9KkvPgY3Ko2Vqz35MecJG3zqwoeNOStkvrhv8bzGg2t1HOBt5xq4IYHIoiGkCQq+U+0aGZ43TJHANLrpCg0=
-X-Received: by 2002:a17:90a:5403:: with SMTP id z3mr3328264pjh.198.1611626039493;
- Mon, 25 Jan 2021 17:53:59 -0800 (PST)
-MIME-Version: 1.0
-References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
- <202101251401.F18409FDD1@keescook>
-In-Reply-To: <202101251401.F18409FDD1@keescook>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 26 Jan 2021 10:53:22 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASOf=B_j5o=L=BL+vz_JK_d3QYUuHg8h+3SP6qOyYD86A@mail.gmail.com>
-Message-ID: <CAK7LNASOf=B_j5o=L=BL+vz_JK_d3QYUuHg8h+3SP6qOyYD86A@mail.gmail.com>
-Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT modules
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Tue, 26 Jan 2021 12:58:59 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D3FC061788
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 09:56:12 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id 11so10876917pfu.4
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 09:56:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=49OfVhE6yUIYau/W+C0A+f0GHRQbjZMk200/UCnt3K8=;
+        b=lm6Av3vx6keX17wsHI34YsUFn71zlQOVF/k29/xxOcx0wQNEBZBAJYjbXDsmult15O
+         qEhk7RMn4rXh2Fwdha3zUWYBySxiLah6gS11Yoz+L6X61BLabG6+mrsn/fFmyNJW7VSW
+         8W3kEOxyfsPXkINt/HGjvHIMOai4+4x9gIWUE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=49OfVhE6yUIYau/W+C0A+f0GHRQbjZMk200/UCnt3K8=;
+        b=RJU0KCDiQD53ZaQKaRfw8iFuQilt1BH9SlVuz5lTdmxZ/m4Ib1OgJWMRqlyoP3cFFX
+         GMdrxCQ0bxB1I4/gsfBHup/xC/0MEwOiuvGovezmo28xeifp6bCT2KwpxOsoNnjBVkQI
+         S6HE6gc8sdwmxKJWIGqfUDCENcF/6Maf5hmsrp2FvNAbrCDHzyAXIIyQs6s7tcXjbKbz
+         6eZlEKgAbubq1p990tEl+vMxpJRuZ84vT2eUVVqi7QUvDiYUqPNAjFg5P574yUOkZJy1
+         m7W/tzRDTOZaOf/Fny/vc/KFKXpY7CapsKuDfe4UEgXJnGbj8RXORhdy5IvdWDaW4MU0
+         zf3A==
+X-Gm-Message-State: AOAM530DQDpbb52LCCnITWPefJwOBW2OJ4pPzynNORSzCUyLRVuBLfhk
+        cYpdJCOh+8r/vjBX0IVkeWqffQ==
+X-Google-Smtp-Source: ABdhPJw4hSgbw4HDAJRlyJdZcMFq3MdSNUNHP0bouDMZZWMFMNRrbouvqLSWcwnQkUMvsOmc+Joy1A==
+X-Received: by 2002:a63:db0d:: with SMTP id e13mr6714733pgg.343.1611683772344;
+        Tue, 26 Jan 2021 09:56:12 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id x14sm20060251pfj.15.2021.01.26.09.56.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 09:56:11 -0800 (PST)
+Date:   Tue, 26 Jan 2021 09:56:10 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Josh Poimboeuf <jpoimboe@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        linux-hardening@vger.kernel.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
         Peter Zijlstra <peterz@infradead.org>,
         Justin Forbes <jforbes@redhat.com>,
         Ondrej Mosnacek <omosnace@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
+ modules
+Message-ID: <202101260955.F83D191B@keescook>
+References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
+ <202101251401.F18409FDD1@keescook>
+ <20210125221953.wng3gk3qc32eahil@treble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210125221953.wng3gk3qc32eahil@treble>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 7:03 AM Kees Cook <keescook@chromium.org> wrote:
->
-> On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
-> > When a GCC version mismatch is detected, print a warning and disable the
-> > plugin.  The only exception is the RANDSTRUCT plugin which needs all
-> > code to see the same struct layouts.  In that case print an error.
->
-> I prefer this patch as-is: only randstruct needs a hard failure. The
-> others likely work (in fact, randstruct likely works too).
->
-> Masahiro, are you suggesting to be a hard-failure for all plugins?
+On Mon, Jan 25, 2021 at 04:19:53PM -0600, Josh Poimboeuf wrote:
+> On Mon, Jan 25, 2021 at 02:03:07PM -0800, Kees Cook wrote:
+> > On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
+> > > When a GCC version mismatch is detected, print a warning and disable the
+> > > plugin.  The only exception is the RANDSTRUCT plugin which needs all
+> > > code to see the same struct layouts.  In that case print an error.
+> > 
+> > I prefer this patch as-is: only randstruct needs a hard failure. The
+> > others likely work (in fact, randstruct likely works too).
+> 
+> I'm curious about this last statement, why would randstruct likely work?
+> 
+> Even struct module has '__randomize_layout', wouldn't basic module init
+> go splat?
 
-Yes.
-
-I want to require
-"I swear to use the same compiler version for external modules"
-when you enable GCC plugins.
-
-
-
-
-config CC_VERSION_CHECK_FOR_EXTERNAL_MODULES
-        bool "Check the compiler version before building external modules"
-        help
-           If this option is enabled, the compiler version is checked
-           before building external modules. This ensures the same
-           compiler is used for the kernel and external modules.
-
-
-config GCC_PLUGINS
-        ...
-        depends on CC_VERSION_CHECK_FOR_EXTERNAL_MODULES
-
-
-
-In Makefile, check the version for out-of-tree modules
-if CONFIG_CC_VERSION_CHECK_FOR_EXTERNAL_MODULES.
-
-
-
-
-There is no difference in the fact that
-you cannot use a different compiler for external modules
-if CONFIG_GCC_PLUGINS=y.
-
-
-
-
-We started with the assumption that modules must be compiled
-by the same compiler as the kernel was.
-https://lore.kernel.org/patchwork/patch/836247/#1031547
-
-Now that the compiler capability is evaluated in Kconfig,
-this is a harder requirement.
-
-In reality, a different compiler might be used,
-and, this requirement might be loosened, but
-the same compiler should be required for CONFIG_GCC_PLUGINS.
-
-
-
+No; the seed is part of the generate includes -- you'll get the same
+layout with the same seed.
 
 -- 
-Best Regards
-Masahiro Yamada
+Kees Cook
