@@ -2,101 +2,103 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63AF2C433E6
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 08:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1652C433DB
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 227BA2074A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 08:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93ED72064B
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234167AbhA0IFn convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 27 Jan 2021 03:05:43 -0500
-Received: from mx1.emlix.com ([136.243.223.33]:47834 "EHLO mx1.emlix.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234295AbhA0IDY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Jan 2021 03:03:24 -0500
-Received: from mailer.emlix.com (p5098be52.dip0.t-ipconnect.de [80.152.190.82])
-        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.emlix.com (Postfix) with ESMTPS id 98AAE5FCE6;
-        Wed, 27 Jan 2021 08:50:55 +0100 (CET)
-From:   Rolf Eike Beer <eb@emlix.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH v6] scripts: use pkg-config to locate libcrypto
-Date:   Wed, 27 Jan 2021 08:50:55 +0100
-Message-ID: <3207945.kN7qQvqmsI@devpool47>
-Organization: emlix GmbH
-In-Reply-To: <3394639.6NgGvCfkNl@devpool47>
-References: <20538915.Wj2CyUsUYa@devpool35> <2278760.8Yd83Mgoko@devpool35> <3394639.6NgGvCfkNl@devpool47>
+        id S314214AbhAZXAm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 26 Jan 2021 18:00:42 -0500
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:17200 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727923AbhAZShh (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 26 Jan 2021 13:37:37 -0500
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 10QIaGw3020487;
+        Wed, 27 Jan 2021 03:36:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 10QIaGw3020487
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1611686177;
+        bh=jdWLcQFJpvkL7fnNbIXEjnV5zSV4ldy1W6fJJer0SS0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=vZ/bW+lTZyrd1ERgU+miNz8+GOlqwTLVOxxzyQasaF86h98Ay6qOjXhWuULGJqKM5
+         4z0X+NPL3o3SXxb8sugDW+V96GjyO8LJGIbkTltMuPaaexC7hTuXQymVd9kVXx3xIt
+         M59p3RVAhxPGJIbLGtDIMcTEHzCk3AuPUHHNzVXWI4h8HM9cXZOXZD1KbO7F0Xuq+O
+         IDejtgYMTP+WsY2imeqglLzgoFd263QtQdDQft8FNDcAwrztsHTgHzlDmNfWkXy7sZ
+         gHs/PaHuMLLlXqWAx95l8qKaJof9ym1H10wBL2jg72B+onuMC65bDq1FCmdLPAfw3K
+         ZwGcG9UUQ2o+g==
+X-Nifty-SrcIP: [209.85.216.48]
+Received: by mail-pj1-f48.google.com with SMTP id l18so2751623pji.3;
+        Tue, 26 Jan 2021 10:36:17 -0800 (PST)
+X-Gm-Message-State: AOAM532JH5rHQWuJ1wk8pqRPf/4+Y7+rlW6Ah8pXVbw1sRTqkzUqYtDd
+        F9PFlzGJkbhzJAl0UAi4uoQcDbd0rt3uOjcqz54=
+X-Google-Smtp-Source: ABdhPJzm8VWDgbWt/Qh9yT3e9UPSeoJupJWOrfVdaMJGhEFCxF7zQGgkjL8RLxx7C1vvctvqdHBbnBzSIJslbdB9RU8=
+X-Received: by 2002:a17:902:a5c5:b029:de:30b0:f1d with SMTP id
+ t5-20020a170902a5c5b02900de30b00f1dmr7207458plq.1.1611686176307; Tue, 26 Jan
+ 2021 10:36:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
+References: <20210120062351.3011786-1-masahiroy@kernel.org> <20210120213929.GA875847@robh.at.kernel.org>
+In-Reply-To: <20210120213929.GA875847@robh.at.kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 27 Jan 2021 03:35:39 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQe9Vq4KEZJwqL=3etTedGVnieKA5vyVoXFr7-a03Nwgg@mail.gmail.com>
+Message-ID: <CAK7LNAQe9Vq4KEZJwqL=3etTedGVnieKA5vyVoXFr7-a03Nwgg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use always-y instead of extra-y
+To:     Rob Herring <robh@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@linux.ie>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        DTML <devicetree@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        intel-gfx@lists.freedesktop.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From f467f251e44cd406c9556ea7d68d131f56e0d832 Mon Sep 17 00:00:00 2001
-From: Rolf Eike Beer <eb@emlix.com>
-Date: Thu, 22 Nov 2018 16:40:49 +0100
-Subject: [PATCH] scripts: use pkg-config to locate libcrypto
+On Thu, Jan 21, 2021 at 6:39 AM Rob Herring <robh@kernel.org> wrote:
+>
+> On Wed, Jan 20, 2021 at 03:23:51PM +0900, Masahiro Yamada wrote:
+> > As commit d0e628cd817f ("kbuild: doc: clarify the difference between
+> > extra-y and always-y") explained, extra-y should be used for listing
+> > the prerequsites of vmlinux. always-y is a better fix here.
+>
+> prerequisites
 
-Otherwise build fails if the headers are not in the default location. While at
-it also ask pkg-config for the libs, with fallback to the existing value.
+Thanks.
 
-Signed-off-by: Rolf Eike Beer <eb@emlix.com>
-Cc: stable@vger.kernel.org # 5.6.x
----
- scripts/Makefile | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+I fixed it up, and applied to linux-kbuild.
 
-Changes in v6:
- - hardcode pkg-config
 
-diff --git a/scripts/Makefile b/scripts/Makefile
-index b5418ec587fb..9de3c03b94aa 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -3,6 +3,9 @@
- # scripts contains sources for various helper programs used throughout
- # the kernel for the build process.
- 
-+CRYPTO_LIBS = $(shell pkg-config --libs libcrypto 2> /dev/null || echo -lcrypto)
-+CRYPTO_CFLAGS = $(shell pkg-config --cflags libcrypto 2> /dev/null)
-+
- hostprogs-always-$(CONFIG_BUILD_BIN2C)			+= bin2c
- hostprogs-always-$(CONFIG_KALLSYMS)			+= kallsyms
- hostprogs-always-$(BUILD_C_RECORDMCOUNT)		+= recordmcount
-@@ -14,8 +17,9 @@ hostprogs-always-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE)	+= insert-sys-cert
- 
- HOSTCFLAGS_sorttable.o = -I$(srctree)/tools/include
- HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
--HOSTLDLIBS_sign-file = -lcrypto
--HOSTLDLIBS_extract-cert = -lcrypto
-+HOSTLDLIBS_sign-file = $(CRYPTO_LIBS)
-+HOSTCFLAGS_extract-cert.o = $(CRYPTO_CFLAGS)
-+HOSTLDLIBS_extract-cert = $(CRYPTO_LIBS)
- 
- ifdef CONFIG_UNWINDER_ORC
- ifeq ($(ARCH),x86_64)
--- 
-2.30.0
+
+> Glad to see this clarified. I think just tried both and picked one.
+>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> >  Documentation/devicetree/bindings/Makefile |  8 ++++----
+> >  drivers/gpu/drm/i915/Makefile              |  2 +-
+> >  scripts/Makefile.lib                       | 10 +++++-----
+> >  scripts/gdb/linux/Makefile                 |  2 +-
+> >  4 files changed, 11 insertions(+), 11 deletions(-)
+
+
 
 -- 
-Rolf Eike Beer, emlix GmbH, http://www.emlix.com
-Fon +49 551 30664-0, Fax +49 551 30664-11
-Gothaer Platz 3, 37083 Göttingen, Germany
-Sitz der Gesellschaft: Göttingen, Amtsgericht Göttingen HR B 3160
-Geschäftsführung: Heike Jordan, Dr. Uwe Kracke – Ust-IdNr.: DE 205 198 055
-
-emlix - smart embedded open source
-
-
-
+Best Regards
+Masahiro Yamada
