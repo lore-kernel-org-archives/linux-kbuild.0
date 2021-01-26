@@ -2,110 +2,124 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF352C4332B
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F04C433DB
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:28:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B69620731
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D707A2067C
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:28:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233322AbhA0K0G (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 27 Jan 2021 05:26:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S314204AbhAZXAk (ORCPT
+        id S314193AbhAZXAg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 26 Jan 2021 18:00:36 -0500
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:38633 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392482AbhAZSE2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jan 2021 18:00:40 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EB7C061788
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 14:59:59 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id o16so236098pgg.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 14:59:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=v4vLMnE79I5H4BnynTTOoA+/hZLJz2auYrPML1aX3qo=;
-        b=Y8/ezfvkoAt+Zv1miXw4RTWhl+j87Mf7SfwiJlLpIBYP3EkeDaGdtkiq+c1+uOIImD
-         sIpkEj2JvabE8/tJMIdj2Bs/sfcNrSumUuIQdHpvJeTZXf7G4xKB3GFUdKeBQ/dn3evm
-         S9F3TMkc+7WC25HJeiKQJDMssxuJZ53Jpn9cQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=v4vLMnE79I5H4BnynTTOoA+/hZLJz2auYrPML1aX3qo=;
-        b=UtIl6GV4GZrb37Y3f+5HIoVwG3gYrcchLUfThXA64IrJVtp7LNsnZYbTKdl+bWaKiC
-         dza1ow4XNGLXMMejAtwfmMPiUMtckyxu8vBhweRt8BE75U6O/0+qZ/ZcSVhIZMTQWGPO
-         0GeDYi5lbEoZZvANTXfHWkQrrLv2+4iEObRKyjr/GUBiAHhbuKu5B5nbYlS1LbPijoz4
-         KlfpXAcGtoVQcBUTrOQ4SopzfFfvtuHpxrveMP+ocX8geYu4tlT2kgxszB4sqpkdFwOF
-         m+yfttMUzqI0ko8jiWXQOqQ73eOQ35bgsNnLpPPTFBQnElr0zBTIp8oSs02Auu6VCe+d
-         CH5A==
-X-Gm-Message-State: AOAM531N2MxKaQbBpYjzFsqp1+6cWpzGilcqUs5MPeXX0zTSR9OjvK0t
-        gi/PPc76UFsVNwayxtcNojCTQA==
-X-Google-Smtp-Source: ABdhPJzptUM+GfHxvz2Hj8TNGijHu7CJwFy+CWJ6D4Qp/44KIYDHOsDBy1RsJyotEUll8V8ms7LqCg==
-X-Received: by 2002:aa7:9a48:0:b029:1b7:bb17:38c9 with SMTP id x8-20020aa79a480000b02901b7bb1738c9mr7461264pfj.51.1611701999000;
-        Tue, 26 Jan 2021 14:59:59 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id w20sm61139pga.90.2021.01.26.14.59.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 14:59:58 -0800 (PST)
-Date:   Tue, 26 Jan 2021 14:59:57 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Justin Forbes <jforbes@redhat.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
- modules
-Message-ID: <202101261459.C90E9F97D@keescook>
-References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
- <202101251401.F18409FDD1@keescook>
- <20210125221953.wng3gk3qc32eahil@treble>
- <202101260955.F83D191B@keescook>
- <20210126184316.hpcy6gqp5vsq6ckq@treble>
+        Tue, 26 Jan 2021 13:04:28 -0500
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 10QI314b020894;
+        Wed, 27 Jan 2021 03:03:02 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 10QI314b020894
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1611684182;
+        bh=kWOccqxKJoFYPnJsQ+y0BCvq3KmzNRThKQzTaXhv0S8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=N7TcHLcnqdF/FFV1Wy+s+viyBMtrA6US56U/UtYazUnTYqU39VnCpTmA3AMq8I6qh
+         Yxzq5E45SKbeLvAjdvbZXkEoaSs6HnpW12otvGY7JDxdwBTA6tC7kLwCmhBvItc/K6
+         s+2JlSHUg8pF15Uvpkj6KPm7GHd4Jnii/mPGV0gysoR3HGbC/CWD1f0nWbODVNb+7f
+         yZQly0ZOhpqX+r3KLAu6HhIb5GZW2ZPEgnp2JG1J7bUKfQxvJQI/f9YaDLsJr5rwdL
+         6KufYEBlN1he17eOVTBS+t6F+Tb9kyuUW9qStXlhS8mwwuCvYRyQY0xMySu4dom2Xt
+         EFB+W6S9BlB5A==
+X-Nifty-SrcIP: [209.85.215.177]
+Received: by mail-pg1-f177.google.com with SMTP id o16so2317059pgg.5;
+        Tue, 26 Jan 2021 10:03:02 -0800 (PST)
+X-Gm-Message-State: AOAM5335+Lei3tGibMPWexIKZzcYioLoSAtBRWn7X3y1YYU7NseuYUWo
+        8byl5bWIyxzp7Wheq7oWx3HpIeKXedJsOivPtPA=
+X-Google-Smtp-Source: ABdhPJx+H/cXgj5zI7oWkcqkTZSzrMbWyb/BlnvQyP4tIvkh5dGbenAkbeJD4xYcpMHWSPyDiZNSRGiDCJ8advtWTH0=
+X-Received: by 2002:a63:ff09:: with SMTP id k9mr6846869pgi.175.1611684181350;
+ Tue, 26 Jan 2021 10:03:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210126184316.hpcy6gqp5vsq6ckq@treble>
+References: <1611343638-28206-1-git-send-email-eberman@codeaurora.org> <1611343638-28206-2-git-send-email-eberman@codeaurora.org>
+In-Reply-To: <1611343638-28206-2-git-send-email-eberman@codeaurora.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 27 Jan 2021 03:02:24 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASJww-7Tboj4w7sJ-ERXz9J7rUswACVQpYuZjOtsDV8Lw@mail.gmail.com>
+Message-ID: <CAK7LNASJww-7Tboj4w7sJ-ERXz9J7rUswACVQpYuZjOtsDV8Lw@mail.gmail.com>
+Subject: Re: [RFC 1/2] Kbuild: Make composite object searching more generic
+To:     Elliot Berman <eberman@codeaurora.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Trilok Soni <tsoni@codeaurora.org>,
+        Mahesh Kumar Kalikot Veetil <mkalikot@codeaurora.org>,
+        Jeff Johnson <jjohnson@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 12:43:16PM -0600, Josh Poimboeuf wrote:
-> On Tue, Jan 26, 2021 at 09:56:10AM -0800, Kees Cook wrote:
-> > On Mon, Jan 25, 2021 at 04:19:53PM -0600, Josh Poimboeuf wrote:
-> > > On Mon, Jan 25, 2021 at 02:03:07PM -0800, Kees Cook wrote:
-> > > > On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
-> > > > > When a GCC version mismatch is detected, print a warning and disable the
-> > > > > plugin.  The only exception is the RANDSTRUCT plugin which needs all
-> > > > > code to see the same struct layouts.  In that case print an error.
-> > > > 
-> > > > I prefer this patch as-is: only randstruct needs a hard failure. The
-> > > > others likely work (in fact, randstruct likely works too).
-> > > 
-> > > I'm curious about this last statement, why would randstruct likely work?
-> > > 
-> > > Even struct module has '__randomize_layout', wouldn't basic module init
-> > > go splat?
-> > 
-> > No; the seed is part of the generate includes -- you'll get the same
-> > layout with the same seed.
-> 
-> Right, but don't you need the plugin enabled to make use of that seed,
-> so the structs get interpreted properly by the module?  Or am I
-> completely misunderstanding how this plugin works?
+On Sat, Jan 23, 2021 at 4:27 AM Elliot Berman <eberman@codeaurora.org> wrote:
+>
+> Reduce repeated logic around expanding composite objects in preparation
+> for later commit to support nested composite objects.
+>
+> Signed-off-by: Elliot Berman <eberman@codeaurora.org>
 
-Having the plugin enabled or not is part of the Kconfig ... you can't
-build anything if you change Kconfig. I feel like I'm missing
-something...
+This patch is a nice clean-up
+regardless of your main motivation in 2/2.
 
--- 
-Kees Cook
+
+I removed the "in preparation ..." part.
+
+Applied to linux-kbuild. Thanks.
+
+
+
+
+> ---
+>  scripts/Makefile.lib | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 213677a5..93e4f10 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -56,15 +56,19 @@ else
+>  obj-y          := $(filter-out %/, $(obj-y))
+>  endif
+>
+> +# Expand $(foo-objs) $(foo-y) by calling $(call suffix-search,foo.o,-objs -y)
+> +suffix-search = $(foreach s,$(2),$($(1:.o=$s)))
+>  # If $(foo-objs), $(foo-y), $(foo-m), or $(foo-) exists, foo.o is a composite object
+> -multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))), $(m))))
+> -multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))), $(m))))
+> +multi-search = $(sort $(foreach m,$(1), $(if $(strip $(call suffix-search,$(m),$(2) -)), $(m))))
+> +multi-used-y := $(call multi-search,$(obj-y),-objs -y)
+> +multi-used-m := $(call multi-search,$(obj-m),-objs -y -m)
+>  multi-used   := $(multi-used-y) $(multi-used-m)
+>
+>  # Replace multi-part objects by their individual parts,
+>  # including built-in.a from subdirectories
+> -real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+> -real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
+> +real-search = $(foreach m,$(1), $(if $(strip $(call suffix-search,$(m),$(2) -)),$(call suffix-search,$(m),$(2)),$(m)))
+> +real-obj-y := $(call real-search, $(obj-y),-objs -y)
+> +real-obj-m := $(call real-search, $(obj-m),-objs -y -m)
+>
+>  always-y += $(always-m)
+>
+> --
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project
+>
+
+
+--
+Best Regards
+Masahiro Yamada
