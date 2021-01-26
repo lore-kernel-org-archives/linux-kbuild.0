@@ -2,180 +2,171 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36837C433E6
-	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 18:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 993A5C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 19:17:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E2CA22240
-	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 18:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B37720724
+	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jan 2021 19:17:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390536AbhAZRV6 (ORCPT
+        id S2388476AbhAZFwM (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:21:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37410 "EHLO
+        Tue, 26 Jan 2021 00:52:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389555AbhAZHV6 (ORCPT
+        with ESMTP id S1726496AbhAZDqc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jan 2021 02:21:58 -0500
-X-Greylist: delayed 73382 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Jan 2021 23:21:12 PST
-Received: from antares.kleine-koenig.org (antares.kleine-koenig.org [IPv6:2a01:4f8:c0c:3a97::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F52C061573;
-        Mon, 25 Jan 2021 23:21:12 -0800 (PST)
-Received: from antares.kleine-koenig.org (localhost [127.0.0.1])
-        by antares.kleine-koenig.org (Postfix) with ESMTP id 46AFDADE69D;
-        Tue, 26 Jan 2021 08:21:09 +0100 (CET)
-Received: from antares.kleine-koenig.org ([94.130.110.236])
-        by antares.kleine-koenig.org (antares.kleine-koenig.org [94.130.110.236]) (amavisd-new, port 10024)
-        with ESMTP id V7DnAz6ZVq0I; Tue, 26 Jan 2021 08:21:07 +0100 (CET)
-Received: from taurus.defre.kleine-koenig.org (unknown [IPv6:2a02:8071:b5ad:20fc:e287:a8e4:9290:29e6])
-        by antares.kleine-koenig.org (Postfix) with ESMTPSA;
-        Tue, 26 Jan 2021 08:21:07 +0100 (CET)
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        cyril@debamax.com, Arnd Bergmann <arnd@arndb.de>,
-        Maxime Ripard <mripard@kernel.org>,
-        DTML <devicetree@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Rob Herring <robh@kernel.org>
-References: <20210125105757.661240-1-uwe@kleine-koenig.org>
- <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
-From:   =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>
-Subject: Re: [PATCH] cmd_dtc: Enable generation of device tree symbols
-Message-ID: <9d9bb0f6-d4f4-b1b9-a4c4-786987578085@kleine-koenig.org>
-Date:   Tue, 26 Jan 2021 08:20:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Mon, 25 Jan 2021 22:46:32 -0500
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08FC0C061574;
+        Mon, 25 Jan 2021 19:45:52 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id u20so6178887qku.7;
+        Mon, 25 Jan 2021 19:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=u+F7qjMVkKy+Z/mTlAsnRGcIPEVHPoI7X+UjyEAMBy8=;
+        b=JkpNujUg4hjRouN6pl6/AQ1uia3Vl5jlYv7qjTJCaxmNC9JbjSh/5DfSswulPM+9mr
+         LtjbiD9w28zln3dTymX9YTMTLyT8kxjekiOQvSo28/UPU8QRbcyidxy5aYDmGRPmGgJg
+         Ead0Y23ohH/R1ytYNB14fmANrS8Cy5afHQLI2ucCEqnJliOF506TLfxpFDaqgvN6Wtur
+         XdU8+cMc4dTZ5l0WJjG7Hy/FBdPGlttzwjkjcCVDsw0Kbw/gqVaBlDOmJjlYN4bn6nkR
+         HZgv4zFBe+P25L/pigy0gfd0THKJLA/T7VlN4H9EkmHXH1fck6UwqjgqRm9leHOoqRLw
+         orkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=u+F7qjMVkKy+Z/mTlAsnRGcIPEVHPoI7X+UjyEAMBy8=;
+        b=W8391kYz1/V8JhbfgJfX2Ul7ndbF9ET4usrbXPw7KyilbHC8MyE6epNRYYDkGq9yZY
+         TywxOOdoAm/MYoR+cWWpJrC42NJLIpWiycC0MQQGOPVAnG+62DlsJCWDZxGpLTodO+I4
+         WNZyJZ6aG+hJByhxs12dmbKBNmJwVTQ4/orGkNDP85OeSFOU9I/EB6rOXgkOluUelnS4
+         kRUUygarjb/pp0W0q3Liq2TIBBTGsJRc9hlnq3FX4MrCu3iZNK3MGu3QeLjJ23rnd2aj
+         akjp3xJz6aNnJtyG8GzOJjWZgOF2jDtoy3mOzDTSWu12WVOmOy1J9hZMLCE/YgLS9KyO
+         6xeg==
+X-Gm-Message-State: AOAM531dJpXLhr723piQYz8ZkPt60uIknjfBKR/mbfDLrYYPVWChYRNT
+        j/2j/6FYYmpaYsEqqfyomPyiCcbQwBsdyg==
+X-Google-Smtp-Source: ABdhPJwpIYYsN7+FoSV73wY12VTrXEJKc5inFk/jjpyOi9VF8PwYt8XqOaFPYaIPFFftclhKxgsBEQ==
+X-Received: by 2002:a37:9ad0:: with SMTP id c199mr4087192qke.112.1611632751332;
+        Mon, 25 Jan 2021 19:45:51 -0800 (PST)
+Received: from [192.168.1.49] (c-67-187-90-124.hsd1.tn.comcast.net. [67.187.90.124])
+        by smtp.gmail.com with ESMTPSA id j66sm13470125qkf.78.2021.01.25.19.45.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jan 2021 19:45:51 -0800 (PST)
+Subject: Re: [PATCH V6 0/6] dt: build overlays
+To:     Viresh Kumar <viresh.kumar@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-kernel@vger.kernel.org, anmar.oueja@linaro.org,
+        Bill Mills <bill.mills@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <cover.1611312122.git.viresh.kumar@linaro.org>
+From:   Frank Rowand <frowand.list@gmail.com>
+Message-ID: <2d31e19c-7a4e-e848-aacc-8bbaa0916b0a@gmail.com>
+Date:   Mon, 25 Jan 2021 21:45:49 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Md9uBspQZ8si26wbTEXGrXNDQsO6WS1FX"
+In-Reply-To: <cover.1611312122.git.viresh.kumar@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Md9uBspQZ8si26wbTEXGrXNDQsO6WS1FX
-Content-Type: multipart/mixed; boundary="bIO7wac1lK89xpNlKc4oBcYpFRZsCPvJE";
- protected-headers="v1"
-From: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, cyril@debamax.com,
- Arnd Bergmann <arnd@arndb.de>, Maxime Ripard <mripard@kernel.org>,
- DTML <devicetree@vger.kernel.org>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Rob Herring <robh@kernel.org>
-Message-ID: <9d9bb0f6-d4f4-b1b9-a4c4-786987578085@kleine-koenig.org>
-Subject: Re: [PATCH] cmd_dtc: Enable generation of device tree symbols
-References: <20210125105757.661240-1-uwe@kleine-koenig.org>
- <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
-In-Reply-To: <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
+On 1/22/21 4:50 AM, Viresh Kumar wrote:
+> Hi Frank/Rob,
+> 
+> This patchset makes necessary changes to the kernel to add support for
+> building overlays (%.dtbo) and the required fdtoverlay tool. This also
+> builds static_test.dtb using most of the existing overlay tests present
+> in drivers/of/unittest-data/ for better test coverage.
+> 
+> Note that in order for anyone to test this stuff, you need to manually
+> run the ./update-dtc-source.sh script once to fetch the necessary
+> changes from the external DTC project (i.e. fdtoverlay.c and this[1]
+> patch).
+> 
 
---bIO7wac1lK89xpNlKc4oBcYpFRZsCPvJE
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> Also note that Frank has already shared his concerns towards the error
+> reporting done by fdtoverlay tool [2], and David said it is not that
+> straight forward to make such changes in fdtoverlay. I have still
+> included the patch in this series for completeness.
 
-Hello Masahiro,
+I started to reply to this email with questions for David about how to
+improve the fdtoverlay error reporting.  But then decided that instead
+of trying to paraphrase the comments in v4 of this patch series, it
+would be more efficient to ask in the v4 thread.  So my questions are
+over there...
 
-On 1/25/21 10:53 PM, Masahiro Yamada wrote:
-> On Mon, Jan 25, 2021 at 8:07 PM Uwe Kleine-K=C3=B6nig <uwe@kleine-koeni=
-g.org> wrote:
->>
->> Adding the -@ switch to dtc results in the binary devicetrees containi=
-ng
->> a list of symbolic references and their paths. This is necessary to
->> apply device tree overlays e.g. on Raspberry Pi as described on
->> https://www.raspberrypi.org/documentation/configuration/device-tree.md=
-=2E
->>
->> Obviously the downside of this change is an increas of the size of the=
+-Frank
 
->> generated dtbs, for an arm out-of-tree build (multi_v7_defconfig):
->>
->>          $ du -s arch/arm/boot/dts*
->>          101380  arch/arm/boot/dts-pre
->>          114308  arch/arm/boot/dts-post
->>
->> so this is in average an increase of 12.8% in size.
->>
->> Signed-off-by: Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org>
->=20
->=20
-> (CCing DT ML.)
+> 
+> FWIW, with fdtoverlay we generate a new build warning now, not sure why
+> though:
+> 
+> drivers/of/unittest-data/tests-interrupts.dtsi:20.5-28: Warning (interrupts_property): /testcase-data/testcase-device2:#interrupt-cells: size is (4), expected multiple of 8
+> 
+> V6:
+> - Create separate rules for dtbo-s and separate entries in .gitignore in
+>   4/6 (Masahiro).
+> - A new file layout for handling all overlays for existing and new tests
+>   5/6 (Frank).
+> - Include overlay.dts as well now in 6/6 (Frank).
+> 
+> V5:
+> 
+> - Don't reuse DTC_SOURCE for fdtoverlay.c in patch 1/5 (Frank).
+> 
+> - Update .gitignore and scripts/Makefile.dtbinst, drop dtbo-y syntax and
+>   DTC_FLAGS += -@ in patch 4/5 (Masahiro).
+> 
+> - Remove the intermediate dtb, rename output to static_test.dtb, don't
+>   use overlay.dtb and overlay_base.dtb for static builds, improved
+>   layout/comments in Makefile for patch 5/5 (Frank).
+> 
+> --
+> Viresh
+> 
+> [1] https://github.com/dgibson/dtc/commit/163f0469bf2ed8b2fe5aa15bc796b93c70243ddc
+> [2] https://lore.kernel.org/lkml/74f8aa8f-ffab-3b0f-186f-31fb7395ebbb@gmail.com/
+> 
+> Viresh Kumar (6):
+>   scripts: dtc: Fetch fdtoverlay.c from external DTC project
+>   scripts: dtc: Build fdtoverlay tool
+>   scripts: dtc: Remove the unused fdtdump.c file
+>   kbuild: Add support to build overlays (%.dtbo)
+>   of: unittest: Create overlay_common.dtsi and testcases_common.dtsi
+>   of: unittest: Statically apply overlays using fdtoverlay
+> 
+>  .gitignore                                    |   1 +
+>  Makefile                                      |   5 +-
+>  drivers/of/unittest-data/Makefile             |  51 ++++++
+>  drivers/of/unittest-data/overlay_base.dts     |  90 +---------
+>  drivers/of/unittest-data/overlay_common.dtsi  |  91 ++++++++++
+>  drivers/of/unittest-data/static_base.dts      |   5 +
+>  drivers/of/unittest-data/testcases.dts        |  17 +-
+>  .../of/unittest-data/testcases_common.dtsi    |  18 ++
+>  scripts/Makefile.dtbinst                      |   3 +
+>  scripts/Makefile.lib                          |   5 +
+>  scripts/dtc/Makefile                          |   6 +-
+>  scripts/dtc/fdtdump.c                         | 163 ------------------
+>  scripts/dtc/update-dtc-source.sh              |   3 +-
+>  13 files changed, 187 insertions(+), 271 deletions(-)
+>  create mode 100644 drivers/of/unittest-data/overlay_common.dtsi
+>  create mode 100644 drivers/of/unittest-data/static_base.dts
+>  create mode 100644 drivers/of/unittest-data/testcases_common.dtsi
+>  delete mode 100644 scripts/dtc/fdtdump.c
+> 
 
-makes sense, thanks.
-
-> https://www.spinics.net/lists/linux-kbuild/msg27904.html
->=20
-> See Rob's comment:
->=20
-> "We've already rejected doing that. Turning on '-@' can grow the dtb
-> size by a significant amount which could be problematic for some
-> boards."
-
-The patch was created after some conversation on irc which continued
-after I sent the patch. I added the participating parties to Cc:.
-
-The (relevant) followups were:
-
-Geert suggested to always generate the symbols and provide a way to
-strip the symbols for installation if and when they are not needed.
-
-Rob said: "I'm less concerned with the size increases, but rather that
-labels go from purely source syntax to an ABI. I'd rather see some
-decision as to which labels are enabled or not."
-
-And then I learned with hints from Rob and Geert that symbols are not
-really necessary for overlays, you just cannot use named labels. But
-using
-
-	target-path =3D "/soc/i2c@23473245";
-
-or
-
-	target =3D <&{/soc/i2c@23473245}>;
-
-instead of
-
-	target =3D <&i2c1>;
-
-works fine. (And if you need to add a phandle the &{/path/to/node}
-construct should work, too (but I didn't test).) Using labels is a tad=20
-nicer, but the problem I wanted to address with my patch now has a known =
-
-different solution.
-
-Best regards
-Uwe
-
-
---bIO7wac1lK89xpNlKc4oBcYpFRZsCPvJE--
-
---Md9uBspQZ8si26wbTEXGrXNDQsO6WS1FX
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmAPwtwACgkQwfwUeK3K
-7AlKXwgAm+kcs8YKGPW7BkNgCAJ44hDVJaUMseUumkbzSu+J7mJb/cEZ0bG87K+J
-SzhQcJQ2LoASq0ZMg6dTn2PyqBDv63nnKmHiFVa+3z9J9EWPK+ZvZSyvoX0PLjiO
-/IoBG+Vaei0hav2poeDjBdSWybhP567KYiYPkrmlbUyt9Aq6fgaEqgOGnnaZbxII
-YOJ51Aec1JjAzlb8uD9dOYPmNKAFqlfONfBcr9abIACfc6FEKQytp/yvn6UvkHrL
-tdP1lubPpzJXFJp8Md4yCPRRUbTpB8b7qvLXIge0YVUeU641roNdDnX9TY818ffA
-qXrWfwyBKeMboKt30RTEfkHmEmIDew==
-=nA4F
------END PGP SIGNATURE-----
-
---Md9uBspQZ8si26wbTEXGrXNDQsO6WS1FX--
