@@ -2,177 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D91C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF352C4332B
 	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 220A12064B
+	by mail.kernel.org (Postfix) with ESMTP id 7B69620731
 	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S314205AbhAZXAk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jan 2021 18:00:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
+        id S233322AbhA0K0G (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 27 Jan 2021 05:26:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394697AbhAZS05 (ORCPT
+        with ESMTP id S314204AbhAZXAk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jan 2021 13:26:57 -0500
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C71DC06174A;
-        Tue, 26 Jan 2021 10:26:17 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id n15so12238245qkh.8;
-        Tue, 26 Jan 2021 10:26:17 -0800 (PST)
+        Tue, 26 Jan 2021 18:00:40 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EB7C061788
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 14:59:59 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id o16so236098pgg.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2021 14:59:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XqI5CT/DnJOGMvQUgx1q4HMcG5oJyLGiChqHaW7eiXs=;
-        b=dbGfmcirlMr7XQ8UCxSwOoJJMLi0Rzh/bjCY+R5ltIEbPKK+t+Ke5/x8JOiE3AsPE9
-         63nzAWtjztLpnRaT+hf8blfrqdlsnztgZgzAF3sS4ig/ihLsnFWfHgLVMKaDIi1JaKtb
-         jj20eXCopZtvQjniZK1HeGGflqz9Veqt28YsOkp0PiWAF6yTnMZZZbiVIFEHGf1xYjU2
-         zUIgcqRXfuXoSLf5g2c8IXA3EUXgmbirXtB0AtA2GPAzDRGof7WQLIRafkAXsTTkKrZW
-         qJgQaGGlFq7yIO4+kofGS3Pfd1ta6eTXMuEYuy9jRWt9/ZoUJCIeirvFEcScmwh96Z/h
-         AkuQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v4vLMnE79I5H4BnynTTOoA+/hZLJz2auYrPML1aX3qo=;
+        b=Y8/ezfvkoAt+Zv1miXw4RTWhl+j87Mf7SfwiJlLpIBYP3EkeDaGdtkiq+c1+uOIImD
+         sIpkEj2JvabE8/tJMIdj2Bs/sfcNrSumUuIQdHpvJeTZXf7G4xKB3GFUdKeBQ/dn3evm
+         S9F3TMkc+7WC25HJeiKQJDMssxuJZ53Jpn9cQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XqI5CT/DnJOGMvQUgx1q4HMcG5oJyLGiChqHaW7eiXs=;
-        b=gvTW+Fubmw0z6BT2o6VfY/m3rxyh0K8NM+CXyYuNYiLYRHOhTOzl+neYyAl2UhXYPK
-         BoRhf/oBTSsVwbRPpyxXD+P8fyey/PxJ+CRNHCd+TWRlELPiDOGn5KOJmPskIz2bFoXD
-         0UCOWMSDv1hLbywdsijiXkCzQxKHTiCGaGOm2l8OM+zQQ3EtP4El2lPSTxRK8oJV8QyT
-         i6va6cskQ6jnnPAQOtNmvoRE77vA6QhYIPDmOA78sCKFZnrwAFlgFnPI1a1flNNUOqiz
-         NZh+Jcrc/7IzEatVhnR8BTH5ztY4bo5+QTuxOligTpcKbEYuP8kY4pjF7AH9+EYP4gNP
-         hIlw==
-X-Gm-Message-State: AOAM5332YgVC1cSO1OX7rJ3Oj1vKlzOvOCkICbd7NznSr2dkfzSj7uGF
-        /EHcYP3T4kQdur9As+go6P8=
-X-Google-Smtp-Source: ABdhPJwLdWihoqdNvgl99J+/q85Po4ByMYuL+PNmJr3LhfXQ6Ok+pE9gTWXnRznU0BaxdQDeZ/IF8g==
-X-Received: by 2002:a37:4815:: with SMTP id v21mr6997141qka.130.1611685576324;
-        Tue, 26 Jan 2021 10:26:16 -0800 (PST)
-Received: from [192.168.1.49] (c-67-187-90-124.hsd1.ky.comcast.net. [67.187.90.124])
-        by smtp.gmail.com with ESMTPSA id r17sm13537371qta.78.2021.01.26.10.26.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 10:26:15 -0800 (PST)
-Subject: Re: [PATCH] cmd_dtc: Enable generation of device tree symbols
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=v4vLMnE79I5H4BnynTTOoA+/hZLJz2auYrPML1aX3qo=;
+        b=UtIl6GV4GZrb37Y3f+5HIoVwG3gYrcchLUfThXA64IrJVtp7LNsnZYbTKdl+bWaKiC
+         dza1ow4XNGLXMMejAtwfmMPiUMtckyxu8vBhweRt8BE75U6O/0+qZ/ZcSVhIZMTQWGPO
+         0GeDYi5lbEoZZvANTXfHWkQrrLv2+4iEObRKyjr/GUBiAHhbuKu5B5nbYlS1LbPijoz4
+         KlfpXAcGtoVQcBUTrOQ4SopzfFfvtuHpxrveMP+ocX8geYu4tlT2kgxszB4sqpkdFwOF
+         m+yfttMUzqI0ko8jiWXQOqQ73eOQ35bgsNnLpPPTFBQnElr0zBTIp8oSs02Auu6VCe+d
+         CH5A==
+X-Gm-Message-State: AOAM531N2MxKaQbBpYjzFsqp1+6cWpzGilcqUs5MPeXX0zTSR9OjvK0t
+        gi/PPc76UFsVNwayxtcNojCTQA==
+X-Google-Smtp-Source: ABdhPJzptUM+GfHxvz2Hj8TNGijHu7CJwFy+CWJ6D4Qp/44KIYDHOsDBy1RsJyotEUll8V8ms7LqCg==
+X-Received: by 2002:aa7:9a48:0:b029:1b7:bb17:38c9 with SMTP id x8-20020aa79a480000b02901b7bb1738c9mr7461264pfj.51.1611701999000;
+        Tue, 26 Jan 2021 14:59:59 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id w20sm61139pga.90.2021.01.26.14.59.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 14:59:58 -0800 (PST)
+Date:   Tue, 26 Jan 2021 14:59:57 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Josh Poimboeuf <jpoimboe@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Frank Rowand <frowand.list@gmail.com>
-Cc:     DTML <devicetree@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Maxime Ripard <mripard@kernel.org>, cyril@debamax.com,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-References: <20210125105757.661240-1-uwe@kleine-koenig.org>
- <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
- <9d9bb0f6-d4f4-b1b9-a4c4-786987578085@kleine-koenig.org>
- <5e552b57-4e8b-6774-577d-4fa7a8d440ba@gmail.com>
-From:   Frank Rowand <frowand.list@gmail.com>
-Message-ID: <98217e0b-e937-f5b3-fa16-57c79b6ae3f6@gmail.com>
-Date:   Tue, 26 Jan 2021 12:26:14 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Justin Forbes <jforbes@redhat.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>
+Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
+ modules
+Message-ID: <202101261459.C90E9F97D@keescook>
+References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
+ <202101251401.F18409FDD1@keescook>
+ <20210125221953.wng3gk3qc32eahil@treble>
+ <202101260955.F83D191B@keescook>
+ <20210126184316.hpcy6gqp5vsq6ckq@treble>
 MIME-Version: 1.0
-In-Reply-To: <5e552b57-4e8b-6774-577d-4fa7a8d440ba@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210126184316.hpcy6gqp5vsq6ckq@treble>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Uwe,
-
-On 1/26/21 12:03 PM, Frank Rowand wrote:
-> +frank
+On Tue, Jan 26, 2021 at 12:43:16PM -0600, Josh Poimboeuf wrote:
+> On Tue, Jan 26, 2021 at 09:56:10AM -0800, Kees Cook wrote:
+> > On Mon, Jan 25, 2021 at 04:19:53PM -0600, Josh Poimboeuf wrote:
+> > > On Mon, Jan 25, 2021 at 02:03:07PM -0800, Kees Cook wrote:
+> > > > On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
+> > > > > When a GCC version mismatch is detected, print a warning and disable the
+> > > > > plugin.  The only exception is the RANDSTRUCT plugin which needs all
+> > > > > code to see the same struct layouts.  In that case print an error.
+> > > > 
+> > > > I prefer this patch as-is: only randstruct needs a hard failure. The
+> > > > others likely work (in fact, randstruct likely works too).
+> > > 
+> > > I'm curious about this last statement, why would randstruct likely work?
+> > > 
+> > > Even struct module has '__randomize_layout', wouldn't basic module init
+> > > go splat?
+> > 
+> > No; the seed is part of the generate includes -- you'll get the same
+> > layout with the same seed.
 > 
-> On 1/26/21 1:20 AM, Uwe Kleine-König wrote:
->> Hello Masahiro,
->>
->> On 1/25/21 10:53 PM, Masahiro Yamada wrote:
->>> On Mon, Jan 25, 2021 at 8:07 PM Uwe Kleine-König <uwe@kleine-koenig.org> wrote:
->>>>
->>>> Adding the -@ switch to dtc results in the binary devicetrees containing
->>>> a list of symbolic references and their paths. This is necessary to
->>>> apply device tree overlays e.g. on Raspberry Pi as described on
->>>> https://www.raspberrypi.org/documentation/configuration/device-tree.md.
->>>>
->>>> Obviously the downside of this change is an increas of the size of the
->>>> generated dtbs, for an arm out-of-tree build (multi_v7_defconfig):
->>>>
->>>>          $ du -s arch/arm/boot/dts*
->>>>          101380  arch/arm/boot/dts-pre
->>>>          114308  arch/arm/boot/dts-post
->>>>
->>>> so this is in average an increase of 12.8% in size.
->>>>
->>>> Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
->>>
->>>
->>> (CCing DT ML.)
->>
->> makes sense, thanks.
->>
->>> https://www.spinics.net/lists/linux-kbuild/msg27904.html
->>>
->>> See Rob's comment:
->>>
->>> "We've already rejected doing that. Turning on '-@' can grow the dtb
->>> size by a significant amount which could be problematic for some
->>> boards."
->>
->> The patch was created after some conversation on irc which continued
->> after I sent the patch. I added the participating parties to Cc:.
+> Right, but don't you need the plugin enabled to make use of that seed,
+> so the structs get interpreted properly by the module?  Or am I
+> completely misunderstanding how this plugin works?
 
-Unfortunately I have not been on irc recently (now rectified).  Do you
-perchance have a copy of the irc conversation that you can send me?
-(No need to edit out unrelated messages, a simple cut and paste from
-the start of the conversation to the end is fine.)
+Having the plugin enabled or not is part of the Kconfig ... you can't
+build anything if you change Kconfig. I feel like I'm missing
+something...
 
--Frank
-
->>
->> The (relevant) followups were:
->>
->> Geert suggested to always generate the symbols and provide a way to
->> strip the symbols for installation if and when they are not needed.
->>
->> Rob said: "I'm less concerned with the size increases, but rather that
->> labels go from purely source syntax to an ABI. I'd rather see some
->> decision as to which labels are enabled or not."
->>
->> And then I learned with hints from Rob and Geert that symbols are not
->> really necessary for overlays, you just cannot use named labels. But
->> using
->>
->>     target-path = "/soc/i2c@23473245";
->>
->> or
->>
->>     target = <&{/soc/i2c@23473245}>;
->>
->> instead of
->>
->>     target = <&i2c1>;
->>
->> works fine. (And if you need to add a phandle the &{/path/to/node}
->> construct should work, too (but I didn't test).) Using labels is a tad nicer, but the problem I wanted to address with my patch now has a known different solution.
->>
->> Best regards
->> Uwe
->>
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->>
-> 
-
+-- 
+Kees Cook
