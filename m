@@ -2,124 +2,164 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F04C433DB
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 653F6C433E0
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D707A2067C
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E9D4206F4
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S314193AbhAZXAg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jan 2021 18:00:36 -0500
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:38633 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392482AbhAZSE2 (ORCPT
+        id S314191AbhAZXAe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 26 Jan 2021 18:00:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392481AbhAZSEA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jan 2021 13:04:28 -0500
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 10QI314b020894;
-        Wed, 27 Jan 2021 03:03:02 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 10QI314b020894
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1611684182;
-        bh=kWOccqxKJoFYPnJsQ+y0BCvq3KmzNRThKQzTaXhv0S8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=N7TcHLcnqdF/FFV1Wy+s+viyBMtrA6US56U/UtYazUnTYqU39VnCpTmA3AMq8I6qh
-         Yxzq5E45SKbeLvAjdvbZXkEoaSs6HnpW12otvGY7JDxdwBTA6tC7kLwCmhBvItc/K6
-         s+2JlSHUg8pF15Uvpkj6KPm7GHd4Jnii/mPGV0gysoR3HGbC/CWD1f0nWbODVNb+7f
-         yZQly0ZOhpqX+r3KLAu6HhIb5GZW2ZPEgnp2JG1J7bUKfQxvJQI/f9YaDLsJr5rwdL
-         6KufYEBlN1he17eOVTBS+t6F+Tb9kyuUW9qStXlhS8mwwuCvYRyQY0xMySu4dom2Xt
-         EFB+W6S9BlB5A==
-X-Nifty-SrcIP: [209.85.215.177]
-Received: by mail-pg1-f177.google.com with SMTP id o16so2317059pgg.5;
-        Tue, 26 Jan 2021 10:03:02 -0800 (PST)
-X-Gm-Message-State: AOAM5335+Lei3tGibMPWexIKZzcYioLoSAtBRWn7X3y1YYU7NseuYUWo
-        8byl5bWIyxzp7Wheq7oWx3HpIeKXedJsOivPtPA=
-X-Google-Smtp-Source: ABdhPJx+H/cXgj5zI7oWkcqkTZSzrMbWyb/BlnvQyP4tIvkh5dGbenAkbeJD4xYcpMHWSPyDiZNSRGiDCJ8advtWTH0=
-X-Received: by 2002:a63:ff09:: with SMTP id k9mr6846869pgi.175.1611684181350;
- Tue, 26 Jan 2021 10:03:01 -0800 (PST)
-MIME-Version: 1.0
-References: <1611343638-28206-1-git-send-email-eberman@codeaurora.org> <1611343638-28206-2-git-send-email-eberman@codeaurora.org>
-In-Reply-To: <1611343638-28206-2-git-send-email-eberman@codeaurora.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 27 Jan 2021 03:02:24 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASJww-7Tboj4w7sJ-ERXz9J7rUswACVQpYuZjOtsDV8Lw@mail.gmail.com>
-Message-ID: <CAK7LNASJww-7Tboj4w7sJ-ERXz9J7rUswACVQpYuZjOtsDV8Lw@mail.gmail.com>
-Subject: Re: [RFC 1/2] Kbuild: Make composite object searching more generic
-To:     Elliot Berman <eberman@codeaurora.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tue, 26 Jan 2021 13:04:00 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B6AC061573;
+        Tue, 26 Jan 2021 10:03:17 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id z22so12876624qto.7;
+        Tue, 26 Jan 2021 10:03:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HtLia3tqHgEA0fRcdYJwmH1U27RukYWW2gTi/zikuJ8=;
+        b=Vzsj/7J9KgidbhduxBCJF0BaKx0+VqkhE7gIWstP4odzRZTtBuyZidDGwwEykIKqSp
+         JR7PLPwLd25jzgJqdeZgZkR5AZ9+/BcRr1cpNaqOMIPol02NTFzPyVN8GX8N2S1l+AXw
+         8zWiPXPbGnJnIw2vqLZBPvzj7YPl1BFmPAOfxTlQ+4tFbUUr5p3yJT9eHgDnwUJMropL
+         iCmuWsvfLtclGiZP23oWA7FPSAo2WJfWdMZxBCQHGe96nNFDQ5W8vc3ezPCaOVKa8qfQ
+         7fGi9wd9P6slTOTfLKEbpAqunoyQ6VqtKU6/Gux1in45U9qhs8rAi/ceMg9cbisI+Nc8
+         cVUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HtLia3tqHgEA0fRcdYJwmH1U27RukYWW2gTi/zikuJ8=;
+        b=KG+IVdcqN8SjswdKklELWIFBBV2iY5P4avmwVgVQJwFK8igu06QQhRn6EhJGqpY/b1
+         JGzuwdAQI6HmUSCmpj1Le9O5GVs0EktsycviyLZLZjrqcBl7xaQFNew+XBlz+8+oVZL3
+         R8RKHrktIJxOooE/zTfARks1JnAuIPlCMBV0lafbxPS40tYnp89+IfzHEgDCay5MnSxe
+         0rL0OxxGWEOooN9XanHYzg2urPQt0RD6yPpMBAS4Ol1dF1Jxb3WoG+hCUJJc7bNxA4Y+
+         ARwXeZqx95OwJH8jfwa9SzpLNvsoLibyc37XPMGBXoiyEKB2XnwnbxgRZlGvzZEKyTlY
+         2xPw==
+X-Gm-Message-State: AOAM530hKS6rAQ6Z4Ihvb+TenUs4VDnUYG44/1c8VjobxFcL7mSKoQpi
+        YqYT1ofu6mfVofDJVp9IuDs=
+X-Google-Smtp-Source: ABdhPJyMtMMMqrLeE5xLSnj9c88fGXDMBwgQdtWPVEpqvVgIpvL/YbNgfRhVRuw0zkTsfe3cF1Lqyg==
+X-Received: by 2002:ac8:59cb:: with SMTP id f11mr6261381qtf.70.1611684196510;
+        Tue, 26 Jan 2021 10:03:16 -0800 (PST)
+Received: from [192.168.1.49] (c-67-187-90-124.hsd1.ky.comcast.net. [67.187.90.124])
+        by smtp.gmail.com with ESMTPSA id y67sm14700409qka.68.2021.01.26.10.03.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 10:03:16 -0800 (PST)
+Subject: Re: [PATCH] cmd_dtc: Enable generation of device tree symbols
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Frank Rowand <frowand.list@gmail.com>
+Cc:     DTML <devicetree@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Arnd Bergmann <arnd@arndb.de>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Trilok Soni <tsoni@codeaurora.org>,
-        Mahesh Kumar Kalikot Veetil <mkalikot@codeaurora.org>,
-        Jeff Johnson <jjohnson@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
+        Maxime Ripard <mripard@kernel.org>, cyril@debamax.com,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+References: <20210125105757.661240-1-uwe@kleine-koenig.org>
+ <CAK7LNAS5t1wew0MMFjdB5HGCAMerhU7pAGiFhcTtCRUAAjGLpw@mail.gmail.com>
+ <9d9bb0f6-d4f4-b1b9-a4c4-786987578085@kleine-koenig.org>
+From:   Frank Rowand <frowand.list@gmail.com>
+Message-ID: <5e552b57-4e8b-6774-577d-4fa7a8d440ba@gmail.com>
+Date:   Tue, 26 Jan 2021 12:03:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <9d9bb0f6-d4f4-b1b9-a4c4-786987578085@kleine-koenig.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jan 23, 2021 at 4:27 AM Elliot Berman <eberman@codeaurora.org> wrote:
->
-> Reduce repeated logic around expanding composite objects in preparation
-> for later commit to support nested composite objects.
->
-> Signed-off-by: Elliot Berman <eberman@codeaurora.org>
++frank
 
-This patch is a nice clean-up
-regardless of your main motivation in 2/2.
+On 1/26/21 1:20 AM, Uwe Kleine-König wrote:
+> Hello Masahiro,
+> 
+> On 1/25/21 10:53 PM, Masahiro Yamada wrote:
+>> On Mon, Jan 25, 2021 at 8:07 PM Uwe Kleine-König <uwe@kleine-koenig.org> wrote:
+>>>
+>>> Adding the -@ switch to dtc results in the binary devicetrees containing
+>>> a list of symbolic references and their paths. This is necessary to
+>>> apply device tree overlays e.g. on Raspberry Pi as described on
+>>> https://www.raspberrypi.org/documentation/configuration/device-tree.md.
+>>>
+>>> Obviously the downside of this change is an increas of the size of the
+>>> generated dtbs, for an arm out-of-tree build (multi_v7_defconfig):
+>>>
+>>>          $ du -s arch/arm/boot/dts*
+>>>          101380  arch/arm/boot/dts-pre
+>>>          114308  arch/arm/boot/dts-post
+>>>
+>>> so this is in average an increase of 12.8% in size.
+>>>
+>>> Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
+>>
+>>
+>> (CCing DT ML.)
+> 
+> makes sense, thanks.
+> 
+>> https://www.spinics.net/lists/linux-kbuild/msg27904.html
+>>
+>> See Rob's comment:
+>>
+>> "We've already rejected doing that. Turning on '-@' can grow the dtb
+>> size by a significant amount which could be problematic for some
+>> boards."
+> 
+> The patch was created after some conversation on irc which continued
+> after I sent the patch. I added the participating parties to Cc:.
+> 
+> The (relevant) followups were:
+> 
+> Geert suggested to always generate the symbols and provide a way to
+> strip the symbols for installation if and when they are not needed.
+> 
+> Rob said: "I'm less concerned with the size increases, but rather that
+> labels go from purely source syntax to an ABI. I'd rather see some
+> decision as to which labels are enabled or not."
+> 
+> And then I learned with hints from Rob and Geert that symbols are not
+> really necessary for overlays, you just cannot use named labels. But
+> using
+> 
+>     target-path = "/soc/i2c@23473245";
+> 
+> or
+> 
+>     target = <&{/soc/i2c@23473245}>;
+> 
+> instead of
+> 
+>     target = <&i2c1>;
+> 
+> works fine. (And if you need to add a phandle the &{/path/to/node}
+> construct should work, too (but I didn't test).) Using labels is a tad nicer, but the problem I wanted to address with my patch now has a known different solution.
+> 
+> Best regards
+> Uwe
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
 
-
-I removed the "in preparation ..." part.
-
-Applied to linux-kbuild. Thanks.
-
-
-
-
-> ---
->  scripts/Makefile.lib | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 213677a5..93e4f10 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -56,15 +56,19 @@ else
->  obj-y          := $(filter-out %/, $(obj-y))
->  endif
->
-> +# Expand $(foo-objs) $(foo-y) by calling $(call suffix-search,foo.o,-objs -y)
-> +suffix-search = $(foreach s,$(2),$($(1:.o=$s)))
->  # If $(foo-objs), $(foo-y), $(foo-m), or $(foo-) exists, foo.o is a composite object
-> -multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))), $(m))))
-> -multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))), $(m))))
-> +multi-search = $(sort $(foreach m,$(1), $(if $(strip $(call suffix-search,$(m),$(2) -)), $(m))))
-> +multi-used-y := $(call multi-search,$(obj-y),-objs -y)
-> +multi-used-m := $(call multi-search,$(obj-m),-objs -y -m)
->  multi-used   := $(multi-used-y) $(multi-used-m)
->
->  # Replace multi-part objects by their individual parts,
->  # including built-in.a from subdirectories
-> -real-obj-y := $(foreach m, $(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
-> -real-obj-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)) $($(m:.o=-))),$($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m)),$(m)))
-> +real-search = $(foreach m,$(1), $(if $(strip $(call suffix-search,$(m),$(2) -)),$(call suffix-search,$(m),$(2)),$(m)))
-> +real-obj-y := $(call real-search, $(obj-y),-objs -y)
-> +real-obj-m := $(call real-search, $(obj-m),-objs -y -m)
->
->  always-y += $(always-m)
->
-> --
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
->
-
-
---
-Best Regards
-Masahiro Yamada
