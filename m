@@ -2,160 +2,156 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F42C433DB
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B801C433DB
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 11:59:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C10320757
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 10:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9586620771
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Jan 2021 11:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313235AbhAZW75 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:59:57 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:49989 "EHLO
-        out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726310AbhAZRIg (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:08:36 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 690C55C0150;
-        Tue, 26 Jan 2021 12:06:59 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 26 Jan 2021 12:06:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm2; bh=qwfFt3bxRXewj3Ji7WJCSpm5uW3
-        lIyqrwINNBr23TDE=; b=LY1MvYt3ENkqtV6DMKveGCYcFZVS9myFqWYKZj9iUMF
-        xvVilvSjuUcevCa0oPex8V4sXLAIxT0cT2SxzAHWfo+irTBuybkq6o0XiMlJDtbj
-        qh9kZkxgUeWc7ELSv3PJTBR1PAJpvtuA9k2k73Mhd5HxOAs0o/hvjRByjVxe9hcT
-        rccpM1I9fMhy2Dhp0takF1F2PdV6Ys19zLWckZcHPlb9NAy5gVDdnvQD4HvoBZ3P
-        5AHd6OnoCABpZoR5d5k0Vmr4cUSu7vQAKlW/AXi0/iaS0p4tfrmMS+a04lkdfdmC
-        2jOCll1khnre4DFkEIVc99HiC2fc0qs1b0lufojMOzA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=qwfFt3
-        bxRXewj3Ji7WJCSpm5uW3lIyqrwINNBr23TDE=; b=DaHDUfNO92aMLUDoEC6Pij
-        IWA9jq76jtSSd5Fb4UgczheRT6/ku/u6KISIeiLbjtZFyPQp2kl9soEv8pnPSzg7
-        bMZiU9S5Uum1C241WPT7hgGhXdba4TsZf59+emsiI1yw5CkZx2wTxdaU68aeKnny
-        Dsn56SIfQGSzi/aGlwF7dsTVrFrrb1M6UqnFjigylswwvIfcpYDWWENAEopo74CN
-        F9qgc8nCBItBh2RPkEW1w54QlNKAc+b7Vsxg+Zi923I2+XZBtd92ES81LiqPYpQY
-        Wr6inGJjukF1hsmRmQMluWzkM9AXFob1T+k2+rMxALF8EB4agFB1cML5XR8sPM5g
-        ==
-X-ME-Sender: <xms:MkwQYPe37qAJXFKwS3G_wET_QD0Xg9apJgr3YlWSr2RNYbUWySuACQ>
-    <xme:MkwQYFNalhDK2BRvi1-9nOJrxDJaxrv7Ywyay8P6BXWzB3l6hintD26A77-FmSdzw
-    3I0O0FeuQ9CBw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdeigdefhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
-    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuheejgf
-    ffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecukfhppeekfedr
-    keeirdejgedrieegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
-X-ME-Proxy: <xmx:MkwQYIhfD1tbo2j9y-JjSNT22JjZqi4xK4b9uDDipiUPywXStIivZg>
-    <xmx:MkwQYA9Jo9sNvsLe9ihhXsajhgqPcFjlBmX8-EkFa1lsPVw8KE4RUg>
-    <xmx:MkwQYLtZQdDQ7qcgrI9wuZ-j0rwZ9ExdH5wHjQiJZBfbPSsMJvIJTQ>
-    <xmx:M0wQYE8f52L-vUsl34iZvxR7ojnClQRkd6AOFB0lkdIgdDsqYnjdhQ>
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        by mail.messagingengine.com (Postfix) with ESMTPA id D434A24005C;
-        Tue, 26 Jan 2021 12:06:57 -0500 (EST)
-Date:   Tue, 26 Jan 2021 18:06:55 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     Justin Forbes <jforbes@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S236973AbhA0L61 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 27 Jan 2021 06:58:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:34026 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236685AbhA0L4A (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 27 Jan 2021 06:56:00 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1611748514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lwuc+jSkD82sotlNHJidx8xja/Bw1JYQcR061EVrMxA=;
+        b=VqvtxSgmJ5cfSryecsAWZnhhs5uilRcndo5u4Gvp2ENukoxoKJsr+mTPjc4n9b02HE5zd2
+        tNiYkZOsfUa2IE/eO+Ngsze83nqq8S0L9O25uNbLapCDnMcbQVY3lblEQhhKn8OhgSez7d
+        hI+RKBYuVTq7jTQ+3zuaVTVbMniYl0A=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6B807AD2B;
+        Wed, 27 Jan 2021 11:55:14 +0000 (UTC)
+Date:   Wed, 27 Jan 2021 12:55:13 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     Jessica Yu <jeyu@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        linux-hardening@vger.kernel.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
- modules
-Message-ID: <YBBML2eB/IXcTvcn@kroah.com>
-References: <20210125220757.vxdsf6sttpy46cq7@treble>
- <YA/PLdX5m9f4v+Yl@kroah.com>
- <CAFbkSA0m1pqmXh29j6wJ9fG05yC72T1kNC0QU3rF7Oh2NoMwYQ@mail.gmail.com>
- <YBAeYaDReAc9VscA@kroah.com>
- <20210126145155.kcfbnzfqg5qugvcl@treble>
- <YBAyGU7H8E98xKng@hirez.programming.kicks-ass.net>
- <20210126154651.itfrnhwfistia3ss@treble>
- <YBA9r13+1uuyDYuR@hirez.programming.kicks-ass.net>
- <CAFbkSA1CibJ6sp+LPLy3hpchLLH2B5__Lk31TLeVThXi5eZV7Q@mail.gmail.com>
- <20210126161934.z6sng4irl5teonvj@treble>
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 04/13] livepatch: move klp_find_object_module to module.c
+Message-ID: <YBFUoYxHjRTmKOEn@alley>
+References: <20210121074959.313333-1-hch@lst.de>
+ <20210121074959.313333-5-hch@lst.de>
+ <YBAmTAsT3S01kU1x@gunter>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210126161934.z6sng4irl5teonvj@treble>
+In-Reply-To: <YBAmTAsT3S01kU1x@gunter>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 10:19:34AM -0600, Josh Poimboeuf wrote:
-> On Tue, Jan 26, 2021 at 10:15:52AM -0600, Justin Forbes wrote:
-> > On Tue, Jan 26, 2021 at 10:05 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> > >
-> > > On Tue, Jan 26, 2021 at 09:46:51AM -0600, Josh Poimboeuf wrote:
-> > > > On Tue, Jan 26, 2021 at 04:15:37PM +0100, Peter Zijlstra wrote:
-> > > > > On Tue, Jan 26, 2021 at 08:51:55AM -0600, Josh Poimboeuf wrote:
-> > > > > > User space mixes compiler versions all the time.  The C ABI is stable.
-> > > > > >
-> > > > > > What specifically is the harder issue you're referring to?
-> > > > >
-> > > > > I don't think the C ABI captures nearly enough. Imagine trying to mix a
-> > > > > compiler with and without asm-goto support (ok, we fail to build without
-> > > > > by now, but just imagine).
-> > > > >
-> > > > > No C ABI violated, but having that GCC extention vs not having it
-> > > > > radically changes the kernel ABI.
-> > > > >
-> > > > > I think I'm with Greg here, just don't do it.
-> > > >
-> > > > Ok, thank you for an actual example.  asm goto is a good one.
-> > > >
-> > > > But it's not a cut-and-dry issue.  Otherwise how could modversions
-> > > > possibly work?
-> > > >
-> > > > So yes, we should enforce GCC versions, but I still haven't seen a
-> > > > reason it should be more than just "same compiler and *major* version".
-> > >
-> > > Why bother? rebuilding the kernel and all modules is a matter of 10
-> > > minutes at most on a decently beefy build box.
-> > >
-> > > What actual problem are we trying to solve here?
+On Tue 2021-01-26 15:25:16, Jessica Yu wrote:
+> +++ Christoph Hellwig [21/01/21 08:49 +0100]:
+> > To uncouple the livepatch code from module loader internals move a
+> > slightly refactored version of klp_find_object_module to module.c
+> > This allows to mark find_module static and removes one of the last
+> > users of module_mutex outside of module.c.
 > > 
-> > This is true for those of us used to working with source and building
-> > by hand. For users who want everything packaged, rebuilding a kernel
-> > package for install is considerably longer, and for distros providing
-> > builds for multiple arches, we are looking at a couple of hours at
-> > best.  From a Fedora standpoint, I am perfectly fine with it failing
-> > if someone tries to build a module on gcc10 when the kernel was built
-> > with gcc11.  It's tedious when the kernel was built with gcc11
-> > yesterday, and a new gcc11 build today means that kernel needs to be
-> > rebuilt.
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> > include/linux/module.h  |  3 +--
+> > kernel/livepatch/core.c | 39 +++++++++++++--------------------------
+> > kernel/module.c         | 17 ++++++++++++++++-
+> > 3 files changed, 30 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/include/linux/module.h b/include/linux/module.h
+> > index b4654f8a408134..8588482bde4116 100644
+> > --- a/include/linux/module.h
+> > +++ b/include/linux/module.h
+> > @@ -586,8 +586,7 @@ static inline bool within_module(unsigned long addr, const struct module *mod)
+> > 	return within_module_init(addr, mod) || within_module_core(addr, mod);
+> > }
+> > 
+> > -/* Search for module by name: must hold module_mutex. */
+> > -struct module *find_module(const char *name);
+> > +struct module *find_klp_module(const char *name);
+> > 
+> > /* Check if a module is loaded. */
+> > bool module_loaded(const char *name);
+> > diff --git a/kernel/livepatch/core.c b/kernel/livepatch/core.c
+> > index a7f625dc24add3..878759baadd81c 100644
+> > --- a/kernel/livepatch/core.c
+> > +++ b/kernel/livepatch/core.c
+> > @@ -49,30 +49,6 @@ static bool klp_is_module(struct klp_object *obj)
+> > 	return obj->name;
+> > }
+> > 
+> > -/* sets obj->mod if object is not vmlinux and module is found */
+> > -static void klp_find_object_module(struct klp_object *obj)
+> > -{
+> > -	struct module *mod;
+> > -
+> > -	mutex_lock(&module_mutex);
+> > -	/*
+> > -	 * We do not want to block removal of patched modules and therefore
+> > -	 * we do not take a reference here. The patches are removed by
+> > -	 * klp_module_going() instead.
+> > -	 */
+> > -	mod = find_module(obj->name);
+> > -	/*
+> > -	 * Do not mess work of klp_module_coming() and klp_module_going().
+> > -	 * Note that the patch might still be needed before klp_module_going()
+> > -	 * is called. Module functions can be called even in the GOING state
+> > -	 * until mod->exit() finishes. This is especially important for
+> > -	 * patches that modify semantic of the functions.
+> > -	 */
+> > -	if (mod && mod->klp_alive)
+> > -		obj->mod = mod;
+> > -	mutex_unlock(&module_mutex);
+> > -}
 > 
-> Right.  It's a problem for distro users.  The compiler and kernel are in
-> separate packages, with separate release cadences.  The latest compiler
-> version may not exactly match what was used to build the latest kernel.
+> Hmm, I am not a huge fan of moving more livepatch code into module.c, I
+> wonder if we can keep them separate.
+> 
+> Why not have module_is_loaded() kill two birds with one stone? That
+> is, just have it return a module pointer to signify that the module is
+> loaded, NULL if not. Then we don't need an extra find_klp_module()
+> function just to call find_module() and return a pointer, as
+> module_is_loaded() can just do that for us.
+> 
+> As for the mod->klp_alive check, I believe this function
+> (klp_find_object_module()) is called with klp_mutex held, and
+> mod->klp_alive is only modified under klp_mutex. Also, if klp_alive is
+> true, the module is at least COMING and cannot be GOING until it
+> acquires the klp_mutex again in klp_module_going(). So does that hunk
+> really need to be under module_mutex? It has been a long time since
+> I've looked at livepatch code so it would be great if someone could
+> double check.
 
-Given that distros _should_ be updating their kernel faster than the
-compiler updates, what's the real issue here?  You build a kernel, and
-all external modules, at the same time.  If you want to build them at
-different times, you make your build system ensure they were the same
-compiler so that you are "bug compatible".
+We need to make sure that the module is not freed before we manipulate
+mod->klp_alive.
 
-And yes, it might be a pain if gcc11 gets updated every other day, but
-as someone living with a "rolling-distro" you get used to it, otherwise
-you just "pin" the build tools and keep that from happening.
+One solution would be to take the reference and block it during this
+operation.
 
-This isn't a new thing, we've been doing this for decades, why is this
-surprising?
+Alternatively it might be to rely on RCU. It seems that the struct
+is protected by RCU because of kallsyms. But I am not sure if it
+is safe in all module states. But it should be. We find the module
+via the same list like kallsyms.
 
-thanks,
-
-greg k-h
+Best Regards,
+Petr
