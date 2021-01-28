@@ -4,48 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA85C433DB
-	for <linux-kbuild@archiver.kernel.org>; Thu, 28 Jan 2021 08:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F311FC433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu, 28 Jan 2021 08:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 522EA64DA1
-	for <linux-kbuild@archiver.kernel.org>; Thu, 28 Jan 2021 08:07:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6B1664D9D
+	for <linux-kbuild@archiver.kernel.org>; Thu, 28 Jan 2021 08:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231916AbhA1ICl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 28 Jan 2021 03:02:41 -0500
-Received: from mail-ot1-f51.google.com ([209.85.210.51]:45872 "EHLO
-        mail-ot1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbhA1IAJ (ORCPT
+        id S231856AbhA1ISP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 28 Jan 2021 03:18:15 -0500
+Received: from mail-oi1-f181.google.com ([209.85.167.181]:44346 "EHLO
+        mail-oi1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231511AbhA1ISB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 28 Jan 2021 03:00:09 -0500
-Received: by mail-ot1-f51.google.com with SMTP id n42so4358238ota.12;
-        Wed, 27 Jan 2021 23:59:08 -0800 (PST)
+        Thu, 28 Jan 2021 03:18:01 -0500
+Received: by mail-oi1-f181.google.com with SMTP id n7so5156687oic.11;
+        Thu, 28 Jan 2021 00:17:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=VFvlavdQj3vCTWkwoAVwJZYrgCNBuE8sgIQdKiGhY+w=;
-        b=V569t6Aun8zU7H8/nsKR/dXIhorUn/YIB/XD30A81SMdT3I+cIolhedJOzH30a+EZy
-         G+VVkNtLZwPZs/1LQUKvKnq6fJx+vc2x5mx18R2ASbBwBw1tx2ub/pMB5NNPFMjqjNX7
-         XnWxqIIbgMR5VpTDPZC3ASjpIx5LzkD2GKOlgEh+NHUvQwPxLPtdA2yAUfxIyTSGDjMd
-         KUKVD+ZtqouxMAj/yasQFRpBnPPG5F2iaxyq4qIBYni37s+nBggNf9Q5BUAC5KWcMbC6
-         ICcQzFFwKzyj/1065FUmexZPcuW3nOSNG0hh5sODdCgxvAd0D2IDZta7Q7JCBp/iTEz+
-         EckQ==
-X-Gm-Message-State: AOAM531enlXV19QvsrjOBYL6D9eIkEkaBZIbgI5JI4QvMYdtU82ON2Ai
-        i75IwbUgF52l8bcP2NOp7xaCePuDyS+6PT5fW5l+Y4LO
-X-Google-Smtp-Source: ABdhPJznIX8Ez5rT0eH2kPu8lo8LgYhmVvO6LoHIL5yF3kdkazjNHo5u99kdHiTbtJ4IH8g890LINaHfxGpj5ywaFPQ=
-X-Received: by 2002:a9d:c01:: with SMTP id 1mr10464911otr.107.1611820723093;
- Wed, 27 Jan 2021 23:58:43 -0800 (PST)
+        bh=TL3tp80ch5Ojmt15uhmuDBGqfvQ8YwjAwOvbZ3H5gho=;
+        b=tY3YuKIqmRaJkzI6nyvtPbLy7yOjbbcQeeta0rppuamco2UVGIKwuoYnzU/mS2cuCa
+         Ibamgeb2O5+vQdjjnN696vcSzs8mC7ZXmKlofm53bFYUcaL1+aOq7YvQO+PguzMUch8W
+         yvlkCIm8ATu4GO/qmCHI7dAF1AENN008sW7eJNY1mjmigcole/y8mHbOzYE8wWoLWFDg
+         coeLdrhY2B7iJaFDSxQPGjmmaRf1xGOsuRO+JkmqZG1/0V0Ee0d8bqapmcXHL6awaUYO
+         eicZlAtaA/2pKlzF/fwB6oAt1G507kOpCrW0M1r6L3raHHiTTwFHDTKGo/Z7CYJouJXo
+         PkCQ==
+X-Gm-Message-State: AOAM530ZiPFrc2eXuKfnEVWqVmWGMlkhvzMgONMyEbJTJpybRxE6DULP
+        qnDHyS/Yd+Cepqo4PYhqh8wV12Oi65jHiCdObok=
+X-Google-Smtp-Source: ABdhPJyaplo6/NZAAIS02LBbY6W1dLxYDZ/X0XB3GuIXLfaRgiB9Cco71R6713OCRdUcK2cT17+0m9PEdnGKkCz70nI=
+X-Received: by 2002:aca:1219:: with SMTP id 25mr5943005ois.54.1611821840178;
+ Thu, 28 Jan 2021 00:17:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20210128005110.2613902-1-masahiroy@kernel.org> <20210128005110.2613902-12-masahiroy@kernel.org>
-In-Reply-To: <20210128005110.2613902-12-masahiroy@kernel.org>
+References: <20210128005110.2613902-1-masahiroy@kernel.org> <20210128005110.2613902-13-masahiroy@kernel.org>
+In-Reply-To: <20210128005110.2613902-13-masahiroy@kernel.org>
 From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Thu, 28 Jan 2021 08:58:32 +0100
-Message-ID: <CAMuHMdWTK7Xa-6E2yLHxv8sGkD-VYgDF2SMRCj4_tDTVS2Uw1A@mail.gmail.com>
-Subject: Re: [PATCH 11/27] m68k: add missing FORCE and fix 'targets' to make
- if_changed work
+Date:   Thu, 28 Jan 2021 09:17:09 +0100
+Message-ID: <CAMuHMdV_AHcnGoVToHLXa95JEd4wcL3eTqYfk6=7Ou0W8VJR5w@mail.gmail.com>
+Subject: Re: [PATCH 12/27] m68k: syscalls: switch to generic syscalltbl.sh
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     Linux-Arch <linux-arch@vger.kernel.org>,
         "the arch/x86 maintainers" <x86@kernel.org>,
@@ -68,18 +67,20 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+Hi Yamada-san,
+
 On Thu, Jan 28, 2021 at 1:54 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> The rules in this Makefile cannot detect the command line change because
-> the prerequisite 'FORCE' is missing.
+> As of v5.11-rc1, 12 architectures duplicate similar shell scripts in
+> order to generate syscall table headers. My goal is to unify them into
+> the single scripts/syscalltbl.sh.
 >
-> Adding 'FORCE' will result in the headers being rebuilt every time
-> because the 'targets' addition is also wrong; the file paths in
-> 'targets' must be relative to the current Makefile.
->
-> Fix all of them so the if_changed rules work correctly.
+> This commit converts m68k to use scripts/syscalltbl.sh.
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
+Thanks a lot!
+
+Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
 Gr{oetje,eeting}s,
