@@ -2,62 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA72C433E0
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 07:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EE5C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 10:46:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1440A64ECB
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 07:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0147864F59
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 10:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbhBBHnr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 02:43:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbhBBHno (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 02:43:44 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACA1C061788;
-        Mon,  1 Feb 2021 23:42:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GTTfpsR4IK4LxzOgI1aGeZfqhLOjs1dzptijFaJWsxs=; b=WggDBW9Cl/cCdoY1Mcr4UW6N6P
-        7DGjDITwMv0LNX7VsuslAT8/mCBu65UxspByL3woDE7qbA2S72t4ytM1D2cjCDrT2qmdA5K5Wcffx
-        WOng7vGvl5Xr7V6R3jDMkZ91RU5V49yuRa9ZTBO3p2vDFVPhj41kD4yMhgxpLlanRhQ4ZaXNBGx4p
-        xskZLgu6xrwaMo3SkRx9KCX01ANIvbQEfZ4nK2TlQmkzqA/WlNDQWqaJB1lJ5d7an854tDmxIBksG
-        n6k1pOc6HglM6W+REmzTgLB0pky4cUuAuHUtlxv3jZcnFhbcKWexJbfktYT+xFndTyM2Z4I/rUS3A
-        dGi4IqUg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l6qKj-00EsJP-C0; Tue, 02 Feb 2021 07:42:45 +0000
-Date:   Tue, 2 Feb 2021 07:42:45 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Will McVicker <willmcvicker@google.com>
-Cc:     Jessica Yu <jeyu@kernel.org>,
+        id S229724AbhBBKqb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 05:46:31 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33980 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229441AbhBBKqa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Feb 2021 05:46:30 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 27FC9AE8D;
+        Tue,  2 Feb 2021 10:45:48 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 11:45:47 +0100 (CET)
+From:   Miroslav Benes <mbenes@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+cc:     Petr Mladek <pmladek@suse.com>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Jessica Yu <jeyu@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Saravana Kannan <saravanak@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        "Cc: Android Kernel" <kernel-team@android.com>
-Subject: Re: [PATCH v6] modules: introduce the MODULE_SCMVERSION config
-Message-ID: <20210202074245.GA3545218@infradead.org>
-References: <20210121213641.3477522-1-willmcvicker@google.com>
- <CABYd82Yk91u287iZvkUik+UYg2mHMpHimZzsg72cXOK6k8WpRg@mail.gmail.com>
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 05/13] kallsyms: refactor
+ {,module_}kallsyms_on_each_symbol
+In-Reply-To: <20210201162842.GB7276@lst.de>
+Message-ID: <alpine.LSU.2.21.2102021145160.570@pobox.suse.cz>
+References: <20210128181421.2279-1-hch@lst.de> <20210128181421.2279-6-hch@lst.de> <YBPYyEvesLMrRtZM@alley> <20210201114749.GB19696@lst.de> <alpine.LSU.2.21.2102011436320.21637@pobox.suse.cz> <20210201162842.GB7276@lst.de>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABYd82Yk91u287iZvkUik+UYg2mHMpHimZzsg72cXOK6k8WpRg@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Just to deposit my opposition again:  I don't think this hack for your
-out of tree builds has any place in the kernel tree.
+On Mon, 1 Feb 2021, Christoph Hellwig wrote:
+
+> On Mon, Feb 01, 2021 at 02:37:12PM +0100, Miroslav Benes wrote:
+> > > > This change is not needed. (objname == NULL) means that we are
+> > > > interested only in symbols in "vmlinux".
+> > > > 
+> > > > module_kallsyms_on_each_symbol(klp_find_callback, &args)
+> > > > will always fail when objname == NULL.
+> > > 
+> > > I just tried to keep the old behavior.  I can respin it with your
+> > > recommended change noting the change in behavior, though.
+> > 
+> > Yes, please. It would be cleaner that way.
+> 
+> Let me know if this works for you:
+> 
+> ---
+> >From 18af41e88d088cfb8680d1669fcae2bc2ede5328 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Wed, 20 Jan 2021 16:23:16 +0100
+> Subject: kallsyms: refactor {,module_}kallsyms_on_each_symbol
+> 
+> Require an explicit call to module_kallsyms_on_each_symbol to look
+> for symbols in modules instead of the call from kallsyms_on_each_symbol,
+> and acquire module_mutex inside of module_kallsyms_on_each_symbol instead
+> of leaving that up to the caller.  Note that this slightly changes the
+> behavior for the livepatch code in that the symbols from vmlinux are not
+> iterated anymore if objname is set, but that actually is the desired
+> behavior in this case.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+Acked-by: Miroslav Benes <mbenes@suse.cz>
+
+Thanks Christoph
+
+M
