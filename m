@@ -4,26 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F93EC433E0
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 14:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF485C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 14:08:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 237C864EDA
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 14:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 815B164E9E
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 14:08:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233683AbhBBOGe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 09:06:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40034 "EHLO mx2.suse.de"
+        id S233555AbhBBOGz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 09:06:55 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40512 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233567AbhBBOE3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 09:04:29 -0500
+        id S233796AbhBBOEu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Feb 2021 09:04:50 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id E1DA4AC45;
-        Tue,  2 Feb 2021 14:03:46 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 15:03:45 +0100 (CET)
+        by mx2.suse.de (Postfix) with ESMTP id 17C99AF33;
+        Tue,  2 Feb 2021 14:04:08 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 15:04:07 +0100 (CET)
 From:   Miroslav Benes <mbenes@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
 cc:     Frederic Barrat <fbarrat@linux.ibm.com>,
@@ -41,11 +41,10 @@ cc:     Frederic Barrat <fbarrat@linux.ibm.com>,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
         linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 06/13] kallsyms: only build {,module_}kallsyms_on_each_symbol
- when required
-In-Reply-To: <20210202121334.1361503-7-hch@lst.de>
-Message-ID: <alpine.LSU.2.21.2102021503250.570@pobox.suse.cz>
-References: <20210202121334.1361503-1-hch@lst.de> <20210202121334.1361503-7-hch@lst.de>
+Subject: Re: [PATCH 07/13] module: mark module_mutex static
+In-Reply-To: <20210202121334.1361503-8-hch@lst.de>
+Message-ID: <alpine.LSU.2.21.2102021503510.570@pobox.suse.cz>
+References: <20210202121334.1361503-1-hch@lst.de> <20210202121334.1361503-8-hch@lst.de>
 User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -55,9 +54,10 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 On Tue, 2 Feb 2021, Christoph Hellwig wrote:
 
-> kallsyms_on_each_symbol and module_kallsyms_on_each_symbol are only used
-> by the livepatching code, so don't build them if livepatching is not
-> enabled.
+> Except for two lockdep asserts module_mutex is only used in module.c.
+> Remove the two asserts given that the functions they are in are not
+> exported and just called from the module code, and mark module_mutex
+> static.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
