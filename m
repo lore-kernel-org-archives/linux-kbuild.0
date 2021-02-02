@@ -5,37 +5,37 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA4EC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83439C4332B
 	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 264E064F72
+	by mail.kernel.org (Postfix) with ESMTP id 46D4464F66
 	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbhBBMP0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 07:15:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55090 "EHLO
+        id S231402AbhBBMPh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 07:15:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230184AbhBBMPS (ORCPT
+        with ESMTP id S231383AbhBBMPV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 07:15:18 -0500
+        Tue, 2 Feb 2021 07:15:21 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF27C061788;
-        Tue,  2 Feb 2021 04:14:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773E4C061794;
+        Tue,  2 Feb 2021 04:14:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=Nt3OH/j8x3/E3EkxymSc5d71PS1AjT6KFPt4K6BMIsQ=; b=nZ+T+b9GD5oLErWBB4jZj+iTsh
-        tG9ykvdy/X7hETt+BBVa1DA7rIxv6b2pCYO0kJmwmbOfzqjScubyewfLqvho8w2kmdwYW0NL1Lzs4
-        848O6Y4vzqMBFvWe68kRlP/JSpbZbBmVGaOsK60ysi80LyMa8Lf0V+oUp2dZjj96bbgi9kaKUHQq3
-        oyjU/HyX7aeodA+kTGRWAsC5VxhKUFiDV85pf9uDJ2HjHS78n7be1AMIJrto68QGpW0+lyT7UjClo
-        +ENT94VOWmypwqAxsEZFDx+WA5M8psyTZb5VjJsh0D7KYreuiNDUwQ/+sI8RwHifY1WqBCdc1xqR8
-        KhL3DknA==;
+        bh=kV6jENyPBObdBfp80pilicME78x3B0Kn4CEssfZhK9g=; b=FyMMC9gPNR+itdK2RAXgU/3klT
+        h3kQS5vjSri1umFy1aSzYsWRuilNRFBJIesqBsDJDlV04p/lCGx7vy4qb7lhAlyKetdSZPVp0MjCr
+        MNoUu8/r9T9nfnlNTbloevFaXrE+MANZgIUMkQJlK0SJOjkQcaS6X0Y/N5FAPCc1asYoOsDtpEk2l
+        TK/9puImVaUfCixncpcxYh49EhyAUEnGAYJ0AHeWPADhZP0j6Mwy00PbUzioY3hBxlJOT0eDZ5i0w
+        TLfv89QwDA3LDISqTtcj8qjTOTA2FPSR4sebDZCTmHZewTTue48CKOPdhr6AWlXb37pIGFewfKkwm
+        cHEcuI9g==;
 Received: from [2001:4bb8:198:6bf4:7f38:755e:a6e0:73e9] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l6uZ1-00FALm-V6; Tue, 02 Feb 2021 12:13:48 +0000
+        id 1l6uZG-00FANE-7C; Tue, 02 Feb 2021 12:14:02 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Frederic Barrat <fbarrat@linux.ibm.com>,
         Andrew Donnellan <ajd@linux.ibm.com>,
@@ -54,9 +54,9 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
         linux-kbuild@vger.kernel.org
-Subject: [PATCH 05/13] kallsyms: refactor {,module_}kallsyms_on_each_symbol
-Date:   Tue,  2 Feb 2021 13:13:26 +0100
-Message-Id: <20210202121334.1361503-6-hch@lst.de>
+Subject: [PATCH 10/13] module: pass struct find_symbol_args to find_symbol
+Date:   Tue,  2 Feb 2021 13:13:31 +0100
+Message-Id: <20210202121334.1361503-11-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210202121334.1361503-1-hch@lst.de>
 References: <20210202121334.1361503-1-hch@lst.de>
@@ -67,103 +67,250 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Require an explicit call to module_kallsyms_on_each_symbol to look
-for symbols in modules instead of the call from kallsyms_on_each_symbol,
-and acquire module_mutex inside of module_kallsyms_on_each_symbol instead
-of leaving that up to the caller.  Note that this slightly changes the
-behavior for the livepatch code in that the symbols from vmlinux are not
-iterated anymore if objname is set, but that actually is the desired
-behavior in this case.
+Simplify the calling convention by passing the find_symbol_args structure
+to find_symbol instead of initializing it inside the function.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Miroslav Benes <mbenes@suse.cz>
 ---
- kernel/kallsyms.c       |  6 +++++-
- kernel/livepatch/core.c |  2 --
- kernel/module.c         | 13 ++++---------
- 3 files changed, 9 insertions(+), 12 deletions(-)
+ kernel/module.c | 113 ++++++++++++++++++++++--------------------------
+ 1 file changed, 52 insertions(+), 61 deletions(-)
 
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index fe9de067771c34..a0d3f0865916f9 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -177,6 +177,10 @@ unsigned long kallsyms_lookup_name(const char *name)
- 	return module_kallsyms_lookup_name(name);
- }
- 
-+/*
-+ * Iterate over all symbols in vmlinux.  For symbols from modules use
-+ * module_kallsyms_on_each_symbol instead.
-+ */
- int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
- 				      unsigned long),
- 			    void *data)
-@@ -192,7 +196,7 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
- 		if (ret != 0)
- 			return ret;
- 	}
--	return module_kallsyms_on_each_symbol(fn, data);
-+	return 0;
- }
- 
- static unsigned long get_symbol_pos(unsigned long addr,
-diff --git a/kernel/livepatch/core.c b/kernel/livepatch/core.c
-index 262cd9b003b9f0..335d988bd81117 100644
---- a/kernel/livepatch/core.c
-+++ b/kernel/livepatch/core.c
-@@ -164,12 +164,10 @@ static int klp_find_object_symbol(const char *objname, const char *name,
- 		.pos = sympos,
- 	};
- 
--	mutex_lock(&module_mutex);
- 	if (objname)
- 		module_kallsyms_on_each_symbol(klp_find_callback, &args);
- 	else
- 		kallsyms_on_each_symbol(klp_find_callback, &args);
--	mutex_unlock(&module_mutex);
- 
- 	/*
- 	 * Ensure an address was found. If sympos is 0, ensure symbol is unique;
 diff --git a/kernel/module.c b/kernel/module.c
-index 6772fb2680eb3e..25345792c770d1 100644
+index ab219a16f35068..02d1dd9bfc0a90 100644
 --- a/kernel/module.c
 +++ b/kernel/module.c
-@@ -255,11 +255,6 @@ static void mod_update_bounds(struct module *mod)
- struct list_head *kdb_modules = &modules; /* kdb needs the list of modules */
- #endif /* CONFIG_KGDB_KDB */
- 
--static void module_assert_mutex(void)
--{
--	lockdep_assert_held(&module_mutex);
--}
--
- static void module_assert_mutex_or_preempt(void)
+@@ -531,12 +531,7 @@ static bool find_exported_symbol_in_section(const struct symsearch *syms,
+  * Find an exported symbol and return it, along with, (optional) crc and
+  * (optional) module which owns it.  Needs preempt disabled or module_mutex.
+  */
+-static const struct kernel_symbol *find_symbol(const char *name,
+-					struct module **owner,
+-					const s32 **crc,
+-					enum mod_license *license,
+-					bool gplok,
+-					bool warn)
++static bool find_symbol(struct find_symbol_arg *fsa)
  {
- #ifdef CONFIG_LOCKDEP
-@@ -4379,8 +4374,7 @@ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+ 	static const struct symsearch arr[] = {
+ 		{ __start___ksymtab, __stop___ksymtab, __start___kcrctab,
+@@ -556,19 +551,14 @@ static const struct kernel_symbol *find_symbol(const char *name,
+ 		  GPL_ONLY, true },
+ #endif
+ 	};
+-	struct find_symbol_arg fsa = {
+-		.name = name,
+-		.gplok = gplok,
+-		.warn = warn,
+-	};
+ 	struct module *mod;
  	unsigned int i;
- 	int ret;
  
--	module_assert_mutex();
--
-+	mutex_lock(&module_mutex);
- 	list_for_each_entry(mod, &modules, list) {
- 		/* We hold module_mutex: no need for rcu_dereference_sched */
- 		struct mod_kallsyms *kallsyms = mod->kallsyms;
-@@ -4396,10 +4390,11 @@ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
- 			ret = fn(data, kallsyms_symbol_name(kallsyms, i),
- 				 mod, kallsyms_symbol_value(sym));
- 			if (ret != 0)
--				return ret;
-+				break;
- 		}
+ 	module_assert_mutex_or_preempt();
+ 
+ 	for (i = 0; i < ARRAY_SIZE(arr); i++)
+-		if (find_exported_symbol_in_section(&arr[i], NULL, &fsa))
+-			goto found;
++		if (find_exported_symbol_in_section(&arr[i], NULL, fsa))
++			return true;
+ 
+ 	list_for_each_entry_rcu(mod, &modules, list,
+ 				lockdep_is_held(&module_mutex)) {
+@@ -598,21 +588,12 @@ static const struct kernel_symbol *find_symbol(const char *name,
+ 			continue;
+ 
+ 		for (i = 0; i < ARRAY_SIZE(arr); i++)
+-			if (find_exported_symbol_in_section(&arr[i], mod, &fsa))
+-				goto found;
++			if (find_exported_symbol_in_section(&arr[i], mod, fsa))
++				return true;
  	}
--	return 0;
-+	mutex_unlock(&module_mutex);
-+	return ret;
- }
- #endif /* CONFIG_KALLSYMS */
  
+-	pr_debug("Failed to find symbol %s\n", name);
+-	return NULL;
+-
+-found:
+-	if (owner)
+-		*owner = fsa.owner;
+-	if (crc)
+-		*crc = fsa.crc;
+-	if (license)
+-		*license = fsa.license;
+-	return fsa.sym;
++	pr_debug("Failed to find symbol %s\n", fsa->name);
++	return false;
+ }
+ 
+ /*
+@@ -1074,12 +1055,15 @@ static inline void print_unload_info(struct seq_file *m, struct module *mod)
+ 
+ void __symbol_put(const char *symbol)
+ {
+-	struct module *owner;
++	struct find_symbol_arg fsa = {
++		.name	= symbol,
++		.gplok	= true,
++	};
+ 
+ 	preempt_disable();
+-	if (!find_symbol(symbol, &owner, NULL, NULL, true, false))
++	if (!find_symbol(&fsa))
+ 		BUG();
+-	module_put(owner);
++	module_put(fsa.owner);
+ 	preempt_enable();
+ }
+ EXPORT_SYMBOL(__symbol_put);
+@@ -1348,19 +1332,22 @@ static int check_version(const struct load_info *info,
+ static inline int check_modstruct_version(const struct load_info *info,
+ 					  struct module *mod)
+ {
+-	const s32 *crc;
++	struct find_symbol_arg fsa = {
++		.name	= "module_layout",
++		.gplok	= true,
++	};
+ 
+ 	/*
+ 	 * Since this should be found in kernel (which can't be removed), no
+ 	 * locking is necessary -- use preempt_disable() to placate lockdep.
+ 	 */
+ 	preempt_disable();
+-	if (!find_symbol("module_layout", NULL, &crc, NULL, true, false)) {
++	if (!find_symbol(&fsa)) {
+ 		preempt_enable();
+ 		BUG();
+ 	}
+ 	preempt_enable();
+-	return check_version(info, "module_layout", mod, crc);
++	return check_version(info, "module_layout", mod, fsa.crc);
+ }
+ 
+ /* First part is kernel version, which we ignore if module has crcs. */
+@@ -1454,10 +1441,11 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
+ 						  const char *name,
+ 						  char ownername[])
+ {
+-	struct module *owner;
+-	const struct kernel_symbol *sym;
+-	const s32 *crc;
+-	enum mod_license license;
++	struct find_symbol_arg fsa = {
++		.name	= name,
++		.gplok	= !(mod->taints & (1 << TAINT_PROPRIETARY_MODULE)),
++		.warn	= true,
++	};
+ 	int err;
+ 
+ 	/*
+@@ -1467,42 +1455,40 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
+ 	 */
+ 	sched_annotate_sleep();
+ 	mutex_lock(&module_mutex);
+-	sym = find_symbol(name, &owner, &crc, &license,
+-			  !(mod->taints & (1 << TAINT_PROPRIETARY_MODULE)), true);
+-	if (!sym)
++	if (!find_symbol(&fsa))
+ 		goto unlock;
+ 
+-	if (license == GPL_ONLY)
++	if (fsa.license == GPL_ONLY)
+ 		mod->using_gplonly_symbols = true;
+ 
+-	if (!inherit_taint(mod, owner)) {
+-		sym = NULL;
++	if (!inherit_taint(mod, fsa.owner)) {
++		fsa.sym = NULL;
+ 		goto getname;
+ 	}
+ 
+-	if (!check_version(info, name, mod, crc)) {
+-		sym = ERR_PTR(-EINVAL);
++	if (!check_version(info, name, mod, fsa.crc)) {
++		fsa.sym = ERR_PTR(-EINVAL);
+ 		goto getname;
+ 	}
+ 
+-	err = verify_namespace_is_imported(info, sym, mod);
++	err = verify_namespace_is_imported(info, fsa.sym, mod);
+ 	if (err) {
+-		sym = ERR_PTR(err);
++		fsa.sym = ERR_PTR(err);
+ 		goto getname;
+ 	}
+ 
+-	err = ref_module(mod, owner);
++	err = ref_module(mod, fsa.owner);
+ 	if (err) {
+-		sym = ERR_PTR(err);
++		fsa.sym = ERR_PTR(err);
+ 		goto getname;
+ 	}
+ 
+ getname:
+ 	/* We must make copy under the lock if we failed to get ref. */
+-	strncpy(ownername, module_name(owner), MODULE_NAME_LEN);
++	strncpy(ownername, module_name(fsa.owner), MODULE_NAME_LEN);
+ unlock:
+ 	mutex_unlock(&module_mutex);
+-	return sym;
++	return fsa.sym;
+ }
+ 
+ static const struct kernel_symbol *
+@@ -2263,16 +2249,19 @@ static void free_module(struct module *mod)
+ 
+ void *__symbol_get(const char *symbol)
+ {
+-	struct module *owner;
+-	const struct kernel_symbol *sym;
++	struct find_symbol_arg fsa = {
++		.name	= symbol,
++		.gplok	= true,
++		.warn	= true,
++	};
+ 
+ 	preempt_disable();
+-	sym = find_symbol(symbol, &owner, NULL, NULL, true, true);
+-	if (sym && strong_try_module_get(owner))
+-		sym = NULL;
++	if (!find_symbol(&fsa) || !strong_try_module_get(fsa.owner)) {
++		preempt_enable();
++		return NULL;
++	}
+ 	preempt_enable();
+-
+-	return sym ? (void *)kernel_symbol_value(sym) : NULL;
++	return (void *)kernel_symbol_value(fsa.sym);
+ }
+ EXPORT_SYMBOL_GPL(__symbol_get);
+ 
+@@ -2285,7 +2274,6 @@ EXPORT_SYMBOL_GPL(__symbol_get);
+ static int verify_exported_symbols(struct module *mod)
+ {
+ 	unsigned int i;
+-	struct module *owner;
+ 	const struct kernel_symbol *s;
+ 	struct {
+ 		const struct kernel_symbol *sym;
+@@ -2302,12 +2290,15 @@ static int verify_exported_symbols(struct module *mod)
+ 
+ 	for (i = 0; i < ARRAY_SIZE(arr); i++) {
+ 		for (s = arr[i].sym; s < arr[i].sym + arr[i].num; s++) {
+-			if (find_symbol(kernel_symbol_name(s), &owner, NULL,
+-					NULL, true, false)) {
++			struct find_symbol_arg fsa = {
++				.name	= kernel_symbol_name(s),
++				.gplok	= true,
++			};
++			if (find_symbol(&fsa)) {
+ 				pr_err("%s: exports duplicate symbol %s"
+ 				       " (owned by %s)\n",
+ 				       mod->name, kernel_symbol_name(s),
+-				       module_name(owner));
++				       module_name(fsa.owner));
+ 				return -ENOEXEC;
+ 			}
+ 		}
 -- 
 2.29.2
 
