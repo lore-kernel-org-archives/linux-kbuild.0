@@ -2,63 +2,80 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FD1C433E6
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 18:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E859C433E6
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 19:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82BEF64F58
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 18:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D4D264E0A
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 19:15:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238632AbhBBSgI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 13:36:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40898 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233811AbhBBOFJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 09:05:09 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 803A8AE74;
-        Tue,  2 Feb 2021 14:04:26 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 15:04:26 +0100 (CET)
-From:   Miroslav Benes <mbenes@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-cc:     Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>, Jessica Yu <jeyu@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>, Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
-        linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 08/13] module: remove each_symbol_in_section
-In-Reply-To: <20210202121334.1361503-9-hch@lst.de>
-Message-ID: <alpine.LSU.2.21.2102021504150.570@pobox.suse.cz>
-References: <20210202121334.1361503-1-hch@lst.de> <20210202121334.1361503-9-hch@lst.de>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S239532AbhBBTOd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 14:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239186AbhBBTMZ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Feb 2021 14:12:25 -0500
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFB1C0617AA;
+        Tue,  2 Feb 2021 11:11:44 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id x71so23925297oia.9;
+        Tue, 02 Feb 2021 11:11:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ska71jiHojC54SOYCBQ1AKHCS3X3JTpfbQsFpLGOP0c=;
+        b=raM/FPGkdCZz1KmHU8ngiCRO/kehkjF1I6X0oa9wNdobKMGo4aA8QtePyfzrV3qOKh
+         UYXLRoV2aEd+AzB30u83r/xfF5WVOpp6ewx0gJNEofxz+Lw+JAk3m7SCIJPw7sAhE9jx
+         XPPSTuoVfD2DzDxUXMu4h9QCVNCWAevZ7zw6G4vsX7ABq8r9VJL4pxHtN1ciQ8IhC3W5
+         JFOuR8zn5ETP/GLmddvMJZNA83XyvfDapILkKj4YvRZDpB/F8S0E1AIy+R1B988+MVL/
+         p/8PF5gtaOuA2ApfAQW/rBbqhwa4WpFMNllcYXO2XCJcKt0/0axs0y6YkyDL+fSWMt6p
+         wPiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ska71jiHojC54SOYCBQ1AKHCS3X3JTpfbQsFpLGOP0c=;
+        b=RtY2QkeSMndtdQMehtWfQhMOQepO+qoPl5DgXlgGBR41dzXgVcyHeGnD7LfMDqZwv9
+         Su38wMdRwi3+RQTsBvaYLNBgJgQC03O650orsVgT625Xeem7Jf7/GwJAhcrmAhK1iaXn
+         UnYgSyQt35Wi1oG+9r7mHUGfP56YlAaOwEeeDqtLETvqoriy2o3owKUEnl+7M2wwoS1g
+         P7//86X/5A9Eeu/gCPI2rToXmQI3gQiBxsMd2MHIm7IEmIcx3LiNcH6X8t/ay5jWaspC
+         xqsX1VZYYekiGSqlcFR4ChzBehJilnZ5cUcsLS9bMpSNBpJBtp+OgDVRMsecUHmg+k6Y
+         JeBA==
+X-Gm-Message-State: AOAM532NAX06aa940BdFdQHUJQV07ZSjP2j3x+6ERdXwjkBTH2JKcR0N
+        QjMdd9Y/uPVWY2Gu9009InjmDdS9+2ex0TWM4YwFGZv3V3k=
+X-Google-Smtp-Source: ABdhPJx0HkGblkDdLafb1qCDmr3Lo5CvcXHSsskkQ5s9ylD1ve6LTgZwK13heLHXImmHWfwtmz9VcKzjnuVS+eNjJkk=
+X-Received: by 2002:a05:6808:1290:: with SMTP id a16mr3892391oiw.161.1612293103833;
+ Tue, 02 Feb 2021 11:11:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <CAE1WUT6mp80yFDgAirZcKvc31O23ynpLGcsdPaa8qd1dsXiXhg@mail.gmail.com>
+ <20210202053307.GB28542@1wt.eu> <CAE1WUT4r1oNmu_7y6AMMSNyNmt8LYo6DXa2DPR=wOGb27XErZA@mail.gmail.com>
+In-Reply-To: <CAE1WUT4r1oNmu_7y6AMMSNyNmt8LYo6DXa2DPR=wOGb27XErZA@mail.gmail.com>
+From:   Amy Parker <enbyamy@gmail.com>
+Date:   Tue, 2 Feb 2021 11:11:32 -0800
+Message-ID: <CAE1WUT7zprk-3naBGwZk=bsVR8Od=PT0kqNO6EVBQUOG+F1h3w@mail.gmail.com>
+Subject: Re: Alternative compilers to GCC/Clang
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-gcc@vger.kernel.org, linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, 2 Feb 2021, Christoph Hellwig wrote:
+On Tue, Feb 2, 2021 at 8:26 AM Amy Parker <enbyamy@gmail.com> wrote:
+> > It compiles extremely fast, implements some subsets of gcc (a few
+> > attributes for example), but is far from being able to compile a kernel
+>
+> Well, we'll see what I can do with that. :)
 
-> each_symbol_in_section just contains a trivial loop over its arguments.
-> Just open code the loop in the two callers.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Well, just installed it and tried building the kernel. Fails every file. :)
 
-Reviewed-by: Miroslav Benes <mbenes@suse.cz>
-
-M
+It's definitely something to work towards - but I don't know if kernel
+advancements requiring newer GCC versions will go slow enough to allow
+TCC improvements to arise. This isn't just something like with Clang
+where a few tweaks to files and to Clang itself did the trick.
