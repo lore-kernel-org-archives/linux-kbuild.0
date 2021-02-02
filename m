@@ -2,112 +2,63 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C47C433E0
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF730C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 17:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1030B64F76
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 16:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8695364F4D
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 17:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236450AbhBBQ3N (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 11:29:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236284AbhBBQ04 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 11:26:56 -0500
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792A9C06178B;
-        Tue,  2 Feb 2021 08:26:15 -0800 (PST)
-Received: by mail-il1-x12f.google.com with SMTP id z18so19339511ile.9;
-        Tue, 02 Feb 2021 08:26:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uUPSf5IONoMjH7eJPdjOKIHOgkvLOpGL4eqwWCbjGqQ=;
-        b=VnsLZMaMRaxj7WfTbrUjXcfUBtOJvRdty0dDO+U2Eh9+5DIogmRJs8nsGV+0p1ppBm
-         z53Se1utHs8QgVHjuWDH6rTIxGRNUl4Mwgt1m+FGzRCurII7IoX6z7a3Y+10kvzwPBTG
-         6czCsyV3zX4mKbUm1CvSJKZGeVwiJz9fqC80p7FSf5H4cX972oCrZqMOYWwynmDyR6Ks
-         mgl3jSagE26iDArQM9FzC4fuys07ib4rGC7RG13HIeD8lxBioUz7JWft/P5hGRY7fyeW
-         NjF4CTpfGSmzygDz+72Cwva1CxHj68LV54H02Hb8MKc1kJ6j7NIIkibSG0U0vVgj8vnT
-         Bf6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uUPSf5IONoMjH7eJPdjOKIHOgkvLOpGL4eqwWCbjGqQ=;
-        b=C7oAh5lAqj4BjyEefMbWelr/dm0B1nj0rPOVfZ4WHRe3Zx3q3KdL/mbtp//GLURP7m
-         X1jRzU2xmrX5oWAfwUkZxZnFGHi+GMRlAUs2UQRa0wEYQ3CTuh2rQWQte1h0IOcbDpQn
-         NIwFE1AnKmZMlsRpl/vXhmApW9nsXs1gW3su47LGO3PUQ2Z+OnCe+BVjStHnnbCv9/F3
-         ogt1/VoPQk0dYce22Ztc5KeUJI02V4cMdtJMtFP+lbvhQNltd2Jt0X8JPH2oqJbdw878
-         qUfJU0mnZfa4FIkmfEU/fdKc+PaT6WXCtAXHIz4P9rq3z3kCceaf4jaC/qE/lfhIYQFx
-         gj+A==
-X-Gm-Message-State: AOAM5313JU+AyQf9ng+rmgE5uCWHJfuhIihFcsIQg7kEaJ/V6DCAMAMJ
-        ZwnYbD9lwVhYHmJAc0jCSjtGXsAKx+kuFhRaqFJcpdXqMz8=
-X-Google-Smtp-Source: ABdhPJzce812e00lFV/98GezeHMsK91BtHrPg83M1U807OvDlwrIfgM7Kzat6SmzGT6F4/pLAaLB1/wCSDCDotAxpuw=
-X-Received: by 2002:a05:6e02:1343:: with SMTP id k3mr530712ilr.102.1612283174756;
- Tue, 02 Feb 2021 08:26:14 -0800 (PST)
+        id S234026AbhBBOMb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 09:12:31 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44480 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233901AbhBBOKx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Feb 2021 09:10:53 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0195DABDA;
+        Tue,  2 Feb 2021 14:10:11 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 15:10:10 +0100 (CET)
+From:   Miroslav Benes <mbenes@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+cc:     Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>, Jessica Yu <jeyu@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>, Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 11/13] module: move struct symsearch to module.c
+In-Reply-To: <20210202121334.1361503-12-hch@lst.de>
+Message-ID: <alpine.LSU.2.21.2102021509510.570@pobox.suse.cz>
+References: <20210202121334.1361503-1-hch@lst.de> <20210202121334.1361503-12-hch@lst.de>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-References: <CAE1WUT6mp80yFDgAirZcKvc31O23ynpLGcsdPaa8qd1dsXiXhg@mail.gmail.com>
- <20210202053307.GB28542@1wt.eu>
-In-Reply-To: <20210202053307.GB28542@1wt.eu>
-From:   Amy Parker <enbyamy@gmail.com>
-Date:   Tue, 2 Feb 2021 08:26:02 -0800
-Message-ID: <CAE1WUT4r1oNmu_7y6AMMSNyNmt8LYo6DXa2DPR=wOGb27XErZA@mail.gmail.com>
-Subject: Re: Alternative compilers to GCC/Clang
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-gcc@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Feb 1, 2021 at 9:33 PM Willy Tarreau <w@1wt.eu> wrote:
->
-> Hi Amy,
->
-> On Mon, Feb 01, 2021 at 03:31:49PM -0800, Amy Parker wrote:
-> > Hello! My name's Amy. I'm really impressed by the work done to make
-> > Clang (and the LLVM toolchain overall) able to compile the kernel.
-> > Figured I might as well donate my monkey hours to helping make it run
-> > on other compilers as well. I haven't been able to find any that use
-> > the same arguments structure as GCC and Clang (read: you can pass it
-> > in as CC=compilername in your $MAKEOPTS). Any compilers along that
-> > route anyone here has worked with that I could work with?
->
-> If you're interested, you should have a look at TCC (tiny CC) :
->
->      https://repo.or.cz/tinycc.git
+On Tue, 2 Feb 2021, Christoph Hellwig wrote:
 
-Thank you for linking this! Wasn't able to find this git repository
-for it - only binaries for nonfree operating systems (yuck).
+> struct symsearch is only used inside of module.h, so move the definition
+> out of module.h.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
->
-> It compiles extremely fast, implements some subsets of gcc (a few
-> attributes for example), but is far from being able to compile a kernel
+Reviewed-by: Miroslav Benes <mbenes@suse.cz>
 
-Well, we'll see what I can do with that. :)
-
-> (at least last time I checked). Its speed makes it very convenient for
-> development. I made some efforts to make haproxy support it (and provided
-> some fixes to tcc) as it compiles the whole project in 0.5 second instead
-> of ~10 seconds with a modern gcc. It could probably compile a kernel in
-> 15-20 seconds if properly supported, and this could be particularly handy
-> for development and testing.
-
-Oh wow, yeah, that would be great. Thank you for pointing this out!
-Compiling the kernel in 15-20 seconds instead of the current *couple
-minutes* would definitely be great.
-
->
-> Regards,
-> Willy
-
-Best regards,
-Amy Parker
-(she/her/hers)
+M
