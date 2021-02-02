@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9A3C43331
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1265CC433E6
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66DCA64F6A
-	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD11A64F05
+	for <linux-kbuild@archiver.kernel.org>; Tue,  2 Feb 2021 12:15:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbhBBMOi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Feb 2021 07:14:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54940 "EHLO
+        id S229657AbhBBMP3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Feb 2021 07:15:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbhBBMOh (ORCPT
+        with ESMTP id S230368AbhBBMPS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Feb 2021 07:14:37 -0500
+        Tue, 2 Feb 2021 07:15:18 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE098C061573;
-        Tue,  2 Feb 2021 04:13:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3A7AC06178A;
+        Tue,  2 Feb 2021 04:14:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=fOGP2fwzT2JhZvsiTzA+wVkqRw7CvPV2PR044xdNRuY=; b=LliTpBdGHtCIA0fAUMvVI13eA6
-        01c0muaz3ZnrWPrPvDshwwaT8MXgpAxmjpuEgeUDAc/EpigN8B68ep6dExUouhw55Q1bPtO9I6mWB
-        CIhqmqfonMknWq2WgwOePdJ2pBQEbRFARM02UpoNT2MdhbXC9jvb/e/GNi4UDY7i3ta59mAjXZhKB
-        q8erkuEhgypFT4zJ9j+V+zD51AXB6bRzKxxB471S3cCo8UKn03xV6RnIxOyzRL4WBD0GPyNAr/eaf
-        QqBDDI1kHax8R6J76qZPKIVef0J8cp8CLfm2AJ/GR+7T7n8P7XRrG7+i1e9fSEuHSAxFGbkrQme68
-        AyPNCXgA==;
+        bh=rmityq/+c4gT3Y2w3Rea29feT5UzMc/vhyG+Rz50xoM=; b=GdOhAGNJYAqEoMHocUUICQvgmO
+        TvbKByne5QtMpaP1HA87tRHwRiOkiAGwyxm+c8aRdfWYLPgSco71rSox0aBDS1FWRZaKo2eJIrgLX
+        K88VNz60IoFroWIaxKnLtQwgsS6CoZYmSoLGx6BQOyohYHQigkzL9vKrCgRPgGslbPvbmOj1VbUid
+        5Fmn5OW97b9F+XbDXkuA9N557XdWbpO07CkF6+OTtZLfY6e7zylEbJuqQhUWZpOP+iV9fr7GyxtY8
+        tlfZaMusSXKAyjC/dVFGuajU3U+lqS0OVhbYI8GVqBxIM8dxpJO4R/1vmp/rd7oul1PDcXzT2GVvg
+        BFw+FTMg==;
 Received: from [2001:4bb8:198:6bf4:7f38:755e:a6e0:73e9] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l6uYu-00FALK-V5; Tue, 02 Feb 2021 12:13:41 +0000
+        id 1l6uZ4-00FAM6-SV; Tue, 02 Feb 2021 12:13:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Frederic Barrat <fbarrat@linux.ibm.com>,
         Andrew Donnellan <ajd@linux.ibm.com>,
@@ -54,9 +54,9 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
         linux-kbuild@vger.kernel.org
-Subject: [PATCH 02/13] drm: remove drm_fb_helper_modinit
-Date:   Tue,  2 Feb 2021 13:13:23 +0100
-Message-Id: <20210202121334.1361503-3-hch@lst.de>
+Subject: [PATCH 06/13] kallsyms: only build {,module_}kallsyms_on_each_symbol when required
+Date:   Tue,  2 Feb 2021 13:13:27 +0100
+Message-Id: <20210202121334.1361503-7-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210202121334.1361503-1-hch@lst.de>
 References: <20210202121334.1361503-1-hch@lst.de>
@@ -67,105 +67,136 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-drm_fb_helper_modinit has a lot of boilerplate for what is not very
-simple functionality.  Just open code it in the only caller using
-IS_ENABLED and IS_MODULE, and skip the find_module check as a
-request_module is harmless if the module is already loaded (and not
-other caller has this find_module check either).
+kallsyms_on_each_symbol and module_kallsyms_on_each_symbol are only used
+by the livepatching code, so don't build them if livepatching is not
+enabled.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/gpu/drm/drm_crtc_helper_internal.h | 10 ---------
- drivers/gpu/drm/drm_fb_helper.c            | 21 ------------------
- drivers/gpu/drm/drm_kms_helper_common.c    | 25 +++++++++++-----------
- 3 files changed, 12 insertions(+), 44 deletions(-)
+ include/linux/kallsyms.h | 17 ++++-------------
+ include/linux/module.h   | 16 ++++------------
+ kernel/kallsyms.c        |  2 ++
+ kernel/module.c          |  2 ++
+ 4 files changed, 12 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/gpu/drm/drm_crtc_helper_internal.h b/drivers/gpu/drm/drm_crtc_helper_internal.h
-index 25ce42e799952c..61e09f8a8d0ff0 100644
---- a/drivers/gpu/drm/drm_crtc_helper_internal.h
-+++ b/drivers/gpu/drm/drm_crtc_helper_internal.h
-@@ -32,16 +32,6 @@
- #include <drm/drm_encoder.h>
- #include <drm/drm_modes.h>
- 
--/* drm_fb_helper.c */
--#ifdef CONFIG_DRM_FBDEV_EMULATION
--int drm_fb_helper_modinit(void);
--#else
--static inline int drm_fb_helper_modinit(void)
--{
--	return 0;
--}
--#endif
--
- /* drm_dp_aux_dev.c */
- #ifdef CONFIG_DRM_DP_AUX_CHARDEV
- int drm_dp_aux_dev_init(void);
-diff --git a/drivers/gpu/drm/drm_fb_helper.c b/drivers/gpu/drm/drm_fb_helper.c
-index 4b81195106875d..0b9f1ae1b7864c 100644
---- a/drivers/gpu/drm/drm_fb_helper.c
-+++ b/drivers/gpu/drm/drm_fb_helper.c
-@@ -2499,24 +2499,3 @@ void drm_fbdev_generic_setup(struct drm_device *dev,
- 	drm_client_register(&fb_helper->client);
+diff --git a/include/linux/kallsyms.h b/include/linux/kallsyms.h
+index 481273f0c72d42..465060acc9816f 100644
+--- a/include/linux/kallsyms.h
++++ b/include/linux/kallsyms.h
+@@ -71,15 +71,14 @@ static inline void *dereference_symbol_descriptor(void *ptr)
+ 	return ptr;
  }
- EXPORT_SYMBOL(drm_fbdev_generic_setup);
--
--/* The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
-- * but the module doesn't depend on any fb console symbols.  At least
-- * attempt to load fbcon to avoid leaving the system without a usable console.
-- */
--int __init drm_fb_helper_modinit(void)
--{
--#if defined(CONFIG_FRAMEBUFFER_CONSOLE_MODULE) && !defined(CONFIG_EXPERT)
--	const char name[] = "fbcon";
--	struct module *fbcon;
--
--	mutex_lock(&module_mutex);
--	fbcon = find_module(name);
--	mutex_unlock(&module_mutex);
--
--	if (!fbcon)
--		request_module_nowait(name);
--#endif
--	return 0;
--}
--EXPORT_SYMBOL(drm_fb_helper_modinit);
-diff --git a/drivers/gpu/drm/drm_kms_helper_common.c b/drivers/gpu/drm/drm_kms_helper_common.c
-index 221a8528c9937a..f933da1656eb52 100644
---- a/drivers/gpu/drm/drm_kms_helper_common.c
-+++ b/drivers/gpu/drm/drm_kms_helper_common.c
-@@ -64,19 +64,18 @@ MODULE_PARM_DESC(edid_firmware,
  
- static int __init drm_kms_helper_init(void)
- {
--	int ret;
+-#ifdef CONFIG_KALLSYMS
+-/* Lookup the address for a symbol. Returns 0 if not found. */
+-unsigned long kallsyms_lookup_name(const char *name);
 -
--	/* Call init functions from specific kms helpers here */
--	ret = drm_fb_helper_modinit();
--	if (ret < 0)
--		goto out;
--
--	ret = drm_dp_aux_dev_init();
--	if (ret < 0)
--		goto out;
--
--out:
--	return ret;
-+	/*
-+	 * The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
-+	 * but the module doesn't depend on any fb console symbols.  At least
-+	 * attempt to load fbcon to avoid leaving the system without a usable
-+	 * console.
-+	 */
-+	if (IS_ENABLED(CONFIG_DRM_FBDEV_EMULATION) &&
-+	    IS_MODULE(CONFIG_FRAMEBUFFER_CONSOLE) &&
-+	    !IS_ENABLED(CONFIG_EXPERT))
-+		request_module_nowait("fbcon");
+-/* Call a function on each kallsyms symbol in the core kernel */
+ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
+ 				      unsigned long),
+ 			    void *data);
+ 
++#ifdef CONFIG_KALLSYMS
++/* Lookup the address for a symbol. Returns 0 if not found. */
++unsigned long kallsyms_lookup_name(const char *name);
 +
-+	return drm_dp_aux_dev_init();
+ extern int kallsyms_lookup_size_offset(unsigned long addr,
+ 				  unsigned long *symbolsize,
+ 				  unsigned long *offset);
+@@ -108,14 +107,6 @@ static inline unsigned long kallsyms_lookup_name(const char *name)
+ 	return 0;
  }
  
- static void __exit drm_kms_helper_exit(void)
+-static inline int kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+-						    struct module *,
+-						    unsigned long),
+-					  void *data)
+-{
+-	return 0;
+-}
+-
+ static inline int kallsyms_lookup_size_offset(unsigned long addr,
+ 					      unsigned long *symbolsize,
+ 					      unsigned long *offset)
+diff --git a/include/linux/module.h b/include/linux/module.h
+index a64aa84d1b182c..3ea4ffae608f97 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -608,10 +608,6 @@ int module_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
+ /* Look for this name: can be of form module:name. */
+ unsigned long module_kallsyms_lookup_name(const char *name);
+ 
+-int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+-					     struct module *, unsigned long),
+-				   void *data);
+-
+ extern void __noreturn __module_put_and_exit(struct module *mod,
+ 			long code);
+ #define module_put_and_exit(code) __module_put_and_exit(THIS_MODULE, code)
+@@ -795,14 +791,6 @@ static inline unsigned long module_kallsyms_lookup_name(const char *name)
+ 	return 0;
+ }
+ 
+-static inline int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+-							   struct module *,
+-							   unsigned long),
+-						 void *data)
+-{
+-	return 0;
+-}
+-
+ static inline int register_module_notifier(struct notifier_block *nb)
+ {
+ 	/* no events will happen anyway, so this can always succeed */
+@@ -891,4 +879,8 @@ static inline bool module_sig_ok(struct module *module)
+ }
+ #endif	/* CONFIG_MODULE_SIG */
+ 
++int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
++					     struct module *, unsigned long),
++				   void *data);
++
+ #endif /* _LINUX_MODULE_H */
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index a0d3f0865916f9..8043a90aa50ed3 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -177,6 +177,7 @@ unsigned long kallsyms_lookup_name(const char *name)
+ 	return module_kallsyms_lookup_name(name);
+ }
+ 
++#ifdef CONFIG_LIVEPATCH
+ /*
+  * Iterate over all symbols in vmlinux.  For symbols from modules use
+  * module_kallsyms_on_each_symbol instead.
+@@ -198,6 +199,7 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
+ 	}
+ 	return 0;
+ }
++#endif /* CONFIG_LIVEPATCH */
+ 
+ static unsigned long get_symbol_pos(unsigned long addr,
+ 				    unsigned long *symbolsize,
+diff --git a/kernel/module.c b/kernel/module.c
+index 25345792c770d1..470fd9d9d68f97 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -4366,6 +4366,7 @@ unsigned long module_kallsyms_lookup_name(const char *name)
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_LIVEPATCH
+ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+ 					     struct module *, unsigned long),
+ 				   void *data)
+@@ -4396,6 +4397,7 @@ int module_kallsyms_on_each_symbol(int (*fn)(void *, const char *,
+ 	mutex_unlock(&module_mutex);
+ 	return ret;
+ }
++#endif /* CONFIG_LIVEPATCH */
+ #endif /* CONFIG_KALLSYMS */
+ 
+ /* Maximum number of characters written by module_flags() */
 -- 
 2.29.2
 
