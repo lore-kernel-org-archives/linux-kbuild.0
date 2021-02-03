@@ -4,80 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621C6C4332B
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Feb 2021 10:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B52FC433E0
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Feb 2021 10:50:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2157F64E0A
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Feb 2021 10:37:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7BFE64F5C
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Feb 2021 10:50:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233938AbhBCKhs convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Feb 2021 05:37:48 -0500
-Received: from wildebeest.demon.nl ([212.238.236.112]:37974 "EHLO
-        gnu.wildebeest.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233731AbhBCKhp (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Feb 2021 05:37:45 -0500
-X-Greylist: delayed 355 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Feb 2021 05:37:45 EST
-Received: from tarox.wildebeest.org (tarox.wildebeest.org [172.31.17.39])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by gnu.wildebeest.org (Postfix) with ESMTPSA id 28BF9304481E;
-        Wed,  3 Feb 2021 11:31:08 +0100 (CET)
-Received: by tarox.wildebeest.org (Postfix, from userid 1000)
-        id 16C714000C6A; Wed,  3 Feb 2021 11:31:08 +0100 (CET)
-Message-ID: <544278979063fbee59f7e8d82c88ba3293380d57.camel@klomp.org>
-Subject: Re: [PATCH] kbuild: fix duplicated flags in DEBUG_CFLAGS
-From:   Mark Wielaard <mark@klomp.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Cc:     Sedat Dilek <sedat.dilek@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Andi Kleen <andi@firstfloor.org>,
-        Ian Rogers <irogers@google.com>,
+        id S233807AbhBCKug (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Feb 2021 05:50:36 -0500
+Received: from verein.lst.de ([213.95.11.211]:50554 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233587AbhBCKuf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 3 Feb 2021 05:50:35 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3433A6736F; Wed,  3 Feb 2021 11:49:50 +0100 (CET)
+Date:   Wed, 3 Feb 2021 11:49:49 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Christoph Hellwig <hch@lst.de>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@linux.ie>, Jessica Yu <jeyu@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
-Date:   Wed, 03 Feb 2021 11:31:07 +0100
-In-Reply-To: <20210203075239.5505-1-masahiroy@kernel.org>
-References: <20210203075239.5505-1-masahiroy@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, live-patching@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 02/13] drm: remove drm_fb_helper_modinit
+Message-ID: <20210203104949.GA9909@lst.de>
+References: <20210128181421.2279-1-hch@lst.de> <20210128181421.2279-3-hch@lst.de> <YBp8ShiKbQSPCcRx@phenom.ffwll.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YBp8ShiKbQSPCcRx@phenom.ffwll.local>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
-
-On Wed, 2021-02-03 at 16:52 +0900, Masahiro Yamada wrote:
-> With commit 121c5d08d53c ("kbuild: Only add -fno-var-tracking-
-> assignments
-> for old GCC versions") applied, DEBUG_CFLAGS is now reset only when
-> CONFIG_CC_IS_GCC=y.
+On Wed, Feb 03, 2021 at 11:34:50AM +0100, Daniel Vetter wrote:
+> On Thu, Jan 28, 2021 at 07:14:10PM +0100, Christoph Hellwig wrote:
+> > drm_fb_helper_modinit has a lot of boilerplate for what is not very
+> > simple functionality.  Just open code it in the only caller using
+> > IS_ENABLED and IS_MODULE, and skip the find_module check as a
+> > request_module is harmless if the module is already loaded (and not
+> > other caller has this find_module check either).
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > 
-> Fix it to reset DEBUG_CFLAGS also when using Clang.
+> Hm I thought I've acked this one already somewhere for merging through
+> your tree.
 > 
-> [...] 
-> +DEBUG_CFLAGS	:=
-> +
->  # Workaround for GCC versions < 5.0
->  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61801
->  ifdef CONFIG_CC_IS_GCC
-> -DEBUG_CFLAGS	:= $(call cc-ifversion, -lt, 0500, $(call cc-option, -fno-var-tracking-assignments))
-> +DEBUG_CFLAGS	+= $(call cc-ifversion, -lt, 0500, $(call cc-option, -fno-var-tracking-assignments))
->  endif
+> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
 
-Yes, this makes sense given that the original code, before commit
-121c5d08d53c did always set DEBUG_CFLAGS without checking for
-CONFIG_CC_IS_GCC. So it behaved like the above code does.
-
-Reviewed-by: Mark Wielaard <mark@klomp.org>
-
-Thanks,
-
-Mark
+The difference is that this new version loses the find_module entirely,
+while the previous one replaced it with the module_loaded helper that
+didn't make it to the second version of the series.
