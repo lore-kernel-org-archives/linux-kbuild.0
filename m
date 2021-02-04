@@ -2,75 +2,74 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C97C433E0
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 06:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5933C433DB
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 06:41:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A3F364DFF
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 06:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A366164F58
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 06:41:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230281AbhBDGQx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 4 Feb 2021 01:16:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
+        id S232941AbhBDGla (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 4 Feb 2021 01:41:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbhBDGQw (ORCPT
+        with ESMTP id S232799AbhBDGl1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Feb 2021 01:16:52 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85279C061573
-        for <linux-kbuild@vger.kernel.org>; Wed,  3 Feb 2021 22:16:12 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id s24so1100995pjp.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Feb 2021 22:16:12 -0800 (PST)
+        Thu, 4 Feb 2021 01:41:27 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA10FC061788
+        for <linux-kbuild@vger.kernel.org>; Wed,  3 Feb 2021 22:40:46 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id m9so1714792qka.22
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Feb 2021 22:40:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=di4/vrEwMGMptUjaosgJOlqFm8Mgh4qA8yfsVQbfl2E=;
-        b=rQhP2RFpcACY1T51YL36IYgw+bupVCBeE/H3FN65jzK8OQr58VpTE1cuvZfj3mUHpR
-         4yg8DwXuY2T4X6k92CTY47xYpQXOeyU0b1lwLWHn4qr8/BFfRqGSYZOFvQ3rqHZ8M/DF
-         JXYH+CihKBX+nM3UYLQRaV6e5yjCpprvQPRBczkPSr/J8HMISuJDwdBBt1J5ta3ZUzrA
-         0x9tvBToknGaRwF5bHfo9/tDphs7k6BXKgr4QCaNaBY2qUcDepL5/pNVK5xG54ua7W08
-         kVBnD3zlDo1hdrIbEi4PJH5Z214wS/huJzSbHCN3pbHab23GmKAZrsLFIJLpgWPcWnlV
-         HrbA==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=iFigka3JXPbuBeHUARia6t3bp5DpIh0Lh5S9mG4lTkc=;
+        b=jXOhuAtQmp2iBB4CXNhILgsBGuonno1OECxXMZX9iyxNm02XOPTxc17MqMTbwqaPqF
+         udTnSMcPmoRk4K6U2d6DxWMSN7g4ndN7nep1DRz8Ch/APFdzZ3oNPeN7deIoM84Ky4XM
+         ijatQ6u3zl4OQG+WD873YWEdjgVilT3rEGIMemu5bqWNi8o2HYjmgLvx3dGpMjnEqXq+
+         ttQYfWrlK0WjfJu+grCRHxhwNdJblJBw/ntTLE6LD7cKcqh1jZ0z92Fz45dHwpFmZFzj
+         hGctfUAdgO3nTnGL14Rvxk+GUd2Iassm97SjjdNrkEjj0g1SLO5G6tfm3R3aG2sruZG6
+         MZsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=di4/vrEwMGMptUjaosgJOlqFm8Mgh4qA8yfsVQbfl2E=;
-        b=OeMGCWfgolAG95U1lVjy3SMb34kIlSAEUasQnRn5YZsgdSi5DHFu4mjA1Mmw90iuc2
-         62Pau++hqys+Bq13sJyNHlsrU30jqPcorGfAxbvBNvvClm8HkU2qEXaPtSyd9bcbDJg3
-         1gDuRvozuc0ZPnUwy4qEY6mYDPdsUoqWFB7lQ5llPc6YFJgw4DOt5HnewMUUI1xinbq6
-         rHIBASRpbd14hNMBNVOntAsxOXQcauswOW3tnUhDUgfBd8tB2SI5R/CIIeoA5RrT77mz
-         NIE2H+63soA8zrLYunVeZTalzofHuS7v/5fSUXBjh7CxeD45+6TaAZWugeLX5XUQM/0l
-         CLVQ==
-X-Gm-Message-State: AOAM5335pUXZ6VAStkXosOJFMbt9vkZiWDuuYsiLSxcrOp6VzcEFixsQ
-        uy6gaci9LxW3D4K1u+FjAB52VG5+AHJsJXqTKIunqw==
-X-Google-Smtp-Source: ABdhPJzImdhsi8EnklTbWdz9vhMkRc7BUoTgyugH+VtVGXN33gVSlYRqsMyMJZ2jqTeyQpCwrmdF+9L16BED3qelaQY=
-X-Received: by 2002:a17:90a:db05:: with SMTP id g5mr7120354pjv.32.1612419371984;
- Wed, 03 Feb 2021 22:16:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20210130004401.2528717-1-ndesaulniers@google.com>
- <20210130004401.2528717-2-ndesaulniers@google.com> <20210130015222.GC2709570@localhost>
- <CAK7LNARfu-wqW9hfnoeeahiNPbwt4xhoWdxXtK8qjVfEi=7OOg@mail.gmail.com>
- <CAKwvOd=YVDS8tjnN6kFqe2FAhfSzVg870VsSvkNuvVZ7X6BrVg@mail.gmail.com> <CAK7LNARWpPBpT7MXeUBYO3SNcB1UtTNrTcVeFW1QXRMfBrOZHQ@mail.gmail.com>
-In-Reply-To: <CAK7LNARWpPBpT7MXeUBYO3SNcB1UtTNrTcVeFW1QXRMfBrOZHQ@mail.gmail.com>
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=iFigka3JXPbuBeHUARia6t3bp5DpIh0Lh5S9mG4lTkc=;
+        b=hjOTD8+Ud2TbLemx+UYSRLhVpvt+h427O5r3xUoTKBj/HN+Rj8yjkvBvVLByWxYXDa
+         soWoJCE/5Llc0WIXI1H/tFM3QGY+GPn60KQ10MPKxqVa4J7uabsmYS4opGevUvaxkflF
+         FlnSLGYHoLppLcOw4pfbmeOuU2ak2KZ4ZrudUfi0+n5D0QWCY0U0TACN3Lrl9kt0FWGF
+         OOnh2iAVyOamfgbmFnRMg8CJkKFsfWaOrC/lztInDxk+RqykoNJHWVsYR402toAgfO/s
+         1K4OVdi+MAKjuVF9p0+YikoVOiayCUdhg85yrOEI0H+r8f4wo4eHMtyLebFpRuX0/bK9
+         DkUA==
+X-Gm-Message-State: AOAM532qOVxIgwnACYMvnI+KHYU54DVEuQOH6ChUxlQTqYgGv3H9/Stg
+        S4DczydmBw5q6rxZiOy4HiG9TnCiPChgcvIvmbI=
+X-Google-Smtp-Source: ABdhPJxvSiVjhRNEbyS9ZOTjE3ThjkTruIefIL1DvVqTcqkWnCLGNAOlSfGIlmXetQe7g0Hf8AxkOepCVJnOzV1gtAs=
+Sender: "ndesaulniers via sendgmr" 
+        <ndesaulniers@ndesaulniers1.mtv.corp.google.com>
+X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:e070:bc84:c4fd:eb02])
+ (user=ndesaulniers job=sendgmr) by 2002:a05:6214:18cb:: with SMTP id
+ cy11mr6069393qvb.61.1612420846028; Wed, 03 Feb 2021 22:40:46 -0800 (PST)
+Date:   Wed,  3 Feb 2021 22:40:36 -0800
+In-Reply-To: <20210204064037.1281726-1-ndesaulniers@google.com>
+Message-Id: <20210204064037.1281726-2-ndesaulniers@google.com>
+Mime-Version: 1.0
+References: <20210204064037.1281726-1-ndesaulniers@google.com>
+X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
+Subject: [PATCH v8 1/2] Kbuild: make DWARF version a choice
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 3 Feb 2021 22:15:59 -0800
-Message-ID: <CAKwvOdmb8i=-AxnW5SB8h1KWbP7Ku24z7btaqy+DmRxRyYCsrA@mail.gmail.com>
-Subject: Re: [PATCH v7 1/2] Kbuild: make DWARF version a choice
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Sedat Dilek <sedat.dilek@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
         Jakub Jelinek <jakub@redhat.com>,
         Fangrui Song <maskray@google.com>,
         Caroline Tice <cmtice@google.com>,
@@ -78,75 +77,77 @@ Cc:     Nathan Chancellor <nathan@kernel.org>,
         Jiri Olsa <jolsa@kernel.org>,
         Andrii Nakryiko <andrii@kernel.org>,
         Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Chris Murphy <bugzilla@colorremedies.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Feb 3, 2021 at 4:30 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> On Thu, Feb 4, 2021 at 8:16 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
-> >
-> > On Wed, Feb 3, 2021 at 2:24 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> > >
-> > > On Sat, Jan 30, 2021 at 10:52 AM Nathan Chancellor <nathan@kernel.org> wrote:
-> > > >
-> > > > On Fri, Jan 29, 2021 at 04:44:00PM -0800, Nick Desaulniers wrote:
-> > > > > Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice which is
-> > > > > the default. Does so in a way that's forward compatible with existing
-> > > > > configs, and makes adding future versions more straightforward.
-> > > > >
-> > > > > GCC since ~4.8 has defaulted to this DWARF version implicitly.
-> > > > >
-> > > > > Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
-> > > > > Suggested-by: Fangrui Song <maskray@google.com>
-> > > > > Suggested-by: Nathan Chancellor <nathan@kernel.org>
-> > > > > Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-> > > > > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> > > >
-> > > > One comment below:
-> > > >
-> > > > Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> > > >
-> > > > > ---
-> > > > >  Makefile          |  5 ++---
-> > > > >  lib/Kconfig.debug | 16 +++++++++++-----
-> > > > >  2 files changed, 13 insertions(+), 8 deletions(-)
-> > > > >
-> > > > > diff --git a/Makefile b/Makefile
-> > > > > index 95ab9856f357..d2b4980807e0 100644
-> > > > > --- a/Makefile
-> > > > > +++ b/Makefile
-> > > > > @@ -830,9 +830,8 @@ ifneq ($(LLVM_IAS),1)
-> > > > >  KBUILD_AFLAGS        += -Wa,-gdwarf-2
-> > > >
-> > > > It is probably worth a comment somewhere that assembly files will still
-> > > > have DWARF v2.
-> > >
-> > > I agree.
-> > > Please noting the reason will be helpful.
-> >
-> > Via a comment in the source, or in the commit message?
-> >
-> > >
-> > > Could you summarize Jakub's comment in short?
-> > > https://patchwork.kernel.org/project/linux-kbuild/patch/20201022012106.1875129-1-ndesaulniers@google.com/#23727667
-> >
-> > Via a comment in the source, or in the commit message?
->
->
-> Both in the source if you can summarize it in three lines or so.
->
->
-> If you need to add more detailed explanation,
-> please provide it in the commit log.
+Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice which is
+the default. Does so in a way that's forward compatible with existing
+configs, and makes adding future versions more straightforward.
 
-This information is mostly in the commit log of patch 2.  I will
-reword it with additional info from the link you sent, but I find that
-such minutiae is resulting in diminishing returns on subsequent
-respins of the patch series.  I implore you to reword v8 (which I will
-send) as you see fit when applying the series.
+GCC since ~4.8 has defaulted to this DWARF version implicitly.
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
+Suggested-by: Fangrui Song <maskray@google.com>
+Suggested-by: Nathan Chancellor <nathan@kernel.org>
+Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ Makefile          |  5 ++---
+ lib/Kconfig.debug | 16 +++++++++++-----
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 407816375983..bed5cc150009 100644
+--- a/Makefile
++++ b/Makefile
+@@ -830,9 +830,8 @@ ifneq ($(LLVM_IAS),1)
+ KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+ endif
+ 
+-ifdef CONFIG_DEBUG_INFO_DWARF4
+-DEBUG_CFLAGS	+= -gdwarf-4
+-endif
++dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
++DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
+ 
+ ifdef CONFIG_DEBUG_INFO_REDUCED
+ DEBUG_CFLAGS	+= $(call cc-option, -femit-struct-debug-baseonly) \
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index e906ea906cb7..94c1a7ed6306 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -256,13 +256,19 @@ config DEBUG_INFO_SPLIT
+ 	  to know about the .dwo files and include them.
+ 	  Incompatible with older versions of ccache.
+ 
++choice
++	prompt "DWARF version"
++	help
++	  Which version of DWARF debug info to emit.
++
+ config DEBUG_INFO_DWARF4
+-	bool "Generate dwarf4 debuginfo"
++	bool "Generate DWARF Version 4 debuginfo"
+ 	help
+-	  Generate dwarf4 debug info. This requires recent versions
+-	  of gcc and gdb. It makes the debug information larger.
+-	  But it significantly improves the success of resolving
+-	  variables in gdb on optimized code.
++	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
++	  It makes the debug information larger, but it significantly
++	  improves the success of resolving variables in gdb on optimized code.
++
++endchoice # "DWARF version"
+ 
+ config DEBUG_INFO_BTF
+ 	bool "Generate BTF typeinfo"
 -- 
-Thanks,
-~Nick Desaulniers
+2.30.0.365.g02bc693789-goog
+
