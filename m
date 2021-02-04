@@ -2,211 +2,241 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0196C433DB
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 23:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916B3C433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 23:55:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76D0D64FA9
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 23:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6045564FB0
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Feb 2021 23:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbhBDXof (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 4 Feb 2021 18:44:35 -0500
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:10486 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231180AbhBDXnv (ORCPT
+        id S231391AbhBDXzj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 4 Feb 2021 18:55:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231230AbhBDXzg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Feb 2021 18:43:51 -0500
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 114NaprI020566;
-        Thu, 4 Feb 2021 15:41:52 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=6iRL3lCTVq2+Tf8Ig58O4c37TXvSYSz86SzugcjS53A=;
- b=nRjuYUYrZAoldCIgVzvvkVx9HHuUB+XMOQ5XRq4zsEUCMLOV47gnzIO7cPLwYev2I4/G
- pyoABXgxsAJCDPQG03kXmdJHlgzKJJwbQnlOr19K7GClJTIuIbM0f5Jg3/D+iZnMqSXn
- 8R/ccubVOg7YWmU5IS9NkCIdwI3j4iub5x8= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com with ESMTP id 36fh1uvphq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 04 Feb 2021 15:41:52 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.36.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1979.3; Thu, 4 Feb 2021 15:41:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LhAcNXQ+WSSmMiinld/8irpstpRJPNsAvKlPhlt3w5Yy6xEgj/hZM/8EHn/3GMMMm4iZglIZDD498LHcAwpX04pB9W0cFXvSkuyCAAn2TIUkc7zqIyEOC2oTWgwW/fh8OhM1rK4l9CIZx0l4Q4+3GoVVrNxG5tDlyAM9+WAUmSUIOqkeOXkRsAHgzjCkKqoOpwPrqtd7PiDLckAIOYRUtRV43kiy28q3WWXMcQy5TUSSfx5YwEbGRBxSxSobKPzgfinU8MAcI63zq7IPYDToI1lMz28eJLUef9HSmrrDSPv4W8i8io+POVcNldCBRVbzOTHT2IVnF7/SCHJwoc4NYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6iRL3lCTVq2+Tf8Ig58O4c37TXvSYSz86SzugcjS53A=;
- b=OMJph7x/dBHWWpFQkhCvItjVq9MnrTFxWsb2M5KXl9kwxwUDdL/4N7F7+NVX0UpcZYyBSlydpZUgP14g1bIXa1tNoGse6gCi5/4XCTnUsjQV600MiLUcpZaJzBqoHl1mH8aBDwB2LzjqErme6U957zpJqeNRTs0/DDNNCHRHOewrMH3P8HTTdhwr14TS6B75gV+uQCpw+NYDDA9PXsN2J6T/YuwyfYioHAtk8okwT2h4iCbhdhTWQNgzaHAVobuok71hVhJ2HeEtZ9mox5gD4AE/YA6HK/BYtsEAKJvLlcG5eYyT/TtR4dctHt4GRaijuvJtWb6sLbWmVSzxEL1McA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6iRL3lCTVq2+Tf8Ig58O4c37TXvSYSz86SzugcjS53A=;
- b=VnLgxqZfyeHTYILC3SgBuPspY9lGolnSlGrLwxGJtT+pdGFuvohu+Di1wIyF6UfEAE/5UwhcOBYP97cfKrx2vtFxB9fX7vAFbTQHwCJZFR72ztxAvR1zP0QLjhGo011XU88R5hDGhoQEufbmkUrJb8sQdZZezcl393JRplSoeic=
-Received: from BYAPR15MB2999.namprd15.prod.outlook.com (2603:10b6:a03:fa::12)
- by BYAPR15MB4086.namprd15.prod.outlook.com (2603:10b6:a02:ca::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.20; Thu, 4 Feb
- 2021 23:41:49 +0000
-Received: from BYAPR15MB2999.namprd15.prod.outlook.com
- ([fe80::c97:58e4:ee9:1dc0]) by BYAPR15MB2999.namprd15.prod.outlook.com
- ([fe80::c97:58e4:ee9:1dc0%7]) with mapi id 15.20.3763.019; Thu, 4 Feb 2021
- 23:41:49 +0000
-From:   Song Liu <songliubraving@fb.com>
-To:     Jiri Olsa <jolsa@kernel.org>
-CC:     Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andriin@fb.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Martin Lau <kafai@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 2/4] tools/resolve_btfids: Check objects before
- removing
-Thread-Topic: [PATCH bpf-next 2/4] tools/resolve_btfids: Check objects before
- removing
-Thread-Index: AQHW+ztfJ9rUk/7B6UKNtOkCD8ckBapIqCQA
-Date:   Thu, 4 Feb 2021 23:41:49 +0000
-Message-ID: <41FF93D0-10DF-4ED3-92D8-E30220010845@fb.com>
-References: <20210129134855.195810-1-jolsa@redhat.com>
- <20210204211825.588160-1-jolsa@kernel.org>
- <20210204211825.588160-3-jolsa@kernel.org>
-In-Reply-To: <20210204211825.588160-3-jolsa@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3654.40.0.2.32)
-authentication-results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=fb.com;
-x-originating-ip: [2620:10d:c091:480::1:aa49]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f0b5b2aa-2457-484a-79d4-08d8c9667126
-x-ms-traffictypediagnostic: BYAPR15MB4086:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR15MB4086739DB4BE80F31C4B3860B3B39@BYAPR15MB4086.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wvFk0Q5zgrIF1mOdqgvaLd6XyYpg9F3+wxXxXtmuRkqqeg4kIZQ4AkHM79vGHkldMgLzWTUVpbRC28Ga4lIh7wKtN4RWqB5imb+59O0zSCLTlMMrQpKjBtB92m1Q7WaRRFNPBiNqxji76YisDNrXp/T3mVIu7ttT+C5PpOQ3/CTlRiGQbPjQGiJa0zXmgcMAa48oCRAMFYU8pTYOq5fvvwZaxIV6yWBXPZmC4j850NzB/B8+i9Nfof3nbvB376kWXwyePC5mmfNVAx9rFAGFQnhRZhZRIvGdap9RzQUVcoNSYb+CYMgmLAzIYYykgQQhVRnuPUl2ZlCzEHsFRxgKOEEVb+5sIZzgQLqFUoBLdZGpj40IdedA3SzIpQGZ3fMV9dihjbHxidwDPiIfv7VclDlE2+ZFxQm8CLC/ymVahCjZYR68ZtwS09WWDy6+Ny0dwCOomJFWoOERMxeGKXNhdFUbWO98oEKL3b/AQAZm9qfvgUlmevGndNFS8wJmzplEqdJynqaWNuvjojNK7Fmab+dr+sIB2E3sypk+NebvaGM5McL27/VQ2poUjlLT0PaIjHV7SnajnTTkdOEHO9UvvQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR15MB2999.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(376002)(366004)(396003)(136003)(346002)(53546011)(54906003)(66946007)(66446008)(6486002)(2906002)(4326008)(71200400001)(66476007)(64756008)(6916009)(36756003)(316002)(5660300002)(478600001)(83380400001)(6506007)(7416002)(8676002)(76116006)(91956017)(186003)(33656002)(2616005)(8936002)(86362001)(6512007)(66556008)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?txljXtD1IukI4FfxuhHDLcGofKHV+P6GEQeOB9VlPx1gHiMCezstmCFWi7Md?=
- =?us-ascii?Q?P01mxYDMsSX2rBZMpwSW0yd2LTjI7mPww6CikvD3WukCY0crN9KbR3OwMTTM?=
- =?us-ascii?Q?RoqwhnB12ShCheYjycKOQAthFp6oKvoO3nKTf+ghkdYdKex2zEpSl5o05GCU?=
- =?us-ascii?Q?bsh2pJtPCQttwGcz2Go5nFvvS8DElkW78LacyxYrsOYzs+4NDnrsUEuCRKd0?=
- =?us-ascii?Q?XjejA7E2msLbfVQ343WFNTwyQohFLwBQeARw17lpzIWKVzvyXag/0bhaCwmB?=
- =?us-ascii?Q?rfasJT4FVPvMtI4XD2M3opiDZtz9ELX8Q6gOtGwFtRm1L8Nol3be92B46OXn?=
- =?us-ascii?Q?zQdKo9gYhTd0C1kugLSlYYCOgH6iF1Xa+IoNKJwpJ7bUXrN/mIaLaeCssUe1?=
- =?us-ascii?Q?YSIizy3lMQJywLqjWPFxMttC5itdL1Ee3engFeSVw+z/eeHfDnFxP7uqmWMP?=
- =?us-ascii?Q?WzRZ4QsdZnmGB8oM/UtIo/wKi0hfHUZVhk2ALWyffy494NmgPSfp1PtR4S8C?=
- =?us-ascii?Q?NZVLJ9O84ZeIURWkO6aU7xMO2TQL02oMs2DTXlz4rqNYKo3ecgkyeYk+iOCp?=
- =?us-ascii?Q?eWw9mGZzA3oFyzyzb4KFXCKtA8vRXd23HwUL9yW80zCjxNGg/AjMyGl0+Fuk?=
- =?us-ascii?Q?x8gOsaBskzHQgi3iYDYIFTwxdqiFiGvDL9w8bgGgbnk5MN3oOV67rQB+zes+?=
- =?us-ascii?Q?efNOjs37Uch6ZHYK+F9jqnfLoZuj7te0eA84wYm9aM3v/SYuxF9RSLpBvsAS?=
- =?us-ascii?Q?5qiIt2hBXiEaXL0hTXfpDa6dw7R0JV6k0x8P6eIQfSoHkuPQpgWW5RSkdyIx?=
- =?us-ascii?Q?oHyw1h0f1n9XZJvNXcgg4U5mSe0CcL7kfPSm+4UvYPWZoNi9amm19bET2ehH?=
- =?us-ascii?Q?QUMDEuAYbV7JGOtlGK7VM901DoKrM6JtTWRFHjBeydiPFDzyUpRbgAS9QstM?=
- =?us-ascii?Q?o0ZbY+5xNR+5gE7J0hJEQhsP7jViLvXRo5V8fWDlyXXRzDKKuY1kJQ4DzdmK?=
- =?us-ascii?Q?CI7WEnDTpk511ro+ARbyLwdJpqaBclee1VRwi7nFKwcvNwhPt0ABdeKmHxX5?=
- =?us-ascii?Q?BbYb4RIW5okD5i9Ip8vZs95NMSFuL181gpGvS2JbE8UGHzFJe7qxFbjqZ18X?=
- =?us-ascii?Q?/iJ15Y3PWrXS16tLh5rDf4mLZKrCCJkXlnZAiMuiU8riF+QoUSw/0WC957Ny?=
- =?us-ascii?Q?+PHreFVIiteVymou45VW9TZUAKy/DZ93ABB75Kn55plpPC2HPHxYmLcdN8pD?=
- =?us-ascii?Q?/0DA8dkC7c/1bhln0jF4zWCuhHTfEY+aWJOuu0zkKT9k+AAKtYosghR0AFbb?=
- =?us-ascii?Q?mif1Agiix1WGD6Zby38ckPusS4sHP2RaHJR7yOSVpi1YJ/903Y5moMH9zf72?=
- =?us-ascii?Q?3CiEiyg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <73A53B3E70A54A4F8785F7DCE786F5CC@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Thu, 4 Feb 2021 18:55:36 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BC5C0613D6;
+        Thu,  4 Feb 2021 15:54:56 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id i71so4995937ybg.7;
+        Thu, 04 Feb 2021 15:54:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0xnEJ/+ZJd9DS4gn/VKHMcY13sD+e64WV8SaUBqyM+Q=;
+        b=NR+kNaW75Gc9+EK1uh9dftkfLDfV+YvqXgIvhoHZmGicuA9LK699TeDhfyes4kQ1Qr
+         OCL9yl/snMTRVLLCWAS6IZ8cWecATlOW2cUPpQdFCZiULn1PtV9JNPp3syg1K1acyboi
+         E2edy9MOO7y7dabVtyyO0VhlpSY6JdCXvTz+BwiaugDZPhcPoJgSv/PeOsGYF1Wi6y4l
+         7u/ku0ucOaXLWlc6U6sxaoea5Nhk5LiAIGxL3RLzFyubUYBetwfAz34rPOvdGXP16Wso
+         u27a8eZ1EGTXpoHeLpEikKGUO5ZON34tMQQqqbm4H1bFerJdgxgttOrZowO9y5L33oa5
+         /8Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0xnEJ/+ZJd9DS4gn/VKHMcY13sD+e64WV8SaUBqyM+Q=;
+        b=HwzLFjH3ifhrAHNBU9Wyu8kltUirWeu03RLK5EBjjKsBOn/uy0rOdTD1JmTkEewv3J
+         0XHKJpwnHZWhbIjV0/+dJaup+MRYWXLvn7ZkL3EtwhFt3SWqapPcfMSDEXrkmE98UaxD
+         wv33YZ3M6XvgHBkJXNbxoWqoXzh7ftmIQlC2VM4HbbEt4GQ1D7D9hxLU3sbIrKU9eOCm
+         V/VXgEZps7I0lhIalAZLZvgyU06OaE0IyDKEaj+wSnUH/Gcw1ce64giNqDyw0ovFAeB+
+         lMHz1q3R8gB5xxoHx1W0RHdhIu6dGmGRt/5Qjp06Z8Jl1HWpQeue7t1YNohJCU62NIaL
+         ebRw==
+X-Gm-Message-State: AOAM531kBI5QfrR92mS0XA6kQ8RPC4J3rpttraaYS8B4Mz7w7t0cxUXD
+        +sOu2dQzNPMla4P8kDMaeZfOzJmlXIey2CKx24c=
+X-Google-Smtp-Source: ABdhPJwZkorXQciQmxG8kAGRnxd+dJyiZqSxfwFGy3+jHMtVM6kpqVVxCaP6GwQlyk9Fbn/dRLJkHEAzs/p0weyG4vg=
+X-Received: by 2002:a25:9882:: with SMTP id l2mr2328044ybo.425.1612482895541;
+ Thu, 04 Feb 2021 15:54:55 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR15MB2999.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0b5b2aa-2457-484a-79d4-08d8c9667126
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2021 23:41:49.4019
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: W3K6Z1FHTYIvujeo7T0vCS72YUI51PDY+JIbTIh5DVH9pJezRGyyQPePPOYZAdfPHzlasXJw5WkAXknn2TgVuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB4086
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-04_13:2021-02-04,2021-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 malwarescore=0
- clxscore=1015 phishscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102040143
-X-FB-Internal: deliver
+References: <20210115210616.404156-1-ndesaulniers@google.com>
+ <CA+icZUVp+JNq89uc_DyWC6zh5=kLtUr7eOxHizfFggnEVGJpqw@mail.gmail.com>
+ <7354583d-de40-b6b9-6534-a4f4c038230f@fb.com> <CAKwvOd=5iR0JONwDb6ypD7dzzjOS3Uj0CjcyYqPF48eK4Pi90Q@mail.gmail.com>
+ <12b6c2ca-4cf7-4edd-faf2-72e3cb59c00e@fb.com> <20210117201500.GO457607@kernel.org>
+ <CAKwvOdmniAMZD0LiFdr5N8eOwHqNFED2Pd=pwOFF2Y8eSRXUHA@mail.gmail.com>
+ <CAEf4Bzbn1app3LZ1oah5ARn81j5RMNxRRHPVAkeY3h_0q7+7fg@mail.gmail.com> <CAKwvOdmrVdxbEHdOFA8x+Q2yDWOfChZzBc6nR3rdaM8R3LsxfQ@mail.gmail.com>
+In-Reply-To: <CAKwvOdmrVdxbEHdOFA8x+Q2yDWOfChZzBc6nR3rdaM8R3LsxfQ@mail.gmail.com>
+From:   Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date:   Thu, 4 Feb 2021 15:54:44 -0800
+Message-ID: <CAEf4Bzbs5sDTB6w1D4LpKLGjY5sCCUnRUsU84Ccn8DoL352j1g@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] Kbuild: DWARF v5 support
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        Nick Clifton <nickc@redhat.com>, dwarves@vger.kernel.org,
+        bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Wed, Feb 3, 2021 at 7:13 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Wed, Feb 3, 2021 at 6:58 PM Andrii Nakryiko
+> <andrii.nakryiko@gmail.com> wrote:
+> >
+> > On Wed, Feb 3, 2021 at 5:31 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
+> > >
+> > > On Sun, Jan 17, 2021 at 12:14 PM Arnaldo Carvalho de Melo
+> > > <acme@kernel.org> wrote:
+> > > >
+> > > > Em Fri, Jan 15, 2021 at 03:43:06PM -0800, Yonghong Song escreveu:
+> > > > >
+> > > > >
+> > > > > On 1/15/21 3:34 PM, Nick Desaulniers wrote:
+> > > > > > On Fri, Jan 15, 2021 at 3:24 PM Yonghong Song <yhs@fb.com> wrote:
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > On 1/15/21 1:53 PM, Sedat Dilek wrote:
+> > > > > > > > En plus, I encountered breakage with GCC v10.2.1 and LLVM=1 and
+> > > > > > > > CONFIG_DEBUG_INFO_DWARF4.
+> > > > > > > > So might be good to add a "depends on !DEBUG_INFO_BTF" in this combination.
+> > > > > >
+> > > > > > Can you privately send me your configs that repro? Maybe I can isolate
+> > > > > > it to a set of configs?
+> > > > > >
+> > > > > > >
+> > > > > > > I suggested not to add !DEBUG_INFO_BTF to CONFIG_DEBUG_INFO_DWARF4.
+> > > > > > > It is not there before and adding this may suddenly break some users.
+> > > > > > >
+> > > > > > > If certain combination of gcc/llvm does not work for
+> > > > > > > CONFIG_DEBUG_INFO_DWARF4 with pahole, this is a bug bpf community
+> > > > > > > should fix.
+> > > > > >
+> > > > > > Is there a place I should report bugs?
+> > > > >
+> > > > > You can send bug report to Arnaldo Carvalho de Melo <acme@kernel.org>,
+> > > > > dwarves@vger.kernel.org and bpf@vger.kernel.org.
+> > > >
+> > > > I'm coming back from vacation, will try to read the messages and see if
+> > > > I can fix this.
+> > >
+> > > IDK about DWARF v4; that seems to work for me.  I was previously observing
+> > > https://bugzilla.redhat.com/show_bug.cgi?id=1922698
+> > > with DWARF v5.  I just re-pulled the latest pahole, rebuilt, and no
+> > > longer see that warning.
+> > >
+> > > I now observe a different set.  I plan on attending "BPF office hours
+> > > tomorrow morning," but if anyone wants a sneak peak of the errors and
+> > > how to reproduce:
+> > > https://gist.github.com/nickdesaulniers/ae8c9efbe4da69b1cf0dce138c1d2781
+> > >
+> >
+> > Is there another (easy) way to get your patch set without the b4 tool?
+> > Is your patch set present in some patchworks instance, so that I can
+> > download it in mbox format, for example?
+>
+> $ wget https://lore.kernel.org/lkml/20210130004401.2528717-2-ndesaulniers@google.com/raw
+> -O - | git am
+> $ wget https://lore.kernel.org/lkml/20210130004401.2528717-3-ndesaulniers@google.com/raw
+> -O - | git am
+>
+> If you haven't tried b4 yet, it's quite nice.  Hard to go back.  Lore
+> also has mbox.gz links.  Not sure about patchwork.
+>
+
+Ok, I managed to apply that on linux-next, but I can't get past this:
+
+ld.lld: error: undefined symbol: pa_trampoline_start
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+
+ld.lld: error: undefined symbol: pa_trampoline_header
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+
+ld.lld: error: undefined symbol: pa_trampoline_pgd
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+>>> referenced by trampoline_64.S:142 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:142)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+
+ld.lld: error: undefined symbol: pa_wakeup_start
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+
+ld.lld: error: undefined symbol: pa_wakeup_header
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+
+ld.lld: error: undefined symbol: pa_machine_real_restart_asm
+>>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+
+ld.lld: error: undefined symbol: pa_startup_32
+>>> referenced by trampoline_64.S:77 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:77)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(trampoline_start)
+
+ld.lld: error: undefined symbol: pa_tr_flags
+>>> referenced by trampoline_64.S:124 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:124)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+
+ld.lld: error: undefined symbol: pa_tr_cr4
+>>> referenced by trampoline_64.S:138 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:138)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+
+ld.lld: error: undefined symbol: pa_tr_efer
+>>> referenced by trampoline_64.S:146 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:146)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>>> referenced by trampoline_64.S:147 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:147)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+
+ld.lld: error: undefined symbol: pa_startup_64
+>>> referenced by trampoline_64.S:161 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:161)
+>>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+
+ld.lld: error: undefined symbol: pa_tr_gdt
+>>> referenced by arch/x86/realmode/rm/trampoline_64.o:(tr_gdt)
+>>> referenced by reboot.S:28 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:28)
+>>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+
+ld.lld: error: undefined symbol: pa_machine_real_restart_paging_off
+>>> referenced by reboot.S:34 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:34)
+>>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+
+ld.lld: error: undefined symbol: pa_machine_real_restart_idt
+>>> referenced by reboot.S:47 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:47)
+>>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+
+ld.lld: error: undefined symbol: pa_machine_real_restart_gdt
+>>> referenced by reboot.S:54 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:54)
+>>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+>>> referenced by arch/x86/realmode/rm/reboot.o:(machine_real_restart_gdt)
+
+ld.lld: error: undefined symbol: pa_wakeup_gdt
+>>> referenced by arch/x86/realmode/rm/wakeup_asm.o:(wakeup_gdt)
+  CC      arch/x86/mm/numa_64.o
+  CC      arch/x86/mm/amdtopology.o
+  HOSTCC  arch/x86/entry/vdso/vdso2c
+make[4]: *** [arch/x86/realmode/rm/realmode.elf] Error 1
+make[3]: *** [arch/x86/realmode/rm/realmode.bin] Error 2
+make[2]: *** [arch/x86/realmode] Error 2
+make[2]: *** Waiting for unfinished jobs....
 
 
-> On Feb 4, 2021, at 1:18 PM, Jiri Olsa <jolsa@kernel.org> wrote:
->=20
-> We want this clean to be called from tree's root clean
-> and that one is silent if there's nothing to clean.
->=20
-> Adding check for all object to clean and display CLEAN
-> messages only if there are objects to remove.
->=20
-> Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+Hopefully Arnaldo will have better luck.
 
-Acked-by: Song Liu <songliubraving@fb.com>
 
-> ---
-> tools/bpf/resolve_btfids/Makefile | 17 ++++++++++++-----
-> 1 file changed, 12 insertions(+), 5 deletions(-)
->=20
-> diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids=
-/Makefile
-> index b780b3a9fb07..3007cfabf5e6 100644
-> --- a/tools/bpf/resolve_btfids/Makefile
-> +++ b/tools/bpf/resolve_btfids/Makefile
-> @@ -64,13 +64,20 @@ $(BINARY): $(BPFOBJ) $(SUBCMDOBJ) $(BINARY_IN)
-> 	$(call msg,LINK,$@)
-> 	$(Q)$(CC) $(BINARY_IN) $(LDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
->=20
-> +clean_objects :=3D $(wildcard $(OUTPUT)/*.o                \
-> +                            $(OUTPUT)/.*.o.cmd           \
-> +                            $(OUTPUT)/.*.o.d             \
-> +                            $(OUTPUT)/libbpf             \
-> +                            $(OUTPUT)/libsubcmd          \
-> +                            $(OUTPUT)/resolve_btfids)
-> +
-> +clean:
-> +
-> +ifneq ($(clean_objects),)
-> clean: fixdep-clean
-> 	$(call msg,CLEAN,$(BINARY))
-> -	$(Q)$(RM) -f $(BINARY); \
-> -	$(RM) -rf $(if $(OUTPUT),$(OUTPUT),.)/feature; \
-> -	$(RM) -rf $(OUTPUT)libbpf; \
-> -	$(RM) -rf $(OUTPUT)libsubcmd; \
-> -	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -nam=
-e \*.o.d | xargs $(RM)
-> +	$(Q)$(RM) -rf $(clean_objects)
-> +endif
->=20
-> tags:
-> 	$(call msg,GEN,,tags)
-> --=20
-> 2.26.2
->=20
 
+> >
+> > >
+> > > (FWIW: some other folks are hitting issues now with kernel's lack of
+> > > DWARF v5 support: https://bugzilla.redhat.com/show_bug.cgi?id=1922707)
+>
+>
+> --
+> Thanks,
+> ~Nick Desaulniers
