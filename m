@@ -2,115 +2,112 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C3FC433E6
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5852C433E6
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 03:02:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90A9964EEF
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58FF564FBB
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 03:02:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231929AbhBFCtG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 21:49:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
+        id S230334AbhBFDB5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 22:01:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231438AbhBFCnX (ORCPT
+        with ESMTP id S230258AbhBFCrf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 21:43:23 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69662C08EE12
-        for <linux-kbuild@vger.kernel.org>; Fri,  5 Feb 2021 16:03:13 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id d3so12441759lfg.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2021 16:03:13 -0800 (PST)
+        Fri, 5 Feb 2021 21:47:35 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A694DC0698D1;
+        Fri,  5 Feb 2021 14:27:19 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id y4so8236892ybk.12;
+        Fri, 05 Feb 2021 14:27:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NWPbrqSGD6rR+HAkD4dteJHXvU5H2qHvAqzNOoE/AX4=;
-        b=Q9wbjEdeHc4TeNxJ/V+vcdkXrft7Hdvxxn+SIjZxu8PZsrwK5feK1ppXy1XqnE28Ro
-         D4ok3CLhopKZbW5fYvBwYj1OZxnIx1dNO+j/IUzx9eM1ch5hzGzmxEydedxC76cWDlf8
-         vavb1T9si/T+EQjB+UhwvM+HTrxgBeGiY4jchmvvqyRbZ7E1tkbi4bGuJI010NTymG1W
-         KmVVl1eMaq4TdUrh/rsBFGcVys2kY3z/YQiM0T97plSvPSfTXUzx6jFYonOe57z75kmY
-         mapTq2Rquh3dM65g/II/UgJxQnA238NhsBg8vg+nUry3YhUuPw3/eRvpW50is8E+69vI
-         Ey4A==
+        bh=ZF+kVH13+yhFtpWltQEZs61WOnOm+RDU6OENTzqgftM=;
+        b=FX3/yhSYZu2WlKBs037VWu5o38fnwMmwmslev82RnmoXC/UZqo9ACDdvZUW97Gtnvl
+         0B5V4D17NLpQk2wMrYcikSomF4TMY8UpJ2nNtAoqxFavUqUhA/6XBH4Frgg7gUngspo6
+         vvyVoMVsgU6Ei3gs40AlpaBeHMUnHphJ8rJRHAN2O+uj2dNQlkRbdNRNxjQ4S8DaOQ5E
+         gVQl8mNta+J0vxwWCbyuM4Hifbjqo4k4X3NILuewRsOdVKRhaggmTZzLxgLrKMgI8CJW
+         d1L/r7LX5RsH2t71y1Rz+XzqwBOiMN4C+wWAjCvSCFjauAkWYSyelIvu9kxaMAUN/tiE
+         CJ5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NWPbrqSGD6rR+HAkD4dteJHXvU5H2qHvAqzNOoE/AX4=;
-        b=jjduRpjyIKX+oFAyT9ZUpeSGp6g1jztrz80FTuhEDPlMALlgmZJGbs0QMjOKXcxZLM
-         llQEdt9hxxuAtSZhGZCBwGgGppvD8rqrazfA4Gln30mbVcGxvB0oVOP2+vE+ivDMc/Wz
-         wN/OUFgzSZXQlRPrb16zXLuS2V5e27eF+qFC4qRtjqaC7iEbtJlUFlw17bHDcfXwEIEG
-         7HW679t+0vzxJg8X8ccba9nAGJaY+5Sh/5FjK79qDw6LSjeE/BRXal9ViUgqoOE1VLcv
-         gE0ojlU01adkCqvC1iIFglWGf4zaFnDABk/e7shNcw0E55u4tagRehEq4cpY7aCbK4Oi
-         IChg==
-X-Gm-Message-State: AOAM533YrT+NVdntASDktSS9cyJJrPaM3ofsVDN7xI3Zy8m6w3Ns8Eo4
-        Y/Vl2GGvuayKf2iydFWoRl1262Ihh4kvv3IVRJhK8w==
-X-Google-Smtp-Source: ABdhPJwFLIr/GH5BZQINZQllHE4paJG7suSjTbzOFq6WfqnMVkh1s9cjISJEvl7WKkrsrv8vLH+/5AkJ3PEobamJQ4I=
-X-Received: by 2002:a2e:7d11:: with SMTP id y17mr4129417ljc.116.1612569791666;
- Fri, 05 Feb 2021 16:03:11 -0800 (PST)
+        bh=ZF+kVH13+yhFtpWltQEZs61WOnOm+RDU6OENTzqgftM=;
+        b=b6SZwVGwtB/7LDM/aKntBlr/Fk0OQE3mdTSSqCdjxBZ6j9BCX9xQ4D/atdlt/vZ0Uc
+         uDCMicj9JMUtBpoE7QJX9oE3KfAE8ZfEJqem2bmerZpc5/cLYgEb+AAuR6hYVJkg5gYD
+         aJcOtEMyEKc5mNnneDZCfESJllqfzG4vRpy8iA4ilnownDzkcJWEizIMFqe7xcNt4tOw
+         7Gsf/dDPmltBIiK/yFlO/LAXuS6WpC+Uo8Niau2jqk58PoaFU2rX55u2AzcX1cVHe52D
+         vjtzyDLThI52nyOPfJYQiM4mSUipRsgC5PWlaOGj2Lb0GU2/S0u5PalBhbCUaVxTCZmQ
+         ibtQ==
+X-Gm-Message-State: AOAM532K4s+uFgEh56JD9givHOVFbyXGfGnUam4/5Fwn1dHsCYxNx/z7
+        K0xOvxrndABMSKELK/qOBBRZXyGYgvcbiIystE8=
+X-Google-Smtp-Source: ABdhPJzUq31FJeNv9UnC/OaU7XfN5zJ4gnklBIWPCabLBw0WdzDZ5wjzOiAS8Xcv2r5S/iv+s/2buOiAdnlYtfo59mI=
+X-Received: by 2002:a25:da4d:: with SMTP id n74mr9798106ybf.347.1612564039083;
+ Fri, 05 Feb 2021 14:27:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20210205202220.2748551-1-ndesaulniers@google.com>
- <20210205202220.2748551-2-ndesaulniers@google.com> <20210205160034.a0e0ba06752bef03e60f91f8@linux-foundation.org>
-In-Reply-To: <20210205160034.a0e0ba06752bef03e60f91f8@linux-foundation.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Fri, 5 Feb 2021 16:02:58 -0800
-Message-ID: <CAKwvOdmkx=+MGkc5uCB=0TssnHNQXb0E+x=CqbGs6gGZc5GH7Q@mail.gmail.com>
-Subject: Re: [PATCH v9 1/3] vmlinux.lds.h: add DWARF v5 sections
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Caroline Tice <cmtice@google.com>,
-        Nick Clifton <nickc@redhat.com>, Yonghong Song <yhs@fb.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Chris Murphy <bugzilla@colorremedies.com>,
-        Mark Wielaard <mark@klomp.org>,
-        "# 3.4.x" <stable@vger.kernel.org>,
-        Chris Murphy <lists@colorremedies.com>,
-        Nathan Chancellor <nathan@kernel.org>
+References: <20210205124020.683286-1-jolsa@kernel.org>
+In-Reply-To: <20210205124020.683286-1-jolsa@kernel.org>
+From:   Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date:   Fri, 5 Feb 2021 14:27:08 -0800
+Message-ID: <CAEf4Bzao-9wNdHxGu1mMhSie78FyWno-RYJM6_Jay8s=hyUWJg@mail.gmail.com>
+Subject: Re: [PATCHv2 bpf-next 0/4] kbuild/resolve_btfids: Invoke
+ resolve_btfids clean in root Makefile
+To:     Jiri Olsa <jolsa@kernel.org>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andriin@fb.com>,
+        Networking <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@chromium.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Feb 5, 2021 at 4:00 PM Andrew Morton <akpm@linux-foundation.org> wrote:
+On Fri, Feb 5, 2021 at 4:45 AM Jiri Olsa <jolsa@kernel.org> wrote:
 >
-> On Fri,  5 Feb 2021 12:22:18 -0800 Nick Desaulniers <ndesaulniers@google.com> wrote:
+> hi,
+> resolve_btfids tool is used during the kernel build,
+> so we should clean it on kernel's make clean.
 >
-> > We expect toolchains to produce these new debug info sections as part of
-> > DWARF v5. Add explicit placements to prevent the linker warnings from
-> > --orphan-section=warn.
-> >
-> > Compilers may produce such sections with explicit -gdwarf-5, or based on
-> > the implicit default version of DWARF when -g is used via DEBUG_INFO.
-> > This implicit default changes over time, and has changed to DWARF v5
-> > with GCC 11.
-> >
-> > .debug_sup was mentioned in review, but without compilers producing it
-> > today, let's wait to add it until it becomes necessary.
-> >
+> v2 changes:
+>   - add Song's acks on patches 1 and 4 (others changed) [Song]
+>   - add missing / [Andrii]
+>   - change srctree variable initialization [Andrii]
+>   - shifted ifdef for clean target [Andrii]
 >
-> There isn't anything in this changelog which explains why a -stable
-> backport was requested?  Or is there?  Irritating linker warnings?
-> More than that?
+> thanks,
+> jirka
+>
+>
 
-Users adopting GCC 11 will start to see warnings from the linker due
-to --orphan-section=warn when building the branches of the stable
-tree.  Stable has IME accepted patches for permitting newer toolchains
-to continue to compile warning free.
--- 
-Thanks,
-~Nick Desaulniers
+FYI, your patch #2 didn't make it into the mailing list (see [0]). So
+maybe wait for a bit and if it doesn't arrive, re-submit?
+
+  [0] https://patchwork.kernel.org/user/todo/netdevbpf/?series=428711&delegate=121173&state=*
+
+> ---
+> Jiri Olsa (4):
+>       tools/resolve_btfids: Build libbpf and libsubcmd in separate directories
+>       tools/resolve_btfids: Check objects before removing
+>       tools/resolve_btfids: Set srctree variable unconditionally
+>       kbuild: Add resolve_btfids clean to root clean target
+>
+>  Makefile                            |  7 ++++++-
+>  tools/bpf/resolve_btfids/.gitignore |  2 --
+>  tools/bpf/resolve_btfids/Makefile   | 44 ++++++++++++++++++++++----------------------
+>  3 files changed, 28 insertions(+), 25 deletions(-)
+>
