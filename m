@@ -2,102 +2,87 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCF7C43381
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13163C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:45:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3048F6500B
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C803D64F91
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbhBFCoZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 21:44:25 -0500
-Received: from condef-02.nifty.com ([202.248.20.67]:32514 "EHLO
-        condef-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231660AbhBFClX (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 21:41:23 -0500
-X-Greylist: delayed 502 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Feb 2021 21:41:18 EST
-Received: from conssluserg-06.nifty.com ([10.126.8.85])by condef-02.nifty.com with ESMTP id 1160sDqm007252;
-        Sat, 6 Feb 2021 09:54:13 +0900
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 1160r6ML013051;
-        Sat, 6 Feb 2021 09:53:06 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 1160r6ML013051
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1612572787;
-        bh=GPySi5FWUUgt3Nf/zevYzreQ14QCHC7dq4Gj7Iu6PdM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=KzoShgNcKgDb7aRIUtJmJ1rx2FCzGlFX5m421RSg8KaR+ZHU8DcZFfkcqCpImJ9Se
-         20oACGiCEzq35ncdGVLdFr6G1HYhyWy3yG5j/x9hhHGP5NxMYVrw8h5YL8Obo6YLgf
-         0JL+92QeKSoxYEWm/F+wV2qZUWoO7N4oDG5iKl1+/QwFmgAkEuLBfJn6y9tjzrDebn
-         CkTvpcRmcekx+4ZSrH5eVn29+qe268TkYo2LZ43I6TRxiQJVDMNn33AogXk8F6sYKx
-         vh58eyX+5U0MuKjD6MMyeih7AS0CJ0J0dJLiYuJsou+U3K8BZAAhnwrtxQ+ZftcYw/
-         XzdXCJifY0GFQ==
-X-Nifty-SrcIP: [209.85.216.47]
-Received: by mail-pj1-f47.google.com with SMTP id nm1so4543652pjb.3;
-        Fri, 05 Feb 2021 16:53:06 -0800 (PST)
-X-Gm-Message-State: AOAM530vi38FgUq3BStni3+djPmsdCkMkd75APd+ouP2CUqitGa9qRye
-        8vhfsDS++evyT1BiAfd2zU/jnAdQ25D8Yun4xHI=
-X-Google-Smtp-Source: ABdhPJy2iadLfW+f/QGkcC2eqfoUOehXlU0LObloB/V5zjeO+YCzFrx6L4Mi1lzQVdV+RNvC/ncuPB1ZZ0t1rSii5I8=
-X-Received: by 2002:a17:902:bb87:b029:e1:d1f:2736 with SMTP id
- m7-20020a170902bb87b02900e10d1f2736mr6360693pls.1.1612572786057; Fri, 05 Feb
- 2021 16:53:06 -0800 (PST)
+        id S231803AbhBFCo1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:44:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38110 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231128AbhBFClz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 5 Feb 2021 21:41:55 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D1E7E64FBC;
+        Fri,  5 Feb 2021 21:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612562133;
+        bh=uGtBS7bWINMK3Lh97XHqzAU0AGk6BwnwE/7ThauRS6o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sqdwdU7B53/JbjKrAOUl1hl8noNcV/EFpLgVG3JvdbbTcQxBEkjnWyFRzSnyCjxzM
+         u3ZYR2lbctEB8rgWfn7/0M0SOJrkEvC18cTrg2fYGUM35J5aYDd+Aohm68PtM3cKLb
+         HI7eTQiCT3pCveGutIzuyuhyP27PcCaWyH3+D6EHLc0nYRZ7up5mkzI35eTQJ4ugYg
+         CkFl0RmTlo/He3Ol5tbCieZEWBUhZEYGhM0n+FJdt2vkmQ8VCGxRr2PZL9FXd9+pQX
+         vKEQcxpXTJ18Fa+KdR9jYSm1KgcJ7QjhpwrUCmKvyZUr+lxGdbw7ms4JGiBlhC+E9O
+         3dkpLmEfdtdKw==
+Date:   Fri, 5 Feb 2021 14:55:31 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Sedat Dilek <sedat.dilek@gmail.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Subject: Re: Using GNU AS from a selfmade binutils v2.35.2
+Message-ID: <20210205215531.GA8294@ubuntu-m3-large-x86>
+References: <CA+icZUUjb_71mWwWFMYN_OPZir2vStLq1kDY1O+JCFjtmEEBjA@mail.gmail.com>
+ <20210205213651.GA16907@Ryzen-5-4500U.localdomain>
+ <CAKwvOdk8vp5z71pQHG04REENSy15Z3DvY1MehS_GGVxnhXx_cg@mail.gmail.com>
 MIME-Version: 1.0
-References: <1612518255-23052-1-git-send-email-yangyicong@hisilicon.com>
- <1612518255-23052-5-git-send-email-yangyicong@hisilicon.com> <YB0VxBrYM3BSoxrc@kroah.com>
-In-Reply-To: <YB0VxBrYM3BSoxrc@kroah.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 6 Feb 2021 09:52:28 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQoUZYxswxT9zkq=G_2A4tdkhkedMyQhj8eHkBeqz7+Lw@mail.gmail.com>
-Message-ID: <CAK7LNAQoUZYxswxT9zkq=G_2A4tdkhkedMyQhj8eHkBeqz7+Lw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] staging: comedi: Use subdir-ccflags-* to inherit
- debug flag
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Yicong Yang <yangyicong@hisilicon.com>, jdelvare@suse.com,
-        Guenter Roeck <linux@roeck-us.net>, giometti@enneenne.com,
-        Ian Abbott <abbotti@mev.co.uk>,
-        Hartley Sweeten <hsweeten@visionengravers.com>, kw@linux.com,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux PM mailing list <linux-pm@vger.kernel.org>,
-        linux-hwmon@vger.kernel.org, devel@driverdev.osuosl.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>, linuxarm@openeuler.org,
-        prime.zeng@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdk8vp5z71pQHG04REENSy15Z3DvY1MehS_GGVxnhXx_cg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Feb 5, 2021 at 6:54 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Feb 05, 2021 at 05:44:15PM +0800, Yicong Yang wrote:
-> > From: Junhao He <hejunhao2@hisilicon.com>
+On Fri, Feb 05, 2021 at 01:44:44PM -0800, 'Nick Desaulniers' via Clang Built Linux wrote:
+> On Fri, Feb 5, 2021 at 1:37 PM Nathan Chancellor <nathan@kernel.org> wrote:
 > >
-> > Use subdir-ccflags-* instead of ccflags-* to inherit the debug
-> > settings from Kconfig when traversing subdirectories.
->
-> Again, explain _why_.
->
-> Please read the section entitled "The canonical patch format" in the
-> kernel file, Documentation/SubmittingPatches for what a proper changelog
-> should look like.
->
-> thanks,
->
-> greg k-h
+> > It is entirely possible that '--prefix=' should always be present though:
+> >
+> > diff --git a/Makefile b/Makefile
+> > index f5842126e89d..409822f45bfd 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -562,10 +562,10 @@ endif
+> >  ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+> >  ifneq ($(CROSS_COMPILE),)
+> >  CLANG_FLAGS    += --target=$(notdir $(CROSS_COMPILE:%-=%))
+> > +endif
+> >  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+> >  CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
+> >  GCC_TOOLCHAIN  := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
+> > -endif
+> >  ifneq ($(GCC_TOOLCHAIN),)
+> >  CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+> >  endif
+> 
+> I'm unsure. Consider the case where I'm building with `LLVM=1
+> LLVM_IAS=1 CROSS_COMPILE=aarch64-linux-gnu`, ie. no GNU binutils and
+> am cross compiling.  In that case, we should not be setting any
+> --prefix or --gcc-toolchain, and yet today we are.  Perhaps that is
+> orthogonal though?
 
+Yes, we could probably move the 'ifneq ($(LLVM_IAS),1)' block up because
+all other build tools should be called directly (really, just "$(LD)")
+but I do think that is orthogonal to the issue that is going on here.
 
-I think this is a good clean-up,
-assuming CONFIG_COMEDI_DEBUG intends to
-give the DEBUG flag to all source files
-under drivers/staging/comedi/.
+I am happy to send patches if you feel this is worthwhile.
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Nathan
