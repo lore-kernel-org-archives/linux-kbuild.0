@@ -2,130 +2,127 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB16C433DB
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 23:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276F0C433E6
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:31:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67D2564FEB
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 23:25:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E26C865024
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:31:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbhBEXZN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 18:25:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50918 "EHLO
+        id S229704AbhBFCb3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:31:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbhBEJ4a (ORCPT
+        with ESMTP id S229537AbhBFCa6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 04:56:30 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC35DC0617A9
-        for <linux-kbuild@vger.kernel.org>; Fri,  5 Feb 2021 01:55:48 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id m12so3329648pjs.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2021 01:55:48 -0800 (PST)
+        Fri, 5 Feb 2021 21:30:58 -0500
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF95CC08ED35;
+        Fri,  5 Feb 2021 15:19:25 -0800 (PST)
+Received: by mail-yb1-xb35.google.com with SMTP id y128so8336936ybf.10;
+        Fri, 05 Feb 2021 15:19:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=bdqbiOx96ZjGlvDj89re9Lv5tP/labX2E5OeezghzzA=;
-        b=sNaAZVhr4ZWW+HvhkEvCK60kufSKBpL0okB1oVoFhRQkODNHmvla3bL0n2655cHakn
-         ahzuSLumkW1g3503AJBqLhhmenG6CeT1aGphN4VUpWBUClFCcOktfkfnMTx35wKd6m9J
-         XRMjl762BKyK2T/YM4iB/Af3qwLr91UqEYGIDdodum1nbUPKkvO7VlSygMg8aya62mZf
-         H4waAizinttR319yw3YGqLnR9D9ubjjjmv1Ee6TqWJnUkClEAr0CZNt69r5RgEKIYBwI
-         WOVmzJ36sjEd0O2ssh2fPxjX3O1ke4RkPfbKPm96OlymIEkLyspIqNOembEfhX19nKiF
-         esbQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eaySnepDzbdWK06t4HWZqmtay2gND6FqJB5mQU1GyNk=;
+        b=A+eCqkjlgp/p4pwaEXRy99LxJWrvSUp2lG8jE+/nw8IYa7DCCx2brl+75YXwf4V1cH
+         GFAMb/Z0ZTwIS+jALWtv6JAOtd5wFxWsmhGZ3T+W7bNhACZo/3f0zmTvYZg2tBWnVH5Y
+         L7WZA3tzmn8iGAfBpejM7y37UgVhHc2hv110IssNLoILQ/xuOB+TOZjVDHvzldnGBLpN
+         Zrd+2FbNsvTUpXhaTNewl9Gofb8jmbx1xN0VgbaQfJ5OChdFnUxlvVukMIW/1iTLXA7L
+         eKLfkqiDvvFwKNHX4ehx5i3BN7IZWr9ezLEwSDOiwLvkUWmW3rdQmNxgq9nDlzBCOmOU
+         vzdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=bdqbiOx96ZjGlvDj89re9Lv5tP/labX2E5OeezghzzA=;
-        b=DTKaChw2f1Pwa8SWPnVCoLxjUz7+KtN0ZjCYUk6wQia3YaVJdZg8eUYGc3avBSttNM
-         +xm8ySlH/1u+pHYBPwyBLUv28sTPIkTtMtKb+YpRb8c0lmp6RG83A91DAnu9BsLAHfTd
-         4kCEKVNJAGJ2McR57TtNCMYZwcqrlFO6Igi0WcqxPcnlIeCy/mbDzb4Hkyw+etu2n0FQ
-         BoZ6LKdMUSKjV6//REiIqaTZKkzcrzNW8ZPhgyZJq8bcg+psXlRCNZDfglz5JVeXcabG
-         PFq9nLfwzD6QatfNHv+a2O5swxa10bya62czHwrKR2V6KBkWkLHwG+uVf+rcgatdz/O+
-         VA9Q==
-X-Gm-Message-State: AOAM530M/tGEYNSohzAgv89BsyB1ePKmTiepML/EExZ6XzlZhRixKzQ2
-        yu/9hlhSc2n24PXATuoZU/Pv8g==
-X-Google-Smtp-Source: ABdhPJx4IP8HYF4plUaQ5oiiOkbrrvWNIgSboohs8FGAMUWfvXRdAYb53lVFHPh4GcbyTOWtUPEKGQ==
-X-Received: by 2002:a17:90a:1503:: with SMTP id l3mr3338386pja.41.1612518948404;
-        Fri, 05 Feb 2021 01:55:48 -0800 (PST)
-Received: from localhost ([122.172.59.240])
-        by smtp.gmail.com with ESMTPSA id i14sm3035535pfk.28.2021.02.05.01.55.47
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Feb 2021 01:55:47 -0800 (PST)
-Date:   Fri, 5 Feb 2021 15:25:45 +0530
-From:   Viresh Kumar <viresh.kumar@linaro.org>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Frank Rowand <frowand.list@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eaySnepDzbdWK06t4HWZqmtay2gND6FqJB5mQU1GyNk=;
+        b=BBNGXepVC50yDuSMYfNidNNJMW5+vAF29Rj4dGTcMsWvP2hK18A4KYXiYpxE5EeJDN
+         fYPoUt5AtzfVur2V1wZOgTpf7zM5ZJdsY9qE+45Qgmdw1YDyb1VvRjmOkssnz3gQzHwZ
+         Oq7Em4SDxCX8ibSXkUyvZ0boqQ6qDlanq6IPtvJQdakeTR/a0ZZjZ8KdJ1vkK2+H+Pfg
+         uBi4rrVWhmDoYc5qY4W856a+ASSsR1w6Yo8OWrwlidPgrcX6VkJvCYg75uSAP+gVU7qT
+         Q/pQFBbRxe0UhZfskofdGdjV3iY6W06goHuFXMhSRNAESnshJbdVo4tn9NktzTgoGGvw
+         7PUg==
+X-Gm-Message-State: AOAM530ugLJ7+4ymPJjStHiNVVtSfRLRnKPGXPxI7Aaz5rrhBMPpY1Vm
+        AWgnnXp2mfsES4zAsThrl2v3xi2CJLw+EXy08AfU+hFv0QFnu3Tf
+X-Google-Smtp-Source: ABdhPJwt7koiechQx56/EbEreAyk9y0MSngpulAsJbBPdaM7f/1PsGrvmYXWqGApF2lrJzzC7RycR83mu192C39uepk=
+X-Received: by 2002:a25:da4d:: with SMTP id n74mr10053150ybf.347.1612567165234;
+ Fri, 05 Feb 2021 15:19:25 -0800 (PST)
+MIME-Version: 1.0
+References: <20210205124020.683286-1-jolsa@kernel.org> <20210205124020.683286-3-jolsa@kernel.org>
+In-Reply-To: <20210205124020.683286-3-jolsa@kernel.org>
+From:   Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date:   Fri, 5 Feb 2021 15:19:14 -0800
+Message-ID: <CAEf4BzY6aJ5YfErvbY8AwuDztvgs4xrd5dC8y3vkxTZbiMppMA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/4] tools/resolve_btfids: Check objects before removing
+To:     Jiri Olsa <jolsa@kernel.org>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andriin@fb.com>,
+        Networking <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        anmar.oueja@linaro.org, Bill Mills <bill.mills@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH V7 4/6] kbuild: Add support to build overlays (%.dtbo)
-Message-ID: <20210205095545.woevnkxg3ar7ctys@vireshk-i7>
-References: <cover.1611904394.git.viresh.kumar@linaro.org>
- <434ba2467dd0cd011565625aeb3450650afe0aae.1611904394.git.viresh.kumar@linaro.org>
- <CAMuHMdVp0vGMqoEoP9A7Y7-ph-DYUWdddtChdq_eZcROYTBMHg@mail.gmail.com>
- <20210205092507.fdxotdjlq5rjs2yh@vireshk-i7>
- <CAMuHMdWUMcMcJxnC+oML8P0+r72_+d6RWGY50dOWCUECdJGWPA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdWUMcMcJxnC+oML8P0+r72_+d6RWGY50dOWCUECdJGWPA@mail.gmail.com>
-User-Agent: NeoMutt/20180716-391-311a52
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 05-02-21, 10:41, Geert Uytterhoeven wrote:
-> Hi Viresh,
-> 
-> On Fri, Feb 5, 2021 at 10:25 AM Viresh Kumar <viresh.kumar@linaro.org> wrote:
-> > On 05-02-21, 10:02, Geert Uytterhoeven wrote:
-> > > Thanks for your patch
-> > > (which I only noticed because it appeared in dt-rh/for-next ;-)
-> > >
-> > > On Fri, Jan 29, 2021 at 8:31 AM Viresh Kumar <viresh.kumar@linaro.org> wrote:
-> > > > Add support for building DT overlays (%.dtbo). The overlay's source file
-> > > > will have the usual extension, i.e. .dts, though the blob will have
-> > >
-> > > Why use .dts and not .dtso for overlays?
-> > > Because you originally (until v5) had a single rule for building .dtb
-> > > and .dtbo files?
-> >
-> > I am fine with doing that as well if Rob and David agree to it. Rob
-> > did suggest that at one point but we didn't do much about it later on
-> > for some reason.
-> >
-> > FWIW, this will also require a change in the DTC compiler.
-> 
-> Care to explain why? I've been using .dtsi for ages in
-> https://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-drivers.git/log/?h=topic/renesas-overlays
+On Fri, Feb 5, 2021 at 2:59 PM Jiri Olsa <jolsa@kernel.org> wrote:
+>
+> We want this clean to be called from tree's root clean
+> and that one is silent if there's nothing to clean.
+>
+> Adding check for all object to clean and display CLEAN
+> messages only if there are objects to remove.
+>
+> Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+> ---
 
-I don't see you building them anywhere, they aren't added to the
-Makefile ever. What am I missing ?
+Acked-by: Andrii Nakryiko <andrii@kernel.org>
 
-actually none of the dtso's were added to any makefile in that branch.
-
-Anyway, the DTC needs to know how to treat the dtso format and it will
-error out currently with unknown format kind of errors.
-
-Below email [1] have some information on the kind of changes required
-here. Also note that we had to do similar changes for dtbo earlier
-[2].
-
--- 
-viresh
-
-[1] https://lore.kernel.org/lkml/CAK7LNASViCOTGR7yDTfh0O+PAu+X-P2NwdY4oPMuXrr51awafA@mail.gmail.com/
-[2] https://lore.kernel.org/lkml/30fd0e5f2156665c713cf191c5fea9a5548360c0.1609926856.git.viresh.kumar@linaro.org/
+>  tools/bpf/resolve_btfids/Makefile | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids/Makefile
+> index 1d46a247ec95..be09ec4f03ff 100644
+> --- a/tools/bpf/resolve_btfids/Makefile
+> +++ b/tools/bpf/resolve_btfids/Makefile
+> @@ -64,13 +64,20 @@ $(BINARY): $(BPFOBJ) $(SUBCMDOBJ) $(BINARY_IN)
+>         $(call msg,LINK,$@)
+>         $(Q)$(CC) $(BINARY_IN) $(LDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
+>
+> +clean_objects := $(wildcard $(OUTPUT)/*.o                \
+> +                            $(OUTPUT)/.*.o.cmd           \
+> +                            $(OUTPUT)/.*.o.d             \
+> +                            $(OUTPUT)/libbpf             \
+> +                            $(OUTPUT)/libsubcmd          \
+> +                            $(OUTPUT)/resolve_btfids)
+> +
+> +ifneq ($(clean_objects),)
+>  clean: fixdep-clean
+>         $(call msg,CLEAN,$(BINARY))
+> -       $(Q)$(RM) -f $(BINARY); \
+> -       $(RM) -rf $(if $(OUTPUT),$(OUTPUT),.)/feature; \
+> -       $(RM) -rf $(OUTPUT)/libbpf; \
+> -       $(RM) -rf $(OUTPUT)/libsubcmd; \
+> -       find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
+> +       $(Q)$(RM) -rf $(clean_objects)
+> +else
+> +clean:
+> +endif
+>
+>  tags:
+>         $(call msg,GEN,,tags)
+> --
+> 2.26.2
+>
