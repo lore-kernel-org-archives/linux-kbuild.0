@@ -2,92 +2,109 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D940C43381
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 22:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF81AC433E9
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 23:02:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5968464EE4
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 22:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAD6F64FE9
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 23:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbhBEWWf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 17:22:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41764 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232630AbhBEO26 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 09:28:58 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D08C264D92;
-        Fri,  5 Feb 2021 16:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612541205;
-        bh=m0Ived/Gtw9H0h9wzJs3877Bi8G+nGI9iZ9HA2qfSi0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=N19lstyfIjNxGz0mYNCERX8vzhh1nu7jBG58K4mykiqzTPnAy4sUWlGy2fihm8BZi
-         2hvg6JcH/74yAAhr6kGe8CSdh/ZWeu7AyEJ/8qD47xa5QJXEcaBroFOEc+OXUz08Kp
-         qhqV4TzpAkO2qCCq6/smiou/HyIojpMLPsUEmQSznsUqfZar1K0byzoV/LkJWHiyNf
-         GSn6boP/u4Jy3y4I3pqrJKex77yGszmnrQq2B9G46HiUhOHS3NpdMcNFKD1T+gKx66
-         v6VBSmMkbxAta0qgbDwCXodwiEat97uh2Wh2Hy5PeLCJ7Pi/wtO0lNQ74b3RcRPfKe
-         1dLN2PLyiSV1w==
-Received: by quaco.ghostprotocols.net (Postfix, from userid 1000)
-        id 3750740513; Fri,  5 Feb 2021 13:06:41 -0300 (-03)
-Date:   Fri, 5 Feb 2021 13:06:41 -0300
-From:   Arnaldo Carvalho de Melo <acme@kernel.org>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     bpf <bpf@vger.kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-        dwarves@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Yonghong Song <yhs@fb.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
+        id S229884AbhBEXB7 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 18:01:59 -0500
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:20204 "EHLO
+        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231934AbhBEMle (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 5 Feb 2021 07:41:34 -0500
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-514-XY0ZIqP-PDOaXbiuUMEF7g-1; Fri, 05 Feb 2021 07:40:35 -0500
+X-MC-Unique: XY0ZIqP-PDOaXbiuUMEF7g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96511C7401;
+        Fri,  5 Feb 2021 12:40:33 +0000 (UTC)
+Received: from krava.cust.in.nbox.cz (unknown [10.40.195.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D6D8460936;
+        Fri,  5 Feb 2021 12:40:30 +0000 (UTC)
+From:   Jiri Olsa <jolsa@kernel.org>
+To:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andriin@fb.com>
+Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Caroline Tice <cmtice@google.com>,
-        Nick Clifton <nickc@redhat.com>
-Subject: Re: [FIXED] Re: 5:11: in-kernel BTF is malformed
-Message-ID: <20210205160641.GE920417@kernel.org>
-References: <CAJCQCtRHOidM7Vps1JQSpZA14u+B5fR860FwZB=eb1wYjTpqDw@mail.gmail.com>
- <CAEf4BzZ4oTB0-JizHe1VaCk2V+Jb9jJoTznkgh6CjE5VxNVqbg@mail.gmail.com>
- <CAJCQCtRw6UWGGvjn0x__godYKYQXXmtyQys4efW2Pb84Q5q8Eg@mail.gmail.com>
- <20210204010038.GA854763@kernel.org>
- <CAJCQCtQfgRp78_WSrSHLNUUYNCyOCH=vo10nVZW_cyMjpZiNJg@mail.gmail.com>
- <CAEf4Bza4XQxpS7VTNWGk6Rz-iUwZemF6+iAVBA_yvrWnV0k8Qg@mail.gmail.com>
- <CAJCQCtRDJ_uiJcanP_p+y6Kz76c4P-EmndMyfHN5f4rtkgYhjA@mail.gmail.com>
- <20210204132625.GB910119@kernel.org>
- <20210204163319.GD910119@kernel.org>
- <CAJCQCtT-i0Lv2zxUDko3XuiHpUqOnYPeND5LzD=zgrB1-GNvAg@mail.gmail.com>
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kbuild@vger.kernel.org
+Subject: [PATCH bpf-next 3/4] tools/resolve_btfids: Set srctree variable unconditionally
+Date:   Fri,  5 Feb 2021 13:40:19 +0100
+Message-Id: <20210205124020.683286-4-jolsa@kernel.org>
+In-Reply-To: <20210205124020.683286-1-jolsa@kernel.org>
+References: <20210205124020.683286-1-jolsa@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJCQCtT-i0Lv2zxUDko3XuiHpUqOnYPeND5LzD=zgrB1-GNvAg@mail.gmail.com>
-X-Url:  http://acmel.wordpress.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jolsa@kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kernel.org
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=WINDOWS-1252
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Em Thu, Feb 04, 2021 at 08:10:52PM -0700, Chris Murphy escreveu:
-> On Thu, Feb 4, 2021 at 9:33 AM Arnaldo Carvalho de Melo <acme@kernel.org> wrote:
-> >
-> > So I think that for the problems related to building the kernel with gcc
-> > 11 in Fedora Rawhide using the default that is now DWARF5, pahole 1.20
-> > is good to go and I'll tag it now.
-> 
-> dwarves-1.20-1.fc34.x86_64
-> libdwarves1-1.20-1.fc34.x86_64
-> 
-> Fixes both "failed to validate module [?????] BTF: -22" type errors,
-> and 'in-kernel BTF is malformed" with qemu-kvm and libvirt.
+We want this clean to be called from tree's root Makefile,
+which defines same srctree variable and that will screw
+the make setup.
 
-Cool! Any fedora user here please give the update some love by bumping
-its karma at:
+We actually do not use srctree being passed from outside,
+so we can solve this by setting current srctree value
+directly.
 
-https://bodhi.fedoraproject.org/updates/FEDORA-2021-804e7a572c
+Also changing the way how srctree is initialized as suggested
+by Andrri.
 
-- Arnaldo
+Also root Makefile does not define the implicit RM variable,
+so adding RM initialization.
+
+Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+---
+ tools/bpf/resolve_btfids/Makefile | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids/Makefile
+index be09ec4f03ff..bb9fa8de7e62 100644
+--- a/tools/bpf/resolve_btfids/Makefile
++++ b/tools/bpf/resolve_btfids/Makefile
+@@ -2,11 +2,7 @@
+ include ../../scripts/Makefile.include
+ include ../../scripts/Makefile.arch
+ 
+-ifeq ($(srctree),)
+-srctree := $(patsubst %/,%,$(dir $(CURDIR)))
+-srctree := $(patsubst %/,%,$(dir $(srctree)))
+-srctree := $(patsubst %/,%,$(dir $(srctree)))
+-endif
++srctree := $(abspath $(CURDIR)/../../../)
+ 
+ ifeq ($(V),1)
+   Q =
+@@ -22,6 +18,7 @@ AR       = $(HOSTAR)
+ CC       = $(HOSTCC)
+ LD       = $(HOSTLD)
+ ARCH     = $(HOSTARCH)
++RM      ?= rm
+ 
+ OUTPUT ?= $(srctree)/tools/bpf/resolve_btfids/
+ 
+-- 
+2.26.2
+
