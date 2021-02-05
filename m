@@ -2,185 +2,188 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B44C43381
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 20:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A00C433DB
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 20:39:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C27464E02
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 20:28:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ED7664F31
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 20:39:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233143AbhBESps (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 13:45:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233517AbhBESm3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 13:42:29 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E316CC061797
-        for <linux-kbuild@vger.kernel.org>; Fri,  5 Feb 2021 12:22:34 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id v23so1069157pfe.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2021 12:22:34 -0800 (PST)
+        id S233036AbhBES4q (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 13:56:46 -0500
+Received: from mail-eopbgr150057.outbound.protection.outlook.com ([40.107.15.57]:52390
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232981AbhBEPDl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 5 Feb 2021 10:03:41 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=THEfZofNCjNG/GnOAk+wOa5xq8pSB7bNZnMqqPFXSHcmVOZRFhRu1wN6POfXxDfW4Wr4d/Vmev06oNGDh5dJm2du6E+v2ellEa2IgL1Aj/xmATDTqQO+NjzeU5zGTPZ8S25gMWBiTaMQdrJgHwzdOelObEeTbUmm1G3qeF4W+fAKxTnLs3yHZEvYMmQOdIbmlCYR2z/X5zQujCDf/Irid/kg6dqI9DrLxHbrllSKhSPkDY9muJL1vV3BidUsR7cIoqq41dwarWjwOF5VDzjnyZuaQl2EI6XLbCw2XWLcd3zC+fWZqyox2ZY2Tv/B9l533QEqb4L7xJb8X8ytzVFh7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NlvzeLhWH+c9HSHl9W/cKAc8U4Qvy3V9zLGyiOAqAxQ=;
+ b=dWZNbZDbzs2NgQIu7J0uaWi2DknGwBh/psgHwX8dRj9PJeMaqd6fss5fy/RNG/qXmcweC75Lm4zRHRkHCyWERhFHA/j1sFcWdoevI3zSiUlmI3IMdEeO5d6lR7BPhzfU4jD1vsHEqiw87bHKCTtbhxymd19aWsUE8fc5JdLatuHGj9vcWiITJE6s3t7UJkRjECI9n0WMe18LFEvLEeyoOtd8aNWcGEDB7ZEExTyjJbe+m2cjOsZH2RyYF+D6Sk4+Zp8mEj8WGL/9Bm6C0ZYT8QdzJefX2I264dzl1buAfviwMI9wb9rWxFB/QPMtSPUlsrPuLCWbXNvFo/4WhcJzeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
+ dkim=pass header.d=seco.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=PZ+RSQ3La9FqfpAq26CoOCWqjs/GvwGs77snpu64N1Q=;
-        b=SgIivOzc5zhDKoGbEw3IXpZs5Ac1v6BUiuNEf6waen1t/bumlH2L9/6FqiiuCF60ec
-         M6UO2w/PpCiLcEEcsJodXxbexOICRy/UGShjN7KJxmbqEC0x5dr+Hc09BF6m+644QHmA
-         iy69FWlrW1voR24iFJwK/jtOxR5XZA86reU8zDfdJc+HNUkZ6+ifcRzoJ/79xQH94urn
-         bJD65L4vK85v/Uls9+3CW1Q0uzqjOUrVPGKnWwRP8AdNAvfXyUAuVh+sIgleydu6rdDr
-         PZ6fHgFOsovW64xcMJO374cAoLLVIP4cSvLcpa2L3QgOA0L96SM6dKRhTKjRg0yEBbhN
-         +36Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=PZ+RSQ3La9FqfpAq26CoOCWqjs/GvwGs77snpu64N1Q=;
-        b=C9hLed/E6ufHP/l82mNlV7BF0M//CDI5O84owiVdl/0g+dW+j4HeSw+ioErvTXGNbI
-         YeRpblz/bKo6/dpjT1VNez+3EIcVBJ00TE+RqaV9LxkdyQdQ/uMZ7BN2KDIJ71TUhOP8
-         xELwLbjVhuEP+VaVxKK0Z7ElLL+++fAnudwnUnQZZffvenXoqrKdfLyCjeRKrXOZ4SX+
-         XbfN01mA5H/ZKObQI1eujYznnmOvYz/UcTIyTLfeIXse4pWSK6alX9OO7EPDRvHJT4ko
-         JRZbgew0ITYw4fk3YLU1c7kkO/ELIcwPG3StE6hpxSXi6u3xaz41T1OR00etPviyE92c
-         mSFw==
-X-Gm-Message-State: AOAM532+GyOT8pozvANQYTJa//Q7rlC/mPgCLyzUpxxgLCtZKXgmpsCO
-        bU5k/54OV41/UBgbb4sGpSSmMeLQtiTBaz/u4y0=
-X-Google-Smtp-Source: ABdhPJxJB8DwKdut//rMtmuCxpHGsLlDNnvPvqiQWMsJzZBI0UleqwQdVFKxjJ3z/g4Kp+c6yv5pE4AG/HwVb+NffyI=
-Sender: "ndesaulniers via sendgmr" 
-        <ndesaulniers@ndesaulniers1.mtv.corp.google.com>
-X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:fce9:1439:f67f:bf26])
- (user=ndesaulniers job=sendgmr) by 2002:a17:90a:8d83:: with SMTP id
- d3mr547381pjo.0.1612556553907; Fri, 05 Feb 2021 12:22:33 -0800 (PST)
-Date:   Fri,  5 Feb 2021 12:22:19 -0800
-In-Reply-To: <20210205202220.2748551-1-ndesaulniers@google.com>
-Message-Id: <20210205202220.2748551-3-ndesaulniers@google.com>
-Mime-Version: 1.0
-References: <20210205202220.2748551-1-ndesaulniers@google.com>
-X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
-Subject: [PATCH v9 2/3] Kbuild: make DWARF version a choice
-From:   Nick Desaulniers <ndesaulniers@google.com>
+ d=secospa.onmicrosoft.com; s=selector2-secospa-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NlvzeLhWH+c9HSHl9W/cKAc8U4Qvy3V9zLGyiOAqAxQ=;
+ b=vlonDCcBjD7zFxurGcRQBas6CVGi6XqxKPCz8mvywz7rLnCS3/+jP5TGxtJZmY2CZCunt2c1tdYC08ZNRDPwxbmgErEOwHh1Td5t6U3MnzaUePB0qicR1nKDBYniYJjy7NCXecYE5esKiUrR+ddHA2Ffjn5BureQ5GSerHhOw6k=
+Authentication-Results: markovi.net; dkim=none (message not signed)
+ header.d=none;markovi.net; dmarc=none action=none header.from=seco.com;
+Received: from AM9PR03MB7251.eurprd03.prod.outlook.com (2603:10a6:20b:26e::16)
+ by AM4PR0302MB2644.eurprd03.prod.outlook.com (2603:10a6:200:8f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.19; Fri, 5 Feb
+ 2021 15:07:39 +0000
+Received: from AM9PR03MB7251.eurprd03.prod.outlook.com
+ ([fe80::a8f2:7dd:46e5:8526]) by AM9PR03MB7251.eurprd03.prod.outlook.com
+ ([fe80::a8f2:7dd:46e5:8526%6]) with mapi id 15.20.3825.019; Fri, 5 Feb 2021
+ 15:07:39 +0000
+Subject: Re: [PATCH] builddeb: Don't look for a missing Module.symvers
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
-        Jakub Jelinek <jakub@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Caroline Tice <cmtice@google.com>,
-        Nick Clifton <nickc@redhat.com>, Yonghong Song <yhs@fb.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Chris Murphy <bugzilla@colorremedies.com>,
-        Mark Wielaard <mark@klomp.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+References: <20210204202054.1608664-1-sean.anderson@seco.com>
+ <CAK7LNATi=4_ieMdi9OKXSF1yBiBDmtddG7ioYhre=hq988UePw@mail.gmail.com>
+From:   Sean Anderson <sean.anderson@seco.com>
+Message-ID: <770adfbd-1eaf-3a65-981a-de8e6556e444@seco.com>
+Date:   Fri, 5 Feb 2021 10:07:34 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <CAK7LNATi=4_ieMdi9OKXSF1yBiBDmtddG7ioYhre=hq988UePw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [50.195.82.171]
+X-ClientProxiedBy: MN2PR06CA0006.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::11) To AM9PR03MB7251.eurprd03.prod.outlook.com
+ (2603:10a6:20b:26e::16)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.27.1.65] (50.195.82.171) by MN2PR06CA0006.namprd06.prod.outlook.com (2603:10b6:208:23d::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Fri, 5 Feb 2021 15:07:38 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1dbcb2d5-600b-4ee8-9cad-08d8c9e7c757
+X-MS-TrafficTypeDiagnostic: AM4PR0302MB2644:
+X-Microsoft-Antispam-PRVS: <AM4PR0302MB2644ABE59665F63090BE919E96B29@AM4PR0302MB2644.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RkO0Cq+rk6zspHUPoZ1t3SGHEMbQujziWoXh0NLS+3ttrWuE081TiV3S4+OlSj5GNNnQay7weeqKy/5TAkKNnEWxJtZ87UWO5ln6g9ATHnxejfySqCqLNa4U+spys4FrgwEq0udXzNqAq6Glo5xH2Uei+1H5rBaOrh3InJT/xmn1z2U7zgdDudf6Ll+pTyH5c/IeyTI/4nCFXGR2nwAaSVQiNjywJ8aTeCdiU3S2ZrRyK4XgGuT/tmz65SgXE8TrRs2vUXV8pTlRqwCwA4QdCihpc/Zh/Mldws2sicTZeTx/P0ZShtUbU7hTcvIphlzrlAhuuDh0WjTarHeGsEgzbv1T2YqqxhmhEVRydOBQNMh4Li7YWxQq24S4LlWzDLrpeei8alMHaQXd6b2BfuTuI7csxFX+7yblTULud0qkVS5My0qrkGrhr2vY4Aae2HS1y+k97UmFN11IndBPZIZYO3e3STCL174xbjhRhga8LOEZ9efHsKAvkdxoYxIyoh57trpDyxachk1n48sa4ipbcKAmBMKQDs4Ic8gPuJXTxpTCTwk2LoWBhNmVwpv160XClN72/u156dzG7MERd+nayY27IIkkRV+CyPTvlbgUPHg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR03MB7251.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(39840400004)(396003)(376002)(136003)(6486002)(956004)(2906002)(186003)(8676002)(6666004)(316002)(66476007)(4326008)(478600001)(36756003)(86362001)(16576012)(66556008)(31686004)(8936002)(83380400001)(6916009)(52116002)(2616005)(16526019)(31696002)(53546011)(54906003)(26005)(66946007)(5660300002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?SjJucXZrQ2QxMEs5T2d2M3BlV1JwNExOSlppVGdONVc3S2tvRXIxTk9iRERQ?=
+ =?utf-8?B?Tzl5V0R4bnZMTzNLeGtaKzFibGlrZmpwbjF0cWY4N0k3L0phWU5sSThacVRP?=
+ =?utf-8?B?SWhXWWFKak1SSitvT3JHcFI2cVRrTEJGc0hlRlZ5TStOZWdSSGtkYk9kYUFt?=
+ =?utf-8?B?QWFBdWRQUURhTjBmWDlkc25OVnpPVi9KTjEwbGMvc3hieVdUZEtmWkxjTFY1?=
+ =?utf-8?B?VmtkelR5TmtvaEF3a01JTVVsdGF5bWRIakNaNWZXRjUvUWNYa1p3aXByTHdq?=
+ =?utf-8?B?T0V3aHdCUENMUC9QYmxXSUVxNlZTQ0hrRDN0bHVBbUp0VWdIN2lvT013RWR2?=
+ =?utf-8?B?VEo0Tnh4OGROQVpMTDRVcTZhak9IZmNIM3BjNm9SbmlmTFR4VUgwbEI5MTBR?=
+ =?utf-8?B?MVZncjZQSDNLZlVrWUZaSzVidmhITUtENVpjM1BUK1hDa2RPVDBBYUxDOWkv?=
+ =?utf-8?B?TXhaeHJXcnpydjZpTDVnc2Y5VnhaemNGcDBoRDFTUVdFYWRHYlZlS05INEtm?=
+ =?utf-8?B?OGs5cjR5M2dpak8rdlZ4YjB2bVZnaTVOSUhIalJxNGVMb054aEZ4aUM4WDZS?=
+ =?utf-8?B?K0tLYVFOL3FMVm1sMUMvM1h0QUVFWi83aUZTOUZOOXZjVFM0TG5VNHdzcnRH?=
+ =?utf-8?B?NERTVmUyWXhWOUxpOTZLOGpUVkEwVXN3YzdmODFET0NNbVY3UWFuNzl6V3lF?=
+ =?utf-8?B?UmxMSHpXMmtuWXVjSVNnVFBBRVBwZEhaTHlrQmpWcytFSGh1a2NDcllyWGwy?=
+ =?utf-8?B?WjBkczUvaFB0ZFY2RGNjNVFORDFOekFsMCt3MTFONWVUMkNwelVzVld1R0hj?=
+ =?utf-8?B?QzhuRldZZFRTNEUrS055amNnNU9nQ2tCTXlUY1U3V0gzRk0zZ0VVcW1ZV1Fi?=
+ =?utf-8?B?Y2lVVmNFNWF0aERGeVpXWG9odGlFWktvQlhJaDNXMVBOY09ZNTZ6RGk0Mmhs?=
+ =?utf-8?B?V3ByMm52RExTZm05WmQ2Zjg2V2ZXMzV4VDZ2UkgvU3RBeUhyNlhSRVhHYWlh?=
+ =?utf-8?B?T2llREZQU0dMSlV0UlBWdnJDZjRGZkdDNFJJZFptZ2ViSWc5YjRnRFRTaXhh?=
+ =?utf-8?B?UTAzMjVLeUs3SWk2a0xKZFA1cDR3d3Rna3hMMVA5RlJhZnFiR2dJZUdsSEVE?=
+ =?utf-8?B?SHhEdWtIcmljUFIxb29zZ1dZTUZEOGRDYk5zUjVDMnFaN2JTREY5UHIvZ1dB?=
+ =?utf-8?B?dUoxbGtkd1hjVmJxMHk3c2lsb0pvcFlMUTNxbHVVbFU2RmNCR0UxNnA5QUZv?=
+ =?utf-8?B?MFR1bEZxYVlWVEJEZ0RQOTMvMjNMK3dDZkpEQi9FZnRmOFIzaFdHR3VScVNj?=
+ =?utf-8?B?ejRueGRhbUw1dWFGS294NW5aRlRkdXNheXNWSUJnMGxyZ1V6eDZoa2hQamRR?=
+ =?utf-8?B?SHc1YnRWOThkN1MvRC9pa1EyL3hSaERSSXZUMmpPQjVsaWpTSkZBMEVVbGVB?=
+ =?utf-8?B?WVBBbUZ3UTAzQjEvTjNoQkNBYW5QaHJpNGE1a2x4OVdsM2sxL2M0eC9hME8w?=
+ =?utf-8?B?NTJNNThxR2JmOUxrK01GMGlwWUxsazZiQ1lMZlh6VlFBVnNwdFRHdGUzUzl4?=
+ =?utf-8?B?RW9LNDBiTjJJUjBxZlRaWE1UUWwrMEcxU0tnMm9YODhwYXZXZUJCUE5McFd0?=
+ =?utf-8?B?RUl0VFlrU1d3RmRLbC9RQ3JHZ2xoK0tsdEVsdFplTDlZTVJoOWpmY0FhaFFk?=
+ =?utf-8?B?NGxzVGRFN2FVRWNDY2JWMEUzOEpCTnZaS2p2SDU1bW9rN1lVVFZNSEtWUzdM?=
+ =?utf-8?Q?k/CZEtfXZoMFpsQAuUzinpUcj1sMKH9/bD8ZQid?=
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1dbcb2d5-600b-4ee8-9cad-08d8c9e7c757
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR03MB7251.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2021 15:07:39.2678
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a9ksp0vdtLLwM5rKB/Tuuglo2/l3AUOZXuUO+Ws5sUPmL5dmNSsF4N+GYg80ShNvgTbKwejgSQbkcmtOAZpzIg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR0302MB2644
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Adds a default CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT which allows
-the implicit default version of DWARF emitted by the toolchain to
-progress over time.
 
-Modifies CONFIG_DEBUG_INFO_DWARF4 to be a member of a choice, making it
-mutually exclusive with CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT. Users
-may want to select this if they are using a newer toolchain, but have
-consumers of the DWARF debug info that aren't yet ready for newer DWARF
-versions' debug info.
 
-Does so in a way that's forward compatible with existing
-configs, and makes adding future versions more straightforward. This
-patch does not change the current behavior or selection of DWARF
-version for users upgrading to kernels with this patch.
+On 2/5/21 3:14 AM, Masahiro Yamada wrote:
+> On Fri, Feb 5, 2021 at 5:21 AM Sean Anderson <sean.anderson@seco.com> wrote:
+>>
+>> If deb-pkg is run with CONFIG_MODULES disabled, then make fails with
+>>
+>> find: ‘Module.symvers’: No such file or directory
+>> make[4]: *** [scripts/Makefile.package:87: intdeb-pkg] Error 1
+>> make[3]: *** [Makefile:1523: intdeb-pkg] Error 2
+>> make[2]: *** [debian/rules:9: binary-arch] Error 2
+>>
+>> Only add it to headerobjfiles if we actually have modules.
+>>
+>> Signed-off-by: Sean Anderson <sean.anderson@seco.com>
+>> ---
+> 
+> 
+> I do not see this error any more after
+> the following commit was merged.
 
-GCC since ~4.8 has defaulted to DWARF v4 implicitly, and GCC 11 has
-bumped this to v5.
+That fixes it on my end as well.
 
-Remove the Kconfig help text  about DWARF v4 being larger.  It's
-empirically false for the latest toolchains for x86_64 defconfig, has no
-point of reference (I suspect it was DWARF v2 but that's stil
-empirically false), and debug info size is not a qualatative measure.
+--Sean
 
-Suggested-by: Arvind Sankar <nivedita@alum.mit.edu>
-Suggested-by: Fangrui Song <maskray@google.com>
-Suggested-by: Jakub Jelinek <jakub@redhat.com>
-Suggested-by: Mark Wielaard <mark@klomp.org>
-Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
-Suggested-by: Nathan Chancellor <nathan@kernel.org>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
- Makefile          |  5 +++--
- lib/Kconfig.debug | 30 +++++++++++++++++++++++++-----
- 2 files changed, 28 insertions(+), 7 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 28019532e55a..a7eee28dd091 100644
---- a/Makefile
-+++ b/Makefile
-@@ -829,8 +829,9 @@ ifneq ($(LLVM_IAS),1)
- KBUILD_AFLAGS	+= -Wa,-gdwarf-2
- endif
- 
--ifdef CONFIG_DEBUG_INFO_DWARF4
--DEBUG_CFLAGS	+= -gdwarf-4
-+ifndef CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
-+dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
-+DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
- endif
- 
- ifdef CONFIG_DEBUG_INFO_REDUCED
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index e906ea906cb7..3ac450346dbe 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -256,13 +256,33 @@ config DEBUG_INFO_SPLIT
- 	  to know about the .dwo files and include them.
- 	  Incompatible with older versions of ccache.
- 
-+choice
-+	prompt "DWARF version"
-+	help
-+	  Which version of DWARF debug info to emit.
-+
-+config DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
-+	bool "Rely on the toolchain's implicit default DWARF version"
-+	help
-+	  The implicit default version of DWARF debug info produced by a
-+	  toolchain changes over time.
-+
-+	  This can break consumers of the debug info that haven't upgraded to
-+	  support newer revisions, and prevent testing newer versions, but
-+	  those should be less common scenarios.
-+
-+	  If unsure, say Y.
-+
- config DEBUG_INFO_DWARF4
--	bool "Generate dwarf4 debuginfo"
-+	bool "Generate DWARF Version 4 debuginfo"
- 	help
--	  Generate dwarf4 debug info. This requires recent versions
--	  of gcc and gdb. It makes the debug information larger.
--	  But it significantly improves the success of resolving
--	  variables in gdb on optimized code.
-+	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
-+
-+	  If you have consumers of DWARF debug info that are not ready for
-+	  newer revisions of DWARF, you may wish to choose this or have your
-+	  config select this.
-+
-+endchoice # "DWARF version"
- 
- config DEBUG_INFO_BTF
- 	bool "Generate BTF typeinfo"
--- 
-2.30.0.365.g02bc693789-goog
-
+> 
+> 
+> commit bac977cbc0d6731fb8e67c2be0e4acbd959e10b3
+> Author: Masahiro Yamada <masahiroy@kernel.org>
+> Date:   Wed Oct 14 03:38:19 2020 +0900
+> 
+>      kbuild: deb-pkg: do not build linux-headers package if CONFIG_MODULES=n
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+>>   scripts/package/builddeb | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+>> index 91a502bb97e8..19d44704832b 100755
+>> --- a/scripts/package/builddeb
+>> +++ b/scripts/package/builddeb
+>> @@ -71,7 +71,11 @@ deploy_kernel_headers () {
+>>                          echo tools/objtool/objtool
+>>                  fi
+>>
+>> -               find arch/$SRCARCH/include Module.symvers include scripts -type f
+>> +               if is_enabled CONFIG_MODULES; then
+>> +                       echo Module.symvers
+>> +               fi
+>> +
+>> +               find arch/$SRCARCH/include include scripts -type f
+>>
+>>                  if is_enabled CONFIG_GCC_PLUGINS; then
+>>                          find scripts/gcc-plugins -name \*.so
+>> --
+>> 2.25.1
+>>
+> 
+> 
