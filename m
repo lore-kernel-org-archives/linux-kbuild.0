@@ -2,179 +2,152 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A04C433DB
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 11:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A95C433E0
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 244EC64F9D
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 11:01:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F035A64FCD
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhBELAF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 06:00:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231927AbhBEK5t (ORCPT
+        id S231273AbhBEMnx convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 07:43:53 -0500
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:41313 "EHLO
+        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232221AbhBEMle (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 05:57:49 -0500
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FC0C061786
-        for <linux-kbuild@vger.kernel.org>; Fri,  5 Feb 2021 02:57:08 -0800 (PST)
-Received: by mail-il1-x12c.google.com with SMTP id g9so5462021ilc.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2021 02:57:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to:cc;
-        bh=IV251W//AjH9o0T9QP5zg1g7QdWQe3QcIbrbw0AVt9M=;
-        b=qHGUpsN8cgf+y0OLe0E1tZG6IP4vTyzys9ig+bsvIcTGCsp/FrmC77CCYNhPb+tS0P
-         9uQx/PNRr2FBcSGwjsL+Az/fD8XyCA4C16B+bNerxZV1JyOzwreKF+ZGO8At/TPmg3Lp
-         xg4aMEbLfwMO4BpXuISxNhKxiPZyG1E7aly0tDSxxaUNPm6QicQIrwXeKKRjaxbodM3M
-         1wQO0+dIwDFNqmjxgRSPTF4S0RAq9drujTx+BNsSUmRaczIYQpiedYoEKrIK/FkWrPGe
-         OeFaIu6rPTzBeFDah8q0FphuRtDJvYSS2QPP+5itREEFKbggKuSpDFyQVJfE2UWYwJQf
-         tXOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=IV251W//AjH9o0T9QP5zg1g7QdWQe3QcIbrbw0AVt9M=;
-        b=C5WR+F1OVSGrYyrwPK5pMeELk3iWZU4FifWhBWeTpZ1ChlSWIUiYRuqxVDCtHJvd8p
-         Hweh1XYWRBkzHNH+L2tUU0PNT+dw3IGdAGgppoAsVfHYYyR1HE5uM63vhecmfSQEFrH0
-         J8MTn18BT70ZLCRnYgctzRf9WzNGh0b/mJpzoyVnK9VWDhbcjqu3qs6E4SJWkb6i1o72
-         fUJElhg7EDtKrakXquTqugHdFnZEHdJDG3yeNOREP1BZCdgunNAUVkXZW1er9q+ODOYk
-         AEOSsdLEl9H646aBgFEYyx+52z9VX5s1vkeF/goShJorgMjaDROdgkjO1ib+nqpDorVK
-         JTtQ==
-X-Gm-Message-State: AOAM531roV1hO37Moece1VjhLwaRrSJPYb7fn6ue/vXyTeB/+3qOyY4V
-        Pp6gYuC0RlLQMbX4+/0GnQqiQrUhmBTGM9ia4+g=
-X-Google-Smtp-Source: ABdhPJxsQU5ijgkt0TVxL/GRvyi2aTEVfE6YTb9Qwm8wQU2E1Ln1bXQEQ3ewHlaeiMq2mKldY7FO6xysTOEGpJuDuso=
-X-Received: by 2002:a92:58ce:: with SMTP id z75mr3474026ilf.209.1612522627089;
- Fri, 05 Feb 2021 02:57:07 -0800 (PST)
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Fri, 5 Feb 2021 11:56:55 +0100
-Message-ID: <CA+icZUUjb_71mWwWFMYN_OPZir2vStLq1kDY1O+JCFjtmEEBjA@mail.gmail.com>
-Subject: Using GNU AS from a selfmade binutils v2.35.2
-To:     Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc:     Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Fri, 5 Feb 2021 07:41:34 -0500
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-H-yKuGuPNNqYTr-ayKu7HQ-1; Fri, 05 Feb 2021 07:40:29 -0500
+X-MC-Unique: H-yKuGuPNNqYTr-ayKu7HQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7545E107ACC7;
+        Fri,  5 Feb 2021 12:40:27 +0000 (UTC)
+Received: from krava.cust.in.nbox.cz (unknown [10.40.195.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A5C360936;
+        Fri,  5 Feb 2021 12:40:24 +0000 (UTC)
+From:   Jiri Olsa <jolsa@kernel.org>
+To:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andriin@fb.com>
+Cc:     Song Liu <songliubraving@fb.com>, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, Martin KaFai Lau <kafai@fb.com>,
+        Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@chromium.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
         linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH bpf-next 1/4] tools/resolve_btfids: Build libbpf and libsubcmd in separate directories
+Date:   Fri,  5 Feb 2021 13:40:17 +0100
+Message-Id: <20210205124020.683286-2-jolsa@kernel.org>
+In-Reply-To: <20210205124020.683286-1-jolsa@kernel.org>
+References: <20210205124020.683286-1-jolsa@kernel.org>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jolsa@kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kernel.org
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=WINDOWS-1252
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro and ClangBuiltLinux folks,
+Setting up separate build directories for libbpf and libpsubcmd,
+so it's separated from other objects and we don't get them mixed
+in the future.
 
-I am trying to use binaries from GNU/binutils v2.35.2 for my
-Linux-kernel builds.
+It also simplifies cleaning, which is now simple rm -rf.
 
-Background is I am doing some testing for BTF + pahole with GCC-10 and LLVM-12.
+Also there's no need for FEATURE-DUMP.libbpf and bpf_helper_defs.h
+files in .gitignore anymore.
 
-I tried several strategies.
+Acked-by: Song Liu <songliubraving@fb.com>
+Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+---
+ tools/bpf/resolve_btfids/.gitignore |  2 --
+ tools/bpf/resolve_btfids/Makefile   | 26 +++++++++++---------------
+ 2 files changed, 11 insertions(+), 17 deletions(-)
 
-[ STRATEGY #1 - Use a-local-binutils.conf LDCONFIG ]
+diff --git a/tools/bpf/resolve_btfids/.gitignore b/tools/bpf/resolve_btfids/.gitignore
+index a026df7dc280..25f308c933cc 100644
+--- a/tools/bpf/resolve_btfids/.gitignore
++++ b/tools/bpf/resolve_btfids/.gitignore
+@@ -1,4 +1,2 @@
+-/FEATURE-DUMP.libbpf
+-/bpf_helper_defs.h
+ /fixdep
+ /resolve_btfids
+diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids/Makefile
+index bf656432ad73..1d46a247ec95 100644
+--- a/tools/bpf/resolve_btfids/Makefile
++++ b/tools/bpf/resolve_btfids/Makefile
+@@ -28,22 +28,22 @@ OUTPUT ?= $(srctree)/tools/bpf/resolve_btfids/
+ LIBBPF_SRC := $(srctree)/tools/lib/bpf/
+ SUBCMD_SRC := $(srctree)/tools/lib/subcmd/
+ 
+-BPFOBJ     := $(OUTPUT)/libbpf.a
+-SUBCMDOBJ  := $(OUTPUT)/libsubcmd.a
++BPFOBJ     := $(OUTPUT)/libbpf/libbpf.a
++SUBCMDOBJ  := $(OUTPUT)/libsubcmd/libsubcmd.a
+ 
+ BINARY     := $(OUTPUT)/resolve_btfids
+ BINARY_IN  := $(BINARY)-in.o
+ 
+ all: $(BINARY)
+ 
+-$(OUTPUT):
++$(OUTPUT) $(OUTPUT)/libbpf $(OUTPUT)/libsubcmd:
+ 	$(call msg,MKDIR,,$@)
+-	$(Q)mkdir -p $(OUTPUT)
++	$(Q)mkdir -p $(@)
+ 
+-$(SUBCMDOBJ): fixdep FORCE
+-	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(OUTPUT)
++$(SUBCMDOBJ): fixdep FORCE | $(OUTPUT)/libsubcmd
++	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(abspath $(dir $@))/ $(abspath $@)
+ 
+-$(BPFOBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPUT)
++$(BPFOBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPUT)/libbpf
+ 	$(Q)$(MAKE) $(submake_extras) -C $(LIBBPF_SRC)  OUTPUT=$(abspath $(dir $@))/ $(abspath $@)
+ 
+ CFLAGS := -g \
+@@ -57,23 +57,19 @@ LIBS = -lelf -lz
+ export srctree OUTPUT CFLAGS Q
+ include $(srctree)/tools/build/Makefile.include
+ 
+-$(BINARY_IN): fixdep FORCE
++$(BINARY_IN): fixdep FORCE | $(OUTPUT)
+ 	$(Q)$(MAKE) $(build)=resolve_btfids
+ 
+ $(BINARY): $(BPFOBJ) $(SUBCMDOBJ) $(BINARY_IN)
+ 	$(call msg,LINK,$@)
+ 	$(Q)$(CC) $(BINARY_IN) $(LDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
+ 
+-libsubcmd-clean:
+-	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(OUTPUT) clean
+-
+-libbpf-clean:
+-	$(Q)$(MAKE) -C $(LIBBPF_SRC) OUTPUT=$(OUTPUT) clean
+-
+-clean: libsubcmd-clean libbpf-clean fixdep-clean
++clean: fixdep-clean
+ 	$(call msg,CLEAN,$(BINARY))
+ 	$(Q)$(RM) -f $(BINARY); \
+ 	$(RM) -rf $(if $(OUTPUT),$(OUTPUT),.)/feature; \
++	$(RM) -rf $(OUTPUT)/libbpf; \
++	$(RM) -rf $(OUTPUT)/libsubcmd; \
+ 	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
+ 
+ tags:
+-- 
+2.26.2
 
-[ /etc/ld.so.conf.d/a-local-binutils.conf ]
-
-# Selfmade GNU/binutils lib configuration
-/opt/binutils/lib
-- EOT -
-
-sudo ldconfig
-sudo ldconfig -v -p
-...shows me above lib path is in the ldconfig-cache.
-
-In my build-script I additionally add:
-
-BINUTILS_BIN_PATH="/opt/binutils/bin"
-if [ -d ${BINUTILS_BIN_PATH} ]; then
-    export PATH="${BINUTILS_BIN_PATH}:${PATH}"
-fi
-
-That's NOT including ld.bfd from /opt/binutils/bin - not including nm,
-ar, strip etc.
-
-NOTE: Symlink: lrwxrwxrwx 1 root   root     15  5. Feb 11:10
-/opt/binutils -> binutils-2.35.2
-
-[ STRATEGY #2 - Use LD_LIBRARY_PATH ]
-
-From my build-script:
-
-BINUTILS_BIN_PATH="/opt/binutils/bin"
-BINUTILS_LIB_PATH="/opt/binutils/lib"
-if [ -d ${BINUTILS_BIN_PATH} ] && [ -d ${BINUTILS_LIB_PATH} ]; then
-   export PATH="${BINUTILS_BIN_PATH}:${PATH}"
-   export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${BINUTILS_LIB_PATH}"
-fi
-
-That's not working either.
-New PATH and LD_LIBRARY_PATH are set in the user's environment variables.
-
-[ STRATEGY #3 - Use which to get full path to binary ]
-
-### GCC version settings
-GCC_MAJOR_VER="10"
-
-### Compiler options
-CC_FOR_BUILD="clang"
-CXX_FOR_BUILD="clang++"
-
-### Linker options
-##LD_FOR_BUILD="ld.bfd"
-LD_FOR_BUILD=$(which ld.bfd)
-
-### GNU tools options
-# NOTE: Selfmade GNU AS v2.35.2 needs to be symlinked in /usr/bin directory
-# XXX: Symlink: /usr/bin/as -> /opt/binutils-2.35.2/bin/as
-HOSTAR_FOR_BUILD=$(which ar)
-AR_FOR_BUILD=$(which ar)
-NM_FOR_BUILD=$(which nm)
-STRIP_FOR_BUILD=$(which strip)
-OBJCOPY_FOR_BUILD=$(which objcopy)
-OBJDUMP_FOR_BUILD=$(which objdump)
-READELF_FOR_BUILD=$(which readelf)
-GNU_TOOLS_OPTS="HOSTCC=${CC_FOR_BUILD} HOSTCXX=${CXX_FOR_BUILD}
-HOSTLD=${LD_FOR_BUILD} HOSTAR=${HOSTAR_FOR_BUILD}"
-GNU_TOOLS_OPTS="$GNU_TOOLS_OPTS CC=${CC_FOR_BUILD} LD=${LD_FOR_BUILD}
-AR=${AR_FOR_BUILD} NM=${NM_FOR_BUILD} STRIP=${STRIP_FOR_BUILD}"
-GNU_TOOLS_OPTS="$GNU_TOOLS_OPTS OBJCOPY=${OBJCOPY_FOR_BUILD}
-OBJDUMP=${OBJDUMP_FOR_BUILD} READELF=${READELF_FOR_BUILD}"
-
-That works - means passes all binaries from GNU binutils v2.35.2 to my
-make-line.
-
-Please NOTE that I had to symlink GNU AS v2.35.2 as I saw too late I
-was using Debian's GNU AS v2.35.1 within my last builds.
-
-AFAICS there is no more AS= assignment in the top-level Makefile.
-How can I say: "Please use a different ASsembler?"
-
-[ LDD ]
-
-When I inspect with ldd (here: GNU AS v2.35.2):
-
-# ldd /opt/binutils/bin/as
-       linux-vdso.so.1 (0x00007ffc7f4d6000)
-       libopcodes-2.35.2.so =>
-/opt/binutils-2.35.2/lib/libopcodes-2.35.2.so (0x00007f11f3bcc000)
-       libbfd-2.35.2.so => /opt/binutils-2.35.2/lib/libbfd-2.35.2.so
-(0x00007f11f3a8b000)
-       libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f11f3a44000)
-       libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f11f387f000)
-       libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f11f3879000)
-       /lib64/ld-linux-x86-64.so.2 (0x00007f11f3de3000)
-
-So GNU AS v2.35.2 is loading from the correct places.
-
-Is the symlink in /opt directory a problem?
-binutils -> binutils-2.35.2
-
-Can someone comment and give me a hint?
-
-Thanks in advance.
-
-Regards,
-- Sedat -
