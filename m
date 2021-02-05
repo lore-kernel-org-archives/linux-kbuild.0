@@ -2,136 +2,248 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3330C433E9
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Feb 2021 12:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3200C433E0
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 00:05:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDE2F64E3B
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Feb 2021 12:15:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A21EB64FB6
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 00:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231479AbhBJMPD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 10 Feb 2021 07:15:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39808 "EHLO
+        id S231463AbhBEAFe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 4 Feb 2021 19:05:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbhBJMMv (ORCPT
+        with ESMTP id S231408AbhBEAFd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Feb 2021 07:12:51 -0500
-Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc0a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD5FC061756;
-        Wed, 10 Feb 2021 04:07:34 -0800 (PST)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DbJRS2vZ7zMpnnY;
-        Wed, 10 Feb 2021 13:07:32 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4DbJRP6qQzzlh8TJ;
-        Wed, 10 Feb 2021 13:07:29 +0100 (CET)
-Subject: =?UTF-8?Q?Re=3a_Conflict_with_Micka=c3=abl_Sala=c3=bcn=27s_blacklis?=
- =?UTF-8?Q?t_patches_=5bwas_=5bPATCH_v5_0/4=5d_Add_EFI=5fCERT=5fX509=5fGUID_?=
- =?UTF-8?Q?support_for_dbx/mokx_entries=5d?=
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-To:     Eric Snowberg <eric.snowberg@oracle.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     dwmw2@infradead.org, Jarkko Sakkinen <jarkko@kernel.org>,
-        James.Bottomley@HansenPartnership.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, jmorris@namei.org, serge@hallyn.com,
-        ardb@kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-        lszubowi@redhat.com, javierm@redhat.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Tyler Hicks <tyhicks@linux.microsoft.com>
-References: <20210122181054.32635-1-eric.snowberg@oracle.com>
- <1103491.1612369600@warthog.procyon.org.uk>
- <10e6616e-0598-9f33-2de9-4a5268bba586@digikod.net>
- <A5B5DEC0-E47A-4C3D-8E79-AF37B6C2E565@oracle.com>
- <7924ce4c-ea94-9540-0730-bddae7c6af07@digikod.net>
- <BFC930B3-7994-4C5B-A8EF-1DD1C73F5750@oracle.com>
- <dc6a4524-3935-fda6-40a8-cebf80942cdf@digikod.net>
- <188DE1AF-A011-4631-B88A-2C4324DA013B@oracle.com>
- <99066eb7-53ac-41b0-46cf-36ea3d7f6590@digikod.net>
- <74EC102D-BD18-4863-A7FB-C88439654C8C@oracle.com>
- <456712ef-1349-ffe2-9e34-7d49848980ff@digikod.net>
-Message-ID: <999f0763-b1c1-a9ad-0efe-d3e148663ced@digikod.net>
-Date:   Wed, 10 Feb 2021 13:07:59 +0100
-User-Agent: 
+        Thu, 4 Feb 2021 19:05:33 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F67C0613D6
+        for <linux-kbuild@vger.kernel.org>; Thu,  4 Feb 2021 16:04:53 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id o63so3270730pgo.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Feb 2021 16:04:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WuuWQCiwdV87iW0z7KxVY5BTEgeNizYr5qdipOfxXnc=;
+        b=hJu87bCSyR1Kv3ijwZbkKNvs01VCINeDtrWjeRxX0TBc8YFS0tk3FKL/zdwi5VP7td
+         PlI3K7mcZso4bJEOtv2rLoBj6TsGxU5HNATT/olyMpUxY4HRuKpdwLeygD5lQ8xJXyOp
+         8asM747S5Mmf6ZQXTnIFYFS2YDOaPVm7uCVnAZHlVeCEVMxQ/t1wP3+dug/EL2QxGaN6
+         venL6y4MmxsBhkB5uiilZ5lgZBP8TP8wJsjgmE9Nxna2IKtbRPWfJKVmMg86FnHWsU3p
+         boUZ8oswAq6lgYMKhYI1r5M8OCCIaXcU2dNcitOPz+jh/6ehx6tlLGeezWQwGD5UU9Ze
+         SQNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WuuWQCiwdV87iW0z7KxVY5BTEgeNizYr5qdipOfxXnc=;
+        b=C7ijr903P3SU6KgrtqeawWAWW63l5OjO1bvBSYl+kYlL6+Xc6JBNp0gWlhJciweM6f
+         2hW3y4PyffJIszNd17XxyJKREE3ae8+sYK6fk0bDZzFr8hBXXfN283EGqLRLwDU+wvu5
+         USy5eOTM5NU0f3OK+0mHlEyuPYVl1NDrXpYkbJQ/xQi6bh/qs+e9Dgwk0EDBzfGzvjXM
+         BXC44nBp1Gfy2nophNSQSc78Uyd7px6Dusqe8/7ZnCWdQ2hf/qX9NzQ5IQrE9x3PCyv3
+         IiHGzpYiqOK62kkRtkl2fRnS36gZDv5TFIVQJjC1tcmtqHVROppRWW5sMyCTVTGLedxX
+         3mnw==
+X-Gm-Message-State: AOAM531Rmu/Of82fsN5DJqjSfUQCg3OMbxyAxvnBMmjJZfbDU3INXUkd
+        V1qLBOQzEFE76Wpbk0h11esECHc41SbrA84o2hd+DA==
+X-Google-Smtp-Source: ABdhPJxiqPOP+t9zseOEfIyIpqMaTUgdxO3foYKfOGifXc4uOhxBTBoT0OVMHzFKRSkn1upcNYcLbnRumZUT3uow9Yg=
+X-Received: by 2002:a62:838d:0:b029:1ba:9b85:2eac with SMTP id
+ h135-20020a62838d0000b02901ba9b852eacmr1917244pfe.36.1612483492832; Thu, 04
+ Feb 2021 16:04:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <456712ef-1349-ffe2-9e34-7d49848980ff@digikod.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210115210616.404156-1-ndesaulniers@google.com>
+ <CA+icZUVp+JNq89uc_DyWC6zh5=kLtUr7eOxHizfFggnEVGJpqw@mail.gmail.com>
+ <7354583d-de40-b6b9-6534-a4f4c038230f@fb.com> <CAKwvOd=5iR0JONwDb6ypD7dzzjOS3Uj0CjcyYqPF48eK4Pi90Q@mail.gmail.com>
+ <12b6c2ca-4cf7-4edd-faf2-72e3cb59c00e@fb.com> <20210117201500.GO457607@kernel.org>
+ <CAKwvOdmniAMZD0LiFdr5N8eOwHqNFED2Pd=pwOFF2Y8eSRXUHA@mail.gmail.com>
+ <CAEf4Bzbn1app3LZ1oah5ARn81j5RMNxRRHPVAkeY3h_0q7+7fg@mail.gmail.com>
+ <CAKwvOdmrVdxbEHdOFA8x+Q2yDWOfChZzBc6nR3rdaM8R3LsxfQ@mail.gmail.com> <CAEf4Bzbs5sDTB6w1D4LpKLGjY5sCCUnRUsU84Ccn8DoL352j1g@mail.gmail.com>
+In-Reply-To: <CAEf4Bzbs5sDTB6w1D4LpKLGjY5sCCUnRUsU84Ccn8DoL352j1g@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 4 Feb 2021 16:04:40 -0800
+Message-ID: <CAKwvOdk-4_Pt=DKFokDpG8L58xj4J-=PPrgSLEZnYs7VJu1jZA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] Kbuild: DWARF v5 support
+To:     Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc:     Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Fangrui Song <maskray@google.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+Moving a bunch of folks + lists to BCC.
 
-On 09/02/2021 22:53, Mickaël Salaün wrote:
-> 
-> On 09/02/2021 00:05, Eric Snowberg wrote:
->>
->>> On Feb 6, 2021, at 11:30 AM, Mickaël Salaün <mic@digikod.net> wrote:
->>>
->>> On 06/02/2021 02:14, Eric Snowberg wrote:
->>>
->>>> I have done some additional testing, I am seeing a regression. The blacklist 
->>>> keyring is no longer picking up any of the hashes from the dbx during boot. 
->>>> I backed out the merge with my changes  (fdbbe7ceeb95090d09c33ce0497e0394c82aa33d) 
->>>> and still see the regression.  I then backed out Mickaël merge
->>>> (5bf1adccf5c41dbdd51d1f4de220d335d9548598) and it fixes the regression.
->>>>
->>>> On a x86 with the updated dbx from uefi.org, I’d expect to see 234 bin hash entries
->>>> in the blacklist keyring.  With the current merged code, there is none.
->>>
->>> Hum, I missed a part in refactoring (commit
->>> f78e50c8f750c0ac6767ac1ed006360cf77c56c4). :/
->>> Could you please test the following patch?
->>>
->>> diff --git a/certs/blacklist.c b/certs/blacklist.c
->>> index 07c592ae5307..f998a2e85ddc 100644
->>> --- a/certs/blacklist.c
->>> +++ b/certs/blacklist.c
->>> @@ -197,13 +197,16 @@ int mark_hash_blacklisted(const u8 *hash, size_t
->>> hash_len,
->>>                enum blacklist_hash_type hash_type)
->>> {
->>>        const char *buffer;
->>> +       int err;
->>>
->>>        buffer = get_raw_hash(hash, hash_len, hash_type);
->>>        if (IS_ERR(buffer))
->>>                return PTR_ERR(buffer);
->>> +       err = mark_raw_hash_blacklisted(buffer);
->>>        kfree(buffer);
->>> -       return 0;
->>> +       return err;
->>> }
->>
->> I applied this patch, it works better, but there is still a regression. 
->> Most of the hashes show up in the blacklist keyring now.  However some 
->> do not, here is what I see in the log during boot:
->>
->> [    2.321876] blacklist: Problem blacklisting hash (-13)
->> [    2.322729] blacklist: Problem blacklisting hash (-13)
->> [    2.323549] blacklist: Problem blacklisting hash (-13)
->> [    2.324369] blacklist: Problem blacklisting hash (-13)
->>
->>> Is it possible to test these kind of dbx blacklist with Qemu?
->>
->> Yes, just use OVMF. 
->>
-> 
-> My changes (with the fix) don't change the previous semantic. I just
-> tested without my changes and with my changes (and the fix), and I get
-> the same result: 184 bin hashes with
-> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin
-> 
-> Could you please re-test and if there is still an issue bisect and share
-> the certificates causing this issue?
-> 
-> David, do you want me to send the two new patches or an updated full
-> patch series?
-> 
+On Thu, Feb 4, 2021 at 3:54 PM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Wed, Feb 3, 2021 at 7:13 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
+> >
+> > On Wed, Feb 3, 2021 at 6:58 PM Andrii Nakryiko
+> > <andrii.nakryiko@gmail.com> wrote:
+> > >
+> > > On Wed, Feb 3, 2021 at 5:31 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
+> > > >
+> > > > On Sun, Jan 17, 2021 at 12:14 PM Arnaldo Carvalho de Melo
+> > > > <acme@kernel.org> wrote:
+> > > > >
+> > > > > Em Fri, Jan 15, 2021 at 03:43:06PM -0800, Yonghong Song escreveu:
+> > > > > >
+> > > > > >
+> > > > > > On 1/15/21 3:34 PM, Nick Desaulniers wrote:
+> > > > > > > On Fri, Jan 15, 2021 at 3:24 PM Yonghong Song <yhs@fb.com> wrote:
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > On 1/15/21 1:53 PM, Sedat Dilek wrote:
+> > > > > > > > > En plus, I encountered breakage with GCC v10.2.1 and LLVM=1 and
+> > > > > > > > > CONFIG_DEBUG_INFO_DWARF4.
+> > > > > > > > > So might be good to add a "depends on !DEBUG_INFO_BTF" in this combination.
+> > > > > > >
+> > > > > > > Can you privately send me your configs that repro? Maybe I can isolate
+> > > > > > > it to a set of configs?
+> > > > > > >
+> > > > > > > >
+> > > > > > > > I suggested not to add !DEBUG_INFO_BTF to CONFIG_DEBUG_INFO_DWARF4.
+> > > > > > > > It is not there before and adding this may suddenly break some users.
+> > > > > > > >
+> > > > > > > > If certain combination of gcc/llvm does not work for
+> > > > > > > > CONFIG_DEBUG_INFO_DWARF4 with pahole, this is a bug bpf community
+> > > > > > > > should fix.
+> > > > > > >
+> > > > > > > Is there a place I should report bugs?
+> > > > > >
+> > > > > > You can send bug report to Arnaldo Carvalho de Melo <acme@kernel.org>,
+> > > > > > dwarves@vger.kernel.org and bpf@vger.kernel.org.
+> > > > >
+> > > > > I'm coming back from vacation, will try to read the messages and see if
+> > > > > I can fix this.
+> > > >
+> > > > IDK about DWARF v4; that seems to work for me.  I was previously observing
+> > > > https://bugzilla.redhat.com/show_bug.cgi?id=1922698
+> > > > with DWARF v5.  I just re-pulled the latest pahole, rebuilt, and no
+> > > > longer see that warning.
+> > > >
+> > > > I now observe a different set.  I plan on attending "BPF office hours
+> > > > tomorrow morning," but if anyone wants a sneak peak of the errors and
+> > > > how to reproduce:
+> > > > https://gist.github.com/nickdesaulniers/ae8c9efbe4da69b1cf0dce138c1d2781
+> > > >
+> > >
+> > > Is there another (easy) way to get your patch set without the b4 tool?
+> > > Is your patch set present in some patchworks instance, so that I can
+> > > download it in mbox format, for example?
+> >
+> > $ wget https://lore.kernel.org/lkml/20210130004401.2528717-2-ndesaulniers@google.com/raw
+> > -O - | git am
+> > $ wget https://lore.kernel.org/lkml/20210130004401.2528717-3-ndesaulniers@google.com/raw
+> > -O - | git am
+> >
+> > If you haven't tried b4 yet, it's quite nice.  Hard to go back.  Lore
+> > also has mbox.gz links.  Not sure about patchwork.
+> >
+>
+> Ok, I managed to apply that on linux-next, but I can't get past this:
+>
+> ld.lld: error: undefined symbol: pa_trampoline_start
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
 
-I found the issue and fixed it in a new patch series:
-https://lore.kernel.org/lkml/20210210120410.471693-1-mic@digikod.net/
+Thanks for testing and the report. Do you have a .config you can send
+me to reproduce?
+
+>
+> ld.lld: error: undefined symbol: pa_trampoline_header
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+>
+> ld.lld: error: undefined symbol: pa_trampoline_pgd
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+> >>> referenced by trampoline_64.S:142 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:142)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>
+> ld.lld: error: undefined symbol: pa_wakeup_start
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+>
+> ld.lld: error: undefined symbol: pa_wakeup_header
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+>
+> ld.lld: error: undefined symbol: pa_machine_real_restart_asm
+> >>> referenced by arch/x86/realmode/rm/header.o:(real_mode_header)
+>
+> ld.lld: error: undefined symbol: pa_startup_32
+> >>> referenced by trampoline_64.S:77 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:77)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(trampoline_start)
+>
+> ld.lld: error: undefined symbol: pa_tr_flags
+> >>> referenced by trampoline_64.S:124 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:124)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>
+> ld.lld: error: undefined symbol: pa_tr_cr4
+> >>> referenced by trampoline_64.S:138 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:138)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>
+> ld.lld: error: undefined symbol: pa_tr_efer
+> >>> referenced by trampoline_64.S:146 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:146)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+> >>> referenced by trampoline_64.S:147 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:147)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>
+> ld.lld: error: undefined symbol: pa_startup_64
+> >>> referenced by trampoline_64.S:161 (/data/users/andriin/linux/arch/x86/realmode/rm/trampoline_64.S:161)
+> >>>               arch/x86/realmode/rm/trampoline_64.o:(startup_32)
+>
+> ld.lld: error: undefined symbol: pa_tr_gdt
+> >>> referenced by arch/x86/realmode/rm/trampoline_64.o:(tr_gdt)
+> >>> referenced by reboot.S:28 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:28)
+> >>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+>
+> ld.lld: error: undefined symbol: pa_machine_real_restart_paging_off
+> >>> referenced by reboot.S:34 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:34)
+> >>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+>
+> ld.lld: error: undefined symbol: pa_machine_real_restart_idt
+> >>> referenced by reboot.S:47 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:47)
+> >>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+>
+> ld.lld: error: undefined symbol: pa_machine_real_restart_gdt
+> >>> referenced by reboot.S:54 (/data/users/andriin/linux/arch/x86/realmode/rm/reboot.S:54)
+> >>>               arch/x86/realmode/rm/reboot.o:(machine_real_restart_asm)
+> >>> referenced by arch/x86/realmode/rm/reboot.o:(machine_real_restart_gdt)
+>
+> ld.lld: error: undefined symbol: pa_wakeup_gdt
+> >>> referenced by arch/x86/realmode/rm/wakeup_asm.o:(wakeup_gdt)
+>   CC      arch/x86/mm/numa_64.o
+>   CC      arch/x86/mm/amdtopology.o
+>   HOSTCC  arch/x86/entry/vdso/vdso2c
+> make[4]: *** [arch/x86/realmode/rm/realmode.elf] Error 1
+> make[3]: *** [arch/x86/realmode/rm/realmode.bin] Error 2
+> make[2]: *** [arch/x86/realmode] Error 2
+> make[2]: *** Waiting for unfinished jobs....
+>
+>
+> Hopefully Arnaldo will have better luck.
+>
+>
+>
+> > >
+> > > >
+> > > > (FWIW: some other folks are hitting issues now with kernel's lack of
+> > > > DWARF v5 support: https://bugzilla.redhat.com/show_bug.cgi?id=1922707)
+> >
+> >
+> > --
+> > Thanks,
+> > ~Nick Desaulniers
+
+
+
+-- 
+Thanks,
+~Nick Desaulniers
