@@ -2,53 +2,51 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A95C433E0
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42EDC433DB
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F035A64FCD
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 934F064FCE
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231273AbhBEMnx convert rfc822-to-8bit (ORCPT
+        id S231750AbhBEMnz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 07:43:53 -0500
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:41313 "EHLO
+        Fri, 5 Feb 2021 07:43:55 -0500
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:34410 "EHLO
         us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232221AbhBEMle (ORCPT
+        by vger.kernel.org with ESMTP id S232216AbhBEMle (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 5 Feb 2021 07:41:34 -0500
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-H-yKuGuPNNqYTr-ayKu7HQ-1; Fri, 05 Feb 2021 07:40:29 -0500
-X-MC-Unique: H-yKuGuPNNqYTr-ayKu7HQ-1
+ us-mta-187-ELyE_vpNNOiQyxonvvGvSw-1; Fri, 05 Feb 2021 07:40:26 -0500
+X-MC-Unique: ELyE_vpNNOiQyxonvvGvSw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7545E107ACC7;
-        Fri,  5 Feb 2021 12:40:27 +0000 (UTC)
-Received: from krava.cust.in.nbox.cz (unknown [10.40.195.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A5C360936;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 389F6804036;
         Fri,  5 Feb 2021 12:40:24 +0000 (UTC)
+Received: from krava.cust.in.nbox.cz (unknown [10.40.195.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24DAA60936;
+        Fri,  5 Feb 2021 12:40:20 +0000 (UTC)
 From:   Jiri Olsa <jolsa@kernel.org>
 To:     Alexei Starovoitov <ast@kernel.org>,
         Daniel Borkmann <daniel@iogearbox.net>,
         Andrii Nakryiko <andriin@fb.com>
-Cc:     Song Liu <songliubraving@fb.com>, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, Martin KaFai Lau <kafai@fb.com>,
-        Yonghong Song <yhs@fb.com>,
+Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
         John Fastabend <john.fastabend@gmail.com>,
         KP Singh <kpsingh@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         linux-kbuild@vger.kernel.org
-Subject: [PATCH bpf-next 1/4] tools/resolve_btfids: Build libbpf and libsubcmd in separate directories
-Date:   Fri,  5 Feb 2021 13:40:17 +0100
-Message-Id: <20210205124020.683286-2-jolsa@kernel.org>
-In-Reply-To: <20210205124020.683286-1-jolsa@kernel.org>
-References: <20210205124020.683286-1-jolsa@kernel.org>
+Subject: [PATCHv2 bpf-next 0/4] kbuild/resolve_btfids: Invoke resolve_btfids clean in root Makefile
+Date:   Fri,  5 Feb 2021 13:40:16 +0100
+Message-Id: <20210205124020.683286-1-jolsa@kernel.org>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
@@ -61,93 +59,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Setting up separate build directories for libbpf and libpsubcmd,
-so it's separated from other objects and we don't get them mixed
-in the future.
+hi,
+resolve_btfids tool is used during the kernel build,
+so we should clean it on kernel's make clean.
 
-It also simplifies cleaning, which is now simple rm -rf.
+v2 changes:
+  - add Song's acks on patches 1 and 4 (others changed) [Song]
+  - add missing / [Andrii]
+  - change srctree variable initialization [Andrii]
+  - shifted ifdef for clean target [Andrii]
 
-Also there's no need for FEATURE-DUMP.libbpf and bpf_helper_defs.h
-files in .gitignore anymore.
+thanks,
+jirka
 
-Acked-by: Song Liu <songliubraving@fb.com>
-Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+
 ---
- tools/bpf/resolve_btfids/.gitignore |  2 --
- tools/bpf/resolve_btfids/Makefile   | 26 +++++++++++---------------
- 2 files changed, 11 insertions(+), 17 deletions(-)
+Jiri Olsa (4):
+      tools/resolve_btfids: Build libbpf and libsubcmd in separate directories
+      tools/resolve_btfids: Check objects before removing
+      tools/resolve_btfids: Set srctree variable unconditionally
+      kbuild: Add resolve_btfids clean to root clean target
 
-diff --git a/tools/bpf/resolve_btfids/.gitignore b/tools/bpf/resolve_btfids/.gitignore
-index a026df7dc280..25f308c933cc 100644
---- a/tools/bpf/resolve_btfids/.gitignore
-+++ b/tools/bpf/resolve_btfids/.gitignore
-@@ -1,4 +1,2 @@
--/FEATURE-DUMP.libbpf
--/bpf_helper_defs.h
- /fixdep
- /resolve_btfids
-diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids/Makefile
-index bf656432ad73..1d46a247ec95 100644
---- a/tools/bpf/resolve_btfids/Makefile
-+++ b/tools/bpf/resolve_btfids/Makefile
-@@ -28,22 +28,22 @@ OUTPUT ?= $(srctree)/tools/bpf/resolve_btfids/
- LIBBPF_SRC := $(srctree)/tools/lib/bpf/
- SUBCMD_SRC := $(srctree)/tools/lib/subcmd/
- 
--BPFOBJ     := $(OUTPUT)/libbpf.a
--SUBCMDOBJ  := $(OUTPUT)/libsubcmd.a
-+BPFOBJ     := $(OUTPUT)/libbpf/libbpf.a
-+SUBCMDOBJ  := $(OUTPUT)/libsubcmd/libsubcmd.a
- 
- BINARY     := $(OUTPUT)/resolve_btfids
- BINARY_IN  := $(BINARY)-in.o
- 
- all: $(BINARY)
- 
--$(OUTPUT):
-+$(OUTPUT) $(OUTPUT)/libbpf $(OUTPUT)/libsubcmd:
- 	$(call msg,MKDIR,,$@)
--	$(Q)mkdir -p $(OUTPUT)
-+	$(Q)mkdir -p $(@)
- 
--$(SUBCMDOBJ): fixdep FORCE
--	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(OUTPUT)
-+$(SUBCMDOBJ): fixdep FORCE | $(OUTPUT)/libsubcmd
-+	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(abspath $(dir $@))/ $(abspath $@)
- 
--$(BPFOBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPUT)
-+$(BPFOBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPUT)/libbpf
- 	$(Q)$(MAKE) $(submake_extras) -C $(LIBBPF_SRC)  OUTPUT=$(abspath $(dir $@))/ $(abspath $@)
- 
- CFLAGS := -g \
-@@ -57,23 +57,19 @@ LIBS = -lelf -lz
- export srctree OUTPUT CFLAGS Q
- include $(srctree)/tools/build/Makefile.include
- 
--$(BINARY_IN): fixdep FORCE
-+$(BINARY_IN): fixdep FORCE | $(OUTPUT)
- 	$(Q)$(MAKE) $(build)=resolve_btfids
- 
- $(BINARY): $(BPFOBJ) $(SUBCMDOBJ) $(BINARY_IN)
- 	$(call msg,LINK,$@)
- 	$(Q)$(CC) $(BINARY_IN) $(LDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
- 
--libsubcmd-clean:
--	$(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(OUTPUT) clean
--
--libbpf-clean:
--	$(Q)$(MAKE) -C $(LIBBPF_SRC) OUTPUT=$(OUTPUT) clean
--
--clean: libsubcmd-clean libbpf-clean fixdep-clean
-+clean: fixdep-clean
- 	$(call msg,CLEAN,$(BINARY))
- 	$(Q)$(RM) -f $(BINARY); \
- 	$(RM) -rf $(if $(OUTPUT),$(OUTPUT),.)/feature; \
-+	$(RM) -rf $(OUTPUT)/libbpf; \
-+	$(RM) -rf $(OUTPUT)/libsubcmd; \
- 	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
- 
- tags:
--- 
-2.26.2
+ Makefile                            |  7 ++++++-
+ tools/bpf/resolve_btfids/.gitignore |  2 --
+ tools/bpf/resolve_btfids/Makefile   | 44 ++++++++++++++++++++++----------------------
+ 3 files changed, 28 insertions(+), 25 deletions(-)
 
