@@ -2,51 +2,53 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E42EDC433DB
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8765C433DB
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 934F064FCE
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66DEF64FD0
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 12:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231750AbhBEMnz convert rfc822-to-8bit (ORCPT
+        id S231328AbhBEMok convert rfc822-to-8bit (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 07:43:55 -0500
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:34410 "EHLO
+        Fri, 5 Feb 2021 07:44:40 -0500
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:50515 "EHLO
         us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232216AbhBEMle (ORCPT
+        by vger.kernel.org with ESMTP id S232174AbhBEMle (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 5 Feb 2021 07:41:34 -0500
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-ELyE_vpNNOiQyxonvvGvSw-1; Fri, 05 Feb 2021 07:40:26 -0500
-X-MC-Unique: ELyE_vpNNOiQyxonvvGvSw-1
+ us-mta-508-xlXrX5MiMzCrA_GoPnE9BQ-1; Fri, 05 Feb 2021 07:40:39 -0500
+X-MC-Unique: xlXrX5MiMzCrA_GoPnE9BQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 389F6804036;
-        Fri,  5 Feb 2021 12:40:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C39BC100CCC3;
+        Fri,  5 Feb 2021 12:40:36 +0000 (UTC)
 Received: from krava.cust.in.nbox.cz (unknown [10.40.195.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 24DAA60936;
-        Fri,  5 Feb 2021 12:40:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E87E660936;
+        Fri,  5 Feb 2021 12:40:33 +0000 (UTC)
 From:   Jiri Olsa <jolsa@kernel.org>
 To:     Alexei Starovoitov <ast@kernel.org>,
         Daniel Borkmann <daniel@iogearbox.net>,
         Andrii Nakryiko <andriin@fb.com>
-Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+Cc:     Song Liu <songliubraving@fb.com>, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, Martin KaFai Lau <kafai@fb.com>,
+        Yonghong Song <yhs@fb.com>,
         John Fastabend <john.fastabend@gmail.com>,
         KP Singh <kpsingh@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         linux-kbuild@vger.kernel.org
-Subject: [PATCHv2 bpf-next 0/4] kbuild/resolve_btfids: Invoke resolve_btfids clean in root Makefile
-Date:   Fri,  5 Feb 2021 13:40:16 +0100
-Message-Id: <20210205124020.683286-1-jolsa@kernel.org>
+Subject: [PATCH bpf-next 4/4] kbuild: Add resolve_btfids clean to root clean target
+Date:   Fri,  5 Feb 2021 13:40:20 +0100
+Message-Id: <20210205124020.683286-5-jolsa@kernel.org>
+In-Reply-To: <20210205124020.683286-1-jolsa@kernel.org>
+References: <20210205124020.683286-1-jolsa@kernel.org>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
@@ -59,29 +61,43 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-hi,
-resolve_btfids tool is used during the kernel build,
+The resolve_btfids tool is used during the kernel build,
 so we should clean it on kernel's make clean.
 
-v2 changes:
-  - add Song's acks on patches 1 and 4 (others changed) [Song]
-  - add missing / [Andrii]
-  - change srctree variable initialization [Andrii]
-  - shifted ifdef for clean target [Andrii]
+Invoking the the resolve_btfids clean as part of root
+'make clean'.
 
-thanks,
-jirka
-
-
+Acked-by: Song Liu <songliubraving@fb.com>
+Signed-off-by: Jiri Olsa <jolsa@kernel.org>
 ---
-Jiri Olsa (4):
-      tools/resolve_btfids: Build libbpf and libsubcmd in separate directories
-      tools/resolve_btfids: Check objects before removing
-      tools/resolve_btfids: Set srctree variable unconditionally
-      kbuild: Add resolve_btfids clean to root clean target
+ Makefile | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- Makefile                            |  7 ++++++-
- tools/bpf/resolve_btfids/.gitignore |  2 --
- tools/bpf/resolve_btfids/Makefile   | 44 ++++++++++++++++++++++----------------------
- 3 files changed, 28 insertions(+), 25 deletions(-)
+diff --git a/Makefile b/Makefile
+index b0e4767735dc..159d9592b587 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1086,6 +1086,11 @@ ifdef CONFIG_STACK_VALIDATION
+   endif
+ endif
+ 
++PHONY += resolve_btfids_clean
++
++resolve_btfids_clean:
++	$(Q)$(MAKE) -sC $(srctree)/tools/bpf/resolve_btfids O=$(abspath $(objtree))/tools/bpf/resolve_btfids clean
++
+ ifdef CONFIG_BPF
+ ifdef CONFIG_DEBUG_INFO_BTF
+   ifeq ($(has_libelf),1)
+@@ -1495,7 +1500,7 @@ vmlinuxclean:
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+ 	$(Q)$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) clean)
+ 
+-clean: archclean vmlinuxclean
++clean: archclean vmlinuxclean resolve_btfids_clean
+ 
+ # mrproper - Delete all generated files, including .config
+ #
+-- 
+2.26.2
 
