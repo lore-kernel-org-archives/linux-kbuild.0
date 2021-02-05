@@ -2,136 +2,106 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67BBDC433DB
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 01:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0123EC433DB
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 03:12:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1219264FA9
-	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 01:33:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7FD364FB9
+	for <linux-kbuild@archiver.kernel.org>; Fri,  5 Feb 2021 03:12:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbhBEBdj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 4 Feb 2021 20:33:39 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12128 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232758AbhBEBdb (ORCPT
+        id S229934AbhBEDMN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 4 Feb 2021 22:12:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230197AbhBEDL5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 4 Feb 2021 20:33:31 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DWyYp4S5Cz162FZ;
-        Fri,  5 Feb 2021 09:31:26 +0800 (CST)
-Received: from [127.0.0.1] (10.69.38.196) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.498.0; Fri, 5 Feb 2021
- 09:32:36 +0800
-Subject: Re: [PATCH] PCI: Use subdir-ccflags-* to inherit debug flag
-To:     Bjorn Helgaas <helgaas@kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <prime.zeng@huawei.com>,
-        <linuxarm@openeuler.org>, Masahiro Yamada <masahiroy@kernel.org>,
-        "Michal Marek" <michal.lkml@markovi.net>,
-        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20210204161048.GA68790@bjorn-Precision-5520>
-From:   Yicong Yang <yangyicong@hisilicon.com>
-Message-ID: <8b4e51a2-ce4c-50e1-4e06-7752bf892f05@hisilicon.com>
-Date:   Fri, 5 Feb 2021 09:32:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        Thu, 4 Feb 2021 22:11:57 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11D1C061786
+        for <linux-kbuild@vger.kernel.org>; Thu,  4 Feb 2021 19:11:10 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id q7so5924724wre.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Feb 2021 19:11:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=colorremedies-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I+kAjuceqQaSn6CnDxq1eGCe6jIuci9QzOZjaAOHZZ4=;
+        b=ald/6GB4cU/3OuNhAVzbLnuB6xvz4CPgony9VaCQPVAgc7KGFZXRVKtLWkWvFIcbYd
+         fMoXq9EJebve6kpGLHdl/w0AUUwuW7oacXEQoWjA30ozOJ+x+mVh8qRFxJQF0LJFrDil
+         Akbv/F/+Kbtk1c+wxZK0UJ2dYzsBC1cTWH2j20Ikolmf0u/r1vmv5xeGSTnzIeTgGfqZ
+         xWwPsD4wEGWXILFenXn9Eqzx0EG1rPKqONAh4AqJyPRRWEXCh4X7gS+K07mTjG4RsM7m
+         icO7WbGydnhB1YktuWBYsIdj5nyLNo6LBRRCB2GKBsbx7zUtL6UqbUxa0wHGPy/lYrIe
+         dmnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I+kAjuceqQaSn6CnDxq1eGCe6jIuci9QzOZjaAOHZZ4=;
+        b=BkTNRIztcAuUKSVSyK7Ep08o6KyqDdZ8ybq3MlijcID9/MCEzUzda8v43W+O+ufSpd
+         5LmU5RgWvnz0P6YVSJBVAOQxBWbworzoOqb2BQzhPzSHqhXMla4YBME/yGtHvmENEAgN
+         c49bKFMDeCzPTeG2hZ2FtdGyweSYKPq8dR9/D38GA7ZkRbpmmQ3Yg+ljt1rGM7w8L2lE
+         xVkx2nzLiwi88RGDyuVckdhU64Yc9Uxj7WOBJ5KG+ZCAfSFdBY3MgJeN/DJUJeZXTC0J
+         fCcvhiI+L9crw3I1J4JpY1Fs71TssUGrvg1uBWGothow75zH6FtDoY6DMDngRQkspePO
+         egDA==
+X-Gm-Message-State: AOAM532ipsm7g4HsShwBiBixXWf/uhP+4B+RsGJ3eeKfcIvBAy/jGfgO
+        38Drh2jS+TEwB3mu2uQdrdOeOAgWZrR5BOsiUm43uA==
+X-Google-Smtp-Source: ABdhPJxNqWdyIThhWcNYJ7sQC/LTzehMjhlXl+bGyYf5G8tr28thHPvS5ccpVRoPl/gmT6DrKtDpm3RQXJLhoNGKvkw=
+X-Received: by 2002:a5d:6686:: with SMTP id l6mr2478909wru.236.1612494669505;
+ Thu, 04 Feb 2021 19:11:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210204161048.GA68790@bjorn-Precision-5520>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.38.196]
-X-CFilter-Loop: Reflected
+References: <CAJCQCtSQLc0VHqO4BY_-YB2OmCNNmHCS6fNdQKmMWGn2v=Jpdw@mail.gmail.com>
+ <CAJCQCtRHOidM7Vps1JQSpZA14u+B5fR860FwZB=eb1wYjTpqDw@mail.gmail.com>
+ <CAEf4BzZ4oTB0-JizHe1VaCk2V+Jb9jJoTznkgh6CjE5VxNVqbg@mail.gmail.com>
+ <CAJCQCtRw6UWGGvjn0x__godYKYQXXmtyQys4efW2Pb84Q5q8Eg@mail.gmail.com>
+ <20210204010038.GA854763@kernel.org> <CAJCQCtQfgRp78_WSrSHLNUUYNCyOCH=vo10nVZW_cyMjpZiNJg@mail.gmail.com>
+ <CAEf4Bza4XQxpS7VTNWGk6Rz-iUwZemF6+iAVBA_yvrWnV0k8Qg@mail.gmail.com>
+ <CAJCQCtRDJ_uiJcanP_p+y6Kz76c4P-EmndMyfHN5f4rtkgYhjA@mail.gmail.com>
+ <20210204132625.GB910119@kernel.org> <20210204163319.GD910119@kernel.org>
+In-Reply-To: <20210204163319.GD910119@kernel.org>
+From:   Chris Murphy <lists@colorremedies.com>
+Date:   Thu, 4 Feb 2021 20:10:52 -0700
+Message-ID: <CAJCQCtT-i0Lv2zxUDko3XuiHpUqOnYPeND5LzD=zgrB1-GNvAg@mail.gmail.com>
+Subject: Re: [FIXED] Re: 5:11: in-kernel BTF is malformed
+To:     Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc:     Chris Murphy <lists@colorremedies.com>, bpf <bpf@vger.kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>, dwarves@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        Nick Clifton <nickc@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 2021/2/5 0:10, Bjorn Helgaas wrote:
-> [+cc Masahiro, Michal, linux-kbuild, linux-kernel]
-> 
-> On Thu, Feb 04, 2021 at 07:30:15PM +0800, Yicong Yang wrote:
->> From: Junhao He <hejunhao2@hisilicon.com>
->>
->> Use subdir-ccflags-* instead of ccflags-* to inherit the debug
->> settings from Kconfig when traversing subdirectories.
-> 
-> So I guess the current behavior is:
-> 
->   If CONFIG_PCI_DEBUG=y, add -DDEBUG to CFLAGS in the current
->   directory, but not in any subdirectories
-> 
-> and the behavior after this patch is:
-> 
->   If CONFIG_PCI_DEBUG=y, add -DDEBUG to CFLAGS in the current
->   directory and any subdirectories
-> 
-> Is that right?  That makes sense to me.  I wonder if any other places
-> have this issue?
+On Thu, Feb 4, 2021 at 9:33 AM Arnaldo Carvalho de Melo <acme@kernel.org> wrote:
+>
+> So I think that for the problems related to building the kernel with gcc
+> 11 in Fedora Rawhide using the default that is now DWARF5, pahole 1.20
+> is good to go and I'll tag it now.
 
-that's right. we didn't check other places, but some have individual config
-in their sub-directory as you mentioned below.
+dwarves-1.20-1.fc34.x86_64
+libdwarves1-1.20-1.fc34.x86_64
 
-> 
-> 'git grep "^ccflags.*-DDEBUG"' finds a few cases where subdirectories
-> use their own debug config options, e.g.,
-> 
->   drivers/i2c/Makefile:ccflags-$(CONFIG_I2C_DEBUG_CORE) := -DDEBUG
->   drivers/i2c/algos/Makefile:ccflags-$(CONFIG_I2C_DEBUG_ALGO) := -DDEBUG
->   drivers/i2c/busses/Makefile:ccflags-$(CONFIG_I2C_DEBUG_BUS) := -DDEBUG
->   drivers/i2c/muxes/Makefile:ccflags-$(CONFIG_I2C_DEBUG_BUS) := -DDEBUG
-> 
-> But some have subdirectories that look like they probably should be
-> included by using subdir-ccflags, e.g.,
-> 
->   drivers/base/Makefile:ccflags-$(CONFIG_DEBUG_DRIVER) := -DDEBUG
->   drivers/base/power/Makefile:ccflags-$(CONFIG_DEBUG_DRIVER) := -DDEBUG
->     # drivers/base/{firmware_loader,regmap,test}/ not included
-> 
->   drivers/hwmon/Makefile:ccflags-$(CONFIG_HWMON_DEBUG_CHIP) := -DDEBUG
->     # drivers/hwmon/{occ,pmbus}/ not included
-> 
->   drivers/pps/Makefile:ccflags-$(CONFIG_PPS_DEBUG) := -DDEBUG
->   drivers/pps/clients/Makefile:ccflags-$(CONFIG_PPS_DEBUG) := -DDEBUG
->     # drivers/pps/generators/ not included
-> 
-> There are many more places that add -DDEBUG to ccflags-y that *don't*
-> have subdirectories.
-> 
-> I wonder the default should be that we use subdir-ccflags all the
-> time, and use ccflags only when we actually want different
-> CONFIG_*_DEBUG options for subdirectories.
+Fixes both "failed to validate module [?????] BTF: -22" type errors,
+and 'in-kernel BTF is malformed" with qemu-kvm and libvirt.
 
-agree. if there is no debug config in the sub-directory, the
-config should be inherited from its parent directory using subdir-ccflags.
+Is that expected? Or maybe the second issue was fixed by
+gcc-11.0.0-0.18.fc34.x86_64 [(GCC) 11.0.0 20210130]? This is what I
+get for changing more than one thing at once.
 
-we can post a separate serial to issue other places.
-
-Thanks,
-Yicong
-
-> 
->> Signed-off-by: Junhao He <hejunhao2@hisilicon.com>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> ---
->>  drivers/pci/Makefile | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
->> index 11cc794..d62c4ac 100644
->> --- a/drivers/pci/Makefile
->> +++ b/drivers/pci/Makefile
->> @@ -36,4 +36,4 @@ obj-$(CONFIG_PCI_ENDPOINT)	+= endpoint/
->>  obj-y				+= controller/
->>  obj-y				+= switch/
->>  
->> -ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
->> +subdir-ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
->> -- 
->> 2.8.1
->>
-> 
-> .
-> 
-
+--
+Chris Murphy
