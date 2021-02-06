@@ -2,135 +2,115 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8D5C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C3FC433E6
 	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:50:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D2A364F91
+	by mail.kernel.org (Postfix) with ESMTP id 90A9964EEF
 	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 02:50:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229854AbhBFCs5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 5 Feb 2021 21:48:57 -0500
-Received: from condef-05.nifty.com ([202.248.20.70]:64831 "EHLO
-        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230273AbhBFCkf (ORCPT
+        id S231929AbhBFCtG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:49:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231438AbhBFCnX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 5 Feb 2021 21:40:35 -0500
-X-Greylist: delayed 439 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Feb 2021 21:40:27 EST
-Received: from conssluserg-05.nifty.com ([10.126.8.84])by condef-05.nifty.com with ESMTP id 1161oMY8006119;
-        Sat, 6 Feb 2021 10:50:22 +0900
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 1161nRBC018896;
-        Sat, 6 Feb 2021 10:49:28 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 1161nRBC018896
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1612576168;
-        bh=gpqQwaTvQcIqHtmt2nFODRlCdmq9NF34DAVw/eO4LAI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=xYLjqAKAFhZ7L8wWrUHU+f+rp9RE+9j96zr5TzdVyUtlVyPZKa57vlv/nGOhe06Jd
-         u/2vChzUiemzJAIZRtihqPnysW5SVDOQlF8yJovsKbm0ZFQh2R7qmbJ2rS7Az7orN3
-         ImD6agICIWZISkrkJXFjxEg44/z6+pvesHPTTglDuaSuD4yOKOpj4wR6H5RLBUCWH/
-         iES7fa+4xRyExlCyJnvDd5q0DNskyqMNxuYoV5OJJGFuYXBe2j0kxaCPiymDLoFNIY
-         STUAG51U3uW6vtSG6J4OFNGbUn0W02b4R+QX91NlLVqt6FoofQslICCAs8ROSMeT1u
-         mq/81Sum/A+vw==
-X-Nifty-SrcIP: [209.85.215.173]
-Received: by mail-pg1-f173.google.com with SMTP id r38so5757555pgk.13;
-        Fri, 05 Feb 2021 17:49:27 -0800 (PST)
-X-Gm-Message-State: AOAM532VwZVWFDxm/lTTN05yzODKa8kB932pzg7Fnt63m16X0MZbTWVR
-        sL8A69u5rMUndSh7wAKf3KBbryTyzdDmViB7huo=
-X-Google-Smtp-Source: ABdhPJzY87ngLMxF79uzibs1VF2FhW8F8uzZsWLUNAu8V4Bgg5khj0mUN7eHENn7VCuiLIGBtO6iBpmDzuYnFLO/Tlg=
-X-Received: by 2002:a63:ff09:: with SMTP id k9mr7335315pgi.175.1612576167170;
- Fri, 05 Feb 2021 17:49:27 -0800 (PST)
+        Fri, 5 Feb 2021 21:43:23 -0500
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69662C08EE12
+        for <linux-kbuild@vger.kernel.org>; Fri,  5 Feb 2021 16:03:13 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id d3so12441759lfg.10
+        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2021 16:03:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NWPbrqSGD6rR+HAkD4dteJHXvU5H2qHvAqzNOoE/AX4=;
+        b=Q9wbjEdeHc4TeNxJ/V+vcdkXrft7Hdvxxn+SIjZxu8PZsrwK5feK1ppXy1XqnE28Ro
+         D4ok3CLhopKZbW5fYvBwYj1OZxnIx1dNO+j/IUzx9eM1ch5hzGzmxEydedxC76cWDlf8
+         vavb1T9si/T+EQjB+UhwvM+HTrxgBeGiY4jchmvvqyRbZ7E1tkbi4bGuJI010NTymG1W
+         KmVVl1eMaq4TdUrh/rsBFGcVys2kY3z/YQiM0T97plSvPSfTXUzx6jFYonOe57z75kmY
+         mapTq2Rquh3dM65g/II/UgJxQnA238NhsBg8vg+nUry3YhUuPw3/eRvpW50is8E+69vI
+         Ey4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NWPbrqSGD6rR+HAkD4dteJHXvU5H2qHvAqzNOoE/AX4=;
+        b=jjduRpjyIKX+oFAyT9ZUpeSGp6g1jztrz80FTuhEDPlMALlgmZJGbs0QMjOKXcxZLM
+         llQEdt9hxxuAtSZhGZCBwGgGppvD8rqrazfA4Gln30mbVcGxvB0oVOP2+vE+ivDMc/Wz
+         wN/OUFgzSZXQlRPrb16zXLuS2V5e27eF+qFC4qRtjqaC7iEbtJlUFlw17bHDcfXwEIEG
+         7HW679t+0vzxJg8X8ccba9nAGJaY+5Sh/5FjK79qDw6LSjeE/BRXal9ViUgqoOE1VLcv
+         gE0ojlU01adkCqvC1iIFglWGf4zaFnDABk/e7shNcw0E55u4tagRehEq4cpY7aCbK4Oi
+         IChg==
+X-Gm-Message-State: AOAM533YrT+NVdntASDktSS9cyJJrPaM3ofsVDN7xI3Zy8m6w3Ns8Eo4
+        Y/Vl2GGvuayKf2iydFWoRl1262Ihh4kvv3IVRJhK8w==
+X-Google-Smtp-Source: ABdhPJwFLIr/GH5BZQINZQllHE4paJG7suSjTbzOFq6WfqnMVkh1s9cjISJEvl7WKkrsrv8vLH+/5AkJ3PEobamJQ4I=
+X-Received: by 2002:a2e:7d11:: with SMTP id y17mr4129417ljc.116.1612569791666;
+ Fri, 05 Feb 2021 16:03:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20210205220125.2931504-1-ndesaulniers@google.com>
-In-Reply-To: <20210205220125.2931504-1-ndesaulniers@google.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 6 Feb 2021 10:48:50 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARKHvjTcnic=ZKntH3NY5meehQbJuBr34y9_tn8b-Ym0w@mail.gmail.com>
-Message-ID: <CAK7LNARKHvjTcnic=ZKntH3NY5meehQbJuBr34y9_tn8b-Ym0w@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: reuse CC_VERSION_TEXT
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <nathan@kernel.org>,
+References: <20210205202220.2748551-1-ndesaulniers@google.com>
+ <20210205202220.2748551-2-ndesaulniers@google.com> <20210205160034.a0e0ba06752bef03e60f91f8@linux-foundation.org>
+In-Reply-To: <20210205160034.a0e0ba06752bef03e60f91f8@linux-foundation.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Fri, 5 Feb 2021 16:02:58 -0800
+Message-ID: <CAKwvOdmkx=+MGkc5uCB=0TssnHNQXb0E+x=CqbGs6gGZc5GH7Q@mail.gmail.com>
+Subject: Re: [PATCH v9 1/3] vmlinux.lds.h: add DWARF v5 sections
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
+        linux-arch <linux-arch@vger.kernel.org>,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        Nick Clifton <nickc@redhat.com>, Yonghong Song <yhs@fb.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Chris Murphy <bugzilla@colorremedies.com>,
+        Mark Wielaard <mark@klomp.org>,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Chris Murphy <lists@colorremedies.com>,
+        Nathan Chancellor <nathan@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Feb 6, 2021 at 7:01 AM 'Nick Desaulniers' via Clang Built
-Linux <clang-built-linux@googlegroups.com> wrote:
+On Fri, Feb 5, 2021 at 4:00 PM Andrew Morton <akpm@linux-foundation.org> wrote:
 >
-> I noticed we're invoking $(CC) via $(shell) more than once to check the
-> version.  Let's reuse the first string captured in $CC_VERSION_TEXT.
+> On Fri,  5 Feb 2021 12:22:18 -0800 Nick Desaulniers <ndesaulniers@google.com> wrote:
 >
-> Fixes: 315bab4e972d ("kbuild: fix endless syncconfig in case arch Makefile sets CROSS_COMPILE")
-
-
-I did not touch this hunk because I have a plan
-for different refactoring, but I have never got
-around to do it.
-
-Anyway, you beat me, and I will pick this up.
-But, the Fixes tag is questionable because
-this is code refactoring.
-
-
-
-
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
->  Makefile | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+> > We expect toolchains to produce these new debug info sections as part of
+> > DWARF v5. Add explicit placements to prevent the linker warnings from
+> > --orphan-section=warn.
+> >
+> > Compilers may produce such sections with explicit -gdwarf-5, or based on
+> > the implicit default version of DWARF when -g is used via DEBUG_INFO.
+> > This implicit default changes over time, and has changed to DWARF v5
+> > with GCC 11.
+> >
+> > .debug_sup was mentioned in review, but without compilers producing it
+> > today, let's wait to add it until it becomes necessary.
+> >
 >
-> diff --git a/Makefile b/Makefile
-> index a85535eb6a7d..70034d7c1051 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -557,7 +557,13 @@ ifdef building_out_of_srctree
->         { echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
->  endif
->
-> -ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
-> +# The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
-> +# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
-> +# CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
-> +# and from include/config/auto.conf.cmd to detect the compiler upgrade.
-> +CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
-> +
-> +ifneq ($(findstring clang,$(CC_VERSION_TEXT)),)
->  ifneq ($(CROSS_COMPILE),)
->  CLANG_FLAGS    += --target=$(notdir $(CROSS_COMPILE:%-=%))
->  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
-> @@ -576,12 +582,6 @@ KBUILD_AFLAGS      += $(CLANG_FLAGS)
->  export CLANG_FLAGS
->  endif
->
-> -# The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
-> -# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
-> -# CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
-> -# and from include/config/auto.conf.cmd to detect the compiler upgrade.
-> -CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
-> -
->  ifdef config-build
->  # ===========================================================================
->  # *config targets only - make sure prerequisites are updated, and descend
-> --
-> 2.30.0.478.g8a0d178c01-goog
->
-> --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20210205220125.2931504-1-ndesaulniers%40google.com.
+> There isn't anything in this changelog which explains why a -stable
+> backport was requested?  Or is there?  Irritating linker warnings?
+> More than that?
 
-
-
+Users adopting GCC 11 will start to see warnings from the linker due
+to --orphan-section=warn when building the branches of the stable
+tree.  Stable has IME accepted patches for permitting newer toolchains
+to continue to compile warning free.
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
