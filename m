@@ -2,97 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965F6C433E0
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 14:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4029C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 15:03:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5838764E49
-	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 14:32:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7769464EBC
+	for <linux-kbuild@archiver.kernel.org>; Sat,  6 Feb 2021 15:03:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbhBFOb5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 6 Feb 2021 09:31:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43442 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229608AbhBFOb5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 6 Feb 2021 09:31:57 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4A35264E2C;
-        Sat,  6 Feb 2021 14:31:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612621876;
-        bh=t1nxghJC+uJ17Dk0GZXqp+NfezDcXVNpaGO/kJgdTHY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PSpEYRP7aWh02tbsPE9rgn3LLCBOp0nBXTHAllTcymz+44qZdy6o89F6iaRsmaNdm
-         JjGl5SXOd2XgJKVkzgs5M5zuhxM3ZO9R7aHlJjcCgXKhd7+A+t51V2daFfuAVBTYgd
-         yM1PAwmc9iVyPZ+R66Szyph5YtJHiheWUpKJOl7LwdrGNhTKGkVArjkkNj/d9qi6Xj
-         fhg3qhH9uroX8OsWJ+OhpUfvaQ0pr/kPvCSoVP+rkBoH0Su0CpNufXeEj8mtu9erVQ
-         94zHmwNMHNB43KEiUYtmwL779JfB9S03ahtMPyN6UPwuhIUl/sRHb3INwtNWMKJ7ea
-         AtjsOfff5OiaQ==
-Date:   Sat, 6 Feb 2021 09:31:15 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@kernel.org
-Subject: Re: [PATCH 3/3] kbuild: introduce KERNEL_VERSION2 and
- LINUX_VERSION_CODE2
-Message-ID: <20210206143115.GX4035784@sasha-vm>
-References: <20210206035033.2036180-1-sashal@kernel.org>
- <20210206035033.2036180-3-sashal@kernel.org>
- <CAK7LNASoWNfEAzQYOo7_PqgU61iiZk8i=F-JS38yn5AnfQNhzQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASoWNfEAzQYOo7_PqgU61iiZk8i=F-JS38yn5AnfQNhzQ@mail.gmail.com>
+        id S230018AbhBFPDA convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 6 Feb 2021 10:03:00 -0500
+Received: from wildebeest.demon.nl ([212.238.236.112]:45684 "EHLO
+        gnu.wildebeest.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229854AbhBFPC4 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 6 Feb 2021 10:02:56 -0500
+Received: from tarox.wildebeest.org (tarox.wildebeest.org [172.31.17.39])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by gnu.wildebeest.org (Postfix) with ESMTPSA id 1996F30278CD;
+        Sat,  6 Feb 2021 16:02:09 +0100 (CET)
+Received: by tarox.wildebeest.org (Postfix, from userid 1000)
+        id BEDE64000987; Sat,  6 Feb 2021 16:02:09 +0100 (CET)
+Message-ID: <642ceee8911e201438068f39f828af9f52cbb6a0.camel@klomp.org>
+Subject: Re: [PATCH v9 1/3] vmlinux.lds.h: add DWARF v5 sections
+From:   Mark Wielaard <mark@klomp.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
+        Jakub Jelinek <jakub@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Caroline Tice <cmtice@google.com>,
+        Nick Clifton <nickc@redhat.com>, Yonghong Song <yhs@fb.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Chris Murphy <bugzilla@colorremedies.com>,
+        stable@vger.kernel.org, Chris Murphy <lists@colorremedies.com>,
+        Nathan Chancellor <nathan@kernel.org>
+Date:   Sat, 06 Feb 2021 16:02:09 +0100
+In-Reply-To: <20210205202220.2748551-2-ndesaulniers@google.com>
+References: <20210205202220.2748551-1-ndesaulniers@google.com>
+         <20210205202220.2748551-2-ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Feb 06, 2021 at 09:45:44PM +0900, Masahiro Yamada wrote:
->On Sat, Feb 6, 2021 at 12:50 PM Sasha Levin <sashal@kernel.org> wrote:
->> -       ((c) > 255 ? 255 : (c)))'
->> +       ((c) > 255 ? 255 : (c)))';                                       \
->> +       echo \#define LINUX_VERSION_CODE2 $(shell                        \
->> +       expr $(VERSION) \* 16777216 + 0$(PATCHLEVEL) \* 65536 + 0$(SUBLEVEL)); \
->
->
->Is this needed?
->No one in this patch uses LINUX_VERSION_CODE2.
->
->The in-kernel code can use
->LINUX_VERSION_MAJOR/PATCHLEVEL/SUBLEVEL directly.
->
->
->Userspace does not need LINUX_VERSION_CODE2 either.
->
->Your comment in 2/3 states that
->userspace only decodes MAJOR and PATCHLEVEL fields,
->so LINUX_VERSION_CODE will still do well.
+Hi Nick,
 
-Yes, that's fair. I wanted to have that to make it easy for out of tree
-code to handle in-kernel ABI changes but as we don't care about such
-code there's no strict need for LINUX_VERSION_CODE2. I'll drop it.
+On Fri, 2021-02-05 at 12:22 -0800, Nick Desaulniers wrote:
+> We expect toolchains to produce these new debug info sections as part of
+> DWARF v5. Add explicit placements to prevent the linker warnings from
+> --orphan-section=warn.
+> 
+> Compilers may produce such sections with explicit -gdwarf-5, or based on
+> the implicit default version of DWARF when -g is used via DEBUG_INFO.
+> This implicit default changes over time, and has changed to DWARF v5
+> with GCC 11.
+> 
+> .debug_sup was mentioned in review, but without compilers producing it
+> today, let's wait to add it until it becomes necessary.
 
->> index ab4b98b3165db..a56bf381335e9 100644
->> --- a/tools/perf/tests/bpf-script-example.c
->> +++ b/tools/perf/tests/bpf-script-example.c
->> @@ -5,7 +5,7 @@
->>   */
->>  #ifndef LINUX_VERSION_CODE
->>  # error Need LINUX_VERSION_CODE
->> -# error Example: for 4.2 kernel, put 'clang-opt="-DLINUX_VERSION_CODE=0x40200" into llvm section of ~/.perfconfig'
->> +# error Example: for 4.2 kernel, put 'clang-opt="-DLINUX_VERSION_CODE=0x4020000" into llvm section of ~/.perfconfig'
->
->
->Is this change needed?
+I don't think that will be necessary. .debug_sup is for Dwarf
+Supplemental file producers like dwz. Those would run after the linker.
 
-Good point, no. I'll resend.
+> Cc: stable@vger.kernel.org
+> Link: https://bugzilla.redhat.com/show_bug.cgi?id=1922707
+> Reported-by: Chris Murphy <lists@colorremedies.com>
+> Suggested-by: Fangrui Song <maskray@google.com>
+> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> ---
+>  include/asm-generic/vmlinux.lds.h | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+> index 34b7e0d2346c..1e7cde4bd3f9 100644
+> --- a/include/asm-generic/vmlinux.lds.h
+> +++ b/include/asm-generic/vmlinux.lds.h
+> @@ -842,8 +842,13 @@
+>  		/* DWARF 4 */						\
+>  		.debug_types	0 : { *(.debug_types) }			\
+>  		/* DWARF 5 */						\
+> +		.debug_addr	0 : { *(.debug_addr) }			\
+> +		.debug_line_str	0 : { *(.debug_line_str) }		\
+> +		.debug_loclists	0 : { *(.debug_loclists) }		\
+>  		.debug_macro	0 : { *(.debug_macro) }			\
+> -		.debug_addr	0 : { *(.debug_addr) }
+> +		.debug_names	0 : { *(.debug_names) }			\
+> +		.debug_rnglists	0 : { *(.debug_rnglists) }		\
+> +		.debug_str_offsets	0 : { *(.debug_str_offsets) }
+>  
+>  /* Stabs debugging sections. */
+>  #define STABS_DEBUG							\
 
--- 
-Thanks,
-Sasha
+Looks good to me.
+
+Cheers,
+
+Mark
