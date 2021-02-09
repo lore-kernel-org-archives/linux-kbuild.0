@@ -2,89 +2,112 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F480C433DB
-	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Feb 2021 16:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBF0C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Feb 2021 23:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 015D364E9D
-	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Feb 2021 16:49:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D10A64E5A
+	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Feb 2021 23:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233086AbhBIQtg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 9 Feb 2021 11:49:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47667 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233200AbhBIQrw (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Feb 2021 11:47:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612889186;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9bKjwgbZ1EP33vL7JsMvHcw8xSOrDL2Zn14AJKji9VU=;
-        b=R+RjCt/NJDlo9uyxze+EHMXseJGc7qULXCph8rscMJv0RJwvefik0Z6VSyjGZ08pBuGv4m
-        kbPAtzWLQppiNwWzt7nlJLyGP8IOTGLppfPWJiW5WyfVe4lwsw6kI8Z4O7JSZ9WtevdCX9
-        aVyl8Z3SXYNj7Af3gfqFAMaY7/0NQK4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-alYt63OcOQKjNdkohcNTEQ-1; Tue, 09 Feb 2021 11:46:23 -0500
-X-MC-Unique: alYt63OcOQKjNdkohcNTEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04A03107ACE8;
-        Tue,  9 Feb 2021 16:46:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C58A5D705;
-        Tue,  9 Feb 2021 16:46:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <5055b9b4-2808-8816-d50c-e651bd88a7c3@digikod.net>
-References: <5055b9b4-2808-8816-d50c-e651bd88a7c3@digikod.net> <74EC102D-BD18-4863-A7FB-C88439654C8C@oracle.com> <20210122181054.32635-1-eric.snowberg@oracle.com> <1103491.1612369600@warthog.procyon.org.uk> <10e6616e-0598-9f33-2de9-4a5268bba586@digikod.net> <A5B5DEC0-E47A-4C3D-8E79-AF37B6C2E565@oracle.com> <7924ce4c-ea94-9540-0730-bddae7c6af07@digikod.net> <BFC930B3-7994-4C5B-A8EF-1DD1C73F5750@oracle.com> <dc6a4524-3935-fda6-40a8-cebf80942cdf@digikod.net> <188DE1AF-A011-4631-B88A-2C4324DA013B@oracle.com> <99066eb7-53ac-41b0-46cf-36ea3d7f6590@digikod.net> <525705.1612876446@warthog.procyon.org.uk>
-To:     =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl=5FSala=3Dc3=3Dbcn=3F?=
-         =?us-ascii?Q?=3D?= <mic@digikod.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     dhowells@redhat.com, dwmw2@infradead.org,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James.Bottomley@HansenPartnership.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, jmorris@namei.org, serge@hallyn.com,
-        ardb@kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-        lszubowi@redhat.com, javierm@redhat.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Tyler Hicks <tyhicks@linux.microsoft.com>
-Subject: Re: Re: Conflict with =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn's?=
- blacklist patches [was [PATCH v5 0/4] Add EFI_CERT_X509_GUID support for
- dbx/mokx entries]
+        id S234284AbhBIXUH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 9 Feb 2021 18:20:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33420 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234349AbhBIWq5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 9 Feb 2021 17:46:57 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 92F1664E8B;
+        Tue,  9 Feb 2021 21:25:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612905913;
+        bh=3l1Lx2Zsd3+a58rOtqbr6Ig2BO03fAiJHekglj/tm5I=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=oU9cIGGZ9+lvTz3ixoLQmevdhcqk5X5fN7zKiSKQ9km0FZCUZTRPHvOTCIzbD6M1W
+         vnXE7cYSpKccas23kLuH6Wzm/8zSNH+onxHtt3UcPAj45dzkspoajXUixWJewEyJcV
+         kOpAOQYYtuAuT/KyCLv7SWI8f46g/QkS6iar7Bg1GoH1e4n0uNJ78gI9Z7EDkafhlF
+         N3k8hhiGuc7Rd28WV7BRooYCOpOPs7RNOIgJ2NYsuRiCMumVKv29td6rVNfiX87xdh
+         Mp+OIUhUbzvT7WZHChGByhuK99QBjCHzvcLR4uhgnVvJH4mJZgKjwKkFD9lbErj1E4
+         pKVsL82XoRPBQ==
+Date:   Tue, 9 Feb 2021 15:25:10 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Yicong Yang <yangyicong@hisilicon.com>
+Cc:     linux-pci@vger.kernel.org, prime.zeng@huawei.com,
+        linuxarm@openeuler.org, Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] PCI: Use subdir-ccflags-* to inherit debug flag
+Message-ID: <20210209212510.GA513360@bjorn-Precision-5520>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 09 Feb 2021 16:46:13 +0000
-Message-ID: <595105.1612889173@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1612438215-33105-1-git-send-email-yangyicong@hisilicon.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> wrote:
+[+cc Masahiro, Michal, linux-kbuild, linux-kernel]
 
-> The only commit causing issues is commit f78e50c8f750 ("certs: Factor
-> out the blacklist hash creation"). I think my last patch fix the issue,
-> and I'm testing with the UEFI DBX, but I don't understand why this
-> change would have an impact. In the meantime you can push Eric's commits
-> first, I'll adapt my changes.
+On Thu, Feb 04, 2021 at 07:30:15PM +0800, Yicong Yang wrote:
+> From: Junhao He <hejunhao2@hisilicon.com>
+> 
+> Use subdir-ccflags-* instead of ccflags-* to inherit the debug
+> settings from Kconfig when traversing subdirectories.
+> 
+> Signed-off-by: Junhao He <hejunhao2@hisilicon.com>
+> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 
-Okay.  In that case, I've dropped your branch from my keys-next branch for =
-the
-moment and remerged Eric's branch.
+I applied this with Krzysztof's reviewed-by and the commit log below
+to pci/misc for v5.12, thanks!
 
-David
+Feel free to copy or improve the commit log for use elsewhere.
 
+> ---
+>  drivers/pci/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+> index 11cc794..d62c4ac 100644
+> --- a/drivers/pci/Makefile
+> +++ b/drivers/pci/Makefile
+> @@ -36,4 +36,4 @@ obj-$(CONFIG_PCI_ENDPOINT)	+= endpoint/
+>  obj-y				+= controller/
+>  obj-y				+= switch/
+>  
+> -ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
+> +subdir-ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
+
+commit e8e9aababe60 ("PCI: Apply CONFIG_PCI_DEBUG to entire drivers/pci hierarchy")
+Author: Junhao He <hejunhao2@hisilicon.com>
+Date:   Thu Feb 4 19:30:15 2021 +0800
+
+    PCI: Apply CONFIG_PCI_DEBUG to entire drivers/pci hierarchy
+    
+    CONFIG_PCI_DEBUG=y adds -DDEBUG to CFLAGS, which enables things like
+    pr_debug() and dev_dbg() (and hence pci_dbg()).  Previously we added
+    -DDEBUG for files in drivers/pci/, but not files in subdirectories of
+    drivers/pci/.
+    
+    Add -DDEBUG to CFLAGS for all files below drivers/pci/ so CONFIG_PCI_DEBUG
+    applies to the entire hierarchy.
+    
+    [bhelgaas: commit log]
+    Link: https://lore.kernel.org/r/1612438215-33105-1-git-send-email-yangyicong@hisilicon.com
+    Signed-off-by: Junhao He <hejunhao2@hisilicon.com>
+    Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+    Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+    Reviewed-by: Krzysztof Wilczyński <kw@linux.com>
+
+diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+index 11cc79411e2d..d62c4ac4ae1b 100644
+--- a/drivers/pci/Makefile
++++ b/drivers/pci/Makefile
+@@ -36,4 +36,4 @@ obj-$(CONFIG_PCI_ENDPOINT)	+= endpoint/
+ obj-y				+= controller/
+ obj-y				+= switch/
+ 
+-ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
++subdir-ccflags-$(CONFIG_PCI_DEBUG) := -DDEBUG
