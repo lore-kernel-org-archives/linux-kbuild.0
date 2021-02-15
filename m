@@ -2,265 +2,96 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 915E3C433DB
-	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 00:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE7BC433DB
+	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 11:38:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3039564DDA
-	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 00:56:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D418364DE0
+	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 11:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbhBOA4p (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 14 Feb 2021 19:56:45 -0500
-Received: from conuserg-08.nifty.com ([210.131.2.75]:34310 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbhBOAzV (ORCPT
+        id S229981AbhBOLhx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 15 Feb 2021 06:37:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229916AbhBOLhu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 Feb 2021 19:55:21 -0500
-Received: from oscar.flets-west.jp (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 11F0mqgC009582;
-        Mon, 15 Feb 2021 09:48:57 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 11F0mqgC009582
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1613350139;
-        bh=Do58g+fIWucUZ2Hl9cDGQ5X6Gc6bjsY9y84cwfGvMEs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SM2AX/TTCgabZcepPaY+EzPWlVFG07BHed4+vVXzs76ahyRHkYdvjiMaxbo4SciNk
-         99V7vAau2v1CJZ3KHHFtlsyvo6HAayFKsqyE45QYBEFlto50Klgio1cy4dCikELgg4
-         jXzbhQlcLnoMztNUY+qoz6gF3IiQTs6LZQECNhrQ3SgQk+5ZjIEOVkvEjNe0kLdvQy
-         5lnx8xIDULhJNVq2q/XmnUdcQ2NkNa26MnbkcPi1iQ03oyTXDlmPZELJWBN+zT1pYk
-         2YZu+JYUWZc3XOFM1ST+sDLb1bwtcZGRc02Yve6q1UW7Z2EZW/5av6DrunsU9tIhyS
-         NiEpgCG0PPQ4w==
-X-Nifty-SrcIP: [126.26.94.251]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Chris Zankel <chris@zankel.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Helge Deller <deller@gmx.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Matt Turner <mattst88@gmail.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Simek <monstr@monstr.eu>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        Richard Henderson <rth@twiddle.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tony Luck <tony.luck@intel.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linux-sh@vger.kernel.org,
-        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
-        sparclinux@vger.kernel.org, x86@kernel.org
-Subject: [PATCH 2/2] arch: syscalls: remove $(srctree)/ prefix from syscall tables
-Date:   Mon, 15 Feb 2021 09:48:23 +0900
-Message-Id: <20210215004823.440102-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210215004823.440102-1-masahiroy@kernel.org>
-References: <20210215004823.440102-1-masahiroy@kernel.org>
+        Mon, 15 Feb 2021 06:37:50 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06AAC061574;
+        Mon, 15 Feb 2021 03:37:09 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id p186so6873767ybg.2;
+        Mon, 15 Feb 2021 03:37:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=B+jVS23cudsZ3/C7Np0YEsBLyRvAeO7S41/Z3TysYA4=;
+        b=JOG10Mwgzcelkb7dKTHw5XvgWJ0BoRmP2jL7R0/nVWE+iKRP6sEubvec/4zOBoQGqN
+         zTNj0+5N3ydhyl9Ig/APiq+27nG20MX7nORYefA7qxGHvOE/TC05urOIWefrko/wM+2d
+         5gwWiS4Z5VB4xzqE/0nJbtTHon15qTu0Xns6QmuGSL7gsDlNY3lrdAuvouPGjzo7Dt3R
+         kT7c6RqKtjqwxTFMBQJi4ZMCiUJuPreih9pmyolvnmdvXLTcdIYIkbyvowbkp0F0nk/S
+         LwLqbOQTjVni5bDRI/kBHLzrt/o8WMvX449FK1QY0hOB/9Zr+P7oQbA0bTtgUJ48cxBp
+         324A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=B+jVS23cudsZ3/C7Np0YEsBLyRvAeO7S41/Z3TysYA4=;
+        b=AndmPQg76Sz5TthQRPd6W9UL4VLPmce6hOma9Ve5apD7cp6m7Ah34NksA3M1G4MZN2
+         tyym1bXZ6DXMUXggKqJ9vZ2qzd6uIxH60DGsB8QLY9f02Gs1+8wqtM56rW1Vc8jPoCZO
+         0PaGfn+vTK+y1nFhNNAjnahYi5XBJ82tPKu/iR76j9FNpZCSjHtH9KI7te4ugba9zVS/
+         vSYTut74pAEvLHZao1bVyZ0UXF62iF1wnSlW+Z50IxtRgoq+ZKEllKflxClB5EP+RPu0
+         lMwqUzoBEnMet7BPN9iWenHAvQKqwEYZaESHN7A7sQ/GUHWWhnFTmw2n1U2ZuLpp6qPD
+         w+yw==
+X-Gm-Message-State: AOAM530fDmccFOviBjS/CrYnRi77Dd6pXHtil+Pq6GFhhwxN4uefZ597
+        5QCPoNRix8y0v5DQUT09Ln3eTh4u8KqvgnPdQGELEQMk
+X-Google-Smtp-Source: ABdhPJz0aZIlcn747RqSVtx7SAdvlxB/DBXw9CVYFNWg0ypH7MzqUjs38lC20M3YmEeK3i3pXoUinAoYWYu4dEd7VT8=
+X-Received: by 2002:a25:e08b:: with SMTP id x133mr12997895ybg.138.1613389029240;
+ Mon, 15 Feb 2021 03:37:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210208195439.GA1097868@ubuntu-m3-large-x86> <CALuz2=d-ENRbWgGYaO_ESEaw5eOVSwkQmkeYBJ-w0Vb3zZ+REg@mail.gmail.com>
+ <20210209192729.GA820978@ubuntu-m3-large-x86> <CALuz2=dyA_ki98t8VNe2L1UcBXrSoJT1r6j1puEmLn7WrX87XQ@mail.gmail.com>
+ <20210210182400.GA3502674@ubuntu-m3-large-x86> <CALuz2=eSv2N2Qp7GimLgdWjvWDwDh1Dj0Q7Czm4Br5a50rs4ew@mail.gmail.com>
+ <CAK7LNAT+CG9zqPpYLoy9_1eA4caZWzxyQACcOrhbg9zfArEwPQ@mail.gmail.com>
+ <CALuz2=ck_=M6Dd8oFgWxnRGdipWOsdL2KODZQSmodh2N7Z8T-w@mail.gmail.com>
+ <CAK7LNAR06H3Ue5SG3=6u1veyjg+kXXb2isEBsHVQEtMMJ3d2Tw@mail.gmail.com>
+ <CALuz2=fHXZ=NrVdRNzyromD88wp9pAzYC9nffPt6y5YM=sJniw@mail.gmail.com> <20210214232820.GA55343@24bbad8f3778>
+In-Reply-To: <20210214232820.GA55343@24bbad8f3778>
+From:   Stephen Zhang <stephenzhangzsd@gmail.com>
+Date:   Mon, 15 Feb 2021 19:36:58 +0800
+Message-ID: <CALuz2=e6F62G8z+tupLnSMT6gFi_St7EQHF-1ZPvQfGb2Ndirg@mail.gmail.com>
+Subject: Re: [PATCH v1] clang_tools:gen_compile_commands: Change the default
+ source directory
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Tom Roeder <tmroeder@google.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The 'syscall' variables are not directly used in the commands.
-Remove the $(srctree)/ prefix because we can rely on VPATH.
+Nathan Chancellor <nathan@kernel.org> =E4=BA=8E2021=E5=B9=B42=E6=9C=8815=E6=
+=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=887:28=E5=86=99=E9=81=93=EF=BC=9A
+>
+> This will actually work for the regular build system as it uses the full
+> path to the files when O=3D is outside of the source tree. My comment
+> applies only to the tools/ build system, which Masahiro has explicitly
+> said he does not want this script to support.
+>
+> Cheers,
+> Nathan
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Thanks for the clarification. I start to get what you mean.
 
- arch/alpha/kernel/syscalls/Makefile      | 2 +-
- arch/arm/tools/Makefile                  | 2 +-
- arch/ia64/kernel/syscalls/Makefile       | 2 +-
- arch/m68k/kernel/syscalls/Makefile       | 2 +-
- arch/microblaze/kernel/syscalls/Makefile | 2 +-
- arch/mips/kernel/syscalls/Makefile       | 6 +++---
- arch/parisc/kernel/syscalls/Makefile     | 2 +-
- arch/powerpc/kernel/syscalls/Makefile    | 2 +-
- arch/sh/kernel/syscalls/Makefile         | 2 +-
- arch/sparc/kernel/syscalls/Makefile      | 2 +-
- arch/x86/entry/syscalls/Makefile         | 4 ++--
- arch/xtensa/kernel/syscalls/Makefile     | 2 +-
- 12 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/arch/alpha/kernel/syscalls/Makefile b/arch/alpha/kernel/syscalls/Makefile
-index 1c42d2d2926d..285aaba832d9 100644
---- a/arch/alpha/kernel/syscalls/Makefile
-+++ b/arch/alpha/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/arm/tools/Makefile b/arch/arm/tools/Makefile
-index 27d8beb7c941..3654f979851b 100644
---- a/arch/arm/tools/Makefile
-+++ b/arch/arm/tools/Makefile
-@@ -11,7 +11,7 @@ uapi := $(gen)/uapi/asm
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- sysnr := $(srctree)/$(src)/syscallnr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- 
- gen-y := $(gen)/calls-oabi.S
- gen-y += $(gen)/calls-eabi.S
-diff --git a/arch/ia64/kernel/syscalls/Makefile b/arch/ia64/kernel/syscalls/Makefile
-index b9bfd186295f..bf4bda0f63eb 100644
---- a/arch/ia64/kernel/syscalls/Makefile
-+++ b/arch/ia64/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/m68k/kernel/syscalls/Makefile b/arch/m68k/kernel/syscalls/Makefile
-index 1c42d2d2926d..285aaba832d9 100644
---- a/arch/m68k/kernel/syscalls/Makefile
-+++ b/arch/m68k/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/microblaze/kernel/syscalls/Makefile b/arch/microblaze/kernel/syscalls/Makefile
-index 1c42d2d2926d..285aaba832d9 100644
---- a/arch/microblaze/kernel/syscalls/Makefile
-+++ b/arch/microblaze/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/mips/kernel/syscalls/Makefile b/arch/mips/kernel/syscalls/Makefile
-index f15842bda464..ed22b711ccb7 100644
---- a/arch/mips/kernel/syscalls/Makefile
-+++ b/arch/mips/kernel/syscalls/Makefile
-@@ -5,9 +5,9 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscalln32 := $(srctree)/$(src)/syscall_n32.tbl
--syscalln64 := $(srctree)/$(src)/syscall_n64.tbl
--syscallo32 := $(srctree)/$(src)/syscall_o32.tbl
-+syscalln32 := $(src)/syscall_n32.tbl
-+syscalln64 := $(src)/syscall_n64.tbl
-+syscallo32 := $(src)/syscall_o32.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- sysnr := $(srctree)/$(src)/syscallnr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
-diff --git a/arch/parisc/kernel/syscalls/Makefile b/arch/parisc/kernel/syscalls/Makefile
-index 556fe30a6c8f..283f64407b07 100644
---- a/arch/parisc/kernel/syscalls/Makefile
-+++ b/arch/parisc/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/powerpc/kernel/syscalls/Makefile b/arch/powerpc/kernel/syscalls/Makefile
-index d609f0040b2a..9e3be295dbba 100644
---- a/arch/powerpc/kernel/syscalls/Makefile
-+++ b/arch/powerpc/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/sh/kernel/syscalls/Makefile b/arch/sh/kernel/syscalls/Makefile
-index 1c42d2d2926d..285aaba832d9 100644
---- a/arch/sh/kernel/syscalls/Makefile
-+++ b/arch/sh/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/sparc/kernel/syscalls/Makefile b/arch/sparc/kernel/syscalls/Makefile
-index 556fe30a6c8f..283f64407b07 100644
---- a/arch/sparc/kernel/syscalls/Makefile
-+++ b/arch/sparc/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
-diff --git a/arch/x86/entry/syscalls/Makefile b/arch/x86/entry/syscalls/Makefile
-index e1c7ddb7546b..cf388e9e8989 100644
---- a/arch/x86/entry/syscalls/Makefile
-+++ b/arch/x86/entry/syscalls/Makefile
-@@ -6,8 +6,8 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(out)' ] || mkdir -p '$(out)') \
- 	  $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')
- 
--syscall32 := $(srctree)/$(src)/syscall_32.tbl
--syscall64 := $(srctree)/$(src)/syscall_64.tbl
-+syscall32 := $(src)/syscall_32.tbl
-+syscall64 := $(src)/syscall_64.tbl
- 
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
-diff --git a/arch/xtensa/kernel/syscalls/Makefile b/arch/xtensa/kernel/syscalls/Makefile
-index 1c42d2d2926d..285aaba832d9 100644
---- a/arch/xtensa/kernel/syscalls/Makefile
-+++ b/arch/xtensa/kernel/syscalls/Makefile
-@@ -5,7 +5,7 @@ uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- _dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
- 	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
- 
--syscall := $(srctree)/$(src)/syscall.tbl
-+syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/$(src)/syscallhdr.sh
- systbl := $(srctree)/$(src)/syscalltbl.sh
- 
--- 
-2.27.0
-
+Cheers,
+Stephen
