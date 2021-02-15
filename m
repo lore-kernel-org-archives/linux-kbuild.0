@@ -7,28 +7,25 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C713AC43381
-	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 18:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01480C4332D
+	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 18:15:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99CBA64E05
+	by mail.kernel.org (Postfix) with ESMTP id CBED364E05
 	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 18:15:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbhBOSPO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 15 Feb 2021 13:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45692 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbhBOSPM (ORCPT
+        id S230172AbhBOSPR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 15 Feb 2021 13:15:17 -0500
+Received: from smtp-1908.mail.infomaniak.ch ([185.125.25.8]:55011 "EHLO
+        smtp-1908.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230108AbhBOSPP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Feb 2021 13:15:12 -0500
-Received: from smtp-42ae.mail.infomaniak.ch (smtp-42ae.mail.infomaniak.ch [IPv6:2001:1600:4:17::42ae])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008F8C061756
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Feb 2021 10:14:26 -0800 (PST)
+        Mon, 15 Feb 2021 13:15:15 -0500
 Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DfXLS6QcrzMprlZ;
-        Mon, 15 Feb 2021 19:14:24 +0100 (CET)
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DfXLX2PsSzMpnlP;
+        Mon, 15 Feb 2021 19:14:28 +0100 (CET)
 Received: from localhost (unknown [23.97.221.149])
-        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4DfXLS42Jfzlh8TC;
-        Mon, 15 Feb 2021 19:14:24 +0100 (CET)
+        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4DfXLX0Fd6zlh8TC;
+        Mon, 15 Feb 2021 19:14:28 +0100 (CET)
 From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To:     James Morris <jmorris@namei.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
@@ -39,9 +36,9 @@ Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org,
         =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@linux.microsoft.com>
-Subject: [PATCH v2 1/3] kconfig: Remove duplicate call to sym_get_string_value()
-Date:   Mon, 15 Feb 2021 19:15:09 +0100
-Message-Id: <20210215181511.2840674-2-mic@digikod.net>
+Subject: [PATCH v2 3/3] security: Add LSMs dependencies to CONFIG_LSM
+Date:   Mon, 15 Feb 2021 19:15:11 +0100
+Message-Id: <20210215181511.2840674-4-mic@digikod.net>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210215181511.2840674-1-mic@digikod.net>
 References: <20210215181511.2840674-1-mic@digikod.net>
@@ -54,29 +51,41 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: Mickaël Salaün <mic@linux.microsoft.com>
 
-Use the saved returned value of sym_get_string_value() instead of
-calling it twice.
+Thanks to the previous commit, this gives the opportunity to users, when
+running make oldconfig, to update the list of enabled LSMs at boot time
+if an LSM has just been enabled or disabled in the build.  Moreover,
+this list only makes sense if at least one LSM is enabled.
 
+Cc: Casey Schaufler <casey@schaufler-ca.com>
+Cc: James Morris <jmorris@namei.org>
 Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Serge E. Hallyn <serge@hallyn.com>
 Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
-Link: https://lore.kernel.org/r/20210215181511.2840674-2-mic@digikod.net
+Link: https://lore.kernel.org/r/20210215181511.2840674-4-mic@digikod.net
 ---
- scripts/kconfig/conf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index db03e2f45de4..18a233d27a8d 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -137,7 +137,7 @@ static int conf_string(struct menu *menu)
- 		printf("%*s%s ", indent - 1, "", menu->prompt->text);
- 		printf("(%s) ", sym->name);
- 		def = sym_get_string_value(sym);
--		if (sym_get_string_value(sym))
-+		if (def)
- 			printf("[%s] ", def);
- 		if (!conf_askvalue(sym, def))
- 			return 0;
+Changes since v1:
+* Add CONFIG_SECURITY as a dependency of CONFIG_LSM.  This prevent an
+  error when building without any LSMs.
+---
+ security/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/security/Kconfig b/security/Kconfig
+index 7561f6f99f1d..addcc1c04701 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -277,6 +277,10 @@ endchoice
+ 
+ config LSM
+ 	string "Ordered list of enabled LSMs"
++	depends on SECURITY || SECURITY_LOCKDOWN_LSM || SECURITY_YAMA || \
++		SECURITY_LOADPIN || SECURITY_SAFESETID || INTEGRITY || \
++		SECURITY_SELINUX || SECURITY_SMACK || SECURITY_TOMOYO || \
++		SECURITY_APPARMOR || BPF_LSM
+ 	default "lockdown,yama,loadpin,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
+ 	default "lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
+ 	default "lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
 -- 
 2.30.0
 
