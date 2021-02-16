@@ -4,44 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B42C433E0
-	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 02:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A07C433DB
+	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 03:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76C1E64D9A
-	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 02:05:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4581B64D9D
+	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 03:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbhBPCFX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 15 Feb 2021 21:05:23 -0500
-Received: from conuserg-09.nifty.com ([210.131.2.76]:35395 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbhBPCFX (ORCPT
+        id S229731AbhBPDLV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 15 Feb 2021 22:11:21 -0500
+Received: from conuserg-07.nifty.com ([210.131.2.74]:32432 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229721AbhBPDLV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Feb 2021 21:05:23 -0500
-Received: from oscar.flets-west.jp (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 11G24M7L027793;
-        Tue, 16 Feb 2021 11:04:23 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 11G24M7L027793
+        Mon, 15 Feb 2021 22:11:21 -0500
+Received: from grover.flets-west.jp (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 11G3A8ch028393;
+        Tue, 16 Feb 2021 12:10:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 11G3A8ch028393
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1613441063;
-        bh=81li7nxJ92BqT9gDIifD0OE17q+dS/4h3UhsmmXnxME=;
+        s=dec2015msa; t=1613445009;
+        bh=dBe0gGOx1OvVHpAym9sqBVoT4U+1i4jHpB2ONSTd2I0=;
         h=From:To:Cc:Subject:Date:From;
-        b=elPlDTSq+wYYg9P+/QmuFFkzUOKw8hSkai1EX0I2w5OdpVukBLlFLpDSiFnE1FHyY
-         WDNFor3U5fVQ6KQTwv/7c4Mk9kLXIliC91yiIHRBBas53k3IOsB8IiNKEItt+QgDHg
-         6V40m9t/LVPQJrZTSJUi8k4lO+uQ4em6hqUuIWkuhkgOdMMlD2AHDO4/BrLfZzyzSg
-         GG+EB5nvtLxsvssUbBwg9VMiHhFFE9DK9GC6q70NZi62uctGblBPBT4MgnCNLiM/4e
-         Ulj1vQN4a5q6TazTqfvgkUvdSL03mYNP6PvUEjvderOm7oFEtVsmNC2v2ew8IpSrgI
-         iup1s2ZN/txgw==
+        b=TArhaOeYa41d8mTB+CbWOOoRdz3iscskjLSWqARmnF7ChwdW+oThXMyw0pcqi3dv5
+         ZEEsOOzXSA/MNCxkDvo5TFvqaKbBQfm9afI/umtOuJHhRty19iRjahP4niA2VNW5aC
+         HJc6w7H1nJpq/ZBwELAe/0qkLEnqz3GoNS+ksfKeuvLvsyRn63i4957MnPiW3rSk9Z
+         +1WzJUwN5EGcxVW4/ValtLAHp5XlJwddXPFBHUaBdaqxUCXX9e2n18RI1v8bfK6D6N
+         xA3Cs7YnonPLHc9kVgdYxu3sHdZqPoyCcMp4cT2VV+h4V79YMmODhMxyfco3c00+os
+         qzVbtpbdc3bow==
 X-Nifty-SrcIP: [126.26.94.251]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/2] scripts: add generic syscalltbl.sh
-Date:   Tue, 16 Feb 2021 11:04:11 +0900
-Message-Id: <20210216020412.800836-1-masahiroy@kernel.org>
+Cc:     David Laight <david.laight@aculab.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] kbuild: remove ld-version macro
+Date:   Tue, 16 Feb 2021 12:10:03 +0900
+Message-Id: <20210216031004.552417-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -49,130 +51,34 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Most of architectures generate syscall headers at the compile time
-in a similar way.
-
-The syscall table has the same format for all architectures. Each line
-has up to 5 fields; syscall number, ABI, syscall name, native entry
-point, and compat entry point. The syscall table is processed by
-syscalltbl.sh script into header files.
-
-Despite the same pattern, scripts are maintained per architecture,
-which results in code duplication and bad maintainability.
-
-As of v5.11-rc1, 12 architectures duplicate similar shell scripts:
-
-  $ find arch -name syscalltbl.sh | sort
-  arch/alpha/kernel/syscalls/syscalltbl.sh
-  arch/arm/tools/syscalltbl.sh
-  arch/ia64/kernel/syscalls/syscalltbl.sh
-  arch/m68k/kernel/syscalls/syscalltbl.sh
-  arch/microblaze/kernel/syscalls/syscalltbl.sh
-  arch/mips/kernel/syscalls/syscalltbl.sh
-  arch/parisc/kernel/syscalls/syscalltbl.sh
-  arch/powerpc/kernel/syscalls/syscalltbl.sh
-  arch/sh/kernel/syscalls/syscalltbl.sh
-  arch/sparc/kernel/syscalls/syscalltbl.sh
-  arch/x86/entry/syscalls/syscalltbl.sh
-  arch/xtensa/kernel/syscalls/syscalltbl.sh
-
-My goal is to unify them into scripts/syscalltbl.sh.
-
-__SYSCALL_WITH_COMPAT should be defined as follows:
-
-32-bit kernel:
-  #define __SYSCALL_WITH_COMPAT(nr, native, compat) __SYSCALL(nr, native)
-
-64-bit kernel:
-
-  #define __SYSCALL_WITH_COMPAT(nr, native, compat) __SYSCALL(nr, compat)
+There is no direct user of ld-version; you can use CONFIG_LD_VERSION
+if needed.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/syscalltbl.sh | 73 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
- create mode 100755 scripts/syscalltbl.sh
+ scripts/Kbuild.include | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
-new file mode 100755
-index 000000000000..aa6ab156301c
---- /dev/null
-+++ b/scripts/syscalltbl.sh
-@@ -0,0 +1,73 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Generate a syscall table header.
-+#
-+# Each line of the syscall table should have the following format:
-+#
-+# NR ABI NAME [NATIVE] [COMPAT]
-+#
-+# NR       syscall number
-+# ABI      ABI name
-+# NAME     syscall name
-+# NATIVE   native entry point (optional)
-+# COMPAT   compat entry point (optional)
-+
-+set -e
-+
-+usage() {
-+	echo >&2 "usage: $0 [--abis ABIS] INFILE OUTFILE" >&2
-+	echo >&2
-+	echo >&2 "  INFILE    input syscall table"
-+	echo >&2 "  OUTFILE   output header file"
-+	echo >&2
-+	echo >&2 "options:"
-+	echo >&2 "  --abis ABIS        ABI(s) to handle (By default, all lines are handled)"
-+	exit 1
-+}
-+
-+# default unless specified by options
-+abis=
-+
-+while [ $# -gt 0 ]
-+do
-+	case $1 in
-+	--abis)
-+		abis=$(echo "($2)" | tr ',' '|')
-+		shift 2;;
-+	-*)
-+		echo "$1: unknown option" >&2
-+		usage;;
-+	*)
-+		break;;
-+	esac
-+done
-+
-+if [ $# -ne 2 ]; then
-+	usage
-+fi
-+
-+infile="$1"
-+outfile="$2"
-+
-+nxt=0
-+
-+grep -E "^[0-9]+[[:space:]]+$abis" "$infile" | sort -n | {
-+
-+	while read nr abi name native compat ; do
-+
-+		while [ $nxt -lt $nr ]; do
-+			echo "__SYSCALL($nxt, sys_ni_syscall)"
-+			nxt=$((nxt + 1))
-+		done
-+
-+		if [ -n "$compat" ]; then
-+			echo "__SYSCALL_WITH_COMPAT($nr, $native, $compat)"
-+		elif [ -n "$native" ]; then
-+			echo "__SYSCALL($nr, $native)"
-+		else
-+			echo "__SYSCALL($nr, sys_ni_syscall)"
-+		fi
-+		nxt=$((nr + 1))
-+	done
-+} > "$outfile"
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 08e011175b4c..509e0856d653 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -141,13 +141,9 @@ cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || e
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
+ ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
+ 
+-# ld-version
+-# Note this is mainly for HJ Lu's 3 number binutil versions
+-ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
+-
+ # ld-ifversion
+ # Usage:  $(call ld-ifversion, -ge, 22252, y)
+-ld-ifversion = $(shell [ $(ld-version) $(1) $(2) ] && echo $(3) || echo $(4))
++ld-ifversion = $(shell [ $(CONFIG_LD_VERSION)0 $(1) $(2)0 ] && echo $(3) || echo $(4))
+ 
+ ######
+ 
 -- 
 2.27.0
 
