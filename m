@@ -2,149 +2,187 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C49B5C433E6
-	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 19:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695EEC433DB
+	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 02:05:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BB5860C3D
-	for <linux-kbuild@archiver.kernel.org>; Mon, 15 Feb 2021 19:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 338BA64D99
+	for <linux-kbuild@archiver.kernel.org>; Tue, 16 Feb 2021 02:05:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230290AbhBOTFQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 15 Feb 2021 14:05:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28522 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230288AbhBOTFO (ORCPT
+        id S229694AbhBPCFX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 15 Feb 2021 21:05:23 -0500
+Received: from conuserg-09.nifty.com ([210.131.2.76]:35396 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229652AbhBPCFX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 Feb 2021 14:05:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613415827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yjLa1ePdzOKfH1hFOxUctagsf0SqnjEtoXHUeu2nq70=;
-        b=clpjMCh76cOmE6HjCckSq6/j6Hdq+0JY0LA/AKKVqyxlg5i8j2avKcktwRhHTpKNzC0+ml
-        vnwdiMjdofUMIkW3Sdl8kit2udNnlsgBisGiByHlN5nxFeNMyGos92g6HlcoezznUnKObV
-        dsRe69jvtmueHYx+lYR3iPuT3TrOnk8=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-XoyolH1YMoaq6MeR8G_gIw-1; Mon, 15 Feb 2021 14:03:43 -0500
-X-MC-Unique: XoyolH1YMoaq6MeR8G_gIw-1
-Received: by mail-yb1-f199.google.com with SMTP id u1so10764990ybu.14
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Feb 2021 11:03:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=yjLa1ePdzOKfH1hFOxUctagsf0SqnjEtoXHUeu2nq70=;
-        b=VqdjhVKaZQPpLYfqIezQiGkaHUqUUsHmKYE0JsHR7dK6UWUk+Ie/+8FRGyct5EvXRi
-         oUj2Z/e/tdCvH7LxszXkZ2ADg0xQmTe5CzBHU7GsgiXCJ+zEUy/jFVzOcJ5EzPA6Uhrb
-         BNuaYhtoj3XWylUYnWp0JMoMZO11fYAhNisvv/W9rCklzZy7UAGJ0iTANPPjYSSgug1E
-         9SLjLmDdwliCgr++D8XPAVVe1aLZD003gZYtkAMq4Av/zyHLl8MCV3bRzrLrI2bEEiyL
-         G0Uvh3x2vQYonEQtr6m694tztczde/OQvfAzpNu78KQWnmtoLbf+6NTPD7YArq/6p7Ri
-         xJOg==
-X-Gm-Message-State: AOAM532LwbFln4LHRAsJoYcLCgzN78IdAr6SSwcxeWOIyJqtqD17MEs7
-        nwWx65mYnAX6ApmdKBDbiARmJRgH+P61xTH+ZBIMTNAjXYW7LsWPsq2hrOl7ot8xbFn7Su8RQEn
-        6Spx1VBazMC9hvYwwFdiD33QLzpRotNndOKUnlEyU
-X-Received: by 2002:a5b:404:: with SMTP id m4mr24943606ybp.436.1613415822971;
-        Mon, 15 Feb 2021 11:03:42 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxedalHqY8rbPQisLkuArGmVarQZGazs9bCgbyFwBWzr5n/txrW6AMcFAF2u8fzpNzUhxkz8qFAkSuEWt2jT7I=
-X-Received: by 2002:a5b:404:: with SMTP id m4mr24943585ybp.436.1613415822772;
- Mon, 15 Feb 2021 11:03:42 -0800 (PST)
+        Mon, 15 Feb 2021 21:05:23 -0500
+Received: from oscar.flets-west.jp (softbank126026094251.bbtec.net [126.26.94.251]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 11G24M7M027793;
+        Tue, 16 Feb 2021 11:04:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 11G24M7M027793
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1613441063;
+        bh=wC7YsNg4x5zm3Wuog28CMrBEe6OHge+3aaSRx9rQOfE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=IYeE8GIOG3gEcpLaENZGap+G0AyzWfWTrxShgBeuxyT8jBSgdgXSINJre1Ym5Bdg1
+         eB0Fq+HqkOoT7qFz2o3Jhf5/AG0NYtRzDFZTe9jXhv66JwzKGH/vfWQ60LiXCObP+b
+         3dgQGuL1A9YM8O1+sT7ayJxwujGyJ8ngPtjrzKBW53VNVzl3KyTA2qoZipO0hXvEpb
+         zKewLKrDQhDKieSeyonEMRTAR1bvtWArZjVMx+LC1s7QlU3VDD9h/8AvHspPlRihZR
+         5qiLw7tglZkvJ/TIdhwxf+ITCvxDgp6oEjmNdycPEaca1NZ7R9JaoVIvqwNKeoyhhG
+         HVME8GxLE4H3g==
+X-Nifty-SrcIP: [126.26.94.251]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 2/2] scripts: add generic syscallhdr.sh
+Date:   Tue, 16 Feb 2021 11:04:12 +0900
+Message-Id: <20210216020412.800836-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210216020412.800836-1-masahiroy@kernel.org>
+References: <20210216020412.800836-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <20210215181511.2840674-1-mic@digikod.net> <20210215181511.2840674-4-mic@digikod.net>
-In-Reply-To: <20210215181511.2840674-4-mic@digikod.net>
-From:   Ondrej Mosnacek <omosnace@redhat.com>
-Date:   Mon, 15 Feb 2021 20:03:29 +0100
-Message-ID: <CAFqZXNsvqx-pbC+wzHB4aXX6h=buU3csM_a=By-zCOmx0n-xCQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] security: Add LSMs dependencies to CONFIG_LSM
-To:     =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc:     James Morris <jmorris@namei.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Nicolas Iooss <nicolas.iooss@m4x.org>,
-        linux-kbuild@vger.kernel.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Linux Security Module list 
-        <linux-security-module@vger.kernel.org>,
-        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Feb 15, 2021 at 7:17 PM Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> =
-wrote:
-> From: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
->
-> Thanks to the previous commit, this gives the opportunity to users, when
-> running make oldconfig, to update the list of enabled LSMs at boot time
-> if an LSM has just been enabled or disabled in the build.  Moreover,
-> this list only makes sense if at least one LSM is enabled.
->
-> Cc: Casey Schaufler <casey@schaufler-ca.com>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Serge E. Hallyn <serge@hallyn.com>
-> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
-> Link: https://lore.kernel.org/r/20210215181511.2840674-4-mic@digikod.net
-> ---
->
-> Changes since v1:
-> * Add CONFIG_SECURITY as a dependency of CONFIG_LSM.  This prevent an
->   error when building without any LSMs.
-> ---
->  security/Kconfig | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/security/Kconfig b/security/Kconfig
-> index 7561f6f99f1d..addcc1c04701 100644
-> --- a/security/Kconfig
-> +++ b/security/Kconfig
-> @@ -277,6 +277,10 @@ endchoice
->
->  config LSM
->         string "Ordered list of enabled LSMs"
-> +       depends on SECURITY || SECURITY_LOCKDOWN_LSM || SECURITY_YAMA || =
-\
-> +               SECURITY_LOADPIN || SECURITY_SAFESETID || INTEGRITY || \
-> +               SECURITY_SELINUX || SECURITY_SMACK || SECURITY_TOMOYO || =
-\
-> +               SECURITY_APPARMOR || BPF_LSM
+Most of architectures generate syscall headers at the compile time
+in a similar way.
 
-This looks really awkward, since all of these already depend on
-SECURITY (if not, it's a bug)... I guarantee you that after some time
-someone will come, see that the weird boolean expression is equivalent
-to just SECURITY, and simplify it.
+As of v5.11-rc1, 12 architectures duplicate similar shell scripts:
 
-I assume the new mechanism wouldn't work as intended if there is just
-SECURITY? If not, then maybe you should rather specify this value
-dependency via some new  field rather than abusing "depends on" (say,
-"value depends on"?). The fact that a seemingly innocent change to the
-config definition breaks your mechanism suggests that the design is
-flawed.
+  $ find arch -name syscallhdr.sh | sort
+  arch/alpha/kernel/syscalls/syscallhdr.sh
+  arch/arm/tools/syscallhdr.sh
+  arch/ia64/kernel/syscalls/syscallhdr.sh
+  arch/m68k/kernel/syscalls/syscallhdr.sh
+  arch/microblaze/kernel/syscalls/syscallhdr.sh
+  arch/mips/kernel/syscalls/syscallhdr.sh
+  arch/parisc/kernel/syscalls/syscallhdr.sh
+  arch/powerpc/kernel/syscalls/syscallhdr.sh
+  arch/sh/kernel/syscalls/syscallhdr.sh
+  arch/sparc/kernel/syscalls/syscallhdr.sh
+  arch/x86/entry/syscalls/syscallhdr.sh
+  arch/xtensa/kernel/syscalls/syscallhdr.sh
 
-I do think this would be a useful feature, but IMHO shouldn't be
-implemented like this.
+My goal is to unify them into scripts/syscallhdr.sh.
 
->         default "lockdown,yama,loadpin,safesetid,integrity,smack,selinux,=
-tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
->         default "lockdown,yama,loadpin,safesetid,integrity,apparmor,selin=
-ux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
->         default "lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf" if=
- DEFAULT_SECURITY_TOMOYO
-> --
-> 2.30.0
->
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
---
-Ondrej Mosnacek
-Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
+ scripts/syscallhdr.sh | 98 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
+ create mode 100755 scripts/syscallhdr.sh
+
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+new file mode 100755
+index 000000000000..848ac2735115
+--- /dev/null
++++ b/scripts/syscallhdr.sh
+@@ -0,0 +1,98 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Generate a syscall number header.
++#
++# Each line of the syscall table should have the following format:
++#
++# NR ABI NAME [NATIVE] [COMPAT]
++#
++# NR       syscall number
++# ABI      ABI name
++# NAME     syscall name
++# NATIVE   native entry point (optional)
++# COMPAT   compat entry point (optional)
++
++set -e
++
++usage() {
++	echo >&2 "usage: $0 [--abis ABIS] [--emit-nr] [--offset OFFSET] [--prefix PREFIX] INFILE OUTFILE" >&2
++	echo >&2
++	echo >&2 "  INFILE    input syscall table"
++	echo >&2 "  OUTFILE   output header file"
++	echo >&2
++	echo >&2 "options:"
++	echo >&2 "  --abis ABIS        ABI(s) to handle (By default, all lines are handled)"
++	echo >&2 "  --emit-nr          Emit the macro of the number of syscalls (__NR_syscalls)"
++	echo >&2 "  --offset OFFSET    The offset of syscall numbers"
++	echo >&2 "  --prefix PREFIX    The prefix to the macro like __NR_<PREFIX><NAME>"
++	exit 1
++}
++
++# default unless specified by options
++abis=
++emit_nr=
++offset=
++prefix=
++
++while [ $# -gt 0 ]
++do
++	case $1 in
++	--abis)
++		abis=$(echo "($2)" | tr ',' '|')
++		shift 2;;
++	--emit-nr)
++		emit_nr=1
++		shift 1;;
++	--offset)
++		offset=$2
++		shift 2;;
++	--prefix)
++		prefix=$2
++		shift 2;;
++	-*)
++		echo "$1: unknown option" >&2
++		usage;;
++	*)
++		break;;
++	esac
++done
++
++if [ $# -ne 2 ]; then
++	usage
++fi
++
++infile="$1"
++outfile="$2"
++
++guard=_UAPI_ASM_$(basename "$outfile" |
++	sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/' \
++	-e 's/[^A-Z0-9_]/_/g' -e 's/__/_/g')
++
++grep -E "^[0-9A-Fa-fXx]+[[:space:]]+$abis" "$infile" | sort -n | {
++	echo "#ifndef $guard"
++	echo "#define $guard"
++	echo
++
++	max=0
++	while read nr abi name native compat ; do
++
++		max=$nr
++
++		if [ -n "$offset" ]; then
++			nr="($offset + $nr)"
++		fi
++
++		echo "#define __NR_$prefix$name $nr"
++	done
++
++	if [ -n "$emit_nr" ]; then
++		echo
++		echo "#ifdef __KERNEL__"
++		echo "#define __NR_${prefix}syscalls $(($max + 1))"
++		echo "#endif"
++	fi
++
++	echo
++	echo "#endif /* $guard */"
++} > "$outfile"
+-- 
+2.27.0
 
