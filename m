@@ -2,142 +2,171 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97969C433E6
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 09:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6F4C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 11:10:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58BAF64F03
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 09:27:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16CAA64F02
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 11:10:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbhBUJ1b (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 21 Feb 2021 04:27:31 -0500
-Received: from conuserg-08.nifty.com ([210.131.2.75]:20001 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbhBUJ13 (ORCPT
+        id S229914AbhBULJ5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 21 Feb 2021 06:09:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229925AbhBULJy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 Feb 2021 04:27:29 -0500
-Received: from grover.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 11L9QV7T030995;
-        Sun, 21 Feb 2021 18:26:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 11L9QV7T030995
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1613899592;
-        bh=b5KnGSZuEM3ZdO/lVmc+ZDEiz8vwxufFyAyyKS7/gFY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=OWYp43q0B+ETpvwsDn6g3/FwUapJlocvJ5c9fIMghwzNNcwnAljTVg2IGVgjtws3L
-         a4TmEAevpav+/mJ2Chq39Wvw4nqmZtTOWMeQUzGZ149gpWXbzPZ/vuXpBZk0dmqhnE
-         fTD6qG0xeym0px5yJqq4SbZUvLvgvdwHxkt0H36sDaw2PvpEwQbBNxThovVoUvKqwx
-         eGvFjrIV9XLyPUg9CATH5rR6T/Vo+xqgQ64wC5ILv7WltOTUa+bBhLyvavi235DqIk
-         ZdExIZK8ap3ZCWcrZlsY9bHSXjyFw6pdH7h/W22OIb+n4S2BUuESb89v+Gb8UfJJyP
-         CsWUNOqwIlxnw==
-X-Nifty-SrcIP: [126.26.90.165]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] kconfig: clean up nested if-conditionals in check_conf()
-Date:   Sun, 21 Feb 2021 18:26:22 +0900
-Message-Id: <20210221092623.133572-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        Sun, 21 Feb 2021 06:09:54 -0500
+Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F0AC061574
+        for <linux-kbuild@vger.kernel.org>; Sun, 21 Feb 2021 03:09:08 -0800 (PST)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Dk2cv5VJPzMqJfj;
+        Sun, 21 Feb 2021 12:09:03 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Dk2cs5QSGzlh8TL;
+        Sun, 21 Feb 2021 12:09:01 +0100 (CET)
+Subject: Re: [PATCH v2 2/3] kconfig: Ask user if string needs to be changed
+ when dependency changed
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Casey Schaufler <casey@schaufler-ca.com>
+Cc:     James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Nicolas Iooss <nicolas.iooss@m4x.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>
+References: <20210215181511.2840674-1-mic@digikod.net>
+ <20210215181511.2840674-3-mic@digikod.net>
+ <CAK7LNAS54Zw7d8Lp5BNs1JVktSLTFx0dNbLMA7W0U_sH2712_A@mail.gmail.com>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <b3ea85ca-5c49-61ab-4769-f2e4557df3c7@digikod.net>
+Date:   Sun, 21 Feb 2021 12:10:14 +0100
+User-Agent: 
 MIME-Version: 1.0
+In-Reply-To: <CAK7LNAS54Zw7d8Lp5BNs1JVktSLTFx0dNbLMA7W0U_sH2712_A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Unify the outer two if-conditionals into one. This decreases the
-indent level by one.
 
-Also, change the if-else blocks:
+On 21/02/2021 09:47, Masahiro Yamada wrote:
+> On Tue, Feb 16, 2021 at 3:14 AM Mickaël Salaün <mic@digikod.net> wrote:
+>>
+>> From: Mickaël Salaün <mic@linux.microsoft.com>
+>>
+>> Content of string configuration may depend on related kernel
+>> configurations.  Modify oldconfig and syncconfig to inform users about
+>> possible required configuration update and give them the opportunity to
+>> update it:
+>> * if dependencies of this string has changed (e.g. enabled or disabled),
+>> * and if the current value of this string is different than the (new)
+>>   default one.
+>>
+>> This is particularly relevant for CONFIG_LSM which contains a list of
+>> LSMs enabled at boot, but users will not have a chance to update this
+>> list with a make oldconfig.
+> 
+> If CONFIG_LSM already exists in the .config,
+> oldconfig does not show a prompt.
+> This is the expected behavior.
 
-    if (input_mode == listnewconfig) {
-            ...
-    } else if (input_mode == helpnewconfig) {
-            ...
-    } else {
-            ...
-    }
+It is not the behavior wished for LSM stacking.
 
-into the switch statement.
+> 
+> You are trying to fix your problem in a wrong way.
+> NACK.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+What do you suggest to ensure that users will be asked to update the
+CONFIG_LSM string if they add or remove an LSM?
 
- scripts/kconfig/conf.c | 55 ++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 26 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 18a233d27a8d..369615d6c97e 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -419,34 +419,37 @@ static void check_conf(struct menu *menu)
- 		return;
- 
- 	sym = menu->sym;
--	if (sym && !sym_has_value(sym)) {
--		if (sym_is_changeable(sym) ||
--		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
--			if (input_mode == listnewconfig) {
--				if (sym->name) {
--					const char *str;
--
--					if (sym->type == S_STRING) {
--						str = sym_get_string_value(sym);
--						str = sym_escape_string_value(str);
--						printf("%s%s=%s\n", CONFIG_, sym->name, str);
--						free((void *)str);
--					} else {
--						str = sym_get_string_value(sym);
--						printf("%s%s=%s\n", CONFIG_, sym->name, str);
--					}
--				}
--			} else if (input_mode == helpnewconfig) {
--				printf("-----\n");
--				print_help(menu);
--				printf("-----\n");
-+	if (sym && !sym_has_value(sym) &&
-+	    (sym_is_changeable(sym) ||
-+	     (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes))) {
- 
--			} else {
--				if (!conf_cnt++)
--					printf("*\n* Restart config...\n*\n");
--				rootEntry = menu_get_parent_menu(menu);
--				conf(rootEntry);
-+		switch (input_mode) {
-+		case listnewconfig:
-+			if (sym->name) {
-+				const char *str;
-+
-+				if (sym->type == S_STRING) {
-+					str = sym_get_string_value(sym);
-+					str = sym_escape_string_value(str);
-+					printf("%s%s=%s\n", CONFIG_, sym->name, str);
-+					free((void *)str);
-+				} else {
-+					str = sym_get_string_value(sym);
-+					printf("%s%s=%s\n", CONFIG_, sym->name, str);
-+				}
- 			}
-+			break;
-+		case helpnewconfig:
-+			printf("-----\n");
-+			print_help(menu);
-+			printf("-----\n");
-+			break;
-+		default:
-+			if (!conf_cnt++)
-+				printf("*\n* Restart config...\n*\n");
-+			rootEntry = menu_get_parent_menu(menu);
-+			conf(rootEntry);
-+			break;
- 		}
- 	}
- 
--- 
-2.27.0
 
+> 
+> 
+> 
+>>
+>> Cc: Casey Schaufler <casey@schaufler-ca.com>
+>> Cc: James Morris <jmorris@namei.org>
+>> Cc: Masahiro Yamada <masahiroy@kernel.org>
+>> Cc: Serge E. Hallyn <serge@hallyn.com>
+>> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+>> Link: https://lore.kernel.org/r/20210215181511.2840674-3-mic@digikod.net
+>> ---
+>>  scripts/kconfig/conf.c | 37 ++++++++++++++++++++++++++++++++++---
+>>  1 file changed, 34 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+>> index 18a233d27a8d..8633dacd39a9 100644
+>> --- a/scripts/kconfig/conf.c
+>> +++ b/scripts/kconfig/conf.c
+>> @@ -82,6 +82,26 @@ static void xfgets(char *str, int size, FILE *in)
+>>                 printf("%s", str);
+>>  }
+>>
+>> +static bool may_need_string_update(struct symbol *sym, const char *def)
+>> +{
+>> +       const struct symbol *dep_sym;
+>> +       const struct expr *e;
+>> +
+>> +       if (sym->type != S_STRING)
+>> +               return false;
+>> +       if (strcmp(def, sym_get_string_default(sym)) == 0)
+>> +               return false;
+>> +       /*
+>> +        * The user may want to synchronize the content of a string related to
+>> +        * changed dependencies (e.g. CONFIG_LSM).
+>> +        */
+>> +       expr_list_for_each_sym(sym->dir_dep.expr, e, dep_sym) {
+>> +               if (dep_sym->flags & SYMBOL_CHANGED)
+>> +                       return true;
+>> +       }
+>> +       return false;
+>> +}
+>> +
+>>  static int conf_askvalue(struct symbol *sym, const char *def)
+>>  {
+>>         enum symbol_type type = sym_get_type(sym);
+>> @@ -102,7 +122,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+>>         switch (input_mode) {
+>>         case oldconfig:
+>>         case syncconfig:
+>> -               if (sym_has_value(sym)) {
+>> +               if (sym_has_value(sym) && !may_need_string_update(sym, def)) {
+>>                         printf("%s\n", def);
+>>                         return 0;
+>>                 }
+>> @@ -137,8 +157,19 @@ static int conf_string(struct menu *menu)
+>>                 printf("%*s%s ", indent - 1, "", menu->prompt->text);
+>>                 printf("(%s) ", sym->name);
+>>                 def = sym_get_string_value(sym);
+>> -               if (def)
+>> -                       printf("[%s] ", def);
+>> +               if (def) {
+>> +                       if (may_need_string_update(sym, def)) {
+>> +                               indent += 2;
+>> +                               printf("\n%*sDefault value is [%s]\n",
+>> +                                               indent - 1, "",
+>> +                                               sym_get_string_default(sym));
+>> +                               printf("%*sCurrent value is [%s] ",
+>> +                                               indent - 1, "", def);
+>> +                               indent -= 2;
+>> +                       } else {
+>> +                               printf("[%s] ", def);
+>> +                       }
+>> +               }
+>>                 if (!conf_askvalue(sym, def))
+>>                         return 0;
+>>                 switch (line[0]) {
+>> --
+>> 2.30.0
+>>
+> 
+> 
