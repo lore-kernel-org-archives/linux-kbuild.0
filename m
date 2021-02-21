@@ -2,109 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA18C433E6
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 08:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBB1C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 09:27:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C649164F03
-	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 08:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2628364F02
+	for <linux-kbuild@archiver.kernel.org>; Sun, 21 Feb 2021 09:27:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbhBUIyZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 21 Feb 2021 03:54:25 -0500
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:51096 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbhBUIyV (ORCPT
+        id S229685AbhBUJ1a (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 21 Feb 2021 04:27:30 -0500
+Received: from conuserg-08.nifty.com ([210.131.2.75]:20003 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229502AbhBUJ13 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 21 Feb 2021 03:54:21 -0500
-X-Greylist: delayed 335 seconds by postgrey-1.27 at vger.kernel.org; Sun, 21 Feb 2021 03:54:20 EST
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 11L8r0CO004841;
-        Sun, 21 Feb 2021 17:53:01 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 11L8r0CO004841
+        Sun, 21 Feb 2021 04:27:29 -0500
+Received: from grover.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 11L9QV7U030995;
+        Sun, 21 Feb 2021 18:26:32 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 11L9QV7U030995
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1613897581;
-        bh=u37K3+qAwR0sUTzWOWIwPsO25Vh/vdCNmym9gGt+TM0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=1MzDHxMDnrEeNiUTmrhliQTe/oiWbM2HjMxw/DI2Ti3IvBcL0nuRrQNTYE4d0rgop
-         GSrGJvilNhN8AWbCGTAY+5XFNRdSWzLAKVl60IxKDsFxxeoEPgsyFw+uScDy82NUxY
-         WiRvcFLva5T9VsaXpPVKVpMjsqpm+WjLTy1HGQSRrZGetoHCyRcjbNWfwgidFR2nEe
-         J/L3nD1jl7taB11DAHShYbLZ/RiTXP5NDpsKVwLADEsyF9Pf6ObPkZvzNQoFsH57SJ
-         zP4ShjjIL5rzp8qmL5zA0c0XvrCTBIqnCMGp9t3SQgRuNAEFpt9I5KUNPSYpu5wQlK
-         n+x6S2XcME8Uw==
-X-Nifty-SrcIP: [209.85.215.175]
-Received: by mail-pg1-f175.google.com with SMTP id n10so8181090pgl.10;
-        Sun, 21 Feb 2021 00:53:01 -0800 (PST)
-X-Gm-Message-State: AOAM530ID7HFA/k7EgdGKeqayy1Ak52D/+Bcon2xwjuG6TuGaFJIxBE8
-        IPs3n9DX34eqZCSPA7DfFtwigOm5EpDYcjt8+L0=
-X-Google-Smtp-Source: ABdhPJwCYDuoHAzYbJO1A2ugunCCef/tJuG6TpI0QILuNu4F4QtCv7Swfe+SSXIg/Yyz3udjxxuF6swSgyd6RWcHhZ0=
-X-Received: by 2002:a63:34c9:: with SMTP id b192mr15845885pga.175.1613897580356;
- Sun, 21 Feb 2021 00:53:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20210215181511.2840674-1-mic@digikod.net> <20210215181511.2840674-2-mic@digikod.net>
-In-Reply-To: <20210215181511.2840674-2-mic@digikod.net>
+        s=dec2015msa; t=1613899593;
+        bh=wwl79vCjZt3c2rZ7CQFuwxGyMAUSjMQQF8icpHrjmEM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JE5wQz5mCKcCpbcg9Vq99Kb1JtT5HlyyCB8tDy7eZok+lNAjP1u3DyE7xocfwfgvK
+         1bNQUFD/0W88G2Em/T3mblbexXHBBV/82xc2V7N/+d2kYz7zmIPqPESh8Zwsl/W4iz
+         EwjhJtF1co2wUKwzGsGdvykqCMf5SSDg3zbTU6p5HpKOK7s7lNW0M4Pbj2OELm++bl
+         VZvPmYJgv3GwzR6/0xBsTM4On7Oo2jvDfTmtD4U36BUu9wPs9lFzMvc6xUZh08DAWI
+         Z6aXbvlXheGnkzrR4kj0wVnI4jdgXAfsorXMTFcgI5VFOUi3KJXlMF8Ij0d8n0yoBD
+         I7VQHcdnz+wvw==
+X-Nifty-SrcIP: [126.26.90.165]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 21 Feb 2021 17:52:23 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR+vDUg-_9LiasvpuJi2BqkNOz+ufNFErHL-nQrFTixeg@mail.gmail.com>
-Message-ID: <CAK7LNAR+vDUg-_9LiasvpuJi2BqkNOz+ufNFErHL-nQrFTixeg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] kconfig: Remove duplicate call to sym_get_string_value()
-To:     =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc:     James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Nicolas Iooss <nicolas.iooss@m4x.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] kconfig: remove dead code in conf_askvalue()
+Date:   Sun, 21 Feb 2021 18:26:23 +0900
+Message-Id: <20210221092623.133572-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210221092623.133572-1-masahiroy@kernel.org>
+References: <20210221092623.133572-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Feb 16, 2021 at 3:15 AM Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> =
-wrote:
->
-> From: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
->
-> Use the saved returned value of sym_get_string_value() instead of
-> calling it twice.
->
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
-> Link: https://lore.kernel.org/r/20210215181511.2840674-2-mic@digikod.net
-> ---
+conf_askvalue() is only called for oldconfig, syncconfig, and
+oldaskconfig. If it is called for other cases, it is a bug.
 
+So, the code after the switch statement is unreachable.
 
-Applied to linux-kbuild. Thanks.
+Remove the dead code, and clean up the switch statement.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ scripts/kconfig/conf.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
->  scripts/kconfig/conf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index db03e2f45de4..18a233d27a8d 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -137,7 +137,7 @@ static int conf_string(struct menu *menu)
->                 printf("%*s%s ", indent - 1, "", menu->prompt->text);
->                 printf("(%s) ", sym->name);
->                 def =3D sym_get_string_value(sym);
-> -               if (sym_get_string_value(sym))
-> +               if (def)
->                         printf("[%s] ", def);
->                 if (!conf_askvalue(sym, def))
->                         return 0;
-> --
-> 2.30.0
->
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 369615d6c97e..3a98c9e0a7c8 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -84,8 +84,6 @@ static void xfgets(char *str, int size, FILE *in)
+ 
+ static int conf_askvalue(struct symbol *sym, const char *def)
+ {
+-	enum symbol_type type = sym_get_type(sym);
+-
+ 	if (!sym_has_value(sym))
+ 		printf("(NEW) ");
+ 
+@@ -107,24 +105,12 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+ 			return 0;
+ 		}
+ 		/* fall through */
+-	case oldaskconfig:
++	default:
+ 		fflush(stdout);
+ 		xfgets(line, sizeof(line), stdin);
+-		return 1;
+-	default:
+ 		break;
+ 	}
+ 
+-	switch (type) {
+-	case S_INT:
+-	case S_HEX:
+-	case S_STRING:
+-		printf("%s\n", def);
+-		return 1;
+-	default:
+-		;
+-	}
+-	printf("%s", line);
+ 	return 1;
+ }
+ 
+-- 
+2.27.0
 
-
---=20
-Best Regards
-Masahiro Yamada
