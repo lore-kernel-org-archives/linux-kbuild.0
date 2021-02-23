@@ -2,156 +2,87 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E75C433DB
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 07:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F0C1C433DB
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 18:15:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5B4164E32
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 07:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C5D964E2E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 18:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhBWHnW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 23 Feb 2021 02:43:22 -0500
-Received: from mail-oi1-f172.google.com ([209.85.167.172]:34446 "EHLO
-        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230178AbhBWHnT (ORCPT
+        id S233837AbhBWSPK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 23 Feb 2021 13:15:10 -0500
+Received: from mail-oo1-f54.google.com ([209.85.161.54]:44545 "EHLO
+        mail-oo1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233167AbhBWSPI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Feb 2021 02:43:19 -0500
-Received: by mail-oi1-f172.google.com with SMTP id w69so7056462oif.1;
-        Mon, 22 Feb 2021 23:43:03 -0800 (PST)
+        Tue, 23 Feb 2021 13:15:08 -0500
+Received: by mail-oo1-f54.google.com with SMTP id n19so4082897ooj.11;
+        Tue, 23 Feb 2021 10:14:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WJFI5RyzuifHOR96lwKCSFonlTIiLRUIGVDJn5EnP2g=;
-        b=YVI/zdRD9Dev8PAgAEBAvI1E2M7HcUH43Y9XF64bQ8EBtz61I9NjypxEIgvOJ8g68A
-         A2FE4Ac8RDY2l3o0eEcXBLf0vlHJEbA4fFj6th7Usn4TKJumCYU1EhDnCJ8qWikkpvaG
-         tHLhR+J6hgxUcLuCZKUGruAJDO3bUpiak5/Rav2Jb5tQMbHxyiZVvJjoNbXxb/cGwpJS
-         ez7EoXtteefdHt+jTsKdBT3KzhxAc+ErGDSRlwXrNfuepWO/Tm2oHV3gvcBVatNG6vze
-         FQTm9+kqDbym1SlXxSWdeOSTgNF9m9alnsaM3Jdj3c72SGY+R+40dPp/LVHpNBW9rKH8
-         Qkew==
-X-Gm-Message-State: AOAM533keDhlCOUV+2SgRewEZHZHxkg4g+pS/ca+JyqHWKsFfXNsW5ZR
-        3IUyj3aC5whTlWZaLoTG/TvqIR8Y1geZg2EyQXKZXPxZLUI=
-X-Google-Smtp-Source: ABdhPJxwLA+IJ2oFZ0i1C36eBSf9oCeHNZMyyblRWQXyCdK6Xd17NBm7c6MpnurOGmZ/pbWEvX+1HBvWalN3LSvmV8U=
-X-Received: by 2002:aca:d908:: with SMTP id q8mr17857257oig.148.1614066157844;
- Mon, 22 Feb 2021 23:42:37 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mLlNY+cGCFP0M8CPAs8lZy0a+QhOrOEW6xBzmwBXj2c=;
+        b=A7NuUy+6RTMMVn89AWG0ceUuDGQKEZrQB4xdqkNVxeYejz6LOJ0POy8ykmjGzZCAEG
+         pzLPYTd+qLvmcszf+6TrSBpwVBKRhWWxn+ALF/+woHmPh3fCzWlo9X917n/LuF7nJ2V1
+         jwRNQmt0FFWVLyUiqLf4R1nKIzdrKbUtXo69uAbuGjkpp4r92BiUQR6f0rYfNXyIaf2X
+         kS9vtGtFoDcILc4VQXE8wuH4kZygSy5bbg+3oB8dG+JifLWy/aA/552vZN+H3DnWePlv
+         Otc9lkLz3Prks7U/eGDQO4kuJlA3good8WKHiEHI+ODX8mOqFwKEwcjV9sMH8aer+5Os
+         N6Hg==
+X-Gm-Message-State: AOAM533l9MG8HqIMdOhx4rKQAz1xb4MWsomEGdRKf6yVBfaZoc+5JvbY
+        Zt5eV43rXsJ4V97s9XSmCA==
+X-Google-Smtp-Source: ABdhPJwNQdjaDtp+Bksf3dL3jifdQ4+Hiw9XxpZo+//9Wqh12LGBIz7MS20NwYHPVrCvRqMqwARDcA==
+X-Received: by 2002:a4a:a301:: with SMTP id q1mr10536866ool.26.1614104067027;
+        Tue, 23 Feb 2021 10:14:27 -0800 (PST)
+Received: from xps15.herring.priv (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.googlemail.com with ESMTPSA id b2sm3578113oov.3.2021.02.23.10.14.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Feb 2021 10:14:26 -0800 (PST)
+From:   Rob Herring <robh@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kbuild@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] Build time gitignore checking
+Date:   Tue, 23 Feb 2021 12:14:22 -0600
+Message-Id: <20210223181425.4010665-1-robh@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20210222125916.4168804-1-geert@linux-m68k.org> <CAK7LNARxO6O7aRwzJ+i9hEGvWBTCukpwGBC6B79c7UdO=f0Ymw@mail.gmail.com>
-In-Reply-To: <CAK7LNARxO6O7aRwzJ+i9hEGvWBTCukpwGBC6B79c7UdO=f0Ymw@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 23 Feb 2021 08:42:26 +0100
-Message-ID: <CAMuHMdX-t4Z27RnWn0Sp1AoO3A=+aT8GXkcGC5gSArtm+W9w1Q@mail.gmail.com>
-Subject: Re: [PATCH] f2fs: compress: Allow modular (de)compression algorithms
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Yamada-san,
+Linus wasn't happy that I forgot a gitignore entry in my recent PR.
+Checking that requires doing in tree build (which is not my usual
+workflow) and checking git status afterwards. Given either one I'll
+easily forget again, I came up with a build time check which works for
+in tree and out of tree builds. It should also show up in any CI builds.
 
-On Tue, Feb 23, 2021 at 7:31 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> On Mon, Feb 22, 2021 at 9:59 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > If F2FS_FS is modular, enabling the compressions options
-> > F2FS_FS_{LZ4,LZ4HZ,LZO,LZORLE,ZSTD} will make the (de)compression
-> > algorithms {LZ4,LZ4HC,LZO,ZSTD}_{,DE}COMPRESS builtin instead of
-> > modular, as the former depend on an intermediate boolean
-> > F2FS_FS_COMPRESSION, which in-turn depends on tristate F2FS_FS.
-> >
-> > Indeed, if a boolean symbol A depends directly on a tristate symbol B
-> > and selects another tristate symbol C:
-> >
-> >     tristate B
-> >
-> >     tristate C
-> >
-> >     bool A
-> >       depends on B
-> >       select C
-> >
-> > and B is modular, then C will also be modular.
-> >
-> > However, if there is an intermediate boolean D in the dependency chain
-> > between A and B:
-> >
-> >     tristate B
-> >
-> >     tristate C
-> >
-> >     bool D
-> >       depends on B
-> >
-> >     bool A
-> >       depends on D
-> >       select C
-> >
-> > then the modular state won't propagate from B to C, and C will be
-> > builtin instead of modular.
-> >
-> > Fix this by making the various compression options depend directly on
-> > F2FS_FS using a big if/endif block.  Drop the now superfluous
-> > dependencies on F2FS_FS from individual symbols.
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> > ---
-> > Perhaps the propagation logic in Kconfig should be fixed instead?
-> > Else people may reintroduce this issue when removing seemingly-unneeded
-> > dependencies.
->
-> I checked the code in menu_finalize(), and this seems to work like this.
->
-> I discussed the oddity of the select behavior before
-> (https://lore.kernel.org/linux-kbuild/e1a6228d-1341-6264-d97a-e2bd52a65c82@infradead.org/),
-> but I was not confident about what the right direction was.
->
->
-> Anyway, the behavior is obscure from the current code.
->
-> If you want to make this more robust,
-> you can write as follows:
->
-> config F2FS_FS
->         tristate "F2FS filesystem support"
->         depends on BLOCK
->         select NLS
->         select CRYPTO
->         select CRYPTO_CRC32
->         select F2FS_FS_XATTR if FS_ENCRYPTION
->         select FS_ENCRYPTION_ALGS if FS_ENCRYPTION
->         select LZO_COMPRESS if F2FS_FS_LZO
->         select LZO_DECOMPRESS if F2FS_FS_LZO
->         select LZ4_COMPRESS if F2FS_FS_LZ4
->         select LZ4_DECOMPRESS if F2FS_FS_LZ4
->         select LZ4HC_COMPRESS if F2FS_FS_LZ4HC
->         select ZSTD_COMPRESS if F2FS_FS_ZSTD
->         select ZSTD_DECOMPRESS if F2FS_FS_ZSTD
->
-> The code is a bit clumsy, but it is clear
-> that the module (F2FS_FS) is selecting the
-> compress/decompress libraries.
+The first 2 patches are fixes which the 3rd patch found. They can be
+picked up regardless of whether folks like the 3rd patch or not.
 
-Actually the above is what I tried first ;-)  Works fine.
+Rob
 
-Then I started to look for similar cases in other file systems (e.g.
-EROFS_FS_ZIP), and discovered the issue doesn't happen there, which
-sparked my investigation.  So I settled on the direct dependency,
-because it keeps all compression-related logic together.
 
-Gr{oetje,eeting}s,
+Rob Herring (3):
+  kbuild: Make old-atomics and missing-syscalls phony targets
+  x86: Drop generated syscall headers from 'targets'
+  kbuild: Add a build check for missing gitignore entries
 
-                        Geert
+ Kbuild                           | 2 ++
+ arch/x86/entry/syscalls/Makefile | 2 --
+ scripts/Makefile.lib             | 4 ++++
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.27.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
