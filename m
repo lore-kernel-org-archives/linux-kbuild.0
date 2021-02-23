@@ -2,97 +2,144 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A01C433E6
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 18:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16F5C433DB
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 20:12:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 356F164E4D
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 18:15:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BEB764E7A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Feb 2021 20:12:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233852AbhBWSPO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 23 Feb 2021 13:15:14 -0500
-Received: from mail-oi1-f172.google.com ([209.85.167.172]:43803 "EHLO
-        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233843AbhBWSPL (ORCPT
+        id S234204AbhBWUL7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 23 Feb 2021 15:11:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233143AbhBWUKy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Feb 2021 13:15:11 -0500
-Received: by mail-oi1-f172.google.com with SMTP id d20so18542609oiw.10;
-        Tue, 23 Feb 2021 10:14:55 -0800 (PST)
+        Tue, 23 Feb 2021 15:10:54 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D609C061574
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Feb 2021 12:10:14 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id g1so58673904ljj.13
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Feb 2021 12:10:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ma6j2gSEFy1ka8BjM/M5fkCejmRsupkHNwcWTVj2T4E=;
+        b=Nl7cOyBtfTdrP6UGznoXkBYxB0wTpXjOri61ZAWrS4HLaRDeByo1hbQEW4IYZf+rVT
+         09F+0aDCEOjwW2FF4xWoaCiP9v1mQKxJUvYe7DbfCB0djrRi1ydx+CF65yu77CXAtk2D
+         XyKNW9uUVCX2aagpdBrOf9oMzha5TF3h4v+m8+5ogMYoqs9lqsfUJRrzyKWskIGNvRlA
+         ClGX1TAaOx7f90AmhPwAHpSPiPHF2fUBPuVo84HTrjrgNk7iY59OaZQhSxOJoGd2WSNz
+         +8LfkFPBV3vZGPlFyGQgNaJKpCXn6YEc5lsLfAYm3QRCCGODap4q22oSVg5hrmkrPZP+
+         MxHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Qt8JapFR4fQx7DIa/yS5vjOVQrDG88jy3WbeHeUDOX8=;
-        b=XBZaQC9Rr1sbx1UeA5jxBNMLQa/mcg1rF89G5QcIAXr30nfRs3AL1elgIE0eaeMwEs
-         xuqcTwLc5yBtlx2pFT9fV+XF+BEVlzK6wlEWMUgCUC3adRaYMCvM1ujjPcInVzmem+ug
-         J+mhkhBs/EdFfxYDSE2i+KbUpG6NIivxzpF3vwBfInyqg9QQ3H4pmOExch80LS/Aer74
-         /OOKqicoN46l4n9xEMpeGFM1TJO1xpa3F/vg6/+BSg+yc7xb5X5p/aCo+7tueFB51FF2
-         Hdr/kpcF1NW9I6n9HMpTIt0cJfXXWWIYuYfqLsI/3+uUxQznAgq25riFjrppg0VqASLK
-         c/Tg==
-X-Gm-Message-State: AOAM532+kS6RogMCKN6jfEcC9RrCHCBP9K4/dvjSs/Z0SwrFVUBy4omZ
-        6O5KCww8cYLYxbmgP3/UZA==
-X-Google-Smtp-Source: ABdhPJyIh57oR1GBWIC49B1ke/YV4wUnFAwqNsVX+/pcTDN2Gqss6L27Fkupxc66/vxn7AylZPI8YQ==
-X-Received: by 2002:aca:b655:: with SMTP id g82mr2307oif.91.1614104070167;
-        Tue, 23 Feb 2021 10:14:30 -0800 (PST)
-Received: from xps15.herring.priv (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.googlemail.com with ESMTPSA id b2sm3578113oov.3.2021.02.23.10.14.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 10:14:29 -0800 (PST)
-From:   Rob Herring <robh@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] x86: Drop generated syscall headers from 'targets'
-Date:   Tue, 23 Feb 2021 12:14:24 -0600
-Message-Id: <20210223181425.4010665-3-robh@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210223181425.4010665-1-robh@kernel.org>
-References: <20210223181425.4010665-1-robh@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ma6j2gSEFy1ka8BjM/M5fkCejmRsupkHNwcWTVj2T4E=;
+        b=D9pna4hnW252ysZ9bHzJ7OanCXQxyzzElsmF+9oTBOVNV8Ycg/Qz+lRVPemuG3WYmW
+         0y9pYvo5T3nRay7vJ/rjfJqYf2ExHVoIkHOp7iUIpMB7hIU4bw4PNaYgi+2hJRglFph5
+         Zgo4eeWdqOxv+1aDNtBwPJC7vv0l2HDFrzfeBbAf/jzBq0r8aV/2Es7KlfuwJvwPkheC
+         QUgGW9KtTX/OIMhjjpKjDRdjsit7q3RcqkiK0+esxKkOJa67PE5qrsKU2UoIZRKy9n2c
+         kdebuBMrr9RDmxTGCBM5pXobdsybYOsQrOtBxzdIFFFgQZBlqtc6PjqWwTXgejVFWL/m
+         tRNQ==
+X-Gm-Message-State: AOAM533T//2RufIx3UYYtkOcXrlgVBG73wBXr9D1pJb/d/26rTI1Xi63
+        LROi+Coq+p/DBoY45V3Ud0vmYUrTixyyc9u9SKOW6g==
+X-Google-Smtp-Source: ABdhPJz215ok2rJ4F+g+LxWLZNzv6ReaEYiGqshChgPpuuXofclZjDhLw4PFAF5f99gycg35saPqIcin14rAaD59ges=
+X-Received: by 2002:a2e:2a83:: with SMTP id q125mr17502638ljq.244.1614111012374;
+ Tue, 23 Feb 2021 12:10:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210205220125.2931504-1-ndesaulniers@google.com> <CAK7LNARKHvjTcnic=ZKntH3NY5meehQbJuBr34y9_tn8b-Ym0w@mail.gmail.com>
+In-Reply-To: <CAK7LNARKHvjTcnic=ZKntH3NY5meehQbJuBr34y9_tn8b-Ym0w@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 23 Feb 2021 12:10:01 -0800
+Message-ID: <CAKwvOd=qh0=tU9fr60DxcJepUfg6+BkqScwifW4s8A2A=ofKpw@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: reuse CC_VERSION_TEXT
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Including the generated syscall headers in 'targets' is wrong because they
-are not built in $(obj)/ and the Makefile does its own path prefix and
-build rules.
+On Fri, Feb 5, 2021 at 5:49 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> On Sat, Feb 6, 2021 at 7:01 AM 'Nick Desaulniers' via Clang Built
+> Linux <clang-built-linux@googlegroups.com> wrote:
+> >
+> > I noticed we're invoking $(CC) via $(shell) more than once to check the
+> > version.  Let's reuse the first string captured in $CC_VERSION_TEXT.
+> >
+> > Fixes: 315bab4e972d ("kbuild: fix endless syncconfig in case arch Makefile sets CROSS_COMPILE")
+>
+>
+> I did not touch this hunk because I have a plan
+> for different refactoring, but I have never got
+> around to do it.
+>
+> Anyway, you beat me, and I will pick this up.
+> But, the Fixes tag is questionable because
+> this is code refactoring.
 
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- arch/x86/entry/syscalls/Makefile | 2 --
- 1 file changed, 2 deletions(-)
+Hi Masahiro,
+A friendly reminder to please pick this up; I don't see it yet in
+linux-next. I'm ok with you dropping the fixes tag when applied.
 
-diff --git a/arch/x86/entry/syscalls/Makefile b/arch/x86/entry/syscalls/Makefile
-index 6fb9b57ed5ba..b0dcb7e41554 100644
---- a/arch/x86/entry/syscalls/Makefile
-+++ b/arch/x86/entry/syscalls/Makefile
-@@ -62,8 +62,6 @@ syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
- syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
- syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
- 
--targets	+= $(uapisyshdr-y) $(syshdr-y)
--
- PHONY += all
- all: $(addprefix $(uapi)/,$(uapisyshdr-y))
- all: $(addprefix $(out)/,$(syshdr-y))
+(Otherwise, I was about to use `grep -m1` instead of `| head -n1 | grep` here.)
+
+>
+>
+>
+>
+> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> > ---
+> >  Makefile | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index a85535eb6a7d..70034d7c1051 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -557,7 +557,13 @@ ifdef building_out_of_srctree
+> >         { echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+> >  endif
+> >
+> > -ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
+> > +# The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+> > +# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+> > +# CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+> > +# and from include/config/auto.conf.cmd to detect the compiler upgrade.
+> > +CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
+> > +
+> > +ifneq ($(findstring clang,$(CC_VERSION_TEXT)),)
+> >  ifneq ($(CROSS_COMPILE),)
+> >  CLANG_FLAGS    += --target=$(notdir $(CROSS_COMPILE:%-=%))
+> >  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+> > @@ -576,12 +582,6 @@ KBUILD_AFLAGS      += $(CLANG_FLAGS)
+> >  export CLANG_FLAGS
+> >  endif
+> >
+> > -# The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+> > -# Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+> > -# CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+> > -# and from include/config/auto.conf.cmd to detect the compiler upgrade.
+> > -CC_VERSION_TEXT = $(shell $(CC) --version 2>/dev/null | head -n 1)
+> > -
+> >  ifdef config-build
+> >  # ===========================================================================
+> >  # *config targets only - make sure prerequisites are updated, and descend
+> > --
+
+
 -- 
-2.27.0
-
+Thanks,
+~Nick Desaulniers
