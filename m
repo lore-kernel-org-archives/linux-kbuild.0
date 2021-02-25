@@ -2,156 +2,255 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED29C433E6
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Feb 2021 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81346C433E9
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Feb 2021 16:45:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F70164F1C
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Feb 2021 16:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59DDC64E83
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Feb 2021 16:45:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233084AbhBYQFb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 25 Feb 2021 11:05:31 -0500
-Received: from conuserg-12.nifty.com ([210.131.2.79]:53233 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233207AbhBYQFB (ORCPT
+        id S233662AbhBYQp0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 25 Feb 2021 11:45:26 -0500
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:30292 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233375AbhBYQoA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Feb 2021 11:05:01 -0500
-Received: from oscar.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 11PG2sqH028425;
-        Fri, 26 Feb 2021 01:02:55 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 11PG2sqH028425
+        Thu, 25 Feb 2021 11:44:00 -0500
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 11PGggQx014178;
+        Fri, 26 Feb 2021 01:42:42 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 11PGggQx014178
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1614268975;
-        bh=kD6YYQcfazkFFrleiT3XOphcGqp8KWUK68CUpacxPEc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FH+djl+aoq0KwOxV5O+3XLczQhmeYEdHT+Rapnrd04mkFZGwsg1Qd9Co+eCE7sRD1
-         NEK5pEpGaq679ElSocJZSnj+Dy4HfnmFC1VFyYVok2BZDwfXhmXZJHlY7BQEeWpcfA
-         tIdRxYq/DI9OHfG1EwnVf33iHbGHMK3tJqCYSJW7XKuDP41caqlTuIAttYSg+pZ3nd
-         CZC2ycG83FHq8Fue19zcn6ZPWRhm4LOxgSRXq/5Bgq4WfKxzSSQusZx1mR8hpinKa5
-         46zsngJALHGMOS5xQtffu6ev/dAOVwEdDuwPIZR9cvgFL0+F3m8OeZ4AhlduthkY/J
-         e9a+KmHYLJ81A==
-X-Nifty-SrcIP: [126.26.90.165]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jessica Yu <jeyu@kernel.org>, Nicolas Pitre <nico@fluxnic.net>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 1/4] kbuild: fix UNUSED_KSYMS_WHITELIST for Clang LTO
-Date:   Fri, 26 Feb 2021 01:02:43 +0900
-Message-Id: <20210225160247.2959903-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210225160247.2959903-1-masahiroy@kernel.org>
-References: <20210225160247.2959903-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1614271362;
+        bh=eWXLvR7TbaJ0BLSmfq2SKCvgsZY5O5gZT9vYboDxnnU=;
+        h=From:Date:Subject:To:Cc:From;
+        b=gM84cK5qQXHZXT94luTV4VKATxMfOhfJc8PsFMspM7uvTCqVtojWMdvMD03FuXbmf
+         ChDEdgeicvn08nHOmUCILRkNbmdQ/i7tUXLwkyMLPjQ6jZMIVi3irSJmzQ+z0bqjK/
+         qVQPVd0TikyrB1ryZIepUZmJX8/YbuUUuON/2OpHAN26fQLpuXQcHVll2GYQ+6f7C1
+         kLBiH69SD49Guc5G3fI0iZikFNpeBTD5AiAxMU0OWWR+bpQCd8sjNaipSGB8Cu+V3e
+         JvGyI1v2dKignQnZYgZSgOPyMdLcnVpKXm9UMJ7cr3TsFu67jKXxY/a22TBlH4e7r8
+         y67Vx/IxSYMIg==
+X-Nifty-SrcIP: [209.85.214.179]
+Received: by mail-pl1-f179.google.com with SMTP id f8so3492149plg.5;
+        Thu, 25 Feb 2021 08:42:42 -0800 (PST)
+X-Gm-Message-State: AOAM530BFXUysaJIq1WHUBBPS6mTC+IvydD4wBkdFF8Os7P3iIfiyXmI
+        gNcMxccrRkD/e8S6rG5lggC8hkKjDfQCvJtZoog=
+X-Google-Smtp-Source: ABdhPJxB/eS0W+OFVXj5GbQDd5vSEzKmsQpHrN/bBD/vZ8lUxsOYhUoScm2fm5NHa3WGm9/7Nx94jS+vrkEATGpCRfA=
+X-Received: by 2002:a17:90a:5510:: with SMTP id b16mr4124022pji.87.1614271361342;
+ Thu, 25 Feb 2021 08:42:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 26 Feb 2021 01:42:04 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQtF+_=U5ba+-rFW1ZFpKoWD4UM7bHBuPd+vYA21waOaA@mail.gmail.com>
+Message-ID: <CAK7LNAQtF+_=U5ba+-rFW1ZFpKoWD4UM7bHBuPd+vYA21waOaA@mail.gmail.com>
+Subject: [GIT PULL] Kbuild updates for v5.12-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit fbe078d397b4 ("kbuild: lto: add a default list of used symbols")
-does not work as expected if the .config file has already specified
-CONFIG_UNUSED_KSYMS_WHITELIST="my/own/white/list" before enabling
-CONFIG_LTO_CLANG.
+Hi Linus,
 
-So, the user-supplied whitelist and LTO-specific white list must be
-independent of each other.
+Please pull Kbuild updates for v5.12-rc1.
 
-I refactored the shell script so CONFIG_MODVERSIONS and CONFIG_CLANG_LTO
-handle whitelists in the same way.
+When you pull this, you will see conflicts
+arch/mips/kernel/syscalls/Makefile and
+scripts/Makefile.lib
 
-Fixes: fbe078d397b4 ("kbuild: lto: add a default list of used symbols")
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+The resolution is available in linux-next.
 
- init/Kconfig                    |  1 -
- scripts/gen_autoksyms.sh        | 33 ++++++++++++++++++++++++---------
- scripts/lto-used-symbollist.txt |  5 -----
- 3 files changed, 24 insertions(+), 15 deletions(-)
- delete mode 100644 scripts/lto-used-symbollist.txt
+Thanks.
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 0bf5b340b80e..351161326e3c 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -2277,7 +2277,6 @@ config TRIM_UNUSED_KSYMS
- config UNUSED_KSYMS_WHITELIST
- 	string "Whitelist of symbols to keep in ksymtab"
- 	depends on TRIM_UNUSED_KSYMS
--	default "scripts/lto-used-symbollist.txt" if LTO_CLANG
- 	help
- 	  By default, all unused exported symbols will be un-exported from the
- 	  build when TRIM_UNUSED_KSYMS is selected.
-diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
-index d54dfba15bf2..b74d5949fea6 100755
---- a/scripts/gen_autoksyms.sh
-+++ b/scripts/gen_autoksyms.sh
-@@ -19,7 +19,24 @@ esac
- # We need access to CONFIG_ symbols
- . include/config/auto.conf
- 
--ksym_wl=/dev/null
-+needed_symbols=
-+
-+# Special case for modversions (see modpost.c)
-+if [ -n "$CONFIG_MODVERSIONS" ]; then
-+	needed_symbols="$needed_symbols module_layout"
-+fi
-+
-+# With CONFIG_LTO_CLANG, LLVM bitcode has not yet been compiled into a binary
-+# when the .mod files are generated, which means they don't yet contain
-+# references to certain symbols that will be present in the final binaries.
-+if [ -n "$CONFIG_LTO_CLANG" ]; then
-+	# intrinsic functions
-+	needed_symbols="$needed_symbols memcpy memmove memset"
-+	# stack protector symbols
-+	needed_symbols="$needed_symbols __stack_chk_fail __stack_chk_guard"
-+fi
-+
-+ksym_wl=
- if [ -n "$CONFIG_UNUSED_KSYMS_WHITELIST" ]; then
- 	# Use 'eval' to expand the whitelist path and check if it is relative
- 	eval ksym_wl="$CONFIG_UNUSED_KSYMS_WHITELIST"
-@@ -40,16 +57,14 @@ cat > "$output_file" << EOT
- EOT
- 
- [ -f modules.order ] && modlist=modules.order || modlist=/dev/null
--sed 's/ko$/mod/' $modlist |
--xargs -n1 sed -n -e '2{s/ /\n/g;/^$/!p;}' -- |
--cat - "$ksym_wl" |
-+
-+{
-+	sed 's/ko$/mod/' $modlist | xargs -n1 sed -n -e '2p'
-+	echo "$needed_symbols"
-+	[ -n "$ksym_wl" ] && cat "$ksym_wl"
-+} | sed -e 's/ /\n/g' | sed -n -e '/^$/!p' |
- # Remove the dot prefix for ppc64; symbol names with a dot (.) hold entry
- # point addresses.
- sed -e 's/^\.//' |
- sort -u |
- sed -e 's/\(.*\)/#define __KSYM_\1 1/' >> "$output_file"
--
--# Special case for modversions (see modpost.c)
--if [ -n "$CONFIG_MODVERSIONS" ]; then
--	echo "#define __KSYM_module_layout 1" >> "$output_file"
--fi
-diff --git a/scripts/lto-used-symbollist.txt b/scripts/lto-used-symbollist.txt
-deleted file mode 100644
-index 38e7bb9ebaae..000000000000
---- a/scripts/lto-used-symbollist.txt
-+++ /dev/null
-@@ -1,5 +0,0 @@
--memcpy
--memmove
--memset
--__stack_chk_fail
--__stack_chk_guard
--- 
-2.27.0
 
+
+The following changes since commit 92bf22614b21a2706f4993b278017e437f7785b3=
+:
+
+  Linux 5.11-rc7 (2021-02-07 13:57:38 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v5.12
+
+for you to fetch changes up to 481083ec0bfc14c15f00fbe87c7b06dc01091950:
+
+  initramfs: Remove redundant dependency of RD_ZSTD on BLK_DEV_INITRD
+(2021-02-24 15:12:06 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v5.12
+
+ - Fix false-positive build warnings for ARCH=3Dia64 builds
+
+ - Optimize dictionary size for module compression with xz
+
+ - Check the compiler and linker versions in Kconfig
+
+ - Fix misuse of extra-y
+
+ - Support DWARF v5 debug info
+
+ - Clamp SUBLEVEL to 255 because stable releases 4.4.x and 4.9.x
+   exceeded the limit
+
+ - Add generic syscall{tbl,hdr}.sh for cleanups across arches
+
+ - Minor cleanups of genksyms
+
+ - Minor cleanups of Kconfig
+
+----------------------------------------------------------------
+Elliot Berman (1):
+      Kbuild: Make composite object searching more generic
+
+Geert Uytterhoeven (1):
+      initramfs: Remove redundant dependency of RD_ZSTD on BLK_DEV_INITRD
+
+Masahiro Yamada (27):
+      ia64: do not typedef struct pal_min_state_area_s
+      ia64: remove unneeded header includes from <asm/mca.h>
+      ia64: remove generated/nr-irqs.h generation to fix build warning
+      kbuild: Remove $(cc-option,-gdwarf-4) dependency from DEBUG_INFO_DWAR=
+F4
+      kbuild: LD_VERSION redenomination
+      kbuild: check the minimum compiler version in Kconfig
+      genksyms: make source_file a local variable in lexer
+      genksyms: remove dead code for ST_TABLE_*
+      genksyms: remove useless case DOTS
+      kbuild: doc: remove "Objects which export symbols" section
+      kbuild: stop removing stale <linux/version.h> file
+      kbuild: use always-y instead of extra-y
+      gen_compile_commands: prune some directories
+      arch: syscalls: add missing FORCE and fix 'targets' to make
+if_changed work
+      arch: syscalls: remove $(srctree)/ prefix from syscall tables
+      scripts: add generic syscalltbl.sh
+      scripts: add generic syscallhdr.sh
+      kbuild: remove ld-version macro
+      kbuild: check the minimum linker version in Kconfig
+      kconfig: clean up nested if-conditionals in check_conf()
+      kconfig: remove dead code in conf_askvalue()
+      kconfig: fix 'invalid option' for help option
+      kconfig: omit --oldaskconfig option for 'make config'
+      kconfig: unify rule of config, menuconfig, nconfig, gconfig, xconfig
+      kbuild: reuse this-makefile to define abs_srctree
+      kbuild: parse C=3D and M=3D before changing the working directory
+      kbuild: remove deprecated 'always' and 'hostprogs-y/m'
+
+Micka=C3=ABl Sala=C3=BCn (1):
+      kconfig: Remove duplicate call to sym_get_string_value()
+
+Nathan Chancellor (1):
+      Makefile: Remove # characters from compiler string
+
+Nick Desaulniers (4):
+      vmlinux.lds.h: add DWARF v5 sections
+      Kbuild: make DWARF version a choice
+      Kconfig: allow explicit opt in to DWARF v5
+      Makefile: reuse CC_VERSION_TEXT
+
+Sasha Levin (2):
+      kbuild: clamp SUBLEVEL to 255
+      kbuild: simplify access to the kernel's version
+
+Tor Vic (1):
+      Makefile: use smaller dictionary size for xz module compression
+
+ Documentation/devicetree/bindings/Makefile     |   8 ++--
+ Documentation/kbuild/makefiles.rst             |   8 +---
+ MAINTAINERS                                    |   2 -
+ Makefile                                       | 105
++++++++++++++++++++++++++++-----------------------
+ arch/alpha/kernel/syscalls/Makefile            |  13 ++++---
+ arch/arm/tools/Makefile                        |   2 +-
+ arch/arm64/Kconfig                             |   2 +-
+ arch/ia64/Makefile                             |   6 ---
+ arch/ia64/include/asm/irq.h                    |   4 +-
+ arch/ia64/include/asm/mca.h                    |  11 ++----
+ arch/ia64/include/asm/pal.h                    |   4 +-
+ arch/ia64/include/asm/sal.h                    |   2 +-
+ arch/ia64/kernel/Makefile                      |   5 ---
+ arch/ia64/kernel/asm-offsets.c                 |  18 ++++-----
+ arch/ia64/kernel/crash.c                       |   1 +
+ arch/ia64/kernel/efi.c                         |   1 +
+ arch/ia64/kernel/mca.c                         |   5 ++-
+ arch/ia64/kernel/mca_drv.c                     |   2 +-
+ arch/ia64/kernel/nr-irqs.c                     |  22 -----------
+ arch/ia64/kernel/syscalls/Makefile             |  13 ++++---
+ arch/m68k/kernel/syscalls/Makefile             |  13 ++++---
+ arch/microblaze/kernel/syscalls/Makefile       |  13 ++++---
+ arch/mips/kernel/syscalls/Makefile             |  33 ++++++++--------
+ arch/mips/loongson64/Platform                  |   2 +-
+ arch/mips/vdso/Kconfig                         |   2 +-
+ arch/parisc/kernel/syscalls/Makefile           |  19 ++++-----
+ arch/powerpc/Makefile                          |   2 +-
+ arch/powerpc/kernel/syscalls/Makefile          |  21 +++++-----
+ arch/powerpc/lib/Makefile                      |   2 +-
+ arch/sh/kernel/syscalls/Makefile               |  13 ++++---
+ arch/sparc/kernel/syscalls/Makefile            |  19 ++++-----
+ arch/x86/entry/syscalls/Makefile               |  29 +++++++-------
+ arch/xtensa/kernel/syscalls/Makefile           |  13 ++++---
+ drivers/gpu/drm/i915/Makefile                  |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c |   4 +-
+ drivers/usb/core/hcd.c                         |   4 +-
+ drivers/usb/gadget/udc/aspeed-vhub/hub.c       |   4 +-
+ include/asm-generic/vmlinux.lds.h              |   7 +++-
+ include/linux/compiler-clang.h                 |  10 -----
+ include/linux/compiler-gcc.h                   |  11 ------
+ include/linux/usb/composite.h                  |   4 +-
+ init/Kconfig                                   |  30 +++++++++------
+ kernel/sys.c                                   |   2 +-
+ lib/Kconfig.debug                              |  49 ++++++++++++++++++++-=
+--
+ scripts/Kbuild.include                         |   6 +--
+ scripts/Kconfig.include                        |  13 ++++++-
+ scripts/Makefile.build                         |   1 -
+ scripts/Makefile.clean                         |   3 --
+ scripts/Makefile.lib                           |  34 +++++++---------
+ scripts/cc-version.sh                          |  82
++++++++++++++++++++++++++++++++++++++++
+ scripts/clang-tools/gen_compile_commands.py    |  12 +++++-
+ scripts/clang-version.sh                       |  19 ---------
+ scripts/gcc-version.sh                         |  20 ----------
+ scripts/gdb/linux/Makefile                     |   4 +-
+ scripts/genksyms/genksyms.c                    |   2 +-
+ scripts/genksyms/genksyms.h                    |   2 +-
+ scripts/genksyms/lex.l                         |  56
++--------------------------
+ scripts/kconfig/Makefile                       |  36 +++++++----------
+ scripts/kconfig/conf.c                         |  78
+++++++++++++++++---------------------
+ scripts/ld-version.sh                          |  82
+++++++++++++++++++++++++++++++++++-----
+ scripts/lld-version.sh                         |  20 ----------
+ scripts/syscallhdr.sh                          |  98
+++++++++++++++++++++++++++++++++++++++++++++++
+ scripts/syscalltbl.sh                          |  73
++++++++++++++++++++++++++++++++++++
+ scripts/test_dwarf5_support.sh                 |   8 ++++
+ usr/Kconfig                                    |   1 -
+ 65 files changed, 696 insertions(+), 496 deletions(-)
+ delete mode 100644 arch/ia64/kernel/nr-irqs.c
+ create mode 100755 scripts/cc-version.sh
+ delete mode 100755 scripts/clang-version.sh
+ delete mode 100755 scripts/gcc-version.sh
+ delete mode 100755 scripts/lld-version.sh
+ create mode 100755 scripts/syscallhdr.sh
+ create mode 100755 scripts/syscalltbl.sh
+ create mode 100755 scripts/test_dwarf5_support.sh
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
