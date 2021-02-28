@@ -2,276 +2,162 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DC6C433E9
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 06:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6CDC433DB
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 07:08:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AF8B64E76
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 06:12:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 601B764E4B
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 07:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbhB1GLr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 28 Feb 2021 01:11:47 -0500
-Received: from conuserg-07.nifty.com ([210.131.2.74]:55338 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbhB1GLq (ORCPT
+        id S230079AbhB1HI3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 28 Feb 2021 02:08:29 -0500
+Received: from condef-09.nifty.com ([202.248.20.74]:35781 "EHLO
+        condef-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230075AbhB1HI3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 28 Feb 2021 01:11:46 -0500
-Received: from oscar.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 11S6Aagt009638;
-        Sun, 28 Feb 2021 15:10:37 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 11S6Aagt009638
+        Sun, 28 Feb 2021 02:08:29 -0500
+Received: from conssluserg-01.nifty.com ([10.126.8.80])by condef-09.nifty.com with ESMTP id 11S74aGf017927
+        for <linux-kbuild@vger.kernel.org>; Sun, 28 Feb 2021 16:04:36 +0900
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 11S70lE9021634;
+        Sun, 28 Feb 2021 16:00:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 11S70lE9021634
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1614492637;
-        bh=FJq1WB6jfuuQwA03yL38QkuEaI3B/IvVwfnLKPEhnqw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zWqk94IXNju6rrod56k/XYMKz3fEZ0bLHtWdJ4nkcKY102BetYLxLHpkooOw5kJkO
-         aV0U4EdCKBcssoSEoDbWEJ/YQg/sLu9TwECwDxdmBLz2siwfl9S6OtmSgC6W6AKrLj
-         W8ftunhw3cOIJhVUcT0LRI1ZYQXEMkX4IRM/IcI53DLHznkheVmmIzMg1M8MsjqHRU
-         PVUPPZ1l+Vbdc6FtKiyaDQFBrPYDGFfP4+f5YWpQYM/tk1M5gF8dO32dL2aCI9mmm/
-         V00LffCEAAEQg+jjSjVoXAA6dSJ6aE5pHCTKj/IBVkeforVCTDTC1bpCJqZIlADm0a
-         hOUVGaEhN7pcQ==
-X-Nifty-SrcIP: [126.26.90.165]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 3/4] kbuild: spilt cc-option and friends to scripts/Makefile.compiler
-Date:   Sun, 28 Feb 2021 15:10:27 +0900
-Message-Id: <20210228061028.239459-3-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210228061028.239459-1-masahiroy@kernel.org>
-References: <20210228061028.239459-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1614495647;
+        bh=tv5SDnKyPgoNP6YiEnF6vKsgSgqKofgv5GPg1jxlWHo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=AqYiemIQdGS7+6qTzFRIOsa0vrTOnXKmqd8bP2egk3+fLmNTxpD6rDl60wZ566qNx
+         whxufXp3wD3ru3jgdraO2wf7HUhzuaTtt1eP1b+jz+qdAtnHC16FylwiDMT091YgkP
+         08x4SZPthTdZp3D/l1vHMWPFqNVU1ev7EV56RrcZCXg46xKegocZqc3aHpkDJ83u3r
+         BWo9veP1HTNPgpPc+/uPHjdyLJI5vfabEOInD3PZ6SdlwvvAms1M2TjJr8f3idb3ja
+         oGG1AMcUToNexOOkMoNMalzyv/ByktPBJ70CF8uldRNItyG5/LtFEW4OTs+bOxV87R
+         bHx+jmvV1xupg==
+X-Nifty-SrcIP: [209.85.216.54]
+Received: by mail-pj1-f54.google.com with SMTP id t9so8489068pjl.5;
+        Sat, 27 Feb 2021 23:00:47 -0800 (PST)
+X-Gm-Message-State: AOAM533SbQyiqVuIbka3PalnV1zCWAP39Ql/xyadtoxaMazZA0TWD5s2
+        VWwrYsdQMT055e0NYKH+kluA8HZkHvNJdoM7RBU=
+X-Google-Smtp-Source: ABdhPJxbsLViJKD15RYvEtsukfPTiWhOx3l3YaSLDqvhv2WZlKrOxfrIHl0DSd7zO+LNS0ZBsnf5ZE8BZiNfCJWVNew=
+X-Received: by 2002:a17:90a:3b0e:: with SMTP id d14mr1565162pjc.198.1614495646276;
+ Sat, 27 Feb 2021 23:00:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210228061028.239459-1-masahiroy@kernel.org> <20210228061028.239459-4-masahiroy@kernel.org>
+In-Reply-To: <20210228061028.239459-4-masahiroy@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 28 Feb 2021 16:00:09 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ+3WNf=9047abBH-jD8XcgJe0V0rGhuo9Ta218UPswqQ@mail.gmail.com>
+Message-ID: <CAK7LNAQ+3WNf=9047abBH-jD8XcgJe0V0rGhuo9Ta218UPswqQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] kbuild: include Makefile.compiler only when compiler
+ is required
+To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Israel Tsadok <itsadok@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-scripts/Kbuild.include is included everywhere, but macros such as
-cc-option are needed by build targets only.
+On Sun, Feb 28, 2021 at 3:10 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Since commit f2f02ebd8f38 ("kbuild: improve cc-option to clean up all
+> temporary files"), running 'make kernelversion' in a read-only source
+> tree emits a bunch of warnings:
+>
+>   mkdir: cannot create directory '.tmp_12345': Permission denied
+>
+> Non-build targets such as kernelversion, clean, help, etc. do not
+> need to evaluate $(call cc-option,) and friends. Do not include
+> Makefile.compiler so $(call cc-option,) becomes no-op.
+>
+> This not only fix the warnings, but also runs non-build targets much
+> faster.
+>
+> Basically, all installation targets should also be non-build targets.
+> Unfortunately, vdso_install requires the compiler because it builds
+> vdso before installtion. This is a problem that must be fixed by a
+> separate patch.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+> I am not adding Reported-by for now because a reporter sent me
+> an email privately.
+>
+> If he allows me to add Reported-by, I will add it to record
+> the credit.
+>
+> (Perhaps, another person might have reported a similar issue
+> somewhere, but my memory is obsure. I cannot recall it.)
+>
 
-For example, when 'make clean' traverses the tree, it does not need
-to evaluate $(call cc-option,).
+Now, I got acknowledge to add this:
 
-Split cc-option, ld-option, etc. to scripts/Makefile.compiler, which
-is only included from the top Makefile and scripts/Makefile.build.
+Reported-by: Israel Tsadok <itsadok@gmail.com>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- Makefile                  |  4 ++
- scripts/Kbuild.include    | 80 ---------------------------------------
- scripts/Makefile.build    |  1 +
- scripts/Makefile.compiler | 77 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 82 insertions(+), 80 deletions(-)
- create mode 100644 scripts/Makefile.compiler
 
-diff --git a/Makefile b/Makefile
-index 2253e31a6bcf..eec7a94f5c33 100644
---- a/Makefile
-+++ b/Makefile
-@@ -582,6 +582,10 @@ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
- export CLANG_FLAGS
- endif
- 
-+# Include this also for config targets because some architectures need
-+# cc-cross-prefix to determine CROSS_COMPILE.
-+include $(srctree)/scripts/Makefile.compiler
-+
- ifdef config-build
- # ===========================================================================
- # *config targets only - make sure prerequisites are updated, and descend
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 509e0856d653..82dd1b65b7a8 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -67,86 +67,6 @@ define filechk
- 	fi
- endef
- 
--######
--# gcc support functions
--# See documentation in Documentation/kbuild/makefiles.rst
--
--# cc-cross-prefix
--# Usage: CROSS_COMPILE := $(call cc-cross-prefix, m68k-linux-gnu- m68k-linux-)
--# Return first <prefix> where a <prefix>gcc is found in PATH.
--# If no gcc found in PATH with listed prefixes return nothing
--#
--# Note: '2>/dev/null' is here to force Make to invoke a shell. Otherwise, it
--# would try to directly execute the shell builtin 'command'. This workaround
--# should be kept for a long time since this issue was fixed only after the
--# GNU Make 4.2.1 release.
--cc-cross-prefix = $(firstword $(foreach c, $(1), \
--			$(if $(shell command -v -- $(c)gcc 2>/dev/null), $(c))))
--
--# output directory for tests below
--TMPOUT = $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_$$$$
--
--# try-run
--# Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
--# Exit code chooses option. "$$TMP" serves as a temporary file and is
--# automatically cleaned up.
--try-run = $(shell set -e;		\
--	TMP=$(TMPOUT)/tmp;		\
--	TMPO=$(TMPOUT)/tmp.o;		\
--	mkdir -p $(TMPOUT);		\
--	trap "rm -rf $(TMPOUT)" EXIT;	\
--	if ($(1)) >/dev/null 2>&1;	\
--	then echo "$(2)";		\
--	else echo "$(3)";		\
--	fi)
--
--# as-option
--# Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
--
--as-option = $(call try-run,\
--	$(CC) $(KBUILD_CFLAGS) $(1) -c -x assembler /dev/null -o "$$TMP",$(1),$(2))
--
--# as-instr
--# Usage: cflags-y += $(call as-instr,instr,option1,option2)
--
--as-instr = $(call try-run,\
--	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
--
--# __cc-option
--# Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
--__cc-option = $(call try-run,\
--	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
--
--# cc-option
--# Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
--
--cc-option = $(call __cc-option, $(CC),\
--	$(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS),$(1),$(2))
--
--# cc-option-yn
--# Usage: flag := $(call cc-option-yn,-march=winchip-c6)
--cc-option-yn = $(call try-run,\
--	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
--
--# cc-disable-warning
--# Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
--cc-disable-warning = $(call try-run,\
--	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
--
--# cc-ifversion
--# Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
--cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
--
--# ld-option
--# Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
--ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
--
--# ld-ifversion
--# Usage:  $(call ld-ifversion, -ge, 22252, y)
--ld-ifversion = $(shell [ $(CONFIG_LD_VERSION)0 $(1) $(2)0 ] && echo $(3) || echo $(4))
--
--######
--
- ###
- # Shorthand for $(Q)$(MAKE) -f scripts/Makefile.build obj=
- # Usage:
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 750d6d5225af..d74d3383666e 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -36,6 +36,7 @@ subdir-ccflags-y :=
- -include include/config/auto.conf
- 
- include $(srctree)/scripts/Kbuild.include
-+include $(srctree)/scripts/Makefile.compiler
- 
- # The filename Kbuild has precedence over Makefile
- kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
-new file mode 100644
-index 000000000000..5f759ecc4f04
---- /dev/null
-+++ b/scripts/Makefile.compiler
-@@ -0,0 +1,77 @@
-+######
-+# gcc support functions
-+# See documentation in Documentation/kbuild/makefiles.rst
-+
-+# cc-cross-prefix
-+# Usage: CROSS_COMPILE := $(call cc-cross-prefix, m68k-linux-gnu- m68k-linux-)
-+# Return first <prefix> where a <prefix>gcc is found in PATH.
-+# If no gcc found in PATH with listed prefixes return nothing
-+#
-+# Note: '2>/dev/null' is here to force Make to invoke a shell. Otherwise, it
-+# would try to directly execute the shell builtin 'command'. This workaround
-+# should be kept for a long time since this issue was fixed only after the
-+# GNU Make 4.2.1 release.
-+cc-cross-prefix = $(firstword $(foreach c, $(1), \
-+			$(if $(shell command -v -- $(c)gcc 2>/dev/null), $(c))))
-+
-+# output directory for tests below
-+TMPOUT = $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_$$$$
-+
-+# try-run
-+# Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
-+# Exit code chooses option. "$$TMP" serves as a temporary file and is
-+# automatically cleaned up.
-+try-run = $(shell set -e;		\
-+	TMP=$(TMPOUT)/tmp;		\
-+	TMPO=$(TMPOUT)/tmp.o;		\
-+	mkdir -p $(TMPOUT);		\
-+	trap "rm -rf $(TMPOUT)" EXIT;	\
-+	if ($(1)) >/dev/null 2>&1;	\
-+	then echo "$(2)";		\
-+	else echo "$(3)";		\
-+	fi)
-+
-+# as-option
-+# Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
-+
-+as-option = $(call try-run,\
-+	$(CC) $(KBUILD_CFLAGS) $(1) -c -x assembler /dev/null -o "$$TMP",$(1),$(2))
-+
-+# as-instr
-+# Usage: cflags-y += $(call as-instr,instr,option1,option2)
-+
-+as-instr = $(call try-run,\
-+	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -x assembler -o "$$TMP" -,$(2),$(3))
-+
-+# __cc-option
-+# Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
-+__cc-option = $(call try-run,\
-+	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
-+
-+# cc-option
-+# Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
-+
-+cc-option = $(call __cc-option, $(CC),\
-+	$(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS),$(1),$(2))
-+
-+# cc-option-yn
-+# Usage: flag := $(call cc-option-yn,-march=winchip-c6)
-+cc-option-yn = $(call try-run,\
-+	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
-+
-+# cc-disable-warning
-+# Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
-+cc-disable-warning = $(call try-run,\
-+	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
-+
-+# cc-ifversion
-+# Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
-+cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
-+
-+# ld-option
-+# Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
-+ld-option = $(call try-run, $(LD) $(KBUILD_LDFLAGS) $(1) -v,$(1),$(2),$(3))
-+
-+# ld-ifversion
-+# Usage:  $(call ld-ifversion, -ge, 22252, y)
-+ld-ifversion = $(shell [ $(CONFIG_LD_VERSION)0 $(1) $(2)0 ] && echo $(3) || echo $(4))
+
+
+
+
+>  Makefile | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index eec7a94f5c33..20724711dc71 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -263,6 +263,10 @@ no-dot-config-targets := $(clean-targets) \
+>                          $(version_h) headers headers_% archheaders archscripts \
+>                          %asm-generic kernelversion %src-pkg dt_binding_check \
+>                          outputmakefile
+> +# Installation targets should not require compiler. Unfortunately, vdso_install
+> +# is an exception where build artifacts may be updated. This must be fixed.
+> +no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
+> +                       headers_install modules_install kernelrelease image_name
+>  no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease \
+>                           image_name
+>  single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+> @@ -270,6 +274,7 @@ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+>  config-build   :=
+>  mixed-build    :=
+>  need-config    := 1
+> +need-compiler  := 1
+>  may-sync-config        := 1
+>  single-build   :=
+>
+> @@ -279,6 +284,12 @@ ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+>         endif
+>  endif
+>
+> +ifneq ($(filter $(no-compiler-targets), $(MAKECMDGOALS)),)
+> +       ifeq ($(filter-out $(no-compiler-targets), $(MAKECMDGOALS)),)
+> +               need-compiler :=
+> +       endif
+> +endif
+> +
+>  ifneq ($(filter $(no-sync-config-targets), $(MAKECMDGOALS)),)
+>         ifeq ($(filter-out $(no-sync-config-targets), $(MAKECMDGOALS)),)
+>                 may-sync-config :=
+> @@ -584,7 +595,9 @@ endif
+>
+>  # Include this also for config targets because some architectures need
+>  # cc-cross-prefix to determine CROSS_COMPILE.
+> +ifdef need-compiler
+>  include $(srctree)/scripts/Makefile.compiler
+> +endif
+>
+>  ifdef config-build
+>  # ===========================================================================
+> --
+> 2.27.0
+>
+
+
 -- 
-2.27.0
-
+Best Regards
+Masahiro Yamada
