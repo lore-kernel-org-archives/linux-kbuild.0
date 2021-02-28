@@ -2,77 +2,78 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1030C433E0
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 01:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D9AC433DB
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 06:12:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6810F64DD2
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 01:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3A3B64E55
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Feb 2021 06:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230008AbhB1BUS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Feb 2021 20:20:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58594 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229640AbhB1BUS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Feb 2021 20:20:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5A18D64DE5;
-        Sun, 28 Feb 2021 01:19:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614475177;
-        bh=JOTKuWdXFQIG7mOjCw+Z8b3WqNrQCwF3E8ra9+Zy89s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZLW6CSEXh0sorRL7sn73xL7ZhPkCFjN6ft3igqwzFdMoU4/dHsPYX7m1Vr3bjPR3C
-         qdiKKxMZdPXQI63vKfgYkdw8JGaam9OrvTyjJ1sWf7CRPtCg0rsatdzwmEYsRPdSpX
-         Ie4lH9/NhN+Mg//vXBXR1EyP0jgZa2ymGZ5kN8Mw2+8J5k+TVAxiDisAFIX2iD/vDS
-         tgJbFcVRH3JypAW3nC9on0DQxWPS4L77HYPJga29asjUBf4W3r75rnS45kUn4inXiV
-         VBDmsLIt+HkLpdt67AEaKkX7EoTx0SOQf5ONA/toaoxhY/BKyZH9plDFDuQowRuuMa
-         t1WCGx8Vw61fw==
-Date:   Sat, 27 Feb 2021 20:19:36 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Zigotzky <chzigotzky@xenosoft.de>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: Fix <linux/version.h> for empty SUBLEVEL or
- PATCHLEVEL again
-Message-ID: <20210228011936.GD473487@sasha-vm>
-References: <20210227142023.63480-1-masahiroy@kernel.org>
+        id S229820AbhB1GLp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 28 Feb 2021 01:11:45 -0500
+Received: from conuserg-07.nifty.com ([210.131.2.74]:55340 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229454AbhB1GLp (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 28 Feb 2021 01:11:45 -0500
+Received: from oscar.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 11S6Aagr009638;
+        Sun, 28 Feb 2021 15:10:36 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 11S6Aagr009638
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1614492636;
+        bh=KEDTQhMtT2eYViKsns8H0yabNkx1k3NTqKR6OviKKQ4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Md5mhQERflDIRQYPFLyHsJX9rEnKHYRphyE3GUMFvUlkr6yXaUtjOoyKQ2mpPCMf+
+         tOiOBP9CCxgWVI7vRjKj22eU3hH6ctver4bw0x7zgAWkYnv2oekVbON9VEI+IEG/pY
+         bw//qy24klyKYQsQJ9bFSx48Pz1es9KTaLUYuRUfcw9ztauVaEidJ12mJZTxU2M5we
+         TTQYuccxhIiGxb/4i/1xR9G5ZK6iMlWaVa6VToUiQtBNMZsc6iEfdp20t96yEgN4pn
+         UHa0PHNmnIAaxwWK2DOybOBLntmCgTscoNb9pOmaecnVMz6CHp87GHQBSFGTHGOKbn
+         8lMordguOrclg==
+X-Nifty-SrcIP: [126.26.90.165]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH 1/4] kbuild: add image_name to no-sync-config-targets
+Date:   Sun, 28 Feb 2021 15:10:25 +0900
+Message-Id: <20210228061028.239459-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210227142023.63480-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Feb 27, 2021 at 11:20:23PM +0900, Masahiro Yamada wrote:
->Commit 9b82f13e7ef3 ("kbuild: clamp SUBLEVEL to 255") breaks the build
->if SUBLEVEL or PATCHLEVEL is empty.
->
->Commit 78d3bb4483ba ("kbuild: Fix <linux/version.h> for empty SUBLEVEL
->or PATCHLEVEL") fixed the issue by prepending a zero.
->
->This time, we cannot take the same approach because we have C code:
->
->  #define LINUX_VERSION_PATCHLEVEL $(PATCHLEVEL)
->  #define LINUX_VERSION_SUBLEVEL $(SUBLEVEL)
->
->Replace empty SUBLEVEL or PATCHLEVEL with a zero.
->
->Fixes: 9b82f13e7ef3 ("kbuild: clamp SUBLEVEL to 255")
->Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
->Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+'make image_name' needs include/config/auto.conf to show the correct
+output because KBUILD_IMAGE depends on CONFIG options, but should not
+attempt to resync the configuration.
 
-Reviewed-and-tested-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Thank you!
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index 633d2769b6ec..c84a9311df29 100644
+--- a/Makefile
++++ b/Makefile
+@@ -263,7 +263,8 @@ no-dot-config-targets := $(clean-targets) \
+ 			 $(version_h) headers headers_% archheaders archscripts \
+ 			 %asm-generic kernelversion %src-pkg dt_binding_check \
+ 			 outputmakefile
+-no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease
++no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease \
++			  image_name
+ single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+ 
+ config-build	:=
 -- 
-Thanks,
-Sasha
+2.27.0
+
