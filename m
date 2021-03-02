@@ -2,97 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15323C433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44890C43142
 	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBB9564E60
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D0B864E6B
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238492AbhCCBfs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:35:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51148 "EHLO
+        id S239511AbhCCBhi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:37:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2359808AbhCBWDh (ORCPT
+        with ESMTP id S1378027AbhCBWee (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Mar 2021 17:03:37 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626B5C061788
-        for <linux-kbuild@vger.kernel.org>; Tue,  2 Mar 2021 14:02:57 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id u18so6644560plc.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Mar 2021 14:02:57 -0800 (PST)
+        Tue, 2 Mar 2021 17:34:34 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4BCC06178A
+        for <linux-kbuild@vger.kernel.org>; Tue,  2 Mar 2021 14:33:52 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id y12so13173814ljj.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 02 Mar 2021 14:33:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VSzmNjYTy01rJCfITYLeDvSot7XkofY2f8pmB6oIiPU=;
-        b=v37pp5Ker1zCTvHH+3OnIxFtYbk5M3rLpiFL+FTfZJ5mpMChJzIUg9M320fc4moIzs
-         kpSj8bAmqKmbeth9zC67P+0SqwGAGippvQLKIN/fDhxY35Q8lrdxFABYWGXoEV+xYQ+1
-         O2n6FbBHXRNDPKlU8icEXpQCYVy3TRjdB4TBG23vdkYWIC2v7q8BsvG5ExlX97G6dupj
-         jXJKfhRpFJwJCzwg5qz/P/vLfr18awjf14gftsfr0VB7iUL+RsnggfP3mBd6SvQYFQse
-         9YHaBYt3wiFgZpxsEnsFjddP0V8ydTQ/MKvW3+Nb4tQlir7nYoouuRhW6MtmYnrs48Sp
-         u2fg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aHp3sOBhNVG2z21fEC5nTsyRiHJNdtFKTVUSbILsbhc=;
+        b=ZS/VhMSd3AAuXIJcy+MFcS0NXV1EQ4IYXoq1/6lldjXI/rRvpGh0BThVrxwXFoiX0K
+         UKpRi0U2HUmyhBuDuRMlboovXP678k0wC4io8y964qYD2X0/g+vCr/TesHwpqfP/FnSJ
+         M0Yo3fDAIt63ruryZtsSlzqSSkuD2jhVmX6OZwYJcBoaOkt3O1ph4vuk1lHJ++IlpKWs
+         GtxfKtlHV9zGhqPCGT55XCKT5xu/X/UjhDtfZAcW9bZNDlU/iTXgRbclQZ5y9WcDqbw3
+         FLWpNpKEvCguEXvq0990sFhuL1MO5nmysQ2Fhtmjg9zLuQ+12VUDQplLx3oFsdaEzavG
+         VOjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VSzmNjYTy01rJCfITYLeDvSot7XkofY2f8pmB6oIiPU=;
-        b=GP8jJpF4agjMPK7NSWmQ8pLCkBcmR93XfIBXl19ypxK7+14BMLuOVFRLEP2hqLfLce
-         KZbohFI0cvM3LW2Sv7bqxBo1A26e/duZGSNumqNy3kX8hM4KCHwxdo/8X0eQKBkpd7rV
-         iyPOIqV7UN1qBC/R//GMeuWHSa1fOXqKncYoHs2USIZVdr+oi9brcTaMGdrr8/0AdJVM
-         i6d+KCAw4z9pgS5DQtctpVP7+KyOhNvo7K5NA2zoXPzVbszgrrpaWgF0wl1FYJb8u2DU
-         KLhwN1nxe7uA+c/78zD+pU2FsFs/j+Vs8Brcz6eUKS3IiRyZPkAW8krTeoleeGFgHkNB
-         GsAQ==
-X-Gm-Message-State: AOAM530MtlsKYET7N6IaQ7vrvJ1/v7403cIwW+KC5ja7hr9tPooAHzgv
-        tLi/mxWC6mn6vvKs3tr3DBIqKQ==
-X-Google-Smtp-Source: ABdhPJxMg9Kt2BsfPvGs37KwCN5uyARf6e9xc254ZYaXK+YgVGe/tpRqN/nhDso36qmUE3trvvwX5A==
-X-Received: by 2002:a17:90a:1b08:: with SMTP id q8mr6229310pjq.203.1614722576641;
-        Tue, 02 Mar 2021 14:02:56 -0800 (PST)
-Received: from google.com ([2620:15c:2ce:0:fce5:88bc:1857:36b4])
-        by smtp.gmail.com with ESMTPSA id g6sm22462672pfi.15.2021.03.02.14.02.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Mar 2021 14:02:56 -0800 (PST)
-Date:   Tue, 2 Mar 2021 14:02:52 -0800
-From:   Fangrui Song <maskray@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aHp3sOBhNVG2z21fEC5nTsyRiHJNdtFKTVUSbILsbhc=;
+        b=YCc6+12uBlnF/myrFuY8S2vx0WNhJMUUHOWatVm3aCgME2xd/NqA64ZulZ4mya66hU
+         d4qGtLa8r1+2QSvA/dp1hRv/987pGPnn0Og7kQEiCzjz9uSLoAxNmS0zGERwajFE+Yx0
+         m7TEW58Ws7pBrF4CUKSGKQsKFzYYlP7dFbZt4E9o4YruN9Ja+fdVoI7jQhu6zMX+4jsC
+         B9q94z5+STA11K/OZMYlU1AQjm9/ZONi83S3jj4te80nn4qU6+7PsGetrlA1Dhth2C8A
+         WsYX5BogWpFKqw79IRcu6U8+Q/ZiojcSmou5C66xDwz2Q2IUv3ZMD/BCgRQU/a1n1yVu
+         AiGQ==
+X-Gm-Message-State: AOAM532Uv/Wnnppc0er9P3UHHbKpfQJ0cDQ9LcPdD0+iAy1mwj8zCjXr
+        snjehsUydPkGY+7IEtssfdpzA747pOQlIT+UuODJfg==
+X-Google-Smtp-Source: ABdhPJww/wJF01NlHj2uUUXXZ3qb7y9gB9grBjIx9xxfrcRRhyi/ZmXUTOC8lBxHPcSNgwJlir4Q1+sRJRHe/MT0YoE=
+X-Received: by 2002:a2e:b008:: with SMTP id y8mr4382857ljk.233.1614724430576;
+ Tue, 02 Mar 2021 14:33:50 -0800 (PST)
+MIME-Version: 1.0
+References: <20210302210646.3044738-1-nathan@kernel.org>
+In-Reply-To: <20210302210646.3044738-1-nathan@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 2 Mar 2021 14:33:38 -0800
+Message-ID: <CAKwvOdn42+2bFOMvJpJUuvmM1cj3V6uNEJWfwBWCRFMXtvQfcA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Makefile: Remove '--gcc-toolchain' flag
 To:     Nathan Chancellor <nathan@kernel.org>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: Re: [PATCH 2/2] Makefile: Only specify '--prefix=' when building
- with clang + GNU as
-Message-ID: <20210302220252.ulvlsfyp4ordwrky@google.com>
-References: <20210302210646.3044738-1-nathan@kernel.org>
- <20210302210646.3044738-2-nathan@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210302210646.3044738-2-nathan@kernel.org>
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 2021-03-02, Nathan Chancellor wrote:
->When building with LLVM_IAS=1, there is no point to specifying
->'--prefix=' because that flag is only used to find the cross assembler,
->which is clang itself when building with LLVM_IAS=1. All of the other
->tools are invoked directly from PATH or a full path specified via the
->command line, which does not depend on the value of '--prefix='.
+On Tue, Mar 2, 2021 at 1:07 PM Nathan Chancellor <nathan@kernel.org> wrote:
 >
->Sharing commands to reproduce issues becomes a little bit easier without
->a '--prefix=' value because that '--prefix=' value is specific to a
->user's machine due to it being an absolute path.
+> This is not necessary anymore now that we specify '--prefix=', which
+> tells clang exactly where to find the GNU cross tools. This has been
+> verified with self compiled LLVM 10.0.1 and LLVM 13.0.0 as well as a
+> distribution version of LLVM 11.1.0 without binutils in the LLVM
+> toolchain locations.
 >
->Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Reviewed-by: Fangrui Song <maskray@google.com>
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 
-clang can spawn GNU as (if -f?no-integrated-as is specified) and GNU
-objcopy (-f?no-integrated-as and -gsplit-dwarf and -g[123]).
+I see this pattern still being used in
+arch/arm64/kernel/vdso32/Makefile, but that can be separate cleanups.
 
-With LLVM_IAS=1, these cases are ruled out.
+> ---
+>  Makefile | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index f9b54da2fca0..c20f0ad8be73 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -568,10 +568,6 @@ ifneq ($(CROSS_COMPILE),)
+>  CLANG_FLAGS    += --target=$(notdir $(CROSS_COMPILE:%-=%))
+>  GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+>  CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
+> -GCC_TOOLCHAIN  := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
+> -endif
+> -ifneq ($(GCC_TOOLCHAIN),)
+> -CLANG_FLAGS    += --gcc-toolchain=$(GCC_TOOLCHAIN)
+>  endif
+>  ifneq ($(LLVM_IAS),1)
+>  CLANG_FLAGS    += -no-integrated-as
+>
+> base-commit: 7a7fd0de4a9804299793e564a555a49c1fc924cb
+> --
+> 2.31.0.rc0.75.gec125d1bc1
+>
+
+
+-- 
+Thanks,
+~Nick Desaulniers
