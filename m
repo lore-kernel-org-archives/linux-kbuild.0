@@ -2,98 +2,85 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0577C433E9
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB69C4332E
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B4A564E66
+	by mail.kernel.org (Postfix) with ESMTP id EE11664E6C
 	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233933AbhCCBaL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:30:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1444802AbhCBMgZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Mar 2021 07:36:25 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 07FD764F3E;
-        Tue,  2 Mar 2021 11:56:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614686186;
-        bh=ab5hniXl98VxlN0bmfQq67BF1biy4T23u0IOq90Wync=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=arUhwyV+0TP+8O9VzQNPkHnzq9cpRy1KLhXbs54gCctgkx6mLhADmT0ZOYL3qVdcn
-         c4cxFhc543j5SikmydAVJi24LysOFA2IaHgRzNNqrQjk0VsXpwPJsHLb0eR83iNMa3
-         ng2h0ViLjmdZO9GbeQPQ7art/6uoZlyMl6nzn6EsLEB01hNM2VrkxM1G6xLuv4Ztcq
-         Gz6DcCvsAVyc8hCylaKWoiHgxn3UVJWuIC6gU2EqzKduAvS5AyT6JC4Hgw0y0Nw/It
-         qi8mUDwknWXSqXxtGwsaUfVSNxysUO1dQinwQG7TvzHzGmpPqH6idUjwsmMrNS4dYG
-         o9+yaFAF1A0ng==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sasha Levin <sashal@kernel.org>,
+        id S232855AbhCCBad (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:30:33 -0500
+Received: from conuserg-07.nifty.com ([210.131.2.74]:49029 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1377916AbhCBO15 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Mar 2021 09:27:57 -0500
+Received: from oscar.flets-west.jp (softbank126026090165.bbtec.net [126.26.90.165]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 122EQHl6026843;
+        Tue, 2 Mar 2021 23:26:18 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 122EQHl6026843
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1614695178;
+        bh=bLEqHI17Ar/SUMtdax+/xBfsUNtwhENj2/0NG79lDvo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=oooBct/xk1fbRtlHVwyg+ErdW47YEUgDt0S+faQnyruGtnHNq67wKjrNwFbJs9vEj
+         7y0TWRWFhZK8GTveTfr3WsTxxoZIfwuwQUudPn3Thn6Lg/B8TZEQUkRf+SKHDPBIVX
+         iJlr+ip6aGhofo0ms8iFv2r96/AD+gW+SBeMCciZYepR/Iw4mz6qQGpHg3y2I05IZI
+         lc5ZDspqZwKj9xj0DJH1+WQhRQf147O9HYKJ2Z7f4R4+AI3xjlAkBAsC8+U38xJBnh
+         Q18uJjXcxovrqKSBUSXHi0Pl618k4IXmdAjL0aDphpVx6348NuXoprHQB9O4LBoBUh
+         U4R1lPuWsTSSA==
+X-Nifty-SrcIP: [126.26.90.165]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 40/52] kbuild: clamp SUBLEVEL to 255
-Date:   Tue,  2 Mar 2021 06:55:21 -0500
-Message-Id: <20210302115534.61800-40-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210302115534.61800-1-sashal@kernel.org>
-References: <20210302115534.61800-1-sashal@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH] kbuild: show warning for 'make headers_check'
+Date:   Tue,  2 Mar 2021 23:26:14 +0900
+Message-Id: <20210302142614.505888-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-[ Upstream commit 9b82f13e7ef316cdc0a8858f1349f4defce3f9e0 ]
+Since commit 7ecaf069da52 ("kbuild: move headers_check rule to
+usr/include/Makefile"), the headers_check target is no-op.
 
-Right now if SUBLEVEL becomes larger than 255 it will overflow into the
-territory of PATCHLEVEL, causing havoc in userspace that tests for
-specific kernel version.
+This stub target is remaining here in case some scripts still invoke
+'make headers_check'. In order to prompt people to remove stale code,
+show a noisy warning message if used. The stub will be really removed
+after the Linux 5.15 release.
 
-While userspace code tests for MAJOR and PATCHLEVEL, it doesn't test
-SUBLEVEL at any point as ABI changes don't happen in the context of
-stable tree.
-
-Thus, to avoid overflows, simply clamp SUBLEVEL to it's maximum value in
-the context of LINUX_VERSION_CODE. This does not affect "make
-kernelversion" and such.
-
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Makefile | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+
+ Makefile | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 0b9ae470a714..bcd11b3d4ced 100644
+index f9b54da2fca0..a3336d9b4a22 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1246,9 +1246,15 @@ define filechk_utsrelease.h
- endef
+@@ -1339,7 +1339,11 @@ headers: $(version_h) scripts_unifdef uapi-asm-generic archheaders archscripts
+ # Deprecated. It is no-op now.
+ PHONY += headers_check
+ headers_check:
+-	@:
++	@echo >&2 "=================== WARNING ==================="
++	@echo >&2 "Since Linux 5.5, 'make headers_check' is no-op,"
++	@echo >&2 "and will be removed after Linux 5.15 release."
++	@echo >&2 "Please remove headers_check from your scripts."
++	@echo >&2 "==============================================="
  
- define filechk_version.h
--	echo \#define LINUX_VERSION_CODE $(shell                         \
--	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
--	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'
-+	if [ $(SUBLEVEL) -gt 255 ]; then                                 \
-+		echo \#define LINUX_VERSION_CODE $(shell                 \
-+		expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 255); \
-+	else                                                             \
-+		echo \#define LINUX_VERSION_CODE $(shell                 \
-+		expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + $(SUBLEVEL)); \
-+	fi;                                                              \
-+	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) +  \
-+	((c) > 255 ? 255 : (c)))'
- endef
- 
- $(version_h): FORCE
+ ifdef CONFIG_HEADERS_INSTALL
+ prepare: headers
 -- 
-2.30.1
+2.27.0
 
