@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED0DC433E9
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0577C433E9
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B94F664E66
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B4A564E66
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233716AbhCCB3n (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:29:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48324 "EHLO mail.kernel.org"
+        id S233933AbhCCBaL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:30:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50610 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1350347AbhCBMVD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 2 Mar 2021 07:21:03 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 32BD764F96;
-        Tue,  2 Mar 2021 11:58:22 +0000 (UTC)
+        id S1444802AbhCBMgZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 2 Mar 2021 07:36:25 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 07FD764F3E;
+        Tue,  2 Mar 2021 11:56:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614686303;
-        bh=mb5XzPjVA/Wj9FalGbm9ViAa4f0b2wEYV8rnPIqdjVU=;
+        s=k20201202; t=1614686186;
+        bh=ab5hniXl98VxlN0bmfQq67BF1biy4T23u0IOq90Wync=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JQz2OYVnwaJsdoIs+/UTLJM2zR+5uGfaNC5n45pj+dEOa6DS1LGBJatv5dvLD9263
-         2WatUTNsLGFcWB65eNQKvCxRx2fhkTRgNMyaNov3X7Xi/gaQ2zXokh2DgNqAZOlKt/
-         SuqvRf0eidui5+8P6phhJjbOfotUcK9zPB8LzrNXYllfbFIEkjEdM4a7Vt46WjBjxW
-         8DSWfLEfMxeO+f+3LKm/LqL65EJ6CKQv7RlKj47y0+l3ByfT9f/Ql1KYrfLiSn21sc
-         O3EANf7X3c8IAV6YwhkKW9B1ycKbMz1ZKWwzw2umfach0MNGZgqSYUTpxM1UPKxD3g
-         TpAQS4hOszi+g==
+        b=arUhwyV+0TP+8O9VzQNPkHnzq9cpRy1KLhXbs54gCctgkx6mLhADmT0ZOYL3qVdcn
+         c4cxFhc543j5SikmydAVJi24LysOFA2IaHgRzNNqrQjk0VsXpwPJsHLb0eR83iNMa3
+         ng2h0ViLjmdZO9GbeQPQ7art/6uoZlyMl6nzn6EsLEB01hNM2VrkxM1G6xLuv4Ztcq
+         Gz6DcCvsAVyc8hCylaKWoiHgxn3UVJWuIC6gU2EqzKduAvS5AyT6JC4Hgw0y0Nw/It
+         qi8mUDwknWXSqXxtGwsaUfVSNxysUO1dQinwQG7TvzHzGmpPqH6idUjwsmMrNS4dYG
+         o9+yaFAF1A0ng==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sasha Levin <sashal@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 25/33] kbuild: clamp SUBLEVEL to 255
-Date:   Tue,  2 Mar 2021 06:57:41 -0500
-Message-Id: <20210302115749.62653-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.11 40/52] kbuild: clamp SUBLEVEL to 255
+Date:   Tue,  2 Mar 2021 06:55:21 -0500
+Message-Id: <20210302115534.61800-40-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210302115749.62653-1-sashal@kernel.org>
-References: <20210302115749.62653-1-sashal@kernel.org>
+In-Reply-To: <20210302115534.61800-1-sashal@kernel.org>
+References: <20210302115534.61800-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -72,10 +72,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f56442751d2c..e8a1989032bd 100644
+index 0b9ae470a714..bcd11b3d4ced 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1175,9 +1175,15 @@ define filechk_utsrelease.h
+@@ -1246,9 +1246,15 @@ define filechk_utsrelease.h
  endef
  
  define filechk_version.h
