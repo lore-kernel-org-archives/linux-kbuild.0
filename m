@@ -2,321 +2,142 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-28.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 262F1C4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 971F9C43331
 	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4C7E64EA4
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68CA964E6C
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231126AbhCCX7i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 18:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33018 "EHLO
+        id S230409AbhCCX7h (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Mar 2021 18:59:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382270AbhCCXIP (ORCPT
+        with ESMTP id S1388056AbhCCUo4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 18:08:15 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB582C0613E0
-        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 15:07:14 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id g4so17533582pgj.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 15:07:14 -0800 (PST)
+        Wed, 3 Mar 2021 15:44:56 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC115C06175F
+        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 12:44:15 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id m11so29615589lji.10
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 12:44:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=TFaM8t9jUylFBQoMqrkAf69dnUf3tqhRo/if2M1bURU=;
-        b=g8WXhnhQ3T4L163ridynbRQURahvjUmZXKORdM2D6bzYG2VQotvdQcYoFX6aSkR772
-         aDrtYmb1OOSlOP/I/EJSGaRJ7htbqfNS9g6NYPUgfdogze+msl3982V0y2MTwPHEoAaG
-         OpF4/y5hm1vKml80p3+PdZYEkFrxjZKQf+COIq7LPOYaVQ2TcRuJ7MdCTb+hqMR2kErz
-         REsHmK6OztDW5HpCEBRvs0t+IKd7Macgr/75MbUSjR/Hp31JFiScx7dxH/lqmAY7jcDk
-         5oL4a66DatIHzRNSbIG9kee2upE9BvDr+xW331rd2BuwXE0+PcW9qTbb//DRywOwdGOw
-         iY1Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cl+ctiF8TwpQDZm2mYgW/hPoAO7x78R4uvY/MJaEkFA=;
+        b=h2CSSdDLIU/zeKn696QCaRkWV/yb8DFw1wD5bB1w4bi0LkwzaW/uDPT3f52XY6AYuA
+         T2B5ag44qAfllSWvh8/5nFW/P/UGCyL84+hejUKcd5yeTuGXLLsQhWiIf8A/f3DLbFnd
+         yVMVurw5QpOiYDiD/ONDMP3+ADkyxvJE+vPVZwErubBhgf6ZTuAKFjcq/xLRH6CiiNKc
+         +KTpjLq9pt4xtVIlEN86r13pNNJPJQqHXku7NCMyqXpw9+4YM3J6ayUbRLI2Lleg94vn
+         OtdWN1lGlZfC2+s3GQyqPJ48svd8Ty4MDWqBTJkCdjkouaaR4o4QJ7tJt9/iu/wXadhJ
+         MrIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=TFaM8t9jUylFBQoMqrkAf69dnUf3tqhRo/if2M1bURU=;
-        b=Alo/cjmrO+taz0ghGN2J5hXSRz8qGcwbg+BOcCTPRP0looVOhuaWlFdKW6SJjrbXF+
-         9lfTJByvsl7HIfqH2pcDD6V4A3SsJPDi89emgB7B4Nd+M5WkGGfUMG/ztXbfkeEq9pdi
-         HucAxlE+5hzWHefseUjocC4rx8YpsQruzw0uZuvk7ScRf74+K4AUyUqSia8ivpGBQp9/
-         Xb0SOHakNFN7Jzq3AScTWzjvukTK3gApZ1tbCUCo5rVbO3QKYFMVKPJuMOhRzcYQeAZT
-         gLSkiJSF/m0K1gBRVbqwZwC7ZlWlG190aa5tS4DZjNJZA/zJVnHFfo2uJM/kFsbKgtFq
-         nVfg==
-X-Gm-Message-State: AOAM532m/D5jE2AgjZIkhqIB4Wgyb44mOSOPgL6z8e1sNBvXvWy8wxcc
-        q015mFvVoD3dvIeeeLsTaRKM5w==
-X-Google-Smtp-Source: ABdhPJwd9OOrY6Nw77GCLkPAJowIaEx4jP/WnzO6ftTZjojnDqnj3Z5C9XlzIFBJImlGBCPN90Lz/g==
-X-Received: by 2002:a63:f549:: with SMTP id e9mr1158204pgk.114.1614812834191;
-        Wed, 03 Mar 2021 15:07:14 -0800 (PST)
-Received: from google.com ([2620:15c:2ce:0:fce5:88bc:1857:36b4])
-        by smtp.gmail.com with ESMTPSA id c78sm25651274pfc.212.2021.03.03.15.07.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 15:07:13 -0800 (PST)
-Date:   Wed, 3 Mar 2021 15:07:08 -0800
-From:   Fangrui Song <maskray@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
-Subject: Re: [PATCH 1/2] Makefile: Remove '--gcc-toolchain' flag
-Message-ID: <20210303230708.l6pbk5o5nc2qa5of@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cl+ctiF8TwpQDZm2mYgW/hPoAO7x78R4uvY/MJaEkFA=;
+        b=b3+flzuYIbKR1Jb9YaTGI79DkSiErccneoK4TaQKWh6SOWgAuunCxybJRwKyv12Tc1
+         vTl6uM6yylXRfDnNDYyihBCohqF/BxfqQjrs1JYEoaxX62dBAV2l9jZlrhiTk1ZTpX/z
+         1e+/NNSEubo/jxYY0EyZVKL3v1wBabvDeXtBmAR6nueTDcFWsWR2VeJk3qasJ1rQxkcN
+         KnytgHvzKLl4XE3ED/fwC0WuFhPTGwlfT/aoxYnoxQSagl8Q1STXS4OpYGwCKtPk+OO9
+         S1O/mkqPKMjOAMzLpL4IwSHCfDIXjcauxLwUb9faywKEYsRa9EJsm3HwpdMJ8V8QtNy2
+         7ymQ==
+X-Gm-Message-State: AOAM533SWvqouNi7dTZP94GfSecYoVF7dFhaSSKvA72FPoRjDrQp41Hy
+        4AG8LGsiTH2qc5q6e4+Na9R6D36CDmoNI4NoZ9B44w==
+X-Google-Smtp-Source: ABdhPJyv325AMIUW9yUkAP75vUelvwHcmwmpOJmBZiJKFt9ZIqd62JzQR7c7n6Ss34aOoIiPvjgU9O5VycNJZwzOfqc=
+X-Received: by 2002:a2e:7d03:: with SMTP id y3mr434582ljc.0.1614804253733;
+ Wed, 03 Mar 2021 12:44:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+References: <20210303183333.46543-1-masahiroy@kernel.org> <20210303183333.46543-4-masahiroy@kernel.org>
+In-Reply-To: <20210303183333.46543-4-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 3 Mar 2021 12:44:02 -0800
+Message-ID: <CAKwvOdmNKKpZY38=ayM3NfU5K_27P_CqkKtLx7CbRw6_mFuxPA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] kbuild: dwarf: use AS_VERSION instead of test_dwarf5_support.sh
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Wed, Mar 3, 2021 at 10:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> The test code in scripts/test_dwarf5_support.sh is somewhat difficult
+> to understand, but after all, we want to check binutils >= 2.35.2
+>
+> From the former discussion, the requrement for generating DRAWF v5 from
 
-On 2021-03-03, Masahiro Yamada wrote:
->Hi.
->
->On Wed, Mar 3, 2021 at 6:44 AM Fangrui Song <maskray@google.com> wrote:
->>
->> Reviewed-by: Fangrui Song <maskray@google.com>
->>
->> Thanks for the clean-up!
->> --gcc-toolchain= is an obsscure way searching for GCC installation prefixes (--prefix).
->> The logic is complex and different for different distributions/architectures.
->>
->> If we specify --prefix= (-B) explicitly, --gcc-toolchain is not needed.
->
->
->I tested this, and worked for me too.
->
->Before applying this patch, could you please
->help me understand the logic?
->
->
->
->
->I checked the manual
->(https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang-b-dir)
->
->
->
->-B<dir>, --prefix <arg>, --prefix=<arg>
->    Add <dir> to search path for binaries and object files used implicitly
->
->--gcc-toolchain=<arg>, -gcc-toolchain <arg>
->    Use the gcc toolchain at the given directory
->
->
->Hmm, this description is too concise
->to understand how it works...
->
->
->
->I use Ubuntu 20.10.
->
->I use distro's default clang
->located in /usr/bin/clang.
->
->I place my aarch64 linaro toolchain in
->/home/masahiro/tools/aarch64-linaro-7.5/bin/aarch64-linux-gnu-gcc,
->which is not in my PATH environment.
->
->
->
->
->From my some experiments,
->
->clang --target=aarch64-linux-gnu -no-integrated-as \
->--prefix=/home/masahiro/tools/aarch64-linaro-7.5/bin/aarch64-linux-gnu-  ...
->
->works almost equivalent to
->
->PATH=/home/masahiro/tools/aarch64-linaro-7.5/bin:$PATH \
->clang --target=aarch64-linux-gnu -no-integrated-as ...
->
->
->Then, clang will pick up aarch64-linux-gnu-as
->found in the search path.
->
->Is this correct?
->
->
->On the other hand, I could not understand
->what the purpose of --gcc-toolchain= is.
->
->
->Even if I add --gcc-toolchain=/home/masahiro/tools/aarch64-linaro-7.5,
->it does not make any difference, and it is completely useless.
->
->
->I read the comment from stephenhines:
->https://github.com/ClangBuiltLinux/linux/issues/78
->
->How could --gcc-toolchain be used
->in a useful way?
+^typos: s/requrement/requirement, s/DRAWF/DWARF
 
---gcc-toolchain was introduced in
-https://reviews.llvm.org/rG1af7c219c7113a35415651127f05cdf056b63110
-to provide a flexible alternative to autoconf configure-time --with-gcc-toolchain (now cmake variable GCC_INSTALL_PREFIX).
+(in vim you can `:set spell` (`:set nospell` to disable), there's
+probably a nice way to auto set this on buffer entry for a commit
+message)
 
-I agree the option is confusing, the documentation is poor, and probably very few people understand what it does.
-I apologize that my previous reply is not particular correct.
-So the more correct answer is below: 
+> C code is as follows:
+>
+>  - gcc + binutils as     -> requires gcc 5.0+ (but 7.0+ for full support)
+>  - clang + binutils as   -> requires binutils 2.35.2+
+>  - clang + integrated as -> OK
+
+Yes. Thanks for the patch.
+
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  lib/Kconfig.debug              | 3 +--
+>  scripts/test_dwarf5_support.sh | 8 --------
+>  2 files changed, 1 insertion(+), 10 deletions(-)
+>  delete mode 100755 scripts/test_dwarf5_support.sh
+>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 2779c29d9981..f3337a38925d 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -284,8 +284,7 @@ config DEBUG_INFO_DWARF4
+>
+>  config DEBUG_INFO_DWARF5
+>         bool "Generate DWARF Version 5 debuginfo"
+> -       depends on GCC_VERSION >= 50000 || CC_IS_CLANG
+> -       depends on CC_IS_GCC || $(success,$(srctree)/scripts/test_dwarf5_support.sh $(CC) $(CLANG_FLAGS))
+> +       depends on GCC_VERSION >= 50000 || (CC_IS_CLANG && AS_IS_GNU && AS_VERSION >= 23502) || (CC_IS_CLANG && AS_IS_LLVM)
+
+Would this be more concise as:
++       depends on GCC_VERSION >= 50000 || (CC_IS_CLANG && (AS_IS_LLVM
+|| (AS_IS_GNU && AS_VERSION >= 23502))
+
+>         depends on !DEBUG_INFO_BTF
+>         help
+>           Generate DWARF v5 debug info. Requires binutils 2.35.2, gcc 5.0+ (gcc
+> diff --git a/scripts/test_dwarf5_support.sh b/scripts/test_dwarf5_support.sh
+> deleted file mode 100755
+> index c46e2456b47a..000000000000
+> --- a/scripts/test_dwarf5_support.sh
+> +++ /dev/null
+> @@ -1,8 +0,0 @@
+> -#!/bin/sh
+> -# SPDX-License-Identifier: GPL-2.0
+> -
+> -# Test that the assembler doesn't need -Wa,-gdwarf-5 when presented with DWARF
+> -# v5 input, such as `.file 0` and `md5 0x00`. Should be fixed in GNU binutils
+> -# 2.35.2. https://sourceware.org/bugzilla/show_bug.cgi?id=25611
+> -echo '.file 0 "filename" md5 0x7a0b65214090b6693bd1dc24dd248245' | \
+> -  $* -gdwarf-5 -Wno-unused-command-line-argument -c -x assembler -o /dev/null -
+> --
+> 2.27.0
+>
 
 
-A --prefix option can specify either of
-
-1) A directory (for something like /a/b/lib/gcc/arm-linux-androideabi, this should be /a/b, the parent directory of 'lib')
-2) A path fragment like /usr/bin/aarch64-linux-gnu-
-
-The directory values of the --prefix list and --gcc-toolchain are used to detect GCC installation directories. The directory is used to fetch include directories, system library directories and binutils directories (as, objcopy).
-(See below, Linux kernel only needs the binutils executables, so the include/library logic is really useless to us)
-
-The logic is around https://github.com/llvm/llvm-project/blob/main/clang/lib/Driver/ToolChains/Gnu.cpp#L1910
-
-   Prefixes = --prefix/-B list (only the directory subset is effective)
-   StringRef GCCToolchainDir = --gcc-toolchain= or CMake variable GCC_INSTALL_PREFIX
-   if (GCCToolchainDir != "") {
-     Prefixes.push_back(std::string(GCCToolchainDir));
-   } else {
-     if (!D.SysRoot.empty()) {
-       Prefixes.push_back(D.SysRoot);
-       // Add D.SysRoot+"/usr" to Prefixes. Some distributions add more directories.
-       AddDefaultGCCPrefixes(TargetTriple, Prefixes, D.SysRoot);
-     }
-
-     // D.InstalledDir is the directory of the clang executable, e.g. /usr/bin
-     Prefixes.push_back(D.InstalledDir + "/..");
-
-     if (D.SysRoot.empty())
-       AddDefaultGCCPrefixes(TargetTriple, Prefixes, D.SysRoot);
-   }
-
-   // Gentoo / ChromeOS specific logic.
-   // I think this block is misplaced.
-   if (GCCToolchainDir == "" || GCCToolchainDir == D.SysRoot + "/usr") {
-     ...
-   }
-
-   // Loop over the various components which exist and select the best GCC
-   // installation available. GCC installs are ranked by version number.
-   Version = GCCVersion::Parse("0.0.0");
-   for (const std::string &Prefix : Prefixes) {
-     auto &VFS = D.getVFS();
-     if (!VFS.exists(Prefix))
-       continue;
-
-     // CandidateLibDirs is a subset of {/lib64, /lib32, /lib}.
-     for (StringRef Suffix : CandidateLibDirs) {
-       const std::string LibDir = Prefix + Suffix.str();
-       if (!VFS.exists(LibDir))
-         continue;
-       bool GCCDirExists = VFS.exists(LibDir + "/gcc");
-       bool GCCCrossDirExists = VFS.exists(LibDir + "/gcc-cross");
-
-       // Precise match. Detect $Prefix/lib/$--target
-       ScanLibDirForGCCTriple(TargetTriple, Args, LibDir, TargetTriple.str(),
-                              false, GCCDirExists, GCCCrossDirExists);
-       // Usually empty.
-       for (StringRef Candidate : ExtraTripleAliases) // Try these first.
-         ScanLibDirForGCCTriple(TargetTriple, Args, LibDir, Candidate, false,
-                                GCCDirExists, GCCCrossDirExists);
-       // CandidateTripleAliases is a set with "x86_64-linux-gnu", "x86_64-unknown-linux-gnu", ...
-       // This loop detects directories like $Prefix/lib/x86_64-linux-gnu.
-       for (StringRef Candidate : CandidateTripleAliases)
-         ScanLibDirForGCCTriple(TargetTriple, Args, LibDir, Candidate, false,
-                                GCCDirExists, GCCCrossDirExists);
-     }
-     for (StringRef Suffix : CandidateBiarchLibDirs) {
-       const std::string LibDir = Prefix + Suffix.str();
-       if (!VFS.exists(LibDir))
-         continue;
-       bool GCCDirExists = VFS.exists(LibDir + "/gcc");
-       bool GCCCrossDirExists = VFS.exists(LibDir + "/gcc-cross");
-       for (StringRef Candidate : CandidateBiarchTripleAliases)
-         ScanLibDirForGCCTriple(TargetTriple, Args, LibDir, Candidate, true,
-                                GCCDirExists, GCCCrossDirExists);
-     }
-   }
-
-
-The comment
-// Loop over the various components which exist and select the best GCC
-// installation available. GCC installs are ranked by version number.
-
-is important. If you specify --prefix=$dir but not --gcc-toolchain, 
-the system cross toolchains (/usr/lib/gcc-cross) are also candidates and they may win.
-
-Specifying just --gcc-toolchain (due to if (GCCToolchainDir != "")) can effectively ignore system cross toolchains.
-
-
-
-In the Linux kernel use case, We specify -nostdinc and -nostdlib so GCC include/library directories are not used.
-We seem to prefer the non-directory use of --prefix: CROSS_COMPILE=arm-linux-gnueabi-
-So all the directory detection logic can be dropped.
-
-
-A better commit message is along the lines of:
---gcc-toolchain specified directory is used to detect GCC installations
-for include/library directories and binutils executables.
-
-We already specify something like --prefix=aarch64-linux-gnu- to inform
-Clang of the binutils executables, and we do not need include/library
-directories, so we can drop --gcc-toolchain.
->
->
->
->
->
->
->
->> On 2021-03-02, Nathan Chancellor wrote:
->> >This is not necessary anymore now that we specify '--prefix=', which
->> >tells clang exactly where to find the GNU cross tools. This has been
->> >verified with self compiled LLVM 10.0.1 and LLVM 13.0.0 as well as a
->> >distribution version of LLVM 11.1.0 without binutils in the LLVM
->> >toolchain locations.
->> >
->> >Signed-off-by: Nathan Chancellor <nathan@kernel.org>
->> >---
->> > Makefile | 4 ----
->> > 1 file changed, 4 deletions(-)
->> >
->> >diff --git a/Makefile b/Makefile
->> >index f9b54da2fca0..c20f0ad8be73 100644
->> >--- a/Makefile
->> >+++ b/Makefile
->> >@@ -568,10 +568,6 @@ ifneq ($(CROSS_COMPILE),)
->> > CLANG_FLAGS   += --target=$(notdir $(CROSS_COMPILE:%-=%))
->> > GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
->> > CLANG_FLAGS   += --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
->> >-GCC_TOOLCHAIN := $(realpath $(GCC_TOOLCHAIN_DIR)/..)
->> >-endif
->> >-ifneq ($(GCC_TOOLCHAIN),)
->> >-CLANG_FLAGS   += --gcc-toolchain=$(GCC_TOOLCHAIN)
->> > endif
->> > ifneq ($(LLVM_IAS),1)
->> > CLANG_FLAGS   += -no-integrated-as
->> >
->> >base-commit: 7a7fd0de4a9804299793e564a555a49c1fc924cb
->> >--
->> >2.31.0.rc0.75.gec125d1bc1
->> >
->> >--
->> >You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
->> >To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
->> >To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/20210302210646.3044738-1-nathan%40kernel.org.
->
->
->
->--
->Best Regards
->
->Masahiro Yamada
->
->-- 
->You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
->To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
->To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/CAK7LNAS4Ri%3DK6M39hYU%2B17JVf0Z%3DhbRgSxuTdX5ZaVYLpmJRtA%40mail.gmail.com.
+-- 
+Thanks,
+~Nick Desaulniers
