@@ -2,142 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971F9C43331
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E9DBC4160E
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68CA964E6C
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBE8664EC0
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbhCCX7h (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 18:59:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58836 "EHLO
+        id S230452AbhCCX7i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Mar 2021 18:59:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388056AbhCCUo4 (ORCPT
+        with ESMTP id S1388228AbhCCVG3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 15:44:56 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC115C06175F
-        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 12:44:15 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id m11so29615589lji.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 12:44:15 -0800 (PST)
+        Wed, 3 Mar 2021 16:06:29 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FCAFC061756
+        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 12:57:11 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id u4so39416018lfs.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 12:57:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cl+ctiF8TwpQDZm2mYgW/hPoAO7x78R4uvY/MJaEkFA=;
-        b=h2CSSdDLIU/zeKn696QCaRkWV/yb8DFw1wD5bB1w4bi0LkwzaW/uDPT3f52XY6AYuA
-         T2B5ag44qAfllSWvh8/5nFW/P/UGCyL84+hejUKcd5yeTuGXLLsQhWiIf8A/f3DLbFnd
-         yVMVurw5QpOiYDiD/ONDMP3+ADkyxvJE+vPVZwErubBhgf6ZTuAKFjcq/xLRH6CiiNKc
-         +KTpjLq9pt4xtVIlEN86r13pNNJPJQqHXku7NCMyqXpw9+4YM3J6ayUbRLI2Lleg94vn
-         OtdWN1lGlZfC2+s3GQyqPJ48svd8Ty4MDWqBTJkCdjkouaaR4o4QJ7tJt9/iu/wXadhJ
-         MrIA==
+        bh=jRuDUUKixXJZDP0HjES33qad4zVN4t6lxUgDAY1T79Q=;
+        b=QNwL/lnQ6xUnUJftFOjYj8S9SK2GrudH3yjL3FFeYEI36t+HVCk0ahbgAXK7QMT1q/
+         d7s7AYb2jVr536dyDslgA1cJdUs4S/uosw+QeGO4MUiZh8yb3HqGGqPuVwKJQLGPWteM
+         NqzmXkjI8rx2WgJHgIn7NY19N0J8VPem+YCDg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cl+ctiF8TwpQDZm2mYgW/hPoAO7x78R4uvY/MJaEkFA=;
-        b=b3+flzuYIbKR1Jb9YaTGI79DkSiErccneoK4TaQKWh6SOWgAuunCxybJRwKyv12Tc1
-         vTl6uM6yylXRfDnNDYyihBCohqF/BxfqQjrs1JYEoaxX62dBAV2l9jZlrhiTk1ZTpX/z
-         1e+/NNSEubo/jxYY0EyZVKL3v1wBabvDeXtBmAR6nueTDcFWsWR2VeJk3qasJ1rQxkcN
-         KnytgHvzKLl4XE3ED/fwC0WuFhPTGwlfT/aoxYnoxQSagl8Q1STXS4OpYGwCKtPk+OO9
-         S1O/mkqPKMjOAMzLpL4IwSHCfDIXjcauxLwUb9faywKEYsRa9EJsm3HwpdMJ8V8QtNy2
-         7ymQ==
-X-Gm-Message-State: AOAM533SWvqouNi7dTZP94GfSecYoVF7dFhaSSKvA72FPoRjDrQp41Hy
-        4AG8LGsiTH2qc5q6e4+Na9R6D36CDmoNI4NoZ9B44w==
-X-Google-Smtp-Source: ABdhPJyv325AMIUW9yUkAP75vUelvwHcmwmpOJmBZiJKFt9ZIqd62JzQR7c7n6Ss34aOoIiPvjgU9O5VycNJZwzOfqc=
-X-Received: by 2002:a2e:7d03:: with SMTP id y3mr434582ljc.0.1614804253733;
- Wed, 03 Mar 2021 12:44:13 -0800 (PST)
+        bh=jRuDUUKixXJZDP0HjES33qad4zVN4t6lxUgDAY1T79Q=;
+        b=CgCdvS4jES15PSkUQwVoGUshn8aByr0DXXMJtxNQaonyLoBlYaw4EHIx3JAYcRT96M
+         AWAd3RydksnYvXFQ7I4x8IvgKm9miVfPwkrvkUcndStckV4Rl0CDv7BDhIP3J/Ct0Qvg
+         cHUJZwzrz9OhTZ43pOcsoeoz5zvc/Vbt1a1QDZesJ7YiupHSF0LzY6pWL4BCILUZM3Cu
+         yEwUI41EfwrPt1wapFGw4K7HYZv78g5BZUHIXDey5wvgkB3KB2vLiT87FppQx0qS3JTd
+         Lm5CF1lFgKmxTB98Za4J9FthxdRswawJ2dbMCkBkUg/o0oagm2g70zHHI5w0voLsinSt
+         5j2w==
+X-Gm-Message-State: AOAM5328mngw2ohaW1RAYva5IZT/dOJRPxAOzZg0ICVtCE5GBGRi6lNm
+        nM3MbqEzWB8E5PLRu99Rm8cTw5SplMzmwQ==
+X-Google-Smtp-Source: ABdhPJwEWIydN9pybnOVxBlCgDLHfy9e/1x5OZkjIbXQfp6uzhsl+Sqfqb54hY15UbSWnCLoEcAcqw==
+X-Received: by 2002:a05:6512:3aa:: with SMTP id v10mr354130lfp.308.1614805029611;
+        Wed, 03 Mar 2021 12:57:09 -0800 (PST)
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com. [209.85.167.41])
+        by smtp.gmail.com with ESMTPSA id d8sm3043986lfg.96.2021.03.03.12.57.08
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Mar 2021 12:57:09 -0800 (PST)
+Received: by mail-lf1-f41.google.com with SMTP id d3so39365419lfg.10
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 12:57:08 -0800 (PST)
+X-Received: by 2002:ac2:58fc:: with SMTP id v28mr305345lfo.201.1614805028665;
+ Wed, 03 Mar 2021 12:57:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20210303183333.46543-1-masahiroy@kernel.org> <20210303183333.46543-4-masahiroy@kernel.org>
-In-Reply-To: <20210303183333.46543-4-masahiroy@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 3 Mar 2021 12:44:02 -0800
-Message-ID: <CAKwvOdmNKKpZY38=ayM3NfU5K_27P_CqkKtLx7CbRw6_mFuxPA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] kbuild: dwarf: use AS_VERSION instead of test_dwarf5_support.sh
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
+ <20210302232649.y2tutffhxsblwqlb@treble> <CAK7LNAReuB5zUq_7S8ZG25+tdQowECDOK1rApYvkPCpHhPjK5w@mail.gmail.com>
+ <20210303191516.6ksxmng4pis7ue4p@treble> <CAHk-=wjR0CyaKU=6mXW9W+65L8h8DQuBdA2ZY2CfrPe6qurz3A@mail.gmail.com>
+ <20210303193806.oovupl4ubtkkyiih@treble> <CAHk-=whA6zru0BaNm4uu5KyZe+aQpRScOnmc9hdOpO3W+xN9Xw@mail.gmail.com>
+ <20210303202406.bxgdx5a25j6wc43b@treble>
+In-Reply-To: <20210303202406.bxgdx5a25j6wc43b@treble>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 3 Mar 2021 12:56:52 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wi9J3mM8y+aH9e=HRo95giK4BRyyasayAimB0gdvbvDsQ@mail.gmail.com>
+Message-ID: <CAHk-=wi9J3mM8y+aH9e=HRo95giK4BRyyasayAimB0gdvbvDsQ@mail.gmail.com>
+Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT modules
+To:     Josh Poimboeuf <jpoimboe@redhat.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-hardening@vger.kernel.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Justin Forbes <jforbes@redhat.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Frank Eigler <fche@redhat.com>,
+        Kees Cook <keescook@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 3, 2021 at 10:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Wed, Mar 3, 2021 at 12:24 PM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
 >
-> The test code in scripts/test_dwarf5_support.sh is somewhat difficult
-> to understand, but after all, we want to check binutils >= 2.35.2
->
-> From the former discussion, the requrement for generating DRAWF v5 from
+> Your nack is for a different reason: GCC plugins are second-class
+> citizens.  Fair enough...
 
-^typos: s/requrement/requirement, s/DRAWF/DWARF
+MNo, I didn't NAK it. Quite the reverser.
 
-(in vim you can `:set spell` (`:set nospell` to disable), there's
-probably a nice way to auto set this on buffer entry for a commit
-message)
+I am ABSOLUTELY against rebuilding normal object files just because
+gcc versions change. A compiler version change makes zero difference
+for any normal object file.
 
-> C code is as follows:
->
->  - gcc + binutils as     -> requires gcc 5.0+ (but 7.0+ for full support)
->  - clang + binutils as   -> requires binutils 2.35.2+
->  - clang + integrated as -> OK
+But the gcc plugins are different. They very much _are_ tied to a
+particular gcc version.
 
-Yes. Thanks for the patch.
+Now, they are tied to a particular gcc version because they are
+horribly badly done, and bad technology, and I went off on a bit of a
+rant about just how bad they are, but the point is that gcc plugins
+depend on the exact gcc version in ways that normal object files do
+_not_.
 
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
->  lib/Kconfig.debug              | 3 +--
->  scripts/test_dwarf5_support.sh | 8 --------
->  2 files changed, 1 insertion(+), 10 deletions(-)
->  delete mode 100755 scripts/test_dwarf5_support.sh
->
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 2779c29d9981..f3337a38925d 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -284,8 +284,7 @@ config DEBUG_INFO_DWARF4
->
->  config DEBUG_INFO_DWARF5
->         bool "Generate DWARF Version 5 debuginfo"
-> -       depends on GCC_VERSION >= 50000 || CC_IS_CLANG
-> -       depends on CC_IS_GCC || $(success,$(srctree)/scripts/test_dwarf5_support.sh $(CC) $(CLANG_FLAGS))
-> +       depends on GCC_VERSION >= 50000 || (CC_IS_CLANG && AS_IS_GNU && AS_VERSION >= 23502) || (CC_IS_CLANG && AS_IS_LLVM)
-
-Would this be more concise as:
-+       depends on GCC_VERSION >= 50000 || (CC_IS_CLANG && (AS_IS_LLVM
-|| (AS_IS_GNU && AS_VERSION >= 23502))
-
->         depends on !DEBUG_INFO_BTF
->         help
->           Generate DWARF v5 debug info. Requires binutils 2.35.2, gcc 5.0+ (gcc
-> diff --git a/scripts/test_dwarf5_support.sh b/scripts/test_dwarf5_support.sh
-> deleted file mode 100755
-> index c46e2456b47a..000000000000
-> --- a/scripts/test_dwarf5_support.sh
-> +++ /dev/null
-> @@ -1,8 +0,0 @@
-> -#!/bin/sh
-> -# SPDX-License-Identifier: GPL-2.0
-> -
-> -# Test that the assembler doesn't need -Wa,-gdwarf-5 when presented with DWARF
-> -# v5 input, such as `.file 0` and `md5 0x00`. Should be fixed in GNU binutils
-> -# 2.35.2. https://sourceware.org/bugzilla/show_bug.cgi?id=25611
-> -echo '.file 0 "filename" md5 0x7a0b65214090b6693bd1dc24dd248245' | \
-> -  $* -gdwarf-5 -Wno-unused-command-line-argument -c -x assembler -o /dev/null -
-> --
-> 2.27.0
->
-
-
--- 
-Thanks,
-~Nick Desaulniers
+               Linus
