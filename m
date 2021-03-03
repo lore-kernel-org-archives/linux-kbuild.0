@@ -2,105 +2,108 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-21.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A30C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F04C433E6
 	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 01:02:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B5E264F83
+	by mail.kernel.org (Postfix) with ESMTP id 6897D64F93
 	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 01:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353066AbhCDBCK (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 20:02:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56630 "EHLO mail.kernel.org"
+        id S241533AbhCDBCE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Mar 2021 20:02:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60136 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1386545AbhCDAbl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 19:31:41 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 58C3F64E67;
-        Thu,  4 Mar 2021 00:30:58 +0000 (UTC)
+        id S1346274AbhCDARF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 3 Mar 2021 19:17:05 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E4CC864F23;
+        Wed,  3 Mar 2021 23:37:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614817859;
-        bh=cG2NMExV7RKwp4loVOfSt61stR3Ekjm51xkrLH9YtKM=;
+        s=k20201202; t=1614814676;
+        bh=QCCQHrxj18Ela26CMOkkAHtcJIjeecbSIqJn3aghvGg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mYbLPZ8ppcXg7nNOUTIPI93C6nUkkEjnZiT4kEfVyjSbF90gVFNd+gS8MucV4OzxR
-         aE5FL8fbIs2Sptm5uiWb1dgHctrZbql6xBb1DOJ9R4hfcTA0SVxbOrJcYCeIu28iLE
-         PEp/vOZjFgeHM1fv20FYZCuXfUzvK16AY6S/AClduuy/oaFDzY2jH5uXDaZyJ0Mv7A
-         Js8m2/1q7wibXLjKZU7kGOQLkOKxsEaawBIuX8eO6vKMX9C+bmqOkS+oRCqI4JZx5T
-         6tUb5PAecLGyGltgGHenPki9CGDxaD8HJbDmvf8r/1kJSu6KxetlieFgAPPMN3SNvV
-         WQL2aFp5JVIpg==
-Date:   Wed, 3 Mar 2021 17:30:55 -0700
+        b=oOxS63Mv3+Ue7LtrTZDn0Hkpt2HXFchTv0kaM+nSyyyqQUBfBACIPtegIG3xMeI3x
+         63XSKFLcCTqAsbL5LBiDga/iUBy9KLkSbCqfXT2y5vcrWlUmal5AXbmIoYhtorjKgR
+         fOQqq5/scBG+oBexGS9XRh0xeXvA/sSysahsm1mNWo3E3dT/5FX/vHuEdbeJ32gGD3
+         cFc960EgqGEbt13uOUh8Th6IkJl0m/YToHrZIfaDwMAjtwSEgOAtGwWKwRkgIgXDJB
+         FpfW5HPDbbCiXVl8MTsdk3EGMDdVP9mX7Jxbr/Y2QDnLzpWehlmj1ZO1h6ot3xXINj
+         RZkxDu45j+N6A==
+Date:   Wed, 3 Mar 2021 16:37:51 -0700
 From:   Nathan Chancellor <nathan@kernel.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] kbuild: dwarf: use AS_VERSION instead of
- test_dwarf5_support.sh
-Message-ID: <20210304003055.tsrqewikdekbhhax@archlinux-ax161>
+Subject: Re: [PATCH 1/4] kbuild: remove LLVM=1 test from HAS_LTO_CLANG
+Message-ID: <20210303233751.k5tkmjdt627oucn3@archlinux-ax161>
 References: <20210303183333.46543-1-masahiroy@kernel.org>
- <20210303183333.46543-4-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210303183333.46543-4-masahiroy@kernel.org>
+In-Reply-To: <20210303183333.46543-1-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Mar 04, 2021 at 03:33:33AM +0900, Masahiro Yamada wrote:
-> The test code in scripts/test_dwarf5_support.sh is somewhat difficult
-> to understand, but after all, we want to check binutils >= 2.35.2
+On Thu, Mar 04, 2021 at 03:33:30AM +0900, Masahiro Yamada wrote:
+> This guarding is wrong. As Documentation/kbuild/llvm.rst notes, LLVM=1
+> switches the default of tools, but you can still override CC, LD, etc.
+> individually.
 > 
-> >From the former discussion, the requrement for generating DRAWF v5 from
-> C code is as follows:
+> BTW, LLVM is not 1/0 flag. If LLVM is not passed in, it is empty.
 > 
->  - gcc + binutils as     -> requires gcc 5.0+ (but 7.0+ for full support)
->  - clang + binutils as   -> requires binutils 2.35.2+
->  - clang + integrated as -> OK
+> Non-zero return code is all treated as failure anyway.
+> 
+> So, $(success,test $(LLVM) -eq 1) and $(success,test "$(LLVM)" = 1)
+> works equivalently in the sense that both are expanded to 'n' if LLVM
+> is not given. The difference is that the former internally fails due
+> to syntax error.
+> 
+>   $ test ${LLVM} -eq 1
+>   bash: test: -eq: unary operator expected
+>   $ echo $?
+>   2
+> 
+>   $ test "${LLVM}" -eq 1
+>   bash: test: : integer expression expected
+>   $ echo $?
+>   2
+> 
+>   $ test "${LLVM}" = 1
+>   echo $?
+>   1
+> 
+>   $ test -n "${LLVM}"
+>   $ echo $?
+>   1
 > 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Yes, there is not too much point of checking if $(LLVM) is set or not
+because we already check for the other tools.
 
 Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
 > ---
 > 
->  lib/Kconfig.debug              | 3 +--
->  scripts/test_dwarf5_support.sh | 8 --------
->  2 files changed, 1 insertion(+), 10 deletions(-)
->  delete mode 100755 scripts/test_dwarf5_support.sh
+>  arch/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 2779c29d9981..f3337a38925d 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -284,8 +284,7 @@ config DEBUG_INFO_DWARF4
->  
->  config DEBUG_INFO_DWARF5
->  	bool "Generate DWARF Version 5 debuginfo"
-> -	depends on GCC_VERSION >= 50000 || CC_IS_CLANG
-> -	depends on CC_IS_GCC || $(success,$(srctree)/scripts/test_dwarf5_support.sh $(CC) $(CLANG_FLAGS))
-> +	depends on GCC_VERSION >= 50000 || (CC_IS_CLANG && AS_IS_GNU && AS_VERSION >= 23502) || (CC_IS_CLANG && AS_IS_LLVM)
->  	depends on !DEBUG_INFO_BTF
->  	help
->  	  Generate DWARF v5 debug info. Requires binutils 2.35.2, gcc 5.0+ (gcc
-> diff --git a/scripts/test_dwarf5_support.sh b/scripts/test_dwarf5_support.sh
-> deleted file mode 100755
-> index c46e2456b47a..000000000000
-> --- a/scripts/test_dwarf5_support.sh
-> +++ /dev/null
-> @@ -1,8 +0,0 @@
-> -#!/bin/sh
-> -# SPDX-License-Identifier: GPL-2.0
-> -
-> -# Test that the assembler doesn't need -Wa,-gdwarf-5 when presented with DWARF
-> -# v5 input, such as `.file 0` and `md5 0x00`. Should be fixed in GNU binutils
-> -# 2.35.2. https://sourceware.org/bugzilla/show_bug.cgi?id=25611
-> -echo '.file 0 "filename" md5 0x7a0b65214090b6693bd1dc24dd248245' | \
-> -  $* -gdwarf-5 -Wno-unused-command-line-argument -c -x assembler -o /dev/null -
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index 2bb30673d8e6..2af10ebe5ed0 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -632,7 +632,6 @@ config HAS_LTO_CLANG
+>  	def_bool y
+>  	# Clang >= 11: https://github.com/ClangBuiltLinux/linux/issues/510
+>  	depends on CC_IS_CLANG && CLANG_VERSION >= 110000 && LD_IS_LLD
+> -	depends on $(success,test $(LLVM) -eq 1)
+>  	depends on $(success,test $(LLVM_IAS) -eq 1)
+>  	depends on $(success,$(NM) --help | head -n 1 | grep -qi llvm)
+>  	depends on $(success,$(AR) --help | head -n 1 | grep -qi llvm)
 > -- 
 > 2.27.0
 > 
