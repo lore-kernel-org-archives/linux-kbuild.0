@@ -2,178 +2,167 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C256C433E0
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BB7C433DB
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2A54600EF
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A3F4600EF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378653AbhCCTbF (ORCPT
+        id S1387582AbhCCTb2 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 14:31:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51680 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242413AbhCCL0W (ORCPT
+        Wed, 3 Mar 2021 14:31:28 -0500
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:41877 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232069AbhCCLka (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 06:26:22 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7BCC061797
-        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 02:54:08 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id ba1so13842606plb.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 02:54:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=17qLkzVR4fDScPfY7vZjF5kcukiEHoAp19Fn4XkGuPo=;
-        b=u/CYVeOPKhDtW43/XVvuz7gk0ggCNlXYO/BohYk/i1Shlw8TnXQ8mPpl7cncGlo0qd
-         JH214uUjMbyZuFyBP/T3DsBTPOqdjdvZa445Nojt9SVx+7UwdW/pggOapqTesPf1RgTL
-         GB1916qdkRtWPfrOZ9JHRRHm6+Ri+rgizJzdsTtlnBS8SpM5C5eTxL97oa3m+uv6V6Cw
-         TYWNNPByPf5bP9t9Zj+WpQ7gl1H7up7IWrkzZZUaF4HMxl4/6UJ1Bv0wm7bT9piwN6UV
-         StCMWw0BGvH9f2WaQsnf40E6OUIzafuMudkNhgAzSM5cLh01ajDOwuE6Fk/NUJgnDfaF
-         zWQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=17qLkzVR4fDScPfY7vZjF5kcukiEHoAp19Fn4XkGuPo=;
-        b=cHuKmtk1vSsiz+5DbtO/kNBu8fKDedJi1ILBEATMPT5MgImPRCl+qr4hP4p/XPGpkx
-         IKNTCttZfco5qs83guU4m2711We1g212Lj7Ru2I4smbbI6EjxRmFtExHt2dMIa+441uE
-         7X/eP6IwxGYVXK/hxy3/+LrpP1YkJU/gREdV99ifXOU6b5O09g4zWCGsRwHDDza1lSa9
-         HT7nlnHjGxjjwuWUInIHwYhaUZJlaDMxUJLTF2nZdEBjLv0spF0V/lvb0ZQJpD25WOdy
-         xlysKEx1/YaZ0rOAfJpd8PFT2pFxvLLO1wYAh6XLM1CX4gkeOEiHfEGep1VDKz5bFp67
-         UlfA==
-X-Gm-Message-State: AOAM533P55vLq8GpI70HjAmQBJCMLku6zQTa8PZ3BckUPqle4fuO+Dgi
-        nnVfLX9xgNpvswxdg6tCQORFcA==
-X-Google-Smtp-Source: ABdhPJzhVZkcz7rWsr6j7MUmAYxKMm1V1EPTGHBCQ6bpz6KHLvxj7xlfX+AsSykXzna+hQyUBcaAtA==
-X-Received: by 2002:a17:90a:be09:: with SMTP id a9mr9023080pjs.219.1614768847836;
-        Wed, 03 Mar 2021 02:54:07 -0800 (PST)
-Received: from localhost ([122.171.124.15])
-        by smtp.gmail.com with ESMTPSA id b26sm20454717pfo.1.2021.03.03.02.54.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Mar 2021 02:54:07 -0800 (PST)
-Date:   Wed, 3 Mar 2021 16:24:04 +0530
-From:   Viresh Kumar <viresh.kumar@linaro.org>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Frank Rowand <frowand.list@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Pantelis Antoniou <pantelis.antoniou@konsulko.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Anmar Oueja <anmar.oueja@linaro.org>,
-        Bill Mills <bill.mills@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH V7 4/6] kbuild: Add support to build overlays (%.dtbo)
-Message-ID: <20210303105404.w2nramurt5teuvpd@vireshk-i7>
-References: <434ba2467dd0cd011565625aeb3450650afe0aae.1611904394.git.viresh.kumar@linaro.org>
- <CAMuHMdVp0vGMqoEoP9A7Y7-ph-DYUWdddtChdq_eZcROYTBMHg@mail.gmail.com>
- <20210205092507.fdxotdjlq5rjs2yh@vireshk-i7>
- <CAMuHMdWUMcMcJxnC+oML8P0+r72_+d6RWGY50dOWCUECdJGWPA@mail.gmail.com>
- <20210205095545.woevnkxg3ar7ctys@vireshk-i7>
- <CAMuHMdXKT3LD3ojMJEg-oHsEKO5TN5P1BTJMyf2fYkhnC8PU=Q@mail.gmail.com>
- <20210205210814.GA3707622@robh.at.kernel.org>
- <02728dac-5666-9c2b-bd46-9c2eabbb2ed8@gmail.com>
- <20210303052125.uh32ndnu5d6mem7c@vireshk-i7>
- <CAMuHMdVJYNf+QQNPSmBvt3njEECY1SJHA9jLAESrTnVuD0cfWA@mail.gmail.com>
+        Wed, 3 Mar 2021 06:40:30 -0500
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id 123BchjN031150;
+        Wed, 3 Mar 2021 20:38:44 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 123BchjN031150
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1614771524;
+        bh=h3LNR7fqXEjV5dRyMGMzxh6NqG+1wU6ysQj2qblhhvc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=X6j6L+ct5IWSkS2hhP3wHjeSWa5tyg7rGb74AZI6AluWiL2bsMg81AYEYsM/F/w0X
+         2qCmOgcTj9OTGTSo0jjpXuAKKTrRSFWzfvwk15RJDAVtJ+onIDMBE/IBWUEn0wb3vM
+         3erMIMrbWk6/lmR2xpYOkG3Ih5FxULZd1tO7orqp24N8B5HAtFRS6Tbsa/j42b/59W
+         gMdHFgAt9hNYORM1GD6Pcgk8V5stFtWEgmyuYwWscQ02Tc6ApPl+Vvf9PwamkKYasF
+         5y2nYOz4NEmlaz/9PEWm9l/gSXsE+jWjwQxDW25OrCftuteKn8rNm8yLH8lgkSKP97
+         oOaRhN2d/z+hA==
+X-Nifty-SrcIP: [209.85.214.181]
+Received: by mail-pl1-f181.google.com with SMTP id z7so13880922plk.7;
+        Wed, 03 Mar 2021 03:38:43 -0800 (PST)
+X-Gm-Message-State: AOAM530OoM4NFo+M3DOdZz2BeTnv2lLI0k8rqBeMHjL0Or37gVODrxRo
+        5M0trloUdvDlrqYN/lWVfkuOwDa6furpXST8UMU=
+X-Google-Smtp-Source: ABdhPJy5m7NZ7nI9yF1ughkJ515hruqzvRdlR0Sd4JiWa+uQR2PIqqhi79S9tmr2uACjr/aW1PWqPFGf89wbUOjkpSU=
+X-Received: by 2002:a17:90a:5510:: with SMTP id b16mr9232214pji.87.1614771523191;
+ Wed, 03 Mar 2021 03:38:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVJYNf+QQNPSmBvt3njEECY1SJHA9jLAESrTnVuD0cfWA@mail.gmail.com>
-User-Agent: NeoMutt/20180716-391-311a52
+References: <20210302221211.1620858-1-bero@lindev.ch> <20210303040237.tvwo34j322tzqnwz@archlinux-ax161>
+In-Reply-To: <20210303040237.tvwo34j322tzqnwz@archlinux-ax161>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 3 Mar 2021 20:38:06 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ8zvEv50HgD4HOzjMBYB7UAHggTsQ7OwoGgktXSDjzYQ@mail.gmail.com>
+Message-ID: <CAK7LNAQ8zvEv50HgD4HOzjMBYB7UAHggTsQ7OwoGgktXSDjzYQ@mail.gmail.com>
+Subject: Re: [PATCH] Fix ld-version.sh script if LLD was built with LLD_VENDOR
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <bero@lindev.ch>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 03-03-21, 11:44, Geert Uytterhoeven wrote:
-> Hi Viresh,
-> 
-> On Wed, Mar 3, 2021 at 6:21 AM Viresh Kumar <viresh.kumar@linaro.org> wrote:
-> > On 24-02-21, 19:32, Frank Rowand wrote:
-> > > I overlooked this and mistakenly thought that the move to .dtbo also
-> > > involved changing to .dtso.  My bad.
-> > >
-> > > My favorite color here is to use .dtso for the source file that will
-> > > be compiled to create a .dtbo.
-> > >
-> > > Linus has already accepted patch 4/6 to 5.12-rc1, so changing to .dtso
-> > > will require another patch.
+On Wed, Mar 3, 2021 at 1:02 PM Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> Hi Bernhard,
+>
+> I have added the ClangBuiltLinux mailing list, kbuild mailing list, and
+> Masahiro and Nick to CC. Maybe ld-version.sh and cc-version.sh should be
+> added to a MAINTAINERS entry to make sure we get CC'd (I can send one
+> along tomorrow).
+>
+> On Tue, Mar 02, 2021 at 11:12:11PM +0100, Bernhard Rosenkr=C3=A4nzer wrot=
+e:
+> > If LLD was built with -DLLD_VENDOR=3D"xyz", ld.lld --version output
+> > will prefix LLD_VENDOR. Since LLD_VENDOR can contain spaces, the
+> > LLD identifier isn't guaranteed to be $2 either.
+>
+> TIL about LLD_VENDOR...
+>
+> > Adjust the version checker to handle such versions of lld.
 > >
-> > Looks like this is what many people desire, lets do it and make it a
-> > standard even if it wasn't followed earlier.
+> > Signed-off-by: Bernhard Rosenkr=C3=A4nzer <bero@lindev.ch>
+> > ---
+> >  scripts/ld-version.sh | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
 > >
-> > What about this ?
-> 
-> Thanks, looks good to me, and works for me, so
-> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> > index a463273509b5..4c042a306e22 100755
+> > --- a/scripts/ld-version.sh
+> > +++ b/scripts/ld-version.sh
+> > @@ -49,6 +49,18 @@ elif [ "$1" =3D LLD ]; then
+> >       min_version=3D$lld_min_version
+> >       name=3DLLD
+> >       disp_name=3DLLD
+> > +elif echo "$@" |grep -q ' LLD '; then
+> > +     # if LLD was built with -DLLD_VENDOR=3D"xyz", it ld.lld --version
+> > +     # says "xyz LLD [...]". Since LLD_VENDOR may contain spaces, we
+> > +     # don't know the exact position of "LLD" and the version info
+> > +     # at this point
+> > +     while [ "$1" !=3D "LLD" ]; do
+> > +             shift
+> > +     done
+> > +     version=3D$2
+> > +     min_version=3D$lld_min_version
+> > +     name=3DLLD
+> > +     disp_name=3DLLD
+> >  else
+> >       echo "$orig_args: unknown linker" >&2
+> >       exit 1
+> > --
+> > 2.30.1
+> >
+>
+> I am not sure what a better fix would be of the top of my head but
+> wouldn't it be better to avoid the duplication? This diff below works
+> for me with or without LLD_VENDOR defined.
+>
+> diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> index a463273509b5..84f9fc741f09 100755
+> --- a/scripts/ld-version.sh
+> +++ b/scripts/ld-version.sh
+> @@ -44,7 +44,10 @@ if [ "$1" =3D GNU -a "$2" =3D ld ]; then
+>  elif [ "$1" =3D GNU -a "$2" =3D gold ]; then
+>         echo "gold linker is not supported as it is not capable of linkin=
+g the kernel proper." >&2
+>         exit 1
+> -elif [ "$1" =3D LLD ]; then
+> +elif echo "$*" | grep -q LLD; then
+> +       while [ "$1" !=3D "LLD" ]; do
+> +               shift
+> +       done
+>         version=3D$2
+>         min_version=3D$lld_min_version
+>         name=3DLLD
 
-Thanks.
 
-> > --- a/scripts/Makefile.lib
-> > +++ b/scripts/Makefile.lib
-> > @@ -337,7 +337,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
-> >
-> >  quiet_cmd_dtc = DTC     $@
-> >  cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-> > -       $(DTC) -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
-> > +       $(DTC) -I dts -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
-> >                 $(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
-> >                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
-> >         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
-> > @@ -348,6 +348,9 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
-> >  $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
-> >         $(call if_changed_dep,dtc)
-> >
-> > +$(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
-> > +       $(call if_changed_dep,dtc)
-> > +
-> >  overlay-y := $(addprefix $(obj)/, $(overlay-y))
-> >
-> >  quiet_cmd_fdtoverlay = DTOVL   $@
-> > @@ -373,6 +376,9 @@ endef
-> >  $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
-> >         $(call if_changed_rule,dtc,yaml)
-> >
-> > +$(obj)/%.dt.yaml: $(src)/%.dtso $(DTC) $(DT_TMP_SCHEMA) FORCE
-> 
-> I'm wondering if "dt.yaml" should be changed to "dto.yaml" (here and in
-> the existing rule earlier in Makefile.lib), to avoid issues if both foo.dts and
-> foo.dtso exist? Unlikely, but it might happen...
 
-I will let Rob answer that :)
+You do not need to use grep.
+How about this?
 
-> > I had to keep the original line as is:
-> >
-> >  $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
-> >
-> > to support the unittest stuff as there are no dtso files there. There
-> > are few things we can do here:
-> >
-> > - Don't follow the dtso/dtbo convention for unittest, build files as
-> >   dtb only and everything will continue to work I suppose as
-> >   fdtoverlay won't complain.
-> >
-> > - Keep the above line in Makefile, this doesn't sound right, isn't it
-> >   ?
-> >
-> > - Make .dts links for unittest file, maybe from the Makefile itself.
-> >
-> > - Something else ?
-> 
-> Rename unittest .dts files to .dtso where applicable?
 
-They are used for some runtime tests, we are reusing them to do this
-testing as well, so renaming them is out of the question I believe.
 
--- 
-viresh
+
+        ...
+else
+        while [ $# -gt 1 -a "$1" !=3D "LLD" ]; do
+               shift
+        done
+
+        if [ "$1" =3D LLD ]; then
+                version=3D$2
+                min_version=3D$lld_min_version
+                name=3DLLD
+                disp_name=3DLLD
+        else
+                echo "$orig_args: unknown linker" >&2
+                exit 1
+        fi
+fi
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
