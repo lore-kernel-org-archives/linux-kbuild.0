@@ -7,44 +7,57 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5084FC4332E
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 23:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2BFC4361A
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3730064F64
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 23:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BADE364E56
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 00:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230227AbhCCX7h (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 18:59:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30294 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1388035AbhCCUd0 (ORCPT
+        id S231133AbhCCX7j (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Mar 2021 18:59:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1390131AbhCCWCA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 15:33:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614803519;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rp8C696QhKx8WEsv8npjzvCJHKF8U4KwqfIW0LL6UTo=;
-        b=Pi6r3i72j7HR3ZrAoy9duVv3/4e57Br+IeG+iJZ+AzncZ3r7fK6xrP/rJl9H5m0i1/pyQF
-        zaxugn4zH/9CG0/EkPumQ6eKUPjmFJ9IbkBeXG2eq88VmzlhGyT0bFtLJh+VRPhinR8oF4
-        8eX66NvjcE0sg25Arz8xXVBR2dLmu4g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-549-ExOu-U9oO0eSbnF6gui41A-1; Wed, 03 Mar 2021 15:31:58 -0500
-X-MC-Unique: ExOu-U9oO0eSbnF6gui41A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42B5C514A;
-        Wed,  3 Mar 2021 20:31:56 +0000 (UTC)
-Received: from treble (ovpn-114-218.rdu2.redhat.com [10.10.114.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A645360BFA;
-        Wed,  3 Mar 2021 20:31:53 +0000 (UTC)
-Date:   Wed, 3 Mar 2021 14:31:50 -0600
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
+        Wed, 3 Mar 2021 17:02:00 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 993EBC06175F
+        for <linux-kbuild@vger.kernel.org>; Wed,  3 Mar 2021 13:52:55 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id a4so17359392pgc.11
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Mar 2021 13:52:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=U4O+yoeWHzagedfUZbZH3qiIab8SJ8X8eM+Tksp4UhY=;
+        b=YYN0VZ5WcAWAdy5YeXEE1zzzPSpAz9ryE+zz2Xjricab0JVxyluPP4MCa4XoxvZyfy
+         PfoXpn+gE9tdYbkr5nG+wTiMmd0FKuwgAulwdpx7KWHw8T7g/kR8Q+EDGF6YJwapvUHQ
+         BTZa6v14yrVnKiN9VM1L5Am+qXRvEVRvEOeE4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=U4O+yoeWHzagedfUZbZH3qiIab8SJ8X8eM+Tksp4UhY=;
+        b=KtIicDwhk9axRdWCEadDyFnDnmlmC033alb7Xgi+q+WFRqp4Rk/CF//DL+4OqXZGaT
+         3IeHMupY8hdKd40eEHnMDofstYir3U634Z2cZS6cwOE9chgnaT0QLCHiuJbtoFxck7g3
+         m4VwhBkZ7gUoMtLqRwXnMouzeyvdsw25rUloJaMOke38t8KuaQwdRtVmKd5jJrMVEAEw
+         5vOF8bRpJD/Q5+RvDdQWDlqcmbbNJQiaKzqB7Tt7v1VBbGhWbzID5ANkbXzKcIyho8cG
+         menYpq6qeaaMStBmHpxRDJof1/FnSVrt5dTglvWQEyYFZDULTmqcFHPxq1YMv4/C6aod
+         Yhig==
+X-Gm-Message-State: AOAM531kMix4L7+XjR51nhvL45uecD5AgtRTuVsKNPmQ7kBs8ZzEIvI+
+        lPdFidRd2zBVfNV4P3Gs5AmDvA==
+X-Google-Smtp-Source: ABdhPJzRbr7qT0eiEBpzaXHBBfgfy8P7f5UDk1iAQYT1T8aUAdJl816Nk43z6fbffM6tjXW+X0hvoA==
+X-Received: by 2002:a63:3e03:: with SMTP id l3mr427004pga.452.1614808375205;
+        Wed, 03 Mar 2021 13:52:55 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id k69sm25568517pfd.4.2021.03.03.13.52.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 13:52:54 -0800 (PST)
+Date:   Wed, 3 Mar 2021 13:52:53 -0800
+From:   Kees Cook <keescook@chromium.org>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         linux-hardening@vger.kernel.org,
@@ -52,11 +65,10 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Justin Forbes <jforbes@redhat.com>,
         Ondrej Mosnacek <omosnace@redhat.com>,
-        Frank Eigler <fche@redhat.com>,
-        Kees Cook <keescook@chromium.org>
+        Frank Eigler <fche@redhat.com>
 Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT
  modules
-Message-ID: <20210303203150.jwupthv6siil6tn2@treble>
+Message-ID: <202103031334.8D898CA@keescook>
 References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
  <20210302232649.y2tutffhxsblwqlb@treble>
  <CAK7LNAReuB5zUq_7S8ZG25+tdQowECDOK1rApYvkPCpHhPjK5w@mail.gmail.com>
@@ -64,44 +76,56 @@ References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@re
  <CAHk-=wjR0CyaKU=6mXW9W+65L8h8DQuBdA2ZY2CfrPe6qurz3A@mail.gmail.com>
  <20210303193806.oovupl4ubtkkyiih@treble>
  <CAHk-=whA6zru0BaNm4uu5KyZe+aQpRScOnmc9hdOpO3W+xN9Xw@mail.gmail.com>
- <20210303202406.bxgdx5a25j6wc43b@treble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210303202406.bxgdx5a25j6wc43b@treble>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAHk-=whA6zru0BaNm4uu5KyZe+aQpRScOnmc9hdOpO3W+xN9Xw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 02:24:12PM -0600, Josh Poimboeuf wrote:
-> On Wed, Mar 03, 2021 at 11:57:33AM -0800, Linus Torvalds wrote:
-> > On Wed, Mar 3, 2021 at 11:38 AM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
-> > >
-> > > > But in the meantime, making the plugins depend on the gcc version some
-> > > > way is certainly better than not doing so.
-> > >
-> > > So currently, the plugins already so that.  They require the GCC version
-> > > to be exact.  If there's a mismatch, then it fails the OOT module build.
-> > 
-> > That's not my experience.
-> > 
-> > Yes, the build fails, but it fails not by _rebuilding_, but by failing
-> > with an error.
-> 
-> Um, that's what I said.  It does not rebuild.  It fails with an error.
-> 
-> The *proposal* is to rebuild the plugin -- which Masahiro nacked because
-> he claims GCC mismatches aren't supported for OOT builds (plugin or
-> not).
-> 
-> Your nack is for a different reason: GCC plugins are second-class
-> citizens.  Fair enough...
+On Wed, Mar 03, 2021 at 11:57:33AM -0800, Linus Torvalds wrote:
+> End result: gcc plugins are pure garbage, and you should shun them. If
 
-Or was it a nack? :-)  Reading your message again, I may have
-misinterpreted.  Put simply, should we rebuild plugins when the GCC
-version changes?
+I think that's pretty harsh, but okay, opinions are opinions. As Josh
+says, people are interested in them for not-uncommon real-world uses:
+
+- stackleak has data-lifetime wiping coverage that -ftrivial-auto-var-init=zero
+  for either Clang or GCC doesn't cover. There are no plans to provide
+  such coverage under Clang yet. It's arguable that stackleak's benefits
+  are smaller than it's maintenance burden compared to having
+  -ftrivial-auto-var-init=zero, but we can have that conversation when
+  we get there. :)
+
+- structleak is likely to vanish as soon as GCC supports
+  -ftrivial-auto-var-init=zero. Clang's implementation is done and in
+  use by every Clang-built kernel I know of.
+
+- latent_entropy is likely less useful since the jitter entropy was added,
+  but I've not seen anyone analyze it. No "upstream" GCC nor Clang support
+  is planned.
+
+- arm32 per-task stack protector canary meaningfully reduces the risk of
+  stack content exposures vs stack frame overwrites, but neither GCC
+  nor Clang seem interested in implementing this "correctly" (as done
+  for arm64 on GCC -- Clang doesn't have this for arm64 yet). I want this
+  fixed for arm64 on Clang, and maybe arm32 can be done at the same time.
+
+- randstruct is likely not used for distro kernels, but very much for
+  end users where security has a giant priority over performance.
+  There's no "upstream" GCC plan for this, and the Clang support has
+  stalled.
+
+> you really believe you need compiler plugins, you should look at
+> clang.
+
+This is currently true only in 1 case (structleak), and only a few
+"traditional" distros are building the kernel with Clang right now. I
+don't disagree: doing this via LLVM IR would be much easier, but the
+implementations for the other above features don't exist yet. I expect
+this to change over time (I expect Clang's randstruct and GCC's
+-ftrivial-auto-var-init=zero to likely be the next two things to
+appear), but it's not the case right now.
 
 -- 
-Josh
-
+Kees Cook
