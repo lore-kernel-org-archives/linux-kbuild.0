@@ -2,150 +2,253 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92433C433E6
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B4DC4332B
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5583364ECF
-	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98E6F64ECF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  3 Mar 2021 21:21:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387661AbhCCTcg (ORCPT
+        id S1387658AbhCCTca (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 14:32:36 -0500
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:35184 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234166AbhCCSyH (ORCPT
+        Wed, 3 Mar 2021 14:32:30 -0500
+Received: from conuserg-09.nifty.com ([210.131.2.76]:63652 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1580862AbhCCSfY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 13:54:07 -0500
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 123IoDLr006152;
-        Thu, 4 Mar 2021 03:50:13 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 123IoDLr006152
+        Wed, 3 Mar 2021 13:35:24 -0500
+Received: from localhost.localdomain (122-103-140-163.kyoto.fdn.vectant.ne.jp [122.103.140.163]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 123IXcJe023524;
+        Thu, 4 Mar 2021 03:33:39 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 123IXcJe023524
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1614797413;
-        bh=fvTDpDKpHB2RoYVt26aVSfRN8H+EkrwI+Rs0xBOTnaY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=x056maJ4bLhrtmh+om8k4pFwPKY7SUSf9fSjaV61pzOCe+r54ANja43k/dNlMyfKT
-         viwScA1dES2h6rSh+y8sxfXG50bhOUTFL50oo+aGXOopPxi1KGwpoxuXoGfiT/0XJn
-         K/HDajcgWeaxF79vOsyd1HbV/PXQxNf6tCJwPRSKb4kqI0g+2H04+Jiz4pjEUoaZ1G
-         VdnQuEAn3+bb3l8+b7TbVnr4hU8tij4eL24zMCrYmtb+BPNI8ZuquwvA0EJufn+93R
-         UZouzZ2hY5rr/81r8aLXZRR8oM17llg0B0UCDpp/2+T0ludvTD2Uf9yEdhS62DmQvP
-         Xo8EMzomXHMnQ==
-X-Nifty-SrcIP: [209.85.215.182]
-Received: by mail-pg1-f182.google.com with SMTP id t25so17053281pga.2;
-        Wed, 03 Mar 2021 10:50:13 -0800 (PST)
-X-Gm-Message-State: AOAM533Iy1qEQBUJU3+Iu8yHslbsYEvkWk3TspHToky1aKaonaVNDN0g
-        t0UC61vAQHBjah6nmQVr1FaHw/vt9p7/nOtq5u8=
-X-Google-Smtp-Source: ABdhPJxJeSO/hkm+twwtXdqQxYmlQhQvuY5QvILOCuJ2lY3fPjFUNkrsevggNJm/rQDa4DHuSRNV0XWfvtHG038rb6o=
-X-Received: by 2002:a65:428b:: with SMTP id j11mr292481pgp.47.1614797412617;
- Wed, 03 Mar 2021 10:50:12 -0800 (PST)
-MIME-Version: 1.0
-References: <efe6b039a544da8215d5e54aa7c4b6d1986fc2b0.1611607264.git.jpoimboe@redhat.com>
- <20210302232649.y2tutffhxsblwqlb@treble>
-In-Reply-To: <20210302232649.y2tutffhxsblwqlb@treble>
+        s=dec2015msa; t=1614796420;
+        bh=Pb1Yn9QvQ5AqxXkqEhyuLAwufQCMvV+RCtumnsJ0qLI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Hdk8QCc0QBD0wXv5XQm0bhs082hZoScaAVjKvmLgguaZNjIB8DqE+y3UwoXWeGA72
+         eq3fuWMsDEuxwdBqGlbOQw65sUkDeYH4FzoMc4EbrZyOd1uqDKV/HqHqsx5y9Z98ra
+         48o3+GAPma/UfL+pNigYUnUGyYFkC8SpFED+66Tn3Kjnw7zH9vsfWluqLuTTEW8sXG
+         MDbpTzSKiOIpHJMT3sQdoZD8oTFT94OXU0xeKBUvIg+3EqOtYy/CBJoM4LzgytuWup
+         EtxPJi937UZvWQsMBq6OZjOKlOhNcc7+0QjiLqTUSkK+/2Kiq7j2GKjZRBJZGwFYRV
+         YBTXhrF2nHXOQ==
+X-Nifty-SrcIP: [122.103.140.163]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 4 Mar 2021 03:49:35 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAReuB5zUq_7S8ZG25+tdQowECDOK1rApYvkPCpHhPjK5w@mail.gmail.com>
-Message-ID: <CAK7LNAReuB5zUq_7S8ZG25+tdQowECDOK1rApYvkPCpHhPjK5w@mail.gmail.com>
-Subject: Re: [PATCH RFC] gcc-plugins: Handle GCC version mismatch for OOT modules
-To:     Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-hardening@vger.kernel.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Justin Forbes <jforbes@redhat.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Frank Eigler <fche@redhat.com>,
-        Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     clang-built-linux@googlegroups.com,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/4] kbuild: check the minimum assembler version in Kconfig
+Date:   Thu,  4 Mar 2021 03:33:32 +0900
+Message-Id: <20210303183333.46543-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210303183333.46543-1-masahiroy@kernel.org>
+References: <20210303183333.46543-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 3, 2021 at 8:27 AM Josh Poimboeuf <jpoimboe@redhat.com> wrote:
->
-> On Mon, Jan 25, 2021 at 02:42:10PM -0600, Josh Poimboeuf wrote:
-> > When building out-of-tree kernel modules, the build system doesn't
-> > require the GCC version to match the version used to build the original
-> > kernel.  That's probably [1] fine.
-> >
-> > In fact, for many distros, the version of GCC used to build the latest
-> > kernel doesn't necessarily match the latest released GCC, so a GCC
-> > mismatch turns out to be pretty common.  And with CONFIG_MODVERSIONS
-> > it's probably more common.
-> >
-> > So a lot of users have come to rely on being able to use a different
-> > version of GCC when building OOT modules.
-> >
-> > But with GCC plugins enabled, that's no longer allowed:
-> >
-> >   cc1: error: incompatible gcc/plugin versions
-> >   cc1: error: failed to initialize plugin ./scripts/gcc-plugins/structleak_plugin.so
-> >
-> > That error comes from the plugin's call to
-> > plugin_default_version_check(), which strictly enforces the GCC version.
-> > The strict check makes sense, because there's nothing to prevent the GCC
-> > plugin ABI from changing -- and it often does.
-> >
-> > But failing the build isn't necessary.  For most plugins, OOT modules
-> > will otherwise work just fine without the plugin instrumentation.
-> >
-> > When a GCC version mismatch is detected, print a warning and disable the
-> > plugin.  The only exception is the RANDSTRUCT plugin which needs all
-> > code to see the same struct layouts.  In that case print an error.
->
-> Hi Masahiro,
->
-> This problem is becoming more prevalent.  We will need to fix it one way
-> or another, if we want to support distro adoption of these GCC
-> plugin-based features.
->
-> Frank suggested a possibly better idea: always rebuild the plugins when
-> the GCC version changes.
+Documentation/process/changes.rst defines the minimum assembler version
+(binutils version), but we have never checked it in the build time.
 
+Kbuild never invokes 'as' directly because all assembly files in the
+kernel tree are *.S, hence must be preprocessed. I do not expect
+raw assembly source files (*.s) would be added to the kernel tree.
 
-That is just another form of the previous patch,
-which was already rejected.
+Therefore, we always use $(CC) as the assembler driver, and commit
+aa824e0c962b ("kbuild: remove AS variable") removed 'AS'. However,
+we are still interested in the version of the assembler sitting behind.
 
+As usual, the --version option prints the version string.
 
-- That is a hack just for external modules
-- Our consensus is, use the same version for the kernel and external modules
+  $ as --version | head -n 1
+  GNU assembler (GNU Binutils for Ubuntu) 2.35.1
 
+But, we do not have $(AS). So, we can add the -Wa prefix so that
+$(CC) passes --version down to the backing assembler.
 
+  $ gcc -Wa,--version | head -n 1
+  gcc: fatal error: no input files
+  compilation terminated.
 
-I use Ubuntu, and I do not see such a problem.
-(I have never seen it on Debian either, except sid.)
+OK, we need to input something to satisfy gcc.
 
-I see Fedora providing GCC whose version is different
-from the one used for building the kernel.
-That is a problem on the distribution side.
+  $ gcc -Wa,--version -c -x assembler /dev/null -o /dev/null | head -n 1
+  GNU assembler (GNU Binutils for Ubuntu) 2.35.1
 
+The combination of Clang and GNU assembler works in the same way:
 
+  $ clang -no-integrated-as -Wa,--version -c -x assembler /dev/null -o /dev/null | head -n 1
+  GNU assembler (GNU Binutils for Ubuntu) 2.35.1
 
-In my ubuntu.
+Clang with the integrated assembler fails like this:
 
-$ grep CC_VERSION_TEXT   /lib/modules/$(uname -r)/build/.config
-CONFIG_CC_VERSION_TEXT="gcc (Ubuntu 10.2.0-13ubuntu1) 10.2.0"
-$ gcc --version  | head -n1
-gcc (Ubuntu 10.2.0-13ubuntu1) 10.2.0
+  $ clang -integrated-as -Wa,--version -c -x assembler /dev/null -o /dev/null | head -n 1
+  clang: error: unsupported argument '--version' to option 'Wa,'
 
+With all this in my mind, I implemented scripts/as-version.sh.
 
+  $ scripts/as-version.sh gcc
+  GNU 23501
+  $ scripts/as-version.sh clang -no-integrated-as
+  GNU 23501
+  $ scripts/as-version.sh clang -integrated-as
+  LLVM 0
 
-> What do you think?
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-NACK.
+ arch/Kconfig            |  3 +-
+ init/Kconfig            | 12 +++++++
+ scripts/Kconfig.include |  6 ++++
+ scripts/as-version.sh   | 77 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 96 insertions(+), 2 deletions(-)
+ create mode 100755 scripts/as-version.sh
 
+diff --git a/arch/Kconfig b/arch/Kconfig
+index 2af10ebe5ed0..d7214f4ae1f7 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -631,8 +631,7 @@ config ARCH_SUPPORTS_LTO_CLANG_THIN
+ config HAS_LTO_CLANG
+ 	def_bool y
+ 	# Clang >= 11: https://github.com/ClangBuiltLinux/linux/issues/510
+-	depends on CC_IS_CLANG && CLANG_VERSION >= 110000 && LD_IS_LLD
+-	depends on $(success,test $(LLVM_IAS) -eq 1)
++	depends on CC_IS_CLANG && CLANG_VERSION >= 110000 && LD_IS_LLD && AS_IS_LLVM
+ 	depends on $(success,$(NM) --help | head -n 1 | grep -qi llvm)
+ 	depends on $(success,$(AR) --help | head -n 1 | grep -qi llvm)
+ 	depends on ARCH_SUPPORTS_LTO_CLANG
+diff --git a/init/Kconfig b/init/Kconfig
+index 22946fe5ded9..f76e5a44e4fe 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -41,6 +41,18 @@ config CLANG_VERSION
+ 	default $(cc-version) if CC_IS_CLANG
+ 	default 0
+ 
++config AS_IS_GNU
++	def_bool $(success,test "$(as-name)" = GNU)
++
++config AS_IS_LLVM
++	def_bool $(success,test "$(as-name)" = LLVM)
++
++config AS_VERSION
++	int
++	# If it is integrated assembler, the version is the same as Clang's one.
++	default CLANG_VERSION if AS_IS_LLVM
++	default $(as-version)
++
+ config LD_IS_BFD
+ 	def_bool $(success,test "$(ld-name)" = BFD)
+ 
+diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+index 58fdb5308725..0496efd6e117 100644
+--- a/scripts/Kconfig.include
++++ b/scripts/Kconfig.include
+@@ -45,6 +45,12 @@ $(error-if,$(success,test -z "$(cc-info)"),Sorry$(comma) this compiler is not su
+ cc-name := $(shell,set -- $(cc-info) && echo $1)
+ cc-version := $(shell,set -- $(cc-info) && echo $2)
+ 
++# Get the assembler name, version, and error out if it is not supported.
++as-info := $(shell,$(srctree)/scripts/as-version.sh $(CC) $(CLANG_FLAGS))
++$(error-if,$(success,test -z "$(as-info)"),Sorry$(comma) this assembler is not supported.)
++as-name := $(shell,set -- $(as-info) && echo $1)
++as-version := $(shell,set -- $(as-info) && echo $2)
++
+ # Get the linker name, version, and error out if it is not supported.
+ ld-info := $(shell,$(srctree)/scripts/ld-version.sh $(LD))
+ $(error-if,$(success,test -z "$(ld-info)"),Sorry$(comma) this linker is not supported.)
+diff --git a/scripts/as-version.sh b/scripts/as-version.sh
+new file mode 100755
+index 000000000000..205d8b9fc4d4
+--- /dev/null
++++ b/scripts/as-version.sh
+@@ -0,0 +1,77 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Print the assembler name and its version in a 5 or 6-digit form.
++# Also, perform the minimum version check.
++# (If it is the integrated assembler, return 0 as the version, and
++# the version check is skipped.)
++
++set -e
++
++# Convert the version string x.y.z to a canonical 5 or 6-digit form.
++get_canonical_version()
++{
++	IFS=.
++	set -- $1
++
++	# If the 2nd or 3rd field is missing, fill it with a zero.
++	#
++	# The 4th field, if present, is ignored.
++	# This occurs in development snapshots as in 2.35.1.20201116
++	echo $((10000 * $1 + 100 * ${2:-0} + ${3:-0}))
++}
++
++orig_args="$@"
++
++# Get the first line of the --version output.
++IFS='
++'
++# Add 2>&1 to check both stdout and stderr.
++# If the backing assembler is binutils, we get the version string in stdout.
++# If it is clang's integrated assembler, we get the following error in stderr:
++#   clang: error: unsupported argument '--version' to option 'Wa,'
++# To avoid the error message affected by locale, set LC_MESSAGES=C just in case.
++set -- $(LC_MESSAGES=C "$@" -Wno-unused-command-line-argument -Wa,--version -c -x assembler /dev/null -o /dev/null 2>&1)
++line="$1"
++
++if [ "$line" = "clang: error: unsupported argument '--version' to option 'Wa,'" ]; then
++	# For the intergrated assembler, we do not check the version here.
++	# It is the same as the clang version, and it has been already checked
++	# by scripts/cc-version.sh.
++	echo LLVM 0
++	exit 0
++fi
++
++# Split the line on spaces.
++IFS=' '
++set -- $line
++
++tool_version=$(dirname $0)/tool-version.sh
++
++if [ "$1" = GNU -a "$2" = assembler ]; then
++	shift $(($# - 1))
++	version=$1
++	min_version=$($tool_version binutils)
++	name=GNU
++else
++	echo "$orig_args: unknown assembler invoked" >&2
++	exit 1
++fi
++
++# Some distributions append a package release number, as in 2.34-4.fc32
++# Trim the hyphen and any characters that follow.
++version=${version%-*}
++
++cversion=$(get_canonical_version $version)
++min_cversion=$(get_canonical_version $min_version)
++
++if [ "$cversion" -lt "$min_cversion" ]; then
++	echo >&2 "***"
++	echo >&2 "*** Assembler is too old."
++	echo >&2 "***   Your $name assembler version:    $version"
++	echo >&2 "***   Minimum $name assembler version: $min_version"
++	echo >&2 "***"
++	exit 1
++fi
++
++echo $name $cversion
+-- 
+2.27.0
 
->  Any suggestions on how to
-> implement that?  Otherwise I can try to hack something together.
->
-> --
-> Josh
->
---
-Best Regards
-Masahiro Yamada
