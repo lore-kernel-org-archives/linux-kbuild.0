@@ -2,108 +2,124 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F04C433E6
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 01:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DEFC433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 03:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6897D64F93
-	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 01:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A15464DE8
+	for <linux-kbuild@archiver.kernel.org>; Thu,  4 Mar 2021 03:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241533AbhCDBCE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 3 Mar 2021 20:02:04 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60136 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346274AbhCDARF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 Mar 2021 19:17:05 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E4CC864F23;
-        Wed,  3 Mar 2021 23:37:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614814676;
-        bh=QCCQHrxj18Ela26CMOkkAHtcJIjeecbSIqJn3aghvGg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oOxS63Mv3+Ue7LtrTZDn0Hkpt2HXFchTv0kaM+nSyyyqQUBfBACIPtegIG3xMeI3x
-         63XSKFLcCTqAsbL5LBiDga/iUBy9KLkSbCqfXT2y5vcrWlUmal5AXbmIoYhtorjKgR
-         fOQqq5/scBG+oBexGS9XRh0xeXvA/sSysahsm1mNWo3E3dT/5FX/vHuEdbeJ32gGD3
-         cFc960EgqGEbt13uOUh8Th6IkJl0m/YToHrZIfaDwMAjtwSEgOAtGwWKwRkgIgXDJB
-         FpfW5HPDbbCiXVl8MTsdk3EGMDdVP9mX7Jxbr/Y2QDnLzpWehlmj1ZO1h6ot3xXINj
-         RZkxDu45j+N6A==
-Date:   Wed, 3 Mar 2021 16:37:51 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] kbuild: remove LLVM=1 test from HAS_LTO_CLANG
-Message-ID: <20210303233751.k5tkmjdt627oucn3@archlinux-ax161>
-References: <20210303183333.46543-1-masahiroy@kernel.org>
+        id S232671AbhCDDhB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 3 Mar 2021 22:37:01 -0500
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:43488 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232582AbhCDDgd (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 3 Mar 2021 22:36:33 -0500
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 1243Zbd8025528;
+        Thu, 4 Mar 2021 12:35:37 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 1243Zbd8025528
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1614828937;
+        bh=9xlyy3Pf9ec/TJfLoVRw1xhcBXuHNCdaC+6iRdmoiN0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ArOUi1Y+M6d+Cd5N8OVt3uLfBXKXkmKZ0t2HZBSHXScOiGOdfTTSi7RKUSofExYNq
+         JNtpZl9uMKAcv1Lfg9VecWd0BoC73mYcW4/0tFwAShqwmJaz55vL1wCtzQ51mAKHoN
+         jnhj1soXpnoxl6WiRGCJDpqiyNzJ84WxF/QeN0acRDIUQRkMyYwgTQNDbVAKWEDlpP
+         t5zykTEGZzdKkg/WCwgc7ml/UFwItLxO2rl0hScQCs/xAY5+0CU19oC5cfCJXckfHb
+         VcHlLriAtUFbhjL8N0snowTgTqpyKnUSaeaBn2wxVbNOi3xoWyJblDo8ykuBWwCCs5
+         H1VrVAfyzYLqw==
+X-Nifty-SrcIP: [209.85.214.180]
+Received: by mail-pl1-f180.google.com with SMTP id g20so15358631plo.2;
+        Wed, 03 Mar 2021 19:35:37 -0800 (PST)
+X-Gm-Message-State: AOAM531YJa+eHIcUHJR/bpp55QhLAwc0BTnwQoqeQzTx8Yaf2wGHxwOi
+        Gbt4egQPfZltC56d+dc9JOm5Y1cp4ipasZduHDE=
+X-Google-Smtp-Source: ABdhPJzHl3UvH2nM6cZC6OtFHZiuQomT5wqG7MZgVdfRTTscSwxjXACOEV4exOvk7bNRCaAmPUeWKI/fcOpRAfAd6Cs=
+X-Received: by 2002:a17:90a:5510:: with SMTP id b16mr2299989pji.87.1614828936712;
+ Wed, 03 Mar 2021 19:35:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210303183333.46543-1-masahiroy@kernel.org>
+References: <20210302221211.1620858-1-bero@lindev.ch>
+In-Reply-To: <20210302221211.1620858-1-bero@lindev.ch>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 4 Mar 2021 12:34:59 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARA3uKsW_G+gnCX6dvSwgXWzqgZON7pc6gBWdw9gimq1A@mail.gmail.com>
+Message-ID: <CAK7LNARA3uKsW_G+gnCX6dvSwgXWzqgZON7pc6gBWdw9gimq1A@mail.gmail.com>
+Subject: Re: [PATCH] Fix ld-version.sh script if LLD was built with LLD_VENDOR
+To:     =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <bero@lindev.ch>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Mar 04, 2021 at 03:33:30AM +0900, Masahiro Yamada wrote:
-> This guarding is wrong. As Documentation/kbuild/llvm.rst notes, LLVM=1
-> switches the default of tools, but you can still override CC, LD, etc.
-> individually.
-> 
-> BTW, LLVM is not 1/0 flag. If LLVM is not passed in, it is empty.
-> 
-> Non-zero return code is all treated as failure anyway.
-> 
-> So, $(success,test $(LLVM) -eq 1) and $(success,test "$(LLVM)" = 1)
-> works equivalently in the sense that both are expanded to 'n' if LLVM
-> is not given. The difference is that the former internally fails due
-> to syntax error.
-> 
->   $ test ${LLVM} -eq 1
->   bash: test: -eq: unary operator expected
->   $ echo $?
->   2
-> 
->   $ test "${LLVM}" -eq 1
->   bash: test: : integer expression expected
->   $ echo $?
->   2
-> 
->   $ test "${LLVM}" = 1
->   echo $?
->   1
-> 
->   $ test -n "${LLVM}"
->   $ echo $?
->   1
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-
-Yes, there is not too much point of checking if $(LLVM) is set or not
-because we already check for the other tools.
-
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-
+On Thu, Mar 4, 2021 at 9:18 AM Bernhard Rosenkr=C3=A4nzer <bero@lindev.ch> =
+wrote:
+>
+> If LLD was built with -DLLD_VENDOR=3D"xyz", ld.lld --version output
+> will prefix LLD_VENDOR. Since LLD_VENDOR can contain spaces, the
+> LLD identifier isn't guaranteed to be $2 either.
+>
+> Adjust the version checker to handle such versions of lld.
+>
+> Signed-off-by: Bernhard Rosenkr=C3=A4nzer <bero@lindev.ch>
 > ---
-> 
->  arch/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/Kconfig b/arch/Kconfig
-> index 2bb30673d8e6..2af10ebe5ed0 100644
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -632,7 +632,6 @@ config HAS_LTO_CLANG
->  	def_bool y
->  	# Clang >= 11: https://github.com/ClangBuiltLinux/linux/issues/510
->  	depends on CC_IS_CLANG && CLANG_VERSION >= 110000 && LD_IS_LLD
-> -	depends on $(success,test $(LLVM) -eq 1)
->  	depends on $(success,test $(LLVM_IAS) -eq 1)
->  	depends on $(success,$(NM) --help | head -n 1 | grep -qi llvm)
->  	depends on $(success,$(AR) --help | head -n 1 | grep -qi llvm)
-> -- 
-> 2.27.0
-> 
+
+
+Bernhard,
+
+Could you senv v2
+with the suggested code change?
+
+Please make sure to add
+linux-kbuild@vger.kernel.org
+in the To:
+
+
+
+
+
+
+
+>  scripts/ld-version.sh | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> index a463273509b5..4c042a306e22 100755
+> --- a/scripts/ld-version.sh
+> +++ b/scripts/ld-version.sh
+> @@ -49,6 +49,18 @@ elif [ "$1" =3D LLD ]; then
+>         min_version=3D$lld_min_version
+>         name=3DLLD
+>         disp_name=3DLLD
+> +elif echo "$@" |grep -q ' LLD '; then
+> +       # if LLD was built with -DLLD_VENDOR=3D"xyz", it ld.lld --version
+> +       # says "xyz LLD [...]". Since LLD_VENDOR may contain spaces, we
+> +       # don't know the exact position of "LLD" and the version info
+> +       # at this point
+> +       while [ "$1" !=3D "LLD" ]; do
+> +               shift
+> +       done
+> +       version=3D$2
+> +       min_version=3D$lld_min_version
+> +       name=3DLLD
+> +       disp_name=3DLLD
+>  else
+>         echo "$orig_args: unknown linker" >&2
+>         exit 1
+> --
+> 2.30.1
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
