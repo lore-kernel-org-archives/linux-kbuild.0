@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B99C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF0DC4332B
 	for <linux-kbuild@archiver.kernel.org>; Mon,  8 Mar 2021 10:46:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37250651DD
+	by mail.kernel.org (Postfix) with ESMTP id 8C3FB651C5
 	for <linux-kbuild@archiver.kernel.org>; Mon,  8 Mar 2021 10:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbhCHKpe (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 8 Mar 2021 05:45:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36294 "EHLO
+        id S231607AbhCHKpd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 8 Mar 2021 05:45:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231343AbhCHKp2 (ORCPT
+        with ESMTP id S231558AbhCHKpV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 Mar 2021 05:45:28 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0691DC06175F
-        for <linux-kbuild@vger.kernel.org>; Mon,  8 Mar 2021 02:45:28 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id kr3-20020a17090b4903b02900c096fc01deso2882101pjb.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Mar 2021 02:45:28 -0800 (PST)
+        Mon, 8 Mar 2021 05:45:21 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A616BC06175F
+        for <linux-kbuild@vger.kernel.org>; Mon,  8 Mar 2021 02:45:21 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so2884546pjv.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 08 Mar 2021 02:45:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eTA/ruWCUgwnz7vARSSAyGAv3Tz9MwTQ6Galh4vgX/g=;
-        b=oBqswjRqRn4rXSpsI9MSF4+KacaCLN3XZrU7xPy4TToCrDCIOUzHUegWYNFEE0dZK/
-         Kybw0tW9U12gi47Jnd/tqRCC3afZIj70Au0SFZKvVYpPGlVKxlGPYwmLv0aWM2oaxZNw
-         nqnw446HiOKBjPpepVHTkUjLbpq6lg3ifTb3d1eomQxkLMhvon3UKp/SuqAAwrZle34U
-         sqlOFONJHf4/LEtOLN8B3+Sirf7eB5rqeLO9QwT5vkDAMnw2SkF8mnExyr6WEMLgOvE+
-         GW/+KeMNVuisOMCBEx1oAaXpk1cVHILTi1Sb/cm5CaO9q7rIAbqG/eQVqTQqaP3Zh7Nx
-         E7nw==
+        bh=1ytsa4rIqavqUhXAymwknqeK3kfGDpJGQeD+ydMOvdY=;
+        b=eElyYqyS8jnS6dRnd0aRHWZ1IVq//9XTvPxukYdRNXhxi8cNJLKpFVNHZFroLpcFdi
+         ebYXhRBAFneRz2Sv0WCpsk90A+mFxTLc4jCpCPdRD7s3BRr9H9kWyGXu2YXlWow6+AVu
+         ot1V3fHmVY2JhU+mSOFTy6eN/ZhEvfHxyce2TEUDX7MuHk+bO3mu97ZqgM54EJ6N0gOx
+         37rx1mvGHKMXJcOFd91omK9JL1a4bwkYl334iXyXDWepEjFVn43gVhkcUmn15cnOtvv3
+         I+2Mb91eHNav7jda5p5gcUpCfXKyV51WHXuopKT0kEsAHTu0x+wZJySppPr6054hctG3
+         UACQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eTA/ruWCUgwnz7vARSSAyGAv3Tz9MwTQ6Galh4vgX/g=;
-        b=C5poSF+B3bYeMcfjF+T2Yt3bRMYOur7dYAZaI9AT63afj+9LXA0lnGnO3fJCqIg4K6
-         v+Jw8gq1N7Z7N/98qlxlrdf8KkjpxB/SLskz1+fH6UVzdy0F9Rh4R2gv8OU9jyoVE9Ns
-         IcyTafCtT4Ud3JSFZphQ6/S0FDAnALzZwnrFwKQk0QBm4TQCUeZ0P18vNqOb/xyek1wk
-         zKUY+7aG0LaNVGS0n/eeWeHMcrkHB2K7uqltqSeCl0yGrlugYA+IJvEObxfpbtX6lsvS
-         zYsNqBZREx+NbOAC+Nolp+MMdXkj7e9tbaV7L8f0qdA2vly8HyiceM1vMafxTD37rpHx
-         xlyQ==
-X-Gm-Message-State: AOAM533jtDOK+bJtbl1BlUmVqWofALNF+nHR8xT85wImb/x8VS7h7DqX
-        K8dmf+ZK1hpInVKcLTZzu3nBDw==
-X-Google-Smtp-Source: ABdhPJxMyvdJDEXud0R+2Kv4hYjscqohz+0TwHZhv+B9DYYlregglmwZYrvHybI0elbJFi3Hfxo8dQ==
-X-Received: by 2002:a17:90b:1105:: with SMTP id gi5mr23855730pjb.26.1615200327589;
-        Mon, 08 Mar 2021 02:45:27 -0800 (PST)
+        bh=1ytsa4rIqavqUhXAymwknqeK3kfGDpJGQeD+ydMOvdY=;
+        b=GQriIrrJL8GsGeA6ThoJBdbFVpqMIQjqAo4zlVbTsPFwzno4SWtm+hSQddwmnaFBM3
+         kJ9KO+I5EvClG3xMs9+xO4bBDcn5JLTJ3vrWEPVev2FzztO2I6BkP5dw+GxtZYJbRVTJ
+         TSqpir5zB9ptfHBofnRKD+FKy4i8Ce2Q2id31ZTSktsmKTTzUw+FfbNPhx+/4PVYBfSa
+         c25OXnwhoBiphZJln8swiSDaLDE54DHv+t0/mrV7eW7DMe9eDGKjfLvBHIj/KJ6vcg8/
+         dwZMp6oVhWh/jQePNOj3nryAHyKoZ8TFT1CgdhKFQ9p9W+LLEjnNX1Bt7gwdebje5o0/
+         hmIw==
+X-Gm-Message-State: AOAM530Kppd8DZHQvM67N0l/PvOV2H4J7qWVU+ZwMX9kuIKg/xNn4uSt
+        OrP4Wassz8rMEQly3QItVL6f2Q==
+X-Google-Smtp-Source: ABdhPJxIKQt2W43ppv6RO4tVI+nDaBDDSHLJ2VDS3w82ZWEXONSXzbp8pBoa3p2j19j63Ag0cqiiGA==
+X-Received: by 2002:a17:902:8ec9:b029:e6:c5e:cf18 with SMTP id x9-20020a1709028ec9b02900e60c5ecf18mr8610316plo.47.1615200321254;
+        Mon, 08 Mar 2021 02:45:21 -0800 (PST)
 Received: from localhost ([122.171.124.15])
-        by smtp.gmail.com with ESMTPSA id e65sm7853652pfe.9.2021.03.08.02.45.26
+        by smtp.gmail.com with ESMTPSA id g6sm10160628pfi.15.2021.03.08.02.45.20
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Mar 2021 02:45:27 -0800 (PST)
+        Mon, 08 Mar 2021 02:45:20 -0800 (PST)
 From:   Viresh Kumar <viresh.kumar@linaro.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>
@@ -66,11 +66,10 @@ Cc:     Viresh Kumar <viresh.kumar@linaro.org>,
         Michal Simek <michal.simek@xilinx.com>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         anmar.oueja@linaro.org, Bill Mills <bill.mills@linaro.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V10 3/5] kbuild: Allow .dtso format for overlay source files
-Date:   Mon,  8 Mar 2021 16:15:08 +0530
-Message-Id: <83217a5e3c964da13d3e69e79d2a1c898d98f63e.1615199908.git.viresh.kumar@linaro.org>
+Subject: [PATCH V10 1/5] kbuild: Simplify builds with CONFIG_OF_ALL_DTBS
+Date:   Mon,  8 Mar 2021 16:15:06 +0530
+Message-Id: <7fe7e5ef6ed75450ddf6c224b8adb53059e504e2.1615199908.git.viresh.kumar@linaro.org>
 X-Mailer: git-send-email 2.25.0.rc1.19.g042ed3e048af
 In-Reply-To: <cover.1615199908.git.viresh.kumar@linaro.org>
 References: <cover.1615199908.git.viresh.kumar@linaro.org>
@@ -80,61 +79,37 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Since the overlays dtb files are now named as .dtbo, there is a lot of
-interest in similarly naming the overlay source dts files as .dtso.
+We update 'extra-y' based on CONFIG_OF_ALL_DTBS three times. It would be
+far more straight forward if we rather update dtb-y to include all .dtb
+files if CONFIG_OF_ALL_DTBS is enabled.
 
-This patch makes the necessary changes to allow .dtso format for overlay
-source files.
-
-Note that we still support generating .dtbo files from .dts files. This
-is required for the source files present in drivers/of/unittest-data/,
-because they can't be renamed to .dtso as they are used for some runtime
-testing as well.
-
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Acked-by: Masahiro Yamada <masahiroy@kernel.org>
 Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
 ---
- scripts/Makefile.lib | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ scripts/Makefile.lib | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index bc045a54a34e..59e86f67f9e0 100644
+index eee59184de64..a2658242d956 100644
 --- a/scripts/Makefile.lib
 +++ b/scripts/Makefile.lib
-@@ -339,7 +339,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+@@ -73,14 +73,13 @@ always-y += $(userprogs-always-y) $(userprogs-always-m)
  
- quiet_cmd_dtc = DTC     $@
- cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
--	$(DTC) -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
-+	$(DTC) -I dts -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
- 		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
- 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
- 	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
-@@ -347,9 +347,13 @@ cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ;
- $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
- 	$(call if_changed_dep,dtc)
- 
-+# Required for of unit-test files as they can't be renamed to .dtso
- $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
- 	$(call if_changed_dep,dtc)
- 
-+$(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
-+	$(call if_changed_dep,dtc)
+ # DTB
+ # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
++dtb-$(CONFIG_OF_ALL_DTBS)       += $(dtb-)
 +
- overlay-y := $(addprefix $(obj)/, $(overlay-y))
+ always-y			+= $(dtb-y)
+-always-$(CONFIG_OF_ALL_DTBS)	+= $(dtb-)
  
- quiet_cmd_fdtoverlay = DTOVL   $@
-@@ -375,6 +379,9 @@ endef
- $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
- 	$(call if_changed_rule,dtc,yaml)
+ ifneq ($(CHECK_DTBS),)
+ always-y += $(patsubst %.dtb,%.dt.yaml, $(dtb-y))
+ always-y += $(patsubst %.dtbo,%.dt.yaml, $(dtb-y))
+-always-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtb,%.dt.yaml, $(dtb-))
+-always-$(CONFIG_OF_ALL_DTBS) += $(patsubst %.dtbo,%.dt.yaml, $(dtb-))
+ endif
  
-+$(obj)/%.dt.yaml: $(src)/%.dtso $(DTC) $(DT_TMP_SCHEMA) FORCE
-+	$(call if_changed_rule,dtc,yaml)
-+
- dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
- 
- # Bzip2
+ # Add subdir path
 -- 
 2.25.0.rc1.19.g042ed3e048af
 
