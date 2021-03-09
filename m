@@ -2,117 +2,105 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D03C43333
-	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Mar 2021 15:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11276C433E0
+	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Mar 2021 15:31:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11127652BB
-	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Mar 2021 15:19:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA7C56525F
+	for <linux-kbuild@archiver.kernel.org>; Tue,  9 Mar 2021 15:31:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231986AbhCIPSy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 9 Mar 2021 10:18:54 -0500
-Received: from conuserg-09.nifty.com ([210.131.2.76]:31498 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232007AbhCIPSr (ORCPT
+        id S231410AbhCIPbS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 9 Mar 2021 10:31:18 -0500
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:54958 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231819AbhCIPbN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 9 Mar 2021 10:18:47 -0500
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 129FHiTc030658;
-        Wed, 10 Mar 2021 00:17:45 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 129FHiTc030658
+        Tue, 9 Mar 2021 10:31:13 -0500
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 129FUcdn018321;
+        Wed, 10 Mar 2021 00:30:38 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 129FUcdn018321
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1615303065;
-        bh=KwJfPDaf46fObQ+3n3hTs9UggnffeJCU/zgw2qw2iLg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=CbDkADy7F/hicCOfVFlYOTLhDTRY2rChGyMdh5iMWL+jIEDJf1Uz6t9g2jAWmaDzS
-         wMuHRsmwDBjUWQn4Foqn4btIgnZAoUoA1tiMniEJpPKbVmjw2VQYrPsnHKHhXUs5Ck
-         jiT0ugQVm6xAEElIubWk7PSZkmIzC7OHE01viBpdP/Kwu8o3jXfrY5VHNmkFGI7vz7
-         0FNgBjLtyQDKudtwaooIJKwr6oeRiqZrNtDGKoJmBJ1+kXg7SS3HH7NrFiONHssh/r
-         F4eQtf7rdmsn1JttEaNVxEaAmJnwRYRhLFdyD3bECS/Qy192DEussYcmoh9GomF/B2
-         O0rkMNnTWfmGg==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jessica Yu <jeyu@kernel.org>, Nicolas Pitre <nico@fluxnic.net>,
-        linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 0/4] kbuild: build speed improvement of CONFIG_TRIM_UNUSED_KSYMS
-Date:   Wed, 10 Mar 2021 00:17:33 +0900
-Message-Id: <20210309151737.345722-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        s=dec2015msa; t=1615303838;
+        bh=duaVjO6ZT9w3WdK0Ejkic79qcK1IWR5fB/TZDf76FGA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=qgM9NFwMiLY47ay6AZVLPl12PZ16k7tMoEC4jOirg2Q556CR9IVNEayLHEsX96iHg
+         z2vIdkeX66iopgC/rKnB/V3drNeqJMZ02q7ZdkOykQwXe1fmQJdptphUd5U/FOzP8f
+         O+SYC5sgdCw7huTniJEp5fWce79kEb8eocxZnzMYaISEj85T8uA5dzNvmLBQ15TSOe
+         CrRyBA7GzDRGJc+gyebsJ+uYgmnSs3HYphNge77KDioK3/y4QIbeg2ygDcr6UznoZH
+         wYKUVlcPe+dNIf/Y/B7Gtk5Hm4wcxJoOda3bfJWNQi149t5XuLzyGz+3HF5Py547JE
+         RrAGzO0hDuGcg==
+X-Nifty-SrcIP: [209.85.210.177]
+Received: by mail-pf1-f177.google.com with SMTP id t85so4409241pfc.13;
+        Tue, 09 Mar 2021 07:30:38 -0800 (PST)
+X-Gm-Message-State: AOAM532P79lgEG4iqDUotU4Y/A8TaqvEr/R/H/UJ7p+5jBQzSRVkg6XY
+        dgXZxdG/VdHO7D1H00xEsRtRaiqkn4n1A64m4/I=
+X-Google-Smtp-Source: ABdhPJyLsPDnmD2y2htemNUFNTD3CKccrm7a07/ky8tR1jO6hHrNhdi3f+3km8/+c3tYh8GKZEI34XL1WNiXXYuYd64=
+X-Received: by 2002:aa7:8d84:0:b029:1f8:3449:1bc6 with SMTP id
+ i4-20020aa78d840000b02901f834491bc6mr6900507pfr.76.1615303835416; Tue, 09 Mar
+ 2021 07:30:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210302142614.505888-1-masahiroy@kernel.org>
+In-Reply-To: <20210302142614.505888-1-masahiroy@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 10 Mar 2021 00:29:57 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARcrGJnoBuzC8mSJqAXPQjdTt-bC8EZEwNBTCTb=o3yQA@mail.gmail.com>
+Message-ID: <CAK7LNARcrGJnoBuzC8mSJqAXPQjdTt-bC8EZEwNBTCTb=o3yQA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: show warning for 'make headers_check'
+To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Tue, Mar 2, 2021 at 11:26 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Since commit 7ecaf069da52 ("kbuild: move headers_check rule to
+> usr/include/Makefile"), the headers_check target is no-op.
+>
+> This stub target is remaining here in case some scripts still invoke
+> 'make headers_check'. In order to prompt people to remove stale code,
+> show a noisy warning message if used. The stub will be really removed
+> after the Linux 5.15 release.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Now CONFIG_TRIM_UNUSED_KSYMS is revived, but Linus is still unhappy
-about the build speed.
-
-I re-implemented this feature, and the build time cost is now
-almost unnoticeable level.
+Applied to linux-kbuild.
 
 
-(no changes since v1)
 
-Masahiro Yamada (4):
-  export.h: make __ksymtab_strings per-symbol section
-  kbuild: separate out vmlinux.lds generation
-  kbuild: re-implement CONFIG_TRIM_UNUSED_KSYMS to make it work in
-    one-pass
-  kbuild: remove guarding from TRIM_UNUSED_KSYMS
+>
+>  Makefile | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index f9b54da2fca0..a3336d9b4a22 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1339,7 +1339,11 @@ headers: $(version_h) scripts_unifdef uapi-asm-generic archheaders archscripts
+>  # Deprecated. It is no-op now.
+>  PHONY += headers_check
+>  headers_check:
+> -       @:
+> +       @echo >&2 "=================== WARNING ==================="
+> +       @echo >&2 "Since Linux 5.5, 'make headers_check' is no-op,"
+> +       @echo >&2 "and will be removed after Linux 5.15 release."
+> +       @echo >&2 "Please remove headers_check from your scripts."
+> +       @echo >&2 "==============================================="
+>
+>  ifdef CONFIG_HEADERS_INSTALL
+>  prepare: headers
+> --
+> 2.27.0
+>
 
- Makefile                                      | 34 ++++-----
- arch/alpha/kernel/Makefile                    |  3 +-
- arch/arc/kernel/Makefile                      |  3 +-
- arch/arm/kernel/Makefile                      |  3 +-
- arch/arm64/kernel/Makefile                    |  3 +-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |  1 +
- arch/csky/kernel/Makefile                     |  3 +-
- arch/h8300/kernel/Makefile                    |  2 +-
- arch/hexagon/kernel/Makefile                  |  3 +-
- arch/ia64/kernel/Makefile                     |  3 +-
- arch/m68k/kernel/Makefile                     |  2 +-
- arch/microblaze/kernel/Makefile               |  3 +-
- arch/mips/kernel/Makefile                     |  3 +-
- arch/nds32/kernel/Makefile                    |  3 +-
- arch/nios2/kernel/Makefile                    |  2 +-
- arch/openrisc/kernel/Makefile                 |  3 +-
- arch/parisc/kernel/Makefile                   |  3 +-
- arch/powerpc/kernel/Makefile                  |  2 +-
- arch/powerpc/kernel/vdso32/vdso32.lds.S       |  1 +
- arch/powerpc/kernel/vdso64/vdso64.lds.S       |  1 +
- arch/riscv/kernel/Makefile                    |  2 +-
- arch/s390/kernel/Makefile                     |  3 +-
- arch/s390/purgatory/purgatory.lds.S           |  1 +
- arch/sh/kernel/Makefile                       |  3 +-
- arch/sparc/kernel/Makefile                    |  2 +-
- arch/um/kernel/Makefile                       |  2 +-
- arch/x86/kernel/Makefile                      |  2 +-
- arch/xtensa/kernel/Makefile                   |  3 +-
- include/asm-generic/export.h                  | 25 +------
- include/asm-generic/vmlinux.lds.h             | 13 ++--
- include/linux/export.h                        | 56 ++++----------
- include/linux/ksyms.lds.h                     | 22 ++++++
- init/Kconfig                                  |  3 +-
- scripts/Makefile.build                        |  7 +-
- scripts/Makefile.lib                          |  1 +
- scripts/adjust_autoksyms.sh                   | 73 -------------------
- .../{gen_autoksyms.sh => gen-keep-ksyms.sh}   | 43 ++++++++---
- scripts/gen_ksymdeps.sh                       | 25 -------
- scripts/module.lds.S                          | 23 +++---
- 39 files changed, 152 insertions(+), 238 deletions(-)
- create mode 100644 include/linux/ksyms.lds.h
- delete mode 100755 scripts/adjust_autoksyms.sh
- rename scripts/{gen_autoksyms.sh => gen-keep-ksyms.sh} (66%)
- delete mode 100755 scripts/gen_ksymdeps.sh
 
 -- 
-2.27.0
-
+Best Regards
+Masahiro Yamada
