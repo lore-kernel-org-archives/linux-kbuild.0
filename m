@@ -2,135 +2,181 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 610D5C433E6
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 19:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9DDAC433DB
+	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 22:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D03664FD6
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 19:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81D9064FCD
+	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 22:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232983AbhCJT2A (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 10 Mar 2021 14:28:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39928 "EHLO
+        id S233069AbhCJWnD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 10 Mar 2021 17:43:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232633AbhCJT1b (ORCPT
+        with ESMTP id S231625AbhCJWmq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Mar 2021 14:27:31 -0500
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CE3CC061760;
-        Wed, 10 Mar 2021 11:27:31 -0800 (PST)
-Received: by mail-yb1-xb2a.google.com with SMTP id l8so19032593ybe.12;
-        Wed, 10 Mar 2021 11:27:31 -0800 (PST)
+        Wed, 10 Mar 2021 17:42:46 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC9B7C061574;
+        Wed, 10 Mar 2021 14:42:45 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id h26so10053221qtm.5;
+        Wed, 10 Mar 2021 14:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=+afERrZACBSDM/epkPt76C1oUwcdWvQIXn6rl1uX6xE=;
-        b=meDgZjxzmUwSC3zLETkZNMT7Ybdo3bvmOhD77SiLuAs7Xonzl175nWPSkzjiTmPHTU
-         U1UPO/Lo+FPtSfAq3NTT1ZPnbZaLryKvhvSxI90eZ8Qnta7KU893tNT1uyI9wsmTOgBp
-         r+WZGQTX0Onb33p0f1ostgbk/Wa59p5wzEq/pcHUKrTjgm7WiiuM15gOsdbYjw4v1L9m
-         tgzdrKhg2xfuZHdvVlIetSibSE+i+OTjGsIcjecojtR9jowPajWayxVl7eh2CWQBgKke
-         mEO/yq7H5ETs/YJQ51tUWz8c7bPS85o3H/9U/VsVyt3IC/ZvCC5+ynkSGUfQYV32l0kX
-         77Og==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=3BAyW4ZQuji90UaVp58rM1Dg3+Lnu9lj7lWY4ICJFZo=;
+        b=oUn+8UE2hzY9b0+ujTcHnlLhLZYkkmKDCU63eYhdIMF5X0TSlc/1Oj01OwMHVfQsxt
+         L/jpabKE9dYtMvfHFdzoFh4DOHqpWbt8Wz2dQCHPKRHZ3cqF0OUeZNtoZOedsJ6ihYlM
+         /hCFSzjmATBeqYxC4/xOuoWJKO+ZnuR+mL8t5w1VaKQiRaDxJqUje4/NHG/EqHZOipII
+         jicKKYX+28szdbv4mqtS+TUJOqPigvbC9QHAF+sAVetyKEAagdht2TUexVnbgzxDjPhu
+         H7kVtIW3YJ40+UCVRTqyyYhlfhuldFfQEAWu5qqIv++HiIrWp8+MW3N4qwJy1wf8zCg8
+         Nhjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=+afERrZACBSDM/epkPt76C1oUwcdWvQIXn6rl1uX6xE=;
-        b=OPTrQMiQk6K0Tk043o4NKlwhbTLDB1RSTWw6QHiN3GW1XC2+gYkmaZv25AOSsl0pHR
-         QGWxBr1jNvcAQM6aKEcSjAa3g/26FYbiBTEorJGDMY9Pu0GaYXp37ZWjzsb6OCUSoDHz
-         9hSQu4NSLVUpgNorOT260ceMViekfPCiQEn4RxrCgwgw8z+tfGfeA5kuQ8ymH4prZgKL
-         N7+hSNhmgk4ueuZ8Py5OLXFrlutSR/qy3JY7qtkWg0upPjNFpIhsdkJK2WBiO3LiGYoo
-         0pVfAHXfJFcvkZZHjSCR59aopdeibhyq2WKP9QuXQj2oOaK6Uy+sTIgoAFTiIf/zHUu3
-         c8gQ==
-X-Gm-Message-State: AOAM533ZodqpJecMWJ+Y63r3FX6gDaU0x/vSYwwP+XPDpfaJfBD97rmm
-        FozbAqkE4OnATBsSELaxbIwjbp8oGMnGTc75MvE=
-X-Google-Smtp-Source: ABdhPJxjRRGLt4SjZNOyHVYpmZFX8W7chBMJkEM/yl7xRcCnjW+yG5Xnn4WUTfGvs/WTZ/MLjkt4tpkwFwA40Mqc004=
-X-Received: by 2002:a25:cc13:: with SMTP id l19mr6293249ybf.260.1615404450455;
- Wed, 10 Mar 2021 11:27:30 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3BAyW4ZQuji90UaVp58rM1Dg3+Lnu9lj7lWY4ICJFZo=;
+        b=T0SbUOFOg8nehB2eRxU8pHnOy3Yqq3VynnFTm4gv50ITXD6G99xX6a+HMB+7+l3ouq
+         w5znCGkW1Uejvy9zXW0BW9bmaA08Hl+eu56HAfY3Z56imkbJHB2jZIgt2VPRapO0bhLf
+         HgahqvOXlx1Mk99qd9kJulAyA0CUph4vMrX3JiryT3zLDmM/hOIvFVSIRXRgAqgoYAZw
+         18lzuIDP+PqE3Dpdq+oExdCytAtur1OwUW7Qe1zNZBLmiFbxx8ur+86z13yioukQ9l2t
+         SLC5lH2UTOk3STfDV9AkdYop9k3JzLozaCOZroFgIU/b3f9vq86gCK0vxTHw74ChRvxN
+         TMuA==
+X-Gm-Message-State: AOAM530Nm7jDw7AlhguD5KkYdpW4dnTITc7k/GQJkipGlnyOIoxYa2zA
+        wJ92gRkwKw/aD47cw9ikTa/HjxHt6dw=
+X-Google-Smtp-Source: ABdhPJww3pZYgo8AGMp5yMWRJEXXP2c7RN7wF4OlXJvXZjA7v0eK1Z4EiRRWZvC62C/5YTDmN9WiCw==
+X-Received: by 2002:a05:622a:2d4:: with SMTP id a20mr4866187qtx.217.1615416165053;
+        Wed, 10 Mar 2021 14:42:45 -0800 (PST)
+Received: from [192.168.1.49] (c-67-187-90-124.hsd1.ky.comcast.net. [67.187.90.124])
+        by smtp.gmail.com with ESMTPSA id b65sm535685qkd.120.2021.03.10.14.42.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Mar 2021 14:42:44 -0800 (PST)
+Subject: Re: [PATCH V11 3/5] kbuild: Allow .dtso format for overlay source
+ files
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Anmar Oueja <anmar.oueja@linaro.org>,
+        Bill Mills <bill.mills@linaro.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <cover.1615354376.git.viresh.kumar@linaro.org>
+ <170e086a5fa076869e7b37de8eea850fa7c39118.1615354376.git.viresh.kumar@linaro.org>
+ <CAK7LNASACr5EaG9j5c-eD3bYxKgrisb60Z3Qy7UsyS-i9YjORg@mail.gmail.com>
+ <20210310144730.5ipzeailoj6nno5h@vireshk-i7>
+ <CAK7LNARKdZT+UdCVmZ1_P3T07yT2Ra34rzMf2RwMvkj7hVkfDg@mail.gmail.com>
+From:   Frank Rowand <frowand.list@gmail.com>
+Message-ID: <8224a5aa-73be-3765-2e03-d640f3464d3a@gmail.com>
+Date:   Wed, 10 Mar 2021 16:42:43 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210205124020.683286-1-jolsa@kernel.org> <20210205124020.683286-2-jolsa@kernel.org>
- <5a48579b-9aff-72a5-7b25-accb40c4dd52@freenet.de>
-In-Reply-To: <5a48579b-9aff-72a5-7b25-accb40c4dd52@freenet.de>
-From:   Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date:   Wed, 10 Mar 2021 11:27:19 -0800
-Message-ID: <CAEf4BzYYG=3ZEu70CV0t0+T583082=FcytCv=jg2b83QaqyQRA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/4] tools/resolve_btfids: Build libbpf and
- libsubcmd in separate directories
-To:     =?UTF-8?B?VmlrdG9yIErDpGdlcnNrw7xwcGVy?= 
-        <viktor_jaegerskuepper@freenet.de>
-Cc:     Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andriin@fb.com>,
-        Song Liu <songliubraving@fb.com>,
-        Networking <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAK7LNARKdZT+UdCVmZ1_P3T07yT2Ra34rzMf2RwMvkj7hVkfDg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 9:35 AM Viktor J=C3=A4gersk=C3=BCpper
-<viktor_jaegerskuepper@freenet.de> wrote:
->
-> Hi,
->
-> > Setting up separate build directories for libbpf and libpsubcmd,
-> > so it's separated from other objects and we don't get them mixed
-> > in the future.
-> >
-> > It also simplifies cleaning, which is now simple rm -rf.
-> >
-> > Also there's no need for FEATURE-DUMP.libbpf and bpf_helper_defs.h
-> > files in .gitignore anymore.
-> >
-> > Acked-by: Song Liu <songliubraving@fb.com>
-> > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
-> > ---
->
-> when I invoke 'git status' on the master branch of my local git repositor=
-y
-> (cloned from stable/linux.git), which I have used to compile several kern=
-els,
-> it lists two untracked files:
->
->         tools/bpf/resolve_btfids/FEATURE-DUMP.libbpf
->         tools/bpf/resolve_btfids/bpf_helper_defs.h
->
-> 'git status' doesn't complain about these files with v5.11, and I can't g=
-et rid
-> of them by 'make clean' with v5.11 or v5.12-rc1/rc2. So I used 'git bisec=
-t' and
-> found that this is caused by commit fc6b48f692f89cc48bfb7fd1aa65454dfe9b2=
-d77,
-> which links to this thread.
->
-> Looking at the diff it's obvious because of the change in the .gitignore =
-file,
-> but I don't know why these files are there and I have never touched anyth=
-ing in
-> the 'tools' directory.
->
-> Can I savely delete the files? Do I even have to delete them before I com=
-pile
-> v5.12-rcX?
+On 3/10/21 9:15 AM, Masahiro Yamada wrote:
+> On Wed, Mar 10, 2021 at 11:47 PM Viresh Kumar <viresh.kumar@linaro.org> wrote:
+>>
+>> On 10-03-21, 20:24, Masahiro Yamada wrote:
+>>> On Wed, Mar 10, 2021 at 2:35 PM Viresh Kumar <viresh.kumar@linaro.org> wrote:
+>>>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>>>> index bc045a54a34e..59e86f67f9e0 100644
+>>>> --- a/scripts/Makefile.lib
+>>>> +++ b/scripts/Makefile.lib
+>>>> @@ -339,7 +339,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+>>>>
+>>>>  quiet_cmd_dtc = DTC     $@
+>>>>  cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+>>>> -       $(DTC) -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
+>>>> +       $(DTC) -I dts -O $(patsubst .%,%,$(suffix $@)) -o $@ -b 0 \
+>>>
+>>> Even without "-I dts",
+>>>
+>>>    inform = guess_input_format(arg, "dts");
+>>>
+>>> seems to fall back to "dts" anyway,
+>>
+>> I missed this TBH.
+>>
+>>> but I guess you wanted to make this explicit, correct?
+>>
+>> That can be a reason now :)
+>>
+>>> I will drop the ugly -O.
+>>> https://patchwork.kernel.org/project/linux-kbuild/patch/20210310110824.782209-1-masahiroy@kernel.org/
+>>
+>> But if we are going to depend on DTC to guess it right, then we
+>> shouldn't add -I at all..
+>>
+>>> I will queue it to linux-kbuild/fixes.
+>>>
+>>>
+>>>
+>>>>                 $(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
+>>>>                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
+>>>>         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
+>>>> @@ -347,9 +347,13 @@ cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ;
+>>>>  $(obj)/%.dtb: $(src)/%.dts $(DTC) FORCE
+>>>>         $(call if_changed_dep,dtc)
+>>>>
+>>>> +# Required for of unit-test files as they can't be renamed to .dtso
+>>>
+>>> If you go with *.dtso, I think you will rename
+>>> all *.dts under the drivers/ directory.
+>>>
+>>> What is blocking you from making this consistent?
+>>
+>> The unit-test dts files are designed differently (we have had lots of
+>> discussion between Frank and David on that) and they aren't purely
+>> overlay or base files. They are designed to do some tricky testing and
+>> renaming them to .dtso won't be right, we are just reusing them to do
+>> static (build time) testing as well.
+> 
+> 
+> I still do not understand.
+> 
+> If they are not overlay files, why
+> do you need to have them suffixed with .dtbo?
+> 
+> ".dts -> .dtb" should be enough.
+> 
+> Why do you need to do ".dts  -> .dtbo" ?
+> 
+> 
+> 
+> 
+>> I think it would be better if we can drop the existing %.dtbo rule
+>> here (i.e. dtbo from .dts) and do some magic in unit-test's Makefile,
+>> so it is localised at least instead of it here.
+>>
+>> Any ideas for that ?
+> 
+> I do not know.
+> 
 
-yes, those were auto-generated files. You can safely remove them.
 
->
-> Thanks,
-> Viktor
->
+> My impression is you are doing something fishy.
 
-[...]
+That is accurate.  Devicetree unittest plays some tricks to enable
+testing to occur.  These tricks will never be used anywhere else
+in the kernel.
+
+-Frank
+
