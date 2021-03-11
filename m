@@ -2,127 +2,80 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04521C43381
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 22:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BADC433E0
+	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Mar 2021 06:32:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3AB364FDF
-	for <linux-kbuild@archiver.kernel.org>; Wed, 10 Mar 2021 22:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B8664FD4
+	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Mar 2021 06:32:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233367AbhCJWnD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 10 Mar 2021 17:43:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52144 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233470AbhCJWmx (ORCPT
+        id S229777AbhCKGcP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Mar 2021 01:32:15 -0500
+Received: from conuserg-08.nifty.com ([210.131.2.75]:56175 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229817AbhCKGbs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Mar 2021 17:42:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615416172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zZUIxQMuHfM2ZGFCSPdMxrKfMjQr1/7Fk1M57+SSlMY=;
-        b=fK72xIyE1YzhGe8QGHbUbkYgImjCK6OfMG8ppKhEYA0dWdvbX2MnZF5XxK43IExchDgBOP
-        VxyhkjCvxDgM2/hSrdwLpE5ZCP3tp9PTyKqbuuDuVlrhtABwjvrM++aA1nkRdSr0AbGABD
-        clUEkT0Khuiv0RMsLheOt1Z8fnJIiEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-kJGkAKZbO4q5nzZz_s0F4Q-1; Wed, 10 Mar 2021 17:42:51 -0500
-X-MC-Unique: kJGkAKZbO4q5nzZz_s0F4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 409C21084C97;
-        Wed, 10 Mar 2021 22:42:48 +0000 (UTC)
-Received: from krava (unknown [10.40.195.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A45B50D0D;
-        Wed, 10 Mar 2021 22:42:44 +0000 (UTC)
-Date:   Wed, 10 Mar 2021 23:42:43 +0100
-From:   Jiri Olsa <jolsa@redhat.com>
-To:     Andrii Nakryiko <andrii.nakryiko@gmail.com>,
-        Viktor =?iso-8859-1?Q?J=E4gersk=FCpper?= 
-        <viktor_jaegerskuepper@freenet.de>
-Cc:     Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andriin@fb.com>,
-        Song Liu <songliubraving@fb.com>,
-        Networking <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@chromium.org>,
+        Thu, 11 Mar 2021 01:31:48 -0500
+Received: from localhost.localdomain (133-175-190-164.kyoto.fdn.vectant.ne.jp [133.175.190.164]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 12B6V9T8023841;
+        Thu, 11 Mar 2021 15:31:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 12B6V9T8023841
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1615444270;
+        bh=pFK6AvxwZw3F3vXwDKj2ZIdqMuI/H73Ebds8nCytKMw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=qbCEKd6kFlCtOPCJcxNHX6hBNKCcAclUb3mgPADCPsW+Awl+oag3igTZfT20YCSNh
+         75nUtpwSTMOUD8KlSc4eVv+QTfHol/pl6UJWT1rqrNS3qRK6SiqfwR5w72WiCb3k2v
+         DWqxtvb0x0Zu4zSZQ0ieCk4S8jflnOiwkCCfhpBO3wXfrhg0iV3jAlWOmRbWDedpdk
+         KP8/5pvJyPIqWSOk1AWra9SnyHlZN+vO1+2uguldw3tXtv3xLPzmUGspOWlcGPB8qb
+         FS0yI9MYOQC/xa4L26jDtmoIAoL1UcytUPh27igBUWh9pDlhFlK/pSg/VC30304Fvw
+         JcjuC25X6k99Q==
+X-Nifty-SrcIP: [133.175.190.164]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     devicetree@vger.kernel.org, Rob Herring <robh@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 1/4] tools/resolve_btfids: Build libbpf and
- libsubcmd in separate directories
-Message-ID: <YElLY7Ht7NNTmoWB@krava>
-References: <20210205124020.683286-1-jolsa@kernel.org>
- <20210205124020.683286-2-jolsa@kernel.org>
- <5a48579b-9aff-72a5-7b25-accb40c4dd52@freenet.de>
- <CAEf4BzYYG=3ZEu70CV0t0+T583082=FcytCv=jg2b83QaqyQRA@mail.gmail.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kbuild: remove meaningless parameter to $(call if_changed_rule,dtc)
+Date:   Thu, 11 Mar 2021 15:30:54 +0900
+Message-Id: <20210311063054.901232-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzYYG=3ZEu70CV0t0+T583082=FcytCv=jg2b83QaqyQRA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 11:27:19AM -0800, Andrii Nakryiko wrote:
-> On Wed, Mar 10, 2021 at 9:35 AM Viktor Jägersküpper
-> <viktor_jaegerskuepper@freenet.de> wrote:
-> >
-> > Hi,
-> >
-> > > Setting up separate build directories for libbpf and libpsubcmd,
-> > > so it's separated from other objects and we don't get them mixed
-> > > in the future.
-> > >
-> > > It also simplifies cleaning, which is now simple rm -rf.
-> > >
-> > > Also there's no need for FEATURE-DUMP.libbpf and bpf_helper_defs.h
-> > > files in .gitignore anymore.
-> > >
-> > > Acked-by: Song Liu <songliubraving@fb.com>
-> > > Signed-off-by: Jiri Olsa <jolsa@kernel.org>
-> > > ---
-> >
-> > when I invoke 'git status' on the master branch of my local git repository
-> > (cloned from stable/linux.git), which I have used to compile several kernels,
-> > it lists two untracked files:
-> >
-> >         tools/bpf/resolve_btfids/FEATURE-DUMP.libbpf
-> >         tools/bpf/resolve_btfids/bpf_helper_defs.h
-> >
-> > 'git status' doesn't complain about these files with v5.11, and I can't get rid
-> > of them by 'make clean' with v5.11 or v5.12-rc1/rc2. So I used 'git bisect' and
-> > found that this is caused by commit fc6b48f692f89cc48bfb7fd1aa65454dfe9b2d77,
-> > which links to this thread.
-> >
-> > Looking at the diff it's obvious because of the change in the .gitignore file,
-> > but I don't know why these files are there and I have never touched anything in
-> > the 'tools' directory.
-> >
-> > Can I savely delete the files? Do I even have to delete them before I compile
-> > v5.12-rcX?
-> 
-> yes, those were auto-generated files. You can safely remove them.
+This is a remnant of commit 78046fabe6e7 ("kbuild: determine the output
+format of DTC by the target suffix").
 
-hm, I answered this email, but for some reason I can't see it on
-lore.. FWIW, trying once more ;-)
+The parameter "yaml" is meaningless because cmd_dtc no loner takes $(2).
 
+Reported-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-hi,
-yes, you can delete them, this patch moved libbpf and libsubcmd
-into their own build directories, so those 2 files stayed there
-from your last build without the patch
+ scripts/Makefile.lib | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-jirka
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 90a4e04cd8f5..8cd67b1b6d15 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -352,7 +352,7 @@ define rule_dtc
+ endef
+ 
+ $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
+-	$(call if_changed_rule,dtc,yaml)
++	$(call if_changed_rule,dtc)
+ 
+ dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
+ 
+-- 
+2.27.0
 
