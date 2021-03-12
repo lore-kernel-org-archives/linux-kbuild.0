@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A04AC433DB
-	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AE9C433E9
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C13164F92
-	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2354A64F82
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231340AbhCLAtw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 11 Mar 2021 19:49:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52048 "EHLO
+        id S231825AbhCLAuQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Mar 2021 19:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbhCLAtd (ORCPT
+        with ESMTP id S231489AbhCLAtn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Mar 2021 19:49:33 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB60C061762
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:32 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id v6so27683853ybk.9
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:32 -0800 (PST)
+        Thu, 11 Mar 2021 19:49:43 -0500
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F790C061762
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:43 -0800 (PST)
+Received: by mail-qt1-x849.google.com with SMTP id b18so3030076qte.21
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Y+bQ/FvCUm3fvBgel5uQUEfp5fAIz/0D/2shjtjBBOQ=;
-        b=XH46gyIVQlOmQFd/RmNS2UiHhzUpt2qt03RTF06Xnae6iCcw0dFPqWjKTPco+qP/Zx
-         fB/uJw66ANkZSXLpgPZzsNiuQ09DnyCviGcpTgD8pTRezXmUpwZek+cB7Y/HvGxA8qch
-         dFOUqeeMZ918ZEBhrbuNcNxKi6PRldR02Suyv0Yn8UZyobwAbNbMX7d8KutkSzRsxDGm
-         0S6hbtJQ8Ws4a+nW+Glvo6IMRSySbHIstPjzQXpwjaBdZ61ql+77Yzbd9C2HqajlQ9bT
-         al24/Uv71xlS2VCq05aPDtCBcnEMCW+8us1rt97YOCFL3l3qREf0N5Bb4Jekm29kn/qK
-         q9Xg==
+        bh=Mjpx22b6GuQLoGn4NzDCeA9C1v5eOn+//WEZjXFxGag=;
+        b=p1YJgca/l7E3iFpL3NEl23p9rq3uH3cCDpSNLobzpaRdN94bWmg2TLWliG4OTlDgNF
+         b20mw7m0miBH3TC5NiTSrjOvpsxd/EdcZEMNofKjul69T290228EfMRqi263sZ7ZcaJy
+         z2WDWEy/jTh6Vd9HVohxsoV9lhuJlYgs7JX6zxyvJVOc46TYiMufhQFP5HjsfNJNllhZ
+         x42Xb3kCdRnLN7XJ1Ai7S9r8k9w7c9TnY3ZIZBGaRP2A6WNp1d5UesIsRKD8bTflljM+
+         ApPAV1OH/Bn5BUKlPk/oyAren6W77UIuvmnx4NkfwgRZxTrZ2vrS8diyGNcOaxyVNLg4
+         QIsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Y+bQ/FvCUm3fvBgel5uQUEfp5fAIz/0D/2shjtjBBOQ=;
-        b=o3TYubzVSo/zVBmDjfLjc1O2CvBmB4qEsxl8kFCsxDJPmWa2WDcJU/laJ+GYwxEXjx
-         2YBq5YAcNEYlnchgbQnyAxU1qshYLmmLrRIfNdGxRrwlxsGjI1p6b705V/sa5QJ0z7A4
-         OQYdl6SfoF4AnlCZNkH5tkvVxElfYPM1DTaSk0vPEDnStx8vAnATYDfc9OL9ZBPHkvFp
-         KUiR0ozoI6v7W69mIuuGxjP+kgc41tsfEHm7u9fqVh8HbHWqcXvPkeb6IW/c75EvyWzr
-         BrcD+Hd0U54vHKyHr4nh13l9gOqHuhkc1HXyDjCpocTYbcAh58B08DB2WGURNwOwnTeJ
-         LT6A==
-X-Gm-Message-State: AOAM532NfcVgIWFjoC+6VxeMupMO+o4d4/OYApoBaJp97IysnbnpwQc8
-        xafOhRrBU8pHqVyuytl9Yw7LTBqwFg9ETq1FaqU=
-X-Google-Smtp-Source: ABdhPJx7qHHoiwHh7Mz2oYX8+DonjBOnAMdcSWoE+4sImbjhV4Eew8XMTramdbIeYBSUSqj6zA5bpTyw6U5L5XSs8WU=
+        bh=Mjpx22b6GuQLoGn4NzDCeA9C1v5eOn+//WEZjXFxGag=;
+        b=J0TquO+FDU83/i+yQKOUbxRvjp+E9bRLYwimd9+dXkfR6lu96AGS56ks3VQoTB5ZEM
+         eUWBKcY6K6lv+LaYr4UUO1KaTrIOi86GXrjQCd/3IPALwwEGVwylwIrBCq5aHxNJDsGQ
+         4607Qe+eGcL1kwtdXBpCdoJR7nuUfCkrusFMBCNgdFxtO9hbQHVRkWEpHzMhNyQR1U6w
+         ZAiZfk/OOGbZaEuXaZvY+C6aLQQsSXoqrktWKlGS/cxW26d6ZTerQcw3G55sj4H6bMdC
+         lhS1xMpEjInUU47+9yqr5zc9AZTGGN1LbrJlNWNyspo5MNaLDHJgkwZf0cM+h2bEi0x/
+         /jSw==
+X-Gm-Message-State: AOAM533igkMt5M26A6/mIt4DbLCpsh/btuELwiNSkT5f+bmPyAV2H7N8
+        F6JYozmSLmTt7EH2QO8uLHN6KhB4T6MDZPt67k4=
+X-Google-Smtp-Source: ABdhPJwmy8g4J1Glwh+9/Qdeqiq2sG1+WJpaNKE+Qhd9e3mgm3N1f00E1AniVKdzTbmiO2hHWYG9eMucONFWzKoR1oM=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:c86b:8269:af92:55a])
- (user=samitolvanen job=sendgmr) by 2002:a25:1d88:: with SMTP id
- d130mr15900461ybd.446.1615510171706; Thu, 11 Mar 2021 16:49:31 -0800 (PST)
-Date:   Thu, 11 Mar 2021 16:49:08 -0800
+ (user=samitolvanen job=sendgmr) by 2002:ad4:4745:: with SMTP id
+ c5mr10451143qvx.39.1615510182313; Thu, 11 Mar 2021 16:49:42 -0800 (PST)
+Date:   Thu, 11 Mar 2021 16:49:13 -0800
 In-Reply-To: <20210312004919.669614-1-samitolvanen@google.com>
-Message-Id: <20210312004919.669614-7-samitolvanen@google.com>
+Message-Id: <20210312004919.669614-12-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210312004919.669614-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH 06/17] kthread: cfi: disable callback pointer check with modules
+Subject: [PATCH 11/17] psci: use __pa_function for cpu_resume
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -78,39 +78,40 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_CFI_CLANG, a callback function passed to
-__kthread_queue_delayed_work from a module points to a jump table
-entry defined in the module instead of the one used in the core
-kernel, which breaks function address equality in this check:
-
-  WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
-
-Disable the warning when CFI and modules are enabled.
+With CONFIG_CFI_CLANG, the compiler replaces function pointers with
+jump table addresses, which results in __pa_symbol returning the
+physical address of the jump table entry. As the jump table contains
+an immediate jump to an EL1 virtual address, this typically won't
+work as intended. Use __pa_function instead to get the address to
+cpu_resume.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- kernel/kthread.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/firmware/psci/psci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/kthread.c b/kernel/kthread.c
-index 1578973c5740..af5fee350586 100644
---- a/kernel/kthread.c
-+++ b/kernel/kthread.c
-@@ -963,7 +963,13 @@ static void __kthread_queue_delayed_work(struct kthread_worker *worker,
- 	struct timer_list *timer = &dwork->timer;
- 	struct kthread_work *work = &dwork->work;
+diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+index f5fc429cae3f..facd3cce3244 100644
+--- a/drivers/firmware/psci/psci.c
++++ b/drivers/firmware/psci/psci.c
+@@ -326,7 +326,7 @@ static int psci_suspend_finisher(unsigned long state)
+ {
+ 	u32 power_state = state;
  
--	WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
-+	/*
-+	 * With CFI, timer->function can point to a jump table entry in a module,
-+	 * which fails the comparison. Disable the warning if CFI and modules are
-+	 * both enabled.
-+	 */
-+	if (!IS_ENABLED(CONFIG_CFI_CLANG) || !IS_ENABLED(CONFIG_MODULES))
-+		WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
+-	return psci_ops.cpu_suspend(power_state, __pa_symbol(cpu_resume));
++	return psci_ops.cpu_suspend(power_state, __pa_function(cpu_resume));
+ }
  
- 	/*
- 	 * If @delay is 0, queue @dwork->work immediately.  This is for
+ int psci_cpu_suspend_enter(u32 state)
+@@ -345,7 +345,7 @@ int psci_cpu_suspend_enter(u32 state)
+ static int psci_system_suspend(unsigned long unused)
+ {
+ 	return invoke_psci_fn(PSCI_FN_NATIVE(1_0, SYSTEM_SUSPEND),
+-			      __pa_symbol(cpu_resume), 0, 0);
++			      __pa_function(cpu_resume), 0, 0);
+ }
+ 
+ static int psci_system_suspend_enter(suspend_state_t state)
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
