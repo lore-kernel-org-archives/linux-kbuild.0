@@ -2,123 +2,119 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C70C433E6
-	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Mar 2021 23:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB80C41621
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C715C64F92
-	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Mar 2021 23:37:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7231864F8D
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbhCKXhG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 11 Mar 2021 18:37:06 -0500
-Received: from mail-io1-f42.google.com ([209.85.166.42]:35213 "EHLO
-        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbhCKXgr (ORCPT
+        id S231661AbhCLAtu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Mar 2021 19:49:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51986 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231239AbhCLAt1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Mar 2021 18:36:47 -0500
-Received: by mail-io1-f42.google.com with SMTP id g27so23852542iox.2;
-        Thu, 11 Mar 2021 15:36:47 -0800 (PST)
+        Thu, 11 Mar 2021 19:49:27 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F19C061574
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:27 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id u15so16466271qvo.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=CeeN3xK5WAqMYQUfCf/QpaYnEzhU3e+FKSYu/FFXY8U=;
+        b=YnzwiV3Orw5sKBr6YMDFmOYncBsKWDPtb68ypzRHMVK3VthGHiIWe4l2U/YxjypRBN
+         wsdCMJQ8zMQ4WArlh/izxsQg9B1HPq7k4+zQzGqy/xvNVcvrOCu/A8nWO7g/+YjeuX2h
+         jGDQ6MfChdyYhzfQCswFV9W0HW6D3ltx+MimGyrgUD1x+t+Bx9gPsDldUro2PNx4V8IN
+         W7Zh/Yi/mTibl7LPNJ8pYn5eEyxkejmEbIYlhqwbmdNSdCR37OXx0M/R0WNI7f5943RF
+         Jxme+nNTOcM7RlsIuIDWP8FV2CKIsNqPYMxSMUacQp9r5XEU2NLvZY8ysWVBhk0rMnGD
+         iC0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=TEluSVU381Ra21RcLCeHjZXwMsuJenQrl8kmmWg+LmQ=;
-        b=sSMZVSd7afeAxF56YtJIfZopwXw7mWE/1w4oUwe5hwqkrnVAh0vfOhrBVoJCuOll8F
-         ueKU7wfgxpCWxKHME2eHIsdu8X/gJS5jHU/nJ1ee9NCKVl5mOBsU1KtdWu7VZ5AgCW57
-         dAGFChhLDYUXyVXmujeHDRgvhBE8ShDd/Y0e1MeQAmgFx5B2Nh04JOj2+acEkqpNpJap
-         92CkzA2QBuH6LXWPglw5noQMtuBz1G+REmc8F0aYL+jI6MgGQK7FYiJWAv+hdDUqO+zU
-         T3xvdcnMR0cAamGx9XLfcyue0IYKEYuE5s6RVIwR7v9C028JgsErzuZTIwRf39PESjk8
-         FEew==
-X-Gm-Message-State: AOAM530jat5R6rtQzqZxBNeaDx0QYUrKfC2JgjnS95kjBqKh1YGvWjmr
-        AlIyrE2amLZRUwQJB+fYYL3FuT6rzA==
-X-Google-Smtp-Source: ABdhPJzasXx8vKNyWMagUD52OxJAx/dM4ycm90OSE7oYTr57NDHJc3J9OFsX+/v1Olh2uy99iXqUGg==
-X-Received: by 2002:a5d:8416:: with SMTP id i22mr7909377ion.32.1615505806554;
-        Thu, 11 Mar 2021 15:36:46 -0800 (PST)
-Received: from xps15.herring.priv ([64.188.179.253])
-        by smtp.googlemail.com with ESMTPSA id y9sm1901016ill.15.2021.03.11.15.36.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Mar 2021 15:36:45 -0800 (PST)
-From:   Rob Herring <robh@kernel.org>
-To:     devicetree@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Maxime Ripard <mripard@kernel.org>,
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=CeeN3xK5WAqMYQUfCf/QpaYnEzhU3e+FKSYu/FFXY8U=;
+        b=Bi9bQ4suFtXjYLclP6/Y5h/ufx2oYYB1SY0KqkTctPDQTIi6U0ye15P2kIHyLYd9hh
+         WvavtKhQQFvplXega5krYzZoLZrWryZ+uxgSa3xEknFc1WB5AVLyrjJYF/Xyp+z/qS4l
+         UK8CLwAyGwDWvETghyNtDKuJatyO7aqxlAKuKxA7yKeAWYggCcq2s+nSY7O2V+wgSvwQ
+         DwbHrco7SmjulmCSxOnONXwPolmMqmQcd3CkCAe6XMHdZarpT35IxgA9C2ZULl6NJ0L8
+         OfA3dSTGeDqERZz0OR5cFqwTh8+OZyN71MnDBQmtw0KCSK5gVtvHsHTkCscab+5SZz9c
+         DhfQ==
+X-Gm-Message-State: AOAM531wnqCZZrk+zjeH4IWM8lXA2bGFn3M/H5XgnNaA9zB5I21ryUgO
+        WsseqosFz9mj6PfUG0WzTJYtc7KbmufNMZllxik=
+X-Google-Smtp-Source: ABdhPJwjquHhXc1azJY3wJx2N7E06CHn55yFR9L2LbefYUmXDDh/IrCaqT99xH2KOyCrVwPGAoCRUF+Cuh4wGPAPnqw=
+X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:c86b:8269:af92:55a])
+ (user=samitolvanen job=sendgmr) by 2002:a05:6214:1144:: with SMTP id
+ b4mr10460988qvt.12.1615510166369; Thu, 11 Mar 2021 16:49:26 -0800 (PST)
+Date:   Thu, 11 Mar 2021 16:49:05 -0800
+In-Reply-To: <20210312004919.669614-1-samitolvanen@google.com>
+Message-Id: <20210312004919.669614-4-samitolvanen@google.com>
+Mime-Version: 1.0
+References: <20210312004919.669614-1-samitolvanen@google.com>
+X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
+Subject: [PATCH 03/17] mm: add generic __va_function and __pa_function macros
+From:   Sami Tolvanen <samitolvanen@google.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 2/2] kbuild: Enable DT undocumented compatible checks
-Date:   Thu, 11 Mar 2021 16:36:40 -0700
-Message-Id: <20210311233640.1581526-2-robh@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210311233640.1581526-1-robh@kernel.org>
-References: <20210311233640.1581526-1-robh@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Will Deacon <will@kernel.org>, Jessica Yu <jeyu@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Tejun Heo <tj@kernel.org>,
+        bpf@vger.kernel.org, linux-hardening@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-dt-validate has an option to warn on any compatible strings which don't
-match any schema. The option has recently been improved to fix false
-positives, so let's enable the option. This is useful for tracking
-compatibles which are undocumented or not yet converted to DT schema.
-Previously, the only check of undocumented compatible strings has been
-an imperfect checkpatch.pl check.
+With CONFIG_CFI_CLANG, the compiler replaces function addresses
+in instrumented C code with jump table addresses. This means that
+__pa_symbol(function) returns the physical address of the jump table
+entry instead of the actual function, which may not work as the jump
+table code will immediately jump to a virtual address that may not be
+mapped.
 
-The option is enabled by default for 'dtbs_check'. This will add more
-warnings, but some platforms are down to only a handful of these
-warnings (good job!).
+To avoid this address space confusion, this change adds generic
+definitions for __va_function and __pa_function, which architectures
+that support CFI can override. The typical implementation of the
+__va_function macro would use inline assembly to take the function
+address, which avoids compiler instrumentation.
 
-There's about 100 cases in the binding examples, so the option is
-disabled until these are fixed. In the meantime, they can be checked
-with:
-
-make DT_CHECKER_FLAGS=-m dt_binding_check
-
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- Documentation/devicetree/bindings/Makefile | 3 +++
- scripts/Makefile.lib                       | 3 ++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ include/linux/mm.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/Makefile b/Documentation/devicetree/bindings/Makefile
-index 81f0b3294c64..bc24ee316726 100644
---- a/Documentation/devicetree/bindings/Makefile
-+++ b/Documentation/devicetree/bindings/Makefile
-@@ -55,6 +55,9 @@ override DTC_FLAGS := \
- 	-Wno-graph_child_address \
- 	-Wno-interrupt_provider
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 77e64e3eac80..1262c4c0242c 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -116,6 +116,14 @@ extern int mmap_rnd_compat_bits __read_mostly;
+ #define __pa_symbol(x)  __pa(RELOC_HIDE((unsigned long)(x), 0))
+ #endif
  
-+# Disable undocumented compatible checks until warning free
-+override DT_CHECKER_FLAGS ?=
++#ifndef __va_function
++#define __va_function(x) (x)
++#endif
 +
- $(obj)/processed-schema-examples.json: $(DT_DOCS) $(src)/.yamllint check_dtschema_version FORCE
- 	$(call if_changed_rule,chkdt)
- 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index eee59184de64..f11fac1a8e9b 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -339,12 +339,13 @@ $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
- 	$(call if_changed_dep,dtc)
- 
- DT_CHECKER ?= dt-validate
-+DT_CHECKER_FLAGS ?= -m
- DT_BINDING_DIR := Documentation/devicetree/bindings
- # DT_TMP_SCHEMA may be overridden from Documentation/devicetree/bindings/Makefile
- DT_TMP_SCHEMA ?= $(objtree)/$(DT_BINDING_DIR)/processed-schema.json
- 
- quiet_cmd_dtb_check =	CHECK   $@
--      cmd_dtb_check =	$(DT_CHECKER) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
-+      cmd_dtb_check =	$(DT_CHECKER) $(DT_CHECKER_FLAGS) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@
- 
- define rule_dtc
- 	$(call cmd_and_fixdep,dtc)
++#ifndef __pa_function
++#define __pa_function(x) __pa_symbol(__va_function(x))
++#endif
++
+ #ifndef page_to_virt
+ #define page_to_virt(x)	__va(PFN_PHYS(page_to_pfn(x)))
+ #endif
 -- 
-2.27.0
+2.31.0.rc2.261.g7f71774620-goog
 
