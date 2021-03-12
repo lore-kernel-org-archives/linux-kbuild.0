@@ -8,112 +8,120 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAA0C4151A
-	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7642AC433DB
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 01:10:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 886C064FA7
-	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46CEC64F90
+	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 01:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231634AbhCLAuV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 11 Mar 2021 19:50:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52166 "EHLO
+        id S229633AbhCLBKM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Mar 2021 20:10:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230523AbhCLAtp (ORCPT
+        with ESMTP id S229569AbhCLBJs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Mar 2021 19:49:45 -0500
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB30DC061763
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:44 -0800 (PST)
-Received: by mail-qk1-x74a.google.com with SMTP id a137so13339452qkb.20
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:44 -0800 (PST)
+        Thu, 11 Mar 2021 20:09:48 -0500
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189C9C061760
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 17:09:48 -0800 (PST)
+Received: by mail-qt1-x84a.google.com with SMTP id l63so13447002qtd.23
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 17:09:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ECTrvoO9KldCfD8hhCsvcspErQHIUuuHBqQ2YK+RGVo=;
-        b=wW+1hJj1hFqCk4rTpcwuBRw62x+A3vHis0Oz5tBAJYHzlXekVI5fCb4CRuFvioi1v8
-         Mh7hYB9AcKeYBbYe1goSlW2jh4jRNczZ50/cIvHXEQ7ZvYFUlJ2UW0wkI493Qhde1FYO
-         6pLN6ClfnYejsqp0oEwmGUo8DiPRFkt8XUU5nKtpWtewS9sJUGEekHLT4Tc4fNpo5Xjv
-         mpKtrgupIsEYAT+X4F4UKvy4K/AyDXWX4jIYTycY5aYcneVJLoUhiOAcvCtUoWt2ePSz
-         Q9zfzeGbLMmxYteDuFtsZTLdQWkZGVmJ6eMArA+j86MRORN5REegAy0i8e2HidZSQHB7
-         s7mQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=n+xPhT43NmscUpw6p+xSEcR+gcJnv0oKtggQXvDZY6A=;
+        b=Ro7zBPpxkv9FGSgPZFnM4f/xnbzurCHaDDuwf9MoExNQZwY6ITRKadi3mmz/10oyIk
+         jbG9SPspaCX6+P9I0cNl0hbHQnuUokAMvktXjd23CEiEv8ioWJJHcFrrHDNMAeSyDxe2
+         wTgf/lwKD88qYnR9E346OOlA7E1St+6zSVdCvQNng/q9X60rKfoLDOBEJeTjIUwtPwqO
+         5Lag+KohaD3ZGIYgCHdnCm4tEePfwEmWpgN7I/ZsveYEH+XwuGzGESnb71SMVrR9Rzm1
+         8dZXTgH4SKk+Ns9knYcDnQsiHrQ1Fe6lf9tWlzFiK/UGcCaP2UwR0nqyslLqlVKYJEU5
+         Wx0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ECTrvoO9KldCfD8hhCsvcspErQHIUuuHBqQ2YK+RGVo=;
-        b=BQB/p3b42cDSHrQS7/5z9sDzbqQxxPRFbMq8yX9kOzAXZKPdkkQbgy5QinGGVjUNMu
-         875lrEkcaGeOi3rWa/KVDM6Vegkxx8yjGwucMWWasSPriuo8QQ1i51R59qt6JBCrx66M
-         vw269XxcDwOLZINBV8OChw8yOo+6c1v5xD22H6gcbmFHlGjPlK9uhLRg7hMY0UOhgWUe
-         mvI4nFEX97ZbVDcPRvIOrAqbpRNfNoniPlNO/MqmR9fBbNX/wYgHSKrMauP1XN8t9K2+
-         fnulA4ROwDtt5yvq9qfQWUWKxiWAe1sZiU4KuP+MMojp2wd0h3mwg71P+NnkoQIDeP4N
-         p8TQ==
-X-Gm-Message-State: AOAM532rUbmBiepelKAlMlAgUZa8lshhjOLz34jYrKs2dXL/N01Hmpod
-        wF7a5ULlUfiQx87kVSL/0xIXMtewW//shLOakng=
-X-Google-Smtp-Source: ABdhPJytXg5BTjwe45Q3r7eqpSZES0F+YXxX5W/l9U8XvamBe9sQnbAHhU6LdjW/F5/J+RERUpGWGLvVN/OI8YfDR1o=
-X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:c86b:8269:af92:55a])
- (user=samitolvanen job=sendgmr) by 2002:a0c:b89a:: with SMTP id
- y26mr10213572qvf.49.1615510184064; Thu, 11 Mar 2021 16:49:44 -0800 (PST)
-Date:   Thu, 11 Mar 2021 16:49:14 -0800
-In-Reply-To: <20210312004919.669614-1-samitolvanen@google.com>
-Message-Id: <20210312004919.669614-13-samitolvanen@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=n+xPhT43NmscUpw6p+xSEcR+gcJnv0oKtggQXvDZY6A=;
+        b=NgYubMrf1X4PMy0Z1KU8q+fPWB6++xtWE/ZU2fEGciQZVcvrGO7K5/roTmFCo55SfQ
+         UxMqN5D+FKsWjknwM4j4DUpNwnFFYeJblG5t4LDAdkOYR0yV4948GTydZM2Z5A0sVSiu
+         qMI6sAyauSOwbdZARhu9CLIk/OD0LGQ4UKFDcpgsGm/5wCccNjTtaWkj2Fl7480Kwx49
+         qnjk+jA+bMWVtzisXQ5/dd9o/MaoHh9O73ThMJZFUGn4TxjzIBywiEsGHBRs4tXtANK3
+         ktIRDmRb9nBYD9Cjut+Y/ldcm3MGHOqNAFBw65cGCpmQpd2943rCSQEB3vk6wWBY6mQd
+         jgYQ==
+X-Gm-Message-State: AOAM532UX3H+d1Y9xKFRQO/Fwl5RVwAbYfm/DmfrAdtwClkuJZ4YTYjz
+        eWqzTytGy9mwTtUv1JCNRcpwbFXvYTlyKdUN43w=
+X-Google-Smtp-Source: ABdhPJxYksMhjkXz0qS5Tfc9f8b0uN6DGFNkVdVKfReR40RRwT5Q+xttnmmUY1MNmPTTJzGoFmbUlVIiqIJCxZIfmlU=
+X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:9c6c:84f8:2058:5b95])
+ (user=ndesaulniers job=sendgmr) by 2002:a05:6214:10e7:: with SMTP id
+ q7mr10184252qvt.16.1615511387105; Thu, 11 Mar 2021 17:09:47 -0800 (PST)
+Date:   Thu, 11 Mar 2021 17:09:41 -0800
+Message-Id: <20210312010942.1546679-1-ndesaulniers@google.com>
 Mime-Version: 1.0
-References: <20210312004919.669614-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH 12/17] arm64: implement __va_function
-From:   Sami Tolvanen <samitolvanen@google.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Will Deacon <will@kernel.org>, Jessica Yu <jeyu@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Tejun Heo <tj@kernel.org>,
-        bpf@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kbuild@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH] Makefile: LTO: have linker check -Wframe-larger-than
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Candle Sun <candlesea@gmail.com>,
+        Fangrui Song <maskray@google.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_CFI_CLANG, the compiler replaces function addresses in
-instrumented C code with jump table addresses. This change implements
-the __va_function() macro, which returns the actual function address
-instead.
+-Wframe-larger-than= requires stack frame information, which the
+frontend cannot provide. This diagnostic is emitted late during
+compilation once stack frame size is available.
 
-Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+When building with LTO, the frontend simply lowers C to LLVM IR and does
+not have stack frame information, so it cannot emit this diagnostic.
+When the linker drives LTO, it restarts optimizations and lowers LLVM IR
+to object code. At that point, it has stack frame information but
+doesn't know to check for a specific max stack frame size.
+
+I consider this a bug in LLVM that we need to fix. There are some
+details we're working out related to LTO such as which value to use when
+there are multiple different values specified per TU, or how to
+propagate these to compiler synthesized routines properly, if at all.
+
+Until it's fixed, ensure we don't miss these. At that point we can wrap
+this in a compiler version guard or revert this based on the minimum
+support version of Clang.
+
+The error message is not generated during link:
+  LTO     vmlinux.o
+ld.lld: warning: stack size limit exceeded (8224) in foobarbaz
+
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Reported-by: Candle Sun <candlesea@gmail.com>
+Suggested-by: Fangrui Song <maskray@google.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
- arch/arm64/include/asm/memory.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+LTO users might want to `make clean` or `rm -rf .thinlto-cache` to test
+this.
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index c759faf7a1ff..4defa9dc3cc5 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -321,6 +321,21 @@ static inline void *phys_to_virt(phys_addr_t x)
- #define virt_to_pfn(x)		__phys_to_pfn(__virt_to_phys((unsigned long)(x)))
- #define sym_to_pfn(x)		__phys_to_pfn(__pa_symbol(x))
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index f9b54da2fca0..74566b1417b8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -910,6 +910,11 @@ CC_FLAGS_LTO	+= -fvisibility=hidden
  
-+#ifdef CONFIG_CFI_CLANG
-+/*
-+ * With CONFIG_CFI_CLANG, the compiler replaces function address
-+ * references with the address of the function's CFI jump table
-+ * entry. The __va_function macro always returns the address of the
-+ * actual function instead.
-+ */
-+#define __va_function(x) ({						\
-+	void *addr;							\
-+	asm("adrp %0, " __stringify(x) "\n\t"				\
-+	    "add  %0, %0, :lo12:" __stringify(x) : "=r" (addr));	\
-+	addr;								\
-+})
-+#endif
+ # Limit inlining across translation units to reduce binary size
+ KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
 +
- /*
-  *  virt_to_page(x)	convert a _valid_ virtual address to struct page *
-  *  virt_addr_valid(x)	indicates whether a virtual address is valid
++# Check for frame size exceeding threshold during prolog/epilog insertion.
++ifneq ($(CONFIG_FRAME_WARN),0)
++KBUILD_LDFLAGS	+= -plugin-opt=-warn-stack-size=$(CONFIG_FRAME_WARN)
++endif
+ endif
+ 
+ ifdef CONFIG_LTO
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
