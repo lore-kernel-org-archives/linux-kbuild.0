@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70CF4C2BA1E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A04AC433DB
 	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6337864FC0
+	by mail.kernel.org (Postfix) with ESMTP id 2C13164F92
 	for <linux-kbuild@archiver.kernel.org>; Fri, 12 Mar 2021 00:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231689AbhCLAtx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 11 Mar 2021 19:49:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52098 "EHLO
+        id S231340AbhCLAtw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Mar 2021 19:49:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbhCLAti (ORCPT
+        with ESMTP id S231360AbhCLAtd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 11 Mar 2021 19:49:38 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B15C061760
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:37 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id p136so27854811ybc.21
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:37 -0800 (PST)
+        Thu, 11 Mar 2021 19:49:33 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB60C061762
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:32 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id v6so27683853ybk.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Mar 2021 16:49:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=6JZKTL3cv5f+QsuwZswDwzrYuKZX5rkh1eIr4Zfx2fE=;
-        b=SdFCtfB+Erk7sy687mtu53wuRF76AZGcEYo50hTsFl58FIcew0neCPwcU/JyE46Lyg
-         8uupf7fpGQiaWZJfLEYQ0iXlShGOCOxPpJWgx6+iNKLuBORfG5z9+ozjbITPTcWG8Hp+
-         krp3MjMp6k/F0pZwOXtdRZPjpcC9Nm+ia4KgnZ9oLej4ik6gd92kTLPwNqBbKFbK3zA5
-         B9vR9YaYjXCmZHFwxIvqh6hEpiNTXSDXUsKDBpLApQYr5+dm/rhtWB/el9ryHg6pZMAI
-         CbS9EPvPMgf2ILbU+iFK2S/kxe2X4eyXHiBnQjBNkmTdJFgT+3hcKhAMd9EtUZ2izmPG
-         2tew==
+        bh=Y+bQ/FvCUm3fvBgel5uQUEfp5fAIz/0D/2shjtjBBOQ=;
+        b=XH46gyIVQlOmQFd/RmNS2UiHhzUpt2qt03RTF06Xnae6iCcw0dFPqWjKTPco+qP/Zx
+         fB/uJw66ANkZSXLpgPZzsNiuQ09DnyCviGcpTgD8pTRezXmUpwZek+cB7Y/HvGxA8qch
+         dFOUqeeMZ918ZEBhrbuNcNxKi6PRldR02Suyv0Yn8UZyobwAbNbMX7d8KutkSzRsxDGm
+         0S6hbtJQ8Ws4a+nW+Glvo6IMRSySbHIstPjzQXpwjaBdZ61ql+77Yzbd9C2HqajlQ9bT
+         al24/Uv71xlS2VCq05aPDtCBcnEMCW+8us1rt97YOCFL3l3qREf0N5Bb4Jekm29kn/qK
+         q9Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6JZKTL3cv5f+QsuwZswDwzrYuKZX5rkh1eIr4Zfx2fE=;
-        b=nbqFP2Ioxw8RoyFKx5RV2P/sVHVADQIZxIt+xGsxDEkd8rRNsg7r3K7Yc5perr5qh0
-         zLfQRS1X2+C8CDPGtjOzJjDjfCpmh5OCQyDLDiNudOdBaJEz+IAztzP6t09DhtPLf0vI
-         Y3OqvULZZBjlsCb91OZ6rg/Tl4Cg+SephLjHdznEb/zP95IYGB32fzTeGakwayT77pj8
-         ngRWg3ZM6T5sKovAfZBTCpHqPPc8kahjXMIQk9I5SHJdwz88M8TaOy61FOYxebAHf9ev
-         j5X8eK4RVAnkbe7P7NLbJHYGeFd004AeOisZqPTbBp3OruVHJ9i9sTXLEFJx0rD0a3up
-         sm8w==
-X-Gm-Message-State: AOAM533vHKiWpO/hfgImEBiDBihCzayg1QFs8Ty2fu8OBUiwzI2vLDFL
-        zrhA2eChRldu0atD0xVriZ4Xe6wrj0fpqqKlAT0=
-X-Google-Smtp-Source: ABdhPJx1YGkGp7cqKP4eWzC8MMNMuq4xIKNrPn1tsOPZo78IMlccqylVp5+hUcgOYd8xYJ5Qbwkysj1kalvbYUi0TXY=
+        bh=Y+bQ/FvCUm3fvBgel5uQUEfp5fAIz/0D/2shjtjBBOQ=;
+        b=o3TYubzVSo/zVBmDjfLjc1O2CvBmB4qEsxl8kFCsxDJPmWa2WDcJU/laJ+GYwxEXjx
+         2YBq5YAcNEYlnchgbQnyAxU1qshYLmmLrRIfNdGxRrwlxsGjI1p6b705V/sa5QJ0z7A4
+         OQYdl6SfoF4AnlCZNkH5tkvVxElfYPM1DTaSk0vPEDnStx8vAnATYDfc9OL9ZBPHkvFp
+         KUiR0ozoI6v7W69mIuuGxjP+kgc41tsfEHm7u9fqVh8HbHWqcXvPkeb6IW/c75EvyWzr
+         BrcD+Hd0U54vHKyHr4nh13l9gOqHuhkc1HXyDjCpocTYbcAh58B08DB2WGURNwOwnTeJ
+         LT6A==
+X-Gm-Message-State: AOAM532NfcVgIWFjoC+6VxeMupMO+o4d4/OYApoBaJp97IysnbnpwQc8
+        xafOhRrBU8pHqVyuytl9Yw7LTBqwFg9ETq1FaqU=
+X-Google-Smtp-Source: ABdhPJx7qHHoiwHh7Mz2oYX8+DonjBOnAMdcSWoE+4sImbjhV4Eew8XMTramdbIeYBSUSqj6zA5bpTyw6U5L5XSs8WU=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:c86b:8269:af92:55a])
- (user=samitolvanen job=sendgmr) by 2002:a25:4ce:: with SMTP id
- 197mr15054589ybe.462.1615510177158; Thu, 11 Mar 2021 16:49:37 -0800 (PST)
-Date:   Thu, 11 Mar 2021 16:49:11 -0800
+ (user=samitolvanen job=sendgmr) by 2002:a25:1d88:: with SMTP id
+ d130mr15900461ybd.446.1615510171706; Thu, 11 Mar 2021 16:49:31 -0800 (PST)
+Date:   Thu, 11 Mar 2021 16:49:08 -0800
 In-Reply-To: <20210312004919.669614-1-samitolvanen@google.com>
-Message-Id: <20210312004919.669614-10-samitolvanen@google.com>
+Message-Id: <20210312004919.669614-7-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210312004919.669614-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH 09/17] lib/list_sort: fix function type mismatches
+Subject: [PATCH 06/17] kthread: cfi: disable callback pointer check with modules
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -78,51 +78,39 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Casting the comparison function to a different type trips indirect
-call Control-Flow Integrity (CFI) checking. Remove the additional
-consts from cmp_func, and the now unneeded casts.
+With CONFIG_CFI_CLANG, a callback function passed to
+__kthread_queue_delayed_work from a module points to a jump table
+entry defined in the module instead of the one used in the core
+kernel, which breaks function address equality in this check:
 
-Fixes: 043b3f7b6388 ("lib/list_sort: simplify and remove MAX_LIST_LENGTH_BITS")
+  WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
+
+Disable the warning when CFI and modules are enabled.
+
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 ---
- lib/list_sort.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ kernel/kthread.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/lib/list_sort.c b/lib/list_sort.c
-index 52f0c258c895..b14accf4ef83 100644
---- a/lib/list_sort.c
-+++ b/lib/list_sort.c
-@@ -8,7 +8,7 @@
- #include <linux/list.h>
+diff --git a/kernel/kthread.c b/kernel/kthread.c
+index 1578973c5740..af5fee350586 100644
+--- a/kernel/kthread.c
++++ b/kernel/kthread.c
+@@ -963,7 +963,13 @@ static void __kthread_queue_delayed_work(struct kthread_worker *worker,
+ 	struct timer_list *timer = &dwork->timer;
+ 	struct kthread_work *work = &dwork->work;
  
- typedef int __attribute__((nonnull(2,3))) (*cmp_func)(void *,
--		struct list_head const *, struct list_head const *);
-+		struct list_head *, struct list_head *);
+-	WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
++	/*
++	 * With CFI, timer->function can point to a jump table entry in a module,
++	 * which fails the comparison. Disable the warning if CFI and modules are
++	 * both enabled.
++	 */
++	if (!IS_ENABLED(CONFIG_CFI_CLANG) || !IS_ENABLED(CONFIG_MODULES))
++		WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
  
- /*
-  * Returns a list organized in an intermediate format suited
-@@ -227,7 +227,7 @@ void list_sort(void *priv, struct list_head *head,
- 		if (likely(bits)) {
- 			struct list_head *a = *tail, *b = a->prev;
- 
--			a = merge(priv, (cmp_func)cmp, b, a);
-+			a = merge(priv, cmp, b, a);
- 			/* Install the merged result in place of the inputs */
- 			a->prev = b->prev;
- 			*tail = a;
-@@ -249,10 +249,10 @@ void list_sort(void *priv, struct list_head *head,
- 
- 		if (!next)
- 			break;
--		list = merge(priv, (cmp_func)cmp, pending, list);
-+		list = merge(priv, cmp, pending, list);
- 		pending = next;
- 	}
- 	/* The final merge, rebuilding prev links */
--	merge_final(priv, (cmp_func)cmp, head, pending, list);
-+	merge_final(priv, cmp, head, pending, list);
- }
- EXPORT_SYMBOL(list_sort);
+ 	/*
+ 	 * If @delay is 0, queue @dwork->work immediately.  This is for
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
