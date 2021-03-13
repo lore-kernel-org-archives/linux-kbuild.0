@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D65AC4332D
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D10C433DB
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F30D664EB7
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:49:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA7AF64EBD
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234455AbhCMTtL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 Mar 2021 14:49:11 -0500
-Received: from conuserg-11.nifty.com ([210.131.2.78]:39826 "EHLO
+        id S234598AbhCMTto (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 Mar 2021 14:49:44 -0500
+Received: from conuserg-11.nifty.com ([210.131.2.78]:39825 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234344AbhCMTtH (ORCPT
+        with ESMTP id S234391AbhCMTtH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 13 Mar 2021 14:49:07 -0500
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 12DJmef5018162;
-        Sun, 14 Mar 2021 04:48:43 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 12DJmef5018162
+        by conuserg-11.nifty.com with ESMTP id 12DJmef2018162;
+        Sun, 14 Mar 2021 04:48:42 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 12DJmef2018162
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1615664923;
-        bh=MGYlzY1GkRGJk4K6IXw77CNt1mJL/7ouqybHgT6bNkk=;
+        s=dec2015msa; t=1615664922;
+        bh=KZJp3Hia5JVlwU61G5LKo7adylHc58fSnTOISpaPHoA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y9IaPadaPRbfg+5RAhoiGmgxJT8PBRuXIqxf9+/6i0yb9/Ts9stMxolA/U7ClOz2Z
-         qmE0b+/bNQN4HaOzjcl5qeRxZrFHsd9tVzoEhaxoU24D/rG+Moef82AYepIyTgQaR8
-         Ms6RaJp37GPnnsGqJ24KOKSIwpSwZqwRhMsFKYLb5sCXue+rA0cDTe5GTkp1HLITEM
-         d0skhZM0bmfu7q9mOhIrLq9VKXHXnQKs1Ujcjvx1cFgLchFLKTm3YZ00YpyQ9mcVdP
-         FczmNn0lFce8WlhLc+A3UXsKi6iB7SQqBLaX7r1xq85B9z/Pn+AI5mvNfE/oov6yQb
-         YyYwZx2xSjmdw==
+        b=JA0QYcV00T7K1khGfHJqsvH+kPvX5yl0Gk81pg7eABbuid8f1Sy4uKpwbtsVgWsMC
+         uEEgB+icBbq9GtR5ozAeq4ck2bC/YchHzmaaVfFWRF3dCauFwpfVfMjWAErg8OCOne
+         VKUW6bToLXZur9/mANDLh/XaWPEhatE/fMCA8cjoTBUr/CgbC1XEuMCwopmNe0oQZ6
+         a9FAlSAN9OtoSm2Eg4CN7Deh1rt4ro6PPDd4hWvGYWfPRma3yAnmBHeQTkPUF/VXIY
+         ZAyRwbbgjALsLfvmTGjr3xQinQzljFuDWStTq4jeOvgvw90mO+Bv2fWTNQobr+h/3N
+         twH9ho+NDDRWA==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 06/13] kconfig: move conf_rewrite_mod_or_yes() to conf.c
-Date:   Sun, 14 Mar 2021 04:48:29 +0900
-Message-Id: <20210313194836.372585-6-masahiroy@kernel.org>
+Subject: [PATCH 03/13] kconfig: add long options --help and --silent
+Date:   Sun, 14 Mar 2021 04:48:26 +0900
+Message-Id: <20210313194836.372585-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210313194836.372585-1-masahiroy@kernel.org>
 References: <20210313194836.372585-1-masahiroy@kernel.org>
@@ -51,77 +51,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This function is only used in conf.c.
+They are long options for -h and -s, respectively.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/conf.c     | 15 +++++++++++++++
- scripts/kconfig/confdata.c | 15 ---------------
- scripts/kconfig/lkc.h      |  1 -
- 3 files changed, 15 insertions(+), 16 deletions(-)
+ scripts/kconfig/conf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 42d35da86604..89c9ba83f9e7 100644
+index dc1a67fd35a9..aac76acfd100 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -112,6 +112,21 @@ static void set_randconfig_seed(void)
- 	srand(seed);
+@@ -474,6 +474,8 @@ static void check_conf(struct menu *menu)
  }
  
-+static void conf_rewrite_mod_or_yes(enum conf_def_mode mode)
-+{
-+	struct symbol *sym;
-+	int i;
-+	tristate old_val = (mode == def_y2m) ? yes : mod;
-+	tristate new_val = (mode == def_y2m) ? mod : yes;
-+
-+	for_all_symbols(i, sym) {
-+		if (sym_get_type(sym) == S_TRISTATE &&
-+		    sym->def[S_DEF_USER].tri == old_val)
-+			sym->def[S_DEF_USER].tri = new_val;
-+	}
-+	sym_clear_all_valid();
-+}
-+
- static int conf_askvalue(struct symbol *sym, const char *def)
- {
- 	if (!sym_has_value(sym))
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 2568dbe16ed6..a828622cb2d0 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1322,18 +1322,3 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
- 
- 	return has_changed;
- }
--
--void conf_rewrite_mod_or_yes(enum conf_def_mode mode)
--{
--	struct symbol *sym;
--	int i;
--	tristate old_val = (mode == def_y2m) ? yes : mod;
--	tristate new_val = (mode == def_y2m) ? mod : yes;
--
--	for_all_symbols(i, sym) {
--		if (sym_get_type(sym) == S_TRISTATE &&
--		    sym->def[S_DEF_USER].tri == old_val)
--			sym->def[S_DEF_USER].tri = new_val;
--	}
--	sym_clear_all_valid();
--}
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index bee2413bda63..f946ab49ef50 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -58,7 +58,6 @@ const char *conf_get_configname(void);
- void sym_set_change_count(int count);
- void sym_add_change_count(int count);
- bool conf_set_all_new_symbols(enum conf_def_mode mode);
--void conf_rewrite_mod_or_yes(enum conf_def_mode mode);
- void set_all_choice_values(struct symbol *csym);
- 
- /* confdata.c and expr.c */
+ static struct option long_opts[] = {
++	{"help",          no_argument,       NULL,            'h'},
++	{"silent",        no_argument,       NULL,            's'},
+ 	{"oldaskconfig",  no_argument,       &input_mode_opt, oldaskconfig},
+ 	{"oldconfig",     no_argument,       &input_mode_opt, oldconfig},
+ 	{"syncconfig",    no_argument,       &input_mode_opt, syncconfig},
 -- 
 2.27.0
 
