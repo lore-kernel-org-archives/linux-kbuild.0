@@ -2,129 +2,98 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1C5C433DB
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 11:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA94C433E0
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:49:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94D2464F0F
-	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 11:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B0A064ECE
+	for <linux-kbuild@archiver.kernel.org>; Sat, 13 Mar 2021 19:49:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231597AbhCMLyW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 13 Mar 2021 06:54:22 -0500
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:49115 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbhCMLyM (ORCPT
+        id S234408AbhCMTtI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 13 Mar 2021 14:49:08 -0500
+Received: from conuserg-11.nifty.com ([210.131.2.78]:39828 "EHLO
+        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234393AbhCMTtH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 13 Mar 2021 06:54:12 -0500
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 12DBrdfe012530;
-        Sat, 13 Mar 2021 20:53:39 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 12DBrdfe012530
+        Sat, 13 Mar 2021 14:49:07 -0500
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-11.nifty.com with ESMTP id 12DJmef9018162;
+        Sun, 14 Mar 2021 04:48:46 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 12DJmef9018162
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1615636419;
-        bh=UsbgXShxta9Fb/uiVHXrhCHY1/IMnaOpCflVSeL+MgE=;
-        h=From:Date:Subject:To:Cc:From;
-        b=O2CGeWQV9FiH25lMWe6VKJySU4M4qK/MwfMgJtsqyqVmgiOzvHXn3aLQmV6vhXO6Y
-         zf9GcXb0pk+jiF6c8G0G92oZMs+LwO+fyeadvjaEEGDBjPRq5L4T9bBjQi/3B/7pon
-         bGaP3ytT5rBU+hq99C/kjiSEQtKnFaf2zC5trPnyOs5gOMj1xGXCgM2cDS6KF2iGMS
-         HVRjNTnk2RgwuVo21TSvxLtOdCuYTwGeaKL6HB6+8Ir+idyV01TwbsVl907Gmh4OXu
-         Y7sztd2bTW+JweyZne6nFM+hE3POhIAtIeKkspcYvgwCRTyA+TW7j0Hn2nKvd0qWiH
-         GoaVz/h5FkG0A==
-X-Nifty-SrcIP: [209.85.215.169]
-Received: by mail-pg1-f169.google.com with SMTP id t37so6767928pga.11;
-        Sat, 13 Mar 2021 03:53:39 -0800 (PST)
-X-Gm-Message-State: AOAM5319V2FYtksRcCTcaP8lsvIRawxEATx3ZAbPelzbJwJkfY8o7Hsb
-        pHvDmIm27sGpD66P2qpeXM/1wz0v1QJUMS3iPl8=
-X-Google-Smtp-Source: ABdhPJwE3Ogz52Abg8ZsfVKn7qjTcySSnmNZ/GZvlbthwU1ctsNhqdOoDMmuaTtN7nlCe2FGBV0APb06vDDIrqNNAuI=
-X-Received: by 2002:a62:b416:0:b029:1e4:fb5a:55bb with SMTP id
- h22-20020a62b4160000b02901e4fb5a55bbmr2548330pfn.80.1615636418698; Sat, 13
- Mar 2021 03:53:38 -0800 (PST)
-MIME-Version: 1.0
+        s=dec2015msa; t=1615664926;
+        bh=oo+l2GrPRSzBEaYQadAcSoXEI2jsSrvlSeuPRjoV1tM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=N+uqGiE7IyoeZUG5Hs41pT9qM3eflkPWg9Bu5W2gzax+UdoHc/0Yu+v3ICUEFO1B9
+         lANGAZjPbgHoUxQxCwRGUmISj4oFMNeZhhwdlQ5Y1gTWIxD2epXioWt9ZGf06VWZGL
+         pJQFCqknaj4JafDM33LHCmB+S0jzUSaEYZJ3HyfXksjkLNWpFQEE5Hsc+r/7fX2AgA
+         LYMS+zfeb3h82AlDNm0/0AJysx2xwsd7x6OX0iG4EdhJi5zSN/uXAvI4k2bkgZUyYZ
+         p9fvdyfapGGHtH1t39FTceVDgv1Z5//3lwWCoutNW8HhUNC3iGoR0UDfQEqrXZ3D6K
+         /fI6av3EiED2A==
+X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 13 Mar 2021 20:53:01 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATqcLBbLVn5Ft+1-m_uC5WC=9HAx2orbopsOJnZ7SRgqQ@mail.gmail.com>
-Message-ID: <CAK7LNATqcLBbLVn5Ft+1-m_uC5WC=9HAx2orbopsOJnZ7SRgqQ@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v5.12-rc3
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 10/13] kconfig: move default KBUILD_DEFCONFIG back to scripts/kconfig/Makefile
+Date:   Sun, 14 Mar 2021 04:48:33 +0900
+Message-Id: <20210313194836.372585-10-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210313194836.372585-1-masahiroy@kernel.org>
+References: <20210313194836.372585-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+This is a partial revert of commit 2a86f6612164 ("kbuild: use
+KBUILD_DEFCONFIG as the fallback for DEFCONFIG_LIST").
 
-Please pull Kbuild fixes.
-Thanks.
+Now that the reference to $(DEFCONFIG_LIST) was removed from
+init/Kconfig, the default KBUILD_DEFCONFIG can go back home.
 
-The following changes since commit a38fd8748464831584a19438cbb3082b5a2dab15=
-:
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-  Linux 5.12-rc2 (2021-03-05 17:33:41 -0800)
+ Makefile                 | 3 ---
+ scripts/kconfig/Makefile | 4 ++++
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-are available in the Git repository at:
+diff --git a/Makefile b/Makefile
+index 31dcdb3d61fa..7d2304155e93 100644
+--- a/Makefile
++++ b/Makefile
+@@ -395,9 +395,6 @@ endif
+ KCONFIG_CONFIG	?= .config
+ export KCONFIG_CONFIG
+ 
+-# Default file for 'make defconfig'. This may be overridden by arch-Makefile.
+-export KBUILD_DEFCONFIG := defconfig
+-
+ # SHELL used by kbuild
+ CONFIG_SHELL := sh
+ 
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 31c5735663c8..7df3c0e4c52e 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -9,6 +9,10 @@ else
+ Kconfig := Kconfig
+ endif
+ 
++ifndef KBUILD_DEFCONFIG
++KBUILD_DEFCONFIG := defconfig
++endif
++
+ ifeq ($(quiet),silent_)
+ silent := -s
+ endif
+-- 
+2.27.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v5.12-2
-
-for you to fetch changes up to bcbcf50f521843445c9ea320a0569874f88c4b7a:
-
-  kbuild: fix ld-version.sh to not be affected by locale (2021-03-13
-11:12:13 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v5.12 (2nd)
-
- - avoid 'make image_name' invoking syncconfig
-
- - fix a couple of bugs in scripts/dummy-tools.
-
- - fix LLD_VENDOR and locale issues in scripts/ld-version.sh
-
- - rebuild GCC plugins when the compiler is upgraded
-
- - allow LTO to be enabled with KASAN_HW_TAGS
-
- - allow LTO to be enabled without LLVM=3D1
-
-----------------------------------------------------------------
-Bernhard Rosenkr=C3=A4nzer (1):
-      kbuild: Fix ld-version.sh script if LLD was built with LLD_VENDOR
-
-Jiri Slaby (2):
-      kbuild: dummy-tools: fix inverted tests for gcc
-      kbuild: dummy-tools: support MPROFILE_KERNEL checks for ppc
-
-Masahiro Yamada (7):
-      kbuild: add image_name to no-sync-config-targets
-      kbuild: rebuild GCC plugins when the compiler is upgraded
-      kbuild: dummy-tools: adjust to scripts/cc-version.sh
-      kbuild: remove unneeded -O option to dtc
-      kbuild: remove LLVM=3D1 test from HAS_LTO_CLANG
-      kbuild: remove meaningless parameter to $(call if_changed_rule,dtc)
-      kbuild: fix ld-version.sh to not be affected by locale
-
-Sami Tolvanen (1):
-      kbuild: Allow LTO to be selected with KASAN_HW_TAGS
-
- Makefile                         |  4 +++-
- arch/Kconfig                     |  3 +--
- include/linux/compiler-version.h | 14 ++++++++++++++
- include/linux/kconfig.h          |  2 --
- init/Kconfig                     |  8 ++++----
- scripts/Makefile.lib             |  4 ++--
- scripts/dummy-tools/gcc          | 18 ++++++++++++++++--
- scripts/gcc-plugins/Makefile     |  1 +
- scripts/ld-version.sh            | 22 ++++++++++++++--------
- 9 files changed, 55 insertions(+), 21 deletions(-)
- create mode 100644 include/linux/compiler-version.h
-
---=20
-Best Regards
-Masahiro Yamada
