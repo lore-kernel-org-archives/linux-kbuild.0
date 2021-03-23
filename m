@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00964C433F7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7CBC43381
 	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Mar 2021 20:41:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4ECC619CB
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Mar 2021 20:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C270619D2
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Mar 2021 20:41:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbhCWUkh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 23 Mar 2021 16:40:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44994 "EHLO
+        id S233634AbhCWUki (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 23 Mar 2021 16:40:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233488AbhCWUkF (ORCPT
+        with ESMTP id S233501AbhCWUkI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Mar 2021 16:40:05 -0400
+        Tue, 23 Mar 2021 16:40:08 -0400
 Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53FADC0613DF
-        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:04 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id c1so132836qke.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB286C061764
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:07 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id g18so120130qki.15
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=hHyY7qre9OXEm5PJ4BWXLYwsH5KdHQkHk/skTedwvAs=;
-        b=XrXpk80QpW18uEoFzgTskAcjmvDwp4KkI6czCZLCI2LllpcLlxdrxTo1ItDmNHN8O3
-         bTKrEPYdAX8nqjUwEIjMGeZsRGCVSfDL1H2a3iHP2ngOiAKHMzDoZoN0zJI6U4uE7k4F
-         VmweQXHEF/+JfAZFlAnZ8tr59hnNtlg0Zu2hks4+H3cinnrhxWtfOBc/gs/UrtgKxOLm
-         BhVL1pP08EBbqj7+0X2iUTjwgv413Vz8hEc3BGPp0zOsqaAbAJtmiERhqTuyjM44Skll
-         xAU/PM/Gg5Aoxn2Inc/k5V8U3wmSxVTzMEVnRHN2lA+v/IcNPy7/8t7fb9X4R/xp1aHQ
-         xZhg==
+        bh=xIKsEDWi8EL1j5NSYc2uWQA3l5Y2NiXXcLT9TovNhRQ=;
+        b=CgO/iSD/xRAdG2p+rJSIXqPZiKxGiKV2KoCvVGLUH2ZMIqkf574rj//FtCji3y0utT
+         6lKsLLQNF9ZBDCdsLOxtHp++EYzY5pP2mxldfH597xr3rQ4xUq9h8H5ZqqqHCXkA5Woj
+         AW4sxR0WuNwk6mjflnE1PSnqER0YBsuwjwXu3Ld7LoONyiCQrMHMa5vxLqAxT+oS7dew
+         573+hZHKrFPSsuuYfRH4A915CMBtXOIjkDVY3SgKsQFOEMK30MSps4h+NJvmkF2xbtOc
+         I9PZSHpWCV2Y3qKuZASiPEN0Gbhj4D7LoWjpCn9ubP4M+BIswdDkzinaS2z4pXhbM2te
+         iBHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=hHyY7qre9OXEm5PJ4BWXLYwsH5KdHQkHk/skTedwvAs=;
-        b=WJ/BtCLw1fjTLsnUc5gRMHeJFN+Ucq4AJqX+bNGQ6NcsnqNUSWcKj7qebvURe0Rq5r
-         vhQOSWT5/9JYCRsP2fxNlGmgZNCGyjV7Rkl/mHHl7ZBWINVJXsLvaCh3FBLrvhxYsSSI
-         zirtfDQWMqSh2Vwak3OX82pVTlQtLnPsu5LnVF5h/wdjJkI4P2bLMI9QWmvAIz/dMcoZ
-         w72Dg5q61iUklYGVjTyfGavdr+QRoL1vGv3XBswECJM75RA6rcJ2k26M2z7shXPQ8vJt
-         3FWtwNNMUeI2Sa0LoDAxZ15hUnANA1bbeypaajjIhLlLpLla6uNGqE3avL/QdbWr0AQ5
-         qhrg==
-X-Gm-Message-State: AOAM530LzL3e9/9GfMAh7KUsPRcL82obB9Jz6vZ8g3yTSNCrzV+pc7fN
-        DGIslvuiGHwiEzbPU1d0w3FtvBh2ULIHrSocn4I=
-X-Google-Smtp-Source: ABdhPJzK5aKSbLwoPjOa/fZ+4wQdl/i/PHvrBqs1DnRZn9DH8KD/9yfcQQbrZv/qBxwpr5GT4qC2fq5WQsc1rIzUeMY=
+        bh=xIKsEDWi8EL1j5NSYc2uWQA3l5Y2NiXXcLT9TovNhRQ=;
+        b=NICMmoBPtkgmkCSXPvAJmpusyOMkTn8MBpWFm/ia1ChN3/etfbMe3rIKytOF7ZOGj9
+         RYmZjz402bQMT7GFh+ZeRusyIITNDoQyOals7KNPu9SO9H66ovl4OaZ5qEy0swwNWvDo
+         iDx/2PoyiWDoqkrd6SN5HGzSTJzdjkXBoBgfgRwUzWGQU2wmb8yauB9yOA0mbtSSc975
+         PLgx/08Fuy0alzwMVjpXseKvvE4HgGITje+G3/wtfVbQvDfVb6W68Pft3u03l4zieVUs
+         Sl3dYI6RnuyA/ZLkjsERxsw52qyCOTiqLo20OpaM8oe15e3+GSemnajqr9ZLihBbXTiD
+         9wsg==
+X-Gm-Message-State: AOAM53359WBb1OiwtWa/SL69hSamGjc7x/dx3ATEMdaBtwHTFDMMIbpk
+        Qr9iNJyIW7ZRk9NSzulhGMRWtOECZlWZoHyu2mc=
+X-Google-Smtp-Source: ABdhPJxb7WUXqQY1HKNj9KDKWZ2mX+BL8U6d8oevhZ712uyBxXvQItdJYqzQ+dKFDvxGu4W+35Xr/uYgxKxus3pnNFc=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:e9a3:260d:763b:67dc])
- (user=samitolvanen job=sendgmr) by 2002:ad4:542b:: with SMTP id
- g11mr7093888qvt.47.1616532003425; Tue, 23 Mar 2021 13:40:03 -0700 (PDT)
-Date:   Tue, 23 Mar 2021 13:39:37 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a0c:e9c7:: with SMTP id
+ q7mr159305qvo.7.1616532007142; Tue, 23 Mar 2021 13:40:07 -0700 (PDT)
+Date:   Tue, 23 Mar 2021 13:39:39 -0700
 In-Reply-To: <20210323203946.2159693-1-samitolvanen@google.com>
-Message-Id: <20210323203946.2159693-9-samitolvanen@google.com>
+Message-Id: <20210323203946.2159693-11-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210323203946.2159693-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v3 08/17] bpf: disable CFI in dispatcher functions
+Subject: [PATCH v3 10/17] lkdtm: use __va_function
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -80,38 +80,30 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-BPF dispatcher functions are patched at runtime to perform direct
-instead of indirect calls. Disable CFI for the dispatcher functions to
-avoid conflicts.
+To ensure we take the actual address of a function in kernel text, use
+__va_function. Otherwise, with CONFIG_CFI_CLANG, the compiler replaces
+the address with a pointer to the CFI jump table, which is actually in
+the module when compiled with CONFIG_LKDTM=m.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Acked-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/bpf.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/misc/lkdtm/usercopy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index cccaef1088ea..9acdca574527 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -635,7 +635,7 @@ struct bpf_dispatcher {
- 	struct bpf_ksym ksym;
- };
+diff --git a/drivers/misc/lkdtm/usercopy.c b/drivers/misc/lkdtm/usercopy.c
+index 109e8d4302c1..d173d6175c87 100644
+--- a/drivers/misc/lkdtm/usercopy.c
++++ b/drivers/misc/lkdtm/usercopy.c
+@@ -314,7 +314,7 @@ void lkdtm_USERCOPY_KERNEL(void)
  
--static __always_inline unsigned int bpf_dispatcher_nop_func(
-+static __always_inline __nocfi unsigned int bpf_dispatcher_nop_func(
- 	const void *ctx,
- 	const struct bpf_insn *insnsi,
- 	unsigned int (*bpf_func)(const void *,
-@@ -663,7 +663,7 @@ void bpf_trampoline_put(struct bpf_trampoline *tr);
- }
- 
- #define DEFINE_BPF_DISPATCHER(name)					\
--	noinline unsigned int bpf_dispatcher_##name##_func(		\
-+	noinline __nocfi unsigned int bpf_dispatcher_##name##_func(	\
- 		const void *ctx,					\
- 		const struct bpf_insn *insnsi,				\
- 		unsigned int (*bpf_func)(const void *,			\
+ 	pr_info("attempting bad copy_to_user from kernel text: %px\n",
+ 		vm_mmap);
+-	if (copy_to_user((void __user *)user_addr, vm_mmap,
++	if (copy_to_user((void __user *)user_addr, __va_function(vm_mmap),
+ 			 unconst + PAGE_SIZE)) {
+ 		pr_warn("copy_to_user failed, but lacked Oops\n");
+ 		goto free_user;
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
