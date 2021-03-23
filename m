@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48804C43618
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F99FC43619
 	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Mar 2021 20:41:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22061619DF
+	by mail.kernel.org (Postfix) with ESMTP id 6C231619D6
 	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Mar 2021 20:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233556AbhCWUkn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 23 Mar 2021 16:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44946 "EHLO
+        id S233576AbhCWUkq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 23 Mar 2021 16:40:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233564AbhCWUkR (ORCPT
+        with ESMTP id S233581AbhCWUkX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Mar 2021 16:40:17 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B777C0613DC
-        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:17 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id x10so3830870ybr.11
-        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:17 -0700 (PDT)
+        Tue, 23 Mar 2021 16:40:23 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50FE4C0613E7
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:21 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id u8so24234qvm.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Mar 2021 13:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=qAbADIQAzXUoq/ElYpa9rjjQHxphEP8wPywcql//gEU=;
-        b=T9lYeG1vNkvikIi777MRSbbTtj3IaPeu7RN7uXeSPXvS4b9+WLGfOdasWEAHo+i17u
-         3080AmXMs2xVaLte8P7ahk8JJEdHsGELqvOLIoahy4V4PMsoqaf2aZV65W6Qbg5iWS+h
-         b6ti/m6+OZ84hMZziyoN5GFocxb13Za6OwHGFrBaUy1iO+H9JEiP0tyCwkF3p/KzGz5a
-         KI2Lj51XAl8PJy62wWStBc6KSEOp8id1hQ564UGK3S0iIjj4kUsIubPJjw5De4OUhc9s
-         huAxEcZhyUcc7CzcBmMkKd6YmZw4qc0E+2UxOVGGUsXyQLc3FPDMC5xWzijn66SgJ0Xs
-         vHJQ==
+        bh=WZ2fsTX5FLJhX01BulIdj9aVU+u+1SaaqVDcWrlk7vo=;
+        b=ec/02RNqMxC3NtjfEqCKWLv4qwmQTmHrkXsCeNO2KBn8qSqKzTE24FKGqfuKH+TVkK
+         X/VKFkbL4vsRYCrPeFIrZP8DeiwqKS96n7WGnqpK5r2/VAz0Iab+2cnLr9ixgbVx3i2+
+         bJO7ki2MVhZqoAWHQEzmE5B7oTVS3IIOSVMH6lZh48SF/0j7bgW6jHNwPIk8gKuBLJqR
+         4qQ5N4v6mKVofR2cSUqiTSphpJlczKzRN+vOPaGMsYJ3GFsS6r9eXFPtqA3WSVhoq05F
+         zPIbSYNFmagSwu4VxL+cE8EfslHOGZyTYBOn5X3fzMMM4mw38aQ1r1FrLS9fBfhCQ2tj
+         1law==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=qAbADIQAzXUoq/ElYpa9rjjQHxphEP8wPywcql//gEU=;
-        b=M+4b/tt3znGAYROoFx0qq4BNSPtl3I1jt00hcEmNbyw0a3gO7y6M1KpJqK7KWln3sf
-         JrI3Fz/rGdWmeAgRPcE9NuYjSgcj4TnE0hZcdwZFRh7UjtpXVfSWo1DRd6jR1lPzZMyK
-         /ekTt1mB+uwocJ17nh+7XsCotfa7LQhrj8XJgISD08w2W3CHUcFHu8Ag+Qr/zQaWquTA
-         NrheoTCEchlEA9ValA0eg9vUBGHON1hiV/udsu1RD2mwry/QuVzfGbd/OwUY6+aQWhP8
-         3KyzycN3XKj3CorRNnQPmVdsJUFy+Hnf3pnA19IPTSy04861rC3w3gBYnKC0wQmxIA8A
-         lypw==
-X-Gm-Message-State: AOAM533HVZNQvJSFkqhCyFCqW3+OzOEaSNlykktUtzdfm1irwvAqhr76
-        csmwpayUyGLXQx4o9Sod5dhikEC6gGVW3Rfm5ms=
-X-Google-Smtp-Source: ABdhPJwmStks0YRxHTnj25YBiyDAjN/ixvNa9lapKnlHKARYrFssO9o0nOXAMkPoRpi0g6QTRn8BhWyhoUBcjcDwMF8=
+        bh=WZ2fsTX5FLJhX01BulIdj9aVU+u+1SaaqVDcWrlk7vo=;
+        b=Uo3IqxPgjWpLfGoDXjbTEdSmmesb41y4Myc3zj6hAuzdB1gq10eKN+5pIaUo541aBB
+         yJPUoTBT/GEOH2QHksSoOzOWPO5fWKHkzeJNaa5U/iXmVnzhzyyo5khTWb4G/NPQhNYS
+         /akCw2QauOPpGRBFQMxk+N7s8j0jdk5jc9jo9KsmbKye0WdMXmZxQ7h/QNtp/7HJMbCe
+         OUSK/QZZpjZQLnPFYeSk+fSM36yVecdVFnrtAI90cAlF0dwe2seI0FWrqZqoa47SDphg
+         /1UOZ3N2fXYNgH194ZAkjWe6vuWAI/Ye9oeyZJwfsN1dRlqups488/OoD/CwxJmEBx+T
+         JoUA==
+X-Gm-Message-State: AOAM533kJ8Otn314LrwIjD+AmvuI+vDloEy69UF0wgV4mZAK7svEQSCH
+        nViAK0gxO6KQyY7a/BDsWlYQwX6DFSvnRZG1CfM=
+X-Google-Smtp-Source: ABdhPJyxpPvs3kGL5X0rhxaceHJDwoHelX5/WOAlmnNB1fMlzzx1j3iwVr8PFhB1zHKJQ3nkMRVGiRyWH5xdyb6dFU8=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:e9a3:260d:763b:67dc])
- (user=samitolvanen job=sendgmr) by 2002:a25:3493:: with SMTP id
- b141mr100244yba.342.1616532016542; Tue, 23 Mar 2021 13:40:16 -0700 (PDT)
-Date:   Tue, 23 Mar 2021 13:39:44 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a0c:bec3:: with SMTP id
+ f3mr6577376qvj.49.1616532020445; Tue, 23 Mar 2021 13:40:20 -0700 (PDT)
+Date:   Tue, 23 Mar 2021 13:39:46 -0700
 In-Reply-To: <20210323203946.2159693-1-samitolvanen@google.com>
-Message-Id: <20210323203946.2159693-16-samitolvanen@google.com>
+Message-Id: <20210323203946.2159693-18-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210323203946.2159693-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v3 15/17] arm64: add __nocfi to __apply_alternatives
+Subject: [PATCH v3 17/17] arm64: allow CONFIG_CFI_CLANG to be selected
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -80,33 +80,26 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-__apply_alternatives makes indirect calls to functions whose address
-is taken in assembly code using the alternative_cb macro. With
-non-canonical CFI, the compiler won't replace these function
-references with the jump table addresses, which trips CFI. Disable CFI
-checking in the function to work around the issue.
+Select ARCH_SUPPORTS_CFI_CLANG to allow CFI to be enabled.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/kernel/alternative.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
-index 1184c44ea2c7..abc84636af07 100644
---- a/arch/arm64/kernel/alternative.c
-+++ b/arch/arm64/kernel/alternative.c
-@@ -133,8 +133,8 @@ static void clean_dcache_range_nopatch(u64 start, u64 end)
- 	} while (cur += d_size, cur < end);
- }
- 
--static void __apply_alternatives(void *alt_region,  bool is_module,
--				 unsigned long *feature_mask)
-+static void __nocfi __apply_alternatives(void *alt_region,  bool is_module,
-+					 unsigned long *feature_mask)
- {
- 	struct alt_instr *alt;
- 	struct alt_region *region = alt_region;
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 5656e7aacd69..2eefdbc3e3c9 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -75,6 +75,7 @@ config ARM64
+ 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
+ 	select ARCH_SUPPORTS_LTO_CLANG if CPU_LITTLE_ENDIAN
+ 	select ARCH_SUPPORTS_LTO_CLANG_THIN
++	select ARCH_SUPPORTS_CFI_CLANG
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
+ 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
+ 	select ARCH_SUPPORTS_NUMA_BALANCING
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
