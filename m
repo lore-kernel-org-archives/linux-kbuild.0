@@ -2,105 +2,123 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB76EC433E2
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E8CC433E3
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 23:18:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 734D761A1E
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E255C61A0D
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 23:18:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbhCYSzG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 25 Mar 2021 14:55:06 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:40402 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbhCYSyi (ORCPT
+        id S231351AbhCYXSS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 25 Mar 2021 19:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230486AbhCYXSQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Mar 2021 14:54:38 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 12PIsD6W025746;
-        Fri, 26 Mar 2021 03:54:14 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 12PIsD6W025746
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1616698454;
-        bh=uiHbK333gwU2gsZYFkshBssdMjJ08FuS6/fFhpW83bg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bsKxdoeESrpd2JqQ93f2SzcwcsJiZ9VbBVbGVCB3gHTXy+vps+svon++wTwypIkmz
-         jtB1fJDxHuIR3tTWMg2gA9T4L/Zxu+sjKORyJ/hPDk7fY9QFXrrnCrrtjpLaAkEFOS
-         krnA2POk+eGoIhkzZ34nFNqJCoXLi1RX82/slNfNVnq6pT0ixqpj/k6yeQUMRV05w6
-         d9coI0VtAVBD7DON8dZQvyX//bS3asAjDxvd63vdbg8bGLOieR5+BAWDOFqz9OuE1l
-         vpfTcxkmh4jDkYlwd3Kr4j8zlj2nGp5Fgo0U7wYvKnzeELwfndjAGS9Pb3YD6U49Zu
-         zp4QCBeGPuXxQ==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 2/3] kbuild: do not set -w for vmlinux.o modpost
-Date:   Fri, 26 Mar 2021 03:54:10 +0900
-Message-Id: <20210325185412.2352951-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210325185412.2352951-1-masahiroy@kernel.org>
-References: <20210325185412.2352951-1-masahiroy@kernel.org>
+        Thu, 25 Mar 2021 19:18:16 -0400
+Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A919C061761
+        for <linux-kbuild@vger.kernel.org>; Thu, 25 Mar 2021 16:18:12 -0700 (PDT)
+Received: by mail-ua1-x933.google.com with SMTP id r8so1046713ual.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 25 Mar 2021 16:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7Yk9NlOmGKofkdfMA6+3ywtQqOEAPVMOAz3hdr7uXvE=;
+        b=vA7OWbbKWkumvZyucEZbcqeuCLfEdVpEWrKxOGx3P4tN9R3u/6w/09xaucaXo3fP1z
+         MQIYpOTb4zLWU/hQWjL9CBjSTPJO+KxQfG7Dx96rt5gAiLXhhKoC7ABFmLukh4KXeZ9Z
+         aRhWqpdYN7r23J9Vzze5A3lqpbSCfVHcu6YBrOLJtfWDQkdTihrZonOMBhhW48YWR/dn
+         IhljM1ItzoydJs5ao4S1mTCZ7s+gfiMgil1ViPnShV6stP0PH7QJBHHaKatW8sJcx0wz
+         u0NvJkbimko9Onpbq3gHaKn863Ymdx5cM9MeIfPQ4d7sEby86nkv+ILpbiaNaR5znvcq
+         qbrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7Yk9NlOmGKofkdfMA6+3ywtQqOEAPVMOAz3hdr7uXvE=;
+        b=q/utcW2mcgWFLdyoM7zsp9znMqR7JYvgnrXvcD3q4Tmz+NhIndyfJNATC2zVN9NxLo
+         6xwf4iPIdBrUA7z9qzSlbx7vbKvaceDLjjFtDJQCbyo7SoW5I6yTbuKwDMWcroUfb3Hv
+         vdIUUfEiF3yNdi5gHf164fnuCCU3jDbiGFJlwCzVCAI4bb2jUcVrjh8KwRWSMm8yToSN
+         +YRxh6SSoh26kogke0srfGkgX9u9vyu9+u6yfKgkB8qqO7r7Pl70pVmjxbr98Y7FnXN8
+         qftO8QuvOKCVnWI8yb94gZ+zzXXQ7iFh0BQ9cHhPQfNsAWKDTswL1Mpak0Wddv0AENMY
+         ex6A==
+X-Gm-Message-State: AOAM5334bqzJEffti5NFRITxCNaQk4trEk2ASiY9GborBwSq9sCCRNDg
+        WJPI1PuJiKywHg7yMbUf8H3wraipHiASTzc6mcuy6g==
+X-Google-Smtp-Source: ABdhPJz3XLagVW8QroqFjxvACNVUH9zZ8ltjPZndhuIyfpInOl3OzeWY/yBVOo6wjOyV8x+RouyyGoOtWVCwXW8GueI=
+X-Received: by 2002:ab0:b14:: with SMTP id b20mr6273790uak.52.1616714291094;
+ Thu, 25 Mar 2021 16:18:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210323203946.2159693-1-samitolvanen@google.com>
+ <20210323203946.2159693-4-samitolvanen@google.com> <20210324071357.GB2639075@infradead.org>
+ <CABCJKufRHCb0sjr1tMGCoVMzV-5dKPPn-t8=+ihNFAgTr2k0DA@mail.gmail.com> <20210325101655.GB36570@C02TD0UTHF1T.local>
+In-Reply-To: <20210325101655.GB36570@C02TD0UTHF1T.local>
+From:   Sami Tolvanen <samitolvanen@google.com>
+Date:   Thu, 25 Mar 2021 16:17:59 -0700
+Message-ID: <CABCJKuf+TxeDsy9B9DM2g-U7uwNu-yxSjARfPe_oeCY2fySvTA@mail.gmail.com>
+Subject: Re: [PATCH v3 03/17] mm: add generic __va_function and __pa_function macros
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Will Deacon <will@kernel.org>, Jessica Yu <jeyu@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Tejun Heo <tj@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        bpf <bpf@vger.kernel.org>, linux-hardening@vger.kernel.org,
+        linux-arch <linux-arch@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        PCI <linux-pci@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The -w option is meaningless for the first pass of modpost (vmlinux.o).
+On Thu, Mar 25, 2021 at 3:17 AM Mark Rutland <mark.rutland@arm.com> wrote:
+>
+> On Wed, Mar 24, 2021 at 08:54:18AM -0700, Sami Tolvanen wrote:
+> > On Wed, Mar 24, 2021 at 12:14 AM Christoph Hellwig <hch@infradead.org> wrote:
+> > >
+> > > On Tue, Mar 23, 2021 at 01:39:32PM -0700, Sami Tolvanen wrote:
+> > > > With CONFIG_CFI_CLANG, the compiler replaces function addresses
+> > > > in instrumented C code with jump table addresses. This means that
+> > > > __pa_symbol(function) returns the physical address of the jump table
+> > > > entry instead of the actual function, which may not work as the jump
+> > > > table code will immediately jump to a virtual address that may not be
+> > > > mapped.
+> > > >
+> > > > To avoid this address space confusion, this change adds generic
+> > > > definitions for __va_function and __pa_function, which architectures
+> > > > that support CFI can override. The typical implementation of the
+> > > > __va_function macro would use inline assembly to take the function
+> > > > address, which avoids compiler instrumentation.
+> > >
+> > > I think these helper are sensible, but shouldn't they have somewhat
+> > > less arcane names and proper documentation?
+> >
+> > Good point, I'll add comments in the next version. I thought
+> > __pa_function would be a fairly straightforward replacement for
+> > __pa_symbol, but I'm fine with renaming these. Any suggestions for
+> > less arcane names?
+>
+> I think dropping 'nocfi' into the name would be clear enough. I think
+> that given the usual fun with {symbol,module,virt}->phys conversions
+> it's not worth having the __pa_* form, and we can leave the phys
+> conversion to the caller that knows where the function lives.
+>
+> How about we just add `function_nocfi()` ?
+>
+> Callers can then do `__pa_symbol(function_nocfi(foo))` and similar.
 
-We know there are unresolved symbols in vmlinux.o, hence we skip
-check_exports() and other checks when mod->is_vmlinux is set.
+Sounds reasonable. I'll drop __pa_function() and rename
+__va_function() to function_nocfi() in the next version.
 
-See the following part in the for-loop.
-
-    if (mod->is_vmlinux || mod->from_dump)
-            continue;
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/Makefile.modpost | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 3f5b09a09aef..b3e08fb1fd56 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -32,8 +32,6 @@
- # Step 4 is solely used to allow module versioning in external modules,
- # where the CRC of each module is retrieved from the Module.symvers file.
- 
--# KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
--# symbols in the final module linking stage
- # KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
- # This is solely useful to speed up test compiles
- 
-@@ -50,7 +48,6 @@ MODPOST = scripts/mod/modpost								\
- 	$(if $(CONFIG_MODVERSIONS),-m)							\
- 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
- 	$(if $(CONFIG_SECTION_MISMATCH_WARN_ONLY),,-E)					\
--	$(if $(KBUILD_MODPOST_WARN),-w) \
- 	-o $@
- 
- ifdef MODPOST_VMLINUX
-@@ -136,6 +133,11 @@ endif
- 
- modules := $(sort $(shell cat $(MODORDER)))
- 
-+# KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined symbols
-+ifneq ($(KBUILD_MODPOST_WARN),)
-+MODPOST += -w
-+endif
-+
- # Read out modules.order to pass in modpost.
- # Otherwise, allmodconfig would fail with "Argument list too long".
- quiet_cmd_modpost = MODPOST $@
--- 
-2.27.0
-
+Sami
