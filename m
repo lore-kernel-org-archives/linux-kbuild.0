@@ -2,188 +2,211 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7798C433C1
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ACC3C433DB
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7427861A2B
-	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14F7F61A1E
+	for <linux-kbuild@archiver.kernel.org>; Thu, 25 Mar 2021 18:55:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbhCYSzH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S230059AbhCYSzH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Thu, 25 Mar 2021 14:55:07 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:40714 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:40401 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbhCYSy7 (ORCPT
+        with ESMTP id S229744AbhCYSyh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Mar 2021 14:54:59 -0400
+        Thu, 25 Mar 2021 14:54:37 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 12PIsD6V025746;
-        Fri, 26 Mar 2021 03:54:14 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 12PIsD6V025746
+        by conuserg-09.nifty.com with ESMTP id 12PIsD6X025746;
+        Fri, 26 Mar 2021 03:54:15 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 12PIsD6X025746
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1616698454;
-        bh=rh9G9lxLInAjsIJ5YF1Dh9a95r8V4/WiPgSc744DqMo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=GIuES/rUkk/G3Bp7SSeHfTBzaHtDHM188n/MPmBFfESz8JRpFo+2r9/WCf22IoKVB
-         N0qlfdMtWOi85sR9UhGbFsemzUmeM2m635Qtq24+u7ysoqrfb/Ioqo6iQWmV6PCUjv
-         leKHS0iLY1WPJjZewaaTg+ZWFGVftk4RDuLleoARv+/lrEPcxIE50xJYkjifua7aZQ
-         f3aBT0BvP77EGjR8jpbMk7rNbaatvFdZ9UWTaOtgsNTEBz82finths7plJofHNVJFt
-         O7nRN18xQH35r9ftOh03hhG07W72Y/g9hmtQDMiwPXjZg5VovNoehjbEKLa+uWyJ3Y
-         q37stbSXOkK3A==
+        s=dec2015msa; t=1616698455;
+        bh=CkmzuG6UHxRu3hG4QdZRDkz3f/FNuz3s7LYEFdfrRzc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=TrunQzTmMD0jCMkHTe/DCWMei7geXFU77bI4q8AZhqJ90MwkWRckT9yMi7fDArYUP
+         OSGZba7GlniiOKPdNJv9gHzJ2RM0MRJZzrrHxLE1wxEKIEn3NlXibaeBNy8dptsByj
+         MlDZmOlKaphPaQuarXWEizXx0rJA+IIVeZhvfv1PUjrLVVVDPSu3gWkNKY9u5ja6Sh
+         /DIjshvKDMD5Zx4tB9ilKHUwFELKM2Ol+frZWBL+B0QPJA6ORvsiwsaGWn7KfTdmtW
+         WwhQO4VwVTpFEbtqpL0gCr4xXXKjErs16FOlxjFiw0TWO3okCjCI1lW9YKaqVfHOBl
+         mg4zb+rzEG8JQ==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-doc@vger.kernel.org
-Subject: [PATCH 1/3] kbuild: generate Module.symvers only when vmlinux exists
-Date:   Fri, 26 Mar 2021 03:54:09 +0900
-Message-Id: <20210325185412.2352951-1-masahiroy@kernel.org>
+        Nathan Chancellor <nathan@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH 3/3] kbuild: fix false-positive modpost warning when all symbols are trimmed
+Date:   Fri, 26 Mar 2021 03:54:11 +0900
+Message-Id: <20210325185412.2352951-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210325185412.2352951-1-masahiroy@kernel.org>
+References: <20210325185412.2352951-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The external module build shows the following warning if Module.symvers
-is missing in the kernel tree.
+Nathan reports that the mips defconfig emits the following warning:
 
-  WARNING: Symbol version dump "Module.symvers" is missing.
-           Modules may not have dependencies or modversions.
+  WARNING: modpost: Symbol info of vmlinux is missing. Unresolved symbol check will be entirely skipped.
 
-I think this is an important heads-up because the resulting modules may
-not work as expected. This happens when you did not build the entire
-kernel tree, for example, you might have prepared the minimal setups
-for external modules by 'make defconfig && make modules_preapre'.
+This false-positive happens under the following combination:
 
-A problem is that 'make modules' creates Module.symvers even without
-vmlinux. In this case, that warning is suppressed since Module.symvers
-already exists in spite of its incomplete content.
+ - CONFIG_TRIM_UNUSED_KSYMS=y
+ - CONFIG_MODULES=y
+ - No CONFIG option is set to 'm'
 
-The incomplete (i.e. invalid) Module.symvers should not be created.
+Commit a0590473c5e6 ("nfs: fix PNFS_FLEXFILE_LAYOUT Kconfig default")
+turned the last 'm' into 'y' for the mips defconfig, and uncovered
+this issue.
 
-This commit changes the second pass of modpost to dump symbols into
-modules-only.symvers. The final Module.symvers is created by
-concatenating vmlinux.symvers and modules-only.symvers if both exist.
+In this case, the module feature itself is enabled, but we have no
+module. As a result, CONFIG_TRIM_UNUSED_KSYMS drops all the instances
+of EXPORT_SYMBOL. Then, modpost wrongly assumes vmlinux is missing
+because vmlinux.symvers is empty. (Or, you can create a module that
+does not use any symbol of vmlinux).
 
-Module.symvers is supposed to contain all the symbols from both vmlinux
-and modules. It might be a bit confusing, and I am not quite sure if it
-is an official interface, but presumably it is difficult to rename it
-because some projects (e.g. kmod) parse it.
+The current behavior is to entirely suppress the unresolved symbol
+warnings when vmlinux is missing just because there are too many.
+I found the origin of this code in the historical git tree. [1]
 
+If this is a matter of noisiness, I think modpost can display the
+first 10 warnings, and the number of suppressed warnings at the end.
+
+You will get a bit noisier logs when you run 'make modules' without
+vmlinux, but such warnings are better to show because you never know
+the resulting modules are actually loadable or not.
+
+This commit changes as follows:
+
+ - If any of input *.symver files is missing, pass -w option to let
+   the module build keep going with warnings instead of errors.
+
+ - If there are too many (10+) unresolved symbol warnings, show only
+   the first 10, and also the number of suppressed warnings.
+
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=1cc0e0529569bf6a94f6d49770aa6d4b599d2c46
+
+Reported-by: Nathan Chancellor <nathan@kernel.org>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- .gitignore               |  1 +
- Documentation/dontdiff   |  1 +
- Makefile                 |  2 +-
- scripts/Makefile.modpost | 15 ++++++++++++++-
- scripts/mod/modpost.c    | 15 +--------------
- 5 files changed, 18 insertions(+), 16 deletions(-)
+ scripts/Makefile.modpost |  7 +++++--
+ scripts/mod/modpost.c    | 25 ++++++++++++-------------
+ 2 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 3adea59847ce..df8d3146a43f 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -57,6 +57,7 @@ modules.order
- /tags
- /TAGS
- /linux
-+/modules-only.symvers
- /vmlinux
- /vmlinux.32
- /vmlinux.map
-diff --git a/Documentation/dontdiff b/Documentation/dontdiff
-index ac42ad8d430d..910b30a2a7d9 100644
---- a/Documentation/dontdiff
-+++ b/Documentation/dontdiff
-@@ -178,6 +178,7 @@ mktables
- mktree
- mkutf8data
- modpost
-+modules-only.symvers
- modules.builtin
- modules.builtin.modinfo
- modules.nsdeps
-diff --git a/Makefile b/Makefile
-index 2b161f5a5a66..ed8bd815e8a3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1532,7 +1532,7 @@ endif # CONFIG_MODULES
- # make distclean Remove editor backup files, patch leftover files and the like
- 
- # Directories & files removed with 'make clean'
--CLEAN_FILES += include/ksym vmlinux.symvers \
-+CLEAN_FILES += include/ksym vmlinux.symvers modules-only.symvers \
- 	       modules.builtin modules.builtin.modinfo modules.nsdeps \
- 	       compile_commands.json .thinlto-cache
- 
 diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index df57e259fac3..3f5b09a09aef 100644
+index b3e08fb1fd56..c383ba33d837 100644
 --- a/scripts/Makefile.modpost
 +++ b/scripts/Makefile.modpost
-@@ -68,7 +68,20 @@ else
- ifeq ($(KBUILD_EXTMOD),)
+@@ -98,9 +98,11 @@ output-symdump := $(KBUILD_EXTMOD)/Module.symvers
  
- input-symdump := vmlinux.symvers
--output-symdump := Module.symvers
-+output-symdump := modules-only.symvers
-+
-+quiet_cmd_cat = GEN     $@
-+      cmd_cat = cat $(real-prereqs) > $@
-+
-+ifneq ($(wildcard vmlinux.symvers),)
-+
-+__modpost: Module.symvers
-+Module.symvers: vmlinux.symvers modules-only.symvers FORCE
-+	$(call if_changed,cat)
-+
-+targets += Module.symvers
-+
-+endif
+ endif
  
- else
++existing-input-symdump := $(wildcard $(input-symdump))
++
+ # modpost options for modules (both in-kernel and external)
+ MODPOST += \
+-	$(addprefix -i ,$(wildcard $(input-symdump))) \
++	$(addprefix -i ,$(existing-input-symdump)) \
+ 	$(if $(KBUILD_NSDEPS),-d $(MODULES_NSDEPS)) \
+ 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N)
+ 
+@@ -114,6 +116,7 @@ VPATH :=
+ $(input-symdump):
+ 	@echo >&2 'WARNING: Symbol version dump "$@" is missing.'
+ 	@echo >&2 '         Modules may not have dependencies or modversions.'
++	@echo >&2 '         You may get many unresolved symbol warnings.'
+ 
+ ifdef CONFIG_LTO_CLANG
+ # With CONFIG_LTO_CLANG, .o files might be LLVM bitcode, so we need to run
+@@ -134,7 +137,7 @@ endif
+ modules := $(sort $(shell cat $(MODORDER)))
+ 
+ # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined symbols
+-ifneq ($(KBUILD_MODPOST_WARN),)
++ifneq ($(KBUILD_MODPOST_WARN)$(filter-out $(existing-input-symdump), $(input-symdump)),)
+ MODPOST += -w
+ endif
  
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 24725e50c7b4..10c3fba26f03 100644
+index 10c3fba26f03..7c6bec78fa34 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2423,19 +2423,6 @@ static void read_dump(const char *fname)
- 	fatal("parse error in symbol dump file\n");
+@@ -23,8 +23,6 @@
+ 
+ /* Are we using CONFIG_MODVERSIONS? */
+ static int modversions = 0;
+-/* Warn about undefined symbols? (do so if we have vmlinux) */
+-static int have_vmlinux = 0;
+ /* Is CONFIG_MODULE_SRCVERSION_ALL set? */
+ static int all_versions = 0;
+ /* If we are modposting external module set to 1 */
+@@ -41,6 +39,13 @@ static int allow_missing_ns_imports;
+ 
+ static bool error_occurred;
+ 
++/*
++ * Cut off the warnings when there are too many. This typically occurs when
++ * vmlinux is missing. ('make modules' without building vmlinux.)
++ */
++#define MAX_UNRESOLVED_REPORTS	10
++static unsigned int nr_unresolved;
++
+ enum export {
+ 	export_plain,
+ 	export_gpl,
+@@ -177,9 +182,6 @@ static struct module *new_module(const char *modname)
+ 	mod->next = modules;
+ 	modules = mod;
+ 
+-	if (mod->is_vmlinux)
+-		have_vmlinux = 1;
+-
+ 	return mod;
  }
  
--/* For normal builds always dump all symbols.
-- * For external modules only dump symbols
-- * that are not read from kernel Module.symvers.
-- **/
--static int dump_sym(struct symbol *sym)
--{
--	if (!external_module)
--		return 1;
--	if (sym->module->from_dump)
--		return 0;
--	return 1;
--}
+@@ -2141,7 +2143,7 @@ static void check_exports(struct module *mod)
+ 		const char *basename;
+ 		exp = find_symbol(s->name);
+ 		if (!exp || exp->module == mod) {
+-			if (have_vmlinux && !s->weak)
++			if (!s->weak && nr_unresolved++ < MAX_UNRESOLVED_REPORTS)
+ 				modpost_log(warn_unresolved ? LOG_WARN : LOG_ERROR,
+ 					    "\"%s\" [%s.ko] undefined!\n",
+ 					    s->name, mod->name);
+@@ -2545,13 +2547,6 @@ int main(int argc, char **argv)
+ 	if (files_source)
+ 		read_symbols_from_files(files_source);
+ 
+-	/*
+-	 * When there's no vmlinux, don't print warnings about
+-	 * unresolved symbols (since there'll be too many ;)
+-	 */
+-	if (!have_vmlinux)
+-		warn("Symbol info of vmlinux is missing. Unresolved symbol check will be entirely skipped.\n");
 -
- static void write_dump(const char *fname)
- {
- 	struct buffer buf = { };
-@@ -2446,7 +2433,7 @@ static void write_dump(const char *fname)
- 	for (n = 0; n < SYMBOL_HASH_SIZE ; n++) {
- 		symbol = symbolhash[n];
- 		while (symbol) {
--			if (dump_sym(symbol)) {
-+			if (!symbol->module->from_dump) {
- 				namespace = symbol->namespace;
- 				buf_printf(&buf, "0x%08x\t%s\t%s\t%s\t%s\n",
- 					   symbol->crc, symbol->name,
+ 	for (mod = modules; mod; mod = mod->next) {
+ 		char fname[PATH_MAX];
+ 
+@@ -2595,6 +2590,10 @@ int main(int argc, char **argv)
+ 		}
+ 	}
+ 
++	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
++		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
++		     nr_unresolved - MAX_UNRESOLVED_REPORTS);
++
+ 	free(buf.p);
+ 
+ 	return error_occurred ? 1 : 0;
 -- 
 2.27.0
 
