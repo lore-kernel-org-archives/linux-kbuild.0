@@ -5,62 +5,63 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAB9C001E1
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4967BC4161D
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6F1661077
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2589C61075
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232827AbhCaV2T (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Mar 2021 17:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51862 "EHLO
+        id S232973AbhCaV2V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Mar 2021 17:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232833AbhCaV1s (ORCPT
+        with ESMTP id S232885AbhCaV1x (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:27:48 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4991FC06174A
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:48 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id a16so1954549qtw.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:48 -0700 (PDT)
+        Wed, 31 Mar 2021 17:27:53 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28BCC061761
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:52 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id c1so2377442qke.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=RWJ9aQhTl20nw/R5RXPJl7NDj1C/UnL5LrldsenTslw=;
-        b=OI2BXN7KaQv0FSebUTwCneDYkgM3EAclc0LW8tfWF13e9tAHbT6S7IOhSWAvQZLEnM
-         JINs3HBpLvp6Qvodp3XPXwpa2AY4B6TKaD777pUzRWtoTAYeD1ocUHZu2HycU4zx1Kmv
-         TNPKwT23uSIbpB+4L8uGbr3k4clT4tWUBKmb6FlOF1Rr6P3NPk9yRjsBi/8/WqNqXQ91
-         l8FNow8wvarKsgb5E8LUZNePMtfEnTyG4gLYP5Kv+xRbrPTbyVM2AH1BrU969hKl7202
-         it/AECGlU/1SsjxKqzkPukkeE7jMpt1aJJc+o2/Ob3guLAV3RI2sN0Iy2pgsPxnRnjo4
-         2KMg==
+        bh=qCxq1N1gA7TwxAMFKmL7hLg9EO4lnSukatZLoaD+FFE=;
+        b=KeQedqCHSppeGUQMSB3qvddKepeNQHx1p1/VSfzMSylvv0LONVB89TrLW3prq8oZLd
+         GBGSMaPvGJnxYeqpyXqf46YXoIA4BadxdCS+/OCujIT/cSSW4RH6HuseJGcAaYs/B2h0
+         VPCq2Yot/QxDNIrN078Op8TpVyvUgNLnqtUsZWFs4jkRLeq3QIubrq+hsNm8jw0/sNbu
+         x6ydT94rlxQyzBBmMXhSg1nR2cT5jJEpSyTDeTKaFhRS7JORrsdmSYdEe1cmftX7I5J0
+         WBiVyhSq+sZPQBRPdqZ0g2ebTLAodY/JCdgVHrXBLyUi190r5xfaOS+yUqmC2AQgYhO3
+         ejSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=RWJ9aQhTl20nw/R5RXPJl7NDj1C/UnL5LrldsenTslw=;
-        b=c3WiTw/DMmwW5UMkhq5+wZGJ/N3h0dX4JCpE8L4JoI0T5B64Ul+U5y/DAgHuaijukQ
-         PmhDY4G58eIHbNwxa5KK+o2FgbmiRCXREfoWELdF7gEoyuxkz1XrCHsVQLlCCiH1HHnB
-         5F3v7liCqWz6dnL5yzxQILksoljzRehrGS/Lj4gs2B6vRP5ZnoW4gRaJTCgAyE5esplh
-         6Q0JjYQ3q7glLatEKlKqIOPZxYwnKDsA7x5MDRghGtkKXiPFtU/zBAk3+au+GraBH4Fd
-         VaTG96AbKhUhPEjiYabK24eEiCttNyif/FiI3ZySObe98WxZm0JeMOh4U1nQvN9uc2qq
-         roHA==
-X-Gm-Message-State: AOAM532rhdCzWMeIVSc+640X3tVGOa3LPj/kxCyEcPNwUs8ndVnfRjl0
-        ElOahpNjxBUMR6xnEayT6pqPTcqIvj3e1LOqCto=
-X-Google-Smtp-Source: ABdhPJwgeYfpiU4TaL+sNYk8JQhgUoPaRCwg5+9HCoLujfPlRhTT1jZ0jK2Sqbbps882JdAhQwjOAlmdak1l08CL8Lw=
+        bh=qCxq1N1gA7TwxAMFKmL7hLg9EO4lnSukatZLoaD+FFE=;
+        b=rUY4ZtphwLosfpw3V9es+1ZXnUnEhRf7Ho+qRFhDxbdS9Bt2dK5orG5PTq+Y5+BH6/
+         +GXoRiltw7MVTV88qT25Y5p8vjMxw6VfE1pdvZf5j5xthmgpe3B6PpdvLHSDBlbMUbm2
+         4E8IpnkfCqudgh8dXeaiYDali5s4MQdQH6Jqv7rPBzPjUU0MNSfo5/5oVYhLJlNQXQvI
+         xLUd1fT5yar6uGqQC4TBVnScXIWAf5zHeHm6RdZ5XsUFkxT5iXzUhUC1rXoYTIW9d43E
+         0FMHmsbYrjG3UAuwF2Zws8fTOckLuC14+Ush3BWMvhMZzJ8nNX45VuLCRJJHkbZqOyzz
+         qzdg==
+X-Gm-Message-State: AOAM533+UYrHlAaazYeZnN7WsZXjOEOCj2PSLmkLyqszoD7s/U6vFgya
+        xniSUIYBRLmLHTixGqC17V7AIrxJKfAiYpw+KmA=
+X-Google-Smtp-Source: ABdhPJx7XX2KOGLVRiBBOLjdMcWGg8SbFNRL+HOjMTa79TjDOvRh955y/RHVoyp83P6xuYihqrO7IRPK/3G0aLsMx0w=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:7933:7015:a5d5:3835])
- (user=samitolvanen job=sendgmr) by 2002:a0c:b410:: with SMTP id
- u16mr5255799qve.8.1617226067444; Wed, 31 Mar 2021 14:27:47 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:27:16 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a05:6214:b04:: with SMTP id
+ u4mr5243055qvj.0.1617226071830; Wed, 31 Mar 2021 14:27:51 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 14:27:18 -0700
 In-Reply-To: <20210331212722.2746212-1-samitolvanen@google.com>
-Message-Id: <20210331212722.2746212-13-samitolvanen@google.com>
+Message-Id: <20210331212722.2746212-15-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210331212722.2746212-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v4 12/17] arm64: implement function_nocfi
+Subject: [PATCH v4 14/17] arm64: add __nocfi to functions that jump to a
+ physical address
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -82,43 +83,64 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_CFI_CLANG, the compiler replaces function addresses in
-instrumented C code with jump table addresses. This change implements
-the function_nocfi() macro, which returns the actual function address
-instead.
+Disable CFI checking for functions that switch to linear mapping and
+make an indirect call to a physical address, since the compiler only
+understands virtual addresses and the CFI check for such indirect calls
+would always fail.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/include/asm/memory.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/arm64/include/asm/mmu_context.h | 2 +-
+ arch/arm64/kernel/cpu-reset.h        | 8 ++++----
+ arch/arm64/kernel/cpufeature.c       | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 0aabc3be9a75..b55410afd3d1 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -321,6 +321,21 @@ static inline void *phys_to_virt(phys_addr_t x)
- #define virt_to_pfn(x)		__phys_to_pfn(__virt_to_phys((unsigned long)(x)))
- #define sym_to_pfn(x)		__phys_to_pfn(__pa_symbol(x))
+diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+index 386b96400a57..d3cef9133539 100644
+--- a/arch/arm64/include/asm/mmu_context.h
++++ b/arch/arm64/include/asm/mmu_context.h
+@@ -119,7 +119,7 @@ static inline void cpu_install_idmap(void)
+  * Atomically replaces the active TTBR1_EL1 PGD with a new VA-compatible PGD,
+  * avoiding the possibility of conflicting TLB entries being allocated.
+  */
+-static inline void cpu_replace_ttbr1(pgd_t *pgdp)
++static inline void __nocfi cpu_replace_ttbr1(pgd_t *pgdp)
+ {
+ 	typedef void (ttbr_replace_func)(phys_addr_t);
+ 	extern ttbr_replace_func idmap_cpu_replace_ttbr1;
+diff --git a/arch/arm64/kernel/cpu-reset.h b/arch/arm64/kernel/cpu-reset.h
+index f3adc574f969..9a7b1262ef17 100644
+--- a/arch/arm64/kernel/cpu-reset.h
++++ b/arch/arm64/kernel/cpu-reset.h
+@@ -13,10 +13,10 @@
+ void __cpu_soft_restart(unsigned long el2_switch, unsigned long entry,
+ 	unsigned long arg0, unsigned long arg1, unsigned long arg2);
  
-+#ifdef CONFIG_CFI_CLANG
-+/*
-+ * With CONFIG_CFI_CLANG, the compiler replaces function address
-+ * references with the address of the function's CFI jump table
-+ * entry. The function_nocfi macro always returns the address of the
-+ * actual function instead.
-+ */
-+#define function_nocfi(x) ({						\
-+	void *addr;							\
-+	asm("adrp %0, " __stringify(x) "\n\t"				\
-+	    "add  %0, %0, :lo12:" __stringify(x) : "=r" (addr));	\
-+	addr;								\
-+})
-+#endif
-+
- /*
-  *  virt_to_page(x)	convert a _valid_ virtual address to struct page *
-  *  virt_addr_valid(x)	indicates whether a virtual address is valid
+-static inline void __noreturn cpu_soft_restart(unsigned long entry,
+-					       unsigned long arg0,
+-					       unsigned long arg1,
+-					       unsigned long arg2)
++static inline void __noreturn __nocfi cpu_soft_restart(unsigned long entry,
++						       unsigned long arg0,
++						       unsigned long arg1,
++						       unsigned long arg2)
+ {
+ 	typeof(__cpu_soft_restart) *restart;
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index ac616c59ae92..1cd7877deada 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1446,7 +1446,7 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
+ }
+ 
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+-static void
++static void __nocfi
+ kpti_install_ng_mappings(const struct arm64_cpu_capabilities *__unused)
+ {
+ 	typedef void (kpti_remap_fn)(int, int, phys_addr_t);
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
