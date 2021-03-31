@@ -5,62 +5,62 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1E7C001E5
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A36C41536
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 114636108E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AED9661090
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232915AbhCaV2X (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Mar 2021 17:28:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51956 "EHLO
+        id S232833AbhCaV2U (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Mar 2021 17:28:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232953AbhCaV17 (ORCPT
+        with ESMTP id S232861AbhCaV1u (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:27:59 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35503C06174A
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:59 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id l16so2091490qvt.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:59 -0700 (PDT)
+        Wed, 31 Mar 2021 17:27:50 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72426C06175F
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:50 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id a7so2099680qvx.10
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=lk8inZlzo7fNLcnXaQ1bMqH+Yl1xnIiMxwLQYqKIvN0=;
-        b=Vn+IV2jTMQ3qfrTZI0BaCIvipMQjXnOyPVdlyPeO2A1ydhmBtiQ0/KPQbFLprUQsKz
-         XEsE22KBNeTSVCxLa9BdhULZj1AuDO/PaWmw/EF9j8xlXX10FsmT0+B+8p/x/fbzZqXB
-         ioPa4cOo0iYeLpwms5O94L4r44baMvUxEDLYiQ4o+KUu+SAM7a1CX7s/NWI/L7SfPxrM
-         Ua/5ZcXDAjzY32eJHiQGKkogawbLWhdKE06AvSW60VNJY10icae6GpzRlVISoSMCZyJ1
-         ZgYMtg4qfAmuFnaNGf+3dlT/SZspW5x0yX39FkVTOC7fQmzwrn8FU2ClEoHTyE8AdE0d
-         Bd6Q==
+        bh=o64BOrDovMhhQ8PDB1l0LcOi9/iKBCLRb9E2FXFROjI=;
+        b=ab418U9t+zO8emXNBH+5SJoSatco1/BYXVKCp5kR9oJ4dCv4FBJ0DOAzFZKeLUfkKl
+         fUgBhHFjNoA5jCgHMBVfISQPsfcV4tkglm8aql2tpBWv1K2SMJ8MWoOGLzJPhln2pjXI
+         eI+Ck2AwY62ZFKL8TjPFZCLps9vUFzJCE+ArU7q1Fo9x7ck10a0C6NDV6lTmVy3ixwTP
+         j1cIlkUHSzwrbxv1RSH3dhf3h2++UXcP0MsAZZuh8hj5TBYXvM2vkFDpZuKWR9E72a/m
+         dvx4zQ1yue18RyXHSDL196mNCqIFEk3eJZZCew9nQBGiqOzbz27VX+tJlmmN3ytfTX8r
+         O0ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=lk8inZlzo7fNLcnXaQ1bMqH+Yl1xnIiMxwLQYqKIvN0=;
-        b=Ytrf7VtkcyLfel8wmRGO8TLdcwPhqgmRGeLvLk0OVW6waPZqCZp3l5I0nHDk5WJIib
-         icf/OkOki5v+/Nh+3BGbUF8OlzX/bbMyI4TZ3jfZYibzBZkK+oQoghFiD/Tp/wDOx5qL
-         Ofuup5rsbT0wEhjKWnsBHyh+ncTovqw09p/mvwjqKjm6jFjqM8yRmjXejroJZQV5FKeh
-         snvFms7GruDWbKJ8E96E8WucJtV61XR4AuD0KJYG9ufdw8PnoEYUdvwSSl7IYcUZDRCi
-         dNeGKmYq6kdaub91fZq7cws2yHZTTWAJ0/OUezJ7XahZmli5A0XsUeFCF351tURj4/sU
-         jm3A==
-X-Gm-Message-State: AOAM532NLTZcsbUx5nOTYPmUDStqYEIyOdIWtlvpftslBLH7TbdY+qNN
-        gklrYoun/LHKnVWGbteB2ABJsl15SJzqlaetFM0=
-X-Google-Smtp-Source: ABdhPJxbLnYVkEE3SX2BDreH5/lfjqbV3qQJ9QM78vYg3uiCL7YeQbGCVkgbIG/Qv+7aSalIOwO+SwFDW3TO97SD7KU=
+        bh=o64BOrDovMhhQ8PDB1l0LcOi9/iKBCLRb9E2FXFROjI=;
+        b=tMKy+lELUPshnRcYiMxmH6Qt3XveifBGhqi/m5OnI0T5WwIl1H7zqD371F/GirqxQa
+         IOVnZ5rltPfYHgHFNgutheSmFtMNz0XjjjngegQhLX7iclU8uFD3m4l77oBKJxPe8JX5
+         WXSnXMtOOSQxCfJPHKMiV6j25uV1ZqTLd78/HGIOA4aZu5Z9SgycLNiUfrD6d9b7/EFb
+         glsAF50hoFq0/TuZaB6ioEh1Le3BTtdUzUc5JSR8r3pO5VIuGqRa9yVLs6n/geKk3L8Y
+         EYOcacLmtxbmBEL5tXXY8O8EVhsYhHHse1nVb1k4m/1/sM5nPOBikt8m1iasN1qPE5G3
+         MaYQ==
+X-Gm-Message-State: AOAM533j87QaMAokTj2XsD9c2mQdO1GnL8trTqHezeVOfbvcDt72dsDq
+        tOYEhqWgzkjb9Ni/jv18f+RfXCOdc5KAPsG2HRs=
+X-Google-Smtp-Source: ABdhPJxPk8zktx7csSixwhB9+NXChBwJxthJyO98xdq2NpEvdMcuq8rD1w1wRNUqI7dcjJv+2zZININi7HzUKUAKx3Y=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:7933:7015:a5d5:3835])
- (user=samitolvanen job=sendgmr) by 2002:a0c:e148:: with SMTP id
- c8mr5184451qvl.56.1617226078315; Wed, 31 Mar 2021 14:27:58 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:27:21 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a0c:a5a5:: with SMTP id
+ z34mr5299257qvz.4.1617226069635; Wed, 31 Mar 2021 14:27:49 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 14:27:17 -0700
 In-Reply-To: <20210331212722.2746212-1-samitolvanen@google.com>
-Message-Id: <20210331212722.2746212-18-samitolvanen@google.com>
+Message-Id: <20210331212722.2746212-14-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210331212722.2746212-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v4 17/17] arm64: allow CONFIG_CFI_CLANG to be selected
+Subject: [PATCH v4 13/17] arm64: use function_nocfi with __pa_symbol
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -82,26 +82,106 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Select ARCH_SUPPORTS_CFI_CLANG to allow CFI to be enabled.
+With CONFIG_CFI_CLANG, the compiler replaces function address
+references with the address of the function's CFI jump table
+entry. This means that __pa_symbol(function) returns the physical
+address of the jump table entry, which can lead to address space
+confusion as the jump table points to the function's virtual
+address. Therefore, use the function_nocfi() macro to ensure we are
+always taking the address of the actual function instead.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- arch/arm64/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/mmu_context.h      | 2 +-
+ arch/arm64/kernel/acpi_parking_protocol.c | 3 ++-
+ arch/arm64/kernel/cpu-reset.h             | 2 +-
+ arch/arm64/kernel/cpufeature.c            | 2 +-
+ arch/arm64/kernel/psci.c                  | 3 ++-
+ arch/arm64/kernel/smp_spin_table.c        | 3 ++-
+ 6 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index e4e1b6550115..d7395772b6b8 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -75,6 +75,7 @@ config ARM64
- 	select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
- 	select ARCH_SUPPORTS_LTO_CLANG if CPU_LITTLE_ENDIAN
- 	select ARCH_SUPPORTS_LTO_CLANG_THIN
-+	select ARCH_SUPPORTS_CFI_CLANG
- 	select ARCH_SUPPORTS_ATOMIC_RMW
- 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
- 	select ARCH_SUPPORTS_NUMA_BALANCING
+diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+index bd02e99b1a4c..386b96400a57 100644
+--- a/arch/arm64/include/asm/mmu_context.h
++++ b/arch/arm64/include/asm/mmu_context.h
+@@ -140,7 +140,7 @@ static inline void cpu_replace_ttbr1(pgd_t *pgdp)
+ 		ttbr1 |= TTBR_CNP_BIT;
+ 	}
+ 
+-	replace_phys = (void *)__pa_symbol(idmap_cpu_replace_ttbr1);
++	replace_phys = (void *)__pa_symbol(function_nocfi(idmap_cpu_replace_ttbr1));
+ 
+ 	cpu_install_idmap();
+ 	replace_phys(ttbr1);
+diff --git a/arch/arm64/kernel/acpi_parking_protocol.c b/arch/arm64/kernel/acpi_parking_protocol.c
+index e7c941d8340d..bfeeb5319abf 100644
+--- a/arch/arm64/kernel/acpi_parking_protocol.c
++++ b/arch/arm64/kernel/acpi_parking_protocol.c
+@@ -99,7 +99,8 @@ static int acpi_parking_protocol_cpu_boot(unsigned int cpu)
+ 	 * that read this address need to convert this address to the
+ 	 * Boot-Loader's endianness before jumping.
+ 	 */
+-	writeq_relaxed(__pa_symbol(secondary_entry), &mailbox->entry_point);
++	writeq_relaxed(__pa_symbol(function_nocfi(secondary_entry)),
++		       &mailbox->entry_point);
+ 	writel_relaxed(cpu_entry->gic_cpu_id, &mailbox->cpu_id);
+ 
+ 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
+diff --git a/arch/arm64/kernel/cpu-reset.h b/arch/arm64/kernel/cpu-reset.h
+index ed50e9587ad8..f3adc574f969 100644
+--- a/arch/arm64/kernel/cpu-reset.h
++++ b/arch/arm64/kernel/cpu-reset.h
+@@ -22,7 +22,7 @@ static inline void __noreturn cpu_soft_restart(unsigned long entry,
+ 
+ 	unsigned long el2_switch = !is_kernel_in_hyp_mode() &&
+ 		is_hyp_mode_available();
+-	restart = (void *)__pa_symbol(__cpu_soft_restart);
++	restart = (void *)__pa_symbol(function_nocfi(__cpu_soft_restart));
+ 
+ 	cpu_install_idmap();
+ 	restart(el2_switch, entry, arg0, arg1, arg2);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2a5d9854d664..ac616c59ae92 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1463,7 +1463,7 @@ kpti_install_ng_mappings(const struct arm64_cpu_capabilities *__unused)
+ 	if (arm64_use_ng_mappings)
+ 		return;
+ 
+-	remap_fn = (void *)__pa_symbol(idmap_kpti_install_ng_mappings);
++	remap_fn = (void *)__pa_symbol(function_nocfi(idmap_kpti_install_ng_mappings));
+ 
+ 	cpu_install_idmap();
+ 	remap_fn(cpu, num_online_cpus(), __pa_symbol(swapper_pg_dir));
+diff --git a/arch/arm64/kernel/psci.c b/arch/arm64/kernel/psci.c
+index 62d2bda7adb8..e74bcb57559b 100644
+--- a/arch/arm64/kernel/psci.c
++++ b/arch/arm64/kernel/psci.c
+@@ -38,7 +38,8 @@ static int __init cpu_psci_cpu_prepare(unsigned int cpu)
+ 
+ static int cpu_psci_cpu_boot(unsigned int cpu)
+ {
+-	int err = psci_ops.cpu_on(cpu_logical_map(cpu), __pa_symbol(secondary_entry));
++	int err = psci_ops.cpu_on(cpu_logical_map(cpu),
++			__pa_symbol(function_nocfi(secondary_entry)));
+ 	if (err)
+ 		pr_err("failed to boot CPU%d (%d)\n", cpu, err);
+ 
+diff --git a/arch/arm64/kernel/smp_spin_table.c b/arch/arm64/kernel/smp_spin_table.c
+index 056772c26098..4c4e36ded4aa 100644
+--- a/arch/arm64/kernel/smp_spin_table.c
++++ b/arch/arm64/kernel/smp_spin_table.c
+@@ -88,7 +88,8 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
+ 	 * boot-loader's endianness before jumping. This is mandated by
+ 	 * the boot protocol.
+ 	 */
+-	writeq_relaxed(__pa_symbol(secondary_holding_pen), release_addr);
++	writeq_relaxed(__pa_symbol(function_nocfi(secondary_holding_pen)),
++		       release_addr);
+ 	__flush_dcache_area((__force void *)release_addr,
+ 			    sizeof(*release_addr));
+ 
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
