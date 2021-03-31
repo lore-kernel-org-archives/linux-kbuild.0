@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EAAC433ED
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5002CC43470
 	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D4FF61989
+	by mail.kernel.org (Postfix) with ESMTP id 2D780619BB
 	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235876AbhCaNiy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S235872AbhCaNiy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 31 Mar 2021 09:38:54 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:38974 "EHLO
+Received: from conuserg-12.nifty.com ([210.131.2.79]:38966 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235869AbhCaNid (ORCPT
+        with ESMTP id S235863AbhCaNid (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 31 Mar 2021 09:38:33 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 12VDcFee003995;
-        Wed, 31 Mar 2021 22:38:18 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFee003995
+        by conuserg-12.nifty.com with ESMTP id 12VDcFeZ003995;
+        Wed, 31 Mar 2021 22:38:16 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFeZ003995
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1617197898;
-        bh=8oTCa3v8DZ4xlhzPxR/jkxGqLlQbn611U3PZhikh6nE=;
+        s=dec2015msa; t=1617197896;
+        bh=gRUT51AU4p255I4cNjY1DaJbtyk6brMPDK+FMwMQ8Q8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2aZcdHmMbUcmj6BXCtkqXGOQTVwYlVpvBsFn0BGORoQefNocOIcOT7GMR0P6F5ZeS
-         aMgcPbCkmJ1/CeUb69gH/XMNqfWhUfBE6L5YPqnp6wWML0TBeBKzKKz19ISekNRkv7
-         q5j6Gw9VxxZw9mbXuQhmMdg0phYHEoREBo/iSfka01MwOzNpVswsUoRH92LEd3P7VM
-         JENfQXEHEQbxGg5KXJP/yCGGlCB/NGS93hW4jrBANyS260hOemD3qqv8r4c+LwroYJ
-         vmAzoCNDz54OQtOKvpYMMw7l8qOALWIRsgeDCtmFthse1Ccgrvo/Wlm1K271PV4YjL
-         rekPA4Sshx6KQ==
+        b=FRy42q6WyAh7zA5ZlsmsyJJMyLtsbKlHvALi9oGyewxqdR2P2zJFvh1LjAP/d7s60
+         8bnFPiFUYQDVq9Uly31PFkuVlrIZV9HPbOv120OnEye3WV+54fwCzayF9x2fBSB6JX
+         gz57DHPgDQUIACtTs0Hb5Q/55VMxCrhi/xK6dthClRZAwlJpVTlvzSQs8Sqrv6izhe
+         Bv95shlb2mmpmdQP23scwBFdMQIpXXqs2nwH95DRxSPnzBntjGcZ+JiZxd3bxHQVLh
+         BCqe3gl4f0UvfJ9+YxX6VUUONqmKJmQI4FOsY5uJqgD+2gn9dSFFaAwuFg+5dn2HtH
+         89rcode/GlPIw==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 7/9] kbuild: move module strip/compression code into scripts/Makefile.modinst
-Date:   Wed, 31 Mar 2021 22:38:08 +0900
-Message-Id: <20210331133811.3221540-7-masahiroy@kernel.org>
+Subject: [PATCH 2/9] kbuild: unify modules(_install) for in-tree and external modules
+Date:   Wed, 31 Mar 2021 22:38:03 +0900
+Message-Id: <20210331133811.3221540-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210331133811.3221540-1-masahiroy@kernel.org>
 References: <20210331133811.3221540-1-masahiroy@kernel.org>
@@ -52,164 +52,161 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Both mod_strip_cmd and mod_compress_cmd are only used in
-scripts/Makefile.modinst, hence there is no good reason to define them
-in the top Makefile. Move the relevant code to scripts/Makefile.modinst.
+If you attempt to build/install modules ('make modules(_install)' with
+CONFIG_MODULES disabled, you will get a clear error message, but nothing
+for external module builds.
 
-Also, show separate log messages for each of install, strip, sign, and
-compress.
+Factor out the modules and modules_install rules into the common part,
+then you will get the same error message when you try to build external
+modules with CONFIG_MODULES=n.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                 | 32 -----------------
- scripts/Makefile.modinst | 76 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 68 insertions(+), 40 deletions(-)
+ Makefile | 85 ++++++++++++++++++++++++--------------------------------
+ 1 file changed, 36 insertions(+), 49 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 88e5c15e1186..f96ae09d111b 100644
+index 0e06db5ed9d8..99a2bd51c02d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1063,38 +1063,6 @@ export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
- MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
- export MODLIB
+@@ -1458,7 +1458,6 @@ endif
  
--#
--# INSTALL_MOD_STRIP, if defined, will cause modules to be
--# stripped after they are installed.  If INSTALL_MOD_STRIP is '1', then
--# the default option --strip-debug will be used.  Otherwise,
--# INSTALL_MOD_STRIP value will be used as the options to the strip command.
+ PHONY += modules
+ modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_check modules_prepare
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ PHONY += modules_check
+ modules_check: modules.order
+@@ -1476,12 +1475,9 @@ PHONY += modules_prepare
+ modules_prepare: prepare
+ 	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
+ 
+-# Target to install modules
+-PHONY += modules_install
+-modules_install: _modinst_ _modinst_post
 -
--ifdef INSTALL_MOD_STRIP
--ifeq ($(INSTALL_MOD_STRIP),1)
--mod_strip_cmd = $(STRIP) --strip-debug
--else
--mod_strip_cmd = $(STRIP) $(INSTALL_MOD_STRIP)
--endif # INSTALL_MOD_STRIP=1
--else
--mod_strip_cmd = true
--endif # INSTALL_MOD_STRIP
--export mod_strip_cmd
+-PHONY += _modinst_
+-_modinst_:
++modules_install: __modinst_pre
++PHONY += __modinst_pre
++__modinst_pre:
+ 	@rm -rf $(MODLIB)/kernel
+ 	@rm -f $(MODLIB)/source
+ 	@mkdir -p $(MODLIB)/kernel
+@@ -1493,14 +1489,6 @@ _modinst_:
+ 	@sed 's:^:kernel/:' modules.order > $(MODLIB)/modules.order
+ 	@cp -f modules.builtin $(MODLIB)/
+ 	@cp -f $(objtree)/modules.builtin.modinfo $(MODLIB)/
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
 -
--# CONFIG_MODULE_COMPRESS, if defined, will cause module to be compressed
--# after they are installed in agreement with CONFIG_MODULE_COMPRESS_GZIP
--# or CONFIG_MODULE_COMPRESS_XZ.
+-# This depmod is only for convenience to give the initial
+-# boot a modules.dep even before / is mounted read-write.  However the
+-# boot script depmod is the master version.
+-PHONY += _modinst_post
+-_modinst_post: _modinst_
+-	$(call cmd,depmod)
+ 
+ ifeq ($(CONFIG_MODULE_SIG), y)
+ PHONY += modules_sign
+@@ -1508,20 +1496,6 @@ modules_sign:
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modsign
+ endif
+ 
+-else # CONFIG_MODULES
 -
--mod_compress_cmd = true
--ifdef CONFIG_MODULE_COMPRESS
--  ifdef CONFIG_MODULE_COMPRESS_GZIP
--    mod_compress_cmd = $(KGZIP) -n -f
--  endif # CONFIG_MODULE_COMPRESS_GZIP
--  ifdef CONFIG_MODULE_COMPRESS_XZ
--    mod_compress_cmd = $(XZ) --lzma2=dict=2MiB -f
--  endif # CONFIG_MODULE_COMPRESS_XZ
--endif # CONFIG_MODULE_COMPRESS
--export mod_compress_cmd
+-# Modules not configured
+-# ---------------------------------------------------------------------------
 -
- ifdef CONFIG_MODULE_SIG_ALL
- $(eval $(call config_filename,MODULE_SIG_KEY))
+-PHONY += modules modules_install
+-modules modules_install:
+-	@echo >&2
+-	@echo >&2 "The present kernel configuration has modules disabled."
+-	@echo >&2 "Type 'make config' and enable loadable module support."
+-	@echo >&2 "Then build a kernel with module support enabled."
+-	@echo >&2
+-	@exit 1
+-
+ endif # CONFIG_MODULES
  
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 3b2d0380504d..943806b0abb5 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -6,6 +6,7 @@
- PHONY := __modinst
- __modinst:
+ ###
+@@ -1769,24 +1743,9 @@ KBUILD_BUILTIN :=
+ KBUILD_MODULES := 1
  
-+include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
- modules := $(sort $(shell cat $(MODORDER)))
-@@ -19,21 +20,80 @@ endif
- 
- dst := $(MODLIB)/$(subdir)
- 
--modules := $(patsubst $(extmod_prefix)%, $(dst)/%, $(modules))
-+suffix-y				:=
-+suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
-+suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
-+
-+modules := $(patsubst $(extmod_prefix)%, $(dst)/%$(suffix-y), $(modules))
- 
- __modinst: $(modules)
+ build-dirs := $(KBUILD_EXTMOD)
+-PHONY += modules
+-modules: $(MODORDER)
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-
+ $(MODORDER): descend
  	@:
  
--# Don't stop modules_install if we can't sign external modules.
-+quiet_cmd_none =
-+      cmd_none = :
-+
-+#
-+# Installation
-+#
- quiet_cmd_install = INSTALL $@
--      cmd_install = \
--    mkdir -p $(dir $@); cp $< $@; \
--    $(mod_strip_cmd) $@; \
--    $(mod_sign_cmd) $@ $(patsubst %,|| true,$(KBUILD_EXTMOD)) ; \
--    $(mod_compress_cmd) $@
-+      cmd_install = mkdir -p $(dir $@); cp $< $@
-+
-+# Strip
-+#
-+# INSTALL_MOD_STRIP, if defined, will cause modules to be stripped after they
-+# are installed. If INSTALL_MOD_STRIP is '1', then the default option
-+# --strip-debug will be used. Otherwise, INSTALL_MOD_STRIP value will be used
-+# as the options to the strip command.
-+ifdef INSTALL_MOD_STRIP
-+
-+ifeq ($(INSTALL_MOD_STRIP),1)
-+strip-option := --strip-debug
-+else
-+strip-option := $(INSTALL_MOD_STRIP)
-+endif
-+
-+quiet_cmd_strip = STRIP   $@
-+      cmd_strip = $(STRIP) $(strip-option) $@
-+
-+else
+-PHONY += modules_install
+-modules_install: _emodinst_ _emodinst_post
+-
+-PHONY += _emodinst_
+-_emodinst_:
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+-
+-PHONY += _emodinst_post
+-_emodinst_post: _emodinst_
+-	$(call cmd,depmod)
+-
+ compile_commands.json: $(extmod-prefix)compile_commands.json
+ PHONY += compile_commands.json
  
--$(modules): $(dst)/%: $(extmod_prefix)% FORCE
-+quiet_cmd_strip =
-+      cmd_strip = :
-+
-+endif
-+
-+#
-+# Signing
-+# Don't stop modules_install even if we can't sign external modules.
-+#
-+ifeq ($(CONFIG_MODULE_SIG_ALL),y)
-+quiet_cmd_sign = SIGN    $@
-+$(eval $(call config_filename,MODULE_SIG_KEY))
-+      cmd_sign = scripts/sign-file $(CONFIG_MODULE_SIG_HASH) $(MODULE_SIG_KEY_SRCPREFIX)$(CONFIG_MODULE_SIG_KEY) certs/signing_key.x509 $@ \
-+                 $(if $(KBUILD_EXTMOD),|| true)
-+else
-+quiet_cmd_sign :=
-+      cmd_sign := :
-+endif
-+
-+$(dst)/%.ko: $(extmod_prefix)%.ko FORCE
- 	$(call cmd,install)
-+	$(call cmd,strip)
-+	$(call cmd,sign)
-+
-+#
-+# Compression
-+#
-+quiet_cmd_gzip = GZIP    $@
-+      cmd_gzip = $(KGZIP) -n -f $<
-+quiet_cmd_xz = XZ      $@
-+      cmd_xz = $(XZ) --lzma2=dict=2MiB -f $<
-+
-+$(dst)/%.ko.gz: $(dst)/%.ko FORCE
-+	$(call cmd,gzip)
-+
-+$(dst)/%.ko.xz: $(dst)/%.ko FORCE
-+	$(call cmd,xz)
+@@ -1809,6 +1768,39 @@ PHONY += prepare modules_prepare
  
- PHONY += FORCE
- FORCE:
+ endif # KBUILD_EXTMOD
+ 
++# ---------------------------------------------------------------------------
++# Modules
++
++PHONY += modules modules_install
++
++ifdef CONFIG_MODULES
++
++modules: $(MODORDER)
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
++
++quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
++      cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
++                   $(KERNELRELEASE)
++
++modules_install:
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
++	$(call cmd,depmod)
++
++else # CONFIG_MODULES
++
++# Modules not configured
++# ---------------------------------------------------------------------------
++
++modules modules_install:
++	@echo >&2 '***'
++	@echo >&2 '*** The present kernel configuration has modules disabled.'
++	@echo >&2 '*** To use the module feature, please run "make menuconfig" etc.'
++	@echo >&2 '*** to enable CONFIG_MODULES.'
++	@echo >&2 '***'
++	@exit 1
++
++endif # CONFIG_MODULES
++
+ # Single targets
+ # ---------------------------------------------------------------------------
+ # To build individual files in subdirectories, you can do like this:
+@@ -1997,11 +1989,6 @@ tools/%: FORCE
+ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
+       cmd_rmfiles = rm -rf $(rm-files)
+ 
+-# Run depmod only if we have System.map and depmod is executable
+-quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
+-      cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
+-                   $(KERNELRELEASE)
+-
+ # read saved command lines for existing targets
+ existing-targets := $(wildcard $(sort $(targets)))
+ 
 -- 
 2.27.0
 
