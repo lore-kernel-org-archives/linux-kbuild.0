@@ -7,45 +7,51 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F985C43460
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DA0C433ED
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:40:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FFAD61989
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A3F361990
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:40:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235758AbhCaNj1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Mar 2021 09:39:27 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:39529 "EHLO
+        id S235788AbhCaNj6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Mar 2021 09:39:58 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:40771 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235863AbhCaNi6 (ORCPT
+        with ESMTP id S235748AbhCaNj4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Mar 2021 09:38:58 -0400
+        Wed, 31 Mar 2021 09:39:56 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 12VDcFec003995;
-        Wed, 31 Mar 2021 22:38:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFec003995
+        by conuserg-12.nifty.com with ESMTP id 12VDcFeg003995;
+        Wed, 31 Mar 2021 22:38:19 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFeg003995
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1617197897;
-        bh=CsrzD+VHMQFiqVVY3z016djKNDznKoCvYX6jCBwlclQ=;
+        s=dec2015msa; t=1617197900;
+        bh=pCE5wN2vI2u3Kwh6WL4a96wk/4E/JAkH3HdxeyeF6/4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FgIC6CbW3JuqH4Stbt5CDZ+8b8M/VZH9Tep8YtUU38ZdTE7Pf4xwbZrg9D4WNj04M
-         FIlchrLMcV9LWL3TZTticIYTk6JLSN8Kosoy3sWL3PcQFj1uRX50Nd1umZTv3NO2jQ
-         2u+T8XkrRHjzdkypUZPsLY1E5BOu1g9jQd0lIeZrMJ2yLL/WXyWIcURqrQ2zchWCen
-         F9cnAiuyFzHGSFmvZYQStmxnyxjswxHIlpRfj2BeYz6I7ODeWwDb7d3YJtklSSKi+9
-         SYwkq/lPcayxguPUn8Ky11xYfmuDXLdaf1BUbV8dtST7j5qsxNdzOF17dQmBF34nGX
-         aQm19lc8iSV0g==
+        b=Ic3//E4K3/cu2nag2n4/Ajhe7CqLVbupolS58bydzuLMJeHk9lIvqnfKM00h97cK3
+         U3Fi/W7OWzAkXbHeD5r+7oWl5LhMqPry+zbIX3sIadOjX6ukr9/SohR29JgXnCKJYf
+         I+5ZJauheUfWFbbDf+2H4cBe+r+ybU86E6BwWglvOPxNuIQL+BlHAU30awzdA1Ee2x
+         3Y2dkYX7bCkMbxTH8Eyj1uJWJh1Q+rqxlUM17C5bW2UHCwjn1jnL4OL18tIeafeEC1
+         pSTPid5RbUyD3sLlsG2EOl2hZHBBbOqunVFmQ6KMHAdxTLRHEUioX1um3s/wl+GEHZ
+         +1G9VGon/OLWQ==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Chris Wilson <chris@chris-wilson.co.uk>,
+        David Howells <dhowells@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Kees Cook <keescook@chromium.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH 5/9] kbuild: rename extmod-prefix to extmod_prefix
-Date:   Wed, 31 Mar 2021 22:38:06 +0900
-Message-Id: <20210331133811.3221540-5-masahiroy@kernel.org>
+        Nick Terrell <terrelln@fb.com>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH 9/9] kbuild: remove CONFIG_MODULE_COMPRESS
+Date:   Wed, 31 Mar 2021 22:38:10 +0900
+Message-Id: <20210331133811.3221540-9-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210331133811.3221540-1-masahiroy@kernel.org>
 References: <20210331133811.3221540-1-masahiroy@kernel.org>
@@ -55,90 +61,94 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This seems to be useful in sub-make as well. As a preparation of
-exporting it, rename extmod-prefix to extmod_prefix because exported
-variables cannot contain hyphens.
+CONFIG_MODULE_COMPRESS is only used to activate the choice for module
+compression algorithm. It will be simpler to make the choice visible
+all the time by adding CONFIG_MODULE_COMPRESS_NONE to allow the user to
+disable module compression.
+
+This is more consistent with the "Kernel compression mode" and "Built-in
+initramfs compression mode" choices.
+
+CONFIG_KERNEL_UNCOMPRESSED and CONFIG_INITRAMFS_COMPRESSION_NONE are
+available to choose to not compress the kernel, initrd, respectively.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ init/Kconfig | 45 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 26 insertions(+), 19 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b5ff4753eba8..e3c2bd1b6f42 100644
---- a/Makefile
-+++ b/Makefile
-@@ -919,7 +919,7 @@ endif
- ifdef CONFIG_LTO_CLANG
- ifdef CONFIG_LTO_CLANG_THIN
- CC_FLAGS_LTO	:= -flto=thin -fsplit-lto-unit
--KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod-prefix).thinlto-cache
-+KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod_prefix).thinlto-cache
- else
- CC_FLAGS_LTO	:= -flto
- endif
-@@ -1141,9 +1141,9 @@ endif # CONFIG_BPF
+diff --git a/init/Kconfig b/init/Kconfig
+index 019c1874e609..3ca1ffd219c4 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2225,40 +2225,47 @@ config MODULE_SIG_HASH
+ 	default "sha384" if MODULE_SIG_SHA384
+ 	default "sha512" if MODULE_SIG_SHA512
  
- PHONY += prepare0
+-config MODULE_COMPRESS
+-	bool "Compress modules on installation"
++choice
++	prompt "Module compression mode"
+ 	help
++	  This option allows you to choose the algorithm which will be used to
++	  compress modules when 'make modules_install' is run. (or, you can
++	  choose to not compress modules at all.)
  
--extmod-prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
--export MODORDER := $(extmod-prefix)modules.order
--export MODULES_NSDEPS := $(extmod-prefix)modules.nsdeps
-+extmod_prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
-+export MODORDER := $(extmod_prefix)modules.order
-+export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+-	  Compresses kernel modules when 'make modules_install' is run; gzip or
+-	  xz depending on "Compression algorithm" below.
++	  External modules will also be compressed in the same way during the
++	  installation.
  
- ifeq ($(KBUILD_EXTMOD),)
- core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-@@ -1742,7 +1742,7 @@ build-dirs := $(KBUILD_EXTMOD)
- $(MODORDER): descend
- 	@:
+-	  module-init-tools MAY support gzip, and kmod MAY support gzip and xz.
++	  For modules inside an initrd or initramfs, it's more efficient to
++	  compress the whole initrd or initramfs instead.
  
--compile_commands.json: $(extmod-prefix)compile_commands.json
-+compile_commands.json: $(extmod_prefix)compile_commands.json
- PHONY += compile_commands.json
+-	  Out-of-tree kernel modules installed using Kbuild will also be
+-	  compressed upon installation.
++	  This is fully compatible with signed modules.
  
- clean-dirs := $(KBUILD_EXTMOD)
-@@ -1832,12 +1832,12 @@ endif
+-	  Note: for modules inside an initrd or initramfs, it's more efficient
+-	  to compress the whole initrd or initramfs instead.
++	  Please note that the tool used to load modules needs to support the
++	  corresponding algorithm. module-init-tools MAY support gzip, and kmod
++	  MAY support gzip and xz.
  
- PHONY += single_modpost
- single_modpost: $(single-no-ko) modules_prepare
--	$(Q){ $(foreach m, $(single-ko), echo $(extmod-prefix)$m;) } > $(MODORDER)
-+	$(Q){ $(foreach m, $(single-ko), echo $(extmod_prefix)$m;) } > $(MODORDER)
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-	  Note: This is fully compatible with signed modules.
++	  Your build system needs to provide the appropriate compression tool
++	  to compress the modules.
  
- KBUILD_MODULES := 1
+-	  If in doubt, say N.
++	  If in doubt, select 'None'.
  
--export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod-prefix), $(single-no-ko))
-+export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod_prefix), $(single-no-ko))
+-choice
+-	prompt "Compression algorithm"
+-	depends on MODULE_COMPRESS
+-	default MODULE_COMPRESS_GZIP
++config MODULE_COMPRESS_NONE
++	bool "None"
+ 	help
+-	  This determines which sort of compression will be used during
+-	  'make modules_install'.
+-
+-	  GZIP (default) and XZ are supported.
++	  Do not compress modules. The installed modules are suffixed
++	  with .ko.
  
- # trim unrelated directories
- build-dirs := $(foreach d, $(build-dirs), \
-@@ -1906,12 +1906,12 @@ nsdeps: modules
- quiet_cmd_gen_compile_commands = GEN     $@
-       cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
+ config MODULE_COMPRESS_GZIP
+ 	bool "GZIP"
++	help
++	  Compress modules with XZ. The installed modules are suffixed
++	  with .ko.gz.
  
--$(extmod-prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
-+$(extmod_prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
- 	$(if $(KBUILD_EXTMOD),,$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)) \
- 	$(if $(CONFIG_MODULES), $(MODORDER)) FORCE
- 	$(call if_changed,gen_compile_commands)
+ config MODULE_COMPRESS_XZ
+ 	bool "XZ"
++	help
++	  Compress modules with XZ. The installed modules are suffixed
++	  with .ko.xz.
  
--targets += $(extmod-prefix)compile_commands.json
-+targets += $(extmod_prefix)compile_commands.json
+ endchoice
  
- PHONY += clang-tidy clang-analyzer
- 
-@@ -1919,7 +1919,7 @@ ifdef CONFIG_CC_IS_CLANG
- quiet_cmd_clang_tools = CHECK   $<
-       cmd_clang_tools = $(PYTHON3) $(srctree)/scripts/clang-tools/run-clang-tools.py $@ $<
- 
--clang-tidy clang-analyzer: $(extmod-prefix)compile_commands.json
-+clang-tidy clang-analyzer: $(extmod_prefix)compile_commands.json
- 	$(call cmd,clang_tools)
- else
- clang-tidy clang-analyzer:
 -- 
 2.27.0
 
