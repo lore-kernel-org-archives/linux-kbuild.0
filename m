@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BB0C433ED
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FC5C001B5
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 610496108D
+	by mail.kernel.org (Postfix) with ESMTP id F207B610A1
 	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 21:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232246AbhCaV2P (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Mar 2021 17:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
+        id S232611AbhCaV2Q (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Mar 2021 17:28:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232601AbhCaV1h (ORCPT
+        with ESMTP id S232728AbhCaV1k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:27:37 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD5FC061760
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:36 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id y9so2357312qki.14
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:36 -0700 (PDT)
+        Wed, 31 Mar 2021 17:27:40 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E34BC06174A
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id x8so3714813ybo.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Mar 2021 14:27:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=w0Ob8x2IVOI0uzzuSsD4k6M727ovkcvMuqyZX5oqc8o=;
-        b=nI+ENEyWz/rNq3xP8nhiHUSZWps3bzcuJMrVtvPjR+rwBVB/lrPv3BQxv4E6KMlKot
-         N2LsEQni14VlVAHF8qnHU7viK/ziWMDnF+LjsDhRC5aIyL3jNfHcFkfBZOz7gp9DHK/O
-         0JRF/cYTuekKimF/7nWHkbZejho/mozDnjz14/sUDrLrCY52H9gqZiseo5bvX4tsLE3n
-         UInjiRYKcOH12CVIEai20isk8gmvkqMy8DVUqR4KnBFv6jve3oIB8g21fppaRejyMB3V
-         etjDn4nUdij5fV9SBqoW9glwdBH2VxhLNg9QBaiZB4SRwbU9iQX2g4S5jS1L/Ej7xHUS
-         tYmQ==
+        bh=VrfRHkoNzR+0/b/OZROtS1u75H9EO8EEUwf0vNpKXW4=;
+        b=lPEGjGAWaiYjsz9zU+YHuadto6OsoV7V49BU7GsqscQe5wK/si5GABPDlQXYT+c+Z1
+         mb0iBsdbFeDScYW+6Ep34gTydantp6e+uiENRCYegt6foDck+ev8w7TstW0kE3+NLA2x
+         v/80R9LLk+21unRgCwZCixd3RJqek9N5I9CXu0emDkhkyEsavlD4eZJDBCQL0gdu1l/E
+         KZGm5gBzVK3x6BXEL/DnxIp9qarxFEGoOoq89b7yhh3Cw4cdSZR5pG2lrq7dbUe5mN9x
+         dxn8t65kLsbOAQqIUcrNXKM/V7HyJ5KLsL1PE/Xn5UzFRc43UqksnE95n14OqVoTrSwo
+         KriQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=w0Ob8x2IVOI0uzzuSsD4k6M727ovkcvMuqyZX5oqc8o=;
-        b=atOejT8gIj5tvnHA4wWQyn4QfX0Vn3JmDPb6MTDolF4JbGETZZVkKNl3YBgos4Ce8m
-         1FwHthykJZAD5AEZsZg3JkeuDAprfy2ODJ5Mz5I5iD9c4/3w1S3wO2ELUUn+Y1hwzPS+
-         1Iyrj7kCPEhE2yO4u5hojJTRux430MiCZzlc36dwW5QSV+hvb4bDbfJS6qrRlFob4Ta6
-         ak9lpukdwWNaPvSXdJHQEMzifA4ZCuJ45L1bcuyigko363YGAh3ScuuXGjYnS2tuEO0f
-         XCbnYfiwa82FKwUi5Ttg4Dnq4WfMIAHbcn3wP3/jo5FBB45KmIWYlf7QoXcIxbZCjx8F
-         McmQ==
-X-Gm-Message-State: AOAM530/oJExPKz+0WpFhGdJ8TQHNE1kgEGjzcA7ZGIDpxaTWVykhpYQ
-        dAmpad094Bpxu+n0Ihke8ZfbAZX+SNwJ+eP+8rs=
-X-Google-Smtp-Source: ABdhPJxyRXN3znqnAe5t9dUQhGAL9s70gMe95fSLJFpd13x9D/1BXHdz4usqL4E5etbu055EIK7g6ge4pYkRTaLFmpw=
+        bh=VrfRHkoNzR+0/b/OZROtS1u75H9EO8EEUwf0vNpKXW4=;
+        b=EYdm2nvLnfRPTpx5FzxFlnu8zAiByrN+ozUthz5H45EHvlVIY/xv8fxzrESLoUNeOK
+         jRXPx/BBdG4k030VzqCqZgo0JMzDVI16A8bT/F2o3HhrSBqoZGrxKDv001Q/VYybCebf
+         9eK6HTvgCf5EltB46fZxdoobYVc5lks4cvefT3mTXkfkl3yctnmFPiyyWbP0nOE121//
+         HO8LHf5S7ow6mQBR0JipOiD5Hq7mqK/vng1dn0fKYVPU9r2d3r1aJxGtfjfa+QvJXMqh
+         lUVIPUiwCzWA7C0o1jHk5RRxf/131zr3XDemXPdZIkPAwBZeui4brJxhzBqENkuLRfjE
+         BFlQ==
+X-Gm-Message-State: AOAM5335Z2hm1VY3lBfMM4uK7Sufv1BvCctgj1u4SEOLOlStYSJ5tazT
+        K+oWCS8lP+cnO0E5W6TYhWRLbhjJQUpXpW4CWLQ=
+X-Google-Smtp-Source: ABdhPJwxA0CtxdkWc6M/jwZJvtoqXk9nSdTKxmLyT5rwl9B6GB5FZIGHnM0kBXshVGaK6mnJ+f6IJx8IAQpBxGRL/Bk=
 X-Received: from samitolvanen1.mtv.corp.google.com ([2620:15c:201:2:7933:7015:a5d5:3835])
- (user=samitolvanen job=sendgmr) by 2002:a0c:cb0c:: with SMTP id
- o12mr5070670qvk.54.1617226055502; Wed, 31 Mar 2021 14:27:35 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:27:10 -0700
+ (user=samitolvanen job=sendgmr) by 2002:a25:bb49:: with SMTP id
+ b9mr8136529ybk.350.1617226059304; Wed, 31 Mar 2021 14:27:39 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 14:27:12 -0700
 In-Reply-To: <20210331212722.2746212-1-samitolvanen@google.com>
-Message-Id: <20210331212722.2746212-7-samitolvanen@google.com>
+Message-Id: <20210331212722.2746212-9-samitolvanen@google.com>
 Mime-Version: 1.0
 References: <20210331212722.2746212-1-samitolvanen@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v4 06/17] kthread: use WARN_ON_FUNCTION_MISMATCH
+Subject: [PATCH v4 08/17] bpf: disable CFI in dispatcher functions
 From:   Sami Tolvanen <samitolvanen@google.com>
 To:     Kees Cook <keescook@chromium.org>
 Cc:     Nathan Chancellor <nathan@kernel.org>,
@@ -82,36 +82,38 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With CONFIG_CFI_CLANG, a callback function passed to
-__kthread_queue_delayed_work from a module points to a jump table
-entry defined in the module instead of the one used in the core
-kernel, which breaks function address equality in this check:
-
-  WARN_ON_ONCE(timer->function != ktead_delayed_work_timer_fn);
-
-Use WARN_ON_FUNCTION_MISMATCH() instead to disable the warning
-when CFI and modules are both enabled.
+BPF dispatcher functions are patched at runtime to perform direct
+instead of indirect calls. Disable CFI for the dispatcher functions to
+avoid conflicts.
 
 Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 Reviewed-by: Kees Cook <keescook@chromium.org>
 ---
- kernel/kthread.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/bpf.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/kthread.c b/kernel/kthread.c
-index 1578973c5740..a1972eba2917 100644
---- a/kernel/kthread.c
-+++ b/kernel/kthread.c
-@@ -963,7 +963,8 @@ static void __kthread_queue_delayed_work(struct kthread_worker *worker,
- 	struct timer_list *timer = &dwork->timer;
- 	struct kthread_work *work = &dwork->work;
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 3625f019767d..2f46f98479e1 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -650,7 +650,7 @@ struct bpf_dispatcher {
+ 	struct bpf_ksym ksym;
+ };
  
--	WARN_ON_ONCE(timer->function != kthread_delayed_work_timer_fn);
-+	WARN_ON_FUNCTION_MISMATCH(timer->function,
-+				  kthread_delayed_work_timer_fn);
+-static __always_inline unsigned int bpf_dispatcher_nop_func(
++static __always_inline __nocfi unsigned int bpf_dispatcher_nop_func(
+ 	const void *ctx,
+ 	const struct bpf_insn *insnsi,
+ 	unsigned int (*bpf_func)(const void *,
+@@ -678,7 +678,7 @@ void bpf_trampoline_put(struct bpf_trampoline *tr);
+ }
  
- 	/*
- 	 * If @delay is 0, queue @dwork->work immediately.  This is for
+ #define DEFINE_BPF_DISPATCHER(name)					\
+-	noinline unsigned int bpf_dispatcher_##name##_func(		\
++	noinline __nocfi unsigned int bpf_dispatcher_##name##_func(	\
+ 		const void *ctx,					\
+ 		const struct bpf_insn *insnsi,				\
+ 		unsigned int (*bpf_func)(const void *,			\
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
