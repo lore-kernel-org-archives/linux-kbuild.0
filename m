@@ -7,42 +7,45 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAE1C433B4
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F985C43460
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3788C61989
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FFAD61989
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Mar 2021 13:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235930AbhCaNjY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Mar 2021 09:39:24 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:39444 "EHLO
+        id S235758AbhCaNj1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Mar 2021 09:39:27 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:39529 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235796AbhCaNiy (ORCPT
+        with ESMTP id S235863AbhCaNi6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Mar 2021 09:38:54 -0400
+        Wed, 31 Mar 2021 09:38:58 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 12VDcFef003995;
-        Wed, 31 Mar 2021 22:38:19 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFef003995
+        by conuserg-12.nifty.com with ESMTP id 12VDcFec003995;
+        Wed, 31 Mar 2021 22:38:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 12VDcFec003995
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1617197899;
-        bh=ccm2gxQ8Sn16uNujvVd9jIDoZhLzk5TpvhT0PuS96OY=;
+        s=dec2015msa; t=1617197897;
+        bh=CsrzD+VHMQFiqVVY3z016djKNDznKoCvYX6jCBwlclQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pnYzAZ2u7wtZfqjlP41GlFl4JdrN40tH5B+EBRK/Qm35ZRX5eLXZ10XBouoHpE8m8
-         c3/ZL25fM5u40PLyf86mPE9lE81wBlIJ1S6lsfWpE593Dc6LmGOIzK8+B6MDmdk4LG
-         dQT2wTQl07ed2ODhslyQqO7s2C+3uxxItpSwwhZsolU9Z3dzFkVqdI+xaXmBHamllU
-         3VDQ9/9MShPLH6HhibIwY5E0WoKZYCdIbly2q+r0F2TRCVcKsX3bAHVHluyIcPe/R9
-         gq/L3OtPELBmXH2xms4bogNKQHcagg3CcUczNAjqMsL1Ck/GSD3rCnsSc5jIZ7T96d
-         8LviLPGSMOdzw==
+        b=FgIC6CbW3JuqH4Stbt5CDZ+8b8M/VZH9Tep8YtUU38ZdTE7Pf4xwbZrg9D4WNj04M
+         FIlchrLMcV9LWL3TZTticIYTk6JLSN8Kosoy3sWL3PcQFj1uRX50Nd1umZTv3NO2jQ
+         2u+T8XkrRHjzdkypUZPsLY1E5BOu1g9jQd0lIeZrMJ2yLL/WXyWIcURqrQ2zchWCen
+         F9cnAiuyFzHGSFmvZYQStmxnyxjswxHIlpRfj2BeYz6I7ODeWwDb7d3YJtklSSKi+9
+         SYwkq/lPcayxguPUn8Ky11xYfmuDXLdaf1BUbV8dtST7j5qsxNdzOF17dQmBF34nGX
+         aQm19lc8iSV0g==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 8/9] kbuild: merge scripts/Makefile.modsign to scripts/Makefile.modinst
-Date:   Wed, 31 Mar 2021 22:38:09 +0900
-Message-Id: <20210331133811.3221540-8-masahiroy@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH 5/9] kbuild: rename extmod-prefix to extmod_prefix
+Date:   Wed, 31 Mar 2021 22:38:06 +0900
+Message-Id: <20210331133811.3221540-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210331133811.3221540-1-masahiroy@kernel.org>
 References: <20210331133811.3221540-1-masahiroy@kernel.org>
@@ -52,148 +55,90 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-scripts/Makefile.modsign is a subset of scripts/Makefile.modinst,
-and duplicates the code. Let's merge them.
-
-By the way, you do not need to run 'make modules_sign' explicitly
-because modules are signed as a part of 'make modules_install' when
-CONFIG_MODULE_SIG_ALL=y. If CONFIG_MODULE_SIG_ALL=n, mod_sign_cmd is
-set to 'true', so 'make modules_sign' is not functional.
-
-In my understanding, the reason of still keeping this is to handle
-corner cases like commit 64178cb62c32 ("builddeb: fix stripped module
-signatures if CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set").
+This seems to be useful in sub-make as well. As a preparation of
+exporting it, rename extmod-prefix to extmod_prefix because exported
+variables cannot contain hyphens.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                 | 36 ++++++++++++++++++++----------------
- scripts/Makefile.modinst |  9 +++++++++
- scripts/Makefile.modsign | 29 -----------------------------
- 3 files changed, 29 insertions(+), 45 deletions(-)
- delete mode 100644 scripts/Makefile.modsign
+ Makefile | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f96ae09d111b..b14483742a67 100644
+index b5ff4753eba8..e3c2bd1b6f42 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1063,15 +1063,6 @@ export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
- MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
- export MODLIB
- 
--ifdef CONFIG_MODULE_SIG_ALL
--$(eval $(call config_filename,MODULE_SIG_KEY))
--
--mod_sign_cmd = scripts/sign-file $(CONFIG_MODULE_SIG_HASH) $(MODULE_SIG_KEY_SRCPREFIX)$(CONFIG_MODULE_SIG_KEY) certs/signing_key.x509
--else
--mod_sign_cmd = true
--endif
--export mod_sign_cmd
--
- HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
- 
- has_libelf = $(call try-run,\
-@@ -1439,7 +1430,26 @@ PHONY += modules_prepare
- modules_prepare: prepare
- 	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
- 
--modules_install: __modinst_pre
-+export modules_sign_only :=
-+
-+ifeq ($(CONFIG_MODULE_SIG),y)
-+PHONY += modules_sign
-+modules_sign: modules_install
-+	@:
-+
-+# modules_sign is a subset of modules_install.
-+# 'make modules_install modules_sign' is equivalent to 'make modules_install'.
-+ifeq ($(filter modules_install,$(MAKECMDGOALS)),)
-+modules_sign_only := y
-+endif
-+endif
-+
-+modinst_pre :=
-+ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
-+modinst_pre := __modinst_pre
-+endif
-+
-+modules_install: $(modinst_pre)
- PHONY += __modinst_pre
- __modinst_pre:
- 	@rm -rf $(MODLIB)/kernel
-@@ -1454,12 +1464,6 @@ __modinst_pre:
- 	@cp -f modules.builtin $(MODLIB)/
- 	@cp -f $(objtree)/modules.builtin.modinfo $(MODLIB)/
- 
--ifeq ($(CONFIG_MODULE_SIG), y)
--PHONY += modules_sign
--modules_sign:
--	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modsign
--endif
--
- endif # CONFIG_MODULES
- 
- ###
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 943806b0abb5..156eb8239abc 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -76,11 +76,20 @@ quiet_cmd_sign :=
-       cmd_sign := :
+@@ -919,7 +919,7 @@ endif
+ ifdef CONFIG_LTO_CLANG
+ ifdef CONFIG_LTO_CLANG_THIN
+ CC_FLAGS_LTO	:= -flto=thin -fsplit-lto-unit
+-KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod-prefix).thinlto-cache
++KBUILD_LDFLAGS	+= --thinlto-cache-dir=$(extmod_prefix).thinlto-cache
+ else
+ CC_FLAGS_LTO	:= -flto
  endif
+@@ -1141,9 +1141,9 @@ endif # CONFIG_BPF
  
-+ifeq ($(modules_sign_only),)
-+
- $(dst)/%.ko: $(extmod_prefix)%.ko FORCE
- 	$(call cmd,install)
- 	$(call cmd,strip)
- 	$(call cmd,sign)
+ PHONY += prepare0
  
-+else
-+
-+$(dst)/%.ko: FORCE
-+	$(call cmd,sign)
-+
-+endif
-+
- #
- # Compression
- #
-diff --git a/scripts/Makefile.modsign b/scripts/Makefile.modsign
-deleted file mode 100644
-index ddf9b5ca77d7..000000000000
---- a/scripts/Makefile.modsign
-+++ /dev/null
-@@ -1,29 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0
--# ==========================================================================
--# Signing modules
--# ==========================================================================
--
--PHONY := __modsign
--__modsign:
--
--include $(srctree)/scripts/Kbuild.include
--
--modules := $(sort $(shell cat modules.order))
--
--PHONY += $(modules)
--__modsign: $(modules)
--	@:
--
--quiet_cmd_sign_ko = SIGN [M] $(2)/$(notdir $@)
--        cmd_sign_ko = $(mod_sign_cmd) $(2)/$(notdir $@)
--
--# Modules built outside the kernel source tree go into extra by default
--INSTALL_MOD_DIR ?= extra
--ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst %/,%,$(KBUILD_EXTMOD)),,$(@D))
--
--modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
--
--$(modules):
--	$(call cmd,sign_ko,$(MODLIB)/$(modinst_dir))
--
--.PHONY: $(PHONY)
+-extmod-prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
+-export MODORDER := $(extmod-prefix)modules.order
+-export MODULES_NSDEPS := $(extmod-prefix)modules.nsdeps
++extmod_prefix = $(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD)/)
++export MODORDER := $(extmod_prefix)modules.order
++export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+ core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
+@@ -1742,7 +1742,7 @@ build-dirs := $(KBUILD_EXTMOD)
+ $(MODORDER): descend
+ 	@:
+ 
+-compile_commands.json: $(extmod-prefix)compile_commands.json
++compile_commands.json: $(extmod_prefix)compile_commands.json
+ PHONY += compile_commands.json
+ 
+ clean-dirs := $(KBUILD_EXTMOD)
+@@ -1832,12 +1832,12 @@ endif
+ 
+ PHONY += single_modpost
+ single_modpost: $(single-no-ko) modules_prepare
+-	$(Q){ $(foreach m, $(single-ko), echo $(extmod-prefix)$m;) } > $(MODORDER)
++	$(Q){ $(foreach m, $(single-ko), echo $(extmod_prefix)$m;) } > $(MODORDER)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ KBUILD_MODULES := 1
+ 
+-export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod-prefix), $(single-no-ko))
++export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod_prefix), $(single-no-ko))
+ 
+ # trim unrelated directories
+ build-dirs := $(foreach d, $(build-dirs), \
+@@ -1906,12 +1906,12 @@ nsdeps: modules
+ quiet_cmd_gen_compile_commands = GEN     $@
+       cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
+ 
+-$(extmod-prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
++$(extmod_prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
+ 	$(if $(KBUILD_EXTMOD),,$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)) \
+ 	$(if $(CONFIG_MODULES), $(MODORDER)) FORCE
+ 	$(call if_changed,gen_compile_commands)
+ 
+-targets += $(extmod-prefix)compile_commands.json
++targets += $(extmod_prefix)compile_commands.json
+ 
+ PHONY += clang-tidy clang-analyzer
+ 
+@@ -1919,7 +1919,7 @@ ifdef CONFIG_CC_IS_CLANG
+ quiet_cmd_clang_tools = CHECK   $<
+       cmd_clang_tools = $(PYTHON3) $(srctree)/scripts/clang-tools/run-clang-tools.py $@ $<
+ 
+-clang-tidy clang-analyzer: $(extmod-prefix)compile_commands.json
++clang-tidy clang-analyzer: $(extmod_prefix)compile_commands.json
+ 	$(call cmd,clang_tools)
+ else
+ clang-tidy clang-analyzer:
 -- 
 2.27.0
 
