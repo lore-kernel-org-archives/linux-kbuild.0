@@ -6,169 +6,87 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555B7C433B4
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Apr 2021 14:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3AEC433B4
+	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Apr 2021 14:31:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33BE1611C1
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Apr 2021 14:30:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8572561260
+	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Apr 2021 14:31:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229942AbhDGOas (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 7 Apr 2021 10:30:48 -0400
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:16668 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbhDGOar (ORCPT
+        id S1344525AbhDGObf (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 7 Apr 2021 10:31:35 -0400
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:17482 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344515AbhDGObf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Apr 2021 10:30:47 -0400
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 137EU59t000332;
-        Wed, 7 Apr 2021 23:30:05 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 137EU59t000332
+        Wed, 7 Apr 2021 10:31:35 -0400
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 137EV5xM030432;
+        Wed, 7 Apr 2021 23:31:05 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 137EV5xM030432
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1617805805;
-        bh=MVRjyvotamx0gGxHkxCvFT+m/YZf+2TbVDcNiqVSJD8=;
+        s=dec2015msa; t=1617805865;
+        bh=8e+q4Ikd5AQvAiW7XE9ViCmXAkg92qw2Ri8DAzyoZpQ=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ejks8/6nhbUZ2BweBH1E08Gn4kIOSuUvT8rr3ckt7oJDcBZopuA9vYygo7RERY56B
-         1lnFnu8Ugd8CzgX26j1+PU9RLtqR5NCq+cZv/M89Fqu/TCzmhzZ5eqGRnAjaN87gOD
-         nho3tuCxZRrGj0WgQ0d+4x8fdps6cRniOJG2kSCG+y9DUb3jEoxcY+jTLRP9KOa+FN
-         AwuRABJVW0oaCIGB8ZZjPnBSi+aj6TIfLtq48x3SrwwL3O/I0Q2hs03bU6UNRevg8j
-         fa2wIp/rqwCo98Z4Mujgeyqg8lOXilveueTUgwGnubdn9QYzNkTM1nY/G3ei2g+W6O
-         Uud9m0SI/Nc6g==
-X-Nifty-SrcIP: [209.85.214.181]
-Received: by mail-pl1-f181.google.com with SMTP id h20so9433132plr.4;
-        Wed, 07 Apr 2021 07:30:05 -0700 (PDT)
-X-Gm-Message-State: AOAM530GtyV/gg+LfPwp2UvBiMoGepzBrYeWI5G+YQkSna63A+lRA4d7
-        aQHkMHNl7+PdAAQuUJAxLoULeIMRwxev0nVQWBo=
-X-Google-Smtp-Source: ABdhPJziQ0BjpbrjRb7L/3qJ6OIKZU2K1LdHVqg7/W3ygxcpNpdQW7zByiAXv9R1/osGLuFJTg0PV7QnW/5XTAyDteY=
-X-Received: by 2002:a17:90a:f68a:: with SMTP id cl10mr3554255pjb.87.1617805804515;
- Wed, 07 Apr 2021 07:30:04 -0700 (PDT)
+        b=ws4+NWf9aORKzCEvNDVlI8gmV5vYxPtUJ/jlTv35z/687xk1FYHDBZMzeifAz51np
+         g1Ihc9w0yC7M/Ma1jNISBXnNYbvIEnlh2KO7vPJS/VH1eKNZVzM379Y8+7s81gKeaW
+         lWEI7cTzgweXysFPfjw3+M+2d7waOt8GxZBjdghBpY5bR/AcOVC/6z66NqPNknxQV/
+         OeYdT7k4AOtPMvyyMa255PvGEJLAbyO1l/hYB4pjUdg+Aj90ybhSZT/Mb6k4UBD8Bc
+         zYKYR5W5mXv+NZaC/iRq91fFYonec5S5xKRy387Zt4CQ+QpS1+LQavf5ivlO3R/q4s
+         AkrPGQSMUq6hQ==
+X-Nifty-SrcIP: [209.85.216.53]
+Received: by mail-pj1-f53.google.com with SMTP id t24so5823318pjw.4;
+        Wed, 07 Apr 2021 07:31:05 -0700 (PDT)
+X-Gm-Message-State: AOAM530SeYF43vkf2oqMVI9ymEXbtR9nNep9ys8Qqh6e7noi7qxcn90u
+        tWct2QJYDEBo5KO2fdQ59QykjnpD3b1couhU0HE=
+X-Google-Smtp-Source: ABdhPJycxGYoCKPfR6zSNJ7A/kdmtVtCH1E4kkCfWh56LdVlXOo7pkhStwKnPIv0Kj6KAqjaSk/5pj/ns8A9479/sl4=
+X-Received: by 2002:a17:90a:1056:: with SMTP id y22mr3359843pjd.153.1617805864677;
+ Wed, 07 Apr 2021 07:31:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210331133811.3221540-1-masahiroy@kernel.org> <20210331133811.3221540-9-masahiroy@kernel.org>
-In-Reply-To: <20210331133811.3221540-9-masahiroy@kernel.org>
+References: <20210331133811.3221540-1-masahiroy@kernel.org>
+In-Reply-To: <20210331133811.3221540-1-masahiroy@kernel.org>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 7 Apr 2021 23:29:27 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASCmTMtS+4MxTKJDcdCxtDfBTgXkZPUssjrWbmoPYuwAA@mail.gmail.com>
-Message-ID: <CAK7LNASCmTMtS+4MxTKJDcdCxtDfBTgXkZPUssjrWbmoPYuwAA@mail.gmail.com>
-Subject: Re: [PATCH 9/9] kbuild: remove CONFIG_MODULE_COMPRESS
+Date:   Wed, 7 Apr 2021 23:30:27 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ4=hu1B9fg4dHQdjF-AOevhowhz=O2by4L77428GJBNw@mail.gmail.com>
+Message-ID: <CAK7LNAQ4=hu1B9fg4dHQdjF-AOevhowhz=O2by4L77428GJBNw@mail.gmail.com>
+Subject: Re: [PATCH 1/9] kbuild: remove unneeded mkdir for external modules_install
 To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chris Wilson <chris@chris-wilson.co.uk>,
-        David Howells <dhowells@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Kees Cook <keescook@chromium.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Valentin Schneider <valentin.schneider@arm.com>,
-        Vlastimil Babka <vbabka@suse.cz>
+        Michal Marek <michal.lkml@markovi.net>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 10:39 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Wed, Mar 31, 2021 at 10:38 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> CONFIG_MODULE_COMPRESS is only used to activate the choice for module
-> compression algorithm. It will be simpler to make the choice visible
-> all the time by adding CONFIG_MODULE_COMPRESS_NONE to allow the user to
-> disable module compression.
->
-> This is more consistent with the "Kernel compression mode" and "Built-in
-> initramfs compression mode" choices.
->
-> CONFIG_KERNEL_UNCOMPRESSED and CONFIG_INITRAMFS_COMPRESSION_NONE are
-> available to choose to not compress the kernel, initrd, respectively.
+> scripts/Makefile.modinst creates directories as needed.
 >
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
->
->  init/Kconfig | 45 ++++++++++++++++++++++++++-------------------
->  1 file changed, 26 insertions(+), 19 deletions(-)
->
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 019c1874e609..3ca1ffd219c4 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -2225,40 +2225,47 @@ config MODULE_SIG_HASH
->         default "sha384" if MODULE_SIG_SHA384
->         default "sha512" if MODULE_SIG_SHA512
->
-> -config MODULE_COMPRESS
-> -       bool "Compress modules on installation"
-> +choice
-> +       prompt "Module compression mode"
->         help
-> +         This option allows you to choose the algorithm which will be used to
-> +         compress modules when 'make modules_install' is run. (or, you can
-> +         choose to not compress modules at all.)
->
-> -         Compresses kernel modules when 'make modules_install' is run; gzip or
-> -         xz depending on "Compression algorithm" below.
-> +         External modules will also be compressed in the same way during the
-> +         installation.
->
-> -         module-init-tools MAY support gzip, and kmod MAY support gzip and xz.
-> +         For modules inside an initrd or initramfs, it's more efficient to
-> +         compress the whole initrd or initramfs instead.
->
-> -         Out-of-tree kernel modules installed using Kbuild will also be
-> -         compressed upon installation.
-> +         This is fully compatible with signed modules.
->
-> -         Note: for modules inside an initrd or initramfs, it's more efficient
-> -         to compress the whole initrd or initramfs instead.
-> +         Please note that the tool used to load modules needs to support the
-> +         corresponding algorithm. module-init-tools MAY support gzip, and kmod
-> +         MAY support gzip and xz.
->
-> -         Note: This is fully compatible with signed modules.
-> +         Your build system needs to provide the appropriate compression tool
-> +         to compress the modules.
->
-> -         If in doubt, say N.
-> +         If in doubt, select 'None'.
->
-> -choice
-> -       prompt "Compression algorithm"
-> -       depends on MODULE_COMPRESS
-> -       default MODULE_COMPRESS_GZIP
-> +config MODULE_COMPRESS_NONE
-> +       bool "None"
->         help
-> -         This determines which sort of compression will be used during
-> -         'make modules_install'.
-> -
-> -         GZIP (default) and XZ are supported.
-> +         Do not compress modules. The installed modules are suffixed
-> +         with .ko.
->
->  config MODULE_COMPRESS_GZIP
->         bool "GZIP"
-> +       help
-> +         Compress modules with XZ. The installed modules are suffixed
+
+Applied to linux-kbuild.
 
 
-This should be "Compress modules with GZIP."
-
-
-I will fix it when applied.
-
-
-
-
-
-
-
-> +         with .ko.gz.
 >
->  config MODULE_COMPRESS_XZ
->         bool "XZ"
-> +       help
-> +         Compress modules with XZ. The installed modules are suffixed
-> +         with .ko.xz.
+>  Makefile | 2 --
+>  1 file changed, 2 deletions(-)
 >
->  endchoice
+> diff --git a/Makefile b/Makefile
+> index ed8bd815e8a3..0e06db5ed9d8 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1779,10 +1779,8 @@ $(MODORDER): descend
+>  PHONY += modules_install
+>  modules_install: _emodinst_ _emodinst_post
 >
+> -install-dir := $(if $(INSTALL_MOD_DIR),$(INSTALL_MOD_DIR),extra)
+>  PHONY += _emodinst_
+>  _emodinst_:
+> -       $(Q)mkdir -p $(MODLIB)/$(install-dir)
+>         $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+>
+>  PHONY += _emodinst_post
 > --
 > 2.27.0
 >
