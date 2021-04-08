@@ -2,215 +2,169 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 705F8C433B4
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7276CC433B4
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:59:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4017C61151
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28F55611BF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:59:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232005AbhDHU1c (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Apr 2021 16:27:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbhDHU1c (ORCPT
+        id S232297AbhDHU75 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Apr 2021 16:59:57 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:46418 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231862AbhDHU75 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Apr 2021 16:27:32 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33721C061760
-        for <linux-kbuild@vger.kernel.org>; Thu,  8 Apr 2021 13:27:19 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id j26so3588580iog.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Apr 2021 13:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=VwARmvk0f+MDXW9goAj0x9TdAHKCo5czEXWS2XohFuA=;
-        b=kzGGEgZQvNfjli1oNzaXGJ8PN9RNrs0iwky6k24Xkrd2Sacl/1eQ+f56QX6otWd3YM
-         ncZXLUSuuAq9J8QMc3a3Bt3G+Z4wByXX+hB8wCZH2isyKuppvIE50m27oyhTOWcjf3oS
-         E0WcHhH14ligIo0EmEoOknNU49hn9OfZLISTebAhgMCFGAwjhX8D54kMch3rLiSqjhxM
-         rsxHJYtYljC4AJHIenQI0i/vpaaBwPTk3WeyFcUjMGQDKQ7yCSyganNf/dfYtmqweN9n
-         P/Q8g1CMOyXcDU66OdM8a4RfOafqHmrRT3blG3+696Mt/HPdQjddmHw1BD39/S8llqpr
-         T7Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=VwARmvk0f+MDXW9goAj0x9TdAHKCo5czEXWS2XohFuA=;
-        b=lITazWkhZfym1RXsunSEuA9w5+1jx7e+W8et9yFr0U0AGJYTwP88lWO741k68GBwi6
-         M9zWqxw00rZtjHwf3TheXg2DeJdHMYY0wgrX70iMv9heDqjTx+lmgCgiD1kldR2FIAas
-         H3aW8VYQwhSnTLeA1dd2KlLVcGe1HyJzzvwsN4oszAmNMU4QaHqXj8kJvrcqOAn4PYAH
-         Zyoa9OvbhFGgQ6KanKrYoz+YKEUJHH6InVkp1cNGbKejJAuNIO+c1RYj6py77lcaQR8v
-         i2dEj3j5lsAO/UcZOsZZW4zYQVle9Y9yOKQcMy/MAKmCUTYEv5axcUMG+5x5BR1z8s+d
-         GBkg==
-X-Gm-Message-State: AOAM530jaEF7/QCkUcloa7DoEwSPWl2YyoSwgcAc+Han1RboSPOPC1jq
-        C6Zx2HGd5judth+QykVa3WOLr1gAZtn6H4qnT0flLLys2O3rJQ==
-X-Google-Smtp-Source: ABdhPJw8J6Vto4/4aO+HZsloiyDoNMpIqYao0rU/XLppr6jdifcQEDtTida/flJ0CYjfu97hJJWAkS4CL7Gw73aVN6Q=
-X-Received: by 2002:a05:6638:1388:: with SMTP id w8mr10713865jad.30.1617913638469;
- Thu, 08 Apr 2021 13:27:18 -0700 (PDT)
+        Thu, 8 Apr 2021 16:59:57 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 138Kx470002644;
+        Fri, 9 Apr 2021 05:59:05 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 138Kx470002644
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1617915545;
+        bh=li+MZgWK1zbowIjt4vew6oW8eQO9xUf7NDfIE5qrd/s=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Q6tCSszvXF5B4p66VXsQCP5aJi+AyC6AWK4jGea6kk9qDk0GZaiZqfo5IjJrb8kA6
+         INS3rY66896AlpYPyNfK7Utz082+29QzhOABzalEBnsiyqV1SjqzpIgPQPmUE733/g
+         DSJZpI//Vy0TSTxlY0Swgzms2LEkEo3qw75xVDIPsnOrUi/lMkR8DX8kClRlHHkwSB
+         VzbtXIVtG+hwjah7iLN0a+JaqmlqN5N8oP4TBVSbkjx+alwsVV2SB2SJY4cUswNny8
+         3dw4EqaZ06dQ1Ur3bi4/74FaQa9pBAHA8WF0yNe0+jmy0k9ExPyWsadNC5T5WOqFpJ
+         VtG7bRRNu/+Qg==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Paul Cercueil <paul@crapouillou.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: [PATCH 1/2] linux/kconfig.h: replace IF_ENABLED() with PTR_IF() in <linux/kernel.h>
+Date:   Fri,  9 Apr 2021 05:58:57 +0900
+Message-Id: <20210408205858.51751-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210408205858.51751-1-masahiroy@kernel.org>
+References: <20210408205858.51751-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <CA+icZUWVsq-frEbJVOooga_FbEQHSPGdz83OtbFy=RDLEgPdBQ@mail.gmail.com>
- <CA+icZUV+XTopAuqvP8fVDNFy+ReQRg4B-ZopBiiso=4HhO+Y4g@mail.gmail.com>
-In-Reply-To: <CA+icZUV+XTopAuqvP8fVDNFy+ReQRg4B-ZopBiiso=4HhO+Y4g@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Thu, 8 Apr 2021 22:26:55 +0200
-Message-ID: <CA+icZUXpuCowJ_xLTwA1_S91sPnC2WEhmDbUVG8ppP7dwartaQ@mail.gmail.com>
-Subject: Re: kbuild: add support for zstd compressed modules
-To:     Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Piotr Gorski <lucjan.lucjanov@gmail.com>
-Cc:     Oleksandr Natalenko <oleksandr@natalenko.name>,
-        linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Apr 8, 2021 at 9:11 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
->
-> On Thu, Apr 8, 2021 at 9:04 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > I tried this patch together with my build-script which uses builddeb
-> > to generate Debian packages.
-> >
-> > Currently, I test a setup with Clang-LTO + DWARF-v5 (and BTF).
-> >
-> > With this patch I get total strange numbers.
-> >
-> > The Kconfig changes to my previous kernel of today:
-> >
-> > $ scripts/diffconfig /boot/config-5.12.0-rc6-3-amd64-clang12-lto
-> > /boot/config-5.12.0-rc6-4-amd64-clang12-lto
-> > BUILD_SALT "5.12.0-rc6-3-amd64-clang12-lto" -> "5.12.0-rc6-4-amd64-clang12-lto"
-> > MODULE_COMPRESS_NONE y -> n
-> > MODULE_COMPRESS_ZSTD n -> y
-> >
-> > The generated linux-image Debian package is greater in size than the
-> > linux-image DEBUG package.
-> > Normally, this is vice-versa.
-> >
-> > With:
-> >
-> > $ du -s -m linux-image-5.12.0-rc6-4-amd64-clang12-lto*
-> > 969     linux-image-5.12.0-rc6-4-amd64-clang12-lto_5.12.0~rc6-4~bullseye+dileks1_amd64.deb
-> > 97      linux-image-5.12.0-rc6-4-amd64-clang12-lto-dbg_5.12.0~rc6-4~bullseye+dileks1_amd64.deb
-> > (DEBUG)
-> >
-> > Without:
-> >
-> > $ du -s -m linux-image-5.12.0-rc6-3-amd64-clang12-lto*
-> > 60      linux-image-5.12.0-rc6-3-amd64-clang12-lto_5.12.0~rc6-3~bullseye+dileks1_amd64.deb
-> > 599     linux-image-5.12.0-rc6-3-amd64-clang12-lto-dbg_5.12.0~rc6-3~bullseye+dileks1_amd64.deb
-> > (DEBUG)
-> >
-> > The kernel-modules directory numbers:
-> >
-> > With:
-> >
-> > # du -s -m /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/
-> > 999     /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/
-> >
-> > Without:
-> >
-> > # du -s -m /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/
-> > 354     /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/
-> >
-> > Checking iwlwifi kernel-module:
-> >
-> > With:
-> >
-> > # find /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/ -name
-> > 'iwlwifi.ko*' -type f -print | xargs ls -l
-> > -rw-r--r-- 1 root root 2381066  8. Apr 15:47
-> > /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko.zst
-> >
-> > # find /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/ -name
-> > 'iwlwifi.ko*' -type f -print | xargs du -k
-> > 2328    /lib/modules/5.12.0-rc6-4-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko.zst
-> >
-> > Without:
-> >
-> > # find /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/ -name
-> > 'iwlwifi.ko*' -type f -print | xargs ls -l
-> > -rw-r--r-- 1 root root 675976  8. Apr 09:35
-> > /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
-> >
-> > # find /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/ -name
-> > 'iwlwifi.ko*' -type f -print | xargs du -k
-> > 664     /lib/modules/5.12.0-rc6-3-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
-> >
-> > My make invocation looks like this
-> > (start-build_5.12.0-rc6-4-amd64-clang12-lto.txt with this patch):
-> >
-> > dileks     74706   74681  0 15:46 pts/1    00:00:00 /usr/bin/perf_5.10
-> > stat make V=1 -j4 LLVM=1 LLVM_IAS=1 PAHOLE=/opt/pahole/bin/pahole
-> > LOCALVERSION=-4-amd64-clang12-lto KBUILD_BUILD_HOST=iniza
-> > KBUILD_BUILD_USER=sedat.dilek@gmail.com
-> > KBUILD_BUILD_TIMESTAMP=2021-04-08 bindeb-pkg
-> > KDEB_PKGVERSION=5.12.0~rc6-4~bullseye+dileks1
-> >
-> > Finally:
-> >
-> > I can *NOT* boot into the kernel with this patch applied.
-> >
-> > Personally, I do disable intentionally:
-> >
-> > CONFIG_DEBUG_INFO_COMPRESSED=n
-> >
-> > ...and will do independent of this patch:
-> >
-> > CONFIG_MODULE_COMPRESS_NONE=n
-> >
-> > As all Debian packages - generated by builddeb - are by default
-> > compressed with XZ.
-> > Compressing stuff before is counterproductive.
-> > This strategy generates in total smaller Debian package binaries.
-> >
-> > This is my first analysis, I had no deeper look.
-> >
-> > If you need further information, please let me know.
-> >
-> > Please take a look at this.
-> >
-> > Both linux-configs attached.
-> >
-> > Thanks.
-> >
->
-> Additional information:
->
-> $ LC_ALL=C ll drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
-> -rw-r--r-- 1 dileks dileks 8.2M Apr  8 19:22
-> drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
->
-> $ file drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
-> drivers/net/wireless/intel/iwlwifi/iwlwifi.ko: ELF 64-bit LSB
-> relocatable, x86-64, version 1 (SYSV),
-> BuildID[sha1]=bfb188058d16a7cb7d579f68edcd1fff2a4d45d7, with
-> debug_info, not stripped
->
-> $ LC_ALL=C ll debian/linux-image/lib/modules/5.12.0-rc6-4-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko.zst
-> -rw-r--r-- 1 dileks dileks 2.3M Apr  8 19:29
-> debian/linux-image/lib/modules/5.12.0-rc6-4-amd64-clang12-lto/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko.zst
->
-> Looks like the kernel-module with debug_info gets ZTSD compressed.
->
+<linux/kconfig.h> is included from all the kernel-space source files,
+including C, assembly, linker scripts. It is intended to contain minimal
+set of macros to evaluate CONFIG options.
 
-Maybe drop `--rm` in scripts/Makefile.modinst:
+IF_ENABLED() is an intruder here because (x ? y : z) is C code, which
+should not be included from assembly files or linker scripts.
 
-+quiet_cmd_zstd = ZSTD    $@
-+      cmd_zstd = $(ZSTD) -T0 --rm -f -q $<
+Also, <linux/kconfig.h> is no longer self-contained because NULL is
+defined in <linux/stddef.h>.
 
-$ zstd --help | grep '\-\-rm'
---rm    : remove source file(s) after successful de/compression
+Move IF_ENABLED() out to <linux/kernel.h> as PTR_IF().
 
-...untested.
-( None of the other compressors do a removal. )
+PTR_IF(IS_ENABLED(CONFIG_FOO), ...) is slightly longer than
+IF_ENABLED(CONFIG_FOO, ...), but it is not a big deal because
+sub-systems often define dedicated macros such as of_match_ptr(),
+pm_ptr() etc. for common use-cases.
 
-- Sedat -
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ drivers/pinctrl/pinctrl-ingenic.c | 20 ++++++++++----------
+ include/linux/kconfig.h           |  6 ------
+ include/linux/kernel.h            |  2 ++
+ 3 files changed, 12 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/pinctrl/pinctrl-ingenic.c b/drivers/pinctrl/pinctrl-ingenic.c
+index f2746125b077..b21e2ae4528d 100644
+--- a/drivers/pinctrl/pinctrl-ingenic.c
++++ b/drivers/pinctrl/pinctrl-ingenic.c
+@@ -2496,43 +2496,43 @@ static int __init ingenic_pinctrl_probe(struct platform_device *pdev)
+ static const struct of_device_id ingenic_pinctrl_of_match[] = {
+ 	{
+ 		.compatible = "ingenic,jz4740-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4740, &jz4740_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4740), &jz4740_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,jz4725b-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4725B, &jz4725b_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4725B), &jz4725b_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,jz4760-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4760, &jz4760_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4760), &jz4760_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,jz4760b-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4760, &jz4760_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4760), &jz4760_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,jz4770-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4770, &jz4770_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4770), &jz4770_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,jz4780-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_JZ4780, &jz4780_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_JZ4780), &jz4780_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,x1000-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_X1000, &x1000_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_X1000), &x1000_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,x1000e-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_X1000, &x1000_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_X1000), &x1000_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,x1500-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_X1500, &x1500_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_X1500), &x1500_chip_info)
+ 	},
+ 	{
+ 		.compatible = "ingenic,x1830-pinctrl",
+-		.data = IF_ENABLED(CONFIG_MACH_X1830, &x1830_chip_info)
++		.data = PTR_IF(IS_ENABLED(CONFIG_MACH_X1830), &x1830_chip_info)
+ 	},
+ 	{ /* sentinel */ },
+ };
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+index 24a59cb06963..cc8fa109cfa3 100644
+--- a/include/linux/kconfig.h
++++ b/include/linux/kconfig.h
+@@ -70,10 +70,4 @@
+  */
+ #define IS_ENABLED(option) __or(IS_BUILTIN(option), IS_MODULE(option))
+ 
+-/*
+- * IF_ENABLED(CONFIG_FOO, ptr) evaluates to (ptr) if CONFIG_FOO is set to 'y'
+- * or 'm', NULL otherwise.
+- */
+-#define IF_ENABLED(option, ptr) (IS_ENABLED(option) ? (ptr) : NULL)
+-
+ #endif /* __LINUX_KCONFIG_H */
+diff --git a/include/linux/kernel.h b/include/linux/kernel.h
+index 5b7ed6dc99ac..8685ca4cf287 100644
+--- a/include/linux/kernel.h
++++ b/include/linux/kernel.h
+@@ -38,6 +38,8 @@
+ #define PTR_ALIGN_DOWN(p, a)	((typeof(p))ALIGN_DOWN((unsigned long)(p), (a)))
+ #define IS_ALIGNED(x, a)		(((x) & ((typeof(x))(a) - 1)) == 0)
+ 
++#define PTR_IF(cond, ptr)	((cond) ? (ptr) : NULL)
++
+ /* generic data direction definitions */
+ #define READ			0
+ #define WRITE			1
+-- 
+2.27.0
+
