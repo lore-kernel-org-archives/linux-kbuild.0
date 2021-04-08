@@ -2,92 +2,75 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1053CC43460
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F15EC433B4
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 21:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6F2E611AD
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 20:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C989361179
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Apr 2021 21:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232443AbhDHVAI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Apr 2021 17:00:08 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:46605 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232416AbhDHVAI (ORCPT
+        id S232327AbhDHVF2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Apr 2021 17:05:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54580 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232091AbhDHVF2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Apr 2021 17:00:08 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 138Kx46x002644;
-        Fri, 9 Apr 2021 05:59:04 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 138Kx46x002644
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1617915545;
-        bh=CMNsK6z9omY3K2WcWrv+g7O+FAyKXeHXo7JaGbnAshQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=mCAELu1K9iNcHwzxPpkt2QeYzsGvXO3xtV9FO7Le8ftDrt50ftucQPKlGRH7qugRy
-         Ya3grKSZw2YFqHeSRjzjleVybuCxC+F+LDqxW2ODDfZDizTzeFFEkS6xgklZ8DNySf
-         sgjxmlZOGgylBtk14MT/msL3h5+0RgNqd1KhWiFHvZojROpII/2xzBmIKYk5FrMILE
-         JH+ze/FBtu+Utc1Sh1V3UapkGiwD83/r25JpRXNpVeB6q8+2OIyrktRiLXSQ5RNZ6Y
-         WT1cfD2EQCAGNfK7s+unVooFzVx+HATnyUBAB+3r8X2pMEEL5HCT32AGFF6izs7hFa
-         M6AzFOhU0pc5Q==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Paul Cercueil <paul@crapouillou.net>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Len Brown <len.brown@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Subject: [PATCH 0/2] linux/kconfig.h: move IF_ENABLED() out of <linux/kconfig.h>
-Date:   Fri,  9 Apr 2021 05:58:56 +0900
-Message-Id: <20210408205858.51751-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        Thu, 8 Apr 2021 17:05:28 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31958C061760;
+        Thu,  8 Apr 2021 14:05:16 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id u20so3907645lja.13;
+        Thu, 08 Apr 2021 14:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=cL1lIDwElKZOdkbB2wZKzZjjfLi2TedoZx0xq0Spyjo=;
+        b=bo3BA3XtRoF9Gi8sX90YuyzjPikFix/O1CZPeRpmjy2ip3YOUPpzWgCz+Qtk8rYjVe
+         Ie6SI1ofCGYzhV6dvfa/EaqSXK52fZILpU8bBvtr2g/9Cxoi/Ze8Styj376WWmdg31YC
+         52bXkjlC++k/iu4QilcNW0rufyBGgKO51m+yH+pfsO2k8XTFTXpVQuW5uIQXZ/EW6O91
+         Ah19icEiNY2hn22wtWlFYLIE1r2iCv2ho9VeW2jOpceHqj4zqCMe3iTPSXZy+1N9dxv+
+         U5GkosQCkq89u26tgach7WHIsFbvC5R9RvzSqs+FTWssGy8RWaWz0V9npIs0L/fhLsLu
+         ENkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=cL1lIDwElKZOdkbB2wZKzZjjfLi2TedoZx0xq0Spyjo=;
+        b=KmuBw2vaZlgoEFvkkhK0XEUWGmA5hb0axTE4v9YMmQ/tzSUr9Mx1iWvO3EWuNt0XXM
+         M3lwTaH5Con+Q9LxjCAK0O4SHRgUJS+Fq4/XuCcVPrPNISmplktytAsMyzGNhtH7j8py
+         SweihOgbWqAXN+tn3jz+Kx7GKcc+AL+2NtExK+SvPpMOlpZftrSxXxwZ8aqyiCYctHRR
+         14SQ4tgqXrJcAuSAuhL82EVNfgDPqN0iiV+XTVD0/3EJ/lFocI4WtJ/hCNkbAl0X/Xzl
+         wpcY82vvOaZS7uIAWTTJHGAg+tx9ZTIDe0/iAvPZTZ2BgwRbtJ2dCjwJiNLtKf8PU+9J
+         YfAQ==
+X-Gm-Message-State: AOAM532azoodlJgF2usFkE+Uea8kY0WdkSuSd/PhnTDwLZUWgYrZDW1L
+        gDpbagcxWMhHUjUY1af2CtOYrnOUX0w/1g==
+X-Google-Smtp-Source: ABdhPJz21GlpPbzlJCpXqcohiFju1pN7dGjwIM00xOtcWmWjNucAqrXgdKxFG+IkeTfNrxOIpkK8Nw==
+X-Received: by 2002:a2e:809a:: with SMTP id i26mr7328266ljg.357.1617915914774;
+        Thu, 08 Apr 2021 14:05:14 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:a31a:e13a:eb00:c5cf:27cc:1ef2:859])
+        by smtp.gmail.com with ESMTPSA id i81sm23500lfd.58.2021.04.08.14.05.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 14:05:14 -0700 (PDT)
+From:   Piotr Gorski <lucjan.lucjanov@gmail.com>
+To:     lucjan.lucjanov@gmail.com
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        masahiroy@kernel.org, oleksandr@natalenko.name,
+        sedat.dilek@gmail.com
+Subject: Subject: Re: [PATCH v3] kbuild: add support for zstd compressed modules
+Date:   Thu,  8 Apr 2021 23:04:47 +0200
+Message-Id: <20210408210448.1850553-1-lucjan.lucjanov@gmail.com>
+X-Mailer: git-send-email 2.31.0.97.g1424303384
+In-Reply-To: <20210407160927.222092-1-lucjan.lucjanov@gmail.com>
+References: <20210407160927.222092-1-lucjan.lucjanov@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-
-I insist on <linux/kconfig.h> having only minimal set of macros
-that are needed to evaluate CONFIG options.
-
-Everytime somebody added an alien to <linux/kconfig.h>, I needed to
-kick it out.
-
-I did not notice 1b399bb04837183cecdc1b32ef1cfc7fcfa75d32 because
-I was not addressed by [1].
-
-[1]: https://lore.kernel.org/lkml/?q=kconfig.h%3A+Add+IF_ENABLED%28%29+macro
-
-I like Paul's idea, but if I had noticed the patch in time, I would
-have tried my best to persuade to implement it outside of <linux/kconfig.h>
-(Paul's initial patch was adding it to a new header instead of <linux/kconfig.h>)
-
-Before it is widely used, I want to fix it.
-
-In 2/2, I converted pm.h to allow driver cleanups.
-
-
-
-Masahiro Yamada (2):
-  linux/kconfig.h: replace IF_ENABLED() with PTR_IF() in
-    <linux/kernel.h>
-  pm: allow drivers to drop #ifdef and __maybe_unused from pm callbacks
-
- drivers/pinctrl/pinctrl-ingenic.c | 20 ++++-----
- include/linux/kconfig.h           |  6 ---
- include/linux/kernel.h            |  2 +
- include/linux/pm.h                | 67 +++++++++++--------------------
- 4 files changed, 36 insertions(+), 59 deletions(-)
-
--- 
-2.27.0
-
+No, the --rm option is essential. xz and gzip have the --rm option built in as opposed to zstd, which is why I used it. I've been using zstd module compression since last december (although I set a different compression level on mine) and everything works fine. Oleksandr also tested it at his place and didn't report any objections. 
