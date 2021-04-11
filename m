@@ -2,26 +2,26 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3056C43460
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F04BC43461
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B00E8611CE
+	by mail.kernel.org (Postfix) with ESMTP id D668961019
 	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231356AbhDKKO6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S235123AbhDKKO6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 11 Apr 2021 06:14:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235123AbhDKKO5 (ORCPT
+        with ESMTP id S235229AbhDKKO5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 11 Apr 2021 06:14:57 -0400
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6EF4C061574
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3CEC06138D
         for <linux-kbuild@vger.kernel.org>; Sun, 11 Apr 2021 03:14:41 -0700 (PDT)
 From:   bage@linutronix.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
@@ -30,28 +30,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YprCFzJGbx6nvlz1jxtaUJj1p9GgOqh51am+QXWV9pA=;
-        b=WCNx7yij3Vaclf3IVEyzso4Qtg43M0poGMwsTq1ICOZWYf9nv+AcTw1WWdEZIM9+13XZO5
-        +B2WRDGhOGYlsp6mppalkdw5XE4Yun1e9zHKTS0SF6nRhz1Z3HllI1HpajI7H4LOCq/z0R
-        SyA8pq8YbGfgGMXWh4S3YS7d1L9Ds0jp8AS3Jh5u6UVsBm+s7PCmSGvD3tkd44QYkjqWZF
-        oCnNhZknzWkLmJKolYhYmksMO/0pXmanxxMX3ZijkSMLl4MNr6eDryT6O24flRUQPOau/x
-        rXkDxIFrrOAWzueGAecaKYnKhGoi9+6DsL/enYe7Tovtxn0bChHehRjaDS32RQ==
+        bh=5s6pA65p/yfFUofwR6oMI3HJ1MVNvuCzB7HAJwIb11I=;
+        b=Xezv23OQvaLsHN9nTDPz4fy7fNZYt1HiA2JBghTVB+xvu0mLI2J0lRQsfm8ReJBjGrwTeC
+        aQMki2gFVTwjGt6ApcXXLOBmPWAuF/1q5uXaSw0YFbtvjBe8VWysHW7Y09bGS7DczhvyMe
+        w8KwZZw6jbCTkzERvhGmg7bhgyTzpTbPVWbDs2nn5ZkaBcUGLskHNPvkYiW8DDHbhhPMNZ
+        EWDMoRxuqL0n1rnMRZcDEAuzch/BdHKUp6GTkBubOWL2PBnJqtJOo+fIKDnseqe7EawAT5
+        kwmwDFToE2+iuwuBGGgQxCKyP9F6r6uRe1lZExBz03ivLbMboJAfj6bXeVVg3A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
         s=2020e; t=1618136078;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YprCFzJGbx6nvlz1jxtaUJj1p9GgOqh51am+QXWV9pA=;
-        b=YfRJKlxKehVomAiV/bZ3XIl3Xr0VOiLkAoJXtaASNE5lJ0Oie5nZjIrUntHu3ZxT0MOo27
-        RRS2ve8cRrM3W9DQ==
+        bh=5s6pA65p/yfFUofwR6oMI3HJ1MVNvuCzB7HAJwIb11I=;
+        b=kByPnUjZoBw5ZhR6Iix4e0DmGEwn0wfUjsxW25YzgyncU8P0FVRSQcgDA+D9srMxd2V0SO
+        ezbvQAeKAxSGG9Ag==
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>
 Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
         tglx@linutronix.de
-Subject: [PATCH 2/6] builddeb: set CC on cross build to prefixed gcc
-Date:   Sun, 11 Apr 2021 12:14:18 +0200
-Message-Id: <20210411101422.7092-3-bage@linutronix.de>
+Subject: [PATCH 4/6] builddeb: use standard format for copyright file
+Date:   Sun, 11 Apr 2021 12:14:20 +0200
+Message-Id: <20210411101422.7092-5-bage@linutronix.de>
 In-Reply-To: <20210411101422.7092-1-bage@linutronix.de>
 References: <20210411101422.7092-1-bage@linutronix.de>
 MIME-Version: 1.0
@@ -62,34 +62,56 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: Bastian Germann <bage@linutronix.de>
 
-Building the generated package with CC unset will fail for cross
-compilation. Detect that and set CC to a sane default prefixed by
-dpkg-architecture's DEB_HOST_GNU_TYPE variable.
+Convert the minimal copyright file to the DEP-5 standard format that is
+commonly used in Debian.
 
+Link: https://trends.debian.net/#copyright-format-machine-readable-dep-5-vs-old-format
 Signed-off-by: Bastian Germann <bage@linutronix.de>
 ---
- scripts/package/mkdebian | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ scripts/package/mkdebian | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 3d2d4b033e44..2fa149796791 100755
+index 717223ef6b03..bb5c19735345 100755
 --- a/scripts/package/mkdebian
 +++ b/scripts/package/mkdebian
-@@ -223,6 +223,14 @@ fi
- cat <<EOF > debian/rules
- #!$(command -v $MAKE) -f
+@@ -152,22 +152,23 @@ EOF
  
-+include /usr/share/dpkg/architecture.mk
+ # Generate copyright file
+ cat <<EOF > debian/copyright
+-This is a packacked upstream version of the Linux kernel.
+-
+-The sources may be found at most Linux archive sites, including:
+-https://www.kernel.org/pub/linux/kernel
+-
+-Copyright: 1991 - 2018 Linus Torvalds and others.
+-
+-The git repository for mainline kernel development is at:
+-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+-
++Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
++Upstream-Name: Linux
++Source: https://www.kernel.org/pub/linux/kernel
++Comment: This is a packaged upstream version of the Linux kernel.
 +
-+ifneq (\$(DEB_BUILD_GNU_TYPE),\$(DEB_HOST_GNU_TYPE))
-+ifeq (\$(origin CC),default)
-+CC := \$(DEB_HOST_GNU_TYPE)-gcc
-+endif
-+endif
-+
- srctree ?= .
++Files: *
++Copyright: 1991 - 2021 Linus Torvalds and others.
++License: GPL-2
++ The git repository for mainline kernel development is at:
++ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
++ .
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; version 2 dated June, 1991.
+-
+-On Debian GNU/Linux systems, the complete text of the GNU General Public
+-License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
++ .
++ On Debian GNU/Linux systems, the complete text of the GNU General Public
++ License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
+ EOF
  
- build-indep:
+ # Generate a control file
 -- 
 2.30.2
 
