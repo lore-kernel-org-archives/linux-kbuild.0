@@ -2,93 +2,80 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A94C43460
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Apr 2021 19:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E2EC433ED
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6545610A3
-	for <linux-kbuild@archiver.kernel.org>; Sat, 10 Apr 2021 19:46:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7B6261019
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235048AbhDJTqg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 10 Apr 2021 15:46:36 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:41642 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234950AbhDJTqf (ORCPT
+        id S235095AbhDKKOy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 11 Apr 2021 06:14:54 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:60590 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231405AbhDKKOy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Apr 2021 15:46:35 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 13AJjaXY021927;
-        Sun, 11 Apr 2021 04:45:38 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 13AJjaXY021927
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1618083938;
-        bh=Qt7LyLpNoISWl7ZC6n0LZqu5kpLDaY4Kj/tKRSYcXyI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qiJUecsQzNe7V4RXZ+GE9XinwffhDPn4yzF6o30UBJjtTMh+vwcMrSCwgQL9sGo1p
-         B2rgdyid68eWw9n9V+OonClKaeobiRU+TUIkfKbYfhQXyDwUQ2yrXKPeCFBETsJz6L
-         9CtdWEL57JpeTRn02pwVaQldi4g1aRpsepbdZFNxGLh+I3YtiSbpsuUjmuaWiXKNbw
-         2lfpWuOKWQnEedqDomufDcpmIz+VSCVR9s4xAi06vvzuerTlfUZBU3eLU4Fs2u5GEG
-         Q3hU98gPSar20Mlj7W2yNIqecWEWcyKn3L6XAJX2s2j+pH5Bi+tAGnPvb0MGgVS933
-         m5igqX2cwdu+w==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] kconfig: nconf: remove unneeded default for menu prompt
-Date:   Sun, 11 Apr 2021 04:45:33 +0900
-Message-Id: <20210410194534.187588-4-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210410194534.187588-1-masahiroy@kernel.org>
-References: <20210410194534.187588-1-masahiroy@kernel.org>
+        Sun, 11 Apr 2021 06:14:54 -0400
+From:   bage@linutronix.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1618136077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CN3phlSxpUzqKwZh/NlE0a8HijtaK040AGHto72X8HA=;
+        b=sOCLv4CUGUkE9Z2s9zmCEwW4oV0MQiwCZ4TKN8YmgPnAQy+LCazzfz3ppGPggmhzolg2+y
+        hHe493Cl6iqa3QfDNPkx6jprITrZy3CJUYJOWOefLvq67LrPyzYuTceNplkP8+CHP3Z1sh
+        qyBfVh2HYSInNqjgtzCKl11dOQcSbyV+szlPXyJcm6EeN6S1Ufv7EBNCvcwE11DKBzW8fg
+        alVq59KhI+WE4T4r+s3+lXAapyfrqAsX0cYsnDtW8IcXbtIvgtPSJgiAtLOBFmacXnuber
+        LMm+c8KSSKnMqIF3zGusAv/I9h5zXvkxZWMJ7Amoj9T+SfuYtvp2iJQeHX9RYw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1618136077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CN3phlSxpUzqKwZh/NlE0a8HijtaK040AGHto72X8HA=;
+        b=LiwfbA+KML8sGP5niQnHdJ2G4nHXQXtfIApP+3iqWbHbeRwTSafGhEp8VDPJkhsP9LvoEM
+        Z6sNZE+h52YOprAg==
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
+        tglx@linutronix.de
+Subject: [PATCH 0/6] builddeb: make deb building more flexible
+Date:   Sun, 11 Apr 2021 12:14:16 +0200
+Message-Id: <20210411101422.7092-1-bage@linutronix.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The rootmenu always has a prompt even if the 'mainmenu' statement is
-missing in the top Kconfig file.
+From: Bastian Germann <bage@linutronix.de>
 
-conf_parse() calls menu_add_prompt(P_MENU, "Main menu", NULL) in this
-case.
+Building Debian packages via the [bin]deb-pkg make targets has some
+shortcomings. These targets do not allow for packing a Debian source
+package independently from actually building the binary package.
 
-So, every 'menu' has a prompt.
+This series improves that process by making it possible to rebuild
+the packages without errors via dpkg-buildpackage, by separating
+source package creation from binary package building, and by making
+the dbg package build optional.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Bastian Germann (6):
+  builddeb: diff-ignore unexported top-level files
+  builddeb: set CC on cross build to prefixed gcc
+  builddeb: clean generated package content
+  builddeb: use standard format for copyright file
+  builddeb: introduce profile excluding the dbg pkg
+  kbuild: introduce srcdeb-pkg target
 
- scripts/kconfig/nconf.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ scripts/Makefile.package |  8 ++++++--
+ scripts/package/mkdebian | 40 ++++++++++++++++++++++++++--------------
+ 2 files changed, 32 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index daeeb5f81445..b6fe7b18a103 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1068,7 +1068,6 @@ static int do_match(int key, struct match_state *state, int *ans)
- static void conf(struct menu *menu)
- {
- 	struct menu *submenu = NULL;
--	const char *prompt = menu_get_prompt(menu);
- 	struct symbol *sym;
- 	int res;
- 	int current_index = 0;
-@@ -1086,9 +1085,8 @@ static void conf(struct menu *menu)
- 		if (!child_count)
- 			break;
- 
--		show_menu(prompt ? prompt : "Main Menu",
--				menu_instructions,
--				current_index, &last_top_row);
-+		show_menu(menu_get_prompt(menu), menu_instructions,
-+			  current_index, &last_top_row);
- 		keypad((menu_win(curses_menu)), TRUE);
- 		while (!global_exit) {
- 			if (match_state.in_search) {
 -- 
-2.27.0
+2.30.2
 
