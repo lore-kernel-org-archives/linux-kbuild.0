@@ -7,48 +7,51 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B45C433ED
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B41BCC433B4
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACCE16108F
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 877DE610C8
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 10:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233514AbhDKKO5 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 11 Apr 2021 06:14:57 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60622 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235123AbhDKKO4 (ORCPT
+        id S235234AbhDKKO6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 11 Apr 2021 06:14:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55310 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235166AbhDKKO5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Apr 2021 06:14:56 -0400
+        Sun, 11 Apr 2021 06:14:57 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD770C06138B
+        for <linux-kbuild@vger.kernel.org>; Sun, 11 Apr 2021 03:14:41 -0700 (PDT)
 From:   bage@linutronix.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1618136079;
+        s=2020; t=1618136077;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Wd/BIX/T87DqZRsUNG1oh6/GmVH+vUs28kJhYAzfhQA=;
-        b=ygqe/tRvQbhRiCqoDIUJ/aH3raWyU9jDh2I83w1pbC192rdlKc+eU0j9Jb38eNDvizyYFN
-        8zrtp1Vpb1ijIY8rmZGv/aaq971B8OazPF+KMYuPcK+0dWg+9Hqzaie/fVUPTug3ec/LlD
-        5XAUWQnGVUpzQ+wBZwUq2yprgVeDrw1ioDM08WQU2Q4iYbzSz0D77IypofuN6gw/ceBTGx
-        LHEFC4z9teMQneEbDl8ZeL22iCr72gKGoXBbTFymE5zRMND+DeTCacIUlbpcRBpMvAfQoT
-        4Mpe0JPhbFZSvl7j7R01C4XHn652Sl9rqHGEYZvCeMKJsZiLajQ2cqOPitOKVA==
+        bh=i3+Kl5FcYsjg9qthOVz0Zxrj9dHPWVVERskguSKkN/Y=;
+        b=ImymoPySjj85YD8qUUxVXk3wnbOo798teXpPRdYJSaS9attSHCkC6VeQJ7VXv4sIvoaM9v
+        e4l92VO4rBfwmV7cmpI4mypSSI203kk2a/OJUAKkVQhHRD/3etOmZXXvzL7t0JxM0qW7z1
+        PBR36uO08cp7Pw4iFjsKXsKHvN8zclmIwegaNkCpcd9nwuA4vK1T1kQkeEcbYFwjTV5uy+
+        xxqc+20q2fxl5R2sKgvo0U3A603/469jiochbE+J2/tVmaLVcutx3fVwXUD+CDDyQEMRRw
+        x9smEJySP8TLLDAxBN0jMj1IBVC/mn/pO0FLJXF13PPdP7F3QkBgL0XC/mSL2w==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1618136079;
+        s=2020e; t=1618136077;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Wd/BIX/T87DqZRsUNG1oh6/GmVH+vUs28kJhYAzfhQA=;
-        b=c8RoIeTh+MAy9v8gnbCgVZ+iBWcyt3xbVCc16JQKDIryOJGl5fHTt0ZZFVRH4FRt6JCcRt
-        POZ6IAjEPePWXbCA==
+        bh=i3+Kl5FcYsjg9qthOVz0Zxrj9dHPWVVERskguSKkN/Y=;
+        b=Y3J3C0eurLhN2XLwQXTOyc8CqbpbETgRsTccl55GrTn9Rs2UpFoV6hbfwqK5lfejORFZIx
+        tvrEVhZhK5ljHbBw==
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>
 Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
         tglx@linutronix.de
-Subject: [PATCH 6/6] kbuild: introduce srcdeb-pkg target
-Date:   Sun, 11 Apr 2021 12:14:22 +0200
-Message-Id: <20210411101422.7092-7-bage@linutronix.de>
+Subject: [PATCH 1/6] builddeb: diff-ignore unexported top-level files
+Date:   Sun, 11 Apr 2021 12:14:17 +0200
+Message-Id: <20210411101422.7092-2-bage@linutronix.de>
 In-Reply-To: <20210411101422.7092-1-bage@linutronix.de>
 References: <20210411101422.7092-1-bage@linutronix.de>
 MIME-Version: 1.0
@@ -59,49 +62,46 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: Bastian Germann <bage@linutronix.de>
 
-A Debian source package can be generated only in combination with building
-it afterwards. Introduce a target srcdeb-pkg that generates the source
-package without building it (adding dpkg-buildpackage's -S flag).
+scripts/Makefile.package's TAR_CONTENT lists the files to include in orig
+tarballs while the deb-pkg make target only ignores .git. This results in
+the other top-level files ending up in the .diff.gz.
 
-Make the former deb-pkg depend on both srcdeb-pkg and bindeb-pkg to retain
-its behavior.
+Let dpkg-source ignore .git with the default diff-ignore and list the other
+top-level files in extend-diff-ignore. Use the debian/source/options to
+always have those available on building the package.
 
 Signed-off-by: Bastian Germann <bage@linutronix.de>
 ---
- scripts/Makefile.package | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ scripts/Makefile.package | 2 +-
+ scripts/package/mkdebian | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 280f3a2fa334..78a363623c3a 100644
+index f952fb64789d..280f3a2fa334 100644
 --- a/scripts/Makefile.package
 +++ b/scripts/Makefile.package
-@@ -69,13 +69,16 @@ binrpm-pkg:
- 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
- 
- PHONY += deb-pkg
--deb-pkg:
-+deb-pkg: srcdeb-pkg bindeb-pkg
-+
-+PHONY += srcdeb-pkg
-+srcdeb-pkg:
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+@@ -75,7 +75,7 @@ deb-pkg:
  	$(call cmd,src_tar,$(KDEB_SOURCENAME))
  	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
  		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
--	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -us -uc
-+	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -S -us -uc
+-	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -i.git -us -uc
++	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -us -uc
  
  PHONY += bindeb-pkg
  bindeb-pkg:
-@@ -145,6 +148,7 @@ help:
- 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
- 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
-+	@echo '  srcdeb-pkg          - Build only the source kernel deb package'
- 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
- 	@echo '  snap-pkg            - Build only the binary kernel snap package'
- 	@echo '                        (will connect to external hosts)'
+diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
+index 60a2a63a5e90..3d2d4b033e44 100755
+--- a/scripts/package/mkdebian
++++ b/scripts/package/mkdebian
+@@ -134,6 +134,8 @@ fi
+ 
+ mkdir -p debian/source/
+ echo "1.0" > debian/source/format
++echo diff-ignore > debian/source/options
++echo 'extend-diff-ignore = ".clang-format|.cocciconfig|.config.old|.*ignore|.mailmap|.version|CREDITS|MAINTAINERS|README"' >> debian/source/options
+ 
+ echo $debarch > debian/arch
+ extra_build_depends=", $(if_enabled_echo CONFIG_UNWINDER_ORC libelf-dev:native)"
 -- 
 2.30.2
 
