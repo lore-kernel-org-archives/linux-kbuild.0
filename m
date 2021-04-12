@@ -2,98 +2,78 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F13C433ED
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 20:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E83C433ED
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 01:12:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA2F6610C7
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Apr 2021 20:03:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93D0160FDB
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 01:12:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235837AbhDKUDz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 11 Apr 2021 16:03:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56422 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235486AbhDKUDz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Apr 2021 16:03:55 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 38982B036;
-        Sun, 11 Apr 2021 20:03:37 +0000 (UTC)
-Date:   Sun, 11 Apr 2021 22:03:35 +0200
-From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] kbuild: dummy-tools: Add elfedit.
-Message-ID: <20210411200335.GS6564@kitsune.suse.cz>
-References: <f6218ac526a04fa4d4406f935bcc4eb4a7df65c4.1617917438.git.msuchanek@suse.de>
- <CAK7LNAR-zdHLpp7eQ_PUG6PQMKUKh2m0b80NGSxnxuXhjyT=3g@mail.gmail.com>
- <20210411101829.GR6564@kitsune.suse.cz>
- <CAK7LNASycuqb2wyizXgVs4aN33LOrxCBikLbSXs+anWJ0-SW_Q@mail.gmail.com>
+        id S236199AbhDLBNO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 11 Apr 2021 21:13:14 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:54770 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236080AbhDLBNO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 11 Apr 2021 21:13:14 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 13C1CVI9003364;
+        Mon, 12 Apr 2021 10:12:32 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 13C1CVI9003364
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1618189952;
+        bh=MHbukYU/Mw/dGTyf52YaPn0f/afm9xLukFnJUGqtVP4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=OZqZQanWqafs3vj3jJwdn2u0efq+tz2LzWqxCWbn6fvhdD19wjv4P71kJHlyFp3nP
+         5XSF9AYoHVGMPz+cnahzoc1t6HK5joCGAOOra/EIqML4BIut4pYRzC3Vv63cqYZ2OB
+         9B1U3jsoB0LJFA0g4JXeQki4v5dNEt4v2LGzwlqJXA+qrUQMAjsgoSA/DL5b6mKOnQ
+         UqNb2v4tGjXskT1pQNz9jKup+0nCO0M4v+Zhec9hlsWkhRj3tj3nttOqoRd8Mmoxzv
+         H85aYN3cFvz0kkyMDaDt5aWetAJ70RrE5x7VnNFo3zJH89tYOBNhjdjQffLOv6NR21
+         UOONerFgYsEtw==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] kconfig: nconf: remove meaningless wattrset() call from show_menu()
+Date:   Mon, 12 Apr 2021 10:12:26 +0900
+Message-Id: <20210412011227.249534-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210412011227.249534-1-masahiroy@kernel.org>
+References: <20210412011227.249534-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK7LNASycuqb2wyizXgVs4aN33LOrxCBikLbSXs+anWJ0-SW_Q@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Apr 11, 2021 at 08:37:03PM +0900, Masahiro Yamada wrote:
-> On Sun, Apr 11, 2021 at 7:18 PM Michal Suchánek <msuchanek@suse.de> wrote:
-> >
-> > On Sun, Apr 11, 2021 at 03:12:40AM +0900, Masahiro Yamada wrote:
-> > > On Fri, Apr 9, 2021 at 6:31 AM Michal Suchanek <msuchanek@suse.de> wrote:
-> > > >
-> > > > elfedit is used in Makefile
-> > > >
-> > > >  Makefile:GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
-> > > >
-> > > > which causes this error getting printed
-> > > >
-> > > >  which: no elfedit in (./scripts/dummy-tools)
-> > >
-> > >
-> > > I am OK with this patch, but how did you reproduce it?
-> >
-> > make ARCH=arm CROSS_COMPILE=scripts/dummy-tools/ allmodconfig
-> >
-> > it possibly depends on the config you already have, too.
-> >
-> > Thanks
-> >
-> > Michal
-> 
-> 
-> Maybey, are you working on linux-next?
+This attribute is not used because it will be overridden some lines
+below:
 
-Yes, I do have the rust support.
+  wattrset(main_window, attr_main_menu_box);
 
-> 
-> 
-> [1]
-> $ git checkout  add74f8473^
-> $ make ARCH=arm CROSS_COMPILE=scripts/dummy-tools/ allmodconfig
-> 
-> [2]
-> $ git checkout  add74f8473
-> $ make ARCH=arm CROSS_COMPILE=scripts/dummy-tools/ allmodconfig
-> 
-> 
-> 
-> If [1] is OK, but [2] is NG,
-> commit add74f8473 is the root cause.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Sounds like it. Before that the elfedit test was conditional on clang.
+ scripts/kconfig/nconf.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-I can try to do the bisect but I think the reason it broke is quite
-clear.
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index d8a6ab5fb521..5209a18eeacb 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -953,7 +953,6 @@ static void show_menu(const char *prompt, const char *instructions,
+ 	current_instructions = instructions;
+ 
+ 	clear();
+-	wattrset(main_window, attr_normal);
+ 	print_in_middle(stdscr, 1, 0, getmaxx(stdscr),
+ 			menu_backtitle,
+ 			attr_main_heading);
+-- 
+2.27.0
 
-Thanks
-
-Michal
