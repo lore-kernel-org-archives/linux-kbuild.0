@@ -2,80 +2,125 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6C3C43462
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 01:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580A0C43460
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 07:44:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9778461206
-	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 01:12:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 280526120B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 12 Apr 2021 07:44:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235391AbhDLBNP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 11 Apr 2021 21:13:15 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:54772 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236104AbhDLBNO (ORCPT
+        id S236808AbhDLHo7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Apr 2021 03:44:59 -0400
+Received: from mail-ua1-f52.google.com ([209.85.222.52]:36376 "EHLO
+        mail-ua1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230510AbhDLHo7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Apr 2021 21:13:14 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 13C1CVI8003364;
-        Mon, 12 Apr 2021 10:12:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 13C1CVI8003364
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1618189952;
-        bh=8n44YieJK85qmJRfL1CyMbvcWKDxnqK4wAAYrHCBx+s=;
-        h=From:To:Cc:Subject:Date:From;
-        b=RH4aKHoyUdthyn7W1ClmLfSFUUjO+6QDJc5/fn04qsO/WWKzfRFAokmU9nZn3sOZG
-         UjpaQYcysbuXfoyOZOmZ1i9hF27T1MH5jr41bfTZawHWu29din/9L1bF2rAc7CQshe
-         9HOtUBZ4ZXz5a6EDyCr5zkDvPUqT9jX8xddeHMYL77vK8dTZz8ykoHUkslCV8ffTgR
-         MEiNEb4RRCWaBztN3rypsNRRFP+gCkqO+cYJpAWgiBxJuT8mqWD3624gpYwMAzWXCe
-         5pv2NhE8zK/IHhZ96O4XNWp3UJexbbaDLmerhdKZuHCBwNGJgI6f6zoFqini7xl9Q9
-         tLsJ0Cnuwdw1g==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] kconfig: nconf: change set_config_filename() to void function
-Date:   Mon, 12 Apr 2021 10:12:25 +0900
-Message-Id: <20210412011227.249534-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        Mon, 12 Apr 2021 03:44:59 -0400
+Received: by mail-ua1-f52.google.com with SMTP id c2so3957888uaj.3;
+        Mon, 12 Apr 2021 00:44:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JXZ2evZ1HlMgd5dQiMnzV28T68ypmIxoPU4uM5YLJDY=;
+        b=Vinz3BFRyvpJ+vPsgG2IHGgWyJ+J8qtd8bLpImK4DDLmbkCUPCNIMZWEKt+NjupWm5
+         2ILHj0eESMASOTNIFBtSPfAdJWqP1PHkH5HWbngQ7Rfz+H7RFXEscjS8U9sfznVSHZxB
+         TMEl4824r/zv2tbc4odVjVsq62lxAhXO2f0YuytydOybUOaEie3QRaZH3Y5aNNoLI1YA
+         oU2fXBbPCcMJGxfWKKIVClOAPXWGKJ+l81wD0GqmDq7z0+oHtB1qydmJEJrN85j9ovdi
+         gxArkn6VmNu/345caKMkTAz0r1bZKOnyURoJEWSQv28ms+MNpMbj6UKKWTjwjAfCOua/
+         kcfg==
+X-Gm-Message-State: AOAM530g4qnct9/xmuRglWUL0gvLG1tg+K8SIrH+6cXJ1FdymOznW8EV
+        ZNPAMXL2HBI0vPy+QJBBsO4Z7BNRjKop0d2D5WO2+7LiPko=
+X-Google-Smtp-Source: ABdhPJx+WwlU+f/sxyzlKoozSp4V5pjbJlg2tOYyn632dPGmXpWO0oMiT+z+uxKe9nNXFSbUevs6IBKhAohcjgM8HOo=
+X-Received: by 2002:a9f:262c:: with SMTP id 41mr8642842uag.4.1618213481107;
+ Mon, 12 Apr 2021 00:44:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210411135532.219797-1-masahiroy@kernel.org>
+In-Reply-To: <20210411135532.219797-1-masahiroy@kernel.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Mon, 12 Apr 2021 09:44:29 +0200
+Message-ID: <CAMuHMdUtqSv6PUfLtuGoBSgqqM4CkwSkT3nKstXRKN1tuXrQ_g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use ?= to assign CROSS_COMPILE by arch-Makefile
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild <linux-kbuild@vger.kernel.org>,
+        Helge Deller <deller@gmx.de>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Rich Felker <dalias@libc.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Vineet Gupta <vgupta@synopsys.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Parisc List <linux-parisc@vger.kernel.org>,
+        Linux-sh list <linux-sh@vger.kernel.org>,
+        arcml <linux-snps-arc@lists.infradead.org>,
+        "moderated list:H8/300 ARCHITECTURE" 
+        <uclinux-h8-devel@lists.sourceforge.jp>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-No one uses the return value of this function.
+Hi Yamada-san,
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+On Sun, Apr 11, 2021 at 3:56 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> Use ?= operator to let arch/*/Makefile to assign CROSS_COMPILE only
+> when CROSS_COMPILE is undefined.
+>
+> This allows arch-Makefiles to drop the ifeq ($(CROSS_COMPILE),)
+> conditional.
+>
+> This slightly changes the behavior; the arch-Makefile previously
+> overrode CROSS_COMPILE when CROSS_COMPILE has already been made empty
+> via an environment variable as in 'export CROSS_COMPILE='.
+>
+> With this commit, arch-Makefle will respect the user's environment
+> set-up, which seems to be a more correct behavior.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
- scripts/kconfig/nconf.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Thanks for your patch!
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index e86d3511b939..d8a6ab5fb521 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -631,13 +631,12 @@ static int item_is_tag(char tag)
- 
- static char filename[PATH_MAX+1];
- static char menu_backtitle[PATH_MAX+128];
--static const char *set_config_filename(const char *config_filename)
-+static void set_config_filename(const char *config_filename)
- {
- 	snprintf(menu_backtitle, sizeof(menu_backtitle), "%s - %s",
- 		 config_filename, rootmenu.prompt->text);
- 
- 	snprintf(filename, sizeof(filename), "%s", config_filename);
--	return menu_backtitle;
- }
- 
- /* return = 0 means we are successful.
+> ---
+>
+>  arch/arc/Makefile    | 4 +---
+>  arch/h8300/Makefile  | 4 +---
+>  arch/m68k/Makefile   | 4 +---
+>  arch/mips/Makefile   | 4 +---
+>  arch/parisc/Makefile | 6 ++----
+>  arch/sh/Makefile     | 4 +---
+
+What about arch/xtensa/Makefile?
+
+> --- a/arch/m68k/Makefile
+> +++ b/arch/m68k/Makefile
+> @@ -17,10 +17,8 @@
+>  KBUILD_DEFCONFIG := multi_defconfig
+>
+>  ifneq ($(SUBARCH),$(ARCH))
+> -       ifeq ($(CROSS_COMPILE),)
+> -               CROSS_COMPILE := $(call cc-cross-prefix, \
+> +       CROSS_COMPILE ?= $(call cc-cross-prefix, \
+>                         m68k-linux-gnu- m68k-linux- m68k-unknown-linux-gnu-)
+> -       endif
+>  endif
+
+This does not seem to work as expected: my standard build scripts
+(using "make ARCH=m68k") no longer pick up the cross-compiler,
+but fall back to the native compiler, thus breaking the build.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.27.0
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
