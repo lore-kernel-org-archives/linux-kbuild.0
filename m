@@ -2,108 +2,166 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 610C4C433ED
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 06:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A598C433ED
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 07:09:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DAA661153
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 06:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E618B61153
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 07:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238714AbhDPGzL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 16 Apr 2021 02:55:11 -0400
-Received: from ivanoab7.miniserver.com ([37.128.132.42]:41246 "EHLO
-        www.kot-begemot.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231193AbhDPGzL (ORCPT
+        id S234681AbhDPHJf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 16 Apr 2021 03:09:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234010AbhDPHJe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Apr 2021 02:55:11 -0400
-X-Greylist: delayed 2568 seconds by postgrey-1.27 at vger.kernel.org; Fri, 16 Apr 2021 02:55:11 EDT
-Received: from tun252.jain.kot-begemot.co.uk ([192.168.18.6] helo=jain.kot-begemot.co.uk)
-        by www.kot-begemot.co.uk with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1lXHhi-0005kc-N1; Fri, 16 Apr 2021 06:11:48 +0000
-Received: from madding.kot-begemot.co.uk ([192.168.3.98])
-        by jain.kot-begemot.co.uk with esmtps (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <anton.ivanov@cambridgegreys.com>)
-        id 1lXHhf-00024s-Lp; Fri, 16 Apr 2021 07:11:46 +0100
-Subject: Re: [PATCH v2] uml: fix W=1 missing-include-dirs warnings
-To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        linux-um@lists.infradead.org
-References: <20210415171352.27398-1-rdunlap@infradead.org>
-From:   Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Organization: Cambridge Greys
-Message-ID: <e3a93e3e-84ba-7274-3476-d63ad4fbcca9@cambridgegreys.com>
-Date:   Fri, 16 Apr 2021 07:11:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        Fri, 16 Apr 2021 03:09:34 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09CDC061574;
+        Fri, 16 Apr 2021 00:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=e1pqz5Awgt1GE6YgZQa4ltuZ9s1zkandzmHzgiCBi6c=; b=OqQfvuTlkemnHt1IBx3a7Ub2j3
+        p1CrRqAMQAvdr7/i+JN+Nb88qSLD2PYT/4hwPVy5gTiU1Q6Jdx/HEJxmePQzP0H8QtQqUpSvS4z2y
+        JFf1p8ls+CqqYNfX/hBE4qkZR3Y0DW4X8ifWd4VKStRFBKb0SV+5PUUgmiDyQbQwB44WDVdHEp5Lc
+        8TtcGmM6aNwtheVEm3v0AsbOMmIpmc9GB1dDfEzvB+DVF5SLO28RtXCtUHGCosfkFQ0bKONxsXczj
+        LFW7ubp35dJO3KT22qNhHOtE9yRzkf7JqOMSaoWn4Ov5an4vbPNDHqX1lY7CGA9kP5cyueF9Bke/T
+        D9OytkZw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lXIb9-0018wR-2d; Fri, 16 Apr 2021 07:09:05 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0D45630015A;
+        Fri, 16 Apr 2021 09:09:02 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id E7B8A200C8D28; Fri, 16 Apr 2021 09:09:01 +0200 (CEST)
+Date:   Fri, 16 Apr 2021 09:09:01 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wedson Almeida Filho <wedsonaf@google.com>
+Cc:     ojeda@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/13] [RFC] Rust support
+Message-ID: <YHk4DZE1ZWTiBB1f@hirez.programming.kicks-ass.net>
+References: <20210414184604.23473-1-ojeda@kernel.org>
+ <YHiMyE4E1ViDcVPi@hirez.programming.kicks-ass.net>
+ <YHj02M3jMSweoP4l@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210415171352.27398-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Clacks-Overhead: GNU Terry Pratchett
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YHj02M3jMSweoP4l@google.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 15/04/2021 18:13, Randy Dunlap wrote:
-> Currently when using "W=1" with UML builds, there are over 700 warnings
-> like so:
->
->    CC      arch/um/drivers/stderr_console.o
-> cc1: warning: ./arch/um/include/uapi: No such file or directory [-Wmissing-include-dirs]
->
-> but arch/um/ does not have include/uapi/ at all, so add that
-> subdir and put one Kbuild file into it (since git does not track
-> empty subdirs).
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: Jeff Dike <jdike@addtoit.com>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-> Cc: linux-um@lists.infradead.org
-> ---
-> v2: use Option 4 from v1: add arch/um/include/uapi so that 'make' is
->      placated -- and just like all other arch's have.
->
->   arch/um/include/uapi/asm/Kbuild |    1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/arch/um/include/uapi/asm/Kbuild b/arch/um/include/uapi/asm/Kbuild
-> new file mode 100644
-> index 000000000000..f66554cd5c45
-> --- /dev/null
-> +++ b/arch/um/include/uapi/asm/Kbuild
-> @@ -0,0 +1 @@
-> +# SPDX-License-Identifier: GPL-2.0
->
-> _______________________________________________
-> linux-um mailing list
-> linux-um@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-um
->
-+1
+On Fri, Apr 16, 2021 at 03:22:16AM +0100, Wedson Almeida Filho wrote:
+> On Thu, Apr 15, 2021 at 08:58:16PM +0200, Peter Zijlstra wrote:
+> > On Wed, Apr 14, 2021 at 08:45:51PM +0200, ojeda@kernel.org wrote:
+> > 
+> > > Rust is a systems programming language that brings several key
+> > > advantages over C in the context of the Linux kernel:
+> > > 
+> > >   - No undefined behavior in the safe subset (when unsafe code is
+> > >     sound), including memory safety and the absence of data races.
+> > 
+> > And yet I see not a single mention of the Rust Memory Model and how it
+> > aligns (or not) with the LKMM. The C11 memory model for example is a
+> > really poor fit for LKMM.
+> 
+> We don't intend to directly expose C data structures to Rust code (outside the
+> kernel crate). Instead, we intend to provide wrappers that expose safe
+> interfaces even though the implementation may use unsafe blocks. So we expect
+> the vast majority of Rust code to just care about the Rust memory model.
+> 
+> We admittedly don't have a huge number of wrappers yet, but we do have enough to
+> implement most of Binder and so far it's been ok. We do intend to eventually
+> cover other classes of drivers that may unveil unforeseen difficulties, we'll
+> see.
+> 
+> If you have concerns that we might have overlooked, we'd be happy to hear about
+> them from you (or anyone else).
 
-I will forward it to openwrt-dev. Their build process adds uapi to uml, 
-so if we are going to change this, it will be nice to give them a heads-up.
+Well, the obvious example would be seqlocks. C11 can't do them. The not
+sharing of data structures would avoid most of that, but will also cost
+you in performance.
 
-Acked-By: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Simlar thing for RCU; C11 can't optimally do that; it needs to make
+rcu_dereference() a load-acquire [something ARM64 has already done in C
+because the compiler might be too clever by half when doing LTO :-(].
+But it's the compiler needing the acquire semantics, not the computer,
+which is just bloody wrong.
 
+And there's more sharp corners to be had. But yes, if you're not
+actually sharing anything; and taking the performance hit that comes
+with that, you might get away with it.
 
--- 
-Anton R. Ivanov
-Cambridgegreys Limited. Registered in England. Company Number 10273661
-https://www.cambridgegreys.com/
+> > HTML is not a valid documentation format. Heck, markdown itself is
+> > barely readable.
+> 
+> Are you stating [what you perceive as] a fact or just venting? If the former,
+> would you mind enlightening us with some evidence?
 
+I've yet to see a program that renders HTML (including all the cruft
+often used in docs, which might include SVG graphics and whatnot) sanely
+in ASCII. Lynx does not qualify, it's output is atrocious crap.
+
+Yes, lynx lets you read HTML in ASCII, but at the cost of bleeding
+eyeballs and missing content.
+
+Nothing beats a sane ASCII document with possibly, where really needed
+some ASCII art.
+
+Sadly the whole kernel documentation project is moving away from that as
+well, which just means I'm back to working on an undocumented codebase.
+This rst crap they adopted is unreadable garbage.
+
+> > It is really *really* hard to read. It has all sorts of weird things,
+> > like operators at the beginning after a line break:
+> > 
+> > 	if (foo
+> > 	    || bar)
+> > 
+> > which is just wrong. And it suffers from CamelCase, which is just about
+> > the worst thing ever. Not even the C++ std libs have that (or had, back
+> > when I still did knew C++).
+> > 
+> > I also see:
+> > 
+> > 	if (foo) {
+> > 		...
+> > 	}
+> > 
+> > and
+> > 
+> > 	if foo {
+> > 	}
+> > 
+> > the latter, ofcourse, being complete rubbish.
+> 
+> There are advantages to adopting the preferred style of a language (when one
+> exists). We, of course, are not required to adopt it but I am of the opinion
+> that we should have good reasons to diverge if that's our choice in the end.
+> 
+> "Not having parentheses around the if-clause expression is complete rubbish"
+> doesn't sound like a good reason to me.
+
+Of course it does; my internal lexer keeps screaming syntax error at me;
+how am I going to understand code when I can't sanely read it?
+
+The more you make it look like (Kernel) C, the easier it is for us C
+people to actually read. My eyes have been reading C for almost 30 years
+by now, they have a lexer built in the optical nerve; reading something
+that looks vaguely like C but is definitely not C is an utterly painful
+experience.
+
+You're asking to join us, not the other way around. I'm fine in a world
+without Rust.
