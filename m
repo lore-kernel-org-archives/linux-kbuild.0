@@ -2,91 +2,112 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62E8C433B4
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 14:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA2EC433ED
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 15:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1F71610FC
-	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 14:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FBC4611ED
+	for <linux-kbuild@archiver.kernel.org>; Fri, 16 Apr 2021 15:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244654AbhDPOVj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 16 Apr 2021 10:21:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41540 "EHLO
+        id S244955AbhDPPE6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 16 Apr 2021 11:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243051AbhDPOVj (ORCPT
+        with ESMTP id S233916AbhDPPE5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Apr 2021 10:21:39 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85077C061574;
-        Fri, 16 Apr 2021 07:21:14 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id x76so20277360ybe.5;
-        Fri, 16 Apr 2021 07:21:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t2GyCAH28OFUKirekIiqG8QH/lg+7x2E9PX/3Ek0zoE=;
-        b=DN4360cPG7/skv/Q3gCUFB73HgA3nzH+525Cgqh/o/Sulu0m4bTBwnHevUocDCwwi6
-         3qKax591nZdA0Ojb9AD3uRCojJykqMb+8bJHhI+Nqkdf9/DJwxtNq/NR8pC79rWyC7T1
-         auBKfUYycwbn6OXqgA5WR9zkM+uswdjdM6SUkV3McSJaZpHLKY2JiBOGP3ueW9iJnAMn
-         IZP+dT6lmrZi0uK5RGzHWWA2ni+Ngn7SPxd0Cw3UO6vxmRc8FwVBxda/Hzpud1hVUjpp
-         sQe2N34/JXAfj5aBTxyAzE6SlWTMIbR3o1kVakAQkmK1xkhe78cdZz3SjJdxDi+o9oak
-         ZLvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t2GyCAH28OFUKirekIiqG8QH/lg+7x2E9PX/3Ek0zoE=;
-        b=LrvISHeis84s5EpObdJmQtUvdow83rCZ2l6GuVs+ksEBGg2sNTKZrxkxsd6CN3N60h
-         CJQbc5KSJBAWz27XrrrMGZupizmVt4q3c9RHVdeD+J3NHT6n3MTbmlpVG2AyASviub4M
-         YgXmcLcD2kQztsXJr07p9E6vbNchLgXAbGVctAgFey3AO80oNiMBo2JStKdi6o6DRA1u
-         fW8V1OhjZaPuIDm5KnMm1aQtkoDXSbQwV+xEIWGjvXEIEz9dXOvnHCTRR+D4OAgAwfht
-         ZtXsoZsjA07Zo01oHxt8C5E9Dy5/IqdrGcgHqP7sh6moDbySESY1TfX0QfOLUl/rAlxc
-         hk9Q==
-X-Gm-Message-State: AOAM532oXh8MOsgVm+B8j6fGbPm1N4EMOw41x/vIq71IhOoPLunJ+nQE
-        taBSWwsW3e0rc+m5KenubDeOrLjiAMvpaiWesrs=
-X-Google-Smtp-Source: ABdhPJwVsoVQM4VZt7oKFcbdYa2NYRotI8uUuXF4t8Xeg5W0UK22rrX/4IWKKe6OqKVB+3im4D0wY+ZKRHlKUQVjdwI=
-X-Received: by 2002:a25:6803:: with SMTP id d3mr12588384ybc.422.1618582873937;
- Fri, 16 Apr 2021 07:21:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210414184604.23473-1-ojeda@kernel.org> <YHlz54rd1YQHsOA/@hirez.programming.kicks-ass.net>
-In-Reply-To: <YHlz54rd1YQHsOA/@hirez.programming.kicks-ass.net>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Fri, 16 Apr 2021 16:21:02 +0200
-Message-ID: <CANiq72=LE64F9VDvr5aajeBNfXCvVK+yXN8m97jo-E6TDHNVbg@mail.gmail.com>
-Subject: Re: [PATCH 00/13] [RFC] Rust support
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Miguel Ojeda <ojeda@kernel.org>,
+        Fri, 16 Apr 2021 11:04:57 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A7AC061574;
+        Fri, 16 Apr 2021 08:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=25hrGU9VZ2QV0c5Hbqrxi9yE5aGpd22JKZJ3w+lQJU8=; b=hyDSOZjdKvkPuQFyX/T/VJ+RAY
+        JmxcWLT61fI68EtDrTVEbvD9gyEHmqmR0wPScYyqUJK21c90XaKL5tz0pckVtWtmXspROR1d2d/hH
+        rKLmRBvPOSaQsaZmUbnNFYOmjxwT6abcBWOgjjNU3cEBpliOCmBgP93NV2Jwwr/waAIIfjgNOUHVI
+        ejz3P+H//G5rqwyl0cN8rNOSX1zqhML0z9hyPzwA4YGrKEIjQSklN3YTSxZQI8rWoSWHgREChCD59
+        ZmDqCAx2pn2RR0ytLxo8lVpgKeXl7EwYh92v4LOtLL0LeDr15+BoZNpavY4CBerRZXEju/y9TIun4
+        J2ssLwuQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lXPzv-00A5sI-KB; Fri, 16 Apr 2021 15:03:37 +0000
+Date:   Fri, 16 Apr 2021 16:03:07 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Wedson Almeida Filho <wedsonaf@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>, ojeda@kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rust-for-linux@vger.kernel.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/13] [RFC] Rust support
+Message-ID: <20210416150307.GJ2531743@casper.infradead.org>
+References: <20210414184604.23473-1-ojeda@kernel.org>
+ <YHlz54rd1YQHsOA/@hirez.programming.kicks-ass.net>
+ <YHmMJWmzz2vZ3qQH@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YHmMJWmzz2vZ3qQH@google.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Apr 16, 2021 at 1:24 PM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> IMO RAII is over-valued, but just in case you care, the below seems to
-> work just fine. No fancy new language needed, works today. Similarly you
-> can create refcount_t guards, or with a little more work full blown
-> smart_ptr crud.
+On Fri, Apr 16, 2021 at 02:07:49PM +0100, Wedson Almeida Filho wrote:
+> There is nothing in C forcing developers to actually use DEFINE_MUTEX_GUARD. So
+> someone may simply forget (or not know that they need) to lock
+> current->perf_event_mutex and directly access some field protected by it. This
+> is unlikely to happen when one first writes the code, but over time as different
+> people modify the code and invariants change, it is possible for this to happen.
+> 
+> In Rust, this isn't possible: the data protected by a lock is only accessible
+> when the lock is locked. So developers cannot accidentally make mistakes of this
+> kind. And since the enforcement happens at compile time, there is no runtime
+> cost.
 
-Please note that even smart pointers (as in C++'s `std::unique_ptr`
-etc.) do not guarantee memory safety. Yes, they help a lot writing
-sound code (in particular exception-safe C++ code), but they do not
-bring the same guarantees.
+Well, we could do that in C too.
 
-That's why using C language extensions (the existing ones, that is) to
-recreate RAII/guards, smart pointers, etc. would only bring you to a
-point closer to C++, but not to Rust.
+struct unlocked_inode {
+	spinlock_t i_lock;
+};
 
-Cheers,
-Miguel
+struct locked_inode {
+	spinlock_t i_lock;
+	unsigned short i_bytes;
+	blkcnt_t i_blocks;
+};
+
+struct locked_inode *lock_inode(struct unlocked_inode *inode)
+{
+	spin_lock(&inode->i_lock);
+	return (struct locked_inode *)inode;
+}
+
+There's a combinatoric explosion when you have multiple locks in a data
+structure that protect different things in it (and things in a data
+structure that are protected by locks outside that data structure),
+but I'm not sufficiently familiar with Rust to know if/how it solves
+that problem.
+
+Anyway, my point is that if we believe this is a sufficiently useful
+feature to have, and we're willing to churn the kernel, it's less churn
+to do this than it is to rewrite in Rust.
+
+> Another scenario: suppose within perf_event_task_enable you need to call a
+> function that requires the mutex to be locked and that will unlock it for you on
+> error (or unconditionally, doesn't matter). How would you do that in C? In Rust,
+> there is a clean idiomatic way of transferring ownership of a guard (or any
+> other object) such that the previous owner cannot continue to use it after
+> ownership is transferred. Again, this is enforced at compile time. I'm happy to
+> provide a small example if that would help.
+
+I think we could do that too with an __attribute__((free)).  It isn't,
+of course, actually freeing the pointer to the locked_inode, but it will
+make the compiler think the pointer is invalid after the function returns.
+
+(hm, looks like gcc doesn't actually have __attribute__((free)) yet.
+that's unfortunate.  there's a potential solution in gcc-11 that might
+do what we need)
+
