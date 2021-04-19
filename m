@@ -2,40 +2,40 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6F5C433ED
-	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 21:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EF0C433B4
+	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 21:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C00AC61354
-	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 21:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B34A261354
+	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 21:38:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbhDSViz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 19 Apr 2021 17:38:55 -0400
-Received: from terminus.zytor.com ([198.137.202.136]:58943 "EHLO
-        terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237147AbhDSVix (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Apr 2021 17:38:53 -0400
+        id S233599AbhDSVjB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 19 Apr 2021 17:39:01 -0400
+Received: from terminus.zytor.com ([198.137.202.136]:60677 "EHLO
+        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230033AbhDSVjB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Apr 2021 17:39:01 -0400
+X-Greylist: delayed 2559 seconds by postgrey-1.27 at vger.kernel.org; Mon, 19 Apr 2021 17:38:53 EDT
 Received: from tazenda.hos.anvin.org ([IPv6:2601:646:8602:8be0:7285:c2ff:fefb:fd4])
         (authenticated bits=0)
-        by mail.zytor.com (8.16.1/8.15.2) with ESMTPSA id 13JKslbT2399793
+        by mail.zytor.com (8.16.1/8.15.2) with ESMTPSA id 13JKslbV2399793
         (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Mon, 19 Apr 2021 13:54:55 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 13JKslbT2399793
+        Mon, 19 Apr 2021 13:54:58 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 13JKslbV2399793
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2021032801; t=1618865697;
-        bh=PSRN5v6fXZoEYzmBfnsY6QxsYgPsedMVL9WdxgLS2qU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=f5zFIsPcOREApY+mB0ii8gwVUTUMKktoUkJE6+w/n/DXJQ4+WojjMKyEXIsI6vWXJ
-         9/D5d7IQ5NxZ/wLrEOJWFcaSRqYkZEP/Dx9wW0ZRA+tfI5eZl3/VEiIZuH16AHmf3T
-         3modexQEAcvHCkTuayE4S15qxDN/gMiglxnJ4KQ1F3i5cQdeDDuMY67/Sa23WHO9BX
-         NrwHQCSsAHMQ3JboGCWFTWzMa6sMtT9utZx87H8fq0R1FD7lOEw5snCrgaafOvNW7R
-         j1CBkBW3e5FKM+x34T/3KMEKfKgugl8DzLdBE5rWHjC+oP1+58/cAVAiLR7RvxPTY7
-         4J6DE7FqmTe+g==
+        s=2021032801; t=1618865698;
+        bh=lL9adgUCHOXgYJL54SVvOg8UrOC8Yn20NRklwm0+KQQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Zbf2DP01sUGlxFlickyjWtP8zw8G1U7LBzjaFriHJDkgZTlmsrkrJl766L0q3f4Tw
+         BvmEap/cI6fmMCjXc45B/OTCbT+u7g2L/3eNHmb1lzZTFb4bTO09/uUpHoN8N5vyZy
+         34mgqavj5Y4RxipPG9yKy5gMxqvosdr5azl70lc9XXrZGkR3eiVMJhJqgU/7pRz2ZW
+         eaR1EXRzyjnmFXYsQcl4FqikH9gwem56UhAkmfmlu00cmBMROWQv6tjjg8iKbYx4Rq
+         ugl/7lENa875M89wa2g2jd6TFXGakPOS7+o5TZYI5olbvUERmJf5qcP+OO9l4gv4SP
+         rOiKDfw8jZwNw==
 From:   "H. Peter Anvin" <hpa@zytor.com>
 To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
         Borislav Petkov <bp@alien8.de>,
@@ -46,10 +46,12 @@ To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
 Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Kbuild Mailing List <linux-kbuild@vger.kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 0/3] x86 disk image and modules initramfs generation
-Date:   Mon, 19 Apr 2021 13:54:35 -0700
-Message-Id: <20210419205438.1531413-1-hpa@zytor.com>
+Subject: [PATCH 2/3] usr, modules: Add build target for creating a modules initramfs image
+Date:   Mon, 19 Apr 2021 13:54:37 -0700
+Message-Id: <20210419205438.1531413-3-hpa@zytor.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210419205438.1531413-1-hpa@zytor.com>
+References: <20210419205438.1531413-1-hpa@zytor.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -58,34 +60,221 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: "H. Peter Anvin" (Intel) <hpa@zytor.com>
 
-When compiling on a different machine than the runtime target,
-including but not limited to simulators, it is rather handy to be able
-to produce a bootable image. The scripts for that in x86 are
-relatively old, and assume a BIOS system.
+Some distributions really cannot be booted without modules
+anymore. To allow an externally built kernel to be run, it is handy to
+be able to create an initramfs image with all the modules, that can
+appended to an existing initramfs image (preferrably without any
+modules, but not necessarily, since the /lib/modules path includes the
+kernel version.)
 
-This adds a build target to generate a hdimage which can be booted
-either from BIOS or EFI, and modernizes the genimage.sh script
-including adding the ability to add an arbitrary number of initramfs
-files (limited only by the length of the command line.)
+This image is generated in usr/modules.img.
 
-Possibly more controversial, at least from a Kbuild design perspective
-(as usual I'm the guy who wants to do something with Kbuild which it
-seems it was never really designed to do), is add the ability to
-create an initramfs image which includes all the built modules. Some
-distributions cannot be easily booted without modules in initramfs,
-and this creates an image which can be added to initramfs to provide
-the kernel modules, as finalized by "make modules_install".
+Since this image may end up being rather large, change the default for
+CONFIG_INITRAMFS_COMPRESSION_*. We already have a special case in the
+Makefile to not re-compress an existing initramfs image; add the very
+small default builtin initramfs as another case to suppress the
+compression. To avoid losing the default compression setting, add a
+separate variable for the possibly overridden builtin initramfs
+compression method.
 
-The final patch put these two together, and allows the modules
-initramfs to be included in the x86 boot image.
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+---
+ Makefile       | 17 ++++++++++++-----
+ usr/.gitignore |  3 +++
+ usr/Kconfig    | 31 +++++++++++++++++--------------
+ usr/Makefile   | 39 +++++++++++++++++++++++++++++++++++----
+ 4 files changed, 67 insertions(+), 23 deletions(-)
 
- Makefile                     |  17 ++-
- arch/x86/Makefile            |   8 +-
- arch/x86/boot/.gitignore     |   1 +
- arch/x86/boot/Makefile       |  55 +++++----
- arch/x86/boot/genimage.sh    | 284 +++++++++++++++++++++++++++++++------------
- arch/x86/boot/mtools.conf.in |   3 +
- usr/.gitignore               |   3 +
- usr/Kconfig                  |  31 ++---
- usr/Makefile                 |  39 +++++-
- 9 files changed, 318 insertions(+), 123 deletions(-)
+diff --git a/Makefile b/Makefile
+index 4730cf156f6b..89e40760384d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -622,7 +622,7 @@ KBUILD_MODULES :=
+ KBUILD_BUILTIN := 1
+ 
+ # If we have only "make modules", don't compile built-in objects.
+-ifeq ($(MAKECMDGOALS),modules)
++ifeq (modules,$(MAKECMDGOALS))
+   KBUILD_BUILTIN :=
+ endif
+ 
+@@ -630,7 +630,8 @@ endif
+ # in addition to whatever we do anyway.
+ # Just "make" or "make all" shall build modules as well
+ 
+-ifneq ($(filter all modules nsdeps %compile_commands.json clang-%,$(MAKECMDGOALS)),)
++ifneq ($(filter all modules nsdeps %compile_commands.json clang-% \
++	modules.img usr/modules.img,$(MAKECMDGOALS)),)
+   KBUILD_MODULES := 1
+ endif
+ 
+@@ -1461,15 +1462,17 @@ modules_prepare: prepare
+ PHONY += modules_install
+ modules_install: _modinst_ _modinst_post
+ 
++INSTALL_MOD_LN ?= ln -s
++
+ PHONY += _modinst_
+ _modinst_:
+ 	@rm -rf $(MODLIB)/kernel
+ 	@rm -f $(MODLIB)/source
+ 	@mkdir -p $(MODLIB)/kernel
+-	@ln -s $(abspath $(srctree)) $(MODLIB)/source
++	@$(INSTALL_MOD_LN) $(abspath $(srctree)) $(MODLIB)/source
+ 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
+-		rm -f $(MODLIB)/build ; \
+-		ln -s $(CURDIR) $(MODLIB)/build ; \
++		rm -rf $(MODLIB)/build ; \
++		$(INSTALL_MOD_LN) $(CURDIR) $(MODLIB)/build ; \
+ 	fi
+ 	@sed 's:^:kernel/:' modules.order > $(MODLIB)/modules.order
+ 	@cp -f modules.builtin $(MODLIB)/
+@@ -1489,6 +1492,10 @@ modules_sign:
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modsign
+ endif
+ 
++# initramfs image containing all modules
++modules.img usr/modules.img: modules
++	$(Q)$(MAKE) $(build)=usr usr/modules.img
++
+ else # CONFIG_MODULES
+ 
+ # Modules not configured
+diff --git a/usr/.gitignore b/usr/.gitignore
+index 935442ed1eb2..14e2fae88d8a 100644
+--- a/usr/.gitignore
++++ b/usr/.gitignore
+@@ -2,3 +2,6 @@
+ gen_init_cpio
+ initramfs_data.cpio
+ /initramfs_inc_data
++/modules
++modules.cpio
++modules.img
+diff --git a/usr/Kconfig b/usr/Kconfig
+index 8bbcf699fe3b..625372682b5e 100644
+--- a/usr/Kconfig
++++ b/usr/Kconfig
+@@ -109,18 +109,23 @@ config RD_ZSTD
+ 	  If unsure, say N.
+ 
+ choice
+-	prompt "Built-in initramfs compression mode"
+-	depends on INITRAMFS_SOURCE != ""
+-	help
+-	  This option allows you to decide by which algorithm the builtin
+-	  initramfs will be compressed.  Several compression algorithms are
+-	  available, which differ in efficiency, compression and
+-	  decompression speed.  Compression speed is only relevant
+-	  when building a kernel.  Decompression speed is relevant at
+-	  each boot. Also the memory usage during decompression may become
+-	  relevant on memory constrained systems. This is usually based on the
+-	  dictionary size of the algorithm with algorithms like XZ and LZMA
+-	  featuring large dictionary sizes.
++	prompt "Preferred initramfs compression mode"
++	default INITRAMFS_COMPRESSION_XZ   if RD_XZ
++	default INITRAMFS_COMPRESSION_GZIP if RD_GZIP
++	default INITRAMFS_COMPRESSION_LZO  if RD_LZO
++	default INITRAMFS_COMPRESSION_LZ4  if RD_LZ4
++	default INITRAMFS_COMPRESSION_NONE
++	help
++	  This option allows you to decide by which algorithm the
++	  builtin initramfs and usr/modules.img will be compressed.
++	  Several compression algorithms are available, which differ
++	  in efficiency, compression and decompression speed.
++	  Compression speed is only relevant when building a kernel.
++	  Decompression speed is relevant at each boot. Also the
++	  memory usage during decompression may become relevant on
++	  memory constrained systems. This is usually based on the
++	  dictionary size of the algorithm with algorithms like XZ and
++	  LZMA featuring large dictionary sizes.
+ 
+ 	  High compression options are mostly useful for users who are
+ 	  low on RAM, since it reduces the memory consumption during
+@@ -130,8 +135,6 @@ choice
+ 	  compression tool to compress the generated initram cpio file for
+ 	  embedding.
+ 
+-	  If in doubt, select 'None'
+-
+ config INITRAMFS_COMPRESSION_GZIP
+ 	bool "Gzip"
+ 	depends on RD_GZIP
+diff --git a/usr/Makefile b/usr/Makefile
+index b1a81a40eab1..6257ba8690a3 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -22,12 +22,14 @@ obj-$(CONFIG_BLK_DEV_INITRD) := initramfs_data.o
+ $(obj)/initramfs_data.o: $(obj)/initramfs_inc_data
+ 
+ ramfs-input := $(strip $(shell echo $(CONFIG_INITRAMFS_SOURCE)))
++ramfs-compress := $(compress-y)
+ cpio-data :=
+ 
+ # If CONFIG_INITRAMFS_SOURCE is empty, generate a small initramfs with the
+-# default contents.
++# default contents. No point in compressing it separately from the kernel.
+ ifeq ($(ramfs-input),)
+ ramfs-input := $(srctree)/$(src)/default_cpio_list
++ramfs-compress := shipped
+ endif
+ 
+ ifeq ($(words $(ramfs-input)),1)
+@@ -42,7 +44,7 @@ endif
+ # .cpio.*, use it directly as an initramfs, and avoid double compression.
+ ifeq ($(words $(subst .cpio.,$(space),$(ramfs-input))),2)
+ cpio-data := $(ramfs-input)
+-compress-y := shipped
++ramfs-compress := shipped
+ endif
+ 
+ endif
+@@ -76,14 +78,43 @@ quiet_cmd_initfs = GEN     $@
+ # 2) There are changes in which files are included (added or deleted)
+ # 3) If gen_init_cpio are newer than initramfs_data.cpio
+ # 4) Arguments to gen_initramfs.sh changes
+-$(obj)/initramfs_data.cpio: $(src)/gen_initramfs.sh $(obj)/gen_init_cpio $(deps_initramfs) FORCE
++$(obj)/initramfs_data.cpio: $(src)/gen_initramfs.sh $(obj)/gen_init_cpio \
++			    $(deps_initramfs) FORCE
+ 	$(call if_changed,initfs)
+ 
+ endif
+ 
+ $(obj)/initramfs_inc_data: $(cpio-data) FORCE
+-	$(call if_changed,$(compress-y))
++	$(call if_changed,$(ramfs-compress))
+ 
+ targets += initramfs_data.cpio initramfs_inc_data
+ 
+ subdir-$(CONFIG_UAPI_HEADER_TEST) += include
++
++# modules.img: an initramfs image containing all the modules
++quiet_cmd_modinst = MODINST $(obj)/modules
++      cmd_modinst = \
++	rm -rf '$(obj)/modules' && \
++	$(MAKE) -f '$(srctree)/Makefile' O='$(objtree)' \
++		INSTALL_MOD_PATH='$(obj)/modules' \
++		INSTALL_MOD_LN=: modules_install
++
++quiet_cmd_modcpio = MODCPIO $@
++      cmd_modcpio = \
++	$(CONFIG_SHELL) $< -o $@ \
++	$(if $(CONFIG_INITRAMFS_ROOT_UID), -u $(CONFIG_INITRAMFS_ROOT_UID)) \
++	$(if $(CONFIG_INITRAMFS_ROOT_GID), -g $(CONFIG_INITRAMFS_ROOT_GID)) \
++	'$(obj)/modules'
++
++modules_order := \
++	$(if $(KBUILD_EXTMOD),$(KBUILD_EXTMOD),$(objtree))/modules.order
++
++$(obj)/modules.cpio: $(src)/gen_initramfs.sh $(obj)/gen_init_cpio \
++	$(modules_order) FORCE
++	$(call if_changed,modinst)
++	$(call if_changed,modcpio)
++
++$(obj)/modules.img: $(obj)/modules.cpio FORCE
++	$(call if_changed,$(compress-y))
++
++targets += modules.cpio modules.img modules
+-- 
+2.30.2
+
