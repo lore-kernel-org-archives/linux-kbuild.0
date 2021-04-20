@@ -2,566 +2,147 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BC3C43461
-	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 23:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C358BC433B4
+	for <linux-kbuild@archiver.kernel.org>; Tue, 20 Apr 2021 00:24:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3703D6108B
-	for <linux-kbuild@archiver.kernel.org>; Mon, 19 Apr 2021 23:03:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AE086108B
+	for <linux-kbuild@archiver.kernel.org>; Tue, 20 Apr 2021 00:24:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231982AbhDSXEN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 19 Apr 2021 19:04:13 -0400
-Received: from terminus.zytor.com ([198.137.202.136]:39215 "EHLO
-        mail.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230326AbhDSXED (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Apr 2021 19:04:03 -0400
-Received: from tazenda.hos.anvin.org ([IPv6:2601:646:8602:8be0:7285:c2ff:fefb:fd4])
-        (authenticated bits=0)
-        by mail.zytor.com (8.16.1/8.15.2) with ESMTPSA id 13JN30Cp2438940
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Mon, 19 Apr 2021 16:03:09 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 13JN30Cp2438940
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2021032801; t=1618873390;
-        bh=VLw22aBEbihi3LrdDn3aUt6okN2p3qy4OLbKqxodokQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UAvZ7n63GdAafbSjvysVTT/Qui3m+txGanptLLVT34zI+AGrRR4EU3ku0ZYHZAFp3
-         TWpns5KdU/NTeanjr5FXhIIJE1yTm4Yevc7hzqtsQyQVFEt6nzRjXXfSXjUsL3I1TM
-         kuYSoq4PCf8iXbcpcH+Dlu2S9uepL9grl9CHGykYKyTxBkgkR/rkN8FL4rV5Q8tlN7
-         tr95nef9Nxw3+BFLUyb0MOaKLZewMBYYVQIsLe5i2yzQ7OujRtjDV8MihVF0/HU7yZ
-         c2a33yqTlfFXuyrb4JtUI0Hz7av1ipWxYQ8iRiQnG3j/wGEYTmeXMKxI6fstF+MzbO
-         vd9u+8mELru9A==
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
-        Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Kbuild Mailing List <linux-kbuild@vger.kernel.org>,
-        "H. Peter Anvin (Intel)" <hpa@zytor.com>
-Subject: [PATCH v2 1/3] x86/boot: Modernize genimage script; hdimage support; remove bzlilo
-Date:   Mon, 19 Apr 2021 16:02:50 -0700
-Message-Id: <20210419230252.1583169-2-hpa@zytor.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210419230252.1583169-1-hpa@zytor.com>
-References: <20210419230252.1583169-1-hpa@zytor.com>
+        id S229758AbhDTAZU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 19 Apr 2021 20:25:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36114 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229774AbhDTAZT (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Apr 2021 20:25:19 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67610C061763
+        for <linux-kbuild@vger.kernel.org>; Mon, 19 Apr 2021 17:24:48 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id u4so41467157ljo.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 19 Apr 2021 17:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FOsh3q0zxk4YO7I+1lA0GntuHcG2gh7NQXhaPukL/Mk=;
+        b=CoROqzssO42bQLqB6Rp8HopASoqkxTL5Lm2RfjSKld7xisl+V2Gbk3AO6vM4JzkdRI
+         7/bT4Hc0FhO+oUpZBbI3ETrfoixdNF0YZ2Ot1snmGj41r+v7P4MnbmNNIvDyP4HkXQi4
+         0ezICMAFt//RtS6SAEmMmnHQoRQXDWCi/r0cTvi63f80u8AKKqL38tod6F11ZAUc5Yhh
+         JVvJJkPdu2MX38h5FOqWPpU9SsWgW505gntYganD/ZpNPwZ1DLlGIpTQR2T09x5tK1qN
+         4mHRdzqo+xqGoNrjTwFPYvQ1oAtGPK3kY4952Y24iMMU10cQcZGbEv1upHPEYYoyxz3k
+         T5/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FOsh3q0zxk4YO7I+1lA0GntuHcG2gh7NQXhaPukL/Mk=;
+        b=MnmvNE0eZ+3FlZCvj4kEW5DVHXGONxha6iWuCXapLnvLDuxgmMLGPhX/srqXFlxgo9
+         fukwMYPdgWs0YuhgQ2aIsVFtO3/U7VfOl3zX73yVN8sHBSLVzHx+tUKVPjZf/hOlCl1X
+         yxf2Xyxa7PqIsoyeGUqi20nzTPD88Hkpz2gSgR6SuGkfxLg5mq8wZXNiAn4vog4ujH4C
+         y+PC4aXR2ElEluF57Z9X4TAhYo2yX6Tw6wtg53+XdVTUeh25jheAwFMSv98U/gyVzCIt
+         WNSGBsAOqu+9LpFMAqmOtc9dmwAoPJnr1dQzDEhyMJIEok8q/zJQ813nAF9P+J8jWYIN
+         +g0g==
+X-Gm-Message-State: AOAM530rCy6ptkD1OeZCbAZsE/AhYZnpobqYJmX8P+CIXXs6RLuv9dwN
+        wysaZeiJqTI/rBKQHeHvzyuInPZqYqYkakcLl5rP+Q==
+X-Google-Smtp-Source: ABdhPJz5Js93YB2ex6G5WNbE1/JafHIcRDNChV3k45O5qMc5EmJ6/0INhkRfhrXeFh9c/TVfqqalk/EfusqMT2bjFbw=
+X-Received: by 2002:a2e:9cc1:: with SMTP id g1mr11473192ljj.0.1618878286604;
+ Mon, 19 Apr 2021 17:24:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210414184604.23473-1-ojeda@kernel.org> <YHlz54rd1YQHsOA/@hirez.programming.kicks-ass.net>
+ <YHmMJWmzz2vZ3qQH@google.com> <YHmc2+bKQJ/XAATF@hirez.programming.kicks-ass.net>
+ <YHmuX1NA5RF7C7XS@google.com> <20210416161444.GA10484@1wt.eu>
+ <CANiq72nbkJFPmiJXX=L8PmkouKgKG1k-CxhZYpL1hcncYwa8JA@mail.gmail.com> <20210416173717.GA10846@1wt.eu>
+In-Reply-To: <20210416173717.GA10846@1wt.eu>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 19 Apr 2021 17:24:33 -0700
+Message-ID: <CAKwvOd=RadTs7Skv6KUBo4qZQtdi0kugTzxvZM+5X_2gstjyaQ@mail.gmail.com>
+Subject: Re: [PATCH 00/13] [RFC] Rust support
+To:     Willy Tarreau <w@1wt.eu>
+Cc:     Wedson Almeida Filho <wedsonaf@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux <rust-for-linux@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+On Fri, Apr 16, 2021 at 10:39 AM Willy Tarreau <w@1wt.eu> wrote:
+>
+> resources usage, I'm really not convinced at all it's suited for
+> low-level development. I understand the interest of the experiment
+> to help the language evolve into that direction, but I fear that
+> the kernel will soon be as bloated and insecure as a browser, and
+> that's really not to please me.
 
-The image generation scripts in arch/x86/boot are pretty out of date,
-except for the isoimage target. Update and clean up the
-genimage.sh script, and make it support an arbitrary number of
-initramfs files in the image.
+Dunno, I don't think the introduction of Rust made Firefox _more_ insecure.
+https://wiki.mozilla.org/Oxidation#Within_Firefox
 
-Add a "hdimage" target, which can be booted by either BIOS or
-EFI (if the kernel is compiled with the EFI stub.) For EFI to be able
-to pass the command line to the kernel, we need the EFI shell, but the
-firmware builtin EFI shell, if it even exists, is pretty much always
-the last resort boot option, so search for OVMF or EDK2 and explicitly
-include a copy of the EFI shell.
+I pray no executives ever see Dmitry Vyukov's 2019 Linux Plumbers Conf
+talk "Reflections on kernel quality, development process and testing."
+https://www.youtube.com/watch?v=3DiAfrrNdl2f4
+or his 2018 Linux Security Summit talk "Syzbot and the Tale of
+Thousand Kernel Bugs" https://www.youtube.com/watch?v=3DqrBVXxZDVQY
+(and they're just fuzzing the syscall interface and USB devices.
+Imagine once folks can more easily craft malformed bluetooth and wifi
+packets.)
 
-To make this all work, use bash features in the script.  Furthermore,
-this version of the script makes use of some mtools features,
-especially mpartition, that might not exist in very old version of
-mtools, but given all the other dependencies on this script this
-doesn't seem such a big deal.
+I'd imagine the first term that comes to mind for them might be
+"liability."  They are quite sensitive to these vulnerabilities with
+silly names, logos, and websites.  There are many of us that believe
+an incremental approach of introducing a memory safe language to our
+existing infrastructure at the very least to attempt to improve the
+quality of drivers for those that choose to use such tools is a better
+approach.
 
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
----
- arch/x86/Makefile            |   5 +-
- arch/x86/boot/.gitignore     |   1 +
- arch/x86/boot/Makefile       |  44 +++---
- arch/x86/boot/genimage.sh    | 294 ++++++++++++++++++++++++++---------
- arch/x86/boot/mtools.conf.in |   3 +
- 5 files changed, 247 insertions(+), 100 deletions(-)
+I think a lot of the current discussion picking nits in syntax, format
+of docs, ease of installation, or theoretical memory models for which
+no language (not even the one the kernel is implemented in) provides
+all rightly should still be added to a revised RFC under "Why not
+[Rust]?" but perhaps are severely overlooking the benefits.  A
+tradeoff for sure though.
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 9a85eae37b17..943f26a32834 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -247,7 +247,7 @@ drivers-$(CONFIG_FB) += arch/x86/video/
- 
- boot := arch/x86/boot
- 
--BOOT_TARGETS = bzdisk fdimage fdimage144 fdimage288 isoimage
-+BOOT_TARGETS = bzdisk fdimage fdimage144 fdimage288 hdimage isoimage
- 
- PHONY += bzImage $(BOOT_TARGETS)
- 
-@@ -305,8 +305,9 @@ define archhelp
-   echo  '  fdimage		- Create 1.4MB boot floppy image (arch/x86/boot/fdimage)'
-   echo  '  fdimage144		- Create 1.4MB boot floppy image (arch/x86/boot/fdimage)'
-   echo  '  fdimage288		- Create 2.8MB boot floppy image (arch/x86/boot/fdimage)'
-+  echo  '  hdimage		- Create a BIOS/EFI hard disk image (arch/x86/boot/hdimage)'
-   echo  '  isoimage		- Create a boot CD-ROM image (arch/x86/boot/image.iso)'
--  echo  '			  bzdisk/fdimage*/isoimage also accept:'
-+  echo  '			  bzdisk/fdimage*/hdimage/isoimage also accept:'
-   echo  '			  FDARGS="..."  arguments for the booted kernel'
-   echo  '                  	  FDINITRD=file initrd for the booted kernel'
-   echo  ''
-diff --git a/arch/x86/boot/.gitignore b/arch/x86/boot/.gitignore
-index 9cc7f1357b9b..1189be057ebd 100644
---- a/arch/x86/boot/.gitignore
-+++ b/arch/x86/boot/.gitignore
-@@ -11,3 +11,4 @@ setup.elf
- fdimage
- mtools.conf
- image.iso
-+hdimage
-diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-index fe605205b4ce..dfbc26a8e924 100644
---- a/arch/x86/boot/Makefile
-+++ b/arch/x86/boot/Makefile
-@@ -29,7 +29,7 @@ KCOV_INSTRUMENT		:= n
- SVGA_MODE	:= -DSVGA_MODE=NORMAL_VGA
- 
- targets		:= vmlinux.bin setup.bin setup.elf bzImage
--targets		+= fdimage fdimage144 fdimage288 image.iso mtools.conf
-+targets		+= fdimage fdimage144 fdimage288 image.iso hdimage
- subdir-		:= compressed
- 
- setup-y		+= a20.o bioscall.o cmdline.o copy.o cpu.o cpuflags.o cpucheck.o
-@@ -115,47 +115,49 @@ $(obj)/compressed/vmlinux: FORCE
- 	$(Q)$(MAKE) $(build)=$(obj)/compressed $@
- 
- # Set this if you want to pass append arguments to the
--# bzdisk/fdimage/isoimage kernel
-+# bzdisk/fdimage/hdimage/isoimage kernel
- FDARGS =
--# Set this if you want an initrd included with the
--# bzdisk/fdimage/isoimage kernel
-+# Set this if you want one or more initrds included in the image
- FDINITRD =
- 
--image_cmdline = default linux $(FDARGS) $(if $(FDINITRD),initrd=initrd.img,)
-+imgdeps = $(obj)/bzImage $(obj)/mtools.conf $(src)/genimage.sh
- 
- $(obj)/mtools.conf: $(src)/mtools.conf.in
- 	sed -e 's|@OBJ@|$(obj)|g' < $< > $@
- 
-+targets += mtools.conf
-+
-+# genimage.sh requires bash, but it also has a bunch of other
-+# external dependencies.
- quiet_cmd_genimage = GENIMAGE $3
--cmd_genimage = sh $(srctree)/$(src)/genimage.sh $2 $3 $(obj)/bzImage \
--			$(obj)/mtools.conf '$(image_cmdline)' $(FDINITRD)
-+cmd_genimage = $(BASH) $(srctree)/$(src)/genimage.sh $2 $3 $(obj)/bzImage \
-+		$(obj)/mtools.conf '$(FDARGS)' $(FDINITRD)
- 
--PHONY += bzdisk fdimage fdimage144 fdimage288 isoimage bzlilo install
-+PHONY += bzdisk fdimage fdimage144 fdimage288 hdimage isoimage install
- 
- # This requires write access to /dev/fd0
--bzdisk: $(obj)/bzImage $(obj)/mtools.conf
-+# All images require syslinux to be installed; hdimage also requires
-+# EDK2/OVMF if the kernel is compiled with the EFI stub.
-+bzdisk: $(imgdeps)
- 	$(call cmd,genimage,bzdisk,/dev/fd0)
- 
--# These require being root or having syslinux 2.02 or higher installed
--fdimage fdimage144: $(obj)/bzImage $(obj)/mtools.conf
-+fdimage fdimage144: $(imgdeps)
- 	$(call cmd,genimage,fdimage144,$(obj)/fdimage)
- 	@$(kecho) 'Kernel: $(obj)/fdimage is ready'
- 
--fdimage288: $(obj)/bzImage $(obj)/mtools.conf
-+fdimage288: $(imgdeps)
- 	$(call cmd,genimage,fdimage288,$(obj)/fdimage)
- 	@$(kecho) 'Kernel: $(obj)/fdimage is ready'
- 
--isoimage: $(obj)/bzImage
-+hdimage: $(imgdeps)
-+	$(call cmd,genimage,hdimage,$(obj)/hdimage)
-+	@$(kecho) 'Kernel: $(obj)/hdimage is ready'
-+
-+isoimage: $(imgdeps)
- 	$(call cmd,genimage,isoimage,$(obj)/image.iso)
- 	@$(kecho) 'Kernel: $(obj)/image.iso is ready'
- 
--bzlilo:
--	if [ -f $(INSTALL_PATH)/vmlinuz ]; then mv $(INSTALL_PATH)/vmlinuz $(INSTALL_PATH)/vmlinuz.old; fi
--	if [ -f $(INSTALL_PATH)/System.map ]; then mv $(INSTALL_PATH)/System.map $(INSTALL_PATH)/System.old; fi
--	cat $(obj)/bzImage > $(INSTALL_PATH)/vmlinuz
--	cp System.map $(INSTALL_PATH)/
--	if [ -x /sbin/lilo ]; then /sbin/lilo; else /etc/lilo/install; fi
--
- install:
--	sh $(srctree)/$(src)/install.sh $(KERNELRELEASE) $(obj)/bzImage \
-+	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh \
-+		$(KERNELRELEASE) $(obj)/bzImage \
- 		System.map "$(INSTALL_PATH)"
-diff --git a/arch/x86/boot/genimage.sh b/arch/x86/boot/genimage.sh
-index 6a10d52a4145..4b554049ec3c 100644
---- a/arch/x86/boot/genimage.sh
-+++ b/arch/x86/boot/genimage.sh
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- #
- # This file is subject to the terms and conditions of the GNU General Public
- # License.  See the file "COPYING" in the main directory of this archive
-@@ -8,15 +8,24 @@
- #
- # Adapted from code in arch/x86/boot/Makefile by H. Peter Anvin and others
- #
--# "make fdimage/fdimage144/fdimage288/isoimage" script for x86 architecture
-+# "make fdimage/fdimage144/fdimage288/hdimage/isoimage"
-+# script for x86 architecture
- #
- # Arguments:
--#   $1 - fdimage format
--#   $2 - target image file
--#   $3 - kernel bzImage file
--#   $4 - mtool configuration file
--#   $5 - kernel cmdline
--#   $6 - inird image file
-+#   $1  - fdimage format
-+#   $2  - target image file
-+#   $3  - kernel bzImage file
-+#   $4  - mtools configuration file
-+#   $5  - kernel cmdline
-+#   $6+ - initrd image file(s)
-+#
-+# This script requires:
-+#   bash
-+#   syslinux
-+#   mtools (for fdimage* and hdimage)
-+#   edk2/OVMF (for hdimage)
-+#
-+# Otherwise try to stick to POSIX shell commands...
- #
- 
- # Use "make V=1" to debug this script
-@@ -26,105 +35,236 @@ case "${KBUILD_VERBOSE}" in
-         ;;
- esac
- 
--verify () {
--	if [ ! -f "$1" ]; then
--		echo ""                                                   1>&2
--		echo " *** Missing file: $1"                              1>&2
--		echo ""                                                   1>&2
--		exit 1
-+# Exit the top-level shell with an error
-+topshell=$$
-+trap 'exit 1' USR1
-+die() {
-+	echo ""        1>&2
-+	echo " *** $*" 1>&2
-+	echo ""        1>&2
-+	kill -USR1 $topshell
-+}
-+
-+# Verify the existence and readability of a file
-+verify() {
-+	if [ ! -f "$1" -o ! -r "$1" ]; then
-+		die "Missing file: $1"
- 	fi
- }
- 
-+diskfmt="$1"
-+FIMAGE="$2"
-+FBZIMAGE="$3"
-+MTOOLSRC="$4"
-+KCMDLINE="$5"
-+shift 5				# Remaining arguments = initrd files
-+
-+export MTOOLSRC
- 
--export MTOOLSRC=$4
--FIMAGE=$2
--FBZIMAGE=$3
--KCMDLINE=$5
--FDINITRD=$6
-+# common options for dd
-+dd='dd iflag=fullblock'
- 
- # Make sure the files actually exist
- verify "$FBZIMAGE"
- 
-+declare -a FDINITRDS
-+irdpfx=' initrd='
-+initrdopts_syslinux=''
-+initrdopts_efi=''
-+for f in "$@"; do
-+	if [ -n "$f" ]; then
-+	    FDINITRDS=("${FDINITRDS[@]}" "$f")
-+	    fname="$(basename "$f")"
-+	    initrdopts_syslinux="${initrdopts_syslinux}${irdpfx}${fname}"
-+	    irdpfx=,
-+	    initrdopts_efi="${initrdopts_efi} initrd=${fname}"
-+	fi
-+done
-+
-+# Read a $3-byte littleendian unsigned value at offset $2 from file $1
-+le() {
-+	local n=0
-+	local m=1
-+	for b in $(od -A n -v -j $2 -N $3 -t u1 "$1"); do
-+		n=$((n + b*m))
-+		m=$((m * 256))
-+	done
-+	echo $n
-+}
-+
-+# Get the EFI architecture name such that boot{name}.efi is the default
-+# boot file name. Returns false with no output if the file is not an
-+# EFI image or otherwise unknown.
-+efiarch() {
-+	[ -f "$1" ] || return
-+	[ $(le "$1" 0 2) -eq 23117 ] || return		# MZ magic
-+	peoffs=$(le "$1" 60 4)				# PE header offset
-+	[ $peoffs -ge 64 ] || return
-+	[ $(le "$1" $peoffs 4) -eq 17744 ] || return	# PE magic
-+	case $(le "$1" $((peoffs+4+20)) 2) in		# PE type
-+		267)	;;				# PE32
-+		523)	;;				# PE32+
-+		*) return 1 ;;				# Invalid
-+	esac
-+	[ $(le "$1" $((peoffs+4+20+68)) 2) -eq 10 ] || return # EFI app
-+	case $(le "$1" $((peoffs+4)) 2) in		# Machine type
-+		 332)	echo i386	;;
-+		 450)	echo arm	;;
-+		 512)	echo ia64	;;
-+		20530)	echo riscv32	;;
-+		20580)	echo riscv64	;;
-+		20776)	echo riscv128	;;
-+		34404)	echo x64	;;
-+		43620)	echo aa64	;;
-+	esac
-+}
-+
-+# Get the combined sizes in bytes of the files given, counting sparse
-+# files as full length, and padding each file to a 4K block size
-+filesizes() {
-+	local t=0
-+	local s
-+	for s in $(ls -lnL "$@" 2>/dev/null | awk '/^-/{ print $5; }'); do
-+		t=$((t + ((s+4095)/4096)*4096))
-+	done
-+	echo $t
-+}
-+
-+# Expand directory names which should be in /usr/share into a list
-+# of possible alternatives
-+sharedirs() {
-+	local dir file
-+	for dir in /usr/share /usr/lib64 /usr/lib; do
-+		for file; do
-+			echo "$dir/$file"
-+			echo "$dir/${file^^}"
-+		done
-+	done
-+}
-+efidirs() {
-+	local dir file
-+	for dir in /usr/share /boot /usr/lib64 /usr/lib; do
-+		for file; do
-+			echo "$dir/$file"
-+			echo "$dir/${file^^}"
-+		done
-+	done
-+}
-+
-+findsyslinux() {
-+	local f="$(find -L $(sharedirs syslinux isolinux) \
-+		    -name "$1" -readable -type f -print -quit 2>/dev/null)"
-+	if [ ! -f "$f" ]; then
-+		die "Need a $1 file, please install syslinux/isolinux."
-+	fi
-+	echo "$f"
-+	return 0
-+}
-+
-+findovmf() {
-+	local arch="$1"
-+	shift
-+	local -a names=(-false)
-+	local name f
-+	for name; do
-+		names=("${names[@]}" -or -iname "$name")
-+	done
-+	for f in $(find -L $(efidirs edk2 ovmf) \
-+			\( "${names[@]}" \) -readable -type f \
-+			-print 2>/dev/null); do
-+		if [ "$(efiarch "$f")" = "$arch" ]; then
-+			echo "$f"
-+			return 0
-+		fi
-+	done
-+	die "Need a $1 file for $arch, please install EDK2/OVMF."
-+}
-+
-+do_mcopy() {
-+	if [ ${#FDINITRDS[@]} -gt 0 ]; then
-+		mcopy "${FDINITRDS[@]}" "$1"
-+	fi
-+	if [ -n "$efishell" ]; then
-+		mmd "$1"EFI "$1"EFI/Boot
-+		mcopy "$efishell" "$1"EFI/Boot/boot${kefiarch}.efi
-+	fi
-+	if [ -n "$kefiarch" ]; then
-+		echo linux "$KCMDLINE$initrdopts_efi" | \
-+			mcopy - "$1"startup.nsh
-+	fi
-+	echo default linux "$KCMDLINE$initrdopts_syslinux" | \
-+		mcopy - "$1"syslinux.cfg
-+	mcopy "$FBZIMAGE" "$1"linux
-+}
-+
- genbzdisk() {
- 	verify "$MTOOLSRC"
- 	mformat a:
--	syslinux $FIMAGE
--	echo "$KCMDLINE" | mcopy - a:syslinux.cfg
--	if [ -f "$FDINITRD" ] ; then
--		mcopy "$FDINITRD" a:initrd.img
--	fi
--	mcopy $FBZIMAGE a:linux
-+	syslinux "$FIMAGE"
-+	do_mcopy a:
- }
- 
- genfdimage144() {
- 	verify "$MTOOLSRC"
--	dd if=/dev/zero of=$FIMAGE bs=1024 count=1440 2> /dev/null
-+	$dd if=/dev/zero of="$FIMAGE" bs=1024 count=1440 2>/dev/null
- 	mformat v:
--	syslinux $FIMAGE
--	echo "$KCMDLINE" | mcopy - v:syslinux.cfg
--	if [ -f "$FDINITRD" ] ; then
--		mcopy "$FDINITRD" v:initrd.img
--	fi
--	mcopy $FBZIMAGE v:linux
-+	syslinux "$FIMAGE"
-+	do_mcopy v:
- }
- 
- genfdimage288() {
- 	verify "$MTOOLSRC"
--	dd if=/dev/zero of=$FIMAGE bs=1024 count=2880 2> /dev/null
-+	$dd if=/dev/zero of="$FIMAGE" bs=1024 count=2880 2>/dev/null
- 	mformat w:
--	syslinux $FIMAGE
--	echo "$KCMDLINE" | mcopy - W:syslinux.cfg
--	if [ -f "$FDINITRD" ] ; then
--		mcopy "$FDINITRD" w:initrd.img
-+	syslinux "$FIMAGE"
-+	do_mcopy w:
-+}
-+
-+genhdimage() {
-+	verify "$MTOOLSRC"
-+	mbr="$(findsyslinux mbr.bin)"
-+	kefiarch="$(efiarch "$FBZIMAGE")"
-+	if [ -n "$kefiarch" ]; then
-+		# The efishell provides command line handling
-+		efishell="$(findovmf $kefiarch shell.efi shell${kefiarch}.efi)"
-+		ptype='-T 0xef'	# EFI system partition, no GPT
- 	fi
--	mcopy $FBZIMAGE w:linux
-+	sizes=$(filesizes "$FBZIMAGE" "${FDINITRDS[@]}" "$efishell")
-+	# Allow 1% + 1 MiB for filesystem and partition table overhead,
-+	# syslinux, and config files
-+	megs=$(((sizes + sizes/100 + 2*1024*1024 - 1)/(1024*1024)))
-+	$dd if=/dev/zero of="$FIMAGE" bs=$((1024*1024)) count=$megs 2>/dev/null
-+	mpartition -I -c -s 32 -h 64 -t $megs $ptype -b 512 -a h:
-+	$dd if="$mbr" of="$FIMAGE" bs=440 count=1 conv=notrunc 2>/dev/null
-+	mformat -s 32 -h 64 -t $megs h:
-+	syslinux --offset $((512*512)) "$FIMAGE"
-+	do_mcopy h:
- }
- 
- geniso() {
--	tmp_dir=`dirname $FIMAGE`/isoimage
--	rm -rf $tmp_dir
--	mkdir $tmp_dir
--	for i in lib lib64 share ; do
--		for j in syslinux ISOLINUX ; do
--			if [ -f /usr/$i/$j/isolinux.bin ] ; then
--				isolinux=/usr/$i/$j/isolinux.bin
--			fi
--		done
--		for j in syslinux syslinux/modules/bios ; do
--			if [ -f /usr/$i/$j/ldlinux.c32 ]; then
--				ldlinux=/usr/$i/$j/ldlinux.c32
--			fi
--		done
--		if [ -n "$isolinux" -a -n "$ldlinux" ] ; then
--			break
--		fi
--	done
--	if [ -z "$isolinux" ] ; then
--		echo 'Need an isolinux.bin file, please install syslinux/isolinux.'
--		exit 1
--	fi
--	if [ -z "$ldlinux" ] ; then
--		echo 'Need an ldlinux.c32 file, please install syslinux/isolinux.'
--		exit 1
--	fi
--	cp $isolinux $tmp_dir
--	cp $ldlinux $tmp_dir
--	cp $FBZIMAGE $tmp_dir/linux
--	echo "$KCMDLINE" > $tmp_dir/isolinux.cfg
--	if [ -f "$FDINITRD" ] ; then
--		cp "$FDINITRD" $tmp_dir/initrd.img
--	fi
--	genisoimage -J -r -input-charset=utf-8 -quiet -o $FIMAGE \
-+	tmp_dir="$(dirname "$FIMAGE")/isoimage"
-+	rm -rf "$tmp_dir"
-+	mkdir "$tmp_dir"
-+	isolinux=$(findsyslinux isolinux.bin)
-+	ldlinux=$(findsyslinux  ldlinux.c32)
-+	cp "$isolinux" "$ldlinux" "$tmp_dir"
-+	cp "$FBZIMAGE" "$tmp_dir"/linux
-+	echo default linux "$KCMDLINE" > "$tmp_dir"/isolinux.cfg
-+	cp "${FDINITRDS[@]}" "$tmp_dir"/
-+	genisoimage -J -r -input-charset=utf-8 -quiet -o "$FIMAGE" \
- 		-b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 \
--		-boot-info-table $tmp_dir
--	isohybrid $FIMAGE 2>/dev/null || true
--	rm -rf $tmp_dir
-+		-boot-info-table "$tmp_dir"
-+	isohybrid "$FIMAGE" 2>/dev/null || true
-+	rm -rf "$tmp_dir"
- }
- 
--case $1 in
-+rm -f "$FIMAGE"
-+
-+case "$diskfmt" in
- 	bzdisk)     genbzdisk;;
- 	fdimage144) genfdimage144;;
- 	fdimage288) genfdimage288;;
-+	hdimage)    genhdimage;;
- 	isoimage)   geniso;;
--	*)          echo 'Unknown image format'; exit 1;
-+	*)          die "Unknown image format: $diskfmt";;
- esac
-diff --git a/arch/x86/boot/mtools.conf.in b/arch/x86/boot/mtools.conf.in
-index efd6d2490c1d..9e2662d01364 100644
---- a/arch/x86/boot/mtools.conf.in
-+++ b/arch/x86/boot/mtools.conf.in
-@@ -14,4 +14,7 @@ drive v:
- drive w:
-   file="@OBJ@/fdimage" cylinders=80 heads=2 sectors=36 filter
- 
-+# Hard disk
-+drive h:
-+  file="@OBJ@/hdimage" partition=1 mformat_only
- 
--- 
-2.30.2
+Really, a key point is that a lot of common mistakes in C are compile
+time errors in Rust. I know no "true" kernel dev would make such
+mistakes in C, but is there nothing we can do to help our peers
+writing drivers?  The point is to transfer cost from runtime to
+compile time to avoid costs at runtime; like all of the memory safety
+bugs which are costing our industry.
 
+Curiously recurring statistics:
+https://www.zdnet.com/article/microsoft-70-percent-of-all-security-bugs-are=
+-memory-safety-issues/
+"Microsoft security engineer Matt Miller said that over the last 12
+years, around 70 percent of all Microsoft patches were fixes for
+memory safety bugs."
+
+https://www.chromium.org/Home/chromium-security/memory-safety
+"The Chromium project finds that around 70% of our serious security
+bugs are memory safety problems."
+
+https://security.googleblog.com/2021/01/data-driven-security-hardening-in.h=
+tml
+(59% of Critical and High severity vulnerabilities fixed in Android
+Security Bulletins in 2019 are classified as "Memory," FWIW)
+
+https://hacks.mozilla.org/2019/02/rewriting-a-browser-component-in-rust/
+"If we=E2=80=99d had a time machine and could have written this component i=
+n
+Rust from the start, 51 (73.9%) of these bugs would not have been
+possible."
+--
+Thanks,
+~Nick Desaulniers
