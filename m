@@ -2,76 +2,127 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A56C6C433B4
-	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Apr 2021 19:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7258EC433B4
+	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Apr 2021 21:14:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F820613B0
-	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Apr 2021 19:47:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4860D613CB
+	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Apr 2021 21:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbhDXTsW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 24 Apr 2021 15:48:22 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60616 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232546AbhDXTsW (ORCPT
+        id S233958AbhDXVOq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 24 Apr 2021 17:14:46 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:55036 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232708AbhDXVOp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 24 Apr 2021 15:48:22 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 13OJlLGY006906;
-        Sun, 25 Apr 2021 04:47:22 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 13OJlLGY006906
+        Sat, 24 Apr 2021 17:14:45 -0400
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 13OLDoUM031351;
+        Sun, 25 Apr 2021 06:13:51 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 13OLDoUM031351
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1619293642;
-        bh=0kHYvMZD5hHvwuknWwBhIIRmtE1gRP4Hgam7dOUMMtg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=1JNE5V5do0bp5fKST7FtNa9IL+9IeWifk8LZ4FgvcUWifrlVDnt1S2CUi8+ls5ClF
-         3GEcjxX5tLa2E27jaB4/b5E4cZz+Nav4WTq6ZjoEkr+wRn891Q8Pcf1IwHIQyFe992
-         LIlcAr8XZpfpOFHj11hJbg/FRVQAgCiymtMcNei7HQU6oQqy7ciiF9xYXRrp6iFaXV
-         L4j8Uggf1L0Ltf7aV+5+6Dd7QK0d1AaTJqbAHPlpgzuS4w/1mngQTAcZDh0iYevTAP
-         9YqysCqX6Tj8PH1TCbvgH2RIy6LGz2+bc4+cAU2ZqMWt8wMdZxQftpD3wAH1Lp9zvp
-         /d/6tcEpRUSCQ==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] usr/include: refactor .gitignore
-Date:   Sun, 25 Apr 2021 04:47:19 +0900
-Message-Id: <20210424194719.1127653-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        s=dec2015msa; t=1619298831;
+        bh=3OnUjkY5ajv//Bx4vO1T7kFi9gDr5XvlyfkukgBhE8M=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=QHcGgY38MLzXqjy+XVuE/W20vy9QzFQxvpkTeBGkSk1M0rivIN10Urz73YCeS3meL
+         skTmYehfrRmgyfQeFWVIfT30FunJZoXfxltEobiLNMPShdTRUkF+LUEXq19mhtvE/o
+         vNu5Kl7PZj3v6XToI+6z2PoLqhWYZmNg8PFx+cxhJxOQsaWqKy73bxPQBoXDbwRQwD
+         JlZiR0oTCEPvqhD2V/E+yPj+l16tMGQ/vF6gjfSrwbSau16Z91mJ7LfHAcjU66+JfW
+         P/8DU/uObzcwSINbNS3uAhYT7rRR2tMAHa3FhFbifHs0h4FVhtn0BgmoeybDSCREGJ
+         us+bddLjoQqAw==
+X-Nifty-SrcIP: [209.85.215.176]
+Received: by mail-pg1-f176.google.com with SMTP id y32so37556763pga.11;
+        Sat, 24 Apr 2021 14:13:51 -0700 (PDT)
+X-Gm-Message-State: AOAM532WUoYbSLpuJfVP3kijXORcWTU6g/tH7cwXBtxK5IOvG//q14tA
+        +jNZwzudLOr3QTM5yC8p9oTq24lzyC8XyzFWSfs=
+X-Google-Smtp-Source: ABdhPJyH9gmmhhYlqBrKttzO47kXPH9XC/yWV/ZvhYSXUkxKYpk1zoN97j2v0cXd+U7krYzpYVs6DnLq72QsCFH4irY=
+X-Received: by 2002:a63:e1d:: with SMTP id d29mr10258164pgl.175.1619298830397;
+ Sat, 24 Apr 2021 14:13:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210422201914.3682494-1-nathan@kernel.org>
+In-Reply-To: <20210422201914.3682494-1-nathan@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 25 Apr 2021 06:13:13 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATgbzTBCrDaD3HhUQv=W3wLOKq3_iOiKM3CNEB4B=qh6Q@mail.gmail.com>
+Message-ID: <CAK7LNATgbzTBCrDaD3HhUQv=W3wLOKq3_iOiKM3CNEB4B=qh6Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Add $(KBUILD_HOSTLDFLAGS) to 'has_libelf' test
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The current .gitignore intends to ignore everything under usr/include/
-except .gitignore and Makefile.
+On Fri, Apr 23, 2021 at 5:19 AM Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> Normally, invocations of $(HOSTCC) include $(KBUILD_HOSTLDFLAGS), which
+> in turn includes $(HOSTLDFLAGS), which allows users to pass in their own
+> flags when linking. However, the 'has_libelf' test does not, meaning
+> that if a user requests a specific linker via HOSTLDFLAGS=-fuse-ld=...,
+> it is not respected and the build might error.
+>
+> For example, if a user building with clang wants to use all of the LLVM
+> tools without any GNU tools, they might remove all of the GNU tools from
+> their system or PATH then build with
+>
+> $ make HOSTLDFLAGS=-fuse-ld=lld LLVM=1 LLVM_IAS=1
+>
+> which says use all of the LLVM tools, the integrated assembler, and
+> ld.lld for linking host executables. Without this change, the build will
+> error because $(HOSTCC) uses its default linker, rather than the one
+> requested via -fuse-ld=..., which is GNU ld in clang's case in a default
+> configuration.
+>
+> error: Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please
+> install libelf-dev, libelf-devel or elfutils-libelf-devel
+> make[1]: *** [Makefile:1260: prepare-objtool] Error 1
+>
+> Add $(KBUILD_HOSTLDFLAGS) to the 'has_libelf' test so that the linker
+> choice is respected.
+>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/479
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
 
-A cleaner solution is to use the '/' suffix, which make the pattern match
-to only directories. It works well here because exported headers are all
-located in sub-directories such as <linux/*.h>, <asm/*.h>, etc.
+I applied this since the MW is opening shortly.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+However, I believe the right thing to do is
+to kill the pointless check entirely.
 
- usr/include/.gitignore | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/usr/include/.gitignore b/usr/include/.gitignore
-index d2fab782cb7d..17b0ba1bd325 100644
---- a/usr/include/.gitignore
-+++ b/usr/include/.gitignore
-@@ -1,4 +1,2 @@
- # SPDX-License-Identifier: GPL-2.0-only
--*
--!.gitignore
--!Makefile
-+/*/
+
+
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index bc19584fee59..1535b32c8baa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1092,7 +1092,7 @@ export mod_sign_cmd
+>  HOST_LIBELF_LIBS = $(shell pkg-config libelf --libs 2>/dev/null || echo -lelf)
+>
+>  has_libelf = $(call try-run,\
+> -               echo "int main() {}" | $(HOSTCC) -xc -o /dev/null $(HOST_LIBELF_LIBS) -,1,0)
+> +               echo "int main() {}" | $(HOSTCC) $(KBUILD_HOSTLDFLAGS) -xc -o /dev/null $(HOST_LIBELF_LIBS) -,1,0)
+>
+>  ifdef CONFIG_STACK_VALIDATION
+>    ifeq ($(has_libelf),1)
+>
+> base-commit: bf05bf16c76bb44ab5156223e1e58e26dfe30a88
+> --
+> 2.31.1.362.g311531c9de
+>
+
+
 -- 
-2.27.0
-
+Best Regards
+Masahiro Yamada
