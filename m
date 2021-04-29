@@ -2,84 +2,93 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-24.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A0C433ED
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Apr 2021 21:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F5AC433B4
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Apr 2021 01:24:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B2B96143A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Apr 2021 21:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F83E6143F
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Apr 2021 01:24:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229903AbhD1VWK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 28 Apr 2021 17:22:10 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:53238 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229805AbhD1VWI (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Apr 2021 17:22:08 -0400
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-25-QA2xojGMO0i6L1EhNbPR8w-1; Wed, 28 Apr 2021 22:21:20 +0100
-X-MC-Unique: QA2xojGMO0i6L1EhNbPR8w-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.2; Wed, 28 Apr 2021 22:21:19 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.015; Wed, 28 Apr 2021 22:21:19 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'mceier+kernel@gmail.com'" <mceier+kernel@gmail.com>,
-        "ojeda@kernel.org" <ojeda@kernel.org>
-CC:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 00/13] [RFC] Rust support
-Thread-Topic: [PATCH 00/13] [RFC] Rust support
-Thread-Index: AQHXPF0cOFPh/tHqwUWOAL+H8MAuYKrKb1Ew
-Date:   Wed, 28 Apr 2021 21:21:19 +0000
-Message-ID: <acce51322e1249f888e7d2815228e7af@AcuMS.aculab.com>
-References: <20210414184604.23473-1-ojeda@kernel.org>
- <CAJTyqKP4Ud7aWxdCihfzeZ3dQe_5yeTAVnXcKDonciez-g2zWA@mail.gmail.com>
-In-Reply-To: <CAJTyqKP4Ud7aWxdCihfzeZ3dQe_5yeTAVnXcKDonciez-g2zWA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S230084AbhD2BY6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 28 Apr 2021 21:24:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59030 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229794AbhD2BY5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 28 Apr 2021 21:24:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B49A5610FA;
+        Thu, 29 Apr 2021 01:24:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1619659452;
+        bh=4Hd6dK6eIjF8l59EgDDYr45OuQJR8Yqbc8fdCNhcpyk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Zc6KpNZ3re98d4jLG7D1Jjuj6wDjVcpW5n1++rnsqWPCsHuP+cganlwOPmRwyOSF8
+         lqkWNr7AGpvw40mv8V01RvbHOsrG4bf8Hlef8bunEngVr3Pv1+12lfV/v1kb9Axq/0
+         37GHP0y7HNNGBNUOXyA0NWCHTyO3xIuSj8HZ1QnGx5srMc3An8kKL4t5ykpNu3cLVf
+         +l+pdegnA95lsYeZP+tYs4DV3/4R23S4Z3grpgqiGkQr0SlOIG/OQRqzH7UCExXKOH
+         jmPqdAya3rOf0lR4eTY+4j+e1vBJGjnKHjEK+CLsgLXGES+RiltVxoMtrnLbULV5Zs
+         bI+OzDLZUDR3w==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Nathan Chancellor <nathan@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH] Makefile: Move -Wno-unused-but-set-variable out of GCC only block
+Date:   Wed, 28 Apr 2021 18:23:50 -0700
+Message-Id: <20210429012350.600951-1-nathan@kernel.org>
+X-Mailer: git-send-email 2.31.1.362.g311531c9de
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+X-Patchwork-Bot: notify
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-RnJvbTogTWFyaXVzeiBDZWllcg0KPiBTZW50OiAyOCBBcHJpbCAyMDIxIDE5OjM0DQouLi4uDQo+
-IA0KPiBJIHN1Z2dlc3QgdG8gd2FpdCB1bnRpbCBmZWF0dXJlZnVsIEdQTCBpbXBsZW1lbnRhdGlv
-biBvZiBydXN0IGxhbmd1YWdlDQo+IGlzIG1hZGUgKGFzc3VtaW5nIEdOVSBSdXN0IGlzIG9uIHRo
-ZSB3YXkpIGJlZm9yZSBtZXJnaW5nIGFueSBydXN0IGNvZGUNCj4gaW4gdGhlIGtlcm5lbCBhbmQg
-d2hlbiB0aGF0IGltcGxlbWVudGF0aW9uIGlzIGRvbmUgbWFrZSBhIHJlcXVpcmVtZW50DQo+IHRo
-YXQgYWxsIHJ1c3QgY29kZSBtdXN0IGJlIGJ1aWxkYWJsZSBieSBhdCBsZWFzdCBHUEwgaW1wbGVt
-ZW50YXRpb24uDQo+IA0KPiBNYXliZSBpdCB3b3VsZCBhbHNvIGJlIHdvcnRod2hpbGUgdG8gbWFr
-ZSB0aGUgcmVxdWlyZW1lbnQgdGhhdCB0aGUNCj4ga2VybmVsIG11c3QgYmUgYnVpbGRhYmxlIHdp
-dGggZnJlZSBzb2Z0d2FyZSAobm90IGp1c3Qgb3BlbiBzb3VyY2UNCj4gc29mdHdhcmUpIGV4cGxp
-Y2l0ID8NCg0KT3IgcHV0IHRoZSB2ZXJzaW9uIG9mIHRoZSBjb21waWxlciB0aGF0IHdvcmtzIGlu
-IHRoZSBzb3VyY2UgdHJlZQ0Kd2l0aCB0aGUga2VybmVsIGFuZCB0aGVuIGJ1aWxkIGl0IGFzIHBh
-cnQgb2YgdGhlIGZ1bGwgYnVpbGQuDQoNCkl0IGlzIGVub3VnaCBvZiBhIFBJVEEgaGF2aW5nIHRv
-IGZpbmQgbGliZWxmLWRldmVsIGluIG9yZGVyIHRvDQpidWlsZCBvYmp0b29sLCBuZXZlciBtaW5k
-IGhhdmluZyB0byBmaW5kIHRoZSBjb3JyZWN0IHZlcnNpb24NCm9mIHNvbWV0aGluZyBlbHNlLg0K
-DQpnY2MgdGVuZHMgdG8gYmUgYXZhaWxhYmxlIGFuZCB0aGUgdmVyc2lvbiBkb2Vzbid0IG1hdHRl
-ciB0b28gbXVjaC4NCkJ1dCBldmVyIHRoYXQgZ2l2ZXMgcHJvYmxlbXMuDQoNCglEYXZpZA0KDQot
-DQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwg
-TWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2Fs
-ZXMpDQo=
+Currently, -Wunused-but-set-variable is only supported by GCC so it is
+disabled unconditionally in a GCC only block (it is enabled with W=1).
+clang currently has its implementation for this warning in review so
+preemptively move this statement out of the GCC only block and wrap it
+with cc-disable-warning so that both compilers function the same.
+
+Cc: stable@vger.kernel.org
+Link: https://reviews.llvm.org/D100581
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f03888cdba4e..911d839cfea8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -775,16 +775,16 @@ KBUILD_CFLAGS += -Wno-gnu
+ KBUILD_CFLAGS += -mno-global-merge
+ else
+ 
+-# These warnings generated too much noise in a regular build.
+-# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+-KBUILD_CFLAGS += -Wno-unused-but-set-variable
+-
+ # Warn about unmarked fall-throughs in switch statement.
+ # Disabled for clang while comment to attribute conversion happens and
+ # https://github.com/ClangBuiltLinux/linux/issues/636 is discussed.
+ KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,)
+ endif
+ 
++# These warnings generated too much noise in a regular build.
++# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
++
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ ifdef CONFIG_FRAME_POINTER
+ KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+
+base-commit: d8201efe75e13146ebde433745c7920e15593baf
+-- 
+2.31.1.362.g311531c9de
 
