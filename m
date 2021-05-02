@@ -2,84 +2,78 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A65DEC433ED
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 02:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CEAC433B4
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:10:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F52361449
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 02:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58C0A611AB
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231408AbhEBCvv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 1 May 2021 22:51:51 -0400
-Received: from smtprelay0179.hostedemail.com ([216.40.44.179]:37046 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230409AbhEBCvu (ORCPT
+        id S232411AbhEBSLT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 2 May 2021 14:11:19 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:37455 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232410AbhEBSLS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 May 2021 22:51:50 -0400
-X-Greylist: delayed 528 seconds by postgrey-1.27 at vger.kernel.org; Sat, 01 May 2021 22:51:50 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave02.hostedemail.com (Postfix) with ESMTP id ED2E51801511B
-        for <linux-kbuild@vger.kernel.org>; Sun,  2 May 2021 02:42:11 +0000 (UTC)
-Received: from omf20.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 2E2581822186F;
-        Sun,  2 May 2021 02:42:10 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf20.hostedemail.com (Postfix) with ESMTPA id 0D7D518A5F1;
-        Sun,  2 May 2021 02:42:04 +0000 (UTC)
-Message-ID: <3943bc020f6227c8801907317fc113aa13ad4bad.camel@perches.com>
-Subject: Re: [PATCH] Raise the minimum GCC version to 5.2
-From:   Joe Perches <joe@perches.com>
-To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Will Deacon <will@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-In-Reply-To: <CANiq72k1hB3X6+Nc_iu=f=BoB-F9JW2j_B4ZMcv8_UpW5QQ2Og@mail.gmail.com>
-References: <20210501151538.145449-1-masahiroy@kernel.org>
-         <CANiq72k1hB3X6+Nc_iu=f=BoB-F9JW2j_B4ZMcv8_UpW5QQ2Og@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date:   Sat, 01 May 2021 19:41:53 -0700
+        Sun, 2 May 2021 14:11:18 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 142I9wPl004068;
+        Mon, 3 May 2021 03:10:00 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 142I9wPl004068
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1619979000;
+        bh=+LNLguQplCoZtSV+3NwrlLlo2vqKKeKdbo1HKDLdTww=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LUX9YSyJ4vrYpLhpMKfMMGCacAjxYHIhgBqpNT30Uz7ppA2i/bZqG8evAVQHh8PSh
+         08TAX0FEB71M6p+MJ1kQzgF/8RJAcve/77YqnewvGMIGxXTKvY5//fOhsxIwKUsuAf
+         CmERJ4iPussSFTWzzsKF8jxlzRflnqOYjGSdo3uYL7yH/4XWaWY+4cv3Y7VCbciejh
+         6yP0K+t6hIdxkN46wFfiA43v7ZnNkslMbyKum0v8PoR2LAtWJEmWCU70NvGaorSQLk
+         tXPA6oKgKGofJtguV4WcqsZHWRNphw81nmguO0+EAobWz4TyUY0+AteGvfvSEMxj94
+         YXzy81CMm8rmQ==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/3] kbuild: refactor modname-multi by using suffix-search
+Date:   Mon,  3 May 2021 03:09:57 +0900
+Message-Id: <20210502180957.3419490-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210502180957.3419490-1-masahiroy@kernel.org>
+References: <20210502180957.3419490-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-User-Agent: Evolution 3.38.1-1 
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Server: rspamout03
-X-Rspamd-Queue-Id: 0D7D518A5F1
-X-Stat-Signature: cq9jpwmborrqawmiw8kjkakc3j6bmyct
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX19KtPWcnnFB2QBxLpInpQtqjaFCZ/4pjzg=
-X-HE-Tag: 1619923324-584352
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, 2021-05-01 at 17:52 +0200, Miguel Ojeda wrote:
-> On Sat, May 1, 2021 at 5:17 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> > 
-> > More cleanups will be possible as follow-up patches, but this one must
-> > be agreed and applied to the mainline first.
-> 
-> +1 This will allow me to remove the __has_attribute hack in
-> include/linux/compiler_attributes.h.
+Improve the readability slightly.
 
-Why not raise the minimum gcc compiler version even higher?
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-https://gcc.gnu.org/releases.html
+ scripts/Makefile.lib | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0da58af8d192..865a5d4bdf1a 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -109,7 +109,7 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+ # Finds the multi-part object the current object will be linked into.
+ # If the object belongs to two or more multi-part objects, list them all.
+ modname-multi = $(sort $(foreach m,$(multi-obj-ym),\
+-		$(if $(filter $*.o, $($(m:.o=-objs)) $($(m:.o=-y)) $($(m:.o=-m))),$(m:.o=))))
++		$(if $(filter $*.o, $(call suffix-search, $m, .o, -objs -y -m)),$(m:.o=))))
+ 
+ __modname = $(if $(modname-multi),$(modname-multi),$(basetarget))
+ 
+-- 
+2.27.0
 
