@@ -2,102 +2,67 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F1EC43460
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42BEC433ED
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:44:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E9DB611AB
-	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:10:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9448A61353
+	for <linux-kbuild@archiver.kernel.org>; Sun,  2 May 2021 18:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232421AbhEBSLT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 2 May 2021 14:11:19 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:37452 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232363AbhEBSLT (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 2 May 2021 14:11:19 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 142I9wPj004068;
-        Mon, 3 May 2021 03:09:58 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 142I9wPj004068
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1619978999;
-        bh=Tpd8otkWti2fb4EYKsLJTORWJfsQTHA3eXq5RcGzaPQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Uvv5k3XSD/pDhCAkaB29eLuVCOYTbsSaG+qngvWNf5EUw0CLkbf993o1rjx3N/zHR
-         HmhpC2qqTU7ou6MguvfFJSsY+yb0jutIlIf/+5MQ7Rk9p84znptunYwGW3IgtXE2oq
-         gSbhVbO+MzV2hJ8AEvtwvZLp5BkBu/DUswhS4q84vethln3W4EyvWhGLMaxqq8e3yM
-         K3ctQ2/Gzpm59UjWiFqkUuxU+FyA1II3tg/hm3gsh7MzR0zYqZRBy5bPgGwmBes4an
-         3AKMPv2ayqfoXslI2zGXU7FokUlyM6TiFMzD5t5rXjokxCxr9hdh1/yy9f7VWEv8uO
-         K1edETBVp3MSg==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Rob Herring <robh+dt@kernel.org>,
+        id S230036AbhEBSpI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 2 May 2021 14:45:08 -0400
+Received: from gate.crashing.org ([63.228.1.57]:49656 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229686AbhEBSpI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 2 May 2021 14:45:08 -0400
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 142IUXWH028181;
+        Sun, 2 May 2021 13:30:33 -0500
+Received: (from segher@localhost)
+        by gate.crashing.org (8.14.1/8.14.1/Submit) id 142IUUr9028168;
+        Sun, 2 May 2021 13:30:30 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date:   Sun, 2 May 2021 13:30:30 -0500
+From:   Segher Boessenkool <segher@kernel.crashing.org>
+To:     Joe Perches <joe@perches.com>
+Cc:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] kbuild: parameterize the .o part of suffix-search
-Date:   Mon,  3 May 2021 03:09:55 +0900
-Message-Id: <20210502180957.3419490-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        Will Deacon <will@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH] Raise the minimum GCC version to 5.2
+Message-ID: <20210502183030.GF10366@gate.crashing.org>
+References: <20210501151538.145449-1-masahiroy@kernel.org> <CANiq72k1hB3X6+Nc_iu=f=BoB-F9JW2j_B4ZMcv8_UpW5QQ2Og@mail.gmail.com> <3943bc020f6227c8801907317fc113aa13ad4bad.camel@perches.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3943bc020f6227c8801907317fc113aa13ad4bad.camel@perches.com>
+User-Agent: Mutt/1.4.2.3i
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The suffix-search macro hard-codes the suffix, '.o'.
+On Sat, May 01, 2021 at 07:41:53PM -0700, Joe Perches wrote:
+> Why not raise the minimum gcc compiler version even higher?
 
-Make it a parameter so that the multi-search and real-search macros
-can be reused for foo-dtbs syntax introduced by commit 15d16d6dadf6
-("kbuild: Add generic rule to apply fdtoverlay").
+The latest GCC 5 release is only three and a half years old.  Do you
+really want to require bleeding edge tools?
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- scripts/Makefile.lib | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 64daf37e874b..88b446ed6532 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -44,19 +44,22 @@ else
- obj-y		:= $(filter-out %/, $(obj-y))
- endif
- 
--# Expand $(foo-objs) $(foo-y) by calling $(call suffix-search,foo.o,-objs -y)
--suffix-search = $(strip $(foreach s, $2, $($(1:.o=$s))))
-+# Expand $(foo-objs) $(foo-y) etc. by replacing their individuals
-+suffix-search = $(strip $(foreach s, $3, $($(1:%$(strip $2)=%$s))))
-+# List composite targets that are constructed by combining other targets
-+multi-search = $(sort $(foreach m, $1, $(if $(call suffix-search, $m, $2, $3 -), $m)))
-+# List primitive targets that are compiled from source files
-+real-search = $(foreach m, $1, $(if $(call suffix-search, $m, $2, $3 -), $(call suffix-search, $m, $2, $3), $m))
-+
- # If $(foo-objs), $(foo-y), $(foo-m), or $(foo-) exists, foo.o is a composite object
--multi-search = $(sort $(foreach m, $1, $(if $(call suffix-search, $m, $2 -), $m)))
--multi-obj-y := $(call multi-search,$(obj-y),-objs -y)
--multi-obj-m := $(call multi-search,$(obj-m),-objs -y -m)
-+multi-obj-y := $(call multi-search, $(obj-y), .o, -objs -y)
-+multi-obj-m := $(call multi-search, $(obj-m), .o, -objs -y -m)
- multi-obj-ym := $(multi-obj-y) $(multi-obj-m)
- 
- # Replace multi-part objects by their individual parts,
- # including built-in.a from subdirectories
--real-search = $(foreach m, $1, $(if $(call suffix-search, $m, $2 -), $(call suffix-search, $m, $2), $m))
--real-obj-y := $(call real-search, $(obj-y),-objs -y)
--real-obj-m := $(call real-search, $(obj-m),-objs -y -m)
-+real-obj-y := $(call real-search, $(obj-y), .o, -objs -y)
-+real-obj-m := $(call real-search, $(obj-m), .o, -objs -y -m)
- 
- always-y += $(always-m)
- 
--- 
-2.27.0
-
+Segher
