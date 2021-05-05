@@ -2,108 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47760C4360C
-	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475F3C433ED
+	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10FBD61073
-	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:21:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11FA8611EE
+	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236219AbhEERWh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 5 May 2021 13:22:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60302 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236550AbhEERBs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 May 2021 13:01:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 38FCB61C18;
-        Wed,  5 May 2021 16:41:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232875;
-        bh=FuqG/imYGjMy9Qfefjs+Hv0KdH1VTTbpDOLrGMouJ/Y=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nnjRVo0taD5c9oaXN5BLiNNkrNC9+YhWrDF4BI3dWQ98QHLBbLgIDygiWKSgyZGaw
-         rHNbVZj5wMdji0T95ahMF89NfD6levnrrcRzrowqg1z2uvn5YeamoF4tQ5ZsktSmYv
-         dO42YUEKZUvQm10D/AEHWUJP9xa9Ih8dBgino/ChGz5siAVCCC32ZokrabsxkODhxx
-         54NX8RpnnFP4Mt9JWGuycacJ1JXfjw7Ef7NCVtPdPdGER4KP7xN/WvgNisAUjy5ZmF
-         rKaT1xa7T1MRWALy+XZGJDyC0N9SZ6nx+NkA8EoKbvVzGya/8KLv10P/wDIAHQhN42
-         6g3w/tK5niDQw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Mihai Moldovan <ionic@ionic.de>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 16/25] kconfig: nconf: stop endless search loops
-Date:   Wed,  5 May 2021 12:40:42 -0400
-Message-Id: <20210505164051.3464020-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505164051.3464020-1-sashal@kernel.org>
-References: <20210505164051.3464020-1-sashal@kernel.org>
+        id S229821AbhEERuL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 5 May 2021 13:50:11 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:46778 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230128AbhEERsK (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 May 2021 13:48:10 -0400
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 145HkmQx014950
+        for <linux-kbuild@vger.kernel.org>; Thu, 6 May 2021 02:46:49 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 145HkmQx014950
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1620236809;
+        bh=9hV0x77gYoBi1iEtmKaO+XbFcGZPmwYeF+D6J6ojjHg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=H/5R32t3v7t955NFUuPKvfQXj0csZb3miKKhLWVvAk3QSX6Bus4PH/Y9EavT61plh
+         KZyAG4TPpkC9Kdz1R0vtmCs+mQtTrmMnzUzzHfam9LLHRK92glD8AidiUQtnBkRp9j
+         bFexeCqVhIRCynYAUWts0Q8z/RWJcX7HWImw/ByTN5sHFiltBlX3HgWb1ThytvFIIo
+         TwRuJ+lQwiF1WGNzqXd2HKq4FTB0ZyZUeX0h89KyW7tUmqg264o19bTFpL8z8CCkrW
+         yObvHqd4HNKAQq/L5jcidWB89G30QXyL6t2rdo17JMKqgb75bUZx5pLCPH93peUo2k
+         rwcFKkUvsQirQ==
+X-Nifty-SrcIP: [209.85.214.177]
+Received: by mail-pl1-f177.google.com with SMTP id t4so1510055plc.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 May 2021 10:46:48 -0700 (PDT)
+X-Gm-Message-State: AOAM532xP1Wa83thTqZ4c2OR9fjyCT7srogtJIN76qymxSx/EWrHnN1l
+        RRAvXt/dG5e6rVBYj5Ctq5sgb0lwRDWHYNbn/JE=
+X-Google-Smtp-Source: ABdhPJw5WlRekSPp53j0pktqtohe7QY/eU6vfpSHQEhcQ3eHObGEVCEJGsf46WaLrWiG9Mfa/1XhPoNz4t79nsKAdK8=
+X-Received: by 2002:a17:90a:8b12:: with SMTP id y18mr15034956pjn.153.1620236808071;
+ Wed, 05 May 2021 10:46:48 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <20210505033527.1282488-1-ak@linux.intel.com>
+In-Reply-To: <20210505033527.1282488-1-ak@linux.intel.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 6 May 2021 02:46:10 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARJkCEkNQKjwUSML_2RL3Wnjyn5RL+RAMqG9BaVnwp-qw@mail.gmail.com>
+Message-ID: <CAK7LNARJkCEkNQKjwUSML_2RL3Wnjyn5RL+RAMqG9BaVnwp-qw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Don't remove link-vmlinux temporary files on exit/signal
+To:     Andi Kleen <ak@linux.intel.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Mihai Moldovan <ionic@ionic.de>
+On Wed, May 5, 2021 at 12:35 PM Andi Kleen <ak@linux.intel.com> wrote:
+>
+> Keep them around until they are cleaned up by make clean. This
+> uses a bit more disk space, but makes it easier to debug any
+> problems with the kernel link process.
+>
+> Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> ---
 
-[ Upstream commit 8c94b430b9f6213dec84e309bb480a71778c4213 ]
+Applied to linux-kbuild. Thanks.
 
-If the user selects the very first entry in a page and performs a
-search-up operation, or selects the very last entry in a page and
-performs a search-down operation that will not succeed (e.g., via
-[/]asdfzzz[Up Arrow]), nconf will never terminate searching the page.
 
-The reason is that in this case, the starting point will be set to -1
-or n, which is then translated into (n - 1) (i.e., the last entry of
-the page) or 0 (i.e., the first entry of the page) and finally the
-search begins. This continues to work fine until the index reaches 0 or
-(n - 1), at which point it will be decremented to -1 or incremented to
-n, but not checked against the starting point right away. Instead, it's
-wrapped around to the bottom or top again, after which the starting
-point check occurs... and naturally fails.
+>  scripts/link-vmlinux.sh | 14 --------------
+>  1 file changed, 14 deletions(-)
+>
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index 7d112681f332..f4de4c97015b 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -320,20 +320,6 @@ cleanup()
+>         rm -f .vmlinux.d
+>  }
+>
+> -on_exit()
+> -{
+> -       if [ $? -ne 0 ]; then
+> -               cleanup
+> -       fi
+> -}
+> -trap on_exit EXIT
+> -
+> -on_signals()
+> -{
+> -       exit 1
+> -}
+> -trap on_signals HUP INT QUIT TERM
+> -
+>  # Use "make V=1" to debug this script
+>  case "${KBUILD_VERBOSE}" in
+>  *1*)
+> --
+> 2.25.4
+>
 
-My original implementation added another check for -1 before wrapping
-the running index variable around, but Masahiro Yamada pointed out that
-the actual issue is that the comparison point (starting point) exceeds
-bounds (i.e., the [0,n-1] interval) in the first place and that,
-instead, the starting point should be fixed.
 
-This has the welcome side-effect of also fixing the case where the
-starting point was n while searching down, which also lead to an
-infinite loop.
-
-OTOH, this code is now essentially all his work.
-
-Amazingly, nobody seems to have been hit by this for 11 years - or at
-the very least nobody bothered to debug and fix this.
-
-Signed-off-by: Mihai Moldovan <ionic@ionic.de>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- scripts/kconfig/nconf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index e8e1944fa09b..7be47bf8e3d2 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -504,8 +504,8 @@ static int get_mext_match(const char *match_str, match_f flag)
- 	else if (flag == FIND_NEXT_MATCH_UP)
- 		--match_start;
- 
-+	match_start = (match_start + items_num) % items_num;
- 	index = match_start;
--	index = (index + items_num) % items_num;
- 	while (true) {
- 		char *str = k_menu_items[index].str;
- 		if (strcasestr(str, match_str) != NULL)
 -- 
-2.30.2
-
+Best Regards
+Masahiro Yamada
