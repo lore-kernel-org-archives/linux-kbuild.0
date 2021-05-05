@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEF3C43600
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47760C4360C
 	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:21:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE35661059
-	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10FBD61073
+	for <linux-kbuild@archiver.kernel.org>; Wed,  5 May 2021 17:21:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236550AbhEERWi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 5 May 2021 13:22:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60708 "EHLO mail.kernel.org"
+        id S236219AbhEERWh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 5 May 2021 13:22:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60302 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238311AbhEERFj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 May 2021 13:05:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8423C61417;
-        Wed,  5 May 2021 16:42:21 +0000 (UTC)
+        id S236550AbhEERBs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 5 May 2021 13:01:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 38FCB61C18;
+        Wed,  5 May 2021 16:41:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232942;
-        bh=fTf4qo64soCDRDnKGHNUSCNtTuVdhpbH+CBMMyRAsiw=;
+        s=k20201202; t=1620232875;
+        bh=FuqG/imYGjMy9Qfefjs+Hv0KdH1VTTbpDOLrGMouJ/Y=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ADt4CGzvTPjlC80Vc6rHc2RU5Tx4I2RK4EtcJdNYzp4h1/xGh5Lqlso9GPhjQqBFg
-         d20S680luo3LKHATvcFVbq+i2yWjZ2ZPVM3TrCeHuLilhwp4MXkZ2K7B6dgRYkVFK2
-         PwnLiVn0LJk+cDvZ4k01dgndfveHfC0pMGdR2EFDE4V0TtI2FrYTKxMd14unIlRgsY
-         NoXpHJ/JinpqoFwakpJSbZ+b7+rW68bJqsHpoyFDQ4MsRaJkFItHRs8ud4CJ/7WcIL
-         w+xsr+L7xaf29PMOlE3s4p9Ee0Qf0bsv2OUWesl+jB3b/dWsC0jsNUqdjaixP245j0
-         oFrUaklS1sB8w==
+        b=nnjRVo0taD5c9oaXN5BLiNNkrNC9+YhWrDF4BI3dWQ98QHLBbLgIDygiWKSgyZGaw
+         rHNbVZj5wMdji0T95ahMF89NfD6levnrrcRzrowqg1z2uvn5YeamoF4tQ5ZsktSmYv
+         dO42YUEKZUvQm10D/AEHWUJP9xa9Ih8dBgino/ChGz5siAVCCC32ZokrabsxkODhxx
+         54NX8RpnnFP4Mt9JWGuycacJ1JXfjw7Ef7NCVtPdPdGER4KP7xN/WvgNisAUjy5ZmF
+         rKaT1xa7T1MRWALy+XZGJDyC0N9SZ6nx+NkA8EoKbvVzGya/8KLv10P/wDIAHQhN42
+         6g3w/tK5niDQw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Mihai Moldovan <ionic@ionic.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 14/19] kconfig: nconf: stop endless search loops
-Date:   Wed,  5 May 2021 12:41:57 -0400
-Message-Id: <20210505164203.3464510-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 16/25] kconfig: nconf: stop endless search loops
+Date:   Wed,  5 May 2021 12:40:42 -0400
+Message-Id: <20210505164051.3464020-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505164203.3464510-1-sashal@kernel.org>
-References: <20210505164203.3464510-1-sashal@kernel.org>
+In-Reply-To: <20210505164051.3464020-1-sashal@kernel.org>
+References: <20210505164051.3464020-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index f7049e288e93..c58a46904861 100644
+index e8e1944fa09b..7be47bf8e3d2 100644
 --- a/scripts/kconfig/nconf.c
 +++ b/scripts/kconfig/nconf.c
-@@ -502,8 +502,8 @@ static int get_mext_match(const char *match_str, match_f flag)
+@@ -504,8 +504,8 @@ static int get_mext_match(const char *match_str, match_f flag)
  	else if (flag == FIND_NEXT_MATCH_UP)
  		--match_start;
  
@@ -103,7 +103,7 @@ index f7049e288e93..c58a46904861 100644
 -	index = (index + items_num) % items_num;
  	while (true) {
  		char *str = k_menu_items[index].str;
- 		if (strcasestr(str, match_str) != 0)
+ 		if (strcasestr(str, match_str) != NULL)
 -- 
 2.30.2
 
