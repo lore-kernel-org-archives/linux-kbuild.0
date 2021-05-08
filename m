@@ -2,101 +2,167 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01729C433B4
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 May 2021 18:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7793C43460
+	for <linux-kbuild@archiver.kernel.org>; Sat,  8 May 2021 02:00:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCF48600D1
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 May 2021 18:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2CFE61350
+	for <linux-kbuild@archiver.kernel.org>; Sat,  8 May 2021 02:00:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbhEGSYz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 May 2021 14:24:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52066 "EHLO
+        id S229920AbhEHCA7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 7 May 2021 22:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbhEGSYz (ORCPT
+        with ESMTP id S229775AbhEHCA7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 May 2021 14:24:55 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38675C061574;
-        Fri,  7 May 2021 11:23:55 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id v188so13114135ybe.1;
-        Fri, 07 May 2021 11:23:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iQl3KwkW0S0op9RGJzgj75C3Xc1gHhg/kbxv4NJL6hU=;
-        b=BLjEoo2bOaGm1oezp4g0stT4NXZFZYMgZShX3ZUoAfASJE+Vn5FqYKTHlRpKYRJjom
-         8uxLJjZ/vo10ZPN1l3y/Bxz6VGVdJ0iCD4ziGDMtjkKTGktx/XM4i9twXYTxcp9NY4gD
-         gDnTiCNRMvL2ZD3XX7yGJKF3gBFyEDupC/L9EC7BFNBBDvX7ya8kz5arIjbwv+/VuieW
-         yPWIuPUQzcEBMxmrgPJFa2JHQcVCGL/XLr3eryev9qZDwhh0Lspk7b7R6rrzKuj9ltbo
-         riNgs524FWof0SBOpUsDaRffEYFjEgcv1sPaUr4uhyN3ONSGzxb9myXu839Sg2zw2yAb
-         24UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iQl3KwkW0S0op9RGJzgj75C3Xc1gHhg/kbxv4NJL6hU=;
-        b=X78ox/+q8qLAhfYJV7u7kk+6/6pnB8liWOvoxnBcZvxFmCb4y4mXxQN9TyMu0l8VtO
-         0CwRbfztgOqLWlWjku00uiiUoVBdmc6HJoZCg4k2PEER4HBQlqV7pKNon7vjp/bJB5zk
-         s1GKHB5LzjNZA0QRmRBaTFa7SH5854jHDts6+vzea1EppikGGL6k9e9ApOlhsZPTV9+6
-         xp3zFOng4H5hOTD13trGY+GhYMMn2TBWrgJOZeIC7dC2Y2gdNhQRRQAGu2J+rakzzjK2
-         2pg6s24pr0vrmf1erhSVm8abcFKDUYUXWM1uDzZM44vYCgc/cbd3RuC2aN/Wc4JQvHIW
-         l+UQ==
-X-Gm-Message-State: AOAM531/7AThXdpAn++G0VawDG39xXDgExlI8VZwHXCRzVzxMYBpF9LF
-        cZixVMUunvyCCPqPlTBbGNwR5ea/2HXurlzOEsg=
-X-Google-Smtp-Source: ABdhPJz2zQM9Cq/d1NG9Xbcput7Bzhx9cumExs2uctjgSfmYiPWMI4RU3fRlKAkXQU6A5I30/dCbOdlTpmWADwNOmik=
-X-Received: by 2002:a25:442:: with SMTP id 63mr269510ybe.93.1620411834534;
- Fri, 07 May 2021 11:23:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210414184604.23473-1-ojeda@kernel.org> <YHiMyE4E1ViDcVPi@hirez.programming.kicks-ass.net>
- <YHj02M3jMSweoP4l@google.com> <CACRpkdat8bny=D2mAsUXcDQvFJ=9jSZSccMMZzH=10dHQ_bXrQ@mail.gmail.com>
- <CANiq72niCj9SfPhfQBMtxF+jth--cXdPQtUo5jhDDJgL6DTXZQ@mail.gmail.com>
- <CACRpkdarfkA1P0ERCXHSA=6VTBn6FXgOxB8haneQtN_4-tyQ0w@mail.gmail.com>
- <CANiq72=VA_cH9yw_LZr3P+n1AsQEEhtY4xdk76jHgimTufHRsQ@mail.gmail.com>
- <CACRpkdYodGnURuaYMBwVAY=8bU0PQoPAvTp34uYksPFmxBsT2A@mail.gmail.com>
- <CANiq72m9V3dVG59jAoR-OM+7QtJauQgrix3DZkw=oCuaaf3H5w@mail.gmail.com>
- <CACRpkdYzqy69G1Fpj4rFQFS+mYmpbQAzTszwCUBuEhe4YW4cuQ@mail.gmail.com>
- <CANiq72k+x13L+sFkjtDLahcvnpEySqk_NGow6FVMZfrV+MmHPw@mail.gmail.com>
- <CACRpkdbNv4O7zs0OpZhWa2fkXkF5arQgDOF9++zKvr+yB5yk_w@mail.gmail.com>
- <CANiq72njjiovAecf5pJGAuyJB8sEZ_fO92FNDZ7rH6YQSffqrw@mail.gmail.com> <CACRpkdYpM=38K2WLS-+R2OhWweO8Q9SFndgGC2Py7uBjjxNdAA@mail.gmail.com>
-In-Reply-To: <CACRpkdYpM=38K2WLS-+R2OhWweO8Q9SFndgGC2Py7uBjjxNdAA@mail.gmail.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Fri, 7 May 2021 20:23:43 +0200
-Message-ID: <CANiq72mofJ4gR6kV3qeuRZO_CAkAYvwy616wuWkK5aD32ARnAg@mail.gmail.com>
-Subject: Re: [PATCH 00/13] [RFC] Rust support
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     Wedson Almeida Filho <wedsonaf@google.com>,
+        Fri, 7 May 2021 22:00:59 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 101A5C061574;
+        Fri,  7 May 2021 18:59:52 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FcVr04Pwkz9sWl;
+        Sat,  8 May 2021 11:59:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1620439189;
+        bh=J1/aeu6sDDZIxeY9gaohtta3/N8SRl0zHtNQvaH+PpQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=I9gp/TJIY+lJ1c7LxCn+pN7YNs4Yv3uC16F4Pe5ltIpkFdTGHQuQlKUcpUbbS7MtM
+         mWQL4ObXzJ3cYvSCfk9aT6E12hIV2fl3x1l3uEEowlTtWSwYBgi+QhoF0yaHEh4C8A
+         9PsT2pKb2w3ruzjdWg7LFh+sLBwbtPzrM4su+XjtEDB5kG/m/PrAJeakOjzvKo8M2Y
+         TKJdUh/BP4MlwMC518r2pDwi7q0GoseCEimfwsbkx5ySiCADfwBoOGgu7fOVDRm5n2
+         H8IGmId3I4haetbYJxgY7jzck6aJagIAlh3wpYLQe93gsv3m+dPCqQwI0Qt2xB9xN9
+         SVEUca8Hq1SDg==
+Date:   Sat, 8 May 2021 11:59:43 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Guilherme G. Piccoli" <gpiccoli@canonical.com>,
+        Kars Mulder <kerneldev@karsmulder.nl>,
+        Kees Cook <keescook@chromium.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Paul Cercueil <paul@crapouillou.net>,
         Peter Zijlstra <peterz@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rust-for-linux <rust-for-linux@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Gleixner <tglx@linutronix.de>, chao <chao@eero.com>,
+        linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org
+Subject: Re: [PATCH v2] linux/kconfig.h: replace IF_ENABLED() with PTR_IF()
+ in <linux/kernel.h>
+Message-ID: <20210508115943.5dbf76f2@canb.auug.org.au>
+In-Reply-To: <20210505174515.87565-1-masahiroy@kernel.org>
+References: <20210505174515.87565-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/pKT.L0/u5p+I2wWxtmkAky6";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, May 6, 2021 at 2:47 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+--Sig_/pKT.L0/u5p+I2wWxtmkAky6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Masahiro,
+
+On Thu,  6 May 2021 02:45:15 +0900 Masahiro Yamada <masahiroy@kernel.org> w=
+rote:
 >
-> I was referring to entities interested in using Rust for the
-> Linux kernel. Not just "using rust". And that interest is coming
-> from Google and a few academic institutions AFAICT.
+> <linux/kconfig.h> is included from all the kernel-space source files,
+> including C, assembly, linker scripts. It is intended to contain a
+> minimal set of macros to evaluate CONFIG options.
+>=20
+> IF_ENABLED() is an intruder here because (x ? y : z) is C code, which
+> should not be included from assembly files or linker scripts.
 
-There is interest from a handful of major companies in using Rust for
-the Linux kernel. For instance, we had a few present in our latest
-informal call.
+Except it doesn't matter unless IF_ENABLED() is used by one of those.
 
-I am also aware of at least two having or looking to
-have someone working on testing the waters of what we have done so
-far for their use cases.
+> Also, <linux/kconfig.h> is no longer self-contained because NULL is
+> defined in <linux/stddef.h>.
 
+Again, it doesn't matter unless IF_ENABLED() is used.
+
+> Move IF_ENABLED() out to <linux/kernel.h> as PTR_IF(). PTF_IF()
+> takes the general boolean expression instead of a CONFIG option
+> so that it fits better in <linux/kernel.h>.
+>=20
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>=20
+> Changes in v2:
+>   - Keep PTF_IF macro in pinctrl-ingenic.c
+>=20
+>  drivers/pinctrl/pinctrl-ingenic.c | 2 ++
+>  include/linux/kconfig.h           | 6 ------
+>  include/linux/kernel.h            | 2 ++
+>  3 files changed, 4 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/pinctrl/pinctrl-ingenic.c b/drivers/pinctrl/pinctrl-=
+ingenic.c
+> index 651a36b9dcc0..0ee69f8e20b2 100644
+> --- a/drivers/pinctrl/pinctrl-ingenic.c
+> +++ b/drivers/pinctrl/pinctrl-ingenic.c
+> @@ -3854,6 +3854,8 @@ static int __init ingenic_pinctrl_probe(struct plat=
+form_device *pdev)
+>  	return 0;
+>  }
+> =20
+> +#define IF_ENABLED(cfg, ptr)	PTR_IF(IS_ENABLED(cfg), (ptr))
+> +
+>  static const struct of_device_id ingenic_pinctrl_of_match[] =3D {
+>  	{
+>  		.compatible =3D "ingenic,jz4730-pinctrl",
+
+You also need to include linux/kernel.h in
+drivers/pinctrl/pinctrl-ingenic.c (for completeness).
+
+Also, I don't understand why the use of IF_ENABLED doesn't produce
+"defined but not used" warnings (if the function "ptr" is not marked as
+__maybe_unused) ...
+
+Also, if there is only one user of IF_ENABLED (and therefore PTR_IF),
+why not just put it in that file and save me rebuilding the world again
+every day because kernel.h is changed (again).  I guess that is going
+to happen just because kconfig.h is being changed and that is also
+included by everything :-(
+
+Also, is anyone else ever going to use PTR_IF() without having to also
+use IS_ENABLED()?
+
+So, in case it is not obvious, I consider this patch unnecessary churn
+(as was probably the patch that introduced IF_ENABLED in the first
+place).
+
+As an aside, this should not have been added to the kbuild tree in
+linux-next until after -rc1 was released ...
+
+--=20
 Cheers,
-Miguel
+Stephen Rothwell
+
+--Sig_/pKT.L0/u5p+I2wWxtmkAky6
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCV8I8ACgkQAVBC80lX
+0GxIUAgAmYisSa9XcG17XA+g98W0dtVKy/JJn4n2mhLiY3zKt1d3bWR6LzvjTuCq
+W/dQxkpBb/DmNI3to2qfoZR8SRDzu97O9TFxjwsLb9mtbI7OkUx3N5PBrJdF4Ci5
+0EstJ/raOnEm0/wctC4Cf14Rqd77/k4FLM3alzsMGq62/ntSNr+ugRiLhs0RWSjp
+e7U/tuffHWtBgqqZYW6u/7LJyEK3k9+IVqimPQb/pD6HS0fZMyaATM7nGc+6Nf/x
+RB1YgKKxSQw2OevdbGFeEwvD6hILR4RwpjY5MV4aMMpsDHZtuqdUA6snElFw0Rt8
+X/je7ntGKOoFhwJE/D5r8X9j28aJ3Q==
+=E5Ka
+-----END PGP SIGNATURE-----
+
+--Sig_/pKT.L0/u5p+I2wWxtmkAky6--
