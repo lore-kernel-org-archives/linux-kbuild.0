@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EBDC433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A14C433ED
 	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E592260241
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:03:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 270C761242
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235059AbhEQHFO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S235085AbhEQHFO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Mon, 17 May 2021 03:05:14 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:58558 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:58552 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233807AbhEQHFO (ORCPT
+        with ESMTP id S234274AbhEQHFO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 17 May 2021 03:05:14 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 14H73Glu004781;
-        Mon, 17 May 2021 16:03:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14H73Glu004781
+        by conuserg-10.nifty.com with ESMTP id 14H73Gls004781;
+        Mon, 17 May 2021 16:03:16 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14H73Gls004781
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1621234998;
-        bh=KkBtZ2ThpHxQa1Zo4oQSeExXwHeyQJ25PzlkNb0k0J8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ai6eux/8otYqnJYHE1UIGsCRn06QiBgxXdzrlC0HQtfQgkym0BFbBc4z/c0hni1dE
-         eI6unsuG31R5uwdz6eLw/S/3iH7mCZU5l96FpEjiaJ8g+yZt5NYSZwDLUHrzsHmqqc
-         J/+jpHe6ERL8UJdK891yhQtmSZRAo2e1IHZWNo7RbHh53EM3lRfupnwoVVwpQvgSi+
-         LQuvwOgyhOJvYkHB5NRUMwkLJf16NZ+tSYj7f0wNTIe3/1Ztx2KAt3Ibm0ToSL3qJr
-         JfIEYVt2O6A6ngMvLBm0XwAEY2x0+/8+j8HNdmN6RgbjESydpGJCbWoRU6NBgtep/2
-         2nK4TzeHE7i5g==
+        s=dec2015msa; t=1621234997;
+        bh=vMmG38PneO5iTqzcHq7rhpDey3NYml8eR7BGuT52bjY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=elDDN4ZexyPq0fEt/XubXnL4eyAgT1xE6MVYZCe06mPbTkOp8+yYykSPYYq+9THNW
+         9Q7NKtml3S4PZDUR5wPYhztNsy9et+vuXvF5YP7fmYPT52ePwMsZ+2rwwvuLMHMDOg
+         MtXXd+IEc7qa/8/KWOK8HZ0b+cbvV4ruu1qIK+VYItGJ9GH3/cTIg0q9sn3aWZSyiQ
+         saYUqSAARPKvwth3I13FIoaLuPwSoHzUpC1hzPikKN5DBpp0a75uuZSA2zMG2laTJ2
+         3nWGMKmtOY9dTJeZ6wKpLvyNiKfPbdZOOhOVXPQdaGiXfO5sFE3KK8DdSvaTe59dnb
+         snJlKg0h3Ohjw==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,103 +41,91 @@ Cc:     Arnd Bergmann <arnd@arndb.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] kbuild: sink stdout from cmd for silent build
-Date:   Mon, 17 May 2021 16:03:13 +0900
-Message-Id: <20210517070314.1428091-3-masahiroy@kernel.org>
+Subject: [PATCH 1/4] kbuild: merge scripts/mkmakefile to top Makefile
+Date:   Mon, 17 May 2021 16:03:11 +0900
+Message-Id: <20210517070314.1428091-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210517070314.1428091-1-masahiroy@kernel.org>
-References: <20210517070314.1428091-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When building with 'make -s', no output to stdout should be printed.
+scripts/mkmakefile is simple enough to be merged in the Makefile.
 
-As Arnd Bergmann reported [1], mkimage shows the detailed information
-of the generated images.
-
-I think this should be done by the 'cmd' macro instead of by individual
-scripts.
-
-Insert 'exec >/dev/null;' in order to redirect stdout to /dev/null for
-silent builds.
-
-[Note about this implementation]
-
-'exec >/dev/null;' may look somewhat tricky, but this has a reason.
-
-At first, I tried this:
-
-  cmd = @set -e; $(echo-cmd) $(cmd_$(1)) >/dev/null
-
-Appending '>/dev/null' is a commonly used way for redirection, but it
-would not work if $(cmd_$(1)) itself contains a redirection.
-
-For example, cmd_wrap in scripts/Makefile.asm-generic redirects the
-output from the 'echo' command into the target file.
-
-'$(cmd_$(1)) >/dev/null' would be expanded into:
-
-  echo "#include <asm-generic/$*.h>" > $@ >/dev/null
-
-Then, the target file gets empty because the string will go to /dev/null
-instead of $@.
-
-Next, I tried this:
-
-  cmd = @set -e; $(echo-cmd) { $(cmd_$(1)); } >/dev/null
-
-The form above would be expanded into:
-
-  { echo "#include <asm-generic/$*.h>" > $@; } >/dev/null
-
-This works as expected. However, it would be a syntax error if
-$(cmd_$(1)) is empty.
-
-When CONFIG_TRIM_UNUSED_KSYMS is disabled, $(call cmd,gen_ksymdeps) in
-scripts/Makefile.build would be expanded into:
-
-  set -e;  { ; } >/dev/null
-
-..., which causes an syntax error.
-
-The following does not work for the same reason.
-
-  cmd = @set -e; $(echo-cmd) ( $(cmd_$(1)) ) >/dev/null
-
-So, finally I adopted:
-
-  cmd = @set -e; $(echo-cmd) exec >/dev/null; $(cmd_$(1))
-
-[1]: https://lore.kernel.org/lkml/20210514135752.2910387-1-arnd@kernel.org/
+Use $(call cmd,...) to show the log instead of doing it in the
+shell script.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Kbuild.include | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ Makefile           | 15 ++++++++++++---
+ scripts/mkmakefile | 17 -----------------
+ 2 files changed, 12 insertions(+), 20 deletions(-)
+ delete mode 100755 scripts/mkmakefile
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 82dd1b65b7a8..f247e691562d 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -90,8 +90,13 @@ clean := -f $(srctree)/scripts/Makefile.clean obj
- echo-cmd = $(if $($(quiet)cmd_$(1)),\
- 	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
+diff --git a/Makefile b/Makefile
+index 15b6476d0f89..50776cc3e894 100644
+--- a/Makefile
++++ b/Makefile
+@@ -544,14 +544,24 @@ scripts_basic:
+ 	$(Q)rm -f .tmp_quiet_recordmcount
  
-+# sink stdout for 'make -s'
-+       redirect :=
-+ quiet_redirect :=
-+silent_redirect := exec >/dev/null;
+ PHONY += outputmakefile
++ifdef building_out_of_srctree
+ # Before starting out-of-tree build, make sure the source tree is clean.
+ # outputmakefile generates a Makefile in the output directory, if using a
+ # separate output directory. This allows convenient use of make in the
+ # output directory.
+ # At the same time when output Makefile generated, generate .gitignore to
+ # ignore whole output directory
+-outputmakefile:
+-ifdef building_out_of_srctree
 +
- # printing commands
--cmd = @set -e; $(echo-cmd) $(cmd_$(1))
-+cmd = @set -e; $(echo-cmd) $($(quiet)redirect) $(cmd_$(1))
- 
- ###
- # if_changed      - execute command if any prerequisite is newer than
++quiet_cmd_makefile = GEN     $@
++      cmd_makefile = { \
++	echo "\# Automatically generated by $(srctree)/Makefile: don't edit"; \
++	echo "include $(srctree)/Makefile"; \
++	} > $@
++
++Makefile: FORCE
++	$(call cmd,makefile)
++
++outputmakefile: Makefile
+ 	$(Q)if [ -f $(srctree)/.config -o \
+ 		 -d $(srctree)/include/config -o \
+ 		 -d $(srctree)/arch/$(SRCARCH)/include/generated ]; then \
+@@ -562,7 +572,6 @@ ifdef building_out_of_srctree
+ 		false; \
+ 	fi
+ 	$(Q)ln -fsn $(srctree) source
+-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile $(srctree)
+ 	$(Q)test -e .gitignore || \
+ 	{ echo "# this is build directory, ignore it"; echo "*"; } > .gitignore
+ endif
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+deleted file mode 100755
+index 1cb174751429..000000000000
+--- a/scripts/mkmakefile
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#!/bin/sh
+-# SPDX-License-Identifier: GPL-2.0
+-# Generates a small Makefile used in the root of the output
+-# directory, to allow make to be started from there.
+-# The Makefile also allow for more convinient build of external modules
+-
+-# Usage
+-# $1 - Kernel src directory
+-
+-if [ "${quiet}" != "silent_" ]; then
+-	echo "  GEN     Makefile"
+-fi
+-
+-cat << EOF > Makefile
+-# Automatically generated by $0: don't edit
+-include $1/Makefile
+-EOF
 -- 
 2.27.0
 
