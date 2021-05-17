@@ -4,45 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB880C43461
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40937C433B4
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EB4B6121F
-	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F4196121F
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 May 2021 07:04:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235091AbhEQHFP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 17 May 2021 03:05:15 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:58553 "EHLO
+        id S235123AbhEQHFR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 17 May 2021 03:05:17 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:58925 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235027AbhEQHFO (ORCPT
+        with ESMTP id S235099AbhEQHFR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 May 2021 03:05:14 -0400
+        Mon, 17 May 2021 03:05:17 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 14H73Glt004781;
-        Mon, 17 May 2021 16:03:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14H73Glt004781
+        by conuserg-10.nifty.com with ESMTP id 14H73Glv004781;
+        Mon, 17 May 2021 16:03:18 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14H73Glv004781
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1621234997;
-        bh=6qjhF17S3DwzBYJAs6pv957dH/5j1JRv4sjCIoKFd30=;
+        s=dec2015msa; t=1621234998;
+        bh=kVXI+j2T0ByDB3o0Pug8Ic19gAdY1qUzgPdDVuQL27o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=u2LSqvfjpQODCn8BGPMMfelqh5m+OTiOGUzdgE3a3gTVBXEAARmWRNc1i12yZWv+g
-         IB9yCuWApieVVhmjFZV1l7seBHwdvE5AaRvOQvhnSV7eYctv4A4onxAMKjWP61u5+N
-         vshDaJDoc118zGtMCbWWh0Nig9Ayrw+RGMD7KH6ebjk4Sdh2lGi1qdwRvGz/8tXK8L
-         fQ2CS2WSjfsKX8eUIpFn01dLcd2vRrf8MPm6U+Xzt6NUK1S9dyGJ7p1YyStxTv4Goh
-         gNvK/wNDNPYGYHvNZtLK9SMMWFXP2AxL+gob4VtXCU2k+MFD2jnUNV9tT21iIdrh6P
-         ovVpccsHTk/Vw==
+        b=ji0UEwNu7FZQdOWrisQour1iw+HTrVTyte1PUanvpHmhGlS7UDYsBo3pfOHnCsz8c
+         Agzea5lRsqBX9F7UfBbf8AeBMMTWvyvgGML/+LkbfGcMLCHonH/eLYKxuMFtIa4ayC
+         YrqXuB4dan4VQn4dgGBnYD9K871LHkVsFCSL1UIp4d58NhWES4mXjpYKzRaOr63CU7
+         TKidIUQ+3KxyPOkKzxtHrsr4XM/AqC+e9FLJnuzy3NlmHaiavWEDHMDI8uQs/NoeDM
+         vzFOfTzUE6XoSRd7yH7n1eMUkk9eY6mANCHr215mkppSa/SpyGRlo70AluWQG3yfA6
+         lLfDS9A50xRsQ==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Arnd Bergmann <arnd@arndb.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Song Liu <song@kernel.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] init: use $(call cmd,) for generating include/generated/compile.h
-Date:   Mon, 17 May 2021 16:03:12 +0900
-Message-Id: <20210517070314.1428091-2-masahiroy@kernel.org>
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Denis Efremov <efremov@linux.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 4/4] kbuild: clean up ${quiet} checks in shell scripts
+Date:   Mon, 17 May 2021 16:03:14 +0900
+Message-Id: <20210517070314.1428091-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210517070314.1428091-1-masahiroy@kernel.org>
 References: <20210517070314.1428091-1-masahiroy@kernel.org>
@@ -52,37 +55,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The 'cmd' macro shows the short log only when $(quiet) is quiet_.
-Do not do it manually.
+There were efforts to make 'make -s' really silent when it is a
+warning-free build.
+
+The conventional way was to let scripts check ${quiet}, and if it
+is 'silent_', suppress the output by their own.
+
+With the previous commit, the 'cmd' takes care of it now. The 'cmd' is
+also invoked from if_changed, if_changed_dep, and if_changed_rule.
+
+You can omit ${quiet} checks in shell scripts when they are invoked
+from the 'cmd' macro.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- init/Makefile | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ kernel/gen_kheaders.sh  | 4 +---
+ scripts/link-vmlinux.sh | 4 +---
+ scripts/mkcompile_h     | 4 +---
+ 3 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/init/Makefile b/init/Makefile
-index 6bc37f64b361..2846113677ee 100644
---- a/init/Makefile
-+++ b/init/Makefile
-@@ -27,11 +27,11 @@ $(obj)/version.o: include/generated/compile.h
- # mkcompile_h will make sure to only update the
- # actual file if its content has changed.
+diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
+index 34a1dc2abc7d..1966a749e0d9 100755
+--- a/kernel/gen_kheaders.sh
++++ b/kernel/gen_kheaders.sh
+@@ -56,9 +56,7 @@ if [ -f kernel/kheaders.md5 ] &&
+ 		exit
+ fi
  
--       chk_compile.h = :
-- quiet_chk_compile.h = echo '  CHK     $@'
--silent_chk_compile.h = :
--include/generated/compile.h: FORCE
--	@$($(quiet)chk_compile.h)
--	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@	\
-+quiet_cmd_compile.h = CHK     $@
-+      cmd_compile.h = \
-+	$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@	\
- 	"$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)"	\
- 	"$(CONFIG_PREEMPT_RT)" $(CONFIG_CC_VERSION_TEXT) "$(LD)"
-+
-+include/generated/compile.h: FORCE
-+	$(call cmd,compile.h)
+-if [ "${quiet}" != "silent_" ]; then
+-       echo "  GEN     $tarfile"
+-fi
++echo "  GEN     $tarfile"
+ 
+ rm -rf $cpio_dir
+ mkdir $cpio_dir
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index f4de4c97015b..3b342b0b0b38 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -38,9 +38,7 @@ LDFLAGS_vmlinux="$3"
+ # Will be supressed by "make -s"
+ info()
+ {
+-	if [ "${quiet}" != "silent_" ]; then
+-		printf "  %-7s %s\n" "${1}" "${2}"
+-	fi
++	printf "  %-7s %s\n" "${1}" "${2}"
+ }
+ 
+ # Generate a linker script to ensure correct ordering of initcalls.
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 4ae735039daf..06bbf4c2c66c 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -9,8 +9,6 @@ PREEMPT_RT=$5
+ CC_VERSION="$6"
+ LD=$7
+ 
+-vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
+-
+ # Do not expand names
+ set -f
+ 
+@@ -82,7 +80,7 @@ if [ -r $TARGET ] && \
+       cmp -s .tmpver.1 .tmpver.2; then
+    rm -f .tmpcompile
+ else
+-   vecho "  UPD     $TARGET"
++   echo "  UPD     $TARGET"
+    mv -f .tmpcompile $TARGET
+ fi
+ rm -f .tmpver.1 .tmpver.2
 -- 
 2.27.0
 
