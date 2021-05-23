@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7205C47081
-	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBFAC4707F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86202611C1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7DF6611C1
+	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbhEWDRO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S231540AbhEWDRO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Sat, 22 May 2021 23:17:14 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:31290 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31288 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231620AbhEWDRO (ORCPT
+        with ESMTP id S231569AbhEWDRN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 May 2021 23:17:14 -0400
+        Sat, 22 May 2021 23:17:13 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 14N3EZep018750;
-        Sun, 23 May 2021 12:14:37 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14N3EZep018750
+        by conuserg-10.nifty.com with ESMTP id 14N3EZen018750;
+        Sun, 23 May 2021 12:14:36 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14N3EZen018750
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1621739678;
-        bh=EozTG0s/RtaXpm/aA8ObyMpK/kGXwNVN+pnqwf4BJcg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=F69IR33kSgatparCS970+P2mk7OPcyIXS15FBwd36Z6MEE7TG+vdgBjLMhx518ZZZ
-         10aNNKbXUJzeBXrqV6sQinp/uQWA4u0C3xxXn9z5EXHNTTvsywnX5/2NQ7lQq4vKqx
-         GY1EWo4tkc+zSB2A4m2SMv0k6Zqh9KDWCUU1Yu8GBQXRMi5QEi43IEGupEkvvqOiX3
-         MEX9JHxCl/9wx00agbA08n15crTDXiy6ouwgwRjJy31iukZDu5HtzHC39LloU/yOzV
-         A7a4QzhqOU8B7OK780BMt7NH0u2KTOiqQzdHYKiz2HEO3NV1jeJfhI4qlnK7R+GS/u
-         dVHL+gq8h82dg==
+        s=dec2015msa; t=1621739676;
+        bh=g1onYEGMkfRjd8QsgCOU60uMAbt4fLk/I9gkUJ//b8g=;
+        h=From:To:Cc:Subject:Date:From;
+        b=q638dZLxiz8YZ+z2ogGizFntECNmgduYMoVcE21g6NDJc7nxaXAfI5jdaRZTNfXT8
+         IL3z+CG1fTwbILvoF/yU1v8I/KVrrUOXUsVkkAkW3u9H4jMzeg1FDfkgz3sAgC/DXD
+         enq3K71xtgZ13dYuM60UjJmsW6e91GsgC2gxk35lg2YWnBFq7ib3gJ4KlUSrnx3nuG
+         zLKXLtWCrd1/t9qpYedtpNHrMQSwKc+Q6uKmSgkWDUY5EajbyBM5aoVWcazbRMPXBG
+         RZePtBW6blaDHR5Fv5GTeDpjwKL1AZPVFr37tcTdegnl4S5VAb+pEusiyMVgaeSZFB
+         U3DxnGhR59zaw==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,63 +41,96 @@ Cc:     Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Matthias Maennich <maennich@google.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 3/5] scripts/setlocalversion: add more comments to -dirty flag detection
-Date:   Sun, 23 May 2021 12:14:26 +0900
-Message-Id: <20210523031428.164186-3-masahiroy@kernel.org>
+Subject: [PATCH 1/5] scripts/setlocalversion: remove mercurial, svn and git-svn supports
+Date:   Sun, 23 May 2021 12:14:24 +0900
+Message-Id: <20210523031428.164186-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210523031428.164186-1-masahiroy@kernel.org>
-References: <20210523031428.164186-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This script stumbled on the read-only source tree over again:
+The mercurial, svn, git-svn supports were added by the following commits
+without explaining why they are useful for the kernel source tree.
 
- - a2bb90a08cb3 ("kbuild: fix delay in setlocalversion on readonly
-   source")
+ - 3dce174cfcba ("kbuild: support mercurial in setlocalversion")
 
- - cdf2bc632ebc ("scripts/setlocalversion on write-protected source
-   tree")
+ - ba3d05fb6369 ("kbuild: add svn revision information to setlocalversion")
 
- - 8ef14c2c41d9 ("Revert "scripts/setlocalversion: git: Make -dirty
-   check more robust"")
+ - ff80aa97c9b4 ("setlocalversion: add git-svn support")
 
- - ff64dd485730 ("scripts/setlocalversion: Improve -dirty check with
-   git-status --no-optional-locks")
-
-Add comments to clarify that this script should never ever try to write
-to the source tree.
-
-'git describe --dirty' might look as a simple solution for appending
-the -dirty string, but we cannot use it because it creates the
-.git/index.lock file.
+Let's revert all of them, and see if somebody will complain about it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/setlocalversion | 4 ++++
- 1 file changed, 4 insertions(+)
+ scripts/setlocalversion | 41 -----------------------------------------
+ 1 file changed, 41 deletions(-)
 
 diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index f3084d6bbb22..6865df6699c8 100755
+index db941f6d9591..879cba956e60 100755
 --- a/scripts/setlocalversion
 +++ b/scripts/setlocalversion
-@@ -80,6 +80,10 @@ scm_version()
+@@ -79,11 +79,6 @@ scm_version()
+ 			fi
  		fi
  
+-		# Is this git on svn?
+-		if git config --get svn-remote.svn.url >/dev/null; then
+-			printf -- '-svn%s' "$(git svn find-rev $head)"
+-		fi
+-
  		# Check for uncommitted changes.
-+		# This script must avoid any write attempt to the source tree,
-+		# which might be read-only.
-+		# You cannot use 'git describe --dirty' because it tries to
-+		# create .git/index.lock .
  		# First, with git-status, but --no-optional-locks is only
  		# supported in git >= 2.14, so fall back to git-diff-index if
- 		# it fails. Note that git-diff-index does not refresh the
+@@ -96,42 +91,6 @@ scm_version()
+ 		} | grep -qvE '^(.. )?scripts/package'; then
+ 			printf '%s' -dirty
+ 		fi
+-
+-		# All done with git
+-		return
+-	fi
+-
+-	# Check for mercurial and a mercurial repo.
+-	if test -d .hg && hgid=$(hg id 2>/dev/null); then
+-		# Do we have an tagged version?  If so, latesttagdistance == 1
+-		if [ "$(hg log -r . --template '{latesttagdistance}')" = "1" ]; then
+-			id=$(hg log -r . --template '{latesttag}')
+-			printf '%s%s' -hg "$id"
+-		else
+-			tag=$(printf '%s' "$hgid" | cut -d' ' -f2)
+-			if [ -z "$tag" -o "$tag" = tip ]; then
+-				id=$(printf '%s' "$hgid" | sed 's/[+ ].*//')
+-				printf '%s%s' -hg "$id"
+-			fi
+-		fi
+-
+-		# Are there uncommitted changes?
+-		# These are represented by + after the changeset id.
+-		case "$hgid" in
+-			*+|*+\ *) printf '%s' -dirty ;;
+-		esac
+-
+-		# All done with mercurial
+-		return
+-	fi
+-
+-	# Check for svn and a svn repo.
+-	if rev=$(LC_ALL=C svn info 2>/dev/null | grep '^Last Changed Rev'); then
+-		rev=$(echo $rev | awk '{print $NF}')
+-		printf -- '-svn%s' "$rev"
+-
+-		# All done with svn
+-		return
+ 	fi
+ }
+ 
 -- 
 2.27.0
 
