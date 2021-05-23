@@ -2,90 +2,102 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 220E1C4707E
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 May 2021 23:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7205C47081
+	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E828661177
-	for <linux-kbuild@archiver.kernel.org>; Sat, 22 May 2021 23:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86202611C1
+	for <linux-kbuild@archiver.kernel.org>; Sun, 23 May 2021 03:15:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbhEVXwm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 22 May 2021 19:52:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231455AbhEVXwl (ORCPT
+        id S231623AbhEWDRO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 22 May 2021 23:17:14 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:31290 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231620AbhEWDRO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 May 2021 19:52:41 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6EDC0613ED
-        for <linux-kbuild@vger.kernel.org>; Sat, 22 May 2021 16:51:15 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id g7so15471309edm.4
-        for <linux-kbuild@vger.kernel.org>; Sat, 22 May 2021 16:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oDYOCCf0w8h4trbY4PGM+YEr9dD9IiV0gScwVLCiGbY=;
-        b=sh2wWvHDR9RjP0eqozl0HjnUgLSzS4G8MXsvMGTcS0yR7NZ91JPf+yJBouE1C/i8c5
-         W8jkLF0Sxl5mBz5OIlWmSlgKKUhsYRF8uLTQMJ8Uurs/R9hZ3ZqqIia4aKMTfJrsZxCv
-         IBt9TQGANbV1pCVR0liXlWqnUSq0rqu12SjqFNgyRgvA7VQ3Aad9Jx2QF3MQYBUdE53h
-         SnddjqpKaJLL7ciqGxGiFqJxruwcF1fsE07aV/VpyHs8o9KNPEFP4GH08zySaQfVvcVk
-         wPebyxLIpaGIyWIOujE8knbgQzbjd4A2yVD5BA/cqQjtmN58zLCqGCeiiCEVeGYnK+Bu
-         CEyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oDYOCCf0w8h4trbY4PGM+YEr9dD9IiV0gScwVLCiGbY=;
-        b=eUUf95HJuIoGTHu7c8eHW+2q7oL4H75q+qCXOoENctC3CztnpOrgIisETUIPfA2Hpx
-         bAJ/UneYbEjZv4b0Lmd/CHByCKCBtRbRH0VVJGS8x0Z13a2GnM4z1M2Yk17MMyhjqd9x
-         bDi9onULsABkI8QLjuPpqZ2psaFkLHzuIqiBUNN6DNU2poVBZcZaj9G2mo+9DC4BkYbP
-         mGHOYHkSNVGKw2W3FBGyCcdxNw3BCNK6ESOZclwCOgYogucVlTO7IfPljgbQSOnith27
-         1+0Unnwmss5jzlx4H8H4rkcpVz53R2jYxhxdfpu5SpqgIJrE+AnLUTQUUqNVRF1aRWs/
-         lIsw==
-X-Gm-Message-State: AOAM530SNc7jq1WvNVy25BDWMgEMqONeeLWPCeRyI0M8ZUuA4k7rFN2W
-        vSts6y6l6u7/WMtErPFx4/pmfKxdYrHiDhbUQ1rE
-X-Google-Smtp-Source: ABdhPJym0f9zc3m+Iz9yqvvA8ZEDJcESzh33Fs5+ndzZSW0RbmVqYtnJbpkuVWYIWYsfgCQeq0NCNSulA6wlBF9Ln8Y=
-X-Received: by 2002:a50:f689:: with SMTP id d9mr18289418edn.197.1621727473341;
- Sat, 22 May 2021 16:51:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210111081821.3041587-1-morbo@google.com> <20210407211704.367039-1-morbo@google.com>
- <202105191422.2E6748C4E0@keescook>
-In-Reply-To: <202105191422.2E6748C4E0@keescook>
-From:   Bill Wendling <morbo@google.com>
-Date:   Sat, 22 May 2021 16:51:02 -0700
-Message-ID: <CAGG=3QWJD3wDr=Eji-rMcD49Mi-SyP1Tn6B63qJFyi492YafNg@mail.gmail.com>
-Subject: Re: [PATCH v9] pgo: add clang's Profile Guided Optimization infrastructure
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Sat, 22 May 2021 23:17:14 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-10.nifty.com with ESMTP id 14N3EZep018750;
+        Sun, 23 May 2021 12:14:37 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 14N3EZep018750
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1621739678;
+        bh=EozTG0s/RtaXpm/aA8ObyMpK/kGXwNVN+pnqwf4BJcg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=F69IR33kSgatparCS970+P2mk7OPcyIXS15FBwd36Z6MEE7TG+vdgBjLMhx518ZZZ
+         10aNNKbXUJzeBXrqV6sQinp/uQWA4u0C3xxXn9z5EXHNTTvsywnX5/2NQ7lQq4vKqx
+         GY1EWo4tkc+zSB2A4m2SMv0k6Zqh9KDWCUU1Yu8GBQXRMi5QEi43IEGupEkvvqOiX3
+         MEX9JHxCl/9wx00agbA08n15crTDXiy6ouwgwRjJy31iukZDu5HtzHC39LloU/yOzV
+         A7a4QzhqOU8B7OK780BMt7NH0u2KTOiqQzdHYKiz2HEO3NV1jeJfhI4qlnK7R+GS/u
+         dVHL+gq8h82dg==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Fangrui Song <maskray@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Matthias Maennich <maennich@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/5] scripts/setlocalversion: add more comments to -dirty flag detection
+Date:   Sun, 23 May 2021 12:14:26 +0900
+Message-Id: <20210523031428.164186-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210523031428.164186-1-masahiroy@kernel.org>
+References: <20210523031428.164186-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, May 19, 2021 at 2:37 PM Kees Cook <keescook@chromium.org> wrote:
->
-> I've added this to patch to my -next tree now:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/commit/?h=for-next/clang/pgo&id=e1af496cbe9b4517428601a4e44fee3602dd3c15
->
-> Thanks!
-> Kees Cook
+This script stumbled on the read-only source tree over again:
 
-Thank you!
+ - a2bb90a08cb3 ("kbuild: fix delay in setlocalversion on readonly
+   source")
 
--bw
+ - cdf2bc632ebc ("scripts/setlocalversion on write-protected source
+   tree")
+
+ - 8ef14c2c41d9 ("Revert "scripts/setlocalversion: git: Make -dirty
+   check more robust"")
+
+ - ff64dd485730 ("scripts/setlocalversion: Improve -dirty check with
+   git-status --no-optional-locks")
+
+Add comments to clarify that this script should never ever try to write
+to the source tree.
+
+'git describe --dirty' might look as a simple solution for appending
+the -dirty string, but we cannot use it because it creates the
+.git/index.lock file.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/setlocalversion | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index f3084d6bbb22..6865df6699c8 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -80,6 +80,10 @@ scm_version()
+ 		fi
+ 
+ 		# Check for uncommitted changes.
++		# This script must avoid any write attempt to the source tree,
++		# which might be read-only.
++		# You cannot use 'git describe --dirty' because it tries to
++		# create .git/index.lock .
+ 		# First, with git-status, but --no-optional-locks is only
+ 		# supported in git >= 2.14, so fall back to git-diff-index if
+ 		# it fails. Note that git-diff-index does not refresh the
+-- 
+2.27.0
+
