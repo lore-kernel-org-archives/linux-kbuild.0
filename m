@@ -7,51 +7,48 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E06C47087
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A791CC47086
 	for <linux-kbuild@archiver.kernel.org>; Tue, 25 May 2021 23:02:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C53161417
+	by mail.kernel.org (Postfix) with ESMTP id 8DC0561417
 	for <linux-kbuild@archiver.kernel.org>; Tue, 25 May 2021 23:02:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232133AbhEYXD6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S232088AbhEYXD6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Tue, 25 May 2021 19:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232088AbhEYXD5 (ORCPT
+Received: from Galois.linutronix.de ([193.142.43.55]:51120 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230103AbhEYXD5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 25 May 2021 19:03:57 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D21FEC06175F
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 May 2021 16:02:26 -0700 (PDT)
 From:   bage@linutronix.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1621983744;
+        s=2020; t=1621983746;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G7e0Q+5dF3OHIGid4Aab2rVzbUa2cJN+n3ka6i1AOc4=;
-        b=nQy7RrpBPBHjWsVu6pL8dbF5kkJBnH+svtGw+Ncd9Taa3tYxGciMdkJpr4s7WW49HFWWta
-        33RkLEzmvBTm4S+gBgN9MmJRszs/lJnwvf4XcE9pOddVWkz18zuFiDZDaL7BDAEamQeOEP
-        OxzJARSOYRD95dSjilkVhwca7kTYvSXaukKBgBM3CfU35uf3nkH8lCODEWdtb7HoiE++wi
-        AMHfVrVn/fHU3jOT4yXNPDDpbtcTpBNaJ7LUnp8clU6B7GCngu6smLYyo4v2s7sVKki2a/
-        /ilHAOQhV4MuUkpuxpPoEcdDuqVgrca/mutCIMRcY3dVKlPCzQG1qt4Rpuallw==
+        bh=Coa/6AgcgN9DAYJTginr0IdsovL0lGETM6OI8BTtTcg=;
+        b=rTh++prfoS03nUuGBEkI2idG7e1iRCEqC4in4g11lZQMAHuryD1L2pQ4LwzBKWh5WeK6eO
+        8y1Tm7FmmuU8AlJ25CBy60GSM59N5QamDLlp5ULOvW98sfR//5uouM9Aes3RRAulT3001X
+        EyBy83JrXpawPs9XCFj9OLO8vogJ6z1by7goSdMhbT4pFfBu262SbILeeCLioYZJO7oTeS
+        V7O10sfK+sG9tTyK/OvNl7GXturDHJlY5o+gYtzqvRS0drM/aUmhaXAKuS0FCU8ypprHyy
+        x9HtrnqpaMzdqtFMNAyNKFA3lUC4YJi+8gagbqlKJqQlYBVGv+cTFd38kjLF+A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1621983744;
+        s=2020e; t=1621983746;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G7e0Q+5dF3OHIGid4Aab2rVzbUa2cJN+n3ka6i1AOc4=;
-        b=eTVri8UVT5tgwUwBuHPhf13fhjEhseYuaSKmM5EI++UoIh3gfQAtpj9R3lr5zUaC0qXCxW
-        EGCBjrXEK/Rm/NBA==
+        bh=Coa/6AgcgN9DAYJTginr0IdsovL0lGETM6OI8BTtTcg=;
+        b=ziyLWtTzcAd413Vm1xhJ2FJ78iPqukDPWKrYtRYoH8LyqPugIoUW6h8p8RLBipxkQsgs7n
+        JvUH/AUkKsD+AiCQ==
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>
 Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
         tglx@linutronix.de
-Subject: [PATCH v2 3/5] builddeb: clean generated package content
-Date:   Wed, 26 May 2021 01:01:37 +0200
-Message-Id: <20210525230139.6165-4-bage@linutronix.de>
+Subject: [PATCH v2 5/5] kbuild: introduce srcdeb-pkg target
+Date:   Wed, 26 May 2021 01:01:39 +0200
+Message-Id: <20210525230139.6165-6-bage@linutronix.de>
 In-Reply-To: <20210525230139.6165-1-bage@linutronix.de>
 References: <20210525230139.6165-1-bage@linutronix.de>
 MIME-Version: 1.0
@@ -62,29 +59,49 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: Bastian Germann <bage@linutronix.de>
 
-For each binary Debian package, a directory with the package name is
-created in the debian directory. Correct the generated file matches in the
-package's clean target, which were renamed without adjusting the target.
+A Debian source package can be generated only in combination with building
+it afterwards. Introduce a target srcdeb-pkg that generates the source
+package without building it (adding dpkg-buildpackage's -S flag).
 
-Fixes: 1694e94e4f46 ("builddeb: match temporary directory name to the package name")
+Make the former deb-pkg run both srcdeb-pkg and bindeb-pkg to retain its
+behavior.
+
 Signed-off-by: Bastian Germann <bage@linutronix.de>
 ---
- scripts/package/mkdebian | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Makefile.package | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 449e284a449c..9470581d8c75 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -246,7 +246,7 @@ binary-arch: build-arch
- 	KBUILD_BUILD_VERSION=${revision} -f \$(srctree)/Makefile intdeb-pkg
+diff --git a/scripts/Makefile.package b/scripts/Makefile.package
+index 360ce0ae2fa1..dd347355c95e 100644
+--- a/scripts/Makefile.package
++++ b/scripts/Makefile.package
+@@ -71,12 +71,17 @@ binrpm-pkg:
  
- clean:
--	rm -rf debian/*tmp debian/files
-+	rm -rf debian/files debian/linux-*
- 	\$(MAKE) clean
+ PHONY += deb-pkg
+ deb-pkg:
++	$(MAKE) srcdeb-pkg
++	$(MAKE) bindeb-pkg
++
++PHONY += srcdeb-pkg
++srcdeb-pkg:
+ 	$(MAKE) clean
+ 	$(CONFIG_SHELL) $(srctree)/scripts/package/mkdebian
+ 	$(call cmd,src_tar,$(KDEB_SOURCENAME))
+ 	origversion=$$(dpkg-parsechangelog -SVersion |sed 's/-[^-]*$$//');\
+ 		mv $(KDEB_SOURCENAME).tar.gz ../$(KDEB_SOURCENAME)_$${origversion}.orig.tar.gz
+-	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -us -uc
++	+dpkg-buildpackage -r$(KBUILD_PKG_ROOTCMD) -a$$(cat debian/arch) $(DPKG_FLAGS) -S -us -uc
  
- binary: binary-arch
+ PHONY += bindeb-pkg
+ bindeb-pkg:
+@@ -146,6 +151,7 @@ help:
+ 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
+ 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
+ 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
++	@echo '  srcdeb-pkg          - Build only the source kernel deb package'
+ 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
+ 	@echo '  snap-pkg            - Build only the binary kernel snap package'
+ 	@echo '                        (will connect to external hosts)'
 -- 
 2.30.2
 
