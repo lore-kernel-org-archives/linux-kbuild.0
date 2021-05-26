@@ -2,91 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75779C47089
-	for <linux-kbuild@archiver.kernel.org>; Tue, 25 May 2021 23:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B29C2B9F7
+	for <linux-kbuild@archiver.kernel.org>; Wed, 26 May 2021 06:11:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B80061284
-	for <linux-kbuild@archiver.kernel.org>; Tue, 25 May 2021 23:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABE4D6101E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 26 May 2021 06:11:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232226AbhEYXD7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 25 May 2021 19:03:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50520 "EHLO
+        id S232736AbhEZGNT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 26 May 2021 02:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232107AbhEYXD5 (ORCPT
+        with ESMTP id S232604AbhEZGNS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 May 2021 19:03:57 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ABC2C061574
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 May 2021 16:02:27 -0700 (PDT)
-From:   bage@linutronix.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1621983745;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cv+zu7W2GChgFJp4HOz/u8Hpr4RiyGNAMX6ZvzMvcDI=;
-        b=wVv9IdBm769eH0avKYiQIZU9RUNH6sWpOrcII7F35K/3Y/njPtfSv0P+WoDKdYxkTXgWtK
-        Q90SqkwUERnW2+3trKOLr3lxJgyXMMRXmA/pnCSZRx9LYsNHuDaNr+5F/RXRCiJRYjiiel
-        Ae4iCjAJZ2hEZ0mV6LGhvUt15xlK384zD0qTCJTJn1LtsJTBJgMkkK9LOCJU3X9oi7QiPr
-        QGFsfmaA7GKkf3gQjedRGYjSQ2w1V1Gu9aDtEv069RAJkFiMUa7S8NEULnuL97IOQtu+sW
-        KAV4vHMPkkOpHtKHTcsACYJmZ9kNEHFPOH4ry2t0jbyBUNsdAr1SwzLjWrsH8w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1621983745;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cv+zu7W2GChgFJp4HOz/u8Hpr4RiyGNAMX6ZvzMvcDI=;
-        b=6T+nrsqVuf4TVnCk9IOK72DM7UlAYiEqHPpTaewf54HFsQkJxZOOuWbhHAOo2vdFqxqUfi
-        FfKqwB2PpsElQXAg==
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     Bastian Germann <bage@linutronix.de>, linux-kbuild@vger.kernel.org,
-        tglx@linutronix.de
-Subject: [PATCH v2 4/5] builddeb: introduce profile excluding the dbg pkg
-Date:   Wed, 26 May 2021 01:01:38 +0200
-Message-Id: <20210525230139.6165-5-bage@linutronix.de>
-In-Reply-To: <20210525230139.6165-1-bage@linutronix.de>
-References: <20210525230139.6165-1-bage@linutronix.de>
+        Wed, 26 May 2021 02:13:18 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B30C06175F
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 May 2021 23:11:47 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id i5so95142pgm.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 May 2021 23:11:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=gbPiSxkPDocMtm20zVFAvhPpgz5/mxvmWnSil/NU8cc=;
+        b=cmzrEfMfXPhpDwTF81sh4RuFzjzZR+AKDtuvb7N5Xo7F7NyF+RT61BO55DhsY6HmQB
+         q2h7zLbPM2pGV7ZbqVeA4DB9dtBdRduEQBlY3jjnirEKvyP5P4cREcQWPoPiL8vIcqy8
+         0N8lL1tdqqqwnqGNFeEBmLdHgp1zGTOE0uuYD/PGrV0l4DuM0aZR8HV/Dmeoiu3rFABX
+         uA6ObrrZ3f/v8lf3g7VXEsk/kDdGo1KP5coisDwVAv7D5TWpc3Iakb/BZB5fNttZEMBZ
+         +QUXyW5n9Ka7/Qlo3s3s6gOa5yO8cRfXZ6eK7rtUbNd9dZ96alctL+Mrhr0fcYOBJLwj
+         YwkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=gbPiSxkPDocMtm20zVFAvhPpgz5/mxvmWnSil/NU8cc=;
+        b=W6H8THyY19zKGQ2aTlRRCPjcHlr+esnQriYCbK7P+uq3tALkyhMC00sKR0hXMdLg1T
+         tdIAYRbEAaupKhl9py/RUkdJuB9LgCqW0GrlgolGLEFewNGYtdyGA21U+P0C5FHE7qyP
+         m46imekjnSHf7y/TR7ZC8REmXlSvDGbY6AOMmc/teoSrJMdNar7Cwk3h6NANwsgQ7HRc
+         4KFcLb+tNvBA6E39FrSuD0eoLHgBK9ffPerzj3YhMJ+Gf1SIQ0EwQojSyA9gnA98LJ3Q
+         CRr92IfZtWU4zgsyFM0XNiXTUnkDTWcqUmNDQGaOPxC7SJfONV8IzAmSiCk/MiAUq5As
+         DGxA==
+X-Gm-Message-State: AOAM532fAy3RKisAMAEoN/FdvVjjv/n7GRCKdslzKUvWVuUvQmGumwa4
+        vO0kdAcjtGsrhgum+h9LcCGChA==
+X-Google-Smtp-Source: ABdhPJwMEHhu/I2taGS0lmYaSUKN7tJ5HDsDPBPTtC01apjOIv0KzmzScNdqLEy7DGo/G+vnUQhfdQ==
+X-Received: by 2002:a62:30c2:0:b029:289:116c:ec81 with SMTP id w185-20020a6230c20000b0290289116cec81mr34147054pfw.42.1622009507172;
+        Tue, 25 May 2021 23:11:47 -0700 (PDT)
+Received: from localhost ([136.185.154.93])
+        by smtp.gmail.com with ESMTPSA id b21sm11842087pfo.47.2021.05.25.23.11.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 May 2021 23:11:46 -0700 (PDT)
+Date:   Wed, 26 May 2021 11:41:44 +0530
+From:   Viresh Kumar <viresh.kumar@linaro.org>
+To:     Frank Rowand <frowand.list@gmail.com>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Rob Herring <robh@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Anmar Oueja <anmar.oueja@linaro.org>,
+        Bill Mills <bill.mills@linaro.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/1] of: unittest: rename overlay source files from .dts
+ to .dtso
+Message-ID: <20210526061144.yvoaurpz75a3bsjr@vireshk-i7>
+References: <20210324223713.1334666-1-frowand.list@gmail.com>
+ <20210327174035.GA291160@robh.at.kernel.org>
+ <3e6710e7-08ac-7d1b-aa69-bcd36f0d932a@gmail.com>
+ <CAMuHMdXpGKMi-xv6hZQmmEw0JO=Q0WuvUzwJ2v0O28Tx5uW+sg@mail.gmail.com>
+ <d1aefaae-7b12-b5fb-4b97-7230bd52c1be@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d1aefaae-7b12-b5fb-4b97-7230bd52c1be@gmail.com>
+User-Agent: NeoMutt/20180716-391-311a52
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Bastian Germann <bage@linutronix.de>
+On 22-04-21, 13:54, Frank Rowand wrote:
+> On 4/22/21 3:44 AM, Geert Uytterhoeven wrote:
+> > Hi Frank, Rob,
+> > 
+> > On Mon, Mar 29, 2021 at 9:23 PM Frank Rowand <frowand.list@gmail.com> wrote:
+> >> On 3/27/21 12:40 PM, Rob Herring wrote:
+> >>> On Wed, Mar 24, 2021 at 05:37:13PM -0500, frowand.list@gmail.com wrote:
+> >>>> From: Frank Rowand <frank.rowand@sony.com>
+> >>>>
+> >>>> Add Makefile rule to build .dtbo.o assembly file from overlay .dtso
+> >>>> source file.
+> >>>>
+> >>>> Rename unittest .dts overlay source files to use .dtso suffix.
+> >>>
+> >>> I'm pretty lukewarm on .dtso...
+> >>
+> >> I was originally also, but I'm warming up to it.
+> > 
+> > What's the status of this?
+> 
+> I was planning to resend on top of the upcoming -rc1.
 
-Enabling CONFIG_DEBUG_INFO implies building the binary linux-image-*-dbg.
-As this increases package build time significantly, one might want to
-exclude it from being built.
+Ping.
 
-Add a pkg.$sourcename.nodbg build profile for that package so it can be
-excluded via e.g.: `make DPKG_FLAGS="-P=pkg.linux-upstream.nodbg" deb-pkg`
-
-Link: https://wiki.debian.org/BuildProfileSpec
-Signed-off-by: Bastian Germann <bage@linutronix.de>
----
- scripts/package/mkdebian | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/scripts/package/mkdebian b/scripts/package/mkdebian
-index 9470581d8c75..2e95966fe4dd 100755
---- a/scripts/package/mkdebian
-+++ b/scripts/package/mkdebian
-@@ -212,6 +212,7 @@ if is_enabled CONFIG_DEBUG_INFO; then
- cat <<EOF >> debian/control
- 
- Package: linux-image-$version-dbg
-+Build-Profiles: <!pkg.$sourcename.nodbg>
- Section: debug
- Architecture: $debarch
- Description: Linux kernel debugging symbols for $version
 -- 
-2.30.2
-
+viresh
