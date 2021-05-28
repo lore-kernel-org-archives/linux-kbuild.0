@@ -2,74 +2,74 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20F9C4707F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 27 May 2021 19:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DACC2B9F7
+	for <linux-kbuild@archiver.kernel.org>; Fri, 28 May 2021 17:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC95F613DD
-	for <linux-kbuild@archiver.kernel.org>; Thu, 27 May 2021 19:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77FAF613B5
+	for <linux-kbuild@archiver.kernel.org>; Fri, 28 May 2021 17:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235252AbhE0TBo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 27 May 2021 15:01:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35236 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235610AbhE0TBn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 May 2021 15:01:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 1C4166139A;
-        Thu, 27 May 2021 19:00:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1622142010;
-        bh=TmxPCYQSORbslCrNHAtsQU6J8HqGLZDhGfjOWxvH3D4=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=RThOd9X0HQZIUcsYQicB1BgnGsRmlfquZEj0A/sHBa8OJgzVrcbWXGaZS+Z33NCpu
-         yJCCyd/rIpwpPcFob50joXZ/tnloQS5mJCgvD9pnR2nLmjF8zA+FBNjfksqwm1nOwP
-         u59mMU90U2QwS4b6mfe8rH1b7jwE+0ri1H4jm04ci1wwfokKURccTIj/CNcdOLND6r
-         Tt50N8XQrX61kG1TFp0quSG62/4601ynSf93sRzeVl5uMQngY4+K07LqhBBrgiPyf4
-         zH8P4v+Upn0am40NgXVb4pMDj9JgpPpLGzbQqxiMBhmOgMP1bJzaTtSlvz6wa96UKT
-         3DM+OG8pgSkyQ==
-Content-Type: text/plain; charset="utf-8"
+        id S230215AbhE1RP3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 28 May 2021 13:15:29 -0400
+Received: from conuserg-07.nifty.com ([210.131.2.74]:28762 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229641AbhE1RP2 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 28 May 2021 13:15:28 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 14SHDNo4032433;
+        Sat, 29 May 2021 02:13:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 14SHDNo4032433
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1622222004;
+        bh=l4ntX8x0JtCnBD5KvAYnltkw9P8JET4BzHSY0clkT+4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=qG1HF8AMk74YxygPm10dKl4QlVXWPTQEIsJ5NlFRI0L3GsanBtevVbVclrfYo5Fml
+         a+itgFn7yKa/t8Ri+LQgX0K4SEPldBkIYOa7ljsnh+PJHHsiX+ACXdMDIvB0KEKXH9
+         hOyM2plZ+ACmM6qEtqrKagaXOALtuQEhzX2+pceq9jkA0wu0ozhii64qK1K091KLfQ
+         GXMVpFbCBN29JaJbERxF8PKLdvC1WKyVvap53j3fod3X/HVRf6FmG/tr+Y5QLnodNu
+         2Y/xQm47j4BvvEQdtt9cpexsmopIcL8y95dcdncfzeTsdnqumBh8v1cXx5vRf03/cE
+         kpPUllbWxCAMg==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kconfig: constify long_opts
+Date:   Sat, 29 May 2021 02:13:21 +0900
+Message-Id: <20210528171321.158586-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] kbuild: quote OBJCOPY var to avoid a pahole call break the
- build
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <162214201005.13306.13681434176517015104.git-patchwork-notify@kernel.org>
-Date:   Thu, 27 May 2021 19:00:10 +0000
-References: <20210526215228.3729875-1-javierm@redhat.com>
-In-Reply-To: <20210526215228.3729875-1-javierm@redhat.com>
-To:     Javier Martinez Canillas <javierm@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, acme@kernel.org, bpf@vger.kernel.org,
-        andrii@kernel.org, acme@redhat.com, ast@kernel.org,
-        masahiroy@kernel.org, michal.lkml@markovi.net,
-        linux-kbuild@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello:
+getopt_long() does not modify the logopts structure.
 
-This patch was applied to bpf/bpf.git (refs/heads/master):
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-On Wed, 26 May 2021 23:52:28 +0200 you wrote:
-> The ccache tool can be used to speed up cross-compilation, by calling the
-> compiler and binutils through ccache. For example, following should work:
-> 
->     $ export ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-"
-> 
->     $ make M=drivers/gpu/drm/rockchip/
-> 
-> [...]
+ scripts/kconfig/conf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [v2] kbuild: quote OBJCOPY var to avoid a pahole call break the build
-    https://git.kernel.org/bpf/bpf/c/ff2e6efda0d5
-
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index bfa1ea8f5f98..5d84b44a2a2a 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -678,7 +678,7 @@ static void check_conf(struct menu *menu)
+ 		check_conf(child);
+ }
+ 
+-static struct option long_opts[] = {
++static const struct option long_opts[] = {
+ 	{"help",          no_argument,       NULL,            'h'},
+ 	{"silent",        no_argument,       NULL,            's'},
+ 	{"oldaskconfig",  no_argument,       &input_mode_opt, oldaskconfig},
+-- 
+2.27.0
 
