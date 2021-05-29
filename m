@@ -2,195 +2,166 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_24_48,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C25C4708E
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 May 2021 05:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9682C47082
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 May 2021 05:35:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D270361248
-	for <linux-kbuild@archiver.kernel.org>; Sat, 29 May 2021 05:16:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78D6A613F0
+	for <linux-kbuild@archiver.kernel.org>; Sat, 29 May 2021 05:35:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbhE2FSP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 29 May 2021 01:18:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbhE2FSP (ORCPT
+        id S229560AbhE2Fgv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 29 May 2021 01:36:51 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:36456 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229456AbhE2Fgv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 May 2021 01:18:15 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBA1C061574;
-        Fri, 28 May 2021 22:16:39 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4FsVCR54Q7z9sW4; Sat, 29 May 2021 15:16:35 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1622265395;
-        bh=9W7EP2KVmTGbFSdQ+OaCesEwTE5wg3X5f+H11fjjHHo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MYRRZR8gDpdM+T1L7qJXrL9NouextTi+KmoUDpHAAGF0+KPNAZYgg03mXRW2AjmrE
-         30RGn01woFa3kTAj9fZ7heLva7SPYgn3ZhO2TBTrJQIGlI2YbDVAmPYqlj+DmgC4Cl
-         wjFgU+SPSxnGN5lAidRsCGRBwejY9ZtJXssa30+w=
-Date:   Fri, 28 May 2021 13:45:35 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Frank Rowand <frowand.list@gmail.com>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Rob Herring <robh@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
+        Sat, 29 May 2021 01:36:51 -0400
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B073F21915;
+        Sat, 29 May 2021 05:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622266514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IruQw+sP3FcUyEyB6OmkDCTJaBHjzPDejNTz9t8cdss=;
+        b=q9GrHYTRYRxil5zszN5QH3w8/VG/d+efJx332oaifGLsmVYx41dsOVKhVUrug9DlkTi5Ft
+        09/T8QKSwCrwPB1hQD5s09c7sCT6aS+R7vfohHZi6T4tg5lO9jEfxOuZtfGB1fzzE0rI7A
+        YkZd3IzezSatC6t7QaTA+sGiHq7ctJE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622266514;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IruQw+sP3FcUyEyB6OmkDCTJaBHjzPDejNTz9t8cdss=;
+        b=Lz1QyVGvjYLaeXayk4nSRt+1LSsAiWf573RIhkJinARPLQOU6hb3neDca8DkXi2LNggPq9
+        ry0YYTjBfH+0zGBQ==
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+        by imap.suse.de (Postfix) with ESMTP id 4B3CE118DD;
+        Sat, 29 May 2021 05:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1622266514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IruQw+sP3FcUyEyB6OmkDCTJaBHjzPDejNTz9t8cdss=;
+        b=q9GrHYTRYRxil5zszN5QH3w8/VG/d+efJx332oaifGLsmVYx41dsOVKhVUrug9DlkTi5Ft
+        09/T8QKSwCrwPB1hQD5s09c7sCT6aS+R7vfohHZi6T4tg5lO9jEfxOuZtfGB1fzzE0rI7A
+        YkZd3IzezSatC6t7QaTA+sGiHq7ctJE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1622266514;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IruQw+sP3FcUyEyB6OmkDCTJaBHjzPDejNTz9t8cdss=;
+        b=Lz1QyVGvjYLaeXayk4nSRt+1LSsAiWf573RIhkJinARPLQOU6hb3neDca8DkXi2LNggPq9
+        ry0YYTjBfH+0zGBQ==
+Received: from director2.suse.de ([192.168.254.72])
+        by imap3-int with ESMTPSA
+        id +9BKEZLSsWCpSwAALh3uQQ
+        (envelope-from <msuchanek@suse.de>); Sat, 29 May 2021 05:35:14 +0000
+Date:   Sat, 29 May 2021 07:35:13 +0200
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Anmar Oueja <anmar.oueja@linaro.org>,
-        Bill Mills <bill.mills@linaro.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/1] of: unittest: rename overlay source files from .dts
- to .dtso
-Message-ID: <YLBnX4PeK51YwUJB@yekko>
-References: <20210324223713.1334666-1-frowand.list@gmail.com>
- <20210327174035.GA291160@robh.at.kernel.org>
- <3e6710e7-08ac-7d1b-aa69-bcd36f0d932a@gmail.com>
- <CAMuHMdXpGKMi-xv6hZQmmEw0JO=Q0WuvUzwJ2v0O28Tx5uW+sg@mail.gmail.com>
- <d1aefaae-7b12-b5fb-4b97-7230bd52c1be@gmail.com>
- <20210526061144.yvoaurpz75a3bsjr@vireshk-i7>
- <f651e95b-feef-5c86-edba-d6008bc80b34@gmail.com>
- <YK70Xsl1oXeEQpWZ@yekko>
- <CAMuHMdWdb2s08a=axC+m88gARSA3enOBnczsN59XL2F9yHXXYA@mail.gmail.com>
+Subject: Re: [PATCH] Revert "kbuild: merge scripts/mkmakefile to top Makefile"
+Message-ID: <20210529053512.GT8544@kitsune.suse.cz>
+References: <20210526173855.5963-1-msuchanek@suse.de>
+ <CAK7LNASEqKwQeLPXedyut+ykSJGPuq3CO1g_fS=sVDaZrwBPBQ@mail.gmail.com>
+ <20210526202825.GB8544@kitsune.suse.cz>
+ <CAK7LNAQ=DiayZ8YqgMTrTWyP_fuEpPL80+BSzj9VB+RQDKD27g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="gmPBfyWAmXOSQLgm"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdWdb2s08a=axC+m88gARSA3enOBnczsN59XL2F9yHXXYA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK7LNAQ=DiayZ8YqgMTrTWyP_fuEpPL80+BSzj9VB+RQDKD27g@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Authentication-Results: imap.suse.de;
+        none
+X-Spamd-Result: default: False [0.00 / 100.00];
+         ARC_NA(0.00)[];
+         DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+         TO_DN_ALL(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         RCPT_COUNT_THREE(0.00)[4];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_NO_TLS_LAST(0.10)[];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_VIA_SMTP_AUTH(0.00)[]
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-
---gmPBfyWAmXOSQLgm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, May 27, 2021 at 09:21:05AM +0200, Geert Uytterhoeven wrote:
-65;6401;1c> On Thu, May 27, 2021 at 3:48 AM David Gibson
-> <david@gibson.dropbear.id.au> wrote:
-> > On Wed, May 26, 2021 at 04:21:48PM -0500, Frank Rowand wrote:
-> > > On 5/26/21 1:11 AM, Viresh Kumar wrote:
-> > > > On 22-04-21, 13:54, Frank Rowand wrote:
-> > > >> On 4/22/21 3:44 AM, Geert Uytterhoeven wrote:
-> > > >>> On Mon, Mar 29, 2021 at 9:23 PM Frank Rowand <frowand.list@gmail.=
-com> wrote:
-> > > >>>> On 3/27/21 12:40 PM, Rob Herring wrote:
-> > > >>>>> On Wed, Mar 24, 2021 at 05:37:13PM -0500, frowand.list@gmail.co=
-m wrote:
-> > > >>>>>> From: Frank Rowand <frank.rowand@sony.com>
-> > > >>>>>>
-> > > >>>>>> Add Makefile rule to build .dtbo.o assembly file from overlay =
-=2Edtso
-> > > >>>>>> source file.
-> > > >>>>>>
-> > > >>>>>> Rename unittest .dts overlay source files to use .dtso suffix.
-> > > >>>>>
-> > > >>>>> I'm pretty lukewarm on .dtso...
-> > > >>>>
-> > > >>>> I was originally also, but I'm warming up to it.
-> > > >>>
-> > > >>> What's the status of this?
-> > > >>
-> > > >> I was planning to resend on top of the upcoming -rc1.
-> > > >
-> > > > Ping.
-> > > >
-> > >
-> > > Thanks for the prod...
-> > >
-> > > The .dtso convention was added to the dtc compiler, then a patch was
-> > > accepted to revert one mention of .dtso ,though there still remains
-> > > two location where .dtbo is still recognized (guess_type_by_name() in
-> > > dtc and the help text of the fdtoverlay program).
-> > >
-> > > It seems that the general .dtso and .dtbo were not popular, so I'm
-> > > going to drop this patch instead of continuing to try to get it
-> > > accepted.
+On Sat, May 29, 2021 at 02:15:55AM +0900, Masahiro Yamada wrote:
+> On Thu, May 27, 2021 at 5:28 AM Michal Suchánek <msuchanek@suse.de> wrote:
 > >
-> > AFAICT .dtbo is moderately well established, and I think it's a good
-> > convention, since it matters whether a blob is an overlay or base
-> > tree, and it's not trivial to tell which is which.
->=20
-> Indeed.
->=20
-> > .dtso is much more recent,
->=20
-> Is it?
+> > On Thu, May 27, 2021 at 03:56:41AM +0900, Masahiro Yamada wrote:
+> > > On Thu, May 27, 2021 at 2:39 AM Michal Suchanek <msuchanek@suse.de> wrote:
+> > > >
+> > > > This reverts commit 243b50c141d71fcf7b88e94474b3b9269f0b1f9d.
+> > > >
+> > > > When packaging the kernel it is built in different place from the one in
+> > > > which it will be installed. After build the makefile needs to be
+> > > > regenerated with the target location but with mkmakefile merged into
+> > > > Makefile tehre is no way to do that.
+> > > >
+> > > > Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+> > >
+> > > My patch was not working as expected
+> > > regardless of packaging.
+> > >
+> > > Does the following fix-up work for you?
+> >
+> > For the packaging I need some way to regenerate the Makefile and fake
+> > the directory where the Makefile will be on the user system (ie DESTDIR)
+> >
+> > Without the mkmakefile I do not see any way to do it.
+> >
+> > If the kernel makefile is no longer location dependent there is no need
+> > any more, of course.
+> >
+> > Thanks
+> >
+> > Michal
+> 
+> Sorry, I do not understand this.
+> 
+> IIUC, this patch does not change any functionality.
+> The generated Makefile is still the same.
+> Why is it a problem?
 
-Well, I wouldn't bet money on it, I just seem to remember encountering
-=2Edtbo for some time before .dtso was mentioned.
+It cannot be regenerated.
 
-> The oldest reference I could find is from May 2015:
-> "[PATCH/RFC] kbuild: Create a rule for building device tree overlay objec=
-ts"
-> https://lore.kernel.org/linux-devicetree/1431431816-24612-1-git-send-emai=
-l-geert+renesas@glider.be/
+During package build you have four directories
 
-Hm, I think .dtbo is even older than that, but again, I wouldn't swear
-to it.
+ - the source directory
+ - the build directory
+ - the staging directory where files are installed to be included in the
+   package
+ - the target directory where files will be installed on the target
+   system once the package is installed by the user
 
-> I have always used dtbo/dtso in my published overlays branches,
-> referred from https://elinux.org/R-Car/DT-Overlays, and used by
-> various people.
->=20
-> > and I think there's much less value to it.
->=20
-> IMHO the same reasoning as for dtb vs. dtbo applies to dts vs. dtso.
-> It matters if the resulting blob will be an overlay or base tree,
-> as the blob will have to be called .dtb or .dtbo.
-> As dtc outputs to stdout by default, the caller has to provide the
-> output filename, and thus needs to know.
-> Even if dtc would name the output file based on the presence of
-> "/plugin/" in the input file, the build system still needs to know
-> for dependency tracking.
+The makefile is generated for the build directory, not the target
+directory. What is needed is a way to generate a makefile in the staging
+directory that will work when installed in the target directory.
+When mkmakefile is folded into makefile the makefile can no longer be
+regenerated because it is up-to-date, and it can no longer be specified
+that it should be generated for the target directory, not the staging
+directory.
 
-Hm, fair point.  I was thinking of the the /plugin/ tag as the
-distinction, whereas dtb is binary and the distinction isn't even
-marked in the header.  But you're right that even readable text labels
-inside the file don't really help make(1).  So, I retract that
-assertion.
+Thanks
 
-> We also do have .dts vs. .dtsi.
->=20
-> Gr{oetje,eeting}s,
->=20
->                         Geert
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---gmPBfyWAmXOSQLgm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmCwZ10ACgkQbDjKyiDZ
-s5I/sBAA0JKiNiETmfLndzpQT9G9iqQKZ1b5A17zh5AnT4c+615XJR0DjNOyyIE7
-IkVFsq2DyvcNBklAsoocoFDmxXs6pAx15tBn1vmmvJbeFhU2p59hjbdMDIF8Hx47
-ouxt9fnkZTqeQWrUwFXcI7wvQ0xaWn9xySCbzykeql+9NSUbE2czNAiLKWl+NJy3
-Twl7D6fuxpOYIrBRsv4bqAVgTyzYn4LeT21p/EmqDO9MFZUUftjrN8+c27Znz4qt
-+Mq9QlSZkNTD7iGMxG3kjdfS7ExCaR3jZ3Y1oeNyx2n8jqyYw3VIgLOJL1xDGwHJ
-scismnPo/lYJR3muiqOJTyWfuqyCwpqEAUEFU+4NEG31MzhgRSgjKBZfjDi+tmtO
-jP+oBPM8VnSTbnimFee2IIUlkv1QekD1IWoBr2eeOY0PCKsi5Uds0JEAgCTfCuqK
-C87v41BOsNooC+QBaWS5JcAtsX6FDZ4j5YYrEL9+pnOntoOKNnCDlnunolGcgy5q
-HxAM68u+3GixptsgDarFM0pcssXbf8/hglsMlHmLuB1qioCexAMCD7/CXLil+ifZ
-q9fNjRlI7WvUaNy5ldtnHrQatE+Gds9fx8cRPfh0zYAOpIyWp67+MKVHyKWYVmmX
-z+RJdQ1/dF+CNn0nRlFR+QAs4PO4wXWJoIfMci+rKlT/9lANEwk=
-=gl/K
------END PGP SIGNATURE-----
-
---gmPBfyWAmXOSQLgm--
+Michal
