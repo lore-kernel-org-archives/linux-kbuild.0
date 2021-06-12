@@ -2,87 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82055C47094
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Jun 2021 12:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FA83C48BCF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Jun 2021 04:03:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F67061406
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Jun 2021 12:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49E6561285
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Jun 2021 04:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbhFJMao (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Jun 2021 08:30:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53092 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230313AbhFJMan (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Jun 2021 08:30:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5E9A9613FF;
-        Thu, 10 Jun 2021 12:28:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623328127;
-        bh=oM8Xy2d4wRrsobuhLSoo6NIi3h4j+xja59Yg4YTixBw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=C0JM370Zn9XSAXrX0rvJQqL0iMUHJUCv1yxzYh531URiNLAvW+TeJpduq1s0suThX
-         8zaVmM2dxW6+cdXLkoOC+MgT16XtWz0iVwJbxKY7Oq4jh9X18sUmhf9xh3I3cF3VZa
-         dOZ7hs5U+XoNp4mslgZC3U822pTOp2/XgPnZMyHvRLTz/5rIAu1yaxVH+I9+m4v7Oa
-         NGwUr78YvKUquAdtAbiuVjL2TSmajRGpOC7fkxXCnfrXCqHlKn2vUbifmaOZCN0frw
-         T6GakEGYg1Px0tp0s3/H/MReuQ/atseQ1PViLsxkFE/iLqmHRa707YFWlF28/g59pE
-         Y41ufH40UzjeA==
-Received: by mail-wm1-f50.google.com with SMTP id h11-20020a05600c350bb02901b59c28e8b4so5956827wmq.1;
-        Thu, 10 Jun 2021 05:28:47 -0700 (PDT)
-X-Gm-Message-State: AOAM531Bie7bvYcwjFjaVzDQMRKo7+bjYq3E5qd9Jo1v+ATCUend0ayI
-        X05/1UlfIGwdLqaCYkkeruzGod5kQz+IkfbZCro=
-X-Google-Smtp-Source: ABdhPJwBHRvZvUbFL9UBAe/5V1ayCpUBjyRB67fB7fC88KdQAAnpTCYoX7GDjBqcyIt1zA/+d1+HlHBvBQ5DCiAiACY=
-X-Received: by 2002:a1c:c90f:: with SMTP id f15mr14938844wmb.142.1623328125935;
- Thu, 10 Jun 2021 05:28:45 -0700 (PDT)
+        id S229537AbhFLEFm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 12 Jun 2021 00:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35048 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229532AbhFLEFl (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 12 Jun 2021 00:05:41 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D75FFC061574
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Jun 2021 21:03:30 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id s14so6026576pfd.9
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Jun 2021 21:03:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aUYw1rF6lNo0RlpPe8Cbpvir2/VmMmKML9LcqMUK4/Y=;
+        b=PLC+hrnjJ5jNFsdK4UBJJDj9hLsS2NdpjH54e2TZaja99KW+3nyoRkGEsONi2D20cZ
+         TYBYy/pLDp/t4DG3dE4FfrtHqqNxp43Y85CMS9pd+nE/bi+kdwbSnPGdAWMDUI3UrC9p
+         6U2eIvFQQ4+6UEXLpb8x0SPPZgYBjlM38/3I/72mDfp9o9+j6brDOzeTn1ApBWMv7HgZ
+         mQ1COAU7OYt2MNbLWnF40lPHo+yHHJ0Rg7KESVsnlAGgKMXiTsMbX6jWkvfV+sRcRlN8
+         sRQqvz3Wy7+wAN3wBTOVAB734G9mOsuIU5JwzmxDAnOtPSTSwnqVkQk8zMxb8g31BIPL
+         IDgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aUYw1rF6lNo0RlpPe8Cbpvir2/VmMmKML9LcqMUK4/Y=;
+        b=eqqXa5LR4eMbZXl2I1n4Xfk/m0jjhV7AxxysS4GxaEjumyo2KXiZoz5BARszMxbBDD
+         8cNWmjMSjiRLPxyIVPozo5DuaCoOaO+uJwFAIM1qGtK2q/bSa++DtY9vhXcjgaJCq0GZ
+         Z0ncYDJ+PDdHwMatJs38v0hw205JYrVHl5LFa1SVbejFTzRTzxcvCls+/0nq/kcM7Mjf
+         hJrvD38TrOO+/Zqrms7werPVdl3kYF6Fd/3RRwbGjfKLCjLP6VBM6hU5i3+qOO/Q6fQK
+         /kEarV2GSSpBlCjVEJYfxycfyc9o9QQJE1wGO7U3LfS9nCw3IbFI9IXVqG7WQi6rjMwf
+         IFAg==
+X-Gm-Message-State: AOAM532DzsadtA2sOmWzZhSS18ezWhttyH7gVNrDPBM/r4egBQtX/zGG
+        0WLK7fVyf8MLfLnrnBO+NWtLJCV/A/Tk+P3Zzse36t3DUUh0cw==
+X-Google-Smtp-Source: ABdhPJw86Yjht37udSzvyqnK2q271WrFveGy/Ls2f+OTr8aBC1nSkrxhsTe6L+j9KT3hJbYOOkgYbBFASI8Zyv/B2QU=
+X-Received: by 2002:a65:60c5:: with SMTP id r5mr6746316pgv.79.1623470610291;
+ Fri, 11 Jun 2021 21:03:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210204152957.1288448-1-arnd@kernel.org> <20210609110531.GA1528247@roeck-us.net>
- <CAK8P3a2cVpJf+r2b-8YCbknOeOA4w=bY8njr-+vmzbmm8AAC3Q@mail.gmail.com>
- <20210609151608.GA3389541@roeck-us.net> <20210609191553.GA2535199@roeck-us.net>
- <CAK8P3a1kgc6+fSHr7ddMRHxh+znW6jL2ZSo=JLWa-Uuzw7UZ-w@mail.gmail.com> <20210610120531.GA711216@roeck-us.net>
-In-Reply-To: <20210610120531.GA711216@roeck-us.net>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Thu, 10 Jun 2021 14:26:50 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a2LTXme3pa-es=7s7aHX2EvC+2Dxegs=reuJrjeS4sygg@mail.gmail.com>
-Message-ID: <CAK8P3a2LTXme3pa-es=7s7aHX2EvC+2Dxegs=reuJrjeS4sygg@mail.gmail.com>
-Subject: Re: [PATCH] kallsyms: fix nonconverging kallsyms table with lld
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        David Brazdil <dbrazdil@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Mikhail Petrov <Mikhail.Petrov@mir.dev>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Marty Faltesek <mfaltesek@google.com>
+References: <CAGRSmLsJmR_NFcovYSP-gK52qDASP4csbaOjx2Sfk9HvhHvAfQ@mail.gmail.com>
+ <CAGRSmLtsWvPhbmEkLNWC8FAtkvXBWSBRunAKNYUCRah2m+y2sQ@mail.gmail.com>
+ <CAK7LNASoK0yhDdeoj1GPELTQ_sz3h=aVdTPUNj-4m6Zacj1fvw@mail.gmail.com>
+ <CAGRSmLtY0WejKxNJ3xggPivmYhTK6tQ7LSfEZHtAaJQCQHdeTw@mail.gmail.com>
+ <CAGRSmLsCOTxYD3nA-JTNBeVA0aAe8RTGkj18pSBJKMYAtqiQXg@mail.gmail.com>
+ <CAGRSmLvQ+BCGJDdSW0JEjeGHznu4vbosxBLSF28RFvbQ_x7AsA@mail.gmail.com>
+ <CAGRSmLu5r4Jrq9C-2B7U6gueKK6B86+yWUJS_J=X10ZDwkzdQQ@mail.gmail.com> <CAGRSmLvFh_DpPqyhq7qzeLHmQYQOeYSR6JVMXRdksFdQr3sNUw@mail.gmail.com>
+In-Reply-To: <CAGRSmLvFh_DpPqyhq7qzeLHmQYQOeYSR6JVMXRdksFdQr3sNUw@mail.gmail.com>
+From:   "David F." <df7729@gmail.com>
+Date:   Fri, 11 Jun 2021 21:03:18 -0700
+Message-ID: <CAGRSmLs0eFic7vFKMwHWKj1-Ougmz+ET2qGNnd7Mr5=eV9ZaCA@mail.gmail.com>
+Subject: Re: 5.10 build issue creating library for driver support.
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jun 10, 2021 at 2:05 PM Guenter Roeck <linux@roeck-us.net> wrote:
-> On Wed, Jun 09, 2021 at 10:30:23PM +0200, Arnd Bergmann wrote:
-> > > I thought I'd see the added symbols, but it looks like the only difference
-> > > between the two files is the addresses.
-> > >
-> > > What am I missing ?
-> >
-> > I probably misremembered the part about 'objdump --syms' and there was
-> > something more to it.
-> >
-> > Maybe this was the last version before converging? It looks like the '<' version
-> > has one extra symbol ompared to the '>' version. The diff has no context, but I
->
-> It is the difference between step 1 and 2. Why would diff on objdump not
-> show the additional symbol ? Is it possible that the symbol is not added
-> to the object file ?
+The problem is: No rule to make target '/path/to/sourcefile.o', needed
+by '/path/to/lib.a' Stop
 
-Note sure. The symbol must be in the object file, but perhaps the
-'objdump --syms' output skips a different set of symbols compared
-to the list that is used as input for kallsyms, which comes from '${NM}'.
+I now know it's related to sourcefile being a .cpp file.  I've looked
+for differences between 5.4.x and 5.10.x and didn't see any.  Note I
+have this in my make file that seems to be ignored which is the
+problem:
 
-Comparing the nm output might be another thing to try.
+# pattern for compiling the c++ parts
+%.o: %.cpp $(FLAGS)
+$(info doing [$@])
+$(Q)g++ `cat $(FLAGS)` $(CC_FLAGS) -fno-exceptions -fno-rtti -Wall -c -o $@ $<
 
-      Arnd
+UPDATE: Found the problem.  Removing the $(FLAGS) from the first line fixed it:
+
+# pattern for compiling the c++ parts
+%.o: %.cpp
+$(info doing [$@])
+$(Q)g++ `cat $(FLAGS)` $(CC_FLAGS) -fno-exceptions -fno-rtti -Wall -c -o $@ $<
