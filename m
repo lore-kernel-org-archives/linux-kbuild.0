@@ -2,127 +2,135 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3962AC49361
-	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Jun 2021 09:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F90C49361
+	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Jun 2021 18:16:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10B9B613C1
-	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Jun 2021 09:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D877610A5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Jun 2021 18:16:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbhFQJUw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 17 Jun 2021 05:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50440 "EHLO
+        id S232973AbhFQSSd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 17 Jun 2021 14:18:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231491AbhFQJU2 (ORCPT
+        with ESMTP id S232879AbhFQSS3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Jun 2021 05:20:28 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF3BC061760
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Jun 2021 02:18:20 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id f16-20020a05600c1550b02901b00c1be4abso5876915wmg.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Jun 2021 02:18:19 -0700 (PDT)
+        Thu, 17 Jun 2021 14:18:29 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F29C06175F
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Jun 2021 11:16:21 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso5851005pjx.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Jun 2021 11:16:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=9BepfpuI4gTK3FDci2Lw1qhlFFFZ3rGxYCCkc+cXF5A=;
-        b=rEJJW1nGT5ylLY1WRR4sbUmeZ+p69uWBzd918Tu6NWXyw8VSh+KQa6pYyJAWoYqaLQ
-         SzDs7ugq8o7Y//fBT9oADwN+jcDPoRyabCUpBKHewMC+2S0XY++dYKEhC/EUtMecou+N
-         jV5e/igrVRQ2jSRPsXRaS8Y2MAU/20IcwzZR7EGTuGshicwMsn4hYr18RP7cOeZgLJoE
-         7zt7Awhz2L2OnsrCfo+uIBsAfgeX0mhS6hCbr/e8VfL6oURjdrApFJaLIsOOlHMpIuT4
-         6KOtpNt1NwQWzzMRqiPE8/L6tP4x5/gf0J+y32KCqGHNmyGojBowXqx6hPaLukvnOqzh
-         hD2A==
+        bh=KRi/QXe0LQzMi+6pLeInEK4KzKA0hEwqTLci8VnoWbw=;
+        b=KbyM6iG9HXDNGfRNYStr2s8SyPWsQZtjPlPad/4hLqGHkDrCbaOZGleaLH7yVwgmnE
+         ECfgkecSAKpwK/B66+nzo5bNna84QPwgFYhu7AmR3LnKnwV3WlgYZmTaVEAuCUbaEqk5
+         uClapizSWOCsf6X1YtOqZ+HiL0Z8/VmrFu6ZA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=9BepfpuI4gTK3FDci2Lw1qhlFFFZ3rGxYCCkc+cXF5A=;
-        b=NdEvZJVPZ+XQfsg2mhtBWNENCxRztBPJAqGZhqNA2VO7L+fGh4dOoBbx1KuCkKpQa5
-         0Udz/folD9lEQ02BMWMQeWeyrtCTo60UBSsUT4D7XKvHjGbu2ES2CmYI42eP6yNuAPHp
-         Uq53QNckp4ZApeRct4GG+dWJNgqUW7sTlC2vRGYjfFcXNGclNODFujujYLUHw34IAFVT
-         GxHrYTFCrY3WmLxiAt+SIt+zvShGr2cNgp2pGNrofQIfWdbWBNKJvLXdjJp/hanoQkzR
-         J5fksZNCXx1gmlGgwcvYyW1dKGo8FAnv8HM2CUNyCsXcFPzAXznr56S8/vgPGvW/HJic
-         jukg==
-X-Gm-Message-State: AOAM533/wzJBWRy+xVeibCnxXpdR1g4v77nFxq0NR/u3gpiJHekXoC9h
-        Q4+L5aFAmLBivv0xIFKTboilAg==
-X-Google-Smtp-Source: ABdhPJxTg0xGDQpF89VezzMjDxw0WHX0T5a/cJf/rozDCBGUj8PS8Tt5YHO54OPysoA+ej/KVYtqrg==
-X-Received: by 2002:a1c:5418:: with SMTP id i24mr3926482wmb.1.1623921497930;
-        Thu, 17 Jun 2021 02:18:17 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:dde2:86fa:532c:18b9])
-        by smtp.gmail.com with ESMTPSA id p13sm3711248wrt.89.2021.06.17.02.18.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jun 2021 02:18:16 -0700 (PDT)
-Date:   Thu, 17 Jun 2021 10:18:16 +0100
-From:   Matthias Maennich <maennich@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Cc: Android Kernel" <kernel-team@android.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH] kbuild: mkcompile_h: consider timestamp if
- KBUILD_BUILD_TIMESTAMP is set
-Message-ID: <YMsTWAYSV1ZZFYvH@google.com>
-References: <20210612141838.1073085-1-maennich@google.com>
- <CAK7LNAQkoqTG540EOER27G83z+DO5fkeHi-in-vRYkrbX-o0cg@mail.gmail.com>
- <CAK7LNAR=Fwzio6CQqDOYQJj9tYrf5a_-sYQ+Yr2=Qt5cYq8wOA@mail.gmail.com>
+        bh=KRi/QXe0LQzMi+6pLeInEK4KzKA0hEwqTLci8VnoWbw=;
+        b=ln0tPpFKplMjcNuwz+HzDHemTtCIbgaJmPaNhRgvt2xhBuJ2GNmG8gs19vuTw9v5uN
+         bWFiq6u8LXGkSri5YKcy6e/Sko73sH9HfTXgzIw30W7uDON7SsuCL1a3BUJ+1bRnXsh1
+         fOzWELH1xbxiGxTEq9+QJqd0G40VMdy+XwvjLODhaKhR8uJiueH09xjyD4p1HG/tfqDL
+         pXvRWPAtjth570Ye65Ckl3fpd6bmFYHRhGRTsK4vOyR6BOljZ8XyAYN/hpavvtXH6TVC
+         eFWT8oUoTZ9WBNt4YdJU5APLH9GSQBf+27Q6umhYPV2vYRB3EZ32jexNL4LvrOqgAJbz
+         aKgQ==
+X-Gm-Message-State: AOAM533ECxTCj3/J8zvD3/rERydZW4jKqDpIiW3gCNCyDM3mi3+3Hhpw
+        gD2KHRduVTGksn5+ZpQ2t7DjWg==
+X-Google-Smtp-Source: ABdhPJwyJh/y5CCBFcqljYWo6aGyOfV35EucM7MER7B58+2F4yHzGguVOx690nkwweau6nsqLwS7Vw==
+X-Received: by 2002:a17:90a:6001:: with SMTP id y1mr17085610pji.5.1623953780486;
+        Thu, 17 Jun 2021 11:16:20 -0700 (PDT)
+Received: from localhost ([2620:15c:202:201:14b4:cd2e:dd64:19e8])
+        by smtp.gmail.com with UTF8SMTPSA id n8sm9069159pjo.1.2021.06.17.11.16.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 11:16:20 -0700 (PDT)
+Date:   Thu, 17 Jun 2021 11:16:18 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-usb@vger.kernel.or, lkft-triage@lists.linaro.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [next] [arm64] allmodconfig build failed - xhci-plat.c:427:
+ undefined reference to `onboard_hub_destroy_pdevs'
+Message-ID: <YMuRcrE8xlWnFSWW@google.com>
+References: <CA+G9fYu6er1nZ602gCnrY+-JNtDHrUJk-RH2biPmjRoe06_m4Q@mail.gmail.com>
+ <YMtSFVg6UoOpDqIP@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK7LNAR=Fwzio6CQqDOYQJj9tYrf5a_-sYQ+Yr2=Qt5cYq8wOA@mail.gmail.com>
+In-Reply-To: <YMtSFVg6UoOpDqIP@kroah.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 10:43:19AM +0900, Masahiro Yamada wrote:
->On Thu, Jun 17, 2021 at 10:05 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->>
->> On Sat, Jun 12, 2021 at 11:18 PM Matthias Maennich <maennich@google.com> wrote:
->> >
->> > To avoid unnecessary recompilations, mkcompile_h does not regenerate
->> > compile.h if just the timestamp changed.
->> > Though, if KBUILD_BUILD_TIMESTAMP is set, an explicit timestamp for the
->> > build was requested, in which case we should not ignore it.
->> >
->> > If a user follows the documentation for reproducible builds [1] and
->> > defines KBUILD_BUILD_TIMESTAMP as the git commit timestamp, a clean
->> > build will have the correct timestamp. A subsequent cherry-pick (or
->> > amend) changes the commit timestamp and if an incremental build is done
->> > with a different KBUILD_BUILD_TIMESTAMP now, that new value is not taken
->> > into consideration. But it should for reproducibility.
->> >
->> > Hence, whenever KBUILD_BUILD_TIMESTAMP is explicitly set, do not ignore
->> > UTS_VERSION when making a decision about whether the regenerated version
->> > of compile.h should be moved into place.
->> >
->> > [1] https://www.kernel.org/doc/html/latest/kbuild/reproducible-builds.html
->> >
->> > Cc: Masahiro Yamada <masahiroy@kernel.org>
->> > Cc: linux-kbuild@vger.kernel.org
->> > Signed-off-by: Matthias Maennich <maennich@google.com>
->> > ---
->>
->>
->> Applied to linux-kbuild. Thanks.
+On Thu, Jun 17, 2021 at 03:45:57PM +0200, Greg Kroah-Hartman wrote:
+> On Thu, Jun 17, 2021 at 07:09:15PM +0530, Naresh Kamboju wrote:
+> > The arm64 allmodconfig build failed on Linux next 20210617 tag due to
+> > the commit,
+> > 
+> > c950686b382d ("usb: host: xhci-plat: Create platform device for
+> > onboard hubs in probe()")
+> > 
+> > build error:
+> > ------------
+> > aarch64-linux-gnu-ld: drivers/usb/host/xhci-plat.o: in function
+> > `xhci_plat_remove':
+> > drivers/usb/host/xhci-plat.c:427: undefined reference to
+> > `onboard_hub_destroy_pdevs'
+> > drivers/usb/host/xhci-plat.c:427:(.text+0x82c): relocation truncated
+> > to fit: R_AARCH64_CALL26 against undefined symbol
+> > `onboard_hub_destroy_pdevs'
+> > aarch64-linux-gnu-ld: drivers/usb/host/xhci-plat.o: in function
+> > `xhci_plat_probe':
+> > drivers/usb/host/xhci-plat.c:379: undefined reference to
+> > `onboard_hub_create_pdevs'
+> > drivers/usb/host/xhci-plat.c:379:(.text+0x131c): relocation truncated
+> > to fit: R_AARCH64_CALL26 against undefined symbol
+> > `onboard_hub_create_pdevs'
+> > make[1]: *** [Makefile:1252: vmlinux] Error 1
+> > make[1]: Target '__all' not remade because of errors.
+> > make: *** [Makefile:222: __sub-make] Error 2
+> > make: Target '__all' not remade because of errors.
+> 
+> Matthias, this is due to your patch, yet-another config option mis-match
+> somewhere. Can you please fix it up?
 
-Thanks!
+I can repro this with:
 
->>
->
->This may not be a big deal, but when KBUILD_BUILD_TIMESTAMP is unset,
->the timestamp is not updated.  It still has a user-specified string.
+make -j 16 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+  KCONFIG_ALLCONFIG=arch/arm64/configs/defconfig allmodconfig kernel modules
 
-I think treating this like any other 'random' prior timestamp is ok.
-So, I agree: not a big deal.
+This results in:
 
-Cheers,
-Matthias
->
->
->
->
->-- 
->Best Regards
->Masahiro Yamada
+CONFIG_USB_XHCI_PLATFORM=y
+CONFIG_USB_ONBOARD_HUB=m
+
+The following Kconfig dependency was supposed to prevent this scenario:
+
+config USB_XHCI_PLATFORM
+        depends on USB_ONBOARD_HUB || !USB_ONBOARD_HUB
+
+But apparently this isn't the case.
+
+With the above allmodconfig command the following warning is emitted:
+
+WARNING: unmet direct dependencies detected for USB_XHCI_PLATFORM
+  Depends on [m]: USB_SUPPORT [=y] && USB [=y] && USB_XHCI_HCD [=y] && (USB_ONBOARD_HUB [=m] || !USB_ONBOARD_HUB [=m])
+
+I read through kconfig-language.rst multiple times, but it's still not
+clear to me how to specify this dependency properly.
+
+Masahiro/Greg, do you have any pointers?
