@@ -2,78 +2,78 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8E3C2B9F4
-	for <linux-kbuild@archiver.kernel.org>; Sat, 19 Jun 2021 11:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60969C49EA2
+	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Jun 2021 08:09:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9345061279
-	for <linux-kbuild@archiver.kernel.org>; Sat, 19 Jun 2021 11:32:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42876611AC
+	for <linux-kbuild@archiver.kernel.org>; Sun, 20 Jun 2021 08:09:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233756AbhFSLeb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 19 Jun 2021 07:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42332 "EHLO
+        id S229516AbhFTIL1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 20 Jun 2021 04:11:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233146AbhFSLeb (ORCPT
+        with ESMTP id S229524AbhFTILZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Jun 2021 07:34:31 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69842C061574;
-        Sat, 19 Jun 2021 04:32:20 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id c138so17794661qkg.5;
-        Sat, 19 Jun 2021 04:32:20 -0700 (PDT)
+        Sun, 20 Jun 2021 04:11:25 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A30EC061760
+        for <linux-kbuild@vger.kernel.org>; Sun, 20 Jun 2021 01:09:13 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id i24so3893575edx.4
+        for <linux-kbuild@vger.kernel.org>; Sun, 20 Jun 2021 01:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wzF+HDIW4RpiFDwS3pehtK/Z2s3VtrcKXebmPCvAZ0Q=;
-        b=X+Qf5RWTBKQu6s7dtYculR2/zvfqf8gdMKqjVYzEv3qNetrKxMPAZvzz1cv4lqJJCZ
-         BrrhDIMj1wZnX/GbuH72DXqZH4gxo2hEmwxP9FXWh3fWaUR2BOkRNxB0vpdLjw/HVo95
-         dJPnzLlar08ywytPHAaNIBGbK56LyRTP1xkBdF3gdbQ0V/1IojPRvl6Rm80Ee4IEqPJV
-         l0Ldrs566oPH7TDjkfqgZ7pzyBXDroT3o5goUsH1lgBiK/2WWPFpdeOzG+YmgDi4HRov
-         ufMvi8cIShMHu3HgzKIU9+Vdu0Rd1+Zsv+fBgfiZ/XPBdcI+QUtLuzws+6HLXwOpEN33
-         WJ0g==
+        bh=sjSERqxDFGCyYrNN/qxA0ZiGx1EeVNWA0j1N532j0OQ=;
+        b=O2mTGoMFVrnU3bwMOM112hgs3Z+LFM4ZVxbnAnn0MS6irjyF75/GvO5dfdLXAua/jf
+         Xr9hkcbrhzoJeXx749WGZo5lY1lvdo6hJxC4KFtzwB3jn1rRG7394JGVBvd0Ob/gP29q
+         a47ABW2L/YWjZLpn8qksbTNjdDK2Sx1CAVTfSy9CedEO1bOiy1EXeBESvHoVdA4N6qK6
+         XkfOlaniy9s4/al3V9Uk7xVW+8qhPb4i3Vm77HwnS4TAGg97oj4vJcU7qPGsWdNNr42U
+         7lcG6SaugtzlbgSzIq8V+B9eXVuT+24QuimRe1JDeLCLqVDFQ4nZyLGgsg6Sb7ivd1LT
+         24tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wzF+HDIW4RpiFDwS3pehtK/Z2s3VtrcKXebmPCvAZ0Q=;
-        b=jDuDNqsTt12tdy873VUmv8k8LBO7zNtHau86E2qkbO/8Cuo83kQpFvc6wSpSdbnTgh
-         SM4KBogxIbCgFULJ/Y3CJS4wyw5J01btkg6acesDY+yfI673ZtokYSYGGEgmgbsZZUcD
-         IH0M882gwDJNJ+eygpLUfAL6RHtFrVmH8Up5a0Gte26PkPkq1hf15G0MHuA2pQE76kTY
-         1MSyCk/5y5CbxHKRAroADIjN5LqTsYmin1uM+8JRGDCBoh2mwrgIGcXGXqGM/ZlV0g5e
-         0tU/k/Xx91zeS+nbUwr7ya0hY4hcAh50sDW68HgN8086oNiUPvE+9363roz3X1n/W+8r
-         Z90A==
-X-Gm-Message-State: AOAM533RIEq3oR9SdwXA3anNPu0oOpckOpSBqyxcUYuwV47Hp1UVj7ha
-        b5PPmU+HKrfCDVJqtJatUDZxAcluG3jIoJTFMWA=
-X-Google-Smtp-Source: ABdhPJx92e5rLjLDFjNc+QgHX4Z6IHN/Br95iCNXiblcUb6SA9kzIrWK8a3IFw+BgDRLkdt6KKpgOVMgSlR04EbJ/MA=
-X-Received: by 2002:a25:880f:: with SMTP id c15mr18259680ybl.247.1624102339591;
- Sat, 19 Jun 2021 04:32:19 -0700 (PDT)
+        bh=sjSERqxDFGCyYrNN/qxA0ZiGx1EeVNWA0j1N532j0OQ=;
+        b=mMv57TmI3w6AT5S1ku+TSwX9nFtD5oApV2NzsiZviMJUaiqtE9R+UG5l/kvy8Z0/iM
+         HMHCUIaKk17OZox3ka0oXhxATQ4KJSJUyquZnWMO/HyEaCZfd3kjVnv4o6PtqUhaoumL
+         SbBpuDLcsurRMAW75QcfUluIZgtCQlmA9/t/CACXm1oSkmII+j1sFonoPCLqScqigyW6
+         Ou3NTpLXfoOSM2W9NZKfxK8lgOd/pYeTMGOUNhhJMgnh0ZgqKqOi7PXpCYVedtPkgJbm
+         ksRxqgho4EJeBCt2PDltOREyQF7JwnLQVVoLk6p5XpBh5DBOYJUtnLlP84qkgTBw8fmp
+         xNOw==
+X-Gm-Message-State: AOAM533LkQZmBKf3MrxOBAju/ppoAZqLtjlbC8TIO2EdY7Fz4QGHF87Q
+        cOfbpDOE5lx9zZDiv7AnpII9Kptm5XtmzsCElHMs
+X-Google-Smtp-Source: ABdhPJxRZvXKUEReti5s+grcd26OnOp3TX95hRrWOLTxyIX7eH6LObWJfBvB5fJdxksmCiFp5/LqjsTtg64W+ZisT2k=
+X-Received: by 2002:a05:6402:946:: with SMTP id h6mr14509058edz.261.1624176549643;
+ Sun, 20 Jun 2021 01:09:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210618233023.1360185-1-ndesaulniers@google.com>
- <20210618233023.1360185-2-ndesaulniers@google.com> <CANiq72kjyiAQn2+ijZKFo7SY3z+dCV6fGXYP1O_Mq7Ui3EqSzQ@mail.gmail.com>
-In-Reply-To: <CANiq72kjyiAQn2+ijZKFo7SY3z+dCV6fGXYP1O_Mq7Ui3EqSzQ@mail.gmail.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Sat, 19 Jun 2021 13:32:08 +0200
-Message-ID: <CANiq72nbbqeD2dv3z0y3rN-_kdnh=9-pD7oSyWUfaG8oJ2y_8A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] compiler_attributes.h: define __no_profile, add to noinstr
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Kees Cook <keescook@chromium.org>,
+References: <20210618233023.1360185-1-ndesaulniers@google.com> <202106181945.AC10BF38ED@keescook>
+In-Reply-To: <202106181945.AC10BF38ED@keescook>
+From:   Bill Wendling <morbo@google.com>
+Date:   Sun, 20 Jun 2021 01:08:58 -0700
+Message-ID: <CAGG=3QXcn0QMGj0AB9N2cSHHGpCmYWg-3Wq8M1jLM2AehEWh5A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] no_profile fn attr and Kconfig for GCOV+PGO
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Bill Wendling <wcw@google.com>,
         Sami Tolvanen <samitolvanen@google.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
         Nathan Chancellor <nathan@kernel.org>,
         Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
         Ard Biesheuvel <ardb@kernel.org>,
         Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
         Andrew Morton <akpm@linux-foundation.org>,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Borislav Petkov <bp@alien8.de>, Martin Liska <mliska@suse.cz>,
@@ -89,24 +89,24 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jun 19, 2021 at 1:26 PM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
+On Fri, Jun 18, 2021 at 7:45 PM Kees Cook <keescook@chromium.org> wrote:
 >
-> I am not sure if it is best or not to have the GCC link in order to be
-> consistent with the rest of the links (they are for the docs only). Do
-> we know if GCC going to implement it soon?
+> On Fri, Jun 18, 2021 at 04:30:21PM -0700, Nick Desaulniers wrote:
+> > When we say noinstr, we mean noinstr.  GCOV and PGO can both instrument
+> > functions. Add a new function annotation __no_profile that expands to
+> > __attribute__((__no_profile__)) and Kconfig value
+> > CC_HAS_NO_PROFILE_FN_ATTR.
+> >
+> > Base is
+> > https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=for-next/clang/pgo.
+> >
+> > Nick Desaulniers (2):
+> >   compiler_attributes.h: define __no_profile, add to noinstr
+> >   Kconfig: CC_HAS_NO_PROFILE_FN_ATTR, depend on for GCOV and PGO
+>
+> Oh, awesome! Thanks for the fast work on this. If there are no objections,
+> I'll apply this in front of the PGO series and put it in -next.
+>
+That works for me! Thanks, Nick and Kees!
 
-i.e. if GCC does not implement it yet we use elsewhere this kind of
-marker instead:
-
-     * Optional: not supported by gcc
-
-The first of its kind, normally it is clang/icc there ;-)
-
-We could nevertheless have the link there, something like:
-
-    * Optional: not supported by GCC
-                https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80223
-
-Cheers,
-Miguel
+-bw
