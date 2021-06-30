@@ -2,150 +2,95 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F45C11F64
-	for <linux-kbuild@archiver.kernel.org>; Mon, 28 Jun 2021 22:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A251C11F65
+	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Jun 2021 12:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C93161CF9
-	for <linux-kbuild@archiver.kernel.org>; Mon, 28 Jun 2021 22:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21533619A0
+	for <linux-kbuild@archiver.kernel.org>; Wed, 30 Jun 2021 12:14:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231791AbhF1WJu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 28 Jun 2021 18:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54020 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237053AbhF1WJW (ORCPT
+        id S234404AbhF3MRZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 30 Jun 2021 08:17:25 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:48706 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234376AbhF3MRZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Jun 2021 18:09:22 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC565C061760
-        for <linux-kbuild@vger.kernel.org>; Mon, 28 Jun 2021 15:06:54 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id u8so6772242qvg.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 28 Jun 2021 15:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Jcq/hdU8FtBDL0LhhuBTnqNe3arqNOFmBPel6E2TbbY=;
-        b=wFOZvFygswM6iCjB0leZ3gKdj9QSe/sMsQsLOSJ3BgMaxFIxMZw5OLY3S/lM8TYN+4
-         F6wQyPrGlhMiyu07L1D+bcUEEGff7b7lY2LFsu0Jd7ayp9ZpI2iu2kEVc+vAwvMoXCyC
-         Cz99MBd0i0faS6BB0aNwDKuWyDPtIjTT8tpaL+M+aaribJqEud6BOY9EANrsA9cjk7uL
-         eFWViBHvyri+4ORayIUaUsi1+zed/m0i+zJw1Z2gfyE+ufRiFdBlSVcH+br0ts5WW0vv
-         yM/VZTsURWHt5/KvcJxifS+zSiIl533aPI87N8ZrOn2k/myh6flfW8Em/lWk5txXjA1r
-         LwYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Jcq/hdU8FtBDL0LhhuBTnqNe3arqNOFmBPel6E2TbbY=;
-        b=nhRW5Ej3mSKyH4Ib+HD5eCea77bxXNVlqTtxNdLLr4wTTGPPqGReko0EHHDhVX9cAj
-         0NWaDGz21rS6FzytHyTvFZCoyowTERa0YeT8lwEsiduxYNU+Qandxyi6EIu8/qFf/cNg
-         BC39NEBBuQc7cug9QEnybTcpmPtj5eSs6jR9tt590r8Eu8JeJ1y/nOd5Mop6l1rdZEtb
-         RLA2wCAIIB4EyhQbOmWfx7RiEedLVqScsyAIsW/N7RZPRZHs+Y2MQJ/zqp5xWuA/YSq2
-         X6fTviytWpGIz3/zldBGAbBeBWsMMWycXY+mmpNBToEf4HFPkEuOGFW2p3WaLLz7hzQU
-         GuaQ==
-X-Gm-Message-State: AOAM531qPvPnYnZbifp5dOz4ne5K8AjGy1zpdkfBxgJLDYJ8qG4TiDJQ
-        GIVd8GprLYIHbjplkD8daw2KzmG1PGOvwaLMHQlQxg==
-X-Google-Smtp-Source: ABdhPJzlqSC7LidZu3Vzdce3XMdQrcR76aWc7WQeGFXeqqIhywxqoS8WZCtNnPTE9vrwoCkmEBNKI/zu4sQi0QO2/Ko=
-X-Received: by 2002:a05:6214:1cb:: with SMTP id c11mr27668985qvt.47.1624918013874;
- Mon, 28 Jun 2021 15:06:53 -0700 (PDT)
+        Wed, 30 Jun 2021 08:17:25 -0400
+X-UUID: 9d6fbbcc74bf4ff4af69faa03283266a-20210630
+X-UUID: 9d6fbbcc74bf4ff4af69faa03283266a-20210630
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
+        (envelope-from <lecopzer.chen@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 529085922; Wed, 30 Jun 2021 20:14:51 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 30 Jun 2021 20:14:50 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 30 Jun 2021 20:14:50 +0800
+From:   Lecopzer Chen <lecopzer.chen@mediatek.com>
+To:     <keescook@chromium.org>, <samitolvanen@google.com>,
+        <linux-kbuild@vger.kernel.org>
+CC:     <clang-built-linux@googlegroups.com>,
+        <linux-kernel@vger.kernel.org>, <yj.chiang@mediatek.com>,
+        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        Lecopzer Chen <lecopzer.chen@mediatek.com>
+Subject: [PATCH 0/2] Kbuild: lto: add make version checking
+Date:   Wed, 30 Jun 2021 20:14:34 +0800
+Message-ID: <20210630121436.19581-1-lecopzer.chen@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-References: <20210513151800.1059435-1-dmitry.baryshkov@linaro.org> <CAL_JsqLtaJ43Y5ySEK5OraScigEO_OD3TMoy6DYFREK7kh=uFg@mail.gmail.com>
-In-Reply-To: <CAL_JsqLtaJ43Y5ySEK5OraScigEO_OD3TMoy6DYFREK7kh=uFg@mail.gmail.com>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date:   Tue, 29 Jun 2021 01:06:42 +0300
-Message-ID: <CAA8EJppSTwrm=8d54OfgagNH7Q8i1uZHko9fZU2gRNZUe23-WA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: allow checking single device tree file
-To:     Rob Herring <robh@kernel.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Rob,
+LTO with MODVERSION will fail in generating correct CRC because
+the makefile rule doesn't work for make with version 3.8X.
 
-On Wed, 19 May 2021 at 16:43, Rob Herring <robh@kernel.org> wrote:
->
-> On Thu, May 13, 2021 at 10:18 AM Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
-> >
-> > Add support for testing single device tree file by running
-> > 'make tree.dt.yaml', e.g. 'make ARCH=arm64 qcom/qrb5165-rb5.dt.yaml'.
-> > This looks useful for checking idividual changes to dts files.
->
-> typo
->
-> I'd rather not expose .*.dt.yaml as I want to make checking not
-> optional and I have some plans of integrating the schema checks into
-> dtc which would eliminate .dt.yaml files. Instead, I think %.dtb
-> targets should run the checks always.
->
-> >
-> > Cc: Rob Herring <robh@kernel.org>
-> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> > ---
-> >  Makefile | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 53d09c414635..b36a3d48eb68 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1383,6 +1383,10 @@ ifneq ($(dtstree),)
-> >  %.dtbo: include/config/kernel.release scripts_dtc
-> >         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-> >
-> > +%.dt.yaml: include/config/kernel.release scripts_dtc
-> > +       $(Q)$(MAKE) $(build)=Documentation/devicetree/bindings Documentation/devicetree/bindings/processed-schema.json
->
-> I don't think we should expose this detail (processed-schema.json) to
-> the top-level makefile. This will be built if 'dt_binding_check' is a
-> dependency with CHECK_DTBS=y set.
->
-> > +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ CHECK_DTBS=y
->
-> CHECK_DTBS here doesn't work. It has to be exported.
->
-> So here's my modified patch (%.dtbo should probably be included too,
-> but I'm not yet sure how well the schema checks will work on them):
+Refer to [1]:
+> When building modules(CONFIG_...=m), I found some of module versions
+> are incorrect and set to 0.
+> This can be found in build log for first clean build which shows
 
-Please excuse me for letting this float for some time. Do you plan to
-submit your patch?
-Would you like me to do it instead?
+> WARNING: EXPORT symbol "XXXX" [drivers/XXX/XXX.ko] version generation failed,
+> symbol will not be versioned.
 
-> 8<---------------------------------------------------------
-> diff --git a/Makefile b/Makefile
-> index 53d09c414635..a1e246956d65 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1377,12 +1377,18 @@ endif
->
->  ifneq ($(dtstree),)
->
-> -%.dtb: include/config/kernel.release scripts_dtc
-> +%.dtb: %.dt.yaml
->         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->
->  %.dtbo: include/config/kernel.release scripts_dtc
->         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->
-> +ifneq ($(filter %.dtb, $(MAKECMDGOALS)),)
-> +export CHECK_DTBS=y
-> +endif
-> +%.dt.yaml: dt_binding_check include/config/kernel.release scripts_dtc
-> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-> +
+> But in second build(incremental build), the WARNING disappeared and the
+> module version becomes valid CRC and make someone who want to change
+> modules without updating kernel image can't insert their modules.
 
+> The problematic code is
+> + $(foreach n, $(filter-out FORCE,$^),        \
+> +   $(if $(wildcard $(n).symversions),      \
+> +     ; cat $(n).symversions >> $@.symversions))
 
+The issue fixed when make version upgrading to 4.2.
+
+Thus we need to check make version during selecting on LTO Kconfig.
+The MAKE_VERSION_INT means MAKE_VERSION in canonical digits integer and
+implemnted by imitating CLANG_VERSION.
+
+[1] https://lore.kernel.org/lkml/20210616080252.32046-1-lecopzer.chen@mediatek.com/
+Signed-off-by: Lecopzer Chen <lecopzer.chen@mediatek.com>
+
+Lecopzer Chen (2):
+  Kbuild: lto: add make-version macros
+  Kbuild: lto: add make version checking
+
+ Makefile                |  2 +-
+ arch/Kconfig            |  1 +
+ init/Kconfig            |  4 ++++
+ scripts/Kconfig.include |  3 +++
+ scripts/make-version.sh | 13 +++++++++++++
+ 5 files changed, 22 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/make-version.sh
 
 -- 
-With best wishes
-Dmitry
+2.18.0
+
