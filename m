@@ -2,99 +2,140 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A13C07E96
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Jul 2021 11:45:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B4AC07E96
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Jul 2021 18:04:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DFBC61626
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Jul 2021 11:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7FFF616EB
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Jul 2021 18:04:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbhGHLrv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Jul 2021 07:47:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39872 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231628AbhGHLrv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Jul 2021 07:47:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6B0B161621;
-        Thu,  8 Jul 2021 11:45:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625744709;
-        bh=eZBKe/AE3k2Idpe/yBgtZmT86HN/n74i8indY31fu+Y=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=biSn9xXdm195FlJIIP9CbMlBVPw6YSf28Xeb/NlKNwhwfpjZIFc94YzXPcG3kH9pg
-         jqkl7HOf4banPoE/bdoaWEw+RAGxwXFENv9Trp9U+BC/dLRe0pIx/aE1CAauXCYlMX
-         rl04moSbvHie/Ie2ZqFHmWamLge5Fw1OeUSIe+ynF23o0ko9LIMJLuoErwUAoAfbxy
-         Hx0x9q7368ES3ock3k2TE+ybVEz9B/aNv/zbmviiys9gvByienVlj9MkUXcPRrz/J0
-         0I0fg4p7U0WcJToH1yQyg5M1ieTMCCz0n13uTPGgaWdC12CQcS+H+/Ddi+1EuMk/Qj
-         POHAjzQBFEVIw==
-Received: by mail-wr1-f42.google.com with SMTP id i8so7104320wrp.12;
-        Thu, 08 Jul 2021 04:45:09 -0700 (PDT)
-X-Gm-Message-State: AOAM530KMC+7CATb4YVuqXSlZ3xPj7vGTBlfQ+2WIzmf+VJZ9YS5tv5e
-        l7PWeSedHwpCo3zu9GuDt3OToJyDsNHAS4ro46g=
-X-Google-Smtp-Source: ABdhPJwTsN6jaswrfsq9u1aI/abGeIi1wl/6hV6uQpSlnG4VEomSksDc2Yyee8kX88ih4MGSkbJsPOrfiApd7vrWZUQ=
-X-Received: by 2002:adf:e107:: with SMTP id t7mr34238667wrz.165.1625744708010;
- Thu, 08 Jul 2021 04:45:08 -0700 (PDT)
+        id S230135AbhGHSHO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Jul 2021 14:07:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41290 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230106AbhGHSHO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Jul 2021 14:07:14 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975B0C06175F
+        for <linux-kbuild@vger.kernel.org>; Thu,  8 Jul 2021 11:04:31 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id f13so17789037lfh.6
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Jul 2021 11:04:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yiCMe5lXnOMqVQwnybceaVdm0JMGJkLwBf5CkHBvdcQ=;
+        b=KNyqlaWo68XAF1LEi/Zau37GxADoq7fDPldzB3kK0hRCO+hZWFs2TLfp/mSArdh64R
+         8qgqFLrCf8nl0PgdG8YRDRjKsa8ENd3u9rtwfoOP0bPsUPJt7+GvL8y39VPwtowmoFLH
+         hngpkVaUOiYi8u5Ux53PA1rRxZwL5Zm1IpkKf1kDFRAPeIes+B6QRQ9+64fFGlWdHc5T
+         d7isaO66eQxpycEVitQxHmvDFRv2PbUKz2jKb74maumSHYmZvwQxWCvpcbrrIpMCLanI
+         TA5FMBWVS8mUqjINC67OZaa11oOiQXYx73Phjt3BvAyRr+u0wGraPi+ydBAOi85/4fNt
+         cjyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yiCMe5lXnOMqVQwnybceaVdm0JMGJkLwBf5CkHBvdcQ=;
+        b=L4xwbNcYFKmqyumTXmr4WzJYQsCsOKoh+iF8PqsXQl4UXNmxY0/9L/ht6w0srMnW8h
+         ZZsLsbawA/rQhBpSabuolNmMmiMP6D4SX/s7JB2cmMBE1DD6v8L/gnmXfq8bgSD+qWBZ
+         VQ1Zh9eBIto9j9bkG7qVP2W0IMNccKGx3ppuNxI6wUyV86hX4KDQB6tX/6BYcrJiAq/q
+         M3J6j71VSSsPueQXBzv81sMpA9lNfpPQLXuY/wOwZoD+LOZKT1fLzR3MCMLi9/fksqRG
+         rQsWwf/TPwGTXVNlTDT2XVAGP18JueTxA2cIbZp6WbiVvTJDFBiWsFGKhn1qmtfV1572
+         cfLw==
+X-Gm-Message-State: AOAM533i245FbiZz83qeiQO99CduUjj2DO7Nalq2eGOrgFzI47MhNwq6
+        AGMxdKFhg1vIY6oBt6QpgV9GtszvROsXnYtliyABXg==
+X-Google-Smtp-Source: ABdhPJyIFUQPbKflqF/C86UvPHbrRVN8BNDcuBn4arckRcNxvlI3kPz4SkAQllBsJa3/ypnpuIB51jOp8MPnnvUGYZY=
+X-Received: by 2002:a19:5f04:: with SMTP id t4mr25450735lfb.297.1625767469586;
+ Thu, 08 Jul 2021 11:04:29 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210707224310.1403944-1-ndesaulniers@google.com>
- <20210707224310.1403944-3-ndesaulniers@google.com> <CAK7LNAR66iE0w4bjpMVEz6W==mnc59MEnRWm1MXrqApP0aE4Qw@mail.gmail.com>
-In-Reply-To: <CAK7LNAR66iE0w4bjpMVEz6W==mnc59MEnRWm1MXrqApP0aE4Qw@mail.gmail.com>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Thu, 8 Jul 2021 13:44:52 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a1MW9hYzDT-iL4CpwaJ5NUuQODT3XgheocrnF7496GKFw@mail.gmail.com>
-Message-ID: <CAK8P3a1MW9hYzDT-iL4CpwaJ5NUuQODT3XgheocrnF7496GKFw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Makefile: drop CROSS_COMPILE for LLVM=1 LLVM_IAS=1
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+ <YOaR1ZjToP/kgNsC@infradead.org> <CAK8P3a1ctLcHuLZfBJ7wXHRmidpQZ4EZdML1nqPJVGYVTgHmaw@mail.gmail.com>
+In-Reply-To: <CAK8P3a1ctLcHuLZfBJ7wXHRmidpQZ4EZdML1nqPJVGYVTgHmaw@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Thu, 8 Jul 2021 11:04:18 -0700
+Message-ID: <CAKwvOdkaifETNvtTA3O9EToVHAK0N50wkT-bHOpQ2RmFg7qk0A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] infer CROSS_COMPILE from ARCH for LLVM=1 LLVM_IAS=1
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Miguel Ojeda <ojeda@kernel.org>,
         Fangrui Song <maskray@google.com>,
         Michal Marek <michal.lkml@markovi.net>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
-        Nathan Chancellor <nathan@kernel.org>
+        Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jul 8, 2021 at 12:23 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> On Thu, Jul 8, 2021 at 7:43 AM 'Nick Desaulniers' via Clang Built
+On Thu, Jul 8, 2021 at 12:27 AM Arnd Bergmann <arnd@kernel.org> wrote:
 >
-> We must rely on this behavior of Clang because
-> --target (which is contained in CLANG_FLAGS)
-> must be specified before the Kconfig time.
-> Then, a user can toggle CONFIG_64BIT any time
-> from menuconfig etc.
->
-> With this in mind, using $(ARCH) as if-else
-> switches is pointless.
-> $(SRCARCH) is the only meaningful input.
->
->
->   else ifeq ($(ARCH),i386)
->   CLANG_FLAGS    += --target=i686-linux-gnu
->   else ifeq ($(ARCH),x86)
->   CLANG_FLAGS    += --target=x86_64-linux-gnu
->   else ifeq ($(ARCH),x86_64)
->   CLANG_FLAGS    += --target=x86_64-linux-gnu
->
-> should be replaced with:
->
->   else ifeq ($(SRCARCH),x86_64)
->   CLANG_FLAGS    += --target=x86_64-linux-gnu
+> On Thu, Jul 8, 2021 at 7:49 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Wed, Jul 07, 2021 at 03:43:08PM -0700, Nick Desaulniers wrote:
+> > > We get constant feedback that the command line invocation of make is too
+> > > long. CROSS_COMPILE is helpful when a toolchain has a prefix of the
+> > > target triple, or is an absolute path outside of $PATH, but it's mostly
+> > > redundant for a given ARCH.
+> > >
+> > > Instead, let's infer it from ARCH, and move some flag handling into a
+> > > new file included from the top level Makefile.
+> >
+> > Why only for LLVM?  I really hate the mess we currently have with
+> > ARCH and CROSS_COMPILE.
 
-I think we usually only have to provide the architecture
-name, as in "--target=x86_64", though for arm I get a
-warning "clang: warning: unknown platform, assuming
--mfloat-abi=soft" unless I provide the full triple.
+I agree.
 
-> For example for ARCH=arm, which is better
-> --target=arm-linux-gnueabi or
-> --target=arm-lnux-gnueabihf or something we don't care about?
+> > Being able to set both in .config (and maybe
+> > even inferring CROSS_COMPILE where possible) would make my life so
+> > much easier.
+>
+> I agree this would be best, but solving the problem for llvm is
+> trivial with a 1:1
+> mapping between ARCH= and --target= strings. Doing the same for gcc
+> requires enumerating all possible target triples, and possibly deciding between
+> different versions, e.g. when your path contains
 
-The kernel is always soft-float itself, so it does not matter either way.
+Yes. There is a seldom used Kbuild macro for this: cc-cross-prefix.
+It's hard coded to check for prefixed versions of gcc, but it will
+handle the enumeration. Perhaps it could be used more widely, once we
+know whether we're building with gcc or clang.  But as you note,
+enumeration is kind of a waste of time for clang as these target
+triples are known ahead of time.  I guess we could check that your
+build of clang was configured with support for that target ARCH (since
+you can disable backends when building clang), but I consider
+disabling backends an antipattern, and I think the user will figure
+out pretty quickly when they're trying to build a target that LLVM
+doesn't support (whether due to configured-off or unimplemented
+target).
 
-       Arnd
+> /usr/bin/powerpc64-linux-gnu-gcc-5.2.0
+> /usr/bin/powerpc64-linux-gnu-gcc -> powerpc64-linux-gnu-gcc-5.2.0
+> /usr/local/bin/ppc64le-linux-gcc-9
+> ~/bin/powerpc/powerpc-linux-unknown-gcc-12.0.20210708.experimental
+>
+> all of these should be able to cross-build any powerpc kernel, but
+> there is no obvious first choice (highest version, first in path,
+> ordered list of target triples, ...). I tried coming up with a heuristic
+> to pick a reasonable toolchain, but at some point gave up because
+> I failed to express that in a readable bash or Makefile syntax.
+
+Right; foremost in my mind was arm-linux-gnueabi-gcc vs
+arm-linux-gnueabihf-gcc.  That's not even to mention the versioned
+suffixes.
+
+In terms of multiversion support; this series doesn't regress doing
+things the hard/verbose way.  But I think for most users we can have a
+simpler common case; folks can play with their $PATH or focus on more
+hermetic builds if they want this new feature (CROSS_COMPILE
+inference) AND support for multiple versions of the same toolchain.
+-- 
+Thanks,
+~Nick Desaulniers
