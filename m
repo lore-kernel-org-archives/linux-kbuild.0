@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4416BC12002
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A34C47E4E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3094F613CA
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45104613C3
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241078AbhGNT5t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S241066AbhGNT5t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 14 Jul 2021 15:57:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45690 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:45596 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241182AbhGNTu0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:50:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2960F600D4;
-        Wed, 14 Jul 2021 19:47:12 +0000 (UTC)
+        id S240876AbhGNTuK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jul 2021 15:50:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B738E61459;
+        Wed, 14 Jul 2021 19:46:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626292032;
-        bh=ak0X2iN8PqFo1g+nRJ173Suw6iFpP+hKATqviaSsB2k=;
+        s=k20201202; t=1626291972;
+        bh=QW36ld2fStFSJxihXCR04GodtNzwukOib+jE0kNjqpE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OW9xjmkMIfGtgoDKvjJM8p42BAHkv73pvMH8ZW59F65wPHcvi0MSdZRaNqSKUjCtd
-         hvhN5tO2kKQGAC8xSTKObKHdpcMBtWBu0BUU3JMmzyDvtphgQQOkmHJAyilzRJQESd
-         xmGhmouKdTvq2Xs/Qsq8x7rV15rqcGLATgnin0hUAz5OuiY7DM9vWUkP12JKl0kG5z
-         QoFefWJrHf5FZX9tetwN1hmr4I7sP55MtaYuxJMMBCJdlsQ5hJCxSvwFp6v/lKmiNZ
-         xkqFRo79kPCVmomS3+UhnPTsQQuk88mvK85fZFXUGqGp8ud3usRY0smA14FkUxpXIa
-         l5+oHdiLi4GyA==
+        b=FYDaw/jgcv+AaJ+/oVxZfxxAcNxC0lgWmijoyZ9a+U+cgTmQ88VpOCj/jNxlsRwPJ
+         94zJuDpTzSrZmriNpus1guFX4yK5EB9EaAysNmRUWru6jGQSwAsYAV2OqtwPbeXl+B
+         Ft2tFYFVO3oZo7iOFot2a7wE0Uw/LETRpuhZn/K2tKDBK1DjEP1/cKAz9QkxthZ6jw
+         07jkEnoNSNWD2I+IOAh5vmJ73EC3kT+ixB5ZpNLHdrwhdnMEsnhxQrwMKbic0Sibnk
+         wRQHAhc4izKIMEpXQx6wt4BUueJ1/8ZS17PskMv/o0Z/PBkNlcKURxDi8G5r2qMBZN
+         UiSA82V/jFc7A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Matthias Maennich <maennich@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 33/39] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
-Date:   Wed, 14 Jul 2021 15:46:18 -0400
-Message-Id: <20210714194625.55303-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 42/51] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
+Date:   Wed, 14 Jul 2021 15:45:04 -0400
+Message-Id: <20210714194513.54827-42-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210714194625.55303-1-sashal@kernel.org>
-References: <20210714194625.55303-1-sashal@kernel.org>
+In-Reply-To: <20210714194513.54827-1-sashal@kernel.org>
+References: <20210714194513.54827-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index 87f1fc9801d7..662fe19da990 100755
+index d1d757c6edf4..06c1e9e3bc38 100755
 --- a/scripts/mkcompile_h
 +++ b/scripts/mkcompile_h
-@@ -78,15 +78,23 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+@@ -80,15 +80,23 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
  # Only replace the real compile.h if the new one is different,
  # in order to preserve the timestamp and avoid unnecessary
  # recompilations.
