@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC75C12002
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1D5C12002
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26107613CA
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79B96613C3
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241143AbhGNT5x (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 14 Jul 2021 15:57:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49708 "EHLO mail.kernel.org"
+        id S241165AbhGNT5y (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 14 Jul 2021 15:57:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49296 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233831AbhGNTvU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:51:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 39C10613D2;
-        Wed, 14 Jul 2021 19:48:26 +0000 (UTC)
+        id S241122AbhGNTwW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jul 2021 15:52:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8A986613E2;
+        Wed, 14 Jul 2021 19:48:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626292106;
+        s=k20201202; t=1626292125;
         bh=i06fPrBmFPd4Vw53yWquMo8pgHRq2PQGWRELFLr2wsU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VIRta9FQDZkXs8RglUQLL6S3szTvRiSypJG5vGbBQ4L7GIPio4nzknM0ek1tDtjDT
-         4l78k+EWDLqaShyKC8Hpl+DwBoJiAIZCXeMe7vLmbETk0NllA+pmUVfZxHMbuT8CT2
-         f4vLnd3y3vVCRiXc5xSV+xYFTTMEi/7qTeCWWf4k9K27YEiaD1XwRTk4qakck6dLOj
-         q4djyu+hfQ16+hJ5gqgRrlcB4ZVVcEtYq7fjO/+LYYSmMiLxXTj5OzvZl/djv3TVdV
-         lx+O26CbZ/FdvdPw0fgktk9yXRhrgVW0JuuLjmKoo3/cKzQAJ1H9ZTWaTkGIalC3YA
-         hX3PZ8kk9et5g==
+        b=hXV5L+5fr+vZj9RGtVJMBE1h8D+gQrPDYjfd66TY7jdc5+FTtTO8lGhFU69W+951U
+         q0/vJnD2oWkmoQwBpiXQYQWvogrMWPL3+0zs3FdBRy6xmH/R0ZlIpWwPppqKsoq2Zp
+         Cmk9ejiXObUJZpuPKGVlSBNQSChBGfoeBKTWWCKb9K291YG0cuGMo3WnkpzgkcPJGG
+         b55AKTHEC09nJ/wmxBUjvvRPLxOxufadZwE/TSlN+r2i9mGaSlR9Pi4DVZDKJSLxht
+         1wP+pWJztI0DHmKqc3DRTYADp8pR86khJDUBdYFV3R2xRz4D1eJEYmbXvVSmpb8xe+
+         uqVfDIal195Lw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Matthias Maennich <maennich@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 14/18] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
-Date:   Wed, 14 Jul 2021 15:48:02 -0400
-Message-Id: <20210714194806.55962-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 08/10] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
+Date:   Wed, 14 Jul 2021 15:48:31 -0400
+Message-Id: <20210714194833.56197-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210714194806.55962-1-sashal@kernel.org>
-References: <20210714194806.55962-1-sashal@kernel.org>
+In-Reply-To: <20210714194833.56197-1-sashal@kernel.org>
+References: <20210714194833.56197-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
