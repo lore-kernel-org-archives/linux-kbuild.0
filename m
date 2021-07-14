@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A34C47E4E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65874C47E4F
 	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45104613C3
+	by mail.kernel.org (Postfix) with ESMTP id 52E45613D9
 	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:55:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241066AbhGNT5t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 14 Jul 2021 15:57:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45596 "EHLO mail.kernel.org"
+        id S241098AbhGNT5v (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 14 Jul 2021 15:57:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48760 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240876AbhGNTuK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:50:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B738E61459;
-        Wed, 14 Jul 2021 19:46:11 +0000 (UTC)
+        id S238109AbhGNTuw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jul 2021 15:50:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 85BBD613D4;
+        Wed, 14 Jul 2021 19:47:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626291972;
-        bh=QW36ld2fStFSJxihXCR04GodtNzwukOib+jE0kNjqpE=;
+        s=k20201202; t=1626292078;
+        bh=iW3+8FrBSNcMwp6wf21zNU4q6SBh7OzuKFjuDmBZ5rg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FYDaw/jgcv+AaJ+/oVxZfxxAcNxC0lgWmijoyZ9a+U+cgTmQ88VpOCj/jNxlsRwPJ
-         94zJuDpTzSrZmriNpus1guFX4yK5EB9EaAysNmRUWru6jGQSwAsYAV2OqtwPbeXl+B
-         Ft2tFYFVO3oZo7iOFot2a7wE0Uw/LETRpuhZn/K2tKDBK1DjEP1/cKAz9QkxthZ6jw
-         07jkEnoNSNWD2I+IOAh5vmJ73EC3kT+ixB5ZpNLHdrwhdnMEsnhxQrwMKbic0Sibnk
-         wRQHAhc4izKIMEpXQx6wt4BUueJ1/8ZS17PskMv/o0Z/PBkNlcKURxDi8G5r2qMBZN
-         UiSA82V/jFc7A==
+        b=qODdfhQVECu5wszO/+nGnRflQ4nr3RYLPnn2dPj82CwiXnv8bwSk+xGC4TYUnWVeU
+         xFuYxVKoFXmsiH7cSR/UlVAttykzMjxN54hAg+Ig2bOpLrZ1fbxtEx+gGNjlF1YyCH
+         Id3DmeYzfdA/B7oA2bZsaDy/VCSPQuo5EoPQPxurTPGWDh2CfQd7XCPGso8pg0rKn6
+         25jaNT0c//Cz3L5T0DX1IxnbBuDOEx8elb329Eo7boFDe6/uz8z0GNa9qVSzf3RCdQ
+         nGu8lZ6njZhmCHK1uZDrt7p94Q5Kd2kWRmYEdE+TgPSRai6qvzOTxYeZU+cbzKtYyO
+         8jKi5505dJtxg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Matthias Maennich <maennich@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 42/51] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
-Date:   Wed, 14 Jul 2021 15:45:04 -0400
-Message-Id: <20210714194513.54827-42-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 23/28] kbuild: mkcompile_h: consider timestamp if KBUILD_BUILD_TIMESTAMP is set
+Date:   Wed, 14 Jul 2021 15:47:18 -0400
+Message-Id: <20210714194723.55677-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210714194513.54827-1-sashal@kernel.org>
-References: <20210714194513.54827-1-sashal@kernel.org>
+In-Reply-To: <20210714194723.55677-1-sashal@kernel.org>
+References: <20210714194723.55677-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index d1d757c6edf4..06c1e9e3bc38 100755
+index 959199c3147e..49f92fffa098 100755
 --- a/scripts/mkcompile_h
 +++ b/scripts/mkcompile_h
-@@ -80,15 +80,23 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+@@ -83,15 +83,23 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
  # Only replace the real compile.h if the new one is different,
  # in order to preserve the timestamp and avoid unnecessary
  # recompilations.
