@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B07C47E48
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E57A5C12002
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49FAB613CA
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3779613CA
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Jul 2021 19:54:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241012AbhGNT5r (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 14 Jul 2021 15:57:47 -0400
+        id S241050AbhGNT5t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 14 Jul 2021 15:57:49 -0400
 Received: from mail.kernel.org ([198.145.29.99]:45596 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238335AbhGNTsj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:48:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2B94161400;
-        Wed, 14 Jul 2021 19:43:53 +0000 (UTC)
+        id S240650AbhGNTt7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jul 2021 15:49:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8D86F6143E;
+        Wed, 14 Jul 2021 19:45:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626291833;
-        bh=PmuHXE9H4zNBy25vnRaIZ9Atb03pBeeR/qmffxxS/XA=;
+        s=k20201202; t=1626291945;
+        bh=vO6jLsstg1PqDiZfbP7AfOwVNt2TH0F65zgaoPMvmsI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=N9KY5h2gHc3wT+JRQRZd2gnyz9Ca5LIestW+z1MbkZJUyQmP/UtdfTeaOwri4XW3P
-         Nn4i5UGEGz7e8x+pVbDfVe9d/6T5soNW+9cp1BoQQOUhpEs7QyCkA+95Uk6HfWUBpx
-         jn3qlVbH+NvHb2O97aY3PcoAo2z1wUVJcAaoR/qbiGv4dSuKVWLxfp8ovLDv8qaPIk
-         8SOokCh9nw+zQqqxuClHYOE16dEHQEqsaU9u0ViOzE/dNAtztg5+CrwKhMVPr1EkYM
-         PFqvpPFXrJVRu8GKcK1PSfcqP9K+6ntgC/O4Lwx1F15DeYT9woWRd/09cK/mMGOELK
-         CA9BG5AivuCYA==
+        b=tswgjlQDr95KfXqJGDz9NK9xQkYEA+CuZwt0uFgbhzm/l9exZNHwExkXIEfJlGhco
+         saHBRrKt5HJArLmkFe4Vh8/sR87urzdS4ftVhUvSSkqmfz4rZwvoBtx6ROjFl9ocjk
+         Dl08Hd/l01yO2WnDx73KmtubSDDIwfgm3ID0KzYqc07vc50qhttlrvF2i7yWyV01dr
+         +Z7f7dnC70xHwyMykyqyYovElXX2SiFiFTiTlSo4hxjRyuACumPlFErPE3vmAFE9lh
+         1UjaA1XEJaFqZ8Bj4TSufDNxtpI0PS3VsFW81cLoMjgCVGMkgQzFYU1evBIIMRzf7k
+         pUE4+USxdho4Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-kbuild@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/88] kbuild: sink stdout from cmd for silent build
-Date:   Wed, 14 Jul 2021 15:42:07 -0400
-Message-Id: <20210714194303.54028-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 22/51] kbuild: sink stdout from cmd for silent build
+Date:   Wed, 14 Jul 2021 15:44:44 -0400
+Message-Id: <20210714194513.54827-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210714194303.54028-1-sashal@kernel.org>
-References: <20210714194303.54028-1-sashal@kernel.org>
+In-Reply-To: <20210714194513.54827-1-sashal@kernel.org>
+References: <20210714194513.54827-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -122,10 +122,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 08e011175b4c..0d6e11820791 100644
+index 7da10afc92c6..b14a7d4a2f05 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -174,8 +174,13 @@ clean := -f $(srctree)/scripts/Makefile.clean obj
+@@ -182,8 +182,13 @@ clean := -f $(srctree)/scripts/Makefile.clean obj
  echo-cmd = $(if $($(quiet)cmd_$(1)),\
  	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
  
