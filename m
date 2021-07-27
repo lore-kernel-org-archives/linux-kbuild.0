@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B39EC4338F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F6FC3F6A3
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11D6260FE3
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FA4460F6D
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:00:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbhG0U76 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54060 "EHLO
+        id S232537AbhG0VAN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:00:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233363AbhG0U72 (ORCPT
+        with ESMTP id S232600AbhG0U7J (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:28 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C107C0619CF
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id b6so1772668pji.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:09 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14516C0613D5
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id l19so1888143pjz.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=c29mjakfJ2fQ2aKIFDDh6/0VPCMzD6jfrBsIcDqvz00=;
-        b=RlPhQG4tFupRcF9Zo5SGLaxAzNDapbwIteB7u6rkSzbogSBMZllEF/VrAqnEiZD/3N
-         jMu0vVlQLCR6LveoC6Xen5g1970529LJ0bSbtflIp3scLv5bGM33uM5lba5O2TQIAKEO
-         uBM3AH5sYjQq47126sIPL2SS3WLMhjNYiSJLc=
+        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
+        b=IYhfsWGlsw3iSzV/PshzqWyl6YBx5L4bzzAy1O/DivhJOOn5XnSEfDfbmKq3pZ+0Vk
+         uh7GiUZL5niXHON0wQ0k5rOANeYvbqA7jpbTdKzVDWyXzIPUHuwdFvuQCZlNfXL/s5xy
+         EIQ0LWDe7jO3cVQe1/FSgbqBokHxmE/gnetDA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=c29mjakfJ2fQ2aKIFDDh6/0VPCMzD6jfrBsIcDqvz00=;
-        b=a8q4ouiND+mnjMv+pFZmPPkGr7l9vePAEKHPk55qDaF8AI20JYWaavnv30m/i3TXJz
-         JdzwHA6JEguMT2SDGKr8h40c6jIt89+ZoUevOMyCN30E7jkMUAoWDg6PruQgQjBpTusq
-         Rb1A0Bta8ryQ5y1mHMf26tKI4e42FsXVtxoMc9dwZJUIULYxLNj/HqEkbmB+h44sVQjF
-         xwx0dC009pXJ3RTshVmCVgHUP/MXBMNHNBDjUuEErGy9QLcYfFaOCX9M4b/5qKf/Ez7s
-         jgOZqsfLhOeR1Ont8ND5fuaY0G0ugl5dwLIG7CgX6WH7bUaUVX1Kh+z5O81u84sMuEVf
-         L4xw==
-X-Gm-Message-State: AOAM530Htn9DBzxtwmQjpPN8yK3Xh/R8pIVV+Rv+fd6bLuZxgunUtdLB
-        KpsNDyiggyGe812dR61hkT3HRw==
-X-Google-Smtp-Source: ABdhPJy4n6zLpIfc83AEqeykgnFel2hLbQQnKIVQqjjF1PsMpjqsZGXLxGOhII4TmSA9tlI0HY9XsA==
-X-Received: by 2002:a17:902:8606:b029:12c:2625:76cf with SMTP id f6-20020a1709028606b029012c262576cfmr9776543plo.17.1627419552543;
-        Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
+        bh=A3PAzWLU246y1XAJJGWj+zmXxgq3vu+t3uT7F7ts2iM=;
+        b=HNPfjZ2IrXcgjM0KOW0OAjLm+A/OgrOKM/Hcy9cI0pP84Um/oxpSF59hZxYTKQs0o5
+         gmZxw6qGDWpC+904pZFlzZD5dVgxRTHQDpvrniUMqpdLP0RMLTd+920N8xeqNfkLRkib
+         z2tCteHWA2H+BKetCXVyDUMJYZYHKOWoaHR195J+qj5L2V3y7sIANC0I/KJd1KtRgoB3
+         vpOhWBuKsa0kuJMGqXReDW/SUmfXFfWssw5llgGriVvWgPHPVyTeoiENW+eMGqw5mGK3
+         bOICkb4zIuRQ8nJJEmaHNDGhWRxvtdLoCkKJtnqaj9jNeXh3O4B0Ltg0rMruhYmLatlj
+         J6BQ==
+X-Gm-Message-State: AOAM530OWCoUbOWHzqGT7aStWYYUPwxdfPVVBoDmSZdChhcIVEW/i5qM
+        8iS55UfR8Bhj8Ypa7Lq+ZyaGvA==
+X-Google-Smtp-Source: ABdhPJztdkoXWjXT5QD/exKWw9kw2lZC8KEgnSRSe5hUXoJqgzkXvN7Kc2Da1tooBWFUMhMM+5Yl+Q==
+X-Received: by 2002:a63:4206:: with SMTP id p6mr25847081pga.285.1627419547538;
+        Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id d2sm5224630pgk.57.2021.07.27.13.59.09
+        by smtp.gmail.com with ESMTPSA id nm19sm3750853pjb.27.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,513 +65,152 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 29/64] lib/string: Move helper functions out of string.c
-Date:   Tue, 27 Jul 2021 13:58:20 -0700
-Message-Id: <20210727205855.411487-30-keescook@chromium.org>
+Subject: [PATCH 08/64] staging: rtl8192u: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:57:59 -0700
+Message-Id: <20210727205855.411487-9-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=14604; h=from:subject; bh=S7ayvaB/WvgQx4Mye8ZmTgp4lMn5gOzwUYIKOkIvxtk=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOGtU59dpyaXNjl7+40exQadXHRV8ojrTSYXlDX 8jxwuf2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhgAKCRCJcvTf3G3AJulfEA CDk2ls2fJR5urOPfvp3kBHnCCLyfSNh+jPPHNyx3njttSgb5Bp0TaONW7u9SunWJSpt0Zqy8auK9DG VUiEbT2hpBZvJBdpuNTQG5gk1mRWTr70dKmgNc60pPNvGircEZx9kMkwcEHeS6wGR1r+ubabC/oV8i jmOCgbQbDU5f7pOy6qr4NojU8Y5uVCI1NGL/tRntYbV97PJ9zd7M7lEWGUo4GtqciXyWnoLBtGEGAc 1M/nrNNJ9uBCzDxWmLQKIM9ilUj1nmF7RLtEQtWBUt7cKYrAYamljDFYRgBUKWMN9XcKvUs9GPzoGa NkYrTO7ue4cIUZ5tMUOKdJo/VXnnhn+QDgHUkmp/GJJmbGZDGwVeDCBXb10nuGwlSJL8CwE4T8tgxC vLCDGkzpu3WvJ82rW8NYlvkO6kTjm4Ur47mhyoT8p2mwTB7fbt8l+/xjGv7I96Y4snCJ5Z+HqW2wtk m6e1bffmtgbHM9KBdjccvPUjllFMLaw63f7/AVanB9wg2CebfEQLRWvXFgLImuR/zmCj0xSukFk9eG 9S13IXRFRUv/Rvq5ehsZX17XBhJMqkYSVTeOkPYx73MaNz6lkT72s0zmHkKSTYfysl5jA06XK5wMzD p+/hAezOPeAb0HoqGG9vEIRql0f+pgVzuVd+Yw1HRFjX05rn3Kzzg7DtKaVQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4950; h=from:subject; bh=Auxw1wcSuXLG5PZpqLVm+ToYm1BZgRegEEtY4+3pHw8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBQir91mVsM70reKpFOtfagOnSNOBMkJbr7LeF cLNYV1eJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJo2aD/ 4h/gem/XLyVOoZV8fQb32viUj7rAyg4aQwHNkuWJUlBL82B2X54xsC7DFKlCa8N29O8H+qPnwHWT4K 6ICv9SY/cbNJmcNDaVRxa1zStMzYOl04p6xD9WCnFFjK4B+q9LeGI2YR5rnKXwMRVRN62lGGb2tbDG n+B7S4A3Lzj7gnCvw8H/Jh9jykK5MtMYCK3XaA8cM136SS6m+/Mz2jQkeWtGxivZP3JfUY99slNEkG 0LZ6JrK7U2HhCqW+GBrJFottbbgKHmwow4xCoIvuKHVrRe+pSDHtQkB9J3CO3kRk/B4+UUgR29S3N1 WGzHQkQOdCogIIKKhl+dGtRJkzv1E6H3AfsfHn9mRX+rlRVMuWdY7OOtWt09v9kOhJi9TJuYsCUhXd bb2iFWqiDbfnzl1cMyIJwIcRmKPa8iWe3+q44A9MO1491pridbSlGKpf8eOQJKQrrofq4o2cm2VKmy VObV/m/b4dpWYSDq+ecjCOAwd9Q2lNy5lWiCgPg/UTP9q/ZJuT+DhU92dfstVyX0UZsLQY2XjsDTcY +kcirjK4bujmk/nhABsxK1FigYwqICkmpUKU2Nw2NqvaMQuz7GFb/MwXE0F6PrttZzKLnIcWQt2RMg S0RnPStAbsoJy+Iytt3EPyIdRveCUUfgivtpUg6QthiMPmFTasWv4patQHMQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The core functions of string.c are those that may be implemented by
-per-architecture functions, or overloaded by FORTIFY_SOURCE. As a
-result, it needs to be built with __NO_FORTIFY. Without this, macros
-will collide with function declarations. This was accidentally working
-due to -ffreestanding (on some architectures). Make this deterministic
-by explicitly setting __NO_FORTIFY and move all the helper functions
-into string_helpers.c so that they gain the fortification coverage they
-had been missing.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memcpy(), memmove(), and memset(), avoid
+intentionally writing across neighboring fields.
+
+Use struct_group() around members addr1, addr2, and addr3 in struct
+rtl_80211_hdr_4addr, and members qui, qui_type, qui_subtype, version,
+and ac_info in struct ieee80211_qos_information_element, so they can be
+referenced together. This will allow memcpy() and sizeof() to more easily
+reason about sizes, improve readability, and avoid future warnings about
+writing beyond the end of addr1 and qui. Additionally replace zero sized
+arrays with flexible arrays in struct ieee_param.
+
+"pahole" shows no size nor member offset changes to struct
+rtl_80211_hdr_4addr nor struct ieee80211_qos_information_element. "objdump
+-d" shows no meaningful object code changes (i.e. only source line number
+induced differences and optimizations).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/s390/lib/string.c   |   3 +
- arch/x86/lib/string_32.c |   1 +
- lib/string.c             | 210 ++-------------------------------------
- lib/string_helpers.c     | 193 +++++++++++++++++++++++++++++++++++
- 4 files changed, 203 insertions(+), 204 deletions(-)
+ .../staging/rtl8192u/ieee80211/ieee80211.h    | 24 +++++++++++--------
+ .../rtl8192u/ieee80211/ieee80211_crypt_ccmp.c |  3 ++-
+ .../staging/rtl8192u/ieee80211/ieee80211_rx.c |  8 +++----
+ 3 files changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/arch/s390/lib/string.c b/arch/s390/lib/string.c
-index cfcdf76d6a95..392fb9f4f4db 100644
---- a/arch/s390/lib/string.c
-+++ b/arch/s390/lib/string.c
-@@ -8,6 +8,9 @@
-  */
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211.h b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
+index 7903c777a417..6ae8d7504558 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211.h
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211.h
+@@ -303,7 +303,7 @@ struct ieee_param {
+ 		struct {
+ 			u32 len;
+ 			u8 reserved[32];
+-			u8 data[0];
++			u8 data[];
+ 		} wpa_ie;
+ 		struct{
+ 			int command;
+@@ -316,7 +316,7 @@ struct ieee_param {
+ 			u8 idx;
+ 			u8 seq[8]; /* sequence counter (set: RX, get: TX) */
+ 			u16 key_len;
+-			u8 key[0];
++			u8 key[];
+ 		} crypt;
+ 	} u;
+ };
+@@ -917,9 +917,11 @@ struct rtl_80211_hdr_3addr {
+ struct rtl_80211_hdr_4addr {
+ 	__le16 frame_ctl;
+ 	__le16 duration_id;
+-	u8 addr1[ETH_ALEN];
+-	u8 addr2[ETH_ALEN];
+-	u8 addr3[ETH_ALEN];
++	struct_group(addrs,
++		u8 addr1[ETH_ALEN];
++		u8 addr2[ETH_ALEN];
++		u8 addr3[ETH_ALEN];
++	);
+ 	__le16 seq_ctl;
+ 	u8 addr4[ETH_ALEN];
+ 	u8 payload[];
+@@ -1100,11 +1102,13 @@ typedef union _frameqos {
+ struct ieee80211_qos_information_element {
+ 	u8 elementID;
+ 	u8 length;
+-	u8 qui[QOS_OUI_LEN];
+-	u8 qui_type;
+-	u8 qui_subtype;
+-	u8 version;
+-	u8 ac_info;
++	struct_group(data,
++		u8 qui[QOS_OUI_LEN];
++		u8 qui_type;
++		u8 qui_subtype;
++		u8 version;
++		u8 ac_info;
++	);
+ } __packed;
  
- #define IN_ARCH_STRING_C 1
-+#ifndef __NO_FORTIFY
-+# define __NO_FORTIFY
-+#endif
+ struct ieee80211_qos_ac_parameter {
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
+index c241cf484023..61f9a189c90c 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c
+@@ -141,7 +141,8 @@ static int ccmp_init_iv_and_aad(struct rtl_80211_hdr_4addr *hdr,
+ 	pos = (u8 *)hdr;
+ 	aad[0] = pos[0] & 0x8f;
+ 	aad[1] = pos[1] & 0xc7;
+-	memcpy(aad + 2, hdr->addr1, 3 * ETH_ALEN);
++	BUILD_BUG_ON(sizeof(hdr->addrs) != 3 * ETH_ALEN);
++	memcpy(aad + 2, &hdr->addrs, 3 * ETH_ALEN);
+ 	pos = (u8 *)&hdr->seq_ctl;
+ 	aad[20] = pos[0] & 0x0f;
+ 	aad[21] = 0; /* all bits masked */
+diff --git a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
+index b0e01ee65f7f..d5557ee0a3b7 100644
+--- a/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
++++ b/drivers/staging/rtl8192u/ieee80211/ieee80211_rx.c
+@@ -1332,13 +1332,13 @@ static int ieee80211_read_qos_param_element(struct ieee80211_qos_parameter_info
+ 					    *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct ieee80211_qos_parameter_info) - 2;
++	u16 size = sizeof(element_param->info_element.data);
  
- #include <linux/types.h>
- #include <linux/string.h>
-diff --git a/arch/x86/lib/string_32.c b/arch/x86/lib/string_32.c
-index d15fdae9656e..53b3f202267c 100644
---- a/arch/x86/lib/string_32.c
-+++ b/arch/x86/lib/string_32.c
-@@ -11,6 +11,7 @@
-  * strings.
-  */
+ 	if (!info_element || !element_param)
+ 		return -1;
  
-+#define __NO_FORTIFY
- #include <linux/string.h>
- #include <linux/export.h>
+ 	if (info_element->id == QOS_ELEMENT_ID && info_element->len == size) {
+-		memcpy(element_param->info_element.qui, info_element->data,
++		memcpy(&element_param->info_element.data, info_element->data,
+ 		       info_element->len);
+ 		element_param->info_element.elementID = info_element->id;
+ 		element_param->info_element.length = info_element->len;
+@@ -1358,7 +1358,7 @@ static int ieee80211_read_qos_info_element(
+ 		struct ieee80211_info_element *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct ieee80211_qos_information_element) - 2;
++	u16 size = sizeof(element_info->data);
  
-diff --git a/lib/string.c b/lib/string.c
-index 4fec38fc6e58..4e111d9dd6d5 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -6,20 +6,15 @@
-  */
+ 	if (!element_info)
+ 		return -1;
+@@ -1366,7 +1366,7 @@ static int ieee80211_read_qos_info_element(
+ 		return -1;
  
- /*
-- * stupid library routines.. The optimized versions should generally be found
-- * as inline code in <asm-xx/string.h>
-+ * This file should be used only for "library" routines that may have
-+ * alternative implementations on specific architectures (generally
-+ * found in <asm-xx/string.h>), or get overloaded by FORTIFY_SOURCE.
-+ * (Specifically, this file is built with __NO_FORTIFY.)
-  *
-- * These are buggy as well..
-- *
-- * * Fri Jun 25 1999, Ingo Oeser <ioe@informatik.tu-chemnitz.de>
-- * -  Added strsep() which will replace strtok() soon (because strsep() is
-- *    reentrant and should be faster). Use only strsep() in new code, please.
-- *
-- * * Sat Feb 09 2002, Jason Thomas <jason@topic.com.au>,
-- *                    Matthew Hawkins <matt@mh.dropbear.id.au>
-- * -  Kissed strtok() goodbye
-+ * Other helper functions should live in string_helpers.c.
-  */
- 
-+#define __NO_FORTIFY
- #include <linux/types.h>
- #include <linux/string.h>
- #include <linux/ctype.h>
-@@ -254,40 +249,6 @@ ssize_t strscpy(char *dest, const char *src, size_t count)
- EXPORT_SYMBOL(strscpy);
- #endif
- 
--/**
-- * strscpy_pad() - Copy a C-string into a sized buffer
-- * @dest: Where to copy the string to
-- * @src: Where to copy the string from
-- * @count: Size of destination buffer
-- *
-- * Copy the string, or as much of it as fits, into the dest buffer.  The
-- * behavior is undefined if the string buffers overlap.  The destination
-- * buffer is always %NUL terminated, unless it's zero-sized.
-- *
-- * If the source string is shorter than the destination buffer, zeros
-- * the tail of the destination buffer.
-- *
-- * For full explanation of why you may want to consider using the
-- * 'strscpy' functions please see the function docstring for strscpy().
-- *
-- * Returns:
-- * * The number of characters copied (not including the trailing %NUL)
-- * * -E2BIG if count is 0 or @src was truncated.
-- */
--ssize_t strscpy_pad(char *dest, const char *src, size_t count)
--{
--	ssize_t written;
--
--	written = strscpy(dest, src, count);
--	if (written < 0 || written == count - 1)
--		return written;
--
--	memset(dest + written + 1, 0, count - written - 1);
--
--	return written;
--}
--EXPORT_SYMBOL(strscpy_pad);
--
- /**
-  * stpcpy - copy a string from src to dest returning a pointer to the new end
-  *          of dest, including src's %NUL-terminator. May overrun dest.
-@@ -530,46 +491,6 @@ char *strnchr(const char *s, size_t count, int c)
- EXPORT_SYMBOL(strnchr);
- #endif
- 
--/**
-- * skip_spaces - Removes leading whitespace from @str.
-- * @str: The string to be stripped.
-- *
-- * Returns a pointer to the first non-whitespace character in @str.
-- */
--char *skip_spaces(const char *str)
--{
--	while (isspace(*str))
--		++str;
--	return (char *)str;
--}
--EXPORT_SYMBOL(skip_spaces);
--
--/**
-- * strim - Removes leading and trailing whitespace from @s.
-- * @s: The string to be stripped.
-- *
-- * Note that the first trailing whitespace is replaced with a %NUL-terminator
-- * in the given string @s. Returns a pointer to the first non-whitespace
-- * character in @s.
-- */
--char *strim(char *s)
--{
--	size_t size;
--	char *end;
--
--	size = strlen(s);
--	if (!size)
--		return s;
--
--	end = s + size - 1;
--	while (end >= s && isspace(*end))
--		end--;
--	*(end + 1) = '\0';
--
--	return skip_spaces(s);
--}
--EXPORT_SYMBOL(strim);
--
- #ifndef __HAVE_ARCH_STRLEN
- /**
-  * strlen - Find the length of a string
-@@ -704,101 +625,6 @@ char *strsep(char **s, const char *ct)
- EXPORT_SYMBOL(strsep);
- #endif
- 
--/**
-- * sysfs_streq - return true if strings are equal, modulo trailing newline
-- * @s1: one string
-- * @s2: another string
-- *
-- * This routine returns true iff two strings are equal, treating both
-- * NUL and newline-then-NUL as equivalent string terminations.  It's
-- * geared for use with sysfs input strings, which generally terminate
-- * with newlines but are compared against values without newlines.
-- */
--bool sysfs_streq(const char *s1, const char *s2)
--{
--	while (*s1 && *s1 == *s2) {
--		s1++;
--		s2++;
--	}
--
--	if (*s1 == *s2)
--		return true;
--	if (!*s1 && *s2 == '\n' && !s2[1])
--		return true;
--	if (*s1 == '\n' && !s1[1] && !*s2)
--		return true;
--	return false;
--}
--EXPORT_SYMBOL(sysfs_streq);
--
--/**
-- * match_string - matches given string in an array
-- * @array:	array of strings
-- * @n:		number of strings in the array or -1 for NULL terminated arrays
-- * @string:	string to match with
-- *
-- * This routine will look for a string in an array of strings up to the
-- * n-th element in the array or until the first NULL element.
-- *
-- * Historically the value of -1 for @n, was used to search in arrays that
-- * are NULL terminated. However, the function does not make a distinction
-- * when finishing the search: either @n elements have been compared OR
-- * the first NULL element was found.
-- *
-- * Return:
-- * index of a @string in the @array if matches, or %-EINVAL otherwise.
-- */
--int match_string(const char * const *array, size_t n, const char *string)
--{
--	int index;
--	const char *item;
--
--	for (index = 0; index < n; index++) {
--		item = array[index];
--		if (!item)
--			break;
--		if (!strcmp(item, string))
--			return index;
--	}
--
--	return -EINVAL;
--}
--EXPORT_SYMBOL(match_string);
--
--/**
-- * __sysfs_match_string - matches given string in an array
-- * @array: array of strings
-- * @n: number of strings in the array or -1 for NULL terminated arrays
-- * @str: string to match with
-- *
-- * Returns index of @str in the @array or -EINVAL, just like match_string().
-- * Uses sysfs_streq instead of strcmp for matching.
-- *
-- * This routine will look for a string in an array of strings up to the
-- * n-th element in the array or until the first NULL element.
-- *
-- * Historically the value of -1 for @n, was used to search in arrays that
-- * are NULL terminated. However, the function does not make a distinction
-- * when finishing the search: either @n elements have been compared OR
-- * the first NULL element was found.
-- */
--int __sysfs_match_string(const char * const *array, size_t n, const char *str)
--{
--	const char *item;
--	int index;
--
--	for (index = 0; index < n; index++) {
--		item = array[index];
--		if (!item)
--			break;
--		if (sysfs_streq(item, str))
--			return index;
--	}
--
--	return -EINVAL;
--}
--EXPORT_SYMBOL(__sysfs_match_string);
--
- #ifndef __HAVE_ARCH_MEMSET
- /**
-  * memset - Fill a region of memory with the given value
-@@ -1221,27 +1047,3 @@ void *memchr_inv(const void *start, int c, size_t bytes)
- 	return check_bytes8(start, value, bytes % 8);
- }
- EXPORT_SYMBOL(memchr_inv);
--
--/**
-- * strreplace - Replace all occurrences of character in string.
-- * @s: The string to operate on.
-- * @old: The character being replaced.
-- * @new: The character @old is replaced with.
-- *
-- * Returns pointer to the nul byte at the end of @s.
-- */
--char *strreplace(char *s, char old, char new)
--{
--	for (; *s; ++s)
--		if (*s == old)
--			*s = new;
--	return s;
--}
--EXPORT_SYMBOL(strreplace);
--
--void fortify_panic(const char *name)
--{
--	pr_emerg("detected buffer overflow in %s\n", name);
--	BUG();
--}
--EXPORT_SYMBOL(fortify_panic);
-diff --git a/lib/string_helpers.c b/lib/string_helpers.c
-index 3806a52ce697..bde13612c25d 100644
---- a/lib/string_helpers.c
-+++ b/lib/string_helpers.c
-@@ -696,3 +696,196 @@ void kfree_strarray(char **array, size_t n)
- 	kfree(array);
- }
- EXPORT_SYMBOL_GPL(kfree_strarray);
-+
-+/**
-+ * strscpy_pad() - Copy a C-string into a sized buffer
-+ * @dest: Where to copy the string to
-+ * @src: Where to copy the string from
-+ * @count: Size of destination buffer
-+ *
-+ * Copy the string, or as much of it as fits, into the dest buffer.  The
-+ * behavior is undefined if the string buffers overlap.  The destination
-+ * buffer is always %NUL terminated, unless it's zero-sized.
-+ *
-+ * If the source string is shorter than the destination buffer, zeros
-+ * the tail of the destination buffer.
-+ *
-+ * For full explanation of why you may want to consider using the
-+ * 'strscpy' functions please see the function docstring for strscpy().
-+ *
-+ * Returns:
-+ * * The number of characters copied (not including the trailing %NUL)
-+ * * -E2BIG if count is 0 or @src was truncated.
-+ */
-+ssize_t strscpy_pad(char *dest, const char *src, size_t count)
-+{
-+	ssize_t written;
-+
-+	written = strscpy(dest, src, count);
-+	if (written < 0 || written == count - 1)
-+		return written;
-+
-+	memset(dest + written + 1, 0, count - written - 1);
-+
-+	return written;
-+}
-+EXPORT_SYMBOL(strscpy_pad);
-+
-+/**
-+ * skip_spaces - Removes leading whitespace from @str.
-+ * @str: The string to be stripped.
-+ *
-+ * Returns a pointer to the first non-whitespace character in @str.
-+ */
-+char *skip_spaces(const char *str)
-+{
-+	while (isspace(*str))
-+		++str;
-+	return (char *)str;
-+}
-+EXPORT_SYMBOL(skip_spaces);
-+
-+/**
-+ * strim - Removes leading and trailing whitespace from @s.
-+ * @s: The string to be stripped.
-+ *
-+ * Note that the first trailing whitespace is replaced with a %NUL-terminator
-+ * in the given string @s. Returns a pointer to the first non-whitespace
-+ * character in @s.
-+ */
-+char *strim(char *s)
-+{
-+	size_t size;
-+	char *end;
-+
-+	size = strlen(s);
-+	if (!size)
-+		return s;
-+
-+	end = s + size - 1;
-+	while (end >= s && isspace(*end))
-+		end--;
-+	*(end + 1) = '\0';
-+
-+	return skip_spaces(s);
-+}
-+EXPORT_SYMBOL(strim);
-+
-+/**
-+ * sysfs_streq - return true if strings are equal, modulo trailing newline
-+ * @s1: one string
-+ * @s2: another string
-+ *
-+ * This routine returns true iff two strings are equal, treating both
-+ * NUL and newline-then-NUL as equivalent string terminations.  It's
-+ * geared for use with sysfs input strings, which generally terminate
-+ * with newlines but are compared against values without newlines.
-+ */
-+bool sysfs_streq(const char *s1, const char *s2)
-+{
-+	while (*s1 && *s1 == *s2) {
-+		s1++;
-+		s2++;
-+	}
-+
-+	if (*s1 == *s2)
-+		return true;
-+	if (!*s1 && *s2 == '\n' && !s2[1])
-+		return true;
-+	if (*s1 == '\n' && !s1[1] && !*s2)
-+		return true;
-+	return false;
-+}
-+EXPORT_SYMBOL(sysfs_streq);
-+
-+/**
-+ * match_string - matches given string in an array
-+ * @array:	array of strings
-+ * @n:		number of strings in the array or -1 for NULL terminated arrays
-+ * @string:	string to match with
-+ *
-+ * This routine will look for a string in an array of strings up to the
-+ * n-th element in the array or until the first NULL element.
-+ *
-+ * Historically the value of -1 for @n, was used to search in arrays that
-+ * are NULL terminated. However, the function does not make a distinction
-+ * when finishing the search: either @n elements have been compared OR
-+ * the first NULL element was found.
-+ *
-+ * Return:
-+ * index of a @string in the @array if matches, or %-EINVAL otherwise.
-+ */
-+int match_string(const char * const *array, size_t n, const char *string)
-+{
-+	int index;
-+	const char *item;
-+
-+	for (index = 0; index < n; index++) {
-+		item = array[index];
-+		if (!item)
-+			break;
-+		if (!strcmp(item, string))
-+			return index;
-+	}
-+
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(match_string);
-+
-+/**
-+ * __sysfs_match_string - matches given string in an array
-+ * @array: array of strings
-+ * @n: number of strings in the array or -1 for NULL terminated arrays
-+ * @str: string to match with
-+ *
-+ * Returns index of @str in the @array or -EINVAL, just like match_string().
-+ * Uses sysfs_streq instead of strcmp for matching.
-+ *
-+ * This routine will look for a string in an array of strings up to the
-+ * n-th element in the array or until the first NULL element.
-+ *
-+ * Historically the value of -1 for @n, was used to search in arrays that
-+ * are NULL terminated. However, the function does not make a distinction
-+ * when finishing the search: either @n elements have been compared OR
-+ * the first NULL element was found.
-+ */
-+int __sysfs_match_string(const char * const *array, size_t n, const char *str)
-+{
-+	const char *item;
-+	int index;
-+
-+	for (index = 0; index < n; index++) {
-+		item = array[index];
-+		if (!item)
-+			break;
-+		if (sysfs_streq(item, str))
-+			return index;
-+	}
-+
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(__sysfs_match_string);
-+
-+/**
-+ * strreplace - Replace all occurrences of character in string.
-+ * @s: The string to operate on.
-+ * @old: The character being replaced.
-+ * @new: The character @old is replaced with.
-+ *
-+ * Returns pointer to the nul byte at the end of @s.
-+ */
-+char *strreplace(char *s, char old, char new)
-+{
-+	for (; *s; ++s)
-+		if (*s == old)
-+			*s = new;
-+	return s;
-+}
-+EXPORT_SYMBOL(strreplace);
-+
-+void fortify_panic(const char *name)
-+{
-+	pr_emerg("detected buffer overflow in %s\n", name);
-+	BUG();
-+}
-+EXPORT_SYMBOL(fortify_panic);
+ 	if ((info_element->id == QOS_ELEMENT_ID) && (info_element->len == size)) {
+-		memcpy(element_info->qui, info_element->data,
++		memcpy(&element_info->data, info_element->data,
+ 		       info_element->len);
+ 		element_info->elementID = info_element->id;
+ 		element_info->length = info_element->len;
 -- 
 2.30.2
 
