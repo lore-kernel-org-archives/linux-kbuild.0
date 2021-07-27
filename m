@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ED1C432BE
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE90C43214
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FB4060FBF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF97360FBF
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:01:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbhG0VBG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:01:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54044 "EHLO
+        id S232284AbhG0U7F (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232489AbhG0U7H (ORCPT
+        with ESMTP id S232179AbhG0U7F (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:07 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8B9C061796
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d17so17579724plh.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:07 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:05 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF9AC061798
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id j18-20020a17090aeb12b029017737e6c349so800860pjz.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2339k4b0c5OWODNkIvToUoNb0tla173APtop2g87yK0=;
-        b=iEi8m5VvnHSI7PFGMBkWP99DR9/hasEmGaHMmQ/hAQvXWolvYn1ZqWUISR9yx86HKe
-         271G4W/Ncz7bw1+gj01x3c+6WGGDOH9Vwl/Z+aiHCXNR+A9GI+MIw4zbZztpHvcFA5pK
-         3bJY25UolqjG5yrPadDsyTKAutRNBCjMgVGtE=
+        bh=7nuFdIglNEHNCZJ4OURvNLaS8oKexf2Xbsw8tAobRMI=;
+        b=fXdIa5xzPdxqW9JkE+8PrL7R3HOjzt/uPGhXwllYH14fLZCAy6MK5N+Aom2hlW1RLu
+         LzaLP/I2bdBUasKo/LWt7kuMLca0bx1GK2a8LA0g1v3rpw0p8gJnsxnOKfkunXhaof5t
+         +9cGUtaq4+nJifYIALqVfSUNMPZBcUPcyBLJc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2339k4b0c5OWODNkIvToUoNb0tla173APtop2g87yK0=;
-        b=fnOPrUpqj6mxupvVLqa6lgpXjk7PvwrzxqDqnQIo7zpUGlIzek4Ja70s64OrSSIxDg
-         OAtfz08c+LygSMitYd+YBJJx0Y2QHRQHhuGWeS9wTU0i0Ohl41jrYJvJCyhLJoL5uyhA
-         XQpNKLciUFc6bLBp5qQeZHFy8wj3v+Wmfi2+8gg3qsOll6c6hESccnYBKyGODOubXri6
-         +fbb+20c21pcOJKP7/iWUyTec9gpteWp1pdSa5SQOrqnIWMVztj13ps+I48jt7la1wCG
-         Fcks9zQJux8MStvXOwsjsNBkkSoyAWLqGoLGhU3uMO914YrIOTZHs49KUTcMei3tZmdE
-         0Ymg==
-X-Gm-Message-State: AOAM530B1TNpSP/XSQyPtkxygBj3O92X5lMNpnmUEBXaw/cJAFeS7UXO
-        sh6/I3DQU2QvcoPIDV8/YztTZQ==
-X-Google-Smtp-Source: ABdhPJyJWxUGA3LrJs4BG51/vLWpJYAHbkWL9HNsMr9tG1fy6upd+bj3BEBNQksVHaNDSvFaiNMgng==
-X-Received: by 2002:a63:5610:: with SMTP id k16mr25193869pgb.439.1627419546981;
-        Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
+        bh=7nuFdIglNEHNCZJ4OURvNLaS8oKexf2Xbsw8tAobRMI=;
+        b=DSXbenrASQeXK7g8HF0f+zzfHwYAoVOQ3hVyYlW1TxJJv8bWpc7AkEyfOZE9lrHLJW
+         AcBQONTpuybbSudiqzqEmTGZfK+xIRMwoCedtEtijgWobom09YFcAhZGOT7+uYEA7UeO
+         +vFa/Npk7MkVAdOhvedKL9JlVXQNMdnnHTMhlHtNrEKeqvEMwmdLHxIWpIyS/1r/hiCY
+         vxGAhTJLBQydTYmhfdZ8v9TXgiggnMH+FC/DxBwQheEKuzCUGS95//yT2H/JlKgQS9om
+         LHM3Mu9Ri/P1YC8mTVSyDdPGAwszf3IwYxHokB9EY7RodAeQh5yQPGsxh0nmwq/CD4R2
+         v8AQ==
+X-Gm-Message-State: AOAM532RA7J20ZojxLePg+bXn3VYPlh4K3v32OCxeq/+BnBOJuuhPrnF
+        pPIegkpX//mAcDTP1ZukDhIGrw==
+X-Google-Smtp-Source: ABdhPJxucZUfEOCwFmOc5wsWAybtREO6GX9yQ3Vd7QeNwkxYfGm08yYOn/RWC1L2rMGwaMab2R+i4g==
+X-Received: by 2002:a17:90a:af8c:: with SMTP id w12mr12989398pjq.109.1627419543028;
+        Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id j20sm4672710pfc.203.2021.07.27.13.59.03
+        by smtp.gmail.com with ESMTPSA id i1sm3849350pjs.31.2021.07.27.13.59.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:02 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 06/64] bnxt_en: Use struct_group_attr() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:57:57 -0700
-Message-Id: <20210727205855.411487-7-keescook@chromium.org>
+Subject: [PATCH 01/64] media: omap3isp: Extract struct group for memcpy() region
+Date:   Tue, 27 Jul 2021 13:57:52 -0700
+Message-Id: <20210727205855.411487-2-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2358; h=from:subject; bh=urnr1c0HuSr0zcemksTCEth1t70QAfbHaEcP+c1mXUA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBqioJQ+1gy1GQQan/jf7RJ1/WXH5A0qXVd7xV vq5+5hOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJiWREA CNm4WJeCn47J5obmfhInAVhQHs+WaRodzYXqYlwhYZwqztfgNWLmnuTFB7WixSIet+ogzFMJ1r7fzU QnWXAsLuJ3BX98gUGzvKpmV42J3D2bYmtlrZs7Eyhzqsf8YU/1DgzM/cyzoMB1MkY7QVnFyA9ECldc n4XuqAu3QiaIe+5lzEXU3cW0wy5VDaO3U89VhsX3c6FWjMhQ0FF71U5yZVlZ7s8QMcwjgGQ/rSZ5HS tHMaYMmuprGsc0WRWDxssLMce4AZIdKRwnQBGxYX56oM9u/26JaL77KjZeahVv+n4nC+KkXfWFoSls jO+qT1zevLJBtQfWAqBgbtl6mxUkW3D/0aBPlL7o63ss885dcW9pWjj8sVkqG2AOPVUcl+mMOp+VQm 5qmqUeZbnxJVtXjSRXpvzpBMjNj47QiFJaRRu++FQ9+TJ9TwFws9C31mCXsNjIBK/xzNCc0OuY/J2T Fuuz5AL5SsvRzztZGGQvpjWG2xGgfilhJucEqfeyaJrFQIvjGMIAVFYzMGX4dwwIpBMhxVU4spof3f TLNENoSRR30/sOaQWASgjwj8RqwZ3WioWr4/ALRyqYdHD8j5usq3wgrSpYlAC1AQpefx1uLVDOyes3 1j+4vL+JqxKC93LWdqu/2gVD/VBJnBjDTcrSW3GQTmYSKuzKxca2WKziYSew==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4703; h=from:subject; bh=LCf4h7e2PK4sOgvQBd73gWCkmhRKJC4tH4kH78fVevA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOAJSAPyozNrKWpqJWAzYod2fmvBM+4l2MwYKWh O4ocQxiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgAAKCRCJcvTf3G3AJoP0D/ 9KTuhNSJSjVRPOJFWeuepSlknmUmM/K2t4MDDXqOX/kDkR2wcXh6ttU5lVNW0YgBjHXAF5eWLYpPt5 XHm/KeoOX2MLhuXazp4Ti4YBKlziUsZTs5O6dl8oGQF8vvSOgQVD4x549qIJAaUMy/Q9HqWzVqq85p yP3Plkr/yT7Fr9RDFQxzPqOdsDFBoD1ZLcppau6vdTB0PZWIhyCpFYq2uKiDluWvj75Xhxrp9micdg U2R1bGYEEaNcOOSkguLQYe0+7XbhyY11oRTvhbZEZRUrrqPf99XF/yF1XvvLi6e8z/hVvbVGsEd8Mv Qiu6hKrvxmLG/6Gu1PUewl4RyNN90iXJ3Rh3zLatEPwPBHAFaGnBpr5RP4Ntn7iSsskKZBwlebvul7 dZxKtji4NE+xbeZup0zNKAjAcLeI8QVdmPiAbeqCybdrJc75zf4LhhuDwRXTdbrsXCooEGGuiMw3/v x+EUAxYAP0mwGpMCMNzDB9dpyGAKbRXmGfGhZu9JSilm3k8JsxQ47nQ3+PU4JxTEAGP/RA6CAwR6zV 7KB5mLzU0yyN2b7Az2uKl0RkeneD9qcEy0xqorM/qFH7O+d020ljiEXSwPXdgJdOF7fiAdpmoeK2uM 3RKFyedkYhLmnhtvfdEg6qb1tMNiC33AbBzVnm8LJMBkL2upkdQjzlsDvzsA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -81,65 +81,144 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+intentionally writing across neighboring fields.  Wrap the target region
+in a common named structure. This additionally fixes a theoretical
+misalignment of the copy (since the size of "buf" changes between 64-bit
+and 32-bit, but this is likely never built for 64-bit).
 
-Use struct_group() around members queue_id, min_bw, max_bw, tsa, pri_lvl,
-and bw_weight so they can be referenced together. This will allow memcpy()
-and sizeof() to more easily reason about sizes, improve readability,
-and avoid future warnings about writing beyond the end of queue_id.
+FWIW, I think this code is totally broken on 64-bit (which appears to
+not be a "real" build configuration): it would either always fail (with
+an uninitialized data->buf_size) or would cause corruption in userspace
+due to the copy_to_user() in the call path against an uninitialized
+data->buf value:
 
-"pahole" shows no size nor member offset changes to struct bnxt_cos2bw_cfg.
-"objdump -d" shows no meaningful object code changes (i.e. only source
-line number induced differences and optimizations).
+omap3isp_stat_request_statistics_time32(...)
+    struct omap3isp_stat_data data64;
+    ...
+    omap3isp_stat_request_statistics(stat, &data64);
 
+int omap3isp_stat_request_statistics(struct ispstat *stat,
+                                     struct omap3isp_stat_data *data)
+    ...
+    buf = isp_stat_buf_get(stat, data);
+
+static struct ispstat_buffer *isp_stat_buf_get(struct ispstat *stat,
+                                               struct omap3isp_stat_data *data)
+...
+    if (buf->buf_size > data->buf_size) {
+            ...
+            return ERR_PTR(-EINVAL);
+    }
+    ...
+    rval = copy_to_user(data->buf,
+                        buf->virt_addr,
+                        buf->buf_size);
+
+Regardless, additionally initialize data64 to be zero-filled to avoid
+undefined behavior.
+
+Fixes: 378e3f81cb56 ("media: omap3isp: support 64-bit version of omap3isp_stat_data")
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h | 14 ++++++++------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ drivers/media/platform/omap3isp/ispstat.c |  5 +--
+ include/uapi/linux/omap3isp.h             | 44 +++++++++++++++++------
+ 2 files changed, 36 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-index 8a68df4d9e59..95c636f89329 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c
-@@ -148,10 +148,10 @@ static int bnxt_hwrm_queue_cos2bw_qcfg(struct bnxt *bp, struct ieee_ets *ets)
- 	}
+diff --git a/drivers/media/platform/omap3isp/ispstat.c b/drivers/media/platform/omap3isp/ispstat.c
+index 5b9b57f4d9bf..ea8222fed38e 100644
+--- a/drivers/media/platform/omap3isp/ispstat.c
++++ b/drivers/media/platform/omap3isp/ispstat.c
+@@ -512,7 +512,7 @@ int omap3isp_stat_request_statistics(struct ispstat *stat,
+ int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
+ 					struct omap3isp_stat_data_time32 *data)
+ {
+-	struct omap3isp_stat_data data64;
++	struct omap3isp_stat_data data64 = { };
+ 	int ret;
  
- 	data = &resp->queue_id0 + offsetof(struct bnxt_cos2bw_cfg, queue_id);
--	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw) - 4) {
-+	for (i = 0; i < bp->max_tc; i++, data += sizeof(cos2bw.cfg)) {
- 		int tc;
+ 	ret = omap3isp_stat_request_statistics(stat, &data64);
+@@ -521,7 +521,8 @@ int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
  
--		memcpy(&cos2bw.queue_id, data, sizeof(cos2bw) - 4);
-+		memcpy(&cos2bw.cfg, data, sizeof(cos2bw.cfg));
- 		if (i == 0)
- 			cos2bw.queue_id = resp->queue_id0;
+ 	data->ts.tv_sec = data64.ts.tv_sec;
+ 	data->ts.tv_usec = data64.ts.tv_usec;
+-	memcpy(&data->buf, &data64.buf, sizeof(*data) - sizeof(data->ts));
++	data->buf = (uintptr_t)data64.buf;
++	memcpy(&data->frame, &data64.buf, sizeof(data->frame));
  
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-index 6eed231de565..716742522161 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.h
-@@ -23,13 +23,15 @@ struct bnxt_dcb {
- 
- struct bnxt_cos2bw_cfg {
- 	u8			pad[3];
--	u8			queue_id;
--	__le32			min_bw;
--	__le32			max_bw;
-+	struct_group_attr(cfg, __packed,
-+		u8		queue_id;
-+		__le32		min_bw;
-+		__le32		max_bw;
- #define BW_VALUE_UNIT_PERCENT1_100		(0x1UL << 29)
--	u8			tsa;
--	u8			pri_lvl;
--	u8			bw_weight;
-+		u8		tsa;
-+		u8		pri_lvl;
-+		u8		bw_weight;
-+	);
- 	u8			unused;
+ 	return 0;
+ }
+diff --git a/include/uapi/linux/omap3isp.h b/include/uapi/linux/omap3isp.h
+index 87b55755f4ff..0a16af91621f 100644
+--- a/include/uapi/linux/omap3isp.h
++++ b/include/uapi/linux/omap3isp.h
+@@ -159,13 +159,25 @@ struct omap3isp_h3a_aewb_config {
  };
+ 
+ /**
+- * struct omap3isp_stat_data - Statistic data sent to or received from user
+- * @ts: Timestamp of returned framestats.
+- * @buf: Pointer to pass to user.
++ * struct omap3isp_stat_frame - Statistic data without timestamp nor pointer.
++ * @buf_size: Size of buffer.
+  * @frame_number: Frame number of requested stats.
+  * @cur_frame: Current frame number being processed.
+  * @config_counter: Number of the configuration associated with the data.
+  */
++struct omap3isp_stat_frame {
++	__u32 buf_size;
++	__u16 frame_number;
++	__u16 cur_frame;
++	__u16 config_counter;
++};
++
++/**
++ * struct omap3isp_stat_data - Statistic data sent to or received from user
++ * @ts: Timestamp of returned framestats.
++ * @buf: Pointer to pass to user.
++ * @frame: Statistic data for frame.
++ */
+ struct omap3isp_stat_data {
+ #ifdef __KERNEL__
+ 	struct {
+@@ -176,10 +188,15 @@ struct omap3isp_stat_data {
+ 	struct timeval ts;
+ #endif
+ 	void __user *buf;
+-	__u32 buf_size;
+-	__u16 frame_number;
+-	__u16 cur_frame;
+-	__u16 config_counter;
++	union {
++		struct {
++			__u32 buf_size;
++			__u16 frame_number;
++			__u16 cur_frame;
++			__u16 config_counter;
++		};
++		struct omap3isp_stat_frame frame;
++	};
+ };
+ 
+ #ifdef __KERNEL__
+@@ -189,10 +206,15 @@ struct omap3isp_stat_data_time32 {
+ 		__s32	tv_usec;
+ 	} ts;
+ 	__u32 buf;
+-	__u32 buf_size;
+-	__u16 frame_number;
+-	__u16 cur_frame;
+-	__u16 config_counter;
++	union {
++		struct {
++			__u32 buf_size;
++			__u16 frame_number;
++			__u16 cur_frame;
++			__u16 config_counter;
++		};
++		struct omap3isp_stat_frame frame;
++	};
+ };
+ #endif
  
 -- 
 2.30.2
