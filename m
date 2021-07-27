@@ -5,52 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F208C432BE
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9038C4320A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4932960F6E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D497160BD3
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:17:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234740AbhG0VRS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58294 "EHLO
+        id S233452AbhG0VRW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:17:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234006AbhG0VRE (ORCPT
+        with ESMTP id S233434AbhG0VRB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:17:04 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91F6C06179F
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id l19so1966203pjz.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
+        Tue, 27 Jul 2021 17:17:01 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865CBC0617A0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:17:00 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id mz5-20020a17090b3785b0290176ecf64922so6701250pjb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:17:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=pTss2I65Q2CWQl0zMLaa8H82eOPPoCY8oMnTRENSqR4=;
-        b=YAUu+p5PRv4m9It5HWgaxQc7eZqBkPBSZLDjvBQJVq7VcgxFhGvoVLyoLJ8N4i8Jfl
-         V1tiBwQXzIjaRpT/6KU3bsvSRWIl+Ed1WJZU8t8lYPaguXMnM+sHAZ9PNM1FRuzeOZ6x
-         1w/S3Lji8xVrapNny1sSSoyKLZ2A+Kc5xxrVc=
+        bh=+X6IZihoLyfy0Wiif0jTU6fGkcegk1/ptK7zaE9ExOM=;
+        b=C4eYS/6TxLrtnqsan6/J7Zca8RC2bv+OkK1KmEC0TiMGMWF147lSswQVfXydxoonCd
+         zUdwx1Va4ndolescW59fUk3TLT83BFmUXVeMdetdNsqEz8mVXPv0ewYiE5zskXAgGk4G
+         Q7ZCHD74HyxqBUrj3K+I9j5R8mEVX54Z8kNjE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=pTss2I65Q2CWQl0zMLaa8H82eOPPoCY8oMnTRENSqR4=;
-        b=W55yGYdLX3BrVicVPvIG5/iMQV8EsZeLJ90mrgXheBb5RZ6EKPjFA08hDT81+l9czm
-         +ie2+h2fYlsFy0rqtSQovsKdSZyw80bmQZ1hYf82MfRt9sQoYXB8bSmFtlvWY9AooCvP
-         AWTZbHv2z8jZqCtUH8Nykl78bPsV3iDd86JR2O6/EojfOS3riOx+GmvE1I1pWRAhNRLL
-         aYAnG7jeVe7jjizIfqeTeRJJ5hYu4u1k0MmWy1GP+WI/eAlkdIWhDao/mrybgNkOr541
-         lAoMUWsG90RDdFZtjbM3qDGu1QA0znIwKIz8Eh5tYOcxejOWaq7+WkxlLxc7iAbGqaAj
-         aeeg==
-X-Gm-Message-State: AOAM532tDSW4fgqa0CD0+aMcnklKk0EnNat++f0TNklaJityRxNOACFK
-        vHprkKiWuUWnB+6y0EBg7M/09Q==
-X-Google-Smtp-Source: ABdhPJzbDPYt/21lhtnaWr0tImee3BF99wlkjaOxZG/zklC2IjLrFJ3c7AoHcvzezPw5M6d3+zm/bg==
-X-Received: by 2002:a17:90a:d301:: with SMTP id p1mr5932205pju.220.1627420621296;
-        Tue, 27 Jul 2021 14:17:01 -0700 (PDT)
+        bh=+X6IZihoLyfy0Wiif0jTU6fGkcegk1/ptK7zaE9ExOM=;
+        b=FBth8a1GqUQgwukg2zdqreDh53hhsTbmg2NQxbm116aDAfOVIMsHzLheZB4OR0Wjs1
+         wQ48QoEqeDXD87Y9ILOkY80C/bqRy6+FG14EjIue+gm/Ltp2QLj9QJpTiQaX+09lGzW+
+         46DuUmDbb+0eO2672LAP0k7SUGlxUsFtYFBBJwOn2qgh4M0G62d5qIl8Pw6YLLn83zDl
+         9hs4kBklY4nB+/tMQv0twVcsZbXfkA2JIrJbQHLXgjp1p39MosqBwX797/lhRXv2Y2Vb
+         NGxeEEUcP6MCHotqUMcdvm4X1Ul+23I56qxJyJt6f/ESFnpt68h/mHPm3qw1NNyMvT5Y
+         kwUw==
+X-Gm-Message-State: AOAM533l7CBvkzrZ639bbJj1kMyxt87ADEhrlC59sHOuBmrrpX8uvf+A
+        3uVDNkFYz0hTzjzOTtc5ha2S7Q==
+X-Google-Smtp-Source: ABdhPJyZAfGbEamLyC4c8LmiX8ynap4BNwnOsYzL7JJhP9bqJWc1REFfqqEuGbkWyeEogyJh4AGqqw==
+X-Received: by 2002:a62:804b:0:b029:328:db41:1f47 with SMTP id j72-20020a62804b0000b0290328db411f47mr25007825pfd.43.1627420620114;
+        Tue, 27 Jul 2021 14:17:00 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id z124sm5174413pgb.6.2021.07.27.14.16.55
+        by smtp.gmail.com with ESMTPSA id z124sm5174411pgb.6.2021.07.27.14.16.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 14:16:58 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -64,348 +65,59 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 33/64] lib: Introduce CONFIG_TEST_MEMCPY
-Date:   Tue, 27 Jul 2021 13:58:24 -0700
-Message-Id: <20210727205855.411487-34-keescook@chromium.org>
+Subject: [PATCH 52/64] dm integrity: Use struct_group() to zero struct journal_sector
+Date:   Tue, 27 Jul 2021 13:58:43 -0700
+Message-Id: <20210727205855.411487-53-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9613; h=from:subject; bh=vMvyiyYe9K9D2gND/ltuxCZWuPzQBox4RoUvXlZiiJg=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOHMVso80UVr0RhQnwYElca8D+4vYHNyJyis1bc atW3oFGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhwAKCRCJcvTf3G3AJjllD/ 9XMGR1In5NUDFOfmtBe5obH+PZnVXYS7aCsaC9BBl36zVbpB9g3hy9o9954IL44Q2M2X8l/iP0Mdt9 Fprd6vbL7wO+hDD4ywgbQtQaW4EbO1b99AS/E4opV8walRqK+MZ1ssZ9th1mYU1Yryl3nNwXH80K5z cHnVH/c6qUM1l7u4iPrktSMcqi0uxY+WT4tJT2QpEzBS2uA2Z++Pg0QAuabvzcMJLD36XlzH1dMGHF QsjWHoq3OpB7JI9BFoibODlYeQfe0vH+O4ZMR0CdC9+uqqaXOGvYga3tfXZzEFjKmWYLSbRiO/mRRb CiyxwZtmj156O9vH2uplTEipL2Mfks1IS1tv2wMc6e1Uc36ZTXbZ+ZDpYJHijeW4Kff8vdOt/zCO6H muSBMvvv8ZNOdnqmeHtRo5TJNWctfJSbnn4+sNRiDBQn7X6UuwmNmMhxRUt+l9Pjt5J1qx0T9lAmLn 0YWwa+kC7zviH7HJgzmVAbq7+flzYb9RAM0a927c5isRD+tKPj1F6yCfYw+B22p8x1p/BgLIibuR8G 83lZvdFsnQZvJgeK1txkG4sB66fQousphoaJGgD4py+IHG1KtnDuFiq/fwlscSFVTgiEGImI+xoQCE yfbM7YDkZxoxwyj7Q+KKDvxwFASZkIBYQ4AxZh75JAJqW2RHNpzsVKTFNVHw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1561; h=from:subject; bh=06AwgDhDm5rfSJczNzpy0ALLnPqFifOqpq/XiymXeZw=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOLkvi4WP3nwdDAQoa1QSWSWWQpEaKPsLt1Yrm3 8FcNJeSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziwAKCRCJcvTf3G3AJtOGD/ 4oB/qnnjc336AyH1K6CiqoIGRiODxOG/34zhnJ2L3+mEclURUs4GXvEBs+ynT4uxsaY9QUrjZhpqCp cdyjZJptJPu5bTduPuT/zB8wtiA1nclT/0pnTgoVaFym7lXLnek6LJsOD0RkPwz3jefg96VcdXLn6T TubbzJ4g0ejSYk50gFY2qrA/M/tOBn/OnNwc05C5P9FMHi9s6oV0SFXBMrqdxQCBjmbWQ6Efr9RdXD anks+/yMI/Ww+Lmq1IKQ+10f86r0m2ii3mT6s7tkBApimQWsrgRRguCOY8Ik4wqIaIQQ8IskbwjfRQ zAvsH8PTdNbFjoqR3LIZWIALOtNDkrAIG3wYkJUVq8qBNCH0Gbs5b+3ICmwcEGk1rjYJtGD1JttHO1 8dhqMnihZZQgW2QTqO9UALTRvnmppmvMGXI9t1RSj32G71bLR37OvLf8RYbb5U/ZwW1mG1NdfR18IT +53ZFRG56YQXa/CvxD25rnfVEjsakHncwqKoh+QE/qcQ0lrgJ4wN1lAf0tGqQ4EFaPskxJVADlbjmN 32hM7hI6LNVfSBDdz70anPmudlxiL2l4IWNCgn2CQFA4uwHDgkkIs+OhSEEXPGp8z4obbVQoaGhoG3 canI+R37hvHDQXuDDJFTaj6vFfN8KFalRxYZp56Y89KxykB44tLc2SwCNSPQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Before changing anything about memcpy(), memmove(), and memset(), add
-run-time tests to check basic behaviors for any regressions.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memset(), avoid intentionally writing across
+neighboring fields.
+
+Add struct_group() to mark region of struct journal_sector that should be
+initialized to zero.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- lib/Kconfig.debug |   3 +
- lib/Makefile      |   1 +
- lib/test_memcpy.c | 285 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 289 insertions(+)
- create mode 100644 lib/test_memcpy.c
+ drivers/md/dm-integrity.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 4654e838d68b..d315db9702de 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2220,6 +2220,9 @@ config TEST_XARRAY
- config TEST_OVERFLOW
- 	tristate "Test check_*_overflow() functions at runtime"
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 40f8116c8e44..59deea0dd305 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -119,8 +119,10 @@ struct journal_entry {
+ #define JOURNAL_MAC_SIZE		(JOURNAL_MAC_PER_SECTOR * JOURNAL_BLOCK_SECTORS)
  
-+config TEST_MEMCPY
-+	tristate "Test memcpy*(), memmove*(), and memset*() functions at runtime"
-+
- config TEST_RHASHTABLE
- 	tristate "Perform selftest on resizable hash table"
- 	help
-diff --git a/lib/Makefile b/lib/Makefile
-index 40b4bf0bc847..083a19336e20 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -77,6 +77,7 @@ obj-$(CONFIG_TEST_MIN_HEAP) += test_min_heap.o
- obj-$(CONFIG_TEST_LKM) += test_module.o
- obj-$(CONFIG_TEST_VMALLOC) += test_vmalloc.o
- obj-$(CONFIG_TEST_OVERFLOW) += test_overflow.o
-+obj-$(CONFIG_TEST_MEMCPY) += test_memcpy.o
- obj-$(CONFIG_TEST_RHASHTABLE) += test_rhashtable.o
- obj-$(CONFIG_TEST_SORT) += test_sort.o
- obj-$(CONFIG_TEST_USER_COPY) += test_user_copy.o
-diff --git a/lib/test_memcpy.c b/lib/test_memcpy.c
-new file mode 100644
-index 000000000000..7c64120a68a9
---- /dev/null
-+++ b/lib/test_memcpy.c
-@@ -0,0 +1,285 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test cases for memcpy(), memmove(), and memset().
-+ */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/device.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/overflow.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/vmalloc.h>
-+
-+struct some_bytes {
-+	union {
-+		u8 data[32];
-+		struct {
-+			u32 one;
-+			u16 two;
-+			u8  three;
-+			/* 1 byte hole */
-+			u32 four[4];
-+		};
-+	};
-+};
-+
-+#define check(instance, v) do {	\
-+	int i;	\
-+	BUILD_BUG_ON(sizeof(instance.data) != 32);	\
-+	for (i = 0; i < sizeof(instance.data); i++) {	\
-+		if (instance.data[i] != v) {	\
-+			pr_err("line %d: '%s' not initialized to 0x%02x @ %d (saw 0x%02x)\n", \
-+				__LINE__, #instance, v, i, instance.data[i]);	\
-+			return 1;	\
-+		}	\
-+	}	\
-+} while (0)
-+
-+#define compare(name, one, two) do { \
-+	int i; \
-+	BUILD_BUG_ON(sizeof(one) != sizeof(two)); \
-+	for (i = 0; i < sizeof(one); i++) {	\
-+		if (one.data[i] != two.data[i]) {	\
-+			pr_err("line %d: %s.data[%d] (0x%02x) != %s.data[%d] (0x%02x)\n", \
-+				__LINE__, #one, i, one.data[i], \
-+				#two, i, two.data[i]);	\
-+			return 1;	\
-+		}	\
-+	}	\
-+	pr_info("ok: " TEST_OP "() " name "\n");	\
-+} while (0)
-+
-+static int __init test_memcpy(void)
-+{
-+#define TEST_OP "memcpy"
-+	struct some_bytes control = {
-+		.data = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			},
-+	};
-+	struct some_bytes zero = { };
-+	struct some_bytes middle = {
-+		.data = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00,
-+			  0x00, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			},
-+	};
-+	struct some_bytes three = {
-+		.data = { 0x00, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x00, 0x00, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-+			},
-+	};
-+	struct some_bytes dest = { };
-+	int count;
-+	u8 *ptr;
-+
-+	/* Verify static initializers. */
-+	check(control, 0x20);
-+	check(zero, 0);
-+	compare("static initializers", dest, zero);
-+
-+	/* Verify assignment. */
-+	dest = control;
-+	compare("direct assignment", dest, control);
-+
-+	/* Verify complete overwrite. */
-+	memcpy(dest.data, zero.data, sizeof(dest.data));
-+	compare("complete overwrite", dest, zero);
-+
-+	/* Verify middle overwrite. */
-+	dest = control;
-+	memcpy(dest.data + 12, zero.data, 7);
-+	compare("middle overwrite", dest, middle);
-+
-+	/* Verify argument side-effects aren't repeated. */
-+	dest = control;
-+	ptr = dest.data;
-+	count = 1;
-+	memcpy(ptr++, zero.data, count++);
-+	ptr += 8;
-+	memcpy(ptr++, zero.data, count++);
-+	compare("argument side-effects", dest, three);
-+
-+	return 0;
-+#undef TEST_OP
-+}
-+
-+static int __init test_memmove(void)
-+{
-+#define TEST_OP "memmove"
-+	struct some_bytes control = {
-+		.data = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			},
-+	};
-+	struct some_bytes zero = { };
-+	struct some_bytes middle = {
-+		.data = { 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x00, 0x00, 0x00, 0x00,
-+			  0x00, 0x00, 0x00, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			},
-+	};
-+	struct some_bytes five = {
-+		.data = { 0x00, 0x00, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x00, 0x00, 0x00, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			},
-+	};
-+	struct some_bytes overlap = {
-+		.data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			},
-+	};
-+	struct some_bytes overlap_expected = {
-+		.data = { 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x04, 0x07,
-+			  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			  0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99,
-+			},
-+	};
-+	struct some_bytes dest = { };
-+	int count;
-+	u8 *ptr;
-+
-+	/* Verify static initializers. */
-+	check(control, 0x99);
-+	check(zero, 0);
-+	compare("static initializers", zero, dest);
-+
-+	/* Verify assignment. */
-+	dest = control;
-+	compare("direct assignment", dest, control);
-+
-+	/* Verify complete overwrite. */
-+	memmove(dest.data, zero.data, sizeof(dest.data));
-+	compare("complete overwrite", dest, zero);
-+
-+	/* Verify middle overwrite. */
-+	dest = control;
-+	memmove(dest.data + 12, zero.data, 7);
-+	compare("middle overwrite", dest, middle);
-+
-+	/* Verify argument side-effects aren't repeated. */
-+	dest = control;
-+	ptr = dest.data;
-+	count = 2;
-+	memmove(ptr++, zero.data, count++);
-+	ptr += 9;
-+	memmove(ptr++, zero.data, count++);
-+	compare("argument side-effects", dest, five);
-+
-+	/* Verify overlapping overwrite is correct. */
-+	ptr = &overlap.data[2];
-+	memmove(ptr, overlap.data, 5);
-+	compare("overlapping write", overlap, overlap_expected);
-+
-+	return 0;
-+#undef TEST_OP
-+}
-+
-+static int __init test_memset(void)
-+{
-+#define TEST_OP "memset"
-+	struct some_bytes control = {
-+		.data = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			},
-+	};
-+	struct some_bytes complete = {
-+		.data = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			},
-+	};
-+	struct some_bytes middle = {
-+		.data = { 0x30, 0x30, 0x30, 0x30, 0x31, 0x31, 0x31, 0x31,
-+			  0x31, 0x31, 0x31, 0x31, 0x31, 0x31, 0x31, 0x31,
-+			  0x31, 0x31, 0x31, 0x31, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			},
-+	};
-+	struct some_bytes three = {
-+		.data = { 0x60, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x61, 0x61, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+			},
-+	};
-+	struct some_bytes dest = { };
-+	int count, value;
-+	u8 *ptr;
-+
-+	/* Verify static initializers. */
-+	check(control, 0x30);
-+	check(dest, 0);
-+
-+	/* Verify assignment. */
-+	dest = control;
-+	compare("direct assignment", dest, control);
-+
-+	/* Verify complete overwrite. */
-+	memset(dest.data, 0xff, sizeof(dest.data));
-+	compare("complete overwrite", dest, complete);
-+
-+	/* Verify middle overwrite. */
-+	dest = control;
-+	memset(dest.data + 4, 0x31, 16);
-+	compare("middle overwrite", dest, middle);
-+
-+	/* Verify argument side-effects aren't repeated. */
-+	dest = control;
-+	ptr = dest.data;
-+	value = 0x60;
-+	count = 1;
-+	memset(ptr++, value++, count++);
-+	ptr += 8;
-+	memset(ptr++, value++, count++);
-+	compare("argument side-effects", dest, three);
-+
-+	return 0;
-+#undef TEST_OP
-+}
-+
-+
-+static int __init test_memcpy_init(void)
-+{
-+	int err = 0;
-+
-+	err |= test_memcpy();
-+	err |= test_memmove();
-+	err |= test_memset();
-+
-+	if (err) {
-+		pr_warn("FAIL!\n");
-+		err = -EINVAL;
-+	} else {
-+		pr_info("all tests passed\n");
-+	}
-+
-+	return err;
-+}
-+
-+static void __exit test_memcpy_exit(void)
-+{ }
-+
-+module_init(test_memcpy_init);
-+module_exit(test_memcpy_exit);
-+MODULE_LICENSE("GPL");
+ struct journal_sector {
+-	__u8 entries[JOURNAL_SECTOR_DATA - JOURNAL_MAC_PER_SECTOR];
+-	__u8 mac[JOURNAL_MAC_PER_SECTOR];
++	struct_group(sectors,
++		__u8 entries[JOURNAL_SECTOR_DATA - JOURNAL_MAC_PER_SECTOR];
++		__u8 mac[JOURNAL_MAC_PER_SECTOR];
++	);
+ 	commit_id_t commit_id;
+ };
+ 
+@@ -2856,7 +2858,8 @@ static void init_journal(struct dm_integrity_c *ic, unsigned start_section,
+ 		wraparound_section(ic, &i);
+ 		for (j = 0; j < ic->journal_section_sectors; j++) {
+ 			struct journal_sector *js = access_journal(ic, i, j);
+-			memset(&js->entries, 0, JOURNAL_SECTOR_DATA);
++			BUILD_BUG_ON(sizeof(js->sectors) != JOURNAL_SECTOR_DATA);
++			memset(&js->sectors, 0, sizeof(js->sectors));
+ 			js->commit_id = dm_integrity_commit_id(ic, i, j, commit_seq);
+ 		}
+ 		for (j = 0; j < ic->journal_section_entries; j++) {
 -- 
 2.30.2
 
