@@ -5,54 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3092FC4320A
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1A6C43216
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1708960FBF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8560F60FBF
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232923AbhG0U70 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
+        id S232774AbhG0U7i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232935AbhG0U7S (ORCPT
+        with ESMTP id S231555AbhG0U7V (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:18 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2F3C06136F
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id mz5-20020a17090b3785b0290176ecf64922so6604278pjb.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:21 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13605C0611A1
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id n10so8080plf.4
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A8VL5uTwi2ok0xQG2fExEpX5b43uBzp5tHuj3L/R+N0=;
-        b=MuVA98uzyFghrpeCefbkYMobO8SHDZI2jc808l40HzcktA/z0DyZWg3UUrPxY2jQTx
-         1ed5PTEGwVLj+gUQNU9VV6/Wlgw5nfs0KfrxNrYxZJIzih6b5CYNoj6jQnfqqe/aF7CG
-         Kag8EJWSgFoDxhRz+uHbAHJSq3YzIYRwaQERY=
+        bh=6/OQGnZJO2xpqz0lPpmxFO5LpaD7fJ1BCkxwNv3dNoc=;
+        b=bWmVc1ATo6Bdi0x0gVcLqTFuEn50oNeK5vOPamlyDMwCoxN4KczP2P/Q3olsoZArK2
+         oEaDqH5Lv44TlCNNV6a3EqDf979ldwBgudTOGYLK7q2bv+90PyeluNnxQuKEn2ueMuVk
+         n5ftFZNLEHzMkRrYO1NorsNdCtRC6MlyGNC0M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A8VL5uTwi2ok0xQG2fExEpX5b43uBzp5tHuj3L/R+N0=;
-        b=QZ0LX6yA3DXkLh3Dr6+8VV2iBCtzbrGIMiFnlQtVNHjxVYEjgzqvJL/LafwzM2q1Gz
-         KMBVkSDQxYNOb7+Vvcq+Zd8Jgbcv5wICZX5OC93YQXuvirAmsu+AKSdjS0mzk2bYbvPN
-         41z5QDOo1W7gowP9B+cH18DidXDCgKOKPTixCJNomjoKeHT4T2/vnBxstRTR5FjE4J7k
-         G1sbg7wh8z6d8eEiM1NZ8VYXr5LBNPBinPVtI2aTqAg8diazeENYZef4PpDhDG5DDLlZ
-         JqfdEIJHQf+f5Z3dbWZrvPmUs76nkRkGxAZyC39xFUIihadLlyIEesnpBU8l1zqfP3wD
-         OzuA==
-X-Gm-Message-State: AOAM530TC/KlgwT8wgOoJG/krcZrMrD7uPJnSQbvYey5LQC4+7FfDJYX
-        0/chnZCq2mAZM1EZDihFW4AFTQ==
-X-Google-Smtp-Source: ABdhPJwK/hlVX3ijEELPaVNGs5CqZ9MYVDpKWehXzD8lK279R3qnfEziD46RtfTuI5da/TZ/A7j89A==
-X-Received: by 2002:a17:90a:1196:: with SMTP id e22mr5942936pja.168.1627419551358;
+        bh=6/OQGnZJO2xpqz0lPpmxFO5LpaD7fJ1BCkxwNv3dNoc=;
+        b=HVwzA9Ddtn21pkQ2swJrNb4RRgaY54BNAixiaUIgQVl2lIQtTCwoEvAj0bN7J/LSCI
+         MthafkydeXEfGRk1Wj0ta1K+qvndwLepPAmgV4BITfJwxeQ7RinOqaZfbNWijv5kijIJ
+         C6CiLrOaMLlWx8RI8pgIB+B/izyFq4Bd0F6jocfbduODgsC6iNI/PWXsqqmlW/VqRhST
+         VpGskdpCmM9MQvylXDSSJxMkezrFde+5BCt2WLZ8O8/gNbSN1NqnGE+TdUCAKFNpWhIb
+         BkfQnAST2YjCtXKAbBzbimaqMHasXifubQpyMvTKmsXBkCi5fQdWPYM0ZtiDpkHqqAjP
+         D4Hg==
+X-Gm-Message-State: AOAM532YQGUP9NTJV6sntxSRrQ7fvqfTN1qNKcbctZyCdJAz2c1cuIiC
+        Q45SoSpPRUFpoiJ/2kKs8ikRLA==
+X-Google-Smtp-Source: ABdhPJzmdxeLSGew7Gw5QIRcplfSenLeqID4spMec/HF12Fb71cU2BA7Mx95mpmUvDPT9kgYaNoUaA==
+X-Received: by 2002:a17:902:b692:b029:12b:e0b8:3415 with SMTP id c18-20020a170902b692b029012be0b83415mr16685504pls.32.1627419551650;
         Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h18sm3550930pjv.21.2021.07.27.13.59.08
+        by smtp.gmail.com with ESMTPSA id e4sm5075904pgi.94.2021.07.27.13.59.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -64,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 27/64] HID: cp2112: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:58:18 -0700
-Message-Id: <20210727205855.411487-28-keescook@chromium.org>
+Subject: [PATCH 18/64] cxgb3: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:58:09 -0700
+Message-Id: <20210727205855.411487-19-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2121; h=from:subject; bh=K97nJ7xl1U2miGBKe3f4iGnBB6d79/ydjDfoar50c1k=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOGJiERxKe5UaB/DWAoZsHfj6ZstGRywspA5cbo qbU/Sa2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhgAKCRCJcvTf3G3AJviXD/ 0awF1xyojK4bdkGTsWWYC5EaCkxQXolbhn5I4Bt5LTgBerDVUkkQ+0hbx3KTd6J1shKe33O721L80q ZPSzA6XO1IU4jEh9ESD0vy/BbcwUB240/GjH7pokMgs1tY/ASfazVm5pEoVQ2XMbM9ttTkxD6cKwl2 wD3CaaTKSXRB54J1wY/RbfKchhBz/awcZEkaPX+V5MH128VNgQWftdwl6k4zkukMyTgQqqtcQEDxLG 2PXGR01tGWiZG4zcq6j0qKS9hF+YMV3vNRTD11FlkXkpCJa/stjQqYc3X+5SMk4CRzfl/Y8cOb2ori taM7ib/LTTXf/XdYjP8mkve4OB2F547uGMmQY02c0e401LtZTJR+BdjWQtnzweLMCU7bZWFnvUt/RI 4cqv3FXHI7G3rsq/9s9nQOPzyX1g6CKdhXSGgnS6F75W6n3LHmhYa9TRe7Q9yzYq+fQMiHisjUkftb iTEIUCDgO5rrzjGJ+PX3mtU2ZT4MbYy9wphEFnW76pP0WmYvf85gMWFUBXxjM3D3zkrPguys6E4LcZ Otlv5886DjdrIVDbh5s3k6JVcDviF5vEmyocVX7Gu/d9l7lhKm805IufyFMpTdxERMUq7Hv4ROE4Ex QkBYn0Udw21OjJBLXDJldGRan/1A1k6mjEOu8Q1mHNN3JiXDko0nT/TA1CHQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1623; h=from:subject; bh=QhhwuNDqwvCqZzGgtIdcelj8gelXre9JSKqa+rdI4Ks=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOE+3A+NvAr12M3pvmHg5gBS+BMuzVkps12U6r6 oUWT/KOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhAAKCRCJcvTf3G3AJnYSD/ 9pCe8EneuIHsFG7O1h9Et9FPdQ4sf78aWG201MY4PkmUZ0eDhPiloiEL0ylEGfsAWVozXDrhIHytSc WDmiUNbkrIdxewQswK1NMMFNJ9Jg6zM/c8zAUNt/MzTm6UhPLvszd3txXLKTOrLOyhBueGBQ5hn+C1 5nEhLlbkW2lrfXHI6MECRZNC7n9ca6OXMeCF2+PxwSe96LQt65zkiu9DRp+JebzmgYrVRe3KCZA4++ 9s5AGSX4owqhIkXUVKuL5t+3moxKtTYBRIpDJFhv8IVHDuIXnjWcdqFudBLh0yEwuN7ojftkvan2dB BsuTkhZeg0acZ/dH0dqsbAQmWtVEBbr7DAfLSqRFyp6TZIID6Ixvj8fo5wG5smHK8Xlyl/GjlKxroY WDoUvKOW/J9slWszjune87PA91amTGSpQPBJ30fHEtl6pxwc2hvREl0rjOYopDh4fQVnlM/hG2RFL4 fodpvMq+aZajblMJTpkucy8wpuq+xzQmfu3HLPrOCeSb4MEvdRHmJz7i9ClO+p78cHY164Izuv0iXN dR11BddC3Oi//XeEhgFN90I/5ttFIoVhVZJPXT22XfeYrGSbMWnh7i8X2JPcxj3s6VhYSciaPqqxze NGd+nEE/9Bey/+V/7KcUxYiUZfNz7HPdVbAcPyXWIctj6leKTFSYkijFcf7g==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -82,53 +83,46 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
-Use struct_group() in struct cp2112_string_report around members report,
-length, type, and string, so they can be referenced together. This will
-allow memcpy() and sizeof() to more easily reason about sizes, improve
-readability, and avoid future warnings about writing beyond the end of
-report.
+Use struct_group() in struct rss_hdr around members imm_data and intr_gen,
+so they can be referenced together. This will allow memcpy() and sizeof()
+to more easily reason about sizes, improve readability, and avoid future
+warnings about writing beyond the end of imm_data.
 
-"pahole" shows no size nor member offset changes to struct
-cp2112_string_report.  "objdump -d" shows no meaningful object
-code changes (i.e. only source line number induced differences.)
+"pahole" shows no size nor member offset changes to struct rss_hdr.
+"objdump -d" shows no object code changes.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/hid/hid-cp2112.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/chelsio/cxgb3/sge.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/hid/hid-cp2112.c b/drivers/hid/hid-cp2112.c
-index 477baa30889c..e6ee453c7cfc 100644
---- a/drivers/hid/hid-cp2112.c
-+++ b/drivers/hid/hid-cp2112.c
-@@ -129,10 +129,12 @@ struct cp2112_xfer_status_report {
- 
- struct cp2112_string_report {
- 	u8 dummy;		/* force .string to be aligned */
--	u8 report;		/* CP2112_*_STRING */
--	u8 length;		/* length in bytes of everyting after .report */
--	u8 type;		/* USB_DT_STRING */
--	wchar_t string[30];	/* UTF16_LITTLE_ENDIAN string */
-+	struct_group_attr(contents, __packed,
-+		u8 report;		/* CP2112_*_STRING */
-+		u8 length;		/* length in bytes of everyting after .report */
-+		u8 type;		/* USB_DT_STRING */
-+		wchar_t string[30];	/* UTF16_LITTLE_ENDIAN string */
+diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+index cb5c79c43bc9..1ab1bd86a3a6 100644
+--- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
++++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+@@ -126,8 +126,10 @@ struct rsp_desc {		/* response queue descriptor */
+ 	struct rss_header rss_hdr;
+ 	__be32 flags;
+ 	__be32 len_cq;
+-	u8 imm_data[47];
+-	u8 intr_gen;
++	struct_group(immediate,
++		u8 imm_data[47];
++		u8 intr_gen;
 +	);
- } __packed;
+ };
  
- /* Number of times to request transfer status before giving up waiting for a
-@@ -986,8 +988,8 @@ static ssize_t pstr_show(struct device *kdev,
- 	u8 length;
- 	int ret;
+ /*
+@@ -929,7 +931,8 @@ static inline struct sk_buff *get_imm_packet(const struct rsp_desc *resp)
  
--	ret = cp2112_hid_get(hdev, attr->report, &report.report,
--			     sizeof(report) - 1, HID_FEATURE_REPORT);
-+	ret = cp2112_hid_get(hdev, attr->report, (u8 *)&report.contents,
-+			     sizeof(report.contents), HID_FEATURE_REPORT);
- 	if (ret < 3) {
- 		hid_err(hdev, "error reading %s string: %d\n", kattr->attr.name,
- 			ret);
+ 	if (skb) {
+ 		__skb_put(skb, IMMED_PKT_SIZE);
+-		skb_copy_to_linear_data(skb, resp->imm_data, IMMED_PKT_SIZE);
++		BUILD_BUG_ON(IMMED_PKT_SIZE != sizeof(resp->immediate));
++		skb_copy_to_linear_data(skb, &resp->immediate, IMMED_PKT_SIZE);
+ 	}
+ 	return skb;
+ }
 -- 
 2.30.2
 
