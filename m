@@ -8,50 +8,50 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F32C432BE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B885BC43214
 	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10A0560FD7
+	by mail.kernel.org (Postfix) with ESMTP id A51DC60FDB
 	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233492AbhG0VIS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:08:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55914 "EHLO
+        id S234548AbhG0VIT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:08:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234589AbhG0VHl (ORCPT
+        with ESMTP id S234530AbhG0VHk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:07:41 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1181AC0612E8
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:04 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id m2-20020a17090a71c2b0290175cf22899cso1133257pjs.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:04 -0700 (PDT)
+        Tue, 27 Jul 2021 17:07:40 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FEB3C061371
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d17so17605082plh.10
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wy7ZFa/vlTHtgg8uQMNJ843aX+ZbzQs1i4QUu9cpwyY=;
-        b=CFD6/QI1O3EsbKYxaKeMIUYOQlfKd8FXsmJJprXlgdw+7zyXlZPIW5o4azRnTC8YCQ
-         mzeyQTg+S62pLX4cDFcNv6/N7XaNBnc5E2uNaV5hs68fYSXMP8/ESaJ0OkQygaJQa7AS
-         4F9qh1blRX9PVQ64lesabwlxtHleiGJJDFMls=
+        bh=9rtpQJfi9BLLOweU32TBsHXrBE4rsqDcc6NfaxawLSk=;
+        b=RtzRv2Hcall8Q6XauG9EQPn8i+Z+6koyHdHqSdWr1lBpyDmTL2zq8f4/gYexNOgk1T
+         WXmsT0CdeWzWqKO4r48fClVJNDtqn6UozibeVLNy9JNbVg75bxoYY9Ruld+9teuS9TwN
+         pO5fWj3PBxdOW6auqhJTHSBpj70tfZtzUkWjM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wy7ZFa/vlTHtgg8uQMNJ843aX+ZbzQs1i4QUu9cpwyY=;
-        b=FVxDMUi7O1qjySxcS+n55OfRjIJi6de0D70B69W/ubZhIv6t149RxqTSgn3aUjwXmu
-         9z41W4wPckXsLRWmMJqfnpE0XqZpsGsQn2140y35NIurbXHXsvzliNoRFPBM2pN9j1Q8
-         pvUKZzK9x4tWyMs/CQ9mYSB5tq7Ot3zCJvSZG3dZUQli7Ub8BxY50TkYRlNRNaQ0yX2D
-         E32YdyPSPJaQTMlc8rOrIcnd1N2DswadxcQ8QYkN8m6SJx7zi34QZdAMdHDRvfMYGwha
-         IwcDfIx6w7GfS/zizS6aTzdvhnek84sFnaqN9hqeqfRi1MyTu8JLpQA7AwAWwnCMNp+K
-         Z8pg==
-X-Gm-Message-State: AOAM533pOiGKWnq2c+rdMLlowBtRHDRgZiZRS9jY0OBrLdmmqgwXnCRM
-        YYIs7WyPuaSZVuzPETuUbHKWlQ==
-X-Google-Smtp-Source: ABdhPJx+2T9X9pdhD3ddcewqGNtueFLcFZVjgp4XV45kz/Mw0ouxkgYoYELpNwYrCF7/43LnQvJqng==
-X-Received: by 2002:a17:90b:1d84:: with SMTP id pf4mr24025324pjb.166.1627420023668;
+        bh=9rtpQJfi9BLLOweU32TBsHXrBE4rsqDcc6NfaxawLSk=;
+        b=J3VS6Fpg+2Nfs1eFNok5oyx7+GMqgR2OsCKQ2/cH4ebtG06pjAtMPfLDRD1t8cKv/F
+         Dx5Sq2TpWeT1+tyVUWS+DpoLImDQRpHF/yUiyZ8DztzKU8roBoSzYJr5K6ZClMreNbc7
+         nWpCa5pV4YMgIZAEK7ZEMJg5HaWxEF905b5hlsSBeBq1kDzyaiLpaeRJlzgBnQ3BE4G2
+         Ij4MLUxuW02hAM5Z1ylJqtXwawkp4xfmJzqFK7ILssswpGv/a52fbtFAPfZRiBIhuULX
+         waLaOOfbAcXOkIHzcNEsHcuCUbDNeoqAXAjsToJOQ/Qf+Ms01ROoFy3H4KRk6Kgy6dvM
+         KjnA==
+X-Gm-Message-State: AOAM533g17rW8uFpViY9oG0njl2XJSFuKnGc6nov0FTt+eEz2S87gSxZ
+        YwjDqoPKKb2Bb9K2IEHIWUjPTA==
+X-Google-Smtp-Source: ABdhPJwtY/96GtTJvQKRxUE9f4XM5WO13IhPiZmvG1Gx9it1XsiDWBqLh+O5ytTK4J0lAw6QIUM9HA==
+X-Received: by 2002:a62:3852:0:b029:32e:50d4:6ee5 with SMTP id f79-20020a6238520000b029032e50d46ee5mr24697953pfa.3.1627420023128;
         Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id s193sm4734376pfc.183.2021.07.27.14.06.56
+        by smtp.gmail.com with ESMTPSA id 19sm5414686pgg.36.2021.07.27.14.06.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 56/64] ethtool: stats: Use struct_group() to clear all stats at once
-Date:   Tue, 27 Jul 2021 13:58:47 -0700
-Message-Id: <20210727205855.411487-57-keescook@chromium.org>
+Subject: [PATCH 50/64] KVM: x86: Use struct_group() to zero decode cache
+Date:   Tue, 27 Jul 2021 13:58:41 -0700
+Message-Id: <20210727205855.411487-51-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1822; h=from:subject; bh=nf2hDwlk0YBMeQam31KvtF6X3nn/T4T4psodjHluwA0=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOM4ay2vSP0iUDUl/jIVt/Blah8KWXvHVH7Wzv7 NYIRQBeJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzjAAKCRCJcvTf3G3AJg7ED/ wIYAKrzGS2QdyAzL+zWobbS3KBQXRaEYAJzUBfRITbmMnqRyWiKhqX9YPUQktluLi8FRLF8/tN1uNl Zxa7PntzoeHKtnHdKaUlHK6jf3BDo5jSq4V1v/ebceGUpYXZEmqBaMINS8m6bmB3D2Mg/O+78AphgA 9W427uDE2RA+00IyaPB0SuPpufyTlaLDtD0Zu/sNtuHoxjQv7TLsi7hKzCX9rzcpT6iYxy+r2oHJHR UW5fD3JxKtWaV5YRkxjG6zL1MuLmgkGRIZRM5MeQGsmfy/FLz/XIKFETiqW5DntGZOtXT/0htDnrlk PzvLPT4HEfNLzx+3A9w8dI9o8ascU8vO2ZRk/b8a7pFTT9viBfWhZaSpikWc0hyxZUUez9dR413PZT Ihk7cAMDTlnVhX8R/9y3T0RhUGSPws7B1NsMvvxVseZgEJlROYx8WchI3f/YQofn8x40OI695ZW6eZ E2E0P3MhTIlruLHwghe2WVf/JwGX5pATdgB83WBO7y5tJPfTi3bt4dUNUN3MVJ1huNwC/xqUbDx8As Ckre4MXvBdIoXEXXN2pOr5ObcLIhMYDjjuGdxhjOInFiHku6jxVuO2Gu3Qwlt8hXM3TPFrAZoEl/Cr 5zyQjXfG1x4OBqaHrzFrl/No/XVLDOKeVvR6caucbAbMqbu6m2ziy3mOa3yA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1896; h=from:subject; bh=Yy2yFM1urtqhL7n0r4aqd2cxgBZVMAyveJbcFvHLMlI=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOLO3D9COdGLWOeR85zbaklAzObwkj15dNUWB7V d7VJAUWJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziwAKCRCJcvTf3G3AJlCqD/ 9cyHvgurMj0+H5UBZbi3PT0Pbs8SRpr/t0XADG40BpZ+yVAAnrqFDSkxMwCaBqoxRSLdmcDqy3b5SU c20S1Aw1siyqHiVEI4mnsKY6Jgrwx/SMBp2bYIVeZru9HNSXKKx57kdf2tIrViE9LYxYJFaHrBwPb9 o5tiJQmaA6MIjjExAe20o1QhTaI/E8sNfmlXtKaS0+XA7Rm8s+Qw65FVDyLqzv2BWb50Hdr4cMYh1X MTXkpiMZrMaPEQ3Wa2TwW0eAlAoWXXUXCLZ9VWJ5QlWKljXrylcdoLAikqEE7v2J5Rlr6FXOAMs3tZ d2CLoMo36Px3zBdTlu90/UlVPgO3P/Uk2ZhkN4uzHd4n/DIvanRvGewXH4liErXPixMmOgnLGLl+5d dVxT4PdjmU6shd83BEuZ8GZH4T6M9tygTNcERhWYIFMPXxYO5sgBrAlOJPmGkJC7hJD/RcfcYrBrpN UanrlQrhn6AYQGnmxcAQjc9dQQiRJO+jcDS4dRElaZb2OkRAD8J6+dNCu3El0L2RSWF1CiAbnwjwZi vxQaozruf1DsPdfg+Bv8JNonOrCpc7rnWMUbZIM6n0KMZJB+puj15D3L2N22fwOUi7MkF9cUWlAzlk H8X7oTv0jAj5RR0KuG/re2JSTLAEqtF1EBsbI72rE8m6mO5OjrH8edIe/qDg==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -83,47 +83,59 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Add struct_group() to mark region of struct stats_reply_data that should
-be initialized, which can now be done in a single memset() call.
+Add struct_group() to mark region of struct x86_emulate_ctxt that should
+be initialized to zero.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- net/ethtool/stats.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ arch/x86/kvm/emulate.c     |  3 +--
+ arch/x86/kvm/kvm_emulate.h | 19 +++++++++++--------
+ 2 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/net/ethtool/stats.c b/net/ethtool/stats.c
-index ec07f5765e03..a20e0a24ff61 100644
---- a/net/ethtool/stats.c
-+++ b/net/ethtool/stats.c
-@@ -14,10 +14,12 @@ struct stats_req_info {
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 2837110e66ed..2608a047e769 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -5377,8 +5377,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
  
- struct stats_reply_data {
- 	struct ethnl_reply_data		base;
--	struct ethtool_eth_phy_stats	phy_stats;
--	struct ethtool_eth_mac_stats	mac_stats;
--	struct ethtool_eth_ctrl_stats	ctrl_stats;
--	struct ethtool_rmon_stats	rmon_stats;
-+	struct_group(stats,
-+		struct ethtool_eth_phy_stats	phy_stats;
-+		struct ethtool_eth_mac_stats	mac_stats;
-+		struct ethtool_eth_ctrl_stats	ctrl_stats;
-+		struct ethtool_rmon_stats	rmon_stats;
-+	);
- 	const struct ethtool_rmon_hist_range	*rmon_ranges;
- };
+ void init_decode_cache(struct x86_emulate_ctxt *ctxt)
+ {
+-	memset(&ctxt->rip_relative, 0,
+-	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
++	memset(&ctxt->decode_cache, 0, sizeof(ctxt->decode_cache));
  
-@@ -117,10 +119,7 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
- 	/* Mark all stats as unset (see ETHTOOL_STAT_NOT_SET) to prevent them
- 	 * from being reported to user space in case driver did not set them.
+ 	ctxt->io_read.pos = 0;
+ 	ctxt->io_read.end = 0;
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 68b420289d7e..9b8afcb8ad39 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -341,14 +341,17 @@ struct x86_emulate_ctxt {
+ 	 * the rest are initialized unconditionally in x86_decode_insn
+ 	 * or elsewhere
  	 */
--	memset(&data->phy_stats, 0xff, sizeof(data->phy_stats));
--	memset(&data->mac_stats, 0xff, sizeof(data->mac_stats));
--	memset(&data->ctrl_stats, 0xff, sizeof(data->ctrl_stats));
--	memset(&data->rmon_stats, 0xff, sizeof(data->rmon_stats));
-+	memset(&data->stats, 0xff, sizeof(data->stats));
- 
- 	if (test_bit(ETHTOOL_STATS_ETH_PHY, req_info->stat_mask) &&
- 	    dev->ethtool_ops->get_eth_phy_stats)
+-	bool rip_relative;
+-	u8 rex_prefix;
+-	u8 lock_prefix;
+-	u8 rep_prefix;
+-	/* bitmaps of registers in _regs[] that can be read */
+-	u32 regs_valid;
+-	/* bitmaps of registers in _regs[] that have been written */
+-	u32 regs_dirty;
++	struct_group(decode_cache,
++		bool rip_relative;
++		u8 rex_prefix;
++		u8 lock_prefix;
++		u8 rep_prefix;
++		/* bitmaps of registers in _regs[] that can be read */
++		u32 regs_valid;
++		/* bitmaps of registers in _regs[] that have been written */
++		u32 regs_dirty;
++	);
++
+ 	/* modrm */
+ 	u8 modrm;
+ 	u8 modrm_mod;
 -- 
 2.30.2
 
