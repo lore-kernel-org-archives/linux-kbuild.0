@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCF9C4338F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2062BC19F31
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70C1960FC0
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBC4060FDA
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbhG0U7E (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54026 "EHLO
+        id S232359AbhG0U7I (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231368AbhG0U7D (ORCPT
+        with ESMTP id S232406AbhG0U7G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:03 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D53C061757
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id mz5-20020a17090b3785b0290176ecf64922so6603533pjb.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:03 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:06 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 243C2C0613C1
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id mz5-20020a17090b3785b0290176ecf64922so6603811pjb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=c3ykowIwDTRKsInbKYf/ek7DP95JkPgh9oE6DtLLi+A=;
-        b=Kp+U9AytVp9BwbsLQj5AYOpg8DezjsG5/creX/t5fYRDEs7tszMAJwrDdgQwhZq/SR
-         pfMuBhqfFlPx2fMK05Ry9tqtfPSV8v4DUZPulqrs+9s8Twz/vFSkAn2NBw8N2WvhGIZs
-         I5L0NhknTsbo7S17qVe98S4vL28QINN1K21ew=
+        bh=iuUva0FySkNQOcUDbwdlW2WIxXp65/YwLJggvLs0d2Q=;
+        b=SDf9ocitfb5Rs0PPIYeCT0/fXFDoOwuSmJ71BqMp8qK67TG51IYhnkPZYy/Q3tNO21
+         Gnrpr40E1hlQTmSfDar2EtSdufgNM0qMB+9w03gQuMGr7mQ5uzF4Kn4bygKa0DXqbzlv
+         VufURF9CT4nl7hDYdR1ieA2X/jXjjsUujEGMU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=c3ykowIwDTRKsInbKYf/ek7DP95JkPgh9oE6DtLLi+A=;
-        b=Ri2SFyHE9jilJ61gWZeUZCIHvTMnxEAyLJDSxMkp2JJ+1gNACASDnjps3xDpQszPyp
-         qGtZNe0pjSq/o1u2iDCnqsMd5QdLRq6RtsH+FsLYU+cWyz58GjEnSss1EIhvKiUmxtGZ
-         byWW3jqNMKmw9XkFNgjmDWkcSh0tZfSruUT3raIjuypZOybX5SF9wDQgc5tlNTAr07ml
-         dlUMGwBUdeOfGPumax+cOFNxBoyPo0WauJ7gi7Gvvr/FKRnauqWCTvDkvxMm2FT6Q5/u
-         LHU1OSRbg82I3lfrBeVYEJDVatmV582MV4YnYmjXOO3fbQzGqK07yhsp/yrP1GGTAWN8
-         /tjg==
-X-Gm-Message-State: AOAM530FPIu/RzHO2PosRcCeLL7j2qndQntwWfl4LoNbwSqPCvfG/Pks
-        aafibW6pLl/Z6HhF9OVg41g9HA==
-X-Google-Smtp-Source: ABdhPJwNHFDf+F+gUxt2yA1m1JnQqLEbNlnBfRoIoqlBir+Zo4XdTRlv/GVLC3WzAXlOzz8ixT2dzQ==
-X-Received: by 2002:a65:4508:: with SMTP id n8mr25560399pgq.407.1627419542777;
-        Tue, 27 Jul 2021 13:59:02 -0700 (PDT)
+        bh=iuUva0FySkNQOcUDbwdlW2WIxXp65/YwLJggvLs0d2Q=;
+        b=soeRZfAIyx7tTT3NKU1nRM4oPVI63MjCJccA4QcRYXV/x8H6VZgD1srgkGxZSmcJ8I
+         9XFH+5jW/AaLjItV8q8oom34XxQ55yd1B8MT1bimJLGVuI0EC7Vtz0MR7KzY6wxRGohv
+         ddf/u3WGky8gwx/RLlO5h+DfWbeRDRIrYtiZD9oGHGJwL3+8Cic/hZX8aBRgimH234Tg
+         V2Wk2ceZVxIhSA4+nx6QV1WrduwSB6khg6YFWD2Fo97rzkF51SJ4SryVUMXfMNyGxQrG
+         HaQ07FJbeMcGeYXG+96Lh3wXWG36JA1SKQ07U8bthNITOsIQretl8NZaMbaDv6sWyGeD
+         VSsg==
+X-Gm-Message-State: AOAM530j71tqXC2/lsDFwGhsikxmrWAslp3fBKpu+fxH78ygUZaVO5Gl
+        7TEGT+kEkXV+2ZS91G0fogR96A==
+X-Google-Smtp-Source: ABdhPJxd9cckzW204bnJlLeGWRw8HsEr60nmuyps9sZC+nCmiB8MQlX0YoxOoNf+wmuMOuPBFQp8bg==
+X-Received: by 2002:a63:44a:: with SMTP id 71mr25103040pge.259.1627419545742;
+        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id g3sm4480039pfi.197.2021.07.27.13.59.01
+        by smtp.gmail.com with ESMTPSA id b10sm4629437pfi.122.2021.07.27.13.59.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 13:59:02 -0700 (PDT)
+        Tue, 27 Jul 2021 13:59:05 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -64,57 +64,120 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 03/64] rpmsg: glink: Replace strncpy() with strscpy_pad()
-Date:   Tue, 27 Jul 2021 13:57:54 -0700
-Message-Id: <20210727205855.411487-4-keescook@chromium.org>
+Subject: [PATCH 05/64] skbuff: Switch structure bounds to struct_group()
+Date:   Tue, 27 Jul 2021 13:57:56 -0700
+Message-Id: <20210727205855.411487-6-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1814; h=from:subject; bh=CGejJDIBWoCTMrdLfdYOlKTt2khst8/bmsGsqzGrjiA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOAj+vEe7YcbCfgSji3keoTaHrI/ZHofnZ1HVRt kwNnps2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgAAKCRCJcvTf3G3AJqZUEA CIcBP+l3BbFi7alvKzzPClmhyUHq9Qrd5uMRNKMY9XyV0NR/jnI8CoYhga76FZhbT+mDmv6EqlY2QS rhhfJ44Nv7YuNm8ADcxv6ICsgHYc6ExgMQ4gO83JrsqVUuNebi/HDrFNw7T4Z5c1/UUTlWpIwnqxs7 zwuIgbFRNhuxTlpAncpl+dPIlkv40KWXaiqTIR/FuXteCb0rHpAWPYMrJ3tXcDqBwzHtpYfAYbneQq NIhvmdPjcFi5GnKQBm9eTRP7/Xcjg+8Ve3GeZadiIqC14fSgnMgtIahIDXLyAD4WuxdSRQwG+lbGXR 16M20bodkEsvyiJfNZJQdqgyHsVt/eXqpuH1om13iF7+wTit6p8gEUfPMy/V38FyOTgjikr8am4k7A 23f/4W0+nt6mLLlDMXQtGC7TmA97UCqRJ+dNmiQMLuRljr6uD1DWUTS75HLcUjcWkIU1fBUYUi0DWk P/zazmIkeRAnFcJGwZf3zUXOErBqGPmnAav3Bok+zgtGP6JjxVaiFcJN+Dq/iIMuZ8gp1+kmma1GMv m/hLrzzRYpUJQyo2xNUAyVn6zzmEqA+jINb6SqBOUVg3sNfzZTRQkVA7NvmZp+LplR7Jw/n/+91q/6 pIUu/YH+PA+X/eemAshAw2isLrLbFZdRioKXBvLqtjcD2yGkNeO8ROQmebfA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3898; h=from:subject; bh=zDRFvFHICr3CPhHUYpPjYfgsT3sRvZztC648O8M/Z+4=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOBpvR1C53LhaWwxonGRaK5/85L2Hs7G8ZVB/N6 FPHA+JWJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgQAKCRCJcvTf3G3AJq8YEA Cme+/3zGc1ol3V7MYHOv02AJS8eYSYvP56YPTN+IWhbG/R9iao0T79B3njP05AdYDQ/YzSVZFyf/nM dA48kevzTJQ5BH6U98ciGMAoiY4MhSCxDjxpggkoOLHCkKWSmCLxIFysdAaSpZoavbJiYSBCDvceLN RiDHeuN7xznxcDnJd55tsJ+s4n3qET0tTBt0l2kGnVjwvTSyzmILuKrvcWemv1D0RVYiX+E2jt99TI xBdZECNgLTvRPfaECNOE/oYadRe/oj4m0V1SGwAAc25mY74Wuw87dVvp6r6XamWTMVynN4sRe1Au0l ZqV6k+AJMT52RN/mXQfd19TzgH+9eLex0ywIpeVu7Wc7KOxzgkA7tN9HjgNuY4CRUVFKbPReaMQdus vwUmDgDCcu9Dx0l4QzTYz361oipSEVY20vjIwEsR6yog6nyRGOYLp1uAmwh9xz2Kp3fv2XoaAzZXR2 I0ceyOT34//v3kbI8cZDJ0fHg0ntu/bSopVzECOxn6N5NUgkRQDKgdk28qyMDnLCU3wodi4dVaFQGS knqS45LxCRnyHOiKsBXLi2kVHORjmVCZ5fuyRrq1JDcWHgY3T3Fb/Pf8qql4TTPlb51tmVciwA7mKN nveG2L2Sw3sIt442QEpUEQ42yM7ri+HBQuuh4OsJ/a9P5DszIHRUcnJVBWcQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The use of strncpy() is considered deprecated for NUL-terminated
-strings[1]. Replace strncpy() with strscpy_pad() (as it seems this case
-expects the NUL padding to fill the allocation following the flexible
-array). This additionally silences a warning seen when building under
--Warray-bounds:
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memcpy(), memmove(), and memset(), avoid
+intentionally writing across neighboring fields.
 
-./include/linux/fortify-string.h:38:30: warning: '__builtin_strncpy' offset 24 from the object at '__mptr' is out of the bounds of referenced subobject 'data' with type 'u8[]' {aka 'unsigned char[]'} at offset 24 [-Warray-bounds]
-   38 | #define __underlying_strncpy __builtin_strncpy
-      |                              ^
-./include/linux/fortify-string.h:50:9: note: in expansion of macro '__underlying_strncpy'
-   50 |  return __underlying_strncpy(p, q, size);
-      |         ^~~~~~~~~~~~~~~~~~~~
-drivers/rpmsg/qcom_glink_native.c: In function 'qcom_glink_work':
-drivers/rpmsg/qcom_glink_native.c:36:5: note: subobject 'data' declared here
-   36 |  u8 data[];
-      |     ^~~~
+Replace the existing empty member position markers "headers_start" and
+"headers_end" with a struct_group(). This will allow memcpy() and sizeof()
+to more easily reason about sizes, and improve readability.
 
-[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings
+"pahole" shows no size nor member offset changes to struct sk_buff.
+"objdump -d" shows no no meaningful object code changes (i.e. only source
+line number induced differences and optimizations.)
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/rpmsg/qcom_glink_native.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/wireguard/queueing.h |  4 +---
+ include/linux/skbuff.h           |  9 ++++-----
+ net/core/skbuff.c                | 14 +++++---------
+ 3 files changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/rpmsg/qcom_glink_native.c b/drivers/rpmsg/qcom_glink_native.c
-index 05533c71b10e..c7b9de655080 100644
---- a/drivers/rpmsg/qcom_glink_native.c
-+++ b/drivers/rpmsg/qcom_glink_native.c
-@@ -1440,7 +1440,7 @@ static int qcom_glink_rx_open(struct qcom_glink *glink, unsigned int rcid,
- 		}
+diff --git a/drivers/net/wireguard/queueing.h b/drivers/net/wireguard/queueing.h
+index 4ef2944a68bc..52da5e963003 100644
+--- a/drivers/net/wireguard/queueing.h
++++ b/drivers/net/wireguard/queueing.h
+@@ -79,9 +79,7 @@ static inline void wg_reset_packet(struct sk_buff *skb, bool encapsulating)
+ 	u8 sw_hash = skb->sw_hash;
+ 	u32 hash = skb->hash;
+ 	skb_scrub_packet(skb, true);
+-	memset(&skb->headers_start, 0,
+-	       offsetof(struct sk_buff, headers_end) -
+-		       offsetof(struct sk_buff, headers_start));
++	memset(&skb->headers, 0, sizeof(skb->headers));
+ 	if (encapsulating) {
+ 		skb->l4_hash = l4_hash;
+ 		skb->sw_hash = sw_hash;
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index f19190820e63..b4032e9b130e 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -800,11 +800,10 @@ struct sk_buff {
+ 	__u8			active_extensions;
+ #endif
  
- 		rpdev->ept = &channel->ept;
--		strncpy(rpdev->id.name, name, RPMSG_NAME_SIZE);
-+		strscpy_pad(rpdev->id.name, name, RPMSG_NAME_SIZE);
- 		rpdev->src = RPMSG_ADDR_ANY;
- 		rpdev->dst = RPMSG_ADDR_ANY;
- 		rpdev->ops = &glink_device_ops;
+-	/* fields enclosed in headers_start/headers_end are copied
++	/* Fields enclosed in headers group are copied
+ 	 * using a single memcpy() in __copy_skb_header()
+ 	 */
+-	/* private: */
+-	__u32			headers_start[0];
++	struct_group(headers,
+ 	/* public: */
+ 
+ /* if you move pkt_type around you also must adapt those constants */
+@@ -920,8 +919,8 @@ struct sk_buff {
+ 	u64			kcov_handle;
+ #endif
+ 
+-	/* private: */
+-	__u32			headers_end[0];
++	); /* end headers group */
++
+ 	/* public: */
+ 
+ 	/* These elements must be at the end, see alloc_skb() for details.  */
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index fc7942c0dddc..5f29c65507e0 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -987,12 +987,10 @@ void napi_consume_skb(struct sk_buff *skb, int budget)
+ }
+ EXPORT_SYMBOL(napi_consume_skb);
+ 
+-/* Make sure a field is enclosed inside headers_start/headers_end section */
++/* Make sure a field is contained by headers group */
+ #define CHECK_SKB_FIELD(field) \
+-	BUILD_BUG_ON(offsetof(struct sk_buff, field) <		\
+-		     offsetof(struct sk_buff, headers_start));	\
+-	BUILD_BUG_ON(offsetof(struct sk_buff, field) >		\
+-		     offsetof(struct sk_buff, headers_end));	\
++	BUILD_BUG_ON(offsetof(struct sk_buff, field) !=		\
++		     offsetof(struct sk_buff, headers.field));	\
+ 
+ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+ {
+@@ -1004,14 +1002,12 @@ static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
+ 	__skb_ext_copy(new, old);
+ 	__nf_copy(new, old, false);
+ 
+-	/* Note : this field could be in headers_start/headers_end section
++	/* Note : this field could be in the headers group.
+ 	 * It is not yet because we do not want to have a 16 bit hole
+ 	 */
+ 	new->queue_mapping = old->queue_mapping;
+ 
+-	memcpy(&new->headers_start, &old->headers_start,
+-	       offsetof(struct sk_buff, headers_end) -
+-	       offsetof(struct sk_buff, headers_start));
++	memcpy(&new->headers, &old->headers, sizeof(new->headers));
+ 	CHECK_SKB_FIELD(protocol);
+ 	CHECK_SKB_FIELD(csum);
+ 	CHECK_SKB_FIELD(hash);
 -- 
 2.30.2
 
