@@ -8,50 +8,50 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1A6C43216
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2896C4320A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8560F60FBF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC7A260FD8
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 20:59:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232774AbhG0U7i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 16:59:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54054 "EHLO
+        id S232749AbhG0U7o (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 16:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231555AbhG0U7V (ORCPT
+        with ESMTP id S232975AbhG0U7T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 16:59:21 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13605C0611A1
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id n10so8080plf.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:12 -0700 (PDT)
+        Tue, 27 Jul 2021 16:59:19 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBE7C061254
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id a4-20020a17090aa504b0290176a0d2b67aso6632792pjq.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6/OQGnZJO2xpqz0lPpmxFO5LpaD7fJ1BCkxwNv3dNoc=;
-        b=bWmVc1ATo6Bdi0x0gVcLqTFuEn50oNeK5vOPamlyDMwCoxN4KczP2P/Q3olsoZArK2
-         oEaDqH5Lv44TlCNNV6a3EqDf979ldwBgudTOGYLK7q2bv+90PyeluNnxQuKEn2ueMuVk
-         n5ftFZNLEHzMkRrYO1NorsNdCtRC6MlyGNC0M=
+        bh=niMj9CXz4ejnw+kzGNZe1+bUFXSbgDhe9sFS3VQ9miI=;
+        b=a+dkLFxyeSBPiOFmgASKI3HBPzumVIOC5mH0NfPZ4G0u9HE21lIwFBBWBONzwmMQDo
+         Efqix/y2SZ0MmC2V1Ld9XBh4ywoKeS0o00fNfBm4e5u9ZpK6ODN3+AjOzFOZhZhaYDHx
+         uzL0y45E1gPOLULzFld6xboGrx4XSCubE7bFI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6/OQGnZJO2xpqz0lPpmxFO5LpaD7fJ1BCkxwNv3dNoc=;
-        b=HVwzA9Ddtn21pkQ2swJrNb4RRgaY54BNAixiaUIgQVl2lIQtTCwoEvAj0bN7J/LSCI
-         MthafkydeXEfGRk1Wj0ta1K+qvndwLepPAmgV4BITfJwxeQ7RinOqaZfbNWijv5kijIJ
-         C6CiLrOaMLlWx8RI8pgIB+B/izyFq4Bd0F6jocfbduODgsC6iNI/PWXsqqmlW/VqRhST
-         VpGskdpCmM9MQvylXDSSJxMkezrFde+5BCt2WLZ8O8/gNbSN1NqnGE+TdUCAKFNpWhIb
-         BkfQnAST2YjCtXKAbBzbimaqMHasXifubQpyMvTKmsXBkCi5fQdWPYM0ZtiDpkHqqAjP
-         D4Hg==
-X-Gm-Message-State: AOAM532YQGUP9NTJV6sntxSRrQ7fvqfTN1qNKcbctZyCdJAz2c1cuIiC
-        Q45SoSpPRUFpoiJ/2kKs8ikRLA==
-X-Google-Smtp-Source: ABdhPJzmdxeLSGew7Gw5QIRcplfSenLeqID4spMec/HF12Fb71cU2BA7Mx95mpmUvDPT9kgYaNoUaA==
-X-Received: by 2002:a17:902:b692:b029:12b:e0b8:3415 with SMTP id c18-20020a170902b692b029012be0b83415mr16685504pls.32.1627419551650;
+        bh=niMj9CXz4ejnw+kzGNZe1+bUFXSbgDhe9sFS3VQ9miI=;
+        b=dGr/xZRpFJjyVg8s0ATSjXshuw0dKKf4ixxrPQK/AxqmHy4iAZIcVX41zAbng9jcZo
+         kruyoUpl8GW9BoSGc7CozSLtbBGCsUL9+V9kSj0RSmwVKtVC4o5O3zYIAtldj9jiNDAS
+         MGuij9FEjAq3UP1wzI2VFm1QqSBPFLNE5T7Pk7CZBEIEetCCx27THmOCD7pI07nGdfza
+         WV7BcrCWI3tax5Ti7TzWqBx91/foBLWHMibGShFHvY7+VcoZxoREAwVYcCkUf447ry8j
+         BNiZS+1AxlBMyN0dsWTiLEN6cEieJ8q2iG2B0+x0GqkAiNtTNCZQ1mVeoWeKtpi0idyr
+         2bYQ==
+X-Gm-Message-State: AOAM532pPj3bTBpFVkRLzWVAqvvxQXZifz3P2hveYxl7WUhRCfS8I51n
+        UKfX6/rgz4hCo2SlIgDoorxd2Q==
+X-Google-Smtp-Source: ABdhPJzH1DT4GrYsm4Wp3fQD5rhWKkENYYazYbCfE0KpJ6DHpEI/MRvOUuvJv6GD7saGx6RnZcVO6Q==
+X-Received: by 2002:a63:2586:: with SMTP id l128mr26012275pgl.68.1627419551372;
         Tue, 27 Jul 2021 13:59:11 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id e4sm5075904pgi.94.2021.07.27.13.59.06
+        by smtp.gmail.com with ESMTPSA id j13sm5025493pgp.29.2021.07.27.13.59.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 13:59:08 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 18/64] cxgb3: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:58:09 -0700
-Message-Id: <20210727205855.411487-19-keescook@chromium.org>
+Subject: [PATCH 15/64] ipw2x00: Use struct_group() for memcpy() region
+Date:   Tue, 27 Jul 2021 13:58:06 -0700
+Message-Id: <20210727205855.411487-16-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1623; h=from:subject; bh=QhhwuNDqwvCqZzGgtIdcelj8gelXre9JSKqa+rdI4Ks=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOE+3A+NvAr12M3pvmHg5gBS+BMuzVkps12U6r6 oUWT/KOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzhAAKCRCJcvTf3G3AJnYSD/ 9pCe8EneuIHsFG7O1h9Et9FPdQ4sf78aWG201MY4PkmUZ0eDhPiloiEL0ylEGfsAWVozXDrhIHytSc WDmiUNbkrIdxewQswK1NMMFNJ9Jg6zM/c8zAUNt/MzTm6UhPLvszd3txXLKTOrLOyhBueGBQ5hn+C1 5nEhLlbkW2lrfXHI6MECRZNC7n9ca6OXMeCF2+PxwSe96LQt65zkiu9DRp+JebzmgYrVRe3KCZA4++ 9s5AGSX4owqhIkXUVKuL5t+3moxKtTYBRIpDJFhv8IVHDuIXnjWcdqFudBLh0yEwuN7ojftkvan2dB BsuTkhZeg0acZ/dH0dqsbAQmWtVEBbr7DAfLSqRFyp6TZIID6Ixvj8fo5wG5smHK8Xlyl/GjlKxroY WDoUvKOW/J9slWszjune87PA91amTGSpQPBJ30fHEtl6pxwc2hvREl0rjOYopDh4fQVnlM/hG2RFL4 fodpvMq+aZajblMJTpkucy8wpuq+xzQmfu3HLPrOCeSb4MEvdRHmJz7i9ClO+p78cHY164Izuv0iXN dR11BddC3Oi//XeEhgFN90I/5ttFIoVhVZJPXT22XfeYrGSbMWnh7i8X2JPcxj3s6VhYSciaPqqxze NGd+nEE/9Bey/+V/7KcUxYiUZfNz7HPdVbAcPyXWIctj6leKTFSYkijFcf7g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3321; h=from:subject; bh=0Nhl+lV3cEcT5lOU4zXDLwJTWM/l7DZ+/5ez9PThfHU=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHODmdLOpeLBo/X7lz0zzh+JJDwEkaDN00Z8kMzv sILJmNmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgwAKCRCJcvTf3G3AJqu3EA CgffJsGtT8m9lsKheu7s+yA1eAMukcAQ13t72QJcc8A2IdLK2lwV9x8QVh9uUd3041NW91qDNI+Czs 3k2PBePcLrqYo+rdGa4Fs/X3zYzBDuEQKSmIYIkoJBe2xr+niqqh7xhFf/5ghdEYzaVZ0zGolFf8it 26bmcWDMOOoHxklGwf6NXQYQfYTg0hdDkG2BM1l7UXEbXz2oREhTB+LtbTnn0Hj4OfW7ZiO0CPrkhI lKRNotmC8/XbWEzRldEuybAi7+tknghi8uuLE+9GIz7AC4Fe6UXopDTqzxyP6j+beO0cI5K8QQPYQl 42woosmLzvhziq8Gj3/SzeQTJF9WacNXul30sJfOMm0mwZMl3y9Z2UvHeW2Q1tzzCZvtSChEQJMlJv VPnGbrapT0zmmokAsquizS99ri3WqvRQ4aa/1HPQLQxPLdEV0mfXlCZyBdS9Di0az/9jo4GTt6+4dk xw6s52TxDhSNMdH0X/j3Rd4x2bK4G+3/LG6bbP73GrzRSX/7cr5SQeJiichuQ2tAPPZLG3xktu+SBj GylM+395+DNTumAg5AwAJownhHXWSpyplcyTrQ9IxdGJW3YqhHop4Auz1mygoryurP3HSPSQoF2pzP k0+9FvuNGVyc4wPzxm3gvya7bZvJas+dThlg4d+oB8lbja/QIUDEBiG3BoIw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -80,49 +80,89 @@ List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), memmove(), and memset(), avoid
-intentionally writing across neighboring fields.
+field array bounds checking for memcpy(), memmove(), and memset(),
+avoid intentionally writing across neighboring fields.
 
-Use struct_group() in struct rss_hdr around members imm_data and intr_gen,
-so they can be referenced together. This will allow memcpy() and sizeof()
-to more easily reason about sizes, improve readability, and avoid future
-warnings about writing beyond the end of imm_data.
+Use struct_group() in struct libipw_qos_information_element around
+members qui, qui_type, qui_subtype, version, and ac_info, so they can be
+referenced together. This will allow memcpy() and sizeof() to more easily
+reason about sizes, improve readability, and avoid future warnings about
+writing beyond the end of qui.
 
-"pahole" shows no size nor member offset changes to struct rss_hdr.
-"objdump -d" shows no object code changes.
+"pahole" shows no size nor member offset changes to struct
+libipw_qos_information_element.
+
+Additionally corrects the size in libipw_read_qos_param_element() as
+it was testing the wrong structure size (it should have been struct
+libipw_qos_information_element, not struct libipw_qos_parameter_info).
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/chelsio/cxgb3/sge.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/wireless/intel/ipw2x00/libipw.h    | 12 +++++++-----
+ drivers/net/wireless/intel/ipw2x00/libipw_rx.c |  8 ++++----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-index cb5c79c43bc9..1ab1bd86a3a6 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-@@ -126,8 +126,10 @@ struct rsp_desc {		/* response queue descriptor */
- 	struct rss_header rss_hdr;
- 	__be32 flags;
- 	__be32 len_cq;
--	u8 imm_data[47];
--	u8 intr_gen;
-+	struct_group(immediate,
-+		u8 imm_data[47];
-+		u8 intr_gen;
+diff --git a/drivers/net/wireless/intel/ipw2x00/libipw.h b/drivers/net/wireless/intel/ipw2x00/libipw.h
+index 7964ef7d15f0..4006a0db2eea 100644
+--- a/drivers/net/wireless/intel/ipw2x00/libipw.h
++++ b/drivers/net/wireless/intel/ipw2x00/libipw.h
+@@ -537,11 +537,13 @@ struct libipw_txb {
+ struct libipw_qos_information_element {
+ 	u8 elementID;
+ 	u8 length;
+-	u8 qui[QOS_OUI_LEN];
+-	u8 qui_type;
+-	u8 qui_subtype;
+-	u8 version;
+-	u8 ac_info;
++	struct_group(data,
++		u8 qui[QOS_OUI_LEN];
++		u8 qui_type;
++		u8 qui_subtype;
++		u8 version;
++		u8 ac_info;
 +	);
- };
+ } __packed;
  
- /*
-@@ -929,7 +931,8 @@ static inline struct sk_buff *get_imm_packet(const struct rsp_desc *resp)
+ struct libipw_qos_ac_parameter {
+diff --git a/drivers/net/wireless/intel/ipw2x00/libipw_rx.c b/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
+index 5a2a723e480b..75cc3cab4992 100644
+--- a/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
++++ b/drivers/net/wireless/intel/ipw2x00/libipw_rx.c
+@@ -948,13 +948,13 @@ static int libipw_read_qos_param_element(struct libipw_qos_parameter_info
+ 					    *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct libipw_qos_parameter_info) - 2;
++	u16 size = sizeof(element_param->info_element.data);
  
- 	if (skb) {
- 		__skb_put(skb, IMMED_PKT_SIZE);
--		skb_copy_to_linear_data(skb, resp->imm_data, IMMED_PKT_SIZE);
-+		BUILD_BUG_ON(IMMED_PKT_SIZE != sizeof(resp->immediate));
-+		skb_copy_to_linear_data(skb, &resp->immediate, IMMED_PKT_SIZE);
- 	}
- 	return skb;
- }
+ 	if ((info_element == NULL) || (element_param == NULL))
+ 		return -1;
+ 
+ 	if (info_element->id == QOS_ELEMENT_ID && info_element->len == size) {
+-		memcpy(element_param->info_element.qui, info_element->data,
++		memcpy(&element_param->info_element.data, info_element->data,
+ 		       info_element->len);
+ 		element_param->info_element.elementID = info_element->id;
+ 		element_param->info_element.length = info_element->len;
+@@ -975,7 +975,7 @@ static int libipw_read_qos_info_element(struct
+ 					   *info_element)
+ {
+ 	int ret = 0;
+-	u16 size = sizeof(struct libipw_qos_information_element) - 2;
++	u16 size = sizeof(element_info->data);
+ 
+ 	if (element_info == NULL)
+ 		return -1;
+@@ -983,7 +983,7 @@ static int libipw_read_qos_info_element(struct
+ 		return -1;
+ 
+ 	if ((info_element->id == QOS_ELEMENT_ID) && (info_element->len == size)) {
+-		memcpy(element_info->qui, info_element->data,
++		memcpy(&element_info->data, info_element->data,
+ 		       info_element->len);
+ 		element_info->elementID = info_element->id;
+ 		element_info->length = info_element->len;
 -- 
 2.30.2
 
