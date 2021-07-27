@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B885BC43214
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB679C4338F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A51DC60FDB
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8C6660FEA
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:08:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234548AbhG0VIT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:08:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55890 "EHLO
+        id S233240AbhG0VIa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:08:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234530AbhG0VHk (ORCPT
+        with ESMTP id S233783AbhG0VHx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:07:40 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FEB3C061371
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d17so17605082plh.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
+        Tue, 27 Jul 2021 17:07:53 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B3EC0611A0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:04 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id ds11-20020a17090b08cbb0290172f971883bso6694734pjb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9rtpQJfi9BLLOweU32TBsHXrBE4rsqDcc6NfaxawLSk=;
-        b=RtzRv2Hcall8Q6XauG9EQPn8i+Z+6koyHdHqSdWr1lBpyDmTL2zq8f4/gYexNOgk1T
-         WXmsT0CdeWzWqKO4r48fClVJNDtqn6UozibeVLNy9JNbVg75bxoYY9Ruld+9teuS9TwN
-         pO5fWj3PBxdOW6auqhJTHSBpj70tfZtzUkWjM=
+        bh=3614TVaw9LF0d4ZTPxFRYVM1NwtwuaIqOAakzdvkIfc=;
+        b=clV0Gq5oIj0iMf/0TjNaHBfl9gFowEEPRY6F12E4uHkupoBZLOBAOjcr6hanGqNJ/D
+         Ou+0N0Rgv9rhpZQ75K6fWWlwQIAJeQwEbGM40/xLoMchxBkeod+sf82FLeOvb290o5QL
+         mySzWEkrdI1XTTrAkdIJlo6oyBUo3Ktd4nSiw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9rtpQJfi9BLLOweU32TBsHXrBE4rsqDcc6NfaxawLSk=;
-        b=J3VS6Fpg+2Nfs1eFNok5oyx7+GMqgR2OsCKQ2/cH4ebtG06pjAtMPfLDRD1t8cKv/F
-         Dx5Sq2TpWeT1+tyVUWS+DpoLImDQRpHF/yUiyZ8DztzKU8roBoSzYJr5K6ZClMreNbc7
-         nWpCa5pV4YMgIZAEK7ZEMJg5HaWxEF905b5hlsSBeBq1kDzyaiLpaeRJlzgBnQ3BE4G2
-         Ij4MLUxuW02hAM5Z1ylJqtXwawkp4xfmJzqFK7ILssswpGv/a52fbtFAPfZRiBIhuULX
-         waLaOOfbAcXOkIHzcNEsHcuCUbDNeoqAXAjsToJOQ/Qf+Ms01ROoFy3H4KRk6Kgy6dvM
-         KjnA==
-X-Gm-Message-State: AOAM533g17rW8uFpViY9oG0njl2XJSFuKnGc6nov0FTt+eEz2S87gSxZ
-        YwjDqoPKKb2Bb9K2IEHIWUjPTA==
-X-Google-Smtp-Source: ABdhPJwtY/96GtTJvQKRxUE9f4XM5WO13IhPiZmvG1Gx9it1XsiDWBqLh+O5ytTK4J0lAw6QIUM9HA==
-X-Received: by 2002:a62:3852:0:b029:32e:50d4:6ee5 with SMTP id f79-20020a6238520000b029032e50d46ee5mr24697953pfa.3.1627420023128;
-        Tue, 27 Jul 2021 14:07:03 -0700 (PDT)
+        bh=3614TVaw9LF0d4ZTPxFRYVM1NwtwuaIqOAakzdvkIfc=;
+        b=Ya6QDfNRkvZPj+kOJiflRBtrUhF3ZBgmNvrA5II4s12yN0HrAv63MLEal3h2i2/xqV
+         nyR+jY8SHo053RrtCodinhvC4TNyks2nIJ/5q95bbp5GPXi7p/ZEx3uJ3GPSC+OnM8ht
+         DizAptNaICPzPB3FfqIDMODSEPE+2g8lCX91Dp1D7z36XnIX/HHTNYvwmLp6g6m0uD1e
+         0VQEE9TqNGj+Z44/OLVBEdD4oWdWEFTtJ5j4vVVFgylHLtyuB63TD2Vozx5rHJcQxvCU
+         JiUMO26fZoQiF+XJ/LfIauoXOLR8JE5gNGRZcWb3Qlw0eGD2Q5ibCsvvGajVbIqgTgkv
+         VUqw==
+X-Gm-Message-State: AOAM533RmVkgbw32TG8LVIsfGg1vDlUajGkmnELbNZWJi5h/++h+0xwP
+        WK9/uIz5XU8+MEDpVDX3QRPEMQ==
+X-Google-Smtp-Source: ABdhPJzheM2xvO7r2KOy5JsPyHkQ5gmU070FcB/CrWaIBKULL/3U7eU4WZmglR8JYkwU1AHc0DVlNQ==
+X-Received: by 2002:aa7:9086:0:b029:39b:6377:17c1 with SMTP id i6-20020aa790860000b029039b637717c1mr9604180pfa.11.1627420024334;
+        Tue, 27 Jul 2021 14:07:04 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id 19sm5414686pgg.36.2021.07.27.14.06.55
+        by smtp.gmail.com with ESMTPSA id b13sm4545729pfl.49.2021.07.27.14.06.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:07:01 -0700 (PDT)
+        Tue, 27 Jul 2021 14:07:02 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
         Keith Packard <keithpac@amazon.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -65,77 +65,44 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 50/64] KVM: x86: Use struct_group() to zero decode cache
-Date:   Tue, 27 Jul 2021 13:58:41 -0700
-Message-Id: <20210727205855.411487-51-keescook@chromium.org>
+Subject: [PATCH 61/64] Makefile: Enable -Warray-bounds
+Date:   Tue, 27 Jul 2021 13:58:52 -0700
+Message-Id: <20210727205855.411487-62-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1896; h=from:subject; bh=Yy2yFM1urtqhL7n0r4aqd2cxgBZVMAyveJbcFvHLMlI=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOLO3D9COdGLWOeR85zbaklAzObwkj15dNUWB7V d7VJAUWJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziwAKCRCJcvTf3G3AJlCqD/ 9cyHvgurMj0+H5UBZbi3PT0Pbs8SRpr/t0XADG40BpZ+yVAAnrqFDSkxMwCaBqoxRSLdmcDqy3b5SU c20S1Aw1siyqHiVEI4mnsKY6Jgrwx/SMBp2bYIVeZru9HNSXKKx57kdf2tIrViE9LYxYJFaHrBwPb9 o5tiJQmaA6MIjjExAe20o1QhTaI/E8sNfmlXtKaS0+XA7Rm8s+Qw65FVDyLqzv2BWb50Hdr4cMYh1X MTXkpiMZrMaPEQ3Wa2TwW0eAlAoWXXUXCLZ9VWJ5QlWKljXrylcdoLAikqEE7v2J5Rlr6FXOAMs3tZ d2CLoMo36Px3zBdTlu90/UlVPgO3P/Uk2ZhkN4uzHd4n/DIvanRvGewXH4liErXPixMmOgnLGLl+5d dVxT4PdjmU6shd83BEuZ8GZH4T6M9tygTNcERhWYIFMPXxYO5sgBrAlOJPmGkJC7hJD/RcfcYrBrpN UanrlQrhn6AYQGnmxcAQjc9dQQiRJO+jcDS4dRElaZb2OkRAD8J6+dNCu3El0L2RSWF1CiAbnwjwZi vxQaozruf1DsPdfg+Bv8JNonOrCpc7rnWMUbZIM6n0KMZJB+puj15D3L2N22fwOUi7MkF9cUWlAzlk H8X7oTv0jAj5RR0KuG/re2JSTLAEqtF1EBsbI72rE8m6mO5OjrH8edIe/qDg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1002; h=from:subject; bh=iIOagZzyF2xdp8n7enwD6qkgQ1o9k/a7rFZX1PVnmxg=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOOq3GxY9uHkpfXPpohPWhLzKrRlLl+w0yr5nG9 o51n+4eJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzjgAKCRCJcvTf3G3AJhXFD/ 9eNQSeUQPuzmwtU/NaiBjngkDUoTXVXv6KDOoXdN0EeDJr9dzNsPU4RUC2Yb7oNKtodqx9qr3F53BT txNpJNl/VSlLBo4MV0T1xF/z3OZoiHCgrhEK6jQQWkJ8g9DbwYCORPaM3KmjKoReDaEVCdUqLLgRLI bgnGYGgyZ8hwan3FbBKFMQwKRDx8sMPqQJUlxpC/0p1LlB5klJYif9tuDWpKW1liKmjqsack/xN7n0 V/cjUuTEEPcy51sw8cSiGkQYLx3KXX0nBtDSFN2xWj3EOY9Bm2RgpOqUqsPFAyinaCqQ43AtocYK4G EWC3c+pF5KODB9bWmzxaiWfcbQnr/qmuRE0npmKCThCFAdIG0L/zSn17BagAoxn/bfs7o1XTo9UQ6L K2E4D3ANbhN9AYyDSrP3MqqguYb7FfMwTv2zQNOLIoHqk90Ys/REfQ6FbJ9b4n+s+hlR2hs9IoQ0+Y 3LfKCSZCrYfZ2rhefZPYVzbWfzbM2+wTL1DtshJ1M+gKFcPfZ663TaMLREqy9r9mTtgswUne36LhxD ZfCNhpXpDpbsenQfUmuciUrsKoatyitqkdd4dOEVsAVIZ7jI+dZ2TTRu6UgVdfpiRIdWgIUBmXNdyf QZyNNzVnUyr2dpmTN5/GnRpfSS+N/XiRxODtkuSEXrfjk1fZDATTwSfL3kKA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
+With the recent fixes for flexible arrays and expanded FORTIFY_SOURCE
+coverage, it is now possible to enable -Warray-bounds. Since both
+GCC and Clang include -Warray-bounds in -Wall, we just need to stop
+disabling it.
 
-Add struct_group() to mark region of struct x86_emulate_ctxt that should
-be initialized to zero.
-
+Co-developed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/kvm/emulate.c     |  3 +--
- arch/x86/kvm/kvm_emulate.h | 19 +++++++++++--------
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 2837110e66ed..2608a047e769 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5377,8 +5377,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
+diff --git a/Makefile b/Makefile
+index 6f781a199624..77d01ba3d4e1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1089,7 +1089,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
  
- void init_decode_cache(struct x86_emulate_ctxt *ctxt)
- {
--	memset(&ctxt->rip_relative, 0,
--	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
-+	memset(&ctxt->decode_cache, 0, sizeof(ctxt->decode_cache));
+ # We'll want to enable this eventually, but it's not going away for 5.7 at least
+ KBUILD_CFLAGS += $(call cc-disable-warning, zero-length-bounds)
+-KBUILD_CFLAGS += $(call cc-disable-warning, array-bounds)
+ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-overflow)
  
- 	ctxt->io_read.pos = 0;
- 	ctxt->io_read.end = 0;
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 68b420289d7e..9b8afcb8ad39 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -341,14 +341,17 @@ struct x86_emulate_ctxt {
- 	 * the rest are initialized unconditionally in x86_decode_insn
- 	 * or elsewhere
- 	 */
--	bool rip_relative;
--	u8 rex_prefix;
--	u8 lock_prefix;
--	u8 rep_prefix;
--	/* bitmaps of registers in _regs[] that can be read */
--	u32 regs_valid;
--	/* bitmaps of registers in _regs[] that have been written */
--	u32 regs_dirty;
-+	struct_group(decode_cache,
-+		bool rip_relative;
-+		u8 rex_prefix;
-+		u8 lock_prefix;
-+		u8 rep_prefix;
-+		/* bitmaps of registers in _regs[] that can be read */
-+		u32 regs_valid;
-+		/* bitmaps of registers in _regs[] that have been written */
-+		u32 regs_dirty;
-+	);
-+
- 	/* modrm */
- 	u8 modrm;
- 	u8 modrm_mod;
+ # Another good warning that we'll want to enable eventually
 -- 
 2.30.2
 
