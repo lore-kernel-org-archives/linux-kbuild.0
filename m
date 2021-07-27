@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-19.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D383C43214
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2119C4338F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 189E160FC4
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B394460F94
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Jul 2021 21:07:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbhG0VG6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Jul 2021 17:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
+        id S233557AbhG0VHI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Jul 2021 17:07:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232779AbhG0VG4 (ORCPT
+        with ESMTP id S233132AbhG0VG7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Jul 2021 17:06:56 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5997C0613D3
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:06:53 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id m1so1862205pjv.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:06:53 -0700 (PDT)
+        Tue, 27 Jul 2021 17:06:59 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E33C0613D3
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id pf12-20020a17090b1d8cb0290175c085e7a5so6708828pjb.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=clRlkcTWzJOWdb6SjT1HZu+AyElzVwLtoYPXziOiXRE=;
-        b=MBUIR3iBfXKxxQGTkwEdR+msAp6pxmWHaDphvmnJvT1Zw3YRPe0XXCC1E1e0Bq7P9v
-         PHNDTqIkm/jI1FEa26EuyG+8VRkITbDssqS0hfWFfeIsKVWMxs6NsU4giYYW+nhBICQ9
-         RxMzcJq+3X+F/NXCQU0H77itPS7DDeCUh+z/o=
+        bh=eOeu4d7QLTPBu6QYYoqWVSDz/qzrHDToqQYaK/VYhSM=;
+        b=nmClRthMB6NUA8m9k5ViyzIj9tZSLtz+W7Y/dUJqpsE4Ra7JIpNa/jk5t7+u9guaKS
+         rD4SN4syDHrUBQt/o8lo3la5Br4kga0btCULhIMfCaHEe3PG6RzT3IeGYfyUKyEfoq3Z
+         2Fz2wu2iQF1vNyl73FIcK6AVJYeThxSfaojvI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=clRlkcTWzJOWdb6SjT1HZu+AyElzVwLtoYPXziOiXRE=;
-        b=t96bAPlLy11F4uLozOOwKC07Fj1dbiyrTmIzQJZRpaVCgfeG+DR1JqCVIg4r3n/obZ
-         wFzO6gRDUFFSBbEf9iuOVYy0YHsSboWafB/HiGsx3iv5YY4pR3+0xGBpSTOpZNOjLLNm
-         inE3dBgkA5DkdQWZh7D0vOamRlgl8VdXMmhSh81mkgscUdYQs0XDQSP/VDr3eBgj/nZl
-         LaJJm3eTvg2JNJd4YkKFTdFMdwoox9hpJQoJ6n2odKEo89rq2tDRZbhaB837wM9rAZc1
-         f/090+/x7yO8BNtb2OGJ8gnceKPA1c/YG9rmCj+RuiXwWcZ8mRR7tR7gGnPl1weBgQM3
-         8bZg==
-X-Gm-Message-State: AOAM531IggHLyGUYdxS4PxqO1kJNxPKVnFMnY5vJCNNCW0ywqnJiCtab
-        EBsoOkYwOV97GfVjd0vqnx2H4Q==
-X-Google-Smtp-Source: ABdhPJyQWD89modfR5XqhD/BrBVi4uhzmxv+/WY0dPBKz1b0mLB8ON+0pnmzIlozqgKLDJGyoixVLw==
-X-Received: by 2002:a65:420d:: with SMTP id c13mr9244079pgq.123.1627420013548;
-        Tue, 27 Jul 2021 14:06:53 -0700 (PDT)
+        bh=eOeu4d7QLTPBu6QYYoqWVSDz/qzrHDToqQYaK/VYhSM=;
+        b=IZn3/pCeHIQhNlGtphX0mLYhpe7m/xN2ZnJ3myy4BsGF+3xRX5VpIbC+BbdINGPD/k
+         /FxvQVGMROF7cKVDUgVW4+tb+/uebhx4+85RdqKrE945goVIQKJoLsQo7q43Ip1Og1rF
+         Er2CXgccuSQsevokLakNzRrYgWBicfdZ4AfvN67PLLG1SrW6xuIf4aO4hgXOJzJIsvNV
+         biwtErlTs+Qb0CvrBjI0alFAZjbmgIZQSq3JFsxatTsoFYmMisgIGjNTsXfRNjnlPb8m
+         /XCcZKKcfOqO24sEEb4O+chpwyV25vMSq/z8nnFVHc6vhQpi6JGjDhnrAyRlKBumNzyF
+         s3CA==
+X-Gm-Message-State: AOAM530aTUOl15JvD30IL60W9PCs69shTY6N7XD02McoRMunsWpWb8PY
+        ZxdQJ339RkXw85lNYZ50cicS8Q==
+X-Google-Smtp-Source: ABdhPJynj7Mxd5dzejb/chP88BPdMVTyDp7rQutQlvaypR/9xo8DyQW71dEyKFZ3FwRUaCTEut3Rdg==
+X-Received: by 2002:a17:902:7884:b029:12a:efa7:18d8 with SMTP id q4-20020a1709027884b029012aefa718d8mr20498548pll.85.1627420017391;
+        Tue, 27 Jul 2021 14:06:57 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l1sm3813994pjq.1.2021.07.27.14.06.50
+        by smtp.gmail.com with ESMTPSA id e12sm3784712pjh.33.2021.07.27.14.06.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 14:06:50 -0700 (PDT)
+        Tue, 27 Jul 2021 14:06:54 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-hardening@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -65,14 +65,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
         linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 16/64] thermal: intel: int340x_thermal: Use struct_group() for memcpy() region
-Date:   Tue, 27 Jul 2021 13:58:07 -0700
-Message-Id: <20210727205855.411487-17-keescook@chromium.org>
+Subject: [PATCH 43/64] ath11k: Use memset_after() for clearing queue descriptors
+Date:   Tue, 27 Jul 2021 13:58:34 -0700
+Message-Id: <20210727205855.411487-44-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210727205855.411487-1-keescook@chromium.org>
 References: <20210727205855.411487-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3277; h=from:subject; bh=FXb9nQQ+9raXNRheCnPL/rsMtfpVZSmOVeEiPUzBx+k=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOD97boEQtghYWjunVAHXryqRBeKslQ/U0/9Z2K SuHsN8WJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBzgwAKCRCJcvTf3G3AJs4JD/ 4t9krlI0msPh0DWMgqWRsM+X+y+HiMVgVUi7JkKAiBNJZoty9G4c1eS7yLV6TgLer2yFH8Ds58wUxF O6n5C18sFXheNiEEW+6vqVVeyQpO6nOPUonTlA8hTYBZp6CBNW7L7fqFalI7RlROQmukoEwMQZpWKx EuiGE22FT/3gJFEHq6KV61yPGYruCiyqaRADMcMMvyaJddy1qUkMgv0+9MsD6Pk/GN14+iLJT/WvX/ +Ncg6xMtv77TZnfLggNoIAXvzxqKTuj4YKPXx37SB2DDRCzdDh7R0hdU6WnJYEDwR5nd28AxRY9pW0 3/vFBrVdXmb5M1ePJqtCrbIM24arQveQJ0OFOeHTeWVNTcpF2rYY6HkYdqN5OgBXbagUUrHLo5sTJT oCoXT0USJzevlZoW3hXd+qGHUmuaA7+oUpf8ERJftB1gtBZ5+mAE3oNp6XoGlqZWXKaZOqEXohtJdE JKAKoqmW3JI+EQI+YUWLhorOoexqDCL3tG1VxN6M8wVEznEOVlCPdgcKjMwd4TvvKajC88ejnODvYX Yx+uFlSgaEFH992Tzy+Sem73iwT45T1pxFzlgXi6UKZ/H5V8dY1HWDHhQdWkFNrA7YldsHu5LMPO23 EVZMhiu2pPLzAvDWB389kz3t6FqAo/HGYnm8kfHnyCibi/cFhsXVyBwQujpg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3116; h=from:subject; bh=j3LfXLw0C1RpC2nAiDmR2FV9ppMLr+xX2/Byaw0lUBI=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhAHOJQjRIUTQLa3kW6JEv7dcnm26TeZbOKFOYV9Uy JUsIKlSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYQBziQAKCRCJcvTf3G3AJv7OD/ wOv9NnzO8vnuCd1yLn28Uh20ipd4blI/H+kMp3Wx9VsXqAUniUau5o4ju7EMl4saOmJ/ltHPdb99Yn /TXqBvuvm/fcFKOY1q7nIR/AaYPJW7LhNkRTXplMqKXe+3Qnnu8FBSAw2DUq1zXDmuYemIlXptx4ne Bmu+McSU4fRhGXiPWsd07ziif5KbBqSw6Xksw8nxp+XBVcxJX8et8bdwHVvJj0saggDJ1aJ4HQ1mF9 4HllmEQZL+wN8MhR+vknVrUK52Mj7rfxI7dwb4lSH2MhOUDYqcIIacwA5QxlhlqjlKy6/FQBNGIoBY ryzx8o2IbdOCSNbzQwAASqLiVYlD6HbVddTDKOJUZ+x++HGUnv9Ns/IgQDKGBNyhoj/ri9ybH6GklO voujRz697QTfjIL/VjnyvyF+xPaJEI8Wohz7g53gpHyYojdV+zinQHZWRwFAMHSly548C+mHC2LU2f E4CcST932vQu8ftiiXm818XOydMxX00CvzoOdlcSm4NgFL87y5zloqO76ihmGAN/LUl+GulYt7gpaN 6tsAlGYd0W8yUr7UrJaRl6QTkAffrdEJCc47+DqZK4QRdgofQHTqb0FpwfJ1WH7QWGQzpFXEyUW2Se Px6rDcKN7HvstRyGsxqRWPFEVU0eQ/A1CMhA1WHwshXb3mfP/uaPnWfv3RBw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -80,106 +80,72 @@ List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memcpy(), avoid intentionally writing across
+field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Use struct_group() in struct art around members weight, and ac[0-9]_max,
-so they can be referenced together. This will allow memcpy() and sizeof()
-to more easily reason about sizes, improve readability, and avoid future
-warnings about writing beyond the end of weight.
-
-"pahole" shows no size nor member offset changes to struct art.
-"objdump -d" shows no meaningful object code changes (i.e. only source
-line number induced differences).
+Use memset_after() so memset() doesn't get confused about writing
+beyond the destination member that is intended to be the starting point
+of zeroing through the end of the struct. Additionally split up a later
+field-spanning memset() so that memset() can reason about the size.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- .../intel/int340x_thermal/acpi_thermal_rel.c  |  5 +-
- .../intel/int340x_thermal/acpi_thermal_rel.h  | 48 ++++++++++---------
- 2 files changed, 29 insertions(+), 24 deletions(-)
+ drivers/net/wireless/ath/ath11k/hal_rx.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-index a478cff8162a..e90690a234c4 100644
---- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-+++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-@@ -250,8 +250,9 @@ static int fill_art(char __user *ubuf)
- 		get_single_name(arts[i].source, art_user[i].source_device);
- 		get_single_name(arts[i].target, art_user[i].target_device);
- 		/* copy the rest int data in addition to source and target */
--		memcpy(&art_user[i].weight, &arts[i].weight,
--			sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
-+		BUILD_BUG_ON(sizeof(art_user[i].data) !=
-+			     sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
-+		memcpy(&art_user[i].data, &arts[i].data, sizeof(art_user[i].data));
- 	}
+diff --git a/drivers/net/wireless/ath/ath11k/hal_rx.c b/drivers/net/wireless/ath/ath11k/hal_rx.c
+index 325055ca41ab..c72b6b45b3ba 100644
+--- a/drivers/net/wireless/ath/ath11k/hal_rx.c
++++ b/drivers/net/wireless/ath/ath11k/hal_rx.c
+@@ -29,8 +29,7 @@ static int ath11k_hal_reo_cmd_queue_stats(struct hal_tlv_hdr *tlv,
+ 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
  
- 	if (copy_to_user(ubuf, art_user, art_len))
-diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-index 58822575fd54..78d942477035 100644
---- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-+++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-@@ -17,17 +17,19 @@
- struct art {
- 	acpi_handle source;
- 	acpi_handle target;
--	u64 weight;
--	u64 ac0_max;
--	u64 ac1_max;
--	u64 ac2_max;
--	u64 ac3_max;
--	u64 ac4_max;
--	u64 ac5_max;
--	u64 ac6_max;
--	u64 ac7_max;
--	u64 ac8_max;
--	u64 ac9_max;
-+	struct_group(data,
-+		u64 weight;
-+		u64 ac0_max;
-+		u64 ac1_max;
-+		u64 ac2_max;
-+		u64 ac3_max;
-+		u64 ac4_max;
-+		u64 ac5_max;
-+		u64 ac6_max;
-+		u64 ac7_max;
-+		u64 ac8_max;
-+		u64 ac9_max;
-+	);
- } __packed;
+ 	desc = (struct hal_reo_get_queue_stats *)tlv->value;
+-	memset(&desc->queue_addr_lo, 0,
+-	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
++	memset_after(desc, 0, cmd);
  
- struct trt {
-@@ -47,17 +49,19 @@ union art_object {
- 	struct {
- 		char source_device[8]; /* ACPI single name */
- 		char target_device[8]; /* ACPI single name */
--		u64 weight;
--		u64 ac0_max_level;
--		u64 ac1_max_level;
--		u64 ac2_max_level;
--		u64 ac3_max_level;
--		u64 ac4_max_level;
--		u64 ac5_max_level;
--		u64 ac6_max_level;
--		u64 ac7_max_level;
--		u64 ac8_max_level;
--		u64 ac9_max_level;
-+		struct_group(data,
-+			u64 weight;
-+			u64 ac0_max_level;
-+			u64 ac1_max_level;
-+			u64 ac2_max_level;
-+			u64 ac3_max_level;
-+			u64 ac4_max_level;
-+			u64 ac5_max_level;
-+			u64 ac6_max_level;
-+			u64 ac7_max_level;
-+			u64 ac8_max_level;
-+			u64 ac9_max_level;
-+		);
- 	};
- 	u64 __data[ACPI_NR_ART_ELEMENTS];
- };
+ 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
+ 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
+@@ -62,8 +61,7 @@ static int ath11k_hal_reo_cmd_flush_cache(struct ath11k_hal *hal, struct hal_tlv
+ 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
+ 
+ 	desc = (struct hal_reo_flush_cache *)tlv->value;
+-	memset(&desc->cache_addr_lo, 0,
+-	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
++	memset_after(desc, 0, cmd);
+ 
+ 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
+ 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
+@@ -101,8 +99,7 @@ static int ath11k_hal_reo_cmd_update_rx_queue(struct hal_tlv_hdr *tlv,
+ 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
+ 
+ 	desc = (struct hal_reo_update_rx_queue *)tlv->value;
+-	memset(&desc->queue_addr_lo, 0,
+-	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
++	memset_after(desc, 0, cmd);
+ 
+ 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
+ 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
+@@ -762,15 +759,17 @@ void ath11k_hal_reo_qdesc_setup(void *vaddr, int tid, u32 ba_window_size,
+ 	 * size changes and also send WMI message to FW to change the REO
+ 	 * queue descriptor in Rx peer entry as part of dp_rx_tid_update.
+ 	 */
+-	memset(ext_desc, 0, 3 * sizeof(*ext_desc));
++	memset(ext_desc, 0, sizeof(*ext_desc));
+ 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
+ 				    HAL_DESC_REO_QUEUE_EXT_DESC,
+ 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_1);
+ 	ext_desc++;
++	memset(ext_desc, 0, sizeof(*ext_desc));
+ 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
+ 				    HAL_DESC_REO_QUEUE_EXT_DESC,
+ 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_2);
+ 	ext_desc++;
++	memset(ext_desc, 0, sizeof(*ext_desc));
+ 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
+ 				    HAL_DESC_REO_QUEUE_EXT_DESC,
+ 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_3);
 -- 
 2.30.2
 
