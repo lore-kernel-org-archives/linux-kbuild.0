@@ -2,236 +2,118 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 023DDC4338F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08F8C4320E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 07:04:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2AE060F6D
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD1E660C3F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 07:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232892AbhG1G7n (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 28 Jul 2021 02:59:43 -0400
-Received: from gateway34.websitewelcome.com ([192.185.149.101]:46647 "EHLO
-        gateway34.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229939AbhG1G7n (ORCPT
+        id S233514AbhG1HEy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 28 Jul 2021 03:04:54 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:57487 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229939AbhG1HEy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:59:43 -0400
-X-Greylist: delayed 1469 seconds by postgrey-1.27 at vger.kernel.org; Wed, 28 Jul 2021 02:59:43 EDT
-Received: from cm17.websitewelcome.com (cm17.websitewelcome.com [100.42.49.20])
-        by gateway34.websitewelcome.com (Postfix) with ESMTP id 5B8F137CE2
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Jul 2021 01:35:10 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 8d9qmtS7mMGeE8d9qmFwP7; Wed, 28 Jul 2021 01:35:10 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Yd5qvDofzDaNNwpGdbNUuqb18y/xFATzxRujwJoGZRA=; b=J4h6G/X4eMPiS5plAUkSA/Q49M
-        5sq+dCc2pmKO2STKNpc0FdVq64215CCBw+l/N782ccpFVyhUZOeVY38y02Orn1PT7UEA/RM2VnnTn
-        JOn6O8FeW6M7x4e7aG0Jmm6SUOs9ZQupTaNHnFE19WtTW1Sg96Es9aWB9eHreB7w1zcqev+lQECi8
-        dMlzL3ujizfpr2MQYqLp81YiC8gwOZbTDYyX6bUcCnZvyXLY1+zZ6mu4qvdtGC+6hw3hahpuZ/U0W
-        uzLvkc0jFOHE93UXdFJADtpBy4YD4MZmZE4+cpv8b0XNIs5c1r7BxhHEBzIz4ApbdZog2VRHGqQxG
-        OgK0bfLQ==;
-Received: from 187-162-31-110.static.axtel.net ([187.162.31.110]:44914 helo=[192.168.15.8])
-        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1m8d9p-003qHh-4N; Wed, 28 Jul 2021 01:35:09 -0500
-Subject: Re: [PATCH 19/64] ip: Use struct_group() for memcpy() regions
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Keith Packard <keithpac@amazon.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210727205855.411487-1-keescook@chromium.org>
- <20210727205855.411487-20-keescook@chromium.org> <YQDxaYrHu0PeBIuX@kroah.com>
- <baead202-569f-775f-348c-aa64e69f03ed@embeddedor.com>
- <YQD2/CA7zJU7MW6M@kroah.com>
- <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
-Message-ID: <b46e1ac6-ee40-1d23-dbba-b985d9764971@embeddedor.com>
-Date:   Wed, 28 Jul 2021 01:37:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Wed, 28 Jul 2021 03:04:54 -0400
+Received: from mail-wm1-f45.google.com ([209.85.128.45]) by
+ mrelayeu.kundenserver.de (mreue106 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1N5FQJ-1n9Ipi13Bt-0117pO; Wed, 28 Jul 2021 09:04:51 +0200
+Received: by mail-wm1-f45.google.com with SMTP id n28-20020a05600c3b9cb02902552e60df56so922907wms.0;
+        Wed, 28 Jul 2021 00:04:51 -0700 (PDT)
+X-Gm-Message-State: AOAM5313lpJUfcDv78Dh6GGcjF/dUcJA84kHhrvqm6hxFWXBR6L9/9hM
+        vfekag4LmZwhS5UReejIy6UqimkJtFu+6mF3Fu4=
+X-Google-Smtp-Source: ABdhPJynD/9Il+Kw/wzVv2FoAI9EzaLkE/ynrgFuvxOuhTIZl8g9i0YgqUQZRMdYvUppf3KbqSXlK642XfMKR85CXEE=
+X-Received: by 2002:a1c:c90f:: with SMTP id f15mr7815803wmb.142.1627455890836;
+ Wed, 28 Jul 2021 00:04:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.162.31.110
-X-Source-L: No
-X-Exim-ID: 1m8d9p-003qHh-4N
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187-162-31-110.static.axtel.net ([192.168.15.8]) [187.162.31.110]:44914
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 41
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+References: <20210721161609.68223-1-yishaih@nvidia.com> <20210721161609.68223-13-yishaih@nvidia.com>
+ <20210727155440.680ee22e.alex.williamson@redhat.com> <20210727230941.GL1721383@nvidia.com>
+ <20210728054306.GA3421@lst.de>
+In-Reply-To: <20210728054306.GA3421@lst.de>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 28 Jul 2021 09:04:34 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a3eSVoCYToP=7cNv97DO-fjV1G6a=-OnrNhXhsbBVU7Qg@mail.gmail.com>
+Message-ID: <CAK8P3a3eSVoCYToP=7cNv97DO-fjV1G6a=-OnrNhXhsbBVU7Qg@mail.gmail.com>
+Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, diana.craciun@oss.nxp.com,
+        kwankhede@nvidia.com, Eric Auger <eric.auger@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:+f2qo4ua7/cksPQTjl1NeHfnGfT7wAnsfKlTOy/V9f/cIKCDU4Q
+ 2VTOnRHjOy+tvKnk1lEYzXGzMRqet4fiN7t1/mxOV2TDeDa0xGWLTPimgsCXdaKpX2zCv7R
+ n1WvBx4Fu4KHWc0uahadfNxt8V43q/H2FWirIDCprGgYrpWEy0dSRSSmShW2B6EZO86qkrB
+ hKYG7CQr0tzNmM1ipIWQw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wm1Mt9kc0/k=:QUXNKlQGOBuDsiUq7keSe8
+ W0k4cMAQct3MqJNU0wxAL4V3brl58luotfZ5+yfJioS3VaIuJLhFLSw7Gu0MIzh28ClyxUCcf
+ HQoXWmK5DrP0KpPpnhTpTak5JLL+OU7yepJY8uI4I3SEtMa+AM8ujELMN4KgPU7HQuhNr8bNm
+ K4JADdEj181L/8r8/1xara1aShvnM/wIskSKvg0aY4JOSaYOEHmQALbHWxd65Q8ShbkCztSv9
+ Qeq7NyoSV00UB9V6LpYZmv2n1Nm5HrDLM2DvMyvXdNQs383OmONzrnHEuBQc97xDHfhskmDbw
+ nQgCNzXu0d5s4rE/nNUCaAPWenC9Ru58n45GzmpKuAKfQtxTB+yMDZhqR/ABGfMFCeoC27m37
+ RmJ+gFMgBimjmGraLc8d307bKXvTyta5UiLbnlnLxdaea2AztaEW9neAXpZLpX+XjT1zXPZeV
+ gXniN9bgh/6FI7ffcLWzKdtxgnr/epbx+yjqxeNPFE7fWG9FFHrbK+/2/tM7lr+Gk770c3MMZ
+ Tf698OLnPpLC0qtMNFz982BgryuR9qu0SSTII17xd/y+T860acPI8nAtpMSIVauRUK4IqS+Hn
+ k/toid48qel0gu5IhWqbXA3rkE0NU4qNxrHYkNaiakE7ycYRW0H+STXLqNFzgxZaLHa8BEIpb
+ JAGgW0FgSXXi7z94cvvwS2NWPW+FxOHY8AdRECyWYc/m50ro7wno++1tBH51xILlc/11niCx4
+ Rb43vSKQgYaIPYpG8x3ma1Ik9hPfxpjE5PV3y1Wc2U/ZEsfiyk/OvZd35MGMMqmxcR0Bjm+8V
+ u32m2E+iBBTed84zKqHVjYh7erU93iAPM7LWCllfs5Z94mYYaH/7W+6B+eFb7a547+GEScA
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Wed, Jul 28, 2021 at 7:43 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Tue, Jul 27, 2021 at 08:09:41PM -0300, Jason Gunthorpe wrote:
+> > On Tue, Jul 27, 2021 at 03:54:40PM -0600, Alex Williamson wrote:
+> >
+> > > I'm still not happy with how this is likely to break users and even
+> > > downstreams when upgrading to a Kconfig with this change.
+> >
+> > I've never heard of Kconfig as stable ABI. Christoph/Arnd, have you
+> > heard of any cases where we want to keep it stable?
+>
+> It isn't an ABI, but we really do try to avoid breaking if we can and
+> I rember Linus shouting at people if they did that for common options.
 
+This is handled in very different ways depending on the maintainers,
+some people go to great lengths to avoid breaking 'make oldconfig'
+or 'make defconfig', others don't seem to mind at all.
 
-On 7/28/21 01:31, Gustavo A. R. Silva wrote:
-> 
-> 
-> On 7/28/21 01:19, Greg Kroah-Hartman wrote:
->> On Wed, Jul 28, 2021 at 01:14:33AM -0500, Gustavo A. R. Silva wrote:
->>>
->>>
->>> On 7/28/21 00:55, Greg Kroah-Hartman wrote:
->>>> On Tue, Jul 27, 2021 at 01:58:10PM -0700, Kees Cook wrote:
->>>>> In preparation for FORTIFY_SOURCE performing compile-time and run-time
->>>>> field bounds checking for memcpy(), memmove(), and memset(), avoid
->>>>> intentionally writing across neighboring fields.
->>>>>
->>>>> Use struct_group() in struct flowi4, struct ipv4hdr, and struct ipv6hdr
->>>>> around members saddr and daddr, so they can be referenced together. This
->>>>> will allow memcpy() and sizeof() to more easily reason about sizes,
->>>>> improve readability, and avoid future warnings about writing beyond the
->>>>> end of saddr.
->>>>>
->>>>> "pahole" shows no size nor member offset changes to struct flowi4.
->>>>> "objdump -d" shows no meaningful object code changes (i.e. only source
->>>>> line number induced differences.)
->>>>>
->>>>> Note that since this is a UAPI header, struct_group() has been open
->>>>> coded.
->>>>>
->>>>> Signed-off-by: Kees Cook <keescook@chromium.org>
->>>>> ---
->>>>>  include/net/flow.h            |  6 ++++--
->>>>>  include/uapi/linux/if_ether.h | 12 ++++++++++--
->>>>>  include/uapi/linux/ip.h       | 12 ++++++++++--
->>>>>  include/uapi/linux/ipv6.h     | 12 ++++++++++--
->>>>>  net/core/flow_dissector.c     | 10 ++++++----
->>>>>  net/ipv4/ip_output.c          |  6 ++----
->>>>>  6 files changed, 42 insertions(+), 16 deletions(-)
->>>>>
->>>>> diff --git a/include/net/flow.h b/include/net/flow.h
->>>>> index 6f5e70240071..f1a3b6c8eae2 100644
->>>>> --- a/include/net/flow.h
->>>>> +++ b/include/net/flow.h
->>>>> @@ -81,8 +81,10 @@ struct flowi4 {
->>>>>  #define flowi4_multipath_hash	__fl_common.flowic_multipath_hash
->>>>>  
->>>>>  	/* (saddr,daddr) must be grouped, same order as in IP header */
->>>>> -	__be32			saddr;
->>>>> -	__be32			daddr;
->>>>> +	struct_group(addrs,
->>>>> +		__be32			saddr;
->>>>> +		__be32			daddr;
->>>>> +	);
->>>>>  
->>>>>  	union flowi_uli		uli;
->>>>>  #define fl4_sport		uli.ports.sport
->>>>> diff --git a/include/uapi/linux/if_ether.h b/include/uapi/linux/if_ether.h
->>>>> index a0b637911d3c..8f5667b2ea92 100644
->>>>> --- a/include/uapi/linux/if_ether.h
->>>>> +++ b/include/uapi/linux/if_ether.h
->>>>> @@ -163,8 +163,16 @@
->>>>>  
->>>>>  #if __UAPI_DEF_ETHHDR
->>>>>  struct ethhdr {
->>>>> -	unsigned char	h_dest[ETH_ALEN];	/* destination eth addr	*/
->>>>> -	unsigned char	h_source[ETH_ALEN];	/* source ether addr	*/
->>>>> +	union {
->>>>> +		struct {
->>>>> +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
->>>>> +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
->>>>> +		};
->>>>> +		struct {
->>>>> +			unsigned char h_dest[ETH_ALEN];	  /* destination eth addr */
->>>>> +			unsigned char h_source[ETH_ALEN]; /* source ether addr	  */
->>>>> +		} addrs;
->>>>
->>>> A union of the same fields in the same structure in the same way?
->>>>
->>>> Ah, because struct_group() can not be used here?  Still feels odd to see
->>>> in a userspace-visible header.
->>>>
->>>>> +	};
->>>>>  	__be16		h_proto;		/* packet type ID field	*/
->>>>>  } __attribute__((packed));
->>>>>  #endif
->>>>> diff --git a/include/uapi/linux/ip.h b/include/uapi/linux/ip.h
->>>>> index e42d13b55cf3..33647a37e56b 100644
->>>>> --- a/include/uapi/linux/ip.h
->>>>> +++ b/include/uapi/linux/ip.h
->>>>> @@ -100,8 +100,16 @@ struct iphdr {
->>>>>  	__u8	ttl;
->>>>>  	__u8	protocol;
->>>>>  	__sum16	check;
->>>>> -	__be32	saddr;
->>>>> -	__be32	daddr;
->>>>> +	union {
->>>>> +		struct {
->>>>> +			__be32	saddr;
->>>>> +			__be32	daddr;
->>>>> +		} addrs;
->>>>> +		struct {
->>>>> +			__be32	saddr;
->>>>> +			__be32	daddr;
->>>>> +		};
->>>>
->>>> Same here (except you named the first struct addrs, not the second,
->>>> unlike above).
->>>>
->>>>
->>>>> +	};
->>>>>  	/*The options start here. */
->>>>>  };
->>>>>  
->>>>> diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
->>>>> index b243a53fa985..1c26d32e733b 100644
->>>>> --- a/include/uapi/linux/ipv6.h
->>>>> +++ b/include/uapi/linux/ipv6.h
->>>>> @@ -130,8 +130,16 @@ struct ipv6hdr {
->>>>>  	__u8			nexthdr;
->>>>>  	__u8			hop_limit;
->>>>>  
->>>>> -	struct	in6_addr	saddr;
->>>>> -	struct	in6_addr	daddr;
->>>>> +	union {
->>>>> +		struct {
->>>>> +			struct	in6_addr	saddr;
->>>>> +			struct	in6_addr	daddr;
->>>>> +		} addrs;
->>>>> +		struct {
->>>>> +			struct	in6_addr	saddr;
->>>>> +			struct	in6_addr	daddr;
->>>>> +		};
->>>>
->>>> addrs first?  Consistancy is key :)
->>>
->>> I think addrs should be second. In general, I think all newly added
->>> non-anonymous structures should be second.
->>
->> Why not use a local version of the macro like was done in the DRM header
->> file, to make it always work the same and more obvious what is
+CONFIG_USB_EHCI_TEGRA is an example of an option that was
+left in place to help users of old config files, another one is
+CONFIG_EXT3_FS. In both cases the idea is that the original
+code was changed, but the old option left in place to point to
+the replacement.
 
-Yep; I agree. That one looks just fine. :)
+I think doing this is generally a good idea, but I would not consider
+this a stable ABI in the sense that we can never break it. Most users
+should have migrated to the new option after a few kernel releases,
+and then I would remove the old one.
 
---
-Gustavo
+If a user upgrades across multiple kernel releases at once, usually
+all hope of reusing an old .config is lost anyway.
+
+> However lately for example the completely silly s/THUNDERBOLT/USB4/
+> change did slip through and did break my test setup with a vfio passed
+> through external nvme drive :(
+
+Another recent example is CONFIG_FB no longer being selected by
+the DRM subsystem, which broke a lot of defconfigs.
+
+        Arnd
