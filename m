@@ -4,115 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DC1C4320A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DB6C4320A
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49FFE60F9D
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:27:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7643C60EB2
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Jul 2021 06:41:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234056AbhG1G1z (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 28 Jul 2021 02:27:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33394 "EHLO mail.kernel.org"
+        id S233537AbhG1GlU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 28 Jul 2021 02:41:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36646 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233949AbhG1G1y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:27:54 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7694560F9B;
-        Wed, 28 Jul 2021 06:27:53 +0000 (UTC)
+        id S232798AbhG1GlU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 28 Jul 2021 02:41:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BA8B16023E;
+        Wed, 28 Jul 2021 06:41:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627453673;
-        bh=axAytxu0yowkL8okhc9sDtY44R3JVEYci6IiSE5czns=;
+        s=korg; t=1627454479;
+        bh=56P83WlclwichTl6Z38luZ2iMK3+gEOYgDjb65V+lIk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HvmIlwAJ/t/pxAr1FIf/7z2/TDgGEQkagTiGcUAzwKrGfzWSlg1q9nqU1mHmLOloN
-         E/fU71tiXpJGF2exxglmyV4jq59+IGwxYqxM8uNl8h+qpTklQMXYppVqMbV9uX7SC7
-         DZzwTzuOosqcuC6ml24IKrbIjyYV0n8taZ41+P24=
-Date:   Wed, 28 Jul 2021 08:27:49 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Wan Jiabing <wanjiabing@vivo.com>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-hardening@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] scripts: make some scripts executable
-Message-ID: <YQD45STjL160RnzR@kroah.com>
-References: <20210727153924.79473-1-masahiroy@kernel.org>
- <YQAsth0TA3AwtxvK@kroah.com>
- <CAK7LNAQM2WzfHdJhukiaeq=qYtJ7U8UbMZdFWSuAJG86bBVHnA@mail.gmail.com>
+        b=RyFulSv1DKr+WMQoNMSADu/bvEL2Nt9m/j8r5jvKSLh5jGBe0pgTIj4j2kHvRaqiq
+         cqa3qzmYXurTLeQgm/jDQEpxNsvH/ufI5US3zham8t8FNmVEui6kSE+H9CKeuNpq36
+         x4opoXtu0wbNZ69pe/1t1danjGs4IfYhvpwS+YHI=
+Date:   Wed, 28 Jul 2021 08:41:17 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 19/64] ip: Use struct_group() for memcpy() regions
+Message-ID: <YQD8DcOeivPzLMkL@kroah.com>
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-20-keescook@chromium.org>
+ <YQDxaYrHu0PeBIuX@kroah.com>
+ <baead202-569f-775f-348c-aa64e69f03ed@embeddedor.com>
+ <YQD2/CA7zJU7MW6M@kroah.com>
+ <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK7LNAQM2WzfHdJhukiaeq=qYtJ7U8UbMZdFWSuAJG86bBVHnA@mail.gmail.com>
+In-Reply-To: <e3193698-86d5-d529-e095-e09b4d52927b@embeddedor.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 10:03:56AM +0900, Masahiro Yamada wrote:
-> On Wed, Jul 28, 2021 at 12:56 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Wed, Jul 28, 2021 at 12:39:24AM +0900, Masahiro Yamada wrote:
-> > > Set the x bit to some scripts to make them directly executable.
-> > >
-> > > Especially, scripts/checkdeclares.pl is not hooked by anyone.
-> > > It should be executable since it is tedious to type
-> > > 'perl scripts/checkdeclares.pl'.
-> > >
-> > > The original patch [1] set the x bit properly, but it was lost when
-> > > it was merged as commit 21917bded72c ("scripts: a new script for
-> > > checking duplicate struct declaration").
-> > >
-> > > [1] https://lore.kernel.org/lkml/20210401110943.1010796-1-wanjiabing@vivo.com/
-> > >
-> > > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > > ---
-> > >
-> > >  scripts/checkdeclares.pl               | 0
-> > >  scripts/gcc-plugins/gen-random-seed.sh | 0
-> > >  scripts/syscallnr.sh                   | 0
-> > >  scripts/xen-hypercalls.sh              | 0
-> > >  4 files changed, 0 insertions(+), 0 deletions(-)
-> > >  mode change 100644 => 100755 scripts/checkdeclares.pl
-> > >  mode change 100644 => 100755 scripts/gcc-plugins/gen-random-seed.sh
-> > >  mode change 100644 => 100755 scripts/syscallnr.sh
-> > >  mode change 100644 => 100755 scripts/xen-hypercalls.sh
-> >
-> > Please no, as other tools (i.e. patch), can not set mode bits, and some
-> > people still rely on patch in places.
-> >
-> > If these need to be called by other parts of the build, we should
-> > execute them properly, not rely on the mode settings.
-> >
-> > thanks,
-> >
-> > greg k-h
+On Wed, Jul 28, 2021 at 01:31:16AM -0500, Gustavo A. R. Silva wrote:
+> > Why not use a local version of the macro like was done in the DRM header
+> > file, to make it always work the same and more obvious what is
+> > happening?  If I were a userspace developer and saw the above, I would
+> > think that the kernel developers have lost it :)
 > 
+> Then don't take a look at this[1]. :p
 > 
-> I believe tools should be executable.
+> --
+> Gustavo
 > 
-> If the x bit were missing in scripts/checkpatch.pl
-> for example, we would need to run 'perl scripts/checkpatch.pl'
-> instead of 'scripts/checkpatch.pl'. That is annoying.
-> 
-> 
-> Most of the scripts under the scripts/ directory
-> are already executable, and we rely on that fact.
-> Some of them are run directly, and I do not hear
-> from anyone who complains about that.
+> [1] https://git.kernel.org/linus/c0a744dcaa29e9537e8607ae9c965ad936124a4d
 
-Ok, fair enough, I just run into problems when dealing with this with
-backports to stable trees, and I know Andrew has also had problems when
-dealing with patches like this.
-
-> BTW, my 'patch' command on Ubuntu can handle the
-> x bit.  Doesn't it work on your 'patch' ?
-
-Somehow quilt can not handle it, I do not know if that is a problem with
-patch not knowing how to read the git-generated-patch or not, but we
-have had issues in the past here.
-
-thanks,
-
-greg k-h
+That one at least looks a "little" different so maybe it could be seen
+as semi-reasonable :)
