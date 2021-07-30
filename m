@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C100C4338F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Jul 2021 12:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54A7C4338F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Jul 2021 12:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2128F60F01
-	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Jul 2021 12:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 839E26103B
+	for <linux-kbuild@archiver.kernel.org>; Fri, 30 Jul 2021 12:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238317AbhG3MBB convert rfc822-to-8bit (ORCPT
+        id S238581AbhG3MBH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 30 Jul 2021 08:01:01 -0400
-Received: from mx1.emlix.com ([136.243.223.33]:42232 "EHLO mx1.emlix.com"
+        Fri, 30 Jul 2021 08:01:07 -0400
+Received: from mx1.emlix.com ([136.243.223.33]:42238 "EHLO mx1.emlix.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238275AbhG3MBA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Jul 2021 08:01:00 -0400
+        id S238275AbhG3MBH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 30 Jul 2021 08:01:07 -0400
 Received: from mailer.emlix.com (p5098be52.dip0.t-ipconnect.de [80.152.190.82])
         (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.emlix.com (Postfix) with ESMTPS id BB5185F807;
+        by mx1.emlix.com (Postfix) with ESMTPS id C9B575F82D;
         Fri, 30 Jul 2021 13:52:05 +0200 (CEST)
 From:   Rolf Eike Beer <eb@emlix.com>
 To:     linux-acpi@vger.kernel.org
@@ -33,9 +33,9 @@ Cc:     Zhang Rui <rui.zhang@intel.com>,
         Jiri Olsa <jolsa@kernel.org>,
         Arnaldo Carvalho de Melo <acme@redhat.com>,
         Jiri Kosina <jkosina@suse.cz>
-Subject: [PATCH 2/2] tools/thermal: tmon: default to prefixed pkg-config when  crosscompiling
-Date:   Fri, 30 Jul 2021 13:51:54 +0200
-Message-ID: <31302992.qZodDJZGDc@devpool47>
+Subject: [PATCH 1/2] tools/thermal: tmon: simplify Makefile
+Date:   Fri, 30 Jul 2021 13:49:04 +0200
+Message-ID: <1951386.ZPQrlMDjM2@devpool47>
 Organization: emlix GmbH
 In-Reply-To: <2149399.oOxd0sxVbX@devpool47>
 References: <2149399.oOxd0sxVbX@devpool47>
@@ -46,27 +46,49 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This matches what other parts of the tools/ directory already do.
-
 Signed-off-by: Rolf Eike Beer <eb@emlix.com>
-Cc: stable@vger.kernel.org
 ---
- tools/thermal/tmon/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/thermal/tmon/Makefile | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/tools/thermal/tmon/Makefile b/tools/thermal/tmon/Makefile
-index 3e650878ea824..f9c52b7fab7bc 100644
+index 9db867df76794..3e650878ea824 100644
 --- a/tools/thermal/tmon/Makefile
 +++ b/tools/thermal/tmon/Makefile
-@@ -10,7 +10,7 @@ override CFLAGS+= $(call cc-option,-O3,-O1) ${WARNFLAGS}
- # Add "-fstack-protector" only if toolchain supports it.
- override CFLAGS+= $(call cc-option,-fstack-protector-strong)
- CC?= $(CROSS_COMPILE)gcc
--PKG_CONFIG?= pkg-config
-+PKG_CONFIG?= $(CROSS_COMPILE)pkg-config
+@@ -13,7 +13,6 @@ CC?= $(CROSS_COMPILE)gcc
+ PKG_CONFIG?= pkg-config
  
  override CFLAGS+=-D VERSION=\"$(VERSION)\"
+-LDFLAGS+=
  TARGET=tmon
+ 
+ INSTALL_PROGRAM=install -m 755 -p
+@@ -33,7 +32,6 @@ override CFLAGS += $(shell $(PKG_CONFIG) --cflags $(STATIC) panelw ncursesw 2> /
+ 		     $(PKG_CONFIG) --cflags $(STATIC) panel ncurses 2> /dev/null)
+ 
+ OBJS = tmon.o tui.o sysfs.o pid.o
+-OBJS +=
+ 
+ tmon: $(OBJS) Makefile tmon.h
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS)  -o $(TARGET) $(TMON_LIBS)
+@@ -42,15 +40,13 @@ valgrind: tmon
+ 	 sudo valgrind -v --track-origins=yes --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./$(TARGET)  1> /dev/null
+ 
+ install:
+-	- mkdir -p $(INSTALL_ROOT)/$(BINDIR)
+-	- $(INSTALL_PROGRAM) "$(TARGET)" "$(INSTALL_ROOT)/$(BINDIR)/$(TARGET)"
++	- $(INSTALL_PROGRAM) -D "$(TARGET)" "$(INSTALL_ROOT)/$(BINDIR)/$(TARGET)"
+ 
+ uninstall:
+ 	$(DEL_FILE) "$(INSTALL_ROOT)/$(BINDIR)/$(TARGET)"
+ 
+ clean:
+-	find . -name "*.o" | xargs $(DEL_FILE)
+-	rm -f $(TARGET)
++	rm -f $(TARGET) $(OBJS)
+ 
+ dist:
+ 	git tag v$(VERSION)
 -- 
 2.32.0
 
