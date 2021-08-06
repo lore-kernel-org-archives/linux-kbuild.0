@@ -2,109 +2,176 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E99C4338F
-	for <linux-kbuild@archiver.kernel.org>; Fri,  6 Aug 2021 11:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2085C4338F
+	for <linux-kbuild@archiver.kernel.org>; Fri,  6 Aug 2021 17:27:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3C7A610FF
-	for <linux-kbuild@archiver.kernel.org>; Fri,  6 Aug 2021 11:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA02B60F38
+	for <linux-kbuild@archiver.kernel.org>; Fri,  6 Aug 2021 17:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243047AbhHFL4r (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 6 Aug 2021 07:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51784 "EHLO
+        id S241155AbhHFR1X (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 6 Aug 2021 13:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbhHFL4q (ORCPT
+        with ESMTP id S240927AbhHFR1X (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 6 Aug 2021 07:56:46 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5399FC061798;
-        Fri,  6 Aug 2021 04:56:29 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id m28-20020a05600c3b1cb02902b5a8c22575so5727632wms.0;
-        Fri, 06 Aug 2021 04:56:29 -0700 (PDT)
+        Fri, 6 Aug 2021 13:27:23 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADE0C061798
+        for <linux-kbuild@vger.kernel.org>; Fri,  6 Aug 2021 10:27:07 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id c3-20020a05620a0ce3b02903b8eff05707so6702919qkj.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Aug 2021 10:27:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=xxcVP1unxQRf/ma4cBAw6r/5ynUOn9I8kcb6t03qdg8=;
-        b=KmpYP3BE+cpz+pElv0OWJBLzo3/xIuvq6uh/veRCW2SSq0AcAWTQVgRa9UU3JVcDpo
-         KPP9//VsYE8H7VHboJOQ6KzAVunWP8/1tGbsWCSk5v0IOl0Yy2lWfp+/y4PdkrYrGO04
-         PCUpVVNBag26yTzqCaIRcMjafZS5PtD/2WIJahUaewAf5Uu/OeAGdpGlXvTTSrmhc0SB
-         Vg7a29cY5yIVTqtwxWKveg/UrfoUVsZjvz2p1kf0ITrj4Z9Dgo/5cIkw7uIDGUYgfuFb
-         M/X9acr4R2leiRKc9InK6ryWne5pZyghXK0ehd0nBd8iTeHk9Ad7oj40MIvIabLmwa0E
-         0pBQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=DsQFy/CzTnQXNoNOJwZLuGXsmdWykdOYnmIA1IAJYnI=;
+        b=SLKP8QT3UTFB+yk0MpS4S2ZYQEJh0gnI+gyTWPJzp356nk7gk9IXC4JqccWo2rsf3/
+         mxbffoWg83nR9QH0xUW3c93TAvFZeiOCwFnyBppdGNWSrkzG4zWhh3dKLn5YLuKXJbd9
+         Kxr9PqtKr7EAId4nMlv5kRVsG6V7G9nSeERVDXcCQeZGUpph8uOjFZYcZeihdrdHZ7sG
+         Wijn7xnJJl2Uy1HwettgBfYqHN77gB3BnC3iKU7w8yZgCR0AKo4d/SJOJ/1AHNxoUB8h
+         aEdlTKnQOo9Lyw3ZOZN+g7g29CTXQ76o0jFNXoZOkn8apGIHsDOeY6g/YqPyc8JegjGB
+         qyfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=xxcVP1unxQRf/ma4cBAw6r/5ynUOn9I8kcb6t03qdg8=;
-        b=i4gnRwoXDhyzH0U80UGsQ5HSheqIwJ7mxCRmty9uJTXGHWrqxQjlhMVUYr3fF2KxNc
-         H/4FOnhSzuhJASUmrR21wPZDLWkvXAztDY24vN/ppyFa5qPMCn2Jpa82af/W4VJxflpx
-         yops00GV8QbT+r3P2qEHFAHiS00qr7Qpzqwd0YuxB7/CaGw6r7z+K0rnZ8aQ6+MXz2Yz
-         XJWIIE18b1ZpfPe6Q5wRtT0pzFURwR6mj9k23/GGRvWtkt4mJjSnEV+hsXJT93BJ8yCG
-         R0mePq/pXFeQQXOYot/Yfw6DWt5e4GXUay+j2UIt+zrIAJHm3Y0S0/VNMlPXUMDVVUn0
-         y+Cg==
-X-Gm-Message-State: AOAM531nUPC99plZggKSZx4refxeVnDkVk7oMxb9xvQQ1R96Psm3xnwP
-        W4uhTKRx/XMtow2xjzt9/h7M1kJPPQc=
-X-Google-Smtp-Source: ABdhPJz3R2vkklO+frfNX6r8aHKE/hIze3yPOvVFk5GPsQnq76HPSuv7pbeeg5nYhh+efbUjTnfXOA==
-X-Received: by 2002:a05:600c:4f49:: with SMTP id m9mr17814809wmq.82.1628250987602;
-        Fri, 06 Aug 2021 04:56:27 -0700 (PDT)
-Received: from felia.fritz.box ([2001:16b8:2dc9:8d00:2198:3536:ca51:cd82])
-        by smtp.gmail.com with ESMTPSA id b20sm9195179wmj.48.2021.08.06.04.56.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Aug 2021 04:56:27 -0700 (PDT)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Nicholas Piggin <npiggin@gmail.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Babu Moger <babu.moger@oracle.com>,
-        Don Zickus <dzickus@redhat.com>, linux-kbuild@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] Kconfig.debug: drop selecting non-existing HARDLOCKUP_DETECTOR_ARCH
-Date:   Fri,  6 Aug 2021 13:56:18 +0200
-Message-Id: <20210806115618.22088-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=DsQFy/CzTnQXNoNOJwZLuGXsmdWykdOYnmIA1IAJYnI=;
+        b=NLAqOvPmKo+2w8DhDep9yZ/I/cIDmPP01GEuQRp7NTWBMYfSpl6UdqKnDDPPTQ97ji
+         HHnVHSpkJIhehZQxdrfkTYc31KVzJOfzmOtNRs+316WBGT5U7FSqjkdTtUhVfFDbueHD
+         LKFIZI6Gu6ZzynpNTGxhcckV5qf6UV9FeOasP174q7qUZR3WnpsOqMrz3tkP91R+eK30
+         ED09Qpg86bkAJycVrMLBT4PAN7Nrlg7etv8y9GFwwxx/1tduKSAXMVZ5DVl14M2uRpMw
+         WDE3qtN1GpwhUUvChbJleg+qlhm/CMbvZTgvPsQqZzSnRgoHGeEth+Bri6PWdf9laNx8
+         nv5A==
+X-Gm-Message-State: AOAM530Re3wKmujm1nuI/NrCPR/DU7hV5SfEocL1Itcza7eqAsVJGcm+
+        XNSdIxbBxsKV+jB00XowaUQtYcxsJ7MSOTddHPc=
+X-Google-Smtp-Source: ABdhPJxlVebXFVl1DX68O2az9jnUDVOkZsun/wYx/gJq/Ne5YY7RqIBz45lXfXNMiZy//yphthHXxKGwM9UXhBISE9s=
+X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:15c:211:202:d20b:bb87:51cd:edc3])
+ (user=ndesaulniers job=sendgmr) by 2002:a05:6214:27e4:: with SMTP id
+ jt4mr1006501qvb.45.1628270826503; Fri, 06 Aug 2021 10:27:06 -0700 (PDT)
+Date:   Fri,  6 Aug 2021 10:27:01 -0700
+Message-Id: <20210806172701.3993843-1-ndesaulniers@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
+Subject: [PATCH v2] scripts/Makefile.clang: default to LLVM_IAS=1
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>
+Cc:     Khem Raj <raj.khem@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit 05a4a9527931 ("kernel/watchdog: split up config options") adds a
-new config HARDLOCKUP_DETECTOR, which selects the non-existing config
-HARDLOCKUP_DETECTOR_ARCH.
+LLVM_IAS=1 controls enabling clang's integrated assembler via
+-integrated-as. This was an explicit opt in until we could enable
+assembler support in Clang for more architecures. Now we have support
+and CI coverage of LLVM_IAS=1 for all architecures except a few more
+bugs affecting s390 and powerpc.
 
-Hence, ./scripts/checkkconfigsymbols.py warns:
+This commit flips the default from opt in via LLVM_IAS=1 to opt out via
+LLVM_IAS=0.  CI systems or developers that were previously doing builds
+with CC=clang or LLVM=1 without explicitly setting LLVM_IAS must now
+explicitly opt out via LLVM_IAS=0, otherwise they will be implicitly
+opted-in.
 
-HARDLOCKUP_DETECTOR_ARCH
-Referencing files: lib/Kconfig.debug
+This finally shortens the command line invocation when cross compiling
+with LLVM to simply:
 
-Simply drop selecting the non-existing HARDLOCKUP_DETECTOR_ARCH.
+$ make ARCH=arm64 LLVM=1
 
-Fixes: 05a4a9527931 ("kernel/watchdog: split up config options")
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
-Nicholas, please review and ack.
+Changes v1 -> v2:
+* Drop "Currently" from Documentation/, as per Matthew.
+* Drop Makefile and riscv Makefile, rebase on
+  https://lore.kernel.org/lkml/20210805150102.131008-1-masahiroy@kernel.org/
+  as per Masahiro.
+* Base is kbuild/for-next, plus
+  https://lore.kernel.org/lkml/20210802183910.1802120-1-ndesaulniers@google.com/
+  https://lore.kernel.org/lkml/20210805150102.131008-1-masahiroy@kernel.org/.
 
-Andrew, please pick this quick cleanup once Nicholas has acked it.
+ Documentation/kbuild/llvm.rst | 14 ++++++++------
+ scripts/Makefile.clang        |  6 +++---
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
- lib/Kconfig.debug | 1 -
- 1 file changed, 1 deletion(-)
+diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+index f8a360958f4c..e87ed5479963 100644
+--- a/Documentation/kbuild/llvm.rst
++++ b/Documentation/kbuild/llvm.rst
+@@ -60,17 +60,14 @@ They can be enabled individually. The full list of the parameters: ::
+ 	  OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf \
+ 	  HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTLD=ld.lld
+ 
+-Currently, the integrated assembler is disabled by default. You can pass
+-``LLVM_IAS=1`` to enable it.
++The integrated assembler is enabled by default. You can pass ``LLVM_IAS=0`` to
++disable it.
+ 
+ Omitting CROSS_COMPILE
+ ----------------------
+ 
+ As explained above, ``CROSS_COMPILE`` is used to set ``--target=<triple>``.
+ 
+-Unless ``LLVM_IAS=1`` is specified, ``CROSS_COMPILE`` is also used to derive
+-``--prefix=<path>`` to search for the GNU assembler and linker.
+-
+ If ``CROSS_COMPILE`` is not specified, the ``--target=<triple>`` is inferred
+ from ``ARCH``.
+ 
+@@ -78,7 +75,12 @@ That means if you use only LLVM tools, ``CROSS_COMPILE`` becomes unnecessary.
+ 
+ For example, to cross-compile the arm64 kernel::
+ 
+-	make ARCH=arm64 LLVM=1 LLVM_IAS=1
++	make ARCH=arm64 LLVM=1
++
++If ``LLVM_IAS=0`` is specified, ``CROSS_COMPILE`` is also used to derive
++``--prefix=<path>`` to search for the GNU assembler and linker. ::
++
++	make ARCH=arm64 LLVM=1 LLVM_IAS=0 CROSS_COMPILE=aarch64-linux-gnu-
+ 
+ Supported Architectures
+ -----------------------
+diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
+index 1f4e3eb70f88..3ae63bd35582 100644
+--- a/scripts/Makefile.clang
++++ b/scripts/Makefile.clang
+@@ -22,12 +22,12 @@ else
+ CLANG_FLAGS	+= --target=$(notdir $(CROSS_COMPILE:%-=%))
+ endif # CROSS_COMPILE
+ 
+-ifeq ($(LLVM_IAS),1)
+-CLANG_FLAGS	+= -integrated-as
+-else
++ifeq ($(LLVM_IAS),0)
+ CLANG_FLAGS	+= -no-integrated-as
+ GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
+ CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
++else
++CLANG_FLAGS	+= -integrated-as
+ endif
+ CLANG_FLAGS	+= -Werror=unknown-warning-option
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 090fb54ecff1..b6b951b0ed46 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1061,7 +1061,6 @@ config HARDLOCKUP_DETECTOR
- 	depends on HAVE_HARDLOCKUP_DETECTOR_PERF || HAVE_HARDLOCKUP_DETECTOR_ARCH
- 	select LOCKUP_DETECTOR
- 	select HARDLOCKUP_DETECTOR_PERF if HAVE_HARDLOCKUP_DETECTOR_PERF
--	select HARDLOCKUP_DETECTOR_ARCH if HAVE_HARDLOCKUP_DETECTOR_ARCH
- 	help
- 	  Say Y here to enable the kernel to act as a watchdog to detect
- 	  hard lockups.
+base-commit: d7a86429dbc691bf540688fcc8542cc20246a85b
+prerequisite-patch-id: 0d3072ecb5fd06ff6fd6ea81fe601f6c54c23910
+prerequisite-patch-id: 2654829756eb8a094a0ffad1679caa75a4d86619
+prerequisite-patch-id: a51e7885ca2376d008bbf146a5589da247806f7b
+prerequisite-patch-id: 6a0342755115ec459610657edac1075f069faa3d
 -- 
-2.17.1
+2.32.0.605.g8dce9f2422-goog
 
