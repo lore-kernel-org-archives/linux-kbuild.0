@@ -2,129 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D146C4338F
-	for <linux-kbuild@archiver.kernel.org>; Sun,  8 Aug 2021 22:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4CAC4338F
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DA0C60E76
-	for <linux-kbuild@archiver.kernel.org>; Sun,  8 Aug 2021 22:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 573D6601FD
+	for <linux-kbuild@archiver.kernel.org>; Mon,  9 Aug 2021 11:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbhHHWS0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 8 Aug 2021 18:18:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48760 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229662AbhHHWS0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 Aug 2021 18:18:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 19A7A60F35;
-        Sun,  8 Aug 2021 22:18:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628461086;
-        bh=AhkExiTj7NgYDK7oXdA9gqLj35ImbC6c4czHxK2oQn0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QwfCn3KbXf7HgTJBDumrlNYfthmkNhnOhXLzc8c4t0p/DkwRRfmdCn6JiJKG8bFDP
-         5gk0EPuc0n4Y5HhJqb6Tub0vLgM/KMVowq/b0Cl8ZeHIbbHHeJnp/IsExIlPny4lMl
-         sPsuB289/KGsSSPIbbYmVRSBRCN+OAZgZcNP/i91yfJQnQ0aQPkOI1A6twmRgPW46o
-         i5dDSwJLVWdHOJJEr+tyN0W95HSyEoyIalUy3wyDWuBnDX3n+jzkvnOliS8MOlyGAK
-         fvondkbzCGNsNV3OqJj9ZkUfGqpoNbmUwvpt/ftG5PEiGadkUCbNf5CscHDb9RvNTH
-         PlNA6OHqi/Mjw==
-Date:   Sun, 8 Aug 2021 15:18:04 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Maciej Falkowski <maciej.falkowski9@gmail.com>
-Cc:     natechancellor@gmail.com, ndesaulniers@google.com,
-        masahiroy@kernel.org, michal.lkml@markovi.net, nhuck@google.com,
-        clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] clang-tools: Print information when clang-tidy tool
- is missing
-Message-ID: <YRBYHAJSpU5jcTQV@Ryzen-9-3900X.localdomain>
-References: <CAK7LNAS=tyS22vk1mO7uCuzZ=YuzgByzC4Aix9JwugdV3xpr-Q@mail.gmail.com>
- <20210807110116.7985-1-maciej.falkowski9@gmail.com>
+        id S234967AbhHILXo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 9 Aug 2021 07:23:44 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34390 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235007AbhHILXo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 9 Aug 2021 07:23:44 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6D8F421ED4;
+        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1628508202;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
+        b=FUJg+QaU7zw3qTf6t8q9Qr96X0Utqfsl+nS4wyhc9/5vWZMS539Of9T5SM02pWzim1Cnda
+        RMrFBB4C9IiCbCzLy7hKe0Nw5kCTqLiYUG2RwoYyBydeMv59tIlgL5Vpa/xsWEDauKkWvj
+        09N1MMAWFSlJkFOi7ijKkWYVWovvXhs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1628508202;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XEHaigBd+p4Kdq3FOyfyiQahnEWWgwrbyI9p3sYy9Jg=;
+        b=4VeRarVySJZv/AlngzeBW/O6mbVTRAHHGwmwBsPvaCbeLhv85RY/VfIGPtUkorqnnpUTKq
+        o+aHpptVRlTrrwAw==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 53C44A3B8E;
+        Mon,  9 Aug 2021 11:23:22 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id BAE5EDA880; Mon,  9 Aug 2021 13:20:30 +0200 (CEST)
+Date:   Mon, 9 Aug 2021 13:20:30 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 47/64] btrfs: Use memset_after() to clear end of struct
+Message-ID: <20210809112030.GM5047@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Kees Cook <keescook@chromium.org>,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Keith Packard <keithpac@amazon.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com
+References: <20210727205855.411487-1-keescook@chromium.org>
+ <20210727205855.411487-48-keescook@chromium.org>
+ <20210728094215.GX5047@twin.jikos.cz>
+ <202107281455.2A0753F5@keescook>
+ <20210729103337.GS5047@suse.cz>
+ <202107310822.31BEB6E543@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210807110116.7985-1-maciej.falkowski9@gmail.com>
+In-Reply-To: <202107310822.31BEB6E543@keescook>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Aug 07, 2021 at 01:01:16PM +0200, Maciej Falkowski wrote:
-> When clang-tidy tool is missing in the system, the FileNotFoundError
-> exception is raised in the program reporting a stack trace to the user:
+On Sat, Jul 31, 2021 at 08:25:51AM -0700, Kees Cook wrote:
+> On Thu, Jul 29, 2021 at 12:33:37PM +0200, David Sterba wrote:
+> > On Wed, Jul 28, 2021 at 02:56:31PM -0700, Kees Cook wrote:
+> > > On Wed, Jul 28, 2021 at 11:42:15AM +0200, David Sterba wrote:
+> > > > On Tue, Jul 27, 2021 at 01:58:38PM -0700, Kees Cook wrote:
+> > > > >  	}
+> > > > >  	if (need_reset) {
+> > > > > -		memset(&item->generation_v2, 0,
+> > > > > -			sizeof(*item) - offsetof(struct btrfs_root_item,
+> > > > > -					generation_v2));
+> > > > > -
+> > > > 
+> > > > Please add
+> > > > 		/* Clear all members from generation_v2 onwards */
+> > > > 
+> > > > > +		memset_after(item, 0, level);
+> > > 
+> > > Perhaps there should be another helper memset_starting()? That would
+> > > make these cases a bit more self-documenting.
+> > 
+> > That would be better, yes.
+> > 
+> > > +		memset_starting(item, 0, generation_v2);
+> > 
+> > memset_from?
 > 
-> $ ./scripts/clang-tools/run-clang-tools.py clang-tidy ./compile_commands.json
-> multiprocessing.pool.RemoteTraceback:
-> """
-> Traceback (most recent call last):
->   File "/usr/lib64/python3.8/multiprocessing/pool.py", line 125, in worker
->     result = (True, func(*args, **kwds))
->   File "/usr/lib64/python3.8/multiprocessing/pool.py", line 48, in mapstar
->     return list(map(*args))
->   File "./scripts/clang-tools/run-clang-tools.py", line 54, in run_analysis
->     p = subprocess.run(["clang-tidy", "-p", args.path, checks, entry["file"]],
->   File "/usr/lib64/python3.8/subprocess.py", line 489, in run
->     with Popen(*popenargs, **kwargs) as process:
->   File "/usr/lib64/python3.8/subprocess.py", line 854, in __init__
->     self._execute_child(args, executable, preexec_fn, close_fds,
->   File "/usr/lib64/python3.8/subprocess.py", line 1702, in _execute_child
->     raise child_exception_type(errno_num, err_msg, err_filename)
-> FileNotFoundError: [Errno 2] No such file or directory: 'clang-tidy'
-> """
-> 
-> The patch adds more user-friendly information about missing tool:
-> 
-> $ ./scripts/clang-tools/run-clang-tools.py clang-tidy ./compile_commands.json
-> Command 'clang-tidy' is missing in the system
-> 
-> Signed-off-by: Maciej Falkowski <maciej.falkowski9@gmail.com>
-> Link: https://github.com/ClangBuiltLinux/linux/issues/1342
+> For v2, I bikeshed this to "memset_startat" since "from" is semantically
+> close to "source" which I thought might be confusing. (I, too, did not
+> like "starting".) :)
 
-LGTM, I think this is much better than the stacktrace output as above as
-it is easier for someone who is not familiar with these scrips to act
-on.
-
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-
-> ---
-> Hi Masahiro,
-> 
-> Thank you for your feedback!
-> I am sorry that I haven't replied for so long.
-> 
-> I agree with your point, based on this I would like
-> to propose a second version of the patch.
-> 
-> changes in v2:
->  - Solution has changed from LBYL style to EAFP
-> 
-> Best regards,
-> Maciej Falkowski
-> ---
->  scripts/clang-tools/run-clang-tools.py | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/clang-tools/run-clang-tools.py b/scripts/clang-tools/run-clang-tools.py
-> index fa7655c7cec0..27ebe2f2069a 100755
-> --- a/scripts/clang-tools/run-clang-tools.py
-> +++ b/scripts/clang-tools/run-clang-tools.py
-> @@ -67,7 +67,14 @@ def main():
->      # Read JSON data into the datastore variable
->      with open(args.path, "r") as f:
->          datastore = json.load(f)
-> -        pool.map(run_analysis, datastore)
-> +        try:
-> +            pool.map(run_analysis, datastore)
-> +        except FileNotFoundError as err:
-> +            if err.filename == 'clang-tidy':
-> +                print("Command 'clang-tidy' is missing in the system", file=sys.stderr)
-> +                sys.exit(127)
-> +            else:
-> +                raise err
->  
->  
->  if __name__ == "__main__":
-> -- 
-> 2.26.3
+memset_startat works for me, thanks.
