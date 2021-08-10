@@ -2,135 +2,105 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9151C4320E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 10 Aug 2021 00:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 544B4C4338F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 10 Aug 2021 18:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B07F26101D
-	for <linux-kbuild@archiver.kernel.org>; Tue, 10 Aug 2021 00:07:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3386460C3E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 10 Aug 2021 18:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237131AbhHJAH4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 9 Aug 2021 20:07:56 -0400
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:16916 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237108AbhHJAHz (ORCPT
+        id S234022AbhHJSR7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 10 Aug 2021 14:17:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236679AbhHJSRH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Aug 2021 20:07:55 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 17A073gm027642;
-        Tue, 10 Aug 2021 09:07:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 17A073gm027642
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1628554023;
-        bh=YHT1wdO9BJeEnVYWadet580A1QtIyBQoR9aiFtvfZGQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qpeaZfj1S52In9OqzugDwJq7LR5sf7DfsN2Ra4D4/7Mj7Sk8kVQ+Ze4SEJu9nxAWr
-         zuOtjmoizVRjdYz+IQ1+0hk8/3F2IkCEiA2JrFs51NCRM2ZTqC5Oz6bzK7nbjxIe86
-         Z4E0Ot1qLc47QDixlLSWr2EeR9DD9eoLOPKsiB/dE4KOQ+zO2rG8SnFmK9m//xIJyL
-         IzO79wsh46l09Bdey5qYnr7xjz6Mp0DFimoh1qGoaQeyaHrOihwNammcKKBbKJDr2d
-         Q0l6y+oOFPYo0z0mNu9C0TpATi4L3yAjIbTSVJ2i+uAHpW8cmyS4JrZDGyxB7uj4bb
-         KYwCOXGXlc7XA==
-X-Nifty-SrcIP: [209.85.214.176]
-Received: by mail-pl1-f176.google.com with SMTP id j3so18531277plx.4;
-        Mon, 09 Aug 2021 17:07:03 -0700 (PDT)
-X-Gm-Message-State: AOAM531hLOgbSq7Md+AJ3QkWY66rLc67hOigjihaUpsY84xskrgxQs6F
-        qvHaWI/gIFhQlpeGGkqhjvbkS99C5g6YR9cK2tg=
-X-Google-Smtp-Source: ABdhPJz5g2UH5l3Gvz6QSJjrySe0RZ6IE4VBgrreB7tp3UOmjppEP2ZS0P89yIPjgFj+aYeVphRC5LeTe/8xavReZBE=
-X-Received: by 2002:a63:dd51:: with SMTP id g17mr282732pgj.47.1628554022572;
- Mon, 09 Aug 2021 17:07:02 -0700 (PDT)
+        Tue, 10 Aug 2021 14:17:07 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CFC8C059350
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Aug 2021 10:58:16 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id z20so6113812lfd.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Aug 2021 10:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=jOtoBPdTetxURGXaH4p/edf3lKEpBVLNOZWC7CVT0Rg=;
+        b=dm9N0vPWFbrcjRwEI9MQKP8yuSqsBl8oNyQGqJ5y7iHMviv88sjQoYrw7GJGGqb2Tj
+         lYjMeBX83/nqzvs4mBL1WtuJnmSn5/sfmrf2kwmrTFOKS1bH7cGUTzdaNybAXmoXmdc6
+         uEeKGODe3aagvLZhhylGco+qZO8gsIRFrCwDAxsaf6oMiA35pnoyQ4Cxxs8J/iQUviNZ
+         v/OLZvmyj0Yui7MWEl72NIOpyuniWzgyDTiCl2+YrWd4X8S48MaM8YcTbCuzSIjpi0fz
+         woHE+J+Rj3sBxlLHvqcgoH2B/xXLMv6Booee/jkTHHyVmVjACD9AU8Fz0Npz5Pwt3wpf
+         BUlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=jOtoBPdTetxURGXaH4p/edf3lKEpBVLNOZWC7CVT0Rg=;
+        b=VyDbYfdW7qMLcx4BGQG3s6fHsBF0r2SU2u4SwHotnwMjnYC9+TNVL237/qL43d2sRT
+         ULj0ZaHu6XQcHfs6ml5c7g+HZCbpE46+rMp93aYqxueoiPlLnA8JOJB81WLZNHutU+j3
+         o7FiAuIHptOZ1ceUZ1HcJ4aafxt8wv5kULA5Gtx93Nwcf5FIk3NbT2SrdToc1i1X+mHb
+         eGdI1XqC6G2tzzu2pkuU9hLdtx884fU9q3gMkmpnAgocQIr6DZtyQI2N5bjhcsP9OWPA
+         QwK8agAKy+DewjQRMb5wy9f8fcqZCV+fbUBwjEQfrX8TaL8Z/9uCTxMk0Pu5lV9cW/Nk
+         iLXg==
+X-Gm-Message-State: AOAM533wn07tOSAAbxEhUtMIcyehz0XqYpYyE0on8DfJknWDUDOvMMKi
+        b9olxx104ORX7oYVOQGbN2Rc/dEGtFgurLRipX2MCTB5aFyqC8LU
+X-Google-Smtp-Source: ABdhPJz19/eIpqCYy/fTPnfLcatxCAIxsDs+JqpO2si9tAUwkyhU5mUyC5TXx4Mg1kBzLD3lYNuzt9fR4ZzQQrU+brI=
+X-Received: by 2002:ac2:4e8c:: with SMTP id o12mr12176777lfr.374.1628618294686;
+ Tue, 10 Aug 2021 10:58:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210806172701.3993843-1-ndesaulniers@google.com> <YQ2TGPwjvn8w4rKs@archlinux-ax161>
-In-Reply-To: <YQ2TGPwjvn8w4rKs@archlinux-ax161>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 10 Aug 2021 09:06:25 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARitJhPF5sggQ_k2885TSS3VbKQ0APAE7G8ANsYxxmz1g@mail.gmail.com>
-Message-ID: <CAK7LNARitJhPF5sggQ_k2885TSS3VbKQ0APAE7G8ANsYxxmz1g@mail.gmail.com>
-Subject: Re: [PATCH v2] scripts/Makefile.clang: default to LLVM_IAS=1
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Khem Raj <raj.khem@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 10 Aug 2021 10:58:03 -0700
+Message-ID: <CAKwvOdkPLrL6wkhSGaadAcj3HNi1W2q6TQHWFhSej8JvatSzfw@mail.gmail.com>
+Subject: cc-option-yn necessary? (vs cc-option)
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:SIFIVE DRIVERS" <linux-riscv@lists.infradead.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Arnd Bergmann <arnd@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Aug 7, 2021 at 4:53 AM Nathan Chancellor <nathan@kernel.org> wrote:
->
-> On Fri, Aug 06, 2021 at 10:27:01AM -0700, Nick Desaulniers wrote:
-> > LLVM_IAS=1 controls enabling clang's integrated assembler via
-> > -integrated-as. This was an explicit opt in until we could enable
-> > assembler support in Clang for more architecures. Now we have support
-> > and CI coverage of LLVM_IAS=1 for all architecures except a few more
-> > bugs affecting s390 and powerpc.
->
-> The powerpc and s390 folks have been testing with clang, I think they
-> should have been on CC for this change (done now).
->
-> > This commit flips the default from opt in via LLVM_IAS=1 to opt out via
-> > LLVM_IAS=0.  CI systems or developers that were previously doing builds
-> > with CC=clang or LLVM=1 without explicitly setting LLVM_IAS must now
-> > explicitly opt out via LLVM_IAS=0, otherwise they will be implicitly
-> > opted-in.
-> >
-> > This finally shortens the command line invocation when cross compiling
-> > with LLVM to simply:
-> >
-> > $ make ARCH=arm64 LLVM=1
-> >
-> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
->
-> I am still not really sure how I feel about this. I would prefer not to
-> break people's builds but I suppose this is inevitabile eventually.
->
-> A little support matrix that I drafted up where based on ARCH and clang
-> version for LLVM_IAS=1 support:
->
->              | 10.x | 11.x | 12.x | 13.x | 14.x |
-> ARCH=arm     |  NO  |  NO  |  NO  |  YES |  YES |
-> ARCH=arm64   |  NO  |  YES |  YES |  YES |  YES |
-> ARCH=i386    |  YES |  YES |  YES |  YES |  YES |
-> ARCH=mips*   |  YES |  YES |  YES |  YES |  YES |
-> ARCH=powerpc |  NO  |  NO  |  NO  |  NO  |  NO  |
-> ARCH=s390    |  NO  |  NO  |  NO  |  NO  |  NO  |
-> ARCH=x86_64  |  NO  |  YES |  YES |  YES |  YES |
->
-> The main issue that I have with this change is that all of these
-> architectures work fine with CC=clang and their build commands that used
-> to work fine will not with this change, as they will have to specify
-> LLVM_IAS=0. I think that making this change for LLVM=1 makes sense but
-> changing the default for just CC=clang feels like a bit much at this
-> point in time. I would love to hear from others on this though, I am not
-> going to object much further than this.
->
-> Regardless of that concern, this patch does what it says so:
->
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+Masahiro,
+I was looking through the uses of cc-option, cc-option-yn, and
+cc-disable-warning to see what we're missing support for in Clang.
 
+I have a short list of places where cc-option can be removed at
+https://github.com/ClangBuiltLinux/linux/issues/1436#issuecomment-895557491
+because all supported versions of supported toolchains support these
+flags.  These should remove a few unnecessary compiler invocations.
 
-Applied to linux-kbuild.
-Thanks.
+There are also a few cc-option tests that are very compiler specific,
+so those might be convertible to just check CC_IS_* rather than
+cc-option (I'll have to verify).
 
+Another thing I noticed is that it seems that most uses of
+cc-option-yn are replaceable with simply cc-option when they use
+cc-option-yn but check that the result is equal to y. I think even the
+cases that check against n could be converted to:
 
+Examples:
+arch/x86/Makefile
+From:
+ifeq ($(call cc-option-yn, -mfentry), n)
+To:
+ifeq ($(call cc-option,-mfentry),)
+(Though technically, all supported versions of gcc and clang support
+-mfentry, so this block should just be deleted)
+
+arch/powerpc/Makefile
+From:
+ifeq ($(call cc-option-yn,-mcmodel=medium),y)
+To:
+ifneq ($(call cc-option,-mcmodel=medium),)
+
+Then perhaps we could consolidate cc-option-yn into cc-option?  What
+are your thoughts? Should I start sending you patches for all of the
+above?
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
