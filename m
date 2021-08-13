@@ -2,96 +2,142 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0541FC4338F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 13 Aug 2021 06:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F92C4338F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 13 Aug 2021 07:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4E81610A7
-	for <linux-kbuild@archiver.kernel.org>; Fri, 13 Aug 2021 06:30:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 896B360F91
+	for <linux-kbuild@archiver.kernel.org>; Fri, 13 Aug 2021 07:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238889AbhHMGbC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 13 Aug 2021 02:31:02 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17303 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238776AbhHMGbB (ORCPT
+        id S239415AbhHMH3f (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 13 Aug 2021 03:29:35 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:32656 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238816AbhHMH3f (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Aug 2021 02:31:01 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 17D6U7KW027960;
-        Fri, 13 Aug 2021 15:30:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 17D6U7KW027960
+        Fri, 13 Aug 2021 03:29:35 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 17D7SX08005023;
+        Fri, 13 Aug 2021 16:28:34 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 17D7SX08005023
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1628836208;
-        bh=8QEPgd04IIZeiouqqMA3n0LluzccoXO1FytQ+dXRUZY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=KT4P3MfRbTbG5UVZF7rcysB22J+PjRQdfEozadN0XPFFeU59q3uuEi58FhzIW1hix
-         yRzkCEyiSTFW2lFY8xRNToy5HfYSa7yrl8f0ZujHtdhG5bYzrrnE8RP6nLr0VGdYDW
-         q/CT2HxQAJVHoqd2yb5P6thtE9YekWqRDz94lQ/AaMKhSSnVlXVWurqj2SGdfTxuyb
-         2SfBO/mQyN7ylFto0My9t6Z+aCPUK01Urg8A5rK/zihfwuyAUCd7j4ZmDxJ//o3ISb
-         OMhCmYip7BHXClBGTrJ3nkdQnOpkVP7SKkjzkRKiN0tVA3OREo+IQApniJ7VhNX5+f
-         a01ts/Pr6aRpA==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH 1/2] kbuild: macrofy the condition of if_changed and friends
-Date:   Fri, 13 Aug 2021 15:30:04 +0900
-Message-Id: <20210813063005.1739278-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        s=dec2015msa; t=1628839714;
+        bh=BV8wnGfpU0adexwE48wxaMnANp7xHb9xXsYRk1N/H18=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Wv4bUS5DC5jMTBHGvc+v/2dW0yUAhx2C+vVmHRxcKO0FCnXTMbyfr+1kYaPLgsdmb
+         AP8MkQY25tURaJfMeMLWoHXModJ1xvNbovHw1LwfoDwxzwQ0QZcA6WMpHBPlrz/PzW
+         8pMYW2ou/pAtxqGmZG1/trSXXAFJkwvrfU+Zt4diwVYcotLBQfF3VCngLvke/aYuZr
+         idCzI9IhobsRo3C9RDNZLgoYPGkzZTjAruIftr1v9cU/AznvCg7APk4Q0d1jiZdX/A
+         C8lT50sItK11iJWza+Ot/5wbjAQiUq8UqEtgLwpWHako41bNM1yrCX0xC84Eq5OdNo
+         5l6C+LwCi/zKQ==
+X-Nifty-SrcIP: [209.85.216.47]
+Received: by mail-pj1-f47.google.com with SMTP id bo18so14171538pjb.0;
+        Fri, 13 Aug 2021 00:28:34 -0700 (PDT)
+X-Gm-Message-State: AOAM531vw/gAV0yRVmhLy/1WD4XoyGkmE1pV7aoOqhCCU/wGwtKAkd9N
+        13Rv/p6oa7wSQyZVHcIjczct7weFXsW+w/NkwtM=
+X-Google-Smtp-Source: ABdhPJyx44tl9Uqj/H6tA+h95icpAvU0tmj4P0oIKNOx0eYC/VoDpCvWHbGhx2UZQAkDxdiox5Mt6fBk1kYZ8MIeF5o=
+X-Received: by 2002:a17:90a:7384:: with SMTP id j4mr1212507pjg.153.1628839713522;
+ Fri, 13 Aug 2021 00:28:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210811225442.9537-1-rdunlap@infradead.org>
+In-Reply-To: <20210811225442.9537-1-rdunlap@infradead.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 13 Aug 2021 16:27:56 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASJi3HWY9ut8+mkSOAWD=QxB7ftnkHdqZRW0fLbO5NDhg@mail.gmail.com>
+Message-ID: <CAK7LNASJi3HWY9ut8+mkSOAWD=QxB7ftnkHdqZRW0fLbO5NDhg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: allow "make" targets 'versioncheck' and
+ 'includecheck' withoug .config file
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add a new macro that expands into $(newer-prereqs)$(cmd-check).
+On Thu, Aug 12, 2021 at 7:54 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> Top-level Makefile targets 'versioncheck' and 'includecheck' don't
+> need a configured kernel (i.e., don't need a .config file), so add
+> them the the list of "no-dot-config-targets".
+> This eliminates the 'make' error:
+>
+> ***
+> *** Configuration file ".config" not found!
+> ***
+> *** Please run some configurator (e.g. "make oldconfig" or
+> *** "make menuconfig" or "make xconfig").
+> ***
+> Makefile:759: include/config/auto.conf.cmd: No such file or directory
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: Michal Marek <michal.lkml@markovi.net>
+> Cc: linux-kbuild@vger.kernel.org
+> ---
+> Fixes: I couldn't determine this.
+>
+>  Makefile |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> --- linux-next-20210811.orig/Makefile
+> +++ linux-next-20210811/Makefile
+> @@ -274,7 +274,8 @@ no-dot-config-targets := $(clean-targets
+>                          cscope gtags TAGS tags help% %docs check% coccicheck \
+>                          $(version_h) headers headers_% archheaders archscripts \
+>                          %asm-generic kernelversion %src-pkg dt_binding_check \
+> -                        outputmakefile rustfmt rustfmtcheck
+> +                        outputmakefile rustfmt rustfmtcheck \
+> +                        versioncheck includecheck
+>  # Installation targets should not require compiler. Unfortunately, vdso_install
+>  # is an exception where build artifacts may be updated. This must be fixed.
+>  no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
 
-It makes it easier to add common code for if_changed, if_changed_dep,
-and if_changed_rule.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- scripts/Kbuild.include | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+There is no good reason to invoke checkincludes.pl via GNU Make
+in the first place.
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index f247e691562d..c3c975a92318 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -130,13 +130,15 @@ make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1))))
- # PHONY targets skipped in both cases.
- newer-prereqs = $(filter-out $(PHONY),$?)
- 
-+if-changed-cond = $(newer-prereqs)$(cmd-check)
-+
- # Execute command if command has changed or prerequisite(s) are updated.
--if_changed = $(if $(newer-prereqs)$(cmd-check),                              \
-+if_changed = $(if $(if-changed-cond),                                        \
- 	$(cmd);                                                              \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
- # Execute the command and also postprocess generated .d dependencies file.
--if_changed_dep = $(if $(newer-prereqs)$(cmd-check),$(cmd_and_fixdep),@:)
-+if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
- 
- cmd_and_fixdep =                                                             \
- 	$(cmd);                                                              \
-@@ -146,7 +148,7 @@ cmd_and_fixdep =                                                             \
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
- # and if so will execute $(rule_foo).
--if_changed_rule = $(if $(newer-prereqs)$(cmd-check),$(rule_$(1)),@:)
-+if_changed_rule = $(if $(if-changed-cond),$(rule_$(1)),@:)
- 
- ###
- # why - tell why a target got built
+
+
+A better solution is to do it by a shell script
+or to make checkincludes.pl traverse the
+subdirectories by itself.
+
+
+
+[1] An easy solution
+
+Add scripts/checkincludes-all:
+
+
+#!/bin/sh
+find . -name '*.[hcS]' -type f -print | sort \
+  | xargs $(dirname $0)/checkincludes.pl
+
+
+Then, remove the 'includecheck' target from the Makefile.
+
+You can do 'scripts/checkincludes-all'
+instead of 'make includecheck'.
+
+
+
+[2] A better solution
+
+Extend scripts/checkincludes.pl so that it checks
+all *.[hcS] files under the current directory
+when no argument is passed.
+
+You can simply do 'scripts/checkincludes.py'
+
+
+
 -- 
-2.30.2
-
+Best Regards
+Masahiro Yamada
