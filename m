@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2B9C4320A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB85C4320E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BFF1061058
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69333610C7
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238655AbhHRGPw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45662 "EHLO
+        id S238538AbhHRGP4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238362AbhHRGPr (ORCPT
+        with ESMTP id S238260AbhHRGPw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:15:47 -0400
+        Wed, 18 Aug 2021 02:15:52 -0400
 Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0594C0617AF
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id j12-20020a17090aeb0c00b00179530520b3so8293491pjz.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73163C0363DF
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:15 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id qe12-20020a17090b4f8c00b00179321cbae7so1647504pjb.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
-        b=a6bTyF6xsvXmJVaSI8AKs77+P0oFTI1gTPlsYa6mh59pACM92P1VFzFqvqU9+X+jNr
-         vTM9CS3vOAuRCBsVzn6N7KgVHI6W6ooLD8DmaYQuGxrolCI4Xru2kAG7C7jmtZ5uZ8PR
-         VDy1iToF9Tpap2g7DTRp0rqJ6lJwmpqW0wJjo=
+        bh=U8hLOmyndrZpbH3W//YQN6YJRgGYlYr4YiBW+Lc3AF4=;
+        b=ClJUrT6ApBH0phA65aDisj5+kyHerJF2/GgwYf6sYImzafPzHckhYzZodOxI7uhCpI
+         vpe004kdrf64A0lB+HxzctUtSU11uTF4QZRwPZLG5yLy/UjnyJdf52u/HU6dj4zxkdJI
+         26TEVOy51sB8cue9oxYDxzhyCi71TMoiQfP2w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
-        b=CMEmE/EUSjwz9996YZ5XQb7qw1wbccYLBeT91wCCY34DkgwWeCpeQyLAwzmU6PHlej
-         TybQLdKkFTQzzeH/DDPjyyNC4aE+tPThYNG1UEj2VQcxqBdONAIuIraAN3E+Hhhqo0dg
-         qNRSpNuuiX2vr1ujxiApmQVYRIUT9TomTMrLwi6uu5Xb/YUDklc46xoG9bZelCSUKHPi
-         SY1g8q3nvtrJsMu0+uAQKej5SuwoD3CFoybLVE0lRSW93ibpIAFPfD6vkJ9MYpylckN8
-         iryIjBT0CajC+4byHoJI4xzxgj3vHVJIXtFFocTgZ83hY7SJhDXbYcxukyb+lWy6KnGP
-         EBNQ==
-X-Gm-Message-State: AOAM530RPzQ5lVuUbbrjr1E+A/ccEmvRqg9zvR3b7T+Es3sOYW5NYRBY
-        xXukEH7F53XU8ufvR2eNZSIkxg==
-X-Google-Smtp-Source: ABdhPJxYy9uajyke8AmxVdXcCpVPxEVIqn6teRhyhxiibQmTAmVANSe3Um2YhA94u6j4OQrmXZTUYg==
-X-Received: by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP id 6-20020a170902e9c6b029012d4cb33985mr5959378plk.56.1629267253269;
-        Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
+        bh=U8hLOmyndrZpbH3W//YQN6YJRgGYlYr4YiBW+Lc3AF4=;
+        b=LW3O/C2eZDH9l73+T6nqbmK+97zLauSLkOpWLOrbRF8BpPuCfknzvNP3zkRENWd3Df
+         304kT+Jf6bjIZb/pwqymzA3g/n/3nRKJ1uBUSFyf4DplKKfGY7FU+cgbCshbVJVpkFC/
+         EwBD8fGGESogm4OhbSJgBDkSs2YzhK6YEGwdIseUSWBBMT5oKvglECfOV0+nx/oR6IL2
+         PiZgAIig+UEtfHxt2j88QSrU4lS7Db+gLKW8qGImAeWr7TNtB+3Pi69ujhxjbnuak65Z
+         Zc+KIckL2LiErePBQuxJd/FGcUf5/DynRE17Xuhza35cRRLZ+zkkklYtLZyh8fiPiZkD
+         xJiA==
+X-Gm-Message-State: AOAM532jJQBaV1R0L2HOkz+QI/4JjCcPyFU3ob3xy9aJAZ8WfIzJud+d
+        93pKyiEYqCNEZkM1OODOfmni4A==
+X-Google-Smtp-Source: ABdhPJwRPPIhR63YQCS3nZeOodK84yxk6DTCJU5/GeqbIYAqZWORFkCkpfMsUc8DkqkxWPqp6Ivd9w==
+X-Received: by 2002:a17:90a:3d4d:: with SMTP id o13mr7935552pjf.34.1629267255044;
+        Tue, 17 Aug 2021 23:14:15 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l12sm5631661pgc.41.2021.08.17.23.14.12
+        by smtp.gmail.com with ESMTPSA id f5sm4570524pfn.134.2021.08.17.23.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:12 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Qinglang Miao <miaoqinglang@huawei.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        netdev@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Hulk Robot <hulkci@huawei.com>,
-        Wang Wensheng <wangwensheng4@huawei.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
+        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 61/63] powerpc: Split memset() to avoid multi-field overflow
-Date:   Tue, 17 Aug 2021 23:05:31 -0700
-Message-Id: <20210818060533.3569517-62-keescook@chromium.org>
+Subject: [PATCH v2 40/63] netfilter: conntrack: Use memset_startat() to zero struct nf_conn
+Date:   Tue, 17 Aug 2021 23:05:10 -0700
+Message-Id: <20210818060533.3569517-41-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1360; h=from:subject; bh=JCECg/Hewr4d9JO4WQR5kDd0IjByC1o9V4GNPJaYPKM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMrEHk87hiQVCzgI18EL/HOEsDc4MJhIkHkaVTZ DZKWkUOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKwAKCRCJcvTf3G3AJjKnD/ 9vO5rK1NcyiJFD1V1xX5Q3QwJPN1EMRWYcJsr5dTRrhYDef2VBoAd3vGVJhv5tPWCziVR95zI+LgIL d02IU4Ow0Hf/RnPFBOD9Lk1pR4bdZqy2udFH1tE06S0wBxz6HBgDxKiHg0hd49XAZs+xsJCSVXM+ks ZJe+gXBJkwU0QQlyx97a3srOeF6TBCIwRbfsc1ny8kqeq7rHXhuez2Nl/jEpDrSY7P6MGZ0RS9pwGp BG8XE5jwyatTqBbwztRYJO6EDxF1oljeN+vw6wXSMzHTs0P0jZF+xhBsDePue4SrU1uYVK4eI314VF ytJTqzumiq1LoMoetRo7XbnZL9HC+8KQkD7iex+cbwbl0vBuTQNERQCXbWiuHcR7WbrVndhdzqr/qr 7kpYWqqHhGYN42VOTCoEV+CxxyGt6O1oEwupEs9JwlhAHT0ET/3m5v95ln9sj4q/idsJQyugW9w9wS B+pdNyiwZvnrIR6r8PjnSHwflJuJYyRkP28Ci+HZxNLOE9WlE6UmnuDmdrcVKpWz+nctnlPQ9JHhAq vpfGhXMnm0qF1zx5IYh+d69+ZRtUQbUKz2k4hFKSxvSse3CvWfi63pBT3m1O556umLnQD6zZbq4vQZ p0vLhJOR+anh57gwE1CG5ilwh9jU07xLpPrNzUQkHrIgJsiMsfqPJrC73E9g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1292; h=from:subject; bh=fE+HPCTs14JsaXA0VZ1+azTXm9sRPSgAjXFdw5wZMQo=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMn9jUxUjmhnSM6V4Tc0qU7XODXJhF3t5WIJd3Y koV1FpKJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjJwAKCRCJcvTf3G3AJhk3D/ 9Y7TD9jWlZ06v+vvdPdc8QlSMediOUFC1q3DoYi7bvc4YyEqXGUCbEBONwNQLvsK3hI4ED3PL+2IhD hz/Dbx5DT2T40OMCMycZbUmvAgn6pOBBpw2q5g7L1MPBPiZjTMXq8E4ovppbe62BM08pHEnfAugWsL Vg8PPE0Mpa5a+QOsrBwIXi58FdhL+TgFoZSeBzbJm+KmZX4h++dF5E6mfecc7iWTRI8x9S8/YHdEh9 ZIb37NLdJeVivXFEuz3DfGGLCuGfbSDNomkElBmWe2yPoHWjEkJTWn6RNq+MEAjA9TJ5TJ3HDso1/K sKW9g8e4L1L/rtxaFXF9BV/xpTwz0kRs0XsBqZ+kJVDfducMf0ve5e9o39+ZRvnlGz1cBPnku+/z+w 0bwBKb/ZheH0vYU+K8EWpKneqiHfpTz4StFzfiQRwhbiGP3RgP5fcXs0kJTQd7Pb2ELVtqLcT+gjk9 6GhJhWeDD/p/qHw7tNmVAq61F9fgKxmA+c7cUPkuWqkaozXqUnyya2WLhQ5LvSbSIIu7/NC2yfZ+vB 5nw/neLBHyCcwQZyeBRVjmkcwXCcmWSOAeUgya9iGsWYJAEHUAkIzm1Hk4kcF6HSJmjPw9ayH8RBkV zBGERJvvVpyPFtl03OuHfjGRW4wn6Zs+wzWO0oB8CiPowPcXXUv7O9y+3+xA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -90,36 +90,37 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Instead of writing across a field boundary with memset(), move the call
-to just the array, and an explicit zeroing of the prior field.
+Use memset_startat() to avoid confusing memset() about writing beyond
+the target struct member.
 
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Qinglang Miao <miaoqinglang@huawei.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Hulk Robot <hulkci@huawei.com>
-Cc: Wang Wensheng <wangwensheng4@huawei.com>
-Cc: linuxppc-dev@lists.ozlabs.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
+Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/lkml/87czqsnmw9.fsf@mpe.ellerman.id.au
 ---
- drivers/macintosh/smu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/netfilter/nf_conntrack_core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/macintosh/smu.c b/drivers/macintosh/smu.c
-index 94fb63a7b357..59ce431da7ef 100644
---- a/drivers/macintosh/smu.c
-+++ b/drivers/macintosh/smu.c
-@@ -848,7 +848,8 @@ int smu_queue_i2c(struct smu_i2c_cmd *cmd)
- 	cmd->read = cmd->info.devaddr & 0x01;
- 	switch(cmd->info.type) {
- 	case SMU_I2C_TRANSFER_SIMPLE:
--		memset(&cmd->info.sublen, 0, 4);
-+		cmd->info.sublen = 0;
-+		memset(&cmd->info.subaddr, 0, 3);
- 		break;
- 	case SMU_I2C_TRANSFER_COMBINED:
- 		cmd->info.devaddr &= 0xfe;
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index d31dbccbe7bd..060503230519 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1500,9 +1500,7 @@ __nf_conntrack_alloc(struct net *net,
+ 	ct->status = 0;
+ 	ct->timeout = 0;
+ 	write_pnet(&ct->ct_net, net);
+-	memset(&ct->__nfct_init_offset, 0,
+-	       offsetof(struct nf_conn, proto) -
+-	       offsetof(struct nf_conn, __nfct_init_offset));
++	memset_after(ct, 0, __nfct_init_offset);
+ 
+ 	nf_ct_zone_add(ct, zone);
+ 
 -- 
 2.30.2
 
