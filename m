@@ -7,59 +7,61 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5663C432BE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88B8C43214
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8F6C610A6
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCA3D6108F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238543AbhHRGYs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:24:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48338 "EHLO
+        id S238437AbhHRGY4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238264AbhHRGYr (ORCPT
+        with ESMTP id S238650AbhHRGYt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:24:47 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B092C061796
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id w8so1185815pgf.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
+        Wed, 18 Aug 2021 02:24:49 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0264EC061764
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:15 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id g14so1101258pfm.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sw/Jd50933MgMDKcslseqtGFSA6d20C1365G+gy2Cx4=;
-        b=lkb90SqGpvhafiRjISSgB0a2FrYdpBXG9CDn9kyMEGK8G+C6mKoqovQIKPmXFTd6fX
-         KhJkX9Egylj1mwlSIMLNcs5ZBl52s9MtlmYUhK0Xdyehqw1A6JTalUf7LXgHvquVhuiB
-         vdvmLxRGM0/kjfEaChvj3QOfSe7n54uv/XChU=
+        bh=hNEXxevdADdpiZT9yDPKRLqHYKrfWBF19uxfyZWmCGo=;
+        b=EGdWOE7bxdowrmsIKSgjZSgmQoiGO+6J6ji89xZ0Q2fptOidpphd5g7qqYXeSAgP8F
+         HH8T/J8n5DYlHXumOIgXQUvZBImHN7ALjddHiJ17ignvtzPpjV4Byoe7oWxlyDXQgWZD
+         c2+aZ7dLhbaQbRZXx81PpkPBbEKgxoLZ5UKNk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sw/Jd50933MgMDKcslseqtGFSA6d20C1365G+gy2Cx4=;
-        b=KoV3yjQ1JEDlLes10p33ArNf25T7Y/3nJCT8te8pSjj8t7gV4nWwbTKyNrA6q1TTZ4
-         9mwcIfCNuLm35yKaqOnrEMuxxdZoRlRjLu4QDGHzI9eH5aFHTStBo161/mxmVZjI2rat
-         PCx800LCaq9yr7U5OfjCQZwXDBR2C14O96Z9I5Xht6TCAZNezKU1zvtAmHZRZRRzu44e
-         a9jCTZs1itTiiUdI2TEJ8Bb77Js0HxMdubkCdABt6WwOoPztBnFPbFUGm7g1ZYIZXnJ+
-         phrNPWVw8lCcvkS2jHAT+wP9ACSfVuYM7Hxl+EXuIWj0yO/Rtw9j1vU4Z9Tha9wOOa+u
-         R3OQ==
-X-Gm-Message-State: AOAM531lh5rqF7vLaSzwD2GvFq7USaLukReK2K1P6qj/H445lVBcaO1Z
-        mhV5rNRVQtHiNn37NdzuOKyLXA==
-X-Google-Smtp-Source: ABdhPJy9CLfg35oDbbdeQsU7HbtEw7JEEvFjjstjJ1u7tRCnU3ll7bgG1jvkDuiyrvoW+GnkiwkfjA==
-X-Received: by 2002:a63:fb08:: with SMTP id o8mr7314165pgh.72.1629267853126;
-        Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
+        bh=hNEXxevdADdpiZT9yDPKRLqHYKrfWBF19uxfyZWmCGo=;
+        b=FpBym20D2+mED/upZhF8oATrpt2W7AeZ/VxQD2jgQtXWtGjrosWBraZ0mKo1tgXhQ4
+         tvLWq+Mf/w5BSL2tCWEmzyALt3Vjx98WUMcPIjSMFA7+9w4StAJUOeitX3sT7tAwX5WH
+         AGMVm6+Mp8PHT25byoU1l5hnyIRF05e/7ghOgEvDjOI/B4oQORbCjWxo21qG3JBGO46R
+         hdQHmMfDO6lBQTat3QEyDbjozDhF/B5tclQAWU5HwFhYCD/MuI95oTUBpJ5rM2GTxXzO
+         oKaOkkCiwwAL/sjZKqJ2GMJA2AEHGvHOo/w7gJ+AyLgKQuIn7j4s6Nc7E69p9Q4yQ7lT
+         7UNg==
+X-Gm-Message-State: AOAM532XSrQHZwGymzYFTygGW149sHycq6wg9IgWBtDstPkaun2Nyb3z
+        CG2q895kj/jSJ37/jsGwQpTvYQ==
+X-Google-Smtp-Source: ABdhPJzEZLL4+vuxKf2KA80vRRNe/aKYgSEeAOIcbSklQP4uG9CeHnUETuB9bUeNsXUisBI4mxHrBA==
+X-Received: by 2002:a65:6658:: with SMTP id z24mr7321502pgv.266.1629267854650;
+        Tue, 17 Aug 2021 23:24:14 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id n13sm4501409pff.164.2021.08.17.23.24.12
+        by smtp.gmail.com with ESMTPSA id v9sm5393520pga.82.2021.08.17.23.24.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:24:12 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Harald Welte <laforge@gnumonks.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Stefan Achatz <erazor_de@users.sourceforge.net>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        linux-input@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
@@ -67,14 +69,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 52/63] cm4000_cs: Use struct_group() to zero struct cm4000_dev region
-Date:   Tue, 17 Aug 2021 23:05:22 -0700
-Message-Id: <20210818060533.3569517-53-keescook@chromium.org>
+Subject: [PATCH v2 55/63] HID: roccat: Use struct_group() to zero kone_mouse_event
+Date:   Tue, 17 Aug 2021 23:05:25 -0700
+Message-Id: <20210818060533.3569517-56-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1756; h=from:subject; bh=J4NGkJQCgahZv2zewL/wYUO+MpNSkAZfZF2EdzgyTRQ=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMplIHvWiwQENOF2c7XlC/x85JbSdFgE5kqsWuK 0OxdRfuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKQAKCRCJcvTf3G3AJtHPD/ 9w1C3xZTkrQOl8qCphP1NuYb6Zzm4m2uWKaotV03HQ6T9nZ1pYcDMMaHhAraQDtG/+gMBjur6kCewv ayrtSdcUPKzKabKpDYkkQQGEE9qhvOYR4et5WymZDf+eN80rUG6e4eGkoBaSg8aVufvzlEbWGGJI1g tqDg4cuv/AswW6J0SfIjA0LGvOcP86foOnbG0fLo1CjkuPmC73qAisdtYqZ728UwCF73xtFOwOcz58 eqjKu4Hpj2sUaNV2ghIn1t2tsXH9VMc5RRvDzUnjKE8WQiYMXT1GnQMQC30RP8X5s0vnTZZK9COqg4 oewq2GoOKKBWejZCZnIt2PWaHfLpUYE3cXHVsUUrUzVwgg/Sk3purVXNGauBM7zNDyMu+OqTX4ib/A +HNqKaO/5WxWULHr6ttMgZKJiYQpCIvqqVqyHlMArxKxGWwiOSShxbeoadhVmd0SxeqdGPdNCiAuk6 FFaKdGvO/XR7rdo2FnWbhYIs1bjRjMoCnyn4vUMe6sRx6ESs8Bvvf+nu0uOBDONLatp0KRkgfFUvYM i85g6GvFHJOXM2duu8wB+SxG0oCcvOTXiLpU3c5ok266H6TYTMs6yQQ6fEkcPZU/wwc56QrWbNdrgO Cwck+Q8ubdcpIlRqgjAb6NEZ7diJsEGXAyIkWnhUKNVIgROWsl4C+tImakjQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1908; h=from:subject; bh=1pufhTOQ+Ev1TBqsKxncMFoRA1ZRswld+5UcgY3UHPc=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMqezgIdICqUvusV3uxfFgc/NzjoDMPzoTPLXKQ ysx/Q+WJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJvMhD/ 4/FvXFOoXTIkumS1QqMpAFhaJGCKF+0RDx/z48DGYo98kCwWG6ybzb+3Sly47Z+VgrSp0nI5xp/nwa 7vzRFjBAI8F/fZVbUlI8Z/Fya+aZbPEeiEK947R3H8Wbap6uVAex0YjyWhhrJ5ZvwN2gBayJJ1WAXz +0fz1YMH8bcbhmSMSRON2ZGR1UjjBuaTH+o0ighQljGy5YLUHHZ+P4xNS0whZ8d+THVIEhrrdzHdRV xQ+rSGFdrgJR7xYVHqTNDyySccjRR12fCgsnFgzx2wmvqD6usQbAtioyZ5ZCTcNXNfyyvHgd++uCyK e638UGzfpOzM5vUWRjmLl1KeEBbobuCg3sgk1AQzR2mUpn6cvbWbZbOyGlGZtTdTn7wCe/qfq120Ud zfBKERaOR0vpEYpiRESonq/qBjud3tRwJ0H/FhwsbPbp2lo15qfYimJ41SEC1abj3Da1Xu61TlMqEd S5Rzg+maFwNcx3sFBdUId31vsspRp/LAtiMPvI3MalLGcTxm9Gdf8i9hEI2yM8v6QUVUqBl/F6N1uW 0dr4/U6A89Pj+zJUWKnGqTw3EZAQEgK5Lbi/njYrrq3JeohlG7jtmoxQDLp3fMw23TORKszxjv3y76 kDqBN4o2faONCRYDcPk3N/ArWnW2NiFPXTb3nBBeYGgetTCuosxxzdiUWWLg==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -85,49 +87,55 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Add struct_group() to mark region of struct cm4000_dev that should be
-initialized to zero.
+Add struct_group() to mark region of struct kone_mouse_event that should
+be initialized to zero.
 
-Cc: Harald Welte <laforge@gnumonks.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Stefan Achatz <erazor_de@users.sourceforge.net>
+Cc: Jiri Kosina <jikos@kernel.org>
+Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Cc: linux-input@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Link: https://lore.kernel.org/lkml/YQDvxAofJlI1JoGZ@kroah.com
 ---
- drivers/char/pcmcia/cm4000_cs.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/hid/hid-roccat-kone.c |  2 +-
+ drivers/hid/hid-roccat-kone.h | 12 +++++++-----
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/pcmcia/cm4000_cs.c b/drivers/char/pcmcia/cm4000_cs.c
-index 8f1bce0b4fe5..2f43e7088e16 100644
---- a/drivers/char/pcmcia/cm4000_cs.c
-+++ b/drivers/char/pcmcia/cm4000_cs.c
-@@ -116,8 +116,9 @@ struct cm4000_dev {
- 	wait_queue_head_t atrq;		/* wait for ATR valid */
- 	wait_queue_head_t readq;	/* used by write to wake blk.read */
+diff --git a/drivers/hid/hid-roccat-kone.c b/drivers/hid/hid-roccat-kone.c
+index 1ca64481145e..ea17abc7ad52 100644
+--- a/drivers/hid/hid-roccat-kone.c
++++ b/drivers/hid/hid-roccat-kone.c
+@@ -857,7 +857,7 @@ static int kone_raw_event(struct hid_device *hdev, struct hid_report *report,
+ 		memcpy(&kone->last_mouse_event, event,
+ 				sizeof(struct kone_mouse_event));
+ 	else
+-		memset(&event->tilt, 0, 5);
++		memset(&event->wipe, 0, sizeof(event->wipe));
  
--	/* warning: do not move this fields.
-+	/* warning: do not move this struct group.
- 	 * initialising to zero depends on it - see ZERO_DEV below.  */
-+	struct_group(init,
- 	unsigned char atr_csum;
- 	unsigned char atr_len_retry;
- 	unsigned short atr_len;
-@@ -140,12 +141,10 @@ struct cm4000_dev {
+ 	kone_keep_values_up_to_date(kone, event);
  
- 	struct timer_list timer;	/* used to keep monitor running */
- 	int monitor_running;
+diff --git a/drivers/hid/hid-roccat-kone.h b/drivers/hid/hid-roccat-kone.h
+index 4a1a9cb76b08..65c800e3addc 100644
+--- a/drivers/hid/hid-roccat-kone.h
++++ b/drivers/hid/hid-roccat-kone.h
+@@ -152,11 +152,13 @@ struct kone_mouse_event {
+ 	uint16_t x;
+ 	uint16_t y;
+ 	uint8_t wheel; /* up = 1, down = -1 */
+-	uint8_t tilt; /* right = 1, left = -1 */
+-	uint8_t unknown;
+-	uint8_t event;
+-	uint8_t value; /* press = 0, release = 1 */
+-	uint8_t macro_key; /* 0 to 8 */
++	struct_group(wipe,
++		uint8_t tilt; /* right = 1, left = -1 */
++		uint8_t unknown;
++		uint8_t event;
++		uint8_t value; /* press = 0, release = 1 */
++		uint8_t macro_key; /* 0 to 8 */
 +	);
- };
+ } __attribute__ ((__packed__));
  
--#define	ZERO_DEV(dev)  						\
--	memset(&dev->atr_csum,0,				\
--		sizeof(struct cm4000_dev) - 			\
--		offsetof(struct cm4000_dev, atr_csum))
-+#define	ZERO_DEV(dev)	memset(&dev->init, 0, sizeof(dev->init))
- 
- static struct pcmcia_device *dev_table[CM4000_MAX_DEV];
- static struct class *cmm_class;
+ enum kone_mouse_events {
 -- 
 2.30.2
 
