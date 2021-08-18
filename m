@@ -8,75 +8,74 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CD7C432BE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:25:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CF2C4320A
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6925A61076
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:25:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 480C2610A6
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:25:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240610AbhHRGZr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:25:47 -0400
+        id S238176AbhHRGYt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:24:49 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239487AbhHRGZD (ORCPT
+        with ESMTP id S238377AbhHRGYs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:25:03 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4239C061292
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:18 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id x16so1103963pfh.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:18 -0700 (PDT)
+        Wed, 18 Aug 2021 02:24:48 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78F6C0617AE
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id mq2-20020a17090b3802b0290178911d298bso1666976pjb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vvaO3IOaijbnIA6KqFSDgFo2qxgHnLpT3XyLd7qDOYY=;
-        b=kDXEIEitA/zilEeOzVZcblUGb+gd0VUzPPKPAZRekMacsTOzvDvGIy5nd+Plg3xGqF
-         ljL/5yphBqGZuftKhE1BcSTKZc0Q9ZAZtIBhK+w2XzKNzqFl0DOizZMClRh8F3cCrW6I
-         4nLShAKzqA0o+5ZrPzG62J+rwCOEUexcSDo3I=
+        bh=wNrSyu18+TQvxqozBk6dKmc83xjPuqXEkZM9+CZkQs8=;
+        b=hq0RZc8pvhUdG6LQCrGBNQbN7VTMq2CkOF4QQtsj4WrxV2UTBN34Md8Gi7LkipMBy6
+         xL7jSFJnNHOowLO3Jca2aK8bMlaJLC+laeAIEoH1LMm2sWoMULTrkMcKoRbBAsM8UOpd
+         ihsdkkeDmGTdleDP1YZNWHcSi4UiGfzn3DsyI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vvaO3IOaijbnIA6KqFSDgFo2qxgHnLpT3XyLd7qDOYY=;
-        b=Sg6UepnrEN7LFmKwg5+V/n9617wMtIY3Nhhy5Pent7HAY+8UQryTEoNwgeoBZG0NAN
-         kysjbIPRghqm5s42tCgqusak4Y0bCbYF7yCDH1NyHLTJmUwv80HARbWj/V7h9JnZgo7J
-         GT/SOAe6aWjCeD6psHD73JpZAycnYqcdLhjhOThTDPJuKEYfKtOXAJ5RiQMXA+vnHnfz
-         IHK59xLXifZV3eJkNRKB7sIBoy9oJ61rve9EmDbGS57dWWfDIVVkO5Z4Wja13Ut7/Wrb
-         z8bzFWkS3Vi6hJaY7/Zziypq68teeH7SWEt2F8lTyochpDPxrvO84ZJ/gA6CyLLFy/Uz
-         LWLw==
-X-Gm-Message-State: AOAM532MjBLV/C5zbMuFEF3Q3fEMyiM0djUidm3lTJ810VlYn98C1EuQ
-        RKkr8Wz/XgmUeWZLyPvhabSh+w==
-X-Google-Smtp-Source: ABdhPJxLnTYg2dyG52a8dlHZQo2KnsFk9IIV2ZT2c1iszf6YYPkQGA1eSgtlSotuJmQJc5qNxJ68Bw==
-X-Received: by 2002:aa7:87d1:0:b029:3e0:e44b:6429 with SMTP id i17-20020aa787d10000b02903e0e44b6429mr7687468pfo.81.1629267857946;
-        Tue, 17 Aug 2021 23:24:17 -0700 (PDT)
+        bh=wNrSyu18+TQvxqozBk6dKmc83xjPuqXEkZM9+CZkQs8=;
+        b=C/GwkBMSNPUkiSCs7oatSColjuPhMYhljnsDQiBafsrQLPJVGaUsNcgBROWUKhkJl+
+         qk+x/fqmU7dbgB0JYLEaHEp+RbExBSHon/R2rydPHW/wO2xDDMilKyZ52k4/8x4sqJHm
+         ZbwUOR5pc+1vuV/Gd6aSEZhNlSG4LYLO/wZ1HXfzPFkJuH9xht4Nok1LBSqmS0+lcZqQ
+         JcGTyadOBJ18zlfAFGvidAbrJtfhXYvVjqUjsieHDiTh768GbAUfip2QX4Q9p0GSNbQY
+         5qTXoKTm4+c2UgN71n+BL7WZHiiV4BPyALBjleqzPW37xQRfKh95ElVkOyXvfMek+mEc
+         bfQg==
+X-Gm-Message-State: AOAM531isIYxKd+TRW9Q9m3aYbQVh/B3oUR7TvfVOUtOz+PUY5Oj4l8k
+        HHXTKCkIczFa6JACR7Vv9zCVwQ==
+X-Google-Smtp-Source: ABdhPJxMkEdSe0VUFwn+z4vxkdsUFqJ2UwImPieDkAd2A7unXagJo2uR8zh40lbVDVJdC8iJXw8UiA==
+X-Received: by 2002:a17:902:cec3:b0:12d:92c4:1ea6 with SMTP id d3-20020a170902cec300b0012d92c41ea6mr5911733plg.36.1629267853392;
+        Tue, 17 Aug 2021 23:24:13 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l12sm4445453pff.182.2021.08.17.23.24.14
+        by smtp.gmail.com with ESMTPSA id y13sm2710073pjr.50.2021.08.17.23.24.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:24:15 -0700 (PDT)
+        Tue, 17 Aug 2021 23:24:12 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, ath11k@lists.infradead.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+Cc:     Kees Cook <keescook@chromium.org>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 45/63] ath11k: Use memset_startat() for clearing queue descriptors
-Date:   Tue, 17 Aug 2021 23:05:15 -0700
-Message-Id: <20210818060533.3569517-46-keescook@chromium.org>
+Subject: [PATCH v2 49/63] btrfs: Use memset_startat() to clear end of struct
+Date:   Tue, 17 Aug 2021 23:05:19 -0700
+Message-Id: <20210818060533.3569517-50-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3372; h=from:subject; bh=NQT3fqVVXi8ODh6WoJGB8sg9K5wYYHx+7JpT5FAL4cU=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMopXDUfrKda33TUBFxN6HBO6TlnPSMDcCCdRDS 0aeVcWmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKAAKCRCJcvTf3G3AJhzGEA CY8p5TOKzJnk1TIbV+Hzc40bIrnKi3XB25slGqFlL9PC0EefG0LRY7a/kfnqj/FIFz17UsuycljRiL cACD/vfRToJ7yzKKAmxJEdfFC9iw7Xzoq9md8jDhbHG+5rEQLDA2Y8/KjGoyRoAVQUeCsHcJe+UAXU /C5fU4ck0d6s6EiIVlN7DyLPX1dt3uBgOwRyBODvNuiyvNXvhGO3XJv0FCDFCT5z75xj1tU14JGWyN PD0hj1XmCBY1e9AxpCMIlhi+/X5qb5jGTLXX/Md1KsTZvmbxvau9ABz55gWYFUQGS3X+k1Rlmv5T+v lQWqSK/nXQAlXtMjB9ywh5KsA5aVqsKNBUXndQA68SKCaNf/TyoXdI1m4yYbWg/BcAGWta/La0zhv8 6uPbEVUb8Vg2ZE5Iqlcs/ld7qL4G/K1NRERjZr+0R73esdLiYb9TgQFqKMWrJPe98lypwjAdWColpN I8cEBcItkU3uu4rF/5fh/NmOKClsPYi08PLRs5e03i6wu9s1aoaETYlf1CnhWQasVpVUQKL19q5EaQ 6mL+ds0GvKbFFnRg94o4s2GHh5vlbNIY8AZQMoUGgZ+Kclor6FXedzWgb33JBTE6JU4bg97H5xgdcx ZY2UZxJPJIziE2+vb6CbU1ZYgZ27bDV0FLUmziQd/krKAdEaAHnqHTqhCInw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1202; h=from:subject; bh=j07ODF9kjbRRiHohObgJ1N/RHPZCTrQAmspnQvku4YA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMpNf/1TOA8EHO13yPM2WoVQcddjcJSpXNg/q95 NGD5Kx+JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKQAKCRCJcvTf3G3AJiFDD/ 43YRq8chsycAfEPzeH3ODP8oX8vzyejO0KZxGwB29jISLONkndclAADo87JB841bplfSqHF4g/N0Yr 9BPUFM/u9aD6MYInBsgRcfvidkMVdvLwJHJroTXouReKf+wENJpCE42XqDFb6/OHW+qszfq48l2ZsZ vlrJcOJH5B/7MGz2vGlPOqarS6QPhKxELyHgWma5US/BF+fmqXoGyLI96PzJHBVwD8Fv1vRW+FZyYX mS0c778XSYdo50TMLiLEeybc58/w6WbytsuOe2gDRaDra0L+tnQU3bUemlEwF/otdXngLgjznL3aHr 03wBbU/uuuYnsF2VxKSH3eTmyOXxM0Fc0gfhMAHlPYOx3FWaj25UujliZBiwYTeajzJsMlNaMxhyYC CNKnLKNfyeqkcnmjrNFG0fLVNoy2o0OR5zMuoedsu9e9ywbM82GfxRkHbOU9ZMZ5GgY2NMQXjzSHXm JS7ECNId/+w48q42Qz1RDDbkk71kX5clz/7ywEULnxcdaVF9VLida+SAjBnEmtDTTT5a3LFsbnweA7 31UgpReo5DWgV9+9dvXi/NGJgP+uufVyB7FGtNrTHKNpqkfmCVfC6YFh7uVwrtuLat1U/8LUy3Rdgf RT0NM3pRRzNQ/fI9ZSg5+8wsIv5qwbvYlgUlhc046qXy22//QbKOPQkqvAQQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -89,73 +88,34 @@ neighboring fields.
 
 Use memset_startat() so memset() doesn't get confused about writing
 beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct. Additionally split up a later
-field-spanning memset() so that memset() can reason about the size.
+of zeroing through the end of the struct.
 
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: ath11k@lists.infradead.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/wireless/ath/ath11k/hal_rx.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ fs/btrfs/root-tree.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath11k/hal_rx.c b/drivers/net/wireless/ath/ath11k/hal_rx.c
-index 325055ca41ab..0bab425f5dc9 100644
---- a/drivers/net/wireless/ath/ath11k/hal_rx.c
-+++ b/drivers/net/wireless/ath/ath11k/hal_rx.c
-@@ -29,8 +29,7 @@ static int ath11k_hal_reo_cmd_queue_stats(struct hal_tlv_hdr *tlv,
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
- 
- 	desc = (struct hal_reo_get_queue_stats *)tlv->value;
--	memset(&desc->queue_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_startat(desc, 0, queue_addr_lo);
- 
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -62,8 +61,7 @@ static int ath11k_hal_reo_cmd_flush_cache(struct ath11k_hal *hal, struct hal_tlv
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
- 
- 	desc = (struct hal_reo_flush_cache *)tlv->value;
--	memset(&desc->cache_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_startat(desc, 0, cache_addr_lo);
- 
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -101,8 +99,7 @@ static int ath11k_hal_reo_cmd_update_rx_queue(struct hal_tlv_hdr *tlv,
- 		  FIELD_PREP(HAL_TLV_HDR_LEN, sizeof(*desc));
- 
- 	desc = (struct hal_reo_update_rx_queue *)tlv->value;
--	memset(&desc->queue_addr_lo, 0,
--	       (sizeof(*desc) - sizeof(struct hal_reo_cmd_hdr)));
-+	memset_startat(desc, 0, queue_addr_lo);
- 
- 	desc->cmd.info0 &= ~HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED;
- 	if (cmd->flag & HAL_REO_CMD_FLG_NEED_STATUS)
-@@ -762,15 +759,17 @@ void ath11k_hal_reo_qdesc_setup(void *vaddr, int tid, u32 ba_window_size,
- 	 * size changes and also send WMI message to FW to change the REO
- 	 * queue descriptor in Rx peer entry as part of dp_rx_tid_update.
- 	 */
--	memset(ext_desc, 0, 3 * sizeof(*ext_desc));
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_1);
- 	ext_desc++;
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_2);
- 	ext_desc++;
-+	memset(ext_desc, 0, sizeof(*ext_desc));
- 	ath11k_hal_reo_set_desc_hdr(&ext_desc->desc_hdr, HAL_DESC_REO_OWNED,
- 				    HAL_DESC_REO_QUEUE_EXT_DESC,
- 				    REO_QUEUE_DESC_MAGIC_DEBUG_PATTERN_3);
+diff --git a/fs/btrfs/root-tree.c b/fs/btrfs/root-tree.c
+index 702dc5441f03..12ceb14a1141 100644
+--- a/fs/btrfs/root-tree.c
++++ b/fs/btrfs/root-tree.c
+@@ -39,10 +39,8 @@ static void btrfs_read_root_item(struct extent_buffer *eb, int slot,
+ 		need_reset = 1;
+ 	}
+ 	if (need_reset) {
+-		memset(&item->generation_v2, 0,
+-			sizeof(*item) - offsetof(struct btrfs_root_item,
+-					generation_v2));
+-
++		/* Clear all members from generation_v2 onwards. */
++		memset_startat(item, 0, generation_v2);
+ 		generate_random_guid(item->uuid);
+ 	}
+ }
 -- 
 2.30.2
 
