@@ -5,61 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88B8C43214
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED2C4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCA3D6108F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1052C60FDA
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:24:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238437AbhHRGY4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:24:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
+        id S239818AbhHRGZF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:25:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238650AbhHRGYt (ORCPT
+        with ESMTP id S238376AbhHRGYy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:24:49 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0264EC061764
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:15 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id g14so1101258pfm.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:14 -0700 (PDT)
+        Wed, 18 Aug 2021 02:24:54 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13683C061764
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:18 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id o2so1186339pgr.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:24:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hNEXxevdADdpiZT9yDPKRLqHYKrfWBF19uxfyZWmCGo=;
-        b=EGdWOE7bxdowrmsIKSgjZSgmQoiGO+6J6ji89xZ0Q2fptOidpphd5g7qqYXeSAgP8F
-         HH8T/J8n5DYlHXumOIgXQUvZBImHN7ALjddHiJ17ignvtzPpjV4Byoe7oWxlyDXQgWZD
-         c2+aZ7dLhbaQbRZXx81PpkPBbEKgxoLZ5UKNk=
+        bh=dkCK961ZyttB0QG+MUzGRc9GbPNZyJOzxDRl3nXU6Gc=;
+        b=F3ghc0DUnRIAuSynTOo4HhTisr9dY2clGPt7Tp2ELGFpLUMoqQjF17RYWes7eco0Fp
+         HKzP4hJH6W8dElSRC/l4MPe4WbDo+9mFg+K8Li9eyi19QvOkLGzu4axj3QbMT/3x3/oK
+         4mFZNJ8jfnCy22ecNEUEUkyyEwRPO3Ye/ohuI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hNEXxevdADdpiZT9yDPKRLqHYKrfWBF19uxfyZWmCGo=;
-        b=FpBym20D2+mED/upZhF8oATrpt2W7AeZ/VxQD2jgQtXWtGjrosWBraZ0mKo1tgXhQ4
-         tvLWq+Mf/w5BSL2tCWEmzyALt3Vjx98WUMcPIjSMFA7+9w4StAJUOeitX3sT7tAwX5WH
-         AGMVm6+Mp8PHT25byoU1l5hnyIRF05e/7ghOgEvDjOI/B4oQORbCjWxo21qG3JBGO46R
-         hdQHmMfDO6lBQTat3QEyDbjozDhF/B5tclQAWU5HwFhYCD/MuI95oTUBpJ5rM2GTxXzO
-         oKaOkkCiwwAL/sjZKqJ2GMJA2AEHGvHOo/w7gJ+AyLgKQuIn7j4s6Nc7E69p9Q4yQ7lT
-         7UNg==
-X-Gm-Message-State: AOAM532XSrQHZwGymzYFTygGW149sHycq6wg9IgWBtDstPkaun2Nyb3z
-        CG2q895kj/jSJ37/jsGwQpTvYQ==
-X-Google-Smtp-Source: ABdhPJzEZLL4+vuxKf2KA80vRRNe/aKYgSEeAOIcbSklQP4uG9CeHnUETuB9bUeNsXUisBI4mxHrBA==
-X-Received: by 2002:a65:6658:: with SMTP id z24mr7321502pgv.266.1629267854650;
-        Tue, 17 Aug 2021 23:24:14 -0700 (PDT)
+        bh=dkCK961ZyttB0QG+MUzGRc9GbPNZyJOzxDRl3nXU6Gc=;
+        b=Srg7/jMgrgm1WHrpw9/8jJ1xn+S42xaBhpcPs8SpwXB4IJcOGdiy8jWUc3DDMaCunb
+         RvD/0Sr3buerloki2r58f2LWmvH4vw+WvV11UlSA7/xI0NByokur8k/BHyizmVdZ/Vij
+         pyoKmSI5Gafob8o638s0eRYjJrP9ccihoZI8Pt8n2PMMF9MbDBDd/nUDj6jeNTlL8ZED
+         HaDpGMsLGH5Gy5RSXrG9bzfdMl2NB7+MVfSG4/0adJEUi1myPGiE9f+73XyxGwwuzgwe
+         ZxZi0740lUWsYuXBtoo+FUzGw5bRGSKQM6z6FMUb84SUMCVNp8NkDPHH/FjyRrjRaeZ4
+         w8kA==
+X-Gm-Message-State: AOAM532ixG1kY7e/WlCARguEJ+FpTLph5X6CjUvAdEeylWlJHu2x6ZRq
+        UQBtPfatK0SsfQ3Ocxipz3EMOQ==
+X-Google-Smtp-Source: ABdhPJzB6Fpw5lksE03mTikq/l8Ungtb52rwsKcOwzebsF0lTq2QR4kdwv8iqtPBdlFbyxw6WcuEBA==
+X-Received: by 2002:aa7:8c19:0:b0:3e1:4b9e:cf89 with SMTP id c25-20020aa78c19000000b003e14b9ecf89mr7683859pfd.58.1629267857641;
+        Tue, 17 Aug 2021 23:24:17 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id v9sm5393520pga.82.2021.08.17.23.24.12
+        by smtp.gmail.com with ESMTPSA id t18sm4582599pfg.111.2021.08.17.23.24.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:24:12 -0700 (PDT)
+        Tue, 17 Aug 2021 23:24:15 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        linux-input@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        linuxppc-dev@lists.ozlabs.org, kernel test robot <lkp@intel.com>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -69,14 +72,14 @@ Cc:     Kees Cook <keescook@chromium.org>,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 55/63] HID: roccat: Use struct_group() to zero kone_mouse_event
-Date:   Tue, 17 Aug 2021 23:05:25 -0700
-Message-Id: <20210818060533.3569517-56-keescook@chromium.org>
+Subject: [PATCH v2 57/63] powerpc/signal32: Use struct_group() to zero spe regs
+Date:   Tue, 17 Aug 2021 23:05:27 -0700
+Message-Id: <20210818060533.3569517-58-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1908; h=from:subject; bh=1pufhTOQ+Ev1TBqsKxncMFoRA1ZRswld+5UcgY3UHPc=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMqezgIdICqUvusV3uxfFgc/NzjoDMPzoTPLXKQ ysx/Q+WJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJvMhD/ 4/FvXFOoXTIkumS1QqMpAFhaJGCKF+0RDx/z48DGYo98kCwWG6ybzb+3Sly47Z+VgrSp0nI5xp/nwa 7vzRFjBAI8F/fZVbUlI8Z/Fya+aZbPEeiEK947R3H8Wbap6uVAex0YjyWhhrJ5ZvwN2gBayJJ1WAXz +0fz1YMH8bcbhmSMSRON2ZGR1UjjBuaTH+o0ighQljGy5YLUHHZ+P4xNS0whZ8d+THVIEhrrdzHdRV xQ+rSGFdrgJR7xYVHqTNDyySccjRR12fCgsnFgzx2wmvqD6usQbAtioyZ5ZCTcNXNfyyvHgd++uCyK e638UGzfpOzM5vUWRjmLl1KeEBbobuCg3sgk1AQzR2mUpn6cvbWbZbOyGlGZtTdTn7wCe/qfq120Ud zfBKERaOR0vpEYpiRESonq/qBjud3tRwJ0H/FhwsbPbp2lo15qfYimJ41SEC1abj3Da1Xu61TlMqEd S5Rzg+maFwNcx3sFBdUId31vsspRp/LAtiMPvI3MalLGcTxm9Gdf8i9hEI2yM8v6QUVUqBl/F6N1uW 0dr4/U6A89Pj+zJUWKnGqTw3EZAQEgK5Lbi/njYrrq3JeohlG7jtmoxQDLp3fMw23TORKszxjv3y76 kDqBN4o2faONCRYDcPk3N/ArWnW2NiFPXTb3nBBeYGgetTCuosxxzdiUWWLg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2908; h=from:subject; bh=uD1y/xoxNTfC/kMxy1YHPqDr4W4r5gvR6/3LUb/d/+Q=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMqjnaaYE2W2OottJ48+Kv314H+c4/L+2RqMHXv r7V1BciJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJgmYD/ 4xOx64rrId3koq1dIVBd1c7qtDRXBXq8ocvbv6TiAzQ5OW2IJsAcesmEDGB0aarLTux96zhVYvPuEY ekfg39GKhCgEPeb5jXP+UH57m9qopfeReANE1S4LvEsOJWuHGa5N2yh0MVFMYdstmPHkfTVtOzOdnW 4FpfS36c3/G650GjYZjHYGK93aUv37ocoMf05CH9DSjWcOrGk+21jowTwXALShjZMmIjz5FWSiAPe+ +1eUzjLiqUeJOGZ7Lv40/p3giVTD2/7lEzVVufOf7KMLHvSJmrltr2bLt88CSW+0Qs2cDc8kDwit4g NSusBANylY1K/6uJsrHXOzr8UYkdtB6bsttgeE9V1+wOYhLMeNib3XArxbwXJKppaNHkpLdAyqOc1N hNWxNmFkEb7gLQI+lgaRv2CySpbhIO+o8h7UWzfZ9W2P7Sz8/0+TLD68DRwxBbPxMHy7FpShanbdlR HAvsXrcU8SaCn8kjeuW7pbNPk+pnaYiQiMH5cl3iCfgq1I13gvGVNmMUEdqsNskPE6H1JjH3DkRQLj i7n33M3844UZk+msL24HAJukYQmiAtXqJDGZb3S179NpLnEREMRQveIz0XRN96WDiRCpbvwy644xQe qmxn1RnVllos5p0W46DDS5Z/a2ezsgCPxronRiihYw6gD81m/cUYTrPKHDSw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -87,55 +90,64 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Add struct_group() to mark region of struct kone_mouse_event that should
-be initialized to zero.
+Add a struct_group() for the spe registers so that memset() can correctly reason
+about the size:
 
-Cc: Stefan Achatz <erazor_de@users.sourceforge.net>
-Cc: Jiri Kosina <jikos@kernel.org>
-Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Cc: linux-input@vger.kernel.org
+   In function 'fortify_memset_chk',
+       inlined from 'restore_user_regs.part.0' at arch/powerpc/kernel/signal_32.c:539:3:
+>> include/linux/fortify-string.h:195:4: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+     195 |    __write_overflow_field();
+         |    ^~~~~~~~~~~~~~~~~~~~~~~~
+
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Sudeep Holla <sudeep.holla@arm.com>
+Cc: linuxppc-dev@lists.ozlabs.org
+Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/hid/hid-roccat-kone.c |  2 +-
- drivers/hid/hid-roccat-kone.h | 12 +++++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ arch/powerpc/include/asm/processor.h | 6 ++++--
+ arch/powerpc/kernel/signal_32.c      | 6 +++---
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/hid/hid-roccat-kone.c b/drivers/hid/hid-roccat-kone.c
-index 1ca64481145e..ea17abc7ad52 100644
---- a/drivers/hid/hid-roccat-kone.c
-+++ b/drivers/hid/hid-roccat-kone.c
-@@ -857,7 +857,7 @@ static int kone_raw_event(struct hid_device *hdev, struct hid_report *report,
- 		memcpy(&kone->last_mouse_event, event,
- 				sizeof(struct kone_mouse_event));
- 	else
--		memset(&event->tilt, 0, 5);
-+		memset(&event->wipe, 0, sizeof(event->wipe));
- 
- 	kone_keep_values_up_to_date(kone, event);
- 
-diff --git a/drivers/hid/hid-roccat-kone.h b/drivers/hid/hid-roccat-kone.h
-index 4a1a9cb76b08..65c800e3addc 100644
---- a/drivers/hid/hid-roccat-kone.h
-+++ b/drivers/hid/hid-roccat-kone.h
-@@ -152,11 +152,13 @@ struct kone_mouse_event {
- 	uint16_t x;
- 	uint16_t y;
- 	uint8_t wheel; /* up = 1, down = -1 */
--	uint8_t tilt; /* right = 1, left = -1 */
--	uint8_t unknown;
--	uint8_t event;
--	uint8_t value; /* press = 0, release = 1 */
--	uint8_t macro_key; /* 0 to 8 */
-+	struct_group(wipe,
-+		uint8_t tilt; /* right = 1, left = -1 */
-+		uint8_t unknown;
-+		uint8_t event;
-+		uint8_t value; /* press = 0, release = 1 */
-+		uint8_t macro_key; /* 0 to 8 */
+diff --git a/arch/powerpc/include/asm/processor.h b/arch/powerpc/include/asm/processor.h
+index f348e564f7dd..05dc567cb9a8 100644
+--- a/arch/powerpc/include/asm/processor.h
++++ b/arch/powerpc/include/asm/processor.h
+@@ -191,8 +191,10 @@ struct thread_struct {
+ 	int		used_vsr;	/* set if process has used VSX */
+ #endif /* CONFIG_VSX */
+ #ifdef CONFIG_SPE
+-	unsigned long	evr[32];	/* upper 32-bits of SPE regs */
+-	u64		acc;		/* Accumulator */
++	struct_group(spe,
++		unsigned long	evr[32];	/* upper 32-bits of SPE regs */
++		u64		acc;		/* Accumulator */
 +	);
- } __attribute__ ((__packed__));
+ 	unsigned long	spefscr;	/* SPE & eFP status */
+ 	unsigned long	spefscr_last;	/* SPEFSCR value on last prctl
+ 					   call or trap return */
+diff --git a/arch/powerpc/kernel/signal_32.c b/arch/powerpc/kernel/signal_32.c
+index 0608581967f0..77b86caf5c51 100644
+--- a/arch/powerpc/kernel/signal_32.c
++++ b/arch/powerpc/kernel/signal_32.c
+@@ -532,11 +532,11 @@ static long restore_user_regs(struct pt_regs *regs,
+ 	regs_set_return_msr(regs, regs->msr & ~MSR_SPE);
+ 	if (msr & MSR_SPE) {
+ 		/* restore spe registers from the stack */
+-		unsafe_copy_from_user(current->thread.evr, &sr->mc_vregs,
+-				      ELF_NEVRREG * sizeof(u32), failed);
++		unsafe_copy_from_user(&current->thread.spe, &sr->mc_vregs,
++				      sizeof(current->thread.spe), failed);
+ 		current->thread.used_spe = true;
+ 	} else if (current->thread.used_spe)
+-		memset(current->thread.evr, 0, ELF_NEVRREG * sizeof(u32));
++		memset(&current->thread.spe, 0, sizeof(current->thread.spe));
  
- enum kone_mouse_events {
+ 	/* Always get SPEFSCR back */
+ 	unsafe_get_user(current->thread.spefscr, (u32 __user *)&sr->mc_vregs + ELF_NEVRREG, failed);
 -- 
 2.30.2
 
