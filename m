@@ -2,66 +2,67 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1069C4320A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 21:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8160FC19F34
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 21:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C65A461101
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 21:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EC9961103
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 21:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234084AbhHRVlO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S234116AbhHRVlO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 18 Aug 2021 17:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37928 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234027AbhHRVlN (ORCPT
+        with ESMTP id S234057AbhHRVlN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 18 Aug 2021 17:41:13 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DD3C0613CF
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4A2C06179A
         for <linux-kbuild@vger.kernel.org>; Wed, 18 Aug 2021 14:40:38 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id f3so2702028plg.3
+Received: by mail-pg1-x535.google.com with SMTP id n18so3735709pgm.12
         for <linux-kbuild@vger.kernel.org>; Wed, 18 Aug 2021 14:40:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=akAmUlIHVyMCnIAEIuPla2RgaGumEDghjwfRk7fePO8=;
-        b=a8rtLFTutCVX8kAVFQBoCFVIFF3XhbHoHk315ZS95VwdPVZZOWozYUV6xXg1LFhzmR
-         b97DOY2X4uTQmBQ0MoV3QYP9jiCOqetKVeS7PzpRs7el0f/9EWLG13/qyjRg3eYOrqle
-         PHl8LB4eQdIb4RU1oDqKh+w1JuI0NlIdvBCg0=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=j9DqXIvxCIM/uJCCeVoynzfDym6qm3dtyLAT5E0EvZQ=;
+        b=IVcXEnYGIgkxp08bXfmT4Z/QM2rlhkGqHMb4AimQ1lPm8+B8jgH7qoE/Y1k6f6RIB0
+         f1loyx5+TOZGqY4BAB479NEA0Wdx5Wwah4KXeOk3PuftyMLStwSpM0LpD0If6gUUc2td
+         ekGdIHDc0xSjaMo9BoL1YSg6vAPozzOgdXG4o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=akAmUlIHVyMCnIAEIuPla2RgaGumEDghjwfRk7fePO8=;
-        b=jZPluTqY8mUgyod8RemgDlghsxZivKAKDudGjgSB47BuBqumYY4L1QcCaxSMxch9M6
-         Nlmu1o20FaIw8zb8WQuMwae43vpUrYPcFIieSgY/XmzUql7rMcYb8+Z7XuJrC0oUEVIS
-         jOJRKXDjA8Px0fy41szjjenlfkxXli8i3u6KzdXsNBgjpPJA+FmZZLVFXw6XhQ4gCGB8
-         tcWQeYNQLHtW/vwIwhOJRUyXYeRrfMiktTBbNEj+ZtJFKiHXhozOoRLJ9MAwdOgA26tb
-         GFk4om5Oi+smpwJNInSFGYbL6ZoRyBpdtC7E7s2XGHl87Gj31mTNp5WpdLvkR5HEte8K
-         gNNg==
-X-Gm-Message-State: AOAM531WmTAF0FAVlCMv8rNRQpWMyTg2TZMZaiJdOkBglhBIkevlr6/q
-        lrdaWMJh60H1d/i1ejVSIr0I9A==
-X-Google-Smtp-Source: ABdhPJxlfTcGT5J/BnXQskI5QEMAEBFE/p6siy3ePLuxLeCum7fhGWFhGAhEGkJ746Sknz1WraR08Q==
-X-Received: by 2002:a17:90a:c7cc:: with SMTP id gf12mr11236442pjb.152.1629322837839;
-        Wed, 18 Aug 2021 14:40:37 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=j9DqXIvxCIM/uJCCeVoynzfDym6qm3dtyLAT5E0EvZQ=;
+        b=uUiQp6p54Sh7Aksd6nHS605aS45vkov3IkATPhvUIzLhnOxPAFq8hhnJn3CKFYCsYQ
+         p2fcNioQE+H7SdS4c0i2TXqsdLdKJJRgI4vT1+8U7UwBbk8XeYDn2QAoKmUYzOOTU5pE
+         0T9WcoLYlusNIL254E9gNeWVWtUXRbzhJCpevb+s3iUTEbAGy14LksGcLbijWtOIruHB
+         ijKsTMNRr3JWPjHXYfXns511BCcIQt3bPAEpHMFbuiX79uQRHZKfKOHhMUoffzqSCu0g
+         CXB3NCndL5JbJATrx3FFbj9dUTN0Etjx7d1tC6gDU4phiedSvoTSxywRRm4ES12W0PsS
+         vKzQ==
+X-Gm-Message-State: AOAM530YJsmHAGWmOnHWuRUs/uF5TwUgCns+JN+8DKv6vuD8shilU1aw
+        6lwoftXovZzlImZ8unioPy44hQ==
+X-Google-Smtp-Source: ABdhPJz4r38rCjQXBAdz5RKupPpOX5AXF2/LNIdBOa/52R9ZgKDp5P005icezNJ91KF+IbpL+Yvx7Q==
+X-Received: by 2002:aa7:87d1:0:b029:3e0:e44b:6429 with SMTP id i17-20020aa787d10000b02903e0e44b6429mr11485358pfo.81.1629322838217;
+        Wed, 18 Aug 2021 14:40:38 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id u16sm833047pgh.53.2021.08.18.14.40.36
+        by smtp.gmail.com with ESMTPSA id v20sm846721pgi.39.2021.08.18.14.40.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 18 Aug 2021 14:40:36 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>, Joe Perches <joe@perches.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
         Andy Whitcroft <apw@canonical.com>,
         Dwaipayan Ray <dwaipayanray1@gmail.com>,
         Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
         Christoph Lameter <cl@linux.com>,
         Pekka Enberg <penberg@kernel.org>,
         David Rientjes <rientjes@google.com>,
@@ -74,61 +75,46 @@ Cc:     Kees Cook <keescook@chromium.org>, Joe Perches <joe@perches.com>,
         Michal Marek <michal.lkml@markovi.net>,
         clang-built-linux@googlegroups.com, linux-mm@kvack.org,
         linux-kbuild@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: [PATCH v2 0/7] Add __alloc_size() for better bounds checking
-Date:   Wed, 18 Aug 2021 14:40:14 -0700
-Message-Id: <20210818214021.2476230-1-keescook@chromium.org>
+Subject: [PATCH v2 2/7] checkpatch: Add __alloc_size() to known $Attribute
+Date:   Wed, 18 Aug 2021 14:40:16 -0700
+Message-Id: <20210818214021.2476230-3-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818214021.2476230-1-keescook@chromium.org>
+References: <20210818214021.2476230-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1862; h=from:subject; bh=rsMgLXm/8j8zp3cC9QOAG2syHyng6bO/WmNVEexJxdo=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHX5CJ/SlNYpWE0Ykxq+PzeUKRG1gC/093Z7fxOqZ wEYXCCiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYR1+QgAKCRCJcvTf3G3AJo3AEA CRpUXhzKUXa83bU08HMYk8w3CI0lPzuD6WVd7f8zuaswtTFfH/Hhf0jvPMTmoC6K5Pd8AE87/wBmUH movYpOXkti6rw/ORur3peVR7FtzjxTcbY+KfjktIU9xbLcdj1GyKNr/ZnXqH4tiGuIYzl7+QIgC1pl Z26pG54aUxZVwgdaBgr3YBwyn9zwNcNlth7UdxDilgHrFB6xeEGdbCwSirgpnboJrVjpve3lDgwjH4 Q6zPPWan82zmnP0HbY/T6brScwp5MpHW3UhTzdcfUfBNxmjfhIQHAhoVcXGlJUyBbHnrINSOv75H3y 6F0wiCpckheLpTgrio85Ydq4S0Et/JtOpejeclbEYhrqe/2D6urk8FEqBKHf7rC7uFlINsuc8z11PS S6WF29dvRToPp4kvE45ge5eIdj24peW4NzGhCGDXPhraGd8tFxLV4F9Vq8g4F2UdbnqkGhN6HNs5OG Te+aSJseJhr+FaAANM8fvXBQzTjM4RGQeFtDwvcWU2zPq5bx3bJCaNTOHnyjGZ/KNS0rxGw8JeqBHF CO8EYPvzIhHVVUT0lebK+o9O0vanvKwUKcy1h1eR8DRx4bK7g8c91Hm59872I8zDPjw1ovaybRAzrv 7Nul/uQgIzzglOXzFM5EZix4zg1+ua3rV5n79ekbMFaagG9uz9kIWkTK2sGA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=912; h=from:subject; bh=6Teat8DBaEMMX6uWXJym8AvRSHRT+DxfYZVALLaAHjA=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHX5DBAWPRR5j7mh8AUY9CepoJIBrtuPXzvvnwNso swpVkhiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYR1+QwAKCRCJcvTf3G3AJh7KD/ 96JnKMQjuQw7QtjrbSbFxElQz16CfGElDpaJ1vmSZyt5B94MVj1bxxm20gR7QAEGbHyBPNyae7HA80 /eGzg2PywQcfB6x4/I0U1vis5JgM8dvYpANANpoi0nYzP/cgkM+ZI7evoAF46FggzG2+O3idTnEgzr DpYQ9H3D3JyEL/TqDbNFh5DgovOyydTKuMWa6ME5T91vVKPrw0ObE03YKzBPehWKbdW+AEzAANor1b cGwSAKuVy32QNt3mPR/IsRkGWSAV0+Kni+8BgmXt/8TTLhxuEAUp5KpQc3061OiwSbbniWGU6TNZTI ajGROJBqm4tAGaBQL2rqL+nMCFm+Hh92wBwgxrJLDur7oiuOii9ZnNgIDx7k+GgFqEYf1HSp0TglqQ M4nuT/MvfO0c/1/F3hGvEQHp4Rp/KOpGTu6z0kJ3RePjPVqMySTot3hJ1JwIIDJha2OlSOXczxBN+E A4P3QaN/sEpO0KRIjbAZeyCCukgg/Ca2QlCCDxETAq2aKCdq6NQJbNwHvTYLJrOqqNAzGBwr++Rt+w 5IqUpM7ekMoEWy10JxkE63eElBxOtaboQ9rYmcAM8Rpg48Y42Dw+WY+QKeIcl/Jwphs5jMUEmACxC1 jYYU0zHh/C+ep7ngW3J3xPyoGZJeNxIzQ1vWRqLiIj4Ua4u/JbSYyCobzvNQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi,
+Make sure checkpatch.pl doesn't get confused about finding the
+__alloc_size attribute on functions.
 
-GCC and Clang both use the "alloc_size" attribute to assist with bounds
-checking around the use of allocation functions. Add the attribute,
-adjust the Makefile to silence needless warnings, and add the hints to
-the allocators where possible. These changes have been in use for a
-while now in GrapheneOS.
+Suggested-by: Joe Perches <joe@perches.com>
+Cc: Andy Whitcroft <apw@canonical.com>
+Cc: Dwaipayan Ray <dwaipayanray1@gmail.com>
+Cc: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ scripts/checkpatch.pl | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-To build without warnings, this series needs a couple small fixes for
-allmodconfig, which I sent separately:
-https://lore.kernel.org/lkml/20210818174855.2307828-5-keescook@chromium.org/
-https://lore.kernel.org/lkml/20210818044252.1533634-1-keescook@chromium.org/
-https://lore.kernel.org/lkml/20210818043912.1466447-1-keescook@chromium.org/
-
-I figure I can take this via my "overflow" series, or it could go via
--mm?
-
--Kees
-
-v2:
-- clean up slab function declarations (joe)
-- update checkpatch.pl attribute regex (joe)
-- explain the Makefile changes better (ojeda, nathan)
-v1: https://lore.kernel.org/lkml/20210818050841.2226600-1-keescook@chromium.org
-
-Kees Cook (7):
-  Compiler Attributes: Add __alloc_size() for better bounds checking
-  checkpatch: Add __alloc_size() to known $Attribute
-  slab: Clean up function declarations
-  slab: Add __alloc_size attributes for better bounds checking
-  mm/page_alloc: Add __alloc_size attributes for better bounds checking
-  percpu: Add __alloc_size attributes for better bounds checking
-  mm/vmalloc: Add __alloc_size attributes for better bounds checking
-
- Makefile                            |  6 ++-
- include/linux/compiler_attributes.h |  6 +++
- include/linux/gfp.h                 |  2 +
- include/linux/percpu.h              |  3 ++
- include/linux/slab.h                | 84 +++++++++++++++++------------
- include/linux/vmalloc.h             | 11 ++++
- scripts/checkpatch.pl               |  3 +-
- 7 files changed, 80 insertions(+), 35 deletions(-)
-
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index a65753c05a69..e4b0def605c3 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -489,7 +489,8 @@ our $Attribute	= qr{
+ 			____cacheline_aligned|
+ 			____cacheline_aligned_in_smp|
+ 			____cacheline_internodealigned_in_smp|
+-			__weak
++			__weak|
++			__alloc_size\s*\(\s*\d+\s*(?:,\s*\d+\s*)?\)
+ 		  }x;
+ our $Modifier;
+ our $Inline	= qr{inline|__always_inline|noinline|__inline|__inline__};
 -- 
 2.30.2
 
