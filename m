@@ -2,130 +2,166 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-24.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D1EC4338F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A57C4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD17960F35
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8027660FDA
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239729AbhHRGRp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S240585AbhHRGRz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:17:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238265AbhHRGQt (ORCPT
+        with ESMTP id S240325AbhHRGQr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:16:49 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34B3C028C14
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id om1-20020a17090b3a8100b0017941c44ce4so8203794pjb.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
+        Wed, 18 Aug 2021 02:16:47 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79738C03327B
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d17so1108892plr.12
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Hcl1ccbFJs4ud/H3xoT9ZSR2o1n+o5k4Vuh9ApRTkZE=;
-        b=X+6d81/MvLfT3RwS/Jq3LliSZFdydCpZduBL+K5p5bTjFlP//w2o7lGFMk764ByK2j
-         4XbCrV8JHtasAStK7sUNoD/ilVbmVoDcq6+ER+OvyegySoWauDTXTIy6SbVa851KB7Q1
-         KUnRDP7SH/0Kg/x5GtujVKZ0O006edjI9Mme8=
+        bh=CRODLTs8x0Qtm/Ptv5tWUChhln5VJpkNvKJjBk8/td0=;
+        b=XzrlZ/y5zwdpS/YJfRaa7Pon4GvdH7CLIrvdHg1SwgGSYlKhjRZ3TGVbYl9Uz2EMR6
+         DmEOD2KhxAa3t0uuDB86CMHd3fOUJumBVJBOXOji0V55L+ZC8vnyAlvKeCi+xG9eP7b+
+         sNyj58Ru/pj7AqU9rwaxc3vtA/ktDXFAaliyc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Hcl1ccbFJs4ud/H3xoT9ZSR2o1n+o5k4Vuh9ApRTkZE=;
-        b=YCg/4NBFJGleWNmbHSkIc0bFpNPA6n9rB7ULwyvoG9HzHTNLzSdoVdhGsFS6AH7hpa
-         YT5L3j9vn2a8sDCnCQj+wg/qDWES5VedKULdEkPtrN5hkboHhmtFUcCcR/O2yfBseqvV
-         GD7+deGj8VnWRCoGx1tRWo4om7M5QP2vJuY3RPeBnlxxtgeMsg99D87BK9PBT5O9ceAg
-         Kp71L5MYOwUtNGfOYeGK2jigYvrOEIQCBXWYrzIIfN8mOSboCAQ020ruhAkmIv4XALaz
-         IlBddy8unwsBslVTt8gK9lE68Fn/CSzsEhT1HrX6go9eyCcMQJb/sABWW++DHsZAfFo+
-         Nimw==
-X-Gm-Message-State: AOAM5308DZEGLm5y3CM/Jz61eSD32zMApIZ1WYonMYtSsFDkzLfZ90jV
-        xnauvVHLpAPcGAdxTUvQij6Mrw==
-X-Google-Smtp-Source: ABdhPJyVdGO+k0ZXLSuBZU6Emb1T8tVPxMBOZys/2ngcwdzE26txO/yjwg2d2fDStsZ38dVCxGAyrA==
-X-Received: by 2002:a17:90b:2313:: with SMTP id mt19mr7827471pjb.230.1629267265564;
-        Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
+        bh=CRODLTs8x0Qtm/Ptv5tWUChhln5VJpkNvKJjBk8/td0=;
+        b=te5OdL1lr7ZepaIqKbxsx//y7b+fOxR2BFqSJi8zNg5AevmMtfRA+rpMzK7jntAukG
+         0zWky8H53Y4OXMMk29SXXHyB8shEYch/1703lxqYH4MXJBW51q+I4JC5+Tw+XDex5Nwe
+         NEN5ZjYxpBqAgLNJBF8BDoKwVOsXF/VAT4SaxvH78tbpS14GixS1LEaqisTSEc8wonvG
+         XB2IRIuONkyYqRiwYzUMJ7xh/q1W5oc9kxMFh05NBXj0WVnpO7Fl7JzboRXQKq+uSZsZ
+         aJMksy8I8Ttc74tWthytsI3zCFATD9wOn5b5QeAlYRDJE8q6t+313T8uMYG45crwfAtd
+         E3wQ==
+X-Gm-Message-State: AOAM531nsz/FqCZtHLeqCHYYLas0qdimvWkerftAwO7FQ/2JXNYtiL0t
+        5fMqWtwVbKfzG475ClqGsH8uXw==
+X-Google-Smtp-Source: ABdhPJw2O2kfFvEOnoehfcZ59jDqdYXp3MteV8gF92EfkMnChHRROnoigwIWoeiy+ab3LBtOKRgccQ==
+X-Received: by 2002:a17:90a:9f93:: with SMTP id o19mr7581672pjp.166.1629267264063;
+        Tue, 17 Aug 2021 23:14:24 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id j23sm3858038pjn.12.2021.08.17.23.14.19
+        by smtp.gmail.com with ESMTPSA id j13sm5326102pgp.29.2021.08.17.23.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:21 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-rdma@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Will Deacon <will@kernel.org>, Marco Elver <elver@google.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 56/63] RDMA/mlx5: Use struct_group() to zero struct mlx5_ib_mr
-Date:   Tue, 17 Aug 2021 23:05:26 -0700
-Message-Id: <20210818060533.3569517-57-keescook@chromium.org>
+Subject: [PATCH v2 25/63] compiler_types.h: Remove __compiletime_object_size()
+Date:   Tue, 17 Aug 2021 23:04:55 -0700
+Message-Id: <20210818060533.3569517-26-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1421; h=from:subject; bh=VDjxwOfX2cjaEibL8dkCGTlxM9AleppD3q/+715fBPc=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMq8O5UKAKpb/rvp5Y2SurRHZONXPPy2R7JrBHQ 07WmcZaJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJqH3D/ 4gNGySY8SCnjrDzEUM7CyrdchqF//a5m2rqxinozby7V9IS5+ycLOFfGvEx1AbtsgpvkKu6IjRZUA5 U67OxhqHOeDoB2W0JrzMD4ZiEf7aeNYRL/FcCw1nfsLjyJUn/7TFORuKQzen2TzINw05zF7xASgg/i xaqv+EuCKtewRoiXcWah1s7jrT1+hp4WtAkQzn/+YaIOVXblb9eHzxMGHhaGDiVNUWryg50fZiOvzo syChMqPaE84IoJx1X3nrdGMbSgJMU0FmsGXcNzY1ouOxqnAlCdt78oxn0N/v+Iddyi/oJlPfrrkCFW zTE3FtjwfhE243hFenyrDn/NEq85myRaQoC3GPPw9uiO1gSwK5OxTciBWBWEY9hT8f55X/K1hRf7Dx z/+mVftkYQIBCPASioBF7UrH+t8vHnUbHcJrYUXmmKNFE8Ki+9oeB0OLJaSo/Yw6PdoabOW4EplCRJ oGAyyzxgxgNTQUYlJOMczrc1z9W3IFlWitdqcPrmsHApkLxRvze0yN1bBp2+BP8kp5Sul0WwUPwAOF gCblqx3UOeJuqqaMUUha9/HfetNzO8oyaLg80znWlEWSXZcMWHgubHnQLVPMv7nqUCEbhdDoN09B46 k0l6F+LB0Ns/6YfKNGhM3NCkF2iuaqgxu0NW66r4tv309D5se4J8ucLMUhmQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2922; h=from:subject; bh=MDjEPu+0JYKYu2Xmf51UoTuGhtFMUlaN8gkl0rN2LiE=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMjfBwoewCUYNgCuB0jumG0NCJivrA+YgTkE1KH MccXxVSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIwAKCRCJcvTf3G3AJm3mEA C1cBGrrgs2la3rIyvrEHW+BRoF9MD1FEFa9+24jUy+7EhTKj5KuskH2wadAz6TmifU9D+cLgGgfC/n amHBb++ivEXxSJhc4y91umgpxGq1S8LFyrlOWOgZqtGNwFOE4L+A6hPQOzVfQqImZrKbUsXQiOTxQF 7grjdlvdZoEFDWPebAGQTCgPQNbtVYVKWoz7N0rUF0q+U6KKngVHIiryXSBI7/jo7JX1xs7kwTa5yb j5ABB3DV0p5m3h+eGdK/o4dtNK3lb7ccrpoMB2vKnfDPiunmk9/NFQdWQDhhPGB20LOuYWqb2DMI5F 8ra6j3oQzxzlnAmyDYk0Ooa7tUqhfIXEiH7BoEFHO1Labygo8HuW7nnfy2MT+oXLprIG0my4K40djX 27uS65O8HaTRBABOICKEnhMZCAjtBXHZrTzmpy/IjAFCLLdhJ/jhsknAVr4PuO4MNgfpjTce+yDc2f q9P+f7KqhEZTR5/XfPySXV6MEI82XEMO1yyRrSeCAUKNaSpY90jIcOl+jIvBSF1AlFB5Heg/LRjEc5 2Rgx7CjVAVaOJW15x45Insq5iN40SQ3HKQy3SVHVdQwKifffNqMWgk4LPRATYF7inKbMWmxUlWu57e y9Y+fqktoIPFyiL5IUhAbNoDS4ngHbm3l04H/saAMuvQX3Z78YJ6a+2ACeqw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
+Since all compilers support __builtin_object_size(), and there is only
+one user of __compiletime_object_size, remove it to avoid the needless
+indirection. This lets Clang reason about check_copy_size() correctly.
 
-Add struct_group() to mark region of struct mlx5_ib_mr that should be
-initialized to zero.
-
-Cc: Leon Romanovsky <leon@kernel.org>
-Cc: Doug Ledford <dledford@redhat.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-rdma@vger.kernel.org
+Link: https://github.com/ClangBuiltLinux/linux/issues/1179
+Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Marco Elver <elver@google.com>
+Cc: Arvind Sankar <nivedita@alum.mit.edu>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Oleg Nesterov <oleg@redhat.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/infiniband/hw/mlx5/mlx5_ib.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/linux/compiler-gcc.h   | 2 --
+ include/linux/compiler_types.h | 4 ----
+ include/linux/thread_info.h    | 2 +-
+ 3 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-index bf20a388eabe..f63bf204a7a1 100644
---- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
-+++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-@@ -644,6 +644,7 @@ struct mlx5_ib_mr {
- 	struct ib_umem *umem;
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index cb9217fc60af..01985821944b 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -41,8 +41,6 @@
  
- 	/* This is zero'd when the MR is allocated */
-+	struct_group(cleared,
- 	union {
- 		/* Used only while the MR is in the cache */
- 		struct {
-@@ -691,12 +692,13 @@ struct mlx5_ib_mr {
- 			bool is_odp_implicit;
- 		};
- 	};
-+	);
- };
+ #define __UNIQUE_ID(prefix) __PASTE(__PASTE(__UNIQUE_ID_, prefix), __COUNTER__)
  
- /* Zero the fields in the mr that are variant depending on usage */
- static inline void mlx5_clear_mr(struct mlx5_ib_mr *mr)
+-#define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
+-
+ #define __compiletime_warning(message) __attribute__((__warning__(message)))
+ #define __compiletime_error(message) __attribute__((__error__(message)))
+ 
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index e4ea86fc584d..c43308b0a9a9 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -290,10 +290,6 @@ struct ftrace_likely_data {
+ 	(sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+ 	 sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+ 
+-/* Compile time object size, -1 for unknown */
+-#ifndef __compiletime_object_size
+-# define __compiletime_object_size(obj) -1
+-#endif
+ #ifndef __compiletime_warning
+ # define __compiletime_warning(message)
+ #endif
+diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
+index 0999f6317978..ad0c4e041030 100644
+--- a/include/linux/thread_info.h
++++ b/include/linux/thread_info.h
+@@ -203,7 +203,7 @@ static inline void copy_overflow(int size, unsigned long count)
+ static __always_inline __must_check bool
+ check_copy_size(const void *addr, size_t bytes, bool is_source)
  {
--	memset(mr->out, 0, sizeof(*mr) - offsetof(struct mlx5_ib_mr, out));
-+	memset(&mr->cleared, 0, sizeof(mr->cleared));
- }
- 
- static inline bool is_odp_mr(struct mlx5_ib_mr *mr)
+-	int sz = __compiletime_object_size(addr);
++	int sz = __builtin_object_size(addr, 0);
+ 	if (unlikely(sz >= 0 && sz < bytes)) {
+ 		if (!__builtin_constant_p(bytes))
+ 			copy_overflow(sz, bytes);
 -- 
 2.30.2
 
