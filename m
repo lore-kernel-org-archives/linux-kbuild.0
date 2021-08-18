@@ -8,175 +8,208 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83111C4320A
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD36C4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EF546108E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48B0C6108E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238207AbhHRGNj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:13:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S238921AbhHRGNu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238134AbhHRGNN (ORCPT
+        with ESMTP id S238727AbhHRGNT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:13:13 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF807C0363D4
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:07 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id n18so1139041pgm.12
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:07 -0700 (PDT)
+        Wed, 18 Aug 2021 02:13:19 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9600C0698DD
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:05 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id y23so1140131pgi.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=WJrpMRxjlck/EUZE2DWpbaWpfbq9vwWWxHEHR5bnD5E=;
-        b=Y4RaduW1rzoHa2IpujBCd5gie/q9/2hiLeyjeu9ex0Lvtmxof39Ph82c32u/wEVwec
-         BeorvJNM0QtxRwnxngByb5MimEYl+Js8IDKmdRfuXrPFuDqHj3Cmg2kZQWZ0j6OqZuGi
-         4aE9yiwILQW91Q1hmTVcwZmAEbqQUR+FHPZhQ=
+        bh=foQDo7WpLo2j2V/z+FSCXpsN+DWjHtp9JYSgEaJMB90=;
+        b=GKSzM0IlJzJUf6lZnhXWBc3es8Ghf2l0pYhAqJGw0m0Etoh9R9ZMUtcr7TQfx5XH16
+         yUU50MfeHmQfTuW7Ip6OieaI0/v3E9dPT9SLJqUTpqoqf9QRyyt07A/6SF5rzbn7F+nJ
+         +/lFdCNLXnONV1jAas5Ljfn8bo+d3tCRsQ77A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WJrpMRxjlck/EUZE2DWpbaWpfbq9vwWWxHEHR5bnD5E=;
-        b=ICGPRdw6KLT0agGWgmYU/ZXCQKNA5x3pDXwtoEA+eBLzdNoWZJvHqYvuHg6lhKAehh
-         83EUp56cfSemYhR25FCvLZbrMJHkDkJpTv4D99AppvogD9W0R9Zf0V4FoVYlIVo8nKYU
-         LU+bcD/H4PUUyf4O0tJgXVAf4IgDNLhjn0gYrz0L2Utz+m4o4rr/6STDYhWe90NwY4XM
-         foxhWlhcRRPd+3GpcRBwJrapSD/NuZo80tASMaUN082xuldvikuIraAm9nRO/N80+ZkC
-         v9Qn3KhooVg6xqqPmZsWBDgqf0PYDBFoJGDnpIs6FORSNfGYzfaBQwvR0X4m3Pulv4kV
-         FOtw==
-X-Gm-Message-State: AOAM532knFDxdH1cBbPQIIvv7JWrgoUoA33DYAcxWJwXy2AAsvmzcfgq
-        hsqAHF57Rgi5djGzVRMXiZFI4A==
-X-Google-Smtp-Source: ABdhPJw+fxDkXxOl4PBdv0otPn1lIDXevnmHeNda+XtjMx2DvEazLyVTOr/SWrLlENk4ZB/InQEloQ==
-X-Received: by 2002:a62:dbc3:0:b029:3e0:ec4a:6e60 with SMTP id f186-20020a62dbc30000b02903e0ec4a6e60mr7438793pfg.25.1629266767474;
-        Tue, 17 Aug 2021 23:06:07 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id s5sm5498942pgp.81.2021.08.17.23.06.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=foQDo7WpLo2j2V/z+FSCXpsN+DWjHtp9JYSgEaJMB90=;
+        b=Ub8bAIwh+2VPTykba8WOk9uS13eVsIQOka22LuNK6lTMpEjrY3blKvQuxfoUVvmsbv
+         cL4lTtIka0/V0orY89BbYth3fmuh93Hy9TT02B3bbC9YKt+rE73LjwfWsLIiQzraC/gs
+         hTYnKx7dGTavFGft5j7gidKNMagcJtnAjSMkouyd9cjiQNoKkJjrc4Waf8KNPGDmtr8B
+         dFbxvBngP38dpQmiFuz5NrlLoE68ONko93/HrVVygo2FstwisAN98bgq5J2PVCwfSHjF
+         9MAAKLplo25lchcb343HYdbdIhIKbq8pSN/6wCZueKraGr8fuZHP3jFUbNPWfzWmBSDr
+         +sAw==
+X-Gm-Message-State: AOAM533YT1XKZg2VX9m/ZDZX3tP17164Kyzvh/WvDoQKVV6opP6yGOki
+        v0zMt/MfYdeJaxuHpw2it7XpPw==
+X-Google-Smtp-Source: ABdhPJyaW6PaSoHolvdHHHrfwFOitgtk5zymjMduPV9RR03aWMu9nIrmKtLLFhURS2RiRyMqgOc9Ww==
+X-Received: by 2002:a63:5c8:: with SMTP id 191mr7451505pgf.293.1629266765131;
         Tue, 17 Aug 2021 23:06:05 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id d18sm5548805pgk.24.2021.08.17.23.06.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 23:06:02 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-can@vger.kernel.org,
+        netdev@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
+        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 62/63] fortify: Detect struct member overflows in memset() at compile-time
-Date:   Tue, 17 Aug 2021 23:05:32 -0700
-Message-Id: <20210818060533.3569517-63-keescook@chromium.org>
+Subject: [PATCH v2 59/63] can: flexcan: Use struct_group() to zero struct flexcan_regs regions
+Date:   Tue, 17 Aug 2021 23:05:29 -0700
+Message-Id: <20210818060533.3569517-60-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3657; h=from:subject; bh=x4SNp17MkJsMDii5dKL06SU0zDLItyjvjIE8yvAGOLw=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMsuEVllcthHvVoZOOtiNzdZSQL+MVxm5lZYC08 cYuVeeiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjLAAKCRCJcvTf3G3AJhFJD/ 0YywcHnMj1c/NexxJTDTdAYqmtmTUD8x82Ns/wjrQAyODC3hv/6fd7/lXy7KLnBf3O7mSQRPo1siWq mi4sD6BTm3hIo3GuFOJ8CTfGgnxxwdN6j/TkfuxlpJSHWlG8CdQJaYNCYJgI7QT0k7mcvIcU0Yiu5/ YaVOOC0zQ85PA//3PbzguuPv50kBbxQ5bQSD5XS5ptljehOSJcCJ66K/cFUtnJoZrfF5m7naOzclM+ YSn8wlMr9aQqL6DEc6etgSVI2n22I9gcsWaObJAPYCut15PH0LnKu3TXUtF2oQy91xDTCZ0kCAuzqt 5poO59eUPNtjb6apuyTyI2sng4UXAVOqnFeKce+zQIoGAdIb5GjE13ffC5AAon3CmAbxRE5FUufUrx zUIYqjgohnwHn6YDtth4aIZB/W2kLG2W2q4TWuZjMxEaw0SVrnd4P2jJSHU8B8d1a6PkAs8epAq0gc D69QvVpSd/j5KuzMZUdDpOKxgIKUXFGXliJiDsu+4vuCdioBLapgoOTvVDBi1LirQl6lP45HoxFQ0b S64cenON/jFuSH9ZmumaJj1QScmPVkoNRRs09YB5f0juMR7C0bopH+EEmaqk++upwBm1nP/e/Dtxew r7vE625A/r6FGg4xIb9flyd3LdIf3HsRkH/Bt6+5XCnDvRxE/u5ev7V+yD8w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5011; h=from:subject; bh=8Ts9umslvw0EuXRaphSdWSysW0LFYybLoYrceMcY2J8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMrtWREAe+sayvsZiZZ8f8J5sqHhCBlNW7evqOS y4cIMiCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKwAKCRCJcvTf3G3AJl2pD/ 95zMtNfq1UN3l8y/gyN1appJq7NzWCP9Ku5k1Ba1Voq8jwjYkgywPDqqLvBA6qhUCGs+OtkOFRJm9r 2WBM2tr0yTR7/Huu8tg3Y9QEDaf1r85ita3zR+Lo8bHAVhDGXrm0QLkXcE5kvRTliHDwuyH5NQdbeI y8MSusibpB/OZKb1O2tTsxmhqrhbyjP6XdzghSiU7T4QDxkGxZwJgsAc7vPRqbHk7VQ4C8W2dPyt0e NE2ZrJYx0O61gXhgePrJkWBiMMPSajK74LMAZnW+05D56fMzPxqiMjtL0p/si6OhxhglP8w/YyyfB4 hnLWCd7r/bixExnxdKaJIIssbZtUDNaR6qxxa++crImbOrfTcB2xJkZxZo5FCuWwXjSeFm5seZ8DSF VqrYUY1JAcu3VBvPK178Bzrnv1RgFdvpt4I+zejm4UhAQh4kmjNR1TG43rdFl+h9uzkvW74E7N8ulI x2uluahMtzsRiCPNN78mfMrihT6ffb7zDUoByobpe2156Mnrn0LmOGmBizoXBiY8TaXTRKSEavjrKQ EjTgqkUCcUBJwrofQz5SF6k1zmaygNghMfj+owZdXn8OFWlfbX7KbDZmtfReV8lng9nDI4GeN25VRY 8eq9GEvLK3a8NRy4xCnvyxCK9Lloiounz6j68lZ9p5uyRuvWXtQFVzzhEMKw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-As done for memcpy(), also update memset() to use the same tightened
-compile-time bounds checking under CONFIG_FORTIFY_SOURCE.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memset(), avoid intentionally writing across
+neighboring fields.
 
+Add struct_group() to mark both regions of struct flexcan_regs that get
+initialized to zero. Avoid the future warnings:
+
+In function 'fortify_memset_chk',
+    inlined from 'memset_io' at ./include/asm-generic/io.h:1169:2,
+    inlined from 'flexcan_ram_init' at drivers/net/can/flexcan.c:1403:2:
+./include/linux/fortify-string.h:199:4: warning: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
+  199 |    __write_overflow_field(p_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In function 'fortify_memset_chk',
+    inlined from 'memset_io' at ./include/asm-generic/io.h:1169:2,
+    inlined from 'flexcan_ram_init' at drivers/net/can/flexcan.c:1408:3:
+./include/linux/fortify-string.h:199:4: warning: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
+  199 |    __write_overflow_field(p_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cc: Wolfgang Grandegger <wg@grandegger.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-can@vger.kernel.org
+Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/linux/fortify-string.h                | 54 ++++++++++++++++---
- .../write_overflow_field-memset.c             |  5 ++
- 2 files changed, 51 insertions(+), 8 deletions(-)
- create mode 100644 lib/test_fortify/write_overflow_field-memset.c
+ drivers/net/can/flexcan.c | 68 +++++++++++++++++++--------------------
+ 1 file changed, 34 insertions(+), 34 deletions(-)
 
-diff --git a/include/linux/fortify-string.h b/include/linux/fortify-string.h
-index 0120d463ba33..7de4673dfe2c 100644
---- a/include/linux/fortify-string.h
-+++ b/include/linux/fortify-string.h
-@@ -198,17 +198,56 @@ __FORTIFY_INLINE char *strncat(char *p, const char *q, __kernel_size_t count)
- 	return p;
- }
- 
--__FORTIFY_INLINE void *memset(void *p, int c, __kernel_size_t size)
-+__FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
-+					 const size_t p_size,
-+					 const size_t p_size_field)
- {
--	size_t p_size = __builtin_object_size(p, 0);
-+	if (__builtin_constant_p(size)) {
-+		/*
-+		 * Length argument is a constant expression, so we
-+		 * can perform compile-time bounds checking where
-+		 * buffer sizes are known.
+diff --git a/drivers/net/can/flexcan.c b/drivers/net/can/flexcan.c
+index 7734229aa078..12b60ad95b02 100644
+--- a/drivers/net/can/flexcan.c
++++ b/drivers/net/can/flexcan.c
+@@ -290,31 +290,33 @@ struct flexcan_regs {
+ 	u32 dbg1;		/* 0x58 */
+ 	u32 dbg2;		/* 0x5c */
+ 	u32 _reserved3[8];	/* 0x60 */
+-	u8 mb[2][512];		/* 0x80 - Not affected by Soft Reset */
+-	/* FIFO-mode:
+-	 *			MB
+-	 * 0x080...0x08f	0	RX message buffer
+-	 * 0x090...0x0df	1-5	reserved
+-	 * 0x0e0...0x0ff	6-7	8 entry ID table
+-	 *				(mx25, mx28, mx35, mx53)
+-	 * 0x0e0...0x2df	6-7..37	8..128 entry ID table
+-	 *				size conf'ed via ctrl2::RFFN
+-	 *				(mx6, vf610)
+-	 */
+-	u32 _reserved4[256];	/* 0x480 */
+-	u32 rximr[64];		/* 0x880 - Not affected by Soft Reset */
+-	u32 _reserved5[24];	/* 0x980 */
+-	u32 gfwr_mx6;		/* 0x9e0 - MX6 */
+-	u32 _reserved6[39];	/* 0x9e4 */
+-	u32 _rxfir[6];		/* 0xa80 */
+-	u32 _reserved8[2];	/* 0xa98 */
+-	u32 _rxmgmask;		/* 0xaa0 */
+-	u32 _rxfgmask;		/* 0xaa4 */
+-	u32 _rx14mask;		/* 0xaa8 */
+-	u32 _rx15mask;		/* 0xaac */
+-	u32 tx_smb[4];		/* 0xab0 */
+-	u32 rx_smb0[4];		/* 0xac0 */
+-	u32 rx_smb1[4];		/* 0xad0 */
++	struct_group(init,
++		u8 mb[2][512];		/* 0x80 - Not affected by Soft Reset */
++		/* FIFO-mode:
++		 *			MB
++		 * 0x080...0x08f	0	RX message buffer
++		 * 0x090...0x0df	1-5	reserved
++		 * 0x0e0...0x0ff	6-7	8 entry ID table
++		 *				(mx25, mx28, mx35, mx53)
++		 * 0x0e0...0x2df	6-7..37	8..128 entry ID table
++		 *				size conf'ed via ctrl2::RFFN
++		 *				(mx6, vf610)
 +		 */
++		u32 _reserved4[256];	/* 0x480 */
++		u32 rximr[64];		/* 0x880 - Not affected by Soft Reset */
++		u32 _reserved5[24];	/* 0x980 */
++		u32 gfwr_mx6;		/* 0x9e0 - MX6 */
++		u32 _reserved6[39];	/* 0x9e4 */
++		u32 _rxfir[6];		/* 0xa80 */
++		u32 _reserved8[2];	/* 0xa98 */
++		u32 _rxmgmask;		/* 0xaa0 */
++		u32 _rxfgmask;		/* 0xaa4 */
++		u32 _rx14mask;		/* 0xaa8 */
++		u32 _rx15mask;		/* 0xaac */
++		u32 tx_smb[4];		/* 0xab0 */
++		u32 rx_smb0[4];		/* 0xac0 */
++		u32 rx_smb1[4];		/* 0xad0 */
++	);
+ 	u32 mecr;		/* 0xae0 */
+ 	u32 erriar;		/* 0xae4 */
+ 	u32 erridpr;		/* 0xae8 */
+@@ -328,9 +330,11 @@ struct flexcan_regs {
+ 	u32 fdcbt;		/* 0xc04 - Not affected by Soft Reset */
+ 	u32 fdcrc;		/* 0xc08 */
+ 	u32 _reserved9[199];	/* 0xc0c */
+-	u32 tx_smb_fd[18];	/* 0xf28 */
+-	u32 rx_smb0_fd[18];	/* 0xf70 */
+-	u32 rx_smb1_fd[18];	/* 0xfb8 */
++	struct_group(init_fd,
++		u32 tx_smb_fd[18];	/* 0xf28 */
++		u32 rx_smb0_fd[18];	/* 0xf70 */
++		u32 rx_smb1_fd[18];	/* 0xfb8 */
++	);
+ };
  
--	if (__builtin_constant_p(size) && p_size < size)
--		__write_overflow();
--	if (p_size < size)
--		fortify_panic(__func__);
--	return __underlying_memset(p, c, size);
-+		/* Error when size is larger than enclosing struct. */
-+		if (p_size > p_size_field && p_size < size)
-+			__write_overflow();
-+
-+		/* Warn when write size is larger than dest field. */
-+		if (p_size_field < size)
-+			__write_overflow_field(p_size_field, size);
-+	}
-+	/*
-+	 * At this point, length argument may not be a constant expression,
-+	 * so run-time bounds checking can be done where buffer sizes are
-+	 * known. (This is not an "else" because the above checks may only
-+	 * be compile-time warnings, and we want to still warn for run-time
-+	 * overflows.)
-+	 */
-+
-+	/*
-+	 * Always stop accesses beyond the struct that contains the
-+	 * field, when the buffer's remaining size is known.
-+	 * (The -1 test is to optimize away checks where the buffer
-+	 * lengths are unknown.)
-+	 */
-+	if (p_size != (size_t)(-1) && p_size < size)
-+		fortify_panic("memset");
- }
+ static_assert(sizeof(struct flexcan_regs) ==  0x4 * 18 + 0xfb8);
+@@ -1400,14 +1404,10 @@ static void flexcan_ram_init(struct net_device *dev)
+ 	reg_ctrl2 |= FLEXCAN_CTRL2_WRMFRZ;
+ 	priv->write(reg_ctrl2, &regs->ctrl2);
  
-+#define __fortify_memset_chk(p, c, size, p_size, p_size_field) ({	\
-+	size_t __fortify_size = (size_t)(size);				\
-+	fortify_memset_chk(__fortify_size, p_size, p_size_field),	\
-+	__underlying_memset(p, c, __fortify_size);			\
-+})
-+
-+/*
-+ * __builtin_object_size() must be captured here to avoid evaluating argument
-+ * side-effects further into the macro layers.
-+ */
-+#define memset(p, c, s) __fortify_memset_chk(p, c, s,			\
-+		__builtin_object_size(p, 0), __builtin_object_size(p, 1))
-+
- /*
-  * To make sure the compiler can enforce protection against buffer overflows,
-  * memcpy(), memmove(), and memset() must not be used beyond individual
-@@ -399,7 +438,6 @@ __FORTIFY_INLINE char *strcpy(char *p, const char *q)
- /* Don't use these outside the FORITFY_SOURCE implementation */
- #undef __underlying_memchr
- #undef __underlying_memcmp
--#undef __underlying_memset
- #undef __underlying_strcat
- #undef __underlying_strcpy
- #undef __underlying_strlen
-diff --git a/lib/test_fortify/write_overflow_field-memset.c b/lib/test_fortify/write_overflow_field-memset.c
-new file mode 100644
-index 000000000000..2331da26909e
---- /dev/null
-+++ b/lib/test_fortify/write_overflow_field-memset.c
-@@ -0,0 +1,5 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#define TEST	\
-+	memset(instance.buf, 0x42, sizeof(instance.buf) + 1)
-+
-+#include "test_fortify.h"
+-	memset_io(&regs->mb[0][0], 0,
+-		  offsetof(struct flexcan_regs, rx_smb1[3]) -
+-		  offsetof(struct flexcan_regs, mb[0][0]) + 0x4);
++	memset_io(&regs->init, 0, sizeof(regs->init));
+ 
+ 	if (priv->can.ctrlmode & CAN_CTRLMODE_FD)
+-		memset_io(&regs->tx_smb_fd[0], 0,
+-			  offsetof(struct flexcan_regs, rx_smb1_fd[17]) -
+-			  offsetof(struct flexcan_regs, tx_smb_fd[0]) + 0x4);
++		memset_io(&regs->init_fd, 0, sizeof(regs->init_fd));
+ 
+ 	reg_ctrl2 &= ~FLEXCAN_CTRL2_WRMFRZ;
+ 	priv->write(reg_ctrl2, &regs->ctrl2);
 -- 
 2.30.2
 
