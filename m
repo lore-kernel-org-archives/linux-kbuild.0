@@ -2,62 +2,68 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-24.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0214C4338F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2B9C4320A
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB77061076
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFF1061058
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238939AbhHRGOB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
+        id S238655AbhHRGPw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:15:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238043AbhHRGNi (ORCPT
+        with ESMTP id S238362AbhHRGPr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:13:38 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF1F0C0363CF
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:07 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id 7so1061615pfl.10
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:06:07 -0700 (PDT)
+        Wed, 18 Aug 2021 02:15:47 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0594C0617AF
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id j12-20020a17090aeb0c00b00179530520b3so8293491pjz.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0bRXcGnjUc7NVLeCTdRJyE4ge8RgoyPp9mDS2KzOq8s=;
-        b=WQqdtls/I5KQTun/hms341YldczQzpNKS3BfKfWY/GwZZ0hWoG9we6ibSjWW7lx/A3
-         n6thS6+Nyek/C9pXuosZvP3ZzBi7YorfMd8mKDm8qDfvHb0EJADzUaECrtRMe9FIa9KN
-         qz2Nc4X0B0W57jPUBjUc42oG7dCdby25RRrX0=
+        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
+        b=a6bTyF6xsvXmJVaSI8AKs77+P0oFTI1gTPlsYa6mh59pACM92P1VFzFqvqU9+X+jNr
+         vTM9CS3vOAuRCBsVzn6N7KgVHI6W6ooLD8DmaYQuGxrolCI4Xru2kAG7C7jmtZ5uZ8PR
+         VDy1iToF9Tpap2g7DTRp0rqJ6lJwmpqW0wJjo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0bRXcGnjUc7NVLeCTdRJyE4ge8RgoyPp9mDS2KzOq8s=;
-        b=HOZ2T2NBqIN0tDQnCukA697KcI6taivaHceurnvADxbn0ABzf/jfkfWAKz2MY8/gcF
-         44FvW5VwsDdHDTpCa3SvTBLuLUPC6afELNKuk3p2/8Ult33QnAkRQFtacXk84cbjN4iu
-         T/hkVMJlFo6PfI5ok4NYzp3fjRZabABGRmnBbziohmIrJaKuv13DStji2lRCxRirhyTc
-         mUZUWENlY23qb2qA2K0wE0PboYjz6rwJ1aW9ru8mKav0DP4Xy8w2DcEzQ6+XGXq/0pwT
-         0KwXWyX8tqpc2ChwDwoHR936HP43LPcTzv5OZcIOjbt616IAPE+K0Yj7omWWIWLm74kD
-         /ELQ==
-X-Gm-Message-State: AOAM532pVZP/gH1RfI7JQi48n2ZJk3cbFRQytFChUqdFT5BtB/EcPSwZ
-        tjcUkSFQ+3nyAYYNnggo89pgag==
-X-Google-Smtp-Source: ABdhPJzf07hn4/UJFD8k9v/PFTouOU2hjIEruQiURQ/GtTe5NoEQV+QNXrPpXGYcUZ9Mijvig6sL0A==
-X-Received: by 2002:aa7:8206:0:b029:3c6:2846:3f9f with SMTP id k6-20020aa782060000b02903c628463f9fmr7834685pfi.30.1629266766977;
-        Tue, 17 Aug 2021 23:06:06 -0700 (PDT)
+        bh=qcRMFUHVF6QqGnr97K+ATth5rLyNBKP5psUqyaewiPQ=;
+        b=CMEmE/EUSjwz9996YZ5XQb7qw1wbccYLBeT91wCCY34DkgwWeCpeQyLAwzmU6PHlej
+         TybQLdKkFTQzzeH/DDPjyyNC4aE+tPThYNG1UEj2VQcxqBdONAIuIraAN3E+Hhhqo0dg
+         qNRSpNuuiX2vr1ujxiApmQVYRIUT9TomTMrLwi6uu5Xb/YUDklc46xoG9bZelCSUKHPi
+         SY1g8q3nvtrJsMu0+uAQKej5SuwoD3CFoybLVE0lRSW93ibpIAFPfD6vkJ9MYpylckN8
+         iryIjBT0CajC+4byHoJI4xzxgj3vHVJIXtFFocTgZ83hY7SJhDXbYcxukyb+lWy6KnGP
+         EBNQ==
+X-Gm-Message-State: AOAM530RPzQ5lVuUbbrjr1E+A/ccEmvRqg9zvR3b7T+Es3sOYW5NYRBY
+        xXukEH7F53XU8ufvR2eNZSIkxg==
+X-Google-Smtp-Source: ABdhPJxYy9uajyke8AmxVdXcCpVPxEVIqn6teRhyhxiibQmTAmVANSe3Um2YhA94u6j4OQrmXZTUYg==
+X-Received: by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP id 6-20020a170902e9c6b029012d4cb33985mr5959378plk.56.1629267253269;
+        Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l18sm4571594pff.24.2021.08.17.23.06.02
+        by smtp.gmail.com with ESMTPSA id l12sm5631661pgc.41.2021.08.17.23.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:06:04 -0700 (PDT)
+        Tue, 17 Aug 2021 23:14:12 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Hulk Robot <hulkci@huawei.com>,
+        Wang Wensheng <wangwensheng4@huawei.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
@@ -66,195 +72,54 @@ Cc:     Kees Cook <keescook@chromium.org>,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 63/63] fortify: Work around Clang inlining bugs
-Date:   Tue, 17 Aug 2021 23:05:33 -0700
-Message-Id: <20210818060533.3569517-64-keescook@chromium.org>
+Subject: [PATCH v2 61/63] powerpc: Split memset() to avoid multi-field overflow
+Date:   Tue, 17 Aug 2021 23:05:31 -0700
+Message-Id: <20210818060533.3569517-62-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7591; h=from:subject; bh=Hec0xxMOh0cK4yBYBOcb5aqhxRAjnc34rm5FBOgOGD0=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMs6ml8yWGswBEn8BNaWTcv46iAfG0OJbmF8YMg oAEj0wmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjLAAKCRCJcvTf3G3AJmy1EA Cxa4AsWTCF8/uDP8AV7JotgjiK7+Wd6hTmjaB2izxSIO3ujFU7lf++q7Flx4Rk0Khk2tYC5yFzkf1q KsVqRI+lR033mk6KdPSJ9FrfNzNJz8wPKrUcmvO1yC5Ew7NsSbVcFG9rAJTpUGSp6PB33hEZa7ao6X g00L0SWHv3JrcPqQxfPVH40XS0edTmHg2xsJ5mtz/NsFH7sjkVvbomQwzPWIWneWOUFnBoNs+gvf6t vSf2XOihAR71V0F5AszPaupkbs6G5njj1px9/ENBv3HIa208Q3y8DpqsvqamaITfm+fmWG8CrO/7OT jWWUwcLUoiPAzcKaa+OKE5ii0xStgjRPNhoJKsOJU0dDqt0/5/X37hzygJ+A+cggmAIfMoTzmE9a8f appSBcljh4nYutCtxDKnbc2yqCBtKYTAlZ+vqGGAe35wFrXKhNNsQK7c8ciBk7F+G4tdWcsfmTfE+h Z4gxHVqy2JU4v0EWPwh/KVUbbHw6edMeAslLgW8TyhklAWJSFhjGecLkyTpx66usdMKTWdYMmrbu8O PytqhJuULFGtFs5i5jkysrms3SGobkhoweDZHzjT82RPdfsZchVOG0LZfHsmuh54DBoXEf/9bw4Zgm QQ4sjZ4Ski2g83oskEkT+N7EABOdA+mCeKE78rnk61IM+xXh4/vRHiEA0ipw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1360; h=from:subject; bh=JCECg/Hewr4d9JO4WQR5kDd0IjByC1o9V4GNPJaYPKM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMrEHk87hiQVCzgI18EL/HOEsDc4MJhIkHkaVTZ DZKWkUOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKwAKCRCJcvTf3G3AJjKnD/ 9vO5rK1NcyiJFD1V1xX5Q3QwJPN1EMRWYcJsr5dTRrhYDef2VBoAd3vGVJhv5tPWCziVR95zI+LgIL d02IU4Ow0Hf/RnPFBOD9Lk1pR4bdZqy2udFH1tE06S0wBxz6HBgDxKiHg0hd49XAZs+xsJCSVXM+ks ZJe+gXBJkwU0QQlyx97a3srOeF6TBCIwRbfsc1ny8kqeq7rHXhuez2Nl/jEpDrSY7P6MGZ0RS9pwGp BG8XE5jwyatTqBbwztRYJO6EDxF1oljeN+vw6wXSMzHTs0P0jZF+xhBsDePue4SrU1uYVK4eI314VF ytJTqzumiq1LoMoetRo7XbnZL9HC+8KQkD7iex+cbwbl0vBuTQNERQCXbWiuHcR7WbrVndhdzqr/qr 7kpYWqqHhGYN42VOTCoEV+CxxyGt6O1oEwupEs9JwlhAHT0ET/3m5v95ln9sj4q/idsJQyugW9w9wS B+pdNyiwZvnrIR6r8PjnSHwflJuJYyRkP28Ci+HZxNLOE9WlE6UmnuDmdrcVKpWz+nctnlPQ9JHhAq vpfGhXMnm0qF1zx5IYh+d69+ZRtUQbUKz2k4hFKSxvSse3CvWfi63pBT3m1O556umLnQD6zZbq4vQZ p0vLhJOR+anh57gwE1CG5ilwh9jU07xLpPrNzUQkHrIgJsiMsfqPJrC73E9g==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-To enable FORTIFY_SOURCE support for Clang, the kernel must work around
-a pair of bugs, related to Clang's inlining.
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memset(), avoid intentionally writing across
+neighboring fields.
 
-Change all the fortified APIs into macros with different inline names to
-bypass Clang's broken inline-of-a-builtin detection:
-https://bugs.llvm.org/show_bug.cgi?id=50322
+Instead of writing across a field boundary with memset(), move the call
+to just the array, and an explicit zeroing of the prior field.
 
-Lift all misbehaving __builtin_object_size() calls into the macros to
-bypass Clang's broken __builtin_object_size() arguments-of-an-inline
-visibility:
-https://github.com/ClangBuiltLinux/linux/issues/1401
-
-Thankfully, due to how the inlining already behaves in GCC, this change
-has no effect on GCC builds, but allows Clang to finally gain full
-FORTIFY coverage.
-
-However, because of a third bug which had no work-arounds, FORTIFY_SOURCE
-will only work with Clang version 13 and later. Update the Kconfig to
-reflect the new requirements.
-
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Qinglang Miao <miaoqinglang@huawei.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Hulk Robot <hulkci@huawei.com>
+Cc: Wang Wensheng <wangwensheng4@huawei.com>
+Cc: linuxppc-dev@lists.ozlabs.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Michael Ellerman <mpe@ellerman.id.au>
+Link: https://lore.kernel.org/lkml/87czqsnmw9.fsf@mpe.ellerman.id.au
 ---
- include/linux/fortify-string.h | 55 +++++++++++++++++++++-------------
- security/Kconfig               |  2 +-
- 2 files changed, 36 insertions(+), 21 deletions(-)
+ drivers/macintosh/smu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/fortify-string.h b/include/linux/fortify-string.h
-index 7de4673dfe2c..e62d3633a329 100644
---- a/include/linux/fortify-string.h
-+++ b/include/linux/fortify-string.h
-@@ -48,10 +48,10 @@ extern char *__underlying_strncpy(char *p, const char *q, __kernel_size_t size)
- #define __underlying_strncpy	__builtin_strncpy
- #endif
- 
--__FORTIFY_INLINE char *strncpy(char *p, const char *q, __kernel_size_t size)
-+#define strncpy(p, q, s) __fortify_strncpy(p, q, s, __builtin_object_size(p, 1))
-+__FORTIFY_INLINE char *__fortify_strncpy(char *p, const char *q,
-+					 __kernel_size_t size, size_t p_size)
- {
--	size_t p_size = __builtin_object_size(p, 1);
--
- 	if (__builtin_constant_p(size) && p_size < size)
- 		__write_overflow();
- 	if (p_size < size)
-@@ -71,9 +71,10 @@ __FORTIFY_INLINE char *strcat(char *p, const char *q)
- }
- 
- extern __kernel_size_t __real_strnlen(const char *, __kernel_size_t) __RENAME(strnlen);
--__FORTIFY_INLINE __kernel_size_t strnlen(const char *p, __kernel_size_t maxlen)
-+#define strnlen(p, s) __fortify_strnlen(p, s, __builtin_object_size(p, 1))
-+__FORTIFY_INLINE __kernel_size_t __fortify_strnlen(const char *p, size_t maxlen,
-+						   size_t p_size)
- {
--	size_t p_size = __builtin_object_size(p, 1);
- 	size_t p_len = __compiletime_strlen(p);
- 	size_t ret;
- 
-@@ -108,10 +109,14 @@ __FORTIFY_INLINE __kernel_size_t strlen(const char *p)
- 
- /* defined after fortified strlen to reuse it */
- extern size_t __real_strlcpy(char *, const char *, size_t) __RENAME(strlcpy);
--__FORTIFY_INLINE size_t strlcpy(char *p, const char *q, size_t size)
-+#define strlcpy(p, q, s) __fortify_strlcpy(p, q, s,			\
-+					   __builtin_object_size(p, 1),	\
-+					   __builtin_object_size(q, 1))
-+__FORTIFY_INLINE size_t __fortify_strlcpy(char *p, const char *q,
-+					  size_t size,
-+					  const size_t p_size,
-+					  const size_t q_size)
- {
--	size_t p_size = __builtin_object_size(p, 1);
--	size_t q_size = __builtin_object_size(q, 1);
- 	size_t q_len;	/* Full count of source string length. */
- 	size_t len;	/* Count of characters going into destination. */
- 
-@@ -135,12 +140,15 @@ __FORTIFY_INLINE size_t strlcpy(char *p, const char *q, size_t size)
- 
- /* defined after fortified strnlen to reuse it */
- extern ssize_t __real_strscpy(char *, const char *, size_t) __RENAME(strscpy);
--__FORTIFY_INLINE ssize_t strscpy(char *p, const char *q, size_t size)
-+#define strscpy(p, q, s) __fortify_strscpy(p, q, s,			\
-+					   __builtin_object_size(p, 1),	\
-+					   __builtin_object_size(q, 1))
-+__FORTIFY_INLINE ssize_t __fortify_strscpy(char *p, const char *q,
-+					   size_t size,
-+					   const size_t p_size,
-+					   const size_t q_size)
- {
- 	size_t len;
--	/* Use string size rather than possible enclosing struct size. */
--	size_t p_size = __builtin_object_size(p, 1);
--	size_t q_size = __builtin_object_size(q, 1);
- 
- 	/* If we cannot get size of p and q default to call strscpy. */
- 	if (p_size == (size_t) -1 && q_size == (size_t) -1)
-@@ -181,11 +189,13 @@ __FORTIFY_INLINE ssize_t strscpy(char *p, const char *q, size_t size)
- }
- 
- /* defined after fortified strlen and strnlen to reuse them */
--__FORTIFY_INLINE char *strncat(char *p, const char *q, __kernel_size_t count)
-+#define strncat(p, q, count)	__fortify_strncat(p, q, count, \
-+						  __builtin_object_size(p, 1), \
-+						  __builtin_object_size(q, 1))
-+__FORTIFY_INLINE char *__fortify_strncat(char *p, const char *q, size_t count,
-+					 size_t p_size, size_t q_size)
- {
- 	size_t p_len, copy_len;
--	size_t p_size = __builtin_object_size(p, 1);
--	size_t q_size = __builtin_object_size(q, 1);
- 
- 	if (p_size == (size_t)-1 && q_size == (size_t)-1)
- 		return __underlying_strncat(p, q, count);
-@@ -352,7 +362,8 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
- 		memmove)
- 
- extern void *__real_memscan(void *, int, __kernel_size_t) __RENAME(memscan);
--__FORTIFY_INLINE void *memscan(void *p, int c, __kernel_size_t size)
-+#define memscan(p, c, s) __fortify_memscan(p, c, s)
-+__FORTIFY_INLINE void *__fortify_memscan(void *p, int c, __kernel_size_t size)
- {
- 	size_t p_size = __builtin_object_size(p, 0);
- 
-@@ -363,7 +374,8 @@ __FORTIFY_INLINE void *memscan(void *p, int c, __kernel_size_t size)
- 	return __real_memscan(p, c, size);
- }
- 
--__FORTIFY_INLINE int memcmp(const void *p, const void *q, __kernel_size_t size)
-+#define memcmp(p, q, s) __fortify_memcmp(p, q, s)
-+__FORTIFY_INLINE int __fortify_memcmp(const void *p, const void *q, __kernel_size_t size)
- {
- 	size_t p_size = __builtin_object_size(p, 0);
- 	size_t q_size = __builtin_object_size(q, 0);
-@@ -379,7 +391,8 @@ __FORTIFY_INLINE int memcmp(const void *p, const void *q, __kernel_size_t size)
- 	return __underlying_memcmp(p, q, size);
- }
- 
--__FORTIFY_INLINE void *memchr(const void *p, int c, __kernel_size_t size)
-+#define memchr(p, c, s) __fortify_memchr(p, c, s)
-+__FORTIFY_INLINE void *__fortify_memchr(const void *p, int c, __kernel_size_t size)
- {
- 	size_t p_size = __builtin_object_size(p, 0);
- 
-@@ -391,7 +404,8 @@ __FORTIFY_INLINE void *memchr(const void *p, int c, __kernel_size_t size)
- }
- 
- void *__real_memchr_inv(const void *s, int c, size_t n) __RENAME(memchr_inv);
--__FORTIFY_INLINE void *memchr_inv(const void *p, int c, size_t size)
-+#define memchr_inv(p, c, s) __fortify_memchr_inv(p, c, s)
-+__FORTIFY_INLINE void *__fortify_memchr_inv(const void *p, int c, size_t size)
- {
- 	size_t p_size = __builtin_object_size(p, 0);
- 
-@@ -415,7 +429,8 @@ __FORTIFY_INLINE void *kmemdup(const void *p, size_t size, gfp_t gfp)
- }
- 
- /* Defined after fortified strlen to reuse it. */
--__FORTIFY_INLINE char *strcpy(char *p, const char *q)
-+#define strcpy(p, q) __fortify_strcpy(p, q)
-+__FORTIFY_INLINE char *__fortify_strcpy(char *p, const char *q)
- {
- 	size_t p_size = __builtin_object_size(p, 1);
- 	size_t q_size = __builtin_object_size(q, 1);
-diff --git a/security/Kconfig b/security/Kconfig
-index fe6c0395fa02..530a15566b1d 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -193,7 +193,7 @@ config FORTIFY_SOURCE
- 	depends on ARCH_HAS_FORTIFY_SOURCE
- 	# https://bugs.llvm.org/show_bug.cgi?id=50322
- 	# https://bugs.llvm.org/show_bug.cgi?id=41459
--	depends on !CC_IS_CLANG
-+	depends on !CC_IS_CLANG || CLANG_VERSION >= 130000
- 	help
- 	  Detect overflows of buffers in common string and memory functions
- 	  where the compiler can determine and validate the buffer sizes.
+diff --git a/drivers/macintosh/smu.c b/drivers/macintosh/smu.c
+index 94fb63a7b357..59ce431da7ef 100644
+--- a/drivers/macintosh/smu.c
++++ b/drivers/macintosh/smu.c
+@@ -848,7 +848,8 @@ int smu_queue_i2c(struct smu_i2c_cmd *cmd)
+ 	cmd->read = cmd->info.devaddr & 0x01;
+ 	switch(cmd->info.type) {
+ 	case SMU_I2C_TRANSFER_SIMPLE:
+-		memset(&cmd->info.sublen, 0, 4);
++		cmd->info.sublen = 0;
++		memset(&cmd->info.subaddr, 0, 3);
+ 		break;
+ 	case SMU_I2C_TRANSFER_COMBINED:
+ 		cmd->info.devaddr &= 0xfe;
 -- 
 2.30.2
 
