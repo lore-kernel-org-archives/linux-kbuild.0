@@ -2,118 +2,157 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FAF2C4320E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 192D3C4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC9FE60F35
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:18:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F156C61058
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:20:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238501AbhHRGS7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45666 "EHLO
+        id S238376AbhHRGVL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:21:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238205AbhHRGPz (ORCPT
+        with ESMTP id S238204AbhHRGU7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:15:55 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10AD0C0363EC
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:17 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id o10so1207607plg.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:17 -0700 (PDT)
+        Wed, 18 Aug 2021 02:20:59 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDA29C0610CC
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:16:48 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id e7so1163377pgk.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0i1or1K/1dFEzNVxMTz6RhSxVOT4OJeaz+0eeqAwhFA=;
-        b=Oe49+j/0UXJ7D4hLbrrauzW6DPsuwO4bSYSpu3MHYIR3JnaLRxc45VZexykTP0KNTs
-         TmDL4PviB0QbN/Io75LJ7Tfje5mipp/v9WFQqOm9o9gyYM1cBdhUbgEaldWedaWT60xS
-         qb7hM0nBEEpQtMj92w3cx9+esvngBsY/a4Otg=
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=qiIiGr/kHO0o1yd85XRx1S/oZrG0a2JVuYsGSPTdPKo=;
+        b=TVddYFx6MZtUu6Gxm5/eq0JnenoYTy2o0WAaLORc6h1rDy3BlAe2MfSQ47sEsZq8aI
+         rnkdVNPYX5ygc3HUGUQrRXKtNe8UxzUZbp49tIfPnQpFN+mMiPemA6Att138bqInZkIs
+         KMMMUh77ITc3FJ3DEFh+jNbzkZpixYigdra/M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=0i1or1K/1dFEzNVxMTz6RhSxVOT4OJeaz+0eeqAwhFA=;
-        b=GU41jU2iIvgc4bQeEbtdApvTAcMCM8XJBB+cmRWDnQLJd/9HuPdjpjlk41loRaiG2I
-         bvhTJk6ihZsB3T/YQ6juHqhKY8CBq7LpnTuHR+A6qGVdHzMIUZWwmKEEJEbNwJOkW1iE
-         j4neFllGSXqQYDgAqEz0ImqXpg0uJnMUqyecIBjMhdliKL2WfaVUal1GlqCUenspV3Dr
-         CVtpQbIGE+QJzRoTssrDo46pYGUyWnFfspoeS6ZLmfAbjW1YsxGWXQfCJTkxgL+QJGWD
-         tyCgzExD++hJ5n4kkI4n0AgbyrouFpEe8YDagTQh/BlggOmiyjLsDUIwR3I4I+IRjrmW
-         pUeg==
-X-Gm-Message-State: AOAM532uT4jz+/VbDad5V1uJMqBXmzW4AjAoG0rCqWeJwGpIEqVbNPxs
-        5zXwYfWfkhP11LsypHzvhbBTXg==
-X-Google-Smtp-Source: ABdhPJywwox1i7+sQwgOh5pOCbo+BOlEsPJIaFcHvRCzFKyYrKK09UqZit7+ggVQZGAHkMaYk9KLlg==
-X-Received: by 2002:a17:90a:17cc:: with SMTP id q70mr7609797pja.1.1629267256623;
-        Tue, 17 Aug 2021 23:14:16 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=qiIiGr/kHO0o1yd85XRx1S/oZrG0a2JVuYsGSPTdPKo=;
+        b=SDukQ3PNXfoSpWDAAeZwiQ/jqoUDojzlhSdB75aknrOcfxkNqhUYOa+Byd2dyv6Jvx
+         ddx4VYo0YGo9BnH1RkUpP+cOhFEoEzX4R9sXUlydfU0puqO6igpTyrkC7bX/mBanjjjH
+         B1nl18NUGoWFv4d+48z+BVK09On/r6jW7gbtPaC+o3OG/bquABHnkyNDhY2YNTuWruGs
+         dlB8ZUM8iraF8S1p+BAsodQ3NDAvg5Is86Dxfx8gc6c/CrnYLTzXSH5DJLnYEx9aqyl6
+         wb/eTG8hJkBVGM+xBkVjtYKbErqiXKB96xUmMLYf5CNO1A3s9frQZUyn2D9d6GQWKfu8
+         mnUQ==
+X-Gm-Message-State: AOAM533k+rV155j7Vgp46zFHgsFi/VdYEzFIM9dY278ZKd6sCHKVtN4E
+        TQw+n4HWWPfGlWgFJtafaXHKIg==
+X-Google-Smtp-Source: ABdhPJzejJTLjdMfXxVAJFIQjmpX7APIS6kpuwCjVMxxOkuNDs4SSrs+ZQmfcYcc43+NKU1r5qPLjQ==
+X-Received: by 2002:a63:5fcc:: with SMTP id t195mr7237993pgb.146.1629267408588;
+        Tue, 17 Aug 2021 23:16:48 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h17sm4603571pfh.192.2021.08.17.23.14.14
+        by smtp.gmail.com with ESMTPSA id l11sm4943382pfd.187.2021.08.17.23.16.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:14:15 -0700 (PDT)
+        Tue, 17 Aug 2021 23:16:48 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 23:16:47 -0700
 From:   Kees Cook <keescook@chromium.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Jes Sorensen <jes@trained-monkey.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, linux-hippi@sunsite.dk,
-        netdev@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+To:     Joe Perches <joe@perches.com>
+Cc:     linux-kernel@vger.kernel.org, Daniel Micay <danielmicay@gmail.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 41/63] net: 802: Use memset_startat() to clear struct fields
-Date:   Tue, 17 Aug 2021 23:05:11 -0700
-Message-Id: <20210818060533.3569517-42-keescook@chromium.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
-References: <20210818060533.3569517-1-keescook@chromium.org>
+Subject: Re: [PATCH 2/5] slab: Add __alloc_size attributes for better bounds
+ checking
+Message-ID: <202108172312.7032A3E@keescook>
+References: <20210818050841.2226600-1-keescook@chromium.org>
+ <20210818050841.2226600-3-keescook@chromium.org>
+ <f3e56f56c36b32dc76e174886008a2a1ecf3fefa.camel@perches.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1181; h=from:subject; bh=C+6KD7t/6fG5hDgRQb4fosYJ4WHPortotbK235WcI2o=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMn5oDen6ROCRtoOkoprqxOZyis1cM1QgeAkzRs Z+Yu9WKJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjJwAKCRCJcvTf3G3AJoehD/ 9r6K6SUsL5lVEdFegLY8K/qjemzJ8Qx2dDCwnIGOnbcI770wVd2gUkq+8bMIiGTpuHm8KLfXED/VPo XEYrAiSzdYDynkSQ5uT93DAcDJecWMvkl5cUZenRJ9e335MwzPk46WbpMY5lsvDG4LBrEYQUe3GB15 fZ8nYwjw5Q+FqdH31kVwt/2NSANrGxWmVtnNghwDYLKm0CqhmEc4kK70cmiOpl45EDBUWHjcVcHhtk +PEcSI8yUja1AxKpyhVTXYsFHlVN/kEk65BL8+8npbvCk63MR9WStzKhTbrb23jLFEg5yu8WATqERe o8xICyKNkMqYX8hCFs5pnjdeEKWUc2/FYepf6KI7RGfKkvKyE2n/BKKsZFKeZ181uCBiO/JcP0Pipn OHApybTpw2p4YCgPfp4IRYVXIyQaygaAotgvJzqZQbLI8E7vsFhH+rcgXzUijzLTAFpUblDhEwLI6b cBzYe+DkWVZ6Glc4eJvXZCjr/W7SxC+nlNR+56QP4XtDM7sC1Yi5QeYqjWqQLKsSmiJ1twc3nx9dtJ qai0woqnGDGFUMcP9v95DEMFbrsh44dGCjOIVocZ3STFgPzYzmTzvVvmCwlMPH+NaZaZZI/NgHQYpw aSEEIjABnuJlCZR3/gTlppRk49XP0ANcu3hytZpYQh0SZTdqnExuxHJTAJ6g==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <f3e56f56c36b32dc76e174886008a2a1ecf3fefa.camel@perches.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
+On Tue, Aug 17, 2021 at 10:31:32PM -0700, Joe Perches wrote:
+> On Tue, 2021-08-17 at 22:08 -0700, Kees Cook wrote:
+> > As already done in GrapheneOS, add the __alloc_size attribute for
+> > regular kmalloc interfaces, to provide additional hinting for better
+> > bounds checking, assisting CONFIG_FORTIFY_SOURCE and other compiler
+> > optimizations.
+> []
+> > diff --git a/include/linux/slab.h b/include/linux/slab.h
+> []
+> > @@ -181,7 +181,7 @@ int kmem_cache_shrink(struct kmem_cache *);
+> >  /*
+> >   * Common kmalloc functions provided by all allocators
+> >   */
+> > -void * __must_check krealloc(const void *, size_t, gfp_t);
+> > +void * __must_check krealloc(const void *, size_t, gfp_t) __alloc_size(2);
+> 
+> I suggest the __alloc_size attribute be placed at the beginning of the
+> function declaration to be more similar to the common __printf attribute
+> location uses.
 
-Use memset_startat() so memset() doesn't get confused about writing
-beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct.
+Yeah, any consistent ordering suggestions are welcome here; thank you!
+These declarations were all over the place, and trying to follow each
+slightly different existing style made my eyes hurt. :)
 
-Cc: Jes Sorensen <jes@trained-monkey.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-hippi@sunsite.dk
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- net/802/hippi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> __alloc_size(2)
+> void * __must_check krealloc(const void *, size_t, gfp_t);
+> 
+> I really prefer the __must_check to be with the other attribute and that
+> function declarations have argument names too like:
+> 
+> __alloc_size(2) __must_check
+> void *krealloc(const void *ptr, size_t size, gfp_t gfp);
 
-diff --git a/net/802/hippi.c b/net/802/hippi.c
-index f80b33a8f7e0..6f71ffc8bdd1 100644
---- a/net/802/hippi.c
-+++ b/net/802/hippi.c
-@@ -65,7 +65,7 @@ static int hippi_header(struct sk_buff *skb, struct net_device *dev,
- 	hip->le.src_addr_type	= 2;	/* 12 bit SC address */
- 
- 	memcpy(hip->le.src_switch_addr, dev->dev_addr + 3, 3);
--	memset(&hip->le.reserved, 0, 16);
-+	memset_startat(&hip->le, 0, reserved);
- 
- 	hip->snap.dsap		= HIPPI_EXTENDED_SAP;
- 	hip->snap.ssap		= HIPPI_EXTENDED_SAP;
+I'm happy with whatever makes the most sense.
+
+> but there are a _lot_ of placement of __must_check after the return type
+> 
+> Lastly __alloc_size should probably be added to checkpatch
+
+Oh, yes! Thanks for the reminder.
+
+> Maybe:
+> ---
+>  scripts/checkpatch.pl | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 161ce7fe5d1e5..1a166b5cf3447 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -489,7 +489,8 @@ our $Attribute	= qr{
+>  			____cacheline_aligned|
+>  			____cacheline_aligned_in_smp|
+>  			____cacheline_internodealigned_in_smp|
+> -			__weak
+> +			__weak|
+> +			__alloc_size\s*\(\s*\d+\s*(?:,\s*d+\s*){0,5}\)
+
+Why the "{0,5}" bit here? I was expecting just "?". (i.e. it can have
+either 1 or 2 arguments.)
+
+>  		  }x;
+>  our $Modifier;
+>  our $Inline	= qr{inline|__always_inline|noinline|__inline|__inline__};
+> 
+> 
+
 -- 
-2.30.2
-
+Kees Cook
