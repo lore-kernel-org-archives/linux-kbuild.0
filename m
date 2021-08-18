@@ -8,76 +8,74 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A646C4320E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7439C4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 515386108E
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3FBA6109E
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:07:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238789AbhHRGIO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44288 "EHLO
+        id S238602AbhHRGIP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:08:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238626AbhHRGHG (ORCPT
+        with ESMTP id S238619AbhHRGHG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 18 Aug 2021 02:07:06 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3FA1C0619FB
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:05:57 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id k24so1140007pgh.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:05:57 -0700 (PDT)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2B1C061144
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id w68so1059919pfd.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LapL5yxDWiBgMKBil8lhP+Lg9k+myZeJSwfalBUcUx8=;
-        b=EyV8N+h5/qyo62GfblZWCLiKR4eLvkF2lwBdydMvJLd79rKTZu8UshzV8ihU7RNjv0
-         rctTsHty3W+9m8LDSzHijAG+TC/Ts7wu5ImOI6E+4Ga8+rVEP+XxnN8jyVallKHpp5vX
-         +sqLYz4PaKZ6WvHaqEZR3B1UL1j8EZKOZFXvk=
+        bh=c3QYmodiWkXXXHnLZdw/pUaRbLmOUogtqxubemJOUWA=;
+        b=USSHyqJVpQWy8ZMzwl4EbGadTiH3HWAD5GKcye1LyreXSczSehLAnTCXNNAfVEOX6u
+         dbx790aQ5KW7gPDgQoMYSPQsAV043/8VAoFfABDnVXFQLnG8rP3OolrjSWEo9TPmmYPs
+         NckpHz6JjgIw87sGZSzScnstmZ3DWQOuxHRNI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LapL5yxDWiBgMKBil8lhP+Lg9k+myZeJSwfalBUcUx8=;
-        b=IWAXpRxw/XU2GaWcRcul5Tneys/PonNpn+eL3CnyuPv14RiiJ498Y/P+EE15/thx7T
-         IpyMh7NqmEUo4tT2BJ2ybS318uE4KuWHoOLnFy4gKEe292iE4RjXbuLR2eEBkhEz6VZh
-         UpDHvKPh7UqYZuxK2m3kZwOze7Eq/H5FV27NABd0620cDmYJ3YI4Rxg/NV0xXu1GnEMW
-         WPWZvMyM466jH+5Bgpbq8ennczZgmrA81KR+AbHIoVxk9lYX8Wfywcu/6TsfGdhr9Oqg
-         IZxhbBGUoqPkzJ54jcjYY7R3zo6Dm1uuF8leZP1GU+H1lIcnkLqtr0z1+Ruok1vz6HlU
-         wjAg==
-X-Gm-Message-State: AOAM531IdummjUmpDVuvE7u+b/unqiZJ1Yb1c/Cq/N+02oKavaXYlG4b
-        TszCsQ9+0OogsIPuzOyTrO9I7w==
-X-Google-Smtp-Source: ABdhPJzjIn36vE/ZNxQmXbOkL9OlqazGYoiVh/BsuZoov9E3aMeRGON42rz5oMitHJsTT64wX9Kjyg==
-X-Received: by 2002:a65:6a09:: with SMTP id m9mr7183122pgu.269.1629266757255;
-        Tue, 17 Aug 2021 23:05:57 -0700 (PDT)
+        bh=c3QYmodiWkXXXHnLZdw/pUaRbLmOUogtqxubemJOUWA=;
+        b=SMCzuT5GFfrro08vNvUAGDlh5K48+h1TzJ0QTUolHM77EUm5nLyKRuqYAbvane4hJw
+         MYzZFk52lmGomuRBwXfeIb4sqiqkr3DIlouvOgFO70GmWdQpOEs3ifDHC/BLcR95vr9V
+         fTnIJ3gpxVLWlOAfCsktgpeAxRJ0r24qWhvPsqRJXLrPR40+/zbkJvHH6UNmijV/AVgm
+         1YJaHv0iJSp4vk/PwU1ECIPHdnrr/u3viFp3M9mcOK2jRC7PptdvDTIRL7AhhLOBF0DP
+         Gx7L+HpHAwiHcJRZWS+Ebl1lZgrO1GW5OHdf3T6G6zLcy/Ath58gnPb4UWm8FlFHbC5x
+         Kr4Q==
+X-Gm-Message-State: AOAM531QmZmChuqKblwZT59XhRP2vbNxyjJ7mt5VHBl6EErPK3aO3CaC
+        AtmpcpZplgImZDEopKRCQRkZAA==
+X-Google-Smtp-Source: ABdhPJywRH9jCkWB+sdI8LV/t2Ou1DJCL47kcdyq5rETJ8QPkKXpqliLW+MKQDbreOWicfFnlLn7Kg==
+X-Received: by 2002:a63:ef12:: with SMTP id u18mr7200850pgh.331.1629266758150;
+        Tue, 17 Aug 2021 23:05:58 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id x12sm4588648pfu.21.2021.08.17.23.05.52
+        by smtp.gmail.com with ESMTPSA id c24sm5560285pgj.11.2021.08.17.23.05.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:05:53 -0700 (PDT)
+        Tue, 17 Aug 2021 23:05:57 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org,
+Cc:     Kees Cook <keescook@chromium.org>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        iommu@lists.linux-foundation.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 10/63] libertas: Use struct_group() for memcpy() region
-Date:   Tue, 17 Aug 2021 23:04:40 -0700
-Message-Id: <20210818060533.3569517-11-keescook@chromium.org>
+Subject: [PATCH v2 13/63] iommu/amd: Use struct_group() for memcpy() region
+Date:   Tue, 17 Aug 2021 23:04:43 -0700
+Message-Id: <20210818060533.3569517-14-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2964; h=from:subject; bh=G7UVOub35WzvknmEHL7Jl7Jxuvzi8CX0QzWk7fVBrqQ=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMgWGY2S69iC9ODdZ0M8ZsaWVpql5uriqr4eine F4MboIKJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIAAKCRCJcvTf3G3AJteQD/ 4r/L3852/rievd/HCtjIVJUoMOZz6SUoEoguqPYoCiczPpPpeKpJMB8uDD+k8S+pjXMuj6JicBICkI f2K0BDnJV4RbCkdpX2ThRmuC56nyfipIvGvFDigW3cXSGgwsbz+sMvZSBqlf3A1pleXAcEQPpEUoyC RaID84Ddzy1AYdiBi9pz6CgTIdaBUM1LkjP4wcrm0FoXf/cEt0LD4tmk4nHyV6lwvqed6AmtCyY9rU dkA6Dt54qMzRZnzJqBiq7ljl7L68N1be8kdp5LUpxq2Yyn0BE0ppZwnBgQtsTuzQfHJUcpTCLehjQ3 Danq5E5Wyx2wmZ7Dv35hsZ6+k0amIxW5DOQmts0adAHyTFUL3anYRSSQE/rKeQnfiedqVGfcZYGtUG U+uc+d0Zvs3Fa+Fx2t0fK0QcbvU90pwzNkIOW+T5Ohsw9d9Dq/azQaih3qPlTLdjjD8tLTboKMAaq0 hBeX108f8oS+tPAyr9Si5SDMTQ53AQcZXq5mYhf1zvsBBwERro7eooHHOnz7tjbQ/qKu4Si4UdGOjY 2oczS0+eITr2B5b9x+s3d/Ajm+ddM80FRaxskj0xOZ4KqteU578zDbWR6ZKyyOCWHiGHtWU56VNIpE IUv57AbMXBi9rAtXby90zuCBN5nHMWxPrySRevP8u1bKfuHgTRdHaYeaYxZg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1560; h=from:subject; bh=20A/+PUHWtthTe8z3o3iWDN4Pea8VoPXFbZDABJx3xk=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMgAqqlbIpZIBPs4khRtZS/Nl/a6SaswUJcEQdW lSBIpT+JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjIAAKCRCJcvTf3G3AJjFlD/ 9d5SSKFk/Byob7i8UcCVOb7iPk8Hi2YrJmknzLO1KIxaNkvuyEARZbq6e4B+T+TPepPhntcPKBfOXP FzeN5FXWJBzVyGoIzNGiCPh2WjsSRI106tmAJhcdyZYmVBcyeyjdu/N1w4oKdYAk4K9v7zjJqZe47b FRaeQAjBKc+4h21NGRtTPZDzSgeXabFrYbQBwUnsITGiIKiRbOWCcDGh1aIZNv6BQVD4Fgpe9isZog 0BCF6kfGofFSR3+EdUSEAaJY5GtmJoPQ5dltBc0m7OGIWYQaf0gwiedtUQd1gVD70DjbjWh3AlITFT Vf7P1sH6jk2mKWV2rZKVWibtUzQcLIXbdByJB+gXLflqIxjrUioE82UZxpX/cMIXbUJ+LVuXzllnFo 8nL/lrsLyasmOQKMZ7Hfx+H9y1Qtsx4Yi9Gf/d+PO5Yq2sV2urkcsqTblr1O674nNzPnTn3PqKHyZd OXFfw5XKgJ15ZpYPMmqOBTwA+1lyh2ypbwGLGTnQJZurT9iDDKnxhukSUEE4UmEgYep9iej5UlVsg1 cUbGoY51vQpCifPn0TF/vQv4ai8qMbObKYv7Xb/rqwe3jqgkYO7Xj97gKJUlXnAJ4bWiRMOFBvJI19 zdGfqZsTlEqTMGHOWNFvVFBQcZYVfy0VfPzdZMvR916KpKjQPu9DSR2qCvyw==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -88,73 +86,49 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memcpy(), memmove(), and memset(), avoid
 intentionally writing across neighboring fields.
 
-Use struct_group() in struct txpd around members tx_dest_addr_high
-and tx_dest_addr_low so they can be referenced together. This will
-allow memcpy() and sizeof() to more easily reason about sizes, improve
-readability, and avoid future warnings about writing beyond the end
-of queue_id.
+Use struct_group() in struct ivhd_entry around members ext and hidh, so
+they can be referenced together. This will allow memcpy() and sizeof()
+to more easily reason about sizes, improve readability, and avoid future
+warnings about writing beyond the end of ext.
 
-"pahole" shows no size nor member offset changes to struct txpd.
+"pahole" shows no size nor member offset changes to struct ivhd_entry.
 "objdump -d" shows no object code changes.
 
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: libertas-dev@lists.infradead.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: iommu@lists.linux-foundation.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/wireless/marvell/libertas/host.h | 10 ++++++----
- drivers/net/wireless/marvell/libertas/tx.c   |  5 +++--
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ drivers/iommu/amd/init.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/wireless/marvell/libertas/host.h b/drivers/net/wireless/marvell/libertas/host.h
-index dfa22468b14a..af96bdba3b2b 100644
---- a/drivers/net/wireless/marvell/libertas/host.h
-+++ b/drivers/net/wireless/marvell/libertas/host.h
-@@ -308,10 +308,12 @@ struct txpd {
- 	__le32 tx_packet_location;
- 	/* Tx packet length */
- 	__le16 tx_packet_length;
--	/* First 2 byte of destination MAC address */
--	u8 tx_dest_addr_high[2];
--	/* Last 4 byte of destination MAC address */
--	u8 tx_dest_addr_low[4];
-+	struct_group(tx_dest_addr,
-+		/* First 2 byte of destination MAC address */
-+		u8 tx_dest_addr_high[2];
-+		/* Last 4 byte of destination MAC address */
-+		u8 tx_dest_addr_low[4];
+diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+index bdcf167b4afe..70506d6175e9 100644
+--- a/drivers/iommu/amd/init.c
++++ b/drivers/iommu/amd/init.c
+@@ -121,8 +121,10 @@ struct ivhd_entry {
+ 	u8 type;
+ 	u16 devid;
+ 	u8 flags;
+-	u32 ext;
+-	u32 hidh;
++	struct_group(ext_hid,
++		u32 ext;
++		u32 hidh;
 +	);
- 	/* Pkt Priority */
- 	u8 priority;
- 	/* Pkt Trasnit Power control */
-diff --git a/drivers/net/wireless/marvell/libertas/tx.c b/drivers/net/wireless/marvell/libertas/tx.c
-index aeb481740df6..27304a98787d 100644
---- a/drivers/net/wireless/marvell/libertas/tx.c
-+++ b/drivers/net/wireless/marvell/libertas/tx.c
-@@ -113,6 +113,7 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	p802x_hdr = skb->data;
- 	pkt_len = skb->len;
+ 	u64 cid;
+ 	u8 uidf;
+ 	u8 uidl;
+@@ -1377,7 +1379,8 @@ static int __init init_iommu_from_acpi(struct amd_iommu *iommu,
+ 				break;
+ 			}
  
-+	BUILD_BUG_ON(sizeof(txpd->tx_dest_addr) != ETH_ALEN);
- 	if (priv->wdev->iftype == NL80211_IFTYPE_MONITOR) {
- 		struct tx_radiotap_hdr *rtap_hdr = (void *)skb->data;
+-			memcpy(hid, (u8 *)(&e->ext), ACPIHID_HID_LEN - 1);
++			BUILD_BUG_ON(sizeof(e->ext_hid) != ACPIHID_HID_LEN - 1);
++			memcpy(hid, &e->ext_hid, ACPIHID_HID_LEN - 1);
+ 			hid[ACPIHID_HID_LEN - 1] = '\0';
  
-@@ -124,10 +125,10 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		pkt_len -= sizeof(*rtap_hdr);
- 
- 		/* copy destination address from 802.11 header */
--		memcpy(txpd->tx_dest_addr_high, p802x_hdr + 4, ETH_ALEN);
-+		memcpy(&txpd->tx_dest_addr, p802x_hdr + 4, ETH_ALEN);
- 	} else {
- 		/* copy destination address from 802.3 header */
--		memcpy(txpd->tx_dest_addr_high, p802x_hdr, ETH_ALEN);
-+		memcpy(&txpd->tx_dest_addr, p802x_hdr, ETH_ALEN);
- 	}
- 
- 	txpd->tx_packet_length = cpu_to_le16(pkt_len);
+ 			if (!(*hid)) {
 -- 
 2.30.2
 
