@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92128C432BE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D1EC4338F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 766C660FDA
-	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD17960F35
+	for <linux-kbuild@archiver.kernel.org>; Wed, 18 Aug 2021 06:17:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240456AbhHRGRf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 02:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45494 "EHLO
+        id S239729AbhHRGRp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 02:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238694AbhHRGQ3 (ORCPT
+        with ESMTP id S238265AbhHRGQt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:16:29 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB96FC08EE26
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:22 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id n12so1157013plf.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:22 -0700 (PDT)
+        Wed, 18 Aug 2021 02:16:49 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34B3C028C14
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id om1-20020a17090b3a8100b0017941c44ce4so8203794pjb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=1LbbD/YHfDVHNeuHjhgxvKcBP+1WtTwantiuN7hQzxQ=;
-        b=R/1OtHvoHrsgMZo2li12wNTYlU4PYGAodCOD+bIgq6ChwHsHKH49ggQITGRp9klOcT
-         hhN+gn1T653COGeLJn51yUwjbH33XbTplN3tsZd0bxePCyRVYpIOaD3v9sb70h6Hkjpp
-         /6QSomg4XXw8M4XDn0+BhJ3006b/HlyORx8ko=
+        bh=Hcl1ccbFJs4ud/H3xoT9ZSR2o1n+o5k4Vuh9ApRTkZE=;
+        b=X+6d81/MvLfT3RwS/Jq3LliSZFdydCpZduBL+K5p5bTjFlP//w2o7lGFMk764ByK2j
+         4XbCrV8JHtasAStK7sUNoD/ilVbmVoDcq6+ER+OvyegySoWauDTXTIy6SbVa851KB7Q1
+         KUnRDP7SH/0Kg/x5GtujVKZ0O006edjI9Mme8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1LbbD/YHfDVHNeuHjhgxvKcBP+1WtTwantiuN7hQzxQ=;
-        b=jVOSf29+6lE0ihH4pIqOrRi4gZtxedqCTkuvM4CBifEZaCEyZhXpHlVWAyxFp91Cma
-         U705sz0qhM2A6TSgNIKMHrPsucWVptaFtREpWG9WGUuFiN2RJ8Ro71przYfbZ4Y3j2Lu
-         K8tDFmfooSvbYtNRPZ72/7rosGEM8IRIk7wwOLL2VUKptY66NJjRdcA4aPJFANabLD0y
-         Dm95tKdecGoZ+lSoEvAVHnRvp2goz52uJe4MhRwZOfwgPyLyADwCbQSUMskSPJIuUG5s
-         QjujaooXaRReXIIlUPFx3bevyv/HExWXClqZSpyPNp34qrbVGFu3AbF4DPYHVEzyHnnJ
-         /kiQ==
-X-Gm-Message-State: AOAM532ezXSTYeAp2rndBgSCEN4nUiUBhYluOECLJgDIe76fFUwKcxMa
-        xzvSshpzBbtlkWMZ+3Vn4ig5lg==
-X-Google-Smtp-Source: ABdhPJyKMEAVPHsuvTX9JdA/U10JiK4He7DVLG9xhnHdmIIqBLdqt2XQeH2Vwwj2NzeOu2ek31vsog==
-X-Received: by 2002:a17:90b:360a:: with SMTP id ml10mr7562259pjb.134.1629267262532;
-        Tue, 17 Aug 2021 23:14:22 -0700 (PDT)
+        bh=Hcl1ccbFJs4ud/H3xoT9ZSR2o1n+o5k4Vuh9ApRTkZE=;
+        b=YCg/4NBFJGleWNmbHSkIc0bFpNPA6n9rB7ULwyvoG9HzHTNLzSdoVdhGsFS6AH7hpa
+         YT5L3j9vn2a8sDCnCQj+wg/qDWES5VedKULdEkPtrN5hkboHhmtFUcCcR/O2yfBseqvV
+         GD7+deGj8VnWRCoGx1tRWo4om7M5QP2vJuY3RPeBnlxxtgeMsg99D87BK9PBT5O9ceAg
+         Kp71L5MYOwUtNGfOYeGK2jigYvrOEIQCBXWYrzIIfN8mOSboCAQ020ruhAkmIv4XALaz
+         IlBddy8unwsBslVTt8gK9lE68Fn/CSzsEhT1HrX6go9eyCcMQJb/sABWW++DHsZAfFo+
+         Nimw==
+X-Gm-Message-State: AOAM5308DZEGLm5y3CM/Jz61eSD32zMApIZ1WYonMYtSsFDkzLfZ90jV
+        xnauvVHLpAPcGAdxTUvQij6Mrw==
+X-Google-Smtp-Source: ABdhPJyVdGO+k0ZXLSuBZU6Emb1T8tVPxMBOZys/2ngcwdzE26txO/yjwg2d2fDStsZ38dVCxGAyrA==
+X-Received: by 2002:a17:90b:2313:: with SMTP id mt19mr7827471pjb.230.1629267265564;
+        Tue, 17 Aug 2021 23:14:25 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id m2sm4664262pfo.45.2021.08.17.23.14.19
+        by smtp.gmail.com with ESMTPSA id j23sm3858038pjn.12.2021.08.17.23.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Aug 2021 23:14:21 -0700 (PDT)
 From:   Kees Cook <keescook@chromium.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, linux-rdma@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH v2 44/63] mac80211: Use memset_after() to clear tx status
-Date:   Tue, 17 Aug 2021 23:05:14 -0700
-Message-Id: <20210818060533.3569517-45-keescook@chromium.org>
+Subject: [PATCH v2 56/63] RDMA/mlx5: Use struct_group() to zero struct mlx5_ib_mr
+Date:   Tue, 17 Aug 2021 23:05:26 -0700
+Message-Id: <20210818060533.3569517-57-keescook@chromium.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
 References: <20210818060533.3569517-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3555; h=from:subject; bh=jIEORg6wH0RDOzc/SbRhmDjozuh0HKi5XMaIwXi52DY=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMn1+XywUWgPufzSUanBKkFtpljUhjVl6XdrCJz 43V0wceJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjJwAKCRCJcvTf3G3AJh5OD/ 9VdGJw1yYkd3gefk4A5UR8RKWnRGhCsbm09zznQ7YsRWg1t+N+YFLA4AFq3FqxFeqDG3jzMNoOsdTO L6w9PUmC/a9IT1z+It5L++wcgxo3uVfAxiDShSCXzCwqbKDVcSrgSTJgJPulz8y1znwvAOPKF64eH0 pSX5zFI6NJwx/mf9nIe+nz9g6VrdmWmHR7mcVM4AIklt7/5RSv325yrDnFLwAyB9rv4exDMh6Egpxj 8sF1D3Pa6Be8GmmXNM7DKo1oqmwnfhplZxkHPfRIFSXVTYwQNGJUx7dCkZsOWVIcy3w6u50Y0mU9DG A+XMuV8TDHlOIEIwtbJKGnvgGkIhTldX5Wd95E/0PKvT9wVgxcTgJUCXhO6V/PfeIWGU6PnZ849Td8 U6ZP5aiyGS6/WCMJuj0tczg2lozZzkge3SUEkNnYtQCKUr1vHrynm7rYVjMrIIvJG275gaGz60NbGE 67lI4Kcj/LGkuEZPVVCVwWeIwkVBaqWNe+W2D/Gs/U7WC+8+e2X7y7YmCXoJhak0Jjoz1KHL2NKG3c 7CTZmKih3SVwYKmzxvKgHmp8I/RljMKmk4PyeSMncOwCjk5UYHvkRAslkthRz0xs54C82JmN6NSLCC Y8i9yUKlOEZkCSxm3fC3nvo3ctL36pHA5wrQEu1m/IneouARaiIxI65dilNg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1421; h=from:subject; bh=VDjxwOfX2cjaEibL8dkCGTlxM9AleppD3q/+715fBPc=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMq8O5UKAKpb/rvp5Y2SurRHZONXPPy2R7JrBHQ 07WmcZaJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJqH3D/ 4gNGySY8SCnjrDzEUM7CyrdchqF//a5m2rqxinozby7V9IS5+ycLOFfGvEx1AbtsgpvkKu6IjRZUA5 U67OxhqHOeDoB2W0JrzMD4ZiEf7aeNYRL/FcCw1nfsLjyJUn/7TFORuKQzen2TzINw05zF7xASgg/i xaqv+EuCKtewRoiXcWah1s7jrT1+hp4WtAkQzn/+YaIOVXblb9eHzxMGHhaGDiVNUWryg50fZiOvzo syChMqPaE84IoJx1X3nrdGMbSgJMU0FmsGXcNzY1ouOxqnAlCdt78oxn0N/v+Iddyi/oJlPfrrkCFW zTE3FtjwfhE243hFenyrDn/NEq85myRaQoC3GPPw9uiO1gSwK5OxTciBWBWEY9hT8f55X/K1hRf7Dx z/+mVftkYQIBCPASioBF7UrH+t8vHnUbHcJrYUXmmKNFE8Ki+9oeB0OLJaSo/Yw6PdoabOW4EplCRJ oGAyyzxgxgNTQUYlJOMczrc1z9W3IFlWitdqcPrmsHApkLxRvze0yN1bBp2+BP8kp5Sul0WwUPwAOF gCblqx3UOeJuqqaMUUha9/HfetNzO8oyaLg80znWlEWSXZcMWHgubHnQLVPMv7nqUCEbhdDoN09B46 k0l6F+LB0Ns/6YfKNGhM3NCkF2iuaqgxu0NW66r4tv309D5se4J8ucLMUhmQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -87,87 +87,45 @@ In preparation for FORTIFY_SOURCE performing compile-time and run-time
 field bounds checking for memset(), avoid intentionally writing across
 neighboring fields.
 
-Use memset_after() so memset() doesn't get confused about writing
-beyond the destination member that is intended to be the starting point
-of zeroing through the end of the struct.
+Add struct_group() to mark region of struct mlx5_ib_mr that should be
+initialized to zero.
 
-Additionally fix the common helper, ieee80211_tx_info_clear_status(),
-which was not clearing ack_signal, but the open-coded versions
-did. Johannes Berg points out this bug was introduced by commit
-e3e1a0bcb3f1 ("mac80211: reduce IEEE80211_TX_MAX_RATES") but was harmless.
-
-Also drops the associated unneeded BUILD_BUG_ON()s, and adds a note to
-carl9170 about usage.
-
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Doug Ledford <dledford@redhat.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-rdma@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/wireless/ath/carl9170/tx.c   | 11 +++++------
- drivers/net/wireless/intersil/p54/txrx.c |  6 +-----
- include/net/mac80211.h                   |  7 +------
- 3 files changed, 7 insertions(+), 17 deletions(-)
+ drivers/infiniband/hw/mlx5/mlx5_ib.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/ath/carl9170/tx.c b/drivers/net/wireless/ath/carl9170/tx.c
-index 88444fe6d1c6..aa95d1a65882 100644
---- a/drivers/net/wireless/ath/carl9170/tx.c
-+++ b/drivers/net/wireless/ath/carl9170/tx.c
-@@ -275,12 +275,11 @@ static void carl9170_tx_release(struct kref *ref)
- 	if (WARN_ON_ONCE(!ar))
- 		return;
+diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+index bf20a388eabe..f63bf204a7a1 100644
+--- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
++++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
+@@ -644,6 +644,7 @@ struct mlx5_ib_mr {
+ 	struct ib_umem *umem;
  
--	BUILD_BUG_ON(
--	    offsetof(struct ieee80211_tx_info, status.ack_signal) != 20);
--
--	memset(&txinfo->status.ack_signal, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ack_signal));
-+	/*
-+	 * Should this call ieee80211_tx_info_clear_status() instead of clearing
-+	 * manually? txinfo->status.rates do not seem to be used here.
-+	 */
-+	memset_after(&txinfo->status, 0, rates);
+ 	/* This is zero'd when the MR is allocated */
++	struct_group(cleared,
+ 	union {
+ 		/* Used only while the MR is in the cache */
+ 		struct {
+@@ -691,12 +692,13 @@ struct mlx5_ib_mr {
+ 			bool is_odp_implicit;
+ 		};
+ 	};
++	);
+ };
  
- 	if (atomic_read(&ar->tx_total_queued))
- 		ar->tx_schedule = true;
-diff --git a/drivers/net/wireless/intersil/p54/txrx.c b/drivers/net/wireless/intersil/p54/txrx.c
-index 873fea59894f..8414aa208655 100644
---- a/drivers/net/wireless/intersil/p54/txrx.c
-+++ b/drivers/net/wireless/intersil/p54/txrx.c
-@@ -431,11 +431,7 @@ static void p54_rx_frame_sent(struct p54_common *priv, struct sk_buff *skb)
- 	 * Clear manually, ieee80211_tx_info_clear_status would
- 	 * clear the counts too and we need them.
- 	 */
--	memset(&info->status.ack_signal, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ack_signal));
--	BUILD_BUG_ON(offsetof(struct ieee80211_tx_info,
--			      status.ack_signal) != 20);
-+	memset_after(&info->status, 0, rates);
- 
- 	if (entry_hdr->flags & cpu_to_le16(P54_HDR_FLAG_DATA_ALIGN))
- 		pad = entry_data->align[0];
-diff --git a/include/net/mac80211.h b/include/net/mac80211.h
-index d8a1d09a2141..4c469b04de37 100644
---- a/include/net/mac80211.h
-+++ b/include/net/mac80211.h
-@@ -1197,12 +1197,7 @@ ieee80211_tx_info_clear_status(struct ieee80211_tx_info *info)
- 	/* clear the rate counts */
- 	for (i = 0; i < IEEE80211_TX_MAX_RATES; i++)
- 		info->status.rates[i].count = 0;
--
--	BUILD_BUG_ON(
--	    offsetof(struct ieee80211_tx_info, status.ack_signal) != 20);
--	memset(&info->status.ampdu_ack_len, 0,
--	       sizeof(struct ieee80211_tx_info) -
--	       offsetof(struct ieee80211_tx_info, status.ampdu_ack_len));
-+	memset_after(&info->status, 0, rates);
+ /* Zero the fields in the mr that are variant depending on usage */
+ static inline void mlx5_clear_mr(struct mlx5_ib_mr *mr)
+ {
+-	memset(mr->out, 0, sizeof(*mr) - offsetof(struct mlx5_ib_mr, out));
++	memset(&mr->cleared, 0, sizeof(mr->cleared));
  }
  
- 
+ static inline bool is_odp_mr(struct mlx5_ib_mr *mr)
 -- 
 2.30.2
 
