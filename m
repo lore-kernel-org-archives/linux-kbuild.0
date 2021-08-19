@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1703C4320E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A5C4320A
 	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB3FE608FE
+	by mail.kernel.org (Postfix) with ESMTP id 883E9610E8
 	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235348AbhHSA7W (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:59:22 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60441 "EHLO
+        id S235265AbhHSA7V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:59:21 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60449 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234903AbhHSA7T (ORCPT
+        with ESMTP id S234824AbhHSA7T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 18 Aug 2021 20:59:19 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4w017219;
-        Thu, 19 Aug 2021 09:57:55 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4w017219
+        by conuserg-10.nifty.com with ESMTP id 17J0vl4s017219;
+        Thu, 19 Aug 2021 09:57:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4s017219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334676;
-        bh=DBA8ZODOzf9FIJUCzgtveE3U7Vc1g/1uNw8IkUnWotA=;
+        s=dec2015msa; t=1629334673;
+        bh=DRNxRpsX6v3sRE7LHBWEe79xZacYol4xWprhfU+M1UA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZXUUkbuBCSKhb65cp9SgZO4y+MbX/32WwqLo0fgIfMyOQUtycS0slYvSfAzCMTGlQ
-         69XBqEkXYXwEbFFDXPVrMUK2JYWfl1k3pMlQe7IQ6etIR2lEHIYhOcnRZp8q/hR79g
-         z90vxOQ/DQf4dhb+5Hf/q1GuZ+hUAaeDDd5NZsPjJKzlQ92N1l9+hueH/Sxi5QIDz1
-         G0C8fyL70jOQ3HM0jNx37c6v6nNBiSPtMPYUuwjMDqwRihhzBWWozFldEqcqjYvqRw
-         GpQl3ykOEAjh/hRczX8tezeAYWTumXeMO3PuG9tITuSXAm9jNDq7PzOU/wpWfnEWQb
-         oqkIX1X1tGc0A==
+        b=jOnXaT2WSYXbNGjHay06GAvXr51PfP53DEAuQ3FHoTE59dG1gSyFgN9qA0lbgDFEU
+         VQ7sO6Wf12xYo0q4SbFXnQpc5syEHmoCYy9/swu9eO3BBdj8C2wueJ7N5qh4kzhZRu
+         lC1HOoYfK6JzPbxTbrd2erEIdCCxAzL2GtOsmiMxU7juMiXC986PaIcBwzS40DoorT
+         82cGvQHr3lVVMQ95ezUIbLrwzXA5+us0je2uFeFVZr3/kb4WHtylSyoEp0yKvs5ymv
+         QIt3pfx4kEeU6tdY/B75R1+a4+rgGwgEym7n6RoT7/7EJ1/ooQjtt0SOB7SV+CSr3V
+         cgCNZ3cFSgrJg==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 13/13] kbuild: merge cmd_ar_builtin and cmd_ar_module
-Date:   Thu, 19 Aug 2021 09:57:44 +0900
-Message-Id: <20210819005744.644908-14-masahiroy@kernel.org>
+Subject: [PATCH 09/13] kbuild: do not create built-in.a.symversions or lib.a.symversions
+Date:   Thu, 19 Aug 2021 09:57:40 +0900
+Message-Id: <20210819005744.644908-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
 References: <20210819005744.644908-1-masahiroy@kernel.org>
@@ -54,76 +54,87 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The difference between cmd_ar_builtin and cmd_ar_module is the
-'[M]' in the short log.
+Merge all *.o.symversions in scripts/link-vmlinux.sh instead of
+merging them in the unit of built-in.a or lib.a.
 
-Merge them into cmd_ar_thin.
-
-$(quiet_modtag) is expanded to '[M]' when it is merging module objects.
+This is a preparation for further code cleanups.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build | 12 +++---------
- scripts/Makefile.lib   |  5 ++++-
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ scripts/Makefile.build  | 10 ++--------
+ scripts/link-vmlinux.sh | 22 ++++++++++++++++++----
+ 2 files changed, 20 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 97392c26ebd7..17ce37c3eceb 100644
+index 585dae34746a..37d6f6da34d6 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -370,11 +370,8 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- # Rule to compile a set of .o files into one .a file (without symbol table)
- #
+@@ -430,11 +430,8 @@ endif
+ quiet_cmd_ar_builtin = AR      $@
+       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
  
--quiet_cmd_ar_builtin = AR      $@
--      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+-quiet_cmd_ar_and_symver = AR      $@
+-      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
 -
  $(obj)/built-in.a: $(real-obj-y) FORCE
--	$(call if_changed,ar_builtin)
-+	$(call if_changed,ar_thin)
+-	$(call if_changed,ar_and_symver)
++	$(call if_changed,ar_builtin)
  
  #
  # Rule to create modules.order file
-@@ -434,14 +431,11 @@ cmd_ld_o_a += ; $(objtool) $(objtool_args) --module $@
- endif
- endif
- 
--quiet_cmd_ar_module = AR [M]  $@
--      cmd_ar_module = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+@@ -454,11 +451,8 @@ $(obj)/modules.order: $(obj-m) FORCE
+ #
+ # Rule to compile a set of .o files into one .a file (with symbol table)
+ #
+-quiet_cmd_ar_lib = AR      $@
+-      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
 -
- $(modules-single): %.a: %.o FORCE
--	$(call if_changed,ar_module)
-+	$(call if_changed,ar_thin)
+ $(obj)/lib.a: $(lib-y) FORCE
+-	$(call if_changed,ar_lib)
++	$(call if_changed,ar)
  
- $(modules-multi): FORCE
--	$(call if_changed,ar_module)
-+	$(call if_changed,ar_thin)
- $(call multi_depend, $(modules-multi), .a, -objs -y -m)
+ # NOTE:
+ # Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index d74cee5c4326..17976609c2d8 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -52,6 +52,13 @@ gen_initcalls()
+ 		> .tmp_initcalls.lds
+ }
  
- targets += $(modules-single) $(modules-multi)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index f604d2d01cad..bd71a7d6fbc1 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -198,7 +198,7 @@ _cpp_flags += -I $(srctree)/$(src) -I $(objtree)/$(obj)
- endif
- endif
- 
--part-of-module = $(if $(filter $(basename $@).o, $(real-obj-m)),y)
-+part-of-module = $(if $(filter $(basename $@).o, $(real-obj-m) $(obj-m)),y)
- quiet_modtag = $(if $(part-of-module),[M],   )
- 
- modkern_cflags =                                          \
-@@ -276,6 +276,9 @@ quiet_cmd_ld = LD      $@
- quiet_cmd_ar = AR      $@
-       cmd_ar = rm -f $@; $(AR) cDPrsT $@ $(real-prereqs)
- 
-+quiet_cmd_ar_thin = AR $(quiet_modtag)  $@
-+      cmd_ar_thin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
++append_symversion()
++{
++	if [ -f ${1}.symversions ]; then
++		cat ${1}.symversions >> .tmp_symversions.lds
++	fi
++}
 +
- # Objcopy
- # ---------------------------------------------------------------------------
+ # If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
+ # .tmp_symversions.lds
+ gen_symversions()
+@@ -59,10 +66,17 @@ gen_symversions()
+ 	info GEN .tmp_symversions.lds
+ 	rm -f .tmp_symversions.lds
+ 
+-	for o in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
+-		if [ -f ${o}.symversions ]; then
+-			cat ${o}.symversions >> .tmp_symversions.lds
+-		fi
++	for a in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
++		case $a in
++		*.a)
++			for o in $(${AR} t ${a}); do
++				append_symversion ${o}
++			done
++			;;
++		*)
++			append_symversion ${a}
++			;;
++		esac
+ 	done
+ }
  
 -- 
 2.30.2
