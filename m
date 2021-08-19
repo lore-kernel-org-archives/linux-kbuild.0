@@ -2,201 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD87BC4338F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D2EFC4320E
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 01:11:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97C33610E9
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00E61610FA
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 01:11:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235517AbhHSA7e (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:59:34 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60780 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234824AbhHSA7a (ORCPT
+        id S234322AbhHSBLl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 21:11:41 -0400
+Received: from smtprelay0120.hostedemail.com ([216.40.44.120]:41386 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232954AbhHSBLk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 20:59:30 -0400
-Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4u017219;
-        Thu, 19 Aug 2021 09:57:54 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4u017219
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334674;
-        bh=xt2zcw+pYyWVZAgR/pWyQdOfFm5v/zBCFRnsJjm5W+g=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EVYycanf/Px0e8PoW2lFFed+KqN6sn0XjbLd8Th2HUihUtpB6zedb+tpPNmmT/lYv
-         tMZX+fLiLAEENxxda+NsCARijTUPMaLjSMYXvZnZwktFU8n/GTN6rAQX9k/B27eQLH
-         J2Fibx45GU7V/8SPWcjqaoCCuWzwgT4Oe+FGCY2oeUzAfa2xUU+e3DbdOza5RNS3G0
-         eqw6kSPoyHg1igdZt/nfl5CGlDMqS5NTc5xylz3I7k44EQdEGGxEpOEKmo9SeTn2Fv
-         PBOQNxKjKTDcAPWlE0zU4fojAfKtNHC/WVeLDGZr+wORuPXvXR/6CumwUEb9pYtytJ
-         /z5GcTXvUZRAA==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Sami Tolvanen <samitolvanen@google.com>,
-        linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
+        Wed, 18 Aug 2021 21:11:40 -0400
+Received: from omf03.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay07.hostedemail.com (Postfix) with ESMTP id 204F81847717B;
+        Thu, 19 Aug 2021 01:11:04 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf03.hostedemail.com (Postfix) with ESMTPA id 2393B13D96;
+        Thu, 19 Aug 2021 01:10:59 +0000 (UTC)
+Message-ID: <3a0c55a3fabc57ce9771c93499ef19327f3b8621.camel@perches.com>
+Subject: Re: [PATCH 2/5] slab: Add __alloc_size attributes for better bounds
+ checking
+From:   Joe Perches <joe@perches.com>
+To:     Matthew Wilcox <willy@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        linux-doc <linux-doc@vger.kernel.org>
+Cc:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
+        Daniel Micay <danielmicay@gmail.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
+        Miguel Ojeda <ojeda@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH 11/13] kbuild: always postpone CRC links for module versioning
-Date:   Thu, 19 Aug 2021 09:57:42 +0900
-Message-Id: <20210819005744.644908-12-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
-References: <20210819005744.644908-1-masahiroy@kernel.org>
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+Date:   Wed, 18 Aug 2021 18:10:57 -0700
+In-Reply-To: <YR2lexDd9N0sWxIW@casper.infradead.org>
+References: <20210818050841.2226600-1-keescook@chromium.org>
+         <20210818050841.2226600-3-keescook@chromium.org>
+         <f3e56f56c36b32dc76e174886008a2a1ecf3fefa.camel@perches.com>
+         <YR2lexDd9N0sWxIW@casper.infradead.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.0-1 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Stat-Signature: 8qe6xyoy57bos6zsdrn7c1ahwobp3eqw
+X-Rspamd-Server: rspamout03
+X-Rspamd-Queue-Id: 2393B13D96
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18uoPU/elFRF3Nb3Gx5R4/gAdoN63UF+n4=
+X-HE-Tag: 1629335459-615253
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When CONFIG_MODVERSIONS=y, the CRCs of EXPORT_SYMBOL are linked into
-*.o files in-place.
+On Thu, 2021-08-19 at 01:27 +0100, Matthew Wilcox wrote:
+> On Tue, Aug 17, 2021 at 10:31:32PM -0700, Joe Perches wrote:
+> > Lastly __alloc_size should probably be added to checkpatch
+> > 
+> > Maybe:
+> > ---
+> >  scripts/checkpatch.pl | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+[]
+> > @@ -489,7 +489,8 @@ our $Attribute	= qr{
+> >  			____cacheline_aligned|
+> >  			____cacheline_aligned_in_smp|
+> >  			____cacheline_internodealigned_in_smp|
+> > -			__weak
+> > +			__weak|
+> > +			__alloc_size\s*\(\s*\d+\s*(?:,\s*d+\s*){0,5}\)
+> 
+> Should probably be added to kernel-doc as well.  Any other awful regexes
+> that need to be changed to understand it?  And can we commonise the
+> regexes that do exist into a perl helper library?
 
-It is impossible for Clang LTO because *.o files are not ELF, but LLVM
-bitcode. The CRCs are stored in separate *.symversions files, and then
-supplied to the modpost link.
+probably, but there would need to be some library work done and
+changes made to both utilities so they could use the same $helpers.
 
-Let's do so for CONFIG_LTO_CLANG=n is possible, and unify the module
-versioning code.
+And there are several nominally incomplete regexes already in
+kernel-doc and I'm not at all familiar with kernel-doc.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+e.g.: kernel-doc has:
 
- scripts/Makefile.build  | 32 ++++++--------------------------
- scripts/link-vmlinux.sh | 22 ++++++++++++++--------
- 2 files changed, 20 insertions(+), 34 deletions(-)
+my $attribute = qr{__attribute__\s*\(\([a-z0-9,_\*\s\(\)]*\)\)}i;
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 957addea830b..874e84a1f3fc 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -158,17 +158,12 @@ quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
- ifdef CONFIG_MODVERSIONS
- # When module versioning is enabled the following steps are executed:
- # o compile a <file>.o from <file>.c
--# o if <file>.o doesn't contain a __ksymtab version, i.e. does
--#   not export symbols, it's done.
-+# o if <file>.o doesn't contain __ksymtab* symbols, i.e. does
-+#   not export symbols, create an empty *.symversions
- # o otherwise, we calculate symbol versions using the good old
- #   genksyms on the preprocessed source and postprocess them in a way
- #   that they are usable as a linker script
--# o generate .tmp_<file>.o from <file>.o using the linker to
--#   replace the unresolved symbols __crc_exported_symbol with
--#   the actual value of the checksum generated by genksyms
--# o remove .tmp_<file>.o to <file>.o
- 
--ifdef CONFIG_LTO_CLANG
- # Generate .o.symversions files for each .o with exported symbols, and link these
- # to the kernel and/or modules at the end.
- cmd_modversions_c =								\
-@@ -178,18 +173,6 @@ cmd_modversions_c =								\
- 	else									\
- 		rm -f $@.symversions;						\
- 	fi;
--else
--cmd_modversions_c =								\
--	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
--		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
--		    > $(@D)/.tmp_$(@F:.o=.ver);					\
--										\
--		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
--			-T $(@D)/.tmp_$(@F:.o=.ver);				\
--		mv -f $(@D)/.tmp_$(@F) $@;					\
--		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
--	fi
--endif
- endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
-@@ -348,12 +331,9 @@ ifdef CONFIG_ASM_MODVERSIONS
- cmd_modversions_S =								\
- 	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
- 		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
--		    > $(@D)/.tmp_$(@F:.o=.ver);					\
--										\
--		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
--			-T $(@D)/.tmp_$(@F:.o=.ver);				\
--		mv -f $(@D)/.tmp_$(@F) $@;					\
--		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
-+		    > $@.symversions;						\
-+	else									\
-+		rm -rf $@.symversions;						\
- 	fi
- endif
- 
-@@ -424,7 +404,7 @@ $(obj)/lib.a: $(lib-y) FORCE
- # Rule to prelink modules
- #
- 
--ifeq ($(CONFIG_LTO_CLANG) $(CONFIG_MODVERSIONS),y y)
-+ifdef CONFIG_MODVERSIONS
- 
- cmd_merge_symver =					\
- 	rm -f $@;					\
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 17976609c2d8..66ced6ff8e65 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -59,8 +59,7 @@ append_symversion()
- 	fi
- }
- 
--# If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
--# .tmp_symversions.lds
-+# Collect generated symbol versions into .tmp_symversions.lds
- gen_symversions()
- {
- 	info GEN .tmp_symversions.lds
-@@ -94,14 +93,13 @@ modpost_link()
- 		${KBUILD_VMLINUX_LIBS}				\
- 		--end-group"
- 
-+	if [ -n "${CONFIG_MODVERSIONS}" ]; then
-+		lds="${lds} -T .tmp_symversions.lds"
-+	fi
-+
- 	if [ -n "${CONFIG_LTO_CLANG}" ]; then
- 		gen_initcalls
--		lds="-T .tmp_initcalls.lds"
--
--		if [ -n "${CONFIG_MODVERSIONS}" ]; then
--			gen_symversions
--			lds="${lds} -T .tmp_symversions.lds"
--		fi
-+		lds="${lds} -T .tmp_initcalls.lds"
- 
- 		# This might take a while, so indicate that we're doing
- 		# an LTO link
-@@ -198,6 +196,10 @@ vmlinux_link()
- 
- 	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
- 
-+	if [ -n "${CONFIG_MODVERSIONS}" ]; then
-+		ldflags="${ldflags} ${wl}--script=.tmp_symversions.lds"
-+	fi
-+
- 	# The kallsyms linking does not need debug symbols included.
- 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
- 		ldflags="${ldflags} ${wl}--strip-debug"
-@@ -351,6 +353,10 @@ fi;
- # final build of init/
- ${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init need-builtin=1
- 
-+if [ -n "${CONFIG_MODVERSIONS}" ]; then
-+	gen_symversions
-+fi
-+
- #link vmlinux.o
- modpost_link vmlinux.o
- objtool_link vmlinux.o
--- 
-2.30.2
+but __attribute__ can have quotes like:
+
+__attribute__((section("foo")))
+
+and spaces around and and I believe between (( and )) like:
+
+__attribute__ ((packed))
+
+so those wouldn't match.
+
+The use of parentheses internal to attributes like __align__(8) may
+not work particularly well either given greedy matching.
+
 
