@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BB1C4338F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1703C4320E
 	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12A25610E8
+	by mail.kernel.org (Postfix) with ESMTP id DB3FE608FE
 	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234965AbhHSA7V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:59:21 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60438 "EHLO
+        id S235348AbhHSA7W (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:59:22 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60441 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234849AbhHSA7S (ORCPT
+        with ESMTP id S234903AbhHSA7T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 20:59:18 -0400
+        Wed, 18 Aug 2021 20:59:19 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4q017219;
-        Thu, 19 Aug 2021 09:57:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4q017219
+        by conuserg-10.nifty.com with ESMTP id 17J0vl4w017219;
+        Thu, 19 Aug 2021 09:57:55 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4w017219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334672;
-        bh=6Gejaa7YZQrrpkNS/TloVBLSNqnj6Sl0GHlM3FPkJW0=;
+        s=dec2015msa; t=1629334676;
+        bh=DBA8ZODOzf9FIJUCzgtveE3U7Vc1g/1uNw8IkUnWotA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=StqXUc+iWJIxnxyf1ckk1PYb49aLCe3E4xcKdQmP8jI5SMLkQJ/8V3UxHnsdr9Agh
-         Sz2TwEJwYVBCXxdZyghpLXfyPMliCh/6ofWY8w0lUC0t5X47lkA2sYCZ5d9/7ULS4M
-         NR9YDCXl70q+Pigp09WmfaCVmJEelvl2TvYQDuziL6s+sSVhD/YKryLiSUyhVdKibD
-         1ykrwKVkMqwcpSGzzPqjFtb0nYBn/Zs7Vgk8fRI3TP3ZjJSj6KJWbCCFt/DaYl5n7j
-         z2xIPECB7hqyZOOeNLc1za9ArBxTIrtW2Hve7yZT3By92ALFEpuPYG8uiPa1imsryU
-         sdnvp6Q4bU5Ug==
+        b=ZXUUkbuBCSKhb65cp9SgZO4y+MbX/32WwqLo0fgIfMyOQUtycS0slYvSfAzCMTGlQ
+         69XBqEkXYXwEbFFDXPVrMUK2JYWfl1k3pMlQe7IQ6etIR2lEHIYhOcnRZp8q/hR79g
+         z90vxOQ/DQf4dhb+5Hf/q1GuZ+hUAaeDDd5NZsPjJKzlQ92N1l9+hueH/Sxi5QIDz1
+         G0C8fyL70jOQ3HM0jNx37c6v6nNBiSPtMPYUuwjMDqwRihhzBWWozFldEqcqjYvqRw
+         GpQl3ykOEAjh/hRczX8tezeAYWTumXeMO3PuG9tITuSXAm9jNDq7PzOU/wpWfnEWQb
+         oqkIX1X1tGc0A==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 07/13] kbuild: do not remove 'linux' link in scripts/link-vmlinux.sh
-Date:   Thu, 19 Aug 2021 09:57:38 +0900
-Message-Id: <20210819005744.644908-8-masahiroy@kernel.org>
+Subject: [PATCH 13/13] kbuild: merge cmd_ar_builtin and cmd_ar_module
+Date:   Thu, 19 Aug 2021 09:57:44 +0900
+Message-Id: <20210819005744.644908-14-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
 References: <20210819005744.644908-1-masahiroy@kernel.org>
@@ -54,30 +54,76 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-arch/um/Makefile passes the -f option to the ln command:
+The difference between cmd_ar_builtin and cmd_ar_module is the
+'[M]' in the short log.
 
-    $(Q)ln -f $< $@
+Merge them into cmd_ar_thin.
 
-So, the hard link is always re-created, and the old one is removed
-anyway.
+$(quiet_modtag) is expanded to '[M]' when it is merging module objects.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/link-vmlinux.sh | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/Makefile.build | 12 +++---------
+ scripts/Makefile.lib   |  5 ++++-
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index a6c4d0bce3ba..7b9c62e4d54a 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -206,7 +206,6 @@ vmlinux_link()
- 			-Wl,-T,${lds}				\
- 			${objects}				\
- 			-lutil -lrt -lpthread
--		rm -f linux
- 	fi
- }
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 97392c26ebd7..17ce37c3eceb 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -370,11 +370,8 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+ #
+ 
+-quiet_cmd_ar_builtin = AR      $@
+-      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+-
+ $(obj)/built-in.a: $(real-obj-y) FORCE
+-	$(call if_changed,ar_builtin)
++	$(call if_changed,ar_thin)
+ 
+ #
+ # Rule to create modules.order file
+@@ -434,14 +431,11 @@ cmd_ld_o_a += ; $(objtool) $(objtool_args) --module $@
+ endif
+ endif
+ 
+-quiet_cmd_ar_module = AR [M]  $@
+-      cmd_ar_module = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+-
+ $(modules-single): %.a: %.o FORCE
+-	$(call if_changed,ar_module)
++	$(call if_changed,ar_thin)
+ 
+ $(modules-multi): FORCE
+-	$(call if_changed,ar_module)
++	$(call if_changed,ar_thin)
+ $(call multi_depend, $(modules-multi), .a, -objs -y -m)
+ 
+ targets += $(modules-single) $(modules-multi)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index f604d2d01cad..bd71a7d6fbc1 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -198,7 +198,7 @@ _cpp_flags += -I $(srctree)/$(src) -I $(objtree)/$(obj)
+ endif
+ endif
+ 
+-part-of-module = $(if $(filter $(basename $@).o, $(real-obj-m)),y)
++part-of-module = $(if $(filter $(basename $@).o, $(real-obj-m) $(obj-m)),y)
+ quiet_modtag = $(if $(part-of-module),[M],   )
+ 
+ modkern_cflags =                                          \
+@@ -276,6 +276,9 @@ quiet_cmd_ld = LD      $@
+ quiet_cmd_ar = AR      $@
+       cmd_ar = rm -f $@; $(AR) cDPrsT $@ $(real-prereqs)
+ 
++quiet_cmd_ar_thin = AR $(quiet_modtag)  $@
++      cmd_ar_thin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
++
+ # Objcopy
+ # ---------------------------------------------------------------------------
  
 -- 
 2.30.2
