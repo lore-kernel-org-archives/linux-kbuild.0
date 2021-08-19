@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 439AEC43216
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F678C4320A
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F53B6113C
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16E40610E8
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbhHSA7X (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:59:23 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60450 "EHLO
+        id S235541AbhHSA7a (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:59:30 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60764 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235034AbhHSA7T (ORCPT
+        with ESMTP id S235445AbhHSA72 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 18 Aug 2021 20:59:19 -0400
+        Wed, 18 Aug 2021 20:59:28 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4r017219;
-        Thu, 19 Aug 2021 09:57:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4r017219
+        by conuserg-10.nifty.com with ESMTP id 17J0vl4v017219;
+        Thu, 19 Aug 2021 09:57:55 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4v017219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334672;
-        bh=RUDO4jzJry61qVqT4mfs6ssC07k4WQc2EZ9PdUGGmXk=;
+        s=dec2015msa; t=1629334675;
+        bh=KLWNtWoQX5iPqAI7oX4v3voqgZg5h4Fqa51BzWNUUW8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qEStO2Ppo9aS6cgTM+D2bW6Ky95lJqK/y3BwLrk630esyDmxdPcfSWFG/TQOXsM+Y
-         RIu1v0/RHIzRxWM13xcBbR93Kacf/lq/XCph1AwuUeHcQgY4lRHK6/RmEEKaJAyAog
-         xd9vfdQgTDPcLUGKpClcLOAUS6HwfzttqYGIU3TII6U1jbjq7t50+oOE0P3KDm4PDI
-         plx/CFgEIRGo7f9saapkx1Zrh8s1NjDlRzX1DbldYjFEHcht5TzmDdS7zG2qc90gKU
-         QoKq9kPQQ1gmLm3gUwvv/5eIrGYIAmFcVxuXZloTyW7H2vv6sevHMjK2zGW80jsFsR
-         H5uiA7Xg/LA6Q==
+        b=yWgZRPmbMbnn13jT/bEgVsi3rPpo27UJvvJfS5WltzGWbTj9JTPCObIK9LVy0RxgL
+         2imoI94x27iFJAdYVdvk6IEjrYJwLzVL8eyr14ogmMuc8EJkES6hWMxPNAeTV42tdZ
+         mj9y5rLM2P5DmQ6jRCpTaJTNuMSvHIswtDLIMgZ7p6EliwUSWEAYRcSE6Z8CPEdfML
+         xbkLu8rzaEFwPHwB2N5FMb/sO3jDB3u5c7vIhHE0v1M4LS1JWKgr4IU7j/KYa6df2d
+         poBU5i2Zkq3iDmLcJCMrKaxmSAm58gTDL0GynNR0RYHHqga2KFd5Y726a0n/C/DDgH
+         XkN+3RwE8olEQ==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,10 +41,12 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 08/13] kbuild: merge vmlinux_link() between ARCH=um and other architectures
-Date:   Thu, 19 Aug 2021 09:57:39 +0900
-Message-Id: <20210819005744.644908-9-masahiroy@kernel.org>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH 12/13] kbuild: merge cmd_modversions_c and cmd_modversions_S
+Date:   Thu, 19 Aug 2021 09:57:43 +0900
+Message-Id: <20210819005744.644908-13-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
 References: <20210819005744.644908-1-masahiroy@kernel.org>
@@ -54,104 +56,57 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-For ARCH=um, ${CC} is used as the linker driver. Hence, the linker
-options are prefixed with -Wl, .
+Now cmd_modversions_c and cmd_modversions_S are similar.
 
-Merge the similar code.
+The latter uses $(OBJDUMP) -h, but it can be replaced with $(NM).
 
-I replaced the -T option with the long option --script= so that it
-works well with/without ${wl}.
+$(NM) works for both ELF and LLVM bitcode (if $(NM) is llvm-nm).
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/link-vmlinux.sh | 56 +++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 33 deletions(-)
+ scripts/Makefile.build | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 7b9c62e4d54a..d74cee5c4326 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -149,13 +149,12 @@ objtool_link()
- # ${2}, ${3}, ... - optional extra .o files
- vmlinux_link()
- {
--	local lds="${objtree}/${KBUILD_LDS}"
- 	local output=${1}
--	local objects
--	local strip_debug
--	local map_option
- 	local objs
- 	local libs
-+	local ld
-+	local ldflags
-+	local ldlibs
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 874e84a1f3fc..97392c26ebd7 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -166,13 +166,16 @@ ifdef CONFIG_MODVERSIONS
  
- 	info LD ${output}
- 
-@@ -171,42 +170,33 @@ vmlinux_link()
- 		libs="${KBUILD_VMLINUX_LIBS}"
- 	fi
- 
-+	if [ "${SRCARCH}" = "um" ]; then
-+		wl=-Wl,
-+		ld="${CC}"
-+		ldflags="${CFLAGS_vmlinux}"
-+		ldlibs="-lutil -lrt -lpthread"
-+	else
-+		wl=
-+		ld="${LD}"
-+		ldflags="${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}"
-+		ldlibs=
-+	fi
+ # Generate .o.symversions files for each .o with exported symbols, and link these
+ # to the kernel and/or modules at the end.
+-cmd_modversions_c =								\
++cmd_modversions =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+-		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
++		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
+ 		    > $@.symversions;						\
+ 	else									\
+ 		rm -f $@.symversions;						\
+ 	fi;
 +
-+	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
++cmd_modversions_c = $(call cmd_modversions,c)
 +
- 	# The kallsyms linking does not need debug symbols included.
- 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
--		strip_debug=-Wl,--strip-debug
-+		ldflags="${ldflags} ${wl}--strip-debug"
- 	fi
+ endif
  
- 	if [ -n "${CONFIG_VMLINUX_MAP}" ]; then
--		map_option="-Map=${output}.map"
-+		ldflags="${ldflags} ${wl}-Map=${output}.map"
- 	fi
+ ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+@@ -327,14 +330,8 @@ ifdef CONFIG_ASM_MODVERSIONS
  
--	if [ "${SRCARCH}" != "um" ]; then
--		objects="--whole-archive ${objs} --no-whole-archive	\
--			 --start-group ${libs} --end-group		\
--			 $@"
--
--		${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}	\
--			${strip_debug#-Wl,}			\
--			-o ${output}				\
--			${map_option}				\
--			-T ${lds} ${objects}
--	else
--		objects="-Wl,--whole-archive			\
--			${KBUILD_VMLINUX_OBJS}			\
--			-Wl,--no-whole-archive			\
--			-Wl,--start-group			\
--			${KBUILD_VMLINUX_LIBS}			\
--			-Wl,--end-group				\
--			${@}"
--
--		${CC} ${CFLAGS_vmlinux}				\
--			${strip_debug}				\
--			-o ${output}				\
--			${map_option:+-Wl,${map_option}}	\
--			-Wl,-T,${lds}				\
--			${objects}				\
--			-lutil -lrt -lpthread
+ # versioning matches the C process described above, with difference that
+ # we parse asm-prototypes.h C header to get function definitions.
++cmd_modversions_S = $(call cmd_modversions,S)
+ 
+-cmd_modversions_S =								\
+-	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
+-		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+-		    > $@.symversions;						\
+-	else									\
+-		rm -rf $@.symversions;						\
 -	fi
-+	${ld} ${ldflags} -o ${output}					\
-+		${wl}--whole-archive ${objs} ${wl}--no-whole-archive	\
-+		${wl}--start-group ${libs} ${wl}--end-group		\
-+		$@ ${ldlibs}
- }
+ endif
  
- # generate .BTF typeinfo from DWARF debuginfo
+ $(obj)/%.o: $(src)/%.S $(objtool_dep) FORCE
 -- 
 2.30.2
 
