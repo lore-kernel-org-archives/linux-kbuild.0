@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF495C4338F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C82C4320A
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2652610E8
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84A81608FE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234194AbhHSA65 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S234261AbhHSA65 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Wed, 18 Aug 2021 20:58:57 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:59855 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:59856 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230180AbhHSA6x (ORCPT
+        with ESMTP id S232954AbhHSA6x (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 18 Aug 2021 20:58:53 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4m017219;
-        Thu, 19 Aug 2021 09:57:49 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4m017219
+        by conuserg-10.nifty.com with ESMTP id 17J0vl4k017219;
+        Thu, 19 Aug 2021 09:57:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4k017219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334669;
-        bh=DubxqZkgQvnO3PgHtqG3et7QlJ4rVJ/qaJqyb8Cduvo=;
+        s=dec2015msa; t=1629334668;
+        bh=PVxZwZza2Bwkv7dBpcaLQNZGPpDeheJxOo2r93CeIqE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GglksW6wZjXDkkYW0nfXPktV/AXlSz4cttFtw4hiwgjZBi3WksFaFPgwNbpkCKivo
-         2YV1l1PmfO/q4jHD/gc+sS/XRIlGmu/+XtSdi+jbX4kJcVfPbMat7eNuFRhkgO41/G
-         52FSCTvKaIHsy8ghOY3CUwraUNZ38a/gQ3LXYqodRNswGQTMKCWWWJM39huu2OvQfK
-         RuHkgKaVnpBrHsi52nCcT4U/TmL1yNvVJCfIGXDPAQM+sid+8uL6tbZarl+mUcpqK/
-         4Ksdu3JhfBcBrS4VP/GGERVogSHEebNm/qApUwi6WZ8hJ5odLiylSspyJDwUWHADgj
-         YPxRQFEyVaNpg==
+        b=N+GqvQNu/si67k8jdd7tyUw0KDpz4xlhmzZtX5ViCyaO/7FY8KSmV4jkyg0FCWEjG
+         u6lSRZ4aAUAPoeOjMhClqhQ/iDPp5AiDgoHNVtqbk6bHaj+7tyRaTgw1tzt9XZURsN
+         QwkgjnwEN7gvdt3HdGXGl2L+f/CaTdwoPeDUuklm+uPUxzMtdHdBsMEfvjkXkBr2zi
+         iB4WtuNewJDP/8JM482U9DhRDFqfwWJYOEVmf+lTlyEyCkmFvy85jm7oWK2deDYLwQ
+         Z77DCCv4xvC0XgKUQZA2HS6lGl9uGDwcWLjr2AdTIhIb4tOwWVLLZ5qZsXOR9ZCCGQ
+         VnW57SQ0ObJhA==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 03/13] kbuild: detect objtool changes correctly and remove .SECONDEXPANSION
-Date:   Thu, 19 Aug 2021 09:57:34 +0900
-Message-Id: <20210819005744.644908-4-masahiroy@kernel.org>
+Subject: [PATCH 01/13] kbuild: move objtool_args back to scripts/Makefile.build
+Date:   Thu, 19 Aug 2021 09:57:32 +0900
+Message-Id: <20210819005744.644908-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
 References: <20210819005744.644908-1-masahiroy@kernel.org>
@@ -54,119 +54,73 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This reverts commit 8852c5524029 ("kbuild: Fix objtool dependency for
-'OBJECT_FILES_NON_STANDARD_<obj> := n'"), and fix the dependency in a
-cleaner way.
+Commit b1a1a1a09b46 ("kbuild: lto: postpone objtool") moved objtool_args
+to Makefile.lib, so the arguments can be used in Makefile.modfinal as
+well as Makefile.build.
 
-Using .SECONDEXPANSION is expensive since Makefile.build is parsed
-twice every time, and the escaping dollars makes the code unreadable.
+With commit 2b1d7fc05467 ("kbuild: Fix TRIM_UNUSED_KSYMS with
+LTO_CLANG"), module LTO linking came back to scripts/Makefile.build
+again.
 
-Adding include/config/* as dependency is not maintainable either because
-objtool_args is dependent on more CONFIG options.
+So, there is no more reason to keep objtool_args separately in
+scripts/Makefile.lib.
 
-A better fix is to include the objtool command in *.cmd files so any
-command change is naturally detected by if_change.
+Get it back to the original place, close to the objtool command.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+ scripts/Makefile.build | 13 +++++++++++++
+ scripts/Makefile.lib   | 12 ------------
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 31154e44c251..3e4cd1439cd4 100644
+index ea549579bfb7..31154e44c251 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -155,7 +155,7 @@ $(obj)/%.ll: $(src)/%.c FORCE
- # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
- 
- quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
--      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
-+      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< $(cmd_objtool)
- 
- ifdef CONFIG_MODVERSIONS
- # When module versioning is enabled the following steps are executed:
-@@ -223,6 +223,8 @@ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+@@ -222,6 +222,19 @@ cmd_record_mcount = $(if $(findstring $(strip $(CC_FLAGS_FTRACE)),$(_c_flags)),
+ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
  
  ifdef CONFIG_STACK_VALIDATION
- 
-+objtool := $(objtree)/tools/objtool/objtool
 +
- # Objtool arguments are also needed for modfinal with LTO, so we define
- # then here to avoid duplication.
- objtool_args =								\
-@@ -237,26 +239,19 @@ objtool_args =								\
- 
++# Objtool arguments are also needed for modfinal with LTO, so we define
++# then here to avoid duplication.
++objtool_args =								\
++	$(if $(CONFIG_UNWINDER_ORC),orc generate,check)			\
++	$(if $(part-of-module), --module,)				\
++	$(if $(CONFIG_FRAME_POINTER),, --no-fp)				\
++	$(if $(or $(CONFIG_GCOV_KERNEL),$(CONFIG_LTO_CLANG)),		\
++		--no-unreachable,)					\
++	$(if $(CONFIG_RETPOLINE), --retpoline,)				\
++	$(if $(CONFIG_X86_SMAP), --uaccess,)				\
++	$(if $(CONFIG_FTRACE_MCOUNT_USE_OBJTOOL), --mcount,)
++
  ifndef CONFIG_LTO_CLANG
  
--__objtool_obj := $(objtree)/tools/objtool/objtool
--
- # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
- cmd_objtool = $(if $(patsubst y%,, \
- 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
--	$(__objtool_obj) $(objtool_args) $@)
--objtool_obj = $(if $(patsubst y%,, \
--	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
--	$(__objtool_obj))
-+	; $(objtool) $(objtool_args) $@)
-+
-+# Rebuild all objects when objtool is updated
-+objtool_dep = $(objtool)
- 
- endif # CONFIG_LTO_CLANG
- endif # CONFIG_STACK_VALIDATION
- 
--# Rebuild all objects when objtool changes, or is enabled/disabled.
--objtool_dep = $(objtool_obj)					\
--	      $(wildcard include/config/ORC_UNWINDER		\
--			 include/config/STACK_VALIDATION)
--
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- cmd_gen_ksymdeps = \
- 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
-@@ -270,7 +265,6 @@ define rule_cc_o_c
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,checksrc)
- 	$(call cmd,checkdoc)
--	$(call cmd,objtool)
- 	$(call cmd,modversions_c)
- 	$(call cmd,record_mcount)
- endef
-@@ -278,13 +272,11 @@ endef
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
--	$(call cmd,objtool)
- 	$(call cmd,modversions_S)
- endef
- 
- # Built-in and composite module parts
--.SECONDEXPANSION:
--$(obj)/%.o: $(src)/%.c $(recordmcount_source) $$(objtool_dep) FORCE
-+$(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_dep) FORCE
- 	$(call if_changed_rule,cc_o_c)
- 	$(call cmd,force_checksrc)
- 
-@@ -367,7 +359,7 @@ $(obj)/%.s: $(src)/%.S FORCE
- 	$(call if_changed_dep,cpp_s_S)
- 
- quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
--      cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
-+      cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $< $(cmd_objtool)
- 
- ifdef CONFIG_ASM_MODVERSIONS
- 
-@@ -386,7 +378,7 @@ cmd_modversions_S =								\
- 	fi
+ __objtool_obj := $(objtree)/tools/objtool/objtool
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index af1c920a585c..34c4c11c4bc1 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -232,18 +232,6 @@ ifeq ($(CONFIG_LTO_CLANG),y)
+ mod-prelink-ext := .lto
  endif
  
--$(obj)/%.o: $(src)/%.S $$(objtool_dep) FORCE
-+$(obj)/%.o: $(src)/%.S $(objtool_dep) FORCE
- 	$(call if_changed_rule,as_o_S)
- 
- targets += $(filter-out $(subdir-builtin), $(real-obj-y))
+-# Objtool arguments are also needed for modfinal with LTO, so we define
+-# then here to avoid duplication.
+-objtool_args =								\
+-	$(if $(CONFIG_UNWINDER_ORC),orc generate,check)			\
+-	$(if $(part-of-module), --module,)				\
+-	$(if $(CONFIG_FRAME_POINTER),, --no-fp)				\
+-	$(if $(or $(CONFIG_GCOV_KERNEL),$(CONFIG_LTO_CLANG)), 		\
+-		--no-unreachable,)					\
+-	$(if $(CONFIG_RETPOLINE), --retpoline,)				\
+-	$(if $(CONFIG_X86_SMAP), --uaccess,)				\
+-	$(if $(CONFIG_FTRACE_MCOUNT_USE_OBJTOOL), --mcount,)
+-
+ # Useful for describing the dependency of composite objects
+ # Usage:
+ #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
 -- 
 2.30.2
 
