@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A5C4320A
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDA5C43214
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 883E9610E8
-	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AF8E610E9
+	for <linux-kbuild@archiver.kernel.org>; Thu, 19 Aug 2021 00:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235265AbhHSA7V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 18 Aug 2021 20:59:21 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60449 "EHLO
+        id S234600AbhHSA7X (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 18 Aug 2021 20:59:23 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60444 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234824AbhHSA7T (ORCPT
+        with ESMTP id S234931AbhHSA7T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 18 Aug 2021 20:59:19 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17J0vl4s017219;
-        Thu, 19 Aug 2021 09:57:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4s017219
+        by conuserg-10.nifty.com with ESMTP id 17J0vl4o017219;
+        Thu, 19 Aug 2021 09:57:50 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17J0vl4o017219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1629334673;
-        bh=DRNxRpsX6v3sRE7LHBWEe79xZacYol4xWprhfU+M1UA=;
+        s=dec2015msa; t=1629334670;
+        bh=aFQt+IVlSY7VLNtdSb4DtL9wrHmQt9RjdrLQzGtwW6Y=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jOnXaT2WSYXbNGjHay06GAvXr51PfP53DEAuQ3FHoTE59dG1gSyFgN9qA0lbgDFEU
-         VQ7sO6Wf12xYo0q4SbFXnQpc5syEHmoCYy9/swu9eO3BBdj8C2wueJ7N5qh4kzhZRu
-         lC1HOoYfK6JzPbxTbrd2erEIdCCxAzL2GtOsmiMxU7juMiXC986PaIcBwzS40DoorT
-         82cGvQHr3lVVMQ95ezUIbLrwzXA5+us0je2uFeFVZr3/kb4WHtylSyoEp0yKvs5ymv
-         QIt3pfx4kEeU6tdY/B75R1+a4+rgGwgEym7n6RoT7/7EJ1/ooQjtt0SOB7SV+CSr3V
-         cgCNZ3cFSgrJg==
+        b=jXmbQ+3NQYTpjLgAXW5VhO4u/wFf6hZrg/rxg8hrD7UGWLLF9l6Npdw8OGdiQ2H/g
+         ++1fE+NwuZ+L3uq+IkkpkVrqL9BJRxh3J0NIY+rKQAlJf2TiLUaidypx07KneIyfXa
+         DW2VMVTpMAfOk3jm+LaTm7NE+65r+hq5avA5kaSH5boFYFlDrPE6iTxpI9rks5UC14
+         vUOwMMnpzH5mZVdxC/SzNAJ37TKzBkKxRUeHRsdxr/LZDx1cTopDaODWrpHKQTaKnJ
+         4WGKWF688N+hj5FtlencfSqHU5Pt7MQsgVRhEduYG55PpnA9BTY8clFkeOhRG91GCs
+         Ofp+lPuCXTlfg==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -42,9 +42,9 @@ Cc:     Sami Tolvanen <samitolvanen@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 09/13] kbuild: do not create built-in.a.symversions or lib.a.symversions
-Date:   Thu, 19 Aug 2021 09:57:40 +0900
-Message-Id: <20210819005744.644908-10-masahiroy@kernel.org>
+Subject: [PATCH 05/13] kbuild: remove stale *.symversions
+Date:   Thu, 19 Aug 2021 09:57:36 +0900
+Message-Id: <20210819005744.644908-6-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819005744.644908-1-masahiroy@kernel.org>
 References: <20210819005744.644908-1-masahiroy@kernel.org>
@@ -54,88 +54,40 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Merge all *.o.symversions in scripts/link-vmlinux.sh instead of
-merging them in the unit of built-in.a or lib.a.
+cmd_update_lto_symversions merges all the existing *.symversions, but
+some of them might be stale.
 
-This is a preparation for further code cleanups.
+If the last EXPORT_SYMBOL is removed from a C file, the *.symversions
+file is not deleted or updated. It contains stale CRCs, which will be
+used for linking the vmlinux or modules.
+
+It is not a big deal when the EXPORT_SYMBOL is really removed. However,
+when the EXPORT_SYMBOL is moved to another file, the same __crc_<symbol>
+will appear twice in the merged *.symversions, possibly with different
+CRCs if the function argument is changed at the same time. It would
+cause potential breakage of module versioning.
+
+If no EXPORT_SYMBOL is found, let's remove *.symversions explicitly.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build  | 10 ++--------
- scripts/link-vmlinux.sh | 22 ++++++++++++++++++----
- 2 files changed, 20 insertions(+), 12 deletions(-)
+ scripts/Makefile.build | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 585dae34746a..37d6f6da34d6 100644
+index 279363266455..585dae34746a 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -430,11 +430,8 @@ endif
- quiet_cmd_ar_builtin = AR      $@
-       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
- 
--quiet_cmd_ar_and_symver = AR      $@
--      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
--
- $(obj)/built-in.a: $(real-obj-y) FORCE
--	$(call if_changed,ar_and_symver)
-+	$(call if_changed,ar_builtin)
- 
- #
- # Rule to create modules.order file
-@@ -454,11 +451,8 @@ $(obj)/modules.order: $(obj-m) FORCE
- #
- # Rule to compile a set of .o files into one .a file (with symbol table)
- #
--quiet_cmd_ar_lib = AR      $@
--      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
--
- $(obj)/lib.a: $(lib-y) FORCE
--	$(call if_changed,ar_lib)
-+	$(call if_changed,ar)
- 
- # NOTE:
- # Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index d74cee5c4326..17976609c2d8 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -52,6 +52,13 @@ gen_initcalls()
- 		> .tmp_initcalls.lds
- }
- 
-+append_symversion()
-+{
-+	if [ -f ${1}.symversions ]; then
-+		cat ${1}.symversions >> .tmp_symversions.lds
-+	fi
-+}
-+
- # If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
- # .tmp_symversions.lds
- gen_symversions()
-@@ -59,10 +66,17 @@ gen_symversions()
- 	info GEN .tmp_symversions.lds
- 	rm -f .tmp_symversions.lds
- 
--	for o in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
--		if [ -f ${o}.symversions ]; then
--			cat ${o}.symversions >> .tmp_symversions.lds
--		fi
-+	for a in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
-+		case $a in
-+		*.a)
-+			for o in $(${AR} t ${a}); do
-+				append_symversion ${o}
-+			done
-+			;;
-+		*)
-+			append_symversion ${a}
-+			;;
-+		esac
- 	done
- }
- 
+@@ -177,6 +177,8 @@ cmd_modversions_c =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+ 		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+ 		    > $@.symversions;						\
++	else									\
++		rm -f $@.symversions;						\
+ 	fi;
+ else
+ cmd_modversions_c =								\
 -- 
 2.30.2
 
