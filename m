@@ -2,35 +2,35 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24EEC4338F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Aug 2021 02:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C29AC4320A
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Aug 2021 02:27:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2F4F613E6
-	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Aug 2021 02:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F134613D2
+	for <linux-kbuild@archiver.kernel.org>; Tue, 24 Aug 2021 02:27:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbhHXC2S (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 Aug 2021 22:28:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36882 "EHLO mail.kernel.org"
+        id S233602AbhHXC2T (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 23 Aug 2021 22:28:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37032 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233170AbhHXC2S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S233477AbhHXC2S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 23 Aug 2021 22:28:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8100F61373;
-        Tue, 24 Aug 2021 02:27:22 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EBDEF613D5;
+        Tue, 24 Aug 2021 02:27:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629772044;
-        bh=FhBLzlnoS/C4efg4LBoQL/1xcceeOT2Nci0FeHlY0KY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=kkx5au/F1QQInf2xhWZfLqu3vw4zyEnICeKZB/AZM6RhF4MYKRsy/1tsWA25Hs235
-         wDUlQNbjpTcPfBnmEmMtYmOrz5rkfzROaQwL+XNFaPXnOh18dAXLyqX7gszOiDzeNm
-         y5wVVPwlaCiNC9eandJcAAPDudr5w3BqckTatwkEeUtPzP0/k4DZ+sSbSXFURryKZH
-         gB6py4/lbjNLM+VaMvNpUSoOKc8HI4oinSPij+ZalbAsEZPasrZVWBzI5+x8yP1wzr
-         ZU5WlAeYcIzNK6mOiCCjv0NckXk+6XyMe1j7WQYQu6TtJLa0aBdomF8DlUyyJ9bj75
-         b4Z37ZCFccKyg==
+        s=k20201202; t=1629772053;
+        bh=NOvJGCvW1HVdaDqhCUnwbbyYfhSHjlfgYPzYKkOiPeI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=sVo8kH14HV4YMJUOa/sFGqFKMlYvaRHWnjrvEpgstLxyWfoE1UaForX7zQQFkmpBb
+         Geep8/Zqy1BvWYK0RIAGXu6dEpxEz/49ho/U/ehCqyXPkV6wZ0P4DPwe56qFFYhfkQ
+         aYsarl6rdNXIFELz7+lEKIKNA21PmggLbrFWwmJmPVabnpAtAIlY7OSPmDfZCUb8zV
+         chWdq/uS+UWzJ6Etm0OD8q7/0gzafwogKdqUygQ48muscUfP9iCwxaUwjwVvqH5nOf
+         7o2M2apdEIejOD0GG69EhgZOchV9AKwNyIzaze5VLDP4UmF1TlrxWdIDnN4UQgb/y8
+         aR7u/vij+whEg==
 From:   Nathan Chancellor <nathan@kernel.org>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -40,10 +40,12 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com, llvm@lists.linux.dev,
         Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 0/2] Harden clang against unknown flag options
-Date:   Mon, 23 Aug 2021 19:26:38 -0700
-Message-Id: <20210824022640.2170859-1-nathan@kernel.org>
+Subject: [PATCH 2/2] kbuild: Add -Werror=ignored-optimization-argument to CLANG_FLAGS
+Date:   Mon, 23 Aug 2021 19:26:40 -0700
+Message-Id: <20210824022640.2170859-3-nathan@kernel.org>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20210824022640.2170859-1-nathan@kernel.org>
+References: <20210824022640.2170859-1-nathan@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Bot: notify
 Content-Transfer-Encoding: 8bit
@@ -51,33 +53,47 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi all,
+Similar to commit 589834b3a009 ("kbuild: Add
+-Werror=unknown-warning-option to CLANG_FLAGS").
 
-This series cleans up an issue that was noticed by the kernel test robot
-where flags that clang does not implement support for are
-unconditionally added to the command line, which causes all subsequent
-calls to cc-{disable-warning,option} to fail, meaning developers are
-flooded with unnecessary and pointless warnings.
+Clang ignores certain GCC flags that it has not implemented, only
+emitting a warning:
 
-I hope the patches in and of themselves are reasonable and
-non-controversial. This is based on Masahiro's kbuild tree as there was
-a fairly large refactor around where clang's flags were added so I
-figured it would be best to go there with an x86 ack since the first
-patch does not depend on anything in -tip.
+$ echo | clang -fsyntax-only -falign-jumps -x c -
+clang-14: warning: optimization flag '-falign-jumps' is not supported
+[-Wignored-optimization-argument]
 
-Cheers,
-Nathan
+When one of these flags gets added to KBUILD_CFLAGS unconditionally, all
+subsequent cc-{disable-warning,option} calls fail because -Werror was
+added to these invocations to turn the above warning and the equivalent
+-W flag warning into errors.
 
-Nathan Chancellor (2):
-  x86: Do not add -falign flags unconditionally for clang
-  kbuild: Add -Werror=ignored-optimization-argument to CLANG_FLAGS
+To catch the presence of these flags earlier, turn
+-Wignored-optimization-argument into an error so that the flags can
+either be implemented or ignored via cc-option and there are no more
+weird errors.
 
- arch/x86/Makefile_32.cpu | 12 +++++++++---
- scripts/Makefile.clang   |  4 ++++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ scripts/Makefile.clang | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-base-commit: fb3fdea450305d932d933d7e75eead0477249d8e
+diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
+index 4cce8fd0779c..2fe38a9fdc11 100644
+--- a/scripts/Makefile.clang
++++ b/scripts/Makefile.clang
+@@ -29,7 +29,11 @@ CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
+ else
+ CLANG_FLAGS	+= -fintegrated-as
+ endif
++# By default, clang only warns on unknown warning or optimization flags
++# Make it behave more like gcc by erroring when these flags are encountered
++# so they can be implemented or wrapped in cc-option.
+ CLANG_FLAGS	+= -Werror=unknown-warning-option
++CLANG_FLAGS	+= -Werror=ignored-optimization-argument
+ KBUILD_CFLAGS	+= $(CLANG_FLAGS)
+ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
 -- 
 2.33.0
 
