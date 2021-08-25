@@ -2,87 +2,89 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BE0C4338F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 25 Aug 2021 09:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF61AC432BE
+	for <linux-kbuild@archiver.kernel.org>; Wed, 25 Aug 2021 10:10:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 967B361163
-	for <linux-kbuild@archiver.kernel.org>; Wed, 25 Aug 2021 09:52:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B5D961163
+	for <linux-kbuild@archiver.kernel.org>; Wed, 25 Aug 2021 10:10:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236729AbhHYJx1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 25 Aug 2021 05:53:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57238 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236405AbhHYJx0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 25 Aug 2021 05:53:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CCBE561153;
-        Wed, 25 Aug 2021 09:52:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629885161;
-        bh=k4qW2MGVv6lsjTMeqsBszx1sWAWurkEnyKnzQikbJaI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fiSY+43j4Yih7SIz3JeRfD7Rgrum1vl+IBCXizvIdRvKFNbHORmNquKph2O/mZFRh
-         nfnkwO0kk+g94JiI/lke5bRCFWyWnrIK2d4F+V7PIa8e93uvD2jszET7/qYhjEfpdo
-         6RVHYPzGKhojaacCwIneU6t45qN5FSjx/KJ0r6uhLXYutK6/mb6n2iw/s5fKCVVIkJ
-         3t5qOjE/JSk0EW0Pu3xauaJjN5JX2mdk9BD9Md6HwFdcwryA36HC+f2ttCR0T4Sz2c
-         6zX+eNo+YOTQblU2vYu91g/NBewiko35f4e1YrxSY9K6jEkVvIFv7SueGGGs6gGvSf
-         VxQUkq1/zAe6g==
-Date:   Wed, 25 Aug 2021 10:52:14 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Luca Coelho <luciano.coelho@intel.com>,
-        Peter Ujfalusi <peter.ujfalusi@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>, alsa-devel@alsa-project.org,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH] kconfig: forbid symbols that end with '_MODULE'
-Message-ID: <20210825095214.GA5186@sirena.org.uk>
-References: <20210825041637.365171-1-masahiroy@kernel.org>
+        id S238949AbhHYKL1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 25 Aug 2021 06:11:27 -0400
+Received: from vmi485042.contaboserver.net ([161.97.139.209]:34644 "EHLO
+        gentwo.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239874AbhHYKLZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 25 Aug 2021 06:11:25 -0400
+X-Greylist: delayed 537 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Aug 2021 06:11:25 EDT
+Received: by gentwo.de (Postfix, from userid 1001)
+        id E4281B004CA; Wed, 25 Aug 2021 12:01:42 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by gentwo.de (Postfix) with ESMTP id E2A99B0021C;
+        Wed, 25 Aug 2021 12:01:42 +0200 (CEST)
+Date:   Wed, 25 Aug 2021 12:01:42 +0200 (CEST)
+From:   Christoph Lameter <cl@gentwo.de>
+To:     Daniel Micay <danielmicay@gmail.com>
+cc:     Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@chromium.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        clang-built-linux@googlegroups.com, Linux-MM <linux-mm@kvack.org>,
+        linux-kbuild <linux-kbuild@vger.kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 0/5] Add __alloc_size() for better bounds checking
+In-Reply-To: <CA+DvKQL6pLfK1vRzaOkEWR7DQLgTh=WZTka2L5yuS8Lf_1ZmoA@mail.gmail.com>
+Message-ID: <alpine.DEB.2.22.394.2108251158420.317806@gentwo.de>
+References: <20210818050841.2226600-1-keescook@chromium.org> <YR4frlpfJQonPuKp@infradead.org> <CA+DvKQL6pLfK1vRzaOkEWR7DQLgTh=WZTka2L5yuS8Lf_1ZmoA@mail.gmail.com>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
-Content-Disposition: inline
-In-Reply-To: <20210825041637.365171-1-masahiroy@kernel.org>
-X-Cookie: MY income is ALL disposable!
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Thu, 19 Aug 2021, Daniel Micay wrote:
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> For example, it will know that kmalloc(n) returns either NULL or an
+> allocation of size n. A simple sample program with calloc in
+> userspace:
+>
+>     #include <stdlib.h>
+>     #include <stdio.h>
+>
+>     int main(void) {
+>         char *p = calloc(64, 1);
+>         if (!p) {
+>             return 1;
+>         }
+>         printf("%zu\n", __builtin_object_size(p, 1));
+>         return 0;
+>     }
+>
+> It will also detect an out-of-bounds access via the allocation with
+> -fsanitize=object-size including with a runtime value as the index.
+>
+> It's not as useful as it should be yet because __builtin_object_size
+> must return a compile-time constant. Clang has a new
+> __builtin_dynamic_object_size that's allowed to return a value that's
+> not a compile-time constant so it can work for kmalloc(n) where n is a
+> runtime value. It might not be quite ready for use yet but it should
+> be able to make it a lot more useful. GCC also seems open to adding it
+> too.
 
-On Wed, Aug 25, 2021 at 01:16:37PM +0900, Masahiro Yamada wrote:
-> Kconfig (syncconfig) generates include/generated/autoconf.h to make
-> CONFIG options available to the pre-processor.
-
-Acked-by: Mark Brown <broonie@kernel.org>
-
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmEmEs0ACgkQJNaLcl1U
-h9Aq4Af+OUuZSvmzbZyoTGGCofB/L+N5Ehn/9iHBJTZBr46S9ip0Zv7RZXiHqhtu
-yJO2Gq1P6j1xVYtqqPCDOvNgaeEghTvLtpukroOGR/uA/S21Xobqhy6F3Tb/jrPm
-KTrf5LWtRKS0I2sxbgteQRvOOjPIELQv8Lr0Y2ykO+yL+UEtNDJH4OsuNdXhdbh5
-t2jZ7OgZ/Ot/6AB78YWbaZTZZHqfGM/jzeUpWG6kCdItSPXam0Q5LyYheMGn7MBb
-6zAG6O+2Napi31AkH6Pyx18+hzh4XhnBLSX9ZPNP8ZM5iRQZjLHt1sYdukoFEATI
-zkcxGg7hM8LCp7KGuyMcTafl0ikf4A==
-=yeET
------END PGP SIGNATURE-----
-
---mYCpIKhGyMATD0i+--
+The other complication with kmalloc etc is that the slab allocators may
+decided to allocate more bytes than needed because it does not support
+that particular allocation size. Some functions check the allocated true
+size and make use of that. See ksize().
