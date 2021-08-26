@@ -2,180 +2,135 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B39CC432BE
-	for <linux-kbuild@archiver.kernel.org>; Thu, 26 Aug 2021 13:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C01C432BE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 26 Aug 2021 22:21:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F7736101A
-	for <linux-kbuild@archiver.kernel.org>; Thu, 26 Aug 2021 13:00:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9155B608FE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 26 Aug 2021 22:21:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242295AbhHZNB0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 26 Aug 2021 09:01:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:45495 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237214AbhHZNB0 (ORCPT
+        id S243775AbhHZWWA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 26 Aug 2021 18:22:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45381 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243760AbhHZWWA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Aug 2021 09:01:26 -0400
-Received: from leknes.fjasle.eu ([92.116.68.110]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MvbOA-1n8KF12Ipq-00sayg; Thu, 26 Aug 2021 15:00:21 +0200
-Received: by leknes.fjasle.eu (Postfix, from userid 1000)
-        id 57C093C081; Thu, 26 Aug 2021 15:00:19 +0200 (CEST)
-Received: from lillesand.fjasle.eu (lillesand.fjasle.eu [10.10.0.51])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits)
-         client-signature RSA-PSS (2048 bits))
-        (Client CN "lillesand.fjasle.eu", Issuer "Fake LE Intermediate X1" (not verified))
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 0C8B13C04F;
-        Wed, 25 Aug 2021 22:20:15 +0200 (CEST)
-Received: by lillesand.fjasle.eu (Postfix, from userid 1000)
-        id 9C7DF101848; Wed, 25 Aug 2021 22:20:14 +0200 (CEST)
-Date:   Wed, 25 Aug 2021 22:20:14 +0200
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] scripts: add generic install.sh
-Message-ID: <YSal/kodID/iE9NO@lillesand.fjasle.eu>
-Mail-Followup-To: Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-References: <20210824165024.303771-1-masahiroy@kernel.org>
+        Thu, 26 Aug 2021 18:22:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630016471;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZgK0Vzj/PyGVf287gkB5KcGajjxflHWYHigJAJkYE8o=;
+        b=SpUL2EN9m3B+cWKmrBo/UFN9CEgN+hY3Sg9BmGaoDLIQP+tFXphc9VVpnoDVX8Es+75AEv
+        XeCzqBBPc0ONCa2qxVHGNWi9YvYZylVEOZzn5qDQB0lhXL8AjVdjfu0ImKZ00rLagBjxDj
+        BM5WLTh6zOIdzkx4pn5Ob1aB3V7pw88=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-WYoXGS0zPZm3mv3UZpc0bg-1; Thu, 26 Aug 2021 18:21:10 -0400
+X-MC-Unique: WYoXGS0zPZm3mv3UZpc0bg-1
+Received: by mail-ot1-f71.google.com with SMTP id v11-20020a056830140b00b0051af4c9ee9fso1830224otp.16
+        for <linux-kbuild@vger.kernel.org>; Thu, 26 Aug 2021 15:21:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZgK0Vzj/PyGVf287gkB5KcGajjxflHWYHigJAJkYE8o=;
+        b=YCXrhSFgDFnv8dYlZSqOT0MxO6LH1ajws4r59pyMzs5uLhvljFMOGZ5uWi0/a6iKcJ
+         BCUEBcQ3NmYcBUHXGiWJtUUGvd/ohkLFpBC7Wgl3jyBhYvOUXfWzLDmxzPJO9uM4Zc/p
+         d6k3Poz7cmwa4vHjbQBEVYu2uf+v123wVFJyicON5k8BKsWv/6gtDN95F7O6eTRNBQEr
+         i35bKEtiw9sxTdpdUcvgD8U2sxvtNwUnxYR5NcG8Q/V+6KPkif9cKEMB5tnVGLCNDkFN
+         vSx5QE1J5S2t1AWNpsInEmQYUlljDec8I/oRc/7VnuSV9h65nPdsXCwayGRhtF0qInG2
+         t3ig==
+X-Gm-Message-State: AOAM530wSWiwN1QzcjUKi1kGbTARg5I2lgvQek9kqKktTQVF+XiAyt9w
+        KvfAGyMo8EfXbPKfO5v/zQeziRa7xuWgWVEkUp9Tiqsnh+rEfKvAhxZ5pp2g0mf7eC/5kf62MJS
+        RBwBt41cHJsxDl94yTM+AYEy2
+X-Received: by 2002:a05:6808:7:: with SMTP id u7mr12965328oic.63.1630016469675;
+        Thu, 26 Aug 2021 15:21:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4wg/4PueI4scRfq8vf8o5WoWu5Cqwvs4cYyqbBPHaHmLY1mmgaQFiaPn6NoNF0UOWDizXew==
+X-Received: by 2002:a05:6808:7:: with SMTP id u7mr12965308oic.63.1630016469544;
+        Thu, 26 Aug 2021 15:21:09 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id s24sm840218otp.37.2021.08.26.15.21.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Aug 2021 15:21:09 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 16:21:08 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <diana.craciun@oss.nxp.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <masahiroy@kernel.org>,
+        <michal.lkml@markovi.net>, <linux-pci@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+        <mgurtovoy@nvidia.com>, <jgg@nvidia.com>, <maorg@nvidia.com>,
+        <leonro@nvidia.com>
+Subject: Re: [PATCH V5 00/13] Introduce vfio_pci_core subsystem
+Message-ID: <20210826162108.4fc8b844.alex.williamson@redhat.com>
+In-Reply-To: <20210826103912.128972-1-yishaih@nvidia.com>
+References: <20210826103912.128972-1-yishaih@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20210824165024.303771-1-masahiroy@kernel.org>
-X-Operating-System: Debian GNU/Linux bookworm/sid
-Jabber-ID: nicolas@jabber.no
-X-TUID: xqPv7H8SYeWU
-X-UID:  9230
-X-Keywords:                                                                     
-X-Provags-ID: V03:K1:IQYv8p3dqZdlRxuNkMnxO8SncifLGHY6vcaZUA9+H9wZEEf6ras
- OMhN4KpIE78hgbxhH+Bqc5NEoS0CbOI3J36h5bdhXQNa+t26CeYdCWdP9iEzJeVDANftYkr
- UsUn+mluAm4tfQVsL50Z6FwRYO/BOMADAfFBbeqVg7QZ4kSqfFCcu8UUNJyuchPxHGR2xXj
- rUgEL8ZDDULsJ5yaU4ozA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Li05EnwIX/E=:QKsTnswyNZrPuriLtsGFGh
- GNJGsl+R8ze6fY+oxOoUAGIX7uRIyPaNcHJ28cq398sGJt5qdo1sfMb2U/S+BoOc/YCi4wJUW
- wNL8FDQCRwBZye6t6nEo2+zDxH2vZAYJDzub3PXTwqvVOmi1Jt3SC+G7IaSFwkBbFPaujNVo+
- 7asYpdmC9pDhPtxjCBkZN2mEq9+3pl7fEVboFjyQcLJSD9x7rL8eVt1KOG9+P/AKehPtqeB27
- Hu2bHud+v3QGF8cPvl2L7S6Yaj72jiISOtuTVUSu8ST+lKs4ElapJd7/wfaYxY9/btvA/rM8b
- ncZTDcDi11KAg5V/kgWy1mrrkidoibmppy66MoRnKWXCApVRb2MqSqw30TEkvlBEKYcIhkIHN
- MtkqbtcPC21A1X78r9LRxm04Io/DsYN476fDTmTcoH+K/JsfAddMtMSqFHLYY2j2vCt7zZZvJ
- DMids2Pwulf+E09cg8OsgitiOg6MhsWAQd2bKZP9Pj42Ca8hikBLynlGkELRbvcB2Uwm3Tw3w
- n/x4kiZUyV8K50jIlCetz880o4jo/t/bd45n5VVozCkS2Pq/nV9hA8I4lxbIEmMTinITbth63
- Dw9UA/Tq6jzLTtKpniQ1NJHKGGPdfAfnunPqUKK5+i8wWcht/v0fZhhxUXrAsFvpwswrY/Wxi
- EwjJGETXAU+Vgl878wfemTjJHqwFbyuvN7ahlgblkcohAqG37vxFF0LRd74PSlSmbmoVsylrZ
- ZRrMSkWAaW1ru3QUcxLytwLjft9uHKywNZhotw==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, 25 Aug 2021 01:50:24 +0900 Masahiro Yamada wrote:
-> Many architectures has a similar install.sh script.
+On Thu, 26 Aug 2021 13:38:59 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
 > 
-> The first half is really generic; ensures the kernel image and the map
-> file exist, then invokes ~/bin/${INSTALLKERNEL} or /sbin/${INSTALLKERNEL}
-> if available.
+> Jason Gunthorpe (2):
+>   vfio: Use select for eventfd
+>   vfio: Use kconfig if XX/endif blocks instead of repeating 'depends on'
 > 
-> The second half is kind of arch-specific. It just copies the kernel image
-> and map file to the destination, but the code is slightly different.
-> (Maybe, this part can be consolidated as well if we want).
+> Max Gurtovoy (10):
+>   vfio/pci: Rename vfio_pci.c to vfio_pci_core.c
+>   vfio/pci: Rename vfio_pci_private.h to vfio_pci_core.h
+>   vfio/pci: Rename vfio_pci_device to vfio_pci_core_device
+>   vfio/pci: Rename ops functions to fit core namings
+>   vfio/pci: Include vfio header in vfio_pci_core.h
+>   vfio/pci: Split the pci_driver code out of vfio_pci_core.c
+>   vfio/pci: Move igd initialization to vfio_pci.c
+>   PCI: Add 'override_only' field to struct pci_device_id
+>   PCI / VFIO: Add 'override_only' support for VFIO PCI sub system
+>   vfio/pci: Introduce vfio_pci_core.ko
 > 
-> This patch factors out the generic part into scripts/install.sh, which
-> will architectures to drop the duplicated code.
-      ^
-I am afraid, a word is missing here, e.g.:
-... which will allow architectures to drop ...?
+> Yishai Hadas (1):
+>   vfio/pci: Move module parameters to vfio_pci.c
+> 
+>  Documentation/PCI/pci.rst                     |    1 +
+>  MAINTAINERS                                   |    1 +
+>  drivers/pci/pci-driver.c                      |   28 +-
+>  drivers/vfio/Kconfig                          |   29 +-
+>  drivers/vfio/fsl-mc/Kconfig                   |    3 +-
+>  drivers/vfio/mdev/Kconfig                     |    1 -
+>  drivers/vfio/pci/Kconfig                      |   40 +-
+>  drivers/vfio/pci/Makefile                     |    8 +-
+>  drivers/vfio/pci/vfio_pci.c                   | 2262 +----------------
+>  drivers/vfio/pci/vfio_pci_config.c            |   70 +-
+>  drivers/vfio/pci/vfio_pci_core.c              | 2158 ++++++++++++++++
+>  drivers/vfio/pci/vfio_pci_igd.c               |   19 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c             |   42 +-
+>  drivers/vfio/pci/vfio_pci_rdwr.c              |   18 +-
+>  drivers/vfio/pci/vfio_pci_zdev.c              |    4 +-
+>  drivers/vfio/platform/Kconfig                 |    6 +-
+>  drivers/vfio/platform/reset/Kconfig           |    4 +-
+>  include/linux/mod_devicetable.h               |    6 +
+>  include/linux/pci.h                           |   29 +
+>  .../linux/vfio_pci_core.h                     |   89 +-
+>  scripts/mod/devicetable-offsets.c             |    1 +
+>  scripts/mod/file2alias.c                      |   17 +-
+>  22 files changed, 2525 insertions(+), 2311 deletions(-)
+>  create mode 100644 drivers/vfio/pci/vfio_pci_core.c
+>  rename drivers/vfio/pci/vfio_pci_private.h => include/linux/vfio_pci_core.h (56%)
 
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  Makefile           |  8 ++++++++
->  scripts/install.sh | 43 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 51 insertions(+)
->  create mode 100755 scripts/install.sh
-> 
-> diff --git a/Makefile b/Makefile
-> index 185ce47d6734..725eadc4fcb8 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1325,6 +1325,14 @@ scripts_unifdef: scripts_basic
->  
->  install: sub_make_done :=
->  
-> +# Install $(KBUILD_IMAGE) by default.
-> +# If necessary, override install-image per target.
-> +install-image = $(KBUILD_IMAGE)
-> +
-> +quiet_cmd_install = INSTALL $(INSTALL_PATH)
-> +      cmd_install = scripts/install.sh $(KERNELRELEASE) $(install-image) \
-> +			System.map "$(INSTALL_PATH)"
-> +
->  # ---------------------------------------------------------------------------
->  # Tools
->  
-> diff --git a/scripts/install.sh b/scripts/install.sh
-> new file mode 100755
-> index 000000000000..6ac0e0c0f078
-> --- /dev/null
-> +++ b/scripts/install.sh
-> @@ -0,0 +1,43 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# This file is subject to the terms and conditions of the GNU General Public
-> +# License.  See the file "COPYING" in the main directory of this archive
-> +# for more details.
-> +#
-> +# Copyright (C) 1995 by Linus Torvalds
-> +#
-> +# Adapted from code in arch/i386/boot/Makefile by H. Peter Anvin
-> +#
-> +# Arguments:
-> +#   $1 - kernel version
-> +#   $2 - kernel image file
-> +#   $3 - kernel map file
-> +#   $4 - default install path (blank if root directory)
-> +
-> +verify () {
-> +	if [ ! -f "$1" ]; then
-> +		echo >&2
-> +		echo >&2 " *** Missing file: $1"
-> +		echo >&2 ' *** You need to run "make" before "make install".'
-> +		echo >&2
-> +		exit 1
-> +	fi
-> +}
-> +
-> +# Make sure the files actually exist
-> +verify "$2"
-> +verify "$3"
-> +
-> +# User/arch may have a custom install script
-> +
-> +for script in "~/bin/${INSTALLKERNEL}" "/sbin/${INSTALLKERNEL}" \
+Applied to vfio next branch for v5.15.  Thanks,
 
-Quoted ~ will not be expanded.  Either you need to put the leading ~/ 
-before the quotes, or replace it by ${HOME}.
+Alex 
 
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
-
-> +		"arch/${SRCARCH}/install.sh" "arch/${SRCARCH}/boot/install.sh"
-> +do
-> +	if [ -x "${script}" ]; then
-> +		exec "${script}" "$@"
-> +	fi
-> +done
-> +
-> +echo "No install script found" >&2
-> +exit 1
-> -- 
-> 2.30.2
-> 
