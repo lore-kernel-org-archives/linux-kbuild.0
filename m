@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B743EC432BE
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Aug 2021 09:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C43C4320A
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Aug 2021 09:51:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9745E6054E
-	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Aug 2021 09:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C7AE60ED3
+	for <linux-kbuild@archiver.kernel.org>; Sat, 28 Aug 2021 09:51:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbhH1Jw0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S233653AbhH1Jw0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Sat, 28 Aug 2021 05:52:26 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:60789 "EHLO
+Received: from conuserg-10.nifty.com ([210.131.2.77]:60787 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230324AbhH1JwZ (ORCPT
+        with ESMTP id S230444AbhH1JwZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 28 Aug 2021 05:52:25 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 17S9p5iF032486;
-        Sat, 28 Aug 2021 18:51:05 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17S9p5iF032486
+        by conuserg-10.nifty.com with ESMTP id 17S9p5iH032486;
+        Sat, 28 Aug 2021 18:51:07 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 17S9p5iH032486
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1630144266;
-        bh=mRdXYx53Ji2/IwMqep6Hxid/WThE4ltfaxnWAzlMAhQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=lhlCIiIfoXwRomlDHsW3jf0v7yyIhSc6Zx3jeFUIaaECtQBkNftF9etBKH0Klev6X
-         uKD95i8Ei3/MUrC65GKCYhoOeJF+swARxtmtGWmVMnnR9JIR8b3tHROOo3i+nVsK7B
-         WCV1pamoDGTY79j5EGiVbn8tz+P7i8OnIC6uPmVRTz746RCrWfDQ7U75GklIHcdsU5
-         Gg0RFPuqUXoojmj67xYWCsGH6vc8vQLtKX5tZ/FCAr9EH5kR/AOFRDF+nR/gYbXiN2
-         h6GtJMWT8i4aLaAiDjz6ShB7Ha/eQ9K0zK9rAlgEXU0qwQYFg7N5aIW4EqascLITNP
-         ADKaacFYNfH2g==
+        s=dec2015msa; t=1630144267;
+        bh=/syLyoEj2LHabGry4vCWawL3+SLYlYahl/OVmmzbivc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dLnBH1EcaOI7+me8/j78O8NFw7WEGVYd7X2YqhCmfHiJCT+Up+z+qsX3SerIvTP3b
+         X8j2mjmP/6hHbRPyGxPaWsOLV8N0mLodDy76WwmZY+adJ+ddGCBJsxZyFJNhqGKuPA
+         8ba7DVfIEVYfoZSEg6+kUatfGUmFbfaarLo+8rZbdyipo84/rewQk3wMpotlxyhyvv
+         qDGADDBSSDlaIm6z/qnRKcQIctZnPSie0l4ltk+pgkh75mKnk4EYregJCPeoF4U/v+
+         7+Q+QChRMCRLqpdV9y6+fPP5lHnste6PLwbiObJ73ImV1P9JSJIUt4xiFzuDxznCWa
+         1Ah/Nj2M8AX1w==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,119 +41,57 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/5] modpost: get the *.mod file path more simply
-Date:   Sat, 28 Aug 2021 18:50:59 +0900
-Message-Id: <20210828095103.2617393-1-masahiroy@kernel.org>
+Subject: [PATCH 3/5] kbuild: clean up objtool_args slightly
+Date:   Sat, 28 Aug 2021 18:51:01 +0900
+Message-Id: <20210828095103.2617393-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210828095103.2617393-1-masahiroy@kernel.org>
+References: <20210828095103.2617393-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-get_src_version() strips 'o' or 'lto.o' from the end of the object file
-path (so, postfixlen is 1 or 5), then adds 'mod'.
+The code:
 
-If you look at the code closely, mod->name already holds the base path
-with the extension stripped.
+  $(if $(or $(CONFIG_GCOV_KERNEL),$(CONFIG_LTO_CLANG)), ...)
 
-Most of the code changes made by commit 7ac204b545f2 ("modpost: lto:
-strip .lto from module names") was actually unneeded.
+... can be simpled to:
 
-sumversion.c does not need strends(), so it can get back local in
-modpost.c again.
+  $(if $(CONFIG_GCOV_KERNEL)$(CONFIG_LTO_CLANG), ...)
+
+Also, remove meaningless commas at the end of $(if ...).
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c    | 11 ++++++++++-
- scripts/mod/modpost.h    |  9 ---------
- scripts/mod/sumversion.c |  7 +------
- 3 files changed, 11 insertions(+), 16 deletions(-)
+ scripts/Makefile.lib | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 270a7df898e2..a26139aa57fd 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -17,6 +17,7 @@
- #include <ctype.h>
- #include <string.h>
- #include <limits.h>
-+#include <stdbool.h>
- #include <errno.h>
- #include "modpost.h"
- #include "../../include/linux/license.h"
-@@ -89,6 +90,14 @@ modpost_log(enum loglevel loglevel, const char *fmt, ...)
- 		error_occurred = true;
- }
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index af1c920a585c..cd011f3f6f78 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -236,13 +236,12 @@ endif
+ # then here to avoid duplication.
+ objtool_args =								\
+ 	$(if $(CONFIG_UNWINDER_ORC),orc generate,check)			\
+-	$(if $(part-of-module), --module,)				\
++	$(if $(part-of-module), --module)				\
+ 	$(if $(CONFIG_FRAME_POINTER),, --no-fp)				\
+-	$(if $(or $(CONFIG_GCOV_KERNEL),$(CONFIG_LTO_CLANG)), 		\
+-		--no-unreachable,)					\
+-	$(if $(CONFIG_RETPOLINE), --retpoline,)				\
+-	$(if $(CONFIG_X86_SMAP), --uaccess,)				\
+-	$(if $(CONFIG_FTRACE_MCOUNT_USE_OBJTOOL), --mcount,)
++	$(if $(CONFIG_GCOV_KERNEL)$(CONFIG_LTO_CLANG), --no-unreachable)\
++	$(if $(CONFIG_RETPOLINE), --retpoline)				\
++	$(if $(CONFIG_X86_SMAP), --uaccess)				\
++	$(if $(CONFIG_FTRACE_MCOUNT_USE_OBJTOOL), --mcount)
  
-+static inline bool strends(const char *str, const char *postfix)
-+{
-+	if (strlen(str) < strlen(postfix))
-+		return false;
-+
-+	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
-+}
-+
- void *do_nofail(void *ptr, const char *expr)
- {
- 	if (!ptr)
-@@ -2060,7 +2069,7 @@ static void read_symbols(const char *modname)
- 	if (!mod->is_vmlinux) {
- 		version = get_modinfo(&info, "version");
- 		if (version || all_versions)
--			get_src_version(modname, mod->srcversion,
-+			get_src_version(mod->name, mod->srcversion,
- 					sizeof(mod->srcversion) - 1);
- 	}
- 
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index c1a895c0d682..0c47ff95c0e2 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -2,7 +2,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <stdarg.h>
--#include <stdbool.h>
- #include <string.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -178,14 +177,6 @@ static inline unsigned int get_secindex(const struct elf_info *info,
- 	return info->symtab_shndx_start[sym - info->symtab_start];
- }
- 
--static inline bool strends(const char *str, const char *postfix)
--{
--	if (strlen(str) < strlen(postfix))
--		return false;
--
--	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
--}
--
- /* file2alias.c */
- extern unsigned int cross_build;
- void handle_moddevtable(struct module *mod, struct elf_info *info,
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 760e6baa7eda..905c0ec291e1 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -391,14 +391,9 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- 	struct md4_ctx md;
- 	char *fname;
- 	char filelist[PATH_MAX + 1];
--	int postfix_len = 1;
--
--	if (strends(modname, ".lto.o"))
--		postfix_len = 5;
- 
- 	/* objects for a module are listed in the first line of *.mod file. */
--	snprintf(filelist, sizeof(filelist), "%.*smod",
--		 (int)strlen(modname) - postfix_len, modname);
-+	snprintf(filelist, sizeof(filelist), "%s.mod", modname);
- 
- 	buf = read_text_file(filelist);
- 
+ # Useful for describing the dependency of composite objects
+ # Usage:
 -- 
 2.30.2
 
