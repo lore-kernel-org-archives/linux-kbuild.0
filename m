@@ -2,253 +2,135 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC3DC19F38
-	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 14:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE27EC432BE
+	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 17:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74BE761053
-	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 14:44:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B10E46109E
+	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 17:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238755AbhHaOpB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 31 Aug 2021 10:45:01 -0400
-Received: from mga11.intel.com ([192.55.52.93]:16897 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239034AbhHaOnu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Aug 2021 10:43:50 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10093"; a="215357990"
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="215357990"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 07:42:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="446126336"
-Received: from irvmail001.ir.intel.com ([10.43.11.63])
-  by orsmga002.jf.intel.com with ESMTP; 31 Aug 2021 07:42:31 -0700
-Received: from alobakin-mobl.ger.corp.intel.com (psmrokox-mobl.ger.corp.intel.com [10.213.6.58])
-        by irvmail001.ir.intel.com (8.14.3/8.13.6/MailSET/Hub) with ESMTP id 17VEfmfk002209;
-        Tue, 31 Aug 2021 15:42:28 +0100
-From:   Alexander Lobakin <alexandr.lobakin@intel.com>
-To:     linux-hardening@vger.kernel.org
-Cc:     "Kristen C Accardi" <kristen.c.accardi@intel.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Marios Pomonis <pomonis@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Lukasz Czapnik <lukasz.czapnik@intel.com>,
-        "Marta A Plantykow" <marta.a.plantykow@intel.com>,
-        Michal Kubiak <michal.kubiak@intel.com>,
-        Michal Swiatkowski <michal.swiatkowski@intel.com>,
-        Alexander Lobakin <alexandr.lobakin@intel.com>,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH v6 kspp-next 20/22] module: use a scripted approach for FG-KASLR
-Date:   Tue, 31 Aug 2021 16:41:12 +0200
-Message-Id: <20210831144114.154-21-alexandr.lobakin@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210831144114.154-1-alexandr.lobakin@intel.com>
-References: <20210831144114.154-1-alexandr.lobakin@intel.com>
+        id S239994AbhHaRR6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 31 Aug 2021 13:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239659AbhHaRRz (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 31 Aug 2021 13:17:55 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCFFC061760
+        for <linux-kbuild@vger.kernel.org>; Tue, 31 Aug 2021 10:16:59 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id y34so268975lfa.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 31 Aug 2021 10:16:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=obdT8H3XYks2rJPjk5mybOLqMo1D6xNjm3PqnOSi/Co=;
+        b=M8HO7XZ8gEpPcSZ9IHcOu5DzjDBc45aO6HMKmSD4PUBvAlGCeW8AZ3yffZUgeXUO4q
+         PmKxHho9OVF/9kWc8M629PmHyioaO74KXGPdnHDooREtDV3DJsWyQuGGYMAT8uj8FHXn
+         SAfJhMYypBSCOqo22iy/+kHfq/jQNKe05Dg/FlSRJhtHTL98u9IWKVNU0DzOaIFCc7Pd
+         OrpftmTdYzwCdAlrrBAQ6wBPH7V1C857vpj88o/pusO94g8khv6GycpRXdlq24n0tTiI
+         mgfJHd9SB/m7zaFCI3bkptzHQ4WnWqM81CMYv5ekHtgMZBP+iw6oOwlxfExLKie8zXGO
+         C6YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=obdT8H3XYks2rJPjk5mybOLqMo1D6xNjm3PqnOSi/Co=;
+        b=nde1n2KVRpiaW5vYt+nT7LmrRVZZ7+adxSGArlxlR+6RkomGH2mQZLD/IGF59FJF5s
+         Ob13ucYAgIjIHcE/W1lWYEj3XLj2+te0w2o3EjISZ7LPFc5Y6dgxTNybo9GeE3Fvoqo4
+         YyTEbxha5wlAg66wML30wlmoBarjLddBsoWp9Bkq4jaeURYzUXzj8+ve0QknQdDTg4lL
+         +tUvgcWgBaZ11Spdwfjvxl3JczDXYymPyu5z0EZal5tbn2DsazYk2O89Iq0Bmm7v+ZUd
+         fm/UGyG8GpliKXPr+R+3F67/I3SZL4B7iGAHbWUBTCpeHRzFc6STlI4yea3aPt3sQsQK
+         M9uA==
+X-Gm-Message-State: AOAM531l5IS9jK/cyOlWAo44xVx5Nfke1DgdoxfYqqsKlgH28qXz9Vi0
+        mjQYyC84WsZC8BVHdwdbMMiVZeyeFb4Kk3Pn71GjTA==
+X-Google-Smtp-Source: ABdhPJydYfYxTQDSdJbtgTOZjrnwb5IRRbv7WAkxTk6roO4tlccLhpb7ALDT3CbhQTmTtv/QjyiiaF86jVRZDomz0/8=
+X-Received: by 2002:a05:6512:3e22:: with SMTP id i34mr22513753lfv.374.1630430217595;
+ Tue, 31 Aug 2021 10:16:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210831074004.3195284-1-masahiroy@kernel.org> <20210831074004.3195284-3-masahiroy@kernel.org>
+In-Reply-To: <20210831074004.3195284-3-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 31 Aug 2021 10:16:45 -0700
+Message-ID: <CAKwvOdn9661=wg3ErhaHM=QS4=zOqjK7_f7VqpTgUoGTGnzHsA@mail.gmail.com>
+Subject: Re: [PATCH v2 02/13] kbuild: rename __objtool_obj to objtool
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use the same methods and scripts to generate an LD script for every
-module containing all the output text sections.
-The only difference there is that we don't need to reserve any space
-as the memory for every section is being allocated dynamically.
+On Tue, Aug 31, 2021 at 12:40 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Rename __objtool_obj to objtool, and move it out of the
+> 'ifndef CONFIG_LTO_CLANG' conditional, so it can be used for
+> cmd_cc_lto_link_modules as well.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
----
- include/asm-generic/vmlinux.lds.h | 12 ++++++++++++
- init/Kconfig                      | 15 ++++++++++++++-
- scripts/Makefile.modfinal         | 19 ++++++++++++++++---
- scripts/generate_text_sections.pl |  7 ++++++-
- scripts/module.lds.S              | 14 +++++++++++++-
- 5 files changed, 61 insertions(+), 6 deletions(-)
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index 70fac18c786e..561f3ef06745 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -127,6 +127,18 @@
- #define TEXT_MAIN		.text
- #endif
- 
-+/*
-+ * Same for modules. However, LD_DEAD_CODE_DATA_ELIMINATION doesn't touch
-+ * them, so no need to check for it here.
-+ */
-+#if defined(CONFIG_LTO_CLANG) && !defined(CONFIG_MODULE_FG_KASLR)
-+#define TEXT_MAIN_MODULE	.text .text.[0-9a-zA-Z_]*
-+#elif defined(CONFIG_MODULE_FG_KASLR)
-+#define TEXT_MAIN_MODULE	.text.__unused__
-+#else
-+#define TEXT_MAIN_MODULE	.text
-+#endif
-+
- /*
-  * Used by scripts/generate_text_sections.pl to inject text sections,
-  * harmless if FG-KASLR is disabled.
-diff --git a/init/Kconfig b/init/Kconfig
-index e8158c256ee9..8e0b5973fb72 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -2333,7 +2333,6 @@ config UNUSED_KSYMS_WHITELIST
- config MODULE_FG_KASLR
- 	bool "Module Function Granular Layout Randomization"
- 	default FG_KASLR
--	depends on BROKEN
- 	help
- 	  This option randomizes the module text section by reordering the text
- 	  section by function at module load time. In order to use this
-@@ -2342,6 +2341,20 @@ config MODULE_FG_KASLR
- 
- 	  If unsure, say N.
- 
-+config MODULE_FG_KASLR_SHIFT
-+	int "Module FG-KASLR granularity (functions per section shift)"
-+	depends on MODULE_FG_KASLR
-+	range 0 16
-+	default 0
-+	help
-+	  This sets the number of functions that will be put in each section
-+	  as a power of two.
-+	  Decreasing the value increases the randomization, but also increases
-+	  the size of the final kernel module due to the amount of sections.
-+	  0 means that a separate section will be created for each function.
-+	  16 almost disables the randomization, leaving only the manual
-+	  separation.
-+
- endif # MODULES
- 
- config MODULES_TREE_LOOKUP
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index ff805777431c..ac1b8415519f 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -28,13 +28,24 @@ quiet_cmd_cc_o_c = CC [M]  $@
- %.mod.o: %.mod.c FORCE
- 	$(call if_changed_dep,cc_o_c)
- 
-+ifdef CONFIG_MODULE_FG_KASLR
-+quiet_cmd_gen_modules_lds = GEN [M] $@
-+      cmd_gen_modules_lds =						\
-+	$(PERL) $(srctree)/scripts/generate_text_sections.pl		\
-+		-s $(CONFIG_MODULE_FG_KASLR_SHIFT) $(filter %.o, $^)	\
-+		< $(filter %.lds, $^) > $@
-+
-+%.lds: %$(mod-prelink-ext).o scripts/module.lds FORCE
-+	$(call if_changed,gen_modules_lds)
-+endif
-+
- ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
- 
- quiet_cmd_ld_ko_o = LD [M]  $@
-       cmd_ld_ko_o +=							\
- 	$(LD) -r $(KBUILD_LDFLAGS)					\
- 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
--		-T scripts/module.lds -o $@ $(filter %.o, $^);		\
-+		-T $(filter %.lds, $^) -o $@ $(filter %.o, $^);		\
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
- quiet_cmd_btf_ko = BTF [M] $@
-@@ -55,13 +66,15 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
- 
- 
- # Re-generate module BTFs if either module's .ko or vmlinux changed
--$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
-+$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o
-+$(modules): %.ko: $(if $(CONFIG_MODULE_FG_KASLR),%.lds,scripts/module.lds)
-+$(modules): %.ko: $(if $(KBUILD_BUILTIN),vmlinux) FORCE
- 	+$(call if_changed_except,ld_ko_o,vmlinux)
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
- endif
- 
--targets += $(modules) $(modules:.ko=.mod.o)
-+targets += $(modules) $(modules:.ko=.mod.o) $(if $(CONFIG_MODULE_FG_KASLR),$(modules:.ko=.lds))
- 
- # Add FORCE to the prequisites of a target to force it to be always rebuilt.
- # ---------------------------------------------------------------------------
-diff --git a/scripts/generate_text_sections.pl b/scripts/generate_text_sections.pl
-index 5f3ece2ee0ea..d5b16057b9ff 100755
---- a/scripts/generate_text_sections.pl
-+++ b/scripts/generate_text_sections.pl
-@@ -44,6 +44,7 @@ my $readelf = $ENV{'READELF'} || die "$0: ERROR: READELF not set?";
- 
- ## text sections array
- my @sections = ();
-+my $vmlinux = 0;
- 
- ## max alignment found to reserve some space
- my $max_align = 64;
-@@ -64,6 +65,10 @@ sub read_sections {
- 			next;
- 		}
- 
-+		if ($name eq ".sched.text") {
-+			$vmlinux = 1;
-+		}
-+
- 		if (!($name =~ /^\.text\.[0-9a-zA-Z_]*((\.constprop|\.isra|\.part)\.[0-9])*(|\.[0-9cfi]*)$/)) {
- 			next;
- 		}
-@@ -120,7 +125,7 @@ sub print_reserve {
- 	## we reserve some space for them to not overlap _etext while shuffling
- 	## sections
- 
--	if (!$count) {
-+	if (!$vmlinux or !$count) {
- 		return;
- 	}
- 
-diff --git a/scripts/module.lds.S b/scripts/module.lds.S
-index 04c5685c25cf..f32437783edf 100644
---- a/scripts/module.lds.S
-+++ b/scripts/module.lds.S
-@@ -3,6 +3,11 @@
-  * Archs are free to supply their own linker scripts.  ld will
-  * combine them automatically.
-  */
-+
-+#include <asm-generic/vmlinux.lds.h>
-+
-+#undef SANITIZER_DISCARDS
-+
- #ifdef CONFIG_CFI_CLANG
- # include <asm/page.h>
- # define ALIGN_CFI 		ALIGN(PAGE_SIZE)
-@@ -57,9 +62,16 @@ SECTIONS {
- 	 */
- 	.text : ALIGN_CFI {
- 		*(.text.__cfi_check)
--		*(.text .text.[0-9a-zA-Z_]* .text..L.cfi*)
-+		*(TEXT_MAIN_MODULE)
-+		*(.text..L.cfi.jumptable .text..L.cfi.jumptable.*)
-+	}
-+#elif defined(CONFIG_MODULE_FG_KASLR)
-+	.text : {
-+		*(TEXT_MAIN_MODULE)
- 	}
- #endif
-+
-+	TEXT_FG_KASLR
- }
- 
- /* bring in arch-specific sections */
+> ---
+>
+>  scripts/Makefile.build | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 17508c0e4358..e78096cd396b 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -225,6 +225,8 @@ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+>
+>  ifdef CONFIG_STACK_VALIDATION
+>
+> +objtool := $(objtree)/tools/objtool/objtool
+> +
+>  objtool_args =                                                         \
+>         $(if $(CONFIG_UNWINDER_ORC),orc generate,check)                 \
+>         $(if $(part-of-module), --module)                               \
+> @@ -236,17 +238,15 @@ objtool_args =                                                            \
+>
+>  ifndef CONFIG_LTO_CLANG
+>
+> -__objtool_obj := $(objtree)/tools/objtool/objtool
+> -
+>  # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+>  # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+>  # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+>  cmd_objtool = $(if $(patsubst y%,, \
+>         $(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+> -       $(__objtool_obj) $(objtool_args) $@)
+> +       $(objtool) $(objtool_args) $@)
+>  objtool_obj = $(if $(patsubst y%,, \
+>         $(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+> -       $(__objtool_obj))
+> +       $(objtool))
+>
+>  endif # CONFIG_LTO_CLANG
+>  endif # CONFIG_STACK_VALIDATION
+> @@ -300,8 +300,7 @@ cmd_cc_lto_link_modules =                                           \
+>  ifdef CONFIG_STACK_VALIDATION
+>  # objtool was skipped for LLVM bitcode, run it now that we have compiled
+>  # modules into native code
+> -cmd_cc_lto_link_modules += ;                                           \
+> -       $(objtree)/tools/objtool/objtool $(objtool_args) --module $@
+> +cmd_cc_lto_link_modules += ; $(objtool) $(objtool_args) --module $@
+>  endif
+>
+>  $(obj)/%.lto.o: $(obj)/%.o FORCE
+> --
+> 2.30.2
+>
+
+
 -- 
-2.31.1
-
+Thanks,
+~Nick Desaulniers
