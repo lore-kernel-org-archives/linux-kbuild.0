@@ -2,142 +2,141 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 086DFC432BE
-	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 04:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAD9C432BE
+	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 07:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFAED600CD
-	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 04:31:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93D9560FE8
+	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 07:40:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbhHaEc0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 31 Aug 2021 00:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43840 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbhHaEc0 (ORCPT
+        id S239973AbhHaHlh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 31 Aug 2021 03:41:37 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:65505 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239753AbhHaHlh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Aug 2021 00:32:26 -0400
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E154BC061575;
-        Mon, 30 Aug 2021 21:31:31 -0700 (PDT)
-Received: by mail-oo1-xc2e.google.com with SMTP id t1-20020a4a54010000b02902638ef0f883so5276695ooa.11;
-        Mon, 30 Aug 2021 21:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=A6HQ5o35slS4lhDe1JWfagZktmq0c6Dz9wk6hg5BiZ0=;
-        b=S1AT3uix9kpP6lB0S/AAIu1rvL8W7u0CXpTo6AT1UAQvTFF1eZc32VFa6EThibHYMM
-         6bxwJykeKBQDzyzpIqOX5P3nPXHvLkvfOaCzCBslH9t3JTD63iFXU1LVGCWFjGWRseRi
-         URyPTKZ+RVxB6+pVOZeRONNjUgJEQo34Lv8InAYOBLuDygU02WQxeyiFHrRMG/4GlBso
-         ACx+Z3eAlRSIRMrPWRHAgr4Unbz49YuIzEmlqPcF2WZhfUWryB7NhEPY6YW4s8MFRC+M
-         G48O4qcXi+/LAI/iQ9kbl5Fc/w3B2ouvRhuE30b2IwAcij9JYWDbcxrdmWoB9vXf9e30
-         aM6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=A6HQ5o35slS4lhDe1JWfagZktmq0c6Dz9wk6hg5BiZ0=;
-        b=s3Bf05eqeavQEYvj/ZyhRB/F8tWj1VpoLF14jSA9qUboeHfHt8G/RdHk+83rUDhYSr
-         +riNp3VssyoMdjkwgbqgB6SYwhCTLOV5vO9mr8eq/8j8d/IwBfMcycoJAAC4ICrZsn+3
-         cZa5tmKGK5NXG9LJ+ajE3UrliSCbWmWcq4ILZZ0v/491+qyuOZQwiz0G6fpLKdF+QkC1
-         8TV0FySZHo+nF+n8lVrendZS+GH/uxmjqQBxtMlzmQXSOxj+Fgma48+xXn7jSZO7eNYX
-         +RuRtoaDKrc2wVs4F+B0eSOtmFYlgx1HgGfsfvi8fsGv/6W8Q9GDI/v5KIRevk+g7TfA
-         HxcQ==
-X-Gm-Message-State: AOAM533r0Yui3oxZ41hV8xPES4wJ4+PGfdXi5aEsSVWozvLknrYXw9dT
-        L9mm+5HW8HCGd6wTHzeFd08=
-X-Google-Smtp-Source: ABdhPJyP9AtFH1rrxT5VVjkGLMvAaFpQAPIBUMRYGg3DXcozOJRYMD4kLYHG4asggjdWIJDcdAgUGg==
-X-Received: by 2002:a4a:8d97:: with SMTP id i23mr12726731ook.4.1630384291086;
-        Mon, 30 Aug 2021 21:31:31 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id y11sm3634270otg.58.2021.08.30.21.31.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Aug 2021 21:31:30 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Mon, 30 Aug 2021 21:31:28 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org,
-        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Keith Packard <keithp@keithp.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        clang-built-linux@googlegroups.com, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] Makefile: Enable -Warray-bounds
-Message-ID: <20210831043128.GA2749311@roeck-us.net>
-References: <20210827163015.3141722-1-keescook@chromium.org>
- <20210827163015.3141722-5-keescook@chromium.org>
+        Tue, 31 Aug 2021 03:41:37 -0400
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 17V7e8EU031407;
+        Tue, 31 Aug 2021 16:40:10 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 17V7e8EU031407
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1630395611;
+        bh=TzRYWVEk2uz94kf4FQhuvI8YUyXUVwnUiVEt4iPFvzA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=YV0BB8hpH+EngEJ8p93dSMnC+X7XsB37dsgBJG//v3zTXdiC+oOyLCs4V21Yf7AiF
+         nlnhFR6+P4bRKkFo6yWmQvIunylwKehEmBBKfn1j51mBz5NPqOuT10VPpbywlO7KTx
+         S3nd82f5XXZND6U/oJ+eCRXrhHF3niyR7XHWekvg3UaNUFk9qqpM9G89ZeyA6fdfP7
+         BHbLn0V8qRyPU6DxNZDqz+BCODYEBAc+fRPrgfPpo3jw4XppM94kTYgjbJN9GtHub8
+         l/EhySD1nv3fs4mWBAbRxgnExLqmQwvl+lUlKpD7TTRbKEIsMfZPwesYEtnOY7YrTR
+         cRtWYbrRHbVUg==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 03/13] kbuild: store the objtool command in *.cmd files
+Date:   Tue, 31 Aug 2021 16:39:54 +0900
+Message-Id: <20210831074004.3195284-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210831074004.3195284-1-masahiroy@kernel.org>
+References: <20210831074004.3195284-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210827163015.3141722-5-keescook@chromium.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 09:30:14AM -0700, Kees Cook wrote:
-> With the recent fixes for flexible arrays and expanded FORTIFY_SOURCE
-> coverage, it is now possible to enable -Warray-bounds. Since both
-> GCC and Clang include -Warray-bounds in -Wall, we just need to stop
-> disabling it.
-> 
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> Co-developed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  Makefile | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index e4f5895badb5..8e7e73a642e2 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -995,7 +995,6 @@ KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
->  
->  # We'll want to enable this eventually, but it's not going away for 5.7 at least
->  KBUILD_CFLAGS += $(call cc-disable-warning, zero-length-bounds)
-> -KBUILD_CFLAGS += $(call cc-disable-warning, array-bounds)
->  KBUILD_CFLAGS += $(call cc-disable-warning, stringop-overflow)
->  
+objtool_dep includes include/config/{ORC_UNWINDER,STACK_VALIDATION}
+so that all the objects are rebuilt when any of CONFIG_ORC_UNWINDER
+and CONFIG_STACK_VALIDATION is toggled.
 
-This patch causes 'alpha' builds to fail when trying to build an image with
-gcc 11.2.
+As you can see in 'objtool_args', there are more CONFIG options
+that affect the objtool command line.
 
-In file included from include/linux/string.h:20,
-                 from include/linux/bitmap.h:11,
-                 from include/linux/cpumask.h:12,
-                 from include/linux/smp.h:13,
-                 from include/linux/lockdep.h:14,
-                 from include/linux/spinlock.h:63,
-                 from include/linux/mmzone.h:8,
-                 from include/linux/gfp.h:6,
-                 from include/linux/mm.h:10,
-                 from include/linux/pagemap.h:8,
-                 from arch/alpha/mm/init.c:10:
-In function '__memset',
-    inlined from '__bad_pagetable' at arch/alpha/mm/init.c:79:2:
-arch/alpha/include/asm/string.h:37:32: error: '__builtin_memset' offset [0, 8191] is out of the bounds [0, 0] [-Werror=array-bounds]
-   37 |                         return __builtin_memset(s, c, n);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~
-In function '__memset',
-    inlined from '__bad_page' at arch/alpha/mm/init.c:86:2:
-arch/alpha/include/asm/string.h:37:32: error: '__builtin_memset' offset [0, 8191] is out of the bounds [0, 0] [-Werror=array-bounds]
-   37 |                         return __builtin_memset(s, c, n);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~
-In function '__memset',
-    inlined from 'paging_init' at arch/alpha/mm/init.c:256:2:
-arch/alpha/include/asm/string.h:37:32: error: '__builtin_memset' offset [0, 8191] is out of the bounds [0, 0] [-Werror=array-bounds]
-   37 |                         return __builtin_memset(s, c, n);
+Adding more and more include/config/* is ugly and unmaintainable.
 
-Seen in next-20210830.
+Another issue is that non-standard objects are needlessly rebuilt.
+Objects specified as OBJECT_FILES_NON_STANDARD is not processed by
+objtool, but they are rebuilt anyway when CONFIG_ORC_UNWINDER or
+CONFIG_STACK_VALIDATION is toggled. This is not a big deal, but
+better to fix.
 
-Guenter
+A cleaner and more precise fix is to include the objtool command in
+*.cmd files so any command change is naturally detected by if_change.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/Makefile.build | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index e78096cd396b..021ae0146913 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -155,7 +155,7 @@ $(obj)/%.ll: $(src)/%.c FORCE
+ # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
+ 
+ quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
+-      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
++      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< $(cmd_objtool)
+ 
+ ifdef CONFIG_MODVERSIONS
+ # When module versioning is enabled the following steps are executed:
+@@ -243,7 +243,7 @@ ifndef CONFIG_LTO_CLANG
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
+ cmd_objtool = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+-	$(objtool) $(objtool_args) $@)
++	; $(objtool) $(objtool_args) $@)
+ objtool_obj = $(if $(patsubst y%,, \
+ 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n), \
+ 	$(objtool))
+@@ -251,10 +251,8 @@ objtool_obj = $(if $(patsubst y%,, \
+ endif # CONFIG_LTO_CLANG
+ endif # CONFIG_STACK_VALIDATION
+ 
+-# Rebuild all objects when objtool changes, or is enabled/disabled.
+-objtool_dep = $(objtool_obj)					\
+-	      $(wildcard include/config/ORC_UNWINDER		\
+-			 include/config/STACK_VALIDATION)
++# Rebuild all objects when objtool changes
++objtool_dep = $(objtool_obj)
+ 
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+ cmd_gen_ksymdeps = \
+@@ -269,7 +267,6 @@ define rule_cc_o_c
+ 	$(call cmd,gen_ksymdeps)
+ 	$(call cmd,checksrc)
+ 	$(call cmd,checkdoc)
+-	$(call cmd,objtool)
+ 	$(call cmd,modversions_c)
+ 	$(call cmd,record_mcount)
+ endef
+@@ -277,7 +274,6 @@ endef
+ define rule_as_o_S
+ 	$(call cmd_and_fixdep,as_o_S)
+ 	$(call cmd,gen_ksymdeps)
+-	$(call cmd,objtool)
+ 	$(call cmd,modversions_S)
+ endef
+ 
+@@ -365,7 +361,7 @@ $(obj)/%.s: $(src)/%.S FORCE
+ 	$(call if_changed_dep,cpp_s_S)
+ 
+ quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
+-      cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
++      cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $< $(cmd_objtool)
+ 
+ ifdef CONFIG_ASM_MODVERSIONS
+ 
+-- 
+2.30.2
+
