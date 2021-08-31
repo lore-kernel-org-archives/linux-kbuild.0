@@ -2,38 +2,37 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58718C4320A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFFEC4320E
 	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 07:40:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40A3260232
+	by mail.kernel.org (Postfix) with ESMTP id 843D860184
 	for <linux-kbuild@archiver.kernel.org>; Tue, 31 Aug 2021 07:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240070AbhHaHlt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 31 Aug 2021 03:41:49 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:16663 "EHLO
+        id S240071AbhHaHlv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 31 Aug 2021 03:41:51 -0400
+Received: from conuserg-12.nifty.com ([210.131.2.79]:16667 "EHLO
         conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239969AbhHaHls (ORCPT
+        with ESMTP id S240062AbhHaHlt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 Aug 2021 03:41:48 -0400
+        Tue, 31 Aug 2021 03:41:49 -0400
 Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 17V7e8EX031407;
-        Tue, 31 Aug 2021 16:40:12 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 17V7e8EX031407
+        by conuserg-12.nifty.com with ESMTP id 17V7e8ER031407;
+        Tue, 31 Aug 2021 16:40:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 17V7e8ER031407
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1630395612;
-        bh=xFLGv8lF3G7O65tVH4SGLfJJLnu04rv+AUXe+aVSKyA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EjY85S866+0wiT4jiBLJlJANS+VNEIHLaPkt6Oq1mm6ej429ZyHkTr9txcvMYAuIl
-         SAaKy66GfM4Ne//MST9o9UzHzNw2ebn/nI9E7f2C6P4rPEHygdthNFvSotOEsn60PK
-         r/Gl3+xYtzo6LRUeUpqtc6iOBcXyxuyamXXQBm7/5IUZaRIy7EyRLPE35RwsOcHbrh
-         xeJ0Syzd2zP0MOX1GnSZjw3B7H2lHH/hZfkZ+nkzpQ0BlIYo605fqDs9l3bMpDJX/K
-         Zj780OS9FIwJii97YuQ4uIo2hsPdFtfeyrb8oP6sy3O/d8WLxKRlKdvs7FdMvha0zw
-         cM0CTgJMQu8EA==
+        s=dec2015msa; t=1630395609;
+        bh=vyreOE+xhPd0lfrmBa1SolU1TBZULzHRHFaBsxypS0U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=pqo3s6ny45Ut+UXr4PyDxmQ5PfFaG4W2gOuwXumtfiUCt/83iB3Tv368Cdw5frJ9h
+         PRORd40EQGpdyh3FhH6mHYGFYma7qkxROmmpamrax+Y23rfk4Z2kCXiuhxj/M84/Pf
+         bNBPTEBrT2+6dfX52Vc2iA287lseOviKzf8/bvjXS+xtsnZP3kblmX+OnhhJxqcIMn
+         nKP6qqB2Gncy/ZenNAaH/BpYq3qwFNh8LmkS175smdhY5dxwKnY4BOTOED4+0quDxb
+         p6A6svmCilYOZAx0lIsLuWgoCdwVd2FvM4p4VKrbvsZW7QEUG2WBtp1KOGhzdQAe7D
+         tbssP6KW5EI6g==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -42,98 +41,43 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 06/13] kbuild: reuse $(cmd_objtool) for cmd_cc_lto_link_modules
-Date:   Tue, 31 Aug 2021 16:39:57 +0900
-Message-Id: <20210831074004.3195284-7-masahiroy@kernel.org>
+Subject: [PATCH v2 00/13] kbuild: second round of Clang LTO refactoring
+Date:   Tue, 31 Aug 2021 16:39:51 +0900
+Message-Id: <20210831074004.3195284-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210831074004.3195284-1-masahiroy@kernel.org>
-References: <20210831074004.3195284-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-For CONFIG_LTO_CLANG=y, the objtool processing is not possible at the
-compilation, hence postponed by the link time.
 
-Reuse $(cmd_objtool) for CONFIG_LTO_CLANG=y by defining objtool-enabled
-properly.
+Masahiro Yamada (13):
+  kbuild: move objtool_args back to scripts/Makefile.build
+  kbuild: rename __objtool_obj to objtool
+  kbuild: store the objtool command in *.cmd files
+  kbuild: factor out OBJECT_FILES_NON_STANDARD check into a macro
+  kbuild: detect objtool update without using .SECONDEXPANSION
+  kbuild: reuse $(cmd_objtool) for cmd_cc_lto_link_modules
+  kbuild: do not create built-in.a.symversions or lib.a.symversions
+  kbuild: build modules in the same way with/without Clang LTO
+  kbuild: add cmd_and_savecmd macro
+  kbuild: rebuild modules when objtool is updated for CONFIG_LTO_CLANG
+  kbuild: always postpone CRC links for module versioning
+  kbuild: merge cmd_modversions_c and cmd_modversions_S
+  kbuild: merge cmd_ar_builtin and cmd_ar_module
 
-For CONFIG_LTO_CLANG=y:
+ scripts/Kbuild.include    |   6 +-
+ scripts/Makefile.build    | 207 ++++++++++++++++----------------------
+ scripts/Makefile.lib      |  27 ++---
+ scripts/Makefile.modfinal |   4 +-
+ scripts/Makefile.modpost  |   7 +-
+ scripts/link-vmlinux.sh   |  31 +++---
+ scripts/merge-symvers.pl  |  52 ++++++++++
+ scripts/mod/modpost.c     |   6 +-
+ 8 files changed, 175 insertions(+), 165 deletions(-)
+ create mode 100644 scripts/merge-symvers.pl
 
-  objtool-enabled is off for %.o compilation
-  objtool-enabled is on  for %.lto link
-
-For CONFIG_LTO_CLANG=n:
-
-  objtool-enabled is on for %.o compilation
-      (but, it depends on OBJECT_FILE_NON_STANDARD)
-
-Set part-of-module := y for %.lto.o to avoid repeating --module.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/Makefile.build | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 21b55f37a23f..afc906cd7256 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -236,20 +236,26 @@ objtool_args =								\
- 	$(if $(CONFIG_X86_SMAP), --uaccess)				\
- 	$(if $(CONFIG_FTRACE_MCOUNT_USE_OBJTOOL), --mcount)
- 
--ifndef CONFIG_LTO_CLANG
-+cmd_objtool = $(if $(objtool-enabled), ; $(objtool) $(objtool_args) $@)
-+cmd_gen_objtooldep = $(if $(objtool-enabled), { echo ; echo '$@: $$(wildcard $(objtool))' ; } >> $(dot-target).cmd)
-+
-+endif # CONFIG_STACK_VALIDATION
-+
-+ifdef CONFIG_LTO_CLANG
-+
-+# Skip objtool for LLVM bitcode
-+$(obj)/%o: objtool-enabled :=
-+
-+else
- 
- # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
- 
--objtool-enabled = $(if $(filter-out y%, \
-+$(obj)/%o: objtool-enabled = $(if $(filter-out y%, \
- 	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
- 
--cmd_objtool = $(if $(objtool-enabled), ; $(objtool) $(objtool_args) $@)
--cmd_gen_objtooldep = $(if $(objtool-enabled), { echo ; echo '$@: $$(wildcard $(objtool))' ; } >> $(dot-target).cmd)
--
--endif # CONFIG_LTO_CLANG
--endif # CONFIG_STACK_VALIDATION
-+endif
- 
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- cmd_gen_ksymdeps = \
-@@ -289,13 +295,13 @@ cmd_cc_lto_link_modules =						\
- 	$(LD) $(ld_flags) -r -o $@					\
- 		$(shell [ -s $(@:.lto.o=.o.symversions) ] &&		\
- 			echo -T $(@:.lto.o=.o.symversions))		\
--		--whole-archive $(filter-out FORCE,$^)
-+		--whole-archive $(filter-out FORCE,$^)			\
-+		$(cmd_objtool)
- 
--ifdef CONFIG_STACK_VALIDATION
- # objtool was skipped for LLVM bitcode, run it now that we have compiled
- # modules into native code
--cmd_cc_lto_link_modules += ; $(objtool) $(objtool_args) --module $@
--endif
-+$(obj)/%.lto.o: objtool-enabled = y
-+$(obj)/%.lto.o: part-of-module := y
- 
- $(obj)/%.lto.o: $(obj)/%.o FORCE
- 	$(call if_changed,cc_lto_link_modules)
 -- 
 2.30.2
 
