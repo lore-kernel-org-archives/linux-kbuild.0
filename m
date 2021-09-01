@@ -2,165 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A71CAC432BE
-	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Sep 2021 17:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A7BC432BE
+	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Sep 2021 21:36:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D9556109E
-	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Sep 2021 17:53:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8EBD61027
+	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Sep 2021 21:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236638AbhIARya (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 1 Sep 2021 13:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
+        id S1343833AbhIAVhM (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 1 Sep 2021 17:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233691AbhIARy3 (ORCPT
+        with ESMTP id S241103AbhIAVhL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Sep 2021 13:54:29 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50786C061575;
-        Wed,  1 Sep 2021 10:53:32 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id o39-20020a05600c512700b002e74638b567so253272wms.2;
-        Wed, 01 Sep 2021 10:53:32 -0700 (PDT)
+        Wed, 1 Sep 2021 17:37:11 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D65C061575
+        for <linux-kbuild@vger.kernel.org>; Wed,  1 Sep 2021 14:36:14 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id l10so2023297lfg.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 01 Sep 2021 14:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=chmdazpsK/ePhDNWEYhOHO7k+euA1jvx99RRVmxt5Xw=;
-        b=ev+4Jb3gtl6J2AmbiJlIUA9wzrsPaIHIKYd19RqSAm17eEfhhfuOUNGPv2vZGsx1ok
-         GtbnpfsM1iN2nFTrdL/gAGfrn2z8Zz4at1Gw0AT3Zly3XOitdb0WA5ShDaByz8NiDVWE
-         uTh6rr4vlMjG5UxSA6HOdtkARHSnaPzpvY4/tdGczOzTdIiiZ352lWixEYtY35+IrUZu
-         fnuCpeCqg6KeyCQMTQVc5sVTU46iuugEqj9aL3qKTcZoaCbFXfaL/YlyRJJCiyW6NyF+
-         mqQg6NqShRS74lL2E95EGB888efv9kjkdjv01KyZjxC3jg8wriqnl4gckcoW2C2kHsIZ
-         W/dg==
+        d=linuxfoundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IYemb+IVIGMJMpiffbPQhUFiWax0UjI4yymjBbO+x2M=;
+        b=L3OYKEs58Snx5mC+czL344+tZCIO7gfpz++GT7mAJJ9TkuGPjlXiYIOypkBLHsfxzx
+         ds+STBdb8Ysq9cPQg06QQe80hsqF++3uZ2kqZQdkxsBDjcVYbjIWPXjRsuzwUZsae9l9
+         mKlZ8KFBOIQgr5ExFEYl0ynTDLEaiIPke2C9g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=chmdazpsK/ePhDNWEYhOHO7k+euA1jvx99RRVmxt5Xw=;
-        b=ZibfwSb2AQM/AXXJLUp/Q/9NP9kz8ADxYogAu1isgb4OpVAgu8Meu/oDxuo55uiZV/
-         gipTTabTT/wOgQgWD0YygG3HzVZIXvJcGZ3XkpxZ1gAifD1dnTn3nFNah3QGo+yj/06J
-         FUwuh23j2kOjBqtS6kvgd+XDjS8av7qNudGGtm3FS3CV1b+o/cg4JOEgtRAmLXMQ1LK3
-         DwrE5ElXnaNNBOQtLirwVroAxTrZcfeXf42FAJoF5SRXcBCQ9+m9F+CVjiVYjIwTS9gK
-         FSipachGG5WsaXC7LE/fORWNeFY0PWYXgdJT8U9IuCPmXifZOzjrBDhkWrwcnVLmYFBe
-         bLdQ==
-X-Gm-Message-State: AOAM5309o5oYk08RHg7VHHGo1ndW7Affb6nbhgAKj4Gis+cHER7QKSsz
-        Z5TFpSiWiAJa6MJ9x4NNamsKnxfRKZMKfw==
-X-Google-Smtp-Source: ABdhPJyEnn3hoRLrt2yqBJOdbjhyXBkwUK5Vp1DdABXWEUtH92aP7JoBC5cPyAElVm/xkKSaJ/C5Tg==
-X-Received: by 2002:a05:600c:5102:: with SMTP id o2mr641658wms.104.1630518810946;
-        Wed, 01 Sep 2021 10:53:30 -0700 (PDT)
-Received: from localhost.localdomain ([147.235.73.50])
-        by smtp.googlemail.com with ESMTPSA id 138sm258105wmb.7.2021.09.01.10.53.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 10:53:30 -0700 (PDT)
-From:   Ariel Marcovitch <arielmarcovitch@gmail.com>
-To:     masahiroy@kernel.org
-Cc:     arielmarcovitch@gmail.com, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH] kconfig: Create links to main menu items in search
-Date:   Wed,  1 Sep 2021 20:53:26 +0300
-Message-Id: <20210901175326.568535-1-arielmarcovitch@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IYemb+IVIGMJMpiffbPQhUFiWax0UjI4yymjBbO+x2M=;
+        b=az9Ke+gtblia5qtUFRR4PUJN3A0QaAOT2/+GS1liGVHTku6GDqjGkEYF5Zxl0gOvnY
+         aLZaRPA5Zz/rDfFReht1aJGhJoz+bjIuZvkfxZSrWLTqT/Q2n4nyMf+fJXz+Qi96nk6q
+         SYu0hGVABRM2Oj95FLZFpq36byXAdI579hNn0sZRsbt6/LsRsrhzkCVl2bSDQwtPdWIq
+         pPFa6O/gE6fpekHoJSJwd5DcyIPTS2ST7mYJibdqBM2olIrm4yVYQ4Vapm7E2jq68IfF
+         Q8i+UmI4Mkm4fg5OUk05DgUIU/fxqtdzn7G3VRQ+BjP2jw2GDOpm4hI38vaB2nJgAIPB
+         tv7A==
+X-Gm-Message-State: AOAM531YCrPwqTOi9ncQg/nMsjQB5cYYC5h5hqsSawIxHt5OrhW4EaU4
+        kdQUhx5zXS0Lp4GKeZ8CbHLDaVe3jsvlKqEU
+X-Google-Smtp-Source: ABdhPJymKgQCzXiMzVJ50eSOs/4zU+VYauyzb+/gs3jofeJbw8WweAA7oKPMUCAu/k0odOI2+lV/Rw==
+X-Received: by 2002:a19:6510:: with SMTP id z16mr1079519lfb.566.1630532172518;
+        Wed, 01 Sep 2021 14:36:12 -0700 (PDT)
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
+        by smtp.gmail.com with ESMTPSA id u3sm66584lft.149.2021.09.01.14.36.11
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Sep 2021 14:36:12 -0700 (PDT)
+Received: by mail-lf1-f47.google.com with SMTP id m28so2003022lfj.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 01 Sep 2021 14:36:11 -0700 (PDT)
+X-Received: by 2002:a05:6512:128a:: with SMTP id u10mr1107687lfs.40.1630532171691;
+ Wed, 01 Sep 2021 14:36:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAK7LNATrzUSQg8pnpG1cDbA0sRdAeQGyy7d3ZqFJ4HMZymB=xQ@mail.gmail.com>
+In-Reply-To: <CAK7LNATrzUSQg8pnpG1cDbA0sRdAeQGyy7d3ZqFJ4HMZymB=xQ@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linuxfoundation.org>
+Date:   Wed, 1 Sep 2021 14:35:55 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjbjVb5wNURa7-_PtvKqf96X-7a1OoUDPJjo9rz68YB=Q@mail.gmail.com>
+Message-ID: <CAHk-=wjbjVb5wNURa7-_PtvKqf96X-7a1OoUDPJjo9rz68YB=Q@mail.gmail.com>
+Subject: Re: [GIT PULL] Kbuild updates for v5.15-rc1
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When one searches for a main menu item, links aren't created for it like
-with the rest of the symbols.
+On Mon, Aug 30, 2021 at 6:34 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> After pulling this, you may see new warnings like this:
+>
+>     arch/x86/entry/vdso/Makefile:135: FORCE prerequisite is missing
+>
+> They are just trivial Makefile mistakes, and patches
+> already exist. So, they will be fixed sooner or later.
 
-This happens because we trace the item until we get to the rootmenu, but
-we don't include it in the path of the item. The rationale was probably
-that we don't want to show the main menu in the path of all items,
-because it is redundant.
+I refuse to have new warnings in my tree, particularly during the merge window.
 
-However, when an item has only the rootmenu in its path it should be
-included, because this way the user can jump to its location.
+So I will not be pulling this, since I do indeed see those warnings
+when doing my test builds.
 
-In case the item is a direct child of the rootmenu, show it in the
-'Location:' section as 'Main Menu'.
-
-This makes the 'if (i > 0)' superfluous because each item with prompt
-will have at least one menu in its path.
-
-Signed-off-by: Ariel Marcovitch <arielmarcovitch@gmail.com>
----
- scripts/kconfig/menu.c | 40 ++++++++++++++++++++++++++--------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
-
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 606ba8a63c24..8d7e3b07bf93 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -712,6 +712,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- 	int i, j;
- 	struct menu *submenu[8], *menu, *location = NULL;
- 	struct jump_key *jump = NULL;
-+	const char *prompt = NULL;
- 
- 	str_printf(r, "  Prompt: %s\n", prop->text);
- 
-@@ -735,6 +736,13 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- 		if (location == NULL && accessible)
- 			location = menu;
- 	}
-+
-+	/* If we have only the root menu, show it */
-+	if (i == 0) {
-+		location = &rootmenu;
-+		submenu[i++] = location;
-+	}
-+
- 	if (head && location) {
- 		jump = xmalloc(sizeof(struct jump_key));
- 
-@@ -758,21 +766,25 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- 		list_add_tail(&jump->entries, head);
- 	}
- 
--	if (i > 0) {
--		str_printf(r, "  Location:\n");
--		for (j = 4; --i >= 0; j += 2) {
--			menu = submenu[i];
--			if (jump && menu == location)
--				jump->offset = strlen(r->s);
--			str_printf(r, "%*c-> %s", j, ' ',
--				   menu_get_prompt(menu));
--			if (menu->sym) {
--				str_printf(r, " (%s [=%s])", menu->sym->name ?
--					menu->sym->name : "<choice>",
--					sym_get_string_value(menu->sym));
--			}
--			str_append(r, "\n");
-+	str_printf(r, "  Location:\n");
-+	for (j = 4; --i >= 0; j += 2) {
-+		menu = submenu[i];
-+		if (jump && menu == location)
-+			jump->offset = strlen(r->s);
-+
-+		/* The real rootmenu prompt is ugly */
-+		if (menu == &rootmenu)
-+			prompt = "Main Menu";
-+		else
-+			prompt = menu_get_prompt(menu);
-+
-+		str_printf(r, "%*c-> %s", j, ' ', prompt);
-+		if (menu->sym) {
-+			str_printf(r, " (%s [=%s])", menu->sym->name ?
-+				menu->sym->name : "<choice>",
-+				sym_get_string_value(menu->sym));
- 		}
-+		str_append(r, "\n");
- 	}
- }
- 
-
-base-commit: 087e856cfb76e9eef9a3a6e000854794f3c36e24
--- 
-2.25.1
-
+                Linus
