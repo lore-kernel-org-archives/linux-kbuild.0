@@ -2,106 +2,140 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912DAC433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Sep 2021 15:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE8EC433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Sep 2021 22:06:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6961E610C8
-	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Sep 2021 15:52:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6D6C60F9C
+	for <linux-kbuild@archiver.kernel.org>; Fri,  3 Sep 2021 22:06:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349664AbhICPxD (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 3 Sep 2021 11:53:03 -0400
-Received: from mail-oo1-f53.google.com ([209.85.161.53]:46990 "EHLO
-        mail-oo1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbhICPxD (ORCPT
+        id S234631AbhICWHS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 3 Sep 2021 18:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233367AbhICWHS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Sep 2021 11:53:03 -0400
-Received: by mail-oo1-f53.google.com with SMTP id z1-20020a4a2241000000b0028e8dfb83b4so1630275ooe.13;
-        Fri, 03 Sep 2021 08:52:03 -0700 (PDT)
+        Fri, 3 Sep 2021 18:07:18 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4097C061575
+        for <linux-kbuild@vger.kernel.org>; Fri,  3 Sep 2021 15:06:17 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id s16so486054qvt.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 03 Sep 2021 15:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=xKcsIX3BfLBwQgdXTJ8xpZnHGVXMHnmcgqRZLMQsLms=;
+        b=e0hA8wdoOpUzzJq5zimuZoliotF/jZH+dEmCYrj3QzZzypb/hy90w3lEgfJCGKupgL
+         vUsN4iHKw0jdZE1Cvm71LTj/85tzxaBKAHKCOiAXZVH9LrHE55qmasJOGxflSWiE4yhm
+         bZGSg1v3GSZNvbX+cEWFIPyuyoFwe6M3J3Z+Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zVNFfi09M86JT10bziJ/Y2VXfaqfqBBOkyrez5O9qP0=;
-        b=UQjzBDOxQzB8cHcdtIDH7m/zjyCfeiJ8fkBV/yWRyNizq3sH0eOyHwPo7rwii5q67S
-         8PvhAC7gvwk2p8c22O02DHCwgsfdrRnC/xG07m/ILnXOw34OgfnRVLny5hySJCx8BG13
-         thw4tcyIKlTHYjpLtHpROjTLp15igbkhBvP8OK292JRlJWlNPWFWRu/Mr4wkYyIRpP+S
-         DuOgkIl1EmC8WJRw/Ak4Oo7axNXpXIoNod21t9FMcQTvlmgNrwi99j8ExUx1UXdi6CNF
-         zUL/2CRWqr+9i/7Es+FkP8GqEDHz0t3psuIy76s+DWXKa6zO7FNatyg1JqhA/6pkac+I
-         TEDQ==
-X-Gm-Message-State: AOAM532seHlaSxzOS6ghaeQOVDgiivMR6S4+dKwJB72sDZyBIG0OR+Yl
-        M9ejmCVmu/yzHJEW5uOtF6hB7ClnVg==
-X-Google-Smtp-Source: ABdhPJxcvlH+serFrOMN+1im9jrwrFaOlEPVYa9rWqoDua+9mdAm1Le4cY9xy6dYpTU8oTbI2QEzBA==
-X-Received: by 2002:a4a:1506:: with SMTP id 6mr3518815oon.93.1630684322565;
-        Fri, 03 Sep 2021 08:52:02 -0700 (PDT)
-Received: from xps15.herring.priv (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.googlemail.com with ESMTPSA id b25sm1078381ooq.6.2021.09.03.08.52.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 08:52:01 -0700 (PDT)
-From:   Rob Herring <robh@kernel.org>
-To:     devicetree@vger.kernel.org
-Cc:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Tom Rini <trini@konsulko.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH] kbuild: Enable DT schema checks for %.dtb targets
-Date:   Fri,  3 Sep 2021 10:52:01 -0500
-Message-Id: <20210903155201.3004567-1-robh@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=xKcsIX3BfLBwQgdXTJ8xpZnHGVXMHnmcgqRZLMQsLms=;
+        b=ks+xVykmnHndkAsfOYPfoPLeoZDZFKyCLgl6fwZPZnPUqfRbvTzaxHQd5Nw5N5aOX7
+         zsCu66gKBDdZKHjfv9V09cgQh0S1ZRPjQBbybjpz+StO5CJ95jMSVHTuYLwrSNsai6tO
+         aXxDhu+n+GrFisONrcrRRF0iz0njcR1y6r09jGyFDnSHOnZScy4C2BxwFjW+8vUquXx2
+         2xewniVPciPPRmPMBluYKXffpx49XojGGWgUqLmrtnrUAQ960xpsX7t87REB0yLoczG9
+         Td8aQ/1y7LreG5F3CefKxTgNY8hfhqAJeFDGb+T+K5rhHjNsXUrE8PdPWKR6JP0Xg1Vd
+         3M7g==
+X-Gm-Message-State: AOAM531IFnMsd3KiTGaNvZbKVpsvZJHjdhzNPj/pLJuBGWEhrTne6ZSU
+        85QEcD2+JlrN+ACtrdgQOaJxX6OR77Xc3LDoHOoKPw8kd6/BsHoA
+X-Google-Smtp-Source: ABdhPJwlbA8ZvmxrMRfWZiXhit//urNbuikAJziCnd9qByfUTVm9Z47/FOzIOnNP/nFB0d34eKqM8oCrVGjGNR/iN0s=
+X-Received: by 2002:a0c:e910:: with SMTP id a16mr1320836qvo.37.1630706776789;
+ Fri, 03 Sep 2021 15:06:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Markus Mayer <mmayer@broadcom.com>
+Date:   Fri, 3 Sep 2021 15:06:05 -0700
+Message-ID: <CAGt4E5tzxtCLaasW_Es4oqx+H2iH=Qmid8YG-gtZrCcK7n_B2g@mail.gmail.com>
+Subject: Module build problems with gmake 3.x
+To:     Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc:     Kbuild Mailing List <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-It is possible to build a single dtb, but not with DT schema validation
-enabled. Enable the schema validation to run for %.dtb targets. Anyone
-building a dtb for a specific platform *should* pay attention to schema
-warnings.
+Hi,
 
-This could be supported with a separate %.dt.yaml target instead.
-However, the .dt.yaml format is considered an intermediate format and
-could possibly go away at some point if schema checking is integrated
-into dtc. Also, the plan is to enable the schema checks by default once
-platforms are free of warnings, and this is a move in that direction.
+We are running into build issues with some external kernel modules if
+the GNUmake version is 3.x and the kernel is recent(-ish). The culprit
+seems to be the sub-make invocation when GNUmake < 4 is detected:
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=688931a5ad4e
 
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Tom Rini <trini@konsulko.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+The module build works fine for older kernels (those not containing
+this patch) even with GNUmake 3.81. And it works fine with GNUmake >=
+4 with any kernel, even those with the above patch. In other words, if
+the sub-make invocation doesn't take place (either because make is new
+enough or because the kernel doesn't have the version check yet), our
+module build does work as intended.
 
-diff --git a/Makefile b/Makefile
-index ec9e8a0fe298..01b888cfe1dc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1399,8 +1399,8 @@ endif
- 
- ifneq ($(dtstree),)
- 
--%.dtb: include/config/kernel.release scripts_dtc
--	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-+%.dtb: dt_binding_check include/config/kernel.release scripts_dtc
-+	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ $(dtstree)/$*.dt.yaml
- 
- %.dtbo: include/config/kernel.release scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-@@ -1409,7 +1409,7 @@ PHONY += dtbs dtbs_install dtbs_check
- dtbs: include/config/kernel.release scripts_dtc
- 	$(Q)$(MAKE) $(build)=$(dtstree)
- 
--ifneq ($(filter dtbs_check, $(MAKECMDGOALS)),)
-+ifneq ($(filter dtbs_check %.dtb, $(MAKECMDGOALS)),)
- export CHECK_DTBS=y
- dtbs: dt_binding_check
- endif
--- 
-2.30.2
+Due to how the build is integrated with other components, we need to
+be calling "make -e" to have environment variables take precedence,
+which seems to be another piece of the puzzle. The problem doesn't
+seem to be happening without "-e".
 
+The ingredients for our problem, therefore, seem to be:
+    * old GNUmake (<4)
+    * newish kernel  (>=5.1)
+    * run make -e
+
+I should also mention that the kernel module is being cross-compiled
+for ARM and ARM64, although that does not seem to be playing a role
+here. In my example below, I was using the native compiler.
+
+The problem we are observing is that the contents of $(M) and
+$(CFLAGS_MODULE) are lost during the extra sub-make invocation that is
+conditional upon GNUmake < 4. There might be other lost variables,
+too, but we haven't noticed any effects if there are.
+
+Losing $(M) causes the build to go off the rails completely. This is
+easily detected and can be worked around by setting $(KBUILD_EXTMOD)
+directly and foregoing $(M) on the command line altogether. The loss
+of $(CFLAGS_MODULE) is a little more insidious, since the build does
+succeed even when it's empty. However, required defines remain unset
+despite being set in the top-level makefile. The resulting kernel
+module doesn't work (which can lead to a lot of head scratching). I
+also don't know of a way of working around losing CFLAGS_MODULE's
+contents.
+
+I was able to reproduce the loss of $(M) quite easily doing something like this:
+
+obj-m += hello.o
+
+all:
+        ${MAKE} -C $(KERNEL_DIR) -e M=$(PWD) modules
+
+clean:
+        make -C $(KERNEL_DIR) M=$(PWD) clean
+
+Instead of building the out-of-tree hello.ko, which we are asking it
+to do, it'll go off and build all the in-kernel modules instead. Since
+it sees $(M) as empty, it just executes "make modules".
+
+Unfortunately, I have NOT been successful reproducing losing the
+contents of $(CFLAGS_MODULE) in a simple test environment. In my
+tests, it was always retained. Nonetheless, in the actual build
+environment, it does get lost. And only in the combination of new-ish
+kernel and old-ish make, i.e. whenever the sub-make invocation happens
+due to the make version.
+
+BTW, commenting out the make version test does make our module build
+work. So, it is definitely related to that code snippet. (Of course,
+building on a reasonably recent Linux distro also makes everything
+work, but that isn't possible for us in all circumstances.)
+
+Do you have any thoughts on this or any pointers? Is there a way this
+issue could be resolved? It does seem like the version check has some
+unintended side-effects, even if the scenario in which one would come
+across them is fairly uncommon and most developers will never
+experience them.
+
+I am willing to try out any suggestions or provide further information
+if needed.
+
+Regards,
+-Markus
