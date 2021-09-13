@@ -2,142 +2,151 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 697D4C433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BD5C433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 16:45:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EF3D610A3
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05DE960F36
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 16:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344766AbhIMPaM (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 13 Sep 2021 11:30:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
+        id S238281AbhIMQrB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Sep 2021 12:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344279AbhIMPaJ (ORCPT
+        with ESMTP id S238597AbhIMQqz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Sep 2021 11:30:09 -0400
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BCFC08ED6E;
-        Mon, 13 Sep 2021 07:33:36 -0700 (PDT)
-Received: by mail-oo1-xc2d.google.com with SMTP id v20-20020a4a2554000000b0028f8cc17378so3466087ooe.0;
-        Mon, 13 Sep 2021 07:33:36 -0700 (PDT)
+        Mon, 13 Sep 2021 12:46:55 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EAF2C061766;
+        Mon, 13 Sep 2021 09:45:29 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 140so3707469wma.0;
+        Mon, 13 Sep 2021 09:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XUePaOFAdB0VXNdn0M/EZEaFLP4il2XD0ts+H5PH8PQ=;
-        b=jvxav826u7+YbApk1RbeOlY7+A0oJEMn0vmZN7A6Ve1CJNpxHWRPTLQlGD/PDPkPL8
-         zB2xBAnWvgv/ZTqY5ZrLdR1RkHQgcjy5c6hTyEPzCzlXDcXHTDbaJHrCAqZoQWPn9+uO
-         /Ic/fvpf8qRg9yRjP8i6wnqMHSI5YK+9WlvDJ7UINjYwUeXCR3KXask393vrk2fgqYdK
-         E33bmtr0tmfRMo8xN3bszBq99uma3sSgVpZofVLy4306y5jkc//ghaZNMKa5416qeUXb
-         aju2zufOoJIIN5KBdTcxFwLJ25yqpIWPSppBGsTU8YkJ+uxGgZ2j7xlwjEE2+1ON/rcd
-         WduQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NRUDddrOhBz7wPs7n2BWvnbLp1YtX5LqNskb7F4KopQ=;
+        b=qFBeR2rM6nK0p+XpJivHd1bcEa+ejelC7XjFg19hOQar2ANlq1ixbE9a53f0CwFGLG
+         kHJL4AXR+xO4OQJRWtdfLI/Fe21gORMp+Zi3D/LdYj17oqSfK3pBkZqYDI9dCslz9AZb
+         wsx8rnKbOgqq/h6kE/xr1UtfdwV3b2FW1v/bknFFhgVEKwDVxhdEDvyJ9/41LVLHFAcs
+         64Q/3wtuuYaQ6taOaVuQdhhfAurRA2X5nLT7zgDnvduTAwXlrH2kuW+Wjtmfy6awcuzy
+         oh0LsD3l0K77Esv+WACeamGiM0GsOzVkNi533mxVIT6U74VWwz1yEWA+it3WboMkqjxB
+         vpoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=XUePaOFAdB0VXNdn0M/EZEaFLP4il2XD0ts+H5PH8PQ=;
-        b=Jo7nfuRzjkdsvIiip0Vyuul9t+sn4XRS4JOEp3DcWB5AaDnZGu2Ia/deTyhqpRvM2o
-         cqH7L458F5VjzLS+5pAGKb+MU3tSeF6wj3XblatHVMJA8sgN776a+r+vKZrvQvhwnGsO
-         etCD8qhh1lm9OmP3Fkbm+vo9j60K/H9ezoYjeUAGlRqCukRr8pNTK3Da/NpJU7kX68zt
-         R4vAAJiyJCkkIGOWXEBG0x9hX0T+tGcEnRhArPFT/chqIdGK/hkkzN+g7J2XhFP2XzUo
-         yksgxDrYPUQIlb1uL0yMR/Xv5e5M/Ct21rQ/dpwDPwbi6NrpwBwbcojkX+VyoI5hc1yL
-         GPDg==
-X-Gm-Message-State: AOAM533dOFB96gv9fbS2020DBLYow3NlY++QRYGwFsiCjlpVITvm7/Ng
-        o5qm5FqgC0ZmYkwXTAp+HrlCzDlSDSE=
-X-Google-Smtp-Source: ABdhPJyF+2Z9z/XFqRvANUemzJMbtHjkk9GypcMxmGa0E4m13O0vPoiaDgLsezFcw91jm4YhvuQpBQ==
-X-Received: by 2002:a4a:4b42:: with SMTP id q63mr9739186ooa.78.1631543615431;
-        Mon, 13 Sep 2021 07:33:35 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id v10sm1900359otp.25.2021.09.13.07.33.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Sep 2021 07:33:34 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Subject: Re: [PATCH] Revert "Enable '-Werror' by default for all kernel
- builds"
-To:     Pavel Machek <pavel@ucw.cz>, Randy Dunlap <rdunlap@infradead.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Marco Elver <elver@google.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        llvm@lists.linux.dev,
-        LSM List <linux-security-module@vger.kernel.org>,
-        linux-toolchains@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Mark Brown <broonie@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vipin Sharma <vipinsh@google.com>,
-        Chris Down <chris@chrisdown.name>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <20210907183843.33028-1-ndesaulniers@google.com>
- <CAHk-=whJOxDefgSA1_ojGbweRJGonWX9_nihA-=fbXFV1DhuxQ@mail.gmail.com>
- <CAKwvOdkuYoke=Sa8Qziveo9aSA2zaNWEcKW8LZLg+d3TPwHkoA@mail.gmail.com>
- <YTfkO2PdnBXQXvsm@elver.google.com>
- <CAHk-=wgPaQsEr+En=cqCqAC_sWmVP6x5rD2rmZRomH9EnTQL7Q@mail.gmail.com>
- <c8fb537f-26e5-b305-6bc5-06f0d27a4029@infradead.org>
- <20210913093256.GA12225@amd>
-From:   Guenter Roeck <linux@roeck-us.net>
-Message-ID: <62c6b091-12ad-a1f0-637c-f696c7dae325@roeck-us.net>
-Date:   Mon, 13 Sep 2021 07:33:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        bh=NRUDddrOhBz7wPs7n2BWvnbLp1YtX5LqNskb7F4KopQ=;
+        b=Q9YaSAopXPZM3WfWrTTLmI1RvyPfEKxJasBSKH919r3VLIfFMGGqSIaXxkY1DF1fKK
+         NfrDdEXpq7HeBqCBsGoLgwhvyTRE+tiPJvytM0uLigkEHs5g4gf7CESJh7+Tij0swYS+
+         5nhXjdp4AWn2Sx8YR6N1J29wQa9NiAOJT3/If8uNzSjw85t2asDqXJkP7kW/a5Vgu6s7
+         H3HzmnW916xMHoMd9yJWtanNx+9RGcq2hU0J/ZqC+JymKCqmk7kIbGVMyvsT1qH94IF3
+         DQMK3UloyCIHMQ7dGVu4rxwMFZ6bbfsLu2LiA8KPNEiLeZlom5cprxcusJPSHbXynV5b
+         ry3Q==
+X-Gm-Message-State: AOAM532Wd3szcBi3BR26B4WZyCIOJSSgDn6S7rPeTNd5PYHuEElfyJje
+        wIIxowaQfZn8uVRgqYAmWCgYs5qfTIR+Ng==
+X-Google-Smtp-Source: ABdhPJwMsRQivrMwh0jTuYOf8q9vjWRDUMG7XrcnLQOMocmgrRpASUrsAc0U3/yZdeqvuEzTaOXy2g==
+X-Received: by 2002:a1c:210a:: with SMTP id h10mr1457033wmh.165.1631551527754;
+        Mon, 13 Sep 2021 09:45:27 -0700 (PDT)
+Received: from localhost.localdomain ([147.235.73.50])
+        by smtp.googlemail.com with ESMTPSA id v10sm8091338wrg.15.2021.09.13.09.45.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Sep 2021 09:45:27 -0700 (PDT)
+From:   Ariel Marcovitch <arielmarcovitch@gmail.com>
+To:     masahiroy@kernel.org
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ariel Marcovitch <arielmarcovitch@gmail.com>
+Subject: [PATCH v2] kconfig: Create links to main menu items in search
+Date:   Mon, 13 Sep 2021 19:45:14 +0300
+Message-Id: <20210913164514.437972-1-arielmarcovitch@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210913093256.GA12225@amd>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 9/13/21 2:32 AM, Pavel Machek wrote:
-> Hi!
-> 
->>>>   config WERROR
->>>>          bool "Compile the kernel with warnings as errors"
->>>> -       default y
->>>> +       default COMPILE_TEST
->>>
->>> That seems reasonable. It very much is about build-testing.
->>
->> That and 2 more things IMO:
->>
->> a. having developers be responsible for build warnings, not just
->>     build errors
->>
->> b. having maintainers merge them more like they are build errors
->>     and not just some warnings that can be overlooked.
->>
->> I don't see enough of a. or b.  :(
-> 
-> Do we really want developers treat warnings as errors? When the code
-> is okay but some random version of gcc dislikes it...
-> 
-> Plus, there's question of stable. We already get ton of churn there
-> ("this fixes random warning"). WERROR will only encourage that...
-> 
+When one searches for a main menu item, links aren't created for it like
+with the rest of the symbols.
 
-All Chrome OS builds are already done with -Werror enabled. Having it
-enabled in the incoming stable releases will reduce our workload when
-backporting stable releases. I am actually working on making at
-least chromeos-5.10 "clean" for allmodconfig builds on arm, arm64,
-and x86 (everything else is hopeless, and even arm may be futile,
-but arm64 and x86 seem to be doable).
+This happens because we trace the item until we get to the rootmenu, but
+we don't include it in the path of the item. The rationale was probably
+that we don't want to show the main menu in the path of all items,
+because it is redundant.
 
-I'd rather have warnings fixed in incoming stable releases than having
-to pull additional patches into our kernels.
+However, when an item has only the rootmenu in its path it should be
+included, because this way the user can jump to its location.
 
-Guenter
+Add a 'Main menu' entry in the 'Location:' section for the kconfig
+items.
+
+This makes the 'if (i > 0)' superfluous because each item with prompt
+will have at least one menu in its path.
+
+Signed-off-by: Ariel Marcovitch <arielmarcovitch@gmail.com>
+---
+ scripts/kconfig/menu.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 606ba8a63c24..3d6f7cba8846 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -728,7 +728,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		get_dep_str(r, prop->visible.expr, "  Visible if: ");
+ 
+ 	menu = prop->menu->parent;
+-	for (i = 0; menu != &rootmenu && i < 8; menu = menu->parent) {
++	for (i = 0; menu && i < 8; menu = menu->parent) {
+ 		bool accessible = menu_is_visible(menu);
+ 
+ 		submenu[i++] = menu;
+@@ -758,21 +758,24 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		list_add_tail(&jump->entries, head);
+ 	}
+ 
+-	if (i > 0) {
+-		str_printf(r, "  Location:\n");
+-		for (j = 4; --i >= 0; j += 2) {
+-			menu = submenu[i];
+-			if (jump && menu == location)
+-				jump->offset = strlen(r->s);
+-			str_printf(r, "%*c-> %s", j, ' ',
+-				   menu_get_prompt(menu));
+-			if (menu->sym) {
+-				str_printf(r, " (%s [=%s])", menu->sym->name ?
+-					menu->sym->name : "<choice>",
+-					sym_get_string_value(menu->sym));
+-			}
+-			str_append(r, "\n");
++	str_printf(r, "  Location:\n");
++	for (j = 4; --i >= 0; j += 2) {
++		menu = submenu[i];
++		if (jump && menu == location)
++			jump->offset = strlen(r->s);
++
++		if (menu == &rootmenu)
++			/* The real rootmenu prompt is ugly */
++			str_printf(r, "%*cMain menu", j, ' ');
++		else
++			str_printf(r, "%*c-> %s", j, ' ', menu_get_prompt(menu));
++
++		if (menu->sym) {
++			str_printf(r, " (%s [=%s])", menu->sym->name ?
++				menu->sym->name : "<choice>",
++				sym_get_string_value(menu->sym));
+ 		}
++		str_append(r, "\n");
+ 	}
+ }
+ 
+
+base-commit: a9086b878b7fd65894eb8cb1fa395dd469970566
+-- 
+2.25.1
+
