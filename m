@@ -2,126 +2,142 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9F9C433FE
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 697D4C433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27A9860FE6
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EF3D610A3
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Sep 2021 15:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237922AbhIMPWO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 13 Sep 2021 11:22:14 -0400
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:39185 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344321AbhIMPVS (ORCPT
+        id S1344766AbhIMPaM (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Sep 2021 11:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344279AbhIMPaJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Sep 2021 11:21:18 -0400
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 18DFJjur009829;
-        Tue, 14 Sep 2021 00:19:46 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 18DFJjur009829
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1631546386;
-        bh=9tkpEAQTgOYECJkodf3bBcA+DlQRDxUU5URTsoIGHEc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=enY7UwR1GWlkiqwaIBsuEsPRySwM66UrPaw/gbrtiwfidf6MnPE8hfVwx2bIpNrmr
-         r5BPuoyInF9Y4Spw+hYJpdNtu5K2i5JeJWFb7tQB+4vx1OdrMRdTJBNKuJYglcg2DN
-         4KPgMgFZ67xgEW2sntRrzvkxU0Q0SULu6JSDL8+hjgLSwKF5LgernOZDGh9BTPlanh
-         Qw/OajB3edPth1AL9WvicphLVHDV71GfLnbYFROrZS9t31WShb635LowrUgWuyKN2j
-         bPJTrZGDq7R6hHRmldz/Le5f6P8U7jA69wYK6Divt+WnqqZr/KIPokNIuEB8uO0VO3
-         UpY9a23Xb8PZg==
-X-Nifty-SrcIP: [209.85.216.44]
-Received: by mail-pj1-f44.google.com with SMTP id gp20-20020a17090adf1400b00196b761920aso267913pjb.3;
-        Mon, 13 Sep 2021 08:19:46 -0700 (PDT)
-X-Gm-Message-State: AOAM533d5WjOqj/7L6ES0qEsfeZ6y98DAHecKOh6Lq0OwAZh48K47b9R
-        6e5MnWor4VH4J0Cm10TtLJ3kMKMGr+3iA0FkK3A=
-X-Google-Smtp-Source: ABdhPJzoLczNF57pRBlUYbj/z5YyMBwTXNCEn0gI+kfwrPZWeLFbcYkh+plyYVpHUun4H4T1+bxItEtw6lj9oIlGX/0=
-X-Received: by 2002:a17:902:6b42:b0:13a:54d0:39c4 with SMTP id
- g2-20020a1709026b4200b0013a54d039c4mr10862011plt.42.1631546385152; Mon, 13
- Sep 2021 08:19:45 -0700 (PDT)
+        Mon, 13 Sep 2021 11:30:09 -0400
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BCFC08ED6E;
+        Mon, 13 Sep 2021 07:33:36 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id v20-20020a4a2554000000b0028f8cc17378so3466087ooe.0;
+        Mon, 13 Sep 2021 07:33:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XUePaOFAdB0VXNdn0M/EZEaFLP4il2XD0ts+H5PH8PQ=;
+        b=jvxav826u7+YbApk1RbeOlY7+A0oJEMn0vmZN7A6Ve1CJNpxHWRPTLQlGD/PDPkPL8
+         zB2xBAnWvgv/ZTqY5ZrLdR1RkHQgcjy5c6hTyEPzCzlXDcXHTDbaJHrCAqZoQWPn9+uO
+         /Ic/fvpf8qRg9yRjP8i6wnqMHSI5YK+9WlvDJ7UINjYwUeXCR3KXask393vrk2fgqYdK
+         E33bmtr0tmfRMo8xN3bszBq99uma3sSgVpZofVLy4306y5jkc//ghaZNMKa5416qeUXb
+         aju2zufOoJIIN5KBdTcxFwLJ25yqpIWPSppBGsTU8YkJ+uxGgZ2j7xlwjEE2+1ON/rcd
+         WduQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XUePaOFAdB0VXNdn0M/EZEaFLP4il2XD0ts+H5PH8PQ=;
+        b=Jo7nfuRzjkdsvIiip0Vyuul9t+sn4XRS4JOEp3DcWB5AaDnZGu2Ia/deTyhqpRvM2o
+         cqH7L458F5VjzLS+5pAGKb+MU3tSeF6wj3XblatHVMJA8sgN776a+r+vKZrvQvhwnGsO
+         etCD8qhh1lm9OmP3Fkbm+vo9j60K/H9ezoYjeUAGlRqCukRr8pNTK3Da/NpJU7kX68zt
+         R4vAAJiyJCkkIGOWXEBG0x9hX0T+tGcEnRhArPFT/chqIdGK/hkkzN+g7J2XhFP2XzUo
+         yksgxDrYPUQIlb1uL0yMR/Xv5e5M/Ct21rQ/dpwDPwbi6NrpwBwbcojkX+VyoI5hc1yL
+         GPDg==
+X-Gm-Message-State: AOAM533dOFB96gv9fbS2020DBLYow3NlY++QRYGwFsiCjlpVITvm7/Ng
+        o5qm5FqgC0ZmYkwXTAp+HrlCzDlSDSE=
+X-Google-Smtp-Source: ABdhPJyF+2Z9z/XFqRvANUemzJMbtHjkk9GypcMxmGa0E4m13O0vPoiaDgLsezFcw91jm4YhvuQpBQ==
+X-Received: by 2002:a4a:4b42:: with SMTP id q63mr9739186ooa.78.1631543615431;
+        Mon, 13 Sep 2021 07:33:35 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id v10sm1900359otp.25.2021.09.13.07.33.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Sep 2021 07:33:34 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Subject: Re: [PATCH] Revert "Enable '-Werror' by default for all kernel
+ builds"
+To:     Pavel Machek <pavel@ucw.cz>, Randy Dunlap <rdunlap@infradead.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Marco Elver <elver@google.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        llvm@lists.linux.dev,
+        LSM List <linux-security-module@vger.kernel.org>,
+        linux-toolchains@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mark Brown <broonie@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vipin Sharma <vipinsh@google.com>,
+        Chris Down <chris@chrisdown.name>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20210907183843.33028-1-ndesaulniers@google.com>
+ <CAHk-=whJOxDefgSA1_ojGbweRJGonWX9_nihA-=fbXFV1DhuxQ@mail.gmail.com>
+ <CAKwvOdkuYoke=Sa8Qziveo9aSA2zaNWEcKW8LZLg+d3TPwHkoA@mail.gmail.com>
+ <YTfkO2PdnBXQXvsm@elver.google.com>
+ <CAHk-=wgPaQsEr+En=cqCqAC_sWmVP6x5rD2rmZRomH9EnTQL7Q@mail.gmail.com>
+ <c8fb537f-26e5-b305-6bc5-06f0d27a4029@infradead.org>
+ <20210913093256.GA12225@amd>
+From:   Guenter Roeck <linux@roeck-us.net>
+Message-ID: <62c6b091-12ad-a1f0-637c-f696c7dae325@roeck-us.net>
+Date:   Mon, 13 Sep 2021 07:33:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210913145146.766080-1-robh@kernel.org>
-In-Reply-To: <20210913145146.766080-1-robh@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 14 Sep 2021 00:19:07 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARwWazaMErsgUB7C8gLbnD5hQhvoCVO=aanPCCj4sqTgA@mail.gmail.com>
-Message-ID: <CAK7LNARwWazaMErsgUB7C8gLbnD5hQhvoCVO=aanPCCj4sqTgA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: Enable DT schema checks for %.dtb targets
-To:     Rob Herring <robh@kernel.org>
-Cc:     DTML <devicetree@vger.kernel.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Tom Rini <trini@konsulko.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210913093256.GA12225@amd>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 11:51 PM Rob Herring <robh@kernel.org> wrote:
->
-> It is possible to build a single dtb, but not with DT schema validation
-> enabled. Enable the schema validation to run for %.dtb and %.dtbo
-> targets. Anyone building a dtb for a specific platform *should* pay
-> attention to schema warnings.
->
-> This could be supported with a separate %.dt.yaml target instead.
-> However, the .dt.yaml format is considered an intermediate format and
-> could possibly go away at some point if schema checking is integrated
-> into dtc. Also, the plan is to enable the schema checks by default once
-> platforms are free of warnings, and this is a move in that direction.
->
-> Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> Cc: Tom Rini <trini@konsulko.com>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: linux-kbuild@vger.kernel.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
+On 9/13/21 2:32 AM, Pavel Machek wrote:
+> Hi!
+> 
+>>>>   config WERROR
+>>>>          bool "Compile the kernel with warnings as errors"
+>>>> -       default y
+>>>> +       default COMPILE_TEST
+>>>
+>>> That seems reasonable. It very much is about build-testing.
+>>
+>> That and 2 more things IMO:
+>>
+>> a. having developers be responsible for build warnings, not just
+>>     build errors
+>>
+>> b. having maintainers merge them more like they are build errors
+>>     and not just some warnings that can be overlooked.
+>>
+>> I don't see enough of a. or b.  :(
+> 
+> Do we really want developers treat warnings as errors? When the code
+> is okay but some random version of gcc dislikes it...
+> 
+> Plus, there's question of stable. We already get ton of churn there
+> ("this fixes random warning"). WERROR will only encourage that...
+> 
 
-Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+All Chrome OS builds are already done with -Werror enabled. Having it
+enabled in the incoming stable releases will reduce our workload when
+backporting stable releases. I am actually working on making at
+least chromeos-5.10 "clean" for allmodconfig builds on arm, arm64,
+and x86 (everything else is hopeless, and even arm may be futile,
+but arm64 and x86 seem to be doable).
 
+I'd rather have warnings fixed in incoming stable releases than having
+to pull additional patches into our kernels.
 
-> ---
-> v2:
->  - Also enable schema checks on %.dtbo targets
-> ---
->  Makefile | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 7cfe4ff36f44..c57a7657c8dd 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1402,17 +1402,17 @@ endif
->
->  ifneq ($(dtstree),)
->
-> -%.dtb: include/config/kernel.release scripts_dtc
-> -       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-> +%.dtb: dt_binding_check include/config/kernel.release scripts_dtc
-> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ $(dtstree)/$*.dt.yaml
->
-> -%.dtbo: include/config/kernel.release scripts_dtc
-> -       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
-> +%.dtbo: dt_binding_check include/config/kernel.release scripts_dtc
-> +       $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ $(dtstree)/$*.dt.yaml
->
->  PHONY += dtbs dtbs_install dtbs_check
->  dtbs: include/config/kernel.release scripts_dtc
->         $(Q)$(MAKE) $(build)=$(dtstree)
->
-> -ifneq ($(filter dtbs_check, $(MAKECMDGOALS)),)
-> +ifneq ($(filter dtbs_check %.dtb %.dtbo, $(MAKECMDGOALS)),)
->  export CHECK_DTBS=y
->  dtbs: dt_binding_check
->  endif
-> --
-> 2.30.2
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+Guenter
