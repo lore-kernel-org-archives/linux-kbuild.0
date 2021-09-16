@@ -2,39 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA93C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F7FC433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:45:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 927C4610A6
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01A8761139
+	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350330AbhIPSnz (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 16 Sep 2021 14:43:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44938 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349179AbhIPSnn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Sep 2021 14:43:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9E065610A6;
-        Thu, 16 Sep 2021 18:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631817742;
-        bh=W8lmbPG+Y7dzqY16kJIWhu7Hte7q4CpDtoM8X9UOKiM=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=naUyEq4E5gf3apJKSzndPpK7/aIAe+JSS11lI1ZBRDlVSeotuOczaxJ43zzK02LCa
-         rD3zGSc2Lt9KEmwk6RQu+UkOMlTQV3sRshuH5PhUWy/lrT2A2CpGegUCx7um3fzi38
-         RF9IbCMzODaL9mRzNiW3jG90gQL3l4SZqKVnvSR0weYqu50gEIHWshudMnbxMbpm8y
-         hiwGHnyfCFhuudQvDt5AxlfqDL4syXomLcCqritQb7WuhdDR/9rTsJwMC9D5jPaXsY
-         MmJOhQdSp3koJVBFRx6b4cgp3fbUnfXHUsvqtRXwk2HYpWwpMNt+8B9lW1qzbdXT2I
-         WDdzk2HDk0KVw==
-Subject: Re: [PATCH 1/2] x86: Do not add -falign flags unconditionally for
- clang
-To:     Borislav Petkov <bp@alien8.de>
+        id S243400AbhIPSqd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 16 Sep 2021 14:46:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243072AbhIPSq1 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Sep 2021 14:46:27 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27D8C08E816;
+        Thu, 16 Sep 2021 10:18:54 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f11c6001e49ea6afe1054f5.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:c600:1e49:ea6a:fe10:54f5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A90881EC01A9;
+        Thu, 16 Sep 2021 19:18:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1631812728;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=WGTaW9wzVo3mRbffUBHb/Jh9Yaw6al5FEDE3OWWucQM=;
+        b=TnBBOysnTsIzYE72gUTor3/nH+wDVKctXHOhtc/8tJvJ/j4eB02Ry7TqHKbpKUvOhck0jO
+        LUYPHx+QKc4wmuqnumvPn0qgaPqqDIo1/fPS99C0176oEdidy4Pb1TTVl3PKukfvPLakHP
+        +F87tFSB+VUB5+uOz23N1vbudCUuSck=
+Date:   Thu, 16 Sep 2021 19:18:42 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Nathan Chancellor <nathan@kernel.org>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
@@ -43,77 +48,66 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         clang-built-linux@googlegroups.com, llvm@lists.linux.dev,
         kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH 1/2] x86: Do not add -falign flags unconditionally for
+ clang
+Message-ID: <YUN8coiEx3JZQytc@zn.tnic>
 References: <20210824022640.2170859-1-nathan@kernel.org>
- <20210824022640.2170859-2-nathan@kernel.org> <YUN8coiEx3JZQytc@zn.tnic>
-From:   Nathan Chancellor <nathan@kernel.org>
-Message-ID: <4d88e0ed-422d-447a-ea8f-36e54b38fac1@kernel.org>
-Date:   Thu, 16 Sep 2021 11:42:19 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ <20210824022640.2170859-2-nathan@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <YUN8coiEx3JZQytc@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210824022640.2170859-2-nathan@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 9/16/2021 10:18 AM, Borislav Petkov wrote:
-> On Mon, Aug 23, 2021 at 07:26:39PM -0700, Nathan Chancellor wrote:
-> 
-> A couple of nitpicks:
-> 
->> Subject: [PATCH 1/2] x86: Do not add -falign flags unconditionally for clang
-> 
-> Make that prefix into "x86/build: "
+On Mon, Aug 23, 2021 at 07:26:39PM -0700, Nathan Chancellor wrote:
 
-Done, I'll be sure to keep that prefix in mind for future flag-based 
-changes.
+A couple of nitpicks:
 
->> clang does not support -falign-jumps and only recently gained support
->> for -falign-loops. When one of the configuration options that adds these
->> flags is enabled, clang warns and all cc-{disable-warning,option} that
->> follow fail because -Werror gets added to test for the presence of this
->> warning:
->>
->> clang-14: warning: optimization flag '-falign-jumps=0' is not supported
->> [-Wignored-optimization-argument]
->>
->> To resolve this, add a couple of cc-option calls when building with
->> clang; gcc has supported these options since 3.2 so there is no point in
->> testing for their support. -falign-functions was implemented in clang-7,
->> -falign-loops was implemented in clang-14, and -falign-jumps has not
->> been implemented yet.
->>
->> Link: https://lore.kernel.org/r/YSQE2f5teuvKLkON@Ryzen-9-3900X.localdomain/
-> 
-> Also, there should be a second Link: tag which points to this mail
-> thread so that we can find it later, when we dig for the "why we did
-> that" question :)
-> 
-> I.e.,
-> 
-> Link: 20210824022640.2170859-2-nathan@kernel.org
+> Subject: [PATCH 1/2] x86: Do not add -falign flags unconditionally for clang
 
-Sure thing, kind of hard to do that on the initial submission but I will 
-do it for the v2 shortly :)
+Make that prefix into "x86/build: " 
 
->> Reported-by: kernel test robot <lkp@intel.com>
->> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
->> ---
->>   arch/x86/Makefile_32.cpu | 12 +++++++++---
->>   1 file changed, 9 insertions(+), 3 deletions(-)
+> clang does not support -falign-jumps and only recently gained support
+> for -falign-loops. When one of the configuration options that adds these
+> flags is enabled, clang warns and all cc-{disable-warning,option} that
+> follow fail because -Werror gets added to test for the presence of this
+> warning:
 > 
-> with that:
+> clang-14: warning: optimization flag '-falign-jumps=0' is not supported
+> [-Wignored-optimization-argument]
 > 
-> Acked-by: Borislav Petkov <bp@suse.de>
+> To resolve this, add a couple of cc-option calls when building with
+> clang; gcc has supported these options since 3.2 so there is no point in
+> testing for their support. -falign-functions was implemented in clang-7,
+> -falign-loops was implemented in clang-14, and -falign-jumps has not
+> been implemented yet.
+> 
+> Link: https://lore.kernel.org/r/YSQE2f5teuvKLkON@Ryzen-9-3900X.localdomain/
 
-Thank you for the ack. The conflicting changes that I mentioned in the 
-cover letter have been merged in 5.15-rc1 so if you guys want to take 
-these changes via -tip, just holler for an ack from Masahiro on the 
-second patch on v2 (but I am going with the assumption this will be 
-merged via the kbuild tree).
+Also, there should be a second Link: tag which points to this mail
+thread so that we can find it later, when we dig for the "why we did
+that" question :)
 
-Cheers,
-Nathan
+I.e.,
+
+Link: 20210824022640.2170859-2-nathan@kernel.org
+
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+>  arch/x86/Makefile_32.cpu | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+
+with that:
+
+Acked-by: Borislav Petkov <bp@suse.de>
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
