@@ -2,102 +2,96 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-24.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4470DC433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 17:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9D9C433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:41:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A9196137F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 17:05:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC132611EE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 18:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245046AbhIPRG1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 16 Sep 2021 13:06:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34038 "EHLO mail.kernel.org"
+        id S1348676AbhIPSnS (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 16 Sep 2021 14:43:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44496 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349196AbhIPRDu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Sep 2021 13:03:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6251A61B1B;
-        Thu, 16 Sep 2021 16:34:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1631810077;
-        bh=mKUHKt96+zZEBkGgTe+1FJCUtvCvG32ZcnkUl3Tmk68=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=laPNrGTpzEekSksiLdMPSbaeFsBypCZ9N7gj+siqhqrybxhVSYBZ/oE7+Nk8xMGS2
-         YT6Gr8Al0alUZJ8lQMBk6z+YvahzoiJ+lC7oQO0Ijyh5mdOKwVsi9pe+YE91NC/J7y
-         JUeaxehGYdJF1Ac7SmGDozhYAoMf6NhXqkvWGHoc=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Daniel Bristot de Oliveira <bristot@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH 5.14 001/432] Makefile: use -Wno-main in the full kernel tree
-Date:   Thu, 16 Sep 2021 17:55:50 +0200
-Message-Id: <20210916155810.865922530@linuxfoundation.org>
+        id S1348572AbhIPSnP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 16 Sep 2021 14:43:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E1616103B;
+        Thu, 16 Sep 2021 18:41:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631817714;
+        bh=ulH418QMyTT2TWux7NsxncGiqxQYNH9YKErMukAqgrY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=rULuUj0Cw0g5HwsjNQYePQw0z/0inRYajo6N7aFmixqexRwKn+otJiOrczm6+ieD2
+         UohJYs+rk0xmvnI5MWsucNBLrlAndRfBrpW/sWj1QL7ihamHFsdM31Wfv/K7veGuWw
+         C17A/aU0S0nKhIxXjYJqszDb+Tye9nqCossveREXI7CSrVGxqd9YLdinzLe9XzN1A1
+         X0oPjLu6ZnC8aQd+xnVTPQ+OP0WsR8qYB4V1It6AskNUunlx3HqEH0i1bGHYiKz69D
+         eOcSvtjhlHtoWMgjhylPyOjanLQJ47JjixMHHzIFFdWijzV5C7JoLigscNcyKj8b0G
+         RS3NUPSTzvU8Q==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH v2 0/2] Harden clang against unknown flag options
+Date:   Thu, 16 Sep 2021 11:40:15 -0700
+Message-Id: <20210916184017.1881473-1-nathan@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210916155810.813340753@linuxfoundation.org>
-References: <20210916155810.813340753@linuxfoundation.org>
-User-Agent: quilt/0.66
-X-stable: review
-X-Patchwork-Hint: ignore
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Patchwork-Bot: notify
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Hi all,
 
-commit 49832c819ab85b33b7a2a1429c8d067e82be2977 upstream.
+This series cleans up an issue that was noticed by the kernel test robot
+where flags that clang does not implement support for are
+unconditionally added to the command line, which causes all subsequent
+calls to cc-{disable-warning,option} to fail, meaning developers are
+flooded with unnecessary and pointless warnings.
 
-When using gcc (SUSE Linux) 7.5.0 (on openSUSE 15.3), I see a build
-warning:
+The first patch handles the problematic flags with cc-option for clang
+and the second patch ensures we catch new additions of unknown flags so
+that they can be handled properly.
 
-  kernel/trace/trace_osnoise.c: In function 'start_kthread':
-  kernel/trace/trace_osnoise.c:1461:8: warning: 'main' is usually a function [-Wmain]
-    void *main = osnoise_main;
-          ^~~~
+I intend for this to be merged via the kbuild tree but it can go via
+-tip if there is any objection to that.
 
-Quieten that warning by using "-Wno-main".  It's OK to use "main" as a
-declaration name in the kernel.
+Cheers,
+Nathan
 
-Build-tested on most ARCHes.
+v1 -> v2: https://lore.kernel.org/r/20210824022640.2170859-1-nathan@kernel.org/
 
-[ v2: only do it for gcc, since clang doesn't have that particular warning ]
+* Patch 1: Change prefix to "x86/build" (Borislav).
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Link: https://lore.kernel.org/lkml/20210813224131.25803-1-rdunlap@infradead.org/
-Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Daniel Bristot de Oliveira <bristot@kernel.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- Makefile |    2 ++
- 1 file changed, 2 insertions(+)
+* Patch 1: Add link to v1 thread for more context (Borislav).
 
---- a/Makefile
-+++ b/Makefile
-@@ -803,6 +803,8 @@ else
- # Disabled for clang while comment to attribute conversion happens and
- # https://github.com/ClangBuiltLinux/linux/issues/636 is discussed.
- KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough=5,)
-+# gcc inanely warns about local variables called 'main'
-+KBUILD_CFLAGS += -Wno-main
- endif
- 
- # These warnings generated too much noise in a regular build.
+* Patch 1: Add Borislav's ack.
 
+* Patch 2: Expand comment in source to make it clear that clang only
+  warns on certain unimplemented optimization flags.
+
+* Series: Add Nick's review.
+
+Nathan Chancellor (2):
+  x86/build: Do not add -falign flags unconditionally for clang
+  kbuild: Add -Werror=ignored-optimization-argument to CLANG_FLAGS
+
+ arch/x86/Makefile_32.cpu | 12 +++++++++---
+ scripts/Makefile.clang   |  5 +++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+
+base-commit: a9086b878b7fd65894eb8cb1fa395dd469970566
+-- 
+2.33.0
 
