@@ -2,90 +2,127 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AD4C433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 19:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B480AC433F5
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 06:11:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C88161216
-	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Sep 2021 19:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A05461019
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 06:11:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243994AbhIPTH0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 16 Sep 2021 15:07:26 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:56646 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346824AbhIPTHU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 16 Sep 2021 15:07:20 -0400
-Received: from zn.tnic (p200300ec2f11c600a255bc81368aa6d8.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:c600:a255:bc81:368a:a6d8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 547CF1EC02DD;
-        Thu, 16 Sep 2021 21:05:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1631819153;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=GPHrZA8eT90xnNQWKOPWxTxqG3zYBZeppwwDINVeVlk=;
-        b=KqdrJwPq/XcXtA1xTAjF6t7sSSpsnbf4CC4VEl5vj1j6bWcQ1mSjqkBtcx7WGsBgXAYyOh
-        6rUcKZsHXmyuZRcll8L/yZRZPAtaQHpIA2JScNf6qbqVpvff91bLLLLYoPPwmLh9FHHyph
-        KIOHb5OWWW9aRUKRVskbnoh6LvIa2/8=
-Date:   Thu, 16 Sep 2021 21:05:47 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH 1/2] x86: Do not add -falign flags unconditionally for
- clang
-Message-ID: <YUOVi6dDqR20qsmx@zn.tnic>
-References: <20210824022640.2170859-1-nathan@kernel.org>
- <20210824022640.2170859-2-nathan@kernel.org>
- <YUN8coiEx3JZQytc@zn.tnic>
- <4d88e0ed-422d-447a-ea8f-36e54b38fac1@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4d88e0ed-422d-447a-ea8f-36e54b38fac1@kernel.org>
+        id S245053AbhIQGMv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 17 Sep 2021 02:12:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35000 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245010AbhIQGMs (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Sep 2021 02:12:48 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51200C061768
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Sep 2021 23:11:26 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id q19-20020ac87353000000b0029a09eca2afso86716973qtp.21
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Sep 2021 23:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=3zrUVwbKEfBYS+g/qOMTeXZGXa+cM1Fx/id4TGcTnuY=;
+        b=aqjshXeHh7KYq65oIgapr0BQjil3sP1rDi7xaSzByT7HUdNhTaI1Ys3Wxlz/Z7g3Am
+         +hOjpH810t+0u4G9mpxQRBffRfJ62rH1ddXs4ULDpEQR6Ts6jBfJ0gjcpO4kVp8wCOHQ
+         Vl8iN8hld/46cAlQUMTAiAhB/6+eDCE1dhcnqKSrsGDeqrAxl6t2FhBn8Bsl4kzSxqNL
+         NAWZ+7xfiGeYj9Qd6nT39cNlAK7qfcwkxHdx1U+CIiom21GYWoJX+2VtAip3VlCuFz1w
+         jGyqNia1LYugFTCoMyC2dyRJTvbrZO/b7LutqymMpftkHK3U8/75gDv5A0e2jD9U6hVB
+         ilXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=3zrUVwbKEfBYS+g/qOMTeXZGXa+cM1Fx/id4TGcTnuY=;
+        b=tdVv5CBkKfLc5KrOeZ6Waa4kKNzsyHecKA1hdp8+gD+HU9adliVn6X4ow38egQrHle
+         B65HcLH6xa/1avSx9Fn+jccLhhaNDeN9EmU0gbVE0V/agJXrj65sQ837XqNsBZgJuoZv
+         XVNrIhBHgkAjowLll+hDU68SzDAvoTRTZqs/3AEqrh810sIFiF01XSUSUrkmC664ITWB
+         VP/pbGstuOWXsiT56wMMqYO1OgO9yo7Qf+z7IGHgc5dnIvD0XI0DHDroDy/ZZqMsMhkZ
+         i41ho7Jy+Zyt2j/c/s9pVz/JHY+1cwBVmSxwl3zULU9/SNniNvN0Yjvj6bUOCxjdw/0B
+         H+Tw==
+X-Gm-Message-State: AOAM530YkHEPzQ8zbyxgb+/7PbHatTJVNjl1yrKD7v1q0rTlejZeMtV4
+        GPR328b4uhhwz4ue61oBYe2dB7dAmOuydwpWJ0JdBA==
+X-Google-Smtp-Source: ABdhPJycuTlpICuFt0WKNwqUbICZRKz0xI20vVDuhSpUpfdHDy2C99ZMkURQuV1YTT5+M888e29TyWCs6BP2z006i3tORQ==
+X-Received: from mactruck.svl.corp.google.com ([2620:15c:2cb:201:4845:43ba:3ff5:2de1])
+ (user=brendanhiggins job=sendgmr) by 2002:ad4:522c:: with SMTP id
+ r12mr9348777qvq.17.1631859085422; Thu, 16 Sep 2021 23:11:25 -0700 (PDT)
+Date:   Thu, 16 Sep 2021 23:10:58 -0700
+Message-Id: <20210917061104.2680133-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v1 0/6] kunit: build kunit tests without structleak plugin
+From:   Brendan Higgins <brendanhiggins@google.com>
+To:     shuah@kernel.org, davidgow@google.com, arnd@arndb.de,
+        keescook@chromium.org, rafael@kernel.org, jic23@kernel.org,
+        lars@metafoo.de, ulf.hansson@linaro.org, andreas.noever@gmail.com,
+        michael.jamet@intel.com, mika.westerberg@linux.intel.com,
+        YehezkelShB@gmail.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, ndesaulniers@google.com
+Cc:     linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+        gregkh@linuxfoundation.org, linux-iio@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        Brendan Higgins <brendanhiggins@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 11:42:19AM -0700, Nathan Chancellor wrote:
-> Done, I'll be sure to keep that prefix in mind for future flag-based
-> changes.
+The structleak plugin causes the stack frame size to grow immensely when
+used with KUnit; this is caused because KUnit allocates lots of
+moderately sized structs on the stack as part of its assertion macro
+implementation. For most tests with small to moderately sized tests
+cases there are never enough KUnit assertions to be an issue at all;
+even when a single test cases has many KUnit assertions, the compiler
+should never put all these struct allocations on the stack at the same
+time since the scope of the structs is so limited; however, the
+structleak plugin does not seem to respect the compiler doing the right
+thing and will still warn of excessive stack size in some cases.
 
-Yeah, what you could do in the future is
+These patches are not a permanent solution since new tests can be added
+with huge test cases, but this serves as a stop gap to stop structleak
+from being used on KUnit tests which will currently result in excessive
+stack size.
 
-git log <filename>
+Of the following patches, I think the thunderbolt patch may be
+unnecessary since Linus already fixed that test. Additionally, I was not
+able to reproduce the error on the sdhci-of-aspeed test. Nevertheless, I
+included these tests cases for completeness. Please see my discussion
+with Arnd for more context[1].
 
-and see the previous prefixes. But not that important - we fix those
-usually before applying.
+NOTE: Arnd did the legwork for most of these patches, but did not
+actually share code for some of them, so I left his Signed-off-by off of
+those patches as I don't want to misrepresent him. Arnd, please sign off
+on those patches at your soonest convenience.
 
-> Sure thing, kind of hard to do that on the initial submission but I will do
-> it for the v2 shortly :)
+[1] https://lore.kernel.org/linux-arm-kernel/CAFd5g44udqkDiYBWh+VeDVJ=ELXeoXwunjv0f9frEN6HJODZng@mail.gmail.com/
 
-Haha, very hard. :-)
+Arnd Bergmann (1):
+  bitfield: build kunit tests without structleak plugin
 
-> Thank you for the ack. The conflicting changes that I mentioned in the cover
-> letter have been merged in 5.15-rc1 so if you guys want to take these
-> changes via -tip, just holler for an ack from Masahiro on the second patch
-> on v2 (but I am going with the assumption this will be merged via the kbuild
-> tree).
+Brendan Higgins (5):
+  gcc-plugins/structleak: add makefile var for disabling structleak
+  iio/test-format: build kunit tests without structleak plugin
+  device property: build kunit tests without structleak plugin
+  thunderbolt: build kunit tests without structleak plugin
+  mmc: sdhci-of-aspeed: build kunit tests without structleak plugin
 
-I'm fine either way. So whatever Masahiro prefers.
+ drivers/base/test/Makefile   | 2 +-
+ drivers/iio/test/Makefile    | 1 +
+ drivers/mmc/host/Makefile    | 1 +
+ drivers/thunderbolt/Makefile | 1 +
+ lib/Makefile                 | 2 +-
+ scripts/Makefile.gcc-plugins | 4 ++++
+ 6 files changed, 9 insertions(+), 2 deletions(-)
 
-Thx.
 
+base-commit: 316346243be6df12799c0b64b788e06bad97c30b
 -- 
-Regards/Gruss,
-    Boris.
+2.33.0.464.g1972c5931b-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
