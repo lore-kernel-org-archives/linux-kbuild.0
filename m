@@ -2,109 +2,122 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60318C433F5
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 06:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 613A0C433F5
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 07:22:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4347160FED
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 06:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CA0960ED7
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 07:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245106AbhIQGNO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 17 Sep 2021 02:13:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245095AbhIQGMz (ORCPT
+        id S235152AbhIQHXt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 17 Sep 2021 03:23:49 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:44499 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233839AbhIQHXt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Sep 2021 02:12:55 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531DAC0613DE
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Sep 2021 23:11:33 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id p23-20020a05620a22f700b003d5ac11ac5cso62887184qki.15
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 Sep 2021 23:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=09xEzYT+gOEMXKux86y0OboJKHhnFsj7tooXascaZws=;
-        b=idTj1foInP1ZjiSa8tzyXsAbvISX9h8D2okHQm47jLNzxI/gnljnhVQYgRp7gVyxij
-         CsbzwRxgqhnisizhrS+yfMH6UHQ4fCv6XeCSCXXwKBm8fIy/regcyzobSzoURswbI015
-         EhQaKFRWM6aq6l5B15meILrewxbaU6yp3g2Nl/72UnbQCanMYa7JpZscbFct1T1qwgHw
-         WQJVUe+4dvGKD1YQH+pOx77QCpeyZep2k1EX0iFtXgeHezV2k7OgPXfN3EKXyp8yiBcw
-         v4zOLgOsvCuCahcjEDuwXB5WMCghprYxDyANJW8IiN3wz2UXia2L39Jl4z728eSWNBky
-         tuvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=09xEzYT+gOEMXKux86y0OboJKHhnFsj7tooXascaZws=;
-        b=OMvyGtJltoFjQfFVIjypJM6w/+jMzlpR8PnIdXtMfogIyuXuxfap3VmyC6836ZNzEZ
-         DU1W8sNUJ/7PopljMneuAvbRlnrA+v/JEB0N9GFM/LSzS9NiP7UhVFFC5oXkn+LZvmCN
-         +0UY7vY6S1thvX9f8FnazUIWEnsBaLjdLHAQtPFT9/rzVEuV1D5OTsBV6nx33r6bZiSo
-         zHlckdvFYmMQRp7ZnlqdYo/4o7CSZW8g4s23/zmrxOHTZdcmuc8WcXMBe7n6IXL1wpgc
-         SROCGN1cFya14Q5o746yBdEzCejha+S/jqh1JqPcmhUiFNz43626ZsJuHISE7AAkJWY1
-         E7GQ==
-X-Gm-Message-State: AOAM532tWdNI6qIdMT4TDlsQ+Dc2SMLp7a9bwpqXDV5Ic17eDzwgPWi+
-        McVN7MdJYK/3JTcwTtlirDRd7JHbSwcs68t/C7H4Bw==
-X-Google-Smtp-Source: ABdhPJypRsw47dQReFc9GVfIgcLEvPuWKVLfs9Zkoz23e3pfAoJ7NFelyWt9aLLvWQZohalclJUd3bgYSnBd8nu1IvZJKA==
-X-Received: from mactruck.svl.corp.google.com ([2620:15c:2cb:201:4845:43ba:3ff5:2de1])
- (user=brendanhiggins job=sendgmr) by 2002:a25:d747:: with SMTP id
- o68mr11675107ybg.488.1631859092480; Thu, 16 Sep 2021 23:11:32 -0700 (PDT)
-Date:   Thu, 16 Sep 2021 23:11:01 -0700
-In-Reply-To: <20210917061104.2680133-1-brendanhiggins@google.com>
-Message-Id: <20210917061104.2680133-4-brendanhiggins@google.com>
-Mime-Version: 1.0
-References: <20210917061104.2680133-1-brendanhiggins@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v1 3/6] device property: build kunit tests without structleak plugin
-From:   Brendan Higgins <brendanhiggins@google.com>
-To:     shuah@kernel.org, davidgow@google.com, arnd@arndb.de,
-        keescook@chromium.org, rafael@kernel.org, jic23@kernel.org,
-        lars@metafoo.de, ulf.hansson@linaro.org, andreas.noever@gmail.com,
-        michael.jamet@intel.com, mika.westerberg@linux.intel.com,
-        YehezkelShB@gmail.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, ndesaulniers@google.com
-Cc:     linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
-        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        gregkh@linuxfoundation.org, linux-iio@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Brendan Higgins <brendanhiggins@google.com>
+        Fri, 17 Sep 2021 03:23:49 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]) by
+ mrelayeu.kundenserver.de (mreue009 [213.165.67.97]) with ESMTPSA (Nemesis) id
+ 1MVvCn-1mHThU09DR-00RmsA; Fri, 17 Sep 2021 09:22:25 +0200
+Received: by mail-wr1-f48.google.com with SMTP id t8so13544371wrq.4;
+        Fri, 17 Sep 2021 00:22:24 -0700 (PDT)
+X-Gm-Message-State: AOAM533d2e3gdScN5QoJuVuHz2DYRF7zteoDv/ZILhs3R+Zs+um5rIPy
+        lA4Ip7+pWUtM25EzEtXnDMFfg6L652xbw9nxtxM=
+X-Google-Smtp-Source: ABdhPJzJsrzhqboheOkJF5DSOKul11PbpO1/TRN4PuVM4wUc/lsEjGqfYS2kGw1Iq3DVe/OqQTjG5Qdil3wWKPMut74=
+X-Received: by 2002:adf:f884:: with SMTP id u4mr9953811wrp.411.1631863344560;
+ Fri, 17 Sep 2021 00:22:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210917061104.2680133-1-brendanhiggins@google.com> <20210917061104.2680133-7-brendanhiggins@google.com>
+In-Reply-To: <20210917061104.2680133-7-brendanhiggins@google.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 17 Sep 2021 09:22:08 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a21j9yJe_X=kU6v2YgOnrhunRbPv+O6STSH71qTb7xnfg@mail.gmail.com>
+Message-ID: <CAK8P3a21j9yJe_X=kU6v2YgOnrhunRbPv+O6STSH71qTb7xnfg@mail.gmail.com>
+Subject: Re: [PATCH v1 6/6] bitfield: build kunit tests without structleak plugin
+To:     Brendan Higgins <brendanhiggins@google.com>
+Cc:     Shuah Khan <shuah@kernel.org>, David Gow <davidgow@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Kees Cook <keescook@chromium.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>, andreas.noever@gmail.com,
+        michael.jamet@intel.com,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        YehezkelShB@gmail.com, Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        KUnit Development <kunit-dev@googlegroups.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        gregkh <gregkh@linuxfoundation.org>, linux-iio@vger.kernel.org,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        linux-hardening@vger.kernel.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:xGdJUU7Jbd4lvFcJi7VZTkYeXXOYuREu0Ya+f5SVA3D4fcQVzv5
+ sgRAiCMKKh3ytUEGmD6Dxf7aETOZ0X/pGgsz2AUIrp9kUt5lqMHR7GHL+Y2l01nZH4mzLRC
+ joVrXC9Ab/Y6xXXfTFeXn/bBIdvEQu3XMlqzqp9iyVUBeQ5WSddVw9o3hbB6el/wOUfnBy/
+ WeuyQDCELhT3LewzUbwBg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aaLODG2UnWY=:8UNFcgwItep3KN1dO16puC
+ XIEYICuRxqJbEU5ER23X5Z6PR9LZVEIze8kIOAfxatbqRqyM2PPSFtCH9Igaph7MWx8xiEsW5
+ InUmTmeETPnUyvoTrIsYwyBBu4M7nHkfkN1VmhFCdizrpkGDyyddhpFuJcaPIPcsqDuIhTzi5
+ 0MAl8jixoNfMFCUpMQP4/RDpXbnHeKSf/tpJ7PMyp2vltwcMoeINfgF+3YNskF1bOCJK9qQB3
+ fKAnBvxBFhgTn6V9N5ByDxdiUDkdHK5h/XgpNDXbseTxaMpH9uWKvGCPx39I24X38EnfOme3c
+ TwpDCPSGWP5vRzaX3Q5iWlzNpHB0N5+wpfNWbwVTDG8oelEiWrmVXR94m9BlmDdlT50/FhJoB
+ ct0CHugb5GiJtqETF9YSXoKCsm3u4SQbXjmO2o+tiBX/l9OFP5t6MwmSWIdt3elXcpvnJqQLa
+ KLCvwLz7ra1d4eYfxTCxTBHdd+4+rOVi65uqRQx5fiUR/thIRAGduFtgg+rfxbpnJ43v3dWg3
+ PpCCK+ZVtqT+HCFDouRYyvIaO/6Wqiv95HHcFrzDsCReGfWd6HWHMB40R9RInPuTAGKQZQvTf
+ OIhHpTorZ4zAJNqhgZXMNx61Ws000Db8FJ37sTpRs3Ru/YmZSw+fU6jJmJvk+Vtt7GU4eucxn
+ 97CYR/u/EZOxUG50tu5ZPNz9bLt49JaQLdNMPQZS1K+QeH46LIvn0tgJsgidWXCeBSh7oRImO
+ LLleyzgY0c+YJMwy7qbf+oooD/oC0JLRq7emc0aqeUx6z43yeRCtQ0Xqu11DkdaI2wWQVr1id
+ +rSEvWF1itpoJYTMGv7VXeExWLmTIEf4reCMz5X9IQfMreMgoXpCFbTyCzJtNkP1pmFB6myNi
+ YSjsuQmyeXtyBgUgFYSw==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The structleak plugin causes the stack frame size to grow immensely when
-used with KUnit:
+On Fri, Sep 17, 2021 at 8:11 AM Brendan Higgins
+<brendanhiggins@google.com> wrote:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> The structleak plugin causes the stack frame size to grow immensely:
+>
+> lib/bitfield_kunit.c: In function 'test_bitfields_constants':
+> lib/bitfield_kunit.c:93:1: error: the frame size of 7440 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
+>
+> Turn it off in this file.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+> ---
+>  lib/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/lib/Makefile b/lib/Makefile
+> index 5efd1b435a37c..c93c4b59af969 100644
+> --- a/lib/Makefile
+> +++ b/lib/Makefile
+> @@ -351,7 +351,7 @@ obj-$(CONFIG_OBJAGG) += objagg.o
+>  obj-$(CONFIG_PLDMFW) += pldmfw/
+>
+>  # KUnit tests
+> -CFLAGS_bitfield_kunit.o := $(call cc-option,-Wframe-larger-than=10240)
+> +CFLAGS_bitfield_kunit.o := $(call cc-option,-Wframe-larger-than=10240) $(DISABLE_STRUCTLEAK_PLUGIN)
 
-../drivers/base/test/property-entry-test.c:492:1: warning: the frame size of 2832 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-../drivers/base/test/property-entry-test.c:322:1: warning: the frame size of 2080 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-../drivers/base/test/property-entry-test.c:250:1: warning: the frame size of 4976 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-../drivers/base/test/property-entry-test.c:115:1: warning: the frame size of 3280 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+I think the  $(call cc-option,-Wframe-larger-than=10240) needs to be dropped
+here. This was not in my original patch and it is definitely broken on
+all architectures
+with 8KB stack size or less if the function needs that much. What is the amount
+of actual stack usage you observe without this? If we still get a warning, then
+I think this needs to be fixed in the code.
 
-Turn it off in this file.
-
-Co-developed-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
----
- drivers/base/test/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/base/test/Makefile b/drivers/base/test/Makefile
-index 64b2f3d744d51..7f76fee6f989d 100644
---- a/drivers/base/test/Makefile
-+++ b/drivers/base/test/Makefile
-@@ -2,4 +2,4 @@
- obj-$(CONFIG_TEST_ASYNC_DRIVER_PROBE)	+= test_async_driver_probe.o
- 
- obj-$(CONFIG_DRIVER_PE_KUNIT_TEST) += property-entry-test.o
--CFLAGS_REMOVE_property-entry-test.o += -fplugin-arg-structleak_plugin-byref -fplugin-arg-structleak_plugin-byref-all
-+CFLAGS_property-entry-test.o += $(DISABLE_STRUCTLEAK_PLUGIN)
--- 
-2.33.0.464.g1972c5931b-goog
-
+       Arnd
