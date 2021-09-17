@@ -2,74 +2,106 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89496C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 10:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F5CC433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 15:07:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7425C6103C
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 10:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA0F061152
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Sep 2021 15:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242290AbhIQKSD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 17 Sep 2021 06:18:03 -0400
-Received: from mga02.intel.com ([134.134.136.20]:56384 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242104AbhIQKSC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Sep 2021 06:18:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10109"; a="209998947"
-X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
-   d="scan'208";a="209998947"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 03:16:40 -0700
-X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
-   d="scan'208";a="472208475"
-Received: from lahna.fi.intel.com (HELO lahna) ([10.237.72.163])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 03:16:33 -0700
-Received: by lahna (sSMTP sendmail emulation); Fri, 17 Sep 2021 13:16:30 +0300
-Date:   Fri, 17 Sep 2021 13:16:30 +0300
-From:   Mika Westerberg <mika.westerberg@linux.intel.com>
-To:     Brendan Higgins <brendanhiggins@google.com>
-Cc:     shuah@kernel.org, davidgow@google.com, arnd@arndb.de,
-        keescook@chromium.org, rafael@kernel.org, jic23@kernel.org,
-        lars@metafoo.de, ulf.hansson@linaro.org, andreas.noever@gmail.com,
-        michael.jamet@intel.com, YehezkelShB@gmail.com,
-        masahiroy@kernel.org, michal.lkml@markovi.net,
-        ndesaulniers@google.com, linux-kselftest@vger.kernel.org,
-        kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-        torvalds@linux-foundation.org, gregkh@linuxfoundation.org,
-        linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v1 4/6] thunderbolt: build kunit tests without structleak
- plugin
-Message-ID: <YURq/qq32WnOaJag@lahna>
-References: <20210917061104.2680133-1-brendanhiggins@google.com>
- <20210917061104.2680133-5-brendanhiggins@google.com>
+        id S239181AbhIQPIl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 17 Sep 2021 11:08:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237944AbhIQPIl (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 17 Sep 2021 11:08:41 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38EDEC061574;
+        Fri, 17 Sep 2021 08:07:19 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id a22so12576539iok.12;
+        Fri, 17 Sep 2021 08:07:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=01aK1+qs2ony0wtCQjSv+7PH8MX0z1DNX/5puDnYAWQ=;
+        b=biO/72ML/F+PPNWDuVwkDDkLg2Z4jjzWk/o5+eoWrS8dH8z2f3TqTrCuDEl84cUwwt
+         7LIsbRSHwlZKmb+aag6R5lpml1WbaUESR9WiUuKXXjBCez1pdcBVTDXDGx1/eLXkA8Pr
+         J7xN3RWrz5vdtmg53+goJyUSpZbKyuHScstZEj6hWJBq51ng40CgHRGQmtLMO938L+Aq
+         zydcrME1WLaypBvvcW6nZq7G156eG0bFe5UKAQXfA5YKaBwbkqgC6Zb+bj4ngOOkaHFG
+         +10JzOLDGgt9WDTBMjCUUApVzgclvWALYtpjjlYjyKMOl1sqG549vZoR3nh+szp5oUaO
+         msCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=01aK1+qs2ony0wtCQjSv+7PH8MX0z1DNX/5puDnYAWQ=;
+        b=fKXu4sFWl7wER0I15wPEIPnA3RF7FLw30Khb2pprjj/n2S4YFtD2ybCmAwTRVO/Krj
+         uWY8ZOIo+FR7IK/QQm9o6+yAj8GgOOTIbLZzGAY+qLOrFqnYNL8aBMi5XQ93N8+z49oc
+         lpqZ2Zb6vJ8/67LLmZCCxwBa9ChmD/PSwEfVRoNBNKbm6Zb899FmQnxBgZVGKQCOeJe9
+         5iQs0baKkmOo/oWcRlQaIvfXprdxcouytEE7GZ68B70bLrLEPJFnaiB/yyRdXZ5KmJzh
+         2HpvaO83ywne+rwk3IGWMs9Bz5pvFGsMtnJ1JkNpB3Y/w1UuO4uSic6pRorJ2UP8SHMt
+         XiGw==
+X-Gm-Message-State: AOAM53216T2aXjSyKVjtZx3XKfKa10RpPcKJ5gNSewDSQUvb9D96ONtS
+        qEt2coL9XKTYksH9tLxrXomwguVZgr3wuPpWxdQApBc3
+X-Google-Smtp-Source: ABdhPJz/hW2EPv/26N4Tu75FdUs6UoMyYVOrMMC+eV3FmlUjSROonOgk5A7zua0dDEkAZX2m/aZSZehjX9Q2R9/KAag=
+X-Received: by 2002:a6b:7104:: with SMTP id q4mr1230501iog.29.1631891238494;
+ Fri, 17 Sep 2021 08:07:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210917061104.2680133-5-brendanhiggins@google.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20210910130954.1392104-1-lucjan.lucjanov@gmail.com>
+In-Reply-To: <20210910130954.1392104-1-lucjan.lucjanov@gmail.com>
+From:   =?UTF-8?Q?Piotr_G=C3=B3rski?= <lucjan.lucjanov@gmail.com>
+Date:   Fri, 17 Sep 2021 17:07:06 +0200
+Message-ID: <CAL2Yj0QvoNZ3VeYfk63oMUTenP3eypJx+fB6f09rprV-fCphGw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use smaller dictionary size for zstd module compression
+To:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 11:11:02PM -0700, Brendan Higgins wrote:
-> The structleak plugin causes the stack frame size to grow immensely when
-> used with KUnit:
-> 
-> drivers/thunderbolt/test.c:1529:1: error: the frame size of 1176 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> 
-> Turn it off in this file.
-> 
-> Linus already split up tests in this file, so this change *should* be
-> redundant now.
-> 
-> Co-developed-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Brendan Higgins <brendanhiggins@google.com>
+Ping...
 
-Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+pt., 10 wrz 2021 o 15:10 Piotr Gorski <lucjan.lucjanov@gmail.com> napisa=C5=
+=82(a):
+>
+> By default, zstd without parameters uses a dictionary size of 8 MB.
+> However, most modules are much smaller than that.
+> Use a dictionary size of 2 MB for module compression, resulting in
+> slightly higher compression speed while still maintaining a good
+> compression ratio.
+> The --zstd=3Dwlog=3D21 option is equivalent to --lzma2=3Ddict=3D2MiB used=
+ in XZ compression.
+>
+> Signed-off-by: Piotr Gorski <lucjan.lucjanov@gmail.com>
+> ---
+>  scripts/Makefile.modinst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+> index ff9b09e4cfca..c3475e5aca7c 100644
+> --- a/scripts/Makefile.modinst
+> +++ b/scripts/Makefile.modinst
+> @@ -97,7 +97,7 @@ quiet_cmd_gzip =3D GZIP    $@
+>  quiet_cmd_xz =3D XZ      $@
+>        cmd_xz =3D $(XZ) --lzma2=3Ddict=3D2MiB -f $<
+>  quiet_cmd_zstd =3D ZSTD    $@
+> -      cmd_zstd =3D $(ZSTD) -T0 --rm -f -q $<
+> +      cmd_zstd =3D $(ZSTD) --zstd=3Dwlog=3D21 -T0 --rm -f -q $<
+>
+>  $(dst)/%.ko.gz: $(dst)/%.ko FORCE
+>         $(call cmd,gzip)
+> --
+> 2.33.0.142.ge0a2f5cbc5
+>
