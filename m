@@ -4,118 +4,128 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A78C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A9EC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:03:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E293161100
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC87F60F58
+	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:03:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhISCEX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 18 Sep 2021 22:04:23 -0400
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:30422 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbhISCEF (ORCPT
+        id S240935AbhISCE3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 18 Sep 2021 22:04:29 -0400
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:31911 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229460AbhISCE2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Sep 2021 22:04:05 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 18J22EkM018406;
-        Sun, 19 Sep 2021 11:02:15 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 18J22EkM018406
+        Sat, 18 Sep 2021 22:04:28 -0400
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 18J22fC3001853;
+        Sun, 19 Sep 2021 11:02:41 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 18J22fC3001853
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1632016935;
-        bh=VqZM/S++/961bT3iqEcU4Nq8VDDaawzzm/jisNoSgow=;
+        s=dec2015msa; t=1632016962;
+        bh=eZ4UqEzoFbcU1gxopsAWucOOsR8Keeo3LyleujdCQ2c=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=NandBl9/LYCSjX8qyEXsPUdhS/nrzNT1t44a9eKdBDkKGxB53WcOTBqdRgL6w3COJ
-         IJzvoVHFW+tX2xny9ZiM+t+lUOYD73jAo20MR50DGC3GgwMbJfycpbJHikU8OZKK00
-         hf3g1tpZ1PBnH5faS1KGxqGaJy2DU9YFARB43WZv4V6eB0JhzZEpLPicw5i/siD8Za
-         3ekfxPa1aoz6djw+k07Wf6iZ4QZn5mr7xjBHLTA1tIHUqfKmX9uONNv0defhu8umlA
-         gDQt61L2wMz+3xntJiJCLUJE0Lo46XeVLgsnLaEvWoHmG3APtwVtfxWCdub6UE2O8+
-         vxJ2wpGHZkKPA==
-X-Nifty-SrcIP: [209.85.216.46]
-Received: by mail-pj1-f46.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so12721985pjc.3;
-        Sat, 18 Sep 2021 19:02:15 -0700 (PDT)
-X-Gm-Message-State: AOAM532Eo6mcMZD56d1POe8zI2oV/ScvoUeXHrfDKHGFFA5PgTxGMY7G
-        8+w6+i8aY6AS+t/HvosYy59pah94XFEcMMDtORw=
-X-Google-Smtp-Source: ABdhPJwWvGV7ovGk9qEOpyXz7Kvcfm9vWIeAHvxgCqmPjM2G9sxLxnggbok97kOnT2oy9/RKHQIph5YC1FnmzPNUbvM=
-X-Received: by 2002:a17:902:e04d:b0:13a:70c9:11b8 with SMTP id
- x13-20020a170902e04d00b0013a70c911b8mr16018399plx.82.1632016934585; Sat, 18
- Sep 2021 19:02:14 -0700 (PDT)
+        b=Gp1X0Imnhk25xHygSuIwJ39zKa8vRJuxluKs09ZphVNtqFxqjCXHuiAVP4u/+Dibz
+         t07RNv3PmHeauIY6sGZITWOCDQERx2Cgs6Rh+eqwAvVjDZf2q+xFSrP4IIEwt4zVSG
+         eG1eIL9l1QUHqtu/HJBJjC4qt0D/OYKQSM1z6mLeOf6P1xKivEA3/wmojiNj2GmWY6
+         DxGx+Yh7sEsDFXYroT6HntEq52ee02o4bCoW8gvEncOaAtYJOkHwwfCqfxeYExPZs3
+         0Gj46GNBVAjb1YRKZ2fBFgFs6ZdMH6sZNtUlHm0tCyWJVSevqxMOP1J92tTDmtgmmT
+         2oPHK+OuoXSzw==
+X-Nifty-SrcIP: [209.85.216.45]
+Received: by mail-pj1-f45.google.com with SMTP id me5-20020a17090b17c500b0019af76b7bb4so12055419pjb.2;
+        Sat, 18 Sep 2021 19:02:41 -0700 (PDT)
+X-Gm-Message-State: AOAM530O8iVnwCGqL7i1ueGA7qMOUXhwo2gu5kctyTqS0BIsxxl7SVxw
+        6bNeyX2r/s5axsWhAZBgpmMweYi5pNO+juvvVEE=
+X-Google-Smtp-Source: ABdhPJzEdjq35ZjkW0hHIL1UUG+LNy7qC1HsCpAIiK3J6D7N5kbSKfCC5cTPRhOBcUI7G4hghXCQ6KRSxa0DGFrJnd8=
+X-Received: by 2002:a17:90b:314a:: with SMTP id ip10mr9609133pjb.77.1632016960976;
+ Sat, 18 Sep 2021 19:02:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210916184017.1881473-1-nathan@kernel.org> <20210916184017.1881473-3-nathan@kernel.org>
-In-Reply-To: <20210916184017.1881473-3-nathan@kernel.org>
+References: <0771f164fcbba2fb425bf525400b8fab7079e539.1631781770.git.geert+renesas@glider.be>
+In-Reply-To: <0771f164fcbba2fb425bf525400b8fab7079e539.1631781770.git.geert+renesas@glider.be>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 19 Sep 2021 11:01:37 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQvjeaGVEMBfnr-8FEYJwV3uLe9U7VwPrHbyfo+ByKNBw@mail.gmail.com>
-Message-ID: <CAK7LNAQvjeaGVEMBfnr-8FEYJwV3uLe9U7VwPrHbyfo+ByKNBw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] kbuild: Add -Werror=ignored-optimization-argument
- to CLANG_FLAGS
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Date:   Sun, 19 Sep 2021 11:02:04 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARTCU12W=nKOrjM8_5aGhkUPhiOqWBgwROsLKcZ80fy3Q@mail.gmail.com>
+Message-ID: <CAK7LNARTCU12W=nKOrjM8_5aGhkUPhiOqWBgwROsLKcZ80fy3Q@mail.gmail.com>
+Subject: Re: [PATCH] sh: Add missing FORCE prerequisites in Makefile
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        Linux-sh list <linux-sh@vger.kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        llvm@lists.linux.dev
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Sep 17, 2021 at 3:42 AM Nathan Chancellor <nathan@kernel.org> wrote:
+On Thu, Sep 16, 2021 at 5:43 PM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
 >
-> Similar to commit 589834b3a009 ("kbuild: Add
-> -Werror=unknown-warning-option to CLANG_FLAGS").
+> make:
 >
-> Clang ignores certain GCC flags that it has not implemented, only
-> emitting a warning:
+>     arch/sh/boot/Makefile:87: FORCE prerequisite is missing
 >
-> $ echo | clang -fsyntax-only -falign-jumps -x c -
-> clang-14: warning: optimization flag '-falign-jumps' is not supported
-> [-Wignored-optimization-argument]
+> Add the missing FORCE prerequisites for all build targets identified by
+> "make help".
 >
-> When one of these flags gets added to KBUILD_CFLAGS unconditionally, all
-> subsequent cc-{disable-warning,option} calls fail because -Werror was
-> added to these invocations to turn the above warning and the equivalent
-> -W flag warning into errors.
->
-> To catch the presence of these flags earlier, turn
-> -Wignored-optimization-argument into an error so that the flags can
-> either be implemented or ignored via cc-option and there are no more
-> weird errors.
->
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> Fixes: e1f86d7b4b2a5213 ("kbuild: warn if FORCE is missing for if_changed(_dep,_rule) and filechk")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > ---
+
 
 Applied to linux-kbuild. Thanks.
 
-
-
->  scripts/Makefile.clang | 5 +++++
->  1 file changed, 5 insertions(+)
+>  arch/sh/boot/Makefile | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 >
-> diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
-> index 4cce8fd0779c..51fc23e2e9e5 100644
-> --- a/scripts/Makefile.clang
-> +++ b/scripts/Makefile.clang
-> @@ -29,7 +29,12 @@ CLANG_FLAGS  += --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
->  else
->  CLANG_FLAGS    += -fintegrated-as
->  endif
-> +# By default, clang only warns when it encounters an unknown warning flag or
-> +# certain optimization flags it knows it has not implemented.
-> +# Make it behave more like gcc by erroring when these flags are encountered
-> +# so they can be implemented or wrapped in cc-option.
->  CLANG_FLAGS    += -Werror=unknown-warning-option
-> +CLANG_FLAGS    += -Werror=ignored-optimization-argument
->  KBUILD_CFLAGS  += $(CLANG_FLAGS)
->  KBUILD_AFLAGS  += $(CLANG_FLAGS)
->  export CLANG_FLAGS
+> diff --git a/arch/sh/boot/Makefile b/arch/sh/boot/Makefile
+> index dded61296c9a00da..5c123f5b2797c08a 100644
+> --- a/arch/sh/boot/Makefile
+> +++ b/arch/sh/boot/Makefile
+> @@ -80,30 +80,30 @@ $(obj)/vmlinux.bin.xz: $(obj)/vmlinux.bin FORCE
+>  $(obj)/vmlinux.bin.lzo: $(obj)/vmlinux.bin FORCE
+>         $(call if_changed,lzo)
+>
+> -$(obj)/uImage.bz2: $(obj)/vmlinux.bin.bz2
+> +$(obj)/uImage.bz2: $(obj)/vmlinux.bin.bz2 FORCE
+>         $(call if_changed,uimage,bzip2)
+>
+> -$(obj)/uImage.gz: $(obj)/vmlinux.bin.gz
+> +$(obj)/uImage.gz: $(obj)/vmlinux.bin.gz FORCE
+>         $(call if_changed,uimage,gzip)
+>
+> -$(obj)/uImage.lzma: $(obj)/vmlinux.bin.lzma
+> +$(obj)/uImage.lzma: $(obj)/vmlinux.bin.lzma FORCE
+>         $(call if_changed,uimage,lzma)
+>
+> -$(obj)/uImage.xz: $(obj)/vmlinux.bin.xz
+> +$(obj)/uImage.xz: $(obj)/vmlinux.bin.xz FORCE
+>         $(call if_changed,uimage,xz)
+>
+> -$(obj)/uImage.lzo: $(obj)/vmlinux.bin.lzo
+> +$(obj)/uImage.lzo: $(obj)/vmlinux.bin.lzo FORCE
+>         $(call if_changed,uimage,lzo)
+>
+> -$(obj)/uImage.bin: $(obj)/vmlinux.bin
+> +$(obj)/uImage.bin: $(obj)/vmlinux.bin FORCE
+>         $(call if_changed,uimage,none)
+>
+>  OBJCOPYFLAGS_vmlinux.srec := -I binary -O srec
+> -$(obj)/vmlinux.srec: $(obj)/compressed/vmlinux
+> +$(obj)/vmlinux.srec: $(obj)/compressed/vmlinux FORCE
+>         $(call if_changed,objcopy)
+>
+>  OBJCOPYFLAGS_uImage.srec := -I binary -O srec
+> -$(obj)/uImage.srec: $(obj)/uImage
+> +$(obj)/uImage.srec: $(obj)/uImage FORCE
+>         $(call if_changed,objcopy)
+>
+>  $(obj)/uImage: $(obj)/uImage.$(suffix-y)
 > --
-> 2.33.0
+> 2.25.1
 >
 
 
