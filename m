@@ -6,130 +6,88 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E78C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D19ECC433F5
+	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:02:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F9D2610CF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B579A610A8
+	for <linux-kbuild@archiver.kernel.org>; Sun, 19 Sep 2021 02:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232470AbhISCDj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 18 Sep 2021 22:03:39 -0400
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:42446 "EHLO
+        id S240931AbhISCEU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 18 Sep 2021 22:04:20 -0400
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:43165 "EHLO
         conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbhISCDi (ORCPT
+        with ESMTP id S240861AbhISCEF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Sep 2021 22:03:38 -0400
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 18J220fs028187;
-        Sun, 19 Sep 2021 11:02:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 18J220fs028187
+        Sat, 18 Sep 2021 22:04:05 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 18J22RRX028484;
+        Sun, 19 Sep 2021 11:02:27 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 18J22RRX028484
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1632016920;
-        bh=Z/gNxIq+bDVsIzi7WYm/lUdYSrE6EljYQaYBdU/xrxE=;
+        s=dec2015msa; t=1632016948;
+        bh=IeRqbMvP0VMKoofeV7jzNf72c4TwrPCoerRwTS9X3mk=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=HSEPVfsG+udftoyE19f0nHM6NcHFPq3gJIVhvRXtqThMQF59ggtQO/HCzqlZZIgQ0
-         oS9mYGl27M82beRh2ss3EhHJY8s+bdjmaY9+sA7+N1NbCJ8uUFsHFKY+t5yXZ0HA45
-         aTuZFxlAVsbwcdEFOLA1j7Joj3K+nI9LwO2ZZVXbwiALu3vriYus+vN/SKqFfeIlj2
-         /+q0UqMQhQF72czXeO5W+vCGcjqu0458hfjSf6fA2JctXzGdqY+UsQNhcy7748DLNe
-         SP/VGOWifGlzki8rHDPTwD9waoprKyZbNv3gmwx13uH/I4rHD55YBTsDBH6kPx6rpz
-         N93MZqSUjdmJg==
-X-Nifty-SrcIP: [209.85.215.169]
-Received: by mail-pg1-f169.google.com with SMTP id q68so13733502pga.9;
-        Sat, 18 Sep 2021 19:02:00 -0700 (PDT)
-X-Gm-Message-State: AOAM530y+i/HLAcAWyAxYytwz/6wz+BPfyK3/MvIX/znb2BiymxDiIBL
-        DGN/iK58aVWi12OCy1qLklFBS389xivYei2b88Q=
-X-Google-Smtp-Source: ABdhPJyw1BAb4i9nakU7J7GTQ5NMugRyYo7+seI20mR/j8MquU+znpaVKlN6fnF1fNFhjEZHUIOU3jifNrszBT+QZVo=
-X-Received: by 2002:a65:40c4:: with SMTP id u4mr17266657pgp.186.1632016919668;
- Sat, 18 Sep 2021 19:01:59 -0700 (PDT)
+        b=owDY/Lk5Mfi0jGsYwuAZneWCwZjYeoUTMwOCCaJMcH1KQG9uBDeXCNQ1hCOZ0K1pu
+         Vw1IWYjfytbeJ/1PJ6G7LOgbRBF0Go9y0zPbrCU5NwiUx3qOnvWv7wuqkoP57uKM6u
+         fxqE9mpf4i4hKYt8xRB+pzGxCRIWSvV4X7yJAzeZDemBzslZb3q79EL3HYtOBzs/Tt
+         xXNMjI/WuAkiDZCCI90VakyQyy8XiSNEs1YYX56SJ3OdQZAjcs3ihtWoLjHuEdqCv5
+         wLWCOStxIxvKYx8n83WgbmhzrIh5/2pRFHXKXA3LSrvbBaVB+4IPtw/xfhyANwgELa
+         gmBMNuZ7gkhMA==
+X-Nifty-SrcIP: [209.85.216.43]
+Received: by mail-pj1-f43.google.com with SMTP id k23so9591026pji.0;
+        Sat, 18 Sep 2021 19:02:27 -0700 (PDT)
+X-Gm-Message-State: AOAM530s8mep3QbfdLyU/XonMLvZCTh6f57B8yfwJEhVjGlHJu/vVmv6
+        P7+ip8Br5eOh6+pbBr17iG9YGnbSMNa8VK4ZlpU=
+X-Google-Smtp-Source: ABdhPJzvq4KrpyJbKQpq6RNH/kBkU2R1w1VAyWxsnb3PAl7gr2l60rQ5zzuxK68Rim9etMHNFvuvw2z50sY6nlIlo+g=
+X-Received: by 2002:a17:90a:192:: with SMTP id 18mr30092740pjc.119.1632016947055;
+ Sat, 18 Sep 2021 19:02:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210916184017.1881473-1-nathan@kernel.org> <20210916184017.1881473-2-nathan@kernel.org>
-In-Reply-To: <20210916184017.1881473-2-nathan@kernel.org>
+References: <20210916092122.2374583-1-ramjiyani@google.com>
+In-Reply-To: <20210916092122.2374583-1-ramjiyani@google.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 19 Sep 2021 11:01:22 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARZwfag+2NFeHQb2=fDJMd+7jLKbre20o6kf0+JGb+Z+w@mail.gmail.com>
-Message-ID: <CAK7LNARZwfag+2NFeHQb2=fDJMd+7jLKbre20o6kf0+JGb+Z+w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] x86/build: Do not add -falign flags
- unconditionally for clang
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+Date:   Sun, 19 Sep 2021 11:01:50 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQE_pEWaHP1GgJ57VJ1FCStDjf+mS5uvpGP=SxpNG0DOA@mail.gmail.com>
+Message-ID: <CAK7LNAQE_pEWaHP1GgJ57VJ1FCStDjf+mS5uvpGP=SxpNG0DOA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Fix comment typo in scripts/Makefile.modpost
+To:     Ramji Jiyani <ramjiyani@google.com>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        llvm@lists.linux.dev, kernel test robot <lkp@intel.com>,
-        Borislav Petkov <bp@suse.de>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Sep 17, 2021 at 3:42 AM Nathan Chancellor <nathan@kernel.org> wrote:
+On Thu, Sep 16, 2021 at 6:21 PM Ramji Jiyani <ramjiyani@google.com> wrote:
 >
-> clang does not support -falign-jumps and only recently gained support
-> for -falign-loops. When one of the configuration options that adds these
-> flags is enabled, clang warns and all cc-{disable-warning,option} that
-> follow fail because -Werror gets added to test for the presence of this
-> warning:
+> Change comment "create one <module>.mod.c file pr. module"
+> to "create one <module>.mod.c file per module"
 >
-> clang-14: warning: optimization flag '-falign-jumps=0' is not supported
-> [-Wignored-optimization-argument]
->
-> To resolve this, add a couple of cc-option calls when building with
-> clang; gcc has supported these options since 3.2 so there is no point in
-> testing for their support. -falign-functions was implemented in clang-7,
-> -falign-loops was implemented in clang-14, and -falign-jumps has not
-> been implemented yet.
->
-> Link: https://lore.kernel.org/r/YSQE2f5teuvKLkON@Ryzen-9-3900X.localdomain/
-> Link: https://lore.kernel.org/r/20210824022640.2170859-2-nathan@kernel.org/
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> Acked-by: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> Signed-off-by: Ramji Jiyani <ramjiyani@google.com>
 > ---
->  arch/x86/Makefile_32.cpu | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/Makefile_32.cpu b/arch/x86/Makefile_32.cpu
-> index e7355f8b51c2..94834c4b5e5e 100644
-> --- a/arch/x86/Makefile_32.cpu
-> +++ b/arch/x86/Makefile_32.cpu
-> @@ -4,6 +4,12 @@
->
->  tune           = $(call cc-option,-mtune=$(1),$(2))
->
-> +ifdef CONFIG_CC_IS_CLANG
-> +align          := -falign-functions=0 $(call cc-option,-falign-jumps=0) $(call cc-option,-falign-loops=0)
-> +else
-> +align          := -falign-functions=0 -falign-jumps=0 -falign-loops=0
-> +endif
-> +
->  cflags-$(CONFIG_M486SX)                += -march=i486
->  cflags-$(CONFIG_M486)          += -march=i486
->  cflags-$(CONFIG_M586)          += -march=i586
-> @@ -19,11 +25,11 @@ cflags-$(CONFIG_MK6)                += -march=k6
->  # They make zero difference whatsosever to performance at this time.
->  cflags-$(CONFIG_MK7)           += -march=athlon
->  cflags-$(CONFIG_MK8)           += $(call cc-option,-march=k8,-march=athlon)
-> -cflags-$(CONFIG_MCRUSOE)       += -march=i686 -falign-functions=0 -falign-jumps=0 -falign-loops=0
-> -cflags-$(CONFIG_MEFFICEON)     += -march=i686 $(call tune,pentium3) -falign-functions=0 -falign-jumps=0 -falign-loops=0
-> +cflags-$(CONFIG_MCRUSOE)       += -march=i686 $(align)
-> +cflags-$(CONFIG_MEFFICEON)     += -march=i686 $(call tune,pentium3) $(align)
->  cflags-$(CONFIG_MWINCHIPC6)    += $(call cc-option,-march=winchip-c6,-march=i586)
->  cflags-$(CONFIG_MWINCHIP3D)    += $(call cc-option,-march=winchip2,-march=i586)
-> -cflags-$(CONFIG_MCYRIXIII)     += $(call cc-option,-march=c3,-march=i486) -falign-functions=0 -falign-jumps=0 -falign-loops=0
-> +cflags-$(CONFIG_MCYRIXIII)     += $(call cc-option,-march=c3,-march=i486) $(align)
->  cflags-$(CONFIG_MVIAC3_2)      += $(call cc-option,-march=c3-2,-march=i686)
->  cflags-$(CONFIG_MVIAC7)                += -march=i686
->  cflags-$(CONFIG_MCORE2)                += -march=i686 $(call tune,core2)
->
-> base-commit: a9086b878b7fd65894eb8cb1fa395dd469970566
-> --
-> 2.33.0
->
+>  scripts/Makefile.modpost | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Applied to linux-kbuild. Thanks.
+
+
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index eef56d629799..48585c4d04ad 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -13,7 +13,7 @@
+>  # Stage 2 is handled by this file and does the following
+>  # 1) Find all modules listed in modules.order
+>  # 2) modpost is then used to
+> -# 3)  create one <module>.mod.c file pr. module
+> +# 3)  create one <module>.mod.c file per module
+>  # 4)  create one Module.symvers file with CRC for all exported symbols
+>
+>  # Step 3 is used to place certain information in the module's ELF
+> --
+> 2.33.0.309.g3052b89438-goog
+>
 
 
 -- 
