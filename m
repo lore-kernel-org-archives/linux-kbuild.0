@@ -2,137 +2,295 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F5FC433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Sep 2021 16:17:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBED2C433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Sep 2021 22:41:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2C6E611EE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Sep 2021 16:17:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1CC4611CA
+	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Sep 2021 22:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236597AbhIVQTO convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 22 Sep 2021 12:19:14 -0400
-Received: from lithops.sigma-star.at ([195.201.40.130]:38220 "EHLO
-        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236523AbhIVQTN (ORCPT
+        id S238298AbhIVWmx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 22 Sep 2021 18:42:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229506AbhIVWmw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Sep 2021 12:19:13 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 9A7306171B1D;
-        Wed, 22 Sep 2021 18:17:41 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id g_Xj6GkVOxov; Wed, 22 Sep 2021 18:17:41 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 0FFDE6171AF5;
-        Wed, 22 Sep 2021 18:17:41 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Czl4Cj8z4wMN; Wed, 22 Sep 2021 18:17:40 +0200 (CEST)
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id DA4B860F6B83;
-        Wed, 22 Sep 2021 18:17:40 +0200 (CEST)
-Date:   Wed, 22 Sep 2021 18:17:40 +0200 (CEST)
-From:   Richard Weinberger <richard@nod.at>
-To:     Boris Kolpackov <boris@codesynthesis.com>
-Cc:     masahiroy <masahiroy@kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-kbuild <linux-kbuild@vger.kernel.org>
-Message-ID: <1942256037.97524.1632327460626.JavaMail.zimbra@nod.at>
-In-Reply-To: <boris.20210922165140@codesynthesis.com>
-References: <20210920213957.1064-1-richard@nod.at> <20210920213957.1064-2-richard@nod.at> <boris.20210922090732@codesynthesis.com> <1402570794.96583.1632295660867.JavaMail.zimbra@nod.at> <boris.20210922165140@codesynthesis.com>
-Subject: Re: [PATCH 2/2] kconfig: Deny command substitution in string values
+        Wed, 22 Sep 2021 18:42:52 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08311C061574
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Sep 2021 15:41:22 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id s16so4048041pfk.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Sep 2021 15:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Clu/CMqYqn57kn46zv2wUM8gp0cFgkCwKnhfOw8qQMI=;
+        b=hH+Rj6HlaGlPQp6NFxLkmROyfSvwLx3LMaDtWfSjaFXTqrZCHbHXaEsmv6Y47g/PcV
+         RBFDqTp3/UIXHeRV63Sr4Ba6HoGY/8m5UCnuU8HfyIVQSnCDlKkXMJCa/+tfwrVRFvpE
+         ROF6Jy/7wkMSv2XeWz8Z4C4VWUF1DbRKg1gw8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Clu/CMqYqn57kn46zv2wUM8gp0cFgkCwKnhfOw8qQMI=;
+        b=HP734A/9W9ruQxocINyBSpsWP+qhNFadcune2w6nXGhhUzl65srBf35j1f4DoF1F7J
+         DBGZBfY+r/8TXX8YrLUCOHPrKHwVz19l06HKt3ej93JQ/1zqPsK4ELgf/IWeyEQMv77F
+         5g57MLLFkwQtJOmtv+rzBtP9qf4H59aI55Iqtnv8moic9/Q6+Ce3d4F35xF2TBjMIpFO
+         3grPtQ7OVqpfV0+HQMxUJYgU9n8HRcGEBCc0Rim5hj3ir7801mglQ7qFZa7FqwY4nuND
+         Ptl7EaeeJcyK7YUYGgztI7/Lvjc9c94iuYqduef8iAHhsUUJHnZCYnqg+JmErEnU5ycb
+         c3zA==
+X-Gm-Message-State: AOAM532+un8b+Kw+MQPmjG5cp85EJnUEOtp1rUQesIdNpalxqo5kElwQ
+        uvP37+NTRy4JxI3Ezi/5lkTnsA==
+X-Google-Smtp-Source: ABdhPJxf+QLmUC5cRgbS/VVEhwW9zCuavMHGFysr+qdZC0KIYuUCa1BenaP9lNNzkbho+Il3Wr6kog==
+X-Received: by 2002:a63:b04c:: with SMTP id z12mr1164353pgo.371.1632350481421;
+        Wed, 22 Sep 2021 15:41:21 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id z62sm6856436pjj.53.2021.09.22.15.41.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 15:41:20 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 15:41:19 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     linux-kernel@vger.kernel.org, Daniel Micay <danielmicay@gmail.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org,
+        Joe Perches <joe@perches.com>, Miguel Ojeda <ojeda@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Andy Whitcroft <apw@canonical.com>,
+        Dwaipayan Ray <dwaipayanray1@gmail.com>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        clang-built-linux@googlegroups.com, linux-kbuild@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 4/7] slab: Add __alloc_size attributes for better
+ bounds checking
+Message-ID: <202109211608.B9B6DEE@keescook>
+References: <20210818214021.2476230-1-keescook@chromium.org>
+ <20210818214021.2476230-5-keescook@chromium.org>
+ <CAKwvOdmxRMcwKtWt+FogVY8iXn=vQ+0AZ36maJP2LbSdo_NNjg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [195.201.40.130]
-X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF92 (Linux)/8.8.12_GA_3809)
-Thread-Topic: kconfig: Deny command substitution in string values
-Thread-Index: UN+UPErbzOHavDcXoin7FTqpapyswg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdmxRMcwKtWt+FogVY8iXn=vQ+0AZ36maJP2LbSdo_NNjg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Boris,
-
------ Ursprüngliche Mail -----
-> Von: "Boris Kolpackov" <boris@codesynthesis.com>
-> An: "richard" <richard@nod.at>
-> CC: "masahiroy" <masahiroy@kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "linux-kbuild"
-> <linux-kbuild@vger.kernel.org>
-> Gesendet: Mittwoch, 22. September 2021 17:18:43
-> Betreff: Re: [PATCH 2/2] kconfig: Deny command substitution in string values
-
-> Richard Weinberger <richard@nod.at> writes:
+On Wed, Aug 25, 2021 at 02:31:34PM -0700, Nick Desaulniers wrote:
+> On Wed, Aug 18, 2021 at 2:40 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > As already done in GrapheneOS, add the __alloc_size attribute for
+> > regular kmalloc interfaces, to provide additional hinting for better
+> > bounds checking, assisting CONFIG_FORTIFY_SOURCE and other compiler
+> > optimizations.
+> >
+> > Co-developed-by: Daniel Micay <danielmicay@gmail.com>
+> > Signed-off-by: Daniel Micay <danielmicay@gmail.com>
+> > Cc: Christoph Lameter <cl@linux.com>
+> > Cc: Pekka Enberg <penberg@kernel.org>
+> > Cc: David Rientjes <rientjes@google.com>
+> > Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: Vlastimil Babka <vbabka@suse.cz>
+> > Cc: linux-mm@kvack.org
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
 > 
->> > So effectively it's now impossible to include ` or $ in kconfig
->> > string values. Seems like a major, backwards-incompatible
->> > restriction.
->> 
->> Do you have a working example?
+> This is a good start, so
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+
+Thanks!
+
+> Do we also want to attribute:
+> * __kmalloc_index
+
+This is just the bucketizer (it returns "int" for the kmalloc bucket).
+
+> * kmem_cache_free_bulk
+
+Not an allocator.
+
+> * kmem_cache_alloc_bulk
+
+This allocates a list of pointers, where "size" is the length of the
+list.
+
+> * kmalloc_order
+> * kmalloc_order_trace
+> * kmalloc_large
+
+Yes, these should be marked, good point.
+
+> * kmalloc_node
+
+This was already marked.
+
+> * kmem_cache_alloc_trace
+> * __kmalloc_track_caller
+> * __kmalloc_node_track_caller
+
+Yeah, these might get passed through in LTO situations. I'll add them.
+
+> * kmalloc_array_node
+
+I'll add this -- I thought it was already here but it got missed.
+
+Thanks!
+
+-Kees
+
 > 
-> You mean of a project that uses kconfig and that is capable of
-> handling string values with these characters? If so, then yes,
-> see for example, libbuild2-kconfig[1] which is a build system
-> module that implements kconfig-based configuration support for
-> build2. In particular, it exposes values from .config  as
-> buildfile variables but it doesn't do this by sourcing .config.
-> Instead it loads .config using the kconfig API and then sets
-> the corresponding buildfile variables programmatically.
-
-I had a config setting of Linux in mind. :-)
-
+> > ---
+> >  include/linux/slab.h | 20 ++++++++++++++++++--
+> >  1 file changed, 18 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/linux/slab.h b/include/linux/slab.h
+> > index 10fd0a8c816a..6ce826d8194d 100644
+> > --- a/include/linux/slab.h
+> > +++ b/include/linux/slab.h
+> > @@ -181,7 +181,7 @@ int kmem_cache_shrink(struct kmem_cache *s);
+> >  /*
+> >   * Common kmalloc functions provided by all allocators
+> >   */
+> > -__must_check
+> > +__must_check __alloc_size(2)
+> >  void *krealloc(const void *objp, size_t new_size, gfp_t flags);
+> >  void kfree(const void *objp);
+> >  void kfree_sensitive(const void *objp);
+> > @@ -426,6 +426,7 @@ static __always_inline unsigned int __kmalloc_index(size_t size,
+> >  #define kmalloc_index(s) __kmalloc_index(s, true)
+> >  #endif /* !CONFIG_SLOB */
+> >
+> > +__alloc_size(1)
+> >  void *__kmalloc(size_t size, gfp_t flags) __assume_kmalloc_alignment __malloc;
+> >  void *kmem_cache_alloc(struct kmem_cache *s, gfp_t flags) __assume_kmalloc_alignment __malloc;
+> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
+> > @@ -450,6 +451,7 @@ static __always_inline void kfree_bulk(size_t size, void **p)
+> >  }
+> >
+> >  #ifdef CONFIG_NUMA
+> > +__alloc_size(1)
+> >  void *__kmalloc_node(size_t size, gfp_t flags, int node) __assume_slab_alignment __malloc;
+> >  void *kmem_cache_alloc_node(struct kmem_cache *s, gfp_t flags, int node)
+> >                             __assume_slab_alignment __malloc;
+> > @@ -574,6 +576,7 @@ static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
+> >   *     Try really hard to succeed the allocation but fail
+> >   *     eventually.
+> >   */
+> > +__alloc_size(1)
+> >  static __always_inline void *kmalloc(size_t size, gfp_t flags)
+> >  {
+> >         if (__builtin_constant_p(size)) {
+> > @@ -596,6 +599,7 @@ static __always_inline void *kmalloc(size_t size, gfp_t flags)
+> >         return __kmalloc(size, flags);
+> >  }
+> >
+> > +__alloc_size(1)
+> >  static __always_inline void *kmalloc_node(size_t size, gfp_t flags, int node)
+> >  {
+> >  #ifndef CONFIG_SLOB
+> > @@ -620,6 +624,7 @@ static __always_inline void *kmalloc_node(size_t size, gfp_t flags, int node)
+> >   * @size: element size.
+> >   * @flags: the type of memory to allocate (see kmalloc).
+> >   */
+> > +__alloc_size(1, 2)
+> >  static inline void *kmalloc_array(size_t n, size_t size, gfp_t flags)
+> >  {
+> >         size_t bytes;
+> > @@ -638,7 +643,7 @@ static inline void *kmalloc_array(size_t n, size_t size, gfp_t flags)
+> >   * @new_size: new size of a single member of the array
+> >   * @flags: the type of memory to allocate (see kmalloc)
+> >   */
+> > -__must_check
+> > +__must_check __alloc_size(2, 3)
+> >  static inline void *krealloc_array(void *p, size_t new_n, size_t new_size,
+> >                                    gfp_t flags)
+> >  {
+> > @@ -656,6 +661,7 @@ static inline void *krealloc_array(void *p, size_t new_n, size_t new_size,
+> >   * @size: element size.
+> >   * @flags: the type of memory to allocate (see kmalloc).
+> >   */
+> > +__alloc_size(1, 2)
+> >  static inline void *kcalloc(size_t n, size_t size, gfp_t flags)
+> >  {
+> >         return kmalloc_array(n, size, flags | __GFP_ZERO);
+> > @@ -685,6 +691,7 @@ static inline void *kmalloc_array_node(size_t n, size_t size, gfp_t flags,
+> >         return __kmalloc_node(bytes, flags, node);
+> >  }
+> >
+> > +__alloc_size(1, 2)
+> >  static inline void *kcalloc_node(size_t n, size_t size, gfp_t flags, int node)
+> >  {
+> >         return kmalloc_array_node(n, size, flags | __GFP_ZERO, node);
+> > @@ -718,6 +725,7 @@ static inline void *kmem_cache_zalloc(struct kmem_cache *k, gfp_t flags)
+> >   * @size: how many bytes of memory are required.
+> >   * @flags: the type of memory to allocate (see kmalloc).
+> >   */
+> > +__alloc_size(1)
+> >  static inline void *kzalloc(size_t size, gfp_t flags)
+> >  {
+> >         return kmalloc(size, flags | __GFP_ZERO);
+> > @@ -729,25 +737,31 @@ static inline void *kzalloc(size_t size, gfp_t flags)
+> >   * @flags: the type of memory to allocate (see kmalloc).
+> >   * @node: memory node from which to allocate
+> >   */
+> > +__alloc_size(1)
+> >  static inline void *kzalloc_node(size_t size, gfp_t flags, int node)
+> >  {
+> >         return kmalloc_node(size, flags | __GFP_ZERO, node);
+> >  }
+> >
+> > +__alloc_size(1)
+> >  extern void *kvmalloc_node(size_t size, gfp_t flags, int node);
+> > +__alloc_size(1)
+> >  static inline void *kvmalloc(size_t size, gfp_t flags)
+> >  {
+> >         return kvmalloc_node(size, flags, NUMA_NO_NODE);
+> >  }
+> > +__alloc_size(1)
+> >  static inline void *kvzalloc_node(size_t size, gfp_t flags, int node)
+> >  {
+> >         return kvmalloc_node(size, flags | __GFP_ZERO, node);
+> >  }
+> > +__alloc_size(1)
+> >  static inline void *kvzalloc(size_t size, gfp_t flags)
+> >  {
+> >         return kvmalloc(size, flags | __GFP_ZERO);
+> >  }
+> >
+> > +__alloc_size(1, 2)
+> >  static inline void *kvmalloc_array(size_t n, size_t size, gfp_t flags)
+> >  {
+> >         size_t bytes;
+> > @@ -758,11 +772,13 @@ static inline void *kvmalloc_array(size_t n, size_t size, gfp_t flags)
+> >         return kvmalloc(bytes, flags);
+> >  }
+> >
+> > +__alloc_size(1, 2)
+> >  static inline void *kvcalloc(size_t n, size_t size, gfp_t flags)
+> >  {
+> >         return kvmalloc_array(n, size, flags | __GFP_ZERO);
+> >  }
+> >
+> > +__alloc_size(3)
+> >  extern void *kvrealloc(const void *p, size_t oldsize, size_t newsize,
+> >                 gfp_t flags);
+> >  extern void kvfree(const void *addr);
+> > --
 > 
->> Since the config is sourced in the scripts/setlocalversion it will
->> not work correctly anyway.
-> 
-> The actual file being sources is include/config/auto.conf, not
-> .config, right?
-> 
+> -- 
+> Thanks,
+> ~Nick Desaulniers
 
-Yes. auto.conf is .config post processed.
-This is exactly where my mitigation takes place.
- 
->> > I think if this is really desired, then it should be re-done with
->> > escaping (similar to ") rather than outright banning inconvenient
->> > characters.
->> 
->> Escaping is not so easy since the very same content is included
->> in shell scripts (sertlocalversion), in Makefiles and in C files.
-> 
-> Again, I don't think it's .config that gets included in C files but
-> rather include/generated/autoconf.h, right?
-> 
-
-Yes. But the key/values are taken as-is.
-
-Just add some odd characters to your .config, build the kernel and observe
-the breakage at different levels.
-Or something like CONFIG_DEFAULT_HOSTNAME="`touch owned`". ;-)
-
->> At least I didn't find find a good way to escape these characters
->> such that all three programming environments will accept it.
-> 
-> If my understanding is correct, then you are concerned with the
-> autoconf functionality: the auto.conf makefile and autoconf.h
-> header, and not the .config file itself. Perhaps it will be less
-> disruptive to do the escaping (or banning) at that level?
-
-My concern is that currently a .config file can contain hostile content
-that will get executed at build time.
-.config files are often blindly shared across untrusted developers.
-So I thought that mitigating this whole is worth it.
-
-> Specifically:
-> 
-> 1. If you do escaping at that level, then you can do it differently
->   for auto.conf and autoconf.h. Though auto.conf still seems to be
->   read by both make and shell.
-
-I need to think about that. Thanks for the pointer.
-
-Thanks,
-//richard
+-- 
+Kees Cook
