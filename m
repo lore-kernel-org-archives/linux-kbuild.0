@@ -2,109 +2,89 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECBEC433FE
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 22:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D370C433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 23:32:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A23961882
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 22:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D3FA61ABB
+	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 23:32:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344758AbhI3Wut (ORCPT
+        id S1350178AbhI3Xel (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 30 Sep 2021 18:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38604 "EHLO
+        Thu, 30 Sep 2021 19:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344107AbhI3Wur (ORCPT
+        with ESMTP id S1350091AbhI3Xeh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Sep 2021 18:50:47 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17B5C06176A;
-        Thu, 30 Sep 2021 15:49:04 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id d18so9517046iof.13;
-        Thu, 30 Sep 2021 15:49:04 -0700 (PDT)
+        Thu, 30 Sep 2021 19:34:37 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2C3C06176A
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Sep 2021 16:32:54 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id j15so5111093plh.7
+        for <linux-kbuild@vger.kernel.org>; Thu, 30 Sep 2021 16:32:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vOtIXIDfSsulhUrItDNQERb0f0g8vwOd+YpN2bOuFew=;
-        b=UsJzLo6YvJ6tSS0UKfdSYQv/O1WCavAUERunvK+OOYqhIEDAS4Z2vFzdKFwqiPmuLh
-         6vevGTjNkpxP1BrrwxdpDz2QXThg/BpKbo9iEsLpomx0/HYd6wGw4n9/053N62i/+cHf
-         n4LAKuTY+c5axHHMCsyZm//x8uVjd2ME65YOa5+awossXqI0wN2god8xyUEVnDXJ73ZC
-         jS7ANVlJzya6Q4KBbze2jQP3/GRw6jUvGp2vouIqQzmoBozzSRo7M0RWaAeakNd++t0q
-         aMjC0twctVpOeB4ubdeEjbMQKtIcVfwvvyJZwwgeC/I6SDYVC4oUQRqUxBN/itndGpes
-         6M3Q==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4kRmuKUrahG9seIEHQB8p6vrb39NQ+GV6pMPjXiJNGs=;
+        b=HGL/KZ0jqmCjgbTC6ZXynflpAz4V9xD4Mrxgfi7Kn0MHTJWTnskxqDkMvms2lZGIBX
+         whpqyazTpy2WtYvPuYsK9Rl1plz9CEAHbe6bojro555WymT5Ktlnf71IzZvSWMtvXF8y
+         RVJC3FRFGCejSZhDyqDruGQDzPijplhH2aIjJP9b30rhYFo3YI9uX4VrtJ1W5OsoD4A1
+         Vx8c7TahhZJPzOTU/Frqsve3jdPPj4a0Yv08b57EKla0aymni0laUlX1x6dqRTKzozLD
+         CzP31LoWH9QzHqbvJkkI1pVHyAVR9qCaodFSUAyka1kYpV162lBAL0LrXsz9unCiycis
+         oXqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vOtIXIDfSsulhUrItDNQERb0f0g8vwOd+YpN2bOuFew=;
-        b=xfq0fBSgTDxDxwLVRnYwm/ikVNTw5gJqWpCAXk52/njBbqIyi1x1imyULmgJuZQ+W8
-         SsIn1U3GlIaqNC6nCFmLBiQawF2KYcEXWetPOafD93uAXWlntyxOPoNwaDZMdVl9qGG3
-         djHncKVDVnpRy7ZLG+ESlo5p56pbKRET4u6rx9Krq33QTPMqFdU5wxmlRYtPCaWOznt7
-         kUPyC41yKBD7rsg1GNM9er0ccyrw51jsEs62922UW4uG7iVw6mMnRaiLfp7SBZVvyjSd
-         kvx7yHkfnNF4ZRu2vEZgzqZSgHcxEQxHF6CQzhqjTA7fy1uHwZOZcJIBCJdec/XgCTbO
-         PdHQ==
-X-Gm-Message-State: AOAM532u17rmWzXbI2Mhdqct2rbtavIJC7zns4Z1pdvBYezrthSrEm7l
-        1bBlW30JACMDsMIgedYpjJleN7gk9ZnwG47FsHQ=
-X-Google-Smtp-Source: ABdhPJz/YDrixlOb9rMZRSF4thA+3ftj/kiegqmIwGTDbMhl4uZQjKdWFZPuzBzbjuKnzp2MGOcTIH4Lk3dZrekpXZ8=
-X-Received: by 2002:a02:a60a:: with SMTP id c10mr7053135jam.131.1633042144130;
- Thu, 30 Sep 2021 15:49:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210930222704.2631604-1-keescook@chromium.org> <20210930222704.2631604-3-keescook@chromium.org>
-In-Reply-To: <20210930222704.2631604-3-keescook@chromium.org>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Fri, 1 Oct 2021 00:48:53 +0200
-Message-ID: <CANiq72m3=pD=D_dt1SUZRAp19WV86LjWRj9xd-tt1YNtnkqy5w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/8] Compiler Attributes: add __alloc_size() for better
- bounds checking
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Andy Whitcroft <apw@canonical.com>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Micay <danielmicay@gmail.com>,
-        David Rientjes <rientjes@google.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Dwaipayan Ray <dwaipayanray1@gmail.com>,
-        Joe Perches <joe@perches.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Pekka Enberg <penberg@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Miguel Ojeda <ojeda@kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4kRmuKUrahG9seIEHQB8p6vrb39NQ+GV6pMPjXiJNGs=;
+        b=lct+y9QkaCKxSW+y3QeqAGVhQHdwMyerVXl9zIfF3SOQfFA4+x244WzGlT+JvMH0Tl
+         5xW2qZ9H5phIqexKHdCYXbg2Hr6dsYxvyGRadhIY/5kU1dm4bXB3k++aw98Qn0ReTmoY
+         B3xZDEX+PI6VMOEIcPBeEknk42Koknp/Uo/6qcsJPSS/5BAH3c9OAL7YB46Xu8IWS7KF
+         ygh1UZPXuVDRAiVk3AvzuHCsPZK6f4PBx1oVZyzVM0RPlk/63q6E/fV4GqxsGa7h4pYU
+         ew83xnd7axnvCZaUbCbMWQQo7MgGCkPxCX4pZN32Vz6UlR7P4zdxRlZO4m1UsWYte4Ug
+         bm5A==
+X-Gm-Message-State: AOAM530Xr7ZtofhFB0hAc+S8mKkvBAJu3hDVqE9/fE2aX39Om+SMOl5v
+        YiszJCxnoZOAt7L3z/TENR7//g==
+X-Google-Smtp-Source: ABdhPJysrpFMMVhFfdW8pGBLGHU+1+GLI5ELLB1RDK4HzOKTh0AU6VhWr2DYdGsWszQCpgnuITTLGQ==
+X-Received: by 2002:a17:90a:4091:: with SMTP id l17mr9552554pjg.138.1633044773874;
+        Thu, 30 Sep 2021 16:32:53 -0700 (PDT)
+Received: from google.com ([2620:15c:211:202:c01d:f023:c9b5:66e8])
+        by smtp.gmail.com with ESMTPSA id b12sm4063267pfp.5.2021.09.30.16.32.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Sep 2021 16:32:52 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 16:32:44 -0700
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH] modpost: add allow list for llvm IPSCCP
+Message-ID: <YVZJHNchx9LZz//v@google.com>
+References: <20210929225850.3889950-1-ndesaulniers@google.com>
+ <CAHk-=wh0BNEDz+uOdJWG8iW=n0PeOEjZpHyuSN2g0pKSCj+6iQ@mail.gmail.com>
+ <CAKwvOdn-Z1q99zZW4GQ2aNnVMQ_JYuczrResTG7tvcfv0WLJ-w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKwvOdn-Z1q99zZW4GQ2aNnVMQ_JYuczrResTG7tvcfv0WLJ-w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Oct 1, 2021 at 12:27 AM Kees Cook <keescook@chromium.org> wrote:
->
-> +ifdef CONFIG_CC_IS_GCC
-> +# The allocators already balk at large sizes, so silence the compiler
-> +# warnings for bounds checks involving those possible values. While
-> +# -Wno-alloc-size-larger-than would normally be used here, earlier versions
-> +# of gcc (<9.1) weirdly don't handle the option correctly when _other_
-> +# warnings are produced (?!). Using -Walloc-size-larger-than=SIZE_MAX
-> +# doesn't work (as it is documented to), silently resolving to "0" prior to
-> +# version 9.1 (and producing an error more recently). Numeric values larger
-> +# than PTRDIFF_MAX also don't work prior to version 9.1, which are silently
-> +# ignored, continuing to default to PTRDIFF_MAX. So, left with no other
-> +# choice, we must perform a versioned check to disable this warning.
-> +# https://lore.kernel.org/lkml/20210824115859.187f272f@canb.auug.org.au
-> +KBUILD_CFLAGS += $(call cc-ifversion, -ge, 0901, -Wno-alloc-size-larger-than)
-> +endif
+On Wed, Sep 29, 2021 at 05:18:49PM -0700, Nick Desaulniers wrote:
+> On Wed, Sep 29, 2021 at 4:28 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > Or, like in at least the early_get_smp_config() case, just make it be
+> > marked __init, so that if it doesn't get inlined it gets the right
+> > section?
+> 
+> In the case of early_get_smp_config(), that's what Boris suggested:
+> https://lore.kernel.org/lkml/20210225114533.GA380@zn.tnic/
 
-An amazing journey!
-
-Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-
-Cheers,
-Miguel
+Sorry, I misremembered the above thread. That's what *Arnd* had suggested.
