@@ -2,42 +2,42 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE92C433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37128C4321E
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB05961A3A
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 196A8619F5
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352024AbhJAFfJ (ORCPT
+        id S1352070AbhJAFfP (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 1 Oct 2021 01:35:09 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:25305 "EHLO
+        Fri, 1 Oct 2021 01:35:15 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25299 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241541AbhJAFfG (ORCPT
+        with ESMTP id S1351892AbhJAFfG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 1 Oct 2021 01:35:06 -0400
 Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 1915WwVV000646;
-        Fri, 1 Oct 2021 14:33:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 1915WwVV000646
+        by conuserg-10.nifty.com with ESMTP id 1915WwVc000646;
+        Fri, 1 Oct 2021 14:33:03 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 1915WwVc000646
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1633066380;
-        bh=fQ8kuzKZhFdV66W9VpMSV4OyHXc8vSXpDVIuBoKabHQ=;
+        s=dec2015msa; t=1633066383;
+        bh=fDT5+bUlmH+NExGoDYLtSJAw+fxo+1QQtTvlcIJMHwA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IZDaBStGJluPWW8kX5Jx91FTyB8BWmra6pY/KBedZ6yXMBivP9Sik9EuAYBJsqRmz
-         IdlRhP/Zz+aGPN0PDqFolignpilGmU511TrkvVm6C2NhXq14ESSGSlJ9dE1phb3BjT
-         Gc4wdrR8/ZQqvXfXTgqo657CYGO44ZjVpBkQOeUvkfpOX0ZSJB1ACKkGDQDcRbzmI0
-         XO2Y85cEfwJiL4GsF7m30akxh144LP2NGIcwyWr7/OQgybJlJP4kEvsS90811KMIMK
-         39WJYfg8j4X+d/t6ey844dzzYtQ01/rOV06CxrzOLHYMy+aJwBz/yV9V4QPnlySWFr
-         EMJzgiSH+YdBw==
+        b=cXFbXehx1QWuFwCVzhp2mFbtwDDEQ7QqbvsoqRkGxjxvL0er5zGEG63RET1wr4KNs
+         n1MpfNnVedHTKK2HacwwlBJrIgBOBYgB6t/tulFqyN5Qd93ecgqsgoJXiim7u+pmzp
+         iPj/FctWVeF7/aKXrINK/ImPj3JmSHmSdR/Ha8W/LRBuQt0WNizZ8u0CAi4SlfKXN5
+         m6ZFFEOgDczaQvi8/l9iz89Q9oR/QqA9e8FuNJanzntLc2n0wTVEDRHhubTeZ6mDxc
+         bewuUnCHV8o1yw47yhaAoj9/1Xj5MOuOaPgENc83EGCNXOrd+dZ+ZsDUb/8c5+OMvb
+         IZB+LaH2pX2cw==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 03/10] kconfig: refactor conf_write_symbol()
-Date:   Fri,  1 Oct 2021 14:32:46 +0900
-Message-Id: <20211001053253.1223316-3-masahiroy@kernel.org>
+Subject: [PATCH 10/10] [for next only] kconfig: generate include/generated/rustc_cfg
+Date:   Fri,  1 Oct 2021 14:32:53 +0900
+Message-Id: <20211001053253.1223316-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211001053253.1223316-1-masahiroy@kernel.org>
 References: <20211001053253.1223316-1-masahiroy@kernel.org>
@@ -47,225 +47,96 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-I do not think 'struct conf_printer' is so useful.
+This patch is not intended for the mainline.
 
-Add simple functions, print_symbol_for_*() to write out one symbol.
+I created this patch for Stephen Rothwell to resolve the merge
+conflicts more easily.
+
+The Rust tree is touching scripts/kconfig/confdata.c to generate
+include/generated/rustc_cfg, which would cause complicated conflicts
+with changes from the kbuild tree.
+
+I re-implemented it to produce the equaivalent rustc_cfg.
+
+I also fixed the memory leak; the original code from the Rust tree
+did not free the malloc'ed pointer.
+
+Stephen:
+When you resolve the conflicts in confdata.c, please take this one.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/confdata.c | 136 ++++++++++++++++---------------------
- 1 file changed, 57 insertions(+), 79 deletions(-)
+ scripts/kconfig/confdata.c | 42 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index ed1bb8ba971b..ce11e7442d12 100644
+index 9ece2f3b61a6..4767f3810cf4 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -11,6 +11,7 @@
- #include <fcntl.h>
- #include <limits.h>
- #include <stdarg.h>
-+#include <stdbool.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -159,10 +160,6 @@ static int conf_touch_dep(const char *name)
- 	return 0;
- }
+@@ -603,6 +603,9 @@ static const struct comment_style comment_style_c = {
  
--struct conf_printer {
--	void (*print_symbol)(FILE *, struct symbol *, const char *, void *);
--};
--
- static void conf_warning(const char *fmt, ...)
- 	__attribute__ ((format (printf, 1, 2)));
- 
-@@ -629,91 +626,52 @@ static void conf_write_heading(FILE *fp, const struct comment_style *cs)
-  * This printer is used when generating the resulting configuration after
-  * kconfig invocation and `defconfig' files. Unset symbol might be omitted by
-  * passing a non-NULL argument to the printer.
-- *
-  */
--static void
--kconfig_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
--{
--
--	switch (sym->type) {
--	case S_BOOLEAN:
--	case S_TRISTATE:
--		if (*value == 'n') {
--			bool skip_unset = (arg != NULL);
--
--			if (!skip_unset)
--				fprintf(fp, "# %s%s is not set\n",
--				    CONFIG_, sym->name);
--			return;
--		}
--		break;
--	default:
--		break;
--	}
--
--	fprintf(fp, "%s%s=%s\n", CONFIG_, sym->name, value);
--}
-+enum output_n { OUTPUT_N, OUTPUT_N_AS_UNSET, OUTPUT_N_NONE };
- 
--static struct conf_printer kconfig_printer_cb =
-+static void __print_symbol(FILE *fp, struct symbol *sym, enum output_n output_n,
-+			   bool escape_string)
+ static void conf_write_heading(FILE *fp, const struct comment_style *cs)
  {
--	.print_symbol = kconfig_print_symbol,
--};
-+	const char *val;
-+	char *escaped = NULL;
- 
--/*
-- * Header printer
-- *
-- * This printer is used when generating the `include/generated/autoconf.h' file.
-- */
--static void
--header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
--{
-+	if (sym->type == S_UNKNOWN)
++	if (!cs) /* no heading for rustc_cfg? */
 +		return;
- 
--	switch (sym->type) {
--	case S_BOOLEAN:
--	case S_TRISTATE: {
--		const char *suffix = "";
-+	val = sym_get_string_value(sym);
- 
--		switch (*value) {
--		case 'n':
--			break;
--		case 'm':
--			suffix = "_MODULE";
--			/* fall through */
--		default:
--			fprintf(fp, "#define %s%s%s 1\n",
--			    CONFIG_, sym->name, suffix);
--		}
--		break;
-+	if ((sym->type == S_BOOLEAN || sym->type == S_TRISTATE) &&
-+	    output_n != OUTPUT_N && *val == 'n') {
-+		if (output_n == OUTPUT_N_AS_UNSET)
-+			fprintf(fp, "# %s%s is not set\n", CONFIG_, sym->name);
-+		return;
- 	}
--	case S_HEX: {
--		const char *prefix = "";
- 
--		if (value[0] != '0' || (value[1] != 'x' && value[1] != 'X'))
--			prefix = "0x";
--		fprintf(fp, "#define %s%s %s%s\n",
--		    CONFIG_, sym->name, prefix, value);
--		break;
--	}
--	case S_STRING:
--	case S_INT:
--		fprintf(fp, "#define %s%s %s\n",
--		    CONFIG_, sym->name, value);
--		break;
--	default:
--		break;
-+	if (sym->type == S_STRING && escape_string) {
-+		escaped = sym_escape_string_value(val);
-+		val = escaped;
- 	}
- 
-+	fprintf(fp, "%s%s=%s\n", CONFIG_, sym->name, val);
 +
-+	free(escaped);
- }
+ 	fprintf(fp, "%s\n", cs->comment_block_begin);
  
--static struct conf_printer header_printer_cb =
-+static void print_symbol_for_dotconfig(FILE *fp, struct symbol *sym)
- {
--	.print_symbol = header_print_symbol,
--};
-+	__print_symbol(fp, sym, OUTPUT_N_AS_UNSET, true);
-+}
-+
-+static void print_symbol_for_autoconf(FILE *fp, struct symbol *sym)
-+{
-+	__print_symbol(fp, sym, OUTPUT_N_NONE, true);
-+}
- 
--static void conf_write_symbol(FILE *fp, struct symbol *sym,
--			      struct conf_printer *printer, void *printer_arg)
-+static void print_symbol_for_c(FILE *fp, struct symbol *sym)
- {
- 	const char *val;
-+	const char *sym_suffix = "";
-+	const char *val_prefix = "";
- 	char *escaped = NULL;
- 
- 	if (sym->type == S_UNKNOWN)
-@@ -721,12 +679,32 @@ static void conf_write_symbol(FILE *fp, struct symbol *sym,
- 
- 	val = sym_get_string_value(sym);
- 
--	if (sym->type == S_STRING) {
-+	switch (sym->type) {
-+	case S_BOOLEAN:
-+	case S_TRISTATE:
-+		switch (*val) {
-+		case 'n':
-+			return;
-+		case 'm':
-+			sym_suffix = "_MODULE";
-+			/* fall through */
-+		default:
-+			val = "1";
-+		}
-+		break;
-+	case S_HEX:
-+		if (val[0] != '0' || (val[1] != 'x' && val[1] != 'X'))
-+			val_prefix = "0x";
-+		break;
-+	case S_STRING:
- 		escaped = sym_escape_string_value(val);
- 		val = escaped;
-+	default:
-+		break;
- 	}
- 
--	printer->print_symbol(fp, sym, val, printer_arg);
-+	fprintf(fp, "#define %s%s%s %s%s\n", CONFIG_, sym->name, sym_suffix,
-+		val_prefix, val);
- 
+ 	fprintf(fp, "%s Automatically generated file; DO NOT EDIT.\n",
+@@ -750,6 +753,39 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
  	free(escaped);
  }
-@@ -787,7 +765,7 @@ int conf_write_defconfig(const char *filename)
- 						goto next_menu;
- 				}
- 			}
--			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
-+			print_symbol_for_dotconfig(out, sym);
- 		}
- next_menu:
- 		if (menu->list != NULL) {
-@@ -874,7 +852,7 @@ int conf_write(const char *name)
- 				need_newline = false;
- 			}
- 			sym->flags |= SYMBOL_WRITTEN;
--			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
-+			print_symbol_for_dotconfig(out, sym);
- 		}
  
- next:
-@@ -1060,8 +1038,8 @@ int conf_write_autoconf(int overwrite)
- 			continue;
++/* rustc configuration */
++static void print_symbol_for_rustc_cfg(FILE *fp, struct symbol *sym)
++{
++	const char *val;
++	char *escaped;
++
++	if (sym->type == S_UNKNOWN)
++		return;
++
++	val = sym_get_string_value(sym);
++	escaped = escape_string_value(val);
++
++	if (sym->type == S_BOOLEAN || sym->type == S_TRISTATE) {
++		if (*val == 'n')
++			return;
++
++		/*
++		 * To have similar functionality to the C macro `IS_ENABLED()`
++		 * we provide an empty `--cfg CONFIG_X` here in both `y`
++		 * and `m` cases.
++		 *
++		 * Then, the common `fprintf()` below will also give us
++		 * a `--cfg CONFIG_X="y"` or `--cfg CONFIG_X="m"`, which can
++		 * be used as the equivalent of `IS_BUILTIN()`/`IS_MODULE()`.
++		 */
++		fprintf(fp, "--cfg=%s%s\n", CONFIG_, sym->name);
++	}
++
++	fprintf(fp, "--cfg=%s%s=%s\n", CONFIG_, sym->name, escaped);
++
++	free(escaped);
++}
++
+ /*
+  * Write out a minimal config.
+  * All values that has default values are skipped as this is redundant.
+@@ -1129,6 +1165,12 @@ int conf_write_autoconf(int overwrite)
+ 	if (ret)
+ 		return ret;
  
- 		/* write symbols to auto.conf and autoconf.h */
--		conf_write_symbol(out, sym, &kconfig_printer_cb, (void *)1);
--		conf_write_symbol(out_h, sym, &header_printer_cb, NULL);
-+		print_symbol_for_autoconf(out, sym);
-+		print_symbol_for_c(out_h, sym);
- 	}
- 	fclose(out);
- 	fclose(out_h);
++	ret = __conf_write_autoconf("include/generated/rustc_cfg",
++				    print_symbol_for_rustc_cfg,
++				    NULL);
++	if (ret)
++		return ret;
++
+ 	/*
+ 	 * Create include/config/auto.conf. This must be the last step because
+ 	 * Kbuild has a dependency on auto.conf and this marks the successful
 -- 
 2.30.2
 
