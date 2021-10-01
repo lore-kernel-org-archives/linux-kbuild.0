@@ -2,204 +2,161 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D9CC4167B
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45890C43219
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 332EB61052
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33CBA619F5
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352075AbhJAFfQ (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 1 Oct 2021 01:35:16 -0400
-Received: from conuserg-10.nifty.com ([210.131.2.77]:25309 "EHLO
+        id S239025AbhJAFfS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 1 Oct 2021 01:35:18 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25307 "EHLO
         conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351909AbhJAFfH (ORCPT
+        with ESMTP id S1351941AbhJAFfH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 1 Oct 2021 01:35:07 -0400
 Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 1915WwVX000646;
-        Fri, 1 Oct 2021 14:33:01 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 1915WwVX000646
+        by conuserg-10.nifty.com with ESMTP id 1915WwVT000646;
+        Fri, 1 Oct 2021 14:32:59 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 1915WwVT000646
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1633066381;
-        bh=2y8u/ekcAKLI09NYZKb5pwSiSRmEUEdUJSeBwntIAss=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eovQZa+Rux+ScrU718yYDencgw2tqT31bTV6V5ca3owxQxg3yixhuMLeyr/G7RWtu
-         hOdRbhGdOadeWJJjayXeApWi7oqjWtskxr3fwEwbKhhwQBGGqdX+tntS1/1j468TGE
-         CrFMXMpwW1gSKilJNVzy4HUZzJ8y8cwb/svI+/Gx5VtwKag9MY/8rW9JXRbYuEKRrc
-         57A/D9zYrCGPg+gvesS8npefUsnooo3JjLzCbv9YvvkyhyqMkffbIxXn/s0CBwtCB0
-         SyqsRu7+cZ3yrsYV4QKpYH8JfLlYUuQAusbdsvr9j3Z8QptXaA2n3gGXnC5xSP+WuZ
-         VVmgRQrNtVlzQ==
+        s=dec2015msa; t=1633066379;
+        bh=Hk86knQX+FtOEwvSmj6Z1Ht+3JjaU0RyCPMk1FsbiQ4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=lun/CgpTky5j/eZSDZ+5f342kVpZDv0t2wywGZSkmkmNDWrqguhh+V/AQvowk4Y8e
+         Ly94RaVa1zs/okD/jIO2Tz2Ziw1zebGPgBSyZSVbhssDK114DxUS6NBPXMS7gPYt5m
+         nEYK+QVdxUGiVkgdmUbBM/d9ujBx6OA/P9YEpLnKabhhdJ/4kKl2BV6CWqEqgbiN6a
+         pOpwMftH5dyRBnrvaNb+Eid59c0E4YpEzmhIen4rDtFDxXXQ+nfMTGRL8kXcoiSG9t
+         /4ZGkrvGXcPE9DH7S6IZK1OQxz/+4zipBlSpeLpCIdoT5swz/5KVPYwsOwwyLoxQOq
+         fT5pnUzGDDkTg==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 05/10] kconfig: move sym_escape_string_value() to confdata.c
-Date:   Fri,  1 Oct 2021 14:32:48 +0900
-Message-Id: <20211001053253.1223316-5-masahiroy@kernel.org>
+Subject: [PATCH 01/10] kconfig: remove 'const' from the return type of sym_escape_string_value()
+Date:   Fri,  1 Oct 2021 14:32:44 +0900
+Message-Id: <20211001053253.1223316-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211001053253.1223316-1-masahiroy@kernel.org>
-References: <20211001053253.1223316-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now that sym_escape_string_value() is only used in confdata.c
-it can be a 'static' function.
+sym_escape_string_value() returns a malloc'ed memory, but as
+(const char *). So, it must be casted to (void *) when it is free'd.
+This is odd.
 
-Rename it escape_string_value() because it is agnostic about
-(struct sym *).
+The return type of sym_escape_string_value() should be (char *).
+
+I exploited that free(NULL) has no effect.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/confdata.c  | 47 +++++++++++++++++++++++++++++++++++--
- scripts/kconfig/lkc_proto.h |  1 -
- scripts/kconfig/symbol.c    | 44 ----------------------------------
- 3 files changed, 45 insertions(+), 47 deletions(-)
+ scripts/kconfig/conf.c      | 15 +++++++--------
+ scripts/kconfig/confdata.c  | 27 ++++++++++++++-------------
+ scripts/kconfig/lkc_proto.h |  2 +-
+ scripts/kconfig/symbol.c    |  3 ++-
+ 4 files changed, 24 insertions(+), 23 deletions(-)
 
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 5d84b44a2a2a..310fdd408793 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -647,17 +647,16 @@ static void check_conf(struct menu *menu)
+ 		switch (input_mode) {
+ 		case listnewconfig:
+ 			if (sym->name) {
+-				const char *str;
++				const char *val = sym_get_string_value(sym);
++				char *escaped = NULL;
+ 
+ 				if (sym->type == S_STRING) {
+-					str = sym_get_string_value(sym);
+-					str = sym_escape_string_value(str);
+-					printf("%s%s=%s\n", CONFIG_, sym->name, str);
+-					free((void *)str);
+-				} else {
+-					str = sym_get_string_value(sym);
+-					printf("%s%s=%s\n", CONFIG_, sym->name, str);
++					escaped = sym_escape_string_value(val);
++					val = escaped;
+ 				}
++
++				printf("%s%s=%s\n", CONFIG_, sym->name, val);
++				free(escaped);
+ 			}
+ 			break;
+ 		case helpnewconfig:
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index adbb9a955c43..78af1dd68894 100644
+index cf72680cd769..9b2271eb43d6 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -620,6 +620,49 @@ static void conf_write_heading(FILE *fp, const struct comment_style *cs)
- 	fprintf(fp, "%s\n", cs->comment_block_end);
+@@ -728,21 +728,22 @@ static struct conf_printer header_printer_cb =
+ static void conf_write_symbol(FILE *fp, struct symbol *sym,
+ 			      struct conf_printer *printer, void *printer_arg)
+ {
+-	const char *str;
++	const char *val;
++	char *escaped = NULL;
+ 
+-	switch (sym->type) {
+-	case S_UNKNOWN:
+-		break;
+-	case S_STRING:
+-		str = sym_get_string_value(sym);
+-		str = sym_escape_string_value(str);
+-		printer->print_symbol(fp, sym, str, printer_arg);
+-		free((void *)str);
+-		break;
+-	default:
+-		str = sym_get_string_value(sym);
+-		printer->print_symbol(fp, sym, str, printer_arg);
++	if (sym->type == S_UNKNOWN)
++		return;
++
++	val = sym_get_string_value(sym);
++
++	if (sym->type == S_STRING) {
++		escaped = sym_escape_string_value(val);
++		val = escaped;
+ 	}
++
++	printer->print_symbol(fp, sym, val, printer_arg);
++
++	free(escaped);
  }
  
-+/* The returned pointer must be freed on the caller side */
-+static char *escape_string_value(const char *in)
-+{
-+	const char *p;
-+	char *out;
-+	size_t len;
-+
-+	len = strlen(in) + strlen("\"\"") + 1;
-+
-+	p = in;
-+	while (1) {
-+		p += strcspn(p, "\"\\");
-+
-+		if (p[0] == '\0')
-+			break;
-+
-+		len++;
-+		p++;
-+	}
-+
-+	out = xmalloc(len);
-+	out[0] = '\0';
-+
-+	strcat(out, "\"");
-+
-+	p = in;
-+	while (1) {
-+		len = strcspn(p, "\"\\");
-+		strncat(out, p, len);
-+		p += len;
-+
-+		if (p[0] == '\0')
-+			break;
-+
-+		strcat(out, "\\");
-+		strncat(out, p++, 1);
-+	}
-+
-+	strcat(out, "\"");
-+
-+	return out;
-+}
-+
- /*
-  * Kconfig configuration printer
-  *
-@@ -648,7 +691,7 @@ static void __print_symbol(FILE *fp, struct symbol *sym, enum output_n output_n,
- 	}
- 
- 	if (sym->type == S_STRING && escape_string) {
--		escaped = sym_escape_string_value(val);
-+		escaped = escape_string_value(val);
- 		val = escaped;
- 	}
- 
-@@ -702,7 +745,7 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
- 			val_prefix = "0x";
- 		break;
- 	case S_STRING:
--		escaped = sym_escape_string_value(val);
-+		escaped = escape_string_value(val);
- 		val = escaped;
- 	default:
- 		break;
+ static void
 diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index ec4a01bb60ce..edd1e617b25c 100644
+index a11626bdc421..e6955df49973 100644
 --- a/scripts/kconfig/lkc_proto.h
 +++ b/scripts/kconfig/lkc_proto.h
-@@ -18,7 +18,6 @@ extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
+@@ -18,7 +18,7 @@ extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
  
  struct symbol * sym_lookup(const char *name, int flags);
  struct symbol * sym_find(const char *name);
--char *sym_escape_string_value(const char *in);
- void print_symbol_for_listconfig(struct symbol *sym);
+-const char * sym_escape_string_value(const char *in);
++char *sym_escape_string_value(const char *in);
  struct symbol ** sym_re_search(const char *pattern);
  const char * sym_type_name(enum symbol_type type);
+ void sym_calc_value(struct symbol *sym);
 diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 6bf8665a6a0f..0572330bf8a7 100644
+index 5844d636d38f..6bf8665a6a0f 100644
 --- a/scripts/kconfig/symbol.c
 +++ b/scripts/kconfig/symbol.c
-@@ -871,50 +871,6 @@ struct symbol *sym_find(const char *name)
+@@ -871,7 +871,8 @@ struct symbol *sym_find(const char *name)
  	return symbol;
  }
  
--/* The returned pointer must be freed on the caller side */
--char *sym_escape_string_value(const char *in)
--{
--	const char *p;
--	size_t reslen;
--	char *res;
--	size_t l;
--
--	reslen = strlen(in) + strlen("\"\"") + 1;
--
--	p = in;
--	for (;;) {
--		l = strcspn(p, "\"\\");
--		p += l;
--
--		if (p[0] == '\0')
--			break;
--
--		reslen++;
--		p++;
--	}
--
--	res = xmalloc(reslen);
--	res[0] = '\0';
--
--	strcat(res, "\"");
--
--	p = in;
--	for (;;) {
--		l = strcspn(p, "\"\\");
--		strncat(res, p, l);
--		p += l;
--
--		if (p[0] == '\0')
--			break;
--
--		strcat(res, "\\");
--		strncat(res, p++, 1);
--	}
--
--	strcat(res, "\"");
--	return res;
--}
--
- struct sym_match {
- 	struct symbol	*sym;
- 	off_t		so, eo;
+-const char *sym_escape_string_value(const char *in)
++/* The returned pointer must be freed on the caller side */
++char *sym_escape_string_value(const char *in)
+ {
+ 	const char *p;
+ 	size_t reslen;
 -- 
 2.30.2
 
