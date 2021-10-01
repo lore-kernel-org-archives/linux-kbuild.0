@@ -2,89 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D370C433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 23:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BE0C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D3FA61ABB
-	for <linux-kbuild@archiver.kernel.org>; Thu, 30 Sep 2021 23:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75AD061A3A
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 05:33:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350178AbhI3Xel (ORCPT
+        id S1351944AbhJAFfG (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 30 Sep 2021 19:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48774 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350091AbhI3Xeh (ORCPT
+        Fri, 1 Oct 2021 01:35:06 -0400
+Received: from conuserg-10.nifty.com ([210.131.2.77]:25304 "EHLO
+        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238424AbhJAFfG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 30 Sep 2021 19:34:37 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2C3C06176A
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Sep 2021 16:32:54 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id j15so5111093plh.7
-        for <linux-kbuild@vger.kernel.org>; Thu, 30 Sep 2021 16:32:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4kRmuKUrahG9seIEHQB8p6vrb39NQ+GV6pMPjXiJNGs=;
-        b=HGL/KZ0jqmCjgbTC6ZXynflpAz4V9xD4Mrxgfi7Kn0MHTJWTnskxqDkMvms2lZGIBX
-         whpqyazTpy2WtYvPuYsK9Rl1plz9CEAHbe6bojro555WymT5Ktlnf71IzZvSWMtvXF8y
-         RVJC3FRFGCejSZhDyqDruGQDzPijplhH2aIjJP9b30rhYFo3YI9uX4VrtJ1W5OsoD4A1
-         Vx8c7TahhZJPzOTU/Frqsve3jdPPj4a0Yv08b57EKla0aymni0laUlX1x6dqRTKzozLD
-         CzP31LoWH9QzHqbvJkkI1pVHyAVR9qCaodFSUAyka1kYpV162lBAL0LrXsz9unCiycis
-         oXqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4kRmuKUrahG9seIEHQB8p6vrb39NQ+GV6pMPjXiJNGs=;
-        b=lct+y9QkaCKxSW+y3QeqAGVhQHdwMyerVXl9zIfF3SOQfFA4+x244WzGlT+JvMH0Tl
-         5xW2qZ9H5phIqexKHdCYXbg2Hr6dsYxvyGRadhIY/5kU1dm4bXB3k++aw98Qn0ReTmoY
-         B3xZDEX+PI6VMOEIcPBeEknk42Koknp/Uo/6qcsJPSS/5BAH3c9OAL7YB46Xu8IWS7KF
-         ygh1UZPXuVDRAiVk3AvzuHCsPZK6f4PBx1oVZyzVM0RPlk/63q6E/fV4GqxsGa7h4pYU
-         ew83xnd7axnvCZaUbCbMWQQo7MgGCkPxCX4pZN32Vz6UlR7P4zdxRlZO4m1UsWYte4Ug
-         bm5A==
-X-Gm-Message-State: AOAM530Xr7ZtofhFB0hAc+S8mKkvBAJu3hDVqE9/fE2aX39Om+SMOl5v
-        YiszJCxnoZOAt7L3z/TENR7//g==
-X-Google-Smtp-Source: ABdhPJysrpFMMVhFfdW8pGBLGHU+1+GLI5ELLB1RDK4HzOKTh0AU6VhWr2DYdGsWszQCpgnuITTLGQ==
-X-Received: by 2002:a17:90a:4091:: with SMTP id l17mr9552554pjg.138.1633044773874;
-        Thu, 30 Sep 2021 16:32:53 -0700 (PDT)
-Received: from google.com ([2620:15c:211:202:c01d:f023:c9b5:66e8])
-        by smtp.gmail.com with ESMTPSA id b12sm4063267pfp.5.2021.09.30.16.32.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 16:32:52 -0700 (PDT)
-Date:   Thu, 30 Sep 2021 16:32:44 -0700
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        Fri, 1 Oct 2021 01:35:06 -0400
+Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-10.nifty.com with ESMTP id 1915WwVW000646;
+        Fri, 1 Oct 2021 14:33:00 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 1915WwVW000646
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1633066380;
+        bh=un6DWX4+x7M43GD94+yMWT2UR1PL+dyvcY3QUplOGro=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fgBnzlvb6Y3jMWsqquY4X5nT8zeaS1ZtQ0OZ+fbbhJs0Wh7UwpuoXP0BCcRkeLtbo
+         ugXKW0umUBsJMFk3ttSUk9265/Y8HMhpgjDESI23DZiHwRGpsmlvi/hNIUO7yybUxZ
+         1asIjZRqGeMMqpgoMLZaHNj7lkNjQIxGxeaL4QZq/OZymRVr4Y1Ixewof3axtc8ZaM
+         WmtsAkANIIs52TKiWiiOYBAJheUDoONtVFHo9TVSUU9ikPnT8ajZlR1a2lCCTsFLSs
+         MTjnQHIB289gjGTu/p9EAg3uqaz6Fiuc5iHWf6OFazdjwmLNRaVtkn+896q2U/obUu
+         syfjjP1VZduVA==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Arnd Bergmann <arnd@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH] modpost: add allow list for llvm IPSCCP
-Message-ID: <YVZJHNchx9LZz//v@google.com>
-References: <20210929225850.3889950-1-ndesaulniers@google.com>
- <CAHk-=wh0BNEDz+uOdJWG8iW=n0PeOEjZpHyuSN2g0pKSCj+6iQ@mail.gmail.com>
- <CAKwvOdn-Z1q99zZW4GQ2aNnVMQ_JYuczrResTG7tvcfv0WLJ-w@mail.gmail.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 04/10] kconfig: refactor listnewconfig code
+Date:   Fri,  1 Oct 2021 14:32:47 +0900
+Message-Id: <20211001053253.1223316-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211001053253.1223316-1-masahiroy@kernel.org>
+References: <20211001053253.1223316-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdn-Z1q99zZW4GQ2aNnVMQ_JYuczrResTG7tvcfv0WLJ-w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 05:18:49PM -0700, Nick Desaulniers wrote:
-> On Wed, Sep 29, 2021 at 4:28 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > Or, like in at least the early_get_smp_config() case, just make it be
-> > marked __init, so that if it doesn't get inlined it gets the right
-> > section?
-> 
-> In the case of early_get_smp_config(), that's what Boris suggested:
-> https://lore.kernel.org/lkml/20210225114533.GA380@zn.tnic/
+We can reuse __print_symbol() helper to print symbols for listnewconfig.
+Only the difference is the format for "n" symbols.
 
-Sorry, I misremembered the above thread. That's what *Arnd* had suggested.
+This prints "CONFIG_FOO=n" instead of "# CONFIG_FOO is not set".
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/kconfig/conf.c      | 14 ++------------
+ scripts/kconfig/confdata.c  |  5 +++++
+ scripts/kconfig/lkc_proto.h |  1 +
+ 3 files changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 310fdd408793..971da3598fe4 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -646,18 +646,8 @@ static void check_conf(struct menu *menu)
+ 
+ 		switch (input_mode) {
+ 		case listnewconfig:
+-			if (sym->name) {
+-				const char *val = sym_get_string_value(sym);
+-				char *escaped = NULL;
+-
+-				if (sym->type == S_STRING) {
+-					escaped = sym_escape_string_value(val);
+-					val = escaped;
+-				}
+-
+-				printf("%s%s=%s\n", CONFIG_, sym->name, val);
+-				free(escaped);
+-			}
++			if (sym->name)
++				print_symbol_for_listconfig(sym);
+ 			break;
+ 		case helpnewconfig:
+ 			printf("-----\n");
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index ce11e7442d12..adbb9a955c43 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -667,6 +667,11 @@ static void print_symbol_for_autoconf(FILE *fp, struct symbol *sym)
+ 	__print_symbol(fp, sym, OUTPUT_N_NONE, true);
+ }
+ 
++void print_symbol_for_listconfig(struct symbol *sym)
++{
++	__print_symbol(stdout, sym, OUTPUT_N, true);
++}
++
+ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
+ {
+ 	const char *val;
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index e6955df49973..ec4a01bb60ce 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -19,6 +19,7 @@ extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
+ struct symbol * sym_lookup(const char *name, int flags);
+ struct symbol * sym_find(const char *name);
+ char *sym_escape_string_value(const char *in);
++void print_symbol_for_listconfig(struct symbol *sym);
+ struct symbol ** sym_re_search(const char *pattern);
+ const char * sym_type_name(enum symbol_type type);
+ void sym_calc_value(struct symbol *sym);
+-- 
+2.30.2
+
