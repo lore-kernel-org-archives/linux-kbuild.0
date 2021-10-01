@@ -2,168 +2,95 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFB4C433F5
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 11:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5A2C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 11:37:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEF1B61A8C
-	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 11:29:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0D1661A63
+	for <linux-kbuild@archiver.kernel.org>; Fri,  1 Oct 2021 11:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353914AbhJALbe (ORCPT
+        id S1354026AbhJALjm (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 1 Oct 2021 07:31:34 -0400
-Received: from mail.avm.de ([212.42.244.119]:59744 "EHLO mail.avm.de"
+        Fri, 1 Oct 2021 07:39:42 -0400
+Received: from mga01.intel.com ([192.55.52.88]:58924 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1353902AbhJALbc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 1 Oct 2021 07:31:32 -0400
-Received: from mail-notes.avm.de (mail-notes.avm.de [172.16.0.1])
-        by mail.avm.de (Postfix) with ESMTP
-        for <linux-kbuild@vger.kernel.org>; Fri,  1 Oct 2021 13:29:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-        t=1633087783; bh=RlNM0TgJbqwGyS7qd1mq0/neCkw0zZkWlkjkYNyK8Eo=;
-        h=Date:Subject:References:In-Reply-To:To:Cc:From:From;
-        b=xhlCSgPccWO3Q1PxrG0/Cxl96m0Qgl2+C6J31abh09wWhpwB5KltTApkz/4oOOTqI
-         kCAvFXaYzoJByfCgCRxrMgQmxwKOMToH0sJ36gRztj5MiHbsfdEZ9wOxezc3xLSjhV
-         nId/o2NODJrVs/czYtrr4JYT3S+lMv5Uu2GLjejM=
-Received: from mail.avm.de ([212.42.244.94])
-          by mail-notes.avm.de (HCL Domino Release 11.0.1FP3)
-          with ESMTP id 2021100113283188-8256 ;
-          Fri, 1 Oct 2021 13:28:31 +0200 
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-        by mail.avm.de (Postfix) with ESMTPS
-        for <n.schier@mail-notes.avm.de>; Fri,  1 Oct 2021 13:28:31 +0200 (CEST)
-Received: from deb-nschier.ads.avm.de (unknown [172.17.24.144])
-        by mail-auth.avm.de (Postfix) with ESMTPSA id 58DCC80521
-        for <n.schier@avm.de>; Fri,  1 Oct 2021 13:28:31 +0200 (CEST)
-Received: by deb-nschier.ads.avm.de (Postfix)
-        id 499A27FEFB; Fri,  1 Oct 2021 13:28:31 +0200 (CEST)
-Date:   Fri, 1 Oct 2021 13:28:31 +0200
-Subject: Re: [PATCH 10/10] [for next only] kconfig: generate
- include/generated/rustc_cfg
-References: <20211001053253.1223316-1-masahiroy@kernel.org>
- <20211001053253.1223316-10-masahiroy@kernel.org>
+        id S1353920AbhJALjl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 1 Oct 2021 07:39:41 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10123"; a="247965850"
+X-IronPort-AV: E=Sophos;i="5.85,337,1624345200"; 
+   d="scan'208";a="247965850"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2021 04:37:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,337,1624345200"; 
+   d="scan'208";a="556258670"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Oct 2021 04:37:54 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 299843DA; Fri,  1 Oct 2021 14:38:00 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Alexander Usyskin <alexander.usyskin@intel.com>,
+        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v3 3/4] mei: Move uuid_le_cmp() to its only user
+Date:   Fri,  1 Oct 2021 14:37:46 +0300
+Message-Id: <20211001113747.64040-3-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211001113747.64040-1-andriy.shevchenko@linux.intel.com>
+References: <20211001113747.64040-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20211001053253.1223316-10-masahiroy@kernel.org>
-Message-Id: <20211001112831.499A27FEFB@deb-nschier.ads.avm.de>
-X-TNEFEvaluated: 1
-Sensitivity: 
-To:     "Masahiro Yamada" <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-From:   n.schier@avm.de
-X-Mailer: Lotus Domino Web Server Release 11.0.1FP3 March 31, 2021
-X-MIMETrack: Itemize by SMTP Server on ANIS1/AVM(Release 11.0.1FP3|March 31, 2021) at
- 01.10.2021 13:28:31,
-        Serialize by http on ANIS1/AVM(Release 11.0.1FP3|March 31, 2021) at
- 01.10.2021 13:29:42,
-        Serialize complete at 01.10.2021 13:29:42,
-        Serialize by Router on ANIS1/AVM(Release 11.0.1FP3|March 31, 2021) at
- 01.10.2021 13:29:42
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-X-Notes-Item: linux-kbuild@vger.kernel.org; name=AltBlindCopyTo
-X-purgate-ID: 149429::1633087783-0000056E-DE22831C/0/0
-X-purgate-type: clean
-X-purgate-size: 3050
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 02:32:53PM +0900, Masahiro Yamada wrote:
-> This patch is not intended for the mainline.
-> 
-> I created this patch for Stephen Rothwell to resolve the merge
-> conflicts more easily.
-> 
-> The Rust tree is touching scripts/kconfig/confdata.c to generate
-> include/generated/rustc_cfg, which would cause complicated conflicts
-> with changes from the kbuild tree.
-> 
-> I re-implemented it to produce the equaivalent rustc_cfg.
-> 
-> I also fixed the memory leak; the original code from the Rust tree
-> did not free the malloc'ed pointer.
-> 
-> Stephen:
-> When you resolve the conflicts in confdata.c, please take this one.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  scripts/kconfig/confdata.c | 42 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
-> 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 9ece2f3b61a6..4767f3810cf4 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -603,6 +603,9 @@ static const struct comment_style comment_style_c = {
->  
->  static void conf_write_heading(FILE *fp, const struct comment_style *cs)
->  {
-> +	if (!cs) /* no heading for rustc_cfg? */
-> +		return;
-> +
->  	fprintf(fp, "%s\n", cs->comment_block_begin);
->  
->  	fprintf(fp, "%s Automatically generated file; DO NOT EDIT.\n",
-> @@ -750,6 +753,39 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
->  	free(escaped);
->  }
->  
-> +/* rustc configuration */
-> +static void print_symbol_for_rustc_cfg(FILE *fp, struct symbol *sym)
-> +{
-> +	const char *val;
-> +	char *escaped;
-> +
-> +	if (sym->type == S_UNKNOWN)
-> +		return;
-> +
-> +	val = sym_get_string_value(sym);
-> +	escaped = escape_string_value(val);
-> +
-> +	if (sym->type == S_BOOLEAN || sym->type == S_TRISTATE) {
-> +		if (*val == 'n')
-> +			return;
+There is only a single user of uuid_le_cmp() API, let's make it private
+to that user.
 
-I'd expect a "free(escaped);" here.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+v3: new patch
+ drivers/misc/mei/mei_dev.h | 5 +++++
+ include/linux/uuid.h       | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-> +
-> +		/*
-> +		 * To have similar functionality to the C macro `IS_ENABLED()`
-> +		 * we provide an empty `--cfg CONFIG_X` here in both `y`
-> +		 * and `m` cases.
-> +		 *
-> +		 * Then, the common `fprintf()` below will also give us
-> +		 * a `--cfg CONFIG_X="y"` or `--cfg CONFIG_X="m"`, which can
-> +		 * be used as the equivalent of `IS_BUILTIN()`/`IS_MODULE()`.
-> +		 */
-> +		fprintf(fp, "--cfg=%s%s\n", CONFIG_, sym->name);
-> +	}
-> +
-> +	fprintf(fp, "--cfg=%s%s=%s\n", CONFIG_, sym->name, escaped);
-> +
-> +	free(escaped);
-> +}
-> +
->  /*
->   * Write out a minimal config.
->   * All values that has default values are skipped as this is redundant.
-> @@ -1129,6 +1165,12 @@ int conf_write_autoconf(int overwrite)
->  	if (ret)
->  		return ret;
->  
-> +	ret = __conf_write_autoconf("include/generated/rustc_cfg",
-> +				    print_symbol_for_rustc_cfg,
-> +				    NULL);
-> +	if (ret)
-> +		return ret;
-> +
->  	/*
->  	 * Create include/config/auto.conf. This must be the last step because
->  	 * Kbuild has a dependency on auto.conf and this marks the successful
-> -- 
-> 2.30.2
-> 
+diff --git a/drivers/misc/mei/mei_dev.h b/drivers/misc/mei/mei_dev.h
+index 694f866f87ef..2c1a22b64302 100644
+--- a/drivers/misc/mei/mei_dev.h
++++ b/drivers/misc/mei/mei_dev.h
+@@ -13,6 +13,11 @@
+ #include <linux/mei.h>
+ #include <linux/mei_cl_bus.h>
+ 
++static inline int uuid_le_cmp(const uuid_le u1, const uuid_le u2)
++{
++	return memcmp(&u1, &u2, sizeof(uuid_le));
++}
++
+ #include "hw.h"
+ #include "hbm.h"
+ 
+diff --git a/include/linux/uuid.h b/include/linux/uuid.h
+index 5be158a49e11..6b1a3efa1e0b 100644
+--- a/include/linux/uuid.h
++++ b/include/linux/uuid.h
+@@ -110,9 +110,4 @@ int uuid_parse(const char *uuid, uuid_t *u);
+ /* MEI UUID type, don't use anywhere else */
+ #include <uapi/linux/uuid.h>
+ 
+-static inline int uuid_le_cmp(const uuid_le u1, const uuid_le u2)
+-{
+-	return memcmp(&u1, &u2, sizeof(uuid_le));
+-}
+-
+ #endif
+-- 
+2.33.0
+
