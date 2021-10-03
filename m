@@ -2,143 +2,101 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA843C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Oct 2021 10:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C797AC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  3 Oct 2021 21:08:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C8F061A81
-	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Oct 2021 10:03:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A06D061351
+	for <linux-kbuild@archiver.kernel.org>; Sun,  3 Oct 2021 21:08:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232707AbhJBKEz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 2 Oct 2021 06:04:55 -0400
-Received: from conuserg-11.nifty.com ([210.131.2.78]:45182 "EHLO
-        conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232691AbhJBKEz (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Oct 2021 06:04:55 -0400
-Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 192A2iLo032585;
-        Sat, 2 Oct 2021 19:02:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 192A2iLo032585
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1633168964;
-        bh=5a1sNzwCRK0PNcAa0N4faUBx/ODXyg0NNxN2/EaDcKw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=mB7vu6ANAyuuBW9RXbWJRJZT/zGbKbL12avQ9h2ICVnM5cKv2P9i3GYcE+BKce6oD
-         LT/UVaZo2WGYUKxzlIXux1wDTPkqpiWzrxT/lozR+tIA4aeGcb/HFMpmAZrQTwsRnH
-         ukS3YQeQ0zw3aA3znZwFVmMk6AukZMy4N4oRTDfP1lYOl23aGTDLo69rCXpBTgfjP7
-         epxCaph2PqOFpdg3/prMip7knILTkLEZyqc6WpVKI8abQVY8yRpUg5AlZTJXq1V3If
-         IKgCasj2FUs+yhgo6Yfk2GQE4Uy37skj73EDfGr1dLbxQVVsvM77ancOca1iAfd0+c
-         ClkdwEps3BoPw==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 10/10] [for -next only] kconfig: generate include/generated/rustc_cfg
-Date:   Sat,  2 Oct 2021 19:02:42 +0900
-Message-Id: <20211002100242.1285242-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S231583AbhJCVKZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 3 Oct 2021 17:10:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41306 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231484AbhJCVKZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 3 Oct 2021 17:10:25 -0400
+Received: from rorschach.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9EED961266;
+        Sun,  3 Oct 2021 21:08:36 +0000 (UTC)
+Date:   Sun, 3 Oct 2021 17:08:35 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Jeremy Kerr <jk@codeconstruct.com.au>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>, netdev@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Johnston <matt@codeconstruct.com.au>,
+        Andrew Jeffery <andrew@aj.id.au>
+Subject: Re: [PATCH net-next v3 01/16] mctp: Add MCTP base
+Message-ID: <20211003170835.0e157b78@rorschach.local.home>
+In-Reply-To: <63a6e8ad8a8ae908aa73a3f910b98692c1a9aa37.camel@codeconstruct.com.au>
+References: <20210723082932.3570396-1-jk@codeconstruct.com.au>
+        <20210723082932.3570396-2-jk@codeconstruct.com.au>
+        <alpine.DEB.2.22.394.2108121139490.530553@ramsan.of.borg>
+        <63a6e8ad8a8ae908aa73a3f910b98692c1a9aa37.camel@codeconstruct.com.au>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This patch is not intended for the mainline.
+On Thu, 12 Aug 2021 19:15:24 +0800
+Jeremy Kerr <jk@codeconstruct.com.au> wrote:
 
-I created this patch for Stephen Rothwell to resolve the merge
-conflicts in linux-next more easily.
+> Hi Geert,
+> 
+> Thanks for the testing!
+> 
+> > When building an allmodconfig kernel, I got:  
+> 
+> [...]
+> 
+> I don't see this on a clean allmodconfig build, nor when building the
+> previous commit then the MCTP commit with something like:
+> 
+>   git checkout bc49d81^
+>   make O=obj.allmodconfig allmodconfig
+>   make O=obj.allmodconfig -j16
+>   git checkout bc49d81
+>   make O=obj.allmodconfig -j16
+> 
+> - but it seems like it might be up to the ordering of a parallel build.
+> 
+> >From your description, it does sound like it's not regenerating flask.h;  
+> the kbuild rules would seem to have a classmap.h -> flask.h dependency:
+> 
+>   $(addprefix $(obj)/,$(selinux-y)): $(obj)/flask.h
+>   
+>   quiet_cmd_flask = GEN     $(obj)/flask.h $(obj)/av_permissions.h
+>         cmd_flask = scripts/selinux/genheaders/genheaders $(obj)/flask.h $(obj)/av_permissions.h
+>   
+>   targets += flask.h av_permissions.h
+>   $(obj)/flask.h: $(src)/include/classmap.h FORCE
+>   	$(call if_changed,flask)
+> 
+> however, classmap.h is #include-ed as part of the genheaders binary
+> build, rather than read at runtime; maybe $(obj)/flask.h should depend
+> on the genheaders binary, rather than $(src)/include/classmap.h ?
+> 
+> If you can reproduce, can you compare the ctimes with:
+> 
+>   stat scripts/selinux/genheaders/genheaders security/selinux/flask.h
 
-The Rust tree is touching scripts/kconfig/confdata.c to generate
-include/generated/rustc_cfg, which would cause complicated conflicts
-with changes from the kbuild tree.
+I just hit the exact same issue. I build with O=../build/ and by removing
+security/selinux/flask.h and av_permission.h, it built fine afterward.
+Appears to be a dependency issue.
 
-I re-implemented it to produce the equaivalent rustc_cfg.
+-- Steve
 
-I also fixed the memory leak; the original code from the Rust tree
-did not free the malloc'ed pointer.
-
-Stephen:
-When you resolve the conflicts in confdata.c, please take this one.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
-Changes for v3:
- - simplify the code
-
-Changes for v2:
- - Fix memory leak for *val == 'n' case.
-
- scripts/kconfig/confdata.c | 41 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 9ece2f3b61a6..f432d9b3a4c6 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -603,6 +603,9 @@ static const struct comment_style comment_style_c = {
- 
- static void conf_write_heading(FILE *fp, const struct comment_style *cs)
- {
-+	if (!cs) /* no heading for rustc_cfg? */
-+		return;
-+
- 	fprintf(fp, "%s\n", cs->comment_block_begin);
- 
- 	fprintf(fp, "%s Automatically generated file; DO NOT EDIT.\n",
-@@ -750,6 +753,38 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
- 	free(escaped);
- }
- 
-+/* rustc configuration */
-+static void print_symbol_for_rustc_cfg(FILE *fp, struct symbol *sym)
-+{
-+	const char *val;
-+	char *escaped;
-+
-+	if (sym->type == S_UNKNOWN)
-+		return;
-+
-+	val = sym_get_string_value(sym);
-+
-+	if (sym->type == S_BOOLEAN || sym->type == S_TRISTATE) {
-+		if (*val == 'n')
-+			return;
-+
-+		/*
-+		 * To have similar functionality to the C macro `IS_ENABLED()`
-+		 * we provide an empty `--cfg CONFIG_X` here in both `y`
-+		 * and `m` cases.
-+		 *
-+		 * Then, the common `fprintf()` below will also give us
-+		 * a `--cfg CONFIG_X="y"` or `--cfg CONFIG_X="m"`, which can
-+		 * be used as the equivalent of `IS_BUILTIN()`/`IS_MODULE()`.
-+		 */
-+		fprintf(fp, "--cfg=%s%s\n", CONFIG_, sym->name);
-+	}
-+
-+	escaped = escape_string_value(val);
-+	fprintf(fp, "--cfg=%s%s=%s\n", CONFIG_, sym->name, escaped);
-+	free(escaped);
-+}
-+
- /*
-  * Write out a minimal config.
-  * All values that has default values are skipped as this is redundant.
-@@ -1129,6 +1164,12 @@ int conf_write_autoconf(int overwrite)
- 	if (ret)
- 		return ret;
- 
-+	ret = __conf_write_autoconf("include/generated/rustc_cfg",
-+				    print_symbol_for_rustc_cfg,
-+				    NULL);
-+	if (ret)
-+		return ret;
-+
- 	/*
- 	 * Create include/config/auto.conf. This must be the last step because
- 	 * Kbuild has a dependency on auto.conf and this marks the successful
--- 
-2.30.2
+> 
+> in your object dir?
+> 
+> Cheers,
+> 
+> 
+> Jeremy
+> 
 
