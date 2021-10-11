@@ -2,60 +2,26 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E14C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 10 Oct 2021 15:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C0BC433EF
+	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Oct 2021 15:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C72C460EFE
-	for <linux-kbuild@archiver.kernel.org>; Sun, 10 Oct 2021 15:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB9B460E9C
+	for <linux-kbuild@archiver.kernel.org>; Mon, 11 Oct 2021 15:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232252AbhJJPpM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 10 Oct 2021 11:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231842AbhJJPpL (ORCPT
+        id S235749AbhJKPoE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 11 Oct 2021 11:44:04 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:48371 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235746AbhJKPoE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 Oct 2021 11:45:11 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510E3C061570;
-        Sun, 10 Oct 2021 08:43:13 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id i189so9130971ioa.1;
-        Sun, 10 Oct 2021 08:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OpCVjCuc3iVcpX0DVnJmixGrpdrKly+/TAJywD3ztME=;
-        b=NnoI+nF7ucdBF9fqznNVysXDdQZFaWDDLMAompgvSCOhBT0XFDYRbyCCJ07Soj0B9j
-         EfP1XP6a8UbpV/zll0rvBj8fjcHb/C2vscN+EKy83H3pIPfSb332v2CAEmyoQYUuGg1z
-         2aM86dSHkmzyTXfJndhDm4tpsVTHeaeS5Ed/XfhXTdo6H1HWPUH5FwB/CflSkVxheGBW
-         5IHAEnGRxytk0dNeUN0+Am7/6dOwbqkOzCXFECGOflvIjrC8DNUlFY+6yKYIwnL0vCdj
-         PifUGPpj4ie2S9RjMwF8/nlHZTVP9SuY9bLvRIK4NqlM/kJ/kCP5D3V+KEdb5UEPw+aU
-         Wjvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OpCVjCuc3iVcpX0DVnJmixGrpdrKly+/TAJywD3ztME=;
-        b=cIfXFNgYsj0tNj8I2Vl/31TJs9rVL75YsXdgoNed0kyUH9kqvh4ySEV5cycoos/OP9
-         UDHkPV9Y8zbjC7O64kJGI54CXkZKYLXH6gcDe7a008tSBbDLaNQZTf4Q4FtVW7yforsg
-         Ue1Fikz/6wnK0iOScCWyJoc3IY/qxfrK0IvR3uFqR/t8Xz0yDCneMahOgoHRov7ukyeR
-         BMuUgnuy4giqWavvFgb+YNWga7BDcLS1dPHy/VL7EYpFQkeFhipJKvCOIOWVlnAK7fO9
-         8Yzyf2E6FjHfSYp86TjUmunlONa3yIXSIUdjkNqkvUjtNFgFP5HsVRo7z19/ePBgSvgv
-         s+TA==
-X-Gm-Message-State: AOAM533a00wuE/l1aMIBS3xuDIADvb49nq49wgOKwkJOqC+1cYzOEQKP
-        G5bzT7qC52jnCUyR1sz3fWms8gO2T4jcuPviSY8=
-X-Google-Smtp-Source: ABdhPJxgYYW2QnoLUXbcEIRsWr3sga43gDXb4l8EhDLnsdUq9O2SQeF0GUyBpcTP/SPH6/2ORtodUAtvTRZ+JCvS+RU=
-X-Received: by 2002:a05:6602:2d4e:: with SMTP id d14mr2010596iow.172.1633880592478;
- Sun, 10 Oct 2021 08:43:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <1633878992-32884-1-git-send-email-ashimida@linux.alibaba.com>
-In-Reply-To: <1633878992-32884-1-git-send-email-ashimida@linux.alibaba.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Sun, 10 Oct 2021 17:43:01 +0200
-Message-ID: <CANiq72nBqiyrcaW47ZW-6i7zJ6HrmjZWSOr==HkEuBR5rXmpdQ@mail.gmail.com>
+        Mon, 11 Oct 2021 11:44:04 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=ashimida@linux.alibaba.com;NM=1;PH=DS;RN=29;SR=0;TI=SMTPD_---0UrUXPEj_1633966917;
+Received: from ashimida.local(mailfrom:ashimida@linux.alibaba.com fp:SMTPD_---0UrUXPEj_1633966917)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 11 Oct 2021 23:42:00 +0800
 Subject: Re: [PATCH] [PATCH V2]ARM64: SCS: Add gcc plugin to support Shadow
  Call Stack
-To:     Dan Li <ashimida@linux.alibaba.com>
+To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -81,26 +47,48 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         linux-hardening@vger.kernel.org,
         clang-built-linux <clang-built-linux@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <1633878992-32884-1-git-send-email-ashimida@linux.alibaba.com>
+ <CANiq72nBqiyrcaW47ZW-6i7zJ6HrmjZWSOr==HkEuBR5rXmpdQ@mail.gmail.com>
+From:   Dan Li <ashimida@linux.alibaba.com>
+Message-ID: <a25b9286-fc1f-d398-150c-ce073eadc6c1@linux.alibaba.com>
+Date:   Mon, 11 Oct 2021 23:41:57 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.1
+MIME-Version: 1.0
+In-Reply-To: <CANiq72nBqiyrcaW47ZW-6i7zJ6HrmjZWSOr==HkEuBR5rXmpdQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Oct 10, 2021 at 5:16 PM Dan Li <ashimida@linux.alibaba.com> wrote:
+
+
+On 10/10/21 11:43 PM, Miguel Ojeda wrote:
+> On Sun, Oct 10, 2021 at 5:16 PM Dan Li <ashimida@linux.alibaba.com> wrote:
+>>
+>> -         This option enables Clang's Shadow Call Stack, which uses a
+>> -         shadow stack to protect function return addresses from being
+>> -         overwritten by an attacker. More information can be found in
+>> -         Clang's documentation:
+>> +         This option enables Clang/GCC plugin's Shadow Call Stack, which
+>> +         uses a shadow stack to protect function return addresses from
+>> +         being overwritten by an attacker. More information can be found
+>> +         in Clang's documentation:
+> 
+> Perhaps it could be worded in a better way? It sounds like it is a
+> custom plugin for Clang as well, e.g.:
+> 
+>      This option enables Shadow Call Stack (in the case of GCC, as a plugin),
+> 
+> Cheers,
+> Miguel
 >
-> -         This option enables Clang's Shadow Call Stack, which uses a
-> -         shadow stack to protect function return addresses from being
-> -         overwritten by an attacker. More information can be found in
-> -         Clang's documentation:
-> +         This option enables Clang/GCC plugin's Shadow Call Stack, which
-> +         uses a shadow stack to protect function return addresses from
-> +         being overwritten by an attacker. More information can be found
-> +         in Clang's documentation:
 
-Perhaps it could be worded in a better way? It sounds like it is a
-custom plugin for Clang as well, e.g.:
+Thanks Miguel.
 
-    This option enables Shadow Call Stack (in the case of GCC, as a plugin),
-
-Cheers,
-Miguel
+How about writing like this:
+This option enables Shadow Call Stack (supported as a compiler option in
+the case of clang, supported as a plugin in the case of gcc), which uses
+a shadow stack to ...
