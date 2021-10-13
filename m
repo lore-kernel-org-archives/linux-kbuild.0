@@ -2,107 +2,83 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2CEC433FE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Oct 2021 18:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFEDC4332F
+	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Oct 2021 20:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 707FF61139
-	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Oct 2021 18:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24D626101D
+	for <linux-kbuild@archiver.kernel.org>; Wed, 13 Oct 2021 20:07:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238739AbhJMSwW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 13 Oct 2021 14:52:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54664 "EHLO
+        id S231657AbhJMUJh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 13 Oct 2021 16:09:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231445AbhJMSwU (ORCPT
+        with ESMTP id S231245AbhJMUJg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 13 Oct 2021 14:52:20 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D75C061749
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Oct 2021 11:50:17 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id i24so15451893lfj.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Oct 2021 11:50:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b8/P8tB/Z2lB3uczx8fuNs4yrMjdgai73jQwqgSmb8k=;
-        b=kDywsRyuPxVHakfyaPBhZGFsKn8P4P0Orn2Y9o0bfVo3J1d4YQZHM3XDib2XXfdWRs
-         KTmYLFOmkI72Z1QGH14GvjX6AYTmZDaS5dPBLcz6wdhhka5qkR2cU5HScrfq4eii9joB
-         kJjGWi78b/h0zw8iYk9t9gAym09ABl/pER9JXtJLYgxQ76TT9SVBaLAHX0NHc43gYtpv
-         IT8uisa6SAJ5YyHZQGUMVqG+3X4K8BBUc6GIlt52UJw1KnuqCIAIzZwGOt7sIWLXLM4M
-         bbF0pE5C2+pwsgZA7jHkaRqoaaFO9M5F6awahLSQp4rxAF+ikhwtg2LfOdeyXOevu15n
-         rmFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b8/P8tB/Z2lB3uczx8fuNs4yrMjdgai73jQwqgSmb8k=;
-        b=Jp03eXKgM1plGW458wxSkFbJ+z2Dws/dgb9H3W4hFA5I0905wEuNO+FOIZUmVtSTtf
-         qDi4sS7QOFDCoOevSSE/SJFSKJESA3AdCo0qPhH7Cpv36sg9AMEN14K1x4dWicg3kZzy
-         SR2aCNHwptBHaU3Z8GuKsJuRz6e07MHT6w/KsTNWRSPc+sELJ2F7XqqSungpc7mPCQ3C
-         WsywMP3sk8379vO4rmAjZttbrGxDlhQazCLJD8qq/ka1ht/QSwPo9Q2nQ/2F+4VE7099
-         Mq9/jR/MfqmDhFHRDeL0MZKxUGmbaLu1lEIIoNwyn9oeVWXNC1ZcQEG2qbt9Kru6ZU+n
-         FLRQ==
-X-Gm-Message-State: AOAM530E6eVE88z2y5NKtBsXZmpiS8NkBf7CxBIjxSOKwDDrxACSCmU6
-        TlX7N+QSEYDql2EIcTaG0xpQ0XPFJfdKtSUES63k/Q==
-X-Google-Smtp-Source: ABdhPJybMQxtFkt+CSaxFXxXt2PhnxWlWW8tmKXXryRxD06ne8odxGrqIGRARW9LCy1ltHsb2ZBF1fp2E4wP78hKYmc=
-X-Received: by 2002:a05:6512:4c7:: with SMTP id w7mr700247lfq.444.1634151015014;
- Wed, 13 Oct 2021 11:50:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <1634148189-29393-1-git-send-email-ashimida@linux.alibaba.com>
-In-Reply-To: <1634148189-29393-1-git-send-email-ashimida@linux.alibaba.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 13 Oct 2021 11:50:03 -0700
-Message-ID: <CAKwvOd=qxHU41HFEWLAz6DOvSMPdW863E9SKVe0PFK0ePDvizQ@mail.gmail.com>
-Subject: Re: [PATCH] [PATCH V3]ARM64: SCS: Add gcc plugin to support Shadow
- Call Stack
-To:     Dan Li <ashimida@linux.alibaba.com>
-Cc:     masahiroy@kernel.org, michal.lkml@markovi.net,
-        catalin.marinas@arm.com, will@kernel.org, keescook@chromium.org,
-        nathan@kernel.org, tglx@linutronix.de, akpm@linux-foundation.org,
-        samitolvanen@google.com, frederic@kernel.org, rppt@kernel.org,
-        mark.rutland@arm.com, yifeifz2@illinois.edu, rostedt@goodmis.org,
-        viresh.kumar@linaro.org, andreyknvl@gmail.com,
-        colin.king@canonical.com, ojeda@kernel.org,
-        luc.vanoostenryck@gmail.com, elver@google.com,
-        nivedita@alum.mit.edu, ardb@kernel.org,
+        Wed, 13 Oct 2021 16:09:36 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9102C061570;
+        Wed, 13 Oct 2021 13:07:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=RXVnMLzX0n92WenFQsNXvxZfnumwQy6spJ6FkB8/pLo=; b=n+Ps40O18Scs0fFFiCjsG5RddG
+        L2h5n411+IZlaZPnon3TgZNCz2kx5vWiWsuVXQPy4kgzVnCbsLLbmvUnzF7+J7iQp9uHRruUyWnof
+        e8Wo8oNWTJQ1boA+tzSvIgoJ4U2nqO9Kn4kPmjgjCG4tgFpUjVeOeB49EoqleT1iUZfpzNrVjCURU
+        lZ8SYwoqU+xd1yYPgJ6seMYYzU2bcnpIRW0ESYLVJl2Ah4ENaQFDlbr3xF3fGAeO9jylhlq9XcTsN
+        niyKlGK0qHsiuX1YhcFT65Fs6gLyl6NcLrnCVRmDmXumDutE336gLYahXFyVdcrWGRkCB7TB7qxtu
+        VHmi3OJg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1makVR-007lZ6-EL; Wed, 13 Oct 2021 20:06:09 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-hardening@vger.kernel.org, clang-built-linux@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        efi@lists.einval.com, debian-kernel@lists.debian.org,
+        linux-efi@vger.kernel.org
+Subject: [PATCH] builddeb: Support signing kernels with a Machine Owner Key
+Date:   Wed, 13 Oct 2021 21:05:36 +0100
+Message-Id: <20211013200536.1851070-1-willy@infradead.org>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 11:03 AM Dan Li <ashimida@linux.alibaba.com> wrote:
->
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 62c3c1d..da2da8c 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -81,7 +81,7 @@ config ARM64
->         select ARCH_SUPPORTS_DEBUG_PAGEALLOC
->         select ARCH_SUPPORTS_HUGETLBFS
->         select ARCH_SUPPORTS_MEMORY_FAILURE
-> -       select ARCH_SUPPORTS_SHADOW_CALL_STACK if CC_HAVE_SHADOW_CALL_STACK
-> +       select ARCH_SUPPORTS_SHADOW_CALL_STACK if (CC_HAVE_SHADOW_CALL_STACK || GCC_PLUGIN_SHADOW_CALL_STACK)
->         select ARCH_SUPPORTS_LTO_CLANG if CPU_LITTLE_ENDIAN
->         select ARCH_SUPPORTS_LTO_CLANG_THIN
->         select ARCH_SUPPORTS_CFI_CLANG
-> @@ -1062,7 +1062,7 @@ config ARCH_HAS_FILTER_PGPROT
->
->  # Supported by clang >= 7.0
->  config CC_HAVE_SHADOW_CALL_STACK
-> -       def_bool $(cc-option, -fsanitize=shadow-call-stack -ffixed-x18)
-> +       def_bool (CC_IS_CLANG && $(cc-option, -fsanitize=shadow-call-stack -ffixed-x18))
+If the config file specifies a signing key, use it to sign
+the kernel so that machines with SecureBoot enabled can boot.
+See https://wiki.debian.org/SecureBoot
 
-I guess since clang supported SCS since clang-7, but the minimally
-supported version of clang according to
-Documentation/process/changes.rst is 10.0.1, then this could be:
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ scripts/package/builddeb | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-def_boot CC_IS_CLANG || $(cc-option, -fsanitize=shadow-call-stack -ffixed-x18)
-
-Then we won't have to touch it again once SCS lands in upstream GCC,
-as the cc-option test will start to pass?
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 91a502bb97e8..4fa6ff2b5cac 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -147,7 +147,15 @@ else
+ 	cp System.map "$tmpdir/boot/System.map-$version"
+ 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+ fi
+-cp "$($MAKE -s -f $srctree/Makefile image_name)" "$tmpdir/$installed_image_path"
++
++vmlinux=$($MAKE -s -f $srctree/Makefile image_name)
++if is_enabled CONFIG_MODULE_SIG; then
++	cert=$srctree/$(grep ^CONFIG_MODULE_SIG_KEY= include/config/auto.conf | cut -d\" -f2)
++	key=${cert%pem}priv
++	sbsign --key $key --cert $cert "$vmlinux" --output "$tmpdir/$installed_image_path"
++else
++	cp "$vmlinux" "$tmpdir/$installed_image_path"
++fi
+ 
+ if is_enabled CONFIG_OF_EARLY_FLATTREE; then
+ 	# Only some architectures with OF support have this target
 -- 
-Thanks,
-~Nick Desaulniers
+2.32.0
+
