@@ -2,132 +2,236 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F138C433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 29 Oct 2021 16:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA2DC433F5
+	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Oct 2021 14:34:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6722B61183
-	for <linux-kbuild@archiver.kernel.org>; Fri, 29 Oct 2021 16:19:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5C3760296
+	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Oct 2021 14:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbhJ2QW0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 29 Oct 2021 12:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
+        id S229993AbhJ3OhK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 30 Oct 2021 10:37:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbhJ2QW0 (ORCPT
+        with ESMTP id S229585AbhJ3OhJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 29 Oct 2021 12:22:26 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF8EC061714
-        for <linux-kbuild@vger.kernel.org>; Fri, 29 Oct 2021 09:19:57 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id p14so16890242wrd.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 29 Oct 2021 09:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ikgahne8KsmeRHB0JuMt+hCjE+vDKAl9WiAJzz6l2C4=;
-        b=yTNK5OyhTtsrJYojdFQbqgaD5Lw4ruZTav9ekBbwBHX9h657sM0VcG/V7AeKm0fl/l
-         qv5aZKAbHHnJdbpH4+6HwLgfU4cPMG+4oyTiuemnPEt5MbikJ1hcv7y9g+icvZMiv5kQ
-         lej0aEJ97x1tabCM3EI1zJQ6yL4KO1bS4gRM2cl3g646f1EafnrDhcNrZ1QOlaZ3zHfE
-         1q1otLK4zLVc7kKCSaBYV3PjyncWUpl4/yzzrptxrMDMB+QM0lSwR8T+avlb6iJVnDM4
-         oTq9zDK6kz3cyJ8e89xDQtDJcN4MBMXRIxoM68NJtqcbN/G4IU3bl29UQ9UPawnduUT5
-         D4bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ikgahne8KsmeRHB0JuMt+hCjE+vDKAl9WiAJzz6l2C4=;
-        b=GIhLUjyoeD3ytPG+kghLKG1NhmZzWLfOhfAOtkjfkV19I/yBYgezwCNRmwH8uyseao
-         ln7z/q/VOJZ43qBD6kwbcc1QuQ9NvsTWtj1SXPGPbGbeQg6OPpNXBTN7kxuOxujD8sc4
-         gbv+O3FN1konOaMBP0apO/JPoT0RDwi7J8NlR4UxOHrI6Qx45e7WK3pBt8Gw4JD+vctQ
-         CA4ImqqufPzeoKXDjCLAv2UYwDmCfE++VKHeOGFvsVwyUOe/9210VtZl4+Tj3Gf3yEhf
-         uqyNaAAp4+1Fo/LFYJ5TdtkHpiVe9wbd3gnvKmqrcaRYMtDwVZ9UBlYPBoabf6ork6DG
-         c7jA==
-X-Gm-Message-State: AOAM531t7QHIo5s3E4/3fF7/HxqO5yuNgcLhxmGfZMSXMcELzge7myt6
-        pHRoWhqa+jsv0J3UPKcnRwgI7w==
-X-Google-Smtp-Source: ABdhPJwQTTfPOMqLfiUtj/Hw5Y2Z3mJ4qcKrUU+eQDR3bfPY1QdIkAR6ZxQGOh95l4OIHTzjiAG1BQ==
-X-Received: by 2002:adf:d1ce:: with SMTP id b14mr15920082wrd.42.1635524395515;
-        Fri, 29 Oct 2021 09:19:55 -0700 (PDT)
-Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
-        by smtp.gmail.com with ESMTPSA id l6sm5320315wmq.17.2021.10.29.09.19.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Oct 2021 09:19:55 -0700 (PDT)
-Date:   Fri, 29 Oct 2021 17:19:52 +0100
-From:   Daniel Thompson <daniel.thompson@linaro.org>
-To:     Qian Cai <quic_qiancai@quicinc.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Sat, 30 Oct 2021 10:37:09 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BC2C061570;
+        Sat, 30 Oct 2021 07:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ba2xFt3kXSmSTLD8SqkglhCszGSJjIidpOhGBZZRwqs=; b=KxNTFF6MESt7Owjy7Rsimcsszl
+        9FviqkuUnjHAEdEUcpb27yNW2R3RQl4BZ2BpEpgKnVGmCQgS43k8yyDkiEwOmJIXh9ny17Oqy49fk
+        PDzxT4IF3ecJyJ+aS8I9Pl95V3b/lHt+cppYj8q6WWrmZVghxldeDp6c0yugf64yb86maeZhY0XW6
+        M4ELbvaS5q42icbzRDk3cL6+bH2lFgfKSth6aBFEFmuvDPZNSdnDF8V0ZJ41dihgWJ3r1h5l6jHoC
+        2yuB27lUIfCxkj/34CUOzYY9V4KFnELO6o+846IGnZxokUITPIP03oyMWbD8H19o9GstbZWmtYv4X
+        f5ChCmVg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mgpQ1-002TG3-24; Sat, 30 Oct 2021 14:33:22 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id C89129816BA; Sat, 30 Oct 2021 16:33:11 +0200 (CEST)
+Date:   Sat, 30 Oct 2021 16:33:11 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] configs: Introduce debug.config for CI-like setup
-Message-ID: <20211029161952.u4g7vutcz3qd57lo@maple.lan>
-References: <20211029034434.24553-1-quic_qiancai@quicinc.com>
- <20211029093115.6ychbe56pnebzi43@maple.lan>
- <e0301a5f-a2c7-eedb-90b1-1d6d631fcc47@quicinc.com>
+        Michal Marek <michal.lkml@markovi.net>,
+        X86 ML <x86@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH] kbuild: Support clang-$ver builds
+Message-ID: <20211030143311.GH174730@worktop.programming.kicks-ass.net>
+References: <YXqpFHeY26sEbort@hirez.programming.kicks-ass.net>
+ <CAK7LNATUpgfKJvjp0+8H6VfMLMio9+BCoyj00mAO8FcaVGCqjg@mail.gmail.com>
+ <YXqwZq53WUiTeqI7@hirez.programming.kicks-ass.net>
+ <YXqyHhWGJfDkuxjP@hirez.programming.kicks-ass.net>
+ <YXq72/yPe76DhDLu@hirez.programming.kicks-ass.net>
+ <YXrhZoOgv5dtFMTs@archlinux-ax161>
+ <20211028204855.GP174703@worktop.programming.kicks-ass.net>
+ <CAKwvOd=x9E=7WcCiieso-CDiiU-wMFcXL4W3V5j8dq7BL5QT+w@mail.gmail.com>
+ <YXu2z6FQ6Z7qtjbk@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0301a5f-a2c7-eedb-90b1-1d6d631fcc47@quicinc.com>
+In-Reply-To: <YXu2z6FQ6Z7qtjbk@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Oct 29, 2021 at 09:57:31AM -0400, Qian Cai wrote:
-> On 10/29/21 5:31 AM, Daniel Thompson wrote:
-> > Does this config need comments at the top of the file describing its 
-> > "mission"?  Put another way, the comments in the description about
-> > where these config options come from seem too important leave buried
-> > in the git history. They are important to understanding what it is
-> > for.
-> > 
-> > I know this the other configs do not have big header comments. However
-> > the existing configs are closer to self-describing. debug.config simply does not explain what the file does in the way xen.config can! People
-> > will surely want to add their "favourite" debug options[1] and those
-> > contributors would benefit from clues on what the configs here are
-> > intended for.
-> 
-> Daniel, (small world, isn't it? Enjoyed your OpenEmbedded lessons in the
-> past.), That's a good point. I personally got used to "git log". I'll
-> add some comments there.
 
-Hello again.
+Latestest greatness... :-)
 
-In this case the small world comes about because "debug" is of the
-keywords I use to filter LKML ;-)
+---
+Subject: kbuild: Fix clang/llvm build infra
 
+Debian (and derived) distros ship their compilers as -$ver suffixed
+binaries. For gcc it is sufficent to use:
 
-> >> +# Keep alphabetically sorted.
-> > 
-> > This results in 119 line file that is more-or-less impossible to
-> > comment. It alphabetic really the best way to maintain something
-> > containing so much subjective judgement?
-> 
-> I thought about ordering those in different subject groups, but then
-> realized it might be an overkill for an only one-hundred line file. Most
-> of the options would have a prefix like _LOCKDEP_, _KMEMLEAK_ etc, so
-> they are subject-related close together even sorted alphabetically.
+ $ make CC=gcc-12
 
-My feedback came about because, in alphabetic form, it is not easy to
-see which ftrace tracers are enabled (because they are named
-CONFIG_<feature>_TRACER they appear all over the place).
+However, clang builds (esp. clang-lto) need a whole array of tools to be
+exactly right, leading to unweildy stuff like:
 
+ $ make CC=clang-13 LD=ld.lld=14 AR=llvm-ar-13 NM=llvm-nm-13 OBJCOPY=llvm-objcopy-13 OBJDUMP=llvm-objdump-13 READELF=llvm-readelf-13 STRIP=llvm-strip-13 LLVM=1
 
-> I don't really have a strong option on this matter though. We could
-> organize it like in Kconfig sections if people like that way better
-> although it could have a potential overhead to sync with future
-> Kconfig.debug in the future as their places and names change from time
-> to time.
-> 
-> # printk and dmesg options
-> # Compile-time checks and compiler options
-> # Generic Kernel Debugging Instruments
-> # Memory Debugging
-> # Scheduler Debugging
-> # Lock Debugging (spinlocks, mutexes, etc...)
-> # Debug kernel data structures
-> # RCU Debugging
+which is, quite franktly, totally insane and unusable. Instead make
+the CC variable DTRT, enabling one such as myself to use:
 
-Personally I'd favour this. It really depends on how often it is
-read/changed by uesrs rather than just consumed by the build system.
-Personally I think this will be read quite often.
+ $ make CC=clang-13
 
+This also lets one quickly test different clang versions.
+Additionally, also support path based LLVM suites like:
 
-Daniel.
+ $ make CC=/opt/llvm/bin/clang
+
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ Makefile                       |   45 +++++++++++++++++++++++++++---------
+ tools/scripts/Makefile.include |   50 ++++++++++++++++++++++++++++-------------
+ 2 files changed, 68 insertions(+), 27 deletions(-)
+
+--- a/Makefile
++++ b/Makefile
+@@ -423,9 +423,29 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_C
+ HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
+ HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
+ 
+-ifneq ($(LLVM),)
+-HOSTCC	= clang
+-HOSTCXX	= clang++
++# powerpc and s390 don't yet work with LLVM as a whole
++ifeq ($(ARCH),powerpc)
++LLVM = 0
++endif
++ifeq ($(ARCH),s390)
++LLVM = 0
++endif
++
++# otherwise, if CC=clang, default to using LLVM to enable LTO
++CC_BASE := $(shell echo $(CC) | sed 's/.*\///')
++CC_NAME := $(shell echo $(CC_BASE) | cut -b "1-5")
++ifeq ($(shell test "$(CC_NAME)" = "clang"; echo $$?),0)
++LLVM ?= 1
++LLVM_PFX := $(shell echo $(CC) | sed 's/\(.*\/\)\?.*/\1/')
++LLVM_SFX := $(shell echo $(CC_BASE) | cut -b "6-")
++endif
++
++# if not set by now, do not use LLVM
++LLVM ?= 0
++
++ifneq ($(LLVM),0)
++HOSTCC	= $(LLVM_PFX)clang$(LLVM_SFX)
++HOSTCXX	= $(LLVM_PFX)clang++$(LLVM_SFX)
+ else
+ HOSTCC	= gcc
+ HOSTCXX	= g++
+@@ -442,15 +462,15 @@ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS)
+ 
+ # Make variables (CC, etc...)
+ CPP		= $(CC) -E
+-ifneq ($(LLVM),)
+-CC		= clang
+-LD		= ld.lld
+-AR		= llvm-ar
+-NM		= llvm-nm
+-OBJCOPY		= llvm-objcopy
+-OBJDUMP		= llvm-objdump
+-READELF		= llvm-readelf
+-STRIP		= llvm-strip
++ifneq ($(LLVM),0)
++CC		= $(LLVM_PFX)clang$(LLVM_SFX)
++LD		= $(LLVM_PFX)ld.lld$(LLVM_SFX)
++AR		= $(LLVM_PFX)llvm-ar$(LLVM_SFX)
++NM		= $(LLVM_PFX)llvm-nm$(LLVM_SFX)
++OBJCOPY		= $(LLVM_PFX)llvm-objcopy$(LLVM_SFX)
++OBJDUMP		= $(LLVM_PFX)llvm-objdump$(LLVM_SFX)
++READELF		= $(LLVM_PFX)llvm-readelf$(LLVM_SFX)
++STRIP		= $(LLVM_PFX)llvm-strip$(LLVM_SFX)
+ else
+ CC		= $(CROSS_COMPILE)gcc
+ LD		= $(CROSS_COMPILE)ld
+@@ -461,6 +481,7 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
+ READELF		= $(CROSS_COMPILE)readelf
+ STRIP		= $(CROSS_COMPILE)strip
+ endif
++
+ PAHOLE		= pahole
+ RESOLVE_BTFIDS	= $(objtree)/tools/bpf/resolve_btfids/resolve_btfids
+ LEX		= flex
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -51,12 +51,32 @@ define allow-override
+     $(eval $(1) = $(2)))
+ endef
+ 
+-ifneq ($(LLVM),)
+-$(call allow-override,CC,clang)
+-$(call allow-override,AR,llvm-ar)
+-$(call allow-override,LD,ld.lld)
+-$(call allow-override,CXX,clang++)
+-$(call allow-override,STRIP,llvm-strip)
++# powerpc and s390 don't yet work with LLVM as a whole
++ifeq ($(ARCH),powerpc)
++LLVM = 0
++endif
++ifeq ($(ARCH),s390)
++LLVM = 0
++endif
++
++# otherwise, if CC=clang, default to using LLVM to enable LTO
++CC_BASE := $(shell echo $(CC) | sed 's/.*\///')
++CC_NAME := $(shell echo $(CC_BASE) | cut -b "1-5")
++ifeq ($(shell test "$(CC_NAME)" = "clang"; echo $$?),0)
++LLVM ?= 1
++LLVM_PFX := $(shell echo $(CC) | sed 's/\(.*\/\)\?.*/\1/')
++LLVM_SFX := $(shell echo $(CC_BASE) | cut -b "6-")
++endif
++
++# if not set by now, do not use LLVM
++LLVM ?= 0
++
++ifneq ($(LLVM),0)
++$(call allow-override,CC,$(LLVM_PFX)clang$(LLVM_SFX))
++$(call allow-override,AR,$(LLVM_PFX)llvm-ar$(LLVM_SFX))
++$(call allow-override,LD,$(LLVM_PFX)ld.lld$(LLVM_SFX))
++$(call allow-override,CXX,$(LLVM_PFX)clang++$(LLVM_SFX))
++$(call allow-override,STRIP,$(LLVM_PFX)llvm-strip$(LLVM_SFX))
+ else
+ # Allow setting various cross-compile vars or setting CROSS_COMPILE as a prefix.
+ $(call allow-override,CC,$(CROSS_COMPILE)gcc)
+@@ -68,10 +88,10 @@ endif
+ 
+ CC_NO_CLANG := $(shell $(CC) -dM -E -x c /dev/null | grep -Fq "__clang__"; echo $$?)
+ 
+-ifneq ($(LLVM),)
+-HOSTAR  ?= llvm-ar
+-HOSTCC  ?= clang
+-HOSTLD  ?= ld.lld
++ifneq ($(LLVM),0)
++HOSTAR  ?= $(LLVM_PFX)llvm-ar$(LLVM_SFX)
++HOSTCC  ?= $(LLVM_PFX)clang$(LLVM_SFX)
++HOSTLD  ?= $(LLVM_PFX)ld.lld$(LLVM_SFX)
+ else
+ HOSTAR  ?= ar
+ HOSTCC  ?= gcc
+@@ -79,11 +99,11 @@ HOSTLD  ?= ld
+ endif
+ 
+ # Some tools require Clang, LLC and/or LLVM utils
+-CLANG		?= clang
+-LLC		?= llc
+-LLVM_CONFIG	?= llvm-config
+-LLVM_OBJCOPY	?= llvm-objcopy
+-LLVM_STRIP	?= llvm-strip
++CLANG		?= $(LLVM_PFX)clang$(LLVM_SFX)
++LLC		?= $(LLVM_PFX)llc$(LLVM_SFX)
++LLVM_CONFIG	?= $(LLVM_PFX)llvm-config$(LLVM_SFX)
++LLVM_OBJCOPY	?= $(LLVM_PFX)llvm-objcopy$(LLVM_SFX)
++LLVM_STRIP	?= $(LLVM_PFX)llvm-strip$(LLVM_SFX)
+ 
+ ifeq ($(CC_NO_CLANG), 1)
+ EXTRA_WARNINGS += -Wstrict-aliasing=3
