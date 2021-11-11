@@ -2,106 +2,125 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C557C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Nov 2021 04:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BB8C433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Nov 2021 08:54:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60A9F613B3
-	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Nov 2021 04:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8544661212
+	for <linux-kbuild@archiver.kernel.org>; Thu, 11 Nov 2021 08:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233245AbhKKE6U (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 10 Nov 2021 23:58:20 -0500
-Received: from gandalf.ozlabs.org ([150.107.74.76]:57459 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233092AbhKKE6U (ORCPT
+        id S229674AbhKKI5F (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 11 Nov 2021 03:57:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230129AbhKKI5D (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 10 Nov 2021 23:58:20 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HqTtS41wYz4xbs;
-        Thu, 11 Nov 2021 15:55:28 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1636606530;
-        bh=GCVMUlmIvsbs8ofijos/QMPB8fyrPXIzfNWltTIec0g=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=qCM/P8yF3p0irn0/dtMmMfI4uHveOGQ7sKdYMeoJlHGC+sdX0SFPl62PUHPn9j0SI
-         ZeMkNjKtdrSCztYOPnsyKYRXWVKeFrbJfAAjy/vPI041IpnfL4sckQWiUQnh6usAE6
-         8asvi/faiow9Hp5v1LHlZ5ypCQXvaoMC3pL1IXS7dZFbja0g6QGpd5tiqlm3nFjmYv
-         RqSoIkIE7GocK03amwDHrCBn/C6gtLIclVwHYImcfNhqGNffJQn8I4TUN09I6fgPU7
-         T+Mr3pthkmMKgPX1W7PTOo2yGb2pFppAbTtgUBckS8uUZ4fPawjUYKcF6MFZnddv9J
-         yYHCHuxVNMvVA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Valentin Schneider <valentin.schneider@arm.com>,
-        linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Thu, 11 Nov 2021 03:57:03 -0500
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F0BEC061766
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Nov 2021 00:54:14 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id 67-20020a1c1946000000b0030d4c90fa87so3889748wmz.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Nov 2021 00:54:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=C2pRx3VrkRvZzvTAGodY7FBYbqa7VwcKa7WgFhF9R6k=;
+        b=hKMluJXv3cyn/6Ynmj9veQdzGcfSmCSFG579re0rSO1tRqLHpBWJu9Fwffh1MImSiV
+         9lVDbZ+PTmFa5VLZtW+4dmbkNJhCiV6Mn31mAn/sv9C2ywUe+5Zi9nw1sKPf3D79mJuH
+         Xu78Qr/gH0FY/7l8aYSagKd3qmz9gYzLZ62FAXcMZVNkqPtXOBh3x22yTvvJpgfPc81T
+         ek0wMLCyit/12eBl70fjor1e4lUxm8HvOdo/uiRyMJ+z0uM+jdn8tMtRpiqnoCejQ6s1
+         9Mxz0cBVuYZN6jSzMhjTX2uPJYFwb+XZ+JH+qIGcAEGf2NQ1Qs5ojQHmD9vsEWdGVZcM
+         GY/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=C2pRx3VrkRvZzvTAGodY7FBYbqa7VwcKa7WgFhF9R6k=;
+        b=tErElpp8exSQwiOhKpAA+82Scs+9/nqU55WBL76DuzkDFDo62JiCYJqW7LJtsRMMOX
+         7hhY9+SaRMmqdll76X4yYv7ExWqDI4F+ZEns6H1JDeCdsHyuxs4hJ/SFx3ew6qgIpP7I
+         I+2+vRRKjEztckys0IAUxKY402SagZxnOJzAU715YHcXd4JqUIQpamCL/0KP1A7NRL8g
+         FEYhK81+8XCtJ0WfFNGLu+/wFInyM0PgbIEm5tObCaby71nZKtEkcqQmWMrUUF2cRgjJ
+         WTDGXqS1AaCTm0Iu9j2YsKVaVkFJWbYpLqpTW+x/p985WPuMi8PjBWw5zs6Njqc8sPhH
+         etiw==
+X-Gm-Message-State: AOAM533spOqfS+sILpazEUuo8YUxdajiPuEIWrTGIfoVSXPYmzjlg7Xz
+        2pE3FIgGF+P2MXZAppbjrEDlRKUCrmE3DA==
+X-Google-Smtp-Source: ABdhPJxEBRNPec/bxvLCqnLUS7WDbPiOxrRwFfQ0JkP8imwe8zHRLQn9sFwrFH2xKqmya9LJVZJJMA==
+X-Received: by 2002:a05:600c:4f8a:: with SMTP id n10mr6436687wmq.54.1636620852405;
+        Thu, 11 Nov 2021 00:54:12 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:15:13:fd21:69cc:1f2b:9812])
+        by smtp.gmail.com with ESMTPSA id l2sm8637092wmq.42.2021.11.11.00.54.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 00:54:11 -0800 (PST)
+Date:   Thu, 11 Nov 2021 09:54:05 +0100
+From:   Marco Elver <elver@google.com>
+To:     Valentin Schneider <valentin.schneider@arm.com>
+Cc:     linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@kernel.org>,
         Frederic Weisbecker <frederic@kernel.org>,
-        Mike Galbraith <efault@gmx.de>, Marco Elver <elver@google.com>,
+        Mike Galbraith <efault@gmx.de>,
         Dmitry Vyukov <dvyukov@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         Paul Mackerras <paulus@samba.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH v2 3/5] powerpc: Use preemption model accessors
-In-Reply-To: <20211110202448.4054153-4-valentin.schneider@arm.com>
+Subject: Re: [PATCH v2 2/5] preempt/dynamic: Introduce preempt mode accessors
+Message-ID: <YYzaLTtf1tFbqDSn@elver.google.com>
 References: <20211110202448.4054153-1-valentin.schneider@arm.com>
- <20211110202448.4054153-4-valentin.schneider@arm.com>
-Date:   Thu, 11 Nov 2021 15:55:27 +1100
-Message-ID: <87o86rmgu8.fsf@mpe.ellerman.id.au>
+ <20211110202448.4054153-3-valentin.schneider@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110202448.4054153-3-valentin.schneider@arm.com>
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Valentin Schneider <valentin.schneider@arm.com> writes:
-> Per PREEMPT_DYNAMIC, checking CONFIG_PREEMPT doesn't tell you the actual
-> preemption model of the live kernel. Use the newly-introduced accessors
-> instead.
->
-> sched_init() -> preempt_dynamic_init() happens way before IRQs are set up,
-> so this should be fine.
+On Wed, Nov 10, 2021 at 08:24PM +0000, Valentin Schneider wrote:
+[...]
+> +#ifdef CONFIG_PREEMPT_DYNAMIC
+> +
+> +extern bool is_preempt_none(void);
+> +extern bool is_preempt_voluntary(void);
+> +extern bool is_preempt_full(void);
+> +
+> +#else
+> +
+> +#define is_preempt_none() IS_ENABLED(CONFIG_PREEMPT_NONE)
+> +#define is_preempt_voluntary() IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY)
+> +#define is_preempt_full() IS_ENABLED(CONFIG_PREEMPT)
+> +
+> +#endif
+> +
+> +#define is_preempt_rt() IS_ENABLED(CONFIG_PREEMPT_RT)
+> +
 
-Despite the name interrupt_exit_kernel_prepare() is called before IRQs
-are setup, traps and page faults are "interrupts" here.
+Can these callables be real functions in all configs, making the
+!DYNAMIC ones just static inline bool ones? That'd catch invalid use in
+#if etc. in all configs.
 
-So I'm not sure about adding that call there, because it will trigger a
-WARN if called early in boot, which will trigger a trap and depending on
-the context we may not survive.
+>  /*
+>   * Does a critical section need to be broken due to another
+>   * task waiting?: (technically does not depend on CONFIG_PREEMPTION,
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index 97047aa7b6c2..9db7f77e53c3 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -6638,6 +6638,17 @@ static void __init preempt_dynamic_init(void)
+>  	}
+>  }
+>  
+> +#define PREEMPT_MODE_ACCESSOR(mode) \
+> +	bool is_preempt_##mode(void)						 \
+> +	{									 \
+> +		WARN_ON_ONCE(preempt_dynamic_mode == preempt_dynamic_undefined); \
+> +		return preempt_dynamic_mode == preempt_dynamic_##mode;		 \
+> +	}
 
-I'd be happier if we can make it a build-time check.
-
-cheers
-
-> diff --git a/arch/powerpc/kernel/interrupt.c b/arch/powerpc/kernel/interrupt.c
-> index de10a2697258..c56c10b59be3 100644
-> --- a/arch/powerpc/kernel/interrupt.c
-> +++ b/arch/powerpc/kernel/interrupt.c
-> @@ -552,7 +552,7 @@ notrace unsigned long interrupt_exit_kernel_prepare(struct pt_regs *regs)
->  		/* Returning to a kernel context with local irqs enabled. */
->  		WARN_ON_ONCE(!(regs->msr & MSR_EE));
->  again:
-> -		if (IS_ENABLED(CONFIG_PREEMPT)) {
-> +		if (is_preempt_full()) {
->  			/* Return to preemptible kernel context */
->  			if (unlikely(current_thread_info()->flags & _TIF_NEED_RESCHED)) {
->  				if (preempt_count() == 0)
-> diff --git a/arch/powerpc/kernel/traps.c b/arch/powerpc/kernel/traps.c
-> index aac8c0412ff9..1cb31bbdc925 100644
-> --- a/arch/powerpc/kernel/traps.c
-> +++ b/arch/powerpc/kernel/traps.c
-> @@ -265,7 +265,7 @@ static int __die(const char *str, struct pt_regs *regs, long err)
->  	printk("%s PAGE_SIZE=%luK%s%s%s%s%s%s %s\n",
->  	       IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN) ? "LE" : "BE",
->  	       PAGE_SIZE / 1024, get_mmu_str(),
-> -	       IS_ENABLED(CONFIG_PREEMPT) ? " PREEMPT" : "",
-> +	       is_preempt_full() ? " PREEMPT" : "",
->  	       IS_ENABLED(CONFIG_SMP) ? " SMP" : "",
->  	       IS_ENABLED(CONFIG_SMP) ? (" NR_CPUS=" __stringify(NR_CPUS)) : "",
->  	       debug_pagealloc_enabled() ? " DEBUG_PAGEALLOC" : "",
-> -- 
-> 2.25.1
+This needs an EXPORT_SYMBOL, so it's usable from modules like the
+kcsan_test module.
