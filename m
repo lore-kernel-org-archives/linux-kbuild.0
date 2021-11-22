@@ -2,21 +2,30 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D31C433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 22 Nov 2021 12:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2A4C433EF
+	for <linux-kbuild@archiver.kernel.org>; Mon, 22 Nov 2021 14:07:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239469AbhKVMS3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 22 Nov 2021 07:18:29 -0500
-Received: from mail.loongson.cn ([114.242.206.163]:55790 "EHLO loongson.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239434AbhKVMS3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 22 Nov 2021 07:18:29 -0500
-Received: from localhost.localdomain.localdomain (unknown [10.2.5.46])
-        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dx79PDiZthKyUAAA--.851S2;
-        Mon, 22 Nov 2021 20:15:04 +0800 (CST)
-From:   Yinbo Zhu <zhuyinbo@loongson.cn>
-To:     Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
+        id S231383AbhKVOLA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 22 Nov 2021 09:11:00 -0500
+Received: from vps0.lunn.ch ([185.16.172.187]:45512 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229984AbhKVOK7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 22 Nov 2021 09:10:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+        Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+        bh=upueizCiMQuEceGsQAkUcPYoBnUQX/FnhfGm4yPF4Ew=; b=wqvlkKesOkzRaE1mbhhtICnk0R
+        dx1qFizFYxDRWgfbk63DZSp4Gk/ba3+VkZ6BBe0tRHdKMGZftD5WUyq4O4F2/imKWnWXpqqK35gCG
+        OOHO2zeTRs0eda1CRPqzK9obwUY4Ly8lc5hQRA/dyjIDvoBGGw1v6hco5szZWap131bg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+        (envelope-from <andrew@lunn.ch>)
+        id 1mp9ym-00EIVH-SB; Mon, 22 Nov 2021 15:07:32 +0100
+Date:   Mon, 22 Nov 2021 15:07:32 +0100
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Yinbo Zhu <zhuyinbo@loongson.cn>
+Cc:     Heiner Kallweit <hkallweit1@gmail.com>,
         Russell King <linux@armlinux.org.uk>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -25,76 +34,32 @@ To:     Andrew Lunn <andrew@lunn.ch>,
         Nick Desaulniers <ndesaulniers@google.com>,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kbuild@vger.kernel.org
-Cc:     zhuyinbo@loongson.cn
-Subject: [PATCH v1 1/2] modpost: file2alias: fixup mdio alias garbled code in modules.alias
-Date:   Mon, 22 Nov 2021 20:14:57 +0800
-Message-Id: <1637583298-20321-1-git-send-email-zhuyinbo@loongson.cn>
-X-Mailer: git-send-email 1.8.3.1
-X-CM-TRANSID: AQAAf9Dx79PDiZthKyUAAA--.851S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF1UAry5Ww47XF18Xr1xuFg_yoW8Jw17pF
-        W3K34a9FZ7GF47Wa1ru34DWr15G3ykJ3yrW3WjgF40qFZ8A3y0yF4SkF1rK34UAFykZa4Y
-        gw13uF98Ar1DWrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-        n2kIc2xKxwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvE
-        x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvj
-        DU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 52kx5xhqerqz5rrqw2lrqou0/
+Subject: Re: [PATCH v1 1/2] modpost: file2alias: fixup mdio alias garbled
+ code in modules.alias
+Message-ID: <YZukJBsf3qMOOK+Y@lunn.ch>
+References: <1637583298-20321-1-git-send-email-zhuyinbo@loongson.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1637583298-20321-1-git-send-email-zhuyinbo@loongson.cn>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-After module compilation, module alias mechanism will generate a ugly
-mdio modules alias configure if ethernet phy was selected, this patch
-is to fixup mdio alias garbled code.
+On Mon, Nov 22, 2021 at 08:14:57PM +0800, Yinbo Zhu wrote:
+> After module compilation, module alias mechanism will generate a ugly
+> mdio modules alias configure if ethernet phy was selected, this patch
+> is to fixup mdio alias garbled code.
+> 
+> In addition, that ugly alias configure will cause ethernet phy module
+> doens't match udev, phy module auto-load is fail, but add this patch
+> that it is well mdio driver alias configure match phy device uevent.
 
-In addition, that ugly alias configure will cause ethernet phy module
-doens't match udev, phy module auto-load is fail, but add this patch
-that it is well mdio driver alias configure match phy device uevent.
+What PHY do you have problems with? What is the PHY id and which
+driver should be loaded.
 
-Signed-off-by: Yinbo Zhu <zhuyinbo@loongson.cn>
----
- scripts/mod/file2alias.c | 17 +----------------
- 1 file changed, 1 insertion(+), 16 deletions(-)
+This code has existed a long time, so suddenly saying it is wrong and
+changing it needs a good explanation why it is wrong. Being ugly is
+not a good reason.
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 49aba86..5ba1039 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -1027,24 +1027,9 @@ static int do_platform_entry(const char *filename,
- static int do_mdio_entry(const char *filename,
- 			 void *symval, char *alias)
- {
--	int i;
- 	DEF_FIELD(symval, mdio_device_id, phy_id);
--	DEF_FIELD(symval, mdio_device_id, phy_id_mask);
--
- 	alias += sprintf(alias, MDIO_MODULE_PREFIX);
--
--	for (i = 0; i < 32; i++) {
--		if (!((phy_id_mask >> (31-i)) & 1))
--			*(alias++) = '?';
--		else if ((phy_id >> (31-i)) & 1)
--			*(alias++) = '1';
--		else
--			*(alias++) = '0';
--	}
--
--	/* Terminate the string */
--	*alias = 0;
--
-+	ADD(alias, "p", phy_id != 0, phy_id);
- 	return 1;
- }
- 
--- 
-1.8.3.1
-
+    Andrew
