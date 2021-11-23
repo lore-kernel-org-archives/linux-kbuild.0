@@ -2,87 +2,192 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7414C433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Nov 2021 13:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 021B3C433F5
+	for <linux-kbuild@archiver.kernel.org>; Tue, 23 Nov 2021 23:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236982AbhKWN5l (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 23 Nov 2021 08:57:41 -0500
-Received: from vps0.lunn.ch ([185.16.172.187]:47928 "EHLO vps0.lunn.ch"
+        id S233346AbhKWX46 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 23 Nov 2021 18:56:58 -0500
+Received: from mga05.intel.com ([192.55.52.43]:50219 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230026AbhKWN5l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Nov 2021 08:57:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-        s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-        Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-        In-Reply-To:References; bh=ylnmSm77t+ov3pgDOwOBhL1yIxfl6alYfbSXEakC9lc=; b=AX
-        GL/kI9xHo3D7y3w6QjLZ2pjSK1al8adOnbafDDaUw+NKGwMowXMy3H6J7E2/J4/CCygA1l1eBFiMB
-        j1HRwfF/Jj8bXoX06TSrxd3aSv9Fm9FHVeZpftOINr9reekzTKjCUFbzyNY6xu+tHo12Ffxx+tuB4
-        371C9sNaaRVSjk8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-        (envelope-from <andrew@lunn.ch>)
-        id 1mpWFd-00EPqc-MF; Tue, 23 Nov 2021 14:54:25 +0100
-Date:   Tue, 23 Nov 2021 14:54:25 +0100
-From:   Andrew Lunn <andrew@lunn.ch>
-To:     zhuyinbo <zhuyinbo@loongson.cn>
-Cc:     Heiner Kallweit <hkallweit1@gmail.com>, linux@armlinux.org.uk,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-        masahiroy@kernel.org, michal.lkml@markovi.net,
-        ndesaulniers@google.com
-Subject: Re: [PATCH v1 1/2] modpost: file2alias: fixup mdio alias garbled
- code in modules.alias
-Message-ID: <YZzykR2rcXnu/Hzx@lunn.ch>
-References: <1637583298-20321-1-git-send-email-zhuyinbo@loongson.cn>
- <YZukJBsf3qMOOK+Y@lunn.ch>
- <5b561d5f-d7ac-4d90-e69e-5a80a73929e0@loongson.cn>
- <YZxqLi7/JDN9mQoK@lunn.ch>
- <0a9e959a-bcd1-f649-b4cd-bd0f65fc71aa@loongson.cn>
+        id S233264AbhKWX45 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Nov 2021 18:56:57 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10177"; a="321397703"
+X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
+   d="scan'208";a="321397703"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2021 15:53:48 -0800
+X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
+   d="scan'208";a="509610560"
+Received: from pshinde-mobl.amr.corp.intel.com ([10.213.85.70])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2021 15:53:41 -0800
+Message-ID: <c5d1ee1f3b59bf18591a164c185650c77ec8aba7.camel@linux.intel.com>
+Subject: Re: [PATCH v2 12/63] thermal: intel: int340x_thermal: Use
+ struct_group() for memcpy() region
+From:   Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Zhang Rui <rui.zhang@intel.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "open list:NETWORKING DRIVERS (WIRELESS)" 
+        <linux-wireless@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Date:   Tue, 23 Nov 2021 15:53:38 -0800
+In-Reply-To: <CAJZ5v0iS3qMgdab1S-NzGfeLLXV=S6p5Qx8AaqJ50rsUngS=LA@mail.gmail.com>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+         <20210818060533.3569517-13-keescook@chromium.org>
+         <CAJZ5v0iS3qMgdab1S-NzGfeLLXV=S6p5Qx8AaqJ50rsUngS=LA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.0-1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0a9e959a-bcd1-f649-b4cd-bd0f65fc71aa@loongson.cn>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-> > > Hi Andrew,
-> > > 
-> > >  ��� Use default mdio configure, After module compilation, mdio alias configure
-> > > is following and it doesn't match
-> > > 
-> > >  ��� the match phy dev(mdio dev)� uevent, because the mdio alias configure
-> > > "0000000101000001000011111001????"� include "?" and
-> > A PHY ID generally break up into 3 parts.
+On Tue, 2021-11-23 at 14:19 +0100, Rafael J. Wysocki wrote:
+> On Wed, Aug 18, 2021 at 8:08 AM Kees Cook <keescook@chromium.org>
+> wrote:
 > > 
-> > The OUI of the manufacture.
-> > The device.
-> > The revision
+> > In preparation for FORTIFY_SOURCE performing compile-time and run-
+> > time
+> > field bounds checking for memcpy(), avoid intentionally writing
+> > across
+> > neighboring fields.
 > > 
-> > The ? means these bits don't matter. Those correspond to the
-> > revision. Generally, a driver can driver any revision of the PHY,
-> > which is why those bits don't matter.
+> > Use struct_group() in struct art around members weight, and ac[0-
+> > 9]_max,
+> > so they can be referenced together. This will allow memcpy() and
+> > sizeof()
+> > to more easily reason about sizes, improve readability, and avoid
+> > future
+> > warnings about writing beyond the end of weight.
 > > 
-> > So when a driver probes with the id 00000001010000010000111110010110
-> > we expect user space to find the best match, performing wildcard
-> > expansion. So the ? will match anything.
+> > "pahole" shows no size nor member offset changes to struct art.
+> > "objdump -d" shows no meaningful object code changes (i.e. only
+> > source
+> > line number induced differences).
 > > 
-> > Since this is worked for a long time, do you have an example where it
-> > is broken? If so, which PHY driver? If it is broken, no driver is
-> > loaded, or the wrong driver is loaded, i expect it is a bug in a
-> > specific driver. And we should fix that bug in the specific driver.
-> > 
-> >       Andrew
+> > Cc: Zhang Rui <rui.zhang@intel.com>
+> > Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> > Cc: Amit Kucheria <amitk@kernel.org>
+> > Cc: linux-pm@vger.kernel.org
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
 > 
-> Hi Andrew,
+> Rui, Srinivas, any comments here?
+Looks good.
+Reviewed-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+
+Thanks,
+Srinivas
+
 > 
-> The string like "0000000101000001000011111001????" dont't match any mdio driver, and i said it include "? that "?" doesn't match any driver, in addition that include Binary digit
-> like "0000000101000001000011111001", that binary digit doesn't match any driver, that should use Hexadecimal for phy id, and I test on some platform, not only a platform, it isn't some
-> specifi driver issue, it is gerneral issue. please you note.  that phy driver match phy device must use whole string "MODALIAS=xxxyyzz", not partial match.
+> > ---
+> >  .../intel/int340x_thermal/acpi_thermal_rel.c  |  5 +-
+> >  .../intel/int340x_thermal/acpi_thermal_rel.h  | 48 ++++++++++-------
+> > --
+> >  2 files changed, 29 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> > b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> > index a478cff8162a..e90690a234c4 100644
+> > --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> > +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> > @@ -250,8 +250,9 @@ static int fill_art(char __user *ubuf)
+> >                 get_single_name(arts[i].source,
+> > art_user[i].source_device);
+> >                 get_single_name(arts[i].target,
+> > art_user[i].target_device);
+> >                 /* copy the rest int data in addition to source and
+> > target */
+> > -               memcpy(&art_user[i].weight, &arts[i].weight,
+> > -                       sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
+> > +               BUILD_BUG_ON(sizeof(art_user[i].data) !=
+> > +                            sizeof(u64) * (ACPI_NR_ART_ELEMENTS -
+> > 2));
+> > +               memcpy(&art_user[i].data, &arts[i].data,
+> > sizeof(art_user[i].data));
+> >         }
+> > 
+> >         if (copy_to_user(ubuf, art_user, art_len))
+> > diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> > b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> > index 58822575fd54..78d942477035 100644
+> > --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> > +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> > @@ -17,17 +17,19 @@
+> >  struct art {
+> >         acpi_handle source;
+> >         acpi_handle target;
+> > -       u64 weight;
+> > -       u64 ac0_max;
+> > -       u64 ac1_max;
+> > -       u64 ac2_max;
+> > -       u64 ac3_max;
+> > -       u64 ac4_max;
+> > -       u64 ac5_max;
+> > -       u64 ac6_max;
+> > -       u64 ac7_max;
+> > -       u64 ac8_max;
+> > -       u64 ac9_max;
+> > +       struct_group(data,
+> > +               u64 weight;
+> > +               u64 ac0_max;
+> > +               u64 ac1_max;
+> > +               u64 ac2_max;
+> > +               u64 ac3_max;
+> > +               u64 ac4_max;
+> > +               u64 ac5_max;
+> > +               u64 ac6_max;
+> > +               u64 ac7_max;
+> > +               u64 ac8_max;
+> > +               u64 ac9_max;
+> > +       );
+> >  } __packed;
+> > 
+> >  struct trt {
+> > @@ -47,17 +49,19 @@ union art_object {
+> >         struct {
+> >                 char source_device[8]; /* ACPI single name */
+> >                 char target_device[8]; /* ACPI single name */
+> > -               u64 weight;
+> > -               u64 ac0_max_level;
+> > -               u64 ac1_max_level;
+> > -               u64 ac2_max_level;
+> > -               u64 ac3_max_level;
+> > -               u64 ac4_max_level;
+> > -               u64 ac5_max_level;
+> > -               u64 ac6_max_level;
+> > -               u64 ac7_max_level;
+> > -               u64 ac8_max_level;
+> > -               u64 ac9_max_level;
+> > +               struct_group(data,
+> > +                       u64 weight;
+> > +                       u64 ac0_max_level;
+> > +                       u64 ac1_max_level;
+> > +                       u64 ac2_max_level;
+> > +                       u64 ac3_max_level;
+> > +                       u64 ac4_max_level;
+> > +                       u64 ac5_max_level;
+> > +                       u64 ac6_max_level;
+> > +                       u64 ac7_max_level;
+> > +                       u64 ac8_max_level;
+> > +                       u64 ac9_max_level;
+> > +               );
+> >         };
+> >         u64 __data[ACPI_NR_ART_ELEMENTS];
+> >  };
+> > --
+> > 2.30.2
+> > 
 
-Please give a concrete example. Show us udev logs of it not working,
-it failing to find a match.
 
-	Andrew
