@@ -2,92 +2,111 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C6EC433FE
-	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Nov 2021 17:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6076CC433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Nov 2021 18:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346905AbhK2SBa (ORCPT
+        id S1348732AbhK2SOj (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 29 Nov 2021 13:01:30 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:40268 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345452AbhK2R7a (ORCPT
+        Mon, 29 Nov 2021 13:14:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236455AbhK2SMj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Nov 2021 12:59:30 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id CDC9ACE13C3;
-        Mon, 29 Nov 2021 17:56:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD2DC53FD0;
-        Mon, 29 Nov 2021 17:56:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638208569;
-        bh=lqJiiKekGdSFz0ooRlx6p12gniCHvJVjb280cnUkOVI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FTljZLxZHTdTwXKdiN3/LDqW+Iz2W21xldKn3X9Zw1ro+kM6cyQHo6KfQXP0mzevL
-         icvxQiPoWjTxVDla7lGkOtiomftwA05ocmRKZTcYgp+rQ0gZvNh5kz14ClYj/dGkdS
-         B2cKLDdhG4ne+f5oUElgvDxm3HxpKJgLtkZrNQeqW8+KJYBo9Tpuu7XGcP621DdP9b
-         mLCSK+uk56SyEuuVOw4ErcjZ+9ZbAypZ+AT5Jz2vuA/zVbW8js7Avd4PiBniVR+Bbr
-         Om+geqOaMnr43x/+ayitvhSlSfixG2oG9VsxvotvnTR1iptNrPOMD1ercEYp0+Vsrf
-         HmZqW+37wozgA==
-Date:   Mon, 29 Nov 2021 17:56:02 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     kernelci@groups.io, nathan@kernel.org
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Tom Stellard <tstellar@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jakub Kicinski <kuba@kernel.org>, cki-project@redhat.com,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH RFC 0/6] Bump minimum supported version of LLVM to 11.0.0
-Message-ID: <YaUUMn6noJQRXp1q@sirena.org.uk>
-References: <20211129165803.470795-1-nathan@kernel.org>
+        Mon, 29 Nov 2021 13:12:39 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 349FAC03AD7C
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Nov 2021 06:43:12 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id t19so35048747oij.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Nov 2021 06:43:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3mz1HPmHbMNrW+p+9eQAxOprfgUAji2Y3fPOhA732u0=;
+        b=UYFA5+Kj7tvA2GXd53dZLzAwlSi6l7w/hTEzJ3H8A+QSaBrwkIe8WweXjIbXj3BELl
+         eEBahNbVY5hxEA+m1Zsm/zHAH7vuo7iO9Gl/UAaFYO0N+uctB9MXeGvMxWld668gE72X
+         ZpkrPa3wLVOeRFpp9PUS3nuus8d3b2MdtaCDRllfNTF1MiJRcjnyweEdXOB+gejWKaba
+         rstv4lNGXUjQ1y0SH14O3YJdiUm9YqCn1bXP5QKKI+H7z3Pivs8/wkzEzplwbBGSVRfD
+         q6IFlC/cNjnDA+eV1n9jQaWwaWtoxvLRocDUtogezJf9caNQXvpLif2bT2/FBaAkE/GO
+         4eeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3mz1HPmHbMNrW+p+9eQAxOprfgUAji2Y3fPOhA732u0=;
+        b=c1AqOnVD20xEUw6+co8R5bn24AwbaOQ9kAmhZc0u8Zn8HkuorTQE3KQc17ncnsKAhC
+         NEYBYWe0qeaFQb7XVEHoL4sdfwbTYtOCFDuTPVLR6HDEG/5khAX6/kNhPV+/ud3G+3FQ
+         zQuzseUhC9DKQYpNxO8GITszIeuDQL6eJMcvB/HtT/tKYPiC4vd80YIN88Cn5ebdrk9i
+         awvqxKrl0VwV+zAQTX+/MdoXcNz0jc5Upg8vwOzG2vh0lEJXcj92tDybHgtpYjAtgqVr
+         rS240dLRghgFTLPmiPz4jGIwoBMxUi0+MBshWv/OHVgargb6ylZ/H2V6FuNNlbIoyNpL
+         hWsw==
+X-Gm-Message-State: AOAM5310q7SQtktBaUEmfIHRSP9YS6wrQZtQy6P/4gGrJHW3GE68tLZY
+        +QtujBfFsfzbN7EUWjE5dgIkXffG67KXoBLXTnyEqQ==
+X-Google-Smtp-Source: ABdhPJxzBms38b97VrAR+iOn0cM/VBioe+AWcYnISh3nXwb94CqvfvGOQZiwp9KrhWts1M5WTIvE6H8tN6RT2BjBeuQ=
+X-Received: by 2002:a05:6808:1903:: with SMTP id bf3mr41684658oib.7.1638196991401;
+ Mon, 29 Nov 2021 06:43:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="wC5KaXERvAzkp9VU"
-Content-Disposition: inline
-In-Reply-To: <20211129165803.470795-1-nathan@kernel.org>
-X-Cookie: Thank god!! ... It's HENNY YOUNGMAN!!
+References: <20211118081027.3175699-1-elver@google.com> <20211118081027.3175699-4-elver@google.com>
+ <YaSTn3JbkHsiV5Tm@boqun-archlinux> <YaSyGr4vW3yifWWC@elver.google.com> <YaTjJnl+Wc1qZbG/@boqun-archlinux>
+In-Reply-To: <YaTjJnl+Wc1qZbG/@boqun-archlinux>
+From:   Marco Elver <elver@google.com>
+Date:   Mon, 29 Nov 2021 15:42:59 +0100
+Message-ID: <CANpmjNMY7nhSq6aBLMusvbaMQ3LFJ=beHbDvbudg9B-NoFxEpA@mail.gmail.com>
+Subject: Re: [PATCH v2 03/23] kcsan: Avoid checking scoped accesses from
+ nested contexts
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     "Paul E. McKenney" <paulmck@kernel.org>,
+        Alexander Potapenko <glider@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Waiman Long <longman@redhat.com>,
+        Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+On Mon, 29 Nov 2021 at 15:27, Boqun Feng <boqun.feng@gmail.com> wrote:
+[...]
+> > This case is also possible:
+> >
+> >       static int v;
+> >       static int x;
+> >       int foo(..)
+> >       {
+> >               ASSERT_EXCLUSIVE_ACCESS_SCOPED(v);
+> >               x++; // preempted during watchpoint for 'v' after checking x++
+> >       }
+> >
+> > Here, all we need is for the scoped access to be checked after x++, end
+> > up with a watchpoint for it, then enter scheduler code, which then
+> > checked 'v', sees the conflicting watchpoint, and reports a nonsensical
+> > race again.
+> >
+>
+> Just to be clear, in both examples, the assumption is that 'v' is a
+> variable that scheduler code doesn't access, right? Because if scheduler
+> code does access 'v', then it's a problem that KCSAN should report. Yes,
+> I don't know any variable that scheduler exports, just to make sure
+> here.
 
---wC5KaXERvAzkp9VU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Right. We might miss such cases where an ASSERT_EXCLUSIVE*_SCOPED()
+could have pointed out a legitimate race with a nested context that
+share ctx, like in scheduler, where the only time to detect it is if
+some state change later in the scope makes a concurrent access
+possible from that point in the scope. I'm willing to bet that there's
+an extremely small chance we'll ever encounter such a case (famous
+last words ;-)), i.e. the initial check_access() in
+kcsan_begin_scoped_access() wouldn't detect it nor would the problem
+manifest as a regular data race.
 
-On Mon, Nov 29, 2021 at 09:57:57AM -0700, Nathan Chancellor wrote:
-> This patch series raises the minimum supported version of LLVM to
-> 11.0.0.
->=20
-> Patch #1 outlines the issue, goes over the potential impact of the
-> change, and does the actual bump. Subsequent patches clean up the
-> various checks that are always true after the bump.
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---wC5KaXERvAzkp9VU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGlFDEACgkQJNaLcl1U
-h9BjEwgAhdF9+7Ne92+Um8gDokv0S14rpQ9x/g0wU3cO0ktDZp5NMlriwkIG0FgQ
-jnV8PvO9oWWvkK9BFr7d1IXGV9ZK1tFyrU6UzuUrPejstZX7vi2NGI21SESCaitj
-OivGUpyOIMi0nsLYlDrvNojRKOh+bZwugAkJh5wGVy+tllvQAWiX8318K0YHipKT
-52IlJ15xt4S7A/RzqLBoGHklutUK0WnFZoEQ7INb4Sdja+KEUeCAIQyuIP7c5TG4
-H0Ys5k8PKegJ7c7u3wCXbBjwOKjz+WjBqzS1gSyILKBHMsBBy8tswwdZznPBceWl
-jMB8V10GZDzyA+N9cGCx/NlKyxZDiA==
-=CplQ
------END PGP SIGNATURE-----
-
---wC5KaXERvAzkp9VU--
+Thanks,
+-- Marco
