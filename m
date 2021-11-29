@@ -2,237 +2,160 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746E9C433EF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Nov 2021 16:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B319C433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Nov 2021 17:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345848AbhK2Qqh (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 29 Nov 2021 11:46:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39924 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242548AbhK2Qoh (ORCPT
+        id S242495AbhK2RGa (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 29 Nov 2021 12:06:30 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:51234 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230361AbhK2REa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Nov 2021 11:44:37 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B09C0AD152;
-        Mon, 29 Nov 2021 06:27:49 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id m5so17501779ilh.11;
-        Mon, 29 Nov 2021 06:27:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=CmdX7iVA88wv2FQ0G9icVb8l+LFoewmSUQ3H2Hqr1hY=;
-        b=aICLz5H2eaDTHAjyMX6zwpInhUjmtso2Mby1/mf7ZVAk5NHUvl81PfqUnEvvMTSGsJ
-         atHaFiUQkJfbceXvoRFeqcw2Rv+t3UgA1jx9fPLtnXGxAFMxLmQoSLjMd99fRYHVtk1N
-         kIi0RPnt/D4tB5bDrKrhLjdVBQkzPhacefs5SJvV1nvyXK+U2AkKzTjnQmP9FVzRSmst
-         mQlcHZbOPC8L20Z6jrTIYiFQfWEM+YCdZYVKjGMyXXKaJcPA5ydpGjOmI2FMmPGLDJ3s
-         qk/D1MQPQzKgnHIhUsoh08mT49vtX2xxAZYubuWXUs8TIkdJ5B/ErVwkK7FP1xuggHcE
-         yXwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CmdX7iVA88wv2FQ0G9icVb8l+LFoewmSUQ3H2Hqr1hY=;
-        b=Yy4F7h7MmwlALGVNKi//EldhFbToYFbfjge7LOgrDwsAI8s/y/6R8igDdAvZaimTWh
-         TIAaC+XhnlRwA8M1bZrH62q66XoZHm1PRgUfBcxN/abmJdQTIqEVi71+K+IGFLEaWcoJ
-         QkN4mldaWrdqRlV9PsPoowdyrFVgAWQxavdwP9xhZ/DODigk3hmiHwsCI9G2s3NZ1GJL
-         qeCowXWGzZqCClWaAAW/BtlpcfEzOqDEmqikYLsSvgZHZ6grWp2W6yvTvoAo6avmR364
-         /z8K8Vpclpt6cdKEfMY1bloT0wIZC6fI81Rcb2jm5c0GdSeWn2Yzj8zci0jhqnVBxGpU
-         2/lw==
-X-Gm-Message-State: AOAM532wv4RklCCk6niJE1BRi1r+SANToCRmRuGSd64hbnkiipjzkzUW
-        L9f9SFWmhTmH/EpsIZqujxQ=
-X-Google-Smtp-Source: ABdhPJyYdDkwGECXZ3EnuTu7M3T0UaxFiBNYjKBWQZcoLT1tC++Ij3DZmrvBsflI3jUl1N/BP1bzBg==
-X-Received: by 2002:a05:6e02:12ad:: with SMTP id f13mr54480526ilr.33.1638196068554;
-        Mon, 29 Nov 2021 06:27:48 -0800 (PST)
-Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
-        by smtp.gmail.com with ESMTPSA id q1sm11659103ilu.51.2021.11.29.06.27.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 06:27:47 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 241A527C005B;
-        Mon, 29 Nov 2021 09:27:45 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 29 Nov 2021 09:27:46 -0500
-X-ME-Sender: <xms:YOOkYbh7klpga0xeJMK_4SwVTmKU6LPR29j_DscfM78ixeu6h4PKrw>
-    <xme:YOOkYYAZHBFmYZqgwHwh-j4odpu4RgGSdwI09kQi7U9MD5mj_JUoPnsRdpvg1nknW
-    DIu9x_braHC8LsehQ>
-X-ME-Received: <xmr:YOOkYbEzQAF2kC-5DkjjAU0obgUm-mCim6bxgBlOhvIPzgMlMIt1SKyaum9Erg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrheelgdeihecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhunhcu
-    hfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtth
-    gvrhhnpedvleeigedugfegveejhfejveeuveeiteejieekvdfgjeefudehfefhgfegvdeg
-    jeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsoh
-    hquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedq
-    udejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmh
-    gvrdhnrghmvg
-X-ME-Proxy: <xmx:YOOkYYR01qDBRr85CjtjOZrPpgJRViyenu70Wmprvco913N1CuwtGQ>
-    <xmx:YOOkYYz48UXMSs2YbzHbPvJiXEtAnxd-5lQy9BmybCo-a4oDkKadNg>
-    <xmx:YOOkYe43SzcRZ_fbVwcVjStgzmEh-C_0jdWa9ubanIbdHGKWUgLqbw>
-    <xmx:YeOkYZrYWSDwVHvnUFjKja1KjCGpCtY0P9c-5rAScLj8JGF4XN2jaRlkXKQ>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 29 Nov 2021 09:27:44 -0500 (EST)
-Date:   Mon, 29 Nov 2021 22:26:46 +0800
-From:   Boqun Feng <boqun.feng@gmail.com>
-To:     Marco Elver <elver@google.com>
-Cc:     "Paul E. McKenney" <paulmck@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Waiman Long <longman@redhat.com>,
-        Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org
-Subject: Re: [PATCH v2 03/23] kcsan: Avoid checking scoped accesses from
- nested contexts
-Message-ID: <YaTjJnl+Wc1qZbG/@boqun-archlinux>
-References: <20211118081027.3175699-1-elver@google.com>
- <20211118081027.3175699-4-elver@google.com>
- <YaSTn3JbkHsiV5Tm@boqun-archlinux>
- <YaSyGr4vW3yifWWC@elver.google.com>
+        Mon, 29 Nov 2021 12:04:30 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 89F14615D7;
+        Mon, 29 Nov 2021 17:01:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B734C53FC7;
+        Mon, 29 Nov 2021 17:01:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638205272;
+        bh=ptC8NyT5DfcMR/qX2dnTn4fLGDCjkRgQFnE8IIO4UyA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EzP392fLrFLu9xn/LrEznBvsk8+ukD+0jgB81pDEkK4HZGLYwv5GFaa32UgUdDszO
+         rN2pnMYgfqJlSHBqTN6xH6BUAwthoONFKTp7WiFVN0z2nlDwva9MFbcqegntR6aNTH
+         3+ibOY2s/zUhgDm6VC/YYOWolAmDGOjc2Osu0dlWLU0o0gAY5td81RW2lrNO9Hr0aB
+         SIDUaFqdd0m5tPL3lESJzv47O1hn8ITfsMASB03ZZT5mkEkA0sqrkVXioXPUuzC+Fm
+         q/0fuYmcWJmRb+c60wYIYdtIIirTcPrt4pRAewiHs6Fw8Bf3js6iRh17nNaD6V5nzn
+         pgShxxJxyRw/w==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Tom Stellard <tstellar@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>, cki-project@redhat.com,
+        kernelci@groups.io, llvm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH RFC 1/6] Documentation: Raise the minimum supported version of LLVM to 11.0.0
+Date:   Mon, 29 Nov 2021 09:57:58 -0700
+Message-Id: <20211129165803.470795-2-nathan@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20211129165803.470795-1-nathan@kernel.org>
+References: <20211129165803.470795-1-nathan@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaSyGr4vW3yifWWC@elver.google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 11:57:30AM +0100, Marco Elver wrote:
-> On Mon, Nov 29, 2021 at 04:47PM +0800, Boqun Feng wrote:
-> > Hi Marco,
-> > 
-> > On Thu, Nov 18, 2021 at 09:10:07AM +0100, Marco Elver wrote:
-> > > Avoid checking scoped accesses from nested contexts (such as nested
-> > > interrupts or in scheduler code) which share the same kcsan_ctx.
-> > > 
-> > > This is to avoid detecting false positive races of accesses in the same
-> > 
-> > Could you provide an example for a false positive?
-> > 
-> > I think we do want to detect the following race:
-> > 
-> > 	static int v = SOME_VALUE; // a percpu variable.
-> > 	static int other_v = ... ;
-> > 
-> > 	void foo(..)
-> > 	{
-> > 		int tmp;
-> > 		int other_tmp;
-> > 
-> > 		preempt_disable();
-> > 		{
-> > 			ASSERT_EXCLUSIVE_ACCESSS_SCOPED(v);
-> > 			tmp = v;
-> > 			
-> > 			other_tmp = other_v; // int_handler() may run here
-> > 			
-> > 			v = tmp + 2;
-> > 		}
-> > 		preempt_enabled();
-> > 	}
-> > 
-> > 	void int_handler() // an interrupt handler
-> > 	{
-> > 		v++;
-> > 	}
-> > 
-> > , if I understand correctly, we can detect this currently, but with this
-> > patch, we cannot detect this if the interrupt happens while we're doing
-> > the check for "other_tmp = other_v;", right? Of course, running tests
-> > multiple times may eventually catch this, but I just want to understand
-> > what's this patch for, thanks!
-> 
-> The above will still be detected. Task and interrupt contexts in this
-> case are distinct, i.e. kcsan_ctx differ (see get_ctx()).
-> 
+LLVM versions prior to 11.0.0 have a harder time with dead code
+elimination, which can cause issues with commonly used expressions such
+as BUILD_BUG_ON and the bitmask functions/macros in bitfield.h (see the
+first two issues links below).
 
-Ok, I was missing that.
+Whenever there is an issue within LLVM that has been resolved in a later
+release, the only course of action is to gate the problematic
+configuration or source code on the toolchain verson or raise the
+minimum supported version of LLVM for building the kernel, as LLVM has a
+limited support lifetime compared to GCC. GCC major releases will
+typically see a few point releases across a two year period on average
+whereas LLVM major releases are only supported until the next major
+release and will only see one or two point releases within that
+timeframe. For example, GCC 8.1 was released in May 2018 and GCC 8.5 was
+released in May 2021, whereas LLVM 12.0.0 was released in April 2021 and
+its only point release, 12.0.1, was released in July 2021, giving a
+minimal window for fixes to be backported.
 
-> But there are rare cases where kcsan_ctx is shared, such as nested
-> interrupts (NMI?), or when entering scheduler code -- which currently
-> has a KCSAN_SANITIZE := n, but I occasionally test it, which is how I
-> found this problem. The problem occurs frequently when enabling KCSAN in
-> kernel/sched and placing a random ASSERT_EXCLUSIVE_ACCESS_SCOPED() in
-> task context, or just enable "weak memory modeling" without this fix.
-> You also need CONFIG_PREEMPT=y + CONFIG_KCSAN_INTERRUPT_WATCHER=y.
-> 
+To resolve these build errors around improper dead code elimination,
+raise the minimum supported version of LLVM for building the kernel to
+11.0.0. Doing so is a more proper solution than mucking around with core
+kernel macros that have always worked with GCC or disabling drivers for
+using these macros in a proper manner. This type of issue may continue
+to crop up and require patching, which creates more debt for bumping the
+minimum supported version in the future.
 
-Thanks for the background, it's now more clear that the problem is
-triggered ;-)
+This should have a minimal impact to distributions. Using a script to
+pull several different Docker images and check the output of
+'clang --version':
 
-> The emphasis here really is on _shared kcsan_ctx_, which is not too
-> common. As noted in the commit description, we need to "[...] setting up
-> a watchpoint for a non-scoped (normal) access that also "conflicts" with
-> a current scoped access."
-> 
-> Consider this:
-> 
-> 	static int v;
-> 	int foo(..)
-> 	{
-> 		ASSERT_EXCLUSIVE_ACCESS_SCOPED(v);
-> 		v++; // preempted during watchpoint for 'v++'
-> 	}
-> 
-> Here we set up a scoped_access to be checked for v. Then on v++, a
-> watchpoint is set up for the normal access. While the watchpoint is set
-> up, the task is preempted and upon entering scheduler code, we're still
-> in_task() and 'current' is still the same, thus get_ctx() returns a
-> kcsan_ctx where the scoped_accesses list is non-empty containing the
-> scoped access for foo()'s ASSERT_EXCLUSIVE.
-> 
-> That means, when instrumenting scheduler code or any other code called
-> by scheduler code or nested interrupts (anything where get_ctx() still
-> returns the same as parent context), it'd now perform checks based on
-> the parent context's scoped access, and because the parent context also
-> has a watchpoint set up on the variable that conflicts with the scoped
-> access we'd report a nonsensical race.
-> 
+archlinux:latest: clang version 13.0.0
 
-Agreed.
+debian:oldoldstable-slim: clang version 3.8.1-24 (tags/RELEASE_381/final)
+debian:oldstable-slim: clang version 7.0.1-8+deb10u2 (tags/RELEASE_701/final)
+debian:stable-slim: Debian clang version 11.0.1-2
+debian:testing-slim: Debian clang version 11.1.0-4
+debian:unstable-slim: Debian clang version 11.1.0-4
 
-> This case is also possible:
-> 
-> 	static int v;
-> 	static int x;
-> 	int foo(..)
-> 	{
-> 		ASSERT_EXCLUSIVE_ACCESS_SCOPED(v);
-> 		x++; // preempted during watchpoint for 'v' after checking x++
-> 	}
-> 
-> Here, all we need is for the scoped access to be checked after x++, end
-> up with a watchpoint for it, then enter scheduler code, which then
-> checked 'v', sees the conflicting watchpoint, and reports a nonsensical
-> race again.
-> 
+fedora:34: clang version 12.0.1 (Fedora 12.0.1-1.fc34)
+fedora:latest: clang version 13.0.0 (Fedora 13.0.0-3.fc35)
+fedora:rawhide: clang version 13.0.0 (Fedora 13.0.0-5.fc36)
 
-Just to be clear, in both examples, the assumption is that 'v' is a
-variable that scheduler code doesn't access, right? Because if scheduler
-code does access 'v', then it's a problem that KCSAN should report. Yes,
-I don't know any variable that scheduler exports, just to make sure
-here.
+opensuse/leap:15.2: clang version 9.0.1
+opensuse/leap:latest: clang version 11.0.1
+opensuse/tumbleweed:latest: clang version 13.0.0
 
-> By disallowing scoped access checking for a kcsan_ctx, we simply make
-> sure that in such nested contexts where kcsan_ctx is shared, none of
-> these nonsensical races would be detected nor reported.
-> 
-> Hopefully that clarifies what this is about.
-> 
+ubuntu:bionic: clang version 6.0.0-1ubuntu2 (tags/RELEASE_600/final)
+ubuntu:latest: clang version 10.0.0-4ubuntu1
+ubuntu:hirsute: Ubuntu clang version 12.0.0-3ubuntu1~21.04.2
+ubuntu:rolling: Ubuntu clang version 13.0.0-2
+ubuntu:devel: Ubuntu clang version 13.0.0-9
 
-Make sense to me, thanks.
+In every case, the distribution's version of clang is either older than
+the current minimum supported version of LLVM 10.0.1 or equal to or
+greater than the proposed 11.0.0 so nothing should change.
 
-Regards,
-Boqun
+Another benefit of this change is LLVM=1 works better with arm64 and
+x86_64 since commit f12b034afeb3 ("scripts/Makefile.clang: default to
+LLVM_IAS=1") enabled the integrated assembler by default, which only
+works well with clang 11+ (clang-10 required it to be disabled to
+successfully build a kernel).
 
-> Thanks,
-> -- Marco
+Link: https://github.com/ClangBuiltLinux/linux/issues/1293
+Link: https://github.com/ClangBuiltLinux/linux/issues/1506
+Link: https://github.com/ClangBuiltLinux/linux/issues/1511
+Link: https://github.com/llvm/llvm-project/commit/fa496ce3c6774097080c8a9cb808da56f383b938
+Link: https://groups.google.com/g/clang-built-linux/c/mPQb9_ZWW0s/m/W7o6S-QTBAAJ
+Link: https://github.com/ClangBuiltLinux/misc-scripts
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ Documentation/process/changes.rst | 2 +-
+ scripts/min-tool-version.sh       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
+index b398b8576417..17182b537141 100644
+--- a/Documentation/process/changes.rst
++++ b/Documentation/process/changes.rst
+@@ -30,7 +30,7 @@ you probably needn't concern yourself with pcmciautils.
+         Program        Minimal version       Command to check the version
+ ====================== ===============  ========================================
+ GNU C                  5.1              gcc --version
+-Clang/LLVM (optional)  10.0.1           clang --version
++Clang/LLVM (optional)  11.0.0           clang --version
+ GNU make               3.81             make --version
+ binutils               2.23             ld -v
+ flex                   2.5.35           flex --version
+diff --git a/scripts/min-tool-version.sh b/scripts/min-tool-version.sh
+index 4edc708baa63..7c20252a90c6 100755
+--- a/scripts/min-tool-version.sh
++++ b/scripts/min-tool-version.sh
+@@ -28,7 +28,7 @@ llvm)
+ 	if [ "$SRCARCH" = s390 ]; then
+ 		echo 13.0.0
+ 	else
+-		echo 10.0.1
++		echo 11.0.0
+ 	fi
+ 	;;
+ *)
+-- 
+2.34.1
+
