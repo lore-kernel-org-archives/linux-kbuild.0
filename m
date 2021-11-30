@@ -2,57 +2,57 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF60C43217
-	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F14C43217
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241126AbhK3LuQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 30 Nov 2021 06:50:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45064 "EHLO
+        id S241020AbhK3LuS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:50:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241176AbhK3Ltm (ORCPT
+        with ESMTP id S235630AbhK3Ltu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:49:42 -0500
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B15DC061373
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:01 -0800 (PST)
-Received: by mail-wr1-x449.google.com with SMTP id u4-20020a5d4684000000b0017c8c1de97dso3521818wrq.16
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:00 -0800 (PST)
+        Tue, 30 Nov 2021 06:49:50 -0500
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF54C0619D3
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:05 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id l6-20020a05600c4f0600b0033321934a39so12691518wmq.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=1F+MofKXejp7ry8lfe8Rm0bUxzdx8s4N4hiT9E57RpU=;
-        b=AxG+zGUAuQz1+vXIOQ6DG6QRjOq3T51cJb6xki7f4JHpONQpFZJx8GE/b7CRWzPCsG
-         OLRaS1SxhNRItDJ+4oOUU5VmP/nYksafcZlT3TVFS1SWFBK3vno6Gg3Jm9z1cK6Zuest
-         ui1H7XkT5tngcQHFEK6CC8n6Ghp1ypFOZCz94aNFgLZvN+GCnNenOMRE9+mty4qRXv1N
-         2qGht/8T/o21I4oyxH8o4aKxIfvvRVeX0nUK1yVoam9e7llKFicSRQUZiaWijAt560uq
-         Dg7b5UU9ZIUcjYU29xL3ofX78AIwM6oIKYpH7LDX2euCle6y9eO4jBbsvtISE16oErOr
-         I/ag==
+        bh=ykQMG7f7HitTY02bjgroWOqQwac8nTYOVAZLqTXm/og=;
+        b=qfKYXOVzY2MTzD2zIwUpOpLCYIanN5AfAyzY4pD6y/00NCNsZhMgCXyQuHgqHRjMQP
+         2Q4GpB2kKiA9NG+mxwbdwhx/T6uztpsr0cPDZKwOOV4NBkpo8wKmqUMwj6QIZ50+WTGC
+         rj+XujQ6x15SViviNrLc8ryKZTpDmfQ59NmqPKusALt7vIXW09vUdxRhx/IHgX0O1Fi0
+         peXM6+tWJqwR46RttMZspmzxuv6mgkZjTPQRNEx0+Evh/SfhzkOebPUPea948l/PAD60
+         8d8gkegUNMa+NHH1FPVvEqF67z8VdDW4GAXutQLRg58SDKDe/Mh9BClDvEsEpsff6SiM
+         sbTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=1F+MofKXejp7ry8lfe8Rm0bUxzdx8s4N4hiT9E57RpU=;
-        b=e3BiaIX5m2qItElmuyO4KLXpniTi/tHmijmK5S/NMFNAaQxdY5ijNMU0tervrQjoWU
-         R0nXq6ST+M1QJOuKJzwfu44Q82a3zuMiCIPte+NbIhSElXZQSipQ/v+FZwWPm1mZNX6J
-         b3S80sCsobMsmfirnG+b14cqelvOAuzYCQjxlUHE+YUSyBvJ9E9f7i6Yzo6tIjs/QCJd
-         aEFnksZkl7FGxE7u2BVuToxKlH4BEwYndHsRx7U+n9FvlWetXdor2Ug1QW3XHIaJ/8/c
-         dJ24Aqiu+lUFv7aXCoRLsamjIXFjxjcZ28AZ5K4XKqm3NUWsJ2dTrE/WQ+u3W7TeQiB7
-         IQhg==
-X-Gm-Message-State: AOAM531EWuwJhSSjp2BKA4+VJDrWkQgJuvACr9OwEmnOK3jQX9Qg5EvX
-        jBrefm1pE+kzVnAemaau8R451CeQYA==
-X-Google-Smtp-Source: ABdhPJyPWvl8zulDnZGqXZ4CGIOsIfQU/gfUk/ZE53ZBn+QfJqlzKFrFzo/IqOCXSYJaXQPpXS6SD3dG+A==
+        bh=ykQMG7f7HitTY02bjgroWOqQwac8nTYOVAZLqTXm/og=;
+        b=P3Jn9ONUCDaeFAX+RXXYaxK3tOJZ7KRhM9xoAoWPQhGqv2yjtvJAuxVrkD8Lhlgr1t
+         JlUpE7QdSi1lSD4MRUCt76jlXfzUuS9o+5WUfspNx+8culs5zWFrKgOIGdhf9evspRkW
+         ra99ThNorLC9JnY5EvLxEPCyo0qrS0IVn1V5gp3Gdpz8mPfRWlUKTnUlo3cg/CSOexk/
+         eXy64geDzXHnXim4ldZ/c1nsCXf3b5MCFLNpvxWIbj/MVwZZ7hzpwKDVym6b/v0sCCXw
+         ovPFJlHbblIJeFL6k9/Vvsqbv3x6w7KiM507zfxjox9PNANSyyf6HPtjYbCHOljf+645
+         WMFw==
+X-Gm-Message-State: AOAM5325RKGyuRBp/5znGDrxKP/b9Rc7orT1SuGrIABQjElcF78v0Gfc
+        xQfZzv4roicJHwA82G7o5YXUCOtFkw==
+X-Google-Smtp-Source: ABdhPJw6whH8Hls3EC+BgAy91BvIDfMtsebOG9cJCkHwE7EfRIVxArLwzYtCPhRhlBjkro/EFip+BpGtoQ==
 X-Received: from elver.muc.corp.google.com ([2a00:79e0:15:13:86b7:11e9:7797:99f0])
- (user=elver job=sendgmr) by 2002:a05:600c:1d1b:: with SMTP id
- l27mr624656wms.1.1638272759191; Tue, 30 Nov 2021 03:45:59 -0800 (PST)
-Date:   Tue, 30 Nov 2021 12:44:31 +0100
+ (user=elver job=sendgmr) by 2002:a05:600c:4f0b:: with SMTP id
+ l11mr626212wmq.0.1638272763966; Tue, 30 Nov 2021 03:46:03 -0800 (PST)
+Date:   Tue, 30 Nov 2021 12:44:33 +0100
 In-Reply-To: <20211130114433.2580590-1-elver@google.com>
-Message-Id: <20211130114433.2580590-24-elver@google.com>
+Message-Id: <20211130114433.2580590-26-elver@google.com>
 Mime-Version: 1.0
 References: <20211130114433.2580590-1-elver@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 23/25] objtool, kcsan: Remove memory barrier
- instrumentation from noinstr
+Subject: [PATCH v3 25/25] kcsan: Support WEAK_MEMORY with Clang where no
+ objtool support exists
 From:   Marco Elver <elver@google.com>
 To:     elver@google.com, "Paul E. McKenney" <paulmck@kernel.org>
 Cc:     Alexander Potapenko <glider@google.com>,
@@ -67,113 +67,83 @@ Cc:     Alexander Potapenko <glider@google.com>,
         Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com,
         linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, llvm@lists.linux.dev, x86@kernel.org,
-        Josh Poimboeuf <jpoimboe@redhat.com>
+        linux-mm@kvack.org, llvm@lists.linux.dev, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Teach objtool to turn instrumentation required for memory barrier
-modeling into nops in noinstr text.
+Clang and GCC behave a little differently when it comes to the
+__no_sanitize_thread attribute, which has valid reasons, and depending
+on context either one could be right.
 
-The __tsan_func_entry/exit calls are still emitted by compilers even
-with the __no_sanitize_thread attribute. The memory barrier
-instrumentation will be inserted explicitly (without compiler help), and
-thus needs to also explicitly be removed.
+Traditionally, user space ThreadSanitizer [1] still expects instrumented
+builtin atomics (to avoid false positives) and __tsan_func_{entry,exit}
+(to generate meaningful stack traces), even if the function has the
+attribute no_sanitize("thread").
+
+[1] https://clang.llvm.org/docs/ThreadSanitizer.html#attribute-no-sanitize-thread
+
+GCC doesn't follow the same policy (for better or worse), and removes
+all kinds of instrumentation if no_sanitize is added. Arguably, since
+this may be a problem for user space ThreadSanitizer, we expect this may
+change in future.
+
+Since KCSAN != ThreadSanitizer, the likelihood of false positives even
+without barrier instrumentation everywhere, is much lower by design.
+
+At least for Clang, however, to fully remove all sanitizer
+instrumentation, we must add the disable_sanitizer_instrumentation
+attribute, which is available since Clang 14.0.
 
 Signed-off-by: Marco Elver <elver@google.com>
-Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
 v3:
-* s/removable_instr/profiling_func/ (suggested by Josh Poimboeuf)
-* s/__kcsan_(mb|wmb|rmb|release)/__atomic_signal_fence/, because
-  Clang < 14.0 will still emit these in noinstr even with __no_kcsan.
-* Fix and add more comments.
-
-v2:
-* Rewrite after rebase to v5.16-rc1.
+* New patch.
 ---
- tools/objtool/check.c               | 37 ++++++++++++++++++++++++-----
- tools/objtool/include/objtool/elf.h |  2 +-
- 2 files changed, 32 insertions(+), 7 deletions(-)
+ include/linux/compiler_types.h | 13 ++++++++++++-
+ lib/Kconfig.kcsan              |  2 +-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/tools/objtool/check.c b/tools/objtool/check.c
-index 61dfb66b30b6..a9a1f7259d62 100644
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -1072,11 +1072,11 @@ static void annotate_call_site(struct objtool_file *file,
- 	}
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 1d32f4c03c9e..3c1795fdb568 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -198,9 +198,20 @@ struct ftrace_likely_data {
+ # define __no_kasan_or_inline __always_inline
+ #endif
  
- 	/*
--	 * Many compilers cannot disable KCOV with a function attribute
--	 * so they need a little help, NOP out any KCOV calls from noinstr
--	 * text.
-+	 * Many compilers cannot disable KCOV or sanitizer calls with a function
-+	 * attribute so they need a little help, NOP out any such calls from
-+	 * noinstr text.
- 	 */
--	if (insn->sec->noinstr && sym->kcov) {
-+	if (insn->sec->noinstr && sym->profiling_func) {
- 		if (reloc) {
- 			reloc->type = R_NONE;
- 			elf_write_reloc(file->elf, reloc);
-@@ -1991,6 +1991,31 @@ static int read_intra_function_calls(struct objtool_file *file)
- 	return 0;
- }
- 
+-#define __no_kcsan __no_sanitize_thread
+ #ifdef __SANITIZE_THREAD__
 +/*
-+ * Return true if name matches an instrumentation function, where calls to that
-+ * function from noinstr code can safely be removed, but compilers won't do so.
++ * Clang still emits instrumentation for __tsan_func_{entry,exit}() and builtin
++ * atomics even with __no_sanitize_thread (to avoid false positives in userspace
++ * ThreadSanitizer). The kernel's requirements are stricter and we really do not
++ * want any instrumentation with __no_kcsan.
++ *
++ * Therefore we add __disable_sanitizer_instrumentation where available to
++ * disable all instrumentation. See Kconfig.kcsan where this is mandatory.
 + */
-+static bool is_profiling_func(const char *name)
-+{
-+	/*
-+	 * Many compilers cannot disable KCOV with a function attribute.
-+	 */
-+	if (!strncmp(name, "__sanitizer_cov_", 16))
-+		return true;
-+
-+	/*
-+	 * Some compilers currently do not remove __tsan_func_entry/exit nor
-+	 * __tsan_atomic_signal_fence (used for barrier instrumentation) with
-+	 * the __no_sanitize_thread attribute, remove them. Once the kernel's
-+	 * minimum Clang version is 14.0, this can be removed.
-+	 */
-+	if (!strncmp(name, "__tsan_func_", 12) ||
-+	    !strcmp(name, "__tsan_atomic_signal_fence"))
-+		return true;
-+
-+	return false;
-+}
-+
- static int classify_symbols(struct objtool_file *file)
- {
- 	struct section *sec;
-@@ -2011,8 +2036,8 @@ static int classify_symbols(struct objtool_file *file)
- 			if (!strcmp(func->name, "__fentry__"))
- 				func->fentry = true;
++# define __no_kcsan __no_sanitize_thread __disable_sanitizer_instrumentation
+ # define __no_sanitize_or_inline __no_kcsan notrace __maybe_unused
++#else
++# define __no_kcsan
+ #endif
  
--			if (!strncmp(func->name, "__sanitizer_cov_", 16))
--				func->kcov = true;
-+			if (is_profiling_func(func->name))
-+				func->profiling_func = true;
- 		}
- 	}
- 
-diff --git a/tools/objtool/include/objtool/elf.h b/tools/objtool/include/objtool/elf.h
-index cdc739fa9a6f..d22336781401 100644
---- a/tools/objtool/include/objtool/elf.h
-+++ b/tools/objtool/include/objtool/elf.h
-@@ -58,7 +58,7 @@ struct symbol {
- 	u8 static_call_tramp : 1;
- 	u8 retpoline_thunk   : 1;
- 	u8 fentry            : 1;
--	u8 kcov              : 1;
-+	u8 profiling_func    : 1;
- 	struct list_head pv_target;
- };
- 
+ #ifndef __no_sanitize_or_inline
+diff --git a/lib/Kconfig.kcsan b/lib/Kconfig.kcsan
+index e4394ea8068b..63b70b8c5551 100644
+--- a/lib/Kconfig.kcsan
++++ b/lib/Kconfig.kcsan
+@@ -198,7 +198,7 @@ config KCSAN_WEAK_MEMORY
+ 	# We can either let objtool nop __tsan_func_{entry,exit}() and builtin
+ 	# atomics instrumentation in .noinstr.text, or use a compiler that can
+ 	# implement __no_kcsan to really remove all instrumentation.
+-	depends on STACK_VALIDATION || CC_IS_GCC
++	depends on STACK_VALIDATION || CC_IS_GCC || CLANG_VERSION >= 140000
+ 	help
+ 	  Enable support for modeling a subset of weak memory, which allows
+ 	  detecting a subset of data races due to missing memory barriers.
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
