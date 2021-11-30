@@ -2,125 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6F8C433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Nov 2021 23:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 346E4C433F5
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 08:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235962AbhK2XHC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 29 Nov 2021 18:07:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236608AbhK2XFA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Nov 2021 18:05:00 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AEEDC047CC3
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Nov 2021 10:31:01 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id f18so47090292lfv.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Nov 2021 10:31:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3cNMSwt45ock9pSAjkXBM1gUWmDWeBPaQRr1gZTZ0gI=;
-        b=Is26+2qi06IhBeX6mUmRAomd6VgRCRKKQEkHS/ElA8ydGNoR3lIDA0vLJqdmMMwIsz
-         VHwNDGTPz1lEon4iVKImIQZ3rVE+KecLBIY4sHTSFYfiI7MVlgWIlYFpnHfD2O+5IOqX
-         oaTmAiEXdKL4ZK56UuLk7bl/wP1+PzqVenx1m2edYaqq636bJjmxLXB6a+veiwKWiEdZ
-         fMd7ZXDe+R7pkUL7V0UVbd1S3zZeIgmjRX7ve2BG+l67WhSOjZ0yeBwy6JzO/ZG72TUX
-         6tXA5Uv7gzT2CaxdF44j6IiNqpvQp+NqFk58+O4MoIfRT8rZCB7BxNlYCMyWLftQaMAb
-         RShw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3cNMSwt45ock9pSAjkXBM1gUWmDWeBPaQRr1gZTZ0gI=;
-        b=JuLa6TLEaMiB9R9JwS81fVCb6dIoaLjCwwVvrmmFQ/hf0VoHcMjfHDdachi5Lbr9+/
-         IEi2JDc91m67IsArhE2TIG0Ch1s4yi9hsOMy6a/ItyGVedYWqDMsmUaZAOCE+owoTMk6
-         GMS19R7jOm/lAu/n/1GoyIHqoEvlM+IAT98iUu8Wi2Gp8NxdkifjQdD0+1ZMzymW3cOK
-         S2VtWyS4cryWOCE0IqO/NA2OxRXODzA19hwzG0opI70PWKLBud2+tS9B5yeGhnM01Fa4
-         RxaoG7P4MSmd8pnG1+thSSxWHJu6asDClGiXIIXEcrnNU1n2gt5VGTnl8EhrFd2LE7By
-         LAfw==
-X-Gm-Message-State: AOAM533EmBMdOhBVXvr5bOGQEbo6XjAnNMLNV9qgNjQ7I9PMzRP4+/aC
-        qvjOUH08SAr2NtrkHtyJhtcHnQow6W/dGwhjuHB+gg==
-X-Google-Smtp-Source: ABdhPJz6dTs7OIKfCj9AdUmQMX4Sqh7ZuZ9v3AsgeE+6RyGPUJnSXVhzX8RTGetchysB6Qz1lZmbh9+C1lZNlb2Cm80=
-X-Received: by 2002:a05:6512:607:: with SMTP id b7mr50143383lfe.489.1638210659100;
- Mon, 29 Nov 2021 10:30:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20211129165803.470795-1-nathan@kernel.org>
-In-Reply-To: <20211129165803.470795-1-nathan@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 29 Nov 2021 10:30:48 -0800
-Message-ID: <CAKwvOdn9o+5TfauYr+ZDngTZEDxVRQka1T3vOEoE=ByFg=n5=w@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/6] Bump minimum supported version of LLVM to 11.0.0
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
+        id S234249AbhK3IZy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Nov 2021 03:25:54 -0500
+Received: from mail.loongson.cn ([114.242.206.163]:39886 "EHLO loongson.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229951AbhK3IZw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 30 Nov 2021 03:25:52 -0500
+Received: from localhost.localdomain.localdomain (unknown [10.2.5.46])
+        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dxz8on36Vhh7UBAA--.4073S3;
+        Tue, 30 Nov 2021 16:22:06 +0800 (CST)
+From:   Yinbo Zhu <zhuyinbo@loongson.cn>
+To:     Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Tom Stellard <tstellar@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jakub Kicinski <kuba@kernel.org>, cki-project@redhat.com,
-        kernelci@groups.io, llvm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Cc:     zhuyinbo@loongson.cn
+Subject: [PATCH v3 2/2] net: mdio: rework mdio_uevent for mdio ethernet phy device
+Date:   Tue, 30 Nov 2021 16:21:57 +0800
+Message-Id: <1638260517-13634-2-git-send-email-zhuyinbo@loongson.cn>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1638260517-13634-1-git-send-email-zhuyinbo@loongson.cn>
+References: <1638260517-13634-1-git-send-email-zhuyinbo@loongson.cn>
+X-CM-TRANSID: AQAAf9Dxz8on36Vhh7UBAA--.4073S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw48GF15Arykuw48Zr4Utwb_yoW8CFy5pF
+        4rJFyrtrWjgr47Wwn5C3yDWF1a9397K397GryF9wsY9rs8AryDXFyftFy29r13AFW8u3W7
+        ta4vqr18ua4DJa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPm14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1l
+        e2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI
+        8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwAC
+        jcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0x
+        kIwI1lc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I
+        3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxV
+        WUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8I
+        cVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aV
+        AFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZE
+        Xa7VUjLL07UUUUU==
+X-CM-SenderInfo: 52kx5xhqerqz5rrqw2lrqou0/
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 9:01 AM Nathan Chancellor <nathan@kernel.org> wrote:
->
-> This patch series raises the minimum supported version of LLVM to
-> 11.0.0.
->
-> Patch #1 outlines the issue, goes over the potential impact of the
-> change, and does the actual bump. Subsequent patches clean up the
-> various checks that are always true after the bump.
->
-> I have marked this revision as RFC to give various parties the option to
-> comment on this bump before it is done, namely KernelCI and Linaro's
-> LKFT, who are still testing clang-10. I have added some other folks to
-> CC that I know are testing with clang to see if this impacts them in any
-> way (as I would like to impact as few people as possible) but as far as
-> I am aware, most other CIs and developers are testing closer to tip of
-> tree. If that is not true, scream so that we can see what can be done
-> about that. If I missed anyone who is actively testing with clang,
-> please key them in and I will make sure to include them in future
-> revisions (if any are needed).
->
-> It probably makes sense for this series to live in -mm.
+The of_device_uevent_modalias is service for 'of' type platform driver
+, which ask the first args must be 'of' that use MODULE_DEVICE_TABLE
+when driver was exported, but ethernet phy is a kind of 'mdio' type
+device and it is inappropriate if driver use 'of' type for exporting,
+in fact, most mainstream ethernet phy driver hasn't used 'of' type,
+even though phy driver was exported use 'of' type and it's irrelevant
+with mdio_uevent, at this time, platform_uevent was responsible for
+reporting uevent to match modules.alias configure, so, whatever that
+of_device_uevent_modalias was unnecessary, this patch was to remove it
+and add phy_id as modio uevent then ethernet phy module auto load
+function will work well.
 
-Series looks good to me. Thanks for the patch, and cleanups!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Yinbo Zhu <zhuyinbo@loongson.cn>
+---
+Change in v3:
+		Rework the patch commit log information.
 
->
-> Nathan Chancellor (6):
->   Documentation: Raise the minimum supported version of LLVM to 11.0.0
->   mm, slab: Remove compiler check in __kmalloc_index
->   arch/Kconfig: Remove CLANG_VERSION check in HAS_LTO_CLANG
->   Revert "ARM: 9070/1: Make UNWINDER_ARM depend on ld.bfd or ld.lld
->     11.0.0+"
->   gcov: Remove compiler version check
->   init/Kconfig: Drop linker version check for LD_ORPHAN_WARN
->
->  Documentation/process/changes.rst | 2 +-
->  arch/Kconfig                      | 3 +--
->  arch/arm/Kconfig.debug            | 2 --
->  include/linux/slab.h              | 3 +--
->  init/Kconfig                      | 1 -
->  kernel/gcov/Kconfig               | 1 -
->  scripts/min-tool-version.sh       | 2 +-
->  7 files changed, 4 insertions(+), 10 deletions(-)
->
->
-> base-commit: d58071a8a76d779eedab38033ae4c821c30295a5
-> --
-> 2.34.1
->
->
+ drivers/net/phy/mdio_bus.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 6865d93..999f0d4 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -962,12 +962,12 @@ static int mdio_bus_match(struct device *dev, struct device_driver *drv)
+ 
+ static int mdio_uevent(struct device *dev, struct kobj_uevent_env *env)
+ {
+-	int rc;
++	struct phy_device *pdev;
+ 
+-	/* Some devices have extra OF data and an OF-style MODALIAS */
+-	rc = of_device_uevent_modalias(dev, env);
+-	if (rc != -ENODEV)
+-		return rc;
++	pdev = to_phy_device(dev);
++
++	if (add_uevent_var(env, "MODALIAS=mdio:p%08X", pdev->phy_id))
++		return -ENOMEM;
+ 
+ 	return 0;
+ }
+@@ -991,7 +991,7 @@ static int mdio_uevent(struct device *dev, struct kobj_uevent_env *env)
+ };
+ 
+ struct bus_type mdio_bus_type = {
+-	.name		= "mdio_bus",
++	.name		= "mdio",
+ 	.dev_groups	= mdio_bus_dev_groups,
+ 	.match		= mdio_bus_match,
+ 	.uevent		= mdio_uevent,
 -- 
-Thanks,
-~Nick Desaulniers
+1.8.3.1
+
