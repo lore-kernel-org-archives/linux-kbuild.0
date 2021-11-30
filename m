@@ -2,56 +2,56 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CE9C4321E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E703C433FE
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241181AbhK3LuZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 30 Nov 2021 06:50:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45312 "EHLO
+        id S241267AbhK3Lu0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:50:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241154AbhK3Ltj (ORCPT
+        with ESMTP id S241264AbhK3Ltm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:49:39 -0500
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC64EC06175E
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:45:55 -0800 (PST)
-Received: by mail-wr1-x449.google.com with SMTP id q7-20020adff507000000b0017d160d35a8so3531019wro.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:45:55 -0800 (PST)
+        Tue, 30 Nov 2021 06:49:42 -0500
+Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06040C06137B
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:03 -0800 (PST)
+Received: by mail-wm1-x349.google.com with SMTP id p12-20020a05600c1d8c00b0033a22e48203so12699586wms.6
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=SnYVQxLC6YSHg0QBspCa3KEICf+BvvptqJyS2cHTmDQ=;
-        b=YAPrqaSvFXPKIyChd2B9G/mC+V4Jc4D9Ysa+dt9+gyWoCPV+nRINqJd57Duo402ra3
-         fACCmxrugjWDUChLO48YEakWmtgKIBS2NenkgfzdEIUaFeOLMeRRLt3y3O0O8m42KVyP
-         EYZTlGjECGMCo3XeJTyzQ9huKYBCMEUzAAG6gZ+6TrfzQbi+hkq/C1sNW9Osl71l2q00
-         KnvJkh1XBMAWo2p+iVXz1ZScDqJ9cYV8qalOkG24HTG/65Ii8z7IiAdL8qvRMC2Opkvc
-         XOyIIRR2dMM8QMdcIa4mT34J5n4EmvIPm98FB4otkGxOdejNKSt9f8kvehv1Vt3mjuJX
-         t2wA==
+        bh=hHpI+TkJP++fcdc46vUsOPoUrJOI1E0VxBDtAT4JUtM=;
+        b=ZydYBw/EQptiAQjTJgW8VFb6M+tj/jnOJSKAzEOo9ttb4/prBXxenHyAcxKFnhYPtG
+         yxkoZSjdkoQwGFG90n0H+8xMHAoecs8kp2mS+zTaZsYuo/VXrNHwT1dCCGqN+qd2xKqO
+         A4acfRlS2z6HmsLoxx1UolNjWfJ2+Ztsu6wU/VCsHuubkWa6zG7vvPdxEtYFrhi/J/x1
+         SgdPBckdgJ9qE7I2ZNNnAqkYt2+gpBZ+AartGApj/044P+zkOJcXZg2hjzRL7no/XtPz
+         MihwHIfIAQnWjB96wkXuEnhFMgqyeDJ1+RyraL9HQrgcKqeYe6aB+N/OeDIQjy/DWPFQ
+         OLpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=SnYVQxLC6YSHg0QBspCa3KEICf+BvvptqJyS2cHTmDQ=;
-        b=uYMO3EaWnFZdqoEpN1b10gWPJVwYTPp7Wxke1USeLahRm0FT9ZyOCDAGhbL9YooWCq
-         20hZ4+ncWuya5QATM6AjMcttrHNe2DG17KsAYTfHiWXv/1P3YhCHQnP8+ERClG9HON38
-         axUnPvx2A30YyBLHeFk3LXz6n6z6wmwq4PHe4EOHAZBuA1bEpsz1fpVs4iWZxMhyj73V
-         xKiL4E6M6VxW1fF7tkVkxls26nkXm7adkFlaf+oqXYSesxH59hlOm/q35OAbdTcBf1CZ
-         TK8PmxGO2UL2V6jiB7hQF4id4FIDDbbSTMq0/Ya1337RMYjKKsZIuYAZr6TKIHK8JLRg
-         WMqg==
-X-Gm-Message-State: AOAM533DHTKjkZmFWteUGxVVsVO8esugwNCSCr78uSx5ngN8/8fEzXzO
-        YIxMxPKqeyjijZ8SJCUFcjrRcfouOQ==
-X-Google-Smtp-Source: ABdhPJy3VXvdk8vo/XrXiDkU+BIk+TJTbB/pqh504ouz3u8/5fsbp+KQ9JgMbQcOudhStkssJotFYNwe1A==
+        bh=hHpI+TkJP++fcdc46vUsOPoUrJOI1E0VxBDtAT4JUtM=;
+        b=4oGymfbeK8F8aNn6g5uv/7ewugEqCoIqn7xRrbxp/OEZPgvnFfH8hDtfJTLvda9zBQ
+         IxU5S4F0KJfGGr6qqQlYpF6/mqelPB5ManKqUz5VnC2NUfgY1xjEJ55u22/hzFLlxjvY
+         bmkN7eGRPvA4ktV06y7lc0lskGriZfzGkWu5JndB+0wnpPs7iMYGUu6QWc/dQrfiXMQ3
+         sge04IDHRKsCNGL8tkls/aLu3u3ajXDadGffUtDo1Fmd8et402Fq2O0n6XW+FMc9bRXE
+         M05dYDyiUIqWV8nbiQhlVs4T5/Q4t2eEZZcTHmXwhFStL7Em+kBi0a8mez26NtW36DbD
+         /p+Q==
+X-Gm-Message-State: AOAM532XGfQVYI/nDhdv5Ww6Y94bS4Akdf2lCyEoOfVeyIZYJpwX7m78
+        y468iRxtLuNq1J4y4iKjmTd/Yq7PYw==
+X-Google-Smtp-Source: ABdhPJxBEJ1Ij4N3anSHCQ6YBfqk8LJXNhrNf/MNCN7ZMLSlwxOUn6GdF8bZmMY3PAFHnunTgtGrJWD/kQ==
 X-Received: from elver.muc.corp.google.com ([2a00:79e0:15:13:86b7:11e9:7797:99f0])
- (user=elver job=sendgmr) by 2002:a05:600c:4f0b:: with SMTP id
- l11mr626057wmq.0.1638272754116; Tue, 30 Nov 2021 03:45:54 -0800 (PST)
-Date:   Tue, 30 Nov 2021 12:44:29 +0100
+ (user=elver job=sendgmr) by 2002:a05:600c:4e07:: with SMTP id
+ b7mr4217301wmq.16.1638272761639; Tue, 30 Nov 2021 03:46:01 -0800 (PST)
+Date:   Tue, 30 Nov 2021 12:44:32 +0100
 In-Reply-To: <20211130114433.2580590-1-elver@google.com>
-Message-Id: <20211130114433.2580590-22-elver@google.com>
+Message-Id: <20211130114433.2580590-25-elver@google.com>
 Mime-Version: 1.0
 References: <20211130114433.2580590-1-elver@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 21/25] sched, kcsan: Enable memory barrier instrumentation
+Subject: [PATCH v3 24/25] compiler_attributes.h: Add __disable_sanitizer_instrumentation
 From:   Marco Elver <elver@google.com>
 To:     elver@google.com, "Paul E. McKenney" <paulmck@kernel.org>
 Cc:     Alexander Potapenko <glider@google.com>,
@@ -72,40 +72,55 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-There's no fundamental reason to disable KCSAN for scheduler code,
-except for excessive noise and performance concerns (instrumenting
-scheduler code is usually a good way to stress test KCSAN itself).
+From: Alexander Potapenko <glider@google.com>
 
-However, several core sched functions imply memory barriers that are
-invisible to KCSAN without instrumentation, but are required to avoid
-false positives. Therefore, unconditionally enable instrumentation of
-memory barriers in scheduler code. Also update the comment to reflect
-this and be a bit more brief.
+The new attribute maps to
+__attribute__((disable_sanitizer_instrumentation)), which will be
+supported by Clang >= 14.0. Future support in GCC is also possible.
 
+This attribute disables compiler instrumentation for kernel sanitizer
+tools, making it easier to implement noinstr. It is different from the
+existing __no_sanitize* attributes, which may still allow certain types
+of instrumentation to prevent false positives.
+
+Signed-off-by: Alexander Potapenko <glider@google.com>
 Signed-off-by: Marco Elver <elver@google.com>
 ---
- kernel/sched/Makefile | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+v3:
+* New patch.
+---
+ include/linux/compiler_attributes.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
-index c7421f2d05e1..c83b37af155b 100644
---- a/kernel/sched/Makefile
-+++ b/kernel/sched/Makefile
-@@ -11,11 +11,10 @@ ccflags-y += $(call cc-disable-warning, unused-but-set-variable)
- # that is not a function of syscall inputs. E.g. involuntary context switches.
- KCOV_INSTRUMENT := n
+diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
+index b9121afd8733..37e260020221 100644
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -308,6 +308,24 @@
+ # define __compiletime_warning(msg)
+ #endif
  
--# There are numerous data races here, however, most of them are due to plain accesses.
--# This would make it even harder for syzbot to find reproducers, because these
--# bugs trigger without specific input. Disable by default, but should re-enable
--# eventually.
-+# Disable KCSAN to avoid excessive noise and performance degradation. To avoid
-+# false positives ensure barriers implied by sched functions are instrumented.
- KCSAN_SANITIZE := n
-+KCSAN_INSTRUMENT_BARRIERS := y
- 
- ifneq ($(CONFIG_SCHED_OMIT_FRAME_POINTER),y)
- # According to Alan Modra <alan@linuxcare.com.au>, the -fno-omit-frame-pointer is
++/*
++ * Optional: only supported since clang >= 14.0
++ *
++ * clang: https://clang.llvm.org/docs/AttributeReference.html#disable-sanitizer-instrumentation
++ *
++ * disable_sanitizer_instrumentation is not always similar to
++ * no_sanitize((<sanitizer-name>)): the latter may still let specific sanitizers
++ * insert code into functions to prevent false positives. Unlike that,
++ * disable_sanitizer_instrumentation prevents all kinds of instrumentation to
++ * functions with the attribute.
++ */
++#if __has_attribute(disable_sanitizer_instrumentation)
++# define __disable_sanitizer_instrumentation \
++	 __attribute__((disable_sanitizer_instrumentation))
++#else
++# define __disable_sanitizer_instrumentation
++#endif
++
+ /*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
