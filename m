@@ -2,57 +2,56 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F14C43217
-	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A07C43219
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241020AbhK3LuS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 30 Nov 2021 06:50:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45068 "EHLO
+        id S237593AbhK3LuY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:50:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235630AbhK3Ltu (ORCPT
+        with ESMTP id S241149AbhK3Ltj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:49:50 -0500
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF54C0619D3
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:05 -0800 (PST)
-Received: by mail-wm1-x34a.google.com with SMTP id l6-20020a05600c4f0600b0033321934a39so12691518wmq.9
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:05 -0800 (PST)
+        Tue, 30 Nov 2021 06:49:39 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA829C0613B8
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:45:52 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id v14-20020a05620a0f0e00b0043355ed67d1so28329020qkl.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:45:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ykQMG7f7HitTY02bjgroWOqQwac8nTYOVAZLqTXm/og=;
-        b=qfKYXOVzY2MTzD2zIwUpOpLCYIanN5AfAyzY4pD6y/00NCNsZhMgCXyQuHgqHRjMQP
-         2Q4GpB2kKiA9NG+mxwbdwhx/T6uztpsr0cPDZKwOOV4NBkpo8wKmqUMwj6QIZ50+WTGC
-         rj+XujQ6x15SViviNrLc8ryKZTpDmfQ59NmqPKusALt7vIXW09vUdxRhx/IHgX0O1Fi0
-         peXM6+tWJqwR46RttMZspmzxuv6mgkZjTPQRNEx0+Evh/SfhzkOebPUPea948l/PAD60
-         8d8gkegUNMa+NHH1FPVvEqF67z8VdDW4GAXutQLRg58SDKDe/Mh9BClDvEsEpsff6SiM
-         sbTA==
+        bh=rzdCErYR7QVJMqQ7C8iOEn+pKBOJL+BpLP2uqDT2sRI=;
+        b=iiJU/NFxnkO4QpNuEziwm44ZddXcfbqTjJ27RND0XQcNYVVoxyYjAqEozptVgUXNwN
+         tUotgFLhO6hTdCXy/8o38iy2aym7FJT+LW4h57+kXk+ITZwaPtmf/ukrKduYHtwrNNVy
+         u6zRnFErKVJc5tA07nIb20yQJs/rjFgBkkJfiMGCJ0+/frkqjjvq7sB5Qlsbun/G1B3v
+         mpVqufLXr0RiWnvRXu2PZPDLndJRxYoHPg3pEXSdStYWib1eEQIROpsu8lv6/UvQvgN4
+         KcSqzQSZ9rtkXbOEAqLYcx/YblyNiiImRh54NndbnYSq+4cJ1Y/85RKTI5bPUsrRqqxr
+         ZZsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ykQMG7f7HitTY02bjgroWOqQwac8nTYOVAZLqTXm/og=;
-        b=P3Jn9ONUCDaeFAX+RXXYaxK3tOJZ7KRhM9xoAoWPQhGqv2yjtvJAuxVrkD8Lhlgr1t
-         JlUpE7QdSi1lSD4MRUCt76jlXfzUuS9o+5WUfspNx+8culs5zWFrKgOIGdhf9evspRkW
-         ra99ThNorLC9JnY5EvLxEPCyo0qrS0IVn1V5gp3Gdpz8mPfRWlUKTnUlo3cg/CSOexk/
-         eXy64geDzXHnXim4ldZ/c1nsCXf3b5MCFLNpvxWIbj/MVwZZ7hzpwKDVym6b/v0sCCXw
-         ovPFJlHbblIJeFL6k9/Vvsqbv3x6w7KiM507zfxjox9PNANSyyf6HPtjYbCHOljf+645
-         WMFw==
-X-Gm-Message-State: AOAM5325RKGyuRBp/5znGDrxKP/b9Rc7orT1SuGrIABQjElcF78v0Gfc
-        xQfZzv4roicJHwA82G7o5YXUCOtFkw==
-X-Google-Smtp-Source: ABdhPJw6whH8Hls3EC+BgAy91BvIDfMtsebOG9cJCkHwE7EfRIVxArLwzYtCPhRhlBjkro/EFip+BpGtoQ==
+        bh=rzdCErYR7QVJMqQ7C8iOEn+pKBOJL+BpLP2uqDT2sRI=;
+        b=lcF5MSegclJZ9HnooN2ZV9iyg/raoW4LhcHuzozH9a9ojlDpsfrixJNVF3HBPv/fG9
+         P99tMofA2c7kSqcxne4B6IawU0L0I/I2XTQnI2Ae+d/lKpNZ9WX47ne6MB5oashRb0W3
+         QXtLSpkFyYt+xA8YpUrAwNXvZ31XALqBQCAA1I+ejpGJCenW9s2owt+soPXOWyauXWz7
+         o1TMKKCiCugiy+DKpJkJQNrEnMb1vfifLJUpwbQ8LAxseopkFGrfdyEJ2GGvaKFo2YgJ
+         p5MQKW5lp1tpmnW6kqQxnHiBafCfrbVdbITAkVlTRe+8Eb3pv3HV3kFd2BXVvZy5vEYV
+         mn6w==
+X-Gm-Message-State: AOAM530ZbHDo8m5CbKXBHW3KB7EkDKuKBgRz3E6A18+SguzxZQoQ6P0c
+        l7d277hIAhTXxxy6vLBC93lHsIYzmg==
+X-Google-Smtp-Source: ABdhPJxS2DvHFjm5rRAa2Cv18Mr86xucn8I+904NmrEkNJGoQhVDVa+JTgno3MDa7PBFHMKHIzeyW8Gdjg==
 X-Received: from elver.muc.corp.google.com ([2a00:79e0:15:13:86b7:11e9:7797:99f0])
- (user=elver job=sendgmr) by 2002:a05:600c:4f0b:: with SMTP id
- l11mr626212wmq.0.1638272763966; Tue, 30 Nov 2021 03:46:03 -0800 (PST)
-Date:   Tue, 30 Nov 2021 12:44:33 +0100
+ (user=elver job=sendgmr) by 2002:ac8:5c45:: with SMTP id j5mr51253786qtj.58.1638272751779;
+ Tue, 30 Nov 2021 03:45:51 -0800 (PST)
+Date:   Tue, 30 Nov 2021 12:44:28 +0100
 In-Reply-To: <20211130114433.2580590-1-elver@google.com>
-Message-Id: <20211130114433.2580590-26-elver@google.com>
+Message-Id: <20211130114433.2580590-21-elver@google.com>
 Mime-Version: 1.0
 References: <20211130114433.2580590-1-elver@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 25/25] kcsan: Support WEAK_MEMORY with Clang where no
- objtool support exists
+Subject: [PATCH v3 20/25] mm, kcsan: Enable barrier instrumentation
 From:   Marco Elver <elver@google.com>
 To:     elver@google.com, "Paul E. McKenney" <paulmck@kernel.org>
 Cc:     Alexander Potapenko <glider@google.com>,
@@ -73,77 +72,40 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Clang and GCC behave a little differently when it comes to the
-__no_sanitize_thread attribute, which has valid reasons, and depending
-on context either one could be right.
+Some memory management calls imply memory barriers that are required to
+avoid false positives. For example, without the correct instrumentation,
+we could observe data races of the following variant:
 
-Traditionally, user space ThreadSanitizer [1] still expects instrumented
-builtin atomics (to avoid false positives) and __tsan_func_{entry,exit}
-(to generate meaningful stack traces), even if the function has the
-attribute no_sanitize("thread").
+                   T0           |           T1
+        ------------------------+------------------------
+                                |
+         *a = 42;    ---+       |
+         kfree(a);      |       |
+                        |       | b = kmalloc(..); // b == a
+          <reordered> <-+       | *b = 42;         // not a data race!
+                                |
 
-[1] https://clang.llvm.org/docs/ThreadSanitizer.html#attribute-no-sanitize-thread
-
-GCC doesn't follow the same policy (for better or worse), and removes
-all kinds of instrumentation if no_sanitize is added. Arguably, since
-this may be a problem for user space ThreadSanitizer, we expect this may
-change in future.
-
-Since KCSAN != ThreadSanitizer, the likelihood of false positives even
-without barrier instrumentation everywhere, is much lower by design.
-
-At least for Clang, however, to fully remove all sanitizer
-instrumentation, we must add the disable_sanitizer_instrumentation
-attribute, which is available since Clang 14.0.
+Therefore, instrument memory barriers in all allocator code currently
+not being instrumented in a default build.
 
 Signed-off-by: Marco Elver <elver@google.com>
 ---
-v3:
-* New patch.
----
- include/linux/compiler_types.h | 13 ++++++++++++-
- lib/Kconfig.kcsan              |  2 +-
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ mm/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index 1d32f4c03c9e..3c1795fdb568 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -198,9 +198,20 @@ struct ftrace_likely_data {
- # define __no_kasan_or_inline __always_inline
- #endif
+diff --git a/mm/Makefile b/mm/Makefile
+index d6c0042e3aa0..7919cd7f13f2 100644
+--- a/mm/Makefile
++++ b/mm/Makefile
+@@ -15,6 +15,8 @@ KCSAN_SANITIZE_slab_common.o := n
+ KCSAN_SANITIZE_slab.o := n
+ KCSAN_SANITIZE_slub.o := n
+ KCSAN_SANITIZE_page_alloc.o := n
++# But enable explicit instrumentation for memory barriers.
++KCSAN_INSTRUMENT_BARRIERS := y
  
--#define __no_kcsan __no_sanitize_thread
- #ifdef __SANITIZE_THREAD__
-+/*
-+ * Clang still emits instrumentation for __tsan_func_{entry,exit}() and builtin
-+ * atomics even with __no_sanitize_thread (to avoid false positives in userspace
-+ * ThreadSanitizer). The kernel's requirements are stricter and we really do not
-+ * want any instrumentation with __no_kcsan.
-+ *
-+ * Therefore we add __disable_sanitizer_instrumentation where available to
-+ * disable all instrumentation. See Kconfig.kcsan where this is mandatory.
-+ */
-+# define __no_kcsan __no_sanitize_thread __disable_sanitizer_instrumentation
- # define __no_sanitize_or_inline __no_kcsan notrace __maybe_unused
-+#else
-+# define __no_kcsan
- #endif
- 
- #ifndef __no_sanitize_or_inline
-diff --git a/lib/Kconfig.kcsan b/lib/Kconfig.kcsan
-index e4394ea8068b..63b70b8c5551 100644
---- a/lib/Kconfig.kcsan
-+++ b/lib/Kconfig.kcsan
-@@ -198,7 +198,7 @@ config KCSAN_WEAK_MEMORY
- 	# We can either let objtool nop __tsan_func_{entry,exit}() and builtin
- 	# atomics instrumentation in .noinstr.text, or use a compiler that can
- 	# implement __no_kcsan to really remove all instrumentation.
--	depends on STACK_VALIDATION || CC_IS_GCC
-+	depends on STACK_VALIDATION || CC_IS_GCC || CLANG_VERSION >= 140000
- 	help
- 	  Enable support for modeling a subset of weak memory, which allows
- 	  detecting a subset of data races due to missing memory barriers.
+ # These files are disabled because they produce non-interesting and/or
+ # flaky coverage that is not a function of syscall inputs. E.g. slab is out of
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
