@@ -2,125 +2,155 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E703C433FE
-	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AE1C433EF
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Nov 2021 11:47:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241267AbhK3Lu0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 30 Nov 2021 06:50:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
+        id S240998AbhK3Lu4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:50:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241264AbhK3Ltm (ORCPT
+        with ESMTP id S241287AbhK3Lu3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:49:42 -0500
-Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06040C06137B
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:03 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id p12-20020a05600c1d8c00b0033a22e48203so12699586wms.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Nov 2021 03:46:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=hHpI+TkJP++fcdc46vUsOPoUrJOI1E0VxBDtAT4JUtM=;
-        b=ZydYBw/EQptiAQjTJgW8VFb6M+tj/jnOJSKAzEOo9ttb4/prBXxenHyAcxKFnhYPtG
-         yxkoZSjdkoQwGFG90n0H+8xMHAoecs8kp2mS+zTaZsYuo/VXrNHwT1dCCGqN+qd2xKqO
-         A4acfRlS2z6HmsLoxx1UolNjWfJ2+Ztsu6wU/VCsHuubkWa6zG7vvPdxEtYFrhi/J/x1
-         SgdPBckdgJ9qE7I2ZNNnAqkYt2+gpBZ+AartGApj/044P+zkOJcXZg2hjzRL7no/XtPz
-         MihwHIfIAQnWjB96wkXuEnhFMgqyeDJ1+RyraL9HQrgcKqeYe6aB+N/OeDIQjy/DWPFQ
-         OLpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=hHpI+TkJP++fcdc46vUsOPoUrJOI1E0VxBDtAT4JUtM=;
-        b=4oGymfbeK8F8aNn6g5uv/7ewugEqCoIqn7xRrbxp/OEZPgvnFfH8hDtfJTLvda9zBQ
-         IxU5S4F0KJfGGr6qqQlYpF6/mqelPB5ManKqUz5VnC2NUfgY1xjEJ55u22/hzFLlxjvY
-         bmkN7eGRPvA4ktV06y7lc0lskGriZfzGkWu5JndB+0wnpPs7iMYGUu6QWc/dQrfiXMQ3
-         sge04IDHRKsCNGL8tkls/aLu3u3ajXDadGffUtDo1Fmd8et402Fq2O0n6XW+FMc9bRXE
-         M05dYDyiUIqWV8nbiQhlVs4T5/Q4t2eEZZcTHmXwhFStL7Em+kBi0a8mez26NtW36DbD
-         /p+Q==
-X-Gm-Message-State: AOAM532XGfQVYI/nDhdv5Ww6Y94bS4Akdf2lCyEoOfVeyIZYJpwX7m78
-        y468iRxtLuNq1J4y4iKjmTd/Yq7PYw==
-X-Google-Smtp-Source: ABdhPJxBEJ1Ij4N3anSHCQ6YBfqk8LJXNhrNf/MNCN7ZMLSlwxOUn6GdF8bZmMY3PAFHnunTgtGrJWD/kQ==
-X-Received: from elver.muc.corp.google.com ([2a00:79e0:15:13:86b7:11e9:7797:99f0])
- (user=elver job=sendgmr) by 2002:a05:600c:4e07:: with SMTP id
- b7mr4217301wmq.16.1638272761639; Tue, 30 Nov 2021 03:46:01 -0800 (PST)
-Date:   Tue, 30 Nov 2021 12:44:32 +0100
-In-Reply-To: <20211130114433.2580590-1-elver@google.com>
-Message-Id: <20211130114433.2580590-25-elver@google.com>
-Mime-Version: 1.0
-References: <20211130114433.2580590-1-elver@google.com>
-X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 24/25] compiler_attributes.h: Add __disable_sanitizer_instrumentation
-From:   Marco Elver <elver@google.com>
-To:     elver@google.com, "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     Alexander Potapenko <glider@google.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Waiman Long <longman@redhat.com>,
-        Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com,
-        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, llvm@lists.linux.dev, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 30 Nov 2021 06:50:29 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231E7C061763;
+        Tue, 30 Nov 2021 03:47:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=ZHmEYF4LZeF4drtWTO7d/7EufUy+uE8BPoSmH0E4R64=; b=Jhj9YSp2RJQcU2ECFjWZaMYhua
+        JUhlttpK8G8pMJvU0PVvvVKhg/RJwZaqUBg77r+n7xCEgflF91GNrnigEJu2nklPDmHtU+WrhsPPR
+        wTHs3GOgl/zjGAZtdODWlPh+wR9W14vDejxNFwedsM6B7Zm2fTtMGROQWRb2idvl+HvV1it/r06sq
+        RUi+mt/P4jkCqz05xpQLiMqwYhbMPjsFcuwv32qRNgEmDDmyEu0DcrB9oKZi0MC0phS3046LjgYMZ
+        rd6n/8gaEAT8LcwTWDjHnFAkE5JpGaXL9rTDzU3/oPCc2zf6E1qnIN49BMr8ytt9pLXh052h7pQ8E
+        UEBXry5A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55976)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1ms1bA-0006nS-LC; Tue, 30 Nov 2021 11:47:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1ms1b6-000719-Mn; Tue, 30 Nov 2021 11:46:56 +0000
+Date:   Tue, 30 Nov 2021 11:46:56 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Heiner Kallweit <hkallweit1@gmail.com>,
+        Andrew Lunn <andrew@lunn.ch>, Yinbo Zhu <zhuyinbo@loongson.cn>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] modpost: file2alias: fixup mdio alias garbled
+ code in modules.alias
+Message-ID: <YaYPMOJ/+OXIWcnj@shell.armlinux.org.uk>
+References: <1637919957-21635-1-git-send-email-zhuyinbo@loongson.cn>
+ <c6d37ae0-9ccb-a527-4f55-e96972813a53@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6d37ae0-9ccb-a527-4f55-e96972813a53@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: Alexander Potapenko <glider@google.com>
+On Fri, Nov 26, 2021 at 11:21:03AM +0100, Heiner Kallweit wrote:
+> On 26.11.2021 10:45, Yinbo Zhu wrote:
+> > After module compilation, module alias mechanism will generate a ugly
+> > mdio modules alias configure if ethernet phy was selected, this patch
+> > is to fixup mdio alias garbled code.
+> > 
+> > In addition, that ugly alias configure will cause ethernet phy module
+> > doens't match udev, phy module auto-load is fail, but add this patch
+> > that it is well mdio driver alias configure match phy device uevent.
+> > 
+> I think Andrew asked you for an example already.
+> For which PHY's the driver isn't auto-loaded?
+> 
+> In addition your commit descriptions are hard to read, especially the
+> one for patch 2. Could you please try to change them to proper English?
+> Not being a native speaker myself ..
 
-The new attribute maps to
-__attribute__((disable_sanitizer_instrumentation)), which will be
-supported by Clang >= 14.0. Future support in GCC is also possible.
+Let's clear this up. PHY module loading is quite different - it does
+_not_ use MODALIAS nor does it use the usual udev approach.
 
-This attribute disables compiler instrumentation for kernel sanitizer
-tools, making it easier to implement noinstr. It is different from the
-existing __no_sanitize* attributes, which may still allow certain types
-of instrumentation to prevent false positives.
+The modalias strings use aliases of the form "mdio:<semi-binary-string>"
+with "?" used as a wildcard for each bit not in the mask. This is an
+entirely appropriate scheme to use, as it allows matching an ID with
+an arbitary mask. There is nothing wrong with this format - it may be
+a bit on the long side, but it is an entirely valid solution.
 
-Signed-off-by: Alexander Potapenko <glider@google.com>
-Signed-off-by: Marco Elver <elver@google.com>
----
-v3:
-* New patch.
----
- include/linux/compiler_attributes.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+The kernel has never generated a MODALIAS of this form, which is fine,
+because we don't use MODALIAS or the uevent/udev approach to loading
+the modules.
 
-diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
-index b9121afd8733..37e260020221 100644
---- a/include/linux/compiler_attributes.h
-+++ b/include/linux/compiler_attributes.h
-@@ -308,6 +308,24 @@
- # define __compiletime_warning(msg)
- #endif
- 
-+/*
-+ * Optional: only supported since clang >= 14.0
-+ *
-+ * clang: https://clang.llvm.org/docs/AttributeReference.html#disable-sanitizer-instrumentation
-+ *
-+ * disable_sanitizer_instrumentation is not always similar to
-+ * no_sanitize((<sanitizer-name>)): the latter may still let specific sanitizers
-+ * insert code into functions to prevent false positives. Unlike that,
-+ * disable_sanitizer_instrumentation prevents all kinds of instrumentation to
-+ * functions with the attribute.
-+ */
-+#if __has_attribute(disable_sanitizer_instrumentation)
-+# define __disable_sanitizer_instrumentation \
-+	 __attribute__((disable_sanitizer_instrumentation))
-+#else
-+# define __disable_sanitizer_instrumentation
-+#endif
-+
- /*
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-weak-function-attribute
-  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-weak-variable-attribute
+We instead use phy_request_driver_module() at PHY device creation time
+to explicitly request modprobe to load a module of the form
+"mdio:<binary-id>" which we know works (I have had the marvell10g and
+bcm84881 modules autoloaded as a result of inserting SFPs.)
+
+However, this won't work for PHY devices created _before_ the kernel
+has mounted the rootfs, whether or not they end up being used. So,
+every PHY mentioned in DT will be created before the rootfs is mounted,
+and none of these PHYs will have their modules loaded.
+
+I believe this is the root cause of Yinbo Zhu's issue.
+
+However, changing the modalias format that we use is not a solution -
+it _will_ cause DSA module loading to break. We've been here with the
+SPI subsystem, where a patch was merged to change the modalias format
+allegedly to fix loading of one or two modules, resulting in the
+spi-nor driver failing to load (as it had done for years) - and the
+resulting change was reverted and the revert backported to all the
+stable trees. It created quite a mess. Linus has always been very clear
+that if fixing one issue causes regressions, then the fix is wrong and
+needs to be reverted. This is exactly what happened in the case of SPI.
+
+This teaches us a lesson: changes to any modalias scheme that has been
+in use for years need _extremely_ careful consideration and thorough
+testing as they risk causing regressions. Without that, such changes
+can result in difficult decisions where no matter what decision is
+made, some breakage occurs as a result of sorting out the resulting
+mess from not having considered the change carefully enough. It is far
+better to avoid boxing oneself into a corner.
+
+We can see that Yinbo Zhu's changes to fix his issue will cause
+regressions with DSA, so it is simply an unacceptable fix. Reposting
+the same code will _never_ change that fact. So please, Yinbo Zhu, stop
+reposting your change. It is provably regression-creating and as such
+will never be accepted. You also seem to be resistant to feedback -
+I've asked you to separate out the "mdio_bus" change but you still have
+not in your version 3 posted today. Therefore, I will assume that you
+won't read this email, and in future if I see those patches again, I
+will reply with a one-line "NAK" and a reference to this email.
+
+We instead need a different approach to solving this issue. What that
+approach is, I'm not sure right now - the tooling is setup to only
+permit one MODALIAS published by the kernel, so we can't publish both
+a DT based modalias and a mdio: based modalias together. It's one or
+the other.
+
+What we _could_ do is review all device trees and PHY drivers to see
+whether DT modaliases are ever used for module loading. If they aren't,
+then we _could_ make the modalias published by the kernel conditional
+on the type of mdio device - continue with the DT approach for non-PHY
+devices, and switch to the mdio: scheme for PHY devices. I repeat, this
+can only happen if no PHY drivers match using the DT scheme, otherwise
+making this change _will_ cause a regression.
+
+The alternative is we simply declare that udev based module auto-loading
+of PHY drivers required for PHYs in DT is simply not supported, and is
+something we are unable to support. For something like root-NFS or IP
+autoconfiguration by the kernel, that is already the case - the PHY
+driver modules _must_ be built-in to the kernel in just the same way as
+the network driver modules must be.
+
 -- 
-2.34.0.rc2.393.gf8c9666880-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
