@@ -2,100 +2,217 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CB9C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu,  2 Dec 2021 08:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8944C4321E
+	for <linux-kbuild@archiver.kernel.org>; Thu,  2 Dec 2021 22:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241248AbhLBIa4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 2 Dec 2021 03:30:56 -0500
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:32413 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238764AbhLBIa4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Dec 2021 03:30:56 -0500
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 1B28QxlN006678;
-        Thu, 2 Dec 2021 17:26:59 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 1B28QxlN006678
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1638433619;
-        bh=/yQg01BYOJFXppdxBduRNih3r4B6OrrFie8TdUvWsH4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JXmvbWDwG9IKGlbZi3rbZ3DTGFqHrgLL6Wyi619NwvTKYg8SHvNOybbAxsGCdO5xu
-         VbcVLiI7JlVuom+6954OzZVFHrAQQh7Q7TD8PIonFkZLHYzlRsyDyoW1Cq7Ii3YV3I
-         a/aAQNHf7HDmnAqcUIJ9Ls+C3LZrzPL6OHxVVPyTlBfR4xBKOiKx30wsOTi2Zujxgf
-         w6c/XhJ5i31O+1loPUWXpp85931taW/uJbfgZJKbCH/QqS8x3rD82cHMXE6Md/2ydt
-         JfekgAj+MXdPlj3EW2wlizT7qgZgy8THxlcxRKRmU42qTVO+ObvwY/g34km16pYT9p
-         b67OTJ/Qdxktg==
-X-Nifty-SrcIP: [209.85.210.180]
-Received: by mail-pf1-f180.google.com with SMTP id o4so27185407pfp.13;
-        Thu, 02 Dec 2021 00:26:59 -0800 (PST)
-X-Gm-Message-State: AOAM531WuF2zNyUTA5yII3D3aikMz6xZSxn0UtLyJHYZSgwkWdQkrM6B
-        4sue8ZQM/9ElJ9FwOyR24Ts/iVAd6ujzS5t2V3k=
-X-Google-Smtp-Source: ABdhPJxcPQ85vfjbSc2TTaMucoAVuXnzpKovoHhZYYdrtl4XmPNKKDlS6sEvhw15FBEyiNyupWGC01mqEQnCKEu0WzM=
-X-Received: by 2002:a65:50c6:: with SMTP id s6mr8754532pgp.352.1638433618425;
- Thu, 02 Dec 2021 00:26:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20211129165803.470795-1-nathan@kernel.org> <202112011140.DA93B3E@keescook>
-In-Reply-To: <202112011140.DA93B3E@keescook>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 2 Dec 2021 17:26:21 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASW2F3SxgR6ydMaW7-ZumsxDv2QQTDqVxqJA1JWN3r4FA@mail.gmail.com>
-Message-ID: <CAK7LNASW2F3SxgR6ydMaW7-ZumsxDv2QQTDqVxqJA1JWN3r4FA@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/6] Bump minimum supported version of LLVM to 11.0.0
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
+        id S243772AbhLBWgX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 2 Dec 2021 17:36:23 -0500
+Received: from mga04.intel.com ([192.55.52.120]:50399 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238812AbhLBWgX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 2 Dec 2021 17:36:23 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10186"; a="235592792"
+X-IronPort-AV: E=Sophos;i="5.87,282,1631602800"; 
+   d="scan'208";a="235592792"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2021 14:33:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,282,1631602800"; 
+   d="scan'208";a="576948096"
+Received: from irvmail001.ir.intel.com ([10.43.11.63])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Dec 2021 14:32:52 -0800
+Received: from newjersey.igk.intel.com (newjersey.igk.intel.com [10.102.20.203])
+        by irvmail001.ir.intel.com (8.14.3/8.13.6/MailSET/Hub) with ESMTP id 1B2MWmYS028552;
+        Thu, 2 Dec 2021 22:32:50 GMT
+From:   Alexander Lobakin <alexandr.lobakin@intel.com>
+To:     linux-hardening@vger.kernel.org, x86@kernel.org
+Cc:     Alexander Lobakin <alexandr.lobakin@intel.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Kristen Carlson Accardi <kristen@linux.intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Bruce Schlobohm <bruce.schlobohm@intel.com>,
+        Jessica Yu <jeyu@kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Evgenii Shatokhin <eshatokhin@virtuozzo.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>, Miguel Ojeda <ojeda@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Marios Pomonis <pomonis@google.com>,
         Sami Tolvanen <samitolvanen@google.com>,
-        Tom Stellard <tstellar@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Jakub Kicinski <kuba@kernel.org>, cki-project@redhat.com,
-        kernelci@groups.io, llvm@lists.linux.dev,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-arch@vger.kernel.org, live-patching@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: [PATCH v8 01/14] x86: Makefile: Add build and config option for CONFIG_FG_KASLR
+Date:   Thu,  2 Dec 2021 23:32:01 +0100
+Message-Id: <20211202223214.72888-2-alexandr.lobakin@intel.com>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211202223214.72888-1-alexandr.lobakin@intel.com>
+References: <20211202223214.72888-1-alexandr.lobakin@intel.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Dec 2, 2021 at 4:41 AM Kees Cook <keescook@chromium.org> wrote:
->
-> On Mon, Nov 29, 2021 at 09:57:57AM -0700, Nathan Chancellor wrote:
-> > This patch series raises the minimum supported version of LLVM to
-> > 11.0.0.
-> >
-> > Patch #1 outlines the issue, goes over the potential impact of the
-> > change, and does the actual bump. Subsequent patches clean up the
-> > various checks that are always true after the bump.
-> >
-> > I have marked this revision as RFC to give various parties the option to
-> > comment on this bump before it is done, namely KernelCI and Linaro's
-> > LKFT, who are still testing clang-10. I have added some other folks to
-> > CC that I know are testing with clang to see if this impacts them in any
-> > way (as I would like to impact as few people as possible) but as far as
-> > I am aware, most other CIs and developers are testing closer to tip of
-> > tree. If that is not true, scream so that we can see what can be done
-> > about that. If I missed anyone who is actively testing with clang,
-> > please key them in and I will make sure to include them in future
-> > revisions (if any are needed).
-> >
-> > It probably makes sense for this series to live in -mm.
->
-> Sounds good to me. Thanks!
->
-> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> --
-> Kees Cook
+From: Kristen Carlson Accardi <kristen@linux.intel.com>
 
+Allow user to select CONFIG_FG_KASLR if dependencies are met. Change
+the make file to build with -ffunction-sections if CONFIG_FG_KASLR.
 
-Only positive feedback so far.
+While the only architecture that supports CONFIG_FG_KASLR does not
+currently enable HAVE_LD_DEAD_CODE_DATA_ELIMINATION, make sure these
+2 features play nicely together for the future by ensuring that if
+CONFIG_LD_DEAD_CODE_DATA_ELIMINATION is selected when used with
+CONFIG_FG_KASLR the function sections will not be consolidated back
+into .text. Thanks to Kees Cook for the dead code elimination changes.
 
-All applied to linux-kbuild.
+Signed-off-by: Kristen Carlson Accardi <kristen@linux.intel.com>
+Reviewed-by: Tony Luck <tony.luck@intel.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Tested-by: Tony Luck <tony.luck@intel.com>
+[ alobakin:
+ - improve cflags management in the top Makefile
+ - move ARCH_HAS_FG_KASLR to the top arch/Kconfig
+ - add symtab_shndx to the list of known sections ]
+Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+---
+ Makefile                          | 13 ++++++++++++-
+ arch/Kconfig                      |  3 +++
+ include/asm-generic/vmlinux.lds.h | 20 ++++++++++++++++++--
+ init/Kconfig                      | 12 ++++++++++++
+ 4 files changed, 45 insertions(+), 3 deletions(-)
 
-
+diff --git a/Makefile b/Makefile
+index 0a6ecc8bb2d2..a4d2eac5f81f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -882,8 +882,19 @@ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+ KBUILD_CFLAGS += -fno-inline-functions-called-once
+ endif
+ 
++# ClangLTO implies -ffunction-sections -fdata-sections, no need
++# to specify them manually and trigger a pointless full rebuild
++ifndef CONFIG_LTO_CLANG
++ifneq ($(CONFIG_LD_DEAD_CODE_DATA_ELIMINATION)$(CONFIG_FG_KASLR),)
++KBUILD_CFLAGS_KERNEL += -ffunction-sections
++endif
++
++ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
++KBUILD_CFLAGS_KERNEL += -fdata-sections
++endif
++endif # CONFIG_LTO_CLANG
++
+ ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+-KBUILD_CFLAGS_KERNEL += -ffunction-sections -fdata-sections
+ LDFLAGS_vmlinux += --gc-sections
+ endif
+ 
+diff --git a/arch/Kconfig b/arch/Kconfig
+index d3c4ab249e9c..602b67162e53 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -1312,6 +1312,9 @@ config ARCH_HAS_PARANOID_L1D_FLUSH
+ config DYNAMIC_SIGFRAME
+ 	bool
+ 
++config ARCH_HAS_FG_KASLR
++	bool
++
+ source "kernel/gcov/Kconfig"
+ 
+ source "scripts/gcc-plugins/Kconfig"
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 42f3866bca69..96fbedcbf7c8 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -97,14 +97,12 @@
+  * sections to be brought in with rodata.
+  */
+ #if defined(CONFIG_LD_DEAD_CODE_DATA_ELIMINATION) || defined(CONFIG_LTO_CLANG)
+-#define TEXT_MAIN .text .text.[0-9a-zA-Z_]*
+ #define DATA_MAIN .data .data.[0-9a-zA-Z_]* .data..L* .data..compoundliteral* .data.$__unnamed_* .data.$L*
+ #define SDATA_MAIN .sdata .sdata.[0-9a-zA-Z_]*
+ #define RODATA_MAIN .rodata .rodata.[0-9a-zA-Z_]* .rodata..L*
+ #define BSS_MAIN .bss .bss.[0-9a-zA-Z_]* .bss..compoundliteral*
+ #define SBSS_MAIN .sbss .sbss.[0-9a-zA-Z_]*
+ #else
+-#define TEXT_MAIN .text
+ #define DATA_MAIN .data
+ #define SDATA_MAIN .sdata
+ #define RODATA_MAIN .rodata
+@@ -112,6 +110,23 @@
+ #define SBSS_MAIN .sbss
+ #endif
+ 
++/*
++ * LTO_CLANG, LD_DEAD_CODE_DATA_ELIMINATION and FG_KASLR options enable
++ * -ffunction-sections, which produces separately named .text sections. In
++ * the case of CONFIG_FG_KASLR, they need to stay distict so they can be
++ * separately randomized. Without CONFIG_FG_KASLR, the separate .text
++ * sections can be collected back into a common section, which makes the
++ * resulting image slightly smaller
++ */
++#if (defined(CONFIG_LD_DEAD_CODE_DATA_ELIMINATION) || \
++     defined(CONFIG_LTO_CLANG)) && !defined(CONFIG_FG_KASLR)
++#define TEXT_MAIN		.text .text.[0-9a-zA-Z_]*
++#elif defined(CONFIG_FG_KASLR)
++#define TEXT_MAIN		.text.__unused__
++#else
++#define TEXT_MAIN		.text
++#endif
++
+ /*
+  * GCC 4.5 and later have a 32 bytes section alignment for structures.
+  * Except GCC 4.9, that feels the need to align on 64 bytes.
+@@ -840,6 +855,7 @@
+ #define ELF_DETAILS							\
+ 		.comment 0 : { *(.comment) }				\
+ 		.symtab 0 : { *(.symtab) }				\
++		.symtab_shndx 0 : { *(.symtab_shndx) }			\
+ 		.strtab 0 : { *(.strtab) }				\
+ 		.shstrtab 0 : { *(.shstrtab) }
+ 
+diff --git a/init/Kconfig b/init/Kconfig
+index 4b7bac10c72d..5cb8f8230915 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2051,6 +2051,18 @@ config PROFILING
+ config TRACEPOINTS
+ 	bool
+ 
++config FG_KASLR
++	bool "Function Granular Kernel Address Space Layout Randomization"
++	depends on ARCH_HAS_FG_KASLR
++	help
++	  This option improves the randomness of the kernel text
++	  over basic Kernel Address Space Layout Randomization (KASLR)
++	  by reordering the kernel text at boot time. This feature
++	  uses information generated at compile time to re-layout the
++	  kernel text section at boot time at function level granularity.
++
++	  If unsure, say N.
++
+ endmenu		# General setup
+ 
+ source "arch/Kconfig"
 -- 
-Best Regards
-Masahiro Yamada
+2.33.1
+
