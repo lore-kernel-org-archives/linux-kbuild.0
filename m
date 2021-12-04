@@ -2,93 +2,66 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9350EC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Dec 2021 13:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E99C433F5
+	for <linux-kbuild@archiver.kernel.org>; Sat,  4 Dec 2021 15:12:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384960AbhLDNQ6 (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 4 Dec 2021 08:16:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbhLDNQ6 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 4 Dec 2021 08:16:58 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8EDC061751;
-        Sat,  4 Dec 2021 05:13:32 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id v11so11774219wrw.10;
-        Sat, 04 Dec 2021 05:13:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Tsd1rE26zaiSJkO/71hza3dNv3C8IY+YEVzWQKSlv74=;
-        b=cF2QdOFhWmuloOtISN2U4eqYZq4v7OZZLqHN6yGnXuUzrGf8LDCcIatJZnbj4TqXgQ
-         odL4HBncm3UtgUolGcMaNvAq+Lm+wPmaWKR9hRAxQJA/nzqSb/4sjEVl+3I6jCY4Gxhx
-         7b+K8GbKi2RPNcDgCY7cDOkFXzjJsoBhEn0v99uy8rdkMt3vJ+E94MeGJisZIzrJl60W
-         F78ZM9hjRMt6j2niHM0LNTe/6hXOiNLl9F8WzOohsbJXT/sfHwcR9cf6xHKgomNLK5om
-         PHZlYBf6t0uF1P7z/xYq+LGgzTXejqx76BYxxczjvYxaVS9d9K99wLkw5qRip62yKQ8c
-         Pwvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=Tsd1rE26zaiSJkO/71hza3dNv3C8IY+YEVzWQKSlv74=;
-        b=DBlwCw9cyL9qUd9vfivZY0H6Eqqzi/zuPyRU/1JwAZcuwl2I1B3QT38+QX+tN1GOTs
-         khHs1dCNLPVnjOxTB39t6YuHIO0Gn53TOLpCR+Y51VQqRj0de1tZHwELODuhxYBDvv9D
-         HQ/fI9FuMeyGKXrQ3wpG8jL7WehWbONmrhGZB78ccY6zeEb9M+q/jYnPGzHkbiIBely/
-         w07Fh3f6Yp7ocY5xLIxxxFsypjA3XmmCYm+OewC48ZVNC8BXDbVL18/fUCbB06Rz6srK
-         dYggWdHyvsUy5CWZxBDFmkBjA/r1XBztS1Gra6pKXlPhPH7d31R0oZTGnHUl6iCj5OST
-         6FLg==
-X-Gm-Message-State: AOAM532eiH1h6VD24+osl5wORBsHSU+vjqdnryqyup+tze7sDl9h6Nbw
-        wUPXaOE6TML3hhPv81fxqq/ejli8nJQulg==
-X-Google-Smtp-Source: ABdhPJwexm3vBI0A446S2gqJvn7oE41xBxIDGyAnF9mp9lh5FdNC3L9Ul4eVSHAImDy+u7AuyAU8QA==
-X-Received: by 2002:adf:f6cf:: with SMTP id y15mr28197130wrp.56.1638623611122;
-        Sat, 04 Dec 2021 05:13:31 -0800 (PST)
-Received: from eldamar (80-218-24-251.dclient.hispeed.ch. [80.218.24.251])
-        by smtp.gmail.com with ESMTPSA id x13sm5748925wrr.47.2021.12.04.05.13.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Dec 2021 05:13:30 -0800 (PST)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Date:   Sat, 4 Dec 2021 14:13:29 +0100
-From:   Salvatore Bonaccorso <carnil@debian.org>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Nathan Chancellor <nathan@kernel.org>,
+        id S242074AbhLDPPd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 4 Dec 2021 10:15:33 -0500
+Received: from vps0.lunn.ch ([185.16.172.187]:38786 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236002AbhLDPPc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 4 Dec 2021 10:15:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+        Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+        bh=Tk/UqSNzICTCyklEj06uzagFaWHZBnaPByLqiCpPEh8=; b=L61e0AiozsAIdFBUauvAEIiDbV
+        uK0AgSSdx9G/n7kKFtPwWz3tjjtX3Wn3L47QxkJhL0R5pO43+C5QSD+LBQnWJea4pe6olZtfx4/q0
+        dZhhTIR1DxD/TVXCUrurZF7y2hI5bH+ZTiJjfSM4/bE8BUrPMFFBJ/fQhMsT2AAdWyNA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+        (envelope-from <andrew@lunn.ch>)
+        id 1mtWhe-00FVjc-2u; Sat, 04 Dec 2021 16:11:54 +0100
+Date:   Sat, 4 Dec 2021 16:11:54 +0100
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Yinbo Zhu <zhuyinbo@loongson.cn>
+Cc:     Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Makefile: CC_IMPLICIT_FALLTHROUGH passed quoted as argument to gcc
-Message-ID: <YatpectAYsWnmPy2@eldamar.lan>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] modpost: file2alias: make mdio alias configure
+ match mdio uevent
+Message-ID: <YauFOgy6tjH+kf3J@lunn.ch>
+References: <1638609208-10339-1-git-send-email-zhuyinbo@loongson.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1638609208-10339-1-git-send-email-zhuyinbo@loongson.cn>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Gustavo,
+On Sat, Dec 04, 2021 at 05:13:27PM +0800, Yinbo Zhu wrote:
+> The do_mdio_entry was responsible for generating a phy alias configure
+> that according to the phy driver's mdio_device_id, before apply this
+> patch, which alias configure is like "alias mdio:000000010100000100001
+> 1011101????", it doesn't match the phy_id of mdio_uevent, because of
+> the phy_id was a hexadecimal digit and the mido uevent is consisit of
+> phy_id with the char 'p', the uevent string is different from alias.
+> Add this patch that mdio alias configure will can match mdio uevent.
+> 
+> Signed-off-by: Yinbo Zhu <zhuyinbo@loongson.cn>
+> ---
+> Change in v4:
+> 		Add following explain information.
 
-Since dee2b702bcf0 ("kconfig: Add support for -Wimplicit-fallthrough")
-CONFIG_CC_IMPLICIT_FALLTHROUGH value is passed quoted to the gcc
-invocation.
+Adding an explanation will not stop the regression happening. You will
+continue to get a NACK while your change causes a regression. Please
+do not post again until you have addressed the regression.
 
-This appears to cause issues for (external) module builds. It was
-reported in Debian for the nvidia module, cf.
-https://bugs.debian.org/1001083 but might happen as well in other
-cases.
-
-Andreas suggested to replace the
-
-KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
-
-with
-
-KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(patsubst "%",%,$(CONFIG_CC_IMPLICIT_FALLTHROUGH))
-
-Is this something you would consider doing or should the issue be
-handled exclusively in the particular OOT module build case?
-
-Regards,
-Salvatore
+   Andrew
