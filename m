@@ -2,104 +2,182 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16197C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Dec 2021 19:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED91CC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  5 Dec 2021 22:53:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237653AbhLETGZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 5 Dec 2021 14:06:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237649AbhLETGZ (ORCPT
+        id S239955AbhLEW5C (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 5 Dec 2021 17:57:02 -0500
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:29230 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233708AbhLEW5B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 5 Dec 2021 14:06:25 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE70C061714;
-        Sun,  5 Dec 2021 11:02:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=SOXl9o+NM3H17iooiOp+N4HYzAPe9LLAu+twEINB+rs=; b=fny8pUDOqLGtQTWhQp0lxnx4LC
-        sAqFhxpZ6TBXxEN/9/qgPc0TcyBu6c0DRRakioc2++zW39hd7gcSg2qKP1Zm+CS2i0P4GWEEYZOsm
-        /+4cUOQXApIDGxGgcD08H0FYQvjglwsAkooyiczEc+LSaPtwAFsJiyPXTLmyZvrH6KVfwQVw5Z4LJ
-        0HfT5VrZFaw3A89G1aEqnwecrcw88ckGpDhBI+amQmteYzsXN8R6cnyO2iE1wP8Q6lMwW+em13I17
-        6aEXC38vhkfXUH6Wedmab81fRv42sUf412Ag5zdOP+d65SeoaIb9638w5aG8tLaDAHCJEfEH9TuHi
-        fJ/oPZLA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56088)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1mtwmh-00047b-Sw; Sun, 05 Dec 2021 19:02:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1mtwme-0003cE-PB; Sun, 05 Dec 2021 19:02:48 +0000
-Date:   Sun, 5 Dec 2021 19:02:48 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Andrew Lunn <andrew@lunn.ch>
-Cc:     Yinbo Zhu <zhuyinbo@loongson.cn>,
-        Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH v3 1/2] modpost: file2alias: make mdio alias configure
- match mdio uevent
-Message-ID: <Ya0M2E+Pqvh1FvPF@shell.armlinux.org.uk>
-References: <1638260517-13634-1-git-send-email-zhuyinbo@loongson.cn>
- <YaXrP1AyZ3AWaQzt@shell.armlinux.org.uk>
- <ea3f6904-c610-0ee6-fbab-913ba6ae36c5@loongson.cn>
- <Yas2+yq3h5/Bfvy9@shell.armlinux.org.uk>
- <YavYM2cs0RuY0JdM@shell.armlinux.org.uk>
- <YazhPOIIzpl43tzq@lunn.ch>
+        Sun, 5 Dec 2021 17:57:01 -0500
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 1B5MrK2f025862;
+        Mon, 6 Dec 2021 07:53:21 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 1B5MrK2f025862
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1638744801;
+        bh=02y8Hmq7k4uWGAUBXxegYbr6n1JwV2k+j9cXSqS837g=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=GxreuHn4bYs0iL/J1LTufSwbvQcC1NCB7TzmCUxf8a4lSnG631qU8obeQwwxwiwG6
+         7RTO1xszqcbcKPCMPgHg6NsWFUjvf0BvD3/2uLqSYIz+5MSHS7yDl8kO65mK5dWkcU
+         aoyRvz/AiqvxNS9RWzcs1En72Ph7SHLtZMgaSNSCXvO6i2GerLKinmT0LzcP3XhRPN
+         DraX3+4baU88Akfy6P5kTqP1tDdrdAkneDVZfD2O0hx+wOZu9yk6EYo7SaYAf5dM1X
+         7jif5Lhjt7+UiNifeGplQGZOch9P3B4hhH/Zg2Xi0FTjxOnMcv/+kWnMhDVXFTm1sd
+         0H6WaEXwfsW4A==
+X-Nifty-SrcIP: [209.85.214.181]
+Received: by mail-pl1-f181.google.com with SMTP id z6so5882105plk.6;
+        Sun, 05 Dec 2021 14:53:20 -0800 (PST)
+X-Gm-Message-State: AOAM533gCpmGxAF7D9Y2FQHOI08V4RfdV2MKycU3Jk6yjE/mcGiGZqz6
+        0OD8Hil8wtHT1Sr7clpW4MGdKlQHizv4h2uEvq8=
+X-Google-Smtp-Source: ABdhPJxxd7SYLDUb3KwfD+jjXQPAqAkN8dUiek9XQ87bpYUK5CNmtdu6FkRtHWyC1ZnRg2okpV1cxrBHSROqtSKN1aE=
+X-Received: by 2002:a17:90b:1d0e:: with SMTP id on14mr32470530pjb.119.1638744800126;
+ Sun, 05 Dec 2021 14:53:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YazhPOIIzpl43tzq@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20211124153105.155739-1-alex_y_xu@yahoo.ca> <20211124153105.155739-2-alex_y_xu@yahoo.ca>
+In-Reply-To: <20211124153105.155739-2-alex_y_xu@yahoo.ca>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 6 Dec 2021 07:52:43 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASO_EmCp2zR_sBq_YNiw83Px8pKhcW78HKv1My7eKB+2w@mail.gmail.com>
+Message-ID: <CAK7LNASO_EmCp2zR_sBq_YNiw83Px8pKhcW78HKv1My7eKB+2w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: pass --stream-size --no-content-size to zstd
+To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Cc:     Michael Forney <forney@google.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nick Terrell <terrelln@fb.com>, Ingo Molnar <mingo@kernel.org>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Dec 05, 2021 at 04:56:44PM +0100, Andrew Lunn wrote:
-> > This patch changes the MODALIAS entry for only PHY devices from:
-> > 	MODALIAS=of:Nethernet-phyT(null)
-> > to:
-> > 	MODALIAS=mdio:00000000001000100001010100010011
-> 
-> Hi Russell
-> 
-> You patch looks good for the straight forward cases.
-> 
-> What happens in the case of
-> 
->         ethernet-phy@0 {
->             compatible = "ethernet-phy-ieee802.3-c45";
-> 
-> 
-> Does this get appended to the end, or does it overwrite?
+On Thu, Nov 25, 2021 at 12:30 AM Alex Xu (Hello71) <alex_y_xu@yahoo.ca> wrote:
+>
+> Otherwise, it allocates 2 GB of memory at once. Even though the majority
+> of this memory is never touched, the default heuristic overcommit
+> refuses this request if less than 2 GB of RAM+swap is currently
+> available. This results in "zstd: error 11 : Allocation error : not
+> enough memory" and the kernel failing to build.
+>
+> When the size is specified, zstd will reduce the memory request
+> appropriately. For typical kernel sizes of ~32 MB, the largest mmap
+> request will be reduced to 512 MB, which will succeed on all but the
+> smallest devices.
+>
+> For inputs around this size, --stream-size --no-content-size may
+> slightly decrease the compressed size, or slightly increase it:
+> https://github.com/facebook/zstd/issues/2848.
+>
+> Signed-off-by: Alex Xu (Hello71) <alex_y_xu@yahoo.ca>
 
-Hmm, good point, I'd forgotten about clause 45 PHYs - we need to dig
-the first existing ID out of the clause 45 ID array and use that
-instead. That said, we don't publish the ID through the "phy_id"
-sysfs file either for clause 45.
 
-I don't believe it's possible to publish multiple modalias strings.
 
-This gives a problem for clause 45 PHYs which can have a different ID
-for each MMD, and the driver might match on only one of those. 88x3310
-is an example where different MMDs have different IDs. The mechanism
-we have in phy_device_create() gets around that, because we call
-phy_request_driver_module() for every ID there is in the hope that one
-of those will load the appropriate driver, but as I say, I don't
-believe that's a possibility via the udev approach.
 
-So I think we may have to say that clause 45 PHYs can't reliably use
-the conventional udev mechanism.
+The reason why we need this workaround is just because we do
+"cat and compress".  zstd must allocate a huge memory beforehand
+since it cannot predict how long the stream it will receive.
+
+If zstd is given with a file name, it can fstat it to know its file size
+and allocate the minimal amount of memory.
+
+
+This is my test.
+I used 'ulimit' to set the upper limit of the memory the zstd can use.
+
+
+[test steps]
+
+  # Create a 1kB file
+  $ truncate --size=1k dummy
+
+  # Set the memory size limit to 10MB
+  $ ulimit -S -v 10240
+
+  # Pass the file as a argument; success
+  $ zstd -19 -o dummy.zst dummy
+  dummy                :  2.15%   (  1024 =>     22 bytes, dummy.zst)
+
+  # cat and zstd; fail
+  $ cat dummy | zstd -19 > dummy.zst
+  zstd: error 11 : Allocation error : not enough memory
+
+  # cat and zstd --stream-size; success
+  $ cat dummy | zstd -19 --stream-size=1024 > dummy.zst
+
+
+
+
+scripts/Makefile.modinst was written in such a way
+that zstd can know the file size by itself.
+
+      cmd_zstd = $(ZSTD) -T0 --rm -f -q $<
+
+
+We cannot rewrite scripts/Makefile.lib in that way because
+arch/x86/boot/compress/Makefile concatenates two files before
+compression. And this is the only use-case of this feature.
+
+So, I am seriously considering to revert this commit:
+
+commit d3dd3b5a29bb9582957451531fed461628dfc834
+Author: H. Peter Anvin <hpa@zytor.com>
+Date:   Tue May 5 21:17:15 2009 -0700
+
+    kbuild: allow compressors (gzip, bzip2, lzma) to take multiple inputs
+
+
+
+
+With that commit reverted, zstd will take a single input file,
+and we can do "zstd -o <output> <input>".
+
+
+So, I will take some time to investigate that approach.
+
+
+
+
+> ---
+>  scripts/Makefile.lib | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index ca901814986a..c98a82ca38e6 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -466,12 +466,20 @@ quiet_cmd_xzmisc = XZMISC  $@
+>  # single pass, so zstd doesn't need to allocate a window buffer. When streaming
+>  # decompression is used, like initramfs decompression, zstd22 should likely not
+>  # be used because it would require zstd to allocate a 128 MB buffer.
+> +#
+> +# --stream-size to reduce zstd memory usage (otherwise zstd -22 --ultra
+> +# allocates, but does not use, 2 GB) and potentially improve compression.
+> +#
+> +# --no-content-size to save three bytes which we do not use (we use size_append).
+> +
+> +# zstd --stream-size is only supported since 1.4.4
+> +zstd_stream_size = $(shell $(ZSTD) -1c --stream-size=0 --no-content-size </dev/null >/dev/null 2>&1 && printf '%s' '--stream-size=$(total_size) --no-content-size')
+>
+>  quiet_cmd_zstd = ZSTD    $@
+> -      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) -19; $(size_append); } > $@
+> +      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -19; $(size_append); } > $@
+>
+>  quiet_cmd_zstd22 = ZSTD22  $@
+> -      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) -22 --ultra; $(size_append); } > $@
+> +      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -22 --ultra; $(size_append); } > $@
+>
+>  # ASM offsets
+>  # ---------------------------------------------------------------------------
+> --
+> 2.34.0
+>
+
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Best Regards
+Masahiro Yamada
