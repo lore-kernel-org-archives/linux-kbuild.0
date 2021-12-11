@@ -2,103 +2,313 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6749BC4332F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Dec 2021 13:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA7FC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 11 Dec 2021 15:54:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241632AbhLJNYb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 10 Dec 2021 08:24:31 -0500
-Received: from pb-sasl-trial3.pobox.com ([64.147.108.87]:61129 "EHLO
-        pb-sasl-trial3.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241521AbhLJNYa (ORCPT
+        id S229518AbhLKPyV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 11 Dec 2021 10:54:21 -0500
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:60356 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230204AbhLKPyV (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:24:30 -0500
-Received: from pb-sasl-trial3.pobox.com (localhost.local [127.0.0.1])
-        by pb-sasl-trial3.pobox.com (Postfix) with ESMTP id A2E342E1EC;
-        Fri, 10 Dec 2021 08:20:49 -0500 (EST)
-        (envelope-from nico@fluxnic.net)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=pobox.com; h=date:from:to
-        :cc:subject:in-reply-to:message-id:references:mime-version
-        :content-type; s=sasl; bh=E68Man9i8uGbUzpPImAfkcG0qQQ=; b=M3i/hG
-        +azN6LUuLTqwmsHeWkGG7FXoUTNLjKlcghu0jP1JL7tMcr1g3DLKr0EwVhjeBZ/L
-        y8icsjLdxH0UvesHgER6DOoFGERVbG5wJCPvby524NWd/jljcQFS250sFKI/vS4w
-        tPkXHLp5Tqj+0NTd4s++EeeXGODc+op0P7iZ8=
-Received: from pb-smtp1.nyi.icgroup.com (pb-smtp1.pobox.com [10.90.30.53])
-        by pb-sasl-trial3.pobox.com (Postfix) with ESMTP id 7B5532E1E9;
-        Fri, 10 Dec 2021 08:20:49 -0500 (EST)
-        (envelope-from nico@fluxnic.net)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=fluxnic.net;
- h=date:from:to:cc:subject:in-reply-to:message-id:references:mime-version:content-type; s=2016-12.pbsmtp; bh=t/i4EcgilqHL2J/A6MZhr8Rb0kiWWXpYExUCO+guzKc=; b=wl6ECYHXf3DMmbJe3rjaV3PHwRQeyftEtMeaXX/tLxVUyMNdWluOEpCkL6gCK68AGUCs3Qpr5a/bOUni3SRDm7odrxxtfU+++aqtjURc2s+DqWbqYpQ+/IlgADslc0PIS+iauEYxKrzGgFVDccc1X5aVWjPyjohZIr9jY6hiZmc=
-Received: from yoda.home (unknown [96.21.170.108])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by pb-smtp1.pobox.com (Postfix) with ESMTPSA id D48B2101024;
-        Fri, 10 Dec 2021 08:20:48 -0500 (EST)
-        (envelope-from nico@fluxnic.net)
-Received: from xanadu.home (xanadu.home [192.168.2.2])
-        by yoda.home (Postfix) with ESMTPSA id 5172A2DA003C;
-        Fri, 10 Dec 2021 08:20:47 -0500 (EST)
-Date:   Fri, 10 Dec 2021 08:20:47 -0500 (EST)
-From:   Nicolas Pitre <nico@fluxnic.net>
-To:     Alexander Lobakin <alexandr.lobakin@intel.com>
-cc:     Peter Zijlstra <peterz@infradead.org>,
-        linux-hardening@vger.kernel.org, x86@kernel.org,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Bruce Schlobohm <bruce.schlobohm@intel.com>,
-        Jessica Yu <jeyu@kernel.org>,
-        kernel test robot <lkp@intel.com>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Evgenii Shatokhin <eshatokhin@virtuozzo.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        "H . J . Lu" <hjl.tools@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Marios Pomonis <pomonis@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-arch@vger.kernel.org, live-patching@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH v8 05/14] x86: conditionally place regular ASM functions
- into separate sections
-In-Reply-To: <20211210110102.707759-1-alexandr.lobakin@intel.com>
-Message-ID: <2onsnq80-p1s8-00-roo9-n02q74319ro@syhkavp.arg>
-References: <20211202223214.72888-1-alexandr.lobakin@intel.com> <20211202223214.72888-6-alexandr.lobakin@intel.com> <Yanm6tJ2obi1aKv6@hirez.programming.kicks-ass.net> <20211210110102.707759-1-alexandr.lobakin@intel.com>
+        Sat, 11 Dec 2021 10:54:21 -0500
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 1BBFrqFX005993;
+        Sun, 12 Dec 2021 00:53:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 1BBFrqFX005993
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1639238033;
+        bh=OnB0zpwoAwMurjphUAtp8uU+9+JVaMiWORrcysltMaU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=gI1mVLvBeXe/apHOHAlBFQKKIUgRxiEWdChVxDGJ4fsI3kuoC/PoDWNKkwQ8+l50n
+         c56iYP9/3ByVZ+196VpisY+ULB2bhl//FFVjMc2YXSxNxgIcp11bJp/p7DG1YdkOAL
+         KdBiI361kZcne82dy7u3JzuuY0xZVFZ5NeFIdF+OHT1uckpOSRdQ3f/8hTDamTbODX
+         Z3FSxvIZXS0959YTasnF39B00jRaA9Apn7JguB4yMwEFSChIny8fLFabMnoRyqz/Hv
+         nrudVqFcJewfqslEKj+iCnyqRz7uhnky2qbwaC//NXuA9b/cyfLRnQd4/dNq53Zg2r
+         45qQLPFzt18/w==
+X-Nifty-SrcIP: [209.85.215.175]
+Received: by mail-pg1-f175.google.com with SMTP id s137so10601195pgs.5;
+        Sat, 11 Dec 2021 07:53:53 -0800 (PST)
+X-Gm-Message-State: AOAM532SG/1Z3Q+EcjODiwM/ZZSUX5zpbutxdnK8XjO6J9cmn+GECOcZ
+        YrU3AxElk9RSD/UIQfNnPSGIQ773h5re2zbn1Pg=
+X-Google-Smtp-Source: ABdhPJwA6pNPRGX5iwZZGN4tY0x/xzcZIrvvAqHfsVMVystJJYLcl9ZLHrzpACGiX8GG/s/ed1fgSYNEPYYNKm8NGt8=
+X-Received: by 2002:a65:50c6:: with SMTP id s6mr45363550pgp.352.1639238032202;
+ Sat, 11 Dec 2021 07:53:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Pobox-Relay-ID: FD891D6C-59BB-11EC-A1FA-E10CCAD8090B-78420484!pb-smtp1.pobox.com
+References: <20211206140313.5653-1-ojeda@kernel.org> <20211206140313.5653-16-ojeda@kernel.org>
+In-Reply-To: <20211206140313.5653-16-ojeda@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 12 Dec 2021 00:53:15 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAS+eiL-kcdnNyyCUNWjV5qGxrw4PM-oJFfw=o1fbhc2qw@mail.gmail.com>
+Message-ID: <CAK7LNAS+eiL-kcdnNyyCUNWjV5qGxrw4PM-oJFfw=o1fbhc2qw@mail.gmail.com>
+Subject: Re: [PATCH 15/19] Kbuild: add Rust support
+To:     Miguel Ojeda <ojeda@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux@vger.kernel.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Finn Behrens <me@kloenk.de>,
+        Adam Bratschi-Kaye <ark.email@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sven Van Asbroeck <thesven73@gmail.com>,
+        Gary Guo <gary@garyguo.net>,
+        Boris-Chengbiao Zhou <bobo1239@web.de>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Douglas Su <d0u9.su@outlook.com>,
+        Dariusz Sosnowski <dsosnowski@dsosnowski.pl>,
+        Antonio Terceiro <antonio.terceiro@linaro.org>,
+        Daniel Xu <dxu@dxuuu.xyz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, 10 Dec 2021, Alexander Lobakin wrote:
+On Mon, Dec 6, 2021 at 11:06 PM Miguel Ojeda <ojeda@kernel.org> wrote:
+>
+> Having all the new files in place, we now enable Rust support
+> in the build system, including `Kconfig` entries related to Rust,
+> the Rust configuration printer, the target definition files,
+> the version detection script and a few other bits.
+>
+> In the future, we will likely want to generate the target files
+> on the fly via a script.
+>
+> Co-developed-by: Alex Gaynor <alex.gaynor@gmail.com>
+> Signed-off-by: Alex Gaynor <alex.gaynor@gmail.com>
+> Co-developed-by: Finn Behrens <me@kloenk.de>
+> Signed-off-by: Finn Behrens <me@kloenk.de>
+> Co-developed-by: Adam Bratschi-Kaye <ark.email@gmail.com>
+> Signed-off-by: Adam Bratschi-Kaye <ark.email@gmail.com>
+> Co-developed-by: Wedson Almeida Filho <wedsonaf@google.com>
+> Signed-off-by: Wedson Almeida Filho <wedsonaf@google.com>
+> Co-developed-by: Michael Ellerman <mpe@ellerman.id.au>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> Co-developed-by: Sven Van Asbroeck <thesven73@gmail.com>
+> Signed-off-by: Sven Van Asbroeck <thesven73@gmail.com>
+> Co-developed-by: Gary Guo <gary@garyguo.net>
+> Signed-off-by: Gary Guo <gary@garyguo.net>
+> Co-developed-by: Boris-Chengbiao Zhou <bobo1239@web.de>
+> Signed-off-by: Boris-Chengbiao Zhou <bobo1239@web.de>
+> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> Co-developed-by: Douglas Su <d0u9.su@outlook.com>
+> Signed-off-by: Douglas Su <d0u9.su@outlook.com>
+> Co-developed-by: Dariusz Sosnowski <dsosnowski@dsosnowski.pl>
+> Signed-off-by: Dariusz Sosnowski <dsosnowski@dsosnowski.pl>
+> Co-developed-by: Antonio Terceiro <antonio.terceiro@linaro.org>
+> Signed-off-by: Antonio Terceiro <antonio.terceiro@linaro.org>
+> Co-developed-by: Daniel Xu <dxu@dxuuu.xyz>
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> ---
+>  .gitignore                    |   5 +
+>  .rustfmt.toml                 |  12 ++
+>  Makefile                      | 146 +++++++++++++-
+>  arch/arm/rust/target.json     |  27 +++
+>  arch/arm64/rust/target.json   |  34 ++++
+>  arch/powerpc/rust/target.json |  29 +++
+>  arch/riscv/Makefile           |   1 +
+>  arch/riscv/rust/rv32ima.json  |  36 ++++
+>  arch/riscv/rust/rv32imac.json |  36 ++++
+>  arch/riscv/rust/rv64ima.json  |  36 ++++
+>  arch/riscv/rust/rv64imac.json |  36 ++++
+>  arch/x86/rust/target.json     |  36 ++++
+>  init/Kconfig                  |  31 ++-
+>  lib/Kconfig.debug             | 144 ++++++++++++++
+>  rust/.gitignore               |   7 +
+>  rust/Makefile                 | 353 ++++++++++++++++++++++++++++++++++
+>  rust/bindgen_parameters       |  13 ++
+>  scripts/Makefile.build        |  22 +++
+>  scripts/Makefile.debug        |  10 +
+>  scripts/Makefile.lib          |  12 ++
+>  scripts/Makefile.modfinal     |   8 +-
+>  scripts/is_rust_module.sh     |  19 ++
+>  scripts/kconfig/confdata.c    |  75 ++++++++
+>  scripts/rust-version.sh       |  31 +++
+>  24 files changed, 1147 insertions(+), 12 deletions(-)
+>  create mode 100644 .rustfmt.toml
+>  create mode 100644 arch/arm/rust/target.json
+>  create mode 100644 arch/arm64/rust/target.json
+>  create mode 100644 arch/powerpc/rust/target.json
+>  create mode 100644 arch/riscv/rust/rv32ima.json
+>  create mode 100644 arch/riscv/rust/rv32imac.json
+>  create mode 100644 arch/riscv/rust/rv64ima.json
+>  create mode 100644 arch/riscv/rust/rv64imac.json
+>  create mode 100644 arch/x86/rust/target.json
+>  create mode 100644 rust/.gitignore
+>  create mode 100644 rust/Makefile
+>  create mode 100644 rust/bindgen_parameters
+>  create mode 100755 scripts/is_rust_module.sh
+>  create mode 100755 scripts/rust-version.sh
+>
+> diff --git a/.gitignore b/.gitignore
+> index 7afd412dadd2..48c68948f476 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -37,6 +37,7 @@
+>  *.o
+>  *.o.*
+>  *.patch
+> +*.rmeta
+>  *.s
+>  *.so
+>  *.so.dbg
+> @@ -96,6 +97,7 @@ modules.order
+>  !.gitattributes
+>  !.gitignore
+>  !.mailmap
+> +!.rustfmt.toml
+>
+>  #
+>  # Generated include files
+> @@ -161,3 +163,6 @@ x509.genkey
+>
+>  # Documentation toolchain
+>  sphinx_*/
+> +
+> +# Rust analyzer configuration
+> +/rust-project.json
+> diff --git a/.rustfmt.toml b/.rustfmt.toml
+> new file mode 100644
+> index 000000000000..3de5cc497465
+> --- /dev/null
+> +++ b/.rustfmt.toml
+> @@ -0,0 +1,12 @@
+> +edition = "2021"
+> +newline_style = "Unix"
+> +
+> +# Unstable options that help catching some mistakes in formatting and that we may want to enable
+> +# when they become stable.
+> +#
+> +# They are kept here since they are useful to run from time to time.
+> +#format_code_in_doc_comments = true
+> +#reorder_impl_items = true
+> +#comment_width = 100
+> +#wrap_comments = true
+> +#normalize_comments = true
+> diff --git a/Makefile b/Makefile
+> index 0a6ecc8bb2d2..0f20ca9bd723 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -120,6 +120,13 @@ endif
+>
+>  export KBUILD_CHECKSRC
+>
+> +# Enable "clippy" (a linter) as part of the Rust compilation.
+> +#
+> +# Use 'make CLIPPY=1' to enable it.
+> +ifeq ("$(origin CLIPPY)", "command line")
+> +  KBUILD_CLIPPY := $(CLIPPY)
+> +endif
 
-> I could do unconditional
-> 
-> .pushsection %S.##name
->                 ^^^^^^ function name
-> 
-> but this would involve changing LDS scripts (and vmlinux.lds.h) to
-> let's say replace *(.noinstr.text) with *(.noinstr.text*).
+Do you really want to support CLIPPY=1
+in addition to KBUILD_CLIPPY=1 ?
 
-Yes, this is meant to be used with a linker script that expects the new 
-name.
+(Refer to C=  V=  M=  O=, which checks $(origin ) )
 
 
-Nicolas
+
+>
+>  KBUILD_LDFLAGS_MODULE += --build-id=sha1
+>  LDFLAGS_vmlinux += --build-id=sha1
+> @@ -1095,6 +1163,11 @@ ifeq ($(KBUILD_EXTMOD),)
+>  core-y                 += kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
+>  core-$(CONFIG_BLOCK)   += block/
+>
+> +# Keep this one as an `ifdef` block since its `Makefile` runs `rustc`.
+> +ifdef CONFIG_RUST
+> +core-y                 += rust/
+> +endif
+
+
+
+Is there any reason why
+you did not write like
+
+  core-$(CONFIG_RUST)  += rust/
+
+?
+
+
+
+
+
+
+
+
+> diff --git a/rust/.gitignore b/rust/.gitignore
+> new file mode 100644
+> index 000000000000..168cb26a31b9
+> --- /dev/null
+> +++ b/rust/.gitignore
+> @@ -0,0 +1,7 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +bindings_generated.rs
+> +bindings_helpers_generated.rs
+> +exports_*_generated.h
+> +doc/
+> +test/
+> diff --git a/rust/Makefile b/rust/Makefile
+> new file mode 100644
+> index 000000000000..2d08314e7031
+> --- /dev/null
+> +++ b/rust/Makefile
+> @@ -0,0 +1,353 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +obj-$(CONFIG_RUST) += core.o compiler_builtins.o helpers.o
+> +extra-$(CONFIG_RUST) += exports_core_generated.h
+> +
+> +extra-$(CONFIG_RUST) += libmacros.so
+> +
+> +extra-$(CONFIG_RUST) += bindings_generated.rs bindings_helpers_generated.rs
+> +obj-$(CONFIG_RUST) += alloc.o kernel.o
+> +extra-$(CONFIG_RUST) += exports_alloc_generated.h exports_kernel_generated.h
+> +
+> +ifdef CONFIG_RUST_BUILD_ASSERT_DENY
+> +extra-$(CONFIG_RUST) += build_error.o
+> +else
+> +obj-$(CONFIG_RUST) += build_error.o
+> +endif
+
+
+extra-y does nothing for 'make modules'.
+Is this your expected behavior?
+
+(commit d0e628cd817f3)
+
+
+
+
+
+> +$(objtree)/rust/build_error.o: $(srctree)/rust/build_error.rs \
+> +    $(objtree)/rust/compiler_builtins.o FORCE
+> +       $(call if_changed_dep,rustc_library)
+> +
+> +# ICE on `--extern macros`: https://github.com/rust-lang/rust/issues/56935
+> +$(objtree)/rust/kernel.o: private rustc_target_flags = --extern alloc \
+> +    --extern build_error \
+> +    --extern macros=$(objtree)/rust/libmacros.so
+> +$(objtree)/rust/kernel.o: $(srctree)/rust/kernel/lib.rs $(objtree)/rust/alloc.o \
+> +    $(objtree)/rust/build_error.o \
+> +    $(objtree)/rust/libmacros.so $(objtree)/rust/bindings_generated.rs \
+> +    $(objtree)/rust/bindings_helpers_generated.rs FORCE
+> +       $(call if_changed_dep,rustc_library)
+> +
+> +# Targets that need to expand twice
+> +.SECONDEXPANSION:
+
+Why is .SECONDEXPANSION: needed ?
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
