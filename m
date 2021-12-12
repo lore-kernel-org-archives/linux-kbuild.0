@@ -2,30 +2,30 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A11C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 12 Dec 2021 19:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B0DC43217
+	for <linux-kbuild@archiver.kernel.org>; Sun, 12 Dec 2021 19:31:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbhLLTbE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 12 Dec 2021 14:31:04 -0500
-Received: from conuserg-08.nifty.com ([210.131.2.75]:25056 "EHLO
+        id S230203AbhLLTbF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 12 Dec 2021 14:31:05 -0500
+Received: from conuserg-08.nifty.com ([210.131.2.75]:25068 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbhLLTbC (ORCPT
+        with ESMTP id S229677AbhLLTbD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Dec 2021 14:31:02 -0500
+        Sun, 12 Dec 2021 14:31:03 -0500
 Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 1BCJTqAl000552;
-        Mon, 13 Dec 2021 04:29:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 1BCJTqAl000552
+        by conuserg-08.nifty.com with ESMTP id 1BCJTqAu000552;
+        Mon, 13 Dec 2021 04:30:00 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 1BCJTqAu000552
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1639337394;
-        bh=sqXOYwkFablz41E0oWMVhTZpxyt50WK1mBZfVI4Zx3w=;
+        s=dec2015msa; t=1639337401;
+        bh=UTYKGj88xYToscrUiygI8mCc6KISWEtozuMy+fS5oOs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=H205vjUCdYO6xAa7AFuA6ENjwwIOzFL+Gy1a1mP8wKMOfFtNWIZZryXg+wyNaw7OA
-         IbKTWhQfZxQAS5If5CCA9FFh52sabHUa830/BZElnjhRK85oG47czr0t5h2e7wuHEF
-         30gJNIaW8WjXihtwxDZpp8fxp8/s73Os/PWoXEVe4g8c0nmJffHHamdsFP4eMQ8FiI
-         OJnhsaY8wDwV/HABFtHvDFxGmkYXr1nf8sEUe36r5AUkMIIprKKdubTgJUox6RMH/A
-         6r/+9b2p4qPI6ICJsDFk1PfI+vFtonVtd11TRGAHUack5exrLUidPuguKzkXa2dCx9
-         cK+pWYUZAqV5Q==
+        b=KCgeTjseCnfEnf23cAtZpH+SF1PG0fz94Jpmlvqj0rdXjFDYgkDHcMXziM2yJ5H21
+         +OYWsJWkMJ187PTnH0UP5p7uAKOYtcKcoerV0vpo0c9t9qUwEbs4rrOkS5rJYG+sYf
+         mkKieUCPcYuxbhuxivVDGd+X2o/4hrxMfLJMWwuWuzD7UWHiRiP4Fg9ADWzlYaXOHV
+         x/lNyL9ESqR48kcOllow/sxJoe/pOJm7CsPi4al9IU45pr30i+AjJCHoaoWq695NSx
+         9yPDuUtXA/f3GK8vm3c6nuDktGb8/IUPNxHXb+AuYFQ+fcr6z/lW50RN/FaDO/b3YE
+         CtJ9/RihBpFYQ==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -34,9 +34,9 @@ Cc:     Michal Simek <michal.simek@xilinx.com>, linux-arch@vger.kernel.org,
         David Woodhouse <dwmw2@infradead.org>,
         keyrings@vger.kernel.org, Richard Weinberger <richard@nod.at>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 01/10] certs: use $@ to simplify the key generation rule
-Date:   Mon, 13 Dec 2021 04:29:32 +0900
-Message-Id: <20211212192941.1149247-2-masahiroy@kernel.org>
+Subject: [PATCH 10/10] microblaze: use built-in function to get CPU_{MAJOR,MINOR,REV}
+Date:   Mon, 13 Dec 2021 04:29:41 +0900
+Message-Id: <20211212192941.1149247-11-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20211212192941.1149247-1-masahiroy@kernel.org>
 References: <20211212192941.1149247-1-masahiroy@kernel.org>
@@ -46,28 +46,32 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Do not repeat $(obj)/signing_key.pem
+Use built-in functions instead of shell commands to avoid forking
+processes.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- certs/Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/microblaze/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/certs/Makefile b/certs/Makefile
-index a702b70f3cb9..97fd6cc02972 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -61,8 +61,7 @@ keytype-$(CONFIG_MODULE_SIG_KEY_TYPE_ECDSA) := -newkey ec -pkeyopt ec_paramgen_c
- quiet_cmd_gen_key = GENKEY  $@
-       cmd_gen_key = openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
- 		-batch -x509 -config $(obj)/x509.genkey \
--		-outform PEM -out $(obj)/signing_key.pem \
--		-keyout $(obj)/signing_key.pem $(keytype-y) 2>&1
-+		-outform PEM -out $@ -keyout $@ $(keytype-y) 2>&1
+diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+index a25e76d89e86..1826d9ce4459 100644
+--- a/arch/microblaze/Makefile
++++ b/arch/microblaze/Makefile
+@@ -6,9 +6,9 @@ UTS_SYSNAME = -DUTS_SYSNAME=\"Linux\"
+ # What CPU version are we building for, and crack it open
+ # as major.minor.rev
+ CPU_VER   := $(CONFIG_XILINX_MICROBLAZE0_HW_VER)
+-CPU_MAJOR := $(shell echo $(CPU_VER) | cut -d '.' -f 1)
+-CPU_MINOR := $(shell echo $(CPU_VER) | cut -d '.' -f 2)
+-CPU_REV   := $(shell echo $(CPU_VER) | cut -d '.' -f 3)
++CPU_MAJOR := $(word 1, $(subst ., , $(CPU_VER)))
++CPU_MINOR := $(word 2, $(subst ., , $(CPU_VER)))
++CPU_REV   := $(word 3, $(subst ., , $(CPU_VER)))
  
- $(obj)/signing_key.pem: $(obj)/x509.genkey FORCE
- 	$(call if_changed,gen_key)
+ export CPU_VER CPU_MAJOR CPU_MINOR CPU_REV
+ 
 -- 
 2.32.0
 
