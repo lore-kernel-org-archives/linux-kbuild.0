@@ -2,122 +2,80 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED06C4332F
-	for <linux-kbuild@archiver.kernel.org>; Sun, 12 Dec 2021 19:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3D1C433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Dec 2021 06:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbhLLTbW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 12 Dec 2021 14:31:22 -0500
-Received: from conuserg-08.nifty.com ([210.131.2.75]:25071 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbhLLTbD (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Dec 2021 14:31:03 -0500
-Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 1BCJTqAo000552;
-        Mon, 13 Dec 2021 04:29:56 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 1BCJTqAo000552
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1639337396;
-        bh=2g0tBurhBmvuApdFMavEEHFbPrAFXCWxdFQ5K1KWeCA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qb36dAb7EH/VE+6ua4zaAYZfs3QbELmdy8H9Who9cyvYp0dxwf6pQeARSebHzS1+o
-         fvwS45+mYGRWfOnZaU3BSMf4jtW4jkQtNjzUokl6RwRvrbQB4dU7+Ut7f1ttsyX8BX
-         bijuc5IsNTHq7r00VBTcsGt3jmZbGfDhA3NLYB+lyedrBtXHNsbQkmx0GNAGDEmCwo
-         RjreLSkQyx1diS2grHcjknTnXANOIz18qjxxleeph3MO6vZzs7SYCt0Y6tsa35m6Jd
-         6E9nBp4Wg2XRiePtkDNC3f65pGzU/OfkQ6RvoXUDCivpq3A6k9FtoodfaIUITpZv1W
-         gnR6vmJI9lD4A==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Michal Simek <michal.simek@xilinx.com>, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        keyrings@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 04/10] certs: refactor file cleaning
-Date:   Mon, 13 Dec 2021 04:29:35 +0900
-Message-Id: <20211212192941.1149247-5-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20211212192941.1149247-1-masahiroy@kernel.org>
-References: <20211212192941.1149247-1-masahiroy@kernel.org>
+        id S232207AbhLMG1l (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Dec 2021 01:27:41 -0500
+Received: from mga04.intel.com ([192.55.52.120]:36861 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232176AbhLMG1k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Dec 2021 01:27:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639376860; x=1670912860;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=NzkKDaPqL+cLbXZfMMA1Kk+T1h3ZKqkozdhUr5mEcTk=;
+  b=ddTyDGhvXEZ8L8gGirvW0u3JQubps8mLHY+ehmV2inO6zdk5xBXktW+l
+   EKhmyh4U7FjHXnKgtKF/gj6tcW41qAx3t4ZX4pIEuKV+beDaQIZqLhzZE
+   wpAQlBr/C2FiV7XbfEhJy+JNv05lH5ShmzgVvH8aASXhhDBcxqq5bOG51
+   mmyaxYL79TkWOqGXyaVCvPEtDWynOWHJkNg0o/iCfyxOzl3BIWBcHHQPU
+   LHdSIMJruj5m4RTFqQlIz0+sD2viVNUDPHVbJPhVeK/tqBqsEP9Zidz5Y
+   C4agkdM3wdJzLQ565jgnMOMmD+dMhhMxwnFE9kzkQJclfDAKa5T3o5o5K
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10196"; a="237406372"
+X-IronPort-AV: E=Sophos;i="5.88,201,1635231600"; 
+   d="scan'208";a="237406372"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2021 22:27:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,201,1635231600"; 
+   d="scan'208";a="464506951"
+Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 12 Dec 2021 22:27:39 -0800
+Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mweoE-0006Nf-Aj; Mon, 13 Dec 2021 06:27:38 +0000
+Date:   Mon, 13 Dec 2021 14:27:21 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     kbuild-all@lists.01.org, linux-kbuild@vger.kernel.org
+Subject: [masahiroy-kbuild:testing-kconfig 24/25] scripts/gen_autoksyms.sh:
+ 1138: include/config/auto.conf: Syntax error: "(" unexpected
+Message-ID: <202112131409.xtFaq5U1-lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-'make clean' removes files listed in 'targets'. It is redundant to
-specify both 'targets' and 'clean-files'.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git testing-kconfig
+head:   e0b2802c637b32a68e0a9f99fc4bb1102518bf79
+commit: 24b17f5f009bd77f46c48645dfd03d430439bd43 [24/25] kbuild: do not quote string values in include/config/auto.conf
+config: x86_64-randconfig-a001-20211212 (https://download.01.org/0day-ci/archive/20211213/202112131409.xtFaq5U1-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git/commit/?id=24b17f5f009bd77f46c48645dfd03d430439bd43
+        git remote add masahiroy-kbuild https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+        git fetch --no-tags masahiroy-kbuild testing-kconfig
+        git checkout 24b17f5f009bd77f46c48645dfd03d430439bd43
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=x86_64 prepare
 
-Move 'targets' assignments out of the ifeq-conditionals so
-scripts/Makefile.clean can see them.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-One effective change is that certs/certs/signing_key.x509 is now
-deleted by 'make clean' instead of 'make mrproper. This certificate
-is embedded in the kernel. It is not used in any way by external
-module builds.
+All errors (new ones prefixed by >>):
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+>> scripts/gen_autoksyms.sh: 1138: include/config/auto.conf: Syntax error: "(" unexpected
+   make[1]: *** [Makefile:1151: include/generated/autoksyms.h] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:219: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
+
 ---
-
- Makefile       | 2 +-
- certs/Makefile | 9 +++++----
- 2 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 0a6ecc8bb2d2..4e8ac0730f51 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1503,7 +1503,7 @@ MRPROPER_FILES += include/config include/generated          \
- 		  debian snap tar-install \
- 		  .config .config.old .version \
- 		  Module.symvers \
--		  certs/signing_key.pem certs/signing_key.x509 \
-+		  certs/signing_key.pem \
- 		  certs/x509.genkey \
- 		  vmlinux-gdb.py \
- 		  *.spec
-diff --git a/certs/Makefile b/certs/Makefile
-index e7d6ee183496..0dc523e8ca7c 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -22,12 +22,11 @@ $(eval $(call config_filename,SYSTEM_TRUSTED_KEYS))
- # GCC doesn't include .incbin files in -MD generated dependencies (PR#66871)
- $(obj)/system_certificates.o: $(obj)/x509_certificate_list
- 
--targets += x509_certificate_list
- $(obj)/x509_certificate_list: scripts/extract-cert $(SYSTEM_TRUSTED_KEYS_SRCPREFIX)$(SYSTEM_TRUSTED_KEYS_FILENAME) FORCE
- 	$(call if_changed,extract_certs,$(SYSTEM_TRUSTED_KEYS_SRCPREFIX)$(CONFIG_SYSTEM_TRUSTED_KEYS))
- endif # CONFIG_SYSTEM_TRUSTED_KEYRING
- 
--clean-files := x509_certificate_list .x509.list x509_revocation_list
-+targets += x509_certificate_list
- 
- ifeq ($(CONFIG_MODULE_SIG),y)
- 	SIGN_KEY = y
-@@ -84,18 +83,20 @@ endif
- # GCC PR#66871 again.
- $(obj)/system_certificates.o: $(obj)/signing_key.x509
- 
--targets += signing_key.x509
- $(obj)/signing_key.x509: scripts/extract-cert $(X509_DEP) FORCE
- 	$(call if_changed,extract_certs,$(MODULE_SIG_KEY_SRCPREFIX)$(CONFIG_MODULE_SIG_KEY))
- endif # CONFIG_MODULE_SIG
- 
-+targets += signing_key.x509
-+
- ifeq ($(CONFIG_SYSTEM_REVOCATION_LIST),y)
- 
- $(eval $(call config_filename,SYSTEM_REVOCATION_KEYS))
- 
- $(obj)/revocation_certificates.o: $(obj)/x509_revocation_list
- 
--targets += x509_revocation_list
- $(obj)/x509_revocation_list: scripts/extract-cert $(SYSTEM_REVOCATION_KEYS_SRCPREFIX)$(SYSTEM_REVOCATION_KEYS_FILENAME) FORCE
- 	$(call if_changed,extract_certs,$(SYSTEM_REVOCATION_KEYS_SRCPREFIX)$(CONFIG_SYSTEM_REVOCATION_KEYS))
- endif
-+
-+targets += x509_revocation_list
--- 
-2.32.0
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
