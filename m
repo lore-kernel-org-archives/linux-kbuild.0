@@ -2,117 +2,145 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FDEC433FE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 15 Dec 2021 17:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F31C433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 16 Dec 2021 22:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245382AbhLORYZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 15 Dec 2021 12:24:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35220 "EHLO
+        id S234459AbhLPWEK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 16 Dec 2021 17:04:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245494AbhLORX6 (ORCPT
+        with ESMTP id S237406AbhLPWEI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Dec 2021 12:23:58 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D151C06173E
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Dec 2021 09:23:55 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y68-20020a626447000000b004a2b2d0c39eso13879644pfb.14
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Dec 2021 09:23:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=iGbvXQdkxYPoygjkM3JM9RpVpo+BIs+MXjiiOrhhuyA=;
-        b=B03ht7PY4Fjl7Z7WQAU3hcdcDr2OYcC9DC/4P4ahXm7bv1hzPXN1T2n7+txvRmbOhC
-         YATe4MzbArKiHdTr/399Ibo4g8EinaAxpLgDHRtnqLMh84cASaMCyP4roVhvRQmnYu1u
-         /3McHgmT3oCLSVPl2v+vdK209GH63GtZJ2yGMk/Uhthl7YBbmAFQkiAgrJS7fKOvCkth
-         Bx70CZS6bqkrkrUSjoUuhJ0H4eH2cQm8GpJvmgzNq6wYkU8kdVP3K2aYMZPwa7LfKPpE
-         hSIZZ1WedIEp5G4oSzPNUlBrt+RPs96n7UpeWfVUuGeQXaXb3uB0fhEoMUjkl3kgJuNn
-         U2rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=iGbvXQdkxYPoygjkM3JM9RpVpo+BIs+MXjiiOrhhuyA=;
-        b=J8aRGEUY5hDeLojprE7t0q2t+4K04VE32TNNdcUlmGCZSoK7StXis4jSJkeyU7t0xO
-         f2gtElTd9J+bKA7DrlebjmP5aLnvLw3oZvh91IRx0xifVA2heSKuO59qeHKrzPx5snMU
-         0+XqT7VfO2K8mvIFC6zPrsqpywHbNBn95+ALrIe55MAFd4Tx9FrWLnt4GI/wokYGoX/m
-         HyU0Ul6dYFppy+6DTeKLe444VDH2FkPUrvX0XupDdBJDPLmzY+cV0aodyme93z+w5j/F
-         bxTq2YeVnYkKOrzAunJRdCfXrktjkzsfMyQqasDjjoqPMnq0Ir0oogiJcEDkHuE3yPoC
-         6L5A==
-X-Gm-Message-State: AOAM530xxmfw2adnt1ujGdsts7wFvNY2IP9XQkOXRWDx5gimeNlrO1aE
-        YfnRwYM2buYbkxFoPvdTxj/sNoXu/8pS5zarimk=
-X-Google-Smtp-Source: ABdhPJw+10CLUnkffKKUBEF/3CRyQuvMh1K1OdfusYdAAHxAwz6xoyzTP2Kabcx8WsFsESUd5WB6dAzMDD6UmftSCk8=
-X-Received: from willmcvicker.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:2dd0])
- (user=willmcvicker job=sendgmr) by 2002:aa7:9416:0:b0:4a8:3012:80b6 with SMTP
- id x22-20020aa79416000000b004a8301280b6mr9943495pfo.6.1639589034973; Wed, 15
- Dec 2021 09:23:54 -0800 (PST)
-Date:   Wed, 15 Dec 2021 17:23:49 +0000
-Message-Id: <20211215172349.388497-1-willmcvicker@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH 1/1] kbuild: install the modules.order for external modules
-From:   Will McVicker <willmcvicker@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Thu, 16 Dec 2021 17:04:08 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E96EC061574;
+        Thu, 16 Dec 2021 14:04:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WAO9hZDcRjB3YCaMlbfdToabQWYt+lhc7ogLYgYfO5A=; b=BWGZ6AuNjpRoC8kgaS6A7mi51K
+        YFPoVwlchEV30CCdSpYhu0huiVuYRRrZu0SADS2YdW3szrKx1THYtThkjR/aEZ3h78wQP+KeDkTiS
+        IAMLKNAjPtvKgsFYD2nggsPLjR0pF9NF6UThOYDcwJXp9Nwtr19GplvwXs8TOWcMpGOYkWA1cU+DO
+        v/CiyT1lUk4WN98ka624Fur6Sh8EWIjiEkXTPUVEffDNXJmaMpfGItLmg21h5Y6JvX3Y4sJYy0EQi
+        HaE4FYPYXGaM9Xd0/85bCmNV0kzRKE9WL4LmNpCCQkDYeBGxevc6fdGDEeu4KZMiYmkjzBTBz0mCM
+        BWmglKEQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mxyr2-00G00R-Sb; Thu, 16 Dec 2021 22:04:00 +0000
+Date:   Thu, 16 Dec 2021 22:04:00 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     kernel-team@android.com, Will McVicker <willmcvicker@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        efi@lists.einval.com,
+        debian-kernel <debian-kernel@lists.debian.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        Ben Hutchings <ben@decadent.org.uk>
+Subject: Re: [PATCH] builddeb: Support signing kernels with a Machine Owner
+ Key
+Message-ID: <Ybu30C6Nc7Mbo8MQ@casper.infradead.org>
+References: <20211013200536.1851070-1-willy@infradead.org>
+ <CAMj1kXEJ+RThJ83H2VNAmOKkVdhTAUCUF61u9JTv6ccc9uVTDw@mail.gmail.com>
+ <CAK7LNASfr4pxmXWO8WLPM4j1NiJ6+dAO_QyUmRREzJUXJNozFw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASfr4pxmXWO8WLPM4j1NiJ6+dAO_QyUmRREzJUXJNozFw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add support to install the modules.order file for external modules
-during module_install in order to retain the Makefile ordering
-of external modules. This helps reduce the extra steps necessary to
-properly order loading of external modules when there are multiple
-kernel modules compiled within a given KBUILD_EXTMOD directory.
+On Thu, Nov 04, 2021 at 06:28:40PM +0900, Masahiro Yamada wrote:
+> On Thu, Oct 14, 2021 at 6:47 PM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > On Wed, 13 Oct 2021 at 22:07, Matthew Wilcox (Oracle)
+> > <willy@infradead.org> wrote:
+> > >
+> > > If the config file specifies a signing key, use it to sign
+> > > the kernel so that machines with SecureBoot enabled can boot.
+> > > See https://wiki.debian.org/SecureBoot
+> > >
+> > > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> >
+> > For the change itself
+> >
+> > Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> >
+> > although I'd suggest to fix the subject not to refer to Machine Owner
+> > Keys, as I don't see anything shim related here (i.e., if you sign
+> > using a key that is listed in db, it should also work)
+> >
+> >
+> > > ---
+> > >  scripts/package/builddeb | 10 +++++++++-
+> > >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > > index 91a502bb97e8..4fa6ff2b5cac 100755
+> > > --- a/scripts/package/builddeb
+> > > +++ b/scripts/package/builddeb
+> > > @@ -147,7 +147,15 @@ else
+> > >         cp System.map "$tmpdir/boot/System.map-$version"
+> > >         cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+> > >  fi
+> > > -cp "$($MAKE -s -f $srctree/Makefile image_name)" "$tmpdir/$installed_image_path"
+> > > +
+> > > +vmlinux=$($MAKE -s -f $srctree/Makefile image_name)
+> > > +if is_enabled CONFIG_MODULE_SIG; then
+> > > +       cert=$srctree/$(grep ^CONFIG_MODULE_SIG_KEY= include/config/auto.conf | cut -d\" -f2)
+> > > +       key=${cert%pem}priv
+> > > +       sbsign --key $key --cert $cert "$vmlinux" --output "$tmpdir/$installed_image_path"
+> > > +else
+> > > +       cp "$vmlinux" "$tmpdir/$installed_image_path"
+> > > +fi
+> > >
+> > >  if is_enabled CONFIG_OF_EARLY_FLATTREE; then
+> > >         # Only some architectures with OF support have this target
+> > > --
+> > > 2.32.0
+> > >
+> 
+> How to compile this patch?
+> 
+> "make  bindeb-pkg" fails with
+> Can't load key from file './certs/signing_key.priv'
 
-To handle compiling multiple external modules within the same
-INSTALL_MOD_DIR, kbuild will append a suffix to the installed
-modules.order file defined like so:
+I'm sorry; I missed this email.
 
-  echo ${KBUILD_EXTMOD} | sed 's:[./_]:_:g'
+I don't know why you're seeing this error, exactly.  I'm just trying to
+automate the step here:
 
-Ex:
-  KBUILD_EXTMOD=/mnt/a.b/c-d/my_driver results in:
-  modules.order._mnt_a_b_c_d_my_driver
+https://wiki.debian.org/SecureBoot#Using_your_key_to_sign_your_kernel
 
-The installed module.order.$(extmod_suffix) files can then be cat'd
-together to create a single modules.order file which would define the
-order to load all of the modules during boot.
+Have you followed the other steps on that page; ie do you have:
+signing_key.priv, signing_key.der and signing_key.pem files?
 
-Signed-off-by: Will McVicker <willmcvicker@google.com>
----
- scripts/Makefile.modinst | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> 
+> Also, sbsign emits "Invalid DOS header magic" error
+> if CONFIG_EFI_STUB is not set.
+> 
+> The CONFIG name might depend on arch.
+> CONFIG_EFI for ARCH=arm64, but CONFIG_EFI_STUB for ARCH=x86.
+> 
+> 
+> If you require sbsign, you need to update Build-Depends ?
 
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index ff9b09e4cfca..2e2e31696fd6 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -24,6 +24,10 @@ suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
- suffix-$(CONFIG_MODULE_COMPRESS_ZSTD)	:= .zst
- 
- modules := $(patsubst $(extmod_prefix)%, $(dst)/%$(suffix-y), $(modules))
-+ifneq ($(KBUILD_EXTMOD),)
-+extmod_suffix := $(subst /,_,$(subst .,_,$(subst -,_,$(KBUILD_EXTMOD))))
-+modules += $(dst)/modules.order.$(extmod_suffix)
-+endif
- 
- __modinst: $(modules)
- 	@:
-@@ -82,6 +86,12 @@ $(dst)/%.ko: $(extmod_prefix)%.ko FORCE
- 	$(call cmd,strip)
- 	$(call cmd,sign)
- 
-+ifneq ($(KBUILD_EXTMOD),)
-+$(dst)/modules.order.$(extmod_suffix): $(MODORDER) FORCE
-+	$(call cmd,install)
-+	@sed -i "s:^$(KBUILD_EXTMOD):$(INSTALL_MOD_DIR):g" $@
-+endif
-+
- else
- 
- $(dst)/%.ko: FORCE
--- 
-2.34.1.173.g76aa8bc2d0-goog
+It looks like we should add a few extra checks before running sbsign ...
+
+> sh ./scripts/package/builddeb
+> Can't load key from file './certs/signing_key.priv'
+> 139999825022720:error:02001002:system library:fopen:No such file or
+> directory:../crypto/bio/bss_file.c:69:fopen('./certs/signing_key.priv','r')
+> 139999825022720:error:2006D080:BIO routines:BIO_new_file:no such
+> file:../crypto/bio/bss_file.c:76:
+> make[4]: *** [scripts/Makefile.package:87: intdeb-pkg] Error 1
+> make[3]: *** [Makefile:1539: intdeb-pkg] Error 2
+> make[2]: *** [debian/rules:13: binary-arch] Error 2
+> dpkg-buildpackage: error: debian/rules binary subprocess returned exit status 2
+> make[1]: *** [scripts/Makefile.package:83: bindeb-pkg] Error 2
+> make: *** [Makefile:1539: bindeb-pkg] Error 2
+
 
