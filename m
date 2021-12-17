@@ -2,55 +2,56 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD77C433F5
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Dec 2021 08:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CD2C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Dec 2021 13:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232533AbhLQIwO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 17 Dec 2021 03:52:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S236735AbhLQNoo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 17 Dec 2021 08:44:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233897AbhLQIwO (ORCPT
+        with ESMTP id S236709AbhLQNon (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Dec 2021 03:52:14 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A89B4C061746;
-        Fri, 17 Dec 2021 00:52:13 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id m9so2023898iop.0;
-        Fri, 17 Dec 2021 00:52:13 -0800 (PST)
+        Fri, 17 Dec 2021 08:44:43 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800B1C061574;
+        Fri, 17 Dec 2021 05:44:43 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id w1so1624324ilh.9;
+        Fri, 17 Dec 2021 05:44:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:reply-to:from:date:message-id
          :subject:to:cc;
-        bh=6H38uGu9oxzNmbHpInukzrA1bB8JViq3OxCgrYvQ+q8=;
-        b=c5mUaFxuA3v3wQSuX/Y9Vj6wug2seSdy8IrJ/XtUCevIu7fN1npr+1EmOxqVxVkmjO
-         YwC4b8Zk2LPD5OXLcBx9+Cy/TouT/SJXr1nCc5hrPdXoXo7u+EV2/7+f6L0sBONIuP3j
-         bbWd7uBzIqsXFuABnyu18H54j1Ml45nqpf8wizllo+WORJJzRJ9hD6E3wIzdr6/6Faxe
-         0NJqccOGpVXQMw5rkvHG+TtSK81w5JyPu8KgxD90JG8gpYmOE1EgVwmDQm0dFVjspSmi
-         dXIo4Pm6sSo7+PCuMV5d9h/R/ANh0TuNDovLFonS799bMBCtcIT2zmZERXG98uByl7CS
-         wwxQ==
+        bh=/1U8rmm2v6IW4IrlYfu1WGU3nMyw7RqXx+g8a0tWtd8=;
+        b=J7gTZ5TlrzQDpy3rrzs2OPkxDkRN8Dlke+E+3xJl+6SbHzTuzoDgXjjl0t2CJjrDLy
+         pO0Sg4QrDFHAdMaHwr6c2Ve3txnkLqqhVgAfDndOYO4S3fct3uYmfBO2kL8CvOXgp67x
+         O359f5MCFQwYMYZBDac4HTrVXnXLOQQTEa3leh4kGoD3/P45UxVEMF6N2h5hnLDvJrUO
+         AOvTmuj557deI/P2K1dCNQmWRBNyhxb2vxs5OrPG7PfoUH4yE+2OPUQcE9ExMnykbu5/
+         jizkXWMJaWSYEzL8KVWCwbNSeGoJLmo82qgOha5fGyVd3HWz9zovyZ51buC9vjHHy2Am
+         2u+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
          :from:date:message-id:subject:to:cc;
-        bh=6H38uGu9oxzNmbHpInukzrA1bB8JViq3OxCgrYvQ+q8=;
-        b=6nQ1KPRFCOjT2dfzl7/yFtbvCzAdc6adgiDqXTHh6f5iz3U9tODWdJikpmVvravGLZ
-         BOLxMM8KGCSlfJ1gA0dolI9+IBW/JjT4vpE374GgUlwToXR3iSkJAVN/n+bOKsk0dUUl
-         BP0yE008HXjwkx4Uv9I0CZVEQrYcYstD9vu6LvzaGTLymgpQbUMZ+oBvGJSGhNp2HvFj
-         pT7ftitSWRz5913reUkyunMqb44UDBo4ia7HKvEKOHgLxH85MzC7iOpa1/UTMKarzAdL
-         Wi7/M21+BHtRU3WN0udpCZq3ApnfjHsZdY6m6IDEIKZk0MIweFN2/yptZsPs7mPdeiGf
-         ejBQ==
-X-Gm-Message-State: AOAM532d03iXIuzxHSycmEuSCwT/mZ48y2xRuri060vzAgnrVZdKMz0f
-        GukbE7VPHOU9+pOsTZeyazSEa6Zr5I8guqqZ73A=
-X-Google-Smtp-Source: ABdhPJzD3xzZ28BUDmkVh4LKRUS0V2gfVPmeLFXT+fv/Dtx2Up7oF4eysOQeKXy+7O/0A6+jw8B9D8RLxiGpdmszHJc=
-X-Received: by 2002:a05:6638:1346:: with SMTP id u6mr1184173jad.126.1639731133009;
- Fri, 17 Dec 2021 00:52:13 -0800 (PST)
+        bh=/1U8rmm2v6IW4IrlYfu1WGU3nMyw7RqXx+g8a0tWtd8=;
+        b=2pxU3PDk8Hwwsb37YvMsVilPAKw+1fQ6j90mW9+6GaOIroUcL11uyhTiZjauxC+6za
+         CXL5jgYftpyksJufrCY5f+4Ot3LsoDNjCa1iJOie04YuTAN0H6epd4rwSPcCaFbExTIs
+         JsRwyECcZdnDKCYk73O4qJ8fQQ49QCISRZ/u2mqkztfat03e9uc4Sb1mb64y52envo97
+         aEUHC8DpJXR1s9Q585GnylA/YeTRuJ/SF52LgaX1A9pFQS+kXWQa9mEVhYADbvvQBgwu
+         WrF2OHbxBDCgD22dF2Ro02NM/614EOTxDP1+HtNpRj9p21pMgTTBeLsu9TMDUU/bh3GH
+         58Yg==
+X-Gm-Message-State: AOAM533/+koahT9RZvG3IFZAGUvvPd8wy1J9b4SdxEUcTD1567RSJW7t
+        nUPx/8Wsqpr2LI7fQIPC8pBfux4+ZlSYupGTEPA=
+X-Google-Smtp-Source: ABdhPJyekkbwWcJQs6XjMX15028dFAptq/1f6BUnjcBFltMAWPJUtvD9jqGfG3HcakoEEBti8xAUenGk38bfuQzMQuc=
+X-Received: by 2002:a05:6e02:180d:: with SMTP id a13mr1518285ilv.1.1639748682866;
+ Fri, 17 Dec 2021 05:44:42 -0800 (PST)
 MIME-Version: 1.0
 References: <20211124153105.155739-1-alex_y_xu@yahoo.ca> <20211124153105.155739-2-alex_y_xu@yahoo.ca>
-In-Reply-To: <20211124153105.155739-2-alex_y_xu@yahoo.ca>
+ <CA+icZUUZwGG-mJg26DOmadZksm4fMCE5QUmnX4ZghWxXzAy9HQ@mail.gmail.com>
+In-Reply-To: <CA+icZUUZwGG-mJg26DOmadZksm4fMCE5QUmnX4ZghWxXzAy9HQ@mail.gmail.com>
 Reply-To: sedat.dilek@gmail.com
 From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Fri, 17 Dec 2021 09:51:36 +0100
-Message-ID: <CA+icZUUZwGG-mJg26DOmadZksm4fMCE5QUmnX4ZghWxXzAy9HQ@mail.gmail.com>
+Date:   Fri, 17 Dec 2021 14:44:06 +0100
+Message-ID: <CA+icZUXLrENSgHJHy1Huy-tX-STpEQXyjQGO_fmdnhq7oMKhzA@mail.gmail.com>
 Subject: Re: [PATCH v2 2/2] kbuild: pass --stream-size --no-content-size to zstd
 To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
         Nick Terrell <terrelln@fb.com>
@@ -66,78 +67,91 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Nov 24, 2021 at 4:30 PM Alex Xu (Hello71) <alex_y_xu@yahoo.ca> wrote:
+On Fri, Dec 17, 2021 at 9:51 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
 >
-> Otherwise, it allocates 2 GB of memory at once. Even though the majority
-> of this memory is never touched, the default heuristic overcommit
-> refuses this request if less than 2 GB of RAM+swap is currently
-> available. This results in "zstd: error 11 : Allocation error : not
-> enough memory" and the kernel failing to build.
+> On Wed, Nov 24, 2021 at 4:30 PM Alex Xu (Hello71) <alex_y_xu@yahoo.ca> wrote:
+> >
+> > Otherwise, it allocates 2 GB of memory at once. Even though the majority
+> > of this memory is never touched, the default heuristic overcommit
+> > refuses this request if less than 2 GB of RAM+swap is currently
+> > available. This results in "zstd: error 11 : Allocation error : not
+> > enough memory" and the kernel failing to build.
+> >
+> > When the size is specified, zstd will reduce the memory request
+> > appropriately. For typical kernel sizes of ~32 MB, the largest mmap
+> > request will be reduced to 512 MB, which will succeed on all but the
+> > smallest devices.
+> >
+> > For inputs around this size, --stream-size --no-content-size may
+> > slightly decrease the compressed size, or slightly increase it:
+> > https://github.com/facebook/zstd/issues/2848.
+> >
 >
-> When the size is specified, zstd will reduce the memory request
-> appropriately. For typical kernel sizes of ~32 MB, the largest mmap
-> request will be reduced to 512 MB, which will succeed on all but the
-> smallest devices.
+> Hi Alex and Nick T.,
 >
-> For inputs around this size, --stream-size --no-content-size may
-> slightly decrease the compressed size, or slightly increase it:
-> https://github.com/facebook/zstd/issues/2848.
+> some questions:
+>
+> Can I apply this patch as a single patch - without patch 1/2?
+>
+> Is there an impact also on the kernel's ZRAM/ZSWAP support plus using
+> ZSTD as (de)comp-algo?
+>
+> Here I have:
+>
+> $ grep -i zstd /boot/config-5.15.7-1-amd64-clang13-lto | egrep -i 'zram|zswap'
+> CONFIG_ZSWAP_COMPRESSOR_DEFAULT_ZSTD=y
+> CONFIG_ZSWAP_COMPRESSOR_DEFAULT="zstd"
+> CONFIG_ZRAM_DEF_COMP_ZSTD=y
+> CONFIG_ZRAM_DEF_COMP="zstd"
 >
 
-Hi Alex and Nick T.,
+$ egrep 'stream-size' build-log_5.15.9-1-amd64-clang13-lto.txt
+49360:  { cat arch/x86/boot/compressed/vmlinux.bin
+arch/x86/boot/compressed/vmlinux.relocs | zstd --stream-size=53340760
+--no-content-size -22 --ultra; printf \130\352
+\055\003; } > arch/x86/boot/compressed/vmlinux.bin.zst
 
-some questions:
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
 
-Can I apply this patch as a single patch - without patch 1/2?
-
-Is there an impact also on the kernel's ZRAM/ZSWAP support plus using
-ZSTD as (de)comp-algo?
-
-Here I have:
-
-$ grep -i zstd /boot/config-5.15.7-1-amd64-clang13-lto | egrep -i 'zram|zswap'
-CONFIG_ZSWAP_COMPRESSOR_DEFAULT_ZSTD=y
-CONFIG_ZSWAP_COMPRESSOR_DEFAULT="zstd"
-CONFIG_ZRAM_DEF_COMP_ZSTD=y
-CONFIG_ZRAM_DEF_COMP="zstd"
-
-Thanks.
-
-Regards,
 - Sedat -
 
-> Signed-off-by: Alex Xu (Hello71) <alex_y_xu@yahoo.ca>
-> ---
->  scripts/Makefile.lib | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+> Thanks.
 >
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index ca901814986a..c98a82ca38e6 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -466,12 +466,20 @@ quiet_cmd_xzmisc = XZMISC  $@
->  # single pass, so zstd doesn't need to allocate a window buffer. When streaming
->  # decompression is used, like initramfs decompression, zstd22 should likely not
->  # be used because it would require zstd to allocate a 128 MB buffer.
-> +#
-> +# --stream-size to reduce zstd memory usage (otherwise zstd -22 --ultra
-> +# allocates, but does not use, 2 GB) and potentially improve compression.
-> +#
-> +# --no-content-size to save three bytes which we do not use (we use size_append).
-> +
-> +# zstd --stream-size is only supported since 1.4.4
-> +zstd_stream_size = $(shell $(ZSTD) -1c --stream-size=0 --no-content-size </dev/null >/dev/null 2>&1 && printf '%s' '--stream-size=$(total_size) --no-content-size')
+> Regards,
+> - Sedat -
 >
->  quiet_cmd_zstd = ZSTD    $@
-> -      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) -19; $(size_append); } > $@
-> +      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -19; $(size_append); } > $@
->
->  quiet_cmd_zstd22 = ZSTD22  $@
-> -      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) -22 --ultra; $(size_append); } > $@
-> +      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -22 --ultra; $(size_append); } > $@
->
->  # ASM offsets
->  # ---------------------------------------------------------------------------
-> --
-> 2.34.0
->
+> > Signed-off-by: Alex Xu (Hello71) <alex_y_xu@yahoo.ca>
+> > ---
+> >  scripts/Makefile.lib | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> > index ca901814986a..c98a82ca38e6 100644
+> > --- a/scripts/Makefile.lib
+> > +++ b/scripts/Makefile.lib
+> > @@ -466,12 +466,20 @@ quiet_cmd_xzmisc = XZMISC  $@
+> >  # single pass, so zstd doesn't need to allocate a window buffer. When streaming
+> >  # decompression is used, like initramfs decompression, zstd22 should likely not
+> >  # be used because it would require zstd to allocate a 128 MB buffer.
+> > +#
+> > +# --stream-size to reduce zstd memory usage (otherwise zstd -22 --ultra
+> > +# allocates, but does not use, 2 GB) and potentially improve compression.
+> > +#
+> > +# --no-content-size to save three bytes which we do not use (we use size_append).
+> > +
+> > +# zstd --stream-size is only supported since 1.4.4
+> > +zstd_stream_size = $(shell $(ZSTD) -1c --stream-size=0 --no-content-size </dev/null >/dev/null 2>&1 && printf '%s' '--stream-size=$(total_size) --no-content-size')
+> >
+> >  quiet_cmd_zstd = ZSTD    $@
+> > -      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) -19; $(size_append); } > $@
+> > +      cmd_zstd = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -19; $(size_append); } > $@
+> >
+> >  quiet_cmd_zstd22 = ZSTD22  $@
+> > -      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) -22 --ultra; $(size_append); } > $@
+> > +      cmd_zstd22 = { cat $(real-prereqs) | $(ZSTD) $(zstd_stream_size) -22 --ultra; $(size_append); } > $@
+> >
+> >  # ASM offsets
+> >  # ---------------------------------------------------------------------------
+> > --
+> > 2.34.0
+> >
