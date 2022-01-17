@@ -2,96 +2,125 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4388C433FE
-	for <linux-kbuild@archiver.kernel.org>; Sat, 15 Jan 2022 13:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E79DC433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 17 Jan 2022 04:45:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbiAON6v (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 15 Jan 2022 08:58:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52016 "EHLO
+        id S237087AbiAQEpj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 16 Jan 2022 23:45:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiAON6v (ORCPT
+        with ESMTP id S229563AbiAQEpi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 15 Jan 2022 08:58:51 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD9C9C061574;
-        Sat, 15 Jan 2022 05:58:50 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id b13so45331572edn.0;
-        Sat, 15 Jan 2022 05:58:50 -0800 (PST)
+        Sun, 16 Jan 2022 23:45:38 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569C8C061574;
+        Sun, 16 Jan 2022 20:45:38 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id d3so13787322ilr.10;
+        Sun, 16 Jan 2022 20:45:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=MNIIAwZPN2WK/bRTkHTV9IygDz14rAm8Sea6YKv4518=;
-        b=NuBujBfcv1KJFzIZZ68NLu3JYoGDW5MAKMgBmxEZYEzGtqdae90cZ/CYsgzxHDm/VQ
-         HBnM3eQIhkT/lkuX2X5W2cw6Ai+S1LqH5D2dzx32tEJbOre/qGnKmKLhPQ5f392KW+nN
-         rZ80+hRnwGpYC4S6fG47AdAvHd9fg9KQMtHL+BooOjNnwwzw9Dxk0usxAzUkVmjH7YWO
-         bUK/RU8l390HX1ly7e2h9tNCUREOX23qHmL0hsG3iFGMZNrsQ6+danuvslmoarMmEUCp
-         wT6bB3i4h9WY/DcsX4+ccjAq1+Ycwy0gT9tKTooEuus0llVv5+C5GksEkiI8yQ45weme
-         prUQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NXJNU8A/vrNI4Y+ivgE9K8Fmf8JFY+TijAbHrzk15XA=;
+        b=PzG00sgeoimoo1zcwhcGVtlDlW3/+n1GDlK7V+RyNpRuHCMClBHy0YdteLUK1u/Qd+
+         uR+lG457kbxkO4LTBEt5Rq1APHSKpT1xSp19GmSjJLUoMgT3D2W6v2jumaYJ0UzEXJ3T
+         vFd3zTLgbvSFjcZ4pgjzM6dNI9V/05BQyBlzCapxqKrFtRvM7n1YQfXgsOZAhwJRDHWF
+         nP9DK/6G6XuhF4if4s7BccDxwgNNE5zF4I1MYlNfoG6eNLlmEPpichojwoYsCQNUgImM
+         YSRM+511RAMm3djS5h4cOb0gN3TBDJz3LvPHI0s1W2n0iWRO/1TRD1/pe7kpP7CCKs72
+         JUrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=MNIIAwZPN2WK/bRTkHTV9IygDz14rAm8Sea6YKv4518=;
-        b=BgrCIcXNdHC/pGuMTGiY9Br26tw0nO58kEe3axEa3+Exsh81qnyX/cFO/rbYuw5xNa
-         eSpr7XgiBTvMNF6pNUMcbctyb6/vFQIxsXNls5Jn6z74Q5GiR4g7k/OjfErvR9PcfbaD
-         YIbBzFPqQzCD8XXtpv4u1nnl/7lyRLRFOxD2Yo6Pe2gQ8GuodcQ27bYesKIsWWkD1MYQ
-         o1Lco+wSOkARl9oi0/47XBHk3F9sEDK0PAjWDBoDpVQ358VYMqlugSaxlkOSjy6ZPTQt
-         yI/mAIhxNIsS4zEfL10a57XMOXZd8LqA8El21Wok9NNiQ9RcsjHV1AdVep4ZuE3LKTX9
-         dWkw==
-X-Gm-Message-State: AOAM5339htQHLbY/cj1vTjTqAgXyH36c/PsBwSelgf8sMhdXA7BRvNCa
-        BQ4IPmbFP64gDBrKUqUz+3aO/83pyeU=
-X-Google-Smtp-Source: ABdhPJxoHKhgNSogvFF3KBWdCDZxLJbgDfDInFO2FBmO5cm08+L1VxSquUGOdmsKoABAGkXZ7wvBjw==
-X-Received: by 2002:a17:907:7e9e:: with SMTP id qb30mr10377494ejc.279.1642255129071;
-        Sat, 15 Jan 2022 05:58:49 -0800 (PST)
-Received: from ?IPv6:2a00:a040:197:458f:2395:a31f:2f8b:a545? ([2a00:a040:197:458f:2395:a31f:2f8b:a545])
-        by smtp.gmail.com with ESMTPSA id g21sm3338556edt.12.2022.01.15.05.58.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 15 Jan 2022 05:58:48 -0800 (PST)
-Subject: Re: [PATCH 0/2] kconfig: Improve comment blocks in the .config file
-To:     masahiroy@kernel.org
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211213100043.45645-1-arielmarcovitch@gmail.com>
-From:   Ariel Marcovitch <arielmarcovitch@gmail.com>
-Message-ID: <343788ac-41bc-4308-6aae-03a00535e9f3@gmail.com>
-Date:   Sat, 15 Jan 2022 15:58:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NXJNU8A/vrNI4Y+ivgE9K8Fmf8JFY+TijAbHrzk15XA=;
+        b=HiaZXqH2QUEUFSJxbd/95TgJ4LKK7caktx5swsbBZKaZ7uxrnj27Q3DcbuR9vumJV2
+         r7IzZrLaoGgu380HfWEMMfxQd5sQD3OUzuEq3uAMuhqR1xsczvywpE5QGN/IwlsqOtAz
+         z3Pm71NlifALfRJDVs8naGXEHRP91fNp8y48NLpyI0vzOQ7/Z2uDBUPD+VJyR5pl19cl
+         dpkqpwWRUIf+au0wCX6+r2an2krGRqKd3CPllPTSRrJPKaSlBK98I/AIZqVUxgLaIoMi
+         RtvQ4QFTYCOFrh3EZtapsjV6QYJPxR9gUZ1q1Fxgx3VFPVzzoJmQ/R0KD05jckEXcPPT
+         p2Eg==
+X-Gm-Message-State: AOAM532ilXJZuyWuv4UsLb2s1nt8GYU+bm10sjDaUpvFjwl2mDCCPOo4
+        TUyc3O1JoHQ7pl9IaGrkS69J0R9RzzDPRRXcTvXwcuwg
+X-Google-Smtp-Source: ABdhPJxRhKFpEsFdyKcte+Zsj7MrW5IXWNB4xcrRU37urSdE65MYsL2fH1bp9UCr9Pbs6bP+ay49DBuxJszsX8sSj9k=
+X-Received: by 2002:a05:6e02:1a41:: with SMTP id u1mr1776348ilv.151.1642394737646;
+ Sun, 16 Jan 2022 20:45:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20211213100043.45645-1-arielmarcovitch@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20211206140313.5653-1-ojeda@kernel.org> <20211206140313.5653-16-ojeda@kernel.org>
+ <CAK7LNAS+eiL-kcdnNyyCUNWjV5qGxrw4PM-oJFfw=o1fbhc2qw@mail.gmail.com>
+In-Reply-To: <CAK7LNAS+eiL-kcdnNyyCUNWjV5qGxrw4PM-oJFfw=o1fbhc2qw@mail.gmail.com>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Mon, 17 Jan 2022 05:45:26 +0100
+Message-ID: <CANiq72n4aM6RG+mcGyG-U_fahRw4H9XLUyp4_Jayf1-uq=qY_g@mail.gmail.com>
+Subject: Re: [PATCH 15/19] Kbuild: add Rust support
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Miguel Ojeda <ojeda@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux <rust-for-linux@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Finn Behrens <me@kloenk.de>,
+        Adam Bratschi-Kaye <ark.email@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sven Van Asbroeck <thesven73@gmail.com>,
+        Gary Guo <gary@garyguo.net>,
+        Boris-Chengbiao Zhou <bobo1239@web.de>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Douglas Su <d0u9.su@outlook.com>,
+        Dariusz Sosnowski <dsosnowski@dsosnowski.pl>,
+        Antonio Terceiro <antonio.terceiro@linaro.org>,
+        Daniel Xu <dxu@dxuuu.xyz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Ping (would really like some feedback :) )
+Hi Masahiro,
 
-On 13/12/2021 12:00, Ariel Marcovitch wrote:
-> Hi there!
+On Sat, Dec 11, 2021 at 4:54 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> This series attempts to make the .config file format make more sense.
-> Currently menuconfig blocks look exactly like regular configs while
-> comment blocks look almost exactly like menu blocks.
+> Do you really want to support CLIPPY=1
+> in addition to KBUILD_CLIPPY=1 ?
 >
-> The first patch makes menuconfig blocks look the same as menu blocks.
+> (Refer to C=  V=  M=  O=, which checks $(origin ) )
+
+I implemented both because I saw the pattern used for `V=`, `W=` etc.,
+and I thought I should follow it too. If I understand correctly, the
+split between `KBUILD_*` and the shorthands is there to avoid
+conflicts if the caller had set very short environment variables for
+some reason -- is this correct?
+
+If you prefer only one, I think writing `KBUILD_CLIPPY=1` would be too
+long for command line usage; so I would prefer `CLIPPY=1` in that
+case.
+
+> Is there any reason why
+> you did not write like
 >
-> The second makes comment blocks look different than menu blocks.
+>   core-$(CONFIG_RUST)  += rust/
 >
-> The format for comment blocks in the second patch is a suggestion. I
-> realize some people will think the '###' prefix is distasteful. I'm open
-> to other options as well, I just couldn't think of a better option that
-> starts with '#', looks different from a menu and can't be confused with
-> a disabled config.
+> ?
+
+I have moved it inside the `rust/Makefile` -- please take a look at
+the next round I am sending in a bit.
+
+> extra-y does nothing for 'make modules'.
+> Is this your expected behavior?
 >
-> Ariel Marcovitch (2):
->    kconfig: Show menuconfigs as menus in the .config file
->    kconfig: Make comments look different than menus in .config
->
->   scripts/kconfig/confdata.c | 34 +++++++++++++++++++++++-----------
->   1 file changed, 23 insertions(+), 11 deletions(-)
->
->
-> base-commit: e06a61a89ccd3edda046c78f9d08aa045b8c4d32
+> (commit d0e628cd817f3)
+
+Thanks for the reference! Changed to `always-y`. Indeed, this is
+needed in `make modules` because we need to trigger the compilation of
+`core.o` etc. for the `.rmeta` files.
+
+> Why is .SECONDEXPANSION: needed ?
+
+It was needed at some point for the prototype more than a year ago;
+however, it isn't the case anymore, so I have removed it. I have also
+made those variables simply expanded ones.
+
+Cheers,
+Miguel
