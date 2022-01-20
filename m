@@ -2,84 +2,76 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34751C433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 20 Jan 2022 19:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A6BC433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 20 Jan 2022 19:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346919AbiATTXc (ORCPT
+        id S1347053AbiATTbR (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 20 Jan 2022 14:23:32 -0500
-Received: from conuserg-08.nifty.com ([210.131.2.75]:24706 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243427AbiATTXb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Jan 2022 14:23:31 -0500
-Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 20KJMCMO001376;
-        Fri, 21 Jan 2022 04:22:13 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 20KJMCMO001376
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1642706533;
-        bh=e7aATIIG+VEhoI3nC/mHzVmccU9dk9dBlThTaanPlSw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mbJhvdlLRE2ESnBfuaVbAUo5c0rr+qIWClKFNU+NF5n3/pqjMaEJoFHBtArAzhtyZ
-         025imjOK78Rz6EXfNri06RXcAwNsIULJs7Mo9w8CKmUlxRADfeoHGCUS3QTVv7N20r
-         XlWZNYrbzatI5j98vt7cqhU1f09lJzquJmuzM7F7b8esaEqRgU2rW3w38orsqlO1M4
-         L+ZCPARxdBcMSFnw0YHgkAFt7kPVGkYcrIqub9G10HclxfMgCKf1/ki7p7N9TYJaq0
-         aG5ulSbCQ91EP/xocZT2enqbmRcmpdy0j9TG7gDTOZ2NcirY6y+Kn0MSb8A7ZjiTNu
-         oGxK43KW4aI2w==
-X-Nifty-SrcIP: [133.32.232.101]
-From:   Masahiro Yamada <masahiroy@kernel.org>
+        Thu, 20 Jan 2022 14:31:17 -0500
+Received: from sdaoden.eu ([217.144.132.164]:50350 "EHLO sdaoden.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231733AbiATTbQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Jan 2022 14:31:16 -0500
+X-Greylist: delayed 562 seconds by postgrey-1.27 at vger.kernel.org; Thu, 20 Jan 2022 14:31:16 EST
+Received: from kent.sdaoden.eu (kent.sdaoden.eu [10.5.0.2])
+        by sdaoden.eu (Postfix) with ESMTPS id 8A79916057;
+        Thu, 20 Jan 2022 20:21:53 +0100 (CET)
+Received: by kent.sdaoden.eu (Postfix, from userid 1000)
+        id EF55D383E; Thu, 20 Jan 2022 20:21:51 +0100 (CET)
+Date:   Thu, 20 Jan 2022 20:21:51 +0100
+Author: Steffen Nurpmeso <steffen@sdaoden.eu>
+From:   Steffen Nurpmeso <steffen@sdaoden.eu>
 To:     linux-kbuild@vger.kernel.org
-Cc:     Michal Kubecek <mkubecek@suse.cz>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] certs: Fix build error when CONFIG_MODULE_SIG_KEY is empty
-Date:   Fri, 21 Jan 2022 04:22:05 +0900
-Message-Id: <20220120192205.525103-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220120192205.525103-1-masahiroy@kernel.org>
-References: <20220120192205.525103-1-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Steffen Nurpmeso <steffen@sdaoden.eu>
+Subject: Makefile: uses rsync(1), could this be optional?
+Message-ID: <20220120192151.k46VF%steffen@sdaoden.eu>
+User-Agent: s-nail v14.9.23-223-g046972b06d
+OpenPGP: id=EE19E1C1F2F7054F8D3954D8308964B51883A0DD;
+ url=https://ftp.sdaoden.eu/steffen.asc; preference=signencrypt
+BlahBlahBlah: Any stupid boy can crush a beetle. But all the professors in
+ the world can make no bugs.
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Since b8c96a6b466c ("certs: simplify $(srctree)/ handling and remove
-config_filename macro"), when CONFIG_MODULE_SIG_KEY is empty,
-signing_key.x509 fails to build:
+Hello.
 
-    CERT    certs/signing_key.x509
-  Usage: extract-cert <source> <dest>
-  make[1]: *** [certs/Makefile:78: certs/signing_key.x509] Error 2
-  make: *** [Makefile:1831: certs] Error 2
+I sent this to linux-kernel@vger.kernel.org on the 15th, which
+seems to be legacy.  Just in case someone is wondering about the
+resend.
 
-Pass "" to the first argument of extract-cert to fix the build error.
+As a not-yet-tested low-quality Makefile suggestion, with modern
+GNU tools and find(1)'s -printf, wouldn't the following code work
+out gracefully in practice?  (Not subscribed.)
 
-Link: https://lore.kernel.org/linux-kbuild/20220120094606.2skuyb26yjlnu66q@lion.mk-sys.cz/T/#u
-Fixes: b8c96a6b466c ("certs: simplify $(srctree)/ handling and remove config_filename macro")
-Reported-by: Michal Kubecek <mkubecek@suse.cz>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Thanks for Linux!
 
- certs/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/certs/Makefile b/certs/Makefile
-index 0c459cfd09df..3ea7fe60823f 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -75,7 +75,7 @@ endif
- $(obj)/system_certificates.o: $(obj)/signing_key.x509
+--- Makefile.orig	2022-01-15 19:33:59.337393371 +0100
++++ Makefile	2022-01-15 19:34:07.447393217 +0100
+@@ -1260,8 +1288,17 @@ export INSTALL_HDR_PATH = $(objtree)/usr
+ quiet_cmd_headers_install = INSTALL $(INSTALL_HDR_PATH)/include
+       cmd_headers_install = \
+ 	mkdir -p $(INSTALL_HDR_PATH); \
+-	rsync -mrl --include='*/' --include='*\.h' --exclude='*' \
+-	usr/include $(INSTALL_HDR_PATH)
++	if command -v rsync; then \
++		rsync -mrl --include='*/' --include='*\.h' --exclude='*' \
++		usr/include $(INSTALL_HDR_PATH);\
++	else \
++		cd usr;\
++		find include/ -type f -name '*.h' -printf '%f %h\n' |\
++		while read f d; do \
++			mkdir -p $(INSTALL_HDR_PATH)/$$d;\
++			cp -P $$d/$$f $(INSTALL_HDR_PATH)/$$d/$$f;\
++		done;\
++	fi
  
- $(obj)/signing_key.x509: $(X509_DEP) $(obj)/extract-cert FORCE
--	$(call if_changed,extract_certs,$(if $(X509_DEP),$<,$(CONFIG_MODULE_SIG_KEY)))
-+	$(call if_changed,extract_certs,$(if $(CONFIG_MODULE_SIG_KEY),$(if $(X509_DEP),$<,$(CONFIG_MODULE_SIG_KEY)),""))
- endif # CONFIG_MODULE_SIG
- 
- targets += signing_key.x509
--- 
-2.32.0
+ PHONY += headers_install
+ headers_install: headers
 
+--steffen
+|
+|Der Kragenbaer,                The moon bear,
+|der holt sich munter           he cheerfully and one by one
+|einen nach dem anderen runter  wa.ks himself off
+|(By Robert Gernhardt)
