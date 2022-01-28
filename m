@@ -2,90 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A97CEC433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 27 Jan 2022 11:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05379C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 28 Jan 2022 02:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240143AbiA0L0t (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 27 Jan 2022 06:26:49 -0500
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:48852 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240138AbiA0L0s (ORCPT
+        id S1345492AbiA1Cls (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 27 Jan 2022 21:41:48 -0500
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:20782 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241696AbiA1Clr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Jan 2022 06:26:48 -0500
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 20RBQU8V021491;
-        Thu, 27 Jan 2022 20:26:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 20RBQU8V021491
+        Thu, 27 Jan 2022 21:41:47 -0500
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 20S2fY8X008122;
+        Fri, 28 Jan 2022 11:41:34 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 20S2fY8X008122
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1643282791;
-        bh=RkEfetbAwyaUhGDT+EAfXqGsSOduHgaH5G5FwAahVv4=;
+        s=dec2015msa; t=1643337694;
+        bh=4JwARZdKVo3l5mCIOwcu21mpuSYlPGM/jXChU9Tmvv8=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=2yqGvMFVnZnm5EncvLDkncnwfLXuX/lQhe94ikeoTObRS08+sRpzyNhcJE5C7GZsF
-         8vwzgG1N/XWaEgJgZrKb7Bm7wNbW3asmraCHzOPPDetsLu7Fe1BuITnHaRfXk2RuB4
-         U1NavlE/YPa2paEtlIBf6gxXJm1ynMmFod0gS2qFrvSWbzRNEjAuq+6nU961NoBCtJ
-         4pWxIzaPX0bWnTtOeitStFbpW/MuCNfsn4pn65CVYfnbm3kJujSZmKe4S4xkXfFYbb
-         OmeEO4wndG85iDBayWcB4aW+v0RNO2ja/zKy0g4orvDZzm3S02phfV0byE90sgeKBN
-         5J2Sljzs07T7g==
-X-Nifty-SrcIP: [209.85.215.172]
-Received: by mail-pg1-f172.google.com with SMTP id g2so2003426pgo.9;
-        Thu, 27 Jan 2022 03:26:31 -0800 (PST)
-X-Gm-Message-State: AOAM532iInOYajZLlficeeR0d065ANhtpGIPleWvR/r5VeCV1jLvmtGz
-        g6PxmCBJrcIFTAkdKcu+WkGe5IzeGwN65QC6Yxo=
-X-Google-Smtp-Source: ABdhPJxylLzS7QiwRjU95VnYBhK6t0BqF1mUWAON9YxU6ylmqVuezv2muXVgvl9NwL8CyMo7NifaCtd0QaHlfL3IfXA=
-X-Received: by 2002:a65:58cc:: with SMTP id e12mr2486659pgu.126.1643282790440;
- Thu, 27 Jan 2022 03:26:30 -0800 (PST)
+        b=lMJ1QSht7dX1owf3nll55YpxS/G/4siojSVe7w7p2iLOjEA5y0bMCCqyjSJUN/54B
+         +eSlP9dCRjPQUnQd3pqwf3YCEEtCw+z/shb0W6gc2VZT4iOj8Kxeg/j+pXouSgNUjs
+         B8oxA1r5s9CiIsu3waOEi6UawlRbFKmYdCSjCTub2bIzh9fh+/JDV2Uz+NQ4XOSoKC
+         lD0X3ilOn6GUkg0CjTtQ4EB4CAq/rOIiT+SzHTrkKxH1sPyK37BKuZJeaai8uHJu6S
+         hhD+LSPmPrRt5zH0pevbvO9ztWegM52QpkEoxZ3LWd4Q8UPHPOZgqSZHfr2yXA0iT/
+         AXH44hL8KcwtQ==
+X-Nifty-SrcIP: [209.85.216.45]
+Received: by mail-pj1-f45.google.com with SMTP id d5so5161591pjk.5;
+        Thu, 27 Jan 2022 18:41:34 -0800 (PST)
+X-Gm-Message-State: AOAM533WE2OgiQsewbJZXxBa0Lu0n8DGYHp/J7JO2FiHfZRkWFtc8krV
+        FstK4jae3NaRXdcDKdDabGfeE8f8PQkj2NneJ0Y=
+X-Google-Smtp-Source: ABdhPJy1GiKZizyfLYhMezNIV1ytKYsoKKMkU59dG1DjFD/iKFc6IodPKJ/Y/ET9SfcyfEuczaNspQfIJ50T03XKddU=
+X-Received: by 2002:a17:90b:1647:: with SMTP id il7mr9537952pjb.119.1643337693823;
+ Thu, 27 Jan 2022 18:41:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20220112224342.958358-1-quic_eberman@quicinc.com> <CAKwvOdk73a6FT3o7Pn7_dRM3U=dbrXy+iqmLC6n5msSNMzOTGQ@mail.gmail.com>
-In-Reply-To: <CAKwvOdk73a6FT3o7Pn7_dRM3U=dbrXy+iqmLC6n5msSNMzOTGQ@mail.gmail.com>
+References: <20220112224342.958358-1-quic_eberman@quicinc.com>
+In-Reply-To: <20220112224342.958358-1-quic_eberman@quicinc.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 27 Jan 2022 20:25:53 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATQ3oW0rQz0M5xvWGqYmFZPeB2bgrdLUBobCRVNvoWZyA@mail.gmail.com>
-Message-ID: <CAK7LNATQ3oW0rQz0M5xvWGqYmFZPeB2bgrdLUBobCRVNvoWZyA@mail.gmail.com>
+Date:   Fri, 28 Jan 2022 11:40:56 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ4wXjLfz_+6QeT06tKr_2Pan0qtxf=adKQtCNagZ+5wQ@mail.gmail.com>
+Message-ID: <CAK7LNAQ4wXjLfz_+6QeT06tKr_2Pan0qtxf=adKQtCNagZ+5wQ@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: Add environment variables for userprogs flags
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Elliot Berman <quic_eberman@quicinc.com>,
+To:     Elliot Berman <quic_eberman@quicinc.com>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Michal Marek <michal.lkml@markovi.net>,
         Nathan Chancellor <nathan@kernel.org>,
         Fangrui Song <maskray@google.com>,
         Matthias Maennich <maennich@google.com>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        llvm@lists.linux.dev
+        llvm@lists.linux.dev, Arnd Bergmann <arnd@arndb.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 3:21 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+(+CC: Arnd)
 
+On Thu, Jan 13, 2022 at 7:44 AM Elliot Berman <quic_eberman@quicinc.com> wrote:
 >
-> >
-> >  config CC_HAS_ASM_GOTO
-> >         def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
-> > diff --git a/usr/include/Makefile b/usr/include/Makefile
-> > index 1c2ae1368079..6a8c7dd9ccaf 100644
-> > --- a/usr/include/Makefile
-> > +++ b/usr/include/Makefile
-> > @@ -12,6 +12,9 @@ UAPI_CFLAGS := -std=c90 -Wall -Werror=implicit-function-declaration
-> >  # It is here just because CONFIG_CC_CAN_LINK is tested with -m32 or -m64.
-> >  UAPI_CFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> >
-> > +# USERCFLAGS might contain sysroot location for CC
-> > +UAPI_CFLAGS += $(USERCFLAGS)
-> > +
-> Do we need to worry about USERLDFLAGS here, too? (or usr/Makefile?)
+> Allow additional arguments be passed to userprogs compilation.
+> Reproducible clang builds need to provide a sysroot and gcc path to
+> ensure same toolchain is used across hosts. KCFLAGS is not currently
+> used for any user programs compilation, so add new USERCFLAGS and
+> USERLDFLAGS which serves similar purpose as HOSTCFLAGS/HOSTLDFLAGS.
+>
+> Specifically, I'm trying to force CC_CAN_LINK to consistently fail in
+> an environment where a user sysroot is not specifically available.
+> Currently, Clang might automatically detect GCC installation on hosts
+> which have it installed to a default location in /. With addition of
+> these environment variables, our build environment can do like
+> "--sysroot=/dev/null" to force sysroot detection to fail.
+>
+> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+> ---
 
 
-I do not think so.
+> --- a/usr/include/Makefile
+> +++ b/usr/include/Makefile
+> @@ -12,6 +12,9 @@ UAPI_CFLAGS := -std=c90 -Wall -Werror=implicit-function-declaration
+>  # It is here just because CONFIG_CC_CAN_LINK is tested with -m32 or -m64.
+>  UAPI_CFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
+>
+> +# USERCFLAGS might contain sysroot location for CC
+> +UAPI_CFLAGS += $(USERCFLAGS)
+>
 
-usr/include/Makefile does not link the objects.
+I am OK with this patch, but I was not sure with this line.
 
-(  $(CC) -S   stops after the compilation stage)
+Initially, I thought exported UAPI headers should be self-contained.
+In other words, we should be able to compile-test them without
+relying on compiler or libc headers.
+
+Is this achievable or not?
+
+I think Arnd is an expert in this area.
+I hope some input from him.
 
 
 
 
---
+
+ +
+>  override c_flags = $(UAPI_CFLAGS) -Wp,-MMD,$(depfile) -I$(objtree)/usr/include
+>
+>  # The following are excluded for now because they fail to build.
+> --
+> 2.25.1
+>
+
+
+-- 
 Best Regards
 Masahiro Yamada
