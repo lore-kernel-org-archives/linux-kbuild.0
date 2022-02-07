@@ -2,140 +2,171 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FD1C4332F
-	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Feb 2022 13:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A10C35294
+	for <linux-kbuild@archiver.kernel.org>; Mon,  7 Feb 2022 13:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238328AbiBGNvk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 7 Feb 2022 08:51:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41876 "EHLO
+        id S243146AbiBGNvl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 7 Feb 2022 08:51:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387223AbiBGNrv (ORCPT
+        with ESMTP id S1387139AbiBGNbB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Feb 2022 08:47:51 -0500
-Received: from condef-04.nifty.com (condef-04.nifty.com [202.248.20.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B97FC043181;
-        Mon,  7 Feb 2022 05:47:50 -0800 (PST)
-Received: from conssluserg-01.nifty.com ([10.126.8.80])by condef-04.nifty.com with ESMTP id 217DjHnk028207;
-        Mon, 7 Feb 2022 22:45:17 +0900
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 217DipVo022226;
-        Mon, 7 Feb 2022 22:44:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 217DipVo022226
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1644241492;
-        bh=QUV0hp+xB/5tu9Im52sNMR58mRLFLhMZGaIvBrJvw+Q=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=nbGi8UszpMuf1YuXNXjb4bnFhY+c9dLrABng6IGMik7U4321n/7HbUJiEz0rSAuDC
-         6cD4A4QDQ5ZU+ZIB75NLw9biK8HJe7RvuCE6Oaeah8sBtulkHBzMZaJ8ZqccnvR94T
-         8QHeSyXccMD9FivQxZQGxxCazVcbFqbzQ7w0olPVGraN8HduDChc5E+KU+1iik4bN4
-         RbJ84oePIAp5VJe3sLn6qaSWVUjD15FoE3+552Fyqti31sjqQKNUXnqw13oGq4IG/9
-         Mln10pW/GTzDiusmCo5z6XHTdkO+l0XGMWniv/oLV5MWBUqeAn5Nbur2rn3TDOHf/2
-         m6XeKpUxo8I+g==
-X-Nifty-SrcIP: [209.85.216.50]
-Received: by mail-pj1-f50.google.com with SMTP id p22-20020a17090adf9600b001b8783b2647so7391102pjv.5;
-        Mon, 07 Feb 2022 05:44:51 -0800 (PST)
-X-Gm-Message-State: AOAM530WE848O1SolBsVKEVFNF6ZZb6/8pvz4oMm0Bq6Xar8WVOofkpr
-        rjl/ndOur2T772pNwIXXNB4EMCtAEppOeT0YQew=
-X-Google-Smtp-Source: ABdhPJwoBSTLjNxzRqh4wM22ZLkK8Kabb+gW2Gmp9KwL9maZhBzOFDPATsJn2nYLB4bdQjZ3p4Q6cWFtQph98OF4fnk=
-X-Received: by 2002:a17:90b:1647:: with SMTP id il7mr18618035pjb.119.1644241491011;
- Mon, 07 Feb 2022 05:44:51 -0800 (PST)
+        Mon, 7 Feb 2022 08:31:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC614C043181;
+        Mon,  7 Feb 2022 05:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Y4BPg2UKSHvSGU0CdwH8Mpx1zWYK6Fo9bjYIFzss50c=; b=gO+MTd+cuCgmd2NhvLdFsRvNn0
+        akbAblQsskUvJ9vHv7dbfFYvvZxvaA7RsXU9uplrUQ/gx9JRWDyXTdesuAXL1d3887b0QH07Z1rr9
+        TN1Wdhp4iwncQs2yrHloAGxOfkt7Lc9Xk1Cpj7Sm1RL7QKNbKFX1qDSkFstqs+Uns7l6RoDX9LeiL
+        rw1sgmr6KyIYA3o7LWgRxqwV2B3Nmf24qgIULTi+GyC9fg+yEfmiozkituUB8Zpwf7Wwm+KLNsW84
+        CWLyggEyqT/jVS3/KkdKnZKoEVnT3ZVKVxVFFPYMSOpKp91/LzjjLUmmfGXjWgjAy6MWH9M4KTWQJ
+        kP7emuyQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nH46X-000vOy-3D; Mon, 07 Feb 2022 13:30:53 +0000
+Date:   Mon, 7 Feb 2022 13:30:53 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Ben Hutchings <ben@decadent.org.uk>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        efi@lists.einval.com,
+        debian-kernel <debian-kernel@lists.debian.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
+Subject: Re: [PATCH v2] builddeb: Support signing kernels with the module
+ signing key
+Message-ID: <YgEfDUh6R5A507QD@casper.infradead.org>
+References: <20211218031122.4117631-1-willy@infradead.org>
+ <CAK7LNAQUChvX3NoukBnjBfJJGu+a96pfbM--xHEHOygWPgE9eA@mail.gmail.com>
+ <YdSOV7LL0vWCMcWl@casper.infradead.org>
+ <CAK7LNAQgixJSnDUMfjc+tg90oMdVoh+i5faEn-rqgmHR3Bk6dQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220128220131.10956-1-brenda.streiff@ni.com>
-In-Reply-To: <20220128220131.10956-1-brenda.streiff@ni.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Mon, 7 Feb 2022 22:44:15 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASdD=xHb24sj80CsG90QVDBXFhFV10MvybdwGf2xx27Kw@mail.gmail.com>
-Message-ID: <CAK7LNASdD=xHb24sj80CsG90QVDBXFhFV10MvybdwGf2xx27Kw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: let 'shell' return enough output for deep path names
-To:     Brenda Streiff <brenda.streiff@ni.com>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQgixJSnDUMfjc+tg90oMdVoh+i5faEn-rqgmHR3Bk6dQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jan 29, 2022 at 7:02 AM Brenda Streiff <brenda.streiff@ni.com> wrot=
-e:
->
-> The 'shell' built-in only returns the first 256 bytes of the command's
-> output. In some cases, 'shell' is used to return a path; by bumping up
-> the buffer size to 4096 this lets us capture up to PATH_MAX.
->
-> The specific case where I ran into this was due to commit 1e860048c53e
-> ("gcc-plugins: simplify GCC plugin-dev capability test"). After this
-> change, we now use `$(shell,$(CC) -print-file-name=3Dplugin)` to return
-> a path; if the gcc path is particularly long, then the path ends up
-> truncated at the 256 byte mark, which makes the HAVE_GCC_PLUGINS
-> depends test always fail.
->
-> Signed-off-by: Brenda Streiff <brenda.streiff@ni.com>
+On Mon, Feb 07, 2022 at 09:33:46PM +0900, Masahiro Yamada wrote:
+> Added "Ben Hutchings <ben@decadent.org.uk>"
+> 
+> On Wed, Jan 5, 2022 at 3:13 AM Matthew Wilcox <willy@infradead.org> wrote:
+> >
+> > On Wed, Jan 05, 2022 at 12:39:57AM +0900, Masahiro Yamada wrote:
+> > > > +vmlinux=$($MAKE -s -f $srctree/Makefile image_name)
+> > > > +key=
+> > > > +if is_enabled CONFIG_EFI_STUB && is_enabled CONFIG_MODULE_SIG; then
+> > > > +       cert=$(grep ^CONFIG_MODULE_SIG_KEY= include/config/auto.conf | cut -d\" -f2)
+> > > > +       if [ ! -f $cert ]; then
+> > > > +               cert=$srctree/$cert
+> > > > +       fi
+> > > > +
+> > > > +       key=${cert%pem}priv
+> > > > +       if [ ! -f $key ]; then
+> > > > +               key=$cert
+> > > > +       fi
+> > >
+> > >
+> > > I still do not understand this part.
+> > >
+> > > It is true that the Debian document you referred to creates separate files
+> > > for the key and the certificate:
+> > >   # openssl req -new -x509 -newkey rsa:2048 -keyout MOK.priv -outform
+> > > DER -out MOK.der -days 36500 -subj "/CN=My Name/" -nodes
+> > >
+> > > but, is such a use-case possible in Kbuild?
+> >
+> > If someone has followed the Debian instructions for creating a MOK,
+> > then they will have two separate files.  We should support both the case
+> > where someone has created a Debian MOK and the case where someone has
+> > used Kbuild to create this foolish blob with both private and public
+> > key in one file.
+> 
+> But, this patch is doing different things than the Debian document.
+> 
+> 
+> The Debian document you referred to says:
+>   "Ubuntu puts its MOK key under /var/lib/shim-signed/mok/ and some
+>    software such as Oracle's virtualbox package expect the key there
+>    so we follow suit (see 989463 for reference) and put it at the same place"
 
-Thanks, applied to linux-kbuild,
-(but I dropped the change to tests)
+Uhh ... it does now.  It didn't when I originally wrote this patch.
+Apparently it was updated in November:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=989463
 
+> In Debian, MOK is generated under /var/lib/shim-signed/mok/,
+> and its primary use is for signing the kernel.
+> Then, you can reuse it for signing modules as well.
+> 
+> 
+> This patch adopts the opposite direction:
+>   Kbuild generates the module signing key, then
+>   this patch reuses it for singing the kernel.
 
+The patch only does this because you asked it to be changed to do this!
+Look back at the version I originally sent out.  It didn't generate
+the module signing key at all.  I had no idea the kernel build was even
+capable of doing such a thing until you pointed it out.
 
+I followed the instructions in the Debian document *that existed at
+the time* (and now apparently we can't see because Debian uses an
+inept type of wiki that can't show old versions).  I generated a key
+and did not store it in the build tree.  I enrolled that key.
+And then I thought "It would be nice if I didn't have to do all this
+manual work after installing a new kernel so that my machine would
+boot".
 
+And here we are, months later, and you're complaining about ...
+something?
 
-> ---
->  scripts/kconfig/preprocess.c                                  | 2 +-
->  scripts/kconfig/tests/preprocess/builtin_func/Kconfig         | 3 +++
->  scripts/kconfig/tests/preprocess/builtin_func/expected_stdout | 1 +
->  3 files changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
-> index 0590f86df6e4..748da578b418 100644
-> --- a/scripts/kconfig/preprocess.c
-> +++ b/scripts/kconfig/preprocess.c
-> @@ -141,7 +141,7 @@ static char *do_lineno(int argc, char *argv[])
->  static char *do_shell(int argc, char *argv[])
->  {
->         FILE *p;
-> -       char buf[256];
-> +       char buf[4096];
->         char *cmd;
->         size_t nread;
->         int i;
-> diff --git a/scripts/kconfig/tests/preprocess/builtin_func/Kconfig b/scri=
-pts/kconfig/tests/preprocess/builtin_func/Kconfig
-> index baa328827911..e9791a97f731 100644
-> --- a/scripts/kconfig/tests/preprocess/builtin_func/Kconfig
-> +++ b/scripts/kconfig/tests/preprocess/builtin_func/Kconfig
-> @@ -25,3 +25,6 @@ $(warning,$(shell,printf 'hello\nworld\n\n4\n\n\n'))
->  # 'lineno' to the line number.
->  $(warning,filename=3D$(filename))
->  $(warning,lineno=3D$(lineno))
-> +
-> +# 'shell' can return more than 256 bytes of output
-> +$(info,$(shell,printf 'hello%01024dworld\n' '0'))
-> diff --git a/scripts/kconfig/tests/preprocess/builtin_func/expected_stdou=
-t b/scripts/kconfig/tests/preprocess/builtin_func/expected_stdout
-> index 82de3a7e97de..8e03e4dfe8f6 100644
-> --- a/scripts/kconfig/tests/preprocess/builtin_func/expected_stdout
-> +++ b/scripts/kconfig/tests/preprocess/builtin_func/expected_stdout
-> @@ -1 +1,2 @@
->  hello world 0
-> +hello0000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000000000000000000000=
-000000000000000000000000000000000000000000000000000000000world
-> --
-> 2.20.1
->
-
-
---=20
-Best Regards
-Masahiro Yamada
+> The key is located in the kernel build tree
+> (that is, the key is lost when you run "make mrproper").
+> 
+> You need to "mokutil --import path/to/module/sining/key"
+> every time Kbuild generates a new key.
+> 
+> 
+> 
+> So, another possible approach is:
+> 
+> builddeb signs the kernel with the key
+> in /var/lib/shim-signed/mok/.
+> 
+> I think this is more aligned with the debian documenation.
+> 
+> I added Ben Hutchings, who might give us insights.
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> > > In the old days, yes, the key and the certificate were stored in separate files.
+> > > (the key in *.priv and the certificate in *.x509)
+> > >
+> > >
+> > > Please read this commit:
+> >
+> > Yes, I did.
+> >
+> > > The motivation for this change is still questionable to me;
+> > > the commit description sounds like they merged *.priv and *.x509
+> > > into *.pem just because they could not write a correct Makefile.
+> > > (If requested, I can write a correct Makefile that works in parallel build)
+> >
+> > I think that would be preferable.  Putting the private and public keys
+> > in the same file cannot be good security practice!
+> 
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
