@@ -2,94 +2,112 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A14FC433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed,  9 Feb 2022 23:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D54DC433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Feb 2022 01:20:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236962AbiBIXFC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 9 Feb 2022 18:05:02 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:58766 "EHLO
+        id S230475AbiBJBUk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 9 Feb 2022 20:20:40 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:37442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236886AbiBIXFB (ORCPT
+        with ESMTP id S229469AbiBJBUj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 Feb 2022 18:05:01 -0500
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DFCE01976B;
-        Wed,  9 Feb 2022 15:05:03 -0800 (PST)
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 219N4i1Z004353;
-        Thu, 10 Feb 2022 08:04:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 219N4i1Z004353
+        Wed, 9 Feb 2022 20:20:39 -0500
+Received: from condef-07.nifty.com (condef-07.nifty.com [202.248.20.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746072629;
+        Wed,  9 Feb 2022 17:20:38 -0800 (PST)
+Received: from conssluserg-02.nifty.com ([10.126.8.81])by condef-07.nifty.com with ESMTP id 21A0sXbt021538;
+        Thu, 10 Feb 2022 09:54:33 +0900
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 21A0s7YW021042;
+        Thu, 10 Feb 2022 09:54:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 21A0s7YW021042
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1644447884;
-        bh=a4CPTySbfz6tATOd3oisyCSdvLEgbXZVMlYkkDX676Q=;
+        s=dec2015msa; t=1644454448;
+        bh=GzF9d1CPJ6YQKFkbbGBhv3+4+f8c6oA7UoFBRscMx1o=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=J+HdsNYfFFKEgIiacdUdp4ULvPnM/LbolxFvFZHp/DGpD5/6wl2As7pPXuzjGPpA9
-         6SEM5s9qN8Iv9fdmusZA4JPcYVT6rqqI/FLXM+3j5Jeme32pQ8NKs7C3kkv73mlfbX
-         lk2G149zFVXv24WacOyzDKiceLjR9QIRj/98h1f6uZ+k0tiUlHrIGblZ67kzS5nOzm
-         rCaCIwpKOjzge2xE6IsoVf76HEHc8YpqyNDBhlK96AnWovLTY+thfNoOlruzJZzmb0
-         N98XM3lWwTogUP060YeBUdsPH7aMpKU1h33a11Tn/prmS90FNfZHBiUa4h5ZceJ/Fg
-         jKZgvJp6urIYw==
-X-Nifty-SrcIP: [209.85.214.174]
-Received: by mail-pl1-f174.google.com with SMTP id y17so252776plg.7;
-        Wed, 09 Feb 2022 15:04:44 -0800 (PST)
-X-Gm-Message-State: AOAM531KSWnQDkOfQZwBq3iyptZAtN85Dlx//5AhIUEDlIWYKxAvTIpB
-        I4iIw74lA9KRhXXQOetlCCjGRXsZVqBeJ5xjOg0=
-X-Google-Smtp-Source: ABdhPJwWB8ZNnsMSrugJLAaUoxmVXtYfCekIy7V3ZzXWPCjfVCdzOirMrkT+yVSMb4QpnAJTnSLfCYIdBvKSRlsafrw=
-X-Received: by 2002:a17:903:22c5:: with SMTP id y5mr2455424plg.99.1644447883812;
- Wed, 09 Feb 2022 15:04:43 -0800 (PST)
+        b=xvGvf1XYqFFIJt4Otcj/oDt5pe8gRh6D7SbUOuChUJOgUD5sptvKTvlrK7lDb2hqp
+         NBb0T5F/mj1Zf43Pke58lSfGTU2XaLdZ0HuNo5u6a8xGDLl7i04ApNkv0WijbKup3w
+         +9wZrS6yaJu4vMSopyBIppW8ic52RbYqR9DpZmjqFgRUiy7jhP0jxb/IC/302wis/I
+         GG4RW0/n6aQkhzwUtDXdE6e5KrAXFAIm+cfnhajL2izuqSAxt/df8wFRFWlFh59H9I
+         HJgjz8PmFdnNEU2RmJEq2l+kQF+0mT3HQV8rOzlplllBR2PRCyhJ1nn7AnabZNLobs
+         pofTxmTSjMfNw==
+X-Nifty-SrcIP: [209.85.216.47]
+Received: by mail-pj1-f47.google.com with SMTP id c8-20020a17090a674800b001b91184b732so4448996pjm.5;
+        Wed, 09 Feb 2022 16:54:08 -0800 (PST)
+X-Gm-Message-State: AOAM533OpxsU4JIrDxZI5PJt4Bd76G/Jbc632UaLIAWf0uqFECOrh08V
+        WKzMTdrpbl8ZfhbMcZd4zRuAEhECJyD+lyX+u14=
+X-Google-Smtp-Source: ABdhPJxYNdvbvsgfJh3s8wRrHOxkb+ZVxnQom67+weOLsIwyXbGJaZTgP6KgRQYD3yXAWw8K9ul72rUx61a9pv7ueFo=
+X-Received: by 2002:a17:903:22c5:: with SMTP id y5mr2853067plg.99.1644454447226;
+ Wed, 09 Feb 2022 16:54:07 -0800 (PST)
 MIME-Version: 1.0
-References: <20211218031122.4117631-1-willy@infradead.org> <CAK7LNAQUChvX3NoukBnjBfJJGu+a96pfbM--xHEHOygWPgE9eA@mail.gmail.com>
- <YdSOV7LL0vWCMcWl@casper.infradead.org> <CAK7LNAQgixJSnDUMfjc+tg90oMdVoh+i5faEn-rqgmHR3Bk6dQ@mail.gmail.com>
- <20220208110122.2z4cmbqexmnxuxld@jak-t480s> <YgJrypdQium7AcWV@casper.infradead.org>
- <3d76ff7aab8cdc134aebf16af66582849bd53156.camel@HansenPartnership.com>
-In-Reply-To: <3d76ff7aab8cdc134aebf16af66582849bd53156.camel@HansenPartnership.com>
+References: <20220208062618.1869210-1-masahiroy@kernel.org>
+In-Reply-To: <20220208062618.1869210-1-masahiroy@kernel.org>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 10 Feb 2022 08:04:06 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASNFnARmhJ0ik3uCiasuTDGgi9PtEgi7m+EPgHtK0-t5Q@mail.gmail.com>
-Message-ID: <CAK7LNASNFnARmhJ0ik3uCiasuTDGgi9PtEgi7m+EPgHtK0-t5Q@mail.gmail.com>
-Subject: Re: [PATCH v2] builddeb: Support signing kernels with the module
- signing key
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Julian Andres Klode <julian.klode@canonical.com>,
-        Ben Hutchings <ben@decadent.org.uk>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        efi@lists.einval.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        debian-kernel <debian-kernel@lists.debian.org>
+Date:   Thu, 10 Feb 2022 09:53:32 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASojfnOaAmgwwCsA9J-nhYtRzJx8AKmy8OpRm50uWfegQ@mail.gmail.com>
+Message-ID: <CAK7LNASojfnOaAmgwwCsA9J-nhYtRzJx8AKmy8OpRm50uWfegQ@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: fix missing fclose() on error paths
+To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc:     Ryan Cai <ycaibb@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 10:21 PM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
+On Tue, Feb 8, 2022 at 3:26 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> On Tue, 2022-02-08 at 13:10 +0000, Matthew Wilcox wrote:
-> > On Tue, Feb 08, 2022 at 12:01:22PM +0100, Julian Andres Klode wrote:
-> > > It's worth pointing out that in Ubuntu, the generated MOK key
-> > > is for module signing only (extended key usage
-> > > 1.3.6.1.4.1.2312.16.1.2), kernels signed with it will NOT be
-> > > bootable.
-> >
-> > Why should these be separate keys?  There's no meaningful security
-> > boundary between a kernel module and the ernel itself; a kernel
-> > modulecan, for example, write to CR3, and that's game over for
-> > any pretence at separation.
+> The file is not closed when ferror() fails.
 >
-> It's standard practice for any automated build private key to be
-> destroyed immediately to preserve security.  Thus the modules get
-> signed with a per kernel ephemeral build key but the MoK key is a long
-> term key with a special signing infrastructure, usually burned into the
-> distro version of shim.  The kernel signing key usually has to be long
-> term because you want shim to boot multiple kernels otherwise upgrading
-> becomes a nightmare.
+> Fixes: 00d674cb3536 ("kconfig: refactor conf_write_dep()")
+> Fixes: 57ddd07c4560 ("kconfig: refactor conf_write_autoconf()")
+> Reported-by: Ryan Cai <ycaibb@gmail.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-Fully agreed.
 
+Applied to linux-kbuild/fixes.
+
+
+>
+>  scripts/kconfig/confdata.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 59717be31210..16897cb8cefd 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -979,10 +979,10 @@ static int conf_write_autoconf_cmd(const char *autoconf_name)
+>
+>         fprintf(out, "\n$(deps_config): ;\n");
+>
+> -       if (ferror(out)) /* error check for all fprintf() calls */
+> -               return -1;
+> -
+> +       ret = ferror(out); /* error check for all fprintf() calls */
+>         fclose(out);
+> +       if (ret)
+> +               return -1;
+>
+>         if (rename(tmp, name)) {
+>                 perror("rename");
+> @@ -1093,10 +1093,10 @@ static int __conf_write_autoconf(const char *filename,
+>                         print_symbol(file, sym);
+>
+>         /* check possible errors in conf_write_heading() and print_symbol() */
+> -       if (ferror(file))
+> -               return -1;
+> -
+> +       ret = ferror(file);
+>         fclose(file);
+> +       if (ret)
+> +               return -1;
+>
+>         if (rename(tmp, filename)) {
+>                 perror("rename");
+> --
+> 2.32.0
+>
 
 
 -- 
