@@ -2,195 +2,168 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BD8C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Feb 2022 10:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A5EC433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 17 Feb 2022 17:41:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239606AbiBQK7K (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 17 Feb 2022 05:59:10 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35942 "EHLO
+        id S242869AbiBQRmB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 17 Feb 2022 12:42:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239603AbiBQK6t (ORCPT
+        with ESMTP id S241845AbiBQRmB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 17 Feb 2022 05:58:49 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49003295FEC;
-        Thu, 17 Feb 2022 02:58:02 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Thu, 17 Feb 2022 12:42:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3C321819;
+        Thu, 17 Feb 2022 09:41:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C6DA11F37D;
-        Thu, 17 Feb 2022 10:58:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1645095480; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UZTrKc5Lz6o1zAV4RkojCzhZSoFvfvM9U2+FCuy4Upw=;
-        b=mi96MmSvLvZI/HKSQJD3M/Dpry9RhfV5rdC0LphzQWnmZVdDu6ZAx0Oij2MaN1sZBoVJim
-        8fdhp+/hdD2TXxFZ0OmTzQlDTXZZe00/CXEVZrILZAIdpS6fkMIN9xIJQ/FHl4ja0uC11U
-        XOi+ITWAR+vDBXNM45NwHCELccDC9tw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1645095480;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UZTrKc5Lz6o1zAV4RkojCzhZSoFvfvM9U2+FCuy4Upw=;
-        b=Lpd/3bOBPJsfJ/tuOzDPolm0f8WTbSZBjj+uxHmtR4KxpBs7y1wdZ9+Vnpanpm9sdCJrvH
-        7qhQkBds4K0fLdDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 74AC913DD8;
-        Thu, 17 Feb 2022 10:58:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id wArUGjgqDmJdTgAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Thu, 17 Feb 2022 10:58:00 +0000
-From:   Petr Vorel <pvorel@suse.cz>
-To:     linux-crypto@vger.kernel.org
-Cc:     Petr Vorel <pvorel@suse.cz>, Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, leitao@debian.org,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: [PATCH v3 1/2] crypto: vmx - merge CRYPTO_DEV_VMX_ENCRYPT into CRYPTO_DEV_VMX
-Date:   Thu, 17 Feb 2022 11:57:50 +0100
-Message-Id: <20220217105751.6330-2-pvorel@suse.cz>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220217105751.6330-1-pvorel@suse.cz>
-References: <20220217105751.6330-1-pvorel@suse.cz>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9051FB820C2;
+        Thu, 17 Feb 2022 17:41:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467FFC340E8;
+        Thu, 17 Feb 2022 17:41:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645119703;
+        bh=8pbZj/3cVuW2vQLaHmXTlBvSAEOnHZPHPU8EvjwJvmY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lICo15JaGIZ/+wRcv2OoGVinuJEdNg3fOgujgAyrExKrBVNZWnseGROU0F8zsi3XY
+         SwZR4kNdyhOIKqUv8y+gsMfXk8TBoQPckN91MTym3WTpQB1X7VLe8CL/u5O+Pf9x9a
+         UxRJvr1+jg2PvqdiG+nBI0C+x2ZyLUiI3nyUguqk62WvzsT2+H3tL3JabPWuJXf4cU
+         AKOkKRnJBf9FTiqOTbx2N6qVW5b2iVuCWLutJcz2kv473EmYc2TlKYMhu4n1/gj0d9
+         1TjxBU5O4nVFT1ikddcrYzGZ55h/hVIr4rQws6yNoehya20EIeOGWhPPzUpR1bL+Nv
+         XQ6Bz+csenJuw==
+Date:   Thu, 17 Feb 2022 10:41:37 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Kees Cook <keescook@chromium.org>, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        David Gow <davidgow@google.com>, linux-um@lists.infradead.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>, kunit-dev@googlegroups.com,
+        llvm@lists.linux.dev,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] um: Allow builds with Clang
+Message-ID: <Yg6I0YZAh5yWYpT2@dev-arch.archlinux-ax161>
+References: <20220217002843.2312603-1-keescook@chromium.org>
+ <CAK7LNASMobjuAen+_O4eFOgkOoUwf5ANk6_TjL4SdtT47Jge-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASMobjuAen+_O4eFOgkOoUwf5ANk6_TjL4SdtT47Jge-w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-CRYPTO_DEV_VMX_ENCRYPT is redundant with CRYPTO_DEV_VMX.
+On Thu, Feb 17, 2022 at 01:54:58PM +0900, Masahiro Yamada wrote:
+> On Thu, Feb 17, 2022 at 9:28 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > Add x86-64 target for Clang+um and update user-offsets.c to use
+> > Clang-friendly assembler, similar to the fix from commit cf0c3e68aa81
+> > ("kbuild: fix asm-offset generation to work with clang").
+> >
+> > This lets me run KUnit tests with Clang:
+> >
+> > $ ./tools/testing/kunit/kunit.py config --make_options LLVM=1
+> > ...
+> > $ ./tools/testing/kunit/kunit.py run --make_options LLVM=1
+> > ...
+> >
+> > Cc: Jeff Dike <jdike@addtoit.com>
+> > Cc: Richard Weinberger <richard@nod.at>
+> > Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+> > Cc: Masahiro Yamada <masahiroy@kernel.org>
+> > Cc: Nick Desaulniers <ndesaulniers@google.com>
+> > Cc: Nathan Chancellor <nathan@kernel.org>
+> > Cc: David Gow <davidgow@google.com>
+> > Cc: linux-um@lists.infradead.org
+> > Cc: linux-kbuild@vger.kernel.org
+> > Cc: linux-kselftest@vger.kernel.org
+> > Cc: kunit-dev@googlegroups.com
+> > Cc: llvm@lists.linux.dev
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  arch/x86/um/user-offsets.c | 4 ++--
+> >  scripts/Makefile.clang     | 1 +
+> >  2 files changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/um/user-offsets.c b/arch/x86/um/user-offsets.c
+> > index bae61554abcc..d9071827b515 100644
+> > --- a/arch/x86/um/user-offsets.c
+> > +++ b/arch/x86/um/user-offsets.c
+> > @@ -10,10 +10,10 @@
+> >  #include <asm/types.h>
+> >
+> >  #define DEFINE(sym, val) \
+> > -       asm volatile("\n->" #sym " %0 " #val : : "i" (val))
+> > +       asm volatile("\n.ascii \"->" #sym " %0 " #val "\"": : "i" (val))
+> >
+> >  #define DEFINE_LONGS(sym, val) \
+> > -       asm volatile("\n->" #sym " %0 " #val : : "i" (val/sizeof(unsigned long)))
+> > +       asm volatile("\n.ascii \"->" #sym " %0 " #val "\"": : "i" (val/sizeof(unsigned long)))
+> >
+> >  void foo(void)
+> >  {
+> > diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
+> > index 51fc23e2e9e5..857b23de51c6 100644
+> > --- a/scripts/Makefile.clang
+> > +++ b/scripts/Makefile.clang
+> > @@ -10,6 +10,7 @@ CLANG_TARGET_FLAGS_powerpc    := powerpc64le-linux-gnu
+> >  CLANG_TARGET_FLAGS_riscv       := riscv64-linux-gnu
+> >  CLANG_TARGET_FLAGS_s390                := s390x-linux-gnu
+> >  CLANG_TARGET_FLAGS_x86         := x86_64-linux-gnu
+> > +CLANG_TARGET_FLAGS_um          := x86_64-linux-gnu
+> 
+> 
+> Does this work for the i386 host?
+> 
+> UML supports i386 and x86_64 as the host architecture as of now,
+> but this always compiles UML for x86_64?
 
-And it also forces CRYPTO_GHASH to be builtin even
-CRYPTO_DEV_VMX_ENCRYPT was configured as module.
+I think the current code will work because arch/x86/Makefile.um includes
+-m32 for CONFIG_X86_32, which will implicitly change x86_64-linux-gnu
+into a 32-bit target triple:
 
-This requires to change defconfig values to m for backwards
-compatibility.
+$ echo | clang --target=x86_64-linux-gnu -x c -c -o test.o -
 
-Signed-off-by: Petr Vorel <pvorel@suse.cz>
----
-changes v2->v3:
-* keep CRYPTO_DEV_VMX and merge CRYPTO_DEV_VMX_ENCRYPT into it instead
-  of vice versa (suggested by Nicolai). I have no problem to send
-  another version if maintainers want the original approach.
-* change commit subject to be compatible
-* remove MAINTAINERS changes
+$ file test.o
+test.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped
 
- arch/powerpc/configs/powernv_defconfig |  2 +-
- arch/powerpc/configs/ppc64_defconfig   |  2 +-
- arch/powerpc/configs/pseries_defconfig |  2 +-
- drivers/crypto/Kconfig                 |  9 +++++----
- drivers/crypto/vmx/Kconfig             | 10 ----------
- drivers/crypto/vmx/Makefile            |  4 ++--
- 6 files changed, 10 insertions(+), 19 deletions(-)
- delete mode 100644 drivers/crypto/vmx/Kconfig
+$ echo | clang --target=x86_64-linux-gnu -m32 -x c -c -o test.o -
 
-diff --git a/arch/powerpc/configs/powernv_defconfig b/arch/powerpc/configs/powernv_defconfig
-index 49f49c263935..661b294d1744 100644
---- a/arch/powerpc/configs/powernv_defconfig
-+++ b/arch/powerpc/configs/powernv_defconfig
-@@ -337,7 +337,7 @@ CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_LZO=m
- CONFIG_CRYPTO_DEV_NX=y
--CONFIG_CRYPTO_DEV_VMX=y
-+CONFIG_CRYPTO_DEV_VMX=m
- CONFIG_VIRTUALIZATION=y
- CONFIG_KVM_BOOK3S_64=m
- CONFIG_KVM_BOOK3S_64_HV=m
-diff --git a/arch/powerpc/configs/ppc64_defconfig b/arch/powerpc/configs/ppc64_defconfig
-index c8b0e80d613b..cc51b506066c 100644
---- a/arch/powerpc/configs/ppc64_defconfig
-+++ b/arch/powerpc/configs/ppc64_defconfig
-@@ -355,7 +355,7 @@ CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_LZO=m
- CONFIG_CRYPTO_DEV_NX=y
- CONFIG_CRYPTO_DEV_NX_ENCRYPT=m
--CONFIG_CRYPTO_DEV_VMX=y
-+CONFIG_CRYPTO_DEV_VMX=m
- CONFIG_PRINTK_TIME=y
- CONFIG_PRINTK_CALLER=y
- CONFIG_MAGIC_SYSRQ=y
-diff --git a/arch/powerpc/configs/pseries_defconfig b/arch/powerpc/configs/pseries_defconfig
-index b571d084c148..2366d3be0d11 100644
---- a/arch/powerpc/configs/pseries_defconfig
-+++ b/arch/powerpc/configs/pseries_defconfig
-@@ -315,7 +315,7 @@ CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_LZO=m
- CONFIG_CRYPTO_DEV_NX=y
- CONFIG_CRYPTO_DEV_NX_ENCRYPT=m
--CONFIG_CRYPTO_DEV_VMX=y
-+CONFIG_CRYPTO_DEV_VMX=m
- CONFIG_VIRTUALIZATION=y
- CONFIG_KVM_BOOK3S_64=m
- CONFIG_KVM_BOOK3S_64_HV=m
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 4f705674f94f..923fa1effb4a 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -762,12 +762,13 @@ config CRYPTO_DEV_QCOM_RNG
- 	  module will be called qcom-rng. If unsure, say N.
+$ file test.o
+test.o: ELF 32-bit LSB relocatable, Intel 80386, version 1 (SYSV), not stripped
+
+In fact, we rely on this for ARCH=i386 LLVM=1 right now, as it uses
+x86_64-linux-gnu for the target flag.
+
+While UML only supports x86, maybe it is worth using SUBARCH instead of
+hardcoding the triple? No strong opinion around that though.
+
+diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
+index 51fc23e2e9e5..87285b76adb2 100644
+--- a/scripts/Makefile.clang
++++ b/scripts/Makefile.clang
+@@ -10,6 +10,7 @@ CLANG_TARGET_FLAGS_powerpc	:= powerpc64le-linux-gnu
+ CLANG_TARGET_FLAGS_riscv	:= riscv64-linux-gnu
+ CLANG_TARGET_FLAGS_s390		:= s390x-linux-gnu
+ CLANG_TARGET_FLAGS_x86		:= x86_64-linux-gnu
++CLANG_TARGET_FLAGS_um		:= $(CLANG_TARGET_FLAGS_$(SUBARCH))
+ CLANG_TARGET_FLAGS		:= $(CLANG_TARGET_FLAGS_$(SRCARCH))
  
- config CRYPTO_DEV_VMX
--	bool "Support for VMX cryptographic acceleration instructions"
-+	tristate "Power VMX cryptographic acceleration instructions driver"
- 	depends on PPC64 && VSX
-+	select CRYPTO_GHASH
- 	help
--	  Support for VMX cryptographic acceleration instructions.
--
--source "drivers/crypto/vmx/Kconfig"
-+	  Support for VMX cryptographic acceleration instructions on Power8 CPU.
-+	  This module supports acceleration for AES and GHASH in hardware. If you
-+	  choose 'M' here, this module will be called vmx-crypto.
- 
- config CRYPTO_DEV_IMGTEC_HASH
- 	tristate "Imagination Technologies hardware hash accelerator"
-diff --git a/drivers/crypto/vmx/Kconfig b/drivers/crypto/vmx/Kconfig
-deleted file mode 100644
-index c85fab7ef0bd..000000000000
---- a/drivers/crypto/vmx/Kconfig
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--config CRYPTO_DEV_VMX_ENCRYPT
--	tristate "Encryption acceleration support on P8 CPU"
--	depends on CRYPTO_DEV_VMX
--	select CRYPTO_GHASH
--	default m
--	help
--	  Support for VMX cryptographic acceleration instructions on Power8 CPU.
--	  This module supports acceleration for AES and GHASH in hardware. If you
--	  choose 'M' here, this module will be called vmx-crypto.
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index 709670d2b553..703f67b8459e 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
-+obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx-crypto.o
- vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
- 
- ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
-@@ -15,7 +15,7 @@ targets += aesp8-ppc.S ghashp8-ppc.S
- 
- $(obj)/aesp8-ppc.S: $(src)/aesp8-ppc.pl FORCE
- 	$(call if_changed,perl)
--  
-+
- $(obj)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl FORCE
- 	$(call if_changed,perl)
- 
--- 
-2.35.1
+ ifeq ($(CROSS_COMPILE),)
 
+> >  CLANG_TARGET_FLAGS             := $(CLANG_TARGET_FLAGS_$(SRCARCH))
+> >
+> >  ifeq ($(CROSS_COMPILE),)
+> > --
+> > 2.30.2
+> >
+> 
+> 
+> -- 
+> Best Regards
+> Masahiro Yamada
