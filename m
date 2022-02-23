@@ -2,57 +2,85 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C708C433F5
-	for <linux-kbuild@archiver.kernel.org>; Tue, 22 Feb 2022 09:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E727FC433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed, 23 Feb 2022 03:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbiBVJTv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 22 Feb 2022 04:19:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
+        id S237883AbiBWDaH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 22 Feb 2022 22:30:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiBVJTu (ORCPT
+        with ESMTP id S237874AbiBWDaG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 22 Feb 2022 04:19:50 -0500
-X-Greylist: delayed 818 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Feb 2022 01:19:25 PST
-Received: from mail.olerise.pl (mail.olerise.pl [46.183.184.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6630149B98
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Feb 2022 01:19:25 -0800 (PST)
-Received: by mail.olerise.pl (Postfix, from userid 1001)
-        id B4EA64A4C4; Tue, 22 Feb 2022 10:01:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=olerise.pl; s=mail;
-        t=1645520589; bh=ZNYiuZLXlxCdAPtstEG/gwJieB5RBwA/cHj1SZ3Mpl0=;
-        h=Date:From:To:Subject:From;
-        b=mAVyMEusZM9Ora7HoF6E1kDzEyhsoScZ+Lw4DeLJsoe3CVAISe99dnwmYupeLfFoF
-         tsKAAmi8/3Qr+tfcgrAslQlWmCJRkg8oUEyruRQ+HxU/BCTAAQaRXkN4Vxlu1evtrQ
-         YQ8TEv+MczlIK3zpbj40+BdVzNjYWKhybtsxtnlZZFAfrYksX9rfKawzFK5hvkcUwQ
-         z3ydBeFgzuf0jxrqZJu2G3RhUcdsnTgv7lxEtRrHeoY0azd44NWFUb1Z38xKcwEGxd
-         eYMRaEUfQ+1f9OKDJ//ZPFEFBPcSFJZyw8FqBturKK7VTVnvG14CJKrPDmyn2qRbe3
-         arIdWuSSHRxdQ==
-Received: by mail.olerise.pl for <linux-kbuild@vger.kernel.org>; Tue, 22 Feb 2022 09:00:29 GMT
-Message-ID: <20220222084500-0.1.1w.f0gh.0.82585ikfn7@olerise.pl>
-Date:   Tue, 22 Feb 2022 09:00:29 GMT
-From:   =?UTF-8?Q? "Miko=C5=82aj_Rudzik" ?= <mikolaj.rudzik@olerise.pl>
-To:     <linux-kbuild@vger.kernel.org>
-Subject: =?UTF-8?Q?Nap=C5=82yw_Klient=C3=B3w_ze_strony?=
-X-Mailer: mail.olerise.pl
+        Tue, 22 Feb 2022 22:30:06 -0500
+X-Greylist: delayed 1894 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Feb 2022 19:29:40 PST
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0058639141;
+        Tue, 22 Feb 2022 19:29:39 -0800 (PST)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nMhrU-0006Db-0w; Wed, 23 Feb 2022 13:58:41 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Feb 2022 14:58:40 +1200
+Date:   Wed, 23 Feb 2022 14:58:39 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Petr Vorel <pvorel@suse.cz>
+Cc:     linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
+        leitao@debian.org, Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] crypto: vmx - add missing dependencies
+Message-ID: <YhWi3xAOXlF+tKan@gondor.apana.org.au>
+References: <20220217105751.6330-1-pvorel@suse.cz>
+ <20220217105751.6330-3-pvorel@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217105751.6330-3-pvorel@suse.cz>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Thu, Feb 17, 2022 at 11:57:51AM +0100, Petr Vorel wrote:
+> vmx-crypto module depends on CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or
+> CRYPTO_XTS, thus add them.
+> 
+> These dependencies are likely to be enabled, but if
+> CRYPTO_DEV_VMX=y && !CRYPTO_MANAGER_DISABLE_TESTS
+> and either of CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or CRYPTO_XTS is built
+> as module or disabled, alg_test() from crypto/testmgr.c complains during
+> boot about failing to allocate the generic fallback implementations
+> (2 == ENOENT):
+> 
+> [    0.540953] Failed to allocate xts(aes) fallback: -2
+> [    0.541014] alg: skcipher: failed to allocate transform for p8_aes_xts: -2
+> [    0.541120] alg: self-tests for p8_aes_xts (xts(aes)) failed (rc=-2)
+> [    0.544440] Failed to allocate ctr(aes) fallback: -2
+> [    0.544497] alg: skcipher: failed to allocate transform for p8_aes_ctr: -2
+> [    0.544603] alg: self-tests for p8_aes_ctr (ctr(aes)) failed (rc=-2)
+> [    0.547992] Failed to allocate cbc(aes) fallback: -2
+> [    0.548052] alg: skcipher: failed to allocate transform for p8_aes_cbc: -2
+> [    0.548156] alg: self-tests for p8_aes_cbc (cbc(aes)) failed (rc=-2)
+> [    0.550745] Failed to allocate transformation for 'aes': -2
+> [    0.550801] alg: cipher: Failed to load transform for p8_aes: -2
+> [    0.550892] alg: self-tests for p8_aes (aes) failed (rc=-2)
+> 
+> Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
+> Fixes: d2e3ae6f3aba ("crypto: vmx - Enabling VMX module for PPC64")
+> 
+> Suggested-by: Nicolai Stange <nstange@suse.de>
+> Signed-off-by: Petr Vorel <pvorel@suse.cz>
+> ---
+> changes v2->v3:
+> * more less the same, just in drivers/crypto/Kconfig (previously it was
+>   in drivers/crypto/vmx/Kconfig)
+> * change commit subject to be compatible
+> 
+>  drivers/crypto/Kconfig | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-chcia=C5=82bym poinformowa=C4=87 Pa=C5=84stwa o mo=C5=BCliwo=C5=9Bci pozy=
-skania nowych zlece=C5=84 ze strony www.
+Please respin this patch to add the selects to the existing tristate.
 
-Widzimy zainteresowanie potencjalnych Klient=C3=B3w Pa=C5=84stwa firm=C4=85=
-, dlatego ch=C4=99tnie pomo=C5=BCemy Pa=C5=84stwu dotrze=C4=87 z ofert=C4=
-=85 do wi=C4=99kszego grona odbiorc=C3=B3w poprzez efektywne metody pozyc=
-jonowania strony w Google.
-
-Czy m=C3=B3g=C5=82bym liczy=C4=87 na kontakt zwrotny?
-
-
-Pozdrawiam
-Miko=C5=82aj Rudzik
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
