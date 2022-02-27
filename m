@@ -2,250 +2,197 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D27C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 27 Feb 2022 09:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11816C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun, 27 Feb 2022 18:45:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbiB0JLq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 27 Feb 2022 04:11:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33024 "EHLO
+        id S230194AbiB0SqA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 27 Feb 2022 13:46:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiB0JLp (ORCPT
+        with ESMTP id S229635AbiB0SqA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 27 Feb 2022 04:11:45 -0500
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B48D6D4EF;
-        Sun, 27 Feb 2022 01:11:08 -0800 (PST)
-Received: from grover.. (133-32-176-37.west.xps.vectant.ne.jp [133.32.176.37]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 21R9AVvT024355;
-        Sun, 27 Feb 2022 18:10:32 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 21R9AVvT024355
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1645953032;
-        bh=mOcLKSAIGUfePOBI6By4Xw9RDNdqliYg+gQKo6ayREY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=u+OvsUi5UrQcZL572ybd+7hoT1bMDmH6vZCZMl7d/dSHUCB8gnkUT5iXVqWOsQCmv
-         kXFe2PPQoGZCTklE8bLQQC5X2TgRWZscIdXVkDrETRYUrS44wNSAhJgdK/ILeOixzZ
-         cqsKhVo+1Qra14yEgasbuYbFBbxSAmpvHL29pgBZRb5rlgGi3IylwEbcs2dXaz0mMv
-         de7jmBlljwOlnmMd9L0qNAZrqcP+ExeqNsSvZzMDl1EBfBFBHvW7rSJ7D98Uawdd51
-         z1jlewjTPSYY1rF4vaNJqVH+DBexY/1KaMHupMUavXnlKjwl68mMR+ymG1xxRE3Vn5
-         0aJ5XjGeyOx6Q==
-X-Nifty-SrcIP: [133.32.176.37]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH] arch: syscalls: simplify uapi/kapi directory creation
-Date:   Sun, 27 Feb 2022 18:10:24 +0900
-Message-Id: <20220227091024.207786-1-masahiroy@kernel.org>
+        Sun, 27 Feb 2022 13:46:00 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7193E28E1E
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Feb 2022 10:45:22 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id iq13-20020a17090afb4d00b001bc4437df2cso9441780pjb.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Feb 2022 10:45:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=rtQJ6+HWuDHNtXviDEv3CrUYrjsryDE8pWmriGiESg0=;
+        b=m2E7Mkc5+O/hSN+7zDdRObC+NbGDn8KfETTWlSmuj/vdJqDtWt/86czuCbSuNxGYsA
+         1Y8x9mmgL+ELb5DPf58L2FnoGs1NDCSPpYG1XAYvTOFZMvu4Tjtd1dL3M+2Uzub2AVmJ
+         mxFjyzhIpbnoLtl+uqKjMt1eDPuGbpgQO/92Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=rtQJ6+HWuDHNtXviDEv3CrUYrjsryDE8pWmriGiESg0=;
+        b=EDPdX1cciNKa1bOq5FfGR4rrR6zhU4KCN+2X4jaYX0XAoNECk+045BeY4PtkpEflXo
+         aDTRj3gjhu3O1PilOxwqjw9RP5yAjWDD1g1kzwXey/6an11nWupQqYPlcASl9Jq7fH4N
+         fcbvJ+qLbw1yme/RthG8nGt73zkskOcSHlzv1LPysWAicviHXkruRTM7EtNHCO0ZsoKK
+         dhgScF3KY4dmbp/JzDLT3RLzKifoIdOdc87EPVkPU8/UM55q+T/bCTqgx44/8COVvX1R
+         Ml/fFXygh2ss1Vz3EOZfhK3hz0DPoiNVSoohNl/vDpprmLbD28MNdpegNDlNbRFzWfJs
+         yoIw==
+X-Gm-Message-State: AOAM532QYeZ76V9CXaa1I2GkaXUWQ0MngKTkoQ3IIVU5qrYLkYElUQw+
+        p4fZuNz3238EL7+akeSTna/RMQ==
+X-Google-Smtp-Source: ABdhPJzVRRQGxF6e1NTngPEsB3I/EvTNRmSUfuQ6v7xj8PQt1X32lE1LoqLXaWLdGVbZluSQR3Vj5w==
+X-Received: by 2002:a17:90b:250f:b0:1bc:e520:91e6 with SMTP id ns15-20020a17090b250f00b001bce52091e6mr13355572pjb.43.1645987521825;
+        Sun, 27 Feb 2022 10:45:21 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id q10-20020a056a00084a00b004f26d3f5d8fsm10450378pfk.25.2022.02.27.10.45.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Feb 2022 10:45:21 -0800 (PST)
+From:   Kees Cook <keescook@chromium.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Vitor Massaru Iha <vitor@massaru.org>,
+        Daniel Latypov <dlatypov@google.com>,
+        David Gow <davidgow@google.com>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-kbuild@vger.kernel.org,
+        kunit-dev@googlegroups.com, llvm@lists.linux.dev, x86@kernel.org,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH v3 1/7] overflow: Provide constant expression struct_size
+Date:   Sun, 27 Feb 2022 10:45:11 -0800
+Message-Id: <20220227184517.504931-2-keescook@chromium.org>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220227184517.504931-1-keescook@chromium.org>
+References: <20220227184517.504931-1-keescook@chromium.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5098; h=from:subject; bh=2kZK8Pa8mdtDR/Nqo/3Vk6gXcxnyZeRVGJOFKK5/Dm4=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBiG8a7FSbvVC74wmbAmC12ksTVuBzN9xRSIPC+WKU3 EO0+lGSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYhvGuwAKCRCJcvTf3G3AJksnD/ 9jFKmi/Ux9BHhxzZ2RpxelaewUNUU1aSHv57YDOG4L43fmRoLxzBROLz9OcWcP5/ejuFFtwfP5323z DZFpA+Ts0sy9zDjBAcP06aCVrZ0D5y/C1HsAUvPpk+yS2jUe50vXwu7X4wwMS//COr8VCW+aGk4dvG B9loTCNsEklQK46RkPdt0d/WAGj0xMnzHWyztM050GcaJUl4TSBtIeN+5BKRWOt045Npdnf3eCWXq5 24GX5UE5ts6sZKHIk4ywytyDoK+uftNnd8Ufbn8iG34ZO8/fbkf7WAilUNTQH/y1cfyx8qYSIDJ7eL ZqDZejMvx4eMGypzGXA4J2L+Isq+cRIXrbnFLxtUgJt9YvTRrfQdunOtMOTC2WmHAnEKzOs9jlymHB T+Vc4UxaWsdNIBMnhRu+nSHuG/JJK2iYBNxjlNh3xcFWcODPFhCJG4S93ANnr+fKRDE8kq9rAkOYna KxjcdpjVWN/jDTmLHOI3cXBRLG3AxPuwSNAvFKvnck0F8hRGoQDfqTXM10M3TLrNXL9tKJrEJ/eIuQ TT36kiajoi0oH2nbWk9ne714xn1lJ4NoqeFFDO05bz78F70Sb5SOe7nU5RN75Gdbpw18YhvTG6ojX6 cuKk1/+pWSBz29y7CCOHSd+MakbP+FqPYa4n7OorO435P4PZiQdZPAhov3Xw==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-$(shell ...) expands to empty. There is no need to assign it to _dummy.
+There have been cases where struct_size() (or flex_array_size()) needs
+to be calculated for an initializer, which requires it be a constant
+expression. This is possible when the "count" argument is a constant
+expression, so provide this ability for the helpers.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Tested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Link: https://lore.kernel.org/lkml/20220210010407.GA701603@embeddedor
 ---
+v1: https://lore.kernel.org/linux-hardening/20220210004326.776574-1-keescook@chromium.org
+v2:
+ - fix broken self-test due to CE optimization
+---
+ include/linux/overflow.h | 10 +++++++---
+ lib/test_overflow.c      | 26 +++++++++++++++++---------
+ 2 files changed, 24 insertions(+), 12 deletions(-)
 
- arch/alpha/kernel/syscalls/Makefile      | 3 +--
- arch/arm/tools/Makefile                  | 3 +--
- arch/ia64/kernel/syscalls/Makefile       | 3 +--
- arch/m68k/kernel/syscalls/Makefile       | 3 +--
- arch/microblaze/kernel/syscalls/Makefile | 3 +--
- arch/mips/kernel/syscalls/Makefile       | 3 +--
- arch/parisc/kernel/syscalls/Makefile     | 3 +--
- arch/powerpc/kernel/syscalls/Makefile    | 3 +--
- arch/s390/kernel/syscalls/Makefile       | 3 +--
- arch/sh/kernel/syscalls/Makefile         | 3 +--
- arch/sparc/kernel/syscalls/Makefile      | 3 +--
- arch/x86/entry/syscalls/Makefile         | 3 +--
- arch/xtensa/kernel/syscalls/Makefile     | 3 +--
- 13 files changed, 13 insertions(+), 26 deletions(-)
-
-diff --git a/arch/alpha/kernel/syscalls/Makefile b/arch/alpha/kernel/syscalls/Makefile
-index 6713c65a25e1..b265e4bc16c2 100644
---- a/arch/alpha/kernel/syscalls/Makefile
-+++ b/arch/alpha/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
+diff --git a/include/linux/overflow.h b/include/linux/overflow.h
+index 59d7228104d0..f1221d11f8e5 100644
+--- a/include/linux/overflow.h
++++ b/include/linux/overflow.h
+@@ -4,6 +4,7 @@
  
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
+ #include <linux/compiler.h>
+ #include <linux/limits.h>
++#include <linux/const.h>
  
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/arm/tools/Makefile b/arch/arm/tools/Makefile
-index 4a5c50f67ced..81f13bdf32f2 100644
---- a/arch/arm/tools/Makefile
-+++ b/arch/arm/tools/Makefile
-@@ -29,8 +29,7 @@ kapi:	$(kapi-hdrs-y) $(gen-y)
- uapi:	$(uapi-hdrs-y)
+ /*
+  * We need to compute the minimum and maximum values representable in a given
+@@ -221,8 +222,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+  * Return: number of bytes needed or SIZE_MAX on overflow.
+  */
+ #define flex_array_size(p, member, count)				\
+-	size_mul(count,							\
+-		 sizeof(*(p)->member) + __must_be_array((p)->member))
++	__builtin_choose_expr(__is_constexpr(count),			\
++		(count) * sizeof(*(p)->member) + __must_be_array((p)->member),	\
++		size_mul(count, sizeof(*(p)->member) + __must_be_array((p)->member)))
  
- # Create output directory if not already present
--_dummy := $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)') \
--          $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')
-+$(shell mkdir -p $(kapi) $(uapi))
+ /**
+  * struct_size() - Calculate size of structure with trailing flexible array.
+@@ -237,6 +239,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+  * Return: number of bytes needed or SIZE_MAX on overflow.
+  */
+ #define struct_size(p, member, count)					\
+-	size_add(sizeof(*(p)), flex_array_size(p, member, count))
++	__builtin_choose_expr(__is_constexpr(count),			\
++		sizeof(*(p)) + flex_array_size(p, member, count),	\
++		size_add(sizeof(*(p)), flex_array_size(p, member, count)))
  
- quiet_cmd_gen_mach = GEN     $@
-       cmd_gen_mach = $(AWK) -f $(real-prereqs) > $@
-diff --git a/arch/ia64/kernel/syscalls/Makefile b/arch/ia64/kernel/syscalls/Makefile
-index 14f40ecf8b65..d009f927a048 100644
---- a/arch/ia64/kernel/syscalls/Makefile
-+++ b/arch/ia64/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
+ #endif /* __LINUX_OVERFLOW_H */
+diff --git a/lib/test_overflow.c b/lib/test_overflow.c
+index 712fb2351c27..f6530fce799d 100644
+--- a/lib/test_overflow.c
++++ b/lib/test_overflow.c
+@@ -602,10 +602,18 @@ struct __test_flex_array {
  
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
+ static int __init test_overflow_size_helpers(void)
+ {
++	/* Make sure struct_size() can be used in a constant expression. */
++	u8 ce_array[struct_size((struct __test_flex_array *)0, data, 55)];
+ 	struct __test_flex_array *obj;
+ 	int count = 0;
+ 	int err = 0;
+ 	int var;
++	volatile int unconst = 0;
++
++	/* Verify constant expression against runtime version. */
++	var = 55;
++	OPTIMIZER_HIDE_VAR(var);
++	err |= sizeof(ce_array) != struct_size(obj, data, var);
  
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/m68k/kernel/syscalls/Makefile b/arch/m68k/kernel/syscalls/Makefile
-index 6713c65a25e1..b265e4bc16c2 100644
---- a/arch/m68k/kernel/syscalls/Makefile
-+++ b/arch/m68k/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
+ #define check_one_size_helper(expected, func, args...)	({	\
+ 	bool __failure = false;					\
+@@ -663,28 +671,28 @@ static int __init test_overflow_size_helpers(void)
+ 				     flex_array_size, obj, data, var++);
+ 	err |= check_one_size_helper(5 * sizeof(*obj->data),
+ 				     flex_array_size, obj, data, var++);
+-	err |= check_one_size_helper(0, flex_array_size, obj, data, 0);
++	err |= check_one_size_helper(0, flex_array_size, obj, data, 0 + unconst);
+ 	err |= check_one_size_helper(sizeof(*obj->data),
+-				     flex_array_size, obj, data, 1);
++				     flex_array_size, obj, data, 1 + unconst);
+ 	err |= check_one_size_helper(7 * sizeof(*obj->data),
+-				     flex_array_size, obj, data, 7);
++				     flex_array_size, obj, data, 7 + unconst);
+ 	err |= check_one_size_helper(SIZE_MAX,
+-				     flex_array_size, obj, data, -1);
++				     flex_array_size, obj, data, -1 + unconst);
+ 	err |= check_one_size_helper(SIZE_MAX,
+-				     flex_array_size, obj, data, SIZE_MAX - 4);
++				     flex_array_size, obj, data, SIZE_MAX - 4 + unconst);
  
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
+ 	var = 4;
+ 	err |= check_one_size_helper(sizeof(*obj) + (4 * sizeof(*obj->data)),
+ 				     struct_size, obj, data, var++);
+ 	err |= check_one_size_helper(sizeof(*obj) + (5 * sizeof(*obj->data)),
+ 				     struct_size, obj, data, var++);
+-	err |= check_one_size_helper(sizeof(*obj), struct_size, obj, data, 0);
++	err |= check_one_size_helper(sizeof(*obj), struct_size, obj, data, 0 + unconst);
+ 	err |= check_one_size_helper(sizeof(*obj) + sizeof(*obj->data),
+-				     struct_size, obj, data, 1);
++				     struct_size, obj, data, 1 + unconst);
+ 	err |= check_one_size_helper(SIZE_MAX,
+-				     struct_size, obj, data, -3);
++				     struct_size, obj, data, -3 + unconst);
+ 	err |= check_one_size_helper(SIZE_MAX,
+-				     struct_size, obj, data, SIZE_MAX - 3);
++				     struct_size, obj, data, SIZE_MAX - 3 + unconst);
  
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/microblaze/kernel/syscalls/Makefile b/arch/microblaze/kernel/syscalls/Makefile
-index 6713c65a25e1..b265e4bc16c2 100644
---- a/arch/microblaze/kernel/syscalls/Makefile
-+++ b/arch/microblaze/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
+ 	pr_info("%d overflow size helper tests finished\n", count);
  
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/mips/kernel/syscalls/Makefile b/arch/mips/kernel/syscalls/Makefile
-index 10bf90dc02c0..e6b21de65cca 100644
---- a/arch/mips/kernel/syscalls/Makefile
-+++ b/arch/mips/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syshdr := $(srctree)/scripts/syscallhdr.sh
- sysnr := $(srctree)/$(src)/syscallnr.sh
-diff --git a/arch/parisc/kernel/syscalls/Makefile b/arch/parisc/kernel/syscalls/Makefile
-index d63f18dd058d..8440c16dfb22 100644
---- a/arch/parisc/kernel/syscalls/Makefile
-+++ b/arch/parisc/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/powerpc/kernel/syscalls/Makefile b/arch/powerpc/kernel/syscalls/Makefile
-index 5476f62eb80f..9d7bd81510b8 100644
---- a/arch/powerpc/kernel/syscalls/Makefile
-+++ b/arch/powerpc/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/s390/kernel/syscalls/Makefile b/arch/s390/kernel/syscalls/Makefile
-index b98f25029b8e..fb85e797946d 100644
---- a/arch/s390/kernel/syscalls/Makefile
-+++ b/arch/s390/kernel/syscalls/Makefile
-@@ -21,8 +21,7 @@ uapi:	$(uapi-hdrs-y)
- 
- 
- # Create output directory if not already present
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)') \
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- filechk_syshdr = $(CONFIG_SHELL) '$(systbl)' -H -a $(syshdr_abi_$(basetarget)) -f "$2" < $<
- 
-diff --git a/arch/sh/kernel/syscalls/Makefile b/arch/sh/kernel/syscalls/Makefile
-index 6713c65a25e1..b265e4bc16c2 100644
---- a/arch/sh/kernel/syscalls/Makefile
-+++ b/arch/sh/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/sparc/kernel/syscalls/Makefile b/arch/sparc/kernel/syscalls/Makefile
-index d63f18dd058d..8440c16dfb22 100644
---- a/arch/sparc/kernel/syscalls/Makefile
-+++ b/arch/sparc/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
-diff --git a/arch/x86/entry/syscalls/Makefile b/arch/x86/entry/syscalls/Makefile
-index 5b3efed0e4e8..9104039cd8f2 100644
---- a/arch/x86/entry/syscalls/Makefile
-+++ b/arch/x86/entry/syscalls/Makefile
-@@ -3,8 +3,7 @@ out := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
- # Create output directory if not already present
--_dummy := $(shell [ -d '$(out)' ] || mkdir -p '$(out)') \
--	  $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')
-+$(shell mkdir -p $(out) $(uapi))
- 
- syscall32 := $(src)/syscall_32.tbl
- syscall64 := $(src)/syscall_64.tbl
-diff --git a/arch/xtensa/kernel/syscalls/Makefile b/arch/xtensa/kernel/syscalls/Makefile
-index 6713c65a25e1..b265e4bc16c2 100644
---- a/arch/xtensa/kernel/syscalls/Makefile
-+++ b/arch/xtensa/kernel/syscalls/Makefile
-@@ -2,8 +2,7 @@
- kapi := arch/$(SRCARCH)/include/generated/asm
- uapi := arch/$(SRCARCH)/include/generated/uapi/asm
- 
--_dummy := $(shell [ -d '$(uapi)' ] || mkdir -p '$(uapi)')	\
--	  $(shell [ -d '$(kapi)' ] || mkdir -p '$(kapi)')
-+$(shell mkdir -p $(uapi) $(kapi))
- 
- syscall := $(src)/syscall.tbl
- syshdr := $(srctree)/scripts/syscallhdr.sh
 -- 
 2.32.0
 
