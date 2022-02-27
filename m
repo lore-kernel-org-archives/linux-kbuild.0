@@ -2,581 +2,277 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38ACBC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 27 Feb 2022 18:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 359D2C433F5
+	for <linux-kbuild@archiver.kernel.org>; Sun, 27 Feb 2022 21:54:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231255AbiB0SqM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 27 Feb 2022 13:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
+        id S231959AbiB0VzI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 27 Feb 2022 16:55:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbiB0SqJ (ORCPT
+        with ESMTP id S230511AbiB0VzH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 27 Feb 2022 13:46:09 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5325B53732
-        for <linux-kbuild@vger.kernel.org>; Sun, 27 Feb 2022 10:45:24 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id cp23-20020a17090afb9700b001bbfe0fbe94so9403082pjb.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 27 Feb 2022 10:45:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=q6m+DhiSNpp0WEg7Y2GFtce2qoilswFv9XNCymBz300=;
-        b=adurY7lnz6k4Lj7dGkSWg3wTjUo42w1bdJZXLgnRdjA8hkoEPM7J4cvLrp/CrDlLZl
-         Kp5lTQEv4oXe/qyvj2H1tsFXgV69fEpPRjxajXYVyMOv4OHWkZ3G6MpUWIT0wSgreplv
-         PXCW9ylgqLq1EAmFd14NpGlzCdpa8Ed3aenmM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=q6m+DhiSNpp0WEg7Y2GFtce2qoilswFv9XNCymBz300=;
-        b=uWW/dia/Sqk0t36w2Sd2i21qOZaE5hDcA0sHrE4wMKoElIaHOKPCdgbXVrVX6QNjrP
-         aPFrgASVJkag1V9ZMlX/VUxmLF/mYt66KK9U97AotUcOGc62fKKXcYbh/9xQCxSCQMeW
-         g9L/T6MscGbXen/Ua16pZ+XX0szbhwr1/Iic1FD3X0EZU+X/ajNcSwurmLRgoBYVDRzy
-         f1YPpnZmBVYcSqPS2intzYHsfc/MzAdA2BAxpTD0GP/0MwvY92iPj25iqeKzIZpugLBh
-         lQrw7lQDW/eXXPDjz7QCM+PNHw/bvSf4z8N4S/i+aoYZRU326meqLbAKSckQVrWmQUw+
-         uMSQ==
-X-Gm-Message-State: AOAM532gHmmMyDJ2SFNORvwjMQ7pbDAAaEphTCLf5yoOpc2qsM89Iwfz
-        NeL+UX0qDsW9eflCIyKi0mqA3g==
-X-Google-Smtp-Source: ABdhPJwSlhs6c8I9Lo6GGuabSIXJWoTu3k7tDJKSwX1nd4WRcf7i7kGNzdvNDJBsvRw8NeGFJP+y+Q==
-X-Received: by 2002:a17:902:d4d1:b0:150:1d1c:30bd with SMTP id o17-20020a170902d4d100b001501d1c30bdmr15303539plg.1.1645987523611;
-        Sun, 27 Feb 2022 10:45:23 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id o10-20020a056a0015ca00b004e0ff94313esm11270971pfu.91.2022.02.27.10.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Feb 2022 10:45:23 -0800 (PST)
-From:   Kees Cook <keescook@chromium.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     David Gow <davidgow@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
+        Sun, 27 Feb 2022 16:55:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0083F3ED3B;
+        Sun, 27 Feb 2022 13:54:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 813AF61182;
+        Sun, 27 Feb 2022 21:54:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 668FDC340E9;
+        Sun, 27 Feb 2022 21:54:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645998868;
+        bh=3t/p0jjcIOQ9cnqtHEjQ0OotL7Yc14GpfGoJxO8STBo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fEN1qIU97LxKCmuCdc9bVegKovR9x6UfjibzNHVn1irr0D+YEfGHf0yjjfo7iHueV
+         4QgkmaAV4DSyjmNuWtZeHjsRM2jMUq0GjuVX47A2MeqPhpCY1+8G+anF3UaRWe7WqW
+         ZgtocMGvAP2SC692l+obVuP6XHhAGoE8FGhgR3ofJZXpmYJlkxhPaWHdsxHto9/N8X
+         bNwXhbBWv6P4LAa2hH6Escq0WtJV/NIhBCMO84e2RkGvxu7TmlN3zkB6yMNAwUfCtx
+         FzOUXESTY0K3zlmNMpF+/voHgGnrAVayMih5W6jj+FQE4pUuWy4UZPFPZrhf4CuvdQ
+         KEQHjoNZIeq4g==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>, llvm@lists.linux.dev,
+        Jonathan Corbet <corbet@lwn.net>,
+        Federico Vaga <federico.vaga@vaga.pv.it>,
+        Alex Shi <alexs@kernel.org>, Hu Haowen <src.res@email.cn>,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Vitor Massaru Iha <vitor@massaru.org>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-kbuild@vger.kernel.org, kunit-dev@googlegroups.com,
-        llvm@lists.linux.dev, x86@kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH v3 6/7] lib: stackinit: Convert to KUnit
-Date:   Sun, 27 Feb 2022 10:45:16 -0800
-Message-Id: <20220227184517.504931-7-keescook@chromium.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220227184517.504931-1-keescook@chromium.org>
-References: <20220227184517.504931-1-keescook@chromium.org>
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc-tw-discuss@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        greybus-dev@lists.linaro.org, linux-staging@lists.linux.dev,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH] Kbuild: remove -std=gnu89 from compiler arguments
+Date:   Sun, 27 Feb 2022 22:52:43 +0100
+Message-Id: <20220227215408.3180023-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=18150; h=from:subject; bh=UP9YVxfMlY8O0+NQMLGofpK4VLIvcpYgNEp/ewL3Cy0=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBiG8a8zSAsXG7oEnfr4TxZoZxcd4Pag+vI1Jn94X84 /Vw1XsGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYhvGvAAKCRCJcvTf3G3AJjCiD/ 0aDe79UaDsyIhrBubBQeRFGV5QTV312hqgfejYoVW3REqLHpl78/fSarG3KikpGeFhv1YY0RcRM+LB cK57iEymCQLba9GlFso5OpTJToY/PjfR7MdxaKgNDVPwQi2NMFIA7gyqoiKZsOBXxJ5x4jYCH1Eiim /B2r2PzGMQC1gXPAlZUi9SrWk7VG9xVFtI2d35Ki7YXslzg7B5/2lwufNFNBaLpoAszcwuKKGZ0xbE njN41caNWtAz1mNT6PlY2vpI/yLkQU38Zq4CdOmmTl8FVL1N+/fpBsc9dnhQcgbuxf2Tr+56NriT1/ y39P7GrZ/F6upX1PxoAMj2Q1FMFERWjLra2zRy8a9m8cxyGcrrkDP3CuqeyusBU0pfLYyQstsNFzhr D+NTQrT2sA8Owp5qm5oHhVqLK5ffOr8T23fQlfdaXqOlzQ0OLngadBP8F1MoMsIvaOM5M1c0W30RYl AK6fvvMbQVMzXs1KYhWTIYIy7saF7GE5bkGm8ILXL/bl9DSo1qKyCk1RakqLj+Uae9gEKF2R1DWBmZ u3kSM4yxBfl3kbobot0gBrqat9yf9vdWWka4EsDWulrAykZB5rGiUXgx4Cf2S62VwtKeVy9hj++1Rp zYZWWyU1BqVm+FQrm3AitOiotMe+NuQz/twVybOPywFHWrllAtWKN6S5obvQ==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Convert stackinit unit tests to KUnit, for better integration
-into the kernel self test framework. Includes a rename of
-test_stackinit.c to stackinit_kunit.c, and CONFIG_TEST_STACKINIT to
-CONFIG_STACKINIT_KUNIT_TEST.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Adjust expected test results based on which stack initialization method
-was chosen:
+During a patch discussion, Linus brought up the option of changing
+the C standard version from gnu89 to gnu99, which allows using variable
+declaration inside of a for() loop. While the C99, C11 and later standards
+introduce many other features, most of these are already available in
+gnu89 as GNU extensions as well.
 
- $ CMD="./tools/testing/kunit/kunit.py run stackinit --raw_output \
-        --arch=x86_64 --kconfig_add"
+An earlier attempt to do this when gcc-5 started defaulting to
+-std=gnu11 failed because at the time that caused warnings about
+designated initializers with older compilers. Now that gcc-5.1 is the
+minimum compiler version used for building kernels, that is no longer a
+concern. Similarly, the behavior of 'inline' functions changes between
+gnu89 and gnu89, but this was taken care of by defining 'inline' to
+include __attribute__((gnu_inline)) in order to allow building with
+clang a while ago.
 
- $ $CMD | grep stackinit:
- # stackinit: pass:36 fail:0 skip:29 total:65
+One minor issue that remains is an added gcc warning for shifts of
+negative integers when building with -Werror, which happens with the
+'make W=1' option, as well as for three drivers in the kernel that always
+enable -Werror, but it was only observed with the i915 driver so far.
 
- $ $CMD CONFIG_GCC_PLUGIN_STRUCTLEAK_USER=y | grep stackinit:
- # stackinit: pass:37 fail:0 skip:28 total:65
+Nathan Chancellor reported an additional -Wdeclaration-after-statement
+warning that appears in a system header on arm, this still needs a
+workaround.
 
- $ $CMD CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF=y | grep stackinit:
- # stackinit: pass:55 fail:0 skip:10 total:65
+Since the differences between gnu99, gnu11 and gnu17 are fairly minimal
+and mainly impact warnings at the -Wpedantic level that the kernel
+never enables, the easiest way is to just leave out the -std=gnu89
+argument entirely, and rely on the compiler default language setting,
+which is gnu11 for gcc-5, and gnu1x/gnu17 for all other supported
+versions of gcc or clang.
 
- $ $CMD CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL=y | grep stackinit:
- # stackinit: pass:62 fail:0 skip:3 total:65
-
- $ $CMD CONFIG_INIT_STACK_ALL_PATTERN=y --make_option LLVM=1 | grep stackinit:
- # stackinit: pass:60 fail:0 skip:5 total:65
-
- $ $CMD CONFIG_INIT_STACK_ALL_ZERO=y --make_option LLVM=1 | grep stackinit:
- # stackinit: pass:60 fail:0 skip:5 total:65
-
-Temporarily remove the userspace-build mode, which will be restored in a
-later patch.
-
-Expand the size of the pre-case switch variable so it doesn't get
-accidentally cleared.
-
-Cc: David Gow <davidgow@google.com>
-Cc: Daniel Latypov <dlatypov@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Link: https://lore.kernel.org/lkml/CAHk-=wiyCH7xeHcmiFJ-YgXUy2Jaj7pnkdKpcovt8fYbVFW3TA@mail.gmail.com/
+Link: https://github.com/ClangBuiltLinux/linux/issues/1603
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: llvm@lists.linux.dev
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-v1: https://lore.kernel.org/lkml/20220224055145.1853657-1-keescook@chromium.org
-v2:
- - split "userspace KUnit stub" into separate header and patch (Daniel)
- - Improve commit log and comments (David)
- - Provide mapping of expected XFAIL tests to CONFIGs (David)
+I put the suggestion into patch form, based on what we discussed
+in the thread.  I only gave it minimal testing, but it would
+be good to have it in linux-next if we want to do this in the
+merge window.
 ---
- lib/Kconfig.debug                           |  22 +-
- lib/Makefile                                |   4 +-
- lib/{test_stackinit.c => stackinit_kunit.c} | 269 ++++++++------------
- 3 files changed, 121 insertions(+), 174 deletions(-)
- rename lib/{test_stackinit.c => stackinit_kunit.c} (66%)
+ Documentation/process/programming-language.rst             | 4 ++--
+ .../translations/it_IT/process/programming-language.rst    | 4 ++--
+ .../translations/zh_CN/process/programming-language.rst    | 4 ++--
+ .../translations/zh_TW/process/programming-language.rst    | 4 ++--
+ Makefile                                                   | 7 +++----
+ arch/arm64/kernel/vdso32/Makefile                          | 3 +--
+ drivers/gpu/drm/i915/Makefile                              | 1 +
+ drivers/staging/greybus/tools/Makefile                     | 3 ++-
+ fs/btrfs/Makefile                                          | 1 +
+ scripts/Makefile.extrawarn                                 | 1 +
+ 10 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 14d90d03bc8d..a5556ab05240 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2511,6 +2511,17 @@ config OVERFLOW_KUNIT_TEST
+diff --git a/Documentation/process/programming-language.rst b/Documentation/process/programming-language.rst
+index ec474a70a02f..894f2a6eb9db 100644
+--- a/Documentation/process/programming-language.rst
++++ b/Documentation/process/programming-language.rst
+@@ -5,8 +5,8 @@ Programming Language
  
- 	  If unsure, say N.
+ The kernel is written in the C programming language [c-language]_.
+ More precisely, the kernel is typically compiled with ``gcc`` [gcc]_
+-under ``-std=gnu89`` [gcc-c-dialect-options]_: the GNU dialect of ISO C90
+-(including some C99 features). ``clang`` [clang]_ is also supported, see
++under ``-std=gnu11`` [gcc-c-dialect-options]_: the GNU dialect of ISO C11
++(including some C17 features). ``clang`` [clang]_ is also supported, see
+ docs on :ref:`Building Linux with Clang/LLVM <kbuild_llvm>`.
  
-+config STACKINIT_KUNIT_TEST
-+	tristate "Test level of stack variable initialization" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Test if the kernel is zero-initializing stack variables and
-+	  padding. Coverage is controlled by compiler flags,
-+	  CONFIG_INIT_STACK_ALL_PATTERN, CONFIG_INIT_STACK_ALL_ZERO,
-+	  CONFIG_GCC_PLUGIN_STRUCTLEAK, CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF,
-+	  or CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL.
-+
- config TEST_UDELAY
- 	tristate "udelay test driver"
- 	help
-@@ -2602,17 +2613,6 @@ config TEST_OBJAGG
- 	  Enable this option to test object aggregation manager on boot
- 	  (or module load).
+ This dialect contains many extensions to the language [gnu-extensions]_,
+diff --git a/Documentation/translations/it_IT/process/programming-language.rst b/Documentation/translations/it_IT/process/programming-language.rst
+index 41db2598ce11..aa21097737ae 100644
+--- a/Documentation/translations/it_IT/process/programming-language.rst
++++ b/Documentation/translations/it_IT/process/programming-language.rst
+@@ -10,8 +10,8 @@ Linguaggio di programmazione
  
--
--config TEST_STACKINIT
--	tristate "Test level of stack variable initialization"
--	help
--	  Test if the kernel is zero-initializing stack variables and
--	  padding. Coverage is controlled by compiler flags,
--	  CONFIG_GCC_PLUGIN_STRUCTLEAK, CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF,
--	  or CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL.
--
--	  If unsure, say N.
--
- config TEST_MEMINIT
- 	tristate "Test heap/page initialization"
- 	help
-diff --git a/lib/Makefile b/lib/Makefile
-index fdfcbfaff32f..353bc09ce38d 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -93,8 +93,6 @@ obj-$(CONFIG_TEST_KMOD) += test_kmod.o
- obj-$(CONFIG_TEST_DEBUG_VIRTUAL) += test_debug_virtual.o
- obj-$(CONFIG_TEST_MEMCAT_P) += test_memcat_p.o
- obj-$(CONFIG_TEST_OBJAGG) += test_objagg.o
--CFLAGS_test_stackinit.o += $(call cc-disable-warning, switch-unreachable)
--obj-$(CONFIG_TEST_STACKINIT) += test_stackinit.o
- obj-$(CONFIG_TEST_BLACKHOLE_DEV) += test_blackhole_dev.o
- obj-$(CONFIG_TEST_MEMINIT) += test_meminit.o
- obj-$(CONFIG_TEST_LOCKUP) += test_lockup.o
-@@ -363,6 +361,8 @@ obj-$(CONFIG_CMDLINE_KUNIT_TEST) += cmdline_kunit.o
- obj-$(CONFIG_SLUB_KUNIT_TEST) += slub_kunit.o
- obj-$(CONFIG_MEMCPY_KUNIT_TEST) += memcpy_kunit.o
- obj-$(CONFIG_OVERFLOW_KUNIT_TEST) += overflow_kunit.o
-+CFLAGS_stackinit_kunit.o += $(call cc-disable-warning, switch-unreachable)
-+obj-$(CONFIG_STACKINIT_KUNIT_TEST) += stackinit_kunit.o
+ Il kernel è scritto nel linguaggio di programmazione C [it-c-language]_.
+ Più precisamente, il kernel viene compilato con ``gcc`` [it-gcc]_ usando
+-l'opzione ``-std=gnu89`` [it-gcc-c-dialect-options]_: il dialetto GNU
+-dello standard ISO C90 (con l'aggiunta di alcune funzionalità da C99).
++l'opzione ``-std=gnu11`` [it-gcc-c-dialect-options]_: il dialetto GNU
++dello standard ISO C11 (con l'aggiunta di alcune funzionalità da C17).
+ Linux supporta anche ``clang`` [it-clang]_, leggete la documentazione
+ :ref:`Building Linux with Clang/LLVM <kbuild_llvm>`.
  
- obj-$(CONFIG_GENERIC_LIB_DEVMEM_IS_ALLOWED) += devmem_is_allowed.o
+diff --git a/Documentation/translations/zh_CN/process/programming-language.rst b/Documentation/translations/zh_CN/process/programming-language.rst
+index 2a47a1d2ec20..58d2b3bd2d85 100644
+--- a/Documentation/translations/zh_CN/process/programming-language.rst
++++ b/Documentation/translations/zh_CN/process/programming-language.rst
+@@ -9,8 +9,8 @@
+ ============
  
-diff --git a/lib/test_stackinit.c b/lib/stackinit_kunit.c
-similarity index 66%
-rename from lib/test_stackinit.c
-rename to lib/stackinit_kunit.c
-index a3c74e6a21ff..35c69aa425b2 100644
---- a/lib/test_stackinit.c
-+++ b/lib/stackinit_kunit.c
-@@ -2,76 +2,21 @@
- /*
-  * Test cases for compiler-based stack variable zeroing via
-  * -ftrivial-auto-var-init={zero,pattern} or CONFIG_GCC_PLUGIN_STRUCTLEAK*.
-+ * For example, see:
-+ * https://www.kernel.org/doc/html/latest/dev-tools/kunit/kunit-tool.html#configuring-building-and-running-tests
-+ *	./tools/testing/kunit/kunit.py run stackinit [--raw_output] \
-+ *		--make_option LLVM=1 \
-+ *		--kconfig_add CONFIG_INIT_STACK_ALL_ZERO=y
-  *
-- * External build example:
-- *	clang -O2 -Wall -ftrivial-auto-var-init=pattern \
-- *		-o test_stackinit test_stackinit.c
-  */
--#ifdef __KERNEL__
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 内核是用C语言 :ref:`c-language <cn_c-language>` 编写的。更准确地说，内核通常是用 :ref:`gcc <cn_gcc>`
+-在 ``-std=gnu89`` :ref:`gcc-c-dialect-options <cn_gcc-c-dialect-options>` 下编译的：ISO C90的 GNU 方言（
+-包括一些C99特性）
++在 ``-std=gnu11`` :ref:`gcc-c-dialect-options <cn_gcc-c-dialect-options>` 下编译的：ISO C11的 GNU 方言（
++包括一些C17特性）
  
-+#include <kunit/test.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/string.h>
+ 这种方言包含对语言 :ref:`gnu-extensions <cn_gnu-extensions>` 的许多扩展，当然，它们许多都在内核中使用。
  
--#else
--
--/* Userspace headers. */
--#include <stdio.h>
--#include <stdint.h>
--#include <string.h>
--#include <stdbool.h>
--#include <errno.h>
--#include <sys/types.h>
--
--/* Linux kernel-ism stubs for stand-alone userspace build. */
--#define KBUILD_MODNAME		"stackinit"
--#define pr_fmt(fmt)		KBUILD_MODNAME ": " fmt
--#define pr_err(fmt, ...)	fprintf(stderr, pr_fmt(fmt), ##__VA_ARGS__)
--#define pr_warn(fmt, ...)	fprintf(stderr, pr_fmt(fmt), ##__VA_ARGS__)
--#define pr_info(fmt, ...)	fprintf(stdout, pr_fmt(fmt), ##__VA_ARGS__)
--#define __init			/**/
--#define __exit			/**/
--#define __user			/**/
--#define noinline		__attribute__((__noinline__))
--#define __aligned(x)		__attribute__((__aligned__(x)))
--#ifdef __clang__
--# define __compiletime_error(message) /**/
--#else
--# define __compiletime_error(message) __attribute__((__error__(message)))
--#endif
--#define __compiletime_assert(condition, msg, prefix, suffix)		\
--	do {								\
--		extern void prefix ## suffix(void) __compiletime_error(msg); \
--		if (!(condition))					\
--			prefix ## suffix();				\
--	} while (0)
--#define _compiletime_assert(condition, msg, prefix, suffix) \
--	__compiletime_assert(condition, msg, prefix, suffix)
--#define compiletime_assert(condition, msg) \
--	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
--#define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
--#define BUILD_BUG_ON(condition) \
--	BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
--typedef uint8_t			u8;
--typedef uint16_t		u16;
--typedef uint32_t		u32;
--typedef uint64_t		u64;
--
--#define module_init(func)	static int (*do_init)(void) = func
--#define module_exit(func)	static void (*do_exit)(void) = func
--#define MODULE_LICENSE(str)	int main(void) {		\
--					int rc;			\
--					/* License: str */	\
--					rc = do_init();		\
--					if (rc == 0)		\
--						do_exit();	\
--					return rc;		\
--				}
--
--#endif /* __KERNEL__ */
--
- /* Exfiltration buffer. */
- #define MAX_VAR_SIZE	128
- static u8 check_buf[MAX_VAR_SIZE];
-@@ -201,7 +146,7 @@ static bool range_contains(char *haystack_start, size_t haystack_size,
-  */
- #define DEFINE_TEST_DRIVER(name, var_type, which, xfail)	\
- /* Returns 0 on success, 1 on failure. */			\
--static noinline __init int test_ ## name (void)			\
-+static noinline void test_ ## name (struct kunit *test)		\
- {								\
- 	var_type zero INIT_CLONE_ ## which;			\
- 	int ignored;						\
-@@ -220,10 +165,8 @@ static noinline __init int test_ ## name (void)			\
- 	/* Verify all bytes overwritten with 0xFF. */		\
- 	for (sum = 0, i = 0; i < target_size; i++)		\
- 		sum += (check_buf[i] != 0xFF);			\
--	if (sum) {						\
--		pr_err(#name ": leaf fill was not 0xFF!?\n");	\
--		return 1;					\
--	}							\
-+	KUNIT_ASSERT_EQ_MSG(test, sum, 0,			\
-+			    "leaf fill was not 0xFF!?\n");	\
- 	/* Clear entire check buffer for later bit tests. */	\
- 	memset(check_buf, 0x00, sizeof(check_buf));		\
- 	/* Extract stack-defined variable contents. */		\
-@@ -231,32 +174,29 @@ static noinline __init int test_ ## name (void)			\
- 				FETCH_ARG_ ## which(zero));	\
- 								\
- 	/* Validate that compiler lined up fill and target. */	\
--	if (!range_contains(fill_start, fill_size,		\
--			    target_start, target_size)) {	\
--		pr_err(#name ": stack fill missed target!?\n");	\
--		pr_err(#name ": fill %zu wide\n", fill_size);	\
--		pr_err(#name ": target offset by %d\n",	\
--			(int)((ssize_t)(uintptr_t)fill_start -	\
--			(ssize_t)(uintptr_t)target_start));	\
--		return 1;					\
--	}							\
-+	KUNIT_ASSERT_TRUE_MSG(test,				\
-+		range_contains(fill_start, fill_size,		\
-+			    target_start, target_size),		\
-+		"stack fill missed target!? "			\
-+		"(fill %zu wide, target offset by %d)\n",	\
-+		fill_size,					\
-+		(int)((ssize_t)(uintptr_t)fill_start -		\
-+		      (ssize_t)(uintptr_t)target_start));	\
- 								\
- 	/* Look for any bytes still 0xFF in check region. */	\
- 	for (sum = 0, i = 0; i < target_size; i++)		\
- 		sum += (check_buf[i] == 0xFF);			\
- 								\
--	if (sum == 0) {						\
--		pr_info(#name " ok\n");				\
--		return 0;					\
--	} else {						\
--		pr_warn(#name " %sFAIL (uninit bytes: %d)\n",	\
--			(xfail) ? "X" : "", sum);		\
--		return (xfail) ? 0 : 1;				\
--	}							\
-+	if (sum != 0 && xfail)					\
-+		kunit_skip(test,				\
-+			   "XFAIL uninit bytes: %d\n",		\
-+			   sum);				\
-+	KUNIT_ASSERT_EQ_MSG(test, sum, 0,			\
-+		"uninit bytes: %d\n", sum);			\
- }
- #define DEFINE_TEST(name, var_type, which, init_level, xfail)	\
- /* no-op to force compiler into ignoring "uninitialized" vars */\
--static noinline __init DO_NOTHING_TYPE_ ## which(var_type)	\
-+static noinline DO_NOTHING_TYPE_ ## which(var_type)		\
- do_nothing_ ## name(var_type *ptr)				\
- {								\
- 	/* Will always be true, but compiler doesn't know. */	\
-@@ -265,9 +205,8 @@ do_nothing_ ## name(var_type *ptr)				\
- 	else							\
- 		return DO_NOTHING_RETURN_ ## which(ptr + 1);	\
- }								\
--static noinline __init int leaf_ ## name(unsigned long sp,	\
--					 bool fill,		\
--					 var_type *arg)		\
-+static noinline int leaf_ ## name(unsigned long sp, bool fill,	\
-+				  var_type *arg)		\
- {								\
- 	char buf[VAR_BUFFER];					\
- 	var_type var						\
-@@ -341,6 +280,27 @@ struct test_user {
- 	unsigned long four;
- };
+diff --git a/Documentation/translations/zh_TW/process/programming-language.rst b/Documentation/translations/zh_TW/process/programming-language.rst
+index 54e3699eadf8..235de05f7e2c 100644
+--- a/Documentation/translations/zh_TW/process/programming-language.rst
++++ b/Documentation/translations/zh_TW/process/programming-language.rst
+@@ -12,8 +12,8 @@
+ ============
  
-+#define ALWAYS_PASS	WANT_SUCCESS
-+#define ALWAYS_FAIL	XFAIL
-+
-+#ifdef CONFIG_INIT_STACK_NONE
-+# define USER_PASS	XFAIL
-+# define BYREF_PASS	XFAIL
-+# define STRONG_PASS	XFAIL
-+#elif defined(CONFIG_GCC_PLUGIN_STRUCTLEAK_USER)
-+# define USER_PASS	WANT_SUCCESS
-+# define BYREF_PASS	XFAIL
-+# define STRONG_PASS	XFAIL
-+#elif defined(CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF)
-+# define USER_PASS	WANT_SUCCESS
-+# define BYREF_PASS	WANT_SUCCESS
-+# define STRONG_PASS	XFAIL
-+#else
-+# define USER_PASS	WANT_SUCCESS
-+# define BYREF_PASS	WANT_SUCCESS
-+# define STRONG_PASS	WANT_SUCCESS
-+#endif
-+
- #define DEFINE_SCALAR_TEST(name, init, xfail)			\
- 		DEFINE_TEST(name ## _ ## init, name, SCALAR,	\
- 			    init, xfail)
-@@ -364,27 +324,26 @@ struct test_user {
- 		DEFINE_STRUCT_TEST(trailing_hole, init, xfail);	\
- 		DEFINE_STRUCT_TEST(packed, init, xfail)
+ 內核是用C語言 :ref:`c-language <tw_c-language>` 編寫的。更準確地說，內核通常是用 :ref:`gcc <tw_gcc>`
+-在 ``-std=gnu89`` :ref:`gcc-c-dialect-options <tw_gcc-c-dialect-options>` 下編譯的：ISO C90的 GNU 方言（
+-包括一些C99特性）
++在 ``-std=gnu11`` :ref:`gcc-c-dialect-options <tw_gcc-c-dialect-options>` 下編譯的：ISO C11的 GNU 方言（
++包括一些C17特性）
  
--#define DEFINE_STRUCT_INITIALIZER_TESTS(base)			\
-+#define DEFINE_STRUCT_INITIALIZER_TESTS(base, xfail)		\
- 		DEFINE_STRUCT_TESTS(base ## _ ## partial,	\
--				    WANT_SUCCESS);		\
--		DEFINE_STRUCT_TESTS(base ## _ ## all,		\
--				    WANT_SUCCESS)
-+				    xfail);			\
-+		DEFINE_STRUCT_TESTS(base ## _ ## all, xfail)
+ 這種方言包含對語言 :ref:`gnu-extensions <tw_gnu-extensions>` 的許多擴展，當然，它們許多都在內核中使用。
  
- /* These should be fully initialized all the time! */
--DEFINE_SCALAR_TESTS(zero, WANT_SUCCESS);
--DEFINE_STRUCT_TESTS(zero, WANT_SUCCESS);
-+DEFINE_SCALAR_TESTS(zero, ALWAYS_PASS);
-+DEFINE_STRUCT_TESTS(zero, ALWAYS_PASS);
- /* Struct initializers: padding may be left uninitialized. */
--DEFINE_STRUCT_INITIALIZER_TESTS(static);
--DEFINE_STRUCT_INITIALIZER_TESTS(dynamic);
--DEFINE_STRUCT_INITIALIZER_TESTS(runtime);
--DEFINE_STRUCT_INITIALIZER_TESTS(assigned_static);
--DEFINE_STRUCT_INITIALIZER_TESTS(assigned_dynamic);
--DEFINE_STRUCT_TESTS(assigned_copy, XFAIL);
-+DEFINE_STRUCT_INITIALIZER_TESTS(static, STRONG_PASS);
-+DEFINE_STRUCT_INITIALIZER_TESTS(dynamic, STRONG_PASS);
-+DEFINE_STRUCT_INITIALIZER_TESTS(runtime, STRONG_PASS);
-+DEFINE_STRUCT_INITIALIZER_TESTS(assigned_static, STRONG_PASS);
-+DEFINE_STRUCT_INITIALIZER_TESTS(assigned_dynamic, STRONG_PASS);
-+DEFINE_STRUCT_TESTS(assigned_copy, ALWAYS_FAIL);
- /* No initialization without compiler instrumentation. */
--DEFINE_SCALAR_TESTS(none, WANT_SUCCESS);
--DEFINE_STRUCT_TESTS(none, WANT_SUCCESS);
-+DEFINE_SCALAR_TESTS(none, STRONG_PASS);
-+DEFINE_STRUCT_TESTS(none, BYREF_PASS);
- /* Initialization of members with __user attribute. */
--DEFINE_TEST(user, struct test_user, STRUCT, none, WANT_SUCCESS);
-+DEFINE_TEST(user, struct test_user, STRUCT, none, USER_PASS);
+diff --git a/Makefile b/Makefile
+index 289ce2be8032..3ff6ba766f02 100644
+--- a/Makefile
++++ b/Makefile
+@@ -432,7 +432,7 @@ HOSTCXX	= g++
+ endif
  
- /*
-  * Check two uses through a variable declaration outside either path,
-@@ -398,7 +357,7 @@ static int noinline __leaf_switch_none(int path, bool fill)
- 		 * This is intentionally unreachable. To silence the
- 		 * warning, build with -Wno-switch-unreachable
- 		 */
--		uint64_t var;
-+		uint64_t var[10];
+ export KBUILD_USERCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
+-			      -O2 -fomit-frame-pointer -std=gnu89
++			      -O2 -fomit-frame-pointer
+ export KBUILD_USERLDFLAGS :=
  
- 	case 1:
- 		target_start = &var;
-@@ -423,19 +382,19 @@ static int noinline __leaf_switch_none(int path, bool fill)
- 		memcpy(check_buf, target_start, target_size);
- 		break;
- 	default:
--		var = 5;
--		return var & forced_mask;
-+		var[1] = 5;
-+		return var[1] & forced_mask;
- 	}
- 	return 0;
- }
+ KBUILD_HOSTCFLAGS   := $(KBUILD_USERCFLAGS) $(HOST_LFS_CFLAGS) $(HOSTCFLAGS)
+@@ -514,8 +514,7 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
+ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+ 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
+ 		   -Werror=implicit-function-declaration -Werror=implicit-int \
+-		   -Werror=return-type -Wno-format-security \
+-		   -std=gnu89
++		   -Werror=return-type -Wno-format-security
+ KBUILD_CPPFLAGS := -D__KERNEL__
+ KBUILD_AFLAGS_KERNEL :=
+ KBUILD_CFLAGS_KERNEL :=
+@@ -782,7 +781,7 @@ KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
  
--static noinline __init int leaf_switch_1_none(unsigned long sp, bool fill,
-+static noinline int leaf_switch_1_none(unsigned long sp, bool fill,
- 					      uint64_t *arg)
- {
- 	return __leaf_switch_none(1, fill);
- }
+ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+-# The kernel builds with '-std=gnu89' so use of GNU extensions is acceptable.
++# The kernel builds with '-std=gnu11' so use of GNU extensions is acceptable.
+ KBUILD_CFLAGS += -Wno-gnu
+ # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32/Makefile
+index 6c01b63ff56d..3250d0e25782 100644
+--- a/arch/arm64/kernel/vdso32/Makefile
++++ b/arch/arm64/kernel/vdso32/Makefile
+@@ -67,8 +67,7 @@ VDSO_CFLAGS += -DENABLE_COMPAT_VDSO=1
+ VDSO_CFLAGS += -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+                -fno-strict-aliasing -fno-common \
+                -Werror-implicit-function-declaration \
+-               -Wno-format-security \
+-               -std=gnu89
++               -Wno-format-security
+ VDSO_CFLAGS  += -O2
+ # Some useful compiler-dependent flags from top-level Makefile
+ VDSO_CFLAGS += $(call cc32-option,-Wdeclaration-after-statement,)
+diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+index 1b62b9f65196..1618a6e0af4e 100644
+--- a/drivers/gpu/drm/i915/Makefile
++++ b/drivers/gpu/drm/i915/Makefile
+@@ -17,6 +17,7 @@ subdir-ccflags-y += -Wno-unused-parameter
+ subdir-ccflags-y += -Wno-type-limits
+ subdir-ccflags-y += -Wno-missing-field-initializers
+ subdir-ccflags-y += -Wno-sign-compare
++subdir-ccflags-y += -Wno-shift-negative-value
+ subdir-ccflags-y += $(call cc-disable-warning, unused-but-set-variable)
+ subdir-ccflags-y += $(call cc-disable-warning, frame-address)
+ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
+diff --git a/drivers/staging/greybus/tools/Makefile b/drivers/staging/greybus/tools/Makefile
+index ad0ae8053b79..a3bbd73171f2 100644
+--- a/drivers/staging/greybus/tools/Makefile
++++ b/drivers/staging/greybus/tools/Makefile
+@@ -12,7 +12,8 @@ CFLAGS	+= -std=gnu99 -Wall -Wextra -g \
+ 	    -Wredundant-decls \
+ 	    -Wcast-align \
+ 	    -Wsign-compare \
+-	    -Wno-missing-field-initializers
++	    -Wno-missing-field-initializers \
++	    -Wno-shift-negative-value
  
--static noinline __init int leaf_switch_2_none(unsigned long sp, bool fill,
-+static noinline int leaf_switch_2_none(unsigned long sp, bool fill,
- 					      uint64_t *arg)
- {
- 	return __leaf_switch_none(2, fill);
-@@ -447,68 +406,56 @@ static noinline __init int leaf_switch_2_none(unsigned long sp, bool fill,
-  * non-code areas (i.e. in a switch statement before the first "case").
-  * https://bugs.llvm.org/show_bug.cgi?id=44916
-  */
--DEFINE_TEST_DRIVER(switch_1_none, uint64_t, SCALAR, XFAIL);
--DEFINE_TEST_DRIVER(switch_2_none, uint64_t, SCALAR, XFAIL);
--
--static int __init test_stackinit_init(void)
--{
--	unsigned int failures = 0;
--
--#define test_scalars(init)	do {				\
--		failures += test_u8_ ## init ();		\
--		failures += test_u16_ ## init ();		\
--		failures += test_u32_ ## init ();		\
--		failures += test_u64_ ## init ();		\
--		failures += test_char_array_ ## init ();	\
--	} while (0)
--
--#define test_structs(init)	do {				\
--		failures += test_small_hole_ ## init ();	\
--		failures += test_big_hole_ ## init ();		\
--		failures += test_trailing_hole_ ## init ();	\
--		failures += test_packed_ ## init ();		\
--	} while (0)
--
-+DEFINE_TEST_DRIVER(switch_1_none, uint64_t, SCALAR, ALWAYS_FAIL);
-+DEFINE_TEST_DRIVER(switch_2_none, uint64_t, SCALAR, ALWAYS_FAIL);
-+
-+#define KUNIT_test_scalars(init)			\
-+		KUNIT_CASE(test_u8_ ## init),		\
-+		KUNIT_CASE(test_u16_ ## init),		\
-+		KUNIT_CASE(test_u32_ ## init),		\
-+		KUNIT_CASE(test_u64_ ## init),		\
-+		KUNIT_CASE(test_char_array_ ## init)
-+
-+#define KUNIT_test_structs(init)			\
-+		KUNIT_CASE(test_small_hole_ ## init),	\
-+		KUNIT_CASE(test_big_hole_ ## init),	\
-+		KUNIT_CASE(test_trailing_hole_ ## init),\
-+		KUNIT_CASE(test_packed_ ## init)	\
-+
-+static struct kunit_case stackinit_test_cases[] = {
- 	/* These are explicitly initialized and should always pass. */
--	test_scalars(zero);
--	test_structs(zero);
-+	KUNIT_test_scalars(zero),
-+	KUNIT_test_structs(zero),
- 	/* Padding here appears to be accidentally always initialized? */
--	test_structs(dynamic_partial);
--	test_structs(assigned_dynamic_partial);
-+	KUNIT_test_structs(dynamic_partial),
-+	KUNIT_test_structs(assigned_dynamic_partial),
- 	/* Padding initialization depends on compiler behaviors. */
--	test_structs(static_partial);
--	test_structs(static_all);
--	test_structs(dynamic_all);
--	test_structs(runtime_partial);
--	test_structs(runtime_all);
--	test_structs(assigned_static_partial);
--	test_structs(assigned_static_all);
--	test_structs(assigned_dynamic_all);
-+	KUNIT_test_structs(static_partial),
-+	KUNIT_test_structs(static_all),
-+	KUNIT_test_structs(dynamic_all),
-+	KUNIT_test_structs(runtime_partial),
-+	KUNIT_test_structs(runtime_all),
-+	KUNIT_test_structs(assigned_static_partial),
-+	KUNIT_test_structs(assigned_static_all),
-+	KUNIT_test_structs(assigned_dynamic_all),
- 	/* Everything fails this since it effectively performs a memcpy(). */
--	test_structs(assigned_copy);
--
-+	KUNIT_test_structs(assigned_copy),
- 	/* STRUCTLEAK_BYREF_ALL should cover everything from here down. */
--	test_scalars(none);
--	failures += test_switch_1_none();
--	failures += test_switch_2_none();
--
-+	KUNIT_test_scalars(none),
-+	KUNIT_CASE(test_switch_1_none),
-+	KUNIT_CASE(test_switch_2_none),
- 	/* STRUCTLEAK_BYREF should cover from here down. */
--	test_structs(none);
--
-+	KUNIT_test_structs(none),
- 	/* STRUCTLEAK will only cover this. */
--	failures += test_user();
--
--	if (failures == 0)
--		pr_info("all tests passed!\n");
--	else
--		pr_err("failures: %u\n", failures);
-+	KUNIT_CASE(test_user),
-+	{}
-+};
+ CC	:= $(CROSS_COMPILE)gcc
  
--	return failures ? -EINVAL : 0;
--}
--module_init(test_stackinit_init);
-+static struct kunit_suite stackinit_test_suite = {
-+	.name = "stackinit",
-+	.test_cases = stackinit_test_cases,
-+};
+diff --git a/fs/btrfs/Makefile b/fs/btrfs/Makefile
+index 4188ba3fd8c3..99f9995670ea 100644
+--- a/fs/btrfs/Makefile
++++ b/fs/btrfs/Makefile
+@@ -17,6 +17,7 @@ subdir-ccflags-y += $(condflags)
+ subdir-ccflags-y += -Wno-missing-field-initializers
+ subdir-ccflags-y += -Wno-sign-compare
+ subdir-ccflags-y += -Wno-type-limits
++subdir-ccflags-y += -Wno-shift-negative-value
  
--static void __exit test_stackinit_exit(void)
--{ }
--module_exit(test_stackinit_exit);
-+kunit_test_suites(&stackinit_test_suite);
+ obj-$(CONFIG_BTRFS_FS) := btrfs.o
  
- MODULE_LICENSE("GPL");
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 8be892887d71..650d0b8ceec3 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -36,6 +36,7 @@ KBUILD_CFLAGS += $(call cc-option, -Wstringop-truncation)
+ KBUILD_CFLAGS += -Wno-missing-field-initializers
+ KBUILD_CFLAGS += -Wno-sign-compare
+ KBUILD_CFLAGS += -Wno-type-limits
++KBUILD_CFLAGS += -Wno-shift-negative-value
+ 
+ KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN1
+ 
 -- 
-2.32.0
+2.29.2
 
