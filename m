@@ -2,131 +2,228 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D4C3C433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed,  2 Mar 2022 22:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E16DCC433FE
+	for <linux-kbuild@archiver.kernel.org>; Wed,  2 Mar 2022 23:47:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238340AbiCBWPb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 2 Mar 2022 17:15:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46874 "EHLO
+        id S229502AbiCBXsF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 2 Mar 2022 18:48:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230045AbiCBWPa (ORCPT
+        with ESMTP id S229599AbiCBXsD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Mar 2022 17:15:30 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E09C9BE1CD;
-        Wed,  2 Mar 2022 14:14:46 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id q4so2608098ilt.0;
-        Wed, 02 Mar 2022 14:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=9ub8TndGmTDnXv5II0vAs1rwRRkggXTkQUEfUiR0zUM=;
-        b=O+XP97fQEzccgNOmdZKRo9ExVQ6aP9qNniiLwYD8WAvJPbeMRPKx6qhcYfeOpm0jG7
-         2kfV6H5Avz5r9Z+Iou+NSRVgPwPyPX0cX1Yh74n49X9gYvVvK66tIN+4U3E4EnQJ7Ix5
-         jWPLTXBBZ1pMEyhmLG+OdDJy0s4gHZNgvKCPey2ibIH/50zY0fZTcgWDcXiT/E4pH84j
-         iknTD0iNaiGnirSwb0OoN8BZ8zcRCWoy9dxo2ZqVN6lTbZAPMXrIjBLpM0CvkhUeOKTI
-         eTrWkYr2nJjuReRc1dWQ2pdcjso9mx/Gr3a8IU2YoBpTYfhgTJJT9fYYzl2YzeKBpMzH
-         llaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=9ub8TndGmTDnXv5II0vAs1rwRRkggXTkQUEfUiR0zUM=;
-        b=E4bxqwnPhJQJJsOi5SViVkP/WHeWFGDbuXmu9IEJMt/xeqk4qcGY+aNxtS4m6g6t3H
-         CQ/POq2mLDYe4E9RUt/RrURPLAiuftnfpjPLZPfz1Re5x+Gqu+TOLYdUEyKe+KQdqu58
-         GItVc3Cfv+Inj2nWhwjQIQ+fnNLvRb8eMF1GD7uKjb4yfR6UcIZdZKS/pJm/wAopzGBq
-         PyZ4QYaCvSzVCEr5FGMurhdK2UJsLekE+8iDZ6dObWQPFugfbJfRAbcPe2ywEc9xBkLO
-         bRO9U6k1xoCTVOH3Sc/VB9p3AVCwb7cxtsYJ7gVy3AvANuiUzjHXi9kuxNFE4uRkIm3r
-         JPyg==
-X-Gm-Message-State: AOAM530Kum6m+mX5LlBrNIBOJOsQRHc62TRS3REK/vya95saNLhW3mhJ
-        suMToQVB2gebWSCUIym1pci1MNNs1eWsUtLqAMk=
-X-Google-Smtp-Source: ABdhPJzli2sDxakapKJWnAyE4Ias/tvbMiWhQHQ+dnKForLGnwLdQ++qGFoPyE7z1ZhQJ/yaEqdh8N2Jt0Lib+cjkjw=
-X-Received: by 2002:a05:6e02:1c04:b0:2be:4c61:20f4 with SMTP id
- l4-20020a056e021c0400b002be4c6120f4mr29224878ilh.245.1646259286229; Wed, 02
- Mar 2022 14:14:46 -0800 (PST)
+        Wed, 2 Mar 2022 18:48:03 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F1CF17185A;
+        Wed,  2 Mar 2022 15:47:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D3278B82259;
+        Wed,  2 Mar 2022 23:47:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA1D5C004E1;
+        Wed,  2 Mar 2022 23:47:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646264823;
+        bh=iNqELq+lX+h6oGIXCLQayAVdk7lzG1NGvnedGOzYkkM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=RTYDe4ktdxhZsPRhExKj5tzN1nAbRVZrUpiXPL2JtIpf2z/I5dM3rN/1hplrrHVs/
+         AUUE+VpS6cjgBRyL66ETXfgZwMZAYlZPgDbdWIDa65uq/AxQlf6oG9J9RWutENDa0o
+         JHHftuSm5ZOPYgoGkP591g+wjyXgKK4yZnaK9ZJHlbBAiVQE63iEGuokIK6nUFN1bo
+         RG3Yiz6cY6KfcrZwCa2dsWYIkiI1oEgeaUI1Fn4LFh3SGmg1IkY7WRVNAVZ/j7wXGM
+         Ri3ihv+umpKM4bgUArI+aDAWp5qB1oWbM1js+cB/KBgtkh2ZZh7Q4NtKvdNxLpbAff
+         socg10N3TsW5Q==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Shuah Khan <shuah@kernel.org>, llvm@lists.linux.dev,
+        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH] kbuild: Allow a suffix with $(LLVM)
+Date:   Wed,  2 Mar 2022 16:44:01 -0700
+Message-Id: <20220302234400.782002-1-nathan@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-References: <20220301145233.3689119-1-arnd@kernel.org> <20220301145233.3689119-3-arnd@kernel.org>
-In-Reply-To: <20220301145233.3689119-3-arnd@kernel.org>
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Wed, 2 Mar 2022 23:14:10 +0100
-Message-ID: <CA+icZUWCTuVeohWvePhxYY3WC9xAYSy9nP1xQQf=tFH_mWDCNQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Kbuild: use -std=gnu11 for KBUILD_USERCFLAGS
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Marco Elver <elver@google.com>,
-        Jani Nikula <jani.nikula@intel.com>,
-        David Sterba <dsterba@suse.com>, Alex Shi <alexs@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 10:47 AM Arnd Bergmann <arnd@kernel.org> wrote:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> As we change the C language standard for the kernel from gnu89 to
-> gnu11, it makes sense to also update the version for user space
-> compilation.
->
+The LLVM make variable allows a developer to quickly switch between the
+GNU and LLVM tools. However, it does not handle versioned binaries, such
+as the ones shipped by Debian, as LLVM=1 just defines the tool variables
+with the unversioned binaries.
 
-Overdue.
+There was some discussion during the review of the patch that introduces
+LLVM=1 around versioned binaries, ultimately coming to the conclusion
+that developers can just add the folder that contains the unversioned
+binaries to their PATH, as Debian's versioned suffixed binaries are
+really just symlinks to the unversioned binaries in /usr/lib/llvm-#/bin:
 
-Can you point me to a lore link where I can easily fetch the full 3/3
-v3 patchset?
+$ realpath /usr/bin/clang-14
+/usr/lib/llvm-14/bin/clang
 
-I would like to give this a try on x86-64 with my latest kernel-config
-(based on the latest kernel-config v5.17-rc5 from Debian/unstable).
+$ PATH=/usr/lib/llvm-14/bin:$PATH make ... LLVM=1
 
-What Linux source base do I need?
-Is Linux v5.17-rc6 good enough (patchset applicable) for testing?
+However, that can be cumbersome to developers who are constantly testing
+series with different toolchains and versions. It is simple enough to
+support these versioned binaries directly in the Kbuild system by
+allowing the developer to specify the version suffix with LLVM=, which
+is shorter than the above suggestion:
 
-Thanks, Arnd.
+$ make ... LLVM=-14
 
-Regards,
-- Sedat -
+It does not change the meaning of LLVM=1 (which will continue to use
+unversioned binaries) and it does not add too much additional complexity
+to the existing $(LLVM) code, while allowing developers to quickly test
+their series with different versions of the whole LLVM suite of tools.
 
-> Some users have older native compilers than what they use for
-> kernel builds, so I considered using gnu99 as the default version
-> for wider compatibility with gcc-4.6 and earlier.
->
-> However, testing with older compilers showed that we already require
-> HOSTCC version 5.1 as well because a lot of host tools include
-> linux/compiler.h that uses __has_attribute():
->
->   CC      tools/objtool/exec-cmd.o
-> In file included from tools/include/linux/compiler_types.h:36:0,
->                  from tools/include/linux/compiler.h:5,
->                  from exec-cmd.c:2:
-> tools/include/linux/compiler-gcc.h:19:5: error: "__has_attribute" is not defined [-Werror=undef]
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 37ef6a555dcd..7c9be7f1ccd4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -432,7 +432,7 @@ HOSTCXX     = g++
->  endif
->
->  export KBUILD_USERCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
-> -                           -O2 -fomit-frame-pointer -std=gnu89 \
-> +                           -O2 -fomit-frame-pointer -std=gnu11 \
->                             -Wdeclaration-after-statement
->  export KBUILD_USERLDFLAGS :=
->
-> --
-> 2.29.2
->
+Link: https://lore.kernel.org/r/20200317215515.226917-1-ndesaulniers@google.com/
+Link: https://lore.kernel.org/r/20220224151322.072632223@infradead.org/
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+
+RFC -> v1: https://lore.kernel.org/r/Yh%2FegU1LZudfrgVy@dev-arch.thelio-3990X/
+
+* Tidy up commit message slightly.
+
+* Add tags.
+
+* Add links to prior discussions for context.
+
+* Add change to tools/testing/selftests/lib.mk.
+
+I would like for this to go through the Kbuild tree, please ack as
+necessary.
+
+ Documentation/kbuild/llvm.rst  |  7 +++++++
+ Makefile                       | 24 ++++++++++++++----------
+ tools/scripts/Makefile.include | 20 ++++++++++++--------
+ tools/testing/selftests/lib.mk |  6 +++++-
+ 4 files changed, 38 insertions(+), 19 deletions(-)
+
+diff --git a/Documentation/kbuild/llvm.rst b/Documentation/kbuild/llvm.rst
+index d32616891dcf..5805a8473a36 100644
+--- a/Documentation/kbuild/llvm.rst
++++ b/Documentation/kbuild/llvm.rst
+@@ -60,6 +60,13 @@ They can be enabled individually. The full list of the parameters: ::
+ 	  OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf \
+ 	  HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTLD=ld.lld
+ 
++If your LLVM tools have a suffix and you prefer to test an explicit version rather
++than the unsuffixed executables, use ``LLVM=<suffix>``. For example: ::
++
++	make LLVM=-14
++
++will use ``clang-14``, ``ld.lld-14``, etc.
++
+ The integrated assembler is enabled by default. You can pass ``LLVM_IAS=0`` to
+ disable it.
+ 
+diff --git a/Makefile b/Makefile
+index a82095c69fdd..963840c00eae 100644
+--- a/Makefile
++++ b/Makefile
+@@ -424,8 +424,12 @@ HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
+ HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
+ 
+ ifneq ($(LLVM),)
+-HOSTCC	= clang
+-HOSTCXX	= clang++
++ifneq ($(LLVM),1)
++LLVM_SFX := $(LLVM)
++endif
++
++HOSTCC	= clang$(LLVM_SFX)
++HOSTCXX	= clang++$(LLVM_SFX)
+ else
+ HOSTCC	= gcc
+ HOSTCXX	= g++
+@@ -444,14 +448,14 @@ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
+ # Make variables (CC, etc...)
+ CPP		= $(CC) -E
+ ifneq ($(LLVM),)
+-CC		= clang
+-LD		= ld.lld
+-AR		= llvm-ar
+-NM		= llvm-nm
+-OBJCOPY		= llvm-objcopy
+-OBJDUMP		= llvm-objdump
+-READELF		= llvm-readelf
+-STRIP		= llvm-strip
++CC		= clang$(LLVM_SFX)
++LD		= ld.lld$(LLVM_SFX)
++AR		= llvm-ar$(LLVM_SFX)
++NM		= llvm-nm$(LLVM_SFX)
++OBJCOPY		= llvm-objcopy$(LLVM_SFX)
++OBJDUMP		= llvm-objdump$(LLVM_SFX)
++READELF		= llvm-readelf$(LLVM_SFX)
++STRIP		= llvm-strip$(LLVM_SFX)
+ else
+ CC		= $(CROSS_COMPILE)gcc
+ LD		= $(CROSS_COMPILE)ld
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index 79d102304470..ab3b2a7dcc94 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -52,11 +52,15 @@ define allow-override
+ endef
+ 
+ ifneq ($(LLVM),)
+-$(call allow-override,CC,clang)
+-$(call allow-override,AR,llvm-ar)
+-$(call allow-override,LD,ld.lld)
+-$(call allow-override,CXX,clang++)
+-$(call allow-override,STRIP,llvm-strip)
++ifneq ($(LLVM),1)
++LLVM_SFX := $(LLVM)
++endif
++
++$(call allow-override,CC,clang$(LLVM_SFX))
++$(call allow-override,AR,llvm-ar$(LLVM_SFX))
++$(call allow-override,LD,ld.lld$(LLVM_SFX))
++$(call allow-override,CXX,clang++$(LLVM_SFX))
++$(call allow-override,STRIP,llvm-strip$(LLVM_SFX))
+ else
+ # Allow setting various cross-compile vars or setting CROSS_COMPILE as a prefix.
+ $(call allow-override,CC,$(CROSS_COMPILE)gcc)
+@@ -69,9 +73,9 @@ endif
+ CC_NO_CLANG := $(shell $(CC) -dM -E -x c /dev/null | grep -Fq "__clang__"; echo $$?)
+ 
+ ifneq ($(LLVM),)
+-HOSTAR  ?= llvm-ar
+-HOSTCC  ?= clang
+-HOSTLD  ?= ld.lld
++HOSTAR  ?= llvm-ar$(LLVM_SFX)
++HOSTCC  ?= clang$(LLVM_SFX)
++HOSTLD  ?= ld.lld$(LLVM_SFX)
+ else
+ HOSTAR  ?= ar
+ HOSTCC  ?= gcc
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index a40add31a2e3..b3ab713537c6 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -1,7 +1,11 @@
+ # This mimics the top-level Makefile. We do it explicitly here so that this
+ # Makefile can operate with or without the kbuild infrastructure.
+ ifneq ($(LLVM),)
+-CC := clang
++ifneq ($(LLVM),1)
++LLVM_SFX := $(LLVM)
++endif
++
++CC := clang$(LLVM_SFX)
+ else
+ CC := $(CROSS_COMPILE)gcc
+ endif
+
+base-commit: 55de8686df7ed2b5237867b130e30c728bbd9db4
+-- 
+2.35.1
+
