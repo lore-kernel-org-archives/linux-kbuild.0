@@ -2,89 +2,105 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EC1C433FE
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Mar 2022 00:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 084A8C433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Mar 2022 00:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbiCCADZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:03:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59444 "EHLO
+        id S229989AbiCCAFV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:05:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiCCADX (ORCPT
+        with ESMTP id S229986AbiCCAFR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:03:23 -0500
-Received: from conssluserg-04.nifty.com (conssluserg-04.nifty.com [210.131.2.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CDB205E0;
-        Wed,  2 Mar 2022 16:02:38 -0800 (PST)
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 2230255c029376;
-        Thu, 3 Mar 2022 09:02:06 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 2230255c029376
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1646265726;
-        bh=1GjC9yWawG+f9/7QP15mK3z9L/3WiA7vCZuCL3HZ/ck=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=NKGLhqH/8mKIE4g16dYZk/L6M7ik/8e6QSzSPnBskQWr+t4IVxZpgOewQNsjXIUQs
-         3k9zOisBbUOsWN5JeeFBvPJnxny+kgqGydth9aNTxDjutVWV1phP/poVez4DzDV+YQ
-         Olxupv1WEVnbZsxLxcCtrvOF9gJwlNtdxtjhLzjGfdg+xD34W67yirbOBVwUWQJxT5
-         APM+OwypDnmPKXewHxcmM0z/EJoYUYxnqx7ZoaUketWqPeIiEIeOUNiVdrC1IgxyKp
-         PcXOqG80ErZdSkqNiX4fN9auVaMTnuPcFvB7Xiz+CwXlcWxggzMmmqjC3TlroHFDI/
-         7OxcpgDqUO1+w==
-X-Nifty-SrcIP: [209.85.215.176]
-Received: by mail-pg1-f176.google.com with SMTP id o8so3010598pgf.9;
-        Wed, 02 Mar 2022 16:02:05 -0800 (PST)
-X-Gm-Message-State: AOAM532nSsXtVlxZAVTgh4TdqF2PrwQthnfaGuwkvijrJq7Tk/QyDhZr
-        bOFMmQJRwFrAEUa6nEVAK/z1FYJoCfgDNKiyKac=
-X-Google-Smtp-Source: ABdhPJzczkt6XTF1gd+/tMp7E2XEb5DrYtXsH1n4BNIFbWW6DCaFDFVyXHX09r9xlLxr6aZAyW4lJSxqyBndLDNhDtw=
-X-Received: by 2002:a63:e758:0:b0:378:8511:cfe7 with SMTP id
- j24-20020a63e758000000b003788511cfe7mr17071801pgk.126.1646265725034; Wed, 02
- Mar 2022 16:02:05 -0800 (PST)
+        Wed, 2 Mar 2022 19:05:17 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02714992D
+        for <linux-kbuild@vger.kernel.org>; Wed,  2 Mar 2022 16:04:28 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id n14so5235091wrq.7
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Mar 2022 16:04:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=npju3rHc3mRSfcSts2+QJjEKDIhH7Izt6iSeFW3/QF8=;
+        b=EGUemDJqLPj5B1hkkSx83siUMy1VVgYpLmLW+ISOhNuoXtHKsSw2hUGh04Nr1SSJBa
+         r1zlSLuTwOVX4majvP3P2eRAehp5T6N3EhkQMRRzPZTVKm7dG9AMpyQkHmmlptVAkH1M
+         9qJqcvZhIGwX2krc9gtYqqgwwQlmQpMuIj2tBVKllvQa6ewTZR3bIzSlOMcvz81A9HgK
+         U6a1Rlq0X8a/j+BcebndmqCX94BKI7/Pk6tA767h9fKeB1KajrFXzeZtGEtmtGtKzQ82
+         MRbBDpAmm2KjoZQU/U/PLkzR0auLS/dAQCdKPVFuvLwFIJNhxluwc4Nr3f7cAO8VDXZ4
+         jz0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=npju3rHc3mRSfcSts2+QJjEKDIhH7Izt6iSeFW3/QF8=;
+        b=zNZcf0dWfbcwsjaarYHNpLSdHV0UwYoReMGhw22m7Uk2qSeHntzWn0qf8weuD86mRN
+         O6P26w23zx5dzBd2DF8Qcd2+QY6RfW/oRrUkUi5RUWXFGgPwfZN3pzmJMsjtGyAUtFAt
+         Yi95aDjx7Ov4vxfFxOtZpeJPN4U+Hn6vcva9FiRy5Ds//y7Td6mmFy6D2K55dhEm6mrn
+         tRtwteQhhWYdVtG8+xencYsjehE7fM92EnhkWbJjdyAiiOA7mkVU/B5Oj5cZrMEAWEhZ
+         SZF8K5NPdIE9wyo0audrYGVWVTPXZ1Z7Oknuhc6qA2ai8uPIEyYQe3bRwtgwwbZlPJPP
+         3Rpw==
+X-Gm-Message-State: AOAM5307w8tvIEPeDgu1DVPVJVrglxROT9JVY0AyZNtozNBmEzclErkU
+        4KbuZ2DDbMx1IYg4p2zEsviPIXpdJq28G+69e1NwVnJeI2kUIA==
+X-Google-Smtp-Source: ABdhPJwNGg4cChj44h6sHunDdkaG9C78703PQ9UZNkp6xZHGYO9BRG6dBg6H3kef6ltm6p6P5d5rhHI0dHWUyV3MtyU=
+X-Received: by 2002:ac2:46ef:0:b0:443:3c30:a372 with SMTP id
+ q15-20020ac246ef000000b004433c30a372mr19890713lfo.626.1646261686698; Wed, 02
+ Mar 2022 14:54:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20220226123755.85213-1-masahiroy@kernel.org> <boris.20220302145825@codesynthesis.com>
-In-Reply-To: <boris.20220302145825@codesynthesis.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 3 Mar 2022 09:01:22 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAS8GO=XzzaVze8y7142Os6J_htBNVV+6kwiXjSxWfnPDw@mail.gmail.com>
-Message-ID: <CAK7LNAS8GO=XzzaVze8y7142Os6J_htBNVV+6kwiXjSxWfnPDw@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: change .config format to use =n instead of "is
- not set"
-To:     Boris Kolpackov <boris@codesynthesis.com>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20220301145233.3689119-1-arnd@kernel.org> <20220301145233.3689119-3-arnd@kernel.org>
+ <CA+icZUWCTuVeohWvePhxYY3WC9xAYSy9nP1xQQf=tFH_mWDCNQ@mail.gmail.com>
+In-Reply-To: <CA+icZUWCTuVeohWvePhxYY3WC9xAYSy9nP1xQQf=tFH_mWDCNQ@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 2 Mar 2022 14:54:35 -0800
+Message-ID: <CAKwvOdn04aoWO_384k5HQodwA1-DCFwU50iRXQXh_BQk5pyz7w@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Kbuild: use -std=gnu11 for KBUILD_USERCFLAGS
+To:     sedat.dilek@gmail.com
+Cc:     Arnd Bergmann <arnd@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Marco Elver <elver@google.com>,
+        Jani Nikula <jani.nikula@intel.com>,
+        David Sterba <dsterba@suse.com>, Alex Shi <alexs@kernel.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 10:17 PM Boris Kolpackov <boris@codesynthesis.com> wrote:
+On Wed, Mar 2, 2022 at 2:14 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
 >
-> Masahiro Yamada <masahiroy@kernel.org> writes:
+> On Wed, Mar 2, 2022 at 10:47 AM Arnd Bergmann <arnd@kernel.org> wrote:
+> >
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >
+> > As we change the C language standard for the kernel from gnu89 to
+> > gnu11, it makes sense to also update the version for user space
+> > compilation.
+> >
 >
-> > With this commit, Kconfig will output disable options in a more natural
-> > form, "CONFIG_FOO=n".
+> Overdue.
 >
-> While I agree with the overall direction, I was wondering how this
-> relates to string and int/hex options. It appears that they either
-> have a value or are not written to the .config at all, for example,
-> if the option is disabled via the `depends on` attribute. At first
-> I thought this would be inconsistent (i.e., =n for bool and omitted
-> for string), but it appears a disabled bool option is also omitted.
-> Hopefully the fact that sometimes a false bool option is =n and
-> sometimes it's omitted won't surprise anyone.
+> Can you point me to a lore link where I can easily fetch the full 3/3
+> v3 patchset?
 
+Hey Sedat!
 
-Options with unmet 'depends on' are all omitted in the .config
-It is consistent for all types.
+$ b4 am https://lore.kernel.org/lkml/20220301145233.3689119-1-arnd@kernel.org/
+-o - | git am -3
 
-
-
-
+https://people.kernel.org/monsieuricon/introducing-b4-and-patch-attestation
 
 >
-> Reviewed-by: Boris Kolpackov <boris@codesynthesis.com>
+> I would like to give this a try on x86-64 with my latest kernel-config
+> (based on the latest kernel-config v5.17-rc5 from Debian/unstable).
+>
+> What Linux source base do I need?
+> Is Linux v5.17-rc6 good enough (patchset applicable) for testing?
 
-
-
-
---
-Best Regards
-Masahiro Yamada
+I suspect so.
+-- 
+Thanks,
+~Nick Desaulniers
