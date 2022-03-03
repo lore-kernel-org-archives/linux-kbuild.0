@@ -2,71 +2,184 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 115D1C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Mar 2022 00:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CB0C433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu,  3 Mar 2022 00:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbiCCAKs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:10:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
+        id S230476AbiCCApz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:45:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230005AbiCCAKs (ORCPT
+        with ESMTP id S230466AbiCCApz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:10:48 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77ED6106CB5;
-        Wed,  2 Mar 2022 16:10:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=QvHwqcPwkZTykh909qxW7OL2Ilw0hy11RsbkbuYKuhE=; b=UsztW02yyvR/LKp62WuXbHExEs
-        x2G0bWabx6fVVB9yk0dBZqtz0pShoV4e0vvUMjBCeXGPq+a8MvZVPHKOWHqLa9nqjFJqLZF5se9s1
-        tMa7EUGNluTpW7bUJ4Ug2LpKo4ZYPIjOIvo3dTdyr1NXCIXOc+9tIrYsXGCrJzcl7ftPNFRMRFOET
-        opdApGAfIxPJW+1uXE5uZdmYwGKLcjk3xQGxIPF4odZ0kLJUkYIvxhHcwbo50LHkNKKe3OGrkPHgs
-        mG6L8TCUltyQ7muTFsya017FVx89uWzFPdh0MedCpFgpc9Ty7TJCjVXl33Z8A2JkpqrZ4mdgPLFGt
-        dl3wTvrA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nPY6s-00EjSF-7X; Wed, 02 Mar 2022 23:10:24 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1E6A7300230;
-        Thu,  3 Mar 2022 00:10:15 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CA92B20610E5A; Thu,  3 Mar 2022 00:10:15 +0100 (CET)
-Date:   Thu, 3 Mar 2022 00:10:15 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>, keescook@chromium.org,
-        x86@kernel.org, joao@overdrivepizza.com, hjl.tools@gmail.com,
-        jpoimboe@redhat.com, andrew.cooper3@citrix.com,
-        linux-kernel@vger.kernel.org, samitolvanen@google.com,
-        mark.rutland@arm.com, alyssa.milburn@intel.com, mbenes@suse.cz,
-        rostedt@goodmis.org, mhiramat@kernel.org,
-        alexei.starovoitov@gmail.com,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH v2 01/39] kbuild: Fix clang build
-Message-ID: <Yh/5V47eetq0aoPe@hirez.programming.kicks-ass.net>
-References: <20220224145138.952963315@infradead.org>
- <20220224151322.072632223@infradead.org>
- <CAKwvOdkD2WY=hEHy8_0zs70AGx6LRQwxL5mEZyB30uqpruYJyA@mail.gmail.com>
- <Yh+dMJsH+ZMPfqwD@thelio-3990X>
- <CAKwvOdmouBTe5pH3JoP6EEfwNT5=6WvX3oCEZRxO0Dkf38S14w@mail.gmail.com>
- <Yh/egU1LZudfrgVy@dev-arch.thelio-3990X>
+        Wed, 2 Mar 2022 19:45:55 -0500
+Received: from conssluserg-06.nifty.com (conssluserg-06.nifty.com [210.131.2.91])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC75B11AA3F;
+        Wed,  2 Mar 2022 16:45:10 -0800 (PST)
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id 2230ipOW000573;
+        Thu, 3 Mar 2022 09:44:51 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 2230ipOW000573
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1646268291;
+        bh=qFJlBbOGHIjmGqrsHLgsSVnCFKYD56zFTMBoZ4bzgoI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=d+QqzInMPNKAtFKqHwSKLeqtPTZMXtp4QljZokz0tRh+GlX8mJPKdroYJxp+/+qXQ
+         Iaqv/Yu6Tg6A0Dkt2XTm7Bh0H9n92eKjSuW7Qx6lhHkxguuCqBRBW7APC2GxA4BSyZ
+         ZENOD4LuUhXWd+jLgGDEY/StHwUeGdJAvx4dgTV5JynbQ5fx14N9o9zJCEtpjrLTKo
+         KF2Ul3a6+iisSvW9VA/umjTlM9b9jmZbDrI9DEiqNKRi7Hfhrj67HKJz1MXrGvabP6
+         LIS7HU6TQC0/5uiwPf+m4vm8iGHn0GDaCC9KAv5ja41rneuHjcfpreWnfrJl+vKccs
+         /l7vqgtT9K2nQ==
+X-Nifty-SrcIP: [209.85.210.171]
+Received: by mail-pf1-f171.google.com with SMTP id u16so3373750pfg.12;
+        Wed, 02 Mar 2022 16:44:51 -0800 (PST)
+X-Gm-Message-State: AOAM532lTzm+eNbFdsKlOuuJQALlY7pjhXZEwy5b6iRs5hhqD6VM6Swe
+        1bGxqxr5F2QrOn6m+sJzzy1wpkc7kfvalbalN9w=
+X-Google-Smtp-Source: ABdhPJxJmpCr7cqZbg0899QCITX2rIIHdJURDFdP7XyJOclpsettcbZAqBuZIHSTaJ8scctyB/vsOG2d8BxfkFG7zqE=
+X-Received: by 2002:a05:6a00:24c7:b0:4e1:cb76:32d1 with SMTP id
+ d7-20020a056a0024c700b004e1cb7632d1mr35565422pfv.36.1646268290741; Wed, 02
+ Mar 2022 16:44:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yh/egU1LZudfrgVy@dev-arch.thelio-3990X>
+References: <20220301145233.3689119-1-arnd@kernel.org> <20220301145233.3689119-2-arnd@kernel.org>
+In-Reply-To: <20220301145233.3689119-2-arnd@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 3 Mar 2022 09:44:08 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQpmqncnnaO+NKEuDajx4G0=7eQ1s5e+o+fPyuxrkwncg@mail.gmail.com>
+Message-ID: <CAK7LNAQpmqncnnaO+NKEuDajx4G0=7eQ1s5e+o+fPyuxrkwncg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] treewide: use -Wdeclaration-after-statement
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Marco Elver <elver@google.com>,
+        Jani Nikula <jani.nikula@intel.com>,
+        David Sterba <dsterba@suse.com>, Alex Shi <alexs@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        llvm@lists.linux.dev,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 02:15:45PM -0700, Nathan Chancellor wrote:
-> Peter, is this approach okay with you? If so, would you like to be
-> co-author or should I use a suggested-by tag?
+On Tue, Mar 1, 2022 at 11:52 PM Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> From: Mark Rutland <mark.rutland@arm.com>
+>
+> In a subsequent patch we'll move the kernel from using `-std=3Dgnu89` to
 
-Yeah, this helps lots. Suggested-by seems fine. Thanks!
+
+Precisely speaking,
+"In a subsequent patch we'll move the userspace tools ..."
+
+The kernel part was done by 1/3.
+
+
+
+> `-std=3Dgnu11`, permitting the use of additional C11 features such as
+> for-loop initial declarations.
+>
+> One contentious aspect of C99 is that it permits mixed declarations and
+> code, and for now at least, it seems preferable to enforce that
+> declarations must come first.
+>
+> These warnings were already disabled in the kernel itself, but not
+
+Is this the opposite?
+
+"These warnings were already _enabled_ in the kernel itself, ..."
+
+
+
+
+If you have a chance to resend this,
+can you please rebase on top of kbuild/for-next?
+
+This is not applicable due to the conflict with:
+https://patchwork.kernel.org/project/linux-kbuild/patch/20220201213542.2808=
+035-1-quic_eberman@quicinc.com/
+
+
+
+
+
+
+> for KBUILD_USERCFLAGS or the compat VDSO on arch/arm64, which uses
+> a separate set of CFLAGS.
+>
+> This patch fixes an existing violation in modpost.c, which is not
+> reported because of the missing flag in KBUILD_USERCFLAGS:
+>
+> | scripts/mod/modpost.c: In function =E2=80=98match=E2=80=99:
+> | scripts/mod/modpost.c:837:3: warning: ISO C90 forbids mixed declaration=
+s and code [-Wdeclaration-after-statement]
+> |   837 |   const char *endp =3D p + strlen(p) - 1;
+> |       |   ^~~~~
+>
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> [arnd: don't add a duplicate flag to the default set, update changelog]
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  Makefile                          | 3 ++-
+>  arch/arm64/kernel/vdso32/Makefile | 1 +
+>  scripts/mod/modpost.c             | 4 +++-
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 94fa9a849a7a..37ef6a555dcd 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -432,7 +432,8 @@ HOSTCXX     =3D g++
+>  endif
+>
+>  export KBUILD_USERCFLAGS :=3D -Wall -Wmissing-prototypes -Wstrict-protot=
+ypes \
+> -                             -O2 -fomit-frame-pointer -std=3Dgnu89
+> +                           -O2 -fomit-frame-pointer -std=3Dgnu89 \
+> +                           -Wdeclaration-after-statement
+>  export KBUILD_USERLDFLAGS :=3D
+>
+>  KBUILD_HOSTCFLAGS   :=3D $(KBUILD_USERCFLAGS) $(HOST_LFS_CFLAGS) $(HOSTC=
+FLAGS)
+> diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32=
+/Makefile
+> index 9378ea055bf2..ed181bedbffc 100644
+> --- a/arch/arm64/kernel/vdso32/Makefile
+> +++ b/arch/arm64/kernel/vdso32/Makefile
+> @@ -68,6 +68,7 @@ VDSO_CFLAGS +=3D -Wall -Wundef -Wstrict-prototypes -Wno=
+-trigraphs \
+>                 -fno-strict-aliasing -fno-common \
+>                 -Werror-implicit-function-declaration \
+>                 -Wno-format-security \
+> +               -Wdeclaration-after-statement \
+>                 -std=3Dgnu11
+>  VDSO_CFLAGS  +=3D -O2
+>  # Some useful compiler-dependent flags from top-level Makefile
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 6bfa33217914..fe693304b120 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -833,8 +833,10 @@ static int match(const char *sym, const char * const=
+ pat[])
+>  {
+>         const char *p;
+>         while (*pat) {
+> +               const char *endp;
+> +
+>                 p =3D *pat++;
+> -               const char *endp =3D p + strlen(p) - 1;
+> +               endp =3D p + strlen(p) - 1;
+>
+>                 /* "*foo*" */
+>                 if (*p =3D=3D '*' && *endp =3D=3D '*') {
+> --
+> 2.29.2
+>
+
+
+--=20
+Best Regards
+Masahiro Yamada
