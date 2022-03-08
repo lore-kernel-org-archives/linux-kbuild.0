@@ -2,102 +2,127 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE5DC433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Mar 2022 21:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502A9C433EF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  8 Mar 2022 21:57:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241296AbiCHVfM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 8 Mar 2022 16:35:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52844 "EHLO
+        id S1350576AbiCHV6A (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 8 Mar 2022 16:58:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239662AbiCHVfL (ORCPT
+        with ESMTP id S1350577AbiCHV55 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Mar 2022 16:35:11 -0500
+        Tue, 8 Mar 2022 16:57:57 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A1B54BF8;
-        Tue,  8 Mar 2022 13:34:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E78D50E07;
+        Tue,  8 Mar 2022 13:57:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C61C0B81DA3;
-        Tue,  8 Mar 2022 21:34:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D0DC340EB;
-        Tue,  8 Mar 2022 21:34:11 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E6039B81D86;
+        Tue,  8 Mar 2022 21:56:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC43C340F9;
+        Tue,  8 Mar 2022 21:56:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646775251;
-        bh=7IIRlF+xZDsI23R5QSlPyFV9mzJNQRtaRJDooE6ATGc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CSW01JIzSWeneovsZAbjUGWOojs65aRPa9K80da79jozE3LE+NdwRKGVkzrsM7FIQ
-         9Ur7mfuONJDFbBf9hMHEjtutYfCBBWxJwCuUmm25BTll7XitXVF9W/ysDezVHXt8RB
-         8g5bvPdT3LtrBtSn6XoUr1Bw9JZUdJWvF67eBazA6wMcvqyq2zb5cnw0F+PjR9J1H4
-         isjMZ6dfA6BHB9I83eX/6Ov3PVgLSdzVfuakCt7UYoT7ICJRiS2YvItMOA88F91gN7
-         Ntp7TfykOROEBPCUD8INtR2Vi8i84omMucaOaqOYxfeWCvg1XuO/lUH4KjUFyw2pR8
-         pikqIdlIMuKXw==
-Date:   Tue, 8 Mar 2022 14:34:04 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
+        s=k20201202; t=1646776617;
+        bh=MSDAfiFmxb619SbNV0Do6ViYQlOLDRcmxvg0q5mQXVg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MGcDWHDdpzSijirtmAR+bbuZP2FzIWh8GyKHYDevUEiMiwo5oAaKV8kVMjuWYTcZl
+         QeSIFMI4XCpErcpUaSG8ulhzpgVPJq1gCUwI2SftIEoafLPwXA74zMnYRIuI9kTY/X
+         KgnJDTclYL4o7ODLvWSOpj6I+iUf88LiLWNYyLbA7TH1AV8VLlm6n/u5EdB49MrJ/0
+         fZ6Baio/T7JaQ+1y35Ic458d1rPh0QxXs87jgA7/VFNJDxsC5tvBs5XaBZ8JRQFPRT
+         yr9CvKVbA37y+Jz7GPiMGTrG6R8VI5WacCYe6SzjSOqr6DEaT6eV/xkTes5b6yWItb
+         +wXyUC9EAOI6Q==
+From:   Arnd Bergmann <arnd@kernel.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        llvm@lists.linux.dev, Fangrui Song <maskray@google.com>,
-        "Dmitry V. Levin" <ldv@altlinux.org>,
-        Elliot Berman <quic_eberman@quicinc.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2] kbuild: add --target to correctly cross-compile UAPI
- headers with Clang
-Message-ID: <YifLzLl4IE/xFMdn@dev-arch.thelio-3990X>
-References: <20220305125605.149913-1-masahiroy@kernel.org>
+Cc:     alexs@kernel.org, arnd@arndb.de, arnd@kernel.org, dsterba@suse.com,
+        elver@google.com, jani.nikula@intel.com, linux-doc@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, mark.rutland@arm.com,
+        ndesaulniers@google.com, ojeda@kernel.org,
+        torvalds@linux-foundation.org
+Subject: [PATCH 1/4] [v4] Kbuild: add -Wno-shift-negative-value where -Wextra is used
+Date:   Tue,  8 Mar 2022 22:56:12 +0100
+Message-Id: <20220308215615.14183-2-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20220308215615.14183-1-arnd@kernel.org>
+References: <20220308215615.14183-1-arnd@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220305125605.149913-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Mar 05, 2022 at 09:56:05PM +0900, Masahiro Yamada wrote:
-> When you compile-test UAPI headers (CONFIG_UAPI_HEADER_TEST=y) with
-> Clang, they are currently compiled for the host target (likely x86_64)
-> regardless of the given ARCH=.
-> 
-> In fact, some exported headers include libc headers. For example,
-> include/uapi/linux/agpgart.h includes <stdlib.h> after being exported.
-> The header search paths should match to the target we are compiling
-> them for.
-> 
-> Pick up the --target triple from KBUILD_CFLAGS in the same ways as
-> commit 7f58b487e9ff ("kbuild: make Clang build userprogs for target
-> architecture").
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+From: Arnd Bergmann <arnd@arndb.de>
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+As a preparation for moving to -std=gnu11, turn off the
+-Wshift-negative-value option. This warning is enabled by gcc when
+building with -Wextra for c99 or higher, but not for c89. Since
+the kernel already relies on well-defined overflow behavior,
+the warning is not helpful and can simply be disabled in
+all locations that use -Wextra.
 
-I suspect that Android will still need to do something with USERCFLAGS
-in its build wrapper to pick up the correct libc (Bionic vs. glibc) but
-that is tangential to this patch, we should still do this change
-regardless.
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+[v4]
+  split into a separate patch
+---
+ drivers/gpu/drm/i915/Makefile          | 1 +
+ drivers/staging/greybus/tools/Makefile | 3 ++-
+ fs/btrfs/Makefile                      | 1 +
+ scripts/Makefile.extrawarn             | 1 +
+ 4 files changed, 5 insertions(+), 1 deletion(-)
 
-> ---
-> 
-> Changes in v2:
->   - Reword the commit description to mention agpgart.h instead of
->     asound.h because the latter is in the no-header-test list.
-> 
->  usr/include/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/usr/include/Makefile b/usr/include/Makefile
-> index ac206fb27c65..4215801e1110 100644
-> --- a/usr/include/Makefile
-> +++ b/usr/include/Makefile
-> @@ -10,7 +10,7 @@ UAPI_CFLAGS := -std=c90 -Wall -Werror=implicit-function-declaration
->  
->  # In theory, we do not care -m32 or -m64 for header compile tests.
->  # It is here just because CONFIG_CC_CAN_LINK is tested with -m32 or -m64.
-> -UAPI_CFLAGS += $(filter -m32 -m64, $(KBUILD_CFLAGS))
-> +UAPI_CFLAGS += $(filter -m32 -m64 --target=%, $(KBUILD_CFLAGS))
->  
->  # USERCFLAGS might contain sysroot location for CC.
->  UAPI_CFLAGS += $(USERCFLAGS)
-> -- 
-> 2.32.0
-> 
+diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+index 1b62b9f65196..1618a6e0af4e 100644
+--- a/drivers/gpu/drm/i915/Makefile
++++ b/drivers/gpu/drm/i915/Makefile
+@@ -17,6 +17,7 @@ subdir-ccflags-y += -Wno-unused-parameter
+ subdir-ccflags-y += -Wno-type-limits
+ subdir-ccflags-y += -Wno-missing-field-initializers
+ subdir-ccflags-y += -Wno-sign-compare
++subdir-ccflags-y += -Wno-shift-negative-value
+ subdir-ccflags-y += $(call cc-disable-warning, unused-but-set-variable)
+ subdir-ccflags-y += $(call cc-disable-warning, frame-address)
+ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
+diff --git a/drivers/staging/greybus/tools/Makefile b/drivers/staging/greybus/tools/Makefile
+index ad0ae8053b79..a3bbd73171f2 100644
+--- a/drivers/staging/greybus/tools/Makefile
++++ b/drivers/staging/greybus/tools/Makefile
+@@ -12,7 +12,8 @@ CFLAGS	+= -std=gnu99 -Wall -Wextra -g \
+ 	    -Wredundant-decls \
+ 	    -Wcast-align \
+ 	    -Wsign-compare \
+-	    -Wno-missing-field-initializers
++	    -Wno-missing-field-initializers \
++	    -Wno-shift-negative-value
+ 
+ CC	:= $(CROSS_COMPILE)gcc
+ 
+diff --git a/fs/btrfs/Makefile b/fs/btrfs/Makefile
+index 4188ba3fd8c3..99f9995670ea 100644
+--- a/fs/btrfs/Makefile
++++ b/fs/btrfs/Makefile
+@@ -17,6 +17,7 @@ subdir-ccflags-y += $(condflags)
+ subdir-ccflags-y += -Wno-missing-field-initializers
+ subdir-ccflags-y += -Wno-sign-compare
+ subdir-ccflags-y += -Wno-type-limits
++subdir-ccflags-y += -Wno-shift-negative-value
+ 
+ obj-$(CONFIG_BTRFS_FS) := btrfs.o
+ 
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 8be892887d71..650d0b8ceec3 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -36,6 +36,7 @@ KBUILD_CFLAGS += $(call cc-option, -Wstringop-truncation)
+ KBUILD_CFLAGS += -Wno-missing-field-initializers
+ KBUILD_CFLAGS += -Wno-sign-compare
+ KBUILD_CFLAGS += -Wno-type-limits
++KBUILD_CFLAGS += -Wno-shift-negative-value
+ 
+ KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN1
+ 
+-- 
+2.29.2
+
