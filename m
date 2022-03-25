@@ -2,95 +2,70 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2697C433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Mar 2022 17:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F7DC433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Mar 2022 19:31:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiCYRgt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 25 Mar 2022 13:36:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        id S230215AbiCYTcf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 25 Mar 2022 15:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbiCYRgr (ORCPT
+        with ESMTP id S230238AbiCYTcS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Mar 2022 13:36:47 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7CFD4452
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Mar 2022 10:35:04 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id z12so724729lfu.10
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Mar 2022 10:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yIMApoDu0cSTb9UHBH+0bGiaMNz8inAICwvHUwG31uM=;
-        b=fImwDEmarxWlMb6gMb1DB3uyeS0b4STGPcZKODQdrNUIGD5G9Kqoh0FWkcCAPqbziQ
-         HIDiJvpOAZ/Hvsyijyg/cAIgAtvr9nzllE3BZOBmRvLYdvbfnrL0+xcorU8NV97pFVmz
-         6HjdVE2BWnwep3mBHwh1GU9827E94rVX0KV9s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yIMApoDu0cSTb9UHBH+0bGiaMNz8inAICwvHUwG31uM=;
-        b=1LrF2Yqw8cQ7a1NQbuGJiraVACSLtbKPdbY+85m0iqnWrKm9SlOYW3J7dbpLfbjvoT
-         Uq70DW6jIySaetjVMpiVV9igo5FmbvC0DOSD82bjkWkDG7wH7EgCBZU8w4fdeeV7fsYg
-         ITbcJAXgdEQ6CaajVDmATQNUI+zPGywWDAClkHfMZzXQW4a0+uYQRC/s7cjQSWEkm7xN
-         9fCowEINM9kRSVBhYR+8YYyizTfONrt1mVByLp4QnH4TdzlOe+pT7UU3DhN0plcII77I
-         24p3rmaZeB++N5bQknal2IFJ6xOzYuoGD8SHeKoeJns/xBHb/Hs97oj6IAt4Oxd5D0Uk
-         AZLg==
-X-Gm-Message-State: AOAM533GLiAqR5JPf6ihWDunsnxKe7fikKj5VQTNdy6CNGMC+6SyAlVW
-        eQ6g5fm6ldnvtHZEa1l5Z6uxzJlV3GhhkI1bstw=
-X-Google-Smtp-Source: ABdhPJwxhhQK9UUuix+gyBxURZNKTp61IOhK0r5Y5ZaRwiWDcu5KLmAspKt9LpR+Mie+xlce22MQRg==
-X-Received: by 2002:a2e:b54f:0:b0:249:1f79:d50f with SMTP id a15-20020a2eb54f000000b002491f79d50fmr9102401ljn.338.1648228832993;
-        Fri, 25 Mar 2022 10:20:32 -0700 (PDT)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
-        by smtp.gmail.com with ESMTPSA id y23-20020a2e95d7000000b00247e4e386aasm751775ljh.121.2022.03.25.10.20.32
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Mar 2022 10:20:32 -0700 (PDT)
-Received: by mail-lj1-f181.google.com with SMTP id o6so11177150ljp.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Mar 2022 10:20:32 -0700 (PDT)
-X-Received: by 2002:a2e:a5c4:0:b0:249:9ec3:f2b with SMTP id
- n4-20020a2ea5c4000000b002499ec30f2bmr8829088ljp.358.1648228831778; Fri, 25
- Mar 2022 10:20:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220325131348.3995-1-andriy.shevchenko@linux.intel.com> <CAK7LNAR9HS7LK5D-07i8_tFcwd=uiHEFu05n0t_UuFZExcfBpw@mail.gmail.com>
-In-Reply-To: <CAK7LNAR9HS7LK5D-07i8_tFcwd=uiHEFu05n0t_UuFZExcfBpw@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 25 Mar 2022 10:20:15 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjGsKD=DYgYqYUDzGKT8BOPLhqebw2YB6PCuZenE3qEzA@mail.gmail.com>
-Message-ID: <CAHk-=wjGsKD=DYgYqYUDzGKT8BOPLhqebw2YB6PCuZenE3qEzA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] Makefile.extrawarn: Turn off -Werror when extra
- warnings are enabled
+        Fri, 25 Mar 2022 15:32:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314FA213508;
+        Fri, 25 Mar 2022 12:07:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5D4CAB829A6;
+        Fri, 25 Mar 2022 19:06:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1BD04C340EE;
+        Fri, 25 Mar 2022 19:06:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648235218;
+        bh=X08yVSMd8t7AOB7xu0DRbRp3VD4q5j0IOg81yugkmus=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=ribhI93LiCbFDJToqS0/f/KZSaIO+A8Yh4ofBnGCC0TLaZO/jUz1fgaVGaoaJaFOX
+         jjfdCvKCG93Dd889dyTXGXtJQpthts7ZkgAn+rdoq5Y0+CJlRQGnYjrqYd2gt9Dd5+
+         4thGoMcBYUeT3Xvcd7XWVFArwSobjUBzawgft3Sr6GLcPHPXCjVOkdcu6IMoBW+KfD
+         Ysa7UUbJTh06yYVwJ4avPbA7Z5HWPlJjjTWBI0zfSaUXlXTORd2YH5QQU3FVZ2ADkK
+         wSyLlBSu1AsdyQGRvnMc4zxDQn8O0ysZtcRmtE8MKHrAdDxgRDP1amBF4Rb2qQ5Cs5
+         0kwzKpMTo8uUA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08FD2E6BBCA;
+        Fri, 25 Mar 2022 19:06:58 +0000 (UTC)
+Subject: Re: [GIT PULL] Kbuild -std=gnu11 updates for v5.17-rc1
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAK7LNAQ2HET1QHG17m1vdCGMoRm6Lj=sAe+cj2Via_LHx3xBPg@mail.gmail.com>
+References: <CAK7LNAQ2HET1QHG17m1vdCGMoRm6Lj=sAe+cj2Via_LHx3xBPg@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kbuild.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAK7LNAQ2HET1QHG17m1vdCGMoRm6Lj=sAe+cj2Via_LHx3xBPg@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild-gnu11-v5.18
+X-PR-Tracked-Commit-Id: 1e24078113ae69c741cb1b03375a9f1490db7308
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 50560ce6a0bdab2fc37384c52aa02c7043909d2c
+Message-Id: <164823521802.3609.14455240159425041368.pr-tracker-bot@kernel.org>
+Date:   Fri, 25 Mar 2022 19:06:58 +0000
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Mar 25, 2022 at 7:35 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> WERROR should not be enabled for regular builds.
+The pull request you sent on Fri, 25 Mar 2022 11:37:37 +0900:
 
-No.
+> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kbuild-gnu11-v5.18
 
-WERROR should be on for regular builds.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/50560ce6a0bdab2fc37384c52aa02c7043909d2c
 
-It's W=1 that is questionable. It enables warnings that are often
-false positives, and if you use W=1 (and particularly W=2) then that's
-_your_ problem.
+Thank you!
 
-W=1 is most definitely not "regular builds". It's only for people who
-want to deal with crazy compiler warnings.
-
-I want WERROR on as widely as possible, because I'm really sick and
-tired of developers not noticing when they add warnings because they
-did a "regular build"
-
-Stop this idiocy where you think warnings are acceptable.
-
-                Linus
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
