@@ -2,150 +2,106 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE6CC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Apr 2022 13:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6351EC433F5
+	for <linux-kbuild@archiver.kernel.org>; Sat,  2 Apr 2022 18:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354886AbiDBNCx (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 2 Apr 2022 09:02:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
+        id S232213AbiDBSb2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 2 Apr 2022 14:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354880AbiDBNCw (ORCPT
+        with ESMTP id S231172AbiDBSb2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Apr 2022 09:02:52 -0400
-Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C2DF13F32;
-        Sat,  2 Apr 2022 06:00:59 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 232D0S3a030001;
-        Sat, 2 Apr 2022 22:00:29 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 232D0S3a030001
+        Sat, 2 Apr 2022 14:31:28 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2301FCCC;
+        Sat,  2 Apr 2022 11:29:35 -0700 (PDT)
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 232IT7Js009212;
+        Sun, 3 Apr 2022 03:29:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 232IT7Js009212
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1648904429;
-        bh=5OZ0/yILFQHmNR7TzDJ3t5BjHVkIHlCUOY7TO3seEhs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=uU2wE63f/QCf6b/d0e3XBsAGZUk4eVbD9hxfoJudd4sGIWlOPxwJyI9cftNFXY75K
-         Br/8DNAtdG/hUylZnK/BmgK1gQrxQkQRB0X3RrgdPU07z1d9wFOfQ7VFYISjSQKPUI
-         EkO7bjTahUAo/UVsWCklCjrhWulZxoXxvEYtxOvFVY4t2kSxmQWqWr3zB894OQ76sj
-         TnjhPIe21/62pBKpCvjsbLJxi0rQcBMQDIh15VOvdm1PPaBXYfG+sKZlvAuKkNRJLd
-         z5B5HTewvyII+dI7KDYIWQIEd+uKnrgO6M505WmUbePEXerhBcSNNISVfISBEzeNP/
-         o7EMIDIup+6Qg==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 1/2] modpost: remove useless export_from_sec()
-Date:   Sat,  2 Apr 2022 22:00:13 +0900
-Message-Id: <20220402130014.1417773-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
+        s=dec2015msa; t=1648924148;
+        bh=Oa7oBLuRLvD/B7fBD4A000HXNjk6EOGgj48TivDZZhY=;
+        h=From:Date:Subject:To:Cc:From;
+        b=2oGfyH3YM4bnjNI1QwZuCo7SvRcGN5MbaRsi4cX3CMl7dwxLSJv2f3h/6QBR7Mg6O
+         e50y7KYhpZ0xPq5WkGOAA7Ghb+8qfEWhwhRf1Vi1AG8FrFDTNpdzHD4F5V7D0N5p/z
+         L98mUPNzFdtxG6BJYdPbDrqPZAalszOCYzSe0XkdLnXjdkjPtdmSrT+o9tMUqLRFKf
+         JUO59R8PFOMhNK8iAd1TZIDRa9YD01HEJRSD74nqwgxnRWphl5DJWstebZHYcrk/pa
+         c2vzVDdtHYDnrWCw/W0ywsObVe9bsmK3jaYQKMxIoKeSM+xLgkJqFUWgp+89/BuQDh
+         AKhDoghVmgUmA==
+X-Nifty-SrcIP: [209.85.216.50]
+Received: by mail-pj1-f50.google.com with SMTP id o3-20020a17090a3d4300b001c6bc749227so5349271pjf.1;
+        Sat, 02 Apr 2022 11:29:07 -0700 (PDT)
+X-Gm-Message-State: AOAM531Oc8wI+LjN8LJgqmFTU3sMLmjxdyH51eopjHIKkpOx1bDvwk6q
+        ZbJ88fmLUZNT6PN8awt+DJ0b1OTNEGO/yFvUP6Y=
+X-Google-Smtp-Source: ABdhPJz4kNlWZBvw0huT8+eWzttVQiQiFECQGXxgdgQFtP4Ii8nFHk/bSvJJ1YP5irmZvarnbSecgAxunGxY2/3ya6g=
+X-Received: by 2002:a17:902:b183:b0:14f:c266:20d5 with SMTP id
+ s3-20020a170902b18300b0014fc26620d5mr16203020plr.136.1648924147091; Sat, 02
+ Apr 2022 11:29:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 3 Apr 2022 03:28:19 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASN9Q40P6dUGSidT5=y0FA4pd+U93L17r8sH0j3VPum4A@mail.gmail.com>
+Message-ID: <CAK7LNASN9Q40P6dUGSidT5=y0FA4pd+U93L17r8sH0j3VPum4A@mail.gmail.com>
+Subject: [GIT PULL] Kbuild fixes for v5.18-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With commit 1743694eb235 ("modpost: stop symbol preloading for
-modversion CRC") applied, now export_from_sec() is useless.
+Hello Linus,
 
-handle_symbol() is called for every symbol in the ELF.
+Please pull a couple of Kbuild fixes.
+Thanks.
 
-When 'symname' does not start with "__ksymtab", export_from_sec() is
-called, and the returned value is stored in 'export'.
 
-It is used in the last part of handle_symbol():
 
-                if (strstarts(symname, "__ksymtab_")) {
-                        name = symname + strlen("__ksymtab_");
-                        sym_add_exported(name, mod, export);
-                }
+The following changes since commit e8b767f5e04097aaedcd6e06e2270f9fe5282696:
 
-'export' is used only when 'symname' starts with "__ksymtab_".
+  Merge tag 'for-linus-5.18-rc1' of
+git://git.kernel.org/pub/scm/linux/kernel/git/rw/uml (2022-03-31
+16:16:58 -0700)
 
-So, the value returned by export_from_sec() is never used.
+are available in the Git repository at:
 
-Remove this useless function. This makes further cleanups possible.
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-fixes-v5.18
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+for you to fetch changes up to bf5c0c2231bcab677e5cdfb7f73e6c79f6d8c2d4:
 
- scripts/mod/modpost.c | 17 +----------------
- scripts/mod/modpost.h |  4 ----
- 2 files changed, 1 insertion(+), 20 deletions(-)
+  modpost: restore the warning message for missing symbol versions
+(2022-04-03 03:11:51 +0900)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index ed9d056d2108..194ca9083c7a 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -369,16 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
- 		return export_unknown;
- }
- 
--static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
--{
--	if (sec == elf->export_sec)
--		return export_plain;
--	else if (sec == elf->export_gpl_sec)
--		return export_gpl;
--	else
--		return export_unknown;
--}
--
- static const char *namespace_from_kstrtabns(const struct elf_info *info,
- 					    const Elf_Sym *sym)
- {
-@@ -576,10 +566,7 @@ static int parse_elf(struct elf_info *info, const char *filename)
- 				fatal("%s has NOBITS .modinfo\n", filename);
- 			info->modinfo = (void *)hdr + sechdrs[i].sh_offset;
- 			info->modinfo_len = sechdrs[i].sh_size;
--		} else if (strcmp(secname, "__ksymtab") == 0)
--			info->export_sec = i;
--		else if (strcmp(secname, "__ksymtab_gpl") == 0)
--			info->export_gpl_sec = i;
-+		}
- 
- 		if (sechdrs[i].sh_type == SHT_SYMTAB) {
- 			unsigned int sh_link_idx;
-@@ -702,8 +689,6 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 
- 	if (strstarts(symname, "__ksymtab"))
- 		export = export_from_secname(info, get_secindex(info, sym));
--	else
--		export = export_from_sec(info, get_secindex(info, sym));
- 
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 0c47ff95c0e2..a85dcec3669a 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -25,7 +25,6 @@
- #define Elf_Sym     Elf32_Sym
- #define Elf_Addr    Elf32_Addr
- #define Elf_Sword   Elf64_Sword
--#define Elf_Section Elf32_Half
- #define ELF_ST_BIND ELF32_ST_BIND
- #define ELF_ST_TYPE ELF32_ST_TYPE
- 
-@@ -40,7 +39,6 @@
- #define Elf_Sym     Elf64_Sym
- #define Elf_Addr    Elf64_Addr
- #define Elf_Sword   Elf64_Sxword
--#define Elf_Section Elf64_Half
- #define ELF_ST_BIND ELF64_ST_BIND
- #define ELF_ST_TYPE ELF64_ST_TYPE
- 
-@@ -138,8 +136,6 @@ struct elf_info {
- 	Elf_Shdr     *sechdrs;
- 	Elf_Sym      *symtab_start;
- 	Elf_Sym      *symtab_stop;
--	Elf_Section  export_sec;
--	Elf_Section  export_gpl_sec;
- 	char         *strtab;
- 	char	     *modinfo;
- 	unsigned int modinfo_len;
+----------------------------------------------------------------
+Kbuild fixes for v5.18
+
+ - Fix empty $(PYTHON) expansion.
+
+ - Fix UML, which got broken by the attempt to suppress Clang warnings.
+
+ - Fix warning message in modpost.
+
+----------------------------------------------------------------
+Masahiro Yamada (3):
+      kconfig: remove stale comment about removed kconfig_print_symbol()
+      kbuild: fix empty ${PYTHON} in scripts/link-vmlinux.sh
+      modpost: restore the warning message for missing symbol versions
+
+Nathan Chancellor (2):
+      kbuild: Remove '-mno-global-merge'
+      Revert "um: clang: Strip out -mno-global-merge from USER_CFLAGS"
+
+ Makefile                   | 4 ----
+ arch/um/Makefile           | 4 ----
+ scripts/kconfig/confdata.c | 7 -------
+ scripts/link-vmlinux.sh    | 2 +-
+ scripts/mod/modpost.c      | 2 +-
+ 5 files changed, 2 insertions(+), 17 deletions(-)
+
+
 -- 
-2.32.0
-
+Best Regards
+Masahiro Yamada
