@@ -2,175 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A219C433FE
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45946C41535
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376399AbiDDV2y (ORCPT
+        id S1380417AbiDDV3A (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Apr 2022 17:28:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34296 "EHLO
+        Mon, 4 Apr 2022 17:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379351AbiDDRCS (ORCPT
+        with ESMTP id S1379544AbiDDR3I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Apr 2022 13:02:18 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4B040A1E
-        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:00:20 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id bu29so18580711lfb.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:00:20 -0700 (PDT)
+        Mon, 4 Apr 2022 13:29:08 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F112A24BF9
+        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:27:11 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id n9so4030458plc.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:27:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lpp/ozNVnLdvnoTjipCF69sWorB9Ss1eoVxFTqOHzco=;
-        b=qAhAC/REUCwi7i3+1Gzc40RTeFOiNy1TlboqLpEisLYhnCJAXa/9lqOZs0rTOp+HJE
-         QoU2M14FdHiKF46PXJpMy1tdEME2DFFpHWb7R01Fa04jlSB8cySJIUtzZoqBqslP6nmr
-         yKULXcsaq4XnX1xzQAML0+xQc/vc6at+3asgvxssszq0WDVIRxlQU8KubeeFk3eA/Ll2
-         Mg0PXahhIMhtmt+u0ePYuOvJaiVjbD9xDfxtjauRZBKq+4VFE3uVKNqz2FvjJ2q27T49
-         M2EFZ0XvWrd3dWcLtLtIXVHHA6KTPWHYNIB/IwiG3jfccSUrfHKl+CaSCriKsjK9BF9v
-         s5dQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VYvPl145gx1NnQ2E3OJKFVQPxapHGXttn5rOGVj8YXo=;
+        b=hd+vUeBK2jke4Z79gSu5EYlGJK/30+8ZPm5vusOwihjccMo+JYQaFziQAAtCID0e5b
+         qiLbaSXJpB5nRDykwDoLmPmHeyaA4U3mO1aNEDIrpBI1y7KWpUIIYaKFkz1sQOFACAOc
+         aM6lCqWr9wZwWsklSOxLwTatnC3eKJ1E18Cyxx8CEA5zLgAe9sm4oTFjzF7SzNxlrSY7
+         5YCfCpDy23ULHUPSewKuWau9wE833jCsfozeqx9dNss7+g86jPjfaK+eh0C/KKY3VLXw
+         f3jp5vi8jNmhQOZlIPVusBowj6XA96wM7engEJdtxH6nw+nNIUhWc7hzzmvwmP0aO5k+
+         ThIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lpp/ozNVnLdvnoTjipCF69sWorB9Ss1eoVxFTqOHzco=;
-        b=2qhRu7Ng+Jl3ETeCnzokN3qR9lsLw2xxz9viJFNaftKVN1joYEiYHnLbhth2i6hGG2
-         48qlKvFKWaIJ2lsWdbYMb5DV5xzVBXR1iOYTvCQYMIPDWsO1/DjbXnA4DDjv8OzwY3st
-         Pb+RMbK+jc3xdeO0ckpUhfOnkoUKXO1wMQsoy5NZ6pTgs6lQbHKngJdgPuF6myFplpz+
-         etyFntP/yDFCyKzOtA2C4i/q+xucLVCIfIJ9bGwkdlIkWqORF3VzIVOkLocZtt0Ew6m7
-         DUSce4th83ssfjrRdQUurAVxIUNhOSwXVW78tCoAHhHRHtYo3zW9RnkIlLizUZBeLZIh
-         Ljvw==
-X-Gm-Message-State: AOAM532YRMBDHztxnC3bXjYeh4wJhXrDjzu63F72XPxicTzKDa55iugc
-        JXCkcNgh/5EEUIJskbg9xSzOdUNK7vMJ4h0wZFufdt+NHRXPoQ==
-X-Google-Smtp-Source: ABdhPJyfnr321gXYxKVcADF7Mg84CJzjSsJG4frp9zc4ju7G/kp2QnXbgnN2lQQYDP3G7rnSfh9tJ0Rm+JoS9AD+qKE=
-X-Received: by 2002:a05:6512:3092:b0:44a:e7bb:e961 with SMTP id
- z18-20020a056512309200b0044ae7bbe961mr303801lfd.190.1649091618372; Mon, 04
- Apr 2022 10:00:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220402130014.1417773-1-masahiroy@kernel.org>
-In-Reply-To: <20220402130014.1417773-1-masahiroy@kernel.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VYvPl145gx1NnQ2E3OJKFVQPxapHGXttn5rOGVj8YXo=;
+        b=4sOSZcjueK4thJh70+AmFwE+FFlIfV3GBrsSYCTtwA73JlQtq+BEI9LyMPl+yEH1DW
+         xc1R1KstwR/99JnWVx4HeP93PiYNaPbUhoGQ+a+RDVD83722c3MfXVF3TLxmR7IXbcKz
+         EuzaVGJ/W6Fz9n65IM3yjzuXsw7QHZxZVl1uLph/vaNuqZmZQNEz49r7GShMljAed4UQ
+         KIc3sVkajlHtgwN0pKYcz+ToDz5bGYbXyd45d784ZR8jgpZVyffL4n6sbihPEr0yBWlo
+         twvaqaZS8ri0z9V6z3kEXx5YyVpqeknZCWFBIUVWkwZxUlz8nKHBVGYqiPPpOAaiJf04
+         9DPQ==
+X-Gm-Message-State: AOAM533RyUqE+rt6ba86Q53XVOi63bxbYWxa09x7/kGKyFIgXyi5xh/i
+        TGX6KJkZdDB4M1wlur6GXWUQAYQlptpXx/G+
+X-Google-Smtp-Source: ABdhPJzIn8VUPSw0kXUgBANdTlP1KbT/bIOfaGMgMZZeENIi+FbBiFh+hZ3dFMto7+s4V24GWdOQ6w==
+X-Received: by 2002:a17:90b:1c07:b0:1c7:5324:c68e with SMTP id oc7-20020a17090b1c0700b001c75324c68emr255680pjb.202.1649093231294;
+        Mon, 04 Apr 2022 10:27:11 -0700 (PDT)
+Received: from google.com ([2620:15c:211:202:9d5:9b93:ffb4:574a])
+        by smtp.gmail.com with ESMTPSA id gt14-20020a17090af2ce00b001c701e0a129sm73834pjb.38.2022.04.04.10.27.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 10:27:09 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 10:27:02 -0700
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 4 Apr 2022 10:00:07 -0700
-Message-ID: <CAKwvOd=0-dka3RwFSZoizccotYkYZjZf3eyj1nQGKJu65M+S3A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] modpost: remove useless export_from_sec()
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [PATCH 1/8] agpgart.h: do not include <stdlib.h> from exported
+ header
+Message-ID: <YksqZv5IqECbFB7a@google.com>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+ <20220404061948.2111820-2-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220404061948.2111820-2-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Apr 2, 2022 at 6:00 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> With commit 1743694eb235 ("modpost: stop symbol preloading for
-> modversion CRC") applied, now export_from_sec() is useless.
->
-> handle_symbol() is called for every symbol in the ELF.
->
-> When 'symname' does not start with "__ksymtab", export_from_sec() is
-> called, and the returned value is stored in 'export'.
->
-> It is used in the last part of handle_symbol():
->
->                 if (strstarts(symname, "__ksymtab_")) {
->                         name = symname + strlen("__ksymtab_");
->                         sym_add_exported(name, mod, export);
->                 }
->
-> 'export' is used only when 'symname' starts with "__ksymtab_".
->
-> So, the value returned by export_from_sec() is never used.
->
-> Remove this useless function. This makes further cleanups possible.
->
+On Mon, Apr 04, 2022 at 03:19:41PM +0900, Masahiro Yamada wrote:
+> Commit 35d0f1d54ecd ("include/uapi/linux/agpgart.h: include stdlib.h in
+> userspace") included <stdlib.h> to fix the unknown size_t error, but
+> I do not think it is the right fix.
+> 
+> This header already uses __kernel_size_t a few lines below.
+> 
+> Replace the remaining size_t, and stop including <stdlib.h>.
+> 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Thanks for the patch!
+Thanks for the patch.
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
 > ---
->
->  scripts/mod/modpost.c | 17 +----------------
->  scripts/mod/modpost.h |  4 ----
->  2 files changed, 1 insertion(+), 20 deletions(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index ed9d056d2108..194ca9083c7a 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -369,16 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
->                 return export_unknown;
->  }
->
-> -static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
-> -{
-> -       if (sec == elf->export_sec)
-> -               return export_plain;
-> -       else if (sec == elf->export_gpl_sec)
-> -               return export_gpl;
-> -       else
-> -               return export_unknown;
-> -}
-> -
->  static const char *namespace_from_kstrtabns(const struct elf_info *info,
->                                             const Elf_Sym *sym)
->  {
-> @@ -576,10 +566,7 @@ static int parse_elf(struct elf_info *info, const char *filename)
->                                 fatal("%s has NOBITS .modinfo\n", filename);
->                         info->modinfo = (void *)hdr + sechdrs[i].sh_offset;
->                         info->modinfo_len = sechdrs[i].sh_size;
-> -               } else if (strcmp(secname, "__ksymtab") == 0)
-> -                       info->export_sec = i;
-> -               else if (strcmp(secname, "__ksymtab_gpl") == 0)
-> -                       info->export_gpl_sec = i;
-> +               }
->
->                 if (sechdrs[i].sh_type == SHT_SYMTAB) {
->                         unsigned int sh_link_idx;
-> @@ -702,8 +689,6 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
->
->         if (strstarts(symname, "__ksymtab"))
->                 export = export_from_secname(info, get_secindex(info, sym));
-> -       else
-> -               export = export_from_sec(info, get_secindex(info, sym));
->
->         switch (sym->st_shndx) {
->         case SHN_COMMON:
-> diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-> index 0c47ff95c0e2..a85dcec3669a 100644
-> --- a/scripts/mod/modpost.h
-> +++ b/scripts/mod/modpost.h
-> @@ -25,7 +25,6 @@
->  #define Elf_Sym     Elf32_Sym
->  #define Elf_Addr    Elf32_Addr
->  #define Elf_Sword   Elf64_Sword
-> -#define Elf_Section Elf32_Half
->  #define ELF_ST_BIND ELF32_ST_BIND
->  #define ELF_ST_TYPE ELF32_ST_TYPE
->
-> @@ -40,7 +39,6 @@
->  #define Elf_Sym     Elf64_Sym
->  #define Elf_Addr    Elf64_Addr
->  #define Elf_Sword   Elf64_Sxword
-> -#define Elf_Section Elf64_Half
->  #define ELF_ST_BIND ELF64_ST_BIND
->  #define ELF_ST_TYPE ELF64_ST_TYPE
->
-> @@ -138,8 +136,6 @@ struct elf_info {
->         Elf_Shdr     *sechdrs;
->         Elf_Sym      *symtab_start;
->         Elf_Sym      *symtab_stop;
-> -       Elf_Section  export_sec;
-> -       Elf_Section  export_gpl_sec;
->         char         *strtab;
->         char         *modinfo;
->         unsigned int modinfo_len;
-> --
+> 
+>  include/uapi/linux/agpgart.h | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/uapi/linux/agpgart.h b/include/uapi/linux/agpgart.h
+> index f5251045181a..9cc3448c0b5b 100644
+> --- a/include/uapi/linux/agpgart.h
+> +++ b/include/uapi/linux/agpgart.h
+> @@ -52,7 +52,6 @@
+>  
+>  #ifndef __KERNEL__
+>  #include <linux/types.h>
+> -#include <stdlib.h>
+>  
+>  struct agp_version {
+>  	__u16 major;
+> @@ -64,10 +63,10 @@ typedef struct _agp_info {
+>  	__u32 bridge_id;	/* bridge vendor/device         */
+>  	__u32 agp_mode;		/* mode info of bridge          */
+>  	unsigned long aper_base;/* base of aperture             */
+> -	size_t aper_size;	/* size of aperture             */
+> -	size_t pg_total;	/* max pages (swap + system)    */
+> -	size_t pg_system;	/* max pages (system)           */
+> -	size_t pg_used;		/* current pages used           */
+> +	__kernel_size_t aper_size;	/* size of aperture             */
+> +	__kernel_size_t pg_total;	/* max pages (swap + system)    */
+> +	__kernel_size_t pg_system;	/* max pages (system)           */
+> +	__kernel_size_t pg_used;	/* current pages used           */
+>  } agp_info;
+>  
+>  typedef struct _agp_setup {
+> -- 
 > 2.32.0
->
-
-
--- 
-Thanks,
-~Nick Desaulniers
+> 
