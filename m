@@ -2,134 +2,138 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA51DC433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 08:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DBFC433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 11:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377905AbiDDIG3 (ORCPT
+        id S1358950AbiDDLFh (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Apr 2022 04:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46410 "EHLO
+        Mon, 4 Apr 2022 07:05:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377907AbiDDIG2 (ORCPT
+        with ESMTP id S236147AbiDDLFg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Apr 2022 04:06:28 -0400
-Received: from conssluserg-04.nifty.com (conssluserg-04.nifty.com [210.131.2.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F8BC31DF6;
-        Mon,  4 Apr 2022 01:04:30 -0700 (PDT)
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 234848bo021121;
-        Mon, 4 Apr 2022 17:04:08 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 234848bo021121
+        Mon, 4 Apr 2022 07:05:36 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8315B25;
+        Mon,  4 Apr 2022 04:03:35 -0700 (PDT)
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 234B3NEQ001658;
+        Mon, 4 Apr 2022 20:03:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 234B3NEQ001658
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649059448;
-        bh=4V3S2537hEXTRhH8SIRp0YPIm1iUoX+tEHBAKXGY68M=;
+        s=dec2015msa; t=1649070203;
+        bh=JG/zbhRcdhdcznjejyKbFMjaPGTJpepqOa9qTr7iSoM=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=0UIw8fYLrhR0X3roP/bYNwzjan97ZWnMOxdXYxZvD42TUakyAUI+iLhbvmbHqYrHc
-         2tSM0DfxEvwvJMjaf+ZNg0xv7i4dKyLLgjcC65VoZVzMiTkSEmNQWby5AH5m278KkU
-         ss6Uv28unkF+M15Ua9pO3/knh/Fbre6QyJgzLHv5JDqQkCDPYxeGKCIgWmRWHPPhNP
-         bfPTx5vLgfEhklrhE+FY6wbHyHx5GRH1+6HeE1Xv9H1nXosUW0jAjWpL07LOiY+UjL
-         2vY7INSuvaNAhvbb/JcwhkpIQed3B9qN9aqsFLEOeSQEEeo1NHiaOsHq1PNMnbCscr
-         JVu9Tg4JmJcGQ==
-X-Nifty-SrcIP: [209.85.210.182]
-Received: by mail-pf1-f182.google.com with SMTP id h24so3898406pfo.6;
-        Mon, 04 Apr 2022 01:04:08 -0700 (PDT)
-X-Gm-Message-State: AOAM531g642i0bb9J0ClVaLo+NCPrfjcxV+hHByBFb90tuBd8sPd/cOO
-        2GJ5PgYRZgys1EwTWi8O8aq76sU9s+3vB5p7pC4=
-X-Google-Smtp-Source: ABdhPJwROPwMLFJgN+ysWt1cOvjuJ5+JIqqWq/foMxeHpnlqqCk2ZxYCccbwbY56dSUxd2aMlrlgPCt4S9gRJud88wA=
-X-Received: by 2002:a63:dc53:0:b0:381:7f41:3a2d with SMTP id
- f19-20020a63dc53000000b003817f413a2dmr25224550pgj.126.1649059447687; Mon, 04
- Apr 2022 01:04:07 -0700 (PDT)
+        b=1RfW205fo5MTTxQ6H4d/yTfBYYZl3gFZRvDg7d3VN8phK15nt8kOZWrE27dfOkRkN
+         TwxsF8vUa0nCy9ufA+lM50D3bAEdlNTbZHh9R7rzZsvNVgH/7Kvi3kYkdQPmJhSiQd
+         0uk8uZ8QiPIt4xQdbvxeAZKM/Mkj/hrdnMZVtZPSjYOqj+dzICLF0Ir9uSSYlWzVc5
+         ts2cWBeg1OzjMNU+RK7QpjvOOeRwGM1Vuilu/7y+AYuGtr1GDNLencM42j/ZscDXb6
+         KB1c50oGYgLbFKDGsznof7aE1pBxComsXRzgxK7RFPI5kxzhpXnXTAbr2HTgIQvANk
+         3pf4Ln1m5quyQ==
+X-Nifty-SrcIP: [209.85.210.180]
+Received: by mail-pf1-f180.google.com with SMTP id h24so4295747pfo.6;
+        Mon, 04 Apr 2022 04:03:23 -0700 (PDT)
+X-Gm-Message-State: AOAM5336t/R0CC04aC+whczX++EoDS5N4SYB9bNSYeY/oNntDLJgJ1il
+        Bxnpke3n+mm89qJW1FCW7ctFBHn/PSTx602wFAs=
+X-Google-Smtp-Source: ABdhPJy2XI7PU06Z81w2Q/TzQqR37viCjtaYtzW7uB0xOB4zElHSENcTHkICyhaiTO8LEh/H5SWQl8PL56i/NBmqoZI=
+X-Received: by 2002:a05:6a00:24d2:b0:4fb:1b6d:ee7d with SMTP id
+ d18-20020a056a0024d200b004fb1b6dee7dmr23384787pfv.36.1649070202372; Mon, 04
+ Apr 2022 04:03:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220404061948.2111820-1-masahiroy@kernel.org>
- <20220404061948.2111820-3-masahiroy@kernel.org> <YkqhQhJIQEL2qh8C@infradead.org>
-In-Reply-To: <YkqhQhJIQEL2qh8C@infradead.org>
+References: <20220307223231.608498-1-mst@redhat.com> <CAK7LNAR=fs+VJUZJj7YyprdA6xjx=4bttPRL6e4bvNkEeX9eng@mail.gmail.com>
+ <t2boae$9u9$1@ciao.gmane.io>
+In-Reply-To: <t2boae$9u9$1@ciao.gmane.io>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Mon, 4 Apr 2022 17:03:19 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATecXbEZZCxb3p9hBe7wHsLkhpavELCFbX7=ZM2hTV7sg@mail.gmail.com>
-Message-ID: <CAK7LNATecXbEZZCxb3p9hBe7wHsLkhpavELCFbX7=ZM2hTV7sg@mail.gmail.com>
-Subject: Re: [PATCH 2/8] kbuild: prevent exported headers from including
- <stdlib.h>, <stdbool.h>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date:   Mon, 4 Apr 2022 20:02:33 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQboNkJcmWdq6=P_PQck3oUGNU_d25PHowtYa2sMcMD-w@mail.gmail.com>
+Message-ID: <CAK7LNAQboNkJcmWdq6=P_PQck3oUGNU_d25PHowtYa2sMcMD-w@mail.gmail.com>
+Subject: Re: [PATCH] Makefile: fix config cc version check
+To:     Akemi Yagi <toracat@elrepo.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Apr 4, 2022 at 4:41 PM Christoph Hellwig <hch@infradead.org> wrote:
+On Sun, Apr 3, 2022 at 6:11 PM Akemi Yagi <toracat@elrepo.org> wrote:
 >
-> On Mon, Apr 04, 2022 at 03:19:42PM +0900, Masahiro Yamada wrote:
-> > If we can make kernel headers self-contained (that is, none of exported
-> > kernel headers includes system headers), we will be able to add the
-> > -nostdinc flag, but that is much far from where we stand now.
+> On Tue, 08 Mar 2022 11:23:31 +0900, Masahiro Yamada wrote:
 >
-> What is still missing for that?
+> > On Tue, Mar 8, 2022 at 7:32 AM Michael S. Tsirkin <mst@redhat.com>
+> > wrote:
+> >>
+> >> .config is of the form:
+> >> CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)"
+> >
+> >
+> > No. This was changed.
+> >
+> > See this:
+> >
+> > $ git show 129ab0d2d9f -- Makefile
+> >
+> >
+> >
+> >> while CC_VERSION_TEXT is of the form: gcc (GCC) 11.2.1 20220127 (Red
+> >> Hat 11.2.1-7)
+> >>
+> >> thus when comparing these, CONFIG_CC_VERSION_TEXT should not be put in
+> >> "", otherwise we get () outside "" which shell then tries to evaluate.
+> >>
+> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >> ---
+> >>  Makefile | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/Makefile b/Makefile index daeb5c88b50b..d5c03c827825
+> >> 100644 --- a/Makefile +++ b/Makefile @@ -1714,9 +1714,9 @@ PHONY +=
+> >> prepare
+> >>  # now expand this into a simple variable to reduce the cost of shell
+> >>  evaluations prepare: CC_VERSION_TEXT := $(CC_VERSION_TEXT)
+> >>  prepare:
+> >> -       @if [ "$(CC_VERSION_TEXT)" != "$(CONFIG_CC_VERSION_TEXT)" ];
+> >> then \
+> >> +       @if [ "$(CC_VERSION_TEXT)" != $(CONFIG_CC_VERSION_TEXT) ]; then
+> >> \
+> >>                 echo >&2 "warning: the compiler differs from the one
+> >>                 used to build the kernel"; \
+> >> -               echo >&2 "  The kernel was built by:
+> >> $(CONFIG_CC_VERSION_TEXT)"; \ +               echo >&2 "  The kernel
+> >> was built by: "$(CONFIG_CC_VERSION_TEXT)";" \
+> >>                 echo >&2 "  You are using:
+> >>                 $(CC_VERSION_TEXT)"; \
+> >>         fi
+> >>
+> >> --
+> >> MST
+>
+> I believe the patch proposed by Michael indeed fixes an issue
+> introduced by 129ab0d2d9f (Makefile).
+>
+> Please see the following bug reports:
+>
+> https://elrepo.org/bugs/view.php?id=1215
+> https://elrepo.org/bugs/view.php?id=1214
+>
+> and this forum post:
+>
+> https://www.phoronix.com/forums/forum/software/general-linux-open-source/
+> 1303986-linux-5-17-rc1-released-a-little-bit-early-but-with-shiny-new-
+> features#post1304036
+>
+> Akemi
+>
+
+I left a comment:
+https://elrepo.org/bugs/view.php?id=1215
 
 
-I changed as follows:
+This is a bug in ELRepo.
 
-diff --git a/usr/include/Makefile b/usr/include/Makefile
-index fa9819e022b7..169fca1a0f28 100644
---- a/usr/include/Makefile
-+++ b/usr/include/Makefile
-@@ -15,7 +15,7 @@ UAPI_CFLAGS += $(filter -m32 -m64 --target=%,
-$(KBUILD_CFLAGS))
- # USERCFLAGS might contain sysroot location for CC.
- UAPI_CFLAGS += $(USERCFLAGS)
+The upstream kernel is good.
 
--override c_flags = $(UAPI_CFLAGS) -Wp,-MMD,$(depfile) -I$(objtree)/usr/include
-+override c_flags = $(UAPI_CFLAGS) -Wp,-MMD,$(depfile)
--I$(objtree)/usr/include -nostdinc
-
- # The following are excluded for now because they fail to build.
- #
-
-
-
-
-I got this:
-
-
-
-masahiro@grover:~/ref/linux$ make -j8 allyesconfig usr/include/
-#
-# No change to .config
-#
-  DESCEND objtool
-  CALL    scripts/atomic/check-atomics.sh
-  CALL    scripts/checksyscalls.sh
-  HDRTEST usr/include/linux/wireless.h
-  HDRTEST usr/include/linux/atmlec.h
-  HDRTEST usr/include/linux/if_fc.h
-  HDRTEST usr/include/linux/iso_fs.h
-  HDRTEST usr/include/linux/sysinfo.h
-  HDRTEST usr/include/linux/un.h
-  HDRTEST usr/include/linux/ax25.h
-  HDRTEST usr/include/linux/map_to_14segment.h
-In file included from ./usr/include/linux/wireless.h:75,
-                 from <command-line>:
-./usr/include/linux/if.h:28:10: fatal error: sys/socket.h: No such
-file or directory
-   28 | #include <sys/socket.h>                 /* for struct
-sockaddr.         */
-      |          ^~~~~~~~~~~~~~
-compilation terminated.
-make[3]: *** [usr/include/Makefile:101:
-usr/include/linux/wireless.hdrtest] Error 1
-make[3]: *** Waiting for unfinished jobs....
-make[2]: *** [scripts/Makefile.build:550: usr/include] Error 2
-make[1]: *** [Makefile:1834: usr] Error 2
-make: *** [Makefile:350: __build_one_by_one] Error 2
-
-
-
-
-
-
+Please do not come back to this over again.
 
 
 
