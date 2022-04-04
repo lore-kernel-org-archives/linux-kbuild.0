@@ -2,104 +2,118 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48979C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  3 Apr 2022 09:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C456C433FE
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 06:20:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239360AbiDCJb7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 3 Apr 2022 05:31:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49388 "EHLO
+        id S1377423AbiDDGWd (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 4 Apr 2022 02:22:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234343AbiDCJb6 (ORCPT
+        with ESMTP id S1377417AbiDDGWc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 3 Apr 2022 05:31:58 -0400
-X-Greylist: delayed 301 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 03 Apr 2022 02:30:05 PDT
-Received: from ciao.gmane.io (ciao.gmane.io [116.202.254.214])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C1A27CCB
-        for <linux-kbuild@vger.kernel.org>; Sun,  3 Apr 2022 02:30:05 -0700 (PDT)
-Received: from list by ciao.gmane.io with local (Exim 4.92)
-        (envelope-from <glkd-linux-kbuild@m.gmane-mx.org>)
-        id 1nawTm-0005d6-BD
-        for linux-kbuild@vger.kernel.org; Sun, 03 Apr 2022 11:25:02 +0200
-X-Injected-Via-Gmane: http://gmane.org/
-To:     linux-kbuild@vger.kernel.org
-From:   Akemi Yagi <toracat@elrepo.org>
-Subject: Re: [PATCH] Makefile: fix config cc version check
-Date:   Sun, 3 Apr 2022 09:10:38 -0000 (UTC)
-Message-ID: <t2boae$9u9$1@ciao.gmane.io>
-References: <20220307223231.608498-1-mst@redhat.com>
-        <CAK7LNAR=fs+VJUZJj7YyprdA6xjx=4bttPRL6e4bvNkEeX9eng@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Mon, 4 Apr 2022 02:22:32 -0400
+Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21ED236E32;
+        Sun,  3 Apr 2022 23:20:29 -0700 (PDT)
+Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 2346K1Bo008244;
+        Mon, 4 Apr 2022 15:20:05 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 2346K1Bo008244
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649053205;
+        bh=PdbBnXvGqqA+FniCDgXg05k8pJcNIN9vip0pBgTchzw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=FJMPxHJFUUv3FiXSITD4Z4GcTOwl0ot6nym5pD5crBXzIA9vZkfP+B1F0WurK52Tt
+         K+moBR35Ld27Wi+FCQjA+KNnvDBRaSM+wPdnX8lbejsDa/YPmi3voHFaPUX3DWrwPx
+         E+GYKJuEhTLZcG3BFx12qajmBCGXPnaCoM023VBrzLpUJOuQkYBZQ6xt4lGKeRKIug
+         fB/x4okJYDOLuRAMqGHEk2euAlSC17xxisGufgIqtVD7Ftkrj+QhXIfkWgZBZDSpCC
+         G7p3tzmLGng1WGANWaGYYDZg16AhQ0Hmx9FccmhMl/VKCvAgWsnAKZOmMqWmj0rd8+
+         PjnTSLXuzibLg==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+Cc:     linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 5/8] powerpc: add asm/stat.h to UAPI compile-test coverage
+Date:   Mon,  4 Apr 2022 15:19:45 +0900
+Message-Id: <20220404061948.2111820-6-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220404061948.2111820-1-masahiroy@kernel.org>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-User-Agent: Pan/0.149 (Bellevue; 4c157ba git@gitlab.gnome.org:GNOME/pan.git)
-Cc:     linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, 08 Mar 2022 11:23:31 +0900, Masahiro Yamada wrote:
+asm/stat.h is currently excluded from the UAPI compile-test for
+ARCH=powerpc because of the errors like follows:
 
-> On Tue, Mar 8, 2022 at 7:32 AM Michael S. Tsirkin <mst@redhat.com>
-> wrote:
->>
->> .config is of the form:
->> CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)"
-> 
-> 
-> No. This was changed.
-> 
-> See this:
-> 
-> $ git show 129ab0d2d9f -- Makefile
-> 
-> 
-> 
->> while CC_VERSION_TEXT is of the form: gcc (GCC) 11.2.1 20220127 (Red
->> Hat 11.2.1-7)
->>
->> thus when comparing these, CONFIG_CC_VERSION_TEXT should not be put in
->> "", otherwise we get () outside "" which shell then tries to evaluate.
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>  Makefile | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/Makefile b/Makefile index daeb5c88b50b..d5c03c827825
->> 100644 --- a/Makefile +++ b/Makefile @@ -1714,9 +1714,9 @@ PHONY +=
->> prepare
->>  # now expand this into a simple variable to reduce the cost of shell
->>  evaluations prepare: CC_VERSION_TEXT := $(CC_VERSION_TEXT)
->>  prepare:
->> -       @if [ "$(CC_VERSION_TEXT)" != "$(CONFIG_CC_VERSION_TEXT)" ];
->> then \
->> +       @if [ "$(CC_VERSION_TEXT)" != $(CONFIG_CC_VERSION_TEXT) ]; then
->> \
->>                 echo >&2 "warning: the compiler differs from the one
->>                 used to build the kernel"; \
->> -               echo >&2 "  The kernel was built by:
->> $(CONFIG_CC_VERSION_TEXT)"; \ +               echo >&2 "  The kernel
->> was built by: "$(CONFIG_CC_VERSION_TEXT)";" \
->>                 echo >&2 "  You are using:          
->>                 $(CC_VERSION_TEXT)"; \
->>         fi
->>
->> --
->> MST
+    HDRTEST usr/include/asm/stat.h
+  In file included from <command-line>:32:
+  ./usr/include/asm/stat.h:32:2: error: unknown type name 'ino_t'
+     32 |  ino_t  st_ino;
+        |  ^~~~~
+  ./usr/include/asm/stat.h:35:2: error: unknown type name 'mode_t'
+     35 |  mode_t  st_mode;
+        |  ^~~~~~
+  ./usr/include/asm/stat.h:40:2: error: unknown type name 'uid_t'
+     40 |  uid_t  st_uid;
+        |  ^~~~~
+  ./usr/include/asm/stat.h:41:2: error: unknown type name 'gid_t'
+     41 |  gid_t  st_gid;
+        |  ^~~~~
 
-I believe the patch proposed by Michael indeed fixes an issue 
-introduced by 129ab0d2d9f (Makefile).
+The errors can be fixed by prefixing the types with __kernel_.
 
-Please see the following bug reports:
+Then, remove the no-header-test entry from user/include/Makefile.
 
-https://elrepo.org/bugs/view.php?id=1215
-https://elrepo.org/bugs/view.php?id=1214
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-and this forum post:
+ arch/powerpc/include/uapi/asm/stat.h | 10 +++++-----
+ usr/include/Makefile                 |  1 -
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-https://www.phoronix.com/forums/forum/software/general-linux-open-source/
-1303986-linux-5-17-rc1-released-a-little-bit-early-but-with-shiny-new-
-features#post1304036
-
-Akemi
+diff --git a/arch/powerpc/include/uapi/asm/stat.h b/arch/powerpc/include/uapi/asm/stat.h
+index 7871055e5e32..a28c9a1201fa 100644
+--- a/arch/powerpc/include/uapi/asm/stat.h
++++ b/arch/powerpc/include/uapi/asm/stat.h
+@@ -29,16 +29,16 @@ struct __old_kernel_stat {
+ 
+ struct stat {
+ 	unsigned long	st_dev;
+-	ino_t		st_ino;
++	__kernel_ino_t	st_ino;
+ #ifdef __powerpc64__
+ 	unsigned long	st_nlink;
+-	mode_t		st_mode;
++	__kernel_mode_t	st_mode;
+ #else
+-	mode_t		st_mode;
++	__kernel_mode_t	st_mode;
+ 	unsigned short	st_nlink;
+ #endif
+-	uid_t		st_uid;
+-	gid_t		st_gid;
++	__kernel_uid_t	st_uid;
++	__kernel_gid_t	st_gid;
+ 	unsigned long	st_rdev;
+ 	long		st_size;
+ 	unsigned long	st_blksize;
+diff --git a/usr/include/Makefile b/usr/include/Makefile
+index da280bdcb391..9d9dea32e3a0 100644
+--- a/usr/include/Makefile
++++ b/usr/include/Makefile
+@@ -66,7 +66,6 @@ no-header-test += linux/if_bonding.h
+ endif
+ 
+ ifeq ($(SRCARCH),powerpc)
+-no-header-test += asm/stat.h
+ no-header-test += linux/bpf_perf_event.h
+ endif
+ 
+-- 
+2.32.0
 
