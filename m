@@ -2,188 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD1A6C433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 13:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20356C43219
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349151AbiDDNHO (ORCPT
+        id S1379583AbiDDV2m (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Apr 2022 09:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43378 "EHLO
+        Mon, 4 Apr 2022 17:28:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349194AbiDDNHN (ORCPT
+        with ESMTP id S1379403AbiDDRGC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Apr 2022 09:07:13 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE3013F9B;
-        Mon,  4 Apr 2022 06:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649077517; x=1680613517;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KpMYCfde85sh/66ugKEnZNtNPom49Jb6tJDgfq2nsdk=;
-  b=ZJU9xlvBGroD1ZW37BhbcVP8MEGckhAMfQh4hcXgYaiJUc6T0ewP1wHh
-   zomN5DUhfHo4gMNg1O/m3noipdDXbt6U7vVWAx20kGSeTIpMCj2ufIahM
-   C/vvsWisbf6/7sbQmxwJJiboWZ3iepv4vZxoHy+azBodHjqQP++dotHYL
-   bLOhsNCPxhVpy1DZstkS7TZWrDyihjH9YXwSh8bWyH1P8LfPaCETYZSSS
-   4Jy0CPNwL5mf6lHcwRre7lfj2D3/n0jGdsjshoD6ZgtO90i7mn2dpz7RW
-   Tfjocv4d+x2YLXsHltXf2bu3/qNUmdXX+fmF/uBfJozSpYV5oSplnfkYH
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10306"; a="242650042"
-X-IronPort-AV: E=Sophos;i="5.90,234,1643702400"; 
-   d="scan'208";a="242650042"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2022 06:05:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,234,1643702400"; 
-   d="scan'208";a="721639506"
-Received: from lkp-server02.sh.intel.com (HELO a44fdfb70b94) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 04 Apr 2022 06:05:14 -0700
-Received: from kbuild by a44fdfb70b94 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nbMOQ-00024D-2b;
-        Mon, 04 Apr 2022 13:05:14 +0000
-Date:   Mon, 4 Apr 2022 21:04:20 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: Re: [PATCH 7/8] posix_types.h: add __kernel_uintptr_t to UAPI
- posix_types.h
-Message-ID: <202204042058.5Kr6q6YX-lkp@intel.com>
-References: <20220404061948.2111820-8-masahiroy@kernel.org>
+        Mon, 4 Apr 2022 13:06:02 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 286AE40A22
+        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:04:06 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id d5so18458793lfj.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:04:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=J334O5uYapL/nSov6BZAzFIp7kzwsiEjIccb8+5N22c=;
+        b=f07uA2nRdSeYaV6J0y8FPL4bPtqDnXuBCANsO8bx0j7F5mJV3d8FyIxuXDZ9mY5LHa
+         GoDjtp8ZFIHxrYd+1KbhjEWgk6q38scATXBkxvTL5bimRO/FxE7oFoKFaFK5u1UPQjhh
+         yEM/yzy4sxr3ObXCNh3tJOi5lsE6MzpZKvwQ1xVizV3wq1ht6lmCPkB336REFQ2Da/8i
+         uAoPQcV5M7F2YHxdHjtPSeiYJBFRtF8s3C/Hk27Qb+29HmpBV0Cj8mXRMJnMoHGZmClv
+         rJJSSIdGGvoR7Lz/ratpwdJS1KfBOdXQfV3LiCnu9zg8jpoJMcCfwSKIEUJWD8/vEuqq
+         NP0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J334O5uYapL/nSov6BZAzFIp7kzwsiEjIccb8+5N22c=;
+        b=4MLkIIIXuQKg6ndXFrvJ3JtY6EN19ILL0u78A247bU+jP6HAHkRH1sFJje7gy/SGFB
+         QoRatLALCYfSKZ16rvbWhlZQIHgSMTkParJuaZqDcgJ4PgirdHkxCZw2l+rHl+YmX3Is
+         N+zYzWrkhdqjq3iLquzrf2I/g5uO8gp0Dum6q79O6lQZqB8Mhg57bF0/eVonb0ei0PHX
+         LrrytcETwvvVrv0MRL+Tqba260lsT0MvBvrReQjkzqLubvcM9TWXqHuOg1JM0nj1eKF0
+         1vHQBZU8/U+TzeEDOuQB+Yz7UQKpGfpoHbaFAxPEsKH0yVIRoiDtqKgJKCqrJHuMk4ab
+         xJ+Q==
+X-Gm-Message-State: AOAM533lolTaK1TheEId0bdKlXqxYvU7ZuMU+k9qQ1/EpzUo+D5E0Apz
+        evjqZsRIMyvOdOSTh8YBR8sjcOq8e0SN1oQECJJALQ==
+X-Google-Smtp-Source: ABdhPJxSX/N/OBaPWataxe8f7C/8UA4YyOws9Udkg9tB+MjsWXVgKMGfJd5zUxPlMjvU6XV3jv/PVlgrCvTkFoyV5Jc=
+X-Received: by 2002:a05:6512:3092:b0:44a:e7bb:e961 with SMTP id
+ z18-20020a056512309200b0044ae7bbe961mr314645lfd.190.1649091843129; Mon, 04
+ Apr 2022 10:04:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220404061948.2111820-8-masahiroy@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20220402130014.1417773-1-masahiroy@kernel.org> <20220402130014.1417773-2-masahiroy@kernel.org>
+In-Reply-To: <20220402130014.1417773-2-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 4 Apr 2022 10:03:51 -0700
+Message-ID: <CAKwvOd=r4JQ0p1xRix934oTaF-7zQJiaNo7Er7ExH0_R3AnmZw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] modpost: move export_from_secname() call to more
+ relevant place
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
+On Sat, Apr 2, 2022 at 6:00 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> The value returned by export_from_secname() is only used by
+> sym_add_exported().
+>
+> Move export_from_secname() just above sym_add_exported().
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-I love your patch! Perhaps something to improve:
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on linux/master v5.18-rc1 next-20220404]
-[cannot apply to soc/for-next drm/drm-next powerpc/next uclinux-h8/h8300-next s390/features arnd-asm-generic/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+> ---
+>
+>  scripts/mod/modpost.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 194ca9083c7a..f9e54247ae1d 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -684,12 +684,8 @@ static void handle_modversion(const struct module *mod,
+>  static void handle_symbol(struct module *mod, struct elf_info *info,
+>                           const Elf_Sym *sym, const char *symname)
+>  {
+> -       enum export export;
+>         const char *name;
+>
+> -       if (strstarts(symname, "__ksymtab"))
+> -               export = export_from_secname(info, get_secindex(info, sym));
+> -
+>         switch (sym->st_shndx) {
+>         case SHN_COMMON:
+>                 if (strstarts(symname, "__gnu_lto_")) {
+> @@ -724,7 +720,11 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
+>         default:
+>                 /* All exported symbols */
+>                 if (strstarts(symname, "__ksymtab_")) {
+> +                       enum export export;
+> +
+>                         name = symname + strlen("__ksymtab_");
+> +                       export = export_from_secname(info,
+> +                                                    get_secindex(info, sym));
+>                         sym_add_exported(name, mod, export);
+>                 }
+>                 if (strcmp(symname, "init_module") == 0)
+> --
+> 2.32.0
+>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Masahiro-Yamada/UAPI-make-more-exported-headers-self-contained-and-put-them-into-test-coverage/20220404-142226
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git be2d3ecedd9911fbfd7e55cc9ceac5f8b79ae4cf
-config: arm-randconfig-r016-20220404 (https://download.01.org/0day-ci/archive/20220404/202204042058.5Kr6q6YX-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c4a1b07d0979e7ff20d7d541af666d822d66b566)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm cross compiling tool for clang build
-        # apt-get install binutils-arm-linux-gnueabi
-        # https://github.com/intel-lab-lkp/linux/commit/e8154d995f34b79843e473d85645fb543d554e7f
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Masahiro-Yamada/UAPI-make-more-exported-headers-self-contained-and-put-them-into-test-coverage/20220404-142226
-        git checkout e8154d995f34b79843e473d85645fb543d554e7f
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/misc/ sound/soc/fsl/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> drivers/misc/fastrpc.c:1639:43: warning: format specifies type 'unsigned long' but the argument has type 'uintptr_t' (aka 'unsigned int') [-Wformat]
-                   dev_dbg(dev, "unmmap\tpt 0x%09lx OK\n", buf->raddr);
-                                              ~~~~~        ^~~~~~~~~~
-                                              %09x
-   include/linux/dev_printk.h:163:47: note: expanded from macro 'dev_dbg'
-                   dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
-                                                       ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:129:34: note: expanded from macro 'dev_printk'
-                   _dev_printk(level, dev, fmt, ##__VA_ARGS__);            \
-                                           ~~~    ^~~~~~~~~~~
-   drivers/misc/fastrpc.c:1645:46: warning: format specifies type 'unsigned long' but the argument has type 'uintptr_t' (aka 'unsigned int') [-Wformat]
-                   dev_err(dev, "unmmap\tpt 0x%09lx ERROR\n", buf->raddr);
-                                              ~~~~~           ^~~~~~~~~~
-                                              %09x
-   include/linux/dev_printk.h:144:65: note: expanded from macro 'dev_err'
-           dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
-                                                                  ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:110:23: note: expanded from macro 'dev_printk_index_wrap'
-                   _p_func(dev, fmt, ##__VA_ARGS__);                       \
-                                ~~~    ^~~~~~~~~~~
-   drivers/misc/fastrpc.c:1737:3: warning: format specifies type 'unsigned long' but the argument has type 'uintptr_t' (aka 'unsigned int') [-Wformat]
-                   buf->raddr, buf->size);
-                   ^~~~~~~~~~
-   include/linux/dev_printk.h:163:47: note: expanded from macro 'dev_dbg'
-                   dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
-                                                       ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:129:34: note: expanded from macro 'dev_printk'
-                   _dev_printk(level, dev, fmt, ##__VA_ARGS__);            \
-                                           ~~~    ^~~~~~~~~~~
-   3 warnings generated.
---
->> sound/soc/fsl/imx-audmux.c:148:40: warning: format specifies type 'unsigned long' but the argument has type 'uintptr_t' (aka 'unsigned int') [-Wformat]
-                   snprintf(buf, sizeof(buf), "ssi%lu", i);
-                                                  ~~~   ^
-                                                  %u
-   1 warning generated.
-
-
-vim +1639 drivers/misc/fastrpc.c
-
-6c16fd8bdd4058 Jeya R              2022-02-14  1604  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1605  static int fastrpc_req_munmap_impl(struct fastrpc_user *fl,
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1606  				   struct fastrpc_req_munmap *req)
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1607  {
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1608  	struct fastrpc_invoke_args args[1] = { [0] = { 0 } };
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1609  	struct fastrpc_buf *buf, *b;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1610  	struct fastrpc_munmap_req_msg req_msg;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1611  	struct device *dev = fl->sctx->dev;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1612  	int err;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1613  	u32 sc;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1614  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1615  	spin_lock(&fl->lock);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1616  	list_for_each_entry_safe(buf, b, &fl->mmaps, node) {
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1617  		if ((buf->raddr == req->vaddrout) && (buf->size == req->size))
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1618  			break;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1619  		buf = NULL;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1620  	}
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1621  	spin_unlock(&fl->lock);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1622  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1623  	if (!buf) {
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1624  		dev_err(dev, "mmap not in list\n");
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1625  		return -EINVAL;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1626  	}
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1627  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1628  	req_msg.pgid = fl->tgid;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1629  	req_msg.size = buf->size;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1630  	req_msg.vaddr = buf->raddr;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1631  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1632  	args[0].ptr = (u64) (uintptr_t) &req_msg;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1633  	args[0].length = sizeof(req_msg);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1634  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1635  	sc = FASTRPC_SCALARS(FASTRPC_RMID_INIT_MUNMAP, 1, 0);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1636  	err = fastrpc_internal_invoke(fl, true, FASTRPC_INIT_HANDLE, sc,
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1637  				      &args[0]);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1638  	if (!err) {
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09 @1639  		dev_dbg(dev, "unmmap\tpt 0x%09lx OK\n", buf->raddr);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1640  		spin_lock(&fl->lock);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1641  		list_del(&buf->node);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1642  		spin_unlock(&fl->lock);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1643  		fastrpc_buf_free(buf);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1644  	} else {
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1645  		dev_err(dev, "unmmap\tpt 0x%09lx ERROR\n", buf->raddr);
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1646  	}
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1647  
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1648  	return err;
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1649  }
-2419e55e532de1 Jorge Ramirez-Ortiz 2019-10-09  1650  
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Thanks,
+~Nick Desaulniers
