@@ -2,117 +2,99 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20356C43219
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16BCC433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379583AbiDDV2m (ORCPT
+        id S1358888AbiDDV2k (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Apr 2022 17:28:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
+        Mon, 4 Apr 2022 17:28:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379403AbiDDRGC (ORCPT
+        with ESMTP id S1379583AbiDDRgc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Apr 2022 13:06:02 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 286AE40A22
-        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:04:06 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id d5so18458793lfj.9
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:04:06 -0700 (PDT)
+        Mon, 4 Apr 2022 13:36:32 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E0B2898F
+        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:34:36 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id j8so8710721pll.11
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:34:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=J334O5uYapL/nSov6BZAzFIp7kzwsiEjIccb8+5N22c=;
-        b=f07uA2nRdSeYaV6J0y8FPL4bPtqDnXuBCANsO8bx0j7F5mJV3d8FyIxuXDZ9mY5LHa
-         GoDjtp8ZFIHxrYd+1KbhjEWgk6q38scATXBkxvTL5bimRO/FxE7oFoKFaFK5u1UPQjhh
-         yEM/yzy4sxr3ObXCNh3tJOi5lsE6MzpZKvwQ1xVizV3wq1ht6lmCPkB336REFQ2Da/8i
-         uAoPQcV5M7F2YHxdHjtPSeiYJBFRtF8s3C/Hk27Qb+29HmpBV0Cj8mXRMJnMoHGZmClv
-         rJJSSIdGGvoR7Lz/ratpwdJS1KfBOdXQfV3LiCnu9zg8jpoJMcCfwSKIEUJWD8/vEuqq
-         NP0w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=V1fiQ+TpCWz9aW9batEAHSpfr5r9dyK3Q/lTwaH3lR0=;
+        b=n5mRgSQ8y20acZ/nK6OhYxxGJzwZSGfgcaIV5gwWcarOIpZUaCExb23hDcba/FfujR
+         xFNvpv34nq2Hj6fGtwvQQenG/CsfvSWly7w85pOa2sG503FmKvshqI9P5cFMoVE3Aar/
+         UQu5P8WN1WRQr6qVnpL2fGXvjFr5cmxhUxxebpUNcv68zXidJPUkPwuQpB2cgSdry9M0
+         eLkTMCOhfou4kVQgZxaauYZqxvKoMSlmivMsJ7IiJDCkOcBgoxX2LkJHmM3A/XGrPuQZ
+         2pPiCkDFuX+TqlPuqM3RY9B1nPG/O5uu9L/f2k9jXWu9RJ6qGXKz05KdOk77e14RcYjY
+         VMzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=J334O5uYapL/nSov6BZAzFIp7kzwsiEjIccb8+5N22c=;
-        b=4MLkIIIXuQKg6ndXFrvJ3JtY6EN19ILL0u78A247bU+jP6HAHkRH1sFJje7gy/SGFB
-         QoRatLALCYfSKZ16rvbWhlZQIHgSMTkParJuaZqDcgJ4PgirdHkxCZw2l+rHl+YmX3Is
-         N+zYzWrkhdqjq3iLquzrf2I/g5uO8gp0Dum6q79O6lQZqB8Mhg57bF0/eVonb0ei0PHX
-         LrrytcETwvvVrv0MRL+Tqba260lsT0MvBvrReQjkzqLubvcM9TWXqHuOg1JM0nj1eKF0
-         1vHQBZU8/U+TzeEDOuQB+Yz7UQKpGfpoHbaFAxPEsKH0yVIRoiDtqKgJKCqrJHuMk4ab
-         xJ+Q==
-X-Gm-Message-State: AOAM533lolTaK1TheEId0bdKlXqxYvU7ZuMU+k9qQ1/EpzUo+D5E0Apz
-        evjqZsRIMyvOdOSTh8YBR8sjcOq8e0SN1oQECJJALQ==
-X-Google-Smtp-Source: ABdhPJxSX/N/OBaPWataxe8f7C/8UA4YyOws9Udkg9tB+MjsWXVgKMGfJd5zUxPlMjvU6XV3jv/PVlgrCvTkFoyV5Jc=
-X-Received: by 2002:a05:6512:3092:b0:44a:e7bb:e961 with SMTP id
- z18-20020a056512309200b0044ae7bbe961mr314645lfd.190.1649091843129; Mon, 04
- Apr 2022 10:04:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220402130014.1417773-1-masahiroy@kernel.org> <20220402130014.1417773-2-masahiroy@kernel.org>
-In-Reply-To: <20220402130014.1417773-2-masahiroy@kernel.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=V1fiQ+TpCWz9aW9batEAHSpfr5r9dyK3Q/lTwaH3lR0=;
+        b=TaZJjijiRAwYLRyR60vAgDFokkR1iiypoj7EiXMfMoAtf3UoptsCmBsVj74b24+1VV
+         RLIA2bIs1GMs4A/PbHjQ0MkTDXSNPM7i39MQeRpPo2JPN5ZuuV7nJihkEO89/qEt4tjP
+         q8BBbLgpQjiNCNydEFniy+1yeiRTIl3GxlpACDs9WSNPVZCu+yY1qgFOxIg2UidEZp5B
+         2cAG0mOx2sxkZ88j1BbHEyHnAxYcOV5P6jFvSAv6VBAdPho0D+pcPzn8yYw/2PcONHy3
+         ttS5i36w8NPE80J8Z+BSBbc1D708WPiJKYioK+s5+Q+hSBEGY9c52QBSNV0KyJBIA2Mp
+         AgCA==
+X-Gm-Message-State: AOAM5302vP8AFpcU8TyRSK2YC+KbaxuxYXFa1jv/v9Rwl11ACEBZRQEd
+        J1QcuC0AfcFveMMdmVlUFTgQ6g==
+X-Google-Smtp-Source: ABdhPJwHq/HMWfqJNWl3Tmj7ZD7tbsm4BjEdWB/ICSYcy3kVA2KslfNYCV0z25OGCfSV48YcTJj1nA==
+X-Received: by 2002:a17:903:20c:b0:154:b58:d424 with SMTP id r12-20020a170903020c00b001540b58d424mr704902plh.45.1649093675449;
+        Mon, 04 Apr 2022 10:34:35 -0700 (PDT)
+Received: from google.com ([2620:15c:211:202:9d5:9b93:ffb4:574a])
+        by smtp.gmail.com with ESMTPSA id f66-20020a62db45000000b004fa8a7b8ad3sm12748136pfg.77.2022.04.04.10.34.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 10:34:34 -0700 (PDT)
+Date:   Mon, 4 Apr 2022 10:34:27 -0700
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 4 Apr 2022 10:03:51 -0700
-Message-ID: <CAKwvOd=r4JQ0p1xRix934oTaF-7zQJiaNo7Er7ExH0_R3AnmZw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] modpost: move export_from_secname() call to more
- relevant place
 To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 2/8] kbuild: prevent exported headers from including
+ <stdlib.h>, <stdbool.h>
+Message-ID: <YkssI2uDHRq41zjw@google.com>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+ <20220404061948.2111820-3-masahiroy@kernel.org>
+ <YkqhQhJIQEL2qh8C@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkqhQhJIQEL2qh8C@infradead.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Apr 2, 2022 at 6:00 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> The value returned by export_from_secname() is only used by
-> sym_add_exported().
->
-> Move export_from_secname() just above sym_add_exported().
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Mon, Apr 04, 2022 at 12:41:54AM -0700, Christoph Hellwig wrote:
+> On Mon, Apr 04, 2022 at 03:19:42PM +0900, Masahiro Yamada wrote:
+> > If we can make kernel headers self-contained (that is, none of exported
+> > kernel headers includes system headers), we will be able to add the
+> > -nostdinc flag, but that is much far from where we stand now.
 
-Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+This is something I'd like to see done. IMO, the kernel headers should
+be the independent variable of which the libc is the dependendent
+variable.
 
-> ---
->
->  scripts/mod/modpost.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 194ca9083c7a..f9e54247ae1d 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -684,12 +684,8 @@ static void handle_modversion(const struct module *mod,
->  static void handle_symbol(struct module *mod, struct elf_info *info,
->                           const Elf_Sym *sym, const char *symname)
->  {
-> -       enum export export;
->         const char *name;
->
-> -       if (strstarts(symname, "__ksymtab"))
-> -               export = export_from_secname(info, get_secindex(info, sym));
-> -
->         switch (sym->st_shndx) {
->         case SHN_COMMON:
->                 if (strstarts(symname, "__gnu_lto_")) {
-> @@ -724,7 +720,11 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
->         default:
->                 /* All exported symbols */
->                 if (strstarts(symname, "__ksymtab_")) {
-> +                       enum export export;
-> +
->                         name = symname + strlen("__ksymtab_");
-> +                       export = export_from_secname(info,
-> +                                                    get_secindex(info, sym));
->                         sym_add_exported(name, mod, export);
->                 }
->                 if (strcmp(symname, "init_module") == 0)
-> --
-> 2.32.0
->
+Android's libc, Bionic, is making use of the UAPI headers. They are
+doing some rewriting of UAPI headers, but I'd like to see what needs to
+be upstreamed from there. I just noticed
+include/uapi/linux/libc-compat.h, which seems like a good place for such
+compat related issues.
 
+In particular, having UAPI_HEADER_TESTS depend on CC_CAN_LINK is
+something I think we can works towards removing. The header tests
+themselves don't link; they force a dependency on a prebuilt libc
+sysroot, and they only need the headers from the sysroot because of this
+existing circular dependency between kernel headers and libc headers.
 
--- 
-Thanks,
-~Nick Desaulniers
+I'd be happy to be explicitly cc'ed on changes like this series, going
+forward. Masahiro, if there's parts you'd like me to help with besides
+just code review, please let me know how I can help.
+
+> 
+> What is still missing for that?
