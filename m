@@ -2,93 +2,129 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90BBAC433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5338C4332F
+	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242067AbiDEOLv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 10:11:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34032 "EHLO
+        id S242709AbiDEOL6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Apr 2022 10:11:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384129AbiDEM1M (ORCPT
+        with ESMTP id S1381370AbiDEMya (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 08:27:12 -0400
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2F60574BE;
-        Tue,  5 Apr 2022 04:35:18 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 235BYCGo000464;
-        Tue, 5 Apr 2022 20:34:14 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 235BYCGo000464
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649158454;
-        bh=8ckilN9UB4blZbcYmDCNzJh4V9ShLvfJ5JTGztZasQY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bFVtcHGeE5Sc3eTAlXo6PVCIP1lQHMaFttQj3YsSu9T5CzBWdWQJEj0QpycKNUzYl
-         46pD8XVdwiOiF3Y1DHkLOP+KBMu75pTvVBBzIz6rcHlIE/g+lvDF06y2o7zJEWgqQL
-         G33sfKrOMLXJ8zXmee9CDbYX3RwuLoAGnml/s1RvJ6E9079yf9JV41GaS6JB3mfK7J
-         sgY4590M0WGPIn5AtY6WLQZJYnsYL5YNOba1SgrtgABViXTPbOhe4k8qXb4mCczSdW
-         iy1UMIAHz7NqL9DR1VG9skM9amXj4MHQ7H06IOlnbqL4z9tsMOIvU324KbQ2CCNdev
-         XvOZYwYkBDfwg==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 02/10] kbuild: do not remove empty *.symtypes explicitly
-Date:   Tue,  5 Apr 2022 20:33:50 +0900
-Message-Id: <20220405113359.2880241-3-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405113359.2880241-1-masahiroy@kernel.org>
-References: <20220405113359.2880241-1-masahiroy@kernel.org>
+        Tue, 5 Apr 2022 08:54:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A727929CAA
+        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 04:57:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649159875;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4tf5cml5DKG34+H+/7P2EmXNj5BSxC+Di2E2isNkLxI=;
+        b=en4YBQCHvkYBN4SIWnA1KZxiwUcwRl6eDizBNbd7KaJAKk8SHO89C6j0vdQ5SevWf1oiDT
+        kZybj9pJTD1ZSGVumcHfD5G8O1Yyb5V54SPUQDIJnoasAsLlH4N0scsTweaWly6DEHDp3p
+        nAhypvbbbhjmg3Ofuix7hwJ9tyuaL4U=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-gKNzK15wOWOL7Q6PDtE0Yw-1; Tue, 05 Apr 2022 07:57:54 -0400
+X-MC-Unique: gKNzK15wOWOL7Q6PDtE0Yw-1
+Received: by mail-wm1-f70.google.com with SMTP id bg8-20020a05600c3c8800b0038e6a989925so1933001wmb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 04:57:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4tf5cml5DKG34+H+/7P2EmXNj5BSxC+Di2E2isNkLxI=;
+        b=OPfOYNm/MXhePIEaAXhghpy86YzCCsKkdOdx4l2uDG4cXsR2DTnrmgWqIePzAEIaKQ
+         GSjT4MvceSeIoQ+e+5pUblEKopWmUMzH2eRg1LsIFa2EhyDj53DRvEuP4VYfmY/IgtDA
+         xHyWAPMAaiBYfKxaYcxG+rJ4XgWOcLsJpqNbaCvfgyNmVJJGK1WNHBjF+ZqdYYYj9zUf
+         dTD4LJxJmY3Y1sKe+LB17wPTiqPobtqgh1kCsycuyxkoATOU69QJZXFQuFUsqcXs00mk
+         nC0G9r5Gh9j6C6ZYScKo41At2Y2bLDqw+M6z868M5LjjJMjVgutxONpJTTprFGSilV8f
+         hl6A==
+X-Gm-Message-State: AOAM533WBRxFxMz7jRZ22v51C21dkQV672GUzVVbAFpAlkuFOKELPMCF
+        N9Zz5iLaDvWZqd6guiYheSCH43vEjTRcXAUMymDAbidYjHJJ4YLY+2yfy6vP11UM7NtC2aZAlKs
+        5Y8fa9sWqBKx1XooSaCV0ANtp
+X-Received: by 2002:adf:8050:0:b0:206:40a:a770 with SMTP id 74-20020adf8050000000b00206040aa770mr2535501wrk.380.1649159873349;
+        Tue, 05 Apr 2022 04:57:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzgqTZayIX4u/UnvkTDHW17PSUoPyzp3WUxX6v1B27xgUyGVSxDLohCf9WBiOzGI5DL0p4UMA==
+X-Received: by 2002:adf:8050:0:b0:206:40a:a770 with SMTP id 74-20020adf8050000000b00206040aa770mr2535488wrk.380.1649159873090;
+        Tue, 05 Apr 2022 04:57:53 -0700 (PDT)
+Received: from redhat.com ([2.52.17.211])
+        by smtp.gmail.com with ESMTPSA id f11-20020a7bcc0b000000b0037e0c362b6dsm1992438wmh.31.2022.04.05.04.57.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Apr 2022 04:57:52 -0700 (PDT)
+Date:   Tue, 5 Apr 2022 07:57:49 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [PATCH 8/8] virtio_ring.h: do not include <stdint.h> from
+ exported header
+Message-ID: <20220405075738-mutt-send-email-mst@kernel.org>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+ <20220404061948.2111820-9-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220404061948.2111820-9-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Presumably, 'test -s $@ || rm -f $@' intends to remove the output when
-the genksyms command fails.
+On Mon, Apr 04, 2022 at 03:19:48PM +0900, Masahiro Yamada wrote:
+> Arnd mentioned a limitation when including <stdint.h> from UAPI
+> headers. [1]
+> 
+> Besides, I'd like exported headers to be as compliant with the
+> traditional C as possible.
+> 
+> In fact, the UAPI headers are compile-tested with -std=c90 (see
+> usr/include/Makefile) even though the kernel itself is now built
+> with -std=gnu11.
+> 
+> Currently, include/uapi/linux/virtio_ring.h includes <stdint.h>
+> presumably because it uses uintptr_t.
+> 
+> Replace it with __kernel_uintptr_t, and stop including <stdint.h>.
+> 
+> [1]: https://lore.kernel.org/all/CAK8P3a0bz8XYJOsmND2=CT_oTDmGMJGaRo9+QMroEhpekSMEaQ@mail.gmail.com/
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-It is unneeded because .DELETE_ON_ERROR automatically removes the output
-on failure.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
-Changes in v2:
-  - Fix accidental drop of '> /dev/null'
-
- scripts/Makefile.build | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 31e0e33dfe5d..3ef2373f0a57 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -135,9 +135,7 @@ genksyms = scripts/genksyms/genksyms		\
- cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
- 
- quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
--cmd_cc_symtypes_c =                                                         \
--    $(call cmd_gensymtypes_c,true,$@) >/dev/null;                           \
--    test -s $@ || rm -f $@
-+      cmd_cc_symtypes_c = $(call cmd_gensymtypes_c,true,$@) >/dev/null
- 
- $(obj)/%.symtypes : $(src)/%.c FORCE
- 	$(call cmd,cc_symtypes_c)
-@@ -348,9 +346,7 @@ cmd_gensymtypes_S =                                                         \
-     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
- 
- quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
--cmd_cc_symtypes_S =                                                         \
--    $(call cmd_gensymtypes_S,true,$@) >/dev/null;                           \
--    test -s $@ || rm -f $@
-+      cmd_cc_symtypes_S = $(call cmd_gensymtypes_S,true,$@) >/dev/null
- 
- $(obj)/%.symtypes : $(src)/%.S FORCE
- 	$(call cmd,cc_symtypes_S)
--- 
-2.32.0
+> ---
+> 
+>  include/uapi/linux/virtio_ring.h | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virtio_ring.h
+> index 476d3e5c0fe7..6329e4ff35f4 100644
+> --- a/include/uapi/linux/virtio_ring.h
+> +++ b/include/uapi/linux/virtio_ring.h
+> @@ -31,9 +31,7 @@
+>   * SUCH DAMAGE.
+>   *
+>   * Copyright Rusty Russell IBM Corporation 2007. */
+> -#ifndef __KERNEL__
+> -#include <stdint.h>
+> -#endif
+> +
+>  #include <linux/types.h>
+>  #include <linux/virtio_types.h>
+>  
+> @@ -196,7 +194,7 @@ static inline void vring_init(struct vring *vr, unsigned int num, void *p,
+>  	vr->num = num;
+>  	vr->desc = p;
+>  	vr->avail = (struct vring_avail *)((char *)p + num * sizeof(struct vring_desc));
+> -	vr->used = (void *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
+> +	vr->used = (void *)(((__kernel_uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
+>  		+ align-1) & ~(align - 1));
+>  }
+>  
+> -- 
+> 2.32.0
+> 
+> 
 
