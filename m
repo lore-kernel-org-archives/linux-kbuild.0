@@ -2,94 +2,127 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B37BC4167D
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B03C4321E
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442115AbiDFAmR (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52738 "EHLO
+        id S229797AbiDFAmB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Apr 2022 20:42:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444188AbiDEPk7 (ORCPT
+        with ESMTP id S1344894AbiDEUVu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:40:59 -0400
-Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99939117C;
-        Tue,  5 Apr 2022 07:03:31 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8K021295;
-        Tue, 5 Apr 2022 23:02:48 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8K021295
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167368;
-        bh=8ckilN9UB4blZbcYmDCNzJh4V9ShLvfJ5JTGztZasQY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mY6yJ0bcFyc31gsjkbO/eUW6UNMRDhZ/vih7O5ZT3Se2kpUukdNoJOH6wN0wbISoi
-         2nqN4DVb1p78+JOukCm9A7rA5rLjRnfpOuH3M1DWOFSpLKrcVlJuqTpbon7I78aRMB
-         5A+d9XUeASWwLF17FcaW0blC2VECkPfbzA77FZNeBrVPWOHwZxUHZG/OpVCarbDhj6
-         IYgFvJqdAMs6McqDC8mEYcBtOHMjQyLNZx3Bij+H0p4WtugCNMxPAqKA6DOfkQpEgj
-         VDIoMtXlXCC4J7lwPxJEslobIQjv9vQ0/C8UbMQ06G+RM3tM1/7lxCRNiv7NuaUtY2
-         mzu5opxy01K+A==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
+        Tue, 5 Apr 2022 16:21:50 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8730B6D1BB;
+        Tue,  5 Apr 2022 13:01:22 -0700 (PDT)
+Received: from leknes.fjasle.eu ([46.142.97.95]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MLAAs-1nKqR22ZFa-00IBZv; Tue, 05 Apr 2022 22:00:46 +0200
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id AB29A3C088; Tue,  5 Apr 2022 22:00:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
+        t=1649188842; bh=Jp5v0unMM8TX1zb3fmwvi3+6Bc6OHGfiq1HG+GUHVyw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HCnghiuB+Wzr1v0Xj7rtxiS0alkX0ofzpVxIAQD6kCNeeJKrRBdzWsEoYLV4WdhGW
+         cK8WpcDjJixQEKeB9CidDTnKmCqBqfYq9K7JWqmuDdZOl3byBsD6cAH/2nOkdkLUED
+         CfyTrc2leT65LiIFaSS13YAg+nRUACsIHfjO8BR8=
+Date:   Tue, 5 Apr 2022 22:00:39 +0200
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 02/10] kbuild: do not remove empty *.symtypes explicitly
-Date:   Tue,  5 Apr 2022 23:02:21 +0900
-Message-Id: <20220405140229.2895394-3-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
-References: <20220405140229.2895394-1-masahiroy@kernel.org>
+Subject: Re: [PATCH v2 01/10] kbuild: factor out genksyms command from
+ cmd_gensymtypes_{c,S}
+Message-ID: <Ykyf51yQ78g71veR@fjasle.eu>
+References: <20220405113359.2880241-1-masahiroy@kernel.org>
+ <20220405113359.2880241-2-masahiroy@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220405113359.2880241-2-masahiroy@kernel.org>
+X-Provags-ID: V03:K1:oSARpcPyymoleg6RyJVu0DeVUrsJvspIYHiB+agK3g3YJzi5n23
+ 863JDClt1QRA49iVriE0QcZMU2v6b2K7KfzkkuLmqLyAIpGbVwpjHjseVGhwynDWQrbQYC4
+ I2OVQYgcg/LNYPEPv+xs66YzmYkcsrmOiR+7fJxqGB0+W81LWCfk8CGxLJHYumkD35jqqA8
+ aeaGGVTrYnv7TOF/G7Fvw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:N/nJZWxHmG4=:MQI6zQKrjr6jugH0+jpOEF
+ wzao4WqD3FuYGxHoo/ydg8lwOgcOEQ6JkPuJyfgyweswbZnCO9LIRW0L4pPTYjI19WEcRrpsD
+ ivMrK1eDaO5zabhjp8FvzcZrJ59SmEvp730GNA5kfCKbBBwK6UV0lqW29w7Cf+BfeS7rvC3ek
+ 8oj9iMH/Vk32LfhsDOxY5NG4jR8sUv6YJF7Rd964q9pm1YPYEEdhgLfN4z1KXflWtl4h0jhQ8
+ uS0ThIRnvDkkyqUWpare0mu446VGCw5SGpxXnQv0AC+diuKT55QQMSER4sVTbjLe/vMx3XISZ
+ QKppKbLZeCyN22CoZRhmoa9PUXCI392eEfn4yMj754Cd2o/tlklwvVCEbK2UtdSvIlV/0nthb
+ Zi66yxUV4TvymjT+kBVhRDn58REIHUAuvv9EPH8ro7GJ29dkRMHfNjasqGaMCQGO7k41zaAuT
+ l3UOMnoJ8zTqBERxEYDgjH+e3xqyQXX9wNLrMB+LL1HvtNCXLUkJ68UF7dX6s5lnC62OPi0d0
+ 5JqKTNZqfPp7yreDWBx8j7o7IqP6O1Uu9m7r9r7xJYkj6DNcqpHW2EfGbVqCL5MZV8ia5WneA
+ TbidzkC/Eg2rK6qiVBYz8hl5H687jYGCdL0QOGMBhDp3JATWZ5hP9s4LxYiMc20Pq8JGl1JnQ
+ 6UoThxkOHeOo8y3i3cJe6sGGWH1QLn6GL0O9mvoIHYBlatqByOkRRkC5AIRUUnw1NZe0=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Presumably, 'test -s $@ || rm -f $@' intends to remove the output when
-the genksyms command fails.
+On Tue, Apr 05, 2022 at 08:33:49PM +0900 Masahiro Yamada wrote:
+> The genksyms command part in cmd_gensymtypes_{c,S} is duplicated.
+> Factor it out into the 'genksyms' macro.
+> 
+> For the readability, I slightly refactor the arguments to genksyms.
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 
-It is unneeded because .DELETE_ON_ERROR automatically removes the output
-on failure.
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+> 
+> Changes in v2:
+>   - Fix the location of the closing parenthesis
+> 
+>  scripts/Makefile.build | 19 ++++++++-----------
+>  1 file changed, 8 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 9717e6f6fb31..31e0e33dfe5d 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -125,13 +125,14 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
+>  $(obj)/%.i: $(src)/%.c FORCE
+>  	$(call if_changed_dep,cpp_i_c)
+>  
+> +genksyms = scripts/genksyms/genksyms		\
+> +	$(if $(1), -T $(2))			\
+> +	$(if $(CONFIG_MODULE_REL_CRCS), -R)	\
+> +	$(if $(KBUILD_PRESERVE), -p)		\
+> +	-r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
+> +
+>  # These mirror gensymtypes_S and co below, keep them in synch.
+> -cmd_gensymtypes_c =                                                         \
+> -    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+> -     $(if $(KBUILD_PRESERVE),-p)                                            \
+> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+> +cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
+>  
+>  quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
+>  cmd_cc_symtypes_c =                                                         \
+> @@ -344,11 +345,7 @@ cmd_gensymtypes_S =                                                         \
+>      $(CPP) $(a_flags) $< |                                                  \
+>       grep "\<___EXPORT_SYMBOL\>" |                                          \
+>       sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
+> -    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+> -     $(if $(KBUILD_PRESERVE),-p)                                            \
+> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+> +    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
+>  
+>  quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
+>  cmd_cc_symtypes_S =                                                         \
+> -- 
+> 2.32.0
+> 
+> 
 
-Changes in v2:
-  - Fix accidental drop of '> /dev/null'
-
- scripts/Makefile.build | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 31e0e33dfe5d..3ef2373f0a57 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -135,9 +135,7 @@ genksyms = scripts/genksyms/genksyms		\
- cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
- 
- quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
--cmd_cc_symtypes_c =                                                         \
--    $(call cmd_gensymtypes_c,true,$@) >/dev/null;                           \
--    test -s $@ || rm -f $@
-+      cmd_cc_symtypes_c = $(call cmd_gensymtypes_c,true,$@) >/dev/null
- 
- $(obj)/%.symtypes : $(src)/%.c FORCE
- 	$(call cmd,cc_symtypes_c)
-@@ -348,9 +346,7 @@ cmd_gensymtypes_S =                                                         \
-     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
- 
- quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
--cmd_cc_symtypes_S =                                                         \
--    $(call cmd_gensymtypes_S,true,$@) >/dev/null;                           \
--    test -s $@ || rm -f $@
-+      cmd_cc_symtypes_S = $(call cmd_gensymtypes_S,true,$@) >/dev/null
- 
- $(obj)/%.symtypes : $(src)/%.S FORCE
- 	$(call cmd,cc_symtypes_S)
 -- 
-2.32.0
-
+epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+↳ gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+     -- frykten for herren er opphav til kunnskap --
