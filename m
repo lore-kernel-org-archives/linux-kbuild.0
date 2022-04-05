@@ -2,152 +2,99 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089C0C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2E2C4332F
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1837051AbiDFAnr (ORCPT
+        id S1837059AbiDFAnz (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49030 "EHLO
+        Tue, 5 Apr 2022 20:43:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1457762AbiDEQot (ORCPT
+        with ESMTP id S1444197AbiDEPlA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 12:44:49 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3F8DFFBD
-        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 09:42:50 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id h7so24291587lfl.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 09:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aVM16YtaCx1dYir94c9sxYwusYmuTqkX1MFty8IIFQk=;
-        b=YtUkRUgQkrt4P9V69iJ32ka9iOIb/+ccGqqjKVsR0c1fQHRSqVXLh76rhQPtxYrQCD
-         5DaXMJOw2MWRhGn1MeMzYEpTNeRWYll4CT4rEwHMH0TxvHSr8B/3jPBrSjhoSQsirJmi
-         5aurdwzxud7rt4lGs2usfaHCr6txQI9A5WPlLs4NQ76cD/Fr9W23PUOTZhnP2omqEYCD
-         XRjiG4ekyp3R1/pKvDVhTm60f8jrwkqmXZkc22HTTUcUCURHBcw5vuNRMd1IWJF8Efn6
-         sUCQOWPkg0lN6dhJ8q06t3ztFR/uwcovxLZMbX5d3v/1PewPUohAn9mFXYCWyoQvXpds
-         YRsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aVM16YtaCx1dYir94c9sxYwusYmuTqkX1MFty8IIFQk=;
-        b=Zkmn7BpdnDZA/qBVL/T3wQfISwMvm61YWyMjGbZPs1+97zo/1tFkz5kbb9yduqV4Wm
-         tbsjX70xYJicCLHnyvBRtp/S/fKnDg3BrSSKBHwmRaAIRQvVOzIQ0gCKyb7AQtVtDFP1
-         GrSPGf0Abo3a7yll5xJwCUCkzo1t+bgJJyrm2tVTdcdv/MO9CoWSYVbWVred94s638Lz
-         JiwYiZ4x/ROuBq6RAgCMYpJgqUH3EZ3kZvVira3e8fEQWAvroVAsEz5nW1b56ah7s3JM
-         AuqQ6qqkO0OVd0B5mOgyIVQOeTwrqqGiMofRnpZq6+pJZ6SP09UuBZvYtYRiUJ2LKtOY
-         rFdA==
-X-Gm-Message-State: AOAM53293dLqZrKUWVAwTA75gY7nIiDdlLZNM5dz/cMHN1qquYEXNOLJ
-        KqU+2NvFWETseHfAA39MuPTgL3uMzW1Xw4eg6oNu9g==
-X-Google-Smtp-Source: ABdhPJz3jBIQ7EkEmj+tI9A+lIIYlFEORto6nxVAIbaEAMf4GKZe+IPBCCzl9LE/xhd2lQpRB76SurWFw5kPGx38Ono=
-X-Received: by 2002:a19:651d:0:b0:44a:b88a:b0b1 with SMTP id
- z29-20020a19651d000000b0044ab88ab0b1mr3373569lfb.380.1649176968442; Tue, 05
- Apr 2022 09:42:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220405113359.2880241-1-masahiroy@kernel.org> <20220405113359.2880241-10-masahiroy@kernel.org>
-In-Reply-To: <20220405113359.2880241-10-masahiroy@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 5 Apr 2022 09:42:36 -0700
-Message-ID: <CAKwvOd=oCivWGHLFLCuPeH1R-gKGRmsvg=NV5ZbSVhd13cqgSw@mail.gmail.com>
-Subject: Re: [PATCH v2 09/10] kbuild: refactor cmd_modversions_c
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tue, 5 Apr 2022 11:41:00 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBF19FDD;
+        Tue,  5 Apr 2022 07:03:32 -0700 (PDT)
+Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 235E2k8S021295;
+        Tue, 5 Apr 2022 23:02:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8S021295
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649167373;
+        bh=gVdAU8NgX5021NtvHRpFHdYK2UvqDo2vrSD9W1vtAMA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=PhOE2ae9fIcn+iE6wmVl+X+52M+ZpGzuuejgzQeNA82FMrm8qcrp8H59yUrXJtbqd
+         rmQ8fFkTz3uqsQMj9/GBq7UcbmhmO61lwTX+13sC4BpufctNk7f2NmgBnUpITcMWvs
+         0XlhF5RMllw7IAnUoFB3Sc1DMw3GOzcMldoBDxc7+E/oTl3b9AZjaDYQjhRTOuKFlo
+         1vj8E5kUu344sGyN2kCeDHq4uQAnNk5DExN9IQzbcK1U+hJB7qH13v4fgawHeCjM24
+         +fi008rk5IzfWEfs6wxshYa9yFonQTn44PvW2Wiads0surwC9BHDA7viAQp+9rXEm4
+         WBrmrSN83ww7w==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <nathan@kernel.org>, llvm@lists.linux.dev,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2 10/10] kbuild: refactor cmd_modversions_S
+Date:   Tue,  5 Apr 2022 23:02:29 +0900
+Message-Id: <20220405140229.2895394-11-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
+References: <20220405140229.2895394-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Apr 5, 2022 at 4:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> cmd_modversions_c implements two parts; run genksyms to calculate CRCs
-> of exported symbols, run $(LD) to update the object with the CRCs. The
-> latter is not executed for CONFIG_LTO_CLANG=y since the object is not
-> ELF but LLVM bit code at this point.
->
-> The first part can be unified because we can always use $(NM) instead
-> of "$(OBJDUMP) -h" to dump the symbols.
->
-> Split the code into the two macros, cmd_gen_symversions_c and
-> cmd_modversions.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Split the code into two macros, cmd_gen_symversions_S for running
+genksyms, and cmd_modversions for running $(LD) to update the object
+with CRCs.
 
-Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> ---
->
-> Changes in v2:
->  - new
->
->  scripts/Makefile.build | 25 +++++++++++--------------
->  1 file changed, 11 insertions(+), 14 deletions(-)
->
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index d934bdf84de4..ba2be555f942 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -169,29 +169,25 @@ ifdef CONFIG_MODVERSIONS
->  #   the actual value of the checksum generated by genksyms
->  # o remove .tmp_<file>.o to <file>.o
->
-> -ifdef CONFIG_LTO_CLANG
->  # Generate .o.symversions files for each .o with exported symbols, and link these
->  # to the kernel and/or modules at the end.
-> -cmd_modversions_c =                                                            \
-> +gen_symversions =                                                              \
->         if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then                       \
-> -               $(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))  \
-> +               $(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
->                     > $@.symversions;                                           \
->         else                                                                    \
->                 rm -f $@.symversions;                                           \
-> -       fi;
-> -else
-> -cmd_modversions_c =                                                            \
-> -       if $(OBJDUMP) -h $@ | grep -q __ksymtab; then                           \
-> -               $(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))  \
-> -                   > $(@D)/.tmp_$(@F:.o=.ver);                                 \
-> -                                                                               \
-> +       fi
-> +
-> +cmd_gen_symversions_c =        $(call gen_symversions,c)
-> +
-> +cmd_modversions =                                                              \
-> +       if [ -r $@.symversions ]; then                                          \
->                 $(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@               \
-> -                       -T $(@D)/.tmp_$(@F:.o=.ver);                            \
-> +                       -T $@.symversions;                                      \
->                 mv -f $(@D)/.tmp_$(@F) $@;                                      \
-> -               rm -f $(@D)/.tmp_$(@F:.o=.ver);                                 \
->         fi
->  endif
-> -endif
->
->  ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
->  # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
-> @@ -269,7 +265,8 @@ define rule_cc_o_c
->         $(call cmd,checksrc)
->         $(call cmd,checkdoc)
->         $(call cmd,gen_objtooldep)
-> -       $(call cmd,modversions_c)
-> +       $(call cmd,gen_symversions_c)
-> +       $(if $(CONFIG_LTO_CLANG),,$(call cmd,modversions))
->         $(call cmd,record_mcount)
->  endef
->
-> --
-> 2.32.0
->
+Changes in v2:
+  - new
 
+ scripts/Makefile.build | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index ba2be555f942..58be0997c5dd 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -274,7 +274,8 @@ define rule_as_o_S
+ 	$(call cmd_and_fixdep,as_o_S)
+ 	$(call cmd,gen_ksymdeps)
+ 	$(call cmd,gen_objtooldep)
+-	$(call cmd,modversions_S)
++	$(call cmd,gen_symversions_S)
++	$(call cmd,modversions)
+ endef
+ 
+ # Built-in and composite module parts
+@@ -366,16 +367,8 @@ ifdef CONFIG_ASM_MODVERSIONS
+ # versioning matches the C process described above, with difference that
+ # we parse asm-prototypes.h C header to get function definitions.
+ 
+-cmd_modversions_S =								\
+-	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
+-		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+-		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+-										\
+-		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
+-			-T $(@D)/.tmp_$(@F:.o=.ver);				\
+-		mv -f $(@D)/.tmp_$(@F) $@;					\
+-		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+-	fi
++cmd_gen_symversions_S = $(call gen_symversions,S)
++
+ endif
+ 
+ $(obj)/%.o: $(src)/%.S FORCE
 -- 
-Thanks,
-~Nick Desaulniers
+2.32.0
+
