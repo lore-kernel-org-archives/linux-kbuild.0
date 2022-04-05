@@ -2,117 +2,85 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83863C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D231C4332F
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1457830AbiDFAng (ORCPT
+        id S1455960AbiDFAnb (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
+        Tue, 5 Apr 2022 20:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345072AbiDEUVv (ORCPT
+        with ESMTP id S1457634AbiDEQWt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 16:21:51 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BBE6D3AB;
-        Tue,  5 Apr 2022 13:02:18 -0700 (PDT)
-Received: from leknes.fjasle.eu ([46.142.97.95]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MowbA-1oLKrN1jnq-00qRec; Tue, 05 Apr 2022 22:01:47 +0200
-Received: by leknes.fjasle.eu (Postfix, from userid 1000)
-        id 9FC753C088; Tue,  5 Apr 2022 22:01:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
-        t=1649188905; bh=eY863nX6Wwm9mRLnYYO3fHmkdfyGXTQ/xmghOew0Aq8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GRzP/jC2U0TBV/y9qU7jvuyjvnYNFoVu+PaxXKHDnOPeAyPjiDMxtTbOpIXIPNOLm
-         Bw/nf5iOaa2bfd+QbCcESV5xXACBvrQsPqWBFhetN/pl+VIkWEKVeo+lcfu505zarQ
-         fVylTX0MSNyHbU9BEa5rF/WZBqw9gKHXCScljF/s=
-Date:   Tue, 5 Apr 2022 22:01:45 +0200
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH v2 02/10] kbuild: do not remove empty *.symtypes
- explicitly
-Message-ID: <YkygKePc7rP7PqRL@fjasle.eu>
-References: <20220405113359.2880241-1-masahiroy@kernel.org>
- <20220405113359.2880241-3-masahiroy@kernel.org>
+        Tue, 5 Apr 2022 12:22:49 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783EA68FB8;
+        Tue,  5 Apr 2022 09:20:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33847B81E76;
+        Tue,  5 Apr 2022 16:20:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C1895C385A5;
+        Tue,  5 Apr 2022 16:20:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649175648;
+        bh=9P0bvPQE7TMYUDS1QHIUxX2gPSQ2fjCXf7+fuJtJhZk=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=DuxV52lKFd1sgfEeUDu9tOfV6G4bvXzk2hAfEUif0dtsVbADNdPFBYFfsMNXTfLkv
+         VPz+SSuWPJiz/2Pt29cWiLakeKR0SIbLT84b2Pt3E8GKMocCT6NBf1+gMiUYSpZR1U
+         5ZrQH2eFiZTVw6Hwf/VR+BVKI8oRuthYG7GkA2B8QeH761kRvg1kukLjz/SiXVMT8k
+         ogt3jYFymRus/NVEDcAyE5tQwCYaN4j3V/CVD6nPyHAEBZ/PbhYFUHS/ZELeTrdjLp
+         4eNyIQomhhBu43ddy3oWEs94w4OA/uuD9XExE+t+c0XbjFvAE88gftmwPdqD5hhn7h
+         wLsEkzxX4J6Ow==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9972CE85D15;
+        Tue,  5 Apr 2022 16:20:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220405113359.2880241-3-masahiroy@kernel.org>
-X-Provags-ID: V03:K1:bDL5eBqGX7rbdQEDVAOTpQN78dDLoeQsBTsbAxRMYGrqncp4UpA
- 0tp2HUnKCSpKwCO7lsFf2K4SW0yy4YVH78zKlJXTSFMFKQNna44o6tjHosimqiHWvJmM/yf
- k+UorR/A6X4f+0ofsvF9Nx/RYaTYeuVTXLUJGowtsCwygdWBrS8V2q7jcWY50WW0vM3hb3q
- msLviDTyn3rZ6WPpybHew==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Kfo+ApJN/Xg=:9W8ueTzpf48J6m6653QZmS
- Kh2OoumupOQD/q95qodTclT3jX4k1SqZAbncIHkLcX4auc+uiXPGukTkWd2k1D5DrF+WNd7My
- 1bnDhOTM4SdRtAF4RiPHZZr83AeDIZZqS03rwS+FKioXxCggL1/ekAN2oZULyboyRlg9rtEVt
- ld55iQu1FNN8lRqgqMMQAK5I5VvlrclrTMPNi5zBQshz9WwurhvWd0/Hv5wEPHfVficIjsl10
- dHVaNqC+GlGuVn1wN5si+IZg+UVcvxTs5yoJVDoVeiOfrk5zrdjRSdb/zz85BImuc39A69r25
- SuGjM6gDPi7epOtUv4BwZ243nVX5gR8GaWYQyjmqT3H5D5rs/Tw2pKiIgWb4v3vz3WXNtnbCW
- nZr6MJsJnD0l0iB4dqehH8tw3cJTMaFDLHSL0bmaJBUx8UIxzW3IFqbVxpMTbpSvPOVTijMX+
- dXpADCeJnOwW0tt8a6XN+KzAF2bbQWX8EsAV3M/YVJAjdlukuxZOBGnFzaRWKLxs34h7Y6cE9
- 4tv0ijHJ62G1fcJggmqmc8qjb6H8bNG0w8LXrqLISm17ibYgK97+1htFTdXDrWsyo1dTNKteh
- NqAQ//D5L3gPPSc5NfSwk5Q/J9nk2WvnmINGbc9vQIgo8Zu7fepauRaMmC5qgssHsWzdwZIwc
- FsN9LoYdJKQhdFPLzPS2FORaXrwdoNLC14ltH5PZyCny6gppIvWRh0xgREezuCb2LORc=
+Subject: Re: [PATCH] tracing: Move user_events.h temporarily out of include/uapi
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164917564862.18481.12734568923836492201.git-patchwork-notify@kernel.org>
+Date:   Tue, 05 Apr 2022 16:20:48 +0000
+References: <20220401143903.188384f3@gandalf.local.home>
+In-Reply-To: <20220401143903.188384f3@gandalf.local.home>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
+        beaub@linux.microsoft.com, mhiramat@kernel.org,
+        linux-trace-devel@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+        torvalds@linux-foundation.org, michal.lkml@markovi.net,
+        ndesaulniers@google.com, linux-kbuild@vger.kernel.org,
+        masahiroy@kernel.org
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Apr 05, 2022 at 08:33:50PM +0900 Masahiro Yamada wrote:
-> Presumably, 'test -s $@ || rm -f $@' intends to remove the output when
-> the genksyms command fails.
-> 
-> It is unneeded because .DELETE_ON_ERROR automatically removes the output
-> on failure.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+Hello:
 
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+This patch was applied to netdev/net-next.git (master)
+by Steven Rostedt (Google) <rostedt@goodmis.org>:
 
+On Fri, 1 Apr 2022 14:39:03 -0400 you wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 > 
-> Changes in v2:
->   - Fix accidental drop of '> /dev/null'
+> While user_events API is under development and has been marked for broken
+> to not let the API become fixed, move the header file out of the uapi
+> directory. This is to prevent it from being installed, then later changed,
+> and then have an old distro user space update with a new kernel, where
+> applications see the user_events being available, but the old header is in
+> place, and then they get compiled incorrectly.
 > 
->  scripts/Makefile.build | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 31e0e33dfe5d..3ef2373f0a57 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -135,9 +135,7 @@ genksyms = scripts/genksyms/genksyms		\
->  cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
->  
->  quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
-> -cmd_cc_symtypes_c =                                                         \
-> -    $(call cmd_gensymtypes_c,true,$@) >/dev/null;                           \
-> -    test -s $@ || rm -f $@
-> +      cmd_cc_symtypes_c = $(call cmd_gensymtypes_c,true,$@) >/dev/null
->  
->  $(obj)/%.symtypes : $(src)/%.c FORCE
->  	$(call cmd,cc_symtypes_c)
-> @@ -348,9 +346,7 @@ cmd_gensymtypes_S =                                                         \
->      $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
->  
->  quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
-> -cmd_cc_symtypes_S =                                                         \
-> -    $(call cmd_gensymtypes_S,true,$@) >/dev/null;                           \
-> -    test -s $@ || rm -f $@
-> +      cmd_cc_symtypes_S = $(call cmd_gensymtypes_S,true,$@) >/dev/null
->  
->  $(obj)/%.symtypes : $(src)/%.S FORCE
->  	$(call cmd,cc_symtypes_S)
-> -- 
-> 2.32.0
-> 
-> 
+> [...]
 
+Here is the summary with links:
+  - tracing: Move user_events.h temporarily out of include/uapi
+    https://git.kernel.org/netdev/net-next/c/5cfff569cab8
+
+You are awesome, thank you!
 -- 
-epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
-↳ gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
-     -- frykten for herren er opphav til kunnskap --
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
