@@ -2,44 +2,46 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82147C35294
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEC3C3527E
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445979AbiDFAnE (ORCPT
+        id S1452704AbiDFAnO (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60306 "EHLO
+        Tue, 5 Apr 2022 20:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444229AbiDEPlD (ORCPT
+        with ESMTP id S1444204AbiDEPlB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:41:03 -0400
+        Tue, 5 Apr 2022 11:41:01 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC5B211;
-        Tue,  5 Apr 2022 07:03:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F919FF2;
+        Tue,  5 Apr 2022 07:03:31 -0700 (PDT)
 Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8O021295;
-        Tue, 5 Apr 2022 23:02:50 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8O021295
+        by conuserg-09.nifty.com with ESMTP id 235E2k8R021295;
+        Tue, 5 Apr 2022 23:02:52 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8R021295
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167370;
-        bh=jQYNKCFxuPQP3ZPrlr5taAXi8gXxcKaNemFjBDbWpQI=;
+        s=dec2015msa; t=1649167373;
+        bh=dJWl8ojIyORclruErwON0RrHfXvcLP2fynkVmPN0hbY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cZXvD0LoQRIt7Gp7lffANaJ3BkZAHSOlpP3Qdy+vuzcdxgsJwNBPXfvnXsfZyIUx/
-         6OdqlpweIGKTjd/tEbO2BLiuxrGnowo7PqKDio2vWxKqt1ihZOTLGkzi9vPCMX3TOC
-         ijdF7e0hBdr7/BYuMxFp6tIrwKRTveiqQ73T6Q/HAbXeZmsZbMHsRf/Vdvyg9Ppz73
-         ZTq41rV82tt9OTsB4kkCuUadvv5cCkKynrvA07S53tWOm+D/qPX27tM8PsMQ9D7ydt
-         d34nuy8qNYctN5QRdFSqS10it5qmIey4sEDfKuinLKoA36FeSWUVlAc5FxAtYnm07b
-         0dZMrGz8Atw9Q==
+        b=0gPpYwVK3J78cPN2gVBns4jH7jWVZYSc3UX75CeziI7H3kVcfTCd8d9UHrS/AdBae
+         ZjdDIG4ThuMP/PenHWe53+DuMJ1vUlJsIzZyQK0jplBYNLwifcPme7ytjhd2VYj96Y
+         HpSQiqEGJA8j1M9xB8pOccIuC8iFKLr1i/mGfJLeHdONBDVjEf6EO6/oY80iIVUgPY
+         b9klvh05rqNnGODj03He6bxOfJRd8UnRFsW32Ce9CKFZhDm22zQfBy6ZXMLxPuaZdc
+         yIv3Drz+jwjir8DnjfWtU3JSiMMqGPZ3jH+medfqTAS7QS8V/SwjK8sGTE2vxJx02K
+         haYbgFw0TtIfA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 06/10] modpost: remove annoying namespace_from_kstrtabns()
-Date:   Tue,  5 Apr 2022 23:02:25 +0900
-Message-Id: <20220405140229.2895394-7-masahiroy@kernel.org>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        llvm@lists.linux.dev
+Subject: [PATCH v2 09/10] kbuild: refactor cmd_modversions_c
+Date:   Tue,  5 Apr 2022 23:02:28 +0900
+Message-Id: <20220405140229.2895394-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
 References: <20220405140229.2895394-1-masahiroy@kernel.org>
@@ -49,78 +51,79 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-There are two call sites for sym_update_namespace().
+cmd_modversions_c implements two parts; run genksyms to calculate CRCs
+of exported symbols, run $(LD) to update the object with the CRCs. The
+latter is not executed for CONFIG_LTO_CLANG=y since the object is not
+ELF but LLVM bit code at this point.
 
-When the symbol has no namespace, s->namespace is set to NULL,
-but the conversion from "" to NULL is done in two different places.
+The first part can be unified because we can always use $(NM) instead
+of "$(OBJDUMP) -h" to dump the symbols.
 
-[1] read_symbols()
-
-  This gets the namespace from __kstrtabns_<symbol>. If the symbol has
-  no namespace, sym_get_data(info, sym) returns the empty string "".
-  namespace_from_kstrtabns() converts it to NULL before it is passed to
-  sym_update_namespace().
-
-[2] read_dump()
-
-  This gets the namespace from the dump file, *.symvers. If the symbol
-  has no namespace, the 'namespace' is the empty string "", which is
-  directly passed into sym_update_namespace(). The conversion from
-  "" to NULL is done in sym_update_namespace().
-
-namespace_from_kstrtabns() exists only for creating this inconsistency.
-
-By removing it, sym_update_namespace() is consistently passed with ""
-when the symbol has no namespace.
+Split the code into the two macros, cmd_gen_symversions_c and
+cmd_modversions.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2:
-  - new
+ - new
 
- scripts/mod/modpost.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+ scripts/Makefile.build | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 2a202764ff48..522d5249d196 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -369,13 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
- 		return export_unknown;
- }
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d934bdf84de4..ba2be555f942 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -169,29 +169,25 @@ ifdef CONFIG_MODVERSIONS
+ #   the actual value of the checksum generated by genksyms
+ # o remove .tmp_<file>.o to <file>.o
  
--static const char *namespace_from_kstrtabns(const struct elf_info *info,
--					    const Elf_Sym *sym)
--{
--	const char *value = sym_get_data(info, sym);
--	return value[0] ? value : NULL;
--}
--
- static void sym_update_namespace(const char *symname, const char *namespace)
- {
- 	struct symbol *s = find_symbol(symname);
-@@ -391,8 +384,7 @@ static void sym_update_namespace(const char *symname, const char *namespace)
- 	}
+-ifdef CONFIG_LTO_CLANG
+ # Generate .o.symversions files for each .o with exported symbols, and link these
+ # to the kernel and/or modules at the end.
+-cmd_modversions_c =								\
++gen_symversions =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+-		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
++		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
+ 		    > $@.symversions;						\
+ 	else									\
+ 		rm -f $@.symversions;						\
+-	fi;
+-else
+-cmd_modversions_c =								\
+-	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
+-		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
+-		    > $(@D)/.tmp_$(@F:.o=.ver);					\
+-										\
++	fi
++
++cmd_gen_symversions_c =	$(call gen_symversions,c)
++
++cmd_modversions =								\
++	if [ -r $@.symversions ]; then						\
+ 		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
+-			-T $(@D)/.tmp_$(@F:.o=.ver);				\
++			-T $@.symversions;					\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
+-		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
+ 	fi
+ endif
+-endif
  
- 	free(s->namespace);
--	s->namespace =
--		namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
-+	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
- }
+ ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+ # compiler will not generate __mcount_loc use recordmcount or recordmcount.pl
+@@ -269,7 +265,8 @@ define rule_cc_o_c
+ 	$(call cmd,checksrc)
+ 	$(call cmd,checkdoc)
+ 	$(call cmd,gen_objtooldep)
+-	$(call cmd,modversions_c)
++	$(call cmd,gen_symversions_c)
++	$(if $(CONFIG_LTO_CLANG),,$(call cmd,modversions))
+ 	$(call cmd,record_mcount)
+ endef
  
- /**
-@@ -2049,9 +2041,7 @@ static void read_symbols(const char *modname)
- 		/* Apply symbol namespaces from __kstrtabns_<symbol> entries. */
- 		if (strstarts(symname, "__kstrtabns_"))
- 			sym_update_namespace(symname + strlen("__kstrtabns_"),
--					     namespace_from_kstrtabns(&info,
--								      sym));
--
-+					     sym_get_data(&info, sym));
- 		if (strstarts(symname, "__crc_"))
- 			handle_modversion(mod, &info, sym,
- 					  symname + strlen("__crc_"));
 -- 
 2.32.0
 
