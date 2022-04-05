@@ -2,117 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45946C41535
-	for <linux-kbuild@archiver.kernel.org>; Mon,  4 Apr 2022 21:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59154C433EF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 02:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380417AbiDDV3A (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 4 Apr 2022 17:29:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49458 "EHLO
+        id S229687AbiDECVz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 4 Apr 2022 22:21:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379544AbiDDR3I (ORCPT
+        with ESMTP id S229668AbiDECVy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 4 Apr 2022 13:29:08 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F112A24BF9
-        for <linux-kbuild@vger.kernel.org>; Mon,  4 Apr 2022 10:27:11 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id n9so4030458plc.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2022 10:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VYvPl145gx1NnQ2E3OJKFVQPxapHGXttn5rOGVj8YXo=;
-        b=hd+vUeBK2jke4Z79gSu5EYlGJK/30+8ZPm5vusOwihjccMo+JYQaFziQAAtCID0e5b
-         qiLbaSXJpB5nRDykwDoLmPmHeyaA4U3mO1aNEDIrpBI1y7KWpUIIYaKFkz1sQOFACAOc
-         aM6lCqWr9wZwWsklSOxLwTatnC3eKJ1E18Cyxx8CEA5zLgAe9sm4oTFjzF7SzNxlrSY7
-         5YCfCpDy23ULHUPSewKuWau9wE833jCsfozeqx9dNss7+g86jPjfaK+eh0C/KKY3VLXw
-         f3jp5vi8jNmhQOZlIPVusBowj6XA96wM7engEJdtxH6nw+nNIUhWc7hzzmvwmP0aO5k+
-         ThIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VYvPl145gx1NnQ2E3OJKFVQPxapHGXttn5rOGVj8YXo=;
-        b=4sOSZcjueK4thJh70+AmFwE+FFlIfV3GBrsSYCTtwA73JlQtq+BEI9LyMPl+yEH1DW
-         xc1R1KstwR/99JnWVx4HeP93PiYNaPbUhoGQ+a+RDVD83722c3MfXVF3TLxmR7IXbcKz
-         EuzaVGJ/W6Fz9n65IM3yjzuXsw7QHZxZVl1uLph/vaNuqZmZQNEz49r7GShMljAed4UQ
-         KIc3sVkajlHtgwN0pKYcz+ToDz5bGYbXyd45d784ZR8jgpZVyffL4n6sbihPEr0yBWlo
-         twvaqaZS8ri0z9V6z3kEXx5YyVpqeknZCWFBIUVWkwZxUlz8nKHBVGYqiPPpOAaiJf04
-         9DPQ==
-X-Gm-Message-State: AOAM533RyUqE+rt6ba86Q53XVOi63bxbYWxa09x7/kGKyFIgXyi5xh/i
-        TGX6KJkZdDB4M1wlur6GXWUQAYQlptpXx/G+
-X-Google-Smtp-Source: ABdhPJzIn8VUPSw0kXUgBANdTlP1KbT/bIOfaGMgMZZeENIi+FbBiFh+hZ3dFMto7+s4V24GWdOQ6w==
-X-Received: by 2002:a17:90b:1c07:b0:1c7:5324:c68e with SMTP id oc7-20020a17090b1c0700b001c75324c68emr255680pjb.202.1649093231294;
-        Mon, 04 Apr 2022 10:27:11 -0700 (PDT)
-Received: from google.com ([2620:15c:211:202:9d5:9b93:ffb4:574a])
-        by smtp.gmail.com with ESMTPSA id gt14-20020a17090af2ce00b001c701e0a129sm73834pjb.38.2022.04.04.10.27.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Apr 2022 10:27:09 -0700 (PDT)
-Date:   Mon, 4 Apr 2022 10:27:02 -0700
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [PATCH 1/8] agpgart.h: do not include <stdlib.h> from exported
- header
-Message-ID: <YksqZv5IqECbFB7a@google.com>
-References: <20220404061948.2111820-1-masahiroy@kernel.org>
- <20220404061948.2111820-2-masahiroy@kernel.org>
+        Mon, 4 Apr 2022 22:21:54 -0400
+Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC8A41856B;
+        Mon,  4 Apr 2022 18:17:08 -0700 (PDT)
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 2351D5xo003801;
+        Tue, 5 Apr 2022 10:13:05 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 2351D5xo003801
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649121185;
+        bh=1XB8+03FMw6quXMbGDHBGH2OtifIRC6gyEDeKLl9zco=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=fykuV1TsMj3k9Ws57DHlBBiTRfCJLa78wHm24isrFs0OYjWLYXMwTpBYPIq4cXIEn
+         HbOl44nWGcfnHr7bWwaB7WnXkTOOfHkk6+jdAmUjgu4Ndoevp2LwXY3h4udSNspNqP
+         vqdDv5VRBBqCoS/VT7h39RpohTeG1pg896jeODp9E4NQh+Sd78v12Z6++gJ6PnlzYP
+         L8It+ZYbHlhIJWQ1iMWnGF8CYqvynrJxAFL6w72QZb8r+++bKVfZ+kTyvQYYPvSiCM
+         SzCvzpqI0sJxlfL/s/jJtSPm/hmJCMC5Aqg82tgHAACtvpK/A51PmBOuRL2dfZPuBp
+         hO3NWsHy8f70Q==
+X-Nifty-SrcIP: [209.85.215.172]
+Received: by mail-pg1-f172.google.com with SMTP id 125so1420894pgc.11;
+        Mon, 04 Apr 2022 18:13:05 -0700 (PDT)
+X-Gm-Message-State: AOAM532dgC25C3ebR1RXPtQl+w0G1FdAUP3WmD0agZ99S01hrjQrrqMB
+        ByahInHY5xGkqtG0ZhB/KcTO780LNK6GweZnrUk=
+X-Google-Smtp-Source: ABdhPJzLBjj4278xvNykiD3w2yfsWF6xRsbcL3Ms+s4YFFRyIBmJxQbqTeWwwPYUkRsLo2sjYt6EdjjfGmwkd6VfZgE=
+X-Received: by 2002:a05:6a00:234f:b0:4fa:f52b:46a1 with SMTP id
+ j15-20020a056a00234f00b004faf52b46a1mr1137771pfj.32.1649121184875; Mon, 04
+ Apr 2022 18:13:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220404061948.2111820-2-masahiroy@kernel.org>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+ <20220404061948.2111820-3-masahiroy@kernel.org> <YkqhQhJIQEL2qh8C@infradead.org>
+ <YkssI2uDHRq41zjw@google.com>
+In-Reply-To: <YkssI2uDHRq41zjw@google.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 5 Apr 2022 10:12:17 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQDD4u5acyG7m4mziz-nz3D2u+ukdZZB+jZah_3JZFMTQ@mail.gmail.com>
+Message-ID: <CAK7LNAQDD4u5acyG7m4mziz-nz3D2u+ukdZZB+jZah_3JZFMTQ@mail.gmail.com>
+Subject: Re: [PATCH 2/8] kbuild: prevent exported headers from including
+ <stdlib.h>, <stdbool.h>
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Apr 04, 2022 at 03:19:41PM +0900, Masahiro Yamada wrote:
-> Commit 35d0f1d54ecd ("include/uapi/linux/agpgart.h: include stdlib.h in
-> userspace") included <stdlib.h> to fix the unknown size_t error, but
-> I do not think it is the right fix.
-> 
-> This header already uses __kernel_size_t a few lines below.
-> 
-> Replace the remaining size_t, and stop including <stdlib.h>.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+On Tue, Apr 5, 2022 at 2:34 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Mon, Apr 04, 2022 at 12:41:54AM -0700, Christoph Hellwig wrote:
+> > On Mon, Apr 04, 2022 at 03:19:42PM +0900, Masahiro Yamada wrote:
+> > > If we can make kernel headers self-contained (that is, none of exported
+> > > kernel headers includes system headers), we will be able to add the
+> > > -nostdinc flag, but that is much far from where we stand now.
+>
+> This is something I'd like to see done. IMO, the kernel headers should
+> be the independent variable of which the libc is the dependendent
+> variable.
+>
+> Android's libc, Bionic, is making use of the UAPI headers. They are
+> doing some rewriting of UAPI headers, but I'd like to see what needs to
+> be upstreamed from there. I just noticed
+> include/uapi/linux/libc-compat.h, which seems like a good place for such
+> compat related issues.
+>
+> In particular, having UAPI_HEADER_TESTS depend on CC_CAN_LINK is
+> something I think we can works towards removing. The header tests
+> themselves don't link; they force a dependency on a prebuilt libc
+> sysroot, and they only need the headers from the sysroot because of this
+> existing circular dependency between kernel headers and libc headers.
+>
+> I'd be happy to be explicitly cc'ed on changes like this series, going
+> forward. Masahiro, if there's parts you'd like me to help with besides
+> just code review, please let me know how I can help.
 
-Thanks for the patch.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-> ---
-> 
->  include/uapi/linux/agpgart.h | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/uapi/linux/agpgart.h b/include/uapi/linux/agpgart.h
-> index f5251045181a..9cc3448c0b5b 100644
-> --- a/include/uapi/linux/agpgart.h
-> +++ b/include/uapi/linux/agpgart.h
-> @@ -52,7 +52,6 @@
->  
->  #ifndef __KERNEL__
->  #include <linux/types.h>
-> -#include <stdlib.h>
->  
->  struct agp_version {
->  	__u16 major;
-> @@ -64,10 +63,10 @@ typedef struct _agp_info {
->  	__u32 bridge_id;	/* bridge vendor/device         */
->  	__u32 agp_mode;		/* mode info of bridge          */
->  	unsigned long aper_base;/* base of aperture             */
-> -	size_t aper_size;	/* size of aperture             */
-> -	size_t pg_total;	/* max pages (swap + system)    */
-> -	size_t pg_system;	/* max pages (system)           */
-> -	size_t pg_used;		/* current pages used           */
-> +	__kernel_size_t aper_size;	/* size of aperture             */
-> +	__kernel_size_t pg_total;	/* max pages (swap + system)    */
-> +	__kernel_size_t pg_system;	/* max pages (system)           */
-> +	__kernel_size_t pg_used;	/* current pages used           */
->  } agp_info;
->  
->  typedef struct _agp_setup {
-> -- 
-> 2.32.0
-> 
+I wanted to make uapi headers as self-contained as possible,
+but I did not see much progress.
+
+I just fixed up some low-hanging fruits, but there are still
+many remaining issues.
+
+Thank you very much for your contribution:
+https://lore.kernel.org/all/20220404175448.46200-1-ndesaulniers@google.com/
+
+If you eliminate other issues, that would be appreciated.
+
+
+> >
+> > What is still missing for that?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
