@@ -2,119 +2,82 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C62C43217
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED1BC433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1573353AbiDFAnm (ORCPT
+        id S1837055AbiDFAnu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37630 "EHLO
+        Tue, 5 Apr 2022 20:43:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241322AbiDEUpv (ORCPT
+        with ESMTP id S1444337AbiDEPlU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 16:45:51 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E9AD9EB5;
-        Tue,  5 Apr 2022 13:22:23 -0700 (PDT)
-Received: from leknes.fjasle.eu ([46.142.97.95]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MxV4T-1nvrQ50Jpp-00xpap; Tue, 05 Apr 2022 22:16:20 +0200
-Received: by leknes.fjasle.eu (Postfix, from userid 1000)
-        id 13DF73C088; Tue,  5 Apr 2022 22:16:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
-        t=1649189778; bh=GPfCvVD2BrdOXMdNnxNrFcntwH8cnF/qTfQuCuV8YzY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZCVPqPQLOy4IRjuET4veOmGPaRaH8zVgC8X5Q//kiDNo254elLsNsrH/jF+A4SfDu
-         fJZol9+js3503xEoh7PNBYfKbO4LsyncqVXwuiW/p1Pz591LUO4stHSWT9jb6f0fpS
-         LwxB4TC/8gRUaXeB6joOFiKkqPwVjCg78ukR8ZIw=
-Date:   Tue, 5 Apr 2022 22:16:16 +0200
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tue, 5 Apr 2022 11:41:20 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9658895A19;
+        Tue,  5 Apr 2022 07:04:16 -0700 (PDT)
+Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 235E2k8I021295;
+        Tue, 5 Apr 2022 23:02:46 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8I021295
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649167367;
+        bh=tlKllE+DeH+owxkSzZkT6wnBC6VcqxWAXsQhSEB8rk0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Uv4X9S8slbNYOacfNha8LhvGPEryM5kYHXmLEzvdr5IAfZaDURgz9esyRoB04c+5C
+         hz1jkmpqUz+Ip3IV6aRBsB7/5c86PqqNgWgMijMJ0EdLZ3i2xMZoJZ1xXSqgcT6lKs
+         ugNv2u7eEhu0EDi7YKN9ckmLl7vZnWW0x2mhEqtxgqv4zUsRWlam8hVy463NOjyUlf
+         YmUqw4UJdABGIlAouutEFUA87PdtTb1qjRCFPWOGlPm8T5S7MBsTfsKLTyRBb3BNEw
+         lefAHmSe4tGn9E2m39rmd8awrAPSD3hTlaxaAD+LT2E3/95Qmfmvmgh4WNANJMxMRP
+         y7oEPJRf2fs4A==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Alexander Lobakin <alobakin@pm.me>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH v2 07/10] kbuild: get rid of duplication in the first
- line of *.mod files
-Message-ID: <YkyjkAWb56wqL3iK@fjasle.eu>
-References: <20220405113359.2880241-1-masahiroy@kernel.org>
- <20220405113359.2880241-8-masahiroy@kernel.org>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <n.schier@avm.de>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sami Tolvanen <samitolvanen@google.com>, llvm@lists.linux.dev
+Subject: [PATCH v2 00/10] kbuild: misc cleanups
+Date:   Tue,  5 Apr 2022 23:02:19 +0900
+Message-Id: <20220405140229.2895394-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220405113359.2880241-8-masahiroy@kernel.org>
-X-Provags-ID: V03:K1:rFb6rOPGOYf54rAUdi4Z7QmLIEC3PNtz5bjBHKiS5S9kz/rp0KY
- IFv++Z8xORrnNoHxVlKCCwBFePfvbMorNonoqK+eS37J6mA0sVrUMi5KhrL+g8s38nFS+it
- jaAii3I6IpoNQwagGGA/fzFzKXA4tIs3r2YX7NcLWQV/jDfiPZzrKBJHQo4UaW/xEY0twmi
- fVbOPGXwmVOOeNcIh86/g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Ac6prOacJsQ=:p+T22kYzZjC80rzUVrllUV
- ji899ZO6uA6RoUtAgYk8IZZV1v6/Il8KGEN8e1kPelzhvp6QSHSRdBmykibXrRbBFG41xQeP1
- gOjOlFnoKvE7DNqn7H0cwQVD6g0lHHsU2mElvBL73v8gU7JruB4viokTp2JJjTcX1ejdRnMQ4
- M/5/8h3Fy6ECkDYQeiMf8/wxuFx/JsVCFil1toUGlGuRs8q/30p1U6Z1hbyLlMewwea18iHfg
- uHrl4pFb88gS3XRed7Q4/v4gPqWTzGyE1BIvN2eGWDi331J77VZ0uBH8aa0aZS9tmXB98nnt0
- ldp3yfFeiCgviIYH9Via4XmsR4B+fWm6TA/xIUXmLlwGppE55kirdoi28QXbGmE9HSG6qaSAb
- 8uS8DyYwVOQgkAJ4i1XVphUoxtTWnolRaDqAx6aZqlV/D/I1+zVX0qp2jKWBTpYeV1+OHnJVu
- 2Jg1sHE6Wu8EGeI5ecf1DWG+x6wjRCJRa2WO24akBRPI8daVDSwHUM/0qloUUYNVTMK3iDF/S
- xwwW6M2fK8SjcZsMHPdCq49U+gAcVvolTnWUlMaMal+KjhzlbOq6Senx5Z6+RQA29+228MMsz
- iQIwXFYA3/PjoT5sfioSIV59SueftRAJuzL/y3ryNYg6tKaVvKT8TWnns0PD47pvP+JH8I0T8
- +ttgm0pPp5/hNHiseCnlEYdpfkKs+A1zEelJuK9dmu69yeipd5yzJp2yYIk1nWq4+mJY=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Apr 05, 2022 at 08:33:55PM +0900 Masahiro Yamada wrote:
-> The first line of *.mod lists the member objects of the module.
-> This list may contain duplication if the same object is added multiple
-> times, like this:
-> 
->   obj-m := foo.o
->   foo-$(CONFIG_FOO1_X) += foo1.o
->   foo-$(CONFIG_FOO1_Y) += foo1.o
->   foo-$(CONFIG_FOO2_X) += foo2.o
->   foo-$(CONFIG_FOO2_Y) += foo2.o
-> 
-> This is probably not a big deal. As far as I know, the only small
-> problem is scripts/mod/sumversion.c parses the same file over again.
-> This can be avoided by adding $(sort ...). It has a side-effect that
-> sorts the objects alphabetically, but it is not a big deal, either.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
-> Changes in v2:
->   - new
-> 
->  scripts/Makefile.build | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 3ef2373f0a57..63625877aeae 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -307,8 +307,10 @@ $(obj)/%.prelink.o: $(obj)/%.o FORCE
->  	$(call if_changed,cc_prelink_modules)
->  endif
->  
-> +multi-m-prereqs = $(sort $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)))
-> +
->  cmd_mod = { \
-> -	echo $(if $($*-objs)$($*-y)$($*-m), $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)), $(@:.mod=.o)); \
-> +	echo $(if $(multi-m-prereqs), $(multi-m-prereqs), $(@:.mod=.o)); \
 
-I'd rather expected to see $(or) here, too, as in commit 5c8166419acf ("kbuild:
-replace $(if A,A,B) with $(or A,B)").
+This is a series of prerequisite cleanups of my next work.
 
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 
->  	$(undefined_syms) echo; \
->  	} > $@
->  
-> -- 
-> 2.32.0
-> 
-> 
+Masahiro Yamada (10):
+  kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
+  kbuild: do not remove empty *.symtypes explicitly
+  modpost: remove useless export_from_sec()
+  modpost: move export_from_secname() call to more relevant place
+  modpost: remove redundant initializes for static variables
+  modpost: remove annoying namespace_from_kstrtabns()
+  kbuild: get rid of duplication in the first line of *.mod files
+  kbuild: split the second line of *.mod into *.usyms
+  kbuild: refactor cmd_modversions_c
+  kbuild: refactor cmd_modversions_S
+
+ .gitignore                  |  1 +
+ Makefile                    |  2 +-
+ scripts/Makefile.build      | 86 ++++++++++++++++---------------------
+ scripts/adjust_autoksyms.sh |  2 +-
+ scripts/gen_autoksyms.sh    | 18 +++++---
+ scripts/mod/modpost.c       | 49 ++++++---------------
+ scripts/mod/modpost.h       |  4 --
+ scripts/mod/sumversion.c    | 11 +----
+ 8 files changed, 64 insertions(+), 109 deletions(-)
 
 -- 
-epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
-↳ gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
-     -- frykten for herren er opphav til kunnskap --
+2.32.0
+
