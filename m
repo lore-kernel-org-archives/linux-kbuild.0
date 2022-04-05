@@ -2,43 +2,43 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1167C433FE
-	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33597C4321E
+	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241050AbiDEOLU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 10:11:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34590 "EHLO
+        id S241350AbiDEOL2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Apr 2022 10:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384116AbiDEM1L (ORCPT
+        with ESMTP id S1384128AbiDEM1M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 08:27:11 -0400
+        Tue, 5 Apr 2022 08:27:12 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB444574B2;
-        Tue,  5 Apr 2022 04:35:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C342957B02;
+        Tue,  5 Apr 2022 04:35:18 -0700 (PDT)
 Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 235BYCGw000464;
-        Tue, 5 Apr 2022 20:34:19 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 235BYCGw000464
+        by conuserg-12.nifty.com with ESMTP id 235BYCGp000464;
+        Tue, 5 Apr 2022 20:34:14 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 235BYCGp000464
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649158459;
-        bh=gVdAU8NgX5021NtvHRpFHdYK2UvqDo2vrSD9W1vtAMA=;
+        s=dec2015msa; t=1649158454;
+        bh=EKCTJzUdUAuHIhmyqzQO5DkjoUd5sMZA3XV4MtVgo6g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HMNX5DFw87nSaiwE1Oo5QFT6reR50jBMkjc3VpbZqaffBYJ707hRf11BYqrmfG7Si
-         OEk8mucbkGCcabxfxTRYnhJtTam4qTUT0s+rlYH4AU6zu91BXOwblHaJB9nlWRMK3k
-         PX/WMesC5umLhTDADPVcsa4/ZIv4Kj3w8rFt4xrVERsnrvYxY+BDQgLVMUyk6hzw6g
-         lxKidVH1fL6pbLHsXTrO+a7YdLlT0lwmsw4LrDPb29fj6n+ifhxZPUky7uYD27diBB
-         nnXV2AUwL6PUhndQZvDnRnOxKOX4jvZ9CTxiJDFL7xaFK1QuE4+e+NdZ8iGSvrtY1k
-         rjviBygrWfAdg==
+        b=DWk37DbYUH+hKAxMwDTIpp4kMMEj+RJPnrCiqJ07xppk6Up0RBLZ+4DTHM7fLj0iK
+         /xbtGtmyRMylOKuKjhH42edScU0bLJ+jsJAcCnsj6Y62upLX/ZUkr6bv/NIXgOnmmo
+         M8snVpltT/XM37UiUKKsR89rVjlcALGWVo9zrOU6HUQ/r1tHhODKq9frJbEVaXVw8i
+         kgwhyvkl8jjozVQ1BjZXdg0wOpmOke2A4huZax8zw1M3iDJdjYWXNVM3VIlUlT51tl
+         YktT6Ccqx7R/NLsCYUo2YZf0CDDnRtuouzREtLeUmsDqpDSAoaetk9Xos+SSjb7OCM
+         tDrin0mmTl/IA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 10/10] kbuild: refactor cmd_modversions_S
-Date:   Tue,  5 Apr 2022 20:33:58 +0900
-Message-Id: <20220405113359.2880241-11-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH v2 03/10] modpost: remove useless export_from_sec()
+Date:   Tue,  5 Apr 2022 20:33:51 +0900
+Message-Id: <20220405113359.2880241-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220405113359.2880241-1-masahiroy@kernel.org>
 References: <20220405113359.2880241-1-masahiroy@kernel.org>
@@ -48,52 +48,127 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Split the code into two macros, cmd_gen_symversions_S for running
-genksyms, and cmd_modversions for running $(LD) to update the object
-with CRCs.
+With commit 1743694eb235 ("modpost: stop symbol preloading for
+modversion CRC") applied, now export_from_sec() is useless.
+
+handle_symbol() is called for every symbol in the ELF.
+
+When 'symname' does not start with "__ksymtab", export_from_sec() is
+called, and the returned value is stored in 'export'.
+
+It is used in the last part of handle_symbol():
+
+    if (strstarts(symname, "__ksymtab_")) {
+            name = symname + strlen("__ksymtab_");
+            sym_add_exported(name, mod, export);
+    }
+
+'export' is used only when 'symname' starts with "__ksymtab_".
+
+So, the value returned by export_from_sec() is never used.
+
+Remove useless export_from_sec(). This makes further cleanups possible.
+
+I put the temporary code:
+
+    export = export_unknown;
+
+Otherwise, I would get the compiler warning:
+
+    warning: 'export' may be used uninitialized in this function [-Wmaybe-uninitialized]
+
+This is apparently false positive because
+
+    if (strstarts(symname, "__ksymtab_")
+
+... is a stronger condition than:
+
+    if (strstarts(symname, "__ksymtab")
+
+Anyway, this part will be cleaned up by the next commit.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
 Changes in v2:
-  - new
+  - Fix compiler warning
 
- scripts/Makefile.build | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+ scripts/mod/modpost.c | 17 ++---------------
+ scripts/mod/modpost.h |  4 ----
+ 2 files changed, 2 insertions(+), 19 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ba2be555f942..58be0997c5dd 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -274,7 +274,8 @@ define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,gen_objtooldep)
--	$(call cmd,modversions_S)
-+	$(call cmd,gen_symversions_S)
-+	$(call cmd,modversions)
- endef
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index ed9d056d2108..eebb32689816 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -369,16 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
+ 		return export_unknown;
+ }
  
- # Built-in and composite module parts
-@@ -366,16 +367,8 @@ ifdef CONFIG_ASM_MODVERSIONS
- # versioning matches the C process described above, with difference that
- # we parse asm-prototypes.h C header to get function definitions.
+-static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
+-{
+-	if (sec == elf->export_sec)
+-		return export_plain;
+-	else if (sec == elf->export_gpl_sec)
+-		return export_gpl;
+-	else
+-		return export_unknown;
+-}
+-
+ static const char *namespace_from_kstrtabns(const struct elf_info *info,
+ 					    const Elf_Sym *sym)
+ {
+@@ -576,10 +566,7 @@ static int parse_elf(struct elf_info *info, const char *filename)
+ 				fatal("%s has NOBITS .modinfo\n", filename);
+ 			info->modinfo = (void *)hdr + sechdrs[i].sh_offset;
+ 			info->modinfo_len = sechdrs[i].sh_size;
+-		} else if (strcmp(secname, "__ksymtab") == 0)
+-			info->export_sec = i;
+-		else if (strcmp(secname, "__ksymtab_gpl") == 0)
+-			info->export_gpl_sec = i;
++		}
  
--cmd_modversions_S =								\
--	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
--		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
--		    > $(@D)/.tmp_$(@F:.o=.ver);					\
--										\
--		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
--			-T $(@D)/.tmp_$(@F:.o=.ver);				\
--		mv -f $(@D)/.tmp_$(@F) $@;					\
--		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
--	fi
-+cmd_gen_symversions_S = $(call gen_symversions,S)
-+
- endif
+ 		if (sechdrs[i].sh_type == SHT_SYMTAB) {
+ 			unsigned int sh_link_idx;
+@@ -703,7 +690,7 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
+ 	if (strstarts(symname, "__ksymtab"))
+ 		export = export_from_secname(info, get_secindex(info, sym));
+ 	else
+-		export = export_from_sec(info, get_secindex(info, sym));
++		export = export_unknown;
  
- $(obj)/%.o: $(src)/%.S FORCE
+ 	switch (sym->st_shndx) {
+ 	case SHN_COMMON:
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 0c47ff95c0e2..a85dcec3669a 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -25,7 +25,6 @@
+ #define Elf_Sym     Elf32_Sym
+ #define Elf_Addr    Elf32_Addr
+ #define Elf_Sword   Elf64_Sword
+-#define Elf_Section Elf32_Half
+ #define ELF_ST_BIND ELF32_ST_BIND
+ #define ELF_ST_TYPE ELF32_ST_TYPE
+ 
+@@ -40,7 +39,6 @@
+ #define Elf_Sym     Elf64_Sym
+ #define Elf_Addr    Elf64_Addr
+ #define Elf_Sword   Elf64_Sxword
+-#define Elf_Section Elf64_Half
+ #define ELF_ST_BIND ELF64_ST_BIND
+ #define ELF_ST_TYPE ELF64_ST_TYPE
+ 
+@@ -138,8 +136,6 @@ struct elf_info {
+ 	Elf_Shdr     *sechdrs;
+ 	Elf_Sym      *symtab_start;
+ 	Elf_Sym      *symtab_stop;
+-	Elf_Section  export_sec;
+-	Elf_Section  export_gpl_sec;
+ 	char         *strtab;
+ 	char	     *modinfo;
+ 	unsigned int modinfo_len;
 -- 
 2.32.0
 
