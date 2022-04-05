@@ -2,173 +2,126 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33597C4321E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 211A0C43217
 	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241350AbiDEOL2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 10:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
+        id S241251AbiDEOLZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Apr 2022 10:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384128AbiDEM1M (ORCPT
+        with ESMTP id S1381345AbiDEMy3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 08:27:12 -0400
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C342957B02;
-        Tue,  5 Apr 2022 04:35:18 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 235BYCGp000464;
-        Tue, 5 Apr 2022 20:34:14 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 235BYCGp000464
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649158454;
-        bh=EKCTJzUdUAuHIhmyqzQO5DkjoUd5sMZA3XV4MtVgo6g=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DWk37DbYUH+hKAxMwDTIpp4kMMEj+RJPnrCiqJ07xppk6Up0RBLZ+4DTHM7fLj0iK
-         /xbtGtmyRMylOKuKjhH42edScU0bLJ+jsJAcCnsj6Y62upLX/ZUkr6bv/NIXgOnmmo
-         M8snVpltT/XM37UiUKKsR89rVjlcALGWVo9zrOU6HUQ/r1tHhODKq9frJbEVaXVw8i
-         kgwhyvkl8jjozVQ1BjZXdg0wOpmOke2A4huZax8zw1M3iDJdjYWXNVM3VIlUlT51tl
-         YktT6Ccqx7R/NLsCYUo2YZf0CDDnRtuouzREtLeUmsDqpDSAoaetk9Xos+SSjb7OCM
-         tDrin0mmTl/IA==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
+        Tue, 5 Apr 2022 08:54:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4825229C93
+        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 04:57:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649159848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yZyeehLgo43vPEC1Sp1n3r3jpBNtdCjtLwgkplLP3v4=;
+        b=Gh1urVgDOeB9+9TxPEQeRkhcqCncaFa8w1U9aVXPwWd9+BzvwtLgauDuT5npxZ7ZsYGpEy
+        +2cLGfjg87/sbCwjZPmJfPObdYuRuPoNUmNfjDY/szAPb3aPdw9c1mV+t+FVj9LCzmEPm1
+        ma0vA+nyG5qidYPD19KL428n3aY96z4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-145-96xcR1bqOhyJE--DWQat9A-1; Tue, 05 Apr 2022 07:57:27 -0400
+X-MC-Unique: 96xcR1bqOhyJE--DWQat9A-1
+Received: by mail-wr1-f72.google.com with SMTP id p18-20020adfba92000000b001e8f7697cc7so2403842wrg.20
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 04:57:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yZyeehLgo43vPEC1Sp1n3r3jpBNtdCjtLwgkplLP3v4=;
+        b=mNWPLms9vv3PbZo7zVlV2OGiY6qQy3PILPd2l9lWhQSCtwefAGWCQJB2NCDF45CdnI
+         Rf8ATkLl+6qYhFkajxzwjHWupdM+zi4gr533SVXjNj5/GRSyum5doxg6mbuxKV2VrMpv
+         ZyrcqF8fJtkFppx2bCur68pZ40XGohRsDcUuA7SJFxzmPc43hT1YwvP10S2lBvbpm59m
+         8tDRcqOJXh8qwY6vTgOdOITj0Sgkf1WbQ89ER9qGbmojsJ7LnN1B5h8qGorQ9GovT2Jo
+         xumDBo4aD0ZQ8+yciBOPeSBOge6617jUIB7tYAkqiYtD9VSdFekXw4TG6GfKe4FgRQxy
+         /TEQ==
+X-Gm-Message-State: AOAM53274fNEWQp8yfU4zmWumE1C/3kxCdVBFWpinPobaWa7VNGPaD8p
+        rTmn5IB4Br9ZLAU8DqnYc18PD5wGPFWTOR6p2MyVZiae7wvsCLfTOtmNI13idsbSxXUIu4YFdts
+        ks0uT/zbrtkNfJAqGQI1XHOCN
+X-Received: by 2002:a05:6000:184a:b0:203:f8f0:3407 with SMTP id c10-20020a056000184a00b00203f8f03407mr2604221wri.190.1649159846181;
+        Tue, 05 Apr 2022 04:57:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypIKxQBes9FfmGLsTQSI+o8ZS7lLWmQJBmsfPcPeNLWB/aoHg6W8W0oB4kBqUTKA7V4gN8eQ==
+X-Received: by 2002:a05:6000:184a:b0:203:f8f0:3407 with SMTP id c10-20020a056000184a00b00203f8f03407mr2604202wri.190.1649159845981;
+        Tue, 05 Apr 2022 04:57:25 -0700 (PDT)
+Received: from redhat.com ([2.52.17.211])
+        by smtp.gmail.com with ESMTPSA id m4-20020a7bcb84000000b00389efb7a5b4sm1883255wmi.17.2022.04.05.04.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Apr 2022 04:57:25 -0700 (PDT)
+Date:   Tue, 5 Apr 2022 07:57:21 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH v2 03/10] modpost: remove useless export_from_sec()
-Date:   Tue,  5 Apr 2022 20:33:51 +0900
-Message-Id: <20220405113359.2880241-4-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405113359.2880241-1-masahiroy@kernel.org>
-References: <20220405113359.2880241-1-masahiroy@kernel.org>
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        virtualization list <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 8/8] virtio_ring.h: do not include <stdint.h> from
+ exported header
+Message-ID: <20220405075627-mutt-send-email-mst@kernel.org>
+References: <20220404061948.2111820-1-masahiroy@kernel.org>
+ <20220404061948.2111820-9-masahiroy@kernel.org>
+ <Ykqh3mEy5uY8spe8@infradead.org>
+ <CAK8P3a07ZdqA0UBC_qkqzMsZWLUK=Rti3AkFe2VVEWLivuZAqA@mail.gmail.com>
+ <YkvVOLj/Rv4yPf5K@infradead.org>
+ <CAK8P3a0FjfSyUtv9a9dM7ixsK2oY9VF7WZPvDctn2JRi7A0YyQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a0FjfSyUtv9a9dM7ixsK2oY9VF7WZPvDctn2JRi7A0YyQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-With commit 1743694eb235 ("modpost: stop symbol preloading for
-modversion CRC") applied, now export_from_sec() is useless.
+On Tue, Apr 05, 2022 at 08:29:36AM +0200, Arnd Bergmann wrote:
+> On Tue, Apr 5, 2022 at 7:35 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Mon, Apr 04, 2022 at 10:04:02AM +0200, Arnd Bergmann wrote:
+> > > The header is shared between kernel and other projects using virtio, such as
+> > > qemu and any boot loaders booting from virtio devices. It's not technically a
+> > > /kernel/ ABI, but it is an ABI and for practical reasons the kernel version is
+> > > maintained as the master copy if I understand it correctly.
+> >
+> > Besides that fact that as you correctly states these are not a UAPI at
+> > all, qemu and bootloades are not specific to Linux and can't require a
+> > specific kernel version.  So the same thing we do for file system
+> > formats or network protocols applies here:  just copy the damn header.
+> > And as stated above any reasonably portable userspace needs to have a
+> > copy anyway.
+> 
+> I think the users all have their own copies, at least the ones I could
+> find on codesearch.debian.org.
 
-handle_symbol() is called for every symbol in the ELF.
+kvmtool does not seem to have its own copy, just grep vring_init.
 
-When 'symname' does not start with "__ksymtab", export_from_sec() is
-called, and the returned value is stored in 'export'.
-
-It is used in the last part of handle_symbol():
-
-    if (strstarts(symname, "__ksymtab_")) {
-            name = symname + strlen("__ksymtab_");
-            sym_add_exported(name, mod, export);
-    }
-
-'export' is used only when 'symname' starts with "__ksymtab_".
-
-So, the value returned by export_from_sec() is never used.
-
-Remove useless export_from_sec(). This makes further cleanups possible.
-
-I put the temporary code:
-
-    export = export_unknown;
-
-Otherwise, I would get the compiler warning:
-
-    warning: 'export' may be used uninitialized in this function [-Wmaybe-uninitialized]
-
-This is apparently false positive because
-
-    if (strstarts(symname, "__ksymtab_")
-
-... is a stronger condition than:
-
-    if (strstarts(symname, "__ksymtab")
-
-Anyway, this part will be cleaned up by the next commit.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
----
-
-Changes in v2:
-  - Fix compiler warning
-
- scripts/mod/modpost.c | 17 ++---------------
- scripts/mod/modpost.h |  4 ----
- 2 files changed, 2 insertions(+), 19 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index ed9d056d2108..eebb32689816 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -369,16 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
- 		return export_unknown;
- }
- 
--static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
--{
--	if (sec == elf->export_sec)
--		return export_plain;
--	else if (sec == elf->export_gpl_sec)
--		return export_gpl;
--	else
--		return export_unknown;
--}
--
- static const char *namespace_from_kstrtabns(const struct elf_info *info,
- 					    const Elf_Sym *sym)
- {
-@@ -576,10 +566,7 @@ static int parse_elf(struct elf_info *info, const char *filename)
- 				fatal("%s has NOBITS .modinfo\n", filename);
- 			info->modinfo = (void *)hdr + sechdrs[i].sh_offset;
- 			info->modinfo_len = sechdrs[i].sh_size;
--		} else if (strcmp(secname, "__ksymtab") == 0)
--			info->export_sec = i;
--		else if (strcmp(secname, "__ksymtab_gpl") == 0)
--			info->export_gpl_sec = i;
-+		}
- 
- 		if (sechdrs[i].sh_type == SHT_SYMTAB) {
- 			unsigned int sh_link_idx;
-@@ -703,7 +690,7 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 	if (strstarts(symname, "__ksymtab"))
- 		export = export_from_secname(info, get_secindex(info, sym));
- 	else
--		export = export_from_sec(info, get_secindex(info, sym));
-+		export = export_unknown;
- 
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 0c47ff95c0e2..a85dcec3669a 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -25,7 +25,6 @@
- #define Elf_Sym     Elf32_Sym
- #define Elf_Addr    Elf32_Addr
- #define Elf_Sword   Elf64_Sword
--#define Elf_Section Elf32_Half
- #define ELF_ST_BIND ELF32_ST_BIND
- #define ELF_ST_TYPE ELF32_ST_TYPE
- 
-@@ -40,7 +39,6 @@
- #define Elf_Sym     Elf64_Sym
- #define Elf_Addr    Elf64_Addr
- #define Elf_Sword   Elf64_Sxword
--#define Elf_Section Elf64_Half
- #define ELF_ST_BIND ELF64_ST_BIND
- #define ELF_ST_TYPE ELF64_ST_TYPE
- 
-@@ -138,8 +136,6 @@ struct elf_info {
- 	Elf_Shdr     *sechdrs;
- 	Elf_Sym      *symtab_start;
- 	Elf_Sym      *symtab_stop;
--	Elf_Section  export_sec;
--	Elf_Section  export_gpl_sec;
- 	char         *strtab;
- 	char	     *modinfo;
- 	unsigned int modinfo_len;
--- 
-2.32.0
+> However, there are 27 virtio_*.h
+> files in include/uapi/linux that probably should stay together for
+> the purpose of defining the virtio protocol, and some others might
+> be uapi relevant.
+> 
+> I see that at least include/uapi/linux/vhost.h has ioctl() definitions
+> in it, and includes the virtio_ring.h header indirectly.
+> 
+> Adding the virtio maintainers to Cc to see if they can provide
+> more background on this.
+> 
+> > If it is just as a "master copy" it can live in drivers/virtio/, just
+> > like we do for other formats.
+> 
+> It has to be in include/linux/ at least because it's used by a number
+> of drivers outside of drivers/virtio/.
+> 
+>         Arnd
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+> 
 
