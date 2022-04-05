@@ -2,130 +2,119 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5473C4321E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C62C43217
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1837048AbiDFAnp (ORCPT
+        id S1573353AbiDFAnm (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35620 "EHLO
+        Tue, 5 Apr 2022 20:43:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1457621AbiDEQS2 (ORCPT
+        with ESMTP id S241322AbiDEUpv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 12:18:28 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2220B193D3
-        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 09:16:29 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id p15so24115833lfk.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 09:16:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Uy8i40RIZFVV64urUf42bHyfQVf4Q/JqjVb+pMMetgg=;
-        b=VEZUGGgcS/bCf+7bs3tHZb8+OMlT5unqdhNUgKPFfUrzmUWPzwkPflleyRfNc9Gszb
-         Zvp51L5ajuECgaMz1MXPXAXCzpd+r7XgMLjc0WwZUqmG6YkOW8zjrrmE+M6NRQcmJWuO
-         Y0fH0pb8byrF6pULERlph+UgHZwh1mkS4uFnJ4VLQVddcyXp54KZF/gQUNfoGi+CLUv5
-         mS5mky+6cLoMPbbvLH9DILjT2TrafcmZcPrfQVcEzGZ47/o/q3O5NsqGbBMbE0V/AgPW
-         oBBJDvv82i/EGVLu1pU55SOGOo1TrCbFYInzxzprvbxO/U2/r7StZYuNCf32nr453634
-         fBJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Uy8i40RIZFVV64urUf42bHyfQVf4Q/JqjVb+pMMetgg=;
-        b=rHAyOYnzsyWAMfoPi4kbhpiJaX51Y5hb4wbcWBGGhow4MYq5ahuDbL2eqIYvAQg+JF
-         TW73MhuayzfyngaBroWrJQ0iuquJciHe+rk6NpkG++rLRvnBn3iV2YABOhaO77RRYR5D
-         K13cju2/1JdEZIDF3OJ1zOPWiU2c2Ow24qKg9LdEKtqXQtHf375HRMGVX6gkWeMMcvJo
-         wHMUGaIBXN5OBM567qeyoiVtWF/t05ePzw1Ur0UcaZwzpXZERmwDrK+JmtcD7yvfiXvH
-         L4tvU3Oc6qs1/LNK6ANKlyOn4WZ3QNLryBwnVE0rjdxasHIy4ZOnMa7atgYpLd+s7qdM
-         O+5g==
-X-Gm-Message-State: AOAM5329pnEZAxagTlBUW75iZG76ajaBaF6dkOfG9kNaJGLoOia/WDdh
-        o2DQXsHuWI63AWr8Rmaz1pAWMmmLcfP6bXRA7R6SrA==
-X-Google-Smtp-Source: ABdhPJyczCamPzZ+WireWxW4CQXH7k2Pos0Q5thRcGyasYMnxW8whHvGnEWwMVjDvTFTyp15EDL3Em9/iSDdkwnlAHg=
-X-Received: by 2002:a05:6512:b9e:b0:44a:10eb:9607 with SMTP id
- b30-20020a0565120b9e00b0044a10eb9607mr3071054lfv.626.1649175385326; Tue, 05
- Apr 2022 09:16:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220405113359.2880241-1-masahiroy@kernel.org> <20220405113359.2880241-2-masahiroy@kernel.org>
-In-Reply-To: <20220405113359.2880241-2-masahiroy@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 5 Apr 2022 09:16:13 -0700
-Message-ID: <CAKwvOdnJoAoMbcLo_N=t46SC62yxNDEbj24Y_zRzT4LG-LheXQ@mail.gmail.com>
-Subject: Re: [PATCH v2 01/10] kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
+        Tue, 5 Apr 2022 16:45:51 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E9AD9EB5;
+        Tue,  5 Apr 2022 13:22:23 -0700 (PDT)
+Received: from leknes.fjasle.eu ([46.142.97.95]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MxV4T-1nvrQ50Jpp-00xpap; Tue, 05 Apr 2022 22:16:20 +0200
+Received: by leknes.fjasle.eu (Postfix, from userid 1000)
+        id 13DF73C088; Tue,  5 Apr 2022 22:16:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fjasle.eu; s=mail;
+        t=1649189778; bh=GPfCvVD2BrdOXMdNnxNrFcntwH8cnF/qTfQuCuV8YzY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZCVPqPQLOy4IRjuET4veOmGPaRaH8zVgC8X5Q//kiDNo254elLsNsrH/jF+A4SfDu
+         fJZol9+js3503xEoh7PNBYfKbO4LsyncqVXwuiW/p1Pz591LUO4stHSWT9jb6f0fpS
+         LwxB4TC/8gRUaXeB6joOFiKkqPwVjCg78ukR8ZIw=
+Date:   Tue, 5 Apr 2022 22:16:16 +0200
+From:   Nicolas Schier <nicolas@fjasle.eu>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>
-Content-Type: text/plain; charset="UTF-8"
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH v2 07/10] kbuild: get rid of duplication in the first
+ line of *.mod files
+Message-ID: <YkyjkAWb56wqL3iK@fjasle.eu>
+References: <20220405113359.2880241-1-masahiroy@kernel.org>
+ <20220405113359.2880241-8-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220405113359.2880241-8-masahiroy@kernel.org>
+X-Provags-ID: V03:K1:rFb6rOPGOYf54rAUdi4Z7QmLIEC3PNtz5bjBHKiS5S9kz/rp0KY
+ IFv++Z8xORrnNoHxVlKCCwBFePfvbMorNonoqK+eS37J6mA0sVrUMi5KhrL+g8s38nFS+it
+ jaAii3I6IpoNQwagGGA/fzFzKXA4tIs3r2YX7NcLWQV/jDfiPZzrKBJHQo4UaW/xEY0twmi
+ fVbOPGXwmVOOeNcIh86/g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Ac6prOacJsQ=:p+T22kYzZjC80rzUVrllUV
+ ji899ZO6uA6RoUtAgYk8IZZV1v6/Il8KGEN8e1kPelzhvp6QSHSRdBmykibXrRbBFG41xQeP1
+ gOjOlFnoKvE7DNqn7H0cwQVD6g0lHHsU2mElvBL73v8gU7JruB4viokTp2JJjTcX1ejdRnMQ4
+ M/5/8h3Fy6ECkDYQeiMf8/wxuFx/JsVCFil1toUGlGuRs8q/30p1U6Z1hbyLlMewwea18iHfg
+ uHrl4pFb88gS3XRed7Q4/v4gPqWTzGyE1BIvN2eGWDi331J77VZ0uBH8aa0aZS9tmXB98nnt0
+ ldp3yfFeiCgviIYH9Via4XmsR4B+fWm6TA/xIUXmLlwGppE55kirdoi28QXbGmE9HSG6qaSAb
+ 8uS8DyYwVOQgkAJ4i1XVphUoxtTWnolRaDqAx6aZqlV/D/I1+zVX0qp2jKWBTpYeV1+OHnJVu
+ 2Jg1sHE6Wu8EGeI5ecf1DWG+x6wjRCJRa2WO24akBRPI8daVDSwHUM/0qloUUYNVTMK3iDF/S
+ xwwW6M2fK8SjcZsMHPdCq49U+gAcVvolTnWUlMaMal+KjhzlbOq6Senx5Z6+RQA29+228MMsz
+ iQIwXFYA3/PjoT5sfioSIV59SueftRAJuzL/y3ryNYg6tKaVvKT8TWnns0PD47pvP+JH8I0T8
+ +ttgm0pPp5/hNHiseCnlEYdpfkKs+A1zEelJuK9dmu69yeipd5yzJp2yYIk1nWq4+mJY=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Apr 5, 2022 at 4:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> The genksyms command part in cmd_gensymtypes_{c,S} is duplicated.
-> Factor it out into the 'genksyms' macro.
->
-> For the readability, I slightly refactor the arguments to genksyms.
->
+On Tue, Apr 05, 2022 at 08:33:55PM +0900 Masahiro Yamada wrote:
+> The first line of *.mod lists the member objects of the module.
+> This list may contain duplication if the same object is added multiple
+> times, like this:
+> 
+>   obj-m := foo.o
+>   foo-$(CONFIG_FOO1_X) += foo1.o
+>   foo-$(CONFIG_FOO1_Y) += foo1.o
+>   foo-$(CONFIG_FOO2_X) += foo2.o
+>   foo-$(CONFIG_FOO2_Y) += foo2.o
+> 
+> This is probably not a big deal. As far as I know, the only small
+> problem is scripts/mod/sumversion.c parses the same file over again.
+> This can be avoided by adding $(sort ...). It has a side-effect that
+> sorts the objects alphabetically, but it is not a big deal, either.
+> 
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-
-It looks like you may have sent v2 twice; apologies if I comment on
-BOTH threads rather than 1.
-
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-
 > ---
->
+> 
 > Changes in v2:
->   - Fix the location of the closing parenthesis
->
->  scripts/Makefile.build | 19 ++++++++-----------
->  1 file changed, 8 insertions(+), 11 deletions(-)
->
+>   - new
+> 
+>  scripts/Makefile.build | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
 > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 9717e6f6fb31..31e0e33dfe5d 100644
+> index 3ef2373f0a57..63625877aeae 100644
 > --- a/scripts/Makefile.build
 > +++ b/scripts/Makefile.build
-> @@ -125,13 +125,14 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
->  $(obj)/%.i: $(src)/%.c FORCE
->         $(call if_changed_dep,cpp_i_c)
->
-> +genksyms = scripts/genksyms/genksyms           \
-> +       $(if $(1), -T $(2))                     \
-> +       $(if $(CONFIG_MODULE_REL_CRCS), -R)     \
-> +       $(if $(KBUILD_PRESERVE), -p)            \
-> +       -r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
+> @@ -307,8 +307,10 @@ $(obj)/%.prelink.o: $(obj)/%.o FORCE
+>  	$(call if_changed,cc_prelink_modules)
+>  endif
+>  
+> +multi-m-prereqs = $(sort $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)))
 > +
->  # These mirror gensymtypes_S and co below, keep them in synch.
-> -cmd_gensymtypes_c =                                                         \
-> -    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
-> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
-> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
-> -     $(if $(KBUILD_PRESERVE),-p)                                            \
-> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-> +cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
->
->  quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
->  cmd_cc_symtypes_c =                                                         \
-> @@ -344,11 +345,7 @@ cmd_gensymtypes_S =                                                         \
->      $(CPP) $(a_flags) $< |                                                  \
->       grep "\<___EXPORT_SYMBOL\>" |                                          \
->       sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
-> -    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
-> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
-> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
-> -     $(if $(KBUILD_PRESERVE),-p)                                            \
-> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-> +    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
->
->  quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
->  cmd_cc_symtypes_S =                                                         \
-> --
-> 2.32.0
->
+>  cmd_mod = { \
+> -	echo $(if $($*-objs)$($*-y)$($*-m), $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)), $(@:.mod=.o)); \
+> +	echo $(if $(multi-m-prereqs), $(multi-m-prereqs), $(@:.mod=.o)); \
 
+I'd rather expected to see $(or) here, too, as in commit 5c8166419acf ("kbuild:
+replace $(if A,A,B) with $(or A,B)").
+
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+
+>  	$(undefined_syms) echo; \
+>  	} > $@
+>  
+> -- 
+> 2.32.0
+> 
+> 
 
 -- 
-Thanks,
-~Nick Desaulniers
+epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+↳ gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+     -- frykten for herren er opphav til kunnskap --
