@@ -2,129 +2,104 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5338C4332F
-	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5C6C433EF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  5 Apr 2022 14:18:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242709AbiDEOL6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 10:11:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49460 "EHLO
+        id S245161AbiDEOME (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 5 Apr 2022 10:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381370AbiDEMya (ORCPT
+        with ESMTP id S1384127AbiDEM1M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 08:54:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A727929CAA
-        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 04:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649159875;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4tf5cml5DKG34+H+/7P2EmXNj5BSxC+Di2E2isNkLxI=;
-        b=en4YBQCHvkYBN4SIWnA1KZxiwUcwRl6eDizBNbd7KaJAKk8SHO89C6j0vdQ5SevWf1oiDT
-        kZybj9pJTD1ZSGVumcHfD5G8O1Yyb5V54SPUQDIJnoasAsLlH4N0scsTweaWly6DEHDp3p
-        nAhypvbbbhjmg3Ofuix7hwJ9tyuaL4U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-gKNzK15wOWOL7Q6PDtE0Yw-1; Tue, 05 Apr 2022 07:57:54 -0400
-X-MC-Unique: gKNzK15wOWOL7Q6PDtE0Yw-1
-Received: by mail-wm1-f70.google.com with SMTP id bg8-20020a05600c3c8800b0038e6a989925so1933001wmb.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 04:57:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4tf5cml5DKG34+H+/7P2EmXNj5BSxC+Di2E2isNkLxI=;
-        b=OPfOYNm/MXhePIEaAXhghpy86YzCCsKkdOdx4l2uDG4cXsR2DTnrmgWqIePzAEIaKQ
-         GSjT4MvceSeIoQ+e+5pUblEKopWmUMzH2eRg1LsIFa2EhyDj53DRvEuP4VYfmY/IgtDA
-         xHyWAPMAaiBYfKxaYcxG+rJ4XgWOcLsJpqNbaCvfgyNmVJJGK1WNHBjF+ZqdYYYj9zUf
-         dTD4LJxJmY3Y1sKe+LB17wPTiqPobtqgh1kCsycuyxkoATOU69QJZXFQuFUsqcXs00mk
-         nC0G9r5Gh9j6C6ZYScKo41At2Y2bLDqw+M6z868M5LjjJMjVgutxONpJTTprFGSilV8f
-         hl6A==
-X-Gm-Message-State: AOAM533WBRxFxMz7jRZ22v51C21dkQV672GUzVVbAFpAlkuFOKELPMCF
-        N9Zz5iLaDvWZqd6guiYheSCH43vEjTRcXAUMymDAbidYjHJJ4YLY+2yfy6vP11UM7NtC2aZAlKs
-        5Y8fa9sWqBKx1XooSaCV0ANtp
-X-Received: by 2002:adf:8050:0:b0:206:40a:a770 with SMTP id 74-20020adf8050000000b00206040aa770mr2535501wrk.380.1649159873349;
-        Tue, 05 Apr 2022 04:57:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzgqTZayIX4u/UnvkTDHW17PSUoPyzp3WUxX6v1B27xgUyGVSxDLohCf9WBiOzGI5DL0p4UMA==
-X-Received: by 2002:adf:8050:0:b0:206:40a:a770 with SMTP id 74-20020adf8050000000b00206040aa770mr2535488wrk.380.1649159873090;
-        Tue, 05 Apr 2022 04:57:53 -0700 (PDT)
-Received: from redhat.com ([2.52.17.211])
-        by smtp.gmail.com with ESMTPSA id f11-20020a7bcc0b000000b0037e0c362b6dsm1992438wmh.31.2022.04.05.04.57.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 04:57:52 -0700 (PDT)
-Date:   Tue, 5 Apr 2022 07:57:49 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [PATCH 8/8] virtio_ring.h: do not include <stdint.h> from
- exported header
-Message-ID: <20220405075738-mutt-send-email-mst@kernel.org>
-References: <20220404061948.2111820-1-masahiroy@kernel.org>
- <20220404061948.2111820-9-masahiroy@kernel.org>
+        Tue, 5 Apr 2022 08:27:12 -0400
+Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3161574BF;
+        Tue,  5 Apr 2022 04:35:18 -0700 (PDT)
+Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 235BYCGn000464;
+        Tue, 5 Apr 2022 20:34:13 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 235BYCGn000464
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649158453;
+        bh=3DqNNvADXzvHcLCX0JSWQu0LGeQKS0pcjU6by571POs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=IMM4BxXHf9E3neDAF1TWt3R+5eYjP6f7RQRZUvTHBnrIAQT4Pz/Q5AIfVvofrn4J4
+         7RoXYWZ8ok44JqyjEhkn9QipP1dxZoWTkOeerMrUH4Q59PunvHTHp323M4A+jQ3RTJ
+         T/extvRF5kV6xsvgaJuf2VjE4pDbPIf08E+3Hyo1Y7nz0OOvEbgyyfjqX5/1e9+oYn
+         gmiEx3+cCur7VXwUVAOmm0aaMuEMp5Gyrkw6DehiFLPZ0JbRwaN4RxyZFzieEQWlZG
+         4BqsexGyno2F1xP5ZzXbeZvfNaldzuMr6gY+u6rhOG7EMHmw2LqRT5Hs4qxz7IRtDc
+         7aFfq7GP3W8DA==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2 01/10] kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
+Date:   Tue,  5 Apr 2022 20:33:49 +0900
+Message-Id: <20220405113359.2880241-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220405113359.2880241-1-masahiroy@kernel.org>
+References: <20220405113359.2880241-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220404061948.2111820-9-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Apr 04, 2022 at 03:19:48PM +0900, Masahiro Yamada wrote:
-> Arnd mentioned a limitation when including <stdint.h> from UAPI
-> headers. [1]
-> 
-> Besides, I'd like exported headers to be as compliant with the
-> traditional C as possible.
-> 
-> In fact, the UAPI headers are compile-tested with -std=c90 (see
-> usr/include/Makefile) even though the kernel itself is now built
-> with -std=gnu11.
-> 
-> Currently, include/uapi/linux/virtio_ring.h includes <stdint.h>
-> presumably because it uses uintptr_t.
-> 
-> Replace it with __kernel_uintptr_t, and stop including <stdint.h>.
-> 
-> [1]: https://lore.kernel.org/all/CAK8P3a0bz8XYJOsmND2=CT_oTDmGMJGaRo9+QMroEhpekSMEaQ@mail.gmail.com/
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+The genksyms command part in cmd_gensymtypes_{c,S} is duplicated.
+Factor it out into the 'genksyms' macro.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+For the readability, I slightly refactor the arguments to genksyms.
 
-> ---
-> 
->  include/uapi/linux/virtio_ring.h | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virtio_ring.h
-> index 476d3e5c0fe7..6329e4ff35f4 100644
-> --- a/include/uapi/linux/virtio_ring.h
-> +++ b/include/uapi/linux/virtio_ring.h
-> @@ -31,9 +31,7 @@
->   * SUCH DAMAGE.
->   *
->   * Copyright Rusty Russell IBM Corporation 2007. */
-> -#ifndef __KERNEL__
-> -#include <stdint.h>
-> -#endif
-> +
->  #include <linux/types.h>
->  #include <linux/virtio_types.h>
->  
-> @@ -196,7 +194,7 @@ static inline void vring_init(struct vring *vr, unsigned int num, void *p,
->  	vr->num = num;
->  	vr->desc = p;
->  	vr->avail = (struct vring_avail *)((char *)p + num * sizeof(struct vring_desc));
-> -	vr->used = (void *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
-> +	vr->used = (void *)(((__kernel_uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
->  		+ align-1) & ~(align - 1));
->  }
->  
-> -- 
-> 2.32.0
-> 
-> 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v2:
+  - Fix the location of the closing parenthesis
+
+ scripts/Makefile.build | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 9717e6f6fb31..31e0e33dfe5d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -125,13 +125,14 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
+ $(obj)/%.i: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cpp_i_c)
+ 
++genksyms = scripts/genksyms/genksyms		\
++	$(if $(1), -T $(2))			\
++	$(if $(CONFIG_MODULE_REL_CRCS), -R)	\
++	$(if $(KBUILD_PRESERVE), -p)		\
++	-r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
++
+ # These mirror gensymtypes_S and co below, keep them in synch.
+-cmd_gensymtypes_c =                                                         \
+-    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+-    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+-     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+-     $(if $(KBUILD_PRESERVE),-p)                                            \
+-     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
++cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
+ 
+ quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
+ cmd_cc_symtypes_c =                                                         \
+@@ -344,11 +345,7 @@ cmd_gensymtypes_S =                                                         \
+     $(CPP) $(a_flags) $< |                                                  \
+      grep "\<___EXPORT_SYMBOL\>" |                                          \
+      sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
+-    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+-    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+-     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+-     $(if $(KBUILD_PRESERVE),-p)                                            \
+-     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
++    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
+ 
+ quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
+ cmd_cc_symtypes_S =                                                         \
+-- 
+2.32.0
 
