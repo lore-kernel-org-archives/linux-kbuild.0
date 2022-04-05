@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 936B2C43217
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A65D2C433F5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1453694AbiDFAnS (ORCPT
+        id S1454322AbiDFAnV (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59546 "EHLO
+        Tue, 5 Apr 2022 20:43:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444179AbiDEPk6 (ORCPT
+        with ESMTP id S1444192AbiDEPlA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:40:58 -0400
+        Tue, 5 Apr 2022 11:41:00 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28738B8D;
-        Tue,  5 Apr 2022 07:03:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A78575FCB;
+        Tue,  5 Apr 2022 07:03:31 -0700 (PDT)
 Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8J021295;
-        Tue, 5 Apr 2022 23:02:47 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8J021295
+        by conuserg-09.nifty.com with ESMTP id 235E2k8M021295;
+        Tue, 5 Apr 2022 23:02:49 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8M021295
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167367;
-        bh=3DqNNvADXzvHcLCX0JSWQu0LGeQKS0pcjU6by571POs=;
+        s=dec2015msa; t=1649167369;
+        bh=yB8mBxh6zgfFkl1vR4ponG9HVyr7i/FNMeStWHFyu/w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LfieR2VmMKTxTNyd2rEQ8kIzgpwQ0gGElm/+R4Gv+yUizsZAMUx7OlekL+Cq87W/w
-         oaeFGyDYwcDQqttYW2cDoatDLf+PgAPBsMGOgvbhcLfAnFi0XWqAPcD+JRfi0JXyyf
-         BjZimdPTSqSBoscR0piS+f9exDxwYD25UdNtjyImjudR175ZrZRHaFhv9IGjfp3OWE
-         kkpnQtRrh69J5UNewWEJ95BZ5LvGCym/qqCpJTFn5rd3SDRbhcKSoFitacvlRV+R5l
-         aOqfb4EVoT8vdO2BhH1u9woz+RhCizmkuLuIFpRYz8ox5IFg71M0uMm9/z7vJmZ/+L
-         qmQID8zdlEKWQ==
+        b=l2bI6SwM4DXiakwdb8B0EEcAferf7Hwfqdh2AWV7Vu42eBtMBZsdK07j/XqSwrIbu
+         o/h4U5jifRvz3VrtDTKBHbqXO9asE+l1LlHn5b5vz5B8HeQLaJcRQWUhT0GPjyrwhl
+         qoduk9NgUbcUzRypZzOpcbh0xn4FOo9UdwNj9jCYLAkJhLwOznXdFoxDVxlLKaN5qX
+         NPOgULaYb/Ht3+n9/kfNKVdNTCpl2kpGdc5ENaiXaxi7610PZ0BKg/GRwLppzNv0EA
+         CX6A6RmTkNKvhHVIlecsLuJtXkpsYd4lFrgbS8qW1gTOVyl4yp2o0nZrGgtJTG3aYG
+         1Tn29v3k2xnww==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 01/10] kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
-Date:   Tue,  5 Apr 2022 23:02:20 +0900
-Message-Id: <20220405140229.2895394-2-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH v2 04/10] modpost: move export_from_secname() call to more relevant place
+Date:   Tue,  5 Apr 2022 23:02:23 +0900
+Message-Id: <20220405140229.2895394-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
 References: <20220405140229.2895394-1-masahiroy@kernel.org>
@@ -49,58 +49,54 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The genksyms command part in cmd_gensymtypes_{c,S} is duplicated.
-Factor it out into the 'genksyms' macro.
+The assigned 'export' is only used when
 
-For the readability, I slightly refactor the arguments to genksyms.
+    if (strstarts(symname, "__ksymtab_"))
+
+is met. The else-part of the assignment is the dead code.
+
+Move the export_from_secname() call to where it is used.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-Changes in v2:
-  - Fix the location of the closing parenthesis
+(no changes since v1)
 
- scripts/Makefile.build | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ scripts/mod/modpost.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 9717e6f6fb31..31e0e33dfe5d 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -125,13 +125,14 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
- $(obj)/%.i: $(src)/%.c FORCE
- 	$(call if_changed_dep,cpp_i_c)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index eebb32689816..f9e54247ae1d 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -684,14 +684,8 @@ static void handle_modversion(const struct module *mod,
+ static void handle_symbol(struct module *mod, struct elf_info *info,
+ 			  const Elf_Sym *sym, const char *symname)
+ {
+-	enum export export;
+ 	const char *name;
  
-+genksyms = scripts/genksyms/genksyms		\
-+	$(if $(1), -T $(2))			\
-+	$(if $(CONFIG_MODULE_REL_CRCS), -R)	\
-+	$(if $(KBUILD_PRESERVE), -p)		\
-+	-r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
+-	if (strstarts(symname, "__ksymtab"))
+-		export = export_from_secname(info, get_secindex(info, sym));
+-	else
+-		export = export_unknown;
+-
+ 	switch (sym->st_shndx) {
+ 	case SHN_COMMON:
+ 		if (strstarts(symname, "__gnu_lto_")) {
+@@ -726,7 +720,11 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
+ 	default:
+ 		/* All exported symbols */
+ 		if (strstarts(symname, "__ksymtab_")) {
++			enum export export;
 +
- # These mirror gensymtypes_S and co below, keep them in synch.
--cmd_gensymtypes_c =                                                         \
--    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
--    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
--     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
--     $(if $(KBUILD_PRESERVE),-p)                                            \
--     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-+cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
- 
- quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
- cmd_cc_symtypes_c =                                                         \
-@@ -344,11 +345,7 @@ cmd_gensymtypes_S =                                                         \
-     $(CPP) $(a_flags) $< |                                                  \
-      grep "\<___EXPORT_SYMBOL\>" |                                          \
-      sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
--    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
--    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
--     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
--     $(if $(KBUILD_PRESERVE),-p)                                            \
--     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-+    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
- 
- quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
- cmd_cc_symtypes_S =                                                         \
+ 			name = symname + strlen("__ksymtab_");
++			export = export_from_secname(info,
++						     get_secindex(info, sym));
+ 			sym_add_exported(name, mod, export);
+ 		}
+ 		if (strcmp(symname, "init_module") == 0)
 -- 
 2.32.0
 
