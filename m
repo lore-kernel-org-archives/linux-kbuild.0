@@ -2,89 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8976FC35276
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C921BC433FE
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442136AbiDFAmU (ORCPT
+        id S1442950AbiDFAmb (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60148 "EHLO
+        Tue, 5 Apr 2022 20:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444191AbiDEPlA (ORCPT
+        with ESMTP id S1457629AbiDEQUj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:41:00 -0400
-Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A1EC21A9;
-        Tue,  5 Apr 2022 07:03:31 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8N021295;
-        Tue, 5 Apr 2022 23:02:49 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8N021295
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167370;
-        bh=OI5QjFeIIWR7CWjIMyrgsMsmmhThQ/JlR8Hn8H2SKxU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EwZqUy+YYd/uAs1mSb79ErncbVd8vd0QgR6mkWd4HA5gZvv357udq6kYxL9MhPTaw
-         X5PrY/cQw2ypzn5vS9+v5dhNs0bOnIz82zlm3PGlDFhn/QNhqHvu8A4n/yK57mBiwu
-         4NLnkjINTALmXeMtb413wl+dn76sbLQjxrP4apyOuuJlXth1yxsnVXBVtTh6g/ueIc
-         5vgzAGwHkx97Gqq1LQiqrZlGufF8imzTbOk7/gy6031hQyL8PfYCe8lUpfluNpI7cg
-         o6kTlg7N2dvVu5Zj1mLjuznXSldB+9lFJivPQVuKzXhvTeNa/hGnAkBoTVTEZd34fy
-         fz1O+aHiHXM1g==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 05/10] modpost: remove redundant initializes for static variables
-Date:   Tue,  5 Apr 2022 23:02:24 +0900
-Message-Id: <20220405140229.2895394-6-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
-References: <20220405140229.2895394-1-masahiroy@kernel.org>
+        Tue, 5 Apr 2022 12:20:39 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9939BA193
+        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 09:18:38 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id t25so24116092lfg.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 09:18:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wIU2TEaS8WXbUqpi1fM6EfmEmwnBi19lD4NhlLBz3ig=;
+        b=H8/4Lx4V0XygDs2dccjNd7TS7BtZ2fMSdr3xp4cjLVJj1pIAG8E/lefcRKdKOVEcDq
+         0K+DG1Xns7N/k3s/nBe/9wCZfncNH69qMkDM9XvpXMRkvH+bCU2KCXleFNDWKjkqewpk
+         IPy2hfj/pbDYC90dDuVUsKY0KS75145Wb2v/078FGCGX71uwEW/JGKMcMqr+9Cj2bPOp
+         HKSXu5vKjskeXytHF25DvAkVsnlFk15eVE4zcractjvW8tvGzunroHoHyGFtu1iB8E40
+         C7FXx+WgMFYFECMibHGBn5OK/9VMXK53nQXr/V6k+ni5i/+X5vRXaQu+vE2tXjFzGv2x
+         SYWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wIU2TEaS8WXbUqpi1fM6EfmEmwnBi19lD4NhlLBz3ig=;
+        b=49WkdJo2t+vp042rBdaZzN0rZtU2h/q2cr04mLDTUhvFKo1z7iAXHHrBf/KoBwSTs5
+         zSsxaFu0uku4r5symXt1MuzJrSiOHAaXavV4fYss7LBJ2wUTB3TBXcc9CteJJNC84rnl
+         N+EfdOMJJOBJR4ZI/kH70KSS+2mTD7wo+Qd5YiSJuKkuM62EvvE7THigroAAQ1TjvmEd
+         lshRNZUm3MpZDWCURwYbnSHHqd5Dq75XDEM+8kapHYyrRsFupZUdDUzzOrtVHxXLIpVq
+         D4IpSYzMtQzb3C9rw6Wg0uSYr05KBUN+HRGMcs38iCU321OAcDwNUDXr0zylYLPYV6kN
+         Rz8w==
+X-Gm-Message-State: AOAM5329WKUnNR7j6Fa6cTe1lp1zIhcIG2ZKbdXPpE/DLPuapuqfEoZ/
+        y2MjB3q4aDzCZwn+c5zJgD/ENIaeaqhvTfQ68a7G1g==
+X-Google-Smtp-Source: ABdhPJzyIXHKLyRxKNDc0gfAZnnCNVmFVcYvD3pwWFNRifi2q7UjxoNx7BuehqH/sa8M5LtAyeh2d+vmVolrtFy4p0A=
+X-Received: by 2002:a05:6512:3da1:b0:44a:2aeb:28e4 with SMTP id
+ k33-20020a0565123da100b0044a2aeb28e4mr3016271lfv.579.1649175515578; Tue, 05
+ Apr 2022 09:18:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220405113359.2880241-1-masahiroy@kernel.org> <20220405113359.2880241-3-masahiroy@kernel.org>
+In-Reply-To: <20220405113359.2880241-3-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 5 Apr 2022 09:18:23 -0700
+Message-ID: <CAKwvOd=13RwpvTQ5O86aQkyrGVSbqJkCWwsvU+DbRsGiKNS71A@mail.gmail.com>
+Subject: Re: [PATCH v2 02/10] kbuild: do not remove empty *.symtypes explicitly
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-These are cleared without explicit initializes.
+On Tue, Apr 5, 2022 at 4:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Presumably, 'test -s $@ || rm -f $@' intends to remove the output when
+> the genksyms command fails.
+>
+> It is unneeded because .DELETE_ON_ERROR automatically removes the output
+> on failure.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Changes in v2:
-  - New
+> ---
+>
+> Changes in v2:
+>   - Fix accidental drop of '> /dev/null'
+>
+>  scripts/Makefile.build | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 31e0e33dfe5d..3ef2373f0a57 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -135,9 +135,7 @@ genksyms = scripts/genksyms/genksyms                \
+>  cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
+>
+>  quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
+> -cmd_cc_symtypes_c =                                                         \
+> -    $(call cmd_gensymtypes_c,true,$@) >/dev/null;                           \
+> -    test -s $@ || rm -f $@
+> +      cmd_cc_symtypes_c = $(call cmd_gensymtypes_c,true,$@) >/dev/null
+>
+>  $(obj)/%.symtypes : $(src)/%.c FORCE
+>         $(call cmd,cc_symtypes_c)
+> @@ -348,9 +346,7 @@ cmd_gensymtypes_S =                                                         \
+>      $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
+>
+>  quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
+> -cmd_cc_symtypes_S =                                                         \
+> -    $(call cmd_gensymtypes_S,true,$@) >/dev/null;                           \
+> -    test -s $@ || rm -f $@
+> +      cmd_cc_symtypes_S = $(call cmd_gensymtypes_S,true,$@) >/dev/null
+>
+>  $(obj)/%.symtypes : $(src)/%.S FORCE
+>         $(call cmd,cc_symtypes_S)
+> --
+> 2.32.0
+>
 
- scripts/mod/modpost.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index f9e54247ae1d..2a202764ff48 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -23,15 +23,15 @@
- #include "../../include/linux/license.h"
- 
- /* Are we using CONFIG_MODVERSIONS? */
--static int modversions = 0;
-+static int modversions;
- /* Is CONFIG_MODULE_SRCVERSION_ALL set? */
--static int all_versions = 0;
-+static int all_versions;
- /* If we are modposting external module set to 1 */
--static int external_module = 0;
-+static int external_module;
- /* Only warn about unresolved symbols */
--static int warn_unresolved = 0;
-+static int warn_unresolved;
- /* How a symbol is exported */
--static int sec_mismatch_count = 0;
-+static int sec_mismatch_count;
- static int sec_mismatch_warn_only = true;
- /* ignore missing files */
- static int ignore_missing_files;
 -- 
-2.32.0
-
+Thanks,
+~Nick Desaulniers
