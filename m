@@ -2,246 +2,148 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF095C433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC8BC46467
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442585AbiDFAmY (ORCPT
+        id S1444213AbiDFAmq (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:42:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
+        Tue, 5 Apr 2022 20:42:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444333AbiDEPlS (ORCPT
+        with ESMTP id S1457660AbiDEQ23 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:41:18 -0400
-Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004F38FE7F;
-        Tue,  5 Apr 2022 07:04:13 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8Q021295;
-        Tue, 5 Apr 2022 23:02:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8Q021295
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167372;
-        bh=oXu2FC2tHikCnI54og5MXSRnhCbAnmIjyeEOCWmBBwA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PwNT30EmdbIk6ELYPbn69wxNB+UFuvu0SqD7EoH/me8iKt5evsxltJNLAI3P7lzVn
-         Ziiz5yE0wNk+mrk+CMShgipp+7SF0ikJnrlNqQoVn9m4Y9koP7Z1Y1KTDI7CtKa7KQ
-         iNlA5LKtA1wE83TBVpRhZwdJlmtktVhfS8/aFsWqIPl3+RO6EEy1ytAdqoEmkaFDXS
-         fXI6ARh01qh8rqVP2hMD7WHukR/NGO/2wuCtKWPCPJfj4C76YnlmKHpD3+phs7Csf9
-         /tKdIikZUUvuLmL7z3PNM1h0n/tdJNffr0Pn8XMSYipaXdpBRVvQpxiEmDWK7X8c4S
-         Cbzdi4nc6erfw==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <n.schier@avm.de>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH v2 08/10] kbuild: split the second line of *.mod into *.usyms
-Date:   Tue,  5 Apr 2022 23:02:27 +0900
-Message-Id: <20220405140229.2895394-9-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
-References: <20220405140229.2895394-1-masahiroy@kernel.org>
+        Tue, 5 Apr 2022 12:28:29 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01DE7C166
+        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 09:26:30 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id t25so24156157lfg.7
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 09:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9lWYY7De4WBUMiRj3mzR0cknXK+RlvIrzmLorqOc2As=;
+        b=iTrCvQL9sM/MUivHYMPf4aKtiHgt6HV4/9ZxumavdEUbybx2Mmzfcw/oiSfdwl2Zrq
+         EhD/G1ftARD2N/Y73EQR3VdBBRBM1j1TGf6b/V0CNMbJFcDDejOS2TPOPdF6bUKoRdd/
+         7gNOYlS4qrA/eUNKW2E+uxCkxDs3ns4pTLN9k+vcChjjNvkW03CcLSzN/WmfM6/ohOtR
+         5SRkfl97vN+215wkqt0YJ6VcHnqvaCD9K+8JqrAdaKCi5Expud2Nw9PXQZqYecntlWWg
+         zv1exSe7AWGBQH3ORUB4oobs2mWIqmKVq21231/XSlykM7pqPzcetba6fb/VTDCumg0a
+         Zh8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9lWYY7De4WBUMiRj3mzR0cknXK+RlvIrzmLorqOc2As=;
+        b=1p9rzhkuYjcXxTwz7Mc7oB1UzFXDoHo8+n1ikYm7piLKGOqCDL1grKfDURpfZenmII
+         Zv5GLjS+5qnkZmlezqQ6NnCqNZJoVOAVZgQphihQOrAZtpqJDJC4PyOWjgOvlkh6hCWX
+         BRLSvM0w6hZ0vtyxXCTEgZM4hsA6fwOQrF5xxwWum1NnsZQdCcgULc5L4kz3IPpxE+eP
+         lH2doqJFtfjo79c1kb5bhFbACjDbakwub/8iOa738C3qlVKoHI+a5EOrcvQso4rz9UEc
+         hfffpbGcvFXtvSLV0hLK1R0rzzyjyI40xw1q6hr0ETvFcEZTcT9HtjKRMRnmkX1rqsXe
+         S4Kw==
+X-Gm-Message-State: AOAM533rzX7UWA4R0OBz6qPaWfEntHwU+JyUEo78Yw7sFQjgu87degET
+        3sHwmDESK2etOQu756I9cbYacA8Bis4gfS43is9giyWjqu+wiA==
+X-Google-Smtp-Source: ABdhPJzm9QcSluyOhFjGMfELQHjTr0+RTq5+/AG1ZSda5FkvPasWSBysDU69ZMdlhv33y1Ls5e4uCGoXp6//pr3GG5Y=
+X-Received: by 2002:a19:651d:0:b0:44a:b88a:b0b1 with SMTP id
+ z29-20020a19651d000000b0044ab88ab0b1mr3328216lfb.380.1649175988738; Tue, 05
+ Apr 2022 09:26:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220405113359.2880241-1-masahiroy@kernel.org> <20220405113359.2880241-7-masahiroy@kernel.org>
+In-Reply-To: <20220405113359.2880241-7-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 5 Apr 2022 09:26:17 -0700
+Message-ID: <CAKwvOdkC3RYjOPx-DS0fSCHsts1YGzotBOs4fTKTQk7WZWfBgg@mail.gmail.com>
+Subject: Re: [PATCH v2 06/10] modpost: remove annoying namespace_from_kstrtabns()
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The *.mod files have two lines; the first line lists the member objects
-of the module, and the second line, if CONFIG_TRIM_UNUSED_KSYMS=y, lists
-the undefined symbols.
+On Tue, Apr 5, 2022 at 4:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> There are two call sites for sym_update_namespace().
+>
+> When the symbol has no namespace, s->namespace is set to NULL,
+> but the conversion from "" to NULL is done in two different places.
+>
+> [1] read_symbols()
+>
+>   This gets the namespace from __kstrtabns_<symbol>. If the symbol has
+>   no namespace, sym_get_data(info, sym) returns the empty string "".
+>   namespace_from_kstrtabns() converts it to NULL before it is passed to
+>   sym_update_namespace().
+>
+> [2] read_dump()
+>
+>   This gets the namespace from the dump file, *.symvers. If the symbol
+>   has no namespace, the 'namespace' is the empty string "", which is
+>   directly passed into sym_update_namespace(). The conversion from
+>   "" to NULL is done in sym_update_namespace().
+>
+> namespace_from_kstrtabns() exists only for creating this inconsistency.
+>
+> By removing it, sym_update_namespace() is consistently passed with ""
+> when the symbol has no namespace.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-These two are orthogonal. For further cleanups, let's split the second
-line out to separate *.usyms files, which are generated only when
-CONFIG_TRIM_UNUSED_KSYMS=y.
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Previously, the list of undefined symbols ended up with a very long
-line, but now symbols are split by new lines.
+> ---
+>
+> Changes in v2:
+>   - new
+>
+>  scripts/mod/modpost.c | 14 ++------------
+>  1 file changed, 2 insertions(+), 12 deletions(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 2a202764ff48..522d5249d196 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -369,13 +369,6 @@ static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
+>                 return export_unknown;
+>  }
+>
+> -static const char *namespace_from_kstrtabns(const struct elf_info *info,
+> -                                           const Elf_Sym *sym)
+> -{
+> -       const char *value = sym_get_data(info, sym);
+> -       return value[0] ? value : NULL;
+> -}
+> -
+>  static void sym_update_namespace(const char *symname, const char *namespace)
+>  {
+>         struct symbol *s = find_symbol(symname);
+> @@ -391,8 +384,7 @@ static void sym_update_namespace(const char *symname, const char *namespace)
+>         }
+>
+>         free(s->namespace);
+> -       s->namespace =
+> -               namespace && namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+> +       s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+>  }
+>
+>  /**
+> @@ -2049,9 +2041,7 @@ static void read_symbols(const char *modname)
+>                 /* Apply symbol namespaces from __kstrtabns_<symbol> entries. */
+>                 if (strstarts(symname, "__kstrtabns_"))
+>                         sym_update_namespace(symname + strlen("__kstrtabns_"),
+> -                                            namespace_from_kstrtabns(&info,
+> -                                                                     sym));
+> -
+> +                                            sym_get_data(&info, sym));
+>                 if (strstarts(symname, "__crc_"))
+>                         handle_modversion(mod, &info, sym,
+>                                           symname + strlen("__crc_"));
+> --
+> 2.32.0
+>
 
-Use 'sed' like we did before commit 7d32358be8ac ("kbuild: avoid split
-lines in .mod files").
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
-Changes in v2:
-  - new
-
- .gitignore                  |  1 +
- Makefile                    |  2 +-
- scripts/Makefile.build      | 17 +++++++++--------
- scripts/adjust_autoksyms.sh |  2 +-
- scripts/gen_autoksyms.sh    | 18 +++++++++++-------
- scripts/mod/sumversion.c    | 11 ++---------
- 6 files changed, 25 insertions(+), 26 deletions(-)
-
-diff --git a/.gitignore b/.gitignore
-index 7afd412dadd2..265959544978 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -45,6 +45,7 @@
- *.symversions
- *.tab.[ch]
- *.tar
-+*.usyms
- *.xz
- *.zst
- Module.symvers
-diff --git a/Makefile b/Makefile
-index d9336e783be3..82ee893909e9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1848,7 +1848,7 @@ clean: $(clean-dirs)
- 		-o -name '*.ko.*' \
- 		-o -name '*.dtb' -o -name '*.dtbo' -o -name '*.dtb.S' -o -name '*.dt.yaml' \
- 		-o -name '*.dwo' -o -name '*.lst' \
--		-o -name '*.su' -o -name '*.mod' \
-+		-o -name '*.su' -o -name '*.mod' -o -name '*.usyms' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.lex.c' -o -name '*.tab.[ch]' \
- 		-o -name '*.asn1.[ch]' \
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 63625877aeae..d934bdf84de4 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -85,7 +85,8 @@ ifdef need-builtin
- targets-for-builtin += $(obj)/built-in.a
- endif
- 
--targets-for-modules := $(patsubst %.o, %.mod, $(filter %.o, $(obj-m)))
-+targets-for-modules := $(foreach suffix, mod $(if $(CONFIG_TRIM_UNUSED_KSYMS), usyms), \
-+				$(patsubst %.o, %.$(suffix), $(filter %.o, $(obj-m))))
- 
- ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
- targets-for-modules += $(patsubst %.o, %.prelink.o, $(filter %.o, $(obj-m)))
-@@ -260,9 +261,6 @@ endif
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- cmd_gen_ksymdeps = \
- 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
--
--# List module undefined symbols
--undefined_syms = $(NM) $< | $(AWK) '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }';
- endif
- 
- define rule_cc_o_c
-@@ -309,14 +307,17 @@ endif
- 
- multi-m-prereqs = $(sort $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)))
- 
--cmd_mod = { \
--	echo $(if $(multi-m-prereqs), $(multi-m-prereqs), $(@:.mod=.o)); \
--	$(undefined_syms) echo; \
--	} > $@
-+cmd_mod = echo $(if $(multi-m-prereqs), $(multi-m-prereqs), $(@:.mod=.o)) > $@
- 
- $(obj)/%.mod: $(obj)/%$(mod-prelink-ext).o FORCE
- 	$(call if_changed,mod)
- 
-+# List module undefined symbols
-+cmd_undefined_syms = $(NM) $< | sed -n 's/^  *U //p' > $@
-+
-+$(obj)/%.usyms: $(obj)/%$(mod-prelink-ext).o FORCE
-+	$(call if_changed,undefined_syms)
-+
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
- 		     $(CONFIG_SHELL) $(srctree)/scripts/makelst $*.o \
-diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
-index 59fdb875e818..f1b5ac818411 100755
---- a/scripts/adjust_autoksyms.sh
-+++ b/scripts/adjust_autoksyms.sh
-@@ -35,7 +35,7 @@ case "$KBUILD_VERBOSE" in
- esac
- 
- # Generate a new symbol list file
--$CONFIG_SHELL $srctree/scripts/gen_autoksyms.sh "$new_ksyms_file"
-+$CONFIG_SHELL $srctree/scripts/gen_autoksyms.sh --modorder "$new_ksyms_file"
- 
- # Extract changes between old and new list and touch corresponding
- # dependency files.
-diff --git a/scripts/gen_autoksyms.sh b/scripts/gen_autoksyms.sh
-index 120225c541c5..faacf7062122 100755
---- a/scripts/gen_autoksyms.sh
-+++ b/scripts/gen_autoksyms.sh
-@@ -2,13 +2,10 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
- # Create an autoksyms.h header file from the list of all module's needed symbols
--# as recorded on the second line of *.mod files and the user-provided symbol
--# whitelist.
-+# as recorded in *.usyms files and the user-provided symbol whitelist.
- 
- set -e
- 
--output_file="$1"
--
- # Use "make V=1" to debug this script.
- case "$KBUILD_VERBOSE" in
- *1*)
-@@ -16,6 +13,15 @@ case "$KBUILD_VERBOSE" in
- 	;;
- esac
- 
-+read_modorder=
-+
-+if [ "$1" = --modorder ]; then
-+	shift
-+	read_modorder=1
-+fi
-+
-+output_file="$1"
-+
- needed_symbols=
- 
- # Special case for modversions (see modpost.c)
-@@ -41,10 +47,8 @@ cat > "$output_file" << EOT
- 
- EOT
- 
--[ -f modules.order ] && modlist=modules.order || modlist=/dev/null
--
- {
--	sed 's/ko$/mod/' $modlist | xargs -n1 sed -n -e '2p'
-+	[ -n "${read_modorder}" ] && sed 's/ko$/usyms/' modules.order | xargs cat
- 	echo "$needed_symbols"
- 	[ -n "$ksym_wl" ] && cat "$ksym_wl"
- } | sed -e 's/ /\n/g' | sed -n -e '/^$/!p' |
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 905c0ec291e1..0125698f2037 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -387,7 +387,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- /* Calc and record src checksum. */
- void get_src_version(const char *modname, char sum[], unsigned sumlen)
- {
--	char *buf, *pos, *firstline;
-+	char *buf;
- 	struct md4_ctx md;
- 	char *fname;
- 	char filelist[PATH_MAX + 1];
-@@ -397,15 +397,8 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- 
- 	buf = read_text_file(filelist);
- 
--	pos = buf;
--	firstline = get_line(&pos);
--	if (!firstline) {
--		warn("bad ending versions file for %s\n", modname);
--		goto free;
--	}
--
- 	md4_init(&md);
--	while ((fname = strsep(&firstline, " "))) {
-+	while ((fname = strsep(&buf, " \n"))) {
- 		if (!*fname)
- 			continue;
- 		if (!(is_static_library(fname)) &&
 -- 
-2.32.0
-
+Thanks,
+~Nick Desaulniers
