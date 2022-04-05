@@ -2,85 +2,130 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D231C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5473C4321E
 	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1455960AbiDFAnb (ORCPT
+        id S1837048AbiDFAnp (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
+        Tue, 5 Apr 2022 20:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1457634AbiDEQWt (ORCPT
+        with ESMTP id S1457621AbiDEQS2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 12:22:49 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783EA68FB8;
-        Tue,  5 Apr 2022 09:20:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 33847B81E76;
-        Tue,  5 Apr 2022 16:20:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C1895C385A5;
-        Tue,  5 Apr 2022 16:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649175648;
-        bh=9P0bvPQE7TMYUDS1QHIUxX2gPSQ2fjCXf7+fuJtJhZk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=DuxV52lKFd1sgfEeUDu9tOfV6G4bvXzk2hAfEUif0dtsVbADNdPFBYFfsMNXTfLkv
-         VPz+SSuWPJiz/2Pt29cWiLakeKR0SIbLT84b2Pt3E8GKMocCT6NBf1+gMiUYSpZR1U
-         5ZrQH2eFiZTVw6Hwf/VR+BVKI8oRuthYG7GkA2B8QeH761kRvg1kukLjz/SiXVMT8k
-         ogt3jYFymRus/NVEDcAyE5tQwCYaN4j3V/CVD6nPyHAEBZ/PbhYFUHS/ZELeTrdjLp
-         4eNyIQomhhBu43ddy3oWEs94w4OA/uuD9XExE+t+c0XbjFvAE88gftmwPdqD5hhn7h
-         wLsEkzxX4J6Ow==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9972CE85D15;
-        Tue,  5 Apr 2022 16:20:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 5 Apr 2022 12:18:28 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2220B193D3
+        for <linux-kbuild@vger.kernel.org>; Tue,  5 Apr 2022 09:16:29 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id p15so24115833lfk.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Apr 2022 09:16:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Uy8i40RIZFVV64urUf42bHyfQVf4Q/JqjVb+pMMetgg=;
+        b=VEZUGGgcS/bCf+7bs3tHZb8+OMlT5unqdhNUgKPFfUrzmUWPzwkPflleyRfNc9Gszb
+         Zvp51L5ajuECgaMz1MXPXAXCzpd+r7XgMLjc0WwZUqmG6YkOW8zjrrmE+M6NRQcmJWuO
+         Y0fH0pb8byrF6pULERlph+UgHZwh1mkS4uFnJ4VLQVddcyXp54KZF/gQUNfoGi+CLUv5
+         mS5mky+6cLoMPbbvLH9DILjT2TrafcmZcPrfQVcEzGZ47/o/q3O5NsqGbBMbE0V/AgPW
+         oBBJDvv82i/EGVLu1pU55SOGOo1TrCbFYInzxzprvbxO/U2/r7StZYuNCf32nr453634
+         fBJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Uy8i40RIZFVV64urUf42bHyfQVf4Q/JqjVb+pMMetgg=;
+        b=rHAyOYnzsyWAMfoPi4kbhpiJaX51Y5hb4wbcWBGGhow4MYq5ahuDbL2eqIYvAQg+JF
+         TW73MhuayzfyngaBroWrJQ0iuquJciHe+rk6NpkG++rLRvnBn3iV2YABOhaO77RRYR5D
+         K13cju2/1JdEZIDF3OJ1zOPWiU2c2Ow24qKg9LdEKtqXQtHf375HRMGVX6gkWeMMcvJo
+         wHMUGaIBXN5OBM567qeyoiVtWF/t05ePzw1Ur0UcaZwzpXZERmwDrK+JmtcD7yvfiXvH
+         L4tvU3Oc6qs1/LNK6ANKlyOn4WZ3QNLryBwnVE0rjdxasHIy4ZOnMa7atgYpLd+s7qdM
+         O+5g==
+X-Gm-Message-State: AOAM5329pnEZAxagTlBUW75iZG76ajaBaF6dkOfG9kNaJGLoOia/WDdh
+        o2DQXsHuWI63AWr8Rmaz1pAWMmmLcfP6bXRA7R6SrA==
+X-Google-Smtp-Source: ABdhPJyczCamPzZ+WireWxW4CQXH7k2Pos0Q5thRcGyasYMnxW8whHvGnEWwMVjDvTFTyp15EDL3Em9/iSDdkwnlAHg=
+X-Received: by 2002:a05:6512:b9e:b0:44a:10eb:9607 with SMTP id
+ b30-20020a0565120b9e00b0044a10eb9607mr3071054lfv.626.1649175385326; Tue, 05
+ Apr 2022 09:16:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] tracing: Move user_events.h temporarily out of include/uapi
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164917564862.18481.12734568923836492201.git-patchwork-notify@kernel.org>
-Date:   Tue, 05 Apr 2022 16:20:48 +0000
-References: <20220401143903.188384f3@gandalf.local.home>
-In-Reply-To: <20220401143903.188384f3@gandalf.local.home>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
-        beaub@linux.microsoft.com, mhiramat@kernel.org,
-        linux-trace-devel@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
-        torvalds@linux-foundation.org, michal.lkml@markovi.net,
-        ndesaulniers@google.com, linux-kbuild@vger.kernel.org,
-        masahiroy@kernel.org
+References: <20220405113359.2880241-1-masahiroy@kernel.org> <20220405113359.2880241-2-masahiroy@kernel.org>
+In-Reply-To: <20220405113359.2880241-2-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 5 Apr 2022 09:16:13 -0700
+Message-ID: <CAKwvOdnJoAoMbcLo_N=t46SC62yxNDEbj24Y_zRzT4LG-LheXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/10] kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello:
+On Tue, Apr 5, 2022 at 4:34 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> The genksyms command part in cmd_gensymtypes_{c,S} is duplicated.
+> Factor it out into the 'genksyms' macro.
+>
+> For the readability, I slightly refactor the arguments to genksyms.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-This patch was applied to netdev/net-next.git (master)
-by Steven Rostedt (Google) <rostedt@goodmis.org>:
+It looks like you may have sent v2 twice; apologies if I comment on
+BOTH threads rather than 1.
 
-On Fri, 1 Apr 2022 14:39:03 -0400 you wrote:
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> 
-> While user_events API is under development and has been marked for broken
-> to not let the API become fixed, move the header file out of the uapi
-> directory. This is to prevent it from being installed, then later changed,
-> and then have an old distro user space update with a new kernel, where
-> applications see the user_events being available, but the old header is in
-> place, and then they get compiled incorrectly.
-> 
-> [...]
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Here is the summary with links:
-  - tracing: Move user_events.h temporarily out of include/uapi
-    https://git.kernel.org/netdev/net-next/c/5cfff569cab8
+> ---
+>
+> Changes in v2:
+>   - Fix the location of the closing parenthesis
+>
+>  scripts/Makefile.build | 19 ++++++++-----------
+>  1 file changed, 8 insertions(+), 11 deletions(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 9717e6f6fb31..31e0e33dfe5d 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -125,13 +125,14 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
+>  $(obj)/%.i: $(src)/%.c FORCE
+>         $(call if_changed_dep,cpp_i_c)
+>
+> +genksyms = scripts/genksyms/genksyms           \
+> +       $(if $(1), -T $(2))                     \
+> +       $(if $(CONFIG_MODULE_REL_CRCS), -R)     \
+> +       $(if $(KBUILD_PRESERVE), -p)            \
+> +       -r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
+> +
+>  # These mirror gensymtypes_S and co below, keep them in synch.
+> -cmd_gensymtypes_c =                                                         \
+> -    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+> -     $(if $(KBUILD_PRESERVE),-p)                                            \
+> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+> +cmd_gensymtypes_c = $(CPP) -D__GENKSYMS__ $(c_flags) $< | $(genksyms)
+>
+>  quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
+>  cmd_cc_symtypes_c =                                                         \
+> @@ -344,11 +345,7 @@ cmd_gensymtypes_S =                                                         \
+>      $(CPP) $(a_flags) $< |                                                  \
+>       grep "\<___EXPORT_SYMBOL\>" |                                          \
+>       sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ; } | \
+> -    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+> -    scripts/genksyms/genksyms $(if $(1), -T $(2))                           \
+> -     $(patsubst y,-R,$(CONFIG_MODULE_REL_CRCS))                             \
+> -     $(if $(KBUILD_PRESERVE),-p)                                            \
+> -     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+> +    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - | $(genksyms)
+>
+>  quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
+>  cmd_cc_symtypes_S =                                                         \
+> --
+> 2.32.0
+>
 
-You are awesome, thank you!
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+~Nick Desaulniers
