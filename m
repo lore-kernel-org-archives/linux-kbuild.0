@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5CADC433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACDCC433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238574AbiDFR3k (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39654 "EHLO
+        id S238865AbiDFR3l (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238895AbiDFR3M (ORCPT
+        with ESMTP id S239105AbiDFR3M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 6 Apr 2022 13:29:12 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D2639BD8C;
-        Wed,  6 Apr 2022 08:31:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BCE439A693;
+        Wed,  6 Apr 2022 08:31:41 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 236FUcaR017647;
-        Thu, 7 Apr 2022 00:30:40 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaR017647
+        by conuserg-08.nifty.com with ESMTP id 236FUcaW017647;
+        Thu, 7 Apr 2022 00:30:43 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaW017647
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649259040;
-        bh=ZjLI+JlU2bV41qJ132mX31sa9fHjwtqOwYEH0MoaLug=;
+        s=dec2015msa; t=1649259044;
+        bh=xi61ivU7WXkz9So9Rg07E0Isc4c3Oyfk6ijcms131ig=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HwKWHytb/6NOhlKUWo3ktzf0qSgbOIzHs0XdE40KePawNCjaYQcr/E3j79K19sAxi
-         lNzL5XnbhtRn3Be9QzMacoDGrvMw+8vcV9vl1bY//3aozWeomBXjc1TA1tnjyzTwSF
-         lua7dFcQ6ON4jAGhAXyub/UC3YZAZVMGlZnRN9AqjCA/OAEifO1iwf5c7km9iye0IV
-         Oml2F/uru4fWLk4aNMl37QFbCTm6Bsq/+qON1vnPDeK+a3HD5LoXHmHqXOb+WAFoYO
-         ac7klb5GGIwx3O1JtR/owTXiokeMn6NUQAXWxdj7YmkruN7B9b+E1tJcWq+kWcSHzF
-         eECPVG3FNOpxA==
+        b=l/IgoVgbWFj4IWz0iLgxZnxikrdfuYjVN6WHn7/uITderaEbd7ocTNr8lMizOBJZF
+         92dFshMCkZoro3xeyINSpOoNGu3R9SpiwiRDVQtS3w0pLoiVtJwmuN0/hWbp7MQwC8
+         +au02BeAuOnZhIAKNolJ3KRjBGo7KFVcfYXW7hpGIToMoFPPQrdZgmzH2cBy+QcSVL
+         gU11ko1P5ByatlJPIlEjvqP8rVja0eyYLhTzp3zzFwC2fFFneD1BDhKX8R1gPvBw//
+         oF498F8fSyPQMTy8vC+nsfhrvLdHulLRcDCYQ1lHuCu8SV8yeRSNE/OCgES+dKeAeK
+         k4zfy3YU1ZmVQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 2/7] kbuild: make multi_depend work with targets in subdirectory
-Date:   Thu,  7 Apr 2022 00:30:18 +0900
-Message-Id: <20220406153023.500847-3-masahiroy@kernel.org>
+Subject: [PATCH 7/7] kbuild: read *.mod to get objects passed to $(LD) or $(AR)
+Date:   Thu,  7 Apr 2022 00:30:23 +0900
+Message-Id: <20220406153023.500847-8-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220406153023.500847-1-masahiroy@kernel.org>
 References: <20220406153023.500847-1-masahiroy@kernel.org>
@@ -48,44 +48,50 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Precisely speaking, when you get the stem of the path, you should use
-$(patsubst $(obj)/%,%,...) instead of $(notdir ...).
+ld and ar support @file, which command-line options are read from.
 
-I do not see this usecase, but if you create a composite object in a
-subdirectory, the Makefile should look like this:
+Now that *.mod lists the member objects in the correct order, without
+duplication, it is ready to be passed to ld and ar.
 
-   obj-$(CONFIG_FOO) += dir/foo.o
-   dir/foo-objs      := dir/foo1.o dir/foo2.o
-
-The member objects should be assigned to dir/foo-objs instead of
-foo-objs.
-
-This syntax is more consistent with commit 54b8ae66ae1a ("kbuild:
-change *FLAGS_<basetarget>.o to take the path relative to $(obj)").
+By using the @file syntax, people will not be worried about the pitfall
+described in the NOTE.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.lib | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/Makefile.build | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index d56cda3c1e8a..0453a1904646 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -236,9 +236,9 @@ endif
- # Usage:
- #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
- define multi_depend
--$(foreach m, $(notdir $1), \
--	$(eval $(obj)/$m: \
--	$(addprefix $(obj)/, $(call suffix-search, $m, $2, $3))))
-+$(foreach m, $1, \
-+	$(eval $m: \
-+	$(addprefix $(obj)/, $(call suffix-search, $(patsubst $(obj)/%,%,$m), $2, $3))))
- endef
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 3da731cf6978..f6a506318795 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -450,22 +450,18 @@ quiet_cmd_ar_lib = AR      $@
+ $(obj)/lib.a: $(lib-y) FORCE
+ 	$(call if_changed,ar_lib)
  
- # Copy a file
+-# NOTE:
+-# Do not replace $(filter %.o,^) with $(real-prereqs). When a single object
+-# module is turned into a multi object module, $^ will contain header file
+-# dependencies recorded in the .*.cmd file.
+ ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
+ quiet_cmd_link_multi-m = AR [M]  $@
+ cmd_link_multi-m =						\
+ 	$(cmd_update_lto_symversions);				\
+ 	rm -f $@; 						\
+-	$(AR) cDPrsT $@ $(filter %.o,$^)
++	$(AR) cDPrsT $@ @$(patsubst %.o,%.mod,$@)
+ else
+ quiet_cmd_link_multi-m = LD [M]  $@
+-      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(filter %.o,$^)
++      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@)
+ endif
+ 
+-$(multi-obj-m): FORCE
++$(multi-obj-m): %.o: %.mod FORCE
+ 	$(call if_changed,link_multi-m)
+ $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
+ 
 -- 
 2.32.0
 
