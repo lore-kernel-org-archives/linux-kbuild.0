@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F0EC433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C57CC433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239080AbiDFR33 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43486 "EHLO
+        id S239123AbiDFR3i (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:29:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239079AbiDFR3L (ORCPT
+        with ESMTP id S239106AbiDFR3M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Apr 2022 13:29:11 -0400
+        Wed, 6 Apr 2022 13:29:12 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3114B39B281;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57241560A5;
         Wed,  6 Apr 2022 08:31:42 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 236FUcaS017647;
-        Thu, 7 Apr 2022 00:30:41 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaS017647
+        by conuserg-08.nifty.com with ESMTP id 236FUcaQ017647;
+        Thu, 7 Apr 2022 00:30:39 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaQ017647
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649259041;
-        bh=IqKgxjmspFS2kV2tike/FlcIHIij7jL1YxZaqBPEov8=;
+        s=dec2015msa; t=1649259040;
+        bh=6o17aiZBvHlMD/DzwDamCOdodobOeuUrwwxgJ29rqNo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uc+pFg8JPgFbK1H3pD+CwlIfnn/jDBZkolRtzDNvHuXcfbEqGPYX7FyuM0JfHm9HK
-         kBmUIU709T4K9DmHxUOCTgHmEgL0BwjVzNZYScUlQOussJFDpRmIGGbgtK19iDSd1r
-         D0CzDclCWlA7vyAAkT29HPnPag/Kf1p4/oIhUYT4UQScdvlULjsNmA2P42pXZGW3LP
-         iChW5f+PB/TpBYWc0sCC8LbXJvJw+wDMVBCdiMkAhGwga+Fsumc9hwnIcf5dgfOCkH
-         /5W3+aarJKjfVZ0tnczdqm/NWaITC+SEPG62cq3wPlxmBLMDNCyz8GK+ryLlI4gCsG
-         4gj9Ydg1cjaSQ==
+        b=cbyS2Nd2FDsH4kPaPK8uaby5RDDNiWRu+WcCe9Yp/vPUTiV5R2Pk0RhXuDl9EGzlp
+         C8pJFTT4ZeWSzQfi6GnZyDZc5l105tIzUExpgBUgjh0wH1Lm0XHf8JnBkqDJljA9oO
+         YZIBIkThqqO7KBy9uLf2W0Rum+dREfpcUghFvWXn/lzdOsOiZiYuocauOp3/c32Swj
+         W9vTg/k3VYgPvcoBxiqcDg2P/ms+mVcbXc0c7amDGzuDCYwDTYxXsnVssNP4+et0gv
+         4qHzTfKwf88KNHyeP/8xK/PC+kog2zkUZPU3f19fNp1lCiAn0CtDeiG2oBqP8xF3n8
+         cpDuSqlIJh+3A==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 3/7] kbuild: reuse real-search to simplify cmd_mod
-Date:   Thu,  7 Apr 2022 00:30:19 +0900
-Message-Id: <20220406153023.500847-4-masahiroy@kernel.org>
+Subject: [PATCH 1/7] kbuild: reuse suffix-search to refactor multi_depend
+Date:   Thu,  7 Apr 2022 00:30:17 +0900
+Message-Id: <20220406153023.500847-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220406153023.500847-1-masahiroy@kernel.org>
 References: <20220406153023.500847-1-masahiroy@kernel.org>
@@ -48,28 +48,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The first command in cmd_mod is similar to the real-search macro.
+The complicated part of multi_depend is the same as suffix-search.
+
 Reuse it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build | 2 +-
+ scripts/Makefile.lib | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f15c245dc17e..857329844789 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -306,7 +306,7 @@ $(obj)/%.prelink.o: $(obj)/%.o FORCE
- endif
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 9f69ecdd7977..d56cda3c1e8a 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -238,7 +238,7 @@ endif
+ define multi_depend
+ $(foreach m, $(notdir $1), \
+ 	$(eval $(obj)/$m: \
+-	$(addprefix $(obj)/, $(foreach s, $3, $($(m:%$(strip $2)=%$(s)))))))
++	$(addprefix $(obj)/, $(call suffix-search, $m, $2, $3))))
+ endef
  
- cmd_mod = { \
--	echo $(if $($*-objs)$($*-y)$($*-m), $(addprefix $(obj)/, $($*-objs) $($*-y) $($*-m)), $(@:.mod=.o)); \
-+	echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)); \
- 	$(undefined_syms) echo; \
- 	} > $@
- 
+ # Copy a file
 -- 
 2.32.0
 
