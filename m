@@ -2,99 +2,136 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2E2C4332F
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB15C433FE
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 07:34:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1837059AbiDFAnz (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
+        id S232296AbiDFHgU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 6 Apr 2022 03:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444197AbiDEPlA (ORCPT
+        with ESMTP id S1380733AbiDFHEg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:41:00 -0400
-Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBF19FDD;
-        Tue,  5 Apr 2022 07:03:32 -0700 (PDT)
-Received: from grover.. (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 235E2k8S021295;
-        Tue, 5 Apr 2022 23:02:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 235E2k8S021295
+        Wed, 6 Apr 2022 03:04:36 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58850B3699;
+        Tue,  5 Apr 2022 22:30:10 -0700 (PDT)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 2365TY6C002095;
+        Wed, 6 Apr 2022 14:29:35 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 2365TY6C002095
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649167373;
-        bh=gVdAU8NgX5021NtvHRpFHdYK2UvqDo2vrSD9W1vtAMA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PhOE2ae9fIcn+iE6wmVl+X+52M+ZpGzuuejgzQeNA82FMrm8qcrp8H59yUrXJtbqd
-         rmQ8fFkTz3uqsQMj9/GBq7UcbmhmO61lwTX+13sC4BpufctNk7f2NmgBnUpITcMWvs
-         0XlhF5RMllw7IAnUoFB3Sc1DMw3GOzcMldoBDxc7+E/oTl3b9AZjaDYQjhRTOuKFlo
-         1vj8E5kUu344sGyN2kCeDHq4uQAnNk5DExN9IQzbcK1U+hJB7qH13v4fgawHeCjM24
-         +fi008rk5IzfWEfs6wxshYa9yFonQTn44PvW2Wiads0surwC9BHDA7viAQp+9rXEm4
-         WBrmrSN83ww7w==
-X-Nifty-SrcIP: [133.32.177.133]
+        s=dec2015msa; t=1649222975;
+        bh=cgPdZWVCb6IRSSlmY7h4O7BE/w3T5icCyWQEI+QOK8o=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=F2XmJxsfAciKRhWS0WPTJJhAWGPS2iSwCBwb73YwKSv5+V5Ca5MJkosnyHHLjCTL8
+         QTQ2NIBxoE/b07Ga1omX2VQg+My/LXwooJo/6F+LaWDp+6yPYTmguLSIdFwesK50oy
+         ci+7Nwx/5FsH8WDoGCNAqFJtk9r4j82k3IaoNgqpDIylE7psdpr6ar3LdDAzEVM1K4
+         cjeBEDc84VbKbMQEURSDGvYl15VMARF3j6Nrgc9puyXyGVCM6JdiFPVqEhTa1KzUPe
+         cxdqZic2y1hvlRGkLOyAssnRi9i+iLiBp0k3/qJgoSaRBYFJduXFdT9eusO6Tq21KP
+         wc5l+uTu0HGJQ==
+X-Nifty-SrcIP: [209.85.216.42]
+Received: by mail-pj1-f42.google.com with SMTP id j20-20020a17090ae61400b001ca9553d073so1620804pjy.5;
+        Tue, 05 Apr 2022 22:29:35 -0700 (PDT)
+X-Gm-Message-State: AOAM5328mRnTr0/v1YIbieevrjCTyreFAf/wCJKDOAWKIWfKkrkiFcqx
+        OcPQNxW/XjUZpMyPsl0C0T/ZU6mhjQlduSwp7Kg=
+X-Google-Smtp-Source: ABdhPJzLsKiCp/v2xJ1WrG9HWnVaQC0FNsJIJb1jbJiI8YmlDUc3vB+W0TOUVJ+Vd9auxBAptPAaiHDEvPOWTG/3o+Q=
+X-Received: by 2002:a17:902:b183:b0:14f:c266:20d5 with SMTP id
+ s3-20020a170902b18300b0014fc26620d5mr7043436plr.136.1649222974223; Tue, 05
+ Apr 2022 22:29:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220405113359.2880241-1-masahiroy@kernel.org>
+ <20220405113359.2880241-8-masahiroy@kernel.org> <YkyjkAWb56wqL3iK@fjasle.eu>
+In-Reply-To: <YkyjkAWb56wqL3iK@fjasle.eu>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
+Date:   Wed, 6 Apr 2022 14:28:45 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATUZesT6JsyrQu-ryU+PahwSwX3UVdxnJhyYDetnR_s1A@mail.gmail.com>
+Message-ID: <CAK7LNATUZesT6JsyrQu-ryU+PahwSwX3UVdxnJhyYDetnR_s1A@mail.gmail.com>
+Subject: Re: [PATCH v2 07/10] kbuild: get rid of duplication in the first line
+ of *.mod files
+To:     Nicolas Schier <nicolas@fjasle.eu>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 10/10] kbuild: refactor cmd_modversions_S
-Date:   Tue,  5 Apr 2022 23:02:29 +0900
-Message-Id: <20220405140229.2895394-11-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220405140229.2895394-1-masahiroy@kernel.org>
-References: <20220405140229.2895394-1-masahiroy@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Split the code into two macros, cmd_gen_symversions_S for running
-genksyms, and cmd_modversions for running $(LD) to update the object
-with CRCs.
+On Wed, Apr 6, 2022 at 5:16 AM Nicolas Schier <nicolas@fjasle.eu> wrote:
+>
+> On Tue, Apr 05, 2022 at 08:33:55PM +0900 Masahiro Yamada wrote:
+> > The first line of *.mod lists the member objects of the module.
+> > This list may contain duplication if the same object is added multiple
+> > times, like this:
+> >
+> >   obj-m :=3D foo.o
+> >   foo-$(CONFIG_FOO1_X) +=3D foo1.o
+> >   foo-$(CONFIG_FOO1_Y) +=3D foo1.o
+> >   foo-$(CONFIG_FOO2_X) +=3D foo2.o
+> >   foo-$(CONFIG_FOO2_Y) +=3D foo2.o
+> >
+> > This is probably not a big deal. As far as I know, the only small
+> > problem is scripts/mod/sumversion.c parses the same file over again.
+> > This can be avoided by adding $(sort ...). It has a side-effect that
+> > sorts the objects alphabetically, but it is not a big deal, either.
+> >
+> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> > ---
+> >
+> > Changes in v2:
+> >   - new
+> >
+> >  scripts/Makefile.build | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > index 3ef2373f0a57..63625877aeae 100644
+> > --- a/scripts/Makefile.build
+> > +++ b/scripts/Makefile.build
+> > @@ -307,8 +307,10 @@ $(obj)/%.prelink.o: $(obj)/%.o FORCE
+> >       $(call if_changed,cc_prelink_modules)
+> >  endif
+> >
+> > +multi-m-prereqs =3D $(sort $(addprefix $(obj)/, $($*-objs) $($*-y) $($=
+*-m)))
+> > +
+> >  cmd_mod =3D { \
+> > -     echo $(if $($*-objs)$($*-y)$($*-m), $(addprefix $(obj)/, $($*-obj=
+s) $($*-y) $($*-m)), $(@:.mod=3D.o)); \
+> > +     echo $(if $(multi-m-prereqs), $(multi-m-prereqs), $(@:.mod=3D.o))=
+; \
+>
+> I'd rather expected to see $(or) here, too, as in commit 5c8166419acf ("k=
+build:
+> replace $(if A,A,B) with $(or A,B)").
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+Ah, good catch.
 
-Changes in v2:
-  - new
+I fixed it up locally.
 
- scripts/Makefile.build | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+Thanks for the review.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ba2be555f942..58be0997c5dd 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -274,7 +274,8 @@ define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,gen_objtooldep)
--	$(call cmd,modversions_S)
-+	$(call cmd,gen_symversions_S)
-+	$(call cmd,modversions)
- endef
- 
- # Built-in and composite module parts
-@@ -366,16 +367,8 @@ ifdef CONFIG_ASM_MODVERSIONS
- # versioning matches the C process described above, with difference that
- # we parse asm-prototypes.h C header to get function definitions.
- 
--cmd_modversions_S =								\
--	if $(OBJDUMP) -h $@ | grep -q __ksymtab; then				\
--		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
--		    > $(@D)/.tmp_$(@F:.o=.ver);					\
--										\
--		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
--			-T $(@D)/.tmp_$(@F:.o=.ver);				\
--		mv -f $(@D)/.tmp_$(@F) $@;					\
--		rm -f $(@D)/.tmp_$(@F:.o=.ver);					\
--	fi
-+cmd_gen_symversions_S = $(call gen_symversions,S)
-+
- endif
- 
- $(obj)/%.o: $(src)/%.S FORCE
--- 
-2.32.0
 
+>
+> Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+>
+> >       $(undefined_syms) echo; \
+> >       } > $@
+> >
+> > --
+> > 2.32.0
+> >
+> >
+>
+> --
+> epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+> =E2=86=B3 gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+>      -- frykten for herren er opphav til kunnskap --
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
