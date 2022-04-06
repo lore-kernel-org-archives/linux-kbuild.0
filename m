@@ -2,126 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D3BC433EF
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 16:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2840C433F5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 16:55:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237182AbiDFQXc (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 6 Apr 2022 12:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52966 "EHLO
+        id S238141AbiDFQ5V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 6 Apr 2022 12:57:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238312AbiDFQXD (ORCPT
+        with ESMTP id S238135AbiDFQ5B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 6 Apr 2022 12:23:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202FA1DE6CA;
-        Tue,  5 Apr 2022 19:31:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B0645616CA;
-        Wed,  6 Apr 2022 02:31:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48457C385A1;
-        Wed,  6 Apr 2022 02:31:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649212296;
-        bh=2MxGsdREcZcC5dPhVe4pegMYaaOwE0pzgrqWpuXtrGc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GXwGW062YdKL8+Jg+FwAV0W7WDkdIVsTVXDAEN7aXQNujZ35ZW3r/eAzX8retscRF
-         R9mIWL8TtQRblz9fugeEJb203dMObcn5oNScGIeR3sTZoFengiBixG5/iVNGpYi/dU
-         YhfsDDCZNrWTtqSUw78W6s1gQ9MH/u+xK5aE2Yiw/E+8AKSdcDiG/GAPzXuSu1RhLK
-         lZ3q7+NR6Mvqb45MbN5emzUF4tUofgGHUgTqXZNN1GqMSi3+iIeRHrwmvyY3osNY8n
-         KCqwT+BFAEC12NbbDkLtWy4gB1UYTjQ8Pj/h6lX4HUnT5sKKAgmF5yeqtbSj64VBMZ
-         jf7B1pxWVkXmg==
-From:   Masami Hiramatsu <mhiramat@kernel.org>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     Masami Hiramatsu <mhiramat@kernel.org>,
-        Padmanabha Srinivasaiah <treasure4paddy@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Nathan Chancellor <nathan@kernel.org>, llvm@lists.linux.dev,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Subject: [PATCH v8 4/4] docs: bootconfig: Add how to embed the bootconfig into kernel
-Date:   Wed,  6 Apr 2022 11:31:30 +0900
-Message-Id: <164921228987.1090670.16843569536974147213.stgit@devnote2>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <164921224829.1090670.9700650651725930602.stgit@devnote2>
-References: <164921224829.1090670.9700650651725930602.stgit@devnote2>
-User-Agent: StGit/0.19
+        Wed, 6 Apr 2022 12:57:01 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B543834330A;
+        Wed,  6 Apr 2022 07:54:42 -0700 (PDT)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 236EsSMg017012;
+        Wed, 6 Apr 2022 23:54:28 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 236EsSMg017012
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1649256869;
+        bh=dXve7En2M5e4xXh5b7jtfh9BPqAH3MYvfHqMc5jc6Ao=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=QGd26goSRGemW9yxN71egfjPrhtbmiN00TYVX0qVeyVjmWL1ZWPVHDBnXVQpDCWUd
+         yt/yApzYSktVEfQ41rwccIAF9vgcPZbDHBoGKL0yqEotBBKpOi+5zVE9WDwC66ewk5
+         mHw1x+2VhZQJMjaLnSUVneBoT5+OJpjHU156IlH0HkNqW7Qfc/PxKz7Do12f33IKh4
+         hZ86f4J+n9GqU1lLVL/hlC2dcCzc4LKSa3F6gB81igQHvRvpKE8hSYtl/ntrFSC8XQ
+         KWR/pfVEtaj8DFfMsihc2EqKLCKuGAwhZF6BYoJ6NCmkIJSgGTLqljkIMPQsuyZc1r
+         CMNGEhfAPRDEw==
+X-Nifty-SrcIP: [209.85.214.170]
+Received: by mail-pl1-f170.google.com with SMTP id o10so2158815ple.7;
+        Wed, 06 Apr 2022 07:54:28 -0700 (PDT)
+X-Gm-Message-State: AOAM531EHFtU5f47MVob2b/6rAj/H8a2MRiLkMMieC9vGndU0M1YiUT9
+        F/3xV1xCP1b07RCUIVzKAjGBWrId2FfD5Knr+/0=
+X-Google-Smtp-Source: ABdhPJyWembw7UB5FHXQ3/iYGzaCekp69tkkqZgrhPUh5j729qxNH8iii8K8VCAnxAkKzsMkl6zOQkbluDZMQftpnnk=
+X-Received: by 2002:a17:902:9887:b0:151:6e1c:7082 with SMTP id
+ s7-20020a170902988700b001516e1c7082mr8890545plp.162.1649256868141; Wed, 06
+ Apr 2022 07:54:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20220405043350.12599-1-fazilyildiran@gmail.com>
+In-Reply-To: <20220405043350.12599-1-fazilyildiran@gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 6 Apr 2022 23:53:38 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT=7=kPQP3+Nf0gyRZGbXE19=wSu3NOanrzuM2gLHE1Rw@mail.gmail.com>
+Message-ID: <CAK7LNAT=7=kPQP3+Nf0gyRZGbXE19=wSu3NOanrzuM2gLHE1Rw@mail.gmail.com>
+Subject: Re: [PATCH] docs: kbuild: add references on Kconfig semantics
+To:     Necip Fazil Yildiran <fazilyildiran@gmail.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        paul@pgazz.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add a description how to embed the bootconfig file into kernel.
+On Tue, Apr 5, 2022 at 1:34 PM Necip Fazil Yildiran
+<fazilyildiran@gmail.com> wrote:
+>
+> Add references to 1) a research paper which provides a definition of
+> Kconfig semantics, 2) the kismet tool, which checks for unmet direct
+> dependency bugs in Kconfig specifications.
+>
+> Signed-off-by: Paul Gazzillo <paul@pgazz.com>
+> Signed-off-by: Necip Fazil Yildiran <fazilyildiran@gmail.com>
+> ---
 
-Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
----
- Changes in v7:
-  - Rename CONFIG_EMBED_BOOT_CONFIG* to CONFIG_BOOT_CONFIG_EMBED*.
- Changes in v5:
-  - Update CONFIG_EMBED_BOOT_CONFIG_FILE which can accept relative path.
- Changes in v3:
-  - Fix typos.
- Changes in v2:
-  - Corrected the text accoding to Randy's suggestion.
-  - Do not reccomend to use relative path for CONFIG_EMBED_BOOT_CONFIG_FILE.
----
- Documentation/admin-guide/bootconfig.rst |   31 +++++++++++++++++++++++++++---
- 1 file changed, 28 insertions(+), 3 deletions(-)
+Applied to linux-kbuild. Thanks.
 
-diff --git a/Documentation/admin-guide/bootconfig.rst b/Documentation/admin-guide/bootconfig.rst
-index a1860fc0ca88..d99994345d41 100644
---- a/Documentation/admin-guide/bootconfig.rst
-+++ b/Documentation/admin-guide/bootconfig.rst
-@@ -158,9 +158,15 @@ Each key-value pair is shown in each line with following style::
- Boot Kernel With a Boot Config
- ==============================
- 
--Since the boot configuration file is loaded with initrd, it will be added
--to the end of the initrd (initramfs) image file with padding, size,
--checksum and 12-byte magic word as below.
-+There are two options to boot the kernel with bootconfig: attaching the
-+bootconfig to the initrd image or embedding it in the kernel itself.
-+
-+Attaching a Boot Config to Initrd
-+---------------------------------
-+
-+Since the boot configuration file is loaded with initrd by default,
-+it will be added to the end of the initrd (initramfs) image file with
-+padding, size, checksum and 12-byte magic word as below.
- 
- [initrd][bootconfig][padding][size(le32)][checksum(le32)][#BOOTCONFIG\n]
- 
-@@ -196,6 +202,25 @@ To remove the config from the image, you can use -d option as below::
- Then add "bootconfig" on the normal kernel command line to tell the
- kernel to look for the bootconfig at the end of the initrd file.
- 
-+Embedding a Boot Config into Kernel
-+-----------------------------------
-+
-+If you can not use initrd, you can also embed the bootconfig file in the
-+kernel by Kconfig options. In this case, you need to recompile the kernel
-+with the following configs::
-+
-+ CONFIG_BOOT_CONFIG_EMBED=y
-+ CONFIG_BOOT_CONFIG_EMBED_FILE="/PATH/TO/BOOTCONFIG/FILE"
-+
-+``CONFIG_BOOT_CONFIG_EMBED_FILE`` requires an absolute path or a relative
-+path to the bootconfig file from source tree or object tree.
-+The kernel will embed it as the default bootconfig.
-+
-+Just as when attaching the bootconfig to the initrd, you need ``bootconfig``
-+option on the kernel command line to enable the embedded bootconfig.
-+
-+Note that even if you set this option, you can override the embedded
-+bootconfig by another bootconfig which attached to the initrd.
- 
- Kernel parameters via Boot Config
- =================================
 
+>  Documentation/kbuild/kconfig-language.rst | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
+> index 93a5b6e1fabd..a7173843a294 100644
+> --- a/Documentation/kbuild/kconfig-language.rst
+> +++ b/Documentation/kbuild/kconfig-language.rst
+> @@ -693,6 +693,8 @@ in documenting basic Kconfig syntax a more precise definition of Kconfig
+>  semantics is welcomed. One project deduced Kconfig semantics through
+>  the use of the xconfig configurator [1]_. Work should be done to confirm if
+>  the deduced semantics matches our intended Kconfig design goals.
+> +Another project formalized a denotational semantics of a core subset of
+> +the Kconfig language [10]_.
+>
+>  Having well defined semantics can be useful for tools for practical
+>  evaluation of dependencies, for instance one such case was work to
+> @@ -700,6 +702,8 @@ express in boolean abstraction of the inferred semantics of Kconfig to
+>  translate Kconfig logic into boolean formulas and run a SAT solver on this to
+>  find dead code / features (always inactive), 114 dead features were found in
+>  Linux using this methodology [1]_ (Section 8: Threats to validity).
+> +The kismet tool, based on the semantics in [10]_, finds abuses of reverse
+> +dependencies and has led to dozens of committed fixes to Linux Kconfig files [11]_.
+>
+>  Confirming this could prove useful as Kconfig stands as one of the leading
+>  industrial variability modeling languages [1]_ [2]_. Its study would help
+> @@ -738,3 +742,5 @@ https://kernelnewbies.org/KernelProjects/kconfig-sat
+>  .. [7] https://vamos.cs.fau.de
+>  .. [8] https://undertaker.cs.fau.de
+>  .. [9] https://www4.cs.fau.de/Publications/2011/tartler_11_eurosys.pdf
+> +.. [10] https://paulgazzillo.com/papers/esecfse21.pdf
+> +.. [11] https://github.com/paulgazz/kmax
+> --
+> 2.25.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
