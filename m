@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7A3C433FE
-	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5CADC433F5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  6 Apr 2022 17:27:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239138AbiDFR3j (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:29:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39650 "EHLO
+        id S238574AbiDFR3k (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:29:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238847AbiDFR3M (ORCPT
+        with ESMTP id S238895AbiDFR3M (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 6 Apr 2022 13:29:12 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E658729F58B;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D2639BD8C;
         Wed,  6 Apr 2022 08:31:42 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 236FUcaU017647;
-        Thu, 7 Apr 2022 00:30:42 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaU017647
+        by conuserg-08.nifty.com with ESMTP id 236FUcaR017647;
+        Thu, 7 Apr 2022 00:30:40 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 236FUcaR017647
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1649259043;
-        bh=fsZLoYvDYA+z/X7p8S2lQGOuwjtdZEozvoW3LWJLMa0=;
+        s=dec2015msa; t=1649259040;
+        bh=ZjLI+JlU2bV41qJ132mX31sa9fHjwtqOwYEH0MoaLug=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XurjcWa8oxcby53NE+d9FsfU2mqkn76uHPM1ZQWoLCLgg2YMsJ73xIE5L8WCXvaIi
-         iDaR5ywgppo6J1ZNmGeA5/9Vvhg1wQt81+cY5OmKHo6MFgPUeCtSALAfQi8Iv0I75I
-         FJaYjttplAKtAbX38dTs8RFsz0OaIXOfSxwKde1XeZIVH7fGBNwanMbVDZ+Sjoqnd6
-         54DIjfJTnyQW8yMzufLTCzBu5jEGCQhZ88+yzSYHk33LKaQjRmwTEnyzOfSFMvASOP
-         7KGHP7oDq0N8KQXdug12K4Rp00ahfQS1/Z0j00N/OK6kIpLZINWzzlUVVNEZKJ3l4D
-         0LyBeQ1oXkGnw==
+        b=HwKWHytb/6NOhlKUWo3ktzf0qSgbOIzHs0XdE40KePawNCjaYQcr/E3j79K19sAxi
+         lNzL5XnbhtRn3Be9QzMacoDGrvMw+8vcV9vl1bY//3aozWeomBXjc1TA1tnjyzTwSF
+         lua7dFcQ6ON4jAGhAXyub/UC3YZAZVMGlZnRN9AqjCA/OAEifO1iwf5c7km9iye0IV
+         Oml2F/uru4fWLk4aNMl37QFbCTm6Bsq/+qON1vnPDeK+a3HD5LoXHmHqXOb+WAFoYO
+         ac7klb5GGIwx3O1JtR/owTXiokeMn6NUQAXWxdj7YmkruN7B9b+E1tJcWq+kWcSHzF
+         eECPVG3FNOpxA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 5/7] kbuild: get rid of duplication in *.mod files
-Date:   Thu,  7 Apr 2022 00:30:21 +0900
-Message-Id: <20220406153023.500847-6-masahiroy@kernel.org>
+Subject: [PATCH 2/7] kbuild: make multi_depend work with targets in subdirectory
+Date:   Thu,  7 Apr 2022 00:30:18 +0900
+Message-Id: <20220406153023.500847-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220406153023.500847-1-masahiroy@kernel.org>
 References: <20220406153023.500847-1-masahiroy@kernel.org>
@@ -48,80 +48,44 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-It is allowed to add the same objects multiple times to obj-y / obj-m:
+Precisely speaking, when you get the stem of the path, you should use
+$(patsubst $(obj)/%,%,...) instead of $(notdir ...).
 
-  obj-y += foo.o foo.o foo.o
-  obj-m += bar.o bar.o bar.o
+I do not see this usecase, but if you create a composite object in a
+subdirectory, the Makefile should look like this:
 
-It is also allowed to add the same objects multiple times to a composite
-module:
+   obj-$(CONFIG_FOO) += dir/foo.o
+   dir/foo-objs      := dir/foo1.o dir/foo2.o
 
-  obj-m    += foo.o
-  foo-objs := foo1.o foo2.o foo2.o foo1.o
+The member objects should be assigned to dir/foo-objs instead of
+foo-objs.
 
-This flexibility is useful because the same object might be selected by
-different CONFIG options, like this:
-
-  obj-m               += foo.o
-  foo-y               := foo1.o
-  foo-$(CONFIG_FOO_X) += foo2.o
-  foo-$(CONFIG_FOO_Y) += foo2.o
-
-The duplicated objects are omitted at link time. It works naturally in
-Makefiles because GNU Make removes duplication in $^ without changing
-the order.
-
-It is working well, almost...
-
-A small flaw I notice is, *.mod contains duplication in such a case.
-
-This is probably not a big deal. As far as I know, the only small
-problem is scripts/mod/sumversion.c parses the same file multiple
-times.
-
-I am fixing this because I plan to reuse *.mod for other purposes,
-where the duplication can be problematic.
-
-The code change is quite simple. We already use awk to drop duplicated
-lines in modules.order (see cmd_modules_order in the same file).
-I copied the code, but changed RS to use spaces as record separators.
-
-I also changed the file format to list one object per line.
+This syntax is more consistent with commit 54b8ae66ae1a ("kbuild:
+change *FLAGS_<basetarget>.o to take the path relative to $(obj)").
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.build   | 3 ++-
- scripts/mod/sumversion.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ scripts/Makefile.lib | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 6ae92d119dfa..f7a30f378e20 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -303,7 +303,8 @@ $(obj)/%.prelink.o: $(obj)/%.o FORCE
- 	$(call if_changed,cc_prelink_modules)
- endif
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index d56cda3c1e8a..0453a1904646 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -236,9 +236,9 @@ endif
+ # Usage:
+ #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
+ define multi_depend
+-$(foreach m, $(notdir $1), \
+-	$(eval $(obj)/$m: \
+-	$(addprefix $(obj)/, $(call suffix-search, $m, $2, $3))))
++$(foreach m, $1, \
++	$(eval $m: \
++	$(addprefix $(obj)/, $(call suffix-search, $(patsubst $(obj)/%,%,$m), $2, $3))))
+ endef
  
--cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) > $@
-+cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) | \
-+	$(AWK) -v RS='( |\n)' '!x[$$0]++' > $@
- 
- $(obj)/%.mod: $(obj)/%$(mod-prelink-ext).o FORCE
- 	$(call if_changed,mod)
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 0125698f2037..79bb9eaa65ac 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -398,7 +398,7 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- 	buf = read_text_file(filelist);
- 
- 	md4_init(&md);
--	while ((fname = strsep(&buf, " \n"))) {
-+	while ((fname = strsep(&buf, "\n"))) {
- 		if (!*fname)
- 			continue;
- 		if (!(is_static_library(fname)) &&
+ # Copy a file
 -- 
 2.32.0
 
