@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC4DC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB28C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238381AbiDXTN4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:13:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40408 "EHLO
+        id S238278AbiDXTOE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238118AbiDXTNs (ORCPT
+        with ESMTP id S238310AbiDXTNy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:13:48 -0400
+        Sun, 24 Apr 2022 15:13:54 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813E0226;
-        Sun, 24 Apr 2022 12:10:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5872BFF;
+        Sun, 24 Apr 2022 12:10:13 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o6E019069;
-        Mon, 25 Apr 2022 04:09:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o6E019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o63019069;
+        Mon, 25 Apr 2022 04:08:56 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o63019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827343;
-        bh=aWmZsWLtPG9IY+voThD7sKHIw6eSBQ7zPKJZlzBGplE=;
+        s=dec2015msa; t=1650827337;
+        bh=4VwlsHdKnI97n8eITvMnw7a1k5Sa+J49aS2TPed1vyc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=x+F/RLrxE+eMTR7IuGCQ2JI67hpRFOzcqDpIQt6yPOVkCId+zjZxyUzIGBbU+YQq9
-         PyVU38dMdFtNqJSS7/NbOEO2vxIqsazZiSgXS2E+xoChMAfPQ0XRAyHGexFEHp6/Lp
-         MQK4rwA4TJnZOgAKJC92UnFoeC9580K/l1BNb12AfRcOpwoSxFTkMa4413Hr3Jz6jf
-         K7tppgjvE2dp3eQwR4uddYyV1gJowEli9YxeBlfJ1qaeySU4SrbWMgI3RvJ2gM7x8L
-         cEzeTuXARToMDLApJL706qEm6ZT3oa5Pue00BT5lG8NyuHaVcFhuLD00G/ir1xnOCq
-         4K8KPcQt8xJNA==
+        b=DsHUQgWImFEExdp1jJRQC6FpRj1SL/YHOnwlC4xh/963JxECS/k8LgIl8G1m6FmyW
+         BaDLv5/jQEus6v2gwoxp2fYqWnrjIaB1DDSDKG7b0Hxx4eZ7KBsd83NZK1/MFLSDTQ
+         W98gZ+p5IIVZXxSkTE9+KwWfv4vVKr5lpqzHZKk3kvPe0eDjqcjMAYWeJuqJjFrA6g
+         iI6bQ7d6LtEYgH1nHNoCgALs4+uMtWrjZdeJE3X0dYraNa9vVT5SKHtTJRpHNAxKxi
+         z4NXjxFfUkQZevPtrc8t1NEAYyVg24DLh7VGgkVCZXfE/TD7n+h6uh7MtxHglSozBf
+         VnX/5pTORSZeQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 20/27] modpost: mitigate false-negatives for static EXPORT_SYMBOL checks
-Date:   Mon, 25 Apr 2022 04:08:04 +0900
-Message-Id: <20220424190811.1678416-21-masahiroy@kernel.org>
+Subject: [PATCH 09/27] modpost: add sym_add_unresolved() helper
+Date:   Mon, 25 Apr 2022 04:07:53 +0900
+Message-Id: <20220424190811.1678416-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,108 +48,78 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The 'static' specifier and EXPORT_SYMBOL() are an odd combination.
+Add a small helper, sym_add_unresolved() to ease the further
+refactoring.
 
-Since commit 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL*
-functions"), modpost tries to detect it, but there are false negatives.
-
-Here is the sample code.
-
-[Sample 1]
-
-  Makefile:
-
-    obj-m += mymod1.o mymod2.o
-
-  mymod1.c:
-
-    #include <linux/export.h>
-    #include <linux/module.h>
-    static void foo(void) {}
-    EXPORT_SYMBOL(foo);
-    MODULE_LICENSE("GPL");
-
-  mymod2.c:
-
-    #include <linux/module.h>
-    void foo(void) {}
-    MODULE_LICENSE("GPL");
-
-mymod1 exports the static symbol 'foo', but modpost cannot catch it
-because it is confused by the same name symbol in another module, mymod2.
-(Without mymod2, modpost can detect the error in mymod1)
-
-find_symbol() returns the first symbol found in the hash table with the
-given name. This hash table is global, so it may return a symbol from
-an unrelated module. So, a global symbol in a module may unset the
-'is_static' flag of a different module.
-
-To mitigate this issue, add find_symbol_in_module(), which receives the
-module pointer as the second argument. If non-NULL pointer is passed, it
-returns the symbol in the specified module. If NULL is passed, it is
-equivalent to find_module().
-
-Please note there are still false positives in the composite module,
-like below (or when both are built-in). I have no idea how to do this
-correctly.
-
-[Sample 2]  (not fixed by this commit)
-
-  Makefile:
-    obj-m += mymod.o
-    mymod-objs := mymod1.o mymod2.o
+Remove the 'weak' argument from alloc_symbol() because it is sensible
+only for unresolved symbols.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 908390b4fa80..fb50927cd241 100644
+index 86416e4af626..1c7d2831e89d 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -271,7 +271,8 @@ static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
- 	list_add_tail(&sym->list, &mod->unresolved_symbols);
- }
- 
--static struct symbol *find_symbol(const char *name)
-+static struct symbol *find_symbol_in_module(const char *name,
-+					    struct module *mod)
+@@ -230,14 +230,12 @@ static inline unsigned int tdb_hash(const char *name)
+  * Allocate a new symbols for use in the hash of exported symbols or
+  * the list of unresolved symbols per module
+  **/
+-static struct symbol *alloc_symbol(const char *name, bool weak,
+-				   struct symbol *next)
++static struct symbol *alloc_symbol(const char *name, struct symbol *next)
  {
- 	struct symbol *s;
+ 	struct symbol *s = NOFAIL(malloc(sizeof(*s) + strlen(name) + 1));
  
-@@ -280,11 +281,17 @@ static struct symbol *find_symbol(const char *name)
- 		name++;
+ 	memset(s, 0, sizeof(*s));
+ 	strcpy(s->name, name);
+-	s->weak = weak;
+ 	s->next = next;
+ 	s->is_static = true;
+ 	return s;
+@@ -250,11 +248,17 @@ static struct symbol *new_symbol(const char *name, struct module *module,
+ 	unsigned int hash;
  
- 	hash_for_matched_symbol(s, exported_symbols, name) {
--		return s;
-+		if (!mod || s->module == mod)
-+			return s;
- 	}
- 	return NULL;
+ 	hash = tdb_hash(name) % SYMBOL_HASH_SIZE;
+-	symbolhash[hash] = alloc_symbol(name, false, symbolhash[hash]);
++	symbolhash[hash] = alloc_symbol(name, symbolhash[hash]);
+ 
+ 	return symbolhash[hash];
  }
  
-+static struct symbol *find_symbol(const char *name)
++static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
 +{
-+	return find_symbol_in_module(name, NULL);
++	mod->unres = alloc_symbol(name, mod->unres);
++	mod->unres->weak = weak;
 +}
 +
- struct namespace_list {
- 	struct list_head list;
- 	char namespace[];
-@@ -2062,8 +2069,9 @@ static void read_symbols(const char *modname)
+ static struct symbol *find_symbol(const char *name)
+ {
+ 	struct symbol *s;
+@@ -701,9 +705,8 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
+ 			}
+ 		}
  
- 		if (bind == STB_GLOBAL || bind == STB_WEAK) {
- 			struct symbol *s =
--				find_symbol(remove_dot(info.strtab +
--						       sym->st_name));
-+				find_symbol_in_module(remove_dot(info.strtab +
-+								 sym->st_name),
-+						      mod);
+-		mod->unres = alloc_symbol(symname,
+-					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
+-					  mod->unres);
++		sym_add_unresolved(symname, mod,
++				   ELF_ST_BIND(sym->st_info) == STB_WEAK);
+ 		break;
+ 	default:
+ 		/* All exported symbols */
+@@ -2073,7 +2076,7 @@ static void read_symbols(const char *modname)
+ 	 * the automatic versioning doesn't pick it up, but it's really
+ 	 * important anyhow */
+ 	if (modversions)
+-		mod->unres = alloc_symbol("module_layout", false, mod->unres);
++		sym_add_unresolved("module_layout", mod, false);
+ }
  
- 			if (s)
- 				s->is_static = false;
+ static void read_symbols_from_files(const char *filename)
 -- 
 2.32.0
 
