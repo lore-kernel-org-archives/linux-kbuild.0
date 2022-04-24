@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70203C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A22CC4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238204AbiDXTNt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
+        id S233688AbiDXTNv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:13:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238065AbiDXTNp (ORCPT
+        with ESMTP id S238049AbiDXTNr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:13:45 -0400
+        Sun, 24 Apr 2022 15:13:47 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15D9111E;
-        Sun, 24 Apr 2022 12:10:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BDC0273E;
+        Sun, 24 Apr 2022 12:10:12 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o69019069;
-        Mon, 25 Apr 2022 04:09:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o69019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o5u019069;
+        Mon, 25 Apr 2022 04:08:52 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o5u019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827340;
-        bh=fFSgbXsS5gwUrnH11gUc1A0zSBYugGdxXRo6n/xj35g=;
+        s=dec2015msa; t=1650827332;
+        bh=QjMPBrb5wf6oir+mjHPJkOaYov2v5r+YKqZc3MADo38=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=19VBAGpuCkzoMIrMgcvWGGuwsA+oAMt28OKWBbGN5xhMBPLluzx6YtFW9ZoHlzXVl
-         Tia2bODv21DcFr9N82V8bjiZ5FHWWA4FwH4/Chw+lv4XXYpCyOaRzqq1L8/HjcjIoN
-         THe8bTkU5WT+zSS1a0ec38dpk4DJ1cvmDlVcqzw6m2B+ses1I1a770OLcBvTrCrX9l
-         OX1ZRYmDsUwkkVLu5/ojeM3klY+0Wr9w9dLUWPaPFbz7iq65V+jVcACx1+ERCvp6C4
-         /s74Kw15yl2+jGJBSBE2ACnDNxncWdBaSNq3ze518OadDi1eykEmOKGbKA+RLtqZJq
-         zArQHu/rajpuQ==
+        b=VLz/irpeYp6S0/j252teXydLQ/fcZXUohfQGpmOg9d3BHQDeIVqsVnsg8nOkW3yta
+         tsfQ3zaLw+QdnKJTfti724/lzYP6MeefnFwR+rqA/rBSFY4/59f8Tn4w0wRdO7c9r0
+         Hn0sV0QvYsm5dkAv5HU6Rvh/egWGwYc61d5JNzryeOkZ84SazkMy98WbnnUm70fEp1
+         dpTFHutO+BsEgdoR2b2Onz0JwNcunJDRiF2SvoY1nb427mZ3tPoGkl2r/UG8bf9dja
+         3LDTStaE+fL68Uu3a4Wm7CJsiSXbAe2AeW16SXJ0o+y1EbJt89Y9LAAZjV9Za3jrad
+         +dDJY02tlHAPQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 15/27] modpost: move static EXPORT_SYMBOL check to check_exports()
-Date:   Mon, 25 Apr 2022 04:07:59 +0900
-Message-Id: <20220424190811.1678416-16-masahiroy@kernel.org>
+Subject: [PATCH 02/27] modpost: do not write out any file when error occurred
+Date:   Mon, 25 Apr 2022 04:07:46 +0900
+Message-Id: <20220424190811.1678416-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,57 +48,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now that struct module has a list of symbols it exports, this check
-can go into check_exports(). The code becomes shorter.
+If an error occurs, modpost will fail anyway. Do not write out
+any content (, which might be invalid).
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ scripts/mod/modpost.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 1793396e1323..14044cd94aaa 100644
+index 141370ebbfd3..f0d48f65fb33 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2195,6 +2195,12 @@ static void check_exports(struct module *mod)
- 		if (!mod->gpl_compatible)
- 			check_for_gpl_usage(exp->export, basename, exp->name);
- 	}
+@@ -2333,6 +2333,9 @@ static void write_buf(struct buffer *b, const char *fname)
+ {
+ 	FILE *file;
+ 
++	if (error_occurred)
++		return;
 +
-+	list_for_each_entry(s, &mod->exported_symbols, list) {
-+		if (s->is_static)
-+			error("\"%s\" [%s] is a static %s\n",
-+			      s->name, mod->name, export_str(s->export));
-+	}
- }
- 
- static void check_modname_len(struct module *mod)
-@@ -2506,7 +2512,6 @@ int main(int argc, char **argv)
- 	char *missing_namespace_deps = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
--	int n;
- 	LIST_HEAD(dump_lists);
- 	struct dump_list *dl, *dl2;
- 
-@@ -2602,16 +2607,6 @@ int main(int argc, char **argv)
- 	if (sec_mismatch_count && !sec_mismatch_warn_only)
- 		error("Section mismatches detected.\n"
- 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
--	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
--		struct symbol *s;
--
--		for (s = symbolhash[n]; s; s = s->next) {
--			if (s->is_static)
--				error("\"%s\" [%s] is a static %s\n",
--				      s->name, s->module->name,
--				      export_str(s->export));
--		}
--	}
- 
- 	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
- 		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
+ 	file = fopen(fname, "w");
+ 	if (!file) {
+ 		perror(fname);
 -- 
 2.32.0
 
