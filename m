@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BB3C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC59C433F5
+	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238276AbiDXTOF (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:14:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40430 "EHLO
+        id S238419AbiDXTOG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:14:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238287AbiDXTNw (ORCPT
+        with ESMTP id S238281AbiDXTNw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 24 Apr 2022 15:13:52 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510366471;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513AD64FD;
         Sun, 24 Apr 2022 12:10:13 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o5t019069;
-        Mon, 25 Apr 2022 04:08:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o5t019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o5v019069;
+        Mon, 25 Apr 2022 04:08:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o5v019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827332;
-        bh=xmbqEDC+KtGt1J30nfqDvMBENgRiG6uXKvfO4rQS4b8=;
+        s=dec2015msa; t=1650827333;
+        bh=3DIZA5tkupZU8nSODyVIXDfuTgtxrNBwn6P7Zx7N+eQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hwvmRmU1DB7j7YdfjGyZcPCgs3f2ie/cSp5NVFbIAPMFaFR0aZQVrqpsbc+3sE/mU
-         LuKWBru6a3N4d68aAJsg7In3Bg8fxClnk002VVW/rXWREzBnOgTAlDYGNd+1hlcu1/
-         lz2hh3RgK47U8qWmhFT2XyIGlGG8Lpjo2l/RdhGJDdOs1DF5GIvWmECyvMM5n3O6cX
-         k539SvQXc5yJieEarPk1MPq8M8eBkVsL1Vmi16PjU95d9FjX5GCSlIUSq6dHJ6bl/p
-         WpiRoTGXDl+xJZLzuO1xS77EDSb1ADonE4JCsjxH8fFWw9st8iQ0l32NF+7AcAwXzB
-         V46JRtf198uzw==
+        b=OCXh4znvO5zwPPKyyC3CS9SOV50mqKBXy98fAlzkkA7vAoktlG03qFYL58N5wq1hx
+         FA7bG5V4Kr8i2ma5nLNpa+kz7dHMArIIIeaojFYveiL1K3WwvUjXPIlNMkB9FlH5Ve
+         HtRJ8HFc6OOC5NqtZGPcAR1HoN9i7TVwM6ZAh9HyCCF5NQ1X6FDITOATMc4LyZw1fX
+         OC/IqqU/WLJHI59YDjqxFluY8hqSyPgQ06exIqHkSkw4h2S1W+pvVVWEkO0OXyoefF
+         EBykLgJh/ZHhl16Pm1gjmX7nWJr6lw7m0dpL9hdKhsR7JPFfgDmeORiq9TNxPqjZ5R
+         fDKcXddu15GGw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 01/27] modpost: use snprintf() instead of sprintf() for safety
-Date:   Mon, 25 Apr 2022 04:07:45 +0900
-Message-Id: <20220424190811.1678416-2-masahiroy@kernel.org>
+Subject: [PATCH 03/27] modpost: remove stale comment about sym_add_exported()
+Date:   Mon, 25 Apr 2022 04:07:47 +0900
+Message-Id: <20220424190811.1678416-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,41 +48,43 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use snprintf() to avoid the potential buffer overflow, and also
-check the return value to detect the too long path.
+The description,
+
+  it may have already been added without a
+  CRC, in this case just update the CRC
+
+... is no longer valid.
+
+In very old days, this function was used to update the CRC as well.
+
+Commit 040fcc819a2e ("kbuild: improved modversioning support for
+external modules") started to use a separate function (sym_update_crc)
+for updating the CRC.
+
+The first part, "Add an exported symbol" is correct, but it is too
+obvious from the function name. Drop this comment entirely.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ scripts/mod/modpost.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 522d5249d196..141370ebbfd3 100644
+index f0d48f65fb33..c7cfeeb088f7 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2560,6 +2560,7 @@ int main(int argc, char **argv)
+@@ -387,10 +387,6 @@ static void sym_update_namespace(const char *symname, const char *namespace)
+ 	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
+ }
  
- 	for (mod = modules; mod; mod = mod->next) {
- 		char fname[PATH_MAX];
-+		int ret;
- 
- 		if (mod->is_vmlinux || mod->from_dump)
- 			continue;
-@@ -2578,7 +2579,12 @@ int main(int argc, char **argv)
- 		add_moddevtable(&buf, mod);
- 		add_srcversion(&buf, mod);
- 
--		sprintf(fname, "%s.mod.c", mod->name);
-+		ret = snprintf(fname, sizeof(fname), "%s.mod.c", mod->name);
-+		if (ret >= sizeof(fname)) {
-+			error("%s: too long path was truncated\n", fname);
-+			continue;
-+		}
-+
- 		write_if_changed(&buf, fname);
- 	}
- 
+-/**
+- * Add an exported symbol - it may have already been added without a
+- * CRC, in this case just update the CRC
+- **/
+ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 				       enum export export)
+ {
 -- 
 2.32.0
 
