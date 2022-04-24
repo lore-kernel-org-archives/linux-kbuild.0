@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A22CC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B463C433EF
 	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbiDXTNv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:13:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40168 "EHLO
+        id S238254AbiDXTNu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238049AbiDXTNr (ORCPT
+        with ESMTP id S238058AbiDXTNp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:13:47 -0400
+        Sun, 24 Apr 2022 15:13:45 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BDC0273E;
-        Sun, 24 Apr 2022 12:10:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18D52BFF;
+        Sun, 24 Apr 2022 12:10:11 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o5u019069;
-        Mon, 25 Apr 2022 04:08:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o5u019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o65019069;
+        Mon, 25 Apr 2022 04:08:58 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o65019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827332;
-        bh=QjMPBrb5wf6oir+mjHPJkOaYov2v5r+YKqZc3MADo38=;
+        s=dec2015msa; t=1650827338;
+        bh=/nbXjb/Czq1uEAA6RFwh8w4kvV4PZw95/VO0fgvQkv8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VLz/irpeYp6S0/j252teXydLQ/fcZXUohfQGpmOg9d3BHQDeIVqsVnsg8nOkW3yta
-         tsfQ3zaLw+QdnKJTfti724/lzYP6MeefnFwR+rqA/rBSFY4/59f8Tn4w0wRdO7c9r0
-         Hn0sV0QvYsm5dkAv5HU6Rvh/egWGwYc61d5JNzryeOkZ84SazkMy98WbnnUm70fEp1
-         dpTFHutO+BsEgdoR2b2Onz0JwNcunJDRiF2SvoY1nb427mZ3tPoGkl2r/UG8bf9dja
-         3LDTStaE+fL68Uu3a4Wm7CJsiSXbAe2AeW16SXJ0o+y1EbJt89Y9LAAZjV9Za3jrad
-         +dDJY02tlHAPQ==
+        b=IbeFnOqKEkGJuATuFubsF4GIacp0Rt5p1Bqls1YAKeRyu8nBpdcPTUDF+8HKZ7TXE
+         OGR85yXfNMTmVzbOdF4+IRd1E9rdN0LM+9bbmI1SyhhtqVqmrZe2f7k7JZYqkIFYEd
+         Jk50DaHMYVKBio5e5+wXT6BjKAOhpkJVKuprUWApyB5aEOJIiOwtMkqTcRNFA2LOub
+         PeztkKwX4opZoIjYX7BFG98OKm8tjh9NESZkqvdXWFxEtoe00ft+7mzv7LdY3sH2OC
+         ke8Wi47vKsF2vms7l3kVNM8rT+u45BVdsqS1oiXD7ttfLzMImqDG2Uf5yQ6LM9yzKY
+         zgUOgKfU3geAQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 02/27] modpost: do not write out any file when error occurred
-Date:   Mon, 25 Apr 2022 04:07:46 +0900
-Message-Id: <20220424190811.1678416-3-masahiroy@kernel.org>
+Subject: [PATCH 11/27] modpost: use doubly linked list for dump_lists
+Date:   Mon, 25 Apr 2022 04:07:55 +0900
+Message-Id: <20220424190811.1678416-12-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,29 +48,71 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-If an error occurs, modpost will fail anyway. Do not write out
-any content (, which might be invalid).
+This looks easier to understand (just because this is a pattern in
+the kernel code). No functional change is intended.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/mod/modpost.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 141370ebbfd3..f0d48f65fb33 100644
+index e1eb188d6282..4c074d6c1721 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2333,6 +2333,9 @@ static void write_buf(struct buffer *b, const char *fname)
- {
- 	FILE *file;
+@@ -2496,7 +2496,7 @@ static void write_namespace_deps_files(const char *fname)
+ }
  
-+	if (error_occurred)
-+		return;
-+
- 	file = fopen(fname, "w");
- 	if (!file) {
- 		perror(fname);
+ struct dump_list {
+-	struct dump_list *next;
++	struct list_head list;
+ 	const char *file;
+ };
+ 
+@@ -2508,8 +2508,8 @@ int main(int argc, char **argv)
+ 	char *dump_write = NULL, *files_source = NULL;
+ 	int opt;
+ 	int n;
+-	struct dump_list *dump_read_start = NULL;
+-	struct dump_list **dump_read_iter = &dump_read_start;
++	LIST_HEAD(dump_lists);
++	struct dump_list *dl, *dl2;
+ 
+ 	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
+ 		switch (opt) {
+@@ -2517,10 +2517,9 @@ int main(int argc, char **argv)
+ 			external_module = true;
+ 			break;
+ 		case 'i':
+-			*dump_read_iter =
+-				NOFAIL(calloc(1, sizeof(**dump_read_iter)));
+-			(*dump_read_iter)->file = optarg;
+-			dump_read_iter = &(*dump_read_iter)->next;
++			dl = NOFAIL(malloc(sizeof(*dl)));
++			dl->file = optarg;
++			list_add_tail(&dl->list, &dump_lists);
+ 			break;
+ 		case 'm':
+ 			modversions = true;
+@@ -2554,13 +2553,10 @@ int main(int argc, char **argv)
+ 		}
+ 	}
+ 
+-	while (dump_read_start) {
+-		struct dump_list *tmp;
+-
+-		read_dump(dump_read_start->file);
+-		tmp = dump_read_start->next;
+-		free(dump_read_start);
+-		dump_read_start = tmp;
++	list_for_each_entry_safe(dl, dl2, &dump_lists, list) {
++		read_dump(dl->file);
++		list_del(&dl->list);
++		free(dl);
+ 	}
+ 
+ 	while (optind < argc)
 -- 
 2.32.0
 
