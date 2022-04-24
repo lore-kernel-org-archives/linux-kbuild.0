@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1AFC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69433C433FE
 	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237850AbiDXTNr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S238109AbiDXTNr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 24 Apr 2022 15:13:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40232 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238020AbiDXTNn (ORCPT
+        with ESMTP id S237890AbiDXTNl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:13:43 -0400
+        Sun, 24 Apr 2022 15:13:41 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0B45FAE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCB42729;
         Sun, 24 Apr 2022 12:10:12 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o6A019069;
-        Mon, 25 Apr 2022 04:09:01 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o6A019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o5w019069;
+        Mon, 25 Apr 2022 04:08:53 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o5w019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827341;
-        bh=q+sI2WvI+q2i6npMbfWAUGCdZca075FjNBQd8rvxMKA=;
+        s=dec2015msa; t=1650827334;
+        bh=KYwyQDgYoSAR9k9phrqg3aahjxUmZXZsbqJH2MfzCS8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yuf2lqYWKVrxOfsTQbDa1MGht18VKIAX93EkPFO8/RH2HayipBCbouFBwt7oPBDLh
-         tVm7Gc3oCiSccuo8IxX1MWUqtFmU1NsnR5XFZ0yV2/zQvMXBzMlzRm59LpKSNLP+so
-         UiDyVpSC0LfDybVmkmPD4cPLLwLJp9NWIOM0GaNyl9sK/Nay007hKEVK9nrpQCRCm4
-         ReJKoHMM4SWoG65JG0ChY6xRkqbgBX4bvz2QNv81lM+7t1hTZFubiwHcUA2JoyD6cz
-         LE97/3tswoKrb9SIDUPuECB1lO982vslo+wjBOYW1cstQN/V1Wh7Lbx1cDkRP5xOUW
-         IcXBzPuBBD3PQ==
+        b=Uyp4MwGoBJDjkP/2Tx7a5ufNv1hfIXfxfFWpD24RG3shKp4PNMNuyn0gUxJ04cXCt
+         w7JrKbwyIoiVgWcaPQcw0wXRdubB5tVi7W+WA1WjJQS3TI0WaaAKPhq8u+Tj1QsG1M
+         c5MsjSXLVZCmHkkdh8Y4RJdAZ+aMJAD/QEXar1vxomOh8uxAT08Kq7ZCsGSw30I3tc
+         zR5ICwRzK8H6V206x1HPjODOalphXgSBpRQ79WfNPzZ7+kwmRqRzKYf5ibTtFNqAE0
+         rRRqKCkmlIl87l49XmQH/ocUDhVms/OZzB/zDh3PQK3voUPzLKu9z7Lmtae6+6ovNU
+         tbOm6HGdcnO3Q==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 16/27] modpost: make multiple export error
-Date:   Mon, 25 Apr 2022 04:08:00 +0900
-Message-Id: <20220424190811.1678416-17-masahiroy@kernel.org>
+Subject: [PATCH 04/27] modpost: add a separate error for exported symbols without definition
+Date:   Mon, 25 Apr 2022 04:07:48 +0900
+Message-Id: <20220424190811.1678416-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,39 +48,59 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This is currently a warning, but I think modpost should stop building
-in this case.
+It took me a while to understand the intent of "exp->module == mod".
 
-If the same symbol is exported multiple times and we let it keep going,
-the sanity check becomes difficult.
+This code goes back to 2003 (pre-git era).
 
-Only the legitimate case is that an external module overrides the
-corresponding in-tree module to provide a different implementation
-with the same interface.
+The commit is not in this git repository, and might be worth a little
+explanation.
+
+You can add EXPORT_SYMBOL() with no definition in the same file (but you
+need to put a declaration).
+
+  int foo(void);
+  EXPORT_SYMBOL(foo);
+
+This is typical when EXPORT_SYMBOL() is defined in a C file, but the
+actual implementation is in a separate assembly file. In old days,
+EXPORT_SYMBOL() were only available in C files (but this limitation
+does not exist any more).
+
+Add a separate, clearer message if an exported symbol has no definition.
+It should be an error even if KBUILD_MODPOST_WARN is given.
+
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=2763b6bcb96e6a38a2fe31108fe5759ec5bcc80a
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/mod/modpost.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 14044cd94aaa..73f0b98e3b5a 100644
+index c7cfeeb088f7..969a081dba62 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -411,9 +411,9 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 		list_add_tail(&s->list, &mod->exported_symbols);
- 	} else if (!external_module || s->module->is_vmlinux ||
- 		   s->module == mod) {
--		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
--		     mod->name, name, s->module->name,
--		     s->module->is_vmlinux ? "" : ".ko");
-+		error("%s: '%s' exported twice. Previous export was in %s%s\n",
-+		      mod->name, name, s->module->name,
-+		      s->module->is_vmlinux ? "" : ".ko");
- 		return s;
- 	}
- 
+@@ -2147,13 +2147,18 @@ static void check_exports(struct module *mod)
+ 	for (s = mod->unres; s; s = s->next) {
+ 		const char *basename;
+ 		exp = find_symbol(s->name);
+-		if (!exp || exp->module == mod) {
++		if (!exp) {
+ 			if (!s->weak && nr_unresolved++ < MAX_UNRESOLVED_REPORTS)
+ 				modpost_log(warn_unresolved ? LOG_WARN : LOG_ERROR,
+ 					    "\"%s\" [%s.ko] undefined!\n",
+ 					    s->name, mod->name);
+ 			continue;
+ 		}
++		if (exp->module == mod) {
++			error("\"%s\" [%s.ko] was exported without definition\n",
++			      s->name, mod->name);
++			continue;
++		}
+ 		basename = strrchr(mod->name, '/');
+ 		if (basename)
+ 			basename++;
 -- 
 2.32.0
 
