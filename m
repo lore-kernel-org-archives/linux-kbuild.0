@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2170C433FE
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C37A0C433F5
+	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238633AbiDXTOq (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:14:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41250 "EHLO
+        id S238678AbiDXTOr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:14:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238577AbiDXTOJ (ORCPT
+        with ESMTP id S238587AbiDXTOK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:14:09 -0400
+        Sun, 24 Apr 2022 15:14:10 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 523041AD95;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CA11D0EC;
         Sun, 24 Apr 2022 12:10:14 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o61019069;
-        Mon, 25 Apr 2022 04:08:55 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o61019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o6K019069;
+        Mon, 25 Apr 2022 04:09:07 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o6K019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827335;
-        bh=VLrxkduJt9ja4CebU+WSgMvgyEZjMIX8RhfbstC/C8w=;
+        s=dec2015msa; t=1650827347;
+        bh=CYEnuztOFP1Dfsxap3iWLFg+MkTNFMlIDRce2jWUqEU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=P+03v+VAvrXzrDGPer+b5GSFTBCeaaazsruVeSC2gp0U59/ppovnwsahXAfb+RStk
-         BTn5pNFZSrOlnPIILnAVhaaMnii3w5Yv02i7+x9xcj0ItZoT/E5ys3hQZ0FfdvJgye
-         /QLFmHMluQOper+k/1EICFgOslC+l1vrB2fMZg4KzCyzmJQUDGUDctFQLofAKpWIOl
-         isd9rnOuhg9j/y6gVkF6RwhXKuRkRTZOC3IG6HyhlGkDDdGgRp85iNA7zdTVoSlGQj
-         JauNdPRS4EXiSQSSTtY6A2O6b8osTTWkFgy9iw6aefpAlpQXKKulWNSMjFHK7AHfXC
-         qLsNpHLPxYAyA==
+        b=Gljh7BYFBAAWWfQh12OYfXjPg/oNuXJ5B6iKUW23FN8/V0Uri0ihRu8HUAmUx2rXQ
+         oACAG6+Ei0jUoaat/hqZo2LUfxzdlI75RAVNnjIDateTEN32pzJMBVvUV3id458eHA
+         TnVcZRFM+0vTpQTXU+BO0OTVSv3Zt3S48vwMqOuL+TSys70A9KI2GWosxPpwo4Lw0J
+         yxtkCe4O6vKtgRpIKhWndROKnp9igk3EYJOnijAhamR7nJ8hnONaNIefMpsNKlNjUF
+         BkxKuNyJgGejwnrcqPFDe7a714LCh7qtps8/CnIIKjtk8chRRdAUhaksFA43SOyIJz
+         z8ZlneT/MCUBA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 07/27] modpost: import include/linux/list.h
-Date:   Mon, 25 Apr 2022 04:07:51 +0900
-Message-Id: <20220424190811.1678416-8-masahiroy@kernel.org>
+Subject: [PATCH 26/27] kbuild: stop generating *.symversions
+Date:   Mon, 25 Apr 2022 04:08:10 +0900
+Message-Id: <20220424190811.1678416-27-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,363 +48,130 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Import include/linux/list.h to use convenient list macros in modpost.
+Now *.symversions is unneeded. Clean up the Makefile and script.
 
-I dropped kernel-space code such as {WRITE,READ}_ONCE etc. and unneeded
-macros.
-
-I also imported container_of() from include/linux/container_of.h and
-type definitions from include/linux/types.h.
+I will keep *.symversions in .gitignore and 'make clean' for a while
+to avoid flooding the output from 'git status'.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/list.h | 336 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 336 insertions(+)
- create mode 100644 scripts/mod/list.h
+ scripts/Makefile.build  | 28 ++++------------------------
+ scripts/link-vmlinux.sh | 19 -------------------
+ 2 files changed, 4 insertions(+), 43 deletions(-)
 
-diff --git a/scripts/mod/list.h b/scripts/mod/list.h
-new file mode 100644
-index 000000000000..c87583a71714
---- /dev/null
-+++ b/scripts/mod/list.h
-@@ -0,0 +1,336 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef LIST_H
-+#define LIST_H
-+
-+#include <stdbool.h>
-+#include <stddef.h>
-+
-+/* Are two types/vars the same type (ignoring qualifiers)? */
-+#define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
-+
-+/**
-+ * container_of - cast a member of a structure out to the containing structure
-+ * @ptr:	the pointer to the member.
-+ * @type:	the type of the container struct this is embedded in.
-+ * @member:	the name of the member within the struct.
-+ *
-+ */
-+#define container_of(ptr, type, member) ({				\
-+	void *__mptr = (void *)(ptr);					\
-+	_Static_assert(__same_type(*(ptr), ((type *)0)->member) ||	\
-+		      __same_type(*(ptr), void),			\
-+		      "pointer type mismatch in container_of()");	\
-+	((type *)(__mptr - offsetof(type, member))); })
-+
-+#define LIST_POISON1  ((void *) 0x100)
-+#define LIST_POISON2  ((void *) 0x122)
-+
-+/*
-+ * Circular doubly linked list implementation.
-+ *
-+ * Some of the internal functions ("__xxx") are useful when
-+ * manipulating whole lists rather than single entries, as
-+ * sometimes we already know the next/prev entries and we can
-+ * generate better code by using them directly rather than
-+ * using the generic single-entry routines.
-+ */
-+
-+struct list_head {
-+	struct list_head *next, *prev;
-+};
-+
-+#define LIST_HEAD_INIT(name) { &(name), &(name) }
-+
-+#define LIST_HEAD(name) \
-+	struct list_head name = LIST_HEAD_INIT(name)
-+
-+/**
-+ * INIT_LIST_HEAD - Initialize a list_head structure
-+ * @list: list_head structure to be initialized.
-+ *
-+ * Initializes the list_head to point to itself.  If it is a list header,
-+ * the result is an empty list.
-+ */
-+static inline void INIT_LIST_HEAD(struct list_head *list)
-+{
-+	list->next = list;
-+	list->prev = list;
-+}
-+
-+/*
-+ * Insert a new entry between two known consecutive entries.
-+ *
-+ * This is only for internal list manipulation where we know
-+ * the prev/next entries already!
-+ */
-+static inline void __list_add(struct list_head *new,
-+			      struct list_head *prev,
-+			      struct list_head *next)
-+{
-+	next->prev = new;
-+	new->next = next;
-+	new->prev = prev;
-+	prev->next = new;
-+}
-+
-+/**
-+ * list_add - add a new entry
-+ * @new: new entry to be added
-+ * @head: list head to add it after
-+ *
-+ * Insert a new entry after the specified head.
-+ * This is good for implementing stacks.
-+ */
-+static inline void list_add(struct list_head *new, struct list_head *head)
-+{
-+	__list_add(new, head, head->next);
-+}
-+
-+/**
-+ * list_add_tail - add a new entry
-+ * @new: new entry to be added
-+ * @head: list head to add it before
-+ *
-+ * Insert a new entry before the specified head.
-+ * This is useful for implementing queues.
-+ */
-+static inline void list_add_tail(struct list_head *new, struct list_head *head)
-+{
-+	__list_add(new, head->prev, head);
-+}
-+
-+/*
-+ * Delete a list entry by making the prev/next entries
-+ * point to each other.
-+ *
-+ * This is only for internal list manipulation where we know
-+ * the prev/next entries already!
-+ */
-+static inline void __list_del(struct list_head *prev, struct list_head *next)
-+{
-+	next->prev = prev;
-+	prev->next = next;
-+}
-+
-+static inline void __list_del_entry(struct list_head *entry)
-+{
-+	__list_del(entry->prev, entry->next);
-+}
-+
-+/**
-+ * list_del - deletes entry from list.
-+ * @entry: the element to delete from the list.
-+ * Note: list_empty() on entry does not return true after this, the entry is
-+ * in an undefined state.
-+ */
-+static inline void list_del(struct list_head *entry)
-+{
-+	__list_del_entry(entry);
-+	entry->next = LIST_POISON1;
-+	entry->prev = LIST_POISON2;
-+}
-+
-+/**
-+ * list_is_head - tests whether @list is the list @head
-+ * @list: the entry to test
-+ * @head: the head of the list
-+ */
-+static inline int list_is_head(const struct list_head *list, const struct list_head *head)
-+{
-+	return list == head;
-+}
-+
-+/**
-+ * list_empty - tests whether a list is empty
-+ * @head: the list to test.
-+ */
-+static inline int list_empty(const struct list_head *head)
-+{
-+	return head->next == head;
-+}
-+
-+/**
-+ * list_entry - get the struct for this entry
-+ * @ptr:	the &struct list_head pointer.
-+ * @type:	the type of the struct this is embedded in.
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_entry(ptr, type, member) \
-+	container_of(ptr, type, member)
-+
-+/**
-+ * list_first_entry - get the first element from a list
-+ * @ptr:	the list head to take the element from.
-+ * @type:	the type of the struct this is embedded in.
-+ * @member:	the name of the list_head within the struct.
-+ *
-+ * Note, that list is expected to be not empty.
-+ */
-+#define list_first_entry(ptr, type, member) \
-+	list_entry((ptr)->next, type, member)
-+
-+/**
-+ * list_next_entry - get the next element in list
-+ * @pos:	the type * to cursor
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_next_entry(pos, member) \
-+	list_entry((pos)->member.next, typeof(*(pos)), member)
-+
-+/**
-+ * list_entry_is_head - test if the entry points to the head of the list
-+ * @pos:	the type * to cursor
-+ * @head:	the head for your list.
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_entry_is_head(pos, head, member)				\
-+	(&pos->member == (head))
-+
-+/**
-+ * list_for_each_entry	-	iterate over list of given type
-+ * @pos:	the type * to use as a loop cursor.
-+ * @head:	the head for your list.
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_for_each_entry(pos, head, member)				\
-+	for (pos = list_first_entry(head, typeof(*pos), member);	\
-+	     !list_entry_is_head(pos, head, member);			\
-+	     pos = list_next_entry(pos, member))
-+
-+/**
-+ * list_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-+ * @pos:	the type * to use as a loop cursor.
-+ * @n:		another type * to use as temporary storage
-+ * @head:	the head for your list.
-+ * @member:	the name of the list_head within the struct.
-+ */
-+#define list_for_each_entry_safe(pos, n, head, member)			\
-+	for (pos = list_first_entry(head, typeof(*pos), member),	\
-+		n = list_next_entry(pos, member);			\
-+	     !list_entry_is_head(pos, head, member);			\
-+	     pos = n, n = list_next_entry(n, member))
-+
-+/*
-+ * Double linked lists with a single pointer list head.
-+ * Mostly useful for hash tables where the two pointer list head is
-+ * too wasteful.
-+ * You lose the ability to access the tail in O(1).
-+ */
-+
-+struct hlist_head {
-+	struct hlist_node *first;
-+};
-+
-+struct hlist_node {
-+	struct hlist_node *next, **pprev;
-+};
-+
-+#define HLIST_HEAD_INIT { .first = NULL }
-+#define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
-+#define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
-+static inline void INIT_HLIST_NODE(struct hlist_node *h)
-+{
-+	h->next = NULL;
-+	h->pprev = NULL;
-+}
-+
-+/**
-+ * hlist_unhashed - Has node been removed from list and reinitialized?
-+ * @h: Node to be checked
-+ *
-+ * Not that not all removal functions will leave a node in unhashed
-+ * state.  For example, hlist_nulls_del_init_rcu() does leave the
-+ * node in unhashed state, but hlist_nulls_del() does not.
-+ */
-+static inline int hlist_unhashed(const struct hlist_node *h)
-+{
-+	return !h->pprev;
-+}
-+
-+static inline void __hlist_del(struct hlist_node *n)
-+{
-+	struct hlist_node *next = n->next;
-+	struct hlist_node **pprev = n->pprev;
-+
-+	*pprev = next;
-+	if (next)
-+		next->pprev = pprev;
-+}
-+
-+/**
-+ * hlist_del - Delete the specified hlist_node from its list
-+ * @n: Node to delete.
-+ *
-+ * Note that this function leaves the node in hashed state.  Use
-+ * hlist_del_init() or similar instead to unhash @n.
-+ */
-+static inline void hlist_del(struct hlist_node *n)
-+{
-+	__hlist_del(n);
-+	n->next = LIST_POISON1;
-+	n->pprev = LIST_POISON2;
-+}
-+
-+/**
-+ * hlist_del_init - Delete the specified hlist_node from its list and initialize
-+ * @n: Node to delete.
-+ *
-+ * Note that this function leaves the node in unhashed state.
-+ */
-+static inline void hlist_del_init(struct hlist_node *n)
-+{
-+	if (!hlist_unhashed(n)) {
-+		__hlist_del(n);
-+		INIT_HLIST_NODE(n);
-+	}
-+}
-+
-+/**
-+ * hlist_add_head - add a new entry at the beginning of the hlist
-+ * @n: new entry to be added
-+ * @h: hlist head to add it after
-+ *
-+ * Insert a new entry after the specified head.
-+ * This is good for implementing stacks.
-+ */
-+static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
-+{
-+	struct hlist_node *first = h->first;
-+	n->next = first;
-+	if (first)
-+		first->pprev = &n->next;
-+	h->first = n;
-+	n->pprev = &h->first;
-+}
-+
-+#define hlist_entry(ptr, type, member) container_of(ptr, type, member)
-+
-+#define hlist_entry_safe(ptr, type, member) \
-+	({ typeof(ptr) ____ptr = (ptr); \
-+	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
-+	})
-+
-+/**
-+ * hlist_for_each_entry	- iterate over list of given type
-+ * @pos:	the type * to use as a loop cursor.
-+ * @head:	the head for your list.
-+ * @member:	the name of the hlist_node within the struct.
-+ */
-+#define hlist_for_each_entry(pos, head, member)				\
-+	for (pos = hlist_entry_safe((head)->first, typeof(*(pos)), member);\
-+	     pos;							\
-+	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
-+
-+/**
-+ * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-+ * @pos:	the type * to use as a loop cursor.
-+ * @n:		a &struct hlist_node to use as temporary storage
-+ * @head:	the head for your list.
-+ * @member:	the name of the hlist_node within the struct.
-+ */
-+#define hlist_for_each_entry_safe(pos, n, head, member)			\
-+	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
-+	     pos && ({ n = pos->member.next; 1; });			\
-+	     pos = hlist_entry_safe(n, typeof(*pos), member))
-+
-+#endif /* LIST_H */
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index aadc16e04632..7f199b0a5170 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -170,12 +170,9 @@ ifdef CONFIG_MODVERSIONS
+ # to the kernel and/or modules at the end.
+ gen_symversions =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+-		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
+-		    > $@.symversions;						\
+ 		echo >> $(dot-target).cmd ;					\
+-		sed 's/\(.*\) = \(.*\);/$(pound)\1=\2/' $@.symversions >> $(dot-target).cmd ; \
+-	else									\
+-		rm -f $@.symversions;						\
++		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) | \
++		sed 's/\(.*\) = \(.*\);/$(pound)\1=\2/' >> $(dot-target).cmd ; \
+ 	fi
+ 
+ cmd_gen_symversions_c =	$(call gen_symversions,c)
+@@ -391,17 +388,6 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
+ $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
+ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ 
+-# combine symversions for later processing
+-ifeq ($(CONFIG_LTO_CLANG) $(CONFIG_MODVERSIONS),y y)
+-      cmd_update_lto_symversions =					\
+-	rm -f $@.symversions						\
+-	$(foreach n, $(filter-out FORCE,$^),				\
+-		$(if $(shell test -s $(n).symversions && echo y),	\
+-			; cat $(n).symversions >> $@.symversions))
+-else
+-      cmd_update_lto_symversions = echo >/dev/null
+-endif
+-
+ #
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+ #
+@@ -409,11 +395,8 @@ endif
+ quiet_cmd_ar_builtin = AR      $@
+       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
+ 
+-quiet_cmd_ar_and_symver = AR      $@
+-      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
+-
+ $(obj)/built-in.a: $(real-obj-y) FORCE
+-	$(call if_changed,ar_and_symver)
++	$(call if_changed,ar_builtin)
+ 
+ #
+ # Rule to create modules.order file
+@@ -433,16 +416,13 @@ $(obj)/modules.order: $(obj-m) FORCE
+ #
+ # Rule to compile a set of .o files into one .a file (with symbol table)
+ #
+-quiet_cmd_ar_lib = AR      $@
+-      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
+ 
+ $(obj)/lib.a: $(lib-y) FORCE
+-	$(call if_changed,ar_lib)
++	$(call if_changed,ar)
+ 
+ ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
+ quiet_cmd_link_multi-m = AR [M]  $@
+ cmd_link_multi-m =						\
+-	$(cmd_update_lto_symversions);				\
+ 	rm -f $@; 						\
+ 	$(AR) cDPrsT $@ @$(patsubst %.o,%.mod,$@)
+ else
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 66a115f204eb..e2900d3bd215 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -56,20 +56,6 @@ gen_initcalls()
+ 		> .tmp_initcalls.lds
+ }
+ 
+-# If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
+-# .tmp_symversions.lds
+-gen_symversions()
+-{
+-	info GEN .tmp_symversions.lds
+-	rm -f .tmp_symversions.lds
+-
+-	for o in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
+-		if [ -f ${o}.symversions ]; then
+-			cat ${o}.symversions >> .tmp_symversions.lds
+-		fi
+-	done
+-}
+-
+ # Link of vmlinux.o used for section mismatch analysis
+ # ${1} output file
+ modpost_link()
+@@ -88,10 +74,6 @@ modpost_link()
+ 		gen_initcalls
+ 		lds="-T .tmp_initcalls.lds"
+ 
+-		if is_enabled CONFIG_MODVERSIONS; then
+-			gen_symversions
+-		fi
+-
+ 		# This might take a while, so indicate that we're doing
+ 		# an LTO link
+ 		info LTO ${1}
+@@ -306,7 +288,6 @@ cleanup()
+ 	rm -f .btf.*
+ 	rm -f .tmp_System.map
+ 	rm -f .tmp_initcalls.lds
+-	rm -f .tmp_symversions.lds
+ 	rm -f .tmp_vmlinux*
+ 	rm -f System.map
+ 	rm -f vmlinux
 -- 
 2.32.0
 
