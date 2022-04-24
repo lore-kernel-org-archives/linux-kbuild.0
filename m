@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B463C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DECAC433FE
+	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:10:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238254AbiDXTNu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
+        id S238292AbiDXTNw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 24 Apr 2022 15:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238058AbiDXTNp (ORCPT
+        with ESMTP id S238124AbiDXTNs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:13:45 -0400
+        Sun, 24 Apr 2022 15:13:48 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18D52BFF;
-        Sun, 24 Apr 2022 12:10:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5BA64FC;
+        Sun, 24 Apr 2022 12:10:12 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o65019069;
-        Mon, 25 Apr 2022 04:08:58 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o65019069
+        by conuserg-10.nifty.com with ESMTP id 23OJ8o67019069;
+        Mon, 25 Apr 2022 04:08:59 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o67019069
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827338;
-        bh=/nbXjb/Czq1uEAA6RFwh8w4kvV4PZw95/VO0fgvQkv8=;
+        s=dec2015msa; t=1650827339;
+        bh=kE3YmacwRc4w88KruYVhB9uFU4llfm9uxH0kRa2UuWE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IbeFnOqKEkGJuATuFubsF4GIacp0Rt5p1Bqls1YAKeRyu8nBpdcPTUDF+8HKZ7TXE
-         OGR85yXfNMTmVzbOdF4+IRd1E9rdN0LM+9bbmI1SyhhtqVqmrZe2f7k7JZYqkIFYEd
-         Jk50DaHMYVKBio5e5+wXT6BjKAOhpkJVKuprUWApyB5aEOJIiOwtMkqTcRNFA2LOub
-         PeztkKwX4opZoIjYX7BFG98OKm8tjh9NESZkqvdXWFxEtoe00ft+7mzv7LdY3sH2OC
-         ke8Wi47vKsF2vms7l3kVNM8rT+u45BVdsqS1oiXD7ttfLzMImqDG2Uf5yQ6LM9yzKY
-         zgUOgKfU3geAQ==
+        b=URbGOQa7nj4mk+0Ham1C85tpC48ZZ4kGppiS6TTGNc65Nnt8wJ+tXmXYMYaKlxUXa
+         1woY4y1nO5QJTj6vsuAA+7mWihaz8s8NBQUe4p9ojRHrfK+Axb9sLPtEzLPAxeBrue
+         scY9ODtfpfzNaY9C1c8SZWEpnhrPG1RoJea6mrI3PuCmpDdPjtsjK6A5QWUq1H/Fu3
+         KHs1cDgCgl1GUTLuzgCS4AIe7YHlO2qz1mHbC8IZ+JHAs9glF25+Tad8iJG303w95l
+         ryBXzB7NQ0cYxJZoemIMCKcpeigX8dN9aj3Gp0mvwS721Z5ENZ6be9aM9JoQX7BMh3
+         9DnBTZhIiGmqw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 11/27] modpost: use doubly linked list for dump_lists
-Date:   Mon, 25 Apr 2022 04:07:55 +0900
-Message-Id: <20220424190811.1678416-12-masahiroy@kernel.org>
+Subject: [PATCH 13/27] modpost: traverse the namespace_list in order
+Date:   Mon, 25 Apr 2022 04:07:57 +0900
+Message-Id: <20220424190811.1678416-14-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
 References: <20220424190811.1678416-1-masahiroy@kernel.org>
@@ -48,71 +48,119 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This looks easier to understand (just because this is a pattern in
-the kernel code). No functional change is intended.
+Use the doubly linked list to traverse the list in the added order.
+This makes the code more consistent.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ scripts/mod/modpost.c | 33 +++++++++++++++------------------
+ scripts/mod/modpost.h |  4 ++--
+ 2 files changed, 17 insertions(+), 20 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index e1eb188d6282..4c074d6c1721 100644
+index 6f2748340746..e23e416213bf 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -2496,7 +2496,7 @@ static void write_namespace_deps_files(const char *fname)
+@@ -186,6 +186,8 @@ static struct module *new_module(const char *modname)
+ 	memset(mod, 0, sizeof(*mod));
+ 
+ 	INIT_LIST_HEAD(&mod->unresolved_symbols);
++	INIT_LIST_HEAD(&mod->missing_namespaces);
++	INIT_LIST_HEAD(&mod->imported_namespaces);
+ 
+ 	strcpy(mod->name, modname);
+ 	mod->is_vmlinux = (strcmp(modname, "vmlinux") == 0);
+@@ -282,39 +284,34 @@ static struct symbol *find_symbol(const char *name)
  }
  
- struct dump_list {
--	struct dump_list *next;
+ struct namespace_list {
+-	struct namespace_list *next;
 +	struct list_head list;
- 	const char *file;
+ 	char namespace[];
  };
  
-@@ -2508,8 +2508,8 @@ int main(int argc, char **argv)
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
- 	int n;
--	struct dump_list *dump_read_start = NULL;
--	struct dump_list **dump_read_iter = &dump_read_start;
-+	LIST_HEAD(dump_lists);
-+	struct dump_list *dl, *dl2;
+-static bool contains_namespace(struct namespace_list *list,
+-			       const char *namespace)
++static bool contains_namespace(struct list_head *head, const char *namespace)
+ {
+-	for (; list; list = list->next)
++	struct namespace_list *list;
++
++	list_for_each_entry(list, head, list) {
+ 		if (!strcmp(list->namespace, namespace))
+ 			return true;
++	}
  
- 	while ((opt = getopt(argc, argv, "ei:mnT:o:awENd:")) != -1) {
- 		switch (opt) {
-@@ -2517,10 +2517,9 @@ int main(int argc, char **argv)
- 			external_module = true;
- 			break;
- 		case 'i':
--			*dump_read_iter =
--				NOFAIL(calloc(1, sizeof(**dump_read_iter)));
--			(*dump_read_iter)->file = optarg;
--			dump_read_iter = &(*dump_read_iter)->next;
-+			dl = NOFAIL(malloc(sizeof(*dl)));
-+			dl->file = optarg;
-+			list_add_tail(&dl->list, &dump_lists);
- 			break;
- 		case 'm':
- 			modversions = true;
-@@ -2554,13 +2553,10 @@ int main(int argc, char **argv)
- 		}
+ 	return false;
+ }
+ 
+-static void add_namespace(struct namespace_list **list, const char *namespace)
++static void add_namespace(struct list_head *head, const char *namespace)
+ {
+ 	struct namespace_list *ns_entry;
+ 
+-	if (!contains_namespace(*list, namespace)) {
+-		ns_entry = NOFAIL(malloc(sizeof(struct namespace_list) +
++	if (!contains_namespace(head, namespace)) {
++		ns_entry = NOFAIL(malloc(sizeof(*ns_entry) +
+ 					 strlen(namespace) + 1));
+ 		strcpy(ns_entry->namespace, namespace);
+-		ns_entry->next = *list;
+-		*list = ns_entry;
++		list_add_tail(&ns_entry->list, head);
  	}
+ }
  
--	while (dump_read_start) {
--		struct dump_list *tmp;
+-static bool module_imports_namespace(struct module *module,
+-				     const char *namespace)
+-{
+-	return contains_namespace(module->imported_namespaces, namespace);
+-}
 -
--		read_dump(dump_read_start->file);
--		tmp = dump_read_start->next;
--		free(dump_read_start);
--		dump_read_start = tmp;
-+	list_for_each_entry_safe(dl, dl2, &dump_lists, list) {
-+		read_dump(dl->file);
-+		list_del(&dl->list);
-+		free(dl);
- 	}
+ static const struct {
+ 	const char *str;
+ 	enum export export;
+@@ -2186,7 +2183,7 @@ static void check_exports(struct module *mod)
+ 			basename = mod->name;
  
- 	while (optind < argc)
+ 		if (exp->namespace &&
+-		    !module_imports_namespace(mod, exp->namespace)) {
++		    !contains_namespace(&mod->imported_namespaces, exp->namespace)) {
+ 			modpost_log(allow_missing_ns_imports ? LOG_WARN : LOG_ERROR,
+ 				    "module %s uses symbol %s from namespace %s, but does not import it.\n",
+ 				    basename, exp->name, exp->namespace);
+@@ -2485,12 +2482,12 @@ static void write_namespace_deps_files(const char *fname)
+ 
+ 	list_for_each_entry(mod, &modules, list) {
+ 
+-		if (mod->from_dump || !mod->missing_namespaces)
++		if (mod->from_dump || list_empty(&mod->missing_namespaces))
+ 			continue;
+ 
+ 		buf_printf(&ns_deps_buf, "%s.ko:", mod->name);
+ 
+-		for (ns = mod->missing_namespaces; ns; ns = ns->next)
++		list_for_each_entry(ns, &mod->missing_namespaces, list)
+ 			buf_printf(&ns_deps_buf, " %s", ns->namespace);
+ 
+ 		buf_printf(&ns_deps_buf, "\n");
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 2dbafbda9b0f..4cb955dda83f 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -120,9 +120,9 @@ struct module {
+ 	struct buffer dev_table_buf;
+ 	char	     srcversion[25];
+ 	// Missing namespace dependencies
+-	struct namespace_list *missing_namespaces;
++	struct list_head missing_namespaces;
+ 	// Actual imported namespaces
+-	struct namespace_list *imported_namespaces;
++	struct list_head imported_namespaces;
+ 	char name[];
+ };
+ 
 -- 
 2.32.0
 
