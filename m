@@ -2,135 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08862C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun, 24 Apr 2022 19:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A8AC433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 25 Apr 2022 18:11:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239085AbiDXTOv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 24 Apr 2022 15:14:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41766 "EHLO
+        id S240150AbiDYSOi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 25 Apr 2022 14:14:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238707AbiDXTOR (ORCPT
+        with ESMTP id S234370AbiDYSOg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 24 Apr 2022 15:14:17 -0400
-Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB492250D;
-        Sun, 24 Apr 2022 12:10:46 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 23OJ8o6I019069;
-        Mon, 25 Apr 2022 04:09:06 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 23OJ8o6I019069
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1650827346;
-        bh=AVil68YSPHWLVjofCEmlZoN0iHmkVQVJstSM/4p9ZwA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oHG1Fzn3TddqpqSLS4uV5XckGv9ZWTUqzYPcPdD4cHXVGJxeiu/vqUZXEp8/yt+QB
-         995I2DJot2zT3vvzNIy+jIw2KR06UNTRzK+N7sLKkBusy5nZWxknRMN1XRaFaCCGCC
-         lXLH1lYD+QijkLoWmNv49/s+wlflDONn77teD1qAo7pvny7F2imtxtkDh88SVSaxtq
-         2iOO8iH5VayaD8hTit4MOZqOH2dGnSkIFW4ejjY8Z7zWEqFQ+QGd2DxUQ2L1s0SCrl
-         iR38yKCrbgHi+I590inv667MWSsvJJW1slHZ/vwCnZf6h8jrgLkoNRznVBrAOCD7DB
-         TfnhGzYaaJ4zw==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH 24/27] modpost: generate linker script to collect symbol versions
-Date:   Mon, 25 Apr 2022 04:08:08 +0900
-Message-Id: <20220424190811.1678416-25-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220424190811.1678416-1-masahiroy@kernel.org>
-References: <20220424190811.1678416-1-masahiroy@kernel.org>
+        Mon, 25 Apr 2022 14:14:36 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EA411115C
+        for <linux-kbuild@vger.kernel.org>; Mon, 25 Apr 2022 11:11:31 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id k12so3248483lfr.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 25 Apr 2022 11:11:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mgZPcLi8Qc/FYo24I5Ui5ng4v5S2bS11j/TNA42dNdI=;
+        b=AyTemggbe9yNeY3RXNoqcAc/M7mfZVWIDn0MNHEfheqaKT2mcwlb1VrhXvL8uuTyWP
+         CNpuA7a0bg5jbWSiYl+aSOaGguqQA+9lY1Fqi7X4ipyhhZBkLDx7aYGS9i92fZTJ7olj
+         bAGHOsvS2m1+Iwe/cjKA6S/ZrJVP0VywU2AmgY0M5byGjlTdfWSXKWgPtQIel65podM8
+         JRrSuaXT2mgZyZ+OaamNgbFGvPaL0qZpMz5kIc6MnOC6tqpZuikPOsgHwpYlHsnrAfUE
+         JtHEtd/MgNB6te4d8uiGz6w4z8KqV2ijeLHQB9eHKFt4iwRMhm5xLJNutC1Z1Et2HDAO
+         GHKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mgZPcLi8Qc/FYo24I5Ui5ng4v5S2bS11j/TNA42dNdI=;
+        b=C9i2fyfHzQf9avDTLXP6L6RFuBUR4oZYuG3pGKRWLbNF9mVZbqmHg0iXRGvtFPgS7O
+         BgqGcDDio+9C4guUAwq5OMATBPSNLidsXNVOtHpimrxDvHGIIItjCciI0ry7oZXgrGwF
+         WwZyNcUy+thHOhGsHY/xIXsDg8o3XaSobTJqbR6VqHXf8ZYfdmFBATgv7+k0iguult9l
+         TWtdjVdbjkQzlVdLFGHFVv3xmN/b8WC5b06MRkEpl0X2AkBOLvVINv8BvFsZGcW5oOf9
+         KnE9hVm7QvyGkq0DJcMbweUNefxrcD9RFyPCUM7zE/sw3aIHR2+Ja83Sug+DkIZ8M3P3
+         2xPw==
+X-Gm-Message-State: AOAM5312KLNxwbMi2HBT4HjORQg9qxF5AFm3RHHDr2WXt82SUUhQME//
+        fYjqaQumb4IadaS30B7I5c/LtWtVKHS/XRO//IFIFA==
+X-Google-Smtp-Source: ABdhPJxiQBayWivPSmwOm7iRe8+oFmRUHaUcR4YG3TbfL0hdALVJpOAd5m2+OrL9AulLRlq44PjBgHKNC39atXKgnfg=
+X-Received: by 2002:a05:6512:1d1:b0:471:f63a:b182 with SMTP id
+ f17-20020a05651201d100b00471f63ab182mr9720569lfp.392.1650910289712; Mon, 25
+ Apr 2022 11:11:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220424190811.1678416-1-masahiroy@kernel.org> <20220424190811.1678416-2-masahiroy@kernel.org>
+In-Reply-To: <20220424190811.1678416-2-masahiroy@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 25 Apr 2022 11:11:17 -0700
+Message-ID: <CAKwvOdmaezR92E1p7UNGTdJf5D+DbKZEaNwTimxSbHVOjPgnuQ@mail.gmail.com>
+Subject: Re: [PATCH 01/27] modpost: use snprintf() instead of sprintf() for safety
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Merge version CRCs per vmlinux or per module.
+On Sun, Apr 24, 2022 at 12:09 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Use snprintf() to avoid the potential buffer overflow, and also
+> check the return value to detect the too long path.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-These linker scripts will be fed to the final link stage.
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+> ---
+>
+>  scripts/mod/modpost.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 522d5249d196..141370ebbfd3 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -2560,6 +2560,7 @@ int main(int argc, char **argv)
+>
+>         for (mod = modules; mod; mod = mod->next) {
+>                 char fname[PATH_MAX];
+> +               int ret;
+>
+>                 if (mod->is_vmlinux || mod->from_dump)
+>                         continue;
+> @@ -2578,7 +2579,12 @@ int main(int argc, char **argv)
+>                 add_moddevtable(&buf, mod);
+>                 add_srcversion(&buf, mod);
+>
+> -               sprintf(fname, "%s.mod.c", mod->name);
+> +               ret = snprintf(fname, sizeof(fname), "%s.mod.c", mod->name);
+> +               if (ret >= sizeof(fname)) {
+> +                       error("%s: too long path was truncated\n", fname);
+> +                       continue;
+> +               }
+> +
+>                 write_if_changed(&buf, fname);
+>         }
+>
+> --
+> 2.32.0
+>
 
- .gitignore            |  1 +
- Makefile              |  1 +
- scripts/mod/modpost.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 29 insertions(+)
 
-diff --git a/.gitignore b/.gitignore
-index 265959544978..f9dad6b917e6 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -42,6 +42,7 @@
- *.so.dbg
- *.su
- *.symtypes
-+*.symver.lds
- *.symversions
- *.tab.[ch]
- *.tar
-diff --git a/Makefile b/Makefile
-index 235d68fa1470..0779db3d1c0c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1859,6 +1859,7 @@ clean: $(clean-dirs)
- 		-o -name '*.c.[012]*.*' \
- 		-o -name '*.ll' \
- 		-o -name '*.gcno' \
-+		-o -name '*.symver.lds' \
- 		-o -name '*.*.symversions' \) -type f -print | xargs rm -f
- 
- # Generate tags for editors
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 43ab4f000ae3..ef779ada04c6 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2577,6 +2577,30 @@ static void write_dump(const char *fname)
- 	free(buf.p);
- }
- 
-+static void write_symversions_lds(struct module *mod)
-+{
-+	struct buffer buf = { };
-+	struct symbol *sym;
-+	char lds_file[PATH_MAX];
-+	int ret;
-+
-+	ret = snprintf(lds_file, sizeof(lds_file), "%s.symver.lds", mod->name);
-+	if (ret >= sizeof(lds_file)) {
-+		error("%s: too long path was truncated\n", lds_file);
-+		return;
-+	}
-+
-+	list_for_each_entry(sym, &mod->exported_symbols, list) {
-+		if (!sym->crc_valid)
-+			continue;
-+
-+		buf_printf(&buf, "__crc_%s = 0x%08x;\n", sym->name, sym->crc);
-+	}
-+
-+	write_if_changed(&buf, lds_file);
-+	free(buf.p);
-+}
-+
- static void write_namespace_deps_files(const char *fname)
- {
- 	struct module *mod;
-@@ -2673,6 +2697,9 @@ int main(int argc, char **argv)
- 		char fname[PATH_MAX];
- 		int ret;
- 
-+		if (modversions && !mod->from_dump)
-+			write_symversions_lds(mod);
-+
- 		if (mod->is_vmlinux || mod->from_dump)
- 			continue;
- 
 -- 
-2.32.0
-
+Thanks,
+~Nick Desaulniers
