@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5158C433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Apr 2022 19:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8274EC433FE
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Apr 2022 19:36:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233400AbiD0Tj4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 27 Apr 2022 15:39:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
+        id S233807AbiD0Tj6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 27 Apr 2022 15:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231273AbiD0Tjz (ORCPT
+        with ESMTP id S233331AbiD0Tj4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Apr 2022 15:39:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D281BD7B;
-        Wed, 27 Apr 2022 12:36:43 -0700 (PDT)
+        Wed, 27 Apr 2022 15:39:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C964FEE;
+        Wed, 27 Apr 2022 12:36:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BAC7861B86;
-        Wed, 27 Apr 2022 19:36:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C09C385C6;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 12BC261B8A;
+        Wed, 27 Apr 2022 19:36:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E17A4C385B1;
         Wed, 27 Apr 2022 19:36:42 +0000 (UTC)
 Received: from rostedt by gandalf.local.home with local (Exim 4.95)
         (envelope-from <rostedt@goodmis.org>)
-        id 1njnSr-002IuG-Jm;
-        Wed, 27 Apr 2022 15:36:41 -0400
-Message-ID: <20220427193641.440543712@goodmis.org>
+        id 1njnSs-002IvQ-0P;
+        Wed, 27 Apr 2022 15:36:42 -0400
+Message-ID: <20220427193641.826142252@goodmis.org>
 User-Agent: quilt/0.66
-Date:   Wed, 27 Apr 2022 15:36:34 -0400
+Date:   Wed, 27 Apr 2022 15:36:36 -0400
 From:   Steven Rostedt <rostedt@goodmis.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Ingo Molnar <mingo@kernel.org>,
@@ -42,8 +42,7 @@ Cc:     Ingo Molnar <mingo@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Masami Hiramatsu <mhiramat@kernel.org>
-Subject: [for-next][PATCH 11/21] bootconfig: Check the checksum before removing the bootconfig from
- initrd
+Subject: [for-next][PATCH 13/21] docs: bootconfig: Add how to embed the bootconfig into kernel
 References: <20220427193623.529296556@goodmis.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -53,11 +52,9 @@ X-Mailing-List: linux-kbuild@vger.kernel.org
 
 From: Masami Hiramatsu <mhiramat@kernel.org>
 
-Check the bootconfig's checksum before removing the bootconfig data
-from initrd to avoid modifying initrd by mistake.
-This will also simplifies the get_boot_config_from_initrd() interface.
+Add a description how to embed the bootconfig file into kernel.
 
-Link: https://lkml.kernel.org/r/164921226891.1090670.16955839243639298134.stgit@devnote2
+Link: https://lkml.kernel.org/r/164921228987.1090670.16843569536974147213.stgit@devnote2
 
 Cc: Padmanabha Srinivasaiah <treasure4paddy@gmail.com>
 Cc: Jonathan Corbet <corbet@lwn.net>
@@ -70,81 +67,57 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
 Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 ---
- init/main.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ Documentation/admin-guide/bootconfig.rst | 31 +++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/init/main.c b/init/main.c
-index 98182c3c2c4b..266d61bc67b0 100644
---- a/init/main.c
-+++ b/init/main.c
-@@ -266,7 +266,7 @@ static int __init loglevel(char *str)
- early_param("loglevel", loglevel);
+diff --git a/Documentation/admin-guide/bootconfig.rst b/Documentation/admin-guide/bootconfig.rst
+index a1860fc0ca88..d99994345d41 100644
+--- a/Documentation/admin-guide/bootconfig.rst
++++ b/Documentation/admin-guide/bootconfig.rst
+@@ -158,9 +158,15 @@ Each key-value pair is shown in each line with following style::
+ Boot Kernel With a Boot Config
+ ==============================
  
- #ifdef CONFIG_BLK_DEV_INITRD
--static void * __init get_boot_config_from_initrd(u32 *_size, u32 *_csum)
-+static void * __init get_boot_config_from_initrd(u32 *_size)
- {
- 	u32 size, csum;
- 	char *data;
-@@ -300,17 +300,20 @@ static void * __init get_boot_config_from_initrd(u32 *_size, u32 *_csum)
- 		return NULL;
- 	}
- 
-+	if (xbc_calc_checksum(data, size) != csum) {
-+		pr_err("bootconfig checksum failed\n");
-+		return NULL;
-+	}
+-Since the boot configuration file is loaded with initrd, it will be added
+-to the end of the initrd (initramfs) image file with padding, size,
+-checksum and 12-byte magic word as below.
++There are two options to boot the kernel with bootconfig: attaching the
++bootconfig to the initrd image or embedding it in the kernel itself.
 +
- 	/* Remove bootconfig from initramfs/initrd */
- 	initrd_end = (unsigned long)data;
- 	if (_size)
- 		*_size = size;
--	if (_csum)
--		*_csum = csum;
++Attaching a Boot Config to Initrd
++---------------------------------
++
++Since the boot configuration file is loaded with initrd by default,
++it will be added to the end of the initrd (initramfs) image file with
++padding, size, checksum and 12-byte magic word as below.
  
- 	return data;
- }
- #else
--static void * __init get_boot_config_from_initrd(u32 *_size, u32 *_csum)
-+static void * __init get_boot_config_from_initrd(u32 *_size)
- {
- 	return NULL;
- }
-@@ -409,12 +412,12 @@ static void __init setup_boot_config(void)
- 	static char tmp_cmdline[COMMAND_LINE_SIZE] __initdata;
- 	const char *msg;
- 	int pos;
--	u32 size, csum;
-+	u32 size;
- 	char *data, *err;
- 	int ret;
+ [initrd][bootconfig][padding][size(le32)][checksum(le32)][#BOOTCONFIG\n]
  
- 	/* Cut out the bootconfig data even if we have no bootconfig option */
--	data = get_boot_config_from_initrd(&size, &csum);
-+	data = get_boot_config_from_initrd(&size);
+@@ -196,6 +202,25 @@ To remove the config from the image, you can use -d option as below::
+ Then add "bootconfig" on the normal kernel command line to tell the
+ kernel to look for the bootconfig at the end of the initrd file.
  
- 	strlcpy(tmp_cmdline, boot_command_line, COMMAND_LINE_SIZE);
- 	err = parse_args("bootconfig", tmp_cmdline, NULL, 0, 0, 0, NULL,
-@@ -438,11 +441,6 @@ static void __init setup_boot_config(void)
- 		return;
- 	}
++Embedding a Boot Config into Kernel
++-----------------------------------
++
++If you can not use initrd, you can also embed the bootconfig file in the
++kernel by Kconfig options. In this case, you need to recompile the kernel
++with the following configs::
++
++ CONFIG_BOOT_CONFIG_EMBED=y
++ CONFIG_BOOT_CONFIG_EMBED_FILE="/PATH/TO/BOOTCONFIG/FILE"
++
++``CONFIG_BOOT_CONFIG_EMBED_FILE`` requires an absolute path or a relative
++path to the bootconfig file from source tree or object tree.
++The kernel will embed it as the default bootconfig.
++
++Just as when attaching the bootconfig to the initrd, you need ``bootconfig``
++option on the kernel command line to enable the embedded bootconfig.
++
++Note that even if you set this option, you can override the embedded
++bootconfig by another bootconfig which attached to the initrd.
  
--	if (xbc_calc_checksum(data, size) != csum) {
--		pr_err("bootconfig checksum failed\n");
--		return;
--	}
--
- 	ret = xbc_init(data, size, &msg, &pos);
- 	if (ret < 0) {
- 		if (pos < 0)
-@@ -471,7 +469,7 @@ static void __init exit_boot_config(void)
- static void __init setup_boot_config(void)
- {
- 	/* Remove bootconfig data from initrd */
--	get_boot_config_from_initrd(NULL, NULL);
-+	get_boot_config_from_initrd(NULL);
- }
- 
- static int __init warn_bootconfig(char *str)
+ Kernel parameters via Boot Config
+ =================================
 -- 
 2.35.1
