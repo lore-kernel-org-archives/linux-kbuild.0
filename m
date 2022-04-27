@@ -2,58 +2,87 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E4EC433F5
-	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Apr 2022 07:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6E8C433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed, 27 Apr 2022 19:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358867AbiD0HiG (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 27 Apr 2022 03:38:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42680 "EHLO
+        id S232881AbiD0Tjz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 27 Apr 2022 15:39:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358901AbiD0HiC (ORCPT
+        with ESMTP id S231127AbiD0Tjz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 27 Apr 2022 03:38:02 -0400
-X-Greylist: delayed 363 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 27 Apr 2022 00:34:52 PDT
-Received: from mail.fixingbiz.pl (mail.fixingbiz.pl [217.61.22.139])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CB690CD3
-        for <linux-kbuild@vger.kernel.org>; Wed, 27 Apr 2022 00:34:52 -0700 (PDT)
-Received: by mail.fixingbiz.pl (Postfix, from userid 1001)
-        id 098C9A4D6D; Wed, 27 Apr 2022 08:28:25 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fixingbiz.pl; s=mail;
-        t=1651044527; bh=FDuFY3XQoq0gMX1b2gxgT7Py2p4Sxl0PJZYZ4NVaPho=;
-        h=Date:From:To:Subject:From;
-        b=ojcLw3HNbOSTZyoc3SkVxjkPqSZP6K77R0CYbsrhKp0VVCyCRmio7I9YqOhf7+dA3
-         ZyRXwBcWZzqti4VGJxS0he/N4c3ernP8MJ75teS4CExv9PIWOn0TlOXjHqNgSzxUIy
-         WjmW46wCpYZOg0g2sS0aTQncVe2FyxQkbOUHEz4vu24qRe8BjJtUM458Ivm9u29SGZ
-         jCy2rsx+Qu9wRSsiNrMOjelv0U4JSS7r1LfnvH0IqTnfrj6utXxw81D1fhr9dYuqbu
-         QsYg/kxCU/SALMOUIcbuOuw1+6r1tw+za10X6EizYJI6TaoFpCtBrCTXmFLcb/ZMK0
-         APQRefGJDCc7w==
-Received: by mail.fixingbiz.pl for <linux-kbuild@vger.kernel.org>; Wed, 27 Apr 2022 07:28:09 GMT
-Message-ID: <20220427073002-0.1.22.ai7u.0.rmy6on4ear@fixingbiz.pl>
-Date:   Wed, 27 Apr 2022 07:28:09 GMT
-From:   =?UTF-8?Q? "Przemys=C5=82aw_Wr=C3=B3blewski" ?= 
-        <przemyslaw.wroblewski@fixingbiz.pl>
-To:     <linux-kbuild@vger.kernel.org>
-Subject: Wycena paneli fotowoltaicznych
-X-Mailer: mail.fixingbiz.pl
+        Wed, 27 Apr 2022 15:39:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BB1A109D;
+        Wed, 27 Apr 2022 12:36:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FC6361B72;
+        Wed, 27 Apr 2022 19:36:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49CEEC385B0;
+        Wed, 27 Apr 2022 19:36:42 +0000 (UTC)
+Received: from rostedt by gandalf.local.home with local (Exim 4.95)
+        (envelope-from <rostedt@goodmis.org>)
+        id 1njnSr-002Ith-Dh;
+        Wed, 27 Apr 2022 15:36:41 -0400
+Message-ID: <20220427193641.259144310@goodmis.org>
+User-Agent: quilt/0.66
+Date:   Wed, 27 Apr 2022 15:36:33 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Padmanabha Srinivasaiah <treasure4paddy@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>
+Subject: [for-next][PATCH 10/21] bootconfig: Make the bootconfig.o as a normal object file
+References: <20220427193623.529296556@goodmis.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Dzie=C5=84 dobry,
+From: Masami Hiramatsu <mhiramat@kernel.org>
 
-dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
-irm=C4=85.
+Since the APIs defined in the bootconfig.o are not individually used,
+it is meaningless to build it as library by lib-y. Use obj-y for that.
 
-=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
-ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
+Link: https://lkml.kernel.org/r/164921225875.1090670.15565363126983098971.stgit@devnote2
 
-Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
-ropozycji?
+Cc: Padmanabha Srinivasaiah <treasure4paddy@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Reported-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ lib/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Pozdrawiam,
-Przemys=C5=82aw Wr=C3=B3blewski
+diff --git a/lib/Makefile b/lib/Makefile
+index 6b9ffc1bd1ee..08053df16c7c 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -279,7 +279,7 @@ $(foreach file, $(libfdt_files), \
+ 	$(eval CFLAGS_$(file) = -I $(srctree)/scripts/dtc/libfdt))
+ lib-$(CONFIG_LIBFDT) += $(libfdt_files)
+ 
+-lib-$(CONFIG_BOOT_CONFIG) += bootconfig.o
++obj-$(CONFIG_BOOT_CONFIG) += bootconfig.o
+ 
+ obj-$(CONFIG_RBTREE_TEST) += rbtree_test.o
+ obj-$(CONFIG_INTERVAL_TREE_TEST) += interval_tree_test.o
+-- 
+2.35.1
