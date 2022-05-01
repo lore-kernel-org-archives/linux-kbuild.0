@@ -2,33 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DC4C4167B
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39CC6C433FE
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245728AbiEAIp4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:45:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
+        id S1343719AbiEAIp5 (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 1 May 2022 04:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245753AbiEAIpu (ORCPT
+        with ESMTP id S1343554AbiEAIpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:50 -0400
+        Sun, 1 May 2022 04:45:53 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E9AF4C79A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E37B4C795;
         Sun,  1 May 2022 01:42:24 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2S0008518;
-        Sun, 1 May 2022 17:41:10 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S0008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2Rn008518;
+        Sun, 1 May 2022 17:41:04 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rn008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394471;
-        bh=ZUU3Y3vmA9T0Ee8Y/D7InN0T59RmqKTCWwB+kK1nhPk=;
+        s=dec2015msa; t=1651394464;
+        bh=deZf4KMCB529EGzoEfuY/52trWUR7WdRSXqW2hg+fYg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gqC51XT+Ao9fidzBHJF7XTQNjsjC9nt77I2kKcEzxAJjxO17slLeirh36ubIaMUph
-         gzzLUyrfd/L/viT5Vxds6k5MTDD4ZIOa5BXaZgOibK4i3NsJNINw96vWG5+5FOZnX/
-         82ubgyjxZGMkkzw+ad1RWcS8r+ajHtSSOlE28FXS88dZleTkE5e1OX4UPymeQBNYUy
-         NB26DIHh//x+zu0nG0QeGFrwpC7UZOk0Wqo4PUqbqFrfBp7HNIcgzNaFJoRFJvBn5Y
-         edB2Q3rbJAytuC7AQhlMnl527dZixlhds8KzSQjGMCpDyrvjAggztWSXZqm8kpNmLl
-         6G8MGITZAP4SA==
+        b=PeTubxZ9DiV7Jc81qLCc4yNu2bLZ/kGCVJ3ruf02cwmSCcjUPLCDlbwNF1Q1juCiz
+         vmwWXmL+NCBZtdk6XKdcYYXsYbfK0PayaaYcpb0lCMTuQwFmw8k0FnmUzFJsuVHnSy
+         LfnofMDrrhgee1oOZ6bm1Yai8l4Xx+9NRjmOJcOkqLRwLApOlu2FEnxGSjcIihiGPF
+         P8nHD4IPK0xxnpioQ2BWHj30a//jyXTKpWoIpmJPKZJSMpG/PSd7OxwBiavHGPOHWr
+         9kvy5BQQOJpcO3xd9kHmzVzy0E78JbOKMwitI1WpAsKyaHpsPDdxch0D8iOVGiSHi2
+         oh9IKw0SVkwMA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 13/26] modpost: split new_symbol() to symbol allocation and hash table addition
-Date:   Sun,  1 May 2022 17:40:19 +0900
-Message-Id: <20220501084032.1025918-14-masahiroy@kernel.org>
+Subject: [PATCH v2 02/26] modpost: change mod->gpl_compatible to bool type
+Date:   Sun,  1 May 2022 17:40:08 +0900
+Message-Id: <20220501084032.1025918-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -48,81 +49,104 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-new_symbol() does two things; allocate a new symbol and register it
-to the hash table.
+Currently, mod->gpl_compatible is tristate; it is set to -1 by default,
+then to 1 or 0 when MODULE_LICENSE() is found.
 
-Using a separate function for each is easier to understand.
+Maybe, -1 was chosen to represent the 'unknown' license, but it is not
+useful.
 
-Replace new_symbol() with hash_add_symbol(). Remove the second parameter
-of alloc_symbol().
+The current code:
+
+    if (!mod->gpl_compatible)
+            check_for_gpl_usage(exp->export, basename, exp->name);
+
+... only cares whether gpl_compatible is zero or not.
+
+Change it to a bool type with the initial value 'true', which has no
+functional change.
+
+The default value should be 'true' instead of 'false'.
+
+Since commit 1d6cd3929360 ("modpost: turn missing MODULE_LICENSE() into
+error"), unknown module license is an error.
+
+The error message, "missing MODULE_LICENSE()" is enough to explain the
+issue. It is not sensible to show another message, "GPL-incompatible
+module ... uses GPL-only symbol".
+
+Add comments to explain this.
+
+While I was here, I renamed gpl_compatible to is_gpl_compatible for
+clarification, and also slightly refactored the code.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2:
-  - New patch
+  - Split as a separate commit
+  - More code refactoring
+  - Add a comment
+  - Rename it to ->is_gpl_compatible (Nick)
 
- scripts/mod/modpost.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ scripts/mod/modpost.c | 17 +++++++++++------
+ scripts/mod/modpost.h |  2 +-
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index c9b75697d0fc..b9f359d10968 100644
+index a6035ab78cd8..f2d6c152cd3f 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -242,34 +242,31 @@ static inline unsigned int tdb_hash(const char *name)
-  * Allocate a new symbols for use in the hash of exported symbols or
-  * the list of unresolved symbols per module
-  **/
--static struct symbol *alloc_symbol(const char *name, struct symbol *next)
-+static struct symbol *alloc_symbol(const char *name)
- {
- 	struct symbol *s = NOFAIL(malloc(sizeof(*s) + strlen(name) + 1));
+@@ -187,7 +187,14 @@ static struct module *new_module(const char *modname)
+ 	/* add to list */
+ 	strcpy(mod->name, modname);
+ 	mod->is_vmlinux = (strcmp(modname, "vmlinux") == 0);
+-	mod->gpl_compatible = -1;
++
++	/*
++	 * Set mod->is_gpl_compatible to true by default to skip
++	 * check_for_gpl_usage() when MODULE_LICENSE() is missing.
++	 * If it is the case, modpost will exit with error anyway.
++	 */
++	mod->is_gpl_compatible = true;
++
+ 	mod->next = modules;
+ 	modules = mod;
  
- 	memset(s, 0, sizeof(*s));
- 	strcpy(s->name, name);
--	s->next = next;
- 	s->is_static = true;
- 	return s;
- }
+@@ -2012,10 +2019,8 @@ static void read_symbols(const char *modname)
+ 		if (!license)
+ 			error("missing MODULE_LICENSE() in %s\n", modname);
+ 		while (license) {
+-			if (license_is_gpl_compatible(license))
+-				mod->gpl_compatible = 1;
+-			else {
+-				mod->gpl_compatible = 0;
++			if (!license_is_gpl_compatible(license)) {
++				mod->is_gpl_compatible = false;
+ 				break;
+ 			}
+ 			license = get_next_modinfo(&info, "license", license);
+@@ -2183,7 +2188,7 @@ static void check_exports(struct module *mod)
+ 			add_namespace(&mod->missing_namespaces, exp->namespace);
+ 		}
  
- /* For the hash of exported symbols */
--static struct symbol *new_symbol(const char *name, struct module *module,
--				 enum export export)
-+static void hash_add_symbol(struct symbol *sym)
- {
- 	unsigned int hash;
- 
--	hash = tdb_hash(name) % SYMBOL_HASH_SIZE;
--	symbolhash[hash] = alloc_symbol(name, symbolhash[hash]);
--
--	return symbolhash[hash];
-+	hash = tdb_hash(sym->name) % SYMBOL_HASH_SIZE;
-+	sym->next = symbolhash[hash];
-+	symbolhash[hash] = sym;
- }
- 
- static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
- {
- 	struct symbol *sym;
- 
--	sym = alloc_symbol(name, NULL);
-+	sym = alloc_symbol(name);
- 	sym->weak = weak;
- 
- 	list_add_tail(&sym->list, &mod->unresolved_symbols);
-@@ -418,10 +415,11 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 		      s->module->is_vmlinux ? "" : ".ko");
+-		if (!mod->gpl_compatible)
++		if (!mod->is_gpl_compatible)
+ 			check_for_gpl_usage(exp->export, basename, exp->name);
  	}
- 
--	s = new_symbol(name, mod, export);
-+	s = alloc_symbol(name);
- 	s->module = mod;
- 	s->export    = export;
- 	list_add_tail(&s->list, &mod->exported_symbols);
-+	hash_add_symbol(s);
- 
- 	return s;
  }
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 7ccfcc8899c1..f21a3782885b 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -110,7 +110,7 @@ buf_write(struct buffer *buf, const char *s, int len);
+ 
+ struct module {
+ 	struct module *next;
+-	int gpl_compatible;
++	bool is_gpl_compatible;
+ 	struct symbol *unres;
+ 	bool from_dump;		/* true if module was loaded from *.symvers */
+ 	bool is_vmlinux;
 -- 
 2.32.0
 
