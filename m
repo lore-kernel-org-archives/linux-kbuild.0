@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18512C43219
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B31C43217
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343670AbiEAIpy (ORCPT
+        id S1343570AbiEAIpy (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 1 May 2022 04:45:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42416 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343538AbiEAIpx (ORCPT
+        with ESMTP id S1343491AbiEAIpu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:53 -0400
+        Sun, 1 May 2022 04:45:50 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215BA4C785;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C484C780;
         Sun,  1 May 2022 01:42:24 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2Rw008518;
-        Sun, 1 May 2022 17:41:09 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rw008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2Rq008518;
+        Sun, 1 May 2022 17:41:06 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rq008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394469;
-        bh=QmTs3PR7KEELPPIayd/c+OePSoC6ZzypNfbFAbQl0aE=;
+        s=dec2015msa; t=1651394466;
+        bh=B+lNmWK0VYu6vQPAdnNXHiB6/Fl/C2exBpvfY8zKS7A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oomdjl7AUftSaHcbRjkePwpd8QcyDHk+DfgteGdrMEx8naD6UgDs0xnMbaXQihoXK
-         I4O5mpf0X8RUR5yryYpjV8h9ekor1yYmPBlrzs5r651ZGMDWXiCHfToUv5Yb4WKI/l
-         9RYxGEEAnTjXr21d9o/glYL5G4x3MDJstqWtXVg3WbraluYqFhVzMRfwLOJg890rR5
-         ry6YVdmkJ3nK9kkJlBJO/CuA/f5A7x4UOieo7olmhMWcihi+qMdwELZmGothV7CA3k
-         6OGf+jVscInMlb2VfBLS604DAiLzW93/+a/NbymU/PMJHP1qbpEOS3w9WQ4UUNbLkt
-         jauqmYGG/3qeQ==
+        b=x0SrOHkYQN1gjPZisws3UrOM4hAA3OJqrs9PHgoQ9sQf6IFqZIsFJ3H3j/Qjzq3Kl
+         ggaYbhCBnpvRsrNTRGmLFOuKgzfnQpfEFyrqIIFGy3VvVdCXpcHEodXMqbeRcrdzSa
+         JJLJgXZx1yrAAS1DbkcII4bhtBgGPAbcPKb3qwBp9VzfxUb4scVp/FHy55GMGXUPrc
+         XFf5Z4Sid7WkwpaTMDY6UbDC4FuigP1z/ElwgR5Wd2FYenn7S2e2qSel+eE/RepEMz
+         zOfcciSkTxLUyCXzCdw6Zb7VtcS29lfL1/ufDyBf8fB32DjHelg6mzSrYQ01c6T+9K
+         S6D/WrQo5aWPQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -37,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH v2 11/26] modpost: make multiple export error
-Date:   Sun,  1 May 2022 17:40:17 +0900
-Message-Id: <20220501084032.1025918-12-masahiroy@kernel.org>
+Subject: [PATCH v2 05/26] modpost: add sym_add_unresolved() helper
+Date:   Sun,  1 May 2022 17:40:11 +0900
+Message-Id: <20220501084032.1025918-6-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,50 +49,81 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This is currently a warning, but I think modpost should stop building
-in this case.
+Add a small helper, sym_add_unresolved() to ease the further
+refactoring.
 
-If the same symbol is exported multiple times and we let it keep going,
-the sanity check becomes difficult.
-
-Only the legitimate case is that an external module overrides the
-corresponding in-tree module to provide a different implementation
-with the same interface.
-
-Also, there exists an upstream example that exploits this feature.
-
-  $ make M=tools/testing/nvdimm
-
-... builds tools/testing/nvdimm/libnvdimm.ko. This is a mocked module
-that overrides the symbols from drivers/nvdimm/libnvdimm.ko.
+Remove the 'weak' argument from alloc_symbol() because it is sensible
+only for unresolved symbols.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-Changes in v2:
-  - Add more commit description
+(no changes since v1)
 
- scripts/mod/modpost.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/mod/modpost.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4ce8d164b8e0..1f01fc942f94 100644
+index 553e5cf88fee..abcdb0677775 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -417,9 +417,9 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 		list_add_tail(&s->list, &mod->exported_symbols);
- 	} else if (!external_module || s->module->is_vmlinux ||
- 		   s->module == mod) {
--		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
--		     mod->name, name, s->module->name,
--		     s->module->is_vmlinux ? "" : ".ko");
-+		error("%s: '%s' exported twice. Previous export was in %s%s\n",
-+		      mod->name, name, s->module->name,
-+		      s->module->is_vmlinux ? "" : ".ko");
- 		return s;
- 	}
+@@ -236,14 +236,12 @@ static inline unsigned int tdb_hash(const char *name)
+  * Allocate a new symbols for use in the hash of exported symbols or
+  * the list of unresolved symbols per module
+  **/
+-static struct symbol *alloc_symbol(const char *name, bool weak,
+-				   struct symbol *next)
++static struct symbol *alloc_symbol(const char *name, struct symbol *next)
+ {
+ 	struct symbol *s = NOFAIL(malloc(sizeof(*s) + strlen(name) + 1));
  
+ 	memset(s, 0, sizeof(*s));
+ 	strcpy(s->name, name);
+-	s->weak = weak;
+ 	s->next = next;
+ 	s->is_static = true;
+ 	return s;
+@@ -256,11 +254,17 @@ static struct symbol *new_symbol(const char *name, struct module *module,
+ 	unsigned int hash;
+ 
+ 	hash = tdb_hash(name) % SYMBOL_HASH_SIZE;
+-	symbolhash[hash] = alloc_symbol(name, false, symbolhash[hash]);
++	symbolhash[hash] = alloc_symbol(name, symbolhash[hash]);
+ 
+ 	return symbolhash[hash];
+ }
+ 
++static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
++{
++	mod->unres = alloc_symbol(name, mod->unres);
++	mod->unres->weak = weak;
++}
++
+ static struct symbol *find_symbol(const char *name)
+ {
+ 	struct symbol *s;
+@@ -712,9 +716,8 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
+ 			}
+ 		}
+ 
+-		mod->unres = alloc_symbol(symname,
+-					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
+-					  mod->unres);
++		sym_add_unresolved(symname, mod,
++				   ELF_ST_BIND(sym->st_info) == STB_WEAK);
+ 		break;
+ 	default:
+ 		/* All exported symbols */
+@@ -2082,7 +2085,7 @@ static void read_symbols(const char *modname)
+ 	 * the automatic versioning doesn't pick it up, but it's really
+ 	 * important anyhow */
+ 	if (modversions)
+-		mod->unres = alloc_symbol("module_layout", false, mod->unres);
++		sym_add_unresolved("module_layout", mod, false);
+ }
+ 
+ static void read_symbols_from_files(const char *filename)
 -- 
 2.32.0
 
