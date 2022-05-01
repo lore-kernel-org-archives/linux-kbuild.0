@@ -2,120 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8203BC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4C5C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 11:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344344AbiEAIqc (ORCPT
+        id S1346491AbiEAMBB (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44212 "EHLO
+        Sun, 1 May 2022 08:01:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344187AbiEAIqS (ORCPT
+        with ESMTP id S244686AbiEAMBA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:46:18 -0400
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4F54E3A6;
-        Sun,  1 May 2022 01:42:49 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2S2008518;
-        Sun, 1 May 2022 17:41:12 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S2008518
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394472;
-        bh=GPcoq5UmVXCtNYinWnkOBgyynm/22Xa0IYnJlhllxx8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e59m/v0iJt1xlzsi/cefKqY8/FDkHpd9nO83IG7HXKSBzM1mjRoJYuyISzsGr134w
-         VvjNH7mQ+ffcwJLy1KEPKJYJjHHp8F/QiJwHcY4T4Ejibpbv6701vvAXUewLJ3zJud
-         fF+5fWI3t0Oanxi0a74Q4QMfZB5hFfGM4cks4yRetUFL8xwH0bfs0ADFaXbmGdIxsj
-         NJ7rlJS/W5kx6pvzqdLyFGaoZAC2XUIFRuCNIxnraOf7nryWLnWujicvocvA3x5d9d
-         sRvSLzp0YZ41N00nmtyfXX0xSqy4esyXh3lGDgn8OeufnrBLYUe3n0k/W++Potu7Y0
-         fAjpQpqIpYj0Q==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
+        Sun, 1 May 2022 08:01:00 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 421983A5C2;
+        Sun,  1 May 2022 04:57:35 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Krl8S2W6kz4xXh;
+        Sun,  1 May 2022 21:57:28 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1651406250;
+        bh=KLrQiQd2hh/CdsUpLpsJ9wNQAuRET+XGyyixHfrk344=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=rfnAWHaonFRnz6CX4sVxw3eZHjjOz4D9N7EJqBE1ipI7gaFq+MUEydrsMMkNN1XV3
+         aSEu6GrtTP7fWb/wAdUbvPPqmF/Rz2J822VD/S253BRxJhKZ1XVsebbSA1zb7wE+S2
+         OyKD6NReOSJoK/gmlrYpe8wMbvtLHHfzP/l++wJw7op30vjeDgZOS3wgbCsTt/+tFo
+         SOb4M9LlHKENd+ypDOthi3jm1q92QnsgQ6kbrn3/slh7+IBtUoWOmTgj1uO40abV8t
+         Gso3VDnoPCz7g2IkVuRgEO51oqRPkePXa/ZSKZ9dun4rFMc5uTCSXqLJ96/4shy1T6
+         0YsikNdHwIWow==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        Joel Stanley <joel@jms.id.au>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <nathan@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        llvm@lists.linux.dev
-Subject: [PATCH v2 15/26] kbuild: record symbol versions in *.cmd files
-Date:   Sun,  1 May 2022 17:40:21 +0900
-Message-Id: <20220501084032.1025918-16-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
-References: <20220501084032.1025918-1-masahiroy@kernel.org>
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] kbuild: drop $(objtree)/ prefix support for clean-files
+In-Reply-To: <20220430110409.256858-1-masahiroy@kernel.org>
+References: <20220430110409.256858-1-masahiroy@kernel.org>
+Date:   Sun, 01 May 2022 21:57:24 +1000
+Message-ID: <871qxda2jf.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When CONFIG_MODVERSIONS=y, the output from genksyms is saved in
-separate *.symversions files, and will be used much later when
-CONFIG_LTO_CLANG=y because it is impossible to update LLVM bit code
-here.
+Masahiro Yamada <masahiroy@kernel.org> writes:
+> I think this hack is a bad idea. arch/powerpc/boot/Makefile is the
+> only user. Let's stop doing this.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+>  arch/powerpc/boot/Makefile | 4 ++--
 
-This approach is not robust because:
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
- - *.symversions may or may not exist. If *.symversions does not
-   exist, we never know if it is missing for legitimate reason
-   (i.e. no EXPORT_SYMBOL) or something bad has happened (for
-   example, the user accidentally deleted it). Once it occurs,
-   it is not self-healing because *.symversions is generated
-   as a side effect.
+cheers
 
- - stale (i.e. invalid) *.symversions might be picked up if an
-   object is generated in a non-ordinary way, and corresponding
-   *.symversions (, which was generated by old builds) just happen
-   to exist.
-
-A more robust approach is to save symbol versions in *.cmd files
-because:
-
- - *.cmd always exists (if the object is generated by if_changed
-   rule or friends). Even if the user accidentally deletes it,
-   it will be regenerated in the next build.
-
- - *.cmd is always re-generated when the object is updated. This
-   avoid stale version information being picked up.
-
-I will remove *.symversions later.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Tested-by: Nicolas Schier <nicolas@fjasle.eu>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
----
-
-Changes in v2:
-  - Fix CONFIG_MODULE_REL_CRCS=y case
-
- scripts/Makefile.build | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f6a506318795..a1023868775f 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -171,10 +171,17 @@ ifdef CONFIG_MODVERSIONS
- 
- # Generate .o.symversions files for each .o with exported symbols, and link these
- # to the kernel and/or modules at the end.
-+
-+genksyms_format_rel_crc := [^_]*__crc_\([^ ]*\) = \.; LONG(\([^)]*\)).*
-+genksyms_format_normal := __crc_\(.*\) = \(.*\);
-+genksyms_format := $(if $(CONFIG_MODULE_REL_CRCS),$(genksyms_format_rel_crc),$(genksyms_format_normal))
-+
- gen_symversions =								\
- 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
- 		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
- 		    > $@.symversions;						\
-+		sed -n 's/$(genksyms_format)/$(pound)SYMVER \1 \2/p' $@.symversions \
-+			>> $(dot-target).cmd;					\
- 	else									\
- 		rm -f $@.symversions;						\
- 	fi
--- 
-2.32.0
-
+>  scripts/Makefile.clean     | 8 +-------
+>  2 files changed, 3 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
+> index 4b4827c475c6..008bf0bff186 100644
+> --- a/arch/powerpc/boot/Makefile
+> +++ b/arch/powerpc/boot/Makefile
+> @@ -453,8 +453,8 @@ clean-files += $(image-) $(initrd-) cuImage.* dtbImage.* treeImage.* \
+>  clean-kernel-base := vmlinux.strip vmlinux.bin
+>  clean-kernel := $(addsuffix .gz,$(clean-kernel-base))
+>  clean-kernel += $(addsuffix .xz,$(clean-kernel-base))
+> -# If not absolute clean-files are relative to $(obj).
+> -clean-files += $(addprefix $(objtree)/, $(clean-kernel))
+> +# clean-files are relative to $(obj).
+> +clean-files += $(addprefix ../../../, $(clean-kernel))
+>  
+>  WRAPPER_OBJDIR := /usr/lib/kernel-wrapper
+>  WRAPPER_DTSDIR := /usr/lib/kernel-wrapper/dts
+> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+> index 74cb1c5c3658..878cec648959 100644
+> --- a/scripts/Makefile.clean
+> +++ b/scripts/Makefile.clean
+> @@ -36,13 +36,7 @@ __clean-files	:= \
+>  
+>  __clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
+>  
+> -# clean-files is given relative to the current directory, unless it
+> -# starts with $(objtree)/ (which means "./", so do not add "./" unless
+> -# you want to delete a file from the toplevel object directory).
+> -
+> -__clean-files   := $(wildcard                                               \
+> -		   $(addprefix $(obj)/, $(filter-out $(objtree)/%, $(__clean-files))) \
+> -		   $(filter $(objtree)/%, $(__clean-files)))
+> +__clean-files   := $(wildcard $(addprefix $(obj)/, $(__clean-files)))
+>  
+>  # ==========================================================================
+>  
+> -- 
+> 2.32.0
