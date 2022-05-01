@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD4FC433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33D0C433F5
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343741AbiEAIp6 (ORCPT
+        id S1343759AbiEAIp7 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:45:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
+        Sun, 1 May 2022 04:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343496AbiEAIpu (ORCPT
+        with ESMTP id S1343558AbiEAIpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:50 -0400
+        Sun, 1 May 2022 04:45:53 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E12E4C78B;
-        Sun,  1 May 2022 01:42:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45A94C434;
+        Sun,  1 May 2022 01:42:25 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2Rt008518;
-        Sun, 1 May 2022 17:41:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rt008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2S6008518;
+        Sun, 1 May 2022 17:41:14 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S6008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394468;
-        bh=nqOwWZU/3WvDM0nGPo3Nyua+Qk38pqiTNHwRVkuJFf0=;
+        s=dec2015msa; t=1651394475;
+        bh=9jy+Qom6a+bDbcXZ0gR9n95gDf6d9RjopGXIPMmScbc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qKhAqpGlRTBN2yfW448P+xDa3CHR5Udd/iH6n9/6rI7Ox0XpSOxK4l/jeJgvPgIa7
-         KqD+p/NXwOWMnvA5el3GPM2k38vyfqoIWWiVvRYyEkaHUX3geSC5s6jes4496/LJDP
-         +WCHX4eGjgl5ytehiUNiToxt0qALNdFQNFMOQRtupuEW/V83tRim95tXsaFB+z/FCX
-         QZRXR2IhHcHMN3bBPIQRMise43ZO+rMkKUgTonTnt8ehYbeI3ZB5s/vlc5JlOsNoR3
-         np8Tt/l9VqJqGMQHrDTaR5+skro6PhyiHuNNauKeM0FUHJOLUizsQF3aPJdHnuuYwT
-         iGfNrZ+dJXR2g==
+        b=q/FtoicWA3Xm3XgSD7G5pxyoXHUrj7C//DraHd+rY9gWRJyScabmwpLigCfOFWURh
+         NMtHQ15/Df3X1FM17Z00CUGRCWB0dNpELZKjRHhg0rfNulh6CKbFvnBgwdkjX9MZi/
+         xXHoWI//8CaJQhLvN8VoYxFphtuyHtqHXIksXN73n/1uRKiSKgF3/OVBLLX5iEUnSP
+         4HNIkf4loMji/pUIDn6dg6CoyhXO+9E9ptj2FBOrvgt58ovx3fUT2JifsLtWZXXL8Y
+         frNudI42h5HobsThpgZ6dl/u0aAl8J4UegbSj0mGi+Trbh9i90tWIw9HP/IuNRpo0j
+         T1FzZbpolijJw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH v2 08/26] modpost: traverse the namespace_list in order
-Date:   Sun,  1 May 2022 17:40:14 +0900
-Message-Id: <20220501084032.1025918-9-masahiroy@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2 19/26] kbuild: embed symbol versions at final link of vmlinux or modules
+Date:   Sun,  1 May 2022 17:40:25 +0900
+Message-Id: <20220501084032.1025918-20-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,122 +49,124 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use the doubly linked list to traverse the list in the added order.
-This makes the code more consistent.
+Do not update objects with version CRCs while the directory descending.
+
+Do it at the final link stage.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
 (no changes since v1)
 
- scripts/mod/modpost.c | 33 +++++++++++++++------------------
- scripts/mod/modpost.h |  4 ++--
- 2 files changed, 17 insertions(+), 20 deletions(-)
+ scripts/Makefile.build    | 22 +++-------------------
+ scripts/Makefile.modfinal |  3 ++-
+ scripts/link-vmlinux.sh   |  4 +++-
+ 3 files changed, 8 insertions(+), 21 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 5e99493b0a82..d0cf94e1e984 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -186,6 +186,8 @@ static struct module *new_module(const char *modname)
- 	memset(mod, 0, sizeof(*mod));
- 
- 	INIT_LIST_HEAD(&mod->unresolved_symbols);
-+	INIT_LIST_HEAD(&mod->missing_namespaces);
-+	INIT_LIST_HEAD(&mod->imported_namespaces);
- 
- 	strcpy(mod->name, modname);
- 	mod->is_vmlinux = (strcmp(modname, "vmlinux") == 0);
-@@ -288,39 +290,34 @@ static struct symbol *find_symbol(const char *name)
- }
- 
- struct namespace_list {
--	struct namespace_list *next;
-+	struct list_head list;
- 	char namespace[];
- };
- 
--static bool contains_namespace(struct namespace_list *list,
--			       const char *namespace)
-+static bool contains_namespace(struct list_head *head, const char *namespace)
- {
--	for (; list; list = list->next)
-+	struct namespace_list *list;
-+
-+	list_for_each_entry(list, head, list) {
- 		if (!strcmp(list->namespace, namespace))
- 			return true;
-+	}
- 
- 	return false;
- }
- 
--static void add_namespace(struct namespace_list **list, const char *namespace)
-+static void add_namespace(struct list_head *head, const char *namespace)
- {
- 	struct namespace_list *ns_entry;
- 
--	if (!contains_namespace(*list, namespace)) {
--		ns_entry = NOFAIL(malloc(sizeof(struct namespace_list) +
-+	if (!contains_namespace(head, namespace)) {
-+		ns_entry = NOFAIL(malloc(sizeof(*ns_entry) +
- 					 strlen(namespace) + 1));
- 		strcpy(ns_entry->namespace, namespace);
--		ns_entry->next = *list;
--		*list = ns_entry;
-+		list_add_tail(&ns_entry->list, head);
- 	}
- }
- 
--static bool module_imports_namespace(struct module *module,
--				     const char *namespace)
--{
--	return contains_namespace(module->imported_namespaces, namespace);
--}
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index a1023868775f..cec17b28de42 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -162,15 +162,9 @@ ifdef CONFIG_MODVERSIONS
+ # o if <file>.o doesn't contain a __ksymtab version, i.e. does
+ #   not export symbols, it's done.
+ # o otherwise, we calculate symbol versions using the good old
+-#   genksyms on the preprocessed source and postprocess them in a way
+-#   that they are usable as a linker script
+-# o generate .tmp_<file>.o from <file>.o using the linker to
+-#   replace the unresolved symbols __crc_exported_symbol with
+-#   the actual value of the checksum generated by genksyms
+-# o remove .tmp_<file>.o to <file>.o
 -
- static const struct {
- 	const char *str;
- 	enum export export;
-@@ -2190,7 +2187,7 @@ static void check_exports(struct module *mod)
- 			basename = mod->name;
+-# Generate .o.symversions files for each .o with exported symbols, and link these
+-# to the kernel and/or modules at the end.
++#   genksyms on the preprocessed source and dump them into the .cmd file.
++# o modpost will extract versions from the .cmd file and create linker
++#   scripts used to link the kernel and/or modules.
  
- 		if (exp->namespace &&
--		    !module_imports_namespace(mod, exp->namespace)) {
-+		    !contains_namespace(&mod->imported_namespaces, exp->namespace)) {
- 			modpost_log(allow_missing_ns_imports ? LOG_WARN : LOG_ERROR,
- 				    "module %s uses symbol %s from namespace %s, but does not import it.\n",
- 				    basename, exp->name, exp->namespace);
-@@ -2489,12 +2486,12 @@ static void write_namespace_deps_files(const char *fname)
+ genksyms_format_rel_crc := [^_]*__crc_\([^ ]*\) = \.; LONG(\([^)]*\)).*
+ genksyms_format_normal := __crc_\(.*\) = \(.*\);
+@@ -188,12 +182,6 @@ gen_symversions =								\
  
- 	list_for_each_entry(mod, &modules, list) {
+ cmd_gen_symversions_c =	$(call gen_symversions,c)
  
--		if (mod->from_dump || !mod->missing_namespaces)
-+		if (mod->from_dump || list_empty(&mod->missing_namespaces))
- 			continue;
+-cmd_modversions =								\
+-	if [ -r $@.symversions ]; then						\
+-		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
+-			-T $@.symversions;					\
+-		mv -f $(@D)/.tmp_$(@F) $@;					\
+-	fi
+ endif
  
- 		buf_printf(&ns_deps_buf, "%s.ko:", mod->name);
+ ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+@@ -273,7 +261,6 @@ define rule_cc_o_c
+ 	$(call cmd,checkdoc)
+ 	$(call cmd,gen_objtooldep)
+ 	$(call cmd,gen_symversions_c)
+-	$(if $(CONFIG_LTO_CLANG),,$(call cmd,modversions))
+ 	$(call cmd,record_mcount)
+ endef
  
--		for (ns = mod->missing_namespaces; ns; ns = ns->next)
-+		list_for_each_entry(ns, &mod->missing_namespaces, list)
- 			buf_printf(&ns_deps_buf, " %s", ns->namespace);
+@@ -282,7 +269,6 @@ define rule_as_o_S
+ 	$(call cmd,gen_ksymdeps)
+ 	$(call cmd,gen_objtooldep)
+ 	$(call cmd,gen_symversions_S)
+-	$(call cmd,modversions)
+ endef
  
- 		buf_printf(&ns_deps_buf, "\n");
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 65296eca20a1..2a8c1ad0305e 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -120,9 +120,9 @@ struct module {
- 	struct buffer dev_table_buf;
- 	char	     srcversion[25];
- 	// Missing namespace dependencies
--	struct namespace_list *missing_namespaces;
-+	struct list_head missing_namespaces;
- 	// Actual imported namespaces
--	struct namespace_list *imported_namespaces;
-+	struct list_head imported_namespaces;
- 	char name[];
- };
+ # Built-in and composite module parts
+@@ -296,8 +282,6 @@ ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
+ quiet_cmd_cc_prelink_modules = LD [M]  $@
+       cmd_cc_prelink_modules =						\
+ 	$(LD) $(ld_flags) -r -o $@					\
+-               $(shell [ -s $(@:.prelink.o=.o.symversions) ] &&		\
+-                       echo -T $(@:.prelink.o=.o.symversions))		\
+ 		--whole-archive $(filter-out FORCE,$^)			\
+ 		$(cmd_objtool)
  
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index 7f39599e9fae..d429e3f9ae1d 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -34,6 +34,7 @@ quiet_cmd_ld_ko_o = LD [M]  $@
+       cmd_ld_ko_o +=							\
+ 	$(LD) -r $(KBUILD_LDFLAGS)					\
+ 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
++		$(addprefix -T, $(filter %.symver.lds, $(real-prereqs)))\
+ 		-T scripts/module.lds -o $@ $(filter %.o, $^);		\
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+ 
+@@ -56,7 +57,7 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
+ 
+ 
+ # Re-generate module BTFs if either module's .ko or vmlinux changed
+-$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
++$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o $(if $(CONFIG_MODVERSIONS), %.symver.lds) scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
+ 	+$(call if_changed_except,ld_ko_o,vmlinux)
+ ifdef CONFIG_DEBUG_INFO_BTF_MODULES
+ 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index eceb3ee7ec06..8da5c0182665 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -90,7 +90,6 @@ modpost_link()
+ 
+ 		if is_enabled CONFIG_MODVERSIONS; then
+ 			gen_symversions
+-			lds="${lds} -T .tmp_symversions.lds"
+ 		fi
+ 
+ 		# This might take a while, so indicate that we're doing
+@@ -196,6 +195,9 @@ vmlinux_link()
+ 	fi
+ 
+ 	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
++	if is_enabled CONFIG_MODVERSIONS; then
++		ldflags="${ldflags} ${wl}--script=vmlinux.symver.lds"
++	fi
+ 
+ 	# The kallsyms linking does not need debug symbols included.
+ 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
 -- 
 2.32.0
 
