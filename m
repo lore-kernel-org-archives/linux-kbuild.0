@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48962C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305BCC433FE
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343828AbiEAIqD (ORCPT
+        id S1343795AbiEAIqG (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:46:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
+        Sun, 1 May 2022 04:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343579AbiEAIpy (ORCPT
+        with ESMTP id S1343592AbiEAIpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:54 -0400
+        Sun, 1 May 2022 04:45:53 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC9C4C7B0;
-        Sun,  1 May 2022 01:42:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11A34CD69;
+        Sun,  1 May 2022 01:42:27 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2SA008518;
-        Sun, 1 May 2022 17:41:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SA008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2SC008518;
+        Sun, 1 May 2022 17:41:18 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SC008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394477;
-        bh=kOdm8XJObGrzROhInSotD5M5BpTpdOvAu4T0ZW1QDx0=;
+        s=dec2015msa; t=1651394478;
+        bh=IzSTHBCFo5w8MwRPWETclURyaZh7eklggt7ocsWZ4ns=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=f1ymieQguz01joSJj4vR2EqzXjYW0KMGnGJ3/uAbFFmhKGkAmXJ0b8mQPxOQUwqGA
-         rSQWoKaUaiVrf+fTdynKkckB4WneGGBuD23BgZts5YjgNgrQzXLg72zN5aCvusaG05
-         fjz3p/u7ynC0qjY050rjC1YZJLjyXZeK3TbbsxPYv6Eoc9kelv+9GYx5TMKRJojPNC
-         ohHvK0RZMeU4ZE8N5xSDWIA7aaWpzRCYfZ3Df8d3p7BR7Q0OUWbtGwMfcPuABq92ax
-         28uCwSQeikbdpn+qwHgRSBQak6VAiTy0ks/ashmBehzokVtkAlsrRM/KT2b8rIEy19
-         t5m5sRF3ztuRA==
+        b=DtYErU1U++poZDMqANR1RWIH8k5CAruNQAVbJ60k0nGSkFiiUKPK+pR6zI/sBig3h
+         SqMnNk3MC77m/Tcmnho5GcKlaTqBbWmg2D6fGMVJCGfrzFCm1dMaIJQzhpK6HDmuBk
+         SkSzC+0xtkF/ZzE4O3sDWXA4ZL1nYSVtp96vN+czXDViPSMA97LqsKEQ3okmr8u8qL
+         lqsjVPZdGrRNLWrIs3vSZ2klQ5rZVE5qsr/zRg89L/5kMm9qYf6nZUZhzUSx1E4DE6
+         ldP+OCnhkYbIgKwGaB3V5TzmAFsJ5nJFrBrY9KA/bseJ/yzh1YYGRMRXHoCVek3lWi
+         FRhA+ldZYDMlQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -37,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 23/26] kbuild: make built-in.a rule robust against too long argument error
-Date:   Sun,  1 May 2022 17:40:29 +0900
-Message-Id: <20220501084032.1025918-24-masahiroy@kernel.org>
+Subject: [PATCH v2 25/26] modpost: simplify the ->is_static initialization
+Date:   Sun,  1 May 2022 17:40:31 +0900
+Message-Id: <20220501084032.1025918-26-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,32 +49,10 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Kbuild runs at the top of objtree instead of changing the working
-directory to subdirectories. I think this design is nice overall but
-some commands have a scapability issue.
+->is_static is set to true at allocation, then to false if the symbol
+comes from the dump file.
 
-The build command of built-in.a is one of them whose length scales with:
-
-    O(D * N)
-
-Here, D is the length of the directory path (i.e. $(obj)/ prefix),
-N is the number of objects in the Makefile, O() is the big O notation.
-
-The deeper directory the Makefile directory is located, the more easily
-it will hit the too long argument error.
-
-We can make it better. Trim the $(obj)/ by Make's builtin function, and
-restore it by a shell command (sed).
-
-With this, the command length scales with:
-
-    O(D + N)
-
-In-tree modules still have some room to the limit (ARG_MAX=2097152),
-but this is more future-proof for big modules in a deep directory.
-
-For example, you can build i915 as builtin (CONFIG_DRM_I915=y) and
-compare drivers/gpu/drm/i915/.built-in.a.cmd with/without this commit.
+It is simpler to use !mod->from_dump as the init value.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
@@ -82,25 +60,38 @@ Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Changes in v2:
   - New patch
 
- scripts/Makefile.build | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index cc8f362f58e2..a9236add4864 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -370,7 +370,10 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
- #
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 1f2f53688d40..85fcac84d2d1 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -250,7 +250,7 @@ static struct symbol *alloc_symbol(const char *name)
  
- quiet_cmd_ar_builtin = AR      $@
--      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
-+      cmd_ar_builtin = rm -f $@; \
-+		echo $(patsubst $(obj)/%,%,$(real-prereqs)) | \
-+		sed -E 's:([^ ]+):$(obj)/\1:g' | \
-+		xargs $(AR) cDPrST $@
+ 	memset(s, 0, sizeof(*s));
+ 	strcpy(s->name, name);
+-	s->is_static = true;
++
+ 	return s;
+ }
  
- $(obj)/built-in.a: $(real-obj-y) FORCE
- 	$(call if_changed,ar_builtin)
+@@ -424,6 +424,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 
+ 	s = alloc_symbol(name);
+ 	s->module = mod;
++	s->is_static = !mod->from_dump;
+ 	s->export    = export;
+ 	list_add_tail(&s->list, &mod->exported_symbols);
+ 	hash_add_symbol(s);
+@@ -2518,7 +2519,6 @@ static void read_dump(const char *fname)
+ 			mod->from_dump = true;
+ 		}
+ 		s = sym_add_exported(symname, mod, export_no(export));
+-		s->is_static = false;
+ 		sym_set_crc(s, crc);
+ 		sym_update_namespace(symname, namespace);
+ 	}
 -- 
 2.32.0
 
