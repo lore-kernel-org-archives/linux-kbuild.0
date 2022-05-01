@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46512C4332F
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18512C43219
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343626AbiEAIpy (ORCPT
+        id S1343670AbiEAIpy (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 1 May 2022 04:45:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245748AbiEAIpu (ORCPT
+        with ESMTP id S1343538AbiEAIpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:50 -0400
+        Sun, 1 May 2022 04:45:53 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DDAB4C782;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215BA4C785;
         Sun,  1 May 2022 01:42:24 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2S7008518;
-        Sun, 1 May 2022 17:41:15 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S7008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2Rw008518;
+        Sun, 1 May 2022 17:41:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rw008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394475;
-        bh=JeO8Oi702PbETl1G33AZGaKd3Q8r5BgCfl45BC4qCrg=;
+        s=dec2015msa; t=1651394469;
+        bh=QmTs3PR7KEELPPIayd/c+OePSoC6ZzypNfbFAbQl0aE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ix8MPfJW1ctxLr6Ajk8s8+f9ZqZSSr3npyKjUP94xGoxK2MZ6etGPWJ8jk+mG35LF
-         CC9CRlcQ0Dqd8ib9PLh6WBGiGZsOYu9MZHcpFWwHD+P84RfJRmw2+ze3NsO5/jGutj
-         bJG/WMzAu7K1MoX3FlncNvAVnCFnUrU8VPADNo/5AGoAtZHRetPeq9tmd+l3rf5mfr
-         Eb4PQEsWWU6WkddVJd28ylCuym4Muiuu0eL0Wq6ZFGVoOTiISy2ffwBhvZ6t0e6fcR
-         eMu0ApbEcTYgK3Ltm6bX6YJN8Jn+ssgeLsonFEvqIuP72OUhaXEDrq+q9N2BcQMk3W
-         iEx4kJWIUT9+Q==
+        b=oomdjl7AUftSaHcbRjkePwpd8QcyDHk+DfgteGdrMEx8naD6UgDs0xnMbaXQihoXK
+         I4O5mpf0X8RUR5yryYpjV8h9ekor1yYmPBlrzs5r651ZGMDWXiCHfToUv5Yb4WKI/l
+         9RYxGEEAnTjXr21d9o/glYL5G4x3MDJstqWtXVg3WbraluYqFhVzMRfwLOJg890rR5
+         ry6YVdmkJ3nK9kkJlBJO/CuA/f5A7x4UOieo7olmhMWcihi+qMdwELZmGothV7CA3k
+         6OGf+jVscInMlb2VfBLS604DAiLzW93/+a/NbymU/PMJHP1qbpEOS3w9WQ4UUNbLkt
+         jauqmYGG/3qeQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 20/26] kbuild: stop merging *.symversions
-Date:   Sun,  1 May 2022 17:40:26 +0900
-Message-Id: <20220501084032.1025918-21-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Michal Marek <michal.lkml@markovi.net>
+Subject: [PATCH v2 11/26] modpost: make multiple export error
+Date:   Sun,  1 May 2022 17:40:17 +0900
+Message-Id: <20220501084032.1025918-12-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,116 +49,50 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now modpost takes care of all of these.
+This is currently a warning, but I think modpost should stop building
+in this case.
 
-Clean up the Makefile and script.
+If the same symbol is exported multiple times and we let it keep going,
+the sanity check becomes difficult.
+
+Only the legitimate case is that an external module overrides the
+corresponding in-tree module to provide a different implementation
+with the same interface.
+
+Also, there exists an upstream example that exploits this feature.
+
+  $ make M=tools/testing/nvdimm
+
+... builds tools/testing/nvdimm/libnvdimm.ko. This is a mocked module
+that overrides the symbols from drivers/nvdimm/libnvdimm.ko.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - Add more commit description
 
- scripts/Makefile.build  | 21 ++-------------------
- scripts/link-vmlinux.sh | 19 -------------------
- 2 files changed, 2 insertions(+), 38 deletions(-)
+ scripts/mod/modpost.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index cec17b28de42..10092efb61ac 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -393,17 +393,6 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
- $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
- $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4ce8d164b8e0..1f01fc942f94 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -417,9 +417,9 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 		list_add_tail(&s->list, &mod->exported_symbols);
+ 	} else if (!external_module || s->module->is_vmlinux ||
+ 		   s->module == mod) {
+-		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
+-		     mod->name, name, s->module->name,
+-		     s->module->is_vmlinux ? "" : ".ko");
++		error("%s: '%s' exported twice. Previous export was in %s%s\n",
++		      mod->name, name, s->module->name,
++		      s->module->is_vmlinux ? "" : ".ko");
+ 		return s;
+ 	}
  
--# combine symversions for later processing
--ifeq ($(CONFIG_LTO_CLANG) $(CONFIG_MODVERSIONS),y y)
--      cmd_update_lto_symversions =					\
--	rm -f $@.symversions						\
--	$(foreach n, $(filter-out FORCE,$^),				\
--		$(if $(shell test -s $(n).symversions && echo y),	\
--			; cat $(n).symversions >> $@.symversions))
--else
--      cmd_update_lto_symversions = echo >/dev/null
--endif
--
- #
- # Rule to compile a set of .o files into one .a file (without symbol table)
- #
-@@ -411,11 +400,8 @@ endif
- quiet_cmd_ar_builtin = AR      $@
-       cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
- 
--quiet_cmd_ar_and_symver = AR      $@
--      cmd_ar_and_symver = $(cmd_update_lto_symversions); $(cmd_ar_builtin)
--
- $(obj)/built-in.a: $(real-obj-y) FORCE
--	$(call if_changed,ar_and_symver)
-+	$(call if_changed,ar_builtin)
- 
- #
- # Rule to create modules.order file
-@@ -435,16 +421,13 @@ $(obj)/modules.order: $(obj-m) FORCE
- #
- # Rule to compile a set of .o files into one .a file (with symbol table)
- #
--quiet_cmd_ar_lib = AR      $@
--      cmd_ar_lib = $(cmd_update_lto_symversions); $(cmd_ar)
- 
- $(obj)/lib.a: $(lib-y) FORCE
--	$(call if_changed,ar_lib)
-+	$(call if_changed,ar)
- 
- ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
- quiet_cmd_link_multi-m = AR [M]  $@
- cmd_link_multi-m =						\
--	$(cmd_update_lto_symversions);				\
- 	rm -f $@; 						\
- 	$(AR) cDPrsT $@ @$(patsubst %.o,%.mod,$@)
- else
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 8da5c0182665..77e343835743 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -56,20 +56,6 @@ gen_initcalls()
- 		> .tmp_initcalls.lds
- }
- 
--# If CONFIG_LTO_CLANG is selected, collect generated symbol versions into
--# .tmp_symversions.lds
--gen_symversions()
--{
--	info GEN .tmp_symversions.lds
--	rm -f .tmp_symversions.lds
--
--	for o in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
--		if [ -f ${o}.symversions ]; then
--			cat ${o}.symversions >> .tmp_symversions.lds
--		fi
--	done
--}
--
- # Link of vmlinux.o used for section mismatch analysis
- # ${1} output file
- modpost_link()
-@@ -88,10 +74,6 @@ modpost_link()
- 		gen_initcalls
- 		lds="-T .tmp_initcalls.lds"
- 
--		if is_enabled CONFIG_MODVERSIONS; then
--			gen_symversions
--		fi
--
- 		# This might take a while, so indicate that we're doing
- 		# an LTO link
- 		info LTO ${1}
-@@ -306,7 +288,6 @@ cleanup()
- 	rm -f .btf.*
- 	rm -f .tmp_System.map
- 	rm -f .tmp_initcalls.lds
--	rm -f .tmp_symversions.lds
- 	rm -f .tmp_vmlinux*
- 	rm -f System.map
- 	rm -f vmlinux
 -- 
 2.32.0
 
