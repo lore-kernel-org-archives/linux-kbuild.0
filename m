@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33D0C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3558C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343759AbiEAIp7 (ORCPT
+        id S1343786AbiEAIp7 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 1 May 2022 04:45:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343558AbiEAIpx (ORCPT
+        with ESMTP id S244504AbiEAIpx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 1 May 2022 04:45:53 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45A94C434;
-        Sun,  1 May 2022 01:42:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4BF4C7BD;
+        Sun,  1 May 2022 01:42:26 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2S6008518;
-        Sun, 1 May 2022 17:41:14 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S6008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2S8008518;
+        Sun, 1 May 2022 17:41:16 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S8008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394475;
-        bh=9jy+Qom6a+bDbcXZ0gR9n95gDf6d9RjopGXIPMmScbc=;
+        s=dec2015msa; t=1651394476;
+        bh=sptS0LmRlNiGcR68bLoyoAyfJyNegh6hJaBxFNIll3o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=q/FtoicWA3Xm3XgSD7G5pxyoXHUrj7C//DraHd+rY9gWRJyScabmwpLigCfOFWURh
-         NMtHQ15/Df3X1FM17Z00CUGRCWB0dNpELZKjRHhg0rfNulh6CKbFvnBgwdkjX9MZi/
-         xXHoWI//8CaJQhLvN8VoYxFphtuyHtqHXIksXN73n/1uRKiSKgF3/OVBLLX5iEUnSP
-         4HNIkf4loMji/pUIDn6dg6CoyhXO+9E9ptj2FBOrvgt58ovx3fUT2JifsLtWZXXL8Y
-         frNudI42h5HobsThpgZ6dl/u0aAl8J4UegbSj0mGi+Trbh9i90tWIw9HP/IuNRpo0j
-         T1FzZbpolijJw==
+        b=KDPFyPCZfsdss2FtLiLT5YxIh9XZAGC9UsWVtwrV1QS+lv5YJrsRK1ddLGmLrUcYI
+         We3JUN2MZxVXVWPds6TkQzdbewxVsedPXfNiEWDAXzCG4P2WG/06e827+8zgnPixJV
+         ukpuxBGdoCb3D8aWkSOibXZPPTS805h9tMuCNH89biib5OluTZKQ7E5F4zKMdsIgk7
+         N2iCeWbWSjQKTJ6XNIC2VlCyCTMvaHkttHZHHRbJ7ZvjIlRbYqW6nf4kR2tJgDPMdu
+         khrNWG5vedVu9gCP2GTq/cllt30Qg3Exxx7R242BAcuSnjVzVp+ly8T2m22Xd5r24Q
+         c3Q4NhPUIff2w==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -37,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 19/26] kbuild: embed symbol versions at final link of vmlinux or modules
-Date:   Sun,  1 May 2022 17:40:25 +0900
-Message-Id: <20220501084032.1025918-20-masahiroy@kernel.org>
+Subject: [PATCH v2 21/26] genksyms: adjust the output format for .cmd files
+Date:   Sun,  1 May 2022 17:40:27 +0900
+Message-Id: <20220501084032.1025918-22-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,124 +49,114 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Do not update objects with version CRCs while the directory descending.
+genksyms output symbol versions in the linker script format.
+The output format depends on CONFIG_MODULE_REL_CRCS.
 
-Do it at the final link stage.
+Now, symbol versions are passed to modpost as plain text data,
+we can simplify the genksyms code.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - New patch
 
- scripts/Makefile.build    | 22 +++-------------------
- scripts/Makefile.modfinal |  3 ++-
- scripts/link-vmlinux.sh   |  4 +++-
- 3 files changed, 8 insertions(+), 21 deletions(-)
+ scripts/Makefile.build      |  9 ---------
+ scripts/genksyms/genksyms.c | 17 ++++-------------
+ 2 files changed, 4 insertions(+), 22 deletions(-)
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a1023868775f..cec17b28de42 100644
+index 10092efb61ac..1f480e4ff70a 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -162,15 +162,9 @@ ifdef CONFIG_MODVERSIONS
- # o if <file>.o doesn't contain a __ksymtab version, i.e. does
- #   not export symbols, it's done.
- # o otherwise, we calculate symbol versions using the good old
--#   genksyms on the preprocessed source and postprocess them in a way
--#   that they are usable as a linker script
--# o generate .tmp_<file>.o from <file>.o using the linker to
--#   replace the unresolved symbols __crc_exported_symbol with
--#   the actual value of the checksum generated by genksyms
--# o remove .tmp_<file>.o to <file>.o
+@@ -128,7 +128,6 @@ $(obj)/%.i: $(src)/%.c FORCE
+ 
+ genksyms = scripts/genksyms/genksyms		\
+ 	$(if $(1), -T $(2))			\
+-	$(if $(CONFIG_MODULE_REL_CRCS), -R)	\
+ 	$(if $(KBUILD_PRESERVE), -p)		\
+ 	-r $(or $(wildcard $(2:.symtypes=.symref)), /dev/null)
+ 
+@@ -166,18 +165,10 @@ ifdef CONFIG_MODVERSIONS
+ # o modpost will extract versions from the .cmd file and create linker
+ #   scripts used to link the kernel and/or modules.
+ 
+-genksyms_format_rel_crc := [^_]*__crc_\([^ ]*\) = \.; LONG(\([^)]*\)).*
+-genksyms_format_normal := __crc_\(.*\) = \(.*\);
+-genksyms_format := $(if $(CONFIG_MODULE_REL_CRCS),$(genksyms_format_rel_crc),$(genksyms_format_normal))
 -
--# Generate .o.symversions files for each .o with exported symbols, and link these
--# to the kernel and/or modules at the end.
-+#   genksyms on the preprocessed source and dump them into the .cmd file.
-+# o modpost will extract versions from the .cmd file and create linker
-+#   scripts used to link the kernel and/or modules.
- 
- genksyms_format_rel_crc := [^_]*__crc_\([^ ]*\) = \.; LONG(\([^)]*\)).*
- genksyms_format_normal := __crc_\(.*\) = \(.*\);
-@@ -188,12 +182,6 @@ gen_symversions =								\
- 
- cmd_gen_symversions_c =	$(call gen_symversions,c)
- 
--cmd_modversions =								\
--	if [ -r $@.symversions ]; then						\
--		$(LD) $(KBUILD_LDFLAGS) -r -o $(@D)/.tmp_$(@F) $@ 		\
--			-T $@.symversions;					\
--		mv -f $(@D)/.tmp_$(@F) $@;					\
--	fi
- endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
-@@ -273,7 +261,6 @@ define rule_cc_o_c
- 	$(call cmd,checkdoc)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_c)
--	$(if $(CONFIG_LTO_CLANG),,$(call cmd,modversions))
- 	$(call cmd,record_mcount)
- endef
- 
-@@ -282,7 +269,6 @@ define rule_as_o_S
- 	$(call cmd,gen_ksymdeps)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
--	$(call cmd,modversions)
- endef
- 
- # Built-in and composite module parts
-@@ -296,8 +282,6 @@ ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
- quiet_cmd_cc_prelink_modules = LD [M]  $@
-       cmd_cc_prelink_modules =						\
- 	$(LD) $(ld_flags) -r -o $@					\
--               $(shell [ -s $(@:.prelink.o=.o.symversions) ] &&		\
--                       echo -T $(@:.prelink.o=.o.symversions))		\
- 		--whole-archive $(filter-out FORCE,$^)			\
- 		$(cmd_objtool)
- 
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 7f39599e9fae..d429e3f9ae1d 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -34,6 +34,7 @@ quiet_cmd_ld_ko_o = LD [M]  $@
-       cmd_ld_ko_o +=							\
- 	$(LD) -r $(KBUILD_LDFLAGS)					\
- 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
-+		$(addprefix -T, $(filter %.symver.lds, $(real-prereqs)))\
- 		-T scripts/module.lds -o $@ $(filter %.o, $^);		\
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
-@@ -56,7 +57,7 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
- 
- 
- # Re-generate module BTFs if either module's .ko or vmlinux changed
--$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
-+$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o $(if $(CONFIG_MODVERSIONS), %.symver.lds) scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
- 	+$(call if_changed_except,ld_ko_o,vmlinux)
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index eceb3ee7ec06..8da5c0182665 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -90,7 +90,6 @@ modpost_link()
- 
- 		if is_enabled CONFIG_MODVERSIONS; then
- 			gen_symversions
--			lds="${lds} -T .tmp_symversions.lds"
- 		fi
- 
- 		# This might take a while, so indicate that we're doing
-@@ -196,6 +195,9 @@ vmlinux_link()
+ gen_symversions =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+ 		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
+-		    > $@.symversions;						\
+-		sed -n 's/$(genksyms_format)/$(pound)SYMVER \1 \2/p' $@.symversions \
+ 			>> $(dot-target).cmd;					\
+-	else									\
+-		rm -f $@.symversions;						\
  	fi
  
- 	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
-+	if is_enabled CONFIG_MODVERSIONS; then
-+		ldflags="${ldflags} ${wl}--script=vmlinux.symver.lds"
-+	fi
+ cmd_gen_symversions_c =	$(call gen_symversions,c)
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index 4827c5abe5b7..ec5ad4405483 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -33,7 +33,7 @@ char *cur_filename;
+ int in_source_file;
  
- 	# The kallsyms linking does not need debug symbols included.
- 	if [ "$output" != "${output#.tmp_vmlinux.kallsyms}" ] ; then
+ static int flag_debug, flag_dump_defs, flag_reference, flag_dump_types,
+-	   flag_preserve, flag_warnings, flag_rel_crcs;
++	   flag_preserve, flag_warnings;
+ 
+ static int errors;
+ static int nsyms;
+@@ -680,11 +680,7 @@ void export_symbol(const char *name)
+ 		if (flag_dump_defs)
+ 			fputs(">\n", debugfile);
+ 
+-		/* Used as a linker script. */
+-		printf(!flag_rel_crcs ? "__crc_%s = 0x%08lx;\n" :
+-		       "SECTIONS { .rodata : ALIGN(4) { "
+-		       "__crc_%s = .; LONG(0x%08lx); } }\n",
+-		       name, crc);
++		printf("#SYMVER %s 0x%08lx\n", name, crc);
+ 	}
+ }
+ 
+@@ -745,7 +741,6 @@ static void genksyms_usage(void)
+ 	      "  -q                    Disable warnings (default)\n"
+ 	      "  -h                    Print this message\n"
+ 	      "  -V                    Print the release version\n"
+-	      "  -R                    Emit section relative symbol CRCs\n"
+ #endif				/* __GNU_LIBRARY__ */
+ 	      , stderr);
+ }
+@@ -766,14 +761,13 @@ int main(int argc, char **argv)
+ 		{"preserve", 0, 0, 'p'},
+ 		{"version", 0, 0, 'V'},
+ 		{"help", 0, 0, 'h'},
+-		{"relative-crc", 0, 0, 'R'},
+ 		{0, 0, 0, 0}
+ 	};
+ 
+-	while ((o = getopt_long(argc, argv, "s:dwqVDr:T:phR",
++	while ((o = getopt_long(argc, argv, "s:dwqVDr:T:ph",
+ 				&long_opts[0], NULL)) != EOF)
+ #else				/* __GNU_LIBRARY__ */
+-	while ((o = getopt(argc, argv, "s:dwqVDr:T:phR")) != EOF)
++	while ((o = getopt(argc, argv, "s:dwqVDr:T:ph")) != EOF)
+ #endif				/* __GNU_LIBRARY__ */
+ 		switch (o) {
+ 		case 'd':
+@@ -813,9 +807,6 @@ int main(int argc, char **argv)
+ 		case 'h':
+ 			genksyms_usage();
+ 			return 0;
+-		case 'R':
+-			flag_rel_crcs = 1;
+-			break;
+ 		default:
+ 			genksyms_usage();
+ 			return 1;
 -- 
 2.32.0
 
