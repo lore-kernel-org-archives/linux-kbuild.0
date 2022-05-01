@@ -2,46 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A372DC433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396D4C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343890AbiEAIqH (ORCPT
+        id S1343897AbiEAIqH (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 1 May 2022 04:46:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42492 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343591AbiEAIpy (ORCPT
+        with ESMTP id S1343628AbiEAIpy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 1 May 2022 04:45:54 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3434C7B8;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F934D242;
         Sun,  1 May 2022 01:42:26 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2S9008518;
-        Sun, 1 May 2022 17:41:16 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S9008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2SD008518;
+        Sun, 1 May 2022 17:41:19 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SD008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394477;
-        bh=985j4qhMc0ABTO6gqDauWtSkenp3iTNDTrKHUN6acdI=;
+        s=dec2015msa; t=1651394479;
+        bh=LtVXFRqfwfAlXYHTNWOCPAk/W0tQ+V8EtvwcoPnsATQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y1CsZsf4O6jrUuKF2DH7X9ya1Ou3Ld83RwSh41SByrkBrvlU16CoM0h8uTi6WU3Kf
-         2lbO3gL8W3UODMrVXJMivMKfE5Mpi4KHOb8a8F9wXYpaj0+OK7glbgSLR6SLVnYCph
-         nQUPQIlU/XlBNjexObQuua575GwMitQ5nmQQnbIy415/oqM+AquqHxDNWw6osBTnBp
-         xNRxcVuYFruSml2+FnakW2Fh5XqtzjOYpNICYdmpRk76xTCJF44mQZrNT8eAIaIPUX
-         pbQ4m1P6vJE0YP2uoErkF77lB795ybEdKBdH/hPgojFFOQ0psPxJa6iM7jq9HRRUPg
-         SieA3Oi5YdQIg==
+        b=eQm5d47w03tHA6HlAVPsV3x5N3110iOdOctvRsBqVeXvSKJjTAigKhvJQjdXJiujc
+         +J6Zlo4JTvxz3B1MtIsDqr6KSpDpWU8YSljj4qCxavHpXNQuVNSWfBxIMGyXqHQrU1
+         p6rhOLIDRli0ycKqUGxVYK7qBDK0ADVeRpqqPGFLw6cg9ivi5H5l/3LoogzHLHO2Js
+         vj4IixBpE6iScfU13hfw8p18dJyubibRPRrlLjMO/zG4noqtupmydZ7m1dBh8LjFZ5
+         pR9DnYSjGLoEcjjB7y46eY1QeS1sytxVszT3ENtgplWaSQc+KzPdkFD5yicuHfuR2R
+         UyTeDSaG9NflQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        llvm@lists.linux.dev
-Subject: [PATCH v2 22/26] kbuild: do not create *.prelink.o for Clang LTO or IBT
-Date:   Sun,  1 May 2022 17:40:28 +0900
-Message-Id: <20220501084032.1025918-23-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2 26/26] modpost: use hlist for hash table implementation
+Date:   Sun,  1 May 2022 17:40:32 +0900
+Message-Id: <20220501084032.1025918-27-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -51,315 +49,200 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When CONFIG_LTO_CLANG=y, additional intermediate *.prelink.o is created
-for each module. Also, objtool is postponed until LLVM bitcode is
-converted to ELF.
+Import hlist macros from include/linux/list.h to implement the hash
+table in a more generic way.
 
-CONFIG_X86_KERNEL_IBT works in a similar way to postpone objtool until
-objects are merged together.
+While I was here, I increased the hash table size from 1024 to 8192
+to decrease the hash collision.
 
-This commit stops generating *.prelink.o, so the build flow will look
-the same with/without LTO.
-
-The following figures show how the LTO build currently works, and
-how this commit is changing it.
-
-Current build flow
-==================
-
- [1] single-object module
-
-                                    [+objtool]
-           $(CC)                      $(LD)                $(LD)
-    foo.c --------------------> foo.o -----> foo.prelink.o -----> foo.ko
-                           (LLVM bitcode)        (ELF)       |
-                                                             |
-                                                 foo.mod.o --/
-
- [2] multi-object module
-                                    [+objtool]
-           $(CC)         $(AR)        $(LD)                $(LD)
-    foo1.c -----> foo1.o -----> foo.o -----> foo.prelink.o -----> foo.ko
-                           |  (archive)          (ELF)       |
-    foo2.c -----> foo2.o --/                                 |
-                (LLVM bitcode)                   foo.mod.o --/
-
-  One confusion is foo.o in multi-object module is an archive despite of
-  its suffix.
-
-New build flow
-==============
-
- [1] single-object module
-
-  Since there is only one object, we do not need to have the LLVM
-  bitcode stage. Use $(CC)+$(LD) to generate an ELF object in one
-  build rule. Of course, only $(CC) is used when LTO is disabled.
-
-           $(CC)+$(LD)[+objtool]           $(LD)
-    foo.c ------------------------> foo.o -------> foo.ko
-                                    (ELF)    |
-                                             |
-                                 foo.mod.o --/
-
- [2] multi-object module
-
-  Previously, $(AR) was used to combine LLVM bitcode into an archive,
-  but there was not a technical reason to do so.
-  This commit just uses $(LD) to combine and convert them into a single
-  ELF object.
-
-                          [+objtool]
-            $(CC)           $(LD)          $(LD)
-    foo1.c -------> foo1.o -------> foo.o -------> foo.ko
-                              |     (ELF)    |
-    foo2.c -------> foo2.o ---/              |
-                (LLVM bitcode)   foo.mod.o --/
+I moved ARRAY_SIZE() from file2alias.c to modpost.h because it is needed
+in modpost.c as well.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
 Changes in v2:
- - replace the chain of $(if ...) with $(and )
+  - Move to the end of the series because this is now optional
 
- scripts/Kbuild.include    |  4 +++
- scripts/Makefile.build    | 58 ++++++++++++---------------------------
- scripts/Makefile.lib      |  7 -----
- scripts/Makefile.modfinal |  5 ++--
- scripts/Makefile.modpost  |  9 ++----
- scripts/mod/modpost.c     |  7 -----
- 6 files changed, 25 insertions(+), 65 deletions(-)
+ scripts/mod/file2alias.c |  2 --
+ scripts/mod/list.h       | 52 ++++++++++++++++++++++++++++++++++++++++
+ scripts/mod/modpost.c    | 39 +++++++++++++++---------------
+ scripts/mod/modpost.h    |  2 ++
+ 4 files changed, 73 insertions(+), 22 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 3514c2149e9d..455a0a6ce12d 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -15,6 +15,10 @@ pound := \#
- # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
- dot-target = $(dir $@).$(notdir $@)
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index 5258247d78ac..e8a9c6816fec 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -734,8 +734,6 @@ static int do_vio_entry(const char *filename, void *symval,
+ 	return 1;
+ }
  
-+###
-+# Name of target with a '.tmp_' as filename prefix. foo/bar.o => foo/.tmp_bar.o
-+tmp-target = $(dir $@).tmp_$(notdir $@)
+-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+-
+ static void do_input(char *alias,
+ 		     kernel_ulong_t *arr, unsigned int min, unsigned int max)
+ {
+diff --git a/scripts/mod/list.h b/scripts/mod/list.h
+index a924a6c4aa4d..c60dbaa70d6b 100644
+--- a/scripts/mod/list.h
++++ b/scripts/mod/list.h
+@@ -210,4 +210,56 @@ static inline int list_empty(const struct list_head *head)
+ 	     !list_entry_is_head(pos, head, member);			\
+ 	     pos = n, n = list_next_entry(n, member))
+ 
++/*
++ * Double linked lists with a single pointer list head.
++ * Mostly useful for hash tables where the two pointer list head is
++ * too wasteful.
++ * You lose the ability to access the tail in O(1).
++ */
 +
- ###
- # The temporary file to save gcc -MMD generated dependencies must not
- # contain a comma
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 1f480e4ff70a..cc8f362f58e2 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -88,10 +88,6 @@ endif
- targets-for-modules := $(foreach x, o mod $(if $(CONFIG_TRIM_UNUSED_KSYMS), usyms), \
- 				$(patsubst %.o, %.$x, $(filter %.o, $(obj-m))))
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--targets-for-modules += $(patsubst %.o, %.prelink.o, $(filter %.o, $(obj-m)))
--endif
--
- ifdef need-modorder
- targets-for-modules += $(obj)/modules.order
- endif
-@@ -152,8 +148,16 @@ $(obj)/%.ll: $(src)/%.c FORCE
- # The C file is compiled and updated dependency information is generated.
- # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
- 
-+is-single-obj-m = $(and $(part-of-module),$(filter $@, $(obj-m)),y)
++struct hlist_head {
++	struct hlist_node *first;
++};
 +
-+ifdef CONFIG_LTO_CLANG
-+cmd_ld_single = $(if $(is-single-obj-m), ; $(LD) $(ld_flags) -r -o $(tmp-target) $@; mv $(tmp-target) $@)
-+endif
++struct hlist_node {
++	struct hlist_node *next, **pprev;
++};
 +
- quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
--      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< $(cmd_objtool)
-+      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< \
-+		$(cmd_ld_single) \
-+		$(cmd_objtool)
- 
- ifdef CONFIG_MODVERSIONS
- # When module versioning is enabled the following steps are executed:
-@@ -224,21 +228,16 @@ cmd_gen_objtooldep = $(if $(objtool-enabled), { echo ; echo '$@: $$(wildcard $(o
- 
- endif # CONFIG_STACK_VALIDATION
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--
--# Skip objtool for LLVM bitcode
--$(obj)/%.o: objtool-enabled :=
--
--else
- 
- # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
- 
--$(obj)/%.o: objtool-enabled = $(if $(filter-out y%, \
--	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
-+is-standard-object = $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
- 
--endif
-+delay-objtool := $(or $(CONFIG_LTO_CLANG),$(CONFIG_X86_KERNEL_IBT))
++/**
++ * hlist_add_head - add a new entry at the beginning of the hlist
++ * @n: new entry to be added
++ * @h: hlist head to add it after
++ *
++ * Insert a new entry after the specified head.
++ * This is good for implementing stacks.
++ */
++static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
++{
++	struct hlist_node *first = h->first;
 +
-+$(obj)/%.o: objtool-enabled = $(if $(is-standard-object),$(if $(delay-objtool),$(is-single-obj-m),y))
- 
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- cmd_gen_ksymdeps = \
-@@ -267,24 +266,6 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call if_changed_rule,cc_o_c)
- 	$(call cmd,force_checksrc)
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--# Module .o files may contain LLVM bitcode, compile them into native code
--# before ELF processing
--quiet_cmd_cc_prelink_modules = LD [M]  $@
--      cmd_cc_prelink_modules =						\
--	$(LD) $(ld_flags) -r -o $@					\
--		--whole-archive $(filter-out FORCE,$^)			\
--		$(cmd_objtool)
--
--# objtool was skipped for LLVM bitcode, run it now that we have compiled
--# modules into native code
--$(obj)/%.prelink.o: objtool-enabled = y
--$(obj)/%.prelink.o: part-of-module := y
--
--$(obj)/%.prelink.o: $(obj)/%.o FORCE
--	$(call if_changed,cc_prelink_modules)
--endif
--
- cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) | \
- 	$(AWK) -v RS='( |\n)' '!x[$$0]++' > $@
- 
-@@ -294,7 +275,7 @@ $(obj)/%.mod: FORCE
- # List module undefined symbols
- cmd_undefined_syms = $(NM) $< | sed -n 's/^  *U //p' > $@
- 
--$(obj)/%.usyms: $(obj)/%$(mod-prelink-ext).o FORCE
-+$(obj)/%.usyms: $(obj)/%.o FORCE
- 	$(call if_changed,undefined_syms)
- 
- quiet_cmd_cc_lst_c = MKLST   $@
-@@ -416,16 +397,11 @@ $(obj)/modules.order: $(obj-m) FORCE
- $(obj)/lib.a: $(lib-y) FORCE
- 	$(call if_changed,ar)
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--quiet_cmd_link_multi-m = AR [M]  $@
--cmd_link_multi-m =						\
--	rm -f $@; 						\
--	$(AR) cDPrsT $@ @$(patsubst %.o,%.mod,$@)
--else
- quiet_cmd_link_multi-m = LD [M]  $@
--      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@)
--endif
-+      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
- 
-+$(multi-obj-m): objtool-enabled := $(delay-objtool)
-+$(multi-obj-m): part-of-module := y
- $(multi-obj-m): %.o: %.mod FORCE
- 	$(call if_changed,link_multi-m)
- $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0453a1904646..f75138385449 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -225,13 +225,6 @@ dtc_cpp_flags  = -Wp,-MMD,$(depfile).pre.tmp -nostdinc                    \
- 		 $(addprefix -I,$(DTC_INCLUDE))                          \
- 		 -undef -D__DTS__
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--# With CONFIG_LTO_CLANG, .o files in modules might be LLVM bitcode, so we
--# need to run LTO to compile them into native code (.lto.o) before further
--# processing.
--mod-prelink-ext := .prelink
--endif
--
- # Useful for describing the dependency of composite objects
- # Usage:
- #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index d429e3f9ae1d..51d384a0e4f9 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -9,7 +9,7 @@ __modfinal:
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
--# for c_flags and mod-prelink-ext
-+# for c_flags
- include $(srctree)/scripts/Makefile.lib
- 
- # find all modules listed in modules.order
-@@ -55,9 +55,8 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
- 	$(cmd);                                                              \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
--
- # Re-generate module BTFs if either module's .ko or vmlinux changed
--$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o $(if $(CONFIG_MODVERSIONS), %.symver.lds) scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
-+$(modules): %.ko: %.o %.mod.o $(if $(CONFIG_MODVERSIONS), %.symver.lds) scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
- 	+$(call if_changed_except,ld_ko_o,vmlinux)
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index fecd721537c9..01e1c8b88a67 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -41,9 +41,6 @@ __modpost:
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
--# for mod-prelink-ext
--include $(srctree)/scripts/Makefile.lib
--
- MODPOST = scripts/mod/modpost								\
- 	$(if $(CONFIG_MODVERSIONS),-m)							\
- 	$(if $(CONFIG_MODULE_REL_CRCS),-r)						\
-@@ -119,8 +116,6 @@ $(input-symdump):
- 	@echo >&2 '         Modules may not have dependencies or modversions.'
- 	@echo >&2 '         You may get many unresolved symbol warnings.'
- 
--modules := $(sort $(shell cat $(MODORDER)))
--
- # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined symbols
- ifneq ($(KBUILD_MODPOST_WARN)$(filter-out $(existing-input-symdump), $(input-symdump)),)
- MODPOST += -w
-@@ -129,9 +124,9 @@ endif
- # Read out modules.order to pass in modpost.
- # Otherwise, allmodconfig would fail with "Argument list too long".
- quiet_cmd_modpost = MODPOST $@
--      cmd_modpost = sed 's/\.ko$$/$(mod-prelink-ext)\.o/' $< | $(MODPOST) -T -
-+      cmd_modpost = sed 's/ko$$/o/' $< | $(MODPOST) -T -
- 
--$(output-symdump): $(MODORDER) $(input-symdump) $(modules:.ko=$(mod-prelink-ext).o) FORCE
-+$(output-symdump): $(MODORDER) $(input-symdump) FORCE
- 	$(call if_changed,modpost)
- 
- targets += $(output-symdump)
++	n->next = first;
++	if (first)
++		first->pprev = &n->next;
++	h->first = n;
++	n->pprev = &h->first;
++}
++
++#define hlist_entry(ptr, type, member) container_of(ptr, type, member)
++
++#define hlist_entry_safe(ptr, type, member) \
++	({ typeof(ptr) ____ptr = (ptr); \
++	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
++	})
++
++/**
++ * hlist_for_each_entry	- iterate over list of given type
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the hlist_node within the struct.
++ */
++#define hlist_for_each_entry(pos, head, member)				\
++	for (pos = hlist_entry_safe((head)->first, typeof(*(pos)), member);\
++	     pos;							\
++	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
++
+ #endif /* LIST_H */
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 935f57f73e40..1f2f53688d40 100644
+index 85fcac84d2d1..ebd544717b91 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1955,10 +1955,6 @@ static char *remove_dot(char *s)
- 		size_t m = strspn(s + n + 1, "0123456789");
- 		if (m && (s[n + m] == '.' || s[n + m] == 0))
- 			s[n] = 0;
+@@ -207,13 +207,8 @@ static struct module *new_module(const char *modname)
+ 	return mod;
+ }
+ 
+-/* A hash of all exported symbols,
+- * struct symbol is also used for lists of unresolved symbols */
 -
--		/* strip trailing .prelink */
--		if (strends(s, ".prelink"))
--			s[strlen(s) - 8] = '\0';
- 	}
+-#define SYMBOL_HASH_SIZE 1024
+-
+ struct symbol {
+-	struct symbol *next;
++	struct hlist_node hash_node;	/* link to the hash table */
+ 	struct list_head list;	/* link to module::exported_symbols or module::unresolved_symbols */
+ 	struct module *module;
+ 	char *namespace;
+@@ -225,8 +220,6 @@ struct symbol {
+ 	char name[];
+ };
+ 
+-static struct symbol *symbolhash[SYMBOL_HASH_SIZE];
+-
+ /* This is based on the hash algorithm from gdbm, via tdb */
+ static inline unsigned int tdb_hash(const char *name)
+ {
+@@ -240,6 +233,21 @@ static inline unsigned int tdb_hash(const char *name)
+ 	return (1103515243 * value + 12345);
+ }
+ 
++/* useful hash macros */
++#define hash_head(table, key)		(&(table)[tdb_hash(key) % ARRAY_SIZE(table)])
++
++#define hash_add_symbol(sym, table)	hlist_add_head(&(sym)->hash_node, \
++						       hash_head(table, (sym)->name))
++
++#define hash_for_matched_symbol(sym, table, key) \
++	hlist_for_each_entry(sym, hash_head(table, key), hash_node) \
++		if (!strcmp(sym->name, key))
++
++#define HASHTABLE_DECLARE(name, size)	struct hlist_head name[size]
++
++/* hash table of all exported symbols */
++HASHTABLE_DECLARE(exported_symbols, 8192);
++
+ /**
+  * Allocate a new symbols for use in the hash of exported symbols or
+  * the list of unresolved symbols per module
+@@ -254,15 +262,6 @@ static struct symbol *alloc_symbol(const char *name)
  	return s;
  }
-@@ -2087,9 +2083,6 @@ static void read_symbols(const char *modname)
- 		/* strip trailing .o */
- 		tmp = NOFAIL(strdup(modname));
- 		tmp[strlen(tmp) - 2] = '\0';
--		/* strip trailing .prelink */
--		if (strends(tmp, ".prelink"))
--			tmp[strlen(tmp) - 8] = '\0';
- 		mod = new_module(tmp);
- 		free(tmp);
+ 
+-/* For the hash of exported symbols */
+-static void hash_add_symbol(struct symbol *sym)
+-{
+-	unsigned int hash;
+-
+-	hash = tdb_hash(sym->name) % SYMBOL_HASH_SIZE;
+-	sym->next = symbolhash[hash];
+-	symbolhash[hash] = sym;
+-}
+ 
+ static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
+ {
+@@ -282,8 +281,8 @@ static struct symbol *sym_find_with_module(const char *name, struct module *mod)
+ 	if (name[0] == '.')
+ 		name++;
+ 
+-	for (s = symbolhash[tdb_hash(name) % SYMBOL_HASH_SIZE]; s; s = s->next) {
+-		if (strcmp(s->name, name) == 0 && (!mod || s->module == mod))
++	hash_for_matched_symbol(s, exported_symbols, name) {
++		if (!mod || s->module == mod)
+ 			return s;
  	}
+ 	return NULL;
+@@ -427,7 +426,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 	s->is_static = !mod->from_dump;
+ 	s->export    = export;
+ 	list_add_tail(&s->list, &mod->exported_symbols);
+-	hash_add_symbol(s);
++	hash_add_symbol(s, exported_symbols);
+ 
+ 	return s;
+ }
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 1c2d6498d764..180eb142375e 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -14,6 +14,8 @@
+ #include "list.h"
+ #include "elfconfig.h"
+ 
++#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
++
+ /* On BSD-alike OSes elf.h defines these according to host's word size */
+ #undef ELF_ST_BIND
+ #undef ELF_ST_TYPE
 -- 
 2.32.0
 
