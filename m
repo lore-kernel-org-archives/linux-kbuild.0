@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC1EC4332F
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583DCC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343913AbiEAIqJ (ORCPT
+        id S1343937AbiEAIqJ (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 1 May 2022 04:46:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42508 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343624AbiEAIpy (ORCPT
+        with ESMTP id S1343587AbiEAIpy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 1 May 2022 04:45:54 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71DAB4CD7D;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC794CD59;
         Sun,  1 May 2022 01:42:26 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2Rv008518;
-        Sun, 1 May 2022 17:41:09 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Rv008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2SB008518;
+        Sun, 1 May 2022 17:41:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SB008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394469;
-        bh=fMEBYGXyw4wj0YOPqOXyNSxkMAJy9YroKhDuXUSoXHo=;
+        s=dec2015msa; t=1651394478;
+        bh=MLLAKdOtjjfRPFMO1T3BrNLDbeU3kj6UXqQmksZq2zA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VoYnIDWCigw029YpcY9orum2qtHKvupe14SmLYVoEnEVna4FGF2OvA47OKgqmsOfR
-         X0OCV+VdhGnek8U5PTX3InZuqt36tiqlCE3v6lJtom2h3MV7iSUOJ4V+saTScayl5V
-         HRGJ4fqJ7hpwnIqib8S4RpyOUuPN16JUKa7SfGEcGqHOlfRtu1Z2z1whksi6IwuuFk
-         pmpxBCpI31U+EletnMR9FJGhBF3XlVbokHomg43Yoy6XCb5TutnXUXVVfalG+4mriO
-         ieYNksoYewJu6B6BfE7JtePcgnbMDHGQkqryVCw1ka1I/B4UJ2qeqdk2bCvMiAlUsh
-         tJxKGbWLgxCGQ==
+        b=hIJAmqJQVYBkdsTKchRWt6W9+m4EhVcJr2r7KwvdFmhivdNWhndcp14Ye4eqwRPx8
+         /UMHhWj24pK1Yz76GxtvGIZrs7SrKlFUeEW1wNLnUpkA8rxGNiiuKn72/ZkUKhxHRC
+         Lp9wR+wg8FNN+KKqDwHjZ4WGrEIXlZpK1uXOLrZUNf0E01IWSQ8al/n11xk//deo7u
+         VW7K2UNn/XLx8PFT3UJlC+RodArQRX8aZDxkKFiHZ6Ad29kDf2DhFU9X3H+hAtbYoA
+         I+SdTw8uclTxVNrrOUjo5OFbm32xdjs+bG0buB5hCvS/jtwDkGAifB73P86uahecDz
+         WbUqRyP53hSYw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -37,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 10/26] modpost: move static EXPORT_SYMBOL check to check_exports()
-Date:   Sun,  1 May 2022 17:40:16 +0900
-Message-Id: <20220501084032.1025918-11-masahiroy@kernel.org>
+Subject: [PATCH v2 24/26] kbuild: make *.mod rule robust against too long argument error
+Date:   Sun,  1 May 2022 17:40:30 +0900
+Message-Id: <20220501084032.1025918-25-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,59 +49,47 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now that struct module has a list of symbols it exports, this check
-can go into check_exports(). The code becomes shorter.
+Like built-in.a, the command length of the *.mod rule scales with
+the depth of the directory times the number of objects in the Makefile.
+
+Add $(obj)/ by the shell command (awk) instead of by Make's builtin
+function.
+
+In-tree modules still have some room to the limit (ARG_MAX=2097152),
+but this is more future-proof for big modules in a deep directory.
+
+For example, you can build i915 as a module (CONFIG_DRM_I915=m) and
+compare drivers/gpu/drm/i915/.i915.mod.cmd with/without this commit.
+
+The issue is more critical for external modules because the M= path
+can be very long as Jeff Johnson reported before [1].
+
+[1] https://lore.kernel.org/linux-kbuild/4c02050c4e95e4cb8cc04282695f8404@codeaurora.org/
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - New patch
 
- scripts/mod/modpost.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ scripts/Makefile.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index cd49ef7b5953..4ce8d164b8e0 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2199,6 +2199,12 @@ static void check_exports(struct module *mod)
- 		if (!mod->is_gpl_compatible)
- 			check_for_gpl_usage(exp->export, basename, exp->name);
- 	}
-+
-+	list_for_each_entry(s, &mod->exported_symbols, list) {
-+		if (s->is_static)
-+			error("\"%s\" [%s] is a static %s\n",
-+			      s->name, mod->name, export_str(s->export));
-+	}
- }
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index a9236add4864..b0718076f50b 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -266,8 +266,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ 	$(call if_changed_rule,cc_o_c)
+ 	$(call cmd,force_checksrc)
  
- static void check_modname_len(struct module *mod)
-@@ -2510,7 +2516,6 @@ int main(int argc, char **argv)
- 	char *missing_namespace_deps = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
--	int n;
- 	LIST_HEAD(dump_lists);
- 	struct dump_list *dl, *dl2;
+-cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) | \
+-	$(AWK) -v RS='( |\n)' '!x[$$0]++' > $@
++cmd_mod = echo $(call real-search, $*.o, .o, -objs -y -m) | \
++	$(AWK) -v RS='( |\n)' '!x[$$0]++ { print("$(obj)/"$$0) }' > $@
  
-@@ -2606,16 +2611,6 @@ int main(int argc, char **argv)
- 	if (sec_mismatch_count && !sec_mismatch_warn_only)
- 		error("Section mismatches detected.\n"
- 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
--	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
--		struct symbol *s;
--
--		for (s = symbolhash[n]; s; s = s->next) {
--			if (s->is_static)
--				error("\"%s\" [%s] is a static %s\n",
--				      s->name, s->module->name,
--				      export_str(s->export));
--		}
--	}
- 
- 	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
- 		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
+ $(obj)/%.mod: FORCE
+ 	$(call if_changed,mod)
 -- 
 2.32.0
 
