@@ -2,44 +2,45 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 583DCC433EF
-	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C66CC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343937AbiEAIqJ (ORCPT
+        id S1344101AbiEAIqT (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:46:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42488 "EHLO
+        Sun, 1 May 2022 04:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343587AbiEAIpy (ORCPT
+        with ESMTP id S1344177AbiEAIqQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 1 May 2022 04:45:54 -0400
+        Sun, 1 May 2022 04:46:16 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC794CD59;
-        Sun,  1 May 2022 01:42:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D91E4CD59;
+        Sun,  1 May 2022 01:42:45 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2SB008518;
-        Sun, 1 May 2022 17:41:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SB008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2S3008518;
+        Sun, 1 May 2022 17:41:12 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2S3008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394478;
-        bh=MLLAKdOtjjfRPFMO1T3BrNLDbeU3kj6UXqQmksZq2zA=;
+        s=dec2015msa; t=1651394473;
+        bh=48YeH5yLVjVlCyq9pr+WDCNXaWRxxkvMIZASlpjblKk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hIJAmqJQVYBkdsTKchRWt6W9+m4EhVcJr2r7KwvdFmhivdNWhndcp14Ye4eqwRPx8
-         /UMHhWj24pK1Yz76GxtvGIZrs7SrKlFUeEW1wNLnUpkA8rxGNiiuKn72/ZkUKhxHRC
-         Lp9wR+wg8FNN+KKqDwHjZ4WGrEIXlZpK1uXOLrZUNf0E01IWSQ8al/n11xk//deo7u
-         VW7K2UNn/XLx8PFT3UJlC+RodArQRX8aZDxkKFiHZ6Ad29kDf2DhFU9X3H+hAtbYoA
-         I+SdTw8uclTxVNrrOUjo5OFbm32xdjs+bG0buB5hCvS/jtwDkGAifB73P86uahecDz
-         WbUqRyP53hSYw==
+        b=WVwc3OaY4iXLOvVOKd74uPe60KP3vepPod/hp9ZUxHhvhhLGU7XzC+22e7B8iUDiF
+         6HGLtpzILSQz4yNSY0BcOM9scMmEIoI28Ktt47pHhhzxXUwhkswBbe5UKyZC9xbblI
+         Pj1YkvxDUJ76DRRTfnnijr/luDxx7om3s+5v1pIeFhi3sX5S568ieT+Ssz7CcaamT8
+         z6oj7Fe89lbMyboQTArFwkaqK5fuHwQBvQLGjlLXbBp8e4OR/QoNxB7SIwS1/9dUwu
+         6FMpCAG1wpfn9wiR1XrCgb6sDmOacA4DC+ezejhMoRcb5ZxrWvpJIrdqMrfLHhsRWs
+         WO87XtFCL6+EA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH v2 24/26] kbuild: make *.mod rule robust against too long argument error
-Date:   Sun,  1 May 2022 17:40:30 +0900
-Message-Id: <20220501084032.1025918-25-masahiroy@kernel.org>
+Subject: [PATCH v2 16/26] kbuild: generate a list of objects in vmlinux
+Date:   Sun,  1 May 2022 17:40:22 +0900
+Message-Id: <20220501084032.1025918-17-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -49,47 +50,51 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Like built-in.a, the command length of the *.mod rule scales with
-the depth of the directory times the number of objects in the Makefile.
+A *.mod file lists the member objects of a module, but vmlinux does
+not have such a file to list out all the member objects.
 
-Add $(obj)/ by the shell command (awk) instead of by Make's builtin
-function.
-
-In-tree modules still have some room to the limit (ARG_MAX=2097152),
-but this is more future-proof for big modules in a deep directory.
-
-For example, you can build i915 as a module (CONFIG_DRM_I915=m) and
-compare drivers/gpu/drm/i915/.i915.mod.cmd with/without this commit.
-
-The issue is more critical for external modules because the M= path
-can be very long as Jeff Johnson reported before [1].
-
-[1] https://lore.kernel.org/linux-kbuild/4c02050c4e95e4cb8cc04282695f8404@codeaurora.org/
+Generate this list to allow modpost to know all the member objects.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 ---
 
 Changes in v2:
-  - New patch
+  - Move '> .vmlinux.objs' to the outside of the loop (Nicolas)
+  - Clean up .vmlinux.objs explicitly
 
- scripts/Makefile.build | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/link-vmlinux.sh | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a9236add4864..b0718076f50b 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -266,8 +266,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call if_changed_rule,cc_o_c)
- 	$(call cmd,force_checksrc)
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 20f44504a644..eceb3ee7ec06 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -311,6 +311,7 @@ cleanup()
+ 	rm -f vmlinux.map
+ 	rm -f vmlinux.o
+ 	rm -f .vmlinux.d
++	rm -f .vmlinux.objs
+ }
  
--cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) | \
--	$(AWK) -v RS='( |\n)' '!x[$$0]++' > $@
-+cmd_mod = echo $(call real-search, $*.o, .o, -objs -y -m) | \
-+	$(AWK) -v RS='( |\n)' '!x[$$0]++ { print("$(obj)/"$$0) }' > $@
+ # Use "make V=1" to debug this script
+@@ -342,6 +343,16 @@ ${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init need-builtin=1
+ modpost_link vmlinux.o
+ objtool_link vmlinux.o
  
- $(obj)/%.mod: FORCE
- 	$(call if_changed,mod)
++# Generate the list of objects in vmlinux
++for f in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
++	case ${f} in
++	*.a)
++		${AR} t ${f} ;;
++	*)
++		echo ${f} ;;
++	esac
++done > .vmlinux.objs
++
+ # modpost vmlinux.o to check for section mismatches
+ ${MAKE} -f "${srctree}/scripts/Makefile.modpost" MODPOST_VMLINUX=1
+ 
 -- 
 2.32.0
 
