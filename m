@@ -2,43 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1628CC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48962C433EF
 	for <linux-kbuild@archiver.kernel.org>; Sun,  1 May 2022 08:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245719AbiEAIqC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 1 May 2022 04:46:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42494 "EHLO
+        id S1343828AbiEAIqD (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 1 May 2022 04:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343590AbiEAIpy (ORCPT
+        with ESMTP id S1343579AbiEAIpy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 1 May 2022 04:45:54 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF3C4C7BE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC9C4C7B0;
         Sun,  1 May 2022 01:42:26 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2418f2Ru008518;
-        Sun, 1 May 2022 17:41:08 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2Ru008518
+        by conuserg-12.nifty.com with ESMTP id 2418f2SA008518;
+        Sun, 1 May 2022 17:41:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2418f2SA008518
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651394468;
-        bh=b7dWhvTr9FrQ+5Dw80ljJlpc6iDLA8xOJ7ErDXQoiLs=;
+        s=dec2015msa; t=1651394477;
+        bh=kOdm8XJObGrzROhInSotD5M5BpTpdOvAu4T0ZW1QDx0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R13VRpUybqhQRpyVbQu+a3VqGuVr5Lo089hvMLNpmQbqn3HWZ2bG0jMf8x96YikTn
-         UdvblE148Z0hgr3flP3TJnc66HF08ogif9sulMtKZT27oEbpMfEyBz07LZ4xOVxmF1
-         l6vrZweWt8OzMRN4ckm+yLsBozkqrtU9msAz9CG6TL0sYDrdG5G329q7dN9fw/VsAI
-         hwpFdMAubQRy5BUDgUsM/pgzdQJbnk0scxpXeAEETXt3+UrAbWtBHXiEzst9h3S+AO
-         MAjltbzQ8HE5WCJi0kiXuih7QO3T1pbKzZojBgKAmNlMcX1oFc7VS6HDk36oKPJ8m6
-         A1fnTX4rkPBsg==
+        b=f1ymieQguz01joSJj4vR2EqzXjYW0KMGnGJ3/uAbFFmhKGkAmXJ0b8mQPxOQUwqGA
+         rSQWoKaUaiVrf+fTdynKkckB4WneGGBuD23BgZts5YjgNgrQzXLg72zN5aCvusaG05
+         fjz3p/u7ynC0qjY050rjC1YZJLjyXZeK3TbbsxPYv6Eoc9kelv+9GYx5TMKRJojPNC
+         ohHvK0RZMeU4ZE8N5xSDWIA7aaWpzRCYfZ3Df8d3p7BR7Q0OUWbtGwMfcPuABq92ax
+         28uCwSQeikbdpn+qwHgRSBQak6VAiTy0ks/ashmBehzokVtkAlsrRM/KT2b8rIEy19
+         t5m5sRF3ztuRA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH v2 09/26] modpost: dump Module.symvers in the same order of modules.order
-Date:   Sun,  1 May 2022 17:40:15 +0900
-Message-Id: <20220501084032.1025918-10-masahiroy@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2 23/26] kbuild: make built-in.a rule robust against too long argument error
+Date:   Sun,  1 May 2022 17:40:29 +0900
+Message-Id: <20220501084032.1025918-24-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
 References: <20220501084032.1025918-1-masahiroy@kernel.org>
@@ -48,100 +49,58 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-modpost dumps the exported symbols into Module.symvers, but currently
-in random order because it iterates in the hash table.
+Kbuild runs at the top of objtree instead of changing the working
+directory to subdirectories. I think this design is nice overall but
+some commands have a scapability issue.
 
-Add a linked list of exported symbols in struct module, so we can
-iterate on symbols per module.
+The build command of built-in.a is one of them whose length scales with:
 
-This commit makes Module.symvers much more readable; the outer loop in
-write_dump() iterates over the modules in the order of modules.order,
-and the inner loop dumps symbols in each module.
+    O(D * N)
+
+Here, D is the length of the directory path (i.e. $(obj)/ prefix),
+N is the number of objects in the Makefile, O() is the big O notation.
+
+The deeper directory the Makefile directory is located, the more easily
+it will hit the too long argument error.
+
+We can make it better. Trim the $(obj)/ by Make's builtin function, and
+restore it by a shell command (sed).
+
+With this, the command length scales with:
+
+    O(D + N)
+
+In-tree modules still have some room to the limit (ARG_MAX=2097152),
+but this is more future-proof for big modules in a deep directory.
+
+For example, you can build i915 as builtin (CONFIG_DRM_I915=y) and
+compare drivers/gpu/drm/i915/.built-in.a.cmd with/without this commit.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-(no changes since v1)
+Changes in v2:
+  - New patch
 
- scripts/mod/modpost.c | 29 +++++++++++++----------------
- scripts/mod/modpost.h |  1 +
- 2 files changed, 14 insertions(+), 16 deletions(-)
+ scripts/Makefile.build | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index d0cf94e1e984..cd49ef7b5953 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -185,6 +185,7 @@ static struct module *new_module(const char *modname)
- 	mod = NOFAIL(malloc(sizeof(*mod) + strlen(modname) + 1));
- 	memset(mod, 0, sizeof(*mod));
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cc8f362f58e2..a9236add4864 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -370,7 +370,10 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ #
  
-+	INIT_LIST_HEAD(&mod->exported_symbols);
- 	INIT_LIST_HEAD(&mod->unresolved_symbols);
- 	INIT_LIST_HEAD(&mod->missing_namespaces);
- 	INIT_LIST_HEAD(&mod->imported_namespaces);
-@@ -211,7 +212,7 @@ static struct module *new_module(const char *modname)
+ quiet_cmd_ar_builtin = AR      $@
+-      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
++      cmd_ar_builtin = rm -f $@; \
++		echo $(patsubst $(obj)/%,%,$(real-prereqs)) | \
++		sed -E 's:([^ ]+):$(obj)/\1:g' | \
++		xargs $(AR) cDPrST $@
  
- struct symbol {
- 	struct symbol *next;
--	struct list_head list;	/* link to module::unresolved_symbols */
-+	struct list_head list;	/* link to module::exported_symbols or module::unresolved_symbols */
- 	struct module *module;
- 	char *namespace;
- 	unsigned int crc;
-@@ -413,6 +414,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 
- 	if (!s) {
- 		s = new_symbol(name, mod, export);
-+		list_add_tail(&s->list, &mod->exported_symbols);
- 	} else if (!external_module || s->module->is_vmlinux ||
- 		   s->module == mod) {
- 		warn("%s: '%s' exported twice. Previous export was in %s%s\n",
-@@ -2456,22 +2458,17 @@ static void read_dump(const char *fname)
- static void write_dump(const char *fname)
- {
- 	struct buffer buf = { };
--	struct symbol *symbol;
--	const char *namespace;
--	int n;
-+	struct module *mod;
-+	struct symbol *sym;
- 
--	for (n = 0; n < SYMBOL_HASH_SIZE ; n++) {
--		symbol = symbolhash[n];
--		while (symbol) {
--			if (!symbol->module->from_dump) {
--				namespace = symbol->namespace;
--				buf_printf(&buf, "0x%08x\t%s\t%s\t%s\t%s\n",
--					   symbol->crc, symbol->name,
--					   symbol->module->name,
--					   export_str(symbol->export),
--					   namespace ? namespace : "");
--			}
--			symbol = symbol->next;
-+	list_for_each_entry(mod, &modules, list) {
-+		if (mod->from_dump)
-+			continue;
-+		list_for_each_entry(sym, &mod->exported_symbols, list) {
-+			buf_printf(&buf, "0x%08x\t%s\t%s\t%s\t%s\n",
-+				   sym->crc, sym->name, mod->name,
-+				   export_str(sym->export),
-+				   sym->namespace ?: "");
- 		}
- 	}
- 	write_buf(&buf, fname);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 2a8c1ad0305e..1c2d6498d764 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -111,6 +111,7 @@ buf_write(struct buffer *buf, const char *s, int len);
- 
- struct module {
- 	struct list_head list;
-+	struct list_head exported_symbols;
- 	struct list_head unresolved_symbols;
- 	bool is_gpl_compatible;
- 	bool from_dump;		/* true if module was loaded from *.symvers */
+ $(obj)/built-in.a: $(real-obj-y) FORCE
+ 	$(call if_changed,ar_builtin)
 -- 
 2.32.0
 
