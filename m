@@ -2,126 +2,83 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9051EC433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 07:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C309BC433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 13:49:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344140AbiEEHaq (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 5 May 2022 03:30:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
+        id S231135AbiEENxE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 5 May 2022 09:53:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344142AbiEEHaM (ORCPT
+        with ESMTP id S1380092AbiEENxB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 May 2022 03:30:12 -0400
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F1C29801;
-        Thu,  5 May 2022 00:26:30 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2457Neno019426;
-        Thu, 5 May 2022 16:23:47 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2457Neno019426
+        Thu, 5 May 2022 09:53:01 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B03580F3;
+        Thu,  5 May 2022 06:49:17 -0700 (PDT)
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 245DmkEn024632;
+        Thu, 5 May 2022 22:48:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 245DmkEn024632
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651735428;
-        bh=jiny9e/0ekLHfzDMPj/sTAYkp3K4e6Ir8SZeJf0qunI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=s8CzChdZOXXECM2SJqlUNY/RhAyMMyUj53jsSphu1U+2MxbScJI/0J74sbJu8dUVP
-         FvXOIHejc8zclit4u9J9UEq+wuFT42/BAOI+9YhBebmsgWrNKPRJCOpl66DmR5cNXU
-         AAH4LfUbUt2jr9/+WwldUA50jaKLwfgV0Vt6Mbglmro41BirayumolaEHice+urhim
-         YzIGOo5QiBzUFigZRKwD/Preqo125kSiD66lcLlMhrgPG6RwtPJnldGl+gdQq18juZ
-         bwQo7ErSMekWvQHB8+6TXyXu2TCug/4pBJ48orLidkmwiG2uk+hE57AmtmKzRpxIYW
-         UldyhAx1qO4aA==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
-        Nicolas Schier a <nicolas@fjasle.eu>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-um@lists.infradead.org,
-        linux-s390@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v3 06/15] kbuild: record symbol versions in *.cmd files
-Date:   Thu,  5 May 2022 16:22:35 +0900
-Message-Id: <20220505072244.1155033-7-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220505072244.1155033-1-masahiroy@kernel.org>
-References: <20220505072244.1155033-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1651758527;
+        bh=IwgRHAG5zKPpb5J9wkpkLch62sbAeAXe6UUEy7oZWx8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=NflHOQ1SchzCR927Orbp99xHnhXDwx7JXWhpuBdOf/cUqIo6ylza5ViSTZ7IBceOT
+         m7jWAdq5TunKPvbD29oIs9McC7ob3Q69bPLQtO2A9Ms5UiwdREp+7m0GwUQxQiiU/l
+         LIVS398bOHNSvzLoWWUIhWY2A+s4IA6J2OaKgeeZ0maCi5sWsUwInNYax4jqlN5XjW
+         hnmz7yusN4hbezVU0p96lLLzlIKtjFdmXXgsKWx2TcK2f38VvpkZptcu7UT07vcTwc
+         pnbjO3YtH0M7tDN+LxnHW4KbKN4Rb+zGVGZ7qJ4+TI/DjpvmsHs2Qo/xOn2gy6OVMq
+         XHV6zYVLmwfNA==
+X-Nifty-SrcIP: [209.85.216.43]
+Received: by mail-pj1-f43.google.com with SMTP id w5-20020a17090aaf8500b001d74c754128so8100056pjq.0;
+        Thu, 05 May 2022 06:48:46 -0700 (PDT)
+X-Gm-Message-State: AOAM530jDBej785LKza5OOXLDAIHEYUEibKhvohCa0BSlO9A7bj9tujf
+        bZ7ZLhctlxOU8Kt+gs7pgTjKrVwL4bFsSfnX8/I=
+X-Google-Smtp-Source: ABdhPJzApibcjGgodp1cj6GknF4zl8wLJYozCpjDCgLel5+3apjJYN7oU5/9F2ILR+v/DVL9JLafRpIVkNmZ+N0NzwQ=
+X-Received: by 2002:a17:902:7891:b0:15e:cae9:7620 with SMTP id
+ q17-20020a170902789100b0015ecae97620mr7726753pll.136.1651758526119; Thu, 05
+ May 2022 06:48:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220501084032.1025918-1-masahiroy@kernel.org>
+ <20220501084032.1025918-22-masahiroy@kernel.org> <YnLgo+y5tR86hBL5@bergen.fjasle.eu>
+In-Reply-To: <YnLgo+y5tR86hBL5@bergen.fjasle.eu>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 5 May 2022 22:47:39 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASMNbOVwE7xMX6=R7cQwcoifwcQvfc37_2PyjQC5jFa6w@mail.gmail.com>
+Message-ID: <CAK7LNASMNbOVwE7xMX6=R7cQwcoifwcQvfc37_2PyjQC5jFa6w@mail.gmail.com>
+Subject: Re: [PATCH v2 21/26] genksyms: adjust the output format for .cmd files
+To:     Nicolas Schier <nicolas@fjasle.eu>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When CONFIG_MODVERSIONS=y, the output from genksyms is saved in
-separate *.symversions files, and will be used much later when
-CONFIG_LTO_CLANG=y because it is impossible to update LLVM bit code
-here.
+On Thu, May 5, 2022 at 5:23 AM Nicolas Schier <nicolas@fjasle.eu> wrote:
+>
+> On s=C3=B8. 01. mai 2022 kl. 17.40 Masahiro Yamada wrote:
+> > genksyms output symbol versions in the linker script format.
+>
+> output -> outputs ?
+>
+> > The output format depends on CONFIG_MODULE_REL_CRCS.
+>
+> Looking at the patch itself, I think the sentence above should be
+> inverted, as all rel_crc special handling is removed.  Or did I get it
+> wrong?
 
-This approach is not robust because:
+I admit this commit description is unclear.
 
- - *.symversions may or may not exist. If *.symversions does not
-   exist, we never know if it is missing for legitimate reason
-   (i.e. no EXPORT_SYMBOL) or something bad has happened (for
-   example, the user accidentally deleted it). Once it occurs,
-   it is not self-healing because *.symversions is generated
-   as a side effect.
+In v3, the patch is simpler and the commit message is clearer.
 
- - stale (i.e. invalid) *.symversions might be picked up if an
-   object is generated in a non-ordinary way, and corresponding
-   *.symversions (, which was generated by old builds) just happen
-   to exist.
+Thanks.
 
-A more robust approach is to save symbol versions in *.cmd files
-because:
 
- - *.cmd always exists (if the object is generated by if_changed
-   rule or friends). Even if the user accidentally deletes it,
-   it will be regenerated in the next build.
 
- - *.cmd is always re-generated when the object is updated. This
-   avoid stale version information being picked up.
-
-I will remove *.symversions later.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Tested-by: Nicolas Schier <nicolas@fjasle.eu>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
----
-
-(no changes since v2)
-
-Changes in v2:
-  - Fix CONFIG_MODULE_REL_CRCS=y case
-
- scripts/Makefile.build | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f6a506318795..a1023868775f 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -171,10 +171,17 @@ ifdef CONFIG_MODVERSIONS
- 
- # Generate .o.symversions files for each .o with exported symbols, and link these
- # to the kernel and/or modules at the end.
-+
-+genksyms_format_rel_crc := [^_]*__crc_\([^ ]*\) = \.; LONG(\([^)]*\)).*
-+genksyms_format_normal := __crc_\(.*\) = \(.*\);
-+genksyms_format := $(if $(CONFIG_MODULE_REL_CRCS),$(genksyms_format_rel_crc),$(genksyms_format_normal))
-+
- gen_symversions =								\
- 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
- 		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
- 		    > $@.symversions;						\
-+		sed -n 's/$(genksyms_format)/$(pound)SYMVER \1 \2/p' $@.symversions \
-+			>> $(dot-target).cmd;					\
- 	else									\
- 		rm -f $@.symversions;						\
- 	fi
--- 
-2.32.0
-
+--=20
+Best Regards
+Masahiro Yamada
