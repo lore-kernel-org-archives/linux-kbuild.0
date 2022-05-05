@@ -2,137 +2,118 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8D5C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 06:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57ECEC433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 07:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239792AbiEEHAh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 5 May 2022 03:00:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39438 "EHLO
+        id S241363AbiEEH3z (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 5 May 2022 03:29:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236957AbiEEHAe (ORCPT
+        with ESMTP id S231535AbiEEH3y (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 May 2022 03:00:34 -0400
-Received: from conssluserg-02.nifty.com (conssluserg-02.nifty.com [210.131.2.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198F7377EF;
-        Wed,  4 May 2022 23:56:54 -0700 (PDT)
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 2456uUBv002675;
-        Thu, 5 May 2022 15:56:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 2456uUBv002675
+        Thu, 5 May 2022 03:29:54 -0400
+Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2E221803;
+        Thu,  5 May 2022 00:26:15 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 2457Nenl019426;
+        Thu, 5 May 2022 16:23:43 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2457Nenl019426
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651733791;
-        bh=i8UVQkDD1UoDas2ND/0n+dx2bVcfUGCIy5PTWE5iI2U=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=NtasHN6CYnJgzyHeGmjakUgOvG3aQKwjwNspzBvJfa1nSTNKB4VJeRjgFr0h5iWGJ
-         Ed2Et83jp97YZI9+ZUWaVzBXPPX1vZ//SjsMzPahP6YGDI5Rd6UKLEL/MHair6kyzE
-         HPhD5JAqaR9pf4QesMJeU20UDYZQYyN+9Eq9t/5sTApSPPHiolvlKR3iSxpM9YwyXe
-         2SUg+dGMYYWojipEOySJ7oKWhzNz6zcZYI7ZbcxDIqt71lS+B1o/lBT2V8FMZjjC44
-         pAno5SkQ/NzVS7IwoMVpMOfRvBVdrIQlZgTvw4h4vP7BDlaSmNWsGYuPIPixYu9ei/
-         PJTBm3RAS79dg==
-X-Nifty-SrcIP: [209.85.214.173]
-Received: by mail-pl1-f173.google.com with SMTP id c9so2868684plh.2;
-        Wed, 04 May 2022 23:56:31 -0700 (PDT)
-X-Gm-Message-State: AOAM5311GHW8mMR+MGIR17B/xRk2rCgDmGgXiEvAmLV8Y+9CX++l37uF
-        WTAUnh9wisV+08zzPQpBX0G5goKwElr2M4sYZeo=
-X-Google-Smtp-Source: ABdhPJxsF51fbTyL6C4bazzUfCl2jPYlFrYotwR5hNcMGm8bZWKjxRNEqo5gx4CM+pyfrjnfAbsIB5F+gLE6/gs6RWU=
-X-Received: by 2002:a17:902:9887:b0:151:6e1c:7082 with SMTP id
- s7-20020a170902988700b001516e1c7082mr25314570plp.162.1651733790231; Wed, 04
- May 2022 23:56:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220501084032.1025918-1-masahiroy@kernel.org>
-In-Reply-To: <20220501084032.1025918-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1651735424;
+        bh=BFUO29caSUfobdcXOazaV3japZmLNF4oOw4tiPaDpqU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=2JXJtDn1hClMMIl6bpROdtphb7/17freo+cExsk4J/TqIDUdWrhKpo1o6NUNh/N58
+         FaQ70f+YJJ/kk9WFVGWJQMNfNKKFdcY7vy9JQ/HwvMf+QX4rNCKE/9yjvXt2bJVWD9
+         r0eq6EECwY2wndn8OtvSRs1egxovqi5mhxtmPEH/cPOmeO5GAS0dn0ZWWlg7sRmPrX
+         /KYZPW/9dnYmKW7DZ6CjoCWT7lt/0TjPi8l9YfWL58ZV5uYLpGBHsPfOm3TwxkZyF+
+         ZEuHzSYuVCHMH0vnqyY0K9YjNqU10nv7KZdtgpeGsMJgiYMLtRTDfqWfAtONJsNwrl
+         w3JB3Ca53DTeQ==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 5 May 2022 15:55:23 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQ3JmpfJRU4xJisuZCzpN7OkK078MP5okBT-PD=N1R9jg@mail.gmail.com>
-Message-ID: <CAK7LNAQ3JmpfJRU4xJisuZCzpN7OkK078MP5okBT-PD=N1R9jg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/26] kbuild: yet another series of cleanups (modpost
- and LTO)
-To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nathan Chancellor <nathan@kernel.org>,
+To:     linux-kbuild@vger.kernel.org
+Cc:     clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
+        Nicolas Schier a <nicolas@fjasle.eu>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-um@lists.infradead.org,
+        linux-s390@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        clang-built-linux <llvm@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+        Sami Tolvanen <samitolvanen@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH v3 03/15] modpost: merge add_{intree_flag,retpoline,staging_flag} to add_header
+Date:   Thu,  5 May 2022 16:22:32 +0900
+Message-Id: <20220505072244.1155033-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220505072244.1155033-1-masahiroy@kernel.org>
+References: <20220505072244.1155033-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, May 1, 2022 at 5:42 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
->
-> This is the third batch of cleanups in this development cycle.
->
-> Major changes in v2:
->
->  - V1 did not work with CONFIG_MODULE_REL_CRCS.
->    I fixed this for v2.
->
->  - Reflect some review comments in v1
->
->  - Refactor the code more
->
->  - Avoid too long argument error
->
->
->
-> Masahiro Yamada (26):
->   modpost: use bool type where appropriate
->   modpost: change mod->gpl_compatible to bool type
->   modpost: import include/linux/list.h
->   modpost: traverse modules in order
->   modpost: add sym_add_unresolved() helper
->   modpost: traverse unresolved symbols in order
->   modpost: use doubly linked list for dump_lists
->   modpost: traverse the namespace_list in order
->   modpost: dump Module.symvers in the same order of modules.order
->   modpost: move static EXPORT_SYMBOL check to check_exports()
->   modpost: make multiple export error
->   modpost: make sym_add_exported() always allocate a new symbol
->   modpost: split new_symbol() to symbol allocation and hash table
->     addition
->   modpost: mitigate false-negatives for static EXPORT_SYMBOL checks
->   kbuild: record symbol versions in *.cmd files
->   kbuild: generate a list of objects in vmlinux
->   modpost: extract symbol versions from *.cmd files
->   modpost: generate linker script to collect symbol versions
->   kbuild: embed symbol versions at final link of vmlinux or modules
->   kbuild: stop merging *.symversions
->   genksyms: adjust the output format for .cmd files
->   kbuild: do not create *.prelink.o for Clang LTO or IBT
->   kbuild: make built-in.a rule robust against too long argument error
->   kbuild: make *.mod rule robust against too long argument error
->   modpost: simplify the ->is_static initialization
->   modpost: use hlist for hash table implementation
+add_intree_flag(), add_retpoline(), and add_staging_flag() are small
+enough to be merged into add_header().
 
-Applied 01-13 to linux-kbuild
-with Nick's reviewed-by.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-I will send v3 for the rest.
+Changes in v3:
+  - New patch
 
->  .gitignore                  |   1 +
->  Makefile                    |   1 +
->  scripts/Kbuild.include      |   4 +
->  scripts/Makefile.build      | 118 +++------
->  scripts/Makefile.lib        |   7 -
->  scripts/Makefile.modfinal   |   6 +-
->  scripts/Makefile.modpost    |  10 +-
->  scripts/genksyms/genksyms.c |  17 +-
->  scripts/link-vmlinux.sh     |  34 +--
->  scripts/mod/file2alias.c    |   2 -
->  scripts/mod/list.h          | 265 +++++++++++++++++++
->  scripts/mod/modpost.c       | 501 ++++++++++++++++++++++--------------
->  scripts/mod/modpost.h       |  24 +-
->  scripts/mod/sumversion.c    |   8 +-
->  14 files changed, 650 insertions(+), 348 deletions(-)
->  create mode 100644 scripts/mod/list.h
->
-> --
-> 2.32.0
->
+ scripts/mod/modpost.c | 25 +++++++------------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
 
-
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index ebd80c77fa03..ae8e4a4dcfd2 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2200,25 +2200,17 @@ static void add_header(struct buffer *b, struct module *mod)
+ 			      "#endif\n");
+ 	buf_printf(b, "\t.arch = MODULE_ARCH_INIT,\n");
+ 	buf_printf(b, "};\n");
+-}
+ 
+-static void add_intree_flag(struct buffer *b, int is_intree)
+-{
+-	if (is_intree)
++	if (!external_module)
+ 		buf_printf(b, "\nMODULE_INFO(intree, \"Y\");\n");
+-}
+ 
+-/* Cannot check for assembler */
+-static void add_retpoline(struct buffer *b)
+-{
+-	buf_printf(b, "\n#ifdef CONFIG_RETPOLINE\n");
+-	buf_printf(b, "MODULE_INFO(retpoline, \"Y\");\n");
+-	buf_printf(b, "#endif\n");
+-}
++	buf_printf(b,
++		   "\n"
++		   "#ifdef CONFIG_RETPOLINE\n"
++		   "MODULE_INFO(retpoline, \"Y\");\n"
++		   "#endif\n");
+ 
+-static void add_staging_flag(struct buffer *b, const char *name)
+-{
+-	if (strstarts(name, "drivers/staging"))
++	if (strstarts(mod->name, "drivers/staging"))
+ 		buf_printf(b, "\nMODULE_INFO(staging, \"Y\");\n");
+ }
+ 
+@@ -2544,9 +2536,6 @@ int main(int argc, char **argv)
+ 		check_exports(mod);
+ 
+ 		add_header(&buf, mod);
+-		add_intree_flag(&buf, !external_module);
+-		add_retpoline(&buf);
+-		add_staging_flag(&buf, mod->name);
+ 		add_versions(&buf, mod);
+ 		add_depends(&buf, mod);
+ 		add_moddevtable(&buf, mod);
 -- 
-Best Regards
-Masahiro Yamada
+2.32.0
+
