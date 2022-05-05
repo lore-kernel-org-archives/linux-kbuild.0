@@ -2,34 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BC8C433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 07:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59732C433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu,  5 May 2022 07:26:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344033AbiEEHaN (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 5 May 2022 03:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36180 "EHLO
+        id S240017AbiEEHaS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 5 May 2022 03:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344065AbiEEHaL (ORCPT
+        with ESMTP id S1343943AbiEEHaI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 May 2022 03:30:11 -0400
+        Thu, 5 May 2022 03:30:08 -0400
 Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2674847AE1;
-        Thu,  5 May 2022 00:26:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6D846146;
+        Thu,  5 May 2022 00:26:24 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 2457Nens019426;
-        Thu, 5 May 2022 16:23:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2457Nens019426
+        by conuserg-12.nifty.com with ESMTP id 2457Nenu019426;
+        Thu, 5 May 2022 16:23:54 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 2457Nenu019426
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651735433;
-        bh=XjVFBOl1B/4tI+LO5abcsoDvV/xc8vPdA32BcnzLDtI=;
+        s=dec2015msa; t=1651735435;
+        bh=CQEwGlTyJHJvfSf0T31INOBqtnHuEcYXjFZZEa+K6Lg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FuOivWkXLFBO79zThz1AyrMc1rrNFxbTQheE0PfMbKnd0CiVRmb8H6EJ7y64Xfy9W
-         p61wWdzZsY8kP+28V0RqRhiSpOt+9xVWyp8sB45Vbwpse8rAAwUM419qpnaDdJjgPE
-         XL+N+AWMJ3N5N1UpUtxT8osKrUtURA5/INQIHhfqhj6SXmdwnf1B21n8AGnGolhUGK
-         fh9yI8kG5qHT5PnTEJXbWyqVvvu7USPdLVo3oiFql696uGICtEB/fQpWnloZmyLE5j
-         pcKdKqKfUUYgSjC9Nn8blZHedemhjilyxwtC07iu4s9lXBcAWtNwnmV5ISctWy6eeh
-         rj+sXEOluxtPg==
+        b=Ghx0K94J/DL64wDGih7KSnS/4k03Qt4Kbxin/Vl55xhF9KLMNF5bx8nBvKcSP36Dn
+         eoPEefSJUjqOAF87Fxw85pdJTrQO8gS4wdTR62AJg2BfxctFyX2s36HrMenLo4Rhms
+         NI9dtfYloIa2j06X9VBQw9phyaczgOPoDkt+++60haCrD0WoHHHkztEUZTl0LnD8u1
+         6OkVIDm8awnVEZ3ADerVv9w4gQOQCGsZ11ZwH9kgX1h9EmuTdfNDE0JEch/yaTKEXe
+         hnJyW7ZerFxMvI4N0HGzrEnWfS6nEmT8RdTPAI79pqhZClIlq+8OGJfj15yXU+KFKE
+         3n9iE4NPCuAMA==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -44,9 +43,9 @@ Cc:     clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
         Sami Tolvanen <samitolvanen@google.com>,
         Kees Cook <keescook@chromium.org>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v3 10/15] genksyms: adjust the output format to modpost
-Date:   Thu,  5 May 2022 16:22:39 +0900
-Message-Id: <20220505072244.1155033-11-masahiroy@kernel.org>
+Subject: [PATCH v3 12/15] modpost: simplify the ->is_static initialization
+Date:   Thu,  5 May 2022 16:22:41 +0900
+Message-Id: <20220505072244.1155033-13-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220505072244.1155033-1-masahiroy@kernel.org>
 References: <20220505072244.1155033-1-masahiroy@kernel.org>
@@ -56,13 +55,10 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Make genksyms output symbol versions in the format modpost expects,
-so the 'sed' is unneeded.
+->is_static is set to true at allocation, then to false if the symbol
+comes from the dump file.
 
-This commit makes *.symversions completely unneeded.
-
-I will keep *.symversions in .gitignore and 'make clean' for a while.
-Otherwise, some people might be upset with 'git status'.
+It is simpler to use !mod->from_dump as the init value.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
@@ -72,45 +68,38 @@ Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Changes in v2:
   - New patch
 
- scripts/Makefile.build      | 6 ------
- scripts/genksyms/genksyms.c | 3 +--
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index dff9220135c4..461998a2ad2b 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -165,16 +165,10 @@ ifdef CONFIG_MODVERSIONS
- # o modpost will extract versions from that file and create *.c files that will
- #   be compiled and linked to the kernel and/or modules.
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index e07542a90fc6..4edd5b223f49 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -242,7 +242,7 @@ static struct symbol *alloc_symbol(const char *name)
  
--genksyms_format := __crc_\(.*\) = \(.*\);
--
- gen_symversions =								\
- 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
- 		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
--		    > $@.symversions;						\
--		sed -n 's/$(genksyms_format)/$(pound)SYMVER \1 \2/p' $@.symversions \
- 			>> $(dot-target).cmd;					\
--	else									\
--		rm -f $@.symversions;						\
- 	fi
- 
- cmd_gen_symversions_c =	$(call gen_symversions,c)
-diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
-index 6e6933ae7911..f5dfdb9d80e9 100644
---- a/scripts/genksyms/genksyms.c
-+++ b/scripts/genksyms/genksyms.c
-@@ -680,8 +680,7 @@ void export_symbol(const char *name)
- 		if (flag_dump_defs)
- 			fputs(">\n", debugfile);
- 
--		/* Used as a linker script. */
--		printf("__crc_%s = 0x%08lx;\n", name, crc);
-+		printf("#SYMVER %s 0x%08lx\n", name, crc);
- 	}
+ 	memset(s, 0, sizeof(*s));
+ 	strcpy(s->name, name);
+-	s->is_static = true;
++
+ 	return s;
  }
  
+@@ -376,6 +376,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
+ 
+ 	s = alloc_symbol(name);
+ 	s->module = mod;
++	s->is_static = !mod->from_dump;
+ 	s->is_gpl_only = gpl_only;
+ 	list_add_tail(&s->list, &mod->exported_symbols);
+ 	hash_add_symbol(s);
+@@ -2523,7 +2524,6 @@ static void read_dump(const char *fname)
+ 			mod->from_dump = true;
+ 		}
+ 		s = sym_add_exported(symname, mod, gpl_only);
+-		s->is_static = false;
+ 		sym_set_crc(s, crc);
+ 		sym_update_namespace(symname, namespace);
+ 	}
 -- 
 2.32.0
 
