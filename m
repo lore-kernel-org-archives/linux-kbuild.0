@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93289C4321E
-	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF1DC35278
+	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:18:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbiEHTVt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 8 May 2022 15:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39630 "EHLO
+        id S229824AbiEHTVu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 8 May 2022 15:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231591AbiEHTTD (ORCPT
+        with ESMTP id S231274AbiEHTPy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 May 2022 15:19:03 -0400
+        Sun, 8 May 2022 15:15:54 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7AC13D35;
-        Sun,  8 May 2022 12:11:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51DE317;
+        Sun,  8 May 2022 12:11:12 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 248J8qSa030019;
-        Mon, 9 May 2022 04:09:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSa030019
+        by conuserg-09.nifty.com with ESMTP id 248J8qSR030019;
+        Mon, 9 May 2022 04:08:57 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSR030019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1652036947;
-        bh=DmsBv1fv38LgYT/uFaEQzmELMmHgADfzOYYANxRYdz0=;
+        s=dec2015msa; t=1652036938;
+        bh=fTWufSGLPIAfiy+llcmQSSOszMnmVGeqEYG5OUh4Gao=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d+jmdaodPAH6CmaNeK0RdEg6nzZHEGEzI19JHUF480ZBoKCzpRQ2pOLBlBTlGArTh
-         fOVXn36FQYvOErvSSxVeIh2A051mxr0Q22rNZdJ7VKr5Jbsl/QPCJ8aD1xuCvR3B1q
-         8q7xdFc11cDI7Gu8EiOTTWVMcC+gyyqUc/5oc/Cw3/Fp4NVXHIjnh2jBunfrCUH5PV
-         mx+yQM8GqYz1qWV1vjItQ+FqBwKoeYQ6yNA3AFIDlBoC82gmSPOC4VQijn1YubUDjO
-         uyJgBaN+A6GxBNFsqo2tdF+GM+5LyZA9xga4fDTIMvZma9LUozQ0mSDnFXKbfnppXN
-         EskpKTwwlS30Q==
+        b=IxQXJhKDS8X8Fsd44zY4pkmn3cOxr3A9N3bFK6Y49wQNuLZ+9WS7ZDQ/g+hNUo9kh
+         BfYIrtdQIkpIfoQ1HXXT4fiR0FJ+hAyWHaNHjV6Leqy0NkCt24bhs6VazRcz8MCBT8
+         ucy5n8tNqoIAPkAz1oN/vyb16Cfod/A1SkZyA2wLpEZz2HN1O4/wFs4k5EtWUXjNLz
+         oHT0+VsMvpoQqx+ipAVBqCt2M/9YJagiYqzBEgBU1YR6P6MD7P0UExrDvJwDfNujrN
+         W5DnekjBkKRUHoj4pPTA6E26syJUR4JOonvqa3MUDfu+kMuwpENMqYwXhknnf51Ygz
+         oEUCfzjIkzsNw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,11 +41,10 @@ Cc:     linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, clang-built-linux@googlegroups.com,
         Ard Biesheuvel <ardb@kernel.org>,
         Sami Tolvanen <samitolvanen@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 13/14] kbuild: add cmd_and_savecmd macro
-Date:   Mon,  9 May 2022 04:06:30 +0900
-Message-Id: <20220508190631.2386038-14-masahiroy@kernel.org>
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH v4 04/14] modpost: add sym_find_with_module() helper
+Date:   Mon,  9 May 2022 04:06:21 +0900
+Message-Id: <20220508190631.2386038-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220508190631.2386038-1-masahiroy@kernel.org>
 References: <20220508190631.2386038-1-masahiroy@kernel.org>
@@ -55,46 +54,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Separate out the command execution part of if_changed, as we did
-for if_changed_dep.
+find_symbol() returns the first symbol found in the hash table. This
+table is global, so it may return a symbol from an unexpected module.
 
-This allows us to reuse it in if_changed_rule.
+There is a case where we want to search for a symbol with a given name
+in a specified module.
 
-  define rule_foo
-          $(call cmd_and_savecmd,foo)
-          $(call cmd,bar)
-  endef
+Add sym_find_with_module(), which receives the module pointer as the
+second argument. It is equivalent to find_module() if NULL is passed
+as the module pointer.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
 ---
 
 Changes in v4:
-  - New.
-    Resent of my previous submission.
-    https://lore.kernel.org/all/20210831074004.3195284-10-masahiroy@kernel.org/
+  - Only takes the new helper from
+    https://patchwork.kernel.org/project/linux-kbuild/patch/20220505072244.1155033-2-masahiroy@kernel.org/
 
- scripts/Kbuild.include | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Changes in v2:
+  - Rename the new func to sym_find_with_module()
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 455a0a6ce12d..ece44b735061 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -142,9 +142,11 @@ check-FORCE = $(if $(filter FORCE, $^),,$(warning FORCE prerequisite is missing)
- if-changed-cond = $(newer-prereqs)$(cmd-check)$(check-FORCE)
+ scripts/mod/modpost.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index e7e2c70a98f5..fc5db1f73cf1 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -266,7 +266,7 @@ static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
+ 	list_add_tail(&sym->list, &mod->unresolved_symbols);
+ }
  
- # Execute command if command has changed or prerequisite(s) are updated.
--if_changed = $(if $(if-changed-cond),                                        \
-+if_changed = $(if $(if-changed-cond),$(cmd_and_savecmd),@:)
+-static struct symbol *find_symbol(const char *name)
++static struct symbol *sym_find_with_module(const char *name, struct module *mod)
+ {
+ 	struct symbol *s;
+ 
+@@ -275,12 +275,17 @@ static struct symbol *find_symbol(const char *name)
+ 		name++;
+ 
+ 	for (s = symbolhash[tdb_hash(name) % SYMBOL_HASH_SIZE]; s; s = s->next) {
+-		if (strcmp(s->name, name) == 0)
++		if (strcmp(s->name, name) == 0 && (!mod || s->module == mod))
+ 			return s;
+ 	}
+ 	return NULL;
+ }
+ 
++static struct symbol *find_symbol(const char *name)
++{
++	return sym_find_with_module(name, NULL);
++}
 +
-+cmd_and_savecmd =                                                            \
- 	$(cmd);                                                              \
--	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
-+	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
- 
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
+ struct namespace_list {
+ 	struct list_head list;
+ 	char namespace[];
 -- 
 2.32.0
 
