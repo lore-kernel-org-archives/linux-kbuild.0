@@ -2,79 +2,99 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A8F0C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93289C4321E
+	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:18:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiEHTVn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 8 May 2022 15:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42914 "EHLO
+        id S229808AbiEHTVt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 8 May 2022 15:21:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237344AbiEHSKH (ORCPT
+        with ESMTP id S231591AbiEHTTD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 May 2022 14:10:07 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1987663B4;
-        Sun,  8 May 2022 11:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dXIZlnwHK15rrJZENweUDVLbVsO7X3h09BOXkfnZAVs=; b=BeB2FaaWyCXFJfYPOVlGrRxyyh
-        JkDouCOTyf7MkyluZIxxnUmR87Z/DW0C77jKJIqfoUoI4nPE1ilfTi9PvRLwTXhJhdLROFvWDHHMp
-        000VX4SrbogSTZvQ4ISTjHh4zNfXVtbK/k9ItAde5GaNKad/et01ucOFYnGCdxFOMk8ivYtMYUiOa
-        LxiuMlpYfAy3bAi35IgiKblbkjCiRIRjJVG9azAjXg28jNJSRdKKWlpLRQquoU1LzZCBVcNqNjl2k
-        T6r3MF4ww2+rXqRroJFYp5Aw18fci0MKTzKr92fIKjYfvoNR8En2Q9Oq1MQTSBonEX0blOhFfkm3u
-        xJL5hOLA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nnlIH-002hid-TS; Sun, 08 May 2022 18:06:09 +0000
-Date:   Sun, 8 May 2022 19:06:09 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Miguel Ojeda <ojeda@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        kunit-dev@googlegroups.com, linux-arm-kernel@lists.infradead.org,
-        linux-doc@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, live-patching@vger.kernel.org
-Subject: Re: [PATCH v6 00/23] Rust support
-Message-ID: <YngGkZTy+byxnD5n@casper.infradead.org>
-References: <20220507052451.12890-1-ojeda@kernel.org>
- <202205070056.ACC3C3D@keescook>
+        Sun, 8 May 2022 15:19:03 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7AC13D35;
+        Sun,  8 May 2022 12:11:42 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 248J8qSa030019;
+        Mon, 9 May 2022 04:09:07 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSa030019
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1652036947;
+        bh=DmsBv1fv38LgYT/uFaEQzmELMmHgADfzOYYANxRYdz0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=d+jmdaodPAH6CmaNeK0RdEg6nzZHEGEzI19JHUF480ZBoKCzpRQ2pOLBlBTlGArTh
+         fOVXn36FQYvOErvSSxVeIh2A051mxr0Q22rNZdJ7VKr5Jbsl/QPCJ8aD1xuCvR3B1q
+         8q7xdFc11cDI7Gu8EiOTTWVMcC+gyyqUc/5oc/Cw3/Fp4NVXHIjnh2jBunfrCUH5PV
+         mx+yQM8GqYz1qWV1vjItQ+FqBwKoeYQ6yNA3AFIDlBoC82gmSPOC4VQijn1YubUDjO
+         uyJgBaN+A6GxBNFsqo2tdF+GM+5LyZA9xga4fDTIMvZma9LUozQ0mSDnFXKbfnppXN
+         EskpKTwwlS30Q==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-modules@vger.kernel.org, linux-s390@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, clang-built-linux@googlegroups.com,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH v4 13/14] kbuild: add cmd_and_savecmd macro
+Date:   Mon,  9 May 2022 04:06:30 +0900
+Message-Id: <20220508190631.2386038-14-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220508190631.2386038-1-masahiroy@kernel.org>
+References: <20220508190631.2386038-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202205070056.ACC3C3D@keescook>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, May 07, 2022 at 01:06:18AM -0700, Kees Cook wrote:
-> On Sat, May 07, 2022 at 07:23:58AM +0200, Miguel Ojeda wrote:
-> > ## Patch series status
-> > 
-> > The Rust support is still to be considered experimental. However,
-> > support is good enough that kernel developers can start working on the
-> > Rust abstractions for subsystems and write drivers and other modules.
-> 
-> I'd really like to see this landed for a few reasons:
-> 
-> - It's under active development, and I'd rather review the changes
->   "normally", incrementally, etc. Right now it can be hard to re-review
->   some of the "mostly the same each version" patches in the series.
-> 
-> - I'd like to break the catch-22 of "ask for a new driver to be
->   written in rust but the rust support isn't landed" vs "the rust
->   support isn't landed because there aren't enough drivers". It
->   really feels like "release early, release often" is needed here;
->   it's hard to develop against -next. :)
-> 
-> Should we give it a try for this coming merge window?
+Separate out the command execution part of if_changed, as we did
+for if_changed_dep.
 
-I'm broadly in favour of that.  It's just code, we can always drop it
-again or fix it.  There's sufficient development community around it
-that it's hardly going to become abandonware.
+This allows us to reuse it in if_changed_rule.
+
+  define rule_foo
+          $(call cmd_and_savecmd,foo)
+          $(call cmd,bar)
+  endef
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+---
+
+Changes in v4:
+  - New.
+    Resent of my previous submission.
+    https://lore.kernel.org/all/20210831074004.3195284-10-masahiroy@kernel.org/
+
+ scripts/Kbuild.include | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 455a0a6ce12d..ece44b735061 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -142,9 +142,11 @@ check-FORCE = $(if $(filter FORCE, $^),,$(warning FORCE prerequisite is missing)
+ if-changed-cond = $(newer-prereqs)$(cmd-check)$(check-FORCE)
+ 
+ # Execute command if command has changed or prerequisite(s) are updated.
+-if_changed = $(if $(if-changed-cond),                                        \
++if_changed = $(if $(if-changed-cond),$(cmd_and_savecmd),@:)
++
++cmd_and_savecmd =                                                            \
+ 	$(cmd);                                                              \
+-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
++	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+ 
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
+-- 
+2.32.0
 
