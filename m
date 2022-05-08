@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF1DC35278
-	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F297EC41535
+	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiEHTVu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        id S229866AbiEHTVu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
         Sun, 8 May 2022 15:21:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39156 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231274AbiEHTPy (ORCPT
+        with ESMTP id S231652AbiEHTTF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 8 May 2022 15:15:54 -0400
+        Sun, 8 May 2022 15:19:05 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51DE317;
-        Sun,  8 May 2022 12:11:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A2A12637;
+        Sun,  8 May 2022 12:11:46 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 248J8qSR030019;
-        Mon, 9 May 2022 04:08:57 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSR030019
+        by conuserg-09.nifty.com with ESMTP id 248J8qSb030019;
+        Mon, 9 May 2022 04:09:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSb030019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1652036938;
-        bh=fTWufSGLPIAfiy+llcmQSSOszMnmVGeqEYG5OUh4Gao=;
+        s=dec2015msa; t=1652036949;
+        bh=kEJzb0HV+D+/XrwgoxTro+DuX7He9WiLcsjIpQbmj1I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IxQXJhKDS8X8Fsd44zY4pkmn3cOxr3A9N3bFK6Y49wQNuLZ+9WS7ZDQ/g+hNUo9kh
-         BfYIrtdQIkpIfoQ1HXXT4fiR0FJ+hAyWHaNHjV6Leqy0NkCt24bhs6VazRcz8MCBT8
-         ucy5n8tNqoIAPkAz1oN/vyb16Cfod/A1SkZyA2wLpEZz2HN1O4/wFs4k5EtWUXjNLz
-         oHT0+VsMvpoQqx+ipAVBqCt2M/9YJagiYqzBEgBU1YR6P6MD7P0UExrDvJwDfNujrN
-         W5DnekjBkKRUHoj4pPTA6E26syJUR4JOonvqa3MUDfu+kMuwpENMqYwXhknnf51Ygz
-         oEUCfzjIkzsNw==
+        b=qukJg56KBZ9tZ03DmIaB9J1P4O7T2033NPHrrIrxUDw+CxtspATGP01RIt7e5lRW7
+         Z8d0neV5tpH0H3TYmv0hMpJxAL9VAxXFzSQF/5g3A1IjTi29mpDwgfF06WWsZSX5Im
+         yDb1xo+Xai3ITqVXuc0tRlGv9PFYYTlh16npzqtGNUCBMoVpF4TzSRhmI053U+0Kmw
+         wyggrDnu5+Ia8Gr8loCssyY4pFSbbT80GGZPVSnGJforCXrcRDvyitQ5GwCx0KhjaM
+         DL7xFka0yMQBpnZa4OptbEq1Zpd1lu0vQNHcLPJIofLQeG1/BA9PY8WRI6Vdl4WfIv
+         mbiloPzfyyMUQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,10 +41,12 @@ Cc:     linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, clang-built-linux@googlegroups.com,
         Ard Biesheuvel <ardb@kernel.org>,
         Sami Tolvanen <samitolvanen@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v4 04/14] modpost: add sym_find_with_module() helper
-Date:   Mon,  9 May 2022 04:06:21 +0900
-Message-Id: <20220508190631.2386038-5-masahiroy@kernel.org>
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: [PATCH v4 14/14] kbuild: rebuild multi-object modules when objtool is updated
+Date:   Mon,  9 May 2022 04:06:31 +0900
+Message-Id: <20220508190631.2386038-15-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220508190631.2386038-1-masahiroy@kernel.org>
 References: <20220508190631.2386038-1-masahiroy@kernel.org>
@@ -54,63 +56,51 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-find_symbol() returns the first symbol found in the hash table. This
-table is global, so it may return a symbol from an unexpected module.
+When CONFIG_LTO_CLANG or CONFIG_X86_KERNEL_IBT is enabled, objtool for
+multi-object modules is postponed until the objects are linked together.
 
-There is a case where we want to search for a symbol with a given name
-in a specified module.
-
-Add sym_find_with_module(), which receives the module pointer as the
-second argument. It is equivalent to find_module() if NULL is passed
-as the module pointer.
+Make sure to re-run objtool and re-link multi-object modules when
+objtool is updated.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
 
 Changes in v4:
-  - Only takes the new helper from
-    https://patchwork.kernel.org/project/linux-kbuild/patch/20220505072244.1155033-2-masahiroy@kernel.org/
+  - New
+    Resent of my previous submission
+    https://lore.kernel.org/linux-kbuild/20210831074004.3195284-11-masahiroy@kernel.org/
 
-Changes in v2:
-  - Rename the new func to sym_find_with_module()
+ scripts/Makefile.build | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
- scripts/mod/modpost.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index e7e2c70a98f5..fc5db1f73cf1 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -266,7 +266,7 @@ static void sym_add_unresolved(const char *name, struct module *mod, bool weak)
- 	list_add_tail(&sym->list, &mod->unresolved_symbols);
- }
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index f546b5f1f33f..4e6902e099e8 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -404,13 +404,18 @@ $(obj)/modules.order: $(obj-m) FORCE
+ $(obj)/lib.a: $(lib-y) FORCE
+ 	$(call if_changed,ar)
  
--static struct symbol *find_symbol(const char *name)
-+static struct symbol *sym_find_with_module(const char *name, struct module *mod)
- {
- 	struct symbol *s;
- 
-@@ -275,12 +275,17 @@ static struct symbol *find_symbol(const char *name)
- 		name++;
- 
- 	for (s = symbolhash[tdb_hash(name) % SYMBOL_HASH_SIZE]; s; s = s->next) {
--		if (strcmp(s->name, name) == 0)
-+		if (strcmp(s->name, name) == 0 && (!mod || s->module == mod))
- 			return s;
- 	}
- 	return NULL;
- }
- 
-+static struct symbol *find_symbol(const char *name)
-+{
-+	return sym_find_with_module(name, NULL);
-+}
+-quiet_cmd_link_multi-m = LD [M]  $@
+-      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
++quiet_cmd_ld_multi_m = LD [M]  $@
++      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
 +
- struct namespace_list {
- 	struct list_head list;
- 	char namespace[];
++define rule_ld_multi_m
++	$(call cmd_and_savecmd,ld_multi_m)
++	$(call cmd,gen_objtooldep)
++endef
+ 
+ $(multi-obj-m): objtool-enabled := $(delay-objtool)
+ $(multi-obj-m): part-of-module := y
+ $(multi-obj-m): %.o: %.mod FORCE
+-	$(call if_changed,link_multi-m)
++	$(call if_changed_rule,ld_multi_m)
+ $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
+ 
+ targets := $(filter-out $(PHONY), $(targets))
 -- 
 2.32.0
 
