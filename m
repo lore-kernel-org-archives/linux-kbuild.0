@@ -2,100 +2,114 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66750C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sat,  7 May 2022 18:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2962CC4707F
+	for <linux-kbuild@archiver.kernel.org>; Sun,  8 May 2022 19:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386815AbiEGS2P (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 7 May 2022 14:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57366 "EHLO
+        id S233255AbiEHTUs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 8 May 2022 15:20:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230521AbiEGS2N (ORCPT
+        with ESMTP id S230262AbiEHTRr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 7 May 2022 14:28:13 -0400
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AADA2ED4B;
-        Sat,  7 May 2022 11:24:24 -0700 (PDT)
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 247IO9iw016056;
-        Sun, 8 May 2022 03:24:10 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 247IO9iw016056
+        Sun, 8 May 2022 15:17:47 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504EB12AFC;
+        Sun,  8 May 2022 12:11:22 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 248J8qSY030019;
+        Mon, 9 May 2022 04:09:04 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 248J8qSY030019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651947850;
-        bh=FgFRLqLdXmAZ2tSGrmOiHUMK4HAjJDfS1aPhPW9riYY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=XlpjzxAbJLOnkSQh/tb0HOtQOPqtdUtV2YDYO/tUcyz2STeGVfG5nojpk6VN7J2eT
-         fD1Yt46NEz5myD5TfnQkXI95VR8jc6nWlbd0FhfMCuSWPfod+Oc/jZO16GPgOvrGhT
-         QQ06Vd7HYiH86/xDly88317QS4jz9XLDn8LtT49bocZwn4QkuiamBwF4ciCanVy6gt
-         oBBsoFPZjDdyS1veUL1z6DowaObGYfFkuK6PI1KpIVOY0fH5XWG9oaz8kwVOrY0P7O
-         0ZmuPURd6hFar5iDI7bRVKY7j8nLRNMp9vPA0TRvkImDqTEFARNelmF49xgH0EmeYV
-         7tVpkySWBhXqA==
-X-Nifty-SrcIP: [209.85.216.54]
-Received: by mail-pj1-f54.google.com with SMTP id t11-20020a17090ad50b00b001d95bf21996so13603710pju.2;
-        Sat, 07 May 2022 11:24:10 -0700 (PDT)
-X-Gm-Message-State: AOAM531VJRcJNCOwsnAgMTwiNR/TUHsMC5xvzoSFNkNcSQxRcePXqk1q
-        aHAIAwb96CLCmPqBSPnWLdqbNd8M3rAUDnvVY+g=
-X-Google-Smtp-Source: ABdhPJzr1Ju2XywINvVYIHvo5aTElU5pR5XHYCWjGcwWneDFCojBCAxoXjaxsHfVPQgmUPjYEIvdGcqBjqlJ6kwaFKA=
-X-Received: by 2002:a17:903:1205:b0:15e:8cbc:fd2b with SMTP id
- l5-20020a170903120500b0015e8cbcfd2bmr9224506plh.99.1651947849326; Sat, 07 May
- 2022 11:24:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220504212714.152837-1-arbab@linux.ibm.com>
-In-Reply-To: <20220504212714.152837-1-arbab@linux.ibm.com>
+        s=dec2015msa; t=1652036945;
+        bh=tcr+72ZYpbdDhhd7b5O3qNkSWb92WQKtLNqtDxevyAs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ZpgxZTqZ2iu1LdA2g0S5JuNwurT0/yzlSN3HqWxP8xRpWBBRGJ9qLRy8FFFfphmw1
+         DTzSxmkNZri7Ulg9bko1nDt1WH7PUyFLGRMN4axpGr+pjpl/0u79qrscDU7fvAKdki
+         5mvme2nhZq5J/45SFhvMYxL8AGUgWGRucB57+Pq2mInVzkdXh8zs5m0XumLFzFsqfl
+         s89GMqFMy2/hikiBt4U17i/XqCY96TPSt5CgiTU4ljC/VtfCKLhmfWUiRwaYJJWZds
+         4V0BRaPasqlm/ggMDv3LbkVmoTKJ1/0woBqcQPr4h+9YFdLyzf9pPLcB5twdmwA9i3
+         BFM4D5Xff24IA==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 8 May 2022 03:23:00 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATOSOy=FgmTqH-ymt34T7+iE93Uu4DTzHjH6m90E83Vng@mail.gmail.com>
-Message-ID: <CAK7LNATOSOy=FgmTqH-ymt34T7+iE93Uu4DTzHjH6m90E83Vng@mail.gmail.com>
-Subject: Re: [PATCH] scripts/prune-kernel: Use kernel-install if available
-To:     Reza Arbab <arbab@linux.ibm.com>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-modules@vger.kernel.org, linux-s390@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, clang-built-linux@googlegroups.com,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH v4 11/14] kbuild: make built-in.a rule robust against too long argument error
+Date:   Mon,  9 May 2022 04:06:28 +0900
+Message-Id: <20220508190631.2386038-12-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220508190631.2386038-1-masahiroy@kernel.org>
+References: <20220508190631.2386038-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, May 5, 2022 at 6:27 AM Reza Arbab <arbab@linux.ibm.com> wrote:
->
-> If the new-kernel-pkg utility isn't present, try using kernel-install.
-> This is what the %preun scriptlet in scripts/package/mkspec does too.
->
-> Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
-> ---
-> Hope I've sent this to the right people. get_maintainer.pl came up
-> blank, but kbuild seems like the nearest match in MAINTAINERS.
->
+Kbuild runs at the top of objtree instead of changing the working
+directory to subdirectories. I think this design is nice overall but
+some commands have a scalability issue.
 
-Applied to linux-kbuild. Thanks.
+The build command of built-in.a is one of them whose length scales with:
 
+    O(D * N)
 
->  scripts/prune-kernel | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/prune-kernel b/scripts/prune-kernel
-> index e8aa940bc0a9..dadfd0e47f89 100755
-> --- a/scripts/prune-kernel
-> +++ b/scripts/prune-kernel
-> @@ -16,6 +16,10 @@ do
->                  rm -f "/boot/initramfs-$f.img" "/boot/System.map-$f"
->                  rm -f "/boot/vmlinuz-$f"   "/boot/config-$f"
->                  rm -rf "/lib/modules/$f"
-> -                new-kernel-pkg --remove $f
-> +                if [ -x "$(command -v new-kernel-pkg)" ]; then
-> +                        new-kernel-pkg --remove $f
-> +                elif [ -x "$(command -v kernel-install)" ]; then
-> +                        kernel-install remove $f
-> +                fi
->          fi
->  done
-> --
-> 2.27.0
->
+Here, D is the length of the directory path (i.e. $(obj)/ prefix),
+N is the number of objects in the Makefile, O() is the big O notation.
 
+The deeper directory the Makefile directory is located, the more easily
+it will hit the too long argument error.
 
+We can make it better. Trim the $(obj)/ by Make's builtin function, and
+restore it by a shell command (sed).
+
+With this, the command length scales with:
+
+    O(D + N)
+
+In-tree modules still have some room to the limit (ARG_MAX=2097152),
+but this is more future-proof for big modules in a deep directory.
+
+For example, you can build i915 as builtin (CONFIG_DRM_I915=y) and
+compare drivers/gpu/drm/i915/.built-in.a.cmd with/without this commit.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+---
+
+(no changes since v2)
+
+Changes in v2:
+  - New patch
+
+ scripts/Makefile.build | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index c2a173b3fd60..8f1a355df7aa 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -374,7 +374,10 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ #
+ 
+ quiet_cmd_ar_builtin = AR      $@
+-      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
++      cmd_ar_builtin = rm -f $@; \
++		echo $(patsubst $(obj)/%,%,$(real-prereqs)) | \
++		sed -E 's:([^ ]+):$(obj)/\1:g' | \
++		xargs $(AR) cDPrST $@
+ 
+ $(obj)/built-in.a: $(real-obj-y) FORCE
+ 	$(call if_changed,ar_builtin)
 -- 
-Best Regards
-Masahiro Yamada
+2.32.0
+
