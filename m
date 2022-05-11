@@ -2,132 +2,113 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DE9C433EF
-	for <linux-kbuild@archiver.kernel.org>; Wed, 11 May 2022 13:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A51AC433FE
+	for <linux-kbuild@archiver.kernel.org>; Wed, 11 May 2022 16:49:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244118AbiEKNuG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 11 May 2022 09:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45924 "EHLO
+        id S238719AbiEKQtn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 11 May 2022 12:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244138AbiEKNuF (ORCPT
+        with ESMTP id S235800AbiEKQtm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 May 2022 09:50:05 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A2B6239782;
-        Wed, 11 May 2022 06:50:03 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id s23so2072854iog.13;
-        Wed, 11 May 2022 06:50:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PPfAjhXsI/sCAXElGiIAWLNhfWDNEi+ZtaHTtSxHBEQ=;
-        b=aGnZg3AT2GqkRlrytHTaN/NZj7se3UweBltQbTucUz8qfefhYRjX8D58C1r2q954R4
-         6DJFBBvHMc/JilfjHyQ5aqY01UN/ab0jVIyzAY5dvdvZIeqaRUit6kQHk967vXUAo93I
-         pB8FjpEP39N8d0YPKBUtmkAzGQERpADWAWEHzgZkXpmv8coKTSst29t7IYGwSgZONziv
-         oI4+fIjhM3bVr2+UA+VQvZRxk3miTrNxlZjLwaex+qmsOl01vetgxC5dI5YMOWpvQjc3
-         XxgpabVXskv3rcn9yXJv3653A48xMi9ZFSBhEqXtI3PP5+XcVG1qaW97tIAzZBRusZCS
-         SidQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PPfAjhXsI/sCAXElGiIAWLNhfWDNEi+ZtaHTtSxHBEQ=;
-        b=Nb95y87xAS8rQvsrczlKK9ref94YMGImjeT860oZAusxTWJZCeC/7LKrvIBdnRAgku
-         +OBgPVBg8X189lH5+5WI1cKzBXyE+TBQPAoUOhCDSXsQmNcCs9zf7tIJe/5mORktkyVy
-         9ZDSIEgk5bqc7XZVIrl7bK151Wvq5L0h+98iMgpZ9uBaltOKmZYvlHenrH048G0193TM
-         qK9r4QsWMcjLxLcHQjA/SCxvNuLzScZFO1IkEQ+NCCqzuHXt2J1w6K/Cy+mSoroajxWm
-         QqWsgVzmAulJ73LVaH8X2ow6QgVi0VxzJr3doOEfE+k7pX4Z+e3svLSAOhAAABcMmuaV
-         97DA==
-X-Gm-Message-State: AOAM5302gSaDbJjhrWq6yyXyegCrGL26Wa3fQxMRaJ6n/sWw05ltk8w3
-        1zL5kd3TsWfGU0aTrFBe1M3c5JdzwmSEicY6Fio=
-X-Google-Smtp-Source: ABdhPJzjJIGp9s2bo97C4Z9816iV19iujbsRA1+GTtjaKDQ3YsQlDo9tdjEGYQ/NX+clvDAPgUUNuHpBQl2DPlIGM9A=
-X-Received: by 2002:a02:8624:0:b0:32b:397d:eeb1 with SMTP id
- e33-20020a028624000000b0032b397deeb1mr12780202jai.264.1652277001693; Wed, 11
- May 2022 06:50:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220507052451.12890-1-ojeda@kernel.org> <20220507052451.12890-19-ojeda@kernel.org>
- <875ymecp6f.fsf@meer.lwn.net>
-In-Reply-To: <875ymecp6f.fsf@meer.lwn.net>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Wed, 11 May 2022 15:49:50 +0200
-Message-ID: <CANiq72mpYjdhq6yZFBmy8zEo7Cjhh-WjOFc4TfKMZh+w4Fu5WA@mail.gmail.com>
-Subject: Re: [PATCH v6 18/23] docs: add Rust documentation
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     Miguel Ojeda <ojeda@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rust-for-linux <rust-for-linux@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Finn Behrens <me@kloenk.de>,
-        Adam Bratschi-Kaye <ark.email@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sven Van Asbroeck <thesven73@gmail.com>,
-        Wu XiangCheng <bobwxc@email.cn>, Gary Guo <gary@garyguo.net>,
-        Boris-Chengbiao Zhou <bobo1239@web.de>,
-        Yuki Okushi <jtitor@2k36.org>, Wei Liu <wei.liu@kernel.org>,
-        Daniel Xu <dxu@dxuuu.xyz>, Julian Merkle <me@jvmerkle.de>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
+        Wed, 11 May 2022 12:49:42 -0400
+Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3E995DDB;
+        Wed, 11 May 2022 09:49:41 -0700 (PDT)
+Received: from grover.jp (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 24BGlWc1031975;
+        Thu, 12 May 2022 01:47:38 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24BGlWc1031975
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1652287659;
+        bh=9Q6mTn1bAGbkjgZhALJ6nTHBDHzsRRSkgxWQCfuUF6o=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WheXMU9GEV/CluE33iXAr7vz1iDk23lqH+YQaVG5VXYoGJV9VsQYDXFzswjBLUAPw
+         mFs/FP6orbudynGzEF6DhFFyDAdUC4HkeOnVG6lCTUjuhzXhU0njrV4QrBq33rgDtZ
+         4y495WbU1FyN5dtYcOcD3wpTnSZTVW4fehiycOakd9fMA5/NAKOqga6Jyu29QKEQX4
+         F26o2NUEU1PlHoNpfXJDOIIJlCD2cQ2K34+5d3UToBEffOgK9NdCrhjG+XthkVpjSX
+         j7hF5BsKjpC2Ha5XTE3MWL25pO+MNhAdEAV2Qg8iNoQXn+wnuBf4rBi6Uj5Py9YAUr
+         Bl6quKoN+q4mA==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-modules@vger.kernel.org, llvm@lists.linux.dev,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH v5 06/12] genksyms: adjust the output format to modpost
+Date:   Thu, 12 May 2022 01:45:08 +0900
+Message-Id: <20220511164514.2741934-7-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220511164514.2741934-1-masahiroy@kernel.org>
+References: <20220511164514.2741934-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, May 10, 2022 at 12:32 AM Jonathan Corbet <corbet@lwn.net> wrote:
->
-> Trying to take a closer look this time...
->
-> I foresee merge conflicts, but so it goes.  Trying to split this apart
-> would not make a lot of sense.
+Make genksyms output symbol versions in the format modpost expects,
+so the 'sed' is unneeded.
 
-Is there a big change coming to docs? (there are not conflicts in
-linux-next within the docs). Or what do you mean?
+This commit makes *.symversions completely unneeded.
 
-> Please use normal tables rather than list-table; this kind of thing is
-> really unreadable in the source form.
+I will keep *.symversions in .gitignore and 'make clean' for a while.
+Otherwise, 'git status' might be surprising.
 
-Will do!
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+---
 
-> I foresee disagreements over coding style conventions in the
-> future... I don't plan to be part of that conversation :)
+(no changes since v2)
 
-Do you mean with the tool settings? I guess we may get some proposals
-about tweaking them, yeah, but one reason to stick to the defaults is
-to avoid that! :)
+Changes in v2:
+  - New patch
 
-If you mean enforcing `rustfmt`, please see below.
+ scripts/Makefile.build      | 6 ------
+ scripts/genksyms/genksyms.c | 2 +-
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-> I will ask whether we want this, though.  Why would anybody want to
-> mass-reformat the entire body of kernel code?  This seems like something
-> that would generate an endless stream of "helpful" patches and a lot of
-> churn.
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index dff9220135c4..461998a2ad2b 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -165,16 +165,10 @@ ifdef CONFIG_MODVERSIONS
+ # o modpost will extract versions from that file and create *.c files that will
+ #   be compiled and linked to the kernel and/or modules.
+ 
+-genksyms_format := __crc_\(.*\) = \(.*\);
+-
+ gen_symversions =								\
+ 	if $(NM) $@ 2>/dev/null | grep -q __ksymtab; then			\
+ 		$(call cmd_gensymtypes_$(1),$(KBUILD_SYMTYPES),$(@:.o=.symtypes)) \
+-		    > $@.symversions;						\
+-		sed -n 's/$(genksyms_format)/$(pound)SYMVER \1 \2/p' $@.symversions \
+ 			>> $(dot-target).cmd;					\
+-	else									\
+-		rm -f $@.symversions;						\
+ 	fi
+ 
+ cmd_gen_symversions_c =	$(call gen_symversions,c)
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index 67b23cc0df0f..f5dfdb9d80e9 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -680,7 +680,7 @@ void export_symbol(const char *name)
+ 		if (flag_dump_defs)
+ 			fputs(">\n", debugfile);
+ 
+-		printf("__crc_%s = 0x%08lx;\n", name, crc);
++		printf("#SYMVER %s 0x%08lx\n", name, crc);
+ 	}
+ }
+ 
+-- 
+2.32.0
 
-So the idea is that, since everything is already formatted, the output
-of this is empty (in mainline), like Gaelan/Josh mentioned. Thus
-nobody should be sending any formatting patches since there is nothing
-to change.
-
-Now, for those developing and not running `rustfmt` automatically in
-some way (e.g. in their editors), it can be useful to run it before
-submitting the patches: the output should only show changes to
-whatever you changed since everything else should be already
-formatted.
-
-Of course, as soon as others start submitting patches independently,
-mistakes may slip through, but we are enforcing this in our CI (and it
-could be done more centrally), so we should notice quickly.
-
-There could be, of course, bugs in the tool; and there are a few
-situations where the tool may not guarantee formatting stability, but
-hopefully those are rare and small enough so that we can keep
-enforcing this. I think it is worth trying.
-
-Cheers,
-Miguel
