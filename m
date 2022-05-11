@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616ABC4167D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB23EC4167E
 	for <linux-kbuild@archiver.kernel.org>; Wed, 11 May 2022 16:49:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345025AbiEKQtq (ORCPT
+        id S1345034AbiEKQtr (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 11 May 2022 12:49:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45222 "EHLO
+        Wed, 11 May 2022 12:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345023AbiEKQtp (ORCPT
+        with ESMTP id S235800AbiEKQtq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 11 May 2022 12:49:45 -0400
+        Wed, 11 May 2022 12:49:46 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F6993982;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A36F95DDB;
         Wed, 11 May 2022 09:49:41 -0700 (PDT)
 Received: from grover.jp (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24BGlWbt031975;
-        Thu, 12 May 2022 01:47:33 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24BGlWbt031975
+        by conuserg-08.nifty.com with ESMTP id 24BGlWc6031975;
+        Thu, 12 May 2022 01:47:43 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24BGlWc6031975
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1652287653;
-        bh=lrObdII52qYaJ8/FrDvrISgaVLdCtE8oZBm6XPqiaSk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=HvtaKjwQOeSVYjh0ysolTKw0r7pYVYcERlcwdZpQLSOyb2htJarI4X6oEKYJW2JkY
-         tUbRVR91L2AF0dD1Rm2Vk0RX7YF7XqkSYZ3t1F7qvDTKnUgrepZMO5x7s6v92Y8eZ8
-         mD9InCNq+6Jxrb8ndZ0bQw05WvtYTPDYOT1UkYxyjwSGbXXDAj5fTVBUD+Xqcx4S7y
-         KKqMgXogOY3dTzJKqvR5i2XOEelm82Cnagl86UAClKILMUQ4PFtcdOa/yuLTeUv18Z
-         MfUEG6YvFOLsG9Wq1OxvL3Wia1Nn2LvlUkFG2cpMeRwfzP8jd0LY0ZWJHKQO1RCJOd
-         Bz2xXMR/ivgfw==
+        s=dec2015msa; t=1652287664;
+        bh=PfsqhsCBk5DMJKQrgxjPrt4cR290nXSjW4ewrtsP89A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KGPJJDyaNocbo6ncNt90Q/OY7ihHW9tXr3BUWHXD4rjMD3KkrdCuYQZTTVomseqSK
+         +XTfWkakm1H4RwK0EbAITtDKkiiAWjT8O/6BZqBXHN/rVs4Q1szUu/FPRyrbwrrzV0
+         eh/ATsHp2W7mHqysKrYp5SE61AiXtfsPnEra23WGRjfzpMzlwUP6MYeY1NoYNI4utk
+         pZV5zT4e++CpCbsBFhvg07OMQ1FdS0zgT72+Ne+un4xKMRHYZBz2fyEsurC8zCVL1j
+         4THxnWfD6Pa3WElSRT+CekpOBnMwVZMMCbvzWIiwwQJLolqwlbnXUralfrpajp7JYT
+         YrzXYa2EGODug==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -41,88 +41,62 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-modules@vger.kernel.org, llvm@lists.linux.dev,
         Ard Biesheuvel <ardb@kernel.org>,
         Sami Tolvanen <samitolvanen@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v5 00/12] kbuild: yet another series of cleanups (modpost, LTO, MODULE_REL_CRCS, export.h)
-Date:   Thu, 12 May 2022 01:45:02 +0900
-Message-Id: <20220511164514.2741934-1-masahiroy@kernel.org>
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH v5 11/12] kbuild: add cmd_and_savecmd macro
+Date:   Thu, 12 May 2022 01:45:13 +0900
+Message-Id: <20220511164514.2741934-12-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220511164514.2741934-1-masahiroy@kernel.org>
+References: <20220511164514.2741934-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+Separate out the command execution part of if_changed, as we did
+for if_changed_dep.
 
-This is the third batch of cleanups in this development cycle.
+This allows us to reuse it in if_changed_rule.
 
-Major changes in v5:
- - Fix build errors
- - More cleanups
+  define rule_foo
+          $(call cmd_and_savecmd,foo)
+          $(call cmd,bar)
+  endef
 
-Major changes in v4:
- - Move static EXPORT_SYMBOL check to a script
- - Some refactoring
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+---
 
-Major changes in v3:
+(no changes since v4)
 
- - Generate symbol CRCs as C code, and remove CONFIG_MODULE_REL_CRCS.
+Changes in v4:
+  - New.
+    Resent of my previous submission.
+    https://lore.kernel.org/all/20210831074004.3195284-10-masahiroy@kernel.org/
 
-Major changes in v2:
+ scripts/Kbuild.include | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
- - V1 did not work with CONFIG_MODULE_REL_CRCS.
-   I fixed this for v2.
-
- - Reflect some review comments in v1
-
- - Refactor the code more
-
- - Avoid too long argument error
-
-
-
-Masahiro Yamada (12):
-  modpost: split the section mismatch checks into section-check.c
-  modpost: add sym_find_with_module() helper
-  modpost: extract symbol versions from *.cmd files
-  kbuild: link symbol CRCs at final link, removing
-    CONFIG_MODULE_REL_CRCS
-  kbuild: stop merging *.symversions
-  genksyms: adjust the output format to modpost
-  kbuild: do not create *.prelink.o for Clang LTO or IBT
-  kbuild: check static EXPORT_SYMBOL* by script instead of modpost
-  kbuild: make built-in.a rule robust against too long argument error
-  kbuild: make *.mod rule robust against too long argument error
-  kbuild: add cmd_and_savecmd macro
-  kbuild: rebuild multi-object modules when objtool is updated
-
- arch/m68k/include/asm/Kbuild    |    1 +
- arch/m68k/include/asm/export.h  |    2 -
- arch/powerpc/Kconfig            |    1 -
- arch/s390/Kconfig               |    1 -
- arch/um/Kconfig                 |    1 -
- include/asm-generic/export.h    |   22 +-
- include/linux/export-internal.h |   16 +
- include/linux/export.h          |   30 +-
- init/Kconfig                    |    4 -
- kernel/module.c                 |   10 +-
- scripts/Kbuild.include          |   10 +-
- scripts/Makefile.build          |  134 +--
- scripts/Makefile.lib            |    7 -
- scripts/Makefile.modfinal       |    5 +-
- scripts/Makefile.modpost        |    9 +-
- scripts/check-local-export      |   64 ++
- scripts/genksyms/genksyms.c     |   18 +-
- scripts/link-vmlinux.sh         |   33 +-
- scripts/mod/Makefile            |    4 +-
- scripts/mod/modpost.c           | 1395 +++----------------------------
- scripts/mod/modpost.h           |   34 +-
- scripts/mod/section-check.c     | 1222 +++++++++++++++++++++++++++
- 22 files changed, 1541 insertions(+), 1482 deletions(-)
- delete mode 100644 arch/m68k/include/asm/export.h
- create mode 100644 include/linux/export-internal.h
- create mode 100755 scripts/check-local-export
- create mode 100644 scripts/mod/section-check.c
-
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 455a0a6ce12d..ece44b735061 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -142,9 +142,11 @@ check-FORCE = $(if $(filter FORCE, $^),,$(warning FORCE prerequisite is missing)
+ if-changed-cond = $(newer-prereqs)$(cmd-check)$(check-FORCE)
+ 
+ # Execute command if command has changed or prerequisite(s) are updated.
+-if_changed = $(if $(if-changed-cond),                                        \
++if_changed = $(if $(if-changed-cond),$(cmd_and_savecmd),@:)
++
++cmd_and_savecmd =                                                            \
+ 	$(cmd);                                                              \
+-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
++	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+ 
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
 -- 
 2.32.0
 
