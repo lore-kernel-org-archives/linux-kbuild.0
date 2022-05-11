@@ -2,152 +2,132 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F0BC4332F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 10 May 2022 14:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DE9C433EF
+	for <linux-kbuild@archiver.kernel.org>; Wed, 11 May 2022 13:50:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344421AbiEJOhk (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 10 May 2022 10:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
+        id S244118AbiEKNuG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 11 May 2022 09:50:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344703AbiEJOfu (ORCPT
+        with ESMTP id S244138AbiEKNuF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 May 2022 10:35:50 -0400
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC33923176;
-        Tue, 10 May 2022 06:55:23 -0700 (PDT)
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 24ADsqFH021437;
-        Tue, 10 May 2022 22:54:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 24ADsqFH021437
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1652190892;
-        bh=GhyJd382a/wS1zL1PdRPTSc5dz0OmScabiVrpCKaIOA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=UauZq89LrkM/cBmL1IrYEN9SfUuhjvaGe24+hHUTCr6S1DeVhg6gB6xE3NmQVWVBj
-         6DbqE9knamXjVI5te5FZFczDJTT7rQh6QEpZGNweYCbuimKgjSP/aGE47BFaaWV7QP
-         nWQxXCsVVeDV23zU0WTiLibA+WIGOjBJTHCjF4SPElVzM4LAreMHLGulclrOMvYw5E
-         qm1qnxBibkRLJhddDsUy2bW1mf7U3O4hZWjTWyZEgCdTAJ2UZWyhO6iXkwbD01KF5z
-         Z5XKrZ5vubGXCeK8VoNsMtnTLZZswrdolQP0koNBf4Nj8MTqic3HFt8425yBdlzD20
-         yW/2Fl9yu/nuQ==
-X-Nifty-SrcIP: [209.85.214.176]
-Received: by mail-pl1-f176.google.com with SMTP id i17so16800307pla.10;
-        Tue, 10 May 2022 06:54:52 -0700 (PDT)
-X-Gm-Message-State: AOAM532NTcpjBtDK34EPiQZlMkC0euoAT2hkOfRsfRlwirrLz8tkJuZT
-        mvr0v6LnSSBlIPozH2J8+7PXuUvYU47N4t8vHw4=
-X-Google-Smtp-Source: ABdhPJzh5Xg40qnHgjRxAy+2yZ4xm+X8+in8r4zEytwaErju3Iipi+xTG2cJwA+7X0E5U7wpLUUa0KgN+U0NnVHMv0g=
-X-Received: by 2002:a17:902:7891:b0:15e:cae9:7620 with SMTP id
- q17-20020a170902789100b0015ecae97620mr21001207pll.136.1652190891612; Tue, 10
- May 2022 06:54:51 -0700 (PDT)
+        Wed, 11 May 2022 09:50:05 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A2B6239782;
+        Wed, 11 May 2022 06:50:03 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id s23so2072854iog.13;
+        Wed, 11 May 2022 06:50:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PPfAjhXsI/sCAXElGiIAWLNhfWDNEi+ZtaHTtSxHBEQ=;
+        b=aGnZg3AT2GqkRlrytHTaN/NZj7se3UweBltQbTucUz8qfefhYRjX8D58C1r2q954R4
+         6DJFBBvHMc/JilfjHyQ5aqY01UN/ab0jVIyzAY5dvdvZIeqaRUit6kQHk967vXUAo93I
+         pB8FjpEP39N8d0YPKBUtmkAzGQERpADWAWEHzgZkXpmv8coKTSst29t7IYGwSgZONziv
+         oI4+fIjhM3bVr2+UA+VQvZRxk3miTrNxlZjLwaex+qmsOl01vetgxC5dI5YMOWpvQjc3
+         XxgpabVXskv3rcn9yXJv3653A48xMi9ZFSBhEqXtI3PP5+XcVG1qaW97tIAzZBRusZCS
+         SidQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PPfAjhXsI/sCAXElGiIAWLNhfWDNEi+ZtaHTtSxHBEQ=;
+        b=Nb95y87xAS8rQvsrczlKK9ref94YMGImjeT860oZAusxTWJZCeC/7LKrvIBdnRAgku
+         +OBgPVBg8X189lH5+5WI1cKzBXyE+TBQPAoUOhCDSXsQmNcCs9zf7tIJe/5mORktkyVy
+         9ZDSIEgk5bqc7XZVIrl7bK151Wvq5L0h+98iMgpZ9uBaltOKmZYvlHenrH048G0193TM
+         qK9r4QsWMcjLxLcHQjA/SCxvNuLzScZFO1IkEQ+NCCqzuHXt2J1w6K/Cy+mSoroajxWm
+         QqWsgVzmAulJ73LVaH8X2ow6QgVi0VxzJr3doOEfE+k7pX4Z+e3svLSAOhAAABcMmuaV
+         97DA==
+X-Gm-Message-State: AOAM5302gSaDbJjhrWq6yyXyegCrGL26Wa3fQxMRaJ6n/sWw05ltk8w3
+        1zL5kd3TsWfGU0aTrFBe1M3c5JdzwmSEicY6Fio=
+X-Google-Smtp-Source: ABdhPJzjJIGp9s2bo97C4Z9816iV19iujbsRA1+GTtjaKDQ3YsQlDo9tdjEGYQ/NX+clvDAPgUUNuHpBQl2DPlIGM9A=
+X-Received: by 2002:a02:8624:0:b0:32b:397d:eeb1 with SMTP id
+ e33-20020a028624000000b0032b397deeb1mr12780202jai.264.1652277001693; Wed, 11
+ May 2022 06:50:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220508190631.2386038-1-masahiroy@kernel.org>
- <20220508190631.2386038-11-masahiroy@kernel.org> <CAKwvOdkhcJB8Bnrt51siRefWe+ZSvHagCs2G011PzkkrD3cxQw@mail.gmail.com>
-In-Reply-To: <CAKwvOdkhcJB8Bnrt51siRefWe+ZSvHagCs2G011PzkkrD3cxQw@mail.gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 10 May 2022 22:53:40 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATMaW34NP+=0UF=aJ=Z7h0QSuzV2F1QjYjru9nFooG9tQ@mail.gmail.com>
-Message-ID: <CAK7LNATMaW34NP+=0UF=aJ=Z7h0QSuzV2F1QjYjru9nFooG9tQ@mail.gmail.com>
-Subject: Re: [PATCH v4 10/14] kbuild: check static EXPORT_SYMBOL* by script
- instead of modpost
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-modules <linux-modules@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>
+References: <20220507052451.12890-1-ojeda@kernel.org> <20220507052451.12890-19-ojeda@kernel.org>
+ <875ymecp6f.fsf@meer.lwn.net>
+In-Reply-To: <875ymecp6f.fsf@meer.lwn.net>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Wed, 11 May 2022 15:49:50 +0200
+Message-ID: <CANiq72mpYjdhq6yZFBmy8zEo7Cjhh-WjOFc4TfKMZh+w4Fu5WA@mail.gmail.com>
+Subject: Re: [PATCH v6 18/23] docs: add Rust documentation
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     Miguel Ojeda <ojeda@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux <rust-for-linux@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Finn Behrens <me@kloenk.de>,
+        Adam Bratschi-Kaye <ark.email@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sven Van Asbroeck <thesven73@gmail.com>,
+        Wu XiangCheng <bobwxc@email.cn>, Gary Guo <gary@garyguo.net>,
+        Boris-Chengbiao Zhou <bobo1239@web.de>,
+        Yuki Okushi <jtitor@2k36.org>, Wei Liu <wei.liu@kernel.org>,
+        Daniel Xu <dxu@dxuuu.xyz>, Julian Merkle <me@jvmerkle.de>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, May 10, 2022 at 3:05 AM 'Nick Desaulniers' via Clang Built
-Linux <clang-built-linux@googlegroups.com> wrote:
+On Tue, May 10, 2022 at 12:32 AM Jonathan Corbet <corbet@lwn.net> wrote:
 >
-> On Sun, May 8, 2022 at 12:10 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >
-> > diff --git a/scripts/check-local-export b/scripts/check-local-export
-> > new file mode 100755
-> > index 000000000000..d1721fa63057
-> > --- /dev/null
-> > +++ b/scripts/check-local-export
-> > @@ -0,0 +1,48 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0-only
-> > +#
-> > +# Copyright (C) 2022 Masahiro Yamada
-> > +
-> > +set -e
-> > +set -o pipefail
-> > +
-> > +declare -A symbol_types
-> > +declare -a export_symbols
-> > +
-> > +exit_code=0
-> > +
-> > +while read value type name
-> > +do
-> > +       # to avoid error for clang LTO; $name may be empty
-> > +       if [[ $value = -* && -z $name ]]; then
-> > +               continue
-> > +       fi
-> > +
-> > +       # The first field (value) may be empty. If so, fix it up.
-> > +       if [[ -z $name ]]; then
-> > +          name=${type}
-> > +          type=${value}
-> > +       fi
+> Trying to take a closer look this time...
 >
-> Consider adding examples of output from NM as comments where you're
-> handling special cases.
->
-> Aren't BOTH from LTO?  The first case is:
->
-> ---------------- T strncpy
+> I foresee merge conflicts, but so it goes.  Trying to split this apart
+> would not make a lot of sense.
 
+Is there a big change coming to docs? (there are not conflicts in
+linux-next within the docs). Or what do you mean?
 
-For LTO, I see
+> Please use normal tables rather than list-table; this kind of thing is
+> really unreadable in the source form.
 
----------------- t
+Will do!
 
-in the llvm-nm output.
+> I foresee disagreements over coding style conventions in the
+> future... I don't plan to be part of that conversation :)
 
+Do you mean with the tool settings? I guess we may get some proposals
+about tweaking them, yeah, but one reason to stick to the defaults is
+to avoid that! :)
 
+If you mean enforcing `rustfmt`, please see below.
 
->
-> while the second is
->
->                  U strncpy
+> I will ask whether we want this, though.  Why would anybody want to
+> mass-reformat the entire body of kernel code?  This seems like something
+> that would generate an endless stream of "helpful" patches and a lot of
+> churn.
 
-Right, this happens for all unresolved symbols.
-The address part is empty.
+So the idea is that, since everything is already formatted, the output
+of this is empty (in mainline), like Gaelan/Josh mentioned. Thus
+nobody should be sending any formatting patches since there is nothing
+to change.
 
+Now, for those developing and not running `rustfmt` automatically in
+some way (e.g. in their editors), it can be useful to run it before
+submitting the patches: the output should only show changes to
+whatever you changed since everything else should be already
+formatted.
 
-I will add the output example in the comment block.
+Of course, as soon as others start submitting patches independently,
+mistakes may slip through, but we are enforcing this in our CI (and it
+could be done more centrally), so we should notice quickly.
 
+There could be, of course, bugs in the tool; and there are a few
+situations where the tool may not guarantee formatting stability, but
+hopefully those are rare and small enough so that we can keep
+enforcing this. I think it is worth trying.
 
-
-
-
-> IIUC?
->
-> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-> --
-> Thanks,
-> ~Nick Desaulniers
->
-> --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/CAKwvOdkhcJB8Bnrt51siRefWe%2BZSvHagCs2G011PzkkrD3cxQw%40mail.gmail.com.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Miguel
