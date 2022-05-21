@@ -2,74 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F579C433FE
-	for <linux-kbuild@archiver.kernel.org>; Sat, 21 May 2022 06:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9020C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 21 May 2022 09:04:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235582AbiEUGom (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 21 May 2022 02:44:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50132 "EHLO
+        id S241352AbiEUJEr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 21 May 2022 05:04:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbiEUGol (ORCPT
+        with ESMTP id S229490AbiEUJEq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 21 May 2022 02:44:41 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA1D815EA4C;
-        Fri, 20 May 2022 23:44:40 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: usama.anjum)
-        with ESMTPSA id 341E41F469C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1653115479;
-        bh=vZubmbERibb5UaHu4PMlVt8DMsGhoRyewNkbdIiKYd0=;
-        h=Date:Cc:From:Subject:To:From;
-        b=gNXRFxou8H8JO0cVZ302YdprJ1+fZ5ZMjEoEOX1307xylbiC+nise/Jr16E//xkID
-         Ct82n3t5g3WVn1G9SSxhICp1yIFcwzy1xCZ+2FSPIQo5Bi+hhBbG7jmm/lCTa+lqyU
-         r//BWJIoUNYnyMLV24AXOZ8HTpqpSpk1xC9J5Z8wvVuEE083Q0DZ0yPwJB9a3FOCVi
-         OOAevZ02WZxPKyiQmVJwGte6yyqju6v9tGcfGky4H/1iGBoboYLeRgKex0ZK7wNK1X
-         SXzFbjNJvrTLRViz3tDbbBJn2tjk1hYUL2VrkZsmbn17lwGPJMeI/2Z8q/uRoZF8RL
-         T1i53NT0TlDnQ==
-Message-ID: <c25d7ea7-4f72-4a2b-d8c3-d317e64fcbbb@collabora.com>
-Date:   Sat, 21 May 2022 11:44:32 +0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Cc:     usama.anjum@collabora.com, Shuah Khan <shuah@kernel.org>,
-        KERNEL SELFTEST FRAMEWORK <linux-kselftest@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "kernelci@groups.io" <kernelci@groups.io>
-Content-Language: en-US
-From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
-Subject: [Bug Report] - kselftest build fails if output directory is first
- level sub-directory
-To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Sat, 21 May 2022 05:04:46 -0400
+Received: from smtp.smtpout.orange.fr (smtp03.smtpout.orange.fr [80.12.242.125])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCAA9E8BA0
+        for <linux-kbuild@vger.kernel.org>; Sat, 21 May 2022 02:04:44 -0700 (PDT)
+Received: from pop-os.home ([86.243.180.246])
+        by smtp.orange.fr with ESMTPA
+        id sL2Nnv20T4LtqsL2NnX8nM; Sat, 21 May 2022 11:04:42 +0200
+X-ME-Helo: pop-os.home
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Sat, 21 May 2022 11:04:42 +0200
+X-ME-IP: 86.243.180.246
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     dan.carpenter@oracle.com, Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-kbuild@vger.kernel.org
+Subject: [RFC PATCH] kbuild: Add an option to enable -O1 and speed-up compilation time
+Date:   Sat, 21 May 2022 11:04:29 +0200
+Message-Id: <23e0ba7863d51ab629498762a97d477645aeafea.1653123744.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+Add a new compilation option which speeds-up compilation time.
+This can be useful when using static checker such as smatch or build-bots.
+In such cases, the speed and quality of the generated code is not
+important.
 
-kselftest can be built using the kernel's top most Makefile without
-using kselftest's Makefile directly. But there is bug in the top most
-Makefile. The build fails if the specified output directory is first
-level sub-directory. Here is a example to reproduce this bug:
+Using -O0 would be even better, but unfortunately, building fails with
+this option.
 
-make kselftest-all O=build
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ Makefile     | 5 ++++-
+ init/Kconfig | 8 ++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-"The Make is working in a wrong directory, that is why the relative path
-does not work." Masahiro Yamada. Feel free to fix it if someone pin the bug.
+diff --git a/Makefile b/Makefile
+index 1f8bef92868f..14467386f947 100644
+--- a/Makefile
++++ b/Makefile
+@@ -817,7 +817,10 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
+ 
+-ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
++ifdef CONFIG_CC_OPTIMIZE_FOR_COMPILATION_SPEED
++KBUILD_CFLAGS += -O1
++KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 1
++else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+ KBUILD_CFLAGS += -O2
+ KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 2
+ else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
+diff --git a/init/Kconfig b/init/Kconfig
+index a96776a9b080..3177a1830c9a 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1384,6 +1384,14 @@ choice
+ 	prompt "Compiler optimization level"
+ 	default CC_OPTIMIZE_FOR_PERFORMANCE
+ 
++config CC_OPTIMIZE_FOR_COMPILATION_SPEED
++	bool "Optimize for compilation speed (-O1)"
++	help
++	  This option can be useful when running a static checker such as smatch
++	  or a build-bot.
++	  Compilation time is slighly faster than -O2 and it requires less
++	  memory.
++
+ config CC_OPTIMIZE_FOR_PERFORMANCE
+ 	bool "Optimize for performance (-O2)"
+ 	help
+-- 
+2.34.1
 
-It should be noted that the build works in some other combinations:
-make kselftest-all (works)
-make kselftest-all O=/tmp (works)
-make kselftest-all O=build/build2 (works)
-
-My unsuccessful attempt to fix this bug can be found here:
-https://lore.kernel.org/lkml/20220223191016.1658728-1-usama.anjum@collabora.com/
-
-Thanks,
-Muhammad Usama Anjum
