@@ -2,143 +2,128 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66211C433F5
-	for <linux-kbuild@archiver.kernel.org>; Sat, 21 May 2022 15:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890FC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sun, 22 May 2022 06:50:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355498AbiEUPkA (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 21 May 2022 11:40:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51034 "EHLO
+        id S239944AbiEVGuj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 22 May 2022 02:50:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355508AbiEUPjj (ORCPT
+        with ESMTP id S244601AbiEVGuj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 21 May 2022 11:39:39 -0400
-Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB596351C;
-        Sat, 21 May 2022 08:39:18 -0700 (PDT)
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 24LFcxRn020449;
-        Sun, 22 May 2022 00:38:59 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 24LFcxRn020449
+        Sun, 22 May 2022 02:50:39 -0400
+Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145CA366A8;
+        Sat, 21 May 2022 23:50:36 -0700 (PDT)
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 24M6oAek017213;
+        Sun, 22 May 2022 15:50:11 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 24M6oAek017213
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653147539;
-        bh=E7Am5Nb9a8KomAfL0DWSpMGcRuyvDbO2H0enFw86lac=;
+        s=dec2015msa; t=1653202211;
+        bh=5TwfumVCNM+fvix8eWg6i86pc65IzESlNEbAwwhHqrU=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Mmss+paMa26fLx30DM4uAjXe+hi1m5UbvsADimGmzr7IWvQyc6/ycCqMbIK6Sn8xm
-         T8VwUVO3Eb1qe8Ct//Bc39+yvk+sWAe9GrN4+miP74KPs7FZWo/AWwG2sSzz8rp6YJ
-         OjAWhOOp6Q7/c1cINOoO8uIqMg3jqxM3Cu8HIlLWrRtdpdT9kS0Z9w3vPlWHVnmuhw
-         vY83rN/VIt3qDm1xePB8sQeGYLmXCE8l6aaeAP3VzyO6rWCc00bN41VzyhIO3SKIwM
-         ROjBLWIkgYW6pr89ytbBmjv53x9OjiLIRYTXGphXiw5fqg4rgR7YU9rK6X5rkZe/dq
-         KwU/UWjM4qW6A==
-X-Nifty-SrcIP: [209.85.210.173]
-Received: by mail-pf1-f173.google.com with SMTP id w200so10053813pfc.10;
-        Sat, 21 May 2022 08:38:59 -0700 (PDT)
-X-Gm-Message-State: AOAM533x//zvxN8lLJ3Zh6SQEJZBrqiYTOR0w3wLftJ5RwjoxCr+zImk
-        W710Y5drRv2OGQ2OhSKti1HqxJZEhkzyhHbydIg=
-X-Google-Smtp-Source: ABdhPJwqVIczKOUbexuJjN8ztbp6Eewxf8TjPCHhzKdG58dczONSDGOjuexLGdkEJyZqRUMX15iTRwYrfw5DZUuNY9A=
+        b=ojV6XLeO60FMwlo+YWIjhWtRGEEawpk4CVTb4L9aglvOsxoK5f7z7QbZSOZfJ/tak
+         alBhcAPXcIxYqPD77l9IRzaTuM1+hmJzoN/AY0CLlXq3RF133ODYyShafJ1NmxJjCa
+         q0lpyWHvIylOEdH/w5NWWS57WrNaaAJ1LH6EpwkqOq/sHCzQtTbTby/WMAjGehyBu4
+         kVp9a8pzx79AFXB+F86AeNMng169Yna619lykZelRBT/YmqMzU/NmFg613kiYe1zhM
+         gliHIyRLAvkJUkXtL+XM5BQLs9Sn5t2kQlyC6svng8bF7Ur/kDDSJ0tasHLmdhpwVA
+         4ZAHOIk6oYabQ==
+X-Nifty-SrcIP: [209.85.210.176]
+Received: by mail-pf1-f176.google.com with SMTP id j6so11048580pfe.13;
+        Sat, 21 May 2022 23:50:11 -0700 (PDT)
+X-Gm-Message-State: AOAM532fMMBst104p0OK6IfasNpJJ+yYm0/NoVVgVsywwWk3D97q1g1L
+        YfOKYFhFVqsZOA/3WLXxgrlEa/opzqqV8kKt0/c=
+X-Google-Smtp-Source: ABdhPJxhJ2rh9Olkm7eNlJF8gpCf6NRGhN1KHbnGfK8m1IcXzz+fxX+v0f9XGq/1eBPx2nbsbhKNAZoEfz+GfSITou8=
 X-Received: by 2002:a63:9043:0:b0:3f9:6c36:3de3 with SMTP id
- a64-20020a639043000000b003f96c363de3mr5866156pge.616.1653147535087; Sat, 21
- May 2022 08:38:55 -0700 (PDT)
+ a64-20020a639043000000b003f96c363de3mr8127619pge.616.1653202210391; Sat, 21
+ May 2022 23:50:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <23e0ba7863d51ab629498762a97d477645aeafea.1653123744.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <23e0ba7863d51ab629498762a97d477645aeafea.1653123744.git.christophe.jaillet@wanadoo.fr>
+References: <20220513113930.10488-1-masahiroy@kernel.org> <CAK7LNAQvneCi11myLpkikuXh=i5PLtTaLe0nGpDZXgv_Q1L0Ow@mail.gmail.com>
+ <CA+icZUUWww3fXvjQcefgFuq=tPO6+FYDbHE2E5PmL-BSJg4+cw@mail.gmail.com>
+In-Reply-To: <CA+icZUUWww3fXvjQcefgFuq=tPO6+FYDbHE2E5PmL-BSJg4+cw@mail.gmail.com>
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 22 May 2022 00:38:17 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASHGyzKS-d+S1GYz_L0pBxxSwk05YfvV+LK4ghZ5xx=cA@mail.gmail.com>
-Message-ID: <CAK7LNASHGyzKS-d+S1GYz_L0pBxxSwk05YfvV+LK4ghZ5xx=cA@mail.gmail.com>
-Subject: Re: [RFC PATCH] kbuild: Add an option to enable -O1 and speed-up
- compilation time
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
+Date:   Sun, 22 May 2022 15:49:33 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATx1QcM6BdqBSascV8J8rD6etRgRZj9PjBno5Qrb=p3Yg@mail.gmail.com>
+Message-ID: <CAK7LNATx1QcM6BdqBSascV8J8rD6etRgRZj9PjBno5Qrb=p3Yg@mail.gmail.com>
+Subject: Re: [PATCH v6 00/10] kbuild: yet another series of cleanups (modpost,
+ LTO, MODULE_REL_CRCS, export.h)
+To:     Sedat Dilek <sedat.dilek@gmail.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Changbin Du <changbin.du@gmail.com>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-modules <linux-modules@vger.kernel.org>,
+        clang-built-linux <llvm@lists.linux.dev>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-(+CC: Arnd, Changbin Du)
-
-
-If -O1 support does not require additional effort,
-I have no objection to this patch.
-
-(but I do not have enough insight about
-the compiler's inlining heuristic)
-
-
-
-BTW, when we attempted to add the -Og support,
-we fixed various parts, and Linus rejected it.
-
-https://lore.kernel.org/linux-kbuild/CAK7LNARQggM3aKEPRKJqa4tunFAfmfErMZuS-rrnRv6UB1VpPQ@mail.gmail.com/
-
-
-
-
-
-
-
-On Sat, May 21, 2022 at 6:04 PM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
+On Sun, May 22, 2022 at 10:45 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
 >
-> Add a new compilation option which speeds-up compilation time.
-> This can be useful when using static checker such as smatch or build-bots.
-> In such cases, the speed and quality of the generated code is not
-> important.
+> On Fri, May 13, 2022 at 4:31 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > On Fri, May 13, 2022 at 8:42 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> > >
+> > >
+> > > This is the third batch of cleanups in this development cycle.
+> > >
+> >
+> >
+> > This series is available at
+> > git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+> >  lto-cleanup-v6
+> >
 >
-> Using -O0 would be even better, but unfortunately, building fails with
-> this option.
+> Hi Masahiro,
 >
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  Makefile     | 5 ++++-
->  init/Kconfig | 8 ++++++++
->  2 files changed, 12 insertions(+), 1 deletion(-)
+> I cloned the repository on top of latest Linus Git.
 >
-> diff --git a/Makefile b/Makefile
-> index 1f8bef92868f..14467386f947 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -817,7 +817,10 @@ KBUILD_CFLAGS      += $(call cc-disable-warning, format-truncation)
->  KBUILD_CFLAGS  += $(call cc-disable-warning, format-overflow)
->  KBUILD_CFLAGS  += $(call cc-disable-warning, address-of-packed-member)
+> Not able to boot in Quemu - Not able to boot on bare metal.
 >
-> -ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-> +ifdef CONFIG_CC_OPTIMIZE_FOR_COMPILATION_SPEED
-> +KBUILD_CFLAGS += -O1
-> +KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 1
-> +else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
->  KBUILD_CFLAGS += -O2
->  KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 2
->  else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
-> diff --git a/init/Kconfig b/init/Kconfig
-> index a96776a9b080..3177a1830c9a 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1384,6 +1384,14 @@ choice
->         prompt "Compiler optimization level"
->         default CC_OPTIMIZE_FOR_PERFORMANCE
+> $ grep module_layout log_quemu-5.18.0-rc7-2-amd64-clang14-lto.txt
+> 366:[    2.173265] floppy: disagrees about version of symbol module_layout
+> 367:[    2.198746] scsi_common: disagrees about version of symbol module_layout
+> 368:[    2.205573] i2c_piix4: disagrees about version of symbol module_layout
+> 369:[    2.210610] psmouse: disagrees about version of symbol module_layout
+> 370:[    2.225138] scsi_common: disagrees about version of symbol module_layout
+> 371:[    2.235536] scsi_common: disagrees about version of symbol module_layout
+> 375:Begin: Running /scripts/local-premount ... [    2.298555]
+> crc32c_intel: disagrees about version of symbol module_layout
+> 376:[    2.303335] crc32c_generic: disagrees about version of symbol
+> module_layout
+> 377:[    2.306667] libcrc32c: disagrees about version of symbol module_layout
 >
-> +config CC_OPTIMIZE_FOR_COMPILATION_SPEED
-> +       bool "Optimize for compilation speed (-O1)"
-> +       help
-> +         This option can be useful when running a static checker such as smatch
-> +         or a build-bot.
-> +         Compilation time is slighly faster than -O2 and it requires less
-> +         memory.
-> +
->  config CC_OPTIMIZE_FOR_PERFORMANCE
->         bool "Optimize for performance (-O2)"
->         help
-> --
-> 2.34.1
+> Infos: LLVM-14 + CONFIG_LTO_CLANG_THIN=y
 >
+> My linux-config and qemu-log are attached.
+>
+
+
+Thanks for your testing.
+
+I was also able to reproduce this issue.
+
+
+The problematic parts are:
+
+[    2.298555] crc32c_intel: disagrees about version of symbol module_layout
+[    2.303335] crc32c_generic: disagrees about version of symbol module_layout
+[    2.306667] libcrc32c: disagrees about version of symbol module_layout
+
+
+
+When CONFIG_LTO_CLANG_THIN=y,
+I cannot see any __crc_* symbols in "nm  vmlinux".
+
+Perhaps, LTO might have discarded all the __crc_* symbols
+from vmlinux, but I am still checking the details...
+
 
 
 -- 
