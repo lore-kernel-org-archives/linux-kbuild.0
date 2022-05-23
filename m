@@ -2,141 +2,151 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D834C433EF
-	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 18:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA752C433FE
+	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 18:44:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241599AbiEWSod (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 May 2022 14:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54480 "EHLO
+        id S244013AbiEWSoi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 23 May 2022 14:44:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244181AbiEWSoP (ORCPT
+        with ESMTP id S243314AbiEWSoZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 May 2022 14:44:15 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F0D69CDB
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2022 11:27:08 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id u23so27051649lfc.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2022 11:27:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cNu8GgvsbpstMN5PR/r7FbQyBoA4doE2J/KRSOCWuco=;
-        b=P4pCSBFcumSIj5G4eIByQ1cm/h9Hiq5VA5X97Wk5UNf0wFrpzLrxjDCqTalhhKVTsz
-         PvwpPZ9FJfsbf0ox3kCgikqETgzKMdva4NshPTE1JP4W53KKH+sW+wrW+54VARwa4YMX
-         BfsdHFkVHasswm9iaWq3P9l1cagN2JnEWskhgSbu/kTSPUGqS4cUtzJDscd1ugPrui5H
-         p0CHPAwR6+c3l1JmiveYG6JaNwZ38USv8NdSsZV/p0I9FfOdpCH7Ex/VpCqvNeG0mFL6
-         dJDZJIX2UzkTIsywtWdqKf1Ca5Mf11nB3+8oZMzd6xdPNwOhDScTVsFtzdwmFVfjIIgt
-         tylA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cNu8GgvsbpstMN5PR/r7FbQyBoA4doE2J/KRSOCWuco=;
-        b=ijwl/zcCNAnuoLzE1DvJKcX259XuNHaabTxZfGDrjOvam9Lc1o2L1D8InXgi6n+Srh
-         wo1XmA8vRu0rq0kOef+eyT94UbgAcK0Qv2OpFdpo2gToNQ3v1mOx4/wxwAJ/eM/PU6Ev
-         E/uA1fyX/yunY/dAx4rVoyMFUYX+La5c13SvM0c9UduEa+WhzxkFjJYXJl8mVOaz2JpA
-         bpy/6TIZTxu5b+egoQTvkKU6pYk5hcnX8c7WgRkizEw9jJ9xxVJJoRZezWDphuzDIB8t
-         /Bhno6d/YoPVVxFUmrFgWxLoLV6WzTg5A189hP8VsTLCeyh25hcRukQ1HQN5+bYBGVye
-         o91w==
-X-Gm-Message-State: AOAM5333TDmfnlBLy3YT18mqFoMfsTAi/PSlmvJDV8zsGakHlQmRLwQ2
-        E4tHp7CVyecjRv4plFlvnZjXqHIR7R0v1cImJBjWyQ==
-X-Google-Smtp-Source: ABdhPJwtL/9b9Op6DZncvq9prrrbtQImTZ5H/bUzajfBqooqYDKMkJ9dAI4p7nxMhLDrq+Oyhd6w4ml0b0qA5xV8mAk=
-X-Received: by 2002:a19:651c:0:b0:477:87cf:de6 with SMTP id
- z28-20020a19651c000000b0047787cf0de6mr16656479lfb.432.1653330426475; Mon, 23
- May 2022 11:27:06 -0700 (PDT)
+        Mon, 23 May 2022 14:44:25 -0400
+Received: from condef-08.nifty.com (condef-08.nifty.com [202.248.20.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE74F6A079;
+        Mon, 23 May 2022 11:27:18 -0700 (PDT)
+Received: from conssluserg-04.nifty.com ([10.126.8.83])by condef-08.nifty.com with ESMTP id 24NI6ipB016156;
+        Tue, 24 May 2022 03:06:44 +0900
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 24NI5KXv002937;
+        Tue, 24 May 2022 03:05:20 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 24NI5KXv002937
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1653329121;
+        bh=xyfMz2s6K1FqS7FKBYD4t23CA7hAJBCjnd+TynP5fZY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=wLWMHJLOejJIXhpVDGf9HNSx+SpTPVQUXvZhixAqDXV0z7z7XYTc7NHsjSVsRdrzO
+         5gFFxjxAUV70SlzCQBQA5zl5Eo9n3JLjoa+Z6Z6R/1GbKTffwLWtZu+guZMreSmFOo
+         7q4VUHA2w4OzRP2FjYyb0e0KAjEyh94eDs+96SgIZ2UVW9GimqGFg1VqKzrk/kK8OQ
+         AcR2aj6xN3Rb2zu003g+PPx3SfgMH1DkkD+0tPAJpqKgRxHuThQsY/RooKKGvP/DEB
+         4EQhtFDGmBM6nCZxh15asv7RHHDlLkbFfBaqLcp135Okm0y8QUoLxGBd96f1e5nsjk
+         5xNLqrgDzpRng==
+X-Nifty-SrcIP: [209.85.215.173]
+Received: by mail-pg1-f173.google.com with SMTP id 137so14345838pgb.5;
+        Mon, 23 May 2022 11:05:20 -0700 (PDT)
+X-Gm-Message-State: AOAM530DxU7nDVS7Z5BXL7oz+xUhCMQ2pSYLP0vvfRhu4WCSqnnmZ8f2
+        koha5Px06Y1k+zW+TD4rzjR4rsyWMMZOi9kth9M=
+X-Google-Smtp-Source: ABdhPJx5Lme6JhQ7OKXuXU7KdkCmDLJQv7tFwa3fzbZTWXsLVHVozSYCDjkmkCCK6F2tBUWOu/ge6oucCPgm4OmGxhg=
+X-Received: by 2002:a63:fc5e:0:b0:3db:5804:f3b with SMTP id
+ r30-20020a63fc5e000000b003db58040f3bmr21273043pgk.126.1653329119628; Mon, 23
+ May 2022 11:05:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <23e0ba7863d51ab629498762a97d477645aeafea.1653123744.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <23e0ba7863d51ab629498762a97d477645aeafea.1653123744.git.christophe.jaillet@wanadoo.fr>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 23 May 2022 11:26:54 -0700
-Message-ID: <CAKwvOdneqUvq+Nz_zPmJmuPFfAvWQgnzrw1AJt=WqQF2hThF-A@mail.gmail.com>
-Subject: Re: [RFC PATCH] kbuild: Add an option to enable -O1 and speed-up
- compilation time
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     dan.carpenter@oracle.com, Masahiro Yamada <masahiroy@kernel.org>,
+References: <20220209185752.1226407-1-alexandr.lobakin@intel.com> <20220209185752.1226407-2-alexandr.lobakin@intel.com>
+In-Reply-To: <20220209185752.1226407-2-alexandr.lobakin@intel.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 24 May 2022 03:04:00 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT3QTfkYLFTBKLxghY_gBQZmud3-4UJMK3tA9eOV4UeTg@mail.gmail.com>
+Message-ID: <CAK7LNAT3QTfkYLFTBKLxghY_gBQZmud3-4UJMK3tA9eOV4UeTg@mail.gmail.com>
+Subject: Re: [PATCH v10 01/15] modpost: fix removing numeric suffixes
+To:     Alexander Lobakin <alexandr.lobakin@intel.com>
+Cc:     linux-hardening@vger.kernel.org, X86 ML <x86@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Kristen Carlson Accardi <kristen@linux.intel.com>,
+        Kees Cook <keescook@chromium.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Bruce Schlobohm <bruce.schlobohm@intel.com>,
+        Jessica Yu <jeyu@kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Evgenii Shatokhin <eshatokhin@virtuozzo.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Marios Pomonis <pomonis@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        "H.J. Lu" <hjl.tools@gmail.com>, Nicolas Pitre <nico@fluxnic.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        live-patching@vger.kernel.org,
+        clang-built-linux <llvm@lists.linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, May 21, 2022 at 2:04 AM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
+On Thu, Feb 10, 2022 at 3:59 AM Alexander Lobakin
+<alexandr.lobakin@intel.com> wrote:
 >
-> Add a new compilation option which speeds-up compilation time.
-> This can be useful when using static checker such as smatch or build-bots.
-> In such cases, the speed and quality of the generated code is not
-> important.
+> `-z unique-symbol` linker flag which is planned to use with FG-KASLR
+> to simplify livepatching (hopefully globally later on) triggers the
+> following:
 >
-> Using -O0 would be even better, but unfortunately, building fails with
-> this option.
-
-Which is a tragedy.
-
-As with the Rust series, I'm not a fan of this (or
-CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3):
-https://lore.kernel.org/lkml/CAKwvOd=7QTUH69+ZbT7e8einvgcosTbDkyohmPaUBv6_y8RfrQ@mail.gmail.com/
-
-These feel more like attempts to wrap every conceivable command line
-flag in a kconfig option, which makes me think of that meme from
-Jurassic Park: "your scientists were so preoccupied with whether or
-not they could, they didn't stop to think if they should."
-Not a fan.  I'd ask for measurements, but that would be a request for
-a "rock fetching quest" for something I still wouldn't be a fan of.
-
+> ERROR: modpost: "param_set_uint.0" [vmlinux] is a static EXPORT_SYMBOL
 >
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> The reason is that for now the condition from remove_dot():
+>
+> if (m && (s[n + m] == '.' || s[n + m] == 0))
+>
+> which was designed to test if it's a dot or a '\0' after the suffix
+> is never satisfied.
+> This is due to that `s[n + m]` always points to the last digit of a
+> numeric suffix, not on the symbol next to it (from a custom debug
+> print added to modpost):
+>
+> param_set_uint.0, s[n + m] is '0', s[n + m + 1] is '\0'
+>
+> So it's off-by-one and was like that since 2014.
+> Fix this for the sake of upcoming features, but don't bother
+> stable-backporting, as it's well hidden -- apart from that LD flag,
+> can be triggered only by GCC LTO which never landed upstream.
+>
+> Fixes: fcd38ed0ff26 ("scripts: modpost: fix compilation warning")
+> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
 > ---
->  Makefile     | 5 ++++-
->  init/Kconfig | 8 ++++++++
->  2 files changed, 12 insertions(+), 1 deletion(-)
+>  scripts/mod/modpost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/Makefile b/Makefile
-> index 1f8bef92868f..14467386f947 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -817,7 +817,10 @@ KBUILD_CFLAGS      += $(call cc-disable-warning, format-truncation)
->  KBUILD_CFLAGS  += $(call cc-disable-warning, format-overflow)
->  KBUILD_CFLAGS  += $(call cc-disable-warning, address-of-packed-member)
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 6bfa33217914..4648b7afe5cc 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -1986,7 +1986,7 @@ static char *remove_dot(char *s)
 >
-> -ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-> +ifdef CONFIG_CC_OPTIMIZE_FOR_COMPILATION_SPEED
-> +KBUILD_CFLAGS += -O1
-> +KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 1
-> +else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
->  KBUILD_CFLAGS += -O2
->  KBUILD_RUSTFLAGS_OPT_LEVEL_MAP := 2
->  else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
-> diff --git a/init/Kconfig b/init/Kconfig
-> index a96776a9b080..3177a1830c9a 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1384,6 +1384,14 @@ choice
->         prompt "Compiler optimization level"
->         default CC_OPTIMIZE_FOR_PERFORMANCE
+>         if (n && s[n]) {
+>                 size_t m = strspn(s + n + 1, "0123456789");
+> -               if (m && (s[n + m] == '.' || s[n + m] == 0))
+> +               if (m && (s[n + m + 1] == '.' || s[n + m + 1] == 0))
+>                         s[n] = 0;
 >
-> +config CC_OPTIMIZE_FOR_COMPILATION_SPEED
-> +       bool "Optimize for compilation speed (-O1)"
-> +       help
-> +         This option can be useful when running a static checker such as smatch
-> +         or a build-bot.
-> +         Compilation time is slighly faster than -O2 and it requires less
-
-s/slighly/slightly/
-
-> +         memory.
-> +
->  config CC_OPTIMIZE_FOR_PERFORMANCE
->         bool "Optimize for performance (-O2)"
->         help
+>                 /* strip trailing .lto */
 > --
 > 2.34.1
 >
 
+This trivial patch has not been picked up yet.
+
+I can apply this to my tree, if you want.
+
+Please let me know your thoughts.
+
 
 -- 
-Thanks,
-~Nick Desaulniers
+Best Regards
+Masahiro Yamada
