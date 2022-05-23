@@ -2,74 +2,176 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC22CC433F5
-	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 18:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAD8C433F5
+	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 19:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbiEWSon (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 May 2022 14:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
+        id S229962AbiEWTI7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 23 May 2022 15:08:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243931AbiEWSo3 (ORCPT
+        with ESMTP id S231511AbiEWTGw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 May 2022 14:44:29 -0400
-Received: from condef-04.nifty.com (condef-04.nifty.com [202.248.20.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E97A005B;
-        Mon, 23 May 2022 11:27:50 -0700 (PDT)
-Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-04.nifty.com with ESMTP id 24NIHJs9012196;
-        Tue, 24 May 2022 03:17:19 +0900
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24NIFrRV027961;
-        Tue, 24 May 2022 03:15:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24NIFrRV027961
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653329753;
-        bh=TFguQGsfBK4SLEoyVpZA3IDbS9toCuPJd055UxlIv6c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=rq3y5P4Hn2OX7VgbbiOSIra6Ou9TkSO4f6p4mMJM+p4Mi0WJdutYUQzNRQISYtx7X
-         /fZo8gNxfUZyrc8yGnpI/dEwvhiuJPd3/lXBdnpSAl/sja1S5A8wbuB7rTkIXZaIIr
-         edPhoSD7YmWgIwvdhvdCFIUAHNwqq6brNe8BI88QgDaMKCzZsyJKoNLVvuWUGSSxJC
-         pfniO6OBmtMRm4PWgR5gkMKo0F7or1EbgD2YbO2Usn3nZ0G+h8y/Bfu6xvjRrpXFjF
-         +gnk90c/7xrBQxhwqofgUh2pkLT/J0trYQCp/HY6bkHkz/6AVpeolaeKNvVtl+UMb/
-         lRDy4nxc+HS5w==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
+        Mon, 23 May 2022 15:06:52 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7171266AEC
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2022 11:45:05 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 27so13330567ljw.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2022 11:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oOWZUBJqNcdlgAF3ozzceIWa1QLe3KoX8JwY9UNGHd4=;
+        b=UstXh4WwiSYrL1ybcoTWRmyZsv9hEjc6PjZMBIKnBZP0zhT7iTun1KvXZ8H17U8qSH
+         iz+7+bLHxdtL7wvkFkMIpdZu3lQ51hwOwKdx/wG4KzaJXykJmazsGwA7t4UGAtTePw/B
+         mK+BUuXVrIeuhZNDEKPHGY+iv6YBe6R27v/utPWafsuvsLf2TmGu2ewgAfZSdKBowv4l
+         LoP4BWbhRDtTjeIcpB3tIiVwfN42D2mxokpmBrGJMTT5Dd6TNpI3j9kQxH/bd3ESREMT
+         XevvqDcVtKuqvXq0zcj3Z/G0wAyCfCELfimVoPf+6+u9hcQLdRX4KGz8yIs0FLopHIeq
+         RhLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oOWZUBJqNcdlgAF3ozzceIWa1QLe3KoX8JwY9UNGHd4=;
+        b=SmuEoh8+IZCLXmt/q6/Qk6h1GrUfAaMwBO1nrhYVhPuWnBE/+jV4rOXr1Wnp4rAIwU
+         PNtthEGrntxdA1MtFOMW4dP0PkG17R89nr1k9nlunI1sTox39XtuuocEzkW+wHVyIGE1
+         pEZHCK6CV2IEJhhEgYThO375ltyb1cSANqbTmEO57hRJIEFzqUPLjDAWJMLM1ImeMmTP
+         6gL1WRI/552bmc9wHhOpiu2TJLA5oqMAPhv1UbjEsddzhzwZz3FMc8hcGUwtiSeOXkYq
+         o2vqbxtLZnbheKZtJF2OnHFc8oOnIzjfbFROpPcc+WcBmdP2GuWsHNGLEPQrzpDlrHoN
+         8Kvw==
+X-Gm-Message-State: AOAM53274rCQM0I1arJPbFhIz2LP4ElezkaHMuUMnnK8bgdMrt8E8HWB
+        FdMpSGslEt6C7YqAPFM0XAGeVOaFqqsevsDYBN+7YA==
+X-Google-Smtp-Source: ABdhPJyqr3CCsMipzHURp2FsSWTJB3upstez3xIYqCFafcp/ENDyuWVgPX2GXxQPyyXKkJMEh1xX8mg+wI61pNqucdI=
+X-Received: by 2002:a2e:98cd:0:b0:253:df46:323e with SMTP id
+ s13-20020a2e98cd000000b00253df46323emr9603557ljj.295.1653331503220; Mon, 23
+ May 2022 11:45:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220523020209.11810-1-ojeda@kernel.org> <20220523020209.11810-22-ojeda@kernel.org>
+In-Reply-To: <20220523020209.11810-22-ojeda@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 23 May 2022 11:44:51 -0700
+Message-ID: <CAKwvOdkTjxNEmCTnuH5f41WB50ef6ErBM2Kp2zJ-t9q_5U8rBA@mail.gmail.com>
+Subject: Re: [PATCH v7 21/25] Kbuild: add Rust support
+To:     Miguel Ojeda <ojeda@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Finn Behrens <me@kloenk.de>,
+        Adam Bratschi-Kaye <ark.email@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sven Van Asbroeck <thesven73@gmail.com>,
+        Gary Guo <gary@garyguo.net>,
+        Boris-Chengbiao Zhou <bobo1239@web.de>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Douglas Su <d0u9.su@outlook.com>,
+        Dariusz Sosnowski <dsosnowski@dsosnowski.pl>,
+        Antonio Terceiro <antonio.terceiro@linaro.org>,
+        Daniel Xu <dxu@dxuuu.xyz>, Miguel Cano <macanroj@gmail.com>,
+        David Gow <davidgow@google.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH] kbuild: replace $(if A,A,B) with $(or A,B) in scripts/Makefile.modpost
-Date:   Tue, 24 May 2022 03:15:03 +0900
-Message-Id: <20220523181503.1007987-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-um@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Similar cleanup to commit 5c8166419acf ("kbuild: replace $(if A,A,B)
-with $(or A,B)").
+> +choice
+> +       prompt "Optimization level"
+> +       default RUST_OPT_LEVEL_SIMILAR_AS_CHOSEN_FOR_C
+> +       depends on RUST
+> +       help
+> +         Controls rustc's `-Copt-level` codegen option.
+> +
+> +         This flag controls the optimization level.
+> +
+> +         If unsure, say "Similar as chosen for C".
+> +
+> +config RUST_OPT_LEVEL_SIMILAR_AS_CHOSEN_FOR_C
+> +       bool "Similar as chosen for C"
+> +       help
+> +         This choice will pick a similar optimization level as chosen in
+> +         the "Compiler optimization level" for C:
+> +
+> +             -O2 is currently mapped to -Copt-level=2
+> +             -O3 is currently mapped to -Copt-level=3
+> +             -Os is currently mapped to -Copt-level=s
+> +
+> +         The mapping may change over time to follow the intended semantics
+> +         of the choice for C as sensibly as possible.
+> +
+> +         This is the default.
+> +
+> +config RUST_OPT_LEVEL_0
+> +       bool "No optimizations (-Copt-level=0)"
+> +       help
+> +         Not recommended for most purposes. It may come in handy for debugging
+> +         suspected optimizer bugs, unexpected undefined behavior, etc.
+> +
+> +         Note that this level will *not* enable debug assertions nor overflow
+> +         checks on its own (like it happens when interacting with rustc
+> +         directly). Use the corresponding configuration options to control
+> +         that instead, orthogonally.
+> +
+> +         Note this level may cause excessive stack usage, which can lead to stack
+> +         overflow and subsequent crashes.
+> +
+> +config RUST_OPT_LEVEL_1
+> +       bool "Basic optimizations (-Copt-level=1)"
+> +       help
+> +         Useful for debugging without getting too lost, but without
+> +         the overhead and boilerplate of no optimizations at all.
+> +
+> +         Note this level may cause excessive stack usage, which can lead to stack
+> +         overflow and subsequent crashes.
+> +
+> +config RUST_OPT_LEVEL_2
+> +       bool "Some optimizations (-Copt-level=2)"
+> +       help
+> +         The sensible choice in most cases.
+> +
+> +config RUST_OPT_LEVEL_3
+> +       bool "All optimizations (-Copt-level=3)"
+> +       help
+> +         Yet more performance (hopefully).
+> +
+> +config RUST_OPT_LEVEL_S
+> +       bool "Optimize for size (-Copt-level=s)"
+> +       help
+> +         Smaller kernel, ideally without too much performance loss.
+> +
+> +config RUST_OPT_LEVEL_Z
+> +       bool "Optimize for size, no loop vectorization (-Copt-level=z)"
+> +       help
+> +         Like the previous level, but also turn off loop vectorization.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/Makefile.modpost | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 7c3899182a4a..911606496341 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -84,7 +84,7 @@ obj := $(KBUILD_EXTMOD)
- src := $(obj)
- 
- # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
--include $(if $(wildcard $(src)/Kbuild), $(src)/Kbuild, $(src)/Makefile)
-+include $(or $(wildcard $(src)/Kbuild), $(src)/Makefile)
- 
- # modpost option for external modules
- MODPOST += -e
+I'm super not into having the rust optimization level differ from the
+C optimization level.  This is just someone having too much fun
+wrapping every compiler flag in a kbuild option.  Either folks wan't
+smaller size or more optimizations. Allowing for RUST_OPT_LEVEL_S and
+CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE or RUST_OPT_LEVEL_3 and
+CONFIG_CC_OPTIMIZE_FOR_SIZE is just wacky nonsense that's going to
+make randconfig bug reports more confusing to tease out.
 -- 
-2.32.0
-
+Thanks,
+~Nick Desaulniers
