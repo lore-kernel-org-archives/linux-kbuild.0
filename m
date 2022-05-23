@@ -2,83 +2,124 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0FFC43219
-	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 16:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A0DC43217
+	for <linux-kbuild@archiver.kernel.org>; Mon, 23 May 2022 17:29:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238868AbiEWQsh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 23 May 2022 12:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
+        id S240912AbiEWR3R (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 23 May 2022 13:29:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239093AbiEWQsf (ORCPT
+        with ESMTP id S242232AbiEWR1c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 May 2022 12:48:35 -0400
-Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC32C633BA;
-        Mon, 23 May 2022 09:48:28 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 24NGlJD1027017;
-        Tue, 24 May 2022 01:47:20 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 24NGlJD1027017
+        Mon, 23 May 2022 13:27:32 -0400
+Received: from condef-05.nifty.com (condef-05.nifty.com [202.248.20.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8591D71DBD;
+        Mon, 23 May 2022 10:22:44 -0700 (PDT)
+Received: from conssluserg-02.nifty.com ([10.126.8.81])by condef-05.nifty.com with ESMTP id 24NHG9Sw006904;
+        Tue, 24 May 2022 02:16:09 +0900
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 24NHFlcu010153;
+        Tue, 24 May 2022 02:15:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 24NHFlcu010153
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653324440;
-        bh=lc+fo6j/ioCeXPDSmA+V4raO61i1wvnDNsz3Z956OcE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ayr1gMhnatRU5ootEInfCpUCIbW2afVk+iyRM+8y94EqrZLNOHH41gN7boKNGI9+X
-         /vdHbEgGeMzMrzQzSsqil4tuZ7IltBwR2Y33mbUsah7p4gku8aDqmK1BH+QfdtnXmD
-         f3zqanazqXGRjg58LQsF6aYCQfJO1ZCswFQefAekniYtq4e9KZlO0TzNmgVpG/iyzh
-         7s2irRYaV8SeMYn2z6nbt8ggP0Lde5MFnD0Cx47ouOCzgc8urZU7xDNm5u4tCd78L4
-         98oTY5l0jmij2uBvY0FILUvpXtuzWKExJGwix5hqJtCANq8eyl5gBDjKIjGMhAOkoz
-         nTkDHcnVT2qvg==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH 2/5] modpost: remove the unused argument of check_sec_ref()
-Date:   Tue, 24 May 2022 01:46:23 +0900
-Message-Id: <20220523164626.858340-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220523164626.858340-1-masahiroy@kernel.org>
-References: <20220523164626.858340-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1653326147;
+        bh=OGFOsJaaPXTp7udfTBYwnoLO5n8NJB9yqzeeBC2uWGM=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=j+5jAm9nSHBtPB2Bm2fgLzp42GcQz0hP9lzKC9wM5o8LQ7y68AD787wckNJm9AzkP
+         Cjnaxd055ZHKvu9UlMi04sxx2SUb9m1leOExEauRGH4CTxMWE3ctLzeByDq+JPMKFr
+         7RijYQ5hKnswouCnMpu7JvIg66kWeUwk5jjz7/rAyJbZgHdQwHDvmb+uca1ZQ3wmAW
+         DgJC/ZKEbOBVOZZQb4RWhIfP5KuKbEW+RT+ufaMEnPdx805uO/xmHutcmsKYPIV6i2
+         KAPHok8toA+ylwrZn8o1UkoypxxSp1io4sGhLWtc1l8I1ZbisBS0tLmfr590iXHRtK
+         1lo3RURqiKULg==
+X-Nifty-SrcIP: [209.85.210.44]
+Received: by mail-ot1-f44.google.com with SMTP id h9-20020a056830400900b0060b03bfe792so4171879ots.12;
+        Mon, 23 May 2022 10:15:47 -0700 (PDT)
+X-Gm-Message-State: AOAM533j0uFvUbZHUvHD9/23I2Zm1uK2Ru7YBj/GUeEjGnyem5oDOEoc
+        r9WmMZiNQ8KuKPxAvrMIbDcPBTJv4mX13JKLRmk=
+X-Google-Smtp-Source: ABdhPJwC/BX9iJtS+me6WCgh4FiVSqSYSjIxoKwp6SUa5MgtH+0lF8YXyOeBRLO/3zxlti48fNjV9tfjg53LtYszjEM=
+X-Received: by 2002:a9d:34d:0:b0:60a:ebab:f100 with SMTP id
+ 71-20020a9d034d000000b0060aebabf100mr6988834otv.55.1653326146590; Mon, 23 May
+ 2022 10:15:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220516092423.14327-1-isak01@gmail.com>
+In-Reply-To: <20220516092423.14327-1-isak01@gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 24 May 2022 02:14:27 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATfGqzikgDLvK2tTK91ynDsS59G7K7OZobyd+=MOqF_4A@mail.gmail.com>
+Message-ID: <CAK7LNATfGqzikgDLvK2tTK91ynDsS59G7K7OZobyd+=MOqF_4A@mail.gmail.com>
+Subject: Re: [PATCH] scripts: kconfig: nconf: make nconfig accept jk keybindings
+To:     Isak Ellmer <isak01@gmail.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-check_sec_ref() does not use the first parameter 'mod'.
+On Mon, May 16, 2022 at 6:24 PM Isak Ellmer <isak01@gmail.com> wrote:
+>
+> Make nconfig accept jk keybindings for movement in addition to arrow keys.
+>
+> Signed-off-by: Isak Ellmer <isak01@gmail.com>
+> ---
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
 
- scripts/mod/modpost.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+I am fine with this.
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 845bc438ca49..843c64eebe8b 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1883,8 +1883,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
-  * to find all references to a section that reference a section that will
-  * be discarded and warns about it.
-  **/
--static void check_sec_ref(struct module *mod, const char *modname,
--			  struct elf_info *elf)
-+static void check_sec_ref(const char *modname, struct elf_info *elf)
- {
- 	int i;
- 	Elf_Shdr *sechdrs = elf->sechdrs;
-@@ -2069,7 +2068,7 @@ static void read_symbols(const char *modname)
- 					     sym_get_data(&info, sym));
- 	}
- 
--	check_sec_ref(mod, modname, &info);
-+	check_sec_ref(modname, &info);
- 
- 	if (!mod->is_vmlinux) {
- 		version = get_modinfo(&info, "version");
+
+Can you update the help message?
+
+
+Around line 55:
+
+"Linewise up                 <Up>\n"
+"Linewise down               <Down>\n"
+
+
+
+
+
+
+
+
+
+
+>  scripts/kconfig/nconf.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 7b371bd7fb36..ded40e5aabf8 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -1105,9 +1105,11 @@ static void conf(struct menu *menu)
+>                                 break;
+>                         switch (res) {
+>                         case KEY_DOWN:
+> +                       case 'j':
+>                                 menu_driver(curses_menu, REQ_DOWN_ITEM);
+>                                 break;
+>                         case KEY_UP:
+> +                       case 'k':
+>                                 menu_driver(curses_menu, REQ_UP_ITEM);
+>                                 break;
+>                         case KEY_NPAGE:
+> @@ -1287,9 +1289,11 @@ static void conf_choice(struct menu *menu)
+>                                 break;
+>                         switch (res) {
+>                         case KEY_DOWN:
+> +                       case 'j':
+>                                 menu_driver(curses_menu, REQ_DOWN_ITEM);
+>                                 break;
+>                         case KEY_UP:
+> +                       case 'k':
+>                                 menu_driver(curses_menu, REQ_UP_ITEM);
+>                                 break;
+>                         case KEY_NPAGE:
+> --
+> 2.35.1
+>
+
+
 -- 
-2.32.0
-
+Best Regards
+Masahiro Yamada
