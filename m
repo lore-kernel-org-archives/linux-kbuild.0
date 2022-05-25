@@ -2,263 +2,269 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FB9C433EF
-	for <linux-kbuild@archiver.kernel.org>; Wed, 25 May 2022 14:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB9CC433F5
+	for <linux-kbuild@archiver.kernel.org>; Wed, 25 May 2022 22:25:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236458AbiEYOjR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 25 May 2022 10:39:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46106 "EHLO
+        id S236603AbiEYWZp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 25 May 2022 18:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbiEYOjR (ORCPT
+        with ESMTP id S231270AbiEYWZo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 25 May 2022 10:39:17 -0400
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B96340F3;
-        Wed, 25 May 2022 07:39:14 -0700 (PDT)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 24PEcjBp021016;
-        Wed, 25 May 2022 23:38:45 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 24PEcjBp021016
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653489525;
-        bh=Lp03uVXMPQlmSiBowOZMUCLROOhnHg+rTLt9h5CDAoY=;
-        h=From:Date:Subject:To:Cc:From;
-        b=0YRxdES1gpi/Wxr7oO2pZplzkux01SKoU4kQ+MrFPd/AGxWOCRh+IJhcvrZd3PaRh
-         MHyH5u6Sujtt24ttWAtbI5xTa7jENrj/Qo2SkiNPPFuGUODyikE/XRLt2bA28ACbkx
-         wjv5yhELfKKgS3x8dFpQ76oWpfk3o4jsY31jr+4ZcISW+sprxjIvzyQh2mCEC6Zc1Z
-         ry0wJxjUwn0GiA4+08wA02gs+2u6Hv0kHI+S9nr52kOAdDCwYO3gTnl4VX8/taWvCA
-         KJfDUA2cmjOjnWlrJCo/F0rrOqwIxQWI1ipcw/PAuuvLrCKhyb5W+BAschENrbpxZY
-         7iDxg9sdxnOWA==
-X-Nifty-SrcIP: [209.85.214.179]
-Received: by mail-pl1-f179.google.com with SMTP id d22so18730060plr.9;
-        Wed, 25 May 2022 07:38:45 -0700 (PDT)
-X-Gm-Message-State: AOAM533Q91g7zZh6ohiqwUZ8O8aVdjF5r6mGjKaOyv3LRwllBbaShcDN
-        lcxVF+pZxYidydSl0w6dvl8ebS5kIDpDEk/jTPI=
-X-Google-Smtp-Source: ABdhPJzt72aesK1C/ucD/FdILkN7b5tEansPbXFJ0N3dRhffVd5O4npq/oZtCz02Diz91oql/Ut7Lh0tV5cPSkOgyCI=
-X-Received: by 2002:a17:902:f68f:b0:162:23c6:e61b with SMTP id
- l15-20020a170902f68f00b0016223c6e61bmr15434702plg.136.1653489524424; Wed, 25
- May 2022 07:38:44 -0700 (PDT)
+        Wed, 25 May 2022 18:25:44 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91AE4BA99C
+        for <linux-kbuild@vger.kernel.org>; Wed, 25 May 2022 15:25:42 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id s20so4230865ljd.10
+        for <linux-kbuild@vger.kernel.org>; Wed, 25 May 2022 15:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Y4JE5dVY5pJ4L5p/4sGg1xocj3NSEFAKSZJJs4bfl50=;
+        b=fAMfron/HjbN7nd+bsG3ASO/nK1WjlcoVqa4+QdtPam6ciW/bwdYCmk9ujS4Abe4VJ
+         w2sueG/5d5jh11UgLmuXnMAdarDjSChSdXdKrhg3y7F8Pjptb4ff8WlByIdiSkfEbGFm
+         PkRmC+09uBSPSsg344wCJdI8n7v1Yt+vr7kQ9DePitEy6ui34PJ0AU8C5jZKRsffEDfP
+         ug3LM0AmYwwUZHhVNWlMxQzBz79rShyO1d1dkhvX1r4lmvgXBfWQm+lShZOQXq9rxarC
+         SWsS9kfyfYspj/5U44fShRnUcSFmlbceeiOtALpaquQdvDHDNyVkshBPqlQYpF3P0oqm
+         UHfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y4JE5dVY5pJ4L5p/4sGg1xocj3NSEFAKSZJJs4bfl50=;
+        b=AM+asUwdgcIDu2GDLQ7lEa8yyiF1IP+KVBtMPWRNoi63D3lZB2j15khj6AHhwQ5JHf
+         YBDnjOzHwJP/bZogfjoC2JO5rLaafufJcWhi5L7ikxE4HKA3gwTTyxMT2mdPpCinuDJ2
+         d/w8ggvnBaSlVlTMK8zCwGvOb9kxFt7mkwwjqlO7UIb2U1nRrEBp+PxI7XDS/2V8VQi3
+         QrNmxNWQSsWK38fhyCouzOu2d56cYrYdhKDyDnV1CIA+TLNF0DoS3g08/QYsgMA3gsIt
+         vt1Q2CMcBSEK6LDXQMmoAJkZgB/s83dNw+FvgU5yC0yL+qmrxwfJ9CQOAR1YYD2DwdbZ
+         g4NQ==
+X-Gm-Message-State: AOAM530t2+wh6FqfsArwrzE1B5pftvVtNuwr08K4GWaCkCBcNLsi6wOw
+        boS7O7eFXPPnQkPKblV29UBIyZmg+0vnixi807Twog==
+X-Google-Smtp-Source: ABdhPJyyMkDOBVLKOsbECK6J7ZWww0BuYU20TDN6fYXnxk8xptFKTQXny9GfJRyE8hkAsArQFcu6jZmKOkIJSKODNlQ=
+X-Received: by 2002:a2e:98c3:0:b0:253:e0e1:20 with SMTP id s3-20020a2e98c3000000b00253e0e10020mr14949440ljj.26.1653517540546;
+ Wed, 25 May 2022 15:25:40 -0700 (PDT)
 MIME-Version: 1.0
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 25 May 2022 23:37:23 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATy1o89+KwgDmJ3tDDxnF2JvhVBm702JbRe6jREWH8MYQ@mail.gmail.com>
-Message-ID: <CAK7LNATy1o89+KwgDmJ3tDDxnF2JvhVBm702JbRe6jREWH8MYQ@mail.gmail.com>
-Subject: [GIT PULL] Kbuild updates for v5.19-rc1
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
+References: <20220523020209.11810-1-ojeda@kernel.org> <20220523020209.11810-22-ojeda@kernel.org>
+In-Reply-To: <20220523020209.11810-22-ojeda@kernel.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 25 May 2022 15:25:28 -0700
+Message-ID: <CAKwvOdn+9qORm8UpDGnPXxiK7B7P_TW5CtXv1+8qkv7UvQr3hQ@mail.gmail.com>
+Subject: Re: [PATCH v7 21/25] Kbuild: add Rust support
+To:     Miguel Ojeda <ojeda@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Finn Behrens <me@kloenk.de>,
+        Adam Bratschi-Kaye <ark.email@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sven Van Asbroeck <thesven73@gmail.com>,
+        Gary Guo <gary@garyguo.net>,
+        Boris-Chengbiao Zhou <bobo1239@web.de>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Douglas Su <d0u9.su@outlook.com>,
+        Dariusz Sosnowski <dsosnowski@dsosnowski.pl>,
+        Antonio Terceiro <antonio.terceiro@linaro.org>,
+        Daniel Xu <dxu@dxuuu.xyz>, Miguel Cano <macanroj@gmail.com>,
+        David Gow <davidgow@google.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-um@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+On Sun, May 22, 2022 at 7:04 PM Miguel Ojeda <ojeda@kernel.org> wrote:
+>
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -120,6 +120,15 @@ endif
+>
+>  export KBUILD_CHECKSRC
+>
+> +# Enable "clippy" (a linter) as part of the Rust compilation.
+> +#
+> +# Use 'make CLIPPY=1' to enable it.
+> +ifeq ("$(origin CLIPPY)", "command line")
+> +  KBUILD_CLIPPY := $(CLIPPY)
+> +endif
 
-Please pull Kbuild updates for v5.19-rc1.
-Thank you.
+Is there a reason to not just turn clippy on always? Might be nicer to
+start off with good practices by default. :^)
 
+> @@ -1494,7 +1588,8 @@ MRPROPER_FILES += include/config include/generated          \
+>                   certs/signing_key.pem \
+>                   certs/x509.genkey \
+>                   vmlinux-gdb.py \
+> -                 *.spec
+> +                 *.spec \
+> +                 rust/target.json rust/libmacros.so
+>
+>  # clean - Delete most, but leave enough to build external modules
+>  #
+> @@ -1519,6 +1614,9 @@ $(mrproper-dirs):
+>
+>  mrproper: clean $(mrproper-dirs)
+>         $(call cmd,rmfiles)
+> +       @find . $(RCS_FIND_IGNORE) \
+> +               \( -name '*.rmeta' \) \
+> +               -type f -print | xargs rm -f
 
+Are there *.rmeta directories that we _don't_ want to remove via `make
+mrproper`? I'm curious why *.rmeta isn't just part of MRPROPER_FILES?
 
-The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
+>
+>  # distclean
+>  #
+> @@ -1606,6 +1704,23 @@ help:
+>         @echo  '  kselftest-merge   - Merge all the config dependencies of'
+>         @echo  '                      kselftest to existing .config.'
+>         @echo  ''
+> +       @echo  'Rust targets:'
+> +       @echo  '  rustavailable   - Checks whether the Rust toolchain is'
+> +       @echo  '                    available and, if not, explains why.'
+> +       @echo  '  rustfmt         - Reformat all the Rust code in the kernel'
+> +       @echo  '  rustfmtcheck    - Checks if all the Rust code in the kernel'
+> +       @echo  '                    is formatted, printing a diff otherwise.'
+> +       @echo  '  rustdoc         - Generate Rust documentation'
+> +       @echo  '                    (requires kernel .config)'
+> +       @echo  '  rusttest        - Runs the Rust tests'
+> +       @echo  '                    (requires kernel .config; downloads external repos)'
+> +       @echo  '  rust-analyzer   - Generate rust-project.json rust-analyzer support file'
+> +       @echo  '                    (requires kernel .config)'
+> +       @echo  '  dir/file.[os]   - Build specified target only'
+> +       @echo  '  dir/file.i      - Build macro expanded source, similar to C preprocessing'
+> +       @echo  '                    (run with RUSTFMT=n to skip reformatting if needed)'
+> +       @echo  '  dir/file.ll     - Build the LLVM assembly file'
 
-  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
+I don't think we need to repeat dir/* here again for rust. The
+existing targets listed above (outside this hunk) make sense in both
+contexts.
 
-are available in the Git repository at:
+Does rustc really use .i as a conventional suffix for macro expanded
+sources? (The C compiler might use the -x flag to override the guess
+it would make based on the file extension; I'm curious if rustc can
+ingest .i files or will it warn?)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-v5.19
+> diff --git a/init/Kconfig b/init/Kconfig
+> index ddcbefe535e9..3457cf596588 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> +config RUSTC_VERSION_TEXT
+> +       string
+> +       depends on RUST
+> +       default $(shell,command -v $(RUSTC) >/dev/null 2>&1 && $(RUSTC) --version || echo n)
+> +
+> +config BINDGEN_VERSION_TEXT
+> +       string
+> +       depends on RUST
+> +       default $(shell,command -v $(BINDGEN) >/dev/null 2>&1 && $(BINDGEN) --version || echo n)
 
-for you to fetch changes up to 5ce2176b81f77366bd02c27509b83049f0020544:
+Are these two kconfigs used anywhere?
 
-  genksyms: adjust the output format to modpost (2022-05-24 16:33:20 +0900)
+> diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
+> index 0496efd6e117..83e850321eb6 100644
+> --- a/scripts/Kconfig.include
+> +++ b/scripts/Kconfig.include
+> @@ -36,12 +36,12 @@ ld-option = $(success,$(LD) -v $(1))
+>  as-instr = $(success,printf "%b\n" "$(1)" | $(CC) $(CLANG_FLAGS) -c -x assembler -o /dev/null -)
+>
+>  # check if $(CC) and $(LD) exist
+> -$(error-if,$(failure,command -v $(CC)),compiler '$(CC)' not found)
+> +$(error-if,$(failure,command -v $(CC)),C compiler '$(CC)' not found)
 
-----------------------------------------------------------------
-Kbuild updates for v5.19
+Not that it's important to do so, but a couple hunks s/compiler/C
+compiler/. Those _could_ probably get submitted ahead of this, but not
+important to do so.
 
- - Add HOSTPKG_CONFIG env variable to allow users to override pkg-config
+> diff --git a/scripts/Makefile.debug b/scripts/Makefile.debug
+> index 9f39b0130551..fe87389d52c0 100644
+> --- a/scripts/Makefile.debug
+> +++ b/scripts/Makefile.debug
+> @@ -1,4 +1,5 @@
+>  DEBUG_CFLAGS   :=
+> +DEBUG_RUSTFLAGS        :=
+>
+>  ifdef CONFIG_DEBUG_INFO_SPLIT
+>  DEBUG_CFLAGS   += -gsplit-dwarf
+> @@ -10,6 +11,12 @@ ifndef CONFIG_AS_IS_LLVM
+>  KBUILD_AFLAGS  += -Wa,-gdwarf-2
+>  endif
+>
+> +ifdef CONFIG_DEBUG_INFO_REDUCED
+> +DEBUG_RUSTFLAGS += -Cdebuginfo=1
+> +else
+> +DEBUG_RUSTFLAGS += -Cdebuginfo=2
+> +endif
+> +
 
- - Support W=e as a shorthand for KCFLAGS=-Werror
+How does enabling or disabling debug info work for rustc? I may have
+missed it, but I was surprised to see no additional flags getting
+passed to rustc based on CONFIG_DEBUG info.
 
- - Fix CONFIG_IKHEADERS build to support toybox cpio
+> diff --git a/scripts/generate_rust_target.rs b/scripts/generate_rust_target.rs
+> new file mode 100644
+> index 000000000000..c146a3407183
+> --- /dev/null
+> +++ b/scripts/generate_rust_target.rs
 
- - Add scripts/dummy-tools/pahole to ease distro packagers' life
+Ah, that explains the host rust build infra.  Bravo! Hard coding the
+target files was my major concern last I looked at the series. I'm
+very happy to see it be generated properly from .config!
 
- - Suppress false-positive warnings from checksyscalls.sh for W=2 build
+I haven't actually reviewed this yet, but it makes me significantly
+more confident in the series to see this approach added. Good job
+whoever wrote this.
 
- - Factor out the common code of arch/*/boot/install.sh into
-   scripts/install.sh
+> diff --git a/scripts/is_rust_module.sh b/scripts/is_rust_module.sh
+> new file mode 100755
+> index 000000000000..277a64d07f22
+> --- /dev/null
+> +++ b/scripts/is_rust_module.sh
+> @@ -0,0 +1,13 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# is_rust_module.sh module.ko
+> +#
+> +# Returns `0` if `module.ko` is a Rust module, `1` otherwise.
+> +
+> +set -e
+> +
+> +# Using the `16_` prefix ensures other symbols with the same substring
+> +# are not picked up (even if it would be unlikely). The last part is
+> +# used just in case LLVM decides to use the `.` suffix.
+> +${NM} "$*" | grep -qE '^[0-9a-fA-F]+ r _R[^[:space:]]+16___IS_RUST_MODULE[^[:space:]]*$'
 
- - Support 'kernel-install' tool in scripts/prune-kernel
+Does `$(READELF) -p .comment foo.o` print anything about which
+compiler was used? That seems less brittle IMO.
 
- - Refactor module-versioning to link the symbol versions at the final
-   link of vmlinux and modules
+---
 
- - Remove CONFIG_MODULE_REL_CRCS because module-versioning now works in
-   an arch-agnostic way
-
- - Refactor modpost, Makefiles
-
-----------------------------------------------------------------
-Chun-Tse Shao (1):
-      kbuild: Allow kernel installation packaging to override pkg-config
-
-Daniel Mentz (1):
-      kheaders: Have cpio unconditionally replace files
-
-Jiri Slaby (1):
-      scripts: dummy-tools, add pahole
-
-Masahiro Yamada (47):
-      kbuild: factor out genksyms command from cmd_gensymtypes_{c,S}
-      kbuild: do not remove empty *.symtypes explicitly
-      modpost: remove useless export_from_sec()
-      modpost: move export_from_secname() call to more relevant place
-      modpost: remove redundant initializes for static variables
-      modpost: remove annoying namespace_from_kstrtabns()
-      kbuild: refactor cmd_modversions_c
-      kbuild: refactor cmd_modversions_S
-      kbuild: reuse suffix-search to refactor multi_depend
-      kbuild: make multi_depend work with targets in subdirectory
-      kbuild: reuse real-search to simplify cmd_mod
-      kbuild: split the second line of *.mod into *.usyms
-      kbuild: get rid of duplication in *.mod files
-      kbuild: make *.mod not depend on *.o
-      kbuild: read *.mod to get objects passed to $(LD) or $(AR)
-      modpost: use snprintf() instead of sprintf() for safety
-      modpost: do not write out any file when error occurred
-      modpost: remove stale comment about sym_add_exported()
-      modpost: add a separate error for exported symbols without definition
-      modpost: retrieve the module dependency and CRCs in check_exports()
-      modpost: move struct namespace_list to modpost.c
-      kbuild: drop $(objtree)/ prefix support for clean-files
-      ia64: make the install target not depend on any build artifact
-      modpost: use bool type where appropriate
-      modpost: change mod->gpl_compatible to bool type
-      modpost: import include/linux/list.h
-      modpost: traverse modules in order
-      modpost: add sym_add_unresolved() helper
-      modpost: traverse unresolved symbols in order
-      modpost: use doubly linked list for dump_lists
-      modpost: traverse the namespace_list in order
-      modpost: dump Module.symvers in the same order of modules.order
-      modpost: make multiple export error
-      modpost: make sym_add_exported() always allocate a new symbol
-      modpost: split new_symbol() to symbol allocation and hash table addition
-      kbuild: factor out the common installation code into scripts/install.sh
-      modpost: merge add_{intree_flag,retpoline,staging_flag} to add_header
-      modpost: move *.mod.c generation to write_mod_c_files()
-      kbuild: generate a list of objects in vmlinux
-      kbuild: record symbol versions in *.cmd files
-      modpost: remove left-over cross_compile declaration
-      modpost: change the license of EXPORT_SYMBOL to bool type
-      modpost: add sym_find_with_module() helper
-      modpost: extract symbol versions from *.cmd files
-      kbuild: link symbol CRCs at final link, removing CONFIG_MODULE_REL_CRCS
-      kbuild: stop merging *.symversions
-      genksyms: adjust the output format to modpost
-
-Necip Fazil Yildiran (1):
-      docs: kbuild: add references on Kconfig semantics
-
-Nick Desaulniers (1):
-      kbuild: uapi: use -fsyntax-only rather than -S
-
-Randy Dunlap (1):
-      Makefile: fix 2 typos
-
-Reza Arbab (1):
-      scripts/prune-kernel: Use kernel-install if available
-
-Vincent Mailhol (1):
-      checksyscalls: ignore -Wunused-macros
-
-Yann Droneaud (1):
-      kbuild: support W=e to make build abort in case of warning
-
- .gitignore                                |   1 +
- Documentation/kbuild/kconfig-language.rst |   6 +
- Makefile                                  |  16 +-
- arch/arm/Makefile                         |   4 +-
- arch/arm/boot/install.sh                  |  21 --
- arch/arm64/Makefile                       |   6 +-
- arch/arm64/boot/install.sh                |  21 --
- arch/ia64/Makefile                        |   5 +-
- arch/ia64/install.sh                      |  10 -
- arch/m68k/Makefile                        |   3 +-
- arch/m68k/include/asm/Kbuild              |   1 +
- arch/m68k/include/asm/export.h            |   2 -
- arch/m68k/install.sh                      |  22 --
- arch/nios2/Makefile                       |   3 +-
- arch/nios2/boot/install.sh                |  22 --
- arch/parisc/Makefile                      |  11 +-
- arch/parisc/install.sh                    |  28 --
- arch/powerpc/Kconfig                      |   1 -
- arch/powerpc/Makefile                     |   3 +-
- arch/powerpc/boot/Makefile                |   4 +-
- arch/powerpc/boot/install.sh              |  23 --
- arch/riscv/Makefile                       |   7 +-
- arch/riscv/boot/install.sh                |  21 --
- arch/s390/Kconfig                         |   1 -
- arch/s390/Makefile                        |   3 +-
- arch/s390/boot/install.sh                 |   6 -
- arch/sparc/Makefile                       |   3 +-
- arch/sparc/boot/install.sh                |  22 --
- arch/um/Kconfig                           |   1 -
- arch/x86/Makefile                         |   3 +-
- arch/x86/boot/install.sh                  |  22 --
- certs/Makefile                            |   4 +-
- include/asm-generic/export.h              |  22 +-
- include/linux/export-internal.h           |  17 +
- include/linux/export.h                    |  30 +-
- init/Kconfig                              |   4 -
- kernel/gen_kheaders.sh                    |   2 +-
- kernel/module.c                           |  10 +-
- scripts/Makefile                          |   4 +-
- scripts/Makefile.build                    | 133 +++-----
- scripts/Makefile.clean                    |   8 +-
- scripts/Makefile.extrawarn                |  13 +-
- scripts/Makefile.lib                      |   6 +-
- scripts/Makefile.vmlinux                  |  32 ++
- scripts/adjust_autoksyms.sh               |   2 +-
- scripts/checksyscalls.sh                  |   2 +-
- scripts/dummy-tools/pahole                |   4 +
- scripts/gen_autoksyms.sh                  |  18 +-
- scripts/genksyms/genksyms.c               |  18 +-
- scripts/install.sh                        |  40 +++
- scripts/kconfig/gconf-cfg.sh              |  12 +-
- scripts/kconfig/mconf-cfg.sh              |  16 +-
- scripts/kconfig/nconf-cfg.sh              |  16 +-
- scripts/kconfig/qconf-cfg.sh              |  14 +-
- scripts/link-vmlinux.sh                   |  40 +--
- scripts/mod/list.h                        | 213 ++++++++++++
- scripts/mod/modpost.c                     | 674
-++++++++++++++++++++------------------
- scripts/mod/modpost.h                     |  31 +-
- scripts/mod/sumversion.c                  |  19 +-
- scripts/prune-kernel                      |   6 +-
- tools/objtool/Makefile                    |   4 +-
- usr/include/Makefile                      |   2 +-
- 62 files changed, 874 insertions(+), 844 deletions(-)
- mode change 100644 => 100755 arch/arm/boot/install.sh
- mode change 100644 => 100755 arch/arm64/boot/install.sh
- mode change 100644 => 100755 arch/ia64/install.sh
- delete mode 100644 arch/m68k/include/asm/export.h
- mode change 100644 => 100755 arch/m68k/install.sh
- mode change 100644 => 100755 arch/nios2/boot/install.sh
- mode change 100644 => 100755 arch/parisc/install.sh
- mode change 100644 => 100755 arch/powerpc/boot/install.sh
- mode change 100644 => 100755 arch/riscv/boot/install.sh
- mode change 100644 => 100755 arch/s390/boot/install.sh
- mode change 100644 => 100755 arch/sparc/boot/install.sh
- mode change 100644 => 100755 arch/x86/boot/install.sh
- create mode 100644 include/linux/export-internal.h
- create mode 100644 scripts/Makefile.vmlinux
- create mode 100755 scripts/dummy-tools/pahole
- create mode 100755 scripts/install.sh
- create mode 100644 scripts/mod/list.h
-
-
+Modulo the RUST_OPT_LEVEL_SIMILAR_AS_CHOSEN_FOR_C which I'm not a fan
+of, this is looking good to me. Masahiro, what are your thoughts on
+the build system support?
 -- 
-Best Regards
-Masahiro Yamada
+Thanks,
+~Nick Desaulniers
