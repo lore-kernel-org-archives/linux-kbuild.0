@@ -2,291 +2,666 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6434DC433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F95C433F5
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 11:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350789AbiE0KE6 (ORCPT
+        id S1351462AbiE0LiV (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 May 2022 06:04:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51864 "EHLO
+        Fri, 27 May 2022 07:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350791AbiE0KE4 (ORCPT
+        with ESMTP id S1351491AbiE0LiQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 06:04:56 -0400
-Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F28B1116EA;
-        Fri, 27 May 2022 03:04:46 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24RA2hPU029808;
-        Fri, 27 May 2022 19:02:48 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPU029808
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653645768;
-        bh=63AM9Y7KFJuXBvKXOmj6kJdz+ZNVbwHrp42ZdIFptX0=;
+        Fri, 27 May 2022 07:38:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E9D12698E;
+        Fri, 27 May 2022 04:38:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2B4BCB824D9;
+        Fri, 27 May 2022 11:38:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C191C385A9;
+        Fri, 27 May 2022 11:37:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1653651479;
+        bh=TdM9kCbzO9r9RHTkFH3ggT2WNkeIKCbHj5t/HggTyXs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RW1wttQF3Oea8ArmryxA7c5OlRphy4XLSdTGnKXoDhQDvP5OS0CvMg6u22wNMneYx
-         MmO+ShRV77S1L7Kw29gY8hdiRenlRehQa9VP/A7EW8Q74MIo5gh55tpvyRw/EjcNDt
-         FtZa4M+gKZRkV1J7Xeaw1CpPiJZPNC+qWSvPi6SIOT+q7f3UQqnuWYNdCbUsSk7eeK
-         VXAsUTwKMj0SR86wH6e551ECa1syR07zSaD6957dxD4pxsoSxokifNvrkHppOu8zAW
-         mngXMEsnyFXgvcZ5tdQ8cgd6TbzUkBzBfMsFXGJzFu11tESBdN4bw0fStXUmgTILtj
-         rmlIrYn4jxCTQ==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
-        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
+        b=oyaleu/Fi5+7oUffh1+z30ee3YGEPhlP5G5CNXcmRJo4yF2Os8Nj3mbnSBNMv9NGK
+         ercFltSTA4MPTpayyjqrGUcSEMvj6a4s8pUCUY2dnJlV6J83NqGAEFM9OnY470bIdo
+         fIcsNY+eJlvM37XJbL8olwKf8aQEefl7uOgoUeLg=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH v7 4/8] kbuild: check static EXPORT_SYMBOL* by script instead of modpost
-Date:   Fri, 27 May 2022 19:01:51 +0900
-Message-Id: <20220527100155.1996314-5-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220527100155.1996314-1-masahiroy@kernel.org>
-References: <20220527100155.1996314-1-masahiroy@kernel.org>
+        linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 5.15 007/145] lib/crypto: blake2s: include as built-in
+Date:   Fri, 27 May 2022 10:48:28 +0200
+Message-Id: <20220527084851.561294196@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220527084850.364560116@linuxfoundation.org>
+References: <20220527084850.364560116@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The 'static' specifier and EXPORT_SYMBOL() are an odd combination.
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-Commit 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL*
-functions") tried to detect it, but this check has false negatives.
+commit 6048fdcc5f269c7f31d774c295ce59081b36e6f9 upstream.
 
-Here is the sample code.
+In preparation for using blake2s in the RNG, we change the way that it
+is wired-in to the build system. Instead of using ifdefs to select the
+right symbol, we use weak symbols. And because ARM doesn't need the
+generic implementation, we make the generic one default only if an arch
+library doesn't need it already, and then have arch libraries that do
+need it opt-in. So that the arch libraries can remain tristate rather
+than bool, we then split the shash part from the glue code.
 
-  Makefile:
-
-    obj-y += foo1.o foo2.o
-
-  foo1.c:
-
-    #include <linux/export.h>
-    static void foo(void) {}
-    EXPORT_SYMBOL(foo);
-
-  foo2.c:
-
-    void foo(void) {}
-
-foo1.c exports the static symbol 'foo', but modpost cannot catch it
-because it is fooled by foo2.c, which has a global symbol with the
-same name.
-
-s->is_static is cleared if a global symbol with the same name is found
-somewhere, but EXPORT_SYMBOL() and the global symbol do not necessarily
-belong to the same compilation unit.
-
-This check should be done per compilation unit, but I do not know how
-to do it in modpost. modpost runs against vmlinux.o or modules, which
-merges multiple objects, then forgets their origin.
-
-modpost cannot parse individual objects because they may not be ELF but
-LLVM IR when CONFIG_LTO_CLANG=y.
-
-Add a simple bash script to parse the output from ${NM}. This works for
-CONFIG_LTO_CLANG=y because llvm-nm can dump symbols of LLVM IR files.
-
-Revert 15bfc2348d54.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com> # LLVM-14 (x86-64)
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
+ arch/arm/crypto/Makefile          |    4 +
+ arch/arm/crypto/blake2s-core.S    |    8 +--
+ arch/arm/crypto/blake2s-glue.c    |   73 ------------------------------------
+ arch/arm/crypto/blake2s-shash.c   |   75 +++++++++++++++++++++++++++++++++++++
+ arch/x86/crypto/Makefile          |    4 +
+ arch/x86/crypto/blake2s-glue.c    |   68 ++-------------------------------
+ arch/x86/crypto/blake2s-shash.c   |   77 ++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig                    |    3 -
+ drivers/net/Kconfig               |    1 
+ include/crypto/internal/blake2s.h |    6 +-
+ lib/crypto/Kconfig                |   23 ++---------
+ lib/crypto/Makefile               |    9 +---
+ lib/crypto/blake2s-generic.c      |    6 ++
+ lib/crypto/blake2s.c              |    6 --
+ 14 files changed, 189 insertions(+), 174 deletions(-)
+ create mode 100644 arch/arm/crypto/blake2s-shash.c
+ create mode 100644 arch/x86/crypto/blake2s-shash.c
 
-Changes in v7:
-  - Fix sparc64 build (skip the line if the number of fields is less than 3)
-
-Changes in v5:
-  - Add more comments in the script
-
-Changes in v4:
-  - New patch
-
- scripts/Makefile.build     |  4 +++
- scripts/check-local-export | 65 ++++++++++++++++++++++++++++++++++++++
- scripts/mod/modpost.c      | 28 +---------------
- 3 files changed, 70 insertions(+), 27 deletions(-)
- create mode 100755 scripts/check-local-export
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 23e1fb19f9ad..0135b4e7f78b 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -248,9 +248,12 @@ cmd_gen_ksymdeps = \
- 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
- endif
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sh
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+ obj-$(CONFIG_CRYPTO_BLAKE2S_ARM) += blake2s-arm.o
++obj-$(if $(CONFIG_CRYPTO_BLAKE2S_ARM),y) += libblake2s-arm.o
+ obj-$(CONFIG_CRYPTO_BLAKE2B_NEON) += blake2b-neon.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+ obj-$(CONFIG_CRYPTO_POLY1305_ARM) += poly1305-arm.o
+@@ -31,7 +32,8 @@ sha256-arm-neon-$(CONFIG_KERNEL_MODE_NEO
+ sha256-arm-y	:= sha256-core.o sha256_glue.o $(sha256-arm-neon-y)
+ sha512-arm-neon-$(CONFIG_KERNEL_MODE_NEON) := sha512-neon-glue.o
+ sha512-arm-y	:= sha512-core.o sha512-glue.o $(sha512-arm-neon-y)
+-blake2s-arm-y   := blake2s-core.o blake2s-glue.o
++blake2s-arm-y   := blake2s-shash.o
++libblake2s-arm-y:= blake2s-core.o blake2s-glue.o
+ blake2b-neon-y  := blake2b-neon-core.o blake2b-neon-glue.o
+ sha1-arm-ce-y	:= sha1-ce-core.o sha1-ce-glue.o
+ sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
+--- a/arch/arm/crypto/blake2s-core.S
++++ b/arch/arm/crypto/blake2s-core.S
+@@ -167,8 +167,8 @@
+ .endm
  
-+cmd_check_local_export = $(srctree)/scripts/check-local-export $@
-+
- define rule_cc_o_c
- 	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
-+	$(call cmd,check_local_export)
- 	$(call cmd,checksrc)
- 	$(call cmd,checkdoc)
- 	$(call cmd,gen_objtooldep)
-@@ -261,6 +264,7 @@ endef
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)
- 	$(call cmd,gen_ksymdeps)
-+	$(call cmd,check_local_export)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
- endef
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-new file mode 100755
-index 000000000000..017119d89cd2
+ //
+-// void blake2s_compress_arch(struct blake2s_state *state,
+-//			      const u8 *block, size_t nblocks, u32 inc);
++// void blake2s_compress(struct blake2s_state *state,
++//			 const u8 *block, size_t nblocks, u32 inc);
+ //
+ // Only the first three fields of struct blake2s_state are used:
+ //	u32 h[8];	(inout)
+@@ -176,7 +176,7 @@
+ //	u32 f[2];	(in)
+ //
+ 	.align		5
+-ENTRY(blake2s_compress_arch)
++ENTRY(blake2s_compress)
+ 	push		{r0-r2,r4-r11,lr}	// keep this an even number
+ 
+ .Lnext_block:
+@@ -303,4 +303,4 @@ ENTRY(blake2s_compress_arch)
+ 	str		r3, [r12], #4
+ 	bne		1b
+ 	b		.Lcopy_block_done
+-ENDPROC(blake2s_compress_arch)
++ENDPROC(blake2s_compress)
+--- a/arch/arm/crypto/blake2s-glue.c
++++ b/arch/arm/crypto/blake2s-glue.c
+@@ -1,78 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- * BLAKE2s digest algorithm, ARM scalar implementation
+- *
+- * Copyright 2020 Google LLC
+- */
+ 
+ #include <crypto/internal/blake2s.h>
+-#include <crypto/internal/hash.h>
+-
+ #include <linux/module.h>
+ 
+ /* defined in blake2s-core.S */
+-EXPORT_SYMBOL(blake2s_compress_arch);
+-
+-static int crypto_blake2s_update_arm(struct shash_desc *desc,
+-				     const u8 *in, unsigned int inlen)
+-{
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
+-}
+-
+-static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
+-{
+-	return crypto_blake2s_final(desc, out, blake2s_compress_arch);
+-}
+-
+-#define BLAKE2S_ALG(name, driver_name, digest_size)			\
+-	{								\
+-		.base.cra_name		= name,				\
+-		.base.cra_driver_name	= driver_name,			\
+-		.base.cra_priority	= 200,				\
+-		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
+-		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
+-		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
+-		.base.cra_module	= THIS_MODULE,			\
+-		.digestsize		= digest_size,			\
+-		.setkey			= crypto_blake2s_setkey,	\
+-		.init			= crypto_blake2s_init,		\
+-		.update			= crypto_blake2s_update_arm,	\
+-		.final			= crypto_blake2s_final_arm,	\
+-		.descsize		= sizeof(struct blake2s_state),	\
+-	}
+-
+-static struct shash_alg blake2s_arm_algs[] = {
+-	BLAKE2S_ALG("blake2s-128", "blake2s-128-arm", BLAKE2S_128_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-160", "blake2s-160-arm", BLAKE2S_160_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-224", "blake2s-224-arm", BLAKE2S_224_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-256", "blake2s-256-arm", BLAKE2S_256_HASH_SIZE),
+-};
+-
+-static int __init blake2s_arm_mod_init(void)
+-{
+-	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
+-		crypto_register_shashes(blake2s_arm_algs,
+-					ARRAY_SIZE(blake2s_arm_algs)) : 0;
+-}
+-
+-static void __exit blake2s_arm_mod_exit(void)
+-{
+-	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
+-		crypto_unregister_shashes(blake2s_arm_algs,
+-					  ARRAY_SIZE(blake2s_arm_algs));
+-}
+-
+-module_init(blake2s_arm_mod_init);
+-module_exit(blake2s_arm_mod_exit);
+-
+-MODULE_DESCRIPTION("BLAKE2s digest algorithm, ARM scalar implementation");
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+-MODULE_ALIAS_CRYPTO("blake2s-128");
+-MODULE_ALIAS_CRYPTO("blake2s-128-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-160");
+-MODULE_ALIAS_CRYPTO("blake2s-160-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-224");
+-MODULE_ALIAS_CRYPTO("blake2s-224-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-256");
+-MODULE_ALIAS_CRYPTO("blake2s-256-arm");
++EXPORT_SYMBOL(blake2s_compress);
 --- /dev/null
-+++ b/scripts/check-local-export
-@@ -0,0 +1,65 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
-+#
-+# Exit with error if a local exported symbol is found.
-+# EXPORT_SYMBOL should be used for global symbols.
++++ b/arch/arm/crypto/blake2s-shash.c
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * BLAKE2s digest algorithm, ARM scalar implementation
++ *
++ * Copyright 2020 Google LLC
++ */
 +
-+set -e
++#include <crypto/internal/blake2s.h>
++#include <crypto/internal/hash.h>
 +
-+declare -A symbol_types
-+declare -a export_symbols
++#include <linux/module.h>
 +
-+exit_code=0
++static int crypto_blake2s_update_arm(struct shash_desc *desc,
++				     const u8 *in, unsigned int inlen)
++{
++	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++}
 +
-+while read value type name
-+do
-+	# Skip the number of fields is less than 3.
-+	#
-+	# case 1)
-+	#   For undefined symbols, the first field (value) is empty.
-+	#   The outout looks like this:
-+	#     "                 U _printk"
-+	#   It is unneeded to record undefined symbols.
-+	#
-+	# case 2)
-+	#   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
-+	#     "---------------- t"
-+	if [[ -z ${name} ]]; then
-+		continue
-+	fi
++static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
++{
++	return crypto_blake2s_final(desc, out, blake2s_compress);
++}
 +
-+	# save (name, type) in the associative array
-+	symbol_types[${name}]=${type}
++#define BLAKE2S_ALG(name, driver_name, digest_size)			\
++	{								\
++		.base.cra_name		= name,				\
++		.base.cra_driver_name	= driver_name,			\
++		.base.cra_priority	= 200,				\
++		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
++		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
++		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
++		.base.cra_module	= THIS_MODULE,			\
++		.digestsize		= digest_size,			\
++		.setkey			= crypto_blake2s_setkey,	\
++		.init			= crypto_blake2s_init,		\
++		.update			= crypto_blake2s_update_arm,	\
++		.final			= crypto_blake2s_final_arm,	\
++		.descsize		= sizeof(struct blake2s_state),	\
++	}
 +
-+	# append the exported symbol to the array
-+	if [[ ${name} == __ksymtab_* ]]; then
-+		export_symbols+=(${name#__ksymtab_})
-+	fi
++static struct shash_alg blake2s_arm_algs[] = {
++	BLAKE2S_ALG("blake2s-128", "blake2s-128-arm", BLAKE2S_128_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-160", "blake2s-160-arm", BLAKE2S_160_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-224", "blake2s-224-arm", BLAKE2S_224_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-256", "blake2s-256-arm", BLAKE2S_256_HASH_SIZE),
++};
 +
-+	# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm)
-+	# shows 'no symbols' diagnostic (but exits with 0). It is harmless and
-+	# hidden by '2>/dev/null'. However, it suppresses real error messages
-+	# as well. Add a hand-crafted error message here.
-+	#
-+	# Use --quiet instead of 2>/dev/null when we upgrade the minimum version
-+	# of binutils to 2.37, llvm to 13.0.0.
-+	#
-+	# Then, the following line will be really simple:
-+	#   done < <(${NM} --quiet ${1})
-+done < <(${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } )
++static int __init blake2s_arm_mod_init(void)
++{
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shashes(blake2s_arm_algs,
++					ARRAY_SIZE(blake2s_arm_algs)) : 0;
++}
 +
-+# Catch error in the process substitution
-+wait $!
++static void __exit blake2s_arm_mod_exit(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
++		crypto_unregister_shashes(blake2s_arm_algs,
++					  ARRAY_SIZE(blake2s_arm_algs));
++}
 +
-+for name in "${export_symbols[@]}"
-+do
-+	# nm(3) says "If lowercase, the symbol is usually local"
-+	if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
-+		echo "$@: error: local symbol '${name}' was exported" >&2
-+		exit_code=1
-+	fi
-+done
++module_init(blake2s_arm_mod_init);
++module_exit(blake2s_arm_mod_exit);
 +
-+exit ${exit_code}
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index e74224a6a8e8..9269735f85c5 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -212,7 +212,6 @@ struct symbol {
- 	unsigned int crc;
- 	bool crc_valid;
- 	bool weak;
--	bool is_static;		/* true if symbol is not global */
- 	bool is_gpl_only;	/* exported by EXPORT_SYMBOL_GPL */
- 	char name[];
- };
-@@ -242,7 +241,7 @@ static struct symbol *alloc_symbol(const char *name)
++MODULE_DESCRIPTION("BLAKE2s digest algorithm, ARM scalar implementation");
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
++MODULE_ALIAS_CRYPTO("blake2s-128");
++MODULE_ALIAS_CRYPTO("blake2s-128-arm");
++MODULE_ALIAS_CRYPTO("blake2s-160");
++MODULE_ALIAS_CRYPTO("blake2s-160-arm");
++MODULE_ALIAS_CRYPTO("blake2s-224");
++MODULE_ALIAS_CRYPTO("blake2s-224-arm");
++MODULE_ALIAS_CRYPTO("blake2s-256");
++MODULE_ALIAS_CRYPTO("blake2s-256-arm");
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -62,7 +62,9 @@ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha
+ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
  
- 	memset(s, 0, sizeof(*s));
- 	strcpy(s->name, name);
--	s->is_static = true;
-+
- 	return s;
+ obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+-blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
++blake2s-x86_64-y := blake2s-shash.o
++obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
++libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+ 
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+--- a/arch/x86/crypto/blake2s-glue.c
++++ b/arch/x86/crypto/blake2s-glue.c
+@@ -5,7 +5,6 @@
+ 
+ #include <crypto/internal/blake2s.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/internal/hash.h>
+ 
+ #include <linux/types.h>
+ #include <linux/jump_label.h>
+@@ -28,9 +27,8 @@ asmlinkage void blake2s_compress_avx512(
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_ssse3);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
+ 
+-void blake2s_compress_arch(struct blake2s_state *state,
+-			   const u8 *block, size_t nblocks,
+-			   const u32 inc)
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc)
+ {
+ 	/* SIMD disables preemption, so relax after processing each page. */
+ 	BUILD_BUG_ON(SZ_4K / BLAKE2S_BLOCK_SIZE < 8);
+@@ -56,49 +54,12 @@ void blake2s_compress_arch(struct blake2
+ 		block += blocks * BLAKE2S_BLOCK_SIZE;
+ 	} while (nblocks);
+ }
+-EXPORT_SYMBOL(blake2s_compress_arch);
+-
+-static int crypto_blake2s_update_x86(struct shash_desc *desc,
+-				     const u8 *in, unsigned int inlen)
+-{
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
+-}
+-
+-static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
+-{
+-	return crypto_blake2s_final(desc, out, blake2s_compress_arch);
+-}
+-
+-#define BLAKE2S_ALG(name, driver_name, digest_size)			\
+-	{								\
+-		.base.cra_name		= name,				\
+-		.base.cra_driver_name	= driver_name,			\
+-		.base.cra_priority	= 200,				\
+-		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
+-		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
+-		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
+-		.base.cra_module	= THIS_MODULE,			\
+-		.digestsize		= digest_size,			\
+-		.setkey			= crypto_blake2s_setkey,	\
+-		.init			= crypto_blake2s_init,		\
+-		.update			= crypto_blake2s_update_x86,	\
+-		.final			= crypto_blake2s_final_x86,	\
+-		.descsize		= sizeof(struct blake2s_state),	\
+-	}
+-
+-static struct shash_alg blake2s_algs[] = {
+-	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
+-};
++EXPORT_SYMBOL(blake2s_compress);
+ 
+ static int __init blake2s_mod_init(void)
+ {
+-	if (!boot_cpu_has(X86_FEATURE_SSSE3))
+-		return 0;
+-
+-	static_branch_enable(&blake2s_use_ssse3);
++	if (boot_cpu_has(X86_FEATURE_SSSE3))
++		static_branch_enable(&blake2s_use_ssse3);
+ 
+ 	if (IS_ENABLED(CONFIG_AS_AVX512) &&
+ 	    boot_cpu_has(X86_FEATURE_AVX) &&
+@@ -109,26 +70,9 @@ static int __init blake2s_mod_init(void)
+ 			      XFEATURE_MASK_AVX512, NULL))
+ 		static_branch_enable(&blake2s_use_avx512);
+ 
+-	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
+-		crypto_register_shashes(blake2s_algs,
+-					ARRAY_SIZE(blake2s_algs)) : 0;
+-}
+-
+-static void __exit blake2s_mod_exit(void)
+-{
+-	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
+-		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	return 0;
  }
  
-@@ -2064,20 +2063,6 @@ static void read_symbols(const char *modname)
- 					     sym_get_data(&info, sym));
- 	}
+ module_init(blake2s_mod_init);
+-module_exit(blake2s_mod_exit);
  
--	// check for static EXPORT_SYMBOL_* functions && global vars
--	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
--		unsigned char bind = ELF_ST_BIND(sym->st_info);
--
--		if (bind == STB_GLOBAL || bind == STB_WEAK) {
--			struct symbol *s =
--				find_symbol(remove_dot(info.strtab +
--						       sym->st_name));
--
--			if (s)
--				s->is_static = false;
--		}
--	}
--
- 	check_sec_ref(modname, &info);
+-MODULE_ALIAS_CRYPTO("blake2s-128");
+-MODULE_ALIAS_CRYPTO("blake2s-128-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-160");
+-MODULE_ALIAS_CRYPTO("blake2s-160-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-224");
+-MODULE_ALIAS_CRYPTO("blake2s-224-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-256");
+-MODULE_ALIAS_CRYPTO("blake2s-256-x86");
+ MODULE_LICENSE("GPL v2");
+--- /dev/null
++++ b/arch/x86/crypto/blake2s-shash.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <crypto/internal/blake2s.h>
++#include <crypto/internal/simd.h>
++#include <crypto/internal/hash.h>
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/sizes.h>
++
++#include <asm/cpufeature.h>
++#include <asm/processor.h>
++
++static int crypto_blake2s_update_x86(struct shash_desc *desc,
++				     const u8 *in, unsigned int inlen)
++{
++	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++}
++
++static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
++{
++	return crypto_blake2s_final(desc, out, blake2s_compress);
++}
++
++#define BLAKE2S_ALG(name, driver_name, digest_size)			\
++	{								\
++		.base.cra_name		= name,				\
++		.base.cra_driver_name	= driver_name,			\
++		.base.cra_priority	= 200,				\
++		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
++		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
++		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
++		.base.cra_module	= THIS_MODULE,			\
++		.digestsize		= digest_size,			\
++		.setkey			= crypto_blake2s_setkey,	\
++		.init			= crypto_blake2s_init,		\
++		.update			= crypto_blake2s_update_x86,	\
++		.final			= crypto_blake2s_final_x86,	\
++		.descsize		= sizeof(struct blake2s_state),	\
++	}
++
++static struct shash_alg blake2s_algs[] = {
++	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
++};
++
++static int __init blake2s_mod_init(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
++		return crypto_register_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	return 0;
++}
++
++static void __exit blake2s_mod_exit(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
++		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++}
++
++module_init(blake2s_mod_init);
++module_exit(blake2s_mod_exit);
++
++MODULE_ALIAS_CRYPTO("blake2s-128");
++MODULE_ALIAS_CRYPTO("blake2s-128-x86");
++MODULE_ALIAS_CRYPTO("blake2s-160");
++MODULE_ALIAS_CRYPTO("blake2s-160-x86");
++MODULE_ALIAS_CRYPTO("blake2s-224");
++MODULE_ALIAS_CRYPTO("blake2s-224-x86");
++MODULE_ALIAS_CRYPTO("blake2s-256");
++MODULE_ALIAS_CRYPTO("blake2s-256-x86");
++MODULE_LICENSE("GPL v2");
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1919,9 +1919,10 @@ config CRYPTO_STATS
+ config CRYPTO_HASH_INFO
+ 	bool
  
- 	if (!mod->is_vmlinux) {
-@@ -2507,7 +2492,6 @@ static void read_dump(const char *fname)
- 			mod->from_dump = true;
- 		}
- 		s = sym_add_exported(symname, mod, gpl_only);
--		s->is_static = false;
- 		sym_set_crc(s, crc);
- 		sym_update_namespace(symname, namespace);
- 	}
-@@ -2572,7 +2556,6 @@ int main(int argc, char **argv)
- 	char *missing_namespace_deps = NULL;
- 	char *dump_write = NULL, *files_source = NULL;
- 	int opt;
--	int n;
- 	LIST_HEAD(dump_lists);
- 	struct dump_list *dl, *dl2;
+-source "lib/crypto/Kconfig"
+ source "drivers/crypto/Kconfig"
+ source "crypto/asymmetric_keys/Kconfig"
+ source "certs/Kconfig"
  
-@@ -2648,15 +2631,6 @@ int main(int argc, char **argv)
- 	if (sec_mismatch_count && !sec_mismatch_warn_only)
- 		error("Section mismatches detected.\n"
- 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
--	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
--		struct symbol *s;
+ endif	# if CRYPTO
++
++source "lib/crypto/Kconfig"
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -81,7 +81,6 @@ config WIREGUARD
+ 	select CRYPTO
+ 	select CRYPTO_LIB_CURVE25519
+ 	select CRYPTO_LIB_CHACHA20POLY1305
+-	select CRYPTO_LIB_BLAKE2S
+ 	select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
+ 	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
+ 	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
+--- a/include/crypto/internal/blake2s.h
++++ b/include/crypto/internal/blake2s.h
+@@ -11,11 +11,11 @@
+ #include <crypto/internal/hash.h>
+ #include <linux/string.h>
+ 
+-void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
++void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+ 			      size_t nblocks, const u32 inc);
+ 
+-void blake2s_compress_arch(struct blake2s_state *state,const u8 *block,
+-			   size_t nblocks, const u32 inc);
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc);
+ 
+ bool blake2s_selftest(void);
+ 
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -1,7 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-comment "Crypto library routines"
 -
--		for (s = symbolhash[n]; s; s = s->next) {
--			if (s->is_static)
--				error("\"%s\" [%s] is a static EXPORT_SYMBOL\n",
--				      s->name, s->module->name);
--		}
--	}
+ config CRYPTO_LIB_AES
+ 	tristate
  
- 	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
- 		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
--- 
-2.32.0
+@@ -9,14 +7,14 @@ config CRYPTO_LIB_ARC4
+ 	tristate
+ 
+ config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+-	tristate
++	bool
+ 	help
+ 	  Declares whether the architecture provides an arch-specific
+ 	  accelerated implementation of the Blake2s library interface,
+ 	  either builtin or as a module.
+ 
+ config CRYPTO_LIB_BLAKE2S_GENERIC
+-	tristate
++	def_bool !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+ 	help
+ 	  This symbol can be depended upon by arch implementations of the
+ 	  Blake2s library interface that require the generic code as a
+@@ -24,15 +22,6 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
+ 	  implementation is enabled, this implementation serves the users
+ 	  of CRYPTO_LIB_BLAKE2S.
+ 
+-config CRYPTO_LIB_BLAKE2S
+-	tristate "BLAKE2s hash function library"
+-	depends on CRYPTO_ARCH_HAVE_LIB_BLAKE2S || !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+-	select CRYPTO_LIB_BLAKE2S_GENERIC if CRYPTO_ARCH_HAVE_LIB_BLAKE2S=n
+-	help
+-	  Enable the Blake2s library interface. This interface may be fulfilled
+-	  by either the generic implementation or an arch-specific one, if one
+-	  is available and enabled.
+-
+ config CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	tristate
+ 	help
+@@ -51,7 +40,7 @@ config CRYPTO_LIB_CHACHA_GENERIC
+ 	  of CRYPTO_LIB_CHACHA.
+ 
+ config CRYPTO_LIB_CHACHA
+-	tristate "ChaCha library interface"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+ 	help
+@@ -76,7 +65,7 @@ config CRYPTO_LIB_CURVE25519_GENERIC
+ 	  of CRYPTO_LIB_CURVE25519.
+ 
+ config CRYPTO_LIB_CURVE25519
+-	tristate "Curve25519 scalar multiplication library"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
+ 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+ 	help
+@@ -111,7 +100,7 @@ config CRYPTO_LIB_POLY1305_GENERIC
+ 	  of CRYPTO_LIB_POLY1305.
+ 
+ config CRYPTO_LIB_POLY1305
+-	tristate "Poly1305 library interface"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+ 	help
+@@ -120,7 +109,7 @@ config CRYPTO_LIB_POLY1305
+ 	  is available and enabled.
+ 
+ config CRYPTO_LIB_CHACHA20POLY1305
+-	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	select CRYPTO_LIB_CHACHA
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -10,11 +10,10 @@ libaes-y					:= aes.o
+ obj-$(CONFIG_CRYPTO_LIB_ARC4)			+= libarc4.o
+ libarc4-y					:= arc4.o
+ 
+-obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= libblake2s-generic.o
+-libblake2s-generic-y				+= blake2s-generic.o
+-
+-obj-$(CONFIG_CRYPTO_LIB_BLAKE2S)		+= libblake2s.o
+-libblake2s-y					+= blake2s.o
++# blake2s is used by the /dev/random driver which is always builtin
++obj-y						+= libblake2s.o
++libblake2s-y					:= blake2s.o
++libblake2s-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= blake2s-generic.o
+ 
+ obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305)	+= libchacha20poly1305.o
+ libchacha20poly1305-y				+= chacha20poly1305.o
+--- a/lib/crypto/blake2s-generic.c
++++ b/lib/crypto/blake2s-generic.c
+@@ -37,7 +37,11 @@ static inline void blake2s_increment_cou
+ 	state->t[1] += (state->t[0] < inc);
+ }
+ 
+-void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc)
++		      __weak __alias(blake2s_compress_generic);
++
++void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+ 			      size_t nblocks, const u32 inc)
+ {
+ 	u32 m[16];
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -16,12 +16,6 @@
+ #include <linux/init.h>
+ #include <linux/bug.h>
+ 
+-#if IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S)
+-#  define blake2s_compress blake2s_compress_arch
+-#else
+-#  define blake2s_compress blake2s_compress_generic
+-#endif
+-
+ void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
+ {
+ 	__blake2s_update(state, in, inlen, blake2s_compress);
+
 
