@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D927C433F5
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B81C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350767AbiE0KEo (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 May 2022 06:04:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51488 "EHLO
+        id S232955AbiE0KFZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 27 May 2022 06:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350772AbiE0KEm (ORCPT
+        with ESMTP id S1350917AbiE0KFL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 06:04:42 -0400
+        Fri, 27 May 2022 06:05:11 -0400
+X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 27 May 2022 03:05:10 PDT
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B4B1078B2;
-        Fri, 27 May 2022 03:04:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB33106A69;
+        Fri, 27 May 2022 03:05:09 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24RA2hPQ029808;
-        Fri, 27 May 2022 19:02:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPQ029808
+        by conuserg-08.nifty.com with ESMTP id 24RA2hPY029808;
+        Fri, 27 May 2022 19:02:52 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPY029808
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653645764;
-        bh=61zPFwXwuMzPPnYh5a2KY2eJrg46Tur01X/5UtHyktY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=2YPSV64Qy3StO2+UBYGQgOhCFR1cwIATKIFqJYTyDsdkMxdosGUD6v4/ed3N9Wbk1
-         H1h3RaS9tKQtF6OA0intkN7q+jMauoV0j4XpNnk+qeMaHauQVnjQtPsX46qKIqTlht
-         qIcHJse9UrOKt4R3ixLQUU3xdvackns8mxdNPk48DqTn4a4hapvuTTzCTWMgvQSjWb
-         kWRmGEDf1557zuUF7bglIVEyA4k9SQ43JXps4nTZV643+td0aA6zHEbs5v9kXYu7I6
-         oVCa2dvrMpB++v4qmTDq7rN5UQ+6n7qzYQO0EJuBLUNT7TKQo+5sNP5W2LBXYd4nOu
-         1xOiN1zVA94Tg==
+        s=dec2015msa; t=1653645773;
+        bh=jCYP4PRhKOSnrfF8IZ7vFN4wM6bjQvDGDEXIDORQ8GA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=jikzAhA331ol0PYeJLvjeBEbXdujI+kIf0o3ofXuKIEM+meJCBxUL0pXT+5ICkrrk
+         WGEI+qfbQ/eYfPv2X/mCpePNalEwvJoQquANrW6/9yUIYvayiJG3pecAlquCklvEzu
+         u9CAnTa2xAQfvS1milmRCkFvz1Ows9DtGa22empJVZwYjcSYwicxgZfullj8vV0NpX
+         hX66B4UH9sI7lX+LKJvr0edE2Gsv1wZM/9PTdvP6Iw+GTJyitv6VLegEP4RdZeO1DD
+         0UWOpTu5TFRnHiim7arEAU9NCmnt1bLfqR+NSrzOK26eqN0h/T4CftjLGI9wKkrUH9
+         bW4oOJqflZ3eQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -38,50 +38,75 @@ Cc:     linux-kernel@vger.kernel.org,
         Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
         Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Michal Marek <michal.lkml@markovi.net>,
+        Kees Cook <keescook@chromium.org>,
         Nathan Chancellor <nathan@kernel.org>,
+        Nicolas Schier <n.schier@avm.de>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Tom Rix <trix@redhat.com>
-Subject: [PATCH v7 0/8] kbuild: yet another series of cleanups
-Date:   Fri, 27 May 2022 19:01:47 +0900
-Message-Id: <20220527100155.1996314-1-masahiroy@kernel.org>
+Subject: [PATCH v7 8/8] kbuild: rebuild multi-object modules when objtool is updated
+Date:   Fri, 27 May 2022 19:01:55 +0900
+Message-Id: <20220527100155.1996314-9-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220527100155.1996314-1-masahiroy@kernel.org>
+References: <20220527100155.1996314-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
+When CONFIG_LTO_CLANG or CONFIG_X86_KERNEL_IBT is enabled, objtool for
+multi-object modules is postponed until the objects are linked together.
 
-A couple errors have been reported since I applied v6.
+Make sure to re-run objtool and re-link multi-object modules when
+objtool is updated.
 
-I am sending v7.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Acked-by: Josh Poimboeuf <jpoimboe@redhat.com>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Nicolas Schier <n.schier@avm.de>
+Tested-by: Sedat Dilek <sedat.dilek@gmail.com> # LLVM-14 (x86-64)
+---
 
+(no changes since v4)
 
-Masahiro Yamada (8):
-  kbuild: replace $(linked-object) with CONFIG options
-  kbuild: do not create *.prelink.o for Clang LTO or IBT
-  parisc: fix the exit status of arch/parisc/nm
-  kbuild: check static EXPORT_SYMBOL* by script instead of modpost
-  kbuild: make built-in.a rule robust against too long argument error
-  kbuild: make *.mod rule robust against too long argument error
-  kbuild: add cmd_and_savecmd macro
-  kbuild: rebuild multi-object modules when objtool is updated
+Changes in v4:
+  - New
+    Resent of my previous submission
+    https://lore.kernel.org/linux-kbuild/20210831074004.3195284-11-masahiroy@kernel.org/
 
- arch/parisc/Makefile       |  2 +-
- arch/parisc/nm             | 12 +++++-
- scripts/Kbuild.include     | 10 ++++-
- scripts/Makefile.build     | 87 +++++++++++++++++---------------------
- scripts/Makefile.lib       |  7 ---
- scripts/Makefile.modfinal  |  5 +--
- scripts/Makefile.modpost   |  9 +---
- scripts/check-local-export | 65 ++++++++++++++++++++++++++++
- scripts/mod/modpost.c      | 35 +--------------
- 9 files changed, 128 insertions(+), 104 deletions(-)
- mode change 100644 => 100755 arch/parisc/nm
- create mode 100755 scripts/check-local-export
+ scripts/Makefile.build | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 31feb798e16e..bd5fc2b37387 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -412,13 +412,18 @@ $(obj)/modules.order: $(obj-m) FORCE
+ $(obj)/lib.a: $(lib-y) FORCE
+ 	$(call if_changed,ar)
+ 
+-quiet_cmd_link_multi-m = LD [M]  $@
+-      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
++quiet_cmd_ld_multi_m = LD [M]  $@
++      cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
++
++define rule_ld_multi_m
++	$(call cmd_and_savecmd,ld_multi_m)
++	$(call cmd,gen_objtooldep)
++endef
+ 
+ $(multi-obj-m): objtool-enabled := $(delay-objtool)
+ $(multi-obj-m): part-of-module := y
+ $(multi-obj-m): %.o: %.mod FORCE
+-	$(call if_changed,link_multi-m)
++	$(call if_changed_rule,ld_multi_m)
+ $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
+ 
+ targets := $(filter-out $(PHONY), $(targets))
 -- 
 2.32.0
 
