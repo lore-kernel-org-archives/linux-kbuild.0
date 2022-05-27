@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0511C4332F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6434DC433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350792AbiE0KF2 (ORCPT
+        id S1350789AbiE0KE6 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 May 2022 06:05:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52314 "EHLO
+        Fri, 27 May 2022 06:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350933AbiE0KFR (ORCPT
+        with ESMTP id S1350791AbiE0KE4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 06:05:17 -0400
+        Fri, 27 May 2022 06:04:56 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B77106577;
-        Fri, 27 May 2022 03:05:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F28B1116EA;
+        Fri, 27 May 2022 03:04:46 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24RA2hPS029808;
-        Fri, 27 May 2022 19:02:46 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPS029808
+        by conuserg-08.nifty.com with ESMTP id 24RA2hPU029808;
+        Fri, 27 May 2022 19:02:48 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPU029808
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653645767;
-        bh=SoYyI3Vl79XcBz6rKgrVB3f/gawTaflZ8wkhRbY1iyg=;
+        s=dec2015msa; t=1653645768;
+        bh=63AM9Y7KFJuXBvKXOmj6kJdz+ZNVbwHrp42ZdIFptX0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XmDVyTj3RAdPhHU5BIen4d8chFB1j4LYP9aySeubfNAwwwx54tXgW0uenkt6cpMQl
-         9yENuYy1d66gB+F3GIQV49sgVIuEjVQDfH8OReZtfb/It9F8aIRVcZLuNYj28BKkhM
-         qbVqEoIqTX3G7SzsawvdryZyxV3uIsZ0vIr4vXf0GDVjObrGqvnTASdYzhOPK0a3MD
-         TgF5G4ubxLppVzjsF5kAGuijrMV8LMCUPVz9MbOyTMysOkOauMU2ITO65zN/VFqCis
-         XMrYu7jZI51VjCihrFNt7eJOU/tqBFEKYqkh0yAKQAt5GUPKDso8RGPdgya0ItmQ6b
-         PpUQdTCzHPMVg==
+        b=RW1wttQF3Oea8ArmryxA7c5OlRphy4XLSdTGnKXoDhQDvP5OS0CvMg6u22wNMneYx
+         MmO+ShRV77S1L7Kw29gY8hdiRenlRehQa9VP/A7EW8Q74MIo5gh55tpvyRw/EjcNDt
+         FtZa4M+gKZRkV1J7Xeaw1CpPiJZPNC+qWSvPi6SIOT+q7f3UQqnuWYNdCbUsSk7eeK
+         VXAsUTwKMj0SR86wH6e551ECa1syR07zSaD6957dxD4pxsoSxokifNvrkHppOu8zAW
+         mngXMEsnyFXgvcZ5tdQ8cgd6TbzUkBzBfMsFXGJzFu11tESBdN4bw0fStXUmgTILtj
+         rmlIrYn4jxCTQ==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -38,16 +38,14 @@ Cc:     linux-kernel@vger.kernel.org,
         Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
         Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nicolas Schier <nicolas@fjasle.eu>,
+        Nick Desaulniers <ndesaulniers@google.com>,
         Nathan Chancellor <nathan@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
         Sedat Dilek <sedat.dilek@gmail.com>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
         Tom Rix <trix@redhat.com>
-Subject: [PATCH v7 2/8] kbuild: do not create *.prelink.o for Clang LTO or IBT
-Date:   Fri, 27 May 2022 19:01:49 +0900
-Message-Id: <20220527100155.1996314-3-masahiroy@kernel.org>
+Subject: [PATCH v7 4/8] kbuild: check static EXPORT_SYMBOL* by script instead of modpost
+Date:   Fri, 27 May 2022 19:01:51 +0900
+Message-Id: <20220527100155.1996314-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220527100155.1996314-1-masahiroy@kernel.org>
 References: <20220527100155.1996314-1-masahiroy@kernel.org>
@@ -57,329 +55,238 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-When CONFIG_LTO_CLANG=y, additional intermediate *.prelink.o is created
-for each module. Also, objtool is postponed until LLVM IR is converted
-to ELF.
+The 'static' specifier and EXPORT_SYMBOL() are an odd combination.
 
-CONFIG_X86_KERNEL_IBT works in a similar way to postpone objtool until
-objects are merged together.
+Commit 15bfc2348d54 ("modpost: check for static EXPORT_SYMBOL*
+functions") tried to detect it, but this check has false negatives.
 
-This commit stops generating *.prelink.o, so the build flow will look
-similar with/without LTO.
+Here is the sample code.
 
-The following figures show how the LTO build currently works, and
-how this commit is changing it.
+  Makefile:
 
-Current build flow
-==================
+    obj-y += foo1.o foo2.o
 
- [1] single-object module
+  foo1.c:
 
-                                      $(LD)
-           $(CC)                     +objtool              $(LD)
-    foo.c --------------------> foo.o -----> foo.prelink.o -----> foo.ko
-                              (LLVM IR)          (ELF)       |
-                                                             |
-                                                 foo.mod.o --/
+    #include <linux/export.h>
+    static void foo(void) {}
+    EXPORT_SYMBOL(foo);
 
- [2] multi-object module
-                                      $(LD)
-           $(CC)         $(AR)       +objtool               $(LD)
-    foo1.c -----> foo1.o -----> foo.o -----> foo.prelink.o -----> foo.ko
-                           |  (archive)          (ELF)       |
-    foo2.c -----> foo2.o --/                                 |
-                 (LLVM IR)                       foo.mod.o --/
+  foo2.c:
 
-  One confusion is foo.o in multi-object module is an archive despite of
-  its suffix.
+    void foo(void) {}
 
-New build flow
-==============
+foo1.c exports the static symbol 'foo', but modpost cannot catch it
+because it is fooled by foo2.c, which has a global symbol with the
+same name.
 
- [1] single-object module
+s->is_static is cleared if a global symbol with the same name is found
+somewhere, but EXPORT_SYMBOL() and the global symbol do not necessarily
+belong to the same compilation unit.
 
-  Since there is only one object, there is no need to keep the LLVM IR.
-  Use $(CC)+$(LD) to generate an ELF object in one build rule. When LTO
-  is disabled, $(LD) is unneeded because $(CC) produces an ELF object.
+This check should be done per compilation unit, but I do not know how
+to do it in modpost. modpost runs against vmlinux.o or modules, which
+merges multiple objects, then forgets their origin.
 
-               $(CC)+$(LD)+objtool              $(LD)
-    foo.c ----------------------------> foo.o ---------> foo.ko
-                                        (ELF)     |
-                                                  |
-                                      foo.mod.o --/
+modpost cannot parse individual objects because they may not be ELF but
+LLVM IR when CONFIG_LTO_CLANG=y.
 
- [2] multi-object module
+Add a simple bash script to parse the output from ${NM}. This works for
+CONFIG_LTO_CLANG=y because llvm-nm can dump symbols of LLVM IR files.
 
-  Previously, $(AR) was used to combine LLVM bitcode into an archive,
-  but there was no technical reason to do so. Use $(LD) to merge them
-  into a single ELF object.
-
-                               $(LD)
-             $(CC)            +objtool          $(LD)
-    foo1.c ---------> foo1.o ---------> foo.o ---------> foo.ko
-                                 |      (ELF)     |
-    foo2.c ---------> foo2.o ----/                |
-                     (LLVM IR)        foo.mod.o --/
+Revert 15bfc2348d54.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 Tested-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com> # LLVM-14 (x86-64)
 ---
 
-(no changes since v2)
+Changes in v7:
+  - Fix sparc64 build (skip the line if the number of fields is less than 3)
 
-Changes in v2:
- - replace the chain of $(if ...) with $(and )
+Changes in v5:
+  - Add more comments in the script
 
- scripts/Kbuild.include    |  4 +++
- scripts/Makefile.build    | 60 ++++++++++++---------------------------
- scripts/Makefile.lib      |  7 -----
- scripts/Makefile.modfinal |  5 ++--
- scripts/Makefile.modpost  |  9 ++----
- scripts/mod/modpost.c     |  7 -----
- 6 files changed, 26 insertions(+), 66 deletions(-)
+Changes in v4:
+  - New patch
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 3514c2149e9d..455a0a6ce12d 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -15,6 +15,10 @@ pound := \#
- # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
- dot-target = $(dir $@).$(notdir $@)
- 
-+###
-+# Name of target with a '.tmp_' as filename prefix. foo/bar.o => foo/.tmp_bar.o
-+tmp-target = $(dir $@).tmp_$(notdir $@)
-+
- ###
- # The temporary file to save gcc -MMD generated dependencies must not
- # contain a comma
+ scripts/Makefile.build     |  4 +++
+ scripts/check-local-export | 65 ++++++++++++++++++++++++++++++++++++++
+ scripts/mod/modpost.c      | 28 +---------------
+ 3 files changed, 70 insertions(+), 27 deletions(-)
+ create mode 100755 scripts/check-local-export
+
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f80196eef03a..23e1fb19f9ad 100644
+index 23e1fb19f9ad..0135b4e7f78b 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -88,10 +88,6 @@ endif
- targets-for-modules := $(foreach x, o mod $(if $(CONFIG_TRIM_UNUSED_KSYMS), usyms), \
- 				$(patsubst %.o, %.$x, $(filter %.o, $(obj-m))))
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--targets-for-modules += $(patsubst %.o, %.prelink.o, $(filter %.o, $(obj-m)))
--endif
--
- ifdef need-modorder
- targets-for-modules += $(obj)/modules.order
+@@ -248,9 +248,12 @@ cmd_gen_ksymdeps = \
+ 	$(CONFIG_SHELL) $(srctree)/scripts/gen_ksymdeps.sh $@ >> $(dot-target).cmd
  endif
-@@ -152,8 +148,16 @@ $(obj)/%.ll: $(src)/%.c FORCE
- # The C file is compiled and updated dependency information is generated.
- # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
  
-+is-single-obj-m = $(and $(part-of-module),$(filter $@, $(obj-m)),y)
++cmd_check_local_export = $(srctree)/scripts/check-local-export $@
 +
-+ifdef CONFIG_LTO_CLANG
-+cmd_ld_single_m = $(if $(is-single-obj-m), ; $(LD) $(ld_flags) -r -o $(tmp-target) $@; mv $(tmp-target) $@)
-+endif
+ define rule_cc_o_c
+ 	$(call cmd_and_fixdep,cc_o_c)
+ 	$(call cmd,gen_ksymdeps)
++	$(call cmd,check_local_export)
+ 	$(call cmd,checksrc)
+ 	$(call cmd,checkdoc)
+ 	$(call cmd,gen_objtooldep)
+@@ -261,6 +264,7 @@ endef
+ define rule_as_o_S
+ 	$(call cmd_and_fixdep,as_o_S)
+ 	$(call cmd,gen_ksymdeps)
++	$(call cmd,check_local_export)
+ 	$(call cmd,gen_objtooldep)
+ 	$(call cmd,gen_symversions_S)
+ endef
+diff --git a/scripts/check-local-export b/scripts/check-local-export
+new file mode 100755
+index 000000000000..017119d89cd2
+--- /dev/null
++++ b/scripts/check-local-export
+@@ -0,0 +1,65 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
++#
++# Exit with error if a local exported symbol is found.
++# EXPORT_SYMBOL should be used for global symbols.
 +
- quiet_cmd_cc_o_c = CC $(quiet_modtag)  $@
--      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< $(cmd_objtool)
-+      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $< \
-+		$(cmd_ld_single_m) \
-+		$(cmd_objtool)
- 
- ifdef CONFIG_MODVERSIONS
- # When module versioning is enabled the following steps are executed:
-@@ -219,7 +223,7 @@ objtool_args =								\
- 	$(if $(CONFIG_STACK_VALIDATION), --stackval)			\
- 	$(if $(CONFIG_HAVE_STATIC_CALL_INLINE), --static-call)		\
- 	--uaccess							\
--	$(if $($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT)), --link)	\
-+	$(if $(delay-objtool), --link)					\
- 	$(if $(part-of-module), --module)				\
- 	$(if $(CONFIG_GCOV_KERNEL), --no-unreachable)
- 
-@@ -228,21 +232,16 @@ cmd_gen_objtooldep = $(if $(objtool-enabled), { echo ; echo '$@: $$(wildcard $(o
- 
- endif # CONFIG_OBJTOOL
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--
--# Skip objtool for LLVM bitcode
--$(obj)/%.o: objtool-enabled :=
--
--else
- 
- # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
- # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file
- 
--$(obj)/%.o: objtool-enabled = $(if $(filter-out y%, \
--	$(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
-+is-standard-object = $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
- 
--endif
-+delay-objtool := $(or $(CONFIG_LTO_CLANG),$(CONFIG_X86_KERNEL_IBT))
++set -e
 +
-+$(obj)/%.o: objtool-enabled = $(if $(is-standard-object),$(if $(delay-objtool),$(is-single-obj-m),y))
- 
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- cmd_gen_ksymdeps = \
-@@ -271,24 +270,6 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call if_changed_rule,cc_o_c)
- 	$(call cmd,force_checksrc)
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--# Module .o files may contain LLVM bitcode, compile them into native code
--# before ELF processing
--quiet_cmd_cc_prelink_modules = LD [M]  $@
--      cmd_cc_prelink_modules =						\
--	$(LD) $(ld_flags) -r -o $@					\
--		--whole-archive $(filter-out FORCE,$^)			\
--		$(cmd_objtool)
--
--# objtool was skipped for LLVM bitcode, run it now that we have compiled
--# modules into native code
--$(obj)/%.prelink.o: objtool-enabled = y
--$(obj)/%.prelink.o: part-of-module := y
--
--$(obj)/%.prelink.o: $(obj)/%.o FORCE
--	$(call if_changed,cc_prelink_modules)
--endif
--
- cmd_mod = echo $(addprefix $(obj)/, $(call real-search, $*.o, .o, -objs -y -m)) | \
- 	$(AWK) -v RS='( |\n)' '!x[$$0]++' > $@
- 
-@@ -298,7 +279,7 @@ $(obj)/%.mod: FORCE
- # List module undefined symbols
- cmd_undefined_syms = $(NM) $< | sed -n 's/^  *U //p' > $@
- 
--$(obj)/%.usyms: $(obj)/%$(mod-prelink-ext).o FORCE
-+$(obj)/%.usyms: $(obj)/%.o FORCE
- 	$(call if_changed,undefined_syms)
- 
- quiet_cmd_cc_lst_c = MKLST   $@
-@@ -420,16 +401,11 @@ $(obj)/modules.order: $(obj-m) FORCE
- $(obj)/lib.a: $(lib-y) FORCE
- 	$(call if_changed,ar)
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--quiet_cmd_link_multi-m = AR [M]  $@
--cmd_link_multi-m =						\
--	rm -f $@; 						\
--	$(AR) cDPrsT $@ @$(patsubst %.o,%.mod,$@)
--else
- quiet_cmd_link_multi-m = LD [M]  $@
--      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@)
--endif
-+      cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
- 
-+$(multi-obj-m): objtool-enabled := $(delay-objtool)
-+$(multi-obj-m): part-of-module := y
- $(multi-obj-m): %.o: %.mod FORCE
- 	$(call if_changed,link_multi-m)
- $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0453a1904646..f75138385449 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -225,13 +225,6 @@ dtc_cpp_flags  = -Wp,-MMD,$(depfile).pre.tmp -nostdinc                    \
- 		 $(addprefix -I,$(DTC_INCLUDE))                          \
- 		 -undef -D__DTS__
- 
--ifneq ($(CONFIG_LTO_CLANG)$(CONFIG_X86_KERNEL_IBT),)
--# With CONFIG_LTO_CLANG, .o files in modules might be LLVM bitcode, so we
--# need to run LTO to compile them into native code (.lto.o) before further
--# processing.
--mod-prelink-ext := .prelink
--endif
--
- # Useful for describing the dependency of composite objects
- # Usage:
- #   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 7f39599e9fae..35100e981f4a 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -9,7 +9,7 @@ __modfinal:
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
--# for c_flags and mod-prelink-ext
-+# for c_flags
- include $(srctree)/scripts/Makefile.lib
- 
- # find all modules listed in modules.order
-@@ -54,9 +54,8 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
- 	$(cmd);                                                              \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
--
- # Re-generate module BTFs if either module's .ko or vmlinux changed
--$(modules): %.ko: %$(mod-prelink-ext).o %.mod.o scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
-+$(modules): %.ko: %.o %.mod.o scripts/module.lds $(if $(KBUILD_BUILTIN),vmlinux) FORCE
- 	+$(call if_changed_except,ld_ko_o,vmlinux)
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 8b343480813d..911606496341 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -41,9 +41,6 @@ __modpost:
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
--# for mod-prelink-ext
--include $(srctree)/scripts/Makefile.lib
--
- MODPOST = scripts/mod/modpost								\
- 	$(if $(CONFIG_MODVERSIONS),-m)							\
- 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
-@@ -117,8 +114,6 @@ $(input-symdump):
- 	@echo >&2 '         Modules may not have dependencies or modversions.'
- 	@echo >&2 '         You may get many unresolved symbol warnings.'
- 
--modules := $(sort $(shell cat $(MODORDER)))
--
- # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined symbols
- ifneq ($(KBUILD_MODPOST_WARN)$(filter-out $(existing-input-symdump), $(input-symdump)),)
- MODPOST += -w
-@@ -127,9 +122,9 @@ endif
- # Read out modules.order to pass in modpost.
- # Otherwise, allmodconfig would fail with "Argument list too long".
- quiet_cmd_modpost = MODPOST $@
--      cmd_modpost = sed 's/\.ko$$/$(mod-prelink-ext)\.o/' $< | $(MODPOST) -T -
-+      cmd_modpost = sed 's/ko$$/o/' $< | $(MODPOST) -T -
- 
--$(output-symdump): $(MODORDER) $(input-symdump) $(modules:.ko=$(mod-prelink-ext).o) FORCE
-+$(output-symdump): $(MODORDER) $(input-symdump) FORCE
- 	$(call if_changed,modpost)
- 
- targets += $(output-symdump)
++declare -A symbol_types
++declare -a export_symbols
++
++exit_code=0
++
++while read value type name
++do
++	# Skip the number of fields is less than 3.
++	#
++	# case 1)
++	#   For undefined symbols, the first field (value) is empty.
++	#   The outout looks like this:
++	#     "                 U _printk"
++	#   It is unneeded to record undefined symbols.
++	#
++	# case 2)
++	#   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
++	#     "---------------- t"
++	if [[ -z ${name} ]]; then
++		continue
++	fi
++
++	# save (name, type) in the associative array
++	symbol_types[${name}]=${type}
++
++	# append the exported symbol to the array
++	if [[ ${name} == __ksymtab_* ]]; then
++		export_symbols+=(${name#__ksymtab_})
++	fi
++
++	# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm)
++	# shows 'no symbols' diagnostic (but exits with 0). It is harmless and
++	# hidden by '2>/dev/null'. However, it suppresses real error messages
++	# as well. Add a hand-crafted error message here.
++	#
++	# Use --quiet instead of 2>/dev/null when we upgrade the minimum version
++	# of binutils to 2.37, llvm to 13.0.0.
++	#
++	# Then, the following line will be really simple:
++	#   done < <(${NM} --quiet ${1})
++done < <(${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } )
++
++# Catch error in the process substitution
++wait $!
++
++for name in "${export_symbols[@]}"
++do
++	# nm(3) says "If lowercase, the symbol is usually local"
++	if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
++		echo "$@: error: local symbol '${name}' was exported" >&2
++		exit_code=1
++	fi
++done
++
++exit ${exit_code}
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index b70a31b4245a..e74224a6a8e8 100644
+index e74224a6a8e8..9269735f85c5 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -1903,10 +1903,6 @@ static char *remove_dot(char *s)
- 		size_t m = strspn(s + n + 1, "0123456789");
- 		if (m && (s[n + m + 1] == '.' || s[n + m + 1] == 0))
- 			s[n] = 0;
--
--		/* strip trailing .prelink */
--		if (strends(s, ".prelink"))
--			s[strlen(s) - 8] = '\0';
- 	}
+@@ -212,7 +212,6 @@ struct symbol {
+ 	unsigned int crc;
+ 	bool crc_valid;
+ 	bool weak;
+-	bool is_static;		/* true if symbol is not global */
+ 	bool is_gpl_only;	/* exported by EXPORT_SYMBOL_GPL */
+ 	char name[];
+ };
+@@ -242,7 +241,7 @@ static struct symbol *alloc_symbol(const char *name)
+ 
+ 	memset(s, 0, sizeof(*s));
+ 	strcpy(s->name, name);
+-	s->is_static = true;
++
  	return s;
  }
-@@ -2028,9 +2024,6 @@ static void read_symbols(const char *modname)
- 		/* strip trailing .o */
- 		tmp = NOFAIL(strdup(modname));
- 		tmp[strlen(tmp) - 2] = '\0';
--		/* strip trailing .prelink */
--		if (strends(tmp, ".prelink"))
--			tmp[strlen(tmp) - 8] = '\0';
- 		mod = new_module(tmp);
- 		free(tmp);
+ 
+@@ -2064,20 +2063,6 @@ static void read_symbols(const char *modname)
+ 					     sym_get_data(&info, sym));
  	}
+ 
+-	// check for static EXPORT_SYMBOL_* functions && global vars
+-	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+-		unsigned char bind = ELF_ST_BIND(sym->st_info);
+-
+-		if (bind == STB_GLOBAL || bind == STB_WEAK) {
+-			struct symbol *s =
+-				find_symbol(remove_dot(info.strtab +
+-						       sym->st_name));
+-
+-			if (s)
+-				s->is_static = false;
+-		}
+-	}
+-
+ 	check_sec_ref(modname, &info);
+ 
+ 	if (!mod->is_vmlinux) {
+@@ -2507,7 +2492,6 @@ static void read_dump(const char *fname)
+ 			mod->from_dump = true;
+ 		}
+ 		s = sym_add_exported(symname, mod, gpl_only);
+-		s->is_static = false;
+ 		sym_set_crc(s, crc);
+ 		sym_update_namespace(symname, namespace);
+ 	}
+@@ -2572,7 +2556,6 @@ int main(int argc, char **argv)
+ 	char *missing_namespace_deps = NULL;
+ 	char *dump_write = NULL, *files_source = NULL;
+ 	int opt;
+-	int n;
+ 	LIST_HEAD(dump_lists);
+ 	struct dump_list *dl, *dl2;
+ 
+@@ -2648,15 +2631,6 @@ int main(int argc, char **argv)
+ 	if (sec_mismatch_count && !sec_mismatch_warn_only)
+ 		error("Section mismatches detected.\n"
+ 		      "Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.\n");
+-	for (n = 0; n < SYMBOL_HASH_SIZE; n++) {
+-		struct symbol *s;
+-
+-		for (s = symbolhash[n]; s; s = s->next) {
+-			if (s->is_static)
+-				error("\"%s\" [%s] is a static EXPORT_SYMBOL\n",
+-				      s->name, s->module->name);
+-		}
+-	}
+ 
+ 	if (nr_unresolved > MAX_UNRESOLVED_REPORTS)
+ 		warn("suppressed %u unresolved symbol warnings because there were too many)\n",
 -- 
 2.32.0
 
