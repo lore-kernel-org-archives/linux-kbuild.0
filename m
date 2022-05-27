@@ -2,121 +2,130 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B66C433F5
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 07:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2D7C433EF
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345515AbiE0HJU (ORCPT
+        id S1350560AbiE0KEL (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 May 2022 03:09:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43842 "EHLO
+        Fri, 27 May 2022 06:04:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345528AbiE0HJQ (ORCPT
+        with ESMTP id S231489AbiE0KEK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 03:09:16 -0400
-Received: from conssluserg-02.nifty.com (conssluserg-02.nifty.com [210.131.2.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05009FF59B;
-        Fri, 27 May 2022 00:08:31 -0700 (PDT)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 24R77wkV008090;
-        Fri, 27 May 2022 16:07:59 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 24R77wkV008090
+        Fri, 27 May 2022 06:04:10 -0400
+Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746E6F137B;
+        Fri, 27 May 2022 03:04:08 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 24RA2hPT029808;
+        Fri, 27 May 2022 19:02:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPT029808
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653635279;
-        bh=mV/udz/FFuiifR9fUggl0SWSX/QJeAsM+es90basFQw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=bZ6koubBA13dDKKMIF4Qj8XW7ypyDItbXW9QeDuyzuJ1VcBBhpyrPd1gi8XFwNr3C
-         FOd4Zi7x5eWmw0zpToh+DeltaWSKMOv/rJxwyEWuGnr2rRR+huri3PWO1akxb4h7I1
-         tZiz09bOYz3rRC0z7QF4U2gEbcL0nIpES61RglMsmqC6b0yryiuCq3eSf8ZhXBgtDf
-         hnKWIYF7V0iGiHPZOofvvv/OJWvYL8FH4xQfJk9bI4BPVa/NMaAkMwt2u6ndFLh1JY
-         mELtIeGoJNElmRK9xbKGUB0+31EPctvX84Akst4scj7aJBtJ952a2NoDH2p7O96d0Y
-         GvHqBcnjd7kEg==
-X-Nifty-SrcIP: [209.85.214.179]
-Received: by mail-pl1-f179.google.com with SMTP id d22so3397859plr.9;
-        Fri, 27 May 2022 00:07:59 -0700 (PDT)
-X-Gm-Message-State: AOAM5319kLs4zkG44vYOw1K2O0PxjrIoHzqE+zMIiV3gLP1XwS/ir//5
-        kTAuvm3Un0tJHnTmopXpbJTS928/ItH0js56/80=
-X-Google-Smtp-Source: ABdhPJylxGPI7tDSEZDye7GXUuW8+TbK0iqVGAGVHq+ghY+58bzx25op6jYR9L4MhCmj303SgIUxmq8grFuWppoIVck=
-X-Received: by 2002:a17:902:9887:b0:151:6e1c:7082 with SMTP id
- s7-20020a170902988700b001516e1c7082mr40896597plp.162.1653635278105; Fri, 27
- May 2022 00:07:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220524152718.331773-1-alexandr.lobakin@intel.com>
-In-Reply-To: <20220524152718.331773-1-alexandr.lobakin@intel.com>
+        s=dec2015msa; t=1653645767;
+        bh=cTEaVsseOx/T6+9eTNjc+bnIPuNDfidAbsIlj5Z4+nw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XpE7bhc4dasDj31nobFoqPZGgWiHTils8FMsJswF8sT3w9ijw0iw3nlSSVTozzRMi
+         5lR95zCyn+Nb62hZxhVHIqd5ZAWWXF0Ki8UEf5wX/DKFCjachHKy+d4+EMx1QH29X9
+         oB0Auu2Zn99EC92w3maEIK2Yd/bYMipg/OlwRvvXPBFznVlCCZRQlpjuNIpRGWqhTJ
+         yYD5OJZlt7Nj2wfepXpIJl4EV+2ROJWGCiqydkPK73l7GS0SbhKeNPsVdHn0TyShTS
+         C9wi5Jten3kQqzhIwYCejZtkdGYT2xGN5xyt4Licsl4OkoREvNk0Ini6mrNgcEehAh
+         Jky+sznG4p0wQ==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 27 May 2022 16:06:35 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARaUvgOeXg5q9JMErYxQsK16JBmK5sWBxhGSu-d+UyrOA@mail.gmail.com>
-Message-ID: <CAK7LNARaUvgOeXg5q9JMErYxQsK16JBmK5sWBxhGSu-d+UyrOA@mail.gmail.com>
-Subject: Re: [PATCH] modpost: fix removing numeric suffixes
-To:     Alexander Lobakin <alexandr.lobakin@intel.com>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Michal Nazarewicz <mina86@mina86.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
+        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Subject: [PATCH v7 3/8] parisc: fix the exit status of arch/parisc/nm
+Date:   Fri, 27 May 2022 19:01:50 +0900
+Message-Id: <20220527100155.1996314-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220527100155.1996314-1-masahiroy@kernel.org>
+References: <20220527100155.1996314-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, May 25, 2022 at 12:28 AM Alexander Lobakin
-<alexandr.lobakin@intel.com> wrote:
->
-> With the `-z unique-symbol` linker flag or any similar mechanism,
-> it is possible to trigger the following:
->
-> ERROR: modpost: "param_set_uint.0" [vmlinux] is a static EXPORT_SYMBOL
->
-> The reason is that for now the condition from remove_dot():
->
-> if (m && (s[n + m] == '.' || s[n + m] == 0))
->
-> which was designed to test if it's a dot or a '\0' after the suffix
-> is never satisfied.
-> This is due to that `s[n + m]` always points to the last digit of a
-> numeric suffix, not on the symbol next to it (from a custom debug
-> print added to modpost):
->
-> param_set_uint.0, s[n + m] is '0', s[n + m + 1] is '\0'
->
-> So it's off-by-one and was like that since 2014.
->
-> Fix this for the sake of any potential upcoming features, but don't
-> bother stable-backporting, as it's well hidden -- apart from that
-> LD flag, it can be triggered only with GCC LTO which never landed
-> upstream.
->
-> Fixes: fcd38ed0ff26 ("scripts: modpost: fix compilation warning")
-> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
-> ---
+parisc overrides 'nm' with a shell script. I do not know the reason,
+but anyway it is how it has worked since 2003. [1]
 
+A problem is that this script returns the exit code of grep instead of
+${CROSS_COMPILE}nm.
 
-Applied to linux-kbuild.
-Thanks.
+grep(1) says:
+    Normally the exit status is 0 if a line is selected, 1 if no lines
+    were selected, and 2 if an error occurred. However, if the -q or
+    --quiet or --silent is used and a line is selected, the exit status
+    is 0 even if an error occurred.
 
+When the given object has no symbol, grep returns 1, while the true nm
+returns 0. Hence, build rules using ${NM} fail on ARCH=parisc even if
+the given object is valid.
 
+This commit corrects the exit status of the script.
 
->  scripts/mod/modpost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 6f5c605ab0fb..fd04ba057490 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -1905,7 +1905,7 @@ static char *remove_dot(char *s)
->
->         if (n && s[n]) {
->                 size_t m = strspn(s + n + 1, "0123456789");
-> -               if (m && (s[n + m] == '.' || s[n + m] == 0))
-> +               if (m && (s[n + m + 1] == '.' || s[n + m + 1] == 0))
->                         s[n] = 0;
->         }
->         return s;
-> --
-> 2.36.1
->
+ - A pipeline returns the exit status of the last command (here, grep).
+   The exit status of ${CROSS_COMPILE}nm is just ignored. Use bash's
+   pipefail flag to catch errors of ${CROSS_COMPILE}nm.
 
+ - If grep returns 1, this script should return 0 in order to mimic
+   true nm. If grep returns 2, it is a real and fatal error. Return
+   it as is.
 
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=36eaa6e4c0e0b6950136b956b72fd08155b92ca3
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v7:
+  - New patch
+
+ arch/parisc/Makefile |  2 +-
+ arch/parisc/nm       | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 arch/parisc/nm
+
+diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+index aca1710fd658..e7139955367d 100644
+--- a/arch/parisc/Makefile
++++ b/arch/parisc/Makefile
+@@ -18,7 +18,7 @@
+ boot := arch/parisc/boot
+ KBUILD_IMAGE := $(boot)/bzImage
+ 
+-NM		= sh $(srctree)/arch/parisc/nm
++NM		= $(srctree)/arch/parisc/nm
+ CHECKFLAGS	+= -D__hppa__=1
+ 
+ ifdef CONFIG_64BIT
+diff --git a/arch/parisc/nm b/arch/parisc/nm
+old mode 100644
+new mode 100755
+index c788308de33f..3e72238a91f3
+--- a/arch/parisc/nm
++++ b/arch/parisc/nm
+@@ -1,6 +1,14 @@
+-#!/bin/sh
++#!/bin/bash
+ ##
+ # Hack to have an nm which removes the local symbols.  We also rely
+ # on this nm being hidden out of the ordinarily executable path
+ ##
+-${CROSS_COMPILE}nm $* | grep -v '.LC*[0-9]*$'
++
++# use pipefail to catch error of ${CROSS_COMPILE}nm
++set -o pipefail
++
++# grep exits with 1 if no lines were selected.
++# If the given object has no symbol, grep returns 1, but it is not an error.
++
++${CROSS_COMPILE}nm "$@" |
++{ grep -v '.LC*[0-9]*$' || { exit_code=$?; test $exit_code -eq 1 || exit $exit_code; } }
 -- 
-Best Regards
-Masahiro Yamada
+2.32.0
+
