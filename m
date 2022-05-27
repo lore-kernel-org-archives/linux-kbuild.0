@@ -2,453 +2,170 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC8AC433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 11:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656BAC433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 13:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351492AbiE0Lir (ORCPT
+        id S1352836AbiE0N6J (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 27 May 2022 07:38:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45658 "EHLO
+        Fri, 27 May 2022 09:58:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351442AbiE0LiR (ORCPT
+        with ESMTP id S240514AbiE0N6J (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 07:38:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EAE12B035;
-        Fri, 27 May 2022 04:38:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 26633B824DD;
-        Fri, 27 May 2022 11:38:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BA68C385A9;
-        Fri, 27 May 2022 11:38:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1653651485;
-        bh=ZXyitpF3peRkvKwnqrMvERHDgBPpYSOUQQeosSV7WVI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Hg5qzty3TWEv9af6//5HxRjnoP+luaCv0KCEeeUAk60+n6eMW9aa25U4XEgUC+M12
-         WnTRGSry9RFwHky2Otpn/ds58TmbuSxOZL6NEtO5SuIRwasMi0GnQN+TW347iTrrAG
-         qY+a9jxz9inu/B4NLfaO9lYtTp2dhdud35ohAi5c=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 5.10 025/163] lib/crypto: blake2s: include as built-in
-Date:   Fri, 27 May 2022 10:48:25 +0200
-Message-Id: <20220527084831.707647946@linuxfoundation.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220527084828.156494029@linuxfoundation.org>
-References: <20220527084828.156494029@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Fri, 27 May 2022 09:58:09 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A72613CD4;
+        Fri, 27 May 2022 06:58:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1653659861;
+        bh=sguvIpamEs+8ZftKok+OD4Ae+fTk7JTH8TB8h2DNyw4=;
+        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+        b=HQymCyj5my8UySLozJjhivzXzt2O0D3r/5PfQ3jcl8OQgtvEq5KzA3SFtU7DNS3Hp
+         PWh49sZU3Q7PmNJ+MebkwMDkQ/CbWc/xig115tEzeosFMDkMm9JdfIwVlHhq+2O6/+
+         1CaeBDR74w3UZxlqMNdnEVPOd3QKUJjfKEzSsvyY=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.20.60] ([92.116.153.1]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mkpav-1nYD1e2jCZ-00mLHH; Fri, 27
+ May 2022 15:57:41 +0200
+Message-ID: <1c12cd26-d8aa-4498-f4c0-29478b9578fe@gmx.de>
+Date:   Fri, 27 May 2022 15:57:26 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v7 3/8] parisc: fix the exit status of arch/parisc/nm
+Content-Language: en-US
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
+        linux-parisc@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+References: <20220527100155.1996314-1-masahiroy@kernel.org>
+ <20220527100155.1996314-4-masahiroy@kernel.org>
+From:   Helge Deller <deller@gmx.de>
+In-Reply-To: <20220527100155.1996314-4-masahiroy@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:rnzEX+fIh/b7XvFHwFrUOvS+E6bfrWBb0OjbmoABoY7eEYFwol/
+ tSEWZTjKLpLoqys43MoXs9LV3XC/t33zohBzXhXDnwtbvSno9l/gRbtG/Pd9sk4M4LPf7Os
+ CpX/dRb36KQR5bz4XG8tmGwqNX6rim9wnN5pdQ+n1xXsfFZvb2iNOAOx4n4SREIxmDddzA4
+ 4wRUOA3dl2IhZ9ivSXCjg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ejNS0xTMqGk=:EGcSQ5nJGcNajPmlb+fvdZ
+ /QWChlhJsNiHTp0PvSWb62rKbY5nkRZrtbqbWAECIZrY7p+QijMVYLH6Yt+dZHCC4as5kgGGF
+ No14sXj55Wh+xoF0pSXptmfZvhjAYKUcfqvNgSzJg2Ri6OV7TyTDRcriDYi74rK6s+7cwWhHI
+ w6mNOkVEXlGdHH/1MwMxNPIrvQcaDdtfYqjBTN/5m0htj94ha1XfTCXCfIJx1sxroLA1WR5Es
+ cd3JUws5DZM0AWzj3tOEvIuAz24ns3uTLOD52w4kZir7EYrLVvsd5Rc1a8KQZPBaQNRBsKMgV
+ A5FpTKj1zGd49+2lS5d4qedChEzIVdSIQQANym0TSN8AsesHV2GqO/Jp0A1RPZv7FxmglYPQE
+ tFjIvXuW2AIRZtfQ+5+X4a7x6zT0b7OrrSKStgk64M59cQNJ06Dab92nI62+ruznjiqyagDJn
+ dfwZX5lWPL9JAS2smWX1v2xdQf6apJ0ZNidHJgTYocooDB7PYYSAtyorrPLgXyuE+sg9nOOmF
+ RBM/h7xf3KVviBjBfITaOK5+IUar/SNWoaY2CrjORe0Y9v767XZXhn5dOmUxQ5QZzpvKQ4Ksq
+ MnQciTFX+6VnSwNqknnsvca+Z/+JWGqpn5EqfnHkYPsM5sQhZ9DMEZ/SqDxV+uuo5tlAk4Yhq
+ a4TEGB+2Ekh2SYzmVXZUu6W9kj2A6E62yGFtecKRXXO8374ixLAYTH1ooGWeS+ANYGUycv0JY
+ l03v08Yq3i1CXa8v7QhCnUM6B5uzXu4slJbPz8SysciVTNHhdtMkOX6SrcLgBPHycpYVU97pY
+ CZJsFwQtIKcNJc+EoRYsJ7izdVa04BEwVkfbKT/acXoN9d9trj+uJIeksLiZO61oF8qww4yFz
+ HF73JFkJKrDT4pLJX+HR8gnCHLhlSA4fnhj8rzjV/lwCJPMr+ymnLtheTlczF9lk/YlHmynVB
+ pEuHsx8P/fv2Sns08Ipp2hyC9dEfKVVdpLfk/xljEhZVFhgcuSiDIrSNgBnnsFxfiL51oNfRQ
+ /PVYhx36fXwKU/ICxvqjuG8jgBRYYK2/NRGL1uOQqqEZ+TwG2k0QD3PxASD1U4QyjdstUYLZ6
+ Me0dcmpD2Uv65lQIFqL8x4pj6Ew9Mvx4Be3eoepPyNGoTqv3sg1UZdGlA==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Hello Masahiro,
 
-commit 6048fdcc5f269c7f31d774c295ce59081b36e6f9 upstream.
+On 5/27/22 12:01, Masahiro Yamada wrote:
+> parisc overrides 'nm' with a shell script. I do not know the reason,
+> but anyway it is how it has worked since 2003. [1]
 
-In preparation for using blake2s in the RNG, we change the way that it
-is wired-in to the build system. Instead of using ifdefs to select the
-right symbol, we use weak symbols. And because ARM doesn't need the
-generic implementation, we make the generic one default only if an arch
-library doesn't need it already, and then have arch libraries that do
-need it opt-in. So that the arch libraries can remain tristate rather
-than bool, we then split the shash part from the glue code.
+I don't know the reason either...
+I assume it was that the older toolchains had bugs and kept lots of local
+symbols like .LC? in the object files.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/crypto/Makefile          |    4 +
- arch/x86/crypto/blake2s-glue.c    |   68 ++-------------------------------
- arch/x86/crypto/blake2s-shash.c   |   77 ++++++++++++++++++++++++++++++++++++++
- crypto/Kconfig                    |    3 -
- drivers/net/Kconfig               |    1 
- include/crypto/internal/blake2s.h |    6 +-
- lib/crypto/Kconfig                |   23 ++---------
- lib/crypto/Makefile               |    9 +---
- lib/crypto/blake2s-generic.c      |    6 ++
- lib/crypto/blake2s.c              |    6 --
- 10 files changed, 106 insertions(+), 97 deletions(-)
- create mode 100644 arch/x86/crypto/blake2s-shash.c
+I did a small build without the nm script (and removed it's reference
+in the Makefile), and it did not seem to break anything.
 
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -66,7 +66,9 @@ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha
- sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
- 
- obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
--blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
-+blake2s-x86_64-y := blake2s-shash.o
-+obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
-+libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
- 
- obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
- ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
---- a/arch/x86/crypto/blake2s-glue.c
-+++ b/arch/x86/crypto/blake2s-glue.c
-@@ -5,7 +5,6 @@
- 
- #include <crypto/internal/blake2s.h>
- #include <crypto/internal/simd.h>
--#include <crypto/internal/hash.h>
- 
- #include <linux/types.h>
- #include <linux/jump_label.h>
-@@ -28,9 +27,8 @@ asmlinkage void blake2s_compress_avx512(
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_ssse3);
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
- 
--void blake2s_compress_arch(struct blake2s_state *state,
--			   const u8 *block, size_t nblocks,
--			   const u32 inc)
-+void blake2s_compress(struct blake2s_state *state, const u8 *block,
-+		      size_t nblocks, const u32 inc)
- {
- 	/* SIMD disables preemption, so relax after processing each page. */
- 	BUILD_BUG_ON(SZ_4K / BLAKE2S_BLOCK_SIZE < 8);
-@@ -56,49 +54,12 @@ void blake2s_compress_arch(struct blake2
- 		block += blocks * BLAKE2S_BLOCK_SIZE;
- 	} while (nblocks);
- }
--EXPORT_SYMBOL(blake2s_compress_arch);
--
--static int crypto_blake2s_update_x86(struct shash_desc *desc,
--				     const u8 *in, unsigned int inlen)
--{
--	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
--}
--
--static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
--{
--	return crypto_blake2s_final(desc, out, blake2s_compress_arch);
--}
--
--#define BLAKE2S_ALG(name, driver_name, digest_size)			\
--	{								\
--		.base.cra_name		= name,				\
--		.base.cra_driver_name	= driver_name,			\
--		.base.cra_priority	= 200,				\
--		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
--		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
--		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
--		.base.cra_module	= THIS_MODULE,			\
--		.digestsize		= digest_size,			\
--		.setkey			= crypto_blake2s_setkey,	\
--		.init			= crypto_blake2s_init,		\
--		.update			= crypto_blake2s_update_x86,	\
--		.final			= crypto_blake2s_final_x86,	\
--		.descsize		= sizeof(struct blake2s_state),	\
--	}
--
--static struct shash_alg blake2s_algs[] = {
--	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
--	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
--	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
--	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
--};
-+EXPORT_SYMBOL(blake2s_compress);
- 
- static int __init blake2s_mod_init(void)
- {
--	if (!boot_cpu_has(X86_FEATURE_SSSE3))
--		return 0;
--
--	static_branch_enable(&blake2s_use_ssse3);
-+	if (boot_cpu_has(X86_FEATURE_SSSE3))
-+		static_branch_enable(&blake2s_use_ssse3);
- 
- 	if (IS_ENABLED(CONFIG_AS_AVX512) &&
- 	    boot_cpu_has(X86_FEATURE_AVX) &&
-@@ -109,26 +70,9 @@ static int __init blake2s_mod_init(void)
- 			      XFEATURE_MASK_AVX512, NULL))
- 		static_branch_enable(&blake2s_use_avx512);
- 
--	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
--		crypto_register_shashes(blake2s_algs,
--					ARRAY_SIZE(blake2s_algs)) : 0;
--}
--
--static void __exit blake2s_mod_exit(void)
--{
--	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
--		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
-+	return 0;
- }
- 
- module_init(blake2s_mod_init);
--module_exit(blake2s_mod_exit);
- 
--MODULE_ALIAS_CRYPTO("blake2s-128");
--MODULE_ALIAS_CRYPTO("blake2s-128-x86");
--MODULE_ALIAS_CRYPTO("blake2s-160");
--MODULE_ALIAS_CRYPTO("blake2s-160-x86");
--MODULE_ALIAS_CRYPTO("blake2s-224");
--MODULE_ALIAS_CRYPTO("blake2s-224-x86");
--MODULE_ALIAS_CRYPTO("blake2s-256");
--MODULE_ALIAS_CRYPTO("blake2s-256-x86");
- MODULE_LICENSE("GPL v2");
---- /dev/null
-+++ b/arch/x86/crypto/blake2s-shash.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0 OR MIT
-+/*
-+ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <crypto/internal/blake2s.h>
-+#include <crypto/internal/simd.h>
-+#include <crypto/internal/hash.h>
-+
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/sizes.h>
-+
-+#include <asm/cpufeature.h>
-+#include <asm/processor.h>
-+
-+static int crypto_blake2s_update_x86(struct shash_desc *desc,
-+				     const u8 *in, unsigned int inlen)
-+{
-+	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
-+}
-+
-+static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
-+{
-+	return crypto_blake2s_final(desc, out, blake2s_compress);
-+}
-+
-+#define BLAKE2S_ALG(name, driver_name, digest_size)			\
-+	{								\
-+		.base.cra_name		= name,				\
-+		.base.cra_driver_name	= driver_name,			\
-+		.base.cra_priority	= 200,				\
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
-+		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
-+		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
-+		.base.cra_module	= THIS_MODULE,			\
-+		.digestsize		= digest_size,			\
-+		.setkey			= crypto_blake2s_setkey,	\
-+		.init			= crypto_blake2s_init,		\
-+		.update			= crypto_blake2s_update_x86,	\
-+		.final			= crypto_blake2s_final_x86,	\
-+		.descsize		= sizeof(struct blake2s_state),	\
-+	}
-+
-+static struct shash_alg blake2s_algs[] = {
-+	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
-+	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
-+	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
-+	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
-+};
-+
-+static int __init blake2s_mod_init(void)
-+{
-+	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
-+		return crypto_register_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
-+	return 0;
-+}
-+
-+static void __exit blake2s_mod_exit(void)
-+{
-+	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
-+		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
-+}
-+
-+module_init(blake2s_mod_init);
-+module_exit(blake2s_mod_exit);
-+
-+MODULE_ALIAS_CRYPTO("blake2s-128");
-+MODULE_ALIAS_CRYPTO("blake2s-128-x86");
-+MODULE_ALIAS_CRYPTO("blake2s-160");
-+MODULE_ALIAS_CRYPTO("blake2s-160-x86");
-+MODULE_ALIAS_CRYPTO("blake2s-224");
-+MODULE_ALIAS_CRYPTO("blake2s-224-x86");
-+MODULE_ALIAS_CRYPTO("blake2s-256");
-+MODULE_ALIAS_CRYPTO("blake2s-256-x86");
-+MODULE_LICENSE("GPL v2");
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1936,9 +1936,10 @@ config CRYPTO_STATS
- config CRYPTO_HASH_INFO
- 	bool
- 
--source "lib/crypto/Kconfig"
- source "drivers/crypto/Kconfig"
- source "crypto/asymmetric_keys/Kconfig"
- source "certs/Kconfig"
- 
- endif	# if CRYPTO
-+
-+source "lib/crypto/Kconfig"
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -80,7 +80,6 @@ config WIREGUARD
- 	select CRYPTO
- 	select CRYPTO_LIB_CURVE25519
- 	select CRYPTO_LIB_CHACHA20POLY1305
--	select CRYPTO_LIB_BLAKE2S
- 	select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
- 	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
- 	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
---- a/include/crypto/internal/blake2s.h
-+++ b/include/crypto/internal/blake2s.h
-@@ -11,11 +11,11 @@
- #include <crypto/internal/hash.h>
- #include <linux/string.h>
- 
--void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
-+void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
- 			      size_t nblocks, const u32 inc);
- 
--void blake2s_compress_arch(struct blake2s_state *state,const u8 *block,
--			   size_t nblocks, const u32 inc);
-+void blake2s_compress(struct blake2s_state *state, const u8 *block,
-+		      size_t nblocks, const u32 inc);
- 
- bool blake2s_selftest(void);
- 
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -1,7 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--comment "Crypto library routines"
--
- config CRYPTO_LIB_AES
- 	tristate
- 
-@@ -9,14 +7,14 @@ config CRYPTO_LIB_ARC4
- 	tristate
- 
- config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the Blake2s library interface,
- 	  either builtin or as a module.
- 
- config CRYPTO_LIB_BLAKE2S_GENERIC
--	tristate
-+	def_bool !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
- 	help
- 	  This symbol can be depended upon by arch implementations of the
- 	  Blake2s library interface that require the generic code as a
-@@ -24,15 +22,6 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
- 	  implementation is enabled, this implementation serves the users
- 	  of CRYPTO_LIB_BLAKE2S.
- 
--config CRYPTO_LIB_BLAKE2S
--	tristate "BLAKE2s hash function library"
--	depends on CRYPTO_ARCH_HAVE_LIB_BLAKE2S || !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
--	select CRYPTO_LIB_BLAKE2S_GENERIC if CRYPTO_ARCH_HAVE_LIB_BLAKE2S=n
--	help
--	  Enable the Blake2s library interface. This interface may be fulfilled
--	  by either the generic implementation or an arch-specific one, if one
--	  is available and enabled.
--
- config CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	tristate
- 	help
-@@ -51,7 +40,7 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 	  of CRYPTO_LIB_CHACHA.
- 
- config CRYPTO_LIB_CHACHA
--	tristate "ChaCha library interface"
-+	tristate
- 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
- 	help
-@@ -76,7 +65,7 @@ config CRYPTO_LIB_CURVE25519_GENERIC
- 	  of CRYPTO_LIB_CURVE25519.
- 
- config CRYPTO_LIB_CURVE25519
--	tristate "Curve25519 scalar multiplication library"
-+	tristate
- 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
- 	help
-@@ -111,7 +100,7 @@ config CRYPTO_LIB_POLY1305_GENERIC
- 	  of CRYPTO_LIB_POLY1305.
- 
- config CRYPTO_LIB_POLY1305
--	tristate "Poly1305 library interface"
-+	tristate
- 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
- 	help
-@@ -120,7 +109,7 @@ config CRYPTO_LIB_POLY1305
- 	  is available and enabled.
- 
- config CRYPTO_LIB_CHACHA20POLY1305
--	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
-+	tristate
- 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_CHACHA
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -10,11 +10,10 @@ libaes-y					:= aes.o
- obj-$(CONFIG_CRYPTO_LIB_ARC4)			+= libarc4.o
- libarc4-y					:= arc4.o
- 
--obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= libblake2s-generic.o
--libblake2s-generic-y				+= blake2s-generic.o
--
--obj-$(CONFIG_CRYPTO_LIB_BLAKE2S)		+= libblake2s.o
--libblake2s-y					+= blake2s.o
-+# blake2s is used by the /dev/random driver which is always builtin
-+obj-y						+= libblake2s.o
-+libblake2s-y					:= blake2s.o
-+libblake2s-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= blake2s-generic.o
- 
- obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305)	+= libchacha20poly1305.o
- libchacha20poly1305-y				+= chacha20poly1305.o
---- a/lib/crypto/blake2s-generic.c
-+++ b/lib/crypto/blake2s-generic.c
-@@ -37,7 +37,11 @@ static inline void blake2s_increment_cou
- 	state->t[1] += (state->t[0] < inc);
- }
- 
--void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
-+void blake2s_compress(struct blake2s_state *state, const u8 *block,
-+		      size_t nblocks, const u32 inc)
-+		      __weak __alias(blake2s_compress_generic);
-+
-+void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
- 			      size_t nblocks, const u32 inc)
- {
- 	u32 m[16];
---- a/lib/crypto/blake2s.c
-+++ b/lib/crypto/blake2s.c
-@@ -16,12 +16,6 @@
- #include <linux/init.h>
- #include <linux/bug.h>
- 
--#if IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S)
--#  define blake2s_compress blake2s_compress_arch
--#else
--#  define blake2s_compress blake2s_compress_generic
--#endif
--
- void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
- {
- 	__blake2s_update(state, in, inlen, blake2s_compress);
+> A problem is that this script returns the exit code of grep instead of
+> ${CROSS_COMPILE}nm.
 
+Instead of fixing this, I'd suggest that you simply remove the nm script
+alltogether. If you like I can apply such a patch in the parisc git tree,
+and you just drop this specific patch. Or you change your patch to remove =
+it.
+Just let me know what you prefer.
+
+Helge
+
+> grep(1) says:
+>     Normally the exit status is 0 if a line is selected, 1 if no lines
+>     were selected, and 2 if an error occurred. However, if the -q or
+>     --quiet or --silent is used and a line is selected, the exit status
+>     is 0 even if an error occurred.
+>
+> When the given object has no symbol, grep returns 1, while the true nm
+> returns 0. Hence, build rules using ${NM} fail on ARCH=3Dparisc even if
+> the given object is valid.
+>
+> This commit corrects the exit status of the script.
+>
+>  - A pipeline returns the exit status of the last command (here, grep).
+>    The exit status of ${CROSS_COMPILE}nm is just ignored. Use bash's
+>    pipefail flag to catch errors of ${CROSS_COMPILE}nm.
+>
+>  - If grep returns 1, this script should return 0 in order to mimic
+>    true nm. If grep returns 2, it is a real and fatal error. Return
+>    it as is.
+>
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git=
+/commit/?id=3D36eaa6e4c0e0b6950136b956b72fd08155b92ca3
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>
+> Changes in v7:
+>   - New patch
+>
+>  arch/parisc/Makefile |  2 +-
+>  arch/parisc/nm       | 12 ++++++++++--
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+>  mode change 100644 =3D> 100755 arch/parisc/nm
+>
+> diff --git a/arch/parisc/Makefile b/arch/parisc/Makefile
+> index aca1710fd658..e7139955367d 100644
+> --- a/arch/parisc/Makefile
+> +++ b/arch/parisc/Makefile
+> @@ -18,7 +18,7 @@
+>  boot :=3D arch/parisc/boot
+>  KBUILD_IMAGE :=3D $(boot)/bzImage
+>
+> -NM		=3D sh $(srctree)/arch/parisc/nm
+> +NM		=3D $(srctree)/arch/parisc/nm
+>  CHECKFLAGS	+=3D -D__hppa__=3D1
+>
+>  ifdef CONFIG_64BIT
+> diff --git a/arch/parisc/nm b/arch/parisc/nm
+> old mode 100644
+> new mode 100755
+> index c788308de33f..3e72238a91f3
+> --- a/arch/parisc/nm
+> +++ b/arch/parisc/nm
+> @@ -1,6 +1,14 @@
+> -#!/bin/sh
+> +#!/bin/bash
+>  ##
+>  # Hack to have an nm which removes the local symbols.  We also rely
+>  # on this nm being hidden out of the ordinarily executable path
+>  ##
+> -${CROSS_COMPILE}nm $* | grep -v '.LC*[0-9]*$'
+> +
+> +# use pipefail to catch error of ${CROSS_COMPILE}nm
+> +set -o pipefail
+> +
+> +# grep exits with 1 if no lines were selected.
+> +# If the given object has no symbol, grep returns 1, but it is not an e=
+rror.
+> +
+> +${CROSS_COMPILE}nm "$@" |
+> +{ grep -v '.LC*[0-9]*$' || { exit_code=3D$?; test $exit_code -eq 1 || e=
+xit $exit_code; } }
 
