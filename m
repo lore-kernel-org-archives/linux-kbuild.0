@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B880DC43217
-	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F89BC43219
+	for <linux-kbuild@archiver.kernel.org>; Fri, 27 May 2022 10:05:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350770AbiE0KF1 (ORCPT
+        id S1350774AbiE0KF1 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
         Fri, 27 May 2022 06:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350915AbiE0KFL (ORCPT
+        with ESMTP id S1350930AbiE0KFP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 May 2022 06:05:11 -0400
+        Fri, 27 May 2022 06:05:15 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102691078B0;
-        Fri, 27 May 2022 03:05:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D0110656D;
+        Fri, 27 May 2022 03:05:14 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 24RA2hPX029808;
-        Fri, 27 May 2022 19:02:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPX029808
+        by conuserg-08.nifty.com with ESMTP id 24RA2hPV029808;
+        Fri, 27 May 2022 19:02:49 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 24RA2hPV029808
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1653645772;
-        bh=/LDGWcsQ86eGZ6AnM0sm302Ykct401VHcmgP1DL7HYM=;
+        s=dec2015msa; t=1653645770;
+        bh=aeTLWp41sB2px7vbsl+AoWvoxM63JuytaCqa9JH2QLY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rRtdN563IfYIa8UJiH9R6JJ+H+T8TUQiUgBziOGfpObJBS0vJgoUxq8MvApQYo5aV
-         O71PUr/VsqixjttnfTjeyypDUIv9rUsWLb4ujUwS/UU5A03nVQausNmzgYsgiYd43r
-         05WZFD8zP5J7ZoAldPOyNxWUv3GVaKzQh/fXLSxQJdNBqhfrcpQX3n4pdcni0SDM0A
-         4+PlqZsMPV/nyTcr799AAberdlGpzsfkVc30H9yuFqKcDiiHcXF143AZUtVsD/9Vme
-         2qvC268JrtUk4pUuE7NcTuPbeplTB5qsk4W8ZllSNgK7otYw7cd9E5l9gvfBKOKbTn
-         KnhUoIuWymdYA==
+        b=HNBXNGONQ3XAXjEyNsT812P/sRM9yUOuKeEx6rV5MeMv1NxMHnZVXWp2u3jL3+YhO
+         hHwEyE27UCcCCype5LopeDwcShy1TIjgvIzb35fNVES8P6DPUjAtO/oKmWQyrjKn7e
+         bNLeFrwGDnwLBGzZ9ECYC+HfWtv1orzRaQxDXtS4bmogZCcZlcfc0L4a8I5xbtRerl
+         AENHInpUJ2umDWLEQ3o3RVbecF3RavfGGRbduj+yTrY6zqZ1VeHFrt267AKy33Vb4M
+         j/NpQV/JGiOhD8mPqsR5WAZPocvvNN8niceVYS/cuIu+CoXuwCESKCAm4kbrQ1JKic
+         Dpe+I0j85Opbg==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -38,16 +38,15 @@ Cc:     linux-kernel@vger.kernel.org,
         Josh Poimboeuf <jpoimboe@redhat.com>, llvm@lists.linux.dev,
         Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <n.schier@avm.de>,
         Sedat Dilek <sedat.dilek@gmail.com>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Tom Rix <trix@redhat.com>
-Subject: [PATCH v7 7/8] kbuild: add cmd_and_savecmd macro
-Date:   Fri, 27 May 2022 19:01:54 +0900
-Message-Id: <20220527100155.1996314-8-masahiroy@kernel.org>
+Subject: [PATCH v7 5/8] kbuild: make built-in.a rule robust against too long argument error
+Date:   Fri, 27 May 2022 19:01:52 +0900
+Message-Id: <20220527100155.1996314-6-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220527100155.1996314-1-masahiroy@kernel.org>
 References: <20220527100155.1996314-1-masahiroy@kernel.org>
@@ -57,51 +56,68 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Separate out the command execution part of if_changed, as we did
-for if_changed_dep.
+Kbuild runs at the top of objtree instead of changing the working
+directory to subdirectories. I think this design is nice overall but
+some commands have a scalability issue.
 
-This allows us to reuse it in if_changed_rule.
+The build command of built-in.a is one of them whose length scales with:
 
-  define rule_foo
-          $(call cmd_and_savecmd,foo)
-          $(call cmd,bar)
-  endef
+    O(D * N)
+
+Here, D is the length of the directory path (i.e. $(obj)/ prefix),
+N is the number of objects in the Makefile, O() is the big O notation.
+
+The deeper directory the Makefile directory is located, the more easily
+it will hit the too long argument error.
+
+We can make it better. Trim the $(obj)/ by Make's builtin function, and
+restore it by a shell command (sed).
+
+With this, the command length scales with:
+
+    O(D + N)
+
+In-tree modules still have some room to the limit (ARG_MAX=2097152),
+but this is more future-proof for big modules in a deep directory.
+
+For example, you can build i915 as builtin (CONFIG_DRM_I915=y) and
+compare drivers/gpu/drm/i915/.built-in.a.cmd with/without this commit.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 Tested-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Nicolas Schier <n.schier@avm.de>
 Tested-by: Sedat Dilek <sedat.dilek@gmail.com> # LLVM-14 (x86-64)
 ---
 
-(no changes since v4)
+Changes in v7:
+  - Add comment to the code
 
-Changes in v4:
-  - New.
-    Resent of my previous submission.
-    https://lore.kernel.org/all/20210831074004.3195284-10-masahiroy@kernel.org/
+Changes in v2:
+  - New patch
 
- scripts/Kbuild.include | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ scripts/Makefile.build | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 455a0a6ce12d..ece44b735061 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -142,9 +142,11 @@ check-FORCE = $(if $(filter FORCE, $^),,$(warning FORCE prerequisite is missing)
- if-changed-cond = $(newer-prereqs)$(cmd-check)$(check-FORCE)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 0135b4e7f78b..014ebee70fd6 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -376,9 +376,14 @@ $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
+ #
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+ #
++# To make this rule robust against "Argument list too long" error,
++# remove $(obj)/ prefix, and restore it by a shell command.
  
- # Execute command if command has changed or prerequisite(s) are updated.
--if_changed = $(if $(if-changed-cond),                                        \
-+if_changed = $(if $(if-changed-cond),$(cmd_and_savecmd),@:)
-+
-+cmd_and_savecmd =                                                            \
- 	$(cmd);                                                              \
--	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
-+	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd
+ quiet_cmd_ar_builtin = AR      $@
+-      cmd_ar_builtin = rm -f $@; $(AR) cDPrST $@ $(real-prereqs)
++      cmd_ar_builtin = rm -f $@; \
++		echo $(patsubst $(obj)/%,%,$(real-prereqs)) | \
++		sed -E 's:([^ ]+):$(obj)/\1:g' | \
++		xargs $(AR) cDPrST $@
  
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
+ $(obj)/built-in.a: $(real-obj-y) FORCE
+ 	$(call if_changed,ar_builtin)
 -- 
 2.32.0
 
