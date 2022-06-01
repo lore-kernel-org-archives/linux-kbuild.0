@@ -2,61 +2,87 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5220C433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 31 May 2022 08:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B94C433F5
+	for <linux-kbuild@archiver.kernel.org>; Wed,  1 Jun 2022 11:31:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241708AbiEaIXD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 31 May 2022 04:23:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51864 "EHLO
+        id S1351013AbiFALbY (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 1 Jun 2022 07:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240646AbiEaIXC (ORCPT
+        with ESMTP id S243810AbiFALbX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 31 May 2022 04:23:02 -0400
-Received: from mail.onlinesuccesses.pl (mail.onlinesuccesses.pl [198.244.150.235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA76201BC
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 May 2022 01:23:01 -0700 (PDT)
-Received: by mail.onlinesuccesses.pl (Postfix, from userid 1002)
-        id 089ECAD862; Tue, 31 May 2022 08:16:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=onlinesuccesses.pl;
-        s=mail; t=1653985037;
-        bh=nE8HqilgMh4dy7+Z8ksfg7Bc9rmPeQtYFq3/3YR2ODU=;
-        h=Date:From:To:Subject:From;
-        b=er0+lSKTDWhB7zSwsEzYplmizggzmOLjGfoQxFA1JhItRgh7+PkuT52c5ReAuNzm8
-         esleA/3hzrtg20sZaZMMeCjJRZ9l/r+GGecomvguV8PIbh4vXik+vYrrQX3EITTtQg
-         HBy0dI2cTfOHFeDEcyVqikKAHBdwN/ohRiSD+/WuImEQ5WMGoV2epW+Gmb3wMnsiTq
-         QRS6HlN8bO7Dp8I7aKfa5po+xkWtGjHiIXhPkLK8hQp6Rvz48lcBfdJiYS0OkqCGFk
-         cZ3ug0Kqz2sGaZq2XZsXRdyH7rW9uAA4AqMt0gpPOjjAnZVqM8OdzKLgmW/tVevLeu
-         M6gshyAQYfxLQ==
-Received: by mail.onlinesuccesses.pl for <linux-kbuild@vger.kernel.org>; Tue, 31 May 2022 08:15:36 GMT
-Message-ID: <20220531064501-0.1.4l.1dcph.0.o98mdj1c4f@onlinesuccesses.pl>
-Date:   Tue, 31 May 2022 08:15:36 GMT
-From:   "Wiktor Zielonko" <wiktor.zielonko@onlinesuccesses.pl>
-To:     <linux-kbuild@vger.kernel.org>
-Subject: Ruch z pierwszej pozycji w Google
-X-Mailer: mail.onlinesuccesses.pl
+        Wed, 1 Jun 2022 07:31:23 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845BA7035E;
+        Wed,  1 Jun 2022 04:31:22 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id n185so794072wmn.4;
+        Wed, 01 Jun 2022 04:31:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=8m5w0VP4J7yp0Tfw5vI1hU7tdi7anvKhoAsyYAE5VPU=;
+        b=N994epOtFhDoj3ZPMMDoAZHkX3EoRIKLXRDzZwp+t0E6osKalIPMlP+cvmXi5MYVBu
+         x5hM8D7fXmDwHhz/sGqWSee+ELg1CNUs0Jgy0NUhcQM+q5tx3Ot4tV33TvcjGtj4+2am
+         WpY26WmNPYd4TLHRo7eUnTNX/9s/oWlzojs8uMp0P4Y8pNABP9Bbv5ha13Pk23ABpzND
+         d6ei+PSo//An+YtCLE76ypmA/9x+GSNUfNEriXQIOK5mrJ/k4ttjOLuYFEyp2t0gJSaC
+         9YQmQA/CBMShbtWTUyW0nCXgzMJaZ1TdPL5a+h7m5qHPs2CDeSRu8euDyQNOksb1R/+m
+         7Q2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=8m5w0VP4J7yp0Tfw5vI1hU7tdi7anvKhoAsyYAE5VPU=;
+        b=6IfS547KbmFw8Rt+sJlUt1U0hRPUanPw6vmjDzgcfCiH9DozHBaoJwjBT6VXsq/W4u
+         WeBa4rVtb7PeZDL5SCXhVvW0nDAzZFw9ewgzhhefeOg31QdIj0ncFIRoq8CPG8wK3P6t
+         P4OtUHpHt85K3AAhcavr6+ApbwRNFrHLl0z69elIttc6BR/JwgMcu/8midTKEt6grt6Q
+         hqpRRsP7Pz4EnpFznub7G3O3TjScyj8ECkgylT+3MRATPvWSBhzTCi6DKnE78H3pYJ6A
+         2jYdVwIq2Itoo9qMZXHhDoOqDIRG5rEAID2Z0jquf0TNbDibL9gI3QajOCHNAIdn43IJ
+         sVXg==
+X-Gm-Message-State: AOAM530rKP0YzEiHVij8H4AUGsg0bzjnPolIEYEG4+WMEc5apHyMOTqJ
+        FV1Bi2xF7RFiI76By5llBpk=
+X-Google-Smtp-Source: ABdhPJyBKTFfBtnQ+y6h1hy7sPwwdWf3Q3fF+kHhgmrXnf0hnFooHIh9bxlAkXs6nnPXrAJ38MBfqQ==
+X-Received: by 2002:a05:600c:4fd2:b0:39c:1586:a2e0 with SMTP id o18-20020a05600c4fd200b0039c1586a2e0mr10873557wmq.62.1654083080751;
+        Wed, 01 Jun 2022 04:31:20 -0700 (PDT)
+Received: from debian (host-2-98-37-191.as13285.net. [2.98.37.191])
+        by smtp.gmail.com with ESMTPSA id h1-20020a5d4fc1000000b0020fc4cd81f6sm1303439wrw.60.2022.06.01.04.31.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jun 2022 04:31:20 -0700 (PDT)
+Date:   Wed, 1 Jun 2022 12:31:18 +0100
+From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Sedat Dilek <sedat.dilek@gmail.com>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        torvalds@linux-foundation.org
+Subject: mainline build failure due to f292d875d0dc ("modpost: extract symbol
+ versions from *.cmd files")
+Message-ID: <YpdOBmEmkG0AaOX0@debian>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+Hi All,
 
-jaki=C5=9B czas temu zg=C5=82osi=C5=82a si=C4=99 do nas firma, kt=C3=B3re=
-j strona internetowa nie pozycjonowa=C5=82a si=C4=99 wysoko w wyszukiwarc=
-e Google.=20
+The latest mainline kernel branch fails to build for csky allmodconfig
+with the error:
 
-Na podstawie wykonanego przez nas audytu SEO zoptymalizowali=C5=9Bmy tre=C5=
-=9Bci na stronie pod k=C4=85tem wcze=C5=9Bniej opracowanych s=C5=82=C3=B3=
-w kluczowych. Nasz wewn=C4=99trzny system codziennie analizuje prawid=C5=82=
-owe dzia=C5=82anie witryny.  Dzi=C4=99ki indywidualnej strategii, firma z=
-dobywa coraz wi=C4=99cej Klient=C3=B3w. =20
+._divsi3.o.cmd: No such file or directory
+make[1]: *** [scripts/Makefile.modpost:59: vmlinux.symvers] Error 1
+make: *** [Makefile:1160: vmlinux] Error 2
 
-Czy chcieliby Pa=C5=84stwo zwi=C4=99kszy=C4=87 liczb=C4=99 os=C3=B3b odwi=
-edzaj=C4=85cych stron=C4=99 internetow=C4=85 firmy? M=C3=B3g=C5=82bym prz=
-edstawi=C4=87 ofert=C4=99?=20
+git bisect pointed to f292d875d0dc ("modpost: extract symbol versions from *.cmd files")
+
+I will be happy to test any patch or provide any extra log if needed.
 
 
-Pozdrawiam serdecznie,
-Wiktor Zielonko
+--
+Regards
+Sudip
