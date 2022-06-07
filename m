@@ -2,138 +2,91 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1F1C43334
-	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Jun 2022 08:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2485FC433EF
+	for <linux-kbuild@archiver.kernel.org>; Tue,  7 Jun 2022 10:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238390AbiFGIpL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 7 Jun 2022 04:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57148 "EHLO
+        id S240541AbiFGKDp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 7 Jun 2022 06:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238403AbiFGIpC (ORCPT
+        with ESMTP id S239176AbiFGKDn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Jun 2022 04:45:02 -0400
-Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC6160B9C;
-        Tue,  7 Jun 2022 01:45:00 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 2578hKA3010951;
-        Tue, 7 Jun 2022 17:43:20 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 2578hKA3010951
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1654591401;
-        bh=Cj3y+Qp/VjL00R1LaGKflQeOz1WUkQnA5jR/e3iAuTM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=LIef4QxqITUfGQJLjVLGmPDVSHahO1iLHJEyvQCP/1vbQh/kGp+1JVcoUX3Nu8sAM
-         MGSQF50CK+RvFQSRHkI0DdO99FAdS8fK/ZZmxYWm27wZsAH7DJ/WdMESOJbKSJoG19
-         bUv7OfHclT08KCLgRNQslG5x0cb7KhVvzXzEzWucWgBMV0/MrPwa2pHkqPV8HjyuC8
-         5V7BlQ0CF0nlW+7W6tZUx+E/uIU9AtAUowItiLsSrry4ECySlBdF5GcxU3hNF8uA5K
-         jgOxJdw5GUDDi4gNXs8GlHu4ArK61UkOhzHsx9X7/5WajN+kl/+eYxTUIq3R8oSKTl
-         UR2zNdTIAwG1Q==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Wang Yugui <wangyugui@e16-tech.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: [PATCH] scripts/check-local-export: avoid 'wait $!' for process substitution
-Date:   Tue,  7 Jun 2022 17:43:17 +0900
-Message-Id: <20220607084317.211785-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
+        Tue, 7 Jun 2022 06:03:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4762DC0E09;
+        Tue,  7 Jun 2022 03:03:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D03C561373;
+        Tue,  7 Jun 2022 10:03:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF87BC34119;
+        Tue,  7 Jun 2022 10:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654596219;
+        bh=u1B8uxzMCkFey7cgXnz/vr+zToHpWFs1K5+BWxxYloU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=K26BYJKPorCQqVcj8VFZH7g9DPuMkA/G8siXvq9Rkg3Q2HYIh8PuG+u/cFCKsjBYY
+         gNaYErecq/8WR+Oi6yHa8vmhhQmSAFgAcgTiFGlp934idTcwd6gg83YBH6bfwFRfuk
+         /XqYUH88dY44xe56sijpmV9e06rHlp0vC0PannW61RJZ9Y9WjTGsNwkMIU09Lv29jj
+         wJ/C0UDg/U+Rq1OZ+mgy46Gd/DD4W5RK/aPXs6RXjcqg6ltHNpux6aH8qsYY1snSHx
+         HOLGQj6AEsxuCU29cx+NfqEuqGNQnVtmCB10ZSDNeaYVtmu4vAuXqpDsv8jua93gV5
+         CoLlhPJTAwRag==
+Date:   Tue, 7 Jun 2022 13:01:44 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     torvalds@linux-foundation.org,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] certs: Convert spaces in certs/Makefile to a tab
+Message-ID: <Yp8iCErgXDFBvhzJ@iki.fi>
+References: <165451871967.1941436.17828809503267245815.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <165451871967.1941436.17828809503267245815.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Bash>=4.4 supports 'wait $!' to check the exit status of a process
-substitution, but some people using older bash versions reported an
-error like this:
+On Mon, Jun 06, 2022 at 01:31:59PM +0100, David Howells wrote:
+> There's a rule in certs/Makefile for which the command begins with eight
+> spaces.  This results in:
+> 
+> 	../certs/Makefile:21: FORCE prerequisite is missing
+> 	../certs/Makefile:21: *** missing separator.  Stop.
+> 
+> Fix this by turning the spaces into a tab.
+> 
+> Fixes: addf466389d9 ("certs: Check that builtin blacklist hashes are valid")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Mickaël Salaün <mic@linux.microsoft.com>
+> cc: Jarkko Sakkinen <jarkko@kernel.org>
+> cc: keyrings@vger.kernel.org
+> ---
+> 
+>  certs/Makefile |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/certs/Makefile b/certs/Makefile
+> index bb904f90f139..cb1a9da3fc58 100644
+> --- a/certs/Makefile
+> +++ b/certs/Makefile
+> @@ -18,7 +18,7 @@ CFLAGS_blacklist_hashes.o += -I$(srctree)
+>  
+>  targets += blacklist_hashes_checked
+>  $(obj)/blacklist_hashes_checked: $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(SYSTEM_BLACKLIST_HASH_LIST_FILENAME) scripts/check-blacklist-hashes.awk FORCE
+> -       $(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
+> +	$(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
+>  obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_hashes.o
+>  else
+>  obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_nohashes.o
+> 
+> 
 
-  ./scripts/check-local-export: line 54: wait: pid 17328 is not a child of this shell
 
-I used the process substitution because a pipeline executes each command
-in a subshell; variables modified within the while-loop in the subshell
-context would be lost after the subshell terminates.
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-Fortunately, Bash>=4.2 supports the 'lastpipe' option, which runs the
-last element of a pipeline in the current shell process.
-
-Also, set 'pipefail' to catch errors from ${NM}.
-
-Bash 4.2, released in 2011, is 5 years older than Bash 4.4.
-
-Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Reported-by: Michael Ellerman <mpe@ellerman.id.au>
-Reported-by: Wang Yugui <wangyugui@e16-tech.com>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/check-local-export | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
-
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-index da745e2743b7..e21c7b54885d 100755
---- a/scripts/check-local-export
-+++ b/scripts/check-local-export
-@@ -8,11 +8,30 @@
- 
- set -e
- 
-+# catch errors from ${NM}
-+set -o pipefail
-+
-+# Run the last element of a pipeline in the current shell.
-+# Without this, the while-loop would be executed in a subshell, and
-+# the changes made to 'symbol_types' and 'export_symbols' would be lost.
-+shopt -s lastpipe
-+
- declare -A symbol_types
- declare -a export_symbols
- 
- exit_code=0
- 
-+# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
-+# 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
-+# '2>/dev/null'. However, it suppresses real error messages as well. Add a
-+# hand-crafted error message here.
-+#
-+# Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
-+# binutils to 2.37, llvm to 13.0.0.
-+#
-+# Then, the following line will be really simple:
-+#   ${NM} --quiet ${1} |
-+{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
- while read value type name
- do
- 	# Skip the line if the number of fields is less than 3.
-@@ -37,21 +56,7 @@ do
- 	if [[ ${name} == __ksymtab_* ]]; then
- 		export_symbols+=(${name#__ksymtab_})
- 	fi
--
--	# If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm)
--	# shows 'no symbols' diagnostic (but exits with 0). It is harmless and
--	# hidden by '2>/dev/null'. However, it suppresses real error messages
--	# as well. Add a hand-crafted error message here.
--	#
--	# Use --quiet instead of 2>/dev/null when we upgrade the minimum version
--	# of binutils to 2.37, llvm to 13.0.0.
--	#
--	# Then, the following line will be really simple:
--	#   done < <(${NM} --quiet ${1})
--done < <(${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } )
--
--# Catch error in the process substitution
--wait $!
-+done
- 
- for name in "${export_symbols[@]}"
- do
--- 
-2.32.0
-
+BR, Jarkko
