@@ -2,44 +2,50 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F075C433EF
-	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Jun 2022 17:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CEBEC43334
+	for <linux-kbuild@archiver.kernel.org>; Thu,  9 Jun 2022 17:27:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237051AbiFIRWI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 9 Jun 2022 13:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48134 "EHLO
+        id S238037AbiFIR1I (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 9 Jun 2022 13:27:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbiFIRWI (ORCPT
+        with ESMTP id S237749AbiFIR1I (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Jun 2022 13:22:08 -0400
-Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3146463
-        for <linux-kbuild@vger.kernel.org>; Thu,  9 Jun 2022 10:22:06 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4LJr884xv7zMqbwC;
-        Thu,  9 Jun 2022 19:05:44 +0200 (CEST)
+        Thu, 9 Jun 2022 13:27:08 -0400
+X-Greylist: delayed 565 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Jun 2022 10:27:06 PDT
+Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [IPv6:2001:1600:4:17::8faa])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CAB45064
+        for <linux-kbuild@vger.kernel.org>; Thu,  9 Jun 2022 10:27:06 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4LJrPv5lQnzMprpC;
+        Thu,  9 Jun 2022 19:17:39 +0200 (CEST)
 Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4LJr880HbBzlm74f;
-        Thu,  9 Jun 2022 19:05:43 +0200 (CEST)
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4LJrPv1bNBzlpC9v;
+        Thu,  9 Jun 2022 19:17:39 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1654794344;
-        bh=gB6G43Fk8EhYn4BH21oNx9y44yniLbvvjM64FMg7kcc=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=nP+3ue5OOVjznB09vHxysn9H2CKOCbFjc2vSSxN81mlmv0XDowKiK6ob8rYUgINUg
-         iq0Jvcdm7D6yDhyi9jfDxmlfqOqYTpMkvUSnMePc0wg7uOOA4jxoAC4TEm68Z4csmq
-         Sk4QC/RTBq0CCifB9ivTuXxuqhlBX/OR4AuH0gG4=
-Message-ID: <486b1b80-9932-aab6-138d-434c541c934a@digikod.net>
-Date:   Thu, 9 Jun 2022 19:05:43 +0200
+        s=20191114; t=1654795059;
+        bh=8Elgg/SN+T6CNwEBcvTtMSfmYQEA0/ksDzG6Y3fvVrw=;
+        h=Date:From:To:Cc:References:Subject:In-Reply-To:From;
+        b=bzc9MNS1Yo9yX1Qw/ZCWX4jyhjoF5l8Yuut6gzWvv+XKfz2nGO4oDe7Ecw6ttxUo3
+         Aa7lA/fyQCIFPPISj0U69JQjAp5wxSe7B0MW+Tm0EZyr4f1j2dlOnFq2RqimmYu7LF
+         SxPdFHmImQwjH9473maRecsvOY5/KmeDLYuZePd8=
+Message-ID: <75918f49-5670-766a-09a2-f29aef95f2ca@digikod.net>
+Date:   Thu, 9 Jun 2022 19:17:38 +0200
 MIME-Version: 1.0
 User-Agent: 
-Subject: Re: [PATCH] certs: Convert spaces in certs/Makefile to a tab
 Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>, torvalds@linux-foundation.org
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <165451871967.1941436.17828809503267245815.stgit@warthog.procyon.org.uk>
 From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <165451871967.1941436.17828809503267245815.stgit@warthog.procyon.org.uk>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        David Howells <dhowells@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <165451871967.1941436.17828809503267245815.stgit@warthog.procyon.org.uk>
+ <CAK7LNAS-0kQOvt=7TNn0osf9JO5hZhSp9PaFFBsSx++2Pevc9g@mail.gmail.com>
+ <22a067fe-795f-d3ae-fac6-7baa75393349@digikod.net>
+Subject: Re: [PATCH] certs: Convert spaces in certs/Makefile to a tab
+In-Reply-To: <22a067fe-795f-d3ae-fac6-7baa75393349@digikod.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -47,44 +53,75 @@ List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
-On 06/06/2022 14:31, David Howells wrote:
-> There's a rule in certs/Makefile for which the command begins with eight
-> spaces.  This results in:
-> 
-> 	../certs/Makefile:21: FORCE prerequisite is missing
-> 	../certs/Makefile:21: *** missing separator.  Stop.
-> 
-> Fix this by turning the spaces into a tab.
 
-These spaces were not part of my patch but they are indeed in this file 
-now: https://lore.kernel.org/r/20210712170313.884724-3-mic@digikod.net
+On 09/06/2022 19:12, Mickaël Salaün wrote:
+> 
+> On 06/06/2022 18:49, Masahiro Yamada wrote:
+>> On Mon, Jun 6, 2022 at 9:32 PM David Howells <dhowells@redhat.com> wrote:
+>>>
+>>> There's a rule in certs/Makefile for which the command begins with eight
+>>> spaces.  This results in:
+>>>
+>>>          ../certs/Makefile:21: FORCE prerequisite is missing
+>>>          ../certs/Makefile:21: *** missing separator.  Stop.
+>>>
+>>> Fix this by turning the spaces into a tab.
+>>>
+>>> Fixes: addf466389d9 ("certs: Check that builtin blacklist hashes are 
+>>> valid")
+>>> Signed-off-by: David Howells <dhowells@redhat.com>
+>>> cc: Mickaël Salaün <mic@linux.microsoft.com>
+>>> cc: Jarkko Sakkinen <jarkko@kernel.org>
+>>> cc: keyrings@vger.kernel.org
+>>
+>>
+>> Not only 8-space indentation, but also:
+>>
+>>    - config_filename does not exist
+>>    - $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX) is always empty
+>>    - $(SYSTEM_BLACKLIST_HASH_LIST_FILENAME) is always empty
+> 
+> These are imported helpers (not only used for this hash list BTW), hence 
+> not defined in this Makefile.
 
-Reviewed-by: Mickaël Salaün <mic@linux.microsoft.com>
+Well, they were defined in scripts/Kbuild.include but they are gone 
+since your commit b8c96a6b466c ("certs: simplify $(srctree)/ handling 
+and remove config_filename macro").
+
+I guess it just happens during the merge. We need to fix that.
 
 
 > 
-> Fixes: addf466389d9 ("certs: Check that builtin blacklist hashes are valid")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Mickaël Salaün <mic@linux.microsoft.com>
-> cc: Jarkko Sakkinen <jarkko@kernel.org>
-> cc: keyrings@vger.kernel.org
-> ---
-> 
->   certs/Makefile |    2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/certs/Makefile b/certs/Makefile
-> index bb904f90f139..cb1a9da3fc58 100644
-> --- a/certs/Makefile
-> +++ b/certs/Makefile
-> @@ -18,7 +18,7 @@ CFLAGS_blacklist_hashes.o += -I$(srctree)
->   
->   targets += blacklist_hashes_checked
->   $(obj)/blacklist_hashes_checked: $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(SYSTEM_BLACKLIST_HASH_LIST_FILENAME) scripts/check-blacklist-hashes.awk FORCE
-> -       $(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
-> +	$(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
->   obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_hashes.o
->   else
->   obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_nohashes.o
-> 
-> 
+>>
+>>
+>>> ---
+>>>
+>>>   certs/Makefile |    2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/certs/Makefile b/certs/Makefile
+>>> index bb904f90f139..cb1a9da3fc58 100644
+>>> --- a/certs/Makefile
+>>> +++ b/certs/Makefile
+>>> @@ -18,7 +18,7 @@ CFLAGS_blacklist_hashes.o += -I$(srctree)
+>>>
+>>>   targets += blacklist_hashes_checked
+>>>   $(obj)/blacklist_hashes_checked: 
+>>> $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(SYSTEM_BLACKLIST_HASH_LIST_FILENAME) 
+>>> scripts/check-blacklist-hashes.awk FORCE
+>>> -       $(call 
+>>> if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST)) 
+>>>
+>>> +       $(call 
+>>> if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST)) 
+>>>
+>>>   obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_hashes.o
+>>>   else
+>>>   obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_nohashes.o
+>>>
+>>>
+>>
+>>
+>> -- 
+>> Best Regards
+>> Masahiro Yamada
