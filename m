@@ -2,80 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B783EC433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Jun 2022 16:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EDBC43334
+	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Jun 2022 18:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346105AbiFJQ5i (ORCPT
+        id S1346515AbiFJSdv (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 10 Jun 2022 12:57:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57902 "EHLO
+        Fri, 10 Jun 2022 14:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231317AbiFJQ5h (ORCPT
+        with ESMTP id S1346477AbiFJSdv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Jun 2022 12:57:37 -0400
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F0310C3;
-        Fri, 10 Jun 2022 09:57:31 -0700 (PDT)
-X-UUID: 3074d9628a6c410286eeecd13f5fc3f3-20220611
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.5,REQID:a4bc0329-0515-494a-8883-0e46bb75846b,OB:0,LO
-        B:0,IP:0,URL:0,TC:0,Content:0,EDM:0,RT:0,SF:22,FILE:0,RULE:Release_Ham,ACT
-        ION:release,TS:22
-X-CID-INFO: VERSION:1.1.5,REQID:a4bc0329-0515-494a-8883-0e46bb75846b,OB:0,LOB:
-        0,IP:0,URL:0,TC:0,Content:0,EDM:0,RT:0,SF:22,FILE:0,RULE:Release_Ham,ACTIO
-        N:release,TS:22
-X-CID-META: VersionHash:2a19b09,CLOUDID:e1dd5e50-276a-4a9a-a4c8-ea931023add4,C
-        OID:IGNORED,Recheck:0,SF:28|100|17|19|48|101,TC:nil,Content:-5,EDM:-3,IP:n
-        il,URL:0,File:nil,QS:0,BEC:nil
-X-UUID: 3074d9628a6c410286eeecd13f5fc3f3-20220611
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
-        (envelope-from <miles.chen@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 796968846; Sat, 11 Jun 2022 00:57:25 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.792.3;
- Sat, 11 Jun 2022 00:57:24 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.792.3 via Frontend Transport; Sat, 11 Jun 2022 00:57:24 +0800
-From:   Miles Chen <miles.chen@mediatek.com>
-To:     <masahiroy@kernel.org>
-CC:     <corbet@lwn.net>, <jonathanh@nvidia.com>,
-        <linux-doc@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <llvm@lists.linux.dev>,
-        <mpe@ellerman.id.au>, <nathan@kernel.org>,
-        <ndesaulniers@google.com>, <penguin-kernel@I-love.SAKURA.ne.jp>,
-        <trix@redhat.com>, <wangyugui@e16-tech.com>
-Subject: Re: [PATCH v3] scripts/check-local-export: avoid 'wait $!' for process substitution
-Date:   Sat, 11 Jun 2022 00:57:24 +0800
-Message-ID: <20220610165724.16214-1-miles.chen@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20220608011100.486735-1-masahiroy@kernel.org>
-References: <20220608011100.486735-1-masahiroy@kernel.org>
+        Fri, 10 Jun 2022 14:33:51 -0400
+Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57ACD39141;
+        Fri, 10 Jun 2022 11:33:48 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 25AIX5TP020882;
+        Sat, 11 Jun 2022 03:33:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 25AIX5TP020882
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1654885990;
+        bh=ebV4+gRnFFeyUFcz5wz1eB/flTewuR25JCfy/TcRt2U=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=lg+lHyyBfli8Rd6bqhWTKnNmE1mIhzuyPRYKkjtgHHTLnFwO0jzJL3wggaX8iu0t5
+         rFhUYu9IfjG0mmDQl1SPIleRHAAAlqWiziwvhRg7GMGApx+DjsGNhOlJCcyYhrSdii
+         5o9RJT7YK0E0Vp+BtKQ8ocHJYr8FXy8Q97zIin/xHK1CyF57hoEfJi5UmvBfZC0pI4
+         CNyfwPAiV2dztxbYqq5ohhm79uIIZfGaA6JCLj/BLrgf7mWuOaB8Ey0F7COoVJd8gw
+         6YdMudxvmCwisssEIbxpM/AjxfQpDnes5smSSKPZplDvlrIrO8up/gpJdl6H4PwN1r
+         +WzkKXrVjBW9Q==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Nicolas Pitre <npitre@baylibre.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-modules@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 4/7] ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
+Date:   Sat, 11 Jun 2022 03:32:33 +0900
+Message-Id: <20220610183236.1272216-5-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220610183236.1272216-1-masahiroy@kernel.org>
+References: <20220610183236.1272216-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
->Bash 4.4, released in 2016, supports 'wait $!' to check the exit status
->of a process substitution, but it seems too new.
->
->Some people using older bash versions (on CentOS 7, Ubuntu 16.04, etc.)
->reported an error like this:
->
->  ./scripts/check-local-export: line 54: wait: pid 17328 is not a child of this shell
+With the previous refactoring, you no longer need to know whether the
+exported symbol is a function or a data.
 
-Thanks for fixing this!
-I hit this issue and this patch fixes my problem.
+Replace two instances in ia64, then remove EXPORT_DATA_SYMBOL*.
 
-Tested-by: Miles Chen <miles.chen@mediatek.com> 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
->
->I used the process substitution to avoid a pipeline, which executes each
->command in a subshell. If the while-loop is executed in the subshell
->context, variable changes within are lost after the subshell terminates.
+ arch/ia64/kernel/head.S      | 2 +-
+ arch/ia64/kernel/ivt.S       | 2 +-
+ include/asm-generic/export.h | 3 ---
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
+diff --git a/arch/ia64/kernel/head.S b/arch/ia64/kernel/head.S
+index f22469f1c1fc..c096500590e9 100644
+--- a/arch/ia64/kernel/head.S
++++ b/arch/ia64/kernel/head.S
+@@ -170,7 +170,7 @@ RestRR:											\
+ 	__PAGE_ALIGNED_DATA
+ 
+ 	.global empty_zero_page
+-EXPORT_DATA_SYMBOL_GPL(empty_zero_page)
++EXPORT_SYMBOL_GPL(empty_zero_page)
+ empty_zero_page:
+ 	.skip PAGE_SIZE
+ 
+diff --git a/arch/ia64/kernel/ivt.S b/arch/ia64/kernel/ivt.S
+index d6d4229b28db..7a418e324d30 100644
+--- a/arch/ia64/kernel/ivt.S
++++ b/arch/ia64/kernel/ivt.S
+@@ -87,7 +87,7 @@
+ 
+ 	.align 32768	// align on 32KB boundary
+ 	.global ia64_ivt
+-	EXPORT_DATA_SYMBOL(ia64_ivt)
++	EXPORT_SYMBOL(ia64_ivt)
+ ia64_ivt:
+ /////////////////////////////////////////////////////////////////////////////////////////
+ // 0x0000 Entry 0 (size 64 bundles) VHPT Translation (8,20,47)
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 0ae9f38a904c..570cd4da7210 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -8,7 +8,4 @@
+  */
+ #include <linux/export.h>
+ 
+-#define EXPORT_DATA_SYMBOL(name)	EXPORT_SYMBOL(name)
+-#define EXPORT_DATA_SYMBOL_GPL(name)	EXPORT_SYMBOL_GPL(name)
+-
+ #endif
+-- 
+2.32.0
 
