@@ -2,99 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B37C43334
-	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Jun 2022 18:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5B4C43334
+	for <linux-kbuild@archiver.kernel.org>; Fri, 10 Jun 2022 18:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350419AbiFJSfm (ORCPT
+        id S1350387AbiFJSgu (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 10 Jun 2022 14:35:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42674 "EHLO
+        Fri, 10 Jun 2022 14:36:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350072AbiFJSfU (ORCPT
+        with ESMTP id S1349885AbiFJSgR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Jun 2022 14:35:20 -0400
-X-Greylist: delayed 72 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 10 Jun 2022 11:35:00 PDT
-Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632273ED30;
-        Fri, 10 Jun 2022 11:35:00 -0700 (PDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id 25AIX5TL020882;
-        Sat, 11 Jun 2022 03:33:05 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 25AIX5TL020882
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1654885986;
-        bh=9V5ZtNuA93j8Q20aLKhJjsp/qlA4DxrP5ew51lWbprM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=EiMGDoVxhBnNAUwmy9Pw4D8rmphe8eCNo0y+s4fv97gyda6/4gSz7svrcCC6tDIQW
-         aP0vbki01SCpg1hqhOCJc4naCcSl0SfPT+qJU7xSLOBGfdpcT+Ret0MBFozRLn5XIp
-         UVOJrKlfMMp/pEzmmedySfSmWAXRkowNr8dxMvxmjVqMgpXrRm3B52le1YCUqlnDBs
-         2NZDyLIkqRMlZyvrMhzWQv9MSgxNZ7474xOBSyN1ger4f19kJWCP1zXBV6tX7vTDy8
-         zzBTSPJRj8Gbv2W92g931cV6L+rKVyDjDTRdAJoThsRtiCCFLpVtndbszNtF06H1QM
-         4e+Hs+bAbBl0w==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Nicolas Pitre <npitre@baylibre.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-modules@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        Fri, 10 Jun 2022 14:36:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3CCD403CA
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Jun 2022 11:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654886160;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1vmTWMZvDmE1FO6rs2zTYe37OspeJHlTiBA08DM86zY=;
+        b=G2+AuxqKTy57hjDCg9sP2KLjVb2QBktASVcge/Vmcp+PYO4y0jOrsLgkxWy9l9M0UOKRcu
+        TQmMq68ZQLDEBWL/PJxMovf+pEO8fbJd+vvBrGIfrCWc3N3LruHKqydPto1nce5jcHcufm
+        9jNQ9/rT+1JRy7HFZMl1utueaXX19aE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-27-wA5lDc8MNm2qOJza1114VQ-1; Fri, 10 Jun 2022 14:35:57 -0400
+X-MC-Unique: wA5lDc8MNm2qOJza1114VQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1780218A0711;
+        Fri, 10 Jun 2022 18:35:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 073A61121314;
+        Fri, 10 Jun 2022 18:35:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+cc:     dhowells@redhat.com,
+        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Alessio Igor Bogani <abogani@kernel.org>,
-        Andy Whitcroft <apw@canonical.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dwaipayan Ray <dwaipayanray1@gmail.com>,
-        Joe Perches <joe@perches.com>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-kbuild@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/7] Unify <linux/export.h> and <asm/export.h>, remove EXPORT_DATA_SYMBOL()
-Date:   Sat, 11 Jun 2022 03:32:29 +0900
-Message-Id: <20220610183236.1272216-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
+Subject: [PATCH] certs: Convert spaces in certs/Makefile to a tab
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 10 Jun 2022 19:35:55 +0100
+Message-ID: <662080.1654886155@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
-This patch set refactors EXPORT_SYMBOL, <linux/export.h> and <asm/export.h>.
+Hi Linus,
 
-You can still put EXPORT_SYMBOL() in *.S file, very close to the definition,
-but you do not need to care about whether it is a function or a data.
-Remove EXPORT_DATA_SYMBOL().
+Can you apply this please?  It fixes a build error that can crop up
+occasionally due to a Makefile error.
 
+Thanks,
+David
+---
+certs: Convert spaces in certs/Makefile to a tab
 
+There's a rule in certs/Makefile for which the command begins with eight
+spaces.  This results in:
 
-Masahiro Yamada (7):
-  modpost: fix section mismatch check for exported init/exit sections
-  modpost: put get_secindex() call inside sec_name()
-  kbuild: generate struct kernel_symbol by modpost
-  ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
-  checkpatch: warn if <asm/export.h> is included
-  modpost: merge sym_update_namespace() into sym_add_exported()
-  modpost: use null string instead of NULL pointer for default namespace
+        ../certs/Makefile:21: FORCE prerequisite is missing
+        ../certs/Makefile:21: *** missing separator.  Stop.
 
- arch/ia64/include/asm/Kbuild    |   1 +
- arch/ia64/include/asm/export.h  |   3 -
- arch/ia64/kernel/head.S         |   2 +-
- arch/ia64/kernel/ivt.S          |   2 +-
- include/asm-generic/export.h    |  83 +------------------
- include/linux/export-internal.h |  44 ++++++++++
- include/linux/export.h          |  97 ++++++++--------------
- kernel/module/internal.h        |  12 +++
- kernel/module/main.c            |   1 -
- scripts/Makefile.build          |   8 +-
- scripts/check-local-export      |   4 +-
- scripts/checkpatch.pl           |   7 ++
- scripts/mod/modpost.c           | 139 +++++++++++++++++---------------
- scripts/mod/modpost.h           |   1 +
- 14 files changed, 182 insertions(+), 222 deletions(-)
- delete mode 100644 arch/ia64/include/asm/export.h
+Fix this by turning the spaces into a tab.
 
--- 
-2.32.0
+Fixes: addf466389d9 ("certs: Check that builtin blacklist hashes are valid")
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Reviewed-by: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
+cc: keyrings@vger.kernel.org
+Link: https://lore.kernel.org/r/486b1b80-9932-aab6-138d-434c541c934a@digiko=
+d.net/ # v1
+---
+ certs/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/certs/Makefile b/certs/Makefile
+index bb904f90f139..cb1a9da3fc58 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -18,7 +18,7 @@ CFLAGS_blacklist_hashes.o +=3D -I$(srctree)
+=20
+ targets +=3D blacklist_hashes_checked
+ $(obj)/blacklist_hashes_checked: $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(=
+SYSTEM_BLACKLIST_HASH_LIST_FILENAME) scripts/check-blacklist-hashes.awk FOR=
+CE
+-       $(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LI=
+ST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
++	$(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRC=
+PREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
+ obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) +=3D blacklist_hashes.o
+ else
+ obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) +=3D blacklist_nohashes.o
 
