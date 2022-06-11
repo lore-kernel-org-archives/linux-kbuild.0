@@ -2,110 +2,95 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24978C43334
-	for <linux-kbuild@archiver.kernel.org>; Sat, 11 Jun 2022 08:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0609C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 11 Jun 2022 17:23:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231577AbiFKIlS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 11 Jun 2022 04:41:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57286 "EHLO
+        id S238308AbiFKRXo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 11 Jun 2022 13:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231468AbiFKIlQ (ORCPT
+        with ESMTP id S238181AbiFKRXn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Jun 2022 04:41:16 -0400
-Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BEC310C8;
-        Sat, 11 Jun 2022 01:41:13 -0700 (PDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 25B8ekfq022701;
-        Sat, 11 Jun 2022 17:40:47 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 25B8ekfq022701
+        Sat, 11 Jun 2022 13:23:43 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C317B3CFC9;
+        Sat, 11 Jun 2022 10:23:37 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 25BHMhjP022692;
+        Sun, 12 Jun 2022 02:22:45 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 25BHMhjP022692
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1654936847;
-        bh=GjObk4qkn+wKKzrcBcuYF59rT44eRBod2haAId0PbXY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=PREvLjGPWl2vpwAWxu9YrCKddWls2iwOpHhGWM+1kaRRovK1JCxy+uSn609YV0gI3
-         08EmkdWb1tfsUC5IIRcF9TVUwP2tsuiirzSg3n/Q/5KcSgJup393cJvlf8XIHkSOLq
-         304Rmb98sPeK4Nix+tSz/RQgmbXaOLkBV0yssM2ySNpzx2x88QOUpmD6ssrxiP3mNr
-         m7dnQhG+MZmxSvlpNzh281ddse/dHcTvqFdvIaBZobn3pqDYiBAsteRN1Iswjqoz24
-         tKpNmExTO5+ytUN2BKTKoNdEjCDwykfiKV0j2dShtcgnxPnLWqhxYO+7DW75Pn7Y2C
-         BF5+6NoT+6RPg==
-X-Nifty-SrcIP: [209.85.221.45]
-Received: by mail-wr1-f45.google.com with SMTP id k19so1264016wrd.8;
-        Sat, 11 Jun 2022 01:40:47 -0700 (PDT)
-X-Gm-Message-State: AOAM533aqmBDJmpKIHiSMTAPCFboIOAaWR17yTdHiC79kqgPKrImZ5FI
-        Je+xhNvngpWKDRv9DW6auFIkMvwcJHOJHeQ7FbM=
-X-Google-Smtp-Source: ABdhPJyiHW2W3e41O1pSCmct30Roanq1/4GAP7WtMOyFwG8Wk3ea+wpvffMHRIqX+Lt7EbWt196HX8/OmJhdHyIm+Iw=
-X-Received: by 2002:adf:f902:0:b0:20e:66db:b9d2 with SMTP id
- b2-20020adff902000000b0020e66dbb9d2mr48895378wrr.682.1654936845690; Sat, 11
- Jun 2022 01:40:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220610213453.630304-1-alvin@pqrs.dk> <20220610213959.bjrw6nrxaby2lb3g@bang-olufsen.dk>
-In-Reply-To: <20220610213959.bjrw6nrxaby2lb3g@bang-olufsen.dk>
+        s=dec2015msa; t=1654968165;
+        bh=MMlWHI79ZXLVfVOPspFzx7WO3YALeI7+en73nS8lFyY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=BPPzm9G0e6v8UIo5UGvWV0+CS09mXXIW3BFcw18fSZLEkOet4hu6efpdPrCVjuOWb
+         I2CJb4QtmLSyESS+JDvVKxbDWuhE1Zbejlb6XpWGX0e/FGzVUU+RhEylEtIVu9hI9G
+         Sux8kMsCqnJ+Z2lQHhnmBJjiBbaqwaRlYUH5SmP1mZv3stMcrG/bXRvNxNu9kmkJ4L
+         VhE6vEpva8xUzxhrMLQZI+6qDiLomI4r1XkR5XTZo8rjakxevx3rBFskiMw+mf45o3
+         Njb+uypw1Pk1fqynv+6cNh1GqX7/AK0dvTB4zmiG1JUyiyn6x1i1BtvIdm+kcfIT55
+         3RaI0LCqLS0xw==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 11 Jun 2022 17:40:08 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQaN0pH01Ntsn9jRxciaiYtWUA8MJeJ9ELiXrrbQwms6g@mail.gmail.com>
-Message-ID: <CAK7LNAQaN0pH01Ntsn9jRxciaiYtWUA8MJeJ9ELiXrrbQwms6g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use a pipe rather than process substitution
-To:     =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Cc:     =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alvin@pqrs.dk>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kbuild@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?q?Micka=8F=AB=B3l=20Sala=8F=AB=E4n?= 
+        <mic@linux.microsoft.com>, Masahiro Yamada <masahiroy@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 3/4] certs: move scripts/check-blacklist-hashes.awk to certs/
+Date:   Sun, 12 Jun 2022 02:22:32 +0900
+Message-Id: <20220611172233.1494073-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220611172233.1494073-1-masahiroy@kernel.org>
+References: <20220611172233.1494073-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sat, Jun 11, 2022 at 6:40 AM Alvin =C5=A0ipraga <ALSI@bang-olufsen.dk> w=
-rote:
->
-> On Fri, Jun 10, 2022 at 11:34:52PM +0200, Alvin =C5=A0ipraga wrote:
-> > From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
-> >
-> > Bash process substitution of the form `foo < <(bar)`, as found in
-> > scripts/check-local-export, can cause issues in chrooted environments
-> > and with tools such as pseudo. The blamed commit started to cause build
-> > errors for me when using the Yocto project's devshell environment;
-> > devshell uses pseudo internally:
-> >
-> > .../scripts/check-local-export: line 51: /dev/fd/63: No such file or di=
-rectory
-> >
-> > Replace the process substitution with a simple pipe into the while loop=
-.
-> > This is functionally equivalent and more portable than the former. Note
-> > that pipefail is enabled so that the script terminates when ${NM} fails=
-.
-> >
-> > Link: https://bugzilla.yoctoproject.org/show_bug.cgi?id=3D13288
-> > Fixes: 31cb50b5590f ("kbuild: check static EXPORT_SYMBOL* by script ins=
-tead of modpost")
-> > Signed-off-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
->
-> Oops, I forgot to check the linux-kbuild list before sending this patch. =
-I see
-> that a more robust patch has been posted which addresses a separate issue=
-, but
-> which also solves the issue I was trying to address:
->
-> https://lore.kernel.org/linux-kbuild/20220608011100.486735-1-masahiroy@ke=
-rnel.org/raw
->
-> Please ignore this. Thanks!
->
-> Kind regards,
-> Alvin
+This script is only used in certs/Makefile, so certs/ is a better
+home for it.
 
-No problem. I did not notice I had broken yocto builds,
-and it is good to know it has been solved as well.
-Thanks for the report.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ MAINTAINERS                                   | 1 -
+ certs/Makefile                                | 2 +-
+ {scripts => certs}/check-blacklist-hashes.awk | 0
+ 3 files changed, 1 insertion(+), 2 deletions(-)
+ rename {scripts => certs}/check-blacklist-hashes.awk (100%)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1fc9ead83d2a..7c2a7c304824 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4627,7 +4627,6 @@ L:	keyrings@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/admin-guide/module-signing.rst
+ F:	certs/
+-F:	scripts/check-blacklist-hashes.awk
+ F:	scripts/sign-file.c
+ F:	tools/certs/
+ 
+diff --git a/certs/Makefile b/certs/Makefile
+index a8d628fd5f7b..df7aaeafd19c 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -13,7 +13,7 @@ CFLAGS_blacklist_hashes.o := -I $(obj)
+ 
+ quiet_cmd_check_and_copy_blacklist_hash_list = GEN     $@
+       cmd_check_and_copy_blacklist_hash_list = \
+-	$(AWK) -f $(srctree)/scripts/check-blacklist-hashes.awk $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) >&2; \
++	$(AWK) -f $(srctree)/$(src)/check-blacklist-hashes.awk $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) >&2; \
+ 	cat $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) > $@
+ 
+ $(obj)/blacklist_hash_list: $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) FORCE
+diff --git a/scripts/check-blacklist-hashes.awk b/certs/check-blacklist-hashes.awk
+similarity index 100%
+rename from scripts/check-blacklist-hashes.awk
+rename to certs/check-blacklist-hashes.awk
+-- 
+2.32.0
 
---=20
-Best Regards
-Masahiro Yamada
