@@ -2,70 +2,102 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070C1C43334
-	for <linux-kbuild@archiver.kernel.org>; Sun, 12 Jun 2022 18:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A40ACCA47B
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Jun 2022 12:35:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233330AbiFLSkt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 12 Jun 2022 14:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
+        id S1348897AbiFMMfA (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Jun 2022 08:35:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233322AbiFLSkt (ORCPT
+        with ESMTP id S1356758AbiFMMeN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Jun 2022 14:40:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BC259967;
-        Sun, 12 Jun 2022 11:40:48 -0700 (PDT)
+        Mon, 13 Jun 2022 08:34:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEBF41A813;
+        Mon, 13 Jun 2022 04:07:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 050DC6101C;
-        Sun, 12 Jun 2022 18:40:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FAC8C3411D;
-        Sun, 12 Jun 2022 18:40:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655059247;
-        bh=2KZn07GBeR+9deDA4wywPy95VracK2cBdvXt2GNbF84=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=oi7CNsd6xbUkpMPHok5RJQ6joirKIvak1Klc48D86PPnRrM+xWml/dWbMgMgVVo5i
-         6Rd2wIkJHZHGBLl1L0BozBw1YGwa0HeJQUxBGnSGlejQwJdlMYKx5umDz5euV6qfVS
-         IPJ6jJSEB7lVKNfjKd9Y46+T7REvfokfGP3LbGIWsmzQDaJXWa9GOD1PjzfqfkWcWZ
-         HHdYisK3pvu6lu13R87YEL7S4Erp4L7waYz3B3ulMuDQktjCYCD9/3YV139aYrzfpq
-         28MKZBEYFqRhnfGolmCy6iYJD83YJzLXIBn3bHsiPYEe0RRvNevY26KpUeKtPJUvgB
-         SbAV6QTphWt+Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CCACE737E6;
-        Sun, 12 Jun 2022 18:40:47 +0000 (UTC)
-Subject: Re: [GIT PULL] Kbuild fixes for v5.19-rc2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAK7LNASHyyT+tw-G8iNWt0sHmMUKr816sCXKfLpo-_GhVa=9WQ@mail.gmail.com>
-References: <CAK7LNASHyyT+tw-G8iNWt0sHmMUKr816sCXKfLpo-_GhVa=9WQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kbuild.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAK7LNASHyyT+tw-G8iNWt0sHmMUKr816sCXKfLpo-_GhVa=9WQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.19
-X-PR-Tracked-Commit-Id: 1f7a6cf6b07c74a17343c2559cd5f5018a245961
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e3b8e2de19e18e4297c0dd747d56ecdc4ff96928
-Message-Id: <165505924731.24195.18010323738696600238.pr-tracker-bot@kernel.org>
-Date:   Sun, 12 Jun 2022 18:40:47 +0000
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        by ams.source.kernel.org (Postfix) with ESMTPS id C04A2B80EAA;
+        Mon, 13 Jun 2022 11:07:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9DA2C34114;
+        Mon, 13 Jun 2022 11:07:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1655118441;
+        bh=NpwyQtAgrx0bKs8vBVpJf/f7o47VdkRdV2KjNRgFA8A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=sBqF6DwRzm4O6+K3kwKWvMu+ep2imDiElncgpa0cHlBluY5PKID3TuciP32Qy/NRZ
+         jNGA4r2VuTaib/ojinTg0Djn86MDGtuusJa6ja7AMwgxOKFJsp4SCZ99fsPR+M9FyW
+         DpQlVyqq8mkvYX0zCEtD45QbjkBQicPGHAGtRoR8=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org,
+        Padmanabha Srinivasaiah <treasure4paddy@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+        Sami Tolvanen <samitolvanen@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10 077/172] bootconfig: Make the bootconfig.o as a normal object file
+Date:   Mon, 13 Jun 2022 12:10:37 +0200
+Message-Id: <20220613094908.906993447@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220613094850.166931805@linuxfoundation.org>
+References: <20220613094850.166931805@linuxfoundation.org>
+User-Agent: quilt/0.66
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The pull request you sent on Sun, 12 Jun 2022 04:39:16 +0900:
+From: Masami Hiramatsu <mhiramat@kernel.org>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git tags/kbuild-fixes-v5.19
+[ Upstream commit 6014a23638cdee63a71ef13c51d7c563eb5829ee ]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e3b8e2de19e18e4297c0dd747d56ecdc4ff96928
+Since the APIs defined in the bootconfig.o are not individually used,
+it is meaningless to build it as library by lib-y. Use obj-y for that.
 
-Thank you!
+Link: https://lkml.kernel.org/r/164921225875.1090670.15565363126983098971.stgit@devnote2
 
+Cc: Padmanabha Srinivasaiah <treasure4paddy@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Sami Tolvanen <samitolvanen@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Reported-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ lib/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index d415fc7067c5..69b8217652ed 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -274,7 +274,7 @@ $(foreach file, $(libfdt_files), \
+ 	$(eval CFLAGS_$(file) = -I $(srctree)/scripts/dtc/libfdt))
+ lib-$(CONFIG_LIBFDT) += $(libfdt_files)
+ 
+-lib-$(CONFIG_BOOT_CONFIG) += bootconfig.o
++obj-$(CONFIG_BOOT_CONFIG) += bootconfig.o
+ 
+ obj-$(CONFIG_RBTREE_TEST) += rbtree_test.o
+ obj-$(CONFIG_INTERVAL_TREE_TEST) += interval_tree_test.o
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.35.1
+
+
+
