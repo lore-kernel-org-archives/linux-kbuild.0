@@ -2,36 +2,38 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D8ECCA47C
-	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Jun 2022 15:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2078C43334
+	for <linux-kbuild@archiver.kernel.org>; Mon, 13 Jun 2022 17:17:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239076AbiFMPSj (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 13 Jun 2022 11:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39640 "EHLO
+        id S240500AbiFMRR0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 13 Jun 2022 13:17:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243879AbiFMPRx (ORCPT
+        with ESMTP id S244491AbiFMROF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Jun 2022 11:17:53 -0400
-Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [IPv6:2001:1600:4:17::42a8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F131269AC;
-        Mon, 13 Jun 2022 05:36:15 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4LM9zK4sW9zMpyPc;
-        Mon, 13 Jun 2022 14:36:13 +0200 (CEST)
+        Mon, 13 Jun 2022 13:14:05 -0400
+Received: from smtp-190a.mail.infomaniak.ch (smtp-190a.mail.infomaniak.ch [IPv6:2001:1600:4:17::190a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46EA6554A4
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 Jun 2022 05:20:08 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4LM9cj5FsVzMpwtX;
+        Mon, 13 Jun 2022 14:20:05 +0200 (CEST)
 Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4LM9zK0CnPzlqK2h;
-        Mon, 13 Jun 2022 14:36:12 +0200 (CEST)
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4LM9cd4MYKzlpb2d;
+        Mon, 13 Jun 2022 14:20:01 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1655123773;
-        bh=y8WeNC3r3J7KNO7FidESYUF65oAKkpk01OypWCpEEpI=;
-        h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
-        b=0jqca2CqbhDm2H3L9tH3sKXia+64mN5xDGlKUNW9yCxFJv0zD0a0dE5UldOGfNPUx
-         X8eLqADKLAK47fE8LhhB7re3x5PwlFGYOZ47hNEBNuPTUvSQJUMZbToTUcdAHgA3k+
-         q4aeIrZvnB9nWaIWm73+N4UrUjWtcvj4H+WHnfN4=
-Message-ID: <e7850717-dad6-daef-c96c-2a74248e98f6@digikod.net>
-Date:   Mon, 13 Jun 2022 14:36:12 +0200
+        s=20191114; t=1655122805;
+        bh=P8NVyXj34ZvJVQWESPk01PC8KYswBLc2J5cBfxA5wlI=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=aOumEP/IoqVDxckhdOnow8XBOtzF6rPUHSpjAaEiKv4s4qTv9+QazdFI/MV0sY9Oj
+         WNcCDGC2NsIWSWr8htmOXQonlVhjqK6/U6g/yYRD9VTzd/JdIjpyOFwXcDvdlX4LMS
+         ZPoJ0aNzkEJ9Yh+5Wu0QvJ3PdsdwNy2lAdCZDTxY=
+Message-ID: <ff05d732-3202-7c9c-0d4c-d95101ed6ba3@digikod.net>
+Date:   Mon, 13 Jun 2022 14:20:00 +0200
 MIME-Version: 1.0
 User-Agent: 
+Subject: Re: [PATCH 1/4] certs/blacklist_hashes.c: fix const confusion in
+ certs blacklist
 Content-Language: en-US
 To:     Masahiro Yamada <masahiroy@kernel.org>,
         linux-kbuild@vger.kernel.org
@@ -43,60 +45,50 @@ Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Tyler Hicks <tyhicks@linux.microsoft.com>
 References: <20220611172233.1494073-1-masahiroy@kernel.org>
- <20220611172233.1494073-3-masahiroy@kernel.org>
 From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Subject: Re: [PATCH 3/4] certs: move scripts/check-blacklist-hashes.awk to
- certs/
-In-Reply-To: <20220611172233.1494073-3-masahiroy@kernel.org>
+In-Reply-To: <20220611172233.1494073-1-masahiroy@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
-
 On 11/06/2022 19:22, Masahiro Yamada wrote:
-> This script is only used in certs/Makefile, so certs/ is a better
-> home for it.
+> This file fails to compile as follows:
 > 
+>    CC      certs/blacklist_hashes.o
+> certs/blacklist_hashes.c:4:1: error: ignoring attribute ‘section (".init.data")’ because it conflicts with previous ‘section (".init.rodata")’ [-Werror=attributes]
+>      4 | const char __initdata *const blacklist_hashes[] = {
+>        | ^~~~~
+> In file included from certs/blacklist_hashes.c:2:
+> certs/blacklist.h:5:38: note: previous declaration here
+>      5 | extern const char __initconst *const blacklist_hashes[];
+>        |                                      ^~~~~~~~~~~~~~~~
+> 
+> Apply the same fix as commit 2be04df5668d ("certs/blacklist_nohashes.c:
+> fix const confusion in certs blacklist").
+> 
+> Fixes: 734114f8782f ("KEYS: Add a system blacklist keyring")
 > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+
+Reviewed-by: Mickaël Salaün <mic@linux.microsoft.com>
+
 > ---
 > 
->   MAINTAINERS                                   | 1 -
->   certs/Makefile                                | 2 +-
->   {scripts => certs}/check-blacklist-hashes.awk | 0
->   3 files changed, 1 insertion(+), 2 deletions(-)
->   rename {scripts => certs}/check-blacklist-hashes.awk (100%)
+>   certs/blacklist_hashes.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1fc9ead83d2a..7c2a7c304824 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -4627,7 +4627,6 @@ L:	keyrings@vger.kernel.org
->   S:	Maintained
->   F:	Documentation/admin-guide/module-signing.rst
->   F:	certs/
-> -F:	scripts/check-blacklist-hashes.awk >   F:	scripts/sign-file.c
->   F:	tools/certs/
+> diff --git a/certs/blacklist_hashes.c b/certs/blacklist_hashes.c
+> index 344892337be0..d5961aa3d338 100644
+> --- a/certs/blacklist_hashes.c
+> +++ b/certs/blacklist_hashes.c
+> @@ -1,7 +1,7 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   #include "blacklist.h"
 >   
-> diff --git a/certs/Makefile b/certs/Makefile
-> index a8d628fd5f7b..df7aaeafd19c 100644
-> --- a/certs/Makefile
-> +++ b/certs/Makefile
-> @@ -13,7 +13,7 @@ CFLAGS_blacklist_hashes.o := -I $(obj)
->   
->   quiet_cmd_check_and_copy_blacklist_hash_list = GEN     $@
->         cmd_check_and_copy_blacklist_hash_list = \
-> -	$(AWK) -f $(srctree)/scripts/check-blacklist-hashes.awk $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) >&2; \
-> +	$(AWK) -f $(srctree)/$(src)/check-blacklist-hashes.awk $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) >&2; \
->   	cat $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) > $@
->   
->   $(obj)/blacklist_hash_list: $(CONFIG_SYSTEM_BLACKLIST_HASH_LIST) FORCE
-> diff --git a/scripts/check-blacklist-hashes.awk b/certs/check-blacklist-hashes.awk
-> similarity index 100%
-> rename from scripts/check-blacklist-hashes.awk
-> rename to certs/check-blacklist-hashes.awk
-
-It looks more appropriate and consistent to me to keep it in scripts/, 
-close to other cert scripts. Is there some precedent to move such script?
+> -const char __initdata *const blacklist_hashes[] = {
+> +const char __initconst *const blacklist_hashes[] = {
+>   #include CONFIG_SYSTEM_BLACKLIST_HASH_LIST
+>   	, NULL
+>   };
