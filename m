@@ -2,162 +2,164 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242B0C433EF
-	for <linux-kbuild@archiver.kernel.org>; Fri, 17 Jun 2022 23:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA3A4C433EF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 18 Jun 2022 05:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383677AbiFQX0S (ORCPT
-        <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 17 Jun 2022 19:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58980 "EHLO
+        id S232269AbiFRF6d (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 18 Jun 2022 01:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383669AbiFQX0R (ORCPT
+        with ESMTP id S229948AbiFRF6c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Jun 2022 19:26:17 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3068D6622D
-        for <linux-kbuild@vger.kernel.org>; Fri, 17 Jun 2022 16:26:16 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id c4so8969186lfj.12
-        for <linux-kbuild@vger.kernel.org>; Fri, 17 Jun 2022 16:26:16 -0700 (PDT)
+        Sat, 18 Jun 2022 01:58:32 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90544EDD4;
+        Fri, 17 Jun 2022 22:58:30 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id y17so4239714ilj.11;
+        Fri, 17 Jun 2022 22:58:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EXgpKpIVzT6qnZVCgCn3/+ZdUQI+LHK0/bEVe7Lb4mY=;
-        b=hldD5704PosVIx7pUYS/I5Fkd39xNzHxffHQ4mZN1Dqeeuu2C4pwCxAQJNgtGLYwk9
-         w7FJIcrUIRSS7x7h7nxefPG9ErzMKZMCYjFXnwB6jDP9vW9l7w3v44r21dvY+UO/roaH
-         DuoO8nTSDMIPRijv/rUkB+5O/ifpxQW5EsEk/kcxRq9igUh8BEY3NEIxapGHRXPEivrV
-         mEubtXEvlefXACss71A3Yow9/ml9N4sTH4bxhcrDrh4VpAU+l17QlhYYZuNW98vzP9tg
-         nWdM5nclxBc/2bwkBpTMkpG+KU30Q0CgYJD/wbMLZRWwW2OIMr9AzbNDc9dxSlEJaxPO
-         Zx/w==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc:content-transfer-encoding;
+        bh=DoXrvmARzpcu70b8xixzSRDkUeRb3CHYW5cwPvaz0gg=;
+        b=SxLEpZGrEW0KeSJ94LopSHGMJ8WsaYKF5m7zNWZfbfF1DR6YkCsziWy2VS0pFvxglQ
+         /QAkZMfGZyInSCg8e6FS/L+he5TGVgTwB+QX1nWKq2JYI5WVqvAvFiv0oYCLpS06L5Yd
+         6l75DEmB+EDeuD2/IVePgX+lP+8zoe9/tBQI82KKZ1pbfEFsqdMtP47MBNR/B7LWkvLg
+         vp/TOUe4nqvJ+UACN5tiWGSQnOOczfdlIEY9OHUTg25WE+9s6l9LbfM4ZytT4WOj9qQK
+         eo5UOv/0SH3DAB7TcFgpXXXl4HDe2oeVqfsW2trtjNWwRWpLQdNPD5hYCUoQXtkHnJ8Z
+         jCKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EXgpKpIVzT6qnZVCgCn3/+ZdUQI+LHK0/bEVe7Lb4mY=;
-        b=5sdH1vfYLw5Za84wZHPaNgepKu4PIotUGreajxHvlfXCszpQh7DNb1mM/ljM5ji2aA
-         x9//cY8ldkHXHBPAFlqwKSg07pkSbbL7VhlXEsWCmf7WFGVtsNE7ViDirFlvqAkYUkk0
-         Fh0KjG1KvgsRupmNGxWTXertcwJBgBihzeGoQ8owOGRwbZ3lXG7tcPYkWVOiLGsh3U6A
-         ESggwRAyGmfpVFmenJ/X8IOuNlYLWsJUlmV437pFEhpcEJovCxE6qlQN4dIvPMnQ4PW2
-         x2lPFKwvPPojgOKoVeN99d7ACd+N8rVuag2DcV5dRI0cYM1yDmYK1n6xs094mSEVM/Ez
-         Vlpg==
-X-Gm-Message-State: AJIora+ert5W04dLAccYskoTkSH1kF1SFR5mPuqh+zJaJ022YA9culJ5
-        5ieIhTfqq2SBNI8kxoZMUYhSg96PBWbaK1VJVKED3mO5ITk=
-X-Google-Smtp-Source: AGRyM1vuSCrUYcJ+fn+AGYw7Otfa1ERbN93s/Se2G5Qnqe8WDMwXm36GodOORpoZgx9wT9vyGeqywndfeQfffGCwypI=
-X-Received: by 2002:a05:6512:3f9f:b0:47d:c87e:f8f3 with SMTP id
- x31-20020a0565123f9f00b0047dc87ef8f3mr7012832lfa.401.1655508374233; Fri, 17
- Jun 2022 16:26:14 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc:content-transfer-encoding;
+        bh=DoXrvmARzpcu70b8xixzSRDkUeRb3CHYW5cwPvaz0gg=;
+        b=FGSEQkLQLds0MwYLyI8EiKUGCs8uztIu7n9kC5vdIWoRqIFrnRHpEkeTsn2a6aeONU
+         8f118yymV8/op2IO3NUmQMway/BEyRuGa0uhJZb6AN8/Latk8VI7N8ek6pci4NMulOZ6
+         uI6KElmkQiF8Mt+0ZsxJqlPehQAP8/ewCrNsw0IR5HLweXupgr4VbuWqK6shBNriImK1
+         lc3WK/UNZDANzg0K+yeM3hQuS1BAf3DIcw1v10uUaJPw5K8RXZLG1yZifZW76A5R9c6g
+         ySpTJ61k7Qr1f9w+Wexw9GBE4SUHSemfXEd0cySt9zh9hxaQi0MV9T+Use0cR2i8M6B8
+         Fe9w==
+X-Gm-Message-State: AJIora/m+qX7/Z8ISNnzWrtX2Gd+esrgbv5Hu7tqMqyY/oXCyFj4F4XI
+        f93DYTIwzzr6f1rgvO7GAoo78o50WioTcHfsq24=
+X-Google-Smtp-Source: AGRyM1sxJuiw21Pj5PT7yT8PySn95IoeqFmyHSMOhzBmabqL2+OTVLzZpIP0MKygupfzSPqdv8juE+/CTwm8Xg9FqCA=
+X-Received: by 2002:a05:6e02:f86:b0:2d8:dc34:8694 with SMTP id
+ v6-20020a056e020f8600b002d8dc348694mr4171997ilo.245.1655531909882; Fri, 17
+ Jun 2022 22:58:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220617203948.3714905-1-ndesaulniers@google.com> <Yq0MV2Z/hqSuSYbt@dev-arch.thelio-3990X>
-In-Reply-To: <Yq0MV2Z/hqSuSYbt@dev-arch.thelio-3990X>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Fri, 17 Jun 2022 16:26:02 -0700
-Message-ID: <CAKwvOdmUMhEe=nqyF-L08c7FL-NWus63JEe=G1MkboB47xjfsA@mail.gmail.com>
-Subject: Re: [PATCH] scripts/Makefile.clang: set --target for host based on
- make -v
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Tom Rix <trix@redhat.com>,
+References: <20220616104541.16289-1-jslaby@suse.cz> <CA+icZUW8O-HUSpw-656o6YZOiR2ZiCXjxsJwm2kctT6DHrs=4g@mail.gmail.com>
+ <CA+icZUV6bM2_jxyROK5B4XRid6fv8oX6YYNEdHUX8e_1OAdQYA@mail.gmail.com>
+ <CA+icZUUSTcrJqZB-gwNYt5objVg1J5+Ous6_hof0_A6eVCM-Kg@mail.gmail.com>
+ <CAKwvOdmb5xdF70TzNp=4STCpzkGh16FnuKE1KbdzDhHt=OuRFA@mail.gmail.com>
+ <CA+icZUWZKGEQ_VbnRL03SRAicEMi4r4J0dLRgXJgHvRg7DBM7A@mail.gmail.com> <YqzXKaaWRNP9C4b0@dev-arch.thelio-3990X>
+In-Reply-To: <YqzXKaaWRNP9C4b0@dev-arch.thelio-3990X>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Sat, 18 Jun 2022 07:57:54 +0200
+Message-ID: <CA+icZUWa9UBNBiijYCfrVorkKAH11=4KKgRkp-MxCsngWOPTeg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: pass jobserver to cmd_ld_vmlinux.o
+To:     Nathan Chancellor <nathan@kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Jiri Slaby <jslaby@suse.cz>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        clang-built-linux <llvm@lists.linux.dev>
+        Michal Marek <michal.lkml@markovi.net>,
+        Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 4:21 PM Nathan Chancellor <nathan@kernel.org> wrote:
+On Fri, Jun 17, 2022 at 9:34 PM Nathan Chancellor <nathan@kernel.org> wrote=
+:
 >
-> On Fri, Jun 17, 2022 at 01:39:48PM -0700, Nick Desaulniers wrote:
-> > We're working on providing statically linked images of clang to host on
-> > kernel.org. We're building them in Alpine Linux based Docker containers,
-> > which are MUSL based systems.
-> >
-> > In order to keep bootstrapping simpler, I'd like for them to have an
-> > implicit default --target of x86_64-alpine-linux-musl (set via LLVM's
-> > cmake variable LLVM_DEFAULT_TARGET_TRIPLE).
-> >
-> > Similarly, if one were to use a different build of clang meant for a
-> > glibc or bionic based system on a MUSL based host, we'd prefer to use
-> > the correct MUSL based triple for target hosts.
-> >
-> > Borrowed from the Zen of Python: Explicit is better than implicit. Let's
-> > be explicit about the target triple for HOSTCC when building with
-> > HOSTCC=clang or LLVM=1.
-> >
-> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+> On Fri, Jun 17, 2022 at 07:50:58PM +0200, Sedat Dilek wrote:
+> > On Fri, Jun 17, 2022 at 6:32 PM Nick Desaulniers
+> > <ndesaulniers@google.com> wrote:
+> > >
+> > > On Fri, Jun 17, 2022 at 3:35 AM Sedat Dilek <sedat.dilek@gmail.com> w=
+rote:
+> > > >
+> > > > On Fri, Jun 17, 2022 at 12:53 AM Sedat Dilek <sedat.dilek@gmail.com=
+> wrote:
+> > > > >
+> > > > > On Thu, Jun 16, 2022 at 4:09 PM Sedat Dilek <sedat.dilek@gmail.co=
+m> wrote:
+> > > > > >
+> > > > > > On Thu, Jun 16, 2022 at 12:45 PM Jiri Slaby <jslaby@suse.cz> wr=
+ote:
+> > > > > > >
+> > > > > > > Until the link-vmlinux.sh split (cf. the commit below), the l=
+inker was
+> > > > > > > run with jobserver set in MAKEFLAGS. After the split, the com=
+mand in
+> > > > > > > Makefile.vmlinux_o is not prefixed by "+" anymore, so this in=
+formation
+> > > > > > > is lost.
+> > > > > > >
+> > > > > > > Restore it as linkers working in parallel (esp. the LTO ones)=
+ make a use
+> > > > > > > of it.
+> > >
+> > > TBH, I agree with Masahiro. I didn't understand this comment "esp. th=
+e
+> > > LTO ones."  Jiri, can you clarify what you mean here?
+> > >
+> > > > [ CC Nathan and Sami ]
+> > > >
+> > > > I re-checked as my build-time takes approx. 15mins more than usual
+> > > > with Linux v5.17.
+> > > >
+> > > > [ Perf - seconds time elapsed ]
+> > > > v5.17: approx. 12500
+> > > > v5.19: approx. 13500
+> > > >
+> > > > +1.000 secs =3D +16,67mins
 >
-> I have tested this with a few different distributions on both aarch64
-> and x86_64:
+> So roughly 7.5% increase if I did my math correctly?
 >
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> Tested-by: Nathan Chancellor <nathan@kernel.org>
->
-> One small comment below.
->
-> > ---
-> >  Makefile               |  3 +--
-> >  scripts/Makefile.clang | 10 ++++++++++
-> >  2 files changed, 11 insertions(+), 2 deletions(-)
+> > > Does this patch make a difference?
+> > > https://lore.kernel.org/linux-kbuild/20220616195759.3214538-1-samitol=
+vanen@google.com/
+> > >
 > >
-> > diff --git a/Makefile b/Makefile
-> > index 1a6678d817bd..87712d9b043c 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -600,10 +600,9 @@ endif
-> >  # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
-> >  # and from include/config/auto.conf.cmd to detect the compiler upgrade.
-> >  CC_VERSION_TEXT = $(subst $(pound),,$(shell LC_ALL=C $(CC) --version 2>/dev/null | head -n 1))
-> > +HOSTCC_VERSION_TEXT = $(subst $(pound),,$(shell LC_ALL=C $(HOSTCC) --version 2>/dev/null | head -n 1))
-> >
-> > -ifneq ($(findstring clang,$(CC_VERSION_TEXT)),)
-> >  include $(srctree)/scripts/Makefile.clang
-> > -endif
-> >
-> >  # Include this also for config targets because some architectures need
-> >  # cc-cross-prefix to determine CROSS_COMPILE.
-> > diff --git a/scripts/Makefile.clang b/scripts/Makefile.clang
-> > index 87285b76adb2..a4505cd62d7b 100644
-> > --- a/scripts/Makefile.clang
-> > +++ b/scripts/Makefile.clang
-> > @@ -1,3 +1,4 @@
-> > +ifneq ($(findstring clang,$(CC_VERSION_TEXT)),)
-> >  # Individual arch/{arch}/Makefiles should use -EL/-EB to set intended
-> >  # endianness and -m32/-m64 to set word size based on Kconfigs instead of
-> >  # relying on the target triple.
-> > @@ -39,3 +40,12 @@ CLANG_FLAGS        += -Werror=ignored-optimization-argument
-> >  KBUILD_CFLAGS        += $(CLANG_FLAGS)
-> >  KBUILD_AFLAGS        += $(CLANG_FLAGS)
-> >  export CLANG_FLAGS
-> > +endif
-> > +
-> > +# If HOSTCC is clang, set the host target triple explicitly; do not rely on
-> > +# implicit defaults.
-> > +ifneq ($(findstring clang,$(HOSTCC_VERSION_TEXT)),)
-> > +HOST_TRIPLE          := --target=$(shell make --version | head -n2 | tail -n1 | cut -d ' ' -f 3)
+> > Running a new build...
 >
-> Should we use $(MAKE) instead of make here? I guess the only case where
+> I did a quick benchmark with Fedora's clang 14.0.0 and I didn't see an
+> increase of that proportion with your configuration (only about 1%,
+> which I would expect would be within the noise for new drivers and
+> such):
+>
+> Benchmark 1: 5.17
+>   Time (abs =E2=89=A1):        287.744 s               [User: 23497.818 s=
+, System: 4444.602 s]
+>
+> Benchmark 2: 5.19-rc2
+>   Time (abs =E2=89=A1):        290.027 s               [User: 24567.290 s=
+, System: 4834.458 s]
+>
+> Summary
+>   '5.17' ran
+>     1.01 times faster than '5.19-rc2'
+>
+> Not to say that there is not an issue but it might be more visible with
+> slower hardware.
+>
 
-oh! yeah, good call. I think so.  Will wait until next Tuesday
-(Juneteenth holiday in the US on Monday) to send a v2. Thanks for
-taking a look!
+@Nick Desaulniers
+I applied the patch.
+Seen from build-time not really measurable.
+Noticed some binary size reduction.
 
-> it would matter is if someone was calling make via an explicit path and
-> did not have it available in their PATH so maybe it is not worth
-> worrying about.
->
-> > +KBUILD_HOSTCFLAGS    += $(HOST_TRIPLE)
-> > +KBUILD_HOSTLDFLAGS   += $(HOST_TRIPLE)
-> > +endif
-> >
-> > base-commit: 79fe0f863f920c5fcf9dea61676742f813f0b7a6
-> > --
-> > 2.36.1.476.g0c4daa206d-goog
-> >
-> >
+@Nathan Chancellor
+Yeah, that I was thinking, too.
+This is due to the number of driver (and modules) increased.
 
+And of course the changes to kbuild-system.
+It's hard to compare.
 
+Surely, ancient CPU (10 years) plus HDD etc.
 
--- 
-Thanks,
-~Nick Desaulniers
+-Sedat-
