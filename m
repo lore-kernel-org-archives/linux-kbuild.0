@@ -2,137 +2,111 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB85ACCA481
-	for <linux-kbuild@archiver.kernel.org>; Mon, 20 Jun 2022 15:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC51C43334
+	for <linux-kbuild@archiver.kernel.org>; Tue, 21 Jun 2022 07:32:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243537AbiFTP3B (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 20 Jun 2022 11:29:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58934 "EHLO
+        id S1347353AbiFUHcS (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 21 Jun 2022 03:32:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245116AbiFTP2p (ORCPT
+        with ESMTP id S1344693AbiFUHb1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Jun 2022 11:28:45 -0400
-Received: from 7of9.schinagl.nl (7of9.connected.by.freedominter.net [185.238.129.13])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9837CD6;
-        Mon, 20 Jun 2022 08:28:42 -0700 (PDT)
-Received: from [10.2.12.24] (unknown [10.2.12.24])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Tue, 21 Jun 2022 03:31:27 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B024E65E3;
+        Tue, 21 Jun 2022 00:30:13 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by 7of9.schinagl.nl (Postfix) with ESMTPSA id 549661842F6F;
-        Mon, 20 Jun 2022 17:11:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=schinagl.nl; s=7of9;
-        t=1655737904; bh=UqBZTWQhX1oGqwuuGk9ArGFlxBsKUZyh+tzOazjtW9s=;
-        h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To;
-        b=bOAzh2IFJWlWBZypDTa0e5IixUmK4ODxJw2v/sUawktoEQv/WpwcVc3LTrMbtQHhF
-         elnL57V0cO+lBHvFupyfUQQnTg4lArzlyPePP/ZUZOKyBBGv1uTDYimPzaXnBf04HK
-         xyx9I2GtQpi6lx7toDHyNw8pQLpR57FT+sUwMkWU=
-Message-ID: <fae4873e-2ff9-df35-0ab9-34bf4417b717@schinagl.nl>
-Date:   Mon, 20 Jun 2022 17:11:43 +0200
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5B2541F9C6;
+        Tue, 21 Jun 2022 07:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655796612; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U4DTymAJzJ+35tPlIxji4RhmkYgZWhkrVnEK1homBN0=;
+        b=xDXlEOxSp1VNq0dGCbuV8cBqopmOOBe+A2BB5vgty35t9Pc/P9Zy4i4FWvAzDXkWFKrVsH
+        pB3OKphPeQk5Zzg0nAX5T+R8q37T1TUR75oNH/oCzzYq2pELsarXQyJu0C2STfbnRBlrsk
+        YcOuN/YP1HGwMUimbind212F/PcAhB8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655796612;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U4DTymAJzJ+35tPlIxji4RhmkYgZWhkrVnEK1homBN0=;
+        b=hnBmxj3WK/dvg/U4SLwzrQISzWAXPwW72yyFMPep1j5ut5MiSRm/2ycY7Kw53Tm92v7F1T
+        uO3z7yVLSQtDwOAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 26E8613638;
+        Tue, 21 Jun 2022 07:30:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 5lt1CIRzsWIJZwAAMHmgww
+        (envelope-from <jslaby@suse.cz>); Tue, 21 Jun 2022 07:30:12 +0000
+Message-ID: <14c9839b-c015-69c1-84f0-a99d03877005@suse.cz>
+Date:   Tue, 21 Jun 2022 09:30:11 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Reply-To: oliver+list@schinagl.nl
-Subject: Re: [PATCH 00/13] [RFC] Rust support
+Subject: Re: [PATCH] kbuild: pass jobserver to cmd_ld_vmlinux.o
 Content-Language: en-US
-To:     ojeda@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        oliver+list@schinagl.nl
-References: <20210414184604.23473-1-ojeda@kernel.org>
-From:   Olliver Schinagl <oliver@schinagl.nl>
-In-Reply-To: <20210414184604.23473-1-ojeda@kernel.org>
+To:     Nick Desaulniers <ndesaulniers@google.com>,
+        Sedat Dilek <sedat.dilek@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+References: <20220616104541.16289-1-jslaby@suse.cz>
+ <CA+icZUW8O-HUSpw-656o6YZOiR2ZiCXjxsJwm2kctT6DHrs=4g@mail.gmail.com>
+ <CA+icZUV6bM2_jxyROK5B4XRid6fv8oX6YYNEdHUX8e_1OAdQYA@mail.gmail.com>
+ <CA+icZUUSTcrJqZB-gwNYt5objVg1J5+Ous6_hof0_A6eVCM-Kg@mail.gmail.com>
+ <CAKwvOdmb5xdF70TzNp=4STCpzkGh16FnuKE1KbdzDhHt=OuRFA@mail.gmail.com>
+From:   Jiri Slaby <jslaby@suse.cz>
+In-Reply-To: <CAKwvOdmb5xdF70TzNp=4STCpzkGh16FnuKE1KbdzDhHt=OuRFA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hey Miguel and others,
-
-Having followed this for a while, I finally decided it best to at least 
-share some thoughts in the hopes to make life better for us with some 
-readability/accessibility issues, such as dyslexia for example.
-
-I apologize for being late to the party and for potentially using the 
-wrong thread, but I recall somewhere in v5 that it was best to respond 
-to the RFC for general comments.
-
-On 14-04-2021 20:45, ojeda@kernel.org wrote:
-> From: Miguel Ojeda <ojeda@kernel.org>
+On 17. 06. 22, 18:32, Nick Desaulniers wrote:
+> On Fri, Jun 17, 2022 at 3:35 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>>
+>> On Fri, Jun 17, 2022 at 12:53 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>>>
+>>> On Thu, Jun 16, 2022 at 4:09 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>>>>
+>>>> On Thu, Jun 16, 2022 at 12:45 PM Jiri Slaby <jslaby@suse.cz> wrote:
+>>>>>
+>>>>> Until the link-vmlinux.sh split (cf. the commit below), the linker was
+>>>>> run with jobserver set in MAKEFLAGS. After the split, the command in
+>>>>> Makefile.vmlinux_o is not prefixed by "+" anymore, so this information
+>>>>> is lost.
+>>>>>
+>>>>> Restore it as linkers working in parallel (esp. the LTO ones) make a use
+>>>>> of it.
 > 
-> Some of you have noticed the past few weeks and months that
-> a serious attempt to bring a second language to the kernel was
-> being forged. We are finally here, with an RFC that adds support
-> for Rust to the Linux kernel.
-> 
-> This cover letter is fairly long, since there are quite a few topics
-> to describe, but I hope it answers as many questions as possible
-> before the discussion starts.
-> 
+> TBH, I agree with Masahiro. I didn't understand this comment "esp. the
+> LTO ones."  Jiri, can you clarify what you mean here?
 
-<snip>
+Sure. clang is not the only compiler/linker that can handle kernel ;). 
+So while rebasing gcc-LTO-kernel-patches to 5.19-rc (to upstream them 
+later), this broke. See:
+https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=gcc/lto-wrapper.cc;h=26e06e77be4e0afb2bc3e913062a9c51cab5d205;hb=HEAD#l1336
 
-> 
-> Moreover, as explained above, we are taking the chance to enforce
-> some documentation guidelines. We are also enforcing automatic code
-> formatting, a set of Clippy lints, etc. We decided to go with Rust's
-> idiomatic style, i.e. keeping `rustfmt` defaults. For instance, this
-> means 4 spaces are used for indentation, rather than a tab. We are
-> happy to change that if needed -- we think what is important is
-> keeping the formatting automated
+gcc really parses MAKEFLAGS and looks for "--jobserver-auth=" there, if 
+one passes specifies -flto=jobserver.
 
-Enforcing this is great, but how will you enforce this 'everywhere'? 
-Right now, you can easily 'bypass' any CI put in place, and while 'for 
-now' this is only about the Rust infra, where this can be strongly 
-enforced, once we see actual drivers pop-up; these won't go through the 
-Rust CI before merging CI forever? A maintainer can 'just merge' 
-something still, right?
-
-Anyway, what I wanted to criticize, is the so called "keeping with 
-`rustfmt` defaults". It has been known, that, well Rust's defaults are 
-pretty biased and opinionated. For the Rust project, that's fair of 
-course, their code, their rules.
-
-However, there's two arguments against that. For one, using the Rust 
-'style', now means there's 2 different code styles in the Kernel. 
-Cognitively alone, that can be quite frustrating and annoying. Having to 
-go back and forth between two styles can be mentally challenging which 
-only causes mistakes and frustration. So why change something that 
-already exists? Also, see my first point. Having to constantly 
-remember/switch to 'in this file/function the curly brace is on a 
-different line'. Lets try to stay consistent, the rules may not be 
-perfect (80 columns ;), but so far consistency is tried. OCD and Autism 
-etc doesn't help with this ;)
-
-Secondly, and this is really far more important, the Rust default style 
-is not very inclusive, as it makes readability harder. This has been 
-brought up by many others in plenty of places, including the `rustfmt` 
-issue tracker under bug #4067 [0]. While the discussion eventually only 
-led to the 'fmt-rfcs' [1], where it was basically said 'you could be on 
-to something, but this ship has sailed 3 years ago (when nobody was 
-looking caring), and while we hear you, we're not going to change our 
-defaults anymore.
-
-But I also agree and share these commenters pain. When the tab character 
-is used for indenting (and not alignment mind you), then visually 
-impaired (who can still be amazing coders) can more easily read code by 
-adjusting the width what works best to them.
-
-With even git renaming `master` to `main` to be more inclusive, can we 
-also be more inclusive to us that have a hard time distinguishing narrow 
-indentations?
-
-Thanks, and sorry for rubbing any ones nerves, but to "some of us" this 
-actually matters a great deal.
-
-Olliver
-
-P.S. would we expect inline C/Rust code mixed? What then?
-
-
-<snip>
-
-[0]: https://github.com/rust-lang/rustfmt/issues/4067#issuecomment-685961408
-[1]: 
-https://github.com/rust-dev-tools/fmt-rfcs/issues/1#issuecomment-911804826
+thanks,
+-- 
+js
+suse labs
