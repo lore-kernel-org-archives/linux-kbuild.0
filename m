@@ -2,31 +2,31 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51829CCA482
-	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Jun 2022 15:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96AE3CCA481
+	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Jun 2022 15:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358735AbiFVPyJ (ORCPT
+        id S1358920AbiFVPyO (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 22 Jun 2022 11:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52734 "EHLO
+        Wed, 22 Jun 2022 11:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359662AbiFVPxC (ORCPT
+        with ESMTP id S1359664AbiFVPxC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 22 Jun 2022 11:53:02 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1EC42FE53;
-        Wed, 22 Jun 2022 08:52:49 -0700 (PDT)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LSnr15fjtzSh6B;
-        Wed, 22 Jun 2022 23:49:21 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67FD535DC8;
+        Wed, 22 Jun 2022 08:52:50 -0700 (PDT)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LSnvK3frHzDsH4;
+        Wed, 22 Jun 2022 23:52:13 +0800 (CST)
 Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 22 Jun 2022 23:52:46 +0800
+ 15.1.2375.24; Wed, 22 Jun 2022 23:52:47 +0800
 Received: from ubuntu1804.huawei.com (10.67.175.36) by
  dggpemm500013.china.huawei.com (7.185.36.172) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 22 Jun 2022 23:52:45 +0800
+ 15.1.2375.24; Wed, 22 Jun 2022 23:52:46 +0800
 From:   Chen Zhongjin <chenzhongjin@huawei.com>
 To:     <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
         <linuxppc-dev@lists.ozlabs.org>,
@@ -39,9 +39,9 @@ CC:     <jpoimboe@kernel.org>, <peterz@infradead.org>,
         <pasha.tatashin@soleen.com>, <broonie@kernel.org>,
         <chenzhongjin@huawei.com>, <rmk+kernel@armlinux.org.uk>,
         <madvenka@linux.microsoft.com>, <christophe.leroy@csgroup.eu>
-Subject: [PATCH v5 22/33] arm64: efi-header: Mark efi header as data
-Date:   Wed, 22 Jun 2022 23:49:09 +0800
-Message-ID: <20220622154920.95075-23-chenzhongjin@huawei.com>
+Subject: [PATCH v5 26/33] arm64: crypto: Remove unnecessary stackframe
+Date:   Wed, 22 Jun 2022 23:49:13 +0800
+Message-ID: <20220622154920.95075-27-chenzhongjin@huawei.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220622154920.95075-1-chenzhongjin@huawei.com>
 References: <20220622154920.95075-1-chenzhongjin@huawei.com>
@@ -55,36 +55,41 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This file only contains a set of constants forming the efi header.
+The way sha256_block_neon restore the stackframe confuses objtool.
+But it turns out this function is a leaf function and does not use
+FP nor LR as scratch register.
 
-Make the constants part of a data symbol.
+Do not create a stackframe in this function as it is not necessary.
 
 Signed-off-by: Julien Thierry <jthierry@redhat.com>
 Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
 ---
- arch/arm64/kernel/efi-header.S | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/crypto/sha512-armv8.pl | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kernel/efi-header.S b/arch/arm64/kernel/efi-header.S
-index 28d8a5dca5f1..3eacd27ab761 100644
---- a/arch/arm64/kernel/efi-header.S
-+++ b/arch/arm64/kernel/efi-header.S
-@@ -28,6 +28,7 @@
- 	.macro	__EFI_PE_HEADER
- #ifdef CONFIG_EFI
- 	.set	.Lpe_header_offset, . - .L_head
-+SYM_DATA_START_LOCAL(arm64_efi_header)
- 	.long	PE_MAGIC
- 	.short	IMAGE_FILE_MACHINE_ARM64		// Machine
- 	.short	.Lsection_count				// NumberOfSections
-@@ -160,6 +161,7 @@
+diff --git a/arch/arm64/crypto/sha512-armv8.pl b/arch/arm64/crypto/sha512-armv8.pl
+index 1882c4110026..6e2a96e05c5a 100644
+--- a/arch/arm64/crypto/sha512-armv8.pl
++++ b/arch/arm64/crypto/sha512-armv8.pl
+@@ -648,8 +648,6 @@ $code.=<<___;
+ .align	4
+ sha256_block_neon:
+ .Lneon_entry:
+-	stp	x29, x30, [sp, #-16]!
+-	mov	x29, sp
+ 	sub	sp,sp,#16*4
  
- 	.balign	SEGMENT_ALIGN
- .Lefi_header_end:
-+SYM_DATA_END_LABEL(arm64_efi_header, SYM_L_LOCAL, efi_header_end)
- #else
- 	.set	.Lpe_header_offset, 0x0
- #endif
+ 	adr	$Ktbl,K256
+@@ -736,8 +734,7 @@ $code.=<<___;
+ 	 mov	$Xfer,sp
+ 	b.ne	.L_00_48
+ 
+-	ldr	x29,[x29]
+-	add	sp,sp,#16*4+16
++	add	sp,sp,#16*4
+ 	ret
+ .size	sha256_block_neon,.-sha256_block_neon
+ ___
 -- 
 2.17.1
 
