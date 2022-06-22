@@ -2,82 +2,101 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E45CCA482
-	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Jun 2022 15:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA74EC43334
+	for <linux-kbuild@archiver.kernel.org>; Wed, 22 Jun 2022 17:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359741AbiFVPzR (ORCPT
+        id S1376324AbiFVRTz (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 22 Jun 2022 11:55:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52734 "EHLO
+        Wed, 22 Jun 2022 13:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359726AbiFVPxX (ORCPT
+        with ESMTP id S1376731AbiFVRTy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Jun 2022 11:53:23 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C96F4C;
-        Wed, 22 Jun 2022 08:52:53 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LSnvK6LxWzDsLZ;
-        Wed, 22 Jun 2022 23:52:13 +0800 (CST)
-Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 22 Jun 2022 23:52:47 +0800
-Received: from ubuntu1804.huawei.com (10.67.175.36) by
- dggpemm500013.china.huawei.com (7.185.36.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 22 Jun 2022 23:52:47 +0800
-From:   Chen Zhongjin <chenzhongjin@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kbuild@vger.kernel.org>, <live-patching@vger.kernel.org>
-CC:     <jpoimboe@kernel.org>, <peterz@infradead.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>,
-        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
-        <ndesaulniers@google.com>, <mark.rutland@arm.com>,
-        <pasha.tatashin@soleen.com>, <broonie@kernel.org>,
-        <chenzhongjin@huawei.com>, <rmk+kernel@armlinux.org.uk>,
-        <madvenka@linux.microsoft.com>, <christophe.leroy@csgroup.eu>
-Subject: [PATCH v5 28/33] arm64: sleep: Properly set frame pointer before call
-Date:   Wed, 22 Jun 2022 23:49:15 +0800
-Message-ID: <20220622154920.95075-29-chenzhongjin@huawei.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220622154920.95075-1-chenzhongjin@huawei.com>
+        Wed, 22 Jun 2022 13:19:54 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79EB321E2B
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Jun 2022 10:19:52 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id z17so9622901wmi.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Jun 2022 10:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g7rgKaNRu6VI+rL2tcZJVezyj5b7Lszc6RDU2QcG3NQ=;
+        b=Dsp3eLP695OxhLmAxgCpTladrks0d9cl3c4pqEG8IsiuYRxlbmyT9zMcfK+VdJOEhP
+         vqcEAnywIUG3D4hOvDO4vgW7mTKDWa4FOUacvv0rZZ1u/SO4iaTUMJT1YLVZARqV4UnP
+         VVaOZc6pGpqsRfWobvfoyII6hejsz2rE4brC494B2LoC31jIRjDfn1jZaLdHctRIJGTs
+         eYVx6Mr13FW6Ezg18RcNdgljwra6zUmgwIfkDvEWL26pByjsiHrTuzgpz4XG6qL9VH6q
+         2R9XZ6ufukStzJFEMcZ2MrXmX7/nzP3kY80P4OPxqAvqF9i9lBRjwSybCsaRqRMoajR9
+         c2mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=g7rgKaNRu6VI+rL2tcZJVezyj5b7Lszc6RDU2QcG3NQ=;
+        b=G0+H4Rqu95PCa1xNlQ9anEhB6+aW4nGco8gG3N+A5Q7LvhI+2REtUlcz0co6aGspOX
+         O42Ks7K0qqgt5pnl1CMILZRNR4GkEMNuyv0KfJEb6/T6VFeTrZJpzqVF8zZ1DpyE1S4B
+         sx/huXSuAXtIwGZPOM8qLyoXNzrKc/rkA5BZ4hS83oAVrRsIrYatt17nLfeGsU6giRrC
+         6RE5UFumB16cTnrTt4cXXxhJVL2LgG7faPxxBoYDAiLYc5ZHiaMsLWLB8TXkvuTLYpRx
+         lmQYgGk/x0fgR7htTvp9ZPPnHWiPi1aVzg0bBAGFHDk0MuYgXGYcS51rDySFO2x3uict
+         C6yg==
+X-Gm-Message-State: AOAM531M1W7ibh/Mnx5DWodFoqQppnryrSjNMbsySgUaDuDnzSSAxuWG
+        tOtzj2SXZ32kLIj3QZxkXJhjww==
+X-Google-Smtp-Source: ABdhPJzonljILXzP/YeUVGmI5wxNQjklVcp+NVX87qobxoQHEtny1OoVzedlkPsbhH9Zvj4Jv4dkKA==
+X-Received: by 2002:a05:600c:3229:b0:39c:65b2:8935 with SMTP id r41-20020a05600c322900b0039c65b28935mr48023528wmp.155.1655918390841;
+        Wed, 22 Jun 2022 10:19:50 -0700 (PDT)
+Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
+        by smtp.gmail.com with ESMTPSA id j18-20020a05600c42d200b003a02b9c47e4sm26041wme.27.2022.06.22.10.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 10:19:49 -0700 (PDT)
+Date:   Wed, 22 Jun 2022 18:19:46 +0100
+From:   Daniel Thompson <daniel.thompson@linaro.org>
+To:     Chen Zhongjin <chenzhongjin@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
+        live-patching@vger.kernel.org, jpoimboe@kernel.org,
+        peterz@infradead.org, catalin.marinas@arm.com, will@kernel.org,
+        masahiroy@kernel.org, michal.lkml@markovi.net,
+        ndesaulniers@google.com, mark.rutland@arm.com,
+        pasha.tatashin@soleen.com, broonie@kernel.org,
+        rmk+kernel@armlinux.org.uk, madvenka@linux.microsoft.com,
+        christophe.leroy@csgroup.eu
+Subject: Re: [PATCH v5 00/33] objtool: add base support for arm64
+Message-ID: <20220622171946.mc3cd375fy4fou3b@maple.lan>
 References: <20220622154920.95075-1-chenzhongjin@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.175.36]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500013.china.huawei.com (7.185.36.172)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220622154920.95075-1-chenzhongjin@huawei.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-In __cpu_suspend_enter, the FP and LR are properly saved on the stack to
-form a stack frame, but the frame pointer is not set afterwards.
+On Wed, Jun 22, 2022 at 11:48:47PM +0800, Chen Zhongjin wrote:
+> This series enables objtool to start doing stack validation and orc
+> generation on arm64 kernel builds.
+> 
+> Based on Julien's previous work(1)(2), Now I have finished most of work
+> for objtool enable on arm64. This series includes objtool part [1-13]
+> and arm64 support part [14-33], the second part is to make objtool run
+> correctly with no warning on arm64 so if necessary it can be taken apart
+> as two series.
+> 
+> ORC generation feature is implemented but not used because we don't have
+> an unwinder_orc on arm64, now it only be used to check whether objtool
+> has correct validation.
+> 
+> This series depends on (https://lkml.org/lkml/2022/6/22/463)
+> I moved some changes which work for all architectures to that series
+> because this one becomes too big now.
+> And it is rebased to tip/objtool/core branch.
 
-Have the frame pointer point to the new frame.
+What is the sha1 of the base?
 
-Signed-off-by: Julien Thierry <jthierry@redhat.com>
-Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
----
- arch/arm64/kernel/sleep.S | 1 +
- 1 file changed, 1 insertion(+)
+With b4 and git am the patch series is derailing at patch 6 and I'm even
+after a bit of fixup (had to use rediff) I'm still getting a cascade of
+errors in later patches to decode.c .
 
-diff --git a/arch/arm64/kernel/sleep.S b/arch/arm64/kernel/sleep.S
-index 799ec01b0649..7fd276f3c532 100644
---- a/arch/arm64/kernel/sleep.S
-+++ b/arch/arm64/kernel/sleep.S
-@@ -92,6 +92,7 @@ SYM_FUNC_START(__cpu_suspend_enter)
- 	str	x0, [x1]
- 	add	x0, x0, #SLEEP_STACK_DATA_SYSTEM_REGS
- 	stp	x29, lr, [sp, #-16]!
-+	mov	x29, sp
- 	bl	cpu_do_suspend
- 	ldp	x29, lr, [sp], #16
- 	mov	x0, #1
--- 
-2.17.1
 
+Daniel.
