@@ -2,229 +2,110 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A3BC433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 28 Jun 2022 12:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F35CC43334
+	for <linux-kbuild@archiver.kernel.org>; Tue, 28 Jun 2022 13:21:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345706AbiF1M2G (ORCPT
+        id S1346313AbiF1NV3 (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 28 Jun 2022 08:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55518 "EHLO
+        Tue, 28 Jun 2022 09:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345704AbiF1M1x (ORCPT
+        with ESMTP id S1346316AbiF1NVM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Jun 2022 08:27:53 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C77C27CD0
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jun 2022 05:27:50 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id v9so1858376wrp.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jun 2022 05:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ah0oP8sC6vNZQuTz/qBPulazK7fI2h9aJC/x7/uskDM=;
-        b=F+++aTM0ybwR/Bl0sF5/dEOKXTjI2ShX7t1I5Sm4yQlplOoVFE4iOA+GI73IGO1PXL
-         WqkYFW22m9gfVdotsuTQ0b3EEQTRqi8sMhqdWEV0JOuJESy+8pQGg3J3+OpW+TPKlOye
-         9XTW1esExflISvLQ0a32m8iv0zbZFqgrY4uE8bLZEIZCC2TBa6dIQlIedVk/X+p0IcXF
-         A6Q5mum9AqxUnA/eC/EBTlmLbbD1okWlTAKbL+4w+HrczGZzxEJwY/llJ2fRWDFsBiqh
-         jumrfUZEAqHe1segPsABvvev10/uQECO/1UR8YOXiD0jPWc7D3D2R05eVzDFJr25L6XP
-         d8/g==
+        Tue, 28 Jun 2022 09:21:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EB7D235A97
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jun 2022 06:19:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656422356;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qtr8/zsHx2lgXvXWLguSyb54C2tIRyCmz4eBKyNcZb0=;
+        b=FanQX8fbKAboMUhwWZK6X5rjtORLcIMo9+N9BuYj415/quB7NPo1s6G8qlwhkzPUTbVFQz
+        mCQ8oDaX8SYWNTB3GMW2CNhEfLHRkCkHSD+feFRf9RgglzlHLsPPZWvi6CszggkY/PXk3V
+        ZfGByGtIswFMDbvwUNK+MciAK5dO/qs=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-509-GOhJ-48WO4iP0JlvW1LdJg-1; Tue, 28 Jun 2022 09:19:14 -0400
+X-MC-Unique: GOhJ-48WO4iP0JlvW1LdJg-1
+Received: by mail-qk1-f199.google.com with SMTP id k190-20020a37bac7000000b006af6d953751so333361qkf.13
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jun 2022 06:19:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ah0oP8sC6vNZQuTz/qBPulazK7fI2h9aJC/x7/uskDM=;
-        b=PRDBr4KQaFnd5j5uTfG3QMZmcm5hvpudCsfCqsGPr5jePudH8RsBt4xHcT39AeNyVC
-         DpheFD2sSdxzI/wRFzNmVd9G4PfVP1eaBL6EywLhA3Q027Oc/AQOdALZNuvJ8Kmn2WzM
-         vonKd4C6jvkknY0Jez9D+dVXmxpqM5JtOlJ8VyuvmrUQ5gtmOyi8VcmYFgRezNUKXD8A
-         njwWyuhEp3EOlbG8y6aiHhhUWaZPvoUx1whVSUhWzTkdBLHN4FtI9SBcptROXoxujdmC
-         5p4yZlwqxnh2kR5g69fSyUv9yzDGKrCAjGXHjusGT5b8mNUvUO/+QaE3NGsCL9hD+Lbm
-         RrJQ==
-X-Gm-Message-State: AJIora+INQLCfBrKLNB48uZWxeTJxeq8MI3UHBGPTHcWeRnyEdChA/aX
-        s579h+vdtrf4uopuHiFB4LuwKQ==
-X-Google-Smtp-Source: AGRyM1tpRfy9+i2D7nawV2QAGsEe1pyjn/0o+QUpqSQFKJwVXm90XbyDkYJeE9T7EdG+2lctgXkymw==
-X-Received: by 2002:a05:6000:70b:b0:21b:a816:85c6 with SMTP id bs11-20020a056000070b00b0021ba81685c6mr16857540wrb.639.1656419268787;
-        Tue, 28 Jun 2022 05:27:48 -0700 (PDT)
-Received: from maple.lan (cpc141216-aztw34-2-0-cust174.18-1.cable.virginm.net. [80.7.220.175])
-        by smtp.gmail.com with ESMTPSA id ay36-20020a05600c1e2400b0039746638d6esm17184212wmb.33.2022.06.28.05.27.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 05:27:46 -0700 (PDT)
-From:   Daniel Thompson <daniel.thompson@linaro.org>
-To:     Nathan Chancellor <nathan@kernel.org>, Tom Rix <trix@redhat.com>
-Cc:     Daniel Thompson <daniel.thompson@linaro.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=qtr8/zsHx2lgXvXWLguSyb54C2tIRyCmz4eBKyNcZb0=;
+        b=FMgddEfYaI97RRpt4HZZsCI26xYhAcYxetedITB+PbwXgf/gMn/g1IwSMJU6mOvlQ0
+         G9alb0DkVN4yFNV/yTbXiRMpQbjx520t8xGam4Rrnv1tZ8O2Kh3fKKdBspNCXMdvKO3h
+         iY5Q+8z1mxPB3Kr98EXI8PPi9Dpu7xXV4BJi918m/30h9NmsAdkw/M4l469gK0Fk18tl
+         adDE4bJj2R1hYt0+gN4JnVid9/F6CTfWIUqvpEiijsmrc/f1vLKK7vPKuJ+T2JgwmYZr
+         9+dwb/1WozIImSLdG6gaa5pfdyLsQCZDbNYEEgpAYssQW6RKr5vqzD2hkhovQg287YpY
+         Bddw==
+X-Gm-Message-State: AJIora+ZMUwoLMfEmH7vyvg8KN2W+hX7xUXpZpSUKwnCrhvlgbHo6z55
+        iFPj+9TX4CvKC6z41yZzAfB86CPdCCdz2Ct5tIP1rCPz1bo7l5VX/IOP3UW+e8JCUTohlmvAajq
+        lb14UIzUhcfBoO7tAw/pj4S5O
+X-Received: by 2002:a05:620a:2629:b0:6ae:f26f:4a6f with SMTP id z41-20020a05620a262900b006aef26f4a6fmr11211899qko.525.1656422354107;
+        Tue, 28 Jun 2022 06:19:14 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1u6u3ElgI5SXkTszodT7+MkuzdhwyGAU7ALTb5+ws6xpB7rbXIdQWZhAuG2FGgMK9tgjL0AfQ==
+X-Received: by 2002:a05:620a:2629:b0:6ae:f26f:4a6f with SMTP id z41-20020a05620a262900b006aef26f4a6fmr11211875qko.525.1656422353898;
+        Tue, 28 Jun 2022 06:19:13 -0700 (PDT)
+Received: from localhost.localdomain (024-205-208-113.res.spectrum.com. [24.205.208.113])
+        by smtp.gmail.com with ESMTPSA id ay42-20020a05620a17aa00b006af3bc9c6bbsm3262520qkb.52.2022.06.28.06.19.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jun 2022 06:19:13 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Enable clang tools for kernels build using gcc
+To:     Daniel Thompson <daniel.thompson@linaro.org>,
+        Nathan Chancellor <nathan@kernel.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] clang-tools: Generate clang compatible output even with gcc builds
-Date:   Tue, 28 Jun 2022 13:27:39 +0100
-Message-Id: <20220628122741.93641-2-daniel.thompson@linaro.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220628122741.93641-1-daniel.thompson@linaro.org>
 References: <20220628122741.93641-1-daniel.thompson@linaro.org>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <0478d832-d902-69ed-7c1c-4f19d942cddf@redhat.com>
+Date:   Tue, 28 Jun 2022 06:19:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220628122741.93641-1-daniel.thompson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently `make compile_commands.json` cannot produce useful output for
-kernels built with gcc. That is because kbuild will opportunistically
-enable gcc-specific command line options from recent versions of gcc.
-Options that are not compatible with clang cause trouble because most of
-the tools that consume compile_commands.json only understand the clang
-argument set. This is to be expected since it was the clang folks wrote
-the spec to help make those tools come alive (and AFAIK all the tools
-that consume the compilation database are closely linked to the clang
-tools):
-https://clang.llvm.org/docs/JSONCompilationDatabase.html
+The limitations of the compilation db are not limited to the kernel.
 
-Let's fix this by adding code to gen_compile_commands.py that will
-automatically strip not-supported-by-clang command line options from
-the compilation database. This allows the common consumers of the
-compilation database (clang-tidy, clangd code completion engine,
-CodeChecker, etc) to work without requiring the developer to build the
-kernel using a different C compiler.
+Why shouldn't the change be made in the llvm project ?
 
-In theory this could cause problems if/when a not-based-on-clang tool
-emerges that reuses the clang compilation database format. This is not
-expected to be a problem in practice since the heuristics added to
-gen_compile_commands.py are pretty conservative. The should only ever
-disable some rather esoteric compiler options ("they must be esoteric
-otherwise clang would have implemented them..."). It is hard to reason
-about what will/won't break tools that are not yet written but we can
-hope the removing esoteric options will be benign!
+Tom
 
-Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
----
- Makefile                                    |  5 +-
- scripts/clang-tools/gen_compile_commands.py | 71 ++++++++++++++++++++-
- 2 files changed, 74 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 513c1fbf7888..9ea6867aaf9c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1886,8 +1886,11 @@ nsdeps: modules
- # Clang Tooling
- # ---------------------------------------------------------------------------
- 
-+ifdef CONFIG_CC_IS_GCC
-+gen_compile_commands-flags += --gcc
-+endif
- quiet_cmd_gen_compile_commands = GEN     $@
--      cmd_gen_compile_commands = $(PYTHON3) $< -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
-+      cmd_gen_compile_commands = $(PYTHON3) $< $(gen_compile_commands-flags) -a $(AR) -o $@ $(filter-out $<, $(real-prereqs))
- 
- $(extmod_prefix)compile_commands.json: scripts/clang-tools/gen_compile_commands.py \
- 	$(if $(KBUILD_EXTMOD),,$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)) \
-diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-index 1d1bde1fd45e..02f6a1408968 100755
---- a/scripts/clang-tools/gen_compile_commands.py
-+++ b/scripts/clang-tools/gen_compile_commands.py
-@@ -56,6 +56,9 @@ def parse_arguments():
-     ar_help = 'command used for parsing .a archives'
-     parser.add_argument('-a', '--ar', type=str, default='llvm-ar', help=ar_help)
- 
-+    gcc_help = 'tidy up gcc invocations to work with clang'
-+    parser.add_argument('-g', '--gcc', action='store_true', help=gcc_help)
-+
-     paths_help = ('directories to search or files to parse '
-                   '(files should be *.o, *.a, or modules.order). '
-                   'If nothing is specified, the current directory is searched')
-@@ -67,6 +70,7 @@ def parse_arguments():
-             os.path.abspath(args.directory),
-             args.output,
-             args.ar,
-+            args.gcc,
-             args.paths if len(args.paths) > 0 else [args.directory])
- 
- 
-@@ -196,10 +200,73 @@ def process_line(root_directory, command_prefix, file_path):
-         'command': prefix + file_path,
-     }
- 
-+clang_options = {}
-+
-+def check_clang_compatibility(target, flag):
-+    """Check that the supplied flag does not cause clang to return an error.
-+
-+    The results of the check, which is expensive if repeated many times, is
-+    cached in the clang_options variable and reused in subsequent calls.
-+    """
-+    global clang_options
-+    if flag in clang_options:
-+        return clang_options[flag]
-+
-+    c = 'echo "int f;"| clang {} {} - -E > /dev/null 2>&1'.format(target, flag)
-+    rc = os.system(c)
-+    compatible = rc == 0
-+    clang_options[flag] = compatible
-+    if not compatible:
-+        logging.info('Not supported by clang: %s', flag)
-+
-+    return compatible
-+
-+def make_clang_compatible(entry):
-+    """Scans and transforms the command line options to make the invocation
-+    compatible with clang.
-+
-+    There are two main heuristics:
-+
-+    1. Use the gcc compiler prefix to populate the clang --target variable
-+       (which is needed for cross-compiles to work correctly)
-+
-+    2. Scan for any -f or -m options that are not supported by clang and
-+       discard them.
-+
-+    This allows us to use clang tools on our kernel builds even if we built the
-+    kernel using gcc.
-+    """
-+    newcmd = []
-+    target = ''
-+
-+    # Splitting the command line like this isn't going to handle quoted
-+    # strings transparently. However assuming the quoted string does not
-+    # contain tabs, double spaces or words commencing with '-f' or '-c'
-+    # (which is fairly reasonable) then this simple approach will be
-+    # sufficient.
-+    atoms = entry['command'].split()
-+
-+    # Use the compiler prefix as the clang --target variable
-+    if atoms[0].endswith('-gcc'):
-+        target = '--target=' + os.path.basename(atoms[0][:-4])
-+        newcmd.append(atoms[0])
-+        newcmd.append(target)
-+        del atoms[0]
-+
-+    # Drop incompatible flags that provoke fatal errors for clang. Note that
-+    # unsupported -Wenable-warning flags are not fatal so we don't have to
-+    # worry about those.
-+    for atom in atoms:
-+        if atom.startswith('-f') or atom.startswith('-m'):
-+            if not check_clang_compatibility(target, atom):
-+                continue
-+        newcmd.append(atom)
-+
-+    entry['command'] = ' '.join(newcmd)
- 
- def main():
-     """Walks through the directory and finds and parses .cmd files."""
--    log_level, directory, output, ar, paths = parse_arguments()
-+    log_level, directory, output, ar, gcc, paths = parse_arguments()
- 
-     level = getattr(logging, log_level)
-     logging.basicConfig(format='%(levelname)s: %(message)s', level=level)
-@@ -232,6 +299,8 @@ def main():
-                     try:
-                         entry = process_line(directory, result.group(1),
-                                              result.group(2))
-+                        if gcc:
-+                            make_clang_compatible(entry)
-                         compile_commands.append(entry)
-                     except ValueError as err:
-                         logging.info('Could not add line from %s: %s',
--- 
-2.35.1
+On 6/28/22 5:27 AM, Daniel Thompson wrote:
+> This patch set makes it possible to use clang based tools, such as
+> the clangd completion engine, regardless of our choice of compiler
+> for the actual kernel build.
+>
+> Most of the fine details are included in the patch header for the
+> first patch (since we'd like them to appear in the kernel history so
+> they can help future archaeologists).
+>
+> Daniel Thompson (2):
+>    clang-tools: Generate clang compatible output even with gcc builds
+>    Makefile: Enable clang-tidy and clang-analyzer for gcc builds
+>
+>   Makefile                                    | 11 ++--
+>   scripts/clang-tools/gen_compile_commands.py | 71 ++++++++++++++++++++-
+>   2 files changed, 74 insertions(+), 8 deletions(-)
+>
+>
+> base-commit: a111daf0c53ae91e71fd2bfe7497862d14132e3e
+> --
+> 2.35.1
+>
 
