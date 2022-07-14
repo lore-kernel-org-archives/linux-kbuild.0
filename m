@@ -2,69 +2,79 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4177EC43334
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jul 2022 04:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 892ADC433EF
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jul 2022 05:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237650AbiGNEhL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 14 Jul 2022 00:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        id S229576AbiGNFHn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 14 Jul 2022 01:07:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237546AbiGNEgW (ORCPT
+        with ESMTP id S229457AbiGNFHR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 14 Jul 2022 00:36:22 -0400
-Received: from mail.tkos.co.il (golan.tkos.co.il [84.110.109.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED35E7A
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jul 2022 21:26:38 -0700 (PDT)
-Received: from tarshish.tkos.co.il (unknown [10.0.8.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.tkos.co.il (Postfix) with ESMTPS id 064AF440F4F;
-        Thu, 14 Jul 2022 07:26:16 +0300 (IDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
-        s=default; t=1657772776;
-        bh=tTaXJje1p/pdEOXi6XRH0C5wg23H3zDcdL4JMPqVefo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=J2qAJZOyMKOsxEyoojGEAG/jwz4fw75I0cCoIpSSpWu/PZ1LO462aln8fuoX0YL1K
-         RmmzBlHhGREh7xD/Xqn9f4XxHPbeD6xp4sK/gyVYHMj3YBr4+Vj9OxfaiZ71g6O1mi
-         PwUBxp2zSoQx3GAW3TtlvXZgU2AO/yRzJRM5niQ26Ni92bPc0uCDlzmneBUJoRZQLw
-         1iOWFDYMrvihGa8rVWzESRGiQSmyTO4V9LWQyw8UtVCcEG5jYHZqIiDaLDGunA5U/G
-         MmHc7JyqzS7NGgnCeJ8EUEJYV0qXL7JSPt1K+/l0MiUeyfN431q7Lc4AHzoLO0arjQ
-         4TR6HM5mnh5Qw==
-From:   Baruch Siach <baruch@tkos.co.il>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Thu, 14 Jul 2022 01:07:17 -0400
+Received: from conuserg-07.nifty.com (conuserg-07.nifty.com [210.131.2.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D1C186D3;
+        Wed, 13 Jul 2022 22:03:55 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 26E52j5F024585;
+        Thu, 14 Jul 2022 14:02:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 26E52j5F024585
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1657774967;
+        bh=6PBSAGLUCdmVZ4v3fyCX6+8X7AUwDfZAbY+nDDOXwGU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bWnphJpPxxcJ7B2pb/svEFmOdbM6Kq3hFJ0ll56tzJG7AVLXJTlnW1igIrLpxJ0sT
+         9mo0Da+ECrkG0ei6uag4Pemc8fpWoSvwz82K98BmiAywNutM6Dk2rSDX0a+9q7byGY
+         xSg8qmXJelXZzNe++ceQr2dDbNgznnipZJrueGadS8OtAtsgs//qjl0anSjlNYQtmA
+         F9H+u7/cRZ99qmpyKuvjrXor07d8xAF7raumuVGvZXVwEsldjw2/NJNu60G7lczoH2
+         Bkmk9CmU8NzN76z3Zun6Gmd/AHLsYNlLQXti4Squ3TVd1HStB1SjW8QUvmC6c0d3Mz
+         0rkWcK9JY3wRg==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org, Baruch Siach <baruch@tkos.co.il>
-Subject: [PATCH] docs: kbuild: fix typo
-Date:   Thu, 14 Jul 2022 07:25:46 +0300
-Message-Id: <d78714e8005b52d5c5dee59bd47a0ba7011b0e55.1657772746.git.baruch@tkos.co.il>
-X-Mailer: git-send-email 2.35.1
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/4] kbuild: error out if $(KBUILD_EXTMOD) contains % or :
+Date:   Thu, 14 Jul 2022 14:02:42 +0900
+Message-Id: <20220714050243.16411-3-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220714050243.16411-1-masahiroy@kernel.org>
+References: <20220714050243.16411-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-on -> one.
+If the directory pass given to KBUILD_EXTMOD (or M=) contains % or :,
+the module fails to build.
 
-Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+% is used in pattern rules, and : as the separator of dependencies.
+
+Bail out with a clearer error message.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- Documentation/kbuild/kconfig-language.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/kbuild/kconfig-language.rst b/Documentation/kbuild/kconfig-language.rst
-index a7173843a294..7fb398649f51 100644
---- a/Documentation/kbuild/kconfig-language.rst
-+++ b/Documentation/kbuild/kconfig-language.rst
-@@ -672,7 +672,7 @@ Future kconfig work
- Work on kconfig is welcomed on both areas of clarifying semantics and on
- evaluating the use of a full SAT solver for it. A full SAT solver can be
- desirable to enable more complex dependency mappings and / or queries,
--for instance on possible use case for a SAT solver could be that of handling
-+for instance one possible use case for a SAT solver could be that of handling
- the current known recursive dependency issues. It is not known if this would
- address such issues but such evaluation is desirable. If support for a full SAT
- solver proves too complex or that it cannot address recursive dependency issues
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index faa4880f25f7..ecda62e27553 100644
+--- a/Makefile
++++ b/Makefile
+@@ -129,6 +129,9 @@ endif
+ $(if $(word 2, $(KBUILD_EXTMOD)), \
+ 	$(error building multiple external modules is not supported))
+ 
++$(foreach x, % :, $(if $(findstring $x, $(KBUILD_EXTMOD)), \
++	$(error module directory path cannot contain '$x')))
++
+ # Remove trailing slashes
+ ifneq ($(filter %/, $(KBUILD_EXTMOD)),)
+ KBUILD_EXTMOD := $(shell dirname $(KBUILD_EXTMOD).)
 -- 
-2.35.1
+2.34.1
 
