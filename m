@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1817C43334
-	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jul 2022 05:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A39BCCA481
+	for <linux-kbuild@archiver.kernel.org>; Thu, 14 Jul 2022 05:07:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbiGNFHn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 14 Jul 2022 01:07:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51738 "EHLO
+        id S232166AbiGNFHp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 14 Jul 2022 01:07:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbiGNFHT (ORCPT
+        with ESMTP id S232146AbiGNFHT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 14 Jul 2022 01:07:19 -0400
 Received: from conuserg-07.nifty.com (conuserg-07.nifty.com [210.131.2.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBBD2193D8;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A7AC193C8;
         Wed, 13 Jul 2022 22:03:55 -0700 (PDT)
 Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-07.nifty.com with ESMTP id 26E52j5E024585;
-        Thu, 14 Jul 2022 14:02:46 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 26E52j5E024585
+        by conuserg-07.nifty.com with ESMTP id 26E52j5G024585;
+        Thu, 14 Jul 2022 14:02:47 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 26E52j5G024585
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1657774966;
-        bh=gh5qXSnB7guosq/2r/U6NMm7kNaH/f1eCk7aqtUJfk0=;
+        s=dec2015msa; t=1657774968;
+        bh=HuP/NgE3e2YKnte18ErEap8o8BxYAN/GPsNIuS117tU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M8JY7j55M1Um364xUI0/jUYbdBs9CQkvcsQsO4BwF5lq3903GLEa3WOkLqkpQk0ol
-         nLoR4RO4qr9HvfB7SN+4aKG8WHVgtRaQHjbPaWwZN8e+gutKEM5b1sT7HiJxJOoKFU
-         hu6ht2cdmx1rYIJUb6/9b3MiNRG8jTNCsRi8MvLuEqmGghhuk8VvpZmb4xyA5R2YGU
-         C1qPJ0HwQlf56R5HPfmPTk/V6tEH5ekps1EQMm4Qadj5D+ikkiWEmgHN0BouFchwyM
-         W/qECXndV55bIfHoyyFLkY8f1sT0QJVXRNuoX5T2KxAw4O4JH5HMwkUnqngJUP7uRh
-         q6PmdDPs6H2/Q==
+        b=c8SXeNmkDtTGxvqP6WKnZXeI1xQQTknQNh7wb1FLdX53PfZCgnQy8Vwp1JQ4SoHBC
+         PE2eBp+qakFfKE4/TdhoM6rlhy0PEVGna+ulTWicyp/pqWvKYlrHwjDvzqXQvCn856
+         SInNHSqxMk7xHbZ+rGOe89aOuU9mwcSNmyOW6QFyQHv1EJytm9KU7DPx0n1f+Mp4qY
+         yuc/pwPw3pJ/rAefZIv2yneP+rRs+d8c6alXdsEjKXGLLiIxWfWSjyywRGO3RwYGV0
+         7/3fCOnlnNZxSUOhd0FFdbY4rOm1k+s2HPdxA5vEB0sHhn/SUuLLNs76Elcfhs+dR2
+         L9FM3nyWnXmgw==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] kbuild: rpm-pkg: pass 'linux' to --target option of rpmbuild
-Date:   Thu, 14 Jul 2022 14:02:41 +0900
-Message-Id: <20220714050243.16411-2-masahiroy@kernel.org>
+Subject: [PATCH 4/4] kbuild: error out if $(INSTALL_MOD_PATH) contains % or :
+Date:   Thu, 14 Jul 2022 14:02:43 +0900
+Message-Id: <20220714050243.16411-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220714050243.16411-1-masahiroy@kernel.org>
 References: <20220714050243.16411-1-masahiroy@kernel.org>
@@ -48,37 +48,33 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Presumably, _target_os is defined even if the --target flag does not
-specify it, but it is better to make it explicit.
+If the directory pass given to INSTALL_MOD_PATH contains % or :,
+the module_install fails.
+
+% is used in pattern rules, and : as the separator of dependencies.
+
+Bail out with a clearer error message.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.package | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/Makefile.modinst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 77b612183c08..5017f6b2da80 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -56,7 +56,7 @@ rpm-pkg:
- 	$(MAKE) clean
- 	$(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
- 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
--	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz \
-+	+rpmbuild $(RPMOPTS) --target $(UTS_MACHINE)-linux -ta $(KERNELPATH).tar.gz \
- 	--define='_smp_mflags %{nil}'
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index 16a02e9237d3..a4c987c23750 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -18,6 +18,9 @@ INSTALL_MOD_DIR ?= extra
+ dst := $(MODLIB)/$(INSTALL_MOD_DIR)
+ endif
  
- # binrpm-pkg
-@@ -66,7 +66,7 @@ binrpm-pkg:
- 	$(MAKE) -f $(srctree)/Makefile
- 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
- 	+rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
--		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
-+		$(UTS_MACHINE)-linux -bb $(objtree)/binkernel.spec
- 
- PHONY += deb-pkg
- deb-pkg:
++$(foreach x, % :, $(if $(findstring $x, $(dst)), \
++	$(error module installation path cannot contain '$x')))
++
+ suffix-y				:=
+ suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
+ suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
 -- 
 2.34.1
 
