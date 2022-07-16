@@ -2,54 +2,54 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DAEC43334
-	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 09:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8D6CCA488
+	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 09:33:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232090AbiGPJdo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 16 Jul 2022 05:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
+        id S232094AbiGPJdp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 16 Jul 2022 05:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbiGPJdl (ORCPT
+        with ESMTP id S232100AbiGPJdo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jul 2022 05:33:41 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C06FA;
+        Sat, 16 Jul 2022 05:33:44 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49AF4182;
         Sat, 16 Jul 2022 02:33:40 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id x18-20020a17090a8a9200b001ef83b332f5so13722438pjn.0;
+Received: by mail-pj1-x1031.google.com with SMTP id x18-20020a17090a8a9200b001ef83b332f5so13722442pjn.0;
         Sat, 16 Jul 2022 02:33:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=3fh2I3zFG2OZMmMkmKH7k0vizel0bjDcR+C76uNSPeM=;
-        b=f5et3aXcLrNcjOQX9XRxzKgeB+MVoosIhCD7Hz5hRSWonkeoEhaSfDi2VqsfyWj8TS
-         QzRMYninq3yqZMom4HcLSNylpadYUlpNLWdob3GW8QrMEoBALoO5YQt24fbeAUyYJch+
-         M4VV50AimgfGGUw+B6Vls/cvXIQFVh1Bo2GbX+OFJVeTBiEko6BnLSCAKcEl9fLuyJiz
-         wwIwxlwFA7m97KXjj+shAGAV87dwZTNrhJk7dfB6bew9gbd44z1pq/V5GePOp9ZqwHzX
-         Oh1Mlro7h380cZQCyZaqQt4Qd9OH/lgFM6L6kT2OU1AFGH1kn0GAANH2w5C/K/HIdwXO
-         rGUQ==
+        bh=xhq++96SwqP8iCLJj1mxjf4nsafc6aa4I9geuOUsTYc=;
+        b=arQXmVNjfmYBDpNRP5PRNWJoI8kfTbc5ypG0ZQEZDHfwB8FX3FTfhpHVNwRCERCZdR
+         kK7A7fU20oJR6WneJQb8VqwOa5cffhmvzxj+qfyb0+JLNVGJRZ0XsZmX1SKtv7L7V+n2
+         vtdgpsw3g/PFkNb7W0d406eVRYjY2ouuxnzMsy6pI8+7vEU+56+jTMxoNr1FeNQqfpWP
+         fKfyr35Oe78cXWxxXxXngBPY6eRotbwcLmElAhiA3mxvVgYX2d4bbPJw2JbYsUyQEYvJ
+         s/iRQ7ilUZk1qwHgfsGrRrkcknx/yJrF7PLiiKA/57v1TeNeUOoM+bIrj2a8yJ/DovOW
+         Sayg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3fh2I3zFG2OZMmMkmKH7k0vizel0bjDcR+C76uNSPeM=;
-        b=hfxAiCqeUVlts0YV18JI5X6sKuq5yXO6LeNRXm/wYckHYGnBe2H5bV7AB44BQhldaJ
-         2ATEaph2f7bKobhc3uhMvDSNasF0vOTecxAHOK/87b9ToAbksI/u9CaiV64bPSn6e5xK
-         k2GvXEghkomzd9qT+z0gvHKkG2jq2VgI1EqfXRPn2OJxg8U1X1gptau3a8zak9etTIFi
-         xli6p847F35Xc2Ae8QDMVbNpgeeS+5EggfZIdZftAy1+1qz5+z0swJ0+Q6KUjA/+ipLr
-         iwIrrT7EGfBjYNXPR3XhQEe6MDfGzC65BlxPxTGFnTBaB65cDUyFsu2eH9ELLNSrL9ke
-         2rxw==
-X-Gm-Message-State: AJIora/RZH1zHokM2qza+0MjRPDrgdzw9ROxeXkhA6l7xNjogiXBhuvm
-        pA8j4fA5I04sIOpsj0VBtz2u9RROfLU=
-X-Google-Smtp-Source: AGRyM1vsiQur0jUyLPbcXsLNvZ3hMHk0z/lt7blHCOpVqSPB8w0ejJATF984vpwY3YU/UvBaGew6cw==
-X-Received: by 2002:a17:90a:be0c:b0:1ef:accb:23a5 with SMTP id a12-20020a17090abe0c00b001efaccb23a5mr20576181pjs.113.1657964019667;
+        bh=xhq++96SwqP8iCLJj1mxjf4nsafc6aa4I9geuOUsTYc=;
+        b=V36ucEBkKQcSuMJGAh+/OnnOBEEHjA5NSOVbxaoV5sWbMO8m+MWg4sxQZQraw5p6j/
+         NwHjEsRRxrfw5Dcmt5tm81r2XHbdBSoGvE5gWi5GWzjuF5SSnJvUSOPkhS5EtoiPBZVv
+         KMPRbcww8T2C6ufEEvoosXb42CgBSg3S9W3ahyVo/AVw9+BXDleYBVGfl7+X79yqrUXb
+         zL8R5q2WTDpFr+8UXALvnmVw2ZcoPUMglMelWZE96P5VAC+T5VEixsSLmBj68P3ZCwtn
+         4NzQ+/U4aatBvFKMOZkpJ+6AMrNXjjGDLbmnvrTa4/4PND9wKIoCsXGC9XJhyxocW8uh
+         cYbg==
+X-Gm-Message-State: AJIora/99K1BZl15jewVC/4U83aqdmeXFWSJmGgzUrFPwNKJOArWXCTr
+        9vpvHCZamwJtq6hSS23HvJE=
+X-Google-Smtp-Source: AGRyM1sCsMunfbPOuymvkXTYD/IzPE6crrGnwwbagMZeRKOYiRRbdJW7sSMgIpbhgwrbS+WipRyRqg==
+X-Received: by 2002:a17:902:eec2:b0:16c:9837:cd4 with SMTP id h2-20020a170902eec200b0016c98370cd4mr15342704plb.132.1657964019824;
         Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
 Received: from debian.me (subs32-116-206-28-23.three.co.id. [116.206.28.23])
-        by smtp.gmail.com with ESMTPSA id p10-20020a170902e74a00b0016c0080df84sm5115147plf.254.2022.07.16.02.33.37
+        by smtp.gmail.com with ESMTPSA id 199-20020a6218d0000000b0052abc2438f1sm5352747pfy.55.2022.07.16.02.33.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sat, 16 Jul 2022 02:33:38 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id 3674910383F; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
+        id 60BCD103840; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -59,11 +59,10 @@ Cc:     linux-kernel@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         Martin Liska <mliska@suse.cz>, Andi Kleen <ak@linux.intel.com>,
         Jiri Slaby <jirislaby@kernel.org>,
-        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH 1/4] Documentation: lto: add blank line padding before single requirement list
-Date:   Sat, 16 Jul 2022 16:32:47 +0700
-Message-Id: <20220716093249.19326-2-bagasdotme@gmail.com>
+        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH 3/4] Documentation: lto: use bullet lists for external link references list
+Date:   Sat, 16 Jul 2022 16:32:49 +0700
+Message-Id: <20220716093249.19326-4-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220716093249.19326-1-bagasdotme@gmail.com>
 References: <20220716093249.19326-1-bagasdotme@gmail.com>
@@ -73,39 +72,48 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-kernel test robot reported a warning on LTO requirements list:
+Similar to the FAQ, use bullet lists in References section since it
+contains list of external reference links.
 
-Documentation/kbuild/lto-build.rst:40: WARNING: Bullet list ends without a blank line; unexpected unindent.
-
-The warning is caused by missing padding between the subheading and the list.
-
-Add blank line padding to fix the warning.
-
-Link: https://lore.kernel.org/linux-doc/202207161100.lCdR6Unx-lkp@intel.com/
-Fixes: 0350b4dd55922f ("Kbuild, lto: Add Link Time Optimization support")
-Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/kbuild/lto-build.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Documentation/kbuild/lto-build.rst | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/Documentation/kbuild/lto-build.rst b/Documentation/kbuild/lto-build.rst
-index e8a0f149e8ceaf..39cbdb12295051 100644
+index 9e3e14042dda4c..3fb17342e72fd6 100644
 --- a/Documentation/kbuild/lto-build.rst
 +++ b/Documentation/kbuild/lto-build.rst
-@@ -36,9 +36,10 @@ the compiler version.
+@@ -56,17 +56,20 @@ FAQs:
+ References:
+ -----------
  
- Requirements:
- -------------
+-Presentation on Kernel LTO
+-(note, performance numbers/details totally outdated.)
+-http://halobates.de/kernel-lto.pdf
++* Presentation on Kernel LTO
++  (note, performance numbers/details totally outdated.)
+ 
+-Generic gcc LTO:
+-http://www.ucw.cz/~hubicka/slides/labs2013.pdf
+-http://www.hipeac.net/system/files/barcelona.pdf
++  http://halobates.de/kernel-lto.pdf
+ 
+-Somewhat outdated too:
+-http://gcc.gnu.org/projects/lto/lto.pdf
+-http://gcc.gnu.org/projects/lto/whopr.pdf
++* Generic gcc LTO:
 +
- - Enough memory: 4GB for a standard build, more for allyesconfig
--The peak memory usage happens single threaded (when lto-wpa merges types),
--so dialing back -j options will not help much.
-+  The peak memory usage happens single threaded (when lto-wpa merges types),
-+  so dialing back -j options will not help much.
++  * http://www.ucw.cz/~hubicka/slides/labs2013.pdf
++  * http://www.hipeac.net/system/files/barcelona.pdf
++
++* Somewhat outdated too (from GCC site):
++
++  * http://gcc.gnu.org/projects/lto/lto.pdf
++  * http://gcc.gnu.org/projects/lto/whopr.pdf
  
- A 32bit hosted compiler is unlikely to work due to the memory requirements.
- You can however build a kernel targeted at 32bit on a 64bit host.
+ Happy Link-Time-Optimizing!
+ 
 -- 
 An old man doll... just what I always wanted! - Clara
 
