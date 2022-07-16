@@ -2,54 +2,62 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51017C433EF
-	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 08:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 485ACC433EF
+	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 08:57:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230366AbiGPIWx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 16 Jul 2022 04:22:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48974 "EHLO
+        id S230476AbiGPI5o (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 16 Jul 2022 04:57:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiGPIWx (ORCPT
+        with ESMTP id S229779AbiGPI5n (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jul 2022 04:22:53 -0400
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8D23718C;
-        Sat, 16 Jul 2022 01:22:51 -0700 (PDT)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 26G8MdC6030466;
-        Sat, 16 Jul 2022 17:22:39 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 26G8MdC6030466
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1657959760;
-        bh=HFhi2GgLg7oEsoRiMqw8ZEkU/FUuixaMOlho3HR5dck=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=KQJPy4zY+KApyeS3nNKLZow7zNLtMccILdnCvGvqjtj+bVFKqJUrl/p26RcEfr0lR
-         EsgJmADi6rIyoDr0VNkeQ9uUwFBfqDqEgN5AENI4WA1YjqWf0Fu9NrBF860LUvEhLm
-         L2unvwJO7KBYkbGD2R8RaX524t8nvxYhy/YfYn9/wb15INl0HVt4AU0gi04OhrdhyK
-         F+N/Nk5jHOQfD72VFKybMPJxZQRMuclRAzaxyjH/mwRz6df56v9M9FQIu+wKIL6Bkf
-         ythtgKpy83ZwCtPuET3JGvFDboEs/odnApnmUemm4fPyrfwXw8Umd7R7PJyhdCTK4o
-         xMVx1H6yxI8Rg==
-X-Nifty-SrcIP: [209.85.128.42]
-Received: by mail-wm1-f42.google.com with SMTP id n185so4053007wmn.4;
-        Sat, 16 Jul 2022 01:22:39 -0700 (PDT)
-X-Gm-Message-State: AJIora9NNEzbtGpIMSU6vehTraqGUNXSmBEin+QvhYyhihIMQKk0RyiP
-        p8JSJ8MzgphNrqV+jd1Zz5dUSu6D6BmtDzycrOM=
-X-Google-Smtp-Source: AGRyM1uoRO8Qz+FSCXJql+waCGu+mhRlQXVZ1LJNvE9kz6AJllMTUSrTJhZBfuW0GaHnoYXSlaf7O+xxZCeBVPOa6jI=
-X-Received: by 2002:a05:600c:35d6:b0:3a2:e873:6295 with SMTP id
- r22-20020a05600c35d600b003a2e8736295mr17513065wmq.22.1657959758310; Sat, 16
- Jul 2022 01:22:38 -0700 (PDT)
+        Sat, 16 Jul 2022 04:57:43 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D35B7F4;
+        Sat, 16 Jul 2022 01:57:42 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id w16so3143262ilh.0;
+        Sat, 16 Jul 2022 01:57:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IYks55HxgsoLlm9FNEz/2R9Y4bixjWKaygGPwKIVjx0=;
+        b=m7RolDKDIlPqQgPf5OTP/N6sK1eysv8GJE4Xfn8CjMg0SxwuCaAjEySP55tmXp5JVI
+         UpIwNpbxTFBX8XrQHPTU10osewAMlkpehUSHMxLE/z5AscetNKSTakXBmT4sFuZxvdSj
+         6pLhVxcEz3FFMTM6nM4GdyvOJqmUEFJQCr3AOL0xm1yUFCsUy47Z3rBXZtMZzmMP/h9s
+         7WpW+a65qg8gkRMjnKQbAyPOY44lzJH7wId88CcIuxY+ie25eQBbKgS5dR4nb4qAp0au
+         boOEvL+LfokeBh3nWrS03XXVnUDvFPo3DxazMu+hCulyNuyUUotHieO4rDvfdCn9+u/Z
+         mv8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IYks55HxgsoLlm9FNEz/2R9Y4bixjWKaygGPwKIVjx0=;
+        b=ktvSdf4TMlb6Q1Hgv6aOYZpPzziBvaLsMchFmkogOS3H0KsNo45A3vYq5IIBzlZ2cx
+         FHfO1TCWqKSjhkQtaTPtbJiH0vPdQOBjmIX6zjMr+gzOCv3NRQQB28+ya1uYcv/C3Z+n
+         qMvSLAXKCn7YcxIh2Khg60uL8fAj63x6Ol/+HNSE6PRQvP1M/uit84mDsNuhnAuBcB0t
+         DiLPKQwbKeTgdJRY69dfFzrqokJLfk4jR/Mvo+h1ErOcB5YlvPrIRSRdj913txzXf2kw
+         /xK+u923Ofe2YHINzJ/1aVBqQ0ivEDIMLAhgMTwiwx4XI4KQzegauXIuKG2WO8uCTuzo
+         3SHw==
+X-Gm-Message-State: AJIora/my00CYN3G9LOlSE0yJvFck04MyC4PjO0xyGrs/jfUoT0LOqOY
+        JgZCFT8N5WiVJUDHda09GvnnQwqHboUlppnEAv8=
+X-Google-Smtp-Source: AGRyM1upiXNei9Ij258Ho2aijo3CxpUzFbH2CubB6AzfY4tMP/5ochBIlN/TgfrRN46dYIn9zQ7KIb7ZCJ9pwMhj3ew=
+X-Received: by 2002:a05:6e02:1c8d:b0:2dc:8162:282e with SMTP id
+ w13-20020a056e021c8d00b002dc8162282emr8874969ill.5.1657961861953; Sat, 16 Jul
+ 2022 01:57:41 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220523020209.11810-1-ojeda@kernel.org> <20220523020209.11810-22-ojeda@kernel.org>
-In-Reply-To: <20220523020209.11810-22-ojeda@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 16 Jul 2022 17:21:59 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQZOTjxJyS3WC1sM7LE-An7DL8xoW=-s1ONe7cq4YukNQ@mail.gmail.com>
-Message-ID: <CAK7LNAQZOTjxJyS3WC1sM7LE-An7DL8xoW=-s1ONe7cq4YukNQ@mail.gmail.com>
+ <CAK7LNAQZOTjxJyS3WC1sM7LE-An7DL8xoW=-s1ONe7cq4YukNQ@mail.gmail.com>
+In-Reply-To: <CAK7LNAQZOTjxJyS3WC1sM7LE-An7DL8xoW=-s1ONe7cq4YukNQ@mail.gmail.com>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Sat, 16 Jul 2022 10:57:30 +0200
+Message-ID: <CANiq72k1aPQuvAL=TqNQVBZBmxojKfPBKU3v_2_B=731fhuJbQ@mail.gmail.com>
 Subject: Re: [PATCH v7 21/25] Kbuild: add Rust support
-To:     Miguel Ojeda <ojeda@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Miguel Ojeda <ojeda@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        rust-for-linux@vger.kernel.org,
+        rust-for-linux <rust-for-linux@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Alex Gaynor <alex.gaynor@gmail.com>,
@@ -93,64 +101,17 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, May 23, 2022 at 11:04 AM Miguel Ojeda <ojeda@kernel.org> wrote:
+Hi Masahiro,
+
+On Sat, Jul 16, 2022 at 10:23 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
 >
-> Having all the new files in place, we now enable Rust support
-> in the build system, including `Kconfig` entries related to Rust,
-> the Rust configuration printer, the target specification
-> generation script, the version detection script and a few
-> other bits.
->
-> Co-developed-by: Alex Gaynor <alex.gaynor@gmail.com>
-> Signed-off-by: Alex Gaynor <alex.gaynor@gmail.com>
-> Co-developed-by: Finn Behrens <me@kloenk.de>
-> Signed-off-by: Finn Behrens <me@kloenk.de>
-> Co-developed-by: Adam Bratschi-Kaye <ark.email@gmail.com>
-> Signed-off-by: Adam Bratschi-Kaye <ark.email@gmail.com>
-> Co-developed-by: Wedson Almeida Filho <wedsonaf@google.com>
-> Signed-off-by: Wedson Almeida Filho <wedsonaf@google.com>
-> Co-developed-by: Michael Ellerman <mpe@ellerman.id.au>
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-> Co-developed-by: Sven Van Asbroeck <thesven73@gmail.com>
-> Signed-off-by: Sven Van Asbroeck <thesven73@gmail.com>
-> Co-developed-by: Gary Guo <gary@garyguo.net>
-> Signed-off-by: Gary Guo <gary@garyguo.net>
-> Co-developed-by: Boris-Chengbiao Zhou <bobo1239@web.de>
-> Signed-off-by: Boris-Chengbiao Zhou <bobo1239@web.de>
-> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
-> Co-developed-by: Douglas Su <d0u9.su@outlook.com>
-> Signed-off-by: Douglas Su <d0u9.su@outlook.com>
-> Co-developed-by: Dariusz Sosnowski <dsosnowski@dsosnowski.pl>
-> Signed-off-by: Dariusz Sosnowski <dsosnowski@dsosnowski.pl>
-> Co-developed-by: Antonio Terceiro <antonio.terceiro@linaro.org>
-> Signed-off-by: Antonio Terceiro <antonio.terceiro@linaro.org>
-> Co-developed-by: Daniel Xu <dxu@dxuuu.xyz>
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> Co-developed-by: Miguel Cano <macanroj@gmail.com>
-> Signed-off-by: Miguel Cano <macanroj@gmail.com>
-> Co-developed-by: David Gow <davidgow@google.com>
-> Signed-off-by: David Gow <davidgow@google.com>
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
-> ---
+> Is it intentional to print the successful message to stderr?
 
+I think it makes sense to change it to `stdout`, given the message is
+the main point of running `rustavailable` for normal users, and those
+that just want the status code may ignore it.
 
+Thanks for taking a look again!
 
-
-
-> +# Rust targets
-> +# ---------------------------------------------------------------------------
-> +
-> +# "Is Rust available?" target
-> +PHONY += rustavailable
-> +rustavailable:
-> +       $(Q)$(CONFIG_SHELL) $(srctree)/scripts/rust-is-available.sh -v && echo >&2 "Rust is available!"
-> +
-
-Is it intentional to print the successful message to stderr?
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Miguel
