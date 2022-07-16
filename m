@@ -2,54 +2,54 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD90CCA479
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5ACECCA483
 	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 09:33:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbiGPJdl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 16 Jul 2022 05:33:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54308 "EHLO
+        id S232088AbiGPJdm (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 16 Jul 2022 05:33:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiGPJdj (ORCPT
+        with ESMTP id S231129AbiGPJdk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jul 2022 05:33:39 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C91E2655C;
+        Sat, 16 Jul 2022 05:33:40 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B746326AEF;
         Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so13619775pjr.4;
+Received: by mail-pj1-x102a.google.com with SMTP id y14-20020a17090a644e00b001ef775f7118so13665984pjm.2;
         Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=NaserlcC6hSl3SwHUAah5zXW3IuFUW5WcFOL2/suCG8=;
-        b=ByuL8OG9nl+Vf3yYQ4gi7DetKcxMxUMuJrV9E2E9JpIX5/jB8cp9mk57+YYI0NNSmV
-         yaKq8Rr2yWGGDal8VYKW8NGP1kN+M7+xu/3q+KPIiBZUc1I8BMA2YvE8B/GELvSEEKOX
-         i3yTCqFrmSekzm4KVTcvE/sEyqdgZ7EE8fwGsOcMN6f8ZAcSCovWerdNjxIg1FvYOfip
-         bSg+hk+OGzkm9ctvm/h892XJ/5fusGSquZnpBwsDEBFfpoxqxm1AvbFWqD5c+bji4Bhg
-         fPDoY9gDMs/bwV+eEITI+/xe50gVPOvkPEs9Pd9KJTTwzsD3S/+O7NfBbibePgTjZtC5
-         cgSg==
+        bh=YcGMxSsIcN9kL146zuaiczusg14msCwCUfXlQG72sVI=;
+        b=NGLeXJduQSC7uUrFYkfvAPJXznPSlYlPc0hXIW/ZDq7Aa5SpDQNX7MzaY6Jdr14Eac
+         FpylrvJk+kGoCzriN1Iwk2oWATCqFQ9SfSgSXlxRSmRfquVS70PY3OxPCOcpebEqRIOs
+         i+fa6gL9v4jt2YYq+0Rr4tDxnS8s03bi2cS8JSAUvh7AOV5QMe0Hc7CgEN4+66kNELEd
+         PFXnJMlEPk0cFYoMhlo6ilztkL/8aBebrV3CWC4CzmV/oliGF24RU+5Ss7bgDkBvj+Zc
+         rXeT1yAibSrzWqpJD/kqdT+vEpKC1OuZzKmJkmJ+2W68BLikxQdTlSb1u6GZS+XlXyE+
+         ohMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=NaserlcC6hSl3SwHUAah5zXW3IuFUW5WcFOL2/suCG8=;
-        b=opii/Plb1Nch9WTo4RPRH4MrrxEhxgO39hkj41ZXe7qaPuOhABBGe5yTz+jD3vHTZ6
-         Nip0yRchZ7sm8BlERe52rXkm7SsRIUkeEHggwpWJ5JFDbrnATW+T2FXFcJog21QxhX9f
-         EyXn+GrdZKQEH1mUGJMffc+MOBS8lWicvwSxKk7pDsss9D1lmFnpHg3zevBq0ePVhKmO
-         4TgcNx9n9GzbE9tnP/y0vzzo3uWMm/i3jpWP22WlOK9OX/kCK1Z1ay15/Zxq1ZBVQNn9
-         tVu9MELdKXtCZpguTRHyvjlLwwZYOjpw0F2lEMDzcD36I8cvnjKbUXliliz73ZklRrOp
-         jXFQ==
-X-Gm-Message-State: AJIora86or7q2nBSrnq6G5aceqh4obT94tuG16Ezzub8resT/6TmMouc
-        TX01WpnsqC4eA+0/SPgXLvU=
-X-Google-Smtp-Source: AGRyM1uSAFRt/vvd1YRX/u/uEw6Wixbw2nFqqMIBxadlr/p7/1iu7OmearIrb10VU4zG23rgJgwv9g==
-X-Received: by 2002:a17:902:f64c:b0:16c:131:73ff with SMTP id m12-20020a170902f64c00b0016c013173ffmr17492991plg.170.1657964018733;
-        Sat, 16 Jul 2022 02:33:38 -0700 (PDT)
+        bh=YcGMxSsIcN9kL146zuaiczusg14msCwCUfXlQG72sVI=;
+        b=NiyjqshE5JFSf4s2TdwoxqnYks25ozGt4x0P2CzHG2sfr3x7PaN7vJxP3bnERIb5AB
+         6z7pnTqm9qHyVv8xeK/maqEguJP5uRpeRqBFwOHIHmV8nY52svRdnbfV6VcDOAdHwm2G
+         Z4TFNuo2fTtUw2Y8FVcT5cB/9wcqD3WmCQehNw7pwhwEohQuJ9II9YUFAMtuUrdjmPHj
+         QTWWANiJnJGqp772cOn8WkDXibLKjm6tRk9KsBKE7tNcUbHMfr+j7zP8cCQwMnvQACZI
+         8bT72aoV/2+CfrFm6+nwTrXBvwovT0GsDsvNlWNRg5ak5o2R4oTzLK/8Hs2TTb9FwbTq
+         30+g==
+X-Gm-Message-State: AJIora9XTNLLEnTcJX8XW7OIWpmxPztcuG8QunlEzHrDKR6Qs6bzJwUg
+        RkZsDa6Y5x3W/lcNLJZm8hg=
+X-Google-Smtp-Source: AGRyM1sw20g7aXB3IjmaVmevRm9S5IvX5TlR+DA2DWp3H00fxSQ4LgwWkL7panc5EVUBCB7Z5S7/Uw==
+X-Received: by 2002:a17:902:8e84:b0:16c:dfce:f579 with SMTP id bg4-20020a1709028e8400b0016cdfcef579mr943549plb.170.1657964019154;
+        Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
 Received: from debian.me (subs32-116-206-28-23.three.co.id. [116.206.28.23])
-        by smtp.gmail.com with ESMTPSA id c5-20020a170903234500b0016be8da658fsm5057280plh.130.2022.07.16.02.33.37
+        by smtp.gmail.com with ESMTPSA id y17-20020aa79e11000000b0052ab5d2d398sm5331521pfq.47.2022.07.16.02.33.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sat, 16 Jul 2022 02:33:38 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id 8C956103844; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
+        id 794FE103853; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -59,11 +59,10 @@ Cc:     linux-kernel@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         Martin Liska <mliska@suse.cz>, Andi Kleen <ak@linux.intel.com>,
         Jiri Slaby <jirislaby@kernel.org>,
-        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH 4/4] Documentation: lto: add LTO documentation to toc index
-Date:   Sat, 16 Jul 2022 16:32:50 +0700
-Message-Id: <20220716093249.19326-5-bagasdotme@gmail.com>
+        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH 2/4] Documentation: lto: use bullet list for FAQ
+Date:   Sat, 16 Jul 2022 16:32:48 +0700
+Message-Id: <20220716093249.19326-3-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220716093249.19326-1-bagasdotme@gmail.com>
 References: <20220716093249.19326-1-bagasdotme@gmail.com>
@@ -73,33 +72,36 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-kernel test robot reported toctree warning:
+The only FAQ item is rendered as a continuous paragraph, although it is
+formatted as Q&A field pair. Use bullet list instead, as in other FAQs
+in kernel documentation.
 
-Documentation/kbuild/lto-build.rst: WARNING: document isn't included in any toctree
-
-Add LTO documentation (lto-build.rst) to kbuild table of contents.
-
-Link: https://lore.kernel.org/linux-doc/202207161100.lCdR6Unx-lkp@intel.com/
-Fixes: 0350b4dd55922f ("Kbuild, lto: Add Link Time Optimization support")
-Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/kbuild/index.rst | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/kbuild/lto-build.rst | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
-index cee2f99f734b5a..1937eee7c43705 100644
---- a/Documentation/kbuild/index.rst
-+++ b/Documentation/kbuild/index.rst
-@@ -22,6 +22,8 @@ Kernel Build System
-     gcc-plugins
-     llvm
+diff --git a/Documentation/kbuild/lto-build.rst b/Documentation/kbuild/lto-build.rst
+index 39cbdb12295051..9e3e14042dda4c 100644
+--- a/Documentation/kbuild/lto-build.rst
++++ b/Documentation/kbuild/lto-build.rst
+@@ -46,10 +46,12 @@ You can however build a kernel targeted at 32bit on a 64bit host.
  
-+    lto-build
+ FAQs:
+ -----
+-Q: I get a section type attribute conflict
+-A: Usually because of someone doing
+-const __initdata (should be const __initconst) or const __read_mostly
+-(should be just const). Check both symbols reported by gcc.
 +
- .. only::  subproject and html
++* I get a section type attribute conflict
++
++  Usually because of someone doing const __initdata (should be
++  const __initconst) or const __read_mostly (should be just const). Check
++  both symbols reported by gcc.
  
-    Indices
+ References:
+ -----------
 -- 
 An old man doll... just what I always wanted! - Clara
 
