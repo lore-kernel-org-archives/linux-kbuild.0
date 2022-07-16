@@ -2,54 +2,54 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73EECC43334
-	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 09:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD90CCA479
+	for <linux-kbuild@archiver.kernel.org>; Sat, 16 Jul 2022 09:33:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231575AbiGPJdk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 16 Jul 2022 05:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54312 "EHLO
+        id S232036AbiGPJdl (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 16 Jul 2022 05:33:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbiGPJdk (ORCPT
+        with ESMTP id S229540AbiGPJdj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 16 Jul 2022 05:33:40 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FD12657A;
+        Sat, 16 Jul 2022 05:33:39 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C91E2655C;
         Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id w185so6579156pfb.4;
+Received: by mail-pj1-x102f.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so13619775pjr.4;
         Sat, 16 Jul 2022 02:33:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=b9sp3ZaPCJfXtbSUrFWEULxoyM5LsOvzmqkPFx3Byxo=;
-        b=oSuy73AJs92IXvif2iJfuHfusV6Sl67EoC7Ee7QAPrYTL3M5YXXwHEod+9oNG2r9aK
-         t+8/j9wbq7HaUGn9idxrzgsY9xt8mqITqkbW/K3wakZygL4IbvgBaWW+Qb18gOUTyWMb
-         dKdzHm2cvmgSZjTa1Kvsz9O+0uXU4MQt2HErd+2QiAywvgnfF9+7AgjNyvuvc+UZmofH
-         AhongfJEHbRF0DDWBGWTywWS83IWww37rnhYH10Tfn3KSuGP1lNP8Ytv1PC9t8ur7KJj
-         tYcIHJR2mEph9sk2Aad+bFr+HxNzcN6pDd7bw7wlQph3eajKe74/SPRYf54y3WERzTC4
-         sO/g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=NaserlcC6hSl3SwHUAah5zXW3IuFUW5WcFOL2/suCG8=;
+        b=ByuL8OG9nl+Vf3yYQ4gi7DetKcxMxUMuJrV9E2E9JpIX5/jB8cp9mk57+YYI0NNSmV
+         yaKq8Rr2yWGGDal8VYKW8NGP1kN+M7+xu/3q+KPIiBZUc1I8BMA2YvE8B/GELvSEEKOX
+         i3yTCqFrmSekzm4KVTcvE/sEyqdgZ7EE8fwGsOcMN6f8ZAcSCovWerdNjxIg1FvYOfip
+         bSg+hk+OGzkm9ctvm/h892XJ/5fusGSquZnpBwsDEBFfpoxqxm1AvbFWqD5c+bji4Bhg
+         fPDoY9gDMs/bwV+eEITI+/xe50gVPOvkPEs9Pd9KJTTwzsD3S/+O7NfBbibePgTjZtC5
+         cgSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=b9sp3ZaPCJfXtbSUrFWEULxoyM5LsOvzmqkPFx3Byxo=;
-        b=6tepUfYN01gqltXRLvdgA95Txk5z2ILZTWGn4O/2eobG0TQoOoFCsajif9Ic1rey7a
-         APquFHenmpERsMd2xj2bAnXh+g/0pfZ1VSAyQEZNX5Hi6kMm/NamV8A/gQdcFcVvNqEB
-         rd5oYxQ+QlACGwLZDKyZ1n3pfKXOUu7oUVQCMd6wRzDdUJZZf+cKTqTxOCmY+dLMlbNA
-         nrBhKhDGrjGJWFQuKFjIGyzeiLGI1ibz+4dKlYEcXMqqgtbh3ziGGZPQrZF7mNfQlJBX
-         lXmFc1L7pR15sVNboikfv3VPHw627mBDoHSTiL7Ef1lFt7bdRMqxdWJVvQgFpvbO8tj3
-         NZmA==
-X-Gm-Message-State: AJIora9jZUVD+x8FEs2MndKXULcEzNIB9KRZ6uXEb6TqgkBUkBvd9pCt
-        2av4/sZ9UVmZkydgZ7jEHCc=
-X-Google-Smtp-Source: AGRyM1vNi9JRB2xodo1rojkRbFa6GagnAAnCAuOteZGLXPf0fVkujN6XolacQOKPLrql7U+1KMwHuA==
-X-Received: by 2002:aa7:88c3:0:b0:52a:d6ee:eb5d with SMTP id k3-20020aa788c3000000b0052ad6eeeb5dmr18257505pff.63.1657964018942;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=NaserlcC6hSl3SwHUAah5zXW3IuFUW5WcFOL2/suCG8=;
+        b=opii/Plb1Nch9WTo4RPRH4MrrxEhxgO39hkj41ZXe7qaPuOhABBGe5yTz+jD3vHTZ6
+         Nip0yRchZ7sm8BlERe52rXkm7SsRIUkeEHggwpWJ5JFDbrnATW+T2FXFcJog21QxhX9f
+         EyXn+GrdZKQEH1mUGJMffc+MOBS8lWicvwSxKk7pDsss9D1lmFnpHg3zevBq0ePVhKmO
+         4TgcNx9n9GzbE9tnP/y0vzzo3uWMm/i3jpWP22WlOK9OX/kCK1Z1ay15/Zxq1ZBVQNn9
+         tVu9MELdKXtCZpguTRHyvjlLwwZYOjpw0F2lEMDzcD36I8cvnjKbUXliliz73ZklRrOp
+         jXFQ==
+X-Gm-Message-State: AJIora86or7q2nBSrnq6G5aceqh4obT94tuG16Ezzub8resT/6TmMouc
+        TX01WpnsqC4eA+0/SPgXLvU=
+X-Google-Smtp-Source: AGRyM1uSAFRt/vvd1YRX/u/uEw6Wixbw2nFqqMIBxadlr/p7/1iu7OmearIrb10VU4zG23rgJgwv9g==
+X-Received: by 2002:a17:902:f64c:b0:16c:131:73ff with SMTP id m12-20020a170902f64c00b0016c013173ffmr17492991plg.170.1657964018733;
         Sat, 16 Jul 2022 02:33:38 -0700 (PDT)
 Received: from debian.me (subs32-116-206-28-23.three.co.id. [116.206.28.23])
-        by smtp.gmail.com with ESMTPSA id i9-20020a17090332c900b0016bee668a5asm5124124plr.161.2022.07.16.02.33.37
+        by smtp.gmail.com with ESMTPSA id c5-20020a170903234500b0016be8da658fsm5057280plh.130.2022.07.16.02.33.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sat, 16 Jul 2022 02:33:38 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id BC9E11038C0; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
+        id 8C956103844; Sat, 16 Jul 2022 16:33:33 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -59,36 +59,47 @@ Cc:     linux-kernel@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         Martin Liska <mliska@suse.cz>, Andi Kleen <ak@linux.intel.com>,
         Jiri Slaby <jirislaby@kernel.org>,
-        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH 0/4] kbuild: lto: documentation fixes
-Date:   Sat, 16 Jul 2022 16:32:46 +0700
-Message-Id: <20220716093249.19326-1-bagasdotme@gmail.com>
+        linux-kbuild@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH 4/4] Documentation: lto: add LTO documentation to toc index
+Date:   Sat, 16 Jul 2022 16:32:50 +0700
+Message-Id: <20220716093249.19326-5-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220716093249.19326-1-bagasdotme@gmail.com>
+References: <20220716093249.19326-1-bagasdotme@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Here is documentation fixes for kbuild LTO feature tree [1]. Two patches
-fixes warnings reported by kernel test robot, the others are formatting
-improvements.
+kernel test robot reported toctree warning:
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/jirislaby/linux.git
+Documentation/kbuild/lto-build.rst: WARNING: document isn't included in any toctree
 
-Bagas Sanjaya (4):
-  Documentation: lto: add blank line padding before single requirement
-    list
-  Documentation: lto: use bullet list for FAQ
-  Documentation: lto: use bullet lists for external link references list
-  Documentation: lto: add LTO documentation to toc index
+Add LTO documentation (lto-build.rst) to kbuild table of contents.
 
- Documentation/kbuild/index.rst     |  2 ++
- Documentation/kbuild/lto-build.rst | 36 +++++++++++++++++-------------
- 2 files changed, 23 insertions(+), 15 deletions(-)
+Link: https://lore.kernel.org/linux-doc/202207161100.lCdR6Unx-lkp@intel.com/
+Fixes: 0350b4dd55922f ("Kbuild, lto: Add Link Time Optimization support")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Documentation/kbuild/index.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
-base-commit: 79a278f10955da2801240f52efb828d158b2b36c
+diff --git a/Documentation/kbuild/index.rst b/Documentation/kbuild/index.rst
+index cee2f99f734b5a..1937eee7c43705 100644
+--- a/Documentation/kbuild/index.rst
++++ b/Documentation/kbuild/index.rst
+@@ -22,6 +22,8 @@ Kernel Build System
+     gcc-plugins
+     llvm
+ 
++    lto-build
++
+ .. only::  subproject and html
+ 
+    Indices
 -- 
 An old man doll... just what I always wanted! - Clara
 
