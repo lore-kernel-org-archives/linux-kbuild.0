@@ -2,122 +2,154 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE739C433EF
-	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jul 2022 09:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0CCC43334
+	for <linux-kbuild@archiver.kernel.org>; Tue, 19 Jul 2022 10:53:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234384AbiGSJQr (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 19 Jul 2022 05:16:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S237394AbiGSKxS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 19 Jul 2022 06:53:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236529AbiGSJQq (ORCPT
+        with ESMTP id S237164AbiGSKxQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 19 Jul 2022 05:16:46 -0400
-Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 878471FCD5;
-        Tue, 19 Jul 2022 02:16:45 -0700 (PDT)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 26J9GEOS019313;
-        Tue, 19 Jul 2022 18:16:15 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 26J9GEOS019313
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1658222175;
-        bh=E6Fkm5tCJlGuOKWaAMEh0ilTa5IY0MFugXH1W5B6FaI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=DfcznssbMealKDrdn4IXdRIBZ7GjmWfPe/ze3vNwUO2L6C4uzn+EwsiskwwEfIWNz
-         H/CQUq7T6ZUCkrs0wvxXJqbXQGEPtS6pIqOhQGQtLvyMj3AYv2aaYA0jM4aE253QcY
-         3cILq9DIvkjKjgjY6Zryl/YzkXt9z7oECboAjbObA40MyPXnDUxXdswyHjkR5rMg8L
-         7ULlyKI7IISilSMu5kmq9QqYlczn9Yj4F9PTvYHbKFp+Ctqgs7oHhnIGvbMZMsfeC1
-         /k/KNd3VZBdGKL6nLk4HGCOEFftENcehx6Mp+3NimqLPtNIvFB4DKNpogbGmNwFCDY
-         ayo88BdrLgJ0w==
-X-Nifty-SrcIP: [209.85.221.49]
-Received: by mail-wr1-f49.google.com with SMTP id n12so7788881wrc.8;
-        Tue, 19 Jul 2022 02:16:15 -0700 (PDT)
-X-Gm-Message-State: AJIora+HDSLk9M95VvJBeGrafEkPOpfbT5lvDPODOE6DscMPgpw3JWOt
-        Pfvqq0G/QUiDMoSivteZW7spjL1b2BjW+4+Uk3M=
-X-Google-Smtp-Source: AGRyM1t0LcKuGmlIJeETeYT7z2TiaHuzBecJ8jPSuoHQM9Xu+Ks2gE3l3ufKz54a41kTLel2HtK50jsvTgq9dzG1YDM=
-X-Received: by 2002:adf:979b:0:b0:21d:868a:7f2f with SMTP id
- s27-20020adf979b000000b0021d868a7f2fmr25642176wrb.409.1658222173652; Tue, 19
- Jul 2022 02:16:13 -0700 (PDT)
+        Tue, 19 Jul 2022 06:53:16 -0400
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C99D402DD
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Jul 2022 03:53:14 -0700 (PDT)
+Received: by mail-oo1-xc2c.google.com with SMTP id c203-20020a4a4fd4000000b0043566a4e265so2811118oob.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Jul 2022 03:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=landley-net.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=ra5x2/muxSeeSQ3tlCgpeqbladVRxJnxCPl4bJq3p34=;
+        b=2lKKxFzSTFfoAqHkPQJOZzk9NSwhvMVfz9AI6037udC8exCOdgmjJTCzLfGNh8TiZR
+         juF5/5iF/lwpY0I4eBxOM7ch26XEY1pzvru00V28d56VKmfDdmUC/dvbNUXfD/GneoTj
+         e62bDsHZKQ06qjQfN6BdAPe8q7wMqzTya9y9Oxq/85+9tv+FEcRChm48xzwJ+vVtJutJ
+         ocu7WYAHxW+9letk5IuqILyJfJ0omA9TYCGqGI3ZW12BP0J1uMrdUw4g3mf6Dnq9iC2d
+         KIoG/xTswyWySLrhFnRZ2Qa4cNrCubzn949cy5pGWP6ba+vFmgIdE/fnF+KPaKPeGBQd
+         k/Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ra5x2/muxSeeSQ3tlCgpeqbladVRxJnxCPl4bJq3p34=;
+        b=R7Swuj2iVvDBUnIHmIKJ9F7hZbaGQ53lrF+luhhOxAQ8SJVNcvdziR5ncPbFHr9Stx
+         j++eRZyRND/8X2lobjPvy82JT8cCYwv+6hfFTont4VVvGFnfGjIUaFyiEeWRsmn+4Y0X
+         s8beG7hM4o01FVTPMgiPB71uFGq6hWSl3r68H5vp6jhx41OKARfauwPq4RJrWIYfxMGC
+         hAVFoG1AfE+E+P4PHbzVuwh3oLQObZ8lpBGNwFcyFds1YBvvGy5kfXxmduazUL8BogfP
+         HC9Gr+r72G3N9cgJhqzMfkydr8Nj8F9TfA/Y4/Tiv+Z57yc2+aLn+VV4EJ5CfBF/ZeAg
+         tEgg==
+X-Gm-Message-State: AJIora/LpOr0a57Tu5t4p/oiF5gTTmjKcoqms3sbQTtd60j+dTDUYoy9
+        uSYQZi6+BuLePcN/ArzMvopkXw==
+X-Google-Smtp-Source: AGRyM1skx4r10nH77MIc8HT+KMfyvuczcqHU0I1yhcm68ijpwQjC9CRg6tXM26btMYm29jvYGotkYg==
+X-Received: by 2002:a4a:864b:0:b0:425:71ed:ada7 with SMTP id w11-20020a4a864b000000b0042571edada7mr10923632ooh.92.1658227993382;
+        Tue, 19 Jul 2022 03:53:13 -0700 (PDT)
+Received: from [192.168.86.210] ([136.62.38.22])
+        by smtp.gmail.com with ESMTPSA id cg4-20020a056830630400b0061c7ac52b75sm5901958otb.26.2022.07.19.03.53.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Jul 2022 03:53:12 -0700 (PDT)
+Message-ID: <99ae4aa6-b55a-55a9-e836-b0b483a358d6@landley.net>
+Date:   Tue, 19 Jul 2022 06:00:04 -0500
 MIME-Version: 1.0
-References: <20220719084149.29950-1-jslaby@suse.cz>
-In-Reply-To: <20220719084149.29950-1-jslaby@suse.cz>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 19 Jul 2022 18:15:32 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQa0QqEG1PLY3nr_ajP59d9cNU-0FBq2WGKnvEnZGJ1MA@mail.gmail.com>
-Message-ID: <CAK7LNAQa0QqEG1PLY3nr_ajP59d9cNU-0FBq2WGKnvEnZGJ1MA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kbuild: pass jobserver to cmd_ld_vmlinux.o
-To:     Jiri Slaby <jslaby@suse.cz>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Sedat Dilek <sedat.dilek@gmail.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "Signed-off-by : Martin Liska" <mliska@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v4 0/3] initramfs: add support for xattrs in the initial
+ ram disk
+Content-Language: en-US
+To:     Roberto Sassu <roberto.sassu@huawei.com>,
+        Jim Baxter <jim_baxter@mentor.com>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc:     "hpa@zytor.com" <hpa@zytor.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "initramfs@vger.kernel.org" <initramfs@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "bug-cpio@gnu.org" <bug-cpio@gnu.org>,
+        "zohar@linux.vnet.ibm.com" <zohar@linux.vnet.ibm.com>,
+        Silviu Vlasceanu <Silviu.Vlasceanu@huawei.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@huawei.com>,
+        "takondra@cisco.com" <takondra@cisco.com>,
+        "kamensky@cisco.com" <kamensky@cisco.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "james.w.mcmechan@gmail.com" <james.w.mcmechan@gmail.com>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        Dirk Behme <dirk.behme@de.bosch.com>,
+        Eugeniu Rosca <roscaeugeniu@gmail.com>
+References: <33cfb804-6a17-39f0-92b7-01d54e9c452d@huawei.com>
+ <1561909199.3985.33.camel@linux.ibm.com>
+ <45164486-782f-a442-e442-6f56f9299c66@huawei.com>
+ <1561991485.4067.14.camel@linux.ibm.com>
+ <f85ed711-f583-51cd-34e2-80018a592280@huawei.com>
+ <0c17bf9e-9b0b-b067-cf18-24516315b682@huawei.com>
+ <20220609102627.GA3922@lxhi-065>
+ <21b3aeab20554a30b9796b82cc58e55b@huawei.com>
+ <20220610153336.GA8881@lxhi-065>
+ <4bc349a59e4042f7831b1190914851fe@huawei.com>
+ <20220615092712.GA4068@lxhi-065>
+ <032ade35-6eb8-d698-ac44-aa45d46752dd@mentor.com>
+ <f82d4961986547b28b6de066219ad08b@huawei.com>
+From:   Rob Landley <rob@landley.net>
+In-Reply-To: <f82d4961986547b28b6de066219ad08b@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 5:41 PM Jiri Slaby <jslaby@suse.cz> wrote:
->
-> Until the link-vmlinux.sh split (cf. the commit below), the linker was
-> run with jobserver set in MAKEFLAGS. After the split, the command in
-> Makefile.vmlinux_o is not prefixed by "+" anymore, so this information
-> is lost.
->
-> Restore it as linkers working in parallel (esp. the LTO ones) make a use
-> of it. In this case, it is gcc producing this warning otherwise:
-> lto-wrapper: warning: jobserver is not available: =E2=80=98--jobserver-au=
-th=3D=E2=80=99 is not present in =E2=80=98MAKEFLAGS=E2=80=99
->
-> Cc: Sedat Dilek <sedat.dilek@gmail.com>
-> Cc: Masahiro Yamada <masahiroy@kernel.org>
-> Cc: Michal Marek <michal.lkml@markovi.net>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Signed-off-by: Martin Liska <mliska@suse.cz>
-> Fixes: 5d45950dfbb1 (kbuild: move vmlinux.o link to scripts/Makefile.vmli=
-nux_o)
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> ---
->
-> Notes:
->     [v2] only commit message updated
+On 7/18/22 11:49, Roberto Sassu wrote:
+> Uhm, I guess this could be solved with:
+> 
+> https://github.com/openeuler-mirror/kernel/commit/18a502f7e3b1de7b9ba0c70896ce08ee13d052da
+> 
+> and adding initramtmpfs to the kernel command line.
 
+It's initmpfs. You can argue about whether it should have two t's (I was
+consistent naming it in the patch series adding it), but ramfs and tmpfs are two
+different things and saying "initramtmpfs" is like saying "mount -t ext4btrfs".
 
-Did you read my previous email?
+> You are probably using ramfs, which does not have xattr support.
 
-https://lore.kernel.org/linux-kbuild/CAK7LNAS46hrVh3FNiHHL8_Hqp85VgWnsHyjQ4=
-t-TFH_H344NOg@mail.gmail.com/
+Do not specify root= in your kernel command line. If you specify root= you're
+saying "switch off of initramfs to a different root filesystem", so it doesn't
+make the overmounted filesystem tmpfs because you told it you wouldn't be using it.
 
+(The decision of what to mount has to be made before it examines the cpio.gz
+contents, so root= is used to signal "we are not keeping this initramfs" because
+that's literally what root= means. Your root filesystem is not initramfs, it is
+instead this thing to be mounted over initramfs.)
 
+You can tell which you're using via /proc/mounts having a line:
 
+rootfs / rootfs rw,size=121832k,nr_inodes=30458 0 0
 
+If it's got the size= then it's tmpfs: ramfs basically doesn't have bounds
+checking and "cat /dev/null > filename" on ramfs will lock your system solid due
+to unpinnable memory exhaustion.
 
+If you don't have a "rootfs" line at ALL then root= was used to overmount and
+part of the gratuitously magic behavior of root= is it hides the rootfs line
+from /proc/mounts even though the filesystem is actually still there, which is
+not something it does for ANY OTHER OVERMOUNT:
 
->
->  scripts/Makefile.vmlinux_o | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-> index 84019814f33f..886db0659d9c 100644
-> --- a/scripts/Makefile.vmlinux_o
-> +++ b/scripts/Makefile.vmlinux_o
-> @@ -65,7 +65,7 @@ define rule_ld_vmlinux.o
->  endef
->
->  vmlinux.o: $(initcalls-lds) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS=
-) FORCE
-> -       $(call if_changed_rule,ld_vmlinux.o)
-> +       +$(call if_changed_rule,ld_vmlinux.o)
->
->  targets +=3D vmlinux.o
->
-> --
-> 2.37.1
->
+  $ mkdir sub
+  $ mount -t proc proc sub
+  $ mount -t ramfs sub sub
+  $ grep sub /proc/mounts
+  proc /sub proc rw,relatime 0 0
+  sub /sub ramfs rw,relatime 0 0
 
+I've never understood why they added that gratuitous special case to hide how
+the system actually works, but it's a land mine you have to be told about after
+you've stepped on it in order to understand what's going on. Part of the reason
+people think initramfs is so "magic" when PID 1 isn't, we don't HIDE the fact
+that PID 1 is always there but we hide the fact initramfs is...
 
---=20
-Best Regards
-Masahiro Yamada
+Rob
