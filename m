@@ -2,165 +2,100 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF25AC43334
-	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jul 2022 09:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F15C00144
+	for <linux-kbuild@archiver.kernel.org>; Tue, 26 Jul 2022 16:53:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbiGZJ1U (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 26 Jul 2022 05:27:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33398 "EHLO
+        id S234121AbiGZQx0 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 26 Jul 2022 12:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbiGZJ1U (ORCPT
+        with ESMTP id S229648AbiGZQx0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 26 Jul 2022 05:27:20 -0400
-Received: from conssluserg-02.nifty.com (conssluserg-02.nifty.com [210.131.2.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 117D02E9F6;
-        Tue, 26 Jul 2022 02:27:18 -0700 (PDT)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 26Q9QrdN024374;
-        Tue, 26 Jul 2022 18:26:53 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 26Q9QrdN024374
+        Tue, 26 Jul 2022 12:53:26 -0400
+Received: from conuserg-07.nifty.com (conuserg-07.nifty.com [210.131.2.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0A863C1;
+        Tue, 26 Jul 2022 09:53:24 -0700 (PDT)
+Received: from localhost.localdomain (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 26QGq6sm002811;
+        Wed, 27 Jul 2022 01:52:06 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 26QGq6sm002811
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1658827614;
-        bh=d6NNJ+nW6fZ2WWBYBA5DCiVLw0ZFlnZQJAM4KipXE4A=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=jPARB7HAapfEkUCDpves2bids8NaztvHxYcrpmaz30aXBKKCq5Fls6fPm6JMl4NEB
-         A+CXQn86ICJNahuYe+wJUVp4X42qyknJGMTFem8Fg39gyqprHgP6bGqygnGJySLLpY
-         Fi0TJ4n8AGHy1QHghgmYAb6tG67BBglbtafIao4SUkicjwCuxWlMCf234yupSWwONe
-         QXTA/NB4xuFdazVACjtFGA/3J6GXfrlFE7KiQy3L10fGJswdIINwUuYL80GwdwbA/X
-         1oaSD81CRh1UXkmTAspo/hdqn56A4uPd0xGP0lEi/wZspTN5MpNFXg4n7sMAhQFY4U
-         xr5ezJ4ImSfvQ==
-X-Nifty-SrcIP: [209.85.128.41]
-Received: by mail-wm1-f41.google.com with SMTP id w8-20020a05600c014800b003a32e89bc4eso7783829wmm.5;
-        Tue, 26 Jul 2022 02:26:53 -0700 (PDT)
-X-Gm-Message-State: AJIora/2pKak2LpGwKZTl3vd0m6XP8zASBoBMlLp0+mjXsh8PgPb+uHl
-        x6DEomJxckWccPXLwh36ZnUSnHhXNk2KwJ6TOHg=
-X-Google-Smtp-Source: AGRyM1uGeaCDAN8z8yKxHxFJ9V3AepuKKOjXcNTD81j1E/+9R+DcEVLuRRv9FUeLk7HNSkZXBvwGr+EHMfBpPdhcGfg=
-X-Received: by 2002:a05:600c:35ce:b0:3a3:1b7f:bbd8 with SMTP id
- r14-20020a05600c35ce00b003a31b7fbbd8mr11063089wmq.22.1658827612274; Tue, 26
- Jul 2022 02:26:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220722022416.137548-1-mfo@canonical.com> <20220722022416.137548-4-mfo@canonical.com>
-In-Reply-To: <20220722022416.137548-4-mfo@canonical.com>
+        s=dec2015msa; t=1658854326;
+        bh=bsANJFQL0PDyyCjbc6YJJ6rzr0lsBYl+Br0sYpHU1oU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fXkCFkPFyyI6MsyzwKg9vrCaid8MdGXQlfGJNVn3KKhDKnDYisp6cY/o5XgD+LPql
+         uen8ATRdaMJeqFs+CmpvnlFcPr7m9au3CttXz3uTs4BnCn2o4CQddOY7BdgDTAy4sg
+         T1fkwFQLbuCbJYoiBf6QcJ2p7HCTd03cPAMBlrEioc+c6mRbcv120q9fVShgRpNEgy
+         8QMLMtzNPRoFm7yGmAKR0oiol3d3F9SdIeUuZLjAhlQBQisQQMj/V7zDWmjP+ULsKW
+         UAlA+xAty9OyuF0zl8GKC2sVWuQ8hQQ0P040LN8ujR2EM+L2tS4E6oZgm5bE4ekPxL
+         0iC3bP+D1CJGQ==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 26 Jul 2022 18:25:51 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARvJEhEOwg_PHe3WKT9BkSchnGOmeiUaB+7E__NS9qrVw@mail.gmail.com>
-Message-ID: <CAK7LNARvJEhEOwg_PHe3WKT9BkSchnGOmeiUaB+7E__NS9qrVw@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/6] sysctl, mod_devicetable: shadow struct
- ctl_table.procname for file2alias
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-modules <linux-modules@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] modpost: remove unused Elf_Sword macro
+Date:   Wed, 27 Jul 2022 01:52:04 +0900
+Message-Id: <20220726165204.3363120-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 11:24 AM Mauricio Faria de Oliveira
-<mfo@canonical.com> wrote:
->
-> In order to expose a sysctl entry to modpost (file2alias.c, precisely)
-> we have to shadow 'struct ctl_table' in mod_devicetable.h, as scripts
-> should not access kernel headers or its types (see file2alias.c).
->
-> The required field is '.procname' (basename of '/proc/sys/.../entry').
->
-> Since 'struct ctl_table' is annotated for structure randomization and
-> we need a known offset for '.procname' (remember, no kernel headers),
-> take it out of the randomized portion (as in, eg, 'struct task_struct').
->
-> Of course, add build-time checks for struct size and .procname offset
-> between both structs. (This has to be done on kernel side; for headers.)
->
-> With that in place, use the regular macros in devicetable-offsets.c to
-> define SIZE_... and OFF_... macros for the shadow struct and the field
-> of interest.
->
-> Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-> ---
->  fs/proc/proc_sysctl.c             | 19 +++++++++++++++++++
->  include/linux/mod_devicetable.h   | 25 +++++++++++++++++++++++++
->  include/linux/sysctl.h            | 11 ++++++++++-
->  kernel/sysctl.c                   |  1 +
->  scripts/mod/devicetable-offsets.c |  3 +++
->  5 files changed, 58 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-> index 021e83fe831f..ebbf8702387e 100644
-> --- a/fs/proc/proc_sysctl.c
-> +++ b/fs/proc/proc_sysctl.c
-> @@ -19,6 +19,24 @@
->  #include <linux/kmemleak.h>
->  #include "internal.h"
->
-> +#ifdef CONFIG_MODULES
-> +#include <linux/mod_devicetable.h>
-> +
-> +static void check_struct_sysctl_device_id(void)
-> +{
-> +       /*
-> +        * The shadow struct sysctl_device_id for file2alias.c needs
-> +        * the same size of struct ctl_table and offset for procname.
-> +        */
-> +       BUILD_BUG_ON(sizeof(struct sysctl_device_id)
-> +                       != sizeof(struct ctl_table));
-> +       BUILD_BUG_ON(offsetof(struct sysctl_device_id, procname)
-> +                       != offsetof(struct ctl_table, procname));
+Commit 9ad21c3f3ecf ("kbuild: try harder to find symbol names in
+modpost") added Elf_Sword (in a wrong way), but did not use it at all.
 
+BTW, the current code looks weird.
 
-Nit:
+The fix for the 32-bit part would be:
 
-If you use static_assert(), you can remove
- check_struct_sysctl_device_id().
+    Elf64_Sword    -->    Elf32_Sword
 
+(weirdness in the prefix, Elf32_ vs Elf64_)
 
-You can write static_assert() out of a function.
+The fix for the 64-bit part would be:
 
+    Elf64_Sxword   -->    Elf64_Sword
 
+(the size is different between Sword and Sxword)
 
-> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-> index 223376959d29..15073621cfa8 100644
-> --- a/kernel/sysctl.c
-> +++ b/kernel/sysctl.c
-> @@ -2487,6 +2487,7 @@ int __init sysctl_init_bases(void)
->
->         return 0;
->  }
-> +
+Note:
 
+    Elf32_Sword   ==  Elf64_Sword   ==  int32_t
+    Elf32_Sxword  ==  Elf64_Sxword  ==  int64_t
 
-Noise.
+Anyway, let's drop unused code instead of fixing it.
 
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
+ scripts/mod/modpost.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-
->  #endif /* CONFIG_SYSCTL */
->  /*
->   * No sense putting this after each symbol definition, twice,
-> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
-> index c0d3bcb99138..43b2549940d2 100644
-> --- a/scripts/mod/devicetable-offsets.c
-> +++ b/scripts/mod/devicetable-offsets.c
-> @@ -262,5 +262,8 @@ int main(void)
->         DEVID(ishtp_device_id);
->         DEVID_FIELD(ishtp_device_id, guid);
->
-> +       DEVID(sysctl_device_id);
-> +       DEVID_FIELD(sysctl_device_id, procname);
-> +
->         return 0;
->  }
-> --
-> 2.25.1
->
-
-
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 68cd4aeeae3d..620f2fd08e05 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -26,7 +26,6 @@
+ #define Elf_Shdr    Elf32_Shdr
+ #define Elf_Sym     Elf32_Sym
+ #define Elf_Addr    Elf32_Addr
+-#define Elf_Sword   Elf64_Sword
+ #define Elf_Section Elf32_Half
+ #define ELF_ST_BIND ELF32_ST_BIND
+ #define ELF_ST_TYPE ELF32_ST_TYPE
+@@ -41,7 +40,6 @@
+ #define Elf_Shdr    Elf64_Shdr
+ #define Elf_Sym     Elf64_Sym
+ #define Elf_Addr    Elf64_Addr
+-#define Elf_Sword   Elf64_Sxword
+ #define Elf_Section Elf64_Half
+ #define ELF_ST_BIND ELF64_ST_BIND
+ #define ELF_ST_TYPE ELF64_ST_TYPE
 -- 
-Best Regards
-Masahiro Yamada
+2.34.1
+
