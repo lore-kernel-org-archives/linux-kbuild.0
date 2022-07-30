@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64632C19F2B
-	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Jul 2022 17:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4E2C19F2A
+	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Jul 2022 17:37:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235197AbiG3Rhs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 30 Jul 2022 13:37:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54076 "EHLO
+        id S235408AbiG3Rhu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 30 Jul 2022 13:37:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235014AbiG3Rhr (ORCPT
+        with ESMTP id S235393AbiG3Rhu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 30 Jul 2022 13:37:47 -0400
+        Sat, 30 Jul 2022 13:37:50 -0400
 Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E8A15A00;
-        Sat, 30 Jul 2022 10:37:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B7215A00;
+        Sat, 30 Jul 2022 10:37:49 -0700 (PDT)
 Received: from localhost.localdomain (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 26UHad9Z015991;
-        Sun, 31 Jul 2022 02:36:39 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 26UHad9Z015991
+        by conuserg-10.nifty.com with ESMTP id 26UHad9b015991;
+        Sun, 31 Jul 2022 02:36:40 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 26UHad9b015991
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1659202599;
-        bh=s5i4NN8QoFKQRwc5evurXo6JXtv34LY9d/GuIT5gPKU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=NnfzF9/LtuTDbNwcvojr/Ivo4XVgeFXRmupqWWDmfNGaZqhuUcvrVKIN5yy2giVrr
-         Bvecxcxl4nd+RO904sAA28IDUyAwH08XaZxchPorsqiiiL04kx21ocKMIVlkTJNewR
-         3DAYgPDZM/QdnlkV/M/YslS9SYr4u0H/6BSKGGmK6QVJLYhslFNvw82fuXBEvazR2m
-         eg5Ow2UYc9y1I3m/vvGNeM59Mm1Y22/5Nb4BRY++3f4Tb9IkYGGDe27Vj/vlF23CP0
-         QA0KR8QGypvLJzqSXVnK8/rRyz3w/GqhIn0mN5/+ce7BqCT9ailLvMOllthtDpeLAn
-         1uELQNo35+y8A==
+        s=dec2015msa; t=1659202600;
+        bh=6qVoxOFybVIZw2PUGjoIGqId1JG7AuoiXXZ4w7M9+lQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JgFWAuog3tIvAJbXlRNQZCZV04LW+eLeE3PMW6++84sM/2DUqpnpeXb315Yd7QgvH
+         cvqbgeRlHOfKsKYiTMVQwOoBHv8E3DrzgHOgIIw71i3gBBev6Bxio0ZccSgAR8HLiL
+         GLapMKgHMts2vBDlkOrRD8TI7zlFOcyETRtEDNS8vNdzJF7Cn4EAHzzK7xhNIYZuep
+         57HVawRZSG9MNnxT8oFeStp0ioPVTn+mUuB3JVVi4hCOe1MF2KW9kX3WeIYeUZPkLn
+         ATDIEBUVn7BYatTTCfW8D+T5It/13scTYg/vAvtvgHEKm76fngcodtvA9/5BQKRcTB
+         JanDoz0UU3A2w==
 X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,58 +36,43 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] modpost: add array range check to sec_name()
-Date:   Sun, 31 Jul 2022 02:36:34 +0900
-Message-Id: <20220730173636.1303357-1-masahiroy@kernel.org>
+Subject: [PATCH 3/3] Revert "Kbuild, lto, workaround: Don't warn for initcall_reference in modpost"
+Date:   Sun, 31 Jul 2022 02:36:36 +0900
+Message-Id: <20220730173636.1303357-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220730173636.1303357-1-masahiroy@kernel.org>
+References: <20220730173636.1303357-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The section index is always positive, so the argunent, secindex, should
-be unsigned.
+This reverts commit 77ab21adae509c5540956729e2d03bc1a59bc82a.
 
-Also, inserted the array range check.
-
-If sym->st_shndx is a special section index (between SHN_LORESERVE and
-SHN_HIRESERVE), there is no corresponding section header.
-
-For example, if a symbol specifies an absolute value, sym->st_shndx is
-SHN_ABS (=0xfff1).
-
-The current users do not cause the out-of-range access of
-info->sechddrs[], but it is better to avoid such a pitfall.
+That commit was 8 years old, and it said "This is a workaround".
+If this is needed for GCC LTO, it should be added in a proper way.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mod/modpost.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ scripts/mod/modpost.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 08411fff3e17..148b38699889 100644
+index c6a055c0291e..a8ee27496da7 100644
 --- a/scripts/mod/modpost.c
 +++ b/scripts/mod/modpost.c
-@@ -336,8 +336,16 @@ static const char *sech_name(const struct elf_info *info, Elf_Shdr *sechdr)
- 				      sechdr->sh_name);
- }
+@@ -1462,9 +1462,6 @@ static void default_mismatch_handler(const char *modname, struct elf_info *elf,
+ 	from = find_elf_symbol2(elf, r->r_offset, fromsec);
+ 	fromsym = sym_name(elf, from);
  
--static const char *sec_name(const struct elf_info *info, int secindex)
-+static const char *sec_name(const struct elf_info *info, unsigned int secindex)
- {
-+	/*
-+	 * If sym->st_shndx is a special section index, there is no
-+	 * corresponding section header.
-+	 * Return "" if the index is out of range of info->sechdrs[] array.
-+	 */
-+	if (secindex >= info->num_sections)
-+		return "";
-+
- 	return sech_name(info, &info->sechdrs[secindex]);
- }
- 
+-	if (strstarts(fromsym, "reference___initcall"))
+-		return;
+-
+ 	tosec = sec_name(elf, get_secindex(elf, sym));
+ 	to = find_elf_symbol(elf, r->r_addend, sym);
+ 	tosym = sym_name(elf, to);
 -- 
 2.34.1
 
