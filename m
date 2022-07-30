@@ -2,117 +2,104 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 842CEC19F2A
-	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Jul 2022 17:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45787C04A68
+	for <linux-kbuild@archiver.kernel.org>; Sat, 30 Jul 2022 17:37:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235261AbiG3RUy (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 30 Jul 2022 13:20:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
+        id S235273AbiG3Rhs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 30 Jul 2022 13:37:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbiG3RUw (ORCPT
+        with ESMTP id S233216AbiG3Rhr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 30 Jul 2022 13:20:52 -0400
-Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131A517588;
-        Sat, 30 Jul 2022 10:20:49 -0700 (PDT)
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 26UHKUAB027213;
-        Sun, 31 Jul 2022 02:20:31 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 26UHKUAB027213
+        Sat, 30 Jul 2022 13:37:47 -0400
+Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7130B15835;
+        Sat, 30 Jul 2022 10:37:45 -0700 (PDT)
+Received: from localhost.localdomain (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-10.nifty.com with ESMTP id 26UHad9a015991;
+        Sun, 31 Jul 2022 02:36:39 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 26UHad9a015991
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1659201631;
-        bh=JttvlRFg6A7a6IS9/qWvYj23vzeOPXItUhbK0OqnR88=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=OA1rWReB+yU0ViAT+X2ZE2pzIcrKI2uvXQrXFXFnlaDCKWg79Qb900GmZZsks0mOp
-         2zqlk8PQRQQv0yTxafU+MMJSgHfuEMlFFNuBJE8A5y3o0UEJ0ilYfQftQ0eg63fbVZ
-         vjroVuAWuBWYh0v9+CRzRdP6EYi35XqVfBMutsD1iDQtJE1JNc4WBb7RHR0qP9jam4
-         F/1fUvxpOHWp5/OZBFKrmuHjBnYh4ctKd/yoh1RRXsQUzGSJmEbWXp7CxwP1pppaxl
-         e5IfI1uxHtQ3BKkkjPVZEb6TpU+HLKgxl2E6k00lHL+mPVaxGEVqaUdAKrDZ+fifQL
-         pRWEhIgZDBdLw==
-X-Nifty-SrcIP: [209.85.128.47]
-Received: by mail-wm1-f47.google.com with SMTP id b21-20020a05600c4e1500b003a32bc8612fso3786512wmq.3;
-        Sat, 30 Jul 2022 10:20:31 -0700 (PDT)
-X-Gm-Message-State: AJIora9Gkp/bQe4WCziq3B9LnYWMWv+LFJXUHLVP4/5i9bRvgGAGjAjY
-        aLfJn/c6mKhwvwvhbrbfj90YYYDSJMOiiRu2o+8=
-X-Google-Smtp-Source: AGRyM1uDfrzdG2MpOEaQMQhWUN572domreJD0fYw/Z9G/D4OnxReQJfSj1Ne7OzwKiTweGxMO35J8ylaPdNRnomBqUk=
-X-Received: by 2002:a05:600c:35ce:b0:3a3:1b7f:bbd8 with SMTP id
- r14-20020a05600c35ce00b003a31b7fbbd8mr5877386wmq.22.1659201629632; Sat, 30
- Jul 2022 10:20:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220724095919.436126-1-masahiroy@kernel.org>
-In-Reply-To: <20220724095919.436126-1-masahiroy@kernel.org>
+        s=dec2015msa; t=1659202600;
+        bh=zDHb71qwI+a+ejytrtA7mu7Mj8TpMPar35Ic/moKcDM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=aPlwIx7XNgw5TU8kj+kuzexvwVlz4VP6ZXUkaE8PhcbY+/K3sPcGnk4unpZvrtQl9
+         LcMczhDuL4hDERQFqHTptmSpU+ls/Mtf4c6bTBuDFb9bCxq46cEHqs3VNh2C7puo32
+         VSHkx9TSbOdOgZPdYRILZm7t0CiRtzpuGBv2Id30plEecuqcVQC29FOCrPMbzkQESN
+         +w9WK9NYZr4TU2eAr7eFnFLXKAW7znVMluN3LYejDmcainuX9jkIXHpgWiB87h5ntG
+         cyDdMDxGFbVqeTe1zFGjDYXTGqbKbvnq3mBteF14Bz6CjeuO1pfpGr9bf5E0KXZKgJ
+         DwyaJ39qT1ivA==
+X-Nifty-SrcIP: [133.32.177.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sun, 31 Jul 2022 02:19:29 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQ7rkSGBs0FLU=f54iAX58U3kkKJ25eT4-6u=W=aoA0nA@mail.gmail.com>
-Message-ID: <CAK7LNAQ7rkSGBs0FLU=f54iAX58U3kkKJ25eT4-6u=W=aoA0nA@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add dtbs_prepare target
-To:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc:     Nicolas Schier <nicolas@fjasle.eu>,
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] modpost: use more reliable way to get fromsec in section_rel(a)()
+Date:   Sun, 31 Jul 2022 02:36:35 +0900
+Message-Id: <20220730173636.1303357-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220730173636.1303357-1-masahiroy@kernel.org>
+References: <20220730173636.1303357-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Jul 24, 2022 at 7:01 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Factor out the common prerequisites for DT compilation into the new
-> target, dtbs_prepare.
->
-> Add comments to explain why include/config/kernel.release is the
-> prerequisite. Our policy is that installation targets must not rebuild
-> anything in the tree. If 'make modules_install' is executed as root,
-> include/config/kernel.release may be owned by root.
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->
+The section name of Rel and Rela starts with ".rel" and ".rela"
+respectively (but, I do not know whether this is specification or
+convention).
 
-Applied to linux-kbuild.
+For example, ".rela.text" holds relocation entries applied to the
+".text" section.
 
-> Changes for v2:
->  - rephase the comment more concise
->
->  Makefile | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index dee707c98bbe..a2a030f41e65 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1370,16 +1370,21 @@ endif
->
->  ifneq ($(dtstree),)
->
-> -%.dtb: include/config/kernel.release scripts_dtc
-> +%.dtb: dtbs_prepare
->         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->
-> -%.dtbo: include/config/kernel.release scripts_dtc
-> +%.dtbo: dtbs_prepare
->         $(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
->
-> -PHONY += dtbs dtbs_install dtbs_check
-> -dtbs: include/config/kernel.release scripts_dtc
-> +PHONY += dtbs dtbs_prepare dtbs_install dtbs_check
-> +dtbs: dtbs_prepare
->         $(Q)$(MAKE) $(build)=$(dtstree)
->
-> +# include/config/kernel.release is actually needed when installing DTBs because
-> +# INSTALL_DTBS_PATH contains $(KERNELRELEASE). However, we do not want to make
-> +# dtbs_install depend on it as dtbs_install may run as root.
-> +dtbs_prepare: include/config/kernel.release scripts_dtc
-> +
->  ifneq ($(filter dtbs_check, $(MAKECMDGOALS)),)
->  export CHECK_DTBS=y
->  dtbs: dt_binding_check
-> --
-> 2.34.1
->
+So, the code chops the ".rel" or ".rela" prefix to get the name of
+the section to which the relocation applies.
 
+However, I do not like to skip 4 or 5 bytes blindly because it is
+potential memory overrun.
 
+The ELF specification provides a more reliable way to do this.
+
+ - The sh_info field holds extra information, whose interpretation
+   depends on the section type
+
+ - If the section type is SHT_REL or SHT_RELA, the sh_info field holds
+   the section header index of the section to which the relocation
+   applies.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/mod/modpost.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 148b38699889..c6a055c0291e 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1723,8 +1723,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
+ 	Elf_Rela *start = (void *)elf->hdr + sechdr->sh_offset;
+ 	Elf_Rela *stop  = (void *)start + sechdr->sh_size;
+ 
+-	fromsec = sech_name(elf, sechdr);
+-	fromsec += strlen(".rela");
++	fromsec = sec_name(elf, sechdr->sh_info);
+ 	/* if from section (name) is know good then skip it */
+ 	if (match(fromsec, section_white_list))
+ 		return;
+@@ -1776,8 +1775,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
+ 	Elf_Rel *start = (void *)elf->hdr + sechdr->sh_offset;
+ 	Elf_Rel *stop  = (void *)start + sechdr->sh_size;
+ 
+-	fromsec = sech_name(elf, sechdr);
+-	fromsec += strlen(".rel");
++	fromsec = sec_name(elf, sechdr->sh_info);
+ 	/* if from section (name) is know good then skip it */
+ 	if (match(fromsec, section_white_list))
+ 		return;
 -- 
-Best Regards
-Masahiro Yamada
+2.34.1
+
