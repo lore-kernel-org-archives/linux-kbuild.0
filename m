@@ -2,132 +2,83 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D22C19F29
-	for <linux-kbuild@archiver.kernel.org>; Mon,  1 Aug 2022 09:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9492C00144
+	for <linux-kbuild@archiver.kernel.org>; Mon,  1 Aug 2022 17:40:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbiHAJmA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 1 Aug 2022 05:42:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58706 "EHLO
+        id S232535AbiHARks (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 1 Aug 2022 13:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbiHAJl6 (ORCPT
+        with ESMTP id S232300AbiHARkr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 Aug 2022 05:41:58 -0400
-Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF1637190;
-        Mon,  1 Aug 2022 02:41:57 -0700 (PDT)
-Received: from grover.sesame ([133.106.54.139]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 2719ejxw028043;
-        Mon, 1 Aug 2022 18:40:48 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 2719ejxw028043
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1659346848;
-        bh=sokvB66jq6RlLMRXgxzMH4QnY0MotEdE/iLkg2kNMeo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Hn+g+asXygjYkm9rmiczoNmzPNMu0vdT94Re/FMw5TNsTeJDHhRBJSfs7TX6QbLKE
-         PIaqdZOo5R0rTRK3rGO64MslrBxXACsEI1WWAlTZc6SzymIYWaz1gbcZSkJHHIT7Wb
-         B8VkUBPF9YuKRKv2a+AffY5HVFtrtuRw5Au9N2XP+6LrUddVVK6CnnPGp47owpZQuG
-         lv5Tvm21D6vzgLBBFe0cm7fBq+byG3SV8TtRtNgHbcbEfpSnjSENPsKfl5RV8VyWhM
-         kg7S7VxPW/ODLKB34yOThycf2V14R6E8+DXpo7Ngb85daC7390i+WW3XEnTI/7RK+J
-         qLe2+LdWFapvQ==
-X-Nifty-SrcIP: [133.106.54.139]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] modpost: remove unneeded .symbol_white_list initializers
-Date:   Mon,  1 Aug 2022 18:39:01 +0900
-Message-Id: <20220801093902.1506297-3-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220801093902.1506297-1-masahiroy@kernel.org>
-References: <20220801093902.1506297-1-masahiroy@kernel.org>
+        Mon, 1 Aug 2022 13:40:47 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D451AF01
+        for <linux-kbuild@vger.kernel.org>; Mon,  1 Aug 2022 10:40:46 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id z18so14689639edb.10
+        for <linux-kbuild@vger.kernel.org>; Mon, 01 Aug 2022 10:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vbpx09H/4ML4u2iqIVxYYiqngYD2A2VgzUmI+xUdR/g=;
+        b=dGQn9HnPGK3V1zgMzL54wYJj48O6+9iWDlARc+RljqL77xZfEerkvBhksT+ve5EwpC
+         M2uXbCMlaH2tZeawaZGAUY5wipiuA1s4tSZN8fbovQSH26yXFtaOn/PRxBu+n2J1G7Ps
+         MO6Mw94atIhopWJpxYxghaE4v4V9IPXuXAH8HKNyjt7JbkNPNvyczcLycm9hcfP9ifff
+         birOVIjltPVIXgLvWMliruGleakB5H7NGTStUH7QiSQygpVazbKSlBboi4CAiE+aoxiV
+         GqI+jGedwMaZ0Q6Ou1GTe0oQop7PbOCj08AAcECuv/6IINrAMTRJ5qOivzI4ViLgQgCr
+         Xicw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vbpx09H/4ML4u2iqIVxYYiqngYD2A2VgzUmI+xUdR/g=;
+        b=MfwjWjQ7I09CEGabCblqMkacjV6eURocaOkvpemN/T5URQ/eCkSx/YR6zEyjJcmepW
+         Zhh6mnt9aLi/wxvqy34TETM4S0OBZnkXZkaaPAvpebj/o/pswfkI3AZ9+vExR49KFQ2K
+         ilOBMjq68BAVawWhCxu/vdlsa4j/+S9JwmqZwQyIF5Z+PR8OMV/bzhOHTjsSI+EweJSL
+         5bzwcmYG13W8xLOZqWJk2gfkcjNJahlWph+ZO/jYHfGd0pWrpZNf9h7we47nXkJisx4d
+         UuW2ABssk3A1QGkL7qAUQitpgq6xlNrUTVNU5ChXButi2MtmAQoQ/hA7+6C3IMb10K/F
+         i3UA==
+X-Gm-Message-State: AJIora/SM9IqeJ/ybZnGfCLpyAUmtXt6QWe8su2wAIb0MA2vOp/wEVaI
+        HfGdaWP5N4mZVvKLL5ZFy9EpWrCkNe8s8Fl/f9ZsCQ==
+X-Google-Smtp-Source: AGRyM1tYs0gst0wzWllfhFmh/2YO6+2mD2drm8ixQ18bj+AqwYkkzGMnkkIZ+8d2QbxsaFh7RG2BPbFDTKBCvU+EAcU=
+X-Received: by 2002:a05:6402:540c:b0:434:d965:f8a with SMTP id
+ ev12-20020a056402540c00b00434d9650f8amr17246024edb.30.1659375644623; Mon, 01
+ Aug 2022 10:40:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220720232332.2720091-1-justinstitt@google.com>
+ <CAKwvOdnSjyOdCZZ9AegCyfns3bvH3fbtbVgdThO2+rJAE=1bag@mail.gmail.com>
+ <YtlsY2A2ZWK97Y8O@dev-arch.thelio-3990X> <CAK7LNASi_yrPhf0wv+0nqRcNhhbwUn-PzHvuiV2W1EsTqd_D8Q@mail.gmail.com>
+In-Reply-To: <CAK7LNASi_yrPhf0wv+0nqRcNhhbwUn-PzHvuiV2W1EsTqd_D8Q@mail.gmail.com>
+From:   Justin Stitt <justinstitt@google.com>
+Date:   Mon, 1 Aug 2022 10:40:29 -0700
+Message-ID: <CAFhGd8r1_A67aVt_5tMz-1NC51JrCFG=8cDsmTMz1kOricWEOA@mail.gmail.com>
+Subject: Re: [PATCH] Makefile.extrawarn: re-enable -Wformat for clang
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        clang-built-linux <llvm@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The ->symbol_white_list field is referenced in secref_whitelist(),
-only when 'fromsec' is data_sections.
+> OK, I think that will be good timing.
+> Please ping me if I forget to pick it up.
+>
+Hey Masahiro, just pinging to see the state of this PR.
 
-        /* Check for pattern 2 */
-        if (match(tosec, init_exit_sections) &&
-            match(fromsec, data_sections) &&
-            match(fromsym, mismatch->symbol_white_list))
-                return 0;
+I think we are on pace to re-enable this warning.
 
-If .fromsec is not data sections, the .symbol_white_list member is
-not used by anyone.
+I believe there exists only _two_ patches left still needing to go
+through along with this patch:
+1) https://lore.kernel.org/all/20220718050356.227647-1-hch@lst.de/
+2) https://lore.kernel.org/all/YtnDltqEVeJQQkbW@dev-arch.thelio-3990X/
+> Best Regards
+> Masahiro Yamada
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/mod/modpost.c | 8 --------
- 1 file changed, 8 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index c2949a1a0d5e..bcd1319f3097 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -930,7 +930,6 @@ static const struct sectioncheck sectioncheck[] = {
- 	.fromsec = { TEXT_SECTIONS, NULL },
- 	.bad_tosec = { ALL_INIT_SECTIONS, NULL },
- 	.mismatch = TEXT_TO_ANY_INIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- {
- 	.fromsec = { DATA_SECTIONS, NULL },
-@@ -951,7 +950,6 @@ static const struct sectioncheck sectioncheck[] = {
- 	.fromsec = { TEXT_SECTIONS, NULL },
- 	.bad_tosec = { ALL_EXIT_SECTIONS, NULL },
- 	.mismatch = TEXT_TO_ANY_EXIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- {
- 	.fromsec = { DATA_SECTIONS, NULL },
-@@ -964,41 +962,35 @@ static const struct sectioncheck sectioncheck[] = {
- 	.fromsec = { ALL_XXXINIT_SECTIONS, NULL },
- 	.bad_tosec = { INIT_SECTIONS, NULL },
- 	.mismatch = XXXINIT_TO_SOME_INIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- /* Do not reference exit code/data from memexit code/data */
- {
- 	.fromsec = { ALL_XXXEXIT_SECTIONS, NULL },
- 	.bad_tosec = { EXIT_SECTIONS, NULL },
- 	.mismatch = XXXEXIT_TO_SOME_EXIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- /* Do not use exit code/data from init code */
- {
- 	.fromsec = { ALL_INIT_SECTIONS, NULL },
- 	.bad_tosec = { ALL_EXIT_SECTIONS, NULL },
- 	.mismatch = ANY_INIT_TO_ANY_EXIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- /* Do not use init code/data from exit code */
- {
- 	.fromsec = { ALL_EXIT_SECTIONS, NULL },
- 	.bad_tosec = { ALL_INIT_SECTIONS, NULL },
- 	.mismatch = ANY_EXIT_TO_ANY_INIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- {
- 	.fromsec = { ALL_PCI_INIT_SECTIONS, NULL },
- 	.bad_tosec = { INIT_SECTIONS, NULL },
- 	.mismatch = ANY_INIT_TO_ANY_EXIT,
--	.symbol_white_list = { NULL },
- },
- /* Do not export init/exit functions or data */
- {
- 	.fromsec = { "___ksymtab*", NULL },
- 	.bad_tosec = { INIT_SECTIONS, EXIT_SECTIONS, NULL },
- 	.mismatch = EXPORT_TO_INIT_EXIT,
--	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
- },
- {
- 	.fromsec = { "__ex_table", NULL },
--- 
-2.34.1
-
+-Justin
