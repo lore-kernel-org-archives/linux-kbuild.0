@@ -2,34 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F872C25B0E
-	for <linux-kbuild@archiver.kernel.org>; Fri, 19 Aug 2022 06:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35EAAC32772
+	for <linux-kbuild@archiver.kernel.org>; Fri, 19 Aug 2022 06:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346751AbiHSG6c (ORCPT
+        id S1346771AbiHSG6e (ORCPT
         <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 19 Aug 2022 02:58:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47854 "EHLO
+        Fri, 19 Aug 2022 02:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243232AbiHSG6b (ORCPT
+        with ESMTP id S1346750AbiHSG6c (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2022 02:58:31 -0400
+        Fri, 19 Aug 2022 02:58:32 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 057A913D5D;
-        Thu, 18 Aug 2022 23:58:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08322662;
+        Thu, 18 Aug 2022 23:58:26 -0700 (PDT)
 Received: from grover.sesame ([133.106.49.178]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 27J6uUCP012757;
-        Fri, 19 Aug 2022 15:56:35 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 27J6uUCP012757
+        by conuserg-08.nifty.com with ESMTP id 27J6uUCM012757;
+        Fri, 19 Aug 2022 15:56:30 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 27J6uUCM012757
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1660892196;
-        bh=JKFoW0ol9y1fVwS1pROFaB3YGi1tPsHIYaMpxHnO61I=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rRgAouaU74jlZAlDDqUnecfj0Os4Xdj9KELOPEeI0L/VecFDP5u9YfqKr8WDwsJNS
-         ecK+LtvdMMDa2HP3jUK1cjSh/iMTvd1QOPFSqI6Ac9uDfPgBA48DYZ2sbU8dRDzoA9
-         U/hB/0e/O6vmgSboc4pe3fvFHUIvWeY0QXHr4Jow95Gts+5AEof3igIxi4Vy+gT156
-         hfBxf03yIsqX/30neGRcAccDwgxDwto7Npgzn8jJE6sYG96kdB8fCfP5Scuk+gNIDw
-         pmEVs3rCzsFIZz6AcdAcIx88cZKVMmzs7WZKgzHHJQQc9vFTQHgSSd7l8k8NH9x1Mf
-         y4qM3lv0O6F6Q==
+        s=dec2015msa; t=1660892191;
+        bh=kLteZgzDyCsUaZbAhJIThD6Chhgc+3Ar23SEEf1zkz8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=wwV9lkhrn16+U7gm+YFpddQAOvKBNo21MwndzEd1hbUr5kQl01tjwsDdVc1rl+xuX
+         ZTamMEMDp2YkQHqXjbVIAqB7aPluHPQOqjmsMPsCLtDFxOrPSOWIj2MkPDORKwYw4E
+         ayzZXLlBofkKBB48QKEQQ/GsniPrWVxmR2OBdaq3cfz9TdCNCPQvL5atvzrEa5JyAQ
+         HoPAo5IX3mX75x86HjMUnU8L87RTl8xY2FD23/iQGxhKKfwEPRzbV8FHP80hpdEdph
+         DmX0c7fME6ugquFwnRmAl2PLIf+HRQ22WC/FEdF7zHSVgRoz8YRlPi2UEpdqBevZL9
+         8SrWSPzrXPZoQ==
 X-Nifty-SrcIP: [133.106.49.178]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -38,83 +38,61 @@ Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         Richard Purdie <richard.purdie@linuxfoundation.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         Michal Marek <michal.lkml@markovi.net>,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 3/3] kbuild: use bash as the default shell for Make and Kconfig
-Date:   Fri, 19 Aug 2022 15:56:03 +0900
-Message-Id: <20220819065604.295572-4-masahiroy@kernel.org>
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/3] kbuild: change the default shell to bash
+Date:   Fri, 19 Aug 2022 15:56:00 +0900
+Message-Id: <20220819065604.295572-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220819065604.295572-1-masahiroy@kernel.org>
-References: <20220819065604.295572-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-GNU Make uses /bin/sh by default for running recipe lines and $(shell ),
-and so does Kconfig for $(shell,...).
 
-We are sometimes hit by subtle portability issues like [1] because the
-code was only tested on systems where /bin/sh is a symlink to bash.
+This is related to the discussion about the portability [1].
 
-One way is to continue whack-a-mole game as somebody will eventually
-notice that the code is not working on their build environments.
+I wrote this code some time ago for some reason. My motivation at that
+time was trap handling.
 
-Another is a big hammer approach; force bash in the build system so that
-it works in the same way for everyone. In fact, there exists such a
-guideline that permits only Bash as the shell scripting language. [2]
-The kbuild test robot also specifies SHELL=/bin/bash to eliminate the
-shell portability issue.
+We use the EXIT trap in several places. The POSIX [2] mentions the 'EXIT'
+as the trap condition, but nothing about the actual conditions that trigger
+the EXIT trap. Bash invokes the EXIT trap when it exits after receiving
+an unhandled signal, while dash does not.
 
-This commit changes the shell for Make and Kconfig to bash. As the GNU
-Make manual [3] says, the 'SHELL' is never set from the environment.
-You cannot do 'export SHELL:=/bin/bash' to propagate it to sub-makes.
-Instead, use MAKEOVERRIDES to make SHELL:=/bin/bash globally effective.
+I did not submit the patches because I lost the use-case of the EXIT trap
+except cleaning temporary files. It is harmless to have temp files left over.
 
-[1]: https://lore.kernel.org/all/20220804190320.262510-1-alexandre.belloni@bootlin.com/
-[2]: https://google.github.io/styleguide/shellguide.html
-[3]: https://www.gnu.org/software/make/manual/html_node/Choosing-the-Shell.html
+Recently, I saw a bug report regarding the portability of 'echo'
+('echo' is a shell's built-in command. The behavior is different between
+bash and dash).
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+I am sharing this patch set as RFC in case somebody might have interest or comment.
+I am still wondering if this might be a big hammer, though.
 
- Makefile                | 7 +++++++
- scripts/Kconfig.include | 3 +++
- 2 files changed, 10 insertions(+)
+[1]: https://lore.kernel.org/all/e902a360e3759c7f87d98d71d79a0d5cbe935e3e.camel@linuxfoundation.org/
+[2]: https://pubs.opengroup.org/onlinepubs/009604599/utilities/trap.html
 
-diff --git a/Makefile b/Makefile
-index f09673b6c11d..cc01987560b3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -36,6 +36,13 @@ __all:
- 
- ifneq ($(sub_make_done),1)
- 
-+# Use /bin/bash for repices and $(shell ) invocations.
-+SHELL := /bin/bash
-+
-+# Unlike the other variables, the 'SHELL' is never set from the environment.
-+# Use MAKEOVERRIDES to pass 'SHELL' down to sub-makes.
-+MAKEOVERRIDES += SHELL=$(SHELL)
-+
- # Do not use make's built-in rules and variables
- # (this increases performance and avoids hard-to-debug behaviour)
- MAKEFLAGS += -rR
-diff --git a/scripts/Kconfig.include b/scripts/Kconfig.include
-index a0ccceb22cf8..d37b864ba1f2 100644
---- a/scripts/Kconfig.include
-+++ b/scripts/Kconfig.include
-@@ -1,6 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0-only
- # Kconfig helper macros
- 
-+# Use /bin/bash to evaluate $(shell,) functions
-+SHELL := /bin/bash
-+
- # Convenient variables
- comma       := ,
- quote       := "
+
+
+Masahiro Yamada (3):
+  kconfig: move declarations for prepossessing to internal.h
+  kconfig: allow to choose the shell for $(shell ) functions
+  kbuild: use bash as the default shell for Make and Kconfig
+
+ .../kbuild/kconfig-macro-language.rst         |  4 ++
+ Makefile                                      |  7 ++
+ scripts/Kconfig.include                       |  3 +
+ scripts/kconfig/confdata.c                    |  1 +
+ scripts/kconfig/internal.h                    | 18 +++++
+ scripts/kconfig/lexer.l                       |  1 +
+ scripts/kconfig/lkc_proto.h                   | 13 ----
+ scripts/kconfig/parser.y                      |  1 +
+ scripts/kconfig/preprocess.c                  | 66 +++++++++++++++----
+ 9 files changed, 87 insertions(+), 27 deletions(-)
+
 -- 
 2.34.1
 
