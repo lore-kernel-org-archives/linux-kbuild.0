@@ -2,126 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 385F5C28D13
-	for <linux-kbuild@archiver.kernel.org>; Fri, 19 Aug 2022 23:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1443AC25B08
+	for <linux-kbuild@archiver.kernel.org>; Sat, 20 Aug 2022 09:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241923AbiHSXdT (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 19 Aug 2022 19:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39708 "EHLO
+        id S244085AbiHTJQO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 20 Aug 2022 05:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240543AbiHSXdS (ORCPT
+        with ESMTP id S231132AbiHTJQN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2022 19:33:18 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8B42190
-        for <linux-kbuild@vger.kernel.org>; Fri, 19 Aug 2022 16:33:14 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id q7so4279825lfu.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 19 Aug 2022 16:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=Y7BwhUziN7Shv1IDBl73QA6DiHDSzdgJ+ZuTLbMJXkA=;
-        b=Ns54S2g0WBfzfkVQ7/nUOVRNeJaY6npkvHh5zPjpWOZ2JmKtTcTlturtO5zz/h6fyr
-         e354YBuRd+kKsyTy14dJMoQYiD7ll25eIDfcdKLDeq82K7bGN+x/BXRWG4FsL0yhHHkj
-         r+WE5mJQpLd9OcYg5Em0yjmJffK7BiDgDa5hiTS+XWT2Qso4P44deem8MyK77H7dTM4c
-         r0mb92hdAoDu2oX0yWLCx5/ad3Gg9yHQ2rL0wm24k0guhLoRORzYID1pD3RAZ3hU6mDT
-         ycg3m2U0UaA1iJN1rSSwPbjiarcDqYbxCY8/OjcHd2dqsUJSi/6oyQTwuEbg4NXcBzl3
-         LCIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=Y7BwhUziN7Shv1IDBl73QA6DiHDSzdgJ+ZuTLbMJXkA=;
-        b=cL17Od53/KGAT036DWf3UHxSKIdGUbvl6d4QjxAAOIuoBfAD8y55C0r+iRR8xaFhB0
-         ThvcmMRh3MZGKc9/uMilFoXG3OdokrH70hdaRDg7wfClRSz49+77r/MXBvm5DzqCTu9j
-         Bhkqsy3/ZjrG4RXO0nLExvY5fEfJge4rOJTBLE9g1jw9nx5GwvvWMKkdceeeoqrUzytN
-         lwHqBnBQ4fbRPw3legfy5hVTpDwkNa3WbLT3u5Vv/oQ9W0DoF4LlnY+cAHuWRzcuwfSj
-         /Om/m1tB6RX25aQuej8EvjdZKaerU/DFktuFeHhS80y1ixtYUpJMnxlSV0oQlCdPmryg
-         JPuA==
-X-Gm-Message-State: ACgBeo0SwcXILkW1LgXGm2rRur2Y1bbYi6g9CwcE9Qk/Y/vyRHK63LLb
-        aWPzdLN3II3jHbCd52TwGRLSPgUGrEsZOa8i3hLRxYR8UfE8tA==
-X-Google-Smtp-Source: AA6agR6S8k2SWNo73q0AqnEABg/vA4UxgEFYZMPy3fg9+zE7sPqCQNmlirz1q5SseKIFDBSMz2y0P8IyMhiFebJK3UM=
-X-Received: by 2002:ac2:4f03:0:b0:48a:6061:bd8e with SMTP id
- k3-20020ac24f03000000b0048a6061bd8emr3463711lfr.647.1660951992444; Fri, 19
- Aug 2022 16:33:12 -0700 (PDT)
+        Sat, 20 Aug 2022 05:16:13 -0400
+Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9EDB4424;
+        Sat, 20 Aug 2022 02:16:10 -0700 (PDT)
+Received: from grover.sesame (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
+        by conuserg-09.nifty.com with ESMTP id 27K9FiMV016772;
+        Sat, 20 Aug 2022 18:15:46 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 27K9FiMV016772
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1660986947;
+        bh=ZaA95r2hIvnjr0IyYniszHW9QBF5d9eg0OdtCM353VU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=hwNzU0dZ+MDYxxD+j5qH42HEQBdHXs4vAokfVD/bFAS8n0YzRBhQgh15qZDT4aXXR
+         b4l3SimfMqUwoHSrQucKvqamk7A1PnB9Bllc3i2z27Msa4RySWnXPIQJKtzugv8OjY
+         8OyglTVbtwmmafyDRZ637Wz0oxd7mtuJVWdJ6DrXcnLaACGQq01MVKHgINC6TmKMc2
+         DdKtvKXKENxALGCjF/p/HDI9BBeOR5TWsaD050XJqkZvhIGVpOml5jCf0UJqwgSeEu
+         pNQ6d+dfKPXq2h8Doz7otwyvF3KhYihhtwm41CDGdslEN8MYpEUU/xBmYWnT9kCZNN
+         S6iM+2ARAvUFg==
+X-Nifty-SrcIP: [133.32.182.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>, linux-kernel@vger.kernel.org
+Subject: [PATCH 4/4] nios2: move core-y in arch/nios2/Makefile to arch/nios2/Kbuild
+Date:   Sat, 20 Aug 2022 18:15:31 +0900
+Message-Id: <20220820091531.682096-4-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220820091531.682096-1-masahiroy@kernel.org>
+References: <20220820091531.682096-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <CGME20220716081736epcas2p346100e67cf44b1dbb79f6e2a4ab07dbf@epcas2p3.samsung.com>
- <20220716084532.2324050-1-youngmin.nam@samsung.com> <CAK7LNAR3YGoQU6ZTZmC84C1OoH0rPinjoyPDXCD0BDPoRS4NDA@mail.gmail.com>
-In-Reply-To: <CAK7LNAR3YGoQU6ZTZmC84C1OoH0rPinjoyPDXCD0BDPoRS4NDA@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Fri, 19 Aug 2022 16:33:00 -0700
-Message-ID: <CAKwvOd=FBDqutQ-6De577GDje=YR32GxDbkgcGeP9J=2Lb3CqQ@mail.gmail.com>
-Subject: Re: [PATCH] Makefile.extrawarn: add -Wformat-insufficient-args for
- clang build
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Youngmin Nam <youngmin.nam@samsung.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        hosung0.kim@samsung.com, d7271.choe@samsung.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 9:22 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> On Sat, Jul 16, 2022 at 5:17 PM Youngmin Nam <youngmin.nam@samsung.com> wrote:
-> >
-> > The -Wformat-insufficient-args for clang is useful to detect the situation
-> > when the total number is unmatched between format specifiers and arguments.
-> >
-> > Originally, this option is enabled by default(Link[1]), but it is disabled by
-> > -Wno-format explicitly so that we can't detect this unmatched situation.
-> >
-> > We can enable it by adding this option after -Wno-format.
-> >
-> > Link[1]: https://releases.llvm.org/13.0.0/tools/clang/docs/DiagnosticsReference.html#wformat-insufficient-args
-> > Signed-off-by: Youngmin Nam <youngmin.nam@samsung.com>
-> > ---
->
->
-> Please let me hold on this patch because
-> I'd rather go straight to the removal of  -Wno-format.
->
-> https://lore.kernel.org/linux-kbuild/CAFhGd8pk+0XEz0tMiJcwMM7B3NYF=yF4cHW8A-6-81SgpKFPNw@mail.gmail.com/T/#m4becf6ed91f25217b59a840ed1829f36e49fe347
+Use obj-y to clean up Makefile.
 
-Let's see what the feedback on
-https://reviews.llvm.org/D132266 is. If it lands, I will send a series
-with this patch first, then wrap it in the else clause of a
-conditional like: if clang version >= 16 then enable -Wformat else
-enable -Wformat-insufficient-args.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
->
->
->
-> >  scripts/Makefile.extrawarn | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> > index f5f0d6f09053..c23d7c286bad 100644
-> > --- a/scripts/Makefile.extrawarn
-> > +++ b/scripts/Makefile.extrawarn
-> > @@ -48,6 +48,7 @@ else
-> >  ifdef CONFIG_CC_IS_CLANG
-> >  KBUILD_CFLAGS += -Wno-initializer-overrides
-> >  KBUILD_CFLAGS += -Wno-format
-> > +KBUILD_CFLAGS += -Wformat-insufficient-args
-> >  KBUILD_CFLAGS += -Wno-sign-compare
-> >  KBUILD_CFLAGS += -Wno-format-zero-length
-> >  KBUILD_CFLAGS += $(call cc-disable-warning, pointer-to-enum-cast)
-> > --
-> > 2.34.0
-> >
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+ arch/nios2/Kbuild   | 2 ++
+ arch/nios2/Makefile | 4 ----
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-
-
+diff --git a/arch/nios2/Kbuild b/arch/nios2/Kbuild
+index 4e39f7abdeb6..fc2952edd2de 100644
+--- a/arch/nios2/Kbuild
++++ b/arch/nios2/Kbuild
+@@ -1,4 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
++obj-y += kernel/ mm/ platform/ boot/dts/
++
+ # for cleaning
+ subdir- += boot
+diff --git a/arch/nios2/Makefile b/arch/nios2/Makefile
+index d6a7499b814c..3f34e6831863 100644
+--- a/arch/nios2/Makefile
++++ b/arch/nios2/Makefile
+@@ -39,8 +39,6 @@ KBUILD_CFLAGS += -G 0
+ 
+ head-y		:= arch/nios2/kernel/head.o
+ libs-y		+= arch/nios2/lib/ $(LIBGCC)
+-core-y		+= arch/nios2/kernel/ arch/nios2/mm/
+-core-y		+= arch/nios2/platform/
+ 
+ INSTALL_PATH ?= /tftpboot
+ nios2-boot := arch/$(ARCH)/boot
+@@ -48,8 +46,6 @@ BOOT_TARGETS = vmImage zImage
+ PHONY += $(BOOT_TARGETS) install
+ KBUILD_IMAGE := $(nios2-boot)/vmImage
+ 
+-core-y	+= $(nios2-boot)/dts/
+-
+ all: vmImage
+ 
+ $(BOOT_TARGETS): vmlinux
 -- 
-Thanks,
-~Nick Desaulniers
+2.34.1
+
