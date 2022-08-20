@@ -2,33 +2,34 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7892AC25B08
-	for <linux-kbuild@archiver.kernel.org>; Sat, 20 Aug 2022 09:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B35C25B08
+	for <linux-kbuild@archiver.kernel.org>; Sat, 20 Aug 2022 09:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245125AbiHTJQs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 20 Aug 2022 05:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35894 "EHLO
+        id S1343731AbiHTJQv (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 20 Aug 2022 05:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231132AbiHTJQr (ORCPT
+        with ESMTP id S245610AbiHTJQt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Aug 2022 05:16:47 -0400
+        Sat, 20 Aug 2022 05:16:49 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CFAB4430;
-        Sat, 20 Aug 2022 02:16:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF25B4430;
+        Sat, 20 Aug 2022 02:16:48 -0700 (PDT)
 Received: from grover.sesame (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 27K9FiMS016772;
-        Sat, 20 Aug 2022 18:15:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 27K9FiMS016772
+        by conuserg-09.nifty.com with ESMTP id 27K9FiMU016772;
+        Sat, 20 Aug 2022 18:15:46 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 27K9FiMU016772
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1660986945;
-        bh=MDlM2ezt7enZ+5N0kMoHRQz+q0tdiPxN4ldECtwKlWs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=rruKtIhpW+mjCAIi5rPbs53ivNGHP9ehWm/Agyg928NYsdSwce5WjYsMLqay2g6KT
-         m2SsKzSS5bvGdI5PhvAVofeduLwQC2wckFIRnjdR6JSDy3nzX47AGdS2zX+C/dPFnf
-         anknFsMmH8M8gwXQsG7Rcuz3X+LYX6fcZBLqNfJyUGe4aIf5T3YKYFsiDp+n0fuE8a
-         5b6qqqf5zBZdk8pJsSaf4P/BgWHC/VoBtppcFQI+Xgrc9DKulTI5Pn1hLBlkBtbxmL
-         3Ti9qtL0pOa3wBSx1C5gOw+8gL6/CMFAcgkLO0xGZMIoxqti3QY+r5jydnKH2nnajF
-         1YIKdKd4YUkGg==
+        s=dec2015msa; t=1660986946;
+        bh=bY6+EI9V1BMBb57Vn4oX7gK4xNrUCHyq24HIGSTCGek=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=CfKRT02jM1vvZF0H7fL3OK90qa8+tmBKGbEnIwt9g5XoJt4zxoW87gXNAKrQaTRY+
+         wzCV3LZhV++TyfOtu8ibR/Y7bPbIc4Ly0AMBGGO5SEgpax6oYXI/a5/EyMNU+QSG+H
+         Nq52xJMbyyLeEv8XA55BfIDVVqJcOlKwm29qsUbbjWmMi2mx/dxc5dzL/uljXbVHSg
+         Uil4qRGNpceXcirabcCSnwwTMrdqfYYru8Wm8mywpYt3dXG0kwLWeZkdwEyxsUliVy
+         VQhREVF+ZtCaAXGg6qdDEPqcieggiKAYlvyIaedvmq5Va7G5EdcEI1Waqu2M5fzmDo
+         UkAXadP1HHTlA==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,115 +37,82 @@ Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] kbuild: add phony targets to ./Kbuild
-Date:   Sat, 20 Aug 2022 18:15:28 +0900
-Message-Id: <20220820091531.682096-1-masahiroy@kernel.org>
+Subject: [PATCH 3/4] kbuild: do not deduplicate modules.order
+Date:   Sat, 20 Aug 2022 18:15:30 +0900
+Message-Id: <20220820091531.682096-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220820091531.682096-1-masahiroy@kernel.org>
+References: <20220820091531.682096-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-missing-syscalls and old-atomics are meant to be phony targets.
-Adding them to always-y is odd. (always-y should generate something).
+The AWK code was added to deduplicate modules.order in case $(obj-m)
+contains the same module multiple times, but it is actually unneeded
+since commit b2c885549122 ("kbuild: update modules.order only when
+contained modules are updated").
 
-Add a new phony target 'prepare', which depends on all the other.
+The list is already deduplicated before being processed by AWK because
+$^ is the deduplicated list of prerequisites.
+(Please note the real-prereqs macro uses $^)
+
+Yet, modules.order will contain duplication if two different Makefiles
+build the same module:
+
+  foo/Makefile:
+
+      obj-m += bar/baz.o
+
+  foo/bar/Makefile:
+
+      obj-m += baz.o
+
+However, the parallel builds cannot properly handle this case in the
+first place. So, it is better to let it fail (as already done by
+scripts/modules-check.sh).
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Kbuild   | 26 +++++++++++++-------------
- Makefile |  2 +-
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ Makefile               | 5 +----
+ scripts/Makefile.build | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/Kbuild b/Kbuild
-index fa441b98c9f6..e122d93cee32 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -2,18 +2,18 @@
- #
- # Kbuild for top-level directory of the kernel
- 
--#####
-+# Prepare global headers and check sanity before descending into sub-directories
-+# ---------------------------------------------------------------------------
-+
- # Generate bounds.h
- 
- bounds-file := include/generated/bounds.h
- 
--always-y := $(bounds-file)
- targets := kernel/bounds.s
- 
- $(bounds-file): kernel/bounds.s FORCE
- 	$(call filechk,offsets,__LINUX_BOUNDS_H__)
- 
--#####
- # Generate timeconst.h
- 
- timeconst-file := include/generated/timeconst.h
-@@ -23,12 +23,10 @@ filechk_gentimeconst = echo $(CONFIG_HZ) | bc -q $<
- $(timeconst-file): kernel/time/timeconst.bc FORCE
- 	$(call filechk,gentimeconst)
- 
--#####
- # Generate asm-offsets.h
- 
- offsets-file := include/generated/asm-offsets.h
- 
--always-y += $(offsets-file)
- targets += arch/$(SRCARCH)/kernel/asm-offsets.s
- 
- arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
-@@ -36,24 +34,26 @@ arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
- $(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
- 	$(call filechk,offsets,__ASM_OFFSETS_H__)
- 
--#####
- # Check for missing system calls
- 
--always-y += missing-syscalls
--
- quiet_cmd_syscalls = CALL    $<
-       cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags) $(missing_syscalls_flags)
- 
--missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
-+PHONY += missing-syscalls
-+missing-syscalls: scripts/checksyscalls.sh $(offsets-file)
- 	$(call cmd,syscalls)
- 
--#####
- # Check atomic headers are up-to-date
- 
--always-y += old-atomics
--
- quiet_cmd_atomics = CALL    $<
-       cmd_atomics = $(CONFIG_SHELL) $<
- 
--old-atomics: scripts/atomic/check-atomics.sh FORCE
-+PHONY += old-atomics
-+old-atomics: scripts/atomic/check-atomics.sh
- 	$(call cmd,atomics)
-+
-+# A phony target that depends on all the preparation targets
-+
-+PHONY += prepare
-+prepare: $(offsets-file) missing-syscalls old-atomics
-+	@:
 diff --git a/Makefile b/Makefile
-index 697ab397fe31..4fcced0d3907 100644
+index d8ca0738b9e1..8add796953ad 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1202,7 +1202,7 @@ archprepare: outputmakefile archheaders archscripts scripts include/config/kerne
+@@ -1435,14 +1435,11 @@ endif
  
- prepare0: archprepare
- 	$(Q)$(MAKE) $(build)=scripts/mod
--	$(Q)$(MAKE) $(build)=.
-+	$(Q)$(MAKE) $(build)=. prepare
+ # Build modules
+ #
+-# A module can be listed more than once in obj-m resulting in
+-# duplicate lines in modules.order files.  Those are removed
+-# using awk while concatenating to the final file.
  
- # All the preparing..
- prepare: prepare0
+ PHONY += modules
+ modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_check modules_prepare
+ 
+-cmd_modules_order = $(AWK) '!x[$$0]++' $(real-prereqs) > $@
++cmd_modules_order = cat $(real-prereqs) > $@
+ 
+ modules.order: $(subdir-modorder) FORCE
+ 	$(call if_changed,modules_order)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 784f46d41959..0df488d0bbb0 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -374,7 +374,7 @@ $(obj)/built-in.a: $(real-obj-y) FORCE
+ 
+ cmd_modules_order = { $(foreach m, $(real-prereqs), \
+ 	$(if $(filter %/modules.order, $m), cat $m, echo $(patsubst %.o,%.ko,$m));) :; } \
+-	| $(AWK) '!x[$$0]++' - > $@
++	> $@
+ 
+ $(obj)/modules.order: $(obj-m) FORCE
+ 	$(call if_changed,modules_order)
 -- 
 2.34.1
 
