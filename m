@@ -2,92 +2,149 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1443AC25B08
-	for <linux-kbuild@archiver.kernel.org>; Sat, 20 Aug 2022 09:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7892AC25B08
+	for <linux-kbuild@archiver.kernel.org>; Sat, 20 Aug 2022 09:16:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244085AbiHTJQO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 20 Aug 2022 05:16:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35708 "EHLO
+        id S245125AbiHTJQs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 20 Aug 2022 05:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231132AbiHTJQN (ORCPT
+        with ESMTP id S231132AbiHTJQr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 Aug 2022 05:16:13 -0400
+        Sat, 20 Aug 2022 05:16:47 -0400
 Received: from conuserg-09.nifty.com (conuserg-09.nifty.com [210.131.2.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9EDB4424;
-        Sat, 20 Aug 2022 02:16:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CFAB4430;
+        Sat, 20 Aug 2022 02:16:46 -0700 (PDT)
 Received: from grover.sesame (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 27K9FiMV016772;
-        Sat, 20 Aug 2022 18:15:46 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 27K9FiMV016772
+        by conuserg-09.nifty.com with ESMTP id 27K9FiMS016772;
+        Sat, 20 Aug 2022 18:15:44 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 27K9FiMS016772
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1660986947;
-        bh=ZaA95r2hIvnjr0IyYniszHW9QBF5d9eg0OdtCM353VU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hwNzU0dZ+MDYxxD+j5qH42HEQBdHXs4vAokfVD/bFAS8n0YzRBhQgh15qZDT4aXXR
-         b4l3SimfMqUwoHSrQucKvqamk7A1PnB9Bllc3i2z27Msa4RySWnXPIQJKtzugv8OjY
-         8OyglTVbtwmmafyDRZ637Wz0oxd7mtuJVWdJ6DrXcnLaACGQq01MVKHgINC6TmKMc2
-         DdKtvKXKENxALGCjF/p/HDI9BBeOR5TWsaD050XJqkZvhIGVpOml5jCf0UJqwgSeEu
-         pNQ6d+dfKPXq2h8Doz7otwyvF3KhYihhtwm41CDGdslEN8MYpEUU/xBmYWnT9kCZNN
-         S6iM+2ARAvUFg==
+        s=dec2015msa; t=1660986945;
+        bh=MDlM2ezt7enZ+5N0kMoHRQz+q0tdiPxN4ldECtwKlWs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=rruKtIhpW+mjCAIi5rPbs53ivNGHP9ehWm/Agyg928NYsdSwce5WjYsMLqay2g6KT
+         m2SsKzSS5bvGdI5PhvAVofeduLwQC2wckFIRnjdR6JSDy3nzX47AGdS2zX+C/dPFnf
+         anknFsMmH8M8gwXQsG7Rcuz3X+LYX6fcZBLqNfJyUGe4aIf5T3YKYFsiDp+n0fuE8a
+         5b6qqqf5zBZdk8pJsSaf4P/BgWHC/VoBtppcFQI+Xgrc9DKulTI5Pn1hLBlkBtbxmL
+         3Ti9qtL0pOa3wBSx1C5gOw+8gL6/CMFAcgkLO0xGZMIoxqti3QY+r5jydnKH2nnajF
+         1YIKdKd4YUkGg==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] nios2: move core-y in arch/nios2/Makefile to arch/nios2/Kbuild
-Date:   Sat, 20 Aug 2022 18:15:31 +0900
-Message-Id: <20220820091531.682096-4-masahiroy@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] kbuild: add phony targets to ./Kbuild
+Date:   Sat, 20 Aug 2022 18:15:28 +0900
+Message-Id: <20220820091531.682096-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220820091531.682096-1-masahiroy@kernel.org>
-References: <20220820091531.682096-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Use obj-y to clean up Makefile.
+missing-syscalls and old-atomics are meant to be phony targets.
+Adding them to always-y is odd. (always-y should generate something).
+
+Add a new phony target 'prepare', which depends on all the other.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- arch/nios2/Kbuild   | 2 ++
- arch/nios2/Makefile | 4 ----
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ Kbuild   | 26 +++++++++++++-------------
+ Makefile |  2 +-
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/arch/nios2/Kbuild b/arch/nios2/Kbuild
-index 4e39f7abdeb6..fc2952edd2de 100644
---- a/arch/nios2/Kbuild
-+++ b/arch/nios2/Kbuild
-@@ -1,4 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
+diff --git a/Kbuild b/Kbuild
+index fa441b98c9f6..e122d93cee32 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -2,18 +2,18 @@
+ #
+ # Kbuild for top-level directory of the kernel
  
-+obj-y += kernel/ mm/ platform/ boot/dts/
+-#####
++# Prepare global headers and check sanity before descending into sub-directories
++# ---------------------------------------------------------------------------
 +
- # for cleaning
- subdir- += boot
-diff --git a/arch/nios2/Makefile b/arch/nios2/Makefile
-index d6a7499b814c..3f34e6831863 100644
---- a/arch/nios2/Makefile
-+++ b/arch/nios2/Makefile
-@@ -39,8 +39,6 @@ KBUILD_CFLAGS += -G 0
+ # Generate bounds.h
  
- head-y		:= arch/nios2/kernel/head.o
- libs-y		+= arch/nios2/lib/ $(LIBGCC)
--core-y		+= arch/nios2/kernel/ arch/nios2/mm/
--core-y		+= arch/nios2/platform/
+ bounds-file := include/generated/bounds.h
  
- INSTALL_PATH ?= /tftpboot
- nios2-boot := arch/$(ARCH)/boot
-@@ -48,8 +46,6 @@ BOOT_TARGETS = vmImage zImage
- PHONY += $(BOOT_TARGETS) install
- KBUILD_IMAGE := $(nios2-boot)/vmImage
+-always-y := $(bounds-file)
+ targets := kernel/bounds.s
  
--core-y	+= $(nios2-boot)/dts/
+ $(bounds-file): kernel/bounds.s FORCE
+ 	$(call filechk,offsets,__LINUX_BOUNDS_H__)
+ 
+-#####
+ # Generate timeconst.h
+ 
+ timeconst-file := include/generated/timeconst.h
+@@ -23,12 +23,10 @@ filechk_gentimeconst = echo $(CONFIG_HZ) | bc -q $<
+ $(timeconst-file): kernel/time/timeconst.bc FORCE
+ 	$(call filechk,gentimeconst)
+ 
+-#####
+ # Generate asm-offsets.h
+ 
+ offsets-file := include/generated/asm-offsets.h
+ 
+-always-y += $(offsets-file)
+ targets += arch/$(SRCARCH)/kernel/asm-offsets.s
+ 
+ arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
+@@ -36,24 +34,26 @@ arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
+ $(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
+ 	$(call filechk,offsets,__ASM_OFFSETS_H__)
+ 
+-#####
+ # Check for missing system calls
+ 
+-always-y += missing-syscalls
 -
- all: vmImage
+ quiet_cmd_syscalls = CALL    $<
+       cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags) $(missing_syscalls_flags)
  
- $(BOOT_TARGETS): vmlinux
+-missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
++PHONY += missing-syscalls
++missing-syscalls: scripts/checksyscalls.sh $(offsets-file)
+ 	$(call cmd,syscalls)
+ 
+-#####
+ # Check atomic headers are up-to-date
+ 
+-always-y += old-atomics
+-
+ quiet_cmd_atomics = CALL    $<
+       cmd_atomics = $(CONFIG_SHELL) $<
+ 
+-old-atomics: scripts/atomic/check-atomics.sh FORCE
++PHONY += old-atomics
++old-atomics: scripts/atomic/check-atomics.sh
+ 	$(call cmd,atomics)
++
++# A phony target that depends on all the preparation targets
++
++PHONY += prepare
++prepare: $(offsets-file) missing-syscalls old-atomics
++	@:
+diff --git a/Makefile b/Makefile
+index 697ab397fe31..4fcced0d3907 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1202,7 +1202,7 @@ archprepare: outputmakefile archheaders archscripts scripts include/config/kerne
+ 
+ prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=scripts/mod
+-	$(Q)$(MAKE) $(build)=.
++	$(Q)$(MAKE) $(build)=. prepare
+ 
+ # All the preparing..
+ prepare: prepare0
 -- 
 2.34.1
 
