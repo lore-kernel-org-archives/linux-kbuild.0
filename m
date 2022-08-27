@@ -2,90 +2,166 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E85F0ECAAD4
-	for <linux-kbuild@archiver.kernel.org>; Mon, 29 Aug 2022 20:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69368ECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Sat, 27 Aug 2022 16:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbiH2UxL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 29 Aug 2022 16:53:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
+        id S233308AbiH0Qzk (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 12:55:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiH2UxK (ORCPT
+        with ESMTP id S230024AbiH0Qzj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 Aug 2022 16:53:10 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C965A7C1FE;
-        Mon, 29 Aug 2022 13:53:08 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:281:8300:73:8b7:7001:c8aa:b65f])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 3C39A6E2;
-        Mon, 29 Aug 2022 20:53:08 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 3C39A6E2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1661806388; bh=FT/boG8NCbfvG3WRa48iItFzgVTCXb0NFZB0UWFeiGg=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=NHC6PkdKcWYSjp44yMzBVq2SxcEc0rM/XOlGel418c+Ab1943ifZ73MffX00kOuKh
-         Xa7NC8qA0v5Rev9CJXWbqtFfKqs6Gn6KdYvh0pnRBF49bb1ScarG5DUi3lP9OgwwTb
-         2umld9zq/1HK9X7Mq5TjVVuDoGLH5CxQ37529ugQJVYLekoxwStQAgw/kT0MIu80yL
-         senCNTHzHIdMRtdGeLWdMqJ77q4+GuhhO7fwwr/ijN+r92oDQAeY9aQUOJ9AXzzwXF
-         xSqyhjWIjCR9na+KhfLwNSSngyshiQXIzEdCutqqhYEsPW9IkyWfKEAm1mJkh3d8Bb
-         sWOJepDQdPRkQ==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Kees Cook <keescook@chromium.org>, Robert Elliott <elliott@hpe.com>
-Cc:     mpe@ellerman.id.au, nanya@linux.vnet.ibm.com, asahiroy@kernel.org,
-        michal.lkml@markovi.net, ndesaulniers@google.com,
-        linux-hardening@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs/core-api: expand Fedora instructions for GCC plugins
-In-Reply-To: <202208291225.A0D3FAFC@keescook>
-References: <20220827193836.2582079-1-elliott@hpe.com>
- <202208291225.A0D3FAFC@keescook>
-Date:   Mon, 29 Aug 2022 14:53:07 -0600
-Message-ID: <87fsheojpo.fsf@meer.lwn.net>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Sat, 27 Aug 2022 12:55:39 -0400
+Received: from mail.owenrafferty.com (owenrafferty.com [45.76.27.4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEBF580A4
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Aug 2022 09:55:36 -0700 (PDT)
+Received: from localhost (unknown [184.55.81.148])
+        by mail.owenrafferty.com (Postfix) with ESMTPSA id 7CB798044D;
+        Sat, 27 Aug 2022 16:55:33 +0000 (UTC)
+Authentication-Results: mail.owenrafferty.com; dkim=permerror (bad message/signature format)
+Message-ID: <e1bec102a17d0013a8e09e4b485a5ee3.owen@owenrafferty.com>
+From:   <owen@owenrafferty.com>
+To:     unlisted-recipients:; (no To-header on input)
+Date:   Sat, 27 Aug 2022 12:55:39 -0400
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
+From 0e70974912f6b2cd95a18192418a438f9c57f690 Mon Sep 17 00:00:00 2001
+In-Reply-To: <CAK7LNAR+Lp2g1kzGNALoge7_51_PKcOd37ebZTV=X-QJEwCn5w@mail.gmail.com>
+References: <CAK7LNAR+Lp2g1kzGNALoge7_51_PKcOd37ebZTV=X-QJEwCn5w@mail.gmail.com>
+From: Owen Rafferty <owen@owenrafferty.com>
+Date: Sat, 27 Aug 2022 11:52:18 -0500
+Subject: [PATCH v3] kbuild: rewrite check-local-export in sh/awk
+To: masahiro@kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-> On Sat, Aug 27, 2022 at 02:38:36PM -0500, Robert Elliott wrote:
->> In Fedora 36, cross-compiling an allmodconfig configuration
->> for other architectures on x86 fails with this problem:
->> 
->> In file included from ../scripts/gcc-plugins/gcc-common.h:95,
->>                  from ../scripts/gcc-plugins/latent_entropy_plugin.c:78:
->> /usr/lib/gcc/aarch64-linux-gnu/12/plugin/include/builtins.h:23:10: fatal
->> error: mpc.h: No such file or directory
->>    23 | #include <mpc.h>
->>       |          ^~~~~~~
->> compilation terminated.
->> 
->> In that distro, that header file is available in the separate
->> libmpc-devel package.
->> 
->> Although future versions of Fedora might correctly mark
->> that dependency, mention this additional package.
->> 
->> To help detect such problems ahead of time, describe the
->>     gcc -print-file-name=plugin
->> command that is used by scripts/gcc-plugins/Kconfig to detect
->> plugins [1].
->> 
->> [1] https://lore.kernel.org/lkml/CAHk-=wjjiYjCp61gdAMpDOsUBU-A2hFFKJoVx5VAC7yV4K6WYg@xxxxxxxxxxxxxx/
->> 
->> Fixes: 43e96ef8b70c50f ("docs/core-api: Add Fedora instructions for GCC plugins");
->> Signed-off-by: Robert Elliott <elliott@hpe.com>
->
-> Thanks!
->
-> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> Jon, do you want to take this since it's entirely in the .rst file?
+---
+ scripts/check-local-export | 96 +++++++++++++++++++-------------------
+ 1 file changed, 47 insertions(+), 49 deletions(-)
 
-Yes, I'll do that.
+diff --git a/scripts/check-local-export b/scripts/check-local-export
+index 6ccc2f467416..0c049ff44aca 100755
+--- a/scripts/check-local-export
++++ b/scripts/check-local-export
+@@ -1,26 +1,14 @@
+-#!/usr/bin/env bash
++#!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0-only
+ #
+ # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
++# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
+ #
+ # Exit with error if a local exported symbol is found.
+ # EXPORT_SYMBOL should be used for global symbols.
+ 
+ set -e
+ 
+-# catch errors from ${NM}
+-set -o pipefail
+-
+-# Run the last element of a pipeline in the current shell.
+-# Without this, the while-loop would be executed in a subshell, and
+-# the changes made to 'symbol_types' and 'export_symbols' would be lost.
+-shopt -s lastpipe
+-
+-declare -A symbol_types
+-declare -a export_symbols
+-
+-exit_code=0
+-
+ # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
+ # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
+ # '2>/dev/null'. However, it suppresses real error messages as well. Add a
+@@ -29,43 +17,53 @@ exit_code=0
+ # TODO:
+ # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
+ # binutils to 2.37, llvm to 13.0.0.
+-# Then, the following line will be really simple:
+-#   ${NM} --quiet ${1} |
++# Then, the following line will be simpler:
++#   { ${NM} --quiet ${1} || kill 0; } |
++
++{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill 0; } } |
++${AWK} -v "file=${1}" '
++BEGIN {
++	i = 0
++}
++
++# Skip the line if the number of fields is less than 3.
++#
++# case 1)
++#   For undefined symbols, the first field (value) is empty.
++#   The outout looks like this:
++#     "                 U _printk"
++#   It is unneeded to record undefined symbols.
++#
++# case 2)
++#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
++#     "---------------- t"
++!length($3) {
++	next
++}
+ 
+-{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
+-while read value type name
+-do
+-	# Skip the line if the number of fields is less than 3.
+-	#
+-	# case 1)
+-	#   For undefined symbols, the first field (value) is empty.
+-	#   The outout looks like this:
+-	#     "                 U _printk"
+-	#   It is unneeded to record undefined symbols.
+-	#
+-	# case 2)
+-	#   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
+-	#     "---------------- t"
+-	if [[ -z ${name} ]]; then
+-		continue
+-	fi
++# save (name, type) in the associative array
++{ symbol_types[$3]=$2 }
+ 
+-	# save (name, type) in the associative array
+-	symbol_types[${name}]=${type}
++# append the exported symbol to the array
++($3 ~ /^__ksymtab_/) {
++	export_symbols[i] = $3
++	sub(/^__ksymtab_/, "", export_symbols[i])
++	i++
++}
+ 
+-	# append the exported symbol to the array
+-	if [[ ${name} == __ksymtab_* ]]; then
+-		export_symbols+=(${name#__ksymtab_})
+-	fi
+-done
++END {
++	exit_code = 0
++	for (j = 0; j < i; ++j) {
++		name = export_symbols[j]
++		# nm(3) says "If lowercase, the symbol is usually local"
++		if (symbol_types[name] ~ /[a-z]/) {
++			printf "%s: error: local symbol %s was exported\n",
++				file, name | "cat 1>&2"
++			exit_code = 1
++		}
++	}
+ 
+-for name in "${export_symbols[@]}"
+-do
+-	# nm(3) says "If lowercase, the symbol is usually local"
+-	if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
+-		echo "$@: error: local symbol '${name}' was exported" >&2
+-		exit_code=1
+-	fi
+-done
++	exit exit_code
++}'
+ 
+-exit ${exit_code}
++exit $?
+-- 
+2.37.2
 
-Thanks,
-
-jon
