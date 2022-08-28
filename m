@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B524EECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B43C0502E
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231800AbiH1Cks (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
+        id S231819AbiH1Ckt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231658AbiH1Ckr (ORCPT
+        with ESMTP id S229773AbiH1Ckq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Aug 2022 22:40:47 -0400
+        Sat, 27 Aug 2022 22:40:46 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85347252B6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D40252B2;
         Sat, 27 Aug 2022 19:40:39 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gl030639;
-        Sun, 28 Aug 2022 11:40:08 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gl030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Go030639;
+        Sun, 28 Aug 2022 11:40:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Go030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654408;
-        bh=hTZUP847fbfef2g9ezPupjBY2vTehYAAacc76rjXEUI=;
+        s=dec2015msa; t=1661654410;
+        bh=Ojdr7OFV9j1YbpIO3D6oC+XaFmz7/7hOYyO9OvHgWLU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h319PIKxEJK4MmGGaPn1m3V4uTzXrMiFG9A/+f/7U31jg2yX7r3rrIQa1hTGfYU3I
-         MsO3VXgZTD6yN0xFYMOjmrnTbvzsFULe6KYawVrNpV+F0tuLjp0Rizk5kpncwtoz44
-         5uSDnYxHG4VvPE69hy8AQiriS+q7G+KKmeq8/8R9YPvQTT/P3SE+vM783waQ4WoUy1
-         sazHtjbEAQHd/thm/IC8rRfFXgz+Ztc2Ryy5Oac7/Xwuh4mUY3x00ll+6yVV68P+N2
-         eiEELw9wMEJWWdLhNbpyTbzajXd6ApryypiMmAvJgj1QqXBMumV7xQrIWfej4/na07
-         n+pmczSJdju8Q==
+        b=OtnOEL7NYfqPML6WGIODFpxvrHhE1Vb5thmq2pIjeo6n6TyyzterPeYzP8wcNWqjR
+         2AxpqlcLBSkWH4k3WVPmjjlpu83dto74nipV1UdPm4QNRqsKQj0oaOItt3pMTeC69K
+         a37QwTQgL72zcJvu1Jv7yfHAMDCXVqj2F+2izOIQS6TbzBniwlZB8DCXe6uKAAraoq
+         eUuVPYIqI7adLqgh6TCo68V2lWLf+9CLZpr16Mzina2VSZk4XTCzFLX553SUT/+vXK
+         oXHCIYssoBKDCqDK6WXi7K+qvYk2Uxp/PEJvNPAeodiln5aNZ7+/gQJAuE7VymDaAZ
+         vVRUuWOhNGwCA==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 03/15] kbuild: move 'PHONY += modules_prepare' to the common part
-Date:   Sun, 28 Aug 2022 11:39:51 +0900
-Message-Id: <20220828024003.28873-4-masahiroy@kernel.org>
+Subject: [PATCH 06/15] kbuild: generate include/generated/compile.h in top Makefile
+Date:   Sun, 28 Aug 2022 11:39:54 +0900
+Message-Id: <20220828024003.28873-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,43 +46,64 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Unify the code between in-tree builds and external module builds.
+Now that UTS_VERSION was separated out, this header can be generated
+much earlier, and probably the top Makefile is a better place to do it
+than init/Makefile.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ Makefile      | 8 +++++++-
+ init/Makefile | 8 +-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index badd318c5524..54e481162608 100644
+index 54e481162608..d933c0acab12 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1446,7 +1446,6 @@ modules.order: $(subdir-modorder) FORCE
- targets += modules.order
+@@ -1198,7 +1198,7 @@ PHONY += prepare archprepare
  
- # Target to prepare building external modules
--PHONY += modules_prepare
- modules_prepare: prepare
- 	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
+ archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
+ 	asm-generic $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
+-	include/generated/autoconf.h remove-stale-files
++	include/generated/compile.h include/generated/autoconf.h remove-stale-files
  
-@@ -1747,15 +1746,12 @@ help:
- 	@echo  '  clean           - remove generated files in module directory only'
- 	@echo  ''
+ prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=scripts/mod
+@@ -1260,6 +1260,12 @@ $(version_h): FORCE
+ include/generated/utsrelease.h: include/config/kernel.release FORCE
+ 	$(call filechk,utsrelease.h)
  
--# no-op for external module builds
--PHONY += modules_prepare
++filechk_compile.h = $(srctree)/scripts/mkcompile_h \
++	"$(UTS_MACHINE)" "$(CONFIG_CC_VERSION_TEXT)" "$(LD)"
++
++include/generated/compile.h: FORCE
++	$(call filechk,compile.h)
++
+ PHONY += headerdep
+ headerdep:
+ 	$(Q)find $(srctree)/include/ -name '*.h' | xargs --max-args 1 \
+diff --git a/init/Makefile b/init/Makefile
+index 63f53d210cad..31c17a8e314b 100644
+--- a/init/Makefile
++++ b/init/Makefile
+@@ -43,15 +43,9 @@ filechk_uts_version = \
+ $(obj)/utsversion-tmp.h: FORCE
+ 	$(call filechk,uts_version)
+ 
+-$(obj)/version.o: include/generated/compile.h $(obj)/utsversion-tmp.h
++$(obj)/version.o: $(obj)/utsversion-tmp.h
+ CFLAGS_version.o := -include $(obj)/utsversion-tmp.h
+ 
+-filechk_compile.h = $(srctree)/scripts/mkcompile_h \
+-	"$(UTS_MACHINE)" "$(CONFIG_CC_VERSION_TEXT)" "$(LD)"
 -
- endif # KBUILD_EXTMOD
- 
- # ---------------------------------------------------------------------------
- # Modules
- 
--PHONY += modules modules_install
-+PHONY += modules modules_install modules_prepare
- 
- ifdef CONFIG_MODULES
- 
+-include/generated/compile.h: FORCE
+-	$(call filechk,compile.h)
+-
+ #
+ # Build version-timestamp.c with final UTS_VERSION
+ #
 -- 
 2.34.1
 
