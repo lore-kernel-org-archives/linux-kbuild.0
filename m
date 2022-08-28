@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D617AECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B524EECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbiH1Ckc (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50546 "EHLO
+        id S231800AbiH1Cks (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiH1Ck0 (ORCPT
+        with ESMTP id S231658AbiH1Ckr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Aug 2022 22:40:26 -0400
+        Sat, 27 Aug 2022 22:40:47 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1F419C01;
-        Sat, 27 Aug 2022 19:40:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85347252B6;
+        Sat, 27 Aug 2022 19:40:39 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gj030639;
-        Sun, 28 Aug 2022 11:40:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gj030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gl030639;
+        Sun, 28 Aug 2022 11:40:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gl030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654407;
-        bh=GBayUjw41o8Ha0J4vO9A3wCOvGjxHrTwsRhpPXXTmuw=;
+        s=dec2015msa; t=1661654408;
+        bh=hTZUP847fbfef2g9ezPupjBY2vTehYAAacc76rjXEUI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ByT6NL1vCaRIYM1STLowZiUmlIgG7PkN+6+lGPAn8L/R2Cr7XzQruqQd2MVCCKMtU
-         vbFLivYm+qeSFa65gBldUTzt7dKj/u4XsGdq+1tgZ2fCLnQjg0fRaQ1llfvhrzt639
-         HPfW585oZ0YgeVqmpliddnnW+XQ5eOM8KHJW1ZUFtfYV/+23Iiam8BfcF4vduFDAPl
-         2LKRGxtoL3D2FW5vwFrMjgMp3SLhwcWfyIk0S53RMYEtCbY8cZn++Gz5twlzs47sey
-         xAXaBQDKHW1z5lgLtZiipdCn07Ec3SIdEHQXW/Jl8faI0ObNbvB6tluAUWr9+00LtZ
-         yPwMEFKL/00ow==
+        b=h319PIKxEJK4MmGGaPn1m3V4uTzXrMiFG9A/+f/7U31jg2yX7r3rrIQa1hTGfYU3I
+         MsO3VXgZTD6yN0xFYMOjmrnTbvzsFULe6KYawVrNpV+F0tuLjp0Rizk5kpncwtoz44
+         5uSDnYxHG4VvPE69hy8AQiriS+q7G+KKmeq8/8R9YPvQTT/P3SE+vM783waQ4WoUy1
+         sazHtjbEAQHd/thm/IC8rRfFXgz+Ztc2Ryy5Oac7/Xwuh4mUY3x00ll+6yVV68P+N2
+         eiEELw9wMEJWWdLhNbpyTbzajXd6ApryypiMmAvJgj1QqXBMumV7xQrIWfej4/na07
+         n+pmczSJdju8Q==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 01/15] kbuild: remove duplicated dependency between modules and modules_check
-Date:   Sun, 28 Aug 2022 11:39:49 +0900
-Message-Id: <20220828024003.28873-2-masahiroy@kernel.org>
+Subject: [PATCH 03/15] kbuild: move 'PHONY += modules_prepare' to the common part
+Date:   Sun, 28 Aug 2022 11:39:51 +0900
+Message-Id: <20220828024003.28873-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,31 +46,42 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The dependency, "modules: modules_check" is specified twice.
-Commit 1a998be620a1 ("kbuild: check module name conflict for external
-modules as well") missed to clean it up.
-
-'PHONY += modules' also appears twice.
+Unify the code between in-tree builds and external module builds.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ Makefile | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 7c955e906445..f04126181885 100644
+index badd318c5524..54e481162608 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1436,8 +1436,7 @@ endif
- # Build modules
- #
+@@ -1446,7 +1446,6 @@ modules.order: $(subdir-modorder) FORCE
+ targets += modules.order
  
--PHONY += modules
--modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_check modules_prepare
-+modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_prepare
+ # Target to prepare building external modules
+-PHONY += modules_prepare
+ modules_prepare: prepare
+ 	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
  
- cmd_modules_order = cat $(real-prereqs) > $@
+@@ -1747,15 +1746,12 @@ help:
+ 	@echo  '  clean           - remove generated files in module directory only'
+ 	@echo  ''
+ 
+-# no-op for external module builds
+-PHONY += modules_prepare
+-
+ endif # KBUILD_EXTMOD
+ 
+ # ---------------------------------------------------------------------------
+ # Modules
+ 
+-PHONY += modules modules_install
++PHONY += modules modules_install modules_prepare
+ 
+ ifdef CONFIG_MODULES
  
 -- 
 2.34.1
