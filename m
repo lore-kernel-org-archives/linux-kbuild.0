@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B8AC0502A
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FB1ECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:41:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232101AbiH1ClB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:41:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
+        id S232224AbiH1ClO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:41:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231889AbiH1Cku (ORCPT
+        with ESMTP id S231981AbiH1Cku (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 27 Aug 2022 22:40:50 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408EC2559E;
-        Sat, 27 Aug 2022 19:40:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E76129827;
+        Sat, 27 Aug 2022 19:40:43 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gk030639;
-        Sun, 28 Aug 2022 11:40:07 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gk030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gp030639;
+        Sun, 28 Aug 2022 11:40:10 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gp030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654408;
-        bh=4CXgD6J2sGYGkI4a6Qbuk/WA0nBqfddOH+RIg6LYLPA=;
+        s=dec2015msa; t=1661654410;
+        bh=eGfR+SEQRQYMntHzRLQYF+Hwh8rbACwjelshdo+fzFY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Aco7HsG21juUhVCgTkK8JTONguRPkeqX2Y5Kx5TTv79lflwr0pJpmtYWNLT4R2gDb
-         Chx/yk01xM/UPTSxzazlz3GL1fLZyYFT69VGJd+c2MqFy2wNjvlLLCHOXGHvrFGZ3O
-         rPjSOAr+/iiSf/Q772QlEANOi9rPoyNSIlCp9fxjRB3Jz+vS6sd7C0Ez+iencIdxD/
-         cVdQ5o3bDUhC7VzVA6gt6LUQPvFwDR2ttRJU/1EmjCQ4BjKUF98f8g79YIXA48ekSs
-         jEtjCch8hJezLHXFcymWdFP+altXIfEcoaLsF5Z1pD22Ct+xY+ii+Vg35rBNg9acW/
-         ayUBbUe9+qOKg==
+        b=02rQo8JopEgajO2tQ0CfaQYKeP+AOJ1x2LJhfrlPaUH2VP89Zn2bLl9/p74m2Zo7a
+         sStaPDtSO/et6rxaxVF6p2LuLm4YTDUlnjw5lZIZR5Dw1pJpgE+pmSpYuOUBg7A6ty
+         FeKHkj0SC/Zmx0sp28YQPQMFPpaeva0rzdT21T00I3ctEnpwmD40HpYe/ztcZk+Jwj
+         /eP1xpRKm9cg3gi/hNhQUaluiK7Jrc8pmBN8+jBAVIsfuFSVl6P5Q39ANbz557FPI1
+         en/boef0CrQwIsuC85HDHiDeNnjmO4lXQd7b12bWTmBGjz5MqEgtt80Igkdi2EF+2J
+         y1/J/OP06sDxA==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 02/15] kbuild: refactor single builds of *.ko
-Date:   Sun, 28 Aug 2022 11:39:50 +0900
-Message-Id: <20220828024003.28873-3-masahiroy@kernel.org>
+Subject: [PATCH 07/15] scripts/mkcompile_h: move LC_ALL=C to '$LD -v'
+Date:   Sun, 28 Aug 2022 11:39:55 +0900
+Message-Id: <20220828024003.28873-8-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,63 +46,47 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Remove the potentially invalid modules.order instead of using
-the temporary file.
+Minimize the scope of LC_ALL=C like before commit 87c94bfb8ad3 ("kbuild:
+override build timestamp & version").
 
-Also, KBUILD_MODULES is don't care for single builds. No need to
-cancel it.
+Give LC_ALL=C to '$LD -v' to get the consistent version output, as commit
+bcbcf50f5218 ("kbuild: fix ld-version.sh to not be affected by locale")
+mentioned the LD version is affected by locale.
+
+While I was here, I merged two sed invocations.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ scripts/mkcompile_h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index f04126181885..badd318c5524 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1787,6 +1787,8 @@ modules modules_install:
- 	@echo >&2 '***'
- 	@exit 1
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index f1a820d49e53..b76ccbbc094b 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -8,10 +8,6 @@ LD=$3
+ # Do not expand names
+ set -f
  
-+KBUILD_MODULES :=
-+
- endif # CONFIG_MODULES
- 
- # Single targets
-@@ -1813,18 +1815,12 @@ $(single-ko): single_modpost
- $(single-no-ko): descend
- 	@:
- 
--ifeq ($(KBUILD_EXTMOD),)
--# For the single build of in-tree modules, use a temporary file to avoid
--# the situation of modules_install installing an invalid modules.order.
--MODORDER := .modules.tmp
--endif
+-# Fix the language to get consistent output
+-LC_ALL=C
+-export LC_ALL
 -
-+# Remove MODORDER when done because it is not the real one.
- PHONY += single_modpost
- single_modpost: $(single-no-ko) modules_prepare
- 	$(Q){ $(foreach m, $(single-ko), echo $(extmod_prefix)$m;) } > $(MODORDER)
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
--
--KBUILD_MODULES := 1
-+	$(Q)rm -f $(MODORDER)
+ if test -z "$KBUILD_BUILD_USER"; then
+ 	LINUX_COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
+ else
+@@ -23,8 +19,8 @@ else
+ 	LINUX_COMPILE_HOST=$KBUILD_BUILD_HOST
+ fi
  
- export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod_prefix), $(single-no-ko))
+-LD_VERSION=$($LD -v | head -n1 | sed 's/(compatible with [^)]*)//' \
+-	      | sed 's/[[:space:]]*$//')
++LD_VERSION=$(LC_ALL=C $LD -v | head -n1 |
++		sed -e 's/(compatible with [^)]*)//' -e 's/[[:space:]]*$//')
  
-@@ -1834,10 +1830,6 @@ build-dirs := $(foreach d, $(build-dirs), \
- 
- endif
- 
--ifndef CONFIG_MODULES
--KBUILD_MODULES :=
--endif
--
- # Handle descending into subdirectories listed in $(build-dirs)
- # Preset locale variables to speed up the build process. Limit locale
- # tweaks to this spot to avoid wrong language settings when running
+ cat <<EOF
+ #define UTS_MACHINE		"${UTS_MACHINE}"
 -- 
 2.34.1
 
