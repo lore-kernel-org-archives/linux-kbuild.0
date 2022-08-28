@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B43C0502E
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A56E3C0502F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbiH1Ckt (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
+        id S231919AbiH1Cku (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:40:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229773AbiH1Ckq (ORCPT
+        with ESMTP id S231735AbiH1Ckr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Aug 2022 22:40:46 -0400
+        Sat, 27 Aug 2022 22:40:47 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D40252B2;
-        Sat, 27 Aug 2022 19:40:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484F3275D5;
+        Sat, 27 Aug 2022 19:40:41 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Go030639;
-        Sun, 28 Aug 2022 11:40:09 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Go030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gm030639;
+        Sun, 28 Aug 2022 11:40:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gm030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654410;
-        bh=Ojdr7OFV9j1YbpIO3D6oC+XaFmz7/7hOYyO9OvHgWLU=;
+        s=dec2015msa; t=1661654409;
+        bh=nmi4TuCe4/ZAlGow19MAlTrGk9A2EH+pzmZGuA/W3Iw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OtnOEL7NYfqPML6WGIODFpxvrHhE1Vb5thmq2pIjeo6n6TyyzterPeYzP8wcNWqjR
-         2AxpqlcLBSkWH4k3WVPmjjlpu83dto74nipV1UdPm4QNRqsKQj0oaOItt3pMTeC69K
-         a37QwTQgL72zcJvu1Jv7yfHAMDCXVqj2F+2izOIQS6TbzBniwlZB8DCXe6uKAAraoq
-         eUuVPYIqI7adLqgh6TCo68V2lWLf+9CLZpr16Mzina2VSZk4XTCzFLX553SUT/+vXK
-         oXHCIYssoBKDCqDK6WXi7K+qvYk2Uxp/PEJvNPAeodiln5aNZ7+/gQJAuE7VymDaAZ
-         vVRUuWOhNGwCA==
+        b=qMLJ5SQP1vKLWoZ0ax+e9zBVS7as01zWNxNsoj/LMTHa6jdioGqsniKe0Ku6K90Tf
+         2RnrOwiABHIT3eExKjZ2FjseWXMgqa/3VB9AAg0AyoFwcSuiZYxT2bRdg+njRkanN6
+         d/4EXT6tk+PBFSUTeB85J927zauUO6E7Ju0o+AeFtLNJ4uqz1igz0e78tamixkU3Yt
+         UJTKiH4BRFhztYsWBLo0xVA0DvdIzg5CO8EVzG8bymkH67h1B5JYvcFtGVTDwcivrK
+         OCHamCDi9u+sauMx+MwtPM8h69hV9NtKF1IxxSGh9IxskcHLLqFuzc0vYoPHT+bZPt
+         6ywSI9ETb0POA==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 06/15] kbuild: generate include/generated/compile.h in top Makefile
-Date:   Sun, 28 Aug 2022 11:39:54 +0900
-Message-Id: <20220828024003.28873-7-masahiroy@kernel.org>
+Subject: [PATCH 04/15] init/version.c: remove #include <linux/version.h>
+Date:   Sun, 28 Aug 2022 11:39:52 +0900
+Message-Id: <20220828024003.28873-5-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,64 +46,27 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Now that UTS_VERSION was separated out, this header can be generated
-much earlier, and probably the top Makefile is a better place to do it
-than init/Makefile.
+This is unneeded since commit 073a9ecb3a73 ("init/version.c: remove
+Version_<LINUX_VERSION_CODE> symbol").
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile      | 8 +++++++-
- init/Makefile | 8 +-------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ init/version.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 54e481162608..d933c0acab12 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1198,7 +1198,7 @@ PHONY += prepare archprepare
+diff --git a/init/version.c b/init/version.c
+index b7f9559d417c..3391c4051bf3 100644
+--- a/init/version.c
++++ b/init/version.c
+@@ -16,7 +16,6 @@
+ #include <linux/uts.h>
+ #include <linux/utsname.h>
+ #include <generated/utsrelease.h>
+-#include <linux/version.h>
+ #include <linux/proc_ns.h>
  
- archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
- 	asm-generic $(version_h) $(autoksyms_h) include/generated/utsrelease.h \
--	include/generated/autoconf.h remove-stale-files
-+	include/generated/compile.h include/generated/autoconf.h remove-stale-files
- 
- prepare0: archprepare
- 	$(Q)$(MAKE) $(build)=scripts/mod
-@@ -1260,6 +1260,12 @@ $(version_h): FORCE
- include/generated/utsrelease.h: include/config/kernel.release FORCE
- 	$(call filechk,utsrelease.h)
- 
-+filechk_compile.h = $(srctree)/scripts/mkcompile_h \
-+	"$(UTS_MACHINE)" "$(CONFIG_CC_VERSION_TEXT)" "$(LD)"
-+
-+include/generated/compile.h: FORCE
-+	$(call filechk,compile.h)
-+
- PHONY += headerdep
- headerdep:
- 	$(Q)find $(srctree)/include/ -name '*.h' | xargs --max-args 1 \
-diff --git a/init/Makefile b/init/Makefile
-index 63f53d210cad..31c17a8e314b 100644
---- a/init/Makefile
-+++ b/init/Makefile
-@@ -43,15 +43,9 @@ filechk_uts_version = \
- $(obj)/utsversion-tmp.h: FORCE
- 	$(call filechk,uts_version)
- 
--$(obj)/version.o: include/generated/compile.h $(obj)/utsversion-tmp.h
-+$(obj)/version.o: $(obj)/utsversion-tmp.h
- CFLAGS_version.o := -include $(obj)/utsversion-tmp.h
- 
--filechk_compile.h = $(srctree)/scripts/mkcompile_h \
--	"$(UTS_MACHINE)" "$(CONFIG_CC_VERSION_TEXT)" "$(LD)"
--
--include/generated/compile.h: FORCE
--	$(call filechk,compile.h)
--
- #
- # Build version-timestamp.c with final UTS_VERSION
- #
+ struct uts_namespace init_uts_ns = {
 -- 
 2.34.1
 
