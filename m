@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD5BECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B8AC0502A
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbiH1Ck6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51742 "EHLO
+        id S232101AbiH1ClB (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:41:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231879AbiH1Cku (ORCPT
+        with ESMTP id S231889AbiH1Cku (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 27 Aug 2022 22:40:50 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF34628E33;
-        Sat, 27 Aug 2022 19:40:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 408EC2559E;
+        Sat, 27 Aug 2022 19:40:44 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gu030639;
-        Sun, 28 Aug 2022 11:40:12 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gu030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gk030639;
+        Sun, 28 Aug 2022 11:40:07 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gk030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654413;
-        bh=bA4m7Oj/dBBjOfmTbtXEU7Zl9NzP1RzoFwx0p/QmZlA=;
+        s=dec2015msa; t=1661654408;
+        bh=4CXgD6J2sGYGkI4a6Qbuk/WA0nBqfddOH+RIg6LYLPA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=O2dRWT6MQavqXDxUN3pVnGLgUD4HO43Wk2TWKy9LF2Vemr+cDDemDALWxndEmT5by
-         02DRkaIy9XWLGK6NJ3BIxxBm8AhmMTDqaZP1XpOQDNXoXeryRepwz5obLdTrMlVnr9
-         78IfjEJ+fcOyaEpeUfZ8BDpqD5RIAeMgNrUiOURg5xi8JmO8wA30J5XXJuOHxVlnKC
-         qUFdBn+CGfujKidnvGE0bhU6gZdNy3YcTQIA7Bnc5wAgxgG6/v/m/EMUjTr2g5cBOS
-         npdKPEfulBLS5mtxfhLrEuxO5nRQdCDQ7y9SwQ1r+MnWMI9A3ZZ0LB8HgfSULuPmt6
-         lpDwLNC87xBMg==
+        b=Aco7HsG21juUhVCgTkK8JTONguRPkeqX2Y5Kx5TTv79lflwr0pJpmtYWNLT4R2gDb
+         Chx/yk01xM/UPTSxzazlz3GL1fLZyYFT69VGJd+c2MqFy2wNjvlLLCHOXGHvrFGZ3O
+         rPjSOAr+/iiSf/Q772QlEANOi9rPoyNSIlCp9fxjRB3Jz+vS6sd7C0Ez+iencIdxD/
+         cVdQ5o3bDUhC7VzVA6gt6LUQPvFwDR2ttRJU/1EmjCQ4BjKUF98f8g79YIXA48ekSs
+         jEtjCch8hJezLHXFcymWdFP+altXIfEcoaLsF5Z1pD22Ct+xY+ii+Vg35rBNg9acW/
+         ayUBbUe9+qOKg==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 12/15] kbuild: move vmlinux.o rule to the top Makefile
-Date:   Sun, 28 Aug 2022 11:40:00 +0900
-Message-Id: <20220828024003.28873-13-masahiroy@kernel.org>
+Subject: [PATCH 02/15] kbuild: refactor single builds of *.ko
+Date:   Sun, 28 Aug 2022 11:39:50 +0900
+Message-Id: <20220828024003.28873-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,68 +46,63 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Move the build rules of vmlinux.o out of scripts/link-vmlinux.sh to
-clearly separate 1) pre-modpost, 2) modpost, 3) post-modpost stages.
-This will make furture refactoring possible.
+Remove the potentially invalid modules.order instead of using
+the temporary file.
+
+Also, KBUILD_MODULES is don't care for single builds. No need to
+cancel it.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                | 10 ++++++++--
- scripts/link-vmlinux.sh |  3 ---
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ Makefile | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 02724bcf8fdc..d81b7a587b43 100644
+index f04126181885..badd318c5524 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -645,6 +645,8 @@ else
- __all: modules
+@@ -1787,6 +1787,8 @@ modules modules_install:
+ 	@echo >&2 '***'
+ 	@exit 1
+ 
++KBUILD_MODULES :=
++
+ endif # CONFIG_MODULES
+ 
+ # Single targets
+@@ -1813,18 +1815,12 @@ $(single-ko): single_modpost
+ $(single-no-ko): descend
+ 	@:
+ 
+-ifeq ($(KBUILD_EXTMOD),)
+-# For the single build of in-tree modules, use a temporary file to avoid
+-# the situation of modules_install installing an invalid modules.order.
+-MODORDER := .modules.tmp
+-endif
+-
++# Remove MODORDER when done because it is not the real one.
+ PHONY += single_modpost
+ single_modpost: $(single-no-ko) modules_prepare
+ 	$(Q){ $(foreach m, $(single-ko), echo $(extmod_prefix)$m;) } > $(MODORDER)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-
+-KBUILD_MODULES := 1
++	$(Q)rm -f $(MODORDER)
+ 
+ export KBUILD_SINGLE_TARGETS := $(addprefix $(extmod_prefix), $(single-no-ko))
+ 
+@@ -1834,10 +1830,6 @@ build-dirs := $(foreach d, $(build-dirs), \
+ 
  endif
  
-+targets :=
-+
- # Decide whether to build built-in, modular, or both.
- # Normally, just do built-in.
- 
-@@ -1153,6 +1155,10 @@ quiet_cmd_autoksyms_h = GEN     $@
- $(autoksyms_h):
- 	$(call cmd,autoksyms_h)
- 
-+targets += vmlinux.o
-+vmlinux.o: autoksyms_recursive $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux_o
-+
- ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
- 
- # Final link of vmlinux with optional arch pass after final link
-@@ -1160,10 +1166,10 @@ cmd_link-vmlinux =                                                 \
- 	$(CONFIG_SHELL) $< "$(LD)" "$(KBUILD_LDFLAGS)" "$(LDFLAGS_vmlinux)";    \
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
--vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
-+vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) FORCE
- 	+$(call if_changed_dep,link-vmlinux)
- 
--targets := vmlinux
-+targets += vmlinux
- 
- # The actual objects are generated when descending,
- # make sure no implicit rule kicks in
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 161bca64e8aa..07486f90d5e2 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -214,9 +214,6 @@ if [ "$1" = "clean" ]; then
- 	exit 0
- fi
- 
--#link vmlinux.o
--${MAKE} -f "${srctree}/scripts/Makefile.vmlinux_o"
+-ifndef CONFIG_MODULES
+-KBUILD_MODULES :=
+-endif
 -
- # modpost vmlinux.o to check for section mismatches
- ${MAKE} -f "${srctree}/scripts/Makefile.modpost" MODPOST_VMLINUX=1
- 
+ # Handle descending into subdirectories listed in $(build-dirs)
+ # Preset locale variables to speed up the build process. Limit locale
+ # tweaks to this spot to avoid wrong language settings when running
 -- 
 2.34.1
 
