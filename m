@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A882AC0502E
-	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD5BECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbiH1Ck4 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51958 "EHLO
+        id S229532AbiH1Ck6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:40:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbiH1Ckt (ORCPT
+        with ESMTP id S231879AbiH1Cku (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Aug 2022 22:40:49 -0400
+        Sat, 27 Aug 2022 22:40:50 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6E128E36;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF34628E33;
         Sat, 27 Aug 2022 19:40:43 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gq030639;
-        Sun, 28 Aug 2022 11:40:10 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gq030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gu030639;
+        Sun, 28 Aug 2022 11:40:12 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gu030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654411;
-        bh=pcMhDiiIpuG9IA8eOqVr1JYW01owykoWnir+g7tldYQ=;
+        s=dec2015msa; t=1661654413;
+        bh=bA4m7Oj/dBBjOfmTbtXEU7Zl9NzP1RzoFwx0p/QmZlA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Jo1j2k/N+uaWBpzCO54Kz2cFlciKFXqxfEn0CjcUzR14SbWmQTc8i++Y6WlwjAn65
-         cosm6dj73cNrg4DQtkr5C/yI9RRGoAXj1Z9CxJ1x4whDqmcLH5rQUoUX7fPkaMmjzk
-         1QSmNsrqFjfTaam3WY484+K6ugzgwig4t1xCjfEgZ94O3XlAinJ57KxqqY6+i5LU2X
-         ieMjy28nzCMjtf5iH7zSGEtomAcbDRtqap89dL+oOUngojV7EC8jy0nmlhKdum8WiW
-         d1ONiErX360qwSNwY87ySwQGnZREiIj9R3De1Ay+tqlA5mcpVjvgrVR4NSft1aI0Hx
-         kEh1TmAqzvFlw==
+        b=O2dRWT6MQavqXDxUN3pVnGLgUD4HO43Wk2TWKy9LF2Vemr+cDDemDALWxndEmT5by
+         02DRkaIy9XWLGK6NJ3BIxxBm8AhmMTDqaZP1XpOQDNXoXeryRepwz5obLdTrMlVnr9
+         78IfjEJ+fcOyaEpeUfZ8BDpqD5RIAeMgNrUiOURg5xi8JmO8wA30J5XXJuOHxVlnKC
+         qUFdBn+CGfujKidnvGE0bhU6gZdNy3YcTQIA7Bnc5wAgxgG6/v/m/EMUjTr2g5cBOS
+         npdKPEfulBLS5mtxfhLrEuxO5nRQdCDQ7y9SwQ1r+MnWMI9A3ZZ0LB8HgfSULuPmt6
+         lpDwLNC87xBMg==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 08/15] Revert "kbuild: Make scripts/compile.h when sh != bash"
-Date:   Sun, 28 Aug 2022 11:39:56 +0900
-Message-Id: <20220828024003.28873-9-masahiroy@kernel.org>
+Subject: [PATCH 12/15] kbuild: move vmlinux.o rule to the top Makefile
+Date:   Sun, 28 Aug 2022 11:40:00 +0900
+Message-Id: <20220828024003.28873-13-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,37 +46,68 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This reverts commit [1] in the pre-git era.
-
-I do not know what problem happened in the script when sh != bash
-because there is no commit message.
-
-Now that this script is much simpler than it used to be, let's revert
-it, and let' see. (If this turns out to be problematic, fix the code
-with proper commit description.)
-
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/history/history.git/commit/?id=11acbbbb8a50f4de7dbe4bc1b5acc440dfe81810
+Move the build rules of vmlinux.o out of scripts/link-vmlinux.sh to
+clearly separate 1) pre-modpost, 2) modpost, 3) post-modpost stages.
+This will make furture refactoring possible.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/mkcompile_h | 3 ---
- 1 file changed, 3 deletions(-)
+ Makefile                | 10 ++++++++--
+ scripts/link-vmlinux.sh |  3 ---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index b76ccbbc094b..2596f78e52ef 100755
---- a/scripts/mkcompile_h
-+++ b/scripts/mkcompile_h
-@@ -5,9 +5,6 @@ UTS_MACHINE=$1
- CC_VERSION="$2"
- LD=$3
+diff --git a/Makefile b/Makefile
+index 02724bcf8fdc..d81b7a587b43 100644
+--- a/Makefile
++++ b/Makefile
+@@ -645,6 +645,8 @@ else
+ __all: modules
+ endif
  
--# Do not expand names
--set -f
++targets :=
++
+ # Decide whether to build built-in, modular, or both.
+ # Normally, just do built-in.
+ 
+@@ -1153,6 +1155,10 @@ quiet_cmd_autoksyms_h = GEN     $@
+ $(autoksyms_h):
+ 	$(call cmd,autoksyms_h)
+ 
++targets += vmlinux.o
++vmlinux.o: autoksyms_recursive $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux_o
++
+ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
+ 
+ # Final link of vmlinux with optional arch pass after final link
+@@ -1160,10 +1166,10 @@ cmd_link-vmlinux =                                                 \
+ 	$(CONFIG_SHELL) $< "$(LD)" "$(KBUILD_LDFLAGS)" "$(LDFLAGS_vmlinux)";    \
+ 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
+ 
+-vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
++vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) FORCE
+ 	+$(call if_changed_dep,link-vmlinux)
+ 
+-targets := vmlinux
++targets += vmlinux
+ 
+ # The actual objects are generated when descending,
+ # make sure no implicit rule kicks in
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 161bca64e8aa..07486f90d5e2 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -214,9 +214,6 @@ if [ "$1" = "clean" ]; then
+ 	exit 0
+ fi
+ 
+-#link vmlinux.o
+-${MAKE} -f "${srctree}/scripts/Makefile.vmlinux_o"
 -
- if test -z "$KBUILD_BUILD_USER"; then
- 	LINUX_COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
- else
+ # modpost vmlinux.o to check for section mismatches
+ ${MAKE} -f "${srctree}/scripts/Makefile.modpost" MODPOST_VMLINUX=1
+ 
 -- 
 2.34.1
 
