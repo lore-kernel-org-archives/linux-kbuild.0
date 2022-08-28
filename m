@@ -2,41 +2,41 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 069D9C0502A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5EEC0502F
 	for <linux-kbuild@archiver.kernel.org>; Sun, 28 Aug 2022 02:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbiH1Ckw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 22:40:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51892 "EHLO
+        id S229493AbiH1Ckv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 27 Aug 2022 22:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231793AbiH1Cks (ORCPT
+        with ESMTP id S231640AbiH1Cks (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sat, 27 Aug 2022 22:40:48 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7379A286F2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031C2286EC;
         Sat, 27 Aug 2022 19:40:42 -0700 (PDT)
 Received: from localhost.localdomain (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 27S2e6Gt030639;
-        Sun, 28 Aug 2022 11:40:12 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gt030639
+        by conuserg-11.nifty.com with ESMTP id 27S2e6Gr030639;
+        Sun, 28 Aug 2022 11:40:11 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 27S2e6Gr030639
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1661654412;
-        bh=nXICWQfG+jfSFnL44++ZviI0zdn5/yoV/XN9eUiVH8w=;
+        s=dec2015msa; t=1661654411;
+        bh=4G1Mu07321fm2z01H8+kEda+iEOQov2qO2fvcpQnyz4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0/YZ3YcABhWASbdoqlnAW+waVDqyRBCpu4iccRgmUhymhwrrf4nGiyI3i3ueVEhwY
-         nf0YAaHn5L/V2KCYtUNeC0fvF+1brsOgO9lc50hs9Y2Q6CV4rj3KllQojm8LCLv12V
-         5BKmHW3WVpb3eUJsEYyteOO+wWOvGPv819GiRisrQCkkMD+xLjJZAVKGuOkbqQOAYC
-         HZ47KG3aNiBZ6LESBkRLQPo2P2adRiGcT4I1MHE+TjGxipgZ3tJtc3E4tNfk5f+8Ur
-         tqWoYR2C9VF85EuvABDCQdNkJ26ye0ZKHFIjQixg2TkbBha/wQqxjn7pgsEtFhlWHe
-         Mlu0pLBmGSYTg==
+        b=S4zzK74VlVTiLeCWtjNYG1zKCrJZPjcQQQPE3UtKw1dZLver+EIP94VcV+gVMVX5s
+         Y8RQg1U+tgs64m66Uefw+bWA6NKjv8GQho5lq6UEOa3OVAckEmYAGg5liaHcxQusku
+         ero8cjvJ1ySCZveVHsrv7UxwAn8FPwNfLok4j1T2Yf5BfhqwcR6wxv5Yn1dKesYA18
+         FfjOUVJVRfKTLM3xoCdYtLOGzqvn2awl2QChfOKb2+3h7V11n8BB1/T90t2ioVOwGz
+         Cj2aoPF0UhDTPPR/Hry8wUZLpgNqBxJoF5yJOYlmRpREOhr0hCTj85xvLYZGnNvkXx
+         Qmk8LkAw9GM3A==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 11/15] kbuild: move .vmlinux.objs rule to Makefile.modpost
-Date:   Sun, 28 Aug 2022 11:39:59 +0900
-Message-Id: <20220828024003.28873-12-masahiroy@kernel.org>
+Subject: [PATCH 09/15] kbuild: rename modules.order in sub-directories to .modules.order
+Date:   Sun, 28 Aug 2022 11:39:57 +0900
+Message-Id: <20220828024003.28873-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220828024003.28873-1-masahiroy@kernel.org>
 References: <20220828024003.28873-1-masahiroy@kernel.org>
@@ -46,122 +46,188 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-.vmlinux.objs is used by modpost, so scripts/Makefile.modpost is
-a better place to generate it.
+The next commit will move core-y from the top Makefile to ./Kbuild to
+use obj-y to list sub-directories.
 
-It is used only when CONFIG_MODVERSIONS=y. It should be guarded
-by "ifdef CONFIG_MODVERSIONS".
+With that, both ./Makefile and ./Kbuild would create modules.order in
+the top directory.
+
+To avoid the conflict, rename the per-directory modules.order to
+.modules.order.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                 |  2 +-
- scripts/Makefile.modpost | 30 ++++++++++++++++++++++++++++--
- scripts/link-vmlinux.sh  | 18 ------------------
- 3 files changed, 29 insertions(+), 21 deletions(-)
+ Makefile               | 27 +++++++++++++--------------
+ scripts/Makefile.build | 18 +++++++++---------
+ scripts/Makefile.lib   |  8 ++++----
+ 3 files changed, 26 insertions(+), 27 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 1bc44bb4be1f..02724bcf8fdc 100644
+index d933c0acab12..89aba2c69be8 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1489,7 +1489,7 @@ endif # CONFIG_MODULES
- # Directories & files removed with 'make clean'
- CLEAN_FILES += include/ksym vmlinux.symvers modules-only.symvers \
- 	       modules.builtin modules.builtin.modinfo modules.nsdeps \
--	       compile_commands.json .thinlto-cache
-+	       compile_commands.json .thinlto-cache .vmlinux.objs
+@@ -1116,8 +1116,6 @@ vmlinux-alldirs	:= $(sort $(vmlinux-dirs) Documentation . \
+ build-dirs	:= $(vmlinux-dirs)
+ clean-dirs	:= $(vmlinux-alldirs)
  
- # Directories & files removed with 'make mrproper'
- MRPROPER_FILES += include/config include/generated          \
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 911606496341..04ad00917b2f 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -57,6 +57,32 @@ vmlinux.symvers: vmlinux.o
+-subdir-modorder := $(addsuffix /modules.order, $(build-dirs))
+-
+ # Externally visible symbols (used by link-vmlinux.sh)
+ KBUILD_VMLINUX_OBJS := $(head-y) $(patsubst %/,%/built-in.a, $(core-y))
+ KBUILD_VMLINUX_OBJS += $(addsuffix built-in.a, $(filter %/, $(libs-y)))
+@@ -1172,7 +1170,7 @@ targets := vmlinux
  
- __modpost: vmlinux.symvers
+ # The actual objects are generated when descending,
+ # make sure no implicit rule kicks in
+-$(sort $(vmlinux-deps) $(subdir-modorder)): descend ;
++$(sort $(vmlinux-deps)): descend ;
  
-+# Generate the list of in-tree objects in vmlinux
-+# ---------------------------------------------------------------------------
-+
-+# This is used to retrieve symbol versions generated by genksyms.
-+ifdef CONFIG_MODVERSIONS
-+vmlinux.symvers: .vmlinux.objs
-+endif
-+
-+# Ignore libgcc.a
-+# Some architectures do '$(CC) --print-libgcc-file-name' to borrow libgcc.a
-+# from the toolchain, but there is no EXPORT_SYMBOL in it.
-+
-+quiet_cmd_vmlinux_objs = GEN     $@
-+      cmd_vmlinux_objs =		\
-+	for f in $(real-prereqs); do	\
-+		case $${f} in		\
-+		*libgcc.a) ;;		\
-+		*.a) $(AR) t $${f} ;;	\
-+		*) echo $${f} ;;	\
-+		esac			\
-+	done > $@
-+
-+targets += .vmlinux.objs
-+.vmlinux.objs: $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
-+	$(call if_changed,vmlinux_objs)
-+
- else
+ filechk_kernel.release = \
+ 	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
+@@ -1444,13 +1442,6 @@ endif
  
- ifeq ($(KBUILD_EXTMOD),)
-@@ -134,6 +160,8 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modfinal
+ modules: $(if $(KBUILD_BUILTIN),vmlinux) modules_prepare
+ 
+-cmd_modules_order = cat $(real-prereqs) > $@
+-
+-modules.order: $(subdir-modorder) FORCE
+-	$(call if_changed,modules_order)
+-
+-targets += modules.order
+-
+ # Target to prepare building external modules
+ modules_prepare: prepare
+ 	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
+@@ -1722,8 +1713,6 @@ KBUILD_BUILTIN :=
+ KBUILD_MODULES := 1
+ 
+ build-dirs := $(KBUILD_EXTMOD)
+-$(MODORDER): descend
+-	@:
+ 
+ compile_commands.json: $(extmod_prefix)compile_commands.json
+ PHONY += compile_commands.json
+@@ -1755,12 +1744,22 @@ help:
+ endif # KBUILD_EXTMOD
+ 
+ # ---------------------------------------------------------------------------
+-# Modules
++# Modules (common for in-tree modules and external modules)
+ 
+ PHONY += modules modules_install modules_prepare
+ 
+ ifdef CONFIG_MODULES
+ 
++subdir-modorder := $(addsuffix /.modules.order, $(build-dirs))
++
++$(sort $(subdir-modorder)): %/.modules.order: % ;
++
++cmd_modules_order = cat $(real-prereqs) > $@
++
++targets += $(MODORDER)
++$(MODORDER): $(subdir-modorder) FORCE
++	$(call if_changed,modules_order)
++
+ modules: modules_check
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+@@ -1860,7 +1859,7 @@ clean: $(clean-dirs)
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.lex.c' -o -name '*.tab.[ch]' \
+ 		-o -name '*.asn1.[ch]' \
+-		-o -name '*.symtypes' -o -name 'modules.order' \
++		-o -name '*.symtypes' -o -name '*modules.order' \
+ 		-o -name '.tmp_*' \
+ 		-o -name '*.c.[012]*.*' \
+ 		-o -name '*.ll' \
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 0df488d0bbb0..c96c3c0ab228 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -73,7 +73,7 @@ endif
+ 
+ # subdir-builtin and subdir-modorder may contain duplications. Use $(sort ...)
+ subdir-builtin := $(sort $(filter %/built-in.a, $(real-obj-y)))
+-subdir-modorder := $(sort $(filter %/modules.order, $(obj-m)))
++subdir-modorder := $(sort $(filter %/.modules.order, $(obj-m)))
+ 
+ targets-for-builtin := $(extra-y)
+ 
+@@ -89,7 +89,7 @@ targets-for-modules := $(foreach x, o mod $(if $(CONFIG_TRIM_UNUSED_KSYMS), usym
+ 				$(patsubst %.o, %.$x, $(filter %.o, $(obj-m))))
+ 
+ ifdef need-modorder
+-targets-for-modules += $(obj)/modules.order
++targets-for-modules += $(obj)/.modules.order
  endif
  
-+endif
-+
- PHONY += FORCE
- FORCE:
+ targets += $(targets-for-builtin) $(targets-for-modules)
+@@ -348,7 +348,7 @@ $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
  
-@@ -141,6 +169,4 @@ existing-targets := $(wildcard $(sort $(targets)))
+ # To build objects in subdirs, we need to descend into the directories
+ $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
+-$(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
++$(subdir-modorder): $(obj)/%/.modules.order: $(obj)/% ;
  
- -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+ #
+ # Rule to compile a set of .o files into one .a file (without symbol table)
+@@ -365,18 +365,18 @@ $(obj)/built-in.a: $(real-obj-y) FORCE
+ 	$(call if_changed,ar_builtin)
  
--endif
--
- .PHONY: $(PHONY)
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 8d982574145a..161bca64e8aa 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -199,7 +199,6 @@ cleanup()
- 	rm -f System.map
- 	rm -f vmlinux
- 	rm -f vmlinux.map
--	rm -f .vmlinux.objs
- 	rm -f .vmlinux.export.c
- }
+ #
+-# Rule to create modules.order file
++# Rule to create .modules.order file
+ #
+-# Create commands to either record .ko file or cat modules.order from
++# Create commands to either record .ko file or cat .modules.order from
+ # a subdirectory
+ # Add $(obj-m) as the prerequisite to avoid updating the timestamp of
+-# modules.order unless contained modules are updated.
++# .modules.order unless contained modules are updated.
  
-@@ -218,23 +217,6 @@ fi
- #link vmlinux.o
- ${MAKE} -f "${srctree}/scripts/Makefile.vmlinux_o"
+ cmd_modules_order = { $(foreach m, $(real-prereqs), \
+-	$(if $(filter %/modules.order, $m), cat $m, echo $(patsubst %.o,%.ko,$m));) :; } \
++	$(if $(filter %/.modules.order, $m), cat $m, echo $(patsubst %.o,%.ko,$m));) :; } \
+ 	> $@
  
--# Generate the list of in-tree objects in vmlinux
--#
--# This is used to retrieve symbol versions generated by genksyms.
--for f in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
--	case ${f} in
--	*libgcc.a)
--		# Some architectures do '$(CC) --print-libgcc-file-name' to
--		# borrow libgcc.a from the toolchain.
--		# There is no EXPORT_SYMBOL in external objects. Ignore this.
--		;;
--	*.a)
--		${AR} t ${f} ;;
--	*)
--		echo ${f} ;;
--	esac
--done > .vmlinux.objs
--
- # modpost vmlinux.o to check for section mismatches
- ${MAKE} -f "${srctree}/scripts/Makefile.modpost" MODPOST_VMLINUX=1
+-$(obj)/modules.order: $(obj-m) FORCE
++$(obj)/.modules.order: $(obj-m) FORCE
+ 	$(call if_changed,modules_order)
  
+ #
+@@ -465,7 +465,7 @@ $(subdir-ym):
+ 	$(Q)$(MAKE) $(build)=$@ \
+ 	$(if $(filter $@/, $(KBUILD_SINGLE_TARGETS)),single-build=) \
+ 	need-builtin=$(if $(filter $@/built-in.a, $(subdir-builtin)),1) \
+-	need-modorder=$(if $(filter $@/modules.order, $(subdir-modorder)),1)
++	need-modorder=$(if $(filter $@/.modules.order, $(subdir-modorder)),1)
+ 
+ # Add FORCE to the prequisites of a target to force it to be always rebuilt.
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 3fb6a99e78c4..b594705d571a 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -26,14 +26,14 @@ subdir-ym := $(sort $(subdir-y) $(subdir-m) \
+ 
+ # Handle objects in subdirs:
+ # - If we encounter foo/ in $(obj-y), replace it by foo/built-in.a and
+-#   foo/modules.order
+-# - If we encounter foo/ in $(obj-m), replace it by foo/modules.order
++#   foo/.modules.order
++# - If we encounter foo/ in $(obj-m), replace it by foo/.modules.order
+ #
+-# Generate modules.order to determine modorder. Unfortunately, we don't have
++# Generate .modules.order to determine modorder. Unfortunately, we don't have
+ # information about ordering between -y and -m subdirs. Just put -y's first.
+ 
+ ifdef need-modorder
+-obj-m := $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m))
++obj-m := $(patsubst %/,%/.modules.order, $(filter %/, $(obj-y)) $(obj-m))
+ else
+ obj-m := $(filter-out %/, $(obj-m))
+ endif
 -- 
 2.34.1
 
