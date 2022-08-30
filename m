@@ -2,167 +2,108 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 554E0ECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Sat, 27 Aug 2022 16:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9622ECAAD4
+	for <linux-kbuild@archiver.kernel.org>; Tue, 30 Aug 2022 10:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbiH0Q5z (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 27 Aug 2022 12:57:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50528 "EHLO
+        id S229541AbiH3KoH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 30 Aug 2022 06:44:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbiH0Q5y (ORCPT
+        with ESMTP id S229935AbiH3KoF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 27 Aug 2022 12:57:54 -0400
-X-Greylist: delayed 139 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 27 Aug 2022 09:57:53 PDT
-Received: from mail.owenrafferty.com (owenrafferty.com [IPv6:2001:19f0:5c01:1f5a:5400:3ff:fe72:9a03])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DAF259251
-        for <linux-kbuild@vger.kernel.org>; Sat, 27 Aug 2022 09:57:53 -0700 (PDT)
-Received: from localhost (unknown [184.55.81.148])
-        by mail.owenrafferty.com (Postfix) with ESMTPSA id 9C5F580451;
-        Sat, 27 Aug 2022 16:57:52 +0000 (UTC)
-Authentication-Results: mail.owenrafferty.com; dkim=permerror (bad message/signature format)
-Message-ID: <effcbadb336e88f9ab802e000b964f12.owen@owenrafferty.com>
-From:   <owen@owenrafferty.com>
-To:     unlisted-recipients:; (no To-header on input)
-Date:   Sat, 27 Aug 2022 12:57:54 -0400
+        Tue, 30 Aug 2022 06:44:05 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13A99F754;
+        Tue, 30 Aug 2022 03:44:03 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MH3nr5wnlz4xG6;
+        Tue, 30 Aug 2022 20:44:00 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1661856241;
+        bh=7FFszpKAwHkUcxfIIXTrsjmWHYTLLEAcEncl3AbzgmY=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=fVf/5xnChhmP5DNHOSS9QSyyCN2N3VX7gGKy3eglqlHvJuahftMSqb1BlXSI9rrDX
+         6DP3LrXiQXRsB05renWOiocFqYxY6u+JvWhyAgxQMcFdeoBKSj2pDJ+7uM2dZbBiRO
+         SrkQFagFwarD+ForSxKLf234yS6ScXJQQJjah00n8cFUjgFncZ8ZfzWyst8FL6Uwon
+         F9NbMQUnA6MHgi+jMKkSDYjde0gnDgZSLiCKDJu/LsUAp8pPtme9dzAmdrmmWMcbeY
+         zfH3AaHP1JvZm+QsJljRKHTVELGAUWcEsC1jQOE0VRBTjrt3dkJIityRWZ2OMwN3e4
+         Ybf3KFKj11ciw==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Daniel Axtens <dja@axtens.net>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] powerpc: clean up binutils version check
+In-Reply-To: <7daf34ca-ed5e-90ea-8ccc-6821127cbd96@csgroup.eu>
+References: <20220827164056.3365356-1-masahiroy@kernel.org>
+ <58a90319-668f-7c87-4168-e0df10644aa7@csgroup.eu>
+ <CAK7LNATJiQc5HMdsct1S5z15-b1fzc5-Y2xtBs6oT17Na79H_w@mail.gmail.com>
+ <7daf34ca-ed5e-90ea-8ccc-6821127cbd96@csgroup.eu>
+Date:   Tue, 30 Aug 2022 20:43:56 +1000
+Message-ID: <87o7w2j9jn.fsf@mpe.ellerman.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-From 0e70974912f6b2cd95a18192418a438f9c57f690 Mon Sep 17 00:00:00 2001
-In-Reply-To: <CAK7LNAR+Lp2g1kzGNALoge7_51_PKcOd37ebZTV=X-QJEwCn5w@mail.gmail.com>
-References: <CAK7LNAR+Lp2g1kzGNALoge7_51_PKcOd37ebZTV=X-QJEwCn5w@mail.gmail.com>
-From: Owen Rafferty <owen@owenrafferty.com>
-Date: Sat, 27 Aug 2022 11:52:18 -0500
-Subject: [PATCH v3] kbuild: rewrite check-local-export in sh/awk
-To: masahiroy@kernel.org
-Cc: linux-kbuild@vger.kernel.org
+Christophe Leroy <christophe.leroy@csgroup.eu> writes:
+> Le 27/08/2022 =C3=A0 20:03, Masahiro Yamada a =C3=A9crit=C2=A0:
+>> On Sun, Aug 28, 2022 at 2:37 AM Christophe Leroy
+>> <christophe.leroy@csgroup.eu> wrote:
+>>> Le 27/08/2022 =C3=A0 18:40, Masahiro Yamada a =C3=A9crit :
+>>>> The checkbin in arch/powerpc/Makefile errors out if ld <=3D 2.24.
+>>>> So, the requirement on PPC is binutils >=3D 2.25. It is cleaner to
+>>>> specify it in scripts/min-tool-version.sh. If binutils < 2.25 is
+>>>> used, the toolchain check will fail in the Kconfig stage going
+>>>> forward.
+>>>>
+>>>> Since binutils >=3D 2.25 is already required, another version test
+>>>> for --save-restore-funcs on PPC64 is always met.
+...
+>>>> diff --git a/scripts/min-tool-version.sh b/scripts/min-tool-version.sh
+>>>> index 250925aab101..7df9f2150ea1 100755
+>>>> --- a/scripts/min-tool-version.sh
+>>>> +++ b/scripts/min-tool-version.sh
+>>>> @@ -14,7 +14,13 @@ fi
+>>>>
+>>>>    case "$1" in
+>>>>    binutils)
+>>>> -     echo 2.23.0
+>>>> +     if [ "$SRCARCH" =3D powerpc ]; then
+>>>
+>>> Isn't this limitation only for ppc64le ?
+>>>
+>>> Refer commit 60e065f70bdb ("powerpc: Reject binutils 2.24 when building
+>>> little endian")
+>>=20
+>> I do not see any CONFIG check in the current checkbin.
+>>=20
+>> Refer commit a3ad84da0760 ("powerpc/toc: Future proof
+>> kernel toc")
+>
+> That's odd. There is no toc on PPC32.
 
----
- scripts/check-local-export | 96 +++++++++++++++++++-------------------
- 1 file changed, 47 insertions(+), 49 deletions(-)
+I think that's just a bug in a3ad84da0760.
 
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-index 6ccc2f467416..0c049ff44aca 100755
---- a/scripts/check-local-export
-+++ b/scripts/check-local-export
-@@ -1,26 +1,14 @@
--#!/usr/bin/env bash
-+#!/bin/sh
- # SPDX-License-Identifier: GPL-2.0-only
- #
- # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
-+# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
- #
- # Exit with error if a local exported symbol is found.
- # EXPORT_SYMBOL should be used for global symbols.
- 
- set -e
- 
--# catch errors from ${NM}
--set -o pipefail
--
--# Run the last element of a pipeline in the current shell.
--# Without this, the while-loop would be executed in a subshell, and
--# the changes made to 'symbol_types' and 'export_symbols' would be lost.
--shopt -s lastpipe
--
--declare -A symbol_types
--declare -a export_symbols
--
--exit_code=0
--
- # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
- # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
- # '2>/dev/null'. However, it suppresses real error messages as well. Add a
-@@ -29,43 +17,53 @@ exit_code=0
- # TODO:
- # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
- # binutils to 2.37, llvm to 13.0.0.
--# Then, the following line will be really simple:
--#   ${NM} --quiet ${1} |
-+# Then, the following line will be simpler:
-+#   { ${NM} --quiet ${1} || kill 0; } |
-+
-+{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill 0; } } |
-+${AWK} -v "file=${1}" '
-+BEGIN {
-+	i = 0
-+}
-+
-+# Skip the line if the number of fields is less than 3.
-+#
-+# case 1)
-+#   For undefined symbols, the first field (value) is empty.
-+#   The outout looks like this:
-+#     "                 U _printk"
-+#   It is unneeded to record undefined symbols.
-+#
-+# case 2)
-+#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
-+#     "---------------- t"
-+!length($3) {
-+	next
-+}
- 
--{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
--while read value type name
--do
--	# Skip the line if the number of fields is less than 3.
--	#
--	# case 1)
--	#   For undefined symbols, the first field (value) is empty.
--	#   The outout looks like this:
--	#     "                 U _printk"
--	#   It is unneeded to record undefined symbols.
--	#
--	# case 2)
--	#   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
--	#     "---------------- t"
--	if [[ -z ${name} ]]; then
--		continue
--	fi
-+# save (name, type) in the associative array
-+{ symbol_types[$3]=$2 }
- 
--	# save (name, type) in the associative array
--	symbol_types[${name}]=${type}
-+# append the exported symbol to the array
-+($3 ~ /^__ksymtab_/) {
-+	export_symbols[i] = $3
-+	sub(/^__ksymtab_/, "", export_symbols[i])
-+	i++
-+}
- 
--	# append the exported symbol to the array
--	if [[ ${name} == __ksymtab_* ]]; then
--		export_symbols+=(${name#__ksymtab_})
--	fi
--done
-+END {
-+	exit_code = 0
-+	for (j = 0; j < i; ++j) {
-+		name = export_symbols[j]
-+		# nm(3) says "If lowercase, the symbol is usually local"
-+		if (symbol_types[name] ~ /[a-z]/) {
-+			printf "%s: error: local symbol %s was exported\n",
-+				file, name | "cat 1>&2"
-+			exit_code = 1
-+		}
-+	}
- 
--for name in "${export_symbols[@]}"
--do
--	# nm(3) says "If lowercase, the symbol is usually local"
--	if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
--		echo "$@: error: local symbol '${name}' was exported" >&2
--		exit_code=1
--	fi
--done
-+	exit exit_code
-+}'
- 
--exit ${exit_code}
-+exit $?
--- 
-2.37.2
+But that means we inadvertantly dropped support for 2.24 about 8 months
+ago, and no one noticed.
 
+Let's see what the responses are to Nick's proposal to increase the
+minimum to 2.25.1.
+
+cheers
