@@ -2,111 +2,206 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5892FECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Aug 2022 20:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12639ECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Aug 2022 21:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiHaUXJ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Aug 2022 16:23:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
+        id S232084AbiHaVDI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Aug 2022 17:03:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231136AbiHaUXI (ORCPT
+        with ESMTP id S231441AbiHaVDG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Aug 2022 16:23:08 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF47D99C3;
-        Wed, 31 Aug 2022 13:23:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 76521B82301;
-        Wed, 31 Aug 2022 20:23:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 563B7C433D6;
-        Wed, 31 Aug 2022 20:23:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661977383;
-        bh=5uN7nzPwfI/1N2ti9Lp5VrCgxZVrN89dYdqpAIQOF6s=;
+        Wed, 31 Aug 2022 17:03:06 -0400
+Received: from mail.owenrafferty.com (owenrafferty.com [45.76.27.4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E76F2C9D
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2022 14:03:05 -0700 (PDT)
+Received: from localhost (unknown [184.55.81.148])
+        by mail.owenrafferty.com (Postfix) with ESMTPSA id EA1C980BD5;
+        Wed, 31 Aug 2022 21:03:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=owenrafferty.com;
+        s=mail; t=1661979783;
+        bh=Xl02WVWojWHxVOeu3sBt6MF1rwXKF0Ex5Av3wzAvRvc=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CA23Eldvy/3ULld1WpL1lAnDzzQD1phusjI7CK4wIZvslO1aL8OOfNQ69a8J2Q57A
-         COq0zBpdM2bF/6wmcWgj2SMyQ+AoP83IR8EQxGFb2mtdhwuAK1YnBu2Ye7LIElOsrq
-         Lb/E943++QUC9yMiSZQoPWJalkuufXONeR4YG/3ddH0k6h2fmi6eE6k32Qf2wnpeRx
-         o1o/Ff0E0LUCfcULCF88iJ509Gy964IRaXir+h1Mf/GjC5GQSPhBSDyUJk5/s1CSpx
-         weomMrDW+vvhYUhBxrNS7l6Do6OICJRQKOVKucSNDd3DTvYe0lU+zAl/6DOoEyme3w
-         1js6ugKD51U9A==
-Date:   Wed, 31 Aug 2022 13:23:00 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Tom Rix <trix@redhat.com>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev, x86@kernel.org,
-        Dmitrii Bundin <dmitrii.bundin.a@gmail.com>,
-        Fangrui Song <maskray@google.com>,
-        Alexey Alexandrov <aalexand@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Greg Thelen <gthelen@google.com>,
-        Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH v2 5/5] Makefile.debug: set -g unconditional on
- CONFIG_DEBUG_INFO_SPLIT
-Message-ID: <Yw/DJLu10nw4aUDw@dev-arch.thelio-3990X>
-References: <20220831184408.2778264-1-ndesaulniers@google.com>
- <20220831184408.2778264-6-ndesaulniers@google.com>
+        b=Nvyrl5oAi6LfoN3U1XfqGdtPxxF5vBjjYCV+SnM2Re2GjpUEPwwOVIAxynASBmfyI
+         +em3UTc58c0AnlUO3wPfTKcz+kwKAu6+aoMFW6dpJANv8zhwQle3vUXl23XM+sBNgm
+         47ShsOZdteaCKspeRre668YewfXSEAH9oowuYb3qbIoHbVy+wWii3yt9aGs3E4cG5+
+         9Cc8hArBhHVZA0EH/VPjXqcs/M0qivK8VBP7EoxoP/Xo/F128jX+VFhG5ekpV9jIS8
+         V6s4I7gGyMog0porRKNqXN44b5QwnW/ATRylfDFhHGsVGcd+2Z3w8Rz0oXODKdd+io
+         ZL0b85Lk4fdOw==
+Date:   Wed, 31 Aug 2022 16:03:00 -0500
+From:   Owen Rafferty <owen@owenrafferty.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v3] kbuild: rewrite check-local-export in sh/awk
+Message-ID: <Yw/MhFFJZuqwVW+/@niobium.localdomain>
+References: <CAK7LNAR+Lp2g1kzGNALoge7_51_PKcOd37ebZTV=X-QJEwCn5w@mail.gmail.com>
+ <0e70974912f6b2cd95a18192418a438f9c57f690.1661730960.git.owen@owenrafferty.com>
+ <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220831184408.2778264-6-ndesaulniers@google.com>
+In-Reply-To: <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 11:44:08AM -0700, Nick Desaulniers wrote:
-> Dmitrii, Fangrui, and Mashahiro note:
-> 
->   Before GCC 11 and Clang 12 -gsplit-dwarf implicitly uses -g2.
-> 
-> Fix CONFIG_DEBUG_INFO_SPLIT for gcc-11+ & clang-12+ which now need -g
-> specified in order for -gsplit-dwarf to work at all.
-> 
-> -gsplit-dwarf has been mutually exclusive with -g since support for
-> CONFIG_DEBUG_INFO_SPLIT was introduced in
-> commit 866ced950bcd ("kbuild: Support split debug info v4")
-> I don't think it ever needed to be.
-> 
-> Link: https://lore.kernel.org/lkml/20220815013317.26121-1-dmitrii.bundin.a@gmail.com/
-> Link: https://lore.kernel.org/lkml/CAK7LNARPAmsJD5XKAw7m_X2g7Fi-CAAsWDQiP7+ANBjkg7R7ng@mail.gmail.com/
-> Link: https://reviews.llvm.org/D80391
-> Cc: Andi Kleen <ak@linux.intel.com>
-> Reported-by: Dmitrii Bundin <dmitrii.bundin.a@gmail.com>
-> Reported-by: Fangrui Song <maskray@google.com>
-> Reported-by: Masahiro Yamada <masahiroy@kernel.org>
-> Suggested-by: Dmitrii Bundin <dmitrii.bundin.a@gmail.com>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+On 22/08/31 03:44PM, Masahiro Yamada wrote:
+> On Mon, Aug 29, 2022 at 8:57 AM Owen Rafferty <owen@owenrafferty.com> wrote:
+> >
+> > ---
+> >  scripts/check-local-export | 96 +++++++++++++++++++-------------------
+> >  1 file changed, 47 insertions(+), 49 deletions(-)
+>
+>
+>
+>
+> V3 improved the code, but the entire commit log disappeared.
+> I guess it is by accident.
+>
+>
+>
+> v2:
+> https://patchwork.kernel.org/project/linux-kbuild/patch/a2ccf1338513f3a2250cd0a9fe5894f83ce3e4a7.1660314650.git.owen@owenrafferty.com/
+>
+> v3:
+> https://patchwork.kernel.org/project/linux-kbuild/patch/0e70974912f6b2cd95a18192418a438f9c57f690.1661730960.git.owen@owenrafferty.com/
+>
+>
+>
+> Do you want me to restore the log from v2?
+>
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+I'll submit v4, applied atop your kbuild branch and with a proper
+signoff. Thanks for bearing with me.
 
-> ---
-> Changes v1 -> v2:
-> * Add reference to 866ced950bcd, cc Andi, in commit message.
-> 
->  scripts/Makefile.debug | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/Makefile.debug b/scripts/Makefile.debug
-> index 46e88f0ca998..b6eb532af3cc 100644
-> --- a/scripts/Makefile.debug
-> +++ b/scripts/Makefile.debug
-> @@ -1,10 +1,8 @@
-> -DEBUG_CFLAGS	:=
-> +DEBUG_CFLAGS	:= -g
-> +KBUILD_AFLAGS	+= -g
->  
->  ifdef CONFIG_DEBUG_INFO_SPLIT
->  DEBUG_CFLAGS	+= -gsplit-dwarf
-> -else
-> -DEBUG_CFLAGS	+= -g
-> -KBUILD_AFLAGS	+= -g
->  endif
->  
->  ifdef CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
-> -- 
-> 2.37.2.672.g94769d06f0-goog
-> 
+>
+> > diff --git a/scripts/check-local-export b/scripts/check-local-export
+> > index 6ccc2f467416..0c049ff44aca 100755
+> > --- a/scripts/check-local-export
+> > +++ b/scripts/check-local-export
+> > @@ -1,26 +1,14 @@
+> > -#!/usr/bin/env bash
+> > +#!/bin/sh
+> >  # SPDX-License-Identifier: GPL-2.0-only
+> >  #
+> >  # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
+> > +# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
+> >  #
+> >  # Exit with error if a local exported symbol is found.
+> >  # EXPORT_SYMBOL should be used for global symbols.
+> >
+> >  set -e
+> >
+> > -# catch errors from ${NM}
+> > -set -o pipefail
+> > -
+> > -# Run the last element of a pipeline in the current shell.
+> > -# Without this, the while-loop would be executed in a subshell, and
+> > -# the changes made to 'symbol_types' and 'export_symbols' would be lost.
+> > -shopt -s lastpipe
+> > -
+> > -declare -A symbol_types
+> > -declare -a export_symbols
+> > -
+> > -exit_code=0
+> > -
+> >  # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
+> >  # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
+> >  # '2>/dev/null'. However, it suppresses real error messages as well. Add a
+> > @@ -29,43 +17,53 @@ exit_code=0
+> >  # TODO:
+> >  # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
+> >  # binutils to 2.37, llvm to 13.0.0.
+> > -# Then, the following line will be really simple:
+> > -#   ${NM} --quiet ${1} |
+> > +# Then, the following line will be simpler:
+> > +#   { ${NM} --quiet ${1} || kill 0; } |
+> > +
+> > +{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill 0; } } |
+> > +${AWK} -v "file=${1}" '
+> > +BEGIN {
+> > +       i = 0
+> > +}
+> > +
+> > +# Skip the line if the number of fields is less than 3.
+> > +#
+> > +# case 1)
+> > +#   For undefined symbols, the first field (value) is empty.
+> > +#   The outout looks like this:
+> > +#     "                 U _printk"
+> > +#   It is unneeded to record undefined symbols.
+> > +#
+> > +# case 2)
+> > +#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
+> > +#     "---------------- t"
+> > +!length($3) {
+> > +       next
+> > +}
+> >
+> > -{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
+> > -while read value type name
+> > -do
+> > -       # Skip the line if the number of fields is less than 3.
+> > -       #
+> > -       # case 1)
+> > -       #   For undefined symbols, the first field (value) is empty.
+> > -       #   The outout looks like this:
+> > -       #     "                 U _printk"
+> > -       #   It is unneeded to record undefined symbols.
+> > -       #
+> > -       # case 2)
+> > -       #   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
+> > -       #     "---------------- t"
+> > -       if [[ -z ${name} ]]; then
+> > -               continue
+> > -       fi
+> > +# save (name, type) in the associative array
+> > +{ symbol_types[$3]=$2 }
+> >
+> > -       # save (name, type) in the associative array
+> > -       symbol_types[${name}]=${type}
+> > +# append the exported symbol to the array
+> > +($3 ~ /^__ksymtab_/) {
+> > +       export_symbols[i] = $3
+> > +       sub(/^__ksymtab_/, "", export_symbols[i])
+> > +       i++
+> > +}
+> >
+> > -       # append the exported symbol to the array
+> > -       if [[ ${name} == __ksymtab_* ]]; then
+> > -               export_symbols+=(${name#__ksymtab_})
+> > -       fi
+> > -done
+> > +END {
+> > +       exit_code = 0
+> > +       for (j = 0; j < i; ++j) {
+> > +               name = export_symbols[j]
+> > +               # nm(3) says "If lowercase, the symbol is usually local"
+> > +               if (symbol_types[name] ~ /[a-z]/) {
+> > +                       printf "%s: error: local symbol %s was exported\n",
+> > +                               file, name | "cat 1>&2"
+> > +                       exit_code = 1
+> > +               }
+> > +       }
+> >
+> > -for name in "${export_symbols[@]}"
+> > -do
+> > -       # nm(3) says "If lowercase, the symbol is usually local"
+> > -       if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
+> > -               echo "$@: error: local symbol '${name}' was exported" >&2
+> > -               exit_code=1
+> > -       fi
+> > -done
+> > +       exit exit_code
+> > +}'
+> >
+> > -exit ${exit_code}
+> > +exit $?
+> > --
+> > 2.37.2
+> >
+>
+>
+> --
+> Best Regards
+> Masahiro Yamada
