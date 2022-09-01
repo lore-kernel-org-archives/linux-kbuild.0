@@ -2,172 +2,82 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 941B7ECAAD1
-	for <linux-kbuild@archiver.kernel.org>; Wed, 31 Aug 2022 21:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2630AECAAD1
+	for <linux-kbuild@archiver.kernel.org>; Thu,  1 Sep 2022 01:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231447AbiHaVDU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 31 Aug 2022 17:03:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48466 "EHLO
+        id S232152AbiIABPS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 31 Aug 2022 21:15:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbiHaVDU (ORCPT
+        with ESMTP id S232007AbiIABPS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 31 Aug 2022 17:03:20 -0400
-Received: from mail.owenrafferty.com (owenrafferty.com [IPv6:2001:19f0:5c01:1f5a:5400:3ff:fe72:9a03])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D195EB87A
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2022 14:03:19 -0700 (PDT)
-Received: from localhost (unknown [184.55.81.148])
-        by mail.owenrafferty.com (Postfix) with ESMTPSA id D9D3C80BD5;
-        Wed, 31 Aug 2022 21:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=owenrafferty.com;
-        s=mail; t=1661979798;
-        bh=6Ljx/h0gGyWywnayCOadECUwxuCIZ3QvtWpmprBnYpo=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=d3bEDPXrAreuu6hCaEULKoA8d3qtHqp3YtCSIkm57iVHQSVw3qwj/D1xzQcUqqoOa
-         Lo3ngxK+VueLy33pQO91vgY4ty0VKfA/xhOVdM8UFwDoRTKOy2+/1gPnhEMeNgLFGF
-         Q9F7KR088wKW0XGCOwiYLObUeq8PbTRTRu/xZrNuEF26vQPwToImUgdDA9Zd8jMWY2
-         QcEENnN5aZsF8q2tCiDqjck8bNOW+bvzu4WL0pnpVf22M3MKuMlWugC1vhuxolWKbM
-         ax2nnf6kuVQNQkRLdoopIhJlQKGDEaaXsum9F7uXvSwFBLKsuZ/MvhpmsXKn/2SN+H
-         +DQvyCy8VcK3A==
-X-Mailbox-Line: From b0cf49ac1a3ece40e133fa80e3ceae7891d6ed8d Mon Sep 17 00:00:00 2001
-Message-Id: <b0cf49ac1a3ece40e133fa80e3ceae7891d6ed8d.1661979510.git.owen@owenrafferty.com>
-In-Reply-To: <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
-References: <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
-From:   Owen Rafferty <owen@owenrafferty.com>
-Date:   Wed, 31 Aug 2022 15:57:08 -0500
-Subject: [PATCH v4] kbuild: rewrite check-local-export in sh/awk
-To:     masahiroy@kernel.org
-Cc:     linux-kbuild@vger.kernel.org
+        Wed, 31 Aug 2022 21:15:18 -0400
+Received: from conuserg-10.nifty.com (conuserg-10.nifty.com [210.131.2.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E231057210;
+        Wed, 31 Aug 2022 18:15:15 -0700 (PDT)
+Received: from grover.sesame (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
+        by conuserg-10.nifty.com with ESMTP id 2811DDtu004311;
+        Thu, 1 Sep 2022 10:13:13 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 2811DDtu004311
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1661994794;
+        bh=pSLA7lAlGxKHbICT8gTY7i5Zp2giDjasDzYgClZZbNY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=qID+LEtprhEh9OzWC/QN0PYJNs5/bV9Yf3wWeIehxq6QVxx1Qrfi1dBZy4N3dHPQw
+         h3Hw5f0kjWFaP4dS5Ix7dittJ4MidYbEIBUw1PJFnoMhjbvy32oFsrvRWP+30lYLdW
+         aFhZHBX8mFEmEMOUZoTk7FTTfe1r9mGp+/gcxt7d2cLATiGhjQAQBWzVodLvalrK9V
+         Uqlyz013HHH2cxFkYyF+Z/TQVy1W1XlvVdR/fgaJjpy6ln1xvk6/Nt0giw+GYZCSFL
+         NW2AsX7J7P82MpQZ914zQFNWWqTxAAVivHrQBwGPRbVlZDJntbN+9cD7voBgRfI7bZ
+         VouolwA3KaAJA==
+X-Nifty-SrcIP: [133.32.182.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kbuild: disable header exports for UML in a straightforward way
+Date:   Thu,  1 Sep 2022 10:12:52 +0900
+Message-Id: <20220901011252.550830-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Signed-off-by: Owen Rafferty <owen@owenrafferty.com>
----
- scripts/check-local-export | 96 +++++++++++++++++++-------------------
- 1 file changed, 47 insertions(+), 49 deletions(-)
+Previously 'make ARCH=um headers' stopped because of missing
+arch/um/include/uapi/asm/Kbuild.
 
-diff --git a/scripts/check-local-export b/scripts/check-local-export
-index 6ccc2f467416..0c049ff44aca 100755
---- a/scripts/check-local-export
-+++ b/scripts/check-local-export
-@@ -1,26 +1,14 @@
--#!/usr/bin/env bash
-+#!/bin/sh
- # SPDX-License-Identifier: GPL-2.0-only
- #
- # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
-+# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
- #
- # Exit with error if a local exported symbol is found.
- # EXPORT_SYMBOL should be used for global symbols.
+The error is not shown since commit ed102bf2afed ("um: Fix W=1
+missing-include-dirs warnings") because UML got
+arch/um/include/uapi/asm/Kbuild.
+
+Hard-code the unsupported architecture, so it works like before.
+
+Fixes: ed102bf2afed ("um: Fix W=1 missing-include-dirs warnings")
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 9d40255d1557..8d2047a4de9b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1304,8 +1304,7 @@ hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
  
- set -e
+ PHONY += headers
+ headers: $(version_h) scripts_unifdef uapi-asm-generic archheaders archscripts
+-	$(if $(wildcard $(srctree)/arch/$(SRCARCH)/include/uapi/asm/Kbuild),, \
+-	  $(error Headers not exportable for the $(SRCARCH) architecture))
++	$(if $(filter um, $(SRCARCH)), $(error Headers not exportable for UML))
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(SRCARCH)/include/uapi
  
--# catch errors from ${NM}
--set -o pipefail
--
--# Run the last element of a pipeline in the current shell.
--# Without this, the while-loop would be executed in a subshell, and
--# the changes made to 'symbol_types' and 'export_symbols' would be lost.
--shopt -s lastpipe
--
--declare -A symbol_types
--declare -a export_symbols
--
--exit_code=0
--
- # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
- # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
- # '2>/dev/null'. However, it suppresses real error messages as well. Add a
-@@ -29,43 +17,53 @@ exit_code=0
- # TODO:
- # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
- # binutils to 2.37, llvm to 13.0.0.
--# Then, the following line will be really simple:
--#   ${NM} --quiet ${1} |
-+# Then, the following line will be simpler:
-+#   { ${NM} --quiet ${1} || kill 0; } |
-+
-+{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill 0; } } |
-+${AWK} -v "file=${1}" '
-+BEGIN {
-+	i = 0
-+}
-+
-+# Skip the line if the number of fields is less than 3.
-+#
-+# case 1)
-+#   For undefined symbols, the first field (value) is empty.
-+#   The outout looks like this:
-+#     "                 U _printk"
-+#   It is unneeded to record undefined symbols.
-+#
-+# case 2)
-+#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
-+#     "---------------- t"
-+!length($3) {
-+	next
-+}
- 
--{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
--while read value type name
--do
--	# Skip the line if the number of fields is less than 3.
--	#
--	# case 1)
--	#   For undefined symbols, the first field (value) is empty.
--	#   The outout looks like this:
--	#     "                 U _printk"
--	#   It is unneeded to record undefined symbols.
--	#
--	# case 2)
--	#   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
--	#     "---------------- t"
--	if [[ -z ${name} ]]; then
--		continue
--	fi
-+# save (name, type) in the associative array
-+{ symbol_types[$3]=$2 }
- 
--	# save (name, type) in the associative array
--	symbol_types[${name}]=${type}
-+# append the exported symbol to the array
-+($3 ~ /^__ksymtab_/) {
-+	export_symbols[i] = $3
-+	sub(/^__ksymtab_/, "", export_symbols[i])
-+	i++
-+}
- 
--	# append the exported symbol to the array
--	if [[ ${name} == __ksymtab_* ]]; then
--		export_symbols+=(${name#__ksymtab_})
--	fi
--done
-+END {
-+	exit_code = 0
-+	for (j = 0; j < i; ++j) {
-+		name = export_symbols[j]
-+		# nm(3) says "If lowercase, the symbol is usually local"
-+		if (symbol_types[name] ~ /[a-z]/) {
-+			printf "%s: error: local symbol %s was exported\n",
-+				file, name | "cat 1>&2"
-+			exit_code = 1
-+		}
-+	}
- 
--for name in "${export_symbols[@]}"
--do
--	# nm(3) says "If lowercase, the symbol is usually local"
--	if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
--		echo "$@: error: local symbol '${name}' was exported" >&2
--		exit_code=1
--	fi
--done
-+	exit exit_code
-+}'
- 
--exit ${exit_code}
-+exit $?
 -- 
-2.37.3
+2.34.1
 
