@@ -2,125 +2,206 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B31ECAAA1
-	for <linux-kbuild@archiver.kernel.org>; Sat,  3 Sep 2022 02:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA7BC38145
+	for <linux-kbuild@archiver.kernel.org>; Sat,  3 Sep 2022 16:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbiICCho (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 2 Sep 2022 22:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38170 "EHLO
+        id S229732AbiICQCQ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 3 Sep 2022 12:02:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiICChn (ORCPT
+        with ESMTP id S230007AbiICQCP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Sep 2022 22:37:43 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60FC4E97C6;
-        Fri,  2 Sep 2022 19:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662172662; x=1693708662;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=uZjszkbsmhce7t/ileXAuZqNCiVsozNNHJWKPtgsoeY=;
-  b=dCbHuhnO+nO5CbfjlxMNU3xgVKh9pgpQQNSLU7Irj/FncX6JIjWKGOpx
-   2+IwxFHkx8l0L9xw9dgenPUu3hL7B8RPk8v4YyzWjaCNU146hjeQTAb9/
-   rxcGg3h/uRQZ8j7iB4Vyo28/AzN9yQdWM2kZKa4nDm5B0A0aPs4PvjYne
-   /UDPUzKg/rA9FMQRGqkLHvsyrPLal/lai+JzyvEF5jRREp9e6jDLmmLWA
-   VDqzG8i4j0PD6ToYLX0l4ny3qrwMMiXQrCyheua+Z6BLckm2ibxpSv0xu
-   U+Gq7sWWyq6coEXNeibqfULdOjruqAoi0ObvO89Jk5evurGVxSYthy1iW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10458"; a="360080006"
-X-IronPort-AV: E=Sophos;i="5.93,286,1654585200"; 
-   d="scan'208";a="360080006"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 19:37:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,286,1654585200"; 
-   d="scan'208";a="609165471"
-Received: from lkp-server02.sh.intel.com (HELO 95dfd251caa2) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 02 Sep 2022 19:37:40 -0700
-Received: from kbuild by 95dfd251caa2 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oUJ2R-0000uT-1B;
-        Sat, 03 Sep 2022 02:37:39 +0000
-Date:   Sat, 3 Sep 2022 10:36:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Peter Zijlstra <peterz@infradead.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: use objtool-args-y to clean up objtool arguments
-Message-ID: <202209031000.bJCDq6zH-lkp@intel.com>
-References: <20220902130846.654526-1-masahiroy@kernel.org>
+        Sat, 3 Sep 2022 12:02:15 -0400
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A79A543C9
+        for <linux-kbuild@vger.kernel.org>; Sat,  3 Sep 2022 09:02:13 -0700 (PDT)
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 283G1uNe019684
+        for <linux-kbuild@vger.kernel.org>; Sun, 4 Sep 2022 01:01:57 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 283G1uNe019684
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1662220917;
+        bh=Wr95nlPDjKBcZDdyUmTZfGidpwdQVigm33DmaWH2s/I=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=xGmw0ReQUkTHuN5/UPzr6lEltUag7dYsQh0nYWPFJQsdr48kspD947Qj+6io04L8S
+         JfyKAmgXR9Yc/7nH+laseiVJSbdbkHrVFaFLkYTk+q4IrjJPA2jFkvu41TA6ZNnho0
+         1h7dz1aDbN7+QjvlTyWAC71j9YOiq4jCT0gXrZ+sFE2KMjnWDElJfZ0osU8MNaKWr5
+         YvE5/Gqji2DLYTUbImw1okq6dHTpJHKMQJjV9MxDnBmdSalG7JLt5VvbPf1BRpUfop
+         s4i7e0MAC08EzL0dn24BB7qRzKOOWIpVQUw7LfpSWQu+gBsawRZk8qfCmX3y1E22b1
+         s4HDGv/VTyveQ==
+X-Nifty-SrcIP: [209.85.160.53]
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-11e7e0a63e2so12050856fac.4
+        for <linux-kbuild@vger.kernel.org>; Sat, 03 Sep 2022 09:01:57 -0700 (PDT)
+X-Gm-Message-State: ACgBeo23sC+gquKsKG5UAwDDXKiOhfWpZGdNOzWzfiePOwXrWx6/Ib0s
+        a4Jt9fH0BJ58zUd5OAIh+dv9bLX+HfwjP2zffaQ=
+X-Google-Smtp-Source: AA6agR40QCa5Hc21pfslo3NlIUrYOLUdrMmyeWQlnbsF675F5S92dvNM3DW+a9y/ElgAZdA4MDe0jjofujUsNYwv7R0=
+X-Received: by 2002:a05:6870:f626:b0:10d:a798:f3aa with SMTP id
+ ek38-20020a056870f62600b0010da798f3aamr4873371oab.194.1662220916075; Sat, 03
+ Sep 2022 09:01:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220902130846.654526-1-masahiroy@kernel.org>
+References: <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
+ <b0cf49ac1a3ece40e133fa80e3ceae7891d6ed8d.1661979510.git.owen@owenrafferty.com>
+In-Reply-To: <b0cf49ac1a3ece40e133fa80e3ceae7891d6ed8d.1661979510.git.owen@owenrafferty.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Sun, 4 Sep 2022 01:01:19 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARYiJNiFKL2pQWCOocxkYWiJ66S4gBDE=54tFYJnfO--g@mail.gmail.com>
+Message-ID: <CAK7LNARYiJNiFKL2pQWCOocxkYWiJ66S4gBDE=54tFYJnfO--g@mail.gmail.com>
+Subject: Re: [PATCH v4] kbuild: rewrite check-local-export in sh/awk
+To:     Owen Rafferty <owen@owenrafferty.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Masahiro,
+On Thu, Sep 1, 2022 at 6:03 AM Owen Rafferty <owen@owenrafferty.com> wrote:
+>
+> Signed-off-by: Owen Rafferty <owen@owenrafferty.com>
+> ---
 
-I love your patch! Yet something to improve:
 
-[auto build test ERROR on masahiroy-kbuild/for-next]
-[also build test ERROR on linux/master linus/master v6.0-rc3 next-20220901]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Please input something in the commit log.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Masahiro-Yamada/kbui=
-ld-use-objtool-args-y-to-clean-up-objtool-arguments/20220902-221441
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbu=
-ild.git for-next
-config: x86_64-randconfig-a013 (https://download.01.org/0day-ci/archive/202=
-20903/202209031000.bJCDq6zH-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
-reproduce (this is a W=3D1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/9cb92b4715f74a8869c=
-a8ec50a8dcdc4fb5b384e
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Masahiro-Yamada/kbuild-use-objtool=
--args-y-to-clean-up-objtool-arguments/20220902-221441
-        git checkout 9cb92b4715f74a8869ca8ec50a8dcdc4fb5b384e
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=3D1 O=3Dbuild_dir ARCH=3Dx86_64 SHELL=3D/bin/bash
+I think the benchmark in v2 is worth mentioning
+because "awk is faster than bash" is one benefit
+of applying this patch.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
 
-All errors (new ones prefixed by >>):
 
->> /bin/bash: -c: line 1: syntax error near unexpected token `)'
-   /bin/bash: -c: line 1: `set -e;  echo '  LD      vmlinux.o';  ld -m elf_=
-x86_64 -z noexecstack --no-warn-rwx-segments -r -o vmlinux.o  --whole-archi=
-ve arch/x86/kernel/head_64.o arch/x86/kernel/head64.o arch/x86/kernel/ebda.=
-o arch/x86/kernel/platform-quirks.o init/built-in.a usr/built-in.a arch/x86=
-/built-in.a kernel/built-in.a certs/built-in.a mm/built-in.a fs/built-in.a =
-ipc/built-in.a security/built-in.a crypto/built-in.a io_uring/built-in.a li=
-b/built-in.a arch/x86/lib/built-in.a  lib/lib.a  arch/x86/lib/lib.a drivers=
-/built-in.a sound/built-in.a net/built-in.a virt/built-in.a arch/x86/pci/bu=
-ilt-in.a arch/x86/power/built-in.a arch/x86/video/built-in.a --no-whole-arc=
-hive --start-group  --end-group  ; ./tools/objtool/objtool --hacks=3Djump_l=
-abel --hacks=3Dnoinstr --orc --static-call --uaccess --no-unreachable --no-=
-unreachable --noinstr ) --link vmlinux.o; printf '%s\n' 'cmd_vmlinux.o :=3D=
- ld -m elf_x86_64 -z noexecstack --no-warn-rwx-segments -r -o vmlinux.o  --=
-whole-archive arch/x86/kernel/head_64.o arch/x86/kernel/head64.o arch/x86/k=
-ernel/ebda.o arch/x86/kernel/platform-quirks.o init/built-in.a usr/built-in=
-=2Ea arch/x86/built-in.a kernel/built-in.a certs/built-in.a mm/built-in.a f=
-s/built-in.a ipc/built-in.a security/built-in.a crypto/built-in.a io_uring/=
-built-in.a lib/built-in.a arch/x86/lib/built-in.a  lib/lib.a  arch/x86/lib/=
-lib.a drivers/built-in.a sound/built-in.a net/built-in.a virt/built-in.a ar=
-ch/x86/pci/built-in.a arch/x86/power/built-in.a arch/x86/video/built-in.a -=
--no-whole-archive --start-group  --end-group  ; ./tools/objtool/objtool --h=
-acks=3Djump_label --hacks=3Dnoinstr --orc --static-call --uaccess --no-unre=
-achable --no-unreachable --noinstr ) --link vmlinux.o' > ./.vmlinux.o.cmd'
 
---=20
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+
+
+
+>  scripts/check-local-export | 96 +++++++++++++++++++-------------------
+>  1 file changed, 47 insertions(+), 49 deletions(-)
+>
+> diff --git a/scripts/check-local-export b/scripts/check-local-export
+> index 6ccc2f467416..0c049ff44aca 100755
+> --- a/scripts/check-local-export
+> +++ b/scripts/check-local-export
+> @@ -1,26 +1,14 @@
+> -#!/usr/bin/env bash
+> +#!/bin/sh
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  #
+>  # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
+> +# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
+>  #
+>  # Exit with error if a local exported symbol is found.
+>  # EXPORT_SYMBOL should be used for global symbols.
+>
+>  set -e
+>
+> -# catch errors from ${NM}
+> -set -o pipefail
+> -
+> -# Run the last element of a pipeline in the current shell.
+> -# Without this, the while-loop would be executed in a subshell, and
+> -# the changes made to 'symbol_types' and 'export_symbols' would be lost.
+> -shopt -s lastpipe
+> -
+> -declare -A symbol_types
+> -declare -a export_symbols
+> -
+> -exit_code=0
+> -
+>  # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
+>  # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
+>  # '2>/dev/null'. However, it suppresses real error messages as well. Add a
+> @@ -29,43 +17,53 @@ exit_code=0
+>  # TODO:
+>  # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
+>  # binutils to 2.37, llvm to 13.0.0.
+> -# Then, the following line will be really simple:
+> -#   ${NM} --quiet ${1} |
+> +# Then, the following line will be simpler:
+> +#   { ${NM} --quiet ${1} || kill 0; } |
+> +
+> +{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill 0; } } |
+> +${AWK} -v "file=${1}" '
+> +BEGIN {
+> +       i = 0
+> +}
+> +
+> +# Skip the line if the number of fields is less than 3.
+> +#
+> +# case 1)
+> +#   For undefined symbols, the first field (value) is empty.
+> +#   The outout looks like this:
+> +#     "                 U _printk"
+> +#   It is unneeded to record undefined symbols.
+> +#
+> +# case 2)
+> +#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
+> +#     "---------------- t"
+> +!length($3) {
+> +       next
+> +}
+>
+> -{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; false; } } |
+> -while read value type name
+> -do
+> -       # Skip the line if the number of fields is less than 3.
+> -       #
+> -       # case 1)
+> -       #   For undefined symbols, the first field (value) is empty.
+> -       #   The outout looks like this:
+> -       #     "                 U _printk"
+> -       #   It is unneeded to record undefined symbols.
+> -       #
+> -       # case 2)
+> -       #   For Clang LTO, llvm-nm outputs a line with type 't' but empty name:
+> -       #     "---------------- t"
+> -       if [[ -z ${name} ]]; then
+> -               continue
+> -       fi
+> +# save (name, type) in the associative array
+> +{ symbol_types[$3]=$2 }
+>
+> -       # save (name, type) in the associative array
+> -       symbol_types[${name}]=${type}
+> +# append the exported symbol to the array
+> +($3 ~ /^__ksymtab_/) {
+> +       export_symbols[i] = $3
+> +       sub(/^__ksymtab_/, "", export_symbols[i])
+> +       i++
+> +}
+>
+> -       # append the exported symbol to the array
+> -       if [[ ${name} == __ksymtab_* ]]; then
+> -               export_symbols+=(${name#__ksymtab_})
+> -       fi
+> -done
+> +END {
+> +       exit_code = 0
+> +       for (j = 0; j < i; ++j) {
+> +               name = export_symbols[j]
+> +               # nm(3) says "If lowercase, the symbol is usually local"
+> +               if (symbol_types[name] ~ /[a-z]/) {
+> +                       printf "%s: error: local symbol %s was exported\n",
+> +                               file, name | "cat 1>&2"
+> +                       exit_code = 1
+> +               }
+> +       }
+>
+> -for name in "${export_symbols[@]}"
+> -do
+> -       # nm(3) says "If lowercase, the symbol is usually local"
+> -       if [[ ${symbol_types[$name]} =~ [a-z] ]]; then
+> -               echo "$@: error: local symbol '${name}' was exported" >&2
+> -               exit_code=1
+> -       fi
+> -done
+> +       exit exit_code
+> +}'
+>
+> -exit ${exit_code}
+> +exit $?
+> --
+> 2.37.3
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
