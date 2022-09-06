@@ -2,65 +2,65 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92257C6FA93
-	for <linux-kbuild@archiver.kernel.org>; Tue,  6 Sep 2022 14:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28492C6FA8D
+	for <linux-kbuild@archiver.kernel.org>; Tue,  6 Sep 2022 14:20:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241249AbiIFOUX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 6 Sep 2022 10:20:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38058 "EHLO
+        id S241335AbiIFOUZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 6 Sep 2022 10:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241972AbiIFOTI (ORCPT
+        with ESMTP id S241665AbiIFOR2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Sep 2022 10:19:08 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2062.outbound.protection.outlook.com [40.107.244.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEE42F65E;
-        Tue,  6 Sep 2022 06:50:05 -0700 (PDT)
+        Tue, 6 Sep 2022 10:17:28 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CA3DEF7;
+        Tue,  6 Sep 2022 06:49:34 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PDosOneLBOD/vZLb77ApRCuBcAmUYng7y0C7AUVrzsA6IjYp7kG74kTkVHPFmsjIyUf0rUpbXRivX2eVPDn8zlMox5yu3w63WJ/WIF28bFzNhfr+JS3Mmya7lgtuj5sLi1koOROKEJ4Qwm7tWsWaxzpvqtuMchtAgmkgy1MMcivgQUlyE7EcnMlxePBxhg7wplg6hSSHrMdhgeu+PbVTymumuu/x1U1524ELLE4D9HloMs1IUtFgt7R4Cg3Nm2DJ97gHqttCEyAq/CeavDBpv+Og+87iyHMELgkp8n18vG64OYqzMuQ7w2Ivgz8JunxFdaCakr2W8y/bpVE9m/Fxow==
+ b=XemBOO3nC6WNAP+aI+9SSmsvwLFQuoEHbTqjUQN+JiHjEoO2k7aLdUwYo9zQ8rQaAAy76QTdB+OpASnLZ83qVgAc7TAEtW3pcJJgmZEWxmVPhuQQIu7YvD5vI4UVntHiS2WI3GD4Fm0lu825S0i1Q/+doGjQVb8LrWa4Mcc+EMGxzr637jaVeFeGCF6zaLuDLizWYW+0qG7A0ZmW4hr5BnNJlVyIbCxTYEHh/IpeQaCNCMo0ie1kR7HNgoNABy5QfreUoDDntMONvJvAWS51dFotaXxa45d8+5jIJX0lwl8iF2psmgdX12O3odV0QiePW4bsMDD5XRc954PcqUHpRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y57p5ouHP4x8F9d9gwp37pMkcc6TTtTd0Z/zpH6bcTs=;
- b=eyQt9UqpoyVwCPncYVvTxL/D35Jv7haxOv7y2XVHyrJP21SCaK0NlEGIx7KwmpKSmaKZFOcO1P833C3XpSdKPS95gd6gFomsTiThtu8P48cCH9P/9ezMuwj4DqY+gDKgT7yJguVGaU7+Yooe5RH1Vsr3cc1IzOi6RuqJOcg9Xyz7dRIVG2yiyJYgn5IdRGmrLj3bTlRfj4gY7gHuV2YpqVnxOBH1N976ByDOtj8kXrYpz6MO3ZIGOEP8QPzQF6mJ4fWhaHvCNT9g8zmnsCOH6fHNYPT+k8E4x2Tap2JykmX77Zy4VPerAmVfORyKqeUDzNp5iU039/EiAVxRHc8XYA==
+ bh=uCJIG/W6utr64/ZhPwmV6hiUCVl91LQmkAFBIzF02+s=;
+ b=n6qUfxojKz/a+43tjPHftgay9mJJBXUu2lissSOQ7B9r2YSszs7AbnBy2h5FHixp+iH6p7PE+HpdmHI4r2+gUu6UwNfqSxfWr6zCF2U0jFWlvuskEc9pjbrseOALBgjtwMTbi5GuWTIXeszEeji4uGZaX36YEmZn4R9DVxAUYF3JSwT8c+sFkm+/gQuFdChMypIqXjhGE6oRr6Nf1iLwUPtFEk5nq4nKbfnccAm3ON09AzzwUfk9JJmpBe6O+T3x8Ycite1m0M1xQq2H+xRokOvfq5M06yML+wddKxg2eHPxVdV86mgsgkHLWBu3keTW7i4dCAp9gBsGKOhwXVvOJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y57p5ouHP4x8F9d9gwp37pMkcc6TTtTd0Z/zpH6bcTs=;
- b=GJ/nlLLWmexxn39Q97Ag/1fQR7UH0S1e6mudd9LF0xYwYkNjeSV6PD6mucw3Xn3PUMy3K1Etr9ZZHjnA/+LeN6g37zdjH7ef5WWxmccnNuI1qBclZOWlFABitNcx1msqy6KE2nOp/7GXNPcACClMMIRjrMO98OaBlixTFhR66iY=
-Received: from BN0PR04CA0133.namprd04.prod.outlook.com (2603:10b6:408:ed::18)
- by DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22) with
+ bh=uCJIG/W6utr64/ZhPwmV6hiUCVl91LQmkAFBIzF02+s=;
+ b=otFUDPNyUSc4xTmscwM7i2gMEHFRi2Y0g8bXOWGmziKYGmoXdCIn+txcZe/fFw6lyltUKdibSZbcCQqLHhuk/1oVOSS1qgiHmj9E/GQXOnXZvmCTIvqXrnLgPKKiWQqTcK3Q4r5wCBfAeZ7LK6ujuy3gxmH1+0xyZRYi1zS/d60=
+Received: from CY5PR22CA0004.namprd22.prod.outlook.com (2603:10b6:930:16::29)
+ by DM4PR12MB7573.namprd12.prod.outlook.com (2603:10b6:8:10f::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
- 2022 13:49:04 +0000
-Received: from BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ed:cafe::25) by BN0PR04CA0133.outlook.office365.com
- (2603:10b6:408:ed::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10 via Frontend
- Transport; Tue, 6 Sep 2022 13:49:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12; Tue, 6 Sep
+ 2022 13:48:29 +0000
+Received: from CY4PEPF0000B8ED.namprd05.prod.outlook.com
+ (2603:10b6:930:16:cafe::d7) by CY5PR22CA0004.outlook.office365.com
+ (2603:10b6:930:16::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12 via Frontend
+ Transport; Tue, 6 Sep 2022 13:48:29 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT039.mail.protection.outlook.com (10.13.177.169) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5588.10 via Frontend Transport; Tue, 6 Sep 2022 13:49:03 +0000
-Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CY4PEPF0000B8ED.mail.protection.outlook.com (10.167.241.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5612.10 via Frontend Transport; Tue, 6 Sep 2022 13:48:29 +0000
+Received: from SATLEXMB07.amd.com (10.181.41.45) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 6 Sep
- 2022 08:49:03 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB08.amd.com
- (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
+ 2022 08:48:23 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB07.amd.com
+ (10.181.41.45) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 6 Sep
- 2022 06:49:02 -0700
+ 2022 06:48:22 -0700
 Received: from xhdipdslab49.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.28 via Frontend
- Transport; Tue, 6 Sep 2022 08:48:53 -0500
+ Transport; Tue, 6 Sep 2022 08:48:12 -0500
 From:   Nipun Gupta <nipun.gupta@amd.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
@@ -79,9 +79,9 @@ CC:     <okaya@kernel.org>, <harpreet.anand@amd.com>,
         <nikhil.agarwal@amd.com>, <michal.simek@amd.com>,
         <aleksandar.radovanovic@amd.com>, <git@amd.com>,
         Nipun Gupta <nipun.gupta@amd.com>
-Subject: [RFC PATCH v3 5/7] bus/cdx: add bus and device attributes
-Date:   Tue, 6 Sep 2022 19:17:59 +0530
-Message-ID: <20220906134801.4079497-6-nipun.gupta@amd.com>
+Subject: [RFC PATCH v3 1/7] dt-bindings: bus: add CDX bus device tree bindings
+Date:   Tue, 6 Sep 2022 19:17:55 +0530
+Message-ID: <20220906134801.4079497-2-nipun.gupta@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220906134801.4079497-1-nipun.gupta@amd.com>
 References: <20220803122655.100254-1-nipun.gupta@amd.com>
@@ -91,335 +91,138 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eb72c8db-bfc4-4e71-64f6-08da900e8fa4
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8ED:EE_|DM4PR12MB7573:EE_
+X-MS-Office365-Filtering-Correlation-Id: c70549d4-1204-48dc-1f19-08da900e7b09
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gneOVv2jGrgvkTEE79Utgcm8kX2tgoleuRqJG14wR//ocqqT4qCRucHUqScaEktwc5hB1TxvPFEncLN6fTQHiORa7t8RqRMg+LUU6wfA+cFOPZiQqmXs6HGeAqY5Tw6mevwByQ8V6uLWXOCX9Rfq6rlUw6mEJnlkO6DwIccSSMCtr+yR/rp5npdQl5nL3R2coTFgKsadr+6XB7QivyGPb2TpRu0bdODEi3s7TJLCAtL+6c+RgShYlFLdhgL/4QMkbMGH+WNPsnACBQVdFim4brkFD74flfH3fAbfSbvt/5X8l7YGRvjxeEQdCixeJ+wpTTAoB5gL9YCYYO+7NZV+hXdUxhw+gcuhoNtZv7JYIYw0XuzRthIO4cu4+e75Zivd7LYUtyriyYst8RcHivWccMbzJYbHQBm2ZC1xDPEPT1HmbZC9COiscMb+IcaBp9tM4d3JXBr0Y75r5jR7FVj3/ELaHqImRYxwlmCzEfnAwUBQH88xutXAUo+qEZIAFxhZWFTApG7XEq6UFJUAy939LRHjDf05tV7T57sp+0UjUbttD4JPY6WUr3Wsy4oZSzTgSLa7Aa2O6FQ8lbyD2tSjDOR0omwK+5klGG/2S37LI67TMif1gjI49oVflcwReluqqf9CFLGGaNksf70bxjejOuEvr2evP80MqZX5QJqCtsA9zdcIfWnt0i3FA4pVcZdD8JlQ1pJAptOYgPV4qfUNNLx7Prd5UaE92ohQABpUVc6Zpao3p3ilqRZkVZ3Lnl2nMe1xR6AyJQRpqVnm4syzxwjfTuzkkDJlYSZeeSS0xq+4qq+T+M/CAGZcJfsaLFyXNGKeEZy/J6O1WV8wokXi66souE/Z26AzV5gM75zUCucXMERPRcniAV/oEQtA+AZM
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(346002)(396003)(136003)(46966006)(40470700004)(36840700001)(4326008)(44832011)(82310400005)(40480700001)(110136005)(316002)(86362001)(54906003)(36756003)(82740400003)(2906002)(356005)(921005)(81166007)(40460700003)(8936002)(5660300002)(7416002)(36860700001)(83380400001)(70586007)(8676002)(47076005)(70206006)(426003)(336012)(41300700001)(2616005)(186003)(1076003)(478600001)(26005)(83996005)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 0C4YTxBp6+Y0di6IdLA3qW++l/vhqi7kx5E5zz2EoLsqUPAcKHDC3Zlrc3NwxOhq2kO5ZIoWj0EMnDE45WyD3R17se5u6eehQnOxtEBNmkkTY5Qv9DD7RddGrcl13lZ+C5mXT5ubOOWzPfAYIUG0cX9T2eLGmz2jFA4Cm87ntsABLvBcFM7z/SIH6JAnPAmzGg3HMxSZzv8UdssAMSHkF0+RXzjcHAXEAJTRaG1jCgek5sk3G+Ey2cTUq2p1pDOM9KwD8AE0mFKdjSkVOkyjdsvqcaB7Rt8edZDZqfhi8S/FS3Dwyl14pTLnACf0k5fIX9SGjZduB6aVao4lycprnL/AGTMXl4QyF7SiW4qzAxV6fqPJV+lVvKVuDiGeyILAFwKSD6e3XCuk6HigA9esPezeSGFGq7eqJDTWJ/FP0v3R9aEai8L2Rr7Ae615a4CDM7SCsuEmKGK9TUf0ORsEBb6HV65ipdfi5mRqnlIrPswPQ2qjJDG03Is9tTKl0eMv0H8xqZvsiJNei/8f3PTi4u6vtq7OZaRVqmwhiKQOyKX2zpOFeW9+OD0YGwtIiKOfBpT/r33hkjo+H1mmIrImyAymCZmmnPGfF/4AtO35NdRprbERYCFtXtYrB1+QArtH9OsLdMfVU9fdp1iEEH+J9GnoBx1mUfeKS5w2ayf+v/QPaqfY3jfTtRKtpfAjjXfeX5obLiiZN8bdQvm7Ubb6oFAWRmdq/ZW0LCpRGbzFm6VRhjKH7QwRynVqBap8Jp5gt8gSQmaropna5psX1lWLvdXcnB2YF/sW4LiEUc22HHkW5zJ8VrQ42WpUka174FUvfL/LX6URnm4xSydSkOlKMgAL1LHgE4TKfDhXasq3eCaTGfx69hQZqeWIvGYjzi5NJAk4RVvRNTBXgFmFIHKr73jJlI3XDF4XJXg2IX9y9OOVq6U8bsBhu8U0B5flWDOm
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(346002)(396003)(39860400002)(40470700004)(36840700001)(46966006)(8936002)(7416002)(5660300002)(36860700001)(44832011)(2906002)(83380400001)(36756003)(8676002)(40460700003)(82740400003)(40480700001)(70586007)(4326008)(70206006)(110136005)(316002)(54906003)(6666004)(86362001)(82310400005)(47076005)(426003)(336012)(81166007)(2616005)(26005)(1076003)(186003)(356005)(921005)(41300700001)(478600001)(966005)(36900700001)(2101003)(83996005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 13:49:03.9579
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 13:48:29.1983
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb72c8db-bfc4-4e71-64f6-08da900e8fa4
+X-MS-Exchange-CrossTenant-Network-Message-Id: c70549d4-1204-48dc-1f19-08da900e7b09
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8ED.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4202
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7573
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This change adds te support for rescanning and reset
-of the CDX buses, as well as option to optionally reset
-any devices on the bus. It also enables sysfs entry for
-vendor and device id.
+This patch adds a devicetree binding documentation for CDX
+bus.
 
-Sysfs entries are provided in CDX controller:
-- rescan of the CDX controller.
-- reset all the devices present on CDX buses.
+CDX bus controller dynamically detects CDX bus and the
+devices on these bus using CDX firmware.
 
-Sysfs entry is provided in each of the platform device
-detected by the CDX controller
-- vendor id
-- device id
-- modalias
-- reset of the device.
-
-Signed-off-by: Puneet Gupta <puneet.gupta@amd.com>
 Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
 ---
- Documentation/ABI/testing/sysfs-bus-cdx |  54 +++++++++
- drivers/bus/cdx/cdx.c                   | 148 ++++++++++++++++++++++++
- drivers/bus/cdx/mcdi_stubs.c            |   6 +
- drivers/bus/cdx/mcdi_stubs.h            |  11 ++
- include/linux/cdx/cdx_bus.h             |   8 ++
- 5 files changed, 227 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-bus-cdx
+ .../devicetree/bindings/bus/xlnx,cdx.yaml     | 75 +++++++++++++++++++
+ MAINTAINERS                                   |  6 ++
+ 2 files changed, 81 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
 
-diff --git a/Documentation/ABI/testing/sysfs-bus-cdx b/Documentation/ABI/testing/sysfs-bus-cdx
+diff --git a/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
 new file mode 100644
-index 000000000000..5f84f0a93a66
+index 000000000000..0aa5599ada8e
 --- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-bus-cdx
-@@ -0,0 +1,54 @@
-+What:		/sys/bus/cdx/rescan
-+Date:		August 2022
-+Contact:	puneet.gupta@amd.com
-+Description:
-+		Writing 1 to this would cause rescan of the bus
-+		and devices on the CDX bus. Any new devices would
-+		be scanned and added to the list of linux devices
-+		and any devices removed are also deleted from linux.
++++ b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
+@@ -0,0 +1,75 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/bus/xlnx,cdx.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+                For example::
++title: AMD CDX bus controller
 +
-+		  # echo 1 > /sys/bus/cdx/rescan
++description: |
++  CDX bus controller for AMD devices is implemented to dynamically
++  detect CDX bus and devices on these bus using the firmware.
++  The CDX bus manages multiple FPGA based hardware devices, which
++  can support network, crypto or any other specialized type of
++  devices. These FPGA based devices can be added/modified dynamically
++  on run-time.
 +
-+What:		/sys/bus/cdx/reset_all
-+Date:		August 2022
-+Contact:	puneet.gupta@amd.com
-+Description:
-+		Writing 1 to this would reset all the devices present
-+		on the CDX bus
++  All devices on the CDX bus will have a unique streamid (for IOMMU)
++  and a unique device ID (for MSI) corresponding to a requestor ID
++  (one to one associated with the device). The streamid and deviceid
++  are used to configure SMMU and GIC-ITS respectively.
 +
-+                For example::
++  iommu-map property is used to define the set of stream ids
++  corresponding to each device and the associated IOMMU.
 +
-+		  # echo 1 > /sys/bus/cdx/reset_all
++  The MSI writes are accompanied by sideband data (Device ID).
++  The msi-map property is used to associate the devices with the
++  device ID as well as the associated ITS controller.
 +
-+What:		/sys/bus/cdx/devices/.../vendor
-+Date:		August 2022
-+Contact:	nipun.gupta@amd.com
-+Description:
-+		Vendor ID for this CDX device
++maintainers:
++  - Nipun Gupta <nipun.gupta@amd.com>
++  - Nikhil Agarwal <nikhil.agarwal@amd.com>
 +
-+What:		/sys/bus/cdx/devices/.../device
-+Date:		August 2022
-+Contact:	nipun.gupta@amd.com
-+Description:
-+		Device ID for this CDX device
++properties:
++  compatible:
++    const: xlnx,cdxbus-controller-1.0
 +
-+What:		/sys/bus/cdx/devices/.../reset
-+What:		/sys/bus/cdx/devices/.../reset
-+Date:		August 2022
-+Contact:	nipun.gupta@amd.com
-+Description:
-+		Writing 1 to this would reset the CDX device
++  reg:
++    maxItems: 1
 +
-+                For example::
++  iommu-map: true
 +
-+		  # echo 1 > /sys/bus/cdx/.../reset
++  msi-map: true
 +
-+What:		/sys/bus/cdx/devices/.../modalias
-+Date:		August 2022
-+Contact:	nipun.gupta@amd.com
-+Description:
-+		A CDX device has modalias:
++required:
++  - compatible
++  - reg
++  - iommu-map
++  - msi-map
 +
-+			- v`vendor`d`device`
-diff --git a/drivers/bus/cdx/cdx.c b/drivers/bus/cdx/cdx.c
-index 02ececce1c84..9b7a69de6a8f 100644
---- a/drivers/bus/cdx/cdx.c
-+++ b/drivers/bus/cdx/cdx.c
-@@ -32,6 +32,23 @@ struct platform_device *cdx_controller_pdev;
++additionalProperties: false
++
++examples:
++  - |
++    smmu@ec000000 {
++        compatible = "arm,smmu-v3";
++        #iommu-cells = <1>;
++    };
++
++    gic@e2000000 {
++        compatible = "arm,gic-v3";
++        interrupt-controller;
++        its: gic-its@e2040000 {
++            compatible = "arm,gic-v3-its";
++            msi-controller;
++        };
++    };
++
++    cdx: cdx@4000000 {
++        compatible = "xlnx,cdxbus-controller-1.0";
++        reg = <0x00000000 0x04000000 0 0x1000>;
++        /* define map for RIDs 250-259 */
++        iommu-map = <250 &smmu 250 10>;
++        /* define msi map for RIDs 250-259 */
++        msi-map = <250 &its 250 10>;
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9d7f64dc0efe..f0598b3d731c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -934,6 +934,12 @@ S:	Supported
+ F:	drivers/crypto/ccp/
+ F:	include/linux/ccp.h
  
- static int cdx_bus_device_discovery(struct platform_device *pdev);
- 
-+static int reset_cdx_device(struct device *dev, void * __always_unused data)
-+{
-+	struct platform_device *cdx_bus_pdev = to_platform_device(dev->parent);
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+	struct cdx_mcdi_t *cdx_mcdi = platform_get_drvdata(cdx_bus_pdev);
++AMD CDX BUS DRIVER
++M:	Nipun Gupta <nipun.gupta@amd.com>
++M:	Nikhil Agarwal <nikhil.agarwal@amd.com>
++S:	Maintained
++F:	Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
 +
-+	/* MCDI FW: reset particular device represented by bus:func */
-+	cdx_mcdi_func_reset(cdx_mcdi, cdx_dev->bus_id, cdx_dev->func_id);
-+
-+	return 0;
-+}
-+
-+int cdx_dev_reset(struct device *dev)
-+{
-+	return reset_cdx_device(dev, NULL);
-+}
-+
- static int cdx_unregister_device(struct device *dev,
- 				 void * __always_unused data)
- {
-@@ -139,10 +156,141 @@ static int cdx_dma_configure(struct device *dev)
- 	return 0;
- }
- 
-+static ssize_t vendor_show(struct device *dev, struct device_attribute *attr,
-+			   char *buf)
-+{
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+
-+	return sprintf(buf, "0x%x\n", cdx_dev->vendor);
-+}
-+static DEVICE_ATTR_RO(vendor);
-+
-+static ssize_t device_show(struct device *dev, struct device_attribute *attr,
-+			   char *buf)
-+{
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+
-+	return sprintf(buf, "0x%x\n", cdx_dev->device);
-+}
-+static DEVICE_ATTR_RO(device);
-+
-+static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
-+			   const char *buf, size_t count)
-+{
-+	int ret = 0;
-+	bool reset = count > 0 && *buf != '0';
-+
-+	if (!reset)
-+		return count;
-+
-+	ret = reset_cdx_device(dev, NULL);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+}
-+static DEVICE_ATTR_WO(reset);
-+
-+static ssize_t modalias_show(struct device *dev, struct device_attribute *attr,
-+			     char *buf)
-+{
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+
-+	return sprintf(buf, "cdx:v%08Xd%d\n", cdx_dev->vendor,
-+			cdx_dev->device);
-+}
-+static DEVICE_ATTR_RO(modalias);
-+
-+static ssize_t driver_override_store(struct device *dev,
-+				     struct device_attribute *attr,
-+				     const char *buf, size_t count)
-+{
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+	int ret;
-+
-+	if (WARN_ON(dev->bus != &cdx_bus_type))
-+		return -EINVAL;
-+
-+	ret = driver_set_override(dev, &cdx_dev->driver_override, buf, count);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+}
-+
-+static ssize_t driver_override_show(struct device *dev,
-+				    struct device_attribute *attr, char *buf)
-+{
-+	struct cdx_device *cdx_dev = to_cdx_device(dev);
-+
-+	return snprintf(buf, PAGE_SIZE, "%s\n", cdx_dev->driver_override);
-+}
-+static DEVICE_ATTR_RW(driver_override);
-+
-+static struct attribute *cdx_dev_attrs[] = {
-+	&dev_attr_reset.attr,
-+	&dev_attr_vendor.attr,
-+	&dev_attr_device.attr,
-+	&dev_attr_modalias.attr,
-+	&dev_attr_driver_override.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(cdx_dev);
-+
-+static ssize_t rescan_store(struct bus_type *bus,
-+			    const char *buf, size_t count)
-+{
-+	bool rescan = count > 0 && *buf != '0';
-+	int ret = 0;
-+
-+	if (!rescan)
-+		return count;
-+
-+	/* Unregister all the devices on the bus */
-+	cdx_unregister_devices(&cdx_bus_type);
-+
-+	/* Rescan all the devices */
-+	ret = cdx_bus_device_discovery(cdx_controller_pdev);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+}
-+static BUS_ATTR_WO(rescan);
-+
-+static ssize_t reset_all_store(struct bus_type *bus,
-+			       const char *buf, size_t count)
-+{
-+	bool reset = count > 0 && *buf != '0';
-+	int ret = 0;
-+
-+	if (!reset)
-+		return count;
-+
-+	/* Reset all the devices attached to cdx bus */
-+	ret = bus_for_each_dev(bus, NULL, NULL, reset_cdx_device);
-+	if (ret) {
-+		pr_err("error in CDX bus reset\n");
-+		return 0;
-+	}
-+
-+	return count;
-+}
-+static BUS_ATTR_WO(reset_all);
-+
-+static struct attribute *cdx_bus_attrs[] = {
-+	&bus_attr_rescan.attr,
-+	&bus_attr_reset_all.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(cdx_bus);
-+
- struct bus_type cdx_bus_type = {
- 	.name = "cdx",
- 	.match = cdx_bus_match,
- 	.dma_configure  = cdx_dma_configure,
-+	.dev_groups = cdx_dev_groups,
-+	.bus_groups = cdx_bus_groups,
- };
- EXPORT_SYMBOL_GPL(cdx_bus_type);
- 
-diff --git a/drivers/bus/cdx/mcdi_stubs.c b/drivers/bus/cdx/mcdi_stubs.c
-index 2c8db1f5a057..2bc042d2b061 100644
---- a/drivers/bus/cdx/mcdi_stubs.c
-+++ b/drivers/bus/cdx/mcdi_stubs.c
-@@ -53,3 +53,9 @@ int cdx_mcdi_get_func_config(struct cdx_mcdi_t *cdx_mcdi,
- 
- 	return 0;
- }
-+
-+int cdx_mcdi_func_reset(struct cdx_mcdi_t *cdx_mcdi,
-+			uint8_t bus_id, uint8_t func_id)
-+{
-+	return 0;
-+}
-diff --git a/drivers/bus/cdx/mcdi_stubs.h b/drivers/bus/cdx/mcdi_stubs.h
-index 7b6f79d48ce9..535218bcdce0 100644
---- a/drivers/bus/cdx/mcdi_stubs.h
-+++ b/drivers/bus/cdx/mcdi_stubs.h
-@@ -73,4 +73,15 @@ int cdx_mcdi_get_func_config(struct cdx_mcdi_t *cdx_mcdi,
- 			     uint8_t bus_id, uint8_t func_id,
- 			     struct cdx_dev_params_t *dev_params);
- 
-+/**
-+ * cdx_mcdi_func_reset - Reset cdx device represented by bus_id:func_id
-+ * @cdx_mcdi: pointer to MCDI interface.
-+ * @bus_num: Bus number.
-+ * @func_id: Function number.
-+ *
-+ * Return 0 on success, <0 on failure
-+ */
-+int cdx_mcdi_func_reset(struct cdx_mcdi_t *cdx_mcdi,
-+			uint8_t bus_id, uint8_t func_id);
-+
- #endif /* _MCDI_STUBS_H_ */
-diff --git a/include/linux/cdx/cdx_bus.h b/include/linux/cdx/cdx_bus.h
-index bf86024783d2..8306b4d3fd82 100644
---- a/include/linux/cdx/cdx_bus.h
-+++ b/include/linux/cdx/cdx_bus.h
-@@ -109,4 +109,12 @@ int cdx_msi_domain_alloc_irqs(struct device *dev, unsigned int irq_count);
-  */
- void cdx_msi_domain_free_irqs(struct device *dev);
- 
-+/**
-+ * cdx_dev_reset - Reset CDX device
-+ * @dev: device pointer
-+ *
-+ * Return 0 for success, -errno on failure
-+ */
-+int cdx_dev_reset(struct device *dev);
-+
- #endif /* _CDX_BUS_H_ */
+ AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SEV SUPPORT
+ M:	Brijesh Singh <brijesh.singh@amd.com>
+ M:	Tom Lendacky <thomas.lendacky@amd.com>
 -- 
 2.25.1
 
