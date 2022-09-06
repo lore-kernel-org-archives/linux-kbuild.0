@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28492C6FA8D
-	for <linux-kbuild@archiver.kernel.org>; Tue,  6 Sep 2022 14:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D38C6FA89
+	for <linux-kbuild@archiver.kernel.org>; Tue,  6 Sep 2022 14:30:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241335AbiIFOUZ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 6 Sep 2022 10:20:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
+        id S241415AbiIFOaA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 6 Sep 2022 10:30:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241665AbiIFOR2 (ORCPT
+        with ESMTP id S242284AbiIFO25 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Sep 2022 10:17:28 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CA3DEF7;
-        Tue,  6 Sep 2022 06:49:34 -0700 (PDT)
+        Tue, 6 Sep 2022 10:28:57 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2068.outbound.protection.outlook.com [40.107.223.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715F290C4E;
+        Tue,  6 Sep 2022 06:55:24 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XemBOO3nC6WNAP+aI+9SSmsvwLFQuoEHbTqjUQN+JiHjEoO2k7aLdUwYo9zQ8rQaAAy76QTdB+OpASnLZ83qVgAc7TAEtW3pcJJgmZEWxmVPhuQQIu7YvD5vI4UVntHiS2WI3GD4Fm0lu825S0i1Q/+doGjQVb8LrWa4Mcc+EMGxzr637jaVeFeGCF6zaLuDLizWYW+0qG7A0ZmW4hr5BnNJlVyIbCxTYEHh/IpeQaCNCMo0ie1kR7HNgoNABy5QfreUoDDntMONvJvAWS51dFotaXxa45d8+5jIJX0lwl8iF2psmgdX12O3odV0QiePW4bsMDD5XRc954PcqUHpRQ==
+ b=WhSJ/hEQHkrHv78eeyaNXfV3TDRPKt+3VJHh9PAKdbpH6K9JXMXrWPsCTnqy3n2YEYmuCazKNxQ6Yz3BIUHW3n1i9RxTymwkOyq/172pAnDbwhYYHb8e4Nd6SzOsKA8/ltNVwh35JwOmiGPt/RShzB2ToXly982P28czhm4bDyGmcOqCGecGOSbeyeL/BVZLYsRpEzBRecLFfEAZPjj0dc5EpmVn4W2kS4c5ucVsHKQXDrhzLOju4nmjwfKdnp5XjFQOCrIoZxnwphaWTrPHQ/f5CakTJkyPfRv8/dYk1XNd3EkRjyiAkUwnOdfj3XUohOYZjXdHfmyai/8JKHQUcQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uCJIG/W6utr64/ZhPwmV6hiUCVl91LQmkAFBIzF02+s=;
- b=n6qUfxojKz/a+43tjPHftgay9mJJBXUu2lissSOQ7B9r2YSszs7AbnBy2h5FHixp+iH6p7PE+HpdmHI4r2+gUu6UwNfqSxfWr6zCF2U0jFWlvuskEc9pjbrseOALBgjtwMTbi5GuWTIXeszEeji4uGZaX36YEmZn4R9DVxAUYF3JSwT8c+sFkm+/gQuFdChMypIqXjhGE6oRr6Nf1iLwUPtFEk5nq4nKbfnccAm3ON09AzzwUfk9JJmpBe6O+T3x8Ycite1m0M1xQq2H+xRokOvfq5M06yML+wddKxg2eHPxVdV86mgsgkHLWBu3keTW7i4dCAp9gBsGKOhwXVvOJg==
+ bh=wpweB7oA0mMZDfBd2KNin3ucSqF3KYPf7GJcDMrWzRY=;
+ b=W6P2RK6x/4NTLsGyx8JyOLAmon+79dSjZhMEQpFp7z0jKDTXDACuj3oC1QYRTJcjequTpY6vrl3RWAi3vSh2uJp+BPMwLK/1b/mJsOU3le+/DDeQKQNmhULAdekgTWjSHiHb5Jph+IF3W+57G5rOUxy5OYHTjo/LrJpzb3WfgF192LqxifbYqtsjVwMOu2LkIfVoqtcd7OgrgHekNqMeg+GBa6dsty2dSGkv788OZwSvO2sZkpzySi9GqyOeTYyYn2tCKKTE3ZL/jH8LChnbqf3bzY9TpITSZndzTgwj+bEF+k2elLIPiRW6a+LPMJLhjix6M32CLSEl2lrcigF20Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uCJIG/W6utr64/ZhPwmV6hiUCVl91LQmkAFBIzF02+s=;
- b=otFUDPNyUSc4xTmscwM7i2gMEHFRi2Y0g8bXOWGmziKYGmoXdCIn+txcZe/fFw6lyltUKdibSZbcCQqLHhuk/1oVOSS1qgiHmj9E/GQXOnXZvmCTIvqXrnLgPKKiWQqTcK3Q4r5wCBfAeZ7LK6ujuy3gxmH1+0xyZRYi1zS/d60=
-Received: from CY5PR22CA0004.namprd22.prod.outlook.com (2603:10b6:930:16::29)
- by DM4PR12MB7573.namprd12.prod.outlook.com (2603:10b6:8:10f::22) with
+ bh=wpweB7oA0mMZDfBd2KNin3ucSqF3KYPf7GJcDMrWzRY=;
+ b=rs1lpTM6v3rUr8ECTKlIQs+1+KevgfwUxKXmVQl+YkJIhPbpgfSzlo75PcimXhYkRu74VzgNe0d5hlc3fPfq5P/YdkDsOkEk2vAJqgVGG7Ondf8N5l0P6c6j8pGqAccFYcFnH0HnKJCzdA98Y2hLg3kNoMH9g2DP9GT2tKtSJ6A=
+Received: from CY5PR14CA0016.namprd14.prod.outlook.com (2603:10b6:930:2::22)
+ by CH0PR12MB5043.namprd12.prod.outlook.com (2603:10b6:610:e2::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12; Tue, 6 Sep
- 2022 13:48:29 +0000
-Received: from CY4PEPF0000B8ED.namprd05.prod.outlook.com
- (2603:10b6:930:16:cafe::d7) by CY5PR22CA0004.outlook.office365.com
- (2603:10b6:930:16::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12 via Frontend
- Transport; Tue, 6 Sep 2022 13:48:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
+ 2022 13:49:14 +0000
+Received: from CY4PEPF0000B8EE.namprd05.prod.outlook.com
+ (2603:10b6:930:2:cafe::6a) by CY5PR14CA0016.outlook.office365.com
+ (2603:10b6:930:2::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.12 via Frontend
+ Transport; Tue, 6 Sep 2022 13:49:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,20 +47,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CY4PEPF0000B8ED.mail.protection.outlook.com (10.167.241.9) with Microsoft
+ CY4PEPF0000B8EE.mail.protection.outlook.com (10.167.241.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5612.10 via Frontend Transport; Tue, 6 Sep 2022 13:48:29 +0000
-Received: from SATLEXMB07.amd.com (10.181.41.45) by SATLEXMB03.amd.com
+ 15.20.5612.9 via Frontend Transport; Tue, 6 Sep 2022 13:49:14 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 6 Sep
- 2022 08:48:23 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB07.amd.com
- (10.181.41.45) with Microsoft SMTP Server (version=TLS1_2,
+ 2022 08:49:13 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB08.amd.com
+ (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 6 Sep
- 2022 06:48:22 -0700
+ 2022 06:49:12 -0700
 Received: from xhdipdslab49.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.28 via Frontend
- Transport; Tue, 6 Sep 2022 08:48:12 -0500
+ Transport; Tue, 6 Sep 2022 08:49:03 -0500
 From:   Nipun Gupta <nipun.gupta@amd.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
@@ -79,9 +79,9 @@ CC:     <okaya@kernel.org>, <harpreet.anand@amd.com>,
         <nikhil.agarwal@amd.com>, <michal.simek@amd.com>,
         <aleksandar.radovanovic@amd.com>, <git@amd.com>,
         Nipun Gupta <nipun.gupta@amd.com>
-Subject: [RFC PATCH v3 1/7] dt-bindings: bus: add CDX bus device tree bindings
-Date:   Tue, 6 Sep 2022 19:17:55 +0530
-Message-ID: <20220906134801.4079497-2-nipun.gupta@amd.com>
+Subject: [RFC PATCH v3 6/7] vfio/cdx: add support for CDX bus
+Date:   Tue, 6 Sep 2022 19:18:00 +0530
+Message-ID: <20220906134801.4079497-7-nipun.gupta@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220906134801.4079497-1-nipun.gupta@amd.com>
 References: <20220803122655.100254-1-nipun.gupta@amd.com>
@@ -91,138 +91,426 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8ED:EE_|DM4PR12MB7573:EE_
-X-MS-Office365-Filtering-Correlation-Id: c70549d4-1204-48dc-1f19-08da900e7b09
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8EE:EE_|CH0PR12MB5043:EE_
+X-MS-Office365-Filtering-Correlation-Id: 95dc4e33-e60f-426e-a555-08da900e95c9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0C4YTxBp6+Y0di6IdLA3qW++l/vhqi7kx5E5zz2EoLsqUPAcKHDC3Zlrc3NwxOhq2kO5ZIoWj0EMnDE45WyD3R17se5u6eehQnOxtEBNmkkTY5Qv9DD7RddGrcl13lZ+C5mXT5ubOOWzPfAYIUG0cX9T2eLGmz2jFA4Cm87ntsABLvBcFM7z/SIH6JAnPAmzGg3HMxSZzv8UdssAMSHkF0+RXzjcHAXEAJTRaG1jCgek5sk3G+Ey2cTUq2p1pDOM9KwD8AE0mFKdjSkVOkyjdsvqcaB7Rt8edZDZqfhi8S/FS3Dwyl14pTLnACf0k5fIX9SGjZduB6aVao4lycprnL/AGTMXl4QyF7SiW4qzAxV6fqPJV+lVvKVuDiGeyILAFwKSD6e3XCuk6HigA9esPezeSGFGq7eqJDTWJ/FP0v3R9aEai8L2Rr7Ae615a4CDM7SCsuEmKGK9TUf0ORsEBb6HV65ipdfi5mRqnlIrPswPQ2qjJDG03Is9tTKl0eMv0H8xqZvsiJNei/8f3PTi4u6vtq7OZaRVqmwhiKQOyKX2zpOFeW9+OD0YGwtIiKOfBpT/r33hkjo+H1mmIrImyAymCZmmnPGfF/4AtO35NdRprbERYCFtXtYrB1+QArtH9OsLdMfVU9fdp1iEEH+J9GnoBx1mUfeKS5w2ayf+v/QPaqfY3jfTtRKtpfAjjXfeX5obLiiZN8bdQvm7Ubb6oFAWRmdq/ZW0LCpRGbzFm6VRhjKH7QwRynVqBap8Jp5gt8gSQmaropna5psX1lWLvdXcnB2YF/sW4LiEUc22HHkW5zJ8VrQ42WpUka174FUvfL/LX6URnm4xSydSkOlKMgAL1LHgE4TKfDhXasq3eCaTGfx69hQZqeWIvGYjzi5NJAk4RVvRNTBXgFmFIHKr73jJlI3XDF4XJXg2IX9y9OOVq6U8bsBhu8U0B5flWDOm
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(346002)(396003)(39860400002)(40470700004)(36840700001)(46966006)(8936002)(7416002)(5660300002)(36860700001)(44832011)(2906002)(83380400001)(36756003)(8676002)(40460700003)(82740400003)(40480700001)(70586007)(4326008)(70206006)(110136005)(316002)(54906003)(6666004)(86362001)(82310400005)(47076005)(426003)(336012)(81166007)(2616005)(26005)(1076003)(186003)(356005)(921005)(41300700001)(478600001)(966005)(36900700001)(2101003)(83996005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: uelHK8Yhw5qrAwUOJWicBVCZcZhvxFIlnFTk0T5P4PrSmB2tw3xCzUtFQAObs7Qp0DGrlL+9P+qFa9f/pjwx90vf7kMiF/L/LNjyXaIN+UzmR/+tJxlOpdteRH32IaRjUY5MVxN2QXxqZMzeDamv/AYJg8mZTNJLODzKXNC6Cf/fbAiIVSoEVD4bR0lxlTS/j/Bx1lHmHCMmB8kA0FfViJlHpznBjC2PlI2PR5usVLMBD1BQuWeNvnm7yta5GtL7tSaARebZDmFgD0DDmQt/jwpm8QBAHic16QQPsIUnUHGPFFzX08sGQNd9PmOPSPIFxQIQVZ6vKuMXxgAMfRPpNjj55uVSDBiMjHs2/w8r5+/sgZIF7KUqGA7/HksoPun/RsH7lRYFIQ05YpaKGf7Y/Dok2KJ42nmAx0U6o27VxnJSkZx8mDLwOqoGGPvaJEMImQAkNNP1M3D5UcgORNeg9Ldhst6Izq9P1ih4vpjBjAhpPh94fiMiHIc+K0Tv5e6Xwv3GasuGBtAZIB/+/8BnJWMtqvt0nSCEHGK81oi//bFMhe7FP0gBkTQVSDf5alP9VfFw5Z6JecC7NJa1jk7t6DOUoOjr+ioxF770PnZKpmjeycwumP3W1nEVRpYpBf6w80RrREV2lJd+DhwQ9mEmOqYi2VZ8JWGt0BfX2SDFeCjPdpBRQpqFeO77M+OJRJTQ8IzPj0JGdJ3uIIIF0HO3aJKam9Iv3Jkw8iakhXFxFCl3IXoyuX3KppvnWVlCrM05HJaSSHLN/kh4l8KGHc3lZwd4iBvPIbYbkiZuU3ayc/BWzJ89Uqh78QnlTmTk9lfyzMIXAcX7mAt6bhuIOL5UzSZ7bsfPsGwY55Yt6ekfYj2KZ9X52eDB2x4nD862KCo+
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(39860400002)(396003)(346002)(136003)(36840700001)(46966006)(40470700004)(82740400003)(478600001)(2616005)(426003)(41300700001)(47076005)(336012)(83380400001)(26005)(1076003)(8936002)(82310400005)(186003)(44832011)(7416002)(30864003)(5660300002)(316002)(110136005)(40460700003)(40480700001)(54906003)(2906002)(4326008)(70586007)(70206006)(36756003)(8676002)(86362001)(81166007)(921005)(356005)(36860700001)(83996005)(36900700001)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 13:48:29.1983
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 13:49:14.1589
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c70549d4-1204-48dc-1f19-08da900e7b09
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95dc4e33-e60f-426e-a555-08da900e95c9
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8ED.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8EE.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7573
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5043
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-This patch adds a devicetree binding documentation for CDX
-bus.
+vfio-cdx driver enables IOCTLs for user space to query
+MMIO regions for CDX devices and mmap them. This change
+also adds support for reset of CDX devices.
 
-CDX bus controller dynamically detects CDX bus and the
-devices on these bus using CDX firmware.
+This change adds the VFIO CDX driver and enables the following
+ioctls for CDX devices:
+ - VFIO_DEVICE_GET_INFO:
+ - VFIO_DEVICE_GET_REGION_INFO
+ - VFIO_DEVICE_RESET
 
 Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
 ---
- .../devicetree/bindings/bus/xlnx,cdx.yaml     | 75 +++++++++++++++++++
- MAINTAINERS                                   |  6 ++
- 2 files changed, 81 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
+ MAINTAINERS                         |   1 +
+ drivers/vfio/Makefile               |   1 +
+ drivers/vfio/cdx/Kconfig            |  10 +
+ drivers/vfio/cdx/Makefile           |   4 +
+ drivers/vfio/cdx/vfio_cdx.c         | 284 ++++++++++++++++++++++++++++
+ drivers/vfio/cdx/vfio_cdx_private.h |  32 ++++
+ 6 files changed, 332 insertions(+)
+ create mode 100644 drivers/vfio/cdx/Kconfig
+ create mode 100644 drivers/vfio/cdx/Makefile
+ create mode 100644 drivers/vfio/cdx/vfio_cdx.c
+ create mode 100644 drivers/vfio/cdx/vfio_cdx_private.h
 
-diff --git a/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-new file mode 100644
-index 000000000000..0aa5599ada8e
---- /dev/null
-+++ b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-@@ -0,0 +1,75 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/bus/xlnx,cdx.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: AMD CDX bus controller
-+
-+description: |
-+  CDX bus controller for AMD devices is implemented to dynamically
-+  detect CDX bus and devices on these bus using the firmware.
-+  The CDX bus manages multiple FPGA based hardware devices, which
-+  can support network, crypto or any other specialized type of
-+  devices. These FPGA based devices can be added/modified dynamically
-+  on run-time.
-+
-+  All devices on the CDX bus will have a unique streamid (for IOMMU)
-+  and a unique device ID (for MSI) corresponding to a requestor ID
-+  (one to one associated with the device). The streamid and deviceid
-+  are used to configure SMMU and GIC-ITS respectively.
-+
-+  iommu-map property is used to define the set of stream ids
-+  corresponding to each device and the associated IOMMU.
-+
-+  The MSI writes are accompanied by sideband data (Device ID).
-+  The msi-map property is used to associate the devices with the
-+  device ID as well as the associated ITS controller.
-+
-+maintainers:
-+  - Nipun Gupta <nipun.gupta@amd.com>
-+  - Nikhil Agarwal <nikhil.agarwal@amd.com>
-+
-+properties:
-+  compatible:
-+    const: xlnx,cdxbus-controller-1.0
-+
-+  reg:
-+    maxItems: 1
-+
-+  iommu-map: true
-+
-+  msi-map: true
-+
-+required:
-+  - compatible
-+  - reg
-+  - iommu-map
-+  - msi-map
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    smmu@ec000000 {
-+        compatible = "arm,smmu-v3";
-+        #iommu-cells = <1>;
-+    };
-+
-+    gic@e2000000 {
-+        compatible = "arm,gic-v3";
-+        interrupt-controller;
-+        its: gic-its@e2040000 {
-+            compatible = "arm,gic-v3-its";
-+            msi-controller;
-+        };
-+    };
-+
-+    cdx: cdx@4000000 {
-+        compatible = "xlnx,cdxbus-controller-1.0";
-+        reg = <0x00000000 0x04000000 0 0x1000>;
-+        /* define map for RIDs 250-259 */
-+        iommu-map = <250 &smmu 250 10>;
-+        /* define msi map for RIDs 250-259 */
-+        msi-map = <250 &its 250 10>;
-+    };
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 9d7f64dc0efe..f0598b3d731c 100644
+index 61af11c9fe06..e66a93ca2218 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -934,6 +934,12 @@ S:	Supported
- F:	drivers/crypto/ccp/
- F:	include/linux/ccp.h
+@@ -940,6 +940,7 @@ M:	Nikhil Agarwal <nikhil.agarwal@amd.com>
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
+ F:	drivers/bus/cdx/*
++F:	drivers/vfio/cdx/*
+ F:	include/linux/cdx/*
  
-+AMD CDX BUS DRIVER
-+M:	Nipun Gupta <nipun.gupta@amd.com>
-+M:	Nikhil Agarwal <nikhil.agarwal@amd.com>
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-+
  AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SEV SUPPORT
- M:	Brijesh Singh <brijesh.singh@amd.com>
- M:	Tom Lendacky <thomas.lendacky@amd.com>
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index 1a32357592e3..7f4f5c891c28 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -12,3 +12,4 @@ obj-$(CONFIG_VFIO_PCI) += pci/
+ obj-$(CONFIG_VFIO_PLATFORM) += platform/
+ obj-$(CONFIG_VFIO_MDEV) += mdev/
+ obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
++obj-$(CONFIG_CDX_BUS) += cdx/
+diff --git a/drivers/vfio/cdx/Kconfig b/drivers/vfio/cdx/Kconfig
+new file mode 100644
+index 000000000000..728d7294a2c7
+--- /dev/null
++++ b/drivers/vfio/cdx/Kconfig
+@@ -0,0 +1,10 @@
++config VFIO_CDX
++	tristate "VFIO support for CDX bus devices"
++	depends on CDX_BUS
++	select EVENTFD
++	help
++	  Driver to enable VFIO support for the devices on CDX bus.
++	  This is required to make use of CDX devices present in
++	  the system using the VFIO framework.
++
++	  If you don't know what to do here, say N.
+diff --git a/drivers/vfio/cdx/Makefile b/drivers/vfio/cdx/Makefile
+new file mode 100644
+index 000000000000..7a4183d76802
+--- /dev/null
++++ b/drivers/vfio/cdx/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++
++#vfio-fsl-mc-y := vfio_cdx.o vfio_cdx_intr.o
++obj-y += vfio_cdx.o vfio_cdx_intr.o
+diff --git a/drivers/vfio/cdx/vfio_cdx.c b/drivers/vfio/cdx/vfio_cdx.c
+new file mode 100644
+index 000000000000..2e5bd494057a
+--- /dev/null
++++ b/drivers/vfio/cdx/vfio_cdx.c
+@@ -0,0 +1,284 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022, Advanced Micro Devices, Inc.
++ */
++
++#include <linux/device.h>
++#include <linux/iommu.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <linux/vfio.h>
++#include <linux/cdx/cdx_bus.h>
++#include <linux/delay.h>
++#include <linux/io-64-nonatomic-hi-lo.h>
++
++#include "vfio_cdx_private.h"
++
++static struct cdx_driver vfio_cdx_driver;
++
++static int vfio_cdx_open_device(struct vfio_device *core_vdev)
++{
++	struct vfio_cdx_device *vdev =
++		container_of(core_vdev, struct vfio_cdx_device, vdev);
++	struct cdx_device *cdx_dev = vdev->cdx_dev;
++	int count = cdx_dev->res_count;
++	int i;
++
++	vdev->regions = kcalloc(count, sizeof(struct vfio_cdx_region),
++				GFP_KERNEL);
++	if (!vdev->regions)
++		return -ENOMEM;
++
++	for (i = 0; i < count; i++) {
++		struct resource *res = &cdx_dev->res[i];
++
++		vdev->regions[i].addr = res->start;
++		vdev->regions[i].size = resource_size(res);
++		vdev->regions[i].type = res->flags;
++		/*
++		 * Only regions addressed with PAGE granularity may be
++		 * MMAPed securely.
++		 */
++		if (!(vdev->regions[i].addr & ~PAGE_MASK) &&
++				!(vdev->regions[i].size & ~PAGE_MASK))
++			vdev->regions[i].flags |=
++					VFIO_REGION_INFO_FLAG_MMAP;
++		vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_READ;
++		if (!(cdx_dev->res[i].flags & IORESOURCE_READONLY))
++			vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_WRITE;
++	}
++
++	return 0;
++}
++
++static void vfio_cdx_regions_cleanup(struct vfio_cdx_device *vdev)
++{
++	kfree(vdev->regions);
++}
++
++static int vfio_cdx_reset_device(struct vfio_cdx_device *vdev)
++{
++	struct vfio_device *core_vdev = &vdev->vdev;
++
++	return cdx_dev_reset(core_vdev->dev);
++}
++
++static void vfio_cdx_close_device(struct vfio_device *core_vdev)
++{
++	struct vfio_cdx_device *vdev =
++		container_of(core_vdev, struct vfio_cdx_device, vdev);
++	int ret;
++
++	vfio_cdx_regions_cleanup(vdev);
++
++	/* reset the device before cleaning up the interrupts */
++	ret = vfio_cdx_reset_device(vdev);
++	if (WARN_ON(ret))
++		dev_warn(core_vdev->dev,
++			 "VFIO_CDX: reset device has failed (%d)\n", ret);
++}
++
++static long vfio_cdx_ioctl(struct vfio_device *core_vdev,
++			   unsigned int cmd, unsigned long arg)
++{
++	unsigned long minsz;
++	struct vfio_cdx_device *vdev =
++		container_of(core_vdev, struct vfio_cdx_device, vdev);
++	struct cdx_device *cdx_dev = vdev->cdx_dev;
++
++	switch (cmd) {
++	case VFIO_DEVICE_GET_INFO:
++	{
++		struct vfio_device_info info;
++
++		minsz = offsetofend(struct vfio_device_info, num_irqs);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		info.flags = VFIO_DEVICE_FLAGS_RESET;
++
++		info.num_regions = cdx_dev->res_count;
++		info.num_irqs = 1;
++
++		return copy_to_user((void __user *)arg, &info, minsz) ?
++			-EFAULT : 0;
++	}
++	case VFIO_DEVICE_GET_REGION_INFO:
++	{
++		struct vfio_region_info info;
++
++		minsz = offsetofend(struct vfio_region_info, offset);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		if (info.index >= cdx_dev->res_count)
++			return -EINVAL;
++
++		/* map offset to the physical address  */
++		info.offset = VFIO_CDX_INDEX_TO_OFFSET(info.index);
++		info.size = vdev->regions[info.index].size;
++		info.flags = vdev->regions[info.index].flags;
++
++		if (copy_to_user((void __user *)arg, &info, minsz))
++			return -EFAULT;
++		return 0;
++	}
++	case VFIO_DEVICE_RESET:
++	{
++		return vfio_cdx_reset_device(vdev);
++	}
++	default:
++		return -ENOTTY;
++	}
++}
++
++static int vfio_cdx_mmap_mmio(struct vfio_cdx_region region,
++			      struct vm_area_struct *vma)
++{
++	u64 size = vma->vm_end - vma->vm_start;
++	u64 pgoff, base;
++	u8 region_cacheable;
++
++	pgoff = vma->vm_pgoff &
++		((1U << (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	base = pgoff << PAGE_SHIFT;
++
++	if (region.size < PAGE_SIZE || base + size > region.size)
++		return -EINVAL;
++
++	region_cacheable = (region.type & IORESOURCE_MEM);
++	if (!region_cacheable)
++		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
++
++	vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
++
++	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
++			       size, vma->vm_page_prot);
++}
++
++static int vfio_cdx_mmap(struct vfio_device *core_vdev,
++			    struct vm_area_struct *vma)
++{
++	struct vfio_cdx_device *vdev =
++		container_of(core_vdev, struct vfio_cdx_device, vdev);
++	struct cdx_device *cdx_dev = vdev->cdx_dev;
++	unsigned int index;
++
++	index = vma->vm_pgoff >> (VFIO_CDX_OFFSET_SHIFT - PAGE_SHIFT);
++
++	if (vma->vm_end < vma->vm_start)
++		return -EINVAL;
++	if (vma->vm_start & ~PAGE_MASK)
++		return -EINVAL;
++	if (vma->vm_end & ~PAGE_MASK)
++		return -EINVAL;
++	if (!(vma->vm_flags & VM_SHARED))
++		return -EINVAL;
++	if (index >= cdx_dev->res_count)
++		return -EINVAL;
++
++	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_MMAP))
++		return -EINVAL;
++
++	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_READ)
++			&& (vma->vm_flags & VM_READ))
++		return -EINVAL;
++
++	if (!(vdev->regions[index].flags & VFIO_REGION_INFO_FLAG_WRITE)
++			&& (vma->vm_flags & VM_WRITE))
++		return -EINVAL;
++
++	vma->vm_private_data = cdx_dev;
++
++	return vfio_cdx_mmap_mmio(vdev->regions[index], vma);
++}
++
++static const struct vfio_device_ops vfio_cdx_ops = {
++	.name		= "vfio-cdx",
++	.open_device	= vfio_cdx_open_device,
++	.close_device	= vfio_cdx_close_device,
++	.ioctl		= vfio_cdx_ioctl,
++	.mmap		= vfio_cdx_mmap,
++};
++
++static int vfio_cdx_probe(struct cdx_device *cdx_dev)
++{
++	struct vfio_cdx_device *vdev;
++	struct device *dev = &cdx_dev->dev;
++	int ret;
++
++	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
++	if (!vdev)
++		return -ENOMEM;
++
++	vfio_init_group_dev(&vdev->vdev, dev, &vfio_cdx_ops);
++	vdev->cdx_dev = cdx_dev;
++	vdev->dev = dev;
++
++	ret = vfio_assign_device_set(&vdev->vdev, dev);
++	if (ret) {
++		dev_err(dev, "VFIO_CDX: vfio_assign_device_set failed\n");
++		goto out_uninit;
++	}
++
++	ret = vfio_register_group_dev(&vdev->vdev);
++	if (ret) {
++		dev_err(dev, "VFIO_CDX: Failed to add to vfio group\n");
++		goto out_uninit;
++	}
++
++	dev_set_drvdata(dev, vdev);
++	return 0;
++
++out_uninit:
++	vfio_uninit_group_dev(&vdev->vdev);
++	kfree(vdev);
++	return ret;
++}
++
++static int vfio_cdx_remove(struct cdx_device *cdx_dev)
++{
++	struct device *dev = &cdx_dev->dev;
++	struct vfio_cdx_device *vdev = dev_get_drvdata(dev);
++
++	vfio_unregister_group_dev(&vdev->vdev);
++
++	vfio_uninit_group_dev(&vdev->vdev);
++	kfree(vdev);
++	return 0;
++}
++
++static struct cdx_driver vfio_cdx_driver = {
++	.probe		= vfio_cdx_probe,
++	.remove		= vfio_cdx_remove,
++	.driver	= {
++		.name	= "vfio-cdx",
++		.owner	= THIS_MODULE,
++	},
++	.driver_managed_dma = true,
++};
++
++static int __init vfio_cdx_driver_init(void)
++{
++	return cdx_driver_register(&vfio_cdx_driver);
++}
++
++static void __exit vfio_cdx_driver_exit(void)
++{
++	cdx_driver_unregister(&vfio_cdx_driver);
++}
++
++module_init(vfio_cdx_driver_init);
++module_exit(vfio_cdx_driver_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("VFIO for CDX devices - User Level meta-driver");
+diff --git a/drivers/vfio/cdx/vfio_cdx_private.h b/drivers/vfio/cdx/vfio_cdx_private.h
+new file mode 100644
+index 000000000000..d87b55663462
+--- /dev/null
++++ b/drivers/vfio/cdx/vfio_cdx_private.h
+@@ -0,0 +1,32 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022, Advanced Micro Devices, Inc.
++ */
++
++#ifndef VFIO_CDX_PRIVATE_H
++#define VFIO_CDX_PRIVATE_H
++
++#define VFIO_CDX_OFFSET_SHIFT    40
++#define VFIO_CDX_OFFSET_MASK (((u64)(1) << VFIO_CDX_OFFSET_SHIFT) - 1)
++
++#define VFIO_CDX_OFFSET_TO_INDEX(off) ((off) >> VFIO_CDX_OFFSET_SHIFT)
++
++#define VFIO_CDX_INDEX_TO_OFFSET(index)	\
++	((u64)(index) << VFIO_CDX_OFFSET_SHIFT)
++
++struct vfio_cdx_region {
++	u32			flags;
++	u32			type;
++	u64			addr;
++	resource_size_t		size;
++	void __iomem		*ioaddr;
++};
++
++struct vfio_cdx_device {
++	struct vfio_device		vdev;
++	struct cdx_device		*cdx_dev;
++	struct device			*dev;
++	struct vfio_cdx_region		*regions;
++};
++
++#endif /* VFIO_CDX_PRIVATE_H */
 -- 
 2.25.1
 
