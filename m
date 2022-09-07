@@ -2,62 +2,63 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3731C6FA82
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Sep 2022 04:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C38C38145
+	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Sep 2022 04:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbiIGE7j (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 7 Sep 2022 00:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38136 "EHLO
+        id S229682AbiIGE7k (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 7 Sep 2022 00:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbiIGE73 (ORCPT
+        with ESMTP id S229528AbiIGE7i (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Sep 2022 00:59:29 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A8B112E
-        for <linux-kbuild@vger.kernel.org>; Tue,  6 Sep 2022 21:59:26 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-345753b152fso39020547b3.7
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Sep 2022 21:59:26 -0700 (PDT)
+        Wed, 7 Sep 2022 00:59:38 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B9C5FAD
+        for <linux-kbuild@vger.kernel.org>; Tue,  6 Sep 2022 21:59:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id d8-20020a25bc48000000b00680651cf051so10171033ybk.23
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Sep 2022 21:59:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=HyKr9I8MzG9kBN69CE/ANl9iOdCK/yJrqP2VJJKmtbA=;
-        b=mJJdHlkWP0qiECsFlrlh4TKS0YhzeMCgS4kv9vWslSXb4Vob+X30ichTiTL9WTKgI5
-         gol9O3sKAlXKI1d1of7Cx5Dpy6M7xy066hXl72LhnNeDvOPqt4fAeMBFk9P/xDlbHDD2
-         UA/pc6CA6BCCHdAtX4qtkpOdFmk8fiZ2OArMTR+ncA3Yby8+sBmM+xa3oX1KJ2YzgJKa
-         L3WqzmAD6s/p69GW8Di63kcHhq5ThiT5UKYWfMmqynAphjEWW/B63Rm2Ocy3RFqD/324
-         TnivXmR6PypnprSSrfFTKQ6rz9V+TOXSc4HJQE//4PY20nwqS/FUvdbNY4f1mLnkixFm
-         MvPQ==
+        bh=bcgi8Ou8th2qqJa7CD88vTQQmiUlNdn6G38aIXpHI6Y=;
+        b=ntpiMlsUZbBzGuoDfGrsuzC9Fu9Dngcb4gIzs9vYGwNNGJsAHWhrinnINN7afNa+aa
+         Ju69QRlfFJKW9Y10Cp/2v4E6l4L3HUCFUsswVqibz/opy/3jfd5IGljZ+yDbnBHTGone
+         gLjkZkXmzODkCXP09P6it2IQmKO6vQiVkQCWObUeDZWSQQsyH2CrqhdhCEkLAIvxJ++3
+         Cn1vaDzB3STqCw6p0UOO+5q+vBLH7eUoI8EnXYuDLIxqAjPA0pQIlsetbgBApQo/8knJ
+         9xuXq0izZx+52Ei7v7eLE+alDASuxx+P4GL55l25kj1eL6HIUPJ9xOXLI0sbvJ+5PZko
+         Niqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=HyKr9I8MzG9kBN69CE/ANl9iOdCK/yJrqP2VJJKmtbA=;
-        b=exboJa2z/dxNhVJGCa+g4GzjumVudMJ03H7dA1IoYw7J2bRA5oT27j0dmDOhboxHhd
-         A7enP/ctsWx/pVGq1I2BHyhKLUu/c96gTCm4nLkrlCG6yBxyALlAfa7A9+UvDvH+wOpf
-         ZMA19hPuvkzRy62a848sFMHT2ve/68WU8LREz8lHOvqEN8yr+O0YTFR4yztEiUcGaeuk
-         /PHu+1hMPSm45C/IEXRyKijEPFl2lEQ4cEw0c+Unk+sMgbLZLT+uBqQ7RfNX3Skg2YQE
-         Vgqrh2nwNsHy/n7aR8WA0PuoMfOuJXuV86wwGNt1kQ+W8w286GE4ZZBOrni0ZUyEgzoi
-         gwuw==
-X-Gm-Message-State: ACgBeo0szIBscYHnegarq04DYo3LHgYbcsZoXzV59lGFK9yI6XdV5sJo
-        2wbIT+RBLpjpQTzKV/0L0P2z/4yMtOi6u14iX1Q=
-X-Google-Smtp-Source: AA6agR6A3nOFVgzH/LIlkj47r/IKh6L2ey7C7N3pfYOn5TOUy3NjV0xTHyAbU1giaqkuT92t6UljPsTDaUWLkFIxjWY=
+        bh=bcgi8Ou8th2qqJa7CD88vTQQmiUlNdn6G38aIXpHI6Y=;
+        b=BwJB88sMNPO1BoNXVXoEAau65vfF36iplCVBh4SGBkohzoL/orQzoQQx/jFT48IJQ4
+         4pNnhYLyRP0Cd9tW9tPDbBYh3X4kqC4Bb24MbuNmiDLuVG/9Pjk4yae3hdjWAozvqhPX
+         2tCERW1gBFESguTCpKCrPjnRE2RtG1Trvb9Ip6DJaNJyr8uk2AnX1+JLJ7Sk986A689B
+         gkM5M5WADPdvtjC2Qn8JYfDGUqrAYVkiZvuAT7+Rrs5Ah9dZKnTJm5IfNbyEF/CPyE9k
+         efVl5xafIWVZfR6nM2hxYQzOeQoRSZiqw7BL+1zj854mQ0ay1LVegjeE0F9M1O/AXsNx
+         uFJw==
+X-Gm-Message-State: ACgBeo38s/JvNoCIbVNUSvqMSb+Pt/DFIakNb44v8YXlgKcFp4wxAhcq
+        /kEnEZ1efwgT9JyIYqfbuvgpg6b9+Uh07dUW2OM=
+X-Google-Smtp-Source: AA6agR51gs/uUHreq+msqsiaEhkiRFCgMis3Jrd7egz+g3Jty9ES9OQyft1PDZ/MLkfp6N0Nb4aIesch0EUTQLjAZFA=
 X-Received: from ndesaulniers1.mtv.corp.google.com ([2620:0:100e:712:9755:c523:9dcb:2228])
- (user=ndesaulniers job=sendgmr) by 2002:a0d:f2c4:0:b0:333:560c:ee46 with SMTP
- id b187-20020a0df2c4000000b00333560cee46mr1649366ywf.109.1662526766087; Tue,
- 06 Sep 2022 21:59:26 -0700 (PDT)
-Date:   Tue,  6 Sep 2022 21:59:03 -0700
+ (user=ndesaulniers job=sendgmr) by 2002:a25:2501:0:b0:6a9:2c63:41df with SMTP
+ id l1-20020a252501000000b006a92c6341dfmr1513377ybl.570.1662526770665; Tue, 06
+ Sep 2022 21:59:30 -0700 (PDT)
+Date:   Tue,  6 Sep 2022 21:59:05 -0700
 In-Reply-To: <20220907045907.484043-1-ndesaulniers@google.com>
 Mime-Version: 1.0
 References: <20220907045907.484043-1-ndesaulniers@google.com>
 X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=lvO/pmg+aaCb6dPhyGC1GyOCvPueDrrc8Zeso5CaGKE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1662526746; l=1808;
- i=ndesaulniers@google.com; s=20211004; h=from:subject; bh=kYGYc5XWvUdto/5QJT//gD0cOAVBQRf+GCe08dKvohM=;
- b=QJ3sqizOMx1/LC5t2cVcxIGdd+h2qlDiVbAXaw+l/z2ysUwiRHXCM6y0Rhd2/XAI2e9D/+A9TzOz
- sLMzCcW9BimZSDyDaerFZtig2p3NctS62ufemI2LaTKtXaET2zUe
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1662526746; l=5523;
+ i=ndesaulniers@google.com; s=20211004; h=from:subject; bh=vU2YBqs04SKJi0GQSDvA4poA04ESc702LTI4xVOdImw=;
+ b=ACvgjV4W2Fn0d0OoSsDUnfzLwgzbvkoSX5pWoxmj3OhBeI7wqr6l/Ze+J8eLCVskjea6kj/Y/Vom
+ ccwPJxl5DeIznlJUZRGwr4WOP/rnBszo5UuLLP878hh5x1U5qH57
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220907045907.484043-2-ndesaulniers@google.com>
-Subject: [PATCH v3 1/5] x86/boot/compressed: prefer cc-option for CFLAGS additions
+Message-ID: <20220907045907.484043-4-ndesaulniers@google.com>
+Subject: [PATCH v3 3/5] Makefile.compiler: replace cc-ifversion with
+ compiler-specific macros
 From:   Nick Desaulniers <ndesaulniers@google.com>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     Michal Marek <michal.lkml@markovi.net>,
@@ -69,54 +70,144 @@ Cc:     Michal Marek <michal.lkml@markovi.net>,
         Alexey Alexandrov <aalexand@google.com>,
         Bill Wendling <morbo@google.com>,
         Greg Thelen <gthelen@google.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-as-option tests new options using KBUILD_CFLAGS, which causes problems
-when using as-option to update KBUILD_AFLAGS because many compiler
-options are not valid assembler options.
+cc-ifversion is GCC specific. Replace it with compiler specific
+variants. Update the users of cc-ifversion to use these new macros.
 
-This is being fixed in a follow up patch. Before doing so, move the
-assembler test for -Wa,-mrelax-relocations=no from using as-option to
-cc-option.
-
-Cc: Arvind Sankar <nivedita@alum.mit.edu>
-Cc: x86@kernel.org
-Link: https://lore.kernel.org/llvm/CAK7LNATcHt7GcXZ=jMszyH=+M_LC9Qr6yeAGRCBbE6xriLxtUQ@mail.gmail.com/
-Suggested-by: Masahiro Yamada <masahiroy@kernel.org>
+Link: https://github.com/ClangBuiltLinux/linux/issues/350
+Link: https://lore.kernel.org/llvm/CAGG=3QWSAUakO42kubrCap8fp-gm1ERJJAYXTnP1iHk_wrH=BQ@mail.gmail.com/
+Suggested-by: Bill Wendling <morbo@google.com>
 Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
 Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 Changes v2 -> v3:
-* Reword commit message as per Nathan.
-* Pick up Nathan's RB/TB tags.
+* Fix AMDGPU -msse flag, as per Nathan.
+* Pick up Nathan's RB tag.
+* Drop cc-min-version, as per Masahiro.
 
 Changes v1 -> v2:
-* Split off of v1 [1/3].
-* Use cc-option to update CFLAGS, as per Masahiro.
-* Add Masahiro's Suggested-by, Cc Arvind.
+* New patch.
 
- arch/x86/boot/compressed/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/kbuild/makefiles.rst          | 29 ++++++++++++---------
+ Makefile                                    |  6 ++---
+ drivers/gpu/drm/amd/display/dc/dml/Makefile |  2 +-
+ scripts/Makefile.compiler                   | 10 ++++---
+ 4 files changed, 27 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 35ce1a64068b..85934204d905 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -49,7 +49,7 @@ KBUILD_CFLAGS += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
- KBUILD_CFLAGS += -fno-asynchronous-unwind-tables
- KBUILD_CFLAGS += -D__DISABLE_EXPORTS
- # Disable relocation relaxation in case the link is not PIE.
--KBUILD_CFLAGS += $(call as-option,-Wa$(comma)-mrelax-relocations=no)
-+KBUILD_CFLAGS += $(call cc-option,-Wa$(comma)-mrelax-relocations=no)
- KBUILD_CFLAGS += -include $(srctree)/include/linux/hidden.h
+diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
+index 11a296e52d68..ee7e3ea1fbe1 100644
+--- a/Documentation/kbuild/makefiles.rst
++++ b/Documentation/kbuild/makefiles.rst
+@@ -682,22 +682,27 @@ more details, with real examples.
+ 	In the above example, -Wno-unused-but-set-variable will be added to
+ 	KBUILD_CFLAGS only if gcc really accepts it.
  
- # sev.c indirectly inludes inat-table.h which is generated during
+-    cc-ifversion
+-	cc-ifversion tests the version of $(CC) and equals the fourth parameter
+-	if version expression is true, or the fifth (if given) if the version
+-	expression is false.
++    gcc-min-version
++	gcc-min-version tests if the value of $(CONFIG_GCC_VERSION) is greater than
++	or equal to the provided value and evaluates to y if so.
+ 
+ 	Example::
+ 
+-		#fs/reiserfs/Makefile
+-		ccflags-y := $(call cc-ifversion, -lt, 0402, -O1)
++		cflags-$(call gcc-min-version, 70100) := -foo
+ 
+-	In this example, ccflags-y will be assigned the value -O1 if the
+-	$(CC) version is less than 4.2.
+-	cc-ifversion takes all the shell operators:
+-	-eq, -ne, -lt, -le, -gt, and -ge
+-	The third parameter may be a text as in this example, but it may also
+-	be an expanded variable or a macro.
++	In this example, cflags-y will be assigned the value -foo if $(CC) is gcc and
++	$(CONFIG_GCC_VERSION) is >= 7.1.
++
++    clang-min-version
++	clang-min-version tests if the value of $(CONFIG_CLANG_VERSION) is greater
++	than or equal to the provided value and evaluates to y if so.
++
++	Example::
++
++		cflags-$(call clang-min-version, 110000) := -foo
++
++	In this example, cflags-y will be assigned the value -foo if $(CC) is clang
++	and $(CONFIG_CLANG_VERSION) is >= 11.0.0.
+ 
+     cc-cross-prefix
+ 	cc-cross-prefix is used to check if there exists a $(CC) in path with
+diff --git a/Makefile b/Makefile
+index a4f71076cacb..cd9919c66b96 100644
+--- a/Makefile
++++ b/Makefile
+@@ -790,7 +790,6 @@ KBUILD_CFLAGS += $(stackp-flags-y)
+ 
+ KBUILD_CFLAGS-$(CONFIG_WERROR) += -Werror
+ KBUILD_CFLAGS-$(CONFIG_CC_NO_ARRAY_BOUNDS) += -Wno-array-bounds
+-KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
+ 
+ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+@@ -972,7 +971,6 @@ ifdef CONFIG_CC_IS_GCC
+ KBUILD_CFLAGS += -Wno-maybe-uninitialized
+ endif
+ 
+-ifdef CONFIG_CC_IS_GCC
+ # The allocators already balk at large sizes, so silence the compiler
+ # warnings for bounds checks involving those possible values. While
+ # -Wno-alloc-size-larger-than would normally be used here, earlier versions
+@@ -984,8 +982,8 @@ ifdef CONFIG_CC_IS_GCC
+ # ignored, continuing to default to PTRDIFF_MAX. So, left with no other
+ # choice, we must perform a versioned check to disable this warning.
+ # https://lore.kernel.org/lkml/20210824115859.187f272f@canb.auug.org.au
+-KBUILD_CFLAGS += $(call cc-ifversion, -ge, 0901, -Wno-alloc-size-larger-than)
+-endif
++KBUILD_CFLAGS-$(call gcc-min-version, 90100) += -Wno-alloc-size-larger-than
++KBUILD_CFLAGS += $(KBUILD_CFLAGS-y) $(CONFIG_CC_IMPLICIT_FALLTHROUGH)
+ 
+ # disable invalid "can't wrap" optimizations for signed / pointers
+ KBUILD_CFLAGS	+= -fno-strict-overflow
+diff --git a/drivers/gpu/drm/amd/display/dc/dml/Makefile b/drivers/gpu/drm/amd/display/dc/dml/Makefile
+index 86a3b5bfd699..3c64ae0b212c 100644
+--- a/drivers/gpu/drm/amd/display/dc/dml/Makefile
++++ b/drivers/gpu/drm/amd/display/dc/dml/Makefile
+@@ -34,7 +34,7 @@ dml_ccflags := -mhard-float -maltivec
+ endif
+ 
+ ifdef CONFIG_CC_IS_GCC
+-ifeq ($(call cc-ifversion, -lt, 0701, y), y)
++ifneq ($(call gcc-min-version, 70100),y)
+ IS_OLD_GCC = 1
+ endif
+ endif
+diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+index a66638b5f4a5..4b998dadd79d 100644
+--- a/scripts/Makefile.compiler
++++ b/scripts/Makefile.compiler
+@@ -61,9 +61,13 @@ cc-option-yn = $(call try-run,\
+ cc-disable-warning = $(call try-run,\
+ 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+ 
+-# cc-ifversion
+-# Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+-cc-ifversion = $(shell [ $(CONFIG_GCC_VERSION)0 $(1) $(2)000 ] && echo $(3) || echo $(4))
++# gcc-min-version
++# Usage: cflags-$(call gcc-min-version, 70100) += -foo
++gcc-min-version = $(shell [ $(CONFIG_GCC_VERSION) -ge $(1) ] && echo y)
++
++# clang-min-version
++# Usage: cflags-$(call clang-min-version, 110000) += -foo
++clang-min-version = $(shell [ $(CONFIG_CLANG_VERSION) -ge $(1) ] && echo y)
+ 
+ # ld-option
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
 -- 
 2.37.2.789.g6183377224-goog
 
