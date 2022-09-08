@@ -2,159 +2,128 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A227C38145
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Sep 2022 10:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F62CECAAD5
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Sep 2022 10:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231487AbiIHKoW (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Sep 2022 06:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
+        id S230345AbiIHKva (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Sep 2022 06:51:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231292AbiIHKoG (ORCPT
+        with ESMTP id S229971AbiIHKv3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Sep 2022 06:44:06 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5044BB90E;
-        Thu,  8 Sep 2022 03:43:56 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id k17so10572338wmr.2;
-        Thu, 08 Sep 2022 03:43:56 -0700 (PDT)
+        Thu, 8 Sep 2022 06:51:29 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2F0F5C4B
+        for <linux-kbuild@vger.kernel.org>; Thu,  8 Sep 2022 03:51:27 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id bx38so19361972ljb.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Sep 2022 03:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date;
-        bh=RDfo3bMr+JPT0XwUqpEkdXAA/w6q2WGGKmvqZnqv+TQ=;
-        b=Fw4IKH8ap4pumBI12Nq1Lfh9UtKeAcIDpwe+b1cX00pCYnpLbbi+7TinfG2yAn37L8
-         04V+5lVNVeT7IoxTbICeOOJhv1i6FAQCJB08146+bhoKQNtIDt3xvNsvk6HTXCBqHFM3
-         N6LDDtIOq8qwPGklXmHEsyu6FkeprRxH3Exu5bKLnJaqtWALAamiEythWkn8NzQQ+8NC
-         txG9S13vwDKVmWy390YKikVWb8EjCqwWoURsQoLOsRXaO5r05Xy2D3/TxKFA1vhOwV5l
-         k/pfHLouALbI5XPTSW97BlFXSnjAB6iK1gfU5LBfKvbTddVEbjqCmqVKQqCV+KQvE2Gq
-         knlQ==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=Ps3lqStzHySPsxXJuGxo0vZdDPyhFg6keE7WeVb52JA=;
+        b=o/ruHuZsbRb3J4aRBZSNXOgC0gbQJiJQr5k8dC92i0jMhf4DWYiRJfo+94HIhCkSv3
+         /HokU7euLiM46BwzGLn18PdHnMEmhjQ22T2l9e2PEYMIp/Dzv3ee4+Z8khE0tVYKjjC5
+         RRyvFN0+9G5E+N0fKvZ0CbSsELx+4GZqMSNdA3KOvpN0NdTMazePQa8e4JY+draSONWD
+         NKONpCiI8VbPQ4ftetNBDNKgF4G2obYeIhDAKZZ1kPWF5KxflbrX+wfDLp5PJsdicUJz
+         tG3xAxGZn5FUM+Fevz9VzBu7oLiD4/7J7FrK0i0tlOKmsMbEnOo5L5LJpu/5RCBbrrWk
+         raHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=RDfo3bMr+JPT0XwUqpEkdXAA/w6q2WGGKmvqZnqv+TQ=;
-        b=l4s46F7h9gmZxnGSKEZoOkCDPTH0/41fNpaqRWrhEUbNxS+xqBe+1lmlZ79Urqic71
-         F6+vFiNqrtR+tNBP3D8iPv7irPW0mIjoo+PInKuq9CXItdYnGRqgVJCb/MAYI7m6MRpK
-         iu2M82UWksAMmnyHpBtCtPu+PpjQewWHr+kugZmBOMiVOzL6tBxR7CIgrZWDeqS/dDOY
-         /fu0xiIifnm8ZpMwrOc9cjSc2azfAwI+mMCG4xr7gPinFMifVsPKXnEu+Jx1MOQ94NhJ
-         De8gZQGWYoGok6d0Z7QBj8GLnwgibsBHEJBxzQ/jyo1fBz7ALz0GdfZCet4nhUW+d6Ql
-         aIJQ==
-X-Gm-Message-State: ACgBeo3FeyBNoQXNnlZa6pYTWwJRo0E65uc65TCrtsrXMy1YVFgNBo3F
-        GQg+JR2GeiIVqGoQmM59E+U=
-X-Google-Smtp-Source: AA6agR6LWwrUGGfoOSbVk9oxNX8imZLStpZ8izPiLHM9p+m8rli2GQHNjyDS5uL1kEKQueemyub1Qg==
-X-Received: by 2002:a1c:6a0a:0:b0:3a5:bcad:f2cc with SMTP id f10-20020a1c6a0a000000b003a5bcadf2ccmr1823007wmc.74.1662633836389;
-        Thu, 08 Sep 2022 03:43:56 -0700 (PDT)
-Received: from felia.fritz.box (200116b826f77600d0640cc051af4288.dip.versatel-1u1.de. [2001:16b8:26f7:7600:d064:cc0:51af:4288])
-        by smtp.gmail.com with ESMTPSA id bu3-20020a056000078300b0022863395912sm17227486wrb.53.2022.09.08.03.43.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 03:43:56 -0700 (PDT)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-media@vger.kernel.org, Peter Chen <peter.chen@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH 5/6] mm: Kconfig: make config SECRETMEM visible with EXPERT
-Date:   Thu,  8 Sep 2022 12:43:36 +0200
-Message-Id: <20220908104337.11940-6-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220908104337.11940-1-lukas.bulwahn@gmail.com>
-References: <20220908104337.11940-1-lukas.bulwahn@gmail.com>
+        bh=Ps3lqStzHySPsxXJuGxo0vZdDPyhFg6keE7WeVb52JA=;
+        b=qNz7JJNZLr7ftNOiYfS8xao0ph2ZcHhac+O5Z8PvYe1i4Ba9aO5QRLssUMWzMg9XX6
+         8pDq4owm+PDldCSD1bWXNKrwC4GAbzburl/mRpzajnz9wCHYjacf2RUz+tRCJlVPuLcG
+         +Izok/wxiYgLfvgCgVGhqCe3PMzqwiC+/hPoIDUuwYhooedRo/lXM52OkyxFuFCJVmVM
+         +iTYq+laqmKLdyuWPPxRssdvlgOCA1QS3G1PkfFR2maClCOemKNeSJ4AIC3Fep8Oim0T
+         z9GXrIHteHGzJIpbhCsbVpr20Y8Tr4fvCLW7HRqYDk/MOlDJzK7jLZyPvO1FTyCvdwpR
+         X+FA==
+X-Gm-Message-State: ACgBeo3/kovubysUq+y8o2mXkg2rQ5iZF7LePwPqFW86NmAz2sX5EBDV
+        81xmfDBi76dMjFRDVMrwBpGV3ASpJLac8g==
+X-Google-Smtp-Source: AA6agR7L+QQqZcc4iA8yVL5wfSIRSeMTKBKrT1SGqVSWUuzNvpwI8LZVG/KWcNq8Zx8VBagz06spwA==
+X-Received: by 2002:a2e:bc21:0:b0:25e:c921:f7d7 with SMTP id b33-20020a2ebc21000000b0025ec921f7d7mr2224729ljf.91.1662634285764;
+        Thu, 08 Sep 2022 03:51:25 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id x19-20020a056512079300b00492d270db5esm2986308lfr.242.2022.09.08.03.51.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Sep 2022 03:51:25 -0700 (PDT)
+Message-ID: <4b648759-1e0d-db2c-5fc6-bf586bff775e@linaro.org>
+Date:   Thu, 8 Sep 2022 12:51:23 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [RFC PATCH v3 1/7] dt-bindings: bus: add CDX bus device tree
+ bindings
+Content-Language: en-US
+To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>, Rob Herring <robh@kernel.org>
+Cc:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "okaya@kernel.org" <okaya@kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "git (AMD-Xilinx)" <git@amd.com>,
+        "saravanak@google.com" <saravanak@google.com>,
+        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>
+References: <20220803122655.100254-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-2-nipun.gupta@amd.com>
+ <1662486402.681939.780022.nullmailer@robh.at.kernel.org>
+ <DM6PR12MB3082B9C670B5F58215259A76E8419@DM6PR12MB3082.namprd12.prod.outlook.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <DM6PR12MB3082B9C670B5F58215259A76E8419@DM6PR12MB3082.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Commit 6a108a14fa35 ("kconfig: rename CONFIG_EMBEDDED to CONFIG_EXPERT")
-introduces CONFIG_EXPERT to carry the previous intent of CONFIG_EMBEDDED
-and just gives that intent a much better name. That has been clearly a good
-and long overdue renaming, and it is clearly an improvement to the kernel
-build configuration that has shown to help managing the kernel build
-configuration in the last decade.
+On 07/09/2022 05:13, Gupta, Nipun wrote:
+>>
+>> If you already ran 'make dt_binding_check' and didn't see the above
+>> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+>> date:
+>>
+>> pip3 install dtschema --upgrade
+>>
+>> Please check and re-submit.
+> 
+> I did run make dt_binding_check, but did not see the issue.
+> Will update the dtschema and fix this.
 
-However, rather than bravely and radically just deleting CONFIG_EMBEDDED,
-this commit gives CONFIG_EMBEDDED a new intended semantics, but keeps it
-open for future contributors to implement that intended semantics:
+Regardless whether you saw it or not, the example DTS is incorrect...
+Even if there are no errors, please do not add incorrect DTS.
 
-    A new CONFIG_EMBEDDED option is added that automatically selects
-    CONFIG_EXPERT when enabled and can be used in the future to isolate
-    options that should only be considered for embedded systems (RISC
-    architectures, SLOB, etc).
-
-Since then, this CONFIG_EMBEDDED implicitly had two purposes:
-
-  - It can make even more options visible beyond what CONFIG_EXPERT makes
-    visible. In other words, it may introduce another level of enabling the
-    visibility of configuration options: always visible, visible with
-    CONFIG_EXPERT and visible with CONFIG_EMBEDDED.
-
-  - Set certain default values of some configurations differently,
-    following the assumption that configuring a kernel build for an
-    embedded system generally starts with a different set of default values
-    compared to kernel builds for all other kind of systems.
-
-Considering the second purpose, note that already probably arguing that a
-kernel build for an embedded system would choose some values differently is
-already tricky: the set of embedded systems with Linux kernels is already
-quite diverse. Many embedded system have powerful CPUs and it would not be
-clear that all embedded systems just optimize towards one specific aspect,
-e.g., a smaller kernel image size. So, it is unclear if starting with "one
-set of default configuration" that is induced by CONFIG_EMBEDDED is a good
-offer for developers configuring their kernels.
-
-Also, the differences of needed user-space features in an embedded system
-compared to a non-embedded system are probably difficult or even impossible
-to name in some generic way.
-
-So it is not surprising that in the last decade hardly anyone has
-contributed changes to make something default differently in case of
-CONFIG_EMBEDDED=y.
-
-Currently, in v6.0-rc4, SECRETMEM is the only config switched off if
-CONFIG_EMBEDDED=y.
-
-As long as that is actually the only option that currently is selected or
-deselected, it is better to just make SECRETMEM configurable at build time
-by experts using menuconfig instead.
-
-Make SECRETMEM configurable when EXPERT is set and otherwise default to
-yes. Further, SECRETMEM needs ARCH_HAS_SET_DIRECT_MAP.
-
-This allows us to remove CONFIG_EMBEDDED in the close future.
-
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
- mm/Kconfig | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/mm/Kconfig b/mm/Kconfig
-index ceec438c0741..aa154c20b129 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -1068,7 +1068,13 @@ config IO_MAPPING
- 	bool
- 
- config SECRETMEM
--	def_bool ARCH_HAS_SET_DIRECT_MAP && !EMBEDDED
-+	default y
-+	bool "Enable memfd_secret() system call" if EXPERT
-+	depends on ARCH_HAS_SET_DIRECT_MAP
-+	help
-+	  Enable the memfd_secret() system call with the ability to create
-+	  memory areas visible only in the context of the owning process and
-+	  not mapped to other processes and other kernel page tables.
- 
- config ANON_VMA_NAME
- 	bool "Anonymous VMA name support"
--- 
-2.17.1
-
+Best regards,
+Krzysztof
