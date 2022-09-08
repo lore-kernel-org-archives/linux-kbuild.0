@@ -2,52 +2,52 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E928C38145
-	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Sep 2022 10:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B5CECAAD5
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Sep 2022 10:44:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231440AbiIHKoK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 8 Sep 2022 06:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53412 "EHLO
+        id S231387AbiIHKoP (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 8 Sep 2022 06:44:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231284AbiIHKoG (ORCPT
+        with ESMTP id S231377AbiIHKoI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Sep 2022 06:44:06 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F01901B9;
-        Thu,  8 Sep 2022 03:43:56 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id t7so20317382wrm.10;
-        Thu, 08 Sep 2022 03:43:55 -0700 (PDT)
+        Thu, 8 Sep 2022 06:44:08 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE4CE1272;
+        Thu,  8 Sep 2022 03:44:00 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id t14so18053922wrx.8;
+        Thu, 08 Sep 2022 03:43:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date;
-        bh=DAvW/j/5PxDjN0idhO6jbr+d99JWnLewou5/uVrgjpw=;
-        b=BjftNcUlKNzBBVcZwF15+1/SUUs6ojyiGx+bmwJqOwI5zKTtIVhoNVvdW8TIaVaAps
-         aFmzTJUK0Ef6cg7zBmV6LX/dGZoPVKPVveNp1rNUaW++nGkfDSyUmRTu68aOk96Ga0kb
-         fSRCjPZQ3DYljHvB7IJp1AYr6FdAu44RzyJZFwdMk6cECanW5F4IsNN8672rXQmOhGgT
-         w5Q43+vhG98S2dBXQrlNbW2OC34mTsABkWOS4wxUoD2d1eAAAGk1Qotds/77Bze+3n9P
-         EXcygbRWdDU5R1rHXmu76wKLlz4ntHJmGuu2+SKMsGn0qkR8sbyLSpyCEz6H6QMxjmAq
-         pTUQ==
+        bh=ItPI0MR3NN2HvuVuI/7ScAvDP5QuDEGNBgMAv6on+2k=;
+        b=Qwl9qXCtUZAEXBRAr7K21sULv09wLNrYWhe7Tqgxdgq8iCs2UNVpXTmHLSihAYrMFB
+         xqPp1w6KiUfXyae1qXE7yYG9/WlBAVSqzQfBQppoR0nPN8/NZV1q0qC81qPEpT25B8j9
+         lv7K1Tpd3eqjlYr9uZR05QBI+Ee4WyqYEiDi9gEeYKP1NfX30ewVC9KM6uc+aeFNKGAU
+         Vhb4Z4anKzyJmunTqHDt5RrnC6twaekPXm8GT/lUid5tNmlUGLYLN5l7IWiShbEWuYJt
+         7sMZoOZOaRVd/OzmXh+IhauAAXAbWstN4pdCv0Z2S02OqUX22yUA5TSbAYhrseEmfD1z
+         jEaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=DAvW/j/5PxDjN0idhO6jbr+d99JWnLewou5/uVrgjpw=;
-        b=z2en7F8eCx7xUmmrP3FKhd51vbRcFayAo7F/LBSAFgjXx25ma5NFWgY6GQCd4imf6J
-         GojwT0ktSmwdBEHvgU2cz6AuhCrp/ylhL9pGtm8W5pSZLruSJvNcjWaUJgALy90H+VqM
-         /zy5C0aQ6JKrmdur5Yax3yr8EdTkzbB/0v8tK+/rgKwxTrf8tX+3LIU8ofh90YmElpEK
-         pTrFs36D9xVUk2t6N0RBLMU3jJa/eGZzgV2RvJl1oOXJPhRyp//IKEH688QciPuC2U0c
-         ysXO/zE/4FHTYf/GAGubR5TzSuLDapQZsZE9oROmxjUgjbisLehv69eUOn4vncD2zy3L
-         iJ6A==
-X-Gm-Message-State: ACgBeo17pfV3rRNgyD+iBiomz/tZf48U2ohQa/u/2g/2QR7QWg/aZ/IE
-        1jCjVyjM424hAusW0J8NjNY=
-X-Google-Smtp-Source: AA6agR5QOaqvtIoVx5Bin2x+wiRcH4moEJJlXrbG8Yn8LK7Igv7M/jtpddN3oejEBKPK9FGt4HnrHg==
-X-Received: by 2002:a5d:6802:0:b0:228:d6e9:6dd8 with SMTP id w2-20020a5d6802000000b00228d6e96dd8mr4963144wru.710.1662633834261;
-        Thu, 08 Sep 2022 03:43:54 -0700 (PDT)
+        bh=ItPI0MR3NN2HvuVuI/7ScAvDP5QuDEGNBgMAv6on+2k=;
+        b=WrDMYHZPbZQpVzRumXYHgVqarESs3HXnEMn1rKthqMJwFiM/LpT6s/yzeOvMuVdMm+
+         mraf4r6mYlVRSvN0DszBQGuXqChTU3SZR9e18DDp74w6aZFdVQkqMryRcpR/5770u0a+
+         xJOz/+81GwVVep9WUPBY4GtRgNMj0uofOqOhW5x41bLKnb1oTD/UyHZijhvx3bXAgWD3
+         Zw742b2ujLYthBDClxJB75PCsCEX2Ap74lJAmrjgOQ9VZLhRkwRfokFeu/UDoAOZCK7I
+         Svoy2I6H7HaNhsGhHRZPt1C8F5QgH//rkeRFpYvh1rr9gB7RNkrzFZeYk0+qNrZHZC9h
+         K5sw==
+X-Gm-Message-State: ACgBeo1kxTzyj2aRf8raxcFw/2lnGIA4maPCt/Bm8rkKCzOnkFfw0rH8
+        ojfzxeBfg3VISLUww6aUMSQ=
+X-Google-Smtp-Source: AA6agR6RYLcqVQoPCUZV9g02cRKPZpdef5LX5qakouTpz1Mv2m826gHTOyz4Ytc64G6rdcluoww9GA==
+X-Received: by 2002:adf:ee89:0:b0:228:7bdf:47d with SMTP id b9-20020adfee89000000b002287bdf047dmr4535843wro.641.1662633838474;
+        Thu, 08 Sep 2022 03:43:58 -0700 (PDT)
 Received: from felia.fritz.box (200116b826f77600d0640cc051af4288.dip.versatel-1u1.de. [2001:16b8:26f7:7600:d064:cc0:51af:4288])
-        by smtp.gmail.com with ESMTPSA id bu3-20020a056000078300b0022863395912sm17227486wrb.53.2022.09.08.03.43.53
+        by smtp.gmail.com with ESMTPSA id bu3-20020a056000078300b0022863395912sm17227486wrb.53.2022.09.08.03.43.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 03:43:53 -0700 (PDT)
+        Thu, 08 Sep 2022 03:43:58 -0700 (PDT)
 From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
 To:     Russell King <linux@armlinux.org.uk>,
         linux-arm-kernel@lists.infradead.org,
@@ -64,9 +64,9 @@ To:     Russell King <linux@armlinux.org.uk>,
         linux-kbuild@vger.kernel.org
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH 4/6] usb: chipidea: make configs for glue drivers visible with EXPERT
-Date:   Thu,  8 Sep 2022 12:43:35 +0200
-Message-Id: <20220908104337.11940-5-lukas.bulwahn@gmail.com>
+Subject: [PATCH 6/6] init/Kconfig: remove confusing config EMBEDDED
+Date:   Thu,  8 Sep 2022 12:43:37 +0200
+Message-Id: <20220908104337.11940-7-lukas.bulwahn@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220908104337.11940-1-lukas.bulwahn@gmail.com>
 References: <20220908104337.11940-1-lukas.bulwahn@gmail.com>
@@ -131,50 +131,57 @@ CONFIG_EMBEDDED. If anyone spends significant effort in structuring the
 visibility of config options, they may re-introduce suitable new config
 options simply as they see fit.
 
-Make the configs for usb chipidea glue drivers visible when CONFIG_EXPERT
-is enabled.
+Hence, all uses of CONFIG_EMBEDDED have been replaced with CONFIG_EXPERT.
+
+Considering the second purpose, note that already probably arguing that a
+kernel build for an embedded system would choose some values differently is
+already tricky: the set of embedded systems with Linux kernels is already
+quite diverse. Many embedded system have powerful CPUs and it would not be
+clear that all embedded systems just optimize towards one specific aspect,
+e.g., a smaller kernel image size. So, it is unclear if starting with "one
+set of default configuration" that is induced by CONFIG_EMBEDDED is a good
+offer for developers configuring their kernels.
+
+Also, the differences of needed user-space features in an embedded system
+compared to a non-embedded system are probably difficult or even impossible
+to name in some generic way.
+
+So it is not surprising that in the last decade hardly anyone has
+contributed changes to make something default differently in case of
+CONFIG_EMBEDDED=y.
+
+In v6.0-rc4, SECRETMEM is the only config switched off if
+CONFIG_EMBEDDED=y. That one use was removed as well, SECRETMEM was made
+configurable at build time by experts using menuconfig instead.
+
+As there are no further uses of CONFIG_EMBEDDED and CONFIG_EMBEDDED never
+lived up to its intended purpose defined above, simply delete this
+confusing CONFIG_EMBEDDED.
 
 Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 ---
- drivers/usb/chipidea/Kconfig | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ init/Kconfig | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/drivers/usb/chipidea/Kconfig b/drivers/usb/chipidea/Kconfig
-index 661818e8fed6..c815824a0b2d 100644
---- a/drivers/usb/chipidea/Kconfig
-+++ b/drivers/usb/chipidea/Kconfig
-@@ -34,26 +34,26 @@ config USB_CHIPIDEA_HOST
- 	  ChipIdea driver.
+diff --git a/init/Kconfig b/init/Kconfig
+index 9e3fd79b089c..d7429e0b8cae 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1818,14 +1818,6 @@ config DEBUG_RSEQ
  
- config USB_CHIPIDEA_PCI
--	tristate "Enable PCI glue driver" if EMBEDDED
-+	tristate "Enable PCI glue driver" if EXPERT
- 	depends on USB_PCI
- 	depends on NOP_USB_XCEIV
- 	default USB_CHIPIDEA
+ 	  If unsure, say N.
  
- config USB_CHIPIDEA_MSM
--	tristate "Enable MSM hsusb glue driver" if EMBEDDED
-+	tristate "Enable MSM hsusb glue driver" if EXPERT
- 	default USB_CHIPIDEA
- 
- config USB_CHIPIDEA_IMX
--	tristate "Enable i.MX USB glue driver" if EMBEDDED
-+	tristate "Enable i.MX USB glue driver" if EXPERT
- 	depends on OF
- 	default USB_CHIPIDEA
- 
- config USB_CHIPIDEA_GENERIC
--	tristate "Enable generic USB2 glue driver" if EMBEDDED
-+	tristate "Enable generic USB2 glue driver" if EXPERT
- 	default USB_CHIPIDEA
- 
- config USB_CHIPIDEA_TEGRA
--	tristate "Enable Tegra USB glue driver" if EMBEDDED
-+	tristate "Enable Tegra USB glue driver" if EXPERT
- 	depends on OF
- 	default USB_CHIPIDEA
- 
+-config EMBEDDED
+-	bool "Embedded system"
+-	select EXPERT
+-	help
+-	  This option should be enabled if compiling the kernel for
+-	  an embedded system so certain expert options are available
+-	  for configuration.
+-
+ config HAVE_PERF_EVENTS
+ 	bool
+ 	help
 -- 
 2.17.1
 
