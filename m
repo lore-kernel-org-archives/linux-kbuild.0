@@ -2,220 +2,188 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B2EC6FA82
-	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Sep 2022 12:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D8BC6FA82
+	for <linux-kbuild@archiver.kernel.org>; Fri, 23 Sep 2022 12:25:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231171AbiIWMVL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 23 Sep 2022 08:21:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
+        id S231171AbiIWMZu (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 23 Sep 2022 08:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231493AbiIWMUT (ORCPT
+        with ESMTP id S232396AbiIWMYo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Sep 2022 08:20:19 -0400
-X-Greylist: delayed 1737 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 23 Sep 2022 05:10:57 PDT
-Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004BEE6DDF;
-        Fri, 23 Sep 2022 05:10:56 -0700 (PDT)
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 28NCALaE023394;
-        Fri, 23 Sep 2022 21:10:21 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 28NCALaE023394
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1663935022;
-        bh=WhugoWZRyKqqBZUcmDpfw3eSjXuzOdApVcqA0ITzK6g=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=oXKRT1SwAbTLcEUi4l381YYauJLR221cZf4BMGgII3LDs6Gf+92VrDeqKyZ+VtGDY
-         wxG2+jCAEjndHwn0cFTfC2BUKtU5hLQGYTsyd1ReAQkepMg4dfX9Hq4FB92Ojw30lp
-         CgHv1dzQyEo64p318UZaHGKEC40vHw5NOYcyDvR3/DtDUgqf9uPokdG8PLIKx+7As4
-         WMsPR742ye5XkI0H+fPGlgP8tGrMVFCmUSK8eZhkaBTMkosZeIAT1xYm6vKIMe+WVz
-         BAxS1UVMSGRLyFKbw/KglbLZFKWSTAc6WLPmth1cXm8tihxbcMoTuyqDSy6qyNaSp7
-         pyJjnSkV4YgCw==
-X-Nifty-SrcIP: [209.85.161.45]
-Received: by mail-oo1-f45.google.com with SMTP id u3-20020a4ab5c3000000b0044b125e5d9eso12774ooo.12;
-        Fri, 23 Sep 2022 05:10:21 -0700 (PDT)
-X-Gm-Message-State: ACrzQf3yvzrPKDe2JQtFC1cBhXcFom3msT2ut9lz9XH3duGC/L5J8ra+
-        ks9O/NWDR/uC8igrZ4RcQCyEQHd/t5cZXDTjqs0=
-X-Google-Smtp-Source: AMsMyM4rumpmOGqZuiZErevZi9hJaLAHvqKCe++epcBOijqsb9wZifSsD9IDENRln7KT42zgJAddmQc5grDvI7uBwhM=
-X-Received: by 2002:a05:6820:1992:b0:475:c2c0:3f92 with SMTP id
- bp18-20020a056820199200b00475c2c03f92mr3287421oob.96.1663935020240; Fri, 23
- Sep 2022 05:10:20 -0700 (PDT)
+        Fri, 23 Sep 2022 08:24:44 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E683E9F0F1
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Sep 2022 05:20:09 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220923122004euoutp018cb694d58a22eab41ac006ce00cafdfc~XfJ3kQapR0476404764euoutp01Z
+        for <linux-kbuild@vger.kernel.org>; Fri, 23 Sep 2022 12:20:04 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220923122004euoutp018cb694d58a22eab41ac006ce00cafdfc~XfJ3kQapR0476404764euoutp01Z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1663935604;
+        bh=EpDM0Vb6lykgvos+Hn5hp44lw7kuaoVKi+4PEICbisw=;
+        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+        b=lhVHQdJXcuO6eB9YTmtHlD1dx7VBWa5pIymBq/9SHLN+dZqiYcXtqPYriaOsqQDeY
+         etKVkMh7vCgDrD6Qk4hM0pACsJlAf/wgmbVZtviob1tZYPfR9wslhRbcal9pKIKEta
+         JZVTvRCwXrp5tVFTeep3y4gmfQaIOT9wpSllwqQg=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220923122004eucas1p138bbdfbc053e74c2a547854d241f4bfd~XfJ25lfxU1978619786eucas1p1A;
+        Fri, 23 Sep 2022 12:20:04 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 48.E6.19378.474AD236; Fri, 23
+        Sep 2022 13:20:04 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220923122003eucas1p14d35921b7e6faf29f2b8605d0e20364a~XfJ2aHnsV1993019930eucas1p1r;
+        Fri, 23 Sep 2022 12:20:03 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220923122003eusmtrp2a008f3b007d30b6c0bc431dce49aa3b0~XfJ2Y_lQC1853918539eusmtrp2c;
+        Fri, 23 Sep 2022 12:20:03 +0000 (GMT)
+X-AuditID: cbfec7f5-a4dff70000014bb2-52-632da4745866
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id B1.9D.10862.374AD236; Fri, 23
+        Sep 2022 13:20:03 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220923122003eusmtip2b9e3f813cfc4040c4af23e26c3b44c74~XfJ1zfjlA0536705367eusmtip2S;
+        Fri, 23 Sep 2022 12:20:02 +0000 (GMT)
+Message-ID: <17123363-90ce-7047-3369-f260082011bd@samsung.com>
+Date:   Fri, 23 Sep 2022 14:20:02 +0200
 MIME-Version: 1.0
-References: <20220906061313.1445810-1-masahiroy@kernel.org>
- <20220906061313.1445810-4-masahiroy@kernel.org> <20220921043946.GA1355561@roeck-us.net>
- <CGME20220923113907eucas1p2b33fa5cf73646401089f96a69cf9b745@eucas1p2.samsung.com>
- <8e70837d-d859-dfb2-bf7f-83f8b31467bc@samsung.com> <0997c2b5-b2f6-2ef7-df6a-6f5657ed4d3a@samsung.com>
-In-Reply-To: <0997c2b5-b2f6-2ef7-df6a-6f5657ed4d3a@samsung.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 23 Sep 2022 21:09:43 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQYN2gL1iQoCKBxt8vT6oMWBuPrBFnUEO6nVH4Zoz+t1Q@mail.gmail.com>
-Message-ID: <CAK7LNAQYN2gL1iQoCKBxt8vT6oMWBuPrBFnUEO6nVH4Zoz+t1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] kbuild: move core-y and drivers-y to ./Kbuild
-To:     Marek Szyprowski <m.szyprowski@samsung.com>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+        Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH] lib/sg_pool: change module_init(sg_pool_init) to
+ subsys_initcall
+Content-Language: en-US
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev
+Cc:     Guenter Roeck <linux@roeck-us.net>, linux-kbuild@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lin <ming.l@ssi.samsung.com>,
+        Sagi Grimberg <sagi@grimberg.me>
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20220923113835.21544-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrIKsWRmVeSWpSXmKPExsWy7djP87olS3STDXZ2cVisXH2UyeLXFwuL
+        P7t2MFlc3jWHzeLJwjNMFsuP/2OyePjgBqtFe28Hs8XBD09YLda9fs/iwOWxZt4aRo/z9zay
+        eGxa1cnm8WLzTEaP3Tcb2Dw+Pr3F4rHzewO7x9uXO1k9Pm+SC+CM4rJJSc3JLEst0rdL4MpY
+        P20lU8Ff4YrJc38yNjDuF+hi5OSQEDCR6D12hL2LkYtDSGAFo8TUlu+sEM4XRoltt/6zQTif
+        GSWmvF7CDtNyeOppJojEckaJf/OOsIEkhAQ+MkqcWMTVxcjBwStgJzHrXxpImEVAVWLjgQtg
+        vbwCghInZz5hAbFFBZIlZh07xghiCwuES3yd84AJxGYWEJe49WQ+2HwRkJNePulnAXGYBQ4w
+        SvzcPwFsEpuAoUTX2y6wxZwCVhIz775ih+iWl9j+dg4zSIOEwHROiXMzVzBDnO0ice71Myhb
+        WOLV8S1Q78hI/N8JsU5CoJ1RYsHv+1DOBEaJhue3GCGqrCXunPvFBvIbs4CmxPpd+hBhR4ld
+        Tw6AhSUE+CRuvBWEOIJPYtK26cwQYV6JjjYhiGo1iVnH18GtPXjhEvMERqVZSAEzCykAZiF5
+        ZxbC3gWMLKsYxVNLi3PTU4uN81LL9YoTc4tL89L1kvNzNzECU9npf8e/7mBc8eqj3iFGJg7G
+        Q4wSHMxKIryz72gmC/GmJFZWpRblxxeV5qQWH2KU5mBREudlm6GVLCSQnliSmp2aWpBaBJNl
+        4uCUamDKDlO+sUHGJelY9eMzi4tFnr9fcf7dL+OXCY+MFPTWZeo7LeNZNvXfLxXOo2bv3zBq
+        fi39ddmbRW/GnAkS96UWxwVkXT6oYStwvyH79lE2vruJb1hm/1qken5djUSZWMW12W9kX015
+        8//+eaHESmlFq8V18fqrD4StKwho2LtvWcrXYu+ru69t2aG+cpGHdJ/l4eJfE2JqBT5rcm4S
+        czh89ijvw52ynYc08l1LppxQ3/Lh1DalAwevR2Yudz2utmv/Z8sdP95kHjj/cMtNuR8h1zba
+        flRYaVKo9/P0SS2HyM1Jjht3/9xoW86gV/1oR+Knl2tVNd9+V674FRTI43mTTagk6MG20IMx
+        dVty9897+EOJpTgj0VCLuag4EQBOl9M51AMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrCIsWRmVeSWpSXmKPExsVy+t/xe7rFS3STDW6dVbRYufook8WvLxYW
+        f3btYLK4vGsOm8WThWeYLJYf/8dk8fDBDVaL9t4OZouDH56wWqx7/Z7Fgctjzbw1jB7n721k
+        8di0qpPN48XmmYweu282sHl8fHqLxWPn9wZ2j7cvd7J6fN4kF8AZpWdTlF9akqqQkV9cYqsU
+        bWhhpGdoaaFnZGKpZ2hsHmtlZKqkb2eTkpqTWZZapG+XoJexftpKpoK/whWT5/5kbGDcL9DF
+        yMkhIWAicXjqaaYuRi4OIYGljBInZ59lhEjISJyc1sAKYQtL/LnWxQZR9J5R4vKNk0AdHBy8
+        AnYSs/6lgdSwCKhKbDxwgR3E5hUQlDg58wkLiC0qkCyxpOE+2BxhgXCJr3MeMIHYzALiEree
+        zAdbLCKwglHiQfs2RhCHWeAAo8SUk5+YIbb1MkpM3LoZ7CQ2AUOJrrcgZ3BycApYScy8+4od
+        YpSZRNfWLkYIW15i+9s5zBMYhWYhuWQWko2zkLTMQtKygJFlFaNIamlxbnpusZFecWJucWle
+        ul5yfu4mRmD0bjv2c8sOxpWvPuodYmTiYDzEKMHBrCTCO/uOZrIQb0piZVVqUX58UWlOavEh
+        RlNgcExklhJNzgemj7ySeEMzA1NDEzNLA1NLM2MlcV7Pgo5EIYH0xJLU7NTUgtQimD4mDk6p
+        BqbZJ9+t+Zss++OZUEaIZXuPmPfqpzYxbx2Sy8+vsOwQFWnP72ie4Gs0i9/fe37dJ3GFd9Is
+        G3w3ePHN+3aw6UhXwg2Zz6nhLwvj/NX/zNcs3sJ93t0yeZG+7vMDwh8enwny+qJ2K0+/b0WH
+        7wJlGckVq/ZM1NqYVd/DJvVtYTN3S+PXClenPSfj3mm+mFH3+Nlra7nD6hGnzloaMXLfcThk
+        dFpEYzHbc960J4dOTp26iNVtRVzomt5+kc6n+a+e3o3c4BHcqHk0sP+Hz6R4H87NHgqNL3/o
+        L1hTe8WVIVgtOup7gIvOLkex2RkZ/3+YHZM4Oml2rXquz9yz555byLxXncd8NqU79onWjMOm
+        d5VYijMSDbWYi4oTAVJ9+3dnAwAA
+X-CMS-MailID: 20220923122003eucas1p14d35921b7e6faf29f2b8605d0e20364a
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220923113941eucas1p2e5f7b9bc7316114e69ab6348d40d3b6d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220923113941eucas1p2e5f7b9bc7316114e69ab6348d40d3b6d
+References: <CGME20220923113941eucas1p2e5f7b9bc7316114e69ab6348d40d3b6d@eucas1p2.samsung.com>
+        <20220923113835.21544-1-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 8:39 PM Marek Szyprowski
-<m.szyprowski@samsung.com> wrote:
+On 23.09.2022 13:38, Masahiro Yamada wrote:
+> sg_alloc_table_chained() is called by several drivers, but if it is
+> called before sg_pool_init(), it results in a NULL pointer dereference
+> in sg_pool_alloc().
 >
-> Hi All,
+> Since commit 9b1d6c895002 ("lib: scatterlist: move SG pool code from
+> SCSI driver to lib/sg_pool.c"), we rely on module_init(sg_pool_init)
+> is invoked before other module_init calls but this assumption is
+> fragile.
 >
-> CCed: Christoph and Robin, although this is not strictly DMA-mapping
-> related issue...
+> I slightly changed the link order while Kbuild refactoring Kbuild,
+> then uncovered this issue. I should keep the current link order, but
+> depending on a specific call order among module_init is so fragine.
 >
-> On 22.09.2022 14:16, Marek Szyprowski wrote:
-> > On 21.09.2022 06:39, Guenter Roeck wrote:
-> >> On Tue, Sep 06, 2022 at 03:13:08PM +0900, Masahiro Yamada wrote:
-> >>> Use the ordinary obj-y to list subdirectories.
-> >>>
-> >>> Note1:
-> >>> GNU Make seems to transform './.modules.order' to '.modules.order'
-> >>> before matching it against the target pattern. Split ./.modules.order
-> >>> to a dedicated rule to avoid "doesn't match the target pattern"
-> >>> warning. [1]
-> >>>
-> >>> Note2:
-> >>> Previously, the link order of lib-y depended on CONFIG_MODULES; lib-y
-> >>> was linked before drivers-y when CONFIG_MODULES=y, otherwise after
-> >>> drivers-y. This was a bug of commit 7273ad2b08f8 ("kbuild: link lib-y
-> >>> objects to vmlinux forcibly when CONFIG_MODULES=y"), but it was not a
-> >>> big deal after all. Now, libs-y (all objects that come from lib/ and
-> >>> arch/*/lib/) is linked last, irrespective of CONFIG_MODULES.
-> >>>
-> >>> Note3:
-> >>> Now, the single target build in arch/*/lib/ works correctly. There was
-> >>> a bug report about this. [2]
-> >>>
-> >>>    $ make ARCH=arm arch/arm/lib/findbit.o
-> >>>      CALL    scripts/checksyscalls.sh
-> >>>      AS      arch/arm/lib/findbit.o
-> >>>
-> >>> [1]: https://lists.gnu.org/archive/html/bug-make/2022-08/msg00059.html
-> >>> [2]:
-> >>> https://lore.kernel.org/linux-kbuild/YvUQOwL6lD4%2F5%2FU6@shell.armlinux.org.uk/
-> >>>
-> >>> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> >> With this patch in place, all parisc images crash during boot with the
-> >> crash dump below. Bisect on next-20220920 points to this patch.
-> >> Crash and bisect logs are attached.
-> >>
-> >> Loking through boot logs, the same problem (same backtrace) is seen
-> >> with various boot tests on alpha. There may be more, but -next
-> >> crashes all over the place right now so it is difficult to determine
-> >> the platforms affected by a specicfic problem.
-> >
-> > I confirm this. I've observed similar issue recently (from time to
-> > time) on the ARM 32bit based Exynos5250-based Arndale board. 'git
-> > bisect' lead me also to this change. A short investigation revealed
-> > that the issue is caused by the NULL sgp->pool in
-> > lib/sg_pool.c:sg_pool_alloc() function. Sometimes it works fine,
-> > sometimes not. It looks that there is a race in the sg_pools and scsi
-> > initialization somehow after this patch.
-> >
-> > To confirm that this change is really responsible for the issue I've
-> > tried to revert it on top of linux-next. This is however hard due to
-> > the dependencies. Instead I've only did:
-> >
-> > # git revert -m1 6fb5a32d95a9b1a9d4a6e135404468a8d74cfde6
-> >
-> > on top of the linux next-20220921 and resolved the conflict (trivial
-> > to resolve). After that the kernel boots fine and I was not able to
-> > reproduce the issue.
-> >
-> > The issue I've observed was:
-> >
-> > ata1: SATA link up 3.0 Gbps (SStatus 123 SControl 300)
-> > ata1.00: HPA detected: current 117229295, native 117231408
-> > ata1.00: ATA-8: Corsair CSSD-F60GB2, 1.1, max UDMA/133
-> > ata1.00: 117229295 sectors, multi 1: LBA48 NCQ (depth 32)
-> > ata1.00: configured for UDMA/133
-> > scsi 0:0:0:0: Direct-Access     ATA      Corsair CSSD-F60 1.1  PQ: 0
-> > ANSI: 5
-> > sd 0:0:0:0: [sda] 117229295 512-byte logical blocks: (60.0 GB/55.9 GiB)
-> > sd 0:0:0:0: Attached scsi generic sg0 type 0
-> > sd 0:0:0:0: [sda] Write Protect is off
-> > sd 0:0:0:0: [sda] Preferred minimum I/O size 512 bytes
-> > 8<--- cut here ---
-> > Unable to handle kernel NULL pointer dereference at virtual address
-> > 00000034
-> > usb3503 usb-hub: switched to HUB mode
-> > [00000034] *pgd=00000000
-> > usb3503 usb-hub: usb3503_probe: probed in hub mode
-> > UDC core: g_ether: couldn't find an available UDC
-> >
-> > Internal error: Oops: 5 [#1] PREEMPT SMP ARM
-> > Modules linked in:
-> > CPU: 0 PID: 7 Comm: kworker/0:0H Not tainted
-> > 6.0.0-rc5-00016-g10d1d4b75525 #12835
-> > Hardware name: Samsung Exynos (Flattened Device Tree)
-> > Workqueue: kblockd blk_mq_run_work_fn
-> > PC is at mempool_alloc+0x48/0x14c
-> > LR is at mempool_alloc+0x2c/0x14c
-> > pc : [<c0267a2c>]    lr : [<c0267a10>]    psr: 40000013
-> > ...
-> > Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> > Control: 10c5387d  Table: 4000406a  DAC: 00000051
-> > ...
-> > Process kworker/0:0H (pid: 7, stack limit = 0x(ptrval))
-> > Stack: (0xf0839cc8 to 0xf083a000)
-> > ...
-> >  mempool_alloc from __sg_alloc_table+0x120/0x160
-> >  __sg_alloc_table from sg_alloc_table_chained+0x5c/0xc0
-> >  sg_alloc_table_chained from scsi_alloc_sgtables+0x5c/0x294
-> >  scsi_alloc_sgtables from sd_init_command+0x118/0x908
-> >  sd_init_command from scsi_queue_rq+0x360/0xbe0
-> >  scsi_queue_rq from blk_mq_dispatch_rq_list+0x1d8/0x8c8
-> >  blk_mq_dispatch_rq_list from blk_mq_do_dispatch_sched+0x2e0/0x338
-> >  blk_mq_do_dispatch_sched from
-> > __blk_mq_sched_dispatch_requests+0xa8/0x150
-> >  __blk_mq_sched_dispatch_requests from
-> > blk_mq_sched_dispatch_requests+0x34/0x5c
-> >  blk_mq_sched_dispatch_requests from __blk_mq_run_hw_queue+0x88/0x22c
-> >  __blk_mq_run_hw_queue from process_one_work+0x288/0x778
-> >  process_one_work from worker_thread+0x44/0x504
-> >  worker_thread from kthread+0xf0/0x124
-> >  kthread from ret_from_fork+0x14/0x2c
-> > Exception stack(0xf0839fb0 to 0xf0839ff8)
-> > 9fa0:                                     00000000 00000000 00000000
-> > 00000000
-> > 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > 00000000
-> > 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> > Code: e30ea764 e3c44d11 e34ca017 e3844a92 (e5953034)
-> > ---[ end trace 0000000000000000 ]---
-> >
-> I've analyzed this issue a bit more and it looks that the $subject patch
-> just revealed a bug in the lib/sg_pool.c. This looks a bit suspicious
-> for me:
+> We usually define the init order by specifying *_initcall correctly,
+> or delay the driver probing by returning -EPROBE_DEFER.
 >
-> module_init(sg_pool_init);
+> Change module_initcall() to subsys_initcall(), and also delete the
+> pointless module_exit() because lib/sg_pool.c is always compiled as
+> built-in. (CONFIG_SG_POOL is bool)
 >
-> After changing the above to:
+> Link: https://lore.kernel.org/all/20220921043946.GA1355561@roeck-us.net/
+> Link: https://lore.kernel.org/all/8e70837d-d859-dfb2-bf7f-83f8b31467bc@samsung.com/
+> Fixes: 9b1d6c895002 ("lib: scatterlist: move SG pool code from SCSI driver to lib/sg_pool.c")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
 >
-> core_initcall(sg_pool_init);
->
-> the issue is gone.
->
->
-> Please confirm that this is a proper way of fixing this issue, so I will
-> send a final patch.
+> I am sending this to DMA subsystem because I did not find
+> a corresponding one for lib/sg_pool.c
 
+Feel free to add:
 
-I am not sure about the choice for *_initcall.
-Please feel free to override me.
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
 
-Anyway, I will make my Kbuild refactoring not depend on sg_pool fix-up.
+>   lib/sg_pool.c | 16 ++--------------
+>   1 file changed, 2 insertions(+), 14 deletions(-)
+>
+> diff --git a/lib/sg_pool.c b/lib/sg_pool.c
+> index a0b1a52cd6f7..9bfe60ca3f37 100644
+> --- a/lib/sg_pool.c
+> +++ b/lib/sg_pool.c
+> @@ -1,5 +1,5 @@
+>   // SPDX-License-Identifier: GPL-2.0-only
+> -#include <linux/module.h>
+> +#include <linux/init.h>
+>   #include <linux/scatterlist.h>
+>   #include <linux/mempool.h>
+>   #include <linux/slab.h>
+> @@ -177,16 +177,4 @@ static __init int sg_pool_init(void)
+>   	return -ENOMEM;
+>   }
+>   
+> -static __exit void sg_pool_exit(void)
+> -{
+> -	int i;
+> -
+> -	for (i = 0; i < SG_MEMPOOL_NR; i++) {
+> -		struct sg_pool *sgp = sg_pools + i;
+> -		mempool_destroy(sgp->pool);
+> -		kmem_cache_destroy(sgp->slab);
+> -	}
+> -}
+> -
+> -module_init(sg_pool_init);
+> -module_exit(sg_pool_exit);
+> +subsys_initcall(sg_pool_init);
 
-
-
+Best regards
 -- 
-Best Regards
-Masahiro Yamada
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
