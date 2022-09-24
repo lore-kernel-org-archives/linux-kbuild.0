@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6552AC6FA8E
-	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Sep 2022 18:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133ACC6FA92
+	for <linux-kbuild@archiver.kernel.org>; Sat, 24 Sep 2022 18:20:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232550AbiIXSUd (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 24 Sep 2022 14:20:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34630 "EHLO
+        id S233588AbiIXSUg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 24 Sep 2022 14:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230181AbiIXSU1 (ORCPT
+        with ESMTP id S229837AbiIXSU3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 24 Sep 2022 14:20:27 -0400
+        Sat, 24 Sep 2022 14:20:29 -0400
 Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6438B2ED4A;
-        Sat, 24 Sep 2022 11:20:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 367D12E6AF;
+        Sat, 24 Sep 2022 11:20:27 -0700 (PDT)
 Received: from zoe.. (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 28OIJItR005682;
-        Sun, 25 Sep 2022 03:19:19 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 28OIJItR005682
+        by conuserg-11.nifty.com with ESMTP id 28OIJItT005682;
+        Sun, 25 Sep 2022 03:19:20 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 28OIJItT005682
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1664043559;
-        bh=AHNswuJHUPX2FMhUYMyi5pOOf1P/SvFBM5veflJK/Zs=;
+        s=dec2015msa; t=1664043560;
+        bh=1hjUHl39f3ahq5fbA8lEwFThtEMEkQko4lR9hIJILXc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HvWECC//isvqaxq2AUBaXfeSphNVauRrnBSOKQCl5CZarEs6QiwnlCnkl4zQSnmxK
-         xvC8vnldS3lXuSJ2A+r/CHGDwJqOR2A+JYoDwonBG6dw/dVhiVyZG80J8dL2Mb6pVx
-         L8tMNzfpy0QthB90OcferRIcNkM00PBdFrBdX0o9lUklBqu9aJsFR0VsxYgBl/R53O
-         nONZq6sjlJA1qYpHj/B4MIkxVqx4M5qfxIWux6y8wrJY+Al0GgvOSOmIOyJ+yQd9Pu
-         k00DIGgrpPAhGh6OmYY3kquI2gIXu+7Qx/umszOOidsRsrkkkn3YmgBg6Y2Kr2N0Dv
-         TddNgIJDWeFBA==
+        b=qnsXZhFniO7nRG7nF0uXwcErr+yccHtzXzvffQkPk0K+4dIJCi+YPFuzvlgdJ3/kV
+         UgmtoD4kg/jUNQOVLt2f5Er9IxHMyX/7DJyxvq7HzUjyVohuWvVmtYtMW/PLTrc6bU
+         ZGYM2k7Ac9iiGov++kR2jGoQ3tV19YNoV+3GGgHhj3i3dY1ty9/0OJ4zFqaefgcVB+
+         ZOyHMrd5yJIZlCv++FfQZarMWDfKM+ykiG5G5gREiJ0xQ3Zm73VvepO5soz+iFrwPT
+         8ihxs7bQXKgv80o1j9bTSEH9ZGVJ0AghVkxBPCq45l2yNCrer8mo5zts9SDxT198fy
+         MLwIxjxx0hs6w==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -36,9 +36,9 @@ Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nathan Chancellor <nathan@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v3 1/7] kbuild: hard-code KBUILD_ALLDIRS in scripts/Makefile.package
-Date:   Sun, 25 Sep 2022 03:19:09 +0900
-Message-Id: <20220924181915.3251186-2-masahiroy@kernel.org>
+Subject: [PATCH v3 3/7] kbuild: move .vmlinux.objs rule to Makefile.modpost
+Date:   Sun, 25 Sep 2022 03:19:11 +0900
+Message-Id: <20220924181915.3251186-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220924181915.3251186-1-masahiroy@kernel.org>
 References: <20220924181915.3251186-1-masahiroy@kernel.org>
@@ -48,50 +48,123 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-My plan is to list subdirectories in ./Kbuild. Once it occurs,
-$(vmlinux-alldirs) will not contain all subdirectories.
+.vmlinux.objs is used by modpost, so scripts/Makefile.modpost is
+a better place to generate it.
 
-Let's hard-code the directory list until I get around to implementing
-a more sophisticated way for generating a source tarball.
+It is used only when CONFIG_MODVERSIONS=y. It should be guarded
+by "ifdef CONFIG_MODVERSIONS".
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v3:
-  - New patch
+(no changes since v1)
 
- Makefile                 | 2 --
- scripts/Makefile.package | 5 ++++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ Makefile                 |  2 +-
+ scripts/Makefile.modpost | 30 ++++++++++++++++++++++++++++--
+ scripts/link-vmlinux.sh  | 18 ------------------
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 57cf4a5bea6d..eb4bbbc898d0 100644
+index f793c3b1eaec..92413b6de451 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1129,8 +1129,6 @@ KBUILD_VMLINUX_OBJS += $(patsubst %/,%/built-in.a, $(drivers-y))
+@@ -1477,7 +1477,7 @@ endif # CONFIG_MODULES
+ # Directories & files removed with 'make clean'
+ CLEAN_FILES += include/ksym vmlinux.symvers modules-only.symvers \
+ 	       modules.builtin modules.builtin.modinfo modules.nsdeps \
+-	       compile_commands.json .thinlto-cache
++	       compile_commands.json .thinlto-cache .vmlinux.objs
  
- export KBUILD_VMLINUX_OBJS KBUILD_VMLINUX_LIBS
- export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
--# used by scripts/Makefile.package
--export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) LICENSES arch include scripts tools)
+ # Directories & files removed with 'make mrproper'
+ MRPROPER_FILES += include/config include/generated          \
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 911606496341..04ad00917b2f 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -57,6 +57,32 @@ vmlinux.symvers: vmlinux.o
  
- vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS)
+ __modpost: vmlinux.symvers
  
-diff --git a/scripts/Makefile.package b/scripts/Makefile.package
-index 5017f6b2da80..8bbcced67c22 100644
---- a/scripts/Makefile.package
-+++ b/scripts/Makefile.package
-@@ -29,7 +29,10 @@ KDEB_SOURCENAME ?= linux-upstream
- KBUILD_PKG_ROOTCMD ?="fakeroot -u"
- export KDEB_SOURCENAME
- # Include only those top-level files that are needed by make, plus the GPL copy
--TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
-+TAR_CONTENT := Documentation LICENSES arch block certs crypto drivers fs \
-+               include init io_uring ipc kernel lib mm net samples scripts \
-+               security sound tools usr virt \
-+               .config .scmversion Makefile \
-                Kbuild Kconfig COPYING $(wildcard localversion*)
- MKSPEC     := $(srctree)/scripts/package/mkspec
++# Generate the list of in-tree objects in vmlinux
++# ---------------------------------------------------------------------------
++
++# This is used to retrieve symbol versions generated by genksyms.
++ifdef CONFIG_MODVERSIONS
++vmlinux.symvers: .vmlinux.objs
++endif
++
++# Ignore libgcc.a
++# Some architectures do '$(CC) --print-libgcc-file-name' to borrow libgcc.a
++# from the toolchain, but there is no EXPORT_SYMBOL in it.
++
++quiet_cmd_vmlinux_objs = GEN     $@
++      cmd_vmlinux_objs =		\
++	for f in $(real-prereqs); do	\
++		case $${f} in		\
++		*libgcc.a) ;;		\
++		*.a) $(AR) t $${f} ;;	\
++		*) echo $${f} ;;	\
++		esac			\
++	done > $@
++
++targets += .vmlinux.objs
++.vmlinux.objs: $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
++	$(call if_changed,vmlinux_objs)
++
+ else
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+@@ -134,6 +160,8 @@ ifneq ($(KBUILD_MODPOST_NOFINAL),1)
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modfinal
+ endif
+ 
++endif
++
+ PHONY += FORCE
+ FORCE:
+ 
+@@ -141,6 +169,4 @@ existing-targets := $(wildcard $(sort $(targets)))
+ 
+ -include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+ 
+-endif
+-
+ .PHONY: $(PHONY)
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 8d982574145a..161bca64e8aa 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -199,7 +199,6 @@ cleanup()
+ 	rm -f System.map
+ 	rm -f vmlinux
+ 	rm -f vmlinux.map
+-	rm -f .vmlinux.objs
+ 	rm -f .vmlinux.export.c
+ }
+ 
+@@ -218,23 +217,6 @@ fi
+ #link vmlinux.o
+ ${MAKE} -f "${srctree}/scripts/Makefile.vmlinux_o"
+ 
+-# Generate the list of in-tree objects in vmlinux
+-#
+-# This is used to retrieve symbol versions generated by genksyms.
+-for f in ${KBUILD_VMLINUX_OBJS} ${KBUILD_VMLINUX_LIBS}; do
+-	case ${f} in
+-	*libgcc.a)
+-		# Some architectures do '$(CC) --print-libgcc-file-name' to
+-		# borrow libgcc.a from the toolchain.
+-		# There is no EXPORT_SYMBOL in external objects. Ignore this.
+-		;;
+-	*.a)
+-		${AR} t ${f} ;;
+-	*)
+-		echo ${f} ;;
+-	esac
+-done > .vmlinux.objs
+-
+ # modpost vmlinux.o to check for section mismatches
+ ${MAKE} -f "${srctree}/scripts/Makefile.modpost" MODPOST_VMLINUX=1
  
 -- 
 2.34.1
