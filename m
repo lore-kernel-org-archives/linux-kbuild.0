@@ -2,86 +2,125 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2BCC6FA8E
-	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Sep 2022 15:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4B7C6FA82
+	for <linux-kbuild@archiver.kernel.org>; Tue, 27 Sep 2022 15:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232039AbiI0PK1 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 27 Sep 2022 11:10:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51566 "EHLO
+        id S230482AbiI0PPh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 27 Sep 2022 11:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbiI0PKX (ORCPT
+        with ESMTP id S230207AbiI0PPg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 27 Sep 2022 11:10:23 -0400
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549F61AF23;
-        Tue, 27 Sep 2022 08:10:20 -0700 (PDT)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-12803ac8113so13656988fac.8;
-        Tue, 27 Sep 2022 08:10:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=01hEAkY1hMZUkwcBVy5mGusCts5qnC2yIn3xsipxquI=;
-        b=PbzJN576EireVHTK/eCYrEUDcQ46N8P6L9WvbmElKcTKN17ipe64tgFMqsKs5gnoBR
-         9ekLhxN6jJEZU6M7a7rq+zdaFJyeaki3Igqpqz/hkw4QRpt99cpDIy/uoPMQOJ4+P+eG
-         pF54cb5qfXwKXusijIyGkyQVwat50cBJLJTSUD7Dq8jbS4pD8M2NJ8AvFfp4OhH1AXcw
-         0A7hGtro8frNRavy1pXLW4ON2nqr0riVBYiV1jAahnFvCfF1fVXIxYZ8Pz4x5jWbh9gw
-         tM/WdIuzkeFvr75SZtsjHUNa18MZ7fX0QutB2Mkhy9GzIQv4d6GNKXZPMyytHPCmBp3/
-         5+AQ==
-X-Gm-Message-State: ACrzQf34Y8+xrBx5aJ8bTDKWjXylrVkf0mSmIP496hVYz6+1lVk2kYCC
-        UqdIAFd/8iUoC3hkw4jFjw==
-X-Google-Smtp-Source: AMsMyM66lHwKEQ473dWPH2HWqmnDEcxhSbVpH7P6xCNk3/33RnDl3cG96wIPt0dQhAv2wSmYzPtQ9w==
-X-Received: by 2002:a05:6870:65a5:b0:126:e94e:926f with SMTP id fp37-20020a05687065a500b00126e94e926fmr2377774oab.230.1664291419464;
-        Tue, 27 Sep 2022 08:10:19 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id d186-20020aca36c3000000b00342ece494ffsm666372oia.46.2022.09.27.08.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 08:10:19 -0700 (PDT)
-Received: (nullmailer pid 1096523 invoked by uid 1000);
-        Tue, 27 Sep 2022 15:10:18 -0000
-Date:   Tue, 27 Sep 2022 10:10:18 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v2] kbuild: take into account DT_SCHEMA_FILES changes
- while checking dtbs
-Message-ID: <20220927151018.GA1095814-robh@kernel.org>
-References: <20220915114422.79378-1-dmitry.baryshkov@linaro.org>
+        Tue, 27 Sep 2022 11:15:36 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2768BCBD;
+        Tue, 27 Sep 2022 08:15:33 -0700 (PDT)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4McNRb3128zHppC;
+        Tue, 27 Sep 2022 23:13:15 +0800 (CST)
+Received: from huawei.com (10.175.103.91) by dggpemm500022.china.huawei.com
+ (7.185.36.162) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 27 Sep
+ 2022 23:15:30 +0800
+From:   Zeng Heng <zengheng4@huawei.com>
+To:     <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        <ndesaulniers@google.com>, <akpm@linux-foundation.org>,
+        <peterz@infradead.org>, <keescook@chromium.org>,
+        <davidgow@google.com>, <nathan@kernel.org>, <jpoimboe@kernel.org>,
+        <dan.j.williams@intel.com>, <ojeda@kernel.org>,
+        <isabbasso@riseup.net>, <dmitrii.bundin.a@gmail.com>,
+        <vbabka@suse.cz>, <linux@rasmusvillemoes.dk>
+CC:     <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <liwei391@huawei.com>, <weiyongjun1@huawei.com>,
+        <zengheng4@huawei.com>
+Subject: [PATCH -next] Makefile: add implicit enum-conversion check for compile build
+Date:   Tue, 27 Sep 2022 23:31:25 +0800
+Message-ID: <20220927153125.811911-1-zengheng4@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220915114422.79378-1-dmitry.baryshkov@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Thu, 15 Sep 2022 14:44:22 +0300, Dmitry Baryshkov wrote:
-> It is useful to be able to recheck dtbs files against a limited set of
-> DT schema files. This can be accomplished by using differnt
-> DT_SCHEMA_FILES argument values while rerunning make dtbs_check. However
-> for some reason if_changed_rule doesn't pick up the rule_dtc changes
-> (and doesn't retrigger the build).
-> 
-> Fix this by changing if_changed_rule to if_changed_dep and squashing DTC
-> and dt-validate into a single new command. Then if_changed_dep triggers
-> on DT_SCHEMA_FILES changes and reruns the build/check.
-> 
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
-> 
-> Changes since v1:
->  - Fixed the quiet_cmd_dtb to fit into the 7 chars limit
-> 
-> ---
->  scripts/Makefile.lib | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
-> 
+Provide implicit enum-conversion warning option
+in general build. When it set enabled, it can
+detect implicit enum type conversion and find
+potential conversion errors like below
+(use "allmodconfig"):
 
-Applied, thanks!
+drivers/gpu/drm/amd/amdgpu/../display/dc/dml/dcn20/display_mode_vba_20.c:3904:46:
+error: implicit conversion from ‘enum <anonymous>’ to ‘enum odm_combine_mode’ [-Werror=enum-conversion]
+ 3904 |       locals->ODMCombineEnablePerState[i][k] = true;
+      |                                              ^
+
+The '-Wenum-conversion' could be regarded as
+effective check on compile runtime and
+call attention on potential mistakes.
+
+Anothor practical example could be referred to:
+https://lore.kernel.org/all/CADnq5_OE0yZvEYGu82QJHL9wvVcTFZrmeTgX7URgh7FVA=jqYg@mail.gmail.com
+
+"-Wenum-conversion" was firstly introduced from
+GNU gcc-10.
+
+Although "-Wenum-conversion" could be enabled
+by "-Wextra" when compiling with 'W=1' option,
+there are many warnings generated by '-Wextra'
+that cause too much noise in a build.
+
+Seeing the details from the following link:
+https://gcc.gnu.org/onlinedocs/gcc-11.3.0/gcc/Warning-Options.html
+
+Because there are still some concerned warnings
+exist, the patch marks the option disabled in default
+for avoiding compile failed like using "allmodconfig".
+
+Signed-off-by: Zeng Heng <zengheng4@huawei.com>
+---
+ Makefile          | 5 +++++
+ lib/Kconfig.debug | 7 +++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index ebd48fc956a3..1790a3624358 100644
+--- a/Makefile
++++ b/Makefile
+@@ -880,6 +880,11 @@ endif
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ 
++# check implicit enum conversion
++ifdef CONFIG_ENUM_CONVERSION
++KBUILD_CFLAGS += -Wenum-conversion
++endif
++
+ # These result in bogus false positives
+ KBUILD_CFLAGS += $(call cc-disable-warning, dangling-pointer)
+ 
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 4f2b81229a2f..a64e06a747d8 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -417,6 +417,13 @@ config FRAME_WARN
+ 	  Setting this too low will cause a lot of warnings.
+ 	  Setting it to 0 disables the warning.
+ 
++config ENUM_CONVERSION
++	bool "Warn for implicit enum conversion"
++	depends on GCC_VERSION >= 100300
++	default n
++	help
++	  Tell gcc to warn at build time for implicit enum conversion.
++
+ config STRIP_ASM_SYMS
+ 	bool "Strip assembler-generated symbols during link"
+ 	default n
+-- 
+2.25.1
+
