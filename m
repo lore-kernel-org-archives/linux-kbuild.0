@@ -2,115 +2,107 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C82C04A95
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Sep 2022 05:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6DBC6FA82
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Sep 2022 06:42:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbiI1Fjh (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 28 Sep 2022 01:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51466 "EHLO
+        id S233213AbiI1GmI (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 28 Sep 2022 02:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230185AbiI1Fjh (ORCPT
+        with ESMTP id S233225AbiI1Glp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 28 Sep 2022 01:39:37 -0400
-Received: from conssluserg-02.nifty.com (conssluserg-02.nifty.com [210.131.2.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0089102C
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Sep 2022 22:39:33 -0700 (PDT)
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 28S5d3UK023029
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Sep 2022 14:39:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 28S5d3UK023029
+        Wed, 28 Sep 2022 02:41:45 -0400
+X-Greylist: delayed 122606 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 27 Sep 2022 23:40:44 PDT
+Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77FAF1F1EBD;
+        Tue, 27 Sep 2022 23:40:44 -0700 (PDT)
+Received: from zoe.. (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 28S6e0G5004120;
+        Wed, 28 Sep 2022 15:40:05 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 28S6e0G5004120
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1664343543;
-        bh=j7WsjhYS8dKZSH3tfHHxY4XaYgKONTNLQPBqrbmADVY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=fVub2KR1LwSTC3G9AB0fqvINJBuk8PTxXt6+AE0S40pG6YIUhTfLhVwOQUkZ9oF9f
-         cr/OhPPD9BzP1xCC9T6d78wD91kiD8Pdqc1ivfNivK5yDdt9yr0P5zXb+5M0pJImDx
-         3mL0bj5ZM3JeCIrjqyWrBv9RPAKhPXV76KRXJt4tDr96V2f7CcCvNPNYimVD0wfEfc
-         D8KkbkXF4nNBQO0uIvZjNJTQb1H2qTTt5Fa4GVcdfqtGhudq83tCo2Me94L/VaKTKX
-         rkee3ZXmSrgNvN2CIDvVmIeanidYzzjFmYJ8tIu5L7PcwEqEh1zXmme/61RTktg1ko
-         f6KTtXt7TzUXA==
-X-Nifty-SrcIP: [209.85.167.174]
-Received: by mail-oi1-f174.google.com with SMTP id m81so14309622oia.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Sep 2022 22:39:03 -0700 (PDT)
-X-Gm-Message-State: ACrzQf2TRZwqhBRpuOiBH1DEYvl1a0sCFv0Ovv0/+bz2o0u5B3DMO68E
-        YedzMGNER56mVZwcqs383z7PSF8i21H+EOkr5q4=
-X-Google-Smtp-Source: AMsMyM7uHct7YRXfZazSKGBPNW1oA2o9WuqMb2pJY8Youe6pNhs8OyR+EZSe7NzQvBVK4irAMl27ry9bbatfCtOABQA=
-X-Received: by 2002:a54:400c:0:b0:34f:9913:262 with SMTP id
- x12-20020a54400c000000b0034f99130262mr3443524oie.287.1664343542543; Tue, 27
- Sep 2022 22:39:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAK7LNATtFv9C4ppgxBWD+R5JtHUtCMb5yqvP1Vxsr2Ki7U466Q@mail.gmail.com>
- <b0cf49ac1a3ece40e133fa80e3ceae7891d6ed8d.1661979510.git.owen@owenrafferty.com>
- <CAK7LNARYiJNiFKL2pQWCOocxkYWiJ66S4gBDE=54tFYJnfO--g@mail.gmail.com>
- <CAK7LNAQBijdVUVE3zpLCp2wXJ6FeC9Ar7ii_bMTPYWvGKgJJTQ@mail.gmail.com> <e628cb91-0ed8-993e-7904-c7bf010b7462@infradead.org>
-In-Reply-To: <e628cb91-0ed8-993e-7904-c7bf010b7462@infradead.org>
+        s=dec2015msa; t=1664347205;
+        bh=mbThpvrninpaCK/CTWbzGhqDF8eGttC+bocdQ0Ww/r4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=a5KVFzadmJLoVQ3EoHPPAvO1dQebgfZ3ZPSK5pObwncMHmumMrx14iWM1X6acvn2T
+         fi5jXigzaWXsrDQGkyPdXUrz4V1HgNErU2iswaWQ0WWI5iryEKt2EXSVKfurBL/vBa
+         93cFDr88Tf7585+MH/w2/dxI+X1mWTTzwFPLfTjv6aiPTTAaMM9fUIdRzaakoRhRom
+         +EJXKVgjWrTNsjvRfX4BMi4NOx+eQJixFIxu1PUDzxNBjwQQNwfL3eUvVIgbguvvAe
+         lB7OgYMMqL8rrWClQxY2AqjBlXCYWpP7nPOW+TobvbpFr9cWcU5yMIj5FlUdZc06d/
+         jswcKjaQtC7HA==
+X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 28 Sep 2022 14:38:26 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATche7qAiTROUYsp9h4E6OEbvddYgArkZHx-OHxqqLwVQ@mail.gmail.com>
-Message-ID: <CAK7LNATche7qAiTROUYsp9h4E6OEbvddYgArkZHx-OHxqqLwVQ@mail.gmail.com>
-Subject: Re: [PATCH v4] kbuild: rewrite check-local-export in sh/awk
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Owen Rafferty <owen@owenrafferty.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ia64@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicolas Pitre <npitre@baylibre.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v3 4/8] ia64,export.h: replace EXPORT_DATA_SYMBOL* with EXPORT_SYMBOL*
+Date:   Wed, 28 Sep 2022 15:39:43 +0900
+Message-Id: <20220928063947.299333-5-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220928063947.299333-1-masahiroy@kernel.org>
+References: <20220928063947.299333-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 7:26 AM Randy Dunlap <rdunlap@infradead.org> wrote:
->
-> Hi,
->
-> On 9/6/22 02:28, Masahiro Yamada wrote:
-> > On Sun, Sep 4, 2022 at 1:01 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> >>
-> >> On Thu, Sep 1, 2022 at 6:03 AM Owen Rafferty <owen@owenrafferty.com> wrote:
-> >>>
-> >>> Signed-off-by: Owen Rafferty <owen@owenrafferty.com>
-> >>> ---
-> >>
-> >>
-> >> Please input something in the commit log.
-> >>
-> >> I think the benchmark in v2 is worth mentioning
-> >> because "awk is faster than bash" is one benefit
-> >> of applying this patch.
-> >>
-> >>
-> >
-> >
-> >
-> > Applied to linux-kbuild. Thanks.
-> >
-> >
-> > (V5 was not delivered to ML somehow,
-> > but I found it in my mailbox.)
->
-> Yeah, I haven't seen that one either.
->
-> For whatever is in linux-next-20220927, I am seeing something
-> unpleasant. I'm not positive that it's due to this patch, so I'm
-> still checking/testing (but I'm about to leave home for awhile so
-> I wanted to go ahead and let people know about this).
->
-> I do N number of randconfig builds in a script (say 10).
-> What I am seeing is that when an 'nm' error happens, the
-> script is Terminated and not continued. E.g., if the error
-> is on randconfig build #4, builds 5-10 are never started.
-> The controlling script dies.
->
+With the previous refactoring, you can always use EXPORT_SYMBOL*.
 
+Replace two instances in ia64, then remove EXPORT_DATA_SYMBOL*.
 
-Hmm, I have not yet observed such an error.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-If it happens depending on a particular configuration,
-please share the .config file.
+(no changes since v1)
 
+ arch/ia64/kernel/head.S      | 2 +-
+ arch/ia64/kernel/ivt.S       | 2 +-
+ include/asm-generic/export.h | 3 ---
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-
-
-
+diff --git a/arch/ia64/kernel/head.S b/arch/ia64/kernel/head.S
+index f22469f1c1fc..c096500590e9 100644
+--- a/arch/ia64/kernel/head.S
++++ b/arch/ia64/kernel/head.S
+@@ -170,7 +170,7 @@ RestRR:											\
+ 	__PAGE_ALIGNED_DATA
+ 
+ 	.global empty_zero_page
+-EXPORT_DATA_SYMBOL_GPL(empty_zero_page)
++EXPORT_SYMBOL_GPL(empty_zero_page)
+ empty_zero_page:
+ 	.skip PAGE_SIZE
+ 
+diff --git a/arch/ia64/kernel/ivt.S b/arch/ia64/kernel/ivt.S
+index d6d4229b28db..7a418e324d30 100644
+--- a/arch/ia64/kernel/ivt.S
++++ b/arch/ia64/kernel/ivt.S
+@@ -87,7 +87,7 @@
+ 
+ 	.align 32768	// align on 32KB boundary
+ 	.global ia64_ivt
+-	EXPORT_DATA_SYMBOL(ia64_ivt)
++	EXPORT_SYMBOL(ia64_ivt)
+ ia64_ivt:
+ /////////////////////////////////////////////////////////////////////////////////////////
+ // 0x0000 Entry 0 (size 64 bundles) VHPT Translation (8,20,47)
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 0ae9f38a904c..570cd4da7210 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -8,7 +8,4 @@
+  */
+ #include <linux/export.h>
+ 
+-#define EXPORT_DATA_SYMBOL(name)	EXPORT_SYMBOL(name)
+-#define EXPORT_DATA_SYMBOL_GPL(name)	EXPORT_SYMBOL_GPL(name)
+-
+ #endif
 -- 
-Best Regards
-Masahiro Yamada
+2.34.1
+
