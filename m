@@ -2,33 +2,33 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30D4C32771
-	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Sep 2022 06:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 894B4C6FA90
+	for <linux-kbuild@archiver.kernel.org>; Wed, 28 Sep 2022 06:42:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233257AbiI1Gmf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 28 Sep 2022 02:42:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57414 "EHLO
+        id S233267AbiI1Gmg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 28 Sep 2022 02:42:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233262AbiI1Glz (ORCPT
+        with ESMTP id S233264AbiI1Glz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Wed, 28 Sep 2022 02:41:55 -0400
 Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550F6115F58;
-        Tue, 27 Sep 2022 23:41:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E91419283;
+        Tue, 27 Sep 2022 23:41:21 -0700 (PDT)
 Received: from zoe.. (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 28S6e0G6004120;
-        Wed, 28 Sep 2022 15:40:05 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 28S6e0G6004120
+        by conuserg-08.nifty.com with ESMTP id 28S6e0G3004120;
+        Wed, 28 Sep 2022 15:40:03 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 28S6e0G3004120
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1664347206;
-        bh=YuiSaa5TunTalSUSMGyvPMuKWQEyEfJw4GcU2AlJPTE=;
+        s=dec2015msa; t=1664347203;
+        bh=8dVjZPAC/oUXBXN0lJxXAzK00cHf6aabrRwUR04CF5Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=K+Ss4BadPpG9mhokH76NFCXwNpyJQQk2U8LJ4BwzVCdlAJ5XNmrwWT8k75kv1tce4
-         nIw0Uo7jpa6ovFT2ARJiPPjYY7eVBw7fMJLiYxkfY37DTPqeXOHzW1fx+Vx22LmijS
-         K7jlW/hi1z3ybhJ/Xkcw5kTMWrWdm69YtsgfLZliWrAuZrtmj5Fv6VXW8SL1ZcXgg/
-         bLFjtJJBwJQviSosJMYW4KgcT5SBuYiCVjR19kLRj4P/RelMJEpqSyhorZPrpPAy93
-         uJ48CCjueLhOp19nNgI+0Bnv7oqtxm6rgoir/M7SQKcsmK6PxHsgUGaNCeHkCs+y78
-         BYGyrmHRhgCUA==
+        b=CwzSxsFEec7Lx0h0x63yNLoutZM2z7vFW5LqZSbglVoMVimWruYR1owxYQvQflU8W
+         8pZpNgluw2X6zlFNQSzb/jhUxmQG3jU00MDdouy3equ/kiP0dsfbd84L1k5vg5BnAY
+         My+BV6EWzOiQtSmzHmnBGvSt8nJ90/j/oO++5bDn5DNkkkchb966MPi8R3wi2HejUk
+         yhDA4INYh+27idymKNVrfrUt527dJXQAoif5+DjnCHS/6vxrhAY81oZf0PLXzIVioS
+         zT94aC084Oh6a8FBBNy87yWpx6Sv7wY7RqQDQQgbmSf2LVjyx9M3PWjpGxzJYzDidm
+         RzSyu2BT1o9ww==
 X-Nifty-SrcIP: [133.32.182.133]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -37,11 +37,11 @@ Cc:     linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ard Biesheuvel <ardb@kernel.org>,
         Nicolas Pitre <npitre@baylibre.com>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Michal Marek <michal.lkml@markovi.net>
-Subject: [PATCH v3 5/8] modpost: squash sym_update_namespace() into sym_add_exported()
-Date:   Wed, 28 Sep 2022 15:39:44 +0900
-Message-Id: <20220928063947.299333-6-masahiroy@kernel.org>
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v3 2/8] kbuild: rebuild .vmlinux.export.o when its prerequisite is updated
+Date:   Wed, 28 Sep 2022 15:39:41 +0900
+Message-Id: <20220928063947.299333-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220928063947.299333-1-masahiroy@kernel.org>
 References: <20220928063947.299333-1-masahiroy@kernel.org>
@@ -51,94 +51,126 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Pass a set of the name, license, and namespace to sym_add_exported().
+When include/linux/export-internal.h is updated, .vmlinux.export.o
+must be rebuilt, but it does not happen because its rule is hidden
+behind scripts/link-vmlinux.sh.
 
-sym_update_namespace() is unneeded.
+Move it out of the shell script, so that Make can see the dependency
+between vmlinux and .vmlinux.export.o.
+
+Move the vmlinux rule to scripts/Makefile.vmlinux.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
-(no changes since v1)
+Changes in v3:
+  - New patch
 
- scripts/mod/modpost.c | 41 +++++++++--------------------------------
- 1 file changed, 9 insertions(+), 32 deletions(-)
+ Makefile                 | 16 ++++------------
+ scripts/Makefile.vmlinux | 21 ++++++++++++++++++++-
+ scripts/link-vmlinux.sh  |  5 -----
+ 3 files changed, 24 insertions(+), 18 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 13fff6e92aef..0bb5bbd176b4 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -352,26 +352,8 @@ static const char *sec_name(const struct elf_info *info, unsigned int secindex)
+diff --git a/Makefile b/Makefile
+index 83d8ff1d521a..79488f155fae 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1160,17 +1160,9 @@ vmlinux_o: autoksyms_recursive vmlinux.a $(KBUILD_VMLINUX_LIBS)
+ vmlinux.o modules.builtin.modinfo modules.builtin: vmlinux_o
+ 	@:
  
- #define strstarts(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
- 
--static void sym_update_namespace(const char *symname, const char *namespace)
--{
--	struct symbol *s = find_symbol(symname);
+-ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
 -
--	/*
--	 * That symbol should have been created earlier and thus this is
--	 * actually an assertion.
--	 */
--	if (!s) {
--		error("Could not update namespace(%s) for symbol %s\n",
--		      namespace, symname);
--		return;
--	}
+-# Final link of vmlinux with optional arch pass after final link
+-cmd_link-vmlinux =                                                 \
+-	$(CONFIG_SHELL) $< "$(LD)" "$(KBUILD_LDFLAGS)" "$(LDFLAGS_vmlinux)";    \
+-	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
 -
--	free(s->namespace);
--	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
--}
+-vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) modpost FORCE
+-	+$(call if_changed_dep,link-vmlinux)
 -
- static struct symbol *sym_add_exported(const char *name, struct module *mod,
--				       bool gpl_only)
-+				       bool gpl_only, const char *namespace)
- {
- 	struct symbol *s = find_symbol(name);
+-targets += vmlinux
++PHONY += vmlinux
++vmlinux: vmlinux.o $(KBUILD_LDS) modpost
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.vmlinux
  
-@@ -384,6 +366,7 @@ static struct symbol *sym_add_exported(const char *name, struct module *mod,
- 	s = alloc_symbol(name);
- 	s->module = mod;
- 	s->is_gpl_only = gpl_only;
-+	s->namespace = namespace[0] ? NOFAIL(strdup(namespace)) : NULL;
- 	list_add_tail(&s->list, &mod->exported_symbols);
- 	hash_add_symbol(s);
+ # The actual objects are generated when descending,
+ # make sure no implicit rule kicks in
+@@ -1501,7 +1493,7 @@ endif # CONFIG_MODULES
+ # Directories & files removed with 'make clean'
+ CLEAN_FILES += include/ksym vmlinux.symvers modules-only.symvers \
+ 	       modules.builtin modules.builtin.modinfo modules.nsdeps \
+-	       compile_commands.json .thinlto-cache .vmlinux.objs
++	       compile_commands.json .thinlto-cache .vmlinux.objs .vmlinux.export.c
  
-@@ -657,17 +640,12 @@ static void handle_symbol(struct module *mod, struct elf_info *info,
- 		break;
- 	default:
- 		if (sym->st_shndx == info->export_symbol_sec) {
--			const char *name;
+ # Directories & files removed with 'make mrproper'
+ MRPROPER_FILES += include/config include/generated          \
+diff --git a/scripts/Makefile.vmlinux b/scripts/Makefile.vmlinux
+index 7a63abf22399..49946cb96844 100644
+--- a/scripts/Makefile.vmlinux
++++ b/scripts/Makefile.vmlinux
+@@ -1,18 +1,37 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ 
++PHONY := __default
++__default: vmlinux
++
+ include include/config/auto.conf
+ include $(srctree)/scripts/Kbuild.include
+ 
+ # for c_flags
+ include $(srctree)/scripts/Makefile.lib
+ 
++targets :=
++
+ quiet_cmd_cc_o_c = CC      $@
+       cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+ 
+ %.o: %.c FORCE
+ 	$(call if_changed_dep,cc_o_c)
+ 
+-targets := $(MAKECMDGOALS)
++ifdef CONFIG_MODULES
++targets += .vmlinux.export.o
++vmlinux: .vmlinux.export.o
++endif
++
++ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
++
++# Final link of vmlinux with optional arch pass after final link
++cmd_link_vmlinux =							\
++	$< "$(LD)" "$(KBUILD_LDFLAGS)" "$(LDFLAGS_vmlinux)";		\
++	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
++
++targets += vmlinux
++vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) FORCE
++	+$(call if_changed_dep,link_vmlinux)
+ 
+ # Add FORCE to the prequisites of a target to force it to be always rebuilt.
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index e3d42202e54c..918470d768e9 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -199,7 +199,6 @@ cleanup()
+ 	rm -f System.map
+ 	rm -f vmlinux
+ 	rm -f vmlinux.map
+-	rm -f .vmlinux.export.c
+ }
+ 
+ # Use "make V=1" to debug this script
+@@ -214,10 +213,6 @@ if [ "$1" = "clean" ]; then
+ 	exit 0
+ fi
+ 
+-if is_enabled CONFIG_MODULES; then
+-	${MAKE} -f "${srctree}/scripts/Makefile.vmlinux" .vmlinux.export.o
+-fi
 -
--			if (strstarts(symname, "__export_symbol_gpl.")) {
--				name = symname + strlen("__export_symbol_gpl.");
--				sym_add_exported(name, mod, true);
--				sym_update_namespace(name, sym_get_data(info, sym));
--			} else if (strstarts(symname, "__export_symbol.")) {
--				name = symname + strlen("__export_symbol.");
--				sym_add_exported(name, mod, false);
--				sym_update_namespace(name, sym_get_data(info, sym));
--			}
-+			if (strstarts(symname, "__export_symbol_gpl."))
-+				sym_add_exported(symname + strlen("__export_symbol_gpl."),
-+						 mod, true, sym_get_data(info, sym));
-+			else if (strstarts(symname, "__export_symbol."))
-+				sym_add_exported(symname + strlen("__export_symbol."),
-+						 mod, false, sym_get_data(info, sym));
+ ${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init init/version-timestamp.o
  
- 			break;
- 		}
-@@ -2283,9 +2261,8 @@ static void read_dump(const char *fname)
- 			mod = new_module(modname, strlen(modname));
- 			mod->from_dump = true;
- 		}
--		s = sym_add_exported(symname, mod, gpl_only);
-+		s = sym_add_exported(symname, mod, gpl_only, namespace);
- 		sym_set_crc(s, crc);
--		sym_update_namespace(symname, namespace);
- 	}
- 	free(buf);
- 	return;
+ btf_vmlinux_bin_o=""
 -- 
 2.34.1
 
