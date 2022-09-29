@@ -2,88 +2,74 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9403C433F5
-	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Sep 2022 18:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 497FAC433F5
+	for <linux-kbuild@archiver.kernel.org>; Thu, 29 Sep 2022 18:18:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235749AbiI2SSH (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 29 Sep 2022 14:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59538 "EHLO
+        id S235779AbiI2SSs (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 29 Sep 2022 14:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235670AbiI2SSC (ORCPT
+        with ESMTP id S235785AbiI2SS0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Sep 2022 14:18:02 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3894A1F7B2D;
-        Thu, 29 Sep 2022 11:18:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A9B88B8257B;
-        Thu, 29 Sep 2022 18:18:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D8EC433D6;
-        Thu, 29 Sep 2022 18:17:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664475479;
-        bh=nDnHLzf58bxqnErR+eXLb4bIm338J8AUuIB1gu/k4CI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZGuq76aYxzPqms4X0Ukp+5q0L03XuDDezfS1SEF7JWCWjm8dxWNfnV5SZyUfSDDvZ
-         PWuh2dZQfLK5fRKYkxm5CwhFbxNt5BFPWoR2JVwuFECX3Yn6V0iAQfL5RMZNesIxlN
-         64wKlKn4JOBC22HKLToKjDCN7Z1HTJUM90hbvP8wg+xS+3ymD1Cxl5L2RWfgorNDU6
-         Sq2r09C/xl3lDiBfEUP57QivbAewPkpoAncNpqR+t6G4bfWkKEX6KVLZlsM0jc2pwT
-         fofSAxtEsmXCXnsG7IiB1JGLtUvyULedxDRkor814YApaTPciHS0BgHGSWiopImHL5
-         Ib/auPNvSVkig==
-Date:   Thu, 29 Sep 2022 11:17:57 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, llvm@lists.linux.dev
-Subject: Re: [PATCH] Revert "kbuild: Check if linker supports the -X option"
-Message-ID: <YzXhVSkCVKZzpf9H@dev-arch.thelio-3990X>
-References: <20220929181223.2502994-1-masahiroy@kernel.org>
+        Thu, 29 Sep 2022 14:18:26 -0400
+Received: from conuserg-12.nifty.com (conuserg-12.nifty.com [210.131.2.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890091F7ED2;
+        Thu, 29 Sep 2022 11:18:21 -0700 (PDT)
+Received: from zoe.. (133-32-182-133.west.xps.vectant.ne.jp [133.32.182.133]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id 28TIHKFu020165;
+        Fri, 30 Sep 2022 03:17:20 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 28TIHKFu020165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1664475441;
+        bh=im3I7uBc1WIhFbxXT+owODuKLCJ4ysSQNjRbCMjInPE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cXrfyvfavVvpa5eeLgTX9opdxrYkvqUYC2e5hBl4uJ1mWlwmfl0WSwF+uFVWNB3E6
+         IwT3dRcpD1h97NS684YjJ2b8bKE+x6UcdOgiWkKxBbrEnEx2gdZSLt7pH8Ze0XAV5O
+         otLOq40THZMS+FVg0/otqsiqqMeEtRJdQUFALDQeNXG3kHw1B0d2WkXhOAEAnSRhU4
+         xDW160Ti+hv7weH9gU+m9lZTBx7XI1xnY6x3OhmU0f2lxh1Mmks15EZ04vi9vPUHnG
+         YlWshr8M0LoO0/dNHChzogXfaSgjvT/mYr5dQVxAjzoU80VaBvHzNN8A8IcLZTbLfK
+         U4YDL+hp5WGSA==
+X-Nifty-SrcIP: [133.32.182.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-ia64@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>
+Subject: [PATCH] ia64: simplify esi object addition in Makefile
+Date:   Fri, 30 Sep 2022 03:17:15 +0900
+Message-Id: <20220929181715.2504087-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220929181223.2502994-1-masahiroy@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Sep 30, 2022 at 03:12:23AM +0900, Masahiro Yamada wrote:
-> This reverts commit d79a27195a33f4b5e591de5536799ad874ea6cf5.
-> 
-> According to the commit description, this ld-option test was added for
-> the gold linker at that time.
-> 
-> Commit 75959d44f9dc ("kbuild: Fail if gold linker is detected") gave
-> up the gold linker support after all.
-> 
-> I tested the BFD linker from binutils 2.23 and LLD from LLVM 11.0.0.
-> Both of them support the -X option.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+CONFIG_IA64_ESI is a bool option. I do not know why the Makefile was
+written like this, but this should not have any functional change.
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-> ---
-> 
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 49dcae886c48..d7c85ec79000 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1037,7 +1037,7 @@ KBUILD_LDFLAGS	+= $(call ld-option,--no-warn-rwx-segments)
->  endif
->  
->  ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
-> -LDFLAGS_vmlinux	+= $(call ld-option, -X,)
-> +LDFLAGS_vmlinux	+= -X
->  endif
->  
->  ifeq ($(CONFIG_RELR),y)
-> -- 
-> 2.34.1
-> 
+ arch/ia64/kernel/Makefile | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+index 4a1fcb121dda..ae9ff07de4ab 100644
+--- a/arch/ia64/kernel/Makefile
++++ b/arch/ia64/kernel/Makefile
+@@ -34,10 +34,7 @@ mca_recovery-y			+= mca_drv.o mca_drv_asm.o
+ obj-$(CONFIG_IA64_MC_ERR_INJECT)+= err_inject.o
+ obj-$(CONFIG_STACKTRACE)	+= stacktrace.o
+ 
+-obj-$(CONFIG_IA64_ESI)		+= esi.o
+-ifneq ($(CONFIG_IA64_ESI),)
+-obj-y				+= esi_stub.o	# must be in kernel proper
+-endif
++obj-$(CONFIG_IA64_ESI)		+= esi.o esi_stub.o # must be in kernel proper
+ obj-$(CONFIG_INTEL_IOMMU)	+= pci-dma.o
+ 
+ obj-$(CONFIG_ELF_CORE)		+= elfcore.o
+-- 
+2.34.1
+
