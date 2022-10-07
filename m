@@ -2,114 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED354C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Oct 2022 14:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390E2C433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri,  7 Oct 2022 20:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbiJGOgU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 7 Oct 2022 10:36:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52204 "EHLO
+        id S229931AbiJGUcw (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 7 Oct 2022 16:32:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiJGOgS (ORCPT
+        with ESMTP id S230141AbiJGUct (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 7 Oct 2022 10:36:18 -0400
-Received: from conssluserg-06.nifty.com (conssluserg-06.nifty.com [210.131.2.91])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A331E72EDC
-        for <linux-kbuild@vger.kernel.org>; Fri,  7 Oct 2022 07:36:16 -0700 (PDT)
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 297Ea20m025817
-        for <linux-kbuild@vger.kernel.org>; Fri, 7 Oct 2022 23:36:02 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 297Ea20m025817
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1665153363;
-        bh=CDCun5TRVs5h8TGjahdouMxcsGU5T69DdqQ+1z+O7vI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=BKOmmTeNVYOYas61IU86k4HDc/EPQfHINjz+BIc3Hs7sWZNUHw/dz3s48j7nKuk9L
-         nshTlTp0pITK+YQDwrYfb/yZPZGfu8Qr4poqV8d3OGZzYyCcV3p3VsOilC0ZuelF4w
-         //8ppsNFCAVRfnHoMrLTgcuSKEGgvbsRWvQrIYlKtYSMkRGq59mgCvAzv7+U3tqOfk
-         WUDOeWwgTuZubOtJC3fMOD2zhgkSuKISJD0NN6NPKTm8BKEdhUeQULdseLHICCeok0
-         OZ4kV8mcDq90aIymmsGfp9LoLiHbHsQaPwMarlR0tEOjMG+tkVNAVlkxJRkSOfWUK4
-         j9TAhCj2rVttA==
-X-Nifty-SrcIP: [209.85.167.182]
-Received: by mail-oi1-f182.google.com with SMTP id n83so5678229oif.11
-        for <linux-kbuild@vger.kernel.org>; Fri, 07 Oct 2022 07:36:02 -0700 (PDT)
-X-Gm-Message-State: ACrzQf3uthJDz9hV666R/x9Ac2wvf4rDjhayJCjVVk764joPKQUORA+G
-        sgbXEwhgU5MBkpnlwhuZi6kvQwLUjB6eUTDztCo=
-X-Google-Smtp-Source: AMsMyM7ZyWosPTx0XaHGbJLw4PoFATCCm2cIMmCKbiRYhXCC/GgS3iOp0GS6QaUJwrfAuN3MC+BUZRPjQUlLgSQWpKw=
-X-Received: by 2002:a05:6808:1b85:b0:34d:8ce1:d5b0 with SMTP id
- cj5-20020a0568081b8500b0034d8ce1d5b0mr7660537oib.194.1665153361395; Fri, 07
- Oct 2022 07:36:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <633f0406.050a0220.9431e.d406@mx.google.com> <Yz8H+CIgq9A8WI6J@sirena.org.uk>
- <CAK7LNART_52inEq0-wXiR=70D7-9TGaCa_f6bpA+ud3Mra3FOQ@mail.gmail.com>
- <CAK7LNAQ2L7fLG1zzS-MkgqKS+JYEvX62wPhZg-S+4vMk0cjNVg@mail.gmail.com> <Y0AOD/EfGEiGevsD@sirena.org.uk>
-In-Reply-To: <Y0AOD/EfGEiGevsD@sirena.org.uk>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 7 Oct 2022 23:35:25 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASR0ufUDmAUdkH1sEtXH9DoG5_==XcNw+KxvpoUg=57bA@mail.gmail.com>
-Message-ID: <CAK7LNASR0ufUDmAUdkH1sEtXH9DoG5_==XcNw+KxvpoUg=57bA@mail.gmail.com>
-Subject: Re: next/master bisection: baseline.login on qemu_arm-virt-gicv3
-To:     Mark Brown <broonie@kernel.org>
-Cc:     kernelci-results@groups.io, bot@kernelci.org,
-        Russell King <linux@armlinux.org.uk>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, gtucker@collabora.com,
-        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>
+        Fri, 7 Oct 2022 16:32:49 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2396127BDB
+        for <linux-kbuild@vger.kernel.org>; Fri,  7 Oct 2022 13:32:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a2-20020a5b0002000000b006b48689da76so5564838ybp.16
+        for <linux-kbuild@vger.kernel.org>; Fri, 07 Oct 2022 13:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=H5PXFuGO6LsvTkGWSyH4IIntX/pmrPgQBzEpfjypKsw=;
+        b=kNHjn6x5hUfuwCtRtaf+cYbg52QTq7S6GaEZitIAjgKwdSB3u0cm0l4Z6cQKD87jUI
+         7G35Df2pOwo9gMegtlSck62AyJCe/hQYv41mG0jr5PlAfqmsxJ6cNbn41KEX8eK0jdAk
+         x00IK7IRfBlhy98VPZbjK0kKoaNqW/+apqS1HiT9CgaBtWfZpXvHBTNzCCO71Xgtsxwz
+         tJcPDlCgmP2sGYhAzqtCk0MkIyVJN8Oe7CbnUo8EpzgQYIM63Z2IbcoSqN3r/6cIXyS8
+         YVq7TDHTpzUCi016DXCol0Sa1pUcq5lk7P3ZalJgZxc6tcDSo29XOspe2BLCNt1a5pXn
+         FQFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H5PXFuGO6LsvTkGWSyH4IIntX/pmrPgQBzEpfjypKsw=;
+        b=H9dCA4bkX1LMftpp6HC0Hqayw8PxydxyN/lEFGi4lUR7REcIFrRsNrbpBxn4HvyGmc
+         XQRMD8yijxnl+W3OGzdIxelLQNm5OiE+FBkhyPw4bpxwpxWvXyu7ZgxJefR9gkpLFoU8
+         UjraY94ww95nj1bpppT53fr3+MjgEC955xkDyvFJo2jDGcsnS1nOj2hFOCQERRwo4EVs
+         gonaZ5ASV0WTqzv04XulVbT0n3eHWzG1Iv88jKYSmsi5Zti8VqyL8oF1QVW8EtI7RLjH
+         P0ki8RT0nCnLLDrZ4W0WEhhf4TFdiQH8xeuQKCDRYNKxZAhS6cMfCt27o2/lm5igXkWS
+         a23g==
+X-Gm-Message-State: ACrzQf3wZv+UrjPyv2qgKDNk9hssYMb8aTlgWZb8xzdhu4pEdQhMqd3S
+        a3vZUUQrEt5V5w5QDnR0HB60I5Qh3ZwSQKQxg10=
+X-Google-Smtp-Source: AMsMyM5xkodeESX8Qe1smo5uI+0KcKPVRF8fNmAe7oJoszCv7gYXUaxSXjbqe03Q4+THi22jagWiUXAdbj+BsGqXHJA=
+X-Received: from ndesaulniers-desktop.svl.corp.google.com ([2620:0:100e:712:35a0:96d6:8c4e:f207])
+ (user=ndesaulniers job=sendgmr) by 2002:a25:8a8a:0:b0:6bc:e04a:d340 with SMTP
+ id h10-20020a258a8a000000b006bce04ad340mr6415762ybl.549.1665174760237; Fri,
+ 07 Oct 2022 13:32:40 -0700 (PDT)
+Date:   Fri,  7 Oct 2022 13:32:36 -0700
+Mime-Version: 1.0
+X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=UIrHvErwpgNbhCkRZAYSX0CFd/XFEwqX3D0xqtqjNug=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1665174756; l=1716;
+ i=ndesaulniers@google.com; s=20220923; h=from:subject; bh=TzGJay1lXQMdgQA/ZyjvCG6BrJE34h1xkzf3M2zsIDQ=;
+ b=GirJqyZImL21fWOg762M3V4qsRhWN8goTG9W87OS1Xjtj8APnccjbNLrKgsb+Bz7D+7np/E1o89C
+ EmDaEm5BA81mqRB58hnAPO8IdaObGngDH2RIkMQBUmPcBnuRdCgk
+X-Mailer: git-send-email 2.38.0.rc2.412.g84df46c1b4-goog
+Message-ID: <20221007203236.1750890-1-ndesaulniers@google.com>
+Subject: [PATCH] kbuild: add -fno-discard-value-names to cmd_cc_ll_c
+From:   Nick Desaulniers <ndesaulniers@google.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Michal Marek <michal.lkml@markovi.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Tom Rix <trix@redhat.com>, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Fri, Oct 7, 2022 at 8:31 PM Mark Brown <broonie@kernel.org> wrote:
->
-> On Fri, Oct 07, 2022 at 02:38:06PM +0900, Masahiro Yamada wrote:
->
-> > The arm virt machine with gicv3 booted as far as I tested.
-> >
-> > So, I need to know more details about the settings of the KernelCI.
->
-> The HTML versions of the boot logs include the qemu command, these days
-> it's run using docker so so you can even get the specific version of
-> qemu version that was being used by kernelci in case that's important:
->
-> docker run --network=3Dhost --cap-add=3DNET_ADMIN --interactive --tty --r=
-m --init --name=3Dlava-docker-qemu-7496529-2.1.1-gexyjab5hb --device=3D/dev=
-/kvm --device=3D/dev/net/tun --mount=3Dtype=3Dbind,source=3D/var/lib/lava/d=
-ispatcher/tmp,destination=3D/var/lib/lava/dispatcher/tmp kernelci/qemu qemu=
--system-arm -cpu cortex-a15 -machine virt-2.11,gic-version=3D3 -nographic -=
-net nic,model=3Dvirtio,macaddr=3DDE:AD:BE:EF:45:5C -net bridge,br=3Dvirbr0 =
--m 1024 -monitor none -kernel /var/lib/lava/dispatcher/tmp/7496529/deployim=
-ages-blwzkdvs/kernel/zImage -append "console=3DttyAMA0,115200 root=3D/dev/r=
-am0 debug verbose console_msg_format=3Dsyslog earlycon" -initrd /var/lib/la=
-va/dispatcher/tmp/7496529/deployimages-blwzkdvs/ramdisk/rootfs.cpio.gz -dri=
-ve format=3Dqcow2,file=3D/var/lib/lava/dispatcher/tmp/7496529/apply-overlay=
--guest-f5mnvw0l/lava-guest.qcow2,media=3Ddisk,if=3Dvirtio,id=3Dlavatest
->
-> Everything from qemu-system-arm on is the command that's run inside the
-> container.
->
-> The logs also show the download of the filesystems that would be used,
-> though we don't get as far as actually using them so it's a bit moot:
->
-> https://storage.kernelci.org/next/master/next-20221004/arm/multi_v7_defco=
-nfig+debug/gcc-10/lab-collabora/baseline-qemu_arm-virt-gicv3.html
+When debugging LLVM IR, it can be handy for clang to not discard value
+names used for local variables and parameters. Compare the generated IR.
 
+Implicit Default (-fdiscard-value-names):
+  define i32 @core_sys_select(i32 %0, ptr %1, ptr %2, ptr %3, ptr %4) {
+    %6 = alloca i64
+    %7 = alloca %struct.poll_wqueues
+    %8 = alloca [64 x i32]
 
+Explicit -fno-discard-value-names:
+  define i32 @core_sys_select(i32 %n, ptr %inp, ptr %outp, ptr %exp,
+                              ptr %end_time) {
+    %expire.i = alloca i64
+    %table.i = alloca %struct.poll_wqueues
+    %stack_fds = alloca [64 x i32]
 
+The rule for generating human readable LLVM IR (.ll) is only useful as a
+debugging feature:
 
+$ make LLVM=1 fs/select.ll
 
+Clang defaults to -fdiscard-value-names to save memory when generating
+LLVM IR. For debugging purposes, the improvement in readability at a
+cost of more verbose IR is a cost we're happy to pay.
 
-I suspect "+debug" in "multi_v7_defconfig+debug"
-because the failure log says "ftrace bug" multiple times.
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+---
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 27be77c0d6d8..d0e4f476dfee 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -140,7 +140,7 @@ $(obj)/%.symtypes : $(src)/%.c FORCE
+ # LLVM assembly
+ # Generate .ll files from .c
+ quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
+-      cmd_cc_ll_c = $(CC) $(c_flags) -emit-llvm -S -o $@ $<
++      cmd_cc_ll_c = $(CC) $(c_flags) -emit-llvm -S -fno-discard-value-names -o $@ $<
+ 
+ $(obj)/%.ll: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cc_ll_c)
 
-Which config options does "+debug" enable?
+base-commit: 93ed07a23fd08b8613f64cf0a15d7fbdaca010fd
+-- 
+2.38.0.rc2.412.g84df46c1b4-goog
 
-Can you share the .config file?
-
-
-
---=20
-Best Regards
-Masahiro Yamada
