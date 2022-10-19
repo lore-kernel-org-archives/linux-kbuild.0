@@ -2,66 +2,42 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B24EC433FE
-	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Oct 2022 19:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47505C43217
+	for <linux-kbuild@archiver.kernel.org>; Wed, 19 Oct 2022 20:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230216AbiJSTyg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 19 Oct 2022 15:54:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46058 "EHLO
+        id S231314AbiJSUXR (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 19 Oct 2022 16:23:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbiJSTye (ORCPT
+        with ESMTP id S229731AbiJSUXO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Oct 2022 15:54:34 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20AC51A056
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Oct 2022 12:54:25 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-134072c15c1so22008922fac.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Oct 2022 12:54:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSG5J/Jp19bLIoPO0PSW05M1FrVD5Y1lwTSpwfUz75M=;
-        b=ZrWRNl/i7xLO3nCLpj86TANKjfrJc9VYQdyddvCNNDWkZjgWsynXIGYYloHFmBLkKo
-         ZR9Y3xyXyLHydBorVZbvJSJonq7xYGlgjFoDKaaU/SmxYWVFgc92FuQ5ds//JqPJOM9o
-         JGfjyqN/Ol18NKSuEY7LLTfvzFHs7HKX9e1iI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSG5J/Jp19bLIoPO0PSW05M1FrVD5Y1lwTSpwfUz75M=;
-        b=651K3og0V1HQ7Ld3DxkhdqQEvD4fBQ3JO/Q37EbmBFDh63/a2jKbzLeb+c9L5lBQ/O
-         j4yLVvcKxReJZXKsCc4LVpfLCjGqUY0fp8B790kDi/X3Cqc1mf+g6b5Wrzu8T1ksH15N
-         cxmKIOmbTUZtWGIqBF23bf/zNLCzZgGo/HtS5U/XA53cN+/T9RGgFaAsJnhwzSCqIzRB
-         GQJOkACgzE0lyQxOiHeZENyTBKvE/afqKq4PES/gyqtniYnDy2oOYKgpYkRqD+2AZiYh
-         VuM7k+Itv1uLa4VnwPhYRGsJMPTNulwD9uX98I7or8JbLDwTrkWJckc2GVFPZYZbnxqT
-         B+1A==
-X-Gm-Message-State: ACrzQf1l1UicJdqlVQRL/pwrHDCS+/H9b+MY+IcQX0gw8P0Nb0NfFiQW
-        qWTN3OuYSNkjMC+EaAKfUe0LqkqXs8hO9g==
-X-Google-Smtp-Source: AMsMyM7khdlihkAqJ5IlxszPKTwOVLugGbR5O7nldcpxjEgdI1u38cY3YkzC5yUft7K8MP7rsLNE/g==
-X-Received: by 2002:a05:6870:5494:b0:133:14f:73e4 with SMTP id f20-20020a056870549400b00133014f73e4mr6006171oan.184.1666209263793;
-        Wed, 19 Oct 2022 12:54:23 -0700 (PDT)
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com. [209.85.210.51])
-        by smtp.gmail.com with ESMTPSA id a62-20020a9d2644000000b00655ca9a109bsm7369397otb.36.2022.10.19.12.54.23
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Oct 2022 12:54:23 -0700 (PDT)
-Received: by mail-ot1-f51.google.com with SMTP id 101-20020a9d0bee000000b00661b54d945fso10137178oth.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Oct 2022 12:54:23 -0700 (PDT)
-X-Received: by 2002:a05:6830:4408:b0:661:dfa1:f018 with SMTP id
- q8-20020a056830440800b00661dfa1f018mr4856482otv.69.1666209262824; Wed, 19 Oct
- 2022 12:54:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221019162648.3557490-1-Jason@zx2c4.com>
-In-Reply-To: <20221019162648.3557490-1-Jason@zx2c4.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 19 Oct 2022 12:54:06 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whT+xyge9UjH+r6dt0FG-eUdrzu5hDMce_vC+n8uLam2A@mail.gmail.com>
-Message-ID: <CAHk-=whT+xyge9UjH+r6dt0FG-eUdrzu5hDMce_vC+n8uLam2A@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: treat char as always signed
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Wed, 19 Oct 2022 16:23:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9FC1C7134;
+        Wed, 19 Oct 2022 13:23:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 13EE1B822EB;
+        Wed, 19 Oct 2022 20:23:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5818C433D6;
+        Wed, 19 Oct 2022 20:23:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lqPZ2kwy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1666210988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6TSG2vrF4L7U0TmIuYTMcX432T1AzPyXPqLh8FCHzYM=;
+        b=lqPZ2kwyeB5qBygjZyi5SR7/J0j5oEwteqw5LXX4ixsXcBUi4I/WVv6IXWL4k2UxEVHj+E
+        WaXtd5/5DlP8yuvKLqjg+tQ+YWXoFMnUKOYEXPQOc+aUfnxpvhaHFxhvvANWnGMDg2lu2p
+        dJauqgiam8nth1lXao18VDlv8Jkt1+k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8bccd0b3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 19 Oct 2022 20:23:08 +0000 (UTC)
+Date:   Wed, 19 Oct 2022 14:23:01 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         linux-arch@vger.kernel.org, linux-toolchains@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
@@ -69,73 +45,41 @@ Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] kbuild: treat char as always signed
+Message-ID: <Y1BcpXAjR4tmV6RQ@zx2c4.com>
+References: <20221019162648.3557490-1-Jason@zx2c4.com>
+ <CAHk-=whT+xyge9UjH+r6dt0FG-eUdrzu5hDMce_vC+n8uLam2A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whT+xyge9UjH+r6dt0FG-eUdrzu5hDMce_vC+n8uLam2A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 9:27 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> So let's just eliminate this particular variety of heisensigned bugs
-> entirely. Set `-fsigned-char` globally, so that gcc makes the type
-> signed on all architectures.
+Hi Linus,
 
-Btw, I do wonder if we might actually be better off doing this - but
-doing it the other way around.
+On Wed, Oct 19, 2022 at 12:54:06PM -0700, Linus Torvalds wrote:
+> On Wed, Oct 19, 2022 at 9:27 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > So let's just eliminate this particular variety of heisensigned bugs
+> > entirely. Set `-fsigned-char` globally, so that gcc makes the type
+> > signed on all architectures.
+> 
+> Btw, I do wonder if we might actually be better off doing this - but
+> doing it the other way around.
 
-IOW, make 'char' always UNsigned. Unlike the signed char thing, it
-shouldn't generate any worse code on any common architecture.
+That could work. The argument here would be that most people indeed
+treat char as a byte. I'll send a v2 doing this.
 
-And I do think that having odd architecture differences is generally a
-bad idea, and making the language rules stricter to avoid differences
-is a good thing.
+This will probably break some things, though, on drivers that are
+already broken on e.g. ARM. For example, the wifi driver I fixed that
+started this whole thing would now be broken on x86 too. But also, we're
+barely past rc1, so maybe this is something to do now, and then we'll
+spend the rest of the 6.1 cycle fixing issues as the pop up? Sounds fine
+to me if you think that's doable.
 
-Now, you did '-fsigned-char', because that's the "common default" in
-an x86-centric world.
+Either way, I'll send a patch and you can do with it what you think is
+best.
 
-You are also right that people might think that "char" works like
-"int", and that if you don't specify the sign, it's signed.
-
-But those people are obviously wrong anyway, so it's not a very strong argu=
-ment.
-
-And from a kernel perspective, I do think that "treat char as a byte"
-and making it be unsigned is in many ways the saner model. There's a
-reason we use 'unsigned char' in a fair number of places.
-
-So using '-funsigned-char' might not be a bad idea.
-
-Hilariously (and by "hilariously", I obviously mean "NOT
-hilariously"), it doesn't actually fix the warning for
-
-   const unsigned char *c =3D "p";
-
-which still complains about
-
-   warning: pointer targets in initialization of =E2=80=98const unsigned ch=
-ar
-*=E2=80=99 from =E2=80=98char *=E2=80=99 differ in signedness
-
-even when you've specified that 'char' should be unsigned with -funsigned-c=
-har.
-
-Because gcc actually tries to be helpful, and has (reasonably, from a
-"type sanity" standpoint) decided that
-
-   "The type char is always a distinct type from each of signed char
-or unsigned char, even though its behavior is always just like one of
-those two"
-
-so using "-funsigned-char" gives us well-defined *behavior*, but
-doesn't really help us with cleaning up our code.
-
-I understand why gcc would want to make it clear that despite any
-behavioral issues, "char" is *not* the same as "[un]signed char" in
-general. But in this kind of use case, that warning is just pointless
-and annoying.
-
-Oh well. You *really* can't win this thing. The game is rigged like
-some geeky carnival game.
-
-              Linus
+Jason
