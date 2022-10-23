@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BE1ECAAA1
-	for <linux-kbuild@archiver.kernel.org>; Sun, 23 Oct 2022 18:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C96F4FA3742
+	for <linux-kbuild@archiver.kernel.org>; Sun, 23 Oct 2022 18:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbiJWSZX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 23 Oct 2022 14:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49222 "EHLO
+        id S230242AbiJWSZY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 23 Oct 2022 14:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229987AbiJWSZV (ORCPT
+        with ESMTP id S230071AbiJWSZW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 23 Oct 2022 14:25:21 -0400
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965A3481F1;
+        Sun, 23 Oct 2022 14:25:22 -0400
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00911481D4;
         Sun, 23 Oct 2022 11:25:16 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29NIOef4128785;
-        Sun, 23 Oct 2022 13:24:40 -0500
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29NIOgxE035579;
+        Sun, 23 Oct 2022 13:24:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1666549480;
-        bh=Eszw1jdJn4j8v1iKIorlGb7DTe56ZXAST+TiCWofrWI=;
+        s=ti-com-17Q1; t=1666549482;
+        bh=CqQmCNnvDd0J0Q/Z1W5OTC4NOPgpy6mPC4/OCc6121Q=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=wjLZNsPNIXscu4GFpLzxocu/4VNwM6O/J+MddjyqqCWbMq7nnWx0nTQMCEUXOmW9j
-         bckwGTXlxOG348Al/4/wZASqw902djwVvLzL2vmxPhXsBBy1nO/K5DE0EIVAOgCJPh
-         QjJ07uod2WbuwFupBJfras6r5qXpwl9Vudl0PMXo=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29NIOeh0043386
+        b=oO6XGmN43tb0d6W/7dpANuS2IO2CDSTmgTjHYzDUHga89JKWOWcLqc+bt6OFTt3vR
+         4wA9rIoeV83WaKb+2v9aH5ASgG9LhXTHgU/fKTcQi3xer3C4pRTq7SfpW1PbEoqc+l
+         RDK1k9daktXVJCmRTN6SzZFXa0fmOTyN+Kh7/zCc=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29NIOg7h021577
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sun, 23 Oct 2022 13:24:40 -0500
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+        Sun, 23 Oct 2022 13:24:42 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Sun, 23
- Oct 2022 13:24:39 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ Oct 2022 13:24:42 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Sun, 23 Oct 2022 13:24:39 -0500
+ Frontend Transport; Sun, 23 Oct 2022 13:24:42 -0500
 Received: from ula0226330.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29NIObVY042708;
-        Sun, 23 Oct 2022 13:24:38 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29NIObVb042708;
+        Sun, 23 Oct 2022 13:24:41 -0500
 From:   Andrew Davis <afd@ti.com>
 To:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -56,9 +56,9 @@ CC:     <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
         <linux-renesas-soc@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, Andrew Davis <afd@ti.com>
-Subject: [PATCH 1/6] kbuild: Allow DTB overlays to built from .dtso named source files
-Date:   Sun, 23 Oct 2022 13:24:32 -0500
-Message-ID: <20221023182437.15263-2-afd@ti.com>
+Subject: [PATCH 4/6] arm64: dts: freescale: Rename DTB overlay source files from .dts to .dtso
+Date:   Sun, 23 Oct 2022 13:24:35 -0500
+Message-ID: <20221023182437.15263-5-afd@ti.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221023182437.15263-1-afd@ti.com>
 References: <20221023182437.15263-1-afd@ti.com>
@@ -70,40 +70,100 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently DTB Overlays (.dtbo) are build from source files with the same
-extension (.dts) as the base DTs (.dtb). This may become confusing and
-even lead to wrong results. For example, a composite DTB (created from a
-base DTB and a set of overlays) might have the same name as one of the
-overlays that create it.
+DTB Overlays (.dtbo) can now be built from source files with the
+extension (.dtso). This makes it clear the content of the file
+and differentiates them from base DTB source files.
 
-Different files should be generated from differently named sources.
- .dtb  <-> .dts
- .dtbo <-> .dtso
-
-We do not remove the ability to compile DTBO files from .dts files here,
-only add a new rule allowing the .dtso file name. The current .dts named
-overlays can be renamed with time. After all have been renamed we can
-remove the other rule.
+Convert the DTB overlay source files in the arm64/freescale directory.
 
 Signed-off-by: Andrew Davis <afd@ti.com>
 ---
- scripts/Makefile.lib | 3 +++
- 1 file changed, 3 insertions(+)
+ .../{fsl-ls1028a-qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso}       | 0
+ .../{fsl-ls1028a-qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso}       | 0
+ .../{fsl-ls1028a-qds-7777.dts => fsl-ls1028a-qds-7777.dtso}       | 0
+ .../{fsl-ls1028a-qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso}       | 0
+ .../{fsl-ls1028a-qds-899b.dts => fsl-ls1028a-qds-899b.dtso}       | 0
+ .../{fsl-ls1028a-qds-9999.dts => fsl-ls1028a-qds-9999.dtso}       | 0
+ ...e-gw72xx-0x-imx219.dts => imx8mm-venice-gw72xx-0x-imx219.dtso} | 0
+ ...xx-0x-rs232-rts.dts => imx8mm-venice-gw72xx-0x-rs232-rts.dtso} | 0
+ ...ice-gw72xx-0x-rs422.dts => imx8mm-venice-gw72xx-0x-rs422.dtso} | 0
+ ...ice-gw72xx-0x-rs485.dts => imx8mm-venice-gw72xx-0x-rs485.dtso} | 0
+ ...e-gw73xx-0x-imx219.dts => imx8mm-venice-gw73xx-0x-imx219.dtso} | 0
+ ...xx-0x-rs232-rts.dts => imx8mm-venice-gw73xx-0x-rs232-rts.dtso} | 0
+ ...ice-gw73xx-0x-rs422.dts => imx8mm-venice-gw73xx-0x-rs422.dtso} | 0
+ ...ice-gw73xx-0x-rs485.dts => imx8mm-venice-gw73xx-0x-rs485.dtso} | 0
+ 14 files changed, 0 insertions(+), 0 deletions(-)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-7777.dts => fsl-ls1028a-qds-7777.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-899b.dts => fsl-ls1028a-qds-899b.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-9999.dts => fsl-ls1028a-qds-9999.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-imx219.dts => imx8mm-venice-gw72xx-0x-imx219.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs232-rts.dts => imx8mm-venice-gw72xx-0x-rs232-rts.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs422.dts => imx8mm-venice-gw72xx-0x-rs422.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs485.dts => imx8mm-venice-gw72xx-0x-rs485.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-imx219.dts => imx8mm-venice-gw73xx-0x-imx219.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs232-rts.dts => imx8mm-venice-gw73xx-0x-rs232-rts.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs422.dts => imx8mm-venice-gw73xx-0x-rs422.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs485.dts => imx8mm-venice-gw73xx-0x-rs485.dtso} (100%)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3aa384cec76b8..0376a6f18bfb1 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -408,6 +408,9 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
- $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
- 	$(call if_changed_dep,dtc)
- 
-+$(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
-+	$(call if_changed_dep,dtc)
-+
- dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
- 
- # Bzip2
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dtso
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-65bb.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-65bb.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-65bb.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-65bb.dtso
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-7777.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-7777.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-7777.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-7777.dtso
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-85bb.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-85bb.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-85bb.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-85bb.dtso
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-899b.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-899b.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-899b.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-899b.dtso
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-9999.dts b/arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-9999.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-9999.dts
+rename to arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-9999.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-imx219.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-imx219.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-imx219.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-imx219.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs232-rts.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs232-rts.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs232-rts.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs232-rts.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs422.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs422.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs422.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs422.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs485.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs485.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs485.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw72xx-0x-rs485.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-imx219.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-imx219.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-imx219.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-imx219.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs232-rts.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs232-rts.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs232-rts.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs232-rts.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs422.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs422.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs422.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs422.dtso
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs485.dts b/arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs485.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs485.dts
+rename to arch/arm64/boot/dts/freescale/imx8mm-venice-gw73xx-0x-rs485.dtso
 -- 
 2.37.3
 
