@@ -2,112 +2,199 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 016B6FA373F
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 16:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DF8ECAAA1
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 18:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233321AbiJXQdv (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 12:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43876 "EHLO
+        id S232875AbiJXSu6 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 14:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234106AbiJXQde (ORCPT
+        with ESMTP id S232678AbiJXSui (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 12:33:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD2C90818;
-        Mon, 24 Oct 2022 08:20:25 -0700 (PDT)
+        Mon, 24 Oct 2022 14:50:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A259C2475D2;
+        Mon, 24 Oct 2022 10:31:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D29706127C;
-        Mon, 24 Oct 2022 15:18:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC62C433D6;
-        Mon, 24 Oct 2022 15:17:58 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cFJ+mhbo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1666624677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jPAvpBt3yY8Z9PqgoksFeUYOcrWPh6V+NDz6Rlmm6uM=;
-        b=cFJ+mhbohWONrNgXJLUNiJdSBZBRnW9h2rwN9Z5QjPYXn0kw2OD+lXIJObhhN2tYDI6lNg
-        R0eHsEH1NE5i93LpPODDj9Q6wR5+MCjPpk+WtN2TSRYH0rBT560h+VirLsPoPLcUIo9VrN
-        M8fu1T0UJZ8DlBVWVA1bZM8rvyQT2Oc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5025459f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 24 Oct 2022 15:17:56 +0000 (UTC)
-Date:   Mon, 24 Oct 2022 17:17:47 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-toolchains@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2] kbuild: treat char as always unsigned
-Message-ID: <Y1asm2GnqgXirEIy@zx2c4.com>
-References: <Y1BcpXAjR4tmV6RQ@zx2c4.com>
- <20221019203034.3795710-1-Jason@zx2c4.com>
- <Y1ZZyP4ZRBIbv+Kg@kili>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0581614F8;
+        Mon, 24 Oct 2022 17:29:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2489C433C1;
+        Mon, 24 Oct 2022 17:29:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666632597;
+        bh=7X3pyy5etiy2bIvntMxqiIcujpkGZ6SQvQR3em+OEfQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VcCpwZdkYFgbPQhi85iPPo1eyIBNpT/qYtnO8dl6duQouAJvMDFnaV6Sg+sAWAKor
+         iwZUIVeLPcMvTVA22drsQzHuwAMQ21quscVSoiAmispWDZbxotN7F5hbajv9TWVuoB
+         f3UrspGND75jdVosfeKHsLS6KedH4juXr+t80Xv8RMLY+owXOIiyFkJbojkeDJwnx6
+         cUQTTXeJuKCUfoEKE7lfOn29DHjihFlUqVq0VWcpJmbZcnUPbsfyQ7/tJovhEgs49z
+         zw1MRAFY38576I9Ko7E/Al/qYG0Z5BfYjKr5eUIUI3aJQbww/D6Du4PR05UXlr92EM
+         U3LzfDEShaVXQ==
+Date:   Mon, 24 Oct 2022 10:29:55 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Xin Li <xin3.li@intel.com>
+Cc:     linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        linux-kbuild@vger.kernel.org, x86@kernel.org,
+        keescook@chromium.org, andrew.cooper3@citrix.com, hpa@zytor.com,
+        peterz@infradead.org
+Subject: Re: [PATCH 1/1] kbuild: upgrade the orphan section warning to an
+ error if CONFIG_WERROR is set
+Message-ID: <Y1bLk47I4pyEmJVi@dev-arch.thelio-3990X>
+References: <20221022030519.9505-1-xin3.li@intel.com>
+ <20221022030519.9505-2-xin3.li@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y1ZZyP4ZRBIbv+Kg@kili>
+In-Reply-To: <20221022030519.9505-2-xin3.li@intel.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 12:24:24PM +0300, Dan Carpenter wrote:
-> On Wed, Oct 19, 2022 at 02:30:34PM -0600, Jason A. Donenfeld wrote:
-> > Recently, some compile-time checking I added to the clamp_t family of
-> > functions triggered a build error when a poorly written driver was
-> > compiled on ARM, because the driver assumed that the naked `char` type
-> > is signed, but ARM treats it as unsigned, and the C standard says it's
-> > architecture-dependent.
-> > 
-> > I doubt this particular driver is the only instance in which
-> > unsuspecting authors make assumptions about `char` with no `signed` or
-> > `unsigned` specifier. We were lucky enough this time that that driver
-> > used `clamp_t(char, negative_value, positive_value)`, so the new
-> > checking code found it, and I've sent a patch to fix it, but there are
-> > likely other places lurking that won't be so easily unearthed.
-> > 
-> > So let's just eliminate this particular variety of heisensign bugs
-> > entirely. Set `-funsigned-char` globally, so that gcc makes the type
-> > unsigned on all architectures.
-> > 
-> > This will break things in some places and fix things in others, so this
-> > will likely cause a bit of churn while reconciling the type misuse.
-> > 
+On Fri, Oct 21, 2022 at 08:05:19PM -0700, Xin Li wrote:
+> Andrew Cooper suggested upgrading the orphan section warning to a hard link
+> error. However Nathan Chancellor said outright turning the warning into an
+> error with no escape hatch might be too aggressive, as we have had these
+> warnings triggered by new compiler generated sections, and suggested turning
+> orphan sections into an error only if CONFIG_WERROR is set. Kees Cook echoed
+> and emphasized that the mandate from Linus is that we should avoid breaking
+> builds. It wrecks bisection, it causes problems across compiler versions, etc.
 > 
-> This is a very daring change and obviously is going to introduce bugs.
-> It might be better to create a static checker rule that says "char"
-> without explicit signedness can only be used for strings.
-
-Indeed this would be great.
-
+> Thus upgrade the orphan section warning to a hard link error only if
+> CONFIG_WERROR is set.
 > 
-> arch/parisc/kernel/drivers.c:337 print_hwpath() warn: impossible condition '(path->bc[i] == -1) => (0-255 == (-1))'
-> arch/parisc/kernel/drivers.c:410 setup_bus_id() warn: impossible condition '(path.bc[i] == -1) => (0-255 == (-1))'
-> arch/parisc/kernel/drivers.c:486 create_parisc_device() warn: impossible condition '(modpath->bc[i] == -1) => (0-255 == (-1))'
-> arch/parisc/kernel/drivers.c:759 hwpath_to_device() warn: impossible condition '(modpath->bc[i] == -1) => (0-255 == (-1))'
-> drivers/media/dvb-frontends/stv0288.c:471 stv0288_set_frontend() warn: assigning (-9) to unsigned variable 'tm'
-> drivers/media/dvb-frontends/stv0288.c:471 stv0288_set_frontend() warn: we never enter this loop
-> drivers/misc/sgi-gru/grumain.c:711 gru_check_chiplet_assignment() warn: 'gts->ts_user_chiplet_id' is unsigned
-> drivers/net/wireless/cisco/airo.c:5316 proc_wepkey_on_close() warn: assigning (-16) to unsigned variable 'key[i / 3]'
-> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9415 rt2800_iq_search() warn: assigning (-32) to unsigned variable 'idx0'
-> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9470 rt2800_iq_search() warn: assigning (-32) to unsigned variable 'perr'
-> drivers/video/fbdev/sis/init301.c:3549 SiS_GetCRT2Data301() warn: 'SiS_Pr->SiS_EModeIDTable[ModeIdIndex]->ROMMODEIDX661' is unsigned
-> sound/pci/au88x0/au88x0_core.c:2029 vortex_adb_checkinout() warn: signedness bug returning '(-22)'
-> sound/pci/au88x0/au88x0_core.c:2046 vortex_adb_checkinout() warn: signedness bug returning '(-12)'
-> sound/pci/au88x0/au88x0_core.c:2125 vortex_adb_allocroute() warn: 'vortex_adb_checkinout(vortex, (0), en, 0)' is unsigned
-> sound/pci/au88x0/au88x0_core.c:2170 vortex_adb_allocroute() warn: 'vortex_adb_checkinout(vortex, stream->resources, en, 4)' is unsigned
-> sound/pci/rme9652/hdsp.c:3953 hdsp_channel_buffer_location() warn: 'hdsp->channel_map[channel]' is unsigned
-> sound/pci/rme9652/rme9652.c:1833 rme9652_channel_buffer_location() warn: 'rme9652->channel_map[channel]' is unsigned
+> Suggested-by: Andrew Cooper <andrew.cooper3@citrix.com>
+> Suggested-by: Nathan Chancellor <nathan@kernel.org>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 
+Thanks for the patch!
 
-Thanks. I'll fix these up.
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+Tested-by: Nathan Chancellor <nathan@kernel.org>
 
-Jason
+We could deduplicate the '$(if $(CONFIG_WERROR),error,warn)' logic if we
+hoisted it into Kconfig by having something like
+
+    config LD_ORPHAN_WARN_LEVEL
+        string
+        depends on LD_ORPHAN_WARN
+        default "error" if WERROR
+        default "warn"
+
+in init/Kconfig then using it everywhere like
+
+    --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
+
+but I will let others decide if they would prefer that over the
+direction we went here.
+
+Cheers,
+Nathan
+
+> ---
+>  Makefile                          | 2 +-
+>  arch/arm/boot/compressed/Makefile | 2 +-
+>  arch/arm64/kernel/vdso/Makefile   | 2 +-
+>  arch/arm64/kernel/vdso32/Makefile | 2 +-
+>  arch/x86/boot/compressed/Makefile | 2 +-
+>  init/Kconfig                      | 9 ++++++---
+>  6 files changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index f41ec8c8426b..b6716a64519f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1118,7 +1118,7 @@ endif
+>  # We never want expected sections to be placed heuristically by the
+>  # linker. All sections should be explicitly named in the linker script.
+>  ifdef CONFIG_LD_ORPHAN_WARN
+> -LDFLAGS_vmlinux += --orphan-handling=warn
+> +LDFLAGS_vmlinux += --orphan-handling=$(if $(CONFIG_WERROR),error,warn)
+>  endif
+>  
+>  # Align the bit size of userspace programs with the kernel
+> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+> index 41bcbb460fac..c97db8b14c4f 100644
+> --- a/arch/arm/boot/compressed/Makefile
+> +++ b/arch/arm/boot/compressed/Makefile
+> @@ -123,7 +123,7 @@ LDFLAGS_vmlinux += --no-undefined
+>  LDFLAGS_vmlinux += -X
+>  # Report orphan sections
+>  ifdef CONFIG_LD_ORPHAN_WARN
+> -LDFLAGS_vmlinux += --orphan-handling=warn
+> +LDFLAGS_vmlinux += --orphan-handling=$(if $(CONFIG_WERROR),error,warn)
+>  endif
+>  # Next argument is a linker script
+>  LDFLAGS_vmlinux += -T
+> diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
+> index 619e2dc7ee14..c8fcc06b5037 100644
+> --- a/arch/arm64/kernel/vdso/Makefile
+> +++ b/arch/arm64/kernel/vdso/Makefile
+> @@ -27,7 +27,7 @@ ldflags-y := -shared -soname=linux-vdso.so.1 --hash-style=sysv	\
+>  	     -Bsymbolic --build-id=sha1 -n $(btildflags-y)
+>  
+>  ifdef CONFIG_LD_ORPHAN_WARN
+> -  ldflags-y += --orphan-handling=warn
+> +  ldflags-y += --orphan-handling=$(if $(CONFIG_WERROR),error,warn)
+>  endif
+>  
+>  ldflags-y += -T
+> diff --git a/arch/arm64/kernel/vdso32/Makefile b/arch/arm64/kernel/vdso32/Makefile
+> index 36c8f66cad25..fa157366e814 100644
+> --- a/arch/arm64/kernel/vdso32/Makefile
+> +++ b/arch/arm64/kernel/vdso32/Makefile
+> @@ -104,7 +104,7 @@ VDSO_AFLAGS += -D__ASSEMBLY__
+>  VDSO_LDFLAGS += -Bsymbolic --no-undefined -soname=linux-vdso.so.1
+>  VDSO_LDFLAGS += -z max-page-size=4096 -z common-page-size=4096
+>  VDSO_LDFLAGS += -shared --hash-style=sysv --build-id=sha1
+> -VDSO_LDFLAGS += --orphan-handling=warn
+> +VDSO_LDFLAGS += --orphan-handling=$(if $(CONFIG_WERROR),error,warn)
+>  
+>  
+>  # Borrow vdsomunge.c from the arm vDSO
+> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+> index 3a261abb6d15..a1a8bec61c10 100644
+> --- a/arch/x86/boot/compressed/Makefile
+> +++ b/arch/x86/boot/compressed/Makefile
+> @@ -68,7 +68,7 @@ KBUILD_LDFLAGS += $(call ld-option,--no-ld-generated-unwind-info)
+>  # address by the bootloader.
+>  LDFLAGS_vmlinux := -pie $(call ld-option, --no-dynamic-linker)
+>  ifdef CONFIG_LD_ORPHAN_WARN
+> -LDFLAGS_vmlinux += --orphan-handling=warn
+> +LDFLAGS_vmlinux += --orphan-handling=$(if $(CONFIG_WERROR),error,warn)
+>  endif
+>  LDFLAGS_vmlinux += -z noexecstack
+>  ifeq ($(CONFIG_LD_IS_BFD),y)
+> diff --git a/init/Kconfig b/init/Kconfig
+> index abf65098f1b6..8f4b838ece47 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -159,10 +159,12 @@ config WERROR
+>  	help
+>  	  A kernel build should not cause any compiler warnings, and this
+>  	  enables the '-Werror' (for C) and '-Dwarnings' (for Rust) flags
+> -	  to enforce that rule by default.
+> +	  to enforce that rule by default. Certain warnings from other tools
+> +	  such as the linker may be upgraded to errors with this option as
+> +	  well.
+>  
+> -	  However, if you have a new (or very old) compiler with odd and
+> -	  unusual warnings, or you have some architecture with problems,
+> +	  However, if you have a new (or very old) compiler or linker with odd
+> +	  and unusual warnings, or you have some architecture with problems,
+>  	  you may need to disable this config option in order to
+>  	  successfully build the kernel.
+>  
+> @@ -1454,6 +1456,7 @@ config LD_ORPHAN_WARN
+>  	def_bool y
+>  	depends on ARCH_WANT_LD_ORPHAN_WARN
+>  	depends on $(ld-option,--orphan-handling=warn)
+> +	depends on $(ld-option,--orphan-handling=error)
+>  
+>  config SYSCTL
+>  	bool
+> -- 
+> 2.34.1
+> 
+> 
