@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F610FA3740
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 22:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8619CFA3740
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 22:54:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbiJXWkJ (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 18:40:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
+        id S232053AbiJXWyx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 18:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232051AbiJXWjH (ORCPT
+        with ESMTP id S232107AbiJXWyc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 18:39:07 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5752BC853;
-        Mon, 24 Oct 2022 14:02:42 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYbA5050121;
-        Mon, 24 Oct 2022 12:34:37 -0500
+        Mon, 24 Oct 2022 18:54:32 -0400
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD962D20DA;
+        Mon, 24 Oct 2022 14:16:11 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYf43047071;
+        Mon, 24 Oct 2022 12:34:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1666632877;
-        bh=0Wv3kxu1zrI9I3zQ+/ntswY76RUlx98SfDnQU2HARwY=;
+        s=ti-com-17Q1; t=1666632881;
+        bh=URuwxbNYEGUMSbDDyc2DIB/HUev400go/YHiS1qkjHI=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=hXT8UWk0aIiJTHKS33cig5CCvhV3QV4PYwjWxDEnmd+IOSxTNQo46NtchRmE6eEu3
-         nUQ06Qxeng6BL21C3rF26Ho6nEl1BvfCYSdmZ1WG3KKBAmZYYRm6f1GH8zeqdRXy9s
-         ysP3dKBVjHR+Zx4ZzIjlZJ9hJ74sqXEGYZujQPgc=
-Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYbbv122837
+        b=Z2Iupi4zP7ORMhwyHM3iv6CL6CmYDsLb5yo9OHCAYFxdYPZXc4/YBXL6pPiBnfMI6
+         Co2iNGgUHilVjoFxCK+Gd1dpA/Dqlj3axccaaZtIDoQeQkhmGstGmfWne43AgSavv5
+         KlvyiYvtT6XQcLYS+QfrNDTWYquINdAo38wOy1XM=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYfFf002389
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 24 Oct 2022 12:34:37 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+        Mon, 24 Oct 2022 12:34:41 -0500
+Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Mon, 24
- Oct 2022 12:34:36 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ Oct 2022 12:34:41 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Mon, 24 Oct 2022 12:34:36 -0500
+ Frontend Transport; Mon, 24 Oct 2022 12:34:41 -0500
 Received: from ula0226330.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYJ0039154;
-        Mon, 24 Oct 2022 12:34:36 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYJ5039154;
+        Mon, 24 Oct 2022 12:34:40 -0500
 From:   Andrew Davis <afd@ti.com>
 To:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -56,9 +56,9 @@ CC:     <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
         <linux-renesas-soc@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, Andrew Davis <afd@ti.com>
-Subject: [PATCH v2 2/7] kbuild: Allow DTB overlays to built into .dtso.S files
-Date:   Mon, 24 Oct 2022 12:34:29 -0500
-Message-ID: <20221024173434.32518-3-afd@ti.com>
+Subject: [PATCH v2 7/7] staging: pi433: overlay: Rename overlay source file from .dts to .dtso
+Date:   Mon, 24 Oct 2022 12:34:34 -0500
+Message-ID: <20221024173434.32518-8-afd@ti.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221024173434.32518-1-afd@ti.com>
 References: <20221024173434.32518-1-afd@ti.com>
@@ -70,59 +70,45 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-DTB files can be built into the kernel by converting them to assembly
-files then assembling them into object files. We extend this here
-for DTB overlays with the .dtso extensions.
+DTB Overlays (.dtbo) can now be built from source files with the
+extension (.dtso). This makes it clear what is the content of the files
+and differentiates them from base DTB source files.
 
-We change the start and end delimiting tag prefix to make it clear that
-this data came from overlay files.
+Rename the pi433-overlay.dts file to pi433-overlay.dtso and update
+the information file pi433.txt for the same.
 
-[Based on patch by Frank Rowand <frank.rowand@sony.com>]
 Signed-off-by: Andrew Davis <afd@ti.com>
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- scripts/Makefile.lib | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ .../devicetree/{pi433-overlay.dts => pi433-overlay.dtso}    | 0
+ drivers/staging/pi433/Documentation/devicetree/pi433.txt    | 6 +++---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+ rename drivers/staging/pi433/Documentation/devicetree/{pi433-overlay.dts => pi433-overlay.dtso} (100%)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0376a6f18bfb1..250b9fd73f6d2 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -358,7 +358,7 @@ DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
- DTC_FLAGS += $(if $(filter $(patsubst $(obj)/%,%,$@), $(base-dtb-y)), -@)
+diff --git a/drivers/staging/pi433/Documentation/devicetree/pi433-overlay.dts b/drivers/staging/pi433/Documentation/devicetree/pi433-overlay.dtso
+similarity index 100%
+rename from drivers/staging/pi433/Documentation/devicetree/pi433-overlay.dts
+rename to drivers/staging/pi433/Documentation/devicetree/pi433-overlay.dtso
+diff --git a/drivers/staging/pi433/Documentation/devicetree/pi433.txt b/drivers/staging/pi433/Documentation/devicetree/pi433.txt
+index a810548c58572..d317c0ec3419e 100644
+--- a/drivers/staging/pi433/Documentation/devicetree/pi433.txt
++++ b/drivers/staging/pi433/Documentation/devicetree/pi433.txt
+@@ -48,13 +48,13 @@ For Raspbian users only
+ =======================
+ Since Raspbian supports device tree overlays, you may use an overlay instead
+ of editing your boards device tree.
+-To use the overlay, you need to compile the file pi433-overlay.dts which can
++To use the overlay, you need to compile the file pi433-overlay.dtso which can
+ be found alongside this documentation.
+ The file needs to be compiled - either manually or by integration in your kernel
+ source tree. For a manual compile, you may use a command line like the following:
+-'linux/scripts/dtc/dtc -@ -I dts -O dtb -o pi433.dtbo pi433-overlay.dts'
++'linux/scripts/dtc/dtc -@ -I dts -O dtb -o pi433.dtbo pi433-overlay.dtso'
  
- # Generate an assembly file to wrap the output of the device tree compiler
--quiet_cmd_dt_S_dtb= DTB     $@
-+quiet_cmd_dt_S_dtb= DTBS    $@
- cmd_dt_S_dtb=						\
- {							\
- 	echo '\#include <asm-generic/vmlinux.lds.h>'; 	\
-@@ -375,6 +375,24 @@ cmd_dt_S_dtb=						\
- $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
- 	$(call if_changed,dt_S_dtb)
- 
-+# Generate an assembly file to wrap the output of the device tree compiler
-+quiet_cmd_dt_S_dtbo= DTBOS   $@
-+cmd_dt_S_dtbo=						\
-+{							\
-+	echo '\#include <asm-generic/vmlinux.lds.h>';	\
-+	echo '.section .dtb.init.rodata,"a"';		\
-+	echo '.balign STRUCT_ALIGNMENT';		\
-+	echo '.global __dtbo_$(subst -,_,$(*F))_begin';	\
-+	echo '__dtbo_$(subst -,_,$(*F))_begin:';	\
-+	echo '.incbin "$<" ';				\
-+	echo '__dtbo_$(subst -,_,$(*F))_end:';		\
-+	echo '.global __dtbo_$(subst -,_,$(*F))_end';	\
-+	echo '.balign STRUCT_ALIGNMENT';		\
-+} > $@
-+
-+$(obj)/%.dtbo.S: $(obj)/%.dtbo FORCE
-+	$(call if_changed,dt_S_dtbo)
-+
- quiet_cmd_dtc = DTC     $@
- cmd_dtc = $(HOSTCC) -E $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
- 	$(DTC) -o $@ -b 0 \
+-For compiling inside of the kernel tree, you need to copy pi433-overlay.dts to
++For compiling inside of the kernel tree, you need to copy pi433-overlay.dtso to
+ arch/arm/boot/dts/overlays and you need to add the file to the list of files
+ in the Makefile over there. Execute 'make dtbs' in kernel tree root to make the
+ kernel make files compile the device tree overlay for you.
 -- 
 2.37.3
 
