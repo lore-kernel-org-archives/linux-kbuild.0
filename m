@@ -2,94 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9254FA3740
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 13:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2578AFA3741
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 14:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236016AbiJXNmN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 09:42:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55284 "EHLO
+        id S232166AbiJXOFp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 10:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236461AbiJXNkO (ORCPT
+        with ESMTP id S237205AbiJXOFB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 09:40:14 -0400
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF9BB1DE5;
-        Mon, 24 Oct 2022 05:37:11 -0700 (PDT)
-Received: by mail-qt1-f170.google.com with SMTP id g16so5500035qtu.2;
-        Mon, 24 Oct 2022 05:37:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mm0DhlBuWerQb7STPnVGOSZg9+mGmS13MMZKjPmbxqM=;
-        b=Q/AB1BYhsDYBQa6OHia4tBMxS5kFaaNnNAaL9kSIB1W1/Erz3cL1zI4Qkp1pkNn1Bh
-         xEnBThJ78dQvIq5j0HmsbT6vQjODHTwrTIaWlO8m2A7cZkYZVFAssIB4XlQmCCBTv7FU
-         VnEXx48B0hJmjrAkIdtznzkJL10q8i5uBttVuGUmMRV79184b7bybqi9SfXFLuerCZ06
-         3/LfLWXnh3L3MPHaSdFWhhh5OTYNcu4emGTvlgqKi9D5SfRvqpqLzfSViwPG96jEGRYq
-         wFlKfQ0i2gftTPdUMmSWmtElckgZMbeScH+gnLtEAH+7bftjeUYc67SRC4E7WsEOKsFo
-         Z2tg==
-X-Gm-Message-State: ACrzQf3QcLnnyrjYP3WnuZDdO6+BDxlJ2nfu4H7FryTWxKhBeD3INiVh
-        4n+jhLmAWZXZPXX9w91S6dm56GIoliUtgQ==
-X-Google-Smtp-Source: AMsMyM5UdJDhicPIDh14Z2dn+rdMdObB+vEnjqqgA6wMFX3s4h4griSYn69Mz4dVty+nt00y7v7Qog==
-X-Received: by 2002:a05:622a:209:b0:39c:d88f:20ed with SMTP id b9-20020a05622a020900b0039cd88f20edmr26522356qtx.131.1666613258930;
-        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
-        by smtp.gmail.com with ESMTPSA id s7-20020a05620a254700b006af0ce13499sm14952635qko.115.2022.10.24.05.07.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
-Received: by mail-yb1-f181.google.com with SMTP id r3so10771170yba.5;
-        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
-X-Received: by 2002:a25:4fc2:0:b0:6be:afb4:d392 with SMTP id
- d185-20020a254fc2000000b006beafb4d392mr26765379ybb.604.1666613257924; Mon, 24
- Oct 2022 05:07:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221023182437.15263-1-afd@ti.com> <20221023182437.15263-3-afd@ti.com>
-In-Reply-To: <20221023182437.15263-3-afd@ti.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 24 Oct 2022 14:07:26 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXAM8VkDeUWqikjHZz8703ho6Ft=eMgN69ktvJXSue+Pg@mail.gmail.com>
-Message-ID: <CAMuHMdXAM8VkDeUWqikjHZz8703ho6Ft=eMgN69ktvJXSue+Pg@mail.gmail.com>
-Subject: Re: [PATCH 2/6] kbuild: Allow DTB overlays to built into .dtso.S files
-To:     Andrew Davis <afd@ti.com>
-Cc:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
+        Mon, 24 Oct 2022 10:05:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA5D722BCD;
+        Mon, 24 Oct 2022 05:49:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B855B81889;
+        Mon, 24 Oct 2022 12:36:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF79C4314E;
+        Mon, 24 Oct 2022 12:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1666615010;
+        bh=hPttMeNMtPjB3kXYpF6XGTSl4eSIr1TUfrKRMoITllI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Mk+3F1y4BQ7Dr+7KElw7CQcznKxuKoWUIte0S+X3492R6MLxQ0WLjbcdErdwMBYvn
+         ZNTV20KF58477I/QK34mRPJ8nlySe3mIYZ803srRvqroBUqcMggd4xaljXkyS0ViFm
+         k2SPKsYc3QQfN5P6K94n06lt8FxBIzPpMOFXcuhI=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH 5.15 087/530] hardening: Remove Clangs enable flag for -ftrivial-auto-var-init=zero
+Date:   Mon, 24 Oct 2022 13:27:11 +0200
+Message-Id: <20221024113048.944971980@linuxfoundation.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221024113044.976326639@linuxfoundation.org>
+References: <20221024113044.976326639@linuxfoundation.org>
+User-Agent: quilt/0.67
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Sun, Oct 23, 2022 at 8:24 PM Andrew Davis <afd@ti.com> wrote:
-> DTB files can be built into the kernel by converting them to assembly
-> files then assembling them into object files. We extend this here
-> for DTB overlays with the .dtso extensions.
->
-> We change the start and end delimiting tag prefix to make it clear that
-> this data came from overlay files.
->
-> [Based on patch by Frank Rowand <frank.rowand@sony.com>]
-> Signed-off-by: Andrew Davis <afd@ti.com>
+From: Kees Cook <keescook@chromium.org>
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+commit 607e57c6c62c00965ae276902c166834ce73014a upstream.
 
-Gr{oetje,eeting}s,
+Now that Clang's -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
+option is no longer required, remove it from the command line. Clang 16
+and later will warn when it is used, which will cause Kconfig to think
+it can't use -ftrivial-auto-var-init=zero at all. Check for whether it
+is required and only use it when so.
 
-                        Geert
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: linux-kbuild@vger.kernel.org
+Cc: llvm@lists.linux.dev
+Cc: stable@vger.kernel.org
+Fixes: f02003c860d9 ("hardening: Avoid harmless Clang option under CONFIG_INIT_STACK_ALL_ZERO")
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ Makefile                   |    4 ++--
+ security/Kconfig.hardening |   14 ++++++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+--- a/Makefile
++++ b/Makefile
+@@ -845,8 +845,8 @@ endif
+ # Initialize all stack variables with a zero value.
+ ifdef CONFIG_INIT_STACK_ALL_ZERO
+ KBUILD_CFLAGS	+= -ftrivial-auto-var-init=zero
+-ifdef CONFIG_CC_IS_CLANG
+-# https://bugs.llvm.org/show_bug.cgi?id=45497
++ifdef CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER
++# https://github.com/llvm/llvm-project/issues/44842
+ KBUILD_CFLAGS	+= -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang
+ endif
+ endif
+--- a/security/Kconfig.hardening
++++ b/security/Kconfig.hardening
+@@ -22,11 +22,17 @@ menu "Memory initialization"
+ config CC_HAS_AUTO_VAR_INIT_PATTERN
+ 	def_bool $(cc-option,-ftrivial-auto-var-init=pattern)
+ 
+-config CC_HAS_AUTO_VAR_INIT_ZERO
+-	# GCC ignores the -enable flag, so we can test for the feature with
+-	# a single invocation using the flag, but drop it as appropriate in
+-	# the Makefile, depending on the presence of Clang.
++config CC_HAS_AUTO_VAR_INIT_ZERO_BARE
++	def_bool $(cc-option,-ftrivial-auto-var-init=zero)
++
++config CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER
++	# Clang 16 and later warn about using the -enable flag, but it
++	# is required before then.
+ 	def_bool $(cc-option,-ftrivial-auto-var-init=zero -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang)
++	depends on !CC_HAS_AUTO_VAR_INIT_ZERO_BARE
++
++config CC_HAS_AUTO_VAR_INIT_ZERO
++	def_bool CC_HAS_AUTO_VAR_INIT_ZERO_BARE || CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER
+ 
+ choice
+ 	prompt "Initialize kernel stack variables at function entry"
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+
