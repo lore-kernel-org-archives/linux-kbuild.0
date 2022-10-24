@@ -2,242 +2,202 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A896FA373D
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 23:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E46AC38A2D
+	for <linux-kbuild@archiver.kernel.org>; Tue, 25 Oct 2022 00:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbiJXXrS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 19:47:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47600 "EHLO
+        id S229515AbiJYAsS (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 20:48:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiJXXq5 (ORCPT
+        with ESMTP id S230470AbiJYAsD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 19:46:57 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9B4315513;
-        Mon, 24 Oct 2022 15:04:30 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id l127so8882320iof.12;
-        Mon, 24 Oct 2022 15:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M6Hj4N+4veeusei3+LeKJBihL82EbHjlptidnA5pQRg=;
-        b=bVW3OkqoFa8qpC3Mtn6GcpLUhrZsle2ubiisRjQliF99pT94NXJ5aZ//4KNmQbErSk
-         uoPNweia+hHp27++v6sKwV41fVmN7gkRJYw4OrGUnZ0hYhB+ksFe8XZrrv6e5XZw2fES
-         GBBPInef9Rf6zOrcfp8cPapeXGwbNV7aqeVWo9A+s1DVx+AVkwWRzFpGomEp8kVvYQrT
-         g9mB5Nxbsa4bYnjCCTwUQzYYSSrYKYUxZPfHX2V0QsWJ7moyLtl7YCucomuie1RFIZ/S
-         6b62B5fkYcL85Z2Rb3RXQcGg53z5ebgWTG+ede71M9/UZVNpY6itat0p2LSSdFALrX4s
-         0/sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M6Hj4N+4veeusei3+LeKJBihL82EbHjlptidnA5pQRg=;
-        b=fhibO+Ks2KyhCxBVvCMZ6ZX0XZHsAeDVqaaCPHBtDogyx0jz/cTXa3Tl2civB+d+Qf
-         5pTl/OlF5VX5smH/laU6BHvWxbvorp+SV5LH/xGhC0q681sXvCefqzAzBNWWYoFEMiu6
-         cP9heQkHDBYedkOmDUoJOkPY2wwRotjDvNSEvyacsuM0NESWJLHSlVd+plt7WPo4W3sR
-         tuodx+AgNsZ9sdG7BiEQpYMLD3ft0u0FA7wjvYrDhwaWLTT5Cc65IPzeXw9LI/LirwVs
-         RP65pM1kGCm5aDUPI08MheuCKGDSJlulYUqDL2SwMnThSvk+6gqf54ag8tGZBwltB87v
-         /kgQ==
-X-Gm-Message-State: ACrzQf2ykUFx9dfgtz1FH6P282Sc6eD72gUL6KPEhAdXKsaSb4oXKMtL
-        RZZ0Z+dX7AjW3feQRaoD9yLhWJQGILs=
-X-Google-Smtp-Source: AMsMyM5VomLJ0q+WWb7FeIRDgK7wmAIEigxDpprDZ2CZWH3YZa3CrzreLrhAHRtzKWvgFnsddFbPyg==
-X-Received: by 2002:a05:6638:2045:b0:365:c463:de2a with SMTP id t5-20020a056638204500b00365c463de2amr23457457jaj.122.1666649067717;
-        Mon, 24 Oct 2022 15:04:27 -0700 (PDT)
-Received: from ?IPV6:2600:1700:2442:6db0:b8cc:2162:7a0f:fd4b? ([2600:1700:2442:6db0:b8cc:2162:7a0f:fd4b])
-        by smtp.gmail.com with ESMTPSA id z17-20020a05660217d100b006a11760aebbsm368047iox.36.2022.10.24.15.04.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 15:04:27 -0700 (PDT)
-Message-ID: <51477b80-478f-d2cb-d98d-477431057fd4@gmail.com>
-Date:   Mon, 24 Oct 2022 17:04:25 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 0/7] Rename DTB overlay source files
+        Mon, 24 Oct 2022 20:48:03 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356C213A7C7;
+        Mon, 24 Oct 2022 16:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666653816; x=1698189816;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=922jYJdd3RiSg3ioYA9cHNoHtHWRwUNHmQW4OTc2Yn4=;
+  b=Y3CoguBVuyof1j6RPGEZxr6z6I7cuApSRG9uHnYUuwVpV2jx1PNTBjyc
+   uiAJO3ieDfSZXuHcN361vCFP8eI/gfVkiTaJe/YVIalgYytAy/8CwE4qb
+   RYVViSvZzscwRROQWzuwnn7WeGp/dEvRpqNtjKryGARxaUaqFUHVzmWCk
+   cNaqxKFZoOWOzcqhE4zwfCTxhidsWhEkAQGRxLDcijqI+ljlggknEf3s9
+   jFB2l1lXFhTnYWqgauKrGmp9QGDIXW6GG5kobbNKLdttIrK9AWe/KiBXP
+   A7O0hcFhHhxMLRDAzUGqiGLOBwoLnSNa42TQzv1STd1thTePVY1Q1mn33
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="371759641"
+X-IronPort-AV: E=Sophos;i="5.95,210,1661842800"; 
+   d="scan'208";a="371759641"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 16:23:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="756739141"
+X-IronPort-AV: E=Sophos;i="5.95,210,1661842800"; 
+   d="scan'208";a="756739141"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga004.jf.intel.com with ESMTP; 24 Oct 2022 16:23:29 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 24 Oct 2022 16:23:28 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 24 Oct 2022 16:23:28 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 24 Oct 2022 16:23:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nepre6UObpHokGP7PUfUqsY98XpxGoYlawkbIA7aqvtvhpb2bVERCM5P/lOHclYNOn6WdmxOx+Lon3AyWUBCsrJVeKJpGIRovr2yIlm1FgQK+y4gYhJiDNhhoMY+q+siquj3hPsvqJ1CkZCOD6UFLryx+cxtdegTvdtgWdIe8TyHCgbtR93boy7QDDLEYE2pqhDexBc3eO4RwJwYOn8sEdJf2FLZ9/pYxanuLwZqAamGrAAUjKCTASIGcxiXQT5PhFH2cFwCFvnCRfNgYcMw4+yG+YCgsg6u59ijRUvaA83WQYGsGjHzRkZbLGe0D3pGWPhvXeDW3YtjTZ/h5Y+CEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9yw4Snpknchr12ICc7KfUycKy/B4dW1Pawsd8zBdx2Y=;
+ b=j8bnUg9X+HQjQ0DEEhd1zRQdP25tC5E/DPvJ9EZcJ5eLAg249BREZm3xUOE7vMT1UZr8r7t/8+kwAYV0QV2gD1vlHok4H9bYHO1lMTKJEYbmxhKEoupbY4+LU32xd1hSPLUO1wpZBWRWwaeDIzNh9PlHmtcszpmagQnB3TTgN2r+aiiuVhRobFmTFzACdSYS8JMwL/NjECBgw8c50ZW5nvFMODQajk2DBqCZo+ckONOCPjz29TRWsLU4+V7yD6pfbS7XlLZyB1wzwj2u40AkEJhCMmQk4WXAEBlzO9GlkhKQTc7x6wLZ068a4C4WPBxU5JEqY9VgWr+RHP/YViMKYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
+ (2603:10b6:405:52::15) by CY8PR11MB6817.namprd11.prod.outlook.com
+ (2603:10b6:930:63::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Mon, 24 Oct
+ 2022 23:23:22 +0000
+Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
+ ([fe80::40a1:5197:e1df:bb6c]) by BN6PR1101MB2161.namprd11.prod.outlook.com
+ ([fe80::40a1:5197:e1df:bb6c%10]) with mapi id 15.20.5746.026; Mon, 24 Oct
+ 2022 23:23:21 +0000
+From:   "Li, Xin3" <xin3.li@intel.com>
+To:     Kees Cook <keescook@chromium.org>,
+        Nathan Chancellor <nathan@kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>
+Subject: RE: [PATCH 1/1] kbuild: upgrade the orphan section warning to an
+ error if CONFIG_WERROR is set
+Thread-Topic: [PATCH 1/1] kbuild: upgrade the orphan section warning to an
+ error if CONFIG_WERROR is set
+Thread-Index: AQHY5cZutEIhoaA9LUqamYfjnx4Fj64d0OmAgAAA2gCAAGG9gA==
+Date:   Mon, 24 Oct 2022 23:23:21 +0000
+Message-ID: <BN6PR1101MB2161BDD7309CD8D02B71F444A82E9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+References: <20221022030519.9505-1-xin3.li@intel.com>
+ <20221022030519.9505-2-xin3.li@intel.com>
+ <Y1bLk47I4pyEmJVi@dev-arch.thelio-3990X> <202210241031.4BB6E70FB@keescook>
+In-Reply-To: <202210241031.4BB6E70FB@keescook>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Andrew Davis <afd@ti.com>, Shawn Guo <shawnguo@kernel.org>,
-        Li Yang <leoyang.li@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20221024173434.32518-1-afd@ti.com>
-From:   Frank Rowand <frowand.list@gmail.com>
-In-Reply-To: <20221024173434.32518-1-afd@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.6.500.17
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN6PR1101MB2161:EE_|CY8PR11MB6817:EE_
+x-ms-office365-filtering-correlation-id: fbe835d0-96a8-4804-6cce-08dab616bdd8
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: TZfmOkLYymT6K6qhB2gv+vpFQNeEabK//InJfrGIeqvlPx9URgkYVJphdBf0GK5KKbSMZ4NZHM7gKvK5h86KDK91VpW7ODuz+9+HR7AJNCNGHv3q+DbtvqF5NEO5lyJCxWsPsAiS3Aa5BePQ5g3//VHK2iPpEvUcig+HbK7td5UvJglQ3wKRl620PBpgqd/O53CZMBR8hlqmMendLMtsreiAeFf790bV2aMjUG4gqz2WgXvEzNQvXwoi1LUBBPHJZQagOGiH4oJpIruW7FXpnlo03R96J3PqQTw4dYOKhl6qKjDQMvhAP4T9KR9MV/UymHoygnbm8vzh7ogCTO4rHwLzTcVVBsN5jMlfKIpIeX3bVL1pNiTXdUQdDtixMJs3V3GGywlpVS6hINifLCEiQYYSis9qkfJw1cUQY+jlDpMqkJ+V1vKTrLBnu2Op4vBI8JW+L++ZUc6D/hFNG5dXASeBtZFv/qtKHW9tL7ieyCoUKJXQJ8zb/CfFpaaWHj4kxGSJjskVtlmVClyJ3aLwcowBw0B5n95xXbGyfU8SPdNDjsVClF0bmGammNVrHPmm5VpHv8p+PjKIl7K8SFngGto5dpbInw6BhKnqAKSN5Qs86iKOC7fc60plyPUxMfqlC/QKjMMb7JyW6B96OmCG+MDn6bojegSBHRSPgV17OfNlJNOz/9KVdyFbwWph16uIXmxTp1IYl4VexBZma9Pnc8m8DoewFXuHFhB17j9Gdo3gvB+LE0ayhISibhjfdGeykz1lSo3+4i3DEkB/zyI1Uw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1101MB2161.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(396003)(136003)(39860400002)(366004)(451199015)(52536014)(82960400001)(122000001)(478600001)(71200400001)(38100700002)(316002)(110136005)(8936002)(83380400001)(26005)(54906003)(64756008)(41300700001)(186003)(9686003)(7696005)(66476007)(38070700005)(8676002)(6506007)(4326008)(55016003)(2906002)(33656002)(5660300002)(66556008)(66946007)(66446008)(76116006)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5BODzHSva6UudsJm9UgoftwZu8SAtMJgwZsbDxX6sVmu8JLxj+KtsVLwqfdo?=
+ =?us-ascii?Q?rTXYyw9yzd5axj6GX17qz99fk0axGoTf1vRuV4h5nw1/epeuXjVccK6OBE3C?=
+ =?us-ascii?Q?qA0mGF+NOfP0NC5c4MwhK4+qVBa/OPZO6sUvN1GKsvR7zMhhqSxl6g/b/jqL?=
+ =?us-ascii?Q?zv5b7kE88I63QDpp3Mk4L+Yi6g47eNl4qHec6jyqz/xhgAGBP9OQA+0dQcm1?=
+ =?us-ascii?Q?WFkERAivyLg2iaF6waMxO7gT9+4Ukf7BgB/wSV51VD6yKJVp6pf1M+El/b9W?=
+ =?us-ascii?Q?bI1kyHybVzDtN0mUHwLMfe3yzhze0cLH72swdnDaDFbZeoZ8wXjFtkltnXK1?=
+ =?us-ascii?Q?37HDjmToRgoQulGf7DM74u1VMtK60yLNn++C78DG23UT8LNIPS4O4TASxu4P?=
+ =?us-ascii?Q?ENlJ1BuB0JggHg4TzNrAI7GtTcD5s6G5f2hn8N/1QEt25W91nhZozb+N9V4C?=
+ =?us-ascii?Q?/ruTgLYLQSOriesvIvJ2sEMkeuwWPDUBWdrkUOL3dyu+67U+UD16H3UMPAsQ?=
+ =?us-ascii?Q?7f3uCsPnjSkVCJGNWyqs/gwabedh2pUEYwQDYtOMjBD3Vj2AqXOTeaY27PvK?=
+ =?us-ascii?Q?tkRLfT3mKVgyoZZgpspDSCaQgX6Mh2PEvqemch5j7gVSAU38zUgD8Yd0CfiL?=
+ =?us-ascii?Q?OL6+EW19k2h5cTqyV/P195B2iAXPPqNRsVwYkcrlHzoChURKu/FRtSVqGglD?=
+ =?us-ascii?Q?r5keZRbcbG+E0fP7YhRGZslBx+aJs8T8fda+GJpiGr7/V7jRwT7y+zeX/YEg?=
+ =?us-ascii?Q?6bQpfqdkXjCrdbNyiMGbjxSgureOatPENNn4Wa0IjjcxDB82QrLkpI/Whz9w?=
+ =?us-ascii?Q?umo5qh9qvzRCJFXs3dQ1ugg9HyuRPFQQplXVGFTgqnTsxlKb6IosUfRATRnk?=
+ =?us-ascii?Q?SPKYn/GuM8axF0Fybb//EViH/W3auSGxP9OuK6G4Vdxl4LMtCB0kJkVLpNY5?=
+ =?us-ascii?Q?Y5VZ2UPMSEud2H2ZqdvZofkfHxrEbK9McjwP62my/IKSgjmOpVZCk1SUFcp5?=
+ =?us-ascii?Q?1g75kY/vkeIb+bq1NrInO/IMxRoCR2CbxGR4iGnXbGc9+uq9FrPDNpMOLVg7?=
+ =?us-ascii?Q?22Yxo2o1H7mPaU+W3D5tzIlC6OV5fzotItlcxxnaBTLZun+FQ7Rz+GnUe+oG?=
+ =?us-ascii?Q?+BzkfZIB4qxpYSDiZjjjRmZumdGwTkogM24o+TkeP/eJaGfoEnZJvelnzQe0?=
+ =?us-ascii?Q?nsYO594L/1YKPrTHFrws0aS6MmzfDR1Nk248KLVRMeSPfhhPtChva2J1Y4T/?=
+ =?us-ascii?Q?WNvkBuPTPq1T+gjIBqD0W0WQs8rEdZX+GFph3txeJhCCXKDDP2szDvajudFy?=
+ =?us-ascii?Q?56pMXPs2Nw6PJla5Cx3HGfbnFWXxocRs3mxF3pg+YthjcLm+NU2mmngmyoEb?=
+ =?us-ascii?Q?11Bb/lEPfeB1iHP+8BEZTuOwrniUzdaqFFUb+1WTxzthvofj3bAt5BmVirf+?=
+ =?us-ascii?Q?NqKvIrYX7QnWs2ekbByo0dWCiCjpVqxzkHkyx7W+OFNOqO3I+vczP8fv5hFh?=
+ =?us-ascii?Q?LWm+QYtxN3A7pxEBgAmsVV49ogNLj3oIXqjCbLUfc1L0OLBcS/GcU/b+GvWR?=
+ =?us-ascii?Q?0cX21q7cYuemplbOX60=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR1101MB2161.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbe835d0-96a8-4804-6cce-08dab616bdd8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2022 23:23:21.6490
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zgY/KPjZoE6DXsWjEGCxF8H/Y2sR/wnbmTjf2C4gO/EwSjX6EEqmHYPhK5cX9yGGcQE7kPIJxX6h8vrchJ/Bbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6817
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Andrew,
+> On Mon, Oct 24, 2022 at 10:29:55AM -0700, Nathan Chancellor wrote:
+> > On Fri, Oct 21, 2022 at 08:05:19PM -0700, Xin Li wrote:
+> > > Andrew Cooper suggested upgrading the orphan section warning to a
+> > > hard link error. However Nathan Chancellor said outright turning the
+> > > warning into an error with no escape hatch might be too aggressive,
+> > > as we have had these warnings triggered by new compiler generated
+> > > sections, and suggested turning orphan sections into an error only
+> > > if CONFIG_WERROR is set. Kees Cook echoed and emphasized that the
+> > > mandate from Linus is that we should avoid breaking builds. It wrecks
+> bisection, it causes problems across compiler versions, etc.
+> > >
+> > > Thus upgrade the orphan section warning to a hard link error only if
+> > > CONFIG_WERROR is set.
+> > >
+> > > Suggested-by: Andrew Cooper <andrew.cooper3@citrix.com>
+> > > Suggested-by: Nathan Chancellor <nathan@kernel.org>
+> > > Signed-off-by: Xin Li <xin3.li@intel.com>
+> >
+> > Thanks for the patch!
+> >
+> > Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> > Tested-by: Nathan Chancellor <nathan@kernel.org>
+> >
+> > We could deduplicate the '$(if $(CONFIG_WERROR),error,warn)' logic if
+> > we hoisted it into Kconfig by having something like
+> >
+> >     config LD_ORPHAN_WARN_LEVEL
+> >         string
+> >         depends on LD_ORPHAN_WARN
+> >         default "error" if WERROR
+> >         default "warn"
+> >
+> > in init/Kconfig then using it everywhere like
+> >
+> >     --orphan-handling=3D$(CONFIG_LD_ORPHAN_WARN_LEVEL)
+> >
+> > but I will let others decide if they would prefer that over the
+> > direction we went here.
+>=20
+> I think this makes it look cleaner, yeah.
 
-On 10/24/22 12:34, Andrew Davis wrote:
-> Hello all,
-> 
-> This is a series based on my patch here[0]. As suggested by Rob
-> I've resurrected Frank's patch and appended it to mine as a series.
-> 
-> First patch here is my original patch, 3rd is Frank's patch but with
-> the unittest changes pulled out into the 2nd patch. That was re-worked
-> moving the source building macro into scripts/Makefile.lib.
-> 
-> Patches 4, 5, and 6 are an attempt at renaming all the existing DTB
-> overlays. Split out by platform so they could be taken by platform
-> maintainers or if easier ACK'd here and taken all together.
-> 
-> This should cover all the DTB overlays so we can remove the old .dts
-> rule for overlays and make .dtso the only supported way, let me know
-> if we want that this cycle and I can post that too.
+Agree this looks much cleaner.
 
-Thanks for picking this up and moving it forward.  I've reviewed patches
-1 - 3, and took a quick look at 4 - 7 (which also look fine at a glance).
-
--Frank
-
-> 
-> Thanks,
-> Andrew
-> 
-> Changes from v1[1]:
->  - Added patch to rename pi433 overlay.
->  - Cleaned wording on patch 4-6.
->  - Collected some ACKs
-> 
-> [0] https://www.spinics.net/lists/kernel/msg4548509.html
-> [1] https://www.spinics.net/lists/arm-kernel/msg1020165.html
-> 
-> Andrew Davis (6):
->   kbuild: Allow DTB overlays to built from .dtso named source files
->   kbuild: Allow DTB overlays to built into .dtso.S files
->   arm64: dts: freescale: Rename DTB overlay source files from .dts to
->     .dtso
->   arm64: dts: renesas: Rename DTB overlay source files from .dts to
->     .dtso
->   arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
->   staging: pi433: overlay: Rename overlay source file from .dts to .dtso
-> 
-> Frank Rowand (1):
->   of: overlay: rename overlay source files from .dts to .dtso
-> 
->  ...qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso} |  0
->  ...qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso} |  0
->  ...qds-7777.dts => fsl-ls1028a-qds-7777.dtso} |  0
->  ...qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso} |  0
->  ...qds-899b.dts => fsl-ls1028a-qds-899b.dtso} |  0
->  ...qds-9999.dts => fsl-ls1028a-qds-9999.dtso} |  0
->  ...ts => imx8mm-venice-gw72xx-0x-imx219.dtso} |  0
->  ...=> imx8mm-venice-gw72xx-0x-rs232-rts.dtso} |  0
->  ...dts => imx8mm-venice-gw72xx-0x-rs422.dtso} |  0
->  ...dts => imx8mm-venice-gw72xx-0x-rs485.dtso} |  0
->  ...ts => imx8mm-venice-gw73xx-0x-imx219.dtso} |  0
->  ...=> imx8mm-venice-gw73xx-0x-rs232-rts.dtso} |  0
->  ...dts => imx8mm-venice-gw73xx-0x-rs422.dtso} |  0
->  ...dts => imx8mm-venice-gw73xx-0x-rs485.dtso} |  0
->  ...2.dts => draak-ebisu-panel-aa104xd12.dtso} |  0
->  ...xd12.dts => salvator-panel-aa104xd12.dtso} |  0
->  ...v-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} |  0
->  ...v-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} |  0
->  drivers/of/unittest-data/Makefile             | 66 +++++++++----------
->  .../{overlay.dts => overlay.dtso}             |  0
->  .../{overlay_0.dts => overlay_0.dtso}         |  0
->  .../{overlay_1.dts => overlay_1.dtso}         |  0
->  .../{overlay_10.dts => overlay_10.dtso}       |  0
->  .../{overlay_11.dts => overlay_11.dtso}       |  0
->  .../{overlay_12.dts => overlay_12.dtso}       |  0
->  .../{overlay_13.dts => overlay_13.dtso}       |  0
->  .../{overlay_15.dts => overlay_15.dtso}       |  0
->  .../{overlay_16.dts => overlay_16.dtso}       |  0
->  .../{overlay_17.dts => overlay_17.dtso}       |  0
->  .../{overlay_18.dts => overlay_18.dtso}       |  0
->  .../{overlay_19.dts => overlay_19.dtso}       |  0
->  .../{overlay_2.dts => overlay_2.dtso}         |  0
->  .../{overlay_20.dts => overlay_20.dtso}       |  0
->  .../{overlay_3.dts => overlay_3.dtso}         |  0
->  .../{overlay_4.dts => overlay_4.dtso}         |  0
->  .../{overlay_5.dts => overlay_5.dtso}         |  0
->  .../{overlay_6.dts => overlay_6.dtso}         |  0
->  .../{overlay_7.dts => overlay_7.dtso}         |  0
->  .../{overlay_8.dts => overlay_8.dtso}         |  0
->  .../{overlay_9.dts => overlay_9.dtso}         |  0
->  ...node.dts => overlay_bad_add_dup_node.dtso} |  0
->  ...prop.dts => overlay_bad_add_dup_prop.dtso} |  0
->  ...d_phandle.dts => overlay_bad_phandle.dtso} |  0
->  ...bad_symbol.dts => overlay_bad_symbol.dtso} |  0
->  .../{overlay_base.dts => overlay_base.dtso}   |  0
->  ...erlay_gpio_01.dts => overlay_gpio_01.dtso} |  0
->  ...lay_gpio_02a.dts => overlay_gpio_02a.dtso} |  0
->  ...lay_gpio_02b.dts => overlay_gpio_02b.dtso} |  0
->  ...erlay_gpio_03.dts => overlay_gpio_03.dtso} |  0
->  ...lay_gpio_04a.dts => overlay_gpio_04a.dtso} |  0
->  ...lay_gpio_04b.dts => overlay_gpio_04b.dtso} |  0
->  .../{testcases.dts => testcases.dtso}         |  0
->  drivers/of/unittest.c                         | 48 +++++++-------
->  .../{pi433-overlay.dts => pi433-overlay.dtso} |  0
->  .../pi433/Documentation/devicetree/pi433.txt  |  6 +-
->  scripts/Makefile.lib                          | 23 ++++++-
->  56 files changed, 82 insertions(+), 61 deletions(-)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-7777.dts => fsl-ls1028a-qds-7777.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-899b.dts => fsl-ls1028a-qds-899b.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-9999.dts => fsl-ls1028a-qds-9999.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-imx219.dts => imx8mm-venice-gw72xx-0x-imx219.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs232-rts.dts => imx8mm-venice-gw72xx-0x-rs232-rts.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs422.dts => imx8mm-venice-gw72xx-0x-rs422.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs485.dts => imx8mm-venice-gw72xx-0x-rs485.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-imx219.dts => imx8mm-venice-gw73xx-0x-imx219.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs232-rts.dts => imx8mm-venice-gw73xx-0x-rs232-rts.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs422.dts => imx8mm-venice-gw73xx-0x-rs422.dtso} (100%)
->  rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs485.dts => imx8mm-venice-gw73xx-0x-rs485.dtso} (100%)
->  rename arch/arm64/boot/dts/renesas/{draak-ebisu-panel-aa104xd12.dts => draak-ebisu-panel-aa104xd12.dtso} (100%)
->  rename arch/arm64/boot/dts/renesas/{salvator-panel-aa104xd12.dts => salvator-panel-aa104xd12.dtso} (100%)
->  rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} (100%)
->  rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay.dts => overlay.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_0.dts => overlay_0.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_1.dts => overlay_1.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_10.dts => overlay_10.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_11.dts => overlay_11.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_12.dts => overlay_12.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_13.dts => overlay_13.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_15.dts => overlay_15.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_16.dts => overlay_16.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_17.dts => overlay_17.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_18.dts => overlay_18.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_19.dts => overlay_19.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_2.dts => overlay_2.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_20.dts => overlay_20.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_3.dts => overlay_3.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_4.dts => overlay_4.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_5.dts => overlay_5.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_6.dts => overlay_6.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_7.dts => overlay_7.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_8.dts => overlay_8.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_9.dts => overlay_9.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_bad_add_dup_node.dts => overlay_bad_add_dup_node.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_bad_add_dup_prop.dts => overlay_bad_add_dup_prop.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_bad_phandle.dts => overlay_bad_phandle.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_bad_symbol.dts => overlay_bad_symbol.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_base.dts => overlay_base.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_01.dts => overlay_gpio_01.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_02a.dts => overlay_gpio_02a.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_02b.dts => overlay_gpio_02b.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_03.dts => overlay_gpio_03.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_04a.dts => overlay_gpio_04a.dtso} (100%)
->  rename drivers/of/unittest-data/{overlay_gpio_04b.dts => overlay_gpio_04b.dtso} (100%)
->  rename drivers/of/unittest-data/{testcases.dts => testcases.dtso} (100%)
->  rename drivers/staging/pi433/Documentation/devicetree/{pi433-overlay.dts => pi433-overlay.dtso} (100%)
-> 
-
+>=20
+> --
+> Kees Cook
