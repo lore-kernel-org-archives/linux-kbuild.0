@@ -2,98 +2,130 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 017D7FA373F
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 18:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AA9C38A2D
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 18:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbiJXS4G (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 14:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
+        id S231371AbiJXS4I (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 14:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232761AbiJXSzU (ORCPT
+        with ESMTP id S232701AbiJXSzR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:55:20 -0400
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05161A20A9;
-        Mon, 24 Oct 2022 10:36:06 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYebx012535;
-        Mon, 24 Oct 2022 12:34:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1666632881;
-        bh=NBWWl42SSL4G3YUtPMkVXQP2CMrKN1xbC8aYMEj43O8=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=fR47W8GfFwNZN3+QM1UwUBG77eSBqQ5WeFsdgHcNQNkdq55ZtSjPpk5Xgf8F7QxQc
-         LAGpgcLuIV4ecgJpoXrJosMow/P9UVZTKIctHu+bMKo86tFVRVYXdrdH5+xpe0ooVI
-         C192ir0Fz+Tba0hQwp2aTlFvcnOdrWzZs5JFrFwQ=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYeek006895
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 24 Oct 2022 12:34:40 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Mon, 24
- Oct 2022 12:34:40 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Mon, 24 Oct 2022 12:34:40 -0500
-Received: from ula0226330.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYJ4039154;
-        Mon, 24 Oct 2022 12:34:39 -0500
-From:   Andrew Davis <afd@ti.com>
-To:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
+        Mon, 24 Oct 2022 14:55:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D917BB97B2;
+        Mon, 24 Oct 2022 10:35:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0ECAE614C7;
+        Mon, 24 Oct 2022 16:34:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C6DAC433C1;
+        Mon, 24 Oct 2022 16:33:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="coJh9+5N"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1666629237;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=A5GZRDB4rbQnStmsUvEvn9MTvGqeI6fsKSlR5kgaMBk=;
+        b=coJh9+5N4coe3q0l8+g431w1AVe444AG6un5QCSRH/ZjlA9o0QFDl+23R8A0v5DRzx6+Kl
+        TltxQiuDLr+IC92Kg0MiuJUD5pripqalYQcoTojAONq8F67nAv/J4Upm1DJyJbetlcwbt1
+        TFmi757DMTcB4kyBTvUBIeVg771pXUY=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c5b9daa8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 24 Oct 2022 16:33:57 +0000 (UTC)
+Date:   Mon, 24 Oct 2022 18:33:52 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-toolchains@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Frank Rowand <frowand.list@gmail.com>
-CC:     <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        <linux-renesas-soc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Davis <afd@ti.com>
-Subject: [PATCH v2 6/7] arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
-Date:   Mon, 24 Oct 2022 12:34:33 -0500
-Message-ID: <20221024173434.32518-7-afd@ti.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221024173434.32518-1-afd@ti.com>
-References: <20221024173434.32518-1-afd@ti.com>
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2] kbuild: treat char as always unsigned
+Message-ID: <Y1a+cHkFt54gJv54@zx2c4.com>
+References: <Y1BcpXAjR4tmV6RQ@zx2c4.com>
+ <20221019203034.3795710-1-Jason@zx2c4.com>
+ <Y1ZZyP4ZRBIbv+Kg@kili>
+ <Y1ZbI4IzAOaNwhoD@kadam>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y1ZbI4IzAOaNwhoD@kadam>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-DTB Overlays (.dtbo) can now be built from source files with the
-extension (.dtso). This makes it clear what is the content of the files
-and differentiates them from base DTB source files.
+On Mon, Oct 24, 2022 at 12:30:11PM +0300, Dan Carpenter wrote:
+> On Mon, Oct 24, 2022 at 12:24:24PM +0300, Dan Carpenter wrote:
+> > On Wed, Oct 19, 2022 at 02:30:34PM -0600, Jason A. Donenfeld wrote:
+> > > Recently, some compile-time checking I added to the clamp_t family of
+> > > functions triggered a build error when a poorly written driver was
+> > > compiled on ARM, because the driver assumed that the naked `char` type
+> > > is signed, but ARM treats it as unsigned, and the C standard says it's
+> > > architecture-dependent.
+> > > 
+> > > I doubt this particular driver is the only instance in which
+> > > unsuspecting authors make assumptions about `char` with no `signed` or
+> > > `unsigned` specifier. We were lucky enough this time that that driver
+> > > used `clamp_t(char, negative_value, positive_value)`, so the new
+> > > checking code found it, and I've sent a patch to fix it, but there are
+> > > likely other places lurking that won't be so easily unearthed.
+> > > 
+> > > So let's just eliminate this particular variety of heisensign bugs
+> > > entirely. Set `-funsigned-char` globally, so that gcc makes the type
+> > > unsigned on all architectures.
+> > > 
+> > > This will break things in some places and fix things in others, so this
+> > > will likely cause a bit of churn while reconciling the type misuse.
+> > > 
+> > 
+> > This is a very daring change and obviously is going to introduce bugs.
+> > It might be better to create a static checker rule that says "char"
+> > without explicit signedness can only be used for strings.
+> > 
+> > arch/parisc/kernel/drivers.c:337 print_hwpath() warn: impossible condition '(path->bc[i] == -1) => (0-255 == (-1))'
+> > arch/parisc/kernel/drivers.c:410 setup_bus_id() warn: impossible condition '(path.bc[i] == -1) => (0-255 == (-1))'
+> > arch/parisc/kernel/drivers.c:486 create_parisc_device() warn: impossible condition '(modpath->bc[i] == -1) => (0-255 == (-1))'
+> > arch/parisc/kernel/drivers.c:759 hwpath_to_device() warn: impossible condition '(modpath->bc[i] == -1) => (0-255 == (-1))'
+> > drivers/media/dvb-frontends/stv0288.c:471 stv0288_set_frontend() warn: assigning (-9) to unsigned variable 'tm'
+> > drivers/media/dvb-frontends/stv0288.c:471 stv0288_set_frontend() warn: we never enter this loop
+> > drivers/misc/sgi-gru/grumain.c:711 gru_check_chiplet_assignment() warn: 'gts->ts_user_chiplet_id' is unsigned
+> > drivers/net/wireless/cisco/airo.c:5316 proc_wepkey_on_close() warn: assigning (-16) to unsigned variable 'key[i / 3]'
+> > drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9415 rt2800_iq_search() warn: assigning (-32) to unsigned variable 'idx0'
+> > drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9470 rt2800_iq_search() warn: assigning (-32) to unsigned variable 'perr'
+> > drivers/video/fbdev/sis/init301.c:3549 SiS_GetCRT2Data301() warn: 'SiS_Pr->SiS_EModeIDTable[ModeIdIndex]->ROMMODEIDX661' is unsigned
+> > sound/pci/au88x0/au88x0_core.c:2029 vortex_adb_checkinout() warn: signedness bug returning '(-22)'
+> > sound/pci/au88x0/au88x0_core.c:2046 vortex_adb_checkinout() warn: signedness bug returning '(-12)'
+> > sound/pci/au88x0/au88x0_core.c:2125 vortex_adb_allocroute() warn: 'vortex_adb_checkinout(vortex, (0), en, 0)' is unsigned
+> > sound/pci/au88x0/au88x0_core.c:2170 vortex_adb_allocroute() warn: 'vortex_adb_checkinout(vortex, stream->resources, en, 4)' is unsigned
+> > sound/pci/rme9652/hdsp.c:3953 hdsp_channel_buffer_location() warn: 'hdsp->channel_map[channel]' is unsigned
+> > sound/pci/rme9652/rme9652.c:1833 rme9652_channel_buffer_location() warn: 'rme9652->channel_map[channel]' is unsigned
+> 
+> Here are some more:
+> 
+> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9472 rt2800_iq_search() warn: impossible condition '(gerr < -7) => (0-255 < (-7))'
+> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:9476 rt2800_iq_search() warn: impossible condition '(perr < -31) => (0-255 < (-31))'
+> drivers/staging/rtl8192e/rtllib_softmac_wx.c:459 rtllib_wx_set_essid() warn: impossible condition '(extra[i] < 0) => (0-255 < 0)'
+> sound/pci/rme9652/hdsp.c:4153 snd_hdsp_channel_info() warn: impossible condition '(hdsp->channel_map[channel] < 0) => (0-255 < 0)'
+> 
+> This might be interesting for backports if everyone starts to rely on
+> the fact that char is unsigned as the PPC people currently do.
 
-Convert the DTB overlay source files in the arm64/xilinx directory.
+Give these a minute to hit Lore, but patches just submitted to various
+maintainers as fixes (for 6.1), since these are already broken on some
+architecture.
 
-Signed-off-by: Andrew Davis <afd@ti.com>
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- .../{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso}       | 0
- .../{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso}       | 0
- 2 files changed, 0 insertions(+), 0 deletions(-)
- rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} (100%)
- rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} (100%)
+https://lore.kernel.org/all/20221024163005.536097-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162947.536060-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162929.536004-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162901.535972-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162843.535921-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162823.535884-1-Jason@zx2c4.com
+https://lore.kernel.org/all/20221024162756.535776-1-Jason@zx2c4.com
 
-diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dts b/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dtso
-similarity index 100%
-rename from arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dts
-rename to arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dtso
-diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dts b/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dtso
-similarity index 100%
-rename from arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dts
-rename to arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dtso
--- 
-2.37.3
-
+Jason
