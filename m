@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 599B0C38A2D
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 18:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 017D7FA373F
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 18:56:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232977AbiJXSzg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 14:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40218 "EHLO
+        id S230193AbiJXS4G (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 14:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232218AbiJXSyg (ORCPT
+        with ESMTP id S232761AbiJXSzU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:54:36 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AFF30545;
-        Mon, 24 Oct 2022 10:35:57 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYaam050116;
-        Mon, 24 Oct 2022 12:34:36 -0500
+        Mon, 24 Oct 2022 14:55:20 -0400
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05161A20A9;
+        Mon, 24 Oct 2022 10:36:06 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYebx012535;
+        Mon, 24 Oct 2022 12:34:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1666632876;
-        bh=k7acRMEz6LtOJEl0PqxtzzwFZfm8M1R3fsLPAYbkZRc=;
+        s=ti-com-17Q1; t=1666632881;
+        bh=NBWWl42SSL4G3YUtPMkVXQP2CMrKN1xbC8aYMEj43O8=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=qRyqoqkGKMJjBzM8E0CjsmTGb7LvrvZDHNdHnj7hUWNj/SBF7h49JZ1quMYcauNCD
-         HA5vMoiKZ940D6CUEW/HZRQupi5tuyk1NCEx97v4Gdr+29r3RslFG6p/8YJ4wvHXn0
-         huO92A31H/QRhBcwGnf/0QTsjj2Np4JJqn0bNpGA=
-Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYa3q019478
+        b=fR47W8GfFwNZN3+QM1UwUBG77eSBqQ5WeFsdgHcNQNkdq55ZtSjPpk5Xgf8F7QxQc
+         LAGpgcLuIV4ecgJpoXrJosMow/P9UVZTKIctHu+bMKo86tFVRVYXdrdH5+xpe0ooVI
+         C192ir0Fz+Tba0hQwp2aTlFvcnOdrWzZs5JFrFwQ=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYeek006895
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 24 Oct 2022 12:34:36 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Mon, 24
- Oct 2022 12:34:35 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE112.ent.ti.com
+        Mon, 24 Oct 2022 12:34:40 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE112.ent.ti.com
  (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Mon, 24
+ Oct 2022 12:34:40 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Mon, 24 Oct 2022 12:34:35 -0500
+ Frontend Transport; Mon, 24 Oct 2022 12:34:40 -0500
 Received: from ula0226330.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYIx039154;
-        Mon, 24 Oct 2022 12:34:35 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYJ4039154;
+        Mon, 24 Oct 2022 12:34:39 -0500
 From:   Andrew Davis <afd@ti.com>
 To:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -56,9 +56,9 @@ CC:     <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
         <linux-renesas-soc@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, Andrew Davis <afd@ti.com>
-Subject: [PATCH v2 1/7] kbuild: Allow DTB overlays to built from .dtso named source files
-Date:   Mon, 24 Oct 2022 12:34:28 -0500
-Message-ID: <20221024173434.32518-2-afd@ti.com>
+Subject: [PATCH v2 6/7] arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
+Date:   Mon, 24 Oct 2022 12:34:33 -0500
+Message-ID: <20221024173434.32518-7-afd@ti.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221024173434.32518-1-afd@ti.com>
 References: <20221024173434.32518-1-afd@ti.com>
@@ -70,42 +70,30 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Currently DTB Overlays (.dtbo) are build from source files with the same
-extension (.dts) as the base DTs (.dtb). This may become confusing and
-even lead to wrong results. For example, a composite DTB (created from a
-base DTB and a set of overlays) might have the same name as one of the
-overlays that create it.
+DTB Overlays (.dtbo) can now be built from source files with the
+extension (.dtso). This makes it clear what is the content of the files
+and differentiates them from base DTB source files.
 
-Different files should be generated from differently named sources.
- .dtb  <-> .dts
- .dtbo <-> .dtso
-
-We do not remove the ability to compile DTBO files from .dts files here,
-only add a new rule allowing the .dtso file name. The current .dts named
-overlays can be renamed with time. After all have been renamed we can
-remove the other rule.
+Convert the DTB overlay source files in the arm64/xilinx directory.
 
 Signed-off-by: Andrew Davis <afd@ti.com>
 Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- scripts/Makefile.lib | 3 +++
- 1 file changed, 3 insertions(+)
+ .../{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso}       | 0
+ .../{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso}       | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} (100%)
+ rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} (100%)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3aa384cec76b8..0376a6f18bfb1 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -408,6 +408,9 @@ $(obj)/%.dtb: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
- $(obj)/%.dtbo: $(src)/%.dts $(DTC) FORCE
- 	$(call if_changed_dep,dtc)
- 
-+$(obj)/%.dtbo: $(src)/%.dtso $(DTC) FORCE
-+	$(call if_changed_dep,dtc)
-+
- dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
- 
- # Bzip2
+diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dts b/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dts
+rename to arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dtso
+diff --git a/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dts b/arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dtso
+similarity index 100%
+rename from arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dts
+rename to arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revB.dtso
 -- 
 2.37.3
 
