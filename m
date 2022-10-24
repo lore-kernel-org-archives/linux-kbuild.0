@@ -2,54 +2,55 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61CAFA3741
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 13:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9254FA3740
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 13:42:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230353AbiJXN1Z (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 09:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43264 "EHLO
+        id S236016AbiJXNmN (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 09:42:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236401AbiJXNZj (ORCPT
+        with ESMTP id S236461AbiJXNkO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 09:25:39 -0400
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2830A9DD84;
-        Mon, 24 Oct 2022 05:31:20 -0700 (PDT)
-Received: by mail-qv1-f53.google.com with SMTP id x13so4892020qvn.6;
-        Mon, 24 Oct 2022 05:31:19 -0700 (PDT)
+        Mon, 24 Oct 2022 09:40:14 -0400
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF9BB1DE5;
+        Mon, 24 Oct 2022 05:37:11 -0700 (PDT)
+Received: by mail-qt1-f170.google.com with SMTP id g16so5500035qtu.2;
+        Mon, 24 Oct 2022 05:37:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BNStuAYK228vf5LzbOeaSSraZdrDlZ0Sjhs1zL+VQXA=;
-        b=aetePGMNRUTGhTxl+a2+y0oXCuyNsQZtyS/7Eux79lxe3tm6ZG8C5bGNWQboOF62IP
-         ZRdKAmn6x2bO6jkPjo4Wa2zzV1z/6ipcBld2PRZwx/Pkw5/6CB157iUy7MUglthnC/ip
-         16vQ81X+mP4lFT9cwmfARQ4BcZ3Is0ufPELUIVgtdnxX36/6ccUHgYaYjYDg2ijtMdvr
-         VqLg23hfjzgS+vt0ZAYN5V/v2zQSG4xHQ8cmp0V4z07TmpkxmUnFDVs2sRCOd+uTJgie
-         np85bDbiwFQC4zACzo8lSkIU8UW7GjhkuRue8Ag24ye0DH4G7XOou3KYovEwLAnUXl3G
-         YinQ==
-X-Gm-Message-State: ACrzQf2ChBQmGunVGigwko1OYdZzGeirx7N8x99n/KF7bLEta2a+Vq7N
-        A98vZ4WN6SD7uebPmOT1NdBIKLDW+Hgs2w==
-X-Google-Smtp-Source: AMsMyM5Rrr1o3yktWRbt9a9lsU1jlKSQ4Tonxkm1QHUtyNCgn4pHDNfL6DrDIuYaqr+yIONtv2yacw==
-X-Received: by 2002:a05:6214:76a:b0:4bb:6fa5:bee2 with SMTP id f10-20020a056214076a00b004bb6fa5bee2mr4265934qvz.53.1666614517409;
-        Mon, 24 Oct 2022 05:28:37 -0700 (PDT)
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com. [209.85.219.180])
-        by smtp.gmail.com with ESMTPSA id bi17-20020a05620a319100b006eeca296c00sm5072062qkb.104.2022.10.24.05.28.36
+        bh=Mm0DhlBuWerQb7STPnVGOSZg9+mGmS13MMZKjPmbxqM=;
+        b=Q/AB1BYhsDYBQa6OHia4tBMxS5kFaaNnNAaL9kSIB1W1/Erz3cL1zI4Qkp1pkNn1Bh
+         xEnBThJ78dQvIq5j0HmsbT6vQjODHTwrTIaWlO8m2A7cZkYZVFAssIB4XlQmCCBTv7FU
+         VnEXx48B0hJmjrAkIdtznzkJL10q8i5uBttVuGUmMRV79184b7bybqi9SfXFLuerCZ06
+         3/LfLWXnh3L3MPHaSdFWhhh5OTYNcu4emGTvlgqKi9D5SfRvqpqLzfSViwPG96jEGRYq
+         wFlKfQ0i2gftTPdUMmSWmtElckgZMbeScH+gnLtEAH+7bftjeUYc67SRC4E7WsEOKsFo
+         Z2tg==
+X-Gm-Message-State: ACrzQf3QcLnnyrjYP3WnuZDdO6+BDxlJ2nfu4H7FryTWxKhBeD3INiVh
+        4n+jhLmAWZXZPXX9w91S6dm56GIoliUtgQ==
+X-Google-Smtp-Source: AMsMyM5UdJDhicPIDh14Z2dn+rdMdObB+vEnjqqgA6wMFX3s4h4griSYn69Mz4dVty+nt00y7v7Qog==
+X-Received: by 2002:a05:622a:209:b0:39c:d88f:20ed with SMTP id b9-20020a05622a020900b0039cd88f20edmr26522356qtx.131.1666613258930;
+        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
+        by smtp.gmail.com with ESMTPSA id s7-20020a05620a254700b006af0ce13499sm14952635qko.115.2022.10.24.05.07.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 05:28:36 -0700 (PDT)
-Received: by mail-yb1-f180.google.com with SMTP id 187so1732755ybe.1;
-        Mon, 24 Oct 2022 05:28:36 -0700 (PDT)
-X-Received: by 2002:a5b:104:0:b0:6b0:429:3fe9 with SMTP id 4-20020a5b0104000000b006b004293fe9mr27655514ybx.543.1666614516350;
- Mon, 24 Oct 2022 05:28:36 -0700 (PDT)
+        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
+Received: by mail-yb1-f181.google.com with SMTP id r3so10771170yba.5;
+        Mon, 24 Oct 2022 05:07:38 -0700 (PDT)
+X-Received: by 2002:a25:4fc2:0:b0:6be:afb4:d392 with SMTP id
+ d185-20020a254fc2000000b006beafb4d392mr26765379ybb.604.1666613257924; Mon, 24
+ Oct 2022 05:07:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221023182437.15263-1-afd@ti.com>
-In-Reply-To: <20221023182437.15263-1-afd@ti.com>
+References: <20221023182437.15263-1-afd@ti.com> <20221023182437.15263-3-afd@ti.com>
+In-Reply-To: <20221023182437.15263-3-afd@ti.com>
 From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 24 Oct 2022 14:28:25 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVSeqcgj=ocY-9XAf9A312xBwdypBCNk-fsnh+bWiCtTg@mail.gmail.com>
-Message-ID: <CAMuHMdVSeqcgj=ocY-9XAf9A312xBwdypBCNk-fsnh+bWiCtTg@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Rename DTB overlay source files
+Date:   Mon, 24 Oct 2022 14:07:26 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXAM8VkDeUWqikjHZz8703ho6Ft=eMgN69ktvJXSue+Pg@mail.gmail.com>
+Message-ID: <CAMuHMdXAM8VkDeUWqikjHZz8703ho6Ft=eMgN69ktvJXSue+Pg@mail.gmail.com>
+Subject: Re: [PATCH 2/6] kbuild: Allow DTB overlays to built into .dtso.S files
 To:     Andrew Davis <afd@ti.com>
 Cc:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -69,35 +70,18 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi Andrew,
-
 On Sun, Oct 23, 2022 at 8:24 PM Andrew Davis <afd@ti.com> wrote:
-> This is a series based on my patch here[0]. As suggested by Rob
-> I've resurrected Frank's patch and appended it to mine as a series.
+> DTB files can be built into the kernel by converting them to assembly
+> files then assembling them into object files. We extend this here
+> for DTB overlays with the .dtso extensions.
 >
-> First patch here is my original patch, 3rd is Frank's patch but with
-> the unittest changes pulled out into the 2nd patch. That was re-worked
-> moving the source building macro into scripts/Makefile.lib.
+> We change the start and end delimiting tag prefix to make it clear that
+> this data came from overlay files.
 >
-> Patches 4, 5, and 6 are an attempt at renaming all the existing DTB
-> overlays. Split out by platform so they could be taken by platform
-> maintainers or if easier ACK'd here and taken all together.
->
-> This should cover all the DTB overlays so we can remove the old .dts
-> rule for overlays and make .dtso the only supported way, let me know
-> if we want that this cycle and I can post that too.
+> [Based on patch by Frank Rowand <frank.rowand@sony.com>]
+> Signed-off-by: Andrew Davis <afd@ti.com>
 
-Thanks a lot for picking this up!
-
-Everything builds still fine, and the OF unit tests still run fine, so
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-BTW, you missed the Smarthome-Wolf Pi433 overlay[1] and its
-documentation[2] under drivers/staging/, but perhaps that was
-intentional, as it is not tied into the build system?
-
-[1] drivers/staging/pi433/Documentation/devicetree/pi433-overlay.dts
-[2] drivers/staging/pi433/Documentation/devicetree/pi433.txt
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
 Gr{oetje,eeting}s,
 
