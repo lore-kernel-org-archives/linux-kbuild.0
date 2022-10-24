@@ -2,44 +2,44 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76212FA3741
-	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 19:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F85FA3740
+	for <linux-kbuild@archiver.kernel.org>; Mon, 24 Oct 2022 19:06:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232163AbiJXTGV (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 24 Oct 2022 15:06:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54360 "EHLO
+        id S232797AbiJXTGi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 24 Oct 2022 15:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232156AbiJXTFZ (ORCPT
+        with ESMTP id S232828AbiJXTGF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2022 15:05:25 -0400
+        Mon, 24 Oct 2022 15:06:05 -0400
 Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBFDCE7;
-        Mon, 24 Oct 2022 10:45:01 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYdI8031173;
-        Mon, 24 Oct 2022 12:34:40 -0500
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90EE0C820C;
+        Mon, 24 Oct 2022 10:45:18 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYZrA031166;
+        Mon, 24 Oct 2022 12:34:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1666632880;
-        bh=DG2Cypqan4dRmgBkwTCD4tPNOhMf/ldAIcyLku3uhSA=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=YV2KXSECI9WQPr3u4hk52TgT0/NaCthMpqqg1+iFlkXhNiEdUw3lNsmDENdoRIezp
-         9dyKFAThRaTaBxxivLP5ZG81Q5hrPjdQiMLM2D1nlcecZ8QxilH6rtMtPqspNUvuVO
-         nlbEIu2Y3UsmvahneK9B02l6obwAZNoZW+Y94hsI=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYdwT122848
+        s=ti-com-17Q1; t=1666632875;
+        bh=bYB2FaSj8hi0qni5g1MXGuvwVR+hZVuPR2WQUXNnHAQ=;
+        h=From:To:CC:Subject:Date;
+        b=QYGfUKycPdh9v7Uei33H0Q6OZSKcgRJGXqnUWatbjPE+clSOEMRp+WvigAYHHe4Gv
+         atky2CsYiHsb55bM768Ua4aimWRxUyJeA5Hg6YMZZLSy8ReR5E4UPYd0rd6V2I59/I
+         mBFIIKw71Uu2n1P8eLcC1PUjRmNkymGtbVCgFrs8=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 29OHYZui002353
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 24 Oct 2022 12:34:39 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+        Mon, 24 Oct 2022 12:34:35 -0500
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Mon, 24
- Oct 2022 12:34:39 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ Oct 2022 12:34:35 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Mon, 24 Oct 2022 12:34:39 -0500
+ Frontend Transport; Mon, 24 Oct 2022 12:34:35 -0500
 Received: from ula0226330.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYJ3039154;
-        Mon, 24 Oct 2022 12:34:38 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 29OHYYIw039154;
+        Mon, 24 Oct 2022 12:34:34 -0500
 From:   Andrew Davis <afd@ti.com>
 To:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -56,12 +56,10 @@ CC:     <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
         <linux-renesas-soc@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, Andrew Davis <afd@ti.com>
-Subject: [PATCH v2 5/7] arm64: dts: renesas: Rename DTB overlay source files from .dts to .dtso
-Date:   Mon, 24 Oct 2022 12:34:32 -0500
-Message-ID: <20221024173434.32518-6-afd@ti.com>
+Subject: [PATCH v2 0/7] Rename DTB overlay source files
+Date:   Mon, 24 Oct 2022 12:34:27 -0500
+Message-ID: <20221024173434.32518-1-afd@ti.com>
 X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221024173434.32518-1-afd@ti.com>
-References: <20221024173434.32518-1-afd@ti.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -70,31 +68,157 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-DTB Overlays (.dtbo) can now be built from source files with the
-extension (.dtso). This makes it clear what is the content of the files
-and differentiates them from base DTB source files.
+Hello all,
 
-Convert the DTB overlay source files in the arm64/renesas directory.
+This is a series based on my patch here[0]. As suggested by Rob
+I've resurrected Frank's patch and appended it to mine as a series.
 
-Signed-off-by: Andrew Davis <afd@ti.com>
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Acked-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- ...ebisu-panel-aa104xd12.dts => draak-ebisu-panel-aa104xd12.dtso} | 0
- ...salvator-panel-aa104xd12.dts => salvator-panel-aa104xd12.dtso} | 0
- 2 files changed, 0 insertions(+), 0 deletions(-)
+First patch here is my original patch, 3rd is Frank's patch but with
+the unittest changes pulled out into the 2nd patch. That was re-worked
+moving the source building macro into scripts/Makefile.lib.
+
+Patches 4, 5, and 6 are an attempt at renaming all the existing DTB
+overlays. Split out by platform so they could be taken by platform
+maintainers or if easier ACK'd here and taken all together.
+
+This should cover all the DTB overlays so we can remove the old .dts
+rule for overlays and make .dtso the only supported way, let me know
+if we want that this cycle and I can post that too.
+
+Thanks,
+Andrew
+
+Changes from v1[1]:
+ - Added patch to rename pi433 overlay.
+ - Cleaned wording on patch 4-6.
+ - Collected some ACKs
+
+[0] https://www.spinics.net/lists/kernel/msg4548509.html
+[1] https://www.spinics.net/lists/arm-kernel/msg1020165.html
+
+Andrew Davis (6):
+  kbuild: Allow DTB overlays to built from .dtso named source files
+  kbuild: Allow DTB overlays to built into .dtso.S files
+  arm64: dts: freescale: Rename DTB overlay source files from .dts to
+    .dtso
+  arm64: dts: renesas: Rename DTB overlay source files from .dts to
+    .dtso
+  arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
+  staging: pi433: overlay: Rename overlay source file from .dts to .dtso
+
+Frank Rowand (1):
+  of: overlay: rename overlay source files from .dts to .dtso
+
+ ...qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso} |  0
+ ...qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso} |  0
+ ...qds-7777.dts => fsl-ls1028a-qds-7777.dtso} |  0
+ ...qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso} |  0
+ ...qds-899b.dts => fsl-ls1028a-qds-899b.dtso} |  0
+ ...qds-9999.dts => fsl-ls1028a-qds-9999.dtso} |  0
+ ...ts => imx8mm-venice-gw72xx-0x-imx219.dtso} |  0
+ ...=> imx8mm-venice-gw72xx-0x-rs232-rts.dtso} |  0
+ ...dts => imx8mm-venice-gw72xx-0x-rs422.dtso} |  0
+ ...dts => imx8mm-venice-gw72xx-0x-rs485.dtso} |  0
+ ...ts => imx8mm-venice-gw73xx-0x-imx219.dtso} |  0
+ ...=> imx8mm-venice-gw73xx-0x-rs232-rts.dtso} |  0
+ ...dts => imx8mm-venice-gw73xx-0x-rs422.dtso} |  0
+ ...dts => imx8mm-venice-gw73xx-0x-rs485.dtso} |  0
+ ...2.dts => draak-ebisu-panel-aa104xd12.dtso} |  0
+ ...xd12.dts => salvator-panel-aa104xd12.dtso} |  0
+ ...v-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} |  0
+ ...v-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} |  0
+ drivers/of/unittest-data/Makefile             | 66 +++++++++----------
+ .../{overlay.dts => overlay.dtso}             |  0
+ .../{overlay_0.dts => overlay_0.dtso}         |  0
+ .../{overlay_1.dts => overlay_1.dtso}         |  0
+ .../{overlay_10.dts => overlay_10.dtso}       |  0
+ .../{overlay_11.dts => overlay_11.dtso}       |  0
+ .../{overlay_12.dts => overlay_12.dtso}       |  0
+ .../{overlay_13.dts => overlay_13.dtso}       |  0
+ .../{overlay_15.dts => overlay_15.dtso}       |  0
+ .../{overlay_16.dts => overlay_16.dtso}       |  0
+ .../{overlay_17.dts => overlay_17.dtso}       |  0
+ .../{overlay_18.dts => overlay_18.dtso}       |  0
+ .../{overlay_19.dts => overlay_19.dtso}       |  0
+ .../{overlay_2.dts => overlay_2.dtso}         |  0
+ .../{overlay_20.dts => overlay_20.dtso}       |  0
+ .../{overlay_3.dts => overlay_3.dtso}         |  0
+ .../{overlay_4.dts => overlay_4.dtso}         |  0
+ .../{overlay_5.dts => overlay_5.dtso}         |  0
+ .../{overlay_6.dts => overlay_6.dtso}         |  0
+ .../{overlay_7.dts => overlay_7.dtso}         |  0
+ .../{overlay_8.dts => overlay_8.dtso}         |  0
+ .../{overlay_9.dts => overlay_9.dtso}         |  0
+ ...node.dts => overlay_bad_add_dup_node.dtso} |  0
+ ...prop.dts => overlay_bad_add_dup_prop.dtso} |  0
+ ...d_phandle.dts => overlay_bad_phandle.dtso} |  0
+ ...bad_symbol.dts => overlay_bad_symbol.dtso} |  0
+ .../{overlay_base.dts => overlay_base.dtso}   |  0
+ ...erlay_gpio_01.dts => overlay_gpio_01.dtso} |  0
+ ...lay_gpio_02a.dts => overlay_gpio_02a.dtso} |  0
+ ...lay_gpio_02b.dts => overlay_gpio_02b.dtso} |  0
+ ...erlay_gpio_03.dts => overlay_gpio_03.dtso} |  0
+ ...lay_gpio_04a.dts => overlay_gpio_04a.dtso} |  0
+ ...lay_gpio_04b.dts => overlay_gpio_04b.dtso} |  0
+ .../{testcases.dts => testcases.dtso}         |  0
+ drivers/of/unittest.c                         | 48 +++++++-------
+ .../{pi433-overlay.dts => pi433-overlay.dtso} |  0
+ .../pi433/Documentation/devicetree/pi433.txt  |  6 +-
+ scripts/Makefile.lib                          | 23 ++++++-
+ 56 files changed, 82 insertions(+), 61 deletions(-)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-13bb.dts => fsl-ls1028a-qds-13bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-65bb.dts => fsl-ls1028a-qds-65bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-7777.dts => fsl-ls1028a-qds-7777.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-85bb.dts => fsl-ls1028a-qds-85bb.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-899b.dts => fsl-ls1028a-qds-899b.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{fsl-ls1028a-qds-9999.dts => fsl-ls1028a-qds-9999.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-imx219.dts => imx8mm-venice-gw72xx-0x-imx219.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs232-rts.dts => imx8mm-venice-gw72xx-0x-rs232-rts.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs422.dts => imx8mm-venice-gw72xx-0x-rs422.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw72xx-0x-rs485.dts => imx8mm-venice-gw72xx-0x-rs485.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-imx219.dts => imx8mm-venice-gw73xx-0x-imx219.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs232-rts.dts => imx8mm-venice-gw73xx-0x-rs232-rts.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs422.dts => imx8mm-venice-gw73xx-0x-rs422.dtso} (100%)
+ rename arch/arm64/boot/dts/freescale/{imx8mm-venice-gw73xx-0x-rs485.dts => imx8mm-venice-gw73xx-0x-rs485.dtso} (100%)
  rename arch/arm64/boot/dts/renesas/{draak-ebisu-panel-aa104xd12.dts => draak-ebisu-panel-aa104xd12.dtso} (100%)
  rename arch/arm64/boot/dts/renesas/{salvator-panel-aa104xd12.dts => salvator-panel-aa104xd12.dtso} (100%)
+ rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revA.dts => zynqmp-sck-kv-g-revA.dtso} (100%)
+ rename arch/arm64/boot/dts/xilinx/{zynqmp-sck-kv-g-revB.dts => zynqmp-sck-kv-g-revB.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay.dts => overlay.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_0.dts => overlay_0.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_1.dts => overlay_1.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_10.dts => overlay_10.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_11.dts => overlay_11.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_12.dts => overlay_12.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_13.dts => overlay_13.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_15.dts => overlay_15.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_16.dts => overlay_16.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_17.dts => overlay_17.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_18.dts => overlay_18.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_19.dts => overlay_19.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_2.dts => overlay_2.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_20.dts => overlay_20.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_3.dts => overlay_3.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_4.dts => overlay_4.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_5.dts => overlay_5.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_6.dts => overlay_6.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_7.dts => overlay_7.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_8.dts => overlay_8.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_9.dts => overlay_9.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_bad_add_dup_node.dts => overlay_bad_add_dup_node.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_bad_add_dup_prop.dts => overlay_bad_add_dup_prop.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_bad_phandle.dts => overlay_bad_phandle.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_bad_symbol.dts => overlay_bad_symbol.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_base.dts => overlay_base.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_01.dts => overlay_gpio_01.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_02a.dts => overlay_gpio_02a.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_02b.dts => overlay_gpio_02b.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_03.dts => overlay_gpio_03.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_04a.dts => overlay_gpio_04a.dtso} (100%)
+ rename drivers/of/unittest-data/{overlay_gpio_04b.dts => overlay_gpio_04b.dtso} (100%)
+ rename drivers/of/unittest-data/{testcases.dts => testcases.dtso} (100%)
+ rename drivers/staging/pi433/Documentation/devicetree/{pi433-overlay.dts => pi433-overlay.dtso} (100%)
 
-diff --git a/arch/arm64/boot/dts/renesas/draak-ebisu-panel-aa104xd12.dts b/arch/arm64/boot/dts/renesas/draak-ebisu-panel-aa104xd12.dtso
-similarity index 100%
-rename from arch/arm64/boot/dts/renesas/draak-ebisu-panel-aa104xd12.dts
-rename to arch/arm64/boot/dts/renesas/draak-ebisu-panel-aa104xd12.dtso
-diff --git a/arch/arm64/boot/dts/renesas/salvator-panel-aa104xd12.dts b/arch/arm64/boot/dts/renesas/salvator-panel-aa104xd12.dtso
-similarity index 100%
-rename from arch/arm64/boot/dts/renesas/salvator-panel-aa104xd12.dts
-rename to arch/arm64/boot/dts/renesas/salvator-panel-aa104xd12.dtso
 -- 
 2.37.3
 
