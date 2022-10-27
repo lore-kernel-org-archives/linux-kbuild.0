@@ -2,160 +2,117 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8ABFA373E
-	for <linux-kbuild@archiver.kernel.org>; Thu, 27 Oct 2022 07:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD48FA3740
+	for <linux-kbuild@archiver.kernel.org>; Thu, 27 Oct 2022 14:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233514AbiJ0H7V (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 27 Oct 2022 03:59:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40390 "EHLO
+        id S234791AbiJ0Ocx (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 27 Oct 2022 10:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234871AbiJ0H7L (ORCPT
+        with ESMTP id S234367AbiJ0Ocw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Oct 2022 03:59:11 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A07169CF6
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Oct 2022 00:59:09 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id u11so1177158ljk.6
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Oct 2022 00:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wUr2EXQ4ftgpTV8ZEQ41jHHOycsGjgaOj2fkUN/SmwY=;
-        b=RjUFbbMfNxCxFcmIKsdWa5O9byrd1jpSQlJe5eU3whNU+B6yepvb7B0D9b8+Jm2SvU
-         K2AC1/Qphb//OHOael7l/Nmty1KTOoEHMsSJtADAHM3UvBWii75uGpQUvhid/+irjrGQ
-         BxwH1/loV9BB3luEH+etQBpjeAC8ZqCizyO/M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wUr2EXQ4ftgpTV8ZEQ41jHHOycsGjgaOj2fkUN/SmwY=;
-        b=Ur/4e9X4rhNksgPNdxh/gGW82XnMHWLTE5rz6459VQtMukVRYRpsbMapgYMi3qpmWV
-         RT8chA2ygIvz6j3Dq4ZFNfSiGs/gKITjy9Pg8TBUyjj9A7/OIPT4svh3CawLRHjnzI9F
-         JXaQyAlSZV2JgLmhWwaipakOgdDIZ0QTtTzczoWyLremWumr0buDhSrWR4k/FSTgWZa1
-         f9M7H2sEWZDz9zF3s/f+v60546YhTDRUt4UQO9oz+e+PuHBFWL0ew8hP05KxCV9w7RO5
-         olMMDoyZKb50smqcMRIaEwH3ZiKnkqyVM1+e9PpwLLd4ObIp5rQY5IcO2feDGEJKABOi
-         8UYw==
-X-Gm-Message-State: ACrzQf0OXEQDHA04CK2lGygaFJE4hHMaX8CuB9LdsEBCbGPHBjY71HOi
-        DuZ+cJXZdrGEyBhQwQBeWKKX4A==
-X-Google-Smtp-Source: AMsMyM6JfSRaduVbrfa57dcCJjTzQ7W0+QDnmLqDB+SkcXec0y+BqsXViensSxRqxUz8HX+M/nNvgg==
-X-Received: by 2002:a2e:9e47:0:b0:276:1ee8:7216 with SMTP id g7-20020a2e9e47000000b002761ee87216mr11763411ljk.339.1666857547760;
-        Thu, 27 Oct 2022 00:59:07 -0700 (PDT)
-Received: from [172.16.11.74] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id t27-20020a2e8e7b000000b0027709875c3esm130842ljk.32.2022.10.27.00.59.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Oct 2022 00:59:07 -0700 (PDT)
-Message-ID: <915a104b-0e70-dfb8-3c85-54fd1e5e63e5@rasmusvillemoes.dk>
-Date:   Thu, 27 Oct 2022 09:59:05 +0200
+        Thu, 27 Oct 2022 10:32:52 -0400
+Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0418179988;
+        Thu, 27 Oct 2022 07:32:51 -0700 (PDT)
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 29REWQkr000621;
+        Thu, 27 Oct 2022 23:32:27 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 29REWQkr000621
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1666881147;
+        bh=4HDEXnWr6VYARBxhtIHHxyW+0nXTxgQlhNlzoM6U/Ls=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=cEMOUuGRx0CiM5dMBySppPWAb4vz2zKfDBSxF4AaxelQ/VZgyeTz6mR356DZvwGBa
+         L3NaQm+ysBspNbVVKOWPlMn6/0PplDiKBUg3GhXYU9BkTbi9sxuUvk+WElbubd1YOi
+         6028JqJm4ULcqhRMu4AUwjYsrRn6JIMdWzOkXjn8DxDUQKF7HG3/ATh3bomtk47REf
+         m7hLWNKkhA6XpXQlCfgMQ7jK9Llyk/WehKgjD9RTCQR05P/9gNZ5CLsh/Zru2hgSKa
+         IQY1BoGcyNjwcLK1yJ8gNdAWs8XQaojSQ/fGnWHkP/z2b6KgRHhBQguArRzJlutDt9
+         KRp0rWdr3qVDg==
+X-Nifty-SrcIP: [209.85.167.169]
+Received: by mail-oi1-f169.google.com with SMTP id s125so1777921oib.6;
+        Thu, 27 Oct 2022 07:32:26 -0700 (PDT)
+X-Gm-Message-State: ACrzQf3RFApk6ytHKf8GM4ti80xAt1WjrVgWChO2/16kJOSKQ07DGf1X
+        yDZHGVj8Luy9fxOZCaqAR5JW3/dTgw0AK7YNZAE=
+X-Google-Smtp-Source: AMsMyM4tqsHTbHWe+6yz0cnG9uKVuvy2JEqtwziNTOAmy0shG5LX1mgNgc+M3G+YmcTGs8ePnEbYIasezCTtPb52hqI=
+X-Received: by 2002:aca:bbd4:0:b0:353:f167:6fd3 with SMTP id
+ l203-20020acabbd4000000b00353f1676fd3mr5067095oif.287.1666881145769; Thu, 27
+ Oct 2022 07:32:25 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: make ctype ascii only? (was [PATCH] kbuild: treat char as always
- signed)
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-toolchains@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
+References: <20221024212144.2852069-1-glider@google.com> <20221024212144.2852069-3-glider@google.com>
+In-Reply-To: <20221024212144.2852069-3-glider@google.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 27 Oct 2022 23:31:49 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARfKkiNSUfZAqDQd15O8NAhpX13dHDuGn3OPL_b_F_92g@mail.gmail.com>
+Message-ID: <CAK7LNARfKkiNSUfZAqDQd15O8NAhpX13dHDuGn3OPL_b_F_92g@mail.gmail.com>
+Subject: Re: [PATCH 3/5] Kconfig.debug: disable CONFIG_FRAME_WARN for KMSAN by default
+To:     Alexander Potapenko <glider@google.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20221019162648.3557490-1-Jason@zx2c4.com>
- <CAHk-=whT+xyge9UjH+r6dt0FG-eUdrzu5hDMce_vC+n8uLam2A@mail.gmail.com>
- <3a2fa7c1-2e31-0479-761f-9c189f8ed8c3@rasmusvillemoes.dk>
- <CAHk-=wg9RNhvDyanUQnxa_xnir70TUiMgjhVhRWUuF5Ojj96Dw@mail.gmail.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-In-Reply-To: <CAHk-=wg9RNhvDyanUQnxa_xnir70TUiMgjhVhRWUuF5Ojj96Dw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 26/10/2022 20.10, Linus Torvalds wrote:
-> On Tue, Oct 25, 2022 at 5:10 PM Rasmus Villemoes
-> <linux@rasmusvillemoes.dk> wrote:
->>
->> Only very tangentially related (because it has to do with chars...): Can
->> we switch our ctype to be ASCII only, just as it was back in the good'ol
->> mid 90s
-> 
-> Those US-ASCII days weren't really very "good" old days, but I forget
-> why we did this (it's attributed to me, but that's from the
-> pre-BK/pre-git days before we actually tracked things all that well,
-> so..)
-> 
-> Anyway, I think anybody using ctype.h on 8-bit chars gets what they
-> deserve, and I think Latin1 (or something close to it) is better than
-> US-ASCII, in that it's at least the same as Unicode in the low 8
-> chars.
+On Tue, Oct 25, 2022 at 6:22 AM Alexander Potapenko <glider@google.com> wrote:
+>
+> KMSAN adds a lot of instrumentation to the code, which results in
+> increased stack usage (up to 2048 bytes and more in some cases).
+> It's hard to predict how big the stack frames can be, so we disable
+> the warnings for KMSAN instead.
+>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Masahiro Yamada <masahiroy@kernel.org>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Link: https://github.com/google/kmsan/issues/89
+> Signed-off-by: Alexander Potapenko <glider@google.com>
+> ---
+>  lib/Kconfig.debug | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 3fc7abffc7aa2..29280072dc0e4 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -400,8 +400,9 @@ config FRAME_WARN
+>         default 1536 if (!64BIT && XTENSA)
+>         default 1024 if !64BIT
+>         default 2048 if 64BIT
+> +       default 0 if KMSAN
 
-My concern is that it's currently somewhat ill specified what our ctype
-actually represents, and that would be a lot easier to specify if we
-just said ASCII, everything above 0x7f is neither punct or ctrl or alpha
-or anything else.
 
-For example, people may do stuff like isprint(c) ? c : '.' in a printk()
-call, but most likely the consumer (somebody doing dmesg) would, at
-least these days, use utf-8, so that just results in a broken utf-8
-sequence. Now I see that a lot of callers actually do "isascii(c) &&
-isprint(c)", so they already know about this, but there are also many
-instances where isprint() is used by itself.
 
-There's also stuff like fs/afs/cell.c and other places that use
-isprint/isalnum/... to make decisions on what is allowed on the wire
-and/or in a disk format, where it's then hard to reason about just
-exactly what is accepted. And places that use toupper() on their strings
-to normalize them; that's broken when toupper() isn't idempotent.
+This is wrong.
 
-> So no, I'm disinclined to go back in time to what I think is an even
-> worse situation. Latin1 isn't great, but it sure beats US-ASCII. And
-> if you really want just US-ASII, then don't use the high bit, and make
-> your disgusting 7-bit code be *explicitly* 7-bit.
-> 
-> Now, if there are errors in that table wrt Latin1 / "first 256
-> codepoints of Unicode" too, then we can fix those.
+Kconfig picks up the first default entry which has
+true 'if' condition.
 
-AFAICT, the differences are:
 
-- 0xaa (FEMININE ORDINAL INDICATOR), 0xb5 (MICRO SIGN), 0xba (FEMININE
-ORDINAL INDICATOR) should be lower (hence alpha and alnum), not punct.
+Since (!64BIT || 64BIT) covers all the possible cases,
+this patch is just adding dead code.
 
-- depending a little on just exactly what one wants latin1 to mean, but
-if it does mean "first 256 codepoints of Unicode", 0x80-0x9f should be cntrl
 
-- for some reason at least glibc seems to classify 0xa0 as punctuation
-and not space (hence also as isgraph)
 
-- 0xdf and 0xff are correctly classified as lower, but since they don't
-have upper-case versions (at least not any that are representable in
-latin1), correct toupper() behaviour is to return them unchanged, but we
-just subtract 0x20, so 0xff becomes 0xdf which isn't isupper() and 0xdf
-becomes something that isn't even isalpha().
 
-Fixing the first would create more instances of the last, and I think
-the only sane way to fix that would be a 256 byte lookup table to use by
-toupper().
 
-> Not that anybody has apparently cared since 2.0.1 was released back in
-> July of 1996 
-(btw, it's sad how none of the old linux git archive
-> creations seem to have tried to import the dates, so you have to look
-> those up separately)
 
-Huh? That commit has 1996 as the author date, while its commit date is
-indeed 2007. The very first line says:
 
-author	linus1 <torvalds@linuxfoundation.org>	1996-07-02 11:00:00 -0600
+>         help
+> -         Tell gcc to warn at build time for stack frames larger than this.
+> +         Tell the compiler to warn at build time for stack frames larger than this.
+>           Setting this too low will cause a lot of warnings.
+>           Setting it to 0 disables the warning.
+>
+> --
+> 2.38.0.135.g90850a2211-goog
+>
 
-> And if nobody has cared since 1996, I don't really think it matters.
 
-Indeed, I don't think it's a huge problem in practice. But it still
-bothers me that such a simple (and usually overlooked) corner of the
-kernel's C library is ill-defined and arguably a little buggy.
-
-Rasmus
+-- 
+Best Regards
+Masahiro Yamada
