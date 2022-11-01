@@ -2,132 +2,98 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC3CFA373D
-	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Nov 2022 05:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AFCC4332F
+	for <linux-kbuild@archiver.kernel.org>; Tue,  1 Nov 2022 22:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbiKAF6K (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 1 Nov 2022 01:58:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
+        id S230463AbiKAWDL (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 1 Nov 2022 18:03:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiKAF6J (ORCPT
+        with ESMTP id S230357AbiKAWDK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Nov 2022 01:58:09 -0400
-Received: from conssluserg-06.nifty.com (conssluserg-06.nifty.com [210.131.2.91])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8F714087;
-        Mon, 31 Oct 2022 22:58:08 -0700 (PDT)
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174]) (authenticated)
-        by conssluserg-06.nifty.com with ESMTP id 2A15viIc025803;
-        Tue, 1 Nov 2022 14:57:45 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com 2A15viIc025803
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1667282265;
-        bh=gCNWBb2Eok8RLy3ONe6jfzn3xPMLs34Yqwb+SBG6Glw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=D+mq7Rhu/EH63zPTFNBDJZL5CdYxdPyLmxD/bi3q+5UT3u5QtlFu3E01kKBxaXeij
-         MlK9kO8VB0s/Z//f9nboSrEvTkB8NVgsVcaxka57DPRbHyeVpjctVWychs0F7/2BvV
-         Ab5cjUn2t7IMwy1I6TsCxSobnB0qcDZRsP/hxAaWaDOto4mtGTd0GlNh2NsJWZKbmf
-         m4c3LuA6q/1LI6v/j9aMMmjCjxgm86QddRn8inU7ekmuNqZ1IjiOEGHlv+6Kp2odQ7
-         gW3o5fPM5CQjtS/9Y4pOSVAPUvyrGEKeumgQcmGSJAK0Qwg8SsOkdsBSGqeLdpHONC
-         xtrSr/Ux1PhJw==
-X-Nifty-SrcIP: [209.85.167.174]
-Received: by mail-oi1-f174.google.com with SMTP id y67so15006349oiy.1;
-        Mon, 31 Oct 2022 22:57:44 -0700 (PDT)
-X-Gm-Message-State: ACrzQf0hL/d+37jgxLmAlYKyH3sGtKJXaOzmFBjURr2wvoODPGl7T9Yo
-        fu40PQI1aP7sNOcKkr+8J6uOYo7CAbab6A/RizU=
-X-Google-Smtp-Source: AMsMyM7n8houcv2BWsa7QWJkxKzh5DKRqrh/PWmVCfZXKXtJA6KJU0/z+oQhzFQ2OKyMwHbCqc0ovVYaYJ3FTsTm2hI=
-X-Received: by 2002:a05:6808:1893:b0:359:f7c7:1caf with SMTP id
- bi19-20020a056808189300b00359f7c71cafmr6481270oib.194.1667282263919; Mon, 31
- Oct 2022 22:57:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221020175655.1660864-1-ndesaulniers@google.com>
- <Y1GV9sHyODVmBbFW@dev-arch.thelio-3990X> <CA+icZUW2tFR=xjJEXJDNARW1yd_vjOOA1etF6aMN3Cx5ReFgmg@mail.gmail.com>
- <CAKwvOdn_mP8kVn5Bhe7bbC8R+VZxr8h02yWwKhvaTHW40ZJ_Uw@mail.gmail.com> <CAKwvOdkNBM2-pMm+fqzXpMxL5745p0Gzmw_+--P8RSqTk=v+VQ@mail.gmail.com>
-In-Reply-To: <CAKwvOdkNBM2-pMm+fqzXpMxL5745p0Gzmw_+--P8RSqTk=v+VQ@mail.gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 1 Nov 2022 14:57:07 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATrBDSLqBZFmWr5RA542pUVR=mieUSNVYXy8thkHS6w_A@mail.gmail.com>
-Message-ID: <CAK7LNATrBDSLqBZFmWr5RA542pUVR=mieUSNVYXy8thkHS6w_A@mail.gmail.com>
-Subject: Re: [PATCH] Makefile.debug: support for -gz=zstd
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Fangrui Song <maskray@google.com>,
-        Sedat Dilek <sedat.dilek@dhl.com>,
+        Tue, 1 Nov 2022 18:03:10 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B0163894;
+        Tue,  1 Nov 2022 15:03:10 -0700 (PDT)
+Received: from notapiano.myfiosgateway.com (unknown [IPv6:2600:4041:5b1a:cd00:524d:e95d:1a9c:492a])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: nfraprado)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 33F8F660284F;
+        Tue,  1 Nov 2022 22:03:07 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1667340188;
+        bh=yMp4w9RoWXCGng4R5gRPNg63j86qA6FnSxUKrRZ65bs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=j+ei/IQG//damy7N0vcrtAagkDLsrP4ZOsk52t5QV64cHuYQQBW58N91q6uAmEQzo
+         5Zh7RRckssF/ZPC1kHvZymv8aB4O9ocAzfWN6QULCBkX3NTPJikOLE2A4giFsFLtJz
+         HPEbSPCP1UVpf4vcqCYag3kgn3oZ8HN9MZKdR0L5J1Vg/eoAk9aFnh6VZgb+ahnC7D
+         p+VO7ciIXExKioAmxgyth17Z8pOiozefhqs7gQPMpoi8SdUXSLKK/Syn4IFXLo0JNL
+         majVSvEOYMtQHT7H2k6Fzo1ng8cfLGPQETsuk85neh3FM3vVXlHt5VTg3Sq56rQuaz
+         nOQoa4+tBaUDA==
+From:   =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?= 
+        <nfraprado@collabora.com>
+To:     Rob Herring <robh@kernel.org>
+Cc:     AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>, kernel@collabora.com,
+        =?UTF-8?q?N=C3=ADcolas=20F=2E=20R=2E=20A=2E=20Prado?= 
+        <nfraprado@collabora.com>, Masahiro Yamada <masahiroy@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
         Michal Marek <michal.lkml@markovi.net>,
-        Nick Terrell <terrelln@fb.com>, Tom Rix <trix@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        David Gow <davidgow@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Isabella Basso <isabbasso@riseup.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        llvm@lists.linux.dev, sedat.dilek@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
+Subject: [PATCH] kbuild: Add DTB_FILES variable for dtbs_check
+Date:   Tue,  1 Nov 2022 18:03:03 -0400
+Message-Id: <20221101220304.65715-1-nfraprado@collabora.com>
+X-Mailer: git-send-email 2.38.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Nov 1, 2022 at 3:49 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
->
-> On Mon, Oct 24, 2022 at 10:44 AM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
-> >
-> > On Sun, Oct 23, 2022 at 8:46 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> > >
-> > > On Thu, Oct 20, 2022 at 8:43 PM Nathan Chancellor <nathan@kernel.org> wrote:
-> > > >
-> > > > On Thu, Oct 20, 2022 at 10:56:49AM -0700, Nick Desaulniers wrote:
-> > > > > +config DEBUG_INFO_UNCOMPRESSED
-> > > > > +     bool "Don't compress debug information"
-> > > > > +     help
-> > > > > +       Don't compress debug info sections.
-> > > > > +
-> > > > >  config DEBUG_INFO_COMPRESSED
-> > >
-> > > Also, I prefer...
-> > >
-> > > DEBUG_INFO_COMPRESSED_NONE
-> > > DEBUG_INFO_COMPRESSED_ZLIB
-> > > DEBUG_INFO_COMPRESSED_ZSTD
-> > >
-> > > Following...
-> > >
-> > > $ ld.lld-16 -v
-> > > Debian LLD 16.0.0 (compatible with GNU linkers)
-> > >
-> > > $ ld.lld-16 --help | grep compress-debug-sections
-> > >  --compress-debug-sections=[none,zlib,zstd]
-> >
-> > It's a good suggestion, though I deliberately did not modify the
-> > identifier used for the existing DEBUG_INFO_COMPRESSED.  No defconfigs
-> > set DEBUG_INFO_COMPRESSED explicitly, but I think one issue with
-> > changing the identifier of existing kconfigs is that upon upgrading to
-> > newer kernel sources, if you run `make oldmodconfig` if you previously
-> > had DEBUG_INFO_COMPRESSED=y, kconfig doesn't know that that option has
-> > been renamed to DEBUG_INFO_COMPRESSED_ZLIB so it would be silently
-> > disabled, and image sizes would increase due to uncompressed debug
-> > info. That seems developer hostile.
-> >
-> > Masahiro, what are your thoughts on how to proceed? Should I change
-> > the pre-existing Kconfig identifier, or "let sleeping dogs lie?"
->
-> Hi Masahiro,
-> What are your thoughts on the above?
+Currently running dtbs_check compiles and runs the DT checker on all
+enabled devicetrees against all dt-bindings. This can take a long time,
+and is an unnecessary burden when just validating a new devicetree or
+changes in an existing one, with the dt-bindings unchanged.
 
+Similarly to DT_SCHEMA_FILES for dt_binding_check, add a DTB_FILES
+variable that can be passed to the dtbs_check make command to restrict
+which devicetrees are validated.
 
-We renamed CONFIG options from time to time.
-We should strive to update in-tree defconfigs,
-but we did not care about external users very much.
-(we rely on "make oldconfig" showing new options
-and asking users for their choice.)
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
 
-So, I like Sedat's DEBUG_INFO_COMPRESSED_{ZLIB,ZSTD,NONE}.
-(and it is consist with CONFIG_INITRAMFS_COMPRESSION_*)
+---
+Usage example:
+make dtbs_check DTB_FILES='arch/arm64/boot/dts/mediatek/mt8192-asurada-spherion-r0.dtb arch/arm64/boot/dts/mediatek/mt8192-asurada-hayato-r1.dtb'
 
+ scripts/Makefile.lib | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index ec391c6a2641..f3ac6d3632a2 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -418,9 +418,16 @@ DT_CHECKER_FLAGS ?= $(if $(DT_SCHEMA_FILES),-l $(DT_SCHEMA_FILES),-m)
+ DT_BINDING_DIR := Documentation/devicetree/bindings
+ DT_TMP_SCHEMA := $(objtree)/$(DT_BINDING_DIR)/processed-schema.json
+ 
++ifeq ($(DTB_FILES),)
+ quiet_cmd_dtb =	DTC_CHK $@
+       cmd_dtb =	$(cmd_dtc) ; $(DT_CHECKER) $(DT_CHECKER_FLAGS) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@ || true
+ else
++SHOULD_CHECK_DTB = $(filter $@,$(DTB_FILES))
++
++quiet_cmd_dtb =	$(if $(SHOULD_CHECK_DTB),DTC_CHK,DTC) $@
++      cmd_dtb =	$(if $(SHOULD_CHECK_DTB), $(cmd_dtc) ; $(DT_CHECKER) $(DT_CHECKER_FLAGS) -u $(srctree)/$(DT_BINDING_DIR) -p $(DT_TMP_SCHEMA) $@ || true , $(cmd_dtc))
++endif
++else
+ quiet_cmd_dtb = $(quiet_cmd_dtc)
+       cmd_dtb = $(cmd_dtc)
+ endif
 -- 
-Best Regards
-Masahiro Yamada
+2.38.1
+
