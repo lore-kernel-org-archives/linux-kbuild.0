@@ -2,86 +2,82 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5C4C433FE
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 15:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC87FC433FE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 18:56:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbiKJPLO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Nov 2022 10:11:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
+        id S229561AbiKJS4B (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 10 Nov 2022 13:56:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiKJPLN (ORCPT
+        with ESMTP id S229547AbiKJS4B (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2022 10:11:13 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAA82654F
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 07:11:06 -0800 (PST)
-Received: from leknes.fjasle.eu ([46.142.49.48]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1M9WiK-1owQu42K3Q-005d7Q; Thu, 10 Nov 2022 16:05:28 +0100
-Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 774713C07B;
-        Thu, 10 Nov 2022 16:05:19 +0100 (CET)
-Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
-Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id 251116F8; Thu, 10 Nov 2022 16:05:18 +0100 (CET)
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-kbuild@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 2/3] MAINTAINERS: Remove Michal Marek from Kbuild maintainers
-Date:   Thu, 10 Nov 2022 16:04:24 +0100
-Message-Id: <20221110150425.164386-3-nicolas@fjasle.eu>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20221110150425.164386-1-nicolas@fjasle.eu>
-References: <20221110150425.164386-1-nicolas@fjasle.eu>
+        Thu, 10 Nov 2022 13:56:01 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D688C2EF3B
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 10:55:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=j8zW4X8+jmmeJrZnTccqwOqEYcCuAbdUJcwslYVxItc=; b=ahkWpF45s5OpT11G4uaobuvmOe
+        ZtQbyIWGKu18yli6Yf9J3zQRhvamUGFpIUAywdne33RKRpjB5bJa4T5S74eE/wZZeCUctxeBlpJ9e
+        PsChFiEbk2I4U81RQ3hZt2i+3TpCe+7MB6lHjebh/W6wjTB7ymHQii6xWqdzaMjp9Z5gwbeWLTeB/
+        DjJqRw7eS9EOlhij1SHX+0Z9baXEc9UnzP6Q66BNn1cm71zg0Ne0jDFNh+3qNUKniDVm5p6jCCZ7l
+        l8gmmYYcO2hbH131x5URU1iAMOPscfwQ9tLXTeV+h/iwVH4xFDmJhb8gPbpO436k50n94OUz1ynpE
+        FEKU8E0w==;
+Received: from [2601:1c2:d80:3110::a2e7]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1otCiL-008NTi-2Q; Thu, 10 Nov 2022 18:55:49 +0000
+Message-ID: <dfeb3422-a184-de5f-0e2a-0a1a233024ae@infradead.org>
+Date:   Thu, 10 Nov 2022 10:55:47 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5RQhQefduvxoNw3AEOOY3vCtE6E7WVpCA2t+wby+JXKbOIye6zA
- S7NcNVGlOkEfkbaO1NUWTs0TbS469UgEph/8grSIyliX4g/bbpi5A3SI1jTLAErceTSvznp
- KGDlqNoxW5wIdwp1wUFkp7Q8Ckr+a32g4zhjnIRsx7/u8GwuZc8K0klThWyQFg2CGAxGMCI
- TVO/DEuxbxZkmLfUlL4LA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:V1TH+1O40/M=:gecFQC0+IAj4SsT1nI2x9V
- /h0JeotrMUgAVmGXeE1GnCNn0aTrRuaaoLnsPcJklpQTcR8JYrFtZtoUQEzxX4KuneLde8w+P
- yGDsdLgupHv/mRHNU35zoRqt0QNxwcPb1HBZGj8fP0n1LmX0/2B7B1VLU8apIlVaAcsjV//Gv
- mV0A0XOypax0HJum7z8njUTBSp7Azg+0QSUyonoVI2ssx+jt5L6/W0qjEBbItCb1yaL5lVOMG
- fRP8465IxgdlJDhCeTit7uRqdtac5KyWxN5aWC2Zaq0O64ASyLEw5g4aFYYJKbdAFSyxWsmbk
- 2Htqyy54oi+8tFES9GZGjRnlAw11BDHO5OVCrH0Acl+Rnr0bFKfzJTwMDxPMOKFH/s3cVPOT9
- kHFatvaoVcmTmQzNx+aLeYDWcbHVE63HN/+fHcAh1U/r1otpINIxMVb3hR6NYEEXi81K9aTrN
- MqWEealZkya2PIxFCctP2b0+IqkJXOvhER1OgfWZjA3l/umTnzpEoGV614JPvNkXZ1pLSaHrl
- c27Wus1ujjHokrqgSmATNV9A7OADBAizbQbqH/3vETb03EIUV/juuvpu9y00BTBqO3JJfGvgn
- eUeok/ANVzkHtrnGSgdaAr08p057vw3OrZmR3YvIQdcqsFYt6JiqlkD+g8gNalReL9qSJJUXA
- +6HH8z5V+ZMZNPOvdV8j9UASwTzONgcTL5o6bKxjiQi/LwbOs1ajHLnWleIEY5HQ6HypZMfJa
- zu3WLNowRCNQt7u9VC1jt+AH7TUSuZepOlqHEesH3moqVvu0NCS584/YnZFi7EUWzxaICe1RZ
- 81iEGAw
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH 2/3] MAINTAINERS: Remove Michal Marek from Kbuild
+ maintainers
+Content-Language: en-US
+To:     Nicolas Schier <nicolas@fjasle.eu>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>
+References: <20221110150425.164386-1-nicolas@fjasle.eu>
+ <20221110150425.164386-3-nicolas@fjasle.eu>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20221110150425.164386-3-nicolas@fjasle.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Remove Michal Marek from Kbuild maintainers as there is response since
-October 2017.
 
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 61a6848192c5..45c88bb34b6b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11083,7 +11083,6 @@ F:	fs/autofs/
- 
- KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
- M:	Masahiro Yamada <masahiroy@kernel.org>
--M:	Michal Marek <michal.lkml@markovi.net>
- R:	Nick Desaulniers <ndesaulniers@google.com>
- R:	Nicolas Schier <nicolas@fjasle.eu>
- L:	linux-kbuild@vger.kernel.org
+On 11/10/22 07:04, Nicolas Schier wrote:
+> Remove Michal Marek from Kbuild maintainers as there is response since
+
+                                                       is no response since
+?
+
+> October 2017.
+> 
+> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 61a6848192c5..45c88bb34b6b 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11083,7 +11083,6 @@ F:	fs/autofs/
+>  
+>  KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
+>  M:	Masahiro Yamada <masahiroy@kernel.org>
+> -M:	Michal Marek <michal.lkml@markovi.net>
+>  R:	Nick Desaulniers <ndesaulniers@google.com>
+>  R:	Nicolas Schier <nicolas@fjasle.eu>
+>  L:	linux-kbuild@vger.kernel.org
+
 -- 
-2.37.2
-
+~Randy
