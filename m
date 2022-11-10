@@ -2,92 +2,94 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AED9C433FE
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 15:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39239C433FE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 15:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbiKJPGE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Nov 2022 10:06:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54482 "EHLO
+        id S229919AbiKJPGO (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 10 Nov 2022 10:06:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiKJPGC (ORCPT
+        with ESMTP id S229651AbiKJPGM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2022 10:06:02 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44CB91DF11
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 07:05:53 -0800 (PST)
+        Thu, 10 Nov 2022 10:06:12 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD2E1D67B
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 07:06:06 -0800 (PST)
 Received: from leknes.fjasle.eu ([46.142.49.48]) by mrelayeu.kundenserver.de
- (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1N7hrw-1p77Jw0axO-014jwP; Thu, 10 Nov 2022 16:05:30 +0100
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MQvGz-1ofAtz1WWV-00O2Tn; Thu, 10 Nov 2022 16:05:28 +0100
 Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 3B8113C1BC;
-        Thu, 10 Nov 2022 16:05:22 +0100 (CET)
+        by leknes.fjasle.eu (Postfix) with ESMTPS id D02EC3C1BA;
+        Thu, 10 Nov 2022 16:05:21 +0100 (CET)
 Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
 Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id 337A9974; Thu, 10 Nov 2022 16:05:18 +0100 (CET)
+        id 119126CE; Thu, 10 Nov 2022 16:05:18 +0100 (CET)
 From:   Nicolas Schier <nicolas@fjasle.eu>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 3/3] MAINTAINERS: Add linux-kbuild's patchwork
-Date:   Thu, 10 Nov 2022 16:04:25 +0100
-Message-Id: <20221110150425.164386-4-nicolas@fjasle.eu>
+Subject: [PATCH 1/3] MAINTAINERS: Add Nicolas Schier to Kbuild reviewers
+Date:   Thu, 10 Nov 2022 16:04:23 +0100
+Message-Id: <20221110150425.164386-2-nicolas@fjasle.eu>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20221110150425.164386-1-nicolas@fjasle.eu>
 References: <20221110150425.164386-1-nicolas@fjasle.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:+52nCadw1fAkswWJNUX0/wZ4Ufp7Okby+8Uv+6p/3XklQowDXq+
- FblQ/bL6fny3DxqsoU6vT0XF7A69Uri0EQTcclUKQda+2AAWxkAmCm2SQWRZgFPkMWGsI3c
- oUbJtDrMrmwVB2yQPBBnlEOcYKMrJOgqdas/1YUDP6cmdjI937O5ENXBN5h4od0GDtY+Pbk
- 8F+CwrtZ2zARHwVWGoH4A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sNIbWP8VOhA=:BBNpbcTYRfk+YRxXWLuHSx
- vRO+mqLdPeqptQmO58mBCBSAeklYx/27C5FuntxbPhUlRXr85O5vUTodfb239+xXDM53Jadyc
- YzaG+EMRWhP8lJm9wBw7wm0etVDTsPTcK0aZCc3ld2mB5UTdCod4IEm9Yu8tDysddlUZdKfms
- MoJNRMR5WZj1GMB0La+YF1K85EGlUNqQardD5jnkCa0fw69REw/xpChoS4XCCLZNbpgXQw4bz
- sqwlVmn/AB49QJbfocTfz4TRDWtfPHFMfyWGrcr71z/H0GVzOUC5FitTABLENCrqu1sFKroq/
- 4CX8S2n6/huAfkr0aFNQfEu9xEVkLp172Y7mnNGsx10Ap58s7vPeEwol2vZky8Qk3eFZ+0Ltq
- jrXinp/naCpZkwkc8O7NTwUxTVJ92U9WIuRzAD+/pHDvWiufxx0QLu15oOE1YdgIrK6/pnd03
- MIp9lJNY+fqR4nplRs0E45xVb7omcfDcz/ha0MI/lnn+MEkZhIWoDWUAOJxR7gq8i5r5bjIca
- zt4mPATSs+0eFp6zqxD45g3cL344l5oRyzj9MZFIXmlDfEgg618Pikc9IywTqaFH7RwKYdng0
- /iBrn0eDeA0rPDk3k1NUjxVm3r+H9MHeThWeZx4wt4eruALTkFqeAzqQskbXpPLJ3nAhvQVAs
- 4ii6icR+6Pc0qvmdrKNt3q9nYlxuPgpZOWEAUXNvmK11gg4IXYI+S7XAbImC78SmFxLK9T3Bm
- bhgTcX42mKl2whzoLJYzIK13KDNuptjMyJMQYrAdHNofzW1vlPBhrQ7OZmZ5geAcD33/NqvnX
- Z/vsn+r
+X-Provags-ID: V03:K1:tUMni6PAgwQ60hQFfsW/++EG1GidmMFTTKvrRpUtRdKAcOu/GOg
+ oOjWAdY3gCo1MHm5V5Mp7alZ/xDaNak/B+aAcUKJU/ZMpu8KIiDyGejH4OFU+A7IHExKa2D
+ E15gSLJ7T31G42x+cm7C1TotqcCtItO3KPf4QG+r+8c2y8+hStQuJ/eRnvG15toMBrgyEKy
+ pjyBkcpr8f+cIFQatSruw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9CBd+omlYUI=:0KRZTgWscCg5NU6FUfntiq
+ P0CT8i8DqHn3NH9KxkfnB+DXLzssnYYO/a0tY/lJc88jH8u2aRxUzPsKawMFQ7Z6g0gk8piEC
+ wZ4+m5EftPomzDNHIu3frM6kyc3ff/zuGUr0PG8tSfKzikcclrtjPMBjJJJbnzCNz4QZXuiTM
+ 86gU/1COdPet6AkJB1NZEneO76Vy00McYG9+RrHjl+ZjKe5LpegNuUOJ3UTXANpMEVasDaeTk
+ aEpBproWikxzcE3G/PtAAgoBRCoVdWNQ6P38jO+DzJxMVRFUC0dLrF7AI6cH/XYTtpc0ZEEFU
+ sYV07HS0sGfPtzm9iBhyQP5gFRICVy7MR1NcxGkILR7UVMLyfWjadOfEy+/eE+4DbHnLQJNgM
+ y+qMzqUfy26hPTAY6s0gbroLz3AMeyamBleqEmsRviHXV4RSn8gssruMwD0sGn/lyIvraUGDk
+ BENfRqPwa25zyetRczhWhVjJVZijLS3dRseTqQANmyvEmmGlyvb32To0Y7LUEWWOhA3wKUzgU
+ zqBGVvGgHCwPIzRkrAVwOPSPEzRQ13J/vlvICgpOWVrFf/xbDek0RSsTdQ623w07W9Oo559zD
+ oSn2z2nZTY+bQPs0LZYHeAf4AM1Ler9I77QbkcBVvx517B3K+g8Ql6RN5VKa6ybiHUGUZsxEO
+ IEVaRGnL7xmdeMCi3/d7ncRJFOVejvrh4wx3S132rkMEPij2DWtfIoHo0ziWtbFTFfBs4cf/R
+ T5rdPwEhqt7W5l1nB3y1VeXZenQgkTScdEq1LknDqSNVYWTpMIItDMZLwLKcLSztfBnfm8hHV
+ PU3iAxBrKo9o/rRbCTB7E43qFhTE2XNjHf8GnltO6AXLuepST4MHV21pXuo4gFXvZ2pFSUzSC
+ Hh9WN/7/4R9Ob37zrPJyRzHLSfmyQQ3ub1M1aBxAWVxKi5Gu1SEFH20pTgTaawO/2wUNszvl1
+ kEsA15hsdBURVnhGpf1XKTuyxHt9m8wIwLR0DSSQadStNc6NWynF5h0Jc2k185itHQYYRiioV
+ 1usG5SaauJxL6DpImQ+bHe7wKNVNr1yOue45rc6hrkqZPnSMlugdfW/eE03AeS1uJ/cLvN+Ce
+ 8WzOXEqhKxUVKcEC8cirVjSxLAnkrPEq+2gJvS3I0TwwBM1VUvC7wW5cJPAlz0vtn0KLivWVR
+ ezda3Q/7W7VojmtR37FMGVEXyQP4Jap/IR+WHaM9e/Akidy+2slqPXDKTGK85M+oDQRIuTghO
+ C/NUgqWnUWpm5QbFC28IlExNhIZ1RertuUeInLN7GEWaf9CTCf51yOY3jWyzgdxYPyFA1A8Nt
+ Iu/VTnGP
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Add patchwork URL for Kconfig and Kbuild.
+As suggested by Nick, add myself to Kbuild reviewers since I have been
+reviewing patches for some time.  Citing from Nick's commit 36f1386d34120:
+"I still have a long way to go in terms of mastery of GNU make, but at the
+least I can help with more code review."
 
 Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
 ---
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 45c88bb34b6b..b031b52e32a2 100644
+index cf0f18502372..61a6848192c5 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -11026,6 +11026,7 @@ KCONFIG
+@@ -11085,6 +11085,7 @@ KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
  M:	Masahiro Yamada <masahiroy@kernel.org>
+ M:	Michal Marek <michal.lkml@markovi.net>
+ R:	Nick Desaulniers <ndesaulniers@google.com>
++R:	Nicolas Schier <nicolas@fjasle.eu>
  L:	linux-kbuild@vger.kernel.org
  S:	Maintained
-+Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig
- F:	Documentation/kbuild/kconfig*
- F:	scripts/Kconfig.include
-@@ -11087,6 +11088,7 @@ R:	Nick Desaulniers <ndesaulniers@google.com>
- R:	Nicolas Schier <nicolas@fjasle.eu>
- L:	linux-kbuild@vger.kernel.org
- S:	Maintained
-+Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
- F:	Documentation/kbuild/
- F:	Makefile
 -- 
 2.37.2
 
