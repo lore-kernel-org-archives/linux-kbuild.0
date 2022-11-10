@@ -2,82 +2,92 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E72C4332F
-	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 15:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AED9C433FE
+	for <linux-kbuild@archiver.kernel.org>; Thu, 10 Nov 2022 15:06:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbiKJPGD (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 10 Nov 2022 10:06:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54484 "EHLO
+        id S230084AbiKJPGE (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Thu, 10 Nov 2022 10:06:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229651AbiKJPGC (ORCPT
+        with ESMTP id S229919AbiKJPGC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Thu, 10 Nov 2022 10:06:02 -0500
-X-Greylist: delayed 66228 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Nov 2022 07:05:52 PST
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD02E1D67B
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 07:05:52 -0800 (PST)
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44CB91DF11
+        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2022 07:05:53 -0800 (PST)
 Received: from leknes.fjasle.eu ([46.142.49.48]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MYvTy-1oXEXQ1WGO-00UsGx; Thu, 10 Nov 2022 16:05:28 +0100
+ (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1N7hrw-1p77Jw0axO-014jwP; Thu, 10 Nov 2022 16:05:30 +0100
 Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 218153C1BB;
+        by leknes.fjasle.eu (Postfix) with ESMTPS id 3B8113C1BC;
         Thu, 10 Nov 2022 16:05:22 +0100 (CET)
 Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
 Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id 079FF5B7; Thu, 10 Nov 2022 16:05:18 +0100 (CET)
+        id 337A9974; Thu, 10 Nov 2022 16:05:18 +0100 (CET)
 From:   Nicolas Schier <nicolas@fjasle.eu>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     linux-kbuild@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 0/3] MAINTAINERS: Update Kbuild and Kconfig entries
-Date:   Thu, 10 Nov 2022 16:04:22 +0100
-Message-Id: <20221110150425.164386-1-nicolas@fjasle.eu>
+Subject: [PATCH 3/3] MAINTAINERS: Add linux-kbuild's patchwork
+Date:   Thu, 10 Nov 2022 16:04:25 +0100
+Message-Id: <20221110150425.164386-4-nicolas@fjasle.eu>
 X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20221110150425.164386-1-nicolas@fjasle.eu>
+References: <20221110150425.164386-1-nicolas@fjasle.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:JuY3yvHdtM7QR8fYxwRpeaQUFvMe6B3wYeiiAyafHPXkI/+GFeI
- +6Anyi4IJ/L3rDMKp6Z3xF12Wq7bezR406xQvqDlLPTFufF7Ia6alaa+OUE19WR27Bc6W/W
- fq4IVJSXGK6Bip0v4gi7mx6Tdcuccr6YrT5ApJGdLMQhzo6pD+uvM7/daNB0XjMwnXHG9Xr
- 6Afd4WQV11djFqPIq4qKw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8oERaB42C8U=:sFT8txsK4iZb6zAQf531Ua
- 5Z9ybJcZeT8nZk1ycrz/gbAlPe6jWwwvIQKphqvqxQVi4luuThkWN3ObDGSvKQadm3l1EegGk
- 3+a1cq8pwmmrxY8oat4/imH64PpE2oUVMmiWrxrpKlIQRMwASE6D3a1V6ehkkf8QsDFBo071X
- HGWJCu8oWmRFaWsGFCRltVNO4dTFkyeG/CH0LBEsMN1dBH/oSuh2pfp2dLfMkw1J3sVLwhpmP
- bqblBaKYLS+kfpXLeHJqngXY4BcVBIW+1iH/Q9k9+qzZlXid8AYZTiV1O6S6bdkpbZ3zxSxOc
- pHKd/+6jM5RcexJ7IJW4wF4r0FZI2SrlETTve5LmRythPmESGQAdfk4tvlRR2v7d6tKWYmxSx
- JdCQZbF00BnjGoClf1uzOAmMDJYuVKSrbWRAWIIXpk29RKuiIdGRoo9hzO9McMLF/ba0eqQ00
- iBqxrJ0CdAwMmsUC3tK2Dat8bg1cPSLdTBCmPfb8G5Vl8cLN3ItiksHcUf/iNoV9My55H0cyb
- oOUfUZfG584sA0s6uVpZ0UdEHJeF2/e8ODJ6uztP9toMLYUTwYGT5nCq1S3SrR2FXSjGdtomS
- mT70LCAqxLsbQ8UjGEIUtK0FwtFrhtjQ7k6sSuvsFIoWDmgVz7uABHib4zde+ptDIyfXF3lQ1
- l30qUB2m+wE7UHhimMprXtNXlCSJafeBqbVPWIgjhgbhgrGwcrUbBK9OdYlOtrPawdNtePhlt
- uMHks5WN0/yG8/5M40DnBrAHXgwidWRzK6EQ4KOriQStNU9mlqEBsgnhdnXn7UbpjHrxPXy7y
- G7FQXTOddzK1oYzE0wwf8UATI8AT2E42T4o4vsG6Qka0KddmvlDBZUVvDhG6L3S9BBMuPxg1g
- y3dMxjpvM5h7LBqNihO1HhQx1lqN/bd/ZmjaQURRvix405/cft9UDqfe5pBSSKqs6THL3c1Tz
- b95MlTa56SfLeEGv2daIrnLapMmg1KHzPP2iwVLpANIQ2K7YWiyeyvPGTsTMdtPd+3v8LJ6kx
- 0UZkCAoB3E+NrxuY0nF35FQgalXO1wfnVd4FcZ8hy+iBaF9ycOG+Bc2ftoA4wIKQ/zBatdxd4
- l2WM2cyk6uZB4BdZY+bmGzgzNp0fJQXRWY6EgKq9R5TFe1owrblMh0gzZifNyu7EOemWLGDV/
- k4SlIDQkiHnV47XttjzPEaAkzCCeaMvdoewhhxO1n0w5QBUtrHasIEFDUv8Y3NGdoJnE/SctB
- u6f7M4gYJRxm+Z67y5BQmY3FDRwY+pe0SpPSCnYtVjG+MufkUxusawGKDoZLJoCTZ8ZUtC6+3
- 7aB0pZTx
+X-Provags-ID: V03:K1:+52nCadw1fAkswWJNUX0/wZ4Ufp7Okby+8Uv+6p/3XklQowDXq+
+ FblQ/bL6fny3DxqsoU6vT0XF7A69Uri0EQTcclUKQda+2AAWxkAmCm2SQWRZgFPkMWGsI3c
+ oUbJtDrMrmwVB2yQPBBnlEOcYKMrJOgqdas/1YUDP6cmdjI937O5ENXBN5h4od0GDtY+Pbk
+ 8F+CwrtZ2zARHwVWGoH4A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:sNIbWP8VOhA=:BBNpbcTYRfk+YRxXWLuHSx
+ vRO+mqLdPeqptQmO58mBCBSAeklYx/27C5FuntxbPhUlRXr85O5vUTodfb239+xXDM53Jadyc
+ YzaG+EMRWhP8lJm9wBw7wm0etVDTsPTcK0aZCc3ld2mB5UTdCod4IEm9Yu8tDysddlUZdKfms
+ MoJNRMR5WZj1GMB0La+YF1K85EGlUNqQardD5jnkCa0fw69REw/xpChoS4XCCLZNbpgXQw4bz
+ sqwlVmn/AB49QJbfocTfz4TRDWtfPHFMfyWGrcr71z/H0GVzOUC5FitTABLENCrqu1sFKroq/
+ 4CX8S2n6/huAfkr0aFNQfEu9xEVkLp172Y7mnNGsx10Ap58s7vPeEwol2vZky8Qk3eFZ+0Ltq
+ jrXinp/naCpZkwkc8O7NTwUxTVJ92U9WIuRzAD+/pHDvWiufxx0QLu15oOE1YdgIrK6/pnd03
+ MIp9lJNY+fqR4nplRs0E45xVb7omcfDcz/ha0MI/lnn+MEkZhIWoDWUAOJxR7gq8i5r5bjIca
+ zt4mPATSs+0eFp6zqxD45g3cL344l5oRyzj9MZFIXmlDfEgg618Pikc9IywTqaFH7RwKYdng0
+ /iBrn0eDeA0rPDk3k1NUjxVm3r+H9MHeThWeZx4wt4eruALTkFqeAzqQskbXpPLJ3nAhvQVAs
+ 4ii6icR+6Pc0qvmdrKNt3q9nYlxuPgpZOWEAUXNvmK11gg4IXYI+S7XAbImC78SmFxLK9T3Bm
+ bhgTcX42mKl2whzoLJYzIK13KDNuptjMyJMQYrAdHNofzW1vlPBhrQ7OZmZ5geAcD33/NqvnX
+ Z/vsn+r
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Update MAINTAINERS by adding myself to Kbuild reviewers and removing emeritus
-maintainer.  Further, add the missing patchwork URLs for Kconfig and Kbuild.
+Add patchwork URL for Kconfig and Kbuild.
 
-Nicolas Schier (3):
-  MAINTAINERS: Add Nicolas Schier to Kbuild reviewers
-  MAINTAINERS: Remove Michal Marek from Kbuild maintainers
-  MAINTAINERS: Add linux-kbuild's patchwork
+Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
- MAINTAINERS | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 45c88bb34b6b..b031b52e32a2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11026,6 +11026,7 @@ KCONFIG
+ M:	Masahiro Yamada <masahiroy@kernel.org>
+ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
++Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git kconfig
+ F:	Documentation/kbuild/kconfig*
+ F:	scripts/Kconfig.include
+@@ -11087,6 +11088,7 @@ R:	Nick Desaulniers <ndesaulniers@google.com>
+ R:	Nicolas Schier <nicolas@fjasle.eu>
+ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
++Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+ F:	Documentation/kbuild/
+ F:	Makefile
 -- 
 2.37.2
 
