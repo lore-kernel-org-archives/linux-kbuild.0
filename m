@@ -2,150 +2,95 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E009C43217
-	for <linux-kbuild@archiver.kernel.org>; Fri, 11 Nov 2022 21:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 522E5C43217
+	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Nov 2022 08:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234058AbiKKVGM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 11 Nov 2022 16:06:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
+        id S234696AbiKLIKb (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 12 Nov 2022 03:10:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233842AbiKKVGK (ORCPT
+        with ESMTP id S230170AbiKLIK3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Nov 2022 16:06:10 -0500
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA55783B94;
-        Fri, 11 Nov 2022 13:06:09 -0800 (PST)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 2ABL5L2W124440;
-        Fri, 11 Nov 2022 15:05:21 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1668200721;
-        bh=qZUp0LgToCdeKTOa83YyPSwidLhs3SutcFlXMmeJ5+g=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To;
-        b=Nk8BC8B1RQkKSHbYNSEtNECGVu6W9yYKEsbJ5eKqzvUZUtARwYEG5mLRuPbdqrKdC
-         uXMqSarIdMkG6TVr2dRZER9MRDGmXwVVXOLlAsKiIzX31SKCg0VyOpheMf7fW6U0s4
-         hoYQs4/YNUoKusjtgFgBMYtuHQB50mat3wigoFbE=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 2ABL5Lv2092391
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 11 Nov 2022 15:05:21 -0600
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6; Fri, 11
- Nov 2022 15:05:20 -0600
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.6 via
- Frontend Transport; Fri, 11 Nov 2022 15:05:20 -0600
-Received: from [128.247.81.39] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 2ABL5K5I066401;
-        Fri, 11 Nov 2022 15:05:20 -0600
-Message-ID: <e5ce57b2-4557-2dcb-fb3a-71e2acae4502@ti.com>
-Date:   Fri, 11 Nov 2022 15:05:20 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v2 0/7] Rename DTB overlay source files
-To:     Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Rob Herring <robh+dt@kernel.org>
-CC:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>,
+        Sat, 12 Nov 2022 03:10:29 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D8EDF84;
+        Sat, 12 Nov 2022 00:10:19 -0800 (PST)
+Received: from leknes.fjasle.eu ([46.142.96.85]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MtOT0-1p7ahU0wSU-00upPz; Sat, 12 Nov 2022 09:07:26 +0100
+Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by leknes.fjasle.eu (Postfix) with ESMTPS id B90403C0CA;
+        Sat, 12 Nov 2022 09:07:23 +0100 (CET)
+Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
+Received: by localhost.fjasle.eu (Postfix, from userid 1000)
+        id 2AB5D974; Sat, 12 Nov 2022 09:07:22 +0100 (CET)
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>
+Cc:     Nicolas Schier <nicolas@fjasle.eu>, linux-kbuild@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        <devicetree@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        <linux-renesas-soc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20221024173434.32518-1-afd@ti.com>
- <CAL_JsqJxgVwsjKnkCEkZeoSsDgaRD+DVPkHRBc2SrcSq69PBNw@mail.gmail.com>
- <Y26lDEtiG4KFzc91@smile.fi.intel.com>
-Content-Language: en-US
-From:   Andrew Davis <afd@ti.com>
-In-Reply-To: <Y26lDEtiG4KFzc91@smile.fi.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v2 1/3] MAINTAINERS: Add Nathan and Nicolas to Kbuild reviewers
+Date:   Sat, 12 Nov 2022 09:07:15 +0100
+Message-Id: <20221112080717.17914-2-nicolas@fjasle.eu>
+X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20221112080717.17914-1-nicolas@fjasle.eu>
+References: <20221112080717.17914-1-nicolas@fjasle.eu>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:yKj3ZP75Gdj5YImIX6eR/DV7AIoyVVngCfnzPfMP29FALDHNzL/
+ rBKQaLB+I8TufxOStiBMCzVf1EUPSejmuOKK3hbJbsqRUlOexQdvZcwx3vLKB00Q9j0c/kK
+ I7U2ZQQHx+qSVWoveu72UM0vrczAn5AaBHIoLt1lqKrLugnXzqvbY8d7pO5YAAhjyCJHHVo
+ wq9g7La2g0OFtXc0GoA8w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CRxcBf8k/s4=:XOaSSCAfq8gZ0g+rQrF2PZ
+ cs923H5tnBTKLYoFpUMvsYypTY3sZSJrFlJaWHOPtWaT4y1VZ5TYsS2rumJp4jraSbjixHRqr
+ u1rmhR/8M9xwHqz82APlXGVFMpTzm2PQwAilBhOKgx7YGQEswqNJ+MKwkFdSEE5n1kF86Qf90
+ 9siN6WkvHzMiPMSKjve8+szskjO2D3d70f6/Nahw4cP6GstOVYrR1lZm5YgACjaidl5S3Bm4M
+ 568vTAdOPFtovXKCyIT1P41K9/0zPKtQkZuNhRuWLrxOTBTGYdcmy8SrxAU3s1tgNUq10JKOp
+ PuIE+7cpdQITXh03+15dCYlLt9ERqcQhOytV5w0aS0jD/1wcwrehsknhNpzOD8f0QKLlcyjqY
+ KiIbxR3ABxfT5JoDkOU09TxuLJDGJHCCFqdo4ET/lW9N/blpJEOhLdLZhgEtiJgzrUWchmyGO
+ Olojip0+TnfqF/WfGy1dbhPRKNUTQ+aWOEYJsz4AC3yOawKRpEj0jCY/s74UTONl4LuLGP/Ok
+ 2mM9CabI2ISr8rmBJb4r0sYW4YhFChdegAfwQJ0MmIs5XDxHMO/4StMMP2VUY9cE0ZdjZFgNt
+ wfCcXY6GZA8q9UfRtEH7Y7Y07cGDWO9UNvt5bWpBCW/4aFm8+7K00LSyu9wqYa/vESf6Wul5y
+ NQxkI17spz4M1BtNQh3zHlNS9Xivcv+UK3NJZ+x+PBu3V3Cx/NMJ5a4KX3ydkODC7cUyrrXfn
+ BADFgoCVudIM2zLLKWnK1F8XC4oOLi90UNaCsNhr3FDEriPvszFl3ZnXVzyGRhv+AM4o/1ocw
+ LlHxm+B
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On 11/11/22 1:39 PM, Andy Shevchenko wrote:
-> On Wed, Oct 26, 2022 at 09:11:21AM -0500, Rob Herring wrote:
->> On Mon, Oct 24, 2022 at 12:34 PM Andrew Davis <afd@ti.com> wrote:
->>>
->>> Hello all,
->>>
->>> This is a series based on my patch here[0]. As suggested by Rob
->>> I've resurrected Frank's patch and appended it to mine as a series.
->>>
->>> First patch here is my original patch, 3rd is Frank's patch but with
->>> the unittest changes pulled out into the 2nd patch. That was re-worked
->>> moving the source building macro into scripts/Makefile.lib.
->>>
->>> Patches 4, 5, and 6 are an attempt at renaming all the existing DTB
->>> overlays. Split out by platform so they could be taken by platform
->>> maintainers or if easier ACK'd here and taken all together.
->>>
->>> This should cover all the DTB overlays so we can remove the old .dts
->>> rule for overlays and make .dtso the only supported way, let me know
->>> if we want that this cycle and I can post that too.
->>>
->>> Thanks,
->>> Andrew
->>>
->>> Changes from v1[1]:
->>>   - Added patch to rename pi433 overlay.
->>>   - Cleaned wording on patch 4-6.
->>>   - Collected some ACKs
->>>
->>> [0] https://www.spinics.net/lists/kernel/msg4548509.html
->>> [1] https://www.spinics.net/lists/arm-kernel/msg1020165.html
->>>
->>> Andrew Davis (6):
->>>    kbuild: Allow DTB overlays to built from .dtso named source files
->>>    kbuild: Allow DTB overlays to built into .dtso.S files
->>>    arm64: dts: freescale: Rename DTB overlay source files from .dts to
->>>      .dtso
->>>    arm64: dts: renesas: Rename DTB overlay source files from .dts to
->>>      .dtso
->>>    arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
->>>    staging: pi433: overlay: Rename overlay source file from .dts to .dtso
->>>
->>> Frank Rowand (1):
->>>    of: overlay: rename overlay source files from .dts to .dtso
->>
->> I've applied patches 1-3 and 7. I'll send a PR for the branch to the
->> platform maintainers after a few days in linux-next.
-> 
-> The patch
-> 
-> commit 941214a512d8c80d47e720c17ec17e8539175e93
-> Author: Andrew Davis <afd@ti.com>
-> Date:   Mon Oct 24 12:34:29 2022 -0500
-> 
->      kbuild: Allow DTB overlays to built into .dtbo.S files
-> 
-> broke the build reproducibility / no-op builds.
-> 
-> Before:
->    2+ execution of `make` on non-changed tree did nothing
-> 
-> Now:
->    Each run of `make` (even without a single bit changed) restarts vmlinux
->    rebuild.
-> 
-> Please, revert or fix.
-> 
+As suggested by Nick, add Nathan and myself to Kbuild reviewers to share more
+review responsibilities.
 
-I do not see this behavior. What config are you using?
+Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
+Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Nathan Chancellor <nathan@kernel.org>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Not sure how this patch could be the root cause, it only adds
-a build target/rule, but doesn't actually use it anywhere yet..
+Changes since v1:
+  * Also add Nathan to Kbuild reviewers (Nick, Nathan), and update commit msg
 
-Andrew
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cf0f18502372..f37c6a9a8fac 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11084,7 +11084,9 @@ F:	fs/autofs/
+ KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
+ M:	Masahiro Yamada <masahiroy@kernel.org>
+ M:	Michal Marek <michal.lkml@markovi.net>
++R:	Nathan Chancellor <nathan@kernel.org>
+ R:	Nick Desaulniers <ndesaulniers@google.com>
++R:	Nicolas Schier <nicolas@fjasle.eu>
+ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+-- 
+2.37.2
+
