@@ -2,119 +2,67 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D1CC433FE
-	for <linux-kbuild@archiver.kernel.org>; Sat, 12 Nov 2022 08:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4205CC433FE
+	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Nov 2022 09:34:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234840AbiKLIKz (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 12 Nov 2022 03:10:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37844 "EHLO
+        id S235177AbiKMJez (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 13 Nov 2022 04:34:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234815AbiKLIKt (ORCPT
+        with ESMTP id S229753AbiKMJey (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 Nov 2022 03:10:49 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA50C13EAE;
-        Sat, 12 Nov 2022 00:10:36 -0800 (PST)
-Received: from leknes.fjasle.eu ([46.142.96.85]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1N3bb3-1p1qaI2IuR-010eZK; Sat, 12 Nov 2022 09:07:29 +0100
-Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 9585F3C1B9;
-        Sat, 12 Nov 2022 09:07:24 +0100 (CET)
-Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
-Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id 3DC2DB98; Sat, 12 Nov 2022 09:07:22 +0100 (CET)
-From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Michal Marek <michal.lkml@markovi.net>
-Cc:     Nicolas Schier <nicolas@fjasle.eu>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v2 2/3] MAINTAINERS: Remove Michal Marek from Kbuild maintainers
-Date:   Sat, 12 Nov 2022 09:07:16 +0100
-Message-Id: <20221112080717.17914-3-nicolas@fjasle.eu>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20221112080717.17914-1-nicolas@fjasle.eu>
-References: <20221112080717.17914-1-nicolas@fjasle.eu>
+        Sun, 13 Nov 2022 04:34:54 -0500
+Received: from jari.cn (unknown [218.92.28.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5D8BFD49;
+        Sun, 13 Nov 2022 01:34:53 -0800 (PST)
+Received: by ajax-webmail-localhost.localdomain (Coremail) ; Sun, 13 Nov
+ 2022 17:29:50 +0800 (GMT+08:00)
+X-Originating-IP: [182.148.14.167]
+Date:   Sun, 13 Nov 2022 17:29:50 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   wangkailong@jari.cn
+To:     masahiroy@kernel.org, michal.lkml@markovi.net,
+        ndesaulniers@google.com
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] kbuild: fix array_size.cocci warning
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT6.0.1 build 20210329(c53f3fee)
+ Copyright (c) 2002-2022 www.mailtech.cn
+ mispb-4e503810-ca60-4ec8-a188-7102c18937cf-zhkzyfz.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:WO3DCxb0hdBXsNQ31xVKOyKez8GzzcPHRi4+LZXfD1IZm+P4CZT
- UCPKqzPbUbQpkcI7T+msxUnVeuAjRu1xScMm01NItbPlAxcEJR7O7ICNkYpst9xfo5UT8xe
- SqkDNilULCCQ0mp9/sKD5Q9MfwWhZ2GwygBrYVvs8lv5xIFb3b7DSsZi28EpPudRS2svpI1
- 7nHk4QWOVxHZnCLO0lpVQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tdMunISeB5M=:KCWYiNNHQ/gYXCYerQ1jSn
- sYw4W3UUs1eQTYW7K9yXymk4aLMuKDmGnL4edJc/fgBN1kLEjG/sjkaXcATM2vupY+f8TSF9v
- SPoMSreN/J72QvjJfT0SWSqLHfgm9pcdYrRAQPTo7wFqBrEu6iEPsanr6FnRn9jGoQqLazNbs
- YxRKSk7/XZK1GARne+065b/wSCmIhR6+WXqVX83b1Gy+qp6u0DGG2OVhA3XRUxFXm2zNYvCOj
- m598adZAdL1HJyPYe8/2ao+UcMKNO5S53GY3WnljAWtoW2LilzIb2B5XB4XL8vQb+NVF1uwls
- CVduUgnuajTiLo4bPGxApJvNJszY2a4GKBaHyz0t5iqCngfSonGFnovQVxT0S/i2oiNorkw/f
- 8XrmHZ4nYBF7iZ9n8lFmHDPwTgS6YZ9j3GPfeKdphIlkH5pKHH38RtBxobB8Er56gsyJxx8Cn
- Pdy4g/Kdpze8NDtgYDgvXcb8zEfOS53ZmK8vmnICXmZZgE9M0KFzcbDdrlL8owOMdYAZaA9hY
- JXmJJsB8lQN5WukqHO527/E+2OSMgKBJOl22x18IdbCYFgCGeQXTeeu81Em0AEnGmKRGGLsLE
- 351ub0boZqNb1aNecAYK7vKUUXzM0VetSvbUrK5BmVWP6DuEQMeng2fu6eVBNRy23rlYS+uEG
- cqE+ife8xnXZsPXDm99ssGognvBvTTm9nzaMMrYa7tSiIW9IHxZ6qRbEemIuXIkdD9AqqPbeh
- +cuJLfCnFDGkmEAFytamQDJLOP4wCB+qanYwCY7IimTRAry4fXL5/Z4rTC8nDYJTVh9dWmmIL
- 14ZClM+7/dmJURariEwB3uzBzpWVUnIp6hgLFi/A2WVl750f2nr2ecq4lx0M2I00d9m0euvoE
- WpHY2BzaqGE3fqUl0F8kFpUxMWA+7yHodwsT9n2cr8lciuWVFrW92JbvD66QiyXJ/IELBAB+L
- sRPeacPMFi64+vw52vwzeyz2vCWmU2yGubHE9A5pEPARi07KFZx+vI12t4OvKkNXck7QKkURq
- uifLbykgx5GS+EY4r/jdEB0EYtm5I23TmCRrWikTQhpNdFxxFAXYORDihkLPr3eox47sT9Tcb
- j/BMWXHmXD2Hy21p0GnAmIfjq3mTuU21fkfJWc5q7v4n8MMTRT+oeXxJXff4H1JR+j6S7V1rH
- 2F0oFJEs0+OaV4nfcPQQBsxtwgTLZ30gm5NsYKfkzvD13+ckTJym9T1Vf8sKfYoOUJYBCROMM
- au1pd2xQK6ML71237udgKKoiYlsgzle0mDuhZSZyKQJkhJ/RjzAEnf2XTk1kJ/LxQRaLaEbig
- NhLou8pKFjkHbBbyV5FbYYJlsPjzPg==
+Message-ID: <4d274d11.12d.1847052e009.Coremail.wangkailong@jari.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: AQAAfwB3jOIOuXBjwBoDAA--.79W
+X-CM-SenderInfo: 5zdqwypdlo00nj6mt2flof0/1tbiAQAEB2FEYx0DfwATs2
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Remove Michal Marek from Kbuild maintainers as there is no response from him
-since October 2017.  Add an entry for Michal in CREDITS.
-
-Michal, thanks for maintaining Kbuild for almost eight years!
-
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Michal Marek <michal.lkml@markovi.net>
-Signed-off-by: Nicolas Schier <nicolas@fjasle.eu>
----
- CREDITS     | 4 ++++
- MAINTAINERS | 1 -
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-Changes since v1:
-  * Add missing 'no' to commit msg (Randy)
-  * Add CREDITS entry for Michal (Nick)
-
-diff --git a/CREDITS b/CREDITS
-index 1841184c834d..1606f1ad29b4 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -2447,6 +2447,10 @@ S: 482 Shadowgraph Dr.
- S: San Jose, CA  95110
- S: USA
- 
-+N: Michal Marek
-+E: michal.lkml@markovi.net
-+D: Kbuild Maintainer 2009-2017
-+
- N: Martin Mares
- E: mj@ucw.cz
- W: http://www.ucw.cz/~mj/
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f37c6a9a8fac..48e45633b223 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11083,7 +11083,6 @@ F:	fs/autofs/
- 
- KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
- M:	Masahiro Yamada <masahiroy@kernel.org>
--M:	Michal Marek <michal.lkml@markovi.net>
- R:	Nathan Chancellor <nathan@kernel.org>
- R:	Nick Desaulniers <ndesaulniers@google.com>
- R:	Nicolas Schier <nicolas@fjasle.eu>
--- 
-2.37.2
-
+Rml4IGZvbGxvd2luZyBjb2NjaWNoZWNrIHdhcm5pbmc6CgpzY3JpcHRzL21vZC9zdW12ZXJzaW9u
+LmM6MjE5OjQ4LTQ5OiBXQVJOSU5HOiBVc2UgQVJSQVlfU0laRQpzY3JpcHRzL21vZC9zdW12ZXJz
+aW9uLmM6MTU2OjQ4LTQ5OiBXQVJOSU5HOiBVc2UgQVJSQVlfU0laRQoKU2lnbmVkLW9mZi1ieTog
+S2FpTG9uZyBXYW5nIDx3YW5na2FpbG9uZ0BqYXJpLmNuPgotLS0KIHNjcmlwdHMvbW9kL3N1bXZl
+cnNpb24uYyB8IDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
+dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zY3JpcHRzL21vZC9zdW12ZXJzaW9uLmMgYi9zY3JpcHRz
+L21vZC9zdW12ZXJzaW9uLmMKaW5kZXggNmJmOWNhY2EwOTY4Li4zMTA2NmJmZGJhMDQgMTAwNjQ0
+Ci0tLSBhL3NjcmlwdHMvbW9kL3N1bXZlcnNpb24uYworKysgYi9zY3JpcHRzL21vZC9zdW12ZXJz
+aW9uLmMKQEAgLTE1Myw3ICsxNTMsNyBAQCBzdGF0aWMgdm9pZCBtZDRfdHJhbnNmb3JtKHVpbnQz
+Ml90ICpoYXNoLCB1aW50MzJfdCBjb25zdCAqaW4pCiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBtZDRf
+dHJhbnNmb3JtX2hlbHBlcihzdHJ1Y3QgbWQ0X2N0eCAqY3R4KQogewotCWxlMzJfdG9fY3B1X2Fy
+cmF5KGN0eC0+YmxvY2ssIHNpemVvZihjdHgtPmJsb2NrKSAvIHNpemVvZih1aW50MzJfdCkpOwor
+CWxlMzJfdG9fY3B1X2FycmF5KGN0eC0+YmxvY2ssIEFSUkFZX1NJWkUoY3R4LT5ibG9jaykpOwog
+CW1kNF90cmFuc2Zvcm0oY3R4LT5oYXNoLCBjdHgtPmJsb2NrKTsKIH0KIApAQCAtMjE2LDcgKzIx
+Niw3IEBAIHN0YXRpYyB2b2lkIG1kNF9maW5hbF9hc2NpaShzdHJ1Y3QgbWQ0X2N0eCAqbWN0eCwg
+Y2hhciAqb3V0LCB1bnNpZ25lZCBpbnQgbGVuKQogCWxlMzJfdG9fY3B1X2FycmF5KG1jdHgtPmJs
+b2NrLCAoc2l6ZW9mKG1jdHgtPmJsb2NrKSAtCiAJCQkgIHNpemVvZih1aW50NjRfdCkpIC8gc2l6
+ZW9mKHVpbnQzMl90KSk7CiAJbWQ0X3RyYW5zZm9ybShtY3R4LT5oYXNoLCBtY3R4LT5ibG9jayk7
+Ci0JY3B1X3RvX2xlMzJfYXJyYXkobWN0eC0+aGFzaCwgc2l6ZW9mKG1jdHgtPmhhc2gpIC8gc2l6
+ZW9mKHVpbnQzMl90KSk7CisJY3B1X3RvX2xlMzJfYXJyYXkobWN0eC0+aGFzaCwgQVJSQVlfU0la
+RShtY3R4LT5oYXNoKSk7CiAKIAlzbnByaW50ZihvdXQsIGxlbiwgIiUwOFglMDhYJTA4WCUwOFgi
+LAogCQkgbWN0eC0+aGFzaFswXSwgbWN0eC0+aGFzaFsxXSwgbWN0eC0+aGFzaFsyXSwgbWN0eC0+
+aGFzaFszXSk7Ci0tIAoyLjI1LjEK
