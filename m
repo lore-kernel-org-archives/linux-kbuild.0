@@ -2,143 +2,168 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72559C43217
-	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Nov 2022 11:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEC1C4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Nov 2022 12:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235300AbiKMLQA (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 13 Nov 2022 06:16:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50832 "EHLO
+        id S235014AbiKMMU7 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 13 Nov 2022 07:20:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235277AbiKMLP6 (ORCPT
+        with ESMTP id S233792AbiKMMU6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 Nov 2022 06:15:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D47FBCB4;
-        Sun, 13 Nov 2022 03:15:57 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C783AB80C71;
-        Sun, 13 Nov 2022 11:15:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C838C433B5;
-        Sun, 13 Nov 2022 11:15:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668338143;
-        bh=1P63x9nTvuyG2RvATLWGR+XaRnu7BvTepYHhkKgeLKQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XL8cVlk83wiEBd8Oka0LGV2ggk6Plrp7LXgvNA/fGr+11sAFvgBPoBK/2lD5/MgXZ
-         qs33wgSxSBNddXpbZlmPToyCDE7yAaoH9D9//iAgRYniqlqY8d/ynn8GHkcu3zw7O7
-         fClCU6xjnrdRKbriWSMQO1L2Bv2VnJF6eaaZQTEd4xVG/aM4sktSzrB1gT9L0Oa/+a
-         MCb11H5oxcYl/lDeI5TW55IldyG/eOxbrTAAiZk8/c87wfjZnGLbbl3xVw8ckDgkh4
-         ydXAk+rDezdAe/5IdiaoTYIfEFXIdCcmWUv5Z7JhByX3S1g7/Ru+YQmM/8olHdesc6
-         NLF+1rQGsMS6Q==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
+        Sun, 13 Nov 2022 07:20:58 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74901DF93;
+        Sun, 13 Nov 2022 04:20:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668342056; x=1699878056;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=O9v7vVxN4raPpuVeniWD+75Gm4EvYuxE8XEu0qEGfuk=;
+  b=DOggXvVLy+/3DrVtE7HcwZy9vd48tdo3phl4cSRUyNjtdEVl/7zAm5SB
+   SHced2KOnyylwyWO6a3rC2BlHIQ/hO4aH8V4nmaZtCozS0qik3jqceCZZ
+   UyUZDVUFKCPNexSu7v6hfjzHf5Rp1IWGmhUcjMF22UDhrbcCeaaKjduCz
+   WR+RDnF+3IzPHOJKyc6cvaSscSlxzIQF/zU6u+9adlZtxzBqXUg8eE6F/
+   AfJTp1tbDedkNp9Ikdpuk1UBIXWZHWAPy4pc9ZMV5sZ2XGRuFX6k//E/x
+   l0qJ/wGMPG6z+P+FwtS4z5K3QVUMG5H+FWx4ddDAD8xBIIzCORyyfYydG
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10529"; a="291525116"
+X-IronPort-AV: E=Sophos;i="5.96,161,1665471600"; 
+   d="scan'208";a="291525116"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2022 04:20:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10529"; a="671233762"
+X-IronPort-AV: E=Sophos;i="5.96,161,1665471600"; 
+   d="scan'208";a="671233762"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga001.jf.intel.com with ESMTP; 13 Nov 2022 04:20:51 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@intel.com>)
+        id 1ouByi-00BfhA-2j;
+        Sun, 13 Nov 2022 14:20:48 +0200
+Date:   Sun, 13 Nov 2022 14:20:48 +0200
+From:   Andy Shevchenko <andriy.shevchenko@intel.com>
+To:     Andrew Davis <afd@ti.com>
+Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH 3/3] [pending] kbuild: make forbid sharing objects among multiple modules
-Date:   Sun, 13 Nov 2022 20:15:25 +0900
-Message-Id: <20221113111525.3762483-4-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221113111525.3762483-1-masahiroy@kernel.org>
-References: <20221113111525.3762483-1-masahiroy@kernel.org>
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] Rename DTB overlay source files
+Message-ID: <Y3DhIO7H9mfRpe3z@smile.fi.intel.com>
+References: <20221024173434.32518-1-afd@ti.com>
+ <CAL_JsqJxgVwsjKnkCEkZeoSsDgaRD+DVPkHRBc2SrcSq69PBNw@mail.gmail.com>
+ <Y26lDEtiG4KFzc91@smile.fi.intel.com>
+ <e5ce57b2-4557-2dcb-fb3a-71e2acae4502@ti.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5ce57b2-4557-2dcb-fb3a-71e2acae4502@ti.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
- *** This patch is applicable after all the warnings are fixed.
- *** It may take a couple of development cycles.
+On Fri, Nov 11, 2022 at 03:05:20PM -0600, Andrew Davis wrote:
+> On 11/11/22 1:39 PM, Andy Shevchenko wrote:
+> > On Wed, Oct 26, 2022 at 09:11:21AM -0500, Rob Herring wrote:
+> > > On Mon, Oct 24, 2022 at 12:34 PM Andrew Davis <afd@ti.com> wrote:
+> > > > 
+> > > > Hello all,
+> > > > 
+> > > > This is a series based on my patch here[0]. As suggested by Rob
+> > > > I've resurrected Frank's patch and appended it to mine as a series.
+> > > > 
+> > > > First patch here is my original patch, 3rd is Frank's patch but with
+> > > > the unittest changes pulled out into the 2nd patch. That was re-worked
+> > > > moving the source building macro into scripts/Makefile.lib.
+> > > > 
+> > > > Patches 4, 5, and 6 are an attempt at renaming all the existing DTB
+> > > > overlays. Split out by platform so they could be taken by platform
+> > > > maintainers or if easier ACK'd here and taken all together.
+> > > > 
+> > > > This should cover all the DTB overlays so we can remove the old .dts
+> > > > rule for overlays and make .dtso the only supported way, let me know
+> > > > if we want that this cycle and I can post that too.
+> > > > 
+> > > > Thanks,
+> > > > Andrew
+> > > > 
+> > > > Changes from v1[1]:
+> > > >   - Added patch to rename pi433 overlay.
+> > > >   - Cleaned wording on patch 4-6.
+> > > >   - Collected some ACKs
+> > > > 
+> > > > [0] https://www.spinics.net/lists/kernel/msg4548509.html
+> > > > [1] https://www.spinics.net/lists/arm-kernel/msg1020165.html
+> > > > 
+> > > > Andrew Davis (6):
+> > > >    kbuild: Allow DTB overlays to built from .dtso named source files
+> > > >    kbuild: Allow DTB overlays to built into .dtso.S files
+> > > >    arm64: dts: freescale: Rename DTB overlay source files from .dts to
+> > > >      .dtso
+> > > >    arm64: dts: renesas: Rename DTB overlay source files from .dts to
+> > > >      .dtso
+> > > >    arm64: dts: xilinx: Rename DTB overlay source files from .dts to .dtso
+> > > >    staging: pi433: overlay: Rename overlay source file from .dts to .dtso
+> > > > 
+> > > > Frank Rowand (1):
+> > > >    of: overlay: rename overlay source files from .dts to .dtso
+> > > 
+> > > I've applied patches 1-3 and 7. I'll send a PR for the branch to the
+> > > platform maintainers after a few days in linux-next.
+> > 
+> > The patch
+> > 
+> > commit 941214a512d8c80d47e720c17ec17e8539175e93
+> > Author: Andrew Davis <afd@ti.com>
+> > Date:   Mon Oct 24 12:34:29 2022 -0500
+> > 
+> >      kbuild: Allow DTB overlays to built into .dtbo.S files
+> > 
+> > broke the build reproducibility / no-op builds.
+> > 
+> > Before:
+> >    2+ execution of `make` on non-changed tree did nothing
+> > 
+> > Now:
+> >    Each run of `make` (even without a single bit changed) restarts vmlinux
+> >    rebuild.
+> > 
+> > Please, revert or fix.
+> > 
+> 
+> I do not see this behavior. What config are you using?
+> 
+> Not sure how this patch could be the root cause, it only adds
+> a build target/rule, but doesn't actually use it anywhere yet..
 
-Now that all the warnings are fixed, the warning can be promoted to
-an error.
+For your reference I started with this one [1].
 
-Simplify the modules.builtin rule because modname always consists of
-a single word.
+When I bisected, I just answered with defaults on whatever `make` told me at
+the configuration stage.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+The actual `make` command I used:
 
- scripts/Makefile.build     | 6 ------
- scripts/Makefile.lib       | 8 ++++----
- scripts/Makefile.vmlinux_o | 5 +----
- 3 files changed, 5 insertions(+), 14 deletions(-)
+	make O=/path/to/the/result W=1 C=1 CF=-D__CHECK_ENDIAN__ -j64
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 799df12b53f3..37cf88d076e8 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -222,10 +222,6 @@ endif
- 
- cmd_check_local_export = $(srctree)/scripts/check-local-export $@
- 
--ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
--cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
--endif
--
- define rule_cc_o_c
- 	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
-@@ -235,7 +231,6 @@ define rule_cc_o_c
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_c)
- 	$(call cmd,record_mcount)
--	$(call cmd,warn_shared_object)
- endef
- 
- define rule_as_o_S
-@@ -244,7 +239,6 @@ define rule_as_o_S
- 	$(call cmd,check_local_export)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
--	$(call cmd,warn_shared_object)
- endef
- 
- # Built-in and composite module parts
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 3aa384cec76b..d73bfe0fabda 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -106,13 +106,13 @@ endif
- 
- # Finds the multi-part object the current object will be linked into.
- # If the object belongs to two or more multi-part objects, list them all.
--modname-multi = $(sort $(foreach m,$(multi-obj-ym),\
-+__modname-multi = $(sort $(foreach m,$(multi-obj-ym),\
- 		$(if $(filter $*.o, $(call suffix-search, $m, .o, -objs -y -m)),$(m:.o=))))
- 
--__modname = $(or $(modname-multi),$(basetarget))
-+modname-multi = $(if $(word 2, $(__modname-multi)), $(error $(kbuild-file): $*.o is added to multiple modules: $(__modname-multi)))$(__modname-multi)
- 
--modname = $(subst $(space),:,$(__modname))
--modfile = $(addprefix $(obj)/,$(__modname))
-+modname = $(or $(modname-multi),$(basetarget))
-+modfile = $(addprefix $(obj)/,$(modname))
- 
- # target with $(obj)/ and its suffix stripped
- target-stem = $(basename $(patsubst $(obj)/%,%,$@))
-diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-index 0edfdb40364b..2faf4960aa7a 100644
---- a/scripts/Makefile.vmlinux_o
-+++ b/scripts/Makefile.vmlinux_o
-@@ -74,13 +74,10 @@ modules.builtin.modinfo: vmlinux.o FORCE
- # module.builtin
- # ---------------------------------------------------------------------------
- 
--# The second line aids cases where multiple modules share the same object.
--
- quiet_cmd_modules_builtin = GEN     $@
-       cmd_modules_builtin = \
- 	tr '\0' '\n' < $< | \
--	sed -n 's/^[[:alnum:]:_]*\.file=//p' | \
--	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$$/.ko/' > $@
-+	sed -n 's@^[[:alnum:]:_]*\.file=\(.*\)@kernel/\1.ko@p' | uniq > $@
- 
- targets += modules.builtin
- modules.builtin: modules.builtin.modinfo FORCE
+But there is nothing that can affect the described issue.
+
+[1]: https://p.defau.lt/?ZSOdGnNxF9v9AQtrfDo_KQ
+
 -- 
-2.34.1
+With Best Regards,
+Andy Shevchenko
+
 
