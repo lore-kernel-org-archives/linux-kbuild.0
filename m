@@ -2,106 +2,88 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8687FC433FE
-	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Nov 2022 11:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC251C4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 13 Nov 2022 11:08:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235323AbiKMK77 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 13 Nov 2022 05:59:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44716 "EHLO
+        id S232799AbiKMLIU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 13 Nov 2022 06:08:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235272AbiKMK74 (ORCPT
+        with ESMTP id S229753AbiKMLIT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 13 Nov 2022 05:59:56 -0500
+        Sun, 13 Nov 2022 06:08:19 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED6CEE05;
-        Sun, 13 Nov 2022 02:59:55 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B935D12AEF;
+        Sun, 13 Nov 2022 03:08:18 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0C666B80C03;
-        Sun, 13 Nov 2022 10:59:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C27F5C433B5;
-        Sun, 13 Nov 2022 10:59:51 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 73125B80B0F;
+        Sun, 13 Nov 2022 11:08:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17BF8C433D6;
+        Sun, 13 Nov 2022 11:08:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668337192;
-        bh=uVh7d1ZdBvFF5UzVDHF1tphjemQ64fS1BQIfrjzswbg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=I8LeTq35nKtbls63J4g7DR4Ng1p5D+BE7tAqosrLsX0Vr3ntlNML5OnOx6jPR7muE
-         h/iCUEf3E41TryKvtPDBzEDAqZH4apUy4VgHffT+AfVq4LDGDBAU6D2AIzpd12Gjex
-         1stec85YCsBLyTvERfMAIWx3YYLC8jRue6p0uCnMadbX+iaAIKXN/CaEnNoGGprHI2
-         Q4OOEWQdAO68QhZA4ovSNvO62br7sDaT0WwcGBQNkKiKHgSLFz3GVoc6rDO+bUPY6S
-         x2YoLwbfzejzti8E9wMIh2BPGnLMh9/Ar97hCKBDdpMvwQ/XRhFTsH+1+toTGbpBYS
-         FiRmk6veIuS3Q==
+        s=k20201202; t=1668337696;
+        bh=re3T4qFodcsJuMPwETQhskz43bkLtjh3Ym+f/Ko/oGk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cOC9F/lfceBb0KeiKCPD7XGlxzx3sDugJtIrfFYWpRaWqP+D7HMNORxPlX4eT3qUg
+         bjU2jv7I2RBncgentGE0x4YYfrNIErG6gZCIEfCurpH5lORSYn2YvrF08zIAzFRJNI
+         YluL/ter1QMz1P9EOWd4A6tyshVCWK4QYrtNaoOcXaHxDoYAiU8frmKYTDG0OPfeur
+         qcY0xdvmgOuW9jLbey3xFF7nRD2T3IAUWImVsMh58CZFK84FjaGpksbBZojo7s3jWi
+         0zPuMG5NMjmJzECzwTA7DevbhgGccMH5U100YiD0wD0KfkMOE+PH1vgoAyKNfbC9EF
+         dStaIisntTzXg==
 From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
+To:     linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] kconfig: remove const qualifier from str_get()
-Date:   Sun, 13 Nov 2022 19:59:42 +0900
-Message-Id: <20221113105943.3753945-2-masahiroy@kernel.org>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jiangshan Yi <yijiangshan@kylinos.cn>,
+        Kees Cook <keescook@chromium.org>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH] linux/init.h: include <linux/build_bug.h> and <linux/stringify.h>
+Date:   Sun, 13 Nov 2022 20:08:02 +0900
+Message-Id: <20221113110802.3760705-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221113105943.3753945-1-masahiroy@kernel.org>
-References: <20221113105943.3753945-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-update_text() apparently edits the buffer returned by str_get().
-(and there is no reason why it shouldn't)
+With CONFIG_HAVE_ARCH_PREL32_RELOCATIONS=y, the following code
+fails to build:
 
-Remove 'const' quailifier and casting.
+  ---------------->8----------------
+  #include <linux/init.h>
+
+  int foo(void) { return 0; }
+  core_initcall(foo);
+  ---------------->8----------------
+
+Include <linux/build_bug.h> for static_assert() and <linux/stringify.h>
+for __stringify().
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/kconfig/lkc.h   | 2 +-
- scripts/kconfig/mconf.c | 4 ++--
- scripts/kconfig/util.c  | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ include/linux/init.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 6ac2eabe109d..e7118d62a45f 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -76,7 +76,7 @@ struct gstr str_new(void);
- void str_free(struct gstr *gs);
- void str_append(struct gstr *gs, const char *s);
- void str_printf(struct gstr *gs, const char *fmt, ...);
--const char *str_get(struct gstr *gs);
-+char *str_get(struct gstr *gs);
+diff --git a/include/linux/init.h b/include/linux/init.h
+index 077d7f93b402..29f7157670a5 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -2,7 +2,9 @@
+ #ifndef _LINUX_INIT_H
+ #define _LINUX_INIT_H
  
- /* menu.c */
- void _menu_init(void);
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 9d3cf510562f..d7f7e1bf7dd4 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -440,8 +440,8 @@ static void search_conf(void)
++#include <linux/build_bug.h>
+ #include <linux/compiler.h>
++#include <linux/stringify.h>
+ #include <linux/types.h>
  
- 		res = get_relations_str(sym_arr, &head);
- 		set_subtitle();
--		dres = show_textbox_ext("Search Results", (char *)
--					str_get(&res), 0, 0, keys, &vscroll,
-+		dres = show_textbox_ext("Search Results", str_get(&res), 0, 0,
-+					keys, &vscroll,
- 					&hscroll, &update_text, (void *)
- 					&data);
- 		again = false;
-diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
-index 29585394df71..b78f114ad48c 100644
---- a/scripts/kconfig/util.c
-+++ b/scripts/kconfig/util.c
-@@ -74,7 +74,7 @@ void str_printf(struct gstr *gs, const char *fmt, ...)
- }
- 
- /* Retrieve value of growable string */
--const char *str_get(struct gstr *gs)
-+char *str_get(struct gstr *gs)
- {
- 	return gs->s;
- }
+ /* Built-in __init functions needn't be compiled with retpoline */
 -- 
 2.34.1
 
