@@ -2,93 +2,129 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBC4C433FE
-	for <linux-kbuild@archiver.kernel.org>; Tue, 15 Nov 2022 12:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB73C43219
+	for <linux-kbuild@archiver.kernel.org>; Tue, 15 Nov 2022 13:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbiKOM2B (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 15 Nov 2022 07:28:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48322 "EHLO
+        id S238340AbiKONbn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 15 Nov 2022 08:31:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbiKOM16 (ORCPT
+        with ESMTP id S238130AbiKONbZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Nov 2022 07:27:58 -0500
-X-Greylist: delayed 226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Nov 2022 04:27:56 PST
-Received: from condef-07.nifty.com (condef-07.nifty.com [202.248.20.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78A62B2;
-        Tue, 15 Nov 2022 04:27:56 -0800 (PST)
-Received: from conssluserg-04.nifty.com ([10.126.8.83])by condef-07.nifty.com with ESMTP id 2AFCC95C005878;
-        Tue, 15 Nov 2022 21:12:09 +0900
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 2AFCBsd6032518;
-        Tue, 15 Nov 2022 21:11:54 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 2AFCBsd6032518
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1668514314;
-        bh=SILR+3RX69mfNk2t722qTqGIc2KmPfUyWI4eu5WGZ+4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Knfk25rUglHqvKrLlgLNNkYYEnsQ1qOODx9fHFc9GX7mTAEX3gYXmaqDWyG5grH3D
-         pf1EuCkNmnLJjIb+vRhH26zPiijqflJejULiTPbk9+RRPTWIsxlVxUQtycFsIlpB4e
-         DrezOv/cECw2Y89OFj+zv159/MeFV/KJVrxauUxi0Qnb0JRv0gkCSmVnte/ckP9wK/
-         wpgc67wdLTMeZ550A1muZqgaKI2gbmoAN+H7LAZvEBj6gORNMQpbRsn2qwP4cM/T1I
-         KBSiTp31mYVukwSNkrA1uJfsCvcSILb7VeKwlioAlRueG1j/5DPJzH/u28hy3uUD+J
-         VO+ez1rduQ4Eg==
-X-Nifty-SrcIP: [209.85.167.173]
-Received: by mail-oi1-f173.google.com with SMTP id s206so14652828oie.3;
-        Tue, 15 Nov 2022 04:11:54 -0800 (PST)
-X-Gm-Message-State: ANoB5pn+2dy1ml0a3agrNegvQ0/+x6ZQUyyKPRvwOESN2p4+WmJ+HQBj
-        4iBnSQuCvWOMOULVf+AK/oN0/qXe5pij4xQOMzI=
-X-Google-Smtp-Source: AA0mqf6hSSCkhlyoX/XbOrOi9iVXeMLvUxTqq2OONNj3JX3htcEvVpprVrUJn8DLxADbyRiWma56cuFWop0k9aui/gg=
-X-Received: by 2002:aca:ded4:0:b0:354:28ae:23b3 with SMTP id
- v203-20020acaded4000000b0035428ae23b3mr675884oig.287.1668514313381; Tue, 15
- Nov 2022 04:11:53 -0800 (PST)
+        Tue, 15 Nov 2022 08:31:25 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46BA3DFC5;
+        Tue, 15 Nov 2022 05:31:24 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E57021F8C7;
+        Tue, 15 Nov 2022 13:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1668519082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6S/6qWoM9bvr/F9wymPHSwbtM7nJIyGIcCGcRNv81bo=;
+        b=nRc2e39ELC7qec2QCbcBqak9znvCwWEA8u/ClgripvGSL3uCRohkLqqN4LZb/WbGYdn1yG
+        lIg5pSeJLRmmiAGEmWBcXnKTp/eEXExg6sNDynNQTc6jT94JA84Ud6wzEhRHgVhe6Arz/g
+        gszY/XtI64D+weNiedTmNo9bTFFXogE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1668519082;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6S/6qWoM9bvr/F9wymPHSwbtM7nJIyGIcCGcRNv81bo=;
+        b=TyVcir2l7dmmsK0P0RXY3Ts8NnEqnyvECLb0kSHuhsVbIksp9rtl1mDSiwsNmIZe8gsPM2
+        qYAnPc36x++uuUAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8D62213273;
+        Tue, 15 Nov 2022 13:31:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id F8OlIKqUc2MRZQAAMHmgww
+        (envelope-from <mliska@suse.cz>); Tue, 15 Nov 2022 13:31:22 +0000
+Message-ID: <858176b3-a70e-01ce-4a56-96cb031f16c5@suse.cz>
+Date:   Tue, 15 Nov 2022 14:31:22 +0100
 MIME-Version: 1.0
-References: <20221114205939.27994-1-afd@ti.com> <Y3N7bLuSTKJYPcIC@smile.fi.intel.com>
-In-Reply-To: <Y3N7bLuSTKJYPcIC@smile.fi.intel.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Tue, 15 Nov 2022 21:11:15 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARqFpQCEDmjmXciT2URcRNA9j-cqmXjuh_ifLEtQx=auw@mail.gmail.com>
-Message-ID: <CAK7LNARqFpQCEDmjmXciT2URcRNA9j-cqmXjuh_ifLEtQx=auw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Cleanup DT Overlay intermediate files as appropriate
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Andrew Davis <afd@ti.com>, Shawn Guo <shawnguo@kernel.org>,
-        Li Yang <leoyang.li@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH 30/46] Kbuild, lto: Add Link Time Optimization support
+Content-Language: en-US
+To:     Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
         Michal Marek <michal.lkml@markovi.net>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Frank Rowand <frowand.list@gmail.com>,
-        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        linux-kbuild@vger.kernel.org, Richard Biener <RGuenther@suse.com>,
+        Jan Hubicka <jh@suse.de>, "H . J . Lu" <hjl.tools@gmail.com>,
+        Don Zickus <dzickus@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jiri Slaby <jslaby@suse.cz>
+References: <20221114114344.18650-1-jirislaby@kernel.org>
+ <20221114114344.18650-31-jirislaby@kernel.org>
+ <20221114185545.yobf3faky2njugfq@treble>
+From:   =?UTF-8?Q?Martin_Li=c5=a1ka?= <mliska@suse.cz>
+In-Reply-To: <20221114185545.yobf3faky2njugfq@treble>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 8:43 PM Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
->
-> On Mon, Nov 14, 2022 at 02:59:39PM -0600, Andrew Davis wrote:
-> > %.dtbo.o and %.dtbo.S files are used to build-in DT Overlay. They should
-> > should not be removed by Make or the kernel will be needlessly rebuilt.
-> >
-> > These should be removed by "clean" and ignored by git like other
-> > intermediate files.
->
-> Fixes: 941214a512d8 ("kbuild: Allow DTB overlays to built into .dtbo.S files")
->
-> Tested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->
-> > Reported-by: Andy Shevchenko <andriy.shevchenko@intel.com>
-> > Signed-off-by: Andrew Davis <afd@ti.com>
+On 11/14/22 19:55, Josh Poimboeuf wrote:
+> On Mon, Nov 14, 2022 at 12:43:28PM +0100, Jiri Slaby (SUSE) wrote:
+>> +++ b/Documentation/kbuild/lto-build.rst
+>> @@ -0,0 +1,76 @@
+>> +=====================================================
+>> +gcc link time optimization (LTO) for the Linux kernel
+>> +=====================================================
+>> +
+>> +Link Time Optimization allows the compiler to optimize the complete program
+>> +instead of just each file.
+>> +
+>> +The compiler can inline functions between files and do various other global
+>> +optimizations, like specializing functions for common parameters,
+>> +determing when global variables are clobbered, making functions pure/const,
+>> +propagating constants globally, removing unneeded data and others.
+>> +
+>> +It will also drop unused functions which can make the kernel
+>> +image smaller in some circumstances, in particular for small kernel
+>> +configurations.
+>> +
+>> +For small monolithic kernels it can throw away unused code very effectively
+>> +(especially when modules are disabled) and usually shrinks
+>> +the code size.
+>> +
+>> +Build time and memory consumption at build time will increase, depending
+>> +on the size of the largest binary. Modular kernels are less affected.
+>> +With LTO incremental builds are less incremental, as always the whole
+>> +binary needs to be re-optimized (but not re-parsed)
+>> +
+>> +Oopses can be somewhat more difficult to read, due to the more aggressive
+>> +inlining: it helps to use scripts/faddr2line.
+>> +
+>> +It is currently incompatible with live patching.
+> 
+> ... because ?
 
-Acked-by: Masahiro Yamada <masahiroy@kernel.org>
+There's no fundamental reason why live patching can't coexist with -flto.
 
+We removed the sorry message for GCC 13.1 release:
+https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=1a308905c1baf64d0ea4d09d7d92b55e79a2a339
+when it comes to -flive-patching=inline-clone option.
 
--- 
-Best Regards
-Masahiro Yamada
+But it seems Linux does not utilize the option (based on git grep):
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#index-flive-patching
+
+That said, I would remove this limitation as LTO can make creation of live patches
+more complicated, but fundamentally there's no barrier.
+
+Thanks,
+Martin
