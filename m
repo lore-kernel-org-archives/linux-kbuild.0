@@ -2,342 +2,86 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C26B3C433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 19:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA56C433FE
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 20:46:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231693AbiKRTxi (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:53:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34578 "EHLO
+        id S229836AbiKRUqp (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 18 Nov 2022 15:46:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231564AbiKRTxZ (ORCPT
+        with ESMTP id S229606AbiKRUqo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Nov 2022 14:53:25 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA38B8F95;
-        Fri, 18 Nov 2022 11:53:23 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2B4DFB82518;
-        Fri, 18 Nov 2022 19:53:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20962C43470;
-        Fri, 18 Nov 2022 19:53:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668801200;
-        bh=ryDjU692vvbieFeB+fZCtkAEExyqfoXOnX/ZyV+MCfU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aOzo8E6tVsqTqKKXgn5QZwVrUYgifP7Er/UHBJ7xylrt0lF5xxwOmD4WEgoRLKn9W
-         pppyrG6XQ+IjT/vYD5L5UimhGwKdz8ioh51dOX+4jEACgYjomdAma1Z6NQiibPwO/p
-         aSc+G9luF4+8WK4H+N8FJwDN81+PaL93925MI3AyvnirfuqIKTtcd6Y1q5FSyf2r3p
-         YnSmzjMi0P8ESTNPeOyyDvV4icZ/++VQQLITELzpSqDZ9C5byzpED3H5mU5peybUC6
-         hJmXTSo8MNqNF6zTDIY3V0GzoJ+kFRmgE5Cux6NzthNQuHJXiV7h6FaSgaGv1h4WCZ
-         e9OOULpyvrG/Q==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 5/6] kconfig: refactor Makefile to reduce process forks
-Date:   Sat, 19 Nov 2022 04:53:06 +0900
-Message-Id: <20221118195307.86049-6-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221118195307.86049-1-masahiroy@kernel.org>
-References: <20221118195307.86049-1-masahiroy@kernel.org>
+        Fri, 18 Nov 2022 15:46:44 -0500
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 347AE6205A;
+        Fri, 18 Nov 2022 12:46:44 -0800 (PST)
+Received: by mail-oi1-f174.google.com with SMTP id l127so6613294oia.8;
+        Fri, 18 Nov 2022 12:46:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h3na0c+zCdiHpYsiS/hKe8VnK8EaiIE0atU3Cp6vqK8=;
+        b=EZJGh3pERaS0dPM2mNqSU1Otc4q3hmAOtAGESfEhg5dy5meAnCC68obisZ8R7xeDM0
+         M8y4N6EOGfLtGFtLhD7Wt9VT22mIlLouNp0S0RphmG/fTHWPvmFlLIN1qMUde75OrNcU
+         CnQ8OpmO019NDz3C3YKrV6zPntCiJ9YNqun+MCCAK/zW8LTiia/Dv4eDdpzRs1yXt7Sv
+         GLhImW9gZX0Zga83Y+9FB9SU0l4lhbdgTCAe54d6tMhLC4bdv3qA7DNmXQ6tfHGDMDm6
+         zDfDJPSHFCB+WW3EHzhUkt5pJqFWYgU1N0qA/ZWSNHHgpKMdkV9VJXdpEOvmU/Kkd20U
+         vXJg==
+X-Gm-Message-State: ANoB5pnAzVtwdbaY2sX4DBQoHSs86w56m4DUdINAZOv1r+4kD4dIFh7x
+        J+2ErlZfwlZ7PZPp9wazpw==
+X-Google-Smtp-Source: AA0mqf77Kvv76+2dRDE7XcyDrmAFDyRj4QvQ7OTBZ2bM59km+E8GbCkPFq9ssjIV4GX905G9Eziucw==
+X-Received: by 2002:a54:4596:0:b0:359:fea2:69d0 with SMTP id z22-20020a544596000000b00359fea269d0mr4245868oib.45.1668804403417;
+        Fri, 18 Nov 2022 12:46:43 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id k9-20020a544409000000b00359b83e3df1sm1814919oiw.9.2022.11.18.12.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Nov 2022 12:46:42 -0800 (PST)
+Received: (nullmailer pid 1327692 invoked by uid 1000);
+        Fri, 18 Nov 2022 20:46:44 -0000
+Date:   Fri, 18 Nov 2022 14:46:44 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Andrew Davis <afd@ti.com>
+Cc:     Shawn Guo <shawnguo@kernel.org>, Li Yang <leoyang.li@nxp.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>,
+        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: Cleanup DT Overlay intermediate files as
+ appropriate
+Message-ID: <20221118204644.GA1327355-robh@kernel.org>
+References: <20221114205939.27994-1-afd@ti.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114205939.27994-1-afd@ti.com>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Refactor Makefile and use read-file macro. For Make >= 4.2, it can read
-out a file by using the built-in function.
+On Mon, Nov 14, 2022 at 02:59:39PM -0600, Andrew Davis wrote:
+> %.dtbo.o and %.dtbo.S files are used to build-in DT Overlay. They should
+> should not be removed by Make or the kernel will be needlessly rebuilt.
+> 
+> These should be removed by "clean" and ignored by git like other
+> intermediate files.
+> 
+> Reported-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+> Signed-off-by: Andrew Davis <afd@ti.com>
+> ---
+>  .gitignore             | 1 +
+>  Makefile               | 4 +++-
+>  scripts/Makefile.build | 2 ++
+>  3 files changed, 6 insertions(+), 1 deletion(-)
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- scripts/kconfig/.gitignore   |  4 +++-
- scripts/kconfig/Makefile     | 43 +++++++++++++++++++-----------------
- scripts/kconfig/gconf-cfg.sh |  7 ++++--
- scripts/kconfig/mconf-cfg.sh | 25 ++++++++++++---------
- scripts/kconfig/nconf-cfg.sh | 23 ++++++++++---------
- scripts/kconfig/qconf-cfg.sh | 10 ++++++---
- scripts/remove-stale-files   |  2 ++
- 7 files changed, 67 insertions(+), 47 deletions(-)
-
-diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
-index 500e7424b3ef..c8a3f9cd52f0 100644
---- a/scripts/kconfig/.gitignore
-+++ b/scripts/kconfig/.gitignore
-@@ -1,5 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /conf
- /[gmnq]conf
--/[gmnq]conf-cfg
-+/[gmnq]conf-cflags
-+/[gmnq]conf-libs
-+/qconf-bin
- /qconf-moc.cc
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index b8ef0fb4bbef..da7da9775a4b 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -159,11 +159,12 @@ conf-objs	:= conf.o $(common-objs)
- hostprogs	+= nconf
- nconf-objs	:= nconf.o nconf.gui.o $(common-objs)
- 
--HOSTLDLIBS_nconf	= $(shell . $(obj)/nconf-cfg && echo $$libs)
--HOSTCFLAGS_nconf.o	= $(shell . $(obj)/nconf-cfg && echo $$cflags)
--HOSTCFLAGS_nconf.gui.o	= $(shell . $(obj)/nconf-cfg && echo $$cflags)
-+HOSTLDLIBS_nconf       = $(call read-file, $(obj)/nconf-libs)
-+HOSTCFLAGS_nconf.o     = $(call read-file, $(obj)/nconf-cflags)
-+HOSTCFLAGS_nconf.gui.o = $(call read-file, $(obj)/nconf-cflags)
- 
--$(obj)/nconf.o $(obj)/nconf.gui.o: $(obj)/nconf-cfg
-+$(obj)/nconf: | $(obj)/nconf-libs
-+$(obj)/nconf.o $(obj)/nconf.gui.o: | $(obj)/nconf-cflags
- 
- # mconf: Used for the menuconfig target based on lxdialog
- hostprogs	+= mconf
-@@ -171,27 +172,28 @@ lxdialog	:= $(addprefix lxdialog/, \
- 		     checklist.o inputbox.o menubox.o textbox.o util.o yesno.o)
- mconf-objs	:= mconf.o $(lxdialog) $(common-objs)
- 
--HOSTLDLIBS_mconf = $(shell . $(obj)/mconf-cfg && echo $$libs)
-+HOSTLDLIBS_mconf = $(call read-file, $(obj)/mconf-libs)
- $(foreach f, mconf.o $(lxdialog), \
--  $(eval HOSTCFLAGS_$f = $$(shell . $(obj)/mconf-cfg && echo $$$$cflags)))
-+  $(eval HOSTCFLAGS_$f = $$(call read-file, $(obj)/mconf-cflags)))
- 
--$(addprefix $(obj)/, mconf.o $(lxdialog)): $(obj)/mconf-cfg
-+$(obj)/mconf: | $(obj)/mconf-libs
-+$(addprefix $(obj)/, mconf.o $(lxdialog)): | $(obj)/mconf-cflags
- 
- # qconf: Used for the xconfig target based on Qt
- hostprogs	+= qconf
- qconf-cxxobjs	:= qconf.o qconf-moc.o
- qconf-objs	:= images.o $(common-objs)
- 
--HOSTLDLIBS_qconf	= $(shell . $(obj)/qconf-cfg && echo $$libs)
--HOSTCXXFLAGS_qconf.o	= $(shell . $(obj)/qconf-cfg && echo $$cflags)
--HOSTCXXFLAGS_qconf-moc.o = $(shell . $(obj)/qconf-cfg && echo $$cflags)
--
--$(obj)/qconf.o: $(obj)/qconf-cfg
-+HOSTLDLIBS_qconf         = $(call read-file, $(obj)/qconf-libs)
-+HOSTCXXFLAGS_qconf.o     = -std=c++11 -fPIC $(call read-file, $(obj)/qconf-cflags)
-+HOSTCXXFLAGS_qconf-moc.o = -std=c++11 -fPIC $(call read-file, $(obj)/qconf-cflags)
-+$(obj)/qconf: | $(obj)/qconf-libs
-+$(obj)/qconf.o $(obj)/qconf-moc.o: | $(obj)/qconf-cflags
- 
- quiet_cmd_moc = MOC     $@
--      cmd_moc = $(shell . $(obj)/qconf-cfg && echo $$moc) $< -o $@
-+      cmd_moc = $(call read-file, $(obj)/qconf-bin)/moc $< -o $@
- 
--$(obj)/qconf-moc.cc: $(src)/qconf.h $(obj)/qconf-cfg FORCE
-+$(obj)/qconf-moc.cc: $(src)/qconf.h FORCE | $(obj)/qconf-bin
- 	$(call if_changed,moc)
- 
- targets += qconf-moc.cc
-@@ -200,15 +202,16 @@ targets += qconf-moc.cc
- hostprogs	+= gconf
- gconf-objs	:= gconf.o images.o $(common-objs)
- 
--HOSTLDLIBS_gconf    = $(shell . $(obj)/gconf-cfg && echo $$libs)
--HOSTCFLAGS_gconf.o  = $(shell . $(obj)/gconf-cfg && echo $$cflags)
-+HOSTLDLIBS_gconf   = $(call read-file, $(obj)/gconf-libs)
-+HOSTCFLAGS_gconf.o = $(call read-file, $(obj)/gconf-cflags)
- 
--$(obj)/gconf.o: $(obj)/gconf-cfg
-+$(obj)/gconf: | $(obj)/gconf-libs
-+$(obj)/gconf.o: | $(obj)/gconf-cflags
- 
- # check if necessary packages are available, and configure build flags
--filechk_conf_cfg = $(CONFIG_SHELL) $<
-+cmd_conf_cfg = $< $(addprefix $(obj)/$*conf-, cflags libs bin)
- 
--$(obj)/%conf-cfg: $(src)/%conf-cfg.sh FORCE
--	$(call filechk,conf_cfg)
-+$(obj)/%conf-cflags $(obj)/%conf-libs $(obj)/%conf-bin: $(src)/%conf-cfg.sh
-+	$(call cmd,conf_cfg)
- 
- clean-files += *conf-cfg
-diff --git a/scripts/kconfig/gconf-cfg.sh b/scripts/kconfig/gconf-cfg.sh
-index cbd90c28c05f..040d8f338820 100755
---- a/scripts/kconfig/gconf-cfg.sh
-+++ b/scripts/kconfig/gconf-cfg.sh
-@@ -1,6 +1,9 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
-+cflags=$1
-+libs=$2
-+
- PKG="gtk+-2.0 gmodule-2.0 libglade-2.0"
- 
- if [ -z "$(command -v ${HOSTPKG_CONFIG})" ]; then
-@@ -26,5 +29,5 @@ if ! ${HOSTPKG_CONFIG} --atleast-version=2.0.0 gtk+-2.0; then
- 	exit 1
- fi
- 
--echo cflags=\"$(${HOSTPKG_CONFIG} --cflags $PKG)\"
--echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG)\"
-+${HOSTPKG_CONFIG} --cflags ${PKG} > ${cflags}
-+${HOSTPKG_CONFIG} --libs ${PKG} > ${libs}
-diff --git a/scripts/kconfig/mconf-cfg.sh b/scripts/kconfig/mconf-cfg.sh
-index 025b565e0b7c..1e61f50a5905 100755
---- a/scripts/kconfig/mconf-cfg.sh
-+++ b/scripts/kconfig/mconf-cfg.sh
-@@ -1,19 +1,22 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
-+cflags=$1
-+libs=$2
-+
- PKG="ncursesw"
- PKG2="ncurses"
- 
- if [ -n "$(command -v ${HOSTPKG_CONFIG})" ]; then
- 	if ${HOSTPKG_CONFIG} --exists $PKG; then
--		echo cflags=\"$(${HOSTPKG_CONFIG} --cflags $PKG)\"
--		echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG)\"
-+		${HOSTPKG_CONFIG} --cflags ${PKG} > ${cflags}
-+		${HOSTPKG_CONFIG} --libs ${PKG} > ${libs}
- 		exit 0
- 	fi
- 
--	if ${HOSTPKG_CONFIG} --exists $PKG2; then
--		echo cflags=\"$(${HOSTPKG_CONFIG} --cflags $PKG2)\"
--		echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG2)\"
-+	if ${HOSTPKG_CONFIG} --exists ${PKG2}; then
-+		${HOSTPKG_CONFIG} --cflags ${PKG2} > ${cflags}
-+		${HOSTPKG_CONFIG} --libs ${PKG2} > ${libs}
- 		exit 0
- 	fi
- fi
-@@ -22,22 +25,22 @@ fi
- # (Even if it is installed, some distributions such as openSUSE cannot
- # find ncurses by pkg-config.)
- if [ -f /usr/include/ncursesw/ncurses.h ]; then
--	echo cflags=\"-D_GNU_SOURCE -I/usr/include/ncursesw\"
--	echo libs=\"-lncursesw\"
-+	echo -D_GNU_SOURCE -I/usr/include/ncursesw > ${cflags}
-+	echo -lncursesw > ${libs}
- 	exit 0
- fi
- 
- if [ -f /usr/include/ncurses/ncurses.h ]; then
--	echo cflags=\"-D_GNU_SOURCE -I/usr/include/ncurses\"
--	echo libs=\"-lncurses\"
-+	echo -D_GNU_SOURCE -I/usr/include/ncurses > ${cflags}
-+	echo -lncurses > ${libs}
- 	exit 0
- fi
- 
- # As a final fallback before giving up, check if $HOSTCC knows of a default
- # ncurses installation (e.g. from a vendor-specific sysroot).
- if echo '#include <ncurses.h>' | ${HOSTCC} -E - >/dev/null 2>&1; then
--	echo cflags=\"-D_GNU_SOURCE\"
--	echo libs=\"-lncurses\"
-+	echo -D_GNU_SOURCE > ${cflags}
-+	echo -lncurses > ${libs}
- 	exit 0
- fi
- 
-diff --git a/scripts/kconfig/nconf-cfg.sh b/scripts/kconfig/nconf-cfg.sh
-index 3a10bac2adb3..f871a2160e36 100755
---- a/scripts/kconfig/nconf-cfg.sh
-+++ b/scripts/kconfig/nconf-cfg.sh
-@@ -1,19 +1,22 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
-+cflags=$1
-+libs=$2
-+
- PKG="ncursesw menuw panelw"
- PKG2="ncurses menu panel"
- 
- if [ -n "$(command -v ${HOSTPKG_CONFIG})" ]; then
- 	if ${HOSTPKG_CONFIG} --exists $PKG; then
--		echo cflags=\"$(${HOSTPKG_CONFIG} --cflags $PKG)\"
--		echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG)\"
-+		${HOSTPKG_CONFIG} --cflags ${PKG} > ${cflags}
-+		${HOSTPKG_CONFIG} --libs ${PKG} > ${libs}
- 		exit 0
- 	fi
- 
- 	if ${HOSTPKG_CONFIG} --exists $PKG2; then
--		echo cflags=\"$(${HOSTPKG_CONFIG} --cflags $PKG2)\"
--		echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG2)\"
-+		${HOSTPKG_CONFIG} --cflags ${PKG2} > ${cflags}
-+		${HOSTPKG_CONFIG} --libs ${PKG2} > ${libs}
- 		exit 0
- 	fi
- fi
-@@ -22,20 +25,20 @@ fi
- # (Even if it is installed, some distributions such as openSUSE cannot
- # find ncurses by pkg-config.)
- if [ -f /usr/include/ncursesw/ncurses.h ]; then
--	echo cflags=\"-D_GNU_SOURCE -I/usr/include/ncursesw\"
--	echo libs=\"-lncursesw -lmenuw -lpanelw\"
-+	echo -D_GNU_SOURCE -I/usr/include/ncursesw > ${cflags}
-+	echo -lncursesw -lmenuw -lpanelw > ${libs}
- 	exit 0
- fi
- 
- if [ -f /usr/include/ncurses/ncurses.h ]; then
--	echo cflags=\"-D_GNU_SOURCE -I/usr/include/ncurses\"
--	echo libs=\"-lncurses -lmenu -lpanel\"
-+	echo -D_GNU_SOURCE -I/usr/include/ncurses > ${cflags}
-+	echo -lncurses -lmenu -lpanel > ${libs}
- 	exit 0
- fi
- 
- if [ -f /usr/include/ncurses.h ]; then
--	echo cflags=\"-D_GNU_SOURCE\"
--	echo libs=\"-lncurses -lmenu -lpanel\"
-+	echo -D_GNU_SOURCE > ${cflags}
-+	echo -lncurses -lmenu -lpanel > ${libs}
- 	exit 0
- fi
- 
-diff --git a/scripts/kconfig/qconf-cfg.sh b/scripts/kconfig/qconf-cfg.sh
-index ad652cb53947..117f36e568fc 100755
---- a/scripts/kconfig/qconf-cfg.sh
-+++ b/scripts/kconfig/qconf-cfg.sh
-@@ -1,6 +1,10 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
-+cflags=$1
-+libs=$2
-+bin=$3
-+
- PKG="Qt5Core Qt5Gui Qt5Widgets"
- 
- if [ -z "$(command -v ${HOSTPKG_CONFIG})" ]; then
-@@ -11,9 +15,9 @@ if [ -z "$(command -v ${HOSTPKG_CONFIG})" ]; then
- fi
- 
- if ${HOSTPKG_CONFIG} --exists $PKG; then
--	echo cflags=\"-std=c++11 -fPIC $(${HOSTPKG_CONFIG} --cflags $PKG)\"
--	echo libs=\"$(${HOSTPKG_CONFIG} --libs $PKG)\"
--	echo moc=\"$(${HOSTPKG_CONFIG} --variable=host_bins Qt5Core)/moc\"
-+	${HOSTPKG_CONFIG} --cflags ${PKG} > ${cflags}
-+	${HOSTPKG_CONFIG} --libs ${PKG} > ${libs}
-+	${HOSTPKG_CONFIG} --variable=host_bins Qt5Core > ${bin}
- 	exit 0
- fi
- 
-diff --git a/scripts/remove-stale-files b/scripts/remove-stale-files
-index ccadfa3afb2b..64b14aa5aebf 100755
---- a/scripts/remove-stale-files
-+++ b/scripts/remove-stale-files
-@@ -47,3 +47,5 @@ rm -f arch/riscv/purgatory/kexec-purgatory.c
- rm -f scripts/extract-cert
- 
- rm -f arch/x86/purgatory/kexec-purgatory.c
-+
-+rm -f scripts/kconfig/[gmnq]conf-cfg
--- 
-2.34.1
-
+Applied, thanks!
