@@ -2,43 +2,43 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB211C4332F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 19:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71E0C4332F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 19:53:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbiKRTxX (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:53:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S229451AbiKRTxY (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 18 Nov 2022 14:53:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231425AbiKRTxW (ORCPT
+        with ESMTP id S231814AbiKRTxX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Nov 2022 14:53:22 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 219C7B5C67;
+        Fri, 18 Nov 2022 14:53:23 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFFBDB8F85;
         Fri, 18 Nov 2022 11:53:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C9F10B82515;
-        Fri, 18 Nov 2022 19:53:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2FC5C433C1;
-        Fri, 18 Nov 2022 19:53:18 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 888BB6251B;
+        Fri, 18 Nov 2022 19:53:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51275C4347C;
+        Fri, 18 Nov 2022 19:53:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668801199;
-        bh=uuzKJuSL9U4I6WHbVaSjSwOBgCBIs163TnW2EI3m5+0=;
+        s=k20201202; t=1668801202;
+        bh=jCvzmbRIXG2v1BOityBLpJImGOs/YCfsYemgrFfs7aA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E0JeKu6Z8lXqKFDfyG317cfY5aNZTtC7IcIZEEhM/mwnAXvQgpyLFvLiUDIKqsKdg
-         lTg1pkn8jYZKB3/nCAJ9Qj5/6C9IJqydO8wC81xtg3vZSHkIojeW8v3PZqKo+HbiiA
-         B4CkFfQ9dBsQAlcXYtfZ4NgTttG8SQL0sDSMaIBNn5WZVah2NTlmByKnEVZ1C66H6c
-         iBArhSYEFYOWhYWk3wlJ1sJAZ1aJ9PFT7R782cD6oA6Yb0ScaMCvR5isTB5JhvmLVR
-         dYMIBuy53qscKzFOiqsiFCghbwoQ6ICV7yZD6ehyJxzizAqb2xsPPJUC3S05rfmqqm
-         GYrtgWH4hI4hg==
+        b=sbJP75T3jcPRTR/gj908EXIbYcArqm1r3Zd30/w7+muYa8r8fBi5VKZuknJ6+i2WN
+         Ay3MhiWJDrXTOfqhLn8J4MRNxcmNxUEN9YufITNGnMEoUOuDVNpp3RUO2/Zftr76Yf
+         sNmxcR86NTp2JROrtlHM/eBUsNoMiXJ2qnUgdN2tL+euM2CJY5D1QZdWpNfsYHAAoj
+         VXZ1wCLoT85T9wEPrrebSD0zojMLfXkHnnQ3uIw1pyDzxyHFMGgG9ftEr6lIXdqbIM
+         NgQkmhx/37scwbSgv63LST3wr9m39jvqG/unz7OY6vmbTi3qMy4aUwmmNw9DEF1sbC
+         5y81cPtJISopQ==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 4/6] kbuild: add read-file macro
-Date:   Sat, 19 Nov 2022 04:53:05 +0900
-Message-Id: <20221118195307.86049-5-masahiroy@kernel.org>
+Subject: [PATCH 6/6] kbuild: check Make version
+Date:   Sat, 19 Nov 2022 04:53:07 +0900
+Message-Id: <20221118195307.86049-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221118195307.86049-1-masahiroy@kernel.org>
 References: <20221118195307.86049-1-masahiroy@kernel.org>
@@ -48,90 +48,29 @@ Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Since GMU Make 4.2, $(file ...) supports the read operater '<', which is
-useful to read a file without forking any process. No warning is shown even
-if the input file is missing.
-
-For older Make versions, it falls back to the cat command.
+This is implemented based on test-le. It will work until GNU Make 10
+is released.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile                  |  2 +-
- scripts/Kbuild.include    | 12 ++++++++++++
- scripts/Makefile.modfinal |  2 +-
- scripts/Makefile.modinst  |  2 +-
- 4 files changed, 15 insertions(+), 3 deletions(-)
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index 03e6ae36c815..93e5749ace55 100644
+index 93e5749ace55..979363590bd7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -369,7 +369,7 @@ else # !mixed-build
+@@ -368,6 +368,9 @@ else # !mixed-build
+ 
  include $(srctree)/scripts/Kbuild.include
  
++# Check for the minimal Make version
++$(if $(call test-lt, $(MAKE_VERSION), 3.82), $(error Make $(MAKE_VERSION) is too old))
++
  # Read KERNELRELEASE from include/config/kernel.release (if it exists)
--KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
-+KERNELRELEASE = $(call read-file, include/config/kernel.release)
+ KERNELRELEASE = $(call read-file, include/config/kernel.release)
  KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
- export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
- 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 9996f34327cb..722846c23264 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -10,6 +10,10 @@ empty   :=
- space   := $(empty) $(empty)
- space_escape := _-_SPACE_-_
- pound := \#
-+define newline
-+
-+
-+endef
- 
- ###
- # Comparison macros.
-@@ -55,6 +59,14 @@ stringify = $(squote)$(quote)$1$(quote)$(squote)
- kbuild-dir = $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
- kbuild-file = $(or $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Makefile)
- 
-+###
-+# Read a file, replacing newlines with spaces
-+ifeq ($(call test-ge, $(MAKE_VERSION), 4.2),y)
-+read-file = $(subst $(newline),$(space),$(file < $1))
-+else
-+read-file = $(shell cat $1 2>/dev/null)
-+endif
-+
- ###
- # Easy method for doing a status message
-        kecho := :
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 25bedd83644b..7252f6cf7837 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -13,7 +13,7 @@ include $(srctree)/scripts/Kbuild.include
- include $(srctree)/scripts/Makefile.lib
- 
- # find all modules listed in modules.order
--modules := $(sort $(shell cat $(MODORDER)))
-+modules := $(sort $(call read-file, $(MODORDER)))
- 
- __modfinal: $(modules)
- 	@:
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index a4c987c23750..509d424dbbd2 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -9,7 +9,7 @@ __modinst:
- include include/config/auto.conf
- include $(srctree)/scripts/Kbuild.include
- 
--modules := $(sort $(shell cat $(MODORDER)))
-+modules := $(sort $(call read-file, $(MODORDER)))
- 
- ifeq ($(KBUILD_EXTMOD),)
- dst := $(MODLIB)/kernel
 -- 
 2.34.1
 
