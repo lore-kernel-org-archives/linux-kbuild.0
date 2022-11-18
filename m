@@ -2,158 +2,359 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D00CC433FE
-	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 19:16:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74358C4332F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 18 Nov 2022 19:53:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241392AbiKRTQG (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:16:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43598 "EHLO
+        id S229670AbiKRTxU (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 18 Nov 2022 14:53:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235536AbiKRTQD (ORCPT
+        with ESMTP id S231388AbiKRTxS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Nov 2022 14:16:03 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F5848774;
-        Fri, 18 Nov 2022 11:16:02 -0800 (PST)
+        Fri, 18 Nov 2022 14:53:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD200B7EB6;
+        Fri, 18 Nov 2022 11:53:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D3C8626B2;
-        Fri, 18 Nov 2022 19:16:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731E8C43470;
-        Fri, 18 Nov 2022 19:16:00 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4845A6251B;
+        Fri, 18 Nov 2022 19:53:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA489C433C1;
+        Fri, 18 Nov 2022 19:53:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668798962;
-        bh=3oaypFAauEKT+WjnVA3nrmkQ0TB+gA+2N8zEi8VAFLo=;
+        s=k20201202; t=1668801196;
+        bh=wXJGBT1A52XfTBUcUmXtciPhChh/z7Sw4+vgV7bpK4E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Cl8DePJfdv9aA0NMSkSSc/zpoCaWvkFV8xxuw4hQbl+k9Ne0G9b3f+m5FXGolow08
-         jaGGGXWSBUgjp47BgFkOYTBMIyTlNybmxEzqkK0NFG3jEG2uKoH/SL+USCqZje5uaS
-         nGz7S+L68y+igN8pP2t72D9BAUTsTdsHods01hzBBKYzxf/jsKNfvYDRQK9hZ0bh1Y
-         5Tt2RpfvLxKh3DyUMyYYyGorLWL41JUFfxhzSUajleqXPqOaimbi6KwJcyXNZMaO+9
-         6PtYQl0s792Xmji33/yLX/7dQJ4KgqExhWx7VPFOhTA9CQDhoqErtVQrXFNbAz1XXc
-         Ukav6xclsceyw==
+        b=bFMMrT1GNVXJMOj/phzLELBESFBKwf25ezq14ItF4APdTJ90/ysm6FlUA6hOJzHrW
+         iAad0HoYM0ruHOpEH/I5RvG6KjUOEHDGTxH9fY43tYmE9oadwLErYOTfGY1JTluqV0
+         ZRmdvvdu2o/PSD3lhAa89yRvUoj9UPvrZvgzX9bpTIcnovx0HLjFiiYFVv0DdBIMBv
+         Et5d31i0aZdRR6XcCFsP2HgIQk+KKfQ4LPDDABaEOmhHj7ErcI118T0K39+13al7sB
+         cQ0y3+bmvmhdOEgIhfYsX5CwUnfjy1FJNnoA7WpWQA+hZzBK0sRaVI54zUMDhhJZDO
+         0h4L8p+2wL1ww==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH v2 2/2] kbuild: warn objects shared among multiple modules
-Date:   Sat, 19 Nov 2022 04:15:51 +0900
-Message-Id: <20221118191551.66448-2-masahiroy@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 2/6] kbuild: make CONFIG_*_VERSION always 6-digit
+Date:   Sat, 19 Nov 2022 04:53:03 +0900
+Message-Id: <20221118195307.86049-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221118191551.66448-1-masahiroy@kernel.org>
-References: <20221118191551.66448-1-masahiroy@kernel.org>
+In-Reply-To: <20221118195307.86049-1-masahiroy@kernel.org>
+References: <20221118195307.86049-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-If an object is shared among multiple modules, amd some of them are
-configured as 'm', but the others as 'y', the shared object is built
-as modular, then linked to the modules and vmlinux. This is a potential
-issue because the expected CFLAGS are different between modules and
-builtins.
+CONFIG_*_VERSION is the version number of a tool in a 5 or 6-digit form.
+This is fine in the Kconfig perspective because Kconfig supports numeric
+comparison (<, <=, >, >=).
 
-Commit 637a642f5ca5 ("zstd: Fixing mixed module-builtin objects")
-reported that this could be even more fatal in some cases such as
-Clang LTO.
+It is harder in Makefiles due to make's limited numerical capabilities.
+So, we ask for shell's "test" command when we compare versions, but it
+needs some process forks.
 
-That commit fixed lib/zlib/zstd_{compress,decompress}, but there are
-still more instances of breakage.
+test-{le,ge,lt,gt} macros can compare versions by using only built-in
+functions, but the number of digits must be aligned for those macros
+to work correctly.
 
-This commit adds a W=1 warning for shared objects, so that the kbuild
-test robot, which provides build tests with W=1, will avoid a new
-breakage slipping in.
+This commit (ab)uses Kconfig's hex type, which allows '0' prefixes,
+in order to make CONFIG_*_VERSION always 6-digit.
 
-Quick compile tests on v6.1-rc4 detected the following:
+For example with GCC 9.5, CONFIG_GCC_VERSION=90500 will be turned
+into CONFIG_GCC_VERSION=090500.
 
-scripts/Makefile.build:252: ./drivers/block/rnbd/Makefile: rnbd-common.o is added to multiple modules: rnbd-client rnbd-server
-scripts/Makefile.build:252: ./drivers/crypto/marvell/octeontx2/Makefile: cn10k_cpt.o is added to multiple modules: rvu_cptpf rvu_cptvf
-scripts/Makefile.build:252: ./drivers/crypto/marvell/octeontx2/Makefile: otx2_cptlf.o is added to multiple modules: rvu_cptpf rvu_cptvf
-scripts/Makefile.build:252: ./drivers/crypto/marvell/octeontx2/Makefile: otx2_cpt_mbox_common.o is added to multiple modules: rvu_cptpf rvu_cptvf
-scripts/Makefile.build:252: ./drivers/edac/Makefile: skx_common.o is added to multiple modules: i10nm_edac skx_edac
-scripts/Makefile.build:252: ./drivers/gpu/drm/bridge/imx/Makefile: imx-ldb-helper.o is added to multiple modules: imx8qm-ldb imx8qxp-ldb
-scripts/Makefile.build:252: ./drivers/mfd/Makefile: rsmu_core.o is added to multiple modules: rsmu-i2c rsmu-spi
-scripts/Makefile.build:252: ./drivers/mtd/tests/Makefile: mtd_test.o is added to multiple modules: mtd_nandbiterrs mtd_oobtest mtd_pagetest mtd_readtest mtd_speedtest mtd_stresstest mtd_subpagetest mtd_torturetest
-scripts/Makefile.build:252: ./drivers/net/dsa/ocelot/Makefile: felix.o is added to multiple modules: mscc_felix mscc_seville
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: cn23xx_pf_device.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: cn23xx_vf_device.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: cn66xx_device.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: cn68xx_device.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: lio_core.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: lio_ethtool.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: octeon_device.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: octeon_droq.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: octeon_mailbox.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: octeon_mem_ops.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: octeon_nic.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: request_manager.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/cavium/liquidio/Makefile: response_manager.o is added to multiple modules: liquidio liquidio_vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-scripts/Makefile.build:252: ./drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-scripts/Makefile.build:252: ./drivers/net/ethernet/freescale/enetc/Makefile: enetc_cbdr.o is added to multiple modules: fsl-enetc fsl-enetc-vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/freescale/enetc/Makefile: enetc_ethtool.o is added to multiple modules: fsl-enetc fsl-enetc-vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/freescale/enetc/Makefile: enetc.o is added to multiple modules: fsl-enetc fsl-enetc-vf
-scripts/Makefile.build:252: ./drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_cmd.o is added to multiple modules: hclge hclgevf
-scripts/Makefile.build:252: ./drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_rss.o is added to multiple modules: hclge hclgevf
-scripts/Makefile.build:252: ./drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_tqp_stats.o is added to multiple modules: hclge hclgevf
-scripts/Makefile.build:252: ./drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_dcbnl.o is added to multiple modules: rvu_nicpf rvu_nicvf
-scripts/Makefile.build:252: ./drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
-scripts/Makefile.build:252: ./drivers/net/ethernet/ti/Makefile: cpsw_ale.o is added to multiple modules: keystone_netcp keystone_netcp_ethss ti_cpsw ti_cpsw_new
-scripts/Makefile.build:252: ./drivers/net/ethernet/ti/Makefile: cpsw_ethtool.o is added to multiple modules: ti_cpsw ti_cpsw_new
-scripts/Makefile.build:252: ./drivers/net/ethernet/ti/Makefile: cpsw_priv.o is added to multiple modules: ti_cpsw ti_cpsw_new
-scripts/Makefile.build:252: ./drivers/net/ethernet/ti/Makefile: cpsw_sl.o is added to multiple modules: ti_cpsw ti_cpsw_new
-scripts/Makefile.build:252: ./drivers/net/ethernet/ti/Makefile: davinci_cpdma.o is added to multiple modules: ti_cpsw ti_cpsw_new ti_davinci_emac
-scripts/Makefile.build:252: ./drivers/platform/x86/intel/int3472/Makefile: common.o is added to multiple modules: intel_skl_int3472_discrete intel_skl_int3472_tps68470
-scripts/Makefile.build:252: ./sound/soc/codecs/Makefile: wcd-clsh-v2.o is added to multiple modules: snd-soc-wcd9335 snd-soc-wcd934x snd-soc-wcd938x
-
-Once all the warnings are fixed, it can become an error irrespective of
-W= option.
+I touched several Kconfig files so that versions are consistently
+compared against 6-digit numbers although this is not mandated.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
-Changes in v2:
-  - Add drivers/block/rnbd/Makefile for commit log
+ arch/arm/mach-rpc/Kconfig |  2 +-
+ arch/arm64/Kconfig        |  4 ++--
+ arch/mips/vdso/Kconfig    |  2 +-
+ arch/powerpc/Kconfig      |  2 +-
+ arch/riscv/Kconfig        |  4 ++--
+ init/Kconfig              | 18 +++++++++---------
+ lib/Kconfig.debug         |  6 +++---
+ lib/Kconfig.kasan         |  2 +-
+ scripts/as-version.sh     |  6 +++---
+ scripts/cc-version.sh     |  6 +++---
+ scripts/ld-version.sh     |  6 +++---
+ 11 files changed, 29 insertions(+), 29 deletions(-)
 
- scripts/Makefile.build | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 37cf88d076e8..799df12b53f3 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -222,6 +222,10 @@ endif
+diff --git a/arch/arm/mach-rpc/Kconfig b/arch/arm/mach-rpc/Kconfig
+index 55f6d829b677..106716042308 100644
+--- a/arch/arm/mach-rpc/Kconfig
++++ b/arch/arm/mach-rpc/Kconfig
+@@ -2,7 +2,7 @@ config ARCH_RPC
+ 	bool "RiscPC"
+ 	depends on ARCH_MULTI_V4 && !(ARCH_MULTI_V4T || ARCH_MULTI_V5)
+ 	depends on !(ARCH_FOOTBRIDGE || ARCH_SA1100 || ARCH_MOXART || ARCH_GEMINI)
+-	depends on !CC_IS_CLANG && GCC_VERSION < 90100 && GCC_VERSION >= 60000
++	depends on !CC_IS_CLANG && GCC_VERSION < 090100 && GCC_VERSION >= 060000
+ 	depends on CPU_LITTLE_ENDIAN
+ 	depends on ATAGS
+ 	depends on MMU
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 505c8a1ccbe0..b318f7ad050b 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -236,7 +236,7 @@ config ARM64
+ config CLANG_SUPPORTS_DYNAMIC_FTRACE_WITH_REGS
+ 	def_bool CC_IS_CLANG
+ 	# https://github.com/ClangBuiltLinux/linux/issues/1507
+-	depends on AS_IS_GNU || (AS_IS_LLVM && (LD_IS_LLD || LD_VERSION >= 23600))
++	depends on AS_IS_GNU || (AS_IS_LLVM && (LD_IS_LLD || LD_VERSION >= 023600))
+ 	select HAVE_DYNAMIC_FTRACE_WITH_REGS
  
- cmd_check_local_export = $(srctree)/scripts/check-local-export $@
+ config GCC_SUPPORTS_DYNAMIC_FTRACE_WITH_REGS
+@@ -1814,7 +1814,7 @@ config ARM64_PTR_AUTH_KERNEL
+ 	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
+ 	# Modern compilers insert a .note.gnu.property section note for PAC
+ 	# which is only understood by binutils starting with version 2.33.1.
+-	depends on LD_IS_LLD || LD_VERSION >= 23301 || (CC_IS_GCC && GCC_VERSION < 90100)
++	depends on LD_IS_LLD || LD_VERSION >= 23301 || (CC_IS_GCC && GCC_VERSION < 090100)
+ 	depends on !CC_IS_CLANG || AS_HAS_CFI_NEGATE_RA_STATE
+ 	depends on (!FUNCTION_GRAPH_TRACER || DYNAMIC_FTRACE_WITH_REGS)
+ 	help
+diff --git a/arch/mips/vdso/Kconfig b/arch/mips/vdso/Kconfig
+index a665f6108cb5..a8316108b756 100644
+--- a/arch/mips/vdso/Kconfig
++++ b/arch/mips/vdso/Kconfig
+@@ -12,7 +12,7 @@
+ # the lack of relocations. As such, we disable the VDSO for microMIPS builds.
  
-+ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
-+cmd_warn_shared_object = $(if $(word 2, $(modname-multi)),$(warning $(kbuild-file): $*.o is added to multiple modules: $(modname-multi)))
-+endif
-+
- define rule_cc_o_c
- 	$(call cmd_and_fixdep,cc_o_c)
- 	$(call cmd,gen_ksymdeps)
-@@ -231,6 +235,7 @@ define rule_cc_o_c
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_c)
- 	$(call cmd,record_mcount)
-+	$(call cmd,warn_shared_object)
- endef
+ config MIPS_LD_CAN_LINK_VDSO
+-	def_bool LD_VERSION >= 22500 || LD_IS_LLD
++	def_bool LD_VERSION >= 022500 || LD_IS_LLD
  
- define rule_as_o_S
-@@ -239,6 +244,7 @@ define rule_as_o_S
- 	$(call cmd,check_local_export)
- 	$(call cmd,gen_objtooldep)
- 	$(call cmd,gen_symversions_S)
-+	$(call cmd,warn_shared_object)
- endef
+ config MIPS_DISABLE_VDSO
+ 	def_bool CPU_MICROMIPS || (!CPU_MIPSR6 && !MIPS_LD_CAN_LINK_VDSO)
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index 2ca5418457ed..e7ba3a145595 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -220,7 +220,7 @@ config PPC
+ 	select HAVE_FUNCTION_ERROR_INJECTION
+ 	select HAVE_FUNCTION_GRAPH_TRACER
+ 	select HAVE_FUNCTION_TRACER
+-	select HAVE_GCC_PLUGINS			if GCC_VERSION >= 50200   # plugin support on gcc <= 5.1 is buggy on PPC
++	select HAVE_GCC_PLUGINS			if GCC_VERSION >= 050200   # plugin support on gcc <= 5.1 is buggy on PPC
+ 	select HAVE_GENERIC_VDSO
+ 	select HAVE_HARDLOCKUP_DETECTOR_ARCH	if PPC_BOOK3S_64 && SMP
+ 	select HAVE_HARDLOCKUP_DETECTOR_PERF	if PERF_EVENTS && HAVE_PERF_EVENTS_NMI && !HAVE_HARDLOCKUP_DETECTOR_ARCH
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index fa78595a6089..292f134f4493 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -416,7 +416,7 @@ config TOOLCHAIN_HAS_ZICBOM
+ 	default y
+ 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zicbom)
+ 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zicbom)
+-	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23800
++	depends on LLD_VERSION >= 150000 || LD_VERSION >= 023800
  
- # Built-in and composite module parts
+ config RISCV_ISA_ZICBOM
+ 	bool "Zicbom extension support for non-coherent DMA operation"
+@@ -440,7 +440,7 @@ config TOOLCHAIN_HAS_ZIHINTPAUSE
+ 	default y
+ 	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zihintpause)
+ 	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zihintpause)
+-	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23600
++	depends on LLD_VERSION >= 150000 || LD_VERSION >= 023600
+ 
+ config FPU
+ 	bool "FPU support"
+diff --git a/init/Kconfig b/init/Kconfig
+index abf65098f1b6..402ce28c8eff 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -20,17 +20,17 @@ config CC_IS_GCC
+ 	def_bool $(success,test "$(cc-name)" = GCC)
+ 
+ config GCC_VERSION
+-	int
++	hex
+ 	default $(cc-version) if CC_IS_GCC
+-	default 0
++	default 000000
+ 
+ config CC_IS_CLANG
+ 	def_bool $(success,test "$(cc-name)" = Clang)
+ 
+ config CLANG_VERSION
+-	int
++	hex
+ 	default $(cc-version) if CC_IS_CLANG
+-	default 0
++	default 000000
+ 
+ config AS_IS_GNU
+ 	def_bool $(success,test "$(as-name)" = GNU)
+@@ -39,7 +39,7 @@ config AS_IS_LLVM
+ 	def_bool $(success,test "$(as-name)" = LLVM)
+ 
+ config AS_VERSION
+-	int
++	hex
+ 	# Use clang version if this is the integrated assembler
+ 	default CLANG_VERSION if AS_IS_LLVM
+ 	default $(as-version)
+@@ -48,17 +48,17 @@ config LD_IS_BFD
+ 	def_bool $(success,test "$(ld-name)" = BFD)
+ 
+ config LD_VERSION
+-	int
++	hex
+ 	default $(ld-version) if LD_IS_BFD
+-	default 0
++	default 000000
+ 
+ config LD_IS_LLD
+ 	def_bool $(success,test "$(ld-name)" = LLD)
+ 
+ config LLD_VERSION
+-	int
++	hex
+ 	default $(ld-version) if LD_IS_LLD
+-	default 0
++	default 000000
+ 
+ config RUST_IS_AVAILABLE
+ 	def_bool $(success,$(srctree)/scripts/rust_is_available.sh)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index d93dbe5a1d14..9d5f061fc4cf 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -258,7 +258,7 @@ config DEBUG_INFO_NONE
+ config DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
+ 	bool "Rely on the toolchain's implicit default DWARF version"
+ 	select DEBUG_INFO
+-	depends on !CC_IS_CLANG || AS_IS_LLVM || CLANG_VERSION < 140000 || (AS_IS_GNU && AS_VERSION >= 23502 && AS_HAS_NON_CONST_LEB128)
++	depends on !CC_IS_CLANG || AS_IS_LLVM || CLANG_VERSION < 140000 || (AS_IS_GNU && AS_VERSION >= 023502 && AS_HAS_NON_CONST_LEB128)
+ 	help
+ 	  The implicit default version of DWARF debug info produced by a
+ 	  toolchain changes over time.
+@@ -270,7 +270,7 @@ config DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
+ config DEBUG_INFO_DWARF4
+ 	bool "Generate DWARF Version 4 debuginfo"
+ 	select DEBUG_INFO
+-	depends on !CC_IS_CLANG || AS_IS_LLVM || (AS_IS_GNU && AS_VERSION >= 23502)
++	depends on !CC_IS_CLANG || AS_IS_LLVM || (AS_IS_GNU && AS_VERSION >= 023502)
+ 	help
+ 	  Generate DWARF v4 debug info. This requires gcc 4.5+, binutils 2.35.2
+ 	  if using clang without clang's integrated assembler, and gdb 7.0+.
+@@ -282,7 +282,7 @@ config DEBUG_INFO_DWARF4
+ config DEBUG_INFO_DWARF5
+ 	bool "Generate DWARF Version 5 debuginfo"
+ 	select DEBUG_INFO
+-	depends on !CC_IS_CLANG || AS_IS_LLVM || (AS_IS_GNU && AS_VERSION >= 23502 && AS_HAS_NON_CONST_LEB128)
++	depends on !CC_IS_CLANG || AS_IS_LLVM || (AS_IS_GNU && AS_VERSION >= 023502 && AS_HAS_NON_CONST_LEB128)
+ 	help
+ 	  Generate DWARF v5 debug info. Requires binutils 2.35.2, gcc 5.0+ (gcc
+ 	  5.0+ accepts the -gdwarf-5 flag but only had partial support for some
+diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+index ca09b1cf8ee9..2ad969c6eb29 100644
+--- a/lib/Kconfig.kasan
++++ b/lib/Kconfig.kasan
+@@ -29,7 +29,7 @@ config CC_HAS_KASAN_SW_TAGS
+ # Old GCC versions do not have proper support for no_sanitize_address.
+ # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89124 for details.
+ config CC_HAS_WORKING_NOSANITIZE_ADDRESS
+-	def_bool !CC_IS_GCC || GCC_VERSION >= 80300
++	def_bool !CC_IS_GCC || GCC_VERSION >= 080300
+ 
+ menuconfig KASAN
+ 	bool "KASAN: dynamic memory safety error detector"
+diff --git a/scripts/as-version.sh b/scripts/as-version.sh
+index 1a21495e9ff0..778ccbc82ca8 100755
+--- a/scripts/as-version.sh
++++ b/scripts/as-version.sh
+@@ -1,14 +1,14 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0-only
+ #
+-# Print the assembler name and its version in a 5 or 6-digit form.
++# Print the assembler name and its version in a 6-digit form.
+ # Also, perform the minimum version check.
+ # (If it is the integrated assembler, return 0 as the version, and
+ # skip the version check.)
+ 
+ set -e
+ 
+-# Convert the version string x.y.z to a canonical 5 or 6-digit form.
++# Convert the version string x.y.z to a canonical 6-digit form.
+ get_canonical_version()
+ {
+ 	IFS=.
+@@ -18,7 +18,7 @@ get_canonical_version()
+ 	#
+ 	# The 4th field, if present, is ignored.
+ 	# This occurs in development snapshots as in 2.35.1.20201116
+-	echo $((10000 * $1 + 100 * ${2:-0} + ${3:-0}))
++	printf "%06d\n" $((10000 * $1 + 100 * ${2:-0} + ${3:-0}))
+ }
+ 
+ # Clang fails to handle -Wa,--version unless -fno-integrated-as is given.
+diff --git a/scripts/cc-version.sh b/scripts/cc-version.sh
+index 2401c86fcf53..fe9f446a40b4 100755
+--- a/scripts/cc-version.sh
++++ b/scripts/cc-version.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ #
+-# Print the C compiler name and its version in a 5 or 6-digit form.
++# Print the C compiler name and its version in a 6-digit form.
+ # Also, perform the minimum version check.
+ 
+ set -e
+@@ -22,12 +22,12 @@ get_c_compiler_info()
+ 	EOF
+ }
+ 
+-# Convert the version string x.y.z to a canonical 5 or 6-digit form.
++# Convert the version string x.y.z to a canonical 6-digit form.
+ get_canonical_version()
+ {
+ 	IFS=.
+ 	set -- $1
+-	echo $((10000 * $1 + 100 * $2 + $3))
++	printf "%06d\n" $((10000 * $1 + 100 * $2 + $3))
+ }
+ 
+ # $@ instead of $1 because multiple words might be given, e.g. CC="ccache gcc".
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+index a78b804b680c..a00693198a53 100755
+--- a/scripts/ld-version.sh
++++ b/scripts/ld-version.sh
+@@ -1,12 +1,12 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ #
+-# Print the linker name and its version in a 5 or 6-digit form.
++# Print the linker name and its version in a 6-digit form.
+ # Also, perform the minimum version check.
+ 
+ set -e
+ 
+-# Convert the version string x.y.z to a canonical 5 or 6-digit form.
++# Convert the version string x.y.z to a canonical 6-digit form.
+ get_canonical_version()
+ {
+ 	IFS=.
+@@ -16,7 +16,7 @@ get_canonical_version()
+ 	#
+ 	# The 4th field, if present, is ignored.
+ 	# This occurs in development snapshots as in 2.35.1.20201116
+-	echo $((10000 * $1 + 100 * ${2:-0} + ${3:-0}))
++	printf "%06d\n" $((10000 * $1 + 100 * ${2:-0} + ${3:-0}))
+ }
+ 
+ orig_args="$@"
 -- 
 2.34.1
 
