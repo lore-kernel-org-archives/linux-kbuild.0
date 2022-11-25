@@ -2,108 +2,108 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A64C433FE
-	for <linux-kbuild@archiver.kernel.org>; Thu, 24 Nov 2022 11:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E57C4332F
+	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Nov 2022 10:12:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbiKXLbg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Thu, 24 Nov 2022 06:31:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36576 "EHLO
+        id S229888AbiKYKMf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Fri, 25 Nov 2022 05:12:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbiKXLb2 (ORCPT
+        with ESMTP id S229914AbiKYKMe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Nov 2022 06:31:28 -0500
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8981716E2;
-        Thu, 24 Nov 2022 03:31:26 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id ECE6F40003;
-        Thu, 24 Nov 2022 11:31:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1669289485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BsRWm2PqElccv4JyIrk7v8YmrEOrU1kVFUncQALxtJk=;
-        b=Q5vljS1tiD68Q5JGexllJhX6PTGykOr04mP2RM6iXS+5VXGtFiJP2DhoscGFgCtyg4WMjY
-        SCD+/FMk1qnW9JmITmWTGMxHfdXnsmBrNS79Cb8YMXH91DIGNh3zzfVpQTvVm+U0PwUXrK
-        P2SsbMIq8L3daxQVRRhx7EImfUzw8iPb8jOE5RfXpg/a5Q4zHYE6Zw83uCVV+qGk1RHNNp
-        KTqxOL9daDhjs4ZgPO+LXK3RyJqzHeIAdFEpPMSKdiQE8nwyG+XZrebEl33OFx1ZZX5LpA
-        Fz8Sv6vNzmpDhtQkHg+5QZj8A/4Jz+GrA854E9HEp7IFoU7XHeODpVn6jNhGkA==
-Date:   Thu, 24 Nov 2022 12:31:24 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Alexander Lobakin <alobakin@pm.me>, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 12/18] mtd: tests: fix object shared between several
- modules
-Message-ID: <20221124123124.2e46ed23@xps-13>
-In-Reply-To: <20221123175900.4e05a0f2@xps-13>
-References: <20221119225650.1044591-1-alobakin@pm.me>
-        <20221119225650.1044591-13-alobakin@pm.me>
-        <CAK7LNASni5uNFOtR-6VykBHX1Wgg-rOt=q0Lk+H2Vbn7pCsBDQ@mail.gmail.com>
-        <20221123175900.4e05a0f2@xps-13>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Fri, 25 Nov 2022 05:12:34 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D802663D8;
+        Fri, 25 Nov 2022 02:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669371152; x=1700907152;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=o//XUtOlF+UX8a4XRDWL4tEuWkSd7eyjbaM1wz1SITA=;
+  b=YTPHWM4AEbaGftks/hydfoSgel3uCKeZrzOlEwyyVbBmgyWdTMx+ayRW
+   3U/YaU8kv/sVu+OIU+BqIMwzIpeXLZXxnqEJ9i/x1vbELEEvXi/Sm8zRZ
+   rJsgIfmEG6VXN7z2bAyc1Wm5SUKwV4Wbe/zUnPBlfOSG0onmRk5bDNx/k
+   rCS2lbiX+/ZKZViMcL2mZu1iOP+BlJVe0TNNrtuy19pVnUkgBPgy17sNe
+   JCXmI+IakXcRpjnY6tQsKmyniV90Q8jM19DSyYfRZ4wmcoAvBwHEXtn0S
+   xdfIIcrqWAkf0Y0d8kpegFNUOSIzlZsBIuKUg1lXx/ZMOx8+0Syy/XwRS
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="314489050"
+X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
+   d="scan'208";a="314489050"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 02:12:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="767329452"
+X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
+   d="scan'208";a="767329452"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga004.jf.intel.com with ESMTP; 25 Nov 2022 02:12:29 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 8C9DF12B; Fri, 25 Nov 2022 12:12:55 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 1/1] modpost: Mark uuid_le type to be suitable only for MEI
+Date:   Fri, 25 Nov 2022 12:12:49 +0200
+Message-Id: <20221125101249.24931-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hello,
+The uuid_le type is used only in MEI ABI, do not advertise it for others.
+While at it, comment out that UUID types are not to be used in a new code.
 
-Reducing the Cc list.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
 
-miquel.raynal@bootlin.com wrote on Wed, 23 Nov 2022 17:59:00 +0100:
+If you confused by acrn user of the uuid_le type, the patch to fix that
+is pending for v6.2 as well 1dbb4f0235a4 ("virt: acrn: Mark the uuid
+field as unused"). Nevertheless this patch doesn't break the things and
+hence can go independently to the respective tree.
 
-> Hi,
->=20
-> masahiroy@kernel.org wrote on Wed, 23 Nov 2022 22:11:49 +0900:
->=20
-> > On Sun, Nov 20, 2022 at 8:08 AM Alexander Lobakin <alobakin@pm.me> wrot=
-e: =20
-> > >
-> > > mtd_test.o is linked to 8(!) different test modules:
-> > >   =20
-> > > > scripts/Makefile.build:252: ./drivers/mtd/tests/Makefile: mtd_test.o
-> > > > is added to multiple modules: mtd_nandbiterrs mtd_oobtest mtd_paget=
-est
-> > > > mtd_readtest mtd_speedtest mtd_stresstest mtd_subpagetest mtd_tortu=
-retest   =20
-> > >
-> > > Although all of them share one Kconfig option
-> > > (CONFIG_MTD_TESTS), it's better to not link one object file into
-> > > several modules (and/or vmlinux).
-> > > Under certain circumstances, such can lead to the situation fixed by
-> > > commit 637a642f5ca5 ("zstd: Fixing mixed module-builtin objects").
-> > > In this particular case, there's also no need to duplicate the very
-> > > same object code 8 times.
-> > >
-> > > Convert mtd_test.o to a standalone module which will export its
-> > > functions to the rest.
-> > >
-> > > Fixes: a995c792280d ("mtd: tests: rename sources in order to link a h=
-elper object")
-> > > Suggested-by: Masahiro Yamada <masahiroy@kernel.org>   =20
-> >=20
-> > IMHO, Reported-by might be a better fit.
-> >=20
-> >=20
-> > I think they can become static inline functions in mtd_test.h
-> > (at least, mtdtest_relax() is a static inline there), but I am not sure.
-> >=20
-> > Please send this to the MTD list, and consult the maintainer(s). =20
->=20
-> TBH I don't really mind. These are test modules that you insert to
-> harden and profile the stack, so whatever makes the robots happy is
-> fine. Anyway, they are being slowly replaced by userspace tools so we
-> might eventually get rid of them.
+ scripts/mod/file2alias.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Once you feel ready, if you want this to be merged through the mtd
-tree, you can resend with the linux-mtd ML in Cc, otherwise if falls out
-of the scope of the tools and it's a pain to collect.
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index 7df23905fdf1..91c2e7ba5e52 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -34,19 +34,23 @@ typedef Elf64_Addr	kernel_ulong_t;
+ typedef uint32_t	__u32;
+ typedef uint16_t	__u16;
+ typedef unsigned char	__u8;
++
++/* UUID types for backward compatibility, don't use in new code */
+ typedef struct {
+ 	__u8 b[16];
+ } guid_t;
+ 
+-/* backwards compatibility, don't use in new code */
+-typedef struct {
+-	__u8 b[16];
+-} uuid_le;
+ typedef struct {
+ 	__u8 b[16];
+ } uuid_t;
++
+ #define	UUID_STRING_LEN		36
+ 
++/* MEI UUID type, don't use anywhere else */
++typedef struct {
++	__u8 b[16];
++} uuid_le;
++
+ /* Big exception to the "don't include kernel headers into userspace, which
+  * even potentially has different endianness and word sizes, since
+  * we handle those differences explicitly below */
+-- 
+2.35.1
 
-Thanks,
-Miqu=C3=A8l
