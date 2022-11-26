@@ -2,108 +2,99 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E57C4332F
-	for <linux-kbuild@archiver.kernel.org>; Fri, 25 Nov 2022 10:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 482B4C46467
+	for <linux-kbuild@archiver.kernel.org>; Sat, 26 Nov 2022 22:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229888AbiKYKMf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Fri, 25 Nov 2022 05:12:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
+        id S229646AbiKZW4h (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 26 Nov 2022 17:56:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229914AbiKYKMe (ORCPT
+        with ESMTP id S229612AbiKZW4h (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Nov 2022 05:12:34 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D802663D8;
-        Fri, 25 Nov 2022 02:12:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669371152; x=1700907152;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=o//XUtOlF+UX8a4XRDWL4tEuWkSd7eyjbaM1wz1SITA=;
-  b=YTPHWM4AEbaGftks/hydfoSgel3uCKeZrzOlEwyyVbBmgyWdTMx+ayRW
-   3U/YaU8kv/sVu+OIU+BqIMwzIpeXLZXxnqEJ9i/x1vbELEEvXi/Sm8zRZ
-   rJsgIfmEG6VXN7z2bAyc1Wm5SUKwV4Wbe/zUnPBlfOSG0onmRk5bDNx/k
-   rCS2lbiX+/ZKZViMcL2mZu1iOP+BlJVe0TNNrtuy19pVnUkgBPgy17sNe
-   JCXmI+IakXcRpjnY6tQsKmyniV90Q8jM19DSyYfRZ4wmcoAvBwHEXtn0S
-   xdfIIcrqWAkf0Y0d8kpegFNUOSIzlZsBIuKUg1lXx/ZMOx8+0Syy/XwRS
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="314489050"
-X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="314489050"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 02:12:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="767329452"
-X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="767329452"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga004.jf.intel.com with ESMTP; 25 Nov 2022 02:12:29 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 8C9DF12B; Fri, 25 Nov 2022 12:12:55 +0200 (EET)
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Sat, 26 Nov 2022 17:56:37 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE08140D7;
+        Sat, 26 Nov 2022 14:56:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A1DF60C71;
+        Sat, 26 Nov 2022 22:56:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FE6EC4347C;
+        Sat, 26 Nov 2022 22:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669503395;
+        bh=573wZuVHPDdtLI75KSLGQVso6x98GKpafL/MbOBnj84=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=QKdqSqqzEeIs2ufMLbTAh2iA7e74VQUHVXj3lZnEJWwTnbXbMQmBJMDwjy6Pi47Yi
+         /rSP9IjrAT4wZRHuaiJMjiK+fA+Ut98b1CIotwdwXJzAsPYIlVL+ByFAWyikTC0KjF
+         9tEhumT/zYP54EN5Rf6fo2s6Mlk2NaYI75VUuhekMDmUWipvYqZeD3KsS2OGrRDgys
+         +ouivD+Q6bcYcLg/PIEGOlXI8AvzaDUxCZIX+ovO4Sm6F7fYawzk5JL+TBVXfQbS3r
+         nyW/BAL5VeuvxBbI2jX7xAoyYw4vu8UWC8XbJpV2R2JDnjC2rbo7TN87DgrKqGCEFY
+         Ccv6854i8MvPA==
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nicolas Schier <nicolas@fjasle.eu>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/1] modpost: Mark uuid_le type to be suitable only for MEI
-Date:   Fri, 25 Nov 2022 12:12:49 +0200
-Message-Id: <20221125101249.24931-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.35.1
+        Tom Rix <trix@redhat.com>, llvm@lists.linux.dev
+Subject: [PATCH v3 2/5] kbuild: implement {gcc,clang}-min-version only with built-in functions
+Date:   Sun, 27 Nov 2022 07:56:21 +0900
+Message-Id: <20221126225624.751661-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221126225624.751661-1-masahiroy@kernel.org>
+References: <20221126225624.751661-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-The uuid_le type is used only in MEI ABI, do not advertise it for others.
-While at it, comment out that UUID types are not to be used in a new code.
+Converting clang-min-version is straightforward because the versions
+are always 6-digit.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+gcc-min-version is somewhat tricky because the minimal GCC version
+is GCC 5.1; prepend '0' to the version that is less than 10 so that
+test-ge is always passed with 6-digit versions.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 ---
 
-If you confused by acrn user of the uuid_le type, the patch to fix that
-is pending for v6.2 as well 1dbb4f0235a4 ("virt: acrn: Mark the uuid
-field as unused"). Nevertheless this patch doesn't break the things and
-hence can go independently to the respective tree.
+Changes in v3:
+  - Add comments
 
- scripts/mod/file2alias.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Changes in v2:
+  - Covert gcc-min-version in a different way
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 7df23905fdf1..91c2e7ba5e52 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -34,19 +34,23 @@ typedef Elf64_Addr	kernel_ulong_t;
- typedef uint32_t	__u32;
- typedef uint16_t	__u16;
- typedef unsigned char	__u8;
-+
-+/* UUID types for backward compatibility, don't use in new code */
- typedef struct {
- 	__u8 b[16];
- } guid_t;
+ scripts/Makefile.compiler | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.compiler b/scripts/Makefile.compiler
+index 20d353dcabfb..4c095beda093 100644
+--- a/scripts/Makefile.compiler
++++ b/scripts/Makefile.compiler
+@@ -63,11 +63,16 @@ cc-disable-warning = $(call try-run,\
  
--/* backwards compatibility, don't use in new code */
--typedef struct {
--	__u8 b[16];
--} uuid_le;
- typedef struct {
- 	__u8 b[16];
- } uuid_t;
+ # gcc-min-version
+ # Usage: cflags-$(call gcc-min-version, 70100) += -foo
+-gcc-min-version = $(shell [ $(CONFIG_GCC_VERSION)0 -ge $(1)0 ] && echo y)
 +
- #define	UUID_STRING_LEN		36
++# Preprend 0 to the version that is less than 10 so test-ge works.
++# This will break when GCC 20 is released. Remove this workaround until then.
++gcc-min-version = $(call test-ge, \
++                  $(or $(filter 1%, $(CONFIG_GCC_VERSION)), 0$(CONFIG_GCC_VERSION)), \
++                  $(or $(filter 1%, $1), 0$(strip $1)))
  
-+/* MEI UUID type, don't use anywhere else */
-+typedef struct {
-+	__u8 b[16];
-+} uuid_le;
-+
- /* Big exception to the "don't include kernel headers into userspace, which
-  * even potentially has different endianness and word sizes, since
-  * we handle those differences explicitly below */
+ # clang-min-version
+ # Usage: cflags-$(call clang-min-version, 110000) += -foo
+-clang-min-version = $(shell [ $(CONFIG_CLANG_VERSION)0 -ge $(1)0 ] && echo y)
++clang-min-version = $(call test-ge, $(CONFIG_CLANG_VERSION), $1)
+ 
+ # ld-option
+ # Usage: KBUILD_LDFLAGS += $(call ld-option, -X, -Y)
 -- 
-2.35.1
+2.34.1
 
