@@ -2,176 +2,148 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF80DC43217
-	for <linux-kbuild@archiver.kernel.org>; Sat, 26 Nov 2022 22:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A31C47088
+	for <linux-kbuild@archiver.kernel.org>; Sat, 26 Nov 2022 22:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbiKZW4h (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sat, 26 Nov 2022 17:56:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40768 "EHLO
+        id S229658AbiKZW4l (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sat, 26 Nov 2022 17:56:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbiKZW4g (ORCPT
+        with ESMTP id S229612AbiKZW4k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 26 Nov 2022 17:56:36 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1733A14033;
-        Sat, 26 Nov 2022 14:56:35 -0800 (PST)
+        Sat, 26 Nov 2022 17:56:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EAE140D7;
+        Sat, 26 Nov 2022 14:56:39 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 49BE860C68;
-        Sat, 26 Nov 2022 22:56:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F234C433D6;
-        Sat, 26 Nov 2022 22:56:30 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 95E45B80A36;
+        Sat, 26 Nov 2022 22:56:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22713C43470;
+        Sat, 26 Nov 2022 22:56:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669503393;
-        bh=m3ZEUK0zXePJycyJFWyVV/OydFcxPrFRvDSAjxSAbFg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=PO2FYMebNnz4Pbfnw8L4jSaDjHMCbBhjOKGHHL0XHqdTEbi9z/rQObYtc5Y1R8A90
-         BfP+J0A5NJQO/9ZpskWhGvFqo5+N4UbA0/KELhr4nfVkR0ZcrD5JbPC1XmRdq5UvCz
-         pFFTHtOLfHL63Xa2FRll9c/1SMNrWbyeqdSa70SK2xcfK3idyIdASCNjALTZ63eR3K
-         ohcsiMfWB1/6ELvIZtYDEiD5am3qskj/aG4I3aGJiffQ6/AUoPbLkPFBggduWJ0HJm
-         nCMros1t7GTgCwsh69Z3buA7Ohtivt+nh04MO1b+ORFjDV8YmaxH8p9/yBPTU9m54E
-         8g2ZlTEp/i1OA==
+        s=k20201202; t=1669503397;
+        bh=AtKhQp8FtKxLMmPcpUUV2Sk+OJL/9nVhE5GmwRmFJ/E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tpc49ynONcF6JHmKmUmDdKQimA5CgkjPa8g75uKF3gIHTiUVOidbUq2NaO6AeRXx0
+         faxfC5+C9SN6n5m+MPij0NW62dlLfBpi7HxSJroADn90szqn4nHcQu8UBpLs3+rAJB
+         9LJ1mI9J308cAk3h7csqYE6R7ZI55mERJRQa3DhK0xPqskmehF0MX4MSnYugRxuQTO
+         VkjIj//94z3zPL6+wpocM42sbe1HZIFzsSU/pqLWjQHG0T2tI+uHvCged6RCISfpQ4
+         ZnUipha/lMiCSMezbryYnutETrFVNA7hX6AMJmPVpT1DvnxMRes6lZCPLwE1tDiNUD
+         g5dUyW76vsYbw==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>,
         Nicolas Schier <nicolas@fjasle.eu>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
         Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Rix <trix@redhat.com>, linux-riscv@lists.infradead.org,
-        llvm@lists.linux.dev, x86@kernel.org
-Subject: [PATCH v3 1/5] kbuild: add test-{le,ge,lt,gt} macros
-Date:   Sun, 27 Nov 2022 07:56:20 +0900
-Message-Id: <20221126225624.751661-1-masahiroy@kernel.org>
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v3 3/5] kbuild: add read-file macro
+Date:   Sun, 27 Nov 2022 07:56:22 +0900
+Message-Id: <20221126225624.751661-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221126225624.751661-1-masahiroy@kernel.org>
+References: <20221126225624.751661-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Because GNU Make is handle strings, it is very hard to perform math in
-Makefiles.
+Since GNU Make 4.2, $(file ...) supports the read operater '<', which
+is useful to read a file without forking any process. No warning is
+shown even if the input file is missing.
 
-When we compare two integers, we invokes shell. One example is in the
-top Makefile:
+For older Make versions, it falls back to the cat command.
 
-  ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
-
-This is more expensive than using built-in functions since it forks a
-process.
-
-If we know the two have the same number of digits, we can do better.
-
-This commit adds four macros, test-le, test-ge, test-lt, test-gt.
-
-$(call test-lt, A, B) is evaluated to 'y' if A is less than B, or
-empty otherwise. This will replace $(call shell test A -lt B).
-
-Again, the limitation is that A and B must have the same number of
-digits because these macros are based on $(sort ) function.
-
-  $(call test-lt, 1, 9)    -->  y        (Works!)
-  $(call test-lt, 10, 9)   -->  y        (Not work...)
-
-To make the latter work, you need to add '0' prefix to align the number
-of digits:
-
-  $(call test-lt, 10, 09)  -->  empty    (Works!)
-
-Actually, we can live with this limitation in many places. As for the
-example above, we know $(CONFIG_LLD_VERSION) is 6-digits because the
-minimal supported version of LLVM is 11.0.0 (or CONFIG_LLD_VERSION=0
-if the linker is not LLD, this case also works.)
-
-So, the shell invocation can be replaced with more efficient code:
-
-  ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
-
-Of course, this assumption will break when LLVM 100 is released, but it
-will be far in the future.
+The added ifeq will break when GNU Make 4.10 or 10.0 is released.
+It will take a long time if the current release pace continues.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 ---
 
-Changes in v3:
-  - Ensure the given parameters are not empty
+(no changes since v1)
 
- Makefile               |  2 +-
- arch/riscv/Makefile    |  2 +-
- arch/x86/Makefile      |  2 +-
- scripts/Kbuild.include | 10 ++++++++++
- 4 files changed, 13 insertions(+), 3 deletions(-)
+ Makefile                  |  2 +-
+ scripts/Kbuild.include    | 15 +++++++++++++++
+ scripts/Makefile.modfinal |  2 +-
+ scripts/Makefile.modinst  |  2 +-
+ 4 files changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 6f846b1f2618..eb80332f7b51 100644
+index eb80332f7b51..60ce9dcafc72 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -986,7 +986,7 @@ KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
- # Check for frame size exceeding threshold during prolog/epilog insertion
- # when using lld < 13.0.0.
- ifneq ($(CONFIG_FRAME_WARN),0)
--ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
-+ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
- KBUILD_LDFLAGS	+= -plugin-opt=-warn-stack-size=$(CONFIG_FRAME_WARN)
- endif
- endif
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 0d13b597cb55..faf2c2177094 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -37,7 +37,7 @@ else
- endif
+@@ -369,7 +369,7 @@ else # !mixed-build
+ include $(srctree)/scripts/Kbuild.include
  
- ifeq ($(CONFIG_LD_IS_LLD),y)
--ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 150000; echo $$?),0)
-+ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 150000),y)
- 	KBUILD_CFLAGS += -mno-relax
- 	KBUILD_AFLAGS += -mno-relax
- ifndef CONFIG_AS_IS_LLVM
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 415a5d138de4..e72c7a49cd59 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -211,7 +211,7 @@ endif
- KBUILD_LDFLAGS += -m elf_$(UTS_MACHINE)
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+-KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
++KERNELRELEASE = $(call read-file, include/config/kernel.release)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
  
- ifdef CONFIG_LTO_CLANG
--ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
-+ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
- KBUILD_LDFLAGS	+= -plugin-opt=-stack-alignment=$(if $(CONFIG_X86_32),4,8)
- endif
- endif
 diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index cbe28744637b..4b8cf464b53b 100644
+index 4b8cf464b53b..55c2243f91c8 100644
 --- a/scripts/Kbuild.include
 +++ b/scripts/Kbuild.include
-@@ -11,6 +11,16 @@ space   := $(empty) $(empty)
+@@ -10,6 +10,10 @@ empty   :=
+ space   := $(empty) $(empty)
  space_escape := _-_SPACE_-_
  pound := \#
++define newline
++
++
++endef
+ 
+ ###
+ # Comparison macros.
+@@ -55,6 +59,17 @@ stringify = $(squote)$(quote)$1$(quote)$(squote)
+ kbuild-dir = $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
+ kbuild-file = $(or $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Makefile)
  
 +###
-+# Comparison macros.
-+# Usage: $(call test-le, A, B)
-+# works like shell's "test A -le B", use with care bacause it is ASCII sort.
-+# If A and B have the same number of digits, it works as expected.
-+test-le = $(and $(strip $1),$(strip $2),$(filter $1, $(firstword $(sort $1 $2))),y)
-+test-ge = $(call test-le, $2, $1)
-+test-lt = $(and $(strip $1),$(strip $2),$(filter-out $2, $(firstword $(sort $1 $2))),y)
-+test-gt = $(call test-lt, $2, $1)
++# Read a file, replacing newlines with spaces
++#
++# This ifeq will break when GNU Make 4.10 is released.
++# Remove this conditional until then.
++ifeq ($(call test-ge, $(MAKE_VERSION), 4.2),y)
++read-file = $(subst $(newline),$(space),$(file < $1))
++else
++read-file = $(shell cat $1 2>/dev/null)
++endif
 +
  ###
- # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
- dot-target = $(dir $@).$(notdir $@)
+ # Easy method for doing a status message
+        kecho := :
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index 25bedd83644b..7252f6cf7837 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -13,7 +13,7 @@ include $(srctree)/scripts/Kbuild.include
+ include $(srctree)/scripts/Makefile.lib
+ 
+ # find all modules listed in modules.order
+-modules := $(sort $(shell cat $(MODORDER)))
++modules := $(sort $(call read-file, $(MODORDER)))
+ 
+ __modfinal: $(modules)
+ 	@:
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index a4c987c23750..509d424dbbd2 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -9,7 +9,7 @@ __modinst:
+ include include/config/auto.conf
+ include $(srctree)/scripts/Kbuild.include
+ 
+-modules := $(sort $(shell cat $(MODORDER)))
++modules := $(sort $(call read-file, $(MODORDER)))
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+ dst := $(MODLIB)/kernel
 -- 
 2.34.1
 
