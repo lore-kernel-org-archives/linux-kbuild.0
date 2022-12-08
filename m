@@ -2,198 +2,213 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CD1C4708D
-	for <linux-kbuild@archiver.kernel.org>; Wed,  7 Dec 2022 19:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 067A1C4708E
+	for <linux-kbuild@archiver.kernel.org>; Thu,  8 Dec 2022 01:43:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbiLGT5O (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 7 Dec 2022 14:57:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58340 "EHLO
+        id S229736AbiLHBnn (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 7 Dec 2022 20:43:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiLGT5L (ORCPT
+        with ESMTP id S229782AbiLHBnl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Dec 2022 14:57:11 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36F765E3FD;
-        Wed,  7 Dec 2022 11:57:09 -0800 (PST)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7GDv8G010250;
-        Wed, 7 Dec 2022 19:56:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2022-7-12;
- bh=tMaLcJnjsya6xB/fqoO37IigfwJeuy3AOFtxwKqlfco=;
- b=jhlLKV2McvFZxY9nAuyYC7kz+YHANvfcb2AcvIKCmTlhuDYacpZbeDmxQwlldJZmSF10
- g64Un8rtQFk4VdT+TMPCmBK9X3/x6L7g/XuUZRYGfp6H46whCDS7dasyornuQJfxVRkk
- ML2XX6EUqD3QtRh8eTbsUA2+9bB+RaipmCBZVh84UTiUCszaX9Hb2PErnx8gMar+U3e3
- NhnnLPQaMEHDHqjUtPqcsfk55eyeoRMNrrGDWJ71D0BmE/VIqiVzfjuCEt5eXMZY2pvt
- tQAfXE3cJ0vlOe5uyxNqSfESTGj8ZQb1hUAOoyz9izd2dYhRnckHlQygwkMh9S1TxCUj Jg== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3maudus7yr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 19:56:31 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B7J0HJm021708;
-        Wed, 7 Dec 2022 19:56:30 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2049.outbound.protection.outlook.com [104.47.73.49])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3maa8gbp80-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 19:56:30 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MbI1vu+49AoWgryg9EEH5fCLVQHpFROmZh0SuqPK6WZ9o9a04qT+hacCQqVIOahx4wfIXdcJiHbEUFpDneTurhakV65iPmlPmd0no4g5RQ2t41IWEUNMwlROpvH5CRD22D4UBQvLcprRyJyiQGzEPQmF/B2A+wb868ae0mK6yNHhD96dxjm8f1OZsy47BvYncjt+AHa+oqbJj3an+ypmu+9mJkOkawt1KMdLALbJx0myXV5cP/EJvRz6LKqdFmTgWwPEHA57NzObM6w7HIiEe2HM2VicZC2hs3Wshf/3PVdO9HNzNNl7vo/VXCXjM9BO7gHYiVwzJfPV6mTbngc86A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tMaLcJnjsya6xB/fqoO37IigfwJeuy3AOFtxwKqlfco=;
- b=WbsO892j4rtfIBAAFsa2r8uO547J4GtPJvkNDG1BY+oFT+68Ae64QDaFhv/gPo2Qp4J6TltG+YbNMcvCJjWhh44P860R+xzCyXuurMFhJFpwhnkPADdH86m4t7lSkDjcKe32fkih8COT+MlcBTnh3a5PbXh8tsKF2OPnGKpsOGVcI2ILc5iQDEBUMzAAaDAgjGumai52EN54qmPyEmn6c04gIo0/P60RgmpkSGtPlng4YyF39GrPkWC+u9+3OaqBilOlv87odKYMWnlycu0daU3FohtsNnb+Lt55MVBWq6xEOP+MAbtpFZHgviXSrD3D/YlwMXTzpY/zzklkfPCneQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tMaLcJnjsya6xB/fqoO37IigfwJeuy3AOFtxwKqlfco=;
- b=VZMtKs0d9mGNIr2qIvYReQLnasNBmpYAxItRdmC+Nq6fAvd1rThwIvZUR14X2n6RehbEibYGRTumcPSqj457r2Z4SmAwSIBTwnOe+Rkaxy46w7u6ZwuhAaL9WG+g+h8usWK/j9t14+7w4WLLizFdCYYWHlkvjcl72Wl+dovgOMU=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by PH7PR10MB6553.namprd10.prod.outlook.com (2603:10b6:510:204::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Wed, 7 Dec
- 2022 19:56:28 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::6a6a:2552:ef79:e2ec]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::6a6a:2552:ef79:e2ec%8]) with mapi id 15.20.5880.014; Wed, 7 Dec 2022
- 19:56:28 +0000
-Date:   Wed, 7 Dec 2022 14:56:23 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] padata: Mark padata_work_init() as __ref
-Message-ID: <20221207195623.mk4jt5vkc76s77cf@parnassus.localdomain>
-References: <20221207191657.2852229-1-nathan@kernel.org>
- <20221207191657.2852229-2-nathan@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221207191657.2852229-2-nathan@kernel.org>
-X-ClientProxiedBy: BL1PR13CA0184.namprd13.prod.outlook.com
- (2603:10b6:208:2be::9) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+        Wed, 7 Dec 2022 20:43:41 -0500
+Received: from conssluserg-01.nifty.com (conssluserg-01.nifty.com [210.131.2.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F42134B756;
+        Wed,  7 Dec 2022 17:43:39 -0800 (PST)
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 2B81hOiI017429;
+        Thu, 8 Dec 2022 10:43:25 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 2B81hOiI017429
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1670463805;
+        bh=k3I8on4gq36IvbTZWeLET12jxubwa9OOg1ZKsIOl2ss=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=mtOo8T0cq1jDd6kIRWnpp0UdEGEL2YahHo5hb57KLXkHKlw8MIhG/J1CiPCd6uPFd
+         KKpT1X4bdoAnRLZXhc9q8WChe3TyVckcHUCuiN/uu+KE4MPcRKvWhMrzjkaYjf+6s8
+         IWkC8+NobGSN3dDvY4HESmxF7kgvUZJRCtoKi0bzL35t6jeGAn3CTMqAV14BCNeiFX
+         JNGvjTlqlXbxWxIGWZS7Hh9kGRDaKqmhczCH/0m0lPLHW/ugIrYX0aQV/k6EkxJtwA
+         FI03uKGiOTh7uoplKlf7YGo8xaMqTiCt06gFAxnztMsh5U5dF7v3xWrHV2JPTW6jvw
+         ol6jaKsi8Yu7w==
+X-Nifty-SrcIP: [209.85.210.44]
+Received: by mail-ot1-f44.google.com with SMTP id v19-20020a9d5a13000000b0066e82a3872dso81239oth.5;
+        Wed, 07 Dec 2022 17:43:25 -0800 (PST)
+X-Gm-Message-State: ANoB5pknK4HFf5TwNXRqg/xKfhE6CqrxDe/UP4sy5xMaomiCi2AMcq5z
+        K+AsOjz1EAPD0I/ICMjB7ZThqZHV2aCM2fj2MZw=
+X-Google-Smtp-Source: AA0mqf5rlckUeBOxtlV5cmoxR9u+G4SHU30UtcO5gXpDSCqFhD98tHV3D02NMhFgMRT7jBugEMm4fqq68XFQrqTt1ME=
+X-Received: by 2002:a9d:282:0:b0:66c:794e:f8c6 with SMTP id
+ 2-20020a9d0282000000b0066c794ef8c6mr47413478otl.343.1670463804040; Wed, 07
+ Dec 2022 17:43:24 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|PH7PR10MB6553:EE_
-X-MS-Office365-Filtering-Correlation-Id: a17c4525-103b-4eef-62f2-08dad88d2090
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7tGa7qDiFVYufyKCZ3E1xQi324DN4yswjgCcS2pJRFOqWLgDdLJF3gxuvZomcX9YiyXGYaf58z+AdCkBKJq/zKCr4GamaNJdvtEGMYiBnJDMQ8UNE4snqAYf+IOOIISIQOpslvYOX6Ay3J39trz3xik2+EP5Bfmm5NXZioCSpezVbjRRPeMrqVRCxpdp8Nj1IL4K9SPBw6uamrPkxVnQsSwU8Oy9uSwmyZvYNnHWtD7tjFqfphfJz8+PMYA8KMf4CZlLMrhfnjq0ktLS3rcSLsF82UZ3Mce5bBchskYFXSFx4yUVUOisq5smaRrU5GqBw+iUg/2+x3eh7HhjowbMllT0+SGDoMuffx5uWOyk6lZyDKAQKD7KyuksKTn9QrOnzifAGX2KX+xBK7tCiX8Ef04HkEURy5Y80DPWSSko0ArJSZ+BBuOVxHvA1/R6kcLaSTBKqYb8nPJsV7yKWUYG4M1uPtqgZ/CKnrjQKg131NiR960jMuuZbNpdjJUQTVyMGLOjXKQ8ZvbONe1sG4fTXGyhLOj69kgqIgkVsoXm23Tk0uARI9FPRkACkofXpq/zsvzGUr2a2HpZIw1kGz9nlRNDTSQqT0g6YwqddluOeULt7ARBK8XNw25xFrCp79BalEKxWVtsu9H5gjEyRZEY0g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(376002)(396003)(346002)(39860400002)(451199015)(2906002)(83380400001)(41300700001)(1076003)(86362001)(66476007)(38100700002)(9686003)(26005)(6512007)(8676002)(8936002)(5660300002)(4326008)(7416002)(186003)(66946007)(316002)(6486002)(6506007)(6666004)(54906003)(478600001)(6916009)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Dl7PRs98j2XTuThZspcYpqYZbdg50l1JuqZT+i5J/rnL83u5SJlE7WDjNiim?=
- =?us-ascii?Q?3YkDARRWJ6vfffx0I0qKHYF835RzyBRqsB5g0Xi+Bu6W2xRwNJlw4/LW3Il+?=
- =?us-ascii?Q?89l3TpD8005uTwBd1ylAu6p8UdBi41foaDtVo7BoHPzF2fxl68Z/cqCouQyq?=
- =?us-ascii?Q?3VRIA1nx9KXZn87es15b1BLd91ahbesUYwJxaimNYaGSTL0vAK/O1ZD5PoTQ?=
- =?us-ascii?Q?PU4KxsPvSzOK4f05YBvOFwf+lmX6zBrqNhwqj8gwsz4srNCeLnwA3e7C5jXE?=
- =?us-ascii?Q?ZhORi1/Fy5gx6RFhQNhxTU5lhnmnvD29sJSr6QMv1YUfZXAKQXapQAw3DGYq?=
- =?us-ascii?Q?+Yd4LUXd9vLyomcqKwWfDxWljyKwa7+6i7Zi6VPJpfAgI3KRjJYC1AfaM8WE?=
- =?us-ascii?Q?nEbj4rKObn0XaCiId6Swk/CPX83PitgK43pEPxljci5rMqpK8hkeoyujJxZO?=
- =?us-ascii?Q?GolLc5I33sQGCX6LwjLyVd7gZnJ3JWckpcnzkXN0tbf+b4nlm+5gBOGtXFMm?=
- =?us-ascii?Q?1z4oPXiVcNs/uInAsuAvIdOGnmqmwOyNoDyKBstBCVSHGlJGiZJrlKiXAOK7?=
- =?us-ascii?Q?xoL5V3GdvqivAjNv1FQjxeXmTi/RM0dACiYq1Y1wcp03/nK/L4Mq5lMOU/vo?=
- =?us-ascii?Q?+NOqsQL4GDEKx9AaNMEN3jg/weF8qfnzfJbWCITwNaQDJQZ3AKUxIqxLtYV9?=
- =?us-ascii?Q?0f8ic8XPbYXHLUablU94lOr47XNaQJzwG+Qt3pOuP+LsBe1djhFCqweoTNnz?=
- =?us-ascii?Q?5WL6h/8NbG9TMm8012A46NTpOGDN/w54cwzS/nj32tziCQ3DCQKFtgCvuFqm?=
- =?us-ascii?Q?gf5KiVK76ShLbP5jOXtzAp6f7V9YHYg8NjfaT1uNfy0mDqq/wUVzZ6Yc6JW2?=
- =?us-ascii?Q?T4nXrsp70zHb4HY6X9RSqUPr7Py7YxN3Oq/3SGiJu+T7+VtUhkcw7Pw/9XXk?=
- =?us-ascii?Q?VDUGHQHybqxBFRO56LoIDpesaMw7cVqT6yStTNlgxZeGje17+3dYeOFDPYK7?=
- =?us-ascii?Q?luiHazZhyhEfUA+ZkWl1USjg5mKV7VDHeS5mlMMHKLYKq9G7lInRnMn+zPA2?=
- =?us-ascii?Q?MkugwKRZDSt27rrtz4J33CrgirB86ZXLAQMtPFp61xDMAVuBKgFVylzNjVuy?=
- =?us-ascii?Q?QenlTtfq+uLPSNu4ziPKv8DU9sjKEPjrlgF+84EfgQ1jggqDCFzmL8p0G3xF?=
- =?us-ascii?Q?doMQyDSDxpcrOv2O64Uve/iViuyPCnQU2Amls0RA2ShIko+YEOBjuxdTK/rf?=
- =?us-ascii?Q?DiF8BVhHgwf+zBf9z9ckHPi73V8b8+t3D2XbKgL7ITaNUfL9X6YSHimXRW7u?=
- =?us-ascii?Q?BIONnLEfle4HU1C6dLKFR8hhdLFaxdxujXcvLAkeMIwpBST7tIkh2uZuWFVd?=
- =?us-ascii?Q?aa6ldMPAHMsqhlHRlWwMzgILWLzUTZWtbB4xpXaEc9bYnvq+jxUIosUXKgEe?=
- =?us-ascii?Q?gX1wWAEHITsGY1hFlBdoilxG/zCvAsxSX7+hnV0e0Wjy/ioUteQor1U7YL0u?=
- =?us-ascii?Q?3c1Jj8uuXmnQUen4o2b9HiNZLV1LACIxog9YzWZLQnFQn0LAqmstjsx65rvS?=
- =?us-ascii?Q?60tZbk00objWSw6zni0WmDAtFMjlRPZOsYxvmIum5SF2E24Ka+xNbijoPj/q?=
- =?us-ascii?Q?BQ=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a17c4525-103b-4eef-62f2-08dad88d2090
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 19:56:28.0604
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BZOQ/lSeA4ApVGwIIJvolw69q3F4s3uCVww2t1oW+uMfk1J/baPyVe3cFI+2IrY5lbi4SvEUe1P6QUFNBI6D6sWVLpvt1vvkfowmpjGJ7AU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6553
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-07_09,2022-12-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
- suspectscore=0 phishscore=0 malwarescore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212070168
-X-Proofpoint-ORIG-GUID: np24030zaTgUIVB0KjHf4nZtyT8Y3pVp
-X-Proofpoint-GUID: np24030zaTgUIVB0KjHf4nZtyT8Y3pVp
+References: <20221123151828.509565-1-masahiroy@kernel.org>
+In-Reply-To: <20221123151828.509565-1-masahiroy@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 8 Dec 2022 10:42:47 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATBBHJR_46HUvZ61zTgt_U4t3BmwTTyHwKjgz8JkFquYg@mail.gmail.com>
+Message-ID: <CAK7LNATBBHJR_46HUvZ61zTgt_U4t3BmwTTyHwKjgz8JkFquYg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] kbuild: add test-{le,ge,lt,gt} macros
+To:     linux-kbuild@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Rix <trix@redhat.com>, linux-riscv@lists.infradead.org,
+        llvm@lists.linux.dev, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Dec 07, 2022 at 12:16:56PM -0700, Nathan Chancellor wrote:
-> When building arm64 allmodconfig + ThinLTO with clang and a proposed
-> modpost update to account for -ffuncton-sections, the following warning
-> appears:
-> 
->   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
->   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
-> 
-> LLVM has optimized padata_work_init() to include the address of
-> padata_mt_helper() directly, which causes modpost to complain since
-> padata_work_init() is not __init, whereas padata_mt_helper() is. In
-> reality, padata_work_init() is only called with padata_mt_helper() as
-> the work_fn argument in code that is __init, so this warning will not
-> result in any problems. Silence it with __ref, which makes it clear to
-> modpost that padata_work_init() can only use padata_mt_helper() in
-> __init code.
+On Thu, Nov 24, 2022 at 12:19 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+>
+> Because GNU Make is only able to handle strings, it is very hard to
+> perform arighmetic in Makefiles.
 
-Thanks!
 
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-> Suggested-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+
+
+I terribly missed that GNU Make 4.4
+introduced the $(intcmp ...) function.
+
+https://www.gnu.org/software/make/manual/make.html#Conditional-Functions
+
+
+I am thinking if we can do better by using it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>
+> When we compare two integers, we invokes shell. One example is in the
+> top Makefile:
+>
+>   ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
+>
+> This is more expensive than using built-in functions since it forks a
+> process.
+>
+> If we know the two have the same number of digits, we can do better.
+>
+> This commit adds four macros, test-le, test-ge, test-lt, test-gt.
+>
+> $(call test-lt, A, B) is evaluated to 'y' if A is less than B, or
+> empty otherwise. This will replace $(call shell test A -lt B).
+>
+> Again, the limitation is that A and B must have the same number of
+> digits because these macros are based on $(sort ) function.
+>
+>   $(call test-lt, 1, 9)    -->  y        (Works!)
+>   $(call test-lt, 10, 9)   -->  y        (Not work...)
+>
+> To make the latter work, you need to add '0' prefix to align the number
+> of digits:
+>
+>   $(call test-lt, 10, 09)  -->  empty    (Works!)
+>
+> Actually, we can live with this limitation in many places. As for the
+> example above, we know $(CONFIG_LLD_VERSION) is 6-digits because the
+> minimal supported version of LLVM is 11.0.0.
+>
+> So, the shell invocation can be replaced with more efficient code:
+>
+>   ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
+>
+> Of course, this assumption will break when LLVM 100 is released, but it
+> will be far in the future.
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 > ---
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Cc: linux-crypto@vger.kernel.org
-> ---
->  kernel/padata.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index e5819bb8bd1d..4c3137fe8449 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -83,8 +83,8 @@ static struct padata_work *padata_work_alloc(void)
->  	return pw;
->  }
->  
-> -static void padata_work_init(struct padata_work *pw, work_func_t work_fn,
-> -			     void *data, int flags)
-> +static __ref void padata_work_init(struct padata_work *pw, work_func_t work_fn,
-> +				   void *data, int flags)
->  {
->  	if (flags & PADATA_WORK_ONSTACK)
->  		INIT_WORK_ONSTACK(&pw->pw_work, work_fn);
-> 
-> base-commit: 76dcd734eca23168cb008912c0f69ff408905235
-> -- 
-> 2.38.1
-> 
+>
+> (no changes since v1)
+>
+>  Makefile               |  2 +-
+>  arch/riscv/Makefile    |  2 +-
+>  arch/x86/Makefile      |  2 +-
+>  scripts/Kbuild.include | 10 ++++++++++
+>  4 files changed, 13 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 6f846b1f2618..eb80332f7b51 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -986,7 +986,7 @@ KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
+>  # Check for frame size exceeding threshold during prolog/epilog insertion
+>  # when using lld < 13.0.0.
+>  ifneq ($(CONFIG_FRAME_WARN),0)
+> -ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
+> +ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
+>  KBUILD_LDFLAGS += -plugin-opt=-warn-stack-size=$(CONFIG_FRAME_WARN)
+>  endif
+>  endif
+> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> index 0d13b597cb55..faf2c2177094 100644
+> --- a/arch/riscv/Makefile
+> +++ b/arch/riscv/Makefile
+> @@ -37,7 +37,7 @@ else
+>  endif
+>
+>  ifeq ($(CONFIG_LD_IS_LLD),y)
+> -ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 150000; echo $$?),0)
+> +ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 150000),y)
+>         KBUILD_CFLAGS += -mno-relax
+>         KBUILD_AFLAGS += -mno-relax
+>  ifndef CONFIG_AS_IS_LLVM
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 415a5d138de4..e72c7a49cd59 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -211,7 +211,7 @@ endif
+>  KBUILD_LDFLAGS += -m elf_$(UTS_MACHINE)
+>
+>  ifdef CONFIG_LTO_CLANG
+> -ifeq ($(shell test $(CONFIG_LLD_VERSION) -lt 130000; echo $$?),0)
+> +ifeq ($(call test-lt, $(CONFIG_LLD_VERSION), 130000),y)
+>  KBUILD_LDFLAGS += -plugin-opt=-stack-alignment=$(if $(CONFIG_X86_32),4,8)
+>  endif
+>  endif
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index cbe28744637b..9996f34327cb 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -11,6 +11,16 @@ space   := $(empty) $(empty)
+>  space_escape := _-_SPACE_-_
+>  pound := \#
+>
+> +###
+> +# Comparison macros.
+> +# Usage: $(call test-le, A, B)
+> +# works like shell's "test A -le B", but A and B must have the same number of
+> +# digits since it is just ASCII sort.
+> +test-le = $(if $(filter $1, $(firstword $(sort $1 $2))),y)
+> +test-ge = $(call test-le, $2, $1)
+> +test-lt = $(if $(filter-out $2, $(firstword $(sort $1 $2))),y)
+> +test-gt = $(call test-lt, $2, $1)
+> +
+>  ###
+>  # Name of target with a '.' as filename prefix. foo/bar.o => foo/.bar.o
+>  dot-target = $(dir $@).$(notdir $@)
+> --
+> 2.34.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
