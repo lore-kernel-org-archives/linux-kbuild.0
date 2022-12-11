@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1CCC4332F
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Dec 2022 09:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C765EC4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Dec 2022 13:04:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbiLKJt3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 11 Dec 2022 04:49:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35468 "EHLO
+        id S230181AbiLKNE2 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 11 Dec 2022 08:04:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbiLKJt1 (ORCPT
+        with ESMTP id S230081AbiLKNE1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Dec 2022 04:49:27 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0EC210FD9;
-        Sun, 11 Dec 2022 01:49:26 -0800 (PST)
+        Sun, 11 Dec 2022 08:04:27 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4947665;
+        Sun, 11 Dec 2022 05:04:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9C67EB80915;
-        Sun, 11 Dec 2022 09:49:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E12EEC433D2;
-        Sun, 11 Dec 2022 09:49:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E3CF60DEC;
+        Sun, 11 Dec 2022 13:04:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2563FC433F2;
+        Sun, 11 Dec 2022 13:04:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670752164;
-        bh=3GMvyRizM+Rxblh7pHwRbabkGYlPbTfIEjgrgW67JR4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=tlxoHj+2xtDqNBEqNRf8IF0m7ZkxeDb7Yu/5Zs2b510WNs6EaenMSHFv8svwpUU5B
-         4Szgb6+Pn4UHMwRmr7ubmnUIBEv4uYeQ8JJYbaGefew1qSvkDh47ZNmtsSXggqdn/u
-         eCyF/uBLHxOg7dzhOU3xVqi2BueWZnmNouEVg2ZOc6fZgWrv8GBEjQ1o0ddD+KbQ01
-         64iNEJyr7vFkM1H+sx7frCHzYT8sT0yV6mfjB3GoU07Sr60r01SqwiMi0QFZlzT740
-         Q3meivDTL3+SdQjZbsYoZk16VhkXTSeDSXf0ntWWP5F7bEfQ8QUdNqX6yRwsKDEhod
-         S3wV1AOBedpzg==
+        s=k20201202; t=1670763865;
+        bh=MLS1s8ktcG2Xasg/KRaUChCLQv9pvRwRoCqpTltawqc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nlOm1ebyH3IY4LHcZpPojtLI2FB6N8ATGeYAEeLrTLZe0DW6XJbWA78ih0g6TPkeJ
+         y6SJAwp65Y1jdsap/D6rX2405K9KRnIVuu58OZfIshZsmXYPwjsWZDnjbpAWKZXVKc
+         Tvub9SiJXqgBCk5+N/og7JhX3FuiEsjPzbhEyGo2+wgkqkG1fEBQoWdZAjW8wYtRWU
+         j4sZMst2ziykzLY03sBIu7hGWHWy81MjbRVUC3PE+NEDsOoaiLQIuwk/rRgdkUbTgQ
+         Ms9V1acjd2Oy6zIkxafRxbCMAg5uw7giK3QdDcuQrZLP8usizTaHf+W2mZ0q1U3OIZ
+         9m2/koJ11+Hig==
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -39,54 +39,118 @@ Cc:     linux-kernel@vger.kernel.org,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nicolas Schier <nicolas@fjasle.eu>
-Subject: [PATCH] kbuild: do not sort after reading modules.order
-Date:   Sun, 11 Dec 2022 18:49:18 +0900
-Message-Id: <20221211094919.2717594-1-masahiroy@kernel.org>
+Subject: [PATCH 2/2] kbuild: refactor the prerequisites of the modpost rule
+Date:   Sun, 11 Dec 2022 22:04:08 +0900
+Message-Id: <20221211130408.2800314-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221211130408.2800314-1-masahiroy@kernel.org>
+References: <20221211130408.2800314-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-modules.order lists modules in the deterministic order (that is why
-"modules order"), and there is no duplication in the list.
+The prerequisites of modpost are cluttered. The variables *-if-present
+and *-if-needed are unreadable.
 
-$(sort ) is pointless.
+It is cleaner to append them into modpost-deps.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- scripts/Makefile.modfinal | 2 +-
- scripts/Makefile.modinst  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/Makefile.modpost | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 25bedd83644b..4705d32388f3 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -13,7 +13,7 @@ include $(srctree)/scripts/Kbuild.include
- include $(srctree)/scripts/Makefile.lib
- 
- # find all modules listed in modules.order
--modules := $(sort $(shell cat $(MODORDER)))
-+modules := $(shell cat $(MODORDER))
- 
- __modfinal: $(modules)
- 	@:
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index a4c987c23750..f4cff42069ad 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -9,7 +9,7 @@ __modinst:
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index f814a6acd200..5eb5e8280379 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -38,6 +38,8 @@ __modpost:
  include include/config/auto.conf
  include $(srctree)/scripts/Kbuild.include
  
--modules := $(sort $(shell cat $(MODORDER)))
-+modules := $(shell cat $(MODORDER))
++MODPOST = scripts/mod/modpost
++
+ modpost-args =										\
+ 	$(if $(CONFIG_MODVERSIONS),-m)							\
+ 	$(if $(CONFIG_MODULE_SRCVERSION_ALL),-a)					\
+@@ -46,6 +48,8 @@ modpost-args =										\
+ 	$(if $(CONFIG_MODULE_ALLOW_MISSING_NAMESPACE_IMPORTS)$(KBUILD_NSDEPS),-N)	\
+ 	-o $@
  
- ifeq ($(KBUILD_EXTMOD),)
- dst := $(MODLIB)/kernel
++modpost-deps := $(MODPOST)
++
+ # 'make -i -k' ignores compile errors, and builds as many modules as possible.
+ ifneq ($(findstring i,$(filter-out --%,$(MAKEFLAGS))),)
+ modpost-args += -n
+@@ -78,12 +82,13 @@ targets += .vmlinux.objs
+ .vmlinux.objs: vmlinux.a $(KBUILD_VMLINUX_LIBS) FORCE
+ 	$(call if_changed,vmlinux_objs)
+ 
+-vmlinux.o-if-present := $(wildcard vmlinux.o)
+-output-symdump := vmlinux.symvers
+-
+-ifdef KBUILD_MODULES
+-output-symdump := $(if $(vmlinux.o-if-present), Module.symvers, modules-only.symvers)
+-missing-input := $(filter-out $(vmlinux.o-if-present),vmlinux.o)
++ifeq ($(wildcard vmlinux.o),)
++missing-input := vmlinux.o
++output-symdump := modules-only.symvers
++else
++modpost-args += vmlinux.o
++modpost-deps += vmlinux.o
++output-symdump := $(if $(KBUILD_MODULES), Module.symvers, vmlinux.symvers)
+ endif
+ 
+ else
+@@ -95,11 +100,16 @@ src := $(obj)
+ # Include the module's Makefile to find KBUILD_EXTRA_SYMBOLS
+ include $(kbuild-file)
+ 
+-module.symvers-if-present := $(wildcard Module.symvers)
+ output-symdump := $(KBUILD_EXTMOD)/Module.symvers
+-missing-input := $(filter-out $(module.symvers-if-present), Module.symvers)
+ 
+-modpost-args += -e $(addprefix -i ,$(module.symvers-if-present) $(KBUILD_EXTRA_SYMBOLS))
++ifeq ($(wildcard Module.symvers),)
++missing-input := Module.symvers
++else
++modpost-args += -i Module.symvers
++modpost-deps += Module.symvers
++endif
++
++modpost-args += -e $(addprefix -i , $(KBUILD_EXTRA_SYMBOLS))
+ 
+ endif # ($(KBUILD_EXTMOD),)
+ 
+@@ -108,12 +118,10 @@ modpost-args += -w
+ endif
+ 
+ ifdef KBUILD_MODULES
+-modorder-if-needed := $(MODORDER)
+ modpost-args += -T $(MODORDER)
++modpost-deps += $(MODORDER)
+ endif
+ 
+-MODPOST = scripts/mod/modpost
+-
+ # Read out modules.order to pass in modpost.
+ # Otherwise, allmodconfig would fail with "Argument list too long".
+ quiet_cmd_modpost = MODPOST $@
+@@ -122,10 +130,10 @@ quiet_cmd_modpost = MODPOST $@
+ 		echo >&2 "WARNING: $(missing-input) is missing."; \
+ 		echo >&2 "         Modules may not have dependencies or modversions."; \
+ 		echo >&2 "         You may get many unresolved symbol warnings.";) \
+-	$(MODPOST) $(modpost-args) $(vmlinux.o-if-present)
++	$(MODPOST) $(modpost-args)
+ 
+ targets += $(output-symdump)
+-$(output-symdump): $(modorder-if-needed) $(vmlinux.o-if-present) $(module.symvers-if-present) $(MODPOST) FORCE
++$(output-symdump): $(modpost-deps) FORCE
+ 	$(call if_changed,modpost)
+ 
+ __modpost: $(output-symdump)
 -- 
 2.34.1
 
