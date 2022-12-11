@@ -2,231 +2,116 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B64C4167B
-	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Dec 2022 13:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8878C4332F
+	for <linux-kbuild@archiver.kernel.org>; Sun, 11 Dec 2022 20:28:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbiLKNE3 (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Sun, 11 Dec 2022 08:04:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52156 "EHLO
+        id S230318AbiLKU2F (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Sun, 11 Dec 2022 15:28:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230240AbiLKNE2 (ORCPT
+        with ESMTP id S229471AbiLKU2E (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Dec 2022 08:04:28 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9CCA46B;
-        Sun, 11 Dec 2022 05:04:27 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 8CC04CE0B3C;
-        Sun, 11 Dec 2022 13:04:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DE3C433EF;
-        Sun, 11 Dec 2022 13:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670763863;
-        bh=Xic9HRp6xQVGQZjjCvAaASkUaXZAG9Z4CIG2ZfttFHY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=hXIVlWe8x7vJgwKNkFoAfdOLZpnLVZQAkgfiJgA1zgEfno1WvyijqCjZehXZvfQRA
-         fgoQRHOD8fz5nF46cOLpTaimBzeb3WV+xzGgpq1yP7uQ02mbLv4eNG5XrBMrDvyqFc
-         mz8T3HeyKuwOL7VlS4mL1x8stSN/ZwIplQ9WdCIWryyv+mzui0ORvluTFVCsyw0vV0
-         yxMoMDJKYWc5fSGQilbhO8vTWhnNzDBm4tpb8o9llm39P4CkDGv8p0rzLwCwsTL6yE
-         PpZTjVGhgX4PBoKflzZ8apiiCjecKIU/jxKpjVt+7JiHOApv6KIv+dFedXqDg0/lDR
-         HYDzsuXnkHLyg==
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
+        Sun, 11 Dec 2022 15:28:04 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694B0E4A;
+        Sun, 11 Dec 2022 12:28:03 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id js9so8908582pjb.2;
+        Sun, 11 Dec 2022 12:28:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=by9IvQrNC4n3hMJPqWVgJdj265wMQ5fsMcjx5CkRMb0=;
+        b=Gvluwy8JmJ35C4rhygAyMhL+GuwkXWeHQDfujZWe2lpeshB2WQwe8zU/oDmPrdNcNz
+         CD6szyiJYLnPouNh7PdPMCRSQXLtRZQ74900pzOfX9tJiRNXq0R4SnMzTFMYe3Q9sYWs
+         nuqQKIgkZasvDWg3OnLuLZwUcCHlvrxpWUicdx1b5rYcZcCFjjCcg5l1b52gBZ/7wWjo
+         577wUQcVyQ9CruX0RRyH5m0J+F9oixQ/Ea3HWdnF9ZpV4yJScVDkQJceaepUkJlrEkcq
+         d9FfFWRoboee96aSzpYxNwux8m3l0kNJTjbf15fwYKTetvqUSS/QNa64NluQ3HHIPINl
+         AJNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=by9IvQrNC4n3hMJPqWVgJdj265wMQ5fsMcjx5CkRMb0=;
+        b=vPsk2/GUUIXG8+SazL6ejyb9vixOZ0blMEY9QqNDkKnlcWt+YPUOKv4ubBc3iKjsN3
+         yLp1hnfiqnPwdrOMcHhfll63DpxoRewHOzUl+SMjljz2vwc4SrCnOlLYMnGz2dzkEblA
+         QDlHJniLxRfTIZy8mcPg4/06OL5ZN6yQAEsuT0VmyQQDgn4DHa+OfNU2n7hc141322DU
+         wjUuvfG17ATgLBP7P8PPNnVnT5JdBXZoA483DONICFbnFmNVb8Lg44LlDvR4RyULBsP1
+         xnbIcLBbmMbLiDCoEO8mgxd6zvQHmpTnmus7HXLa8pI/R67hJyQlVi8nYu9DwgJUaeZu
+         iGzg==
+X-Gm-Message-State: ANoB5pkJz0dCcSVpKZjBm05DuW8JcLBVxTqi6RdrWQVyhcazxZI1dA2Q
+        BSqFQvNyIB6g62+Nv0R/VB0=
+X-Google-Smtp-Source: AA0mqf4GK7azKp1g/5pH5O5L6eYpB3GPoNtYfq1K6iRvncnGG1DylBHg8K05syopNMajOeARdzRoUQ==
+X-Received: by 2002:a17:902:f285:b0:189:f0ac:191d with SMTP id k5-20020a170902f28500b00189f0ac191dmr3559258plc.4.1670790482873;
+        Sun, 11 Dec 2022 12:28:02 -0800 (PST)
+Received: from mail.google.com ([103.229.249.253])
+        by smtp.gmail.com with ESMTPSA id u14-20020a17090341ce00b001754fa42065sm4749908ple.143.2022.12.11.12.27.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Dec 2022 12:28:02 -0800 (PST)
+Date:   Mon, 12 Dec 2022 09:27:55 +1300
+From:   Paulo Miguel Almeida <paulo.miguel.almeida.rodenas@gmail.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>, Tom Rix <trix@redhat.com>,
-        linux-modules@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH 1/2] kbuild: change module.order to list *.o instead of *.ko
-Date:   Sun, 11 Dec 2022 22:04:07 +0900
-Message-Id: <20221211130408.2800314-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        Nicolas Schier <nicolas@fjasle.eu>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Vipin Sharma <vipinsh@google.com>,
+        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] scripts/tags.sh: choose which directories to exclude
+ from being indexed
+Message-ID: <Y5Y9S0qSOAL/KHp1@mail.google.com>
+References: <Y5T66yWNVAZNIaJ0@mail.google.com>
+ <Y5UP+tnnxNgoi6A2@mail.google.com>
+ <Y5VazQnY7s4+cXdM@debian.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5VazQnY7s4+cXdM@debian.me>
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-scripts/Makefile.build replaces the suffix .o with .ko, then
-scripts/Makefile.modpost calls the sed command to change .ko back
-to the original .o suffix.
+On Sun, Dec 11, 2022 at 11:21:33AM +0700, Bagas Sanjaya wrote:
+> On Sun, Dec 11, 2022 at 12:02:18PM +1300, Paulo Miguel Almeida wrote:
+> > This patch makes it possible for the devs to specify which folders
+> > they don't want to include into database as part of the
+> > find_other_sources func if a makefile variable IGNOREDIRS is present,
+> > otherwise the original behaviour is kept.
+> 
+> Better say "Add IGNOREDIRS variable, which specifies which directories
+> to be ignored from indexing."
+> 
+> > @@ -278,6 +278,13 @@ To get all available archs you can also specify all. E.g.::
+> >  
+> >      $ make ALLSOURCE_ARCHS=all tags
+> >  
+> > +IGNOREDIRS
+> > +---------------
+> > +For tags/TAGS/cscope targets, you can choose which directories won't
+> > +be included in the databases, separated by comma. E.g.:
+> > +
+> > +    $ make IGNOREDIRS=drivers/gpu/drm/radeon,tools cscope
+> > +
+> 
+> Use two-colon syntax (::) for code block above to be consistent with
+> other code blocks.
+> 
+> Thanks. 
+> 
+> -- 
+> An old man doll... just what I always wanted! - Clara
 
-Instead of converting the suffixes back-and-forth, store the .o paths
-in modules.order, and replace it with .ko in 'make modules_install'.
+Hi Bagas,
 
-This avoids the unneeded sed command.
+thanks for taking the time to review this patch. I will make the changes
+that you've pointed out.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+thanks!
 
- Makefile                                    |  2 +-
- scripts/Makefile.build                      |  2 +-
- scripts/Makefile.modfinal                   |  6 +++---
- scripts/Makefile.modinst                    |  2 +-
- scripts/Makefile.modpost                    |  7 +++++--
- scripts/clang-tools/gen_compile_commands.py |  8 ++++----
- scripts/mod/modpost.c                       | 11 ++++-------
- scripts/modules-check.sh                    |  2 +-
- 8 files changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 8b5930d521fc..669e25970917 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1569,7 +1569,7 @@ __modinst_pre:
- 		rm -f $(MODLIB)/build ; \
- 		ln -s $(CURDIR) $(MODLIB)/build ; \
- 	fi
--	@sed 's:^:kernel/:' modules.order > $(MODLIB)/modules.order
-+	@sed 's:^\(.*\)\.o$$:kernel/\1.ko:' modules.order > $(MODLIB)/modules.order
- 	@cp -f modules.builtin $(MODLIB)/
- 	@cp -f $(objtree)/modules.builtin.modinfo $(MODLIB)/
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 799df12b53f3..267eb7aac5b2 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -435,7 +435,7 @@ $(obj)/built-in.a: $(real-obj-y) FORCE
- # modules.order unless contained modules are updated.
- 
- cmd_modules_order = { $(foreach m, $(real-prereqs), \
--	$(if $(filter %/modules.order, $m), cat $m, echo $(patsubst %.o,%.ko,$m));) :; } \
-+	$(if $(filter %/modules.order, $m), cat $m, echo $m);) :; } \
- 	> $@
- 
- $(obj)/modules.order: $(obj-m) FORCE
-diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
-index 83f2797e530c..a30d5b08eee9 100644
---- a/scripts/Makefile.modfinal
-+++ b/scripts/Makefile.modfinal
-@@ -15,7 +15,7 @@ include $(srctree)/scripts/Makefile.lib
- # find all modules listed in modules.order
- modules := $(call read-file, $(MODORDER))
- 
--__modfinal: $(modules)
-+__modfinal: $(modules:%.o=%.ko)
- 	@:
- 
- # modname and part-of-module are set to make c_flags define proper module flags
-@@ -57,13 +57,13 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
- 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
- # Re-generate module BTFs if either module's .ko or vmlinux changed
--$(modules): %.ko: %.o %.mod.o scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
-+%.ko: %.o %.mod.o scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
- 	+$(call if_changed_except,ld_ko_o,vmlinux)
- ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
- endif
- 
--targets += $(modules) $(modules:.ko=.mod.o)
-+targets += $(modules:%.o=%.ko) $(modules:%.o=%.mod.o)
- 
- # Add FORCE to the prequisites of a target to force it to be always rebuilt.
- # ---------------------------------------------------------------------------
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 65aac6be78ec..836391e5d209 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -26,7 +26,7 @@ suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
- suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
- suffix-$(CONFIG_MODULE_COMPRESS_ZSTD)	:= .zst
- 
--modules := $(patsubst $(extmod_prefix)%, $(dst)/%$(suffix-y), $(modules))
-+modules := $(patsubst $(extmod_prefix)%.o, $(dst)/%.ko$(suffix-y), $(modules))
- 
- __modinst: $(modules)
- 	@:
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 55a72f5eb76d..f814a6acd200 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -107,7 +107,10 @@ ifneq ($(KBUILD_MODPOST_WARN)$(missing-input),)
- modpost-args += -w
- endif
- 
--modorder-if-needed := $(if $(KBUILD_MODULES), $(MODORDER))
-+ifdef KBUILD_MODULES
-+modorder-if-needed := $(MODORDER)
-+modpost-args += -T $(MODORDER)
-+endif
- 
- MODPOST = scripts/mod/modpost
- 
-@@ -119,7 +122,7 @@ quiet_cmd_modpost = MODPOST $@
- 		echo >&2 "WARNING: $(missing-input) is missing."; \
- 		echo >&2 "         Modules may not have dependencies or modversions."; \
- 		echo >&2 "         You may get many unresolved symbol warnings.";) \
--	sed 's/ko$$/o/' $(or $(modorder-if-needed), /dev/null) | $(MODPOST) $(modpost-args) -T - $(vmlinux.o-if-present)
-+	$(MODPOST) $(modpost-args) $(vmlinux.o-if-present)
- 
- targets += $(output-symdump)
- $(output-symdump): $(modorder-if-needed) $(vmlinux.o-if-present) $(module.symvers-if-present) $(MODPOST) FORCE
-diff --git a/scripts/clang-tools/gen_compile_commands.py b/scripts/clang-tools/gen_compile_commands.py
-index d800b2c0af97..0227522959a4 100755
---- a/scripts/clang-tools/gen_compile_commands.py
-+++ b/scripts/clang-tools/gen_compile_commands.py
-@@ -138,10 +138,10 @@ def cmdfiles_for_modorder(modorder):
-     """
-     with open(modorder) as f:
-         for line in f:
--            ko = line.rstrip()
--            base, ext = os.path.splitext(ko)
--            if ext != '.ko':
--                sys.exit('{}: module path must end with .ko'.format(ko))
-+            obj = line.rstrip()
-+            base, ext = os.path.splitext(obj)
-+            if ext != '.o':
-+                sys.exit('{}: module path must end with .o'.format(obj))
-             mod = base + '.mod'
-             # Read from *.mod, to get a list of objects that compose the module.
-             with open(mod) as m:
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 56d856f2e511..b48838a71bf6 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1856,11 +1856,9 @@ static void read_symbols_from_files(const char *filename)
- 	FILE *in = stdin;
- 	char fname[PATH_MAX];
- 
--	if (strcmp(filename, "-") != 0) {
--		in = fopen(filename, "r");
--		if (!in)
--			fatal("Can't open filenames file %s: %m", filename);
--	}
-+	in = fopen(filename, "r");
-+	if (!in)
-+		fatal("Can't open filenames file %s: %m", filename);
- 
- 	while (fgets(fname, PATH_MAX, in) != NULL) {
- 		if (strends(fname, "\n"))
-@@ -1868,8 +1866,7 @@ static void read_symbols_from_files(const char *filename)
- 		read_symbols(fname);
- 	}
- 
--	if (in != stdin)
--		fclose(in);
-+	fclose(in);
- }
- 
- #define SZ 500
-diff --git a/scripts/modules-check.sh b/scripts/modules-check.sh
-index e06327722263..4c8da90de78e 100755
---- a/scripts/modules-check.sh
-+++ b/scripts/modules-check.sh
-@@ -16,7 +16,7 @@ check_same_name_modules()
- 	for m in $(sed 's:.*/::' "$1" | sort | uniq -d)
- 	do
- 		echo "error: the following would cause module name conflict:" >&2
--		sed -n "/\/$m/s:^:  :p" "$1" >&2
-+		sed -n "/\/$m/s:^\(.*\)\.o\$:  \1.ko:p" "$1" >&2
- 		exit_code=1
- 	done
- }
--- 
-2.34.1
+- Paulo A,
 
