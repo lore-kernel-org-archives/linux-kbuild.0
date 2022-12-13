@@ -2,205 +2,122 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83B1C00145
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 02:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F4BC4332F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 04:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233522AbiLMCEC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Dec 2022 21:04:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37438 "EHLO
+        id S234053AbiLMEEf (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Dec 2022 23:04:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234113AbiLMCEB (ORCPT
+        with ESMTP id S233994AbiLMEEd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Dec 2022 21:04:01 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC671B1F0;
-        Mon, 12 Dec 2022 18:03:53 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id s196so9497380pgs.3;
-        Mon, 12 Dec 2022 18:03:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=13l+GAcYpGztlBUQlibYZJJu+N68RuXQ0jlYBQoMmJs=;
-        b=C7e8fTgkcHmuTrZQ/8Hm+970UEm9w0GwiZQGb4P0t3TPyHs6BpkM19PxJKevgaBLH9
-         ecc6OZuZK31MBIapt3Lx9Doc/1/2Zvy3Sv4RNgX6VByVPmrOtG/+Ga1wvjrYg7Bg+aJU
-         hBgAyMCEUrE77NMwofmYJhE+QZY8Sc2s5pf4BPUzxW6e00/RwCGXDej3FJWD8AG8SnJg
-         KgKJF3uN6Ged36LgIu81WCnrak4VYiMRSiCowJctYqviIDtOoOciCV/KMx1uoZlsH3dv
-         SRltgj/hC3dEGy/mcMZI0/LZcodQBnxbZfBAOgdy29UtCfFQTiPlpzjq8xKdCA8vgA0g
-         jGYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=13l+GAcYpGztlBUQlibYZJJu+N68RuXQ0jlYBQoMmJs=;
-        b=Hw/FI9Lzhh/tcVzuBY/BOtHhmZtNozv4LX/5cjmR32BNtqKPGCnzP3/WLSkHvvH8i4
-         G9V+BV9Xpm9CFcQFayYdxsKNLPwsGMMowZWjKsFi2RkwmfbAUZfKOPcECiSIgVy47M0d
-         3y83xVchTfSgUda69NBKiJKrA5pslpKrnDyoB1v4Tmst4nxz2fc5PDbXsthbZmexidIV
-         aM4yeYjx9nJECiTvTlOx2fSLTlSmEpe/qGlhUKMuzqoft2TCG/YfJodSoFdSWflhw9Gr
-         pU4+eoAOABGMaFnJ8z2dt003kvr2r9LC95Xs2RVK9EaHkW24bAER92P/9NUOcJON+j7L
-         j+1g==
-X-Gm-Message-State: ANoB5pl4WybH6nwLaLS78TKvueFZXccSSHDQnc2+I8N/1nVNb72Yr/tC
-        MyG7obTaM7fTf0toXPZ0vLc=
-X-Google-Smtp-Source: AA0mqf6TOA5Zv73oVP0Hyc/ykYBfNk8zTqgxjnqSQOAaaS39735qjuxncWfCwWmiPm9kAsblFyF7zA==
-X-Received: by 2002:a62:fb14:0:b0:574:2b95:6f41 with SMTP id x20-20020a62fb14000000b005742b956f41mr3757325pfm.1.1670897033202;
-        Mon, 12 Dec 2022 18:03:53 -0800 (PST)
-Received: from mail.google.com ([103.229.249.253])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa78f1c000000b0056bc5ad4862sm6476212pfr.28.2022.12.12.18.03.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 18:03:52 -0800 (PST)
-Date:   Tue, 13 Dec 2022 15:03:44 +1300
-From:   Paulo Miguel Almeida <paulo.miguel.almeida.rodenas@gmail.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Mon, 12 Dec 2022 23:04:33 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7C51E3F3;
+        Mon, 12 Dec 2022 20:04:27 -0800 (PST)
+Received: from leknes.fjasle.eu ([46.142.49.245]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1M8hph-1p0FWq1vwf-004im1; Tue, 13 Dec 2022 05:02:25 +0100
+Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by leknes.fjasle.eu (Postfix) with ESMTPS id C79803C0C9;
+        Tue, 13 Dec 2022 05:02:17 +0100 (CET)
+Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
+Received: by localhost.fjasle.eu (Postfix, from userid 1000)
+        id 90111381; Tue, 13 Dec 2022 05:02:17 +0100 (CET)
+Date:   Tue, 13 Dec 2022 05:02:17 +0100
+From:   Nicolas Schier <nicolas@fjasle.eu>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Palmer Dabbelt <palmer@rivosinc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Nicolas Schier <nicolas@fjasle.eu>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] scripts/tags.sh: choose which directories to exclude
- from being indexed
-Message-ID: <Y5fdgI4uTpXZQ9yn@mail.google.com>
-References: <Y5T66yWNVAZNIaJ0@mail.google.com>
- <Y5UP+tnnxNgoi6A2@mail.google.com>
- <CAHVum0eOzd8MgP0FGObHWvqG_oPVoTmk_5gkEB0sAJK9JgCsFg@mail.gmail.com>
- <Y5ekQcJeoHd1i+Um@mail.google.com>
- <CAHVum0fqOj9peepXdrAETTO3_qNX-B2qM41AnPdHMMgPNyrnKg@mail.gmail.com>
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Rix <trix@redhat.com>, linux-riscv@lists.infradead.org,
+        llvm@lists.linux.dev, x86@kernel.org
+Subject: Re: [PATCH] kbuild: add test-{ge,gt,le,lt} macros
+Message-ID: <Y5f5SQxQRFpH8u2s@bergen.fjasle.eu>
+References: <20221211024647.2614394-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="0t9NkD14nKZzrYq+"
 Content-Disposition: inline
-In-Reply-To: <CAHVum0fqOj9peepXdrAETTO3_qNX-B2qM41AnPdHMMgPNyrnKg@mail.gmail.com>
+In-Reply-To: <20221211024647.2614394-1-masahiroy@kernel.org>
+Jabber-ID: nicolas@fjasle.eu
+X-Operating-System: Debian GNU/Linux bookworm/sid
+X-Provags-ID: V03:K1:5qgXUwpYs/m4w9C/Xh/pxvEtqm4qXUOG8JKpnIXe5eiduWTcQFb
+ 30ONln8NYJ54kyn7N5Swb0WdMBeILEHeTxKo552VtI/0gx4CYlzWmzwPsBUlXXQjBUZRkgX
+ bidVuKdQv6jurc+NQ8+I3REVLkX0gGQqS7997ynbJTuoHmlQHubHLOUh17BhS7NmZ4vIv76
+ MLkjxWSN7McjetvSnVYnQ==
+UI-OutboundReport: notjunk:1;M01:P0:Bg++/5kr/Xk=;QHknaR3hrJn5tOUaaqybmwSHhOE
+ WN5sxwZWC2pEba184Uuie/TSR3y2jVDpePH8ZnEdn0KeTzp/IWPwKkWADw3oxh3aQ1lgT4fQ2
+ 2vyvr+jR8Kw6GwbnUM1oPkJy2waZA82jB82zoLsWIIjiAOwR7DZ6FmVz+Ts3fRFqxfEQu2ejM
+ kJ8u6ls8ocLXQP3PNoGgDtDe6nBHmtvfbmvS4sNsSYniPQfAV+bHQwKIQMoo+2SCJLQWp0idF
+ qb60uDU/B25HUDkSVvCqLDYMO9F/l4Pm2ojLzwAkxDACEHqDwBlh6zjqMKFAYI0V/CiDpIGJV
+ yluJnCYJhti9SJd2uv5kLTPCJKbdjqk0XuZDwc31HTZTPoeDY4zkH/OrmD1M/7nh2tWgwx9yz
+ 5XNGM7391CtMzfIbA0uPpTXuxDprOpsp0CZmxGA5iIcboJ7AF+xvxXaujbPLfx+PgdfTJ3wgm
+ BdwO+N3iVpYZVhVeYIPPzC4Zm1xcjQWD9bj4Y4Dp8gziFdh42lXnEq7uyYfST5t47+f8rtiQW
+ EOZ1KnVIc1z31LIXRM+yZeYApmyl068siCVf+OfAxc733fj0dYXUV6h5ViCkrC/tREL1YNXWG
+ puszdn0uLYGtZcWQRj45zKp3eJTxYtZ8xNLWEAc3hAcvzdgx+YF9TMQ9mqx81GBQLhgUuiBfj
+ nMwvEmO26cA7JhMffLSk03SAp3kCquFNo5Tw6y2Sbw==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 02:32:41PM -0800, Vipin Sharma wrote:
-> On Mon, Dec 12, 2022 at 1:59 PM Paulo Miguel Almeida
-> <paulo.miguel.almeida.rodenas@gmail.com> wrote:
-> >
-> > On Mon, Dec 12, 2022 at 01:27:37PM -0800, Vipin Sharma wrote:
-> > > On Sat, Dec 10, 2022 at 3:02 PM Paulo Miguel Almeida
-> > > <paulo.miguel.almeida.rodenas@gmail.com> wrote:
-> > > >  # find sources in rest of tree
-> > > > -# we could benefit from a list of dirs to search in here
-> > > >  find_other_sources()
-> > > >  {
-> > > > -       find ${tree}* $ignore \
-> > > > +       local loc_ignore=${ignore}
-> > > > +       if [ -n "${IGNOREDIRS}" ]; then
-> > > > +               exp_ignored_dirs=$(sed 's/,/ /g' <<< ${IGNOREDIRS})
-> > > > +               for i in ${exp_ignored_dirs}; do
-> > > > +                       loc_ignore="${loc_ignore} ( -path $i ) -prune -o"
-> > > > +               done
-> > > > +       fi
-> > > > +
-> > >
-> > > This should be global overwrite instead of just in this function.
-> > > Before find_other_sources() is executed, this script finds files in
-> > > arch directories. So, if you keep it local then those files cannot be
-> > > excluded which makes execution of the command incorrect:
-> > >
-> > > make IGNOREDIRS=arch/x86 cscope
-> > >
-> >
-> > Hi Vipin, thanks for taking the time to review this patch.
-> >
-> > I see where you are coming from. I was aware of the 'loophole' that the
-> > current approach could have but, to be honest, I thought that there
-> > would be very little use in being able to exclude arch/.*?/ files.
-> >
-> > The reason for that being that I thought the most common usage for this
-> > feature would be to ignore folders within subsystems like drivers and
-> > tools to ensure code navigation would be less 'messy'.
-> 
-> Yes, the original intent was to make driver code browsing less messy
-> but if we are introducing an option we should adapt it for generic
-> cases and correct the semantics.
 
-Agreed.
+--0t9NkD14nKZzrYq+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> >
-> > Additionally, if we go with the global IGNOREDIRS approach you just
-> > described, we could have some conflicting options too such as:
-> >
-> > make ALLSOURCE_ARCHS="x86 arm" IGNOREDIRS=arch/x86 cscope
-> >
-> 
-> I don't think this is conflicting, to me it is more complementary.
-> Above line shows get all code for x86 and arm but don't get x86 source
-> code ("arch/x86/include" is fine). This can even be fine tuned to sub
-> directories.
-> 
+On Sun 11 Dec 2022 11:46:47 GMT, Masahiro Yamada wrote:
+> GNU Make 4.4 introduced $(intcmp ...), which is useful to compare two
+> integers without forking a new process.
+>=20
+> Add test-{ge,gt,le,lt} macros, which work more efficiently with GNU
+> Make >=3D 4.4. For older Make versions, they fall back to the 'test'
+> shell command.
+>=20
+> The first two parameters to $(intcmp ...) must not be empty. To avoid
+> the syntax error, I appended '0' to them. Fortunately, '00' is treated
+> as '0'. This is needed because CONFIG options may expand to an empty
+> string when the kernel configuration is not included.
+>=20
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com> # RISC-V
+> ---
+>=20
+> Changes in v3:
+>   - Use $(intcmp ...) instead of playing with $(sort ...)
 
-That's a fair point. I had not thought about it that way. Thanks!
+Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
 
-Will implement the changes when I get home.
+--0t9NkD14nKZzrYq+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> I just now noticed after seeing your command, ALLSOURCE_ARCHS take
-> space separated values, whereas, IGNOREDIRS take comma separated
-> values. They both should be in the same format, since ALLSOURCE_ARCHS
-> was already there, it is better to change IGNOREDIRS.
-> 
-> Can you also change IGNOREDIRS to IGNORE_DIRS? It is much easier to
-> read this way. Sorry, I should have said this in the  beginning.
-> 
+-----BEGIN PGP SIGNATURE-----
 
-Yep, no problem! :-)
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmOX+UkACgkQB1IKcBYm
+EmkfAhAApWxZ5TLlye6r6ubq1oPH6KxdMTM7wec0/MHj+Ga99bJcULpcYoWA/016
+vz1Al+59s3cJoV5oCTxVobXu2XpBVhpxiKWVQdKZFpSHt7LIhN/nbSCsDkyu7Lz1
+RoVUZFFM4D3cChGVHZMHFsw9M1TE/5PplZ2LqfcCm6bsDuXWcEwpAS2vfuwk3ios
+UQhvm6p76lKOhPynxY4xFJXaQDMseGlr3FlpbKLW9GZoHd3dWyBGvx2geawvo3Pg
+ixoYKcvAj/EgrGYk2QP7PUGz7EB+cu5b0IPuSfp5BzNSuoZq9D8bZe1tIPD3d2sI
+38YlpmqDa8RDTetSBpRXtRKtwtaC8HOxILKNLpEef4kb3G9/yKymY7Ao6DSh/bj3
+gSF0PgeaaUaUmYw2kF5s9VuIPEoP8acIzNnGeVFRBPj5xEqTRI8inyYDZsR6WzfJ
+iKSB8+Zt85GJMhMXdqrEhWcGmpjZEFy4jkj+IwzEPHNbXTkNz0hNh1xqaVXayrav
+7YGt/E7FEwoCsix2WlEIrSk/TU2Xdm9dTvjRhrkDrDMxSYlgXwFXiR4l4kWPLcDL
+8h+BoSc5QNYOAFoy3oNIlMySHhNUuKB/mmCRiLGb2tly/DyttNkmzpr7Y24EAlVU
+sHaM9f3vw8RwTv6w2sNW+6y0/Cc+84Um1el7bLhN1TZ8S8b9V2U=
+=ESv1
+-----END PGP SIGNATURE-----
 
-> > My 2 cents is that ALLSOURCE_ARCHS is already the mechanism for
-> > excluding archs so it's 'okay' to keep IGNOREDIRS as is.
-> >
-> > Let me know your thoughts.
-> >
-> > Thanks!
-> >
-> > - Paulo A.
-> >
-> > > Above command will still index all of the code in arch/x86. Something
-> > > like this will be better.
-> > >
-> > > --- a/scripts/tags.sh
-> > > +++ b/scripts/tags.sh
-> > > @@ -17,6 +17,13 @@ ignore="$(echo "$RCS_FIND_IGNORE" | sed 's|\\||g' )"
-> > >  # tags and cscope files should also ignore MODVERSION *.mod.c files
-> > >  ignore="$ignore ( -name *.mod.c ) -prune -o"
-> > >
-> > > +if [ -n "${IGNOREDIRS}" ]; then
-> > > +       exp_ignored_dirs=$(sed 's/,/ /g' <<< ${IGNOREDIRS})
-> > > +       for i in ${exp_ignored_dirs}; do
-> > > +               ignore="${ignore} ( -path $i ) -prune -o"
-> > > +       done
-> > > +fi
-> > > +
-> > >  # Use make KBUILD_ABS_SRCTREE=1 {tags|cscope}
-> > >  # to force full paths for a non-O= build
-> > >  if [ "${srctree}" = "." -o -z "${srctree}" ]; then
-> > > @@ -62,9 +69,9 @@ find_include_sources()
-> > >  # we could benefit from a list of dirs to search in here
-> > >  find_other_sources()
-> > >  {
-> > > -       find ${tree}* $ignore \
-> > > -            \( -path ${tree}include -o -path ${tree}arch -o -name
-> > > '.tmp_*' \) -prune -o \
-> > > -              -name "$1" -not -type l -print;
-> > > +       find ${tree}* ${ignore} \
-> > > +               \( -path ${tree}include -o -path ${tree}arch -o -name
-> > > '.tmp_*' \) -prune -o \
-> > > +               -name "$1" -not -type l -print;
-> > >  }
-> > >
-> > > We will still have to specify arch/x86 and arch/x86/include but this
-> > > works and keeps the definition of IGNOREDIRS relatively correct.
-> > >
-> > >
-> > > > +       find ${tree}* ${loc_ignore} \
-> > > >              \( -path ${tree}include -o -path ${tree}arch -o -name '.tmp_*' \) -prune -o \
-> > > >                -name "$1" -not -type l -print;
-> > > >  }
-> > > > --
-> > > > 2.38.1
-> > > >
+--0t9NkD14nKZzrYq+--
