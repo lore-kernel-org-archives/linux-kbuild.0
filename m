@@ -2,137 +2,148 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0BE7C10F1B
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 04:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28660C4332F
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 04:18:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbiLMEEg (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Mon, 12 Dec 2022 23:04:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56822 "EHLO
+        id S233968AbiLMESo (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Mon, 12 Dec 2022 23:18:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233965AbiLMEEd (ORCPT
+        with ESMTP id S229611AbiLMESm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Dec 2022 23:04:33 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 935B51DF22;
-        Mon, 12 Dec 2022 20:04:26 -0800 (PST)
+        Mon, 12 Dec 2022 23:18:42 -0500
+X-Greylist: delayed 1168 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 12 Dec 2022 20:18:36 PST
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C725192BD;
+        Mon, 12 Dec 2022 20:18:35 -0800 (PST)
 Received: from leknes.fjasle.eu ([46.142.49.245]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MuDoR-1onxTw0NQb-00uWbT; Tue, 13 Dec 2022 04:58:33 +0100
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1M5wTt-1p1tgF13Gt-007R4o; Tue, 13 Dec 2022 05:18:12 +0100
 Received: from localhost.fjasle.eu (bergen.fjasle.eu [IPv6:fdda:8718:be81:0:6f0:21ff:fe91:394])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (Client did not present a certificate)
-        by leknes.fjasle.eu (Postfix) with ESMTPS id 966C03C0C9;
-        Tue, 13 Dec 2022 04:58:31 +0100 (CET)
+        by leknes.fjasle.eu (Postfix) with ESMTPS id C93C83C0EE;
+        Tue, 13 Dec 2022 05:18:10 +0100 (CET)
 Authentication-Results: leknes.fjasle.eu; dkim=none; dkim-atps=neutral
 Received: by localhost.fjasle.eu (Postfix, from userid 1000)
-        id 26F47381; Tue, 13 Dec 2022 04:58:30 +0100 (CET)
-Date:   Tue, 13 Dec 2022 04:58:30 +0100
+        id 2820A381; Tue, 13 Dec 2022 05:18:04 +0100 (CET)
+Date:   Tue, 13 Dec 2022 05:18:04 +0100
 From:   Nicolas Schier <nicolas@fjasle.eu>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] kbuild: ensure Make >= 3.82 is used
-Message-ID: <Y5f4ZgyK7QlqYu31@bergen.fjasle.eu>
-References: <20221211030352.2622425-1-masahiroy@kernel.org>
- <Y5djBr9rVhSq8+iK@dev-arch.thelio-3990X>
+Subject: Re: [PATCH] kbuild: do not sort after reading modules.order
+Message-ID: <Y5f8/BCOpJAqKgcd@bergen.fjasle.eu>
+References: <20221211094919.2717594-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qiUajzA37JnJs5lE"
+        protocol="application/pgp-signature"; boundary="Upav2svuIRAE6goJ"
 Content-Disposition: inline
-In-Reply-To: <Y5djBr9rVhSq8+iK@dev-arch.thelio-3990X>
+In-Reply-To: <20221211094919.2717594-1-masahiroy@kernel.org>
 Jabber-ID: nicolas@fjasle.eu
 X-Operating-System: Debian GNU/Linux bookworm/sid
-X-Provags-ID: V03:K1:ce7jmiET6SD91dPNTFBj5cbC8cWGi2R4bwN/lR4AU2vdLr78uuA
- Iq63o2NlBELuR5VRhCoH0kFildRiPNLWOuBIpIfzvmFOrotTeFUG4v5ELaJcDYwvzYxnvbV
- rAWVJUJYqj3rWf3vw0rSC4P+U2JKIH26SaMhF4U1lPshMwJrNOVQIfghreXzg54wbzKxwG6
- dBB5mZalBqOjFgLWX8m+Q==
-UI-OutboundReport: notjunk:1;M01:P0:kBqmWvQ7KL8=;8Sy5dR218fiTyPQQE8QCXLaTeLD
- xns9cDIA+DxoZ/6xUJE+EJ3X8kXLSEmU84lkD/wCAUgNtnFDFUdGJn+/lZD3fPRhybnWEepuH
- k0koNGFv70KVhMhDojpxnAk+rkVxjEjS9KjbBS/gTCZ1UKjTBi/aem+KEX/Vn7/C/GX2ZhM3V
- vOsyTm0e7QBK3mxUvDk9qVBmCApqcAYyVhIpBoiwuyU3JP4FV3j7/A3awyJ4hR+xuBGKoe6Ok
- MuK4eYJX78hjwKYngpYDLmNQsyPdLgQx2C6QkPv8UPX5w02JkltlEk5urcRrrbzvkW+09tVfM
- nkJaHGNNIxCFLuxfB7ktUdfGQr0BtqXlNWkoWSpRP8OeFE89KiRRgmzH8eszejTLR5BAix9RY
- C1bO1GWvxRLHSJY2SXAwXIViW5V5VdDfZwzibKJP9p+bGkodR242N+wjcD/khqgwv1O57RRJc
- eQVlrnKZTtdRDAzTdyyTrpMRD1xbYk4mu6q/wjTeKeIBRBnmQB5b3qieVk+zA0tvkT8OQx5wF
- fuTGCkN4PA3KRM37aLT+xs13QPQ17bCZtS0ICzpnlt+MWfmrLI9duOhsQis1CmSGIn8cM23HJ
- F35dIjMxLdbE3voHf/DsoOkD9KZ9rrCeTPFj/dum3d/NBVObQfl0fWA8Wzy6so+Tr+odGD/Op
- xhGHF7MJah61ZsKIcJGNV1WB6zQGzRuMdv9HxZsNyg==
+X-Provags-ID: V03:K1:dusdd3ZvI66iLKPsiSw3XRx26yaF1bifpOM6avUoVkxvjA3PrmW
+ xf4OiDO2NYPqmaNcH2u+PcvmAAE+4WQL5rj5fjRUmS4B4BrzkNvAZ3IZaCNcxoqVgGjZrs8
+ IZ2m9Gz4runfFIriqQ9JjZ86bafdc6yu6pAFI2HdZpF2nifekeCrybDPIpTdKwqKFRLzYQ/
+ nLtlsZhskvZpHeUnZVWXQ==
+UI-OutboundReport: notjunk:1;M01:P0:Zt+MErAqjeQ=;V+gC71bwH++jfPY3DSYatp17Kgc
+ ezu2trfwFLvE1xZh5Q4Cc51DIDkNo3o7TupAYqAih4D9xYhS5V+iSaDVncPhhq+2YOEwqUW7Z
+ tB1FJHx1SUU5rhfoimjqs5mfqrpAeXw6AuDMtSvD+rb7xfuCX/95taIYAIz7H/bN1Inxoo/0A
+ 7lucphi4kGcCn0TkenjL2Zm2foih9TY8wWD8/42ymWCTQgxx1NKFOScTK37dz3jgSnRUFJGiX
+ 9KYu5a8ABxd8tbT4jB/HOMu4KrnzXp1771ttrOqRKri25xn2RjlSxrNjX5TLhkCT+Klc/+Rt7
+ 0KE1NgYrErx77eTr6TZsRInA9A0PWZxw0wfAqXx3Zq/NfUvTDpmDz6BCzea+22Kty0IeJ9Fme
+ W5YZQMS4Qwcx2eJxH5tGcMMHMmsJeJz3vKJWnAtNSagMoo7UC/medJAQ3bCbabbEvGT3z1xRp
+ 3IlWvDqE8oh9C5s3DqnDyeLJ85XYUyzaVJSCTyl30+UvuzXOftYrKqo8Y5rJ24K85mT/1Y3DF
+ TfXmcbs8sLppLpqbQ2VyHm+wvcwmBfKHgOzSc6ethZcnhVNMMr1/IW7cvXeQAaXjG8G/SHKgs
+ o9JDwvQ/y452wdQkuX8TRg3Wv4J29r9fxK/lvB/HRoEgrLwGL/yUsUsVovhJN/zx72F+UyipK
+ V+vc5FhMpjgQRRy+Bh7UeyNd6D3fE5UDSpKi/haNXQ==
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
 
---qiUajzA37JnJs5lE
-Content-Type: text/plain; charset=iso-8859-1
+--Upav2svuIRAE6goJ
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon 12 Dec 2022 10:21:10 GMT, Nathan Chancellor wrote:
-> On Sun, Dec 11, 2022 at 12:03:52PM +0900, Masahiro Yamada wrote:
-> > Documentation/process/changes.rst notes the minimal GNU Make version,
-> > but it is not checked anywhere.
-> >=20
-> > We could check $(MAKE_VERSION), but another simple way is to check
-> > $(.FEATURES) since the feature list always grows although this way
-> > is not always possible. For example Make 4.0 through 4.2 have the
-> > same set of $(.FEATURES).
-> >=20
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
->=20
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+On Sun 11 Dec 2022 18:49:18 GMT, Masahiro Yamada wrote:
+> modules.order lists modules in the deterministic order (that is why
+> "modules order"), and there is no duplication in the list.
 
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
-
-> > ---
-> >=20
-> > Changes in v3:
-> >   - Check the version in a different way
-> >=20
-> >  Makefile | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >=20
-> > diff --git a/Makefile b/Makefile
-> > index 2dda1e9a717a..66dfc5751470 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -11,6 +11,11 @@ NAME =3D Hurr durr I'ma ninja sloth
-> >  # Comments in this file are targeted only to the developer, do not
-> >  # expect to learn how to build the kernel reading this file.
-> > =20
-> > +# Ensure Make >=3D 3.82
-> > +ifeq ($(filter undefine,$(.FEATURES)),)
-> > +$(error Make $(MAKE_VERSION) is too old)
->=20
-> Would it make sense to state what version is needed, similar to the
-> Kconfig checks for compiler and binutils?
-
-Checking against 'undefine' (introduced in make-3.82~38) is quite a=20
-nice way, I think.  Otherwise we needed something like
-$(filter 3.82% 3.9% 4.% 5.% ..., $(MAKE_VERSION)).
+Isn't a subdirectory's modules.order just created by
+concatenation of $(obj-m) (w/ respect to mentioned subdirs)?
+Thus, "no duplication" seems to be true, as long as there is no obj-m=20
+containing duplicated entries.  Do we ensure unique entries in obj-m=20
+only?
 
 Kind regards,
 Nicolas
 
---qiUajzA37JnJs5lE
+>=20
+> $(sort ) is pointless.
+>=20
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+>=20
+>  scripts/Makefile.modfinal | 2 +-
+>  scripts/Makefile.modinst  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+> index 25bedd83644b..4705d32388f3 100644
+> --- a/scripts/Makefile.modfinal
+> +++ b/scripts/Makefile.modfinal
+> @@ -13,7 +13,7 @@ include $(srctree)/scripts/Kbuild.include
+>  include $(srctree)/scripts/Makefile.lib
+> =20
+>  # find all modules listed in modules.order
+> -modules :=3D $(sort $(shell cat $(MODORDER)))
+> +modules :=3D $(shell cat $(MODORDER))
+> =20
+>  __modfinal: $(modules)
+>  	@:
+> diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+> index a4c987c23750..f4cff42069ad 100644
+> --- a/scripts/Makefile.modinst
+> +++ b/scripts/Makefile.modinst
+> @@ -9,7 +9,7 @@ __modinst:
+>  include include/config/auto.conf
+>  include $(srctree)/scripts/Kbuild.include
+> =20
+> -modules :=3D $(sort $(shell cat $(MODORDER)))
+> +modules :=3D $(shell cat $(MODORDER))
+> =20
+>  ifeq ($(KBUILD_EXTMOD),)
+>  dst :=3D $(MODLIB)/kernel
+> --=20
+> 2.34.1
+
+--=20
+epost|xmpp: nicolas@fjasle.eu          irc://oftc.net/nsc
+=E2=86=B3 gpg: 18ed 52db e34f 860e e9fb  c82b 7d97 0932 55a0 ce7f
+     -- frykten for herren er opphav til kunnskap --
+
+--Upav2svuIRAE6goJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmOX+GAACgkQB1IKcBYm
-EmmqMRAA1vftfyhTMiJEISX7t3qa8wCAh+1VeF5PU9lURhfbjBQ+FnKhwP1zjwzG
-Jc0SlnaS/1kAHnl14G6l9bUJ160D5x0adWAj5t4DGhNIwhWu/S5yE6rFvteTGJSN
-FinR+NzfKTHq+N19XutmPzxgh8P/ZusMUqgtsTyma4JLWXVZe/JYC4yJgFfDRa2m
-7/0YriULcEs6F4SnoFnsr+iI1ega4hsQC8+OPvK3JFltot4RVc7Oz6lwARaaeJoI
-c0nPFlgpoM0sryZOxRqt3niccJmxf1kBB7i4AZfXet9bFVwAwRCGpG7O/lzIXqgk
-/HbYCK7dtt3AxlCJhk61efXl2vTSY0Keb60/tkQltCUMCgNn5BwcJ8StW/lKbrXD
-UHL/AM2LPubXGftn8MACblkGoWEczOCWPD82GCRlhaJkqBFTYDtWxQ8vQkZCIOLV
-8AIYdL7urwAnxoP3aGmeBPDGZFk+Pm2ZQQFqPOzs31uHpWMySCAzn4zXLaXJpbGw
-lFMX61p/v8VQLVOsyTg+Ve3wkEPyjdWrMaEf84rEQ4gTmMm3FgflX3qP1q9OePJN
-6923JwsEsZnswzetBOfnCnxDui+yCuSkEIMCdTzpzx4Z6una42E7N8og0so6q8Uq
-YX2doQgdo+UGI6Q0JuoHWOj6xTDGyqhiV/iWGbUuSmT3pw0BKAI=
-=tiub
+iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmOX/PcACgkQB1IKcBYm
+Eml6exAAsCxV0lz3EyMp9YaivYDv2cQ601+Et58gZhXxNwrvi+pOBg+3lqRPdkaM
+D5v+O/fCiAKmYf9rDMUyaS+OFiyKjOTzWAHCR62goP5TQK2jgmRNEl74CUjAXxlD
+10QKNQe/tOyK9MFgZzVzO0ineDDXLTqzTy7+jdmS8xK0Xssm1U2XkDQgMYvO4Np3
+PFS5Hd989d03bjUQSc2gL7cSOzUeMrs2rXOwVFF6su92nbm/a17XcdsDniE+YKl8
+VNT1Vuf4p22ZilJCd1+C/oJrW+fUhCXBw7heI7/jCkUCNESrQiyx16xb9QznS9gn
+kh2rzmfrCbZZisBdgtF5Mp5FaFJMNxEQ1nGIgOc179Rzc/0I2KYa2o3aYXmIuFxh
+wA7H2ytwXeALWb1mGiQ5Vc9YVvp+qFlhX8beX7yY/6XbPvTgF0lLOguaMCXYXW88
+bqZ3rFHLIuP6sYAvQltXkfHkerF29hv4YRseazminlEYk3fgjTSQr0CG4rK5JZ+g
+hwhUYpOTY07qKOLHRBNXZVQwlAA9F0foLbB3xFwRaCs4KbzbdcadGlO5MM+BA/Ws
+o/+O3Jxu9coedlBVsLTl4caYGN/jaK/pXjiaEn4u5AVGgsDrQ4zjCdNbCKGfktoJ
+xWpl9+gxeZrjPMnsYPtGBNn4d4VTyETwPYo/I9oKxPfeylrWpUE=
+=mA0S
 -----END PGP SIGNATURE-----
 
---qiUajzA37JnJs5lE--
+--Upav2svuIRAE6goJ--
