@@ -2,36 +2,36 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B37FC4332F
-	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 18:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC365C10F1D
+	for <linux-kbuild@archiver.kernel.org>; Tue, 13 Dec 2022 18:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236548AbiLMSgK (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Tue, 13 Dec 2022 13:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
+        id S236619AbiLMSgM (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
+        Tue, 13 Dec 2022 13:36:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236622AbiLMSft (ORCPT
+        with ESMTP id S236671AbiLMSfx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Dec 2022 13:35:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4802528A;
-        Tue, 13 Dec 2022 10:35:49 -0800 (PST)
+        Tue, 13 Dec 2022 13:35:53 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A062528F;
+        Tue, 13 Dec 2022 10:35:52 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7556616D9;
-        Tue, 13 Dec 2022 18:35:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E8CC433EF;
-        Tue, 13 Dec 2022 18:35:47 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DA095616DA;
+        Tue, 13 Dec 2022 18:35:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F3B1C43392;
+        Tue, 13 Dec 2022 18:35:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670956548;
-        bh=RwcV3yZ+zQ6XKY/GbgFiJKf5T1kYYz04kemOgRUA7uU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jvuhGbNITwreRiZ6mCd8ZfwFCEd3fpRlqFTzUWuRSggeVUUy1Orke/XEnuiI7x7Bb
-         SrYk/T4ta/dKNEBDyThYCbgfAeeIfVCjOeuVaZJ1D0aRa+gpPvK0p2AnzqkghlIioT
-         2Y+cRX+tm2izZVigmexK+TytaJrRbgQ5OBjTcD/s4Ot4vpw5RRTWtPZGNZNBs8UCJb
-         dwfoR1DnFxBsPv3/FBgLWGajV9l9TKGuR07bfDPEbJ3boPmPZGjuwz7UqXfGk6BgXm
-         JjylM3Xbe9FWUwzrGczbKKsyWM7yQHQb8T5KMcw1ZBnHM0QLO6LwYEYlHWQDliUOhD
-         b7jXvkj3/YJ+A==
+        s=k20201202; t=1670956551;
+        bh=zP20aDjnUQPn1P7/uYtDstE9AmCYWnXCx1jW4UCPLd0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=b4I19TCYll82qUU7uOX/Wqwot21STcEHJ5idUJO82gRdoaAprx+YSIW3rU6CzNcul
+         zKWe3CIzJ81Vet50Y9CW/9fPlKr8FDdNnql+xME6UHb49fOC9G6gAdbQgoISOh7NHV
+         931dgVIKZEG5V7Vbg8ZjvsNnJq3Q9mlpZ9zowdNptW0LkoP/dCaC60QlPxlg0M+y1Y
+         ySd+6ySAnYLsKvKPMy/Rg8668WpU1FBnqJfn0bJk9gB+A3mEGBi3ilffjn47R3baOS
+         rYTOU3epfXv4dS3gSW3ZsC+wLk0aVlcGFAVlyB/MDgL9JQRn+jD1iIJVuw8HnqUgQD
+         +N3CkcRmI6cFQ==
 From:   Nathan Chancellor <nathan@kernel.org>
 To:     Masahiro Yamada <masahiroy@kernel.org>
 Cc:     Nick Desaulniers <ndesaulniers@google.com>,
@@ -41,59 +41,57 @@ Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         llvm@lists.linux.dev, patches@lists.linux.dev,
         Nathan Chancellor <nathan@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v3 0/2] Fix lack of section mismatch warnings with LTO
-Date:   Tue, 13 Dec 2022 11:35:27 -0700
-Message-Id: <20221213183529.766630-1-nathan@kernel.org>
+        Alexander Lobakin <alexandr.lobakin@intel.com>
+Subject: [PATCH v3 2/2] modpost: Include '.text.*' in TEXT_SECTIONS
+Date:   Tue, 13 Dec 2022 11:35:29 -0700
+Message-Id: <20221213183529.766630-3-nathan@kernel.org>
 X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20221213183529.766630-1-nathan@kernel.org>
+References: <20221213183529.766630-1-nathan@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-Hi all,
+Commit 6c730bfc894f ("modpost: handle -ffunction-sections") added
+".text.*" to the OTHER_TEXT_SECTIONS macro to fix certain section
+mismatch warnings. Unfortunately, this makes it impossible for modpost
+to warn about section mismatches with LTO, which implies
+'-ffunction-sections', as all functions are put in their own
+'.text.<func_name>' sections, which may still reference functions in
+sections they are not supposed to, such as __init.
 
-Vincent recently reported an issue with lack of section mismatch
-warnings with LTO. This is due to commit 6c730bfc894f ("modpost: handle
--ffunction-sections"), which ignores all function sections for modpost.
+Fix this by moving ".text.*" into TEXT_SECTIONS, so that configurations
+with '-ffunction-sections' will see warnings about mismatched sections.
 
-I believe this is incorrect, as these function sections may still refer
-to symbols in other sections and they will ultimately be coalesced into
-.text by vmlinux.lds anyways.
+Link: https://lore.kernel.org/Y39kI3MOtVI5BAnV@google.com/
+Reported-by: Vincent Donnefort <vdonnefort@google.com>
+Reviewed-and-tested-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Tested-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ scripts/mod/modpost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The first patch fixes a warning that I see with allmodconfig + ThinLTO
-builds after applying the second patch. The second patch moves ".text.*"
-into TEXT_SECTIONS so that modpost audits them for mismatches.
-
-I expect this to go via the kbuild tree with an ack from the padata
-maintainers.
-
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: linux-crypto@vger.kernel.org
-
-v3:
-  - Stick a comment above padata_work_init() to explain presence of
-    __ref (Masahiro, Daniel).
-  - Expand on problem in first patch's commit message (Masahiro).
-  - Adjust location of __ref within function definition (Daniel)
-  - Fix typo in commit message of second patch (Masahiro).
-v2: https://lore.kernel.org/20221207191657.2852229-1-nathan@kernel.org/
-v1: https://lore.kernel.org/20221129190123.872394-1-nathan@kernel.org/
-
-Nathan Chancellor (2):
-  padata: Mark padata_work_init() as __ref
-  modpost: Include '.text.*' in TEXT_SECTIONS
-
- kernel/padata.c       | 12 ++++++++++--
- scripts/mod/modpost.c |  4 ++--
- 2 files changed, 12 insertions(+), 4 deletions(-)
-
-
-base-commit: 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 2c80da0220c3..c861beabc128 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -823,10 +823,10 @@ static void check_section(const char *modname, struct elf_info *elf,
+ #define ALL_EXIT_SECTIONS EXIT_SECTIONS, ALL_XXXEXIT_SECTIONS
+ 
+ #define DATA_SECTIONS ".data", ".data.rel"
+-#define TEXT_SECTIONS ".text", ".text.unlikely", ".sched.text", \
++#define TEXT_SECTIONS ".text", ".text.*", ".sched.text", \
+ 		".kprobes.text", ".cpuidle.text", ".noinstr.text"
+ #define OTHER_TEXT_SECTIONS ".ref.text", ".head.text", ".spinlock.text", \
+-		".fixup", ".entry.text", ".exception.text", ".text.*", \
++		".fixup", ".entry.text", ".exception.text", \
+ 		".coldtext", ".softirqentry.text"
+ 
+ #define INIT_SECTIONS      ".init.*"
 -- 
 2.39.0
 
