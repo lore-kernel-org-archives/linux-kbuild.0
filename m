@@ -2,121 +2,83 @@ Return-Path: <linux-kbuild-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A27C4332F
-	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Dec 2022 06:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B719EC001B2
+	for <linux-kbuild@archiver.kernel.org>; Wed, 14 Dec 2022 11:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237429AbiLNGxC (ORCPT <rfc822;linux-kbuild@archiver.kernel.org>);
-        Wed, 14 Dec 2022 01:53:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40050 "EHLO
+        id S238151AbiLNLFU convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-kbuild@archiver.kernel.org>);
+        Wed, 14 Dec 2022 06:05:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiLNGxA (ORCPT
+        with ESMTP id S238142AbiLNLFT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Dec 2022 01:53:00 -0500
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C434A3897;
-        Tue, 13 Dec 2022 22:52:58 -0800 (PST)
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 2BE6qgeX000412;
-        Wed, 14 Dec 2022 15:52:43 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 2BE6qgeX000412
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1671000763;
-        bh=kUp70rP8+WE375gZo6RwGVSoC7tN1va3x0gcuXXmVAc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=fWj4uAFnhzIPVRwYJ4AcO3K43yxwwVige5gzPnptks2Dc9KHP0gdXw9ZgqA7lVN/l
-         tBYwl+YsZkBxWNB6vDEkAPbxh+LGu0R8VVXeBNF/q9nkYNMYlt80QOkhs5MKWZLikb
-         4PtdUJLwxzTDWDgGmc4daFosAMPfFbyWowixaKgfddq67sxqKUJo4z/Phn13gitaOo
-         1D6D4U25eKwdG0sxEmLzfJPnw93R5vNJh9rGwzFvRBld/t5o65vDgOWr/byh9tc6U4
-         Hr4F4MOPTsrLu4ux++vp+Dz3LZ7GEgyPxg2Jv94UDbgNnzvr2cunvmVVwmEvgZavlo
-         tF8MkaknFwwOg==
-X-Nifty-SrcIP: [209.85.210.51]
-Received: by mail-ot1-f51.google.com with SMTP id x25-20020a056830115900b00670932eff32so1244238otq.3;
-        Tue, 13 Dec 2022 22:52:43 -0800 (PST)
-X-Gm-Message-State: ANoB5pnaFpu9knjPXF18CWtwdt1uiMu46BvaX5wVKNtZp6cDwV4cv0pR
-        UysForg8Qth7nMfLYIhwv3ZLUbYKvxBxWOAyZQo=
-X-Google-Smtp-Source: AA0mqf4hyLaZPZqPEZgMASVAcc5qkFLGibxEUKGsAwT9Hi2h9o8TOTn1hbIUpkclYCt2W71rUBR6CM5VPiXHvUbYKqI=
-X-Received: by 2002:a9d:282:0:b0:66c:794e:f8c6 with SMTP id
- 2-20020a9d0282000000b0066c794ef8c6mr49412729otl.343.1671000762325; Tue, 13
- Dec 2022 22:52:42 -0800 (PST)
+        Wed, 14 Dec 2022 06:05:19 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51176E79
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Dec 2022 03:05:16 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-242-JdesrG8NMdGniNtm-PNc3Q-1; Wed, 14 Dec 2022 11:05:13 +0000
+X-MC-Unique: JdesrG8NMdGniNtm-PNc3Q-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 14 Dec
+ 2022 11:05:10 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Wed, 14 Dec 2022 11:05:10 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Nicolas Schier' <nicolas@fjasle.eu>,
+        Nathan Chancellor <nathan@kernel.org>
+CC:     Masahiro Yamada <masahiroy@kernel.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: RE: [PATCH] kbuild: ensure Make >= 3.82 is used
+Thread-Topic: [PATCH] kbuild: ensure Make >= 3.82 is used
+Thread-Index: AQHZDqgK2HakTLHXy0uTd8KCKGQlc65tOHlQ
+Date:   Wed, 14 Dec 2022 11:05:10 +0000
+Message-ID: <6c4413040a624b728081e27213fb46a1@AcuMS.aculab.com>
+References: <20221211030352.2622425-1-masahiroy@kernel.org>
+ <Y5djBr9rVhSq8+iK@dev-arch.thelio-3990X> <Y5f4ZgyK7QlqYu31@bergen.fjasle.eu>
+In-Reply-To: <Y5f4ZgyK7QlqYu31@bergen.fjasle.eu>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-References: <20221213183529.766630-1-nathan@kernel.org>
-In-Reply-To: <20221213183529.766630-1-nathan@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 14 Dec 2022 15:52:06 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR6aPQEM3e_yuq4jgCAAiJ+cr6xGvG1N4uZfw70xk_YSg@mail.gmail.com>
-Message-ID: <CAK7LNAR6aPQEM3e_yuq4jgCAAiJ+cr6xGvG1N4uZfw70xk_YSg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] Fix lack of section mismatch warnings with LTO
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-kbuild.vger.kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 3:35 AM Nathan Chancellor <nathan@kernel.org> wrote:
->
-> Hi all,
->
-> Vincent recently reported an issue with lack of section mismatch
-> warnings with LTO. This is due to commit 6c730bfc894f ("modpost: handle
-> -ffunction-sections"), which ignores all function sections for modpost.
->
-> I believe this is incorrect, as these function sections may still refer
-> to symbols in other sections and they will ultimately be coalesced into
-> .text by vmlinux.lds anyways.
->
-> The first patch fixes a warning that I see with allmodconfig + ThinLTO
-> builds after applying the second patch. The second patch moves ".text.*"
-> into TEXT_SECTIONS so that modpost audits them for mismatches.
->
-> I expect this to go via the kbuild tree with an ack from the padata
-> maintainers.
+From: Nicolas Schier
+> Sent: 13 December 2022 03:59
+...
+> > > diff --git a/Makefile b/Makefile
+> > > index 2dda1e9a717a..66dfc5751470 100644
+> > > --- a/Makefile
+> > > +++ b/Makefile
+> > > @@ -11,6 +11,11 @@ NAME = Hurr durr I'ma ninja sloth
+> > >  # Comments in this file are targeted only to the developer, do not
+> > >  # expect to learn how to build the kernel reading this file.
+> > >
+> > > +# Ensure Make >= 3.82
 
+Wouldn't it be better to say either:
+	# Ensure gmake supports 'undefine' (added in 3.82)
+or:
+	# Building with gmake versions prior to 3.82 fails due to
+	# bug 'brief description'.
+	# Check for 'undefine' support as a surrogate for the bug fix.
 
-Daniel Acked v2.
+    David
 
-Applied to kbuild with his Acked-by.
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-Thanks.
-
-
->
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Cc: linux-crypto@vger.kernel.org
->
-> v3:
->   - Stick a comment above padata_work_init() to explain presence of
->     __ref (Masahiro, Daniel).
->   - Expand on problem in first patch's commit message (Masahiro).
->   - Adjust location of __ref within function definition (Daniel)
->   - Fix typo in commit message of second patch (Masahiro).
-> v2: https://lore.kernel.org/20221207191657.2852229-1-nathan@kernel.org/
-> v1: https://lore.kernel.org/20221129190123.872394-1-nathan@kernel.org/
->
-> Nathan Chancellor (2):
->   padata: Mark padata_work_init() as __ref
->   modpost: Include '.text.*' in TEXT_SECTIONS
->
->  kernel/padata.c       | 12 ++++++++++--
->  scripts/mod/modpost.c |  4 ++--
->  2 files changed, 12 insertions(+), 4 deletions(-)
->
->
-> base-commit: 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
-> --
-> 2.39.0
->
-
-
--- 
-Best Regards
-Masahiro Yamada
